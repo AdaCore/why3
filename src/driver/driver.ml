@@ -75,6 +75,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let printer   = ref None in
   let transform = ref [] in
   let timeregexps = ref [] in
+  let stepsregexps = ref [] in
   let blacklist = Queue.create () in
 
   let set_or_raise loc r v error = match !r with
@@ -91,6 +92,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
+    | StepRegexp (r,ns) -> add_to_list stepsregexps (Call_provers.stepsregexp r ns)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
@@ -197,6 +199,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       {
       prp_regexps     = List.rev !regexps;
       prp_timeregexps = List.rev !timeregexps;
+      prp_stepsregexp = List.rev !stepsregexps;
       prp_exitcodes   = List.rev !exitcodes;
     };
     drv_tag         = !driver_tag;

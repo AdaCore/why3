@@ -8,13 +8,9 @@ prelude "(set-logic AUFBVNIRA)"
 
 import "smt-libv2.drv"
 
-(* regexp for steps should match things like
+(* regexp for steps *)
+steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
 
-smt::SmtEngine::resourceUnitsUsed, 1041
-
-but not in the same line as the "valid" answer
-
-*)
 
 (* CVC4 division seems to be neither the Euclidean one, nor the Computer one *)
 (*

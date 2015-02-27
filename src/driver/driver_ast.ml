@@ -60,6 +60,7 @@ type global =
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
   | TimeRegexp of string
+  | StepRegexp of string * int
   | ExitCodeValid of int
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
