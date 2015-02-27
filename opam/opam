@@ -32,13 +32,14 @@ depends: [
   "conf-gtksourceview"
   "camlzip"
   "zarith"
+  "menhir"
 ]
 depopts: [
   "ocamlgraph" {>= "1.8.2"}
-  "coq" {>= "8.4"}
+  "coq"        {>= "8.4"}
+  "zenon"
 ]
 messages: [
   "Proving with Coq won't be possible unless you install the coq package"
   {! coq:installed}
 ]
-
