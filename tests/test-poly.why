@@ -28,6 +28,14 @@ with b = G | H a
 
 goal g3 : forall x. x <> F (H x)
 
+type v = I (p:t) | J (p:t) u
+
+constant x : v
+
+goal g4 : match x with I y -> y=A | J y (D z) -> z=A | J B z -> z=C | J A C -> true end
+
+goal g5 : match x with I y -> y | J y _ -> y end = A
+
 end
 
 

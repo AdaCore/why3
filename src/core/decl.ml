@@ -804,4 +804,3 @@ let make_record_pattern kn fll ty =
     | None -> pat_wild (ty_inst s (Opt.get pj.ls_value))
   in
   pat_app cs (List.map get_arg pjl) ty
-
