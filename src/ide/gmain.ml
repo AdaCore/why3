@@ -322,17 +322,22 @@ let goals_model,goals_view =
 
 
 (******************************)
-(* vertical paned on the right*)
+(*    notebook on the right   *)
 (******************************)
 
-let right_vb = GPack.vbox ~packing:hp#add ()
+let notebook = GPack.notebook ~packing:hp#add ()
 
-let vp =
-  try
-    GPack.paned `VERTICAL ~packing:right_vb#add ()
-  with Gtk.Error _ -> assert false
+let source_page,source_tab =
+  let label = GMisc.label ~text:"Source code" () in
+  0, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
-let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
+let task_page,task_tab =
+  let label = GMisc.label ~text:"Task/Prover Output" () in
+  1, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let right_hb = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
 
 (******************)
 (* goal text view *)
@@ -341,20 +346,13 @@ let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
 let scrolled_task_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
-
-let (_ : GtkSignal.id) =
-  scrolled_task_view#misc#connect#size_allocate
-    ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} ->
-       gconfig.task_height <- h)
+    ~shadow_type:`ETCHED_OUT ~packing:task_tab#add ()
 
 let task_view =
   GSourceView2.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_task_view#add
-    ~height:gconfig.task_height
     ()
 
 let modifiable_sans_font_views = ref [goals_view#misc]
@@ -421,13 +419,13 @@ let set_proof_state a =
     (image_of_result ~obsolete res);
   let t = match res with
     | S.Done { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
-       let s = 
+       let s =
         if gconfig.show_time_limit then
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
        in
-       if steps >= 0 then 
+       if steps >= 0 then
 	 Format.sprintf "%s (steps: %d)" s steps
        else
 	 s
@@ -535,6 +533,10 @@ let update_task_view a =
               Buffer.contents b
             | S.Done r ->
               let out = r.Call_provers.pr_output in
+              let out = if out = "" then
+                  "Output not available. Rerun it with \"Replay\" button"
+                else out
+              in
               begin
                 let env = env_session () in
                 match S.get_edited_as_abs env.S.session a with
@@ -771,7 +773,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   in ()
 
 let file_info = GMisc.label ~text:""
-  ~packing:(right_hb#pack ~fill:true) ()
+  ~packing:(source_tab#pack ~fill:true) ()
 
 let warnings = Queue.create ()
 
@@ -1835,7 +1837,7 @@ let (_ : GMenu.image_menu_item) =
 
 let scrolled_source_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-  ~packing:vp#add ~shadow_type:`ETCHED_OUT
+  ~packing:source_tab#add ~shadow_type:`ETCHED_OUT
   ()
 
 let source_view =
@@ -1902,9 +1904,7 @@ let color_loc (v:GSourceView2.source_view) ~color l b e =
   let stop = start#forward_chars (e-b) in
   buf#apply_tag ~start ~stop color
 
-let scroll_to_loc ?(yalign=0.0) ~color loc =
-  reset_gc ();
-  let (f,l,b,e) = Loc.get loc in
+let scroll_to_file f =
   if f <> !current_file then
     begin
       let lang =
@@ -1915,7 +1915,12 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
       source_view#source_buffer#set_language lang;
       source_view#source_buffer#set_text (source_text f);
       set_current_file f;
-    end;
+    end
+
+let scroll_to_loc ?(yalign=0.0) ~color loc =
+  reset_gc ();
+  let (f,l,b,e) = Loc.get loc in
+  scroll_to_file f;
   move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
   (* FIXME: use another color or none at all *)
@@ -2257,17 +2262,20 @@ let select_row r =
   update_task_view a;
   match a with
     | S.Goal g ->
-       scroll_to_source_goal g
+      scroll_to_source_goal g
     | S.Theory th ->
-        scroll_to_theory th
-    | S.File _file -> ()
-        (* scroll_to_file file *)
+      scroll_to_theory th;
+      notebook#goto_page source_page (* go to "source" tab *)
+    | S.File file ->
+      scroll_to_file (Filename.concat project_dir file.S.file_name);
+      notebook#goto_page source_page (* go to "source" tab *)
     | S.Proof_attempt a ->
-        scroll_to_source_goal a.S.proof_parent
+      scroll_to_source_goal a.S.proof_parent;
+      notebook#goto_page task_page (* go to "prover output" tab *)
     | S.Transf tr ->
-        scroll_to_source_goal tr.S.transf_parent
+      scroll_to_source_goal tr.S.transf_parent
     | S.Metas m ->
-        scroll_to_source_goal m.S.metas_parent
+      scroll_to_source_goal m.S.metas_parent
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =

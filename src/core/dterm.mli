@@ -103,6 +103,6 @@ val dterm : ?loc:Loc.position -> dterm_node -> dterm
 
 (** Final stage *)
 
-val term : strict:bool -> keep_loc:bool -> dterm -> term
+val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 
-val fmla : strict:bool -> keep_loc:bool -> dterm -> term
+val fmla : ?strict:bool -> ?keep_loc:bool -> dterm -> term

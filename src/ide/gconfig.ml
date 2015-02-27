@@ -44,7 +44,6 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
-      mutable task_height : int;
       mutable verbose : int;
       mutable default_prover : string; (* "" means none *)
       mutable default_editor : string;
@@ -219,7 +218,6 @@ let load_config config original_config env =
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
-    task_height   = ide.ide_task_height;
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
     show_labels   = ide.ide_show_labels ;
@@ -292,7 +290,6 @@ let save_config t =
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
   let ide = set_int ide "tree_width" t.tree_width in
-  let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "intro_premises" t.intro_premises in
   let ide = set_bool ide "print_labels" t.show_labels in

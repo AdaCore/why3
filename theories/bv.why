@@ -38,7 +38,7 @@ theory BitVector
     forall n:int. 0 <= n < size -> nth zero n = False
 
   constant ones : t
-  axiom Nth_ones: 
+  axiom Nth_ones:
     forall n:int. 0 <= n < size -> nth ones n = True
 
   function bw_and (v1 v2 : t) : t
@@ -65,7 +65,7 @@ theory BitVector
   (** rotate left *)
 
   axiom Nth_rotate_left_high:
-    forall v:t, n:int. 
+    forall v:t, n:int.
        0 < n < size -> nth (rotate_left v) n = nth v (n - 1)
 
   axiom  Nth_rotate_left_low:
@@ -87,11 +87,11 @@ theory BitVector
   function lsr t int : t
 
   axiom Lsr_nth_low:
-    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size -> 
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size ->
       nth (lsr b s) n = nth b (n+s)
 
   axiom Lsr_nth_high:
-    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> 
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size ->
       nth (lsr b s) n = False
 
   function lsr_bv t t : t
@@ -147,10 +147,10 @@ theory BitVector
   axiom of_int_is_mod:
     forall i:int. to_uint( of_int i ) = mod i two_power_size
 
-  axiom of_int_extmod:  
-    forall i,j:int. of_int i = of_int j -> 
+  axiom of_int_extmod:
+    forall i,j:int. of_int i = of_int j ->
       mod i two_power_size = mod j two_power_size
-  
+
   function of_int_const int : t
 
   axiom of_int_const_to_int:
@@ -161,19 +161,19 @@ theory BitVector
 
   (* TODO? axioms related to_int/to_unit and of_int *)
 
-  (** addition modulo 2^m *) 
+  (** addition modulo 2^m *)
   function add (v1 v2 : t) : t
-  
+
   (** 2's complement subtraction modulo 2^m *)
   function sub (v1 v2 : t) : t
-      
+
   (** 2's complement unary minus *)
   function neg (v1 : t) : t
- 
-  (** multiplication modulo 2^m *)	
+
+  (** multiplication modulo 2^m *)
   function mul (v1 v2 : t) : t
 
-  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)  
+  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
   function udiv (v1 v2 : t) : t
 
   (** unsigned remainder from truncating division (undefined if divisor is 0) *)
@@ -258,7 +258,7 @@ theory BitVectorWithAxiom
     forall n:int. 0 <= n < size -> nth zero n = False
 
   constant ones : t
-  axiom Nth_ones: 
+  axiom Nth_ones:
     forall n:int. 0 <= n < size -> nth ones n = True
 
   function bw_and (v1 v2 : t) : t
@@ -285,7 +285,7 @@ theory BitVectorWithAxiom
   (** rotate left *)
 
   axiom Nth_rotate_left_high:
-    forall v:t, n:int. 
+    forall v:t, n:int.
        0 < n < size -> nth (rotate_left v) n = nth v (n - 1)
 
   axiom  Nth_rotate_left_low:
@@ -307,11 +307,11 @@ theory BitVectorWithAxiom
   function lsr t int : t
 
   axiom Lsr_nth_low:
-    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size -> 
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size ->
       nth (lsr b s) n = nth b (n+s)
 
   axiom Lsr_nth_high:
-    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> 
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size ->
       nth (lsr b s) n = False
 
   function lsr_bv t t : t
@@ -370,10 +370,10 @@ theory BitVectorWithAxiom
   axiom of_int_is_mod:
     forall i:int. to_uint( of_int i ) = mod i two_power_size
 
-  axiom of_int_extmod:  
-    forall i,j:int. of_int i = of_int j -> 
+  axiom of_int_extmod:
+    forall i,j:int. of_int i = of_int j ->
       mod i two_power_size = mod j two_power_size
-  
+
   function of_int_const int : t
 
   axiom of_int_const_to_int:
@@ -387,27 +387,27 @@ theory BitVectorWithAxiom
 
   (* TODO? axioms related to_int/to_unit and of_int *)
 
-  (** addition modulo 2^m *) 
+  (** addition modulo 2^m *)
   function add (v1 v2 : t) : t
   axiom Add_is_add:
     forall v1 v2:t. to_uint( add v1 v2 ) = mod( to_uint (v1) + to_uint (v2) ) two_power_size
-  
+
   (** 2's complement subtraction modulo 2^m *)
   function sub (v1 v2 : t) : t
   axiom Min_is_min:
     forall v1 v2:t. to_uint( sub v1 v2 ) = mod( to_uint (v1) - to_uint (v2) ) two_power_size
-      
+
   (** 2's complement unary minus *)
   function neg (v1 : t) : t
   axiom Neg_is_neg:
     forall v:t. to_uint( neg v ) = mod( -to_uint (v) ) two_power_size
-  
-  (** multiplication modulo 2^m *)	
+
+  (** multiplication modulo 2^m *)
   function mul (v1 v2 : t) : t
   axiom Mul_is_mul:
     forall v1 v2:t. to_uint( mul v1 v2 ) = mod (to_uint (v1) * to_uint (v2) ) two_power_size
 
-  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)  
+  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
   function udiv (v1 v2 : t) : t
   axiom Udiv_is_udiv:
     forall v1 v2:t. to_uint( udiv v1 v2 ) = div ( to_uint v1 ) ( to_uint v2 )
@@ -464,10 +464,10 @@ end
 theory BV32Ax
   constant size: int = 32
   constant two_power_size : int = 0x1_0000_0000
-  clone export BitVectorWithAxiom with 
-    constant size = size, 
-    constant two_power_size = two_power_size, 
-    goal size_pos, 
+  clone export BitVectorWithAxiom with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
     lemma val_two_power_size
 end
 
@@ -476,9 +476,9 @@ end
 theory BV31
   constant size: int = 31
   constant two_power_size : int = 0x8000_0000
-  clone export BitVector with 
-    constant size = size, 
-    constant two_power_size = two_power_size,     
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
     goal size_pos,
     lemma val_two_power_size
 end
@@ -488,10 +488,10 @@ end
 theory BV32
   constant size: int = 32
   constant two_power_size : int = 0x1_0000_0000
-  clone export BitVector with 
-    constant size = size, 
-    constant two_power_size = two_power_size, 
-    goal size_pos, 
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
     lemma val_two_power_size
 end
 
@@ -500,10 +500,10 @@ end
 theory BV63
   constant size: int = 63
   constant two_power_size : int = 0x8000_0000_0000_0000
-  clone export BitVector with 
-    constant size = size, 
-    constant two_power_size = two_power_size, 
-    goal size_pos, 
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
     lemma val_two_power_size
 end
 
@@ -512,8 +512,8 @@ end
 theory BV64
   constant size: int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
-  clone export BitVector with 
-    constant size = size, 
+  clone export BitVector with
+    constant size = size,
     constant two_power_size = two_power_size,
     goal size_pos,
     lemma val_two_power_size
@@ -524,10 +524,10 @@ end
 theory BV8
   constant size: int = 8
   constant two_power_size : int = 0x100
-  clone export BitVector with 
-    constant size = size, 
-    constant two_power_size = two_power_size, 
-    goal size_pos, 
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
     lemma val_two_power_size
 end
 
@@ -536,10 +536,10 @@ end
 theory BV16
   constant size: int = 16
   constant two_power_size : int = 0x1_0000
-  clone export BitVector with 
-    constant size = size, 
-    constant two_power_size = two_power_size, 
-    goal size_pos, 
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
     lemma val_two_power_size
 end
 
@@ -563,8 +563,8 @@ end
 theory BVConverter_32_64
   use BV32
   use BV64
-       
-  clone export BVConverter with 
+
+  clone export BVConverter with
     type bigBV = BV64.t,
     type smallBV = BV32.t
 end
@@ -573,7 +573,7 @@ theory BVConverter_16_64
   use BV16
   use BV64
 
-  clone export BVConverter with 
+  clone export BVConverter with
     type bigBV = BV64.t,
     type smallBV = BV16.t
 end
@@ -582,7 +582,7 @@ theory BVConverter_8_64
   use BV8
   use BV64
 
-  clone export BVConverter with 
+  clone export BVConverter with
     type bigBV = BV64.t,
     type smallBV = BV8.t
 end
@@ -591,7 +591,7 @@ theory BVConverter_16_32
   use BV16
   use BV32
 
-  clone export BVConverter with 
+  clone export BVConverter with
     type bigBV = BV32.t,
     type smallBV = BV16.t
 end
@@ -601,7 +601,7 @@ theory BVConverter_8_32
   use BV8
   use BV32
 
-  clone export BVConverter with 
+  clone export BVConverter with
     type bigBV = BV32.t,
     type smallBV = BV8.t
 end
@@ -610,7 +610,7 @@ theory BVConverter_8_16
   use BV8
   use BV16
 
-  clone export BVConverter with 
+  clone export BVConverter with
     type bigBV = BV16.t,
     type smallBV = BV8.t
 end

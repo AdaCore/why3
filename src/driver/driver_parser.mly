@@ -74,14 +74,15 @@ theory:
     { { thr_name = $2; thr_rules = $3 } }
 
 trule:
-| PRELUDE STRING                   { Rprelude  ($2) }
-| SYNTAX TYPE      qualid STRING   { Rsyntaxts ($3, $4) }
-| SYNTAX CONSTANT  qualid STRING   { Rsyntaxfs ($3, $4) }
-| SYNTAX FUNCTION  qualid STRING   { Rsyntaxfs ($3, $4) }
-| SYNTAX PREDICATE qualid STRING   { Rsyntaxps ($3, $4) }
-| REMOVE PROP qualid               { Rremovepr ($3) }
-| META ident meta_args             { Rmeta     ($2, $3) }
-| META STRING meta_args            { Rmeta     ($2, $3) }
+| PRELUDE STRING                   { Rprelude   ($2) }
+| SYNTAX TYPE      qualid STRING   { Rsyntaxts  ($3, $4) }
+| SYNTAX CONSTANT  qualid STRING   { Rsyntaxfs  ($3, $4) }
+| SYNTAX FUNCTION  qualid STRING   { Rsyntaxfs  ($3, $4) }
+| SYNTAX PREDICATE qualid STRING   { Rsyntaxps  ($3, $4) }
+| SYNTAX CONVERTER qualid STRING   { Rconverter ($3, $4) }
+| REMOVE PROP qualid               { Rremovepr  ($3) }
+| META ident meta_args             { Rmeta      ($2, $3) }
+| META STRING meta_args            { Rmeta      ($2, $3) }
 
 meta_args: separated_nonempty_list(COMMA,meta_arg) { $1 }
 
@@ -188,6 +189,5 @@ mrule:
 | trule                          { MRtheory $1 }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
 | SYNTAX VAL qualid STRING       { MRval ($3, $4) }
-| SYNTAX CONVERTER qualid STRING { MRconverter ($3, $4) }
 
 loc(X): X { Loc.extract ($startpos,$endpos), $1 }

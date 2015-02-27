@@ -1,18 +1,17 @@
-
 theory TestBV
 
   use import int.Int
   use import bv.BV32
 
-  constant b0000 : t = of_int 0b0000
-  constant b0001 : t = of_int 0b0001
-  constant b0010 : t = of_int 0b0010
-  constant b0011 : t = of_int 0b0011
-  constant b0110 : t = of_int 0b0110
-  constant b0101 : t = of_int 0b0101
-  constant b0111 : t = of_int 0b0111
-  constant b1100 : t = of_int 0b1100
-  constant b11100 : t = of_int 0b11100
+  constant b0000  : t = of_int_const 0b0000
+  constant b0001  : t = of_int_const 0b0001
+  constant b0010  : t = of_int_const 0b0010
+  constant b0011  : t = of_int_const 0b0011
+  constant b0110  : t = of_int_const 0b0110
+  constant b0101  : t = of_int_const 0b0101
+  constant b0111  : t = of_int_const 0b0111
+  constant b1100  : t = of_int_const 0b1100
+  constant b11100 : t = of_int_const 0b11100
 
   goal g1 : bw_and b0011 b0110 = b0010
   goal f1 : bw_and b0011 b0110 = b0011
@@ -21,14 +20,14 @@ theory TestBV
   goal f2 :  bw_or b0011 b0110 = b0110
 
   goal g3 :  bw_xor b0011 b0110 = b0101
-  goal g4 :  bw_not b0011 = (of_int 0xFFFFFFFC)
+  goal g4 :  bw_not b0011 = (of_int_const 0xFFFFFFFC)
 
   goal g3a : lsr b0111 2 = b0001
   goal g3b : lsr ones 31 = b0001
-  goal g3c : lsr ones 0x100000001 = (of_int 0x7FFFFFFF)
+  goal g3c : lsr ones 0x100000001 = (of_int_const 0x7FFFFFFF)
 
   goal g4a : lsl b0111 2 = b11100
-  goal g4b : lsl b0001 31 = (of_int 0x80000000)
+  goal g4b : lsl b0001 31 = (of_int_const 0x80000000)
 
   goal g5a : asr b0111 2 = b0001
   goal g5b : asr ones 31 = ones
@@ -59,18 +58,17 @@ theory TestBV
     forall v:t, n:int. 0 <= n < size ->
       nth (bw_not v) n = notb (nth v n)
 
-
   goal not_not : forall v:t. bw_not (bw_not v) = v
 
   goal not_and : forall v1 v2:t.
     bw_not (bw_and v1 v2) = bw_or (bw_not v1) (bw_not v2)
 
   goal Lsr_nth_low:
-    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size -> 
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size ->
       nth (lsr b s) n = nth b (n+s)
 
   goal Lsr_nth_high:
-    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> 
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size ->
       nth (lsr b s) n = False
 
   goal Asr_nth_low:
@@ -84,6 +82,5 @@ theory TestBV
 
   goal Lsl_nth_low:
     forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n-s < 0 -> nth (lsl b s) n = False
-
 
 end

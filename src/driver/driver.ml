@@ -33,7 +33,7 @@ type driver = {
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_res_parser  : prover_result_parser;
-  drv_tag         : int
+  drv_tag         : int;
 }
 
 (** parse a driver file *)
@@ -106,9 +106,9 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let f = load_file file in
   List.iter add_global f.f_global;
 
-  let thprelude = ref Mid.empty in
-  let meta      = ref Mid.empty in
-  let qualid    = ref [] in
+  let thprelude     = ref Mid.empty in
+  let meta          = ref Mid.empty in
+  let qualid        = ref [] in
 
   let find_pr th (loc,q) = try ns_find_pr th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownProp (!qualid,q)))
@@ -145,6 +145,9 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
         add_meta th td meta
+    | Rconverter (q,s) ->
+        let cs = syntax_converter (find_ls th q) s in
+        add_meta th cs meta
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
@@ -190,13 +193,13 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_thprelude   = Mid.map List.rev !thprelude;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_meta        = !meta;
-    drv_res_parser = 
+    drv_res_parser =
       {
       prp_regexps     = List.rev !regexps;
       prp_timeregexps = List.rev !timeregexps;
       prp_exitcodes   = List.rev !exitcodes;
     };
-    drv_tag         = !driver_tag
+    drv_tag         = !driver_tag;
   }
 
 let syntax_map drv =
@@ -338,4 +341,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | PSymExpected ls -> Format.fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
-

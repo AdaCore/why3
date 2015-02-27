@@ -1148,20 +1148,20 @@ and expr_fun ~keep_loc uloc env pvl dsp de =
   let xq = create_xpost dsp.ds_xpost in
   e_fun pvl p q xq e, dsp, env
 
-let val_decl ~keep_loc:_ (id,_,_,_,_,_ as vald) =
+let val_decl ?(keep_loc=true) (id,_,_,_,_,_ as vald) =
   reunify_regions ();
   Loc.try2 ?loc:id.pre_loc val_decl env_empty vald
 
-let rec_defn ~keep_loc drdf =
+let rec_defn ?(keep_loc=true) drdf =
   reunify_regions ();
   expr_rec ~keep_loc None env_empty drdf
 
-let expr ~keep_loc de =
+let expr ?(keep_loc=true) de =
   reunify_regions ();
   let e = expr ~keep_loc None env_empty false de in
   check_expr e; e
 
-let let_defn ~keep_loc (id,ghost,kind,de) =
+let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
   let e = expr ~keep_loc de in
   if e.e_ghost && not ghost then Loc.errorm ?loc:id.pre_loc
     "%s %s must be explicitly marked ghost" (match kind, e.e_vty with
