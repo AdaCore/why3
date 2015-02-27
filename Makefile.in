@@ -793,12 +793,12 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
 	    $(CAMLP5O) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
-src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cma
+src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
 	    WHY3CONFIG="" $(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
-src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
+src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cmxs
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
 	    WHY3CONFIG="" $(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
 	    touch src/coq-tactic/.why3-vo-opt
