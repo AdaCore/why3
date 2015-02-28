@@ -462,13 +462,13 @@ let run_external_proof_v3 eS eT a callback =
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
-      let stepslimit, timelimit =
+      let stepslimit =
 	match a with
 	| { proof_state =
             Done { Call_provers.pr_answer = Call_provers.Valid;
                    Call_provers.pr_steps = s };
-	    proof_obsolete = false } when s >= 0 -> s, 0
-	| _ -> -1, timelimit
+	    proof_obsolete = false } when s >= 0 -> s
+	| _ -> -1
       in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in

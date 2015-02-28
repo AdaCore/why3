@@ -184,6 +184,7 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
 let actualcommand command timelimit memlimit stepslimit file =
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
+  (* FIXME: use_stdin is never modified below ?? *)
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace s = match Str.matched_group 1 s with
@@ -199,8 +200,9 @@ let actualcommand command timelimit memlimit stepslimit file =
     | "l" -> Config.libdir
     | "d" -> Config.datadir
     | "S" -> string_of_int stepslimit
-    | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, or %d"
+    | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, %d or %S"
   in
+  (* FIXME: are we sure that tuples are evaluated from left to right ? *)
   List.map (Str.global_substitute cmd_regexp replace) arglist,
   !use_stdin, !on_timelimit
 
