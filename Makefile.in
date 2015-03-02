@@ -47,7 +47,8 @@ OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
-CAMLP5O   = @CAMLP5O@
+COQCAMLP  = @COQCAMLP@
+COQCAMLPLIB = @COQCAMLPLIB@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 
 ifeq (@enable_menhirLib@,yes)
@@ -768,7 +769,7 @@ COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
-COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
+COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
@@ -795,8 +796,8 @@ lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
-	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
-	    $(CAMLP5O) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
+	$(if $(QUIET),@echo 'Camlp    $<' &&) \
+	    $(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
