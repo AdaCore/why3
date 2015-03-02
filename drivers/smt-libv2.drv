@@ -2,7 +2,6 @@
 
 prelude ";;; this is a prelude for smt-lib v2"
 
-
 printer "smtv2"
 filename "%f-%t-%g.smt2"
 
@@ -302,10 +301,9 @@ theory bitvec.BV64
   remove prop to_int_mul
   remove prop to_int_udiv
   remove prop to_int_urem
+  remove prop to_int_lsr
+  remove prop to_int_lsl
 
-  syntax function nth
-    "(not (= (bvand (bvlshr %1 %2) (_ bv1 64))
-             (_ bv0 64)))"
   remove prop nth_ext
   remove prop Nth_zero
   remove prop Nth_ones
@@ -313,8 +311,8 @@ theory bitvec.BV64
   remove prop Nth_bw_and
   remove prop Nth_bw_xor
   remove prop Nth_bw_not
-  remove prop Nth_rotate_left_n
-  remove prop Nth_rotate_right_n
+  remove prop Nth_rotate_left
+  remove prop Nth_rotate_right
   remove prop Lsr_nth_low
   remove prop Lsr_nth_high
   remove prop Asr_nth_low
@@ -327,132 +325,12 @@ theory bitvec.BV64
   syntax predicate ugt "(bvugt %1 %2)"
   syntax predicate uge "(bvuge %1 %2)"
 
-  syntax function rotate_left_1 "((_ rotate_left 1) %1)"
-  syntax function rotate_left_2 "((_ rotate_left 2) %1)"
-  syntax function rotate_left_3 "((_ rotate_left 3) %1)"
-  syntax function rotate_left_4 "((_ rotate_left 4) %1)"
-  syntax function rotate_left_5 "((_ rotate_left 5) %1)"
-  syntax function rotate_left_6 "((_ rotate_left 6) %1)"
-  syntax function rotate_left_7 "((_ rotate_left 7) %1)"
-  syntax function rotate_left_8 "((_ rotate_left 8) %1)"
-  syntax function rotate_left_9 "((_ rotate_left 9) %1)"
-  syntax function rotate_left_10 "((_ rotate_left 10) %1)"
-  syntax function rotate_left_11 "((_ rotate_left 11) %1)"
-  syntax function rotate_left_12 "((_ rotate_left 12) %1)"
-  syntax function rotate_left_13 "((_ rotate_left 13) %1)"
-  syntax function rotate_left_14 "((_ rotate_left 14) %1)"
-  syntax function rotate_left_15 "((_ rotate_left 15) %1)"
-  syntax function rotate_left_16 "((_ rotate_left 16) %1)"
-  syntax function rotate_left_17 "((_ rotate_left 17) %1)"
-  syntax function rotate_left_18 "((_ rotate_left 18) %1)"
-  syntax function rotate_left_19 "((_ rotate_left 19) %1)"
-  syntax function rotate_left_20 "((_ rotate_left 20) %1)"
-  syntax function rotate_left_21 "((_ rotate_left 21) %1)"
-  syntax function rotate_left_22 "((_ rotate_left 22) %1)"
-  syntax function rotate_left_23 "((_ rotate_left 23) %1)"
-  syntax function rotate_left_24 "((_ rotate_left 24) %1)"
-  syntax function rotate_left_25 "((_ rotate_left 25) %1)"
-  syntax function rotate_left_26 "((_ rotate_left 26) %1)"
-  syntax function rotate_left_27 "((_ rotate_left 27) %1)"
-  syntax function rotate_left_28 "((_ rotate_left 28) %1)"
-  syntax function rotate_left_29 "((_ rotate_left 29) %1)"
-  syntax function rotate_left_30 "((_ rotate_left 30) %1)"
-  syntax function rotate_left_31 "((_ rotate_left 31) %1)"
-  syntax function rotate_left_32 "((_ rotate_left 32) %1)"
-  syntax function rotate_left_33 "((_ rotate_left 33) %1)"
-  syntax function rotate_left_34 "((_ rotate_left 34) %1)"
-  syntax function rotate_left_35 "((_ rotate_left 35) %1)"
-  syntax function rotate_left_36 "((_ rotate_left 36) %1)"
-  syntax function rotate_left_37 "((_ rotate_left 37) %1)"
-  syntax function rotate_left_38 "((_ rotate_left 38) %1)"
-  syntax function rotate_left_39 "((_ rotate_left 39) %1)"
-  syntax function rotate_left_40 "((_ rotate_left 40) %1)"
-  syntax function rotate_left_41 "((_ rotate_left 41) %1)"
-  syntax function rotate_left_42 "((_ rotate_left 42) %1)"
-  syntax function rotate_left_43 "((_ rotate_left 43) %1)"
-  syntax function rotate_left_44 "((_ rotate_left 44) %1)"
-  syntax function rotate_left_45 "((_ rotate_left 45) %1)"
-  syntax function rotate_left_46 "((_ rotate_left 46) %1)"
-  syntax function rotate_left_47 "((_ rotate_left 47) %1)"
-  syntax function rotate_left_48 "((_ rotate_left 48) %1)"
-  syntax function rotate_left_49 "((_ rotate_left 49) %1)"
-  syntax function rotate_left_50 "((_ rotate_left 50) %1)"
-  syntax function rotate_left_51 "((_ rotate_left 51) %1)"
-  syntax function rotate_left_52 "((_ rotate_left 52) %1)"
-  syntax function rotate_left_53 "((_ rotate_left 53) %1)"
-  syntax function rotate_left_54 "((_ rotate_left 54) %1)"
-  syntax function rotate_left_55 "((_ rotate_left 55) %1)"
-  syntax function rotate_left_56 "((_ rotate_left 56) %1)"
-  syntax function rotate_left_57 "((_ rotate_left 57) %1)"
-  syntax function rotate_left_58 "((_ rotate_left 58) %1)"
-  syntax function rotate_left_59 "((_ rotate_left 59) %1)"
-  syntax function rotate_left_60 "((_ rotate_left 60) %1)"
-  syntax function rotate_left_61 "((_ rotate_left 61) %1)"
-  syntax function rotate_left_62 "((_ rotate_left 62) %1)"
-  syntax function rotate_left_63 "((_ rotate_left 63) %1)"
-  syntax function rotate_right_1 "((_ rotate_right 1) %1)"
-  syntax function rotate_right_2 "((_ rotate_right 2) %1)"
-  syntax function rotate_right_3 "((_ rotate_right 3) %1)"
-  syntax function rotate_right_4 "((_ rotate_right 4) %1)"
-  syntax function rotate_right_5 "((_ rotate_right 5) %1)"
-  syntax function rotate_right_6 "((_ rotate_right 6) %1)"
-  syntax function rotate_right_7 "((_ rotate_right 7) %1)"
-  syntax function rotate_right_8 "((_ rotate_right 8) %1)"
-  syntax function rotate_right_9 "((_ rotate_right 9) %1)"
-  syntax function rotate_right_10 "((_ rotate_right 10) %1)"
-  syntax function rotate_right_11 "((_ rotate_right 11) %1)"
-  syntax function rotate_right_12 "((_ rotate_right 12) %1)"
-  syntax function rotate_right_13 "((_ rotate_right 13) %1)"
-  syntax function rotate_right_14 "((_ rotate_right 14) %1)"
-  syntax function rotate_right_15 "((_ rotate_right 15) %1)"
-  syntax function rotate_right_16 "((_ rotate_right 16) %1)"
-  syntax function rotate_right_17 "((_ rotate_right 17) %1)"
-  syntax function rotate_right_18 "((_ rotate_right 18) %1)"
-  syntax function rotate_right_19 "((_ rotate_right 19) %1)"
-  syntax function rotate_right_20 "((_ rotate_right 20) %1)"
-  syntax function rotate_right_21 "((_ rotate_right 21) %1)"
-  syntax function rotate_right_22 "((_ rotate_right 22) %1)"
-  syntax function rotate_right_23 "((_ rotate_right 23) %1)"
-  syntax function rotate_right_24 "((_ rotate_right 24) %1)"
-  syntax function rotate_right_25 "((_ rotate_right 25) %1)"
-  syntax function rotate_right_26 "((_ rotate_right 26) %1)"
-  syntax function rotate_right_27 "((_ rotate_right 27) %1)"
-  syntax function rotate_right_28 "((_ rotate_right 28) %1)"
-  syntax function rotate_right_29 "((_ rotate_right 29) %1)"
-  syntax function rotate_right_30 "((_ rotate_right 30) %1)"
-  syntax function rotate_right_31 "((_ rotate_right 31) %1)"
-  syntax function rotate_right_32 "((_ rotate_right 32) %1)"
-  syntax function rotate_right_33 "((_ rotate_right 33) %1)"
-  syntax function rotate_right_34 "((_ rotate_right 34) %1)"
-  syntax function rotate_right_35 "((_ rotate_right 35) %1)"
-  syntax function rotate_right_36 "((_ rotate_right 36) %1)"
-  syntax function rotate_right_37 "((_ rotate_right 37) %1)"
-  syntax function rotate_right_38 "((_ rotate_right 38) %1)"
-  syntax function rotate_right_39 "((_ rotate_right 39) %1)"
-  syntax function rotate_right_40 "((_ rotate_right 40) %1)"
-  syntax function rotate_right_41 "((_ rotate_right 41) %1)"
-  syntax function rotate_right_42 "((_ rotate_right 42) %1)"
-  syntax function rotate_right_43 "((_ rotate_right 43) %1)"
-  syntax function rotate_right_44 "((_ rotate_right 44) %1)"
-  syntax function rotate_right_45 "((_ rotate_right 45) %1)"
-  syntax function rotate_right_46 "((_ rotate_right 46) %1)"
-  syntax function rotate_right_47 "((_ rotate_right 47) %1)"
-  syntax function rotate_right_48 "((_ rotate_right 48) %1)"
-  syntax function rotate_right_49 "((_ rotate_right 49) %1)"
-  syntax function rotate_right_50 "((_ rotate_right 50) %1)"
-  syntax function rotate_right_51 "((_ rotate_right 51) %1)"
-  syntax function rotate_right_52 "((_ rotate_right 52) %1)"
-  syntax function rotate_right_53 "((_ rotate_right 53) %1)"
-  syntax function rotate_right_54 "((_ rotate_right 54) %1)"
-  syntax function rotate_right_55 "((_ rotate_right 55) %1)"
-  syntax function rotate_right_56 "((_ rotate_right 56) %1)"
-  syntax function rotate_right_57 "((_ rotate_right 57) %1)"
-  syntax function rotate_right_58 "((_ rotate_right 58) %1)"
-  syntax function rotate_right_59 "((_ rotate_right 59) %1)"
-  syntax function rotate_right_60 "((_ rotate_right 60) %1)"
-  syntax function rotate_right_61 "((_ rotate_right 61) %1)"
-  syntax function rotate_right_62 "((_ rotate_right 62) %1)"
-  syntax function rotate_right_63 "((_ rotate_right 63) %1)"
+  syntax function nth
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 64))
+             (_ bv0 64)))"
+
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
 end
 
 theory bitvec.BV32
@@ -489,6 +367,24 @@ theory bitvec.BV32
   remove prop to_int_mul
   remove prop to_int_udiv
   remove prop to_int_urem
+  remove prop to_int_lsr
+  remove prop to_int_lsl
+
+  remove prop nth_ext
+  remove prop Nth_zero
+  remove prop Nth_ones
+  remove prop Nth_bw_or
+  remove prop Nth_bw_and
+  remove prop Nth_bw_xor
+  remove prop Nth_bw_not
+  remove prop Nth_rotate_left
+  remove prop Nth_rotate_right
+  remove prop Lsr_nth_low
+  remove prop Lsr_nth_high
+  remove prop Asr_nth_low
+  remove prop Asr_nth_high
+  remove prop Lsl_nth_low
+  remove prop Lsl_nth_high
 
   syntax predicate ult "(bvult %1 %2)"
   syntax predicate ule "(bvule %1 %2)"
@@ -498,148 +394,9 @@ theory bitvec.BV32
   syntax function nth
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 32))
              (_ bv0 32)))"
-  remove prop nth_ext
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left_n
-  remove prop Nth_rotate_right_n
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
 
-  syntax function rotate_left_1 "((_ rotate_left 1) %1)"
-  syntax function rotate_left_2 "((_ rotate_left 2) %1)"
-  syntax function rotate_left_3 "((_ rotate_left 3) %1)"
-  syntax function rotate_left_4 "((_ rotate_left 4) %1)"
-  syntax function rotate_left_5 "((_ rotate_left 5) %1)"
-  syntax function rotate_left_6 "((_ rotate_left 6) %1)"
-  syntax function rotate_left_7 "((_ rotate_left 7) %1)"
-  syntax function rotate_left_8 "((_ rotate_left 8) %1)"
-  syntax function rotate_left_9 "((_ rotate_left 9) %1)"
-  syntax function rotate_left_10 "((_ rotate_left 10) %1)"
-  syntax function rotate_left_11 "((_ rotate_left 11) %1)"
-  syntax function rotate_left_12 "((_ rotate_left 12) %1)"
-  syntax function rotate_left_13 "((_ rotate_left 13) %1)"
-  syntax function rotate_left_14 "((_ rotate_left 14) %1)"
-  syntax function rotate_left_15 "((_ rotate_left 15) %1)"
-  syntax function rotate_left_16 "((_ rotate_left 16) %1)"
-  syntax function rotate_left_17 "((_ rotate_left 17) %1)"
-  syntax function rotate_left_18 "((_ rotate_left 18) %1)"
-  syntax function rotate_left_19 "((_ rotate_left 19) %1)"
-  syntax function rotate_left_20 "((_ rotate_left 20) %1)"
-  syntax function rotate_left_21 "((_ rotate_left 21) %1)"
-  syntax function rotate_left_22 "((_ rotate_left 22) %1)"
-  syntax function rotate_left_23 "((_ rotate_left 23) %1)"
-  syntax function rotate_left_24 "((_ rotate_left 24) %1)"
-  syntax function rotate_left_25 "((_ rotate_left 25) %1)"
-  syntax function rotate_left_26 "((_ rotate_left 26) %1)"
-  syntax function rotate_left_27 "((_ rotate_left 27) %1)"
-  syntax function rotate_left_28 "((_ rotate_left 28) %1)"
-  syntax function rotate_left_29 "((_ rotate_left 29) %1)"
-  syntax function rotate_left_30 "((_ rotate_left 30) %1)"
-  syntax function rotate_left_31 "((_ rotate_left 31) %1)"
-  syntax function rotate_left_32 "((_ rotate_left 32) %1)"
-  syntax function rotate_left_33 "((_ rotate_left 33) %1)"
-  syntax function rotate_left_34 "((_ rotate_left 34) %1)"
-  syntax function rotate_left_35 "((_ rotate_left 35) %1)"
-  syntax function rotate_left_36 "((_ rotate_left 36) %1)"
-  syntax function rotate_left_37 "((_ rotate_left 37) %1)"
-  syntax function rotate_left_38 "((_ rotate_left 38) %1)"
-  syntax function rotate_left_39 "((_ rotate_left 39) %1)"
-  syntax function rotate_left_40 "((_ rotate_left 40) %1)"
-  syntax function rotate_left_41 "((_ rotate_left 41) %1)"
-  syntax function rotate_left_42 "((_ rotate_left 42) %1)"
-  syntax function rotate_left_43 "((_ rotate_left 43) %1)"
-  syntax function rotate_left_44 "((_ rotate_left 44) %1)"
-  syntax function rotate_left_45 "((_ rotate_left 45) %1)"
-  syntax function rotate_left_46 "((_ rotate_left 46) %1)"
-  syntax function rotate_left_47 "((_ rotate_left 47) %1)"
-  syntax function rotate_left_48 "((_ rotate_left 48) %1)"
-  syntax function rotate_left_49 "((_ rotate_left 49) %1)"
-  syntax function rotate_left_50 "((_ rotate_left 50) %1)"
-  syntax function rotate_left_51 "((_ rotate_left 51) %1)"
-  syntax function rotate_left_52 "((_ rotate_left 52) %1)"
-  syntax function rotate_left_53 "((_ rotate_left 53) %1)"
-  syntax function rotate_left_54 "((_ rotate_left 54) %1)"
-  syntax function rotate_left_55 "((_ rotate_left 55) %1)"
-  syntax function rotate_left_56 "((_ rotate_left 56) %1)"
-  syntax function rotate_left_57 "((_ rotate_left 57) %1)"
-  syntax function rotate_left_58 "((_ rotate_left 58) %1)"
-  syntax function rotate_left_59 "((_ rotate_left 59) %1)"
-  syntax function rotate_left_60 "((_ rotate_left 60) %1)"
-  syntax function rotate_left_61 "((_ rotate_left 61) %1)"
-  syntax function rotate_left_62 "((_ rotate_left 62) %1)"
-  syntax function rotate_left_63 "((_ rotate_left 63) %1)"
-  syntax function rotate_right_1 "((_ rotate_right 1) %1)"
-  syntax function rotate_right_2 "((_ rotate_right 2) %1)"
-  syntax function rotate_right_3 "((_ rotate_right 3) %1)"
-  syntax function rotate_right_4 "((_ rotate_right 4) %1)"
-  syntax function rotate_right_5 "((_ rotate_right 5) %1)"
-  syntax function rotate_right_6 "((_ rotate_right 6) %1)"
-  syntax function rotate_right_7 "((_ rotate_right 7) %1)"
-  syntax function rotate_right_8 "((_ rotate_right 8) %1)"
-  syntax function rotate_right_9 "((_ rotate_right 9) %1)"
-  syntax function rotate_right_10 "((_ rotate_right 10) %1)"
-  syntax function rotate_right_11 "((_ rotate_right 11) %1)"
-  syntax function rotate_right_12 "((_ rotate_right 12) %1)"
-  syntax function rotate_right_13 "((_ rotate_right 13) %1)"
-  syntax function rotate_right_14 "((_ rotate_right 14) %1)"
-  syntax function rotate_right_15 "((_ rotate_right 15) %1)"
-  syntax function rotate_right_16 "((_ rotate_right 16) %1)"
-  syntax function rotate_right_17 "((_ rotate_right 17) %1)"
-  syntax function rotate_right_18 "((_ rotate_right 18) %1)"
-  syntax function rotate_right_19 "((_ rotate_right 19) %1)"
-  syntax function rotate_right_20 "((_ rotate_right 20) %1)"
-  syntax function rotate_right_21 "((_ rotate_right 21) %1)"
-  syntax function rotate_right_22 "((_ rotate_right 22) %1)"
-  syntax function rotate_right_23 "((_ rotate_right 23) %1)"
-  syntax function rotate_right_24 "((_ rotate_right 24) %1)"
-  syntax function rotate_right_25 "((_ rotate_right 25) %1)"
-  syntax function rotate_right_26 "((_ rotate_right 26) %1)"
-  syntax function rotate_right_27 "((_ rotate_right 27) %1)"
-  syntax function rotate_right_28 "((_ rotate_right 28) %1)"
-  syntax function rotate_right_29 "((_ rotate_right 29) %1)"
-  syntax function rotate_right_30 "((_ rotate_right 30) %1)"
-  syntax function rotate_right_31 "((_ rotate_right 31) %1)"
-  syntax function rotate_right_32 "((_ rotate_right 32) %1)"
-  syntax function rotate_right_33 "((_ rotate_right 33) %1)"
-  syntax function rotate_right_34 "((_ rotate_right 34) %1)"
-  syntax function rotate_right_35 "((_ rotate_right 35) %1)"
-  syntax function rotate_right_36 "((_ rotate_right 36) %1)"
-  syntax function rotate_right_37 "((_ rotate_right 37) %1)"
-  syntax function rotate_right_38 "((_ rotate_right 38) %1)"
-  syntax function rotate_right_39 "((_ rotate_right 39) %1)"
-  syntax function rotate_right_40 "((_ rotate_right 40) %1)"
-  syntax function rotate_right_41 "((_ rotate_right 41) %1)"
-  syntax function rotate_right_42 "((_ rotate_right 42) %1)"
-  syntax function rotate_right_43 "((_ rotate_right 43) %1)"
-  syntax function rotate_right_44 "((_ rotate_right 44) %1)"
-  syntax function rotate_right_45 "((_ rotate_right 45) %1)"
-  syntax function rotate_right_46 "((_ rotate_right 46) %1)"
-  syntax function rotate_right_47 "((_ rotate_right 47) %1)"
-  syntax function rotate_right_48 "((_ rotate_right 48) %1)"
-  syntax function rotate_right_49 "((_ rotate_right 49) %1)"
-  syntax function rotate_right_50 "((_ rotate_right 50) %1)"
-  syntax function rotate_right_51 "((_ rotate_right 51) %1)"
-  syntax function rotate_right_52 "((_ rotate_right 52) %1)"
-  syntax function rotate_right_53 "((_ rotate_right 53) %1)"
-  syntax function rotate_right_54 "((_ rotate_right 54) %1)"
-  syntax function rotate_right_55 "((_ rotate_right 55) %1)"
-  syntax function rotate_right_56 "((_ rotate_right 56) %1)"
-  syntax function rotate_right_57 "((_ rotate_right 57) %1)"
-  syntax function rotate_right_58 "((_ rotate_right 58) %1)"
-  syntax function rotate_right_59 "((_ rotate_right 59) %1)"
-  syntax function rotate_right_60 "((_ rotate_right 60) %1)"
-  syntax function rotate_right_61 "((_ rotate_right 61) %1)"
-  syntax function rotate_right_62 "((_ rotate_right 62) %1)"
-  syntax function rotate_right_63 "((_ rotate_right 63) %1)"
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
 end
 
 theory bitvec.BV16
@@ -676,10 +433,9 @@ theory bitvec.BV16
   remove prop to_int_mul
   remove prop to_int_udiv
   remove prop to_int_urem
+  remove prop to_int_lsr
+  remove prop to_int_lsl
 
-  syntax function nth
-    "(not (= (bvand (bvlshr %1 %2) (_ bv1 16))
-             (_ bv0 16)))"
   remove prop nth_ext
   remove prop Nth_zero
   remove prop Nth_ones
@@ -687,8 +443,8 @@ theory bitvec.BV16
   remove prop Nth_bw_and
   remove prop Nth_bw_xor
   remove prop Nth_bw_not
-  remove prop Nth_rotate_left_n
-  remove prop Nth_rotate_right_n
+  remove prop Nth_rotate_left
+  remove prop Nth_rotate_right
   remove prop Lsr_nth_low
   remove prop Lsr_nth_high
   remove prop Asr_nth_low
@@ -701,132 +457,12 @@ theory bitvec.BV16
   syntax predicate ugt "(bvugt %1 %2)"
   syntax predicate uge "(bvuge %1 %2)"
 
-  syntax function rotate_left_1 "((_ rotate_left 1) %1)"
-  syntax function rotate_left_2 "((_ rotate_left 2) %1)"
-  syntax function rotate_left_3 "((_ rotate_left 3) %1)"
-  syntax function rotate_left_4 "((_ rotate_left 4) %1)"
-  syntax function rotate_left_5 "((_ rotate_left 5) %1)"
-  syntax function rotate_left_6 "((_ rotate_left 6) %1)"
-  syntax function rotate_left_7 "((_ rotate_left 7) %1)"
-  syntax function rotate_left_8 "((_ rotate_left 8) %1)"
-  syntax function rotate_left_9 "((_ rotate_left 9) %1)"
-  syntax function rotate_left_10 "((_ rotate_left 10) %1)"
-  syntax function rotate_left_11 "((_ rotate_left 11) %1)"
-  syntax function rotate_left_12 "((_ rotate_left 12) %1)"
-  syntax function rotate_left_13 "((_ rotate_left 13) %1)"
-  syntax function rotate_left_14 "((_ rotate_left 14) %1)"
-  syntax function rotate_left_15 "((_ rotate_left 15) %1)"
-  syntax function rotate_left_16 "((_ rotate_left 16) %1)"
-  syntax function rotate_left_17 "((_ rotate_left 17) %1)"
-  syntax function rotate_left_18 "((_ rotate_left 18) %1)"
-  syntax function rotate_left_19 "((_ rotate_left 19) %1)"
-  syntax function rotate_left_20 "((_ rotate_left 20) %1)"
-  syntax function rotate_left_21 "((_ rotate_left 21) %1)"
-  syntax function rotate_left_22 "((_ rotate_left 22) %1)"
-  syntax function rotate_left_23 "((_ rotate_left 23) %1)"
-  syntax function rotate_left_24 "((_ rotate_left 24) %1)"
-  syntax function rotate_left_25 "((_ rotate_left 25) %1)"
-  syntax function rotate_left_26 "((_ rotate_left 26) %1)"
-  syntax function rotate_left_27 "((_ rotate_left 27) %1)"
-  syntax function rotate_left_28 "((_ rotate_left 28) %1)"
-  syntax function rotate_left_29 "((_ rotate_left 29) %1)"
-  syntax function rotate_left_30 "((_ rotate_left 30) %1)"
-  syntax function rotate_left_31 "((_ rotate_left 31) %1)"
-  syntax function rotate_left_32 "((_ rotate_left 32) %1)"
-  syntax function rotate_left_33 "((_ rotate_left 33) %1)"
-  syntax function rotate_left_34 "((_ rotate_left 34) %1)"
-  syntax function rotate_left_35 "((_ rotate_left 35) %1)"
-  syntax function rotate_left_36 "((_ rotate_left 36) %1)"
-  syntax function rotate_left_37 "((_ rotate_left 37) %1)"
-  syntax function rotate_left_38 "((_ rotate_left 38) %1)"
-  syntax function rotate_left_39 "((_ rotate_left 39) %1)"
-  syntax function rotate_left_40 "((_ rotate_left 40) %1)"
-  syntax function rotate_left_41 "((_ rotate_left 41) %1)"
-  syntax function rotate_left_42 "((_ rotate_left 42) %1)"
-  syntax function rotate_left_43 "((_ rotate_left 43) %1)"
-  syntax function rotate_left_44 "((_ rotate_left 44) %1)"
-  syntax function rotate_left_45 "((_ rotate_left 45) %1)"
-  syntax function rotate_left_46 "((_ rotate_left 46) %1)"
-  syntax function rotate_left_47 "((_ rotate_left 47) %1)"
-  syntax function rotate_left_48 "((_ rotate_left 48) %1)"
-  syntax function rotate_left_49 "((_ rotate_left 49) %1)"
-  syntax function rotate_left_50 "((_ rotate_left 50) %1)"
-  syntax function rotate_left_51 "((_ rotate_left 51) %1)"
-  syntax function rotate_left_52 "((_ rotate_left 52) %1)"
-  syntax function rotate_left_53 "((_ rotate_left 53) %1)"
-  syntax function rotate_left_54 "((_ rotate_left 54) %1)"
-  syntax function rotate_left_55 "((_ rotate_left 55) %1)"
-  syntax function rotate_left_56 "((_ rotate_left 56) %1)"
-  syntax function rotate_left_57 "((_ rotate_left 57) %1)"
-  syntax function rotate_left_58 "((_ rotate_left 58) %1)"
-  syntax function rotate_left_59 "((_ rotate_left 59) %1)"
-  syntax function rotate_left_60 "((_ rotate_left 60) %1)"
-  syntax function rotate_left_61 "((_ rotate_left 61) %1)"
-  syntax function rotate_left_62 "((_ rotate_left 62) %1)"
-  syntax function rotate_left_63 "((_ rotate_left 63) %1)"
-  syntax function rotate_right_1 "((_ rotate_right 1) %1)"
-  syntax function rotate_right_2 "((_ rotate_right 2) %1)"
-  syntax function rotate_right_3 "((_ rotate_right 3) %1)"
-  syntax function rotate_right_4 "((_ rotate_right 4) %1)"
-  syntax function rotate_right_5 "((_ rotate_right 5) %1)"
-  syntax function rotate_right_6 "((_ rotate_right 6) %1)"
-  syntax function rotate_right_7 "((_ rotate_right 7) %1)"
-  syntax function rotate_right_8 "((_ rotate_right 8) %1)"
-  syntax function rotate_right_9 "((_ rotate_right 9) %1)"
-  syntax function rotate_right_10 "((_ rotate_right 10) %1)"
-  syntax function rotate_right_11 "((_ rotate_right 11) %1)"
-  syntax function rotate_right_12 "((_ rotate_right 12) %1)"
-  syntax function rotate_right_13 "((_ rotate_right 13) %1)"
-  syntax function rotate_right_14 "((_ rotate_right 14) %1)"
-  syntax function rotate_right_15 "((_ rotate_right 15) %1)"
-  syntax function rotate_right_16 "((_ rotate_right 16) %1)"
-  syntax function rotate_right_17 "((_ rotate_right 17) %1)"
-  syntax function rotate_right_18 "((_ rotate_right 18) %1)"
-  syntax function rotate_right_19 "((_ rotate_right 19) %1)"
-  syntax function rotate_right_20 "((_ rotate_right 20) %1)"
-  syntax function rotate_right_21 "((_ rotate_right 21) %1)"
-  syntax function rotate_right_22 "((_ rotate_right 22) %1)"
-  syntax function rotate_right_23 "((_ rotate_right 23) %1)"
-  syntax function rotate_right_24 "((_ rotate_right 24) %1)"
-  syntax function rotate_right_25 "((_ rotate_right 25) %1)"
-  syntax function rotate_right_26 "((_ rotate_right 26) %1)"
-  syntax function rotate_right_27 "((_ rotate_right 27) %1)"
-  syntax function rotate_right_28 "((_ rotate_right 28) %1)"
-  syntax function rotate_right_29 "((_ rotate_right 29) %1)"
-  syntax function rotate_right_30 "((_ rotate_right 30) %1)"
-  syntax function rotate_right_31 "((_ rotate_right 31) %1)"
-  syntax function rotate_right_32 "((_ rotate_right 32) %1)"
-  syntax function rotate_right_33 "((_ rotate_right 33) %1)"
-  syntax function rotate_right_34 "((_ rotate_right 34) %1)"
-  syntax function rotate_right_35 "((_ rotate_right 35) %1)"
-  syntax function rotate_right_36 "((_ rotate_right 36) %1)"
-  syntax function rotate_right_37 "((_ rotate_right 37) %1)"
-  syntax function rotate_right_38 "((_ rotate_right 38) %1)"
-  syntax function rotate_right_39 "((_ rotate_right 39) %1)"
-  syntax function rotate_right_40 "((_ rotate_right 40) %1)"
-  syntax function rotate_right_41 "((_ rotate_right 41) %1)"
-  syntax function rotate_right_42 "((_ rotate_right 42) %1)"
-  syntax function rotate_right_43 "((_ rotate_right 43) %1)"
-  syntax function rotate_right_44 "((_ rotate_right 44) %1)"
-  syntax function rotate_right_45 "((_ rotate_right 45) %1)"
-  syntax function rotate_right_46 "((_ rotate_right 46) %1)"
-  syntax function rotate_right_47 "((_ rotate_right 47) %1)"
-  syntax function rotate_right_48 "((_ rotate_right 48) %1)"
-  syntax function rotate_right_49 "((_ rotate_right 49) %1)"
-  syntax function rotate_right_50 "((_ rotate_right 50) %1)"
-  syntax function rotate_right_51 "((_ rotate_right 51) %1)"
-  syntax function rotate_right_52 "((_ rotate_right 52) %1)"
-  syntax function rotate_right_53 "((_ rotate_right 53) %1)"
-  syntax function rotate_right_54 "((_ rotate_right 54) %1)"
-  syntax function rotate_right_55 "((_ rotate_right 55) %1)"
-  syntax function rotate_right_56 "((_ rotate_right 56) %1)"
-  syntax function rotate_right_57 "((_ rotate_right 57) %1)"
-  syntax function rotate_right_58 "((_ rotate_right 58) %1)"
-  syntax function rotate_right_59 "((_ rotate_right 59) %1)"
-  syntax function rotate_right_60 "((_ rotate_right 60) %1)"
-  syntax function rotate_right_61 "((_ rotate_right 61) %1)"
-  syntax function rotate_right_62 "((_ rotate_right 62) %1)"
-  syntax function rotate_right_63 "((_ rotate_right 63) %1)"
+  syntax function nth
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 16))
+             (_ bv0 16)))"
+
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
 end
 
 theory bitvec.BV8
@@ -863,6 +499,24 @@ theory bitvec.BV8
   remove prop to_int_mul
   remove prop to_int_udiv
   remove prop to_int_urem
+  remove prop to_int_lsr
+  remove prop to_int_lsl
+
+  remove prop nth_ext
+  remove prop Nth_zero
+  remove prop Nth_ones
+  remove prop Nth_bw_or
+  remove prop Nth_bw_and
+  remove prop Nth_bw_xor
+  remove prop Nth_bw_not
+  remove prop Nth_rotate_left
+  remove prop Nth_rotate_right
+  remove prop Lsr_nth_low
+  remove prop Lsr_nth_high
+  remove prop Asr_nth_low
+  remove prop Asr_nth_high
+  remove prop Lsl_nth_low
+  remove prop Lsl_nth_high
 
   syntax predicate ult "(bvult %1 %2)"
   syntax predicate ule "(bvule %1 %2)"
@@ -872,148 +526,9 @@ theory bitvec.BV8
   syntax function nth
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 8))
              (_ bv0 8)))"
-  remove prop nth_ext
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left_n
-  remove prop Nth_rotate_right_n
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
 
-  syntax function rotate_left_1 "((_ rotate_left 1) %1)"
-  syntax function rotate_left_2 "((_ rotate_left 2) %1)"
-  syntax function rotate_left_3 "((_ rotate_left 3) %1)"
-  syntax function rotate_left_4 "((_ rotate_left 4) %1)"
-  syntax function rotate_left_5 "((_ rotate_left 5) %1)"
-  syntax function rotate_left_6 "((_ rotate_left 6) %1)"
-  syntax function rotate_left_7 "((_ rotate_left 7) %1)"
-  syntax function rotate_left_8 "((_ rotate_left 8) %1)"
-  syntax function rotate_left_9 "((_ rotate_left 9) %1)"
-  syntax function rotate_left_10 "((_ rotate_left 10) %1)"
-  syntax function rotate_left_11 "((_ rotate_left 11) %1)"
-  syntax function rotate_left_12 "((_ rotate_left 12) %1)"
-  syntax function rotate_left_13 "((_ rotate_left 13) %1)"
-  syntax function rotate_left_14 "((_ rotate_left 14) %1)"
-  syntax function rotate_left_15 "((_ rotate_left 15) %1)"
-  syntax function rotate_left_16 "((_ rotate_left 16) %1)"
-  syntax function rotate_left_17 "((_ rotate_left 17) %1)"
-  syntax function rotate_left_18 "((_ rotate_left 18) %1)"
-  syntax function rotate_left_19 "((_ rotate_left 19) %1)"
-  syntax function rotate_left_20 "((_ rotate_left 20) %1)"
-  syntax function rotate_left_21 "((_ rotate_left 21) %1)"
-  syntax function rotate_left_22 "((_ rotate_left 22) %1)"
-  syntax function rotate_left_23 "((_ rotate_left 23) %1)"
-  syntax function rotate_left_24 "((_ rotate_left 24) %1)"
-  syntax function rotate_left_25 "((_ rotate_left 25) %1)"
-  syntax function rotate_left_26 "((_ rotate_left 26) %1)"
-  syntax function rotate_left_27 "((_ rotate_left 27) %1)"
-  syntax function rotate_left_28 "((_ rotate_left 28) %1)"
-  syntax function rotate_left_29 "((_ rotate_left 29) %1)"
-  syntax function rotate_left_30 "((_ rotate_left 30) %1)"
-  syntax function rotate_left_31 "((_ rotate_left 31) %1)"
-  syntax function rotate_left_32 "((_ rotate_left 32) %1)"
-  syntax function rotate_left_33 "((_ rotate_left 33) %1)"
-  syntax function rotate_left_34 "((_ rotate_left 34) %1)"
-  syntax function rotate_left_35 "((_ rotate_left 35) %1)"
-  syntax function rotate_left_36 "((_ rotate_left 36) %1)"
-  syntax function rotate_left_37 "((_ rotate_left 37) %1)"
-  syntax function rotate_left_38 "((_ rotate_left 38) %1)"
-  syntax function rotate_left_39 "((_ rotate_left 39) %1)"
-  syntax function rotate_left_40 "((_ rotate_left 40) %1)"
-  syntax function rotate_left_41 "((_ rotate_left 41) %1)"
-  syntax function rotate_left_42 "((_ rotate_left 42) %1)"
-  syntax function rotate_left_43 "((_ rotate_left 43) %1)"
-  syntax function rotate_left_44 "((_ rotate_left 44) %1)"
-  syntax function rotate_left_45 "((_ rotate_left 45) %1)"
-  syntax function rotate_left_46 "((_ rotate_left 46) %1)"
-  syntax function rotate_left_47 "((_ rotate_left 47) %1)"
-  syntax function rotate_left_48 "((_ rotate_left 48) %1)"
-  syntax function rotate_left_49 "((_ rotate_left 49) %1)"
-  syntax function rotate_left_50 "((_ rotate_left 50) %1)"
-  syntax function rotate_left_51 "((_ rotate_left 51) %1)"
-  syntax function rotate_left_52 "((_ rotate_left 52) %1)"
-  syntax function rotate_left_53 "((_ rotate_left 53) %1)"
-  syntax function rotate_left_54 "((_ rotate_left 54) %1)"
-  syntax function rotate_left_55 "((_ rotate_left 55) %1)"
-  syntax function rotate_left_56 "((_ rotate_left 56) %1)"
-  syntax function rotate_left_57 "((_ rotate_left 57) %1)"
-  syntax function rotate_left_58 "((_ rotate_left 58) %1)"
-  syntax function rotate_left_59 "((_ rotate_left 59) %1)"
-  syntax function rotate_left_60 "((_ rotate_left 60) %1)"
-  syntax function rotate_left_61 "((_ rotate_left 61) %1)"
-  syntax function rotate_left_62 "((_ rotate_left 62) %1)"
-  syntax function rotate_left_63 "((_ rotate_left 63) %1)"
-  syntax function rotate_right_1 "((_ rotate_right 1) %1)"
-  syntax function rotate_right_2 "((_ rotate_right 2) %1)"
-  syntax function rotate_right_3 "((_ rotate_right 3) %1)"
-  syntax function rotate_right_4 "((_ rotate_right 4) %1)"
-  syntax function rotate_right_5 "((_ rotate_right 5) %1)"
-  syntax function rotate_right_6 "((_ rotate_right 6) %1)"
-  syntax function rotate_right_7 "((_ rotate_right 7) %1)"
-  syntax function rotate_right_8 "((_ rotate_right 8) %1)"
-  syntax function rotate_right_9 "((_ rotate_right 9) %1)"
-  syntax function rotate_right_10 "((_ rotate_right 10) %1)"
-  syntax function rotate_right_11 "((_ rotate_right 11) %1)"
-  syntax function rotate_right_12 "((_ rotate_right 12) %1)"
-  syntax function rotate_right_13 "((_ rotate_right 13) %1)"
-  syntax function rotate_right_14 "((_ rotate_right 14) %1)"
-  syntax function rotate_right_15 "((_ rotate_right 15) %1)"
-  syntax function rotate_right_16 "((_ rotate_right 16) %1)"
-  syntax function rotate_right_17 "((_ rotate_right 17) %1)"
-  syntax function rotate_right_18 "((_ rotate_right 18) %1)"
-  syntax function rotate_right_19 "((_ rotate_right 19) %1)"
-  syntax function rotate_right_20 "((_ rotate_right 20) %1)"
-  syntax function rotate_right_21 "((_ rotate_right 21) %1)"
-  syntax function rotate_right_22 "((_ rotate_right 22) %1)"
-  syntax function rotate_right_23 "((_ rotate_right 23) %1)"
-  syntax function rotate_right_24 "((_ rotate_right 24) %1)"
-  syntax function rotate_right_25 "((_ rotate_right 25) %1)"
-  syntax function rotate_right_26 "((_ rotate_right 26) %1)"
-  syntax function rotate_right_27 "((_ rotate_right 27) %1)"
-  syntax function rotate_right_28 "((_ rotate_right 28) %1)"
-  syntax function rotate_right_29 "((_ rotate_right 29) %1)"
-  syntax function rotate_right_30 "((_ rotate_right 30) %1)"
-  syntax function rotate_right_31 "((_ rotate_right 31) %1)"
-  syntax function rotate_right_32 "((_ rotate_right 32) %1)"
-  syntax function rotate_right_33 "((_ rotate_right 33) %1)"
-  syntax function rotate_right_34 "((_ rotate_right 34) %1)"
-  syntax function rotate_right_35 "((_ rotate_right 35) %1)"
-  syntax function rotate_right_36 "((_ rotate_right 36) %1)"
-  syntax function rotate_right_37 "((_ rotate_right 37) %1)"
-  syntax function rotate_right_38 "((_ rotate_right 38) %1)"
-  syntax function rotate_right_39 "((_ rotate_right 39) %1)"
-  syntax function rotate_right_40 "((_ rotate_right 40) %1)"
-  syntax function rotate_right_41 "((_ rotate_right 41) %1)"
-  syntax function rotate_right_42 "((_ rotate_right 42) %1)"
-  syntax function rotate_right_43 "((_ rotate_right 43) %1)"
-  syntax function rotate_right_44 "((_ rotate_right 44) %1)"
-  syntax function rotate_right_45 "((_ rotate_right 45) %1)"
-  syntax function rotate_right_46 "((_ rotate_right 46) %1)"
-  syntax function rotate_right_47 "((_ rotate_right 47) %1)"
-  syntax function rotate_right_48 "((_ rotate_right 48) %1)"
-  syntax function rotate_right_49 "((_ rotate_right 49) %1)"
-  syntax function rotate_right_50 "((_ rotate_right 50) %1)"
-  syntax function rotate_right_51 "((_ rotate_right 51) %1)"
-  syntax function rotate_right_52 "((_ rotate_right 52) %1)"
-  syntax function rotate_right_53 "((_ rotate_right 53) %1)"
-  syntax function rotate_right_54 "((_ rotate_right 54) %1)"
-  syntax function rotate_right_55 "((_ rotate_right 55) %1)"
-  syntax function rotate_right_56 "((_ rotate_right 56) %1)"
-  syntax function rotate_right_57 "((_ rotate_right 57) %1)"
-  syntax function rotate_right_58 "((_ rotate_right 58) %1)"
-  syntax function rotate_right_59 "((_ rotate_right 59) %1)"
-  syntax function rotate_right_60 "((_ rotate_right 60) %1)"
-  syntax function rotate_right_61 "((_ rotate_right 61) %1)"
-  syntax function rotate_right_62 "((_ rotate_right 62) %1)"
-  syntax function rotate_right_63 "((_ rotate_right 63) %1)"
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
 end
 
 theory bitvec.BVConverter_32_64
