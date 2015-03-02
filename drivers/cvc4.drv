@@ -32,14 +32,8 @@ transformation "encoding_smt"
 
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 timeout "interrupted by timeout"
+steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
 
-(* regexp for steps should match things like
-
-smt::SmtEngine::resourceUnitsUsed, 1041
-
-but not in the same line as the "valid" answer
-
-*)
 
 (** Extra theories supported by CVC4 *)
 

@@ -57,13 +57,21 @@ val debug : Debug.flag
 type timeregexp
 (** The type of precompiled regular expressions for time parsing *)
 
+type stepsregexp
+(** The type of precompiled regular expressions for parsing of steps *)
+
 val timeregexp : string -> timeregexp
 (** Converts a regular expression with special markers '%h','%m',
     '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
+val stepsregexp : string -> int -> stepsregexp
+(** stepsregexp s n creates a regular expression for matching number of steps.
+s is regular expression, n is a group number with steps information *)
+
 type prover_result_parser = {
   prp_regexps     : (Str.regexp * prover_answer) list;
   prp_timeregexps : timeregexp list;
+  prp_stepsregexp : stepsregexp list;
   prp_exitcodes   : (int * prover_answer) list;
 }
 

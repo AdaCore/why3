@@ -333,14 +333,24 @@ let source_page,source_tab =
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
 let task_page,task_tab =
-  let label = GMisc.label ~text:"Task/Prover Output" () in
+  let label = GMisc.label ~text:"Task" () in
   1, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
-let right_hb = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
+let edited_page,edited_tab =
+  let label = GMisc.label ~text:"Edited proof" () in
+  2, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let output_page,output_tab =
+  let label = GMisc.label ~text:"Prover Output" () in
+  3, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let _ = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
 
 (******************)
-(* goal text view *)
+(* views          *)
 (******************)
 
 let scrolled_task_view =
@@ -355,8 +365,33 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
+let scrolled_edited_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:edited_tab#add ()
+
+let edited_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_edited_view#add
+    ()
+
+let scrolled_output_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:output_tab#add ()
+
+let output_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_output_view#add
+    ()
+
 let modifiable_sans_font_views = ref [goals_view#misc]
-let modifiable_mono_font_views = ref [task_view#misc]
+let modifiable_mono_font_views =
+  ref [task_view#misc;edited_view#misc;output_view#misc]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -504,20 +539,39 @@ let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
-let update_task_view a =
-  let text =
-  match a with
-    | S.Goal g ->
-      if (Gconfig.config ()).intro_premises then
-        let trans =
-          Trans.lookup_transform intro_transformation (env_session()).S.env
-        in
-        task_text (try Trans.apply trans (S.goal_task g) with
-          e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
-      else
-        task_text (S.goal_task g)
+let goal_task_text g =
+  if (Gconfig.config ()).intro_premises then
+    let trans =
+      Trans.lookup_transform intro_transformation (env_session()).S.env
+    in
+    task_text (try Trans.apply trans (S.goal_task g) with
+      e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
+  else
+    task_text (S.goal_task g)
+
+let update_tabs a =
+  let task_text =
+    match a with
+    | S.Goal g -> goal_task_text g
+    | S.Proof_attempt a -> goal_task_text a.S.proof_parent
     | S.Theory th -> "Theory " ^ th.S.theory_name.Ident.id_string
     | S.File file -> "File " ^ file.S.file_name
+    | S.Transf tr -> "transformation \"" ^ tr.S.transf_name ^ "\""
+    | S.Metas _ -> "metas"
+  in
+  let edited_text =
+    match a with
+    | S.Proof_attempt a ->
+      begin
+        let env = env_session () in
+        match S.get_edited_as_abs env.S.session a with
+        | None -> ""
+        | Some f -> source_text f
+      end
+    | _ -> ""
+  in
+  let output_text =
+    match a with
     | S.Proof_attempt a ->
         begin
           match a.S.proof_state with
@@ -533,18 +587,9 @@ let update_task_view a =
               Buffer.contents b
             | S.Done r ->
               let out = r.Call_provers.pr_output in
-              let out = if out = "" then
-                  "Output not available. Rerun it with \"Replay\" button"
-                else out
-              in
-              begin
-                let env = env_session () in
-                match S.get_edited_as_abs env.S.session a with
-                | None -> out
-                | Some f -> (source_text f) ^
-                  "\n----------------------------------------------\n\n"
-                  ^ out
-              end
+              if out = "" then
+                "Output not available. Rerun it with \"Replay\" button"
+              else out
             | S.Scheduled-> "proof scheduled but not running yet"
             | S.Running -> "prover currently running"
             | S.InternalFailure e ->
@@ -552,20 +597,22 @@ let update_task_view a =
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b
         end
-    | S.Transf tr ->
-        "transformation \"" ^ tr.S.transf_name ^ "\""
-   | S.Metas m ->
-     let print_meta_args =
-       Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
-     let print =
-       Pp.print_iter2 Mstr.iter Pp.newline2 Pp.newline Pp.string
-         (Pp.indent 2
-            (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
-     in
-     (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+    | S.Metas m ->
+      let print_meta_args =
+        Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
+      let print =
+        Pp.print_iter2 Mstr.iter Pp.newline2 Pp.newline Pp.string
+          (Pp.indent 2
+             (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
+      in
+      (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+    | _ -> ""
  in
- task_view#source_buffer#set_text text;
- task_view#scroll_to_mark `INSERT
+ task_view#source_buffer#set_text task_text;
+ task_view#scroll_to_mark `INSERT;
+ edited_view#source_buffer#set_text edited_text;
+ edited_view#scroll_to_mark `INSERT;
+ output_view#source_buffer#set_text output_text
 
 
 
@@ -641,7 +688,7 @@ let notify any =
   begin
     match !current_selected_row with
       | Some r when r == ind ->
-        update_task_view any
+        update_tabs any
       | _ -> ()
   end;
   if expanded then goals_view#expand_to_path row#path else
@@ -2259,19 +2306,19 @@ let select_row r =
   let ind = goals_model#get ~row:r#iter ~column:index_column in
   current_selected_row := Some ind;
   let a = get_any_from_row_reference r in
-  update_task_view a;
+  update_tabs a;
   match a with
     | S.Goal g ->
       scroll_to_source_goal g
     | S.Theory th ->
       scroll_to_theory th;
-      notebook#goto_page source_page (* go to "source" tab *)
+      (* notebook#goto_page source_page (* go to "source" tab *)*)
     | S.File file ->
       scroll_to_file (Filename.concat project_dir file.S.file_name);
-      notebook#goto_page source_page (* go to "source" tab *)
+      (* notebook#goto_page source_page (\* go to "source" tab *\) *)
     | S.Proof_attempt a ->
       scroll_to_source_goal a.S.proof_parent;
-      notebook#goto_page task_page (* go to "prover output" tab *)
+      (* notebook#goto_page output_page (\* go to "prover output" tab *\) *)
     | S.Transf tr ->
       scroll_to_source_goal tr.S.transf_parent
     | S.Metas m ->

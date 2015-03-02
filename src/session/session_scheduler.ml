@@ -292,7 +292,8 @@ let schedule_edition t command filename callback =
   let res_parser =
     { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown "")];
       Call_provers.prp_regexps = [];
-      Call_provers.prp_timeregexps = []
+      Call_provers.prp_timeregexps = [];
+      Call_provers.prp_stepsregexp = [];
     } in
   let precall =
     Call_provers.call_on_file ~command ~res_parser ~redirect:false filename in
@@ -461,13 +462,13 @@ let run_external_proof_v3 eS eT a callback =
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
-      let stepslimit, timelimit =
+      let stepslimit =
 	match a with
 	| { proof_state =
             Done { Call_provers.pr_answer = Call_provers.Valid;
                    Call_provers.pr_steps = s };
-	    proof_obsolete = false } when s >= 0 -> s, 0
-	| _ -> -1, timelimit
+	    proof_obsolete = false } when s >= 0 -> s
+	| _ -> -1
       in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in

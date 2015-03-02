@@ -23,7 +23,7 @@
 %token <string> OPERATOR
 %token <string> INPUT (* never reaches the parser *)
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
-%token VALID INVALID TIMEOUT OUTOFMEMORY UNKNOWN FAIL TIME
+%token VALID INVALID TIMEOUT OUTOFMEMORY UNKNOWN FAIL TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
 %token BLACKLIST
 %token MODULE EXCEPTION VAL CONVERTER
@@ -56,6 +56,7 @@ global:
 | TIMEOUT STRING { RegexpTimeout $2 }
 | OUTOFMEMORY STRING { RegexpOutOfMemory $2 }
 | TIME STRING  { TimeRegexp $2 }
+| STEPS STRING INTEGER { StepRegexp ($2, $3) }
 | UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
 | FAIL STRING STRING { RegexpFailure ($2, $3) }
 | VALID INTEGER { ExitCodeValid $2 }
@@ -106,20 +107,21 @@ qualid_:
 | ident DOT qualid_  { ($1 :: $3) }
 
 ident:
-| IDENT     { $1 }
-| SYNTAX    { "syntax" }
-| REMOVE    { "remove" }
-| PRELUDE   { "prelude" }
-| BLACKLIST { "blacklist" }
-| PRINTER   { "printer" }
-| VALID     { "valid" }
-| INVALID   { "invalid" }
-| TIMEOUT   { "timeout" }
-| UNKNOWN   { "unknown" }
-| FAIL      { "fail" }
-| FILENAME  { "filename" }
-| TRANSFORM { "transformation" }
-| PLUGIN    { "plugin" }
+| IDENT        { $1 }
+| SYNTAX       { "syntax" }
+| REMOVE       { "remove" }
+| PRELUDE      { "prelude" }
+| BLACKLIST    { "blacklist" }
+| PRINTER      { "printer" }
+| STEPS        { "steps" }
+| VALID        { "valid" }
+| INVALID      { "invalid" }
+| TIMEOUT      { "timeout" }
+| UNKNOWN      { "unknown" }
+| FAIL         { "fail" }
+| FILENAME     { "filename" }
+| TRANSFORM    { "transformation" }
+| PLUGIN       { "plugin" }
 
 ident_rich:
 | ident                     { $1 }
