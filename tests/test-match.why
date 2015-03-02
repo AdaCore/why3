@@ -1,0 +1,29 @@
+
+
+theory T
+
+  use import int.Int
+
+  type list = Nil | Cons int list
+
+  function tl list : list
+  
+  function length (l:list) : int
+(*  =
+    match l with
+       | Nil -> 0
+       | Cons _ r -> 1 + length r
+    end
+*)
+
+  axiom a : forall l:list. let h = tl l in length l = 1 + length h
+  
+  goal g0: length (Cons 1 Nil) = 1
+
+
+(*
+  goal g1 : forall x.
+       match x with A -> x=x | B A -> false | B (B _) -> false end
+*)
+
+end

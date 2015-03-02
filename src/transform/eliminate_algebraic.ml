@@ -501,7 +501,7 @@ let eliminate_algebraic_if_poly =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
     | [] -> eliminate_algebraic
-    | _ -> Trans.identity)
+    | _ -> compile_match)
 
 let () =
   Trans.register_transform "eliminate_algebraic_if_poly"
