@@ -337,6 +337,7 @@ let sprint_decl (fn : 'a -> Format.formatter -> decl -> 'a * string list) =
 
 exception UnsupportedType of ty   * string
 exception UnsupportedTerm of term * string
+exception UnsupportedPattern of pattern * string
 exception UnsupportedDecl of decl * string
 exception NotImplemented  of        string
 exception Unsupported     of        string
@@ -345,6 +346,7 @@ exception Unsupported     of        string
 
 let unsupportedType e s = raise (UnsupportedType (e,s))
 let unsupportedTerm e s = raise (UnsupportedTerm (e,s))
+let unsupportedPattern p s = raise (UnsupportedPattern (p,s))
 let unsupportedDecl e s = raise (UnsupportedDecl (e,s))
 let notImplemented    s = raise (NotImplemented s)
 let unsupported       s = raise (Unsupported s)
@@ -384,6 +386,9 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | UnsupportedTerm (e,s) ->
       fprintf fmt "@[@[<hov 3> This expression isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_term e s
+  | UnsupportedPattern (p,s) ->
+      fprintf fmt "@[@[<hov 3> This pattern isn't supported:@\n%a@]@\n %s@]"
+        Pretty.print_pat p s
   | UnsupportedDecl (d,s) ->
       fprintf fmt "@[@[<hov 3> This declaration isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_decl d s

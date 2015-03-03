@@ -156,11 +156,40 @@ let rec print_term info fmt t = match t.t_node with
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
+(*
   | Tcase _ -> unsupportedTerm t
-      "smtv2 : you must eliminate match"
+      "smtv2: you must eliminate match"
+*)
+  | Tcase(t,bl) ->
+     let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+     fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+             print_var subject (print_term info) t
+             (print_branches info subject) bl;
+     forget_var subject
   | Teps _ -> unsupportedTerm t
-      "smtv2 : you must eliminate epsilon"
+      "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
+
+and print_branches info subject fmt bl =
+  match bl with
+  | [] -> assert false
+  | br::bl ->
+     let (p,t) = t_open_branch br in
+     let constr,args =
+       match p.pat_node with
+       | Papp(cs,args) -> cs,args
+       | _ -> unsupportedPattern p
+                "smtv2: you must compile nested pattern-matching"
+     in
+     match bl with
+     | [] -> print_branch info fmt (args,t)
+     | _ ->
+        fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+                print_ident constr.ls_name print_var subject
+                (print_branch info) (args,t) (print_branches info subject) bl
+
+and print_branch info fmt (vars,t) =
+  fprintf fmt "<branch>"
 
 and print_fmla info fmt f = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
