@@ -6,24 +6,23 @@ theory T
 
   type list = Nil | Cons int list
 
-  function tl list : list
-  
-  function length (l:list) : int
-(*  =
+  function tl (l:list) : list =
+    match l with
+       | Nil -> Nil
+       | Cons _ r -> r
+    end
+
+  goal g0: tl (Cons 42 (Cons 37 Nil)) = Cons 37 Nil
+
+  function length (l:list) : int =
     match l with
        | Nil -> 0
        | Cons _ r -> 1 + length r
     end
-*)
 
-  axiom a : forall l:list. let h = tl l in length l = 1 + length h
-  
-  goal g0: length (Cons 1 Nil) = 1
+  goal g1 : forall l:list. l <> Nil -> let h = tl l in length l = 1 + length h
+ 
+  goal g2: length (Cons 1 Nil) = 1
 
-
-(*
-  goal g1 : forall x.
-       match x with A -> x=x | B A -> false | B (B _) -> false end
-*)
 
 end

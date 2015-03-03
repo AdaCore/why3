@@ -179,7 +179,7 @@ let eliminate_definition_if_poly =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
     | [] -> eliminate_definition
-    | _ -> Trans.identity)
+    | _ -> eliminate_recursion)
 
 let () =
   Trans.register_transform "eliminate_definition_if_poly"
