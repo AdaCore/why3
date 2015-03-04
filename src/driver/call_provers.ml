@@ -163,15 +163,7 @@ let rec debug_print_model model =
     debug_print_model t;
   end
 
-let rec add_model str model =
-  match model with
-  | [] -> str
-  | (term, value)::t -> begin
-    let n_str = str ^ term ^ " = " ^ value ^ "\n" in
-    add_model n_str t
-  end
-
-let parse_prover_run res_parser time out ret on_timelimit timelimit =
+let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
   let ans = match ret with
     | Unix.WSTOPPED n ->
         Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
@@ -192,14 +184,13 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
       && time >= (0.9 *. float timelimit) -> Timeout
     | _ -> ans
   in
-  let model = res_parser.prp_model_parser out in
-  let out_with_model = add_model (out^"\nModel:\n") model
-  in
+  let model = res_parser.prp_model_parser out printer_mapping in
+  (* let out_with_model = add_model (out^"\nModel:\n") model in *)
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;
   { pr_answer = ans;
     pr_status = ret;
-    pr_output = out_with_model;
+    pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
     pr_model  = model;
@@ -230,8 +221,9 @@ let actualcommand command timelimit memlimit stepslimit file =
   List.map (Str.global_substitute cmd_regexp replace) arglist,
   !use_stdin, !on_timelimit
 
-let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
+let  call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                  ~res_parser
+		 ~printer_mapping
                  ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
   let command, use_stdin, on_timelimit =
@@ -277,12 +269,13 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
           if inplace then swallow (Sys.rename (save fin)) fin;
           if redirect then swallow Sys.remove fout
         end;
-        parse_prover_run res_parser time out ret on_timelimit timelimit
+        parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping
     in
     { call = call; pid = pid }
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                    ~res_parser ~filename
+		   ~printer_mapping
                    ?(inplace=false) buffer =
 
   let fin,cin =
@@ -293,7 +286,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~timelimit ~memlimit ~stepslimit
-               ~res_parser ~cleanup:true ~inplace fin
+               ~res_parser ~printer_mapping ~cleanup:true ~inplace fin
 
 let query_call pc =
   let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in

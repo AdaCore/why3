@@ -347,6 +347,12 @@ let output_page,output_tab =
   3, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
+let counterexample_page,counterexample_tab =
+  let label = GMisc.label ~text:"Counter-example" () in
+  3, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+
 let _ = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
 
 (******************)
@@ -387,6 +393,18 @@ let output_view =
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_output_view#add
+    ()
+
+let scrolled_counterexample_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:counterexample_tab#add ()
+
+let counterexample_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_counterexample_view#add
     ()
 
 let modifiable_sans_font_views = ref [goals_view#misc]
@@ -539,6 +557,14 @@ let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
+let rec add_model str model =
+  match model with
+  | [] -> str
+  | (term, value)::t -> begin
+    let n_str = str ^ term ^ " = " ^ value ^ "\n" in
+    add_model n_str t
+  end
+
 let goal_task_text g =
   if (Gconfig.config ()).intro_premises then
     let trans =
@@ -608,11 +634,23 @@ let update_tabs a =
       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
     | _ -> ""
  in
+  let counterexample_text = 
+    match a with
+    | S.Proof_attempt a ->
+      begin
+        match a.S.proof_state with
+	  | S.Done r ->
+            add_model "" r.Call_provers.pr_model
+	  | _ -> "" 
+      end
+    | _ -> ""
+  in
  task_view#source_buffer#set_text task_text;
  task_view#scroll_to_mark `INSERT;
  edited_view#source_buffer#set_text edited_text;
  edited_view#scroll_to_mark `INSERT;
- output_view#source_buffer#set_text output_text
+ output_view#source_buffer#set_text output_text;
+ counterexample_view#source_buffer#set_text counterexample_text
 
 
 
