@@ -1,14 +1,19 @@
-
-
 module M
+
+  use import ref.Ref
 
   use import int.Int
 
-  constant x "model" : int
+  let incr ( x "model" "model_trace:x" : ref int ): unit
+  ensures { !x = old !x + 2 }
+  = 
+  x := !x + 1;	 
+  x := !x + 1;
+  x := !x + 1
 
-  constant y "model" : int
-
-  goal g : x + y >= 0
-
-  goal h : forall z "model". x+z >= 0
+  let test_loop ( x "model" "model_trace:x" : ref int ): unit
+  ensures { !x < old !x }
+  =
+  incr x;
+  while "model" "model_trace:cond" !x > 0 do invariant { !x >= 0 } x := !x - 1 done
 end
