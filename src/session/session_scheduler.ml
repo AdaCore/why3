@@ -471,7 +471,7 @@ let run_external_proof_v3 eS eT a callback =
 	| _ -> -1
       in
       let inplace = npc.prover_config.Whyconf.in_place in
-      let command = Whyconf.get_complete_command npc.prover_config in
+      let command = Whyconf.get_complete_command npc.prover_config stepslimit in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
         callback a ap timelimit

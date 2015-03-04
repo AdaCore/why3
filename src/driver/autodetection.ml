@@ -66,6 +66,7 @@ type prover_autodetection_data =
       versions_bad : Str.regexp list;
       (** If none it's a fake prover (very bad version) *)
       prover_command : string option;
+      prover_command_steps : string option;
       prover_driver : string;
       prover_editor : string;
       prover_in_place : bool;
@@ -96,6 +97,7 @@ let load_prover kind (id,section) =
     versions_old = reg_map (get_stringl section ~default:[] "version_old");
     versions_bad = reg_map (get_stringl section ~default:[] "version_bad");
     prover_command = get_stringo section "command";
+    prover_command_steps = get_stringo section "commad_steps";
     prover_driver = get_string section ~default:""  "driver";
     prover_editor = get_string section ~default:"" "editor";
     prover_in_place = get_bool section ~default:false "in_place";
@@ -377,12 +379,17 @@ let detect_exec env main data acc exec_name =
     | Some prover_command ->
     (** create the prover config *)
     let c = make_command exec_name prover_command in
+    let c_steps = (match data.prover_command_steps with
+      | None -> None
+      | Some prover_command_steps ->
+	Some (make_command exec_name prover_command_steps)) in
     let prover = {Wc.prover_name = data.prover_name;
                   prover_version      = ver;
                   prover_altern       = data.prover_altern} in
     let prover_config =
       {prover  = prover;
        command = c;
+       command_steps = c_steps;
        driver  = Filename.concat (datadir main) data.prover_driver;
        editor  = data.prover_editor;
        in_place      = data.prover_in_place;

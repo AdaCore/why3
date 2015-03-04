@@ -1062,7 +1062,7 @@ let bisect_proof_attempt pa =
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
-          ~command:(C.get_complete_command lp.S.prover_config)
+          ~command:(C.get_complete_command lp.S.prover_config (-1))
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
@@ -1099,7 +1099,7 @@ let bisect_proof_attempt pa =
 	      ~stepslimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
-              ~command:(C.get_complete_command lp.S.prover_config)
+              ~command:(C.get_complete_command lp.S.prover_config (-1))
               ~driver:lp.S.prover_driver
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."

@@ -107,17 +107,18 @@ module Hprover  : Exthtbl.S with type key = prover
 (** {3 Prover configuration} *)
 
 type config_prover = {
-  prover  : prover;   (* unique name for session *)
-  command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
-  driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
-  in_place: bool;     (* verification should be performed in-place *)
-  editor  : string;   (* Dedicated editor *)
-  interactive : bool; (* Interactive theorem prover *)
-  extra_options : string list;
-  extra_drivers : string list;
+  prover       : prover;   (* unique name for session *)
+  command      : string;   (* "exec why-limit %t %m alt-ergo %f" *)
+  command_steps: string option; (* The command when the number of steps is limited "exec why-limit %t %m -steps-bound %S alt-ergo %f"  *)
+  driver       : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  in_place     : bool;     (* verification should be performed in-place *)
+  editor       : string;   (* Dedicated editor *)
+  interactive  : bool; (* Interactive theorem prover *)
+  extra_options: string list;
+  extra_drivers: string list;
 }
 
-val get_complete_command : config_prover -> string
+val get_complete_command : config_prover -> int -> string
 (** add the extra_options to the command *)
 
 val get_provers : config -> config_prover Mprover.t

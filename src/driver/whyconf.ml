@@ -114,6 +114,7 @@ type prover_upgrade_policy =
 type config_prover = {
   prover  : prover;
   command : string;
+  command_steps : string option;
   driver  : string;
   in_place: bool;
   editor  : string;
@@ -202,9 +203,17 @@ let loadpath m =
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
-let get_complete_command pc =
-  String.concat " " (pc.command :: pc.extra_options)
 
+exception StepsCommandNotSpecified of string
+
+let get_complete_command pc stepslimit =
+  let comm = if stepslimit < 0 then pc.command
+      else 
+      match pc.command_steps with 
+      | None -> raise (StepsCommandNotSpecified "The solver is used with step limit and the command for running the solver with steplimit is not specified.")
+      | Some command_steps -> command_steps in
+  String.concat " " (comm :: pc.extra_options)
+    
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
 
@@ -388,6 +397,7 @@ let load_prover dirname (provers,shortcuts) section =
     let provers = Mprover.add prover
       { prover  = prover;
         command = get_string section "command";
+	command_steps = get_stringo section "command_steps";
         driver  = absolute_filename dirname (get_string section "driver");
         in_place = get_bool ~default:false section "in_place";
         editor  = get_string ~default:"" section "editor";
