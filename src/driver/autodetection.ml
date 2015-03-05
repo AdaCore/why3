@@ -78,7 +78,7 @@ let prover_keys =
   List.fold_left add Sstr.empty
     ["name";"compile_time_support";
      "exec";"version_switch";"version_regexp";
-     "version_ok";"version_old";"version_bad";"command";
+     "version_ok";"version_old";"version_bad";"command"; "command_steps";
      "editor";"driver";"in_place";"message";"alternative";]
 
 let load_prover kind (id,section) =
@@ -97,7 +97,7 @@ let load_prover kind (id,section) =
     versions_old = reg_map (get_stringl section ~default:[] "version_old");
     versions_bad = reg_map (get_stringl section ~default:[] "version_bad");
     prover_command = get_stringo section "command";
-    prover_command_steps = get_stringo section "commad_steps";
+    prover_command_steps = get_stringo section "command_steps";
     prover_driver = get_string section ~default:""  "driver";
     prover_editor = get_string section ~default:"" "editor";
     prover_in_place = get_bool section ~default:false "in_place";
@@ -379,10 +379,17 @@ let detect_exec env main data acc exec_name =
     | Some prover_command ->
     (** create the prover config *)
     let c = make_command exec_name prover_command in
+    
     let c_steps = (match data.prover_command_steps with
       | None -> None
       | Some prover_command_steps ->
 	Some (make_command exec_name prover_command_steps)) in
+    
+    (*
+    let c_steps = (match data.prover_command_steps with
+      | None -> ""
+      | Some prover_command_steps ->
+	 (make_command exec_name prover_command_steps)) in *)
     let prover = {Wc.prover_name = data.prover_name;
                   prover_version      = ver;
                   prover_altern       = data.prover_altern} in

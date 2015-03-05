@@ -208,10 +208,12 @@ exception StepsCommandNotSpecified of string
 
 let get_complete_command pc stepslimit =
   let comm = if stepslimit < 0 then pc.command
-      else 
+      else
+      
       match pc.command_steps with 
       | None -> raise (StepsCommandNotSpecified "The solver is used with step limit and the command for running the solver with steplimit is not specified.")
       | Some command_steps -> command_steps in
+      (* pc.command_steps in *)
   String.concat " " (comm :: pc.extra_options)
     
 let set_limits m time mem running =
@@ -711,9 +713,22 @@ let merge_config config filename =
   { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
 
+let debug = Debug.register_info_flag "whyconf"
+  ~desc:"Print@ debugging@ messages@ about@ whyconf."
+
+let debug_print_commands key prover =
+  Debug.dprintf debug "Prover name = %s@." key.prover_name;
+  Debug.dprintf debug "Prover commad = %s@." prover.command;
+  match prover.command_steps with
+  | None -> Debug.dprintf debug "Steps command not given."
+  | Some (comm_steps) ->Debug.dprintf debug "Prover commad steps = %s@." comm_steps
+
 let save_config config =
   let filename = config.conf_file in
   if filename <> "" then begin
+    Debug.dprintf debug "Prover configurations:@.";
+    Mprover.iter debug_print_commands config.provers;
+
     Sysutil.backup_file filename;
     to_file filename config.config
   end
