@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN=map__Map mp__N
+GEN=map__Map mach__int__UInt32 mp__N
 OBJ=$(GEN) parse
 
 GENML = $(addsuffix .ml, $(GEN))
@@ -46,7 +46,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(GENML): ../mp.mlw
-	$(WHY3) -E ocaml32 $< -o .
+	$(WHY3) extract -D ocaml32 $< -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
@@ -70,12 +70,12 @@ JSMAIN=jsmain
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
           -syntax camlp4o
 
-$(JSMAIN).js: $(JSMAIN).byte 
-	js_of_ocaml -pretty -noinline $(JSMAIN).byte
+$(JSMAIN).js: $(JSMAIN).byte
+	js_of_ocaml +nat.js $(JSMAIN).byte
 
 
 $(JSMAIN).byte: $(CMO) jsmain.ml
-	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg nums.cma why3extract.cma $^
 
 
 %.cmo: %.ml

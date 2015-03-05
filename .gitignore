@@ -21,6 +21,7 @@ why3.conf
 *.vd
 *.glob
 *.elc
+*.summary
 \#*\#
 
 # /
@@ -137,13 +138,15 @@ why3.conf
 # /share/
 /share/emacs/semantic.cache
 /share/Makefile.config
+/share/drivers
+/share/modules
+/share/theories
 
 # /src/
 /src/config.sh
 
 # Coq tactic
-/src/coq-tactic/coqCompat.ml
-/src/coq-tactic/g_why3tac.ml
+/src/coq-tactic/why3tac.ml
 /src/coq-tactic/.why3-vo-*
 
 # PVS
@@ -159,18 +162,19 @@ pvsbin/
 /lib/isabelle/list/
 /lib/isabelle/map/
 /lib/isabelle/set/
+/lib/isabelle/last_build
 
 # /src/driver/
 /src/driver/driver_lexer.ml
 /src/driver/driver_parser.ml
 /src/driver/driver_parser.mli
-/src/driver/driver_parser.output
+/src/driver/driver_parser.conflicts
 
 # /src/parser/
 /src/parser/lexer.ml
 /src/parser/parser.ml
 /src/parser/parser.mli
-/src/parser/parser.output
+/src/parser/parser.conflicts
 
 # /src/why3doc/
 /src/why3doc/doc_lexer.ml
@@ -192,7 +196,7 @@ pvsbin/
 /plugins/tptp/tptp_lexer.ml
 /plugins/tptp/tptp_parser.ml
 /plugins/tptp/tptp_parser.mli
-/plugins/tptp/tptp_parser.output
+/plugins/tptp/tptp_parser.conflicts
 /plugins/parser/dimacs.ml
 
 # /drivers
@@ -224,8 +228,11 @@ pvsbin/
 /examples/in_progress/*/*.byte
 /examples/*.html
 /examples/*/*.html
+!/examples/*/index.html
 /examples/*/*/*.html
+!/examples/*/*/index.html
 /examples/*/*/*/*.html
+!/examples/*/*/*/index.html
 /examples/style.css
 /examples/*/style.css
 /examples/*/*/style.css
@@ -238,6 +245,9 @@ pvsbin/
 /examples/vstte10_max_sum/*__*.ml
 /examples/euler001/*__*.ml
 /examples/sudoku/*__*.ml
+/examples/sudoku/jsmain.js
+/examples/in_progress/sudoku_reloaded/*__*.ml
+/examples/in_progress/sudoku_reloaded/jsmain.js
 /examples/gcd/*__*.ml
 /examples/gcd/jsmain.js
 /examples/defunctionalization/*__*.ml

@@ -79,7 +79,7 @@ module Make(O : OBSERVER) = struct
 (*************************)
 
 type action =
-  | Action_proof_attempt of int * int * string option * bool * string *
+  | Action_proof_attempt of int * int * int * string option * bool * string *
       Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
 
@@ -209,13 +209,13 @@ let idle_handler t =
     if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
       begin
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
+        | Action_proof_attempt(timelimit,memlimit,stepslimit,old,inplace,command,driver,
                                callback,goal) ->
             begin
               try
                 let pre_call =
                   Driver.prove_task
-                    ?old ~inplace ~command ~timelimit ~memlimit driver goal
+                    ?old ~inplace ~command ~timelimit ~stepslimit ~memlimit driver goal
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
@@ -257,7 +257,7 @@ let cancel_scheduled_proofs t =
   try
     while true do
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(_timelimit,_memlimit,_old,_inplace,_command,
+        | Action_proof_attempt(_timelimit,_memlimit,_stepslimit,_old,_inplace,_command,
                                _driver,callback,_goal) ->
             callback Interrupted
         | Action_delayed _ as a->
@@ -275,14 +275,14 @@ let cancel_scheduled_proofs t =
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
-let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
+let schedule_proof_attempt ~timelimit ~memlimit ~stepslimit ?old ~inplace
     ~command ~driver ~callback t goal =
   Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   callback Scheduled;
   Queue.push
-    (Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
+    (Action_proof_attempt(timelimit,memlimit,stepslimit,old,inplace,command,driver,
                         callback,goal))
     t.actions_queue;
   run_idle_handler t
@@ -292,7 +292,8 @@ let schedule_edition t command filename callback =
   let res_parser =
     { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown "")];
       Call_provers.prp_regexps = [];
-      Call_provers.prp_timeregexps = []
+      Call_provers.prp_timeregexps = [];
+      Call_provers.prp_stepsregexp = [];
     } in
   let precall =
     Call_provers.call_on_file ~command ~res_parser ~redirect:false filename in
@@ -461,6 +462,14 @@ let run_external_proof_v3 eS eT a callback =
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
+      let stepslimit =
+	match a with
+	| { proof_state =
+            Done { Call_provers.pr_answer = Call_provers.Valid;
+                   Call_provers.pr_steps = s };
+	    proof_obsolete = false } when s >= 0 -> s
+	| _ -> -1
+      in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in
       let cb result =
@@ -476,7 +485,7 @@ let run_external_proof_v3 eS eT a callback =
             if Sys.file_exists f then Some f
             else raise (NoFile f) in
         schedule_proof_attempt
-          ~timelimit ~memlimit
+          ~timelimit ~memlimit ~stepslimit
           ?old ~inplace ~command
           ~driver:npc.prover_driver
           ~callback:cb
@@ -589,7 +598,11 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
 (* method: replay obsolete proofs *)
 (**********************************)
 
-let proof_successful_or_just_edited a =
+(* in the default context, a proof should be replayed if
+   . it was successful or
+   . it was just edited
+*)
+let proof_should_be_replayed a =
   match a.proof_state with
     | Done { Call_provers.pr_answer = Call_provers.Valid }
     | JustEdited -> true
@@ -600,7 +613,7 @@ let rec replay_on_goal_or_children eS eT
   iter_goal
     (fun a ->
        if not obsolete_only || a.proof_obsolete then
-         if not context_unproved_goals_only || proof_successful_or_just_edited a
+         if not context_unproved_goals_only || proof_should_be_replayed a
          then run_external_proof eS eT a)
     (iter_transf
        (replay_on_goal_or_children eS eT
@@ -880,12 +893,21 @@ let remove_metas t =
   O.remove t.metas_key;
   remove_metas ~notify t
 
+(* a proof is removable if
+    . it is not in progress and
+    . it is obsolete or not successful
+*)
+let proof_removable a =
+  match a.proof_state with
+  | Done pr ->
+    a.proof_obsolete || pr.Call_provers.pr_answer <> Call_provers.Valid
+  | _ -> false
+
+
 let rec clean = function
   | Goal g when Opt.inhabited g.goal_verified ->
     iter_goal
-      (fun a ->
-        if a.proof_obsolete || not (proof_successful_or_just_edited a) then
-          remove_proof_attempt a)
+      (fun a -> if proof_removable a then remove_proof_attempt a)
       (fun t ->
         if not (Opt.inhabited t.transf_verified) then remove_transformation t
         else transf_iter clean t)
@@ -895,18 +917,7 @@ let rec clean = function
       g
   | Goal g ->
     (** don't iter on proof_attempt if the goal is not proved *)
-    iter_goal
-      (fun _ -> ())
-      (fun t ->
-        (* NO !!!
-           if not t.transf_verified then remove_transformation t
-        else
-        *)
-        transf_iter clean t)
-      (fun m ->
-        if not (Opt.inhabited m.metas_verified) then remove_metas m
-        else metas_iter clean m)
-      g
+    iter_goal (fun _ -> ()) (transf_iter clean) (metas_iter clean) g
   | Proof_attempt a -> clean (Goal a.proof_parent)
   | any -> iter clean any
 

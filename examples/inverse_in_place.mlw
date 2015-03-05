@@ -18,18 +18,14 @@
 module InverseInPlace
 
   use import int.Int
+  use int.NumOf
   use import ref.Ref
   use import array.Array
 
   function (~_) (x: int) : int = -x-1
 
-  type param = M.map int int
-  predicate pr (a: param) (n: int) = M.([]) a n >= 0
-  clone import int.NumOfParam with type param = param, predicate pr = pr
-
-  lemma num_of_decrease:
-    forall m: param, l r i v: int. l <= i < r ->
-    M.get m i >= 0 -> v < 0 -> num_of (M.set m i v) l r < num_of m l r
+  function numof (m: M.map int int) (l r: int) : int =
+    NumOf.numof (\ n. M.([]) m n >= 0) l r
 
   predicate is_permutation (a: array int) =
     forall i: int. 0 <= i < length a ->
@@ -72,7 +68,7 @@ module InverseInPlace
                       (at a 'L)[~ !j] = !k /\ a[~ !j] < 0 /\ a[m] < 0 }
           invariant { forall e: int. 0 <= e < m -> a[e] < 0 -> a[e] <> !j }
           invariant { loopinvariant (at a 'L) a m (m-1) n }
-          variant   { num_of a.elts 0 n }
+          variant   { numof a.elts 0 n }
           a[!k] <- !j;
           j := ~ !k;
           k := !i;

@@ -25,13 +25,12 @@ module Mjrty
   use import int.Int
   use import ref.Refint
   use import array.Array
+  use import array.NumOfEq
 
   exception Not_found
   exception Found
 
   type candidate
-
-  clone import array.NumOfEq with type elt = candidate
 
   let mjrty (a: array candidate) : candidate
     requires { 1 <= length a }

@@ -344,6 +344,7 @@ depending on whether the index is meaningful or not.
 \begin{whycode}
 module SearchingALinkedList
   use import int.Int
+  use import option.Option
   use export list.List
   use export list.Length
   use export list.Nth
@@ -795,6 +796,7 @@ operations we will require: length, reversal, and concatenation.
 \begin{whycode}
 module AmortizedQueue
   use import int.Int
+  use import option.Option
   use export list.ListRich
 \end{whycode}
 The queue data type is naturally introduced as a polymorphic record type.

@@ -50,6 +50,11 @@ let opt_parser = ref None
 let opt_driver = ref None
 let opt_output = ref None
 
+let add_opt_driver s =
+  match !opt_driver with
+  | None -> opt_driver := Some s
+  | Some _ -> eprintf "Cannot specify more than one driver@."; exit 1
+
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " read the input file from stdin";
@@ -61,9 +66,9 @@ let option_list = [
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "-D", Arg.String (fun s -> opt_driver := Some s),
+  "-D", Arg.String add_opt_driver,
       "<file> specify a driver";
-  "--driver", Arg.String (fun s -> opt_driver := Some s),
+  "--driver", Arg.String add_opt_driver,
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> print the selected goals to separate files in <dir>";

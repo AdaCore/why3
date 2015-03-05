@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="23" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<file name="../bitvectors.why" expanded="true">
+<theory name="TestBV" sum="d318f02c83a7261b5dc501a4a7f36ac8" expanded="true">
+ <goal name="g1">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="f1">
+ <proof prover="0"><result status="timeout" time="3.80"/></proof>
+ <proof prover="2"><result status="timeout" time="5.97"/></proof>
+ <proof prover="3"><result status="timeout" time="4.97"/></proof>
+ </goal>
+ <goal name="g2">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="f2">
+ <proof prover="0"><result status="timeout" time="3.57"/></proof>
+ <proof prover="2"><result status="timeout" time="5.99"/></proof>
+ <proof prover="3"><result status="timeout" time="5.01"/></proof>
+ </goal>
+ <goal name="g3">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="g4">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="g3a">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="g3b">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="g3c">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="g4a">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="g4b">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="g5a">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="g5b">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="g6a">
+ <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
+ </goal>
+ <goal name="g6b">
+ <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="g7a">
+ <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+ </goal>
+ <goal name="g7b" expanded="true">
+ <proof prover="0"><result status="timeout" time="3.69"/></proof>
+ <proof prover="2"><result status="timeout" time="6.00"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ </goal>
+ <goal name="g8a" expanded="true">
+ <proof prover="0"><result status="timeout" time="3.80"/></proof>
+ <proof prover="2"><result status="timeout" time="5.98"/></proof>
+ <proof prover="3"><result status="timeout" time="5.01"/></proof>
+ </goal>
+ <goal name="g8b" expanded="true">
+ <proof prover="0"><result status="timeout" time="3.83"/></proof>
+ <proof prover="2"><result status="timeout" time="5.98"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ </goal>
+ <goal name="Nth_bw_and">
+ <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Nth_bw_or">
+ <proof prover="0"><result status="valid" time="0.03" steps="10"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Nth_bw_xor">
+ <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Nth_bw_not">
+ <proof prover="0"><result status="valid" time="0.03" steps="10"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="not_not">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="not_and">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Lsr_nth_low">
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Lsr_nth_high">
+ <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Asr_nth_low">
+ <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Asr_nth_high">
+ <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Lsl_nth_high">
+ <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Lsl_nth_low">
+ <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

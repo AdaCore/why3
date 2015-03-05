@@ -19,10 +19,12 @@ ifeq ($(BENCH),yes)
   INCLUDE += -I ../../lib/why3
 endif
 
-MAIN = main
-OBJ = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver
+MAIN=main
+GEN = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver
+OBJ=$(GEN)
 
-ML  = $(addsuffix .ml, $(OBJ))
+GENML = $(addsuffix .ml, $(GEN))
+ML = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
 CMX = $(addsuffix .cmx, $(OBJ))
 
@@ -30,7 +32,7 @@ OCAMLOPT = ocamlopt -noassert -inline 1000
 
 all: $(MAIN).opt
 
-extract: $(ML)
+extract: $(GENML)
 
 doc:
 	$(WHY3) doc ../sudoku.mlw
@@ -44,22 +46,33 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 
 $(MAIN).cmx: $(CMX)
 
-$(ML): ../sudoku.mlw
+$(GENML): ../sudoku.mlw
 	$(WHY3) extract -D ocaml32 ../sudoku.mlw -o .
+
+# javascript
+
+
+JSMAIN=jsmain
+
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
+          -syntax camlp4o
+
+$(JSMAIN).js: $(JSMAIN).byte
+	js_of_ocaml +nat.js $(JSMAIN).byte
+
+$(JSMAIN).byte: $(CMO) $(JSMAIN).cmo
+	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
+
+%.cmo: %.ml
+	$(JSOCAMLC) $(INCLUDE) -annot -c $<
+
+%.cmi: %.mli
+	$(JSOCAMLC) $(INCLUDE) -annot -c $<
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
 
-%.cmo: %.ml
-	ocamlc $(INCLUDE) -annot -g -c $<
-
-%.cmi: %.mli
-	ocamlc $(INCLUDE) -annot -g -c $<
-
 clean::
-	rm -f $(ML) *.annot *.o *.cm[xio] $(MAIN).opt $(MAIN).byte
+	rm -f $(GENML) *.annot *.o *.cm[xio] $(MAIN).opt $(MAIN).byte
 	rm -f sudoku__*.ml why3__*.ml
 	rm -f int__Int.ml map__Map.ml array__Array.ml
-
-
-

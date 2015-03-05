@@ -673,10 +673,10 @@ let theory_checksum ?(version=current_shape_version) t =
 *)
 
 module type S = sig
-  type t
-  val checksum : t -> checksum option
-  val shape    : t -> string
-  val name     : t -> Ident.ident
+  type 'a t
+  val checksum : 'a t -> checksum option
+  val shape    : 'a t -> string
+  val name     : 'a t -> Ident.ident
 end
 
 module Pairing(Old: S)(New: S) = struct
@@ -688,21 +688,30 @@ module Pairing(Old: S)(New: S) = struct
 
   open Ident
 
-  type any_goal = Old of Old.t | New of New.t
+  type goal_index = Old of int | New of int
+
+  type ('a,'b) goal_table = {
+    table_old : 'a Old.t array;
+    table_new : 'b New.t array;
+  }
 
   (* doubly linked lists; left and right bounds point to themselves *)
 
   type node = {
     mutable  prev: node;
             shape: string;
-              elt: any_goal;
+              elt: goal_index;
     mutable valid: bool;
     mutable  next: node;
   }
 
-  let mk_node g =
-    let s = match g with Old g -> Old.shape g | New g -> New.shape g in
-    let rec n = { prev = n; shape = s; elt = g; next = n; valid = true } in n
+  let mk_node table g =
+    let s = match g with
+      | Old g -> Old.shape table.table_old.(g)
+      | New g -> New.shape table.table_new.(g)
+    in
+    let rec n = { prev = n; shape = s; elt = g; next = n; valid = true }
+    in n
 
   let rec iter_pairs f = function
     | [] | [_] -> ()
@@ -728,39 +737,52 @@ module Pairing(Old: S)(New: S) = struct
   let dprintf = Debug.dprintf debug
 
   let associate oldgoals newgoals =
+    let table = {
+      table_old = Array.of_list oldgoals;
+      table_new = Array.of_list newgoals;
+    }
+    in
     (* set up an array [result] containing the solution
        [new_goal_index g] returns the index of goal [g] in that array *)
     let new_goal_index = Hid.create 17 in
     let result =
       let make i newg =
-        Hid.add new_goal_index (New.name newg) i; (newg, None) in
-      Array.mapi make (Array.of_list newgoals) in
+        Hid.add new_goal_index (New.name newg) i; (newg, None)
+      in
+      Array.mapi make table.table_new
+    in
     let new_goal_index newg =
       try Hid.find new_goal_index (New.name newg)
       with Not_found -> assert false in
     (* phase 1: pair goals with identical checksums *)
     let old_checksums = Hashtbl.create 17 in
-    let add acc oldg = match Old.checksum oldg with
-      | None -> mk_node (Old oldg) :: acc
-      | Some s -> Hashtbl.add old_checksums s oldg; acc
-    in
     let old_goals_without_checksum =
-      List.fold_left add [] oldgoals
+      let acc =ref [] in
+      for oldg = 0 to Array.length table.table_old - 1 do
+        match Old.checksum table.table_old.(oldg) with
+        | None -> acc := mk_node table (Old oldg) :: !acc
+        | Some s -> Hashtbl.add old_checksums s oldg
+      done;
+      !acc
     in
-    let collect acc newg =
-      try
-        match New.checksum newg with
-        | None -> raise Not_found
-        | Some c ->
-          let oldg = Hashtbl.find old_checksums c in
-          Hashtbl.remove old_checksums c;
-          result.(new_goal_index newg) <- (newg, Some (oldg, false));
-          acc
-      with Not_found ->
-        mk_node (New newg) :: acc
+    let newgoals =
+      let acc = ref old_goals_without_checksum in
+      for newi = 0 to Array.length table.table_new - 1 do
+        try
+          let newg = table.table_new.(newi) in
+          match New.checksum newg with
+          | None -> raise Not_found
+          | Some c ->
+             let oldi = Hashtbl.find old_checksums c in
+             let oldg = table.table_old.(oldi) in
+             Hashtbl.remove old_checksums c;
+             result.(new_goal_index newg) <- (newg, Some (oldg, false))
+        with Not_found ->
+          acc := mk_node table (New newi) :: !acc
+      done;
+      !acc
     in
-    let newgoals = List.fold_left collect old_goals_without_checksum newgoals in
-    let add _ oldg acc = mk_node (Old oldg) :: acc in
+    let add _ oldg acc = mk_node table (Old oldg) :: acc in
     let allgoals = Hashtbl.fold add old_checksums newgoals in
     Hashtbl.clear old_checksums;
     (* phase 2: pair goals according to shapes *)
@@ -781,19 +803,32 @@ module Pairing(Old: S)(New: S) = struct
           let o, n = match x.elt, y.elt with
             | New n, Old o | Old o, New n -> o, n | _ -> assert false in
           dprintf "[assoc] new pairing@.";
-          result.(new_goal_index n) <- n, Some (o, true);
+          let newg = table.table_new.(n) in
+          let oldg = table.table_old.(o) in
+          result.(new_goal_index newg) <- newg, Some (oldg, true);
           if x.prev != x && y.next != y then add x.prev y.next;
           remove x;
           remove y
         end
       done
     end;
-    Array.to_list result
+    let detached =
+      List.fold_left
+        (fun acc x ->
+         if x.valid then
+           match x.elt with
+           | Old g -> table.table_old.(g) :: acc
+           | New _ -> acc
+         else acc)
+        [] allgoals
+    in
+    Debug.dprintf debug "[assoc] %d detached goals@." (List.length detached);
+    Array.to_list result, detached
 
-  let simple_associate (* ~obsolete *) oldgoals newgoals =
+  let simple_associate oldgoals newgoals =
     let rec aux acc o n =
       match o,n with
-        | _, [] -> acc
+        | old, [] -> acc,old
         | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
         | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
     in

@@ -36,7 +36,7 @@
 <!ATTLIST goal loccnumb CDATA #IMPLIED>
 <!ATTLIST goal loccnume CDATA #IMPLIED>
 
-<!ELEMENT proof (result|undone|internalfailure)>
+<!ELEMENT proof (result|undone|internalfailure|unedited)>
 <!ATTLIST proof prover CDATA #REQUIRED>
 <!ATTLIST proof timelimit CDATA #IMPLIED>
 <!ATTLIST proof memlimit CDATA #IMPLIED>
@@ -47,8 +47,10 @@
 <!ELEMENT result EMPTY>
 <!ATTLIST result status (valid|invalid|unknown|timeout|outofmemory|failure|highfailure) #REQUIRED>
 <!ATTLIST result time CDATA #IMPLIED>
+<!ATTLIST result steps CDATA #IMPLIED>
 
 <!ELEMENT undone EMPTY>
+<!ELEMENT unedited EMPTY>
 
 <!ELEMENT internalfailure EMPTY>
 <!ATTLIST internalfailure reason CDATA #REQUIRED>

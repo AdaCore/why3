@@ -19,10 +19,7 @@ open Task
 
 
 
-(** TODO use this label in the following function *)
-(* dead code
-let label_induction = create_label "induction"
-*)
+let lab_ind = create_label "induction"
 
 (*
 let desc_labels = [label_induction,
@@ -169,10 +166,7 @@ let decompose_forall t =
 
 
 let qvl_labeled qvl =
-  List.filter (fun v ->
-    let slab = Slab.filter (fun v ->
-      v.lab_string = "induction") v.vs_name.id_label
-    in not (Slab.is_empty slab)) qvl
+  List.filter (fun v -> Slab.mem lab_ind v.vs_name.id_label) qvl
 
 (*HEURISTICS SEARCH FOR CANDIDATES IN THE BODY OF THE FORMULA*)
 (* This function collects lists of variables corresponding to

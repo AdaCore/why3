@@ -42,7 +42,7 @@ theory Tree
     depths d1 t = depths d2 t -> d1 = d2
 
   lemma depths_subtree:
-    forall t1 t2: tree, d1 d2: int, s1: list int.
+    forall t1 "induction" t2: tree, d1 d2: int, s1: list int.
     depths d1 t1 ++ s1 = depths d2 t2 -> d1 >= d2
 
   lemma depths_unique2:

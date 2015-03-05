@@ -71,18 +71,17 @@ let read_env_spec () =
   let env = Env.create_env loadpath in
   env,config,read_simple_spec ()
 
-
 let read_update_session ~allow_obsolete env config fname =
-  let project_dir = Session.get_project_dir fname in
-  let session,use_shapes = Session.read_session project_dir in
+  let project_dir = S.get_project_dir fname in
+  let session,use_shapes = S.read_session project_dir in
   let ctxt = {
     S.allow_obsolete_goals = allow_obsolete;
     S.release_tasks = false;
     S.use_shapes_for_pairing_sub_goals = use_shapes;
-    S.keygen = fun ?parent:_ _ -> ();
+    S.keygen = (fun ?parent:_ () -> ());
   }
   in
-  Session.update_session ~ctxt session env config
+  S.update_session ~ctxt session env config
 
 (** filter *)
 type filter_prover =
@@ -216,7 +215,7 @@ let iter_proof_attempt_by_filter iter filters f session =
   let f = three_value f filters.verified_goal
     (fun a -> Opt.inhabited a.S.proof_parent.S.goal_verified) in
   (** verified *)
-  let f = three_value f filters.verified 
+  let f = three_value f filters.verified
     (fun p -> Opt.inhabited (S.proof_verified p)) in
   (** status *)
   let f = if filters.status = [] then f else

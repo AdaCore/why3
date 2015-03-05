@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Sudoku Solver using Why3</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body id="body" style="background-color:#e0e0a0">
+    <h1>Sudoku Solver</h1>
+        <p>This solver was developed and formally proved correct using
+        <a href="http://why3.lri.fr/">Why3</a>, extracted to OCaml and
+        then compiled to JavaScript
+        using <a href="http://ocsigen.org/js_of_ocaml/">Js_of_ocaml</a></p>
+
+    <div id="board"></div>
+    <p>
+      <button id="solve">Solve</button>
+      <button id="reset">Reset</button>
+    </p>
+    <p>
+      <button id="sample1">Example 1</button>
+      <button id="sample2">Example 2</button>
+      <button id="sample3">Example 3 (hard)</button>
+    </p>
+    <script type="text/javascript" src="jsmain.js"></script>
+        <p>See also
+          <ul>
+            <li> The <a href="http://toccata.lri.fr/gallery/sudoku.en.html">Why3 source of this solver</a>
+            <li> A <a href="http://www-sop.inria.fr/marelle/Laurent.Thery/Sudoku/Sudoku.html">Sudoku Solver formally proved using Coq</a>
+          </ul>
+        </p>
+  </body>
+</html>

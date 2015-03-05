@@ -189,7 +189,11 @@ and 'a transf =
       mutable transf_goals : 'a goal list;
       (** Not mutated after the creation of the session *)
       mutable transf_expanded : bool;
+      mutable transf_detached : 'a detached option;
     }
+
+and 'a detached =
+    { detached_goals: 'a goal list; }
 
 and 'a theory =
     { mutable theory_key : 'a;
@@ -200,6 +204,7 @@ and 'a theory =
       mutable theory_verified : float option;
       mutable theory_expanded : bool;
       mutable theory_task : Theory.theory hide;
+      mutable theory_detached : 'a detached option;
     }
 
 and 'a file =
@@ -539,9 +544,17 @@ let save_string fmt s =
       | c -> pp_print_char fmt c
   done
 
+let opt pr lab fmt = function
+  | None -> ()
+  | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
 let save_result fmt r =
-  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"/>"
+  let steps = if  r.Call_provers.pr_steps >= 0 then 
+		Some  r.Call_provers.pr_steps 
+	      else 
+		None
+  in
+  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"%a/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -551,6 +564,7 @@ let save_result fmt r =
        | Call_provers.OutOfMemory -> "outofmemory"
        | Call_provers.Invalid -> "invalid")
     r.Call_provers.pr_time
+    (opt pp_print_int "steps") steps
 
 let save_status fmt s =
   match s with
@@ -569,10 +583,6 @@ let save_bool_def name def fmt b =
 
 let save_int_def name def fmt n =
   if n <> def then fprintf fmt "@ %s=\"%d\"" name n
-
-let opt pr lab fmt = function
-  | None -> ()
-  | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
 let opt_string = opt save_string
 
@@ -1053,6 +1063,7 @@ let raw_add_transformation ~(keygen:'a keygen) ~(expanded:bool) g name =
              transf_key = key;
              transf_goals = [];
              transf_expanded = expanded;
+             transf_detached = None;
            }
   in
   PHstr.replace g.goal_transformations name tr;
@@ -1085,6 +1096,7 @@ let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool)
               theory_verified = None;
               theory_expanded = expanded;
               theory_task = None;
+              theory_detached = None;
             }
   in
   mth
@@ -1152,8 +1164,6 @@ let string_attribute field r =
       field r.Xml.name;
     assert false
 
-let dummy_keygen ?parent:_ () = ()
-
 let load_result r =
   match r.Xml.name with
     | "result" ->
@@ -1176,11 +1186,16 @@ let load_result r =
           try float_of_string (List.assoc "time" r.Xml.attributes)
           with Not_found -> 0.0
         in
+        let steps = 
+          try int_of_string (List.assoc "steps" r.Xml.attributes)
+          with Not_found -> -1
+        in
         Done {
           Call_provers.pr_answer = answer;
           Call_provers.pr_time = time;
           Call_provers.pr_output = "";
-          Call_provers.pr_status = Unix.WEXITED 0
+          Call_provers.pr_status = Unix.WEXITED 0;
+	  Call_provers.pr_steps = steps
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited
@@ -1216,11 +1231,9 @@ let load_ident elt =
       Ident.id_fresh ~label name in
   Ident.id_register preid
 
-type load_ctxt = {
+type 'key load_ctxt = {
   old_provers : (Whyconf.prover * int * int) Mint.t ;
-(*
-  shapes : ((string, Tc.shape) Hashtbl.t) option
-*)
+  keygen : 'key keygen;
 }
 
 let rec load_goal ctxt parent acc g =
@@ -1233,19 +1246,10 @@ let rec load_goal ctxt parent acc g =
         let shape =
           try Tc.shape_of_string (List.assoc "shape" g.Xml.attributes)
           with Not_found -> Tc.shape_of_string ""
-(*
-            match ctxt.shapes with
-              | None -> Tc.shape_of_string ""
-              | Some h ->
-                try Hashtbl.find h csum
-                with Not_found ->
-                  Format.eprintf "[Warning] shape not found for goal %s@." csum;
-                  Tc.shape_of_string ""
-*)
         in
         let expanded = bool_attribute "expanded" g false in
         let mg =
-          raw_add_no_task ~keygen:dummy_keygen ~expanded parent gname expl sum shape
+          raw_add_no_task ~keygen:ctxt.keygen ~expanded parent gname expl sum shape
         in
         List.iter (load_proof_or_transf ctxt mg) g.Xml.elements;
         mg.goal_verified <- goal_verified mg;
@@ -1285,7 +1289,7 @@ and load_proof_or_transf ctxt mg a =
           end;
         *)
           let (_ : 'a proof_attempt) =
-            add_external_proof ~keygen:dummy_keygen ~archived ~obsolete
+            add_external_proof ~keygen:ctxt.keygen ~archived ~obsolete
               ~timelimit ~memlimit ~edit mg p res
           in
           ()
@@ -1296,7 +1300,7 @@ and load_proof_or_transf ctxt mg a =
     | "transf" ->
         let trname = string_attribute "name" a in
         let expanded = bool_attribute "expanded" a false in
-        let mtr = raw_add_transformation ~keygen:dummy_keygen ~expanded mg trname in
+        let mtr = raw_add_transformation ~keygen:ctxt.keygen ~expanded mg trname in
         mtr.transf_goals <-
           List.rev
           (List.fold_left
@@ -1414,7 +1418,7 @@ and load_metas ctxt mg a =
   let metas_args =
     List.fold_left load_meta Mstr.empty metas_args in
   let expanded = bool_attribute "expanded" a false in
-  let metas = raw_add_metas ~keygen:dummy_keygen ~expanded mg metas_args idpos in
+  let metas = raw_add_metas ~keygen:ctxt.keygen ~expanded mg metas_args idpos in
   let goal = match goal with
     | [] -> raise (LoadError (a,"No subgoal for this metas"))
     | [goal] -> goal
@@ -1436,7 +1440,7 @@ let load_theory ctxt mf acc th =
         let expanded = bool_attribute "expanded" th false in
         let csum = string_attribute_opt "sum" th in
         let checksum = Opt.map Tc.checksum_of_string csum in
-        let mth = raw_add_theory ~keygen:dummy_keygen ~expanded ~checksum mf thname in
+        let mth = raw_add_theory ~keygen:ctxt.keygen ~expanded ~checksum mf thname in
         mth.theory_goals <-
           List.rev
           (List.fold_left
@@ -1449,17 +1453,18 @@ let load_theory ctxt mf acc th =
           s;
         acc
 
-let load_file session old_provers f =
+let load_file ~keygen session old_provers f =
   match f.Xml.name with
     | "file" ->
+       let ctxt = { old_provers = old_provers ; keygen = keygen } in
         let fn = string_attribute "name" f in
         let fmt = load_option "format" f in
         let expanded = bool_attribute "expanded" f false in
-        let mf = raw_add_file ~keygen:dummy_keygen ~expanded session fn fmt in
+        let mf = raw_add_file ~keygen:ctxt.keygen ~expanded session fn fmt in
         mf.file_theories <-
           List.rev
           (List.fold_left
-             (load_theory { old_provers = old_provers } mf) [] f.Xml.elements);
+             (load_theory ctxt mf) [] f.Xml.elements);
         mf.file_verified <- file_verified mf;
         old_provers
     | "prover" ->
@@ -1485,14 +1490,7 @@ let load_file session old_provers f =
         Warning.emit "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
 
-(*
-let old_provers = ref Mstr.empty
-*)
-(* dead code
-let get_old_provers () = !old_provers
-*)
-
-let load_session session xml =
+let load_session ~keygen session xml =
   match xml.Xml.name with
     | "why3session" ->
       let shape_version = int_attribute_def "shape_version" xml 1 in
@@ -1500,7 +1498,7 @@ let load_session session xml =
       Debug.dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
       let old_provers =
-        List.fold_left (load_file session) Mint.empty xml.Xml.elements
+        List.fold_left (load_file ~keygen session) Mint.empty xml.Xml.elements
       in
       Mint.iter
         (fun id (p,_,_) ->
@@ -1616,8 +1614,7 @@ with e ->
     (Printexc.to_string e);
   Xml.from_file xml_filename, false
 
-type notask = unit
-let read_session dir =
+let read_session_with_keys ~keygen dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
     raise (SessionFileError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
@@ -1629,7 +1626,7 @@ let read_session dir =
         Tc.reset_dict ();
         let xml,use_shapes = read_file_session_and_shapes dir xml_filename in
         try
-          load_session session xml.Xml.content;
+          load_session ~keygen session xml.Xml.content;
           use_shapes
         with Sys_error msg ->
           failwith ("Open session: sys error " ^ msg)
@@ -1644,6 +1641,7 @@ let read_session dir =
   in
   session, use_shapes
 
+let read_session = read_session_with_keys ~keygen:(fun ?parent:_ () -> ())
 
 (*******************************)
 (* Session modification        *)
@@ -2038,55 +2036,14 @@ let print_external_proof fmt p =
 
 (** Pairing *)
 
-module AssoGoals : sig
-  val set_use_shapes : bool -> unit
-  val associate :
-    'a goal list -> 'b goal list ->
-    ('b goal * ('a goal * bool) option) list
-end = struct
-(** When Why3 will require 3.12 put all of that in a function using
-    explicit type argument "(type t)" and remove all the Obj.magic *)
-
-  module ToGoal = struct
-    (** The functor can't be instantiated with an 'a t so we will give
-        a t *)
-    type tto (** will represent any type *)
-    type t = tto goal
-    let checksum g = g.goal_checksum
-    let shape g    = g.goal_shape
-    let name g     = g.goal_name
-  end
-  module FromGoal = struct
-    (** The functor can't be instantiated with an 'a t so we will give
-        a t *)
-    type ffrom (** will represent any type *)
-    type t = ffrom goal
-    let checksum g = g.goal_checksum
-    let shape g    = g.goal_shape
-    let name g     = g.goal_name
+module Goal = struct
+  type 'a t = 'a goal
+  let checksum g = g.goal_checksum
+  let shape g    = g.goal_shape
+  let name g     = g.goal_name
   end
 
-  module AssoGoals = Tc.Pairing(FromGoal)(ToGoal)
-  open ToGoal
-  open FromGoal
-
-  let use_shapes = ref true
-  let set_use_shapes b = use_shapes := b
-
-  let associate
-      (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
-      ('tto goal * ('ffrom goal * bool) option) list =
-    let from_goals : ffrom goal list =
-      Obj.magic (from_goals : 'ffrom goal list) in
-    let to_goals   : tto goal list =
-      Obj.magic (to_goals : 'tto goal list) in
-    let associated : (tto goal * (ffrom goal * bool) option) list =
-      AssoGoals.associate
-        ~use_shapes:!use_shapes from_goals to_goals
-    in
-    (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
-
-end
+module AssoGoals = Tc.Pairing(Goal)(Goal)
 
 (**********************************)
 (* merge a file into another      *)
@@ -2340,10 +2297,10 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
         raise Exit
     in
     set_transf_expanded to_transf from_transf.transf_expanded;
-    let associated =
+    let associated,detached =
       Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
-      AssoGoals.associate
+      AssoGoals.associate ~use_shapes:ctxt.use_shapes_for_pairing_sub_goals
         from_transf.transf_goals to_transf.transf_goals
     in
     List.iter (function
@@ -2351,8 +2308,13 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
         merge_any_goal ~ctxt ~theories env obsolete  from_goal to_goal
       | (_, None) ->
         found_missed_goals_in_theory := true)
-      associated
-  with Exit -> ()
+      associated;
+(* TODO: we should copy the goal, using the new type of keys
+    if detached <> [] then
+    to_transf.transf_detached <- Some { detached_goals = detached }
+ *)
+    ignore detached
+  with Exit -> () (* silent failure, not a good thing... *)
 
 (** convert the ident from the old task to the ident at the same
     position in the new task *)
@@ -2512,7 +2474,9 @@ let recompute_all_shapes ~release session =
 let update_session ~ctxt old_session env whyconf =
   Debug.dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
+(*
   AssoGoals.set_use_shapes ctxt.use_shapes_for_pairing_sub_goals;
+ *)
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
       old_session.session_dir
@@ -2675,16 +2639,21 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
         from_transf_name Exn_printer.exn_printer exn;
       raise Paste_error
   in
-  let associated =
+  let associated,detached =
     Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
-    AssoGoals.associate
+    AssoGoals.associate ~use_shapes:false
       from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
   | (to_goal, Some (from_goal, _obsolete)) ->
     add_goal_to_parent ~keygen env from_goal to_goal
   | (_, None) -> ()
   ) associated;
+(*
+  if detached <> [] then
+    to_transf.transf_detached <- Some { detached_goals = detached };
+ *)
+  ignore(detached);
   to_transf
 
 let get_project_dir fname =

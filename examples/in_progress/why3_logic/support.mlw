@@ -1,0 +1,123 @@
+
+module HO
+  
+  use export HighOrd
+  
+  predicate extensional_equal (f g:'a -> 'b) =
+    forall x. f x = g x
+  
+  (* Hackish way to prove functional extensionality. *)
+  predicate hack (f g h:'a -> 'b) =
+    f = g = h
+  let lemma extensionality (f g:'a -> 'b)
+    requires { extensional_equal f g }
+    ensures { f = g }
+  = assert { hack f (\x. f x) g }
+  meta remove_logic predicate hack
+  
+  function compose (g:'b -> 'c) (f:'a -> 'b) : 'a -> 'c =
+    \x. g (f x)
+  
+  function rcompose (f:'a -> 'b) (g:'b -> 'c) : 'a -> 'c = compose g f
+  
+  function identity : 'a -> 'a = \x. x
+  
+  let lemma compose_associative (f:'a -> 'b) (g:'b -> 'c) (h:'c -> 'd)
+    ensures { compose (compose h g) f = compose h (compose g f) }
+  = extensionality (compose (compose h g) f) (compose h (compose g f))
+  
+  let lemma id_neutral (f:'a -> 'b)
+    ensures { compose identity f = f = compose f identity }
+  = extensionality (compose identity f) f;
+    extensionality f (compose f identity)
+  
+  function const (x:'b) : 'a -> 'b = \_.x
+  
+  let lemma compose_const_right (x:'c) (f:'a -> 'b)
+    ensures { compose (const x) f = const x }
+  = extensionality (compose (const x) f) (const x)
+  
+  let lemma compose_const_left (x:'b) (f:'b -> 'c)
+    ensures { compose f (const x:'a -> 'b) = const (f x) }
+  = extensionality (compose f (const x:'a -> 'b)) (const (f x))
+  
+  function ho_ite (p:'a -> bool) (t e:'a -> 'b) : 'a -> 'b =
+    \x. if p x then t x else e x
+  
+  let lemma ho_ite_compose_left (p:'a -> bool) (t e:'a -> 'b) (g:'b -> 'c)
+    ensures { compose g (ho_ite p t e) = ho_ite p (compose g t) (compose g e) }
+  = extensionality (compose g (ho_ite p t e))
+                   (ho_ite p (compose g t) (compose g e))
+  
+end
+
+module Bind
+  
+  use import HO
+  
+  type bind 'a 'b =
+    | Old 'a
+    | Fresh 'b
+  
+  function bfold (o:'a -> 'c) (f:'b -> 'c) : bind 'a 'b -> 'c =
+    \x. match x with Old x -> o x | Fresh y -> f y end
+  
+  let lemma bfold_identity ()
+    ensures { bfold Old Fresh = (identity:bind 'a 'b -> bind 'a 'b) }
+  = assert { extensional_equal (bfold Old Fresh)
+                               (identity:bind 'a 'b -> bind 'a 'b) }
+  
+  let lemma bfold_compose (o:'a -> 'c) (f:'b -> 'c) (g:'c -> 'd)
+    ensures { compose g (bfold o f) = bfold (compose g o) (compose g f) }
+  = assert { let a = compose g (bfold o f) in
+    let b = bfold (compose g o) (compose g f) in
+    forall x. a x <> b x -> match x with
+      | Old _ -> a x = b x && false | Fresh _ -> false end && false }
+  
+  let lemma bfold_constructor (o:'a -> 'c) (f:'b -> 'c)
+    ensures { compose (bfold o f) Old = o }
+    ensures { compose (bfold o f) Fresh = f }
+  = assert { extensional_equal (compose (bfold o f) Old) o /\
+             extensional_equal (compose (bfold o f) Fresh) f }
+  
+  (* There is no need to map over second component for bindings,
+     so keep it simple. *)
+  function bmap (f:'a -> 'b) : bind 'a 'c -> bind 'b 'c =
+    bfold (compose Old f) Fresh
+  
+  lemma bmap_compose : forall g:'b -> 'c,f:'a -> 'b.
+    bmap (compose g f) = compose (bmap g) (bmap f:bind 'a 'd -> bind 'b 'd)
+  
+  lemma bmap_id : bmap identity = (identity:bind 'a 'b -> bind 'a 'b)
+  
+  (* Standard renamings for opening/closing binders in program. *)
+  function open (f:'b -> 'a) : bind 'a 'b -> 'a =
+    bfold identity f
+  
+  function close (bound:'a -> bool) (f:'a -> 'b) : 'a -> bind 'a 'b =
+    ho_ite bound (compose Fresh f) Old
+  
+  (* Identity useful to caracterise folding values upon opening/closing
+     binders in programs. *)
+  lemma close_fold : forall bound:'a -> bool,f:'a -> 'b,g:'a -> 'c,h:'b -> 'c.
+    compose (bfold g h) (close bound f) = ho_ite bound (compose h f) g
+  
+end
+
+module Choice
+  
+  use import HighOrd
+  
+  constant default : 'a
+  
+  function choice (p:'a -> bool) : 'a
+  
+  lemma choice_def : forall p:'a -> bool. (exists x. p x) -> p (choice p)
+  
+  val choice_def (p:'a -> bool) : unit
+    requires { exists x. p x }
+    ensures { p (choice p) }
+  
+end
+
+

@@ -1,7 +1,9 @@
 
-(* OCaml driver for 64-bit architecture *)
+(** OCaml driver for 64-bit architecture *)
 
 import "ocaml-gen.drv"
+
+(** Machine arithmetic *)
 
 module mach.int.Int32
   syntax val of_int "Why3__BigInt.to_int"
@@ -79,6 +81,9 @@ module mach.int.Int63
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
+
+  syntax val      to_bv     "(fun x -> x)"
+  syntax val      of_bv     "(fun x -> x)"
 end
 
 module mach.int.Int64
@@ -102,7 +107,68 @@ module mach.int.Int64
   syntax val      (>)       "(>)"
 end
 
-(* arrays *)
+module mach.peano.Peano
+  syntax type t "int"
+  syntax val to_int "Why3__BigInt.of_int"
+  syntax val zero "(fun _ -> 0)"
+  syntax val succ "succ"
+  syntax val pred "pred"
+  syntax val lt "(<)"
+  syntax val le "(<=)"
+  syntax val gt "(>)"
+  syntax val ge "(>=)"
+  syntax val eq "(=)"
+  syntax val ne "(<>)"
+  syntax val neg "(~-)"
+  syntax val abs "abs"
+  syntax val add "(fun x y _ _ -> x+y)"
+  syntax val sub "(fun x y _ _ -> x-y)"
+  syntax val mul "(fun x y _ _ -> x*y)"
+  syntax val of_int "(fun n _ _ -> Why3__BigInt.to_int n)"
+  syntax val div "(/)"
+  syntax val mod "(mod)"
+  syntax val max "max"
+  syntax val min "min"
+end
+
+module mach.onetime.OneTime
+  syntax type t "int"
+  syntax val to_int "Why3__BigInt.of_int"
+  syntax val zero "(fun _ -> 0)"
+  syntax val succ "succ"
+  syntax val pred "pred"
+  syntax val lt "(<)"
+  syntax val le "(<=)"
+  syntax val gt "(>)"
+  syntax val ge "(>=)"
+  syntax val eq "(=)"
+  syntax val ne "(<>)"
+  syntax val to_peano "(fun x -> x)"
+  syntax val transfer "(fun x -> x)"
+  syntax val neg "(~-)"
+  syntax val abs "abs"
+  syntax val add "(+)"
+  syntax val sub "(-)"
+  syntax val split "(fun x y -> x - y, y)"
+end
+
+(** Bit vectors *)
+
+theory bv.BV63
+  syntax type      t      "int"
+  syntax constant  zero   "0"
+  syntax constant  ones    "-1"
+  syntax function  bw_and "(%1 land %2)"
+  syntax predicate eq     "(%1 = %2)"
+  (* TODO ... *)
+end
+
+(* TODO
+    bv.BV31 ?
+    bv.BV32 -> int or int32 ?
+    bv.BV64 -> int64 *)
+
+(** Arrays *)
 
 module mach.array.Array32
   syntax type array  "(%1 array)"
@@ -133,3 +199,4 @@ module mach.array.Array63
   syntax val  blit   "Array.blit"
   syntax val  self_blit "Array.blit"
 end
+

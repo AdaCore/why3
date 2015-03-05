@@ -1,0 +1,227 @@
+
+
+(*Imp to ImpVm compiler *)
+(**************************************************************************)
+module Compile_aexpr
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import imp.Imp
+  use import vm.Vm
+  use import vm.VMClock
+  use import state.State
+  use import logic.Compiler_logic
+  use import specs.VM_instr_spec
+
+  function aexpr_post (a:aexpr) (len:pos) : post 'a =
+    \x p ms ms'. let VMC _ s m c = ms in
+      let VMC p' s' m' c' = ms' in
+      p' = p + len /\ s' = push (aeval m a) s /\ m' = m /\ c' >= c
+  meta rewrite_def function aexpr_post
+
+  let rec compile_aexpr (a:aexpr) :  hl 'a
+    ensures { result.pre = trivial_pre /\ hl_correctness result }
+    ensures { result.post = aexpr_post a result.code.length }
+    variant { a }
+    = let c = match a with
+      | Anum n     -> $ iconstf n
+      | Avar x     -> $ ivarf x
+      | Aadd a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ iaddf ()
+      | Asub a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ isubf ()
+      | Amul a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ imulf ()
+      end in
+      hoare trivial_pre c (aexpr_post a c.wcode.length)
+
+end
+
+module Compile_bexpr
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import imp.Imp
+  use import vm.Vm
+  use import vm.VMClock
+  use import state.State
+  use import logic.Compiler_logic
+  use import specs.VM_instr_spec
+  use import Compile_aexpr
+
+  function bexpr_post (b:bexpr) (cond: bool) (out_t:pos) (out_f:pos) : post 'a =
+    \x p ms ms'. let VMC _ s m c = ms in
+      let VMC p' s' m' c' = ms' in
+      s' = s /\ m' = m /\ c' >= c /\
+      if beval m b = cond then p' = p + out_t else p' = p + out_f
+  meta rewrite_def function bexpr_post
+
+  function exec_cond (b1:bexpr) (cond:bool) : pre 'a =
+    \x p ms. let VMC _ _ m _ = ms in beval m b1 = cond
+  meta rewrite_def function exec_cond
+
+  let rec compile_bexpr (b : bexpr) (cond: bool) (ofs: pos) :  hl 'a
+    ensures { result.pre = trivial_pre /\ hl_correctness result }
+    ensures { result.post =
+              bexpr_post b cond (result.code.length + ofs) result.code.length }
+    variant { b }
+  = let c = match b with
+    | Btrue      -> $ if cond then ibranchf ofs else inil ()
+    | Bfalse     -> $ if cond then inil () else ibranchf ofs
+    | Bnot b1    -> $ compile_bexpr b1 (not cond) ofs
+    | Band b1 b2 ->
+      let c2  = $ compile_bexpr b2 cond ofs % exec_cond b1 true in
+      let ofs = if cond then length c2.wcode else ofs + length c2.wcode in
+      $ compile_bexpr b1 false ofs ~ c2
+    | Beq a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
+                   $ if cond then ibeqf ofs else ibnef ofs
+    | Ble a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
+                   $ if cond then iblef ofs else ibgtf ofs
+    end in
+    let ghost post = bexpr_post b cond (c.wcode.length + ofs) c.wcode.length in
+    hoare trivial_pre c post
+
+end
+
+module Compile_com
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import imp.Imp
+  use import vm.Vm
+  use import vm.VMClock
+  use import state.State
+  use import logic.Compiler_logic
+  use import specs.VM_instr_spec
+  use import Compile_aexpr
+  use import Compile_bexpr
+
+  function com_post (cmd:com) (len:pos) : post 'a =
+    \x p ms ms'. let VMC _ s m c = ms in
+      let VMC p' s' m' c' = ms' in
+      p' = p + len /\ s' = s /\ ceval m cmd m' /\ c' >= c
+  meta rewrite_def function com_post
+
+  function exec_cond_old (b1:bexpr) (cond:bool) : pre ('a,clock_state) =
+    \x p ms. let VMC _ _ m _ = snd x in beval m b1 = cond
+  meta rewrite_def function exec_cond_old
+
+  function loop_invariant (c:com) : pre ('a,clock_state) =
+    \x p msi. let VMC _ s0 m0 c0 = snd x in
+      let VMC pi si mi ci = msi in
+      pi = p /\ s0 = si /\ ci >= c0 /\
+      (forall mf. ceval mi c mf -> ceval m0 c mf)
+  meta rewrite_def function loop_invariant
+
+  function loop_post (c : com) (len: pos) : pre ('a,clock_state) =
+    \x p msf. let VMC _ s0 m0 c0 = snd x in let VMC pf sf mf cf = msf in
+      pf = p + len /\ s0 = sf /\ cf >= c0 /\ ceval m0 c mf
+  meta rewrite_def function loop_post
+
+  let rec compile_com (cmd: com) : hl 'a
+    ensures  { result.pre = trivial_pre /\ hl_correctness result }
+    ensures  { result.post = com_post cmd result.code.length }
+    variant  { cmd }
+  = let res = match cmd with
+    | Cskip              -> $ inil ()
+    | Cassign x a        -> $ compile_aexpr a  ~ $ isetvarf x
+    | Cseq cmd1 cmd2     -> $ compile_com cmd1 ~ $ compile_com cmd2
+    | Cif cond cmd1 cmd2 -> let code_false = compile_com cmd2 in
+      let code_true = $ compile_com cmd1 ~ $ ibranchf code_false.code.length in
+      $ compile_bexpr cond false code_true.wcode.length ~
+      (code_true % exec_cond cond true) ~
+      ($ code_false % exec_cond_old cond false)
+    | Cwhile test body  -> let code_body = compile_com body in
+      let body_length = length code_body.code + 1 in
+      let code_test = compile_bexpr test false body_length in
+      let ofs = length code_test.code + body_length in
+      let wp_while = $ code_test ~
+          ($ code_body ~ $ ibranchf (- ofs)) % exec_cond test true in
+      let ghost inv  = loop_invariant cmd in
+      let ghost post = loop_post cmd ofs in
+      let hl_while = hoare inv wp_while (loop_preservation inv post) in
+      $ inil () ~ $ make_loop_hl hl_while inv post
+    end in
+    hoare trivial_pre res (com_post cmd res.wcode.length)
+
+  let compile_program (prog:com) : code
+    ensures { forall mi mf:state,p s.
+      vm_stuck result (VMS 0 Nil mi) (VMS p s mf) ->
+      s = Nil /\ codeseq_at result p ihalt /\ ceval mi prog mf }
+  = let res = compile_com prog : hl unit in
+    let res' = res.code ++ ihalt in
+    assert { codeseq_at res' 0 res.code &&
+      forall mi pf sf mf.
+      (forall ms'. not transition res' (VMS pf sf mf) ms') ->
+      forall p' s' m'.
+      ("induction" transition_star res' (VMS p' s' m') (VMS pf sf mf)) ->
+      forall c'.
+      let init = VMC 0 Nil mi 0 in
+      let post = com_post prog res.code.length () 0 init in
+      trivial_pre () 0 init ->
+      C.transition_star (res',post) init (VMC p' s' m' c') ->
+      ("stop_split" sf = Nil /\ pf = res.code.length /\ ceval mi prog mf) };
+    assert { forall mi mf, p s.
+      vm_stuck res' (VMS 0 Nil mi) (VMS p s mf) ->
+      let init = VMC 0 Nil mi 0 in
+      let post = com_post prog res.code.length () 0 init in
+      C.transition_star (res',post) init init &&
+      p = res.code.length &&
+        s = Nil /\ codeseq_at res' p ihalt /\ ceval mi prog mf };
+    res'
+
+  (*
+  (* Execution test: compile a simple factorial program, e.g
+     X := 1; WHILE NOT (Y <= 0) DO X := X * Y; Y := Y - 1 DONE
+     (why3 execute -L . compiler.mlw Compile_com.test) *)
+  let test () : code =
+    let x = Id 0 in
+    let y = Id 1 in
+    let cond = Bnot (Ble (Avar y) (Anum 0)) in
+    let body1 = Cassign x (Amul (Avar x) (Avar y)) in
+    let body2 = Cassign y (Asub (Avar y) (Anum 1)) in
+    let lp = Cwhile cond (Cseq body1 body2) in
+    let code = Cseq (Cassign x (Anum 1)) lp in
+    compile_program code
+
+  let test2 () : code =
+    compile_program (Cwhile Btrue Cskip)*)
+
+end
+
+
+
+(*
+Local Variables:
+compile-command: "why3 ide -L . compiler.mlw"
+End:
+*)
+
+
+(* *)
+
+   (*
+   (res.wp p post) ms ->
+     (exists ms' : machine_state. (post ms')
+      /\ contextual_irrelevance res.wcode p ms ms')
+  *)
+
+ (*
+   (res.wp p post) ms
+   exists ms'
+   -----------------------------------------------
+   (post ms') /\ contextual_irrelevance res.wcode p ms ms')
+  *)
+
+ (*condition suffisante ? *)
+(* trouver un ms' qui vérifie :
+ ((s2.wp (p + s1.wcode.length) post) ms')  /\ contextual_irrelevance res.wcode p ms ms' *)
+
+ (*
+   (res.wp p post) ms
+   exists ms'
+   -----------------------------------------------
+   (post ms') /\ contextual_irrelevance res.wcode p ms ms') *)

@@ -1,10 +1,34 @@
 prelude "(set-logic AUFBVNIRA)"
-(** A    : Array
-    UF   : Uninterpreted Function
-    BV   : Bitvectors
+(** A  : Array
+    UF : Uninterpreted Function
+    DT : Datatypes (not needed at the end ...)
     NIRA : NonLinear Integer Reals Arithmetic
-
-    Note that this logic is a CVC4 extension and not part of SMTLIB2.
 *)
+(* prelude "(set-logic ALL_SUPPORTED)" *)
 
 import "smt-libv2.drv"
+
+(* regexp for steps *)
+steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
+
+
+(* CVC4 division seems to be neither the Euclidean one, nor the Computer one *)
+(*
+theory int.EuclideanDivision
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+
+theory int.ComputerDivision
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+*)

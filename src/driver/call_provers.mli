@@ -37,6 +37,8 @@ type prover_result = {
   (** The output of the prover currently stderr and stdout *)
   pr_time   : float;
   (** The time taken by the prover *)
+  pr_steps  : int;
+  (** The number of steps taken by the prover (-1 if not available) *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
@@ -55,13 +57,21 @@ val debug : Debug.flag
 type timeregexp
 (** The type of precompiled regular expressions for time parsing *)
 
+type stepsregexp
+(** The type of precompiled regular expressions for parsing of steps *)
+
 val timeregexp : string -> timeregexp
 (** Converts a regular expression with special markers '%h','%m',
     '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
+val stepsregexp : string -> int -> stepsregexp
+(** stepsregexp s n creates a regular expression for matching number of steps.
+s is regular expression, n is a group number with steps information *)
+
 type prover_result_parser = {
   prp_regexps     : (Str.regexp * prover_answer) list;
   prp_timeregexps : timeregexp list;
+  prp_stepsregexp : stepsregexp list;
   prp_exitcodes   : (int * prover_answer) list;
 }
 
@@ -78,6 +88,7 @@ val call_on_file :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
+  ?stepslimit : int ->
   res_parser  : prover_result_parser ->
   ?cleanup    : bool ->
   ?inplace    : bool ->
@@ -88,6 +99,7 @@ val call_on_buffer :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
+  ?stepslimit : int ->
   res_parser  : prover_result_parser ->
   filename    : string ->
   ?inplace    : bool ->
@@ -138,6 +150,7 @@ val prove_file_server :
           command : string ->
           timelimit : int ->
           memlimit : int ->
+          stepslimit : int ->
           ?inplace : bool ->
           string -> server_id
 

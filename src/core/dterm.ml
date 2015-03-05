@@ -156,9 +156,15 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
+  | DPcast of dpattern * ty
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+
+type dquant =
+  | DTforall | DTexists | DTlambda
+
+type dbinder = preid option * dty * Loc.position option
 
 type dterm = {
   dt_node  : dterm_node;
@@ -176,7 +182,7 @@ and dterm_node =
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
-  | DTquant of quant * (preid * dty) list * dterm list list * dterm
+  | DTquant of dquant * dbinder list * dterm list list * dterm
   | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
@@ -211,8 +217,13 @@ let denv_add_let denv dt {pre_name = n} =
   Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
 
 let denv_add_quant denv vl =
-  let add acc ({pre_name = n}, dty) =
-    Mstr.add_new (DuplicateVar n) n (DTvar (n, dty)) acc in
+  let add acc (id,dty,_) = match id with
+    | Some ({pre_name = n} as id) ->
+        let exn = match id.pre_loc with
+          | Some loc -> Loc.Located (loc, DuplicateVar n)
+          | None     -> DuplicateVar n in
+        Mstr.add_new exn n (DTvar (n,dty)) acc
+    | None -> acc in
   let s = List.fold_left add Mstr.empty vl in
   Mstr.set_union s denv
 
@@ -272,8 +283,12 @@ let dpattern ?loc node =
             "Variable %s has type %a,@ but is expected to have type %a"
             n print_dty dty1 print_dty dty2 in
         dp1.dp_dty, Mstr.union join dp1.dp_vars dp2.dp_vars
-    | DPas (dp, {pre_name = n}) ->
-        dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars in
+    | DPas (dp,{pre_name = n}) ->
+        dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars
+    | DPcast (dp,ty) ->
+        let dty = dty_of_ty ty in
+        dpat_expected_type dp dty;
+        dty, dp.dp_vars in
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
@@ -324,7 +339,11 @@ let dterm ?loc node =
     | DTeps (_,dty,df) ->
         dfmla_expected_type df;
         Some dty
-    | DTquant (_,_,_,df) ->
+    | DTquant (DTlambda,vl,_,df) ->
+        let res = Opt.get_def dty_bool df.dt_dty in
+        let app (_,l,_) r = Dapp (ts_func,[l;r]) in
+        Some (List.fold_right app vl res)
+    | DTquant ((DTforall|DTexists),_,_,df) ->
         dfmla_expected_type df;
         None
     | DTbinop (_,df1,df2) ->
@@ -389,30 +408,35 @@ let pattern ~strict env dp =
         pat_or (get dp1) (get dp2)
     | DPas (dp,id) ->
         let pat = get dp in
-        pat_as pat (find_var id pat.pat_ty) in
+        pat_as pat (find_var id pat.pat_ty)
+    | DPcast (dp,_) ->
+        get dp in
   let pat = get dp in
   Mstr.set_union !acc env, pat
 
 let quant_vars ~strict env vl =
-  let add acc ({pre_name = n} as id, dty) =
-    let ty = var_ty_of_dty id ~strict dty in
-    let vs = create_vsymbol id ty in
-    let exn = match id.pre_loc with
-      | Some loc -> Loc.Located (loc, DuplicateVar n)
-      | None -> DuplicateVar n in
-    Mstr.add_new exn n vs acc, vs in
+  let add acc (id,dty,loc) = match id with
+    | Some ({pre_name = n} as id) ->
+        let ty = var_ty_of_dty id ~strict dty in
+        let vs = create_vsymbol id ty in
+        let exn = match id.pre_loc with
+          | Some loc -> Loc.Located (loc, DuplicateVar n)
+          | None     -> DuplicateVar n in
+        Mstr.add_new exn n vs acc, vs
+    | None ->
+        let ty = Loc.try1 ?loc (pat_ty_of_dty ~strict) dty in
+        acc, create_vsymbol (id_fresh "_") ty in
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
 let check_used_var t vs =
-  if t_v_occurs vs t = 0 then
   let s = vs.vs_name.id_string in
-  if not (String.length s > 0 && s.[0] = '_') then
-  (*Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s*)
+  if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
+(*   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s *)
     ()
 
-let check_exists_implies q f = match q, f.t_node with
-  | Texists, Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
+let check_exists_implies f = match f.t_node with
+  | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
@@ -491,12 +515,20 @@ and try_term strict keep_loc uloc env prop dty node =
       t_eps_close v f
   | DTquant (q,vl,dll,df) ->
       let env, vl = quant_vars ~strict env vl in
+      let prop = q <> DTlambda || df.dt_dty = None in
       let tr_get dt = get env (dt.dt_dty = None) dt in
       let trl = List.map (List.map tr_get) dll in
-      let f = get env true df in
+      let f = get env prop df in
       List.iter (check_used_var f) vl;
-      check_exists_implies q f;
-      t_quant_close q vl trl f
+      begin match q with
+        | DTforall ->
+            t_forall_close vl trl f
+        | DTexists ->
+            check_exists_implies f;
+            t_exists_close vl trl f
+        | DTlambda ->
+            t_lambda vl trl f
+      end
   | DTbinop (DTand,df1,df2) ->
       t_and (get env true df1) (get env true df2)
   | DTbinop (DTand_asym,df1,df2) ->
@@ -518,8 +550,11 @@ and try_term strict keep_loc uloc env prop dty node =
   | DTcast _ | DTuloc _ | DTlabel _ ->
       assert false (* already stripped *)
 
-let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty true dt
-let term ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty false dt
+let fmla ?(strict=true) ?(keep_loc=true) dt =
+  term ~strict ~keep_loc None Mstr.empty true dt
+
+let term ?(strict=true) ?(keep_loc=true) dt =
+  term ~strict ~keep_loc None Mstr.empty false dt
 
 (** Exception printer *)
 

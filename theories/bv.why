@@ -1,0 +1,616 @@
+
+(** {1 Bit vectors} *)
+
+(** {2 Generic theory (arbitrary length)} *)
+
+theory BitVector
+
+  use export bool.Bool
+  use import int.Int
+  use import int.Power
+  use import int.EuclideanDivision
+
+  constant size : int
+
+  constant two_power_size : int
+
+  (* useful ? *)
+  axiom size_pos: size > 0
+
+  axiom val_two_power_size:
+    two_power_size = power 2 size
+
+  type t
+
+  function nth t int: bool
+  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+      the least significant bit *)
+
+  (* function nth_bv t t : bool *)
+
+  predicate eq (v1 v2 : t) =
+    forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
+
+  axiom Extensionality: forall x y : t. eq x y -> x = y
+
+  constant zero : t
+  axiom Nth_zero:
+    forall n:int. 0 <= n < size -> nth zero n = False
+
+  constant ones : t
+  axiom Nth_ones:
+    forall n:int. 0 <= n < size -> nth ones n = True
+
+  function bw_and (v1 v2 : t) : t
+  axiom Nth_bw_and:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  function bw_or (v1 v2 : t) : t
+  axiom Nth_bw_or:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
+  function bw_xor (v1 v2 : t) : t
+  axiom Nth_bw_xor:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  function bw_not (v : t) : t
+  axiom Nth_bw_not:
+    forall v:t, n:int. 0 <= n < size ->
+      nth (bw_not v) n = notb (nth v n)
+
+  function rotate_left (v : t) : t
+  (** rotate left *)
+
+  axiom Nth_rotate_left_high:
+    forall v:t, n:int.
+       0 < n < size -> nth (rotate_left v) n = nth v (n - 1)
+
+  axiom  Nth_rotate_left_low:
+    forall v:t.
+      nth (rotate_left v) 0 = nth v (size - 1)
+
+  function rotate_right (v : t) : t
+  (** rotate right *)
+
+  axiom Nth_rotate_right_high:
+    forall v:t.
+      nth (rotate_right v) (size - 1) = nth v 0
+
+  axiom Nth_rotate_right_low:
+    forall v:t, n:int.
+       0 <= n < size - 1 -> nth (rotate_right v) n = nth v (n + 1)
+
+  (** logical shift right *)
+  function lsr t int : t
+
+  axiom Lsr_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size ->
+      nth (lsr b s) n = nth b (n+s)
+
+  axiom Lsr_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size ->
+      nth (lsr b s) n = False
+
+  function lsr_bv t t : t
+
+  (** arithmetic shift right *)
+  function asr t int : t
+
+  axiom Asr_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
+
+  axiom Asr_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> nth (asr b s) n = nth b (size-1)
+
+  function asr_bv t t : t
+
+  (** logical shift left *)
+  function lsl t int : t
+
+  axiom Lsl_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
+
+  axiom Lsl_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n-s < 0 -> nth (lsl b s) n = False
+
+  function lsl_bv t t : t
+
+  (** conversion to unsigned integers *)
+  function to_uint t: int
+
+  axiom to_uint_extensionality:
+    forall v,v':t. to_uint v = to_uint v' -> v = v'
+
+  axiom to_uint_zero:
+    to_uint zero = 0
+
+  axiom to_uint_ones:
+    to_uint ones = 0xFFFF_FFFF
+
+  (* TODO? axiom 0 <= to_int b < power 2 size *)
+
+  (** conversion to signed integers *)
+  function to_int t: int
+
+  axiom to_int_extensionality:
+    forall v,v':t. to_int v = to_int v' -> v = v'
+
+  (* TODO? axiom - power 2 (size-1) <= to_int b < power 2 (size-1) *)
+
+  (** conversion from integers. The (infinitary) 2-complement binary
+  representation of the argument is truncated to [size] bits *)
+  function of_int int : t
+
+  axiom of_int_is_mod:
+    forall i:int. to_uint( of_int i ) = mod i two_power_size
+
+  axiom of_int_extmod:
+    forall i,j:int. of_int i = of_int j ->
+      mod i two_power_size = mod j two_power_size
+
+  function of_int_const int : t
+
+  axiom of_int_const_to_int:
+    forall i:int. to_int( of_int_const i ) = mod i two_power_size
+
+  axiom of_int_const_to_uint:
+    forall i:int. to_uint( of_int_const i ) = mod i two_power_size
+
+  (* TODO? axioms related to_int/to_unit and of_int *)
+
+  (** addition modulo 2^m *)
+  function add (v1 v2 : t) : t
+
+  (** 2's complement subtraction modulo 2^m *)
+  function sub (v1 v2 : t) : t
+
+  (** 2's complement unary minus *)
+  function neg (v1 : t) : t
+
+  (** multiplication modulo 2^m *)
+  function mul (v1 v2 : t) : t
+
+  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
+  function udiv (v1 v2 : t) : t
+
+  (** unsigned remainder from truncating division (undefined if divisor is 0) *)
+  function urem (v1 v2 : t) : t
+
+  (** 2's complement signed division *)
+  function sdiv (v1 v2 : t) : t
+  (* beware of -2^31 / -1 *)
+
+  (** 2's complement signed remainder (sign follows dividend) *)
+  function srem (v1 v2 : t) : t
+
+  (** 2's complement signed remainder (sign follows divisor) *)
+  function smod (v1 v2 : t) : t
+
+  (** binary predicate for signed less than *)
+  predicate slt (v1 v2 : t) =
+    (to_int v1) < (to_int v2)
+
+  (** binary predicate for signed less than or equal *)
+  predicate sle (v1 v2 : t) =
+    (to_int v1) <= (to_int v2)
+
+  (**  binary predicate for signed greater than *)
+  predicate sgt (v1 v2 : t) =
+    (to_int v1) > (to_int v2)
+
+  (**  binary predicate for signed greater than or equal *)
+  predicate sge (v1 v2 : t) =
+    (to_int v1) >= (to_int v2)
+
+  (** binary predicate for unsigned less than *)
+  predicate ult (v1 v2 : t) =
+    (to_uint v1) < (to_uint v2)
+
+  (** binary predicate for unsigned less than or equal *)
+  predicate ule (v1 v2 : t) =
+    (to_uint v1) <= (to_uint v2)
+
+  (**  binary predicate for unsigned greater than *)
+  predicate ugt (v1 v2 : t) =
+    (to_uint v1) > (to_uint v2)
+
+  (**  binary predicate for unsigned greater than or equal *)
+  predicate uge (v1 v2 : t) =
+    (to_uint v1) >= (to_uint v2)
+
+end
+
+theory BitVectorWithAxiom
+
+  use export bool.Bool
+  use import int.Int
+  use import int.Power
+  use import int.EuclideanDivision
+
+  constant size : int
+
+  constant two_power_size : int
+
+  (* useful ? *)
+  axiom size_pos: size > 0
+
+  axiom val_two_power_size:
+    two_power_size = power 2 size
+
+  type t
+
+  function nth t int: bool
+  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+      the least significant bit *)
+
+  (* function nth_bv t t : bool *)
+
+  predicate eq (v1 v2 : t) =
+    forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
+
+  axiom Extensionality: forall x y : t. eq x y -> x = y
+
+  constant zero : t
+  axiom Nth_zero:
+    forall n:int. 0 <= n < size -> nth zero n = False
+
+  constant ones : t
+  axiom Nth_ones:
+    forall n:int. 0 <= n < size -> nth ones n = True
+
+  function bw_and (v1 v2 : t) : t
+  axiom Nth_bw_and:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  function bw_or (v1 v2 : t) : t
+  axiom Nth_bw_or:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
+  function bw_xor (v1 v2 : t) : t
+  axiom Nth_bw_xor:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  function bw_not (v : t) : t
+  axiom Nth_bw_not:
+    forall v:t, n:int. 0 <= n < size ->
+      nth (bw_not v) n = notb (nth v n)
+
+  function rotate_left (v : t) : t
+  (** rotate left *)
+
+  axiom Nth_rotate_left_high:
+    forall v:t, n:int.
+       0 < n < size -> nth (rotate_left v) n = nth v (n - 1)
+
+  axiom  Nth_rotate_left_low:
+    forall v:t.
+      nth (rotate_left v) 0 = nth v (size - 1)
+
+  function rotate_right (v : t) : t
+  (** rotate right *)
+
+  axiom Nth_rotate_right_high:
+    forall v:t.
+      nth (rotate_right v) (size - 1) = nth v 0
+
+  axiom Nth_rotate_right_low:
+    forall v:t, n:int.
+       0 <= n < size - 1 -> nth (rotate_right v) n = nth v (n + 1)
+
+  (** logical shift right *)
+  function lsr t int : t
+
+  axiom Lsr_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size ->
+      nth (lsr b s) n = nth b (n+s)
+
+  axiom Lsr_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size ->
+      nth (lsr b s) n = False
+
+  function lsr_bv t t : t
+
+  (** arithmetic shift right *)
+  function asr t int : t
+
+  axiom Asr_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
+
+  axiom Asr_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> nth (asr b s) n = nth b (size-1)
+
+  function asr_bv t t : t
+
+  (** logical shift left *)
+  function lsl t int : t
+
+  axiom Lsl_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
+
+  axiom Lsl_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n-s < 0 -> nth (lsl b s) n = False
+
+  function lsl_bv t t : t
+
+  (** conversion to unsigned integers *)
+  function to_uint t: int
+
+  axiom to_uint_extensionality:
+    forall v,v':t. to_uint v = to_uint v' -> v = v'
+
+  axiom to_uint_zero:
+    to_uint zero = 0
+
+  axiom to_uint_ones:
+    to_uint ones = 0xFFFF_FFFF
+
+  (* TODO? axiom 0 <= to_int b < power 2 size *)
+
+  (** conversion to signed integers *)
+  function to_int t: int
+
+  axiom to_int_extensionality:
+    forall v,v':t. to_int v = to_int v' -> v = v'
+
+  (* axiom nth_bv_to_int: *)
+  (*   forall u,v. nth_bv v u = nth v (to_int u) *)
+
+  (* TODO? axiom - power 2 (size-1) <= to_int b < power 2 (size-1) *)
+
+  (** conversion from integers. The (infinitary) 2-complement binary
+  representation of the argument is truncated to [size] bits *)
+  function of_int int : t
+
+  axiom of_int_is_mod:
+    forall i:int. to_uint( of_int i ) = mod i two_power_size
+
+  axiom of_int_extmod:
+    forall i,j:int. of_int i = of_int j ->
+      mod i two_power_size = mod j two_power_size
+
+  function of_int_const int : t
+
+  axiom of_int_const_to_int:
+    forall i:int. to_int( of_int_const i ) = mod i two_power_size
+
+  axiom of_int_const_to_uint:
+    forall i:int. to_uint( of_int_const i ) = mod i two_power_size
+
+  (* axiom nth_bv_of_int: *)
+  (*   forall i,v. nth_bv v (of_int i) = nth v i *)
+
+  (* TODO? axioms related to_int/to_unit and of_int *)
+
+  (** addition modulo 2^m *)
+  function add (v1 v2 : t) : t
+  axiom Add_is_add:
+    forall v1 v2:t. to_uint( add v1 v2 ) = mod( to_uint (v1) + to_uint (v2) ) two_power_size
+
+  (** 2's complement subtraction modulo 2^m *)
+  function sub (v1 v2 : t) : t
+  axiom Min_is_min:
+    forall v1 v2:t. to_uint( sub v1 v2 ) = mod( to_uint (v1) - to_uint (v2) ) two_power_size
+
+  (** 2's complement unary minus *)
+  function neg (v1 : t) : t
+  axiom Neg_is_neg:
+    forall v:t. to_uint( neg v ) = mod( -to_uint (v) ) two_power_size
+
+  (** multiplication modulo 2^m *)
+  function mul (v1 v2 : t) : t
+  axiom Mul_is_mul:
+    forall v1 v2:t. to_uint( mul v1 v2 ) = mod (to_uint (v1) * to_uint (v2) ) two_power_size
+
+  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
+  function udiv (v1 v2 : t) : t
+  axiom Udiv_is_udiv:
+    forall v1 v2:t. to_uint( udiv v1 v2 ) = div ( to_uint v1 ) ( to_uint v2 )
+
+  (** unsigned remainder from truncating division (undefined if divisor is 0) *)
+  function urem (v1 v2 : t) : t
+
+  (** 2's complement signed division *)
+  function sdiv (v1 v2 : t) : t
+  (* beware of -2^31 / -1 *)
+
+  (** 2's complement signed remainder (sign follows dividend) *)
+  function srem (v1 v2 : t) : t
+
+  (** 2's complement signed remainder (sign follows divisor) *)
+  function smod (v1 v2 : t) : t
+
+  (** binary predicate for signed less than *)
+  predicate slt (v1 v2 : t) =
+    (to_int v1) < (to_int v2)
+
+  (** binary predicate for signed less than or equal *)
+  predicate sle (v1 v2 : t) =
+    (to_int v1) <= (to_int v2)
+
+  (**  binary predicate for signed greater than *)
+  predicate sgt (v1 v2 : t) =
+    (to_int v1) > (to_int v2)
+
+  (**  binary predicate for signed greater than or equal *)
+  predicate sge (v1 v2 : t) =
+    (to_int v1) >= (to_int v2)
+
+  (** binary predicate for unsigned less than *)
+  predicate ult (v1 v2 : t) =
+    (to_uint v1) < (to_uint v2)
+
+  (** binary predicate for unsigned less than or equal *)
+  predicate ule (v1 v2 : t) =
+    (to_uint v1) <= (to_uint v2)
+
+  (**  binary predicate for unsigned greater than *)
+  predicate ugt (v1 v2 : t) =
+    (to_uint v1) > (to_uint v2)
+
+  (**  binary predicate for unsigned greater than or equal *)
+  predicate uge (v1 v2 : t) =
+    (to_uint v1) >= (to_uint v2)
+
+end
+
+(** {2 32-bits Bitvectors} *)
+
+theory BV32Ax
+  constant size: int = 32
+  constant two_power_size : int = 0x1_0000_0000
+  clone export BitVectorWithAxiom with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(** {2 31-bits Bitvectors} *)
+
+theory BV31
+  constant size: int = 31
+  constant two_power_size : int = 0x8000_0000
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(** {2 32-bits Bitvectors} *)
+
+theory BV32
+  constant size: int = 32
+  constant two_power_size : int = 0x1_0000_0000
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(** {2 63-bits Bitvectors} *)
+
+theory BV63
+  constant size: int = 63
+  constant two_power_size : int = 0x8000_0000_0000_0000
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(** {2 64-bits Bitvectors} *)
+
+theory BV64
+  constant size: int = 64
+  constant two_power_size : int = 0x1_0000_0000_0000_0000
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(** {2 8-bits Bitvectors} *)
+
+theory BV8
+  constant size: int = 8
+  constant two_power_size : int = 0x100
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(** {2 16-bits Bitvectors} *)
+
+theory BV16
+  constant size: int = 16
+  constant two_power_size : int = 0x1_0000
+  clone export BitVector with
+    constant size = size,
+    constant two_power_size = two_power_size,
+    goal size_pos,
+    lemma val_two_power_size
+end
+
+(* converters *)
+
+theory BVConverter
+
+  type bigBV
+  type smallBV
+
+  function toBig (bv : smallBV) : bigBV
+  function toSmall (bv : bigBV) : smallBV
+
+  (* axioms ? *)
+
+  axiom back_from_bigBV:
+    forall bv : smallBV. toSmall( toBig bv ) = bv
+
+end
+
+theory BVConverter_32_64
+  use BV32
+  use BV64
+
+  clone export BVConverter with
+    type bigBV = BV64.t,
+    type smallBV = BV32.t
+end
+
+theory BVConverter_16_64
+  use BV16
+  use BV64
+
+  clone export BVConverter with
+    type bigBV = BV64.t,
+    type smallBV = BV16.t
+end
+
+theory BVConverter_8_64
+  use BV8
+  use BV64
+
+  clone export BVConverter with
+    type bigBV = BV64.t,
+    type smallBV = BV8.t
+end
+
+theory BVConverter_16_32
+  use BV16
+  use BV32
+
+  clone export BVConverter with
+    type bigBV = BV32.t,
+    type smallBV = BV16.t
+end
+
+
+theory BVConverter_8_32
+  use BV8
+  use BV32
+
+  clone export BVConverter with
+    type bigBV = BV32.t,
+    type smallBV = BV8.t
+end
+
+theory BVConverter_8_16
+  use BV8
+  use BV16
+
+  clone export BVConverter with
+    type bigBV = BV16.t,
+    type smallBV = BV8.t
+end

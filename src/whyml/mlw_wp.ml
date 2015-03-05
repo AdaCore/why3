@@ -2033,7 +2033,7 @@ let wp_rec ~wp env kn th fdl =
         Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkn f in*)
       let pr = create_prsymbol (id_clone name) in
       let d = create_prop_decl Paxiom pr f in
-      Theory.add_decl th d
+      Theory.add_decl ~warn:false th d
     else
       th
   in

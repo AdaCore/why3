@@ -66,7 +66,7 @@ open Session
 
 type context =
     (string ->
-     (formatter -> notask session -> unit) -> notask session
+     (formatter -> unit session -> unit) -> unit session
      -> unit, formatter, unit) format
 
 let run_file (context : context) print_session fname =

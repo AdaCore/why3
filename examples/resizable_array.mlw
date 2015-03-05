@@ -16,6 +16,9 @@ module ResizableArraySpec
     ensures  { result.data = Map.const dummy }
     (* ensures  { forall i: int. 0 <= i < len -> result[i] = dummy } *)
 
+  val length (r: rarray 'a) : int
+    ensures { result = r.length }
+
   val ([]) (r: rarray 'a) (i: int) : 'a
     requires { 0 <= i < r.length } ensures { result = r[i] }
 

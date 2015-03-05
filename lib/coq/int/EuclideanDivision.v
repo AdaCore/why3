@@ -28,6 +28,44 @@ case Z_le_dec ; intros H ; ring.
 Qed.
 
 (* Why3 goal *)
+Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
+  y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z).
+intros x y Zy.
+zify.
+assert (H1 := Z_mod_neg x y).
+assert (H2 := Z_mod_lt x y).
+unfold mod1, div.
+case Z_le_dec ; intros H0.
+rewrite Zmult_comm, <- Zmod_eq_full with (1 := Zy).
+omega.
+replace (x - y * (x / y + 1))%Z with (x - x / y * y - y)%Z by ring.
+rewrite <- Zmod_eq_full with (1 := Zy).
+omega.
+Qed.
+
+(* Why3 goal *)
+Lemma Div_unique : forall (x:Z) (y:Z) (q:Z), (0%Z < y)%Z ->
+  ((((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z) -> ((div x y) = q)).
+intros x y q h1 (h2,h3).
+assert (h:(~(y=0))%Z) by omega.
+generalize (Mod_bound x y h); intro h0.
+rewrite Z.abs_eq in h0; auto with zarith.
+generalize (Div_mod x y h); clear h; intro h.
+assert (cases:(div x y = q \/ (div x y <= q - 1 \/ div x y >= q+1))%Z) by omega.
+destruct cases as [h4 | [h5 | h6]]; auto.
+assert (y * div x y <= y * (q - 1))%Z.
+ apply  Zmult_le_compat_l; auto with zarith.
+replace (y*(q-1))%Z with (q*y - y)%Z in H by ring.
+elimtype False.
+omega.
+assert (y * div x y >= y * (q + 1))%Z.
+ apply  Zmult_ge_compat_l; auto with zarith.
+replace (y*(q+1))%Z with (q*y + y)%Z in H by ring.
+elimtype False.
+omega.
+Qed.
+
+(* Why3 goal *)
 Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
 intros x y (Hx,Hy).
@@ -45,22 +83,6 @@ omega.
 elim H.
 apply Z_mod_lt.
 now apply Zlt_gt.
-Qed.
-
-(* Why3 goal *)
-Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z).
-intros x y Zy.
-zify.
-assert (H1 := Z_mod_neg x y).
-assert (H2 := Z_mod_lt x y).
-unfold mod1, div.
-case Z_le_dec ; intros H0.
-rewrite Zmult_comm, <- Zmod_eq_full with (1 := Zy).
-omega.
-replace (x - y * (x / y + 1))%Z with (x - x / y * y - y)%Z by ring.
-rewrite <- Zmod_eq_full with (1 := Zy).
-omega.
 Qed.
 
 (* Why3 goal *)

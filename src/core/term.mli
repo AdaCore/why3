@@ -58,7 +58,7 @@ val create_fsymbol :
   ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
 
 val create_psymbol :
-  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> lsymbol
+  ?opaque:Stv.t -> preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 
@@ -270,7 +270,8 @@ val t_forall_close_simp : vsymbol list -> trigger -> term -> term
 val t_exists_close_simp : vsymbol list -> trigger -> term -> term
 
 val t_forall_close_merge : vsymbol list -> term -> term
-(** [forall_close_merge vs f] puts a universal quantifier over [f];
+val t_exists_close_merge : vsymbol list -> term -> term
+(** [t_forall_close_merge vs f] puts a universal quantifier over [f];
     merges variable lists if [f] is already universally quantified;
     reuses triggers of [f], if any, otherwise puts no triggers. *)
 
@@ -304,6 +305,61 @@ val t_pred_app : term -> term -> term  (* prop-typed application *)
 
 val t_func_app_l : term -> term list -> term  (* value-typed application *)
 val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
+
+(** {2 Lambda-term manipulation} *)
+
+val t_lambda : vsymbol list -> trigger -> term -> term
+(** [t_lambda vl tr e] produces a term [eps f. (forall vl [tr]. f@vl = e)]
+    or [eps f. (forall vl [tr]. f@vl = True <-> e] if [e] is prop-typed.
+    If [vl] is empty, [t_lambda] returns [e] or [if e then True else False],
+    if [e] is prop-typed. *)
+
+val t_open_lambda : term -> vsymbol list * trigger * term
+(** [t_open_lambda t] returns a triple [(vl,tr,e)], such that [t] is equal
+    to [t_lambda vl tr e]. If [t] is not a lambda-term, then [vl] is empty,
+    [tr] is empty, and [e] is [t]. The term [e] may be prop-typed. *)
+
+val t_open_lambda_cb : term -> vsymbol list * trigger * term *
+                             (vsymbol list -> trigger -> term -> term)
+(** the same as [t_open_lambda] but returns additionally an instance of
+    [t_lambda] that restores the original term if applied to the physically
+    same arguments. Should be used in mapping functions. *)
+
+val t_is_lambda : term -> bool
+(** [t_is_lambda t] returns [true] if [t] is a lambda-term. Do not use
+    this function if you call [t_open_lambda] afterwards. Internally,
+    [t_is_lambda] opens binders itself, so you will pay twice the price.
+    It is better to optimistically call [t_open_lambda] on any [Teps],
+    and handle the generic case if an empty argument list is returned. *)
+
+val t_closure : lsymbol -> ty list -> ty option -> term
+(** [t_closure ls tyl oty] returns a type-instantiated lambda-term
+    [\xx:tyl.(ls xx : oty)], or [ls : oty] if [ls] is a constant.
+    The length of [tyl] must be equal to that of [ls.ls_args], and
+    [oty] should be [None] if and only if [ls] is a predicate symbol. *)
+
+val t_app_partial : lsymbol -> term list -> ty list -> ty option -> term
+(** [t_app_partial ls tl tyl oty] produces a closure of [ls] and applies
+    it to [tl] using [t_func_app]. The type signature of the closure is
+    obtained by prepending the list of types of terms in [tl] to [tyl].
+    The resulting list must have the same length as [ls.ls_args], and
+    [oty] should be [None] if and only if [ls] is a predicate symbol.
+    If the symbol is fully applied ([tyl] is empty), the [Tapp] term
+    is returned. Otherwise, no beta-reduction is performed, in order
+    to preserve the closure. *)
+
+val t_func_app_beta : term -> term -> term
+(** [t_func_app_beta f a] applies [f] to [a] performing beta-reduction
+    when [f] is a lambda-term. Always returns a value-typed term, even
+    if [f] is a lambda-term built on top of a formula. *)
+
+val t_pred_app_beta : term -> term -> term
+(** [t_pred_app_beta f a] applies [f] to [a] performing beta-reduction
+    when [f] is a lambda-term. Always returns a formula, even if [f] is
+    a lambda-term built on top of a bool-typed term. *)
+
+val t_func_app_beta_l : term -> term list -> term
+val t_pred_app_beta_l : term -> term list -> term
 
 (** {2 Term library} *)
 
@@ -389,6 +445,7 @@ val t_v_occurs : vsymbol -> term -> int
 
 val t_subst_single : vsymbol -> term -> term -> term
 (** [t_subst_single v t1 t2] substitutes variable [v] in [t2] by [t1] *)
+
 val t_subst : term Mvs.t -> term -> term
 (** [t_subst m t] substitutes variables in [t] by the variable mapping [m] *)
 
@@ -399,8 +456,7 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
 val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
 (** [t_subst_types mt mv t] substitutes type variables by
     mapping [mt] simultaneously in substitution [mv] and in term [t].
-    beware that this operation may rename the variables in t
-*)
+    This operation may rename the variables in [t]. *)
 
 (** {2 Find free variables and type variables} *)
 

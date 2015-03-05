@@ -10,3 +10,4 @@
 (********************************************************************)
 
 val eliminate_epsilon : Task.task Trans.trans
+val eliminate_nl_epsilon : Task.task Trans.trans

@@ -24,6 +24,10 @@
     lexbuf.lex_curr_p <-
       { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
+  let backtrack lexbuf =
+    lexbuf.lex_curr_pos <- lexbuf.lex_start_pos;
+    lexbuf.lex_curr_p <- lexbuf.lex_start_p
+
   let make_table l =
     let ht = Hashtbl.create 97 in
     List.iter (fun s -> Hashtbl.add ht s ()) l;
@@ -178,6 +182,7 @@ and scan_embedded fmt depth = parse
               pp_print_char fmt ']';
               scan_embedded fmt (depth - 1) lexbuf
             end }
+  | "*)"  { backtrack lexbuf }
   | eof   { () }
   | ident as s
           { print_ident fmt lexbuf s;
@@ -275,6 +280,7 @@ and doc fmt block headings = parse
 
 
 and raw_html fmt depth = parse
+  | "*)"  { backtrack lexbuf }
   | eof    { () }
   | "\n"   { newline lexbuf;
              pp_print_char fmt '\n';

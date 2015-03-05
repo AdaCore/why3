@@ -113,7 +113,7 @@ module Make(O: OBSERVER) : sig
     allow_obsolete:bool ->
     release:bool ->
     use_shapes:bool ->
-    'key session ->
+    'oldkey session ->
     Env.env -> Whyconf.config ->
     O.key env_session * bool * bool
   (**
@@ -286,6 +286,7 @@ module Make(O: OBSERVER) : sig
   val schedule_proof_attempt:
     timelimit:int ->
     memlimit:int ->
+    stepslimit:int ->
     ?old:string ->
     inplace:bool ->
     command:string ->

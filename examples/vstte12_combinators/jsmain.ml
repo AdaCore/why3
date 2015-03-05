@@ -1,5 +1,8 @@
 
 
+
+let () = Firebug.console##info (Js.string "debut de jsmain.ml")
+
 (* computation part  *)
 
 let compute_result text =

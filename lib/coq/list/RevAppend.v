@@ -33,20 +33,6 @@ now simpl.
 Qed.
 
 (* Why3 goal *)
-Lemma rev_append_append_r : forall {a:Type} {a_WT:WhyType a},
-  forall (r:(list a)) (s:(list a)) (t:(list a)),
-  ((Lists.List.rev_append r (Init.Datatypes.app s t)) = (Lists.List.rev_append (Lists.List.rev_append s r) t)).
-Proof.
-intros a a_WT r s t.
-revert r.
-induction s as [|sh st IHs].
-easy.
-intros r.
-simpl.
-now rewrite <- IHs.
-Qed.
-
-(* Why3 goal *)
 Lemma rev_append_length : forall {a:Type} {a_WT:WhyType a},
   forall (s:(list a)) (t:(list a)),
   ((list.Length.length (Lists.List.rev_append s t)) = ((list.Length.length s) + (list.Length.length t))%Z).
@@ -72,5 +58,19 @@ now auto.
 intro s; rewrite IHr.
 rewrite <- Append.Append_assoc.
 simpl. reflexivity.
+Qed.
+
+(* Why3 goal *)
+Lemma rev_append_append_r : forall {a:Type} {a_WT:WhyType a},
+  forall (r:(list a)) (s:(list a)) (t:(list a)),
+  ((Lists.List.rev_append r (Init.Datatypes.app s t)) = (Lists.List.rev_append (Lists.List.rev_append s r) t)).
+Proof.
+intros a a_WT r s t.
+revert r.
+induction s as [|sh st IHs].
+easy.
+intros r.
+simpl.
+now rewrite <- IHs.
 Qed.
 

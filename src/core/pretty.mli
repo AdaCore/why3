@@ -21,6 +21,8 @@ val forget_all : unit -> unit     (* flush id_unique *)
 val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
 val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
 
+val print_id_labels : formatter -> ident -> unit  (* labels and location *)
+
 val print_tv : formatter -> tvsymbol -> unit      (* type variable *)
 val print_vs : formatter -> vsymbol -> unit       (* variable *)
 

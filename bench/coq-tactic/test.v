@@ -254,15 +254,15 @@ Qed.
 
 (* Polymorphic, Mutually inductive types *)
 
-Inductive ptree (a:Set) : Set :=
-  | PLeaf : ptree a
-  | PNode : a -> pforest a -> ptree a
+Inductive ptree {a:Set} : Set :=
+  | PLeaf : ptree
+  | PNode : a -> pforest -> ptree
 
-with pforest (a:Set) : Set :=
-  | PNil : pforest a
-  | PCons : ptree a -> pforest a -> pforest a.
+with pforest {a:Set} : Set :=
+  | PNil : pforest
+  | PCons : ptree -> pforest -> pforest.
 
-Goal forall x : ptree Z, x=x.
+Goal forall x : @ptree Z, x=x.
 ae.
 Qed.
 
@@ -277,18 +277,18 @@ Goal bb=0.
 ae.
 Qed.
 
-Fixpoint ptree_size (a:Set) (t:ptree a) : Z := match t with
+Fixpoint ptree_size {a:Set} (t:@ptree a) : Z := match t with
   | PLeaf => 0
-  | PNode _ f => 1 + pforest_size _ f end
-with pforest_size (a:Set) (f:pforest a) : Z := match f with
+  | PNode _ f => 1 + pforest_size f end
+with pforest_size {a:Set} (f:@pforest a) : Z := match f with
   | PNil => 0
-  | PCons t f => ptree_size _ t + pforest_size _ f end.
+  | PCons t f => ptree_size t + pforest_size f end.
 
-Goal ptree_size _ (@PLeaf Z) = 0.
+Goal ptree_size (@PLeaf Z) = 0.
 ae.
 Qed.
 
-Goal forall (a:Set), ptree_size a (PLeaf a) = 0.
+Goal forall (a:Set), ptree_size (@PLeaf a) = 0.
 intros.
 ae.
 Qed.

@@ -99,7 +99,7 @@ and decl_node = private
   | Dtype  of tysymbol          (** abstract types and aliases *)
   | Ddata  of data_decl list    (** recursive algebraic types *)
   | Dparam of lsymbol           (** abstract functions and predicates *)
-  | Dlogic of logic_decl list   (** recursive functions and predicates *)
+  | Dlogic of logic_decl list   (** defined functions and predicates (possibly recursively) *)
   | Dind   of ind_list          (** (co)inductive predicates *)
   | Dprop  of prop_decl         (** axiom / lemma / goal *)
 
@@ -198,4 +198,3 @@ val make_record_update :
 
 val make_record_pattern :
   known_map -> (lsymbol * pattern) list -> ty -> pattern
-

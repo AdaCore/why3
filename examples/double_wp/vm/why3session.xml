@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../vm.mlw" expanded="true">
+<theory name="ReflTransClosure" sum="41f42e2f3926adcb698b8698151507f0">
+ <goal name="transition_star_one">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="transition_star_transitive">
+ <transf name="induction_pr">
+  <goal name="transition_star_transitive.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="transition_star_transitive.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Vm" sum="60241979209704f3c99a003fd588279c">
+ <goal name="codeseq_at_app_right">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="codeseq_at_app_left">
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

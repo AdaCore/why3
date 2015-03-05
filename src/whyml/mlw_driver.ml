@@ -111,6 +111,8 @@ let load_driver env file extra_files =
         let ps = find_ps th q in
         check_syntax_logic ps s;
         add_syntax ps.ls_name s
+    | Rconverter _ ->
+        Loc.errorm "Syntax converter cannot be used in pure theories"
     | Rremovepr (q) ->
         ignore (find_pr th q)
     | Rmeta (s,al) ->
@@ -151,16 +153,17 @@ let load_driver env file extra_files =
     with Not_found -> raise (Loc.Located (loc, UnknownExn (!qualid,q)))
   in
   let add_local_module loc m = function
-    | MRtheory trule -> add_local m.mod_theory (loc,trule)
     | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.xs_name s
     | MRval (q,s) ->
         let id = find_val m q in
         add_syntax id s
-    | MRconverter (q,s) ->
+    | MRtheory (Rconverter (q,s)) ->
         let id = find_val m q in
         add_converter id s
+    | MRtheory trule ->
+        add_local m.mod_theory (loc,trule)
   in
   let add_local_module m (loc,rule) =
     Loc.try3 ~loc add_local_module loc m rule
@@ -217,5 +220,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | PSymExpected ls -> Format.fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
-
-

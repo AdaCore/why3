@@ -51,8 +51,8 @@ val find_qualid :
 
 type global_vs = Ptree.qualid -> vsymbol option
 
-val type_term : theory_uc -> global_vs -> Ptree.lexpr -> term
+val type_term : theory_uc -> global_vs -> Ptree.term -> term
 
-val type_fmla : theory_uc -> global_vs -> Ptree.lexpr -> term
+val type_fmla : theory_uc -> global_vs -> Ptree.term -> term
 
 val type_inst : theory_uc -> theory -> Ptree.clone_subst list -> th_inst

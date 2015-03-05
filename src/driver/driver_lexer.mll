@@ -31,6 +31,7 @@
         "meta", META;
         "prelude", PRELUDE;
         "printer", PRINTER;
+	"steps", STEPS;
         "valid", VALID;
         "invalid", INVALID;
         "timeout", TIMEOUT;

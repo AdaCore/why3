@@ -51,6 +51,12 @@ COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 
+ifeq (@enable_menhirLib@,yes)
+MENHIR	  = @MENHIR@ --table
+else
+MENHIR	  = @MENHIR@
+endif
+
 DEPFLAGS  = -slash -I lib/why3
 ifeq (@OCAMLBEST@,opt)
 DEPFLAGS += -native
@@ -64,7 +70,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @ZIPINCLUDE@
+INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 
@@ -82,14 +88,14 @@ endif
 
 # external libraries common to all binaries
 
-EXTOBJS =
+EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
 INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
-COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep output
+COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
 
 TARGET_EMACS = share/emacs/why3.elc
 
@@ -112,6 +118,11 @@ endif
 CLEANDIRS =
 CLEANLIBS =
 GENERATED =
+
+install_local::
+	ln -s ../drivers share/drivers
+	ln -s ../modules share/modules
+	ln -s ../theories share/theories
 
 ##############
 # Why3 library
@@ -137,7 +148,7 @@ LIB_CORE = ident ty term pattern decl theory \
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection
 
-LIB_MLW = ity
+LIB_MLW = ity expr dexpr
 
 LIB_PARSER = ptree glob parser typing lexer
 
@@ -151,7 +162,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		introduction abstraction close_epsilon lift_epsilon \
 		eliminate_epsilon \
 		eval_match instantiate_predicate smoke_detector \
-		reduction_engine compute \
+		reduction_engine compute induction_pr prop_curry \
 		gnat_float rec_logic eliminate_bounded_types \
 		gnat_split_conj gnat_split_disj \
 		eliminate_unused_hypo
@@ -160,7 +171,7 @@ LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
 LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
-	    mlw_dexpr mlw_typing mlw_driver mlw_ocaml \
+	    mlw_dexpr mlw_typing mlw_driver mlw_exec mlw_ocaml \
 	    mlw_main mlw_interp
 
 LIB_SESSION = compress xml termcode session session_tools strategy \
@@ -278,12 +289,14 @@ endif
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f modules/mach/*.mlw $(DATADIR)/why3/modules/mach
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	cp -f LICENSE $(DATADIR)/why3/
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
 	cp -f share/images/icons.rc $(DATADIR)/why3/images
 	cp -f share/images/*.png $(DATADIR)/why3/images
-	cp -f share/images/boomy/*.png $(DATADIR)/why3/images/boomy
-	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
+	cp -f share/images/boomy/* $(DATADIR)/why3/images/boomy
+	cp -f share/images/fatcow/* $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
+	cp -f share/Makefile.config $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
@@ -840,9 +853,9 @@ install_local:: bin/why3session
 
 ifeq (@enable_coq_tactic@,yes)
 
-COQPGENERATED = src/coq-tactic/coqCompat.ml src/coq-tactic/g_why3tac.ml
+COQPGENERATED = src/coq-tactic/why3tac.ml
 
-COQP_FILES = coqCompat why3tac g_why3tac
+COQP_FILES = why3tac
 
 COQPMODULES = $(addprefix src/coq-tactic/, $(COQP_FILES))
 
@@ -850,7 +863,7 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
+COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
 COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
@@ -863,29 +876,32 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
-src/coq-tactic/coqCompat.ml: src/coq-tactic/coqCompat@coq_compat_version@.ml
-	cp -f $< $@
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
+
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $(addsuffix .cmxa, @ZIPLIB@) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
 lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) -a $(BFLAGS) -o $@ $(addsuffix .cma, @ZIPLIB@) $^
+	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
+src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
-	    $(CAMLP5O) pr_o.cmo @COQLIB@/parsing/grammar.cma -impl $^ -o $@
+	    $(CAMLP5O) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
-src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cma
+src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3CONFIG="" $(COQC) -byte -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
-src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
+src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cmxs
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3CONFIG="" $(COQC) -opt -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
 # depend and clean targets
@@ -913,6 +929,8 @@ endif
 ####################
 # Coq realizations
 ####################
+
+ifeq (@enable_coq_support@,yes)
 
 ifeq (@enable_coq_libs@,yes)
 
@@ -949,18 +967,6 @@ endif
 
 COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)
 
-COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
-COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
-COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
-
-%.vo: %.v
-	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    $(COQC) -R lib/coq Why3 $<
-
-%.vd: %.v
-	$(if $(QUIET),@echo 'Coqdep   $<' &&) \
-	    $(COQDEP) -slash -R lib/coq Why3 $< > $@
-
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
@@ -985,8 +991,6 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
-opt byte: $(COQVO)
-
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
 	cp lib/coq/BuiltIn.vo $(LIBDIR)/why3/coq/
@@ -1010,22 +1014,6 @@ ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
-	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
-
-install_local:: $(COQVO) drivers/coq-realizations.aux
-
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
-include $(COQVD)
-endif
-endif
-
-depend: $(COQVD)
-
-clean-coq:
-	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
-
-clean:: clean-coq
 
 update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp
 
@@ -1061,10 +1049,48 @@ else
 drivers/coq-realizations.aux:
 	echo "(* generated automatically at compilation time *)" > $@
 
-install_no_local::
-	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
+COQLIBS_FILES = lib/coq/BuiltIn
 
 endif
+
+COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
+COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
+COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
+
+%.vo: %.v
+	$(if $(QUIET),@echo 'Coqc     $<' &&) \
+	    $(COQC) -R lib/coq Why3 $<
+
+%.vd: %.v
+	$(if $(QUIET),@echo 'Coqdep   $<' &&) \
+	    $(COQDEP) -R lib/coq Why3 $< > $@
+
+opt byte: $(COQVO)
+
+install_local:: $(COQVO) drivers/coq-realizations.aux
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
+include $(COQVD)
+endif
+endif
+
+depend: $(COQVD)
+
+clean-coq:
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
+
+clean:: clean-coq
+
+else
+
+drivers/coq-realizations.aux:
+	echo "(* generated automatically at compilation time *)" > $@
+
+endif
+
+install_no_local::
+	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
 opt byte: drivers/coq-realizations.aux
 
@@ -1198,27 +1224,30 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
 	) > $@
 
+ifeq (@enable_local@,yes)
+  ISABELLE_TARGET_DIR=`pwd`/lib/isabelle
+else
+  ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
+endif
+
+lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+	@(if isabelle components -l | grep -q "$(ISABELLE_TARGET_DIR)$$"; then \
+	    echo "Building the Why3 heap for Isabelle/HOL:"; \
+	    isabelle build -bc Why3; \
+	    touch $@; \
+	  else \
+	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
+	    echo "  the Isabelle component configuration does not contain"; \
+	    echo "  [$(ISABELLE_TARGET_DIR)]"; \
+	  fi)
+
 install_no_local::
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
-	@(if isabelle components -l | grep -q "$(LIBDIR)/why3/isabelle$$"; then \
-	    echo "Building the Why3 heap for Isabelle/HOL:"; \
-	    isabelle build -bc Why3; true; \
-	  else \
-	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
-	    echo "  the Isabelle component configuration does not contain"; \
-            echo "  [$(LIBDIR)/why3/isabelle]"; \
-	  fi)
 
-install_local::
-	@(if isabelle components -l | grep -q "`pwd`/lib/isabelle$$"; then \
-	    echo "Building the Why3 heap for Isabelle/HOL:"; \
-	    isabelle build -bc Why3; true; \
-	  else \
-	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
-	    echo "  the Isabelle component configuration does not contain"; \
-            echo "  [`pwd`/lib/isabelle]"; \
-	  fi)
+install_no_local:: lib/isabelle/last_build
+
+install_local:: lib/isabelle/last_build
 
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 
@@ -1262,7 +1291,8 @@ $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realization
 	mkdir -p lib/isabelle/option
 	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
-opt byte: update-isabelle
+# do not update isabelle realizations systematically
+# opt byte: update-isabelle
 
 clean::
 	rm -f lib/isabelle/*/*.xml
@@ -1512,10 +1542,10 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
 test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
-	$(COQC) -byte -I lib/coq-tactic/ bench/coq-tactic/test.v
+	$(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 bench/coq-tactic/test.v
 
 test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
-	$(COQC) -opt -I lib/coq-tactic/ bench/coq-tactic/test.v
+	$(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 bench/coq-tactic/test.v
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
@@ -1695,7 +1725,7 @@ STDLIBS = algebra \
 	sum
 # function ? tptp ?
 
-STDMODS = array hashtbl impset pqueue queue random ref stack string
+STDMODS = array matrix hashtbl impset pqueue queue random ref stack string
 
 STDMACS = array int
 
@@ -1727,6 +1757,14 @@ clean::
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
+# supress "unused rec" warning for Menhir-produced files
+%.cmo: %.ml %.mly
+	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) -w -39 $<
+
+# supress "unused rec" warning for Menhir-produced files
+%.cmx: %.ml %.mly
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) -w -39 $<
+
 %.cmo: %.ml
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
@@ -1746,7 +1784,7 @@ clean::
 	$(if $(QUIET),@echo 'Ocamllex $<' &&) $(OCAMLLEX) $<
 
 %.ml %.mli: %.mly
-	$(if $(QUIET),@echo 'Ocamlyacc $<' &&) $(OCAMLYACC) -v $<
+	$(if $(QUIET),@echo 'Menhir $<' &&) $(MENHIR) --explain --strict $<
 
 %.dep: %.ml %.mli
 	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< $<i > $@
@@ -1810,23 +1848,15 @@ ocp:
 #########
 
 NAME = why3-@VERSION@
-DISTRIB_DIR = distrib/$(NAME)
-DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 
-# TODO?
-# share/zsh ?
-# symbolic links in share/ ?
-
+# see .gitattributes for the list of files that are not distributed
 EXTRA_DIST = configure doc/manual.pdf
-NODIST = examples/in_progress/ misc/ ROADMAP DEVELOPER.readme opam/
 
 dist: $(EXTRA_DIST)
-	rm -rf $(DISTRIB_TAR) $(DISTRIB_DIR)
-	mkdir -p $(DISTRIB_DIR)
-	for d in `git ls-tree -d -r --name-only HEAD`; do mkdir $(DISTRIB_DIR)/$$d; done
-	for f in `git ls-tree -r --name-only HEAD` $(EXTRA_DIST); do cp $$f $(DISTRIB_DIR)/$$f; done
-	rm `find $(DISTRIB_DIR) -name .gitignore`
-	cd $(DISTRIB_DIR); rm -rf $(NODIST)
+	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
+	mkdir -p distrib/
+	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
+	for f in $(EXTRA_DIST); do cp $$f distrib/$(NAME)/$$f; done
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 

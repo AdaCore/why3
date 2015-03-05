@@ -11,7 +11,7 @@ case "$1" in
         exit 2
 esac
 
-REPORTDIR=$PWD/..
+REPORTDIR=$PWD/../why3-reports
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
@@ -70,6 +70,20 @@ fi
 # increase number of cores used
 perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
+# add uninstalled prover substitution policies
+cat >> why3.conf <<EOF
+
+[uninstalled_prover policy0]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "8.4pl5"
+version = "8.4pl4"
+
+EOF
+
 # run the bench
 make bench &> $OUT
 if test "$?" != "0" ; then
@@ -107,6 +121,7 @@ diff -u $PREVIOUS $OUT &> $DIFF
 if test "$?" == 0 ; then
     echo "---------- No difference with last bench ---------- " >> $REPORT
 else
+    SUBJECT="$SUBJECT (with new differences)"
     if expr `cat $DIFF | wc -l` '>=' `cat $OUT | wc -l` ; then
         echo "------- Diff with last bench is larger than the bench itself ------" >> $REPORT
     else
@@ -125,4 +140,3 @@ cat $OUT >> $REPORT
 
 # final notification after the replay
 notify
-

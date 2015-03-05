@@ -65,7 +65,7 @@ type incremental = {
 (* start a module *)
 
 let mk_ident ?(label=[]) ?(loc=Loc.dummy_position) s = {
-  id = s; id_lab=label; id_loc = loc
+  id_str = s; id_lab=label; id_loc = loc
 }
 
 let m = t.open_module (mk_ident "Program")
@@ -93,11 +93,11 @@ let () = t.use_clone Loc.dummy_position (use_int_Int,None)
 
 let mul_int = mk_qid ["Int";"infix *"]
 
-let mk_lexpr p = { pp_loc = Loc.dummy_position;
-                   pp_desc = p }
+let mk_lexpr p = { term_loc = Loc.dummy_position;
+                   term_desc = p }
 
 let mk_const s =
-  mk_lexpr (PPconst(Number.ConstInt(Number.int_const_dec s)))
+  mk_lexpr (Tconst(Number.ConstInt(Number.int_const_dec s)))
 
 let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
 
@@ -110,7 +110,7 @@ let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
  *)
 let d : pdecl =
   let args =
-    [Loc.dummy_position,Some(mk_ident "_dummy"),false,Some(PPTtuple [])]
+    [Loc.dummy_position,Some(mk_ident "_dummy"),false,Some(PTtuple [])]
   in
   let spec = {
     sp_pre = [];
@@ -127,8 +127,8 @@ let d : pdecl =
     let c6 = mk_const "6" in
     let c7 = mk_const "7" in
     let c42 = mk_const "42" in
-    let c6p7 = mk_lexpr (PPidapp(mul_int,[c6;c7])) in
-    let p = mk_lexpr (PPinfix(c6p7,mk_ident "infix =",c42)) in
+    let c6p7 = mk_lexpr (Tidapp(mul_int,[c6;c7])) in
+    let p = mk_lexpr (Tinfix(c6p7,mk_ident "infix =",c42)) in
     mk_expr(Eassert(Aassert,p))
   in
   Dfun(mk_ident "f",Gnone,(args,None,body,spec))

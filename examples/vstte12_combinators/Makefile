@@ -51,7 +51,7 @@ $(GENML): ../vstte12_combinators.mlw
 
 clean::
 	rm -f $(GENML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
-	rm -f vstte12_combinators__*.ml* 
+	rm -f vstte12_combinators__*.ml*
 
 # javascript
 
@@ -61,12 +61,13 @@ JSMAIN=jsmain
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
           -syntax camlp4o
 
-$(JSMAIN).js: $(JSMAIN).byte 
-	js_of_ocaml -pretty -noinline $(JSMAIN).byte
+$(JSMAIN).js: $(JSMAIN).byte
+	js_of_ocaml -pretty -noinline +nat.js $(JSMAIN).byte
 
 
-$(JSMAIN).byte: $(ML) jsmain.ml
-	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
+$(JSMAIN).byte: $(CMO) jsmain.ml
+#	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
 
 
 %.cmo: %.ml
@@ -78,4 +79,3 @@ $(JSMAIN).byte: $(ML) jsmain.ml
 
 clean::
 	rm -f *.cm[io] $(NAME).byte $(NAME).js
-

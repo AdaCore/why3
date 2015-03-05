@@ -1,0 +1,86 @@
+theory TestBV
+
+  use import int.Int
+  use import bv.BV32
+
+  constant b0000  : t = of_int_const 0b0000
+  constant b0001  : t = of_int_const 0b0001
+  constant b0010  : t = of_int_const 0b0010
+  constant b0011  : t = of_int_const 0b0011
+  constant b0110  : t = of_int_const 0b0110
+  constant b0101  : t = of_int_const 0b0101
+  constant b0111  : t = of_int_const 0b0111
+  constant b1100  : t = of_int_const 0b1100
+  constant b11100 : t = of_int_const 0b11100
+
+  goal g1 : bw_and b0011 b0110 = b0010
+  goal f1 : bw_and b0011 b0110 = b0011
+
+  goal g2 :  bw_or b0011 b0110 = b0111
+  goal f2 :  bw_or b0011 b0110 = b0110
+
+  goal g3 :  bw_xor b0011 b0110 = b0101
+  goal g4 :  bw_not b0011 = (of_int_const 0xFFFFFFFC)
+
+  goal g3a : lsr b0111 2 = b0001
+  goal g3b : lsr ones 31 = b0001
+  goal g3c : lsr ones 0x100000001 = (of_int_const 0x7FFFFFFF)
+
+  goal g4a : lsl b0111 2 = b11100
+  goal g4b : lsl b0001 31 = (of_int_const 0x80000000)
+
+  goal g5a : asr b0111 2 = b0001
+  goal g5b : asr ones 31 = ones
+
+  goal g6a : to_uint b11100 = 28
+  goal g6b : to_uint ones = 0xFFFFFFFF
+
+  goal g7a : to_int b11100 = 28
+  goal g7b : to_int ones = -1
+
+  goal g8a : nth b0110 2 = True
+  goal g8b : nth b0110 3 = False
+
+
+  goal Nth_bw_and:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  goal Nth_bw_or:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
+  goal Nth_bw_xor:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  goal Nth_bw_not:
+    forall v:t, n:int. 0 <= n < size ->
+      nth (bw_not v) n = notb (nth v n)
+
+  goal not_not : forall v:t. bw_not (bw_not v) = v
+
+  goal not_and : forall v1 v2:t.
+    bw_not (bw_and v1 v2) = bw_or (bw_not v1) (bw_not v2)
+
+  goal Lsr_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size ->
+      nth (lsr b s) n = nth b (n+s)
+
+  goal Lsr_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size ->
+      nth (lsr b s) n = False
+
+  goal Asr_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
+
+  goal Asr_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> nth (asr b s) n = nth b (size-1)
+
+  goal Lsl_nth_high:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
+
+  goal Lsl_nth_low:
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n-s < 0 -> nth (lsl b s) n = False
+
+end

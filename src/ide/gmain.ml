@@ -322,43 +322,76 @@ let goals_model,goals_view =
 
 
 (******************************)
-(* vertical paned on the right*)
+(*    notebook on the right   *)
 (******************************)
 
-let right_vb = GPack.vbox ~packing:hp#add ()
+let notebook = GPack.notebook ~packing:hp#add ()
 
-let vp =
-  try
-    GPack.paned `VERTICAL ~packing:right_vb#add ()
-  with Gtk.Error _ -> assert false
+let source_page,source_tab =
+  let label = GMisc.label ~text:"Source code" () in
+  0, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
-let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
+let task_page,task_tab =
+  let label = GMisc.label ~text:"Task" () in
+  1, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let edited_page,edited_tab =
+  let label = GMisc.label ~text:"Edited proof" () in
+  2, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let output_page,output_tab =
+  let label = GMisc.label ~text:"Prover Output" () in
+  3, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let _ = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
 
 (******************)
-(* goal text view *)
+(* views          *)
 (******************)
 
 let scrolled_task_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
-
-let (_ : GtkSignal.id) =
-  scrolled_task_view#misc#connect#size_allocate
-    ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} ->
-       gconfig.task_height <- h)
+    ~shadow_type:`ETCHED_OUT ~packing:task_tab#add ()
 
 let task_view =
   GSourceView2.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_task_view#add
-    ~height:gconfig.task_height
+    ()
+
+let scrolled_edited_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:edited_tab#add ()
+
+let edited_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_edited_view#add
+    ()
+
+let scrolled_output_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:output_tab#add ()
+
+let output_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_output_view#add
     ()
 
 let modifiable_sans_font_views = ref [goals_view#misc]
-let modifiable_mono_font_views = ref [task_view#misc]
+let modifiable_mono_font_views =
+  ref [task_view#misc;edited_view#misc;output_view#misc]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -420,11 +453,17 @@ let set_proof_state a =
   goals_model#set ~row:row#iter ~column:status_column
     (image_of_result ~obsolete res);
   let t = match res with
-    | S.Done { Call_provers.pr_time = time } ->
+    | S.Done { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
+       let s =
         if gconfig.show_time_limit then
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
+       in
+       if steps >= 0 then
+	 Format.sprintf "%s (steps: %d)" s steps
+       else
+	 s
     | S.Unedited -> "(not yet edited)"
     | S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
@@ -493,26 +532,46 @@ let env_session () =
     | Some e -> e
 
 let task_text t =
-  Pp.string_of ~max_boxes:42 Pretty.print_task t
+  let max_boxes = (Gconfig.config ()).max_boxes in
+  Pp.string_of ~max_boxes Pretty.print_task t
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
-let update_task_view a =
-  let text =
-  match a with
-    | S.Goal g ->
-      if (Gconfig.config ()).intro_premises then
-        let trans =
-          Trans.lookup_transform intro_transformation (env_session()).S.env
-        in
-        task_text (try Trans.apply trans (S.goal_task g) with
-          e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
-      else
-        task_text (S.goal_task g)
+let goal_task_text g =
+  if (Gconfig.config ()).intro_premises then
+    let trans =
+      Trans.lookup_transform intro_transformation (env_session()).S.env
+    in
+    task_text (try Trans.apply trans (S.goal_task g) with
+      e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
+  else
+    task_text (S.goal_task g)
+
+let update_tabs a =
+  let task_text =
+    match a with
+    | S.Goal g -> goal_task_text g
+    | S.Proof_attempt a -> goal_task_text a.S.proof_parent
     | S.Theory th -> "Theory " ^ th.S.theory_name.Ident.id_string
     | S.File file -> "File " ^ file.S.file_name
+    | S.Transf tr -> "transformation \"" ^ tr.S.transf_name ^ "\""
+    | S.Metas _ -> "metas"
+  in
+  let edited_text =
+    match a with
+    | S.Proof_attempt a ->
+      begin
+        let env = env_session () in
+        match S.get_edited_as_abs env.S.session a with
+        | None -> ""
+        | Some f -> source_text f
+      end
+    | _ -> ""
+  in
+  let output_text =
+    match a with
     | S.Proof_attempt a ->
         begin
           match a.S.proof_state with
@@ -528,14 +587,9 @@ let update_task_view a =
               Buffer.contents b
             | S.Done r ->
               let out = r.Call_provers.pr_output in
-              begin
-                let env = env_session () in
-                match S.get_edited_as_abs env.S.session a with
-                | None -> out
-                | Some f -> (source_text f) ^
-                  "\n----------------------------------------------\n\n"
-                  ^ out
-              end
+              if out = "" then
+                "Output not available. Rerun it with \"Replay\" button"
+              else out
             | S.Scheduled-> "proof scheduled but not running yet"
             | S.Running -> "prover currently running"
             | S.InternalFailure e ->
@@ -543,20 +597,22 @@ let update_task_view a =
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b
         end
-    | S.Transf tr ->
-        "transformation \"" ^ tr.S.transf_name ^ "\""
-   | S.Metas m ->
-     let print_meta_args =
-       Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
-     let print =
-       Pp.print_iter2 Mstr.iter Pp.newline2 Pp.newline Pp.string
-         (Pp.indent 2
-            (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
-     in
-     (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+    | S.Metas m ->
+      let print_meta_args =
+        Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
+      let print =
+        Pp.print_iter2 Mstr.iter Pp.newline2 Pp.newline Pp.string
+          (Pp.indent 2
+             (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
+      in
+      (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+    | _ -> ""
  in
- task_view#source_buffer#set_text text;
- task_view#scroll_to_mark `INSERT
+ task_view#source_buffer#set_text task_text;
+ task_view#scroll_to_mark `INSERT;
+ edited_view#source_buffer#set_text edited_text;
+ edited_view#scroll_to_mark `INSERT;
+ output_view#source_buffer#set_text output_text
 
 
 
@@ -632,7 +688,7 @@ let notify any =
   begin
     match !current_selected_row with
       | Some r when r == ind ->
-        update_task_view any
+        update_tabs any
       | _ -> ()
   end;
   if expanded then goals_view#expand_to_path row#path else
@@ -764,7 +820,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   in ()
 
 let file_info = GMisc.label ~text:""
-  ~packing:(right_hb#pack ~fill:true) ()
+  ~packing:(source_tab#pack ~fill:true) ()
 
 let warnings = Queue.create ()
 
@@ -778,16 +834,28 @@ let () = Warning.set_hook record_warning
 let display_warnings () =
   if Queue.is_empty warnings then () else
     begin
+      let nwarn = ref 0 in
+      begin try
       Queue.iter
         (fun (loc,msg) ->
-          match loc with
-            | None ->
-              Format.fprintf Format.str_formatter "%s@\n" msg
-            | Some l ->
-            (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-              Format.fprintf Format.str_formatter "%a: %s@\n"
-                Loc.gen_report_position l msg)
-        warnings;
+         if !nwarn = 4 then
+           begin
+             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+             raise Exit
+           end
+         else
+           begin
+             incr nwarn;
+             match loc with
+             | None ->
+                Format.fprintf Format.str_formatter "%s@\n@\n" msg
+             | Some l ->
+                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
+                               Loc.gen_report_position l msg
+           end) warnings;
+        with Exit -> ();
+      end;
       Queue.clear warnings;
       let msg =
         Format.flush_str_formatter ()
@@ -990,6 +1058,7 @@ let bisect_proof_attempt pa =
         M.schedule_proof_attempt
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
+	  ~stepslimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
@@ -1027,6 +1096,7 @@ let bisect_proof_attempt pa =
             M.schedule_proof_attempt
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
+	      ~stepslimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
               ~command:(C.get_complete_command lp.S.prover_config)
@@ -1814,7 +1884,7 @@ let (_ : GMenu.image_menu_item) =
 
 let scrolled_source_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-  ~packing:vp#add ~shadow_type:`ETCHED_OUT
+  ~packing:source_tab#add ~shadow_type:`ETCHED_OUT
   ()
 
 let source_view =
@@ -1881,9 +1951,7 @@ let color_loc (v:GSourceView2.source_view) ~color l b e =
   let stop = start#forward_chars (e-b) in
   buf#apply_tag ~start ~stop color
 
-let scroll_to_loc ?(yalign=0.0) ~color loc =
-  reset_gc ();
-  let (f,l,b,e) = Loc.get loc in
+let scroll_to_file f =
   if f <> !current_file then
     begin
       let lang =
@@ -1894,7 +1962,12 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
       source_view#source_buffer#set_language lang;
       source_view#source_buffer#set_text (source_text f);
       set_current_file f;
-    end;
+    end
+
+let scroll_to_loc ?(yalign=0.0) ~color loc =
+  reset_gc ();
+  let (f,l,b,e) = Loc.get loc in
+  scroll_to_file f;
   move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
   (* FIXME: use another color or none at all *)
@@ -1968,7 +2041,8 @@ let reload () =
       M.update_session ~allow_obsolete:true ~release:false ~use_shapes:true
         old_session gconfig.env gconfig.Gconfig.config
     in
-    current_env_session := Some new_env_session
+    current_env_session := Some new_env_session;
+    display_warnings ()
   with
     | e ->
         let e = match e with
@@ -2232,20 +2306,23 @@ let select_row r =
   let ind = goals_model#get ~row:r#iter ~column:index_column in
   current_selected_row := Some ind;
   let a = get_any_from_row_reference r in
-  update_task_view a;
+  update_tabs a;
   match a with
     | S.Goal g ->
-       scroll_to_source_goal g
+      scroll_to_source_goal g
     | S.Theory th ->
-        scroll_to_theory th
-    | S.File _file -> ()
-        (* scroll_to_file file *)
+      scroll_to_theory th;
+      (* notebook#goto_page source_page (* go to "source" tab *)*)
+    | S.File file ->
+      scroll_to_file (Filename.concat project_dir file.S.file_name);
+      (* notebook#goto_page source_page (\* go to "source" tab *\) *)
     | S.Proof_attempt a ->
-        scroll_to_source_goal a.S.proof_parent
+      scroll_to_source_goal a.S.proof_parent;
+      (* notebook#goto_page output_page (\* go to "prover output" tab *\) *)
     | S.Transf tr ->
-        scroll_to_source_goal tr.S.transf_parent
+      scroll_to_source_goal tr.S.transf_parent
     | S.Metas m ->
-        scroll_to_source_goal m.S.metas_parent
+      scroll_to_source_goal m.S.metas_parent
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =

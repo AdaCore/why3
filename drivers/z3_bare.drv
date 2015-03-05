@@ -1,141 +1,4 @@
-(* Why driver for SMT syntax *)
-
-prelude ";;; this is a prelude for Z3"
-prelude "(set-logic AUFNIRA)"
-
-printer "smtv2"
-filename "%f-%t-%g.smt2"
-
-valid "^unsat"
-unknown "^\\(unknown\\|sat\\|Fail\\)" ""
-outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
-time "why3cpulimit time : %s s"
-
-
-(* À discuter *)
-transformation "inline_trivial"
-
-transformation "eliminate_builtin"
-transformation "eliminate_definition"
-transformation "eliminate_inductive"
-transformation "eliminate_algebraic"
-transformation "eliminate_epsilon"
-
-transformation "simplify_formula"
-(*transformation "simplify_trivial_quantification"*)
-
-transformation "discriminate"
-transformation "encoding_smt"
-
-theory BuiltIn
-  syntax type int   "Int"
-  syntax type real  "Real"
-  syntax predicate (=)  "(= %1 %2)"
-
-  meta "encoding : kept" type int
-end
-
-theory int.Int
-
-  prelude ";;; this is a prelude for Z3 integer arithmetic"
-
-  syntax function zero "0"
-  syntax function one  "1"
-
-  syntax function (+)  "(+ %1 %2)"
-  syntax function (-)  "(- %1 %2)"
-  syntax function (*)  "(* %1 %2)"
-  syntax function (-_) "(- %1)"
-
-  syntax predicate (<=) "(<= %1 %2)"
-  syntax predicate (<)  "(< %1 %2)"
-  syntax predicate (>=) "(>= %1 %2)"
-  syntax predicate (>)  "(> %1 %2)"
-
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm.Comm
-  remove prop Unitary
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
-
-end
-
-
-theory real.Real
-
-  prelude ";;; this is a prelude for Z3 real arithmetic"
-
-  syntax function zero "0.0"
-  syntax function one  "1.0"
-
-  syntax function (+)  "(+ %1 %2)"
-  syntax function (-)  "(- %1 %2)"
-  syntax function (*)  "(* %1 %2)"
-  syntax function (/)  "(/ %1 %2)"
-  syntax function (-_) "(- %1)"
-  syntax function inv  "(/ 1.0 %1)"
-
-  syntax predicate (<=) "(<= %1 %2)"
-  syntax predicate (<)  "(< %1 %2)"
-  syntax predicate (>=) "(>= %1 %2)"
-  syntax predicate (>)  "(> %1 %2)"
-
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm.Comm
-  remove prop Unitary
-  remove prop Inverse
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
-
-  meta "encoding : kept" type real
-
-end
-
-theory Bool
-   syntax type     bool  "Bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding : kept" type bool
-end
-
-theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function xorb  "(xor %1 %2)"
-   syntax function notb  "(not %1)"
-   syntax function implb "(=> %1 %2)"
-end
-
-theory bool.Ite
-  syntax function ite "(ite %1 %2 %3)"
-  meta "encoding : lskept" function ite
-end
+import "smt-libv2.drv"
 
 (* div/mod of Z3 seems to be Euclidean Division *)
 theory int.EuclideanDivision
@@ -157,29 +20,16 @@ theory real.FromInt
   remove prop Neg
 end
 
-(*
-theory real.Truncate
-  syntax function floor "(to_int %1)"
-  remove prop Floor_down
-  remove prop Floor_monotonic
+(* does not work: Z3 segfaults 
+theory real.Trigonometry
+
+  syntax function cos "(cos %1)"
+  syntax function sin "(sin %1)"
+  syntax function pi "pi"
+  syntax function tan "(tan %1)"
+  syntax function atan "(atan %1)"
+
 end
 *)
 
-theory map.Map
-  syntax type map "(Array %1 %2)"
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
-  meta "encoding : lskept" function const
-
-  syntax function get   "(select %1 %2)"
-  syntax function set   "(store %1 %2 %3)"
-(*  syntax function const "(const[%t0] %1)" *)
-end
-
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
+import "discrimination.gen"

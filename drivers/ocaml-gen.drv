@@ -214,7 +214,7 @@ end
 
 module mach.int.UInt64
   (* no OCaml library for unsigned 64-bit integers => we use BigInt *)
-  syntax val       of_int   "%1"
+  syntax val       of_int   "(fun x -> x)"
   syntax converter of_int   "(Why3__BigInt.of_string \"%1\")"
 
   syntax function to_int "%1"
@@ -263,4 +263,20 @@ module io.StdIO
   syntax val print_char "Pervasives.print_char"
   syntax val print_int "Why3__BigInt.print"
   syntax val print_newline "Pervasives.print_newline"
+end
+
+module null.Null
+
+  syntax type t           "%1"
+  syntax val  create_null "(fun () -> Obj.magic (ref 0))"
+  syntax val  eq_null     "(==)"
+  syntax val  create      "(fun x -> x)"
+  syntax val  get         "(fun x -> x)"
+
+end
+
+module random.Random
+
+  syntax val random_int    "Why3__BigInt.random_int"
+
 end

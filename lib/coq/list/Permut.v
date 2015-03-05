@@ -128,7 +128,7 @@ induction l1 as [|l1h l1t IHl1].
   contradict H.
   simpl.
   case why_decidable_eq ; intros H.
-  generalize (NumOcc.Num_Occ_pos l2h l2t).
+  generalize (NumOcc.Num_Occ_NonNeg l2h l2t).
   omega.
   now elim H.
 - intros l2 H.
@@ -138,7 +138,7 @@ induction l1 as [|l1h l1t IHl1].
     simpl in H.
     destruct (why_decidable_eq l1h l1h) as [_|H'].
     2: now elim H'.
-    generalize (NumOcc.Num_Occ_pos l1h l1t).
+    generalize (NumOcc.Num_Occ_NonNeg l1h l1t).
     omega.
   destruct (Append.mem_decomp _ _ H') as [l2a [l2b Hl2]].
   rewrite Hl2.

@@ -12,7 +12,7 @@ module SimplePrioriyQueue
   type elt
   function priority elt : int
 
-  clone import array.NumOfEq with type elt = elt
+  use import array.NumOfEq
 
   type t = {
     elems: array elt;

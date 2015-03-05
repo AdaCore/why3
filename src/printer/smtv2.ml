@@ -53,7 +53,9 @@ let ident_printer =
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
-      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left"; "rotate_right";
+
+      "cos"; "sin"; "tan"; "atan"; "pi";
 
       (** the new floating point theory *)
       "FloatingPoint";
@@ -91,7 +93,8 @@ let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
 type info = {
-  info_syn : syntax_map;
+  info_syn        : syntax_map;
+  info_converters : converter_map;
 }
 
 (** type *)
@@ -145,7 +148,19 @@ let rec print_term info fmt t = match t.t_node with
         } in
       Number.print number_format fmt c
   | Tvar v -> print_var fmt v
-  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
+  | Tapp (ls, tl) ->
+    (* let's check if a converter applies *)
+    begin try
+      match tl with
+      | [ { t_node = Tconst _} ] ->
+        begin match query_converter info.info_converters ls with
+        | None -> raise Exit
+        | Some s -> syntax_arguments s (print_term info) fmt tl
+        end
+      | _ -> raise Exit
+    with Exit ->
+    (* non converter applies, then ... *)
+    match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
@@ -288,12 +303,14 @@ let print_decl info fmt d = match d.d_node with
       print_prop_decl info fmt k pr f
 
 let print_decls =
-  let print_decl sm fmt d =
-    try print_decl {info_syn = sm} fmt d; sm, []
+  let print_decl (sm, cm) fmt d =
+    try print_decl {info_syn = sm; info_converters = cm} fmt d; (sm, cm), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
-  Discriminate.on_syntax_map (fun sm -> Trans.fold print_decl (sm,[]))
+  Discriminate.on_syntax_map (fun sm ->
+  Printer.on_converter_map (fun cm ->
+      Trans.fold print_decl ((sm, cm),[])))
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)

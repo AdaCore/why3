@@ -5,76 +5,76 @@ Require BuiltIn.
 Require int.Int.
 Require map.Map.
 
-Require Recdef.
-
-Function occ_ (a:Type) (a_WT:WhyType a) (v:a) (m: map.Map.map Z a)
-  (l: Z) (delta: Z) {measure Zabs_nat delta } : Z :=
-  if Z_le_gt_dec delta 0%Z then 0%Z else
-  ((if why_decidable_eq (map.Map.get m (l + delta - 1)%Z) v then 1 else 0) +
-   occ_ a a_WT v m l (delta-1))%Z.
-intros a a_WT _ _ _ delta h.
-destruct (Z_le_gt_dec delta 0); intros.
-now omega.
-now apply Zabs_nat_lt; omega.
-Defined.
-
 (* Why3 goal *)
 Definition occ: forall {a:Type} {a_WT:WhyType a}, a -> (map.Map.map Z a) ->
   Z -> Z -> Z.
+Proof.
 intros a a_WT v m l u.
-exact (occ_ a a_WT v m l (u-l)%Z).
+induction (Z.to_nat (u-l)) as [|delta occ_].
+exact Z0.
+exact ((if why_decidable_eq (map.Map.get m (l + Z_of_nat delta)%Z) v then 1 else 0) + occ_)%Z.
 Defined.
+
+Lemma occ_equation :
+  forall {a:Type} {a_WT:WhyType a} v m l u,
+  (l < u)%Z ->
+  occ v m l u =
+  ((if why_decidable_eq (map.Map.get m (u - 1)%Z) v then 1 else 0) + occ v m l (u - 1))%Z.
+Proof.
+intros a a_WT v m l u Hlu.
+assert (0 < u - l)%Z as h1' by omega.
+unfold occ.
+replace (u - 1 - l)%Z with (u - l - 1)%Z by ring.
+replace (u - 1)%Z with (l + (u - l - 1))%Z by ring.
+rewrite <- (Z2Nat.id (u - l - 1)) by omega.
+rewrite (Z2Nat.inj_sub _ 1) by easy.
+destruct (u - l)%Z ; try easy.
+simpl.
+assert (exists n, Pos.to_nat p = S n) as [n ->].
+  exists (Z.to_nat (Zpred (Zpos p))).
+  rewrite Z2Nat.inj_pred.
+  apply (S_pred _ O).
+  apply Pos2Nat.is_pos.
+simpl.
+now rewrite <- minus_n_O, Nat2Z.id.
+Qed.
 
 (* Why3 goal *)
 Lemma occ_empty : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (u:Z), (u <= l)%Z -> ((occ v m l u) = 0%Z).
+Proof.
 intros a a_WT v m l u h1.
-unfold occ. rewrite occ__equation.
-destruct (Z_le_gt_dec (u - l) 0)%Z; intros.
-now trivial.
-omega.
+assert (u - l <= 0)%Z as h1' by omega.
+unfold occ.
+destruct (u - l)%Z ; try easy.
+now elim h1'.
 Qed.
 
 (* Why3 goal *)
 Lemma occ_right_no_add : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (u:Z), (l < u)%Z -> ((~ ((map.Map.get m
   (u - 1%Z)%Z) = v)) -> ((occ v m l u) = (occ v m l (u - 1%Z)%Z))).
+Proof.
 intros a a_WT v m l u h1 h2.
-unfold occ. rewrite occ__equation.
-destruct (Z_le_gt_dec (u - l) 0)%Z; intros.
-rewrite occ__equation.
-destruct (Z_le_gt_dec (u - 1 - l) 0)%Z; intros.
-now trivial.
-omega.
-destruct (why_decidable_eq (Map.get m (l + (u - l) - 1)%Z) v).
-replace (l + (u - l) - 1)%Z with (u-1)%Z in e by omega.
-intuition.
-replace (u - 1 - l)%Z with (u - l - 1)%Z by omega.
-ring.
+rewrite occ_equation with (1 := h1).
+now destruct why_decidable_eq as [H|H].
 Qed.
 
 (* Why3 goal *)
 Lemma occ_right_add : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (u:Z), (l < u)%Z -> (((map.Map.get m
   (u - 1%Z)%Z) = v) -> ((occ v m l u) = (1%Z + (occ v m l (u - 1%Z)%Z))%Z)).
+Proof.
 intros a a_WT v m l u h1 h2.
-unfold occ. rewrite occ__equation.
-destruct (Z_le_gt_dec (u - l) 0)%Z; intros.
-rewrite occ__equation.
-destruct (Z_le_gt_dec (u - 1 - l) 0)%Z; intros.
-omega.
-omega.
-destruct (why_decidable_eq (Map.get m (l + (u - l) - 1)%Z) v).
-replace (u - 1 - l)%Z with (u - l - 1)%Z by omega.
-ring.
-replace (l + (u - l) - 1)%Z with (u-1)%Z in n by omega.
-intuition.
+rewrite occ_equation with (1 := h1).
+now destruct why_decidable_eq as [H|H].
 Qed.
 
 (* Why3 goal *)
 Lemma occ_bounds : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (u:Z), (l <= u)%Z -> ((0%Z <= (occ v m l
   u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z).
+Proof.
 intros a a_WT v m l u h1.
 cut (0 <= u - l)%Z. 2: omega.
 replace (occ v m l u) with (occ v m l (l + (u - l)))%Z.
@@ -107,6 +107,7 @@ Qed.
 Lemma occ_append : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (mid:Z) (u:Z), ((l <= mid)%Z /\
   (mid <= u)%Z) -> ((occ v m l u) = ((occ v m l mid) + (occ v m mid u))%Z).
+Proof.
 intros a a_WT v m l mid u (h1,h2).
 cut (0 <= u - mid)%Z. 2: omega.
 replace (occ v m l u) with (occ v m l (mid + (u - mid)))%Z.
@@ -150,6 +151,7 @@ Qed.
 Lemma occ_neq : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (u:Z), (forall (i:Z), ((l <= i)%Z /\
   (i < u)%Z) -> ~ ((map.Map.get m i) = v)) -> ((occ v m l u) = 0%Z).
+Proof.
 intros a a_WT v m l u.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
 rewrite occ_empty. trivial. omega.
@@ -176,6 +178,7 @@ Qed.
 Lemma occ_exists : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m:(map.Map.map Z a)) (l:Z) (u:Z), (0%Z < (occ v m l u))%Z -> exists i:Z,
   ((l <= i)%Z /\ (i < u)%Z) /\ ((map.Map.get m i) = v).
+Proof.
 intros a a_WT v m l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
 rewrite occ_empty in h1. elimtype False; omega. omega.
@@ -200,6 +203,7 @@ Qed.
 Lemma occ_pos : forall {a:Type} {a_WT:WhyType a}, forall (m:(map.Map.map Z
   a)) (l:Z) (u:Z) (i:Z), ((l <= i)%Z /\ (i < u)%Z) ->
   (0%Z < (occ (map.Map.get m i) m l u))%Z.
+Proof.
 intros a a_WT m l u i (h1,h2).
 pose (v := (Map.get m i)). fold v.
 assert (occ v m l u = occ v m l i + occ v m i u)%Z.
@@ -221,6 +225,7 @@ Lemma occ_eq : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   (m1:(map.Map.map Z a)) (m2:(map.Map.map Z a)) (l:Z) (u:Z), (forall (i:Z),
   ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get m1 i) = (map.Map.get m2 i))) ->
   ((occ v m1 l u) = (occ v m2 l u)).
+Proof.
 intros a a_WT v m1 m2 l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
 rewrite occ_empty.
@@ -251,4 +256,3 @@ replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
 rewrite <- h0. trivial. omega. omega.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring. assumption.
 Qed.
-

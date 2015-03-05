@@ -33,7 +33,7 @@ type driver = {
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_res_parser  : prover_result_parser;
-  drv_tag         : int
+  drv_tag         : int;
 }
 
 (** parse a driver file *)
@@ -75,6 +75,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let printer   = ref None in
   let transform = ref [] in
   let timeregexps = ref [] in
+  let stepsregexps = ref [] in
   let blacklist = Queue.create () in
 
   let set_or_raise loc r v error = match !r with
@@ -91,6 +92,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
+    | StepRegexp (r,ns) -> add_to_list stepsregexps (Call_provers.stepsregexp r ns)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
@@ -106,9 +108,9 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let f = load_file file in
   List.iter add_global f.f_global;
 
-  let thprelude = ref Mid.empty in
-  let meta      = ref Mid.empty in
-  let qualid    = ref [] in
+  let thprelude     = ref Mid.empty in
+  let meta          = ref Mid.empty in
+  let qualid        = ref [] in
 
   let find_pr th (loc,q) = try ns_find_pr th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownProp (!qualid,q)))
@@ -145,6 +147,9 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
         add_meta th td meta
+    | Rconverter (q,s) ->
+        let cs = syntax_converter (find_ls th q) s in
+        add_meta th cs meta
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
@@ -194,9 +199,10 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       {
       prp_regexps     = List.rev !regexps;
       prp_timeregexps = List.rev !timeregexps;
+      prp_stepsregexp = List.rev !stepsregexps;
       prp_exitcodes   = List.rev !exitcodes;
     };
-    drv_tag         = !driver_tag
+    drv_tag         = !driver_tag;
   }
 
 let syntax_map drv =
@@ -241,9 +247,9 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buffer =
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ~res_parser:drv.drv_res_parser
+    ~command ?timelimit ?memlimit ?stepslimit ~res_parser:drv.drv_res_parser
     ~filename ?inplace buffer
 
 (** print'n'prove *)
@@ -312,7 +318,7 @@ let file_name_of_task ?old ?inplace drv task =
 
 
 let prove_task_prepared
-  ~command ?timelimit ?memlimit ?old ?inplace drv task =
+  ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -320,21 +326,21 @@ let prove_task_prepared
   print_task_prepared ?old:old_channel drv filename fmt task; pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buf in
+    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ?timelimit ?memlimit ?old ?inplace drv task =
+let prove_task ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task =
   let task = prepare_task drv task in
-  prove_task_prepared ~command ?timelimit ?memlimit ?old ?inplace drv task
+  prove_task_prepared ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task
 
-let prove_task_server command ~timelimit ~memlimit ?old ?inplace drv task =
+let prove_task_server command ~timelimit ~memlimit ~stepslimit ?old ?inplace drv task =
   let task = prepare_task drv task in
   let fn = file_name_of_task ?old ?inplace drv task in
   let res_parser = drv.drv_res_parser in
   match inplace with
   | Some true ->
-     prove_file_server ~command ~res_parser ~timelimit ~memlimit ?inplace fn
+     prove_file_server ~command ~res_parser ~timelimit ~memlimit ~stepslimit ?inplace fn
   | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
          let p = match drv.drv_printer with
            | None -> raise NoPrinter
@@ -349,7 +355,7 @@ let prove_task_server command ~timelimit ~memlimit ?old ?inplace drv task =
                                         filename    = fn } in
          fprintf fmt "@[%a@]@?" (printer ?old:None) task;
          close_out outc;
-         prove_file_server ~command ~res_parser ~timelimit ~memlimit fn
+         prove_file_server ~command ~res_parser ~timelimit ~memlimit ~stepslimit fn
 
 (* exception report *)
 

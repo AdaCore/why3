@@ -1,0 +1,43 @@
+
+theory Tests
+
+  use import int.Int
+
+  axiom a : 1 = 2
+
+  type myRecord = { value : int }
+
+  axiom value_axiom : forall i1 : myRecord. i1.value >= 1
+
+end
+
+theory T
+
+  type t
+
+  function f t : int
+
+end
+
+theory BadExtension
+
+  use import int.Int
+
+  use import T
+
+  axiom a : forall x:t. f x >= 0
+
+end
+
+module ProblemWithLemmaFunction
+
+(* this case should not issue a warning *)
+
+use import int.Int
+
+let lemma plus_comm (x y : int) : unit
+  ensures { x + y = y + x }
+= ()
+
+
+end
