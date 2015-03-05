@@ -4,10 +4,12 @@ module M
 
   use import int.Int
 
+  val y "model" "model_trace:y" :ref int
+
   let incr ( x "model" "model_trace:x" : ref int ): unit
-  ensures { !x = old !x + 2 }
+  ensures { !x = old !x + 2 + !y }
   = 
-  x := !x + 1;	 
+  y := !y + 1;	 
   x := !x + 1;
   x := !x + 1
 
@@ -15,5 +17,5 @@ module M
   ensures { !x < old !x }
   =
   incr x;
-  while "model" "model_trace:cond" !x > 0 do invariant { !x >= 0 } x := !x - 1 done
+  while "model" "model_trace:cond" !x > 0 do invariant { !x >= 0 } variant { !x } x := !x - 1 done
 end

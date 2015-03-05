@@ -295,7 +295,7 @@ let print_task_prepared ?old drv fmt task =
 
 let print_task ?old drv fmt task =
   let task = prepare_task drv task in
-  print_task_prepared ?old drv fmt task;
+  let _ = print_task_prepared ?old drv fmt task in
   ()
 
 let print_theory ?old drv fmt th =

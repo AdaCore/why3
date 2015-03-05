@@ -280,11 +280,25 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
-let model1_lab = Slab.singleton (create_label "model:1")
-let model2_lab = Slab.singleton (create_label "model:quantify(2)")
-let model3_lab = Slab.singleton (create_label "model:cond")
+let trace_model_regexp = Str.regexp "model_trace:"
 
-let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
+let is_trace_label l =
+  try
+    ignore(Str.search_forward trace_model_regexp l.lab_string 0);
+    true
+  with Not_found -> false
+
+let add_to_trace_label labels to_add =
+  let trace_label = Slab.choose (Slab.filter is_trace_label labels) in
+  let labels_without_trace = Slab.remove trace_label labels in
+  let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_add) in
+  Slab.add new_trace_label labels_without_trace
+
+
+let mk_var id label ?loc ty =
+  let new_labels = add_to_trace_label id.id_label label in
+
+  create_vsymbol (id_fresh ~label:new_labels ?loc id.id_string) ty
 
 (* replace "contemporary" variables with fresh ones *)
 let rec subst_at_now now mvs t = match t.t_node with
@@ -337,7 +351,7 @@ let update_term env (mreg : vsymbol Mreg.t) f =
     | t -> Some t in
   let vars = Mvs.mapi_filter update (t_vars f) in
   (* [vv'] : modified variable -> fresh variable *)
-  let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
+  let new_var vs _ = mk_var vs.vs_name "model_quantify" ?loc:f.t_loc vs.vs_ty in
   let vv' = Mvs.mapi new_var vars in
   (* update modified variables *)
   let update v t f = wp_let (Mvs.find v vv') t f in
@@ -356,14 +370,14 @@ let var_of_region reg f =
     | _ -> acc in
   t_v_fold test None f
 
-let quantify env regs f =
+let quantify model_info env regs f =
   (* mreg : modified region -> vs *)
   let get_var reg () =
     let ty = ty_of_ity reg.reg_ity in
     let id = match var_of_region reg f with
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
-    mk_var id model1_lab ty in
+    mk_var id model_info ?loc:f.t_loc ty in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
   let f = update_term env mreg f in
@@ -657,7 +671,6 @@ and wp_desc env e q xq = match e.e_node with
   | Eif (e1, e2, e3) ->
       let res = vs_result e1 in
       let test = t_equ (t_var res) t_bool_true in
-      let test = t_label ?loc:e1.e_loc model3_lab test in
       (* if both branches are pure, do not split *)
       let w =
         let get_term e = match e.e_node with
@@ -725,7 +738,7 @@ and wp_desc env e q xq = match e.e_node with
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let w = wp_abstract "any" env spec.c_effect spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p w
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
@@ -736,7 +749,7 @@ and wp_desc env e q xq = match e.e_node with
         if olds = [] then t_true (* we are out of letrec *) else
         decrease e.e_loc expl_variant env olds spec.c_variant in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let w = wp_abstract "call" env spec.c_effect spec.c_post spec.c_xpost q xq in
       let w = wp_and ~sym:true d (wp_and ~sym:false p w) in
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
@@ -748,7 +761,7 @@ and wp_desc env e q xq = match e.e_node with
       (* so that now we don't need to prove these exceptions again *)
       let lost = Mexn.set_diff (exns_of_raises e1.e_effect) spec.c_xpost in
       let c_eff = Sexn.fold_left eff_remove_raise e1.e_effect lost in
-      let w2 = wp_abstract env c_eff spec.c_post spec.c_xpost q xq in
+      let w2 = wp_abstract "abstract" env c_eff spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p (wp_and ~sym:true (wp_label e w1) w2)
   | Eassign (pl, e1, reg, pv) ->
       (* if we create an intermediate variable npv to represent e1
@@ -773,7 +786,7 @@ and wp_desc env e q xq = match e.e_node with
       let t = fs_app pl.pl_ls [t] pv.pv_vs.vs_ty in
       let c_q = create_unit_post (t_equ t (t_var pv.pv_vs)) in
       let eff = eff_write eff_empty reg in
-      let w = wp_abstract env eff c_q Mexn.empty q xq in
+      let w = wp_abstract "assign" env eff c_q Mexn.empty q xq in
       let q = create_post res w in
       wp_label e (wp_expr env e1 q xq)
   | Eloop (inv, varl, e1) ->
@@ -786,7 +799,7 @@ and wp_desc env e q xq = match e.e_node with
       let q = create_unit_post i in
       let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
-      let w = quantify env regs (wp_implies inv w) in
+      let w = quantify "loop"  env regs (wp_implies inv w) in
       let i = wp_expl expl_loop_init inv in
       wp_label e (wp_and ~sym:true i w)
   | Efor ({pv_vs = x}, ({pv_vs = v1}, d, {pv_vs = v2}), inv, e1) ->
@@ -815,7 +828,7 @@ and wp_desc env e q xq = match e.e_node with
         wp_implies (t_subst_single x v2pl1 inv) q in
       let wp_good = wp_and ~sym:true
         wp_init
-        (quantify env (regs_of_writes e1.e_effect)
+        (quantify "loop" env (regs_of_writes e1.e_effect)
            (wp_and ~sym:true
               (wp_forall [x] (wp_implies
                 (wp_and ~sym:true (ps_app le [t_var v1; t_var x])
@@ -829,7 +842,7 @@ and wp_desc env e q xq = match e.e_node with
       in
       wp_label e wp_full
 
-and wp_abstract env c_eff c_q c_xq q xq =
+and wp_abstract model env c_eff c_q c_xq q xq =
   let regs = regs_of_writes c_eff in
   let exns = exns_of_raises c_eff in
   let quantify_post c_q q =
@@ -837,7 +850,7 @@ and wp_abstract env c_eff c_q c_xq q xq =
     let c_v, c_f = open_post c_q in
     let c_f = t_subst_single c_v (t_var v) c_f in
     let f = wp_forall_post v c_f f in
-    quantify env regs f
+    quantify model env regs f
   in
   let quantify_xpost _ c_xq xq =
     Some (quantify_post c_xq xq) in
@@ -885,7 +898,7 @@ and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv c.c_xpost) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
-  wp_forall args (quantify env (wp_fun_regs ps l) f)
+  wp_forall args (quantify "init" env (wp_fun_regs ps l) f)
 
 and wp_rec_defn env fdl = List.map (wp_fun_defn env) fdl
 
@@ -1105,7 +1118,7 @@ end = struct
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
 
-  let mk_var name ity = mk_var name Slab.empty (ty_of_ity ity)
+  let mk_var name ity = mk_var name "fast wp" (ty_of_ity ity)
 
   let fresh_var_from_region hints reg =
     let name =
@@ -2014,7 +2027,7 @@ let wp_rec ~wp env kn th fdl =
       let q = old_mark lab spec.c_post in
       let f = wp_expr env e_void q Mexn.empty in
       let f = wp_implies spec.c_pre (erase_mark lab f) in
-      let f = wp_forall args (quantify env (wp_fun_regs ps l) f) in
+      let f = wp_forall args (quantify "lemma function"  env (wp_fun_regs ps l) f) in
       let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
       let lkn = Theory.get_known th in
       let f = if Debug.test_flag no_track then f else track_values lkn kn f in
