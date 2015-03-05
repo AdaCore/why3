@@ -455,6 +455,11 @@ let timeout =
          if !opt_steps <> None then 0
          else default_timeout
 
+let steps =
+  match !opt_steps with
+  | None -> -1
+  | Some c -> c
+
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy
 let debug = !opt_debug

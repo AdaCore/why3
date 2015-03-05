@@ -426,7 +426,7 @@ let check_decl_opacity d = match d.d_node with
           "inductive predicates cannot have opaque type parameters" in
       List.iter check dl
 
-let warn_dubious_axiom uc k p syms =
+let warn_dubious_axiom uc k _ syms =
   match k with
   | Plemma | Pgoal | Pskip -> ()
   | Paxiom ->
@@ -439,8 +439,10 @@ let warn_dubious_axiom uc k p syms =
             raise Exit
           | _ -> ())
         syms;
+(*
       Warning.emit ?loc:p.id_loc "axiom %s does not contain any local abstract symbol"
         p.id_string
+*)
     with Exit -> ()
 
 let add_decl ?(warn=true) uc d =

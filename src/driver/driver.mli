@@ -73,6 +73,7 @@ val print_task_prepared :
   driver -> string -> Format.formatter -> Task.task -> unit
 
 val prove_task_server : string -> timelimit:int -> memlimit:int ->
+                        stepslimit:int ->
                         ?old:string -> ?inplace:bool -> driver -> Task.task ->
                         Call_provers.server_id
 
