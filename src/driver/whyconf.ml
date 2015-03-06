@@ -283,7 +283,10 @@ exception NonUniqueId
 let set_prover _ (prover,shortcuts) family =
   let section = empty_section in
   let section = set_string section "name" prover.prover.prover_name in
-  let section = set_string section "command" prover.command in
+  let section = set_string section "command" prover.command in    
+  let section = 
+    Opt.fold (fun s c -> set_string s "command_steps" c) section prover.command_steps
+  in
   let section = set_string section "driver" prover.driver in
   let section = set_string section "version" prover.prover.prover_version in
   let section =
