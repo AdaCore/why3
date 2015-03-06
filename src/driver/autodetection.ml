@@ -379,17 +379,10 @@ let detect_exec env main data acc exec_name =
     | Some prover_command ->
     (** create the prover config *)
     let c = make_command exec_name prover_command in
-    
     let c_steps = (match data.prover_command_steps with
       | None -> None
       | Some prover_command_steps ->
 	Some (make_command exec_name prover_command_steps)) in
-    
-    (*
-    let c_steps = (match data.prover_command_steps with
-      | None -> ""
-      | Some prover_command_steps ->
-	 (make_command exec_name prover_command_steps)) in *)
     let prover = {Wc.prover_name = data.prover_name;
                   prover_version      = ver;
                   prover_altern       = data.prover_altern} in
