@@ -14,6 +14,7 @@
 open Printer
 open Ident
 open Term
+open Model_parser
 
 exception EndOfStringExc;;
 
@@ -131,10 +132,15 @@ let rec get_terms_values_strings raw_strings terms collected_strings =
   match raw_strings with
   | [] -> collected_strings
   | (raw_term_string, value)::raw_strings_tail ->
-    let (term_string, terms_tail) = match terms with
-      | [] -> (raw_term_string, [])
-      | term::t_tail -> ((get_term_string term raw_term_string), t_tail) in
-    get_terms_values_strings raw_strings_tail terms_tail (collected_strings @ [(term_string, value)])
+    let (term_string, term_location, terms_tail) = match terms with
+      | [] -> (raw_term_string, None, [])
+      | term::t_tail -> ((get_term_string term raw_term_string), term.t_loc, t_tail) in
+    let new_model_element = { 
+      me_name = term_string; 
+      me_value = value; 
+      me_location = term_location} in
+    let collected_strings = collected_strings @ [new_model_element] in
+    get_terms_values_strings raw_strings_tail terms_tail collected_strings
 
 (* Parses the model returned by CVC4 or Z3.
 Assumes that the model has the following form "model: (pairs)"
@@ -150,5 +156,5 @@ let parse model printer_mapping =
 
 let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))" Printer.get_default_printer_mapping
 
-let () = Model_parser.register_model_parser "cvc4_z3" parse
+let () = register_model_parser "cvc4_z3" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."

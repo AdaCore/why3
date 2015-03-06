@@ -9,7 +9,13 @@
 (*                                                                  *)
 (********************************************************************)
 
-type model_parser = string ->  Printer.printer_mapping -> (string * string) list
+type model_element = { 
+  me_name     : string;
+  me_value    : string;
+  me_location : Loc.position option; 
+}
+
+type model_parser = string ->  Printer.printer_mapping -> model_element list
 
 val register_model_parser : desc:Pp.formatted -> string -> model_parser -> unit
 

@@ -11,8 +11,13 @@
 
 open Stdlib
 
+type model_element = { 
+  me_name     : string;
+  me_value    : string;
+  me_location : Loc.position option; 
+}
 
-type model_parser =  string -> Printer.printer_mapping -> (string * string) list
+type model_parser =  string -> Printer.printer_mapping -> model_element list
 
 type reg_model_parser = Pp.formatted * model_parser
 

@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Format
+open Model_parser
 
 let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
@@ -97,7 +98,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : (string * string) list;
+  pr_model  : model_element list;
 }
 
 type prover_result_parser = {
@@ -158,8 +159,8 @@ let save f = f ^ ".save"
 let rec debug_print_model model =
   match model with
   | [] -> ()
-  | (term, value)::t -> begin
-    Debug.dprintf debug "Call_provers: model %s = %s@." term value;
+  | el::t -> begin
+    Debug.dprintf debug "Call_provers: model %s = %s@." el.me_name el.me_value;
     debug_print_model t;
   end
 

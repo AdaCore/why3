@@ -17,6 +17,7 @@ open Whyconf
 open Gconfig
 open Stdlib
 open Debug
+open Model_parser
 
 module C = Whyconf
 
@@ -560,8 +561,14 @@ let intro_transformation = "introduce_premises"
 let rec add_model str model =
   match model with
   | [] -> str
-  | (term, value)::t -> begin
-    let n_str = str ^ term ^ " = " ^ value ^ "\n" in
+  | m_element::t -> begin
+    let loc_string = match m_element.me_location with
+      | None -> "\"no location\""
+      | Some loc -> begin
+	Loc.report_position str_formatter loc;
+	flush_str_formatter ()
+      end in
+    let n_str = str ^ m_element.me_name ^ " at " ^ loc_string ^ " = " ^ m_element.me_value ^ "\n" in
     add_model n_str t
   end
 

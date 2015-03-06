@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Model_parser
+
 (** Call provers and parse their outputs *)
 
 type prover_answer =
@@ -39,8 +41,8 @@ type prover_result = {
   (** The time taken by the prover *)
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
-  (** The model produced by a the solver (pairs of term value) *)
-  pr_model  : (string * string) list;
+  (** The model produced by a the solver *)
+  pr_model  : model_element list;
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
