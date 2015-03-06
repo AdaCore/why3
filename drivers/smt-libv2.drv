@@ -4,11 +4,12 @@ prelude ";;; this is a prelude for smt-lib v2"
 
 printer "smtv2"
 filename "%f-%t-%g.smt2"
-valid "^unsat"
 unknown "^\\(unknown\\|sat\\|Fail\\)" ""
-outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
+outofmemory "^(error \".*out of memory\")\\|Cannot allocate memory"
+fail "^(error \"\\(.*\\)\")" "Error: \1"
 timeout "interrupted by timeout"
 time "why3cpulimit time : %s s"
+valid "^unsat"
 
 (* À discuter *)
 transformation "inline_trivial"
