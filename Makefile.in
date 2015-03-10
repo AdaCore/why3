@@ -120,9 +120,9 @@ CLEANLIBS =
 GENERATED =
 
 install_local::
-	ln -s ../drivers share/drivers
-	ln -s ../modules share/modules
-	ln -s ../theories share/theories
+	ln -s -n -f ../drivers share/drivers
+	ln -s -n -f ../modules share/modules
+	ln -s -n -f ../theories share/theories
 
 ##############
 # Why3 library
