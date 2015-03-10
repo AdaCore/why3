@@ -1,0 +1,800 @@
+
+module Model
+  
+  use import list.List
+  use import support.HO
+  
+  type model 'univ 'tv 'tyv 'tys 'ls = {
+    (* Type variable interpretation. *)
+    ty_vars : 'tyv -> 'univ;
+    (* Type symbols: interpreted as any-ary functions. *)
+    ty_funs : 'tys -> list 'univ -> 'univ;
+    (* Interpretation of types as (non-empty) domains. *)
+    ty_doms : 'univ -> 'univ -> bool;
+    (* Term variable interpretation. *)
+    t_vars : 'tv -> 'univ;
+    (* Interpretation of logical symbols.
+       The two sequences of arguments corresponds respectively
+       to types and elements arguments/ *)
+    ls_eval : 'ls -> list 'univ -> list 'univ -> 'univ;
+    (* Projections for invertible symbols (e.g constructors). *)
+    ls_proj : 'ls -> list 'univ -> 'univ -> list 'univ;
+    (* Builtin sort for proposition, with two members true and false. *)
+    i_prop : 'univ;
+    i_true : 'univ;
+    i_false : 'univ;
+  }
+  
+  (* Definition of a valid model. *)
+  predicate model_ok (m:model 'univ 'tv 'tyv 'tys 'ls) =
+    (* Every semantic type is inhabited. *)
+    (forall ty. exists x. m.ty_doms ty x) /\
+    (* true and false are distinct inhabitant of prop. *)
+    m.i_true <> m.i_false /\
+    m.ty_doms m.i_prop m.i_true /\ m.ty_doms m.i_prop m.i_false
+  
+  predicate tyl_doms (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (a:list 'univ) (b:list 'univ) = match a with
+    | Nil -> b = Nil
+    | Cons x q -> exists y r. b = Cons y r /\
+      m.ty_doms x y /\ tyl_doms m q r
+    end
+  
+  let rec lemma tyl_doms_independence (m1:model 'univ 'tv 'tyv 'tys 'ls)
+    (m2:model 'univ 'tv2 'tyv2 'tys2 'ls2)
+    (a b:list 'univ) : unit
+    requires { m1.ty_doms = m2.ty_doms }
+    ensures { tyl_doms m1 a b <-> tyl_doms m2 a b }
+    variant { a }
+  = match a , b with
+    | Nil , _ | _ , Nil -> ()
+    | Cons _ qa , Cons _ qb -> tyl_doms_independence m1 m2 qa qb
+    end
+  
+end
+
+(* Definition of types/formulas semantics. *)
+module Sem
+  
+  use import logic_syntax.Defs
+  use import logic_syntax.VarsIn
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import option.Option
+  use import support.HO
+  use import support.Bind
+  use import support.Choice
+  use import support.PartialMap
+  use import Model
+  
+  function ty_sem (m:model 'univ 'tv 'tyv 'tys 'ls) (ty:ty 'tyv 'tys) : 'univ =
+    match ty with
+    | TyVar x -> m.ty_vars x
+    | TyApp f tyl -> m.ty_funs f (tyl_sem m tyl)
+    end
+  
+  with tyl_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (tyl:list (ty 'tyv 'tys)) : list 'univ =
+    match tyl with
+    | Cons x q -> Cons (ty_sem m x) (tyl_sem m q)
+    | Nil -> Nil
+    end
+  
+  predicate pat_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (p:pattern 'pv 'tyv 'tys 'ls) (u:'univ)
+    (sigma:'pv -> option 'univ) =
+    match p with
+    | PWild -> sigma = const None
+    | PVar x -> sigma = (const None)[x <- Some u]
+    | PAs p x -> exists sigma'.
+      pat_sem m p u sigma' /\ sigma = sigma'[x <- Some u]
+    | PApp f tyl args -> patl_sem m args (m.ls_proj f (tyl_sem m tyl) u) sigma
+    | POr p1 p2 -> pat_sem m p1 u sigma \/
+      (pat_sem m p2 u sigma /\ not pat_accept m p1 u)
+    end
+  
+  with patl_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (pl:list (pattern 'pv 'tyv 'tys 'ls)) (u:list 'univ)
+    (sigma:'pv -> option 'univ) =
+    match pl with
+    | Nil -> u = Nil /\ sigma = const None
+    | Cons x q -> exists y r s1 s2. u = Cons y r /\
+      pat_sem m x y s1 /\ patl_sem m q r s2 /\
+      sigma = extend s1 s2
+    end
+  
+  with pat_accept (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (p:pattern 'pv 'tyv 'tys 'ls) (u:'univ) =
+    exists sigma. pat_sem m p u sigma
+  
+  with patl_accept (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (p:list (pattern 'pv 'tyv 'tys 'ls)) (u:list 'univ) =
+    exists sigma. patl_sem m p u sigma
+  
+  predicate br_accept (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (br:branch 'tv 'tyv 'tys 'ls) (u:'univ) =
+    let (p,_) = br in pat_accept m p u
+  
+  predicate brl_accept (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (brl:list (branch 'tv 'tyv 'tys 'ls)) (u:'univ) =
+    match brl with
+    | Nil -> false
+    | Cons x q -> br_accept m x u \/ brl_accept m q u
+    end
+  
+  predicate wty_assignment (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (l:list (ty 'tyv 'tys)) (f:int -> 'univ) =
+    forall n. 0 <= n < length l -> match nth n l with
+      | None -> false
+      | Some ty -> m.ty_doms (ty_sem m ty) (f n)
+      end
+  
+  function t_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (t:term 'tv 'tyv 'tys 'ls) : 'univ =
+    match t with
+    | TVar x -> m.t_vars x
+    | TApp f tyl tl -> m.ls_eval f (tyl_sem m tyl) (tl_sem m tl)
+    | TIf b t e -> if t_sem m b = m.i_true
+      then t_sem m t
+      else t_sem m e
+    | TLet t1 t2 -> let x = t_sem m t1 in
+      t_sem { m with t_vars = bfold m.t_vars (const x) } t2
+    | TCase t brl -> brl_sem m brl (t_sem m t)
+    | TForall fty tq -> if (forall f. wty_assignment m fty f ->
+      t_sem { m with t_vars = bfold m.t_vars f } tq = m.i_true)
+      then m.i_true
+      else m.i_false
+    | TExists fty tq -> if (exists f. wty_assignment m fty f /\
+      t_sem { m with t_vars = bfold m.t_vars f } tq = m.i_true)
+      then m.i_true
+      else m.i_false
+    | TAnd a b -> if t_sem m a = m.i_true /\ t_sem m b = m.i_true
+      then m.i_true
+      else m.i_false
+    | TOr a b -> if t_sem m a = m.i_true \/ t_sem m b = m.i_true
+      then m.i_true
+      else m.i_false
+    | TImplies a b -> if (t_sem m a = m.i_true -> t_sem m b = m.i_true)
+      then m.i_true
+      else m.i_false
+    | TIff a b -> if (t_sem m a = m.i_true <-> t_sem m b = m.i_true)
+      then m.i_true
+      else m.i_false
+    | TNot a -> if t_sem m a = m.i_true
+      then m.i_false
+      else m.i_true
+    | TTrue -> m.i_true
+    | TFalse -> m.i_false
+    end
+  
+  with tl_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (l:list (term 'tv 'tyv 'tys 'ls)) : list 'univ =
+    match l with
+    | Cons x q -> Cons (t_sem m x) (tl_sem m q)
+    | Nil -> Nil
+    end
+  
+  with brl_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (l:list (branch 'tv 'tyv 'tys 'ls)) (x:'univ) : 'univ =
+    match l with
+    | Cons b q -> br_sem m b x (brl_sem m q x)
+    | Nil -> m.i_false
+    end
+  
+  with br_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (b:branch 'tv 'tyv 'tys 'ls) (x:'univ) (cont:'univ) : 'univ =
+    match b with
+    | (pat,right) -> if (exists sigma. pat_sem m pat x sigma)
+      then let sigma = choice (pat_sem m pat x) in
+        let sigma_c = complete sigma default in
+        t_sem { m with t_vars = bfold m.t_vars sigma_c } right
+      else cont
+    end
+  
+  (* Independence of semantics with respects to model assignement to
+     non-free variables. *)
+  
+  predicate model_ty_congruence (s1:'tyv -> bool) (s2:'tys -> bool)
+    (m1:model 'univ 'tv 'tyv 'tys 'ls)
+    (m2:model 'univ 'tv2 'tyv 'tys 'ls2) =
+    (forall tys. s2 tys -> m1.ty_funs tys = m2.ty_funs tys) /\
+    (forall tyv. s1 tyv -> m1.ty_vars tyv = m2.ty_vars tyv) /\
+    m1.ty_doms = m2.ty_doms
+  
+  let rec lemma ty_sem_independence (m1:model 'univ 'tv 'tyv 'tys 'ls)
+    (m2:model 'univ 'tv2 'tyv 'tys 'ls2)
+    (s1:'tyv -> bool) (s2:'tys -> bool) (ty:ty 'tyv 'tys)
+    requires { ty_vars_in s1 s2 ty }
+    requires { model_ty_congruence s1 s2 m1 m2 }
+    ensures { ty_sem m1 ty = ty_sem m2 ty }
+    variant { ty }
+  = match ty with
+    | TyApp _ tyl -> tyl_sem_independence m1 m2 s1 s2 tyl
+    | _ -> ()
+    end
+  
+  with lemma tyl_sem_independence (m1:model 'univ 'tv 'tyv 'tys 'ls)
+    (m2:model 'univ 'tv2 'tyv 'tys 'ls2)
+    (s1:'tyv -> bool) (s2:'tys -> bool) (tyl:list (ty 'tyv 'tys))
+    requires { tyl_vars_in s1 s2 tyl }
+    requires { model_ty_congruence s1 s2 m1 m2 }
+    ensures { tyl_sem m1 tyl = tyl_sem m2 tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_sem_independence m1 m2 s1 s2 x;
+      tyl_sem_independence m1 m2 s1 s2 q
+    | _ -> ()
+    end
+  
+  let rec lemma tyl_sem_len (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (tyl:list (ty 'tyv 'tys)) : unit
+    ensures { length (tyl_sem m tyl) = length tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons _ q -> tyl_sem_len m q
+    | _ -> ()
+    end
+  
+  let rec lemma tyl_sem_nth (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (tyl:list (ty 'tyv 'tys)) (n:int) (d1:int -> ty 'tyv 'tys)
+    (d2:int -> 'univ) : unit
+    requires { 0 <= n < length tyl }
+    ensures { ty_sem m (list_nth tyl d1 n) = list_nth (tyl_sem m tyl) d2 n }
+    ensures { length (tyl_sem m tyl) = length tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons _ q -> if n > 0
+      then tyl_sem_nth m q (n-1) d1 d2
+    | _ -> ()
+    end
+  
+end
+
+module SemSubst
+  
+  use import logic_syntax.Defs
+  use import logic_syntax.Substs
+  use import logic_syntax.VarsIn
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import option.Option
+  use import support.HO
+  use import support.Bind
+  use import support.Choice
+  use import Model
+  use import Sem
+  
+  function subst_model (f:'tv1 -> term 'tv2 'tyv2 'tys2 'ls2)
+    (g:'tyv1 -> ty 'tyv2 'tys2)
+    (h:'tys1 -> 'tys2)
+    (i:'ls1 -> 'ls2)
+    (m:model 'univ 'tv2 'tyv2 'tys2 'ls2) : model 'univ 'tv1 'tyv1 'tys1 'ls1 =
+    { m with ty_vars = compose (ty_sem m) g;
+      ty_funs = compose m.ty_funs h;
+      t_vars = compose (t_sem m) f;
+      ls_eval = compose m.ls_eval i;
+      ls_proj = compose m.ls_proj i }
+  
+  let rec lemma ty_subst_sem (m:model 'univ 'tv2 'tyv2 'tys2 'ls2)
+    (f:'tv1 -> term 'tv2 'tyv2 'tys2 'ls2)
+    (g:'tyv1 -> ty 'tyv2 'tys2)
+    (h:'tys1 -> 'tys2)
+    (i:'ls1 -> 'ls2)
+    (ty:ty 'tyv1 'tys1) : unit
+    ensures { ty_sem (subst_model f g h i m) ty = ty_sem m (ty_subst g h ty) }
+    variant { ty }
+  = match ty with
+    | TyApp _ tyl -> tyl_subst_sem m f g h i tyl
+    | _ -> ()
+    end
+  
+  with lemma tyl_subst_sem (m:model 'univ 'tv2 'tyv2 'tys2 'ls2)
+    (f:'tv1 -> term 'tv2 'tyv2 'tys2 'ls2)
+    (g:'tyv1 -> ty 'tyv2 'tys2)
+    (h:'tys1 -> 'tys2)
+    (i:'ls1 -> 'ls2)
+    (tyl:list (ty 'tyv1 'tys1)) : unit
+    ensures { tyl_sem (subst_model f g h i m) tyl =
+      tyl_sem m (tyl_subst g h tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_subst_sem m f g h i x;
+      tyl_subst_sem m f g h i q
+    | _ -> ()
+    end
+  
+end
+
+(* Typing judgement can be transported semantically. *)
+module WellTyped
+  
+  use import logic_syntax.Defs
+  use import logic_syntax.Substs
+  use import logic_syntax.VarsIn
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import option.Option
+  use import support.HO
+  use import support.Bind
+  use import support.Choice
+  use import support.PartialMap
+  use import Model
+  use import Sem
+  use import SemSubst
+  use import logic_typing.Env
+  use import logic_typing.Pattern
+  use import logic_typing.Term
+  
+  function ty_inst_args (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls)
+    (f:'ls) (tyl:list 'univ) : list 'univ =
+    let ext = list_nth tyl (const default) in
+    let m_ext = { m with ty_vars = bfold m.ty_vars ext } in
+    tyl_sem m_ext (env.ls_args f)
+  
+  function ty_inst_ret (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls)
+    (f:'ls) (tyl:list 'univ) : 'univ =
+    let ext = list_nth tyl (const default) in
+    let m_ext = { m with ty_vars = bfold m.ty_vars ext } in
+    ty_sem m_ext (env.ls_ret f)
+  
+  (* Coherence between model and environment: variable/logical symbols
+     respect their types. *)
+  predicate coherent_model_env (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls) =
+    (* Variables have the right type. *)
+    (forall x. env.tv_belong x ->
+      m.ty_doms (ty_sem m (env.tv_ty x)) (m.t_vars x)) /\
+    (* Functions respect their type scheme. *)
+    (forall f tyl args. env.ls_belong f ->
+      let ty_a = ty_inst_args m env f tyl in
+      let ty_r = ty_inst_ret m env f tyl in
+      tyl_doms m ty_a args -> m.ty_doms ty_r (m.ls_eval f tyl args)) /\
+    (* Propositional type symbol is mapped to semantic proposition sort. *)
+    (m.ty_funs env.tys_prop Nil = m.i_prop) /\
+    (* Specific for constructors. *)
+    (* Well-typed application of constructors is discriminating. *)
+    (forall ty_alg f g tyl_args argf argg.
+      let ty_f = ty_inst_args m env f tyl_args in
+      let ty_g = ty_inst_args m env g tyl_args in
+      env.tys_belong ty_alg /\
+      env.tys_constr ty_alg f /\ env.tys_constr ty_alg g /\ f <> g /\
+      tyl_doms m ty_f argf /\ tyl_doms m ty_g argg ->
+      m.ls_eval f tyl_args argf <> m.ls_eval g tyl_args argg) /\
+    (* All elements in an algebraic type can be inverted to a constructor. *)
+    (forall ty_alg tyl_args x.
+      env.tys_belong ty_alg /\ (exists f. env.tys_constr ty_alg f) /\
+      m.ty_doms (m.ty_funs ty_alg tyl_args) x ->
+      exists f. env.tys_constr ty_alg f /\
+        let args = m.ls_proj f tyl_args x in m.ls_eval f tyl_args args = x /\
+        let ty_a = ty_inst_args m env f tyl_args in tyl_doms m ty_a args) /\
+    (* Constructors are injective. *)
+    (forall f tyl_args args.
+      let ty_a = ty_inst_args m env f tyl_args in
+        env.ls_constr f /\ tyl_doms m ty_a args ->
+      let x = m.ls_eval f tyl_args args in args = m.ls_proj f tyl_args x)
+  
+  let lemma ty_args_ret_subst_sem (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls)
+    (f:'ls)
+    (tyl:list (ty 'tyv 'tys)) : unit
+    requires { env_wf env /\ env.ls_belong f /\ length tyl = env.ls_ty_arity f }
+    ensures { let tyl_s = tyl_sem m tyl in
+      tyl_sem m (ty_args env f tyl) = ty_inst_args m env f tyl_s /\
+      ty_sem m (ty_ret env f tyl) = ty_inst_ret m env f tyl_s }
+  = assert { let tyl_s = tyl_sem m tyl in
+      let ext = list_nth tyl_s (const default) in
+      let m_ext = { m with ty_vars = bfold m.ty_vars ext } in
+      let s0 = bfold TyVar (list_nth tyl (const default)) in
+      let m0 = subst_model TVar s0 identity identity m in
+      let n = env.ls_ty_arity f in
+      (forall x. bfold all (range 0 n) x -> m_ext.ty_vars x <> m0.ty_vars x ->
+        match x with Old _ -> false
+        | Fresh u -> range 0 n u && match nth u tyl with None -> false
+          | Some v -> nth u tyl_s = Some (ty_sem m v) && false
+          end && false end && false) &&
+      model_ty_congruence (bfold all (range 0 n)) env.tys_belong m_ext m0 &&
+      tyl_vars_in (bfold all (range 0 n)) env.tys_belong (env.ls_args f) &&
+      ty_vars_in (bfold all (range 0 n)) env.tys_belong (env.ls_ret f) }
+  
+  predicate coherent_extension (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (v_ext:'ntv -> 'univ)
+    (v_new:'ntv -> bool)
+    (ty_ext:'ntv -> ty 'tyv 'tys) =
+    forall x. v_new x -> m.ty_doms (ty_sem m (ty_ext x)) (v_ext x)
+  
+  (* Preservation of coherence by well-typed extension of model. *)
+  let lemma coherence_extension (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (m':model 'univ (bind 'tv 'ntv) 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls)
+    (env':ty_env (bind 'tv 'ntv) 'tyv 'tys 'ls)
+    (v_ext:'ntv -> 'univ)
+    (v_new:'ntv -> bool)
+    (ty_ext:'ntv -> ty 'tyv 'tys)
+    requires { coherent_model_env m env }
+    requires { coherent_extension m v_ext v_new ty_ext }
+    requires { m' = { m with t_vars = bfold m.t_vars v_ext } }
+    requires { env' = { env with tv_belong = bfold env.tv_belong v_new;
+                                 tv_ty = bfold env.tv_ty ty_ext } }
+    ensures { coherent_model_env m' env' }
+  = assert { model_ty_congruence all all m m' };
+    assert { forall x. env'.tv_belong x ->
+      not m'.ty_doms (ty_sem m' (env'.tv_ty x)) (m'.t_vars x) ->
+      match x with Fresh _ -> false | Old y -> env.tv_belong y && false end
+      && false };
+    assert { forall f tyl.
+      not(ty_inst_args m env f tyl = ty_inst_args m' env' f tyl /\
+          ty_inst_ret m env f tyl = ty_inst_ret m' env' f tyl) ->
+        let ext = list_nth tyl (const default) in
+        let m_ext2 = { m' with ty_vars = bfold m'.ty_vars ext } in
+        let m_ext = { m with ty_vars = bfold m.ty_vars ext } in
+        model_ty_congruence all all m_ext m_ext2 && false };
+    assert { forall ty_alg f g tyl_args argf argg.
+      let ty_f = ty_inst_args m' env' f tyl_args in
+      let ty_g = ty_inst_args m' env' g tyl_args in
+      env'.tys_belong ty_alg /\
+      env'.tys_constr ty_alg f /\ env'.tys_constr ty_alg g /\ f <> g /\
+      tyl_doms m' ty_f argf /\ tyl_doms m' ty_g argg ->
+      not (m'.ls_eval f tyl_args argf <> m'.ls_eval g tyl_args argg) ->
+      ty_f = ty_inst_args m env f tyl_args &&
+      ty_g = ty_inst_args m env g tyl_args &&
+      tyl_doms m ty_f argf && tyl_doms m ty_g argg &&
+      m.ls_eval f tyl_args argf <> m.ls_eval g tyl_args argg && false }
+  
+  (* Syntactic pattern exhaustiveness => semantic pattern exhaustiveness.
+     Method: destructurate the value till depth n+1, with n being the
+     depth of the pattern-matching, then show the resulting pattern
+     must be accepted... Hum...
+     BETTER: show that for every value that is NOT accepted and obeying
+     to some shape, we can 'refine' the shape till it is NOT accepted
+     neither. Note that it is obvious that if a pattern is not accepted
+     no refinement will be.
+     Hence, if a pattern-matching is exhaustive and a value is not accepted:
+     - Take the empty shape, which is coherent with the starting value.
+     - Refine the shape through the pattern-matching
+     - The shape is not unifiable with any case, absurd.
+   *)
+   (* p1 is a shape refinement of p2. *)
+   predicate pat_refine (p1 p2:pattern 'pv 'tyv 'tys 'ls) =
+     match p2 with
+     | PWild -> true
+     | PApp f tyl l -> exists l'. p1 = PApp f tyl l' /\ patl_refine l' l
+     | _ -> false
+     end
+   
+   with patl_refine (p1 p2:list (pattern 'pv 'tyv 'tys 'ls)) =
+     match p2 with
+     | Nil -> p1 = Nil
+     | Cons x q -> exists y r. p1 = Cons y r /\
+       pat_refine y x /\ patl_refine r q
+     end
+  
+  let rec lemma pat_refine_self (p:pattern 'pv 'tyv 'tys 'ls) : unit
+    requires { pat_structural p }
+    ensures { pat_refine p p }
+    variant { p }
+  = match p with
+    | PApp _ _ l -> patl_refine_self l
+    | _ -> ()
+    end
+  
+  with lemma patl_refine_self (l:list (pattern 'pv 'tyv 'tys 'ls)) : unit
+    requires { patl_structural l }
+    ensures { patl_refine l l }
+    variant { l }
+  = match l with
+    | Cons x q -> pat_refine_self x; patl_refine_self q
+    | _ -> ()
+    end
+  
+  let rec lemma pat_refine_trans (p1 p2 p3:pattern 'pv 'tyv 'tys 'ls) : unit
+    requires { pat_structural p1 /\ pat_refine p1 p2 }
+    requires { pat_structural p2 /\ pat_refine p2 p3 }
+    ensures { pat_refine p1 p3 }
+    variant { p1 }
+  = match p1 , p2 , p3 with
+    | PApp _ _ l1 , PApp _ _ l2 , PApp _ _ l3 -> patl_refine_trans l1 l2 l3
+    | _ , _ , _ -> ()
+    end
+  
+  with lemma patl_refine_trans
+    (l1 l2 l3:list (pattern 'pv 'tyv 'tys 'ls)) : unit
+    requires { patl_structural l1 /\ patl_refine l1 l2 }
+    requires { patl_structural l2 /\ patl_refine l2 l3 }
+    ensures { patl_refine l1 l3 }
+    variant { l1 }
+  = match l1 , l2 , l3 with
+    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 ->
+      pat_refine_trans x1 x2 x3; patl_refine_trans q1 q2 q3
+    | Nil , Nil , Nil -> ()
+    | _ , _ , _ -> absurd
+    end
+  
+  let rec lemma pat_refine_structural_match
+    (p1 p2 p3:pattern 'pv 'tyv 'tys 'ls) : unit
+    requires { pat_refine p1 p2 }
+    requires { pat_structural p1 }
+    requires { pat_structural_match p1 p3 }
+    ensures { pat_structural_match p2 p3 }
+    variant { p3 }
+  = match p1 , p2 , p3 with
+    | _ , PWild , _ -> ()
+    | PWild , _ , _ -> absurd
+    | _ , _ , (PWild | PVar _) -> ()
+    | _ , _ , PAs p3 _ -> pat_refine_structural_match p1 p2 p3
+    | _ , _ , POr p3 p4 ->
+      let u = if pat_structural_match p1 p3 then p3 else p4 in
+      pat_refine_structural_match p1 p2 u
+    | PApp _ _ l1 , PApp _ _ l2 , PApp f tyl l3 ->
+      patl_refine_structural_match l1 l2 l3
+    | _ -> absurd
+    end
+  
+  with lemma patl_refine_structural_match
+    (l1 l2 l3:list (pattern 'pv 'tyv 'tys 'ls)) : unit
+    requires { patl_refine l1 l2 }
+    requires { patl_structural l1 }
+    requires { patl_structural_match l1 l3 }
+    ensures { patl_structural_match l2 l3 }
+    variant { l3 }
+  = match l1 , l2 , l3 with
+    | Nil , Nil , Nil -> ()
+    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 ->
+      patl_refine_structural_match q1 q2 q3;
+      pat_refine_structural_match x1 x2 x3
+    | _ , _ , _ -> absurd
+    end
+  
+  function is_constructor (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls) (ty_alg:'tys) (tyl_s:list 'univ)
+    (x:'univ) : 'ls -> bool = \f.
+      env.tys_constr ty_alg f /\
+      let args = m.ls_proj f tyl_s x in m.ls_eval f tyl_s args = x /\
+      let ty_a = ty_inst_args m env f tyl_s in tyl_doms m ty_a args
+  
+  let rec ghost pat_var_list (m:model 'univ 'tv 'tyv 'tys 'ls)
+    (env:ty_env 'tv 'tyv 'tys 'ls) (args:list 'univ)
+    (tyl:list (ty 'tyv 'tys)) : list (pattern 'pv 'tyv 'tys 'ls)
+    requires { length args = length tyl }
+    ensures { patl_wty env result tyl }
+    ensures { patl_structural result }
+    ensures { patl_accept m result args }
+    variant { tyl }
+  = match args , tyl with
+    | Nil , Nil -> let res = Nil in
+      assert { patl_sem m res args (const None) }; res
+    | Cons _ q1 , Cons _ q2 ->
+      let qr = pat_var_list m env q1 q2 in
+      let res = Cons PWild qr in
+      assert { not patl_accept m res args ->
+        (forall s. patl_sem m qr q1 s ->
+         patl_sem m res args (extend (const None) s) && false) && false };
+      res
+    | _ , _ -> absurd
+    end
+  
+  let rec ghost pat_refine_unaccepted
+    (m:model 'univ 'tv 'tyv 'tys 'ls) (env:ty_env 'tv 'tyv 'tys 'ls) (x:'univ)
+    (coh pat:pattern 'pv 'tyv 'tys 'ls)
+    (ty:ty 'tyv 'tys) : pattern 'pv 'tyv 'tys 'ls
+    requires { model_ok m /\ env_wf env }
+    requires { coherent_model_env m env }
+    requires { pat_wty env pat ty /\ pat_wty env coh ty /\ pat_no_conflict pat }
+    requires { pat_accept m coh x /\ pat_structural coh }
+    requires { m.ty_doms (ty_sem m ty) x }
+    requires { not pat_accept m pat x }
+    ensures { pat_accept m result x /\ pat_structural result }
+    ensures { pat_refine result coh /\ pat_wty env result ty }
+    ensures { not pat_structural_match result pat }
+    variant { pat }
+  = match coh , pat with
+    | PApp f tylf lf , PApp g tylg lg ->
+      if f = g
+      then begin
+        assert { tylf = tylg };
+        let tyl_s = tyl_sem m tylf in
+        let ty_a = ty_args env f tylf in
+        let lx = m.ls_proj f tyl_s x in
+        let l_coh = patl_refine_unaccepted m env lx lf lg ty_a in
+        PApp g tylg l_coh
+      end else coh
+    | PWild , PApp g tylg lg -> let ty_alg = match env.ls_ret g with
+      | TyApp ty_a _ -> ty_a | _ -> absurd end in
+      let tyl_s = tyl_sem m tylg in
+      let f = choice (is_constructor m env ty_alg tyl_s x) in
+      assert { env.ls_constr g && ty_wf env (env.ls_ret g) &&
+        env.tys_belong ty_alg && env.tys_constr ty_alg g &&
+        ty_sem m ty = m.ty_funs ty_alg tyl_s &&
+        m.ty_doms (m.ty_funs ty_alg tyl_s) x &&
+        is_constructor m env ty_alg tyl_s x f };
+      let args = m.ls_proj f tyl_s x in
+      let args_types = ty_args env f tylg in
+      assert { is_constructor m env ty_alg tyl_s x f &&
+        m.ls_eval f tyl_s args = x };
+      if f = g
+      then begin
+        absurd (* TODO *)
+      end else begin
+        
+        let res = PApp f tylg (pat_var_list m env args args_types) in res
+      end
+    | _ , PWild -> assert { pat_sem m pat x (const None) };absurd
+    | _ , PVar y -> assert { pat_sem m pat x ((const None)[y <- Some x]) };
+      absurd
+    | _ , PAs pat2 y -> assert { (forall s. pat_sem m pat2 x s ->
+        pat_sem m pat x (s[y <- Some x]) && false) &&
+        not (pat_accept m pat2 x) };
+      let res = pat_refine_unaccepted m env x coh pat2 ty in
+      assert { pat_structural_match res pat -> match res , coh , pat2 with
+        | PWild , _ , _ | _ , PWild , _ | _ , _ , PWild ->
+          ("keep_on_simp" true) && false
+        | _ -> false end && false }; res
+    | _ , POr p1 p2 -> assert { pat_accept m p1 x -> (forall s.
+        pat_sem m p1 x s -> pat_sem m pat x s && false) && false };
+      assert { pat_accept m p2 x -> (forall s.
+        pat_sem m p2 x s -> pat_sem m pat x s && false) && false };
+      let coh1 = pat_refine_unaccepted m env x coh p1 ty in
+      let coh2 = pat_refine_unaccepted m env x coh1 p2 ty in
+      assert { pat_structural_match coh2 pat ->
+        not pat_structural_match coh2 p1 && match coh2 , p1 with
+          | PWild , _ | _ , PWild -> ("keep_on_simp" true) && false
+          | _ -> false end && false };
+      coh2
+    | _ , _ -> absurd
+    end
+  
+  with ghost patl_refine_unaccepted
+    (m:model 'univ 'tv 'tyv 'tys 'ls) (env:ty_env 'tv 'tyv 'tys 'ls)
+    (l:list 'univ) (cohl patl:list (pattern 'pv 'tyv 'tys 'ls))
+    (tyl:list (ty 'tyv 'tys)) : list (pattern 'pv 'tyv 'tys 'ls)
+    requires { model_ok m /\ env_wf env }
+    requires { coherent_model_env m env }
+    requires { patl_wty env patl tyl /\ patl_wty env cohl tyl }
+    requires { patl_no_conflict patl }
+    requires { patl_accept m cohl l /\ patl_structural cohl }
+    requires { not patl_accept m patl l }
+    requires { tyl_doms m (tyl_sem m tyl) l }
+    ensures { patl_accept m result l /\ patl_structural result }
+    ensures { patl_refine result cohl /\ patl_wty env result tyl }
+    ensures { not patl_structural_match result patl }
+    variant { patl }
+  = match cohl , patl , l , tyl with
+    | Cons ch cq , Cons ph pq , Cons lh lq , Cons ty_h ty_q ->
+      assert { pat_accept m ch lh /\ patl_accept m cq lq };
+      assert { forall hs qs,hp:pattern 'pv 'tyv 'tys 'ls,qp.
+        pat_accept m hp hs /\ patl_accept m qp qs ->
+        not patl_accept m (Cons hp qp) (Cons hs qs) ->
+        (forall s1 s2. pat_sem m hp hs s1 /\ patl_sem m qp qs s2 ->
+          patl_sem m (Cons hp qp) (Cons hs qs) (extend s1 s2) && false) &&
+        false };
+      if not pat_accept m ph lh
+      then Cons (pat_refine_unaccepted m env lh ch ph ty_h) cq
+      else Cons ch (patl_refine_unaccepted m env lq cq pq ty_q)
+    | _ , Nil , _ , _ | Cons _ _ , _ , Nil , _ | Nil , _ , Cons _ _ , _ ->
+      assert { "keep_on_simp" true }; absurd
+    | _ , _ , _ , _ -> absurd
+    end
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  (* A well-typed term t with type T, in a model M coherent with
+     a typing environment G, has semantic in this model belong to the
+     semantic of its type in this model. *)
+  let rec lemma t_coherent_type (t:term 'tv 'tyv 'tys 'ls) : unit
+    ensures { forall env:ty_env 'tv 'tyv 'tys 'ls,
+      m:model 'univ 'tv 'tyv 'tys 'ls, ty:ty 'tyv 'tys.
+      coherent_model_env m env /\ model_ok m /\ env_wf env /\ t_wf env t ty ->
+      m.ty_doms (ty_sem m ty) (t_sem m t) }
+    variant { t }
+  = match t with
+    | TApp f tyl tl -> tl_coherent_type tl;
+      assert { forall env,m:model 'univ 'tv 'tyv 'tys 'ls,ty.
+        coherent_model_env m env /\ model_ok m /\ env_wf env /\ t_wf env t ty ->
+        not(m.ty_doms (ty_sem m ty) (t_sem m t)) ->
+          let ty_a = ty_args env f tyl in
+          let tyl_s = tyl_sem m tyl in
+          let ext = list_nth tyl_s (const default) in
+          let m_ext = { m with ty_vars = bfold m.ty_vars ext } in
+          ty = ty_ret env f tyl && tl_wf env tl ty_a &&
+          tyl_doms m (tyl_sem m ty_a) (tl_sem m tl) &&
+          tyl_sem m ty_a = tyl_sem m_ext (env.ls_args f) &&
+          ty_sem m ty = ty_sem m_ext (env.ls_ret f) &&
+          false }
+    | TIf b t e -> t_coherent_type b;
+      t_coherent_type t;
+      t_coherent_type e
+    | TLet t1 t2 -> t_coherent_type t1; t_coherent_type t2;
+      assert { forall env,m:model 'univ 'tv 'tyv 'tys 'ls,ty.
+        coherent_model_env m env /\ model_ok m /\ env_wf env /\
+          t_wf env t ty ->
+        not (m.ty_doms (ty_sem m ty) (t_sem m t)) ->
+        ((forall ty0.
+          let env' = { env with tv_belong = bfold env.tv_belong all;
+                                tv_ty = bfold env.tv_ty (const ty0) } in
+          t_wf env t1 ty0 /\ t_wf env' t2 ty /\ ty_wf env ty0 ->
+            let v0 = t_sem m t1 in
+            let m' = { m with t_vars = bfold m.t_vars (const v0) } in
+            (forall ty1. ty_sem m' ty1 <> ty_sem m ty1 ->
+              model_ty_congruence all all m m' && false) &&
+            coherent_extension m (const v0:unit -> 'univ) all (const ty0) &&
+            coherent_model_env m' env' && model_ok m' &&
+            m.ty_doms (ty_sem m ty0) (t_sem m t1) &&
+            env_coherent_ext env (all:int -> bool) (const ty0) && env_wf env' &&
+            m'.ty_doms (ty_sem m' ty) (t_sem m' t2) &&
+            ty_sem m' ty = ty_sem m ty && false) /\
+        (exists ty0.
+          let env' = { env with tv_belong = bfold env.tv_belong all;
+                                tv_ty = bfold env.tv_ty (const ty0) } in
+          t_wf env t1 ty0 /\ t_wf env' t2 ty /\ ty_wf env ty0)) && false }
+    | TCase t lb -> t_coherent_type t;brl_coherent_type lb
+    | TForall _ _ | TExists _ _
+    | TAnd _ _ | TOr _ _ | TImplies _ _ | TIff _ _
+    | TNot _ | TVar _ | TTrue | TFalse -> ()
+    end
+  
+  with lemma tl_coherent_type (tl:list (term 'tv 'tyv 'tys 'ls)) : unit
+    ensures { forall env:ty_env 'tv 'tyv 'tys 'ls,
+      m:model 'univ 'tv 'tyv 'tys 'ls, tyl:list (ty 'tyv 'tys).
+      coherent_model_env m env /\ model_ok m /\ env_wf env /\
+        tl_wf env tl tyl ->
+      tyl_doms m (tyl_sem m tyl) (tl_sem m tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_coherent_type x;tl_coherent_type q;
+      assert { forall env:ty_env 'tv 'tyv 'tys 'ls,
+        m:model 'univ 'tv 'tyv 'tys 'ls, tyl:list (ty 'tyv 'tys).
+        coherent_model_env m env /\ model_ok m /\ env_wf env /\
+          tl_wf env tl tyl ->
+        not (tyl_doms m (tyl_sem m tyl) (tl_sem m tl)) ->
+        match tyl with
+        | Cons tyx tyq -> m.ty_doms (ty_sem m tyx) (t_sem m x) && false
+        | _ -> false
+        end && false }
+    | _ -> ()
+    end
+  
+  (* TODO: miss acceptation conditions.
+     Indeed, well-typedness can only be guaranteed for a value matching
+     one of the patterns given here. *)
+  with lemma brl_coherent_type (brl:list (branch 'tv 'tyv 'tys 'ls)) : unit
+    ensures { forall env:ty_env 'tv 'tyv 'tys 'ls,
+      m:model 'univ 'tv 'tyv 'tys 'ls, tyc ty:ty 'tyv 'tys,x:'univ.
+      coherent_model_env m env /\ model_ok m /\ env_wf env /\
+      brl_wf env brl tyc ty /\ m.ty_doms (ty_sem m tyc) x /\
+      brl_accept m brl x ->
+      m.ty_doms (ty_sem m ty) (brl_sem m brl x) }
+    variant { brl }
+  = match brl with
+    | Cons _ q -> brl_coherent_type q
+    | _ -> ()
+    end
+  
+  with lemma br_coherent_type (br:branch 'tv 'tyv 'tys 'ls) : unit
+    ensures { forall env:ty_env 'tv 'tyv 'tys 'ls,
+      m:model 'univ 'tv 'tyv 'tys 'ls,tyc ty:ty 'tyv 'tys,x cont:'univ.
+      coherent_model_env m env /\ model_ok m /\ env_wf env /\
+      br_wf env br tyc ty /\ m.ty_doms (ty_sem m tyc) x ->
+      m.ty_doms (ty_sem m ty) (br_sem m br x cont) }
+    variant { br }
+  = match br with
+    | ( pat , right ) -> absurd (* TODO-TODO-TODO-TODO-TODO. *)
+    | _ -> ()
+    end
+  
+end
+
