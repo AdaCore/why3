@@ -357,7 +357,7 @@ let build_shared proof_dir prover =
 
   let exec_cmd cmd =
     let hackish_filename =
-      List.fold_left (fun s fn -> s ^ " " ^ fn)
+      List.fold_left (fun s fn -> s ^ " \"" ^ fn ^ "\"")
                      (List.hd vc_files) (List.tl vc_files) in
     let cmd = actual_cmd hackish_filename cmd in
     let cmd_splitted = Cmdline.cmdline_split cmd in
