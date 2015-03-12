@@ -113,7 +113,7 @@ end
 
 (** {2 Generic theory (arbitrary length)} *)
 
-module BitVectorBase
+module BitVector
 
   use export bool.Bool
   use import Pow2int
@@ -291,34 +291,34 @@ end
 
 (** {2 32-bits Bitvectors} *)
 
-module BV64
+module BitVector64
   constant size_int : int = 64
   constant max_int : int = 0xFFFF_FFFF_FFFF_FFFF
-  clone export BitVectorBase with
+  clone export BitVector with
     constant size_int = size_int,
     constant max_int = max_int
 end
 
-module BV32
+module BitVector32
   constant size_int : int = 32
   constant max_int : int = 0xFFFF_FFFF
-  clone export BitVectorBase with
+  clone export BitVector with
     constant size_int = size_int,
     constant max_int = max_int
 end
 
-module BV16
+module BitVector16
   constant size_int : int = 16
   constant max_int : int = 0xFFFF
-  clone export BitVectorBase with
+  clone export BitVector with
     constant size_int = size_int,
     constant max_int = max_int
 end
 
-module BV8
+module BitVector8
   constant size_int : int = 8
   constant max_int : int = 0xFF
-  clone export BitVectorBase with
+  clone export BitVector with
     constant size_int = size_int,
     constant max_int = max_int
 end
@@ -342,278 +342,91 @@ module BVConverter
 end
 
 module BVConverter_32_64
-  use BV32
-  use BV64
+  use BitVector32
+  use BitVector64
 
-  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV32.max_int)
+  predicate in_range (b : BitVector64.t) = BitVector64.ule b (BitVector64.of_int BitVector32.max_int)
 
   clone export BVConverter with
-    type bigBV = BV64.t,
-    type smallBV = BV32.t,
+    type bigBV = BitVector64.t,
+    type smallBV = BitVector32.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV32.two_power_size,
-    function to_int_small = BV32.to_int,
-    function to_int_big = BV64.to_int
+    constant pow2_smallSize = BitVector32.two_power_size,
+    function to_int_small = BitVector32.to_int,
+    function to_int_big = BitVector64.to_int
 end
 
 module BVConverter_16_64
-  use BV16
-  use BV64
+  use BitVector16
+  use BitVector64
 
-  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV16.max_int)
+  predicate in_range (b : BitVector64.t) = BitVector64.ule b (BitVector64.of_int BitVector16.max_int)
 
   clone export BVConverter with
-    type bigBV = BV64.t,
-    type smallBV = BV16.t,
+    type bigBV = BitVector64.t,
+    type smallBV = BitVector16.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV16.two_power_size,
-    function to_int_small = BV16.to_int,
-    function to_int_big = BV64.to_int
+    constant pow2_smallSize = BitVector16.two_power_size,
+    function to_int_small = BitVector16.to_int,
+    function to_int_big = BitVector64.to_int
 end
 
 module BVConverter_8_64
-  use BV8
-  use BV64
+  use BitVector8
+  use BitVector64
 
-  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV8.max_int)
+  predicate in_range (b : BitVector64.t) = BitVector64.ule b (BitVector64.of_int BitVector8.max_int)
 
   clone export BVConverter with
-    type bigBV = BV64.t,
-    type smallBV = BV8.t,
+    type bigBV = BitVector64.t,
+    type smallBV = BitVector8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize =  BV8.two_power_size,
-    function to_int_small = BV8.to_int,
-    function to_int_big = BV64.to_int
+    constant pow2_smallSize =  BitVector8.two_power_size,
+    function to_int_small = BitVector8.to_int,
+    function to_int_big = BitVector64.to_int
 end
 
 module BVConverter_16_32
-  use BV16
-  use BV32
+  use BitVector16
+  use BitVector32
 
-  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV16.max_int)
+  predicate in_range (b : BitVector32.t) = BitVector32.ule b (BitVector32.of_int BitVector16.max_int)
 
   clone export BVConverter with
-    type bigBV = BV32.t,
-    type smallBV = BV16.t,
+    type bigBV = BitVector32.t,
+    type smallBV = BitVector16.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV16.two_power_size,
-    function to_int_small = BV16.to_int,
-    function to_int_big = BV32.to_int
+    constant pow2_smallSize = BitVector16.two_power_size,
+    function to_int_small = BitVector16.to_int,
+    function to_int_big = BitVector32.to_int
 end
 
 module BVConverter_8_32
-  use BV8
-  use BV32
+  use BitVector8
+  use BitVector32
 
-  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV8.max_int)
+  predicate in_range (b : BitVector32.t) = BitVector32.ule b (BitVector32.of_int BitVector8.max_int)
 
   clone export BVConverter with
-    type bigBV = BV32.t,
-    type smallBV = BV8.t,
+    type bigBV = BitVector32.t,
+    type smallBV = BitVector8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV8.two_power_size,
-    function to_int_small = BV8.to_int,
-    function to_int_big = BV32.to_int
+    constant pow2_smallSize = BitVector8.two_power_size,
+    function to_int_small = BitVector8.to_int,
+    function to_int_big = BitVector32.to_int
 end
 
 module BVConverter_8_16
-  use BV8
-  use BV16
+  use BitVector8
+  use BitVector16
 
-  predicate in_range (b : BV16.t) = BV16.ule b (BV16.of_int BV8.max_int)
+  predicate in_range (b : BitVector16.t) = BitVector16.ule b (BitVector16.of_int BitVector8.max_int)
 
   clone export BVConverter with
-    type bigBV = BV16.t,
-    type smallBV = BV8.t,
+    type bigBV = BitVector16.t,
+    type smallBV = BitVector8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV8.two_power_size,
-    function to_int_small = BV8.to_int,
-    function to_int_big = BV16.to_int
-end
-(* module BitVectors *)
-
-(*   use import int.Int *)
-(*   use import int.Power *)
-(*   use import int.EuclideanDivision *)
-(*   use import bv.BitVector *)
-
-(*   type bitvec = t *)
-
-(*   (\* shifts and rotations *\) *)
-
-(*   val lsl (x : bitvec) (n : bitvec) : bitvec *)
-(*     requires{ 0 <= to_uint n < 32 } *)
-(*     ensures{ result = lsl_bv x n } *)
-(*     ensures{ to_uint result = mod ( to_uint x * ( power 2 ( to_uint n ) ) ) powSize } *)
-
-(*   val lsr (x : bitvec) (n : bitvec) : bitvec *)
-(*     requires{ 0 <= to_uint n < 32 } *)
-(*     ensures{ result = lsr_bv x n } *)
-(*     ensures{ to_uint result = div ( to_uint x ) ( power 2 ( to_uint n ) ) } *)
-
-(*   val asr (x : bitvec) (n : bitvec) : bitvec (\* Check that ! | find better *\) *)
-(*     requires{ 0 <= to_uint n < 32 } *)
-(*     ensures{ result = asr_bv x n } *)
-(*     ensures{ to_int result = div ( to_int x ) ( power 2 ( to_uint n ) ) } *)
-
-(*   val rotate_left (x : bitvec) : bitvec *)
-(*     ensures{ result = rotate_left x } *)
-
-(*   val rotate_right (x : bitvec) : bitvec *)
-(*     ensures{ result = rotate_right x } *)
-
-(*   (\* bitwise operations *\) *)
-    
-(*   val bw_and (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = bw_and x y } *)
-
-(*   val bw_or (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = bw_or x y } *)
-
-(*   val bw_xor (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = bw_xor x y } *)
-
-(*   val bw_not (x : bitvec) : bitvec *)
-(*     ensures{ result = bw_not x } *)
-
-(*   (\* arithmetic operations *\) *)
-
-(*   val add (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = add x y } *)
-(*     ensures{ to_uint result = mod ( to_uint x + to_uint y ) powSize } *)
-
-(*   val sub (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = sub x y } *)
-(*     ensures{ to_uint result = mod ( to_uint x - to_uint y ) powSize } *)
-
-(*   val neg (x : bitvec) : bitvec *)
-(*     ensures{ result = neg x } *)
-(*     ensures{ to_uint result = mod ( - to_uint x ) powSize } *)
-
-(*   val mul (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = mul x y } *)
-(*     ensures{ to_uint result = mod ( to_uint x * to_uint y ) powSize } *)
-
-(*   val udiv (x : bitvec) (y : bitvec) : bitvec *)
-(*     ensures{ result = udiv x y } *)
-(*     ensures{ to_uint result = mod ( div ( to_uint x ) ( to_uint y ) ) powSize } *)
-
-(*   (\* comparison *\) *)
-
-(*   val eq (x : bitvec) (y : bitvec) : bool *)
-(*     ensures{ result = eq x y } *)
-(*     ensures{ result = (=) ( to_uint x ) ( to_uint y ) } *)
-
-(*   val ult (x : bitvec) (y : bitvec) : bool *)
-(*     ensures{ result = ult x y } *)
-(*     ensures{ result = (<) ( to_uint x ) ( to_uint y ) } *)
-
-(*   val ule (x : bitvec) (y : bitvec) : bool *)
-(*     ensures{ result = ule x y } *)
-(*     ensures{ result = (<=) ( to_uint x ) ( to_uint y ) } *)
-
-(*   val ugt (x : bitvec) (y : bitvec) : bool *)
-(*     ensures{ result = ugt x y } *)
-(*     ensures{ result = (>) ( to_uint x ) ( to_uint y ) } *)
-
-(*   val uge (x : bitvec) (y : bitvec) : bool *)
-(*     ensures{ result = uge x y } *)
-(*     ensures{ result = (>=) ( to_uint x ) ( to_uint y ) } *)
-
-(* end *)
-
-module BitVector_32
-
-  use import int.Int
-  use import int.Power
-  use import int.EuclideanDivision
-  use export bv.BV32
-
-  type bitvec32 = t 
-
-  (* shifts and rotations *)
-
-  val lsl (x : bitvec32) (n : bitvec32) : bitvec32
-    requires{ 0 <= to_uint n < 32 }
-    ensures{ result = lsl_bv x n }
-    ensures{ to_uint result = mod ( to_uint x * ( power 2 ( to_uint n ) ) ) two_power_size }
-
-  val lsr (x : bitvec32) (n : bitvec32) : bitvec32
-    requires{ 0 <= to_uint n < 32 }
-    ensures{ result = lsr_bv x n }
-    ensures{ to_uint result = div ( to_uint x ) ( power 2 ( to_uint n ) ) }
-
-  val asr (x : bitvec32) (n : bitvec32) : bitvec32 (* Check that ! | find better *)
-    requires{ 0 <= to_uint n < 32 }
-    ensures{ result = asr_bv x n }
-    ensures{ to_int result = div ( to_int x ) ( power 2 ( to_uint n ) ) }
-
-  val rotate_left (x : bitvec32) : bitvec32
-    ensures{ result = rotate_left x }
-
-  val rotate_right (x : bitvec32) : bitvec32
-    ensures{ result = rotate_right x }
-
-  (* bitwise operations *)
-    
-  val bw_and (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = bw_and x y }
-
-  val bw_or (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = bw_or x y }
-
-  val bw_xor (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = bw_xor x y }
-
-  val bw_not (x : bitvec32) : bitvec32
-    ensures{ result = bw_not x }
-
-  (* arithmetic operations *)
-
-  val add (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = add x y }
-    ensures{ to_uint result = mod ( to_uint x + to_uint y ) two_power_size }
-
-  val sub (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = sub x y }
-    ensures{ to_uint result = mod ( to_uint x - to_uint y ) two_power_size }
-
-  val neg (x : bitvec32) : bitvec32
-    ensures{ result = neg x }
-    ensures{ to_uint result = mod ( - to_uint x ) two_power_size }
-
-  val mul (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = mul x y }
-    ensures{ to_uint result = mod ( to_uint x * to_uint y ) two_power_size }
-
-  val udiv (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = udiv x y }
-    ensures{ to_uint result = mod ( div ( to_uint x ) ( to_uint y ) ) two_power_size }
-
-  val urem (x : bitvec32) (y : bitvec32) : bitvec32
-    ensures{ result = urem x y}
-    ensures{ to_uint result = mod (to_uint x) (to_uint y) }
-
-  (* comparison *)
-
-  val eq (x : bitvec32) (y : bitvec32) : bool
-    ensures{ result = eq x y }
-    ensures{ result = (=) ( to_uint x ) ( to_uint y ) }
-
-  val ult (x : bitvec32) (y : bitvec32) : bool
-    ensures{ result = ult x y }
-    ensures{ result = (<) ( to_uint x ) ( to_uint y ) }
-
-  val ule (x : bitvec32) (y : bitvec32) : bool
-    ensures{ result = ule x y }
-    ensures{ result = (<=) ( to_uint x ) ( to_uint y ) }
-
-  val ugt (x : bitvec32) (y : bitvec32) : bool
-    ensures{ result = ugt x y }
-    ensures{ result = (>) ( to_uint x ) ( to_uint y ) }
-
-  val uge (x : bitvec32) (y : bitvec32) : bool
-    ensures{ result = uge x y }
-    ensures{ result = (>=) ( to_uint x ) ( to_uint y ) }
-
+    constant pow2_smallSize = BitVector8.two_power_size,
+    function to_int_small = BitVector8.to_int,
+    function to_int_big = BitVector16.to_int
 end
