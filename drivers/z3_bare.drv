@@ -56,7 +56,7 @@ theory bitvec.BitVector64
   syntax function lsr "(bvlshr %1 %2)"
   syntax function lsl "(bvshl %1 %2)"
   syntax function asr "(bvashr %1 %2)"
-  syntax converter of_int "(_ bv%1 64)"
+  syntax converter of_int "((_ int2bv 64) %1)"
   syntax function to_int "(bv2int %1)"
   remove prop to_int_of_int
   remove prop to_int_extensionality
@@ -121,7 +121,7 @@ theory bitvec.BitVector32
   syntax function lsr "(bvlshr %1 %2)"
   syntax function lsl "(bvshl %1 %2)"
   syntax function asr "(bvashr %1 %2)"
-  syntax converter of_int "(_ bv%1 32)"
+  syntax converter of_int "((_ int2bv 32) %1)"
   syntax function to_int "(bv2int %1)"
   remove prop to_int_of_int
   remove prop to_int_extensionality
@@ -186,7 +186,7 @@ theory bitvec.BitVector16
   syntax function lsr "(bvlshr %1 %2)"
   syntax function lsl "(bvshl %1 %2)"
   syntax function asr "(bvashr %1 %2)"
-  syntax converter of_int "(_ bv%1 16)"
+  syntax converter of_int "((_ int2bv 16) %1)"
   syntax function to_int "(bv2int %1)"
   remove prop to_int_of_int
   remove prop to_int_extensionality
@@ -251,7 +251,7 @@ theory bitvec.BitVector8
   syntax function lsr "(bvlshr %1 %2)"
   syntax function lsl "(bvshl %1 %2)"
   syntax function asr "(bvashr %1 %2)"
-  syntax converter of_int "(_ bv%1 8)"
+  syntax converter of_int "((_ int2bv 8) %1)"
   syntax function to_int "(bv2int %1)"
   remove prop to_int_of_int
   remove prop to_int_extensionality
