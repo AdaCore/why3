@@ -357,32 +357,14 @@ let build_shared proof_dir prover =
 
   let exec_cmd cmd =
     let hackish_filename =
-      List.fold_left (fun s fn -> s ^ " \"" ^ fn ^ "\"")
+      List.fold_left (fun s fn -> s ^ fn)
                      (List.hd vc_files) (List.tl vc_files) in
     let cmd = actual_cmd hackish_filename cmd in
-    let cmd_splitted = Cmdline.cmdline_split cmd in
-    let pid = Unix.fork () in
-    if pid = 0 then
-      (
-        Unix.dup2 child_out Unix.stdout;
-        Unix.dup2 child_out Unix.stderr;
-        Unix.close unused;
-        Unix.close child_out;
-        let () = Unix.execvp (List.hd cmd_splitted)
-                             (Array.of_list cmd_splitted) in
-        Unix.WEXITED (1)
-      )
-    else
-      (
-        let (_, status) = Unix.waitpid [] pid in
-        status
-      )
+    Sys.command cmd
   in
 
   let check_success res msg =
-    match res with
-    | Unix.WEXITED 0 -> ()
-    | _ -> let () = Gnat_util.abort_with_message ~internal:true msg in ()
+    if res <> 0 then Gnat_util.abort_with_message ~internal:true msg
   in
 
   if vc_files <> [] then
