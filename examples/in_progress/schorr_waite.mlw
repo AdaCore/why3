@@ -1,0 +1,86 @@
+
+(** Schorr-Waite algorithm
+
+    The Schorr-Waite algorithm is the first mountain that any
+    formalism for pointer aliasing should climb.
+                                      -- Richard Bornat, 2000
+
+*)
+
+
+module SchorrWaite
+
+  use import bool.Bool
+  use import map.Map
+  use import ref.Ref
+
+  (** a small component-as-array memory model *)
+
+  type loc
+  constant null: loc
+
+  val m: ref (map loc bool)
+  val c: ref (map loc bool)
+  val left: ref (map loc loc)
+  val right: ref (map loc loc)
+
+  val get_left (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = !left[p] }
+
+  val get_right (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = !right[p] }
+
+  val set_left (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { left }
+    ensures  { !left = set (old !left) p v }
+
+  val set_right (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { right }
+    ensures  { !right = set (old !right) p v }
+
+  val set_m (p: loc) (v: bool) : unit
+    requires { p <> null }
+    writes   { m }
+    ensures  { !m = set (old !m) p v }
+
+  val set_c (p: loc) (v: bool) : unit
+    requires { p <> null }
+    writes   { c }
+    ensures  { !c = set (old !c) p v }
+
+  let rec schorr_waite (root: loc) : unit
+    requires { true }
+    ensures  { true }
+  =
+    let t = ref root in
+    let p = ref null in
+    while !p <> null || !t <> null && not !m[!t] do
+      if !t = null || !m[!t] then begin
+        if !c[!p] then begin (* pop *)
+          let q = !t in
+          t := !p;
+          p := !right[!p];
+          set_right !t q;
+        end else begin (* swing *)
+          let q = !t in
+          t := get_right !p;
+          set_right !p (get_left !p);
+          set_left !p q;
+          set_c !p true;
+        end
+      end else begin (* push *)
+        let q = !p in
+        p := !t;
+        t := get_left !t;
+        set_left !p q;
+        set_m !p true;
+        set_c !p false
+      end
+    done
+
+
+end
