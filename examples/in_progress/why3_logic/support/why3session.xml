@@ -6,7 +6,6 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../support.mlw" expanded="true">
 <theory name="HO" sum="cacf043d990e8fc0b8032e0b3427633c">
  <goal name="WP_parameter extensionality" expl="VC for extensionality">
@@ -14,34 +13,34 @@
   <goal name="WP_parameter extensionality.1" expl="1. assertion">
   <transf name="inline_goal">
    <goal name="WP_parameter extensionality.1.1" expl="1. assertion">
-   <proof prover="4"><result status="valid" time="0.01" steps="1"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter extensionality.2" expl="2. postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter compose_associative" expl="VC for compose_associative">
- <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter id_neutral" expl="VC for id_neutral">
- <proof prover="4"><result status="valid" time="0.01" steps="43"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
  <goal name="WP_parameter compose_const_right" expl="VC for compose_const_right">
- <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="WP_parameter compose_const_left" expl="VC for compose_const_left">
- <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="WP_parameter ho_ite_compose_left" expl="VC for ho_ite_compose_left">
- <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
 <theory name="PartialMap" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Bind" sum="2ac974e6f1a13d733b204142230df4fe">
+<theory name="Bind" sum="84c5d9efd8b9cef1a2a2d90187a06512">
  <goal name="WP_parameter bfold_identity" expl="VC for bfold_identity">
  <proof prover="0"><result status="valid" time="0.04" steps="34"/></proof>
  </goal>
@@ -81,9 +80,9 @@
  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="Choice" sum="68e1b9014aa75a68b118b93980778ee0">
- <goal name="WP_parameter choice_def" expl="VC for choice_def">
- <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
+<theory name="Choice" sum="68e1b9014aa75a68b118b93980778ee0" expanded="true">
+ <goal name="WP_parameter choose" expl="VC for choose">
+ <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
 </theory>
 </file>

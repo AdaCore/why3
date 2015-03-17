@@ -56,6 +56,8 @@ module HO
   
   constant all : 'a -> bool = \_.true
   
+  constant none : 'a -> bool = \_.false
+  
   function union (a b:'a -> bool) : 'a -> bool = \x. a x \/ b x
   
   use import int.Int
@@ -162,10 +164,10 @@ module Choice
   
   axiom choice_def : forall p:'a -> bool. (exists x. p x) -> p (choice p)
   
-  let choice_def (p:'a -> bool) : unit
+  let choose (p:'a -> bool) : 'a
     requires { exists x. p x }
-    ensures { p (choice p) }
-  = ()
+    ensures { p result }
+  = choice p
   
 end
 

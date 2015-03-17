@@ -5,1196 +5,987 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <file name="../logic_semantic.mlw" expanded="true">
-<theory name="Model" sum="e05c788441d9d78a89e47f12c7f14033">
- <goal name="WP_parameter tyl_doms_independence" expl="VC for tyl_doms_independence">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter tyl_doms_independence.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_doms_independence.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_doms_independence.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_doms_independence.4" expl="4. variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_doms_independence.5" expl="5. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_doms_independence.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="59"/></proof>
-  </goal>
- </transf>
- </goal>
+<theory name="Model" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Sem" sum="a390310dc52fff67053980d5d1be06a3">
+<theory name="Sem" sum="f7e229986ac8119f0bcbb49a086fba2e">
  <goal name="WP_parameter ty_sem_independence" expl="VC for ty_sem_independence">
- <proof prover="0"><result status="valid" time="0.08" steps="46"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="47"/></proof>
  </goal>
  <goal name="WP_parameter tyl_sem_independence" expl="VC for tyl_sem_independence">
- <proof prover="0"><result status="valid" time="0.09" steps="68"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="69"/></proof>
  </goal>
  <goal name="WP_parameter tyl_sem_len" expl="VC for tyl_sem_len">
- <proof prover="0"><result status="valid" time="0.07" steps="44"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="45"/></proof>
  </goal>
  <goal name="WP_parameter tyl_sem_nth" expl="VC for tyl_sem_nth">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter tyl_sem_nth.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.06" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.2" expl="2. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="57"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="52"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter tyl_sem_nth.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="4"/></proof>
-  </goal>
- </transf>
+ <proof prover="0"><result status="valid" time="0.10" steps="127"/></proof>
  </goal>
 </theory>
-<theory name="SemSubst" sum="527dda6ff964e433ae4a4cc23bdaa2d1">
+<theory name="SemSubst" sum="3423a5624a60a6aed20103325576630c">
  <goal name="WP_parameter ty_subst_sem" expl="VC for ty_subst_sem">
- <proof prover="0"><result status="valid" time="0.12" steps="52"/></proof>
+ <proof prover="0"><result status="valid" time="0.10" steps="43"/></proof>
  </goal>
  <goal name="WP_parameter tyl_subst_sem" expl="VC for tyl_subst_sem">
- <proof prover="0"><result status="valid" time="0.11" steps="69"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="80"/></proof>
  </goal>
 </theory>
-<theory name="WellTyped" sum="bf5b6e39ebe85584c069343c882311ca" expanded="true">
+<theory name="WellTyped" sum="e0fe4ad0f488e41ff3c826932c548146">
  <goal name="WP_parameter ty_args_ret_subst_sem" expl="VC for ty_args_ret_subst_sem">
+ <proof prover="0"><result status="valid" time="0.28" steps="165"/></proof>
+ </goal>
+ <goal name="WP_parameter coherence_extension" expl="VC for coherence_extension">
+ <proof prover="2"><result status="valid" time="1.56"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_refine_self" expl="VC for pat_refine_self">
+ <proof prover="0"><result status="valid" time="0.23" steps="96"/></proof>
+ </goal>
+ <goal name="WP_parameter patl_refine_self" expl="VC for patl_refine_self">
+ <proof prover="0"><result status="valid" time="0.18" steps="74"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_refine_trans" expl="VC for pat_refine_trans">
+ <proof prover="0"><result status="valid" time="0.58" steps="469"/></proof>
+ </goal>
+ <goal name="WP_parameter patl_refine_trans" expl="VC for patl_refine_trans">
+ <proof prover="0"><result status="valid" time="0.53" steps="681"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_refine_skeleton_match" expl="VC for pat_refine_skeleton_match">
+ <proof prover="0"><result status="valid" time="1.60" steps="1212"/></proof>
+ </goal>
+ <goal name="WP_parameter patl_refine_skeleton_match" expl="VC for patl_refine_skeleton_match">
+ <proof prover="0"><result status="valid" time="0.40" steps="327"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_wild_list" expl="VC for pat_wild_list">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter ty_args_ret_subst_sem.1" expl="1. assertion">
+  <goal name="WP_parameter pat_wild_list.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.17" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.5" expl="5. unreachable point">
+  <proof prover="0"><result status="valid" time="0.14" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.6" expl="6. variant decrease">
+  <proof prover="0"><result status="valid" time="0.16" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="62"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.8" expl="8. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.24" steps="121"/></proof>
+   <goal name="WP_parameter pat_wild_list.8.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.15" steps="41"/></proof>
    </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.25" steps="55"/></proof>
+   <goal name="WP_parameter pat_wild_list.8.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.15" steps="52"/></proof>
    </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.20" steps="42"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.99" steps="396"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="0.94" steps="357"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.21" steps="7"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.7" expl="7. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="5"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.8" expl="8. assertion">
-   <proof prover="0"><result status="valid" time="0.32" steps="45"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.9" expl="9. assertion">
-   <proof prover="0"><result status="valid" time="0.24" steps="10"/></proof>
-   </goal>
-   <goal name="WP_parameter ty_args_ret_subst_sem.1.10" expl="10. assertion">
-   <proof prover="0"><result status="valid" time="0.24" steps="10"/></proof>
+   <goal name="WP_parameter pat_wild_list.8.3" expl="3. assertion">
+   <proof prover="4"><result status="valid" time="0.32"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter ty_args_ret_subst_sem.2" expl="2. postcondition">
-  <proof prover="2"><result status="valid" time="0.47"/></proof>
+  <goal name="WP_parameter pat_wild_list.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.11" expl="11. postcondition">
+  <proof prover="0"><result status="valid" time="0.15" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_wild_list.12" expl="12. unreachable point">
+  <proof prover="0"><result status="valid" time="0.19" steps="51"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter coherence_extension" expl="VC for coherence_extension">
+ <goal name="WP_parameter pat_refine_unaccepted" expl="VC for pat_refine_unaccepted">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter coherence_extension.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.14" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter coherence_extension.2" expl="2. assertion">
+  <goal name="WP_parameter pat_refine_unaccepted.1" expl="1. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter coherence_extension.2.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.22" steps="125"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.1.1" expl="1.">
+   <proof prover="1"><result status="valid" time="0.52"/></proof>
    </goal>
-   <goal name="WP_parameter coherence_extension.2.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.26" steps="74"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.1.2" expl="2.">
+   <proof prover="0"><result status="valid" time="0.15" steps="86"/></proof>
    </goal>
-   <goal name="WP_parameter coherence_extension.2.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.39" steps="198"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.1.3" expl="3.">
+   <proof prover="0"><result status="valid" time="0.13" steps="46"/></proof>
    </goal>
-   <goal name="WP_parameter coherence_extension.2.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.20" steps="25"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.1.4" expl="4.">
+   <proof prover="1"><result status="valid" time="0.63"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.1.5" expl="5.">
+   <proof prover="1"><result status="valid" time="0.48"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.1.6" expl="6.">
+   <proof prover="0"><result status="valid" time="0.23" steps="53"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.1.7" expl="7.">
+   <proof prover="0"><result status="valid" time="0.22" steps="50"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter coherence_extension.3" expl="3. assertion">
+  <goal name="WP_parameter pat_refine_unaccepted.2" expl="2. assertion">
+  <proof prover="0"><result status="valid" time="0.27" steps="164"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.3" expl="3. variant decrease">
+  <proof prover="0"><result status="valid" time="0.35" steps="155"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.22" steps="118"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.6" expl="6. precondition">
+  <proof prover="1"><result status="valid" time="1.83"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="162"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.8" expl="8. precondition">
+  <proof prover="0"><result status="valid" time="0.38" steps="150"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.9" expl="9. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter coherence_extension.3.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="32"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.9.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.31" steps="175"/></proof>
    </goal>
-   <goal name="WP_parameter coherence_extension.3.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.41" steps="92"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.9.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="1.11" steps="138"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.9.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.32" steps="127"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter coherence_extension.4" expl="4. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter coherence_extension.4.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.27" steps="33"/></proof>
-   </goal>
-   <goal name="WP_parameter coherence_extension.4.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="34"/></proof>
-   </goal>
-   <goal name="WP_parameter coherence_extension.4.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.14" steps="36"/></proof>
-   </goal>
-   <goal name="WP_parameter coherence_extension.4.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="37"/></proof>
-   </goal>
-   <goal name="WP_parameter coherence_extension.4.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="1.78" steps="707"/></proof>
-   </goal>
-   <goal name="WP_parameter coherence_extension.4.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.27" steps="34"/></proof>
-   </goal>
-  </transf>
+  <goal name="WP_parameter pat_refine_unaccepted.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="46"/></proof>
   </goal>
-  <goal name="WP_parameter coherence_extension.5" expl="5. postcondition">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter coherence_extension.5.1" expl="1. postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter coherence_extension.5.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
-     <goal name="WP_parameter coherence_extension.5.1.1.1" expl="1.">
-     <proof prover="0"><result status="valid" time="0.18" steps="31"/></proof>
-     </goal>
-     <goal name="WP_parameter coherence_extension.5.1.1.2" expl="2.">
-     <proof prover="0"><result status="valid" time="1.51" steps="667"/></proof>
-     </goal>
-     <goal name="WP_parameter coherence_extension.5.1.1.3" expl="3.">
-     <proof prover="0"><result status="valid" time="0.22" steps="25"/></proof>
-     </goal>
-     <goal name="WP_parameter coherence_extension.5.1.1.4" expl="4.">
-     <proof prover="0"><result status="valid" time="1.21" steps="395"/></proof>
-     </goal>
-     <goal name="WP_parameter coherence_extension.5.1.1.5" expl="5.">
-     <proof prover="0" timelimit="20"><result status="valid" time="11.57" steps="379"/></proof>
-     </goal>
-     <goal name="WP_parameter coherence_extension.5.1.1.6" expl="6.">
-     <proof prover="0"><result status="valid" time="0.79" steps="105"/></proof>
-     </goal>
-    </transf>
+  <goal name="WP_parameter pat_refine_unaccepted.11" expl="11. postcondition">
+  <proof prover="0"><result status="valid" time="0.31" steps="362"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.12" expl="12. postcondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="47"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.13" expl="13. unreachable point">
+  <proof prover="0"><result status="valid" time="0.14" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.14" expl="14. unreachable point">
+  <proof prover="0"><result status="valid" time="0.12" steps="66"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.15" expl="15. postcondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.16" expl="16. postcondition">
+  <proof prover="0"><result status="valid" time="0.22" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.17" expl="17. postcondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.18" expl="18. assertion">
+  <proof prover="1"><result status="valid" time="0.73"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.19" expl="19. precondition">
+  <transf name="simplify_trivial_quantification">
+   <goal name="WP_parameter pat_refine_unaccepted.19.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter pat_refine_unaccepted.19.1.1" expl="1.">
+    <proof prover="0"><result status="valid" time="0.51" steps="151"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter pat_refine_self" expl="VC for pat_refine_self">
- <proof prover="0"><result status="valid" time="0.51" steps="91"/></proof>
- </goal>
- <goal name="WP_parameter patl_refine_self" expl="VC for patl_refine_self">
- <proof prover="0"><result status="valid" time="0.23" steps="75"/></proof>
- </goal>
- <goal name="WP_parameter pat_refine_trans" expl="VC for pat_refine_trans">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter pat_refine_trans.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.21" steps="53"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.20" expl="20. assertion">
+  <proof prover="1"><result status="valid" time="1.80"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_trans.2" expl="2. precondition">
-  <proof prover="0"><result status="valid" time="0.29" steps="69"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.21" expl="21. assertion">
+  <proof prover="0"><result status="valid" time="0.37" steps="233"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_trans.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.20" steps="70"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.22" expl="22. precondition">
+  <proof prover="1"><result status="valid" time="1.45"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_trans.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.21" steps="70"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.23" expl="23. variant decrease">
+  <proof prover="0"><result status="valid" time="0.19" steps="153"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_trans.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="67"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.24" expl="24. precondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_trans.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.21" steps="37"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.25" expl="25. precondition">
+  <proof prover="0"><result status="valid" time="0.29" steps="118"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_trans.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.17" steps="13"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.26" expl="26. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="33"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter patl_refine_trans" expl="VC for patl_refine_trans">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter patl_refine_trans.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="37"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.27" expl="27. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_trans.2" expl="2. precondition">
-  <proof prover="0"><result status="valid" time="0.30" steps="86"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="87"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.4" expl="4. variant decrease">
-  <proof prover="0"><result status="valid" time="0.27" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.5" expl="5. precondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="89"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.24" steps="90"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="48"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.8" expl="8. unreachable point">
-  <proof prover="0"><result status="valid" time="0.20" steps="43"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.9" expl="9. unreachable point">
-  <proof prover="0"><result status="valid" time="0.21" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.11" expl="11. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_trans.12" expl="12. unreachable point">
-  <proof prover="0"><result status="valid" time="0.15" steps="20"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter pat_refine_structural_match" expl="VC for pat_refine_structural_match">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter pat_refine_structural_match.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.3" expl="3. unreachable point">
-  <proof prover="0"><result status="valid" time="0.21" steps="33"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.28" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.15" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.7" expl="7. unreachable point">
-  <proof prover="0"><result status="valid" time="0.23" steps="35"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.26" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.20" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.11" expl="11. unreachable point">
-  <proof prover="0"><result status="valid" time="0.17" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.12" expl="12. variant decrease">
-  <proof prover="0"><result status="valid" time="0.67" steps="460"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.13" expl="13. precondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.14" expl="14. precondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.15" expl="15. precondition">
-  <proof prover="0"><result status="valid" time="0.31" steps="99"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.16" expl="16. postcondition">
-  <proof prover="0"><result status="valid" time="0.32" steps="97"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.17" expl="17. postcondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.18" expl="18. postcondition">
-  <proof prover="0"><result status="valid" time="0.20" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.19" expl="19. unreachable point">
-  <proof prover="0"><result status="valid" time="0.24" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.20" expl="20. variant decrease">
-  <proof prover="0"><result status="valid" time="0.78" steps="633"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.21" expl="21. precondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.22" expl="22. precondition">
-  <proof prover="0"><result status="valid" time="0.21" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.23" expl="23. precondition">
-  <proof prover="0"><result status="valid" time="0.45" steps="90"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.24" expl="24. postcondition">
-  <proof prover="0"><result status="valid" time="0.44" steps="147"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.25" expl="25. postcondition">
-  <proof prover="0"><result status="valid" time="0.21" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.26" expl="26. postcondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.27" expl="27. unreachable point">
-  <proof prover="0"><result status="valid" time="0.19" steps="40"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.28" expl="28. variant decrease">
-  <proof prover="0"><result status="valid" time="0.34" steps="120"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.29" expl="29. precondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="86"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.30" expl="30. precondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.31" expl="31. precondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.32" expl="32. postcondition">
-  <proof prover="0"><result status="valid" time="0.15" steps="52"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.33" expl="33. unreachable point">
-  <proof prover="0"><result status="valid" time="0.15" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.34" expl="34. unreachable point">
-  <proof prover="0"><result status="valid" time="0.15" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_structural_match.35" expl="35. unreachable point">
-  <proof prover="0"><result status="valid" time="0.15" steps="11"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter patl_refine_structural_match" expl="VC for patl_refine_structural_match">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter patl_refine_structural_match.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.2" expl="2. unreachable point">
-  <proof prover="0"><result status="valid" time="0.22" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.3" expl="3. unreachable point">
-  <proof prover="0"><result status="valid" time="0.22" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.4" expl="4. variant decrease">
-  <proof prover="0"><result status="valid" time="0.20" steps="35"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.5" expl="5. precondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="98"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.7" expl="7. precondition">
-  <proof prover="0"><result status="valid" time="0.17" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.8" expl="8. variant decrease">
-  <proof prover="0"><result status="valid" time="0.19" steps="41"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.9" expl="9. precondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.10" expl="10. precondition">
-  <proof prover="0"><result status="valid" time="0.17" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.11" expl="11. precondition">
-  <proof prover="0"><result status="valid" time="0.18" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.12" expl="12. postcondition">
-  <proof prover="0"><result status="valid" time="0.17" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.13" expl="13. unreachable point">
-  <proof prover="0"><result status="valid" time="0.17" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_structural_match.14" expl="14. unreachable point">
-  <proof prover="0"><result status="valid" time="0.15" steps="18"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter pat_var_list" expl="VC for pat_var_list">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter pat_var_list.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.15" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.15" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.21" steps="5"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="4.98"/></proof>
-  <proof prover="3" obsolete="true"><result status="timeout" time="5.45"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="4.99"/></proof>
-  <proof prover="5" obsolete="true"><result status="timeout" time="4.97"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.5" expl="5. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.6" expl="6. variant decrease">
-  <proof prover="0"><result status="valid" time="0.16" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.7" expl="7. precondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.8" expl="8. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter pat_var_list.8.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="45"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_var_list.8.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="56"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_var_list.8.3" expl="3. assertion">
-   <proof prover="5"><result status="valid" time="0.20"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter pat_var_list.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.17" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.15" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_var_list.12" expl="12. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="13"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter pat_refine_unaccepted" expl="VC for pat_refine_unaccepted" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter pat_refine_unaccepted.1" expl="1. assertion" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.2" expl="2. variant decrease">
-  <proof prover="0"><result status="valid" time="0.24" steps="133"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.24" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.4" expl="4. precondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.5" expl="5. precondition">
-  <proof prover="0"><result status="valid" time="0.31" steps="73"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.26" steps="41"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.7" expl="7. precondition">
-  <proof prover="0"><result status="valid" time="0.35" steps="145"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.8" expl="8. precondition">
-  <proof prover="0"><result status="valid" time="0.31" steps="65"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.9" expl="9. precondition" expanded="true">
-  <proof prover="0"><result status="timeout" time="4.98"/></proof>
-  <proof prover="1"><result status="timeout" time="4.98"/></proof>
-  <proof prover="2"><result status="timeout" time="4.98"/></proof>
-  <proof prover="3"><result status="timeout" time="5.25"/></proof>
-  <proof prover="4"><result status="timeout" time="4.99"/></proof>
-  <proof prover="5"><result status="timeout" time="4.98"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.39" steps="176"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.52" steps="367"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.12" expl="12. postcondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="40"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.13" expl="13. postcondition">
-  <proof prover="0"><result status="valid" time="0.24" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.14" expl="14. postcondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.15" expl="15. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.16" expl="16. assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter pat_refine_unaccepted.16.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.20" steps="42"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.16.2" expl="2.">
-   <proof prover="1"><result status="valid" time="0.25"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.16.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.17" steps="44"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.16.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.18" steps="71"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.16.5" expl="5." expanded="true">
-   <proof prover="0"><result status="timeout" time="4.99"/></proof>
-   <proof prover="1"><result status="timeout" time="4.99"/></proof>
-   <proof prover="2"><result status="timeout" time="4.99"/></proof>
-   <proof prover="3"><result status="timeout" time="5.15"/></proof>
-   <proof prover="4"><result status="timeout" time="5.01"/></proof>
-   <proof prover="5"><result status="timeout" time="5.00"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.16.6" expl="6.">
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.16.7" expl="7." expanded="true">
-   <proof prover="1" obsolete="true"><result status="timeout" time="5.99"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.17" expl="17. assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter pat_refine_unaccepted.17.1" expl="1." expanded="true">
-   <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
-   <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="4.98"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="5.15"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="5.01"/></proof>
-   <proof prover="5" obsolete="true"><result status="timeout" time="4.99"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.17.2" expl="2." expanded="true">
-   <proof prover="0" obsolete="true"><result status="valid" time="0.21" steps="94"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.18" expl="18. unreachable point" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.19" expl="19. precondition" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.20" expl="20. postcondition" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.21" expl="21. postcondition" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.22" expl="22. postcondition" expanded="true">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.26" steps="37"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.23" expl="23. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="52"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.24" expl="24. unreachable point">
-  <proof prover="0"><result status="valid" time="0.30" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.25" expl="25. assertion">
-  <proof prover="0"><result status="valid" time="0.25" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.26" expl="26. unreachable point">
-  <proof prover="0"><result status="valid" time="0.17" steps="45"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.27" expl="27. assertion">
-  <proof prover="0"><result status="valid" time="0.15" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.28" expl="28. unreachable point">
-  <proof prover="0"><result status="valid" time="0.20" steps="53"/></proof>
-  <proof prover="1"><result status="valid" time="0.25"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.28" expl="28. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="115"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.29" expl="29. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter pat_refine_unaccepted.29.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.15" steps="22"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.29.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.15" steps="96"/></proof>
    </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.29.2" expl="2.">
-   <proof prover="0"><result status="valid" time="0.29" steps="45"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.29.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.62" steps="134"/></proof>
    </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.29.3" expl="3.">
-   <proof prover="5"><result status="valid" time="0.35"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.29.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.32" steps="129"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.30" expl="30. variant decrease">
-  <proof prover="0"><result status="valid" time="0.34" steps="98"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.30" expl="30. postcondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="50"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.31" expl="31. precondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="12"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.31" expl="31. postcondition">
+  <proof prover="0"><result status="valid" time="0.31" steps="210"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.32" expl="32. precondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="12"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.32" expl="32. postcondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="50"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.33" expl="33. precondition">
-  <proof prover="0"><result status="valid" time="0.26" steps="49"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.34" expl="34. precondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.35" expl="35. precondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.36" expl="36. precondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.37" expl="37. assertion">
+  <goal name="WP_parameter pat_refine_unaccepted.33" expl="33. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter pat_refine_unaccepted.37.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.14" steps="0"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.33.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.15" steps="88"/></proof>
    </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="21"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.33.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.27" steps="129"/></proof>
    </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.23" steps="21"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="0.15" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.26" steps="21"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.7" expl="7. assertion">
-   <proof prover="0"><result status="valid" time="0.13" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.8" expl="8. assertion">
-   <proof prover="0"><result status="valid" time="0.25" steps="53"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.9" expl="9. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.10" expl="10. assertion">
-   <proof prover="0"><result status="valid" time="0.28" steps="34"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.11" expl="11. assertion">
-   <proof prover="0"><result status="valid" time="0.23" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.12" expl="12. assertion">
-   <proof prover="0"><result status="valid" time="0.28" steps="79"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.13" expl="13. assertion">
-   <proof prover="0"><result status="valid" time="0.23" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.14" expl="14. assertion">
-   <proof prover="0"><result status="valid" time="0.39" steps="50"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.15" expl="15. assertion">
-   <proof prover="0"><result status="valid" time="0.43" steps="117"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.37.16" expl="16. assertion">
-   <proof prover="0"><result status="valid" time="0.30" steps="44"/></proof>
+   <goal name="WP_parameter pat_refine_unaccepted.33.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.26" steps="125"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.38" expl="38. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="20"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.34" expl="34. postcondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="43"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.39" expl="39. postcondition">
-  <proof prover="0"><result status="valid" time="0.28" steps="20"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.35" expl="35. postcondition">
+  <proof prover="1"><result status="valid" time="1.87"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.40" expl="40. postcondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="20"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.36" expl="36. postcondition">
+  <proof prover="0"><result status="valid" time="0.21" steps="43"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.41" expl="41. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter pat_refine_unaccepted.41.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="21"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.41.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.19" steps="43"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.41.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.31" steps="39"/></proof>
-   </goal>
-  </transf>
+  <goal name="WP_parameter pat_refine_unaccepted.37" expl="37. unreachable point">
+  <proof prover="0"><result status="valid" time="0.18" steps="126"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.42" expl="42. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter pat_refine_unaccepted.42.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="23"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.42.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.36" steps="70"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.42.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.18" steps="40"/></proof>
-   </goal>
-  </transf>
+  <goal name="WP_parameter pat_refine_unaccepted.38" expl="38. unreachable point">
+  <proof prover="0"><result status="valid" time="0.19" steps="54"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.43" expl="43. variant decrease">
-  <proof prover="0"><result status="valid" time="0.36" steps="99"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.44" expl="44. precondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.45" expl="45. precondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.46" expl="46. precondition">
-  <proof prover="0"><result status="valid" time="0.31" steps="50"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.47" expl="47. precondition">
-  <proof prover="0"><result status="valid" time="0.24" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.48" expl="48. precondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.49" expl="49. precondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.50" expl="50. variant decrease">
-  <proof prover="0"><result status="valid" time="0.37" steps="105"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.51" expl="51. precondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.52" expl="52. precondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.53" expl="53. precondition">
-  <proof prover="0"><result status="valid" time="0.30" steps="57"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.54" expl="54. precondition">
-  <proof prover="0"><result status="valid" time="0.24" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.55" expl="55. precondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.56" expl="56. precondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.57" expl="57. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter pat_refine_unaccepted.57.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="55"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.14" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.15" steps="30"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.13" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="0.22" steps="46"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="0"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.7" expl="7. assertion">
-   <proof prover="0"><result status="valid" time="0.21" steps="42"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.8" expl="8. assertion">
-   <proof prover="0"><result status="valid" time="0.22" steps="90"/></proof>
-   </goal>
-   <goal name="WP_parameter pat_refine_unaccepted.57.9" expl="9. assertion">
-   <proof prover="0"><result status="valid" time="0.18" steps="40"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.58" expl="58. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.59" expl="59. postcondition">
+  <goal name="WP_parameter pat_refine_unaccepted.39" expl="39. unreachable point">
   <proof prover="0"><result status="valid" time="0.15" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter pat_refine_unaccepted.60" expl="60. postcondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="28"/></proof>
+  <goal name="WP_parameter pat_refine_unaccepted.40" expl="40. assertion">
+  <proof prover="0"><result status="valid" time="0.13" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.41" expl="41. unreachable point">
+  <proof prover="0"><result status="valid" time="0.15" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.42" expl="42. assertion">
+  <proof prover="0"><result status="valid" time="0.18" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.43" expl="43. unreachable point">
+  <proof prover="0"><result status="valid" time="0.15" steps="52"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.44" expl="44. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pat_refine_unaccepted.44.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="27"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.44.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="52"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.44.3" expl="3. assertion">
+   <proof prover="4"><result status="valid" time="0.35"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.45" expl="45. variant decrease">
+  <proof prover="0"><result status="valid" time="0.24" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.46" expl="46. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.47" expl="47. precondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.48" expl="48. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.49" expl="49. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.50" expl="50. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.51" expl="51. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pat_refine_unaccepted.51.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="24"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="24"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.6" expl="6. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="24"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.7" expl="7. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.8" expl="8. assertion">
+   <proof prover="0"><result status="valid" time="0.31" steps="56"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.9" expl="9. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.10" expl="10. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="38"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.11" expl="11. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.12" expl="12. assertion">
+   <proof prover="0"><result status="valid" time="0.15" steps="78"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.13" expl="13. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.14" expl="14. assertion">
+   <proof prover="0"><result status="valid" time="0.18" steps="54"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.15" expl="15. assertion">
+   <proof prover="0"><result status="valid" time="0.23" steps="120"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.51.16" expl="16. assertion">
+   <proof prover="0"><result status="valid" time="0.13" steps="43"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.52" expl="52. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.53" expl="53. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.54" expl="54. postcondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.55" expl="55. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pat_refine_unaccepted.55.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="25"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.55.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.16" steps="48"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.55.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="44"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.56" expl="56. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pat_refine_unaccepted.56.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="27"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.56.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.20" steps="76"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.56.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.16" steps="45"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.57" expl="57. variant decrease">
+  <proof prover="0"><result status="valid" time="0.14" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.58" expl="58. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.59" expl="59. precondition">
+  <proof prover="0"><result status="valid" time="0.25" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.60" expl="60. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.61" expl="61. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.62" expl="62. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.63" expl="63. variant decrease">
+  <proof prover="0"><result status="valid" time="0.15" steps="98"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.64" expl="64. precondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.65" expl="65. precondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.66" expl="66. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.67" expl="67. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.68" expl="68. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.69" expl="69. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pat_refine_unaccepted.69.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="59"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="32"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="48"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.6" expl="6. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.7" expl="7. assertion">
+   <proof prover="0"><result status="valid" time="0.15" steps="44"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.8" expl="8. assertion">
+   <proof prover="0"><result status="valid" time="0.17" steps="93"/></proof>
+   </goal>
+   <goal name="WP_parameter pat_refine_unaccepted.69.9" expl="9. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="38"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.70" expl="70. postcondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.71" expl="71. postcondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_refine_unaccepted.72" expl="72. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter patl_refine_unaccepted" expl="VC for patl_refine_unaccepted">
  <transf name="split_goal_wp">
   <goal name="WP_parameter patl_refine_unaccepted.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.58" steps="463"/></proof>
+  <proof prover="0"><result status="valid" time="0.55" steps="395"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.2" expl="2. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter patl_refine_unaccepted.2.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.28" steps="28"/></proof>
+   <proof prover="0"><result status="valid" time="0.23" steps="32"/></proof>
    </goal>
    <goal name="WP_parameter patl_refine_unaccepted.2.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.34" steps="102"/></proof>
+   <proof prover="0"><result status="valid" time="0.27" steps="101"/></proof>
    </goal>
    <goal name="WP_parameter patl_refine_unaccepted.2.3" expl="3. assertion">
-   <proof prover="5"><result status="valid" time="0.94"/></proof>
+   <proof prover="4"><result status="valid" time="0.86"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.3" expl="3. variant decrease">
-  <proof prover="0"><result status="valid" time="0.33" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.24" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.4" expl="4. precondition">
-  <proof prover="0"><result status="valid" time="0.18" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.5" expl="5. precondition">
-  <proof prover="0"><result status="valid" time="0.24" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.26" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.32" steps="115"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.7" expl="7. precondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="53"/></proof>
+  <proof prover="0"><result status="valid" time="0.27" steps="130"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.8" expl="8. precondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="138"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.9" expl="9. precondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="17"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="82"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="85"/></proof>
+  <proof prover="0"><result status="valid" time="0.28" steps="268"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.38" steps="304"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="43"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.12" expl="12. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="40"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.12" expl="12. variant decrease">
+  <proof prover="0"><result status="valid" time="0.23" steps="52"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.13" expl="13. variant decrease">
-  <proof prover="0"><result status="valid" time="0.28" steps="57"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.14" expl="14. precondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.15" expl="15. precondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.16" expl="16. precondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="84"/></proof>
+  <proof prover="0"><result status="valid" time="0.26" steps="134"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.17" expl="17. precondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="53"/></proof>
+  <proof prover="0"><result status="valid" time="0.23" steps="70"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.18" expl="18. precondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="53"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.18" expl="18. postcondition">
+  <proof prover="0"><result status="valid" time="0.22" steps="82"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.19" expl="19. precondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="67"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.19" expl="19. postcondition">
+  <proof prover="0"><result status="valid" time="0.28" steps="197"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.20" expl="20. precondition">
-  <proof prover="0"><result status="valid" time="0.21" steps="142"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.20" expl="20. postcondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="44"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.21" expl="21. postcondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="85"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.21" expl="21. assertion">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.22" expl="22. postcondition">
-  <proof prover="0"><result status="valid" time="0.34" steps="221"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.22" expl="22. unreachable point">
+  <proof prover="0"><result status="valid" time="0.18" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.23" expl="23. postcondition">
-  <proof prover="0"><result status="valid" time="0.18" steps="41"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.23" expl="23. assertion">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.24" expl="24. assertion">
-  <proof prover="0"><result status="valid" time="0.17" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.24" expl="24. unreachable point">
+  <proof prover="0"><result status="valid" time="0.14" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.25" expl="25. unreachable point">
-  <proof prover="0"><result status="valid" time="0.25" steps="26"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.25" expl="25. assertion">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.26" expl="26. assertion">
-  <proof prover="0"><result status="valid" time="0.14" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.26" expl="26. unreachable point">
+  <proof prover="0"><result status="valid" time="0.14" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.27" expl="27. unreachable point">
-  <proof prover="0"><result status="valid" time="0.23" steps="14"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.27" expl="27. assertion">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.28" expl="28. assertion">
-  <proof prover="0"><result status="valid" time="0.14" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.28" expl="28. unreachable point">
+  <proof prover="0"><result status="valid" time="0.20" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.29" expl="29. unreachable point">
-  <proof prover="0"><result status="valid" time="0.24" steps="26"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.29" expl="29. assertion">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.30" expl="30. assertion">
-  <proof prover="0"><result status="valid" time="0.12" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.30" expl="30. unreachable point">
+  <proof prover="0"><result status="valid" time="0.12" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.31" expl="31. unreachable point">
-  <proof prover="0"><result status="valid" time="0.15" steps="26"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.31" expl="31. assertion">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.32" expl="32. assertion">
-  <proof prover="0"><result status="valid" time="0.12" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.32" expl="32. unreachable point">
+  <proof prover="0"><result status="valid" time="0.17" steps="122"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.33" expl="33. unreachable point">
-  <proof prover="0"><result status="valid" time="0.18" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.34" expl="34. assertion">
-  <proof prover="0"><result status="valid" time="0.15" steps="0"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.35" expl="35. unreachable point">
-  <proof prover="0"><result status="valid" time="0.36" steps="137"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.36" expl="36. unreachable point">
-  <proof prover="0"><result status="valid" time="0.18" steps="26"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.36" expl="36. assertion">
+  <proof prover="0"><result status="valid" time="0.17" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.37" expl="37. assertion">
-  <proof prover="0"><result status="valid" time="0.12" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.37" expl="37. unreachable point">
+  <proof prover="0"><result status="valid" time="0.10" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.38" expl="38. unreachable point">
-  <proof prover="0"><result status="valid" time="0.14" steps="26"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.38" expl="38. assertion">
+  <proof prover="0"><result status="valid" time="0.15" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.39" expl="39. assertion">
-  <proof prover="0"><result status="valid" time="0.13" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.39" expl="39. unreachable point">
+  <proof prover="0"><result status="valid" time="0.11" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.40" expl="40. unreachable point">
-  <proof prover="0"><result status="valid" time="0.20" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.41" expl="41. assertion">
-  <proof prover="0"><result status="valid" time="0.15" steps="0"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.42" expl="42. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.43" expl="43. unreachable point">
-  <proof prover="0"><result status="valid" time="0.14" steps="26"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.43" expl="43. assertion">
+  <proof prover="0"><result status="valid" time="0.14" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.44" expl="44. assertion">
-  <proof prover="0"><result status="valid" time="0.23" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.44" expl="44. unreachable point">
+  <proof prover="0"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.45" expl="45. unreachable point">
-  <proof prover="0"><result status="valid" time="0.13" steps="14"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.45" expl="45. assertion">
+  <proof prover="0"><result status="valid" time="0.18" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.46" expl="46. assertion">
-  <proof prover="0"><result status="valid" time="0.24" steps="0"/></proof>
+  <goal name="WP_parameter patl_refine_unaccepted.46" expl="46. unreachable point">
+  <proof prover="0"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter patl_refine_unaccepted.47" expl="47. unreachable point">
-  <proof prover="0"><result status="valid" time="0.21" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.48" expl="48. assertion">
-  <proof prover="0"><result status="valid" time="0.23" steps="0"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.49" expl="49. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter patl_refine_unaccepted.50" expl="50. unreachable point">
-  <proof prover="0"><result status="valid" time="0.16" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="30"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter t_coherent_type" expl="VC for t_coherent_type" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter t_coherent_type.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.42" steps="96"/></proof>
+ <goal name="WP_parameter brl_refine_unaccepted" expl="VC for brl_refine_unaccepted">
+ <proof prover="0"><result status="valid" time="0.22" steps="210"/></proof>
+ </goal>
+ <goal name="WP_parameter exhaustive_matching_accept" expl="VC for exhaustive_matching_accept">
+ <proof prover="4"><result status="valid" time="0.76"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_coherent_type" expl="VC for pat_coherent_type">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter pat_coherent_type.1" expl="1. postcondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="86"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.2" expl="2. assertion">
+  <goal name="WP_parameter pat_coherent_type.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.38" steps="201"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.3" expl="3. variant decrease">
+  <proof prover="0"><result status="valid" time="0.29" steps="90"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="49"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.52" steps="303"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.8" expl="8. variant decrease">
+  <proof prover="0"><result status="valid" time="0.26" steps="90"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.9" expl="9. precondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.10" expl="10. precondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="49"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.12" expl="12. variant decrease">
+  <proof prover="0"><result status="valid" time="0.25" steps="91"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.21" steps="51"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.15" expl="15. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.16" expl="16. postcondition">
+  <proof prover="0"><result status="valid" time="0.35" steps="399"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.17" expl="17. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter t_coherent_type.2.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.28" steps="32"/></proof>
+   <goal name="WP_parameter pat_coherent_type.17.1" expl="1.">
+   <proof prover="1"><result status="valid" time="0.50"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.2.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.29" steps="38"/></proof>
+   <goal name="WP_parameter pat_coherent_type.17.2" expl="2.">
+   <proof prover="0"><result status="valid" time="0.17" steps="62"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.2.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.29" steps="39"/></proof>
+   <goal name="WP_parameter pat_coherent_type.17.3" expl="3.">
+   <proof prover="0"><result status="valid" time="0.25" steps="76"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.2.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.36" steps="55"/></proof>
+   <goal name="WP_parameter pat_coherent_type.17.4" expl="4.">
+   <proof prover="0"><result status="valid" time="0.16" steps="26"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.2.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="0.33" steps="47"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.2.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.47" steps="118"/></proof>
+   <goal name="WP_parameter pat_coherent_type.17.5" expl="5.">
+   <proof prover="0"><result status="valid" time="0.18" steps="118"/></proof>
    </goal>
   </transf>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.18" expl="18. variant decrease">
+  <proof prover="0"><result status="valid" time="0.26" steps="119"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.19" expl="19. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.20" expl="20. precondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="86"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.21" expl="21. precondition">
+  <proof prover="0"><result status="valid" time="0.26" steps="113"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.22" expl="22. postcondition">
+  <proof prover="0"><result status="valid" time="0.40" steps="288"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.23" expl="23. unreachable point">
+  <proof prover="0"><result status="valid" time="0.22" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_coherent_type.24" expl="24. postcondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="81"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter patl_coherent_type" expl="VC for patl_coherent_type">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter patl_coherent_type.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.14" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="67"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.5" expl="5. variant decrease">
+  <proof prover="0"><result status="valid" time="0.17" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="74"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.8" expl="8. precondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="98"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="3.64" steps="1132"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.10" expl="10. unreachable point">
+  <proof prover="0"><result status="valid" time="0.16" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.11" expl="11. unreachable point">
+  <proof prover="0"><result status="valid" time="0.23" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.12" expl="12. postcondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="70"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.13" expl="13. unreachable point">
+  <proof prover="0"><result status="valid" time="0.17" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_coherent_type.14" expl="14. unreachable point">
+  <proof prover="0"><result status="valid" time="0.17" steps="67"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter t_coherent_type" expl="VC for t_coherent_type">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter t_coherent_type.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.27" steps="124"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="35"/></proof>
+  <proof prover="0"><result status="valid" time="0.21" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.4" expl="4. variant decrease">
-  <proof prover="0"><result status="valid" time="0.37" steps="111"/></proof>
+  <proof prover="0"><result status="valid" time="0.39" steps="139"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.5" expl="5. variant decrease">
-  <proof prover="0"><result status="valid" time="0.36" steps="110"/></proof>
+  <goal name="WP_parameter t_coherent_type.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.6" expl="6. variant decrease">
-  <proof prover="0"><result status="valid" time="0.40" steps="109"/></proof>
+  <proof prover="0"><result status="valid" time="0.37" steps="138"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.38" steps="182"/></proof>
+  <goal name="WP_parameter t_coherent_type.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.8" expl="8. variant decrease">
-  <proof prover="0"><result status="valid" time="0.39" steps="97"/></proof>
+  <proof prover="0"><result status="valid" time="0.39" steps="137"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.9" expl="9. variant decrease">
-  <proof prover="0"><result status="valid" time="0.35" steps="83"/></proof>
+  <goal name="WP_parameter t_coherent_type.9" expl="9. precondition">
+  <proof prover="0"><result status="valid" time="0.15" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.10" expl="10. assertion">
+  <goal name="WP_parameter t_coherent_type.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.36" steps="157"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.11" expl="11. variant decrease">
+  <proof prover="0"><result status="valid" time="0.35" steps="125"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.13" expl="13. variant decrease">
+  <proof prover="0"><result status="valid" time="0.35" steps="111"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.15" expl="15. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter t_coherent_type.10.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.28" steps="19"/></proof>
+   <goal name="WP_parameter t_coherent_type.15.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="62"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.10.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.21" steps="19"/></proof>
+   <goal name="WP_parameter t_coherent_type.15.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="48"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.10.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.48" steps="102"/></proof>
+   <goal name="WP_parameter t_coherent_type.15.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.85" steps="271"/></proof>
    </goal>
-   <goal name="WP_parameter t_coherent_type.10.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.30" steps="22"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.5" expl="5. assertion">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter t_coherent_type.10.5.1" expl="1.">
-    <transf name="inline_goal">
-     <goal name="WP_parameter t_coherent_type.10.5.1.1" expl="1.">
-     <transf name="split_goal_wp">
-      <goal name="WP_parameter t_coherent_type.10.5.1.1.1" expl="1.">
-      <proof prover="0"><result status="valid" time="0.39" steps="19"/></proof>
-      </goal>
-      <goal name="WP_parameter t_coherent_type.10.5.1.1.2" expl="2.">
-      <proof prover="0"><result status="valid" time="0.26" steps="12"/></proof>
-      </goal>
-      <goal name="WP_parameter t_coherent_type.10.5.1.1.3" expl="3.">
-      <proof prover="0"><result status="valid" time="0.27" steps="13"/></proof>
-      </goal>
-      <goal name="WP_parameter t_coherent_type.10.5.1.1.4" expl="4.">
-      <proof prover="0"><result status="valid" time="0.14" steps="14"/></proof>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.82" steps="63"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.7" expl="7. assertion">
-   <proof prover="0"><result status="valid" time="0.41" steps="26"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.8" expl="8. assertion">
-   <proof prover="2"><result status="valid" time="0.92"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.9" expl="9. assertion">
-   <proof prover="0"><result status="valid" time="0.83" steps="83"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.10" expl="10. assertion">
-   <proof prover="0"><result status="valid" time="0.80" steps="30"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.11" expl="11. assertion">
-   <proof prover="0"><result status="valid" time="0.69" steps="50"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.12" expl="12. assertion">
-   <proof prover="0"><result status="valid" time="0.37" steps="61"/></proof>
-   </goal>
-   <goal name="WP_parameter t_coherent_type.10.13" expl="13. assertion">
-   <proof prover="2"><result status="valid" time="0.50"/></proof>
+   <goal name="WP_parameter t_coherent_type.15.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.21" steps="123"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t_coherent_type.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.28" steps="37"/></proof>
-  </goal>
-  <goal name="WP_parameter t_coherent_type.12" expl="12. variant decrease">
-  <proof prover="0"><result status="valid" time="0.42" steps="97"/></proof>
-  </goal>
-  <goal name="WP_parameter t_coherent_type.13" expl="13. variant decrease">
-  <proof prover="0"><result status="valid" time="0.42" steps="83"/></proof>
-  </goal>
-  <goal name="WP_parameter t_coherent_type.14" expl="14. postcondition" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
-  </goal>
-  <goal name="WP_parameter t_coherent_type.15" expl="15. postcondition">
-  <proof prover="0"><result status="valid" time="1.09" steps="229"/></proof>
-  </goal>
   <goal name="WP_parameter t_coherent_type.16" expl="16. postcondition">
-  <proof prover="0"><result status="valid" time="1.07" steps="233"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.17" expl="17. postcondition">
-  <proof prover="0"><result status="valid" time="0.61" steps="300"/></proof>
+  <goal name="WP_parameter t_coherent_type.17" expl="17. variant decrease">
+  <proof prover="0"><result status="valid" time="0.41" steps="125"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.18" expl="18. postcondition">
-  <proof prover="0"><result status="valid" time="0.74" steps="301"/></proof>
+  <goal name="WP_parameter t_coherent_type.18" expl="18. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.19" expl="19. postcondition">
-  <proof prover="0"><result status="valid" time="0.69" steps="303"/></proof>
+  <goal name="WP_parameter t_coherent_type.19" expl="19. variant decrease">
+  <proof prover="0"><result status="valid" time="0.26" steps="111"/></proof>
   </goal>
-  <goal name="WP_parameter t_coherent_type.20" expl="20. postcondition">
-  <proof prover="0"><result status="valid" time="0.89" steps="412"/></proof>
+  <goal name="WP_parameter t_coherent_type.20" expl="20. precondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.21" expl="21. postcondition">
-  <proof prover="0"><result status="valid" time="0.45" steps="149"/></proof>
+  <proof prover="0"><result status="valid" time="0.36" steps="118"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.22" expl="22. postcondition">
-  <proof prover="0"><result status="valid" time="0.31" steps="52"/></proof>
+  <proof prover="0"><result status="valid" time="0.51" steps="214"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.23" expl="23. postcondition">
-  <proof prover="0"><result status="valid" time="0.29" steps="68"/></proof>
+  <proof prover="0"><result status="valid" time="0.49" steps="182"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.24" expl="24. postcondition">
-  <proof prover="0"><result status="valid" time="0.25" steps="68"/></proof>
+  <proof prover="0"><result status="valid" time="0.63" steps="217"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.25" expl="25. postcondition">
+  <proof prover="0"><result status="valid" time="0.61" steps="219"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.26" expl="26. postcondition">
+  <proof prover="0"><result status="valid" time="0.45" steps="219"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.27" expl="27. postcondition">
+  <proof prover="0"><result status="valid" time="0.57" steps="291"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.28" expl="28. postcondition">
+  <proof prover="0"><result status="valid" time="0.44" steps="113"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.29" expl="29. postcondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="56"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.30" expl="30. postcondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="64"/></proof>
+  </goal>
+  <goal name="WP_parameter t_coherent_type.31" expl="31. postcondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="64"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter tl_coherent_type" expl="VC for tl_coherent_type">
  <transf name="split_goal_wp">
   <goal name="WP_parameter tl_coherent_type.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.16" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter tl_coherent_type.2" expl="2. variant decrease">
-  <proof prover="0"><result status="valid" time="0.15" steps="19"/></proof>
+  <goal name="WP_parameter tl_coherent_type.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter tl_coherent_type.3" expl="3. assertion">
+  <goal name="WP_parameter tl_coherent_type.3" expl="3. variant decrease">
+  <proof prover="0"><result status="valid" time="0.12" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter tl_coherent_type.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter tl_coherent_type.5" expl="5. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter tl_coherent_type.3.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.19" steps="75"/></proof>
+   <goal name="WP_parameter tl_coherent_type.5.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
    </goal>
-   <goal name="WP_parameter tl_coherent_type.3.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.24" steps="114"/></proof>
+   <goal name="WP_parameter tl_coherent_type.5.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.19" steps="98"/></proof>
    </goal>
-   <goal name="WP_parameter tl_coherent_type.3.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.17" steps="18"/></proof>
+   <goal name="WP_parameter tl_coherent_type.5.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.14" steps="25"/></proof>
    </goal>
-   <goal name="WP_parameter tl_coherent_type.3.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.13" steps="6"/></proof>
+   <goal name="WP_parameter tl_coherent_type.5.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="13"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter tl_coherent_type.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="32"/></proof>
+  <goal name="WP_parameter tl_coherent_type.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter tl_coherent_type.5" expl="5. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.57"/></proof>
-  <proof prover="5"><result status="valid" time="0.62"/></proof>
+  <goal name="WP_parameter tl_coherent_type.7" expl="7. postcondition">
+  <proof prover="4"><result status="valid" time="0.83"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter brl_coherent_type" expl="VC for brl_coherent_type" expanded="true">
- <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter brl_coherent_type" expl="VC for brl_coherent_type">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter brl_coherent_type.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter brl_coherent_type.2" expl="2. postcondition" expanded="true">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.78"/></proof>
+  <goal name="WP_parameter brl_coherent_type.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter brl_coherent_type.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.26" steps="24"/></proof>
+  <goal name="WP_parameter brl_coherent_type.3" expl="3. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_coherent_type.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_coherent_type.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="101"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_coherent_type.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.21" steps="31"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter br_coherent_type" expl="VC for br_coherent_type" expanded="true">
- <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter br_coherent_type.1" expl="1. unreachable point" expanded="true">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.15"/></proof>
+ <goal name="WP_parameter br_coherent_type" expl="VC for br_coherent_type">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter br_coherent_type.1" expl="1. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter br_coherent_type.2" expl="2. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter br_coherent_type.2.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.19" steps="76"/></proof>
+   </goal>
+   <goal name="WP_parameter br_coherent_type.2.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.54" steps="303"/></proof>
+   </goal>
+   <goal name="WP_parameter br_coherent_type.2.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.20" steps="40"/></proof>
+   </goal>
+   <goal name="WP_parameter br_coherent_type.2.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="1.30" steps="554"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter br_coherent_type.3" expl="3. postcondition">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>

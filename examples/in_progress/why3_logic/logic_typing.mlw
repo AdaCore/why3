@@ -14,187 +14,222 @@ module Env
   use import support.HO
   use import support.Choice
   
-  (* Typing environment. *)
-  type ty_env 'tv 'tyv 'tys 'ls = {
-    (* Type symbols belonging to the environment. *)
-    tys_belong : 'tys -> bool;
+  type signature = {
+    (* Type symbols belonging to the signature. *)
+    tys_belong : ty_symbol -> bool;
     (* Type symbol arities. *)
-    tys_arity : 'tys -> int;
+    tys_arity : ty_symbol -> int;
     (* Set of known constructors associated to the type.
        If there is one, then the set is exhaustive. *)
-    tys_constr : 'tys -> 'ls -> bool;
+    tys_constr : ty_symbol -> lsymbol -> bool;
     (* Built-in type symbol for propositions. *)
-    tys_prop : 'tys;
-    (* Logical symbols belonging to the environment. *)
-    ls_belong : 'ls -> bool;
+    tys_prop : ty_symbol;
+    (* Logical symbols belonging to the signature. *)
+    ls_belong : lsymbol -> bool;
     (* Logical symbols which are constructors. *)
-    ls_constr : 'ls -> bool;
+    ls_constr : lsymbol -> bool;
     (* Logical symbols arity with respect to types. *)
-    ls_ty_arity : 'ls -> int;
+    ls_ty_arity : lsymbol -> int;
     (* Types for logical symbols arguments. *)
-    ls_args : 'ls -> list (ty (bind 'tyv int) 'tys);
+    ls_args : lsymbol -> list ty;
     (* Types for logical symbols return values. *)
-    ls_ret : 'ls -> ty (bind 'tyv int) 'tys;
+    ls_ret : lsymbol -> ty;
+  }
+  
+  predicate tys_alg (sig:signature) (tys:ty_symbol) =
+    sig.tys_belong tys /\ exists f. sig.tys_constr tys f
+  
+  (* Typing environment. *)
+  type ty_env 'tv = {
     (* Term variables currently in the environment. *)
     tv_belong : 'tv -> bool;
     (* Types of variables currently in the environment. *)
-    tv_ty : 'tv -> ty 'tyv 'tys;
+    tv_ty : 'tv -> ty;
   }
   
   (* Well-formedness of types: respect arities and all type
      symbols belong to the environment. *)
-  predicate ty_wf (g:ty_env 'tv 'tyv 'tys 'ls) (ty:ty 'tyv2 'tys) =
+  predicate ty_wf (sig:signature) (ty:ty) =
     match ty with
     | TyVar _ -> true
-    | TyApp f l -> g.tys_belong f /\
-      g.tys_arity f = length l /\
-      tyl_wf g l
+    | TyApp f l -> sig.tys_belong f /\
+      sig.tys_arity f = length l /\
+      tyl_wf sig l
     end
   
-  with tyl_wf (g:ty_env 'tv 'tyv 'tys 'ls) (tyl:list (ty 'tyv2 'tys)) =
+  with tyl_wf (sig:signature) (tyl:list ty) =
     match tyl with
     | Nil -> true
-    | Cons x q -> ty_wf g x /\ tyl_wf g q
+    | Cons x q -> ty_wf sig x /\ tyl_wf sig q
     end
   
-  function constr_ty_list (a b:int) : list (ty (bind 'tyv int) 'tys)
-  axiom constr_ty_list_empty : forall a.
-    constr_ty_list a a = (Nil:list (ty (bind 'tyv int) 'tys))
+  (* Build the list of type variables [0;1;...;n-1].
+     Corresponds to the list of type arguments for polymorphic constructors. *)
+  function constr_ty_list (a b:int) : list ty
+  axiom constr_ty_list_empty : forall a. constr_ty_list a a = Nil
   axiom constr_ty_list_succ : forall a b. a < b ->
-    (constr_ty_list a b:list (ty (bind 'tyv int) 'tys)) =
-    Cons (TyVar (Fresh a)) (constr_ty_list (a+1) b)
+    constr_ty_list a b = Cons (TyVar a) (constr_ty_list (a+1) b)
   
   let rec lemma constr_ty_list_length_nth (a b:int) : unit
     requires { a <= b }
-    ensures { let l = (constr_ty_list a b:list (ty (bind 'tyv int) 'tys)) in
-      length l = b - a /\
-      forall n. 0 <= n < b - a -> nth n l = Some (TyVar (Fresh (a+n))) }
+    ensures { let l = constr_ty_list a b in length l = b - a /\
+      forall n. 0 <= n < b - a -> nth n l = Some (TyVar (a+n)) }
     variant { b - a }
   = if a < b then constr_ty_list_length_nth (a+1) b
   
-  (* Well-formedness of environment. *)
-  predicate env_wf (g:ty_env 'tv 'tyv 'tys 'ls) =
+  (* Well-formedness of signature. *)
+  predicate sig_wf (sig:signature) =
     (* Positive arities for types symbols. *)
-    (forall f. g.tys_belong f -> g.tys_arity f >= 0) /\
+    (forall f. sig.tys_belong f -> sig.tys_arity f >= 0) /\
     (* Proposition is a type symbol of arity 0. *)
-    g.tys_belong g.tys_prop /\
-    g.tys_arity g.tys_prop = 0 /\
+    sig.tys_belong sig.tys_prop /\
+    sig.tys_arity sig.tys_prop = 0 /\
     (* Constructors are also logical symbols, and are indeed associated
        to their respective return types. *)
-    (forall f. g.ls_constr f -> g.ls_belong f /\
-      match g.ls_ret f with
-      | TyApp tys _ -> g.tys_constr tys f
+    (forall f. sig.ls_constr f -> sig.ls_belong f /\
+      match sig.ls_ret f with
+      | TyApp tys _ -> sig.tys_constr tys f
       | _ -> false
       end) /\
-    (forall tys f. g.tys_belong tys /\ g.tys_constr tys f ->
-      g.ls_constr f /\
-      g.ls_ret f = TyApp tys (constr_ty_list 0 (g.ls_ty_arity f))) /\
-    (*(* Constructors type arguments are entirely determined by their
-       return type, e.g every type argument occur in the result type
-       (which can then be deduced by unification). *)
-    (forall f tyvs tyss n. g.ls_constr f /\
-      ty_vars_in tyvs tyss (g.ls_ret f) /\
-      0 <= n < g.ls_ty_arity f -> tyvs (Fresh n)) /\*)
-    (forall f. g.ls_belong f -> let n = g.ls_ty_arity f in
+    (forall tys f. sig.tys_belong tys /\ sig.tys_constr tys f ->
+      sig.ls_constr f /\
+      sig.ls_ret f = TyApp tys (constr_ty_list 0 (sig.ls_ty_arity f))) /\
+    (forall f. sig.ls_belong f -> let n = sig.ls_ty_arity f in
       (* Positive type arities for logical symbols. *)
       n >= 0 /\
       (* Arguments and return types are well-formed, and does not
          contain unbound type variables. *)
-      ty_vars_in (bfold all (range 0 n)) g.tys_belong (g.ls_ret f) /\
-      tyl_vars_in (bfold all (range 0 n)) g.tys_belong (g.ls_args f) /\
-      ty_wf g (g.ls_ret f) /\
-      tyl_wf g (g.ls_args f))
+      ty_vars_in (range 0 n) sig.tys_belong (sig.ls_ret f) /\
+      tyl_vars_in (range 0 n) sig.tys_belong (sig.ls_args f) /\
+      ty_wf sig (sig.ls_ret f) /\
+      tyl_wf sig (sig.ls_args f))
+  
+  predicate env_wf (sig:signature) (env:ty_env 'tv) =
+    forall x. env.tv_belong x -> ty_wf sig (env.tv_ty x)
+  
+  function ls_app_ty_subst (tyl:list ty) : int -> ty =
+    list_nth tyl default
   
   (* Useful functions giving the real type arguments/return types
      of logical symbols given their scheme and their type arguments. *)
-  function ty_subst_args (tyl:list (ty 'tyv 'tys))
-    (ty_args:list (ty (bind 'tyv int) 'tys)) : list (ty 'tyv 'tys) =
-    tyl_subst (bfold TyVar (list_nth tyl (const default))) identity ty_args
+  function ty_subst_args (tyl:list ty) (ty_args:list ty) : list ty =
+    tyl_subst (ls_app_ty_subst tyl) identity ty_args
   
-  function ty_subst_ret (tyl:list (ty 'tyv 'tys))
-    (ty_ret:ty (bind 'tyv int) 'tys) : ty 'tyv 'tys =
-    ty_subst (bfold TyVar (list_nth tyl (const default))) identity ty_ret
+  function ty_subst_ret (tyl:list ty) (ty_ret:ty ) : ty =
+    ty_subst (ls_app_ty_subst tyl) identity ty_ret
   
-  function ty_args (g:ty_env 'tv 'tyv 'tys 'ls)
-    (f:'ls) (tyl:list (ty 'tyv 'tys)): list (ty 'tyv 'tys) =
-    ty_subst_args tyl (g.ls_args f)
+  function ty_args (sig:signature) (f:lsymbol) (tyl:list ty): list ty =
+    ty_subst_args tyl (sig.ls_args f)
   
-  function ty_ret (g:ty_env 'tv 'tyv 'tys 'ls)
-    (f:'ls) (tyl:list (ty 'tyv 'tys)) : ty 'tyv 'tys =
-    ty_subst_ret tyl (g.ls_ret f)
+  function ty_ret (sig:signature) (f:lsymbol) (tyl:list ty) : ty =
+    ty_subst_ret tyl (sig.ls_ret f)
   
-  function ty_prop (g:ty_env 'tv 'tyv 'tys 'ls) : ty 'tyv 'tys =
-    TyApp g.tys_prop Nil
+  function ty_prop (sig:signature) : ty =
+    TyApp sig.tys_prop Nil
   
   (* Well-formedness dependencies. *)
-  predicate env_ty_congruence (a:'tys -> bool) (g1:ty_env 'tv 'tyv 'tys 'ls)
-    (g2:ty_env 'tv2 'tyv2 'tys 'ls2) =
-    forall x. a x -> (g1.tys_belong x <-> g2.tys_belong x) /\
-                     g1.tys_arity x = g2.tys_arity x
+  predicate sig_ty_congruence (a:ty_symbol -> bool) (sig1 sig2:signature)  =
+    forall x. a x -> (sig1.tys_belong x <-> sig2.tys_belong x) /\
+                     sig1.tys_arity x = sig2.tys_arity x
   
-  let rec lemma ty_wf_independence (a:'tyv -> bool) (b:'tys -> bool)
-    (g1:ty_env 'tv 'tyv2 'tys 'ls)
-    (g2:ty_env 'tv2 'tyv3 'tys 'ls2)
-    (ty:ty 'tyv 'tys) : unit
-    requires { env_ty_congruence b g1 g2 }
+  let rec lemma ty_wf_independence (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (sig1 sig2:signature) (ty:ty) : unit
+    requires { sig_ty_congruence b sig1 sig2 }
     requires { ty_vars_in a b ty }
-    requires { ty_wf g1 ty }
-    ensures { ty_wf g2 ty }
+    requires { ty_wf sig1 ty }
+    ensures { ty_wf sig2 ty }
     variant { ty }
   = match ty with
-    | TyApp _ l -> tyl_wf_independence a b g1 g2 l
+    | TyApp _ l -> tyl_wf_independence a b sig1 sig2 l
     | _ -> ()
     end
   
-  with lemma tyl_wf_independence (a:'tyv -> bool) (b:'tys -> bool)
-    (g1:ty_env 'tv 'tyv2 'tys 'ls)
-    (g2:ty_env 'tv2 'tyv3 'tys 'ls2)
-    (tyl:list (ty 'tyv 'tys)) : unit
-    requires { env_ty_congruence b g1 g2 }
+  with lemma tyl_wf_independence (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (sig1 sig2:signature) (tyl:list ty) : unit
+    requires { sig_ty_congruence b sig1 sig2 }
     requires { tyl_vars_in a b tyl }
-    requires { tyl_wf g1 tyl }
-    ensures { tyl_wf g2 tyl }
+    requires { tyl_wf sig1 tyl }
+    ensures { tyl_wf sig2 tyl }
     variant { tyl }
   = match tyl with
-    | Cons x q -> ty_wf_independence a b g1 g2 x;tyl_wf_independence a b g1 g2 q
+    | Cons x q -> ty_wf_independence a b sig1 sig2 x;
+      tyl_wf_independence a b sig1 sig2 q
     | _ -> ()
     end
   
-  let rec lemma ty_wf_subst (a:'tyv -> bool) (b:'tys -> bool)
-    (fa:'tyv -> ty 'tyv2 'tys2)
-    (fb:'tys -> 'tys2)
-    (g:ty_env 'tv 'tyv3 'tys 'ls)
-    (g2:ty_env 'tv2 'tyv4 'tys2 'ls2)
-    (ty:ty 'tyv 'tys) : unit
-    requires { ty_wf g ty }
+  let rec lemma ty_wf_subst (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (fa:ty_var -> ty) (fb:ty_symbol -> ty_symbol)
+    (sig sig2:signature) (ty:ty) : unit
+    requires { ty_wf sig ty }
     requires { ty_vars_in a b ty }
-    requires { forall x. a x -> ty_wf g2 (fa x) }
-    requires { forall x. b x -> g.tys_belong x /\ g2.tys_belong (fb x) /\
-      g2.tys_arity (fb x) = g.tys_arity x }
-    ensures { ty_wf g2 (ty_subst fa fb ty) }
+    requires { forall x. a x -> ty_wf sig2 (fa x) }
+    requires { forall x. b x -> sig.tys_belong x /\ sig2.tys_belong (fb x) /\
+      sig2.tys_arity (fb x) = sig.tys_arity x }
+    ensures { ty_wf sig2 (ty_subst fa fb ty) }
     variant { ty }
   = match ty with
-    | TyApp _ l -> tyl_wf_subst a b fa fb g g2 l
+    | TyApp _ l -> tyl_wf_subst a b fa fb sig sig2 l
     | _ -> ()
     end
   
-  with lemma tyl_wf_subst (a:'tyv -> bool) (b:'tys -> bool)
-    (fa:'tyv -> ty 'tyv2 'tys2)
-    (fb:'tys -> 'tys2)
-    (g:ty_env 'tv 'tyv3 'tys 'ls)
-    (g2:ty_env 'tv2 'tyv4 'tys2 'ls2)
-    (tyl:list (ty 'tyv 'tys)) : unit
-    requires { tyl_wf g tyl }
+  with lemma tyl_wf_subst (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (fa:ty_var -> ty) (fb:ty_symbol -> ty_symbol)
+    (sig sig2:signature) (tyl:list ty) : unit
+    requires { tyl_wf sig tyl }
     requires { tyl_vars_in a b tyl }
-    requires { forall x. a x -> ty_wf g2 (fa x) }
-    requires { forall x. b x -> g.tys_belong x /\ g2.tys_belong (fb x) /\
-      g2.tys_arity (fb x) = g.tys_arity x }
-    ensures { tyl_wf g2 (tyl_subst fa fb tyl) }
+    requires { forall x. a x -> ty_wf sig2 (fa x) }
+    requires { forall x. b x -> sig.tys_belong x /\ sig2.tys_belong (fb x) /\
+      sig2.tys_arity (fb x) = sig.tys_arity x }
+    ensures { tyl_wf sig2 (tyl_subst fa fb tyl) }
     variant { tyl }
   = match tyl with
-    | Cons x q -> ty_wf_subst a b fa fb g g2 x;tyl_wf_subst a b fa fb g g2 q
+    | Cons x q -> ty_wf_subst a b fa fb sig sig2 x;
+      tyl_wf_subst a b fa fb sig sig2 q
     | _ -> ()
     end
+  
+  let rec lemma tyl_wf_nth (sig:signature) (tyl:list ty) (n:int) : unit
+    requires { 0 <= n < length tyl }
+    requires { tyl_wf sig tyl }
+    ensures { match nth n tyl with None -> false | Some ty -> ty_wf sig ty end }
+    variant { tyl }
+  = match tyl with
+    | Cons _ q -> if n <> 0 then tyl_wf_nth sig q (n-1)
+    | _ -> absurd
+    end
+  
+  let rec ghost constr_ty_list_subst_nth (a b:int) (s:int -> ty) : unit
+    requires { a <= b }
+    ensures { forall n. 0 <= n < b-a ->
+      nth n (tyl_subst s identity (constr_ty_list a b)) = Some (s (n+a)) }
+    variant { b-a }
+  = if a <> b
+    then constr_ty_list_subst_nth (a+1) b s
+  
+  let rec ghost nth_extensionality (l1 l2:list 'a) : unit
+    requires { length l1 = length l2 }
+    requires { forall n. 0 <= n < length l1 -> nth n l1 = nth n l2 }
+    ensures { l1 = l2 }
+    variant { l1 }
+  = match l1 , l2 with
+    | Cons h1 q1 , Cons h2 q2 ->
+      assert { forall n. 0 <= n < length q1 ->
+        nth n q1 = nth (n+1) l1 = nth (n+1) l2 = nth n q2 };
+      nth_extensionality q1 q2;
+      assert { Some h1 = nth 0 l1 = nth 0 l2 = Some h2 }
+    | _ , _ -> ()
+    end
+  
+  let lemma constructor_return_type (sig:signature) (tys:ty_symbol)
+    (f:lsymbol) (tyl:list ty)
+    requires { sig_wf sig /\ sig.tys_belong tys /\ sig.tys_constr tys f }
+    requires { length tyl = sig.ls_ty_arity f }
+    ensures { ty_ret sig f tyl = TyApp tys tyl }
+  = let n = sig.ls_ty_arity f in
+    let s = list_nth tyl default in
+    let l = constr_ty_list 0 n in
+    constr_ty_list_subst_nth 0 n s;
+    nth_extensionality (tyl_subst s identity l) tyl
   
 end
 
@@ -215,102 +250,98 @@ module Pattern
   use import support.Choice
   use import Env
   
-  (* Simple syntactic criterion for the absence of conflicts
-     between patterns variables.
-     Conflicts may be of two kinds:
-     - Presence on only one side of a or pattern.
-     - Presence on several sides of a multi-pattern. *)
-  predicate pat_no_conflict (pat:pattern 'pv 'tyv 'tys 'ls) =
-    match pat with
-    | PAs p x -> not pat_pv_free_var p x /\ pat_no_conflict p
-    | POr p1 p2 -> pat_no_conflict p1 /\ pat_no_conflict p2 /\
-      forall x. pat_pv_free_var p1 x <-> pat_pv_free_var p2 x
-    | PApp _ _ pl -> patl_no_conflict pl
-    | _ -> true
-    end
-  
-  with patl_no_conflict (patl:list (pattern 'pv 'tyv 'tys 'ls)) =
-    match patl with
-    | Nil -> true
-    | Cons p q -> pat_no_conflict p /\ patl_no_conflict q /\
-      forall x. not (pat_pv_free_var p x /\ patl_pv_free_var q x)
-    end
-  
   (* Well-typed patterns. *)
-  predicate pat_wty (g:ty_env 'tv 'tyv 'tys 'ls)
-    (pat:pattern 'pv 'tyv 'tys 'ls)
-    (ty:ty 'tyv 'tys) =
+  predicate pat_wty (sig:signature) (pat:pattern) (ty:ty) =
     match pat with
-    | PAs p _ -> pat_wty g p ty
-    | POr p1 p2 -> pat_wty g p1 ty /\ pat_wty g p2 ty
-    | PApp f tyl pl -> patl_wty g pl (ty_args g f tyl) /\
-      g.ls_ty_arity f = length tyl /\ g.ls_constr f /\ ty_ret g f tyl = ty
+    | PAs p _ -> pat_wty sig p ty
+    | POr p1 p2 -> pat_wty sig p1 ty /\ pat_wty sig p2 ty
+    | PApp f tyl pl -> tyl_wf sig tyl /\
+      sig.ls_ty_arity f = length tyl /\
+      sig.ls_constr f /\ ty_ret sig f tyl = ty /\
+      patl_wty sig pl (ty_args sig f tyl)
     | _ -> true
     end
   
-  with patl_wty (g:ty_env 'tv 'tyv 'tys 'ls)
-    (patl:list (pattern 'pv 'tyv 'tys 'ls))
-    (tyl:list (ty 'tyv 'tys)) =
+  with patl_wty (sig:signature) (patl:list pattern) (tyl:list ty) =
     match patl , tyl with
-    | Cons p q , Cons typ tyq -> pat_wty g p typ /\ patl_wty g q tyq
+    | Cons p q , Cons typ tyq -> pat_wty sig p typ /\ patl_wty sig q tyq
     | Nil , Nil -> true
     | _ -> false
     end
   
   (* Collect types of variables occuring in a pattern. *)
-  function pat_ty_collector (g:ty_env 'tv 'tyv 'tys 'ls)
-    (pat:pattern 'pv 'tyv 'tys 'ls)
-    (ty:ty 'tyv 'tys) : 'pv -> option (ty 'tyv 'tys) = 
+  function pat_ty_collector (sig:signature) (pat:pattern)
+    (ty:ty) : pat_var -> option ty =
     match pat with
     | PWild -> const None
     | PVar x -> (const None)[x <- Some ty]
-    | PAs p x -> (pat_ty_collector g p ty)[x <- Some ty]
-    | POr p1 _ -> pat_ty_collector g p1 ty
-    | PApp f tyl pl -> patl_ty_collector g pl (ty_args g f tyl)
+    | PAs p x -> (pat_ty_collector sig p ty)[x <- Some ty]
+    | POr p1 _ -> pat_ty_collector sig p1 ty
+    | PApp f tyl pl -> patl_ty_collector sig pl (ty_args sig f tyl)
     end
   
-  with patl_ty_collector (g:ty_env 'tv 'tyv 'tys 'ls)
-    (patl:list (pattern 'pv 'tyv 'tys 'ls))
-    (tyl:list (ty 'tyv 'tys)) : 'pv -> option (ty 'tyv 'tys) =
+  with patl_ty_collector (sig:signature) (patl:list pattern)
+    (tyl:list ty) : pat_var -> option ty =
     match patl , tyl with
     | Nil , _ | _ , Nil -> const None
-    | Cons x q , Cons y r -> let m1 = pat_ty_collector g x y in
-      let m2 = patl_ty_collector g q r in
+    | Cons x q , Cons y r -> let m1 = pat_ty_collector sig x y in
+      let m2 = patl_ty_collector sig q r in
       extend m1 m2
+    end
+  
+  (* Simple syntactic criterion for the absence of conflicts
+     between patterns variables.
+     Conflicts may be of two kinds:
+     - Presence on a single side of a or pattern, or on both with
+       different types.
+     - Presence on several sides of a multi-pattern (conjunctive) *)
+  predicate pat_no_conflict (sig:signature) (pat:pattern) (ty:ty) =
+    match pat with
+    | PAs p x -> pat_ty_collector sig p ty x = None /\ pat_no_conflict sig p ty
+    | POr p1 p2 -> pat_no_conflict sig p1 ty /\ pat_no_conflict sig p2 ty /\
+      forall x. pat_ty_collector sig p1 ty x = pat_ty_collector sig p2 ty x
+    | PApp f tyl pl -> patl_no_conflict sig pl (ty_args sig f tyl)
+    | _ -> true
+    end
+  
+  with patl_no_conflict (sig:signature) (patl:list pattern) (tyl:list ty) =
+    match patl , tyl with
+    | Nil , _ | _ , Nil -> true
+    | Cons p q , Cons hty qty ->
+      pat_no_conflict sig p hty /\ patl_no_conflict sig q qty /\
+      forall x. pat_ty_collector sig p hty x = None \/
+                patl_ty_collector sig q qty x = None
     end
   
   (* Variables collected and variables occuring in a well-formed pattern
      are the same thing. *)
-  let rec lemma pat_ty_collector_dom (g:ty_env 'tv 'tyv 'tys 'ls)
-    (pat:pattern 'pv 'tyv 'tys 'ls)
-    (ty:ty 'tyv 'tys)
-    (x:'pv) : unit
-    requires { pat_no_conflict pat }
-    requires { pat_wty g pat ty }
-    ensures { pat_pv_free_var pat x <-> pat_ty_collector g pat ty x <> None }
+  let rec lemma pat_ty_collector_dom (sig:signature) (pat:pattern)
+    (ty:ty) (x:pat_var) : unit
+    requires { pat_no_conflict sig pat ty }
+    requires { pat_wty sig pat ty }
+    ensures { pat_pv_free_var pat x <-> pat_ty_collector sig pat ty x <> None }
     variant { pat }
   = match pat with
-    | PAs p _ -> pat_ty_collector_dom g p ty x
-    | POr p1 _ -> pat_ty_collector_dom g p1 ty x
-    | PApp f tyl pl -> patl_ty_collector_dom g pl (ty_args g f tyl) x
+    | PAs p _ -> pat_ty_collector_dom sig p ty x
+    | POr p1 p2 -> pat_ty_collector_dom sig p1 ty x;
+      pat_ty_collector_dom sig p2 ty x
+    | PApp f tyl pl -> patl_ty_collector_dom sig pl (ty_args sig f tyl) x
     | _ -> ()
     end
   
-  with lemma patl_ty_collector_dom (g:ty_env 'tv 'tyv 'tys 'ls)
-    (patl:list (pattern 'pv 'tyv 'tys 'ls))
-    (tyl:list (ty 'tyv 'tys))
-    (x:'pv) : unit
-    requires { patl_no_conflict patl }
-    requires { patl_wty g patl tyl }
+  with lemma patl_ty_collector_dom (sig:signature) (patl:list pattern)
+    (tyl:list ty) (x:pat_var) : unit
+    requires { patl_no_conflict sig patl tyl }
+    requires { patl_wty sig patl tyl }
     ensures { patl_pv_free_var patl x <->
-      patl_ty_collector g patl tyl x <> None }
+      patl_ty_collector sig patl tyl x <> None }
     variant { patl }
   = match patl , tyl with
-    | Cons p q , Cons typ tyq -> pat_ty_collector_dom g p typ x;
-      patl_ty_collector_dom g q tyq x;
-      let m1 = pat_ty_collector g p typ in
-      let m2 = patl_ty_collector g q tyq in
-      assert { not (patl_ty_collector g patl tyl x <> None <->
+    | Cons p q , Cons typ tyq -> pat_ty_collector_dom sig p typ x;
+      patl_ty_collector_dom sig q tyq x;
+      let m1 = pat_ty_collector sig p typ in
+      let m2 = patl_ty_collector sig q tyq in
+      assert { not (patl_ty_collector sig patl tyl x <> None <->
         m1 x <> None \/ m2 x <> None) -> match m1 x , m2 x with
           | Some _ , _ | _ , Some _ -> ("keep_on_simp" true) && false
           | _ -> false end }
@@ -318,56 +349,94 @@ module Pattern
     | _ -> assert { "keep_on_simp" true }
     end
   
+  (* Types of collected variables are well-formed. *)
+  let rec lemma pat_ty_collector_wf (sig:signature) (pat:pattern)
+    (ty:ty) (x:pat_var) : unit
+    requires { pat_wty sig pat ty }
+    requires { sig_wf sig /\ ty_wf sig ty }
+    ensures { match pat_ty_collector sig pat ty x with
+      | None -> true
+      | Some ty0 -> ty_wf sig ty0
+      end }
+    variant { pat }
+  = match pat with
+    | PWild | PVar _ -> ()
+    | POr p1 p2 -> pat_ty_collector_wf sig p1 ty x;
+      pat_ty_collector_wf sig p2 ty x
+    | PAs p _ -> pat_ty_collector_wf sig p ty x
+    | PApp f tylf pl ->
+      let sub = ls_app_ty_subst tylf in
+      let n = length tylf in
+      let sub_dom = range 0 n in
+      assert { sig.ls_belong f };
+      let tyargs = tyl_subst sub identity (sig.ls_args f) in
+      tyl_wf_subst sub_dom sig.tys_belong sub identity sig sig (sig.ls_args f);
+      patl_ty_collector_wf sig pl tyargs x
+    end
+  
+  with lemma patl_ty_collector_wf (sig:signature) (patl:list pattern)
+    (tyl:list ty) (x:pat_var) : unit
+    requires { patl_wty sig patl tyl }
+    requires { sig_wf sig /\ tyl_wf sig tyl }
+    ensures { match patl_ty_collector sig patl tyl x with
+      | None -> true
+      | Some ty0 -> ty_wf sig ty0
+      end }
+    variant { patl }
+  = match patl , tyl with
+    | Cons hp qp , Cons ht qt -> pat_ty_collector_wf sig hp ht x;
+      patl_ty_collector_wf sig qp qt x
+    | Nil , Nil -> () | _ -> absurd
+    end
+  
   (* Now, let us move to pattern-matching exhaustiveness.
-     The simplest syntactic way to define it is to ask that any structural
+     The simplest syntactic way to define it is to ask that any skeleton
      pattern of the right type can be structurally unified with one of the
      initial patterns.
-     (a structural pattern is a pattern containing only constructors and
+     (a skeleton pattern is a pattern containing only constructors and
      wildcards).
      Any other way would requires some form of pattern compilation,
      which we want to avoid. *)
   
-  predicate pat_structural (pat:pattern 'pv 'tyv 'tys 'ls) =
+  predicate pat_skeleton (pat:pattern) =
     match pat with
     | PWild -> true
-    | PApp _ _ pl -> patl_structural pl
+    | PApp _ _ pl -> patl_skeleton pl
     | _ -> false
     end
   
-  with patl_structural (patl:list (pattern 'pv 'tyv 'tys 'ls)) =
+  with patl_skeleton (patl:list pattern) =
     match patl with
     | Nil -> true
-    | Cons x q -> pat_structural x /\ patl_structural q
+    | Cons x q -> pat_skeleton x /\ patl_skeleton q
     end
   
-  predicate pat_structural_match (p1 p2:pattern 'pv 'tyv 'tys 'ls) =
+  predicate pat_skeleton_match (p1 p2:pattern) =
     match p1 , p2 with
     | PWild , _ | _ , PWild | _ , PVar _ -> true
-    | _ , PAs p2 _ -> pat_structural_match p1 p2
-    | _ , POr p2 p3 -> pat_structural_match p1 p2 \/ pat_structural_match p1 p3
-    | PApp f1 _ l1 , PApp f2 _ l2 -> f1 = f2 /\ patl_structural_match l1 l2
+    | _ , PAs p2 _ -> pat_skeleton_match p1 p2
+    | _ , POr p2 p3 -> pat_skeleton_match p1 p2 \/ pat_skeleton_match p1 p3
+    | PApp f1 _ l1 , PApp f2 _ l2 -> f1 = f2 /\ patl_skeleton_match l1 l2
     | _ -> false
     end
   
-  with patl_structural_match (p1 p2:list (pattern 'pv 'tyv 'tys 'ls)) =
+  with patl_skeleton_match (p1 p2:list pattern) =
     match p1 , p2 with
     | Nil , Nil -> true
-    | Cons h1 t1 , Cons h2 t2 -> pat_structural_match h1 h2 /\
-      patl_structural_match t1 t2
+    | Cons h1 t1 , Cons h2 t2 -> pat_skeleton_match h1 h2 /\
+      patl_skeleton_match t1 t2
     | _ -> false
     end
   
-  predicate case_structural_match (p1:pattern int 'tyv 'tys 'ls)
-    (brl:list (branch 'tv 'tyv 'tys 'ls)) = match brl with
+  predicate case_skeleton_match (p1:pattern) (brl:list (branch 'tv)) =
+    match brl with
     | Nil -> false
-    | Cons (h,_) t -> pat_structural_match p1 h \/ case_structural_match p1 t
+    | Cons (h,_) t -> pat_skeleton_match p1 h \/ case_skeleton_match p1 t
     end
   
-  predicate exhaustive (g:ty_env 'tv 'tyv 'tys 'ls)
-    (brl:list (branch 'tv 'tyv 'tys 'ls))
-    (ty:ty 'tyv 'tys) =
-    forall pat. pat_structural pat /\ pat_wty g pat ty ->
-      case_structural_match pat brl
+  predicate exhaustive (sig:signature) (brl:list (branch 'tv)) (ty:ty) =
+    forall pat. pat_skeleton pat /\ pat_wty sig pat ty ->
+      case_skeleton_match pat brl
   
 end
 
@@ -389,83 +458,145 @@ module Term
   use import Env
   use import Pattern
   
-  predicate t_wf (g:ty_env 'tv 'tyv 'tys 'ls)
-    (t:term 'tv 'tyv 'tys 'ls)
-    (ty:ty 'tyv 'tys) =
+  function ext_env (env:ty_env 'tv) (dom:'ntv -> bool)
+    (ext:'ntv -> ty) : ty_env (bind 'tv 'ntv) =
+    { tv_belong = bfold env.tv_belong dom;
+      tv_ty = bfold env.tv_ty ext }
+  
+  predicate t_wf (sig:signature) (env:ty_env 'tv) (t:term 'tv) (ty:ty) =
     match t with
-    | TVar x -> g.tv_belong x /\ g.tv_ty x = ty
-    | TApp f tyl tl -> g.ls_belong f /\ g.ls_ty_arity f = length tyl /\
-      tl_wf g tl (ty_args g f tyl) /\ ty_ret g f tyl = ty
-    | TIf b t e -> t_wf g b g.ty_prop /\ t_wf g t ty /\ t_wf g e ty
-    | TLet t1 t2 -> exists ty0. t_wf g t1 ty0 /\ ty_wf g ty0 /\
-      let g' = { g with tv_belong = bfold g.tv_belong all;
-        tv_ty = bfold g.tv_ty (const ty0) } in
-      t_wf g' t2 ty
-    | TCase t brl -> exists ty0. t_wf g t ty0 /\ ty_wf g ty0 /\
-      brl_wf g brl ty0 ty /\ exhaustive g brl ty0
-    | TForall tyl t | TExists tyl t ->
-      let g' = { g with tv_belong = bfold g.tv_belong (range 0 (length tyl));
-        tv_ty = bfold g.tv_ty (list_nth tyl (const default)) } in
-      t_wf g' t ty /\ g.ty_prop = ty
+    | TVar x -> env.tv_belong x /\ env.tv_ty x = ty
+    | TApp f tyl tl -> sig.ls_belong f /\ sig.ls_ty_arity f = length tyl /\
+      tyl_wf sig tyl /\ tl_wf sig env tl (ty_args sig f tyl) /\
+      ty_ret sig f tyl = ty
+    | TIf b t e -> t_wf sig env b sig.ty_prop /\ t_wf sig env t ty /\
+      t_wf sig env e ty
+    | TLet t1 t2 -> exists ty0. t_wf sig env t1 ty0 /\
+      t_wf sig (ext_env env all (const ty0)) t2 ty
+    | TCase t brl -> exists ty0. t_wf sig env t ty0 /\
+      brl_wf sig env brl ty0 ty /\ exhaustive sig brl ty0
+    | TForall tyl t | TExists tyl t -> tyl_wf sig tyl /\
+      let dom = range 0 (length tyl) in
+      let env' = ext_env env dom (list_nth tyl default) in
+      t_wf sig env' t ty /\ sig.ty_prop = ty
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 ->
-      g.ty_prop = ty /\ t_wf g t1 ty /\ t_wf g t2 ty
-    | TNot t -> g.ty_prop = ty /\ t_wf g t ty
-    | TTrue | TFalse -> g.ty_prop = ty
+      sig.ty_prop = ty /\ t_wf sig env t1 ty /\ t_wf sig env t2 ty
+    | TNot t -> sig.ty_prop = ty /\ t_wf sig env t ty
+    | TTrue | TFalse -> sig.ty_prop = ty
     end
   
-  with tl_wf (g:ty_env 'tv 'tyv 'tys 'ls)
-    (tl:list (term 'tv 'tyv 'tys 'ls))
-    (tyl:list (ty 'tyv 'tys)) =
+  with tl_wf (sig:signature) (env:ty_env 'tv)
+    (tl:list (term 'tv)) (tyl:list ty) =
     match tl , tyl with
     | Nil , Nil-> true
-    | Cons ht qt , Cons hty qty -> t_wf g ht hty /\ tl_wf g qt qty
+    | Cons ht qt , Cons hty qty -> t_wf sig env ht hty /\ tl_wf sig env qt qty
     | _ , _ -> false
     end
   
-  with brl_wf (g:ty_env 'tv 'tyv 'tys 'ls)
-    (brl:list (branch 'tv 'tyv 'tys 'ls))
-    (tyc:ty 'tyv 'tys)
-    (ty:ty 'tyv 'tys) =
+  with brl_wf (sig:signature) (env:ty_env 'tv)
+    (brl:list (branch 'tv)) (tyc ty:ty) =
     match brl with
     | Nil -> true
-    | Cons h q -> br_wf g h tyc ty /\ brl_wf g q tyc ty
+    | Cons h q -> br_wf sig env h tyc ty /\ brl_wf sig env q tyc ty
     end
   
-  with br_wf (g:ty_env 'tv 'tyv 'tys 'ls)
-    (br:branch 'tv 'tyv 'tys 'ls)
-    (tyc:ty 'tyv 'tys)
-    (ty:ty 'tyv 'tys) =
+  with br_wf (sig:signature) (env:ty_env 'tv) (br:branch 'tv) (tyc ty:ty) =
     match br with
-    | (pat,right) -> pat_no_conflict pat /\ pat_wty g pat tyc /\
-      let m = pat_ty_collector g pat tyc in
-      let g' = { g with tv_belong = bfold g.tv_belong (domain m);
-        tv_ty = bfold g.tv_ty (complete m (const default)) } in
-      t_wf g' right ty
+    | (pat,right) -> pat_no_conflict sig pat tyc /\ pat_wty sig pat tyc /\
+      let m = pat_ty_collector sig pat tyc in
+      let env' = ext_env env (domain m) (complete m default) in
+      t_wf sig env' right ty
     end
   
-  (* Q: which lemmas are useful here ? *)
+  predicate env_coherent_ext (sig:signature)
+    (dom:'ntv -> bool) (ext:'ntv -> ty) =
+    forall x. dom x -> ty_wf sig (ext x)
   
-  predicate env_coherent_ext (g:ty_env 'tv 'tyv 'tys 'ls)
-    (dom:'ntv -> bool)
-    (ext:'ntv -> ty 'tyv 'tys) =
-    forall x. dom x -> ty_wf g (ext x)
+  let lemma env_coherent_extension (sig:signature)
+    (env:ty_env 'tv) (dom:'ntv -> bool) (ext:'ntv -> ty) : unit
+    requires { env_coherent_ext sig dom ext }
+    requires { env_wf sig env }
+    ensures { env_wf sig (ext_env env dom ext) }
+  = ()
   
-  let lemma env_extension_wf (g:ty_env 'tv 'tyv 'tys 'ls)
-    (g':ty_env (bind 'tv 'ntv) 'tyv 'tys 'ls)
-    (dom:'ntv -> bool)
-    (ext:'ntv -> ty 'tyv 'tys) : unit
-    requires { env_wf g }
-    requires { env_coherent_ext g dom ext }
-    requires { g' = { g with tv_belong = bfold g.tv_belong dom;
-                             tv_ty = bfold g.tv_ty ext } }
-    ensures { env_wf g' }
-  = assert { env_ty_congruence all g g' &&
-      forall f. g'.ls_belong f ->
-        g.ls_belong f &&
-        ty_wf g (g.ls_ret f) && tyl_wf g (g.ls_args f) &&
-        ty_vars_in all all (g.ls_ret f) && tyl_vars_in all all (g.ls_args f) &&
-        ty_wf g' (g'.ls_ret f) && tyl_wf g' (g'.ls_args f)
-    }
+  function ty_let_witness (sig:signature) (env:ty_env 'tv)
+    (t1:term 'tv) (t2:term (bind 'tv unit)) (ty:ty) : ty -> bool =
+    \ty0. t_wf sig env t1 ty0 /\ t_wf sig (ext_env env all (const ty0)) t2 ty
+  meta rewrite_def function ty_let_witness
+  
+  function ty_case_witness (sig:signature) (env:ty_env 'tv)
+    (t:term 'tv) (brl:list (branch 'tv)) (ty:ty) : ty -> bool =
+    \ty0. t_wf sig env t ty0 /\
+      brl_wf sig env brl ty0 ty /\ exhaustive sig brl ty0
+  meta rewrite_def function ty_case_witness
+  
+  let rec lemma t_wf_ty_wf (sig:signature) (env:ty_env 'tv)
+    (t:term 'tv) (ty:ty) : unit
+    requires { sig_wf sig /\ env_wf sig env }
+    requires { t_wf sig env t ty }
+    ensures { ty_wf sig ty }
+    variant { t }
+  = match t with
+    | TApp f tyl _ -> let sub = ls_app_ty_subst tyl in
+      let n = length tyl in
+      let sub_dom = range 0 n in
+      assert { sig.ls_belong f };
+      ty_wf_subst sub_dom sig.tys_belong sub identity sig sig (sig.ls_ret f)
+    | TIf _ t _ -> t_wf_ty_wf sig env t ty
+    | TLet t1 t2 ->
+      let ty0 = choose (ty_let_witness sig env t1 t2 ty) in
+      t_wf_ty_wf sig env t1 ty0;
+      t_wf_ty_wf sig (ext_env env all (const ty0)) t2 ty
+    | TCase t brl ->
+      let ty0 = choose (ty_case_witness sig env t brl ty) in
+      t_wf_ty_wf sig env t ty0;
+      brl_wf_ty_wf sig env brl ty0 ty
+    | TForall _ _ | TExists _ _ | TAnd _ _ | TOr _ _ | TImplies _ _ | TIff _ _
+    | TNot _ | TTrue | TFalse | TVar _ -> ()
+    end
+  
+  with lemma tl_wf_tyl_wf (sig:signature) (env:ty_env 'tv)
+    (tl:list (term 'tv)) (tyl:list ty) : unit
+    requires { sig_wf sig /\ env_wf sig env }
+    requires { tl_wf sig env tl tyl }
+    ensures { tyl_wf sig tyl }
+    variant { tl }
+  = match tl , tyl with
+    | Cons tx tq , Cons tyx tyq -> t_wf_ty_wf sig env tx tyx;
+      tl_wf_tyl_wf sig env tq tyq
+    | Nil , Nil -> ()
+    | _ , _ -> absurd
+    end
+  
+  with lemma brl_wf_ty_wf (sig:signature) (env:ty_env 'tv)
+    (brl:list (branch 'tv)) (tyc ty:ty) : unit
+    requires { sig_wf sig /\ env_wf sig env }
+    requires { ty_wf sig tyc }
+    requires { brl_wf sig env brl tyc ty }
+    requires { exhaustive sig brl tyc }
+    ensures { ty_wf sig ty }
+    variant { brl }
+  = match brl with
+    | Cons brx _ -> br_wf_ty_wf sig env brx tyc ty
+    | _ -> absurd (* An exhaustive pattern-matching must
+      have at least one case. *)
+    end
+  
+  with lemma br_wf_ty_wf (sig:signature) (env:ty_env 'tv)
+    (br:branch 'tv) (tyc ty:ty) : unit
+    requires { sig_wf sig /\ env_wf sig env }
+    requires { ty_wf sig tyc }
+    requires { br_wf sig env br tyc ty }
+    ensures { ty_wf sig ty }
+    variant { br }
+  = match br with
+    | (pat,right) -> let sigma = pat_ty_collector sig pat tyc in
+      let dom = domain sigma in let ext = complete sigma default in
+      t_wf_ty_wf sig (ext_env env dom ext) right ty
+    end
+  
+  meta remove_logic function ty_let_witness
+  meta remove_logic function ty_case_witness
   
 end
 
