@@ -256,11 +256,10 @@ module Sem
   
 end
 
-module SemSubst
+module TySemSubst
   
   use import logic_syntax.Defs
   use import logic_syntax.Substs
-  use import logic_syntax.VarsIn
   use import int.Int
   use import list.List
   use import list.Length
@@ -294,6 +293,227 @@ module SemSubst
   
 end
 
+module SemSubst
+  
+  use import logic_syntax.Defs
+  use import logic_syntax.Substs
+  use import logic_syntax.SubstList
+  (* BIG PROBLEM HERE:
+     Importing this module makes it visible in all dependencies,
+     which lose a lot of proofs.
+     However, we need it only temporarily here to make some other proofs.
+     ==> Problem of large contexts.
+     FIX: split the module in two, with the extension requiring commutations
+     out. *)
+  use import logic_syntax.Commutations
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import option.Option
+  use import support.HO
+  use import support.Bind
+  use import support.Choice
+  use import support.PartialMap
+  use import Model
+  use import Sem
+  use import TySemSubst
+  
+  let rec lemma pat_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:int -> ty) (pat:pattern) : unit
+    ensures { forall x s.
+      pat_sem m tyv (pat_subst identity f identity identity pat) x s <->
+      pat_sem m (compose (ty_sem m tyv) f) pat x s }
+    variant { pat }
+  = let ghost rc = pat_subst_sem m tyv f in
+    match pat with
+    | PWild | PVar _ -> ()
+    | PAs p _ -> rc p
+    | POr p1 p2 -> rc p1;rc p2
+    | PApp _ _ pl -> patl_subst_sem m tyv f pl
+    end
+  
+  with lemma patl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:int -> ty) (pl:list pattern) : unit
+    ensures { forall lx s.
+      patl_sem m tyv (patl_subst identity f identity identity pl) lx s <->
+      patl_sem m (compose (ty_sem m tyv) f) pl lx s }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_subst_sem m tyv f x;patl_subst_sem m tyv f q
+    | _ -> ()
+    end
+  
+  let rec lemma t_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+     (f:'tv1 -> 'tv2) (t:term 'tv1) : unit
+    ensures { forall rho.
+      t_sem m tyv rho (t_map f identity identity identity t) =
+      t_sem m tyv (compose rho f) t }
+    variant { t }
+  = let ghost rc = t_map_sem m tyv f in
+    match t with
+    | TApp _ _ tl -> tl_map_sem m tyv f tl
+    | TIf b t e -> rc b;rc t;rc e
+    | TLet t1 t2 -> rc t1;t_map_sem m tyv (bmap f) t2;
+      assert { forall rho.
+        let v0 = t_sem m tyv rho (t_map f identity identity identity t1) in
+        let cv0 = const v0 in let g0 = bfold rho cv0 in
+        t_sem m tyv g0 (t_map (bmap f) identity identity identity t2) =
+        t_sem m tyv (bfold (compose rho f) cv0) t2 }
+    | TCase t brl -> rc t;brl_map_sem m tyv f brl
+    | TForall _ t | TExists _ t -> t_map_sem m tyv (bmap f) t;
+      assert { forall rho fv. let g0 = bfold rho fv in
+        t_sem m tyv g0 (t_map (bmap f) identity identity identity t) =
+        t_sem m tyv (bfold (compose rho f) fv) t };
+    | TAnd a b | TOr a b | TImplies a b | TIff a b -> rc a;rc b
+    | TNot t -> rc t
+    | TTrue | TFalse | TVar _ -> ()
+    end
+  
+  with lemma tl_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:'tv1 -> 'tv2) (tl:list (term 'tv1)) : unit
+    ensures { forall rho.
+      tl_sem m tyv rho (tl_map f identity identity identity tl) =
+      tl_sem m tyv (compose rho f) tl }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_map_sem m tyv f x;tl_map_sem m tyv f q
+    | _ -> ()
+    end
+  
+  with lemma brl_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:'tv1 -> 'tv2) (brl:list (branch 'tv1)) : unit
+    ensures { forall rho x.
+      brl_sem m tyv rho (brl_map f identity identity identity brl) x =
+      brl_sem m tyv (compose rho f) brl x }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_map_sem m tyv f x;brl_map_sem m tyv f q
+    | _ -> ()
+    end
+  
+  with lemma br_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:'tv1 -> 'tv2) (br:branch 'tv1) : unit
+    ensures { forall rho x cont.
+      br_sem m tyv rho (br_map f identity identity identity br) x cont =
+      br_sem m tyv (compose rho f) br x cont }
+    variant { br }
+  = match br with
+    | (pat,right) -> t_map_sem m tyv (bmap f) right;
+      let tr = t_map (bmap f) identity identity identity right in
+      assert { forall rho x s.
+        pat_sem m tyv pat x s -> let sc = complete s default in
+        t_sem m tyv (bfold rho sc) tr =
+        t_sem m tyv (bfold (compose rho f) sc) right }
+    end
+  
+  let lemma term_lift_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (rho:valuation 'tv2 'univ) (f:'tv1 -> term 'tv2) (cmpl:'ntv -> 'univ) : unit
+    ensures { compose (t_sem m tyv (bfold rho cmpl)) (term_lift f) =
+      bfold (compose (t_sem m tyv rho) f) cmpl }
+  = assert { let g0 = bfold rho cmpl in
+      let f1 = compose (t_sem m tyv g0) (term_lift f) in
+      let f2 = bfold (compose (t_sem m tyv rho) f) cmpl in
+      not extensional_equal f1 f2 -> (forall x. f1 x <> f2 x ->
+        match x with
+        | Fresh y -> term_lift f x = TVar (Fresh y) && false
+        | Old y -> term_lift f x = t_map Old identity identity identity (f y)
+          && false end && false ) && false }
+  
+  let rec lemma t_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+     (f:'tv1 -> term 'tv2) (g:int -> ty) (t:term 'tv1) : unit
+    ensures { forall rho.
+      t_sem m tyv rho (t_subst f g identity identity t) =
+      t_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv rho) f) t }
+    variant { t }
+  = let ghost rc = t_subst_sem m tyv f g in
+    match t with
+    | TApp _ _ tl -> tl_subst_sem m tyv f g tl
+    | TIf b t e -> rc b;rc t;rc e
+    | TLet t1 t2 -> rc t1;t_subst_sem m tyv (term_lift f) g t2;
+      assert { forall rho.
+        let v0 = t_sem m tyv rho (t_subst f g identity identity t1) in
+        let cv0 = const v0 in let g0 = bfold rho cv0 in
+        t_sem m tyv g0 (t_subst (term_lift f) g identity identity t2) =
+        t_sem m (compose (ty_sem m tyv) g)
+                (bfold (compose (t_sem m tyv rho) f) cv0) t2 }
+    | TCase t brl -> rc t;brl_subst_sem m tyv f g brl
+    | TForall tyl t | TExists tyl t -> t_subst_sem m tyv (term_lift f) g t;
+      let ts = t_subst (term_lift f) g identity identity t in
+      let tyls = tyl_subst g identity tyl in
+      assert { let g0 = compose (ty_sem m tyv) g in
+        (forall fv.
+          not (wty_assignment m g0 tyl fv <->
+               wty_assignment m tyv tyls fv) ->
+          length tyl = length tyls && (forall n. 0 <= n < length tyl ->
+            match nth n tyl , nth n tyls with
+            | Some ty1 , Some ty2 -> ty2 = ty_subst g identity ty1 &&
+              m.ty_doms (ty_sem m tyv ty2) (fv n) <->
+              m.ty_doms (ty_sem m g0 ty1) (fv n)
+            | _ -> false
+            end) && false
+          ) &&
+       (forall rho fv.
+          t_sem m tyv (bfold rho fv) ts =
+          t_sem m g0 (bfold (compose (t_sem m tyv rho) f) fv) t) &&
+       (forall rho.
+         ((forall fv. wty_assignment m g0 tyl fv ->
+           t_sem m g0 (bfold (compose (t_sem m tyv rho) f) fv) t = m.i_true) <->
+         (forall fv. wty_assignment m tyv (tyl_subst g identity tyl) fv ->
+           t_sem m tyv (bfold rho fv) ts = m.i_true)) /\
+         ((exists fv. wty_assignment m g0 tyl fv /\
+           t_sem m g0 (bfold (compose (t_sem m tyv rho) f) fv) t = m.i_true) <->
+         (exists fv. wty_assignment m tyv (tyl_subst g identity tyl) fv /\
+           t_sem m tyv (bfold rho fv) ts = m.i_true))) }
+    | TAnd a b | TOr a b | TImplies a b | TIff a b -> rc a;rc b
+    | TNot t -> rc t
+    | TTrue | TFalse | TVar _ -> ()
+    end
+  
+  with lemma tl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:'tv1 -> term 'tv2) (g:int -> ty) (tl:list (term 'tv1)) : unit
+    ensures { forall rho.
+      tl_sem m tyv rho (tl_subst f g identity identity tl) =
+      tl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv rho) f) tl }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_subst_sem m tyv f g x;tl_subst_sem m tyv f g q
+    | _ -> ()
+    end
+  
+  with lemma brl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:'tv1 -> term 'tv2) (g:int -> ty) (brl:list (branch 'tv1)) : unit
+    ensures { forall rho x.
+      brl_sem m tyv rho (brl_subst f g identity identity brl) x =
+      brl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv rho) f) brl x }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_subst_sem m tyv f g x;brl_subst_sem m tyv f g q
+    | _ -> ()
+    end
+  
+  with lemma br_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+    (f:'tv1 -> term 'tv2) (g:int -> ty) (br:branch 'tv1) : unit
+    ensures { forall rho x cont.
+      br_sem m tyv rho (br_subst f g identity identity br) x cont =
+      br_sem m (compose (ty_sem m tyv) g)
+               (compose (t_sem m tyv rho) f) br x cont }
+    variant { br }
+  = match br with
+    | (pat,right) -> t_subst_sem m tyv (term_lift f) g right;
+      let tr = t_subst (term_lift f) g identity identity right in
+      let pr = pat_subst identity g identity identity pat in
+      pat_subst_sem m tyv g pat;
+      assert { forall x. extensional_equal (pat_sem m tyv pr x)
+        (pat_sem m (compose (ty_sem m tyv) g) pat x) };
+      assert { forall rho x s. pat_sem m tyv pr x s ->
+        let sc = complete s default in
+        t_sem m tyv (bfold rho sc) tr =
+        t_sem m (compose (ty_sem m tyv) g)
+                (bfold (compose (t_sem m tyv rho) f) sc) right };
+    end
+  
+end
 
 
 (* Typing judgement can be transported semantically. *)
@@ -313,7 +533,7 @@ module WellTyped
   use import support.PartialMap
   use import Model
   use import Sem
-  use import SemSubst
+  use import TySemSubst
   use import logic_typing.Env
   use import logic_typing.Pattern
   use import logic_typing.Term
@@ -826,7 +1046,7 @@ module WellTyped
           let rho' = bfold rho s_c in
           let env' = ext_env env (domain sty) sty_c in
           assignment_coherence m tyv s_c (domain sty) sty_c &&
-          valuation_coherence m tyv env' rho' && false
+          valuation_coherence m tyv env' rho' && env_wf sig env' && false
       }
     | _ -> ()
     end
