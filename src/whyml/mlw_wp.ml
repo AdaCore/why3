@@ -370,14 +370,17 @@ let var_of_region reg f =
     | _ -> acc in
   t_v_fold test None f
 
-let quantify model_info env regs f =
+let quantify ?loc:(l=None) model_info env regs f =
   (* mreg : modified region -> vs *)
   let get_var reg () =
     let ty = ty_of_ity reg.reg_ity in
     let id = match var_of_region reg f with
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
-    mk_var id model_info ?loc:f.t_loc ty in
+    let l = match l with
+      | None -> id.id_loc
+      | _ -> l in
+    mk_var id model_info ?loc:l ty in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
   let f = update_term env mreg f in
@@ -749,7 +752,7 @@ and wp_desc env e q xq = match e.e_node with
         if olds = [] then t_true (* we are out of letrec *) else
         decrease e.e_loc expl_variant env olds spec.c_variant in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract "call" env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let w = wp_abstract ~loc:e1.e_loc "call" env spec.c_effect spec.c_post spec.c_xpost q xq in
       let w = wp_and ~sym:true d (wp_and ~sym:false p w) in
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
@@ -761,7 +764,7 @@ and wp_desc env e q xq = match e.e_node with
       (* so that now we don't need to prove these exceptions again *)
       let lost = Mexn.set_diff (exns_of_raises e1.e_effect) spec.c_xpost in
       let c_eff = Sexn.fold_left eff_remove_raise e1.e_effect lost in
-      let w2 = wp_abstract "abstract" env c_eff spec.c_post spec.c_xpost q xq in
+      let w2 = wp_abstract ~loc:e1.e_loc "abstract" env c_eff spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p (wp_and ~sym:true (wp_label e w1) w2)
   | Eassign (pl, e1, reg, pv) ->
       (* if we create an intermediate variable npv to represent e1
@@ -799,7 +802,7 @@ and wp_desc env e q xq = match e.e_node with
       let q = create_unit_post i in
       let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
-      let w = quantify "loop"  env regs (wp_implies inv w) in
+      let w = quantify ~loc:e1.e_loc "loop"  env regs (wp_implies inv w) in
       let i = wp_expl expl_loop_init inv in
       wp_label e (wp_and ~sym:true i w)
   | Efor ({pv_vs = x}, ({pv_vs = v1}, d, {pv_vs = v2}), inv, e1) ->
@@ -842,7 +845,7 @@ and wp_desc env e q xq = match e.e_node with
       in
       wp_label e wp_full
 
-and wp_abstract model env c_eff c_q c_xq q xq =
+and wp_abstract ?loc:(l=None) model env c_eff c_q c_xq q xq =
   let regs = regs_of_writes c_eff in
   let exns = exns_of_raises c_eff in
   let quantify_post c_q q =
@@ -850,7 +853,7 @@ and wp_abstract model env c_eff c_q c_xq q xq =
     let c_v, c_f = open_post c_q in
     let c_f = t_subst_single c_v (t_var v) c_f in
     let f = wp_forall_post v c_f f in
-    quantify model env regs f
+    quantify ~loc:l model env regs f
   in
   let quantify_xpost _ c_xq xq =
     Some (quantify_post c_xq xq) in
