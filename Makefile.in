@@ -1,12 +1,11 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
 #  on linking described in file LICENSE.                           #
-#                                                                  #
 ####################################################################
 
 VERBOSEMAKE ?= @enable_verbose_make@
@@ -1818,8 +1817,10 @@ dist: $(EXTRA_DIST)
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*/*.ml src/*/*.ml[iyl] \
-		plugins/*/*.ml plugins/*/*.ml[ily] src/tools/cpulimit.c \
+		src/*/*.ml src/*/*.ml[iyl4] \
+		plugins/*/*.ml plugins/*/*.ml[ily] \
+		lib/coq-tactic/*.v lib/coq/*.v lib/coq/*/*.v \
+		src/tools/cpulimit.c \
 		examples/use_api/*.ml
 
 #########
