@@ -49,6 +49,56 @@ module HO
   = extensionality (compose g (ho_ite p t e))
                    (ho_ite p (compose g t) (compose g e))
   
+  function update (f:'a -> 'b) (x:'a) (y:'b) : 'a -> 'b =
+    \z. if z = x then y else f z
+  
+  function ([ <- ]) (f:'a -> 'b) (x:'a) (y:'b) : 'a -> 'b = update f x y
+  
+  constant all : 'a -> bool = \_.true
+  
+  constant none : 'a -> bool = \_.false
+  
+  function union (a b:'a -> bool) : 'a -> bool = \x. a x \/ b x
+  
+  use import int.Int
+  
+  function range (a b:int) : int -> bool = \x. a <= x < b
+  
+  use import list.List
+  use import list.Nth
+  use import list.NthLength
+  use import option.Option
+  
+  function list_nth (l:list 'a) (d:int -> 'a) : int -> 'a =
+    \n. match nth n l with
+      | None -> d n
+      | Some x -> x
+      end
+  
+end
+
+module PartialMap
+  
+  use import HO
+  use import option.Option
+  
+  type pmap 'a 'b = 'a -> option 'b
+  
+  function extend (m1:'a -> option 'b) (m2:'a -> option 'b) : 'a -> option 'b =
+    \x. match m1 x with
+      | None -> m2 x
+      | s -> s
+      end
+  
+  function domain (m:'a -> option 'b) : 'a -> bool =
+    \x. m x <> None
+  
+  function complete (m:'a -> option 'b) (d:'a -> 'b) : 'a -> 'b =
+    \x. match m x with
+      | None -> d x
+      | Some x -> x
+      end
+  
 end
 
 module Bind
@@ -112,11 +162,12 @@ module Choice
   
   function choice (p:'a -> bool) : 'a
   
-  lemma choice_def : forall p:'a -> bool. (exists x. p x) -> p (choice p)
+  axiom choice_def : forall p:'a -> bool. (exists x. p x) -> p (choice p)
   
-  val choice_def (p:'a -> bool) : unit
+  let choose (p:'a -> bool) : 'a
     requires { exists x. p x }
-    ensures { p (choice p) }
+    ensures { p result }
+  = choice p
   
 end
 

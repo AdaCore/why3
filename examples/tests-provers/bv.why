@@ -1,0 +1,316 @@
+theory CheckBV64
+  use import bitvec.BitVector64
+  use int.Int
+
+  constant one   : t                                      = of_int 1
+  constant two   : t                                      = of_int 2
+  constant sz    : int                                    = 64
+  constant mx    : int                                    = 18446744073709551615
+  constant md    : int                                    = 18446744073709551616
+  constant lastb : t                                      = of_int 9223372036854775808
+
+  goal ok_zero   : zero                                   = (of_int 0)
+  goal ok_ones   : ones                                   = (of_int mx)
+  goal ok_zero2  : to_int zero                            = 0
+  goal ok_ones2  : to_int ones                            = mx
+  goal ok_size   : size_int                               = sz
+  goal ok_max    : max_int                                = mx
+  goal ok_tpsize : two_power_size                         = md
+
+  goal ok1       : add ones one                           = zero
+  goal ok2       : sub zero one                           = ones
+  goal ok3       : neg ones                               = one
+  goal ok5       : mul one two                            = two
+  goal ok6       : mul ones ones                          = one
+  goal ok7       : udiv one two                           = zero
+  goal ok8       : urem one two                           = one
+  goal ok9       : lsl one one                            = two
+  goal ok10      : lsl ones one                           = sub ones one
+  goal ok12      : lsr one two                            = zero
+  goal ok13      : lsr ones (sub (of_int sz) one)         = one
+  goal ok14      : asr one two                            = zero
+  goal ok15      : asr ones two                           = ones
+  goal ok16      : bw_and ones one                        = one
+  goal ok17      : bw_or  ones one                        = ones
+  goal ok18      : bw_xor ones one                        = sub ones one
+  goal ok19      : bw_not ones                            = zero
+  goal ok20      : rotate_right one one                   = lastb
+  goal ok21      : rotate_right ones two                  = ones
+  goal ok22      : rotate_left lastb one                  = one
+  goal ok23      : rotate_left ones two                   = ones
+  goal ok24      : lsl one (add (of_int sz) one)          = zero
+  goal ok25      : lsr lastb (add (of_int sz) one)        = zero
+  goal ok26      : asr lastb (add (of_int sz) one)        = ones
+  goal ok27      : rotate_right one (add (of_int sz) one) = lastb
+  goal ok28      : rotate_left one (add (of_int sz) one)  = two
+
+  goal trap      : of_int md                              = zero
+
+  goal smoke1    : neg lastb                              = zero
+  goal smoke2    : udiv one zero                          = zero
+  goal smoke3    : urem one zero                          = zero
+  goal smoke4    : lsl ones one                           = ones
+  goal smoke5    : ugt (lsr ones one) lastb
+  goal smoke6    : ule (asr lastb one) lastb
+  goal smoke7    : rotate_right one one                   = zero
+  goal smoke8    : rotate_left lastb one                  = zero
+
+  (* from example/logic/bitvectors.why *)
+
+  constant b0000  : t                                     = of_int 0b0000
+  constant b0001  : t                                     = of_int 0b0001
+  constant b0010  : t                                     = of_int 0b0010
+  constant b0011  : t                                     = of_int 0b0011
+  constant b0110  : t                                     = of_int 0b0110
+  constant b0101  : t                                     = of_int 0b0101
+  constant b0111  : t                                     = of_int 0b0111
+  constant b1100  : t                                     = of_int 0b1100
+  constant b11100 : t                                     = of_int 0b11100
+
+  constant size_sub_one : int                             = Int.(-) size_int 1
+
+  goal g1 : bw_and b0011 b0110                            = b0010
+  goal f1 : bw_and b0011 b0110                            = b0011
+
+  goal g2 :  bw_or b0011 b0110                            = b0111
+  goal f2 :  bw_or b0011 b0110                            = b0110
+
+  goal g3 :  bw_xor b0011 b0110                           = b0101
+  goal g4 :  bw_not b0011                                 = (of_int 0xFFFFFFFFFFFFFFFC)
+
+  goal g3a : lsr b0111 (of_int 2)                         = b0001
+  goal g3b : lsr ones (of_int size_sub_one)               = b0001
+  goal f3  : lsr ones (of_int 0x100000001)                = (of_int 0x7FFFFFFF)
+
+  goal g4a : lsl b0111 (of_int 2)                         = b11100
+  goal g4b : lsl b0001 (of_int 31)                        = (of_int 0x80000000)
+
+  goal g5a : asr b0111 (of_int 2)                         = b0001
+  goal g5b : asr ones (of_int (Int.(-) size_int 1))       = ones
+
+  goal g7 : to_int b11100                                 = 28
+  goal f7 : to_int ones                                   = Int.(-_) 1
+
+  goal g8a : nth b0110 (of_int 2)                         = True
+  goal g8b : nth b0110 (of_int 3)                         = False
+
+  goal Nth_bw_and:
+    forall v1 v2 n. ult n size ->
+      nth (bw_and v1 v2) n                                = andb (nth v1 n) (nth v2 n)
+
+  goal Nth_bw_or:
+    forall v1 v2 n. ult n size ->
+      nth (bw_or v1 v2) n                                 = orb (nth v1 n) (nth v2 n)
+
+  goal Nth_bw_xor:
+    forall v1 v2 n. ult n size ->
+      nth (bw_xor v1 v2) n                                = xorb (nth v1 n) (nth v2 n)
+
+  goal Nth_bw_not:
+    forall v n. ult n size ->
+      nth (bw_not v) n                                    = notb (nth v n)
+
+  goal not_not : forall v:t. bw_not (bw_not v)            = v
+
+  goal not_and : forall v1 v2:t.
+    bw_not (bw_and v1 v2)                                 = bw_or (bw_not v1) (bw_not v2)
+
+  goal Lsr_nth_low: forall b n s.
+    ult s size -> ult n size -> ult (add n s) size ->
+      nth (lsr b s) n                                     = nth b (add n s)
+
+  goal Lsr_nth_high: forall b n s.
+    ult s size -> ult n size -> uge (add n s) size ->
+      nth (lsr b s) n                                     = False
+
+  goal Asr_nth_low: forall b n s.
+    ult s size -> ult n size -> ult (add n s) size ->
+       nth (asr b s) n                                    = nth b (add n s)
+
+  goal Asr_nth_high: forall b n s.
+    ult s size -> ult n size -> uge (add n s) size ->
+      nth (asr b s) n                                     = nth b (sub size one)
+
+  goal Lsl_nth_high: forall b n s.
+    ult s size -> ult n size -> ult (sub n s) size ->
+      nth (lsl b s) n                                     = nth b (sub n s)
+
+  goal Lsl_nth_low: forall b n s.
+    ult s size -> ult n size -> uge (sub n s) size ->
+      nth (lsl b s) n                                     = False
+
+end
+
+theory CheckBV32
+  use import bitvec.BitVector32
+  use int.Int
+
+  constant one   : t                                      = of_int 1
+  constant two   : t                                      = of_int 2
+  constant sz    : int                                    = 32
+  constant mx    : int                                    = 4294967295
+  constant md    : int                                    = 4294967296
+  constant lastb : t                                      = of_int 2147483648
+
+  goal ok_zero   : zero                                   = (of_int 0)
+  goal ok_ones   : ones                                   = (of_int mx)
+  goal ok_zero2  : to_int zero                            = 0
+  goal ok_ones2  : to_int ones                            = mx
+  goal ok_size   : size_int                               = sz
+  goal ok_max    : max_int                                = mx
+  goal ok_tpsize : two_power_size                         = md
+
+  goal ok1       : add ones one                           = zero
+  goal ok2       : sub zero one                           = ones
+  goal ok3       : neg ones                               = one
+  goal ok5       : mul one two                            = two
+  goal ok6       : mul ones ones                          = one
+  goal ok7       : udiv one two                           = zero
+  goal ok8       : urem one two                           = one
+  goal ok9       : lsl one one                            = two
+  goal ok10      : lsl ones one                           = sub ones one
+  goal ok12      : lsr one two                            = zero
+  goal ok13      : lsr ones (sub (of_int sz) one)         = one
+  goal ok14      : asr one two                            = zero
+  goal ok15      : asr ones two                           = ones
+  goal ok16      : bw_and ones one                        = one
+  goal ok17      : bw_or  ones one                        = ones
+  goal ok18      : bw_xor ones one                        = sub ones one
+  goal ok19      : bw_not ones                            = zero
+  goal ok20      : rotate_right one one                   = lastb
+  goal ok21      : rotate_right ones two                  = ones
+  goal ok22      : rotate_left lastb one                  = one
+  goal ok23      : rotate_left ones two                   = ones
+  goal ok24      : lsl one (add (of_int sz) one)          = zero
+  goal ok25      : lsr lastb (add (of_int sz) one)        = zero
+  goal ok26      : asr lastb (add (of_int sz) one)        = ones
+  goal ok27      : rotate_right one (add (of_int sz) one) = lastb
+  goal ok28      : rotate_left one (add (of_int sz) one)  = two
+
+  goal trap      : of_int md                              = zero
+
+  goal smoke1    : neg lastb                              = zero
+  goal smoke2    : udiv one zero                          = zero
+  goal smoke3    : urem one zero                          = zero
+  goal smoke4    : lsl ones one                           = ones
+  goal smoke5    : ugt (lsr ones one) lastb
+  goal smoke6    : ule (asr lastb one) lastb
+  goal smoke7    : rotate_right one one                   = zero
+  goal smoke8    : rotate_left lastb one                  = zero
+end
+
+theory CheckBV16
+  use import bitvec.BitVector16
+  use int.Int
+
+  constant one   : t                                      = of_int 1
+  constant two   : t                                      = of_int 2
+  constant sz    : int                                    = 16
+  constant mx    : int                                    = 65535
+  constant md    : int                                    = 65536
+  constant lastb : t                                      = of_int 32768
+
+  goal ok_zero   : zero                                   = (of_int 0)
+  goal ok_ones   : ones                                   = (of_int mx)
+  goal ok_zero2  : to_int zero                            = 0
+  goal ok_ones2  : to_int ones                            = mx
+  goal ok_size   : size_int                               = sz
+  goal ok_max    : max_int                                = mx
+  goal ok_tpsize : two_power_size                         = md
+
+  goal ok1       : add ones one                           = zero
+  goal ok2       : sub zero one                           = ones
+  goal ok3       : neg ones                               = one
+  goal ok5       : mul one two                            = two
+  goal ok6       : mul ones ones                          = one
+  goal ok7       : udiv one two                           = zero
+  goal ok8       : urem one two                           = one
+  goal ok9       : lsl one one                            = two
+  goal ok10      : lsl ones one                           = sub ones one
+  goal ok12      : lsr one two                            = zero
+  goal ok13      : lsr ones (sub (of_int sz) one)         = one
+  goal ok14      : asr one two                            = zero
+  goal ok15      : asr ones two                           = ones
+  goal ok16      : bw_and ones one                        = one
+  goal ok17      : bw_or  ones one                        = ones
+  goal ok18      : bw_xor ones one                        = sub ones one
+  goal ok19      : bw_not ones                            = zero
+  goal ok20      : rotate_right one one                   = lastb
+  goal ok21      : rotate_right ones two                  = ones
+  goal ok22      : rotate_left lastb one                  = one
+  goal ok23      : rotate_left ones two                   = ones
+  goal ok24      : lsl one (add (of_int sz) one)          = zero
+  goal ok25      : lsr lastb (add (of_int sz) one)        = zero
+  goal ok26      : asr lastb (add (of_int sz) one)        = ones
+  goal ok27      : rotate_right one (add (of_int sz) one) = lastb
+  goal ok28      : rotate_left one (add (of_int sz) one)  = two
+
+  goal trap      : of_int md                              = zero
+
+  goal smoke1    : neg lastb                              = zero
+  goal smoke2    : udiv one zero                          = zero
+  goal smoke3    : urem one zero                          = zero
+  goal smoke4    : lsl ones one                           = ones
+  goal smoke5    : ugt (lsr ones one) lastb
+  goal smoke6    : ule (asr lastb one) lastb
+  goal smoke7    : rotate_right one one                   = zero
+  goal smoke8    : rotate_left lastb one                  = zero
+end
+
+theory CheckBV8
+  use import bitvec.BitVector8
+  use int.Int
+
+  constant one   : t                                      = of_int 1
+  constant two   : t                                      = of_int 2
+  constant sz    : int                                    = 8
+  constant mx    : int                                    = 255
+  constant md    : int                                    = 256
+  constant lastb : t                                      = of_int 128
+
+  goal ok_zero   : zero                                   = (of_int 0)
+  goal ok_ones   : ones                                   = (of_int mx)
+  goal ok_zero2  : to_int zero                            = 0
+  goal ok_ones2  : to_int ones                            = mx
+  goal ok_size   : size_int                               = sz
+  goal ok_max    : max_int                                = mx
+  goal ok_tpsize : two_power_size                         = md
+
+  goal ok1       : add ones one                           = zero
+  goal ok2       : sub zero one                           = ones
+  goal ok3       : neg ones                               = one
+  goal ok5       : mul one two                            = two
+  goal ok6       : mul ones ones                          = one
+  goal ok7       : udiv one two                           = zero
+  goal ok8       : urem one two                           = one
+  goal ok9       : lsl one one                            = two
+  goal ok10      : lsl ones one                           = sub ones one
+  goal ok12      : lsr one two                            = zero
+  goal ok13      : lsr ones (sub (of_int sz) one)         = one
+  goal ok14      : asr one two                            = zero
+  goal ok15      : asr ones two                           = ones
+  goal ok16      : bw_and ones one                        = one
+  goal ok17      : bw_or  ones one                        = ones
+  goal ok18      : bw_xor ones one                        = sub ones one
+  goal ok19      : bw_not ones                            = zero
+  goal ok20      : rotate_right one one                   = lastb
+  goal ok21      : rotate_right ones two                  = ones
+  goal ok22      : rotate_left lastb one                  = one
+  goal ok23      : rotate_left ones two                   = ones
+  goal ok24      : lsl one (add (of_int sz) one)          = zero
+  goal ok25      : lsr lastb (add (of_int sz) one)        = zero
+  goal ok26      : asr lastb (add (of_int sz) one)        = ones
+  goal ok27      : rotate_right one (add (of_int sz) one) = lastb
+  goal ok28      : rotate_left one (add (of_int sz) one)  = two
+
+  goal trap      : of_int md                              = zero
+
+  goal smoke1    : neg lastb                              = zero
+  goal smoke2    : udiv one zero                          = zero
+  goal smoke3    : urem one zero                          = zero
+  goal smoke4    : lsl ones one                           = ones
+  goal smoke5    : ugt (lsr ones one) lastb
+  goal smoke6    : ule (asr lastb one) lastb
+  goal smoke7    : rotate_right one one                   = zero
+  goal smoke8    : rotate_left lastb one                  = zero
+end

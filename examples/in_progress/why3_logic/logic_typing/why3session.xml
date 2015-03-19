@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<file name="../logic_typing.mlw" expanded="true">
+<theory name="Env" sum="37ce88bad8ac08c97a1cf6eab946f11e">
+ <goal name="WP_parameter constr_ty_list_length_nth" expl="VC for constr_ty_list_length_nth">
+ <proof prover="0"><result status="valid" time="0.09" steps="87"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_wf_independence" expl="VC for ty_wf_independence">
+ <proof prover="0"><result status="valid" time="0.08" steps="48"/></proof>
+ </goal>
+ <goal name="WP_parameter tyl_wf_independence" expl="VC for tyl_wf_independence">
+ <proof prover="0"><result status="valid" time="0.08" steps="77"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_wf_subst" expl="VC for ty_wf_subst">
+ <proof prover="0"><result status="valid" time="0.14" steps="132"/></proof>
+ </goal>
+ <goal name="WP_parameter tyl_wf_subst" expl="VC for tyl_wf_subst">
+ <proof prover="0"><result status="valid" time="0.19" steps="215"/></proof>
+ </goal>
+ <goal name="WP_parameter tyl_wf_nth" expl="VC for tyl_wf_nth">
+ <proof prover="0"><result status="valid" time="0.07" steps="74"/></proof>
+ </goal>
+ <goal name="WP_parameter constr_ty_list_subst_nth" expl="VC for constr_ty_list_subst_nth">
+ <proof prover="0"><result status="valid" time="0.11" steps="84"/></proof>
+ </goal>
+ <goal name="WP_parameter nth_extensionality" expl="VC for nth_extensionality">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nth_extensionality.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.06" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.2" expl="2. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.4" expl="4. precondition">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.5" expl="5. assertion">
+  <proof prover="0"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter nth_extensionality.8" expl="8. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter constructor_return_type" expl="VC for constructor_return_type">
+ <proof prover="0"><result status="valid" time="0.13" steps="161"/></proof>
+ </goal>
+</theory>
+<theory name="Pattern" sum="c8350b38afd0b4bd32aee03100faba8e" expanded="true">
+ <goal name="WP_parameter pat_ty_collector_dom" expl="VC for pat_ty_collector_dom" expanded="true">
+ <proof prover="0"><result status="valid" time="0.56" steps="1324"/></proof>
+ </goal>
+ <goal name="WP_parameter patl_ty_collector_dom" expl="VC for patl_ty_collector_dom">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter patl_ty_collector_dom.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.4" expl="4. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.7" expl="7. assertion">
+  <proof prover="0"><result status="valid" time="0.12" steps="170"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.8" expl="8. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.9" expl="9. assertion">
+  <proof prover="0"><result status="valid" time="0.05" steps="1"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.11" expl="11. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.12" expl="12. assertion">
+  <proof prover="0"><result status="valid" time="0.05" steps="1"/></proof>
+  </goal>
+  <goal name="WP_parameter patl_ty_collector_dom.13" expl="13. postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="22"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter pat_ty_collector_wf" expl="VC for pat_ty_collector_wf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter pat_ty_collector_wf.1" expl="1. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.3" expl="3. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.6" expl="6. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.8" expl="8. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="51"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.10" expl="10. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.13" expl="13. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="97"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.14" expl="14. assertion">
+  <proof prover="0"><result status="valid" time="0.08" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.15" expl="15. precondition">
+  <proof prover="1"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.16" expl="16. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="57"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.18" expl="18. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.19" expl="19. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.20" expl="20. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.21" expl="21. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter pat_ty_collector_wf.22" expl="22. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="70"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter patl_ty_collector_wf" expl="VC for patl_ty_collector_wf">
+ <proof prover="0"><result status="valid" time="0.50" steps="809"/></proof>
+ </goal>
+</theory>
+<theory name="Term" sum="1b5011ab0926eeb68f2a56fc1213bbb5">
+ <goal name="WP_parameter env_coherent_extension" expl="VC for env_coherent_extension">
+ <proof prover="0"><result status="valid" time="0.66" steps="620"/></proof>
+ </goal>
+ <goal name="WP_parameter t_wf_ty_wf" expl="VC for t_wf_ty_wf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter t_wf_ty_wf.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.10" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.2" expl="2. precondition">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.28" steps="149"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.7" expl="7. variant decrease">
+  <proof prover="0"><result status="valid" time="0.16" steps="120"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.8" expl="8. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.9" expl="9. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.11" expl="11. precondition">
+  <transf name="simplify_trivial_quantification">
+   <goal name="WP_parameter t_wf_ty_wf.11.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter t_wf_ty_wf.11.1.1" expl="1.">
+    <proof prover="0"><result status="valid" time="0.08" steps="24"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.12" expl="12. variant decrease">
+  <proof prover="0"><result status="valid" time="0.14" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.15" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.15" expl="15. variant decrease">
+  <proof prover="0"><result status="valid" time="0.14" steps="97"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.16" expl="16. precondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.18" expl="18. postcondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.19" expl="19. precondition">
+  <transf name="simplify_trivial_quantification">
+   <goal name="WP_parameter t_wf_ty_wf.19.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter t_wf_ty_wf.19.1.1" expl="1.">
+    <proof prover="0"><result status="valid" time="0.08" steps="24"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.20" expl="20. variant decrease">
+  <proof prover="0"><result status="valid" time="0.26" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.21" expl="21. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.22" expl="22. precondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.23" expl="23. variant decrease">
+  <proof prover="0"><result status="valid" time="0.19" steps="97"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.24" expl="24. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.25" expl="25. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.26" expl="26. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.27" expl="27. precondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.28" expl="28. postcondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.29" expl="29. postcondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.30" expl="30. postcondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.31" expl="31. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.32" expl="32. postcondition">
+  <proof prover="0"><result status="valid" time="0.15" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.33" expl="33. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.34" expl="34. postcondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.35" expl="35. postcondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.36" expl="36. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.37" expl="37. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter t_wf_ty_wf.38" expl="38. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="24"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter tl_wf_tyl_wf" expl="VC for tl_wf_tyl_wf">
+ <proof prover="0"><result status="valid" time="0.12" steps="92"/></proof>
+ </goal>
+ <goal name="WP_parameter brl_wf_ty_wf" expl="VC for brl_wf_ty_wf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter brl_wf_ty_wf.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_wf_ty_wf.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_wf_ty_wf.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_wf_ty_wf.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_wf_ty_wf.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter brl_wf_ty_wf.6" expl="6. unreachable point">
+  <proof prover="2"><result status="valid" time="0.17"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter br_wf_ty_wf" expl="VC for br_wf_ty_wf">
+ <proof prover="0"><result status="valid" time="0.72" steps="768"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

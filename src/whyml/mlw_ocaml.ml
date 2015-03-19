@@ -14,15 +14,32 @@
   - no more parentheses in drivers (the printer will add them with protect_on)
 
   - driver uses %1, %2, etc. and translation eta-expanses if necessary
+      introduce a let when %1 appears several times?
 
   - simplications
       let x = y in ...
       let x = 17 in ... (converter)
       let x = () in ...
       let f (us: unit) = ... (when variable us is not used)
+      some beta-reductions, at least (fun _ -> e) ()
 
   - singleton types
     record/constructor fields of type unit
+
+  - preludes
+
+  - command line
+
+  - drivers:
+
+    we'd like to use both ocaml64.drv from the lib and a local
+    driver (specific to the files being extracted) but currently
+
+    - only one driver is allowed on the extraction command line
+
+    - import "ocaml64" in the local driver fails, because it's looking
+      for a file ocaml64 in the local directory (and not for ocaml64.drv
+      in the library)
 
 *)
 
@@ -512,7 +529,8 @@ module Translate = struct
           ML.Eraise (ML.Xexit, None)
       | Eraise (xs, e1) ->
           begin match query_syntax info.info_syn xs.xs_name with
-          | Some s -> ML.Eraise (ML.Xsyntax s, Some (expr info e1))
+          | Some s ->
+              ML.Eraise (ML.Xsyntax s, Some (expr info e1))
           | None when ity_equal xs.xs_ity ity_unit ->
               ML.Eraise (ML.Xident xs.xs_name, None)
           | None ->
@@ -939,9 +957,11 @@ module Print = struct
         assert (a = None);
         fprintf fmt (protect_on paren "raise Pervasives.Exit")
     | Eraise (Xsyntax s, None) ->
-        syntax_arguments s (print_expr info) fmt []
+        fprintf fmt (protect_on paren "raise %a")
+          (syntax_arguments s (print_expr info)) []
     | Eraise (Xsyntax s, Some e1) ->
-        syntax_arguments s (print_expr info) fmt [e1]
+        fprintf fmt (protect_on paren "raise %a")
+          (syntax_arguments s (print_expr info)) [e1]
     | Eraise (Xident id, None) ->
         fprintf fmt (protect_on paren "raise %a") (print_uident info) id
     | Eraise (Xident id, Some e1) ->
