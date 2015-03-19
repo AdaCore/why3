@@ -11,18 +11,18 @@
 <theory name="BinarySearch" sum="6edf021e1310395e54f253f514978225" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="3" timelimit="10"><result status="valid" time="0.17"/></proof>
+ <proof prover="3" timelimit="10"><result status="valid" time="0.17" steps="55"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
 <theory name="BinarySearchAnyMidPoint" sum="cf35a6556f511e3fa459bea0349c2cf8" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="3" timelimit="10"><result status="valid" time="0.02"/></proof>
+ <proof prover="3" timelimit="10"><result status="valid" time="0.02" steps="39"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchInt32" sum="642f4f476a562fd749a936e9ac849abb" expanded="true">
+<theory name="BinarySearchInt32" sum="3bccc1a191f702802bbee521528e559c" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter binary_search.1" expl="1. integer overflow">
@@ -32,7 +32,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.3" expl="3. integer overflow">
-  <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.4" expl="4. loop invariant init">
   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
@@ -53,10 +53,10 @@
   <proof prover="3"><result status="valid" time="0.04" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.10" expl="10. integer overflow">
-  <proof prover="3"><result status="valid" time="0.85" steps="50"/></proof>
+  <proof prover="3"><result status="valid" time="0.52" steps="51"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.11" expl="11. assertion">
-  <proof prover="3"><result status="valid" time="1.55" steps="70"/></proof>
+  <proof prover="3"><result status="valid" time="0.91" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.12" expl="12. index in array bounds">
   <proof prover="3"><result status="valid" time="0.01" steps="25"/></proof>
@@ -73,7 +73,7 @@
   <goal name="WP_parameter binary_search.16" expl="16. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="9.67" steps="113"/></proof>
+  <proof prover="3"><result status="valid" time="6.24" steps="115"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.17" expl="17. loop variant decrease">
   <proof prover="3"><result status="valid" time="0.02" steps="33"/></proof>
@@ -93,13 +93,13 @@
   <goal name="WP_parameter binary_search.22" expl="22. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3" timelimit="60"><result status="valid" time="12.11" steps="114"/></proof>
+  <proof prover="3" timelimit="60"><result status="valid" time="9.69" steps="116"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.23" expl="23. loop variant decrease">
   <proof prover="3"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.24" expl="24. postcondition">
-  <proof prover="3"><result status="valid" time="2.32" steps="62"/></proof>
+  <proof prover="3"><result status="valid" time="1.22" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.25" expl="25. exceptional postcondition">
   <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>

@@ -43,7 +43,7 @@ let timeregexp s =
     | "m" -> add_unit Min
     | "s" -> add_unit Sec
     | "i" -> add_unit Msec
-    | _ -> failwith "unknown time format specifier, use %%h, %%m, %%s, %%i"
+    | x -> failwith ("unknown time format specifier: %%"^x^" (should be either %%h, %%m, %%s or %%i")
   in
   let s = Str.global_substitute cmd_regexp replace s in
   let group = Array.make !nb Hour in

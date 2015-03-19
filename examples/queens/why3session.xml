@@ -21,24 +21,24 @@
  <transf name="split_goal_wp">
   <goal name="WP_parameter t.1" expl="1. loop invariant init">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t.2" expl="2. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="57"/></proof>
   <proof prover="10"><result status="valid" time="0.01" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter t.3" expl="3. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="10"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t.4" expl="4. loop variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
   <proof prover="10"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
  </transf>
@@ -47,7 +47,7 @@
 <theory name="Solution" sum="1bccbabcbdca1ca0b83a9e1faec22b83">
  <goal name="partial_solution_eq_prefix">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="44"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  <proof prover="10"><result status="valid" time="0.02" steps="44"/></proof>
  </goal>
@@ -61,763 +61,763 @@
  <transf name="split_goal_wp">
   <goal name="WP_parameter t3.1" expl="1. loop invariant init">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="56"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.02" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter t3.2" expl="2. variant decrease">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.79"/></proof>
+  <proof prover="3"><result status="valid" time="0.79" steps="251"/></proof>
   <proof prover="10"><result status="valid" time="0.80" steps="249"/></proof>
   </goal>
   <goal name="WP_parameter t3.3" expl="3. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter t3.3.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="17"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.2" expl="2.">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="1.01"/></proof>
-   <proof prover="10"><result status="valid" time="1.29" steps="246"/></proof>
+   <proof prover="3"><result status="valid" time="1.01" steps="248"/></proof>
+   <proof prover="10"><result status="valid" time="0.82" steps="246"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.3" expl="3.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="17"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.4" expl="4.">
-   <proof prover="3"><result status="valid" time="0.11"/></proof>
+   <proof prover="3"><result status="valid" time="0.11" steps="71"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.13" steps="71"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.5" expl="5.">
-   <proof prover="3"><result status="valid" time="0.12"/></proof>
+   <proof prover="3"><result status="valid" time="0.12" steps="72"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.12" steps="72"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.6" expl="6.">
    <proof prover="1"><result status="valid" time="0.05"/></proof>
-   <proof prover="3"><result status="valid" time="2.40"/></proof>
-   <proof prover="10"><result status="valid" time="3.72" steps="409"/></proof>
+   <proof prover="3"><result status="valid" time="2.40" steps="410"/></proof>
+   <proof prover="10"><result status="valid" time="2.23" steps="409"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.7" expl="7.">
    <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"><result status="valid" time="2.07"/></proof>
-   <proof prover="3"><result status="valid" time="5.43"/></proof>
-   <proof prover="10"><result status="valid" time="3.94" steps="562"/></proof>
+   <proof prover="3"><result status="valid" time="5.43" steps="618"/></proof>
+   <proof prover="10"><result status="valid" time="2.08" steps="562"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.8" expl="8.">
-   <proof prover="3"><result status="valid" time="19.84"/></proof>
+   <proof prover="3"><result status="valid" time="16.98" steps="1259"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.9" expl="9.">
    <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"><result status="valid" time="3.15"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.10" expl="10.">
    <proof prover="1"><result status="valid" time="0.11"/></proof>
-   <proof prover="3"><result status="valid" time="3.70"/></proof>
+   <proof prover="3"><result status="valid" time="3.70" steps="417"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.11" expl="11.">
-   <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"><result status="valid" time="3.53"/></proof>
+   <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"><result status="valid" time="2.91"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.12" expl="12.">
    <transf name="inline_goal">
     <goal name="WP_parameter t3.3.12.1" expl="1.">
     <transf name="split_goal_wp">
      <goal name="WP_parameter t3.3.12.1.1" expl="1.">
-     <proof prover="3"><result status="valid" time="2.69"/></proof>
-     <proof prover="10"><result status="valid" time="3.96" steps="481"/></proof>
+     <proof prover="3"><result status="valid" time="2.69" steps="481"/></proof>
+     <proof prover="10"><result status="valid" time="2.34" steps="481"/></proof>
      </goal>
      <goal name="WP_parameter t3.3.12.1.2" expl="2.">
-     <proof prover="3"><result status="valid" time="2.00"/></proof>
-     <proof prover="10"><result status="valid" time="2.91" steps="285"/></proof>
+     <proof prover="3"><result status="valid" time="2.00" steps="285"/></proof>
+     <proof prover="10"><result status="valid" time="1.68" steps="285"/></proof>
      </goal>
      <goal name="WP_parameter t3.3.12.1.3" expl="3.">
-     <proof prover="1"><result status="valid" time="0.26"/></proof>
+     <proof prover="1"><result status="valid" time="9.75"/></proof>
      </goal>
      <goal name="WP_parameter t3.3.12.1.4" expl="4.">
      <metas>
-      <ts_pos name="ref" arity="1" id="3677"
+      <ts_pos name="ref" arity="1" id="3430"
        ip_theory="Ref">
        <ip_library name="ref"/>
        <ip_qualid name="ref"/>
       </ts_pos>
-      <ts_pos name="solution" arity="0" id="4141"
+      <ts_pos name="solution" arity="0" id="3894"
        ip_theory="Solution">
        <ip_qualid name="solution"/>
       </ts_pos>
-      <ts_pos name="solutions" arity="0" id="4206"
+      <ts_pos name="solutions" arity="0" id="3959"
        ip_theory="Solution">
        <ip_qualid name="solutions"/>
       </ts_pos>
-      <ls_pos name="zero" id="803"
+      <ls_pos name="zero" id="556"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="zero"/>
       </ls_pos>
-      <ls_pos name="one" id="804"
+      <ls_pos name="one" id="557"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="one"/>
       </ls_pos>
-      <ls_pos name="infix &lt;" id="805"
+      <ls_pos name="infix &lt;" id="558"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="infix &lt;"/>
       </ls_pos>
-      <ls_pos name="infix &gt;" id="808"
+      <ls_pos name="infix &gt;" id="561"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="infix &gt;"/>
       </ls_pos>
-      <ls_pos name="infix +" id="1974"
+      <ls_pos name="infix +" id="1727"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="infix +"/>
       </ls_pos>
-      <ls_pos name="prefix -" id="1975"
+      <ls_pos name="prefix -" id="1728"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="prefix -"/>
       </ls_pos>
-      <ls_pos name="infix *" id="1976"
+      <ls_pos name="infix *" id="1729"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="infix *"/>
       </ls_pos>
-      <ls_pos name="infix &gt;=" id="2044"
+      <ls_pos name="infix &gt;=" id="1797"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="infix &gt;="/>
       </ls_pos>
-      <ls_pos name="mem" id="2752"
+      <ls_pos name="mem" id="2505"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="mem"/>
       </ls_pos>
-      <ls_pos name="infix ==" id="2755"
+      <ls_pos name="infix ==" id="2508"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="infix =="/>
       </ls_pos>
-      <ls_pos name="subset" id="2773"
+      <ls_pos name="subset" id="2526"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="subset"/>
       </ls_pos>
-      <ls_pos name="empty" id="2794"
+      <ls_pos name="empty" id="2547"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="empty"/>
       </ls_pos>
-      <ls_pos name="add" id="2806"
+      <ls_pos name="add" id="2559"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="add"/>
       </ls_pos>
-      <ls_pos name="singleton" id="2812"
+      <ls_pos name="singleton" id="2565"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="singleton"/>
       </ls_pos>
-      <ls_pos name="remove" id="2817"
+      <ls_pos name="remove" id="2570"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="remove"/>
       </ls_pos>
-      <ls_pos name="union" id="2835"
+      <ls_pos name="union" id="2588"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="union"/>
       </ls_pos>
-      <ls_pos name="inter" id="2842"
+      <ls_pos name="inter" id="2595"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="inter"/>
       </ls_pos>
-      <ls_pos name="diff" id="2849"
+      <ls_pos name="diff" id="2602"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="diff"/>
       </ls_pos>
-      <ls_pos name="choose" id="2861"
+      <ls_pos name="choose" id="2614"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="choose"/>
       </ls_pos>
-      <ls_pos name="cardinal" id="2865"
+      <ls_pos name="cardinal" id="2618"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal"/>
       </ls_pos>
-      <ls_pos name="min_elt" id="2965"
+      <ls_pos name="min_elt" id="2718"
        ip_theory="Fsetint">
        <ip_library name="set"/>
        <ip_qualid name="min_elt"/>
       </ls_pos>
-      <ls_pos name="max_elt" id="2975"
+      <ls_pos name="max_elt" id="2728"
        ip_theory="Fsetint">
        <ip_library name="set"/>
        <ip_qualid name="max_elt"/>
       </ls_pos>
-      <ls_pos name="get" id="3075"
+      <ls_pos name="get" id="2828"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="get"/>
       </ls_pos>
-      <ls_pos name="set" id="3078"
+      <ls_pos name="set" id="2831"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="set"/>
       </ls_pos>
-      <ls_pos name="mixfix [&lt;-]" id="3098"
+      <ls_pos name="mixfix [&lt;-]" id="2851"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="mixfix [&lt;-]"/>
       </ls_pos>
-      <ls_pos name="const" id="3129"
+      <ls_pos name="const" id="2882"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="const"/>
       </ls_pos>
-      <ls_pos name="succ" id="3660" ip_theory="S">
+      <ls_pos name="succ" id="3413" ip_theory="S">
        <ip_qualid name="succ"/>
       </ls_pos>
-      <ls_pos name="pred" id="3667" ip_theory="S">
+      <ls_pos name="pred" id="3420" ip_theory="S">
        <ip_qualid name="pred"/>
       </ls_pos>
-      <ls_pos name="prefix !" id="3683"
+      <ls_pos name="prefix !" id="3436"
        ip_theory="Ref">
        <ip_library name="ref"/>
        <ip_qualid name="prefix !"/>
       </ls_pos>
-      <ls_pos name="n" id="4140" ip_theory="Solution">
+      <ls_pos name="n" id="3893" ip_theory="Solution">
        <ip_qualid name="n"/>
       </ls_pos>
-      <ls_pos name="eq_sol" id="4158"
+      <ls_pos name="eq_sol" id="3911"
        ip_theory="Solution">
        <ip_qualid name="eq_sol"/>
       </ls_pos>
-      <ls_pos name="solution" id="4182"
+      <ls_pos name="solution" id="3935"
        ip_theory="Solution">
        <ip_qualid name="solution"/>
       </ls_pos>
-      <ls_pos name="sorted" id="4207"
+      <ls_pos name="sorted" id="3960"
        ip_theory="Solution">
        <ip_qualid name="sorted"/>
       </ls_pos>
-      <pr_pos name="Assoc" id="1977"
+      <pr_pos name="Assoc" id="1730"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CommutativeGroup"/>
        <ip_qualid name="Assoc"/>
       </pr_pos>
-      <pr_pos name="Unit_def_l" id="1984"
+      <pr_pos name="Unit_def_l" id="1737"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CommutativeGroup"/>
        <ip_qualid name="Unit_def_l"/>
       </pr_pos>
-      <pr_pos name="Unit_def_r" id="1987"
+      <pr_pos name="Unit_def_r" id="1740"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CommutativeGroup"/>
        <ip_qualid name="Unit_def_r"/>
       </pr_pos>
-      <pr_pos name="Inv_def_l" id="1990"
+      <pr_pos name="Inv_def_l" id="1743"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CommutativeGroup"/>
        <ip_qualid name="Inv_def_l"/>
       </pr_pos>
-      <pr_pos name="Inv_def_r" id="1993"
+      <pr_pos name="Inv_def_r" id="1746"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CommutativeGroup"/>
        <ip_qualid name="Inv_def_r"/>
       </pr_pos>
-      <pr_pos name="Comm" id="1996"
+      <pr_pos name="Comm" id="1749"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CommutativeGroup"/>
        <ip_qualid name="Comm"/>
        <ip_qualid name="Comm"/>
       </pr_pos>
-      <pr_pos name="Assoc" id="2001"
+      <pr_pos name="Assoc" id="1754"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Assoc"/>
        <ip_qualid name="Assoc"/>
       </pr_pos>
-      <pr_pos name="Mul_distr_l" id="2008"
+      <pr_pos name="Mul_distr_l" id="1761"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Mul_distr_l"/>
       </pr_pos>
-      <pr_pos name="Mul_distr_r" id="2015"
+      <pr_pos name="Mul_distr_r" id="1768"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Mul_distr_r"/>
       </pr_pos>
-      <pr_pos name="Comm" id="2033"
+      <pr_pos name="Comm" id="1786"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Comm"/>
        <ip_qualid name="Comm"/>
       </pr_pos>
-      <pr_pos name="Unitary" id="2038"
+      <pr_pos name="Unitary" id="1791"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Unitary"/>
       </pr_pos>
-      <pr_pos name="NonTrivialRing" id="2041"
+      <pr_pos name="NonTrivialRing" id="1794"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="NonTrivialRing"/>
       </pr_pos>
-      <pr_pos name="Refl" id="2053"
+      <pr_pos name="Refl" id="1806"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Refl"/>
       </pr_pos>
-      <pr_pos name="Trans" id="2056"
+      <pr_pos name="Trans" id="1809"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Trans"/>
       </pr_pos>
-      <pr_pos name="Antisymm" id="2063"
+      <pr_pos name="Antisymm" id="1816"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Antisymm"/>
       </pr_pos>
-      <pr_pos name="Total" id="2068"
+      <pr_pos name="Total" id="1821"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="Total"/>
       </pr_pos>
-      <pr_pos name="ZeroLessOne" id="2073"
+      <pr_pos name="ZeroLessOne" id="1826"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="ZeroLessOne"/>
       </pr_pos>
-      <pr_pos name="CompatOrderAdd" id="2074"
+      <pr_pos name="CompatOrderAdd" id="1827"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CompatOrderAdd"/>
       </pr_pos>
-      <pr_pos name="CompatOrderMult" id="2081"
+      <pr_pos name="CompatOrderMult" id="1834"
        ip_theory="Int">
        <ip_library name="int"/>
        <ip_qualid name="CompatOrderMult"/>
       </pr_pos>
-      <pr_pos name="extensionality" id="2766"
+      <pr_pos name="extensionality" id="2519"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="extensionality"/>
       </pr_pos>
-      <pr_pos name="subset_refl" id="2784"
+      <pr_pos name="subset_refl" id="2537"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="subset_refl"/>
       </pr_pos>
-      <pr_pos name="subset_trans" id="2787"
+      <pr_pos name="subset_trans" id="2540"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="subset_trans"/>
       </pr_pos>
-      <pr_pos name="empty_def1" id="2803"
+      <pr_pos name="empty_def1" id="2556"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="empty_def1"/>
       </pr_pos>
-      <pr_pos name="mem_empty" id="2804"
+      <pr_pos name="mem_empty" id="2557"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="mem_empty"/>
       </pr_pos>
-      <pr_pos name="add_def1" id="2807"
+      <pr_pos name="add_def1" id="2560"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="add_def1"/>
       </pr_pos>
-      <pr_pos name="remove_def1" id="2818"
+      <pr_pos name="remove_def1" id="2571"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="remove_def1"/>
       </pr_pos>
-      <pr_pos name="add_remove" id="2823"
+      <pr_pos name="add_remove" id="2576"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="add_remove"/>
       </pr_pos>
-      <pr_pos name="remove_add" id="2827"
+      <pr_pos name="remove_add" id="2580"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="remove_add"/>
       </pr_pos>
-      <pr_pos name="subset_remove" id="2831"
+      <pr_pos name="subset_remove" id="2584"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="subset_remove"/>
       </pr_pos>
-      <pr_pos name="union_def1" id="2836"
+      <pr_pos name="union_def1" id="2589"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="union_def1"/>
       </pr_pos>
-      <pr_pos name="inter_def1" id="2843"
+      <pr_pos name="inter_def1" id="2596"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="inter_def1"/>
       </pr_pos>
-      <pr_pos name="subset_diff" id="2856"
+      <pr_pos name="subset_diff" id="2609"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="subset_diff"/>
       </pr_pos>
-      <pr_pos name="choose_def" id="2862"
+      <pr_pos name="choose_def" id="2615"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="choose_def"/>
       </pr_pos>
-      <pr_pos name="cardinal_nonneg" id="2867"
+      <pr_pos name="cardinal_nonneg" id="2620"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal_nonneg"/>
       </pr_pos>
-      <pr_pos name="cardinal_empty" id="2870"
+      <pr_pos name="cardinal_empty" id="2623"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal_empty"/>
       </pr_pos>
-      <pr_pos name="cardinal_add" id="2873"
+      <pr_pos name="cardinal_add" id="2626"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal_add"/>
       </pr_pos>
-      <pr_pos name="cardinal_remove" id="2878"
+      <pr_pos name="cardinal_remove" id="2631"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal_remove"/>
       </pr_pos>
-      <pr_pos name="cardinal_subset" id="2883"
+      <pr_pos name="cardinal_subset" id="2636"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal_subset"/>
       </pr_pos>
-      <pr_pos name="cardinal1" id="2888"
+      <pr_pos name="cardinal1" id="2641"
        ip_theory="Fset">
        <ip_library name="set"/>
        <ip_qualid name="cardinal1"/>
       </pr_pos>
-      <pr_pos name="min_elt_def2" id="2970"
+      <pr_pos name="min_elt_def2" id="2723"
        ip_theory="Fsetint">
        <ip_library name="set"/>
        <ip_qualid name="min_elt_def2"/>
       </pr_pos>
-      <pr_pos name="max_elt_def1" id="2977"
+      <pr_pos name="max_elt_def1" id="2730"
        ip_theory="Fsetint">
        <ip_library name="set"/>
        <ip_qualid name="max_elt_def1"/>
       </pr_pos>
-      <pr_pos name="max_elt_def2" id="2980"
+      <pr_pos name="max_elt_def2" id="2733"
        ip_theory="Fsetint">
        <ip_library name="set"/>
        <ip_qualid name="max_elt_def2"/>
       </pr_pos>
-      <pr_pos name="Select_eq" id="3111"
+      <pr_pos name="Select_eq" id="2864"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="Select_eq"/>
       </pr_pos>
-      <pr_pos name="Select_neq" id="3120"
+      <pr_pos name="Select_neq" id="2873"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="Select_neq"/>
       </pr_pos>
-      <pr_pos name="Const" id="3131"
+      <pr_pos name="Const" id="2884"
        ip_theory="Map">
        <ip_library name="map"/>
        <ip_qualid name="Const"/>
       </pr_pos>
-      <pr_pos name="succ_def" id="3662"
+      <pr_pos name="succ_def" id="3415"
        ip_theory="S">
        <ip_qualid name="succ_def"/>
       </pr_pos>
-      <pr_pos name="pred_def" id="3669"
+      <pr_pos name="pred_def" id="3422"
        ip_theory="S">
        <ip_qualid name="pred_def"/>
       </pr_pos>
-      <pr_pos name="partial_solution_eq_prefix" id="4187"
+      <pr_pos name="partial_solution_eq_prefix" id="3940"
        ip_theory="Solution">
        <ip_qualid name="partial_solution_eq_prefix"/>
       </pr_pos>
-      <pr_pos name="no_duplicate" id="4226"
+      <pr_pos name="no_duplicate" id="3979"
        ip_theory="Solution">
        <ip_qualid name="no_duplicate"/>
       </pr_pos>
       <meta name="remove_logic">
-       <meta_arg_ls id="803"/>
+       <meta_arg_ls id="556"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="804"/>
+       <meta_arg_ls id="557"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="805"/>
+       <meta_arg_ls id="558"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="808"/>
+       <meta_arg_ls id="561"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="1974"/>
+       <meta_arg_ls id="1727"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="1975"/>
+       <meta_arg_ls id="1728"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="1976"/>
+       <meta_arg_ls id="1729"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2044"/>
+       <meta_arg_ls id="1797"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2752"/>
+       <meta_arg_ls id="2505"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2755"/>
+       <meta_arg_ls id="2508"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2773"/>
+       <meta_arg_ls id="2526"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2794"/>
+       <meta_arg_ls id="2547"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2806"/>
+       <meta_arg_ls id="2559"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2812"/>
+       <meta_arg_ls id="2565"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2817"/>
+       <meta_arg_ls id="2570"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2835"/>
+       <meta_arg_ls id="2588"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2842"/>
+       <meta_arg_ls id="2595"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2849"/>
+       <meta_arg_ls id="2602"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2861"/>
+       <meta_arg_ls id="2614"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2865"/>
+       <meta_arg_ls id="2618"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2965"/>
+       <meta_arg_ls id="2718"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="2975"/>
+       <meta_arg_ls id="2728"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3075"/>
+       <meta_arg_ls id="2828"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3078"/>
+       <meta_arg_ls id="2831"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3098"/>
+       <meta_arg_ls id="2851"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3129"/>
+       <meta_arg_ls id="2882"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3660"/>
+       <meta_arg_ls id="3413"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3667"/>
+       <meta_arg_ls id="3420"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="3683"/>
+       <meta_arg_ls id="3436"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="4140"/>
+       <meta_arg_ls id="3893"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="4158"/>
+       <meta_arg_ls id="3911"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="4182"/>
+       <meta_arg_ls id="3935"/>
       </meta>
       <meta name="remove_logic">
-       <meta_arg_ls id="4207"/>
+       <meta_arg_ls id="3960"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="1977"/>
+       <meta_arg_pr id="1730"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="1984"/>
+       <meta_arg_pr id="1737"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="1987"/>
+       <meta_arg_pr id="1740"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="1990"/>
+       <meta_arg_pr id="1743"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="1993"/>
+       <meta_arg_pr id="1746"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="1996"/>
+       <meta_arg_pr id="1749"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2001"/>
+       <meta_arg_pr id="1754"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2008"/>
+       <meta_arg_pr id="1761"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2015"/>
+       <meta_arg_pr id="1768"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2033"/>
+       <meta_arg_pr id="1786"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2038"/>
+       <meta_arg_pr id="1791"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2041"/>
+       <meta_arg_pr id="1794"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2053"/>
+       <meta_arg_pr id="1806"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2056"/>
+       <meta_arg_pr id="1809"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2063"/>
+       <meta_arg_pr id="1816"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2068"/>
+       <meta_arg_pr id="1821"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2073"/>
+       <meta_arg_pr id="1826"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2074"/>
+       <meta_arg_pr id="1827"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2081"/>
+       <meta_arg_pr id="1834"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2766"/>
+       <meta_arg_pr id="2519"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2784"/>
+       <meta_arg_pr id="2537"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2787"/>
+       <meta_arg_pr id="2540"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2803"/>
+       <meta_arg_pr id="2556"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2804"/>
+       <meta_arg_pr id="2557"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2807"/>
+       <meta_arg_pr id="2560"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2818"/>
+       <meta_arg_pr id="2571"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2823"/>
+       <meta_arg_pr id="2576"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2827"/>
+       <meta_arg_pr id="2580"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2831"/>
+       <meta_arg_pr id="2584"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2836"/>
+       <meta_arg_pr id="2589"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2843"/>
+       <meta_arg_pr id="2596"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2856"/>
+       <meta_arg_pr id="2609"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2862"/>
+       <meta_arg_pr id="2615"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2867"/>
+       <meta_arg_pr id="2620"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2870"/>
+       <meta_arg_pr id="2623"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2626"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2631"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2636"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2641"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2723"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2730"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2733"/>
+      </meta>
+      <meta name="remove_prop">
+       <meta_arg_pr id="2864"/>
       </meta>
       <meta name="remove_prop">
        <meta_arg_pr id="2873"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2878"/>
+       <meta_arg_pr id="2884"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2883"/>
+       <meta_arg_pr id="3415"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2888"/>
+       <meta_arg_pr id="3422"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2970"/>
+       <meta_arg_pr id="3940"/>
       </meta>
       <meta name="remove_prop">
-       <meta_arg_pr id="2977"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="2980"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="3111"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="3120"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="3131"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="3662"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="3669"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="4187"/>
-      </meta>
-      <meta name="remove_prop">
-       <meta_arg_pr id="4226"/>
+       <meta_arg_pr id="3979"/>
       </meta>
       <meta name="remove_type">
-       <meta_arg_ts id="3677"/>
+       <meta_arg_ts id="3430"/>
       </meta>
       <meta name="remove_type">
-       <meta_arg_ts id="4141"/>
+       <meta_arg_ts id="3894"/>
       </meta>
       <meta name="remove_type">
-       <meta_arg_ts id="4206"/>
+       <meta_arg_ts id="3959"/>
       </meta>
       <goal name="WP_parameter t3.3.12.1.4" expl="4.">
       <transf name="eliminate_builtin">
        <goal name="WP_parameter t3.3.12.1.4.1" expl="1.">
-       <proof prover="5" timelimit="25"><result status="valid" time="0.31"/></proof>
+       <proof prover="5" timelimit="25"><result status="valid" time="0.12"/></proof>
        <proof prover="9"><result status="valid" time="0.01"/></proof>
        </goal>
       </transf>
@@ -825,7 +825,7 @@
      </metas>
      </goal>
      <goal name="WP_parameter t3.3.12.1.5" expl="5.">
-     <proof prover="3"><result status="valid" time="6.41"/></proof>
+     <proof prover="3"><result status="valid" time="5.64" steps="660"/></proof>
      </goal>
     </transf>
     </goal>
@@ -837,31 +837,31 @@
   <transf name="split_goal_wp">
    <goal name="WP_parameter t3.4.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.03"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.2" expl="2.">
    <proof prover="1"><result status="valid" time="0.03"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.3" expl="3.">
    <proof prover="1"><result status="valid" time="0.03"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="29"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.4" expl="4.">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.03" steps="37"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.5" expl="5.">
    <proof prover="1"><result status="valid" time="0.08"/></proof>
-   <proof prover="3"><result status="valid" time="22.03"/></proof>
+   <proof prover="3"><result status="valid" time="22.03" steps="1077"/></proof>
    <proof prover="6"><result status="valid" time="0.18"/></proof>
    <proof prover="7"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -869,13 +869,13 @@
    <proof prover="0" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"><result status="valid" time="3.32"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.7" expl="7.">
-   <proof prover="0" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"><result status="valid" time="2.02"/></proof>
+   <proof prover="0" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"><result status="valid" time="1.60"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.8" expl="8.">
    <proof prover="6" timelimit="55"><result status="valid" time="1.92"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.9" expl="9.">
-   <proof prover="1"><result status="valid" time="0.09"/></proof>
+   <proof prover="1"><result status="valid" time="0.20"/></proof>
    <proof prover="6"><result status="valid" time="0.21"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.10" expl="10.">
@@ -886,13 +886,13 @@
    </goal>
    <goal name="WP_parameter t3.4.12" expl="12.">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.04" steps="37"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.13" expl="13.">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="36"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.03" steps="36"/></proof>
    </goal>
@@ -900,32 +900,32 @@
   </goal>
   <goal name="WP_parameter t3.5" expl="5. loop variant decrease">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="56"/></proof>
   <proof prover="10"><result status="valid" time="0.08" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter t3.6" expl="6. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter t3.6.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
    <proof prover="7"><result status="valid" time="0.00"/></proof>
    <proof prover="10"><result status="valid" time="0.01" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.2" expl="2.">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
    <proof prover="7"><result status="valid" time="0.00"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.3" expl="3.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
    <proof prover="7"><result status="valid" time="0.00"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.4" expl="4.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.5" expl="5.">
@@ -937,20 +937,20 @@
    </goal>
    <goal name="WP_parameter t3.6.7" expl="7.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="44"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.04" steps="44"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.8" expl="8.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
    <proof prover="6"><result status="valid" time="0.01"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.9" expl="9.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="15"/></proof>
@@ -961,47 +961,47 @@
   <transf name="split_goal_wp">
    <goal name="WP_parameter t3.7.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
    <proof prover="7"><result status="valid" time="0.00"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.2" expl="2.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
    <proof prover="7"><result status="valid" time="0.01"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.3" expl="3.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
    <proof prover="7"><result status="valid" time="0.01"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.4" expl="4.">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="7"><result status="valid" time="0.01"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="18"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.5" expl="5.">
-   <proof prover="3"><result status="valid" time="0.08"/></proof>
+   <proof prover="3"><result status="valid" time="0.08" steps="84"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.06" steps="84"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.6" expl="6.">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    <proof prover="10"><result status="valid" time="0.02" steps="18"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.7" expl="7.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.00"/></proof>
+   <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
    <proof prover="7"><result status="valid" time="0.00"/></proof>
    <proof prover="10"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter t3.7.8" expl="8.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
    <proof prover="7"><result status="valid" time="0.01"/></proof>
    <proof prover="10"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
@@ -1014,45 +1014,45 @@
   <goal name="WP_parameter queens3.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="57"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="8"><result status="valid" time="0.03"/></proof>
   <proof prover="10"><result status="valid" time="0.02" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter queens3.2" expl="2. postcondition">
   <proof prover="1" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="55"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.02" steps="55"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Bits" sum="27b3acf5f4918ee96a5648dae4132868">
+<theory name="Bits" sum="2598f213e558a1fa55e392e3346bfaf4">
  <goal name="WP_parameter zero" expl="VC for zero">
  <proof prover="5"><result status="valid" time="0.06"/></proof>
- <proof prover="10"><result status="valid" time="0.06" steps="18"/></proof>
+ <proof prover="10"><result status="valid" time="0.06" steps="19"/></proof>
  </goal>
  <goal name="WP_parameter remove_singleton" expl="VC for remove_singleton">
- <proof prover="10"><result status="valid" time="2.00" steps="703"/></proof>
+ <proof prover="10"><result status="valid" time="1.60" steps="769"/></proof>
  </goal>
  <goal name="WP_parameter add_singleton" expl="VC for add_singleton">
- <proof prover="10"><result status="valid" time="0.51" steps="516"/></proof>
+ <proof prover="10"><result status="valid" time="0.30" steps="569"/></proof>
  </goal>
  <goal name="WP_parameter mul2" expl="VC for mul2">
- <proof prover="10"><result status="valid" time="0.55" steps="227"/></proof>
+ <proof prover="10"><result status="valid" time="0.55" steps="242"/></proof>
  </goal>
  <goal name="WP_parameter div2" expl="VC for div2">
- <proof prover="10"><result status="valid" time="0.05" steps="71"/></proof>
+ <proof prover="10"><result status="valid" time="0.05" steps="75"/></proof>
  </goal>
  <goal name="WP_parameter diff" expl="VC for diff">
- <proof prover="5"><result status="valid" time="0.55"/></proof>
- <proof prover="10"><result status="valid" time="0.88" steps="227"/></proof>
+ <proof prover="5"><result status="valid" time="0.27"/></proof>
+ <proof prover="10"><result status="valid" time="0.50" steps="253"/></proof>
  </goal>
  <goal name="WP_parameter rightmost_bit_trick" expl="VC for rightmost_bit_trick">
  </goal>
  <goal name="WP_parameter below" expl="VC for below">
- <proof prover="10"><result status="valid" time="0.14" steps="72"/></proof>
+ <proof prover="10"><result status="valid" time="0.14" steps="85"/></proof>
  </goal>
 </theory>
 </file>
