@@ -130,7 +130,7 @@ let collect_model_ls info ls =
     Slab.mem model_label ls.ls_name.id_label then 
     begin
       let t = t_app ls [] ls.ls_value in
-      info.info_model <- (t_label ls.ls_name.id_label t) :: info.info_model
+      info.info_model <- (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
     end
 
 (** expr *)
