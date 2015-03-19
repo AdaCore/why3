@@ -128,7 +128,7 @@ let get_term_string term raw_string  =
   extract_term_string labels raw_string regexp
   
 
-let rec get_terms_values_strings raw_strings terms collected_strings =
+let rec get_terms_values_locs_strings raw_strings terms collected_strings =
   match raw_strings with
   | [] -> collected_strings
   | (raw_term_string, value)::raw_strings_tail ->
@@ -140,7 +140,7 @@ let rec get_terms_values_strings raw_strings terms collected_strings =
       me_value = value; 
       me_location = term_location} in
     let collected_strings = collected_strings @ [new_model_element] in
-    get_terms_values_strings raw_strings_tail terms_tail collected_strings
+    get_terms_values_locs_strings raw_strings_tail terms_tail collected_strings
 
 (* Parses the model returned by CVC4 or Z3.
 Assumes that the model has the following form "model: (pairs)"
@@ -151,7 +151,7 @@ let parse model printer_mapping =
     let start_m = Str.search_forward r model 0 in
     let start = find_first_open_bracket model start_m in
     let raw_terms_values_strings = snd(parse_pairs model (start+1) []) in
-    get_terms_values_strings raw_terms_values_strings printer_mapping.queried_terms []
+    get_terms_values_locs_strings raw_terms_values_strings printer_mapping.queried_terms []
   with Not_found -> [] 
 
 let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))" Printer.get_default_printer_mapping
