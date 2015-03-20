@@ -6,6 +6,7 @@
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
 (********************************************************************)
 
 (** The aim of this translation is to obtain terms where all epsilon
