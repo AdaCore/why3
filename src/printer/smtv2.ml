@@ -158,11 +158,58 @@ let rec print_term info fmt t = match t.t_node with
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
+(*
   | Tcase _ -> unsupportedTerm t
-      "smtv2 : you must eliminate match"
+      "smtv2: you must eliminate match"
+*)
+  | Tcase(t,bl) ->
+     let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+     fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+             print_var subject (print_term info) t
+             (print_branches info subject print_term) bl;
+     forget_var subject
   | Teps _ -> unsupportedTerm t
-      "smtv2 : you must eliminate epsilon"
+      "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
+
+and print_branches info subject pr fmt bl =
+  match bl with
+  | [] -> assert false
+  | br::bl ->
+     let (p,t) = t_open_branch br in
+     let constr,args =
+       try
+         match p.pat_node with
+         | Papp(cs,args) ->
+            let vars = List.map
+                         (function { pat_node = Pvar v} -> v
+                                 | _ -> raise Exit) args
+            in cs,vars
+         | _ -> raise Exit
+       with Exit ->
+         unsupportedPattern p
+           "smtv2: you must compile nested pattern-matching"
+     in
+     match bl with
+     | [] -> print_branch info subject pr fmt (constr,args,t)
+     | _ ->
+        fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+                print_ident constr.ls_name print_var subject
+                (print_branch info subject pr) (constr,args,t)
+                (print_branches info subject pr) bl
+
+and print_branch info subject pr fmt (cs,vars,t) =
+  let i = ref 0 in
+  let print_proj fmt v =
+    incr i;
+    fprintf fmt "(%a (%a_proj_%d %a))" print_var v print_ident cs.ls_name
+            !i print_var subject
+  in
+  match vars with
+  | [] -> pr info fmt t
+  | _ -> fprintf fmt "@[(let (%a) %a)@]"
+                 (print_list space print_proj) vars
+                 (pr info) t
 
 and print_fmla info fmt f = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -215,8 +262,16 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
+(*
   | Tcase _ -> unsupportedTerm f
       "smtv2 : you must eliminate match"
+ *)
+  | Tcase(t,bl) ->
+     let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+     fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+             print_var subject (print_term info) t
+             (print_branches info subject print_fmla) bl;
+     forget_var subject
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
@@ -269,11 +324,36 @@ let print_prop_decl info fmt k pr f = match k with
       fprintf fmt "@[(check-sat)@]@\n"
   | Plemma| Pskip -> assert false
 
+let print_constructor_decl info fmt (ls,args) =
+  match args with
+  | [] -> fprintf fmt "(%a)" print_ident ls.ls_name
+  | _ ->
+     fprintf fmt "@[(%a@ " print_ident ls.ls_name;
+     let _ = 
+       List.fold_left2
+         (fun i ty pr ->
+          begin match pr with
+                | Some pr -> fprintf fmt "(%a" print_ident pr.ls_name
+                | None -> fprintf fmt "(%a_proj_%d" print_ident ls.ls_name i
+          end;
+          fprintf fmt " %a)" (print_type info) ty;
+          succ i) 1 ls.ls_args args
+     in
+     fprintf fmt ")@]"
+
+let print_data_decl info fmt (ts,cl) =
+  fprintf fmt "@[(%a@ %a)@]"
+    print_ident ts.ts_name
+    (print_list space (print_constructor_decl info)) cl
+
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
-  | Ddata _ -> unsupportedDecl d
-      "smtv2 : algebraic type are not supported"
+  | Ddata dl ->
+    (*unsupportedDecl d
+      "smtv2 : algebraic type are not supported" *)
+    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+      (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       print_param_decl info fmt ls
   | Dlogic dl ->

@@ -108,6 +108,7 @@ exception NotImplemented  of        string
 
 val unsupportedType : ty   -> string -> 'a
 val unsupportedTerm : term -> string -> 'a
+val unsupportedPattern : pattern -> string -> 'a
 val unsupportedDecl : decl -> string -> 'a
 val notImplemented  :         string -> 'a
 

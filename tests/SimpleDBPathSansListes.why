@@ -1,0 +1,67 @@
+theory SimpleDBPath
+
+use import int.Int
+
+type book
+type shelf
+
+predicate book1 book
+function shelfId1 book : int
+function code1 book : int
+predicate bPK1 = forall a,b : book. ((book1 a) /\ (book1 b) /\ ((code1 a) = (code1 b))) -> a = b
+
+predicate shelf1 shelf
+function numberOfBooks1 shelf : int
+function id1 shelf : int
+predicate sCK1 = forall a : shelf. (numberOfBooks1 a) > 0
+predicate sPK1 = forall a,b : shelf. ((shelf1 a) /\ (shelf1 b) /\ ((id1 a) = (id1 b))) -> a = b
+
+predicate fk1 = forall a : book. (book1 a) -> (exists b : shelf. (shelf1 b) /\ ((shelfId1 a) = (id1 b)))
+
+constant i1 : int
+predicate r1 = (i1 = 0)
+
+constant error1 : int
+predicate r4 = (error1 = 0)
+
+constant theshelf1 : int
+
+constant shelves1Size : int
+function shelves1List int : shelf
+function shelves1InvertedList shelf : int
+predicate shelves1Trigger int 
+predicate r5 = (shelves1Size >= 0) /\ ((shelves1Size = 0) -> forall c : shelf. not ((shelf1 c) /\ ((id1 c) = theshelf1)))
+predicate r6 = forall c : shelf. ((shelf1 c) /\ ((id1 c) = theshelf1)) ->
+   	(((shelves1InvertedList c) >= 0) /\ ((shelves1InvertedList c) < shelves1Size))
+predicate r7 = forall c : shelf. ((shelf1 c) /\ ((id1 c) = theshelf1)) -> (c = (shelves1List (shelves1InvertedList c)))
+predicate r8 = forall i : int. ((i >= 0) /\ (i < shelves1Size)) -> 
+   	(i = (shelves1InvertedList (shelves1List i)))
+predicate r9 = forall i : int.  ((i >= 0) /\ (i < shelves1Size)) -> 
+   	   ((shelf1 (shelves1List i)) /\ ((id1 (shelves1List i)) =  theshelf1) )
+predicate r10 = (0 >= shelves1Size) -> (shelves1Trigger 1)
+predicate r11 = forall i : int. 
+   ((i >= 0) /\ (i < shelves1Size)) -> (shelves1Trigger (i + 1)) 
+
+predicate r12 = (shelves1Size >= 1)
+
+function numberOfBooks2 shelf : int
+predicate r13 = forall p : shelf. (((shelf1 p) /\ (not ((id1 p) = theshelf1))) \/ (not (shelf1 p))) -> ((numberOfBooks2 p) = (numberOfBooks1 p))
+predicate r14 = forall p : shelf.  ((shelf1 p) /\ ((id1 p) = theshelf1)) -> ((numberOfBooks2 p) = ((numberOfBooks1 p) + 1))
+predicate r15 = forall a : shelf.  (numberOfBooks2 a) > 0
+
+constant newbooks1 : int
+
+
+predicate r16 = (exists a : book. (book1 a) /\ ((code1 a) = newbooks1)) \/ (forall a : shelf. (shelf1 a) -> (not ((id1 a) = theshelf1)))
+
+constant error2 : int
+predicate r20 = (error2 = 1)
+
+predicate r21 = (not (error2 = 0))
+
+constant i2 : int
+predicate r22 = (i2 = i1 + 1)
+ 
+goal G: not (bPK1 /\ sCK1 /\ sPK1 /\ fk1 /\ r1 /\ r4 /\ r5 /\ r6 /\ r7 /\ r8 /\ r9 /\ r10 /\ r11 /\ r12 /\ r13 /\ r14 /\ r15 /\ r16 /\ r20 /\ r21 /\ r22 ) 
+
+end
