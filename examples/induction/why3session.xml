@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../induction.mlw" expanded="true">
+<theory name="Hyps" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+</theory>
+<theory name="Induction1" sum="9221b97d5cf79194e00ff2b0ad12ab27" expanded="true">
+ <goal name="SimpleInduction.base" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="SimpleInduction.induction_step" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+ </goal>
+ <goal name="G" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="Induction2" sum="758b34abfd620b640c0847bc03ffba3d" expanded="true">
+ <goal name="G" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+</theory>
+<theory name="LemmaFunction1" sum="0b97221ee56665c396f229c342892274" expanded="true">
+ <goal name="WP_parameter ind" expl="VC for ind" expanded="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+ </goal>
+ <goal name="G" expanded="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+</theory>
+<theory name="LemmaFunction2" sum="bac118e1088f3adc890ccd3ff1bf0913" expanded="true">
+ <goal name="WP_parameter ind" expl="VC for ind" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+ </goal>
+ <goal name="G" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+</theory>
+<theory name="LemmaFunction3" sum="5452936ba24ac5f71b4ccf89f38e7496" expanded="true">
+ <goal name="WP_parameter ind" expl="VC for ind" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
+ </goal>
+ <goal name="G" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
