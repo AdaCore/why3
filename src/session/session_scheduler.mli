@@ -159,10 +159,10 @@ module Make(O: OBSERVER) : sig
   val run_external_proof_v3 :
     O.key Session.env_session -> t -> O.key Session.proof_attempt ->
     (O.key Session.proof_attempt -> Whyconf.prover ->
-     int -> Call_provers.prover_result option -> run_external_status -> unit) ->
+     int * int * int -> Call_provers.prover_result option -> run_external_status -> unit) ->
     unit
   (** [run_external_proof_v3 env_session sched pa callback] the
-      callback is applied with [callback pa p timelimit old_result
+      callback is applied with [callback pa p limits old_result
       status]. run_external_proof_v3 don't change the existing proof
       attempt just can add new by O.uninstalled_prover. Be aware since
       the session is not modified there is no test to see if the
@@ -255,24 +255,24 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     obsolete_only:bool ->
     context_unproved_goals_only:bool -> O.key any -> unit
-    (** [replay es sched ~obsolete_only ~context_unproved_goals_only a]
-        reruns proofs under [a]
-        if [obsolete_only] is set then does not rerun non-obsolete proofs
-        if [context_unproved_goals_only] is set then don't rerun proofs
-        already 'valid' (FIXME: its the opposite, no?)
-    *)
+  (** [replay es sched ~obsolete_only ~context_unproved_goals_only
+        a] reruns proofs under [a] if [obsolete_only] is set then does
+        not rerun non-obsolete proofs if [context_unproved_goals_only]
+        is set then only rerun proofs whose previous answer was
+        'valid' *)
 
   val check_all:
     ?release:bool -> (** Can all the goals be released at the end? def: false *)
     ?filter:(O.key proof_attempt -> bool) ->
     O.key env_session -> t ->
-    callback:((Ident.ident * Whyconf.prover * int * report) list -> unit) ->
+    callback:((Ident.ident * Whyconf.prover * (int * int * int) * report) list -> unit) ->
     unit
-    (** [check_all session callback] reruns all the proofs of the
+  (** [check_all session callback] reruns all the proofs of the
         session, and reports for all proofs the current result and the
-        new one (does not change the session state) When finished,
-        calls the callback with the reports which are 4-uples (goal
-        name, prover, timelimit, report) *)
+        new one (does not change the session state). When finished,
+        calls the callback with the reports which are 4-uples [(goal
+        name, prover, limits, report)] where [limits] is a triple
+        [(timelimit, memlimit, stepslimit)] *)
 
   val play_all :
     O.key env_session -> t -> callback:(unit-> unit) ->

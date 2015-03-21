@@ -1149,6 +1149,7 @@ and expr_fun ~keep_loc uloc env pvl dsp de =
 
 (*
 let val_decl ?(keep_loc=true) (id,_,_,_,_,_ as vald) =
+  ignore keep_loc;
   reunify_regions ();
   Loc.try2 ?loc:id.pre_loc val_decl env_empty vald
 *)

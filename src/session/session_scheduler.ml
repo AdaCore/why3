@@ -445,20 +445,22 @@ let fuzzy_proof_time nres ores =
     Done { res' with Call_provers.pr_time = told }
   | _, _ -> nres
 
+let dummy_limits = (0,0,0)
+
 (** run_external_proof_v3 doesn't modify existing proof attempt, it can just
     create new one by find_prover *)
 let run_external_proof_v3 eS eT a callback =
   match find_prover eS a with
   | None ->
-    callback a a.proof_prover 0 None Starting;
+    callback a a.proof_prover dummy_limits None Starting;
     (* nothing to do *)
-    callback a a.proof_prover 0 None MissingProver
+    callback a a.proof_prover dummy_limits None MissingProver
   | Some(ap,npc,a) ->
-    callback a ap 0 None Starting;
+    callback a ap dummy_limits None Starting;
     if a.proof_edited_as = None &&
        npc.prover_config.Whyconf.interactive
     then begin
-      callback a ap 0 None (MissingFile "unedited")
+      callback a ap dummy_limits None (MissingFile "unedited")
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
@@ -474,7 +476,7 @@ let run_external_proof_v3 eS eT a callback =
       let command = Whyconf.get_complete_command npc.prover_config stepslimit in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
-        callback a ap timelimit
+        callback a ap (timelimit,memlimit,stepslimit)
           (match previous_result with Done res -> Some res | _ -> None)
           (StatusChange result) in
       try
@@ -492,13 +494,13 @@ let run_external_proof_v3 eS eT a callback =
           eT
           (goal_task_or_recover eS a.proof_parent)
       with NoFile f ->
-        callback a ap 0 None (MissingFile f)
+        callback a ap dummy_limits None (MissingFile f)
     end
 
 (** run_external_proof_v2 modify the session according to the current state *)
 let run_external_proof_v2 eS eT a callback =
   let previous_res = ref (a.proof_state,a.proof_obsolete) in
-  let callback a ap timelimit previous state =
+  let callback a ap limits previous state =
     begin match state with
     | Starting -> previous_res := (a.proof_state,a.proof_obsolete)
     | MissingFile _ ->
@@ -516,7 +518,7 @@ let run_external_proof_v2 eS eT a callback =
       end
     | _ -> ()
     end;
-    callback a ap timelimit previous state
+    callback a ap limits previous state
   in
   run_external_proof_v3 eS eT a callback
 
@@ -681,29 +683,29 @@ type report =
   | Edited_file_absent of string
   | No_former_result of Call_provers.prover_result
 
-let push_report report (g,p,t,r) =
-  (g.goal_name,p,t,r)::report
+let push_report report (g,p,limits,r) =
+  (g.goal_name,p,limits,r)::report
 
 let check_external_proof eS eT todo a =
-  let callback a ap tl old s =
+  let callback a ap limits old s =
     let g = a.proof_parent in
     match s with
     | Starting ->
       Todo.start todo
     | MissingFile f ->
-      Todo._done todo (g, ap, tl, Edited_file_absent f)
+      Todo._done todo (g, ap, limits, Edited_file_absent f)
     | MissingProver ->
-      Todo._done todo (g, ap, tl, Prover_not_installed)
+      Todo._done todo (g, ap, limits, Prover_not_installed)
     | StatusChange (Scheduled | Running) -> ()
     | StatusChange (Interrupted | Unedited | JustEdited) -> assert false
     | StatusChange (InternalFailure e) ->
-      Todo._done todo (g, ap, tl, CallFailed e)
+      Todo._done todo (g, ap, limits, CallFailed e)
     | StatusChange (Done res) ->
       let r =
         match old with
         | None -> No_former_result res
         | Some old -> Result (res, old) in
-      Todo._done todo (g, ap, tl, r) in
+      Todo._done todo (g, ap, limits, r) in
   run_external_proof_v2 eS eT a callback
 
 let rec goal_iter_proof_attempt_with_release ~release f g =

@@ -714,7 +714,7 @@ let merge_config config filename =
   { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
 
-let debug = Debug.register_info_flag "whyconf"
+let _debug = Debug.register_info_flag "whyconf"
   ~desc:"Print@ debugging@ messages@ about@ whyconf."
 
 let save_config config =
