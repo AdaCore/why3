@@ -195,6 +195,8 @@ rule token = parse
       { LAMBDA }
   | "."
       { DOT }
+  | ".."
+      { DOTDOT }
   | "|"
       { BAR }
   | "="
