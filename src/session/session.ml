@@ -549,9 +549,9 @@ let opt pr lab fmt = function
   | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
 let save_result fmt r =
-  let steps = if  r.Call_provers.pr_steps >= 0 then 
-		Some  r.Call_provers.pr_steps 
-	      else 
+  let steps = if  r.Call_provers.pr_steps >= 0 then
+		Some  r.Call_provers.pr_steps
+	      else
 		None
   in
   fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"%a/>"
@@ -754,7 +754,7 @@ let save_file ctxt fmt _ f =
   List.iter (save_theory ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
-let save_prover ctxt fmt p (timelimits,memlimits) provers =
+let get_prover_to_save prover_ids p (timelimits,memlimits) provers =
   let mostfrequent_timelimit,_ =
     Hashtbl.fold
       (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
@@ -769,31 +769,34 @@ let save_prover ctxt fmt p (timelimits,memlimits) provers =
   in
   let id =
     try
-      PHprover.find ctxt.prover_ids p
+      PHprover.find prover_ids p
     with Not_found ->
       (* we need to find an unused prover id *)
       let occurs = Hashtbl.create 7 in
-      PHprover.iter (fun _ n -> Hashtbl.add occurs n ()) ctxt.prover_ids;
+      PHprover.iter (fun _ n -> Hashtbl.add occurs n ()) prover_ids;
       let id = ref 0 in
       try
         while true do
           try
             let _ = Hashtbl.find occurs !id in incr id
           with Not_found -> raise Exit
-            done;
+        done;
         assert false
       with Exit ->
-        PHprover.add ctxt.prover_ids p !id;
+        PHprover.add prover_ids p !id;
         !id
   in
+  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers
+
+
+let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_memlimit) =
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
                version=\"%a\"%a@ timelimit=\"%d\"@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
     p.C.prover_altern
-    mostfrequent_timelimit mostfrequent_memlimit;
-  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers
+    mostfrequent_timelimit mostfrequent_memlimit
 
 let save fname shfname _config session =
   let ch = open_out fname in
@@ -809,19 +812,20 @@ let save fname shfname _config session =
   fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
   Tc.reset_dict ();
-  let ctxt =
-    { prover_ids = session.session_prover_ids;
-      provers = Mprover.empty;
-      ch_shapes = chsh;
-    }
-  in
+  let prover_ids = session.session_prover_ids in
   let provers =
-    PHprover.fold (save_prover ctxt fmt) (get_used_provers_with_stats session)
-      Mprover.empty
+    PHprover.fold (get_prover_to_save prover_ids)
+      (get_used_provers_with_stats session) Mprover.empty
   in
-  PHstr.iter
-    (save_file { ctxt with provers = provers; ch_shapes = chsh} fmt)
-    session.session_files;
+  let provers_to_save =
+    Mprover.fold
+      (fun p (id,mostfrequent_timelimit,mostfrequent_memlimit) acc ->
+        Mint.add id (p,mostfrequent_timelimit,mostfrequent_memlimit) acc)
+      provers Mint.empty
+  in
+  Mint.iter (save_prover fmt) provers_to_save;
+  let ctxt = { prover_ids = prover_ids; provers = provers; ch_shapes = chsh } in
+  PHstr.iter (save_file ctxt fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
   close_out ch;
@@ -1186,7 +1190,7 @@ let load_result r =
           try float_of_string (List.assoc "time" r.Xml.attributes)
           with Not_found -> 0.0
         in
-        let steps = 
+        let steps =
           try int_of_string (List.assoc "steps" r.Xml.attributes)
           with Not_found -> -1
         in
@@ -1502,6 +1506,7 @@ let load_session ~keygen session xml =
       in
       Mint.iter
         (fun id (p,_,_) ->
+          Debug.dprintf debug "prover %d: %a@." id Whyconf.print_prover p;
           PHprover.replace session.session_prover_ids p id)
         old_provers;
       Debug.dprintf debug "[Info] load_session: done@\n"
@@ -2476,6 +2481,9 @@ let update_session ~ctxt old_session env whyconf =
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
       old_session.session_dir
+  in
+  let new_session =
+    { new_session with session_prover_ids = old_session.session_prover_ids }
   in
   let will_recompute_shape =
     old_session.session_shape_version <> Termcode.current_shape_version in

@@ -1256,7 +1256,7 @@ let save_session () =
 
 
 let exit_function ?(destroy=false) () =
-  Gconfig.save_config ();
+  (* do not save automatically anymore Gconfig.save_config (); *)
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
@@ -2063,6 +2063,11 @@ let (_ : GMenu.image_menu_item) =
 
 
 (* Saving the session *)
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
+    ~label:"_Save config" ~callback:Gconfig.save_config
+    ()
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
