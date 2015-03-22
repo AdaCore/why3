@@ -3,14 +3,20 @@
 import "alt_ergo_common.drv"
 
 theory BuiltIn
+
+  (* Alt-Ergo >= 0.95 supports enumerated datatypes and records *)
+
   meta "eliminate_algebraic" "keep_enums"
   meta "eliminate_algebraic" "keep_recs"
+
 end
 
 
 theory int.EuclideanDivision
 
-  (* protection against wrongs semantics for negative arguments *)
+  (* protection against wrong semantics for negative arguments
+    last checked on 0.99.1: this is still needed
+  *)
 
   prelude "logic safe_eucl_div: int, int -> int"
   prelude "axiom safe_eucl_div_def: forall x, y:int. x >= 0 and y > 0 -> safe_eucl_div(x,y) = x / y"
@@ -25,7 +31,9 @@ end
 
 theory int.ComputerDivision
 
-  (* protection against wrongs semantics for negative arguments *)
+  (* protection against wrong semantics for negative arguments
+     last checked on 0.99.1: this is still needed
+  *)
 
   prelude "logic safe_comp_div: int, int -> int"
   prelude "axiom safe_comp_div_def: forall x, y:int. x >= 0 and y > 0 -> safe_comp_div(x,y) = x / y"
@@ -38,15 +46,6 @@ theory int.ComputerDivision
 
 end
 
-theory map.Map
-  syntax type  map "(%1,%2) farray"
-
-  syntax function get "(%1[%2])"
-  syntax function set "(%1[%2 <- %3])"
-
-  remove prop Select_eq
-  remove prop Select_neq
-end
 
 (*
 Local Variables:
