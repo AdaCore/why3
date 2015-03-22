@@ -7,12 +7,17 @@
 
 *)
 
-
 module SchorrWaite
 
-  use import bool.Bool
+  (*use import bool.Bool*)
   use import map.Map
   use import ref.Ref
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Mem as L
+  use import list.HdTlNoOpt
+  use import set.Fset as S
 
   (** a small component-as-array memory model *)
 
@@ -52,33 +57,101 @@ module SchorrWaite
     writes   { c }
     ensures  { !c = set (old !c) p v }
 
-  let rec schorr_waite (root: loc) : unit
-    requires { true }
-    ensures  { true }
-  =
-    let t = ref root in
+  val tl_stackNodes (stack : list loc) : list loc 
+    requires { stack <> Nil }
+    ensures  { result = tl stack }
+
+  (* start by defining the predicate 'reachable' (using the 
+     notion of path presented in the standard library, graph file);
+     then, start proving termination by adding the necessary
+     ghost data-structures *)
+
+  (* reachable (u, x) -> there is a finite path from node u to x *)
+
+  let rec lemma length_tl (l : list 'a) (* is this lemma really necessary? *)
+    requires { l <> Nil }
+    ensures  { length (tl l) < length l }
+    variant  { l }
+  = match l with
+    | Nil        -> ()
+    | Cons _ Nil -> ()
+    | Cons _ y   -> length_tl y
+    end
+
+  predicate reachable loc loc 
+
+  axiom reachable_refl :
+    forall p : loc. reachable p p
+
+  function bool_to_int (b : bool) : int = if b then 1 else 0
+
+  let rec schorr_waite (root: loc) (graph : set loc) : unit
+    requires { S.mem root graph }
+    (* what is set S --> closed under children of all vertices *)
+    requires { forall n : loc. S.mem n graph -> 
+    	       n <> null /\ 
+	       (!left[n] = null \/ S.mem !left[n] graph) /\
+	       (!right[n] = null \/ S.mem !right[n] graph) }
+    (* graph starts with nothing marked and no child currently visited *)
+    requires { forall n : loc. S.mem n graph ->
+    	       not !m[n] /\ not !c[n] }
+    (* the structure of the graph is not changed *)
+    ensures  { forall n : loc. S.mem n graph ->
+    	       (old !left)[n] = !left[n] /\
+	       (old !right)[n] = !right[n] }
+    (* all the non-null vertices reachable from root
+       are marked at the end of the algorithm *)
+    ensures  { forall n : loc. 
+    	       S.mem n graph /\ n <> null /\ reachable root n ->
+	       !m[n] }
+    (* forall non-reachable vertices the mark remains 
+       the same as in the pre-state *)
+    ensures  { forall n : loc. 
+    	       S.mem n graph /\ not reachable root n ->
+	       !m[n] = (old !m)[n] }
+  = let t = ref root in
     let p = ref null in
-    while !p <> null || !t <> null && not !m[!t] do
+    let ghost stackNodes = ref Nil in
+    let ghost unmarkedNodes = ref graph in
+    let ghost cFalseNodes = ref graph in
+    while !p <> null || (!t <> null && not !m[!t]) do
+      invariant { S.mem !t graph /\ not (L.mem !t !stackNodes) }
+      invariant { length !stackNodes = 0 <-> !p = null }
+      invariant { forall n : loc. S.mem n graph /\
+      		  not !m[n] -> S.mem n !unmarkedNodes }
+      invariant { forall n : loc. S.mem n graph /\ 
+      		  not !c[n] -> S.mem n !cFalseNodes }
+      invariant { forall n : loc. L.mem n !stackNodes ->
+      		  S.mem n graph }
+      (*invariant { !p <> null -> S.mem !p graph }*)
+      variant   { S.cardinal !unmarkedNodes, S.cardinal !cFalseNodes, length !stackNodes }
       if !t = null || !m[!t] then begin
+        (*assert { S.mem !p graph };*)
         if !c[!p] then begin (* pop *)
           let q = !t in
           t := !p;
+	  stackNodes := tl_stackNodes !stackNodes;
           p := !right[!p];
           set_right !t q;
         end else begin (* swing *)
+	  assert { S.mem !p !cFalseNodes };
           let q = !t in
           t := get_right !p;
           set_right !p (get_left !p);
           set_left !p q;
+	  cFalseNodes := S.remove !p !cFalseNodes;
           set_c !p true;
         end
       end else begin (* push *)
         let q = !p in
         p := !t;
+	stackNodes := Cons !p !stackNodes;
         t := get_left !t;
         set_left !p q;
         set_m !p true;
-        set_c !p false
+        (*set_c !p false;*) (* if we assume at the pre-condition that all nodes start with c = 0,
+		   	       then this redundant *)
+	unmarkedNodes := S.remove !p !unmarkedNodes
       end
     done
 
