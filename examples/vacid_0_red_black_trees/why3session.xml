@@ -135,8 +135,8 @@
  <goal name="almost_rbtree_rbtree_black">
  <proof prover="7" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
- <goal name="WP_parameter lbalance" expl="VC for lbalance">
- <transf name="split_goal_wp">
+ <goal name="WP_parameter lbalance" expl="VC for lbalance" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter lbalance.1" expl="1. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter lbalance.1.1" expl="1.">
@@ -713,8 +713,8 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter lbalance.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.71" steps="1172"/></proof>
+  <goal name="WP_parameter lbalance.11" expl="11. postcondition" expanded="true">
+  <proof prover="0"><result status="valid" time="1.20" steps="1173"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.12" expl="12. postcondition">
   <proof prover="4"><result status="valid" time="0.04"/></proof>

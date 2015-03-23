@@ -133,6 +133,8 @@ let print_result_prov proofs prov fmt=
                   fprintf fmt "& \\timeout{%ds} " pr.S.proof_timelimit
 		| Call_provers.OutOfMemory ->
                   fprintf fmt "& \\outofmemory{%dM} " pr.S.proof_memlimit
+		| Call_provers.StepsLimitExceeded ->
+                  fprintf fmt "& \\stepslimitexceeded "
 		| Call_provers.Unknown _ ->
                   fprintf fmt "& \\unknown{%.2f} " res.Call_provers.pr_time
 		| Call_provers.Failure _ ->

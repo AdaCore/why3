@@ -18,9 +18,9 @@ prelude "(set-logic AUFNIRA)"
 
 printer "smtv2"
 filename "%f-%t-%g.smt2"
-unknown "^\\(unknown\\|sat\\|Fail\\)" ""
+unknown "^\\(unknown\\|sat\\|Fail\\)$" ""
 time "why3cpulimit time : %s s"
-valid "^unsat"
+valid "^unsat$"
 
 
 theory BuiltIn

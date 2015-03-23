@@ -17,9 +17,11 @@ type prover_answer =
   | Invalid
       (** The task is invalid *)
   | Timeout
-      (** the task timeout, ie it takes more time than specified *)
+      (** the task timeouts, ie it takes more time than specified *)
   | OutOfMemory
-      (** the task timeout, ie it takes more time than specified *)
+      (** the task runs out of memory *)
+  | StepsLimitExceeded
+      (** the task required more steps than the limit provided *)
   | Unknown of string
       (** The prover can't determine if the task is valid *)
   | Failure of string

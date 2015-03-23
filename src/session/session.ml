@@ -562,6 +562,7 @@ let save_result fmt r =
        | Call_provers.HighFailure -> "highfailure"
        | Call_provers.Timeout -> "timeout"
        | Call_provers.OutOfMemory -> "outofmemory"
+       | Call_provers.StepsLimitExceeded -> "stepslimitexceeded"
        | Call_provers.Invalid -> "invalid")
     r.Call_provers.pr_time
     (opt pp_print_int "steps") steps

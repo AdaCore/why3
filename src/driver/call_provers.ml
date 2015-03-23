@@ -87,6 +87,7 @@ type prover_answer =
   | Invalid
   | Timeout
   | OutOfMemory
+  | StepsLimitExceeded
   | Unknown of string
   | Failure of string
   | HighFailure
@@ -111,6 +112,7 @@ let print_prover_answer fmt = function
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
+  | StepsLimitExceeded -> fprintf fmt "Steps limit exceeded"
   | Unknown "" -> fprintf fmt "Unknown"
   | Failure "" -> fprintf fmt "Failure"
   | Unknown s -> fprintf fmt "Unknown (%s)" s
@@ -139,7 +141,7 @@ let rec grep out l = match l with
       begin try
         ignore (Str.search_forward re out 0);
         match pa with
-        | Valid | Invalid | Timeout | OutOfMemory -> pa
+        | Valid | Invalid | Timeout | OutOfMemory | StepsLimitExceeded -> pa
         | Unknown s -> Unknown (Str.replace_matched s out)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false

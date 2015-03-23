@@ -415,6 +415,7 @@ let adapt_limits a =
       match r with
       | Call_provers.OutOfMemory -> increased_time, a.proof_memlimit
       | Call_provers.Timeout -> a.proof_timelimit, increased_mem
+      | Call_provers.StepsLimitExceeded
       | Call_provers.Valid
       | Call_provers.Unknown _
       | Call_provers.Invalid -> increased_time, increased_mem
@@ -596,66 +597,6 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
       prover_on_goal_or_children eS eT
         ~context_unproved_goals_only ~timelimit ~memlimit pr m.metas_goal
 
-(**********************************)
-(* method: replay obsolete proofs *)
-(**********************************)
-
-(* in the default context, a proof should be replayed if
-   . it was successful or
-   . it was just edited
-*)
-let proof_should_be_replayed a =
-  match a.proof_state with
-    | Done { Call_provers.pr_answer = Call_provers.Valid }
-    | JustEdited -> true
-    | _ -> false
-
-let rec replay_on_goal_or_children eS eT
-    ~obsolete_only ~context_unproved_goals_only g =
-  iter_goal
-    (fun a ->
-       if not obsolete_only || a.proof_obsolete then
-         if not context_unproved_goals_only || proof_should_be_replayed a
-         then run_external_proof eS eT a)
-    (iter_transf
-       (replay_on_goal_or_children eS eT
-          ~obsolete_only ~context_unproved_goals_only)
-    )
-    (iter_metas
-       (replay_on_goal_or_children eS eT
-          ~obsolete_only ~context_unproved_goals_only)
-    )
-    g
-
-let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
-  match a with
-    | Goal g ->
-        replay_on_goal_or_children eS eT
-          ~obsolete_only ~context_unproved_goals_only g
-    | Theory th ->
-        List.iter
-          (replay_on_goal_or_children eS eT
-             ~obsolete_only ~context_unproved_goals_only)
-          th.theory_goals
-    | File file ->
-        List.iter
-          (fun th ->
-             List.iter
-               (replay_on_goal_or_children eS eT
-                  ~obsolete_only ~context_unproved_goals_only)
-               th.theory_goals)
-          file.file_theories
-    | Proof_attempt a ->
-        replay_on_goal_or_children eS eT
-          ~obsolete_only ~context_unproved_goals_only a.proof_parent
-    | Transf tr ->
-        List.iter
-          (replay_on_goal_or_children eS eT
-             ~obsolete_only ~context_unproved_goals_only)
-          tr.transf_goals
-    | Metas m ->
-      replay_on_goal_or_children eS eT
-        ~obsolete_only ~context_unproved_goals_only m.metas_goal
 
 
 (***********************************)
@@ -733,6 +674,68 @@ let check_all ?(release=false) ?filter eS eT ~callback =
         file.file_theories)
     eS.session.session_files;
   Todo.stop todo
+
+
+(**********************************)
+(* method: replay obsolete proofs *)
+(**********************************)
+
+(* in the default context, a proof should be replayed if
+   . it was successful or
+   . it was just edited
+*)
+let proof_should_be_replayed a =
+  match a.proof_state with
+    | Done { Call_provers.pr_answer = Call_provers.Valid }
+    | JustEdited -> true
+    | _ -> false
+
+let rec replay_on_goal_or_children eS eT
+    ~obsolete_only ~context_unproved_goals_only g =
+  iter_goal
+    (fun a ->
+       if not obsolete_only || a.proof_obsolete then
+         if not context_unproved_goals_only || proof_should_be_replayed a
+         then run_external_proof eS eT a)
+    (iter_transf
+       (replay_on_goal_or_children eS eT
+          ~obsolete_only ~context_unproved_goals_only)
+    )
+    (iter_metas
+       (replay_on_goal_or_children eS eT
+          ~obsolete_only ~context_unproved_goals_only)
+    )
+    g
+
+let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
+  match a with
+    | Goal g ->
+        replay_on_goal_or_children eS eT
+          ~obsolete_only ~context_unproved_goals_only g
+    | Theory th ->
+        List.iter
+          (replay_on_goal_or_children eS eT
+             ~obsolete_only ~context_unproved_goals_only)
+          th.theory_goals
+    | File file ->
+        List.iter
+          (fun th ->
+             List.iter
+               (replay_on_goal_or_children eS eT
+                  ~obsolete_only ~context_unproved_goals_only)
+               th.theory_goals)
+          file.file_theories
+    | Proof_attempt a ->
+        replay_on_goal_or_children eS eT
+          ~obsolete_only ~context_unproved_goals_only a.proof_parent
+    | Transf tr ->
+        List.iter
+          (replay_on_goal_or_children eS eT
+             ~obsolete_only ~context_unproved_goals_only)
+          tr.transf_goals
+    | Metas m ->
+      replay_on_goal_or_children eS eT
+        ~obsolete_only ~context_unproved_goals_only m.metas_goal
 
 
 (***********************************)

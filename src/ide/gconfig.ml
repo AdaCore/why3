@@ -265,12 +265,14 @@ let image_unknown = ref !image_default
 let image_invalid = ref !image_default
 let image_timeout = ref !image_default
 let image_outofmemory = ref !image_default
+let image_stepslimitexceeded = ref !image_default
 let image_failure = ref !image_default
 let image_valid_obs = ref !image_default
 let image_unknown_obs = ref !image_default
 let image_invalid_obs = ref !image_default
 let image_timeout_obs = ref !image_default
 let image_outofmemory_obs = ref !image_default
+let image_stepslimitexceeded_obs = ref !image_default
 let image_failure_obs = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
@@ -310,12 +312,14 @@ let iconname_unknown = ref ""
 let iconname_invalid = ref ""
 let iconname_timeout = ref ""
 let iconname_outofmemory = ref ""
+let iconname_stepslimitexceeded = ref ""
 let iconname_failure = ref ""
 let iconname_valid_obs = ref ""
 let iconname_unknown_obs = ref ""
 let iconname_invalid_obs = ref ""
 let iconname_timeout_obs = ref ""
 let iconname_outofmemory_obs = ref ""
+let iconname_stepslimitexceeded_obs = ref ""
 let iconname_failure_obs = ref ""
 let iconname_yes = ref ""
 let iconname_no = ref ""
@@ -354,12 +358,14 @@ let load_icon_names () =
   iconname_invalid := get_icon_name "invalid";
   iconname_timeout := get_icon_name "timeout";
   iconname_outofmemory := get_icon_name "outofmemory";
+  iconname_stepslimitexceeded := get_icon_name "stepslimitexceeded";
   iconname_failure := get_icon_name "failure";
   iconname_valid_obs := get_icon_name "valid_obs";
   iconname_unknown_obs := get_icon_name "unknown_obs";
   iconname_invalid_obs := get_icon_name "invalid_obs";
   iconname_timeout_obs := get_icon_name "timeout_obs";
   iconname_outofmemory_obs := get_icon_name "outofmemory_obs";
+  iconname_stepslimitexceeded_obs := get_icon_name "stepslimitexceeded_obs";
   iconname_failure_obs := get_icon_name "failure_obs";
   iconname_yes := get_icon_name "yes";
   iconname_no := get_icon_name "no";
@@ -387,12 +393,14 @@ let resize_images size =
   image_invalid := image ~size !iconname_invalid;
   image_timeout := image ~size !iconname_timeout;
   image_outofmemory := image ~size !iconname_outofmemory;
+  image_stepslimitexceeded := image ~size !iconname_stepslimitexceeded;
   image_failure := image ~size !iconname_failure;
   image_valid_obs := image ~size !iconname_valid_obs;
   image_unknown_obs := image ~size !iconname_unknown_obs;
   image_invalid_obs := image ~size !iconname_invalid_obs;
   image_timeout_obs := image ~size !iconname_timeout_obs;
   image_outofmemory_obs := image ~size !iconname_outofmemory_obs;
+  image_stepslimitexceeded_obs := image ~size !iconname_stepslimitexceeded_obs;
   image_failure_obs := image ~size !iconname_failure_obs;
   image_yes := image ~size !iconname_yes;
   image_no := image ~size !iconname_no;
@@ -458,6 +466,8 @@ let show_legend_window () =
   i "   External prover reached the time limit\n";
   ib image_outofmemory;
   i "   External prover ran out of memory\n";
+  ib image_stepslimitexceeded;
+  i "   External prover exceeded the steps limit\n";
   ib image_unknown;
   i "   External prover answer not conclusive\n";
   ib image_failure;
