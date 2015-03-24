@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="MetiTarski" version="2.2" timelimit="60" memlimit="4000"/>
+<prover id="1" name="MetiTarski" version="2.4" timelimit="5" memlimit="1000"/>
 <file name="../metitarski.why" expanded="true">
 <theory name="P" sum="1d04567a049f848cb57260f3bbd2cdfa" expanded="true">
  <goal name="x_mul_x_pos" expanded="true">
@@ -29,6 +30,17 @@
  </goal>
  <goal name="MethodErrorWrong" expanded="true">
  <proof prover="0" memlimit="1000"><result status="unknown" time="3.24"/></proof>
+ </goal>
+</theory>
+<theory name="Power" sum="f1807c022587c3770e4e7984d0a322b9" expanded="true">
+ <goal name="G" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.17"/></proof>
+ </goal>
+ <goal name="G1" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.19"/></proof>
+ </goal>
+ <goal name="G2" expanded="true">
+ <proof prover="1" edited="metitarski-Power-G2_1.tptp"><result status="unknown" time="0.20"/></proof>
  </goal>
 </theory>
 </file>

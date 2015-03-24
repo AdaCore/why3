@@ -45,3 +45,16 @@ theory P3
 
 end
 
+
+theory Power
+
+use import real.RealInfix
+use import real.PowerReal
+
+goal G: false
+
+goal G1: forall x:real. x >. 2.0 -> (pow x 3.0) *. 2.0 >. 20.0
+
+goal G2: forall x:real. x >. 2.0 -> x >. 5.0
+
+end
