@@ -1,16 +1,38 @@
 
 * marks an incompatible change
 
+core
+  o steps limit for reliable replay of proofs, available for Alt-Ergo
+    and CVC4
+  o new transformations induction_pr and inversion_pr to reason with
+    inductive predicates
+
 library
-  * renamed library int.NumOfParam into int.NumOf; the predicate numof
+  * renamed theory int.NumOfParam into int.NumOf; the predicate numof
     now takes some higher-order predicate as argument (no more need
     for cloning). Similar change in modules array.NumOf...
+  * improved theory real.PowerReal
+  o new theory: sequences
+  o new theories for bitvectors, mapped to BV theories of SMT solvers
+    Z3 and CVC4
 
 provers
   o support for Coq 8.4pl5 (released Nov 7, 2014)
   o support for Z3 4.3.2 (released Oct 25, 2014)
   o support for MetiTarski 2.4 (released Oct 21, 2014)
   o support for Alt-Ergo 0.99.1 (released Dec 30, 2014)
+  o support for veriT 201410 (released Nov 2014)
+  o support for Psyche (experimental,
+    http://www.lix.polytechnique.fr/~lengrand/Psyche/)
+
+bug fixes:
+  o bug in interpreter in presence of nested mutable fields
+  o IDE: proofs in progress should never be "cleaned"
+  o IDE: display warnings after reload
+
+IDE:
+  o conf file not automatically saved anymore at exit
+  o right part of main window organized in tabs
 
 version 0.85, September 17, 2014
 ================================
