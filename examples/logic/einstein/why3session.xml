@@ -17,6 +17,7 @@
 <prover id="12" name="veriT" version="201310" timelimit="5" memlimit="4000"/>
 <prover id="13" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <prover id="14" name="Vampire" version="0.6" timelimit="20" memlimit="1000"/>
+<prover id="15" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
 <file name="../einstein.why" expanded="true">
 <theory name="Bijection" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
@@ -38,6 +39,7 @@
  <proof prover="12"><result status="valid" time="0.02"/></proof>
  <proof prover="13"><result status="unknown" time="0.06"/></proof>
  <proof prover="14"><result status="valid" time="1.50"/></proof>
+ <proof prover="15"><result status="valid" time="2.86" steps="642"/></proof>
  </goal>
  <goal name="Wrong" expanded="true">
  <proof prover="0"><result status="unknown" time="15.98"/></proof>
@@ -55,6 +57,7 @@
  <proof prover="12"><result status="timeout" time="4.97"/></proof>
  <proof prover="13"><result status="unknown" time="0.06"/></proof>
  <proof prover="14" timelimit="5"><result status="timeout" time="10.08"/></proof>
+ <proof prover="15"><result status="unknown" time="1.33"/></proof>
  </goal>
  <goal name="G2" expanded="true">
  <proof prover="0"><result status="valid" time="12.12" steps="1747"/></proof>
@@ -72,6 +75,7 @@
  <proof prover="12"><result status="valid" time="0.02"/></proof>
  <proof prover="13" timelimit="3"><result status="unknown" time="0.06"/></proof>
  <proof prover="14"><result status="valid" time="1.27"/></proof>
+ <proof prover="15"><result status="valid" time="1.82" steps="523"/></proof>
  </goal>
 </theory>
 </file>
