@@ -548,19 +548,19 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.verbose <- 1 - c.verbose)
   in
 *)
+  let page_pack = page#pack ?from:None ?expand:None ?fill:None ?padding:None in
   let external_processes_options_frame =
-    GBin.frame ~label:"External provers options"
-      ~packing:page#pack ()
+    GBin.frame ~label:"External provers options" ~packing:page_pack ()
   in
   let vb = GPack.vbox ~homogeneous:false
     ~packing:external_processes_options_frame#add ()
   in
   (* time limit *)
-  let width = 200 and xalign = 0.0 in
-  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add ()
-  in
+  let width = 300 and xalign = 0.0 in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in
+  let hb_pack = hb#pack ~expand:false ?from:None ?fill:None ?padding:None in
   let _ = GMisc.label ~text:"Time limit (in sec.): " ~width ~xalign
-    ~packing:(hb#pack ~expand:false) () in
+    ~packing:hb_pack () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:86_400. ~step_incr:5. ();
   timelimit_spin#adjustment#set_value (float_of_int c.session_time_limit);
@@ -569,10 +569,10 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.session_time_limit <- timelimit_spin#value_as_int)
   in
   (* mem limit *)
-  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add ()
-  in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in
+  let hb_pack = hb#pack ~expand:false ?from:None ?fill:None ?padding:None in
   let _ = GMisc.label ~text:"Memory limit (in Mb): " ~width ~xalign
-    ~packing:(hb#pack ~expand:false) () in
+    ~packing:hb_pack () in
   let memlimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   memlimit_spin#adjustment#set_bounds ~lower:0. ~upper:16_000. ~step_incr:500. ();
   memlimit_spin#adjustment#set_value (float_of_int c.session_mem_limit);
@@ -581,10 +581,10 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.session_mem_limit <- memlimit_spin#value_as_int)
   in
   (* nb of processes *)
-  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add ()
-  in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in
+  let hb_pack = hb#pack ~expand:false ?from:None ?fill:None ?padding:None in
   let _ = GMisc.label ~text:"Nb of processes: " ~width ~xalign
-    ~packing:(hb#pack ~expand:false) () in
+    ~packing:hb_pack () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds
     ~lower:1. ~upper:64. ~step_incr:1. ();
@@ -607,8 +607,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> save_for_future := not !save_for_future)
   in
   let display_options_frame =
-    GBin.frame ~label:"Display options"
-      ~packing:page#pack ()
+    GBin.frame ~label:"Display options" ~packing:page_pack ()
   in
   (* options for task display *)
   let display_options_box =
@@ -617,10 +616,9 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   in
   (* max boxes *)
   let width = 200 and xalign = 0.0 in
-  let hb = GPack.hbox ~homogeneous:false ~packing:display_options_box#add ()
-  in
-  let _ = GMisc.label ~text:"Max boxes: " ~width ~xalign
-    ~packing:(hb#pack ~expand:false) () in
+  let hb = GPack.hbox ~homogeneous:false ~packing:display_options_box#add () in
+  let hb_pack = hb#pack ~expand:false ?fill:None ?from:None ?padding:None in
+  let _ = GMisc.label ~text:"Max boxes: " ~width ~xalign ~packing:hb_pack () in
   let max_boxes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   max_boxes_spin#adjustment#set_bounds ~lower:0. ~upper:1000. ~step_incr:1. ();
   max_boxes_spin#adjustment#set_value (float_of_int c.max_boxes);
@@ -676,30 +674,33 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let set_saving_policy n () = c.saving_policy <- n in
   let saving_policy_frame =
     GBin.frame ~label:"Session saving policy"
-      ~packing:page#pack ()
+      ~packing:page_pack ()
   in
   let saving_policy_box =
     GPack.button_box
       `VERTICAL ~border_width:5 ~spacing:5
       ~packing:saving_policy_frame#add ()
   in
+  let saving_policy_box_pack =
+    saving_policy_box#pack ?from:None ?expand:None ?fill:None ?padding:None
+  in
   let choice0 =
     GButton.radio_button
       ~label:"always save on exit"
       ~active:(c.saving_policy = 0)
-      ~packing:saving_policy_box#pack ()
+      ~packing:saving_policy_box_pack ()
   in
   let choice1 =
     GButton.radio_button
       ~label:"never save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 1)
-      ~packing:saving_policy_box#pack ()
+      ~packing:saving_policy_box_pack ()
   in
   let choice2 =
     GButton.radio_button
       ~label:"ask whether to save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 2)
-      ~packing:saving_policy_box#pack ()
+      ~packing:saving_policy_box_pack ()
   in
   let (_ : GtkSignal.id) =
     choice0#connect#toggled ~callback:(set_saving_policy 0)
@@ -711,7 +712,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     choice2#connect#toggled ~callback:(set_saving_policy 2)
   in
   let (_ : GPack.box) =
-    GPack.vbox ~packing:(page#pack ~expand:true) ()
+    GPack.vbox ~packing:page_pack ()
   in
   save_for_future
 
@@ -723,19 +724,23 @@ let provers_page c (notebook:GPack.notebook) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
-  let hbox = GPack.hbox ~packing:(page#pack ~fill:true ~expand:true) () in
+  let page_pack = page#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let hbox = GPack.hbox ~packing:page_pack () in
+  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   let scrollview =
   try
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
-      ~packing:(hbox#pack ~fill:true ~expand:true) ()
+      ~packing:hbox_pack ()
   with Gtk.Error _ -> assert false
   in let () = scrollview#set_shadow_type `OUT in
   let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
-  let hbox = GPack.hbox ~packing:(vbox#pack ~fill:true ~expand:true) () in
+  let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let hbox = GPack.hbox ~packing:vbox_pack () in
+  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   (* show/hide provers *)
   let frame =
-    GBin.frame ~label:"Prover button in the left toolbar"
-      ~packing:(hbox#pack ~fill:true ~expand:true) () in
+    GBin.frame ~label:"Prover button in the left toolbar" ~packing:hbox_pack ()
+  in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:frame#add () in
@@ -760,8 +765,7 @@ let provers_page c (notebook:GPack.notebook) =
     (Whyconf.get_provers c.config);
   (* default prover *)
   let frame2 =
-    GBin.frame ~label:"Default prover"
-      ~packing:(hbox#pack ~fill:true ~expand:true) () in
+    GBin.frame ~label:"Default prover" ~packing:hbox_pack () in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:frame2#add () in
@@ -790,9 +794,9 @@ let alternatives_frame c (notebook:GPack.notebook) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
+  let page_pack = page#pack ?fill:None ?expand:None ?from:None ?padding:None in
   let frame =
-    GBin.frame ~label:"Click to remove a setting"
-      ~packing:page#pack ()
+    GBin.frame ~label:"Click to remove a setting" ~packing:page_pack ()
   in
   let box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -817,9 +821,8 @@ let alternatives_frame c (notebook:GPack.notebook) =
     in ()
   in
   Mprover.iter iter (get_policies c.config);
-  let _fillbox =
-    GPack.vbox ~packing:(page#pack ~expand:true) ()
-  in
+  let page_pack = page#pack ?fill:None ~expand:true ?from:None ?padding:None in
+  let _fillbox = GPack.vbox ~packing:page_pack () in
   ()
 
 let editors_page c (notebook:GPack.notebook) =
@@ -828,14 +831,17 @@ let editors_page c (notebook:GPack.notebook) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
-  let hbox = GPack.hbox ~packing:(page#pack ~expand:true ~fill:true) () in
+  let page_pack = page#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let hbox = GPack.hbox ~packing:page_pack () in
+  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   let scrollview =
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
-      ~packing:(hbox#pack ~fill:true ~expand:true) ()
+      ~packing:hbox_pack ()
   in
   let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
+  let vbox_pack = vbox#pack ?fill:None ?expand:None ?from:None ?padding:None in
   let default_editor_frame =
-    GBin.frame ~label:"Default editor" ~packing:vbox#pack ()
+    GBin.frame ~label:"Default editor" ~packing:vbox_pack ()
   in
   let editor_entry =
    GEdit.entry ~text:c.default_editor ~packing:default_editor_frame#add ()
@@ -844,11 +850,9 @@ let editors_page c (notebook:GPack.notebook) =
     editor_entry#connect#changed ~callback:
       (fun () -> c.default_editor <- editor_entry#text)
   in
-  let frame =
-    GBin.frame ~label:"Specific editors"
-      ~packing:vbox#pack ()
-  in
+  let frame = GBin.frame ~label:"Specific editors" ~packing:vbox_pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
+  let box_pack = box#pack ?fill:None ?expand:None ?from:None ?padding:None in
   let editors = Whyconf.get_editors c.config in
   let _,strings,indexes,map =
     Meditor.fold
@@ -860,11 +864,15 @@ let editors_page c (notebook:GPack.notebook) =
   let strings = "(default)" :: "--" :: (List.rev strings) in
   let add_prover p pi =
     let text = Pp.string_of_wnl Whyconf.print_prover p in
-    let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
+    let hb = GPack.hbox ~homogeneous:false ~packing:box_pack () in
+    let hb_pack_fill_expand =
+      hb#pack ~fill:true ~expand:true ?from:None ?padding:None
+    in
+    let hb_pack = hb#pack ?fill:None ?expand:None ?from:None ?padding:None in
     let _ = GMisc.label ~width:150 ~xalign:0.0 ~text
-      ~packing:(hb#pack ~fill:true ~expand:true) () in
+      ~packing:hb_pack_fill_expand () in
     let (combo, ((_ : GTree.list_store), column)) =
-      GEdit.combo_box_text ~packing:hb#pack ~strings ()
+      GEdit.combo_box_text ~packing:hb_pack ~strings ()
     in
     combo#set_row_separator_func
       (Some (fun m row -> m#get ~row ~column = "--"));
@@ -966,15 +974,33 @@ let uninstalled_prover c eS unknown =
       ~title:"Why3: Uninstalled prover" ()
     in
     let vbox = dialog#vbox in
+(* Does not work: why ??
+    let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+    let hbox = GPack.hbox ~packing:vbox_pack () in
+    let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+    let scrollview =
+      GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
+        ~packing:hbox_pack ()
+    in
+    let () = scrollview#set_shadow_type `OUT in
+    let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
+*)
+    (* header *)
     let hb = GPack.hbox ~packing:vbox#add () in
     let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
-    let text =
-      Pp.sprintf "The prover %a is not installed"
-        Whyconf.print_prover unknown
+    let _ =
+      let text =
+        Pp.sprintf "The prover %a is not installed"
+          Whyconf.print_prover unknown
+      in
+      GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add ()
     in
-    let _ = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add () in
+    (* choices *)
+    let vbox_pack =
+      vbox#pack ~fill:true ~expand:true ?from:None ?padding:None
+    in
     let label = "Please select a policy for associated proof attempts" in
-    let policy_frame = GBin.frame ~label ~packing:vbox#add () in
+    let policy_frame = GBin.frame ~label ~packing:vbox_pack () in
     let choice = ref 0 in
     let prover_choosed = ref None in
     let set_prover prover () = prover_choosed := Some prover in
@@ -1000,7 +1026,7 @@ let uninstalled_prover c eS unknown =
         let frame = GBin.frame ~label ~packing:vbox#add () in
         let box =
           GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-            ~packing:(vbox#pack ~fill:true ~expand:true) ()
+            ~packing:frame#add ()
         in
         let iter_alter prover =
           let choice =
