@@ -92,6 +92,9 @@ val forget_id : ident_printer -> ident -> unit
 val forget_all : ident_printer -> unit
 (** forget all idents *)
 
+val sanitizer' : (char -> string) -> (char -> string) -> (char -> string) -> string -> string
+(** generic sanitizer taking a separate encoder for the first and last letter *)
+
 val sanitizer : (char -> string) -> (char -> string) -> string -> string
 (** generic sanitizer taking a separate encoder for the first letter *)
 

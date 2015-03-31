@@ -198,11 +198,14 @@ let char_to_alnumus c =
 let char_to_lalnumus c =
   match c with '_' | ' ' -> "_" | _ -> char_to_lalnum c
 
-let sanitizer head rest n =
+let sanitizer' head rest last n =
   let lst = ref [] in
-  let code c = lst := rest c :: !lst in
+  let code i c = lst :=
+    (if i = 0 then head
+     else if i = String.length n - 1 then last
+     else rest) c :: !lst in
   let n = if n = "" then "zilch" else n in
-  String.iter code n;
-  let rst = List.tl (List.rev !lst) in
-  let cs = head (String.get n 0) :: rst in
-  String.concat "" cs
+  String.iteri code n;
+  String.concat "" (List.rev !lst)
+
+let sanitizer head rest n = sanitizer' head rest rest n
