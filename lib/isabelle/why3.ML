@@ -640,11 +640,20 @@ fun close incomplete thy =
     | _ => err_no_env ()) |>
   Sign.parent_path;
 
-fun process_decls consts types x = elem "theory" (fn atts =>
+fun process_decls consts types x path = elem "theory" (fn atts =>
   (fn imports :: xs => elem "realized" (fn _ => fn rs => fn thy =>
         let
           val thyname = get_name atts;
           val realize = get_bool "realize" atts;
+          val _ =
+            realize orelse
+            Path.is_basic path andalso
+            let val (path', ext) = Path.split_ext path
+            in
+              Path.implode path' = Context.theory_name thy andalso
+              ext = "xml"
+            end orelse
+            error "Name of Why3 file does not match name of theory";
           val (ds, thy') = thy |>
             Sign.add_path thyname |>
             init_decls thyname consts types |>
@@ -781,11 +790,11 @@ fun show_status thy sel =
 (**** commands ****)
 
 fun why3_open ((files, consts), types) thy =
-  let val ([{lines, ...}: Token.file], thy') = files thy;
+  let val ([{src_path, lines, ...}: Token.file], thy') = files thy;
   in process_decls
     (map (apsnd (Sign.intern_const thy)) consts)
     (map (apsnd (Sign.intern_type thy)) types)
-    (parse_xml (cat_lines lines)) thy'
+    (parse_xml (cat_lines lines)) src_path thy'
   end;
 
 fun prove_vc vc_name lthy =
