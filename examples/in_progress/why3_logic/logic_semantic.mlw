@@ -572,14 +572,18 @@ module WellTyped
       sig.tys_constr ty_alg f /\ sig.tys_constr ty_alg g /\ f <> g /\
       m.ty_doms (m.ty_funs ty_alg ty_a) u ->
       not m.ls_case f ty_a u \/ not m.ls_case g ty_a u) /\
-    (* All elements in an algebraic type can be
+    (* All elements in a complete algebraic type can be
        inverted to some constructor. *)
     (forall ty_alg ty_a x.
-      tys_alg sig ty_alg /\ m.ty_doms (m.ty_funs ty_alg ty_a) x ->
+      sig.tys_constr_complete ty_alg /\ m.ty_doms (m.ty_funs ty_alg ty_a) x ->
       exists f. sig.tys_constr ty_alg f /\ m.ls_case f ty_a x) /\
     (* Constructors are injective. *)
     (forall f ty_a args.
-      sig.ls_constr f -> m.ls_proj f ty_a (m.ls_eval f ty_a args) = args)
+      sig.ls_constr f -> m.ls_proj f ty_a (m.ls_eval f ty_a args) = args) /\
+    (* Semantics for equality. *)
+    (forall ty_a x y. m.ty_doms ty_a x /\ m.ty_doms ty_a y ->
+      m.ls_eval sig.ls_equ (Cons ty_a Nil) (Cons x (Cons y Nil)) = m.i_true <->
+      x = y)
   
   predicate valuation_coherence (m:model 'univ)
     (tyv:ty_valuation 'univ) (env:ty_env 'tv) (v:valuation 'tv 'univ) =
@@ -622,13 +626,44 @@ module WellTyped
        possible to refine the skeletal shape to a point where a given case
        does not accept the shape anymore. Once done through the whole
        pattern-matching, we have a skeletal shape that is NOT accepted by
-       any case, which is an obvious contradication. *)
+       any case, which is an obvious contradication.
+       
+       Note: again, there is a bit of trouble with extension to incomplete
+       algebraic types. We cannot simply use pat_accept to represent
+       acceptation by a skeletal pattern.
+   *)
+   
+   predicate skeleton_accept (sig:signature) (m:model 'univ)
+     (tyv:ty_valuation 'univ) (pat:pattern) (ty:ty) (x:'univ) = match pat with
+     | PWild -> true
+     | PVar _ -> match ty with
+       | TyApp tys tyl -> (forall f. sig.tys_constr tys f ->
+         not m.ls_case f (tyl_sem m tyv tyl) x)
+       | TyVar _ -> true
+       end
+     | PApp f tyl args -> let prj = (m.ls_proj f (tyl_sem m tyv tyl) x) in
+       m.ls_case f (tyl_sem m tyv tyl) x /\
+      skeleton_l_accept sig m tyv args (ty_args sig f tyl) prj
+     | _ -> false
+     end
+   
+   with skeleton_l_accept (sig:signature) (m:model 'univ)
+     (tyv:ty_valuation 'univ)
+     (patl:list pattern) (tyl:list ty) (lx:list 'univ) =
+     match patl , lx , tyl with
+     | Nil , Nil , Nil -> true
+     | Cons hp qp , Cons hx qx , Cons hty qty ->
+       skeleton_accept sig m tyv hp hty hx /\
+       skeleton_l_accept sig m tyv qp qty qx
+     | _ -> false
+     end
    
    (* p1 is a skeleton refinement of p2. *)
    predicate pat_refine (p1 p2:pattern) =
      match p2 with
      | PWild -> true
      | PApp f tyl l -> exists l'. p1 = PApp f tyl l' /\ patl_refine l' l
+     | PVar _ -> p1 = p2
      | _ -> false
      end
    
@@ -640,48 +675,55 @@ module WellTyped
      end
   
   (* Some properties of skeleton pattern refinement. *)
-  let rec lemma pat_refine_self (p:pattern) : unit
-    requires { pat_skeleton p }
+  let rec lemma pat_refine_self (sig:signature) (p:pattern) (ty:ty) : unit
+    requires { skeleton_wty sig p ty }
     ensures { pat_refine p p }
     variant { p }
   = match p with
-    | PApp _ _ l -> patl_refine_self l
+    | PApp f tyl l -> patl_refine_self sig l (ty_args sig f tyl)
     | _ -> ()
     end
   
-  with lemma patl_refine_self (l:list pattern) : unit
-    requires { patl_skeleton l }
+  with lemma patl_refine_self (sig:signature) (l:list pattern)
+    (tyl:list ty) : unit
+    requires { skeleton_l_wty sig l tyl }
     ensures { patl_refine l l }
     variant { l }
-  = match l with
-    | Cons x q -> pat_refine_self x; patl_refine_self q
-    | _ -> ()
+  = match l , tyl with
+    | Cons x q , Cons hty qty -> pat_refine_self sig x hty;
+      patl_refine_self sig q qty
+    | Nil , Nil -> ()
+    | _ -> absurd
     end
   
-  let rec lemma pat_refine_trans (p1 p2 p3:pattern) : unit
-    requires { pat_skeleton p1 /\ pat_refine p1 p2 }
-    requires { pat_skeleton p2 /\ pat_refine p2 p3 }
+  let rec lemma pat_refine_trans (sig:signature)
+    (p1 p2 p3:pattern) (ty:ty) : unit
+    requires { skeleton_wty sig p1 ty /\ pat_refine p1 p2 }
+    requires { skeleton_wty sig p2 ty /\ pat_refine p2 p3 }
     ensures { pat_refine p1 p3 }
     variant { p1 }
   = match p1 , p2 , p3 with
-    | PApp _ _ l1 , PApp _ _ l2 , PApp _ _ l3 -> patl_refine_trans l1 l2 l3
+    | PApp f tyl l1 , PApp _ _ l2 , PApp _ _ l3 ->
+      patl_refine_trans sig l1 l2 l3 (ty_args sig f tyl)
     | _ , _ , _ -> ()
     end
   
-  with lemma patl_refine_trans (l1 l2 l3:list pattern) : unit
-    requires { patl_skeleton l1 /\ patl_refine l1 l2 }
-    requires { patl_skeleton l2 /\ patl_refine l2 l3 }
+  with lemma patl_refine_trans (sig:signature)
+    (l1 l2 l3:list pattern) (tyl:list ty) : unit
+    requires { skeleton_l_wty sig l1 tyl /\ patl_refine l1 l2 }
+    requires { skeleton_l_wty sig l2 tyl /\ patl_refine l2 l3 }
     ensures { patl_refine l1 l3 }
     variant { l1 }
-  = match l1 , l2 , l3 with
-    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 ->
-      pat_refine_trans x1 x2 x3; patl_refine_trans q1 q2 q3
-    | Nil , Nil , Nil -> ()
-    | _ , _ , _ -> absurd
+  = match l1 , l2 , l3 , tyl with
+    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 , Cons hty qty ->
+      pat_refine_trans sig x1 x2 x3 hty ; patl_refine_trans sig q1 q2 q3 qty
+    | Nil , Nil , Nil , Nil -> ()
+    | _ , _ , _ , _ -> absurd
     end
   
-  let rec lemma pat_refine_skeleton_match (p1 p2 p3:pattern) : unit
-    requires { pat_skeleton p1 /\ pat_refine p1 p2 }
+  let rec lemma pat_refine_skeleton_match (sig:signature)
+    (p1 p2 p3:pattern) (ty:ty) : unit
+    requires { skeleton_wty sig p1 ty /\ pat_refine p1 p2 }
     requires { pat_skeleton_match p1 p3 }
     ensures { pat_skeleton_match p2 p3 }
     variant { p3 }
@@ -689,26 +731,29 @@ module WellTyped
     | _ , PWild , _ -> ()
     | PWild , _ , _ -> absurd
     | _ , _ , (PWild | PVar _) -> ()
-    | _ , _ , PAs p3 _ -> pat_refine_skeleton_match p1 p2 p3
+    | _ , _ , PAs p3 _ -> pat_refine_skeleton_match sig p1 p2 p3 ty
     | _ , _ , POr p3 p4 ->
       let u = if pat_skeleton_match p1 p3 then p3 else p4 in
-      pat_refine_skeleton_match p1 p2 u
-    | PApp _ _ l1 , PApp _ _ l2 , PApp _ _ l3 ->
-      patl_refine_skeleton_match l1 l2 l3
+      pat_refine_skeleton_match sig p1 p2 u ty
+    | PApp f tyl l1 , PApp _ _ l2 , PApp _ _ l3 ->
+      patl_refine_skeleton_match sig l1 l2 l3 (ty_args sig f tyl)
     | _ -> absurd
     end
   
-  with lemma patl_refine_skeleton_match (l1 l2 l3:list pattern) : unit
-    requires { patl_skeleton l1 /\ patl_refine l1 l2 }
+  with lemma patl_refine_skeleton_match (sig:signature)
+    (l1 l2 l3:list pattern) (tyl:list ty) : unit
+    requires { skeleton_l_wty sig l1 tyl /\ patl_refine l1 l2 }
     requires { patl_skeleton_match l1 l3 }
     ensures { patl_skeleton_match l2 l3 }
     variant { l3 }
-  = match l1 , l2 , l3 with
-    | Nil , Nil , Nil -> ()
-    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 ->
-      patl_refine_skeleton_match q1 q2 q3;
-      pat_refine_skeleton_match x1 x2 x3
-    | _ , _ , _ -> absurd
+  = match l1 , l2 , l3 , tyl with
+    | Nil , Nil , Nil , Nil -> ()
+    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 , Cons hty qty ->
+      patl_refine_skeleton_match sig q1 q2 q3 qty;
+      pat_refine_skeleton_match sig x1 x2 x3 hty
+    | Nil , _ , _ , _ | _ , Nil , _ , _ | _ , _ , Nil , _ | _ , _ , _ , Nil ->
+      "keep_on_simp" absurd
+    | _ , _ , _ , _ -> absurd
     end
   
   (* Build a list of wildcard patterns. *)
@@ -716,8 +761,8 @@ module WellTyped
     (tyv:ty_valuation 'univ) (args:list 'univ) (tyl:list ty) : list pattern
     requires { tyl_doms m (tyl_sem m tyv tyl) args }
     ensures { patl_wty sig result tyl }
-    ensures { patl_skeleton result }
-    ensures { patl_accept m tyv result args }
+    ensures { skeleton_l_wty sig result tyl }
+    ensures { skeleton_l_accept sig m tyv result tyl args }
     variant { tyl }
   = match args , tyl with
     | Nil , Nil -> let res = Nil in
@@ -725,9 +770,6 @@ module WellTyped
     | Cons _ q1 , Cons _ q2 ->
       let qr = pat_wild_list m sig tyv q1 q2 in
       let res = Cons PWild qr in
-      assert { not patl_accept m tyv res args ->
-        (forall s. patl_sem m tyv qr q1 s ->
-         patl_sem m tyv res args (extend (const None) s) && false) && false };
       res
     | _ , _ -> absurd
     end
@@ -736,17 +778,20 @@ module WellTyped
     (ty_alg:ty_symbol) (tyl:list 'univ) (x:'univ) : lsymbol -> bool =
     \f. m.ls_case f tyl x /\ sig.tys_constr ty_alg f
   meta rewrite_def function is_constructor
+  predicate eis_constructor (m:model 'univ) (sig:signature)
+    (ty_alg:ty_symbol) (tyl:list 'univ) (x:'univ) =
+    exists g. is_constructor m sig ty_alg tyl x g
   
   (* Skeleton refinement through a pattern. *)
   let rec ghost pat_refine_unaccepted (m:model 'univ) (sig:signature)
     (tyv:ty_valuation 'univ) (x:'univ) (coh pat:pattern) (ty:ty) : pattern
     requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
-    requires { pat_wty sig pat ty /\ pat_wty sig coh ty }
-    requires { pat_accept m tyv coh x /\ pat_skeleton coh }
+    requires { pat_wty sig pat ty /\ skeleton_wty sig coh ty }
+    requires { skeleton_accept sig m tyv coh ty x }
     requires { m.ty_doms (ty_sem m tyv ty) x }
     requires { not pat_accept m tyv pat x }
-    ensures { pat_accept m tyv result x /\ pat_skeleton result }
-    ensures { pat_refine result coh /\ pat_wty sig result ty }
+    ensures { skeleton_accept sig m tyv result ty x }
+    ensures { pat_refine result coh /\ skeleton_wty sig result ty }
     ensures { not pat_skeleton_match result pat }
     variant { pat }
   = match coh , pat with
@@ -754,7 +799,7 @@ module WellTyped
       if f = g
       then match sig.ls_ret f , sig.ls_ret g with
         | TyApp ty_alg1 _ , TyApp ty_alg2 _ ->
-          assert { sig.tys_belong ty_alg1 &&
+          assert { sig.tys_belong ty_alg1 && sig.tys_belong ty_alg2 &&
             sig.tys_constr ty_alg1 f && sig.tys_constr ty_alg2 g &&
             TyApp ty_alg1 tylf = ty = TyApp ty_alg2 tylg &&
             ty_alg1 = ty_alg2 && tylf = tylg };
@@ -764,9 +809,6 @@ module WellTyped
           assert { tyl_doms m (ty_inst_args m sig f tyl_s) lx };
           let l_coh = patl_refine_unaccepted m sig tyv lx lf lg ty_a in
           let res = PApp g tylg l_coh in
-          assert { not pat_accept m tyv res x ->
-            (forall s. patl_sem m tyv l_coh lx s ->
-              pat_sem m tyv res x s && false) && false };
           res
         | _ -> absurd
       end else coh
@@ -776,31 +818,28 @@ module WellTyped
           sig.tys_constr ty_alg f && ty = TyApp ty_alg tyl &&
           tys_alg sig ty_alg };
         let tyl_s = tyl_sem m tyv tyl in
-        let g = choose (is_constructor m sig ty_alg tyl_s x) in
-        match sig.ls_ret g with
-        | TyApp ty_algg _ -> assert { sig.tys_constr ty_algg g &&
-          ty_algg = ty_alg && ty_ret sig g tyl = ty };
-          let ty_a = ty_args sig g tyl in
-          let lx = m.ls_proj g tyl_s x in
-          assert { tyl_doms m (ty_inst_args m sig g tyl_s) lx };
-          let lg = pat_wild_list m sig tyv lx ty_a in
-          if f = g
-          then begin
-            let l_coh = patl_refine_unaccepted m sig tyv lx lg lf ty_a in
-            let res = PApp g tyl l_coh in
-            assert { not pat_accept m tyv res x ->
-              (forall s. patl_sem m tyv l_coh lx s ->
-                pat_sem m tyv res x s && false) && false };
-            res
-          end else begin
-            let res = PApp g tyl lg in
-            assert { not pat_accept m tyv res x ->
-              (forall s. patl_sem m tyv lg lx s ->
-                pat_sem m tyv res x s && false) && false };
-            res
+        if eis_constructor m sig ty_alg tyl_s x
+        then let g = choose (is_constructor m sig ty_alg tyl_s x) in
+          match sig.ls_ret g with
+          | TyApp ty_algg _ -> assert { sig.tys_constr ty_algg g &&
+            ty_algg = ty_alg && ty_ret sig g tyl = ty };
+            let ty_a = ty_args sig g tyl in
+            let lx = m.ls_proj g tyl_s x in
+            assert { tyl_doms m (ty_inst_args m sig g tyl_s) lx };
+            let lg = pat_wild_list m sig tyv lx ty_a in
+            if f = g
+            then begin
+              let l_coh = patl_refine_unaccepted m sig tyv lx lg lf ty_a in
+              let res = PApp g tyl l_coh in
+              res
+            end else begin
+              let res = PApp g tyl lg in
+              res
+            end
+          | _ -> absurd
           end
-        | _ -> absurd
-        end
+        else let (u:pat_var) = choose all in
+          PVar u
       | _ -> absurd
       end
     | _ , PWild -> assert { pat_sem m tyv pat x (const None) };absurd
@@ -829,6 +868,7 @@ module WellTyped
           | PWild , _ | _ , PWild -> ("keep_on_simp" true) && false
           | _ -> false end && false };
       coh2
+    | PVar _ , _ -> coh
     | _ -> absurd
     end
   
@@ -836,17 +876,17 @@ module WellTyped
     (tyv:ty_valuation 'univ) (lx:list 'univ) (cohl patl:list pattern)
     (tyl:list ty) : list pattern
     requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
-    requires { patl_wty sig patl tyl /\ patl_wty sig cohl tyl }
-    requires { patl_accept m tyv cohl lx /\ patl_skeleton cohl }
+    requires { patl_wty sig patl tyl }
+    requires { skeleton_l_accept sig m tyv cohl tyl lx }
+    requires { skeleton_l_wty sig cohl tyl }
     requires { tyl_doms m (tyl_sem m tyv tyl) lx }
     requires { not patl_accept m tyv patl lx }
-    ensures { patl_accept m tyv result lx /\ patl_skeleton result }
-    ensures { patl_refine result cohl /\ patl_wty sig result tyl }
+    ensures { skeleton_l_accept sig m tyv result tyl lx }
+    ensures { patl_refine result cohl /\ skeleton_l_wty sig result tyl }
     ensures { not patl_skeleton_match result patl }
     variant { patl }
   = match cohl , patl , lx , tyl with
     | Cons ch cq , Cons ph pq , Cons xh xq , Cons th tq ->
-      assert { pat_accept m tyv ch xh /\ patl_accept m tyv cq xq };
       assert { forall hs qs,hp,qp.
         pat_accept m tyv hp hs /\ patl_accept m tyv qp qs ->
         not patl_accept m tyv (Cons hp qp) (Cons hs qs) ->
@@ -857,22 +897,23 @@ module WellTyped
       then Cons (pat_refine_unaccepted m sig tyv xh ch ph th) cq
       else Cons ch (patl_refine_unaccepted m sig tyv xq cq pq tq)
     | _ , Nil , _ , _ | Cons _ _ , _ , Nil , _ | Nil , _ , Cons _ _ , _ ->
-      assert { "keep_on_simp" true }; absurd
+      "keep_on_simp" absurd
     | _ , _ , _ , _ -> absurd
     end
   
   meta remove_logic function is_constructor
+  meta remove_logic predicate eis_constructor
   
   let rec ghost brl_refine_unaccepted (m:model 'univ) (sig:signature)
     (tyv:ty_valuation 'univ) (env:ty_env 'tv) (x:'univ) (coh:pattern)
     (brl:list (branch 'tv)) (tyc ty:ty) : pattern
     requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
-    requires { pat_wty sig coh tyc /\ brl_wf sig env brl tyc ty }
-    requires { pat_accept m tyv coh x /\ pat_skeleton coh }
+    requires { brl_wf sig env brl tyc ty }
+    requires { skeleton_accept sig m tyv coh tyc x /\ skeleton_wty sig coh tyc }
     requires { m.ty_doms (ty_sem m tyv tyc) x }
     requires { not brl_accept m tyv brl x }
-    ensures { pat_accept m tyv result x /\ pat_skeleton result }
-    ensures { pat_refine result coh /\ pat_wty sig result tyc }
+    ensures { skeleton_accept sig m tyv result tyc x }
+    ensures { pat_refine result coh /\ skeleton_wty sig result tyc }
     ensures { not case_skeleton_match result brl }
     variant { brl }
   = match brl with

@@ -171,4 +171,25 @@ module Choice
   
 end
 
+module Finite
+  
+  use import HO
+  use import int.Int
+  
+  predicate finite ('a -> bool)
+  function cardinal ('a -> bool) : int
+  
+  axiom finite_empty : finite (none:'a -> bool)
+  axiom finite_add : forall x,y:'a. finite x -> finite (update x y true)
+  axiom finite_remove : forall x,y:'a. finite x -> finite (update x y false)
+  axiom cardinal_empty : cardinal (none:'a -> bool) = 0
+  axiom cardinal_positive : forall x:'a -> bool. finite x -> cardinal x >= 0
+  axiom cardinal_add : forall x,y:'a.
+    finite x -> not x y -> cardinal (update x y true) = cardinal x + 1
+  let lemma cardinal_remove (x:'a -> bool) (y:'a)
+    requires { finite x /\ x y }
+    ensures { cardinal (update x y false) = cardinal x - 1 }
+  = assert { extensional_equal (update (update x y false) y true) x }
+  
+end
 

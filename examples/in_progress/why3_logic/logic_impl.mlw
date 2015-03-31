@@ -1,0 +1,298 @@
+
+(* TODO: enforce the restriction (enforced by Why3) that all type variables
+   occur in a type scheme.
+   Also allow world creation. *)
+
+module Ident
+  
+  (* Identifiers types from Why3.
+     Note: as Why3 has no support for string whatsoever,
+     any transformation that should create particular names (pre-id)
+     (for readability) should do so by calling an abstract value
+     implemented in drivers. Nothing will be verified about actual names
+     anyway. *)
+  type preid
+  type ident
+  
+end
+
+module Ty
+  
+  use import logic_syntax.Defs as D
+  use import logic_syntax.VarsIn
+  use import logic_syntax.Substs
+  use import support.HO
+  use import support.Finite
+  use import ref.Ref
+  use import list.List
+  use import logic_typing.Env as E
+  use import Ident
+  use import option.Option
+  
+  (* Type variables. *)
+  type tvsymbol
+  (* Interpretation of type variable. Variable interpretation is indeed
+     context-dependent. A type variable 'world' is a bijective mapping
+     between type variables and integers. It typically represent the
+     binding context for type variables. It live only in spec/ghost code. *)
+  type tvworld
+  function tv_m tvworld tvsymbol : int
+  function tv_mi tvworld int : tvsymbol
+  axiom tv_m_bijection : (forall tvw x. tv_mi tvw (tv_m tvw x) = x) /\
+    (forall tvw x. tv_m tvw (tv_mi tvw x) = x)
+  (* Machinery for generation of fresh type variables: maintain an ever-growing
+     finite set of generated names. *)
+  type tv_all model { mutable tv_all : tvsymbol -> bool }
+  type tv_all_s model { tv_all_s : tvsymbol -> bool }
+  val ghost tv_all_set : tv_all
+  (* Ensures growth of tv_all_set without having to state it in every
+     post-condition. *)
+  val ghost tv_all_snapshot () : tv_all_s
+    ensures { result.tv_all_s = tv_all_set.tv_all }
+  val ghost tv_all_growth (u:tv_all_s) : unit
+    ensures { forall x. u.tv_all_s x -> tv_all_set.tv_all x }
+  (* Every generated tvsymbol must be in the set.
+     Note: such an axiom is dangerous, as it may be a source of contradiction.
+     It basically states a type invariant dependent of a mutable variable.
+     However, the mentioned variable can only 'grow', and the invariant
+     'increase' with its growth, so the invariant may never become wrong.
+     Such statement becomes dangerous iff it is somehow possible to do an
+     infinite number of call to the statement => It is correct in current Why3,
+     but would be wrong in an imaginable extension with a Dafny-like forall.
+     (also, implementing a module with such a specification is currently
+      unfeasible in Why3) *)
+  val ghost tvsymbol_in (x:tvsymbol) : unit
+    ensures { tv_all_set.tv_all x }
+  val create_tvsymbol (x:preid) : tvsymbol
+    writes { tv_all_set }
+    ensures { not (old tv_all_set).tv_all result }
+    ensures { forall x. (old tv_all_set).tv_all x -> tv_all_set.tv_all x }
+  val tv_name (x:tvsymbol) : ident
+  val tv_equal (x y:tvsymbol) : bool
+    ensures { result <-> x = y }
+  (* Global world for top-level definitions. *)
+  val ghost tv_global : tvworld
+  
+  
+  (* Type symbols, types, and global signature.
+     Global signature behave roughly like tv_all_set. *)
+  
+  (* Particular type symbol for propositions. Exists only at specification
+     level, in Why3 it is encoded specially using options (hence cannot
+     occur at any place beyond term toplevel) *)
+  constant tys_prop : D.ty_symbol
+  constant ty_prop : D.ty = D.TyApp tys_prop Nil
+  (* Particular logical symbol for equality. This version exists only
+     at specification level, and must be stated here because it is a signature
+     built-in. *)
+  constant ls_equ : D.lsymbol
+  
+  type tysymbol
+  type ty
+  type ty_cons =
+    | TyVar tvsymbol
+    | TyApp tysymbol (list ty)
+  type signature model { mutable sig_m : E.signature }
+    invariant { sig_wf self.sig_m /\
+      self.sig_m.E.tys_prop = tys_prop /\
+      self.sig_m.E.ls_equ = ls_equ /\
+      forall tys. self.sig_m.tys_belong tys ->
+        finite (self.sig_m.tys_constr tys) }
+  type signature_s model { sig_s_m : E.signature }
+    invariant { sig_wf self.sig_s_m /\
+      self.sig_s_m.E.tys_prop = tys_prop /\
+      self.sig_s_m.E.ls_equ = ls_equ /\
+      forall tys. self.sig_s_m.tys_belong tys ->
+        finite (self.sig_s_m.tys_constr tys) }
+  function ts_m tysymbol : D.ty_symbol
+  (* Encode the stateless information into the name. Not only it is
+     what is actually done in Why3 anyway, but it also simplify preservation
+     proofs for stateless information through environmental extension. *)
+  function ts_arity tysymbol : int
+  function ty_m tvworld ty : D.ty
+  function tyl_m (tvw:tvworld) (tyl:list ty) : list D.ty = match tyl with
+    | Nil -> Nil
+    | Cons x q -> Cons (ty_m tvw x) (tyl_m tvw q)
+    end
+  val ghost global_sig : signature
+  val ghost global_sig_snapshot () : signature_s
+    ensures { result.sig_s_m = global_sig.sig_m }
+  val ghost global_sig_growth (s:signature_s) : unit
+    ensures { let so = s.sig_s_m in let sc = global_sig.sig_m in
+      (forall tys. so.tys_belong tys -> sc.tys_belong tys /\
+        sc.tys_arity tys = so.tys_arity tys) /\
+      (forall tys ls. so.tys_belong tys /\ so.tys_constr tys ls ->
+        sc.tys_constr tys ls) /\
+      (forall ls. so.ls_belong ls -> sc.ls_belong ls /\
+        sc.ls_ty_arity ls = so.ls_ty_arity ls /\
+        sc.ls_args ls = so.ls_args ls /\
+        sc.ls_ret ls = so.ls_ret ls) /\
+      (forall ls. so.ls_constr ls -> sc.ls_constr ls) }
+  val ghost tysymbol_in (tys:tysymbol) : unit
+    ensures { global_sig.sig_m.tys_belong (ts_m tys) }
+    ensures { global_sig.sig_m.tys_arity (ts_m tys) = ts_arity tys }
+    ensures { ts_m tys <> tys_prop }
+  val ghost ty_inv (ghost tvw:tvworld) (ty:ty) : unit
+    ensures { ty_wf global_sig.sig_m (ty_m tvw ty) }
+    ensures { let s0 = compose tv_all_set.tv_all (tv_mi tvw) in
+      ty_vars_in s0 global_sig.sig_m.tys_belong (ty_m tvw ty) }
+  let rec ghost tyl_inv (ghost tvw:tvworld) (tyl:list ty) : unit
+    ensures { tyl_wf global_sig.sig_m (tyl_m tvw tyl) }
+    ensures { let s0 = compose tv_all_set.tv_all (tv_mi tvw) in
+      tyl_vars_in s0 global_sig.sig_m.tys_belong (tyl_m tvw tyl) }
+    variant { tyl }
+  = match tyl with Cons x q -> ty_inv tvw x;tyl_inv tvw q | _ -> () end
+  
+  val ts_equal (u v:tysymbol) : bool
+    ensures { result -> u = v }
+    ensures { ts_m u = ts_m v -> result }
+  val ts_arity (u:tysymbol) : int
+    ensures { result = ts_arity u = global_sig.sig_m.tys_arity (ts_m u) }
+  val create_tysymbol (p:preid) (ar:int) : tysymbol
+    writes { global_sig }
+    ensures { not (old global_sig).sig_m.tys_belong result.ts_m }
+    ensures { ts_arity result = ar = global_sig.sig_m.tys_arity result.ts_m }
+  
+  val ty_var (ghost tvw:tvworld) (tyv:tvsymbol) : ty
+    ensures { ty_m tvw result = D.TyVar (tv_m tvw tyv) }
+  val ty_app (ghost tvw:tvworld) (tys:tysymbol) (tyl:list ty) : ty
+    ensures { ty_m tvw result = D.TyApp (ts_m tys) (tyl_m tvw tyl) }
+  val ty_case (ghost tvw:tvworld) (ty:ty) : ty_cons
+    returns { TyVar tv -> ty_m tvw ty = D.TyVar (tv_m tvw tv)
+      | TyApp tys tyl -> ty_m tvw ty = D.TyApp (ts_m tys) (tyl_m tvw tyl) }
+  
+  function tyo_m (tvw:tvworld) (ty:option ty) : D.ty = match ty with
+    | None -> ty_prop
+    | Some ty -> ty_m tvw ty
+    end
+  
+  (*
+  
+  (* TODO: Replace the functional arguments in substitution, using
+     some kind of maps abstraction.
+     Though relatively easy to specify as itself, requires backup from
+     such specified implementation of maps, which is not written yet. *)
+  
+  val ty_inst (ghost tvg:tvgroup) (f:tvsymbol -> ty) (ty:ty) : ty
+    requires { forall x. ty_var_g x = ty_g ty -> ty_g (f x) = tvg }
+    ensures { let f0 = compose ty_m (compose f (get_tvs (ty_g ty))) in
+      ty_g result = tvg /\
+      ty_m result = ty_subst f0 identity (ty_m ty) /\
+      ty_wf env.sig_m (ty_m result) }
+  
+  (* TODO: type matching...  *)
+  
+  (* TODO: add other various built-in type symbols. *)
+  *)
+end
+
+module Term
+  
+  use import logic_syntax.Defs as D
+  use import logic_syntax.VarsIn
+  use import logic_syntax.Substs
+  use import support.HO
+  use import support.Finite
+  use import ref.Ref
+  use import list.List
+  use import logic_typing.Env as E
+  use import option.Option
+  use import int.Int
+  use import Ident
+  use import Ty
+  
+  (* First, logical symbols. *)
+  
+  type lsymbol
+  function ls_m lsymbol : D.lsymbol
+  function ls_constr lsymbol : int
+  function ls_tvworld lsymbol : tvworld
+  function ls_ty_arity lsymbol : int
+  function ls_args lsymbol : list D.ty
+  function ls_ret lsymbol : D.ty
+  axiom ls_constr_pos : forall ls. ls.ls_constr >= 0
+  
+  (* tys_constr global environment. *)
+  type ts_constr_env model { mutable tsc : D.ty_symbol -> int }
+  type ts_constr_env_s model { tsc_s : D.ty_symbol -> int }
+  val ghost ts_constr_env : ts_constr_env
+  val ghost ts_constr_env_snapshot () : ts_constr_env_s
+    ensures { result.tsc_s = ts_constr_env.tsc }
+  val ghost ts_constr_env_fixed (e:ts_constr_env_s) : unit
+    ensures { forall tys. tys_alg global_sig.sig_m tys ->
+      ts_constr_env.tsc tys = e.tsc_s tys }
+  val ghost ts_constr_env_s_inv (e:ts_constr_env_s) : unit
+    ensures { let sig = global_sig.sig_m in
+      forall tys. tys_alg sig tys ->
+        e.tsc_s tys > 0 /\ e.tsc_s tys >= cardinal (sig.tys_constr tys) /\
+        (e.tsc_s tys = cardinal (sig.tys_constr tys) <->
+         sig.tys_constr_complete tys) }
+  let ghost ts_constr_env_inv () : unit
+    ensures { let e = ts_constr_env in let sig = global_sig.sig_m in
+      forall tys. tys_alg sig tys ->
+        e.tsc tys > 0 /\ e.tsc tys >= cardinal (sig.tys_constr tys) /\
+        (e.tsc tys = cardinal (sig.tys_constr tys) <->
+         sig.tys_constr_complete tys) }
+  = ts_constr_env_s_inv (ts_constr_env_snapshot ())
+  
+  val ls_name lsymbol : ident
+  val ls_args (ls:lsymbol) : list ty
+    ensures { tyl_m ls.ls_tvworld result = ls.ls_args
+      = global_sig.sig_m.E.ls_args ls.ls_m }
+  val ls_value (ls:lsymbol) : option ty
+    ensures { tyo_m ls.ls_tvworld result = ls.ls_ret
+      = global_sig.sig_m.E.ls_ret ls.ls_m }
+  val ghost ls_ty_arity (ls:lsymbol) : int
+    ensures { result = ls.ls_ty_arity
+      = global_sig.sig_m.E.ls_ty_arity ls.ls_m }
+  val ghost ls_tvworld (ls:lsymbol) : tvworld
+    ensures { result = ls.ls_tvworld }
+  (* ls_constr is a complicated field: if it is > 0, then the lsymbol
+     is a constructor, and the cardinal of constructors in the same type
+     being ls_constr is equivalent to the type being complete for this
+     decomposition. *)
+  val ls_constr (ls:lsymbol) : int
+    ensures { result = ls.ls_constr }
+    ensures { result > 0 -> let sig = global_sig.sig_m in
+      sig.E.ls_constr ls.ls_m /\ match sig.E.ls_ret ls.ls_m with
+        | D.TyVar _ -> false
+        | D.TyApp tys _ -> result = ts_constr_env.tsc tys end }
+  val ls_equal (a b:lsymbol) : bool
+    ensures { result -> a = b }
+    ensures { ls_m a = ls_m b -> result }
+  val create_lsymbol (ghost tvw:tvworld) (ghost ty_ar:int)
+    (constr:int) (p:preid) (tyl:list ty) (vl:option ty) : lsymbol
+    writes { ts_constr_env , global_sig }
+    requires { ty_vars_in (range 0 ty_ar) all (tyo_m tvw vl) }
+    requires { tyl_vars_in (range 0 ty_ar) all (tyl_m tvw tyl) }
+    requires { constr >= 0 }
+    requires { constr > 0 -> match tyo_m tvw vl with
+      | D.TyApp tys _ -> tys_alg global_sig.sig_m tys ->
+        constr = ts_constr_env.tsc tys
+      | _ -> false
+      end }
+    ensures { not (old global_sig).sig_m.ls_belong result.ls_m }
+    ensures { result.ls_ty_arity = ty_ar }
+    ensures { result.ls_constr = constr }
+    ensures { result.ls_args = tyl_m tvw tyl }
+    ensures { result.ls_ret = tyo_m tvw vl }
+  
+  (* MISSING: equivalent of ls_ty_freevars. *)
+  
+  (* Variable symbols. *)
+  type vsymbol
+  function vs_ty tvworld vsymbol : D.ty
+  val vs_equal (a b:vsymbol) : bool
+    ensures { result <-> a = b }
+  
+  (* Terms (without patterns for now). *)
+  type term 'tv
+  function t_ptl (term 'tv) : 'tv -> vsymbol
+  function t_ltp (term 'tv) : vsymbol -> 'tv
+  function t_ty tvworld (term 'tv) : D.tys
+  
+  
+end
+
+
+
