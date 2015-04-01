@@ -113,6 +113,7 @@ let (_unused : (unit -> unit) -> unit -> unit) =
     (Datatype.func Datatype.unit Datatype.unit)
 
 let run () =  if ACSLtoWhy3.Enabled.get () then process ()
+
 let () =
   try
     Db.Main.extend run

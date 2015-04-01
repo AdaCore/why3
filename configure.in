@@ -677,10 +677,10 @@ if test "$enable_frama_c" = yes ; then
       FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|Version: *\(.*\)$|\1|p'`
       AC_MSG_RESULT($FRAMAC_VERSION)
       case $FRAMAC_VERSION in
-         Neon-*) ;;
-         *) AC_MSG_WARN(Version Neon required.)
+         Sodium-*) ;;
+         *) AC_MSG_WARN(Version Sodium required.)
             enable_frama_c=no
-            reason_frama_c=" (version Neon required)"
+            reason_frama_c=" (version Sodium required)"
             ;;
       esac
       FRAMAC_SHARE=`$FRAMAC -print-path`
