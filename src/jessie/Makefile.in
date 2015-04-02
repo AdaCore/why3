@@ -34,10 +34,12 @@ Jessie3.cmxs: Jessie3.cmx
 	ocamlopt.opt $(FLAGS) $(INCLUDE) -for-pack Jessie3 -c $^
 
 test.byte:
-	frama-c.byte -kernel-debug 2 -load-module ./Jessie3.cma -jessie3 tests/basic/forty-two.c
+	frama-c.byte -load-module ./Jessie3.cma -jessie3 tests/basic/forty-two.c
+# -kernel-debug 2
 
 test.opt:
-	frama-c -kernel-debug 2 -load-module ./Jessie3.cmxs -jessie3 tests/basic/forty-two.c
+	frama-c -load-module ./Jessie3.cmxs -jessie3 tests/basic/forty-two.c
+# -kernel-debug 2
 
 tests::
 	time -p ptests.opt

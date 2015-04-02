@@ -22,7 +22,9 @@ module OutputFile =
 
 open Why3
 
+(*
 let () = Debug.set_flag Call_provers.debug
+*)
 
 let run_on_task fmt prover prover_driver t =
   let result =
@@ -35,7 +37,7 @@ let run_on_task fmt prover prover_driver t =
   Format.fprintf fmt "%a" Call_provers.print_prover_answer result.Call_provers.pr_answer;
   match result.Call_provers.pr_answer with
   | Call_provers.Failure _ | Call_provers.HighFailure ->
-                 Format.fprintf fmt "@\n=======@\n%s@\n======@\n" result.Call_provers.pr_output
+    Format.fprintf fmt "@\n=======@\n%s@\n======@\n" result.Call_provers.pr_output
   | _ -> ()
 
 let get_prover config env acc (short, name) =
