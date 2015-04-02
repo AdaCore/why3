@@ -8,10 +8,9 @@ WHYLIB  = ../../lib/why3
 
 INCLUDE = -I $(FRAMAC_LIBDIR) -I $(FRAMAC_LIBDIR)/plugins -I +ocamlgraph @ZIPINCLUDE@ @MENHIRINCLUDE@ -I $(WHYLIB)
 FLAGS = -w +a-3-4-6-9-41-44-45-48 -annot -bin-annot  -g
-
-all: Jessie3.cma
-
 OCAMLLEX  = @OCAMLLEX@
+
+all:: Jessie3.cma Jessie3.cmxs
 
 Makefile: Makefile.in ../../config.status
 	(cd ../../ ; ./config.status chmod --file src/jessie/Makefile)
@@ -41,6 +40,7 @@ test.opt:
 	frama-c -kernel-debug 2 -load-module ./Jessie3.cmxs -jessie3 tests/basic/forty-two.c
 
 tests::
+	time -p ptests.opt
 	grep 'Task\|Ergo' tests/basic/result/*.res.log  tests/demo/result/*.res.log
 
 
