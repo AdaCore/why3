@@ -1,31 +1,50 @@
 FRAMAC_SHARE  = @FRAMAC_SHARE@
 FRAMAC_LIBDIR = @FRAMAC_LIBDIR@
 
-PLUGIN_NAME     := Jessie3
-PLUGIN_CMO      := literals ACSLtoWhy3 register
+PLUGIN_NAME   = Jessie3
+MODULES       = literals ACSLtoWhy3 register
 
-SHELL := /bin/bash
+WHYLIB  = ../../lib/why3
 
-WHYLIB := ../../lib/why3
+INCLUDE = -I $(FRAMAC_LIBDIR) -I $(FRAMAC_LIBDIR)/plugins -I +ocamlgraph @ZIPINCLUDE@ @MENHIRINCLUDE@ -I $(WHYLIB)
+FLAGS = -w +a-3-4-6-9-41-44-45-48 -annot -bin-annot  -g
 
-PLUGIN_EXTRA_BYTE:= $(WHYLIB)/why3.cma
-PLUGIN_EXTRA_OPT:= $(WHYLIB)/why3.cmxa
-PLUGIN_BFLAGS:= -I $(WHYLIB)
-PLUGIN_OFLAGS:= -I $(WHYLIB)
-PLUGIN_LINK_BFLAGS:= -I $(WHYLIB)
-PLUGIN_LINK_OFLAGS:= -I $(WHYLIB)
-PLUGIN_TESTS_DIRS := basic demo
+all: Jessie3.cma
 
 OCAMLLEX  = @OCAMLLEX@
+
+Makefile: Makefile.in ../../config.status
+	(cd ../../ ; ./config.status chmod --file src/jessie/Makefile)
 
 literals.ml: literals.mll
 	$(OCAMLLEX) $<
 
-$(addsuffix .cmo, $(PLUGIN_CMO)): $(WHYLIB)/why3.cmi
-$(addsuffix .cmx, $(PLUGIN_CMO)): $(WHYLIB)/why3.cmi $(WHYLIB)/why3.cmx
+Jessie3.cma: $(addsuffix .cmo, $(MODULES))
+	ocamlc.opt -a $(FLAGS) $(INCLUDE) -o $@ nums.cma unix.cma dynlink.cma str.cma $(addsuffix .cmo, @MENHIRLIB@) $(addsuffix .cma, @ZIPLIB@) $(WHYLIB)/why3.cma $^
 
-include $(FRAMAC_SHARE)/Makefile.dynamic
+Jessie3.cmx: $(addsuffix .cmx, $(MODULES))
+	ocamlopt.opt $(FLAGS) $(INCLUDE) -o $@ -pack $^
+
+Jessie3.cmxs: Jessie3.cmx
+	ocamlopt.opt -shared $(FLAGS) $(INCLUDE) -o $@ $(addsuffix .cmx, @MENHIRLIB@) $(addsuffix .cmxa, @ZIPLIB@) $(WHYLIB)/why3.cmxa $^
+
+%.cmo: %.ml
+	ocamlc.opt $(FLAGS) $(INCLUDE) -c $^
+
+%.cmx: %.ml
+	ocamlopt.opt $(FLAGS) $(INCLUDE) -for-pack Jessie3 -c $^
+
+test.byte:
+	frama-c.byte -kernel-debug 2 -load-module ./Jessie3.cma -jessie3 tests/basic/forty-two.c
+
+test.opt:
+	frama-c -kernel-debug 2 -load-module ./Jessie3.cmxs -jessie3 tests/basic/forty-two.c
 
 tests::
 	grep 'Task\|Ergo' tests/basic/result/*.res.log  tests/demo/result/*.res.log
 
+
+clean:
+	rm -f $(addsuffix .cmo, $(MODULES))
+	rm -f $(addsuffix .cmx, $(MODULES))
+	rm -f Jessie3.cma Jessie3.cmxs
