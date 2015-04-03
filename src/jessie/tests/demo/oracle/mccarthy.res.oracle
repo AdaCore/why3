@@ -3,21 +3,13 @@
 [jessie3] Loading Why3 theories...
 [jessie3] Loading Why3 modules...
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
-[kernel] Parsing tests/demo/isqrt.c (with preprocessing)
+[kernel] Parsing tests/demo/mccarthy.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
-[jessie3] creating logic symbol 68 (sqr)
-[jessie3] processing function isqrt
-[jessie3] created program function isqrt (69)
-[jessie3] processing function main
-[jessie3] created program function main (76)
-[jessie3] found 1 logic decl(s)
-[jessie3] made 1 theory(ies)
-[jessie3] failure: Exception raised during translation to Why3:
-                   Ident isqrt is not yet declared
+[jessie3] processing function f91
 [jessie3] failure: Exception raised when loading prover drivers:
-                   anomaly: Log.AbortFatal("jessie3")
-[kernel] Current source was: tests/demo/isqrt.c:22
+                   anomaly: Log.FeatureRequest("jessie3", "named behaviors")
+[kernel] Current source was: tests/demo/mccarthy.c:15
          The full backtrace is:
          Raised at file "src/kernel/log.ml", line 524, characters 30-31
          Called from file "src/kernel/log.ml", line 518, characters 9-16

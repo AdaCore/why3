@@ -1,8 +1,10 @@
+FRAMAC_TOPLEVEL = @FRAMAC@
 FRAMAC_SHARE  = @FRAMAC_SHARE@
 FRAMAC_LIBDIR = @FRAMAC_LIBDIR@
 
 PLUGIN_NAME   = Jessie3
 MODULES       = literals ACSLtoWhy3 register
+TESTS	      = basic demo
 
 WHYLIB  = ../../lib/why3
 
@@ -41,10 +43,20 @@ test.opt:
 	frama-c -load-module ./Jessie3.cmxs -jessie3 tests/basic/forty-two.c
 # -kernel-debug 2
 
-tests::
+tests:: tests/ptests_config
 	time -p ptests.opt
 	grep 'Task\|Ergo' tests/basic/result/*.res.log  tests/demo/result/*.res.log
 
+tests/ptests_config: Makefile
+	rm -rf tests/ptests_config
+	echo "DEFAULT_SUITES="$(TESTS) > tests/ptests_config
+	echo "TOPLEVEL_PATH="$(FRAMAC_TOPLEVEL) >> tests/ptests_config
+	echo "FRAMAC_SHARE="$(FRAMAC_SHARE) >> tests/ptests_config
+	echo "FRAMAC_PLUGIN=." >> tests/ptests_config
+	echo "FRAMAC_PLUGIN_GUI=./gui" >> tests/ptests_config
+	echo "FRAMAC_LIB="$(FRAMAC_LIBDIR) >> tests/ptests_config
+	echo "OCAMLRUNPARAM=" >> tests/ptests_config
+	chmod a-w tests/ptests_config
 
 clean:
 	rm -f $(addsuffix .cmo, $(MODULES))
