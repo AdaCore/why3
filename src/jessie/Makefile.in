@@ -43,7 +43,9 @@ test.opt:
 	frama-c -load-module ./Jessie3.cmxs -jessie3 tests/basic/forty-two.c
 # -kernel-debug 2
 
-tests:: tests/ptests_config
+.PHONY: tests
+
+tests: tests/ptests_config
 	time -p ptests.opt
 	grep 'Task\|Ergo' tests/basic/result/*.res.log  tests/demo/result/*.res.log
 
