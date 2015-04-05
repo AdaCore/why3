@@ -22,7 +22,26 @@
 #include <string.h>
 #include <sys/wait.h>
 
-void do_nothing() {}
+static int wallclock_timelimit = 60;
+static int showtime = 0, hidetime = 0;
+
+void show_time() {
+  struct tms tms;
+  double time;
+  if (showtime) {
+    times(&tms);
+    time = (double)((tms.tms_cutime + tms.tms_cstime + 0.0)
+                    / sysconf(_SC_CLK_TCK));
+    fprintf(stderr, "why3cpulimit time : %f s\n", time);
+  }
+}
+
+void wallclock_timelimit_reached() {
+  fprintf(stderr,
+          "Why3cpulimit: wallclock timelimit %d reached, killing command\n",
+          wallclock_timelimit);
+}
+
 
 void usage(char *argv0) {
   fprintf(stderr,
@@ -34,7 +53,6 @@ void usage(char *argv0) {
 
 int main(int argc, char *argv[]) {
   long timelimit, memlimit;
-  int showtime, hidetime;
   struct rlimit res;
 
   if (argc < 5) usage(argv[0]);
@@ -63,18 +81,18 @@ int main(int argc, char *argv[]) {
 
     if (pid > 0) {
       int status;
-      struct tms tms;
-      double time;
       pid_t p;
       struct sigaction sa;
 
-      sa.sa_handler = &do_nothing;
+      /* set a wallclock time limit as last resort */
+      sa.sa_handler = &wallclock_timelimit_reached;
       sigemptyset(&sa.sa_mask);
       sa.sa_flags = 0;
       sigaction(SIGALRM, &sa, NULL);
+      wallclock_timelimit = 2*timelimit + 60;
+      alarm(wallclock_timelimit);
 
-      alarm(timelimit + 60);
-
+      /* wait for the subprocess */
       p = waitpid(pid, &status, 0);
 
       if (p <= 0) {
@@ -86,12 +104,7 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      if (showtime) {
-        times(&tms);
-        time = (double)((tms.tms_cutime + tms.tms_cstime + 0.0)
-                        / sysconf(_SC_CLK_TCK));
-        fprintf(stderr, "why3cpulimit time : %f s\n", time);
-      }
+      show_time();
 
       if (WIFEXITED(status)) return WEXITSTATUS(status);
       if (WIFSIGNALED(status)) kill(getpid(), WTERMSIG(status));
@@ -130,4 +143,3 @@ int main(int argc, char *argv[]) {
   return EXIT_FAILURE;
 
 }
-
