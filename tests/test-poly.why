@@ -8,6 +8,10 @@ use import int.Int
 
 goal g : 2+2 = 5
 
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T Mono -G g *)
+
+
 end
 
 
@@ -35,6 +39,8 @@ constant x : v
 goal g4 : match x with I y -> y=A | J y (D z) -> z=A | J B z -> z=C | J A C -> true end
 
 goal g5 : match x with I y -> y | J y _ -> y end = A
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T MonoType -G g0 *)
 
 end
 
@@ -72,6 +78,8 @@ end
 theory PolySymb
 
 function id (x:'a) : 'a = x
+
+meta "encoding:ignore_polymorphism_ls" function id
 
 goal g: forall x:int. id x = x
 

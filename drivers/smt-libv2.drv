@@ -27,7 +27,7 @@ theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
-
+  meta "encoding:ignore_polymorphism_ls" predicate (=)
   meta "encoding : kept" type int
 end
 
