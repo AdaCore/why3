@@ -19,6 +19,7 @@ module SchorrWaite
   use import list.HdTlNoOpt
   use import list.Append
   use import set.Fset as S
+  use import option.Option
 
   (** a small component-as-array memory model *)
 
@@ -29,6 +30,8 @@ module SchorrWaite
   val c: ref (map loc bool)
   val left: ref (map loc loc)
   val right: ref (map loc loc)
+  (** record the path from the root to a node *)
+  val ghost path_from_root : ref (map loc (list loc))
 
   val get_left (p: loc) : loc
     requires { p <> null }
@@ -66,7 +69,7 @@ module SchorrWaite
     x <> null && (left[x] = y || right[x] = y)
 
   inductive path (left right : map loc loc) (x y : loc) (p : list loc) = 
-  | path_null  : forall x : loc, l r : map loc loc. path l r x x Nil
+  | path_nil   : forall x : loc, l r : map loc loc. path l r x x Nil
   | path_cons  : forall x y z : loc,
     	      	 l r : (map loc loc),
 		 p : list loc.
@@ -106,13 +109,25 @@ module SchorrWaite
     | Cons _ y   -> length_tl y
     end
 
+  (* auxiliar function the define the form of a stack *)
+  function next (l r : map loc loc) (c : map loc bool) (p : loc) : loc = 
+    if c[p] then r[p] else l[p]
+
+  inductive stack_form (l r : map loc loc) (c : map loc bool) (p : loc) (stack : list loc) =
+  | stack_nil  : forall l r : map loc loc, c : map loc bool, p : loc. stack_form l r c p Nil
+  | stack_cons : forall l r : map loc loc,
+    	       	 c : map loc bool,
+		 p : loc, 
+		 s : list loc. stack_form l r c (next l r c p) s -> 
+		 stack_form l r c p (Cons p s)
+
   let schorr_waite (root: loc) (unmarked_nodes c_false_nodes : ref (set loc)) : unit
     requires { root <> null }
     (* graph starts with nothing marked and no child currently visited *)
-    requires { forall x : loc. x <> null && reachable root x !left !right ->
+    requires { forall x : loc. x <> null (*&& reachable root x !left !right*) ->
     	       not !m[x] /\ not !c[x] }
-    requires { forall x : loc. x <> null /\ not !m[x] -> S.mem x !unmarked_nodes }
-    requires { forall x : loc. x <> null /\ not !c[x] -> S.mem x !c_false_nodes }
+    requires { forall x : loc. x <> null /\ not !m[x] <-> S.mem x !unmarked_nodes } (* isto é capaz de estar ao contrario *)
+    requires { forall x : loc. x <> null /\ not !c[x] <-> S.mem x !c_false_nodes }  (* idem *)
     (* the structure of the graph is not changed *)
     ensures  { forall n : loc. 
     	       (old !left)[n] = !left[n] /\
@@ -120,26 +135,42 @@ module SchorrWaite
     (* all the non-null vertices reachable from root
        are marked at the end of the algorithm *)
     ensures  { forall n : loc. 
-    	       n <> null /\ reachable root n !left !right ->
+    	       n <> null /\ reachable root n (old !left) (old !right) ->
 	       !m[n] }
+    (* every marked node was reachable from 'root' in the pre-state *)	       
+    ensures  { forall n : loc. n <> null /\ 
+    	       !m[n] -> reachable root n (old !left) (old !right) }
     (* forall non-reachable vertices the mark remains 
        the same as in the pre-state *)
-    ensures  { forall n : loc. 
+    ensures  { forall n : loc. n <> null /\
     	       not reachable root n !left !right ->
 	       !m[n] = (old !m)[n] }
-  = let t = ref root in
+  = 'Init:
+    let t = ref root in
     let p = ref null in
     let ghost stackNodes = ref Nil in
+    let ghost path = ref Nil in
     while !p <> null || (!t <> null && not !m[!t]) do
       invariant { not (L.mem !t !stackNodes) }
       invariant { length !stackNodes = 0 <-> !p = null }
       invariant { forall n : loc. n <> null /\ not !m[n] -> 
       		  S.mem n !unmarked_nodes }
+      invariant { length !stackNodes > 0 -> hd !stackNodes = !p }
+      invariant { forall n : loc. n <> null /\ (n = !p \/ L.mem n !stackNodes) ->
+      		  !m[n] }
+      (* the current pointers within the stack *)
+      invariant { stack_form !left !right !c !p !stackNodes }
+      		  
       invariant { forall n : loc. n <> null /\ not !c[n] -> 
       		  S.mem n !c_false_nodes }
-      (* invariant { forall n : loc. L.mem n !stackNodes ->
-      		  S.mem n graph } *)
-      (*invariant { !p <> null -> S.mem !p graph }*)
+      invariant { forall n : loc. not L.mem n !stackNodes /\ n <> !t ->
+      		  !c[n] = (at !c 'Init)[n] }
+      invariant { forall n : loc. L.mem n !stackNodes  \/ 
+      		  (!right[n] = (at !right 'Init)[n] /\ !left[n] = (at !left 'Init)[n]) }
+      invariant { !p <> null -> reachable_via root !p (at !left 'Init) (at !right 'Init) !path }
+      invariant { forall n : loc, pth : list loc. n <> null /\ !m[n] /\ pth = !path_from_root[n] ->
+      		  reachable_via root n (at !left 'Init) (at !right 'Init) pth }
+      invariant { forall n : loc. n <> null /\ !m[n] -> reachable root n (at !left 'Init) (at !right 'Init) }
       variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, length !stackNodes }
       if !t = null || !m[!t] then begin
         (*assert { S.mem !p graph };*)
@@ -149,6 +180,7 @@ module SchorrWaite
 	  stackNodes := tl_stackNodes !stackNodes;
           p := !right[!p];
           set_right !t q;
+	  path := !path_from_root[!p];
         end else begin (* swing *)
           let q = !t in
           t := get_right !p;
@@ -161,9 +193,11 @@ module SchorrWaite
         let q = !p in
         p := !t;
 	stackNodes := Cons !p !stackNodes;
+	if !p <> root then path := !path ++ (Cons !p Nil);
         t := get_left !t;
         set_left !p q;
         set_m !p true;
+	!path_from_root[!p] = !path;
         (*set_c !p false;*) (* if we assume at the pre-condition that all nodes start with c = 0,
 		   	       then this redundant *)
 	unmarked_nodes := S.remove !p !unmarked_nodes
