@@ -185,7 +185,7 @@ module MachineArithmetic
 
   use mach.onetime.OneTime as O
 
-(***
+  type oref = { mutable ot : O.t }
 
   let rec mcount_bt_queens (board: array int63) (n: int63) (pos: int63) : O.t
     requires { to_int (length board) = to_int n }
@@ -197,7 +197,7 @@ module MachineArithmetic
     if eq pos n then
       O.succ (O.zero ())
     else begin
-      let s = ref (O.zero ()) in
+      let s = { ot = O.zero () } in
       let rec forloop (i: int63) = (* for i = 0 to n-1 do *)
         requires { 0 <= to_int i <= to_int n }
         requires { is_board board (to_int pos) }
@@ -206,13 +206,13 @@ module MachineArithmetic
         if i < n then begin
           board[pos] <- i;
           if mcheck_is_consistent board pos then
-            s := O.add !s (mcount_bt_queens board n (pos + of_int 1));
+            s.ot <- O.add s.ot (mcount_bt_queens board n (pos + of_int 1));
             (* let _ = O.add !s (mcount_bt_queens board n (pos + of_int 1))
                in (); *)
           forloop (i + of_int 1)
         end in
       forloop (of_int 0);
-      !s
+      s.ot
     end
 
   let mcount_queens (board: array int63) (n: int63) : O.t
@@ -224,8 +224,6 @@ module MachineArithmetic
     let n = of_int 8 in
     let a = Array63.make n (of_int 0) in
     mcount_queens a n
-
-***)
 
 end
 
