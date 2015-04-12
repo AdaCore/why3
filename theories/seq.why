@@ -108,7 +108,8 @@ theory Seq
   function create (len: int) (f: int -> 'a) : seq 'a
 
   axiom create_length:
-    forall len: int, f: int -> 'a. length (create len f) = len
+    forall len: int, f: int -> 'a.
+    0 <= len -> length (create len f) = len
 
   axiom create_get:
     forall len: int, f: int -> 'a, i: int. 0 <= i < len ->
