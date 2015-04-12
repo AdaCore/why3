@@ -192,6 +192,7 @@ module MachineArithmetic
     requires { 0 <= to_int pos <= to_int n }
     requires { is_board board (to_int pos) }
     variant  { to_int n - to_int pos }
+    ensures  { result.O.valid }
     ensures  { is_board board (to_int pos) }
   =
     if eq pos n then
@@ -200,15 +201,15 @@ module MachineArithmetic
       let s = { ot = O.zero () } in
       let rec forloop (i: int63) = (* for i = 0 to n-1 do *)
         requires { 0 <= to_int i <= to_int n }
+        requires { s.ot.O.valid }
         requires { is_board board (to_int pos) }
         variant  { to_int n - to_int i }
+        ensures  { s.ot.O.valid }
         ensures  { is_board board (to_int pos) }
         if i < n then begin
           board[pos] <- i;
           if mcheck_is_consistent board pos then
             s.ot <- O.add s.ot (mcount_bt_queens board n (pos + of_int 1));
-            (* let _ = O.add !s (mcount_bt_queens board n (pos + of_int 1))
-               in (); *)
           forloop (i + of_int 1)
         end in
       forloop (of_int 0);
