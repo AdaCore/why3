@@ -4,7 +4,13 @@ module M
 
   use import int.Int
 
-  val y "model" "model_trace:y" :ref int
+  function projf (l : int) : int
+  =
+  l+100
+
+  meta "model_projection" function projf
+
+  val y "model" "model_projected" "model_trace:y" :ref int
 
   let incr ( x "model" "model_trace:x" : ref int ): unit
   ensures { !x = old !x + 2 + !y }
