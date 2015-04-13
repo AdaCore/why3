@@ -1,0 +1,107 @@
+
+(**
+
+{1 VerifyThis @ ETAPS 2015 competition, Challenge 2: Parallel GCD}
+
+{h
+
+The following is the original description of the verification task,
+reproduced verbatim from
+<a href="http://etaps2015.verifythis.org/challenges">the competition web site</a>.
+
+<pre>
+PARALLEL GCD (60 minutes)
+=========================
+
+Algorithm description
+---------------------
+
+Various parallel GCD algorithms exist. In this challenge, we consider a
+simple Euclid-like algorithm with two parallel threads. One thread
+subtracts in one direction, the other thread subtracts in the other
+direction, and eventually this procedure converges on GCD.
+
+
+Implementation
+--------------
+
+In pseudocode, the algorithm is described as follows:
+
+(
+  WHILE a != b DO
+      IF a>b THEN a:=a-b ELSE SKIP FI
+  OD
+||
+  WHILE a != b DO
+       IF b>a THEN b:=b-a ELSE SKIP FI
+  OD
+);
+OUTPUT a
+
+
+Verification tasks
+------------------
+
+Specify and verify the following behaviour of this parallel GCD algorithm:
+
+Input:  two positive integers a and b
+Output: a positive number that is the greatest common divisor of a and b
+
+Feel free to add synchronisation where appropriate, but try to avoid
+blocking of the parallel threads.
+
+
+Sequentialization
+-----------------
+
+If your tool does not support reasoning about parallel threads, you may
+verify the following pseudocode algorithm:
+
+WHILE a != b DO
+    CHOOSE(
+         IF a > b THEN a := a - b ELSE SKIP FI,
+         IF b > a THEN b := b - a ELSE SKIP FI
+    )
+OD;
+OUTPUT a
+
+</pre>}
+
+The following is the solution by Jean-Christophe Filliâtre (CNRS)
+and Guillaume Melquiond (Inria) who entered the competition as "team Why3".
+
+Since Why3 has no support for threads, we prove the sequential
+implementation. We do not prove termination, which would require some
+fairness hypothesis (in that case, you can prove that the code
+terminates with probability 1).
+
+*)
+
+module ParallelGCD
+
+  use import int.Int
+  use import number.Gcd
+  use import ref.Ref
+
+  (** the following lemma is easily derived from a more general
+      lemma in library [number.Gcd], namely [gcd_euclid].*)
+  lemma gcd_sub: forall a b: int. gcd a b = gcd a (b - a)
+
+  let parallel_gcd (a0 b0: int) : int
+    requires { 0 < a0 /\ 0 < b0 }
+    diverges
+    ensures  { result = gcd a0 b0 }
+  =
+    let a = ref a0 in
+    let b = ref b0 in
+    while !a <> !b do
+      invariant { 0 < !a <= a0 /\ 0 < !b <= b0 }
+      invariant { gcd !a !b = gcd a0 b0 }
+      if any bool then
+        if !a > !b then a := !a - !b else ()
+      else
+        if !b > !a then b := !b - !a else ()
+    done;
+    !a
+
+end
