@@ -3,12 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
-<file name="../verifythis_2015_relaxed_prefix.mlw" expanded="true">
-<theory name="RelaxedPrefix" sum="1aec45f1cb638f259a0aa093f19178a1" expanded="true">
- <goal name="WP_parameter is_relaxed_prefix" expl="VC for is_relaxed_prefix" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<file name="../verifythis_2015_relaxed_prefix.mlw">
+<theory name="RelaxedPrefix" sum="1aec45f1cb638f259a0aa093f19178a1">
+ <goal name="WP_parameter is_relaxed_prefix" expl="VC for is_relaxed_prefix">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter is_relaxed_prefix.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -52,8 +51,6 @@
   </goal>
   <goal name="WP_parameter is_relaxed_prefix.11" expl="11. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.15" steps="43"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="6.04"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="5.98"/></proof>
   </goal>
   <goal name="WP_parameter is_relaxed_prefix.12" expl="12. index in array bounds">
   <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
