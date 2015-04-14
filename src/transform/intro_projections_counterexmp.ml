@@ -9,10 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-  
-*)
-
 open Ident
 open Term
 open Decl
@@ -128,12 +124,14 @@ let meta_transform2 projs =
   let map_projs = build_projections_map projs in
   Trans.decl (introduce_projs map_projs) None
 
-let intro_projections_counterexmp = Trans.on_tagged_ls meta_projection meta_transform2
+let intro_projections_counterexmp = 
+  Trans.on_tagged_ls meta_projection meta_transform2
+
 
 let () = Trans.register_transform "intro_projections_counterexmp" intro_projections_counterexmp
-  ~desc:"Introduce@ new@ constant@ symbol@ for@ every@ term@ with@ model@ \
-         label@ that@ has@ the@ same@ type@ as@ an@ argument@ of@ some@ function@ \
-         labeled@ with@ meta@ model_projectionin@ the@ goal."
+  ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ labeled@ with@ label@ \
+model_projected@ for@ that@ it@ exists@ a@ projection@ function@ f@ creates@ declaration@ of@ \
+new@ constant@ c@ and@ axiom@ stating@ that c = f p"
 
 (*
 Local Variables:
