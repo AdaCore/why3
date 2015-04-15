@@ -15,125 +15,101 @@ open Theory
 let debug = Debug.register_info_flag "detect_poly"
   ~desc:"Print@ debugging@ messages@ of@ the@ 'detect_polymorphism'@ transformation."
 
+(* metas to attach to symbols or propositions to tell their polymorphic
+nature can be ignored because it will be treated specifically by
+drivers *)
+
+let meta_ignore_polymorphism_ts =
+  register_meta
+    "encoding:ignore_polymorphism_ts" [MTtysymbol]
+    ~desc:"Ignore@ polymorphism@ of@ given@ type@ symbol."
+
+let meta_ignore_polymorphism_ls =
+  register_meta
+    "encoding:ignore_polymorphism_ls" [MTlsymbol]
+    ~desc:"Ignore@ polymorphism@ of@ given@ logic@ symbol."
+
+let meta_ignore_polymorphism_pr =
+  register_meta
+    "encoding:ignore_polymorphism_pr" [MTprsymbol]
+    ~desc:"Ignore@ polymorphism@ of@ given@ proposition."
+
+(* exclusive meta that is set by the transformation when no
+   polymorphic definition is found *)
+
 let meta_monomorphic_types_only =
   register_meta_excl "encoding:monomorphic_only" []
   ~desc:"Set@ when@ no@ occurrences@ of@ type@ variables@ occur."
 
-(*
-let meta_has_polymorphic_types =
-  register_meta_excl "encoding:polymorphic_types" []
-  ~desc:"Set@ when@ occurrences@ of@ type@ variables@ occur."
-*)
 
-exception Found
+let check_ts ign_ts ts =
+  ts.Ty.ts_args <> [] && not (Ty.Sts.mem ts ign_ts)
 
-open Term
+let check_ls ign_ls ls =
+  not (Term.Sls.mem ls ign_ls) &&
+  List.fold_left
+    (fun acc ty -> acc || not (Ty.ty_closed ty))
+    false
+    ls.Term.ls_args
 
-let check_ts ts =
-  if ts.Ty.ts_args <> [] then
-    (Debug.dprintf debug "====== Type %a is polymorphic =======@."
-       Pretty.print_ts ts;
-     raise Found)
-
-let check_ls ls =
-  if not (ls_equal ls ps_equ) then
-    try
-      List.iter (fun ty -> if not (Ty.ty_closed ty) then raise Found)
-        ls.ls_args
-    with Found ->
-      Debug.dprintf debug "====== Symbol %a is polymorphic =======@."
-        Pretty.print_ls ls;
-      raise Found
-
-let check_term t =
-  let s = Term.t_ty_freevars Ty.Stv.empty t in
-  if not (Ty.Stv.is_empty s) then raise Found
-
-let find_in_decl d =
+let detect_polymorphism_in_decl ign_ts ign_ls ign_pr d =
+  Debug.dprintf debug "[detect_polymorphism] |sts|=%d |sls|=%d |spr|=%d@."
+                (Ty.Sts.cardinal ign_ts)
+                (Term.Sls.cardinal ign_ls)
+                (Spr.cardinal ign_pr);
+  Debug.dprintf debug "[detect_polymorphism] decl %a@."
+                Pretty.print_decl d;
   match d.d_node with
-  | Dtype ts ->
-    Debug.dprintf debug "@[Dtype %a@]@." Pretty.print_ts ts;
-    check_ts ts
+  | Dtype ts -> check_ts ign_ts ts
   | Ddata dl ->
-    Debug.dprintf debug "@[Ddata %a@]@."
-      (Pp.print_list Pp.space Pretty.print_data_decl) dl;
-    List.iter (fun (ts,_) -> check_ts ts) dl
+     List.fold_left (fun acc (ts,_) -> acc || check_ts ign_ts ts) false dl
   | Dparam ls ->
-    Debug.dprintf debug "@[Dparam %a@]@." Pretty.print_ls ls;
-    check_ls ls
+     Debug.dprintf debug "[detect_polymorphism] param %a@."
+                Pretty.print_ls ls;
+     check_ls ign_ls ls
   | Dlogic dl ->
-    Debug.dprintf debug "@[Dlogic %a@]@."
-      (Pp.print_list Pp.space Pretty.print_ls) (List.map fst dl);
-    List.iter (fun (ls,_) -> check_ls ls) dl
-    (* TODO: check also that definition bodies are monomorphic ? *)
+     (* note: we don't need to check also that definition bodies are
+        monomorphic, since it is checked by typing *)
+     List.fold_left (fun acc (ls,_) -> acc || check_ls ign_ls ls) false dl
   | Dind (_,indl) ->
-    Debug.dprintf debug "@[Dind %a@]@."
-      (Pp.print_list Pp.space Pretty.print_ls) (List.map fst indl);
-    List.iter (fun (ls,_) -> check_ls ls) indl
-    (* TODO: check also that clauses are monomorphic ? *)
+     (* note: we don't need to check also that clauses are
+        monomorphic, since it is checked by typing *)
+     List.fold_left (fun acc (ls,_) -> acc || check_ls ign_ls ls) false indl
   | Dprop (_,pr,t) ->
-    Debug.dprintf debug "@[Dprop %a@]@." Pretty.print_pr pr;
-    try check_term t
-    with Found ->
-      Debug.dprintf debug "====== prop is polymorphic =======@.";
-      raise Found
+     not (Spr.mem pr ign_pr) &&
+       let s = Term.t_ty_freevars Ty.Stv.empty t in
+       not (Ty.Stv.is_empty s)
 
 
-(**)
+let detect_polymorphism_in_task_hd ign_ts ign_l ign_pr t acc =
+  match t.Task.task_decl.td_node with
+  | Decl d -> acc || detect_polymorphism_in_decl ign_ts ign_l ign_pr d
+  | Use _ | Clone _ | Meta _ -> acc
 
-let (*
-rec find_in_theory th = List.iter find_in_tdecl th.th_decls
 
-and
-    *)
-find_in_tdecl td =
-  match td.td_node with
-  | Decl d -> find_in_decl d
-  | Use _th ->
-    (* Debug.dprintf debug "Look up in used theory %a@." Pretty.print_th th; *)
-    (* find_in_theory th *)
-    () (* no need to traverse used theories *)
-  | Clone (_th,_) ->
-    (* Debug.dprintf debug "Look up in cloned theory %a@." Pretty.print_th th; *)
-    (* find_in_theory th *)
-    () (* no need to traverse used theories *)
-  | Meta  _ -> ()
-
-let rec find_in_task task =
-  match task with
-  | None -> ()
-  | Some t -> find_in_task t.Task.task_prev ; find_in_tdecl t.Task.task_decl
+let detect_polymorphism_in_task =
+  Trans.on_tagged_ts
+    meta_ignore_polymorphism_ts
+    (fun sts ->
+     Trans.on_tagged_ls
+       meta_ignore_polymorphism_ls
+       (fun sls ->
+        Trans.on_tagged_pr
+          meta_ignore_polymorphism_pr
+          (fun spr ->
+           Trans.fold
+             (detect_polymorphism_in_task_hd sts sls spr)
+             false)))
 
 let detect_polymorphism task =
-  try
-    find_in_task task;
+  if Trans.apply detect_polymorphism_in_task task then task else
     try
       let g,t = Task.task_separate_goal task in
       let ta = Task.add_meta t meta_monomorphic_types_only [] in
       Task.add_tdecl ta g
     with Task.GoalNotFound ->
       Task.add_meta task meta_monomorphic_types_only []
-  with Found -> task
 
 let () = Trans.register_transform "detect_polymorphism"
   (Trans.store detect_polymorphism)
   ~desc:"Detect if task has polymorphic types somewhere."
-
-
-(* A variant, not satisfactory
-let check_decl d =
-  try
-    find_in_decl d;
-    [Theory.create_decl d]
-  with Found ->
-    [Theory.create_meta meta_has_polymorphic_types [];
-     Theory.create_decl d]
-
-
-let detect_polymorphism = Trans.tdecl check_decl None
-
-let () = Trans.register_transform "detect_polymorphism"
-  detect_polymorphism
-  ~desc:"Detect if task has polymorphic types somewhere."
-
-*)

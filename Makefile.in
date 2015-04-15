@@ -1278,8 +1278,8 @@ CLEANLIBS += lib/why3/why3extract
 
 ifeq (@enable_frama_c@,yes)
 
-byte: jessie.byte
-opt: jessie.opt
+nobyte: jessie.byte
+noopt: jessie.opt
 
 jessie.byte: src/jessie/Makefile lib/why3/why3.cma
 	@$(MAKE) -C src/jessie Jessie3.cma

@@ -1,13 +1,21 @@
-[kernel] preprocessing with "gcc -C -E -I.  tests/basic/generic.c"
-[jessie3] creating logic symbol 740 (occ)
-[jessie3] creating logic symbol 742 (singleton)
-[jessie3] creating logic symbol 745 (bag_union)
+[jessie3] Loading Why3 configuration...
+[jessie3] Why3 environment loaded.
+[jessie3] Loading Why3 theories...
+[jessie3] Loading Why3 modules...
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] Parsing tests/basic/generic.c (with preprocessing)
+[jessie3] Loading prover drivers...
+[jessie3] Translating to Why3...
+[jessie3] creating logic symbol 69 (occ)
+[jessie3] creating logic symbol 71 (singleton)
+[jessie3] creating logic symbol 74 (bag_union)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 1 theory(ies)
 [jessie3] made 0 function(s)
+[jessie3] Running provers...
 [jessie3] running theory 1:
 [jessie3] theory Bag
-            (* use why3.BuiltIn *)
+            (* use why3.BuiltIn.BuiltIn *)
             
             (* use int.Int *)
             
@@ -23,16 +31,16 @@
             
             function bag_union (bag 'x) (bag 'x) : bag 'x
             end
-[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
-            (* use why3.BuiltIn *)
+            (* use why3.BuiltIn.BuiltIn *)
             
-            (* use why3.Bool *)
+            (* use why3.Bool.Bool *)
             
-            (* use why3.Unit *)
+            (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude *)
+            (* use why3.Prelude.Prelude *)
             
             (* use int.Int *)
             
@@ -44,6 +52,6 @@
             
             (* use ref.Ref *)
             
-            (* use mach_int.Int32 *)
+            (* use mach.int.Int32 *)
             end
-[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1

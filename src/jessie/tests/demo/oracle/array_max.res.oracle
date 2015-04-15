@@ -1,0 +1,154 @@
+[jessie3] Loading Why3 configuration...
+[jessie3] Why3 environment loaded.
+[jessie3] Loading Why3 theories...
+[jessie3] Loading Why3 modules...
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] Parsing tests/demo/array_max.c (with preprocessing)
+[jessie3] Loading prover drivers...
+[jessie3] Translating to Why3...
+[jessie3] processing function max
+[jessie3] created program function max (67)
+[jessie3] found 0 logic decl(s)
+[jessie3] made 0 theory(ies)
+[jessie3] made 1 function(s)
+[jessie3] Running provers...
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use why3.Prelude.Prelude *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            (* use map.Map *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach.int.Int32 *)
+            
+            goal WP_parameter_max :
+              forall a:map int int32, len:int32.
+               to_int len > 0 ->
+                in_bounds 0 &&
+                 (forall o:int32.
+                   to_int o = 0 ->
+                    in_bounds 0 &&
+                     (forall o1:int32.
+                       to_int o1 = 0 ->
+                        in_bounds 0 &&
+                         (forall o2:int32.
+                           to_int o2 = 0 ->
+                            (forall x:int32.
+                              x = o2 ->
+                               in_bounds 1 &&
+                                (forall o3:int32.
+                                  to_int o3 = 1 ->
+                                   in_bounds (to_int len - to_int o3) &&
+                                    (forall o4:int32.
+                                      to_int o4 = (to_int len - to_int o3) ->
+                                       (forall y:int32.
+                                         y = o4 ->
+                                          ((0 <= to_int x /\ to_int x <= to_int y) /\
+                                            to_int y < to_int len) /\
+                                           (forall y1:int32, x1:int32.
+                                             (0 <= to_int x1 /\ to_int x1 <= to_int y1) /\
+                                              to_int y1 < to_int len ->
+                                              (forall result:bool.
+                                                (result = True <->
+                                                  not to_int x1 = to_int y1) ->
+                                                 (if result = True then forall result1:
+                                                                         bool.
+                                                                         (result1 =
+                                                                           True <->
+                                                                           to_int
+                                                                            (get a
+                                                                              (
+                                                                              to_int x1)) <=
+                                                                            to_int
+                                                                             (get a
+                                                                              (to_int
+                                                                              y1))) ->
+                                                                          (if result1 =
+                                                                              True then 
+                                                                          in_bounds 1 &&
+                                                                           (forall o5:
+                                                                             int32.
+                                                                             to_int o5 =
+                                                                              1 ->
+                                                                              in_bounds
+                                                                              (to_int
+                                                                              x1 +
+                                                                              to_int o5) &&
+                                                                              (forall o6:
+                                                                              int32.
+                                                                              to_int o6 =
+                                                                              (to_int
+                                                                              x1 +
+                                                                              to_int o5) ->
+                                                                              (forall x2:
+                                                                              int32.
+                                                                              x2 = o6 ->
+                                                                              ((0 <=
+                                                                              to_int x2 /\
+                                                                              to_int x2 <=
+                                                                              to_int y1) /\
+                                                                              to_int y1 <
+                                                                              to_int
+                                                                              len) /\
+                                                                              0 <=
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int x1) /\
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int x2) <
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int x1))))
+                                                                          else 
+                                                                          in_bounds 1 &&
+                                                                           (forall o5:
+                                                                             int32.
+                                                                             to_int o5 =
+                                                                              1 ->
+                                                                              in_bounds
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int o5) &&
+                                                                              (forall o6:
+                                                                              int32.
+                                                                              to_int o6 =
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int o5) ->
+                                                                              (forall y2:
+                                                                              int32.
+                                                                              y2 = o6 ->
+                                                                              ((0 <=
+                                                                              to_int x1 /\
+                                                                              to_int x1 <=
+                                                                              to_int y2) /\
+                                                                              to_int y2 <
+                                                                              to_int
+                                                                              len) /\
+                                                                              0 <=
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int x1) /\
+                                                                              (to_int
+                                                                              y2 -
+                                                                              to_int x1) <
+                                                                              (to_int
+                                                                              y1 -
+                                                                              to_int x1)))))
+                                                 else 0 <= to_int x1 /\
+                                                       to_int x1 < to_int len))))))))))
+            end
+[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter max): Valid, Valid, Valid, Timeout, Timeout

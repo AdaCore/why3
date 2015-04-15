@@ -19,9 +19,14 @@ module Env
     tys_belong : ty_symbol -> bool;
     (* Type symbol arities. *)
     tys_arity : ty_symbol -> int;
-    (* Set of known constructors associated to the type.
-       If there is one, then the set is exhaustive. *)
+    (* Set of known constructors associated to the type. *)
     tys_constr : ty_symbol -> lsymbol -> bool;
+    (* Is the set of constructors complete ?
+       Added because:
+       1) In Why3 internals an incomplete situation is perfectly possible !
+       2) It fit much better to an incremental framework where constructors are
+          likely to be added one by one anyway. *)
+    tys_constr_complete : ty_symbol -> bool;
     (* Built-in type symbol for propositions. *)
     tys_prop : ty_symbol;
     (* Logical symbols belonging to the signature. *)
@@ -34,6 +39,8 @@ module Env
     ls_args : lsymbol -> list ty;
     (* Types for logical symbols return values. *)
     ls_ret : lsymbol -> ty;
+    (* Built-in logical symbol for equality. *)
+    ls_equ : lsymbol;
   }
   
   predicate tys_alg (sig:signature) (tys:ty_symbol) =
@@ -62,6 +69,11 @@ module Env
     | Nil -> true
     | Cons x q -> ty_wf sig x /\ tyl_wf sig q
     end
+  
+  function ty_prop (sig:signature) : ty =
+    TyApp sig.tys_prop Nil
+  
+  constant eq_args : list ty = Cons (TyVar 0) (Cons (TyVar 0) Nil)
   
   (* Build the list of type variables [0;1;...;n-1].
      Corresponds to the list of type arguments for polymorphic constructors. *)
@@ -102,7 +114,11 @@ module Env
       ty_vars_in (range 0 n) sig.tys_belong (sig.ls_ret f) /\
       tyl_vars_in (range 0 n) sig.tys_belong (sig.ls_args f) /\
       ty_wf sig (sig.ls_ret f) /\
-      tyl_wf sig (sig.ls_args f))
+      tyl_wf sig (sig.ls_args f)) /\
+    (* Equality is a logical symbol with scheme 'a. 'a -> 'a -> prop *)
+    sig.ls_belong sig.ls_equ /\
+    sig.ls_ret sig.ls_equ = ty_prop sig /\
+    sig.ls_args sig.ls_equ = eq_args
   
   predicate env_wf (sig:signature) (env:ty_env 'tv) =
     forall x. env.tv_belong x -> ty_wf sig (env.tv_ty x)
@@ -123,9 +139,6 @@ module Env
   
   function ty_ret (sig:signature) (f:lsymbol) (tyl:list ty) : ty =
     ty_subst_ret tyl (sig.ls_ret f)
-  
-  function ty_prop (sig:signature) : ty =
-    TyApp sig.tys_prop Nil
   
   (* Well-formedness dependencies. *)
   predicate sig_ty_congruence (a:ty_symbol -> bool) (sig1 sig2:signature)  =
@@ -346,7 +359,7 @@ module Pattern
           | Some _ , _ | _ , Some _ -> ("keep_on_simp" true) && false
           | _ -> false end }
     | Nil , Nil -> ()
-    | _ -> assert { "keep_on_simp" true }
+    | _ -> "keep_on_simp" ()
     end
   
   (* Types of collected variables are well-formed. *)
@@ -396,8 +409,40 @@ module Pattern
      (a skeleton pattern is a pattern containing only constructors and
      wildcards).
      Any other way would requires some form of pattern compilation,
-     which we want to avoid. *)
+     which we want to avoid.
+     NOTE: Since we now have to handle incomplete patterns, we now
+       have a missing skeleton: a pattern matching absolutely nothing known
+       (can be easily coded using some PVar).
+       However, such pattern can only be allowed iff the signature say that
+       the type being matched has incomplete constructors, e.g values that
+       cannot be decomposed.
+       => We have to switch from skeleton patterns to skeleton patterns for
+          a given type. *)
   
+  (* Well-typed skeletons. *)
+  predicate skeleton_wty (sig:signature) (pat:pattern) (ty:ty) =
+    match pat with
+    | PWild -> true
+    | PVar _ -> match ty with
+      | TyApp tys _ -> not sig.tys_constr_complete tys
+      | _ -> true
+      end
+    | PApp f tyl pl -> tyl_wf sig tyl /\
+      sig.ls_ty_arity f = length tyl /\
+      sig.ls_constr f /\ ty_ret sig f tyl = ty /\
+      skeleton_l_wty sig pl (ty_args sig f tyl)
+    | _ -> false
+    end
+  
+  with skeleton_l_wty (sig:signature) (patl:list pattern) (tyl:list ty) =
+    match patl , tyl with
+    | Cons p q , Cons typ tyq -> skeleton_wty sig p typ /\
+      skeleton_l_wty sig q tyq
+    | Nil , Nil -> true
+    | _ -> false
+    end
+  
+  (*
   predicate pat_skeleton (pat:pattern) =
     match pat with
     | PWild -> true
@@ -409,7 +454,7 @@ module Pattern
     match patl with
     | Nil -> true
     | Cons x q -> pat_skeleton x /\ patl_skeleton q
-    end
+    end*)
   
   predicate pat_skeleton_match (p1 p2:pattern) =
     match p1 , p2 with
@@ -435,8 +480,7 @@ module Pattern
     end
   
   predicate exhaustive (sig:signature) (brl:list (branch 'tv)) (ty:ty) =
-    forall pat. pat_skeleton pat /\ pat_wty sig pat ty ->
-      case_skeleton_match pat brl
+    forall pat. skeleton_wty sig pat ty -> case_skeleton_match pat brl
   
 end
 

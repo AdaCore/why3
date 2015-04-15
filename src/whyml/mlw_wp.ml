@@ -137,11 +137,19 @@ let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let expl_loopvar   = Ident.create_label "expl:loop variant decrease"
 let expl_variant   = Ident.create_label "expl:variant decrease"
 
-let rec wp_expl l f = match f.t_node with
-  | _ when Slab.mem Split_goal.stop_split f.t_label -> t_label_add l f
-  | Tbinop (Tand,f1,f2) -> t_label_copy f (t_and (wp_expl l f1) (wp_expl l f2))
-  | Teps _ -> t_label_add l f (* post-condition, push down later *)
-  | _ -> f
+let lab_has_expl =
+  let expl_regexp = Str.regexp "expl:\\(.*\\)" in
+  Slab.exists
+    (fun l ->
+       Str.string_match expl_regexp l.lab_string 0)
+
+let rec wp_expl l f =
+  if lab_has_expl f.t_label then f
+  else match f.t_node with
+    | _ when Slab.mem Split_goal.stop_split f.t_label -> t_label_add l f
+    | Tbinop (Tand,f1,f2) -> t_label_copy f (t_and (wp_expl l f1) (wp_expl l f2))
+    | Teps _ -> t_label_add l f (* post-condition, push down later *)
+    | _ -> f
 
 let wp_and ~sym f1 f2 =
   if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
@@ -963,14 +971,19 @@ let rec unabsurd f = match f.t_node with
 let add_wp_decl km name f uc =
   (* prepare a proposition symbol *)
   let s = "WP_parameter " ^ name.id_string in
-  (* set a proper explanation *)
-  let n =
-    try let _,_,l = restore_path name in
-        String.concat "." l
-    with Not_found -> name.id_string
+  let label =
+    let label = name.id_label in
+    if lab_has_expl label then label
+    else
+      (* set a proper explanation *)
+      let n =
+        try let _, _, l = restore_path name in
+          String.concat "." l
+        with Not_found -> name.id_string
+      in
+      let lab = Ident.create_label ("expl:VC for " ^ n) in
+      Slab.add lab label
   in
-  let lab = Ident.create_label ("expl:VC for " ^ n) in
-  let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)

@@ -3,9 +3,17 @@
 printer "why3"
 filename "%f-%t-%g.why"
 
+(* transformation "detect_polymorphism" *)
+
 theory BuiltIn
   syntax type  int  "int"
   syntax type  real "real"
   syntax predicate (=)  "(%1 = %2)"
+  (* meta "encoding:ignore_polymorphism_ls" predicate (=) *)
 end
 
+(*
+theory list.List
+  meta "encoding:ignore_polymorphism_ts" type list
+end
+*)
