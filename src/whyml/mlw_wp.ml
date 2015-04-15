@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -289,11 +289,12 @@ let is_trace_label l =
   with Not_found -> false
 
 let add_to_trace_label labels to_add =
-  let trace_label = Slab.choose (Slab.filter is_trace_label labels) in
-  let labels_without_trace = Slab.remove trace_label labels in
-  let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_add) in
-  Slab.add new_trace_label labels_without_trace
-
+  try
+    let trace_label = Slab.choose (Slab.filter is_trace_label labels) in
+    let labels_without_trace = Slab.remove trace_label labels in
+    let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_add) in
+    Slab.add new_trace_label labels_without_trace
+  with Not_found -> labels
 
 let mk_var id label ?loc ty =
   let new_labels = add_to_trace_label id.id_label label in

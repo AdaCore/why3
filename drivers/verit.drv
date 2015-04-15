@@ -1,18 +1,20 @@
-(* Why driver for SMT syntax *)
+(* Why3 driver for veriT solver *)
 
 prelude ";;; this is a prelude for veriT"
 prelude "(set-logic AUFLIRA)"
+(* A  : Array
+   UF : Uninterpreted Function
+   LIRA : Linear Integer Reals Arithmetic
+*)
 
-printer "smtv2"
-filename "%f-%t-%g.smt2"
+import "smt-libv2.drv"
+import "discrimination.gen"
 
-valid "^unsat"
-unknown "^\\(unknown\\|sat\\)" ""
+(* specific message from veriT 201310 *)
 unknown "non-linear reasoning desactivated" ""
+(* specific message from veriT 201410 *)
+unknown "error : Non linear expression with non-linear reasoning disabled" ""
 
-time "why3cpulimit time : %s s"
-
-(* À discuter *)
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
@@ -27,114 +29,10 @@ transformation "simplify_formula"
 transformation "encoding_smt"
 transformation "encoding_sort"
 
-theory BuiltIn
-  syntax type int   "Int"
-  syntax type real  "Real"
-  syntax predicate (=)  "(= %1 %2)"
-
-  meta "encoding : kept" type int
-end
-
-theory int.Int
-
-  prelude ";;; this is a prelude for integer arithmetic"
-
-  syntax function zero "0"
-  syntax function one  "1"
-
-  syntax function (+)  "(+ %1 %2)"
-  syntax function (-)  "(- %1 %2)"
-  syntax function (*)  "(* %1 %2)"
-  syntax function (-_) "(- %1)"
-
-  syntax predicate (<=) "(<= %1 %2)"
-  syntax predicate (<)  "(< %1 %2)"
-  syntax predicate (>=) "(>= %1 %2)"
-  syntax predicate (>)  "(> %1 %2)"
-
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm.Comm
-  remove prop Unitary
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
-
-end
-
-
-theory real.Real
-
-  prelude ";;; this is a prelude for real arithmetic"
-
-  syntax function zero "0.0"
-  syntax function one  "1.0"
-
-  syntax function (+)  "(+ %1 %2)"
-  syntax function (-)  "(- %1 %2)"
-  syntax function (*)  "(* %1 %2)"
-  syntax function (/)  "(/ %1 %2)"
-  syntax function (-_) "(- %1)"
-  syntax function inv  "(/ 1.0 %1)"
-
-  syntax predicate (<=) "(<= %1 %2)"
-  syntax predicate (<)  "(< %1 %2)"
-  syntax predicate (>=) "(>= %1 %2)"
-  syntax predicate (>)  "(> %1 %2)"
-
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm.Comm
-  remove prop Unitary
-  remove prop Inverse
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
-
-  meta "encoding : kept" type real
-
-end
-
-theory Bool
-   syntax type bool      "Bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding : kept" type bool
-end
-
-theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function xorb  "(xor %1 %2)"
-   syntax function notb  "(not %1)"
-end
-
 
 (*
 Local Variables:
-mode: why
+mode: why3
 compile-command: "unset LANG; make -C .. bench"
 End:
 *)

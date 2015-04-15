@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -58,6 +58,7 @@ type global =
   | RegexpInvalid of string
   | RegexpTimeout of string
   | RegexpOutOfMemory of string
+  | RegexpStepsLimitExceeded of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
   | TimeRegexp of string
@@ -66,6 +67,7 @@ type global =
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
   | ExitCodeOutOfMemory of int
+  | ExitCodeStepsLimitExceeded of int
   | ExitCodeUnknown of int * string
   | ExitCodeFailure of int * string
   | Filename of string

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1289,6 +1289,7 @@ let why3tac ?(timelimit=timelimit) s gl =
       | Call_provers.Failure s -> error ("Failure: " ^ s)
       | Call_provers.Timeout -> error "Timeout"
       | OutOfMemory -> error "Out Of Memory"
+      | StepsLimitExceeded -> error "Steps Limit reached"
       | HighFailure ->
           error ("Prover failure\n" ^ res.pr_output ^ "\n")
   with

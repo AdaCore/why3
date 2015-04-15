@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** SMT v1 printer with some extensions *)
+(** SMT v2 printer with some extensions *)
 
 open Format
 open Pp
@@ -67,7 +67,10 @@ let ident_printer =
       "Bool"; "true"; "false";
       "Array";"const";
       "abs";
-      "BitVec"; "extract"; "bv2nat"; "nat2bv"
+      "BitVec"; "extract"; "bv2nat"; "nat2bv";
+
+      (** From Z3 *)
+      "map"; "bv"; "subset"; "union"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
@@ -186,10 +189,16 @@ let rec print_term info fmt t =
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
-  | Tcase _ -> unsupportedTerm t
-      "smtv2 : you must eliminate match"
+  | Tcase({t_node = Tvar v}, bl) ->
+      print_branches info v print_term fmt bl
+  | Tcase(t, bl) ->
+      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+        print_var subject (print_term info) t
+        (print_branches info subject print_term) bl;
+      forget_var subject
   | Teps _ -> unsupportedTerm t
-      "smtv2 : you must eliminate epsilon"
+      "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = 
@@ -248,9 +257,43 @@ and print_fmla info fmt f =
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Tcase _ -> unsupportedTerm f
-      "smtv2 : you must eliminate match"
+  | Tcase({t_node = Tvar v}, bl) ->
+      print_branches info v print_fmla fmt bl
+  | Tcase(t, bl) ->
+      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+        print_var subject (print_term info) t
+        (print_branches info subject print_fmla) bl;
+      forget_var subject
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+
+and print_branches info subject pr fmt bl = match bl with
+  | [] -> assert false
+  | br::bl ->
+      let (p,t) = t_open_branch br in
+      let error () = unsupportedPattern p
+        "smtv2: you must compile nested pattern matching" in
+      match p.pat_node with
+      | Pwild -> pr info fmt t
+      | Papp (cs,args) ->
+          let args = List.map (function
+            | {pat_node = Pvar v} -> v | _ -> error ()) args in
+          if bl = [] then print_branch info subject pr fmt (cs,args,t)
+          else fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+            print_ident cs.ls_name print_var subject
+            (print_branch info subject pr) (cs,args,t)
+            (print_branches info subject pr) bl
+      | _ -> error ()
+
+and print_branch info subject pr fmt (cs,vars,t) =
+  if vars = [] then pr info fmt t else
+  let tvs = t_freevars Mvs.empty t in
+  if List.for_all (fun v -> not (Mvs.mem v tvs)) vars then pr info fmt t else
+  let i = ref 0 in
+  let pr_proj fmt v = incr i;
+    if Mvs.mem v tvs then fprintf fmt "(%a (%a_proj_%d %a))"
+      print_var v print_ident cs.ls_name !i print_var subject in
+  fprintf fmt "@[(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
@@ -320,11 +363,37 @@ let print_prop_decl args info fmt k pr f = match k with
 	  
   | Plemma| Pskip -> assert false
 
+
+let print_constructor_decl info fmt (ls,args) =
+  match args with
+  | [] -> fprintf fmt "(%a)" print_ident ls.ls_name
+  | _ ->
+     fprintf fmt "@[(%a@ " print_ident ls.ls_name;
+     let _ =
+       List.fold_left2
+         (fun i ty pr ->
+          begin match pr with
+                | Some pr -> fprintf fmt "(%a" print_ident pr.ls_name
+                | None -> fprintf fmt "(%a_proj_%d" print_ident ls.ls_name i
+          end;
+          fprintf fmt " %a)" (print_type info) ty;
+          succ i) 1 ls.ls_args args
+     in
+     fprintf fmt ")@]"
+
+let print_data_decl info fmt (ts,cl) =
+  fprintf fmt "@[(%a@ %a)@]"
+    print_ident ts.ts_name
+    (print_list space (print_constructor_decl info)) cl
+
 let print_decl args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
-  | Ddata _ -> unsupportedDecl d
-      "smtv2 : algebraic type are not supported"
+  | Ddata dl ->
+    (*unsupportedDecl d
+      "smtv2 : algebraic type are not supported" *)
+    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+      (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls

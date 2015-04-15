@@ -1,6 +1,6 @@
-(* Why driver for Alt-Ergo *)
+(* Why drivers for Alt-Ergo: common part *)
 
-prelude "(* this is a prelude for Alt-Ergo*)"
+prelude "(* this is the prelude for Alt-Ergo, any versions *)"
 
 printer "alt-ergo"
 filename "%f-%t-%g.why"
@@ -9,7 +9,7 @@ valid "Valid"
 invalid "Invalid"
 unknown "I don't know" ""
 timeout "Timeout"
-timeout "Steps limit reached"
+stepslimitexceeded "Steps limit reached"
 outofmemory "Fatal error: out of memory"
 outofmemory "Fatal error: exception Stack_overflow"
 fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
@@ -166,4 +166,14 @@ theory algebra.AC
   meta AC function op
   remove prop Comm.Comm
   remove prop Assoc
+end
+
+theory map.Map
+  syntax type  map "(%1,%2) farray"
+
+  syntax function get "(%1[%2])"
+  syntax function set "(%1[%2 <- %3])"
+
+  remove prop Select_eq
+  remove prop Select_neq
 end

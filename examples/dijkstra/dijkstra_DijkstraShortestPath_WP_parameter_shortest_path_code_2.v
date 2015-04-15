@@ -203,8 +203,11 @@ Definition inv_succ2 (src:vertex) (s:(set vertex)) (q:(set vertex))
   ((map.Map.get d y) <= ((map.Map.get d x) + (weight x y))%Z)%Z)).
 
 Require Import Why3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5.
+(*
 Ltac ae0952 := why3 "Alt-Ergo,0.95.2," timelimit 3.
 Ltac z3 := why3 "z3" timelimit 3.
+*)
 
 (* Why3 goal *)
 Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
@@ -266,8 +269,8 @@ intros src dst d (h1,h2) q d1 visited ((h3,h4),h5) q1 d2 visited1
 ((h24,(h25,(h26,(h27,(h28,(h29,(h30,(h31,h32)))))))),h33) result h34 h35 h36
 su1 v1 (h37,h38) q4 d4 h39 v2 h40.
 *)
-intuition; try ae0952. (* note Alt-Ergo 0.99.1 solves all ! *)
-
+intuition; try ae. 
+(*
 destruct (why_decidable_eq v2 v1) as [case|case].
 subst v2 d4; rewrite Map.Select_eq.
 apply Path_cons.
@@ -285,5 +288,6 @@ z3.
 ae0952.
 trivial.
 ae0952.
+*)
 Qed.
 

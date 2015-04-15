@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -172,6 +172,19 @@ let () =
     eliminate_mutual_recursion
     ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutually@ \
            recursive@ definitions."
+
+(** conditional transformations, only applied when polymorphic types occur *)
+
+let eliminate_definition_if_poly =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> eliminate_definition
+    | _ -> eliminate_recursion)
+
+let () =
+  Trans.register_transform "eliminate_definition_if_poly"
+    eliminate_definition_if_poly
+    ~desc:"Same@ as@ eliminate_definition@ but@ only@ if@ polymorphism@ appear."
 
 (** Bisect *)
 open Task

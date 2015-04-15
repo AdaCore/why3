@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -44,7 +44,7 @@ let timeregexp s =
     | "m" -> add_unit Min
     | "s" -> add_unit Sec
     | "i" -> add_unit Msec
-    | _ -> failwith "unknown format specifier, use %%h, %%m, %%s, %%i, %%S"
+    | x -> failwith ("unknown time format specifier: %%"^x^" (should be either %%h, %%m, %%s or %%i")
   in
   let s = Str.global_substitute cmd_regexp replace s in
   let group = Array.make !nb Hour in
@@ -88,6 +88,7 @@ type prover_answer =
   | Invalid
   | Timeout
   | OutOfMemory
+  | StepsLimitExceeded
   | Unknown of string
   | Failure of string
   | HighFailure
@@ -114,6 +115,7 @@ let print_prover_answer fmt = function
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
+  | StepsLimitExceeded -> fprintf fmt "Steps limit exceeded"
   | Unknown "" -> fprintf fmt "Unknown"
   | Failure "" -> fprintf fmt "Failure"
   | Unknown s -> fprintf fmt "Unknown (%s)" s
@@ -125,9 +127,12 @@ let print_prover_status fmt = function
   | Unix.WSIGNALED n -> fprintf fmt "killed by signal %d" n
   | Unix.WEXITED n -> fprintf fmt "exited with status %d" n
 
+let print_steps fmt s =
+  if s >= 0 then fprintf fmt ", %d steps)" s
+
 let print_prover_result fmt
-  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t} =
-  fprintf fmt "%a (%.2fs)" print_prover_answer ans t;
+  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s} =
+  fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
       print_prover_status status out
@@ -139,7 +144,7 @@ let rec grep out l = match l with
       begin try
         ignore (Str.search_forward re out 0);
         match pa with
-        | Valid | Invalid | Timeout | OutOfMemory -> pa
+        | Valid | Invalid | Timeout | OutOfMemory | StepsLimitExceeded -> pa
         | Unknown s -> Unknown (Str.replace_matched s out)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false

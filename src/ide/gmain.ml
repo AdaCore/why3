@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -434,6 +434,9 @@ let image_of_result ~obsolete result =
             if obsolete then !image_timeout_obs else !image_timeout
         | Call_provers.OutOfMemory ->
             if obsolete then !image_outofmemory_obs else !image_outofmemory
+        | Call_provers.StepsLimitExceeded ->
+            if obsolete then !image_stepslimitexceeded_obs
+            else !image_stepslimitexceeded
         | Call_provers.Unknown _ ->
             if obsolete then !image_unknown_obs else !image_unknown
         | Call_provers.Failure _ ->
@@ -1107,7 +1110,7 @@ let bisect_proof_attempt pa =
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
-          ~command:(C.get_complete_command lp.S.prover_config)
+          ~command:(C.get_complete_command lp.S.prover_config (-1))
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
@@ -1144,7 +1147,7 @@ let bisect_proof_attempt pa =
 	      ~stepslimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
-              ~command:(C.get_complete_command lp.S.prover_config)
+              ~command:(C.get_complete_command lp.S.prover_config (-1))
               ~driver:lp.S.prover_driver
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
@@ -1301,7 +1304,7 @@ let save_session () =
 
 
 let exit_function ?(destroy=false) () =
-  Gconfig.save_config ();
+  (* do not save automatically anymore Gconfig.save_config (); *)
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
@@ -2108,6 +2111,11 @@ let (_ : GMenu.image_menu_item) =
 
 
 (* Saving the session *)
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
+    ~label:"_Save config" ~callback:Gconfig.save_config
+    ()
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)

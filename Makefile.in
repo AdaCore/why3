@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -47,7 +47,8 @@ OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
-CAMLP5O   = @CAMLP5O@
+COQCAMLP  = @COQCAMLP@
+COQCAMLPLIB = @COQCAMLPLIB@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 
 ifeq (@enable_menhirLib@,yes)
@@ -119,9 +120,9 @@ CLEANLIBS =
 GENERATED =
 
 install_local::
-	ln -s ../drivers share/drivers
-	ln -s ../modules share/modules
-	ln -s ../theories share/theories
+	ln -s -n -f ../drivers share/drivers
+	ln -s -n -f ../modules share/modules
+	ln -s -n -f ../theories share/theories
 
 ##############
 # Why3 library
@@ -152,6 +153,7 @@ LIB_MLW = ity expr dexpr
 LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
+		detect_polymorphism \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
@@ -768,7 +770,7 @@ COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
-COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
+COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
@@ -795,8 +797,8 @@ lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
-	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
-	    $(CAMLP5O) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
+	$(if $(QUIET),@echo 'Camlp    $<' &&) \
+	    $(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
@@ -845,7 +847,7 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 COQLIBS_BOOL_FILES = Bool
 COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
 
-COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt Real RealInfix Square Trigonometry
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
@@ -919,7 +921,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1814,12 +1816,18 @@ dist: $(EXTRA_DIST)
 # file headers
 ###############
 
-headers:
+headers: headers-coq
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*/*.ml src/*/*.ml[iyl] \
-		plugins/*/*.ml plugins/*/*.ml[ily] src/tools/cpulimit.c \
+		src/*/*.ml src/*/*.ml[iyl4] \
+		plugins/*/*.ml plugins/*/*.ml[ily] \
+		lib/coq-tactic/*.v lib/coq/*.v \
+		src/tools/cpulimit.c \
 		examples/use_api/*.ml
+
+headers-coq:
+	headache -c misc/headache_config.txt -h misc/header.txt \
+		lib/coq/*/*.v
 
 #########
 # myself

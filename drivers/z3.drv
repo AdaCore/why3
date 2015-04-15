@@ -1,9 +1,65 @@
+(** Why3 driver for Z3 <= 4.3.1 *)
+
 prelude "(set-logic AUFNIRA)"
-(** A  : Array
-    UF : Uninterpreted Function
-    DT : Datatypes (not needed at the end ...)
-    NIRA : NonLinear Integer Reals Arithmetic
+(* A  : Array
+   UF : Uninterpreted Function
+   NIRA : NonLinear Integer Reals Arithmetic
 *)
 
-import "z3_bare.drv"
+import "smt-libv2.drv"
+import "discrimination.gen"
 
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_epsilon"
+
+transformation "simplify_formula"
+(* transformation "simplify_trivial_quantification" *)
+
+transformation "discriminate"
+transformation "encoding_smt"
+
+(** Error messages specific to Z3 *)
+
+outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
+timeout "interrupted by timeout"
+(* stop reporting Z3 2.19 warnings as errors *)
+fail "^(error \"\\(W\\(A\\(R\\(N\\(I\\(N[^G]\\|[^N]\\)\\|[^I]\\)\\|[^N]\\)\\|[^R]\\)\\|[^A]\\)\\|[^W]\\)\\(.*\\)\")" "Error: \1"
+
+
+(** Extra theories supported by Z3 *)
+
+(* div/mod of Z3 seems to be Euclidean Division *)
+theory int.EuclideanDivision
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+end
+
+(* does not work: Z3 segfaults
+theory real.Trigonometry
+
+  syntax function cos "(cos %1)"
+  syntax function sin "(sin %1)"
+  syntax function pi "pi"
+  syntax function tan "(tan %1)"
+  syntax function atan "(atan %1)"
+
+end
+*)

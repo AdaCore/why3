@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -374,9 +374,6 @@ and drec_defn = { fds : dfun_defn list }
 
 and dfun_defn = preid * ghost * rs_kind *
   dbinder list * dspec later * variant list later * dexpr
-
-type dval_decl = preid * ghost * rs_kind *
-  dbinder list * dspec later * dity
 
 (** Environment *)
 
@@ -884,6 +881,7 @@ let cty_of_spec env bl dsp dity =
   let xq = create_xpost dsp.ds_xpost in
   create_cty bl p q xq rds eff ity
 
+(*
 let val_decl env (id,ghost,kind,bl,dsp,dity) =
   let ity = ity_of_dity dity in match kind with
   | RKlocal -> invalid_arg "Dexpr.val_decl"
@@ -914,6 +912,7 @@ let val_decl env (id,ghost,kind,bl,dsp,dity) =
       "Mutable top-level variables cannot be logical predicates"
   | RKlemma -> Loc.errorm
       "Mutable top-level variables cannot be logical lemmas"
+*)
 
 (** Expressions *)
 
@@ -1148,9 +1147,12 @@ and expr_fun ~keep_loc uloc env pvl dsp de =
   let xq = create_xpost dsp.ds_xpost in
   e_fun pvl p q xq e, dsp, env
 
+(*
 let val_decl ?(keep_loc=true) (id,_,_,_,_,_ as vald) =
+  ignore keep_loc;
   reunify_regions ();
   Loc.try2 ?loc:id.pre_loc val_decl env_empty vald
+*)
 
 let rec_defn ?(keep_loc=true) drdf =
   reunify_regions ();

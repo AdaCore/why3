@@ -1,0 +1,36 @@
+(* Why3 driver for Yices-smt2 solver *)
+
+prelude ";;; this is a prelude for Yices-smt2"
+prelude "(set-logic AUFLIRA)"
+(* A  : Array
+   UF : Uninterpreted Function
+   LIRA : Linear Integer Reals Arithmetic
+*)
+
+import "smt-libv2.drv"
+import "discrimination.gen"
+
+(* specific messages from Yices-smt2 *)
+unknown "feature not supported: non linear problem" "non linear arith"
+
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_epsilon"
+
+transformation "simplify_formula"
+(*transformation "simplify_trivial_quantification"*)
+
+transformation "encoding_smt"
+transformation "encoding_sort"
+
+
+(*
+Local Variables:
+mode: why3
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)

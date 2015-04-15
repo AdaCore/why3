@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -242,14 +242,14 @@ let print_statistics files =
   List.iter print_file (List.rev files)
 
 
-let print_report (g,p,t,r) =
+let print_report (g,p,(t,m,s),r) =
   printf "   goal '%s', prover '%a': " g.Ident.id_string Whyconf.print_prover p;
   match r with
   | M.Result(new_res,old_res) ->
     (* begin match !opt_smoke with *)
     (*   | Session.SD_None -> *)
-        printf "%a instead of %a (timelimit=%d)@."
-          print_result new_res print_result old_res t
+        printf "%a instead of %a (timelimit=%d, memlimit=%d, stepslimit=%d)@."
+          print_result new_res print_result old_res t m s
     (*   | _ -> *)
     (*     printf "Smoke detected!!!@." *)
     (* end *)

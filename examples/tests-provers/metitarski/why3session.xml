@@ -3,32 +3,51 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="MetiTarski" version="2.2" timelimit="60" memlimit="4000"/>
+<prover id="1" name="MetiTarski" version="2.4" timelimit="5" memlimit="1000"/>
 <file name="../metitarski.why" expanded="true">
 <theory name="P" sum="1d04567a049f848cb57260f3bbd2cdfa" expanded="true">
  <goal name="x_mul_x_pos" expanded="true">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="sqr_pos" expanded="true">
  <proof prover="0" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
 <theory name="P2" sum="4c1a6e36bab92d102d254173153460e3" expanded="true">
  <goal name="sqr_pos" expanded="true">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 <theory name="P3" sum="bbf0c651ac8241eae35a2ee034b75f93" expanded="true">
  <goal name="cos_bound" expanded="true">
  <proof prover="0" memlimit="1000"><result status="unknown" time="2.62"/></proof>
+ <proof prover="1"><result status="unknown" time="1.86"/></proof>
  </goal>
  <goal name="cos_bound_harder" expanded="true">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.19"/></proof>
+ <proof prover="1"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="MethodErrorOK" expanded="true">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.15"/></proof>
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="MethodErrorWrong" expanded="true">
  <proof prover="0" memlimit="1000"><result status="unknown" time="3.24"/></proof>
+ <proof prover="1"><result status="unknown" time="4.14"/></proof>
+ </goal>
+</theory>
+<theory name="Power" sum="99784816af5084fd1d900784082e2924" expanded="true">
+ <goal name="G" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.17"/></proof>
+ </goal>
+ <goal name="G1" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.19"/></proof>
+ </goal>
+ <goal name="G2" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.23"/></proof>
  </goal>
 </theory>
 </file>

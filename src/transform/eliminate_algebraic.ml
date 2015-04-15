@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -431,7 +431,7 @@ let meta_elim = register_meta "eliminate_algebraic" [MTstring]
     \"keep_types\" : @[keep algebraic type definitions@]@\n\
     \"keep_enums\" : @[keep monomorphic enumeration types@]@\n\
     \"keep_recs\"  : @[keep non-recursive records@]@\n\
-    \"no_index\"   : @[do not generate indexing funcitons@]@]"
+    \"no_index\"   : @[do not generate indexing functions@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
@@ -493,3 +493,17 @@ let () =
     ~desc:"Replace@ algebraic@ data@ types@ by@ first-order@ definitions.";
   Trans.register_transform "eliminate_projections" eliminate_projections
     ~desc:"Define@ algebraic@ projection@ symbols@ separately."
+
+
+(** conditional transformations, only applied when polymorphic types occur *)
+
+let eliminate_algebraic_if_poly =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> eliminate_algebraic
+    | _ -> compile_match)
+
+let () =
+  Trans.register_transform "eliminate_algebraic_if_poly"
+    eliminate_algebraic_if_poly
+    ~desc:"Same@ as@ eliminate_algebraic@ but@ only@ if@ polymorphism@ appear."

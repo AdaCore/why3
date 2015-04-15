@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -148,7 +148,7 @@ let eval_match ~inline kn t =
 
 let rec linear vars t = match t.t_node with
   | Tvar x -> Svs.add_new Exit x vars
-  | Tif _ -> raise Exit
+  | Tif _ | Teps _ -> raise Exit
   | _ -> t_fold linear vars t
 
 let linear t =

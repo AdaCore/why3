@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -107,7 +107,11 @@ val task_decls  : task -> decl list
 
 val task_goal  : task -> prsymbol
 val task_goal_fmla  : task -> term
+
 val task_separate_goal : task -> tdecl * task
+(** [task_separate_goal t] returns a pair [(g,t')] where [g] is the
+    goal of the task [t] and [t'] is the rest.  raises [GoalNotFound]
+    if task [t] has no goal *)
 
 (** {2 selectors} *)
 
@@ -131,4 +135,3 @@ exception GoalNotFound
 exception GoalFound
 exception SkipFound
 exception LemmaFound
-

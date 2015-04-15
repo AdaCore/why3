@@ -1,0 +1,90 @@
+
+(** Various ways of proving
+
+            p 0
+            p 1
+            forall n: int. 0 <= n -> p n -> p (n+2)
+            ---------------------------------------
+            forall n: int. 0 <= n -> p n
+
+    by induction using theories int.SimpleInduction or
+    int.Induction or lemma functions.
+
+*)
+
+theory Hyps
+  use export int.Int
+
+  predicate p int
+
+  axiom H0: p 0
+  axiom H1: p 1
+  axiom H2: forall n: int. 0 <= n -> p n -> p (n + 2)
+
+end
+
+module Induction1 "with a simple induction"
+  use import Hyps
+
+  predicate pr (k: int) = p k && p (k+1)
+  clone import int.SimpleInduction
+    with predicate p = pr, lemma base, lemma induction_step
+
+  goal G: forall n: int. 0 <= n -> p n
+
+end
+
+module Induction2 "with a strong induction"
+  use import Hyps
+
+  clone import int.Induction
+    with predicate p = p, constant bound = zero
+
+  goal G: forall n: int. 0 <= n -> p n
+
+end
+
+module LemmaFunction1 "with a recursive lemma function"
+  use import Hyps
+
+  let rec lemma ind (n: int) requires { 0 <= n} ensures { p n }
+    variant { n }
+    = if n >= 2 then ind (n-2)
+
+  (** no need to write the following goal, that's just a check this is
+      now proved *)
+  goal G: forall n: int. 0 <= n -> p n
+
+end
+
+module LemmaFunction2 "with a while loop"
+  use import Hyps
+  use import ref.Ref
+
+  let lemma ind (n: int) requires { 0 <= n} ensures { p n }
+    =
+    let k = ref n in
+    while !k >= 2 do
+      invariant { 0 <= !k && (p !k -> p n) } variant { !k }
+      k := !k - 2
+    done
+
+  goal G: forall n: int. 0 <= n -> p n
+
+end
+
+module LemmaFunction3 "with an ascending while loop"
+  use import Hyps
+  use import ref.Ref
+
+  let lemma ind (n: int) requires { 0 <= n} ensures { p n }
+    =
+    let k = ref 0 in
+    while !k <= n - 2 do
+      invariant { 0 <= !k <= n && p !k && p (!k + 1) } variant { n - !k }
+      k := !k + 2
+    done
+
+  goal G: forall n: int. 0 <= n -> p n
+
+end

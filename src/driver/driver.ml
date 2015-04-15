@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -90,14 +90,19 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
     | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
     | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
+    | RegexpStepsLimitExceeded s ->
+      add_to_list regexps (Str.regexp s, StepsLimitExceeded)
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
-    | StepRegexp (r,ns) -> add_to_list stepsregexps (Call_provers.stepsregexp r ns)
+    | StepRegexp (r,ns) ->
+      add_to_list stepsregexps (Call_provers.stepsregexp r ns)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
     | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
+    | ExitCodeStepsLimitExceeded s ->
+      add_to_list exitcodes (s, StepsLimitExceeded)
     | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"

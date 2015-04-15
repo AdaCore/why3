@@ -247,31 +247,38 @@ end
 theory PowerReal
 
   use import Real
-  use import Square
   use import ExpLog
 
   function pow real real : real
 
-  axiom Pow_zero_y:
-    forall y:real. y > 0.0 -> pow 0.0 y = 0.0
+  axiom Pow_def:
+    forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
 
-  axiom Pow_x_zero:
-    forall x:real. x <> 0.0 -> pow x 0.0 = 1.0
+  lemma Pow_pos:
+    forall x y. x > 0.0 -> pow x y > 0.0
 
-  axiom Pow_x_one:
-    forall x:real. pow x 1.0 = x
+  lemma Pow_plus :
+    forall x y z. z > 0.0 -> pow z (x + y) = pow z x * pow z y
 
-  axiom Pow_one_y:
+  lemma Pow_mult :
+    forall x y z. x > 0.0 -> pow (pow x y) z = pow x (y * z)
+
+  lemma Pow_x_zero:
+    forall x:real. x > 0.0 -> pow x 0.0 = 1.0
+
+  lemma Pow_x_one:
+    forall x:real. x > 0.0 -> pow x 1.0 = x
+
+  lemma Pow_one_y:
     forall y:real. pow 1.0 y = 1.0
 
-  axiom Pow_x_two:
-    forall x:real. pow x 2.0 = sqr x
+  use import Square
 
-  axiom Pow_half:
-    forall x:real. x >= 0.0 -> pow x 0.5 = sqrt x
+  lemma Pow_x_two:
+    forall x:real. x > 0.0 -> pow x 2.0 = sqr x
 
-  axiom Pow_exp_log:
-    forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
+  lemma Pow_half:
+    forall x:real. x > 0.0 -> pow x 0.5 = sqrt x
 
 end
 
@@ -383,4 +390,3 @@ theory Polar
     forall x y:real. y = hypot x y * sin (atan2 y x)
 
 end
-

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -275,8 +275,6 @@ if test "$MENHIR" = no ; then
 	AC_MSG_ERROR(Cannot find menhir.)
 fi
 
-AC_CHECK_PROG(CAMLP5O,camlp5o,camlp5o,no)
-
 ## Where are the library we need
 # we look for ocamlfind; if not present, we just don't use it to find
 # libraries
@@ -495,6 +493,10 @@ else
         COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
         AC_MSG_CHECKING(Coq version)
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
+
+        #Even if the name of the variable is CAMLP4 the value can be camlp5
+        COQCAMLP=$(eval `coqtop -config`; echo ${CAMLP4BIN}${CAMLP4}o)
+        COQCAMLPLIB=$(eval `coqtop -config`; echo ${CAMLP4LIB})
 
         case $COQVERSION in
           8.4*)
@@ -730,7 +732,8 @@ AC_SUBST(MENHIR)
 AC_SUBST(enable_profiling)
 AC_SUBST(enable_bin_annot)
 
-AC_SUBST(CAMLP5O)
+AC_SUBST(COQCAMLP)
+AC_SUBST(COQCAMLPLIB)
 
 AC_SUBST(enable_ide)
 AC_SUBST(LABLGTK2LIB)
