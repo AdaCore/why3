@@ -18,6 +18,8 @@ module SchorrWaite
   use import list.Mem as L
   use import list.HdTlNoOpt
   use import list.Append
+  use import list.Reverse
+  use import list.Distinct
   use import set.Fset as S
   use import option.Option
 
@@ -64,7 +66,14 @@ module SchorrWaite
   val tl_stackNodes (stack : list loc) : list loc 
     requires { stack <> Nil }
     ensures  { result = tl stack }
-
+    (* 
+     * the following post-condition is usefull to prove the 
+     * invariant that stackNodes' elements are also graph elements
+     * for the push case. An equivalent lemma would say:
+     * lemma mem_tl : forall x : 'a, l : list 'a. mem x l -> mem x (tl l) 
+     *) 
+    ensures  { forall n : loc. L.mem n result -> L.mem n stack } 
+  
   predicate edge (x y : loc) (left right : map loc loc) = 
     x <> null && (left[x] = y || right[x] = y)
 
@@ -121,20 +130,33 @@ module SchorrWaite
 		 s : list loc. stack_form l r c (next l r c p) s -> 
 		 stack_form l r c p (Cons p s)
 
-  let schorr_waite (root: loc) (unmarked_nodes c_false_nodes : ref (set loc)) : unit
-    requires { root <> null }
+  predicate pair_in_list (p1 p2 : loc) (l : list loc)  =
+    match l with
+    | Nil -> false
+    | Cons b m -> (b = p1 /\
+       match  m with
+       | Nil -> false
+       | Cons c _ -> c = p2
+       end) \/ pair_in_list p1 p2 m
+    end
+
+  let schorr_waite (root: loc) (graph : set loc) : unit
+    requires { root <> null /\ S.mem root graph }
+    (* what is set S --> closed under children of all vertices *)
+    requires { forall n : loc. S.mem n graph -> 
+    	       n <> null /\ (* is this ok? won't this be a contradiction? *)
+               S.mem !left[n] graph /\
+               S.mem !right[n] graph }
     (* graph starts with nothing marked and no child currently visited *)
-    requires { forall x : loc. x <> null (*&& reachable root x !left !right*) ->
+    requires { forall x : loc. x <> null /\ S.mem x graph(*&& reachable root x !left !right*) ->
     	       not !m[x] /\ not !c[x] }
-    requires { forall x : loc. x <> null /\ not !m[x] <-> S.mem x !unmarked_nodes } (* isto é capaz de estar ao contrario *)
-    requires { forall x : loc. x <> null /\ not !c[x] <-> S.mem x !c_false_nodes }  (* idem *)
     (* the structure of the graph is not changed *)
-    ensures  { forall n : loc. 
+    ensures  { forall n : loc. S.mem n graph /\ n <> null -> 
     	       (old !left)[n] = !left[n] /\
 	       (old !right)[n] = !right[n] }
     (* all the non-null vertices reachable from root
        are marked at the end of the algorithm *)
-    ensures  { forall n : loc. 
+    ensures  { forall n : loc.
     	       n <> null /\ reachable root n (old !left) (old !right) ->
 	       !m[n] }
     (* every marked node was reachable from 'root' in the pre-state *)	       
@@ -150,38 +172,52 @@ module SchorrWaite
     let p = ref null in
     let ghost stackNodes = ref Nil in
     let ghost path = ref Nil in
+    let ghost unmarked_nodes = ref graph in
+    let ghost c_false_nodes = ref graph in
     while !p <> null || (!t <> null && not !m[!t]) do
-      invariant { not (L.mem !t !stackNodes) }
-      invariant { length !stackNodes = 0 <-> !p = null }
-      invariant { forall n : loc. n <> null /\ not !m[n] -> 
-      		  S.mem n !unmarked_nodes }
-      invariant { length !stackNodes > 0 -> hd !stackNodes = !p }
-      invariant { forall n : loc. n <> null /\ (n = !p \/ L.mem n !stackNodes) ->
-      		  !m[n] }
-      (* the current pointers within the stack *)
+      (*invariant { not (L.mem !t !stackNodes) } *)
+      invariant { !stackNodes = Nil <-> !p = null }
+      invariant { S.mem !t graph }
+      invariant { !p <> null -> S.mem !p graph }
+      invariant { !stackNodes <> Nil -> hd !stackNodes = !p }
+      invariant { forall n : loc. S.mem n graph /\ n <> null /\ not !m[n] -> S.mem n !unmarked_nodes }
+      invariant { forall n : loc. S.mem n graph /\ n <> null /\ not !c[n] -> S.mem n !c_false_nodes }
+      invariant { forall n : loc. L.mem n !stackNodes -> S.mem n graph }
+      invariant { forall p1 p2 : loc. pair_in_list p1 p2 (Cons !t !stackNodes) ->
+      		  (!c[p2] -> (at !left 'Init)[p2] = !left[p2] /\ (at !right 'Init)[p2] = p1) /\
+		  (not !c[p2] -> (at !left 'Init)[p2] = p1 /\ (at !right 'Init)[p2] = !right[p2]) }
+      invariant { not L.mem !t !stackNodes } (* this will be usefull to prove that !t is in graph *)
+      (* I4d from Hubert and Marché's paper and something related to line 63-65 from Leino's *)
+      invariant { forall n : loc. S.mem n graph /\ n <> null /\ not L.mem n !stackNodes ->
+      		  !left[n] = (at !left 'Init)[n] /\ !right[n] = (at !right 'Init)[n] }
+      (* I4a from Hubert and Marché's paper; useful to prove that !stackNodes = !p::... *)
       invariant { stack_form !left !right !c !p !stackNodes }
-      		  
-      invariant { forall n : loc. n <> null /\ not !c[n] -> 
-      		  S.mem n !c_false_nodes }
-      invariant { forall n : loc. not L.mem n !stackNodes /\ n <> !t ->
-      		  !c[n] = (at !c 'Init)[n] }
-      invariant { forall n : loc. L.mem n !stackNodes  \/ 
-      		  (!right[n] = (at !right 'Init)[n] /\ !left[n] = (at !left 'Init)[n]) }
-      invariant { !p <> null -> reachable_via root !p (at !left 'Init) (at !right 'Init) !path }
-      invariant { forall n : loc, pth : list loc. n <> null /\ !m[n] /\ pth = !path_from_root[n] ->
-      		  reachable_via root n (at !left 'Init) (at !right 'Init) pth }
-      invariant { forall n : loc. n <> null /\ !m[n] -> reachable root n (at !left 'Init) (at !right 'Init) }
+      (* something like Leino's line 74; this is useful to prove that 
+       * the stack is empty iff p = null *)
+      invariant { !stackNodes <> Nil ->
+      		  let first = hd (reverse !stackNodes) in
+      		  if !c[first] then !right[first] = null
+		  else !left[first] = null }
+      (* all nodes in the stack are marked ---> I4a from Hubert and Marché's paper
+       * and something alike line 57 from Leino's paper *)
+      invariant { forall n : loc. L.mem n !stackNodes -> !m[n] }
+      (* stack has no duplicates ---> line 55 from Leino's paper *)
+      invariant { distinct !stackNodes } 
+      (* termination proved using lexicographic order over a triple *)
       variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, length !stackNodes }
       if !t = null || !m[!t] then begin
         (*assert { S.mem !p graph };*)
         if !c[!p] then begin (* pop *)
           let q = !t in
           t := !p;
-	  stackNodes := tl_stackNodes !stackNodes;
           p := !right[!p];
+	  stackNodes := tl_stackNodes !stackNodes;
           set_right !t q;
 	  path := !path_from_root[!p];
         end else begin (* swing *)
+	  (* the following assertion is automatically discharged 
+	   * and it is useful to prove that t is in the set graph *)
+	  assert { pair_in_list !t !p (Cons !t !stackNodes) };
           let q = !t in
           t := get_right !p;
           set_right !p (get_left !p);
@@ -193,7 +229,7 @@ module SchorrWaite
         let q = !p in
         p := !t;
 	stackNodes := Cons !p !stackNodes;
-	if !p <> root then path := !path ++ (Cons !p Nil);
+	(*if !p <> root then path := !path ++ (Cons !p Nil);*)
         t := get_left !t;
         set_left !p q;
         set_m !p true;

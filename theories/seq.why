@@ -14,8 +14,8 @@ theory Seq
 
   type seq 'a
 
-  (** if ['a] is an infinite type, then [set 'a] is infinite *)
-  meta "material_type_arg" type seq, 0
+  (** [seq 'a] is an infinite type *)
+  meta "infinite_type" type seq
 
   (** length *)
 
