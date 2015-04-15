@@ -1,6 +1,6 @@
-(** Why3 driver for CVC4 >= 1.4 *)
+(** Why3 driver for CVC4 >= 1.5 *)
 
-prelude "(set-logic AUFBVDTNIRA)"
+prelude "(set-logic AUFBVDTLIRA)"
 (*
     A  : Array
     UF : Uninterpreted Function
@@ -11,6 +11,20 @@ prelude "(set-logic AUFBVDTNIRA)"
 (* prelude "(set-logic ALL_SUPPORTED)"
    does not seem to include DT
 *)
+
+(* Counterexamples: enable model construction *)
+prelude ";; Enable model construction"
+prelude "(set-option :produce-models true)"
+
+(* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *) 
+(* transformation "split_intro" *)
+
+(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
+transformation "introduce_premises"
+transformation "intro_projections_counterexmp"
+
+(* Counterexamples: set model parser *)
+model_parser "cvc4_z3"
 
 import "smt-libv2.drv"
 import "discrimination.gen"
