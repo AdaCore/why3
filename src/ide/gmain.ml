@@ -1892,6 +1892,8 @@ let scrolled_source_view = GBin.scrolled_window
   ~packing:source_tab#add ~shadow_type:`ETCHED_OUT
   ()
 
+let allow_editing = false (* not reliable enough yet *)
+
 let source_view =
   GSourceView2.source_view
     ~auto_indent:true
@@ -1899,7 +1901,7 @@ let source_view =
     ~show_line_numbers:true
     ~right_margin_position:80 ~show_right_margin:true
     (* ~smart_home_end:true *)
-    ~editable:false
+    ~editable:allow_editing
     ~packing:scrolled_source_view#add
     ()
 
@@ -1929,6 +1931,7 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 line in
   let line = min line v#buffer#line_count in
   let it = v#buffer#get_iter (`LINE line) in
+  v#buffer#place_cursor ~where:it;
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
@@ -2052,7 +2055,8 @@ let reload () =
     | e ->
         let e = match e with
           | Loc.Located(loc,e) ->
-              scroll_to_loc ~color:error_tag ~yalign:0.5 loc; e
+            scroll_to_loc ~color:error_tag ~yalign:0.5 loc;
+            e
           | e -> e
         in
         fprintf str_formatter
@@ -2081,8 +2085,8 @@ let (_ : GMenu.image_menu_item) =
 
 
 (*
-
-Saving the source_view: deactivated for the moment
+Saving the source_view
+*)
 
 let save_file () =
   let f = !current_file in
@@ -2098,11 +2102,14 @@ let save_file () =
   else
     info_window `ERROR "No file currently edited"
 
-let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~key:GdkKeysyms._S
-    ~label:"_Save" ~callback:save_file
-    ()
-*)
+let () =
+  if allow_editing then
+    let (_ : GMenu.image_menu_item) =
+      file_factory#add_image_item ~key:GdkKeysyms._S
+        ~label:"_Save" ~callback:save_file
+        ()
+    in ()
+
 
 let (_ : GtkSignal.id) = w#connect#destroy
   ~callback:(exit_function ~destroy:true)
