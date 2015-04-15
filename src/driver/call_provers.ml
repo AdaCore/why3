@@ -161,12 +161,21 @@ type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
 
-let rec debug_print_model model =
+let rec debug_print_model_with_loc model =
   match model with
   | [] -> ()
-  | el::t -> begin
-    Debug.dprintf debug "Call_provers: model %s = %s@." el.me_name el.me_value;
-    debug_print_model t;
+  | m_element::t -> begin
+    let loc_string = match m_element.me_location with
+      | None -> "\"no location\""
+      | Some loc -> begin
+	Loc.report_position str_formatter loc;
+	flush_str_formatter ()
+      end in
+
+    Debug.dprintf debug "Call_provers: %s = %s@." m_element.me_name m_element.me_value;
+    Debug.dprintf debug "  Call_provers: At %s" loc_string;
+
+    debug_print_model_with_loc t
   end
 
 let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
@@ -192,7 +201,7 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
   in
   let model = res_parser.prp_model_parser out printer_mapping in
   Debug.dprintf debug "Call_provers: model:@.";
-  debug_print_model model;
+  debug_print_model_with_loc model;
   { pr_answer = ans;
     pr_status = ret;
     pr_output = out;
