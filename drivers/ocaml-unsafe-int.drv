@@ -1,11 +1,15 @@
 
-(* OCaml driver
-   Generic part, for both 32-bit and 64-bit architectures *)
+(** OCaml driver with Why3 type int being mapped to OCaml type int.
+
+    This is of course unsafe, yet useful to run your code is you
+    have an independant argument regarding the absence of arithmetic
+    overflows. *)
 
 printer "ocaml"
 
 theory BuiltIn
-  syntax type int "Why3__BigInt.t"
+  syntax type int "int"
+  (* meta "ocaml arithmetic" "unsafe int" *)
   syntax predicate  (=)   "(%1 = %2)"
 end
 
@@ -14,29 +18,37 @@ import "ocaml-no-arith.drv"
 (* int *)
 
 theory int.Int
-  syntax constant zero "Why3__BigInt.zero"
-  syntax constant one  "Why3__BigInt.one"
+  syntax constant zero "0"
+  syntax constant one  "1"
 
-  syntax predicate (<)  "(Why3__BigInt.lt %1 %2)"
-  syntax predicate (<=) "(Why3__BigInt.le %1 %2)"
-  syntax predicate (>)  "(Why3__BigInt.gt %1 %2)"
-  syntax predicate (>=) "(Why3__BigInt.ge %1 %2)"
+  syntax predicate (<)  "(%1 < %2)"
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (>)  "(%1 > %2)"
+  syntax predicate (>=) "(%1 >= %2)"
 
-  syntax function (+)   "(Why3__BigInt.add %1 %2)"
-  syntax function (-)   "(Why3__BigInt.sub %1 %2)"
-  syntax function ( * ) "(Why3__BigInt.mul %1 %2)"
-  syntax function (-_)  "(Why3__BigInt.minus %1)"
+  syntax function (+)   "(%1 + %2)"
+  syntax function (-)   "(%1 - %2)"
+  syntax function ( * ) "(%1 * %2)"
+  syntax function (-_)  "(- %1)"
 end
 
+theory int.ComputerDivision
+  syntax function div "(%1 / %2)"
+  syntax function mod "(%1 mod %2)"
+end
+
+(* FIXME: avoid Pervasives using a black list of reserved OCaml names *)
+
 theory int.Abs
-  syntax function abs "(Why3__BigInt.abs %1)"
+  syntax function abs "(Pervasives.abs %1)"
 end
 
 theory int.MinMax
-  syntax function min "(Why3__BigInt.min %1 %2)"
-  syntax function max "(Why3__BigInt.max %1 %2)"
+  syntax function min "(Pervasives.min %1 %2)"
+  syntax function max "(Pervasives.max %1 %2)"
 end
 
+(* FIXME
 theory int.Lex2
   syntax predicate lt_nat "(Why3__BigInt.lt_nat %1 %2)"
   syntax predicate lex    "(Why3__BigInt.lex %1 %2)"
@@ -45,11 +57,6 @@ end
 theory int.EuclideanDivision
   syntax function div "(Why3__BigInt.euclidean_div %1 %2)"
   syntax function mod "(Why3__BigInt.euclidean_mod %1 %2)"
-end
-
-theory int.ComputerDivision
-  syntax function div "(Why3__BigInt.computer_div %1 %2)"
-  syntax function mod "(Why3__BigInt.computer_mod %1 %2)"
 end
 
 theory int.Power
@@ -64,7 +71,8 @@ theory int.Fibonacci
   syntax function fib "(Why3__IntAux.fib %1)"
 end
 
-(* TODO number.Gcd *)
+TODO number.Gcd
+*)
 
 (* WhyML *)
 
@@ -80,7 +88,7 @@ module stack.Stack
   syntax val       clear    "Stack.clear"
   syntax val       copy     "Stack.copy"
   syntax val       is_empty "Stack.is_empty"
-  syntax val       length   "Why3__IntAux.stack_length"
+  syntax val       length   "Stack.length"
 end
 
 module queue.Queue
@@ -95,41 +103,35 @@ module queue.Queue
   syntax val       clear     "Queue.clear"
   syntax val       copy      "Queue.copy"
   syntax val       is_empty  "Queue.is_empty"
-  syntax val       length    "Why3__IntAux.queue_length"
+  syntax val       length    "Queue.length"
   syntax val       transfer  "Queue.transfer"
 end
 
 module array.Array
-  syntax type array "(%1 Why3__Array.t)"
+  syntax type array "(%1 array)"
 
-  syntax function ([]) "(Why3__Array.get %1 %2)"
+  syntax function ([]) "(%1.(%2))"
 
-  syntax exception OutOfBounds "Why3__Array.OutOfBounds"
+  syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
 
-  syntax val ([])          "Why3__Array.get"
-  syntax val ([]<-)        "Why3__Array.set"
-  syntax val length        "Why3__Array.length"
-  syntax val defensive_get "Why3__Array.defensive_get"
-  syntax val defensive_set "Why3__Array.defensive_set"
-  syntax val make          "Why3__Array.make"
-  syntax val append        "Why3__Array.append"
-  syntax val sub           "Why3__Array.sub"
-  syntax val copy          "Why3__Array.copy"
-  syntax val fill          "Why3__Array.fill"
-  syntax val blit          "Why3__Array.blit"
-end
-
-module mach.int.Int
-  syntax val ( / ) "Why3__BigInt.computer_div"
-  syntax val ( % ) "Why3__BigInt.computer_mod"
+  syntax val ([])          "Array.unsafe_get"
+  syntax val ([]<-)        "Array.unsafe_set"
+  syntax val length        "Array.length"
+  syntax val defensive_get "Array.get"
+  syntax val defensive_set "Array.set"
+  syntax val make          "Array.make"
+  syntax val append        "Array.append"
+  syntax val sub           "Array.sub"
+  syntax val copy          "Array.copy"
+  syntax val fill          "Array.fill"
+  syntax val blit          "Array.blit"
 end
 
 module mach.int.Int31
-  (* even on a 64-bit machine, it is safe to use type int for 31-bit integers *)
-  syntax val       of_int   "Why3__BigInt.to_int"
+  syntax val       of_int   "(fun x -> x)"
   syntax converter of_int   "%1"
 
-  syntax function to_int "(Why3__BigInt.of_int %1)"
+  syntax function to_int "(%1)"
 
   syntax type     int31     "int"
   syntax val      ( + )     "( + )"
@@ -146,27 +148,8 @@ module mach.int.Int31
   syntax val      (>)       "(>)"
 end
 
-module mach.int.UInt64
-  (* no OCaml library for unsigned 64-bit integers => we use BigInt *)
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "(Why3__BigInt.of_string \"%1\")"
-
-  syntax function to_int "%1"
-
-  syntax type     uint64    "Why3__BigInt.t"
-  syntax val      ( + )     "Why3__BigInt.add"
-  syntax val      ( - )     "Why3__BigInt.sub"
-  syntax val      (-_)      "Why3__BigInt.minus"
-  syntax val      ( * )     "Why3__BigInt.mul"
-  syntax val      ( / )     "Why3__BigInt.computer_div"
-  syntax val      ( % )     "Why3__BigInt.computer_mod"
-  syntax val      eq        "(=)"
-  syntax val      ne        "(<>)"
-  syntax val      (<=)      "(<=)"
-  syntax val      (<)       "(<)"
-  syntax val      (>=)      "(>=)"
-  syntax val      (>)       "(>)"
-end
+(* TODO
+   other mach.int.XXX modules *)
 
 module mach.array.Array31
   syntax type array  "(%1 array)"
@@ -183,7 +166,7 @@ module mach.array.Array31
   syntax val  self_blit "Array.blit"
 end
 
-
+(* TODO
 module string.Char
   syntax type char "Pervasives.char"
   syntax val chr "Why3__BigInt.chr"
@@ -191,7 +174,6 @@ module string.Char
   syntax function uppercase "Char.uppercase"
   syntax function lowercase "Char.lowercase"
 end
-
 
 module io.StdIO
   syntax val print_char "Pervasives.print_char"
@@ -204,3 +186,4 @@ module random.Random
   syntax val random_int    "Why3__BigInt.random_int"
 
 end
+*)
