@@ -320,37 +320,37 @@
   <transf name="inline_goal">
    <goal name="WP_parameter merge.53.1" expl="1. postcondition">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter merge.53.1.1" expl="1.">
+    <goal name="WP_parameter merge.53.1.1" expl="1. VC for merge">
     <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
     <proof prover="4"><result status="valid" time="0.04"/></proof>
     <proof prover="8" timelimit="40"><result status="valid" time="0.03" steps="2"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.2" expl="2.">
+    <goal name="WP_parameter merge.53.1.2" expl="2. VC for merge">
     <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
     <proof prover="4"><result status="valid" time="0.03"/></proof>
     <proof prover="8" timelimit="40"><result status="valid" time="0.05" steps="3"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.3" expl="3.">
+    <goal name="WP_parameter merge.53.1.3" expl="3. VC for merge">
     <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
     <proof prover="4"><result status="valid" time="0.04"/></proof>
     <proof prover="8" timelimit="40"><result status="valid" time="0.04" steps="8"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.4" expl="4.">
+    <goal name="WP_parameter merge.53.1.4" expl="4. VC for merge">
     <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
     <proof prover="4"><result status="valid" time="0.03"/></proof>
     <proof prover="8" timelimit="40"><result status="valid" time="0.05" steps="8"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.5" expl="5.">
+    <goal name="WP_parameter merge.53.1.5" expl="5. VC for merge">
     <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
     <proof prover="4"><result status="valid" time="0.04"/></proof>
     <proof prover="8" timelimit="40"><result status="valid" time="0.04" steps="3"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.6" expl="6.">
+    <goal name="WP_parameter merge.53.1.6" expl="6. VC for merge">
     <proof prover="4"><result status="valid" time="0.24"/></proof>
     <proof prover="6" timelimit="40"><result status="valid" time="0.06"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
@@ -435,20 +435,20 @@
   <transf name="inline_goal">
    <goal name="WP_parameter merge_using.11.1" expl="1. assertion">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter merge_using.11.1.1" expl="1.">
+    <goal name="WP_parameter merge_using.11.1.1" expl="1. VC for merge_using">
     <proof prover="2"><result status="valid" time="0.03" steps="21"/></proof>
     <proof prover="4"><result status="valid" time="0.05"/></proof>
     <proof prover="8" timelimit="20"><result status="valid" time="0.08" steps="21"/></proof>
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter merge_using.11.1.2" expl="2.">
+    <goal name="WP_parameter merge_using.11.1.2" expl="2. VC for merge_using">
     <proof prover="1"><result status="valid" time="0.26"/></proof>
     <proof prover="2"><result status="valid" time="1.15" steps="379"/></proof>
     <proof prover="4"><result status="valid" time="0.12"/></proof>
     <proof prover="6"><result status="valid" time="1.15"/></proof>
     <proof prover="9"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter merge_using.11.1.3" expl="3.">
+    <goal name="WP_parameter merge_using.11.1.3" expl="3. VC for merge_using">
     <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
     <proof prover="4"><result status="valid" time="0.06"/></proof>
     <proof prover="8" timelimit="20"><result status="valid" time="0.05" steps="21"/></proof>
@@ -1008,13 +1008,13 @@
   </goal>
   <goal name="WP_parameter natural_mergesort.13" expl="13. loop variant decrease">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter natural_mergesort.13.1" expl="1.">
+   <goal name="WP_parameter natural_mergesort.13.1" expl="1. VC for natural_mergesort">
    <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.02" steps="23"/></proof>
    <proof prover="9"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter natural_mergesort.13.2" expl="2.">
+   <goal name="WP_parameter natural_mergesort.13.2" expl="2. VC for natural_mergesort">
    <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.06" steps="23"/></proof>
@@ -1110,7 +1110,6 @@
   <goal name="WP_parameter natural_mergesort.29" expl="29. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.18" steps="267"/></proof>
   <proof prover="4"><result status="valid" time="0.37"/></proof>
-  <proof prover="8"><result status="valid" time="5.30" steps="2461"/></proof>
   <proof prover="9"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="WP_parameter natural_mergesort.30" expl="30. loop invariant preservation">
@@ -1145,13 +1144,13 @@
   </goal>
   <goal name="WP_parameter natural_mergesort.35" expl="35. loop variant decrease">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter natural_mergesort.35.1" expl="1.">
+   <goal name="WP_parameter natural_mergesort.35.1" expl="1. VC for natural_mergesort">
    <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.05" steps="15"/></proof>
    <proof prover="9"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter natural_mergesort.35.2" expl="2.">
+   <goal name="WP_parameter natural_mergesort.35.2" expl="2. VC for natural_mergesort">
    <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.06" steps="21"/></proof>
@@ -1287,31 +1286,31 @@
   </goal>
   <goal name="WP_parameter naturalrec.20" expl="20. precondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter naturalrec.20.1" expl="1.">
+   <goal name="WP_parameter naturalrec.20.1" expl="1. VC for naturalrec">
    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.02" steps="25"/></proof>
    <proof prover="9"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.2" expl="2.">
+   <goal name="WP_parameter naturalrec.20.2" expl="2. VC for naturalrec">
    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.03" steps="25"/></proof>
    <proof prover="9"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.3" expl="3.">
+   <goal name="WP_parameter naturalrec.20.3" expl="3. VC for naturalrec">
    <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.03" steps="35"/></proof>
    <proof prover="9"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.4" expl="4.">
+   <goal name="WP_parameter naturalrec.20.4" expl="4. VC for naturalrec">
    <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.02" steps="36"/></proof>
    <proof prover="9"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.5" expl="5.">
+   <goal name="WP_parameter naturalrec.20.5" expl="5. VC for naturalrec">
    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="8"><result status="valid" time="0.02" steps="25"/></proof>
