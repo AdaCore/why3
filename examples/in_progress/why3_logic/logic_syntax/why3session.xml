@@ -13,91 +13,491 @@
 </theory>
 <theory name="Substs" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="SubstList" sum="4b61b4e1ad3de612fd62cfcfe8ab7f46">
+<theory name="SubstList" sum="674a4cd885e4cb2589b6e32dcc4483c5">
  <goal name="WP_parameter tyl_map_length_nth" expl="VC for tyl_map_length_nth">
- <proof prover="0"><result status="valid" time="0.07" steps="134"/></proof>
+ <proof prover="0"><result status="valid" time="0.07" steps="136"/></proof>
  </goal>
  <goal name="WP_parameter tyl_subst_length_nth" expl="VC for tyl_subst_length_nth">
  <proof prover="0"><result status="valid" time="0.07" steps="133"/></proof>
  </goal>
 </theory>
-<theory name="VarsIn" sum="286889ed0720ef6fae4204dcd2ed843d">
+<theory name="VarsIn" sum="b6de5c25d9fc8e73365e1ed3c995d2e7">
  <goal name="WP_parameter ty_vars_in_all" expl="VC for ty_vars_in_all">
- <proof prover="0"><result status="valid" time="0.05" steps="23"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="21"/></proof>
  </goal>
  <goal name="WP_parameter tyl_vars_in_all" expl="VC for tyl_vars_in_all">
- <proof prover="0"><result status="valid" time="0.05" steps="37"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="38"/></proof>
  </goal>
  <goal name="WP_parameter pat_vars_in_all" expl="VC for pat_vars_in_all">
- <proof prover="0"><result status="valid" time="0.08" steps="145"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="143"/></proof>
  </goal>
  <goal name="WP_parameter patl_vars_in_all" expl="VC for patl_vars_in_all">
- <proof prover="0"><result status="valid" time="0.06" steps="37"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="38"/></proof>
  </goal>
  <goal name="WP_parameter t_vars_in_all" expl="VC for t_vars_in_all">
- <proof prover="0"><result status="valid" time="3.02" steps="5009"/></proof>
+ <proof prover="0"><result status="valid" time="2.65" steps="5132"/></proof>
  </goal>
  <goal name="WP_parameter tl_vars_in_all" expl="VC for tl_vars_in_all">
- <proof prover="0"><result status="valid" time="0.06" steps="36"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="39"/></proof>
  </goal>
  <goal name="WP_parameter br_vars_in_all" expl="VC for br_vars_in_all">
  <proof prover="0"><result status="valid" time="0.20" steps="235"/></proof>
  </goal>
  <goal name="WP_parameter brl_vars_in_all" expl="VC for brl_vars_in_all">
- <proof prover="0"><result status="valid" time="0.07" steps="38"/></proof>
+ <proof prover="0"><result status="valid" time="0.07" steps="35"/></proof>
  </goal>
  <goal name="WP_parameter ty_vars_subset" expl="VC for ty_vars_subset">
- <proof prover="0"><result status="valid" time="0.07" steps="45"/></proof>
+ <proof prover="0"><result status="valid" time="0.07" steps="47"/></proof>
  </goal>
  <goal name="WP_parameter tyl_vars_subset" expl="VC for tyl_vars_subset">
- <proof prover="0"><result status="valid" time="0.06" steps="91"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="89"/></proof>
  </goal>
  <goal name="WP_parameter pat_vars_subset" expl="VC for pat_vars_subset">
- <proof prover="0"><result status="valid" time="0.21" steps="335"/></proof>
+ <proof prover="0"><result status="valid" time="0.21" steps="330"/></proof>
  </goal>
  <goal name="WP_parameter patl_vars_subset" expl="VC for patl_vars_subset">
  <proof prover="0"><result status="valid" time="0.12" steps="123"/></proof>
  </goal>
  <goal name="WP_parameter t_vars_subset" expl="VC for t_vars_subset">
- <proof prover="0"><result status="valid" time="5.46" steps="8279"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter t_vars_subset.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="52"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.8" expl="8. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="121"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.9" expl="9. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.10" expl="10. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.14" expl="14. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="122"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.15" expl="15. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.16" expl="16. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.18" expl="18. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.19" expl="19. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.20" expl="20. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="123"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.21" expl="21. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.22" expl="22. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.23" expl="23. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.24" expl="24. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.25" expl="25. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.26" expl="26. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.27" expl="27. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.28" expl="28. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.29" expl="29. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.30" expl="30. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.31" expl="31. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.32" expl="32. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.33" expl="33. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.34" expl="34. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.35" expl="35. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="125"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.36" expl="36. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.37" expl="37. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.38" expl="38. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.39" expl="39. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.40" expl="40. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.41" expl="41. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.42" expl="42. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.43" expl="43. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.44" expl="44. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.45" expl="45. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.46" expl="46. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="94"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.47" expl="47. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.48" expl="48. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.49" expl="49. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.50" expl="50. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.51" expl="51. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.52" expl="52. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.53" expl="53. variant decrease">
+  <proof prover="0"><result status="valid" time="0.05" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.54" expl="54. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.55" expl="55. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="114"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.56" expl="56. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.57" expl="57. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.58" expl="58. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.59" expl="59. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.60" expl="60. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.61" expl="61. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.62" expl="62. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="114"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.63" expl="63. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.64" expl="64. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.65" expl="65. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.66" expl="66. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.67" expl="67. variant decrease">
+  <proof prover="0"><result status="valid" time="0.05" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.68" expl="68. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.69" expl="69. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="114"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.70" expl="70. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.71" expl="71. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.72" expl="72. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.73" expl="73. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.74" expl="74. variant decrease">
+  <proof prover="0"><result status="valid" time="0.05" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.75" expl="75. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.76" expl="76. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.77" expl="77. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.78" expl="78. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.79" expl="79. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.80" expl="80. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.81" expl="81. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.82" expl="82. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.83" expl="83. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.84" expl="84. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.85" expl="85. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.86" expl="86. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.87" expl="87. variant decrease">
+  <proof prover="0"><result status="valid" time="0.05" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.88" expl="88. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.89" expl="89. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.90" expl="90. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.91" expl="91. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.92" expl="92. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.93" expl="93. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.94" expl="94. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.95" expl="95. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.96" expl="96. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.97" expl="97. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.98" expl="98. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.99" expl="99. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.100" expl="100. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.101" expl="101. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.102" expl="102. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.103" expl="103. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.104" expl="104. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.105" expl="105. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.106" expl="106. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.107" expl="107. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.108" expl="108. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.109" expl="109. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.110" expl="110. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.111" expl="111. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.112" expl="112. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.113" expl="113. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="106"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.114" expl="114. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.115" expl="115. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.116" expl="116. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.117" expl="117. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.118" expl="118. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.119" expl="119. variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.120" expl="120. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.121" expl="121. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.122" expl="122. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.123" expl="123. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.124" expl="124. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.125" expl="125. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.126" expl="126. variant decrease">
+  <proof prover="0"><result status="valid" time="0.05" steps="91"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.127" expl="127. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.128" expl="128. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.129" expl="129. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.130" expl="130. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.131" expl="131. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.132" expl="132. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter t_vars_subset.133" expl="133. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="WP_parameter tl_vars_subset" expl="VC for tl_vars_subset">
- <proof prover="0"><result status="valid" time="0.12" steps="125"/></proof>
+ <proof prover="0"><result status="valid" time="0.12" steps="123"/></proof>
  </goal>
  <goal name="WP_parameter b_vars_subset" expl="VC for b_vars_subset">
- <proof prover="0"><result status="valid" time="0.35" steps="529"/></proof>
+ <proof prover="0"><result status="valid" time="0.51" steps="529"/></proof>
  </goal>
  <goal name="WP_parameter bl_vars_subset" expl="VC for bl_vars_subset">
- <proof prover="0"><result status="valid" time="0.09" steps="121"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="123"/></proof>
  </goal>
 </theory>
 <theory name="FreeVars" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="FreeVarsIn" sum="509a0c7b0f897c7451c6415dea1104d4">
+<theory name="FreeVarsIn" sum="e0cef41dab64a3884260634b9e9099db">
  <goal name="WP_parameter pat_pv_free_var_minimal" expl="VC for pat_pv_free_var_minimal">
- <proof prover="0"><result status="valid" time="0.30" steps="453"/></proof>
+ <proof prover="0"><result status="valid" time="0.30" steps="448"/></proof>
  </goal>
  <goal name="WP_parameter patl_pv_free_var_minimal" expl="VC for patl_pv_free_var_minimal">
- <proof prover="0"><result status="valid" time="0.11" steps="157"/></proof>
+ <proof prover="0"><result status="valid" time="0.11" steps="154"/></proof>
  </goal>
 </theory>
-<theory name="SubstVarsIn" sum="3b8e226a0ed63ac6a4ace57fe8b90d9e">
+<theory name="SubstVarsIn" sum="baef2ba0d56206a8f82385cc072f076f">
  <goal name="WP_parameter ty_map_vars_in" expl="VC for ty_map_vars_in">
  <proof prover="0"><result status="valid" time="0.10" steps="95"/></proof>
  </goal>
  <goal name="WP_parameter tyl_map_vars_in" expl="VC for tyl_map_vars_in">
- <proof prover="0"><result status="valid" time="0.12" steps="189"/></proof>
+ <proof prover="0"><result status="valid" time="0.12" steps="193"/></proof>
  </goal>
  <goal name="WP_parameter pat_map_vars_in" expl="VC for pat_map_vars_in">
- <proof prover="0"><result status="valid" time="0.51" steps="692"/></proof>
+ <proof prover="0"><result status="valid" time="0.30" steps="687"/></proof>
  </goal>
  <goal name="WP_parameter patl_map_vars_in" expl="VC for patl_map_vars_in">
- <proof prover="0"><result status="valid" time="0.21" steps="266"/></proof>
+ <proof prover="0"><result status="valid" time="0.21" steps="265"/></proof>
  </goal>
  <goal name="WP_parameter t_map_vars_in" expl="VC for t_map_vars_in">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t_map_vars_in.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.12" steps="100"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.2" expl="2. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="8"/></proof>
@@ -115,10 +515,10 @@
   <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.84" steps="570"/></proof>
+  <proof prover="0"><result status="valid" time="0.84" steps="610"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.8" expl="8. variant decrease">
-  <proof prover="0"><result status="valid" time="0.13" steps="115"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="122"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.9" expl="9. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
@@ -136,7 +536,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.14" expl="14. variant decrease">
-  <proof prover="0"><result status="valid" time="0.07" steps="130"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="138"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.15" expl="15. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
@@ -154,7 +554,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.20" expl="20. variant decrease">
-  <proof prover="0"><result status="valid" time="0.09" steps="145"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="154"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.21" expl="21. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="17"/></proof>
@@ -175,7 +575,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.27" expl="27. variant decrease">
-  <proof prover="0"><result status="valid" time="0.08" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.28" expl="28. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
@@ -209,7 +609,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_map_vars_in.34" expl="34. variant decrease">
-  <proof prover="0"><result status="valid" time="0.11" steps="103"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="111"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.35" expl="35. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="17"/></proof>
@@ -230,7 +630,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.41" expl="41. variant decrease">
-  <proof prover="0"><result status="valid" time="0.11" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.42" expl="42. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
@@ -248,7 +648,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.47" expl="47. variant decrease">
-  <proof prover="0"><result status="valid" time="0.12" steps="103"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="110"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.48" expl="48. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
@@ -271,13 +671,13 @@
   <goal name="WP_parameter t_map_vars_in.54" expl="54. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter t_map_vars_in.54.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.95" steps="548"/></proof>
+   <proof prover="0"><result status="valid" time="0.78" steps="548"/></proof>
    </goal>
    <goal name="WP_parameter t_map_vars_in.54.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
+   <proof prover="0"><result status="valid" time="0.11" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter t_map_vars_in.54.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.75" steps="547"/></proof>
+   <proof prover="0"><result status="valid" time="0.80" steps="547"/></proof>
    </goal>
    <goal name="WP_parameter t_map_vars_in.54.4" expl="4. assertion">
    <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
@@ -285,56 +685,56 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_map_vars_in.55" expl="55. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.56" expl="56. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.57" expl="57. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.58" expl="58. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.59" expl="59. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.60" expl="60. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.61" expl="61. postcondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="82"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="82"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.62" expl="62. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter t_map_vars_in.62.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.80" steps="548"/></proof>
+   <proof prover="0"><result status="valid" time="0.95" steps="548"/></proof>
    </goal>
    <goal name="WP_parameter t_map_vars_in.62.2" expl="2. assertion">
    <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter t_map_vars_in.62.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.89" steps="547"/></proof>
+   <proof prover="0"><result status="valid" time="0.75" steps="547"/></proof>
    </goal>
    <goal name="WP_parameter t_map_vars_in.62.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+   <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter t_map_vars_in.63" expl="63. variant decrease">
-  <proof prover="0"><result status="valid" time="0.15" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.64" expl="64. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.65" expl="65. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.66" expl="66. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.67" expl="67. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.68" expl="68. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
@@ -342,17 +742,30 @@
   <goal name="WP_parameter t_map_vars_in.69" expl="69. postcondition">
   <proof prover="0"><result status="valid" time="0.13" steps="82"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.70" expl="70. variant decrease">
-  <proof prover="0"><result status="valid" time="0.16" steps="101"/></proof>
+  <goal name="WP_parameter t_map_vars_in.70" expl="70. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter t_map_vars_in.70.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.80" steps="548"/></proof>
+   </goal>
+   <goal name="WP_parameter t_map_vars_in.70.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
+   </goal>
+   <goal name="WP_parameter t_map_vars_in.70.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.89" steps="547"/></proof>
+   </goal>
+   <goal name="WP_parameter t_map_vars_in.70.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.71" expl="71. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
+  <goal name="WP_parameter t_map_vars_in.71" expl="71. variant decrease">
+  <proof prover="0"><result status="valid" time="0.14" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.72" expl="72. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.73" expl="73. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.74" expl="74. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
@@ -360,166 +773,190 @@
   <goal name="WP_parameter t_map_vars_in.75" expl="75. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.76" expl="76. variant decrease">
-  <proof prover="0"><result status="valid" time="0.15" steps="116"/></proof>
+  <goal name="WP_parameter t_map_vars_in.76" expl="76. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.77" expl="77. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="13"/></proof>
+  <goal name="WP_parameter t_map_vars_in.77" expl="77. postcondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="82"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.78" expl="78. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  <goal name="WP_parameter t_map_vars_in.78" expl="78. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.79" expl="79. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.80" expl="80. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.81" expl="81. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.82" expl="82. postcondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
+  <goal name="WP_parameter t_map_vars_in.82" expl="82. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.83" expl="83. variant decrease">
-  <proof prover="0"><result status="valid" time="0.09" steps="101"/></proof>
+  <goal name="WP_parameter t_map_vars_in.83" expl="83. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.84" expl="84. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  <goal name="WP_parameter t_map_vars_in.84" expl="84. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="123"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.85" expl="85. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.86" expl="86. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.87" expl="87. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.88" expl="88. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.89" expl="89. variant decrease">
-  <proof prover="0"><result status="valid" time="0.09" steps="116"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.90" expl="90. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.91" expl="91. precondition">
+  <goal name="WP_parameter t_map_vars_in.89" expl="89. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.92" expl="92. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.93" expl="93. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.94" expl="94. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.95" expl="95. postcondition">
+  <goal name="WP_parameter t_map_vars_in.90" expl="90. postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.96" expl="96. variant decrease">
-  <proof prover="0"><result status="valid" time="0.07" steps="101"/></proof>
+  <goal name="WP_parameter t_map_vars_in.91" expl="91. variant decrease">
+  <proof prover="0"><result status="valid" time="0.16" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.97" expl="97. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
+  <goal name="WP_parameter t_map_vars_in.92" expl="92. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.93" expl="93. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.94" expl="94. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.95" expl="95. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.96" expl="96. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.97" expl="97. variant decrease">
+  <proof prover="0"><result status="valid" time="0.15" steps="123"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.98" expl="98. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.99" expl="99. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.100" expl="100. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.101" expl="101. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.102" expl="102. variant decrease">
-  <proof prover="0"><result status="valid" time="0.11" steps="116"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.103" expl="103. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.104" expl="104. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.105" expl="105. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.106" expl="106. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.107" expl="107. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.108" expl="108. postcondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.109" expl="109. variant decrease">
-  <proof prover="0"><result status="valid" time="0.08" steps="101"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.110" expl="110. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.111" expl="111. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.112" expl="112. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.113" expl="113. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.114" expl="114. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.115" expl="115. variant decrease">
-  <proof prover="0"><result status="valid" time="0.09" steps="116"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.116" expl="116. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.117" expl="117. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.118" expl="118. precondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_map_vars_in.119" expl="119. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.120" expl="120. precondition">
+  <goal name="WP_parameter t_map_vars_in.100" expl="100. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.101" expl="101. precondition">
   <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.121" expl="121. postcondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="30"/></proof>
+  <goal name="WP_parameter t_map_vars_in.102" expl="102. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.122" expl="122. variant decrease">
-  <proof prover="0"><result status="valid" time="0.07" steps="87"/></proof>
+  <goal name="WP_parameter t_map_vars_in.103" expl="103. postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.123" expl="123. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="4"/></proof>
+  <goal name="WP_parameter t_map_vars_in.104" expl="104. variant decrease">
+  <proof prover="0"><result status="valid" time="0.08" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.124" expl="124. precondition">
+  <goal name="WP_parameter t_map_vars_in.105" expl="105. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.106" expl="106. precondition">
   <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.125" expl="125. precondition">
+  <goal name="WP_parameter t_map_vars_in.107" expl="107. precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.108" expl="108. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.109" expl="109. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.110" expl="110. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="123"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.111" expl="111. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.112" expl="112. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.113" expl="113. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.114" expl="114. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.115" expl="115. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.116" expl="116. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.117" expl="117. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.118" expl="118. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.119" expl="119. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.120" expl="120. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.121" expl="121. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.122" expl="122. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.123" expl="123. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="123"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.124" expl="124. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.125" expl="125. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.126" expl="126. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.127" expl="127. precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_map_vars_in.128" expl="128. postcondition">
-  <proof prover="0"><result status="valid" time="0.05" steps="19"/></proof>
+  <goal name="WP_parameter t_map_vars_in.128" expl="128. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.129" expl="129. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.130" expl="130. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.131" expl="131. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.132" expl="132. precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.133" expl="133. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.134" expl="134. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.135" expl="135. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.136" expl="136. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter t_map_vars_in.137" expl="137. postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="58"/></proof>
   </goal>
  </transf>
@@ -572,18 +1009,18 @@
  <proof prover="0"><result status="valid" time="0.18" steps="90"/></proof>
  </goal>
  <goal name="WP_parameter tyl_subst_vars_in" expl="VC for tyl_subst_vars_in">
- <proof prover="0"><result status="valid" time="0.22" steps="195"/></proof>
+ <proof prover="0"><result status="valid" time="0.10" steps="194"/></proof>
  </goal>
  <goal name="WP_parameter pat_subst_vars_in" expl="VC for pat_subst_vars_in">
- <proof prover="0"><result status="valid" time="0.45" steps="682"/></proof>
+ <proof prover="0"><result status="valid" time="0.45" steps="684"/></proof>
  </goal>
  <goal name="WP_parameter patl_subst_vars_in" expl="VC for patl_subst_vars_in">
- <proof prover="0"><result status="valid" time="0.25" steps="266"/></proof>
+ <proof prover="0"><result status="valid" time="0.12" steps="266"/></proof>
  </goal>
  <goal name="WP_parameter t_subst_vars_in" expl="VC for t_subst_vars_in">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t_subst_vars_in.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="100"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.2" expl="2. precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
@@ -601,10 +1038,10 @@
   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.71" steps="473"/></proof>
+  <proof prover="0"><result status="valid" time="0.71" steps="559"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.8" expl="8. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="115"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="122"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.9" expl="9. precondition">
   <proof prover="0"><result status="valid" time="0.12" steps="11"/></proof>
@@ -622,7 +1059,7 @@
   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.14" expl="14. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="116"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="123"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.15" expl="15. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="13"/></proof>
@@ -640,7 +1077,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.20" expl="20. variant decrease">
-  <proof prover="0"><result status="valid" time="0.13" steps="117"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="124"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.21" expl="21. precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="15"/></proof>
@@ -661,7 +1098,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.27" expl="27. variant decrease">
-  <proof prover="0"><result status="valid" time="0.10" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.28" expl="28. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
@@ -698,7 +1135,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.34" expl="34. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="96"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.35" expl="35. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
@@ -719,7 +1156,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.41" expl="41. variant decrease">
-  <proof prover="0"><result status="valid" time="0.12" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.42" expl="42. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
@@ -737,7 +1174,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.47" expl="47. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="95"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.48" expl="48. precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
@@ -763,13 +1200,13 @@
    <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.54.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.10" steps="37"/></proof>
+   <proof prover="0"><result status="valid" time="0.07" steps="37"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.54.3" expl="3. assertion">
-   <proof prover="1"><result status="valid" time="0.14"/></proof>
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.54.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.13" steps="185"/></proof>
+   <proof prover="0"><result status="valid" time="0.24" steps="185"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.54.5" expl="5. assertion">
    <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
@@ -777,25 +1214,25 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.55" expl="55. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.56" expl="56. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.57" expl="57. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.58" expl="58. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.59" expl="59. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.60" expl="60. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.61" expl="61. postcondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="75"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="75"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.62" expl="62. assertion">
   <transf name="split_goal_wp">
@@ -803,21 +1240,21 @@
    <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.62.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.12" steps="37"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="37"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.62.3" expl="3. assertion">
-   <proof prover="1"><result status="valid" time="0.12"/></proof>
+   <proof prover="1"><result status="valid" time="0.14"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.62.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.12" steps="185"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="185"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_vars_in.62.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.63" expl="63. variant decrease">
-  <proof prover="0"><result status="valid" time="0.18" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.64" expl="64. precondition">
   <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
@@ -826,195 +1263,235 @@
   <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.66" expl="66. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.67" expl="67. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.68" expl="68. precondition">
   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.69" expl="69. postcondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="75"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="75"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.70" expl="70. variant decrease">
-  <proof prover="0"><result status="valid" time="0.18" steps="101"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.70" expl="70. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter t_subst_vars_in.70.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_vars_in.70.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="37"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_vars_in.70.3" expl="3. assertion">
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_vars_in.70.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="185"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_vars_in.70.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.71" expl="71. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="10"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.71" expl="71. variant decrease">
+  <proof prover="0"><result status="valid" time="0.17" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.72" expl="72. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.73" expl="73. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.74" expl="74. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.75" expl="75. precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.76" expl="76. variant decrease">
-  <proof prover="0"><result status="valid" time="0.19" steps="102"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.76" expl="76. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.77" expl="77. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="12"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.77" expl="77. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="75"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.78" expl="78. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.78" expl="78. variant decrease">
+  <proof prover="0"><result status="valid" time="0.15" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.79" expl="79. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.80" expl="80. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.81" expl="81. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.82" expl="82. postcondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="26"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.82" expl="82. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.83" expl="83. variant decrease">
-  <proof prover="0"><result status="valid" time="0.15" steps="101"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.83" expl="83. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.84" expl="84. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.84" expl="84. variant decrease">
+  <proof prover="0"><result status="valid" time="0.17" steps="108"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.85" expl="85. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.86" expl="86. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.87" expl="87. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.88" expl="88. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.89" expl="89. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.90" expl="90. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.91" expl="91. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.92" expl="92. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.93" expl="93. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.94" expl="94. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.95" expl="95. postcondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.96" expl="96. variant decrease">
-  <proof prover="0"><result status="valid" time="0.10" steps="101"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.97" expl="97. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.98" expl="98. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.99" expl="99. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.100" expl="100. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.101" expl="101. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.102" expl="102. variant decrease">
-  <proof prover="0"><result status="valid" time="0.10" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.103" expl="103. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.104" expl="104. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.105" expl="105. precondition">
+  <goal name="WP_parameter t_subst_vars_in.88" expl="88. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.106" expl="106. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.89" expl="89. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.107" expl="107. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.90" expl="90. postcondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.108" expl="108. postcondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="26"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.91" expl="91. variant decrease">
+  <proof prover="0"><result status="valid" time="0.18" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.109" expl="109. variant decrease">
-  <proof prover="0"><result status="valid" time="0.13" steps="101"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.92" expl="92. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.110" expl="110. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.93" expl="93. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.111" expl="111. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.94" expl="94. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.112" expl="112. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.95" expl="95. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.113" expl="113. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.96" expl="96. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.114" expl="114. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.97" expl="97. variant decrease">
+  <proof prover="0"><result status="valid" time="0.19" steps="108"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.115" expl="115. variant decrease">
-  <proof prover="0"><result status="valid" time="0.10" steps="102"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.98" expl="98. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.116" expl="116. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.117" expl="117. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.118" expl="118. precondition">
+  <goal name="WP_parameter t_subst_vars_in.99" expl="99. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.119" expl="119. precondition">
+  <goal name="WP_parameter t_subst_vars_in.100" expl="100. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.101" expl="101. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.102" expl="102. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.120" expl="120. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_vars_in.121" expl="121. postcondition">
+  <goal name="WP_parameter t_subst_vars_in.103" expl="103. postcondition">
   <proof prover="0"><result status="valid" time="0.07" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.122" expl="122. variant decrease">
-  <proof prover="0"><result status="valid" time="0.09" steps="87"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.104" expl="104. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.123" expl="123. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="4"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.105" expl="105. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.124" expl="124. precondition">
+  <goal name="WP_parameter t_subst_vars_in.106" expl="106. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.125" expl="125. precondition">
+  <goal name="WP_parameter t_subst_vars_in.107" expl="107. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.126" expl="126. precondition">
+  <goal name="WP_parameter t_subst_vars_in.108" expl="108. precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.127" expl="127. precondition">
+  <goal name="WP_parameter t_subst_vars_in.109" expl="109. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_vars_in.128" expl="128. postcondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
+  <goal name="WP_parameter t_subst_vars_in.110" expl="110. variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="108"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.111" expl="111. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.112" expl="112. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.113" expl="113. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.114" expl="114. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.115" expl="115. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.116" expl="116. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.117" expl="117. variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.118" expl="118. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.119" expl="119. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.120" expl="120. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.121" expl="121. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.122" expl="122. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.123" expl="123. variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="108"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.124" expl="124. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.125" expl="125. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.126" expl="126. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.127" expl="127. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.128" expl="128. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.129" expl="129. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.130" expl="130. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.131" expl="131. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.132" expl="132. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.133" expl="133. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.134" expl="134. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.135" expl="135. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.136" expl="136. postcondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_vars_in.137" expl="137. postcondition">
   <proof prover="0"><result status="valid" time="0.14" steps="45"/></proof>
   </goal>
  </transf>
@@ -1073,7 +1550,7 @@
  <proof prover="0"><result status="valid" time="0.17" steps="109"/></proof>
  </goal>
  <goal name="WP_parameter pat_subst_free_vars" expl="VC for pat_subst_free_vars">
- <proof prover="0"><result status="valid" time="0.26" steps="479"/></proof>
+ <proof prover="0"><result status="valid" time="0.26" steps="473"/></proof>
  </goal>
  <goal name="WP_parameter patl_subst_free_vars" expl="VC for patl_subst_free_vars">
  <proof prover="0"><result status="valid" time="0.08" steps="149"/></proof>
@@ -1081,7 +1558,7 @@
  <goal name="WP_parameter t_subst_free_vars" expl="VC for t_subst_free_vars">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t_subst_free_vars.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.17" steps="100"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.2" expl="2. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
@@ -1099,10 +1576,10 @@
   <proof prover="0"><result status="valid" time="0.05" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.64" steps="2308"/></proof>
+  <proof prover="0"><result status="valid" time="0.89" steps="2244"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.8" expl="8. variant decrease">
-  <proof prover="0"><result status="valid" time="0.18" steps="115"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="122"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.9" expl="9. precondition">
   <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
@@ -1120,7 +1597,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.14" expl="14. variant decrease">
-  <proof prover="0"><result status="valid" time="0.15" steps="116"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="123"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.15" expl="15. precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
@@ -1138,7 +1615,7 @@
   <proof prover="0"><result status="valid" time="0.12" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.20" expl="20. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="117"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="124"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.21" expl="21. precondition">
   <proof prover="0"><result status="valid" time="0.11" steps="9"/></proof>
@@ -1159,7 +1636,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.27" expl="27. variant decrease">
-  <proof prover="0"><result status="valid" time="0.10" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.28" expl="28. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
@@ -1199,7 +1676,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.34" expl="34. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="96"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.35" expl="35. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
@@ -1220,7 +1697,7 @@
   <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.41" expl="41. variant decrease">
-  <proof prover="0"><result status="valid" time="0.14" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.42" expl="42. precondition">
   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
@@ -1238,7 +1715,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.47" expl="47. variant decrease">
-  <proof prover="0"><result status="valid" time="0.12" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="95"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.48" expl="48. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
@@ -1261,45 +1738,45 @@
   <goal name="WP_parameter t_subst_free_vars.54" expl="54. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter t_subst_free_vars.54.1" expl="1. assertion">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="1"><result status="valid" time="0.14"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.54.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.13" steps="31"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.54.3" expl="3. assertion">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="1"><result status="valid" time="0.14"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.54.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.08" steps="8"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.54.5" expl="5. assertion">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="1"><result status="valid" time="0.13"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.54.6" expl="6. assertion">
-   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.55" expl="55. variant decrease">
-  <proof prover="0"><result status="valid" time="0.19" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.56" expl="56. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.57" expl="57. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.58" expl="58. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.59" expl="59. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.60" expl="60. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.61" expl="61. postcondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="38"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.62" expl="62. assertion">
   <transf name="split_goal_wp">
@@ -1307,13 +1784,13 @@
    <proof prover="2"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.62.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.11" steps="31"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.62.3" expl="3. assertion">
-   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.62.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.12" steps="8"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="8"/></proof>
    </goal>
    <goal name="WP_parameter t_subst_free_vars.62.5" expl="5. assertion">
    <proof prover="2"><result status="valid" time="0.10"/></proof>
@@ -1324,204 +1801,247 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.63" expl="63. variant decrease">
-  <proof prover="0"><result status="valid" time="0.16" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.64" expl="64. precondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.65" expl="65. precondition">
   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.66" expl="66. precondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.67" expl="67. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.68" expl="68. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.69" expl="69. postcondition">
   <proof prover="0"><result status="valid" time="0.12" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.70" expl="70. variant decrease">
-  <proof prover="0"><result status="valid" time="0.15" steps="101"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.70" expl="70. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter t_subst_free_vars.70.1" expl="1. assertion">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_free_vars.70.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="31"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_free_vars.70.3" expl="3. assertion">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_free_vars.70.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="8"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_free_vars.70.5" expl="5. assertion">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="WP_parameter t_subst_free_vars.70.6" expl="6. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.71" expl="71. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.71" expl="71. variant decrease">
+  <proof prover="0"><result status="valid" time="0.19" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.72" expl="72. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.73" expl="73. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.74" expl="74. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.75" expl="75. precondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.76" expl="76. variant decrease">
-  <proof prover="0"><result status="valid" time="0.20" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.77" expl="77. precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.78" expl="78. precondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.79" expl="79. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.80" expl="80. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.81" expl="81. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.82" expl="82. postcondition">
-  <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.83" expl="83. variant decrease">
-  <proof prover="0"><result status="valid" time="0.12" steps="101"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.84" expl="84. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.85" expl="85. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.86" expl="86. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.87" expl="87. precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.88" expl="88. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.73" expl="73. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.89" expl="89. variant decrease">
-  <proof prover="0"><result status="valid" time="0.13" steps="102"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.74" expl="74. precondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.90" expl="90. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.75" expl="75. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.91" expl="91. precondition">
+  <goal name="WP_parameter t_subst_free_vars.76" expl="76. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.77" expl="77. postcondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.78" expl="78. variant decrease">
+  <proof prover="0"><result status="valid" time="0.12" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.79" expl="79. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.80" expl="80. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.81" expl="81. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.82" expl="82. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.83" expl="83. precondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.84" expl="84. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="108"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.85" expl="85. precondition">
   <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.92" expl="92. precondition">
+  <goal name="WP_parameter t_subst_free_vars.86" expl="86. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.87" expl="87. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.93" expl="93. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.88" expl="88. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.94" expl="94. precondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.89" expl="89. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.95" expl="95. postcondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.96" expl="96. variant decrease">
-  <proof prover="0"><result status="valid" time="0.11" steps="101"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.97" expl="97. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.98" expl="98. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.99" expl="99. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.100" expl="100. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.101" expl="101. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.102" expl="102. variant decrease">
-  <proof prover="0"><result status="valid" time="0.11" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.103" expl="103. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.104" expl="104. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.105" expl="105. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.106" expl="106. precondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.107" expl="107. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.108" expl="108. postcondition">
+  <goal name="WP_parameter t_subst_free_vars.90" expl="90. postcondition">
   <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.109" expl="109. variant decrease">
-  <proof prover="0"><result status="valid" time="0.11" steps="101"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.91" expl="91. variant decrease">
+  <proof prover="0"><result status="valid" time="0.15" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.110" expl="110. precondition">
+  <goal name="WP_parameter t_subst_free_vars.92" expl="92. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.93" expl="93. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.94" expl="94. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.95" expl="95. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.96" expl="96. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.97" expl="97. variant decrease">
+  <proof prover="0"><result status="valid" time="0.20" steps="108"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.98" expl="98. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.99" expl="99. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.100" expl="100. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.101" expl="101. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.102" expl="102. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.103" expl="103. postcondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.104" expl="104. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.105" expl="105. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.106" expl="106. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.107" expl="107. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.108" expl="108. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.109" expl="109. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.110" expl="110. variant decrease">
+  <proof prover="0"><result status="valid" time="0.12" steps="108"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.111" expl="111. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.112" expl="112. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.113" expl="113. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.114" expl="114. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.115" expl="115. variant decrease">
-  <proof prover="0"><result status="valid" time="0.12" steps="102"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.115" expl="115. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.116" expl="116. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.116" expl="116. postcondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter t_subst_free_vars.117" expl="117. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <goal name="WP_parameter t_subst_free_vars.117" expl="117. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="107"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.118" expl="118. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.119" expl="119. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.120" expl="120. precondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.121" expl="121. postcondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.122" expl="122. variant decrease">
-  <proof prover="0"><result status="valid" time="0.09" steps="87"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.123" expl="123. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.121" expl="121. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.122" expl="122. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.123" expl="123. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="108"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_free_vars.124" expl="124. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.125" expl="125. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.126" expl="126. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.127" expl="127. precondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter t_subst_free_vars.128" expl="128. postcondition">
   <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
   </goal>
+  <goal name="WP_parameter t_subst_free_vars.125" expl="125. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.126" expl="126. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.127" expl="127. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.128" expl="128. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
   <goal name="WP_parameter t_subst_free_vars.129" expl="129. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.130" expl="130. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.131" expl="131. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.132" expl="132. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.133" expl="133. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.134" expl="134. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.135" expl="135. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.136" expl="136. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter t_subst_free_vars.137" expl="137. postcondition">
   <proof prover="0"><result status="valid" time="0.07" steps="19"/></proof>
   </goal>
  </transf>
@@ -1577,12 +2097,12 @@
  <proof prover="0"><result status="valid" time="0.20" steps="149"/></proof>
  </goal>
 </theory>
-<theory name="Commutations" sum="f44f087f32f31134bdad5bb3f4f13b1f">
+<theory name="Commutations" sum="0218c7e0593d82ec0c15af027e43f018">
  <goal name="WP_parameter ty_map_id" expl="VC for ty_map_id">
  <proof prover="0"><result status="valid" time="0.06" steps="28"/></proof>
  </goal>
  <goal name="WP_parameter tyl_map_id" expl="VC for tyl_map_id">
- <proof prover="0"><result status="valid" time="0.05" steps="30"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="33"/></proof>
  </goal>
  <goal name="WP_parameter ty_map_ho_id" expl="VC for ty_map_ho_id">
  <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
@@ -1591,10 +2111,10 @@
  <proof prover="0"><result status="valid" time="0.05" steps="9"/></proof>
  </goal>
  <goal name="WP_parameter pat_map_id" expl="VC for pat_map_id">
- <proof prover="0"><result status="valid" time="0.09" steps="153"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="150"/></proof>
  </goal>
  <goal name="WP_parameter patl_map_id" expl="VC for patl_map_id">
- <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="32"/></proof>
  </goal>
  <goal name="WP_parameter pat_map_ho_id" expl="VC for pat_map_ho_id">
  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
@@ -1603,13 +2123,13 @@
  <proof prover="0"><result status="valid" time="0.05" steps="11"/></proof>
  </goal>
  <goal name="WP_parameter t_map_id" expl="VC for t_map_id">
- <proof prover="0"><result status="valid" time="0.83" steps="2049"/></proof>
+ <proof prover="0"><result status="valid" time="1.09" steps="2289"/></proof>
  </goal>
  <goal name="WP_parameter tl_map_id" expl="VC for tl_map_id">
- <proof prover="0"><result status="valid" time="0.06" steps="36"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="38"/></proof>
  </goal>
  <goal name="WP_parameter brl_map_id" expl="VC for brl_map_id">
- <proof prover="0"><result status="valid" time="0.09" steps="34"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="37"/></proof>
  </goal>
  <goal name="WP_parameter br_map_id" expl="VC for br_map_id">
  <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
@@ -1618,7 +2138,7 @@
  <proof prover="0"><result status="valid" time="0.08" steps="58"/></proof>
  </goal>
  <goal name="WP_parameter tyl_map_compose" expl="VC for tyl_map_compose">
- <proof prover="0"><result status="valid" time="0.10" steps="113"/></proof>
+ <proof prover="0"><result status="valid" time="0.10" steps="112"/></proof>
  </goal>
  <goal name="WP_parameter ty_map_ho_compose" expl="VC for ty_map_ho_compose">
  <proof prover="0"><result status="valid" time="0.08" steps="14"/></proof>
@@ -1639,13 +2159,13 @@
  <proof prover="0"><result status="valid" time="0.05" steps="14"/></proof>
  </goal>
  <goal name="WP_parameter t_map_compose" expl="VC for t_map_compose">
- <proof prover="0"><result status="valid" time="1.13" steps="2706"/></proof>
+ <proof prover="0"><result status="valid" time="1.13" steps="2895"/></proof>
  </goal>
  <goal name="WP_parameter tl_map_compose" expl="VC for tl_map_compose">
  <proof prover="0"><result status="valid" time="0.07" steps="68"/></proof>
  </goal>
  <goal name="WP_parameter brl_map_compose" expl="VC for brl_map_compose">
- <proof prover="0"><result status="valid" time="0.08" steps="62"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="63"/></proof>
  </goal>
  <goal name="WP_parameter br_map_compose" expl="VC for br_map_compose">
  <proof prover="0"><result status="valid" time="0.08" steps="21"/></proof>
@@ -1701,7 +2221,7 @@
  <proof prover="0"><result status="valid" time="0.07" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter pat_smap_compose" expl="VC for pat_smap_compose">
- <proof prover="0"><result status="valid" time="0.17" steps="247"/></proof>
+ <proof prover="0"><result status="valid" time="0.17" steps="254"/></proof>
  </goal>
  <goal name="WP_parameter pat_list_smap_compose" expl="VC for pat_list_smap_compose">
  <proof prover="0"><result status="valid" time="0.11" steps="79"/></proof>
@@ -1713,13 +2233,13 @@
  <proof prover="0"><result status="valid" time="0.07" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter term_smap_compose" expl="VC for term_smap_compose">
- <proof prover="0"><result status="valid" time="2.44" steps="2339"/></proof>
+ <proof prover="0"><result status="valid" time="1.71" steps="2680"/></proof>
  </goal>
  <goal name="WP_parameter term_list_smap_compose" expl="VC for term_list_smap_compose">
- <proof prover="0"><result status="valid" time="0.12" steps="73"/></proof>
+ <proof prover="0"><result status="valid" time="0.12" steps="60"/></proof>
  </goal>
  <goal name="WP_parameter branch_list_smap_compose" expl="VC for branch_list_smap_compose">
- <proof prover="0"><result status="valid" time="0.12" steps="61"/></proof>
+ <proof prover="0"><result status="valid" time="0.12" steps="73"/></proof>
  </goal>
  <goal name="WP_parameter branch_smap_compose" expl="VC for branch_smap_compose">
  <proof prover="0"><result status="valid" time="0.12" steps="25"/></proof>
@@ -1740,11 +2260,11 @@
  <transf name="split_goal_wp">
   <goal name="WP_parameter maps_term_lifting.1" expl="1. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter maps_term_lifting.1.1" expl="1.">
-   <proof prover="1"><result status="valid" time="0.68"/></proof>
+   <goal name="WP_parameter maps_term_lifting.1.1" expl="1. VC for maps_term_lifting">
+   <proof prover="1"><result status="valid" time="0.53"/></proof>
    </goal>
-   <goal name="WP_parameter maps_term_lifting.1.2" expl="2.">
-   <proof prover="1"><result status="valid" time="0.37"/></proof>
+   <goal name="WP_parameter maps_term_lifting.1.2" expl="2. VC for maps_term_lifting">
+   <proof prover="1"><result status="valid" time="0.42"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1757,7 +2277,7 @@
  <proof prover="0"><result status="valid" time="0.12" steps="67"/></proof>
  </goal>
  <goal name="WP_parameter tyl_maps_compose" expl="VC for tyl_maps_compose">
- <proof prover="0"><result status="valid" time="0.13" steps="110"/></proof>
+ <proof prover="0"><result status="valid" time="0.13" steps="144"/></proof>
  </goal>
  <goal name="WP_parameter ty_maps_ho_compose" expl="VC for ty_maps_ho_compose">
  <proof prover="0"><result status="valid" time="0.10" steps="16"/></proof>
@@ -1766,10 +2286,10 @@
  <proof prover="0"><result status="valid" time="0.12" steps="15"/></proof>
  </goal>
  <goal name="WP_parameter pat_maps_compose" expl="VC for pat_maps_compose">
- <proof prover="0"><result status="valid" time="0.32" steps="501"/></proof>
+ <proof prover="0"><result status="valid" time="0.32" steps="500"/></proof>
  </goal>
  <goal name="WP_parameter patl_maps_compose" expl="VC for patl_maps_compose">
- <proof prover="0"><result status="valid" time="0.20" steps="109"/></proof>
+ <proof prover="0"><result status="valid" time="0.20" steps="144"/></proof>
  </goal>
  <goal name="WP_parameter pat_maps_ho_compose" expl="VC for pat_maps_ho_compose">
  <proof prover="0"><result status="valid" time="0.08" steps="15"/></proof>
@@ -1778,13 +2298,13 @@
  <proof prover="0"><result status="valid" time="0.08" steps="15"/></proof>
  </goal>
  <goal name="WP_parameter t_maps_compose" expl="VC for t_maps_compose">
- <proof prover="0"><result status="valid" time="1.97" steps="2835"/></proof>
+ <proof prover="0"><result status="valid" time="1.97" steps="3039"/></proof>
  </goal>
  <goal name="WP_parameter tl_maps_compose" expl="VC for tl_maps_compose">
- <proof prover="0"><result status="valid" time="0.14" steps="89"/></proof>
+ <proof prover="0"><result status="valid" time="0.14" steps="88"/></proof>
  </goal>
  <goal name="WP_parameter brl_maps_compose" expl="VC for brl_maps_compose">
- <proof prover="0"><result status="valid" time="0.15" steps="88"/></proof>
+ <proof prover="0"><result status="valid" time="0.15" steps="72"/></proof>
  </goal>
  <goal name="WP_parameter br_maps_compose" expl="VC for br_maps_compose">
  <proof prover="0"><result status="valid" time="0.13" steps="31"/></proof>
@@ -1818,10 +2338,10 @@
    <proof prover="0"><result status="valid" time="0.07" steps="23"/></proof>
    </goal>
    <goal name="WP_parameter subst_term_lifting.1.3" expl="3. assertion">
-   <proof prover="1"><result status="valid" time="0.99"/></proof>
+   <proof prover="1"><result status="valid" time="0.76"/></proof>
    </goal>
    <goal name="WP_parameter subst_term_lifting.1.4" expl="4. assertion">
-   <proof prover="1" edited="logic_syntax-Commutations-WP_parameter_subst_term_lifting_1.smt2"><result status="valid" time="0.24"/></proof>
+   <proof prover="1"><result status="valid" time="0.18"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1843,7 +2363,7 @@
  <proof prover="0"><result status="valid" time="0.15" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter pat_subst_compose" expl="VC for pat_subst_compose">
- <proof prover="0"><result status="valid" time="0.26" steps="456"/></proof>
+ <proof prover="0"><result status="valid" time="0.26" steps="457"/></proof>
  </goal>
  <goal name="WP_parameter patl_subst_compose" expl="VC for patl_subst_compose">
  <proof prover="0"><result status="valid" time="0.09" steps="115"/></proof>
@@ -1855,7 +2375,7 @@
  <proof prover="0"><result status="valid" time="0.12" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter t_subst_compose" expl="VC for t_subst_compose">
- <proof prover="0"><result status="valid" time="3.02" steps="3170"/></proof>
+ <proof prover="0"><result status="valid" time="3.02" steps="3531"/></proof>
  </goal>
  <goal name="WP_parameter tl_subst_compose" expl="VC for tl_subst_compose">
  <proof prover="0"><result status="valid" time="0.19" steps="92"/></proof>
@@ -1885,7 +2405,7 @@
  <proof prover="0"><result status="valid" time="0.10" steps="44"/></proof>
  </goal>
  <goal name="WP_parameter tyl_subst_id" expl="VC for tyl_subst_id">
- <proof prover="0"><result status="valid" time="0.17" steps="50"/></proof>
+ <proof prover="0"><result status="valid" time="0.17" steps="52"/></proof>
  </goal>
  <goal name="WP_parameter ty_subst_ho_id" expl="VC for ty_subst_ho_id">
  <proof prover="0"><result status="valid" time="0.13" steps="16"/></proof>
@@ -1894,10 +2414,10 @@
  <proof prover="0"><result status="valid" time="0.13" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter pat_subst_id" expl="VC for pat_subst_id">
- <proof prover="0"><result status="valid" time="0.31" steps="230"/></proof>
+ <proof prover="0"><result status="valid" time="0.31" steps="229"/></proof>
  </goal>
  <goal name="WP_parameter patl_subst_id" expl="VC for patl_subst_id">
- <proof prover="0"><result status="valid" time="0.19" steps="54"/></proof>
+ <proof prover="0"><result status="valid" time="0.19" steps="55"/></proof>
  </goal>
  <goal name="WP_parameter pat_subst_ho_id" expl="VC for pat_subst_ho_id">
  <proof prover="0"><result status="valid" time="0.20" steps="17"/></proof>
@@ -1906,13 +2426,13 @@
  <proof prover="0"><result status="valid" time="0.19" steps="18"/></proof>
  </goal>
  <goal name="WP_parameter t_subst_id" expl="VC for t_subst_id">
- <proof prover="0"><result status="valid" time="2.40" steps="2204"/></proof>
+ <proof prover="0"><result status="valid" time="1.85" steps="2513"/></proof>
  </goal>
  <goal name="WP_parameter tl_subst_id" expl="VC for tl_subst_id">
- <proof prover="0"><result status="valid" time="0.19" steps="57"/></proof>
+ <proof prover="0"><result status="valid" time="0.19" steps="54"/></proof>
  </goal>
  <goal name="WP_parameter brl_subst_id" expl="VC for brl_subst_id">
- <proof prover="0"><result status="valid" time="0.09" steps="57"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="56"/></proof>
  </goal>
  <goal name="WP_parameter br_subst_id" expl="VC for br_subst_id">
  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>

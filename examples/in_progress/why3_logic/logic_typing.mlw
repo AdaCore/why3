@@ -519,6 +519,8 @@ module Term
       t_wf sig (ext_env env all (const ty0)) t2 ty
     | TCase t brl -> exists ty0. t_wf sig env t ty0 /\
       brl_wf sig env brl ty0 ty /\ exhaustive sig brl ty0
+    | TEps ty2 t -> ty = ty2 /\ ty_wf sig ty /\
+      t_wf sig (ext_env env all (const ty)) t sig.ty_prop
     | TForall tyl t | TExists tyl t -> tyl_wf sig tyl /\
       let dom = range 0 (length tyl) in
       let env' = ext_env env dom (list_nth tyl default) in
@@ -595,7 +597,8 @@ module Term
       let ty0 = choose (ty_case_witness sig env t brl ty) in
       t_wf_ty_wf sig env t ty0;
       brl_wf_ty_wf sig env brl ty0 ty
-    | TForall _ _ | TExists _ _ | TAnd _ _ | TOr _ _ | TImplies _ _ | TIff _ _
+    | TEps _ _ | TForall _ _ | TExists _ _
+    | TAnd _ _ | TOr _ _ | TImplies _ _ | TIff _ _
     | TNot _ | TTrue | TFalse | TVar _ -> ()
     end
   
