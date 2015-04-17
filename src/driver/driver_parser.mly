@@ -22,7 +22,7 @@
 %token <string> STRING
 %token <string> OPERATOR
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPSLIMITEXCEEDED TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
@@ -52,6 +52,7 @@ list0_global_theory:
 global:
 | PRELUDE STRING { Prelude $2 }
 | PRINTER STRING { Printer $2 }
+| MODEL_PARSER STRING { ModelParser $2 }
 | VALID STRING { RegexpValid $2 }
 | INVALID STRING { RegexpInvalid $2 }
 | TIMEOUT STRING { RegexpTimeout $2 }
@@ -117,6 +118,7 @@ ident:
 | BLACKLIST    { "blacklist" }
 | PRINTER      { "printer" }
 | STEPS        { "steps" }
+| MODEL_PARSER { "model_parser" }
 | VALID        { "valid" }
 | INVALID      { "invalid" }
 | TIMEOUT      { "timeout" }

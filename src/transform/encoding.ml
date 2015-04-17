@@ -69,7 +69,7 @@ let encoding_smt env = Trans.seq [
   Libencoding.monomorphise_goal;
   select_kept def_enco_select_smt env;
   Trans.print_meta Libencoding.debug Libencoding.meta_kept;
-  Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_smt env;
+  Trans.trace_goal "meta_enco_kept" (Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_smt env);
   Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_smt env]
 
 let encoding_tptp env = Trans.seq [

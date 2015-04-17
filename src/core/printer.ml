@@ -28,11 +28,17 @@ type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
 
+type printer_mapping = {
+  lsymbol_m     : string -> Term.lsymbol;
+  queried_terms : Term.term list;
+}
+
 type printer_args = {
   env        : Env.env;
   prelude    : prelude;
   th_prelude : prelude_map;
   blacklist  : blacklist;
+  mutable printer_mapping : printer_mapping; 
 }
 
 type printer = printer_args -> ?old:in_channel -> task pp
@@ -43,6 +49,11 @@ let printers : reg_printer Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
+
+let get_default_printer_mapping = {
+  lsymbol_m = (function _ -> raise Not_found);
+  queried_terms = [];
+}
 
 let register_printer ~desc s p =
   if Hstr.mem printers s then raise (KnownPrinter s);

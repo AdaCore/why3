@@ -70,6 +70,8 @@ module Defs
     | TLet (term 'tv) (term (bind 'tv unit))
       (* Pattern-matching: the first matching case. *)
     | TCase (term 'tv) (list (branch 'tv))
+      (* Hilbert epsilon. *)
+    | TEps ty (term (bind 'tv unit))
       (* Universal/Existential quantifications. The types of the quantified
          variables are given by the sequences. *)
     | TForall (list ty) (term (bind 'tv int))
@@ -141,6 +143,7 @@ module Maps
                        (t_map f g h i e)
     | TLet t1 t2 -> TLet (t_map f g h i t1) (t_map (bmap f) g h i t2)
     | TCase t lb -> TCase (t_map f g h i t) (brl_map f g h i lb)
+    | TEps ty t -> TEps (ty_map g h ty) (t_map (bmap f) g h i t)
     | TForall tys t ->
       TForall (tyl_map g h tys) (t_map (bmap f) g h i t)
     | TExists tys t ->
@@ -237,6 +240,7 @@ module Substs
     | TLet t1 t2 ->
       TLet (t_subst f g h i t1) (t_subst (term_lift f) g h i t2)
     | TCase t lb -> TCase (t_subst f g h i t) (brl_subst f g h i lb)
+    | TEps ty t -> TEps (ty_subst g h ty) (t_subst (term_lift f) g h i t)
     | TForall tys t ->
       TForall (tyl_subst g h tys) (t_subst (term_lift f) g h i t)
     | TExists tys t ->
@@ -377,6 +381,8 @@ module VarsIn
       t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t2
     | TCase t lb -> t_vars_in tv_set tyv_set tys_set ls_set t /\
       brl_vars_in tv_set tyv_set tys_set ls_set lb
+    | TEps ty t -> ty_vars_in tyv_set tys_set ty /\
+      t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t
     | TForall tys t -> t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t /\
       tyl_vars_in tyv_set tys_set tys
     | TExists tys t -> t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t /\
@@ -460,13 +466,13 @@ module VarsIn
   = let ghost rc = t_vars_in_all in match t with
     | TApp _ _ l -> tl_vars_in_all l
     | TIf b t e -> rc b; rc t; rc e
-    | TLet t1 t2 ->
-      assert { extensional_equal (bfold all all:bind 'tv unit -> bool) all };
-      rc t1; rc t2
+    | TLet t1 t2 -> rc t1;rc t2;
+      assert { extensional_equal (bfold all all:bind 'tv unit -> bool) all }
     | TCase t lb -> rc t; brl_vars_in_all lb
-    | TForall _ t | TExists _ t ->
-      assert { extensional_equal (bfold all all:bind 'tv int -> bool) all };
-      rc t
+    | TEps _ t -> rc t;
+      assert { extensional_equal (bfold all all:bind 'tv unit -> bool) all }
+    | TForall _ t | TExists _ t -> rc t;
+      assert { extensional_equal (bfold all all:bind 'tv int -> bool) all }
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
     | TNot t -> rc t
     | _ -> ()
@@ -568,6 +574,8 @@ module VarsIn
       t_vars_subset (bfold tv1 all) (bfold tv2 all)
         tyv1 tyv2 tys1 tys2 ls1 ls2 t2
     | TCase t lb -> rc t; bl_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 lb
+    | TEps _ t -> t_vars_subset (bfold tv1 all) (bfold tv2 all)
+        tyv1 tyv2 tys1 tys2 ls1 ls2 t
     | TForall _ t | TExists _ t ->
       t_vars_subset (bfold tv1 all) (bfold tv2 all)
         tyv1 tyv2 tys1 tys2 ls1 ls2 t
@@ -790,6 +798,11 @@ module SubstVarsIn
         && false };
       t_map_vars_in bf (bmap f) (bfold qf all) pg g qg ph h qh pi i qi t2
     | TCase t lb -> rc t; brl_map_vars_in pf f qf pg g qg ph h qh pi i qi lb
+    | TEps _ t -> let bf = bfold pf all in
+      assert { forall x. bf x -> not (bfold qf all (bmap f x)) ->
+        match x with Fresh u -> bmap f x = Fresh u && false | _ -> false end
+        && false };
+        t_map_vars_in bf (bmap f) (bfold qf all) pg g qg ph h qh pi i qi t
     | TForall _ t | TExists _ t -> let bf = bfold pf all in
       assert { forall x. bf x -> not (bfold qf all (bmap f x)) ->
         match x with Fresh u -> bmap f x = Fresh u && false | _ -> false end
@@ -953,6 +966,13 @@ module SubstVarsIn
           && false end && false };
       t_subst_vars_in bf (term_lift f) (bfold qf all) pg g qg ph h qh pi i qi t2
     | TCase t lb -> rc t; brl_subst_vars_in pf f qf pg g qg ph h qh pi i qi lb
+    | TEps _ t -> let bf = bfold pf all in
+      assert { forall x. bf x ->
+        not (t_vars_in (bfold qf all) qg qh qi (term_lift f x)) ->
+        match x with Fresh u -> term_lift f x = TVar (Fresh u) && false
+        | Old u -> term_lift f x = t_map Old identity identity identity (f u)
+          && false end && false };
+      t_subst_vars_in bf (term_lift f) (bfold qf all) pg g qg ph h qh pi i qi t
     | TForall _ t | TExists _ t -> let bf = bfold pf all in
       assert { forall x. bf x ->
         not (t_vars_in (bfold qf all) qg qh qi (term_lift f x)) ->
@@ -1120,6 +1140,17 @@ module SubstVarsIn
       t_subst_free_vars bf tf1 tf2 sg g1 g2 sh h1 h2 si i1 i2 t2
     | TCase t lb -> rc t;
       brl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 lb
+    | TEps _ t ->
+      let bf = bfold sf all in
+      let tf1 = term_lift f1 in
+      let tf2 = term_lift f2 in
+      assert { forall x. bf x -> tf1 x <> tf2 x ->
+        match x with
+        | Old u -> tf1 x = t_map Old identity identity identity (f1 u) =
+          t_map Old identity identity identity (f2 u) = tf2 x && false
+        | _ -> false
+        end && false };
+      t_subst_free_vars bf tf1 tf2 sg g1 g2 sh h1 h2 si i1 i2 t
     | TForall _ t | TExists _ t ->
       let bf = bfold sf all in
       let tf1 = term_lift f1 in
@@ -1264,6 +1295,7 @@ module Commutations
     | TIf b t e -> rc b; rc t; rc e
     | TLet t1 t2 -> rc t1; rc t2
     | TCase t lb -> rc t; brl_map_id lb
+    | TEps _ t -> rc t
     | TForall _ t | TExists _ t -> rc t
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
     | TNot t -> rc t
@@ -1384,6 +1416,7 @@ module Commutations
     | TLet t1 t2 -> rc t1;
       t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 t2
     | TCase t lb -> rc t; brl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TEps _ t -> t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 t
     | TForall _ t | TExists _ t ->
       t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 t
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
@@ -1606,6 +1639,8 @@ module Commutations
     | TLet t1 t2 -> rc t1;
       term_smap_compose (term_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 t2
     | TCase t lb -> rc t; branch_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TEps _ t ->
+      term_smap_compose (term_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 t
     | TForall _ t | TExists _ t ->
       term_smap_compose (term_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 t
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
@@ -1818,6 +1853,7 @@ module Commutations
     | TLet t1 t2 -> rc t1;
       t_maps_compose (bmap f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t2
     | TCase t lb -> rc t; brl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TEps _ t -> t_maps_compose (bmap f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t
     | TForall _ t | TExists _ t ->
       t_maps_compose (bmap f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
@@ -2042,6 +2078,8 @@ module Commutations
     | TLet t1 t2 -> rc t1;
       t_subst_compose (term_lift f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t2
     | TCase t lb -> rc t; brl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TEps _ t ->
+      t_subst_compose (term_lift f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t
     | TForall _ t | TExists _ t ->
       t_subst_compose (term_lift f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
@@ -2219,6 +2257,7 @@ module Commutations
     | TIf b t e -> rc b; rc t; rc e
     | TLet t1 t2 -> rc t1; rc t2
     | TCase t lb -> rc t; brl_subst_id lb
+    | TEps _ t -> rc t
     | TForall _ t | TExists _ t -> rc t
     | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
     | TNot t -> rc t

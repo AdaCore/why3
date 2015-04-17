@@ -82,6 +82,15 @@ target_name = "Coq"
 target_version = "8.4pl5"
 version = "8.4pl4"
 
+[uninstalled_prover policy1]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "8.4pl4"
+version = "8.4pl5"
+
 EOF
 
 # run the bench

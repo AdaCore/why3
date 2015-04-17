@@ -24,14 +24,24 @@ type blacklist = string list
 
 type 'a pp = Format.formatter -> 'a -> unit
 
+(* Makes it possible to estabilish traceability from names
+in the output of the printer to elements of AST in its input. *)
+type printer_mapping = {
+  lsymbol_m     : string -> Term.lsymbol;
+  queried_terms : Term.term list;
+}
+
 type printer_args = {
   env        : Env.env;
   prelude    : prelude;
   th_prelude : prelude_map;
   blacklist  : blacklist;
+  mutable printer_mapping : printer_mapping;
 }
 
 type printer = printer_args -> ?old:in_channel -> task pp
+
+val get_default_printer_mapping : printer_mapping
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 

@@ -19,6 +19,10 @@ open Term
 open Decl
 open Printer
 
+let debug = Debug.register_info_flag "smtv2_printer"
+  ~desc:"Print@ debugging@ messages@ about@ printing@ \
+         the@ input@ of@ smtv2."
+
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
 let ident_printer =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
@@ -78,7 +82,17 @@ let print_ident fmt id =
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  mutable info_model : term list;
 }
+
+let debug_print_term message t =
+  let form = Debug.get_debug_formatter () in
+  begin
+    Debug.dprintf debug message;
+    if Debug.test_flag debug then 
+      Pretty.print_term form t;
+    Debug.dprintf debug "@.";
+  end
 
 (** type *)
 let rec print_type info fmt ty = match ty.ty_node with
@@ -112,8 +126,24 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
+let model_label = Ident.create_label "model"
+
+let collect_model_ls info ls =
+  if ls.ls_args = [] &&
+    Slab.mem model_label ls.ls_name.id_label then 
+    begin
+      let t = t_app ls [] ls.ls_value in
+      info.info_model <- (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
+    end
+
 (** expr *)
-let rec print_term info fmt t = match t.t_node with
+let rec print_term info fmt t = 
+  debug_print_term "Printing term: " t; 
+
+  if Slab.mem model_label t.t_label then
+    info.info_model <- (t) :: info.info_model;
+
+  match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
@@ -171,7 +201,12 @@ let rec print_term info fmt t = match t.t_node with
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = match f.t_node with
+and print_fmla info fmt f = 
+  debug_print_term "Printing formula: " f;  
+  if Slab.mem model_label f.t_label then
+    info.info_model <- (f) :: info.info_model;
+  
+  match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -286,6 +321,7 @@ let print_param_decl info fmt ls =
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else
+  collect_model_ls info ls;
   let vsl,expr = Decl.open_ls_defn def in
   fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
     print_ident ls.ls_name
@@ -294,7 +330,7 @@ let print_logic_decl info fmt (ls,def) =
     (print_expr info) expr;
   List.iter forget_var vsl
 
-let print_prop_decl info fmt k pr f = match k with
+let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -307,8 +343,26 @@ let print_prop_decl info fmt k pr f = match k with
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
-      fprintf fmt "@[(check-sat)@]@\n"
+      fprintf fmt "@[(check-sat)@]@\n";
+      if info.info_model != [] then 
+	begin
+	  let model_list = info.info_model in
+	  (*
+          fprintf fmt "@[(get-value (%a))@]@\n"
+            (Pp.print_list Pp.space (print_fmla info)) model_list;*)
+	  fprintf fmt "@[(get-value (";
+	  List.iter (fun f -> 
+	    fprintf str_formatter "%a" (print_fmla info) f;
+          let s = flush_str_formatter () in
+          fprintf fmt "@\n;; %s@\n%s" s s;
+          ) model_list;
+	  fprintf fmt "))@]@\n";
+	end;
+      args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
+			       queried_terms = info.info_model; }
+	  
   | Plemma| Pskip -> assert false
+
 
 let print_constructor_decl info fmt (ls,args) =
   match args with
@@ -332,7 +386,7 @@ let print_data_decl info fmt (ts,cl) =
     print_ident ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl info fmt d = match d.d_node with
+let print_decl args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata dl ->
@@ -341,6 +395,7 @@ let print_decl info fmt d = match d.d_node with
     fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
       (print_list space (print_data_decl info)) dl
   | Dparam ls ->
+      collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
@@ -348,17 +403,18 @@ let print_decl info fmt d = match d.d_node with
       "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl info fmt k pr f
+      print_prop_decl args info fmt k pr f
 
-let print_decls =
-  let print_decl (sm, cm) fmt d =
-    try print_decl {info_syn = sm; info_converters = cm} fmt d; (sm, cm), []
+let print_decls args =
+  let print_decl (sm, cm, model) fmt d =
+    try let info = {info_syn = sm; info_converters = cm; info_model = model} in
+        print_decl args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
   Printer.on_converter_map (fun cm ->
-      Trans.fold print_decl ((sm, cm),[])))
+      Trans.fold print_decl ((sm, cm, []),[])))
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
@@ -368,7 +424,7 @@ let print_task args ?old:_ fmt task =
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in
-  print (snd (Trans.apply print_decls task));
+  print (snd (Trans.apply (print_decls args) task));
   pp_print_flush fmt ()
 
 let () = register_printer "smtv2" print_task

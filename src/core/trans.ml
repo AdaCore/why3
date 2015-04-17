@@ -53,6 +53,21 @@ let store fn = let tr = Wtask.memoize_option 63 fn in fun t -> match t with
 
 let bind f g = store (fun task -> g (f task) task)
 
+let trace_goal msg tr =
+  fun task ->
+    begin match task with
+    | Some { task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,t)}}} ->
+      Debug.dprintf debug "[%s (before)] task goal is %a@." msg Pretty.print_term t
+    | _ -> Debug.dprintf debug "[%s (before)] task has non goal@." msg
+    end;
+    let new_task = tr task in
+    begin match new_task with
+    | Some { task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,t)}}} ->
+      Debug.dprintf debug "[%s (after)] task goal is %a@." msg Pretty.print_term t
+    | _ -> Debug.dprintf debug "[%s (after)] task has non goal@." msg
+    end;
+    new_task
+
 let fold fn v =
   let h = Wtask.create 63 in
   let rewind acc task =
@@ -233,6 +248,35 @@ let print_meta f m task =
   in
   Debug.dprintf f "@[<hov 2>meta %s :@\n%a@]@." m.Theory.meta_name print_tds m;
   task
+
+let print_task_goal t = match t with
+  | None -> ()
+  | Some x ->
+    begin
+      match x.task_decl.td_node with
+      | Decl d ->
+	begin
+	  match d.d_node with
+	  | Dprop (Pgoal, _, te) ->
+	    let form = Debug.get_debug_formatter () in
+	    Pretty.print_term form te
+	  | _ -> ()
+	end
+      | _ -> ()
+    end
+
+let create_debugging_trans trans_name (tran : Task.task trans) =
+  let new_trans (t:Task.task) = begin
+    Debug.dprintf debug "The goal before the transformation %s:@." trans_name;
+    print_task_goal t;
+    let t2 = apply tran t in
+    Debug.dprintf debug "@.The goal after the transformation %s:@." trans_name;
+    print_task_goal t2;
+    Debug.dprintf debug "@.@.";
+    t2;
+    
+  end in
+  store new_trans
 
 (** register transformations *)
 

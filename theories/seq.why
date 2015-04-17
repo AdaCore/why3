@@ -14,8 +14,8 @@ theory Seq
 
   type seq 'a
 
-  (** if ['a] is an infinite type, then [set 'a] is infinite *)
-  meta "material_type_arg" type seq, 0
+  (** [seq 'a] is an infinite type *)
+  meta "infinite_type" type seq
 
   (** length *)
 
@@ -146,6 +146,12 @@ theory ToList
 end
 
 (* TODO / TO DISCUSS
+
+  - add set
+
+      s[i <- v] = s when i < 0 || i >= length s?
+
+  - reverse
 
   - what about s[i..j] when i..j is not a valid range?
     left undefined? empty sequence?

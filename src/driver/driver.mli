@@ -41,6 +41,7 @@ val call_on_buffer :
   ?stepslimit : int ->
   ?inplace   : bool ->
   filename   : string ->
+  printer_mapping : Printer.printer_mapping ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
 
 
@@ -67,7 +68,7 @@ val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.task -> unit
+  driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
 val prove_task_prepared :
   command    : string ->

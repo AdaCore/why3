@@ -243,7 +243,8 @@ let output_task_prepared drv fname _tname th task dir =
   let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
   let ext = String.sub dest i (String.length dest - i) in
   let cout = open_out (Filename.concat dir (name ^ ext)) in
-  Driver.print_task_prepared drv (formatter_of_out_channel cout) task;
+  (* TODO print the counterexample *)
+  let _counterexample = Driver.print_task_prepared drv (formatter_of_out_channel cout) task in
   close_out cout
 
 let output_theory drv fname _tname th task dir =

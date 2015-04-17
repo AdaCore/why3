@@ -32,6 +32,7 @@
         "prelude", PRELUDE;
         "printer", PRINTER;
 	"steps", STEPS;
+	"model_parser", MODEL_PARSER;
         "valid", VALID;
         "invalid", INVALID;
         "timeout", TIMEOUT;
