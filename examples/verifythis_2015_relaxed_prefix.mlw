@@ -126,7 +126,6 @@ module RelaxedPrefix
       let ghost ignored = ref 0 in
       for i = 0 to n - 1 do
         invariant { 0 <= !shift <= 1 }
-        invariant { i = 0 -> !shift = 0 }
         invariant { !shift = 1 -> 0 <= !ignored < i }
         invariant { m + !shift >= i }
         invariant {
