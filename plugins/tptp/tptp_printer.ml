@@ -19,13 +19,15 @@ open Term
 open Decl
 open Printer
 
+let bls = ["true";"false"]
+
 let ident_printer =
   let san = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer [] ~sanitizer:san
+  create_ident_printer bls ~sanitizer:san
 
 let pr_printer =
   let san = sanitizer char_to_lalpha char_to_alnumus in
-  create_ident_printer [] ~sanitizer:san
+  create_ident_printer bls ~sanitizer:san
 
 let print_symbol fmt id =
   let san = String.uncapitalize in
