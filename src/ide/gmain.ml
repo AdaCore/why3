@@ -2066,11 +2066,6 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
-    ~label:"_Save config" ~callback:Gconfig.save_config
-    ()
-
-let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
     ~label:"_Save session" ~callback:save_session
     ()
 

@@ -344,16 +344,18 @@ let iconname_reload = ref ""
 let iconname_remove = ref ""
 let iconname_cleaning = ref ""
 
-let load_icon_names () =
-  let ide = config () in
-  let iconset = ide.iconset in
+let iconsets () =
   let main = get_main () in
   let n =
     Filename.concat (datadir main) (Filename.concat "images" "icons.rc")
   in
   let d = Rc.from_file n in
-  let d = Rc.get_family d "iconset" in
-  let d = List.assoc iconset d in
+  Rc.get_family d "iconset"
+
+let load_icon_names () =
+  let ide = config () in
+  let iconset = ide.iconset in
+  let d = List.assoc iconset (iconsets ()) in
   let get_icon_name n =
     Filename.concat iconset (get_string ~default:"default" d n)
   in
@@ -602,25 +604,83 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     nb_processes_spin#connect#value_changed ~callback:
       (fun () -> c.session_nb_processes <- nb_processes_spin#value_as_int)
   in
+  (* session saving policy *)
+  let set_saving_policy n () = c.saving_policy <- n in
+  let saving_policy_frame =
+    GBin.frame ~label:"Session saving policy"
+      ~packing:page_pack ()
+  in
+  let saving_policy_box =
+    GPack.button_box
+      `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:saving_policy_frame#add ()
+  in
+  let saving_policy_box_pack =
+    saving_policy_box#pack ?from:None ?expand:None ?fill:None ?padding:None
+  in
+  let choice0 =
+    GButton.radio_button
+      ~label:"always save on exit"
+      ~active:(c.saving_policy = 0)
+      ~packing:saving_policy_box_pack ()
+  in
+  let choice1 =
+    GButton.radio_button
+      ~label:"never save on exit" ~group:choice0#group
+      ~active:(c.saving_policy = 1)
+      ~packing:saving_policy_box_pack ()
+  in
+  let choice2 =
+    GButton.radio_button
+      ~label:"ask whether to save on exit" ~group:choice0#group
+      ~active:(c.saving_policy = 2)
+      ~packing:saving_policy_box_pack ()
+  in
+  let (_ : GtkSignal.id) =
+    choice0#connect#toggled ~callback:(set_saving_policy 0)
+  in
+  let (_ : GtkSignal.id) =
+    choice1#connect#toggled ~callback:(set_saving_policy 1)
+  in
+  let (_ : GtkSignal.id) =
+    choice2#connect#toggled ~callback:(set_saving_policy 2)
+  in
+  let (_ : GPack.box) =
+    GPack.vbox ~packing:page_pack ()
+  in
+  ()
+
+(** Appearance *)
+
+let appearance_settings (c : t) (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Appearance" () in
+  let page =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+  in
+  let page_pack = page#pack ?from:None ?expand:None ?fill:None ?padding:None in
   let display_options_frame =
     GBin.frame ~label:"Display options" ~packing:page_pack ()
   in
-  (* options for task display *)
-  let display_options_box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-      ~packing:display_options_frame#add ()
+  let vb = GPack.vbox ~homogeneous:false
+    ~packing:display_options_frame#add ()
   in
   (* max boxes *)
-  let width = 200 and xalign = 0.0 in
-  let hb = GPack.hbox ~homogeneous:false ~packing:display_options_box#add () in
+  let width = 300 and xalign = 0.0 in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in
   let hb_pack = hb#pack ~expand:false ?fill:None ?from:None ?padding:None in
-  let _ = GMisc.label ~text:"Max boxes: " ~width ~xalign ~packing:hb_pack () in
+  let _ = GMisc.label ~text:"Use ellipsis for terms deeper than: " ~width ~xalign ~packing:hb_pack () in
   let max_boxes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   max_boxes_spin#adjustment#set_bounds ~lower:0. ~upper:1000. ~step_incr:1. ();
   max_boxes_spin#adjustment#set_value (float_of_int c.max_boxes);
   let (_ : GtkSignal.id) =
     max_boxes_spin#connect#value_changed ~callback:
       (fun () -> c.max_boxes <- max_boxes_spin#value_as_int)
+  in
+  (* options for task display *)
+  let display_options_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:vb#add ()
   in
   let intropremises =
     GButton.check_button ~label:"introduce premises"
@@ -666,47 +726,46 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () ->
          c.show_time_limit <- not c.show_time_limit)
   in
-  (* session saving policy *)
-  let set_saving_policy n () = c.saving_policy <- n in
-  let saving_policy_frame =
-    GBin.frame ~label:"Session saving policy"
+  (* icon sets *)
+  let icon_sets_frame =
+    GBin.frame ~label:"Change icon family (needs save & restart)"
       ~packing:page_pack ()
   in
-  let saving_policy_box =
+  let icon_sets_box =
     GPack.button_box
       `VERTICAL ~border_width:5 ~spacing:5
-      ~packing:saving_policy_frame#add ()
+      ~packing:icon_sets_frame#add ()
   in
-  let saving_policy_box_pack =
-    saving_policy_box#pack ?from:None ?expand:None ?fill:None ?padding:None
+  let icon_sets_box_pack =
+    icon_sets_box#pack ?from:None ?expand:None ?fill:None ?padding:None
   in
-  let choice0 =
-    GButton.radio_button
-      ~label:"always save on exit"
-      ~active:(c.saving_policy = 0)
-      ~packing:saving_policy_box_pack ()
+  let set_icon_set s () = c.iconset <- s in
+  let (_,choices) = List.fold_left
+    (fun (acc,l) (s,_) ->
+      match acc with
+      | None ->
+        let choice =
+          GButton.radio_button
+            ~label:s
+            ~active:(c.iconset = s)
+            ~packing:icon_sets_box_pack ()
+        in (Some choice,(s,choice)::l)
+      | Some c0 ->
+        let choice =
+          GButton.radio_button
+            ~label:s
+            ~active:(c.iconset = s)
+            ~group:c0#group
+            ~packing:icon_sets_box_pack ()
+        in (acc,(s,choice)::l))
+    (None,[]) (iconsets ())
   in
-  let choice1 =
-    GButton.radio_button
-      ~label:"never save on exit" ~group:choice0#group
-      ~active:(c.saving_policy = 1)
-      ~packing:saving_policy_box_pack ()
-  in
-  let choice2 =
-    GButton.radio_button
-      ~label:"ask whether to save on exit" ~group:choice0#group
-      ~active:(c.saving_policy = 2)
-      ~packing:saving_policy_box_pack ()
-  in
-  let (_ : GtkSignal.id) =
-    choice0#connect#toggled ~callback:(set_saving_policy 0)
-  in
-  let (_ : GtkSignal.id) =
-    choice1#connect#toggled ~callback:(set_saving_policy 1)
-  in
-  let (_ : GtkSignal.id) =
-    choice2#connect#toggled ~callback:(set_saving_policy 2)
-  in
+  List.iter
+    (fun (s,c) ->
+      let (_ : GtkSignal.id) =
+        c#connect#toggled ~callback:(set_icon_set s)
+      in ())
+    choices;
   let (_ : GPack.box) =
     GPack.vbox ~packing:page_pack ()
   in
@@ -910,6 +969,8 @@ let preferences (c : t) =
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page "general settings" **)
   general_settings c notebook;
+  (** page "appearance" **)
+  appearance_settings c notebook;
   (*** page "editors" **)
   editors_page c notebook;
   (** page "Provers" **)
