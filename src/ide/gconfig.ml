@@ -33,6 +33,7 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable font_size : int;
       mutable verbose : int;
       mutable default_prover : string; (* "" means none *)
       mutable default_editor : string;
@@ -65,7 +66,7 @@ type ide = {
   ide_window_width : int;
   ide_window_height : int;
   ide_tree_width : int;
-  ide_task_height : int;
+  ide_font_size : int;
   ide_verbose : int;
   ide_intro_premises : bool;
   ide_show_labels : bool;
@@ -87,7 +88,7 @@ let default_ide =
   { ide_window_width = 1024;
     ide_window_height = 768;
     ide_tree_width = 512;
-    ide_task_height = 384;
+    ide_font_size = 10;
     ide_verbose = 0;
     ide_intro_premises = true;
     ide_show_labels = false;
@@ -114,8 +115,8 @@ let load_ide section =
       get_int section ~default:default_ide.ide_window_height "window_height";
     ide_tree_width =
       get_int section ~default:default_ide.ide_tree_width "tree_width";
-    ide_task_height =
-      get_int section ~default:default_ide.ide_task_height "task_height";
+    ide_font_size =
+      get_int section ~default:default_ide.ide_font_size "font_size";
     ide_verbose =
       get_int section ~default:default_ide.ide_verbose "verbose";
     ide_intro_premises =
@@ -176,6 +177,7 @@ let load_config config original_config env =
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
+    font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
     show_labels   = ide.ide_show_labels ;
@@ -217,6 +219,7 @@ let save_config t =
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
   let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "intro_premises" t.intro_premises in
   let ide = set_bool ide "print_labels" t.show_labels in
@@ -248,6 +251,11 @@ let save_config () = save_config (config ())
 
 let get_main () = (get_main (config ()).config)
 
+let incr_font_size n =
+  let c = config () in
+  let s = max (c.font_size + n) 4 in
+  c.font_size <- s;
+  s
 
 (*
 

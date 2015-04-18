@@ -15,6 +15,7 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable font_size : int;
       mutable verbose : int;
       mutable default_prover : string;
       mutable default_editor : string;
@@ -51,6 +52,10 @@ val config : unit -> t
     if load_config is not called *)
 
 val get_main : unit -> Whyconf.main
+
+val incr_font_size : int -> int
+(** [incr_font_size n] increments current font size by [n] (can be negative)
+    and returns the new size *)
 
 (*****************)
 (* images, icons *)

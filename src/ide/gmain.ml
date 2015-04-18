@@ -359,7 +359,6 @@ let counterexample_page,counterexample_tab =
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
 
-let _ = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
 let (_ : GPack.box) =
   GPack.hbox ~packing:(source_tab#pack ~expand:false ?from:None ?fill:None
                          ?padding:None) ()
@@ -418,7 +417,8 @@ let counterexample_view =
 
 let modifiable_sans_font_views = ref [goals_view#misc]
 let modifiable_mono_font_views =
-  ref [task_view#misc;edited_view#misc;output_view#misc]
+  ref [task_view#misc;edited_view#misc;output_view#misc;
+       counterexample_view#misc]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -650,14 +650,14 @@ let update_tabs a =
       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
     | _ -> ""
  in
-  let counterexample_text = 
+  let counterexample_text =
     match a with
     | S.Proof_attempt a ->
       begin
         match a.S.proof_state with
 	  | S.Done r ->
             add_model "" r.Call_provers.pr_model
-	  | _ -> "" 
+	  | _ -> ""
       end
     | _ -> ""
   in
@@ -1338,34 +1338,25 @@ let exit_function ~destroy () =
 
 let sans_font_family = "Sans"
 let mono_font_family = "Monospace"
-let font_size = ref 10
 
-let change_font () =
+let change_font size =
 (*
   Tools.resize_images (!Colors.font_size * 2 - 4);
 *)
-  let sff = sans_font_family ^ " " ^ string_of_int !font_size in
-  let mff = mono_font_family ^ " " ^ string_of_int !font_size in
+  let sff = sans_font_family ^ " " ^ string_of_int size in
+  let mff = mono_font_family ^ " " ^ string_of_int size in
   let sf = Pango.Font.from_string sff in
   let mf = Pango.Font.from_string mff in
   List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
   List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
 
 let enlarge_font () =
-  incr font_size;
-  change_font ();
-(*
-  GConfig.save ()
-*)
-  ()
+  let size = Gconfig.incr_font_size 1 in
+  change_font size
 
 let reduce_font () =
-  decr font_size;
-  change_font ();
-(*
-  GConfig.save ()
-*)
-()
+  let size = Gconfig.incr_font_size (-1) in
+  change_font size
 
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group
@@ -1912,7 +1903,7 @@ let source_view =
 *)
 let () = modifiable_mono_font_views :=
           source_view#misc :: !modifiable_mono_font_views
-let () = change_font ()
+let () = change_font (Gconfig.incr_font_size 0)
 
 let () = source_view#source_buffer#set_language None
 let () = source_view#set_highlight_current_line true
