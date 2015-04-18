@@ -161,10 +161,6 @@ Release Notes (details in file CHANGES):
 
 * plusieurs drivers acceptés sur la ligne de commande (AP)
 
-* determine which is the minumum version of Ocaml to compile, and then
-updated configure.in and the manual
--> vérification compilation avec OCaml 3.12 -> Claude va le faire
-
 * solve issues with metitarski
 . DONE theory PowerReal
 . crashes when applied on a WP (see examples/my_cosine.mlw)
@@ -177,6 +173,19 @@ updated configure.in and the manual
     mais enlever l'onglet "Counterexamples" avant la release
 
 == DONE ==
+
+* determine which is the minumum version of Ocaml to compile, and then
+updated configure.in and the manual
+-> vérification compilation avec OCaml 3.12 -> Claude va le faire
+
+  . 3.11.2: opam install menhir plante car ocamlfind ne compile pas
+  . 3.12.1: Why3 ne compile pas:
+    File "src/core/ident.ml", line 208, characters 2-14:
+    Error: Unbound value String.iteri
+  . 4.00.0: pas teste, et sans doute pas recommande
+  . 4.00.1: ca fonctionne
+
+-> ocaml minimal = 4.00.1
 
 DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
 -> Claude le met dans la fenetre preferences a cote du bouton "Close"
