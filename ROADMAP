@@ -149,7 +149,7 @@ and no epsilon
 
 ==================== Roadmap for release 0.86 ========================
 
-
+DATE : fin avril / début mai
 
 Release Notes (details in file CHANGES):
 
@@ -158,22 +158,33 @@ Release Notes (details in file CHANGES):
 
 == TODO ==
 
-determine which is the minumum version of Ocaml to compile, and then
-updated configure.in and the manual
+* plusieurs drivers acceptés sur la ligne de commande (AP)
 
-support for veriT recent
+* determine which is the minumum version of Ocaml to compile, and then
+updated configure.in and the manual
+-> vérification compilation avec OCaml 3.12 -> Claude va le faire
+
+* support for veriT recent
 -> DONE: version 201410
 
-support for Yices2 recent
+* support for Yices2 recent
 -> DONE: 2.3.0, but still does not support quantifiers
 
-solve issues with metitarski
+* solve issues with metitarski
 . DONE theory PowerReal
 . crashes when applied on a WP (see examples/my_cosine.mlw)
 
-clean up the support for SMTLIB bitvectors: there are 2 theories in the stdlib: thoeries/bv.why and modules/bitvectors.mlw
+* clean up the support for SMTLIB bitvectors: there are 2 theories in the stdlib: thoeries/bv.why and modules/bitvectors.mlw
+-> not anymore, but more cleaning can be done: no need to separate all theories in drivers for Z3 and CVC4, since the same theory can be put several times in a driver (or imported sub-drivers)
 
-decide if GUI with tabs is convenient enough
+* decide if GUI with tabs is convenient enough
+-> onglets dans why3 ide : est-ce apprécié ? OUI
+    mais enlever l'onglet "Counterexamples" avant la release
+
+* sauvegarde de la configuration : à quel endroit dans l'IDE ?
+-> Claude le met dans la fenetre preferences a cote du bouton "Close"
+
+
 
 == Final preparation ==
 
