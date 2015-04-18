@@ -594,18 +594,6 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     nb_processes_spin#connect#value_changed ~callback:
       (fun () -> c.session_nb_processes <- nb_processes_spin#value_as_int)
   in
-  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in
-  let save_for_future = ref false in
-  let save =
-    GButton.check_button
-      ~label:"save settings above for future sessions"
-      ~packing:hb#add ()
-      ~active:false
-  in
-  let (_ : GtkSignal.id) =
-    save#connect#toggled ~callback:
-      (fun () -> save_for_future := not !save_for_future)
-  in
   let display_options_frame =
     GBin.frame ~label:"Display options" ~packing:page_pack ()
   in
@@ -714,7 +702,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let (_ : GPack.box) =
     GPack.vbox ~packing:page_pack ()
   in
-  save_for_future
+  ()
 
 (* Page "Provers" *)
 
@@ -913,7 +901,7 @@ let preferences (c : t) =
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page "general settings" **)
-  let save_for_future_session = general_settings c notebook in
+  general_settings c notebook;
   (*** page "editors" **)
   editors_page c notebook;
   (** page "Provers" **)
@@ -935,18 +923,18 @@ let preferences (c : t) =
   in
 *)
   (** bottom button **)
+  dialog#add_button "Save&Close" `SAVE ;
   dialog#add_button "Close" `CLOSE ;
-  let ( _ : GWindow.Buttons.about) = dialog#run () in
-  (* let config = set_main config *)
-  (*   (set_limits (get_main config) *)
-  (*      t.time_limit t.mem_limit t.max_running_processes) *)
-  (* in *)
-
-  if !save_for_future_session then
-    c.config <- Whyconf.set_main c.config
-      (Whyconf.set_limits (Whyconf.get_main c.config)
-         c.session_time_limit c.session_mem_limit c.session_nb_processes);
-  save_config ();
+  let ( answer : [`SAVE | `CLOSE | `DELETE_EVENT ]) = dialog#run () in
+  begin
+    match answer with
+    | `SAVE ->
+      c.config <- Whyconf.set_main c.config
+        (Whyconf.set_limits (Whyconf.get_main c.config)
+           c.session_time_limit c.session_mem_limit c.session_nb_processes);
+      save_config ()
+    | `CLOSE | `DELETE_EVENT -> ()
+  end;
   dialog#destroy ()
 
 (*
