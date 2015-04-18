@@ -72,6 +72,10 @@ theory real.Real
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
 
+  meta "inline : no" predicate (<=)
+  meta "inline : no" predicate (>=)
+  meta "inline : no" predicate (>)
+
   (* These follow from Metitarski's axioms. *)
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc
