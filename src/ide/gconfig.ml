@@ -99,8 +99,7 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
     ide_error_color = "orange";
-    ide_iconset = "boomy";
-    (* ide_replace_prover = CRP_Ask; *)
+    ide_iconset = "fatcow";
     ide_default_prover = "";
     ide_default_editor =
       (try Sys.getenv "EDITOR" ^ " %f"
@@ -346,16 +345,25 @@ let iconname_cleaning = ref ""
 
 let iconsets () =
   let main = get_main () in
-  let n =
-    Filename.concat (datadir main) (Filename.concat "images" "icons.rc")
+  let dir = Filename.concat (datadir main) "images" in
+  let n = Filename.concat dir "icons.rc"
   in
   let d = Rc.from_file n in
-  Rc.get_family d "iconset"
+  (dir, Rc.get_family d "iconset")
 
 let load_icon_names () =
   let ide = config () in
   let iconset = ide.iconset in
-  let d = List.assoc iconset (iconsets ()) in
+  let _,iconsets = iconsets () in
+  let d =
+    try
+      List.assoc iconset iconsets
+    with Not_found ->
+      try
+        List.assoc "fatcow" iconsets
+      with Not_found ->
+        failwith "No icon set found"
+  in
   let get_icon_name n =
     Filename.concat iconset (get_string ~default:"default" d n)
   in
@@ -739,26 +747,47 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
   let icon_sets_box_pack =
     icon_sets_box#pack ?from:None ?expand:None ?fill:None ?padding:None
   in
+  let dir,iconsets = iconsets () in
   let set_icon_set s () = c.iconset <- s in
   let (_,choices) = List.fold_left
-    (fun (acc,l) (s,_) ->
-      match acc with
-      | None ->
-        let choice =
-          GButton.radio_button
-            ~label:s
-            ~active:(c.iconset = s)
-            ~packing:icon_sets_box_pack ()
-        in (Some choice,(s,choice)::l)
-      | Some c0 ->
-        let choice =
-          GButton.radio_button
-            ~label:s
-            ~active:(c.iconset = s)
-            ~group:c0#group
-            ~packing:icon_sets_box_pack ()
-        in (acc,(s,choice)::l))
-    (None,[]) (iconsets ())
+    (fun (acc,l) (s,fields) ->
+      let name = Rc.get_string ~default:s fields "name" in
+      let license = Rc.get_string ~default:"" fields "license" in
+      let acc,choice =
+        match acc with
+        | None ->
+          let choice =
+            GButton.radio_button
+              ~label:name
+              ~active:(c.iconset = s)
+              ~packing:icon_sets_box_pack ()
+          in
+          (Some choice,choice)
+        | Some c0 ->
+          let choice =
+            GButton.radio_button
+              ~label:name
+              ~active:(c.iconset = s)
+              ~group:c0#group
+              ~packing:icon_sets_box_pack ()
+          in (acc,choice)
+      in
+      if license <> "" then
+        begin
+          let f = Filename.concat (Filename.concat dir s) license in
+          let c = Sysutil.file_contents f in
+          let text = "See license in " ^ f ^ ":\n\n" in
+          let l = String.length c in
+          let text =
+            if l >= 256 then
+              text ^ String.sub c 0 255 ^ "\n[...]"
+            else
+              text ^ c
+          in
+          choice#misc#set_tooltip_markup text
+        end;
+      (acc,(s,choice)::l))
+    (None,[]) iconsets
   in
   List.iter
     (fun (s,c) ->

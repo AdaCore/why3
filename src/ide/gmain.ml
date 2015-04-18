@@ -109,17 +109,6 @@ let try_convert s =
         s
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
-let source_text fname =
-  try
-    let ic = open_in fname in
-    let size = in_channel_length ic in
-    let buf = String.create size in
-    really_input ic buf 0 size;
-    close_in ic;
-    try_convert buf
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    "Error while opening or reading file '" ^ fname ^ "':\n" ^ (Printexc.to_string e)
-
 (***************)
 (* Main window *)
 (***************)
@@ -610,7 +599,7 @@ let update_tabs a =
         let env = env_session () in
         match S.get_edited_as_abs env.S.session a with
         | None -> ""
-        | Some f -> source_text f
+        | Some f -> Sysutil.file_contents f
       end
     | _ -> ""
   in
@@ -1959,7 +1948,7 @@ let scroll_to_file f =
         then why_lang else any_lang f
       in
       source_view#source_buffer#set_language lang;
-      source_view#source_buffer#set_text (source_text f);
+      source_view#source_buffer#set_text (Sysutil.file_contents f);
       set_current_file f;
     end
 
