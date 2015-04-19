@@ -37,10 +37,10 @@
   </goal>
   <goal name="WP_parameter maximum.7" expl="7. loop invariant preservation" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter maximum.7.1" expl="1.">
+   <goal name="WP_parameter maximum.7.1" expl="1. VC for maximum">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter maximum.7.2" expl="2." expanded="true">
+   <goal name="WP_parameter maximum.7.2" expl="2. VC for maximum" expanded="true">
    <proof prover="2"><result status="valid" time="6.99"/></proof>
    </goal>
   </transf>
@@ -63,10 +63,10 @@
  <transf name="split_goal_wp">
   <goal name="WP_parameter memo.1" expl="1. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter memo.1.1" expl="1.">
+   <goal name="WP_parameter memo.1.1" expl="1. VC for memo">
    <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter memo.1.2" expl="2.">
+   <goal name="WP_parameter memo.1.2" expl="2. VC for memo">
    <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.00"/></proof>
    </goal>
   </transf>
@@ -93,22 +93,22 @@
   <transf name="inline_goal">
    <goal name="WP_parameter maxmat.2.1" expl="1. precondition">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter maxmat.2.1.1" expl="1.">
+    <goal name="WP_parameter maxmat.2.1.1" expl="1. VC for maxmat">
     <proof prover="3"><result status="valid" time="0.00"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.2" expl="2.">
+    <goal name="WP_parameter maxmat.2.1.2" expl="2. VC for maxmat">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.3" expl="3.">
+    <goal name="WP_parameter maxmat.2.1.3" expl="3. VC for maxmat">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.4" expl="4.">
+    <goal name="WP_parameter maxmat.2.1.4" expl="4. VC for maxmat">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.5" expl="5.">
+    <goal name="WP_parameter maxmat.2.1.5" expl="5. VC for maxmat">
     <proof prover="3"><result status="valid" time="0.00"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.6" expl="6.">
+    <goal name="WP_parameter maxmat.2.1.6" expl="6. VC for maxmat">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
    </transf>
