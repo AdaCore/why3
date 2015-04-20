@@ -71,10 +71,12 @@ module Bounded_int
     ensures  { to_int result = - to_int a }
 
   val eq (a:t) (b:t) : bool
-    ensures { result <-> to_int a = to_int b }
+    ensures { to_int a = to_int b -> result }
+    ensures { result -> a = b }
 
   val ne (a:t) (b:t) : bool
-    ensures { result <-> to_int a <> to_int b }
+    ensures { a <> b -> result }
+    ensures { result -> to_int a <> to_int b }
 
   axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
 
