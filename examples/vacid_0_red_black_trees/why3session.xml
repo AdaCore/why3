@@ -139,22 +139,22 @@
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter lbalance.1" expl="1. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter lbalance.1.1" expl="1.">
+   <goal name="WP_parameter lbalance.1.1" expl="1. VC for lbalance">
    <proof prover="7" timelimit="12" memlimit="0"><result status="valid" time="0.88" steps="750"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.1.2" expl="2.">
+   <goal name="WP_parameter lbalance.1.2" expl="2. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.1.3" expl="3.">
+   <goal name="WP_parameter lbalance.1.3" expl="3. VC for lbalance">
    <proof prover="7" timelimit="100" memlimit="0"><result status="valid" time="0.31" steps="231"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.1.4" expl="4.">
+   <goal name="WP_parameter lbalance.1.4" expl="4. VC for lbalance">
    <proof prover="2" memlimit="0"><result status="valid" time="0.09"/></proof>
    <proof prover="4"><result status="valid" time="0.05"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.06"/></proof>
    <proof prover="7" timelimit="8" memlimit="0"><result status="valid" time="0.26" steps="194"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.1.5" expl="5.">
+   <goal name="WP_parameter lbalance.1.5" expl="5. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="7" timelimit="6" memlimit="0"><result status="valid" time="1.11" steps="1184"/></proof>
    </goal>
@@ -162,13 +162,13 @@
   </goal>
   <goal name="WP_parameter lbalance.2" expl="2. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter lbalance.2.1" expl="1.">
+   <goal name="WP_parameter lbalance.2.1" expl="1. VC for lbalance">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.2.2" expl="2.">
+   <goal name="WP_parameter lbalance.2.2" expl="2. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" timelimit="120"><result status="valid" time="0.02" steps="45"/></proof>
    <metas>
@@ -615,9 +615,9 @@
     <meta name="remove_type">
      <meta_arg_ts id="377"/>
     </meta>
-    <goal name="WP_parameter lbalance.2.2" expl="2.">
+    <goal name="WP_parameter lbalance.2.2" expl="2. VC for lbalance">
     <transf name="eliminate_builtin">
-     <goal name="WP_parameter lbalance.2.2.1" expl="1.">
+     <goal name="WP_parameter lbalance.2.2.1" expl="1. VC for lbalance">
      <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
      <proof prover="7" timelimit="120"><result status="valid" time="0.02" steps="57"/></proof>
      </goal>
@@ -625,18 +625,18 @@
     </goal>
    </metas>
    </goal>
-   <goal name="WP_parameter lbalance.2.3" expl="3.">
+   <goal name="WP_parameter lbalance.2.3" expl="3. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="6" timelimit="8" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.03" steps="62"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.2.4" expl="4.">
+   <goal name="WP_parameter lbalance.2.4" expl="4. VC for lbalance">
    <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="64"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.2.5" expl="5.">
+   <goal name="WP_parameter lbalance.2.5" expl="5. VC for lbalance">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.01"/></proof>
@@ -667,23 +667,23 @@
   </goal>
   <goal name="WP_parameter lbalance.9" expl="9. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter lbalance.9.1" expl="1.">
+   <goal name="WP_parameter lbalance.9.1" expl="1. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.9.2" expl="2.">
+   <goal name="WP_parameter lbalance.9.2" expl="2. VC for lbalance">
    <proof prover="4"><result status="timeout" time="5.03"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.34" steps="304"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.9.3" expl="3.">
+   <goal name="WP_parameter lbalance.9.3" expl="3. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.03" steps="61"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.9.4" expl="4.">
+   <goal name="WP_parameter lbalance.9.4" expl="4. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.03" steps="63"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.9.5" expl="5.">
+   <goal name="WP_parameter lbalance.9.5" expl="5. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
@@ -691,23 +691,23 @@
   </goal>
   <goal name="WP_parameter lbalance.10" expl="10. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter lbalance.10.1" expl="1.">
+   <goal name="WP_parameter lbalance.10.1" expl="1. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.10.2" expl="2.">
+   <goal name="WP_parameter lbalance.10.2" expl="2. VC for lbalance">
    <proof prover="4"><result status="timeout" time="5.03"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.12" steps="169"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.10.3" expl="3.">
+   <goal name="WP_parameter lbalance.10.3" expl="3. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.04" steps="48"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.10.4" expl="4.">
+   <goal name="WP_parameter lbalance.10.4" expl="4. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="50"/></proof>
    </goal>
-   <goal name="WP_parameter lbalance.10.5" expl="5.">
+   <goal name="WP_parameter lbalance.10.5" expl="5. VC for lbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
@@ -738,22 +738,22 @@
  <transf name="split_goal_wp">
   <goal name="WP_parameter rbalance.1" expl="1. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter rbalance.1.1" expl="1.">
+   <goal name="WP_parameter rbalance.1.1" expl="1. VC for rbalance">
    <proof prover="7" timelimit="14" memlimit="0"><result status="valid" time="0.93" steps="807"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.1.2" expl="2.">
+   <goal name="WP_parameter rbalance.1.2" expl="2. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.1.3" expl="3.">
+   <goal name="WP_parameter rbalance.1.3" expl="3. VC for rbalance">
    <proof prover="7" timelimit="100" memlimit="0"><result status="valid" time="0.96" steps="524"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.1.4" expl="4.">
+   <goal name="WP_parameter rbalance.1.4" expl="4. VC for rbalance">
    <proof prover="2" memlimit="0"><result status="valid" time="0.10"/></proof>
    <proof prover="4"><result status="valid" time="0.13"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.06"/></proof>
    <proof prover="7" timelimit="7" memlimit="0"><result status="valid" time="0.36" steps="222"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.1.5" expl="5.">
+   <goal name="WP_parameter rbalance.1.5" expl="5. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.04"/></proof>
    <proof prover="7" timelimit="6" memlimit="0"><result status="valid" time="1.64" steps="1572"/></proof>
    </goal>
@@ -1239,23 +1239,23 @@
   </goal>
   <goal name="WP_parameter rbalance.9" expl="9. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter rbalance.9.1" expl="1.">
+   <goal name="WP_parameter rbalance.9.1" expl="1. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.9.2" expl="2.">
+   <goal name="WP_parameter rbalance.9.2" expl="2. VC for rbalance">
    <proof prover="4"><result status="timeout" time="5.03"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.36" steps="304"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.9.3" expl="3.">
+   <goal name="WP_parameter rbalance.9.3" expl="3. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.04" steps="61"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.9.4" expl="4.">
+   <goal name="WP_parameter rbalance.9.4" expl="4. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.03" steps="63"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.9.5" expl="5.">
+   <goal name="WP_parameter rbalance.9.5" expl="5. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
    </goal>
@@ -1263,23 +1263,23 @@
   </goal>
   <goal name="WP_parameter rbalance.10" expl="10. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter rbalance.10.1" expl="1.">
+   <goal name="WP_parameter rbalance.10.1" expl="1. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.10.2" expl="2.">
+   <goal name="WP_parameter rbalance.10.2" expl="2. VC for rbalance">
    <proof prover="4"><result status="timeout" time="5.04"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.15" steps="192"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.10.3" expl="3.">
+   <goal name="WP_parameter rbalance.10.3" expl="3. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.03" steps="48"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.10.4" expl="4.">
+   <goal name="WP_parameter rbalance.10.4" expl="4. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.03" steps="50"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.10.5" expl="5.">
+   <goal name="WP_parameter rbalance.10.5" expl="5. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
@@ -1294,23 +1294,23 @@
   </goal>
   <goal name="WP_parameter rbalance.13" expl="13. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter rbalance.13.1" expl="1.">
+   <goal name="WP_parameter rbalance.13.1" expl="1. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.13.2" expl="2.">
+   <goal name="WP_parameter rbalance.13.2" expl="2. VC for rbalance">
    <proof prover="4"><result status="timeout" time="5.03"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.18" steps="235"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.13.3" expl="3.">
+   <goal name="WP_parameter rbalance.13.3" expl="3. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="48"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.13.4" expl="4.">
+   <goal name="WP_parameter rbalance.13.4" expl="4. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="50"/></proof>
    </goal>
-   <goal name="WP_parameter rbalance.13.5" expl="5.">
+   <goal name="WP_parameter rbalance.13.5" expl="5. VC for rbalance">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
@@ -1343,31 +1343,31 @@
   </goal>
   <goal name="WP_parameter insert.4" expl="4. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.4.1" expl="1.">
+   <goal name="WP_parameter insert.4.1" expl="1. VC for insert">
    <proof prover="7" memlimit="0"><result status="valid" time="0.05" steps="77"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.2" expl="2.">
+   <goal name="WP_parameter insert.4.2" expl="2. VC for insert">
    <proof prover="2" timelimit="6" memlimit="0"><result status="valid" time="0.12"/></proof>
    <proof prover="6" timelimit="6" memlimit="0"><result status="valid" time="0.10"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.3" expl="3.">
+   <goal name="WP_parameter insert.4.3" expl="3. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.08" steps="41"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.4" expl="4.">
+   <goal name="WP_parameter insert.4.4" expl="4. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.5" expl="5.">
+   <goal name="WP_parameter insert.4.5" expl="5. VC for insert">
    <proof prover="7" memlimit="0"><result status="valid" time="0.11" steps="95"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.6" expl="6.">
+   <goal name="WP_parameter insert.4.6" expl="6. VC for insert">
    <proof prover="6" timelimit="9" memlimit="0"><result status="valid" time="0.05"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.12" steps="41"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.7" expl="7.">
+   <goal name="WP_parameter insert.4.7" expl="7. VC for insert">
    <proof prover="6" timelimit="8" memlimit="0"><result status="valid" time="0.05"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.04" steps="63"/></proof>
    </goal>
@@ -1383,33 +1383,33 @@
   </goal>
   <goal name="WP_parameter insert.7" expl="7. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.7.1" expl="1.">
+   <goal name="WP_parameter insert.7.1" expl="1. VC for insert">
    <proof prover="7" memlimit="0"><result status="valid" time="0.05" steps="80"/></proof>
    </goal>
-   <goal name="WP_parameter insert.7.2" expl="2.">
+   <goal name="WP_parameter insert.7.2" expl="2. VC for insert">
    <proof prover="2" timelimit="6" memlimit="0"><result status="valid" time="0.12"/></proof>
    <proof prover="6" timelimit="6" memlimit="0"><result status="valid" time="0.10"/></proof>
    </goal>
-   <goal name="WP_parameter insert.7.3" expl="3.">
+   <goal name="WP_parameter insert.7.3" expl="3. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.12" steps="42"/></proof>
    </goal>
-   <goal name="WP_parameter insert.7.4" expl="4.">
+   <goal name="WP_parameter insert.7.4" expl="4. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
-   <goal name="WP_parameter insert.7.5" expl="5.">
+   <goal name="WP_parameter insert.7.5" expl="5. VC for insert">
    <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.06"/></proof>
    <proof prover="6" timelimit="8" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.16" steps="95"/></proof>
    </goal>
-   <goal name="WP_parameter insert.7.6" expl="6.">
+   <goal name="WP_parameter insert.7.6" expl="6. VC for insert">
    <proof prover="6" timelimit="9" memlimit="0"><result status="valid" time="0.05"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.12" steps="42"/></proof>
    </goal>
-   <goal name="WP_parameter insert.7.7" expl="7.">
+   <goal name="WP_parameter insert.7.7" expl="7. VC for insert">
    <proof prover="6" timelimit="9" memlimit="0"><result status="valid" time="0.05"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.04" steps="80"/></proof>
    </goal>
@@ -1431,36 +1431,36 @@
   </goal>
   <goal name="WP_parameter insert.12" expl="12. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.12.1" expl="1.">
+   <goal name="WP_parameter insert.12.1" expl="1. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter insert.12.2" expl="2.">
+   <goal name="WP_parameter insert.12.2" expl="2. VC for insert">
    <proof prover="6" timelimit="100" memlimit="0"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter insert.12.3" expl="3.">
+   <goal name="WP_parameter insert.12.3" expl="3. VC for insert">
    <proof prover="2" timelimit="10"><result status="valid" time="0.18"/></proof>
    <proof prover="3" timelimit="10"><result status="valid" time="0.07"/></proof>
    <proof prover="4" timelimit="10"><result status="valid" time="0.02"/></proof>
    <proof prover="6" timelimit="10"><result status="valid" time="0.14"/></proof>
    </goal>
-   <goal name="WP_parameter insert.12.4" expl="4.">
+   <goal name="WP_parameter insert.12.4" expl="4. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.10"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.09"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
-   <goal name="WP_parameter insert.12.5" expl="5.">
+   <goal name="WP_parameter insert.12.5" expl="5. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.10" steps="81"/></proof>
    </goal>
-   <goal name="WP_parameter insert.12.6" expl="6.">
+   <goal name="WP_parameter insert.12.6" expl="6. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="41"/></proof>
    </goal>
-   <goal name="WP_parameter insert.12.7" expl="7.">
+   <goal name="WP_parameter insert.12.7" expl="7. VC for insert">
    <proof prover="7" memlimit="0"><result status="valid" time="0.13" steps="96"/></proof>
    </goal>
   </transf>
@@ -1478,35 +1478,35 @@
   </goal>
   <goal name="WP_parameter insert.16" expl="16. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.16.1" expl="1.">
+   <goal name="WP_parameter insert.16.1" expl="1. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="17"/></proof>
    </goal>
-   <goal name="WP_parameter insert.16.2" expl="2.">
+   <goal name="WP_parameter insert.16.2" expl="2. VC for insert">
    <proof prover="6" timelimit="100" memlimit="0"><result status="valid" time="0.10"/></proof>
    </goal>
-   <goal name="WP_parameter insert.16.3" expl="3.">
+   <goal name="WP_parameter insert.16.3" expl="3. VC for insert">
    <proof prover="2" timelimit="10"><result status="valid" time="0.16"/></proof>
    <proof prover="3" timelimit="10"><result status="valid" time="0.04"/></proof>
    <proof prover="4" timelimit="10"><result status="valid" time="0.02"/></proof>
    <proof prover="6" timelimit="10"><result status="valid" time="0.14"/></proof>
    <proof prover="8"><result status="valid" time="2.50"/></proof>
    </goal>
-   <goal name="WP_parameter insert.16.4" expl="4.">
+   <goal name="WP_parameter insert.16.4" expl="4. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.10"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.09"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
-   <goal name="WP_parameter insert.16.5" expl="5.">
+   <goal name="WP_parameter insert.16.5" expl="5. VC for insert">
    <proof prover="7" memlimit="0"><result status="valid" time="0.10" steps="82"/></proof>
    </goal>
-   <goal name="WP_parameter insert.16.6" expl="6.">
+   <goal name="WP_parameter insert.16.6" expl="6. VC for insert">
    <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.04"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="43"/></proof>
    </goal>
-   <goal name="WP_parameter insert.16.7" expl="7.">
+   <goal name="WP_parameter insert.16.7" expl="7. VC for insert">
    <proof prover="7" memlimit="0"><result status="valid" time="0.13" steps="103"/></proof>
    </goal>
   </transf>
@@ -1525,32 +1525,32 @@
   </goal>
   <goal name="WP_parameter add.2" expl="2. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter add.2.1" expl="1.">
+   <goal name="WP_parameter add.2.1" expl="1. VC for add">
    <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter add.2.2" expl="2.">
+   <goal name="WP_parameter add.2.2" expl="2. VC for add">
    <transf name="inline_goal">
-    <goal name="WP_parameter add.2.2.1" expl="1.">
+    <goal name="WP_parameter add.2.2.1" expl="1. VC for add">
     <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.98"/></proof>
     </goal>
    </transf>
    </goal>
-   <goal name="WP_parameter add.2.3" expl="3.">
+   <goal name="WP_parameter add.2.3" expl="3. VC for add">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.01"/></proof>
    <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter add.2.4" expl="4.">
+   <goal name="WP_parameter add.2.4" expl="4. VC for add">
    <proof prover="2" memlimit="0"><result status="valid" time="0.14"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter add.2.5" expl="5.">
+   <goal name="WP_parameter add.2.5" expl="5. VC for add">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter add.2.6" expl="6.">
+   <goal name="WP_parameter add.2.6" expl="6. VC for add">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="6" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>

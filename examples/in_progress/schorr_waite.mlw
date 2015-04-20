@@ -202,11 +202,17 @@ module SchorrWaite
        * and something alike line 57 from Leino's paper *)
       invariant { forall n : loc. L.mem n !stackNodes -> !m[n] }
       (* stack has no duplicates ---> line 55 from Leino's paper *)
-      invariant { distinct !stackNodes } 
+      invariant { distinct !stackNodes }
+      (* something like Leino's line 68; I believe this is useful to prove
+       * that in the pop case the left child of p is the initial one *)
+      invariant { forall n : loc. L.mem n !stackNodes ->
+      		  if !c[n] then !left[n] = (at !left 'Init)[n] else !right[n] = (at !right 'Init)[n] }
+      (* lines 80-81 from Leino's paper *)
+      invariant { !stackNodes <> Nil -> if !c[!p] then (at !right 'Init)[!p] = !t
+      		  else (at !left 'Init)[!p] = !t }
       (* termination proved using lexicographic order over a triple *)
       variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, length !stackNodes }
       if !t = null || !m[!t] then begin
-        (*assert { S.mem !p graph };*)
         if !c[!p] then begin (* pop *)
           let q = !t in
           t := !p;

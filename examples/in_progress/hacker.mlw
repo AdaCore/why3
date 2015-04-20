@@ -1,6 +1,6 @@
 
 module Delight
-
+(*
   use import int.Int
   use import int.Power
   use import bv.BV32
@@ -23,7 +23,7 @@ module Delight
     forall i. to_int( of_int i ) = mod i 0x1_0000_0000
     (* forall i. 0 <= i < 0x1_0000_0000 -> to_int( of_int i ) = i *)
 
-  axiom to_int_2 : 
+  axiom to_int_2 :
     forall i. of_int( to_int i ) = i
 
   (* axiom to_int32_1 :  *)
@@ -31,12 +31,12 @@ module Delight
 
   (* axiom to_int32_2 : *)
   (*   forall i. of_int32( to_int32 i ) = i *)
-    
+
 
   (* axiom to_int_local :  *)
   (*   forall b. to_int b = BV32.to_int b *)
 
-  axiom of_int_local : 
+  axiom of_int_local :
     forall i. of_int i = BV32.of_int i
 
   (* axiom conversion : *)
@@ -64,7 +64,7 @@ module Delight
   (*   	     	    mod (to_int x) (power 2 (to_int y)) *)
   (*       	  = to_int (bw_and x (sub (lsl_bv one y) one)) *)
 
-  (* axiom lsl_to_int : *) 
+  (* axiom lsl_to_int : *)
 
 (*   val lsl_32 (x : int32 ) ( n : int32 ) : int32 *)
 (*   requires{ 0 <= to_int n < 32 } *)
@@ -92,7 +92,7 @@ module Delight
 (*   val bw_and_32 ( x : int32 ) ( y : int32 ) : int32 *)
 (*     ensures { to_bv result = BV32.bw_and ( to_bv x ) ( to_bv y ) } *)
 (*     (\* ensures { to_int result = bitVec32o_int ( to_bv result ) } *\) *)
-    
+
 (*   val sub_32 ( x : int32 ) ( y : int32 ) : int32 *)
 (*     ensures { to_bv result = BV32.sub ( to_bv x ) ( to_bv y ) } *)
 (*     ensures { - 0x8000_0000 <= to_int x - to_int y < twoP31 *)
@@ -112,7 +112,7 @@ module Delight
 (*     bw_and_32 x ( sub_32 y one ) *)
 
 (*   use import ref.Ref *)
-    
+
 (*   (\* Returns the digit index of the most significant (non-zero) digit of Number. (from N622-004) *\) *)
 (*   let get_MSD ( number : int32 ) : int *)
 (*     requires { not( eq number zero ) } *)
@@ -129,5 +129,5 @@ module Delight
 (* 	    digit_index := i *)
 (*     done; *)
 (*     !digit_index *)
-
+*)
 end

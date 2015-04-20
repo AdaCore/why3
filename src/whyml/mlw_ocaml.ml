@@ -1039,6 +1039,11 @@ end
 let extract_filename ?fname th =
   (modulename ?fname th.th_path th.th_name.Ident.id_string) ^ ".ml"
 
+(*
+let arith_meta = register_meta "ocaml arithmetic" [MTstring]
+  ~desc:"Specify@ OCaml@ arithmetic:@ 32, 64, or unsafe"
+*)
+
 let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
   let info = {

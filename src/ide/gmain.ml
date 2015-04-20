@@ -109,17 +109,6 @@ let try_convert s =
         s
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
-let source_text fname =
-  try
-    let ic = open_in fname in
-    let size = in_channel_length ic in
-    let buf = String.create size in
-    really_input ic buf 0 size;
-    close_in ic;
-    try_convert buf
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    "Error while opening or reading file '" ^ fname ^ "':\n" ^ (Printexc.to_string e)
-
 (***************)
 (* Main window *)
 (***************)
@@ -359,7 +348,6 @@ let counterexample_page,counterexample_tab =
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
 
-let _ = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
 let (_ : GPack.box) =
   GPack.hbox ~packing:(source_tab#pack ~expand:false ?from:None ?fill:None
                          ?padding:None) ()
@@ -418,7 +406,8 @@ let counterexample_view =
 
 let modifiable_sans_font_views = ref [goals_view#misc]
 let modifiable_mono_font_views =
-  ref [task_view#misc;edited_view#misc;output_view#misc]
+  ref [task_view#misc;edited_view#misc;output_view#misc;
+       counterexample_view#misc]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -610,7 +599,7 @@ let update_tabs a =
         let env = env_session () in
         match S.get_edited_as_abs env.S.session a with
         | None -> ""
-        | Some f -> source_text f
+        | Some f -> Sysutil.file_contents f
       end
     | _ -> ""
   in
@@ -650,14 +639,14 @@ let update_tabs a =
       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
     | _ -> ""
  in
-  let counterexample_text = 
+  let counterexample_text =
     match a with
     | S.Proof_attempt a ->
       begin
         match a.S.proof_state with
 	  | S.Done r ->
             add_model "" r.Call_provers.pr_model
-	  | _ -> "" 
+	  | _ -> ""
       end
     | _ -> ""
   in
@@ -1338,34 +1327,25 @@ let exit_function ~destroy () =
 
 let sans_font_family = "Sans"
 let mono_font_family = "Monospace"
-let font_size = ref 10
 
-let change_font () =
+let change_font size =
 (*
   Tools.resize_images (!Colors.font_size * 2 - 4);
 *)
-  let sff = sans_font_family ^ " " ^ string_of_int !font_size in
-  let mff = mono_font_family ^ " " ^ string_of_int !font_size in
+  let sff = sans_font_family ^ " " ^ string_of_int size in
+  let mff = mono_font_family ^ " " ^ string_of_int size in
   let sf = Pango.Font.from_string sff in
   let mf = Pango.Font.from_string mff in
   List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
   List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
 
 let enlarge_font () =
-  incr font_size;
-  change_font ();
-(*
-  GConfig.save ()
-*)
-  ()
+  let size = Gconfig.incr_font_size 1 in
+  change_font size
 
 let reduce_font () =
-  decr font_size;
-  change_font ();
-(*
-  GConfig.save ()
-*)
-()
+  let size = Gconfig.incr_font_size (-1) in
+  change_font size
 
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group
@@ -1892,6 +1872,8 @@ let scrolled_source_view = GBin.scrolled_window
   ~packing:source_tab#add ~shadow_type:`ETCHED_OUT
   ()
 
+let allow_editing = false (* not reliable enough yet *)
+
 let source_view =
   GSourceView2.source_view
     ~auto_indent:true
@@ -1899,7 +1881,7 @@ let source_view =
     ~show_line_numbers:true
     ~right_margin_position:80 ~show_right_margin:true
     (* ~smart_home_end:true *)
-    ~editable:false
+    ~editable:allow_editing
     ~packing:scrolled_source_view#add
     ()
 
@@ -1910,7 +1892,7 @@ let source_view =
 *)
 let () = modifiable_mono_font_views :=
           source_view#misc :: !modifiable_mono_font_views
-let () = change_font ()
+let () = change_font (Gconfig.incr_font_size 0)
 
 let () = source_view#source_buffer#set_language None
 let () = source_view#set_highlight_current_line true
@@ -1929,6 +1911,7 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 line in
   let line = min line v#buffer#line_count in
   let it = v#buffer#get_iter (`LINE line) in
+  v#buffer#place_cursor ~where:it;
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
@@ -1965,7 +1948,7 @@ let scroll_to_file f =
         then why_lang else any_lang f
       in
       source_view#source_buffer#set_language lang;
-      source_view#source_buffer#set_text (source_text f);
+      source_view#source_buffer#set_text (Sysutil.file_contents f);
       set_current_file f;
     end
 
@@ -2052,7 +2035,8 @@ let reload () =
     | e ->
         let e = match e with
           | Loc.Located(loc,e) ->
-              scroll_to_loc ~color:error_tag ~yalign:0.5 loc; e
+            scroll_to_loc ~color:error_tag ~yalign:0.5 loc;
+            e
           | e -> e
         in
         fprintf str_formatter
@@ -2071,18 +2055,13 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
-    ~label:"_Save config" ~callback:Gconfig.save_config
-    ()
-
-let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
     ~label:"_Save session" ~callback:save_session
     ()
 
 
 (*
-
-Saving the source_view: deactivated for the moment
+Saving the source_view
+*)
 
 let save_file () =
   let f = !current_file in
@@ -2098,11 +2077,14 @@ let save_file () =
   else
     info_window `ERROR "No file currently edited"
 
-let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~key:GdkKeysyms._S
-    ~label:"_Save" ~callback:save_file
-    ()
-*)
+let () =
+  if allow_editing then
+    let (_ : GMenu.image_menu_item) =
+      file_factory#add_image_item ~key:GdkKeysyms._S
+        ~label:"_Save" ~callback:save_file
+        ()
+    in ()
+
 
 let (_ : GtkSignal.id) = w#connect#destroy
   ~callback:(exit_function ~destroy:true)
