@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -677,10 +677,10 @@ if test "$enable_frama_c" = yes ; then
       FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|Version: *\(.*\)$|\1|p'`
       AC_MSG_RESULT($FRAMAC_VERSION)
       case $FRAMAC_VERSION in
-         Neon-*) ;;
-         *) AC_MSG_WARN(Version Neon required.)
+         Sodium-*) ;;
+         *) AC_MSG_WARN(Version Sodium required.)
             enable_frama_c=no
-            reason_frama_c=" (version Neon required)"
+            reason_frama_c=" (version Sodium required)"
             ;;
       esac
       FRAMAC_SHARE=`$FRAMAC -print-path`

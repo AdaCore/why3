@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -804,4 +804,3 @@ let make_record_pattern kn fll ty =
     | None -> pat_wild (ty_inst s (Opt.get pj.ls_value))
   in
   pat_app cs (List.map get_arg pjl) ty
-

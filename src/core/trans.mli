@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -30,6 +30,8 @@ val identity_l : task tlist
 val singleton : 'a trans -> 'a tlist
 val return    : 'a -> 'a trans
 val bind      : 'a trans -> ('a -> 'b trans) -> 'b trans
+
+val trace_goal : string -> task trans -> task trans
 
 (** Compose transformation *)
 val compose   : task trans -> 'a trans -> 'a trans
@@ -98,6 +100,11 @@ val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
 val print_meta : Debug.flag -> meta -> task trans
 (** [print_meta f m] is an identity transformation that
     prints every meta [m] in the task if flag [d] is set *)
+
+(* Creates new transformation that prints the goal of the task to be 
+transfromed, do the original transformation and than prints the goal 
+of the transformed task.  *)
+val create_debugging_trans: string -> task trans ->  task trans
 
 (** {2 Registration} *)
 

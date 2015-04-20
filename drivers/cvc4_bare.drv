@@ -1,4 +1,7 @@
-prelude "(set-logic AUFBVNIRA)"
+prelude "(set-logic AUFNIRA)"
+
+(* cvc4 does not support generating counterexamples with non-linear arithmetic *)
+(* prelude "(set-logic AUFLIRA)"   *)
 (** A  : Array
     UF : Uninterpreted Function
     DT : Datatypes (not needed at the end ...)
@@ -6,11 +9,23 @@ prelude "(set-logic AUFBVNIRA)"
 *)
 (* prelude "(set-logic ALL_SUPPORTED)" *)
 
+(* Counterexamples: enable model construction *)
+prelude ";; Enable model construction"
+prelude "(set-option :produce-models true)"
+
+(* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *) 
+(* transformation "split_intro" *)
+
+(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
+transformation "introduce_premises"
+
+(* Counterexamples: set model parser *)
+model_parser "cvc4_z3"
+
 import "smt-libv2.drv"
 
 (* regexp for steps *)
 steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
-
 
 (* CVC4 division seems to be neither the Euclidean one, nor the Computer one *)
 (*

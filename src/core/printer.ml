@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -66,12 +66,18 @@ type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
 
+type printer_mapping = {
+  lsymbol_m     : string -> Term.lsymbol;
+  queried_terms : Term.term list;
+}
+
 type printer_args = {
   env        : Env.env;
   prelude    : prelude;
   th_prelude : prelude_map;
   blacklist  : blacklist;
-  filename   : string
+  filename   : string;
+  mutable printer_mapping : printer_mapping; 
 }
 
 type printer = printer_args -> ?old:in_channel -> task pp
@@ -82,6 +88,11 @@ let printers : reg_printer Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
+
+let get_default_printer_mapping = {
+  lsymbol_m = (function _ -> raise Not_found);
+  queried_terms = [];
+}
 
 let register_printer ~desc s p =
   if Hstr.mem printers s then raise (KnownPrinter s);
@@ -376,6 +387,7 @@ let sprint_decl (fn : 'a -> Format.formatter -> decl -> 'a * string list) =
 
 exception UnsupportedType of ty   * string
 exception UnsupportedTerm of term * string
+exception UnsupportedPattern of pattern * string
 exception UnsupportedDecl of decl * string
 exception NotImplemented  of        string
 exception Unsupported     of        string
@@ -384,6 +396,7 @@ exception Unsupported     of        string
 
 let unsupportedType e s = raise (UnsupportedType (e,s))
 let unsupportedTerm e s = raise (UnsupportedTerm (e,s))
+let unsupportedPattern p s = raise (UnsupportedPattern (p,s))
 let unsupportedDecl e s = raise (UnsupportedDecl (e,s))
 let notImplemented    s = raise (NotImplemented s)
 let unsupported       s = raise (Unsupported s)
@@ -423,6 +436,9 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | UnsupportedTerm (e,s) ->
       fprintf fmt "@[@[<hov 3> This expression isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_term e s
+  | UnsupportedPattern (p,s) ->
+      fprintf fmt "@[@[<hov 3> This pattern isn't supported:@\n%a@]@\n %s@]"
+        Pretty.print_pat p s
   | UnsupportedDecl (d,s) ->
       fprintf fmt "@[@[<hov 3> This declaration isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_decl d s

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,6 +17,7 @@ open Whyconf
 open Gconfig
 open Stdlib
 open Debug
+open Model_parser
 
 module C = Whyconf
 
@@ -143,7 +144,9 @@ let vbox = GPack.vbox ~packing:w#add ()
 
 (* Menu *)
 
-let menubar = GMenu.menu_bar ~packing:vbox#pack ()
+let menubar = GMenu.menu_bar
+  ~packing:(vbox#pack ?from:None ?expand:None ?fill:None ?padding:None)
+  ()
 
 let factory = new GMenu.factory menubar
 
@@ -154,7 +157,7 @@ let hb = GPack.hbox ~packing:vbox#add ()
 let left_scrollview =
   try
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
-      ~packing:(hb#pack ~expand:false) ()
+      ~packing:(hb#pack ~expand:false ?from:None ?fill:None ?padding:None) ()
   with Gtk.Error _ -> assert false
 
 let () = left_scrollview#set_shadow_type `OUT
@@ -164,9 +167,12 @@ let tools_window_vbox =
     GPack.vbox ~packing:left_scrollview#add_with_viewport ()
   with Gtk.Error _ -> assert false
 
+let tools_window_vbox_pack =
+  tools_window_vbox#pack ~expand:false ?from:None ?fill:None ?padding:None
+
 let context_frame =
   GBin.frame ~label:"Context" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
+    ~packing:tools_window_vbox_pack ()
 
 let context_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -197,7 +203,7 @@ let () =
 
 let strategies_frame =
   GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
+    ~packing:tools_window_vbox_pack ()
 
 let strategies_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -205,7 +211,7 @@ let strategies_box =
 
 let provers_frame =
   GBin.frame ~label:"Provers" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
+    ~packing:tools_window_vbox_pack ()
 
 
 let provers_box =
@@ -216,7 +222,7 @@ let () = provers_frame#set_resize_mode `PARENT
 
 let tools_frame =
   GBin.frame ~label:"Tools" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
+    ~packing:tools_window_vbox_pack ()
 
 let tools_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -224,7 +230,7 @@ let tools_box =
 
 let monitor_frame =
   GBin.frame ~label:"Proof monitoring" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
+    ~packing:tools_window_vbox_pack ()
 
 let monitor_box =
   GPack.vbox ~homogeneous:false ~packing:monitor_frame#add ()
@@ -347,7 +353,16 @@ let output_page,output_tab =
   3, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
+let counterexample_page,counterexample_tab =
+  let label = GMisc.label ~text:"Counter-example" () in
+  3, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+
 let _ = GPack.hbox ~packing:(source_tab#pack ~expand:false) ()
+let (_ : GPack.box) =
+  GPack.hbox ~packing:(source_tab#pack ~expand:false ?from:None ?fill:None
+                         ?padding:None) ()
 
 (******************)
 (* views          *)
@@ -389,6 +404,18 @@ let output_view =
     ~packing:scrolled_output_view#add
     ()
 
+let scrolled_counterexample_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:counterexample_tab#add ()
+
+let counterexample_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_counterexample_view#add
+    ()
+
 let modifiable_sans_font_views = ref [goals_view#misc]
 let modifiable_mono_font_views =
   ref [task_view#misc;edited_view#misc;output_view#misc]
@@ -415,6 +442,9 @@ let image_of_result ~obsolete result =
             if obsolete then !image_timeout_obs else !image_timeout
         | Call_provers.OutOfMemory ->
             if obsolete then !image_outofmemory_obs else !image_outofmemory
+        | Call_provers.StepsLimitExceeded ->
+            if obsolete then !image_stepslimitexceeded_obs
+            else !image_stepslimitexceeded
         | Call_provers.Unknown _ ->
             if obsolete then !image_unknown_obs else !image_unknown
         | Call_provers.Failure _ ->
@@ -539,6 +569,20 @@ let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
+let rec add_model str model =
+  match model with
+  | [] -> str
+  | m_element::t -> begin
+    let loc_string = match m_element.me_location with
+      | None -> "\"no location\""
+      | Some loc -> begin
+	Loc.report_position str_formatter loc;
+	flush_str_formatter ()
+      end in
+    let n_str = str ^ m_element.me_name ^ " at " ^ loc_string ^ " = " ^ m_element.me_value ^ "\n" in
+    add_model n_str t
+  end
+
 let goal_task_text g =
   if (Gconfig.config ()).intro_premises then
     let trans =
@@ -582,9 +626,8 @@ let update_tabs a =
               "Edited interactive proof. Run it with \"Replay\" button"
             | S.Done
                 ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
-              let b = Buffer.create 37 in
-              bprintf b "%a" Call_provers.print_prover_result r;
-              Buffer.contents b
+              fprintf str_formatter "%a" Call_provers.print_prover_result r;
+                  flush_str_formatter ()
             | S.Done r ->
               let out = r.Call_provers.pr_output in
               if out = "" then
@@ -593,9 +636,8 @@ let update_tabs a =
             | S.Scheduled-> "proof scheduled but not running yet"
             | S.Running -> "prover currently running"
             | S.InternalFailure e ->
-              let b = Buffer.create 37 in
-              bprintf b "%a" Exn_printer.exn_printer e;
-              Buffer.contents b
+              fprintf str_formatter "%a" Exn_printer.exn_printer e;
+              flush_str_formatter ()
         end
     | S.Metas m ->
       let print_meta_args =
@@ -608,11 +650,23 @@ let update_tabs a =
       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
     | _ -> ""
  in
+  let counterexample_text = 
+    match a with
+    | S.Proof_attempt a ->
+      begin
+        match a.S.proof_state with
+	  | S.Done r ->
+            add_model "" r.Call_provers.pr_model
+	  | _ -> "" 
+      end
+    | _ -> ""
+  in
  task_view#source_buffer#set_text task_text;
  task_view#scroll_to_mark `INSERT;
  edited_view#source_buffer#set_text edited_text;
  edited_view#scroll_to_mark `INSERT;
- output_view#source_buffer#set_text output_text
+ output_view#source_buffer#set_text output_text;
+ counterexample_view#source_buffer#set_text counterexample_text
 
 
 
@@ -820,7 +874,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   in ()
 
 let file_info = GMisc.label ~text:""
-  ~packing:(source_tab#pack ~fill:true) ()
+  ~packing:(source_tab#pack ~fill:true ?from:None ?expand:None ?padding:None) ()
 
 let warnings = Queue.create ()
 
@@ -1062,7 +1116,7 @@ let bisect_proof_attempt pa =
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
-          ~command:(C.get_complete_command lp.S.prover_config)
+          ~command:(C.get_complete_command lp.S.prover_config (-1))
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
@@ -1099,7 +1153,7 @@ let bisect_proof_attempt pa =
 	      ~stepslimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
-              ~command:(C.get_complete_command lp.S.prover_config)
+              ~command:(C.get_complete_command lp.S.prover_config (-1))
               ~driver:lp.S.prover_driver
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
@@ -1255,8 +1309,8 @@ let save_session () =
   end
 
 
-let exit_function ?(destroy=false) () =
-  Gconfig.save_config ();
+let exit_function ~destroy () =
+  (* do not save automatically anymore Gconfig.save_config (); *)
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
@@ -1456,37 +1510,6 @@ let add_tool_separator () =
 let add_tool_item label callback =
   add_gui_item (fun () -> ignore(tools_factory#add_image_item ~label ~callback ()))
 
-let () =
-  let add_item_provers () =
-    let provers = C.get_provers gconfig.Gconfig.config in
-    let provers =
-      C.Mprover.fold
-        (fun k p acc ->
-          let pr = p.prover in
-          if List.mem (C.prover_parseable_format pr) gconfig.hidden_provers
-          then acc
-          else C.Mprover.add k p acc)
-        provers C.Mprover.empty
-    in
-    C.Mprover.iter
-      (fun p _ ->
-         let n = Pp.string_of_wnl C.print_prover p in
-         let (_ : GMenu.image_menu_item) =
-           tools_factory#add_image_item ~label:n
-             ~callback:(fun () -> prover_on_selected_goals p)
-             ()
-         in
-         let b = GButton.button ~packing:provers_box#add ~label:n () in
-         b#misc#set_tooltip_markup
-           (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
-              C.print_prover p);
-         let (_ : GtkSignal.id) =
-           b#connect#pressed
-             ~callback:(fun () -> prover_on_selected_goals p)
-         in ())
-      provers
-  in
-  add_gui_item add_item_provers
 
 let split_strategy =
   [| Strategy.Itransform(split_transformation,1) |]
@@ -1620,42 +1643,22 @@ let () =
     add_submenu_transform
       "splitting transformations" Trans.list_transforms_l
   in
-  let add_non_splitting_1 =
-    add_submenu_transform
-      "non-splitting transformations (a-e)"
-      (fun () ->
-        let l = Trans.list_transforms () in
-        List.filter (fun (x,_) -> x < "f") l)
+  let add_non_splitting text filt =
+    add_submenu_transform text
+      (fun () -> let l = Trans.list_transforms () in List.filter filt l)
   in
-  let add_non_splitting_2 =
-    add_submenu_transform
-      "non-splitting transformations (f-z)"
-      (fun () ->
-        let l = Trans.list_transforms () in
-        List.filter (fun (x,_) -> x >= "f") l)
-  in
-  add_tool_separator ();
-  add_tool_item "Copy" copy_on_selection;
-  add_tool_item "Paste" paste_on_selection;
-  add_tool_separator ();
-  let submenu = tools_factory#add_submenu "Strategies" in
-  let submenu = new GMenu.factory submenu ~accel_group in
-  let iter (name,desc,strat,k) =
-    let callback () = apply_strategy_on_selection strat in
-    let ii = submenu#add_image_item
-      ~label:(sanitize_markup name) ~callback ()
-    in
-    let name =
-      match k with
-        | None -> name
-        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
-    in
-    ii#misc#set_tooltip_text (string_of_desc (name,desc))
-  in
-  List.iter iter (strategies ());
-  add_tool_separator ();
-  add_gui_item add_non_splitting_1;
-  add_gui_item add_non_splitting_2;
+  add_gui_item
+    (add_non_splitting "non-splitting transformations (a-e)"
+       (fun (x,_) -> x < "eliminate"));
+  add_gui_item
+    (add_non_splitting "eliminate"
+       (fun (x,_) -> x >= "eliminate" && x < "eliminatf"));
+  add_gui_item
+    (add_non_splitting "non-splitting transformations (e-i)"
+       (fun (x,_) -> x >= "eliminatf" && x < "j"));
+  add_gui_item
+    (add_non_splitting "non-splitting transformations (j-z)"
+       (fun (x,_) -> x >= "j"));
   add_gui_item add_splitting;
   add_tool_separator ();
   add_tool_item "Bisect in selection" apply_bisect_on_selection
@@ -1684,6 +1687,7 @@ let () =
 (* Run  menu *)
 (*************)
 
+(*
 let run_menu = factory#add_submenu "_Run"
 let run_factory = new GMenu.factory run_menu ~accel_group
 
@@ -1856,6 +1860,7 @@ let (_ : GMenu.image_menu_item) =
     ()
 *)
 
+*)
 
 (*************)
 (* Help menu *)
@@ -2066,6 +2071,11 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
+    ~label:"_Save config" ~callback:Gconfig.save_config
+    ()
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
     ~label:"_Save session" ~callback:save_session
     ()
 
@@ -2099,7 +2109,7 @@ let (_ : GtkSignal.id) = w#connect#destroy
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
-    ~callback:exit_function ()
+    ~callback:(exit_function ~destroy:false) ()
 
 
 (*****************************)
@@ -2259,6 +2269,63 @@ let () =
     b#connect#pressed ~callback:(fun () -> M.cancel_scheduled_proofs sched)
   in ()
 
+(***)
+
+let () =
+  add_tool_separator ();
+  add_tool_item "Copy" copy_on_selection;
+  add_tool_item "Paste" paste_on_selection;
+  add_tool_separator ();
+  let submenu = tools_factory#add_submenu "Strategies" in
+  let submenu = new GMenu.factory submenu ~accel_group in
+  let iter (name,desc,strat,k) =
+    let callback () = apply_strategy_on_selection strat in
+    let ii = submenu#add_image_item
+      ~label:(sanitize_markup name) ~callback ()
+    in
+    let name =
+      match k with
+        | None -> name
+        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+    in
+    ii#misc#set_tooltip_text (string_of_desc (name,desc))
+  in
+  List.iter iter (strategies ());
+  add_tool_separator ();
+  let provers_factory =
+    let tools_submenu_provers = tools_factory#add_submenu "Provers" in
+    new GMenu.factory tools_submenu_provers
+  in
+  let add_item_provers () =
+    let provers = C.get_provers gconfig.Gconfig.config in
+    let provers =
+      C.Mprover.fold
+        (fun k p acc ->
+          let pr = p.prover in
+          if List.mem (C.prover_parseable_format pr) gconfig.hidden_provers
+          then acc
+          else C.Mprover.add k p acc)
+        provers C.Mprover.empty
+    in
+    C.Mprover.iter
+      (fun p _ ->
+         let n = Pp.string_of_wnl C.print_prover p in
+         let (_ : GMenu.image_menu_item) =
+           provers_factory#add_image_item ~label:n
+             ~callback:(fun () -> prover_on_selected_goals p)
+             ()
+         in
+         let b = GButton.button ~packing:provers_box#add ~label:n () in
+         b#misc#set_tooltip_markup
+           (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
+              C.print_prover p);
+         let (_ : GtkSignal.id) =
+           b#connect#pressed
+             ~callback:(fun () -> prover_on_selected_goals p)
+         in ())
+      provers
+  in
+  add_gui_item add_item_provers
 
 (***********************************************)
 (* Keyboard shortcuts in the (goals) tree view *)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -114,6 +114,7 @@ type prover_upgrade_policy =
 type config_prover = {
   prover  : prover;
   command : string;
+  command_steps : string option;
   driver  : string;
   in_place: bool;
   editor  : string;
@@ -208,9 +209,17 @@ let loadpath m =
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
-let get_complete_command pc =
-  String.concat " " (pc.command :: pc.extra_options)
 
+exception StepsCommandNotSpecified of string
+
+let get_complete_command pc stepslimit =
+  let comm = if stepslimit < 0 then pc.command
+    else
+      match pc.command_steps with 
+      | None -> raise (StepsCommandNotSpecified "The solver is used with step limit and the command for running the solver with steplimit is not specified.")
+      | Some command_steps -> command_steps in
+  String.concat " " (comm :: pc.extra_options)
+    
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
 
@@ -279,7 +288,10 @@ exception NonUniqueId
 let set_prover _ (prover,shortcuts) family =
   let section = empty_section in
   let section = set_string section "name" prover.prover.prover_name in
-  let section = set_string section "command" prover.command in
+  let section = set_string section "command" prover.command in    
+  let section = 
+    Opt.fold (fun s c -> set_string s "command_steps" c) section prover.command_steps
+  in
   let section = set_string section "driver" prover.driver in
   let section = set_string section "version" prover.prover.prover_version in
   let section =
@@ -395,6 +407,7 @@ let load_prover dirname (provers,shortcuts) section =
     let provers = Mprover.add prover
       { prover  = prover;
         command = get_string section "command";
+	command_steps = get_stringo section "command_steps";
         driver  = absolute_filename dirname (get_string section "driver");
         in_place = get_bool ~default:false section "in_place";
         editor  = get_string ~default:"" section "editor";
@@ -712,6 +725,9 @@ let merge_config config filename =
   let editors = List.fold_left load_editor editors (get_family rc "editor") in
   { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
+
+let _debug = Debug.register_info_flag "whyconf"
+  ~desc:"Print@ debugging@ messages@ about@ whyconf."
 
 let save_config config =
   let filename = config.conf_file in

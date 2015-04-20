@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,34 +17,45 @@ open Term
 
 let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
-let check_expl lab acc =
-  let lab = lab.Ident.lab_string in
-  if Str.string_match expl_regexp lab 0
-  then Some (Str.matched_group 1 lab)
-  else acc
+let collect_expls lab =
+  Ident.Slab.fold
+    (fun lab acc ->
+       let lab = lab.Ident.lab_string in
+       if Str.string_match expl_regexp lab 0
+       then Str.matched_group 1 lab :: acc
+       else acc)
+    lab
+    []
 
-let check_expl lab = Ident.Slab.fold check_expl lab None
+let concat_expls = function
+  | [] -> None
+  | [l] -> Some l
+  | l :: ls -> Some (l ^ " (" ^ String.concat ". " ls ^ ")")
 
-let rec get_expl_fmla acc f =
-  if f.t_ty <> None then acc else
-  if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc else
-  let res = check_expl f.Term.t_label in
-  if res = None then match f.t_node with
-    | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
-    | Term.Tbinop (Term.Timplies,_,f) -> get_expl_fmla acc f
-    | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
-        Term.t_fold get_expl_fmla acc f
-    | _ -> raise Exit
-  else if acc = None then res else raise Exit
+let rec get_expls_fmla acc f =
+  if f.t_ty <> None then acc
+  else if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc
+  else
+    let res = collect_expls f.Term.t_label in
+    if res = [] then match f.t_node with
+      | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
+      | Term.Tbinop (Term.Timplies, _, f) -> get_expls_fmla acc f
+      | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
+        Term.t_fold get_expls_fmla acc f
+      | _ -> raise Exit
+    else if acc = [] then res
+    else raise Exit
 
-let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
+let get_expls_fmla f = try get_expls_fmla [] f with Exit -> []
 
 let goal_expl_task ~root task =
   let gid = (Task.task_goal task).Decl.pr_name in
   let info =
-    let fmla = Task.task_goal_fmla task in
-    let res = get_expl_fmla fmla in
-    if res <> None || not root then res else check_expl gid.Ident.id_label
+    let res = get_expls_fmla (Task.task_goal_fmla task) in
+    concat_expls
+      (if res <> [] && not root
+       then res
+       else collect_expls gid.Ident.id_label)
   in
   gid, info
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -73,6 +73,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let exitcodes = ref [] in
   let filename  = ref None in
   let printer   = ref None in
+  let model_parser = ref "no_model" in
   let transform = ref [] in
   let timeregexps = ref [] in
   let stepsregexps = ref [] in
@@ -89,18 +90,24 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
     | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
     | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
+    | RegexpStepsLimitExceeded s ->
+      add_to_list regexps (Str.regexp s, StepsLimitExceeded)
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
-    | StepRegexp (r,ns) -> add_to_list stepsregexps (Call_provers.stepsregexp r ns)
+    | StepRegexp (r,ns) ->
+      add_to_list stepsregexps (Call_provers.stepsregexp r ns)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
     | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
+    | ExitCodeStepsLimitExceeded s ->
+      add_to_list exitcodes (s, StepsLimitExceeded)
     | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
     | Printer s -> set_or_raise loc printer s "printer"
+    | ModelParser s -> model_parser := s
     | Transform s -> add_to_list transform s
     | Plugin files -> load_plugin (Filename.dirname file) files
     | Blacklist sl -> List.iter (fun s -> Queue.add s blacklist) sl
@@ -201,6 +208,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       prp_timeregexps = List.rev !timeregexps;
       prp_stepsregexp = List.rev !stepsregexps;
       prp_exitcodes   = List.rev !exitcodes;
+      prp_model_parser = Model_parser.lookup_model_parser !model_parser
     };
     drv_tag         = !driver_tag;
   }
@@ -247,10 +255,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
     ~command ?timelimit ?memlimit ?stepslimit ~res_parser:drv.drv_res_parser
-    ~filename ?inplace buffer
+    ~filename ~printer_mapping ?inplace buffer
 
 (** print'n'prove *)
 
@@ -289,17 +297,20 @@ let print_task_prepared ?old drv filename fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer = lookup_printer p
-    { Printer.env = drv.drv_env;
+  let printer_args = { Printer.env = drv.drv_env;
       prelude     = drv.drv_prelude;
       th_prelude  = drv.drv_thprelude;
       blacklist   = drv.drv_blacklist;
+      printer_mapping = get_default_printer_mapping;
       filename    = filename } in
-  fprintf fmt "@[%a@]@?" (printer ?old) task
+  let printer = lookup_printer p printer_args in
+  fprintf fmt "@[%a@]@?" (printer ?old) task;
+  printer_args.printer_mapping
 
 let print_task ?old drv filename fmt task =
   let task = prepare_task drv task in
-  print_task_prepared ?old drv filename fmt task
+  let _ = print_task_prepared ?old drv filename fmt task in
+  ()
 
 let print_theory ?old drv filename fmt th =
   let task = Task.use_export None th in
@@ -323,10 +334,12 @@ let prove_task_prepared
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
   let filename = file_name_of_task ?old ?inplace drv task in
-  print_task_prepared ?old:old_channel drv filename fmt task; pp_print_flush fmt ();
+  let printer_mapping =
+    print_task_prepared ?old:old_channel drv filename fmt task in
+  pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buf in
+    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
@@ -338,9 +351,11 @@ let prove_task_server command ~timelimit ~memlimit ~stepslimit ?old ?inplace drv
   let task = prepare_task drv task in
   let fn = file_name_of_task ?old ?inplace drv task in
   let res_parser = drv.drv_res_parser in
+  let printer_mapping = get_default_printer_mapping in
   match inplace with
   | Some true ->
-     prove_file_server ~command ~res_parser ~timelimit ~memlimit ~stepslimit ?inplace fn
+     prove_file_server ~command ~res_parser ~timelimit ~memlimit ~stepslimit
+     ~printer_mapping ?inplace fn
   | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
          let p = match drv.drv_printer with
            | None -> raise NoPrinter
@@ -352,10 +367,12 @@ let prove_task_server command ~timelimit ~memlimit ~stepslimit ?old ?inplace drv
                                         prelude     = drv.drv_prelude;
                                         th_prelude  = drv.drv_thprelude;
                                         blacklist   = drv.drv_blacklist;
+                                        printer_mapping = printer_mapping;
                                         filename    = fn } in
          fprintf fmt "@[%a@]@?" (printer ?old:None) task;
          close_out outc;
-         prove_file_server ~command ~res_parser ~timelimit ~memlimit ~stepslimit fn
+         prove_file_server ~command ~res_parser ~timelimit ~memlimit
+         ~stepslimit ~printer_mapping fn
 
 (* exception report *)
 

@@ -147,6 +147,167 @@ and no epsilon
    chaque instance necessaires. plutot qu'un seul symbole _match
    polymorphe.
 
+==================== Roadmap for release 0.86 ========================
+
+
+
+Release Notes (details in file CHANGES):
+
+* Support for new provers or new versions of provers
+
+
+== TODO ==
+
+determine which is the minumum version of Ocaml to compile, and then
+updated configure.in and the manual
+
+support for veriT recent
+-> DONE: version 201410
+
+support for Yices2 recent
+-> DONE: 2.3.0, but still does not support quantifiers
+
+solve issues with metitarski
+. DONE theory PowerReal
+. crashes when applied on a WP (see examples/my_cosine.mlw)
+
+clean up the support for SMTLIB bitvectors: there are 2 theories in the stdlib: thoeries/bv.why and modules/bitvectors.mlw
+
+decide if GUI with tabs is convenient enough
+
+== Final preparation ==
+
+* faire une passe sur le BTS
+* do "make update-coq" and "make", fix Coq realizations if needed
+* check that nightly bench is OK
+* check that "make xml-validate-local" is OK
+  (see below : copy the dtd on the web)
+* put 0.86 in file Version, and then run ./config.status
+* check/update the content of the About dialog in src/ide/gconfig.ml
+  around lines 550-600
+* check headers
+* check the file CHANGES, add the release date
+* manual in PDF:
+** update the date in doc/manual.tex (near \whyversion{})
+** check that macro \todo is commented out in doc/macros.tex
+** and then "make doc"
+  (check that manual in HTML is also generated, doc/html/index.html)
+* do "make dist"
+* test distrib/why3-0.86.tar.gz
+* put on the web page why3-0.86.tar.gz:
+  cp distrib/why3-0.86.tar.gz /users/www-perso/projets/why3/download
+* inform Jerry James <loganjerry@gmail.com> so that he can test the
+  Fedora package
+* install web page for why2 which includes an updated page for the
+  quick migration guide. (sources are in CVS repository
+  ~filliatr/ARCHIVE/www/why).
+* move distrib from Why3 site to Inria forge:
+** remove /users/www-perso/projets/why3/download/why3-0.86.tar.gz
+** upload distrib/why3-0.86.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
+* put on the web page
+ - the manual in PDF
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.86.pdf
+
+ - the HTML version of the manual (content of doc/html)
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.86
+
+ - why3session.dtd
+   cp -f share/why3session.dtd /users/www-perso/projets/why3/
+
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.86
+   rm /users/www-perso/projets/why3/stdlib
+   ln -s /users/www-perso/projets/why3/stdlib-0.86 \
+            /users/www-perso/projets/why3/stdlib
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.86
+    rm /users/www-perso/projets/why3/api
+    ln -s /users/www-perso/projets/why3/api-0.86 \
+      /users/www-perso/projets/why3/api
+
+ - update the main HTML page (sources are in repository why3-www)
+   edit index.html
+   make (to check validity)
+   make export
+
+ - add links to extra resources like
+   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
+   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
+ - make everything writeable for the group
+   chmod -R g+w /users/www-perso/projets/why3
+
+* prepare for the OPAM package
+
+. update opam/url: url and checksum of why-0.86.tar.gz
+   (use "md5sum distrib/why3-0.86.tar.gz")
+. update opam/descr if necessary
+. update opam/opam with correct dependencies and such
+
+* make a last commit:
+ - git commit -am "release 0.86"
+ - add tag 0.86 to the git repository, using
+   git tag 0.86
+ - do not forget to push it using
+   git push
+   git push --tags
+
+* add a new version to the bugtracker:
+  https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
+
+
+* test the OPAM package
+
+  . with opam 1.2:
+    opam pin add why3 --kind=git <...>/why3/.git
+    (it runs "opam install why3")
+  . with opam < 1.2:
+
+    - first step: have a local copy of opam-repository if not done yet, e.g.:
+
+        git clone git@github.com:claudemarche/opam-repository.git
+        cd opam-repository/
+        git remote add opam https://github.com/ocaml/opam-repository.git
+
+      or, if you already have one, make sure it is up-to-date:
+
+        git fetch opam
+        git reset --hard opam/master
+        git push
+
+    - second step: copy why3 opam files into it :
+
+      cd packages/why3
+      cp -r <source why3>/opam why3.0.86
+
+    - second step:
+
+      opam repository add local <...>/opam-repository
+      opam install why3
+      (* test it, e.g.
+         cp example/quicksort.mlw ~/tmp
+         why3 ide ~/tmp/quicksort.mlw *)
+      opam remove why3
+      opam repository remove local
+
+
+* make a pull request on OPAM
+
+  git add why3.0.86
+  git commit -am "new package version why3 0.86"
+  git push
+  sur github: creer un pull request
+
+* produce the Why3 part of Toccata gallery
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
+  "make gallery-files" in the sources of the Toccata web pages)
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+
 ==================== Roadmap for release 0.85 ========================
 
 Release Notes:

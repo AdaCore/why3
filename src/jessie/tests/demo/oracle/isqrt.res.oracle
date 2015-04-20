@@ -1,185 +1,36 @@
-[kernel] preprocessing with "gcc -C -E -I.  tests/demo/isqrt.c"
-[jessie3] creating logic symbol 739 (sqr)
+[jessie3] Loading Why3 configuration...
+[jessie3] Why3 environment loaded.
+[jessie3] Loading Why3 theories...
+[jessie3] Loading Why3 modules...
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] Parsing tests/demo/isqrt.c (with preprocessing)
+[jessie3] Loading prover drivers...
+[jessie3] Translating to Why3...
+[jessie3] creating logic symbol 68 (sqr)
 [jessie3] processing function isqrt
-[jessie3] created program function isqrt (740)
+[jessie3] created program function isqrt (69)
 [jessie3] processing function main
-[jessie3] created program function main (747)
+[jessie3] created program function main (76)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
-[jessie3] made 2 function(s)
-[jessie3] running theory 1:
-[jessie3] theory Global_logic_declarations
-            (* use why3.BuiltIn *)
-            
-            (* use int.Int *)
-            
-            (* use real.Real *)
-            
-            (* use map.Map *)
-            
-            function sqr (x:int) : int = x * x
-            end
-[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] running theory 1:
-[jessie3] theory C_Functions
-            (* use why3.BuiltIn *)
-            
-            (* use why3.Bool *)
-            
-            (* use why3.Unit *)
-            
-            (* use why3.Prelude *)
-            
-            (* use int.Int *)
-            
-            (* use real.Real *)
-            
-            (* use map.Map *)
-            
-            (* use Global_logic_declarations *)
-            
-            (* use ref.Ref *)
-            
-            (* use mach_int.Int32 *)
-            
-            goal WP_parameter_isqrt :
-              forall x:int32.
-               to_int x <= 1000000000 /\ to_int x >= 0 ->
-                in_bounds 0 &&
-                 (forall o:int32.
-                   to_int o = 0 ->
-                    in_bounds 0 &&
-                     (forall o1:int32.
-                       to_int o1 = 0 ->
-                        in_bounds 0 &&
-                         (forall o2:int32.
-                           to_int o2 = 0 ->
-                            (forall count:int32.
-                              count = o2 ->
-                               in_bounds 1 &&
-                                (forall o3:int32.
-                                  to_int o3 = 1 ->
-                                   (forall sum:int32.
-                                     sum = o3 ->
-                                      ((to_int count >= 0 /\
-                                         to_int x >= sqr (to_int count + 0)) /\
-                                        to_int sum = sqr (to_int count + 1)) /\
-                                       (forall sum1:int32, count1:int32.
-                                         (to_int count1 >= 0 /\
-                                           to_int x >= sqr (to_int count1 + 0)) /\
-                                          to_int sum1 = sqr (to_int count1 + 1) ->
-                                          (forall result:bool.
-                                            (if result = True then to_int sum1 <=
-                                                                    to_int x
-                                             else to_int sum1 > to_int x) ->
-                                             (if result = True then in_bounds 1 &&
-                                                                     (forall o4:int32.
-                                                                       to_int o4 = 1 ->
-                                                                        in_bounds
-                                                                         (to_int count1 +
-                                                                           to_int o4) &&
-                                                                         (forall o5:
-                                                                           int32.
-                                                                           to_int o5 =
-                                                                            (to_int
-                                                                              count1 +
-                                                                              to_int o4) ->
-                                                                            (forall count2:
-                                                                              int32.
-                                                                              count2 =
-                                                                              o5 ->
-                                                                              in_bounds
-                                                                              1 &&
-                                                                              (forall o6:
-                                                                              int32.
-                                                                              to_int o6 =
-                                                                              1 ->
-                                                                              in_bounds
-                                                                              2 &&
-                                                                              (forall o7:
-                                                                              int32.
-                                                                              to_int o7 =
-                                                                              2 ->
-                                                                              in_bounds
-                                                                              (to_int
-                                                                              o7 *
-                                                                              to_int
-                                                                              count2) &&
-                                                                              (forall o8:
-                                                                              int32.
-                                                                              to_int o8 =
-                                                                              (to_int
-                                                                              o7 *
-                                                                              to_int
-                                                                              count2) ->
-                                                                              in_bounds
-                                                                              (to_int
-                                                                              o8 +
-                                                                              to_int o6) &&
-                                                                              (forall o9:
-                                                                              int32.
-                                                                              to_int o9 =
-                                                                              (to_int
-                                                                              o8 +
-                                                                              to_int o6) ->
-                                                                              in_bounds
-                                                                              (to_int
-                                                                              sum1 +
-                                                                              to_int o9) &&
-                                                                              (forall o10:
-                                                                              int32.
-                                                                              to_int
-                                                                              o10 =
-                                                                              (to_int
-                                                                              sum1 +
-                                                                              to_int o9) ->
-                                                                              (forall sum2:
-                                                                              int32.
-                                                                              sum2 =
-                                                                              o10 ->
-                                                                              ((to_int
-                                                                              count2 >=
-                                                                              0 /\
-                                                                              to_int x >=
-                                                                              sqr
-                                                                              (to_int
-                                                                              count2 +
-                                                                              0)) /\
-                                                                              to_int
-                                                                              sum2 =
-                                                                              sqr
-                                                                              (to_int
-                                                                              count2 +
-                                                                              1)) /\
-                                                                              0 <=
-                                                                              (to_int x -
-                                                                              to_int
-                                                                              count1) /\
-                                                                              (to_int x -
-                                                                              to_int
-                                                                              count2) <
-                                                                              (to_int x -
-                                                                              to_int
-                                                                              count1))))))))))
-                                             else (to_int count1 >= 0 /\
-                                                    sqr (to_int count1 + 0) <= to_int x) /\
-                                                   to_int x < sqr (to_int count1 + 1))))))))))
-            
-            goal WP_parameter_main :
-              in_bounds 0 &&
-               (forall o:int32.
-                 to_int o = 0 ->
-                  in_bounds 17 &&
-                   (forall o1:int32.
-                     to_int o1 = 17 ->
-                      (to_int o1 <= 1000000000 /\ to_int o1 >= 0) &&
-                       (forall o2:int32.
-                         (to_int o2 >= 0 /\ sqr (to_int o2 + 0) <= to_int o1) /\
-                          to_int o1 < sqr (to_int o2 + 1) ->
-                          (forall r:int32.
-                            r = o2 ->
-                             not to_int r < 4 && not to_int r > 4 && to_int r = 4))))
-            end
-[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1 (WP_parameter isqrt): Timeout, Timeout, Timeout, Timeout
-[jessie3] Task 2 (WP_parameter main): Unknown, Unknown, Valid, Valid
+[jessie3] failure: Exception raised during translation to Why3:
+                   Ident isqrt is not yet declared
+[jessie3] failure: Exception raised when loading prover drivers:
+                   anomaly: Log.AbortFatal("jessie3")
+[kernel] Current source was: tests/demo/isqrt.c:22
+         The full backtrace is:
+         Raised at file "src/kernel/log.ml", line 524, characters 30-31
+         Called from file "src/kernel/log.ml", line 518, characters 9-16
+         Re-raised at file "src/kernel/log.ml", line 521, characters 15-16
+         Called from file "register.ml", line 87, characters 6-113
+         Called from file "queue.ml", line 134, characters 6-20
+         Called from file "src/kernel/boot.ml", line 37, characters 4-20
+         Called from file "src/kernel/cmdline.ml", line 763, characters 2-9
+         Called from file "src/kernel/cmdline.ml", line 216, characters 4-8
+         
+         Plug-in jessie3 aborted: internal error.
+         Please report as 'crash' at http://bts.frama-c.com/.
+         Your Frama-C version is Sodium-20150201.
+         Note that a version and a backtrace alone often do not contain enough
+         information to understand the bug. Guidelines for reporting bugs are at:
+         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines

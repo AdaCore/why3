@@ -1,0 +1,2385 @@
+
+module Defs
+  
+  use import list.List
+  use import support.Bind
+  
+  (*meta "select_inst" "none"
+  meta "select_lskept" "none"
+  meta "select_lsinst" "none"
+  meta "select_kept" "all"*)
+  
+  (* type variables = integers. Variable n is the n-th variable
+     bound by the currently defined logical symbol (no need for
+     a type parameter as there is only a single level of binding).
+     Why not an abstract type:
+     If it were an abstract type, we would have to define
+     polymorphic symbol application with a substitution. This
+     is possible (and what is usually done when programming), but ill-suited
+     to semantic interpretation of logical symbols, as it requires
+     to lift this substitution in the semantic interpretation as well.
+     Integers allows to consider type variables as if they where regular
+     parameters. *)
+  type ty_var = int
+  
+  (* Abstract infinite type for type symbols. *)
+  type ty_symbol
+  function ty_symbol_from_index (n:int) : ty_symbol
+  axiom ty_symbol_from_index_injective : forall n m.
+    ty_symbol_from_index n = ty_symbol_from_index m -> n = m
+  meta infinite_type type ty_symbol
+  
+  (* Abstract infinite type for logic symbols. *)
+  type lsymbol
+  function lsymbol_from_index (n:int) : lsymbol
+  axiom lsymbol_from_index_injective : forall n m.
+    lsymbol_from_index n = lsymbol_from_index m -> n = m
+  meta infinite_type type lsymbol
+  
+  (* Abstract infinite type for pattern variables. *)
+  type pat_var
+  function pat_var_from_index (n:int) : pat_var
+  axiom pat_var_from_index_injective : forall n m.
+    pat_var_from_index n = pat_var_from_index m -> n = m
+  meta infinite_type type pat_var
+  
+  (* Type definitions. *)
+  
+  (* Types *)
+  type ty =
+    | TyVar ty_var
+    | TyApp ty_symbol (list ty)
+  
+  (* Patterns *)
+  type pattern =
+    | PWild
+    | PVar pat_var
+    | PApp lsymbol (list ty) (list pattern)
+    | POr pattern pattern
+    | PAs pattern pat_var
+  
+  (* Terms. *)
+  type term 'tv =
+      (* Term variable. *)
+    | TVar 'tv
+      (* Application of a logical symbol. *)
+    | TApp lsymbol (list ty) (list (term 'tv))
+      (* If-Then-Else. *)
+    | TIf (term 'tv) (term 'tv) (term 'tv)
+      (* Let-binding. *)
+    | TLet (term 'tv) (term (bind 'tv unit))
+      (* Pattern-matching: the first matching case. *)
+    | TCase (term 'tv) (list (branch 'tv))
+      (* Universal/Existential quantifications. The types of the quantified
+         variables are given by the sequences. *)
+    | TForall (list ty) (term (bind 'tv int))
+    | TExists (list ty) (term (bind 'tv int))
+      (* Logical connectives. *)
+    | TAnd (term 'tv) (term 'tv)
+    | TOr (term 'tv) (term 'tv)
+    | TImplies (term 'tv) (term 'tv)
+    | TIff (term 'tv) (term 'tv)
+    | TNot (term 'tv)
+    | TTrue
+    | TFalse
+  
+  (* Case branches. *)
+  with branch 'tv = (pattern,term (bind 'tv pat_var))
+
+end
+
+
+(* Map functions (e.g renamings, or using category theory vocabulary,
+   functors). *)
+module Maps
+
+  use export Defs
+  use import list.List
+  use import support.Bind
+  use import support.HO
+  
+  function ty_map (f:ty_var -> ty_var)
+    (g:ty_symbol -> ty_symbol) (ty:ty) : ty =
+    match ty with
+    | TyVar x -> TyVar (f x)
+    | TyApp u l -> TyApp (g u) (tyl_map f g l)
+    end
+  
+  with tyl_map (f:ty_var -> ty_var)
+    (g:ty_symbol -> ty_symbol) (tyl:list ty) : list ty = match tyl with
+    | Nil -> Nil
+    | Cons x q -> Cons (ty_map f g x) (tyl_map f g q)
+    end
+  
+  function pat_map (f:pat_var -> pat_var) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (p:pattern) : pattern =
+    match p with
+    | PWild -> PWild
+    | PVar x -> PVar (f x)
+    | PApp c tyl l -> PApp (i c) (tyl_map g h tyl) (patl_map f g h i l)
+    | POr p1 p2 -> POr (pat_map f g h i p1) (pat_map f g h i p2)
+    | PAs p x -> PAs (pat_map f g h i p) (f x)
+    end
+  
+  with patl_map (f:pat_var -> pat_var) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (pl:list pattern) : list pattern =
+    match pl with
+    | Nil -> Nil
+    | Cons x q -> Cons (pat_map f g h i x) (patl_map f g h i q)
+    end
+  
+  function t_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (t:term 'tv1) : term 'tv2 =
+    match t with
+    | TVar x -> TVar (f x)
+    | TApp fs tyl l ->
+      TApp (i fs) (tyl_map g h tyl) (tl_map f g h i l)
+    | TIf b t e -> TIf (t_map f g h i b)
+                       (t_map f g h i t)
+                       (t_map f g h i e)
+    | TLet t1 t2 -> TLet (t_map f g h i t1) (t_map (bmap f) g h i t2)
+    | TCase t lb -> TCase (t_map f g h i t) (brl_map f g h i lb)
+    | TForall tys t ->
+      TForall (tyl_map g h tys) (t_map (bmap f) g h i t)
+    | TExists tys t ->
+      TExists (tyl_map g h tys) (t_map (bmap f) g h i t)
+    | TAnd t1 t2 -> TAnd (t_map f g h i t1) (t_map f g h i t2)
+    | TOr t1 t2 -> TOr (t_map f g h i t1) (t_map f g h i t2)
+    | TImplies t1 t2 -> TImplies (t_map f g h i t1) (t_map f g h i t2)
+    | TIff t1 t2 -> TIff (t_map f g h i t1) (t_map f g h i t2)
+    | TNot t -> TNot (t_map f g h i t)
+    | TTrue -> TTrue
+    | TFalse -> TFalse
+    end
+  
+  with tl_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (tl:list (term 'tv1)) : list (term 'tv2) =
+    match tl with
+    | Nil -> Nil
+    | Cons x q -> Cons (t_map f g h i x) (tl_map f g h i q)
+    end
+  
+  with brl_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (brl:list (branch 'tv1)) : list (branch 'tv2) =
+    match brl with
+    | Nil -> Nil
+    | Cons x q -> Cons (br_map f g h i x) (brl_map f g h i q)
+    end
+  
+  with br_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (br:branch 'tv1) : branch 'tv2 =
+    match br with
+    | (pat,right) -> (pat_map identity g h i pat,t_map (bmap f) g h i right)
+    end
+
+end
+
+(* Substitution. *)
+module Substs
+
+  use export Maps
+  use import list.List
+  use import support.Bind
+  use import support.HO
+  
+  function ty_subst (f:ty_var -> ty) (g:ty_symbol -> ty_symbol) (ty:ty) : ty =
+    match ty with
+    | TyVar x -> f x
+    | TyApp u l -> TyApp (g u) (tyl_subst f g l)
+    end
+  
+  with tyl_subst (f:ty_var -> ty) (g:ty_symbol -> ty_symbol)
+    (ty:list ty) : list ty = match ty with
+    | Nil -> Nil
+    | Cons x q -> Cons (ty_subst f g x) (tyl_subst f g q)
+    end
+  
+  function pat_subst (f:pat_var -> pat_var) (g:ty_var -> ty)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (p:pattern) : pattern =
+    match p with
+    | PWild -> PWild
+    | PVar x -> PVar (f x)
+    | PApp c tyl l ->
+      PApp (i c) (tyl_subst g h tyl) (patl_subst f g h i l)
+    | POr p1 p2 -> POr (pat_subst f g h i p1) (pat_subst f g h i p2)
+    | PAs p x -> PAs (pat_subst f g h i p) (f x)
+    end
+  
+  with patl_subst (f:pat_var -> pat_var) (g:ty_var -> ty)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (pl:list pattern) : list pattern =
+    match pl with
+    | Nil -> Nil
+    | Cons x q -> Cons (pat_subst f g h i x) (patl_subst f g h i q)
+    end
+  
+  function term_lift (f:'tv1 -> term 'tv2) :
+    bind 'tv1 'l -> term (bind 'tv2 'l) =
+    bfold (compose (t_map Old identity identity identity) f)
+          (compose TVar Fresh)
+  
+  function t_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (t:term 'tv1) : term 'tv2 =
+    match t with
+    | TVar x -> f x
+    | TApp fs tyl l ->
+      TApp (i fs) (tyl_subst g h tyl) (tl_subst f g h i l)
+    | TIf b t e -> TIf (t_subst f g h i b)
+                       (t_subst f g h i t)
+                       (t_subst f g h i e)
+    | TLet t1 t2 ->
+      TLet (t_subst f g h i t1) (t_subst (term_lift f) g h i t2)
+    | TCase t lb -> TCase (t_subst f g h i t) (brl_subst f g h i lb)
+    | TForall tys t ->
+      TForall (tyl_subst g h tys) (t_subst (term_lift f) g h i t)
+    | TExists tys t ->
+      TExists (tyl_subst g h tys) (t_subst (term_lift f) g h i t)
+    | TAnd t1 t2 -> TAnd (t_subst f g h i t1) (t_subst f g h i t2)
+    | TOr t1 t2 -> TOr (t_subst f g h i t1) (t_subst f g h i t2)
+    | TImplies t1 t2 -> TImplies (t_subst f g h i t1) (t_subst f g h i t2)
+    | TIff t1 t2 -> TIff (t_subst f g h i t1) (t_subst f g h i t2)
+    | TNot t -> TNot (t_subst f g h i t)
+    | TTrue -> TTrue
+    | TFalse -> TFalse
+    end
+  
+  with tl_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (tl:list (term 'tv1)) : list (term 'tv2) =
+    match tl with
+    | Nil -> Nil
+    | Cons x q -> Cons (t_subst f g h i x) (tl_subst f g h i q)
+    end
+  
+  with brl_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (brl:list (branch 'tv1)) : list (branch 'tv2) =
+    match brl with
+    | Nil -> Nil
+    | Cons x q -> Cons (br_subst f g h i x) (brl_subst f g h i q)
+    end
+  
+  with br_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    (br:branch 'tv1) : branch 'tv2 =
+    match br with
+    | (pat,right) ->
+      (pat_subst identity g h i pat,t_subst (term_lift f) g h i right)
+    end
+
+end
+
+(* Substitution of lists and behavior with respect to usual list functions
+   like length/nth/etc. *)
+module SubstList
+  
+  use import Substs
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import option.Option
+  
+  let rec lemma tyl_map_length_nth (f:ty_var -> ty_var)
+    (g:ty_symbol -> ty_symbol) (tyl:list ty) : unit =
+    ensures { length (tyl_map f g tyl) = length tyl }
+    ensures { forall n. let u = nth n (tyl_map f g tyl) in
+      let v = nth n tyl in match u with
+        | None -> v = None
+        | Some x -> match v with
+          | None -> false
+          | Some y -> x = ty_map f g y
+        end end }
+    variant { tyl }
+    match tyl with
+    | Cons _ q -> tyl_map_length_nth f g q
+    | _ -> ()
+    end
+  
+  let rec lemma tyl_subst_length_nth (f:ty_var -> ty)
+    (g:ty_symbol -> ty_symbol) (tyl:list ty) : unit =
+    ensures { length (tyl_subst f g tyl) = length tyl }
+    ensures { forall n. let u = nth n (tyl_subst f g tyl) in
+      let v = nth n tyl in match u with
+        | None -> v = None
+        | Some x -> match v with
+          | None -> false
+          | Some y -> x = ty_subst f g y
+        end end }
+    variant { tyl }
+    match tyl with
+    | Cons _ q -> tyl_subst_length_nth f g q
+    | _ -> ()
+    end
+  
+end
+
+(* Inclusion of free variables in sets.
+   In most cases, those predicates are much more useful
+   than direct free variables predicates. Also,
+   there are considerably less such predicates. *)
+module VarsIn
+
+  use export Defs
+  use import list.List
+  use import support.HO
+  use import support.Bind
+  
+  predicate ty_vars_in (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ty:ty) = match ty with
+    | TyVar x -> tyv_set x
+    | TyApp f l -> tys_set f /\ tyl_vars_in tyv_set tys_set l
+    end
+  
+  with tyl_vars_in (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (tyl:list ty) = match tyl with
+    | Nil -> true
+    | Cons x q -> ty_vars_in tyv_set tys_set x /\
+      tyl_vars_in tyv_set tys_set q
+    end
+  
+  predicate pat_vars_in (pv_set:pat_var -> bool) (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
+    (pat:pattern) = match pat with
+    | PWild -> true
+    | PVar x -> pv_set x
+    | PApp f tyl l -> ls_set f /\ tyl_vars_in tyv_set tys_set tyl /\
+      patl_vars_in pv_set tyv_set tys_set ls_set l
+    | POr p1 p2 -> pat_vars_in pv_set tyv_set tys_set ls_set p1 /\
+      pat_vars_in pv_set tyv_set tys_set ls_set p2
+    | PAs p x -> pat_vars_in pv_set tyv_set tys_set ls_set p /\ pv_set x
+    end
+  
+  with patl_vars_in (pv_set:pat_var -> bool) (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
+    (patl:list pattern) = match patl with
+    | Nil -> true
+    | Cons x q -> pat_vars_in pv_set tyv_set tys_set ls_set x /\
+      patl_vars_in pv_set tyv_set tys_set ls_set q
+    end
+  
+  predicate t_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
+    (t:term 'tv) = match t with
+    | TVar x -> tv_set x
+    | TApp fs tyl l -> ls_set fs /\ tyl_vars_in tyv_set tys_set tyl /\
+      tl_vars_in tv_set tyv_set tys_set ls_set l
+    | TIf b t e -> t_vars_in tv_set tyv_set tys_set ls_set b /\
+      t_vars_in tv_set tyv_set tys_set ls_set t /\
+      t_vars_in tv_set tyv_set tys_set ls_set e
+    | TLet t1 t2 -> t_vars_in tv_set tyv_set tys_set ls_set t1 /\
+      t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t2
+    | TCase t lb -> t_vars_in tv_set tyv_set tys_set ls_set t /\
+      brl_vars_in tv_set tyv_set tys_set ls_set lb
+    | TForall tys t -> t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t /\
+      tyl_vars_in tyv_set tys_set tys
+    | TExists tys t -> t_vars_in (bfold tv_set all) tyv_set tys_set ls_set t /\
+      tyl_vars_in tyv_set tys_set tys
+    | TAnd t1 t2 -> t_vars_in tv_set tyv_set tys_set ls_set t1 /\
+      t_vars_in tv_set tyv_set tys_set ls_set t2
+    | TOr t1 t2 -> t_vars_in tv_set tyv_set tys_set ls_set t1 /\
+      t_vars_in tv_set tyv_set tys_set ls_set t2
+    | TImplies t1 t2 -> t_vars_in tv_set tyv_set tys_set ls_set t1 /\
+      t_vars_in tv_set tyv_set tys_set ls_set t2
+    | TIff t1 t2 -> t_vars_in tv_set tyv_set tys_set ls_set t1 /\
+      t_vars_in tv_set tyv_set tys_set ls_set t2
+    | TNot t -> t_vars_in tv_set tyv_set tys_set ls_set t
+    | TTrue -> true
+    | TFalse -> true
+    end
+  
+  with tl_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
+    (tl:list (term 'tv)) = match tl with
+    | Nil -> true
+    | Cons x q -> t_vars_in tv_set tyv_set tys_set ls_set x /\
+      tl_vars_in tv_set tyv_set tys_set ls_set q
+    end
+  
+  with br_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
+    (br:branch 'tv) = match br with
+    | (pat,right) -> pat_vars_in all tyv_set tys_set ls_set pat /\
+      t_vars_in (bfold tv_set all) tyv_set tys_set ls_set right
+    end
+  
+  with brl_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
+    (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
+    (brl:list (branch 'tv)) = match brl with
+    | Nil -> true
+    | Cons x q -> br_vars_in tv_set tyv_set tys_set ls_set x /\
+      brl_vars_in tv_set tyv_set tys_set ls_set q
+    end
+  
+  (* Necessary trivialities:
+     1) full sets are always inclusion sets
+     2) if we have inclusion sets, their supersets are inclusion sets.
+     (non-necessary but would be easy to prove:
+      if we have a family of inclusion set, their
+      intersection is an inclusion set. In particular, there are
+      minimum inclusion sets (the sets of free variables). An alternative
+      to this proof is the easy explicit construction of those minimum
+      sets)
+      Note: subset properties could be derived without induction using
+      inclusion maps ! *)
+  
+  let rec lemma ty_vars_in_all (ty:ty) : unit
+    ensures { ty_vars_in all all ty }
+    variant { ty }
+  = match ty with TyApp _ q -> tyl_vars_in_all q | _ -> () end
+  
+  with lemma tyl_vars_in_all (tyl:list ty) : unit
+    ensures { tyl_vars_in all all tyl }
+    variant { tyl }
+  = match tyl with Cons x q -> ty_vars_in_all x;tyl_vars_in_all q | _ -> () end
+  
+  let rec lemma pat_vars_in_all (pat:pattern) : unit
+    ensures { pat_vars_in all all all all pat }
+    variant { pat }
+  = match pat with
+    | POr p1 p2 -> pat_vars_in_all p1; pat_vars_in_all p2
+    | PAs p _ -> pat_vars_in_all p
+    | PApp _ _ pl -> patl_vars_in_all pl
+    | _ -> ()
+    end
+  
+  with lemma patl_vars_in_all (pl:list (pattern)) : unit
+    ensures { patl_vars_in all all all all pl }
+    variant { pl }
+  = match pl with Cons x q -> pat_vars_in_all x;patl_vars_in_all q | _ -> () end
+  
+  let rec lemma t_vars_in_all (t:term 'tv) : unit
+    ensures { t_vars_in all all all all t }
+    variant { t }
+  = let ghost rc = t_vars_in_all in match t with
+    | TApp _ _ l -> tl_vars_in_all l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 ->
+      assert { extensional_equal (bfold all all:bind 'tv unit -> bool) all };
+      rc t1; rc t2
+    | TCase t lb -> rc t; brl_vars_in_all lb
+    | TForall _ t | TExists _ t ->
+      assert { extensional_equal (bfold all all:bind 'tv int -> bool) all };
+      rc t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_vars_in_all (tl:list (term 'tv)) : unit
+    ensures { tl_vars_in all all all all tl }
+    variant { tl }
+  = match tl with Cons x q -> t_vars_in_all x;tl_vars_in_all q | _ -> () end
+  
+  with lemma br_vars_in_all (br:branch 'tv) : unit
+    ensures { br_vars_in all all all all br }
+    variant { br }
+  = match br with
+    | (_,r) ->
+      assert { extensional_equal (bfold all all:bind 'tv pat_var -> bool) all };
+      t_vars_in_all r
+    end
+  
+  with lemma brl_vars_in_all (brl:list (branch 'tv)) : unit
+    ensures { brl_vars_in all all all all brl }
+    variant { brl }
+  = match brl with Cons x q -> br_vars_in_all x;brl_vars_in_all q | _ -> () end
+  
+  let rec lemma ty_vars_subset (tyv1 tyv2:ty_var -> bool)
+    (tys1 tys2:ty_symbol -> bool) (ty:ty) : unit
+    requires { ty_vars_in tyv1 tys1 ty }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    ensures { ty_vars_in tyv2 tys2 ty }
+    variant { ty }
+  = match ty with
+    | TyApp _ l -> tyl_vars_subset tyv1 tyv2 tys1 tys2 l
+    | _ -> ()
+    end
+  
+  with lemma tyl_vars_subset (tyv1 tyv2:ty_var -> bool)
+    (tys1 tys2:ty_symbol -> bool) (tyl:list ty) : unit
+    requires { tyl_vars_in tyv1 tys1 tyl }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    ensures { tyl_vars_in tyv2 tys2 tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_vars_subset tyv1 tyv2 tys1 tys2 x;
+      tyl_vars_subset tyv1 tyv2 tys1 tys2 q
+    | _ -> ()
+    end
+  
+  let rec lemma pat_vars_subset (pv1 pv2:pat_var -> bool)
+    (tyv1 tyv2:ty_var -> bool) (tys1 tys2:ty_symbol -> bool)
+    (ls1 ls2:lsymbol -> bool) (p:pattern) : unit
+    requires { pat_vars_in pv1 tyv1 tys1 ls1 p }
+    requires { forall x. pv1 x -> pv2 x }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    requires { forall x. ls1 x -> ls2 x }
+    ensures { pat_vars_in pv2 tyv2 tys2 ls2 p }
+    variant { p }
+  = let ghost rc = pat_vars_subset pv1 pv2 tyv1 tyv2 tys1 tys2 ls1 ls2 in
+    match p with
+    | PApp _ _ l -> patl_vars_subset pv1 pv2 tyv1 tyv2 tys1 tys2 ls1 ls2 l
+    | POr p1 p2 -> rc p1;rc p2
+    | PAs p _ -> rc p
+    | _ -> ()
+    end
+  
+  with lemma patl_vars_subset (pv1 pv2:pat_var -> bool)
+    (tyv1 tyv2:ty_var -> bool) (tys1 tys2:ty_symbol -> bool)
+    (ls1 ls2:lsymbol -> bool) (pl:list pattern) : unit
+    requires { patl_vars_in pv1 tyv1 tys1 ls1 pl }
+    requires { forall x. pv1 x -> pv2 x }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    requires { forall x. ls1 x -> ls2 x }
+    ensures { patl_vars_in pv2 tyv2 tys2 ls2 pl }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_vars_subset pv1 pv2 tyv1 tyv2 tys1 tys2 ls1 ls2 x;
+      patl_vars_subset pv1 pv2 tyv1 tyv2 tys1 tys2 ls1 ls2 q
+    | _ -> ()
+    end
+  
+  let rec lemma t_vars_subset (tv1 tv2:'tv -> bool)
+    (tyv1 tyv2:ty_var -> bool) (tys1 tys2:ty_symbol -> bool)
+    (ls1 ls2:lsymbol -> bool) (t:term 'tv) : unit
+    requires { t_vars_in tv1 tyv1 tys1 ls1 t }
+    requires { forall x. tv1 x -> tv2 x }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    requires { forall x. ls1 x -> ls2 x }
+    ensures { t_vars_in tv2 tyv2 tys2 ls2 t }
+    variant { t }
+  = let ghost rc = t_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 in
+    match t with
+    | TApp _ _ l -> tl_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1;
+      t_vars_subset (bfold tv1 all) (bfold tv2 all)
+        tyv1 tyv2 tys1 tys2 ls1 ls2 t2
+    | TCase t lb -> rc t; bl_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 lb
+    | TForall _ t | TExists _ t ->
+      t_vars_subset (bfold tv1 all) (bfold tv2 all)
+        tyv1 tyv2 tys1 tys2 ls1 ls2 t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_vars_subset (tv1 tv2:'tv -> bool)
+    (tyv1 tyv2:ty_var -> bool) (tys1 tys2:ty_symbol -> bool)
+    (ls1 ls2:lsymbol -> bool) (tl:list (term 'tv)) : unit
+    requires { tl_vars_in tv1 tyv1 tys1 ls1 tl }
+    requires { forall x. tv1 x -> tv2 x }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    requires { forall x. ls1 x -> ls2 x }
+    ensures { tl_vars_in tv2 tyv2 tys2 ls2 tl }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 x;
+      tl_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 q
+    | _ -> ()
+    end
+  
+  with lemma b_vars_subset (tv1 tv2:'tv -> bool)
+    (tyv1 tyv2:ty_var -> bool) (tys1 tys2:ty_symbol -> bool)
+    (ls1 ls2:lsymbol -> bool) (br:branch 'tv) : unit
+    requires { br_vars_in tv1 tyv1 tys1 ls1 br }
+    requires { forall x. tv1 x -> tv2 x }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    requires { forall x. ls1 x -> ls2 x }
+    ensures { br_vars_in tv2 tyv2 tys2 ls2 br }
+    variant { br }
+  = match br with
+    | (_,right) -> t_vars_subset (bfold tv1 all) (bfold tv2 all)
+      tyv1 tyv2 tys1 tys2 ls1 ls2 right
+    end
+  
+  with lemma bl_vars_subset (tv1 tv2:'tv -> bool)
+    (tyv1 tyv2:ty_var -> bool) (tys1 tys2:ty_symbol -> bool)
+    (ls1 ls2:lsymbol -> bool) (brl:list (branch 'tv)) : unit
+    requires { brl_vars_in tv1 tyv1 tys1 ls1 brl }
+    requires { forall x. tv1 x -> tv2 x }
+    requires { forall x. tyv1 x -> tyv2 x }
+    requires { forall x. tys1 x -> tys2 x }
+    requires { forall x. ls1 x -> ls2 x }
+    ensures { brl_vars_in tv2 tyv2 tys2 ls2 brl }
+    variant { brl }
+  = match brl with
+    | Cons x q -> b_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 x;
+      bl_vars_subset tv1 tv2 tyv1 tyv2 tys1 tys2 ls1 ls2 q
+    | _ -> ()
+    end
+  
+end
+
+(* Real free variables predicates. *)
+module FreeVars
+  
+  use export Defs
+  use import list.List
+  use import support.HO
+  use import support.Bind
+  
+  predicate pat_pv_free_var (pat:pattern) (x:pat_var) =
+    match pat with
+    | PWild -> false
+    | PVar y -> x = y
+    | PAs p y -> x = y \/ pat_pv_free_var p x
+    | POr p1 p2 -> pat_pv_free_var p1 x \/ pat_pv_free_var p2 x
+    | PApp _ _ pl -> patl_pv_free_var pl x
+    end
+  
+  with patl_pv_free_var (patl:list pattern) (x:pat_var) =
+    match patl with
+    | Nil -> false
+    | Cons p q -> pat_pv_free_var p x \/ patl_pv_free_var q x
+    end
+  
+end
+
+module FreeVarsIn
+  
+  use export FreeVars
+  use export VarsIn
+  use import list.List
+  use import support.HO
+  use import support.Bind
+  
+  let rec lemma pat_pv_free_var_minimal (s1:pat_var -> bool)
+    (s2:ty_var -> bool) (s3:ty_symbol -> bool) (s4:lsymbol -> bool)
+    (pat:pattern) : unit
+    requires { pat_vars_in s1 s2 s3 s4 pat }
+    ensures { pat_vars_in (pat_pv_free_var pat) s2 s3 s4 pat }
+    ensures { forall x. pat_pv_free_var pat x -> s1 x }
+    variant { pat }
+  = let ghost rc = pat_pv_free_var_minimal s1 s2 s3 s4 in
+    match pat with
+    | PAs p _ -> rc p
+    | POr p1 p2 -> rc p1; rc p2
+    | PApp _ _ pl -> patl_pv_free_var_minimal s1 s2 s3 s4 pl
+    | _ -> ()
+    end
+  
+  with lemma patl_pv_free_var_minimal (s1:pat_var -> bool)
+    (s2:ty_var -> bool) (s3:ty_symbol -> bool) (s4:lsymbol -> bool)
+    (patl:list pattern) : unit
+    requires { patl_vars_in s1 s2 s3 s4 patl }
+    ensures { patl_vars_in (patl_pv_free_var patl) s2 s3 s4 patl }
+    ensures { forall x. patl_pv_free_var patl x -> s1 x }
+    variant { patl }
+  = match patl with
+    | Cons x q -> pat_pv_free_var_minimal s1 s2 s3 s4 x;
+      patl_pv_free_var_minimal s1 s2 s3 s4 q
+    | _ -> ()
+    end
+  
+end
+
+(* Lemmas about behavior of free variable inclusion sets
+   through renaming/substitutions *)
+module SubstVarsIn
+  
+  use export VarsIn
+  use export Substs
+  use import list.List
+  use import support.HO
+  use import support.Bind
+  
+  let rec lemma ty_map_vars_in
+    (pf:ty_var -> bool) (f:ty_var -> ty_var) (qf:ty_var -> bool)
+    (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
+    (ty:ty) : unit
+    requires { ty_vars_in pf pg ty }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    ensures { ty_vars_in qf qg (ty_map f g ty) }
+    variant { ty }
+  = match ty with
+    | TyApp _ l -> tyl_map_vars_in pf f qf pg g qg l
+    | _ -> ()
+    end
+  
+  with lemma tyl_map_vars_in
+    (pf:ty_var -> bool) (f:ty_var -> ty_var) (qf:ty_var -> bool)
+    (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
+    (tyl:list ty) : unit
+    requires { tyl_vars_in pf pg tyl }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    ensures { tyl_vars_in qf qg (tyl_map f g tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_map_vars_in pf f qf pg g qg x;
+      tyl_map_vars_in pf f qf pg g qg q
+    | _ -> ()
+    end
+  
+  let rec lemma pat_map_vars_in
+    (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (pat:pattern) : unit
+    requires { pat_vars_in pf pg ph pi pat }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { pat_vars_in qf qg qh qi (pat_map f g h i pat) }
+    variant { pat }
+  = let ghost rc = pat_map_vars_in pf f qf pg g qg ph h qh pi i qi in
+    match pat with
+    | PApp _ _ l -> patl_map_vars_in pf f qf pg g qg ph h qh pi i qi l
+    | POr p1 p2 -> rc p1;rc p2
+    | PAs p _ -> rc p
+    | _ -> ()
+    end
+  
+  with lemma patl_map_vars_in
+    (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (patl:list pattern) : unit
+    requires { patl_vars_in pf pg ph pi patl }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { patl_vars_in qf qg qh qi (patl_map f g h i patl) }
+    variant { patl }
+  = match patl with
+    | Cons x q -> pat_map_vars_in pf f qf pg g qg ph h qh pi i qi x;
+      patl_map_vars_in pf f qf pg g qg ph h qh pi i qi q
+    | _ -> ()
+    end
+  
+  let rec lemma t_map_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (t:term 'tv1) : unit
+    requires { t_vars_in pf pg ph pi t }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { t_vars_in qf qg qh qi (t_map f g h i t) }
+    variant { t }
+  = let ghost rc = t_map_vars_in pf f qf pg g qg ph h qh pi i qi in
+    match t with
+    | TApp _ _ l -> tl_map_vars_in pf f qf pg g qg ph h qh pi i qi l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1; let bf = bfold pf all in
+      assert { forall x. bf x -> not (bfold qf all (bmap f x)) ->
+        match x with Fresh u -> bmap f x = Fresh u && false | _ -> false end
+        && false };
+      t_map_vars_in bf (bmap f) (bfold qf all) pg g qg ph h qh pi i qi t2
+    | TCase t lb -> rc t; brl_map_vars_in pf f qf pg g qg ph h qh pi i qi lb
+    | TForall _ t | TExists _ t -> let bf = bfold pf all in
+      assert { forall x. bf x -> not (bfold qf all (bmap f x)) ->
+        match x with Fresh u -> bmap f x = Fresh u && false | _ -> false end
+        && false };
+      t_map_vars_in bf (bmap f) (bfold qf all) pg g qg ph h qh pi i qi t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_map_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (tl:list (term 'tv1)) : unit
+    requires { tl_vars_in pf pg ph pi tl }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { tl_vars_in qf qg qh qi (tl_map f g h i tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_map_vars_in pf f qf pg g qg ph h qh pi i qi x;
+      tl_map_vars_in pf f qf pg g qg ph h qh pi i qi q
+    | _ -> ()
+    end
+  
+  with lemma br_map_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (br:branch 'tv1) : unit
+    requires { br_vars_in pf pg ph pi br }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { br_vars_in qf qg qh qi (br_map f g h i br) }
+    variant { br }
+  = match br with
+    | (_,right) -> let bf = bfold pf all in
+      assert { forall x. bf x -> not (bfold qf all (bmap f x)) ->
+        match x with Fresh u -> bmap f x = Fresh u && false | _ -> false end
+        && false };
+      t_map_vars_in bf (bmap f) (bfold qf all) pg g qg ph h qh pi i qi right
+    end
+  
+  with lemma brl_map_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (brl:list (branch 'tv1)) : unit
+    requires { brl_vars_in pf pg ph pi brl }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { brl_vars_in qf qg qh qi (brl_map f g h i brl) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_map_vars_in pf f qf pg g qg ph h qh pi i qi x;
+      brl_map_vars_in pf f qf pg g qg ph h qh pi i qi q
+    | _ -> ()
+    end
+  
+  let rec lemma ty_subst_vars_in
+    (pf:ty_var -> bool) (f:ty_var -> ty) (qf:ty_var -> bool)
+    (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
+    (ty:ty) : unit
+    requires { ty_vars_in pf pg ty }
+    requires { forall x. pf x -> ty_vars_in qf qg (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    ensures { ty_vars_in qf qg (ty_subst f g ty) }
+    variant { ty }
+  = match ty with
+    | TyApp _ l -> tyl_subst_vars_in pf f qf pg g qg l
+    | _ -> ()
+    end
+  
+  with lemma tyl_subst_vars_in
+    (pf:ty_var -> bool) (f:ty_var -> ty) (qf:ty_var -> bool)
+    (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
+    (tyl:list ty) : unit
+    requires { tyl_vars_in pf pg tyl }
+    requires { forall x. pf x -> ty_vars_in qf qg (f x) }
+    requires { forall x. pg x -> qg (g x) }
+    ensures { tyl_vars_in qf qg (tyl_subst f g tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_subst_vars_in pf f qf pg g qg x;
+      tyl_subst_vars_in pf f qf pg g qg q
+    | _ -> ()
+    end
+  
+  let rec lemma pat_subst_vars_in
+    (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (pat:pattern) : unit
+    requires { pat_vars_in pf pg ph pi pat }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> ty_vars_in qg qh (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { pat_vars_in qf qg qh qi (pat_subst f g h i pat) }
+    variant { pat }
+  = let ghost rc = pat_subst_vars_in pf f qf pg g qg ph h qh pi i qi in
+    match pat with
+    | PApp _ _ l -> patl_subst_vars_in pf f qf pg g qg ph h qh pi i qi l
+    | POr p1 p2 -> rc p1;rc p2
+    | PAs p _ -> rc p
+    | _ -> ()
+    end
+  
+  with lemma patl_subst_vars_in
+    (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (patl:list pattern) : unit
+    requires { patl_vars_in pf pg ph pi patl }
+    requires { forall x. pf x -> qf (f x) }
+    requires { forall x. pg x -> ty_vars_in qg qh (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { patl_vars_in qf qg qh qi (patl_subst f g h i patl) }
+    variant { patl }
+  = match patl with
+    | Cons x q -> pat_subst_vars_in pf f qf pg g qg ph h qh pi i qi x;
+      patl_subst_vars_in pf f qf pg g qg ph h qh pi i qi q
+    | _ -> ()
+    end
+  
+  let rec lemma t_subst_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (t:term 'tv1) : unit
+    requires { t_vars_in pf pg ph pi t }
+    requires { forall x. pf x -> t_vars_in qf qg qh qi (f x) }
+    requires { forall x. pg x -> ty_vars_in qg qh (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { t_vars_in qf qg qh qi (t_subst f g h i t) }
+    variant { t }
+  = let ghost rc = t_subst_vars_in pf f qf pg g qg ph h qh pi i qi in
+    match t with
+    | TApp _ _ l -> tl_subst_vars_in pf f qf pg g qg ph h qh pi i qi l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1; let bf = bfold pf all in
+      assert { forall x. bf x ->
+        not (t_vars_in (bfold qf all) qg qh qi (term_lift f x)) ->
+        match x with Fresh u -> term_lift f x = TVar (Fresh u) && false
+        | Old u -> term_lift f x = t_map Old identity identity identity (f u)
+          && false end && false };
+      t_subst_vars_in bf (term_lift f) (bfold qf all) pg g qg ph h qh pi i qi t2
+    | TCase t lb -> rc t; brl_subst_vars_in pf f qf pg g qg ph h qh pi i qi lb
+    | TForall _ t | TExists _ t -> let bf = bfold pf all in
+      assert { forall x. bf x ->
+        not (t_vars_in (bfold qf all) qg qh qi (term_lift f x)) ->
+        match x with Fresh u -> term_lift f x = TVar (Fresh u) && false
+        | Old u -> term_lift f x = t_map Old identity identity identity (f u)
+          && false end && false };
+      t_subst_vars_in bf (term_lift f) (bfold qf all) pg g qg ph h qh pi i qi t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_subst_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (tl:list (term 'tv1)) : unit
+    requires { tl_vars_in pf pg ph pi tl }
+    requires { forall x. pf x -> t_vars_in qf qg qh qi (f x) }
+    requires { forall x. pg x -> ty_vars_in qg qh (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { tl_vars_in qf qg qh qi (tl_subst f g h i tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_subst_vars_in pf f qf pg g qg ph h qh pi i qi x;
+      tl_subst_vars_in pf f qf pg g qg ph h qh pi i qi q
+    | _ -> ()
+    end
+  
+  with lemma br_subst_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (br:branch 'tv1) : unit
+    requires { br_vars_in pf pg ph pi br }
+    requires { forall x. pf x -> t_vars_in qf qg qh qi (f x) }
+    requires { forall x. pg x -> ty_vars_in qg qh (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { br_vars_in qf qg qh qi (br_subst f g h i br) }
+    variant { br }
+  = match br with
+    | (_,right) -> let bf = bfold pf all in
+      assert { forall x. bf x ->
+        not (t_vars_in (bfold qf all) qg qh qi (term_lift f x)) ->
+        match x with Fresh u -> term_lift f x = TVar (Fresh u) && false
+        | Old u -> term_lift f x = t_map Old identity identity identity (f u)
+          && false end && false };
+      t_subst_vars_in bf (term_lift f) (bfold qf all)
+        pg g qg ph h qh pi i qi right
+    end
+  
+  with lemma brl_subst_vars_in
+    (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
+    (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
+    (ph:ty_symbol -> bool) (h:ty_symbol -> ty_symbol) (qh:ty_symbol -> bool)
+    (pi:lsymbol -> bool) (i:lsymbol -> lsymbol) (qi:lsymbol -> bool)
+    (brl:list (branch 'tv1)) : unit
+    requires { brl_vars_in pf pg ph pi brl }
+    requires { forall x. pf x -> t_vars_in qf qg qh qi (f x) }
+    requires { forall x. pg x -> ty_vars_in qg qh (g x) }
+    requires { forall x. ph x -> qh (h x) }
+    requires { forall x. pi x -> qi (i x) }
+    ensures { brl_vars_in qf qg qh qi (brl_subst f g h i brl) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_subst_vars_in pf f qf pg g qg ph h qh pi i qi x;
+      brl_subst_vars_in pf f qf pg g qg ph h qh pi i qi q
+    | _ -> ()
+    end
+  
+  (* When equalizers are inclusion sets, substitutions gives the same result. *)
+  let rec lemma ty_subst_free_vars (sf:ty_var -> bool) (f1 f2:ty_var -> ty)
+    (sg:ty_symbol -> bool) (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { ty_vars_in sf sg ty }
+    ensures { ty_subst f1 g1 ty = ty_subst f2 g2 ty }
+    variant { ty }
+  = match ty with
+    | TyApp _ l -> tyl_subst_free_vars sf f1 f2 sg g1 g2 l
+    | _ -> ()
+    end
+  
+  with lemma tyl_subst_free_vars (sf:ty_var -> bool) (f1 f2:ty_var -> ty)
+    (sg:ty_symbol -> bool) (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { tyl_vars_in sf sg tyl }
+    ensures { tyl_subst f1 g1 tyl = tyl_subst f2 g2 tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_subst_free_vars sf f1 f2 sg g1 g2 x;
+      tyl_subst_free_vars sf f1 f2 sg g1 g2 q
+    | _ -> ()
+    end
+  
+  let rec lemma pat_subst_free_vars
+    (sf:pat_var -> bool) (f1 f2:pat_var -> pat_var)
+    (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
+    (sh:ty_symbol -> bool) (h1 h2:ty_symbol -> ty_symbol)
+    (si:lsymbol -> bool) (i1 i2:lsymbol -> lsymbol) (pat:pattern) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { forall x. sh x -> h1 x = h2 x }
+    requires { forall x. si x -> i1 x = i2 x }
+    requires { pat_vars_in sf sg sh si pat }
+    ensures { pat_subst f1 g1 h1 i1 pat = pat_subst f2 g2 h2 i2 pat }
+    variant { pat }
+  = let ghost rc = pat_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 in
+    match pat with
+    | PApp _ _ l -> patl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 l
+    | POr p1 p2 -> rc p1;rc p2
+    | PAs p _ -> rc p
+    | _ -> ()
+    end
+  
+  with lemma patl_subst_free_vars
+    (sf:pat_var -> bool) (f1 f2:pat_var -> pat_var)
+    (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
+    (sh:ty_symbol -> bool) (h1 h2:ty_symbol -> ty_symbol)
+    (si:lsymbol -> bool) (i1 i2:lsymbol -> lsymbol) (patl:list pattern) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { forall x. sh x -> h1 x = h2 x }
+    requires { forall x. si x -> i1 x = i2 x }
+    requires { patl_vars_in sf sg sh si patl }
+    ensures { patl_subst f1 g1 h1 i1 patl = patl_subst f2 g2 h2 i2 patl }
+    variant { patl }
+  = match patl with
+    | Cons x q -> pat_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 x;
+      patl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 q
+    | _ -> ()
+    end
+  
+  let rec lemma t_subst_free_vars
+    (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
+    (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
+    (sh:ty_symbol -> bool) (h1 h2:ty_symbol -> ty_symbol)
+    (si:lsymbol -> bool) (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { forall x. sh x -> h1 x = h2 x }
+    requires { forall x. si x -> i1 x = i2 x }
+    requires { t_vars_in sf sg sh si t }
+    ensures { t_subst f1 g1 h1 i1 t = t_subst f2 g2 h2 i2 t }
+    variant { t }
+  = let ghost rc = t_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 in
+    match t with
+    | TApp _ _ l -> tl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1;
+      let bf = bfold sf all in
+      let tf1 = term_lift f1 in
+      let tf2 = term_lift f2 in
+      assert { forall x. bf x -> tf1 x <> tf2 x ->
+        match x with
+        | Old u -> tf1 x = t_map Old identity identity identity (f1 u) =
+          t_map Old identity identity identity (f2 u) = tf2 x && false
+        | _ -> false
+        end && false };
+      t_subst_free_vars bf tf1 tf2 sg g1 g2 sh h1 h2 si i1 i2 t2
+    | TCase t lb -> rc t;
+      brl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 lb
+    | TForall _ t | TExists _ t ->
+      let bf = bfold sf all in
+      let tf1 = term_lift f1 in
+      let tf2 = term_lift f2 in
+      assert { forall x. bf x -> tf1 x <> tf2 x ->
+        match x with
+        | Old u -> tf1 x = t_map Old identity identity identity (f1 u) =
+          t_map Old identity identity identity (f2 u) = tf2 x && false
+        | _ -> false
+        end && false };
+      t_subst_free_vars bf tf1 tf2 sg g1 g2 sh h1 h2 si i1 i2 t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_subst_free_vars
+    (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
+    (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
+    (sh:ty_symbol -> bool) (h1 h2:ty_symbol -> ty_symbol)
+    (si:lsymbol -> bool) (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { forall x. sh x -> h1 x = h2 x }
+    requires { forall x. si x -> i1 x = i2 x }
+    requires { tl_vars_in sf sg sh si tl }
+    ensures { tl_subst f1 g1 h1 i1 tl = tl_subst f2 g2 h2 i2 tl }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 x;
+      tl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma br_subst_free_vars
+    (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
+    (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
+    (sh:ty_symbol -> bool) (h1 h2:ty_symbol -> ty_symbol)
+    (si:lsymbol -> bool) (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { forall x. sh x -> h1 x = h2 x }
+    requires { forall x. si x -> i1 x = i2 x }
+    requires { br_vars_in sf sg sh si br }
+    ensures { br_subst f1 g1 h1 i1 br = br_subst f2 g2 h2 i2 br }
+    variant { br }
+  = match br with
+    | (_,right) ->
+      let bf = bfold sf all in
+      let tf1 = term_lift f1 in
+      let tf2 = term_lift f2 in
+      assert { forall x. bf x -> tf1 x <> tf2 x ->
+        match x with
+        | Old u -> tf1 x = t_map Old identity identity identity (f1 u) =
+          t_map Old identity identity identity (f2 u) = tf2 x && false
+        | _ -> false
+        end && false };
+      t_subst_free_vars bf tf1 tf2 sg g1 g2 sh h1 h2 si i1 i2 right
+    end
+  
+  with lemma brl_subst_free_vars
+    (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
+    (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
+    (sh:ty_symbol -> bool) (h1 h2:ty_symbol -> ty_symbol)
+    (si:lsymbol -> bool) (i1 i2:lsymbol -> lsymbol)
+    (brl:list (branch 'tv1)) : unit
+    requires { forall x. sf x -> f1 x = f2 x }
+    requires { forall x. sg x -> g1 x = g2 x }
+    requires { forall x. sh x -> h1 x = h2 x }
+    requires { forall x. si x -> i1 x = i2 x }
+    requires { brl_vars_in sf sg sh si brl }
+    ensures { brl_subst f1 g1 h1 i1 brl = brl_subst f2 g2 h2 i2 brl }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 x;
+      brl_subst_free_vars sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 q
+    | _ -> ()
+    end
+  
+end
+
+(* Gigantic module regrouping all commutations lemmas. *)
+module Commutations
+  
+  use import Substs
+  use import list.List
+  use import support.Bind
+  use import support.HO
+  
+  (* Preliminary: identity renaming is identity. *)
+  
+  let rec lemma ty_map_id (ty:ty) : unit
+    ensures { ty_map identity identity ty = ty }
+    variant { ty }
+  = match ty with TyApp _ l -> tyl_map_id l | _ -> () end
+  
+  with lemma tyl_map_id (tyl:list ty) : unit
+    ensures { tyl_map identity identity tyl = tyl }
+    variant { tyl }
+  = match tyl with Cons x q -> ty_map_id x ; tyl_map_id q | _ -> () end
+  
+  let lemma ty_map_ho_id () : unit
+    ensures { ty_map identity identity = identity }
+  = assert { extensional_equal (ty_map identity identity) identity }
+  
+  let lemma tyl_map_ho_id () : unit
+    ensures { tyl_map identity identity = identity }
+  = assert { extensional_equal (tyl_map identity identity) identity }
+  
+  let rec lemma pat_map_id (p:pattern) : unit
+    ensures { pat_map identity identity identity identity p = p }
+    variant { p }
+  = let ghost rc = pat_map_id in
+    match p with
+    | PApp _ _ l -> patl_map_id l
+    | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
+    end
+  
+  with lemma patl_map_id (pl:list pattern) : unit
+    ensures { patl_map identity identity identity identity pl = pl }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_map_id x; patl_map_id q | _ -> ()
+    end
+  
+  let lemma pat_map_ho_id () : unit
+    ensures { pat_map identity identity identity identity = identity }
+  = assert { extensional_equal (pat_map identity identity identity identity)
+                               identity }
+  
+  let lemma patl_map_ho_id () : unit
+    ensures { patl_map identity identity identity identity = identity }
+  = assert { extensional_equal (patl_map identity identity identity identity)
+                               identity }
+  
+  let rec lemma t_map_id (t:term 'a) : unit
+    ensures { t_map identity identity identity identity t = t }
+    variant { t }
+  = let ghost rc = t_map_id in
+    match t with
+    | TApp _ _ l -> tl_map_id l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1; rc t2
+    | TCase t lb -> rc t; brl_map_id lb
+    | TForall _ t | TExists _ t -> rc t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_map_id (tl:list (term 'a)) : unit
+    ensures { tl_map identity identity identity identity tl = tl }
+    variant { tl }
+  = match tl with Cons x q -> t_map_id x; tl_map_id q | _ -> () end
+  
+  with lemma brl_map_id (brl:list (branch 'a)) : unit
+    ensures { brl_map identity identity identity identity brl = brl }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_map_id x; brl_map_id q | _ -> ()
+    end
+  
+  with lemma br_map_id (br:branch 'a) : unit
+    ensures { br_map identity identity identity identity br = br }
+    variant { br }
+  = match br with
+    | (pat,right) -> pat_map_id pat; t_map_id right
+    end
+  
+  (* Commutations lemmas *)
+  
+  (* First for rename-rename. *)
+  
+  let rec lemma ty_map_compose (f1 f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
+    ensures { ty_map (compose f2 f1) (compose g2 g1) ty =
+      ty_map f2 g2 (ty_map f1 g1 ty) }
+    variant { ty }
+  = match ty with TyApp _ l -> tyl_map_compose f1 f2 g1 g2 l | _ -> () end
+  
+  with lemma tyl_map_compose (f1 f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
+    ensures { tyl_map (compose f2 f1) (compose g2 g1) tyl =
+      tyl_map f2 g2 (tyl_map f1 g1 tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_map_compose f1 f2 g1 g2 x;
+      tyl_map_compose f1 f2 g1 g2 q
+    | _ -> () end
+  
+  let lemma ty_map_ho_compose (f1 f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { ty_map (compose f2 f1) (compose g2 g1) =
+      compose (ty_map f2 g2) (ty_map f1 g1) }
+  = assert { extensional_equal (ty_map (compose f2 f1) (compose g2 g1))
+    (compose (ty_map f2 g2) (ty_map f1 g1)) }
+  
+  let lemma tyl_map_ho_compose (f1 f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { tyl_map (compose f2 f1) (compose g2 g1) =
+      compose (tyl_map f2 g2) (tyl_map f1 g1) }
+  = assert { extensional_equal (tyl_map (compose f2 f1) (compose g2 g1))
+    (compose (tyl_map f2 g2) (tyl_map f1 g1)) }
+  
+  let rec lemma pat_map_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
+    ensures { pat_map (compose f2 f1) (compose g2 g1)
+                      (compose h2 h1) (compose i2 i1) p =
+      pat_map f2 g2 h2 i2 (pat_map f1 g1 h1 i1 p) }
+    variant { p }
+  = let ghost rc = pat_map_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match p with
+    | PApp _ _ l -> patl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
+    end
+  
+  with lemma patl_map_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
+    ensures { patl_map (compose f2 f1) (compose g2 g1)
+                           (compose h2 h1) (compose i2 i1) pl =
+      patl_map f2 g2 h2 i2 (patl_map f1 g1 h1 i1 pl) }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_map_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      patl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  let lemma pat_map_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { pat_map (compose f2 f1) (compose g2 g1)
+                      (compose h2 h1) (compose i2 i1) =
+              compose (pat_map f2 g2 h2 i2) (pat_map f1 g1 h1 i1) }
+  = assert { extensional_equal (pat_map (compose f2 f1) (compose g2 g1)
+                                        (compose h2 h1) (compose i2 i1))
+    (compose (pat_map f2 g2 h2 i2) (pat_map f1 g1 h1 i1)) }
+  
+  let lemma patl_map_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { patl_map (compose f2 f1) (compose g2 g1)
+                           (compose h2 h1) (compose i2 i1) =
+      compose (patl_map f2 g2 h2 i2) (patl_map f1 g1 h1 i1) }
+  = assert { extensional_equal (patl_map (compose f2 f1) (compose g2 g1)
+                                             (compose h2 h1) (compose i2 i1))
+    (compose (patl_map f2 g2 h2 i2) (patl_map f1 g1 h1 i1)) }
+  
+  let rec lemma t_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
+    ensures { t_map (compose f2 f1) (compose g2 g1)
+                       (compose h2 h1) (compose i2 i1) t =
+              t_map f2 g2 h2 i2 (t_map f1 g1 h1 i1 t) }
+    variant { t }
+  = let ghost rc = t_map_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match t with
+    | TApp _ _ l -> tl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1;
+      t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 t2
+    | TCase t lb -> rc t; brl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TForall _ t | TExists _ t ->
+      t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
+    ensures { tl_map (compose f2 f1) (compose g2 g1)
+                             (compose h2 h1) (compose i2 i1) tl =
+              tl_map f2 g2 h2 i2 (tl_map f1 g1 h1 i1 tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_map_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      tl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma brl_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
+    ensures { brl_map (compose f2 f1) (compose g2 g1)
+                              (compose h2 h1) (compose i2 i1) brl =
+              brl_map f2 g2 h2 i2 (brl_map f1 g1 h1 i1 brl) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_map_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      brl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma br_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
+    ensures { br_map (compose f2 f1) (compose g2 g1)
+                         (compose h2 h1) (compose i2 i1) br =
+              br_map f2 g2 h2 i2 (br_map f1 g1 h1 i1 br) }
+    variant { br }
+  = match br with
+    | (_,right) ->
+      t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 right
+    end
+  
+  let lemma t_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { t_map (compose f2 f1) (compose g2 g1)
+                       (compose h2 h1) (compose i2 i1) =
+              compose (t_map f2 g2 h2 i2) (t_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (t_map (compose f2 f1) (compose g2 g1) (compose h2 h1) (compose i2 i1))
+    (compose (t_map f2 g2 h2 i2) (t_map f1 g1 h1 i1)) }
+  
+  let lemma tl_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { tl_map (compose f2 f1) (compose g2 g1)
+                             (compose h2 h1) (compose i2 i1) =
+              compose (tl_map f2 g2 h2 i2) (tl_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+      (tl_map (compose f2 f1) (compose g2 g1)
+                     (compose h2 h1) (compose i2 i1))
+      (compose (tl_map f2 g2 h2 i2) (tl_map f1 g1 h1 i1)) }
+  
+  let lemma brl_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { brl_map (compose f2 f1) (compose g2 g1)
+                              (compose h2 h1) (compose i2 i1) =
+      compose (brl_map f2 g2 h2 i2) (brl_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (brl_map (compose f2 f1) (compose g2 g1)
+                     (compose h2 h1) (compose i2 i1))
+    (compose (brl_map f2 g2 h2 i2) (brl_map f1 g1 h1 i1)) }
+  
+  let lemma br_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
+    (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { br_map (compose f2 f1) (compose g2 g1)
+                         (compose h2 h1) (compose i2 i1) =
+      compose (br_map f2 g2 h2 i2) (br_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (br_map (compose f2 f1) (compose g2 g1)
+                (compose h2 h1) (compose i2 i1))
+    (compose (br_map f2 g2 h2 i2) (br_map f1 g1 h1 i1)) }
+  
+  (* Second, subst-then-rename. *)
+  
+  (* Need a small additional commutation lemma *)
+  
+  let lemma map_ty_var (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol) : unit
+    ensures { compose (ty_map f g) TyVar = compose TyVar f }
+  = assert { extensional_equal (compose (ty_map f g) TyVar) (compose TyVar f) }
+  
+  let lemma map_term_var (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
+    ensures { compose (t_map f g h i) TVar = compose TVar f }
+  = assert {
+    extensional_equal (compose (t_map f g h i) TVar) (compose TVar f) }
+  
+  let lemma smap_term_lifting (s:'a -> term 'tv1)
+    (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
+    ensures { let rn = t_map f g h i in
+      let rn' = t_map (bmap f:bind 'tv1 'bnd -> bind 'tv2 'bnd) g h i in
+      term_lift (compose rn s) = compose rn' (term_lift s) }
+  = assert { let rn = t_map f g h i in
+      let rn' = t_map (bmap f:bind 'tv1 'bnd -> bind 'tv2 'bnd) g h i in
+      let u1 = t_map Old identity identity identity in
+      let u2 = t_map Old identity identity identity in
+      let v1 = compose TVar Fresh in let v2 = compose TVar Fresh in
+      compose u1 rn = compose rn' u2 && compose rn' v2 = v1 &&
+      compose rn' (term_lift s) =
+        bfold (compose rn' (compose u2 s)) (compose rn' v2)
+    }
+  
+  let rec lemma ty_smap_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
+    ensures { let s2 = ty_map f2 g2 in
+      ty_subst (compose s2 f1) (compose g2 g1) ty =
+      ty_map f2 g2 (ty_subst f1 g1 ty) }
+    variant { ty }
+  = match ty with TyApp _ l -> ty_list_smap_compose f1 f2 g1 g2 l | _ -> () end
+  
+  with lemma ty_list_smap_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
+    ensures { let s2 = ty_map f2 g2 in
+      tyl_subst (compose s2 f1) (compose g2 g1) tyl =
+      tyl_map f2 g2 (tyl_subst f1 g1 tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_smap_compose f1 f2 g1 g2 x;
+      ty_list_smap_compose f1 f2 g1 g2 q
+    | _ -> () end
+  
+  let lemma ty_smap_ho_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { let s2 = ty_map f2 g2 in
+      ty_subst (compose s2 f1) (compose g2 g1) = compose s2 (ty_subst f1 g1) }
+  = assert { let s2 = ty_map f2 g2 in
+      extensional_equal (ty_subst (compose s2 f1) (compose g2 g1))
+      (compose s2 (ty_subst f1 g1)) }
+  
+  let lemma ty_list_smap_ho_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { let s2 = ty_map f2 g2 in
+      tyl_subst (compose s2 f1) (compose g2 g1) =
+      compose (tyl_map f2 g2) (tyl_subst f1 g1) }
+  = assert { let s2 = ty_map f2 g2 in
+      extensional_equal (tyl_subst (compose s2 f1) (compose g2 g1))
+      (compose (tyl_map f2 g2) (tyl_subst f1 g1)) }
+  
+  let rec lemma pat_smap_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
+    ensures { let s2 = ty_map g2 h2 in
+      pat_subst (compose f2 f1) (compose s2 g1)
+                (compose h2 h1) (compose i2 i1) p =
+      pat_map f2 g2 h2 i2 (pat_subst f1 g1 h1 i1 p) }
+    variant { p }
+  = let ghost rc = pat_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match p with
+    | PApp _ _ l -> pat_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
+    end
+  
+  with lemma pat_list_smap_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
+    ensures { let s2 = ty_map g2 h2 in
+      patl_subst (compose f2 f1) (compose s2 g1)
+                     (compose h2 h1) (compose i2 i1) pl =
+      patl_map f2 g2 h2 i2 (patl_subst f1 g1 h1 i1 pl) }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      pat_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  let lemma pat_smap_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = ty_map g2 h2 in
+      pat_subst (compose f2 f1) (compose s2 g1)
+                (compose h2 h1) (compose i2 i1) =
+      compose (pat_map f2 g2 h2 i2) (pat_subst f1 g1 h1 i1) }
+  = assert { let s2 = ty_map g2 h2 in
+      extensional_equal (pat_subst (compose f2 f1) (compose s2 g1)
+                                   (compose h2 h1) (compose i2 i1))
+        (compose (pat_map f2 g2 h2 i2) (pat_subst f1 g1 h1 i1)) }
+  
+  let lemma pat_list_smap_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = ty_map g2 h2 in
+      patl_subst (compose f2 f1) (compose s2 g1)
+                     (compose h2 h1) (compose i2 i1) =
+      compose (patl_map f2 g2 h2 i2) (patl_subst f1 g1 h1 i1) }
+  = assert { let s2 = ty_map g2 h2 in
+      extensional_equal (patl_subst (compose f2 f1) (compose s2 g1)
+                                        (compose h2 h1) (compose i2 i1))
+        (compose (patl_map f2 g2 h2 i2) (patl_subst f1 g1 h1 i1)) }
+  
+  let rec lemma term_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      t_subst (compose s2 f1) (compose s'2 g1)
+                 (compose h2 h1) (compose i2 i1) t =
+      t_map f2 g2 h2 i2 (t_subst f1 g1 h1 i1 t) }
+    variant { t }
+  = let ghost rc = term_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match t with
+    | TApp _ _ l -> term_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1;
+      term_smap_compose (term_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 t2
+    | TCase t lb -> rc t; branch_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TForall _ t | TExists _ t ->
+      term_smap_compose (term_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma term_list_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+              let s'2 = ty_map g2 h2 in
+      tl_subst (compose s2 f1) (compose s'2 g1)
+                    (compose h2 h1) (compose i2 i1) tl =
+      tl_map f2 g2 h2 i2 (tl_subst f1 g1 h1 i1 tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> term_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      term_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma branch_list_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      brl_subst (compose s2 f1) (compose s'2 g1)
+                        (compose h2 h1) (compose i2 i1) brl =
+      brl_map f2 g2 h2 i2 (brl_subst f1 g1 h1 i1 brl) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> branch_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      branch_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma branch_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      br_subst (compose s2 f1) (compose s'2 g1)
+                   (compose h2 h1) (compose i2 i1) br =
+      br_map f2 g2 h2 i2 (br_subst f1 g1 h1 i1 br) }
+    variant { br }
+  = match br with
+    | (_,right) ->
+      term_smap_compose (term_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 right
+    end
+  
+  let lemma term_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      t_subst (compose s2 f1) (compose s'2 g1)
+                 (compose h2 h1) (compose i2 i1) =
+      compose (t_map f2 g2 h2 i2) (t_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      extensional_equal
+  (t_subst (compose s2 f1) (compose s'2 g1) (compose h2 h1) (compose i2 i1))
+  (compose (t_map f2 g2 h2 i2) (t_subst f1 g1 h1 i1)) }
+  
+  let lemma term_list_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      tl_subst (compose s2 f1) (compose s'2 g1)
+                      (compose h2 h1) (compose i2 i1) =
+      compose (tl_map f2 g2 h2 i2) (tl_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+    extensional_equal
+      (tl_subst (compose s2 f1) (compose s'2 g1)
+                       (compose h2 h1) (compose i2 i1))
+      (compose (tl_map f2 g2 h2 i2) (tl_subst f1 g1 h1 i1)) }
+  
+  let lemma branch_list_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      brl_subst (compose s2 f1) (compose s'2 g1)
+                        (compose h2 h1) (compose i2 i1) =
+      compose (brl_map f2 g2 h2 i2) (brl_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+    extensional_equal
+    (brl_subst (compose s2 f1) (compose s'2 g1)
+                     (compose h2 h1) (compose i2 i1))
+    (compose (brl_map f2 g2 h2 i2) (brl_subst f1 g1 h1 i1)) }
+  
+  let lemma branch_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
+    (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+      br_subst (compose s2 f1) (compose s'2 g1)
+                   (compose h2 h1) (compose i2 i1) =
+      compose (br_map f2 g2 h2 i2) (br_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_map f2 g2 h2 i2 in
+      let s'2 = ty_map g2 h2 in
+    extensional_equal
+    (br_subst (compose s2 f1) (compose s'2 g1)
+                  (compose h2 h1) (compose i2 i1))
+    (compose (br_map f2 g2 h2 i2) (br_subst f1 g1 h1 i1)) }
+  
+  (* Third: rename-then-subst *)
+  
+  (* Need a small additional commutation lemma *)
+  let lemma maps_term_lifting (r:'a -> 'b) (s:'b -> term 'c) : unit
+    ensures { term_lift (compose s r) =
+      compose (term_lift s) (bmap r:bind 'a 'bnd -> bind 'b 'bnd) }
+  = assert { compose (term_lift s) (compose (Old:'b -> bind 'b 'bnd) r) =
+        compose (compose (t_map Old identity identity identity) s) r &&
+      compose (term_lift s) Fresh = compose TVar (Fresh:'bnd -> bind 'c 'bnd) }
+  
+  let rec lemma ty_maps_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
+    ensures { ty_subst (compose f2 f1) (compose g2 g1) ty =
+      ty_subst f2 g2 (ty_map f1 g1 ty) }
+    variant { ty }
+  = match ty with TyApp _ l -> tyl_maps_compose f1 f2 g1 g2 l | _ -> () end
+  
+  with lemma tyl_maps_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
+    ensures { tyl_subst (compose f2 f1) (compose g2 g1) tyl =
+      tyl_subst f2 g2 (tyl_map f1 g1 tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_maps_compose f1 f2 g1 g2 x;
+      tyl_maps_compose f1 f2 g1 g2 q
+    | _ -> () end
+  
+  let lemma ty_maps_ho_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { ty_subst (compose f2 f1) (compose g2 g1) =
+      compose (ty_subst f2 g2) (ty_map f1 g1) }
+  = assert { extensional_equal (ty_subst (compose f2 f1) (compose g2 g1))
+    (compose (ty_subst f2 g2) (ty_map f1 g1)) }
+  
+  let lemma tyl_maps_ho_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { tyl_subst (compose f2 f1) (compose g2 g1) =
+      compose (tyl_subst f2 g2) (tyl_map f1 g1) }
+  = assert { extensional_equal (tyl_subst (compose f2 f1) (compose g2 g1))
+    (compose (tyl_subst f2 g2) (tyl_map f1 g1)) }
+  
+  let rec lemma pat_maps_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
+    ensures { pat_subst (compose f2 f1) (compose g2 g1)
+                        (compose h2 h1) (compose i2 i1) p =
+              pat_subst f2 g2 h2 i2 (pat_map f1 g1 h1 i1 p) }
+    variant { p }
+  = let ghost rc = pat_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match p with
+    | PApp _ _ l -> patl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
+    end
+  
+  with lemma patl_maps_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
+    ensures { patl_subst (compose f2 f1) (compose g2 g1)
+                         (compose h2 h1) (compose i2 i1) pl =
+              patl_subst f2 g2 h2 i2 (patl_map f1 g1 h1 i1 pl) }
+    variant { pl }
+  = match pl with
+    | Cons x q -> patl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 q;
+      pat_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 x
+    | _ -> ()
+    end
+  
+  let lemma pat_maps_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { pat_subst (compose f2 f1) (compose g2 g1)
+                        (compose h2 h1) (compose i2 i1) =
+              compose (pat_subst f2 g2 h2 i2) (pat_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (pat_subst (compose f2 f1) (compose g2 g1) (compose h2 h1) (compose i2 i1))
+    (compose (pat_subst f2 g2 h2 i2) (pat_map f1 g1 h1 i1)) }
+  
+  let lemma patl_maps_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { patl_subst (compose f2 f1) (compose g2 g1)
+                             (compose h2 h1) (compose i2 i1) =
+            compose (patl_subst f2 g2 h2 i2) (patl_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+      (patl_subst (compose f2 f1) (compose g2 g1)
+                  (compose h2 h1) (compose i2 i1))
+      (compose (patl_subst f2 g2 h2 i2) (patl_map f1 g1 h1 i1)) }
+  
+  let rec lemma t_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
+    ensures { t_subst (compose f2 f1) (compose g2 g1)
+                      (compose h2 h1) (compose i2 i1) t =
+              t_subst f2 g2 h2 i2 (t_map f1 g1 h1 i1 t) }
+    variant { t }
+  = let ghost rc = t_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match t with
+    | TApp _ _ l -> tl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1;
+      t_maps_compose (bmap f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t2
+    | TCase t lb -> rc t; brl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TForall _ t | TExists _ t ->
+      t_maps_compose (bmap f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
+    ensures { tl_subst (compose f2 f1) (compose g2 g1)
+                       (compose h2 h1) (compose i2 i1) tl =
+              tl_subst f2 g2 h2 i2 (tl_map f1 g1 h1 i1 tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      tl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma brl_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
+    ensures { brl_subst (compose f2 f1) (compose g2 g1)
+                        (compose h2 h1) (compose i2 i1) brl =
+              brl_subst f2 g2 h2 i2 (brl_map f1 g1 h1 i1 brl) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      brl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma br_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
+    ensures { br_subst (compose f2 f1) (compose g2 g1)
+                       (compose h2 h1) (compose i2 i1) br =
+              br_subst f2 g2 h2 i2 (br_map f1 g1 h1 i1 br) }
+    variant { br }
+  = match br with
+    | (_,right) ->
+      t_maps_compose (bmap f1) (term_lift f2) g1 g2 h1 h2 i1 i2 right
+    end
+  
+  let lemma t_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { t_subst (compose f2 f1) (compose g2 g1)
+                         (compose h2 h1) (compose i2 i1) =
+              compose (t_subst f2 g2 h2 i2) (t_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (t_subst (compose f2 f1) (compose g2 g1) (compose h2 h1) (compose i2 i1))
+    (compose (t_subst f2 g2 h2 i2) (t_map f1 g1 h1 i1)) }
+  
+  let lemma tl_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { tl_subst (compose f2 f1) (compose g2 g1)
+                              (compose h2 h1) (compose i2 i1) =
+            compose (tl_subst f2 g2 h2 i2) (tl_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+      (tl_subst (compose f2 f1) (compose g2 g1)
+                       (compose h2 h1) (compose i2 i1))
+      (compose (tl_subst f2 g2 h2 i2) (tl_map f1 g1 h1 i1)) }
+  
+  let lemma brl_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { brl_subst (compose f2 f1) (compose g2 g1)
+                                (compose h2 h1) (compose i2 i1) =
+      compose (brl_subst f2 g2 h2 i2) (brl_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (brl_subst (compose f2 f1) (compose g2 g1)
+                       (compose h2 h1) (compose i2 i1))
+    (compose (brl_subst f2 g2 h2 i2) (brl_map f1 g1 h1 i1)) }
+  
+  let lemma br_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { br_subst (compose f2 f1) (compose g2 g1)
+                           (compose h2 h1) (compose i2 i1) =
+      compose (br_subst f2 g2 h2 i2) (br_map f1 g1 h1 i1) }
+  = assert { extensional_equal
+    (br_subst (compose f2 f1) (compose g2 g1)
+                  (compose h2 h1) (compose i2 i1))
+    (compose (br_subst f2 g2 h2 i2) (br_map f1 g1 h1 i1)) }
+  
+  (* Last part: subst-subst composition. *)
+  
+  (* Need a small additional commutation lemma *)
+  
+  let lemma subst_ty_var (f:ty_var -> ty) (g:ty_symbol -> ty_symbol) : unit
+    ensures { compose (ty_subst f g) TyVar = f }
+  = assert { extensional_equal (compose (ty_subst f g) TyVar) f }
+  
+  let lemma subst_term_var (f:'tv1 -> term 'tv2)
+    (g:ty_var -> ty) (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
+    ensures { compose (t_subst f g h i) TVar = f }
+  = assert { extensional_equal (compose (t_subst f g h i) TVar) f }
+  
+  let lemma subst_term_lifting (s:'a -> term 'tv1) (f:'tv1 -> term 'tv2)
+    (g:ty_var -> ty) (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
+    ensures { let sn = t_subst f g h i in
+      let lf = (term_lift f:bind 'tv1 'bnd -> term (bind 'tv2 'bnd)) in
+      let sn' = t_subst lf g h i in
+      term_lift (compose sn s) = compose sn' (term_lift s) }
+  = assert { let sn = t_subst f g h i in
+      let lf = (term_lift f:bind 'tv1 'bnd -> term (bind 'tv2 'bnd)) in
+      let sn' = t_subst lf g h i in
+      let u1 = t_map Old identity identity identity in
+      let u2 = t_map Old identity identity identity in
+      let v1 = compose TVar Fresh in let v2 = compose TVar Fresh in
+      compose u1 f = compose lf Old &&
+      compose u1 sn = compose sn' u2 && compose sn' v2 = v1 &&
+      compose sn' (term_lift s) =
+        bfold (compose sn' (compose u2 s)) (compose sn' v2)
+    }
+  
+  let rec lemma ty_subst_compose (f1 f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
+    ensures { let s2 = ty_subst f2 g2 in
+      ty_subst (compose s2 f1) (compose g2 g1) ty =
+      ty_subst f2 g2 (ty_subst f1 g1 ty) }
+    variant { ty }
+  = match ty with TyApp _ l -> tyl_subst_compose f1 f2 g1 g2 l | _ -> () end
+  
+  with lemma tyl_subst_compose (f1 f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
+    ensures { let s2 = ty_subst f2 g2 in
+      tyl_subst (compose s2 f1) (compose g2 g1) tyl =
+      tyl_subst f2 g2 (tyl_subst f1 g1 tyl) }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_subst_compose f1 f2 g1 g2 x;
+      tyl_subst_compose f1 f2 g1 g2 q
+    | _ -> () end
+  
+  let lemma ty_subst_ho_compose (f1 f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { let s2 = ty_subst f2 g2 in
+      ty_subst (compose s2 f1) (compose g2 g1) = compose s2 (ty_subst f1 g1) }
+  = assert { let s2 = ty_subst f2 g2 in
+      extensional_equal (ty_subst (compose s2 f1) (compose g2 g1))
+      (compose s2 (ty_subst f1 g1)) }
+  
+  let lemma tyl_subst_ho_compose (f1 f2:ty_var -> ty)
+    (g1 g2:ty_symbol -> ty_symbol) : unit
+    ensures { let s2 = ty_subst f2 g2 in
+      tyl_subst (compose s2 f1) (compose g2 g1) =
+        compose (tyl_subst f2 g2) (tyl_subst f1 g1) }
+  = assert { let s2 = ty_subst f2 g2 in
+      extensional_equal (tyl_subst (compose s2 f1) (compose g2 g1))
+      (compose (tyl_subst f2 g2) (tyl_subst f1 g1)) }
+  
+  let rec lemma pat_subst_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
+    ensures { let s2 = ty_subst g2 h2 in
+      pat_subst (compose f2 f1) (compose s2 g1)
+                (compose h2 h1) (compose i2 i1) p =
+      pat_subst f2 g2 h2 i2 (pat_subst f1 g1 h1 i1 p) }
+    variant { p }
+  = let ghost rc = pat_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match p with
+    | PApp _ _ l -> patl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
+    end
+  
+  with lemma patl_subst_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
+    ensures { let s2 = ty_subst g2 h2 in
+      patl_subst (compose f2 f1) (compose s2 g1)
+                 (compose h2 h1) (compose i2 i1) pl =
+      patl_subst f2 g2 h2 i2 (patl_subst f1 g1 h1 i1 pl) }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      patl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  let lemma pat_subst_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = ty_subst g2 h2 in
+      pat_subst (compose f2 f1) (compose s2 g1)
+                (compose h2 h1) (compose i2 i1) =
+      compose (pat_subst f2 g2 h2 i2) (pat_subst f1 g1 h1 i1) }
+  = assert { let s2 = ty_subst g2 h2 in
+      extensional_equal
+  (pat_subst (compose f2 f1) (compose s2 g1) (compose h2 h1) (compose i2 i1))
+  (compose (pat_subst f2 g2 h2 i2) (pat_subst f1 g1 h1 i1)) }
+  
+  let lemma patl_subst_ho_compose (f1 f2:pat_var -> pat_var)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = ty_subst g2 h2 in
+      patl_subst (compose f2 f1) (compose s2 g1)
+                 (compose h2 h1) (compose i2 i1) =
+      compose (patl_subst f2 g2 h2 i2) (patl_subst f1 g1 h1 i1) }
+  = assert { let s2 = ty_subst g2 h2 in
+    extensional_equal
+      (patl_subst (compose f2 f1) (compose s2 g1)
+                      (compose h2 h1) (compose i2 i1))
+      (compose (patl_subst f2 g2 h2 i2) (patl_subst f1 g1 h1 i1)) }
+  
+  let rec lemma t_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      t_subst (compose s2 f1) (compose s'2 g1)
+              (compose h2 h1) (compose i2 i1) t =
+      t_subst f2 g2 h2 i2 (t_subst f1 g1 h1 i1 t) }
+    variant { t }
+  = let ghost rc = t_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 in
+    match t with
+    | TApp _ _ l -> tl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1;
+      t_subst_compose (term_lift f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t2
+    | TCase t lb -> rc t; brl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 lb
+    | TForall _ t | TExists _ t ->
+      t_subst_compose (term_lift f1) (term_lift f2) g1 g2 h1 h2 i1 i2 t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+              let s'2 = ty_subst g2 h2 in
+      tl_subst (compose s2 f1) (compose s'2 g1)
+               (compose h2 h1) (compose i2 i1) tl =
+      tl_subst f2 g2 h2 i2 (tl_subst f1 g1 h1 i1 tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      tl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma brl_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      brl_subst (compose s2 f1) (compose s'2 g1)
+                (compose h2 h1) (compose i2 i1) brl =
+      brl_subst f2 g2 h2 i2 (brl_subst f1 g1 h1 i1 brl) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 x;
+      brl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 q
+    | _ -> ()
+    end
+  
+  with lemma br_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      br_subst (compose s2 f1) (compose s'2 g1)
+               (compose h2 h1) (compose i2 i1) br =
+      br_subst f2 g2 h2 i2 (br_subst f1 g1 h1 i1 br) }
+    variant { br }
+  = match br with
+    | (_,right) ->
+      t_subst_compose (term_lift f1) (term_lift f2) g1 g2 h1 h2 i1 i2 right
+    end
+  
+  let lemma t_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      t_subst (compose s2 f1) (compose s'2 g1)
+                 (compose h2 h1) (compose i2 i1) =
+      compose (t_subst f2 g2 h2 i2) (t_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      extensional_equal
+  (t_subst (compose s2 f1) (compose s'2 g1) (compose h2 h1) (compose i2 i1))
+  (compose (t_subst f2 g2 h2 i2) (t_subst f1 g1 h1 i1)) }
+  
+  let lemma tl_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      tl_subst (compose s2 f1) (compose s'2 g1)
+                      (compose h2 h1) (compose i2 i1) =
+      compose (tl_subst f2 g2 h2 i2) (tl_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+    extensional_equal
+      (tl_subst (compose s2 f1) (compose s'2 g1)
+                       (compose h2 h1) (compose i2 i1))
+      (compose (tl_subst f2 g2 h2 i2) (tl_subst f1 g1 h1 i1)) }
+  
+  let lemma brl_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      brl_subst (compose s2 f1) (compose s'2 g1)
+                        (compose h2 h1) (compose i2 i1) =
+      compose (brl_subst f2 g2 h2 i2) (brl_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+    extensional_equal
+    (brl_subst (compose s2 f1) (compose s'2 g1)
+                     (compose h2 h1) (compose i2 i1))
+    (compose (brl_subst f2 g2 h2 i2) (brl_subst f1 g1 h1 i1)) }
+  
+  let lemma br_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
+    (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
+    (i1 i2:lsymbol -> lsymbol) : unit
+    ensures { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+      br_subst (compose s2 f1) (compose s'2 g1)
+                   (compose h2 h1) (compose i2 i1) =
+      compose (br_subst f2 g2 h2 i2) (br_subst f1 g1 h1 i1) }
+  = assert { let s2 = t_subst f2 g2 h2 i2 in
+      let s'2 = ty_subst g2 h2 in
+    extensional_equal
+    (br_subst (compose s2 f1) (compose s'2 g1)
+                  (compose h2 h1) (compose i2 i1))
+    (compose (br_subst f2 g2 h2 i2) (br_subst f1 g1 h1 i1)) }
+  
+  (* identity substitution is indeed identity. *)
+  
+  let lemma term_lift_id () : unit
+    ensures { (TVar:bind 'a 'e -> term (bind 'a 'e)) = term_lift TVar }
+  = assert { extensional_equal (term_lift TVar)
+                               (TVar:bind 'a 'e -> term (bind 'a 'e)) }
+  
+  let rec lemma ty_subst_id (ty:ty) : unit
+    ensures { ty_subst TyVar identity ty = ty }
+    variant { ty }
+  = match ty with
+    | TyApp _ l -> tyl_subst_id l
+    | _ -> ()
+    end
+  
+  with lemma tyl_subst_id (tyl:list ty) : unit
+    ensures { tyl_subst TyVar identity tyl = tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_subst_id x; tyl_subst_id q
+    | _ -> ()
+    end
+  
+  let lemma ty_subst_ho_id () : unit
+    ensures { ty_subst TyVar identity = identity }
+  = assert { extensional_equal (ty_subst TyVar identity) identity }
+  
+  let lemma tyl_subst_ho_id () : unit
+    ensures { tyl_subst TyVar identity = identity }
+  = assert { extensional_equal (tyl_subst TyVar identity) identity }
+  
+  let rec lemma pat_subst_id (p:pattern) : unit
+    ensures { pat_subst identity TyVar identity identity p = p }
+    variant { p }
+  = let ghost rc = pat_subst_id in
+    match p with
+    | PApp _ _ l -> patl_subst_id l
+    | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
+    end
+  
+  with lemma patl_subst_id (pl:list pattern) : unit
+    ensures { patl_subst identity TyVar identity identity pl = pl }
+    variant { pl }
+  = match pl with
+    | Cons x q -> pat_subst_id x; patl_subst_id q
+    | _ -> ()
+    end
+  
+  let lemma pat_subst_ho_id () : unit
+    ensures { pat_subst identity TyVar identity identity = identity }
+  = assert {
+      extensional_equal (pat_subst identity TyVar identity identity) identity }
+  
+  let lemma patl_subst_ho_id () : unit
+    ensures { patl_subst identity TyVar identity identity = identity }
+  = assert {
+      extensional_equal (patl_subst identity TyVar identity identity) identity }
+  
+  let rec lemma t_subst_id (t:term 'a) : unit
+    ensures { t_subst TVar TyVar identity identity t = t }
+    variant { t }
+  = let ghost rc = t_subst_id in
+    match t with
+    | TApp _ _ l -> tl_subst_id l
+    | TIf b t e -> rc b; rc t; rc e
+    | TLet t1 t2 -> rc t1; rc t2
+    | TCase t lb -> rc t; brl_subst_id lb
+    | TForall _ t | TExists _ t -> rc t
+    | TAnd t1 t2 | TOr t1 t2 | TImplies t1 t2 | TIff t1 t2 -> rc t1; rc t2
+    | TNot t -> rc t
+    | _ -> ()
+    end
+  
+  with lemma tl_subst_id (tl:list (term 'a)) : unit
+    ensures { tl_subst TVar TyVar identity identity tl = tl }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_subst_id x; tl_subst_id q
+    | _ -> ()
+    end
+  
+  with lemma brl_subst_id (brl:list (branch 'a)) : unit
+    ensures { brl_subst TVar TyVar identity identity brl = brl }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_subst_id x; brl_subst_id q
+    | _ -> ()
+    end
+  
+  with lemma br_subst_id (br:branch 'a) : unit
+    ensures { br_subst TVar TyVar identity identity br = br }
+    variant { br }
+  = match br with (_,right) -> t_subst_id right end
+  
+  let lemma t_subst_ho_id ()
+    ensures { t_subst TVar TyVar identity identity =
+      (identity:term 'a -> term 'a) }
+  = assert { extensional_equal (t_subst TVar TyVar identity identity)
+      (identity:term 'a -> term 'a) }
+  
+  let lemma tl_subst_ho_id ()
+    ensures { tl_subst TVar TyVar identity identity =
+      (identity:list (term 'a) -> list (term 'a)) }
+  = assert { extensional_equal (tl_subst TVar TyVar identity identity)
+      (identity:list (term 'a) -> list (term 'a)) }
+  
+  let lemma brl_subst_ho_id ()
+    ensures { brl_subst TVar TyVar identity identity =
+      (identity:list (branch 'a) -> list (branch 'a)) }
+  = assert { extensional_equal (brl_subst TVar TyVar identity identity)
+      (identity:list (branch 'a) -> list (branch 'a)) }
+  
+  let lemma br_subst_ho_id ()
+    ensures { br_subst TVar TyVar identity identity =
+      (identity:branch 'a -> branch 'a) }
+  = assert { extensional_equal (br_subst TVar TyVar identity identity)
+      (identity:branch 'a -> branch 'a) }
+  
+  (* Renamings as substitutions. *)
+  
+  let lemma ty_map_as_subst (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
+    (ty:ty)
+    ensures { ty_map f g ty = ty_subst (compose TyVar f) g ty }
+  = ()
+  
+  let lemma ty_map_as_subst_ho (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
+    ensures { ty_map f g = ty_subst (compose TyVar f) g }
+  = ()
+  
+  let lemma tyl_map_as_subst (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
+    (tyl:list ty)
+    ensures { tyl_map f g tyl = tyl_subst (compose TyVar f) g tyl }
+  = ()
+  
+  let lemma tyl_map_as_subst_ho (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
+    ensures { tyl_map f g = tyl_subst (compose TyVar f) g }
+  = assert { extensional_equal (tyl_map f g) (tyl_subst (compose TyVar f) g) }
+  
+  let lemma pat_map_as_subst (f:pat_var -> pat_var) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (p:pattern)
+    ensures { pat_map f g h i p = pat_subst f (compose TyVar g) h i p }
+  = assert { pat_subst f (compose TyVar g) h i p =
+      pat_subst identity TyVar identity identity (pat_map f g h i p) }
+  
+  let lemma pat_map_as_subst_ho (f:pat_var -> pat_var) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    ensures { pat_map f g h i = pat_subst f (compose TyVar g) h i }
+  = assert { extensional_equal (pat_map f g h i)
+      (pat_subst f (compose TyVar g) h i) }
+  
+  let lemma patl_map_as_subst (f:pat_var -> pat_var) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (pl:list pattern)
+    ensures { patl_map f g h i pl = patl_subst f (compose TyVar g) h i pl }
+  = assert { patl_subst f (compose TyVar g) h i pl =
+      patl_subst identity TyVar identity identity (patl_map f g h i pl) }
+  
+  let lemma patl_map_as_subst_ho (f:pat_var -> pat_var) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
+    ensures { patl_map f g h i = patl_subst f (compose TyVar g) h i }
+  = assert { extensional_equal (patl_map f g h i)
+      (patl_subst f (compose TyVar g) h i) }
+  
+  let lemma t_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (t:term 'tv1)
+    ensures { t_map f g h i t =
+      t_subst (compose TVar f) (compose TyVar g) h i t }
+  = assert { t_subst (compose TVar f) (compose TyVar g) h i t =
+      t_subst TVar TyVar identity identity (t_map f g h i t) }
+  
+  let lemma t_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    ensures { t_map f g h i =
+      t_subst (compose TVar f) (compose TyVar g) h i }
+  = assert { extensional_equal (t_map f g h i)
+      (t_subst (compose TVar f) (compose TyVar g) h i) }
+  
+  let lemma tl_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (tl:list (term 'tv1))
+    ensures { tl_map f g h i tl =
+      tl_subst (compose TVar f) (compose TyVar g) h i tl }
+  = assert { tl_subst (compose TVar f) (compose TyVar g) h i tl =
+      tl_subst TVar TyVar identity identity (tl_map f g h i tl) }
+  
+  let lemma tl_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    ensures { tl_map f g h i =
+      tl_subst (compose TVar f) (compose TyVar g) h i }
+  = assert { extensional_equal (tl_map f g h i)
+      (tl_subst (compose TVar f) (compose TyVar g) h i) }
+  
+  let lemma brl_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (brl:list (branch 'tv1))
+    ensures { brl_map f g h i brl =
+      brl_subst (compose TVar f) (compose TyVar g) h i brl }
+  = assert { brl_subst (compose TVar f) (compose TyVar g) h i brl =
+      brl_subst TVar TyVar identity identity (brl_map f g h i brl) }
+  
+  let lemma brl_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    ensures { brl_map f g h i =
+      brl_subst (compose TVar f) (compose TyVar g) h i }
+  = assert { extensional_equal (brl_map f g h i)
+      (brl_subst (compose TVar f) (compose TyVar g) h i) }
+  
+  let lemma br_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (br:branch 'tv1)
+    ensures { br_map f g h i br =
+      br_subst (compose TVar f) (compose TyVar g) h i br }
+  = assert { br_subst (compose TVar f) (compose TyVar g) h i br =
+      br_subst TVar TyVar identity identity (br_map f g h i br) }
+  
+  let lemma br_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
+    (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
+    ensures { br_map f g h i =
+      br_subst (compose TVar f) (compose TyVar g) h i }
+  = assert { extensional_equal (br_map f g h i)
+      (br_subst (compose TVar f) (compose TyVar g) h i) }
+  
+end
+
+(* Regroup all purely syntactic definitions. *)
+module All
+  
+  use export Commutations
+  use export SubstVarsIn
+  use export SubstList
+  use export FreeVarsIn
+  
+end
+
+

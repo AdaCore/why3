@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -91,6 +91,9 @@ val forget_id : ident_printer -> ident -> unit
 
 val forget_all : ident_printer -> unit
 (** forget all idents *)
+
+val sanitizer' : (char -> string) -> (char -> string) -> (char -> string) -> string -> string
+(** generic sanitizer taking a separate encoder for the first and last letter *)
 
 val sanitizer : (char -> string) -> (char -> string) -> string -> string
 (** generic sanitizer taking a separate encoder for the first letter *)

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -143,16 +143,17 @@ LIB_UTIL = config bigInt util opt lists strings \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
-	   task pretty dterm env trans printer
+	   task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
-	     whyconf autodetection
+	     whyconf autodetection parse_cvc4_z3_model
 
 LIB_MLW = ity expr dexpr
 
 LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
+		detect_polymorphism \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
@@ -160,7 +161,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		encoding_guards encoding_tags encoding_twin \
 		encoding_sort simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
-		eliminate_epsilon \
+		eliminate_epsilon intro_projections_counterexmp \
 		eval_match instantiate_predicate smoke_detector \
 		reduction_engine compute induction_pr prop_curry \
 		gnat_float rec_logic eliminate_bounded_types \
@@ -941,7 +942,7 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 COQLIBS_BOOL_FILES = Bool
 COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
 
-COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt Real RealInfix Square Trigonometry
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
@@ -1015,7 +1016,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1372,8 +1373,8 @@ CLEANLIBS += lib/why3/why3extract
 
 ifeq (@enable_frama_c@,yes)
 
-byte: jessie.byte
-opt: jessie.opt
+nobyte: jessie.byte
+noopt: jessie.opt
 
 jessie.byte: src/jessie/Makefile lib/why3/why3.cma
 	@$(MAKE) -C src/jessie Jessie3.cma
@@ -1914,12 +1915,18 @@ dist: $(EXTRA_DIST)
 # file headers
 ###############
 
-headers:
+headers: headers-coq
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*/*.ml src/*/*.ml[iyl] \
-		plugins/*/*.ml plugins/*/*.ml[ily] src/tools/cpulimit.c \
+		src/*/*.ml src/*/*.ml[iyl4] \
+		plugins/*/*.ml plugins/*/*.ml[ily] \
+		lib/coq-tactic/*.v lib/coq/*.v \
+		src/tools/cpulimit.c \
 		examples/use_api/*.ml
+
+headers-coq:
+	headache -c misc/headache_config.txt -h misc/header.txt \
+		lib/coq/*/*.v
 
 #########
 # myself

@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <file name="../support.mlw" expanded="true">
 <theory name="HO" sum="cacf043d990e8fc0b8032e0b3427633c">
  <goal name="WP_parameter extensionality" expl="VC for extensionality">
@@ -13,74 +13,89 @@
   <goal name="WP_parameter extensionality.1" expl="1. assertion">
   <transf name="inline_goal">
    <goal name="WP_parameter extensionality.1.1" expl="1. assertion">
-   <proof prover="3"><result status="valid" time="0.01" steps="1"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter extensionality.2" expl="2. postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter compose_associative" expl="VC for compose_associative">
- <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter id_neutral" expl="VC for id_neutral">
- <proof prover="3"><result status="valid" time="0.01" steps="43"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
  <goal name="WP_parameter compose_const_right" expl="VC for compose_const_right">
- <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="WP_parameter compose_const_left" expl="VC for compose_const_left">
- <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="WP_parameter ho_ite_compose_left" expl="VC for ho_ite_compose_left">
- <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="Bind" sum="052c79c65246d9ae2ba93971e7aa46ab">
+<theory name="PartialMap" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+</theory>
+<theory name="Bind" sum="84c5d9efd8b9cef1a2a2d90187a06512">
  <goal name="WP_parameter bfold_identity" expl="VC for bfold_identity">
- <proof prover="3"><result status="valid" time="0.04" steps="36"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="34"/></proof>
  </goal>
  <goal name="WP_parameter bfold_compose" expl="VC for bfold_compose">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bfold_compose.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter bfold_compose.1.1" expl="1. assertion">
-   <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
    <goal name="WP_parameter bfold_compose.1.2" expl="2. assertion">
-   <proof prover="3"><result status="valid" time="0.01" steps="2"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
    </goal>
    <goal name="WP_parameter bfold_compose.1.3" expl="3. assertion">
-   <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
    </goal>
    <goal name="WP_parameter bfold_compose.1.4" expl="4. assertion">
-   <proof prover="3"><result status="valid" time="0.01" steps="2"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter bfold_compose.2" expl="2. postcondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.14"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter bfold_constructor" expl="VC for bfold_constructor">
- <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
  </goal>
  <goal name="bmap_compose">
- <proof prover="0"><result status="unknown" time="0.84"/></proof>
- <proof prover="1"><result status="valid" time="0.09"/></proof>
- <proof prover="3"><result status="unknown" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="bmap_id">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="close_fold">
- <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="Choice" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+<theory name="Choice" sum="68e1b9014aa75a68b118b93980778ee0" expanded="true">
+ <goal name="WP_parameter choose" expl="VC for choose">
+ <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ </goal>
+</theory>
+<theory name="Finite" sum="7bd24662c8f9c694425089ee7fd83fb5" expanded="true">
+ <goal name="WP_parameter cardinal_remove" expl="VC for cardinal_remove">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter cardinal_remove.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_remove.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
 </theory>
 </file>
 </why3session>

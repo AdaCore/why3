@@ -1,0 +1,163 @@
+
+(** {1 Sequences}
+
+    This file provides a basic theory of sequences.
+*)
+
+(** {2 Sequences and basic operations} *)
+
+theory Seq
+
+  use import int.Int
+
+  (** the polymorphic type of sequences *)
+
+  type seq 'a
+
+  (** [seq 'a] is an infinite type *)
+  meta "infinite_type" type seq
+
+  (** length *)
+
+  function length (seq 'a) : int
+
+  axiom length_nonnegative:
+    forall s: seq 'a. 0 <= length s
+
+  (** empty sequence *)
+
+  constant empty : seq 'a
+
+  axiom empty_length:
+    length (empty: seq 'a) = 0
+
+  (** n-th element *)
+
+  function ([]) (seq 'a) int : 'a
+    (** [s[i]] is the ([i]+1)-th element of sequence [s]
+        (the first element has index 0) *)
+
+  (** equality *)
+
+  predicate (==) (s1 s2: seq 'a) =
+    length s1 = length s2 &&
+    forall i: int. 0 <= i < length s1 -> s1[i] = s2[i]
+
+  axiom extensionality:
+    forall s1 s2: seq 'a. s1 == s2 -> s1 = s2
+
+  (** insertion of elements on both sides *)
+
+  function cons 'a (seq 'a) : seq 'a
+
+  axiom cons_length:
+    forall x: 'a, s: seq 'a. length (cons x s) = 1 + length s
+
+  axiom cons_get:
+    forall x: 'a, s: seq 'a, i: int. 0 <= i <= length s ->
+    (cons x s)[i] = if i = 0 then x else s[i-1]
+
+  function snoc (seq 'a) 'a : seq 'a
+
+  axiom snoc_length:
+    forall s: seq 'a, x: 'a. length (snoc s x) = 1 + length s
+
+  axiom snoc_get:
+    forall s: seq 'a, x: 'a, i: int. 0 <= i <= length s ->
+    (snoc s x)[i] = if i < length s then s[i] else x
+
+  (** sub-sequence *)
+
+  function ([_.._]) (seq 'a) int int : seq 'a
+    (** [s[i..j]] is the sub-sequence of [s] from element [i] included
+        to element [j] excluded *)
+
+  axiom sub_length:
+    forall s: seq 'a, i j: int. 0 <= i <= j <= length s ->
+    length s[i..j] = j - i
+
+  axiom sub_get:
+    forall s: seq 'a, i j: int. 0 <= i <= j <= length s ->
+    forall k: int. 0 <= k < j - i -> s[i..j][k] = s[i + k]
+
+  function ([_..]) (s: seq 'a) (i: int) : seq 'a =
+    s[i .. length s]
+
+  function ([.._]) (s: seq 'a) (j: int) : seq 'a =
+    s[0 .. j]
+
+  (** concatenation *)
+
+  function (++) (seq 'a) (seq 'a) : seq 'a
+
+  axiom concat_length:
+    forall s1 s2: seq 'a. length (s1 ++ s2) = length s1 + length s2
+
+  axiom concat_get1:
+    forall s1 s2: seq 'a, i: int. 0 <= i < length s1 ->
+    (s1 ++ s2)[i] = s1[i]
+
+  axiom concat_get2:
+    forall s1 s2: seq 'a, i: int. length s1 <= i < length s1 + length s2 ->
+    (s1 ++ s2)[i] = s2[i - length s1]
+
+  (** sequence comprehension *)
+
+  use HighOrd
+
+  function create (len: int) (f: int -> 'a) : seq 'a
+
+  axiom create_length:
+    forall len: int, f: int -> 'a.
+    0 <= len -> length (create len f) = len
+
+  axiom create_get:
+    forall len: int, f: int -> 'a, i: int. 0 <= i < len ->
+    (create len f)[i] = f i
+
+end
+
+theory ToList
+  use import int.Int
+  use import Seq
+  use import list.List
+
+  function to_list (a: seq 'a) : list 'a
+
+  axiom to_list_empty:
+    to_list (empty: seq 'a) = (Nil: list 'a)
+
+  axiom to_list_cons:
+    forall s: seq 'a. 0 < length s ->
+    to_list s = Cons s[0] (to_list s[1 ..])
+
+  use list.Length as ListLength
+
+  lemma to_list_length:
+    forall s: seq 'a. ListLength.length (to_list s) = length s
+
+  use list.Nth as ListNth
+  use import option.Option
+
+  lemma to_list_nth:
+    forall s: seq 'a, i: int. 0 <= i < length s ->
+    ListNth.nth i (to_list s) = Some s[i]
+
+end
+
+(* TODO / TO DISCUSS
+
+  - what about s[i..j] when i..j is not a valid range?
+    left undefined? empty sequence?
+
+  - what about negative index e.g. s[-3..] for the last three elements?
+
+  - a syntax for cons and snoc?
+
+  - create: better name? move to a separate theory?
+
+  - UNPLEASANT: we cannot write s[1..] because 1. is recognized as a float
+    so we have to write s[1 ..]
+
+*)
+

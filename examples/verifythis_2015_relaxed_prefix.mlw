@@ -1,0 +1,164 @@
+
+(**
+
+{1 VerifyThis @ ETAPS 2015 competition, Challenge 1: Relaxed Prefix}
+
+{h
+
+The following is the original description of the verification task,
+reproduced verbatim from
+<a href="http://etaps2015.verifythis.org/challenges">the competition web site</a>.
+
+<pre>
+RELAXED PREFIX (60 minutes)
+===========================
+
+
+Description
+-----------
+
+Verify a function isRelaxedPrefix determining if a list _pat_ (for
+pattern) is a relaxed prefix of another list _a_.
+
+The relaxed prefix property holds iff _pat_ is a prefix of _a_ after
+removing at most one element from _pat_.
+
+
+Examples
+--------
+
+pat = {1,3}   is a relaxed prefix of a = {1,3,2,3} (standard prefix)
+
+pat = {1,2,3} is a relaxed prefix of a = {1,3,2,3} (remove 2 from pat)
+
+pat = {1,2,4} is not a relaxed prefix of a = {1,3,2,3}.
+
+
+Implementation notes
+--------------------
+
+You can implement lists as arrays, e.g., of integers. A reference
+implementation is given below. It may or may not contain errors.
+
+
+public class Relaxed {
+
+    public static boolean isRelaxedPrefix(int[] pat, int[] a) {
+        int shift = 0;
+
+        for(int i=0; i<pat.length; i++) {
+            if (pat[i]!=a[i-shift])
+                if (shift==0) shift=1;
+                    else return false;
+        }
+        return true;
+    }
+
+
+    public static void main(String[] argv) {
+        int[] pat = {1,2,3};
+        int[] a1 = {1,3,2,3};
+        System.out.println(isRelaxedPrefix(pat, a1));
+    }
+
+}
+
+
+
+Advanced verification task (if you get bored)
+---------------------------------------------
+
+Implement and verify a function relaxedContains(pat, a) returning
+whether _a_ contains _pat_ in the above relaxed sense, i.e., whether
+_pat_ is a relaxed prefix of any suffix of _a_.
+</pre>}
+
+The following is the solution by Jean-Christophe Filliâtre (CNRS)
+and Guillaume Melquiond (Inria) who entered the competition as "team Why3".
+
+*)
+
+module RelaxedPrefix
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+
+  type char
+
+  (** [a1[ofs1..ofs1+len]] and [a2[ofs2..ofs2+len]] are valid sub-arrays
+      and they are equal *)
+  predicate eq_array (a1: array char) (ofs1: int)
+                     (a2: array char) (ofs2: int) (len: int) =
+    0 <= len /\ 0 <= ofs1 /\ 0 <= ofs2 /\
+    ofs1 + len <= length a1 /\ ofs2 + len <= length a2 /\
+    forall i: int. 0 <= i < len -> a1[ofs1 + i] = a2[ofs2 + i]
+
+  (** The target property.  Note that this definition imposes the
+      index of the character which is ignored (index [i] in the existential
+      quantifier). It simplifies our proof, but a looser definition would
+      be possible (see the comment at the end of this file). *)
+
+  predicate is_relaxed_prefix (pat a: array char) =
+    let n = length pat in
+       eq_array pat 0 a 0 n
+    \/ exists i: int. 0 <= i < n /\
+                      eq_array pat 0 a 0 i /\
+                      (i = length a \/ pat[i] <> a[i]) /\
+                      eq_array pat (i+1) a i (n - i - 1)
+
+  (** This exception is used to exit the loop as soon as the target
+      property is no more possible. *)
+
+  exception NoPrefix
+
+  (** Note regarding the code: the suggested pseudo-code is buggy, as it
+      may access [a] out of bounds. We fix it by strengthening the
+      test in the conditional. *)
+
+  let is_relaxed_prefix (pat a: array char) : bool
+    ensures { result <-> is_relaxed_prefix pat a }
+  =
+    let n = length pat in
+    let m = length a in
+    try
+      let shift = ref 0 in
+      let ghost ignored = ref 0 in
+      for i = 0 to n - 1 do
+        invariant { 0 <= !shift <= 1 }
+        invariant { i = 0 -> !shift = 0 }
+        invariant { !shift = 1 -> 0 <= !ignored < i }
+        invariant { m + !shift >= i }
+        invariant {
+          if !shift = 0 then eq_array pat 0 a 0 i
+          else eq_array pat 0 a 0 !ignored /\
+               eq_array pat (!ignored + 1) a !ignored (i - !ignored - 1) /\
+               not (eq_array pat 0 a 0 i) /\
+               (!ignored < m -> pat[!ignored] <> a[!ignored]) }
+        if i - !shift >= m || pat[i] <> a[i - !shift] then begin
+          if !shift = 1 then raise NoPrefix;
+          ignored := i;
+          shift := 1;
+        end
+      done;
+      True
+    with NoPrefix ->
+      False
+    end
+
+  (** a simpler definition of [is_relaxed_prefix] would be the following: *)
+
+  predicate simple_is_relaxed_prefix (pat a: array char) =
+    let n = length pat in
+       eq_array pat 0 a 0 n
+    \/ exists i: int. 0 <= i < n /\
+                      eq_array pat 0 a 0 i /\
+                      eq_array pat (i+1) a i (n - i - 1)
+
+  (* TODO: prove the equivalence
+  lemma equivalence:
+    forall pat a: array char.
+    is_relaxed_prefix pat a <-> simple_is_relaxed_prefix pat a
+  *)
+
+end

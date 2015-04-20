@@ -2,13 +2,14 @@
 [jessie3] Why3 environment loaded.
 [jessie3] Loading Why3 theories...
 [jessie3] Loading Why3 modules...
-[kernel] preprocessing with "gcc -C -E -I.  tests/basic/incr.c"
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] Parsing tests/basic/incr.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
 [jessie3] processing function f
-[jessie3] created program function f (757)
+[jessie3] created program function f (67)
 [jessie3] processing function h
-[jessie3] created program function h (763)
+[jessie3] created program function h (73)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
 [jessie3] made 3 function(s)
@@ -60,4 +61,4 @@
             end
 [jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
 [jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2 (WP_parameter h): Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 2 (WP_parameter h): Valid, Valid, Valid, Timeout, Timeout

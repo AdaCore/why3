@@ -1,0 +1,325 @@
+(* Why3 driver for SMT-LIB2, common part of bit-vector theories *)
+
+prelude ";;; SMT-LIB2 driver: bit-vectors, common part"
+
+theory bitvec.BVConverter_32_64
+  syntax function toBig "((_ zero_extend 32) %1)"
+  syntax function toSmall "((_ extract 31 0) %1)"
+end
+
+theory bitvec.BVConverter_16_64
+  syntax function toBig "((_ zero_extend 48) %1)"
+  syntax function toSmall "((_ extract 15 0) %1)"
+end
+
+theory bitvec.BVConverter_8_64
+  syntax function toBig "((_ zero_extend 56) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
+end
+
+theory bitvec.BVConverter_16_32
+  syntax function toBig "((_ zero_extend 16) %1)"
+  syntax function toSmall "((_ extract 15 0) %1)"
+end
+
+theory bitvec.BVConverter_8_32
+  syntax function toBig "((_ zero_extend 24) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
+end
+
+theory bitvec.BVConverter_8_16
+  syntax function toBig "((_ zero_extend 8) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
+end
+
+theory bv.BV32
+  syntax type t "(_ BitVec 32)"
+
+  syntax function zero "#x00000000"
+  syntax function ones "#xFFFFFFFF"
+  syntax function bw_and "(bvand %1 %2)"
+  syntax function bw_or "(bvor %1 %2)"
+  syntax function bw_xor "(bvxor %1 %2)"
+  syntax function bw_not "(bvnot %1)"
+
+  syntax function add "(bvadd %1 %2)"
+  syntax function sub "(bvsub %1 %2)"
+  syntax function neg "(bvneg %1)"
+  syntax function mul "(bvmul %1 %2)"
+  syntax function udiv "(bvudiv %1 %2)"
+  syntax function urem "(bvurem %1 %2)"
+  syntax function sdiv "(bvsdiv %1 %2)"
+  syntax function srem "(bvsrem %1 %2)"
+  syntax function smod "(bvsmod %1 %2)"
+
+  syntax function rotate_left "((_ rotate_left 1) %1)"
+  syntax function rotate_right "((_ rotate_right 1) %1)"
+
+  syntax function lsr "(bvlshr %1 ((_ int2bv 32) %2))"
+  syntax function lsl "(bvshl %1 ((_ int2bv 32) %2))"
+  syntax function asr "(bvashr %1 ((_ int2bv 32) %2))"
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  syntax function lsl_bv "(bvshl %1 %2)"
+  syntax function asr_bv "(bvashr %1 %2)"
+  syntax function of_int_const "((_ int2bv 32) %1)"
+  syntax predicate eq "(= %1 %2)"
+  remove prop Extensionality
+
+  syntax predicate slt "(bvslt %1 %2)"
+  syntax predicate sle "(bvsle %1 %2)"
+  syntax predicate sgt "(bvsgt %1 %2)"
+  syntax predicate sge "(bvsge %1 %2)"
+  syntax predicate ult "(bvult %1 %2)"
+  syntax predicate ule "(bvule %1 %2)"
+  syntax predicate ugt "(bvugt %1 %2)"
+  syntax predicate uge "(bvuge %1 %2)"
+end
+
+theory bv.BV64
+  syntax type t "(_ BitVec 64)"
+
+  syntax function zero "#x0000000000000000"
+  syntax function ones "#xFFFFFFFFFFFFFFFF"
+  syntax function bw_and "(bvand %1 %2)"
+  syntax function bw_or "(bvor %1 %2)"
+  syntax function bw_xor "(bvxor %1 %2)"
+  syntax function bw_not "(bvnot %1)"
+
+  syntax function add "(bvadd %1 %2)"
+  syntax function sub "(bvsub %1 %2)"
+  syntax function neg "(bvneg %1)"
+  syntax function mul "(bvmul %1 %2)"
+  syntax function udiv "(bvudiv %1 %2)"
+  syntax function urem "(bvurem %1 %2)"
+  syntax function sdiv "(bvsdiv %1 %2)"
+  syntax function srem "(bvsrem %1 %2)"
+  syntax function smod "(bvsmod %1 %2)"
+
+  syntax function rotate_left "((_ rotate_left 1) %1)"
+  syntax function rotate_right "((_ rotate_right 1) %1)"
+
+  syntax function lsr "(bvlshr %1 ((_ int2bv 64) %2))"
+  syntax function lsl "(bvshl %1 ((_ int2bv 64) %2))"
+  syntax function asr "(bvashr %1 ((_ int2bv 64) %2))"
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  syntax function lsl_bv "(bvshl %1 %2)"
+  syntax function asr_bv "(bvashr %1 %2)"
+  syntax function of_int_const "((_ int2bv 64) %1)"
+  syntax predicate eq "(= %1 %2)"
+
+  syntax predicate slt "(bvslt %1 %2)"
+  syntax predicate sle "(bvsle %1 %2)"
+  syntax predicate sgt "(bvsgt %1 %2)"
+  syntax predicate sge "(bvsge %1 %2)"
+  syntax predicate ult "(bvult %1 %2)"
+  syntax predicate ule "(bvule %1 %2)"
+  syntax predicate ugt "(bvugt %1 %2)"
+  syntax predicate uge "(bvuge %1 %2)"
+end
+
+theory bv.BV16
+  syntax type t "(_ BitVec 16)"
+
+  syntax function zero "#x0000"
+  syntax function ones "#xFFFF"
+  syntax function bw_and "(bvand %1 %2)"
+  syntax function bw_or "(bvor %1 %2)"
+  syntax function bw_xor "(bvxor %1 %2)"
+  syntax function bw_not "(bvnot %1)"
+
+  syntax function add "(bvadd %1 %2)"
+  syntax function sub "(bvsub %1 %2)"
+  syntax function neg "(bvneg %1)"
+  syntax function mul "(bvmul %1 %2)"
+  syntax function udiv "(bvudiv %1 %2)"
+  syntax function urem "(bvurem %1 %2)"
+  syntax function sdiv "(bvsdiv %1 %2)"
+  syntax function srem "(bvsrem %1 %2)"
+  syntax function smod "(bvsmod %1 %2)"
+
+  syntax function rotate_left "((_ rotate_left 1) %1)"
+  syntax function rotate_right "((_ rotate_right 1) %1)"
+
+  syntax function lsr "(bvlshr %1 ((_ int2bv 16) %2))"
+  syntax function lsl "(bvshl %1 ((_ int2bv 16) %2))"
+  syntax function asr "(bvashr %1 ((_ int2bv 16) %2))"
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  syntax function lsl_bv "(bvshl %1 %2)"
+  syntax function asr_bv "(bvashr %1 %2)"
+  syntax function of_int_const "((_ int2bv 16) %1)"
+  syntax predicate eq "(= %1 %2)"
+
+  syntax predicate slt "(bvslt %1 %2)"
+  syntax predicate sle "(bvsle %1 %2)"
+  syntax predicate sgt "(bvsgt %1 %2)"
+  syntax predicate sge "(bvsge %1 %2)"
+  syntax predicate ult "(bvult %1 %2)"
+  syntax predicate ule "(bvule %1 %2)"
+  syntax predicate ugt "(bvugt %1 %2)"
+  syntax predicate uge "(bvuge %1 %2)"
+end
+
+theory bv.BV8
+  syntax type t "(_ BitVec 8)"
+
+  syntax function zero "#x00"
+  syntax function ones "#xFF"
+  syntax function bw_and "(bvand %1 %2)"
+  syntax function bw_or "(bvor %1 %2)"
+  syntax function bw_xor "(bvxor %1 %2)"
+  syntax function bw_not "(bvnot %1)"
+
+  syntax function add "(bvadd %1 %2)"
+  syntax function sub "(bvsub %1 %2)"
+  syntax function neg "(bvneg %1)"
+  syntax function mul "(bvmul %1 %2)"
+  syntax function udiv "(bvudiv %1 %2)"
+  syntax function urem "(bvurem %1 %2)"
+  syntax function sdiv "(bvsdiv %1 %2)"
+  syntax function srem "(bvsrem %1 %2)"
+  syntax function smod "(bvsmod %1 %2)"
+
+  syntax function rotate_left "((_ rotate_left 1) %1)"
+  syntax function rotate_right "((_ rotate_right 1) %1)"
+
+  syntax function lsr "(bvlshr %1 ((_ int2bv 8) %2))"
+  syntax function lsl "(bvshl %1 ((_ int2bv 8) %2))"
+  syntax function asr "(bvashr %1 ((_ int2bv 8) %2))"
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  syntax function lsl_bv "(bvshl %1 %2)"
+  syntax function asr_bv "(bvashr %1 %2)"
+  syntax function of_int_const "((_ int2bv 8) %1)"
+  syntax predicate eq "(= %1 %2)"
+
+  syntax predicate slt "(bvslt %1 %2)"
+  syntax predicate sle "(bvsle %1 %2)"
+  syntax predicate sgt "(bvsgt %1 %2)"
+  syntax predicate sge "(bvsge %1 %2)"
+  syntax predicate ult "(bvult %1 %2)"
+  syntax predicate ule "(bvule %1 %2)"
+  syntax predicate ugt "(bvugt %1 %2)"
+  syntax predicate uge "(bvuge %1 %2)"
+end
+
+theory bv.BVConverter_32_64
+  syntax function toBig "((_ zero_extend 32) %1)"
+  syntax function toSmall "((_ extract 31 0) %1)"
+
+  remove prop back_from_bigBV
+end
+
+theory bv.BVConverter_16_64
+  syntax function toBig "((_ zero_extend 48) %1)"
+  syntax function toSmall "((_ extract 15 0) %1)"
+
+  remove prop back_from_bigBV
+end
+
+theory bv.BVConverter_8_64
+  syntax function toBig "((_ zero_extend 56) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
+
+  remove prop back_from_bigBV
+end
+
+theory bv.BVConverter_16_32
+  syntax function toBig "((_ zero_extend 16) %1)"
+  syntax function toSmall "((_ extract 15 0) %1)"
+
+  remove prop back_from_bigBV
+end
+
+theory bv.BVConverter_8_32
+  syntax function toBig "((_ zero_extend 24) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
+
+  remove prop back_from_bigBV
+end
+
+theory bv.BVConverter_8_16
+  syntax function toBig "((_ zero_extend 8) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
+
+  remove prop back_from_bigBV
+end
+
+theory bitvec.Pow2int
+
+  remove prop Power_0
+  remove prop Power_s
+  remove prop Power_1
+  remove prop Power_sum
+  remove prop pow2pos
+  remove prop Div_mult_inst
+  remove prop Div_double
+  remove prop Div_pow
+  remove prop Div_double_neg
+  remove prop Div_pow2
+  remove prop Div_div_pow
+  remove prop Mod_pow2_gen
+  remove prop pow2_0
+  remove prop pow2_1
+  remove prop pow2_2
+  remove prop pow2_3
+  remove prop pow2_4
+  remove prop pow2_5
+  remove prop pow2_6
+  remove prop pow2_7
+  remove prop pow2_8
+  remove prop pow2_9
+  remove prop pow2_10
+  remove prop pow2_11
+  remove prop pow2_12
+  remove prop pow2_13
+  remove prop pow2_14
+  remove prop pow2_15
+  remove prop pow2_16
+  remove prop pow2_17
+  remove prop pow2_18
+  remove prop pow2_19
+  remove prop pow2_20
+  remove prop pow2_21
+  remove prop pow2_22
+  remove prop pow2_23
+  remove prop pow2_24
+  remove prop pow2_25
+  remove prop pow2_26
+  remove prop pow2_27
+  remove prop pow2_28
+  remove prop pow2_29
+  remove prop pow2_30
+  remove prop pow2_31
+  remove prop pow2_32
+  remove prop pow2_33
+  remove prop pow2_34
+  remove prop pow2_35
+  remove prop pow2_36
+  remove prop pow2_37
+  remove prop pow2_38
+  remove prop pow2_39
+  remove prop pow2_40
+  remove prop pow2_41
+  remove prop pow2_42
+  remove prop pow2_43
+  remove prop pow2_44
+  remove prop pow2_45
+  remove prop pow2_46
+  remove prop pow2_47
+  remove prop pow2_48
+  remove prop pow2_49
+  remove prop pow2_50
+  remove prop pow2_51
+  remove prop pow2_52
+  remove prop pow2_53
+  remove prop pow2_54
+  remove prop pow2_55
+  remove prop pow2_56
+  remove prop pow2_57
+  remove prop pow2_58
+  remove prop pow2_59
+  remove prop pow2_60
+  remove prop pow2_61
+  remove prop pow2_62
+  remove prop pow2_63
+  remove prop pow2_64
+end

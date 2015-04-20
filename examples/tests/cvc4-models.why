@@ -1,0 +1,98 @@
+
+theory T
+
+  use import int.Int
+
+  goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
+
+  goal g_lab0 : forall x "model":int. ("model" x >= 42) ->
+    ("model" x + 3 <= 50)
+
+  constant g : int
+
+  goal g2_lab : forall x "model":int. ("model" g >= x)
+
+  goal newgoal : forall x1 "model" "model_trace:david" x2 "model" x3 "model" x4 "model" x5 "model" x6 "model" x7 "model" x8 "model". 
+  ("model" "model_trace: x1 + 1 = 2" x1 + 1 = 2) ->
+  ("model" x2 + 1 = 2) ->
+  ("model" x3 + 1 = 2) ->
+  ("model" x4 + 1 = 2) ->
+  ("model" x5 + 1 = 2) ->
+  ("model" x6 + 1 = 2) ->
+  ("model" x7 + 1 = 2) ->
+  ("model" x8 + 1 = 2) ->
+  ("model" x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 = 2)
+
+end
+
+theory ModelInt
+
+use import int.Int
+
+goal test0 : forall x "model":int. not (0 < x < 1)
+
+goal test1 : forall x "model":int. not (0 <= x <= 1)
+
+use import int.EuclideanDivision
+
+goal test2 : forall x "model":int. div x x = 1
+
+goal test_overflow:
+  forall x "model" y "model" :  int.
+     0 <= x <= 65535 /\ 0 <= y <= 65535 -> 0 <= x + y <= 65535
+
+goal test_overflow2:
+  forall x "model" y "model" :  int.
+     -2 <= x <= 65535 /\ -2 <= y <= 65535 -> -2 <= x + y <= 65535
+
+predicate is_int16 (x:int) = -65536 <= x <= 65535
+
+goal test_overflow_int16:
+  forall x "model" y "model" :  int.
+     is_int16 x /\ is_int16 y -> is_int16 (x + y)
+
+goal test_overflow_int16_alt:
+  forall x "model" y "model" :  int.
+      -65536 <= x <= 65535 /\ -65536 <= y <= 65535 -> -65536 <= x+y <= 65535
+
+goal test_overflow_int16_bis:
+  forall x "model" y "model" :  int.
+     is_int16 x /\ is_int16 y /\
+     ("model" 0 <= x) /\ (x <= y) -> is_int16 (x + y)
+
+predicate is_int32 (x:int) = -2147483648 <= x <= 2147483647
+
+goal test_overflow_int32:
+  forall x "model" y "model" :  int.
+     is_int32 x /\ is_int32 y -> is_int32 (x + y)
+
+goal test_overflow_int32_bis:
+  forall x "model" y "model" :  int.
+     is_int32 x /\ is_int32 y /\ 0 <= x <= y -> is_int32 (x + y)
+
+goal test_overflow_int32_bis_inline:
+  forall x "model" y "model" :  int.
+     -2147483648 <= x <= 2147483647 /\ -2147483648 <= y <= 2147483647 /\ 0 <= x <= y -> -2147483648 <= x + y <= 2147483647
+
+end
+
+theory ModelReal
+
+use import real.Real
+
+goal test1 : forall x "model":real. not (0.0 < x < 1.0)
+
+goal test2 : forall x "model":real. x/x=1.0
+
+end
+
+theory ModelArray
+
+use import map.Map
+
+goal t1 : forall t "model" :map int int, i "model" : int.
+   get (set t 0 42) i = get t i
+
+end
+
+

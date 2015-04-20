@@ -1,0 +1,115 @@
+
+(**
+
+{1 VerifyThis @ ETAPS 2015 competition, Challenge 3: Dancing Links}
+
+{h
+
+The following is the original description of the verification task,
+reproduced verbatim from
+<a href="http://etaps2015.verifythis.org/challenges">the competition web site</a>.
+
+<pre>
+DANCING LINKS (90 minutes)
+==========================
+
+Dancing links is a technique introduced in 1979 by Hitotumatu and
+Noshita and later popularized by Knuth. The technique can be used to
+efficiently implement a search for all solutions of the exact cover
+problem, which in its turn can be used to solve Tiling, Sudoku,
+N-Queens, and other problems.
+
+The technique
+-------------
+
+Suppose x points to a node of a doubly linked list; let L[x] and R[x]
+point to the predecessor and successor of that node. Then the operations
+
+L[R[x]] := L[x];
+R[L[x]] := R[x];
+
+remove x from the list. The subsequent operations
+
+L[R[x]] := x;
+R[L[x]] := x;
+
+will put x back into the list again.
+
+A graphical illustration of the process is available at
+http://formal.iti.kit.edu/~klebanov/DLX.png
+
+
+Verification task
+-----------------
+
+Implement the data structure with these operations, and specify and
+verify that they behave in the way described above.
+</pre>}
+
+The following is the solution by Jean-Christophe Filliâtre (CNRS)
+and Guillaume Melquiond (Inria) who entered the competition as "team Why3".
+
+*)
+
+module DancingLinks
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+
+  (** we model the data structure with two arrays, nodes being
+      represented by array indices *)
+  type dll = { prev: array int; next: array int; ghost n: int }
+    invariant { length self.prev = length self.next = self.n }
+
+  (** node [i] is a valid node i.e. it has consistent neighbors *)
+  predicate valid_in (l: dll) (i: int) =
+    0 <= i < l.n /\ 0 <= l.prev[i] < l.n /\ 0 <= l.next[i] < l.n /\
+    l.next[l.prev[i]] = i /\
+    l.prev[l.next[i]] = i
+
+  (** node [i] is ready to be put back in a list *)
+  predicate valid_out (l: dll) (i: int) =
+    0 <= i < l.n /\ 0 <= l.prev[i] < l.n /\ 0 <= l.next[i] < l.n /\
+    l.next[l.prev[i]] = l.next[i] /\
+    l.prev[l.next[i]] = l.prev[i]
+
+  use seq.Seq as S
+  function nth (s: S.seq 'a) (i: int) : 'a = S.([]) s i
+
+  (** Representation predicate: Sequence [s] is the list of indices of
+      a valid circular list in [l].
+      We choose to model circular lists, since this is the way the
+      data structure is used in Knuth's dancing links algorithm. *)
+  predicate is_list (l: dll) (s: S.seq int) =
+    forall k: int. 0 <= k < S.length s ->
+      0 <= nth s k < l.n /\
+      l.prev[nth s k] = nth s (if k = 0 then S.length s - 1 else k - 1) /\
+      l.next[nth s k] = nth s (if k = S.length s - 1 then 0 else k + 1) /\
+      (forall k': int. 0 <= k' < S.length s -> k <> k' -> nth s k <> nth s k')
+
+  (** Note: the code below works fine even when the list has one element
+      (necessarily [i] in that case). *)
+  let remove (l: dll) (i: int) (ghost s: S.seq int)
+    requires { valid_in l i }
+    requires { is_list l (S.cons i s) }
+    ensures  { valid_out l i }
+    ensures  { is_list l s }
+  =
+    l.prev[l.next[i]] <- l.prev[i];
+    l.next[l.prev[i]] <- l.next[i];
+    assert { forall k: int. 0 <= k < S.length s ->
+       nth (S.cons i s) (k + 1) = nth s k } (* to help SMT with triggers *)
+
+  let put_back (l: dll) (i: int) (ghost s: S.seq int)
+    requires { valid_out l i } (* [i] is ready to be reinserted *)
+    requires { is_list l s }
+    requires { 0 < S.length s } (* [s] must contain at least one element *)
+    requires { l.next[i] = nth s 0 <> i } (* do not link [i] to itself *)
+    ensures  { valid_in l i }
+    ensures  { is_list l (S.cons i s) }
+  =
+    l.prev[l.next[i]] <- i;
+    l.next[l.prev[i]] <- i
+
+end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -32,15 +32,25 @@ type blacklist = string list
 
 type 'a pp = Format.formatter -> 'a -> unit
 
+(* Makes it possible to estabilish traceability from names
+in the output of the printer to elements of AST in its input. *)
+type printer_mapping = {
+  lsymbol_m     : string -> Term.lsymbol;
+  queried_terms : Term.term list;
+}
+
 type printer_args = {
   env        : Env.env;
   prelude    : prelude;
   th_prelude : prelude_map;
   blacklist  : blacklist;
-  filename   : string
+  filename   : string;
+  mutable printer_mapping : printer_mapping;
 }
 
 type printer = printer_args -> ?old:in_channel -> task pp
+
+val get_default_printer_mapping : printer_mapping
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 
@@ -118,6 +128,7 @@ exception NotImplemented  of        string
 
 val unsupportedType : ty   -> string -> 'a
 val unsupportedTerm : term -> string -> 'a
+val unsupportedPattern : pattern -> string -> 'a
 val unsupportedDecl : decl -> string -> 'a
 val notImplemented  :         string -> 'a
 

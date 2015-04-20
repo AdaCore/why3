@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -47,28 +47,28 @@ let tv_set = ref Sid.empty
 
 (* type variables *)
 
-let print_tv ?(whytypes=false) fmt tv =
+let print_tv ~whytypes fmt tv =
   let n = id_unique iprinter tv.tv_name in
   fprintf fmt "%s" n;
   if whytypes then fprintf fmt " %s_WT" n
 
-let print_tv_binder ?(whytypes=false) ?(implicit=false) fmt tv =
+let print_tv_binder ~whytypes ~implicit fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
   if implicit then fprintf fmt "{%s:Type}" n else fprintf fmt "(%s:Type)" n;
   if whytypes then fprintf fmt " {%s_WT:WhyType %s}" n n
 
-let print_tv_binders ?(whytypes=false) ?(implicit=false) fmt stv =
+let print_tv_binders ~whytypes ~implicit fmt stv =
   Stv.iter (fprintf fmt "@ %a" (print_tv_binder ~whytypes ~implicit)) stv
 
-let print_tv_binders_list ?(whytypes=false) ?(implicit=false) fmt ltv =
+let print_tv_binders_list ~whytypes ~implicit fmt ltv =
   List.iter (fprintf fmt "@ %a" (print_tv_binder ~whytypes ~implicit)) ltv
 
-let print_params ?(whytypes=false) fmt stv =
+let print_params ~whytypes fmt stv =
   if Stv.is_empty stv then () else
     fprintf fmt "forall%a,@ " (print_tv_binders ~whytypes ~implicit:true) stv
 
-let print_params_list ?(whytypes=false) fmt ltv =
+let print_params_list ~whytypes fmt ltv =
   match ltv with
   | [] -> ()
   | _ -> fprintf fmt "forall%a,@ " (print_tv_binders_list ~whytypes ~implicit:false) ltv
@@ -133,11 +133,11 @@ let print_ts_tv fmt ts =
   match ts.ts_args with
   | [] -> fprintf fmt "%a" print_ts ts
   | _ -> fprintf fmt "(%a %a)" print_ts ts
-    (print_list space print_tv) ts.ts_args
+    (print_list space (print_tv ~whytypes:false)) ts.ts_args
 
 let rec print_ty info fmt ty =
   begin match ty.ty_node with
-  | Tyvar v -> print_tv fmt v
+  | Tyvar v -> print_tv ~whytypes:false fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin
         match tl with
@@ -394,7 +394,7 @@ let print_expr info fmt =
 let print_constr info ts fmt (cs,_) =
   fprintf fmt "@[<hov 4>| %a : %a%a%a@]" print_ls cs
     (print_arrow_list (print_ty info)) cs.ls_args
-    print_ts ts (print_list_pre space print_tv) ts.ts_args
+    print_ts ts (print_list_pre space (print_tv ~whytypes:false)) ts.ts_args
 
 (*
 
@@ -702,7 +702,9 @@ let print_type_decl ~prev info fmt ts =
           print_ts ts
     | Some ty ->
       fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a :=@ %a.@]@\n@\n"
-        print_ts ts (print_list_pre space print_tv_binder) ts.ts_args
+        print_ts ts
+          (print_list_pre space
+             (print_tv_binder ~whytypes:false ~implicit:false)) ts.ts_args
         (print_ty info) ty
 
 let print_type_decl ~prev info fmt ts =
@@ -715,7 +717,8 @@ let print_data_decl ~first info fmt ts csl =
     fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive"
   else fprintf fmt "@\nwith";
   fprintf fmt " %s%a :=@\n@[<hov>%a@]"
-    name (print_list_pre space print_tv_binder) ts.ts_args
+    name (print_list_pre space
+            (print_tv_binder ~whytypes:false ~implicit:false)) ts.ts_args
     (print_list newline (print_constr info ts)) csl;
   name
 

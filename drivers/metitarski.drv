@@ -222,8 +222,8 @@ theory real.PowerReal
   prelude "include('Axioms/pow.ax')."
 
   (* These follow from Metitarski's axioms. *)
+  remove prop Pow_def
   remove prop Pow_one_y
-  remove prop Pow_exp_log
 end
 
 (* support for integers disabled because may be inconsistent

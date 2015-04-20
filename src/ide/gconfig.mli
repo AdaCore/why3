@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -82,12 +82,14 @@ val image_valid : GdkPixbuf.pixbuf ref
 val image_invalid : GdkPixbuf.pixbuf ref
 val image_timeout : GdkPixbuf.pixbuf ref
 val image_outofmemory : GdkPixbuf.pixbuf ref
+val image_stepslimitexceeded : GdkPixbuf.pixbuf ref
 val image_unknown : GdkPixbuf.pixbuf ref
 val image_failure : GdkPixbuf.pixbuf ref
 val image_valid_obs : GdkPixbuf.pixbuf ref
 val image_invalid_obs : GdkPixbuf.pixbuf ref
 val image_timeout_obs : GdkPixbuf.pixbuf ref
 val image_outofmemory_obs : GdkPixbuf.pixbuf ref
+val image_stepslimitexceeded_obs : GdkPixbuf.pixbuf ref
 val image_unknown_obs : GdkPixbuf.pixbuf ref
 val image_failure_obs : GdkPixbuf.pixbuf ref
 

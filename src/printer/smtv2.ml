@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** SMT v1 printer with some extensions *)
+(** SMT v2 printer with some extensions *)
 
 open Format
 open Pp
@@ -18,6 +18,10 @@ open Ty
 open Term
 open Decl
 open Printer
+
+let debug = Debug.register_info_flag "smtv2_printer"
+  ~desc:"Print@ debugging@ messages@ about@ printing@ \
+         the@ input@ of@ smtv2."
 
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
 let ident_printer =
@@ -83,7 +87,7 @@ let ident_printer =
       "true"; "false";
       "const";
       "abs";
-      "extract"; "bv2nat"; "nat2bv";
+      "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (** From Z3 *)
       "map"; "bv"; "subset"; "union"
@@ -98,7 +102,17 @@ let print_ident fmt id =
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  mutable info_model : term list;
 }
+
+let debug_print_term message t =
+  let form = Debug.get_debug_formatter () in
+  begin
+    Debug.dprintf debug message;
+    if Debug.test_flag debug then 
+      Pretty.print_term form t;
+    Debug.dprintf debug "@.";
+  end
 
 (** type *)
 let rec print_type info fmt ty = match ty.ty_node with
@@ -132,8 +146,24 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
+let model_label = Ident.create_label "model"
+
+let collect_model_ls info ls =
+  if ls.ls_args = [] &&
+    Slab.mem model_label ls.ls_name.id_label then 
+    begin
+      let t = t_app ls [] ls.ls_value in
+      info.info_model <- (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
+    end
+
 (** expr *)
-let rec print_term info fmt t = match t.t_node with
+let rec print_term info fmt t = 
+  debug_print_term "Printing term: " t; 
+
+  if Slab.mem model_label t.t_label then
+    info.info_model <- (t) :: info.info_model;
+
+  match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
@@ -179,13 +209,24 @@ let rec print_term info fmt t = match t.t_node with
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
-  | Tcase _ -> unsupportedTerm t
-      "smtv2 : you must eliminate match"
+  | Tcase({t_node = Tvar v}, bl) ->
+      print_branches info v print_term fmt bl
+  | Tcase(t, bl) ->
+      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+        print_var subject (print_term info) t
+        (print_branches info subject print_term) bl;
+      forget_var subject
   | Teps _ -> unsupportedTerm t
-      "smtv2 : you must eliminate epsilon"
+      "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = match f.t_node with
+and print_fmla info fmt f = 
+  debug_print_term "Printing formula: " f;  
+  if Slab.mem model_label f.t_label then
+    info.info_model <- (f) :: info.info_model;
+  
+  match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -236,9 +277,43 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Tcase _ -> unsupportedTerm f
-      "smtv2 : you must eliminate match"
+  | Tcase({t_node = Tvar v}, bl) ->
+      print_branches info v print_fmla fmt bl
+  | Tcase(t, bl) ->
+      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+        print_var subject (print_term info) t
+        (print_branches info subject print_fmla) bl;
+      forget_var subject
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+
+and print_branches info subject pr fmt bl = match bl with
+  | [] -> assert false
+  | br::bl ->
+      let (p,t) = t_open_branch br in
+      let error () = unsupportedPattern p
+        "smtv2: you must compile nested pattern matching" in
+      match p.pat_node with
+      | Pwild -> pr info fmt t
+      | Papp (cs,args) ->
+          let args = List.map (function
+            | {pat_node = Pvar v} -> v | _ -> error ()) args in
+          if bl = [] then print_branch info subject pr fmt (cs,args,t)
+          else fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+            print_ident cs.ls_name print_var subject
+            (print_branch info subject pr) (cs,args,t)
+            (print_branches info subject pr) bl
+      | _ -> error ()
+
+and print_branch info subject pr fmt (cs,vars,t) =
+  if vars = [] then pr info fmt t else
+  let tvs = t_freevars Mvs.empty t in
+  if List.for_all (fun v -> not (Mvs.mem v tvs)) vars then pr info fmt t else
+  let i = ref 0 in
+  let pr_proj fmt v = incr i;
+    if Mvs.mem v tvs then fprintf fmt "(%a (%a_proj_%d %a))"
+      print_var v print_ident cs.ls_name !i print_var subject in
+  fprintf fmt "@[(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
@@ -266,6 +341,7 @@ let print_param_decl info fmt ls =
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else
+  collect_model_ls info ls;
   let vsl,expr = Decl.open_ls_defn def in
   fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
     print_ident ls.ls_name
@@ -274,7 +350,7 @@ let print_logic_decl info fmt (ls,def) =
     (print_expr info) expr;
   List.iter forget_var vsl
 
-let print_prop_decl info fmt k pr f = match k with
+let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -287,15 +363,59 @@ let print_prop_decl info fmt k pr f = match k with
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
-      fprintf fmt "@[(check-sat)@]@\n"
+      fprintf fmt "@[(check-sat)@]@\n";
+      if info.info_model != [] then 
+	begin
+	  let model_list = info.info_model in
+	  (*
+          fprintf fmt "@[(get-value (%a))@]@\n"
+            (Pp.print_list Pp.space (print_fmla info)) model_list;*)
+	  fprintf fmt "@[(get-value (";
+	  List.iter (fun f -> 
+	    fprintf str_formatter "%a" (print_fmla info) f;
+          let s = flush_str_formatter () in
+          fprintf fmt "@\n;; %s@\n%s" s s;
+          ) model_list;
+	  fprintf fmt "))@]@\n";
+	end;
+      args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
+			       queried_terms = info.info_model; }
+	  
   | Plemma| Pskip -> assert false
 
-let print_decl info fmt d = match d.d_node with
+
+let print_constructor_decl info fmt (ls,args) =
+  match args with
+  | [] -> fprintf fmt "(%a)" print_ident ls.ls_name
+  | _ ->
+     fprintf fmt "@[(%a@ " print_ident ls.ls_name;
+     let _ =
+       List.fold_left2
+         (fun i ty pr ->
+          begin match pr with
+                | Some pr -> fprintf fmt "(%a" print_ident pr.ls_name
+                | None -> fprintf fmt "(%a_proj_%d" print_ident ls.ls_name i
+          end;
+          fprintf fmt " %a)" (print_type info) ty;
+          succ i) 1 ls.ls_args args
+     in
+     fprintf fmt ")@]"
+
+let print_data_decl info fmt (ts,cl) =
+  fprintf fmt "@[(%a@ %a)@]"
+    print_ident ts.ts_name
+    (print_list space (print_constructor_decl info)) cl
+
+let print_decl args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
-  | Ddata _ -> unsupportedDecl d
-      "smtv2 : algebraic type are not supported"
+  | Ddata dl ->
+    (*unsupportedDecl d
+      "smtv2 : algebraic type are not supported" *)
+    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+      (print_list space (print_data_decl info)) dl
   | Dparam ls ->
+      collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
@@ -303,17 +423,18 @@ let print_decl info fmt d = match d.d_node with
       "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl info fmt k pr f
+      print_prop_decl args info fmt k pr f
 
-let print_decls =
-  let print_decl (sm, cm) fmt d =
-    try print_decl {info_syn = sm; info_converters = cm} fmt d; (sm, cm), []
+let print_decls args =
+  let print_decl (sm, cm, model) fmt d =
+    try let info = {info_syn = sm; info_converters = cm; info_model = model} in
+        print_decl args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
   Printer.on_converter_map (fun cm ->
-      Trans.fold print_decl ((sm, cm),[])))
+      Trans.fold print_decl ((sm, cm, []),[])))
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
@@ -323,7 +444,7 @@ let print_task args ?old:_ fmt task =
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in
-  print (snd (Trans.apply print_decls task));
+  print (snd (Trans.apply (print_decls args) task));
   pp_print_flush fmt ()
 
 let () = register_printer "smtv2" print_task

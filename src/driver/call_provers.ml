@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Format
+open Model_parser
 
 let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
@@ -43,7 +44,7 @@ let timeregexp s =
     | "m" -> add_unit Min
     | "s" -> add_unit Sec
     | "i" -> add_unit Msec
-    | _ -> failwith "unknown format specifier, use %%h, %%m, %%s, %%i, %%S"
+    | x -> failwith ("unknown time format specifier: %%"^x^" (should be either %%h, %%m, %%s or %%i")
   in
   let s = Str.global_substitute cmd_regexp replace s in
   let group = Array.make !nb Hour in
@@ -87,6 +88,7 @@ type prover_answer =
   | Invalid
   | Timeout
   | OutOfMemory
+  | StepsLimitExceeded
   | Unknown of string
   | Failure of string
   | HighFailure
@@ -97,6 +99,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
+  pr_model  : model_element list;
 }
 
 type prover_result_parser = {
@@ -104,6 +107,7 @@ type prover_result_parser = {
   prp_timeregexps : timeregexp list;
   prp_stepsregexp : stepsregexp list;
   prp_exitcodes   : (int * prover_answer) list;
+  prp_model_parser : Model_parser.model_parser;
 }
 
 let print_prover_answer fmt = function
@@ -111,6 +115,7 @@ let print_prover_answer fmt = function
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
+  | StepsLimitExceeded -> fprintf fmt "Steps limit exceeded"
   | Unknown "" -> fprintf fmt "Unknown"
   | Failure "" -> fprintf fmt "Failure"
   | Unknown s -> fprintf fmt "Unknown (%s)" s
@@ -122,9 +127,12 @@ let print_prover_status fmt = function
   | Unix.WSIGNALED n -> fprintf fmt "killed by signal %d" n
   | Unix.WEXITED n -> fprintf fmt "exited with status %d" n
 
+let print_steps fmt s =
+  if s >= 0 then fprintf fmt ", %d steps)" s
+
 let print_prover_result fmt
-  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t} =
-  fprintf fmt "%a (%.2fs)" print_prover_answer ans t;
+  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s} =
+  fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
       print_prover_status status out
@@ -136,7 +144,7 @@ let rec grep out l = match l with
       begin try
         ignore (Str.search_forward re out 0);
         match pa with
-        | Valid | Invalid | Timeout | OutOfMemory -> pa
+        | Valid | Invalid | Timeout | OutOfMemory | StepsLimitExceeded -> pa
         | Unknown s -> Unknown (Str.replace_matched s out)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false
@@ -153,7 +161,24 @@ type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
 
-let parse_prover_run res_parser time out ret on_timelimit timelimit =
+let rec debug_print_model_with_loc model =
+  match model with
+  | [] -> ()
+  | m_element::t -> begin
+    let loc_string = match m_element.me_location with
+      | None -> "\"no location\""
+      | Some loc -> begin
+	Loc.report_position str_formatter loc;
+	flush_str_formatter ()
+      end in
+
+    Debug.dprintf debug "Call_provers: %s = %s@." m_element.me_name m_element.me_value;
+    Debug.dprintf debug "  Call_provers: At %s" loc_string;
+
+    debug_print_model_with_loc t
+  end
+
+let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
   let ans = match ret with
     | Unix.WSTOPPED n ->
         Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
@@ -174,11 +199,15 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
       && time >= (0.9 *. float timelimit) -> Timeout
     | _ -> ans
   in
+  let model = res_parser.prp_model_parser out printer_mapping in
+  Debug.dprintf debug "Call_provers: model:@.";
+  debug_print_model_with_loc model;
   { pr_answer = ans;
     pr_status = ret;
     pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
+    pr_model  = model;
   }
 
 let actualcommand command timelimit memlimit stepslimit file =
@@ -207,8 +236,9 @@ let actualcommand command timelimit memlimit stepslimit file =
   List.map (Str.global_substitute cmd_regexp replace) arglist,
   !use_stdin, !on_timelimit
 
-let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
+let  call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                  ~res_parser
+		 ~printer_mapping
                  ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
   let command, use_stdin, on_timelimit =
@@ -252,12 +282,13 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
           if inplace then Sys.rename (save fin) fin;
           if redirect then Sys.remove fout;
         end;
-        parse_prover_run res_parser time out ret on_timelimit timelimit
+        parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping
     in
     { call = call; pid = pid }
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                    ~res_parser ~filename
+		   ~printer_mapping
                    ?(inplace=false) buffer =
 
   let fin,cin =
@@ -268,7 +299,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~timelimit ~memlimit ~stepslimit
-               ~res_parser ~cleanup:true ~inplace fin
+               ~res_parser ~printer_mapping ~cleanup:true ~inplace fin
 
 let query_call pc =
   let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
@@ -297,12 +328,13 @@ type save_data =
     is_temporary : bool;
     timeout      : int;
     res_parser   : prover_result_parser;
+    printer_mapping : Printer.printer_mapping;
   }
 
 let regexs = Hashtbl.create 17
 
 let prove_file_server ~res_parser ~command ~timelimit
-                      ~memlimit ~stepslimit ?(inplace=false) file =
+                      ~memlimit ~stepslimit ~printer_mapping ?(inplace=false) file =
   let id = gen_id () in
   let cmd, _, _ =
     actualcommand command timelimit memlimit stepslimit file in
@@ -310,7 +342,8 @@ let prove_file_server ~res_parser ~command ~timelimit
     { vc_file      = file;
       is_temporary = not inplace;
       timeout      = timelimit;
-      res_parser   = res_parser } in
+      res_parser   = res_parser;
+      printer_mapping = printer_mapping } in
   Hashtbl.add regexs id saved_data;
   Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
   id
@@ -339,10 +372,13 @@ let handle_answer answer =
     Sys.remove save.vc_file;
   let out = read_and_delete_file answer.Prove_client.out_file in
   let ret = Unix.WEXITED answer.Prove_client.exit_code in
+  let printer_mapping = save.printer_mapping in
   let ans =
     parse_prover_run save.res_parser
                      answer.Prove_client.time
-                     out ret answer.Prove_client.timeout save.timeout in
+                     out ret answer.Prove_client.timeout save.timeout
+                     ~printer_mapping
+  in
   id, ans
 
 let wait_for_server_result () =

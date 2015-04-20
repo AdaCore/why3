@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -49,7 +49,7 @@ let black_list =
   ["o"; "O"]
 
 let fresh_printer () =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  let isanitize = sanitizer' char_to_alpha char_to_alnumus char_to_alnum in
   create_ident_printer black_list ~sanitizer:isanitize
 
 let iprinter = fresh_printer ()

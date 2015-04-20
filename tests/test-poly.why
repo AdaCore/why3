@@ -1,0 +1,96 @@
+
+
+theory Mono
+
+goal g0 : 2 = 3
+
+use import int.Int
+
+goal g : 2+2 = 5
+
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T Mono -G g *)
+
+
+end
+
+
+theory MonoType
+
+type t = A | B
+
+goal g0 : A <> B
+
+goal g1 : forall x. x = A \/ x = B
+
+type u = C | D t
+
+goal g2 : forall x y. y = D x
+
+type a = E | F b
+with b = G | H a
+
+goal g3 : forall x. x <> F (H x)
+
+type v = I (p:t) | J (p:t) u
+
+constant x : v
+
+goal g4 : match x with I y -> y=A | J y (D z) -> z=A | J B z -> z=C | J A C -> true end
+
+goal g5 : match x with I y -> y | J y _ -> y end = A
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T MonoType -G g0 *)
+
+end
+
+
+theory PolyType
+
+type t 'a = A 'a
+
+goal g: forall x y:'a. A x = A y
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolyType -G g *)
+
+end
+
+
+theory TestList
+
+use import list.List
+
+goal g : match Cons 42 Nil with Nil -> false | Cons x _ -> x=42 end
+
+end
+
+
+theory MonoSymb
+
+function id (x:int) : int = x
+
+goal g: forall x:int. id x = x
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolySymb -G g *)
+
+end
+
+theory PolySymb
+
+function id (x:'a) : 'a = x
+
+meta "encoding:ignore_polymorphism_ls" function id
+
+goal g: forall x:int. id x = x
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolySymb -G g *)
+
+end
+
+theory PolyProp
+
+goal g: forall x:'a. x = x
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolyProp -G g *)
+
+end

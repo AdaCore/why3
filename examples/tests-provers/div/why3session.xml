@@ -24,9 +24,11 @@
 <prover id="19" name="Alt-Ergo" version="0.95.2" timelimit="2" memlimit="4000"/>
 <prover id="20" name="CVC4" version="1.3" timelimit="2" memlimit="4000"/>
 <prover id="21" name="Vampire" version="0.6" timelimit="2" memlimit="4000"/>
+<prover id="22" name="veriT" version="201410" timelimit="5" memlimit="1000"/>
+<prover id="23" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
 <file name="../div.why" expanded="true">
 <theory name="EuclideanDivTest" sum="3e584ab9c80aff1f54d2f1ee5bdf6bfc" expanded="true">
- <goal name="ok1">
+ <goal name="ok1" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -49,8 +51,10 @@
  <proof prover="19"><result status="valid" time="0.01" steps="1"/></proof>
  <proof prover="20"><result status="valid" time="0.00"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="ok2">
+ <goal name="ok2" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -73,8 +77,10 @@
  <proof prover="19"><result status="valid" time="0.01" steps="1"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="ok3">
+ <goal name="ok3" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -97,8 +103,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.02"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="ok4">
+ <goal name="ok4" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -121,8 +129,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="6"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="ok5">
+ <goal name="ok5" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -145,8 +155,10 @@
  <proof prover="19"><result status="valid" time="0.01" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.08"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="ok6">
+ <goal name="ok6" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -169,8 +181,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="6"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="smoke1">
+ <goal name="smoke1" expanded="true">
  <proof prover="0"><result status="unknown" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
@@ -193,8 +207,10 @@
  <proof prover="19"><result status="unknown" time="0.14"/></proof>
  <proof prover="20"><result status="unknown" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.05"/></proof>
  </goal>
- <goal name="smoke2">
+ <goal name="smoke2" expanded="true">
  <proof prover="0"><result status="unknown" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.98"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
@@ -217,8 +233,10 @@
  <proof prover="19"><result status="unknown" time="0.15"/></proof>
  <proof prover="20"><result status="unknown" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.08"/></proof>
  </goal>
- <goal name="smoke3">
+ <goal name="smoke3" expanded="true">
  <proof prover="0"><result status="unknown" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
@@ -241,8 +259,10 @@
  <proof prover="19"><result status="unknown" time="0.08"/></proof>
  <proof prover="20"><result status="unknown" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.18"/></proof>
  </goal>
- <goal name="smoke4">
+ <goal name="smoke4" expanded="true">
  <proof prover="0"><result status="unknown" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
@@ -265,8 +285,10 @@
  <proof prover="19"><result status="unknown" time="0.10"/></proof>
  <proof prover="20"><result status="unknown" time="0.02"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.32"/></proof>
  </goal>
- <goal name="smoke5">
+ <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="unknown" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.05"/></proof>
@@ -289,8 +311,10 @@
  <proof prover="19"><result status="unknown" time="0.06"/></proof>
  <proof prover="20"><result status="unknown" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.04"/></proof>
  </goal>
- <goal name="smoke6">
+ <goal name="smoke6" expanded="true">
  <proof prover="0"><result status="unknown" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
@@ -313,10 +337,12 @@
  <proof prover="19"><result status="unknown" time="0.07"/></proof>
  <proof prover="20"><result status="unknown" time="0.05"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.05"/></proof>
  </goal>
 </theory>
 <theory name="ComputerDivTest" sum="e88ff8a75d71641b9d8bebae288f3cd7" expanded="true">
- <goal name="ok1">
+ <goal name="ok1" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -339,8 +365,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="10"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="ok2">
+ <goal name="ok2" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -363,8 +391,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.00"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
- <goal name="ok3">
+ <goal name="ok3" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -387,8 +417,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.00"/></proof>
  <proof prover="21"><result status="timeout" time="4.02"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
- <goal name="ok4">
+ <goal name="ok4" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -411,8 +443,10 @@
  <proof prover="19"><result status="valid" time="0.01" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="ok5">
+ <goal name="ok5" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -435,8 +469,10 @@
  <proof prover="19"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.00"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
- <goal name="ok6">
+ <goal name="ok6" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -459,8 +495,10 @@
  <proof prover="19"><result status="valid" time="0.01" steps="9"/></proof>
  <proof prover="20"><result status="valid" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="valid" time="0.00"/></proof>
+ <proof prover="23"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="smoke1">
+ <goal name="smoke1" expanded="true">
  <proof prover="0"><result status="unknown" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.14"/></proof>
@@ -483,8 +521,10 @@
  <proof prover="19"><result status="unknown" time="0.02"/></proof>
  <proof prover="20"><result status="unknown" time="0.02"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.01"/></proof>
  </goal>
- <goal name="smoke2">
+ <goal name="smoke2" expanded="true">
  <proof prover="0"><result status="unknown" time="0.02"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.07"/></proof>
@@ -507,8 +547,10 @@
  <proof prover="19"><result status="unknown" time="0.02"/></proof>
  <proof prover="20"><result status="unknown" time="0.03"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.01"/></proof>
  </goal>
- <goal name="smoke3">
+ <goal name="smoke3" expanded="true">
  <proof prover="0"><result status="unknown" time="0.01"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.13"/></proof>
@@ -531,8 +573,10 @@
  <proof prover="19"><result status="unknown" time="0.02"/></proof>
  <proof prover="20"><result status="unknown" time="0.05"/></proof>
  <proof prover="21"><result status="timeout" time="4.02"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.01"/></proof>
  </goal>
- <goal name="smoke4">
+ <goal name="smoke4" expanded="true">
  <proof prover="0"><result status="unknown" time="0.02"/></proof>
  <proof prover="1"><result status="timeout" time="1.98"/></proof>
  <proof prover="2"><result status="unknown" time="0.10"/></proof>
@@ -555,8 +599,10 @@
  <proof prover="19"><result status="unknown" time="0.03"/></proof>
  <proof prover="20"><result status="unknown" time="0.01"/></proof>
  <proof prover="21"><result status="timeout" time="4.09"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.02"/></proof>
  </goal>
- <goal name="smoke5">
+ <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="unknown" time="0.02"/></proof>
  <proof prover="1"><result status="timeout" time="1.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.13"/></proof>
@@ -579,8 +625,10 @@
  <proof prover="19"><result status="unknown" time="0.02"/></proof>
  <proof prover="20"><result status="unknown" time="0.04"/></proof>
  <proof prover="21"><result status="timeout" time="4.02"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.00"/></proof>
  </goal>
- <goal name="smoke6">
+ <goal name="smoke6" expanded="true">
  <proof prover="0"><result status="unknown" time="0.02"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.10"/></proof>
@@ -603,6 +651,8 @@
  <proof prover="19"><result status="unknown" time="0.02"/></proof>
  <proof prover="20"><result status="unknown" time="0.02"/></proof>
  <proof prover="21"><result status="timeout" time="4.10"/></proof>
+ <proof prover="22"><result status="unknown" time="0.00"/></proof>
+ <proof prover="23"><result status="unknown" time="0.02"/></proof>
  </goal>
 </theory>
 </file>

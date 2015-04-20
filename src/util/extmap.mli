@@ -271,6 +271,13 @@ module type S =
     val of_list: (key * 'a) list -> 'a t
     (** construct a map from a pair of bindings *)
 
+    val domain : 'a t -> unit t
+    (** [domain m] returns the set of keys of binding [m] *)
+
+    val subdomain : (key -> 'a -> bool) -> 'a t -> unit t
+    (** [subdomain pr m] returns the set of keys of bindings in [m]
+        that satisfy predicate [pr] *)
+
     val is_num_elt : int -> 'a t -> bool
     (** check if the map has the given number of elements *)
 

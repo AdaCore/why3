@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -43,6 +43,9 @@ end
 
   let get_op s e = Qident (mk_id (mixfix "[]") s e)
   let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
+  let sub_op s e = Qident (mk_id (mixfix "[_.._]") s e)
+  let above_op s e = Qident (mk_id (mixfix "[_..]") s e)
+  let below_op s e = Qident (mk_id (mixfix "[.._]") s e)
 
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
@@ -131,7 +134,7 @@ end
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT EQUAL LAMBDA LTGT
+%token DOT DOTDOT EQUAL LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -551,6 +554,12 @@ term_sub_:
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
     { Tidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+| term_arg LEFTSQ term DOTDOT term RIGHTSQ
+    { Tidapp (sub_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+| term_arg LEFTSQ term DOTDOT RIGHTSQ
+    { Tidapp (above_op $startpos($2) $endpos($2), [$1;$3]) }
+| term_arg LEFTSQ DOTDOT term RIGHTSQ
+    { Tidapp (below_op $startpos($2) $endpos($2), [$1;$4]) }
 
 field_list1(X):
 | fl = semicolon_list1(separated_pair(lqualid, EQUAL, X)) { fl }
@@ -907,6 +916,9 @@ lident_op:
 | LEFTSQ RIGHTSQ          { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
 | LEFTSQ RIGHTSQ LARROW   { mixfix "[]<-" }
+| LEFTSQ UNDERSCORE DOTDOT UNDERSCORE RIGHTSQ { mixfix "[_.._]" }
+| LEFTSQ            DOTDOT UNDERSCORE RIGHTSQ { mixfix "[.._]" }
+| LEFTSQ UNDERSCORE DOTDOT            RIGHTSQ { mixfix "[_..]" }
 
 op_symbol:
 | OP1 { $1 }

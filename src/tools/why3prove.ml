@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -245,7 +245,8 @@ let output_task_prepared drv fname _tname th task dir =
   let ext = String.sub dest i (String.length dest - i) in
   let file = Filename.concat dir (name ^ ext) in
   let cout = open_out file in
-  Driver.print_task_prepared drv file (formatter_of_out_channel cout) task;
+  (* TODO print the counterexample *)
+  let _counterexample = Driver.print_task_prepared drv file (formatter_of_out_channel cout) task in
   close_out cout
 
 let output_theory drv fname _tname th task dir =
