@@ -905,6 +905,9 @@ module Print = struct
         fprintf fmt (protect_on paren "let %a = @[%a@] in@ %a")
           (print_lident info) v (print_expr info) e1 (print_expr info) e2;
         forget_id v
+    | Ematch (e1, [p, b1]) ->
+        fprintf fmt (protect_on paren "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a")
+          (print_pat info) p (print_expr info) e1 (print_expr info) b1
     | Ematch (e1, bl) ->
         fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
           (print_expr info) e1 (print_list newline (print_branch info)) bl
@@ -949,7 +952,7 @@ module Print = struct
           (print_expr info) e1 (print_expr info) e2
     | Efor (x, vfrom, dir, vto, e1) ->
         fprintf fmt
-          "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a -> %a))@]"
+          "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
           (if dir = To then "to" else "downto")
           (print_lident info) vfrom (print_lident info) vto
           (print_lident info) x (print_expr info) e1
