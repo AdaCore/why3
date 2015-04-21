@@ -8,7 +8,6 @@ prelude "(set-logic AUFNIRA)"
 *)
 
 import "smt-libv2.drv"
-import "smt-libv2-bv.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -22,6 +21,7 @@ transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
 
 transformation "discriminate"
+transformation "encoding_smt"
 
 (** Error messages specific to CVC4 *)
 

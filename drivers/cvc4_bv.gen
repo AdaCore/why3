@@ -20,7 +20,7 @@ theory bv.BV64
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int "(_ bv%1 64)"
+  syntax function of_int "((_ int2bv 64) %1)"
   syntax function to_uint "(bv2nat %1)"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
@@ -89,7 +89,7 @@ theory bv.BV32
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int "(_ bv%1 32)"
+  syntax function of_int "((_ int2bv 32) %1)"
   syntax function to_uint "(bv2nat %1)"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
@@ -158,7 +158,7 @@ theory bv.BV16
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int "(_ bv%1 16)"
+  syntax function of_int "((_ int2bv 16) %1)"
   syntax function to_uint "(bv2nat %1)"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
@@ -227,7 +227,7 @@ theory bv.BV8
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int "(_ bv%1 8)"
+  syntax function of_int "((_ int2bv 8) %1)"
   syntax function to_uint "(bv2nat %1)"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality

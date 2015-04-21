@@ -20,30 +20,9 @@ printer "smtv2"
 filename "%f-%t-%g.smt2"
 
 invalid "^sat"
-unknown "^\\(unknown\\|sat\\|Fail\\)$" ""
+unknown "^\\(unknown\\|Fail\\)$" ""
 time "why3cpulimit time : %s s"
 valid "^unsat$"
-
-(* À discuter *)
-transformation "inline_trivial"
-
-transformation "eliminate_builtin"
-transformation "eliminate_recursion"
-transformation "eliminate_inductive"
-transformation "eliminate_algebraic"
-transformation "eliminate_epsilon"
-
-transformation "simplify_formula"
-
-(* remove pointless quantifiers from the goal *)
-transformation "introduce_premises"
-
-(* For some reason this is commented out in all drivers except gappa
-and mathematica. Why? *)
-(* transformation "simplify_trivial_quantification" *)
-
-transformation "discriminate"
-transformation "encoding_smt"
 
 theory BuiltIn
   syntax type int   "Int"
