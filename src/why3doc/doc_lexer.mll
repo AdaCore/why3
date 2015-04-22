@@ -51,38 +51,6 @@
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
 
-  let html_char fmt c =
-    pp_print_string fmt (match c with
-      | '<' -> "&lt;"
-      | '>' -> "&gt;"
-      | '&' -> "&amp;"
-      | _ -> assert false)
-
-  let html_escape s =
-    let len = ref 0 in
-    String.iter (function '<' | '>' -> len := !len + 4
-      | '&' -> len := !len + 5 | _ -> incr len) s;
-    let len' = !len in
-    let len = String.length s in
-    if len = len' then s else begin
-      let t = String.create len' in
-      let j = ref 0 in
-      let app u =
-        let l = String.length u in
-        String.blit u 0 t !j l;
-        j := !j + l in
-      for i = 0 to len - 1 do
-        match s.[i] with
-        | '<' -> app "&lt;"
-        | '>' -> app "&gt;"
-        | '&' -> app "&amp;"
-        | c -> t.[!j] <- c; incr j
-      done;
-      t
-    end
-
-  let pp_html_escape = Pp.html_string
-
   let current_file = ref ""
 
   let print_ident fmt lexbuf s =
@@ -94,15 +62,14 @@
       let (* f,l,c as *) loc = get_loc lexbuf in
       (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
       (* is this a def point? *)
-      let s = html_escape s in
       try
         match Glob.find loc with
         | id, Glob.Def ->
           fprintf fmt "<a name=\"%a\">%a</a>"
-            Doc_def.pp_anchor id pp_html_escape s
+            Doc_def.pp_anchor id Pp.html_string s
         | id, Glob.Use ->
           fprintf fmt "<a href=\"%a\">%a</a>"
-            Doc_def.pp_locate id pp_html_escape s
+            Doc_def.pp_locate id Pp.html_string s
       with Not_found ->
         (* otherwise, just print it *)
         pp_print_string fmt s
@@ -135,7 +102,7 @@ let operator =
 
 let space = [' ' '\t']
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
-let special = ['<' '>' '&']
+let special = ['\'' '"' '<' '>' '&']
 
 rule scan fmt empty = parse
   | "(*)" as s
@@ -212,7 +179,7 @@ and comment fmt do_output = parse
              string fmt do_output lexbuf;
              comment fmt do_output lexbuf }
   | special as c
-           { if do_output then html_char fmt c;
+           { if do_output then Pp.html_char fmt c;
              comment fmt do_output lexbuf }
   | "'\"'"
   | _ as s { if do_output then pp_print_string fmt s;
@@ -224,7 +191,7 @@ and string fmt do_output = parse
              string fmt do_output lexbuf }
   | '"'    { if do_output then pp_print_string fmt "&quot;" }
   | special as c
-           { if do_output then html_char fmt c;
+           { if do_output then Pp.html_char fmt c;
              string fmt do_output lexbuf }
   | "\\" _
   | _ as s { if do_output then pp_print_string fmt s;
@@ -274,7 +241,7 @@ and doc fmt block headings = parse
              doc fmt block headings lexbuf }
   | special as c
            { if not block then pp_print_string fmt "<p>";
-             html_char fmt c;
+             Pp.html_char fmt c;
              doc fmt true headings lexbuf }
   | _ as c { if not block then pp_print_string fmt "<p>";
              pp_print_char fmt c;

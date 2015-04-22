@@ -147,6 +147,7 @@ val sprintf :
 val sprintf_wnl :
   ('b,  formatter, unit, string) Pervasives.format4 -> 'b
 
+val html_char : Format.formatter -> char -> unit
 val html_string : Format.formatter -> string -> unit
   (** formats the string by escaping special HTML characters
       quote, double quote, <, > and & *)
