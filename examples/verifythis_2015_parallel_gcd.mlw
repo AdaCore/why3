@@ -108,7 +108,6 @@ end
 
 (** Threads interleaving.
     Code and invariants by Rustan Leino. *)
-(***
 module Interleaving
 
   use import int.Int
@@ -117,6 +116,23 @@ module Interleaving
 
   lemma gcd_sub: forall a b: int. gcd a b = gcd a (b - a)
 
+  (* Representation of a thread: two local variables
+    (register copies of the globals) and a program counter:
+    
+     ReadA:
+       local_a <- a
+     ReadB:
+       local_b <- b
+     Compare:
+       if local_a = local_b goto Halt;
+       if local_a > local_b a := local_a - local_b;
+       goto ReadA;
+     Halt:
+     
+     For the sake of simplicity, every section is considered atomic.
+     (strictly speaking, section Compare is not, but it interacts
+      atomically with memory so it would be equivalent)
+   *)
   type state = ReadA | ReadB | Compare | Halt
 
   type thread = {
@@ -125,24 +141,69 @@ module Interleaving
     mutable state  : state;
   }
 
-  predicate inv (th: thread) (a0 b0 a b: int) =
-    0 < a /\ 0 < b /\ gcd a b = gcd a0 b0 /\
+  (* Thread invariant. *)
+  predicate inv (th: thread) (d a b: int) =
+    0 < a /\ 0 < b /\ gcd a b = d /\
     match th.state with
     | ReadA -> true
-    | ReadB -> th.local_a = a
+    | ReadB -> th.local_a = a (* No other thread can write in a. *)
     | Compare -> th.local_a = a && b <= th.local_b &&
                   (th.local_b <= th.local_a -> th.local_b = b)
-    | Halt -> th.local_a = a = b
+                (* Other thread may have overwritten b, but only in a decreasing
+                   decreasing fashion, and only once under a. *)
+    | Halt -> th.local_a = a = b (* Final state is stable. *)
     end
+
+  (* Does running this thread make any progress toward the result ? *)
+  predicate progress_thread (th:thread) (a b:int) =
+    a > b \/ (a = b /\ th.state <> Halt)
+
+  (* Decreasing ordering on program counter *)
+  function state_index (s:state) : int = match s with
+    | ReadA -> 7
+    | ReadB -> 5
+    | Compare -> 3
+    | Halt -> 2
+    end
+
+  (* Synchronisation status. *)
+  predicate sync (th:thread) (b:int) =
+    match th.state with Compare -> th.local_b = b | _ -> true end
+
+  (* Convert status into an index. *)
+  function sync_index (th:thread) (b:int) : int =
+    if sync th b then 0 else 42
+
+  (* Thread progression index: if running this thread should make any
+     progression toward the result, then it will have the following shape:
+     - A first (optional) loop run for synchronization.
+     - A second synchronized run until effective progress *)
+  function prog_index (th:thread) (b:int) : int =
+    sync_index th b + state_index th.state
 
   val create_thread () : thread
     ensures { result.state = ReadA }
 
-  let step (th: thread) (ghost a0 b0: int) (a b: ref int)
-    requires { inv th a0 b0 !a !b }
+  (* Fair scheduler modelisation: Each time it switch to a thread,
+     it also writes down the time remaining before it switch to the other.
+     If it does not switch, this timeout decrease. *)
+  val ghost scheduled : ref bool
+  val ghost timer : ref int
+
+  val schedule () : bool
+    writes { scheduled , timer }
+    ensures { !scheduled = old !scheduled -> 0 <= !timer < old !timer }
+    ensures { result = !scheduled }
+
+  (* Execution of one thread step. *)
+  let step (th: thread) (ghost d: int) (a b: ref int)
+    requires { inv th d !a !b }
     writes   { th, a }
-    ensures  { inv th a0 b0 !a !b }
+    ensures  { inv th d !a !b }
     ensures  { 0 < !a <= old !a }
+    ensures { old !a > !a -> old !a >= !a + !b }
+    ensures { progress_thread th !a !b ->
+      prog_index (old th) !b > prog_index th !b \/ !a < old !a }
   =
     match th.state with
     | ReadA ->
@@ -162,20 +223,30 @@ module Interleaving
 
   let parallel_gcd (a0 b0: int) : int
     requires { 0 < a0 /\ 0 < b0 }
-    diverges
     ensures  { result = gcd a0 b0 }
   =
     (* shared variables *)
     let a = ref a0 in
     let b = ref b0 in
+    let ghost d = gcd a0 b0 in
     (* two threads *)
     let th1 = create_thread () in
     let th2 = create_thread () in
     while th1.state <> Halt || th2.state <> Halt do
-      invariant { inv th1 a0 b0 !a !b /\ inv th2 b0 a0 !b !a }
-      if any bool then step th1 a0 b0 a b else step th2 b0 a0 b a
+      invariant { inv th1 d !a !b /\ inv th2 d !b !a }
+      variant { !a + !b ,
+                if !a = !b
+                then prog_index th2 !a + prog_index th1 !b
+                else if !a < !b
+                then prog_index th2 !a
+                else prog_index th1 !b ,
+                if progress_thread th1 !a !b
+                then if !scheduled then 1 else 0
+                else if progress_thread th2 !b !a
+                then if !scheduled then 0 else 1
+                else 0 , !timer }
+      if schedule () then step th1 d a b else step th2 d b a
     done;
     !a
 
 end
-***)
