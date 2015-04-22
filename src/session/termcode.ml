@@ -266,9 +266,8 @@ let ident_shape ~push id acc =
   id_string_shape ~push id.Ident.id_string acc
 
 let const_shape ~push acc c =
-  let b = Buffer.create 17 in
-  Format.bprintf b "%a" Pretty.print_const c;
-  push (Buffer.contents b) acc
+  Format.fprintf Format.str_formatter "%a" Pretty.print_const c;
+  push (Format.flush_str_formatter ()) acc
 
 let rec pat_shape ~(push:string->'a->'a) c m (acc:'a) p : 'a =
   match p.pat_node with
@@ -442,12 +441,9 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-  let const =
-    let buf = Buffer.create 17 in
-    fun b c ->
-      Format.bprintf buf "%a" Pretty.print_const c;
-      let s = Buffer.contents buf in
-      Buffer.clear buf;
+  let const b c =
+      Format.fprintf Format.str_formatter "%a" Pretty.print_const c;
+      let s = Format.flush_str_formatter () in
       string b s
 
   let tvsymbol b tv = ident b tv.Ty.tv_name

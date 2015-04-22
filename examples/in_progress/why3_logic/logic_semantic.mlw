@@ -19,6 +19,8 @@ module Model
     ls_case : lsymbol -> list 'univ -> 'univ -> bool;
     (* Projections for invertible symbols (e.g constructors). *)
     ls_proj : lsymbol -> list 'univ -> 'univ -> list 'univ;
+    (* Interpretation of choice operator (epsilon). *)
+    i_eps : 'univ -> ('univ -> bool) -> 'univ;
     (* Builtin sort for proposition, with two members true and false. *)
     i_prop : 'univ;
     i_true : 'univ;
@@ -31,8 +33,11 @@ module Model
   
   (* Definition of a valid model. *)
   predicate model_ok (m:model 'univ) =
-    (* Every semantic type is inhabited. *)
-    (forall ty. exists x. m.ty_doms ty x) /\
+    (* Choice operator fall in the right type interpretation. In particular,
+       it implies that every type interpretation is inhabited. *)
+    (forall ty s. m.ty_doms ty (m.i_eps ty s)) /\
+    (* Choice operator fall in the input set when possible. *)
+    (forall ty s x. m.ty_doms ty x /\ s x -> s (m.i_eps ty s)) /\
     (* true and false are distinct inhabitant of prop. *)
     m.i_true <> m.i_false /\
     m.ty_doms m.i_prop m.i_true /\ m.ty_doms m.i_prop m.i_false
@@ -146,6 +151,7 @@ module Sem
     | TLet t1 t2 -> let x = t_sem m tyv tv t1 in
       t_sem m tyv (bfold tv (const x)) t2
     | TCase t brl -> brl_sem m tyv tv brl (t_sem m tyv tv t)
+    | TEps ty t -> m.i_eps (ty_sem m tyv ty) (p_sem m tyv tv t)
     | TForall fty tq -> if (forall f. wty_assignment m tyv fty f ->
       t_sem m tyv (bfold tv f) tq = m.i_true)
       then m.i_true
@@ -174,6 +180,10 @@ module Sem
     | TTrue -> m.i_true
     | TFalse -> m.i_false
     end
+  
+  with p_sem (m:model 'univ) (tyv:ty_valuation 'univ) (tv:valuation 'tv 'univ)
+    (t:term (bind 'tv unit)) : 'univ -> bool =
+    \x. t_sem m tyv (bfold tv (const x)) t = m.i_true
   
   with tl_sem (m:model 'univ) (tyv:ty_valuation 'univ) (tv:valuation 'tv 'univ)
     (l:list (term 'tv)) : list 'univ =
@@ -361,6 +371,14 @@ module SemSubst
         t_sem m tyv g0 (t_map (bmap f) identity identity identity t2) =
         t_sem m tyv (bfold (compose rho f) cv0) t2 }
     | TCase t brl -> rc t;brl_map_sem m tyv f brl
+    | TEps _ t -> t_map_sem m tyv (bmap f) t;
+      assert { forall rho.
+        let tm = t_map (bmap f) identity identity identity t in
+        (forall x. t_sem m tyv (bfold rho (const x)) tm =
+          t_sem m tyv (compose (bfold rho (const x)) (bmap f)) t =
+          t_sem m tyv (bfold (compose rho f) (const x)) t) &&
+        extensional_equal (p_sem m tyv rho tm)
+                          (p_sem m tyv (compose rho f) t) };
     | TForall _ t | TExists _ t -> t_map_sem m tyv (bmap f) t;
       assert { forall rho fv. let g0 = bfold rho fv in
         t_sem m tyv g0 (t_map (bmap f) identity identity identity t) =
@@ -438,6 +456,12 @@ module SemSubst
         t_sem m (compose (ty_sem m tyv) g)
                 (bfold (compose (t_sem m tyv rho) f) cv0) t2 }
     | TCase t brl -> rc t;brl_subst_sem m tyv f g brl
+    | TEps _ t -> t_subst_sem m tyv (term_lift f) g t;
+      let ts = t_subst (term_lift f) g identity identity t in
+      assert { forall rho.
+        extensional_equal (p_sem m tyv rho ts)
+                          (p_sem m (compose (ty_sem m tyv) g)
+                                   (compose (t_sem m tyv rho) f) t) };
     | TForall tyl t | TExists tyl t -> t_subst_sem m tyv (term_lift f) g t;
       let ts = t_subst (term_lift f) g identity identity t in
       let tyls = tyl_subst g identity tyl in
@@ -1024,7 +1048,7 @@ module WellTyped
           valuation_coherence m tyv env' rho' && false) && false) }
     | TCase tc brl -> t_coherent_type m sig tyv tc;
       brl_coherent_type m sig tyv brl
-    | TForall _ _ | TExists _ _
+    | TEps _ _ | TForall _ _ | TExists _ _
     | TAnd _ _ | TOr _ _ | TImplies _ _ | TIff _ _
     | TNot _ | TVar _ | TTrue | TFalse -> ()
     end

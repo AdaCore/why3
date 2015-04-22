@@ -48,9 +48,9 @@ module Sexpr = Set.Make(ExprNode)
 (** prints the given expression, transforming spaces into _ *)
 let string_of_expr_node node =
   let print_in_buf printer x =
-    let b = Buffer.create 42 in
-    Format.bprintf b "@[%a@]" printer x;
-    Buffer.contents b in
+    Format.fprintf Format.str_formatter "@[%a@]" printer x;
+    Format.flush_str_formatter()
+  in
   let white_space = Str.regexp "[ ()]" in
   let translate x = Str.global_replace white_space "_" x in
   let repr = print_in_buf Pretty.print_term node in
@@ -362,7 +362,7 @@ module Select = struct
       | Tnot f -> fmla_get_pred ~pos:false acc f
       | Tapp (pred,_) -> (pred, (if pos then `Positive else `Negative))::acc
       | _ -> failwith "bad formula in get_predicates !"
-    in List.fold_left fmla_get_pred acc clause
+    in List.fold_left (fmla_get_pred ?pos:None) acc clause
 
   (** get all sub-formulae *)
   let get_sub_fmlas fTbl tTbl fmla =
@@ -598,4 +598,3 @@ Local Variables:
 End:
 vim:foldmethod=indent:foldnestmax=1
 *)
-

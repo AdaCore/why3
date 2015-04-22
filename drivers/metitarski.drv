@@ -34,7 +34,13 @@ transformation "eliminate_epsilon"
 transformation "eliminate_if"
 transformation "eliminate_let"
 
+transformation "simplify_formula"
 transformation "simplify_unknown_lsymbols"
+transformation "simplify_trivial_quantification"
+transformation "introduce_premises"
+transformation "instantiate_predicate"
+transformation "abstract_unknown_lsymbols"
+
 transformation "discriminate"
 transformation "encoding_tptp"
 
@@ -65,6 +71,10 @@ theory real.Real
   syntax predicate (<)  "(%1 < %2)"
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
+
+  meta "inline : no" predicate (<=)
+  meta "inline : no" predicate (>=)
+  meta "inline : no" predicate (>)
 
   (* These follow from Metitarski's axioms. *)
   remove prop CommutativeGroup.Comm.Comm

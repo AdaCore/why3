@@ -5,8 +5,9 @@
 module Hackers_delight
   use import int.Int
   use import bool.Bool
-  use import bitvec.BitVector32
+  use import bv.BV32
 
+  constant one : t = of_int 1
   constant two : t = of_int 2
   constant lastbit : t = sub size one
 
@@ -28,13 +29,13 @@ module Hackers_delight
       *)
 
   function count (bv : t) : t =
-    let x = sub bv (bw_and (lsr bv one) (of_int 0x55555555)) in
+    let x = sub bv (bw_and (lsr_bv bv one) (of_int 0x55555555)) in
     let x = add (bw_and x (of_int 0x33333333))
-                (bw_and (lsr x (of_int 2)) (of_int (0x33333333))) in
-    let x = bw_and (add x (lsr x (of_int 4)))
+                (bw_and (lsr_bv x (of_int 2)) (of_int (0x33333333))) in
+    let x = bw_and (add x (lsr_bv x (of_int 4)))
                    (of_int 0x0F0F0F0F) in
-    let x = add x (lsr x (of_int 8)) in
-    let x = add x (lsr x (of_int 16)) in
+    let x = add x (lsr_bv x (of_int 8)) in
+    let x = add x (lsr_bv x (of_int 16)) in
     bw_and x (of_int 0x0000003F)
 
   (** We can verify our definition by, first, checking that there are no
@@ -48,8 +49,8 @@ module Hackers_delight
       there are n-1 1-bits in the shifting of b by one on the right. *)
 
   lemma countStep: forall b.
-    (not (nth b zero) <-> count (lsr b one) = count b) /\
-    (nth b zero <-> count (lsr b one) = sub (count b) one)
+    (not (nth_bv b zero) <-> count (lsr_bv b one) = count b) /\
+    (nth_bv b zero <-> count (lsr_bv b one) = sub (count b) one)
 
   (** We then define the associated notion of distance, namely
       "Hamming distance", that counts the number of bits that differ
@@ -71,17 +72,17 @@ module Hackers_delight
   (** A ascii character is valid if its number of bits is even.
       (Remember that a binary number is odd if and only if its first
       bit is 1) *)
-  predicate validAscii (b : t) = not (nth (count b) zero)
+  predicate validAscii (b : t) = not (nth_bv (count b) zero)
 
   (** The ascii checksum aim is to make any character valid in the
       sens that we just defined. One way to implement it is to count
       the number of bit of a character encoded in 7 bits, and if this
       number is odd, set the 8th bit to 1 if not, do nothing:*)
   let ascii (b : t) =
-    requires { not (nth b lastbit) }
+    requires { not (nth_bv b lastbit) }
     ensures  { validAscii result }
     let c = count b in
-    bw_or b (lsl c lastbit)
+    bw_or b (lsl_bv c lastbit)
 
   (** Now, for the correctness of the checksum :
 
@@ -92,7 +93,7 @@ module Hackers_delight
       will be invalid, hence the validity of the encoding. *)
   lemma asciiProp: forall a b.
       ((validAscii a /\ not validAscii b) \/ (validAscii b /\ not
-      validAscii a)) <-> nth (hammingD a b) zero
+      validAscii a)) <-> nth_bv (hammingD a b) zero
 
   (** {2 Gray code}
     Gray codes are bit-wise representations of integers with the
@@ -106,14 +107,14 @@ module Hackers_delight
   (** {4 the two transformations, to and from Gray-coded integer } *)
 
   function toGray (bv : t) : t =
-    bw_xor bv (lsr bv one)
+    bw_xor bv (lsr_bv bv one)
 
   function fromGray (gr : t) : t =
-    let b = bw_xor gr (lsr gr (of_int 1)) in
-    let b = bw_xor b (lsr b (of_int 2)) in
-    let b = bw_xor b (lsr b (of_int 4)) in
-    let b = bw_xor b (lsr b (of_int 8)) in
-      bw_xor b (lsr b (of_int 16))
+    let b = bw_xor gr (lsr_bv gr (of_int 1)) in
+    let b = bw_xor b (lsr_bv b (of_int 2)) in
+    let b = bw_xor b (lsr_bv b (of_int 4)) in
+    let b = bw_xor b (lsr_bv b (of_int 8)) in
+      bw_xor b (lsr_bv b (of_int 16))
 
   (** Which define an isomorphism. *)
 
@@ -137,12 +138,12 @@ module Hackers_delight
 
   lemma nthGray: forall b i.
     ult i lastbit ->
-      xorb (nth b i) (nth b (add i one)) <-> nth (toGray b) i
+      xorb (nth_bv b i) (nth_bv b (add i one)) <-> nth_bv (toGray b) i
 
   (** (using 0 if there is no bit to the left of i) *)
 
   lemma lastNthGray: forall b.
-    nth (toGray b) lastbit <-> nth b lastbit
+    nth_bv (toGray b) lastbit <-> nth_bv b lastbit
 
   (** Bit i of a binary integer is the parity of all the bits at and
       to the left of position i in the corresponding Gray coded
@@ -150,14 +151,14 @@ module Hackers_delight
 
   lemma nthBinary: forall b i.
     ult i size ->
-      nth (fromGray b) i <-> nth (count (lsr b i)) zero
+      nth_bv (fromGray b) i <-> nth_bv (count (lsr_bv b i)) zero
 
   (** The last property that we check is that if an integer is even
       its encoding has an even number of 1-bits, and if it is odd, its
       encoding has an odd number of 1-bits. *)
 
   lemma evenOdd : forall b.
-    nth b zero <-> nth (count (toGray b)) zero
+    nth_bv b zero <-> nth_bv (count (toGray b)) zero
 
   (** {2 Various (in)equalities between bitvectors. } *)
 
@@ -254,16 +255,16 @@ module Hackers_delight
   (** shift right and arithmetic shift right (p.20)*)
 
   lemma SR1: forall x n. ult n size ->
-    bw_or (lsr x n) (lsl (neg( lsr x (of_int 31) )) (sub (of_int 31) n))
-  = asr x n
+    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
+  = asr_bv x n
 
   (** rotate vs shift (p.37)*)
 
   lemma RS_left: forall x.
-    bw_or (lsl x (of_int 1)) (lsr x (of_int 31)) = rotate_left x one
+    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left x one
 
   lemma RS_right: forall x.
-    bw_or (lsr x (of_int 1)) (lsl x (of_int 31)) = rotate_right x one
+    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right x one
 
   (** {6 bound propagation (p.73)} *)
 

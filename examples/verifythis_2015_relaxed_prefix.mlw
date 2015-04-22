@@ -94,17 +94,13 @@ module RelaxedPrefix
     ofs1 + len <= length a1 /\ ofs2 + len <= length a2 /\
     forall i: int. 0 <= i < len -> a1[ofs1 + i] = a2[ofs2 + i]
 
-  (** The target property.  Note that this definition imposes the
-      index of the character which is ignored (index [i] in the existential
-      quantifier). It simplifies our proof, but a looser definition would
-      be possible (see the comment at the end of this file). *)
+  (** The target property. *)
 
   predicate is_relaxed_prefix (pat a: array char) =
     let n = length pat in
        eq_array pat 0 a 0 n
     \/ exists i: int. 0 <= i < n /\
                       eq_array pat 0 a 0 i /\
-                      (i = length a \/ pat[i] <> a[i]) /\
                       eq_array pat (i+1) a i (n - i - 1)
 
   (** This exception is used to exit the loop as soon as the target
@@ -126,7 +122,6 @@ module RelaxedPrefix
       let ghost ignored = ref 0 in
       for i = 0 to n - 1 do
         invariant { 0 <= !shift <= 1 }
-        invariant { i = 0 -> !shift = 0 }
         invariant { !shift = 1 -> 0 <= !ignored < i }
         invariant { m + !shift >= i }
         invariant {
@@ -136,29 +131,20 @@ module RelaxedPrefix
                not (eq_array pat 0 a 0 i) /\
                (!ignored < m -> pat[!ignored] <> a[!ignored]) }
         if i - !shift >= m || pat[i] <> a[i - !shift] then begin
-          if !shift = 1 then raise NoPrefix;
+          if !shift = 1 then begin
+            assert { forall j. eq_array pat 0 a 0 j ->
+              eq_array pat (j+1) a j (n-j-1) ->
+              !ignored > j -> pat[j+1+(i-j-1)] = a[j+(i-j-1)]
+            };
+            raise NoPrefix
+          end;
           ignored := i;
           shift := 1;
-        end
+        end;
       done;
       True
     with NoPrefix ->
       False
     end
-
-  (** a simpler definition of [is_relaxed_prefix] would be the following: *)
-
-  predicate simple_is_relaxed_prefix (pat a: array char) =
-    let n = length pat in
-       eq_array pat 0 a 0 n
-    \/ exists i: int. 0 <= i < n /\
-                      eq_array pat 0 a 0 i /\
-                      eq_array pat (i+1) a i (n - i - 1)
-
-  (* TODO: prove the equivalence
-  lemma equivalence:
-    forall pat a: array char.
-    is_relaxed_prefix pat a <-> simple_is_relaxed_prefix pat a
-  *)
 
 end

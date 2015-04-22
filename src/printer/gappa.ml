@@ -48,7 +48,7 @@ let () =
       ])))
     ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ \
       of@ substituting@ quantified@ variables,@ substitute@ applications@ \
-      of@ non-buit-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer."
+      of@ non-built-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer."
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
 

@@ -205,7 +205,6 @@ val read_session: string -> unit session * bool
 
 *)
 
-
 val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
 

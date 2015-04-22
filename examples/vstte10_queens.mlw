@@ -158,68 +158,60 @@ module MachineArithmetic
     forall q: int. 0 <= q < pos ->
     0 <= to_int board[q] < to_int (length board)
 
-  exception MInconsistent int63
+  exception MInconsistent
 
   let mcheck_is_consistent (board: array int63) (pos: int63)
     requires { 0 <= to_int pos < to_int (length board) }
     requires { is_board board (to_int pos + 1) }
   = try
-      let rec forloop q (* for q = 0 to pos-1 do *) =
-        requires { 0 <= to_int q <= to_int pos }
-        requires { is_board board (to_int pos + 1) }
-        variant  { to_int pos - to_int q }
-        raises   { MInconsistent -> true }
-        if q < pos then begin
-          let bq   = board[q]   in
-          let bpos = board[pos] in
-          if bq        = bpos    then raise (MInconsistent q);
-          if bq - bpos = pos - q then raise (MInconsistent q);
-          if bpos - bq = pos - q then raise (MInconsistent q);
-          forloop (q + of_int 1)
-        end in
-      forloop (of_int 0);
+      let q = ref (of_int 0) in
+      while !q < pos do
+        invariant { 0 <= to_int !q <= to_int pos }
+        invariant { is_board board (to_int pos + 1) }
+        variant   { to_int pos - to_int !q }
+        let bq   = board[!q]   in
+        let bpos = board[pos] in
+        if bq        = bpos     then raise MInconsistent;
+        if bq - bpos = pos - !q then raise MInconsistent;
+        if bpos - bq = pos - !q then raise MInconsistent;
+        q := !q + of_int 1
+      done;
       True
-    with MInconsistent _ ->
+    with MInconsistent ->
       False
     end
 
-  use mach.onetime.OneTime as O
+  use mach.peano.Peano as P
 
-  type oref = { mutable ot : O.t }
-
-  let rec mcount_bt_queens (board: array int63) (n: int63) (pos: int63) : O.t
+  let rec mcount_bt_queens
+    (solutions: ref P.t) (board: array int63) (n: int63) (pos: int63)
     requires { to_int (length board) = to_int n }
     requires { 0 <= to_int pos <= to_int n }
     requires { is_board board (to_int pos) }
     variant  { to_int n - to_int pos }
-    ensures  { result.O.valid }
     ensures  { is_board board (to_int pos) }
   =
     if eq pos n then
-      O.succ (O.zero ())
-    else begin
-      let s = { ot = O.zero () } in
-      let rec forloop (i: int63) = (* for i = 0 to n-1 do *)
-        requires { 0 <= to_int i <= to_int n }
-        requires { s.ot.O.valid }
-        requires { is_board board (to_int pos) }
-        variant  { to_int n - to_int i }
-        ensures  { s.ot.O.valid }
-        ensures  { is_board board (to_int pos) }
-        if i < n then begin
-          board[pos] <- i;
-          if mcheck_is_consistent board pos then
-            s.ot <- O.add s.ot (mcount_bt_queens board n (pos + of_int 1));
-          forloop (i + of_int 1)
-        end in
-      forloop (of_int 0);
-      s.ot
-    end
+      solutions := P.succ !solutions
+    else
+      let i = ref (of_int 0) in
+      while !i < n do
+        invariant { 0 <= to_int !i <= to_int n }
+        invariant { is_board board (to_int pos) }
+        variant   { to_int n - to_int !i }
+        board[pos] <- !i;
+        if mcheck_is_consistent board pos then
+          mcount_bt_queens solutions board n (pos + of_int 1);
+        i := !i + of_int 1
+      done
 
-  let mcount_queens (board: array int63) (n: int63) : O.t
+  let mcount_queens (board: array int63) (n: int63) : P.t
     requires { to_int (length board) = to_int n }
     ensures  { true }
-  = mcount_bt_queens board n (of_int 0)
+  =
+     let solutions = ref (P.zero ()) in
+     mcount_bt_queens solutions board n (of_int 0);
+     !solutions
 
   let test_mcount_8 () =
     let n = of_int 8 in

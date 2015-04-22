@@ -285,7 +285,7 @@ let add_decl uc d =
     | Decl.Dind (_,dl) -> List.fold_left add_logic uc dl
     | Decl.Dprop _ -> uc
   in
-  add_to_theory Theory.add_decl uc d
+  add_to_theory (Theory.add_decl ?warn:None) uc d
 
 let use_export_theory uc th =
   let nth = Theory.use_export uc.muc_theory th in

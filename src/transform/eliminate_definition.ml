@@ -291,7 +291,7 @@ let bisect_step task0 =
     | Some {task_prev = t} -> length acc t
     | None -> acc in
   let n = length 0 task in
-  let a = Array.create n (Obj.magic 0) in
+  let a = Array.make n (Obj.magic 0) in
   let rec init acc = function
     | Some {task_decl = {td_node = Decl d}; task_prev = t} ->
       a.(acc) <- d; init (acc - 1) t

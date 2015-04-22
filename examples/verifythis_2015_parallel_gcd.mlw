@@ -105,3 +105,77 @@ module ParallelGCD
     !a
 
 end
+
+(** Threads interleaving.
+    Code and invariants by Rustan Leino. *)
+(***
+module Interleaving
+
+  use import int.Int
+  use import number.Gcd
+  use import ref.Ref
+
+  lemma gcd_sub: forall a b: int. gcd a b = gcd a (b - a)
+
+  type state = ReadA | ReadB | Compare | Halt
+
+  type thread = {
+    mutable local_a: int; (* local copy of a *)
+    mutable local_b: int; (* local copy of b *)
+    mutable state  : state;
+  }
+
+  predicate inv (th: thread) (a0 b0 a b: int) =
+    0 < a /\ 0 < b /\ gcd a b = gcd a0 b0 /\
+    match th.state with
+    | ReadA -> true
+    | ReadB -> th.local_a = a
+    | Compare -> th.local_a = a && b <= th.local_b &&
+                  (th.local_b <= th.local_a -> th.local_b = b)
+    | Halt -> th.local_a = a = b
+    end
+
+  val create_thread () : thread
+    ensures { result.state = ReadA }
+
+  let step (th: thread) (ghost a0 b0: int) (a b: ref int)
+    requires { inv th a0 b0 !a !b }
+    writes   { th, a }
+    ensures  { inv th a0 b0 !a !b }
+    ensures  { 0 < !a <= old !a }
+  =
+    match th.state with
+    | ReadA ->
+        th.local_a <- !a; th.state <- ReadB
+    | ReadB ->
+        th.local_b <- !b; th.state <- Compare
+    | Compare ->
+        if th.local_a = th.local_b then
+          th.state <- Halt
+        else begin
+          if th.local_a > th.local_b then a := th.local_a - th.local_b;
+          th.state <- ReadA
+        end
+    | Halt ->
+        ()
+    end
+
+  let parallel_gcd (a0 b0: int) : int
+    requires { 0 < a0 /\ 0 < b0 }
+    diverges
+    ensures  { result = gcd a0 b0 }
+  =
+    (* shared variables *)
+    let a = ref a0 in
+    let b = ref b0 in
+    (* two threads *)
+    let th1 = create_thread () in
+    let th2 = create_thread () in
+    while th1.state <> Halt || th2.state <> Halt do
+      invariant { inv th1 a0 b0 !a !b /\ inv th2 b0 a0 !b !a }
+      if any bool then step th1 a0 b0 a b else step th2 b0 a0 b a
+    done;
+    !a
+
+end
+***)

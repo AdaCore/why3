@@ -1281,7 +1281,10 @@ and exec_app env s ps args (*spec*) ity_result =
     Mreg.filter (fun r1 r2 -> not (reg_equal r1 r2)) subst
   in
   let env1 = { env with regenv =
+(*
       Mreg.union (fun _ x _ -> Some x) subst env.regenv }
+*)
+    Mreg.set_union subst env.regenv }
   in
   match find_definition env ps with
     | Some d ->

@@ -113,7 +113,7 @@ end
 
 (** {2 Generic theory (arbitrary length)} *)
 
-module BitVector
+module BV
 
   use export bool.Bool
   use import Pow2int
@@ -124,108 +124,135 @@ module BitVector
   constant max_int : int
 
   function to_int t : int
+  function to_uint t : int
   function of_int int : t
 
   constant size : t = of_int size_int
 
-  use int.Int
+  use import int.Int
   use import int.EuclideanDivision
 
   constant two_power_size : int = Int.(+) max_int 1
 
-  axiom to_int_extensionality :
+  axiom to_uint_extensionality :
+    forall v,v':t. to_uint v = to_uint v' -> v = v'
+
+  axiom to_int_extensionality:
     forall v,v':t. to_int v = to_int v' -> v = v'
 
-  predicate int_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
+  predicate uint_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
 
-  axiom to_int_bounds :
-    forall v:t. int_in_range (to_int v)
+  axiom to_uint_bounds :
+    forall v:t. uint_in_range (to_uint v)
 
-  axiom to_int_of_int :
-    forall i. int_in_range i -> to_int (of_int i) = i
+  axiom to_uint_of_int :
+    forall i. uint_in_range i -> to_uint (of_int i) = i
 
   predicate ult (x y : t) =
-    Int.(<) (to_int x) (to_int y)
+    Int.(<) (to_uint x) (to_uint y)
 
   predicate ule (x y : t) =
-    Int.(<=) (to_int x) (to_int y)
+    Int.(<=) (to_uint x) (to_uint y)
 
   predicate ugt (x y : t) =
-    Int.(>) (to_int x) (to_int y)
+    Int.(>) (to_uint x) (to_uint y)
 
   predicate uge (x y : t) =
-    Int.(>=) (to_int x) (to_int y)
+    Int.(>=) (to_uint x) (to_uint y)
 
-  function nth t t: bool
-  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+  (** binary predicate for signed less than *)
+  predicate slt (v1 v2 : t) =
+    Int.(<) (to_int v1) (to_int v2)
+
+  (** binary predicate for signed less than or equal *)
+  predicate sle (v1 v2 : t) =
+    Int.(<=) (to_int v1) (to_int v2)
+
+  (**  binary predicate for signed greater than *)
+  predicate sgt (v1 v2 : t) =
+    Int.(>) (to_int v1) (to_int v2)
+
+  (**  binary predicate for signed greater than or equal *)
+  predicate sge (v1 v2 : t) =
+    Int.(>=) (to_int v1) (to_int v2)
+
+  function nth t int : bool
+  function nth_bv t t: bool
+  (** [nth(_bv) b n] is the n-th bit of x (0 <= n < size). bit 0 is
       the least significant bit *)
 
-  axiom nth_ext : forall u v. not( u = v ) -> exists t. ult t size /\ not (nth u t = nth v t)
+  axiom Nth_bv_is_nth:
+    forall x i: t.
+      nth_bv x i = nth x (to_uint i)
 
-  constant zero : t = of_int 0
+  (* axiom nth_ext : forall u v. not( u = v ) -> exists t. ult t size /\ not (nth u t = nth v t) *)
+
+  constant zero : t
+  axiom Of_int_zero:
+    zero = of_int 0
   axiom Nth_zero:
-    forall n. ult n size -> nth zero n = False
+    forall n:int. 0 <= n < size_int -> nth zero n = False
 
-  constant ones : t = of_int max_int
+  constant ones : t
+  axiom Of_int_ones:
+    ones = of_int max_int
   axiom Nth_ones:
-    forall n. ult n size -> nth ones n = True
+    forall n. 0 <= n < size_int -> nth ones n = True
 
   predicate eq (v1 v2 : t) =
-    forall n. ult n size -> nth v1 n = nth v2 n
+    forall n. 0 <= n < size_int -> nth v1 n = nth v2 n
 
   axiom Extensionality: forall x y : t. eq x y -> x = y
 
-  constant one : t = of_int 1
-
   (** addition modulo 2^m *)
   function add (v1 v2 : t) : t
-  axiom to_int_add:
-    forall v1 v2. to_int (add v1 v2) =  mod (Int.(+) (to_int v1) (to_int v2)) two_power_size
+  axiom to_uint_add:
+    forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
 
   (** 2's complement subtraction modulo 2^m *)
   function sub (v1 v2 : t) : t
-  axiom to_int_sub:
-    forall v1 v2. to_int (sub v1 v2) = mod (Int.(-) (to_int v1) (to_int v2)) two_power_size
+  axiom to_uint_sub:
+    forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
 
   (** 2's complement unary minus *)
   function neg (v1 : t) : t
-  axiom to_int_neg:
-    forall v. to_int (neg v) = mod (Int.(-_) (to_int v)) two_power_size
+  axiom to_uint_neg:
+    forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
 
   (** multiplication modulo 2^m *)
   function mul (v1 v2 : t) : t
-  axiom to_int_mul:
-    forall v1 v2. to_int (mul v1 v2) = mod (Int.( * ) (to_int v1) (to_int v2)) two_power_size
+  axiom to_uint_mul:
+    forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
 
   (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
   function udiv (v1 v2 : t) : t
-  axiom to_int_udiv:
-    forall v1 v2. to_int (udiv v1 v2) = div (to_int v1) (to_int v2)
+  axiom to_uint_udiv:
+    forall v1 v2. to_uint (udiv v1 v2) = div (to_uint v1) (to_uint v2)
 
   (** unsigned remainder from truncating division (undefined if divisor is 0) *)
   function urem (v1 v2 : t) : t
-  axiom to_int_urem:
-    forall v1 v2. to_int (urem v1 v2) = mod (to_int v1) (to_int v2)
+  axiom to_uint_urem:
+    forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
 
   function bw_and (v1 v2 : t) : t
   axiom Nth_bw_and:
-    forall v1 v2 n. ult n size ->
+    forall v1 v2:t, n:int. 0 <= n < size_int ->
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
 
   function bw_or (v1 v2 : t) : t
   axiom Nth_bw_or:
-    forall v1 v2 n. ult n size ->
+    forall v1 v2:t, n:int. 0 <= n < size_int ->
       nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
 
   function bw_xor (v1 v2 : t) : t
   axiom Nth_bw_xor:
-    forall v1 v2 n. ult n size ->
+    forall v1 v2:t, n:int. 0 <= n < size_int ->
       nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
 
   function bw_not (v : t) : t
   axiom Nth_bw_not:
-    forall v n. ult n size ->
-      nth (bw_not v) n = not (nth v n)
+    forall v:t, n:int. 0 <= n < size_int ->
+      nth (bw_not v) n = notb (nth v n)
 
   function rotate_right (v n : t) : t
   (** rotate right  *)
@@ -235,55 +262,68 @@ module BitVector
 
   axiom Nth_rotate_left :
     forall v n i. ult i size ->
-      nth v i = nth (rotate_left v n) (urem (add i n) size)
+      nth_bv v i = nth_bv (rotate_left v n) (urem (add i n) size)
 
   axiom Nth_rotate_right :
     forall v n i. ult i size ->
-      nth (rotate_right v n) i = nth v (urem (add i n) size)
+      nth_bv (rotate_right v n) i = nth_bv v (urem (add i n) size)
 
   (* no problems with shift of length greater than size in ada : *)
   (* http://www.adaic.org/resources/add_content/standards/12rm/html/RM-B-2.html *)
 
-  function lsr t t : t
+  function lsr_bv t t : t
+  function lsr t int : t
   (** logical shift right *)
 
-  axiom Lsr_nth_low: forall b s n.
-      ult s size /\ ult n (sub size s) ->
-        nth (lsr b s) n = nth b (add n s)
+  axiom lsr_bv_is_lsr:
+    forall x n.
+      lsr_bv x n = lsr x (to_uint n)
 
-  axiom Lsr_nth_high: forall b s n.
-      ult n size /\ ( uge s size \/ uge (add n s) size ) ->
-        nth (lsr b s) n = False
+  axiom Lsr_nth_low:
+    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s < size_int ->
+      nth (lsr b s) n = nth b (n+s)
 
-  axiom to_int_lsr:
+  axiom Lsr_nth_high:
+    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
+      nth (lsr b s) n = False
+
+  axiom to_uint_lsr:
     forall v n : t.
-      to_int (lsr v n) = div (to_int v) (pow2 ( to_int n ))
+      to_uint (lsr_bv v n) = div (to_uint v) (pow2 ( to_uint n ))
 
-  function asr t t : t
+  function asr_bv t t : t
+  function asr t int : t
   (** arithmetic shift right *)
 
-  axiom Asr_nth_low: forall b n s.
-      ult s size /\ ult n (sub size s) ->
-        nth (asr b s) n = nth b (add n s)
+  axiom asr_bv_is_asr:
+    forall x n.
+      asr_bv x n = asr x (to_uint n)
 
-  axiom Asr_nth_high: forall b n s.
-      ult n size /\ ( uge s size \/ uge (add n s) size ) ->
-        nth (asr b s) n = nth b (sub size one)
+  axiom Asr_nth_low:
+    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n+s < size_int ->
+      nth (asr b s) n = nth b (n+s)
+
+  axiom Asr_nth_high:
+    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
+      nth (asr b s) n = nth b (size_int-1)
 
   (** logical shift left *)
-  function lsl t t : t
+  function lsl_bv t t : t
+  function lsl t int : t
 
-  axiom Lsl_nth_high: forall b s n.
-      ult s size /\ ule s n /\ ult n size ->
-        nth (lsl b s) n = nth b (sub n s)
+  axiom lsl_bv_is_lsl:
+    forall x n.
+      lsl_bv x n = lsl x (to_uint n)
 
-  axiom Lsl_nth_low: forall b s n.
-      ult n size /\ ult n s ->
-        nth (lsl b s) n = False
+  axiom Lsl_nth_high:
+    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n-s < size_int -> nth (lsl b s) n = nth b (n-s)
 
-  axiom to_int_lsl:
+  axiom Lsl_nth_low:
+    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n-s < 0 -> nth (lsl b s) n = False
+
+  axiom to_uint_lsl:
     forall v n : t.
-         to_int (lsl v n) = mod (Int.( * ) (to_int v) (pow2 (to_int n))) two_power_size
+         to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
 
   axiom two_power_size_val :
     two_power_size = pow2 size_int
@@ -291,34 +331,34 @@ end
 
 (** {2 32-bits Bitvectors} *)
 
-module BitVector64
+module BV64
   constant size_int : int = 64
   constant max_int : int = 0xFFFF_FFFF_FFFF_FFFF
-  clone export BitVector with
+  clone export BV with
     constant size_int = size_int,
     constant max_int = max_int
 end
 
-module BitVector32
+module BV32
   constant size_int : int = 32
   constant max_int : int = 0xFFFF_FFFF
-  clone export BitVector with
+  clone export BV with
     constant size_int = size_int,
     constant max_int = max_int
 end
 
-module BitVector16
+module BV16
   constant size_int : int = 16
   constant max_int : int = 0xFFFF
-  clone export BitVector with
+  clone export BV with
     constant size_int = size_int,
     constant max_int = max_int
 end
 
-module BitVector8
+module BV8
   constant size_int : int = 8
   constant max_int : int = 0xFF
-  clone export BitVector with
+  clone export BV with
     constant size_int = size_int,
     constant max_int = max_int
 end
@@ -334,99 +374,99 @@ module BVConverter
 
   predicate in_small_range bigBV
 
-  function to_int_small smallBV : int
-  function to_int_big bigBV : int
+  function to_uint_small smallBV : int
+  function to_uint_big bigBV : int
 
   function toBig smallBV : bigBV
   function toSmall bigBV : smallBV
 end
 
 module BVConverter_32_64
-  use BitVector32
-  use BitVector64
+  use BV32
+  use BV64
 
-  predicate in_range (b : BitVector64.t) = BitVector64.ule b (BitVector64.of_int BitVector32.max_int)
+  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV32.max_int)
 
   clone export BVConverter with
-    type bigBV = BitVector64.t,
-    type smallBV = BitVector32.t,
+    type bigBV = BV64.t,
+    type smallBV = BV32.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BitVector32.two_power_size,
-    function to_int_small = BitVector32.to_int,
-    function to_int_big = BitVector64.to_int
+    constant pow2_smallSize = BV32.two_power_size,
+    function to_uint_small = BV32.to_uint,
+    function to_uint_big = BV64.to_uint
 end
 
 module BVConverter_16_64
-  use BitVector16
-  use BitVector64
+  use BV16
+  use BV64
 
-  predicate in_range (b : BitVector64.t) = BitVector64.ule b (BitVector64.of_int BitVector16.max_int)
+  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV16.max_int)
 
   clone export BVConverter with
-    type bigBV = BitVector64.t,
-    type smallBV = BitVector16.t,
+    type bigBV = BV64.t,
+    type smallBV = BV16.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BitVector16.two_power_size,
-    function to_int_small = BitVector16.to_int,
-    function to_int_big = BitVector64.to_int
+    constant pow2_smallSize = BV16.two_power_size,
+    function to_uint_small = BV16.to_uint,
+    function to_uint_big = BV64.to_uint
 end
 
 module BVConverter_8_64
-  use BitVector8
-  use BitVector64
+  use BV8
+  use BV64
 
-  predicate in_range (b : BitVector64.t) = BitVector64.ule b (BitVector64.of_int BitVector8.max_int)
+  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV8.max_int)
 
   clone export BVConverter with
-    type bigBV = BitVector64.t,
-    type smallBV = BitVector8.t,
+    type bigBV = BV64.t,
+    type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize =  BitVector8.two_power_size,
-    function to_int_small = BitVector8.to_int,
-    function to_int_big = BitVector64.to_int
+    constant pow2_smallSize =  BV8.two_power_size,
+    function to_uint_small = BV8.to_uint,
+    function to_uint_big = BV64.to_uint
 end
 
 module BVConverter_16_32
-  use BitVector16
-  use BitVector32
+  use BV16
+  use BV32
 
-  predicate in_range (b : BitVector32.t) = BitVector32.ule b (BitVector32.of_int BitVector16.max_int)
+  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV16.max_int)
 
   clone export BVConverter with
-    type bigBV = BitVector32.t,
-    type smallBV = BitVector16.t,
+    type bigBV = BV32.t,
+    type smallBV = BV16.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BitVector16.two_power_size,
-    function to_int_small = BitVector16.to_int,
-    function to_int_big = BitVector32.to_int
+    constant pow2_smallSize = BV16.two_power_size,
+    function to_uint_small = BV16.to_uint,
+    function to_uint_big = BV32.to_uint
 end
 
 module BVConverter_8_32
-  use BitVector8
-  use BitVector32
+  use BV8
+  use BV32
 
-  predicate in_range (b : BitVector32.t) = BitVector32.ule b (BitVector32.of_int BitVector8.max_int)
+  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV8.max_int)
 
   clone export BVConverter with
-    type bigBV = BitVector32.t,
-    type smallBV = BitVector8.t,
+    type bigBV = BV32.t,
+    type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BitVector8.two_power_size,
-    function to_int_small = BitVector8.to_int,
-    function to_int_big = BitVector32.to_int
+    constant pow2_smallSize = BV8.two_power_size,
+    function to_uint_small = BV8.to_uint,
+    function to_uint_big = BV32.to_uint
 end
 
 module BVConverter_8_16
-  use BitVector8
-  use BitVector16
+  use BV8
+  use BV16
 
-  predicate in_range (b : BitVector16.t) = BitVector16.ule b (BitVector16.of_int BitVector8.max_int)
+  predicate in_range (b : BV16.t) = BV16.ule b (BV16.of_int BV8.max_int)
 
   clone export BVConverter with
-    type bigBV = BitVector16.t,
-    type smallBV = BitVector8.t,
+    type bigBV = BV16.t,
+    type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BitVector8.two_power_size,
-    function to_int_small = BitVector8.to_int,
-    function to_int_big = BitVector16.to_int
+    constant pow2_smallSize = BV8.two_power_size,
+    function to_uint_small = BV8.to_uint,
+    function to_uint_big = BV16.to_uint
 end
