@@ -8,9 +8,9 @@ section {* Parity properties *}
 
 why3_open "number/Parity.xml"
 
-why3_vc even_def by (simp add: even_equiv_def)
+why3_vc even_def by arith
 
-why3_vc odd_def by (simp add: odd_equiv_def)
+why3_vc odd_def by arith
 
 why3_vc even_or_odd by auto
 
@@ -98,9 +98,9 @@ why3_vc divides_mod_computer
   by (simp add: cmod_def dvd_eq_mod_eq_0 zabs_def
     zmod_zminus1_eq_if zmod_zminus2_eq_if)
 
-why3_vc even_divides by (rule even_iff_2_dvd)
+why3_vc even_divides ..
 
-why3_vc odd_divides by (simp add: even_iff_2_dvd)
+why3_vc odd_divides ..
 
 why3_end
 
@@ -277,14 +277,14 @@ proof -
   from `prime (nat p)` have "0 \<le> p" by (simp add: prime_def)
   from `prime (nat p)` have "2 \<le> nat p" by auto
   with `prime (nat p)` `even p` `0 \<le> p` show ?thesis
-    by (auto simp add: order_le_less prime_odd_nat pos_int_even_equiv_nat_even)
+    by (auto simp add: order_le_less prime_odd_nat even_nat_iff [symmetric])
 qed
 
 why3_vc odd_prime
 proof -
   from `prime (nat p)` have "2 \<le> nat p" by auto
   with `prime (nat p)` `3 \<le> p` show ?thesis
-    by (auto simp add: order_le_less prime_odd_nat pos_int_even_equiv_nat_even)
+    by (auto simp add: order_le_less prime_odd_nat even_nat_iff [symmetric])
 qed
 
 why3_end

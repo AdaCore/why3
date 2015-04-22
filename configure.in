@@ -616,15 +616,15 @@ else
         ISABELLEVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
 
         case $ISABELLEVERSION in
-          2014*)
+          2015*)
 	        enable_isabelle_support=yes
                 AC_MSG_RESULT($ISABELLEVERSION)
                 ;;
           *)
                 AC_MSG_RESULT($ISABELLEVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle2013-2; Isabelle discarded)
-                reason_isabelle_support=" (need version 2013-2)"
+	        AC_MSG_WARN(You need Isabelle2015; Isabelle discarded)
+                reason_isabelle_support=" (need version 2015)"
                 ;;
         esac
     fi
