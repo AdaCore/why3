@@ -81,6 +81,8 @@
       t
     end
 
+  let pp_html_escape = Pp.html_string
+
   let current_file = ref ""
 
   let print_ident fmt lexbuf s =
@@ -96,9 +98,11 @@
       try
         match Glob.find loc with
         | id, Glob.Def ->
-          fprintf fmt "<a name=\"%a\">%s</a>" Doc_def.pp_anchor id s
+          fprintf fmt "<a name=\"%a\">%a</a>"
+            Doc_def.pp_anchor id pp_html_escape s
         | id, Glob.Use ->
-          fprintf fmt "<a href=\"%a\">%s</a>" Doc_def.pp_locate id s
+          fprintf fmt "<a href=\"%a\">%a</a>"
+            Doc_def.pp_locate id pp_html_escape s
       with Not_found ->
         (* otherwise, just print it *)
         pp_print_string fmt s

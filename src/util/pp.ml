@@ -206,6 +206,18 @@ let sprintf_wnl p =
   kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
 
 
+let html_string fmt s =
+  for i=0 to String.length s - 1 do
+    match String.get s i with
+      | '\"' -> pp_print_string fmt "&quot;"
+      | '\'' -> pp_print_string fmt "&apos;"
+      | '<' -> pp_print_string fmt "&lt;"
+      | '>' -> pp_print_string fmt "&gt;"
+      | '&' -> pp_print_string fmt "&amp;"
+      | c -> pp_print_char fmt c
+  done
+
+
 module Ansi =
   struct
 
