@@ -4,6 +4,18 @@
    prelude "(set-logic AUFNIRA)"
 *)
 
+(* Counterexamples: enable model construction *)
+prelude ";; Enable model construction"
+prelude "(set-option :produce-models true)"
+
+(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
+transformation "introduce_premises"
+transformation "intro_projections_counterexmp"
+
+(* Counterexamples: set model parser *)
+model_parser "cvc4_z3"
+
+
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
 import "discrimination.gen"
