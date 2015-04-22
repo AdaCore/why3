@@ -96,11 +96,9 @@
       try
         match Glob.find loc with
         | id, Glob.Def ->
-          let t = Doc_def.anchor id in
-          fprintf fmt "<a name=\"%s\">%s</a>" t s
+          fprintf fmt "<a name=\"%a\">%s</a>" Doc_def.pp_anchor id s
         | id, Glob.Use ->
-          let url = Doc_def.locate id in
-          fprintf fmt "<a href=\"%s\">%s</a>" url s
+          fprintf fmt "<a href=\"%a\">%s</a>" Doc_def.pp_locate id s
       with Not_found ->
         (* otherwise, just print it *)
         pp_print_string fmt s
@@ -339,4 +337,3 @@ Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3doc.opt"
 End:
 *)
-

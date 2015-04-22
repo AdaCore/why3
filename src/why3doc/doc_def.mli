@@ -21,12 +21,7 @@ val set_stdlib_url: string -> unit
 
 val output_file: string -> string
 
-type anchor = string
+val pp_anchor: Format.formatter -> ident -> unit
 
-val anchor: ident -> string
-
-type url = string
-
-val locate: ident -> url
+val pp_locate: Format.formatter -> ident -> unit
   (* or raises [Not_found] *)
-
