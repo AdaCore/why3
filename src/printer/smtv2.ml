@@ -354,7 +354,7 @@ let print_prop_decl args info fmt k pr f = match k with
 	  List.iter (fun f -> 
 	    fprintf str_formatter "%a" (print_fmla info) f;
           let s = flush_str_formatter () in
-          fprintf fmt "@\n;; %s@\n%s" s s;
+          fprintf fmt "%s" s;
           ) model_list;
 	  fprintf fmt "))@]@\n";
 	end;
