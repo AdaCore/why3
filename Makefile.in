@@ -1137,6 +1137,9 @@ else
 endif
 
 lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+ifneq (@enable_local@,yes)
+	cp -r lib/isabelle "$(LIBDIR)/why3"
+endif
 	@(if isabelle components -l | grep -q "$(ISABELLE_TARGET_DIR)$$"; then \
 	    echo "Building the Why3 heap for Isabelle/HOL:"; \
 	    isabelle build -bc Why3; \
@@ -1148,7 +1151,6 @@ lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS
 	  fi)
 
 install_no_local::
-	cp -r lib/isabelle "$(LIBDIR)/why3"
 	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
 
 install_no_local:: lib/isabelle/last_build
