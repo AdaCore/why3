@@ -1173,6 +1173,7 @@ let load_result r =
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.HighFailure
+            | "stepslimitexceeded" -> Call_provers.StepsLimitExceeded
             | s ->
                 Warning.emit
                   "[Warning] Session.load_result: unexpected status '%s'@." s;
