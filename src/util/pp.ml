@@ -176,10 +176,15 @@ let string_of ?max_boxes p x =
   Buffer.contents b
 
 let wnl fmt =
+(*
   let out,flush,_newline,spaces =
     pp_get_all_formatter_output_functions fmt () in
   pp_set_all_formatter_output_functions fmt
     ~out ~flush ~newline:(fun () -> spaces 1) ~spaces
+*)
+  let o = pp_get_formatter_out_functions fmt () in
+  pp_set_formatter_out_functions fmt
+    { o with out_newline = (fun () -> o.out_spaces 1) }
 
 
 let string_of_wnl p x =
@@ -199,6 +204,20 @@ let sprintf_wnl p =
   let fmt = formatter_of_buffer b in
   wnl fmt;
   kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
+
+let html_char fmt c =
+  match c with
+  | '\"' -> pp_print_string fmt "&quot;"
+  | '\'' -> pp_print_string fmt "&apos;"
+  | '<' -> pp_print_string fmt "&lt;"
+  | '>' -> pp_print_string fmt "&gt;"
+  | '&' -> pp_print_string fmt "&amp;"
+  | c -> pp_print_char fmt c
+
+let html_string fmt s =
+  for i=0 to String.length s - 1 do
+    html_char fmt (String.get s i)
+  done
 
 
 module Ansi =

@@ -215,11 +215,11 @@ exception StepsCommandNotSpecified of string
 let get_complete_command pc stepslimit =
   let comm = if stepslimit < 0 then pc.command
     else
-      match pc.command_steps with 
+      match pc.command_steps with
       | None -> raise (StepsCommandNotSpecified "The solver is used with step limit and the command for running the solver with steplimit is not specified.")
       | Some command_steps -> command_steps in
   String.concat " " (comm :: pc.extra_options)
-    
+
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
 
@@ -288,8 +288,8 @@ exception NonUniqueId
 let set_prover _ (prover,shortcuts) family =
   let section = empty_section in
   let section = set_string section "name" prover.prover.prover_name in
-  let section = set_string section "command" prover.command in    
-  let section = 
+  let section = set_string section "command" prover.command in
+  let section =
     Opt.fold (fun s c -> set_string s "command_steps" c) section prover.command_steps
   in
   let section = set_string section "driver" prover.driver in
@@ -578,9 +578,8 @@ let read_config conf_file =
   try
     get_config filenamerc
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    let b = Buffer.create 40 in
-    Format.bprintf b "%a" Exn_printer.exn_printer e;
-    raise (ConfigFailure (fst filenamerc, Buffer.contents b))
+    Format.fprintf str_formatter "%a" Exn_printer.exn_printer e;
+    raise (ConfigFailure (fst filenamerc, flush_str_formatter ()))
 
 (** filter prover *)
 type regexp_desc = { reg : Str.regexp; desc : string}

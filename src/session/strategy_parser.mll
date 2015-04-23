@@ -143,7 +143,7 @@ rule scan code = parse
   let parse env s =
     let code = create_code env in
     scan code (Lexing.from_string s);
-    let label = Array.create code.temp 0 in
+    let label = Array.make code.temp 0 in
     let fill name lab = match lab.defined with
       | None -> error "label '%s' is undefined" name
       | Some n -> label.(lab.temporary) <- n in

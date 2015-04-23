@@ -7,15 +7,15 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <file name="../bitvector_examples.mlw" expanded="true">
-<theory name="Test_proofinuse" sum="ee2b0706c948b7fbb0dceccdae7fcbb8" expanded="true">
- <goal name="WP_parameter shift_is_div" expl="VC for shift_is_div" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="Test_proofinuse" sum="ee2b0706c948b7fbb0dceccdae7fcbb8">
+ <goal name="WP_parameter shift_is_div" expl="VC for shift_is_div">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter shift_is_div.1" expl="1. assertion">
   <proof prover="1"><result status="valid" time="0.16"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter shift_is_div.2" expl="2. assertion" expanded="true">
+  <goal name="WP_parameter shift_is_div.2" expl="2. assertion">
   <proof prover="1"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="WP_parameter shift_is_div.3" expl="3. assertion">
@@ -23,7 +23,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter shift_is_div.4" expl="4. assertion" expanded="true">
+  <goal name="WP_parameter shift_is_div.4" expl="4. assertion">
   <proof prover="1"><result status="valid" time="0.24"/></proof>
   </goal>
  </transf>
@@ -104,7 +104,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight_mod" sum="358ae27e3c7dd0ffc3bad38307e7ee71" expanded="true">
+<theory name="Hackers_delight_mod" sum="358ae27e3c7dd0ffc3bad38307e7ee71">
  <goal name="WP_parameter dm1" expl="VC for dm1">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -173,7 +173,7 @@
  <proof prover="2"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="Test_imperial_violet" sum="9d49ecf681253b01c1150fab4a271ed5" expanded="true">
+<theory name="Test_imperial_violet" sum="9d49ecf681253b01c1150fab4a271ed5">
  <goal name="bv32_bounds_bv">
  <proof prover="0"><result status="valid" time="0.13" steps="141"/></proof>
  <proof prover="1"><result status="valid" time="0.25"/></proof>
@@ -247,8 +247,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter lsr29" expl="VC for lsr29">
- <proof prover="0"><result status="valid" time="0.24" steps="192"/></proof>
+ <goal name="WP_parameter lsr29" expl="VC for lsr29" expanded="true">
  <proof prover="1"><result status="valid" time="0.74"/></proof>
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -301,8 +300,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="to_int_0x00000007">
- <proof prover="0"><result status="valid" time="0.14" steps="192"/></proof>
+ <goal name="to_int_0x00000007" expanded="true">
  <proof prover="1"><result status="valid" time="0.74"/></proof>
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -331,8 +329,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="to_int_0x000000FF">
- <proof prover="0"><result status="valid" time="0.22" steps="192"/></proof>
+ <goal name="to_int_0x000000FF" expanded="true">
  <proof prover="1"><result status="valid" time="0.73"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>

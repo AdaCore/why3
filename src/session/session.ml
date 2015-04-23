@@ -533,16 +533,7 @@ let shape_filename = "why3shapes"
 let compressed_shape_filename = "why3shapes.gz"
 let session_dir_for_save = ref "."
 
-let save_string fmt s =
-  for i=0 to String.length s - 1 do
-    match String.get s i with
-      | '\"' -> pp_print_string fmt "&quot;"
-      | '\'' -> pp_print_string fmt "&apos;"
-      | '<' -> pp_print_string fmt "&lt;"
-      | '>' -> pp_print_string fmt "&gt;"
-      | '&' -> pp_print_string fmt "&amp;"
-      | c -> pp_print_char fmt c
-  done
+let save_string = Pp.html_string
 
 let opt pr lab fmt = function
   | None -> ()
@@ -1182,6 +1173,7 @@ let load_result r =
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.HighFailure
+            | "stepslimitexceeded" -> Call_provers.StepsLimitExceeded
             | s ->
                 Warning.emit
                   "[Warning] Session.load_result: unexpected status '%s'@." s;
