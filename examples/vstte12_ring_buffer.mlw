@@ -139,3 +139,85 @@ module Harness
     let h = pop b in assert { h = z }
 
 end
+
+(** With sequences instead of lists *)
+
+module RingBufferSeq
+
+  use import int.Int
+  use import seq.Seq as S
+  use import array.Array
+
+  type buffer 'a = {
+    mutable first: int;
+    mutable len  : int;
+            data : array 'a;
+    ghost mutable sequence: S.seq 'a;
+  }
+  invariant {
+    let size = Array.length self.data in
+    0 <= self.first <  size /\
+    0 <= self.len   <= size /\
+    self.len = S.length self.sequence /\
+    forall i: int. 0 <= i < self.len ->
+      (self.first + i < size ->
+         S.([]) self.sequence i = self.data[self.first + i]) /\
+      (0 <= self.first + i - size ->
+         S.([]) self.sequence i = self.data[self.first + i - size])
+  }
+
+  (* total capacity of the buffer *)
+  function size (b: buffer 'a) : int = Array.length b.data
+
+  (* length = number of elements *)
+  function length (b: buffer 'a) : int = b.len
+
+  (* code *)
+
+  let create (n: int) (dummy: 'a) : buffer 'a
+    requires { n > 0 }
+    ensures  { size result = n }
+    ensures  { result.sequence = S.empty }
+  = { first = 0; len = 0; data = make n dummy; sequence = S.empty }
+
+  let length (b: buffer 'a) : int
+    ensures { result = length b }
+  = b.len
+
+  let clear (b: buffer 'a) : unit
+    writes  { b.len, b.sequence }
+    ensures { length b = 0 }
+    ensures { b.sequence = S.empty }
+  = ghost b.sequence <- S.empty;
+    b.len <- 0
+
+  let push (b: buffer 'a) (x: 'a) : unit
+    requires { length b < size b }
+    writes   { b.data.elts, b.len, b.sequence }
+    ensures  { length b = (old (length b)) + 1 }
+    ensures  { b.sequence = S.snoc (old b.sequence) x }
+  = ghost b.sequence <- S.snoc b.sequence x;
+    let i = b.first + b.len in
+    let n = Array.length b.data in
+    b.data[if i >= n then i - n else i] <- x;
+    b.len <- b.len + 1
+
+  let head (b: buffer 'a) : 'a
+    requires { length b > 0 }
+    ensures  { result = S.([]) b.sequence 0 }
+  = b.data[b.first]
+
+  let pop (b: buffer 'a) : 'a
+    requires { length b > 0 }
+    writes   { b.first, b.len, b.sequence }
+    ensures  { length b = (old (length b)) - 1 }
+    ensures  { result = S.([]) (old b.sequence) 0 }
+    ensures  { b.sequence = (old b.sequence)[1 ..] }
+  = ghost b.sequence <- b.sequence[1 ..];
+    let r = b.data[b.first] in
+    b.len <- b.len - 1;
+    let n = Array.length b.data in
+    b.first <- b.first + 1;
+    if b.first = n then b.first <- 0;
+    r
+end
