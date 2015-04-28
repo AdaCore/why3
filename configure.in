@@ -495,8 +495,10 @@ else
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         #Even if the name of the variable is CAMLP4 the value can be camlp5
-        COQCAMLP=$(eval `coqtop -config`; echo ${CAMLP4BIN}${CAMLP4}o)
-        COQCAMLPLIB=$(eval `coqtop -config`; echo ${CAMLP4LIB})
+        CAMLP4BIN=`coqtop -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
+        CAMLP4=`coqtop -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
+        COQCAMLPLIB=`coqtop -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
+        COQCAMLP=${CAMLP4BIN}${CAMLP4}o
 
         case $COQVERSION in
           8.4*)
