@@ -57,7 +57,8 @@ let ident_printer =
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
-      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left"; "rotate_right";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
+      "rotate_right";
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
@@ -129,12 +130,10 @@ let print_var_list info fmt vsl =
 let model_label = Ident.create_label "model"
 
 let collect_model_ls info ls =
-  if ls.ls_args = [] &&
-    Slab.mem model_label ls.ls_name.id_label then 
-    begin
-      let t = t_app ls [] ls.ls_value in
-      info.info_model <- (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
-    end
+  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+    let t = t_app ls [] ls.ls_value in
+    info.info_model <-
+      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
 
 (** expr *)
 let rec print_term info fmt t = 
