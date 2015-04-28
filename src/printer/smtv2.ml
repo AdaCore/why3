@@ -319,15 +319,16 @@ let print_param_decl info fmt ls =
     (print_type_value info) ls.ls_value
 
 let print_logic_decl info fmt (ls,def) =
-  if Mid.mem ls.ls_name info.info_syn then () else
-  collect_model_ls info ls;
-  let vsl,expr = Decl.open_ls_defn def in
-  fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
-    print_ident ls.ls_name
-    (print_var_list info) vsl
-    (print_type_value info) ls.ls_value
-    (print_expr info) expr;
-  List.iter forget_var vsl
+  if Mid.mem ls.ls_name info.info_syn then () else begin
+    collect_model_ls info ls;
+    let vsl,expr = Decl.open_ls_defn def in
+    fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
+      print_ident ls.ls_name
+      (print_var_list info) vsl
+      (print_type_value info) ls.ls_value
+      (print_expr info) expr;
+    List.iter forget_var vsl
+  end
 
 let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
