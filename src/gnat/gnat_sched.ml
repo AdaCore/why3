@@ -104,8 +104,10 @@ let server_pid = ref 0
 
 let init_proof_server () =
   if Gnat_config.stand_alone then begin
+    let bin_dir = Filename.dirname Sys.executable_name in
+    let why3server = Filename.concat bin_dir "why3server" in
     server_pid :=
-      Unix.create_process "why3server"
+      Unix.create_process why3server
         [|"why3server"; "--socket"; Gnat_config.socket_name|]
         Unix.stdin Unix.stdout Unix.stderr;
     (* need to wait a bit before connecting. This is debug code, so not an
