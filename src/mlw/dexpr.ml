@@ -349,7 +349,8 @@ and dexpr_node =
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
-  | DElazy of lazy_op * dexpr * dexpr
+  | DEand of dexpr * dexpr
+  | DEor of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of (dexpr * rsymbol * dexpr) list
@@ -612,11 +613,12 @@ let dexpr ?loc node =
         de.de_dvty
     | DEnot de ->
         dexpr_expected_type de dity_bool;
-        de.de_dvty
-    | DElazy (_,de1,de2) ->
+        dvty_bool
+    | DEand (de1,de2)
+    | DEor (de1,de2) ->
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_bool;
-        de1.de_dvty
+        dvty_bool
     | DEif (de1,de2,de3) ->
         let res = dity_fresh () in
         dexpr_expected_type de1 dity_bool;
@@ -644,12 +646,12 @@ let dexpr ?loc node =
     | DEwhile (de1,_,_,de2) ->
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_unit;
-        de2.de_dvty
+        dvty_unit
     | DEfor (_,de_from,_,de_to,_,de) ->
         dexpr_expected_type de_from dity_int;
         dexpr_expected_type de_to dity_int;
         dexpr_expected_type de dity_unit;
-        de.de_dvty
+        dvty_unit
     | DEtry (_,[]) ->
         invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
     | DEtry (de,bl) ->
@@ -743,26 +745,23 @@ let rec effect_of_term t =
   | _ -> quit ()
 
 let effect_of_dspec dsp =
-  let add_raise xs _ eff = eff_raise eff xs in
-  let eff = Mexn.fold add_raise dsp.ds_xpost eff_empty in
-  let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   let add_read s v = Spv.add (try restore_pv v with Not_found ->
     Loc.errorm "unsupported effect expression") s in
   let pvs = List.fold_left add_read Spv.empty dsp.ds_reads in
-  let add_write (s,l,e) t = match effect_of_term t with
+  let add_write (l,eff) t = match effect_of_term t with
     | v, {ity_node = Ityreg reg}, fd ->
         let fs = match fd with
           | Some fd -> Spv.singleton (Opt.get fd.rs_field)
           | None -> Spv.of_list reg.reg_its.its_mfields in
-        let wr = Loc.try3 ?loc:t.t_loc eff_write eff_empty reg fs in
-        Spv.add v s, (wr,t)::l, eff_union e wr
+        let rd = Spv.singleton v and wr = Mreg.singleton reg fs in
+        let e = Loc.try2 ?loc:t.t_loc eff_write rd wr in
+        (e,t)::l, eff_union_par eff e
     | _ ->
         Loc.errorm ?loc:t.t_loc "mutable expression expected" in
-  List.fold_left add_write (pvs, [], eff) dsp.ds_writes
-
-let e_find_eff pr e =
-  try (e_find_minimal (fun e -> e.e_loc <> None && pr e.e_effect) e).e_loc
-  with Not_found -> None
+  let wl, eff = List.fold_left add_write ([], eff_read pvs) dsp.ds_writes in
+  let eff = Mexn.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
+  let eff = if dsp.ds_diverge then eff_diverge eff else eff in
+  wl, eff
 
 let check_spec dsp ecty e =
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
@@ -770,11 +769,11 @@ let check_spec dsp ecty e =
   let bad_raise xeff eff = not (Sexn.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
   let check_rwd = dsp.ds_checkrw in
-  let ur, uwrl, ue = effect_of_dspec dsp in
+  let uwrl, ue = effect_of_dspec dsp in
   let ucty = create_cty ecty.cty_args ecty.cty_pre
-    ecty.cty_post ecty.cty_xpost ur ue ecty.cty_result in
-  let ueff = ucty.cty_effect and urds = ucty.cty_reads in
-  let eeff = ecty.cty_effect and erds = ecty.cty_reads in
+    ecty.cty_post ecty.cty_xpost ue ecty.cty_result in
+  let ueff = ucty.cty_effect and eeff = ecty.cty_effect in
+  let urds = ueff.eff_reads and erds = eeff.eff_reads in
   (* check that every user effect actually happens *)
   if not (Spv.subset urds erds) then Loc.errorm ?loc:e.e_loc
     "variable@ %a@ does@ not@ occur@ in@ this@ expression"
@@ -785,7 +784,7 @@ let check_spec dsp ecty e =
   if bad_raise ueff eeff then Loc.errorm ?loc:e.e_loc
     "this@ expression@ does@ not@ raise@ exception@ %a"
     print_xs (Sexn.choose (Sexn.diff ueff.eff_raises eeff.eff_raises));
-  if ueff.eff_diverg && not eeff.eff_diverg then Loc.errorm ?loc:e.e_loc
+  if ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc:e.e_loc
     "this@ expression@ does@ not@ diverge";
   (* check that every computed effect is listed *)
   if check_rwd && not (Spv.subset erds urds) then Spv.iter (fun v ->
@@ -793,14 +792,14 @@ let check_spec dsp ecty e =
       "this@ expression@ depends@ on@ variable@ %a@ left@ out@ in@ \
       the@ specification" Pretty.print_vs v.pv_vs) (Spv.diff erds urds);
   if check_rwd && bad_write eeff ueff then
-    Loc.errorm ?loc:(e_find_eff (fun eff -> bad_write eff ueff) e)
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sexn.iter (fun xs ->
-    Loc.errorm ?loc:(e_find_eff (fun eff -> Sexn.mem xs eff.eff_raises) e)
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> Sexn.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
       print_xs xs) (Sexn.diff eeff.eff_raises ueff.eff_raises);
-  if check_rwd && eeff.eff_diverg && not ueff.eff_diverg then
-    Loc.errorm ?loc:(e_find_eff (fun eff -> eff.eff_diverg) e)
+  if check_rwd && eeff.eff_oneway && not ueff.eff_oneway then
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> eff.eff_oneway) e)
       "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
         stated@ in@ the@ specification"
 
@@ -808,7 +807,7 @@ let check_aliases recu c =
   let rds_regs = c.cty_freeze.isb_reg in
   let report r _ _ =
     if Mreg.mem r rds_regs then let spv = Spv.filter
-        (fun v -> ity_r_occurs r v.pv_ity) c.cty_reads in
+        (fun v -> ity_r_occurs r v.pv_ity) (cty_reads c) in
       Loc.errorm "The type of this function contains an alias with \
         external variable %a" print_pv (Spv.choose spv)
     else Loc.errorm "The type of this function contains an alias" in
@@ -830,7 +829,7 @@ let check_aliases recu c =
 
 let check_fun rsym dsp e =
   let c,e = match e with
-    | { e_node = Efun e; e_vty = VtyC c } -> c,e
+    | { c_node = Cfun e; c_cty = c } -> c,e
     | _ -> invalid_arg "Dexpr.check_fun" in
   let c = match rsym with
     | Some s -> s.rs_cty
@@ -852,9 +851,12 @@ let env_empty = {
   vsm = Mstr.empty;
 }
 
-let add_rsymbol ({rsm = rsm} as env) rs =
+let add_rsymbol ({rsm = rsm; vsm = vsm} as env) rs =
   let n = rs.rs_name.id_string in
-  { env with rsm = Mstr.add n rs rsm }
+  let vsm = match rs.rs_logic with
+    | RLpv pv -> Mstr.add n pv.pv_vs vsm
+    | _ -> vsm in
+  { env with rsm = Mstr.add n rs rsm; vsm = vsm }
 
 let add_pvsymbol ({pvm = pvm; vsm = vsm} as env) pv =
   let n = pv.pv_vs.vs_name.id_string in
@@ -874,45 +876,12 @@ let cty_of_spec env bl dsp dity =
   let bl = binders bl in
   let env = add_binders env bl in
   let dsp = dsp env.vsm ty in
-  let rds,_,eff = effect_of_dspec dsp in
-  let eff = refresh_of_effect eff in
+  let _,eff = effect_of_dspec dsp in
+  let eff = eff_strong eff in
   let p = create_pre dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  create_cty bl p q xq rds eff ity
-
-(*
-let val_decl env (id,ghost,kind,bl,dsp,dity) =
-  let ity = ity_of_dity dity in match kind with
-  | RKlocal -> invalid_arg "Dexpr.val_decl"
-  | _ when bl <> [] ->
-      let c = cty_of_spec env bl dsp dity in
-      ValS (create_rsymbol id ~ghost ~kind c)
-  | _ when ity_immutable ity ->
-      let c = cty_of_spec env bl dsp dity in
-      if c.cty_pre <> [] then Loc.errorm
-        "Top-level constants can have no preconditions";
-      if not (Spv.is_empty c.cty_reads) then Loc.errorm
-        "Top-level constants can have no external dependencies";
-      if not (eff_is_empty c.cty_effect) then Loc.errorm
-        "Top-level constants can produce no effects";
-      ValS (create_rsymbol id ~ghost ~kind c)
-  | RKnone when ity_closed ity ->
-      let dsp = dsp env.vsm (ty_of_ity ity) in
-      if dsp.ds_pre <> [] || dsp.ds_post <> [] ||
-          not (Mexn.is_empty dsp.ds_xpost) || dsp.ds_reads <> [] ||
-          dsp.ds_writes <> [] || dsp.ds_diverge || dsp.ds_checkrw then
-        Loc.errorm "Mutable top-level variables can have no specification";
-      ValV (create_pvsymbol id ~ghost ity)
-  | RKnone -> Loc.errorm
-      "Mutable top-level variables must have monomorphic type"
-  | RKfunc -> Loc.errorm
-      "Mutable top-level variables cannot be logical functions"
-  | RKpred -> Loc.errorm
-      "Mutable top-level variables cannot be logical predicates"
-  | RKlemma -> Loc.errorm
-      "Mutable top-level variables cannot be logical lemmas"
-*)
+  create_cty bl p q xq eff ity
 
 (** Expressions *)
 
@@ -925,143 +894,165 @@ let warn_unused s loc =
   if s = "" || s.[0] <> '_' then
   Warning.emit ?loc "unused variable %s" s
 
-let check_used_pv e pv = if not (Spv.mem pv e.e_vars) then
+let check_used_pv e pv = if not (Spv.mem pv e.e_effect.eff_reads) then
   warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
+
+let e_let_check ld e = match ld with
+  | LDvar (v,_) -> check_used_pv e v; e_let ld e
+  | _           -> e_let ld e
 
 let rec strip uloc labs de = match de.de_node with
   | DEcast (de,_) -> strip uloc labs de
-  | DEuloc (de,loc) -> strip (Some loc) labs de
+  | DEuloc (de,loc) -> strip (Some (Some loc)) labs de
   | DElabel (de,s) -> strip uloc (Slab.union labs s) de
   | _ -> uloc, labs, de
 
-let set_loc ?(labs=Slab.empty) keep_loc loc uloc e =
-  let loc = if uloc <> None then uloc else
-            if keep_loc then loc else None in
-  if loc = None && Slab.is_empty labs then e
-  else e_label ?loc labs e
+let get_pv env n = Mstr.find_exn (Dterm.UnboundVar n) n env.pvm
+let get_rs env n = Mstr.find_exn (Dterm.UnboundVar n) n env.rsm
 
-let rec expr ~keep_loc uloc env ffo ({de_loc = loc} as de) =
+let rec expr uloc env ({de_loc = loc} as de) =
   let uloc, labs, de = strip uloc Slab.empty de in
-  let e = Loc.try5 ?loc try_expr keep_loc uloc env ffo de in
-  let e = match e.e_vty with
-    | VtyC _ when ffo ->
-        let dt = dity_of_dvty de.de_dvty in
-        let ty = Loc.try1 ?loc ity_of_dity dt in
-        let e = set_loc keep_loc loc uloc e in
-        Loc.try4 ?loc e_app e [] [] ty
-    | _ -> e in
-  set_loc ~labs keep_loc loc uloc e
+  let e = Loc.try3 ?loc try_expr uloc env de in
+  let loc = Opt.get_def loc uloc in
+  if loc = None && Slab.is_empty labs
+  then e else e_label ?loc labs e
 
-and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
-  let get env de = expr ~keep_loc uloc env true de in
+and cexp uloc env ghost ({de_loc = loc} as de) =
+  let uloc, labs, de = strip uloc Slab.empty de in
+  if not (Slab.is_empty labs) then Warning.emit ?loc
+    "Ignoring labels over a higher-order expression";
+  Loc.try4 ?loc try_cexp uloc env ghost de
+
+and try_cexp uloc env ghost de0 = match de0.de_node with
+  | DEvar _ | DErs _ | DEapp _ ->
+      let app (ldl,c) el =
+        let argl, res = de0.de_dvty in
+        ext_c_app (ldl, c_ghostify ghost c) el
+          (List.map ity_of_dity argl) (ity_of_dity res) in
+      let rec down de el = match de.de_node with
+        | DEapp (de1,de2) -> down de1 (expr uloc env de2 :: el)
+        | DEvar (n,_) -> app (ext_c_sym (get_rs env n)) el
+        | DErs s -> app (ext_c_sym s) el
+        | _ -> app (cexp uloc env ghost de) el in
+      down de0 []
+  | DEfun (bl,dsp,de) ->
+      let c, dsp, _ = lambda uloc env (binders bl) dsp de in
+      check_fun None dsp c;
+      [], c_ghostify ghost c
+  | DEany (bl,dsp,dity) ->
+      [], c_ghostify ghost (c_any (cty_of_spec env bl dsp dity))
+  | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
+      let ld, env = var_defn uloc env ghost dldf in
+      let ldl, c = cexp uloc env ghost de in
+      ld::ldl, c
+  | DElet (dldf,de) ->
+      let ldl0, env = sym_defn uloc env ghost dldf in
+      let ldl, c = cexp uloc env ghost de in
+      ldl0 @ ldl, c
+  | DErec (drdf,de) ->
+      let ld, env = rec_defn uloc env ghost drdf in
+      let ldl, c = cexp uloc env ghost de in
+      ld::ldl, c
+  | DEghost de -> cexp uloc env true de
+  | DEmark _ ->
+      Loc.errorm "Marks are not allowed over higher-order expressions"
+  | DEpv _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
+  | DEassign _ | DEwhile _ | DEfor _ | DEtry _ | DEraise _ | DEassert _
+  | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
+  | DEcast _ | DEuloc _ | DElabel _ -> assert false (* already stripped *)
+
+and try_expr uloc env ({de_dvty = argl,res} as de0) =
   match de0.de_node with
   | DEvar (n,_) when argl = [] ->
-      e_var (Mstr.find_exn (Dterm.UnboundVar n) n env.pvm)
-  | DEvar (n,_) ->
-      e_sym (Mstr.find_exn (Dterm.UnboundVar n) n env.rsm)
+      e_var (get_pv env n)
   | DEpv v ->
       e_var v
-  | DErs s ->
-      e_sym s
   | DEconst c ->
       e_const c
-  | DEapp ({de_dvty = (_::_,_)} as de1, de2) ->
-      (* it should be impossible for e1 to be a mapping *)
-      let rec down de el = match de.de_node with
-        | DEapp (de1, de2) -> down de1 (get env de2 :: el)
-        | _ -> expr ~keep_loc uloc env false de, el in
-      let e, el = down de1 [get env de2] in
-      if argl = [] || not ffo
-        then e_app e el (List.map ity_of_dity argl) (ity_of_dity res)
-        else e_app e el [] (ity_of_dity (dity_of_dvty de0.de_dvty))
   | DEapp ({de_dvty = ([],_)} as de1, de2) ->
-      (* it should be impossible for e1 to be a computation *)
-      e_app (e_sym rs_func_app) [get env de1; get env de2] [] (ity_of_dity res)
-  | DEfun (bl,dsp,de) ->
-      let e, dsp, _ = expr_fun ~keep_loc uloc env (binders bl) dsp de in
-      check_fun None dsp e;
-      if bl <> [] then e else
-        let e = set_loc keep_loc de0.de_loc uloc e in
-        e_app e [] [] (cty_of_expr e).cty_result
-  | DEany (bl,dsp,dity) ->
-      let e = e_any (cty_of_spec env bl dsp dity) in
-      if bl <> [] then e else
-        let e = set_loc keep_loc de0.de_loc uloc e in
-        e_app e [] [] (cty_of_expr e).cty_result
-  | DElet ((id,ghost,kind,de1),de2) ->
-      let e1 = expr ~keep_loc uloc env false de1 in
-      let ld = create_let_defn id ~ghost ~kind e1 in
-      let env = match ld.let_sym with
-        | ValS s when s.rs_ghost && not ghost -> Loc.errorm ?loc:id.pre_loc
-            "Function %s must be explicitly marked ghost" id.pre_name
-        | ValS s -> add_rsymbol env s
-        | ValV v -> add_pvsymbol env v in
-      let e2 = expr ~keep_loc uloc env ffo de2 in
+      let e1 = expr uloc env de1 in
+      let e2 = expr uloc env de2 in
+      e_app rs_func_app [e1; e2] [] (ity_of_dity res)
+  | DEvar _ | DErs _ | DEapp _ | DEfun _ | DEany _ ->
+      let ldl,c = try_cexp uloc env false de0 in
+      List.fold_right e_let_check ldl (e_exec c)
+  | DElet ((id,_,_,{de_dvty = ([],_)}) as dldf,de) ->
+      let ld, env = var_defn uloc env false dldf in
+      let e2 = expr uloc env de in
       let e2 =
-        let e2_unit = match e2.e_vty with
-          | VtyI i -> ity_equal i ity_unit
-          | _ -> false in
-        let id_in_e2 = match ld.let_sym with
-          | ValV v -> Spv.mem v e2.e_vars
-          | ValS s -> Srs.mem s e2.e_syms in
+        let v, e1 = match ld with
+          | LDvar (v,e1) -> v, e1
+          | _ -> assert false in
+        let e2_unit = ity_equal e2.e_ity ity_unit in
+        let id_in_e2 = Spv.mem v e2.e_effect.eff_reads in
         if not id_in_e2 then warn_unused id.pre_name id.pre_loc;
         (* if e1 is a recursive call, we may not know yet its effects,
             so we have to rely on an heuristic: if the result of e1 is
             not used in e2, then it was probably called for the effect. *)
-        let e1_no_eff = eff_is_pure e1.e_effect && id_in_e2 in
+        let e1_no_eff = eff_pure e1.e_effect && id_in_e2 in
         if e2_unit (* e2 is unit *)
-          && e2.e_ghost (* and e2 is ghost *)
-          && not e1.e_ghost (* and e1 is non-ghost *)
+          && e_ghost e2 (* and e2 is ghost *)
+          && not (e_ghost e1) (* and e1 is non-ghost *)
           && not e1_no_eff (* and e1 has observable effects *)
         then
-          let ld = create_let_defn (id_fresh "_") e2 in
+          let ld,_ = let_var (id_fresh "_") e2 in
           e_label ?loc:e2.e_loc Slab.empty (e_let ld e_void)
         else e2
       in
       e_let ld e2
+  | DElet (dldf,de) ->
+      let ldl, env = sym_defn uloc env false dldf in
+      List.fold_right e_let_check ldl (expr uloc env de)
   | DErec (drdf,de) ->
-      let rdf = expr_rec ~keep_loc uloc env drdf in
-      let add env fd = add_rsymbol env fd.fun_sym in
-      let env = List.fold_left add env rdf.rec_defn in
-      e_rec rdf (expr ~keep_loc uloc env ffo de)
-  | DEnot de1 ->
-      e_not (get env de1)
-  | DElazy (op,de1,de2) ->
-      e_lazy op (get env de1) (get env de2)
+      let ld, env = rec_defn uloc env false drdf in
+      e_let ld (expr uloc env de)
+  | DEnot de ->
+      e_not (expr uloc env de)
+  | DEand (de1,de2) ->
+      e_and (expr uloc env de1) (expr uloc env de2)
+  | DEor (de1,de2) ->
+      e_or (expr uloc env de1) (expr uloc env de2)
   | DEif (de1,de2,de3) ->
-      e_if (get env de1) (get env de2) (get env de3)
+      e_if (expr uloc env de1) (expr uloc env de2) (expr uloc env de3)
   | DEcase (de1,bl) ->
-      let e1 = get env de1 in
-      let ity = ity_of_expr e1 in
-      let ghost = e1.e_ghost in
-      let branch (dp,de) =
-        let vm, pat = create_prog_pattern dp.dp_pat ~ghost ity in
-        let e = get (add_pv_map env vm) de in
+      let e1 = expr uloc env de1 in
+      let mk_branch (dp,de) =
+        let vm, pat = create_prog_pattern
+          dp.dp_pat ~ghost:(e_ghost e1) e1.e_ity in
+        let e = expr uloc (add_pv_map env vm) de in
         Mstr.iter (fun _ v -> check_used_pv e v) vm;
         pat, e in
-      e_case e1 (List.map branch bl)
+      let bl = List.rev_map mk_branch bl in
+      let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
+      let v = create_vsymbol (id_fresh "x") (ty_of_ity e1.e_ity) in
+      let bl = if Pattern.is_exhaustive [t_var v] pl then bl else begin
+        if List.length bl > 1 then Warning.emit ?loc:de0.de_loc
+          "Non-exhaustive pattern matching, asserting `absurd'";
+        let _,pp = create_prog_pattern PPwild e1.e_ity in
+        (pp, e_absurd (ity_of_dity res)) :: bl end in
+      e_case e1 (List.rev bl)
   | DEassign al ->
-      let conv (de1,f,de2) = get env de1, f, get env de2 in
+      let conv (de1,f,de2) = expr uloc env de1, f, expr uloc env de2 in
       e_assign (List.map conv al)
   | DEwhile (de1,dinv,dvarl,de2) ->
-      let e1 = get env de1 in
-      let e2 = get env de2 in
+      let e1 = expr uloc env de1 in
+      let e2 = expr uloc env de2 in
       let inv = dinv env.vsm in
       let varl = dvarl env.vsm in
       e_while e1 (create_invariant inv) varl e2
   | DEfor (id,de_from,dir,de_to,dinv,de) ->
-      let e_from = get env de_from in
-      let e_to = get env de_to in
+      let e_from = expr uloc env de_from in
+      let e_to = expr uloc env de_to in
       let v = create_pvsymbol id ity_int in
       let env = add_pvsymbol env v in
-      let e = get env de in
+      let e = expr uloc env de in
       let inv = dinv env.vsm in
       e_for v e_from dir e_to (create_invariant inv) e
   | DEtry (de1,bl) ->
-      let e1 = get env de1 in
+      let e1 = expr uloc env de1 in
       let add_branch (m,l) (xs,dp,de) =
         let vm, pat = create_prog_pattern dp.dp_pat xs.xs_ity in
-        let e = get (add_pv_map env vm) de in
+        let e = expr uloc (add_pv_map env vm) de in
         Mstr.iter (fun _ v -> check_used_pv e v) vm;
         try Mexn.add xs ((pat,e) :: Mexn.find xs m) m, l
         with Not_found -> Mexn.add xs [pat,e] m, (xs::l) in
@@ -1084,10 +1075,9 @@ and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
       in
       e_try e1 (List.rev_map mk_branch xsl)
   | DEraise (xs,de) ->
-      e_raise xs (get env de) (ity_of_dity res)
+      e_raise xs (expr uloc env de) (ity_of_dity res)
   | DEghost de ->
-      (* keep user ghost annotations even if redundant *)
-      e_ghost (expr ~keep_loc uloc env ffo de)
+      e_ghostify true (expr uloc env de)
   | DEassert (ak,f) ->
       e_assert ak (create_assert (f env.vsm))
   | DEpure t ->
@@ -1100,25 +1090,40 @@ and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
       e_false
   | DEmark _ -> assert false (* TODO *)
 (*
-  | DEmark (id,de) ->
       let ld,v = create_let_defn_pv id Mlw_wp.e_now in
       let env = add_pvsymbol env v in
-      e_let ld (expr ~keep_loc uloc env env ffo de)
+      e_let ld (expr uloc env de)
 *)
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
-and expr_rec ~keep_loc uloc env {fds = dfdl} =
+and var_defn uloc env ghost (id,gh,kind,de) =
+  let e = match kind with
+    | RKlemma -> Loc.errorm ?loc:id.pre_loc
+        "Lemma-functions must have parameters"
+    | RKfunc | RKpred | RKlocal | RKnone ->
+        expr uloc env de in
+  let ld, v = let_var id ~ghost:(gh || ghost) e in
+  ld, add_pvsymbol env v
+
+and sym_defn uloc env ghost (id,gh,kind,de) =
+  let ldl, c = cexp uloc env (gh || ghost) de in
+  if c_ghost c && not (gh || ghost) then Loc.errorm ?loc:id.pre_loc
+    "Function %s must be explicitly marked ghost" id.pre_name;
+  let ld, s = let_sym id ~ghost:(gh || ghost) ~kind c in
+  ldl @ [ld], add_rsymbol env s
+
+and rec_defn uloc env ghost {fds = dfdl} =
   let step1 env (id, gh, kind, bl, dsp, dvl, ({de_dvty = dvty} as de)) =
     let pvl = binders bl in
     let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
-    let cty = create_cty pvl [] [] Mexn.empty Spv.empty eff_empty ity in
-    let rs = create_rsymbol id ~ghost:gh ~kind:RKnone cty in
+    let cty = create_cty pvl [] [] Mexn.empty eff_empty ity in
+    let rs = create_rsymbol id ~ghost:(gh || ghost) ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, dsp, dvl, de) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
   let step2 ({rs_cty = c} as rs, kind, dsp, dvl, de) (fdl, dspl) =
-    let lam, dsp, env = expr_fun ~keep_loc uloc env c.cty_args dsp de in
-    if lam.e_ghost && not rs.rs_ghost then Loc.errorm ?loc:rs.rs_name.id_loc
+    let lam, dsp, env = lambda uloc env c.cty_args dsp de in
+    if c_ghost lam && not (rs_ghost rs) then Loc.errorm ?loc:rs.rs_name.id_loc
       "Function %s must be explicitly marked ghost" rs.rs_name.id_string;
     (rs, lam, dvl env.vsm, kind)::fdl, dsp::dspl in
   (* check for unexpected aliases in case of trouble *)
@@ -1127,45 +1132,72 @@ and expr_rec ~keep_loc uloc env {fds = dfdl} =
         List.iter (fun ({rs_name = {id_loc = loc}} as rs,_,_,_,_) ->
           Loc.try2 ?loc check_aliases true rs.rs_cty) fdl;
         raise exn in
-  let rdf = try create_rec_defn fdl with
+  let ld, rdl = try let_rec fdl with
     | Loc.Located (_, Ity.TypeMismatch _) | Ity.TypeMismatch _ as exn ->
         List.iter (fun ({rs_name = {id_loc = loc}},lam,_,_) ->
-          Loc.try2 ?loc check_aliases true (cty_of_expr lam)) fdl;
+          Loc.try2 ?loc check_aliases true lam.c_cty) fdl;
         raise exn in
-  let check {fun_rsym = rs; fun_expr = e} dsp =
-    Loc.try3 ?loc:rs.rs_name.id_loc check_fun (Some rs) dsp e in
-  List.iter2 check rdf.rec_defn dspl;
-  rdf
+  let add_fd env {rec_sym = s; rec_rsym = rs; rec_fun = c} dsp =
+    Loc.try3 ?loc:rs.rs_name.id_loc check_fun (Some rs) dsp c;
+    add_rsymbol env s in
+  ld, List.fold_left2 add_fd env rdl dspl
 
-and expr_fun ~keep_loc uloc env pvl dsp de =
+and lambda uloc env pvl dsp de =
   let env = add_binders env pvl in
-  let e = expr ~keep_loc uloc env true de in
-  let ty = ty_of_ity (ity_of_expr e) in
+  let e = expr uloc env de in
+  let ty = ty_of_ity e.e_ity in
   let dsp = dsp env.vsm ty in
   let p = create_pre dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  e_fun pvl p q xq e, dsp, env
-
-(*
-let val_decl ?(keep_loc=true) (id,_,_,_,_,_ as vald) =
-  ignore keep_loc;
-  reunify_regions ();
-  Loc.try2 ?loc:id.pre_loc val_decl env_empty vald
-*)
+  c_fun pvl p q xq e, dsp, env
 
 let rec_defn ?(keep_loc=true) drdf =
   reunify_regions ();
-  expr_rec ~keep_loc None env_empty drdf
+  let uloc = if keep_loc then None else Some None in
+  fst (rec_defn uloc env_empty false drdf)
+
+let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
+  reunify_regions ();
+  let uloc = if keep_loc then None else Some None in
+  match kind, de.de_dvty with
+  | _, (_::_, _) ->
+      let ldl, c = cexp uloc env_empty ghost de in
+      if ldl <> [] then Loc.errorm ?loc:de.de_loc
+        "Illegal top-level function definition";
+      if c_ghost c && not ghost then Loc.errorm ?loc:id.pre_loc
+        "Function %s must be explicitly marked ghost" id.pre_name;
+      fst (let_sym id ~ghost ~kind c)
+  | (RKfunc | RKpred), ([], _) ->
+      let e = expr uloc env_empty de in
+      if e_ghost e && not ghost then Loc.errorm ?loc:id.pre_loc
+        "Function %s must be explicitly marked ghost" id.pre_name;
+      let c = c_fun [] [] [] Mexn.empty e in
+      (* the rsymbol will carry a single postcondition "the result
+         is equal to the logical constant". Any user-written spec
+         will be checked once, in-place, under Eexec. Since kind
+         guarantees the absence of effects and any external reads,
+         this one-time check is sufficient, and we won't pollute
+         the later WPs with the copies of the spec. When preparing
+         the logical constant definition, we must extract that
+         user-written specification from under Cfun, and put it
+         into an axiom. *)
+      fst (let_sym id ~ghost ~kind c)
+  | RKnone, ([], _) ->
+      let e = expr uloc env_empty de in
+      if e_ghost e && not ghost then Loc.errorm ?loc:id.pre_loc
+        "Variable %s must be explicitly marked ghost" id.pre_name;
+(* TODO: this must be done at the declaration level
+      if not (ity_closed e.e_ity) then Loc.errorm ?loc:id.pre_loc
+        "Top-level variables must have monomorphic type";
+      if not (Eexec (Cfun | Cany)) then Loc.errorm ?loc:id.pre_loc
+        "Top-level computations must carry a specification"; *)
+      fst (let_var id ~ghost e)
+  | RKlemma, ([], _) -> Loc.errorm ?loc:id.pre_loc
+      "Lemma-functions must have parameters"
+  | RKlocal, _ -> invalid_arg "Dexpr.let_defn"
 
 let expr ?(keep_loc=true) de =
   reunify_regions ();
-  let e = expr ~keep_loc None env_empty false de in
-  check_expr e; e
-
-let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
-  let e = expr ~keep_loc de in
-  if e.e_ghost && not ghost then Loc.errorm ?loc:id.pre_loc
-    "%s %s must be explicitly marked ghost" (match kind, e.e_vty with
-      | RKnone, VtyI _ -> "Variable" | _ -> "Function") id.pre_name;
-  Loc.try1 ?loc:id.pre_loc (create_let_defn id ~ghost ~kind) e
+  let uloc = if keep_loc then None else Some None in
+  expr uloc env_empty de

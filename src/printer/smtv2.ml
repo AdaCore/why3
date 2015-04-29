@@ -57,7 +57,8 @@ let ident_printer =
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
-      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left"; "rotate_right";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
+      "rotate_right";
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
@@ -129,12 +130,10 @@ let print_var_list info fmt vsl =
 let model_label = Ident.create_label "model"
 
 let collect_model_ls info ls =
-  if ls.ls_args = [] &&
-    Slab.mem model_label ls.ls_name.id_label then 
-    begin
-      let t = t_app ls [] ls.ls_value in
-      info.info_model <- (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
-    end
+  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+    let t = t_app ls [] ls.ls_value in
+    info.info_model <-
+      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
 
 (** expr *)
 let rec print_term info fmt t = 
@@ -320,15 +319,16 @@ let print_param_decl info fmt ls =
     (print_type_value info) ls.ls_value
 
 let print_logic_decl info fmt (ls,def) =
-  if Mid.mem ls.ls_name info.info_syn then () else
-  collect_model_ls info ls;
-  let vsl,expr = Decl.open_ls_defn def in
-  fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
-    print_ident ls.ls_name
-    (print_var_list info) vsl
-    (print_type_value info) ls.ls_value
-    (print_expr info) expr;
-  List.iter forget_var vsl
+  if Mid.mem ls.ls_name info.info_syn then () else begin
+    collect_model_ls info ls;
+    let vsl,expr = Decl.open_ls_defn def in
+    fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
+      print_ident ls.ls_name
+      (print_var_list info) vsl
+      (print_type_value info) ls.ls_value
+      (print_expr info) expr;
+    List.iter forget_var vsl
+  end
 
 let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
