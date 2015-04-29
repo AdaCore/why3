@@ -68,7 +68,7 @@ module SchorrWaite
     ensures  { !c = set (old !c) p v }
 
   val set_path_from_root (p: loc) (l : list loc) : unit
-    requires { p <> null }
+    requires { p <> null } 
     writes   { path_from_root }
     ensures  { !path_from_root = set (old !path_from_root) p l }
 
@@ -150,8 +150,11 @@ module SchorrWaite
        end) \/ pair_in_list p1 p2 m
     end
 
-  lemma t : forall n x y: loc, left right : map loc loc, pth : list loc.
-   
+  (* the two following lemmas help proving the assertion in the push case *)
+  lemma path_edge : forall x y : loc, left right : map loc loc.
+    edge x y left right -> path left right x y (Cons x Nil)
+
+  lemma path_edge_cons : forall n x y : loc, left right : map loc loc, pth : list loc.
     reachable_via n x left right pth -> edge x y left right ->
     reachable_via n y left right (pth ++ (Cons x Nil))
 
@@ -176,6 +179,9 @@ module SchorrWaite
     (* every marked node was reachable from 'root' in the pre-state *)	       
     ensures  { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] ->
     	       reachable root n (old !left) (old !right) }
+    ensures  { !m[root] }
+    ensures  { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] -> 
+    	       (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
     (* forall non-reachable vertices the mark remains 
        the same as in the pre-state *)
     (* update: no need for this post-condition (taken from Hubert and Marché's work) 
@@ -231,22 +237,27 @@ module SchorrWaite
       		  if !c[nth k !stackNodes] then
 		    nth (k - 1) !stackNodes = (at !right 'Init)[nth k !stackNodes]
 		  else nth (k - 1) !stackNodes = (at !left 'Init)[nth k !stackNodes] }
+      (* help establishing the next invariant for the push case -->
+       * line 70 from Leino's paper *)
+      invariant { !p <> null -> reachable_via root !p (at !left 'Init) (at !right 'Init) !pth }
       (* line 72 from Leino's paper --> used to prove the post that very marked node was 
        * reachable from 'root' in the pre-state *)
       invariant { forall n : loc. S.mem n graph /\ !m[n] /\ n <> null ->
       		  reachable root n (at !left 'Init) (at !right 'Init) }
-      (* help establishing the previous invariant for the push case -->
-       * line 70 from Leino's paper *)
-      invariant { !p <> null -> reachable_via root !p (at !left 'Init) (at !right 'Init) !pth }
       (* help establishing the previous invariant when p = null, ie 
        * for the firts push of the loop *)
-      invariant { !p = null <-> !t = root }
+      invariant { !p = null -> !t = root }
       invariant { (!p = null \/ !p = root) -> !pth = Nil }
       (* help establishing the previous invariant for the pop case -->
        * line 70 from Leino's paper *)
       invariant { forall n : loc, pth : list loc.
       		  S.mem n graph /\ n <> null /\ !m[n] /\ pth = !path_from_root[n] ->
 		  reachable_via root n (at !left 'Init) (at !right 'Init) pth }
+      (* lines 61-62 from Leinos' paper --> help establish the post that 
+       * all nodes reachable from root are marked *)
+      invariant { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] /\
+      		  not (L.mem n !stackNodes) /\ n <> !t ->
+		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
       (* termination proved using lexicographic order over a triple *)
       variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, length !stackNodes }
       if !t = null || !m[!t] then begin
@@ -275,11 +286,11 @@ module SchorrWaite
 	stackNodes := Cons !p !stackNodes;
         t := get_left !t;
         set_left !p q;
-        set_m !p true;
+        set_m !p true;	
 	set_path_from_root !p !pth;
 	(* this is assertion is automatically discharged and it helps 
  	 * proving that all marked nodes are reachable from root *)
-	assert { path (at !left 'Init) (at !right 'Init) root !p !pth }; 
+	(*assert { path (at !left 'Init) (at !right 'Init) root !p !pth }; *)
         (*set_c !p false;*) (* if we assume at the pre-condition that all nodes start with c = 0,
 		   	       then this redundant *)
 	unmarked_nodes := S.remove !p !unmarked_nodes
