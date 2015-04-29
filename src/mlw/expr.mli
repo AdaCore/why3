@@ -19,7 +19,6 @@ open Ity
 type rsymbol = private {
   rs_name  : ident;
   rs_cty   : cty;
-  rs_ghost : bool;
   rs_logic : rs_logic;
   rs_field : pvsymbol option;
 }
@@ -64,6 +63,8 @@ val create_field : preid -> itysymbol -> pvsymbol -> rsymbol
 val restore_rs : lsymbol -> rsymbol
 (** raises [Not_found] if the argument is not a [rs_logic] *)
 
+val rs_ghost : rsymbol -> bool
+
 (** {2 Program patterns} *)
 
 type prog_pattern = private {
@@ -86,8 +87,6 @@ val create_prog_pattern :
 
 (** {2 Program expressions} *)
 
-type lazy_op = Eand | Eor
-
 type assertion_kind = Assert | Assume | Check
 
 type for_direction = To | DownTo
@@ -100,129 +99,118 @@ type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
 type assign = pvsymbol * rsymbol * pvsymbol (* region * field * value *)
 
-type vty =
-  | VtyI of ity
-  | VtyC of cty
-
-type val_decl =
-  | ValV of pvsymbol
-  | ValS of rsymbol
-
 type expr = private {
   e_node   : expr_node;
-  e_vty    : vty;
-  e_ghost  : bool;
+  e_ity    : ity;
   e_effect : effect;
-  e_vars   : Spv.t;
-  e_syms   : Srs.t;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
 
 and expr_node = private
   | Evar    of pvsymbol
-  | Esym    of rsymbol
   | Econst  of Number.constant
-  | Eapp    of expr * pvsymbol list * cty
-  | Efun    of expr
+  | Eexec   of cexp
+  | Eassign of assign list
   | Elet    of let_defn * expr
-  | Erec    of rec_defn * expr
-  | Enot    of expr
-  | Elazy   of lazy_op * expr * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
-  | Eassign of assign list
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant list * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eraise  of xsymbol * expr
-  | Eghost  of expr
   | Eassert of assertion_kind * term
   | Epure   of term
   | Eabsurd
-  | Etrue
-  | Efalse
-  | Eany
 
-and let_defn = private {
-  let_sym  : val_decl;
-  let_expr : expr;
+and cexp = private {
+  c_node : cexp_node;
+  c_cty  : cty;
 }
+
+and cexp_node = private
+  | Capp of rsymbol * pvsymbol list
+  | Cfun of expr
+  | Cany
+
+and let_defn = private
+  | LDvar of pvsymbol * expr
+  | LDsym of rsymbol * cexp
+  | LDrec of rec_defn list
 
 and rec_defn = private {
-  rec_defn : fun_defn list;
-  rec_decr : lsymbol option;
+  rec_sym  : rsymbol; (* exported symbol *)
+  rec_rsym : rsymbol; (* internal symbol *)
+  rec_fun  : cexp;    (* Cfun *)
+  rec_varl : variant list;
 }
 
-and fun_defn = {
-  fun_sym  : rsymbol; (* exported symbol *)
-  fun_rsym : rsymbol; (* internal symbol *)
-  fun_expr : expr;    (* Efun *)
-  fun_varl : variant list;
-}
+(** {2 Expressions} *)
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
-exception ItyExpected of expr
-exception CtyExpected of expr
+val e_ghost : expr -> bool
+val c_ghost : cexp -> bool
 
-val ity_of_expr : expr -> ity
-val cty_of_expr : expr -> cty
+val e_ghostify : bool -> expr -> expr
+val c_ghostify : bool -> cexp -> cexp
 
-val check_expr : expr -> unit
-(** [check_expr e] verifies that [e] does not perform bad
-    ghost writes nor contains stale (i.e., reset) regions.
-    This function must be called for any expression which
-    is used outside of an [Efun]-closure. *)
+(** {2 Definitions} *)
 
-val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
+val let_var :
+  preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
 
-val e_find_minimal : (expr -> bool) -> expr -> expr
-(** [e_find_minimal pr e] looks for a minimal sub-expression
-    of [e] satisfying [pr], raises [Not_found] if none found. *)
+val let_sym :
+  preid -> ?ghost:bool -> ?kind:rs_kind -> cexp -> let_defn * rsymbol
 
-val proxy_label : label
+val let_rec :
+  (rsymbol * cexp * variant list * rs_kind) list -> let_defn * rec_defn list
 
-(** {2 Smart constructors} *)
+(** {2 Callable expressions} *)
+
+val c_app : rsymbol -> pvsymbol list -> ity list -> ity -> cexp
+
+val c_fun :
+  pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> cexp
+
+val c_any : cty -> cexp
+
+type ext_cexp = let_defn list * cexp
+
+val ext_c_sym : rsymbol -> ext_cexp
+
+val ext_c_app : ext_cexp -> expr list -> ity list -> ity -> ext_cexp
+
+(** {2 Expression constructors} *)
 
 val e_var : pvsymbol -> expr
-val e_sym : rsymbol  -> expr
 
 val e_const : Number.constant -> expr
 val e_nat_const : int -> expr
 
-val create_let_defn_pv :
-  preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
+val e_exec : cexp -> expr
 
-val create_let_defn_rs :
-  preid -> ?ghost:bool -> ?kind:rs_kind -> expr -> let_defn * rsymbol
-
-val create_let_defn :
-  preid -> ?ghost:bool -> ?kind:rs_kind -> expr -> let_defn
-
-val create_rec_defn :
-  (rsymbol * expr (* Efun *) * variant list * rs_kind) list -> rec_defn
-
-val e_fun :
-  pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr
+val e_app : rsymbol -> expr list -> ity list -> ity -> expr
 
 val e_let : let_defn -> expr -> expr
-val e_rec : rec_defn -> expr -> expr
 
-val e_app : expr -> expr list -> ity list -> ity -> expr
+exception FieldExpected of rsymbol
 
 val e_assign : (expr * rsymbol * expr) list -> expr
 
-val e_ghost : expr -> expr
-val e_ghostify : expr -> expr
-
 val e_if : expr -> expr -> expr -> expr
-val e_lazy : lazy_op -> expr -> expr -> expr
+
+val e_and : expr -> expr -> expr
+val e_or  : expr -> expr -> expr
 val e_not : expr -> expr
-val e_true : expr
+
+val e_true  : expr
 val e_false : expr
+
+val is_e_true  : expr -> bool
+val is_e_false : expr -> bool
 
 val e_raise : xsymbol -> expr -> ity -> expr
 
@@ -232,8 +220,8 @@ val e_case : expr -> (prog_pattern * expr) list -> expr
 
 val e_while : expr -> invariant list -> variant list -> expr -> expr
 
-val e_for :
-  pvsymbol -> expr -> for_direction -> expr -> invariant list -> expr -> expr
+val e_for : pvsymbol ->
+  expr -> for_direction -> expr -> invariant list -> expr -> expr
 
 val e_pure : term -> expr
 
@@ -241,15 +229,21 @@ val e_assert : assertion_kind -> term -> expr
 
 val e_absurd : ity -> expr
 
-val e_any : cty -> expr
+(** {2 Expression manipulation tools} *)
+
+val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
+(** [e_fold] does not descend into Cfun *)
+
+val e_locate_effect : (effect -> bool) -> expr -> Loc.position option
+(** [e_locate_effect pr e] looks for a minimal sub-expression of
+    [e] whose effect satisfies [pr] and returns its location *)
+
+val proxy_label : label
 
 (** {2 Built-in symbols} *)
 
-val rs_bool_true  : rsymbol
-val rs_bool_false : rsymbol
-
-val e_bool_true  : expr
-val e_bool_false : expr
+val rs_true  : rsymbol
+val rs_false : rsymbol
 
 val rs_tuple : int -> rsymbol
 val e_tuple : expr list -> expr
@@ -257,6 +251,7 @@ val e_tuple : expr list -> expr
 val rs_void : rsymbol
 val e_void : expr
 
+val is_e_void : expr -> bool
 val is_rs_tuple : rsymbol -> bool
 
 val rs_func_app : rsymbol
@@ -268,8 +263,7 @@ val e_func_app_l : expr -> expr list -> expr
 val forget_rs  : rsymbol -> unit (* flush id_unique for a program symbol *)
 
 val print_rs   : Format.formatter -> rsymbol -> unit  (* program symbol *)
+
 val print_expr : Format.formatter -> expr -> unit     (* expression *)
 
-val print_val_decl : Format.formatter -> val_decl -> unit
 val print_let_defn : Format.formatter -> let_defn -> unit
-val print_rec_defn : Format.formatter -> rec_defn -> unit
