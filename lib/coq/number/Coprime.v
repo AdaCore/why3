@@ -95,3 +95,4 @@ apply Z.gcd_unique.
   rewrite coprime_is_Zrel_prime in h1.
   now apply Znumtheory.rel_prime_div with (2:=h2).
 Qed.
+

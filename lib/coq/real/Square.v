@@ -57,3 +57,4 @@ Lemma Sqrt_le : forall (x:R) (y:R), ((0%R <= x)%R /\ (x <= y)%R) ->
 intros x y (h1 & h2); apply sqrt_le_1; auto.
 apply Rle_trans with x; auto.
 Qed.
+

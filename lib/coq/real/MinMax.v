@@ -117,3 +117,4 @@ apply eq_sym, Rmax_left.
 apply Rmax_case ; now apply Rlt_le.
 now apply Rlt_le.
 Qed.
+

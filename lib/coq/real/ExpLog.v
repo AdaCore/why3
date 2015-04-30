@@ -69,3 +69,4 @@ Definition log2 (x:R): R := ((Reals.Rpower.ln x) / (Reals.Rpower.ln 2%R))%R.
 (* Why3 assumption *)
 Definition log10 (x:R): R :=
   ((Reals.Rpower.ln x) / (Reals.Rpower.ln 10%R))%R.
+

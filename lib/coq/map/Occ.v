@@ -267,3 +267,4 @@ replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
 rewrite <- h0. trivial. omega. omega.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring. assumption.
 Qed.
+

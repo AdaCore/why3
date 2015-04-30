@@ -194,3 +194,4 @@ Proof.
 intros x.
 apply atan_right_inv.
 Qed.
+

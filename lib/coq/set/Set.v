@@ -243,3 +243,4 @@ Lemma all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem x
 Proof.
 now intros a a_WT x.
 Qed.
+
