@@ -84,7 +84,7 @@ module SchorrWaite
     ensures  { forall n : loc. L.mem n result -> L.mem n stack } 
   
   predicate edge (x y : loc) (left right : map loc loc) = 
-    x <> null && (left[x] = y || right[x] = y)
+    x <> null /\ (left[x] = y \/ right[x] = y)
 
   inductive path (left right : map loc loc) (x y : loc) (p : list loc) = 
   | path_nil   : forall x : loc, l r : map loc loc. path l r x x Nil
@@ -174,8 +174,10 @@ module SchorrWaite
 	       (old !right)[n] = !right[n] }
     (* all the non-null vertices reachable from root
        are marked at the end of the algorithm *)
-    ensures  { forall n : loc. S.mem n graph /\  n <> null /\
-    	       reachable root n (old !left) (old !right) -> !m[n] }
+    (* update: following Leino's paper, I will specify that all reachable nodes
+     * are marked as a transitive propertie, rather than using reachability *)
+    (* ensures  { forall n : loc. S.mem n graph /\  n <> null /\
+    	       reachable root n (old !left) (old !right) -> !m[n] } *)
     (* every marked node was reachable from 'root' in the pre-state *)	       
     ensures  { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] ->
     	       reachable root n (old !left) (old !right) }
@@ -256,8 +258,8 @@ module SchorrWaite
       (* lines 61-62 from Leinos' paper --> help establish the post that 
        * all nodes reachable from root are marked *)
       invariant { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] /\
-      		  not (L.mem n !stackNodes) /\ n <> !t ->
-		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
+      		  not (L.mem n !stackNodes) -> (* /\ n <> !t ---> do I really need this 'n <> !t'? *)
+		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }	
       (* termination proved using lexicographic order over a triple *)
       variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, length !stackNodes }
       if !t = null || !m[!t] then begin
