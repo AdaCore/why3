@@ -140,31 +140,23 @@ Lemma cons_get : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(seq a))
   (i:Z), ((0%Z <= i)%Z /\ (i <= (length s))%Z) -> (((i = 0%Z) ->
   ((mixfix_lbrb (cons x s) i) = x)) /\ ((~ (i = 0%Z)) ->
   ((mixfix_lbrb (cons x s) i) = (mixfix_lbrb s (i - 1%Z)%Z)))).
-(*
 intros a (d,eq) x s i hi.
-split; intros.
-subst i. unfold mixfix_lbrb. auto.
-unfold mixfix_lbrb. simpl.
+split.
+intro; subst i; now auto.
+
 destruct s.
-unfold List.nth, default, elts; simpl; auto.
-destruct s; unfold mixfix_lbrb; simpl.
-destruct (Z.abs_nat i) eqn:?.
-(* i = 0 *)
-assert (i = 0)%Z.
-assert (O < Z.abs_nat i)%nat.
-rewrite <- Zabs2Nat.inj_0.
-apply Zabs_nat_lt. omega. omega. omega.
-(* i = S n *)
-replace (Z.abs_nat (i - 1)) with n.
-reflexivity.
-assert (i = Zsucc (i-1))%Z by omega.
-rewrite H0 in Heqn.
-rewrite Zabs2Nat.inj_succ in Heqn.
-injection Heqn; auto.
-omega.
+simpl in hi. intro. absurd (i=0)%Z; omega.
+intro h.
+unfold mixfix_lbrb at 1.
+simpl ((fix nth (n : int) (l : list a) {struct l} : a :=
+   match l with
+   | nil => d
+   | (h0 :: t)%list => if Zeq_bool n 0 then h0 else nth (n - 1)%Z t
+   end) i (cons x (a0 :: s)%list)).
+destruct (Zeq_bool i 0) eqn:? in *.
+generalize (Zeq_bool_eq _ _ Heqb). now intuition.
+auto.
 Qed.
-*)
-Admitted. (* TODO *)
 
 (* Why3 goal *)
 Definition snoc: forall {a:Type} {a_WT:WhyType a}, (seq a) -> a -> (seq a).
@@ -172,19 +164,26 @@ intros a aWT s x.
 exact (s ++ List.cons x nil)%list.
 Defined.
 
+Open Scope list_scope.
+Open Scope Z_scope.
+
+Lemma length_append:
+  forall {a:Type} {a_WT:WhyType a} s1 s2, length (s1 ++ s2) = length s1 + length s2.
+induction s1.
+auto.
+intro s2. simpl ((a0 :: s1) ++ s2).
+unfold length; fold length.
+rewrite IHs1; omega.
+Qed.
+
 (* Why3 goal *)
 Lemma snoc_length : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a))
   (x:a), ((length (snoc s x)) = (1%Z + (length s))%Z).
-(*
-intros a a_WT (l, d) x.
-unfold length, snoc, elts.
-rewrite List.app_length.
-simpl Datatypes.length.
-rewrite Nat2Z.inj_add.
-auto with *.
+intros.
+unfold snoc.
+rewrite length_append.
+simpl (length (x::nil)). omega.
 Qed.
-*)
-Admitted. (* TODO *)
 
 (* Why3 goal *)
 Lemma snoc_get : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (x:a)
@@ -281,18 +280,43 @@ intros a a_WT s1 s2 i (h1,h2).
 
 Admitted. (* TODO *)
 
+Fixpoint enum {a:Type} (f: Z -> a) (start: Z) (n: nat) : seq a :=
+  match n with
+  | O => nil
+  | S p => (f start :: enum f (start+1)%Z p)%list end.
+
 (* Why3 goal *)
 Definition create: forall {a:Type} {a_WT:WhyType a}, Z -> (Z -> a) -> (seq
   a).
+intros a a_WT n f.
+exact (if Zlt_bool n 0 then nil else enum f 0%Z (Zabs_nat n)).
+Defined.
 
-Admitted. (* TODO *)
+Lemma enum_length:
+  forall {a:Type} {a_WT:WhyType a} (f: Z -> a) n start,
+  length (enum f start n) = Z.of_nat n.
+induction n; intros.
+now auto.
+unfold enum. fold (enum f).
+unfold length. fold length.
+rewrite IHn.
+rewrite Nat2Z.inj_succ. auto with *.
+Qed.
 
 (* Why3 goal *)
 Lemma create_length : forall {a:Type} {a_WT:WhyType a}, forall (len:Z)
   (f:(Z -> a)), (0%Z <= len)%Z -> ((length (create len f)) = len).
 intros a a_WT len f h1.
-
-Admitted. (* TODO *)
+unfold create.
+generalize (Z.ltb_lt len 0).
+destruct (Zlt_bool len 0) eqn:?.
+intuition.
+intros _. clear Heqb.
+rewrite enum_length.
+rewrite Zabs2Nat.abs_nat_nonneg.
+apply Z2Nat.id; auto.
+assumption.
+Qed.
 
 (* Why3 goal *)
 Lemma create_get : forall {a:Type} {a_WT:WhyType a}, forall (len:Z) (f:(Z ->
