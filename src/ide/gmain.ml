@@ -344,13 +344,21 @@ let output_page,output_tab =
 
 let counterexample_page,counterexample_tab =
   let label = GMisc.label ~text:"Counter-example" () in
-  3, GPack.vbox ~homogeneous:false ~packing:
+  4, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-
 
 let (_ : GPack.box) =
   GPack.hbox ~packing:(source_tab#pack ~expand:false ?from:None ?fill:None
                          ?padding:None) ()
+
+let () =
+  notebook#goto_page gconfig.current_tab;
+  let page_selected n = gconfig.current_tab <- n in
+  let (_ : GtkSignal.id) =
+    notebook#connect#switch_page ~callback:page_selected
+  in ()
+
+
 
 (******************)
 (* views          *)
