@@ -83,3 +83,42 @@ module RandomAccessList
       end
 
 end
+
+(** A straightforward encapsulation with a list ghost model
+    (in anticipation of module refinement) *)
+
+module RAL
+
+  use import int.Int
+  use import RandomAccessList as R
+  use import list.List
+  use import list.Length
+  use import option.Option
+  use import list.Nth
+
+  type t 'a = { r: ral 'a; ghost l: list 'a }
+    invariant { self.l = elements self.r }
+
+  let empty () : t 'a
+    ensures { result.l = Nil }
+  =
+    { r = Empty; l = Nil }
+
+  let size (t: t 'a) : int
+    ensures { result = length t.l }
+  =
+    size t.r
+
+  let cons (x: 'a) (s: t 'a) : t 'a
+    ensures { result.l = Cons x s.l }
+  =
+    { r = add x s.r; l = Cons x s.l }
+
+  let get (i: int) (s: t 'a) : 'a
+    requires { 0 <= i < length s.l }
+    ensures { Some result = nth i s.l }
+  =
+    get i s.r
+
+end
+
