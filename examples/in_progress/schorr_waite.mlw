@@ -157,6 +157,11 @@ module SchorrWaite
   lemma path_edge_cons : forall n x y : loc, left right : map loc loc, pth : list loc.
     reachable_via n x left right pth -> edge x y left right ->
     reachable_via n y left right (pth ++ (Cons x Nil))
+
+  (* helps proving that the last element in the stack is always root *)
+  (* do I really need this lemma? *)
+  lemma hd_rev_cons : forall l : list 'a, x : 'a.
+    l <> Nil -> hd (reverse (Cons x l)) = hd (reverse l)
   
   let schorr_waite (root: loc) (graph : set loc) : unit
     requires { root <> null /\ S.mem root graph }
@@ -196,6 +201,7 @@ module SchorrWaite
     let p = ref null in
     let ghost stackNodes = ref Nil in
     let ghost pth = ref Nil in
+    set_path_from_root !t !pth;
     let ghost unmarked_nodes = ref graph in
     let ghost c_false_nodes = ref graph in
     while !p <> null || (!t <> null && not !m[!t]) do
@@ -210,6 +216,7 @@ module SchorrWaite
       invariant { forall p1 p2 : loc. pair_in_list p1 p2 (Cons !t !stackNodes) ->
       		  (!c[p2] -> (at !left 'Init)[p2] = !left[p2] /\ (at !right 'Init)[p2] = p1) /\
 		  (not !c[p2] -> (at !left 'Init)[p2] = p1 /\ (at !right 'Init)[p2] = !right[p2]) }
+      invariant { !path_from_root[root] = Nil }
       (*invariant { not L.mem !t !stackNodes }*) (* this will be usefull to prove that !t is in graph after the push ---> but this is false! think of the case when the graph is cyclic *)
       (* I4d from Hubert and Marché's paper and something related to line 63-65 from Leino's *)
       invariant { forall n : loc. S.mem n graph /\ n <> null /\ not L.mem n !stackNodes ->
@@ -222,6 +229,8 @@ module SchorrWaite
       		  let first = hd (reverse !stackNodes) in
       		  if !c[first] then !right[first] = null
 		  else !left[first] = null }
+      invariant { !stackNodes <> Nil ->
+      		  hd (reverse !stackNodes) = root }
       (* something like lines 75-76 from Leino's paper --> with this invariant I believe there
        * is no need to use 'stack_form' *)
       invariant { forall k : int. 0 <= k < length !stackNodes - 1->
@@ -254,7 +263,6 @@ module SchorrWaite
       (* help establishing the previous invariant when p = null, ie 
        * for the firts push of the loop *)
       invariant { !p = null -> !t = root }
-      invariant { (!p = null \/ !p = root) -> !pth = Nil }
       (* help establishing the previous invariant for the pop case -->
        * line 70 from Leino's paper *)
       invariant { forall n : loc, pth : list loc.
@@ -292,12 +300,13 @@ module SchorrWaite
         end
       end else begin (* push *)
         let q = !p in
-	if !p <> null then pth := !pth ++ (Cons q Nil);
+	(*if !p <> null then pth := !pth ++ (Cons q Nil);*)
         p := !t;
 	stackNodes := Cons !p !stackNodes;
         t := get_left !t;
         set_left !p q;
-        set_m !p true;	
+        set_m !p true;
+	if !p <> root then pth := !pth ++ (Cons q Nil) else pth := Nil;
 	set_path_from_root !p !pth;
 	(* this is assertion is automatically discharged and it helps 
  	 * proving that all marked nodes are reachable from root *)
