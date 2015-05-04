@@ -30,8 +30,16 @@ module RandomAccessList
     | Cons (x, y) l1 -> Cons x (Cons y (flatten l1))
     end
 
-  lemma length_flatten:
-    forall l: list ('a, 'a). length (flatten l) = 2 * length l
+  let rec lemma length_flatten (l:list ('a,'a))
+    ensures { length (flatten l) = 2 * length l }
+    variant { l }
+  = match l with
+    | Cons (_,_) q -> length_flatten q
+    | Nil -> ()
+    end
+
+  (*lemma length_flatten:
+    forall l: list ('a, 'a). length (flatten l) = 2 * length l*)
 
   function elements (l: ral 'a) : list 'a
     = match l with
