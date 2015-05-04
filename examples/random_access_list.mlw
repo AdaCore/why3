@@ -38,9 +38,6 @@ module RandomAccessList
     | Nil -> ()
     end
 
-  (*lemma length_flatten:
-    forall l: list ('a, 'a). length (flatten l) = 2 * length l*)
-
   function elements (l: ral 'a) : list 'a
     = match l with
       | Empty    -> Nil

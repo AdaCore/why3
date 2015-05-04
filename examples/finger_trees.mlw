@@ -1,0 +1,75 @@
+
+module FingerTrees
+  
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  
+  type digit 'a =
+   | One 'a
+   | Two 'a 'a
+   | Three 'a 'a 'a
+   | Four 'a 'a 'a 'a
+  
+  function d_m (b:digit 'a) : list 'a = match b with
+    | One x -> Cons x Nil
+    | Two y x -> Cons y (Cons x Nil)
+    | Three z y x -> Cons z (Cons y (Cons x Nil))
+    | Four u z y x -> Cons u (Cons z (Cons y (Cons x Nil)))
+    end
+  
+  type node 'a =
+    | Node2 'a 'a
+    | Node3 'a 'a 'a
+  
+  function node_cons (nd:node 'a) (l:list 'a) : list 'a = match nd with
+    | Node2 x y -> Cons x (Cons y l)
+    | Node3 x y z -> Cons x (Cons y (Cons z l))
+    end
+  
+  let lemma node_cons_app (nd:node 'a) (p q:list 'a)
+    ensures { node_cons nd (p++q) = node_cons nd p ++ q }
+  = match nd with Node2 _ _ -> "keep_on_simp" () | _ -> () end
+  
+  function flatten (l:list (node 'a)) : list 'a = match l with
+    | Nil -> Nil
+    | Cons nd q -> node_cons nd (flatten q)
+    end
+  
+  type t 'a =
+    | Empty
+    | Single (digit 'a)
+    | Deep (digit 'a) (t (node 'a)) (digit 'a)
+  
+  function t_m (t:t 'a) : list 'a = match t with
+    | Empty -> Nil
+    | Single x -> d_m x
+    | Deep l m r -> d_m l ++ flatten (t_m m) ++ d_m r
+    end
+  
+  let d_cons (x:'a) (d:digit 'a) : (digit 'a,list (node 'a))
+    returns { (b,o) -> Cons x (d_m d) = d_m b ++ flatten o /\ length o <= 1 }
+  = match d with
+    | One y -> (Two x y , Nil)
+    | Two y z -> (Three x y z , Nil)
+    | Three y z t -> (Four x y z t , Nil)
+    | Four y z t u -> (Two x y , Cons (Node3 z t u) Nil)
+    end
+  
+  let rec cons (x:'a) (t:t 'a) : t 'a
+    ensures { t_m result = Cons x (t_m t) }
+    variant { t }
+  = match t with
+    | Empty -> Single (One x)
+    | Single d -> Deep (One x) Empty d
+    | Deep lf md rg -> let (lf2 , rem) = d_cons x lf in
+      match rem with
+      | Nil -> Deep lf2 md rg
+      | Cons x q -> assert { q = Nil };
+        Deep lf2 (cons x md) rg
+      end
+    end
+  
+end
+
