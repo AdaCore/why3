@@ -52,11 +52,66 @@ module Hackers_delight
     (not (nth_bv b zero) <-> count (lsr_bv b one) = count b) /\
     (nth_bv b zero <-> count (lsr_bv b one) = sub (count b) one)
 
+  use import int.NumOf
+
+  lemma tointzero: to_uint zero = 0
+  lemma tointone: to_uint one = 1
+
+  lemma numOfZero: NumOf.numof (\i. nth zero i) 0 32 = 0
+
+  lemma numof_change_equiv:
+    forall p1 p2: int -> bool, a b: int.
+    (forall j: int. a <= j < b -> p1 j <-> p2 j) ->
+    numof p2 a b = numof p1 a b
+
+  let rec lemma numof_shift (p q : int -> bool) (a b k: int) : unit
+    requires {forall i. q i = p (i + k)}
+    variant {b - a}
+    ensures {numof p (a+k) (b+k) = numof q a b}
+  =
+    if a < b then
+    numof_shift p q a (b-1) k
+
+
+  let rec lemma countAux (bv : t) : unit
+  variant {bv with ult}
+  ensures {to_uint (count bv) = NumOf.numof (nth bv) 0 32}
+  =
+    if bv = zero then ()
+    else
+    begin
+      countAux (lsr_bv bv one);
+      assert {
+                 let x = (if nth_bv bv zero then 1 else 0) in
+                  let f = nth bv in
+                  let g = nth (lsr_bv bv one) in
+                  let h = \i. nth bv (i+1) in
+                  (forall i. 0 <= i < 31 -> g i = h i) &&
+                  NumOf.numof f 0 32 - x = NumOf.numof f (0+1) 32 &&
+                  NumOf.numof f (0+1) (31+1) = NumOf.numof h 0 31 &&
+                  NumOf.numof g 0 (32-1) = NumOf.numof g 0 32
+           }
+    end
+
+  lemma countSpec: forall b. to_uint (count b) = NumOf.numof
+        (nth b) 0 32
+
   (** We then define the associated notion of distance, namely
       "Hamming distance", that counts the number of bits that differ
       between two bitvectors. *)
 
   function hammingD (a b : t) : t = count (bw_xor a b)
+
+  predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
+
+  use HighOrd as HO
+
+  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+
+  let lemma hamming_spec (a b : t) : unit
+  ensures {to_uint (hammingD a b) = NumOf.numof (nth_diff a b) 0 32}
+  =
+   assert { forall i. 0 <= i < 32 -> nth (bw_xor a b) i <-> (nth_diff a b i) }
 
   (** It is indeed a distance in the algebraic sense: *)
 
@@ -64,8 +119,23 @@ module Hackers_delight
 
   lemma separation: forall a b. hammingD a b = zero <-> a = b
 
+  let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
+    variant {b - a}
+    ensures {numof (fun_or p q) a b <= numof p a b + numof q a b}
+  =
+    if a < b then
+    numof_or p q a (b-1)
+
+  let lemma triangleInequalityInt (a b c : t) : unit
+    ensures {to_uint (hammingD a b) + to_uint (hammingD b c) >= to_uint (hammingD a c)}
+  =
+    assert {numof (nth_diff a b) 0 32 + numof (nth_diff b c) 0 32 >=
+    numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >=
+    numof (nth_diff a c) 0 32}
+
   lemma triangleInequality: forall a b c. (* not proved ! :-( *)
     uge (add (hammingD a b) (hammingD b c)) (hammingD a c)
+
 
   (** {6 Checksum computation and correctness } *)
 

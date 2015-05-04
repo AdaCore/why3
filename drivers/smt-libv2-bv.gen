@@ -2,6 +2,103 @@
 
 prelude ";;; SMT-LIB2 driver: bit-vectors, common part"
 
+theory bv.BV_Gen
+  syntax function bw_and "(bvand %1 %2)"
+  syntax function bw_or "(bvor %1 %2)"
+  syntax function bw_xor "(bvxor %1 %2)"
+  syntax function bw_not "(bvnot %1)"
+
+  syntax function add "(bvadd %1 %2)"
+  syntax function sub "(bvsub %1 %2)"
+  syntax function neg "(bvneg %1)"
+  syntax function mul "(bvmul %1 %2)"
+  syntax function udiv "(bvudiv %1 %2)"
+  syntax function urem "(bvurem %1 %2)"
+
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  syntax function lsl_bv "(bvshl %1 %2)"
+  syntax function asr_bv "(bvashr %1 %2)"
+  syntax predicate eq "(= %1 %2)"
+  remove prop Extensionality
+
+  remove prop Nth_zero
+  remove prop Nth_ones
+  remove prop Nth_bw_or
+  remove prop Nth_bw_and
+  remove prop Nth_bw_xor
+  remove prop Nth_bw_not
+  remove prop Nth_rotate_left
+  remove prop Nth_rotate_right
+  remove prop Nth_bv_is_nth
+  remove prop Lsr_nth_low
+  remove prop Lsr_nth_high
+  remove prop Asr_nth_low
+  remove prop Asr_nth_high
+  remove prop Lsl_nth_low
+  remove prop Lsl_nth_high
+
+  syntax predicate ult "(bvult %1 %2)"
+  syntax predicate ule "(bvule %1 %2)"
+  syntax predicate ugt "(bvugt %1 %2)"
+  syntax predicate uge "(bvuge %1 %2)"
+  syntax predicate slt "(bvslt %1 %2)"
+  syntax predicate sle "(bvsle %1 %2)"
+  syntax predicate sgt "(bvsgt %1 %2)"
+  syntax predicate sge "(bvsge %1 %2)"
+end
+
+theory bv.BV64
+  syntax type t "(_ BitVec 64)"
+
+  syntax function zero "#x0000000000000000"
+  syntax function ones "#xFFFFFFFFFFFFFFFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 64)) (_ bv0 64)))"
+
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+end
+
+theory bv.BV32
+  syntax type t "(_ BitVec 32)"
+
+  syntax function zero "#x00000000"
+  syntax function ones "#xFFFFFFFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 32)) (_ bv0 32)))"
+
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+end
+
+theory bv.BV16
+  syntax type t "(_ BitVec 16)"
+
+  syntax function zero "#x0000"
+  syntax function ones "#xFFFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 16)) (_ bv0 16)))"
+
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+end
+
+theory bv.BV8
+  syntax type t "(_ BitVec 8)"
+
+  syntax function zero "#x00"
+  syntax function ones "#xFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 8)) (_ bv0 8)))"
+
+  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+end
+
 theory bv.BVConverter_32_64
   syntax function toBig "((_ zero_extend 32) %1)"
   syntax function toSmall "((_ extract 31 0) %1)"
@@ -39,13 +136,6 @@ theory bv.Pow2int
   remove prop Power_1
   remove prop Power_sum
   remove prop pow2pos
-  remove prop Div_mult_inst
-  remove prop Div_double
-  remove prop Div_pow
-  remove prop Div_double_neg
-  remove prop Div_pow2
-  remove prop Div_div_pow
-  remove prop Mod_pow2_gen
   remove prop pow2_0
   remove prop pow2_1
   remove prop pow2_2

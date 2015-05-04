@@ -5,156 +5,212 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <file name="../hackers-delight.mlw" expanded="true">
-<theory name="Hackers_delight" sum="f68afbb08101be54ae51e015e4048def" expanded="true">
+<theory name="Hackers_delight" sum="9c3b657273e4ea082027d6ac7909b8f1" expanded="true">
  <goal name="countZero" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.05"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="countStep" expanded="true">
- <proof prover="1"><result status="valid" time="4.98"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="4.98"/></proof>
  </goal>
- <goal name="symmetric" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="tointzero" expanded="true">
+ <proof prover="1" timelimit="15"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="tointone" expanded="true">
+ <proof prover="1" timelimit="15"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="numOfZero" expanded="true">
+ <proof prover="1" timelimit="15"><result status="timeout" time="16.00"/></proof>
+ </goal>
+ <goal name="numof_change_equiv" expanded="true">
+ <proof prover="0" timelimit="15"><result status="valid" time="1.37" steps="587"/></proof>
+ <proof prover="1" timelimit="15"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="numof_shift" expanded="true">
+ <proof prover="0" timelimit="15" obsolete="true"><result status="timeout" time="14.85"/></proof>
+ <proof prover="1" timelimit="15" obsolete="true"><result status="timeout" time="16.02"/></proof>
+ <proof prover="2" timelimit="15" obsolete="true"><result status="timeout" time="14.99"/></proof>
+ <proof prover="3" timelimit="15" obsolete="true"><result status="timeout" time="14.94"/></proof>
+ </goal>
+ <goal name="WP_parameter countAux" expl="VC for countAux" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter countAux.1" expl="1. postcondition">
+  <proof prover="0" timelimit="15"><result status="valid" time="0.24" steps="137"/></proof>
+  <proof prover="1" timelimit="15"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter countAux.2" expl="2. variant decrease">
+  <proof prover="1" timelimit="15"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter countAux.3" expl="3. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter countAux.3.1" expl="1. assertion">
+   <proof prover="0"><undone/></proof>
+   </goal>
+   <goal name="WP_parameter countAux.3.2" expl="2. assertion">
+   <proof prover="0"><undone/></proof>
+   <proof prover="3"><undone/></proof>
+   </goal>
+   <goal name="WP_parameter countAux.3.3" expl="3. assertion">
+   </goal>
+   <goal name="WP_parameter countAux.3.4" expl="4. assertion">
+   <proof prover="3"><undone/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter countAux.4" expl="4. postcondition" expanded="true">
+  <proof prover="1" timelimit="15" obsolete="true"><undone/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="countSpec" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="76"/></proof>
+ <proof prover="1"><result status="valid" time="0.08"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="symmetric">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="separation" expanded="true">
- <proof prover="1"><result status="valid" time="0.06"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="triangleInequality" expanded="true">
- <proof prover="0"><result status="timeout" time="4.88"/></proof>
- <proof prover="1"><result status="timeout" time="4.87"/></proof>
- <proof prover="2"><result status="timeout" time="5.00"/></proof>
+ <proof prover="0" obsolete="true"><result status="timeout" time="4.88"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="4.87"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
  </goal>
  <goal name="WP_parameter ascii" expl="VC for ascii" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="asciiProp" expanded="true">
- <proof prover="1"><result status="valid" time="1.41"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="1.41"/></proof>
  </goal>
  <goal name="iso" expanded="true">
- <proof prover="1"><result status="valid" time="0.40"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="grayIsGray" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="nthGray" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="lastNthGray" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="nthBinary" expanded="true">
- <proof prover="1"><result status="valid" time="0.48"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="evenOdd" expanded="true">
- <proof prover="1"><result status="valid" time="0.14"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="DM1" expanded="true">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="DM2" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.05"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="DM3" expanded="true">
- <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="DM4" expanded="true">
- <proof prover="1"><result status="valid" time="0.11"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="DM5" expanded="true">
- <proof prover="1"><result status="valid" time="0.10"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="DM6" expanded="true">
- <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="DM7" expanded="true">
- <proof prover="1"><result status="valid" time="0.08"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="DM8" expanded="true">
- <proof prover="1"><result status="valid" time="0.09"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="DMtest" expanded="true">
- <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="Aa" expanded="true">
- <proof prover="1"><result status="valid" time="0.06"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Ac" expanded="true">
- <proof prover="1"><result status="valid" time="0.07"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.07"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Ad" expanded="true">
- <proof prover="1"><result status="valid" time="0.06"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Ae" expanded="true">
- <proof prover="0"><result status="valid" time="0.05" steps="72"/></proof>
- <proof prover="1"><result status="valid" time="0.04"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="0" obsolete="true"><result status="valid" time="0.05" steps="72"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Af" expanded="true">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="Aj" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="An" expanded="true">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="Ao" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Aq" expanded="true">
- <proof prover="1"><result status="valid" time="0.08"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.08"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="At" expanded="true">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="Au" expanded="true">
- <proof prover="1"><result status="valid" time="0.13"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.13"/></proof>
  </goal>
  <goal name="Av" expanded="true">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.12"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="IE1" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="IE2" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="IEa" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="IEb" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="IE3" expanded="true">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="IE4" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="SR1" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="RS_left" expanded="true">
- <proof prover="1"><result status="valid" time="0.11"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.11"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="RS_right" expanded="true">
- <proof prover="1"><result status="valid" time="0.09"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.09"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="BP" expanded="true">
- <proof prover="1"><result status="valid" time="0.10"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
 </file>

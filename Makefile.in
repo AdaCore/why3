@@ -868,13 +868,16 @@ COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 COQLIBS_SEQ_FILES = Seq
 COQLIBS_SEQ = $(addprefix lib/coq/seq/, $(COQLIBS_SEQ_FILES))
 
+COQLIBS_BV_FILES = Pow2int BV_Gen
+COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV)
 
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
@@ -899,6 +902,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_SEQ_FILES); do \
 	echo 'theory seq.'"$$f"' meta "realized_theory" "seq.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_BV_FILES); do \
+	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -924,6 +929,8 @@ install_no_local::
 	cp $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
 	mkdir -p $(LIBDIR)/why3/coq/seq
 	cp $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
+	mkdir -p $(LIBDIR)/why3/coq/bv
+	cp $(addsuffix .vo, $(COQLIBS_BV)) $(LIBDIR)/why3/coq/bv/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
@@ -957,6 +964,9 @@ update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theo
 
 update-coq-seq: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/seq.why
 	for f in $(COQLIBS_SEQ_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T seq.$$f -o lib/coq/seq/; done
+
+update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/bv.why
+	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T bv.$$f -o lib/coq/bv/; done
 
 update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
@@ -1641,7 +1651,8 @@ STDLIBS = algebra \
 	real \
 	relations \
 	set \
-	sum
+	sum \
+	bv
 # function ? tptp ?
 
 STDMODS = array matrix hashtbl impset pqueue queue random ref stack string
