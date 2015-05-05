@@ -47,13 +47,8 @@ let add_opt_theory x =
       Queue.push (x, p, t) tlist
 
 let opt_parser = ref None
-let opt_driver = ref None
 let opt_output = ref None
-
-let add_opt_driver s =
-  match !opt_driver with
-  | None -> opt_driver := Some s
-  | Some _ -> eprintf "Cannot specify more than one driver@."; exit 1
+let opt_driver = ref []
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
@@ -66,9 +61,9 @@ let option_list = [
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "-D", Arg.String add_opt_driver,
-      "<file> specify a driver";
-  "--driver", Arg.String add_opt_driver,
+  "-D", Arg.String (fun s -> opt_driver := s::!opt_driver),
+      "<file> specify an extraction driver";
+  "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> print the selected goals to separate files in <dir>";
@@ -89,16 +84,17 @@ let opt_output =
     exit 1
   | Some d -> d
 
+let driver_file s =
+  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
+  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
+
 let opt_driver =
-  try match !opt_driver with
-  | None ->
-    eprintf "Driver (-D) is required.@.";
+  try match List.rev_map driver_file !opt_driver with
+  | [] ->
+    eprintf "Extraction driver (-D) is required.@.";
     exit 1
-  | Some s ->
-    let s =
-      if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-      else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv")) in
-    Mlw_driver.load_driver env s []
+  | f::ef ->
+    Mlw_driver.load_driver env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
