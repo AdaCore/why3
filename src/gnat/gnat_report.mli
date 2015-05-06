@@ -68,3 +68,4 @@ val print_messages : unit -> unit
    print the result file. The return value describes whether "warning messages"
    have been issued (= unproved checks). *)
 
+val add_warning : ?loc:Loc.position -> string -> unit
