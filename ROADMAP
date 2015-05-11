@@ -276,22 +276,11 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
+* The next commit : add +git to the version in file Version
 
 * prepare the OPAM package
 
-. update opam/url: url and checksum of why-0.86.tar.gz
-   (use "md5sum distrib/why3-0.86.tar.gz")
-. update opam/descr if necessary
-. update opam/opam with correct dependencies and such
-
-* test the OPAM package
-
-  . with opam 1.2:
-    opam pin add why3 --kind=git <...>/why3/.git
-    (it runs "opam install why3")
-  . with opam < 1.2:
-
-    - first step: have a local copy of opam-repository if not done yet, e.g.:
+. obtain a local copy of opam repository, or obtain a former one :
 
         git clone git@github.com:claudemarche/opam-repository.git
         cd opam-repository/
@@ -303,21 +292,25 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
         git reset --hard opam/master
         git push
 
-    - second step: copy why3 opam files into it :
+. copy former files:
 
-      cd packages/why3
-      cp -r <source why3>/opam why3.0.86
+  cp -r packages/why3-base/why3-base-0.85 packages/why3-base/why3-base-0.86
+  cp -r packages/why3/why3-0.85 packages/why3/why3-0.86
 
-    - second step:
+. update packages/why3-base/why3-base-0.86/url:
+  url and checksum of why-0.86.tar.gz obtained via
 
-      opam repository add local <...>/opam-repository
-      opam install why3
-      (* test it, e.g.
-         cp example/quicksort.mlw ~/tmp
-         why3 ide ~/tmp/quicksort.mlw *)
-      opam remove why3
-      opam repository remove local
+    md5sum distrib/why3-0.86.tar.gz
 
+. update packages/why3-base/why3-base-0.86/descr if necessary
+. update packages/why3/why3-0.86/descr if necessary
+. update packages/why3-base/why3-base-0.86/opam with correct dependencies and such
+. update packages/why3/why3-0.86/opam with correct dependencies and such
+  (at least the dependency on why3-base should be fixed)
+
+* test the OPAM package (requires opam 1.2)
+    opam pin why3 ./.git
+    opam install why3
 
 * make a pull request on OPAM
 
@@ -330,13 +323,14 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
   Fedora package
 
 * produce the Why3 part of Toccata gallery
-  -> add also a tar.gz and a ZIP file of it (this is done by doing
-  "make gallery-files" in the sources of the Toccata web pages)
+  (TODO: add the procedure here)
+  add also a tar.gz and a ZIP file of it: this is done by doing
+  "make gallery-files" in the sources of the Toccata web pages
 
-* Announce the distrib
- - What to put in the announcement: see New Features above
+* Once the OPAM package is pulled in the main OPAM repository: a
+  nnounce the distrib
+  What to put in the announcement: see New Features above
 
-* The next commit : add +git to the version in file Version
 
 
 ==================== Roadmap for release 0.85 ========================
