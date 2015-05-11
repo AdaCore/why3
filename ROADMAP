@@ -159,16 +159,18 @@ Release Notes (details in file CHANGES):
 
 == TODO ==
 
-* plusieurs drivers acceptés sur la ligne de commande (AP)
-
-* clean up the support for SMTLIB bitvectors: there are 2 theories in the stdlib: thoeries/bv.why and modules/bitvectors.mlw
--> not anymore, but more cleaning can be done: no need to separate all theories in drivers for Z3 and CVC4, since the same theory can be put several times in a driver (or imported sub-drivers)
-
 * decide if GUI with tabs is convenient enough
 -> onglets dans why3 ide : est-ce apprécié ? OUI
     mais enlever l'onglet "Counterexamples" avant la release
 
+* for next release: complete realization of bitvector library
+
 == DONE ==
+
+* clean up the support for SMTLIB bitvectors: there are 2 theories in the stdlib: thoeries/bv.why and modules/bitvectors.mlw
+-> not anymore, but more cleaning can be done: no need to separate all theories in drivers for Z3 and CVC4, since the same theory can be put several times in a driver (or imported sub-drivers)
+
+* DONE plusieurs drivers acceptés sur la ligne de commande (AP)
 
 * solve issues with metitarski
 . DONE theory PowerReal
