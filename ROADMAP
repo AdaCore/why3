@@ -236,15 +236,7 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
   (check that manual in HTML is also generated, doc/html/index.html)
 * do "make dist"
 * test distrib/why3-0.86.tar.gz
-* put on the web page why3-0.86.tar.gz:
-  cp distrib/why3-0.86.tar.gz /users/www-perso/projets/why3/download
-* inform Jerry James <loganjerry@gmail.com> so that he can test the
-  Fedora package
-* install web page for why2 which includes an updated page for the
-  quick migration guide. (sources are in CVS repository
-  ~filliatr/ARCHIVE/www/why).
 * move distrib from Why3 site to Inria forge:
-** remove /users/www-perso/projets/why3/download/why3-0.86.tar.gz
 ** upload distrib/why3-0.86.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
 * put on the web page
  - the manual in PDF
@@ -259,34 +251,19 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    make stdlibdoc
    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.86
-   rm /users/www-perso/projets/why3/stdlib
-   ln -s /users/www-perso/projets/why3/stdlib-0.86 \
+   ln -s -n -f /users/www-perso/projets/why3/stdlib-0.86 \
             /users/www-perso/projets/why3/stdlib
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     make apidoc
     cp -r doc/apidoc /users/www-perso/projets/why3/api-0.86
-    rm /users/www-perso/projets/why3/api
-    ln -s /users/www-perso/projets/why3/api-0.86 \
+    ln -s -n -f /users/www-perso/projets/why3/api-0.86 \
       /users/www-perso/projets/why3/api
 
  - update the main HTML page (sources are in repository why3-www)
-   edit index.html
+   edit index.html, change at least all occurrences of 0.85 by 0.86, and
+     update the url for download
    make (to check validity)
    make export
-
- - add links to extra resources like
-   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
-   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
-
- - make everything writeable for the group
-   chmod -R g+w /users/www-perso/projets/why3
-
-* prepare for the OPAM package
-
-. update opam/url: url and checksum of why-0.86.tar.gz
-   (use "md5sum distrib/why3-0.86.tar.gz")
-. update opam/descr if necessary
-. update opam/opam with correct dependencies and such
 
 * make a last commit:
  - git commit -am "release 0.86"
@@ -299,6 +276,13 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
+
+* prepare the OPAM package
+
+. update opam/url: url and checksum of why-0.86.tar.gz
+   (use "md5sum distrib/why3-0.86.tar.gz")
+. update opam/descr if necessary
+. update opam/opam with correct dependencies and such
 
 * test the OPAM package
 
@@ -342,11 +326,16 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
   git push
   sur github: creer un pull request
 
+* inform Jerry James <loganjerry@gmail.com> so that he can produce the
+  Fedora package
+
 * produce the Why3 part of Toccata gallery
   -> add also a tar.gz and a ZIP file of it (this is done by doing
   "make gallery-files" in the sources of the Toccata web pages)
+
 * Announce the distrib
  - What to put in the announcement: see New Features above
+
 * The next commit : add +git to the version in file Version
 
 

@@ -533,6 +533,7 @@ let show_about_window () =
                 "David Hauzar";
                 "Daisuke Ishii";
                 "Johannes Kanig";
+                "Mikhail Mandrykin";
                 "David Mentré";
                 "Benjamin Monate";
                 "Thi-Minh-Tuyen Nguyen";
