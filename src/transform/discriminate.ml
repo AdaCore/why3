@@ -241,6 +241,26 @@ let metas_from_env env =
   let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
   Sty.fold add sty (Lsmap.metas env)
 
+let inst_completion kn kept =
+  let rec inst_constructors ty acc = match ty.ty_node with
+    | Tyapp (ts,tyl) when not (Sty.mem ty acc) ->
+        let acc = Sty.add ty acc in
+        let tys = Sty.of_list tyl in
+        let csl = Decl.find_constructors kn ts in
+        let tys = if csl = [] then tys else
+          let d = Mid.find ts.ts_name kn in
+          let base = ty_app ts (List.map ty_var ts.ts_args) in
+          let sbs = ty_match Mtv.empty base ty in
+          let recu ts = Sid.mem ts.ts_name d.d_news in
+          let add_fd tys ty = if ty_s_any recu ty
+            then tys else Sty.add (ty_inst sbs ty) tys in
+          let add_cs tys (cs,_) =
+            List.fold_left add_fd tys cs.ls_args in
+          List.fold_left add_cs tys csl in
+        Sty.fold inst_constructors tys acc
+    | _ -> acc in
+  Sty.fold inst_constructors kept Sty.empty
+
 let lsinst_completion kept lskept env =
   let fold_ls ls env =
     let rec aux env tydisl subst = function
@@ -284,6 +304,7 @@ let select_lsinst env =
     let inst   = Sty.union inst   (Task.on_tagged_ty meta_inst   task) in
     let lskept = Sls.union lskept (Task.on_tagged_ls meta_lskept task) in
     let lsinst = Task.on_meta meta_lsinst add_user_lsinst lsinst task in
+    let inst   = inst_completion (Task.task_known task) inst in
     let lsinst = lsinst_completion inst lskept lsinst in
     let task   = Trans.apply clear_metas task in
     Trans.apply (Trans.add_tdecls (metas_from_env lsinst)) task

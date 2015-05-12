@@ -262,4 +262,7 @@ theory map.Map
   syntax function get   "(select %1 %2)"
   syntax function set   "(store %1 %2 %3)"
 (*  syntax function const "(const[%t0] %1)" *)
+
+  remove prop Select_eq
+  remove prop Select_neq
 end
