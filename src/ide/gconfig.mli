@@ -27,6 +27,7 @@ type t =
       mutable max_boxes : int;
       mutable saving_policy : int;
       mutable premise_color : string;
+      mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
       mutable iconset : string;

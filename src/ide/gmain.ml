@@ -1938,6 +1938,9 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
 let premise_tag = source_view#buffer#create_tag
   ~name:"premise_tag" [`BACKGROUND gconfig.premise_color]
 
+let neg_premise_tag = source_view#buffer#create_tag
+  ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color]
+
 let goal_tag = source_view#buffer#create_tag
   ~name:"goal_tag" [`BACKGROUND gconfig.goal_color]
 
@@ -1947,6 +1950,7 @@ let error_tag = source_view#buffer#create_tag
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in
   buf#remove_tag premise_tag ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag neg_premise_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag goal_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag error_tag ~start:buf#start_iter ~stop:buf#end_iter
 
@@ -2001,13 +2005,17 @@ let rec color_locs ~color f =
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
    No t_fold, no t_open_quant! *)
 let rec color_t_locs f =
+  let premise_tag = function
+    | { Term. t_node = Term.Tnot _; t_loc = None } -> neg_premise_tag
+    | _ -> premise_tag
+  in
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        let b = color_locs ~color:premise_tag f1 in
+        let b = color_locs ~color:(premise_tag f1) f1 in
         color_t_locs f2 || b
     | Term.Tlet (t,fb) ->
         let _,f1 = Term.t_open_bound fb in
-        let b = color_locs ~color:premise_tag t in
+        let b = color_locs ~color:(premise_tag t) t in
         color_t_locs f1 || b
     | Term.Tquant (Term.Tforall,fq) ->
         let _,_,f1 = Term.t_open_quant fq in
