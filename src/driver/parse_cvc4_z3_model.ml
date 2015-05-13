@@ -94,5 +94,5 @@ let parse input printer_mapping =
     update_element_names_and_locations raw_model printer_mapping.queried_terms []
   with Not_found -> [] 
 
-let () = register_model_parser "cvc4_z3_obsolete" parse
+let () = register_model_parser "cvc4_z3" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
