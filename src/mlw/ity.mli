@@ -13,7 +13,7 @@ open Ident
 open Ty
 open Term
 
-(** {2 Individual types (first-order types w/o effects)} *)
+(** {2 Individual types (first-order types without effects)} *)
 
 type itysymbol = private {
   its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
@@ -256,40 +256,55 @@ val create_xsymbol : preid -> ity -> xsymbol
 
 (** {2 Effects} *)
 
+exception IllegalAlias of region
+exception AssignPrivate of region
+exception StaleVariable of pvsymbol * region
+exception BadGhostWrite of pvsymbol * region
+exception DuplicateField of region * pvsymbol
+exception WriteImmutable of region * pvsymbol
+exception GhostDivergence
+
 type effect = private {
-  eff_writes : Spv.t Mreg.t;
-  eff_resets : Sreg.t Mreg.t;
-  eff_raises : Sexn.t;
-  eff_diverg : bool;
+  eff_reads  : Spv.t;         (* known variables *)
+  eff_writes : Spv.t Mreg.t;  (* modifications to specific fields *)
+  eff_covers : Sreg.t Mreg.t; (* confinement of regions to covers *)
+  eff_taints : Sreg.t;        (* ghost modifications *)
+  eff_raises : Sexn.t;        (* raised exceptions *)
+  eff_oneway : bool;          (* non-termination *)
+  eff_ghost  : bool;          (* ghost status *)
 }
 
 val eff_empty : effect
+
 val eff_equal : effect -> effect -> bool
-val eff_union : effect -> effect -> effect
+val eff_pure : effect -> bool
 
-val eff_is_empty : effect -> bool
-val eff_is_pure  : effect -> bool
+val eff_read : Spv.t -> effect
+val eff_write : Spv.t -> Spv.t Mreg.t -> effect (* drops writes outside reads *)
+val eff_assign : (pvsymbol * pvsymbol * pvsymbol) list -> effect (* r,field,v *)
 
-exception AssignPrivate of region
-exception DuplicateField of region * pvsymbol
-exception WriteImmutable of region * pvsymbol
+val eff_read_pre  : Spv.t -> effect -> effect (* no stale-variable check *)
+val eff_read_post : effect -> Spv.t -> effect (* checks for stale variables *)
+val eff_bind      : Spv.t -> effect -> effect (* removes variables from reads *)
 
-val eff_write : effect -> region -> Spv.t -> effect
+val eff_read_single      : pvsymbol -> effect
+val eff_read_single_pre  : pvsymbol -> effect -> effect
+val eff_read_single_post : effect -> pvsymbol -> effect
+val eff_bind_single      : pvsymbol -> effect -> effect
+
+val eff_reset : effect -> region -> effect  (* confine to an empty cover *)
+val eff_strong : effect -> effect (* confine all subregions under writes *)
+
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
-val eff_reset : effect -> region -> effect
 
-val eff_diverge : effect -> effect
+val eff_diverge : effect -> effect            (* forbidden if ghost *)
+val eff_ghostify : bool -> effect -> effect   (* forbidden if diverges *)
 
-val eff_assign : effect -> (region * pvsymbol * ity) list -> effect
+val eff_contagious : effect -> bool           (* ghost and raising exceptions *)
 
-val refresh_of_effect : effect -> effect
-
-exception IllegalAlias of region
-
-val eff_full_inst : ity_subst -> effect -> effect
-
-val eff_stale_region : effect -> ity -> bool
+val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
+val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
 
 (** {2 Computation types (higher-order types with effects)} *)
 
@@ -304,57 +319,52 @@ type cty = private {
   cty_pre    : pre list;
   cty_post   : post list;
   cty_xpost  : post list Mexn.t;
-  cty_reads  : Spv.t;
   cty_effect : effect;
   cty_result : ity;
   cty_freeze : ity_subst;
 }
 
 val create_cty : pvsymbol list ->
-  pre list -> post list -> post list Mexn.t -> Spv.t -> effect -> ity -> cty
-(** [create_cty args pre post xpost reads effect result] creates a cty.
+  pre list -> post list -> post list Mexn.t -> effect -> ity -> cty
+(** [create_cty args pre post xpost effect result] creates a cty.
     The [cty_xpost] field does not have to cover all raised exceptions.
-    The [cty_reads] field contains all unbound variables from the spec.
-    The [cty_freeze] field freezes every pvsymbol in [cty_reads].
-    The [cty_effect] field is filtered wrt [cty_reads] and [args].
+    [cty_effect.eff_reads] is completed wrt the specification and [args].
+    [cty_freeze] freezes every unbound pvsymbol in [cty_effect.eff_reads].
+    All effects on regions outside [cty_effect.eff_reads] are removed.
     Fresh regions in [result] are reset. Every type variable in [pre],
     [post], and [xpost] must come from [cty_reads], [args] or [result]. *)
 
-val cty_apply :
-  ?ghost:bool -> cty -> pvsymbol list -> ity list -> ity -> bool * cty
-(** [cty_apply ?(ghost=false) cty pvl rest res] instantiates [cty]
-    up to the types in [pvl], [rest] and [res], then applies it to
-    the arguments in [pvl], and returns the ghost status and the
-    computation type of the result, [rest -> res], with every type
-    variable and region in [pvl] freezed. Typecasts into a mapping
-    type are allowed for total effectless computations. *)
+val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
+(** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
+    [pvl], [rest] and [res], then applies it to the arguments in [pvl],
+    and returns the computation type of the result, [rest -> res],
+    with every type variable and region in [pvl] being frozen. *)
 
-val cty_r_visible : cty -> Sreg.t
-(** [cty_r_visible cty] returns the set of regions which are visible
-    from the non-ghost read dependencies and arguments of [cty]. *)
+val cty_ghost : cty -> bool
+(** [cty_ghost cty] returns [cty.cty_effect.eff_ghost] *)
 
-val cty_ghost_writes : bool -> cty -> Spv.t Mreg.t
-(** [cty_ghost_writes ghost cty] returns the subset of the write effect
-    of [cty] which corresponds to ghost writes into visible fields of
-    the ghost read dependencies and arguments of [cty]. *)
+val cty_ghostify : bool -> cty -> cty
+(** [cty_ghostify ghost cty] ghostifies the effect of [cty]. *)
+
+val cty_reads : cty -> Spv.t
+(** [cty_reads cty] returns the set of external dependencies of [cty]. *)
 
 val cty_add_reads : cty -> Spv.t -> cty
-(** [cty_add_reads cty pvs] adds variables in [pvs] to [cty.cty_reads].
-    This function performs capture: if some variables in [pvs] occur in
-    [cty.cty_args], they are removed from [pvs], and the corresponding
-    type variables and regions are not frozen. *)
+(** [cty_add_reads cty pvs] adds [pvs] to [cty.cty_effect.eff_reads].
+    This function performs capture: if some variables in [pvs] occur
+    in [cty.cty_args], they are not frozen. *)
 
-val cty_add_pre : cty -> pre list -> cty
-(** [cty_add_pre cty fl] appends pre-conditions in [fl] to [cty.cty_pre].
+val cty_add_pre : pre list -> cty -> cty
+(** [cty_add_pre fl cty] appends pre-conditions in [fl] to [cty.cty_pre].
     This function performs capture: the formulas in [fl] may refer to
     the variables in [cty.cty_args]. Only the new external dependencies
-    in [fl] are added to [cty.cty_reads] and frozen. *)
+    in [fl] are added to [cty.cty_effect.eff_reads] and frozen. *)
 
 val cty_add_post : cty -> post list -> cty
 (** [cty_add_post cty fl] appends post-conditions in [fl] to [cty.cty_post].
     This function performs capture: the formulas in [fl] may refer to the
     variables in [cty.cty_args]. Only the new external dependencies in [fl]
-    are added to [cty.cty_reads] and frozen. *)
+    are added to [cty.cty_effect.eff_reads] and frozen. *)
 
 (** {2 Pretty-printing} *)
 
@@ -371,5 +381,6 @@ val print_pv   : Format.formatter -> pvsymbol -> unit (* program variable *)
 val print_pvty : Format.formatter -> pvsymbol -> unit (* pvsymbol : type *)
 val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
 
-val print_spec : pvsymbol list -> pre list -> post list -> post list Mexn.t ->
-  Spv.t -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)
+val print_spec :
+  pvsymbol list -> pre list -> post list -> post list Mexn.t ->
+    effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)

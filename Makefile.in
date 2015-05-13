@@ -868,18 +868,22 @@ COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
 COQLIBS_OPTION_FILES = Option
 COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 
+COQLIBS_SEQ_FILES = Seq
+COQLIBS_SEQ = $(addprefix lib/coq/seq/, $(COQLIBS_SEQ_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)
 
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
 	echo 'theory BuiltIn meta "realized_theory" "BuiltIn", "" end'; \
+	echo 'theory HighOrd meta "realized_theory" "HighOrd", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
 	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_BOOL_FILES); do \
@@ -896,13 +900,15 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_OPTION_FILES); do \
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_SEQ_FILES); do \
+	echo 'theory seq.'"$$f"' meta "realized_theory" "seq.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
-	cp lib/coq/BuiltIn.vo $(LIBDIR)/why3/coq/
+	cp lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
 	mkdir -p $(LIBDIR)/why3/coq/int
 	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	mkdir -p $(LIBDIR)/why3/coq/bool
@@ -919,12 +925,14 @@ install_no_local::
 	cp $(addsuffix .vo, $(COQLIBS_LIST)) $(LIBDIR)/why3/coq/list/
 	mkdir -p $(LIBDIR)/why3/coq/option
 	cp $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
+	mkdir -p $(LIBDIR)/why3/coq/seq
+	cp $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -950,6 +958,9 @@ update-coq-list: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theori
 update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/option.why
 	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T option.$$f -o lib/coq/option/; done
 
+update-coq-seq: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/seq.why
+	for f in $(COQLIBS_SEQ_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T seq.$$f -o lib/coq/seq/; done
+
 update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
@@ -958,7 +969,7 @@ else
 drivers/coq-realizations.aux:
 	echo "(* generated automatically at compilation time *)" > $@
 
-COQLIBS_FILES = lib/coq/BuiltIn
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd
 
 endif
 
@@ -1628,6 +1639,7 @@ STDLIBS = algebra \
 	map \
 	number \
 	option \
+	seq \
 	pigeon \
 	real \
 	relations \
@@ -1831,6 +1843,9 @@ headers: headers-coq
 headers-coq:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		lib/coq/*/*.v
+
+remove-coq-headers:
+	headache -r -c misc/headache_config.txt lib/coq/*/*.v
 
 #########
 # myself

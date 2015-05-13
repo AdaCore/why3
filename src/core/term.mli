@@ -309,8 +309,8 @@ val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
 (** {2 Lambda-term manipulation} *)
 
 val t_lambda : vsymbol list -> trigger -> term -> term
-(** [t_lambda vl tr e] produces a term [eps f. (forall vl [tr]. f@vl = e)]
-    or [eps f. (forall vl [tr]. f@vl = True <-> e] if [e] is prop-typed.
+(** [t_lambda vl tr e] produces a term [eps f. (forall vl [tr]. f\@vl = e)]
+    or [eps f. (forall vl [tr]. f\@vl = True <-> e] if [e] is prop-typed.
     If [vl] is empty, [t_lambda] returns [e] or [if e then True else False],
     if [e] is prop-typed. *)
 

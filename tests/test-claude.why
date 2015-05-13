@@ -236,3 +236,12 @@ theory TestPVSRealAbs
   lemma l: A.abs (-. 1.0) = 1.0
 
 end
+
+theory TestTransform
+
+ predicate a int
+ predicate b int
+
+ lemma L: a 1 /\ b 2
+
+end

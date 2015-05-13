@@ -79,9 +79,9 @@ let add_opt_meta meta =
   in
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
+let opt_driver = ref []
 let opt_parser = ref None
 let opt_prover = ref None
-let opt_driver = ref None
 let opt_output = ref None
 let opt_timelimit = ref None
 let opt_memlimit = ref None
@@ -126,9 +126,9 @@ let option_list = [
       "<meta_name>[=<string>] add a meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
-  "-D", Arg.String (fun s -> opt_driver := Some (s, [])),
+  "-D", Arg.String (fun s -> opt_driver := s::!opt_driver),
       "<file> specify a prover's driver (conflicts with -P)";
-  "--driver", Arg.String (fun s -> opt_driver := Some (s, [])),
+  "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> print the selected goals to separate files in <dir>";
@@ -145,6 +145,14 @@ let option_list = [
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
+
+let driver_file s =
+  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
+  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
+
+let opt_driver = ref (match List.rev_map driver_file !opt_driver with
+  | f::ef -> Some (f, ef)
+  | [] -> None)
 
 let () = try
   if Queue.is_empty opt_queue then
@@ -365,19 +373,10 @@ let do_input env drv = function
         else
           Queue.iter (do_local_theory env drv fname m) tlist
 
-let driver_file s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then
-    s
-  else
-    Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
-
-let load_driver env (s,ef) =
-  let file = driver_file s in
-  load_driver env file ef
-
 let () =
   try
-    let drv = Opt.map (load_driver env) !opt_driver in
+    let load (f,ef) = load_driver env f ef in
+    let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

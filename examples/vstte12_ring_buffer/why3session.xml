@@ -7,146 +7,146 @@
 <prover id="2" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="10" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <file name="../vstte12_ring_buffer.mlw" expanded="true">
-<theory name="RingBuffer" sum="1289ca204defa8dd09e9844f9bb044ce" expanded="true">
- <goal name="WP_parameter create" expl="VC for create" expanded="true">
+<theory name="RingBuffer" sum="1289ca204defa8dd09e9844f9bb044ce">
+ <goal name="WP_parameter create" expl="VC for create">
  <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter length" expl="VC for length" expanded="true">
+ <goal name="WP_parameter length" expl="VC for length">
  <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter clear" expl="VC for clear" expanded="true">
+ <goal name="WP_parameter clear" expl="VC for clear">
  <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter push" expl="VC for push" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter push.1" expl="1. index in array bounds" expanded="true">
+ <goal name="WP_parameter push" expl="VC for push">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter push.1" expl="1. index in array bounds">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter push.2" expl="2. type invariant" expanded="true">
-  <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter push.2.1" expl="1. type invariant" expanded="true">
-   <transf name="split_goal_wp" expanded="true">
-    <goal name="WP_parameter push.2.1.1" expl="1. VC for push" expanded="true">
+  <goal name="WP_parameter push.2" expl="2. type invariant">
+  <transf name="inline_goal">
+   <goal name="WP_parameter push.2.1" expl="1. type invariant">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter push.2.1.1" expl="1. VC for push">
     <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter push.2.1.2" expl="2. VC for push" expanded="true">
+    <goal name="WP_parameter push.2.1.2" expl="2. VC for push">
     <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter push.2.1.3" expl="3. VC for push" expanded="true">
+    <goal name="WP_parameter push.2.1.3" expl="3. VC for push">
     <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter push.2.1.4" expl="4. VC for push" expanded="true">
+    <goal name="WP_parameter push.2.1.4" expl="4. VC for push">
     <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter push.2.1.5" expl="5. VC for push" expanded="true">
+    <goal name="WP_parameter push.2.1.5" expl="5. VC for push">
     <proof prover="4" memlimit="0"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter push.2.1.6" expl="6. VC for push" expanded="true">
+    <goal name="WP_parameter push.2.1.6" expl="6. VC for push">
     <proof prover="4" timelimit="5"><result status="valid" time="0.16"/></proof>
     </goal>
-    <goal name="WP_parameter push.2.1.7" expl="7. VC for push" expanded="true">
+    <goal name="WP_parameter push.2.1.7" expl="7. VC for push">
     <proof prover="4"><result status="valid" time="0.08"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter push.3" expl="3. type invariant" expanded="true">
+  <goal name="WP_parameter push.3" expl="3. type invariant">
   <proof prover="4" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter push.4" expl="4. postcondition" expanded="true">
+  <goal name="WP_parameter push.4" expl="4. postcondition">
   <proof prover="4" timelimit="30"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter push.5" expl="5. postcondition" expanded="true">
+  <goal name="WP_parameter push.5" expl="5. postcondition">
   <proof prover="4" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter head" expl="VC for head" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter head.1" expl="1. index in array bounds" expanded="true">
+ <goal name="WP_parameter head" expl="VC for head">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter head.1" expl="1. index in array bounds">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter head.2" expl="2. postcondition" expanded="true">
+  <goal name="WP_parameter head.2" expl="2. postcondition">
   <proof prover="0" edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_head_1.v"><result status="valid" time="1.17"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter pop" expl="VC for pop" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter pop.1" expl="1. unreachable point" expanded="true">
+ <goal name="WP_parameter pop" expl="VC for pop">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter pop.1" expl="1. unreachable point">
   <proof prover="4" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter pop.2" expl="2. index in array bounds" expanded="true">
+  <goal name="WP_parameter pop.2" expl="2. index in array bounds">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter pop.3" expl="3. type invariant" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter pop.3.1" expl="1. VC for pop" expanded="true">
+  <goal name="WP_parameter pop.3" expl="3. type invariant">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pop.3.1" expl="1. VC for pop">
    <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.3.2" expl="2. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.3.2" expl="2. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter pop.3.3" expl="3. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.3.3" expl="3. VC for pop">
    <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.3.4" expl="4. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.3.4" expl="4. VC for pop">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter pop.3.5" expl="5. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.3.5" expl="5. VC for pop">
    <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.3.6" expl="6. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.3.6" expl="6. VC for pop">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter pop.3.7" expl="7. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.3.7" expl="7. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter pop.4" expl="4. postcondition" expanded="true">
+  <goal name="WP_parameter pop.4" expl="4. postcondition">
   <proof prover="4" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter pop.5" expl="5. postcondition" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter pop.5.1" expl="1. VC for pop" expanded="true">
+  <goal name="WP_parameter pop.5" expl="5. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pop.5.1" expl="1. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.5.2" expl="2. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.5.2" expl="2. VC for pop">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.25"/></proof>
    </goal>
-   <goal name="WP_parameter pop.5.3" expl="3. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.5.3" expl="3. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.00"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter pop.6" expl="6. type invariant" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter pop.6.1" expl="1. VC for pop" expanded="true">
+  <goal name="WP_parameter pop.6" expl="6. type invariant">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pop.6.1" expl="1. VC for pop">
    <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.6.2" expl="2. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.6.2" expl="2. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.6.3" expl="3. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.6.3" expl="3. VC for pop">
    <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter pop.6.4" expl="4. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.6.4" expl="4. VC for pop">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.6.5" expl="5. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.6.5" expl="5. VC for pop">
    <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.6.6" expl="6. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.6.6" expl="6. VC for pop">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.09"/></proof>
    </goal>
-   <goal name="WP_parameter pop.6.7" expl="7. VC for pop" expanded="true">
-   <metas
-    expanded="true">
+   <goal name="WP_parameter pop.6.7" expl="7. VC for pop">
+   <metas>
     <ts_pos name="real" arity="0" id="2"
      ip_theory="BuiltIn">
      <ip_library name="why3"/>
@@ -647,9 +647,9 @@
     <meta name="remove_type">
      <meta_arg_ts id="4990"/>
     </meta>
-    <goal name="WP_parameter pop.6.7" expl="7. VC for pop" expanded="true">
-    <transf name="eliminate_builtin" expanded="true">
-     <goal name="WP_parameter pop.6.7.1" expl="1. VC for pop" expanded="true">
+    <goal name="WP_parameter pop.6.7" expl="7. VC for pop">
+    <transf name="eliminate_builtin">
+     <goal name="WP_parameter pop.6.7.1" expl="1. VC for pop">
      <proof prover="1" memlimit="1000"><result status="valid" time="0.07"/></proof>
      <proof prover="3"><result status="valid" time="0.37"/></proof>
      </goal>
@@ -659,18 +659,18 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter pop.7" expl="7. postcondition" expanded="true">
+  <goal name="WP_parameter pop.7" expl="7. postcondition">
   <proof prover="4" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter pop.8" expl="8. postcondition" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter pop.8.1" expl="1. VC for pop" expanded="true">
+  <goal name="WP_parameter pop.8" expl="8. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter pop.8.1" expl="1. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter pop.8.2" expl="2. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.8.2" expl="2. VC for pop">
    <proof prover="2"><result status="valid" time="2.33"/></proof>
    </goal>
-   <goal name="WP_parameter pop.8.3" expl="3. VC for pop" expanded="true">
+   <goal name="WP_parameter pop.8.3" expl="3. VC for pop">
    <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
@@ -678,148 +678,168 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="b3296915b3d584339068bfe8da77d186" expanded="true">
- <goal name="WP_parameter harness" expl="VC for harness" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter harness.1" expl="1. precondition" expanded="true">
+<theory name="Harness" sum="b3296915b3d584339068bfe8da77d186">
+ <goal name="WP_parameter harness" expl="VC for harness">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter harness.1" expl="1. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter harness.2" expl="2. precondition" expanded="true">
+  <goal name="WP_parameter harness.2" expl="2. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter harness.3" expl="3. precondition" expanded="true">
+  <goal name="WP_parameter harness.3" expl="3. precondition">
   <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter harness.4" expl="4. precondition" expanded="true">
+  <goal name="WP_parameter harness.4" expl="4. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter harness.5" expl="5. precondition" expanded="true">
+  <goal name="WP_parameter harness.5" expl="5. precondition">
   <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter harness.6" expl="6. assertion" expanded="true">
+  <goal name="WP_parameter harness.6" expl="6. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.18"/></proof>
   </goal>
-  <goal name="WP_parameter harness.7" expl="7. precondition" expanded="true">
+  <goal name="WP_parameter harness.7" expl="7. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter harness.8" expl="8. assertion" expanded="true">
+  <goal name="WP_parameter harness.8" expl="8. assertion">
   <proof prover="4" timelimit="13" memlimit="0"><result status="valid" time="0.25"/></proof>
   </goal>
-  <goal name="WP_parameter harness.9" expl="9. precondition" expanded="true">
+  <goal name="WP_parameter harness.9" expl="9. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter harness.10" expl="10. assertion" expanded="true">
+  <goal name="WP_parameter harness.10" expl="10. assertion">
   <proof prover="4" timelimit="14" memlimit="0"><result status="valid" time="0.30"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter harness2" expl="VC for harness2" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter harness2.1" expl="1. precondition" expanded="true">
+ <goal name="WP_parameter harness2" expl="VC for harness2">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter harness2.1" expl="1. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.2" expl="2. precondition" expanded="true">
+  <goal name="WP_parameter harness2.2" expl="2. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.3" expl="3. assertion" expanded="true">
+  <goal name="WP_parameter harness2.3" expl="3. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.4" expl="4. precondition" expanded="true">
+  <goal name="WP_parameter harness2.4" expl="4. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.5" expl="5. assertion" expanded="true">
+  <goal name="WP_parameter harness2.5" expl="5. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.6" expl="6. precondition" expanded="true">
+  <goal name="WP_parameter harness2.6" expl="6. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.7" expl="7. assertion" expanded="true">
+  <goal name="WP_parameter harness2.7" expl="7. assertion">
   <proof prover="1" timelimit="10" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.8" expl="8. precondition" expanded="true">
+  <goal name="WP_parameter harness2.8" expl="8. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.9" expl="9. assertion" expanded="true">
+  <goal name="WP_parameter harness2.9" expl="9. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.10" expl="10. assertion" expanded="true">
+  <goal name="WP_parameter harness2.10" expl="10. assertion">
   <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.11" expl="11. precondition" expanded="true">
+  <goal name="WP_parameter harness2.11" expl="11. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.12" expl="12. assertion" expanded="true">
+  <goal name="WP_parameter harness2.12" expl="12. assertion">
   <proof prover="1" timelimit="10" memlimit="1000"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.13" expl="13. precondition" expanded="true">
+  <goal name="WP_parameter harness2.13" expl="13. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.14" expl="14. assertion" expanded="true">
+  <goal name="WP_parameter harness2.14" expl="14. assertion">
   <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.15" expl="15. assertion" expanded="true">
+  <goal name="WP_parameter harness2.15" expl="15. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.16" expl="16. precondition" expanded="true">
+  <goal name="WP_parameter harness2.16" expl="16. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.17" expl="17. assertion" expanded="true">
+  <goal name="WP_parameter harness2.17" expl="17. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.18" expl="18. assertion" expanded="true">
+  <goal name="WP_parameter harness2.18" expl="18. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.19" expl="19. precondition" expanded="true">
+  <goal name="WP_parameter harness2.19" expl="19. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.20" expl="20. assertion" expanded="true">
+  <goal name="WP_parameter harness2.20" expl="20. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.10"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter test" expl="VC for test" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter test.1" expl="1. precondition" expanded="true">
+ <goal name="WP_parameter test" expl="VC for test">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter test.1" expl="1. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.2" expl="2. precondition" expanded="true">
+  <goal name="WP_parameter test.2" expl="2. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.3" expl="3. precondition" expanded="true">
+  <goal name="WP_parameter test.3" expl="3. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter test.4" expl="4. assertion" expanded="true">
+  <goal name="WP_parameter test.4" expl="4. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.35"/></proof>
   </goal>
-  <goal name="WP_parameter test.5" expl="5. precondition" expanded="true">
+  <goal name="WP_parameter test.5" expl="5. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.6" expl="6. assertion" expanded="true">
+  <goal name="WP_parameter test.6" expl="6. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter test.7" expl="7. assertion" expanded="true">
+  <goal name="WP_parameter test.7" expl="7. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter test.8" expl="8. precondition" expanded="true">
+  <goal name="WP_parameter test.8" expl="8. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.9" expl="9. assertion" expanded="true">
+  <goal name="WP_parameter test.9" expl="9. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter test.10" expl="10. precondition" expanded="true">
+  <goal name="WP_parameter test.10" expl="10. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter test.11" expl="11. assertion" expanded="true">
+  <goal name="WP_parameter test.11" expl="11. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter test.12" expl="12. precondition" expanded="true">
+  <goal name="WP_parameter test.12" expl="12. precondition">
   <proof prover="4" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter test.13" expl="13. assertion" expanded="true">
+  <goal name="WP_parameter test.13" expl="13. assertion">
   <proof prover="4" memlimit="0"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
+ </goal>
+</theory>
+<theory name="RingBufferSeq" sum="995db2405e6e3b861bcd154088b0541e" expanded="true">
+ <goal name="WP_parameter create" expl="VC for create" expanded="true">
+ <proof prover="5"><result status="valid" time="0.01" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter length" expl="VC for length" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="0"/></proof>
+ </goal>
+ <goal name="WP_parameter clear" expl="VC for clear" expanded="true">
+ <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
+ </goal>
+ <goal name="WP_parameter push" expl="VC for push" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="51"/></proof>
+ </goal>
+ <goal name="WP_parameter head" expl="VC for head" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter pop" expl="VC for pop" expanded="true">
+ <proof prover="5"><result status="valid" time="0.03" steps="62"/></proof>
  </goal>
 </theory>
 </file>

@@ -16,6 +16,7 @@ type t =
       mutable window_height : int;
       mutable tree_width : int;
       mutable font_size : int;
+      mutable current_tab : int;
       mutable verbose : int;
       mutable default_prover : string;
       mutable default_editor : string;
@@ -26,6 +27,7 @@ type t =
       mutable max_boxes : int;
       mutable saving_policy : int;
       mutable premise_color : string;
+      mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
       mutable iconset : string;
