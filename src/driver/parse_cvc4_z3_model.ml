@@ -80,7 +80,6 @@ let do_parsing model =
       []
     end
 
-
 (* Parses the model returned by CVC4 or Z3.
 Assumes that the model has the following form "model: (pairs)"
 Returns the list of pairs term - value *)
@@ -95,5 +94,5 @@ let parse input printer_mapping =
     update_element_names_and_locations raw_model printer_mapping.queried_terms []
   with Not_found -> [] 
 
-let () = register_model_parser "cvc4_z3" parse
+let () = register_model_parser "cvc4_z3_obsolete" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
