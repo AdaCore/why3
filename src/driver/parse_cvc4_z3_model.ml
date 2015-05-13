@@ -15,6 +15,94 @@ open Printer
 open Ident
 open Term
 open Model_parser
+open Lexing
+
+let debug = Debug.register_info_flag "parse_cvc4_z3_model"
+  ~desc:"Print@ debugging@ messages@ about@ parsing@ model@ \
+         returned@ from@ cvc4@ or@ z3."
+
+(*
+*************************************************************** 
+**  Estabilish mapping to why3 code
+****************************************************************
+*)
+let rec extract_term_string labels raw_string regexp =
+  match labels with
+  | [] -> raw_string
+  | label::labels_tail ->
+    let l_string = label.lab_string in
+    begin 
+      try 
+	    ignore(Str.search_forward regexp l_string 0);
+	    let end_pos = Str.match_end () in
+	    String.sub l_string end_pos ((String.length l_string) - end_pos)
+      with Not_found -> extract_term_string labels_tail raw_string regexp
+    end
+    
+
+let get_term_string term raw_string  =
+  let labels = Slab.elements term.t_label in
+  let regexp = Str.regexp "model_trace:" in
+  extract_term_string labels raw_string regexp
+  
+
+let rec get_terms_values_locs_strings raw_strings terms collected_strings =
+  match raw_strings with
+  | [] -> collected_strings
+  | model_element::raw_strings_tail ->
+    let (term_string, term_location, terms_tail) = match terms with
+      | [] -> (model_element.me_name, None, [])
+      | term::t_tail -> ((get_term_string term model_element.me_name), term.t_loc, t_tail) in
+    let new_model_element = create_model_element 
+      ~name:term_string ~value:model_element.me_value ~location:term_location in
+    let collected_strings = collected_strings @ [new_model_element] in
+    get_terms_values_locs_strings raw_strings_tail terms_tail collected_strings
+
+(*
+*************************************************************** 
+**   Parser written using menhir 
+****************************************************************
+*)
+let do_parsing model =
+  let lexbuf = Lexing.from_string model in
+  try
+    Parse_cvc4_z3_model_parser.output Parse_cvc4_z3_model_lexer.token lexbuf
+  with
+  | Parse_cvc4_z3_model_lexer.Error msg -> Printf.fprintf stderr "%s%!\n" msg;
+    []
+  | Parse_cvc4_z3_model_parser.Error ->
+    begin
+      let pos = lexbuf.lex_curr_p in
+      Printf.fprintf stderr "%d:%d \n"
+	pos.pos_lnum (pos.pos_cnum - pos.pos_bol + 1);
+      []
+    end
+
+
+(* Parses the model returned by CVC4 or Z3.
+Assumes that the model has the following form "model: (pairs)"
+Returns the list of pairs term - value *)
+let parse input printer_mapping =
+  try
+    let r = Str.regexp "unknown\\|sat" in
+    let start_m = Str.search_forward r input 0 in
+    let model_string = String.sub input start_m ((String.length input) - start_m) in
+
+    let raw_model = do_parsing model_string in
+    
+    get_terms_values_locs_strings raw_model printer_mapping.queried_terms []
+  with Not_found -> [] 
+
+let () = register_model_parser "cvc4_z3" parse
+  ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
+
+(*
+*************************************************************** 
+**   Obsolete parser 
+****************************************************************
+*)
+
+(*
 
 exception EndOfStringExc;;
 
@@ -90,7 +178,8 @@ let _ = parse_pair "((s(s)) 1)" 0
 let _ = parse_pair "((sdfd()) (dsf)" 0
 let _ = parse_pair "((= (+ (+ (+ (+ (+ (+ (+ x1 x2) x3) x4) x5) x6) x7) x8) 2) false)" 0
 
-(* Parses a sequence of pairs from str. Returns the list of pairs.
+(* Parses a sequence of pairs from str. Returns the position in the parsed string 
+and list of parsed pairs.
 Assumes that the parts have a form: "parts: [pair]*\)" *)
 let rec parse_pairs str pos list =
   try 
@@ -108,44 +197,10 @@ let rec parse_pairs str pos list =
 let _ = parse_pairs "((s(s)) 1) (x 1))" 0 []
 let _ = parse_pairs "((= (+ (+ (+ (+ (+ (+ (+ x1 x2) x3) x4) x5) x6) x7) x8) 2) false))" 0 []
 
-let rec extract_term_string labels raw_string regexp =
-  match labels with
-  | [] -> raw_string
-  | label::labels_tail ->
-    let l_string = label.lab_string in
-    begin 
-      try 
-	    ignore(Str.search_forward regexp l_string 0);
-	    let end_pos = Str.match_end () in
-	    String.sub l_string end_pos ((String.length l_string) - end_pos)
-      with Not_found -> extract_term_string labels_tail raw_string regexp
-    end
-    
-
-let get_term_string term raw_string  =
-  let labels = Slab.elements term.t_label in
-  let regexp = Str.regexp "model_trace:" in
-  extract_term_string labels raw_string regexp
-  
-
-let rec get_terms_values_locs_strings raw_strings terms collected_strings =
-  match raw_strings with
-  | [] -> collected_strings
-  | (raw_term_string, value)::raw_strings_tail ->
-    let (term_string, term_location, terms_tail) = match terms with
-      | [] -> (raw_term_string, None, [])
-      | term::t_tail -> ((get_term_string term raw_term_string), term.t_loc, t_tail) in
-    let new_model_element = { 
-      me_name = term_string; 
-      me_value = value; 
-      me_location = term_location} in
-    let collected_strings = collected_strings @ [new_model_element] in
-    get_terms_values_locs_strings raw_strings_tail terms_tail collected_strings
-
 (* Parses the model returned by CVC4 or Z3.
 Assumes that the model has the following form "model: (pairs)"
 Returns the list of pairs term - value *)
-let parse model printer_mapping =
+let parse_obsolete model printer_mapping =
   try
     let r = Str.regexp "unknown\\|sat" in
     let start_m = Str.search_forward r model 0 in
@@ -156,5 +211,6 @@ let parse model printer_mapping =
 
 let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))" Printer.get_default_printer_mapping
 
-let () = register_model_parser "cvc4_z3" parse
+let () = register_model_parser "cvc4_z3_obsolete" parse_obsolete
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
+*)
