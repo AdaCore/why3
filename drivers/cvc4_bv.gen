@@ -22,11 +22,15 @@ theory bv.BV64
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 64) %1)"
   syntax function to_uint "(bv2nat %1)"
+  syntax function to_int "(ite (bvslt x (_ bv0 64)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
+  remove prop to_int_extensionality
   syntax predicate eq "(= %1 %2)"
   remove prop Extensionality
+  remove prop Of_int_zero
+  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -91,11 +95,15 @@ theory bv.BV32
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 32) %1)"
   syntax function to_uint "(bv2nat %1)"
+  syntax function to_int "(ite (bvslt x (_ bv0 32)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
+  remove prop to_int_extensionality
   syntax predicate eq "(= %1 %2)"
   remove prop Extensionality
+  remove prop Of_int_zero
+  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -160,11 +168,15 @@ theory bv.BV16
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 16) %1)"
   syntax function to_uint "(bv2nat %1)"
+  syntax function to_int "(ite (bvslt x (_ bv0 16)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
+  remove prop to_int_extensionality
   syntax predicate eq "(= %1 %2)"
   remove prop Extensionality
+  remove prop Of_int_zero
+  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -229,11 +241,15 @@ theory bv.BV8
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 8) %1)"
   syntax function to_uint "(bv2nat %1)"
+  syntax function to_int "(ite (bvslt x (_ bv0 8)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
+  remove prop to_int_extensionality
   syntax predicate eq "(= %1 %2)"
   remove prop Extensionality
+  remove prop Of_int_zero
+  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
