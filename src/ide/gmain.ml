@@ -17,7 +17,6 @@ open Whyconf
 open Gconfig
 open Stdlib
 open Debug
-open Model_parser
 
 module C = Whyconf
 
@@ -558,20 +557,6 @@ let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
-let rec add_model str model =
-  match model with
-  | [] -> str
-  | m_element::t -> begin
-    let loc_string = match m_element.me_location with
-      | None -> "\"no location\""
-      | Some loc -> begin
-	Loc.report_position str_formatter loc;
-	flush_str_formatter ()
-      end in
-    let n_str = str ^ m_element.me_name ^ " at " ^ loc_string ^ " = " ^ m_element.me_value ^ "\n" in
-    add_model n_str t
-  end
-
 let goal_task_text g =
   if (Gconfig.config ()).intro_premises then
     let trans =
@@ -645,7 +630,7 @@ let update_tabs a =
       begin
         match a.S.proof_state with
 	  | S.Done r ->
-            add_model "" r.Call_provers.pr_model
+	    Model_parser.model_to_string r.Call_provers.pr_model
 	  | _ -> ""
       end
     | _ -> ""

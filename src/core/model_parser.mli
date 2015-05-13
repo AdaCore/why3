@@ -9,11 +9,67 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Counter-example model values *)
+type model_value =
+ | Integer of string
+ | Array of model_array
+ | Other of string
+and  arr_index = {
+  arr_index_key : int;
+  arr_index_value : model_value;
+}
+and model_array = {
+  arr_others  : model_value;
+  arr_indices : arr_index list;
+}
+
+val array_create_constant : 
+  value : model_value -> 
+  model_array
+(** Creates constant array with all indices equal to the parameter value. *)
+
+val array_add_element : 
+  array : model_array -> 
+  index : model_value -> 
+  value : model_value -> 
+  model_array
+(** Adds an element to the array. 
+    @param array : the array to that the element will be added
+    
+    @param index : the index on which the element will be added.
+    Note that the index must be of value model_value.Integer
+
+    @param value : the value of the element to be added
+*)
+
+val print_model_value : Format.formatter -> model_value -> unit
+
+(** Counter-example model elements. Each element represents
+    a counter-example for a single source-code element.*)
 type model_element = { 
   me_name     : string;
-  me_value    : string;
-  me_location : Loc.position option; 
+    (** The name of the source-code element.  *)
+  me_value    : model_value;
+    (** Counter-example value for the element. *)
+  me_location : Loc.position option;
+    (** Source-code location of the element. *)
 }
+
+val create_model_element : 
+  name     : string -> 
+  value    : model_value -> 
+  location : Loc.position option -> 
+  model_element
+(** Creates a counter-example model element. 
+    @param name : the name of the source-code element
+
+    @param value  : counter-example value for the element
+
+    @param location : source-code location of the element *)
+
+val print_model : Format.formatter -> model_element list -> unit
+
+val model_to_string : model_element list -> string
 
 type model_parser = string ->  Printer.printer_mapping -> model_element list
 
