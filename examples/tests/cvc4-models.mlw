@@ -12,12 +12,13 @@ module M
 
   val y "model" "model_projected" "model_trace:y" :ref int
 
-  let incr ( x "model" "model_trace:x" : ref int ): unit
-  ensures { !x = old !x + 2 + !y }
-  = 
-  y := !y + 1;	 
-  x := !x + 1;
-  x := !x + 1
+  let incr ( x23 "model" "model_trace:my_x" : ref int ): unit
+  ensures { !x23 = old !x23 + 2 + !y }
+  =
+  #"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#
+  y := !y + 1;
+  x23 := !x23 + 1;
+  x23 := !x23 + 1
 
   let test_loop ( x "model" "model_trace:x" : ref int ): unit
   ensures { !x < old !x }
