@@ -288,26 +288,60 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
-let trace_model_regexp = Str.regexp "model_trace:"
+let model_trace_regexp = Str.regexp "model_trace:"
 
-let is_trace_label l =
+let is_model_trace_label l =
   try
-    ignore(Str.search_forward trace_model_regexp l.lab_string 0);
+    ignore(Str.search_forward model_trace_regexp l.lab_string 0);
     true
   with Not_found -> false
 
-let add_to_trace_label labels to_add =
+(* Appends the string to_append to the label that begins with "model_trace:" *)
+let append_to_model_trace_label ~labels ~to_append =
   try
-    let trace_label = Slab.choose (Slab.filter is_trace_label labels) in
+    let trace_label = Slab.choose (Slab.filter is_model_trace_label labels) in
     let labels_without_trace = Slab.remove trace_label labels in
-    let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_add) in
+    let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_append) in
     Slab.add new_trace_label labels_without_trace
   with Not_found -> labels
 
-let mk_var id label ?loc ty =
-  let new_labels = add_to_trace_label id.id_label label in
+(* The counter-example model related data needed for creating new 
+   variable. *)
+type model_data = {
+  md_append_to_model_trace : string;
+    (* The string that will be appended to the end of "model_trace:" label.
+       It is used to specify the reason why the variable is created. *)
+  md_loc                   : Loc.position option;
+    (* The location of the new variable. *)
+  md_context_labels         : Slab.t option;
+    (* The labels of an element that represents the context in 
+       that the variable is created.
+       Used in SPARK branch - the SPARK locations are kept in 
+       labels and when a new variable is created, these location 
+       labels are copied from md_context_labels. *)
+}
 
-  create_vsymbol (id_fresh ~label:new_labels ?loc id.id_string) ty
+let create_model_data ?loc ?context_labels append_to_model_trace =
+(* Creates new counter-example model related data.
+   @param loc : the location of the new variable
+
+   @param context_labels : The labels of an element that represents the context in that 
+   the variable is created.
+   Used in SPARK branch - the SPARK locations are kept in labels and when a new 
+   variable is created, these location labels are copied from md_context_labels.
+
+   @param append_to_model_trace : The string that will be appended to the end of 
+   "model_trace:" label. It is used to specify the reason why the variable is created. *)
+  { 
+    md_append_to_model_trace = append_to_model_trace;
+    md_loc = loc;
+    md_context_labels = context_labels;
+  }
+    
+let mk_var id ty model_data =
+  let new_labels = append_to_model_trace_label ~labels:id.id_label ~to_append:model_data.md_append_to_model_trace in
+
+  create_vsymbol (id_fresh ~label:new_labels ?loc:model_data.md_loc id.id_string) ty
 
 (* replace "contemporary" variables with fresh ones *)
 let rec subst_at_now now mvs t = match t.t_node with
@@ -360,7 +394,7 @@ let update_term env (mreg : vsymbol Mreg.t) f =
     | t -> Some t in
   let vars = Mvs.mapi_filter update (t_vars f) in
   (* [vv'] : modified variable -> fresh variable *)
-  let new_var vs _ = mk_var vs.vs_name "model_quantify" ?loc:f.t_loc vs.vs_ty in
+  let new_var vs _ = mk_var vs.vs_name vs.vs_ty (create_model_data ?loc:f.t_loc ~context_labels:f.t_label "model_quantify") in
   let vv' = Mvs.mapi new_var vars in
   (* update modified variables *)
   let update v t f = wp_let (Mvs.find v vv') t f in
@@ -379,17 +413,18 @@ let var_of_region reg f =
     | _ -> acc in
   t_v_fold test None f
 
-let quantify ?loc:(l=None) model_info env regs f =
+let quantify model_data env regs f =
   (* mreg : modified region -> vs *)
   let get_var reg () =
     let ty = ty_of_ity reg.reg_ity in
     let id = match var_of_region reg f with
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
-    let l = match l with
-      | None -> id.id_loc
-      | _ -> l in
-    mk_var id model_info ?loc:l ty in
+    let model_data = match model_data.md_loc with
+      | None -> create_model_data 
+	?loc:id.id_loc ~context_labels:id.id_label model_data.md_append_to_model_trace
+      | _ -> model_data in
+    mk_var id ty model_data in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
   let f = update_term env mreg f in
@@ -750,7 +785,7 @@ and wp_desc env e q xq = match e.e_node with
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract "any" env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let w = wp_abstract (create_model_data "any") env spec.c_effect spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p w
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
@@ -761,7 +796,8 @@ and wp_desc env e q xq = match e.e_node with
         if olds = [] then t_true (* we are out of letrec *) else
         decrease e.e_loc expl_variant env olds spec.c_variant in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract ~loc:e1.e_loc "call" env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let model_data = create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call" in
+      let w = wp_abstract model_data env spec.c_effect spec.c_post spec.c_xpost q xq in
       let w = wp_and ~sym:true d (wp_and ~sym:false p w) in
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
@@ -773,7 +809,8 @@ and wp_desc env e q xq = match e.e_node with
       (* so that now we don't need to prove these exceptions again *)
       let lost = Mexn.set_diff (exns_of_raises e1.e_effect) spec.c_xpost in
       let c_eff = Sexn.fold_left eff_remove_raise e1.e_effect lost in
-      let w2 = wp_abstract ~loc:e1.e_loc "abstract" env c_eff spec.c_post spec.c_xpost q xq in
+      let model_data = create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "abstract" in
+      let w2 = wp_abstract model_data env c_eff spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p (wp_and ~sym:true (wp_label e w1) w2)
   | Eassign (pl, e1, reg, pv) ->
       (* if we create an intermediate variable npv to represent e1
@@ -798,7 +835,7 @@ and wp_desc env e q xq = match e.e_node with
       let t = fs_app pl.pl_ls [t] pv.pv_vs.vs_ty in
       let c_q = create_unit_post (t_equ t (t_var pv.pv_vs)) in
       let eff = eff_write eff_empty reg in
-      let w = wp_abstract "assign" env eff c_q Mexn.empty q xq in
+      let w = wp_abstract (create_model_data "assign") env eff c_q Mexn.empty q xq in
       let q = create_post res w in
       wp_label e (wp_expr env e1 q xq)
   | Eloop (inv, varl, e1) ->
@@ -811,7 +848,8 @@ and wp_desc env e q xq = match e.e_node with
       let q = create_unit_post i in
       let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
-      let w = quantify ~loc:e1.e_loc "loop"  env regs (wp_implies inv w) in
+      let model_data = create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "loop" in
+      let w = quantify model_data  env regs (wp_implies inv w) in
       let i = wp_expl expl_loop_init inv in
       wp_label e (wp_and ~sym:true i w)
   | Efor ({pv_vs = x}, ({pv_vs = v1}, d, {pv_vs = v2}), inv, e1) ->
@@ -840,7 +878,7 @@ and wp_desc env e q xq = match e.e_node with
         wp_implies (t_subst_single x v2pl1 inv) q in
       let wp_good = wp_and ~sym:true
         wp_init
-        (quantify "loop" env (regs_of_writes e1.e_effect)
+        (quantify (create_model_data "loop") env (regs_of_writes e1.e_effect)
            (wp_and ~sym:true
               (wp_forall [x] (wp_implies
                 (wp_and ~sym:true (ps_app le [t_var v1; t_var x])
@@ -854,7 +892,7 @@ and wp_desc env e q xq = match e.e_node with
       in
       wp_label e wp_full
 
-and wp_abstract ?loc:(l=None) model env c_eff c_q c_xq q xq =
+and wp_abstract model_data env c_eff c_q c_xq q xq =
   let regs = regs_of_writes c_eff in
   let exns = exns_of_raises c_eff in
   let quantify_post c_q q =
@@ -862,7 +900,7 @@ and wp_abstract ?loc:(l=None) model env c_eff c_q c_xq q xq =
     let c_v, c_f = open_post c_q in
     let c_f = t_subst_single c_v (t_var v) c_f in
     let f = wp_forall_post v c_f f in
-    quantify ~loc:l model env regs f
+    quantify model_data env regs f
   in
   let quantify_xpost _ c_xq xq =
     Some (quantify_post c_xq xq) in
@@ -910,7 +948,8 @@ and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv c.c_xpost) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
-  wp_forall args (quantify "init" env (wp_fun_regs ps l) f)
+  let model_data = create_model_data "init" in
+  wp_forall args (quantify model_data env (wp_fun_regs ps l) f)
 
 and wp_rec_defn env fdl = List.map (wp_fun_defn env) fdl
 
@@ -1135,17 +1174,19 @@ end = struct
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
 
-  let mk_var name ity = mk_var name "fast wp" (ty_of_ity ity)
+  let mk_var name ity model_data = mk_var name (ty_of_ity ity) model_data
 
   let fresh_var_from_region hints reg =
     let name =
       try (Mreg.find reg hints).vs_name
       with Not_found -> reg.reg_name
     in
-    mk_var name reg.reg_ity
+    mk_var name reg.reg_ity (create_model_data "fast wp - from region")
 
   let fresh_var_from_var vs =
-    mk_var vs.vs_name (ity_of_vs vs)
+    let model_data = create_model_data 
+      "fast wp - from var" ?loc:vs.vs_name.id_loc ~context_labels:vs.vs_name.id_label in
+    mk_var vs.vs_name (ity_of_vs vs) model_data
 
   let is_simple_var = get_single_region_of_var
   let is_simple_pvar pv = is_simple_var pv.pv_vs
@@ -2044,7 +2085,8 @@ let wp_rec ~wp env kn th fdl =
       let q = old_mark lab spec.c_post in
       let f = wp_expr env e_void q Mexn.empty in
       let f = wp_implies spec.c_pre (erase_mark lab f) in
-      let f = wp_forall args (quantify "lemma function"  env (wp_fun_regs ps l) f) in
+      let model_data = create_model_data "lemma function" in
+      let f = wp_forall args (quantify model_data  env (wp_fun_regs ps l) f) in
       let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
       let lkn = Theory.get_known th in
       let f = if Debug.test_flag no_track then f else track_values lkn kn f in
