@@ -160,19 +160,6 @@ let rec print_ty info fmt ty =
     end
   end
 
-(* can the type of a value be derived from the type of the arguments? *)
-let unambig_fs fs =
-  let rec lookup v ty = match ty.ty_node with
-    | Tyvar u when tv_equal u v -> true
-    | _ -> ty_any (lookup v) ty
-  in
-  let lookup v = List.exists (lookup v) fs.ls_args in
-  let rec inspect ty = match ty.ty_node with
-    | Tyvar u when not (lookup u) -> false
-    | _ -> ty_all inspect ty
-  in
-  inspect (Opt.get fs.ls_value)
-
 (** Patterns, terms, and formulas *)
 
 (* unused

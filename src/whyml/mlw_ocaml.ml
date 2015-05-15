@@ -302,19 +302,6 @@ module Translate = struct
         List.exists constr dl
       | _ -> false
 
-  (* can the type of a value be derived from the type of the arguments? *)
-  let unambig_fs fs =
-    let rec lookup v ty = match ty.ty_node with
-      | Tyvar u when tv_equal u v -> true
-      | _ -> ty_any (lookup v) ty
-    in
-    let lookup v = List.exists (lookup v) fs.ls_args in
-    let rec inspect ty = match ty.ty_node with
-      | Tyvar u when not (lookup u) -> false
-      | _ -> ty_all inspect ty
-    in
-    Opt.fold (fun _ -> inspect) true fs.ls_value
-
   let oty_int = Some ty_int
 
   let rec app ls info tl =

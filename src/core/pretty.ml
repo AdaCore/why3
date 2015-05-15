@@ -141,19 +141,6 @@ let print_const fmt = function
   | ConstReal (RConstHex (i,f,Some e)) -> fprintf fmt "0x%s.%sp%s" i f e
   | ConstReal (RConstHex (i,f,None)) -> fprintf fmt "0x%s.%s" i f
 
-(* can the type of a value be derived from the type of the arguments? *)
-let unambig_fs fs =
-  let rec lookup v ty = match ty.ty_node with
-    | Tyvar u when tv_equal u v -> true
-    | _ -> ty_any (lookup v) ty
-  in
-  let lookup v = List.exists (lookup v) fs.ls_args in
-  let rec inspect ty = match ty.ty_node with
-    | Tyvar u when not (lookup u) -> false
-    | _ -> ty_all inspect ty
-  in
-  Opt.fold (fun _ -> inspect) true fs.ls_value
-
 (** Patterns, terms, and formulas *)
 
 let rec print_pat_node pri fmt p = match p.pat_node with

@@ -191,6 +191,9 @@ val t_prop : term -> term
 val t_ty_check : term -> ty option -> unit
 (** [t_ty_check t ty] checks that the type of [t] is [ty] *)
 
+val unambig_fs : lsymbol -> bool
+(** can the type of a value be derived from the type of the arguments? *)
+
 (** {2 Smart constructors for terms and formulas} *)
 
 val t_app  : lsymbol -> term list -> ty option -> term
