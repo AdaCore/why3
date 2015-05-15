@@ -52,11 +52,11 @@ let rec update_element_names_and_locations raw_model terms updated_model =
   match raw_model with
   | [] -> updated_model
   | model_element::raw_strings_tail ->
-    let (element_name, element_location, terms_tail) = match terms with
-      | [] -> (model_element.me_name, None, [])
-      | term::t_tail -> ((get_element_name term model_element.me_name), term.t_loc, t_tail) in
+    let (element_name, element_location, element_term, terms_tail) = match terms with
+      | [] -> (model_element.me_name, None, None, [])
+      | term::t_tail -> ((get_element_name term model_element.me_name), term.t_loc, Some term, t_tail) in
     let new_model_element = create_model_element 
-      ~name:element_name ~value:model_element.me_value ~location:element_location in
+      ~name:element_name ~value:model_element.me_value ?location:element_location ?term:element_term () in
     let updated_model = updated_model @ [new_model_element] in
     update_element_names_and_locations raw_strings_tail terms_tail updated_model
 

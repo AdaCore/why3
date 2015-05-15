@@ -21,7 +21,7 @@ output:
 pairs:
 | possible_space { [] }
 | possible_space LPAREN term SPACE value RPAREN pairs 
-    { (Model_parser.create_model_element ~name:$3 ~value:$5 ~location:None)::$7 }
+    { (Model_parser.create_model_element ~name:$3 ~value:$5 ())::$7 }
 
 possible_space:
 | { "" }

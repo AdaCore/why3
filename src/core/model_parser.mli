@@ -53,19 +53,25 @@ type model_element = {
     (** Counter-example value for the element. *)
   me_location : Loc.position option;
     (** Source-code location of the element. *)
+  me_term     : Term.term option;
+    (** Why term corresponding to the element.  *)
 }
 
 val create_model_element : 
   name     : string -> 
   value    : model_value -> 
-  location : Loc.position option -> 
+  ?location : Loc.position -> 
+  ?term     : Term.term ->
+  unit ->
   model_element
 (** Creates a counter-example model element. 
     @param name : the name of the source-code element
 
     @param value  : counter-example value for the element
 
-    @param location : source-code location of the element *)
+    @param location : source-code location of the element 
+    
+    @param term : why term corresponding to the element *)
 
 val print_model : Format.formatter -> model_element list -> unit
 

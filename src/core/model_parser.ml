@@ -71,14 +71,16 @@ print_model_value fmt value =
 type model_element = { 
   me_name     : string;
   me_value    : model_value;
-  me_location : Loc.position option; 
+  me_location : Loc.position option;
+  me_term     : Term.term option;
 }
 
-let create_model_element ~name ~value ~location =
+let create_model_element ~name ~value ?location ?term () =
   {
     me_name = name;
     me_value = value;
     me_location = location;
+    me_term = term;
   }
 
 let print_location fmt m_element =
