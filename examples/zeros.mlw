@@ -1,4 +1,6 @@
 
+(** Setting all the elements of an array to zero *)
+
 module SetZeros
 
   use import int.Int
@@ -16,5 +18,74 @@ module SetZeros
     set_zeros a0;
     assert { length a0 = 42 };
     assert { a0[12] = 0 }
+
+end
+
+(** Checking that an array contains only zeros *)
+
+module AllZeros
+
+  use import int.Int
+  use import array.Array
+  use import ref.Refint
+
+  predicate all_zeros (a: array int) (hi: int) =
+    forall i: int. 0 <= i < hi -> a[i] = 0
+
+  (** with a for loop (a bit naive, since it always scans the whole array) *)
+
+  let all_zeros1 (a: array int) : bool
+    ensures { result <-> all_zeros a a.length }
+  =
+    let res = ref True in
+    for i = 0 to length a - 1 do
+      invariant { !res <-> all_zeros a i }
+      if a[i] <> 0 then res := False
+    done;
+    !res
+
+  (** with a while loop, stopping as early as possible *)
+
+  let all_zeros2 (a: array int) : bool
+    ensures { result <-> all_zeros a a.length }
+  =
+    let res = ref True in
+    let i = ref 0 in
+    while !res && !i < length a do
+      invariant { 0 <= !i <= a.length }
+      invariant { !res <-> all_zeros a !i }
+      variant   { a.length - !i }
+      res := (a[!i] = 0);
+      incr i
+    done;
+    !res
+
+  (** no need for a Boolean variable, actually *)
+
+  let all_zeros3 (a: array int) : bool
+    ensures { result <-> all_zeros a a.length }
+  =
+    let i = ref 0 in
+    while !i < length a && a[!i] = 0 do
+      invariant { 0 <= !i <= a.length }
+      invariant { all_zeros a !i }
+      variant   { a.length - !i }
+      incr i
+    done;
+    !i = length a
+
+  (** with a recursive function *)
+
+  let all_zeros4 (a: array int) : bool
+    ensures { result <-> all_zeros a a.length }
+  =
+    let rec check_from (i: int) : bool
+      requires { 0 <= i <= a.length }
+      requires { all_zeros a i }
+      variant  { a.length - i }
+      ensures  { result <-> all_zeros a a.length }
+    = i = length a || a[i] = 0 && check_from (i+1)
+    in
+    check_from 0
 
 end
