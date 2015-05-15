@@ -156,3 +156,5 @@ val all_split_leaf_goals : unit -> unit
 
 val clean_automatic_proofs : goal -> unit
 (* deletes previous proof attempts of the selected provers for this goal *)
+
+val goal_has_splits : goal -> bool

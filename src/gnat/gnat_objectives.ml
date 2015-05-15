@@ -602,6 +602,9 @@ module Save_VCs = struct
 
 end
 
+let goal_has_splits goal =
+  not (Session.PHstr.is_empty goal.Session.goal_transformations)
+
 let schedule_goal g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
