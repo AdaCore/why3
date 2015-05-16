@@ -152,7 +152,11 @@ let parse model printer_mapping =
     let start = find_first_open_bracket model start_m in
     let raw_terms_values_strings = snd(parse_pairs model (start+1) []) in
     get_terms_values_locs_strings raw_terms_values_strings printer_mapping.queried_terms []
-  with Not_found -> [] 
+  with
+  | Not_found -> []
+  | EndOfStringExc ->
+    Warning.emit "Error@ during@ parsing@ of@ cvc4@ or@ z3@ model";
+    []
 
 let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))" Printer.get_default_printer_mapping
 
