@@ -47,6 +47,7 @@ stepslimitexceeded "??"
 
 (* Disabled:
    CVC4 division seems to be neither the Euclidean one, nor the Computer one
+*)
 
 theory int.EuclideanDivision
    syntax function div "(div %1 %2)"
@@ -57,6 +58,7 @@ theory int.EuclideanDivision
    remove prop Div_1
 end
 
+(*
 theory int.ComputerDivision
    syntax function div "(div %1 %2)"
    syntax function mod "(mod %1 %2)"
