@@ -104,3 +104,4 @@ array:
 
 array_skipped_part:
 | LPAREN term_list RPAREN {}
+

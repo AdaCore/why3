@@ -1,5 +1,5 @@
 {
-  open Parse_cvc4_z3_model_parser
+  open Parse_smtv2_model_parser
   exception SyntaxError
 }
 

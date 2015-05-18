@@ -17,7 +17,7 @@ open Term
 open Model_parser
 open Lexing
 
-let debug = Debug.register_info_flag "parse_cvc4_z3_model"
+let debug = Debug.register_info_flag "parse_smtv2_model"
   ~desc:"Print@ debugging@ messages@ about@ parsing@ model@ \
          returned@ from@ cvc4@ or@ z3."
 
@@ -88,14 +88,14 @@ let get_position lexbuf =
 let do_parsing model =
   let lexbuf = Lexing.from_string model in
   try
-    Parse_cvc4_z3_model_parser.output Parse_cvc4_z3_model_lexer.token lexbuf
+    Parse_smtv2_model_parser.output Parse_smtv2_model_lexer.token lexbuf
   with
-  | Parse_cvc4_z3_model_lexer.SyntaxError -> 
+  | Parse_smtv2_model_lexer.SyntaxError -> 
     Warning.emit 
       ~loc:(get_position lexbuf)
       "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected character";
     []
-  | Parse_cvc4_z3_model_parser.Error ->
+  | Parse_smtv2_model_parser.Error ->
     begin
       let loc = get_position lexbuf in
       Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model";
@@ -121,5 +121,5 @@ let parse input printer_mapping =
   | Not_found -> [] 
 
     
-let () = register_model_parser "cvc4_z3" parse
+let () = register_model_parser "smtv2" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
