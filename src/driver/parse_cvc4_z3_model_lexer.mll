@@ -1,6 +1,6 @@
 {
   open Parse_cvc4_z3_model_parser
-  exception Error of string
+  exception SyntaxError
 }
 
 let atom = [^'('')'' ''\t''\n']
@@ -26,5 +26,5 @@ rule token = parse
       { EOF }
     (* | space { SPACE } *)
   | _
-	{ raise (Error (Printf.sprintf "At offset %d: unexpected character.\n" (Lexing.lexeme_start lexbuf))) }
+	{ raise SyntaxError }
 

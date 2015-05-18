@@ -72,7 +72,8 @@ other_val_str:
 (* Everything that cannot be negative integer and start of an array  *)
 paren_other_val_str:
 | other_than_neg_int_and_array_store term_list { $1 ^ $2 }
-| LPAREN possible_space other_than_const_array possible_space RPAREN { "(" ^ $3 ^ ")" }
+| LPAREN possible_space other_than_const_array possible_space RPAREN 
+    { "(" ^ $3 ^ ")" }
 
 other_than_neg_int_and_array_store:
 | INT_STR { $1 }
@@ -88,9 +89,17 @@ other_than_const_array:
 (* Example:
    (store (store ((as const (Array Int Int)) 0) 1 2) 3 4) *)
 array:
-| LPAREN possible_space LPAREN possible_space AS SPACE CONST possible_space array_skipped_part possible_space RPAREN possible_space integer possible_space RPAREN 
+| LPAREN possible_space 
+    LPAREN possible_space 
+      AS SPACE CONST possible_space array_skipped_part possible_space 
+    RPAREN possible_space 
+    integer possible_space 
+  RPAREN 
     { Model_parser.array_create_constant ~value:$13 }
-| LPAREN possible_space STORE possible_space array possible_space integer SPACE integer possible_space RPAREN 
+| LPAREN possible_space 
+    STORE possible_space array possible_space integer SPACE integer
+    possible_space 
+  RPAREN 
 	{ Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
 
 array_skipped_part:
