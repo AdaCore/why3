@@ -330,6 +330,27 @@ let print_logic_decl info fmt (ls,def) =
     List.iter forget_var vsl
   end
 
+let print_info_model fmt info =
+  (* Prints the content of info.info_model *)
+  let info_model = info.info_model in
+  if info_model != [] then 
+    begin
+	  (*
+            fprintf fmt "@[(get-value (%a))@]@\n"
+            (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
+      fprintf fmt "@[(get-value (";
+      List.iter (fun f -> 
+	fprintf str_formatter "%a" (print_fmla info) f;
+        let s = flush_str_formatter () in
+        fprintf fmt "%s " s;
+      ) info_model;
+      fprintf fmt "))@]@\n";
+
+      (* Printing model has modification of info.info_model as undesirable
+	 side-effect. Revert it back. *)
+      info.info_model <- info_model
+    end
+
 let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
@@ -344,22 +365,10 @@ let print_prop_decl args info fmt k pr f = match k with
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       fprintf fmt "@[(check-sat)@]@\n";
-      if info.info_model != [] then 
-	begin
-	  let model_list = info.info_model in
-	  (*
-          fprintf fmt "@[(get-value (%a))@]@\n"
-            (Pp.print_list Pp.space (print_fmla info)) model_list;*)
-	  fprintf fmt "@[(get-value (";
-	  List.iter (fun f -> 
-	    fprintf str_formatter "%a" (print_fmla info) f;
-          let s = flush_str_formatter () in
-          fprintf fmt "%s " s;
-          ) model_list;
-	  fprintf fmt "))@]@\n";
-	end;
+      print_info_model fmt info;
+      
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-			       queried_terms = info.info_model; }
+				queried_terms = info.info_model; }
 	  
   | Plemma| Pskip -> assert false
 
