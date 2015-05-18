@@ -22,7 +22,7 @@ theory bv.BV64
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 64) %1)"
   syntax function to_uint "(bv2nat %1)"
-  syntax function to_int "(ite (bvslt x (_ bv0 64)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
+  syntax function to_int "(ite (bvslt %1 (_ bv0 64)) (+ (- 18446744073709551616) (bv2nat %1)) (bv2nat %1))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
@@ -45,7 +45,7 @@ end
 theory bv.BV32
   syntax converter of_int "(_ bv%1 32)"
   syntax function to_uint "(bv2nat %1)"
-  syntax function to_int "(ite (bvslt x (_ bv0 32)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
+  syntax function to_int "(ite (bvslt %1 (_ bv0 32)) (+ (- 4294967296) (bv2nat %1)) (bv2nat %1))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
@@ -87,7 +87,7 @@ theory bv.BV16
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 16) %1)"
   syntax function to_uint "(bv2nat %1)"
-  syntax function to_int "(ite (bvslt x (_ bv0 16)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
+  syntax function to_int "(ite (bvslt %1 (_ bv0 16)) (+ (- 65536) (bv2nat %1)) (bv2nat %1))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
@@ -129,7 +129,8 @@ theory bv.BV8
   syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 8) %1)"
   syntax function to_uint "(bv2nat %1)"
-  syntax function to_int "(ite (bvslt x (_ bv0 8)) (- (bv2nat (bvneg ((_ sign_extend 1) x)))) (bv2nat x))"
+  syntax function to_int "(ite (bvslt %1 (_ bv0 8)) (+ (- 256) (bv2nat %1)) (bv2nat %1))"
+
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
