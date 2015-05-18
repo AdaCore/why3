@@ -762,6 +762,12 @@ expr_sub:
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ expr LARROW expr RIGHTSQ
     { Eidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+| expr_arg LEFTSQ expr DOTDOT expr RIGHTSQ
+    { Eidapp (sub_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+| expr_arg LEFTSQ expr DOTDOT RIGHTSQ
+    { Eidapp (above_op $startpos($2) $endpos($2), [$1;$3]) }
+| expr_arg LEFTSQ DOTDOT expr RIGHTSQ
+    { Eidapp (below_op $startpos($2) $endpos($2), [$1;$4]) }
 
 loop_annotation:
 | (* epsilon *)

@@ -38,8 +38,8 @@ let add_opt_theory x =
       Queue.push (x, p, t) opt_queue
 
 let opt_parser = ref None
-let opt_driver = ref None
 let opt_output = ref None
+let opt_driver = ref []
 
 let option_list = [
   "-T", Arg.String add_opt_theory,
@@ -50,9 +50,9 @@ let option_list = [
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "-D", Arg.String (fun s -> opt_driver := Some s),
+  "-D", Arg.String (fun s -> opt_driver := s::!opt_driver),
       "<file> specify a realization driver";
-  "--driver", Arg.String (fun s -> opt_driver := Some s),
+  "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> write the realizations in <dir>";
@@ -73,16 +73,17 @@ let opt_output =
     exit 1
   | Some d -> d
 
+let driver_file s =
+  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
+  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
+
 let opt_driver =
-  try match !opt_driver with
-  | None ->
-    eprintf "Driver (-D) is required.@.";
+  try match List.rev_map driver_file !opt_driver with
+  | [] ->
+    eprintf "Realization driver (-D) is required.@.";
     exit 1
-  | Some s ->
-    let s =
-      if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-      else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv")) in
-    Driver.load_driver env s []
+  | f::ef ->
+    Driver.load_driver env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

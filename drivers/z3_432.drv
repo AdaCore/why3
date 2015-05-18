@@ -92,10 +92,6 @@ theory bv.BV64
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
-  syntax function to_int "(ite (not (= (bvand %1 #x80000000) zero))
-                               (bv2int %1) (- (not %1) (- (1))))"
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -105,37 +101,6 @@ theory bv.BV64
   remove prop to_uint_urem
   remove prop to_uint_lsr
   remove prop to_uint_lsl
-
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left
-  remove prop Nth_rotate_right
-  remove prop Nth_bv_is_nth
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
-
-  syntax predicate ult "(bvult %1 %2)"
-  syntax predicate ule "(bvule %1 %2)"
-  syntax predicate ugt "(bvugt %1 %2)"
-  syntax predicate uge "(bvuge %1 %2)"
-  syntax predicate slt "(bvslt %1 %2)"
-  syntax predicate sle "(bvsle %1 %2)"
-  syntax predicate sgt "(bvsgt %1 %2)"
-  syntax predicate sge "(bvsge %1 %2)"
-
-  syntax function nth_bv
-    "(not (= (bvand (bvlshr %1 %2) (_ bv1 64)) (_ bv0 64)))"
-
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
 end
 
 theory bv.BV32
@@ -163,8 +128,6 @@ theory bv.BV32
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -174,37 +137,6 @@ theory bv.BV32
   remove prop to_uint_urem
   remove prop to_uint_lsr
   remove prop to_uint_lsl
-
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left
-  remove prop Nth_rotate_right
-  remove prop Nth_bv_is_nth
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
-
-  syntax predicate ult "(bvult %1 %2)"
-  syntax predicate ule "(bvule %1 %2)"
-  syntax predicate ugt "(bvugt %1 %2)"
-  syntax predicate uge "(bvuge %1 %2)"
-  syntax predicate slt "(bvslt %1 %2)"
-  syntax predicate sle "(bvsle %1 %2)"
-  syntax predicate sgt "(bvsgt %1 %2)"
-  syntax predicate sge "(bvsge %1 %2)"
-
-  syntax function nth_bv
-    "(not (= (bvand (bvlshr %1 %2) (_ bv1 32)) (_ bv0 32)))"
-
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
 end
 
 theory bv.BV16
@@ -232,8 +164,6 @@ theory bv.BV16
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -243,37 +173,6 @@ theory bv.BV16
   remove prop to_uint_urem
   remove prop to_uint_lsr
   remove prop to_uint_lsl
-
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left
-  remove prop Nth_rotate_right
-  remove prop Nth_bv_is_nth
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
-
-  syntax predicate ult "(bvult %1 %2)"
-  syntax predicate ule "(bvule %1 %2)"
-  syntax predicate ugt "(bvugt %1 %2)"
-  syntax predicate uge "(bvuge %1 %2)"
-  syntax predicate slt "(bvslt %1 %2)"
-  syntax predicate sle "(bvsle %1 %2)"
-  syntax predicate sgt "(bvsgt %1 %2)"
-  syntax predicate sge "(bvsge %1 %2)"
-
-  syntax function nth_bv
-    "(not (= (bvand (bvlshr %1 %2) (_ bv1 16)) (_ bv0 16)))"
-
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
 end
 
 theory bv.BV8
@@ -301,8 +200,6 @@ theory bv.BV8
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -312,35 +209,4 @@ theory bv.BV8
   remove prop to_uint_urem
   remove prop to_uint_lsr
   remove prop to_uint_lsl
-
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left
-  remove prop Nth_rotate_right
-  remove prop Nth_bv_is_nth
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
-
-  syntax predicate ult "(bvult %1 %2)"
-  syntax predicate ule "(bvule %1 %2)"
-  syntax predicate ugt "(bvugt %1 %2)"
-  syntax predicate uge "(bvuge %1 %2)"
-  syntax predicate slt "(bvslt %1 %2)"
-  syntax predicate sle "(bvsle %1 %2)"
-  syntax predicate sgt "(bvsgt %1 %2)"
-  syntax predicate sge "(bvsge %1 %2)"
-
-  syntax function nth_bv
-    "(not (= (bvand (bvlshr %1 %2) (_ bv1 8)) (_ bv0 8)))"
-
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
 end

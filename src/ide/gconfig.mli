@@ -16,6 +16,7 @@ type t =
       mutable window_height : int;
       mutable tree_width : int;
       mutable font_size : int;
+      mutable current_tab : int;
       mutable verbose : int;
       mutable default_prover : string;
       mutable default_editor : string;

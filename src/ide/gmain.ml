@@ -342,15 +342,25 @@ let output_page,output_tab =
   3, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
+(*
 let counterexample_page,counterexample_tab =
   let label = GMisc.label ~text:"Counter-example" () in
-  3, GPack.vbox ~homogeneous:false ~packing:
+  4, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-
+*)
 
 let (_ : GPack.box) =
   GPack.hbox ~packing:(source_tab#pack ~expand:false ?from:None ?fill:None
                          ?padding:None) ()
+
+let () =
+  notebook#goto_page gconfig.current_tab;
+  let page_selected n = gconfig.current_tab <- n in
+  let (_ : GtkSignal.id) =
+    notebook#connect#switch_page ~callback:page_selected
+  in ()
+
+
 
 (******************)
 (* views          *)
@@ -392,6 +402,7 @@ let output_view =
     ~packing:scrolled_output_view#add
     ()
 
+(*
 let scrolled_counterexample_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
@@ -403,11 +414,15 @@ let counterexample_view =
     ~show_line_numbers:true
     ~packing:scrolled_counterexample_view#add
     ()
+*)
 
 let modifiable_sans_font_views = ref [goals_view#misc]
 let modifiable_mono_font_views =
   ref [task_view#misc;edited_view#misc;output_view#misc;
-       counterexample_view#misc]
+(*
+       counterexample_view#misc
+*)
+]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -639,6 +654,7 @@ let update_tabs a =
       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
     | _ -> ""
  in
+(*
   let counterexample_text =
     match a with
     | S.Proof_attempt a ->
@@ -650,13 +666,16 @@ let update_tabs a =
       end
     | _ -> ""
   in
+*)
  task_view#source_buffer#set_text task_text;
  task_view#scroll_to_mark `INSERT;
  edited_view#source_buffer#set_text edited_text;
  edited_view#scroll_to_mark `INSERT;
  output_view#source_buffer#set_text output_text;
- counterexample_view#source_buffer#set_text counterexample_text
-
+(*
+ counterexample_view#source_buffer#set_text counterexample_text;
+*)
+  ()
 
 
 

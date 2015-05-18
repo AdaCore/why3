@@ -1,6 +1,9 @@
 
 * marks an incompatible change
 
+version 0.86, May 11th, 2015
+============================
+
 core
   o steps limit for reliable replay of proofs, available for Alt-Ergo
     and CVC4
@@ -27,16 +30,18 @@ provers
     http://www.lix.polytechnique.fr/~lengrand/Psyche/)
   o preliminary support for upcoming CVC4 1.5 (steps feature)
 
-bug fixes:
-  o bug in interpreter in presence of nested mutable fields
-  o IDE: proofs in progress should never be "cleaned"
-  o IDE: display warnings after reload
-
 IDE:
   o config file not automatically saved anymore at exit. Configuration
     is saved on disk for future sessions if, and only if, preferences
     window is exited by hitting the "Save&Close" button
   o right part of main window organized in tabs.
+  o better explanations and task highlighting
+    (contributed by Mikhail Mandrykin)
+
+bug fixes:
+  o bug in interpreter in presence of nested mutable fields
+  o IDE: proofs in progress should never be "cleaned"
+  o IDE: display warnings after reload
 
 version 0.85, September 17, 2014
 ================================
