@@ -120,7 +120,8 @@ and create_manual_or_schedule obj goal =
                   let pa = Gnat_manual.manual_attempt_of_goal goal in
                   let info = Gnat_manual.manual_proof_info (Opt.get pa) in
                   Gnat_report.register obj None None false info ""
-  | _ -> schedule_goal goal
+  | _ ->
+      schedule_goal goal
 
 and schedule_goal (g : Gnat_objectives.goal) =
    (* schedule a goal for proof - the goal may not be scheduled actually,
@@ -134,7 +135,8 @@ and schedule_goal (g : Gnat_objectives.goal) =
      Gnat_objectives.clean_automatic_proofs g;
    if Gnat_config.force || (Gnat_config.manual_prover <> None
                             && g.Session.goal_verified = None) then begin
-    (* then implement reproving logic *)
+      actually_schedule_goal g
+   (* then implement reproving logic *)
    end else begin
       (* Maybe the goal is already proved *)
       if g.Session.goal_verified <> None then begin
