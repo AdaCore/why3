@@ -1,25 +1,6 @@
 (* bitvector modules, is not in smt-libv2.drv since cvc4 and z3 don't
    have the same name for the function to_int *)
 theory bv.BV64
-  syntax type t "(_ BitVec 64)"
-
-  syntax function zero "#x0000000000000000"
-  syntax function ones "#xFFFFFFFFFFFFFFFF"
-  syntax function bw_and "(bvand %1 %2)"
-  syntax function bw_or "(bvor %1 %2)"
-  syntax function bw_xor "(bvxor %1 %2)"
-  syntax function bw_not "(bvnot %1)"
-
-  syntax function add "(bvadd %1 %2)"
-  syntax function sub "(bvsub %1 %2)"
-  syntax function neg "(bvneg %1)"
-  syntax function mul "(bvmul %1 %2)"
-  syntax function udiv "(bvudiv %1 %2)"
-  syntax function urem "(bvurem %1 %2)"
-
-  syntax function lsr_bv "(bvlshr %1 %2)"
-  syntax function lsl_bv "(bvshl %1 %2)"
-  syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 64) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 64)) (+ (- 18446744073709551616) (bv2nat %1)) (bv2nat %1))"
@@ -27,10 +8,6 @@ theory bv.BV64
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
   remove prop to_int_extensionality
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
-  remove prop Of_int_zero
-  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -43,17 +20,13 @@ theory bv.BV64
 end
 
 theory bv.BV32
-  syntax converter of_int "(_ bv%1 32)"
+  syntax function of_int "((_ int2bv 32) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 32)) (+ (- 4294967296) (bv2nat %1)) (bv2nat %1))"
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
   remove prop to_int_extensionality
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
-  remove prop Of_int_zero
-  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -66,25 +39,6 @@ theory bv.BV32
 end
 
 theory bv.BV16
-  syntax type t "(_ BitVec 16)"
-
-  syntax function zero "#x0000"
-  syntax function ones "#xFFFF"
-  syntax function bw_and "(bvand %1 %2)"
-  syntax function bw_or "(bvor %1 %2)"
-  syntax function bw_xor "(bvxor %1 %2)"
-  syntax function bw_not "(bvnot %1)"
-
-  syntax function add "(bvadd %1 %2)"
-  syntax function sub "(bvsub %1 %2)"
-  syntax function neg "(bvneg %1)"
-  syntax function mul "(bvmul %1 %2)"
-  syntax function udiv "(bvudiv %1 %2)"
-  syntax function urem "(bvurem %1 %2)"
-
-  syntax function lsr_bv "(bvlshr %1 %2)"
-  syntax function lsl_bv "(bvshl %1 %2)"
-  syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 16) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 16)) (+ (- 65536) (bv2nat %1)) (bv2nat %1))"
@@ -92,10 +46,6 @@ theory bv.BV16
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
   remove prop to_int_extensionality
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
-  remove prop Of_int_zero
-  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
@@ -108,37 +58,13 @@ theory bv.BV16
 end
 
 theory bv.BV8
-  syntax type t "(_ BitVec 8)"
-
-  syntax function zero "#x00"
-  syntax function ones "#xFF"
-  syntax function bw_and "(bvand %1 %2)"
-  syntax function bw_or "(bvor %1 %2)"
-  syntax function bw_xor "(bvxor %1 %2)"
-  syntax function bw_not "(bvnot %1)"
-
-  syntax function add "(bvadd %1 %2)"
-  syntax function sub "(bvsub %1 %2)"
-  syntax function neg "(bvneg %1)"
-  syntax function mul "(bvmul %1 %2)"
-  syntax function udiv "(bvudiv %1 %2)"
-  syntax function urem "(bvurem %1 %2)"
-
-  syntax function lsr_bv "(bvlshr %1 %2)"
-  syntax function lsl_bv "(bvshl %1 %2)"
-  syntax function asr_bv "(bvashr %1 %2)"
   syntax function of_int "((_ int2bv 8) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 8)) (+ (- 256) (bv2nat %1)) (bv2nat %1))"
-
   remove prop to_uint_of_int
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
   remove prop to_int_extensionality
-  syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
-  remove prop Of_int_zero
-  remove prop Of_int_ones
 
   remove prop to_uint_add
   remove prop to_uint_sub
