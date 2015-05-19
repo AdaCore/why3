@@ -5,6 +5,11 @@
     formalism for pointer aliasing should climb.
                                       -- Richard Bornat, 2000
 
+  Author: Mario Pereira (UBI, then Université Paris Sud)
+
+  The proof below closely follows that of Rustan Leino with dafny,
+  which is described in this paper:
+  http://research.microsoft.com/en-us/um/people/leino/papers/krml203.pdf
 *)
 
 module SchorrWaite
@@ -68,25 +73,25 @@ module SchorrWaite
     ensures  { !c = set (old !c) p v }
 
   val set_path_from_root (p: loc) (l : list loc) : unit
-    requires { p <> null } 
+    requires { p <> null }
     writes   { path_from_root }
     ensures  { !path_from_root = set (old !path_from_root) p l }
 
-  val tl_stackNodes (stack : list loc) : list loc 
+  val tl_stackNodes (stack : list loc) : list loc
     requires { stack <> Nil }
     ensures  { result = tl stack }
-    (* 
-     * the following post-condition is usefull to prove the 
+    (*
+     * the following post-condition is usefull to prove the
      * invariant that stackNodes' elements are also graph elements
      * for the push case. An equivalent lemma would say:
-     * lemma mem_tl : forall x : 'a, l : list 'a. mem x l -> mem x (tl l) 
-     *) 
-    ensures  { forall n : loc. L.mem n result -> L.mem n stack } 
-  
-  predicate edge (x y : loc) (left right : map loc loc) = 
+     * lemma mem_tl : forall x : 'a, l : list 'a. mem x l -> mem x (tl l)
+     *)
+    ensures  { forall n : loc. L.mem n result -> L.mem n stack }
+
+  predicate edge (x y : loc) (left right : map loc loc) =
     x <> null /\ (left[x] = y \/ right[x] = y)
 
-  inductive path (left right : map loc loc) (x y : loc) (p : list loc) = 
+  inductive path (left right : map loc loc) (x y : loc) (p : list loc) =
   | path_nil   : forall x : loc, l r : map loc loc. path l r x x Nil
   | path_cons  : forall x y z : loc,
     	      	 l r : (map loc loc),
@@ -94,108 +99,85 @@ module SchorrWaite
 		 edge x z l r -> path l r z y p ->
 		 path l r x y (Cons x p)
 
-  lemma reflex_path : forall x : loc, l r : map loc loc. path l r x x Nil
-
   let rec lemma trans_path (x y z : loc) (l r : map loc loc) (p1 p2 : list loc)
     variant  { length p1 }
     requires { path l r x y p1 }
     requires { path l r y z p2 }
-    ensures  { path l r x z (p1++p2) }
+    ensures  { path l r x z (p1 ++ p2) }
   = match p1 with
-    | Nil       -> ()
-    | Cons _ p' -> 
-      match p' with
-      | Nil -> ()
-      | Cons b _ ->
-        trans_path b y z l r p' p2
-      end
-    end
-
-  predicate reachable_via (x y : loc) (l r : map loc loc) (p : list loc) = 
-    path l r x y p
-
-  predicate reachable (x y : loc) (l r : map loc loc) =
-    exists p : list loc. reachable_via x y l r p
-
-  let rec lemma length_tl (l : list 'a) (* is this lemma really necessary? *)
-    requires { l <> Nil }
-    ensures  { length (tl l) < length l }
-    variant  { l }
-  = match l with
-    | Nil        -> ()
-    | Cons _ Nil -> ()
-    | Cons _ y   -> length_tl y
-    end
-
-  (* auxiliar function the define the form of a stack *)
-  function next (l r : map loc loc) (c : map loc bool) (p : loc) : loc = 
-    if c[p] then r[p] else l[p]
-
-  inductive stack_form (l r : map loc loc) (c : map loc bool) (p : loc) (stack : list loc) =
-  | stack_nil  : forall l r : map loc loc, c : map loc bool, p : loc. stack_form l r c p Nil
-  | stack_cons :
-    forall l r : map loc loc,
-    c : map loc bool,
-    p : loc,
-    s : list loc. stack_form l r c (next l r c p) s ->
-    stack_form l r c p (Cons p s)
-
-  predicate pair_in_list (p1 p2 : loc) (l : list loc)  =
-    match l with
-    | Nil -> false
-    | Cons b m -> (b = p1 /\
-       match  m with
-       | Nil -> false
-       | Cons c _ -> c = p2
-       end) \/ pair_in_list p1 p2 m
+    | Cons _ (Cons b _ as p') -> trans_path b y z l r p' p2
+    | _                       -> ()
     end
 
   (* the two following lemmas help proving the assertion in the push case *)
   lemma path_edge : forall x y : loc, left right : map loc loc.
     edge x y left right -> path left right x y (Cons x Nil)
 
-  lemma path_edge_cons : forall n x y : loc, left right : map loc loc, pth : list loc.
+  (* TODO: choose between reachable_via and path *)
+  predicate reachable_via (x y : loc) (l r : map loc loc) (p : list loc) =
+    path l r x y p
+
+  lemma path_edge_cons:
+    forall n x y : loc, left right : map loc loc, pth : list loc.
     reachable_via n x left right pth -> edge x y left right ->
     reachable_via n y left right (pth ++ (Cons x Nil))
+
+  predicate reachable (x y : loc) (l r : map loc loc) =
+    exists p : list loc. reachable_via x y l r p
+
+  lemma length_tl: forall l : list 'a.
+    l <> Nil -> length (tl l) < length l
+
+  (* auxiliary function the define the form of a stack *)
+  function next (l r : map loc loc) (c : map loc bool) (p : loc) : loc =
+    if c[p] then r[p] else l[p]
+
+  inductive stack_form
+     (l r : map loc loc) (c : map loc bool) (p : loc) (stack : list loc) =
+  | stack_nil:
+      forall l r : map loc loc, c : map loc bool, p : loc.
+      stack_form l r c p Nil
+  | stack_cons :
+      forall l r : map loc loc, c : map loc bool, p : loc, s : list loc.
+       stack_form l r c (next l r c p) s ->
+       stack_form l r c p (Cons p s)
+
+  predicate pair_in_list (p1 p2 : loc) (l : list loc)  =
+    match l with
+    | Cons b (Cons c _ as m) -> (b = p1 /\ c = p2) \/ pair_in_list p1 p2 m
+    | _ -> false
+    end
 
   (* helps proving that the last element in the stack is always root *)
   (* do I really need this lemma? *)
   lemma hd_rev_cons : forall l : list 'a, x : 'a.
     l <> Nil -> hd (reverse (Cons x l)) = hd (reverse l)
-  
-  let schorr_waite (root: loc) (graph : set loc) : unit
+
+  let schorr_waite (root: loc) (ghost graph : set loc) : unit
     requires { root <> null /\ S.mem root graph }
     (* what is set S --> closed under children of all vertices *)
-    requires { forall n : loc. S.mem n graph -> 
+    requires { forall n : loc. S.mem n graph ->
     	       n <> null /\ (* is this ok? won't this be a contradiction? *)
                S.mem !left[n] graph /\
                S.mem !right[n] graph }
     (* graph starts with nothing marked and no child currently visited *)
-    requires { forall x : loc. x <> null /\ S.mem x graph(*&& reachable root x !left !right*) ->
+    requires { forall x : loc. x <> null -> S.mem x graph ->
     	       not !m[x] /\ not !c[x] }
-    (* the structure of the graph is not changed *)
-    ensures  { forall n : loc. S.mem n graph /\ n <> null -> 
+    (* the structure of the graph is not changed
+       TODO? actually, nothing is changed *)
+    ensures  { forall n : loc. S.mem n graph -> n <> null ->
     	       (old !left)[n] = !left[n] /\
 	       (old !right)[n] = !right[n] }
     (* all the non-null vertices reachable from root
-       are marked at the end of the algorithm *)
+       are marked at the end of the algorithm, and only these *)
     (* update: following Leino's paper, I will specify that all reachable nodes
      * are marked as a transitive property, rather than using reachability *)
-    (* ensures  { forall n : loc. S.mem n graph /\  n <> null /\
-    	       reachable root n (old !left) (old !right) -> !m[n] } *)
-    (* every marked node was reachable from 'root' in the pre-state *)	       
-    ensures  { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] ->
+    ensures  { forall n : loc. S.mem n graph -> n <> null -> !m[n] ->
     	       reachable root n (old !left) (old !right) }
     ensures  { !m[root] }
-    ensures  { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] -> 
-    	       (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
-    (* forall non-reachable vertices the mark remains 
-       the same as in the pre-state *)
-    (* update: no need for this post-condition (taken from Hubert and Marché's work) 
-     * since the previous one guarantees that only reachable nodes from root have their 
-     * marks changed *)
-    (* ensures  { forall n : loc. n <> null /\ not reachable root n !left !right ->
-	       !m[n] = (old !m)[n] } *)
+    ensures  { forall n : loc. S.mem n graph -> n <> null -> !m[n] ->
+          (forall ch : loc. edge n ch !left !right -> ch <> null -> !m[ch]) }
+    (* FIXME: remove unnecessary n<>null above *)
   = 'Init:
     let t = ref root in
     let p = ref null in
@@ -223,7 +205,7 @@ module SchorrWaite
       		  !left[n] = (at !left 'Init)[n] /\ !right[n] = (at !right 'Init)[n] }
       (* I4a from Hubert and Marché's paper; useful to prove that !stackNodes = !p::... *)
       invariant { stack_form !left !right !c !p !stackNodes }
-      (* something like Leino's line 74; this is useful to prove that 
+      (* something like Leino's line 74; this is useful to prove that
        * the stack is empty iff p = null *)
       invariant { !stackNodes <> Nil ->
       		  let first = hd (reverse !stackNodes) in
@@ -256,11 +238,11 @@ module SchorrWaite
       (* help establishing the next invariant for the push case -->
        * line 70 from Leino's paper *)
       invariant { !p <> null -> reachable_via root !p (at !left 'Init) (at !right 'Init) !pth }
-      (* line 72 from Leino's paper --> used to prove the post that very marked node was 
+      (* line 72 from Leino's paper --> used to prove the post that very marked node was
        * reachable from 'root' in the pre-state *)
       invariant { forall n : loc. S.mem n graph /\ !m[n] /\ n <> null ->
       		  reachable root n (at !left 'Init) (at !right 'Init) }
-      (* help establishing the previous invariant when p = null, ie 
+      (* help establishing the previous invariant when p = null, ie
        * for the firts push of the loop *)
       invariant { !p = null -> !t = root }
       (* help establishing the previous invariant for the pop case -->
@@ -268,7 +250,7 @@ module SchorrWaite
       invariant { forall n : loc, pth : list loc.
       		  S.mem n graph /\ n <> null /\ !m[n] /\ pth = !path_from_root[n] ->
 		  reachable_via root n (at !left 'Init) (at !right 'Init) pth }
-      (* lines 61-62 from Leinos' paper --> help establish the post that 
+      (* lines 61-62 from Leinos' paper --> help establish the post that
        * all nodes reachable from root are marked *)
       invariant { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] /\
       		  not (L.mem n !stackNodes) -> (* /\ n <> !t ---> do I really need this 'n <> !t'? *)
@@ -288,7 +270,7 @@ module SchorrWaite
           set_right !t q;
 	  pth := get_path_from_root !p;
         end else begin (* swing *)
-	  (* the following assertion is automatically discharged 
+	  (* the following assertion is automatically discharged
 	   * and it is useful to prove that t is in the set graph *)
 	  assert { pair_in_list !t !p (Cons !t !stackNodes) };
           let q = !t in
@@ -308,19 +290,19 @@ module SchorrWaite
         set_m !p true;
 	if !p <> root then pth := !pth ++ (Cons q Nil) else pth := Nil;
 	set_path_from_root !p !pth;
-	(* this is assertion is automatically discharged and it helps 
+	(* this is assertion is automatically discharged and it helps
  	 * proving that all marked nodes are reachable from root *)
 	assert { path (at !left 'Init) (at !right 'Init) root !p !pth };
         set_c !p false; (* if we assume at the pre-condition that all nodes start with c = 0,
 		   	 * then this redundant;
 			 * update: explicitly changing !c[p] to false and adding it to the
 			 * set of false nodes (even if it is already there) helps in proving
-			 * the invariant that all nodes in the stack with !c=1 have their 
+			 * the invariant that all nodes in the stack with !c=1 have their
 			 * children marked *)
 	c_false_nodes := S.add !p !c_false_nodes;
 	unmarked_nodes := S.remove !p !unmarked_nodes
       end
-    done 
+    done
 
 
 end
