@@ -75,7 +75,10 @@ module SchorrWaite
 
   type stacknodes = Seq.seq loc
 
-  val tl_stackNodes (stack: stacknodes) : stacknodes
+  predicate not_in_stack (n: loc) (s: stacknodes) =
+    forall i: int. 0 <= i < Seq.length s -> n <> Seq.get s i
+
+  let tl_stackNodes (stack: stacknodes) : stacknodes
     requires { Seq.length stack > 0 }
     ensures  { result = stack[1 .. ] }
     (*
@@ -84,7 +87,9 @@ module SchorrWaite
      * for the push case. An equivalent lemma would say:
      * lemma mem_tl : forall x : 'a, l : list 'a. mem x l -> mem x (tl l)
      *)
-    (* ensures  { forall n : loc. L.mem n result -> L.mem n stack } *)
+    ensures  { forall n. not_in_stack n stack -> not_in_stack n result }
+  =
+    stack[1 .. ]
 
   function last (s: stacknodes) : loc =
     Seq.get s (Seq.length s - 1)
@@ -205,7 +210,7 @@ module SchorrWaite
       (*invariant { not L.mem !t !stackNodes }*) (* this will be usefull to prove that !t is in graph after the push ---> but this is false! think of the case when the graph is cyclic *)
       (* I4d from Hubert and Marché's paper and something related to line 63-65 from Leino's *)
       invariant { forall n : loc. S.mem n graph -> n <> null ->
-                  (forall i. 0 <= i < Seq.length !stackNodes -> n <> Seq.get !stackNodes i) ->
+                  not_in_stack n !stackNodes ->
       		  !left[n] = (at !left 'Init)[n] /\ !right[n] = (at !right 'Init)[n] }
       (* I4a from Hubert and Marché's paper; useful to prove that !stackNodes = !p::... *)
       (* invariant { stack_form !left !right !c !p !stackNodes } *)
@@ -258,10 +263,11 @@ module SchorrWaite
       (* lines 61-62 from Leinos' paper --> help establish the post that
        * all nodes reachable from root are marked *)
       invariant { forall n : loc. S.mem n graph -> n <> null -> !m[n] ->
-      		  (forall i. 0 <= i < Seq.length !stackNodes -> n <> Seq.get !stackNodes i) ->
+      		  not_in_stack n !stackNodes ->
                   (* /\ n <> !t ---> do I really need this 'n <> !t'? *)
 		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
-      (* help establishing the previous invariant for the pop case --->
+                  (* (!left[n] <> null -> !m[!left[n]] /\ (!right[n] <> null -> !m[!right[n]]) *)
+(* help establishing the previous invariant for the pop case --->
        * something like Leino's lines 57-59 *)
       invariant { forall i. 0 <= i < Seq.length !stackNodes ->
                   let n = Seq.get !stackNodes i in
