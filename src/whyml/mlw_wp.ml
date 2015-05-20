@@ -1122,11 +1122,14 @@ module Subst : sig
    (* the initial substitution for a program which mentions the given program
       variables *)
 
-   val havoc : wp_env -> Sreg.t -> t -> t * term
+   val havoc : ?model_data : model_data -> wp_env -> Sreg.t -> t -> t * term
    (* [havoc env regions s] generates a new state in which all regions in
       [regions] are touched and all other regions unchanged. The result pair
       (s',f) is the new state [s'] and a formula [f] which defines the new
-      values in [s'] with respect to the input state [s]. *)
+      values in [s'] with respect to the input state [s]. 
+      The parameter model_data can be used to pass information about new
+      variables created in the new state.
+*)
 
    val extract_glue : wp_env -> Sreg.t -> t -> t -> term
    (* The formula [extract_glue env regs s1 s2] expresses what has not changed
@@ -1176,16 +1179,22 @@ end = struct
 
   let mk_var name ity model_data = mk_var name (ty_of_ity ity) model_data
 
-  let fresh_var_from_region hints reg =
+  let fresh_var_from_region ?model_data hints reg =
     let name =
       try (Mreg.find reg hints).vs_name
       with Not_found -> reg.reg_name
     in
-    mk_var name reg.reg_ity (create_model_data "fast wp - from region")
+
+    let model_data = match model_data with
+      | None -> 
+	create_model_data "fast wp - from region "
+      | Some model_data -> model_data in
+    
+    mk_var name reg.reg_ity model_data
 
   let fresh_var_from_var vs =
     let model_data = create_model_data 
-      "fast wp - from var" ?loc:vs.vs_name.id_loc ~context_labels:vs.vs_name.id_label in
+      "fast wp - from var" ?loc:vs.vs_name.id_loc in
     mk_var vs.vs_name (ity_of_vs vs) model_data
 
   let is_simple_var = get_single_region_of_var
@@ -1252,12 +1261,12 @@ end = struct
        been touched. *)
     reg_any (fun reg -> Sreg.mem reg regset) (restore_pv vs).pv_ity.ity_vars
 
-  let havoc env regset s =
+  let havoc ?model_data env regset s =
     (* introduce new variables for all regions, and all program variables for a
        region. *)
     let regs =
       Sreg.fold (fun reg acc ->
-        Mreg.add reg (fresh_var_from_region s.reg_names reg) acc)
+        Mreg.add reg (fresh_var_from_region ?model_data:model_data s.reg_names reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
     (* We special case simple variables: no new variable is introduced for the
@@ -1603,8 +1612,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
       let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
+      let model_data = create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call" in 
       let state_after_call, call_glue =
-        Subst.havoc env call_regs state_before_call in
+        Subst.havoc ~model_data:model_data env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->
         { s = state_after_call;
           ne = p }) spec.c_xpost in
