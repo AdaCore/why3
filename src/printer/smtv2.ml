@@ -44,7 +44,7 @@ let ident_printer =
       "declare-datatypes"; "get-model"; "echo"; "assert-rewrite";
       "assert-reduction"; "assert-propagation"; "declare-sorts";
       "declare-funs"; "declare-preds"; "define"; "declare-const";
-      "simplify";
+      "simplify"; "par";
 
       (** attributes *)
 
@@ -83,7 +83,7 @@ let ident_printer =
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
 
       (** Other stuff that Why3 seems to need *)
-      "DECIMAL"; "NUMERAL"; "par"; "STRING";
+      "DECIMAL"; "NUMERAL"; "STRING";
       "unsat";"sat";
       "true"; "false";
       "const";
@@ -116,8 +116,11 @@ let debug_print_term message t =
   end
 
 (** type *)
+let print_type_var fmt tv =
+  print_ident fmt tv.tv_name
+
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
+  | Tyvar tv -> print_type_var fmt tv
   | Tyapp (ts, l) ->
      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
@@ -125,9 +128,6 @@ let rec print_type info fmt ty = match ty.ty_node with
       | None, _ -> fprintf fmt "(%a %a)" print_ident ts.ts_name
           (print_list space (print_type info)) l
      end
-
-let print_type info fmt ty = try print_type info fmt ty
-  with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let print_type_value info fmt = function
   | None -> fprintf fmt "Bool"
@@ -195,11 +195,24 @@ let rec print_term info fmt t =
     match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) t fmt tl
-      | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
+      | None when unambig_fs ls ->
+        begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
           | _ -> fprintf fmt "@[(%a@ %a)@]"
               print_ident ls.ls_name (print_list space (print_term info)) tl
-        end end
+        end
+      | None ->
+        begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
+          | [] -> fprintf fmt "@[(as %a %a)@]"
+                    print_ident ls.ls_name
+                    (print_type info) (t_type t)
+          | _ -> fprintf fmt "@[(as (%a@ %a) %a)@]"
+                   print_ident ls.ls_name
+                   (print_list space (print_term info)) tl
+                   (print_type info) (t_type t)
+
+        end
+    end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
@@ -333,35 +346,64 @@ let print_type_decl info fmt ts =
 
 let print_param_decl info fmt ls =
   if Mid.mem ls.ls_name info.info_syn then () else
-  fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
-    print_ident ls.ls_name
-    (print_list space (print_type info)) ls.ls_args
-    (print_type_value info) ls.ls_value
+    let freevars = ls_ty_freevars ls in
+    if Stv.is_empty freevars then
+      fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
+        print_ident ls.ls_name
+        (print_list space (print_type info)) ls.ls_args
+        (print_type_value info) ls.ls_value
+    else
+      fprintf fmt "@[<hov 2>(declare-fun %a (par (%a) (%a) %a))@]@\n@\n"
+        print_ident ls.ls_name
+        (print_iter1 Stv.iter space print_type_var) freevars
+        (print_list space (print_type info)) ls.ls_args
+        (print_type_value info) ls.ls_value
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else begin
     collect_model_ls info ls;
-    let vsl,expr = Decl.open_ls_defn def in
+  let vsl,expr = Decl.open_ls_defn def in
+  let freevars = ls_ty_freevars ls in
+  if Stv.is_empty freevars then
     fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
       print_ident ls.ls_name
       (print_var_list info) vsl
       (print_type_value info) ls.ls_value
+      (print_expr info) expr
+  else
+    fprintf fmt "@[<hov 2>(define-fun %a (par (%a) ((%a) %a %a)))@]@\n@\n"
+      print_ident ls.ls_name
+      (print_iter1 Stv.iter space print_type_var) freevars
+      (print_var_list info) vsl
+      (print_type_value info) ls.ls_value
       (print_expr info) expr;
-    List.iter forget_var vsl
+  List.iter forget_var vsl
   end
 
 let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
+    let freevars = t_ty_freevars Stv.empty f in
+    if Stv.is_empty freevars then
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
-        pr.pr_name.id_string (* FIXME? collisions *)
+        pr.pr_name.id_string
         (print_fmla info) f
+    else
+      fprintf fmt "@[<hov 2>;; %s@\n(assert@ (par (%a) %a))@]@\n@\n"
+        pr.pr_name.id_string
+        (print_iter1 Stv.iter space print_type_var) freevars
+        (print_fmla info) f
+
   | Pgoal ->
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match pr.pr_name.id_loc with
         | None -> ()
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
-            Loc.gen_report_position loc);
+         Loc.gen_report_position loc);
+      let freevars = t_ty_freevars Stv.empty f in
+      if not (Stv.is_empty freevars) then
+        raise (UnsupportedTerm(f, "No polymorphism in goal, \
+                                   you should introduce the types"));
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       fprintf fmt "@[(check-sat)@]@\n";
       if info.info_model != [] then 
@@ -410,9 +452,12 @@ let print_decl args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata dl ->
-    (*unsupportedDecl d
-      "smtv2 : algebraic type are not supported" *)
-    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+    let freevars = List.fold_left (fun acc (ts,_) ->
+        List.fold_right Stv.add ts.ts_args acc
+      ) Stv.empty dl
+    in
+    fprintf fmt "@[(declare-datatypes (%a)@ (%a))@]@\n"
+      (print_iter1 Stv.iter space print_type_var) freevars
       (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       collect_model_ls info ls;

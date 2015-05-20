@@ -517,6 +517,18 @@ let t_ty_check t ty = match ty, t.t_ty with
 
 let vs_check v t = ty_equal_check v.vs_ty (t_type t)
 
+let unambig_fs fs =
+  let rec lookup v ty = match ty.ty_node with
+    | Tyvar u when tv_equal u v -> true
+    | _ -> ty_any (lookup v) ty
+  in
+  let lookup v = List.exists (lookup v) fs.ls_args in
+  let rec inspect ty = match ty.ty_node with
+    | Tyvar u when not (lookup u) -> false
+    | _ -> ty_all inspect ty
+  in
+  Opt.fold (fun _ -> inspect) true fs.ls_value
+
 (* trigger equality and traversal *)
 
 let tr_equal = Lists.equal (Lists.equal t_equal)

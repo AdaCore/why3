@@ -1,0 +1,53 @@
+(** Why3 driver for CVC4 <= 1.3 *)
+
+prelude "(set-logic AUFNIRA)"
+(*
+    A  : Array
+    UF : Uninterpreted Function
+    NIRA : NonLinear Integer Reals Arithmetic
+*)
+
+import "smt-libv2.drv"
+import "discrimination.gen"
+
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "compile_match"
+transformation "eliminate_epsilon"
+
+transformation "simplify_formula"
+
+transformation "monomorphise_goal"
+
+
+(** Error messages specific to CVC4 *)
+
+outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
+timeout "interrupted by timeout"
+
+
+(** Extra theories supported by CVC4 *)
+
+(* Disabled:
+   CVC4 division seems to be neither the Euclidean one, nor the Computer one
+
+theory int.EuclideanDivision
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+
+theory int.ComputerDivision
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+*)

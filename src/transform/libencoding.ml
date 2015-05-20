@@ -255,6 +255,12 @@ let monomorphise_goal = Trans.goal (fun pr f ->
     (fun acc ts -> create_ty_decl ts :: acc)
     [create_prop_decl Pgoal pr f] ltv)
 
+let () =
+  Trans.register_transform
+    ~desc:"Introduce@ the@ type@ variable@ in@ the@ goal"
+    "monomorphise_goal"
+    monomorphise_goal
+
 (* close by subtype the set of types tagged by meta_kept *)
 let close_kept =
   Trans.on_tagged_ty meta_kept (fun kept ->
