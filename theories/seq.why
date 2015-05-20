@@ -37,6 +37,9 @@ theory Seq
     (** [s[i]] is the ([i]+1)-th element of sequence [s]
         (the first element has index 0) *)
 
+  function get (s: seq 'a) (i: int) : 'a =
+    s[i]
+
   (** equality *)
 
   predicate (==) (s1 s2: seq 'a) =
