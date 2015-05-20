@@ -15,17 +15,13 @@
 module SchorrWaite
 
   (*use import bool.Bool*)
+  use import seq.Seq
   use import map.Map
   use import ref.Ref
   use import int.Int
   use import list.List
   use import list.Length
-  use import list.Mem as L
-  use import list.HdTlNoOpt
-  use import list.NthNoOpt
   use import list.Append
-  use import list.Reverse
-  use import list.Distinct
   use import set.Fset as S
 
   (** a small component-as-array memory model *)
@@ -77,16 +73,25 @@ module SchorrWaite
     writes   { path_from_root }
     ensures  { !path_from_root = set (old !path_from_root) p l }
 
-  val tl_stackNodes (stack : list loc) : list loc
-    requires { stack <> Nil }
-    ensures  { result = tl stack }
+  type stacknodes = Seq.seq loc
+
+  val tl_stackNodes (stack: stacknodes) : stacknodes
+    requires { Seq.length stack > 0 }
+    ensures  { result = stack[1 .. ] }
     (*
      * the following post-condition is usefull to prove the
      * invariant that stackNodes' elements are also graph elements
      * for the push case. An equivalent lemma would say:
      * lemma mem_tl : forall x : 'a, l : list 'a. mem x l -> mem x (tl l)
      *)
-    ensures  { forall n : loc. L.mem n result -> L.mem n stack }
+    (* ensures  { forall n : loc. L.mem n result -> L.mem n stack } *)
+
+  function last (s: stacknodes) : loc =
+    Seq.get s (Seq.length s - 1)
+
+  predicate distinct (s: stacknodes) =
+    forall i j. 0 <= i < Seq.length s -> 0 <= j < Seq.length s -> i <> j ->
+    Seq.get s i <> Seq.get s j
 
   predicate edge (x y : loc) (left right : map loc loc) =
     x <> null /\ (left[x] = y \/ right[x] = y)
@@ -125,33 +130,27 @@ module SchorrWaite
   predicate reachable (x y : loc) (l r : map loc loc) =
     exists p : list loc. reachable_via x y l r p
 
-  lemma length_tl: forall l : list 'a.
-    l <> Nil -> length (tl l) < length l
-
   (* auxiliary function the define the form of a stack *)
   function next (l r : map loc loc) (c : map loc bool) (p : loc) : loc =
     if c[p] then r[p] else l[p]
 
   inductive stack_form
-     (l r : map loc loc) (c : map loc bool) (p : loc) (stack : list loc) =
+     (l r : map loc loc) (c : map loc bool) (p : loc) (stack : stacknodes) =
   | stack_nil:
       forall l r : map loc loc, c : map loc bool, p : loc.
-      stack_form l r c p Nil
+      stack_form l r c p Seq.empty
   | stack_cons :
-      forall l r : map loc loc, c : map loc bool, p : loc, s : list loc.
+      forall l r : map loc loc, c : map loc bool, p : loc, s : stacknodes.
        stack_form l r c (next l r c p) s ->
-       stack_form l r c p (Cons p s)
+       stack_form l r c p (Seq.cons p s)
 
+(*
   predicate pair_in_list (p1 p2 : loc) (l : list loc)  =
     match l with
     | Cons b (Cons c _ as m) -> (b = p1 /\ c = p2) \/ pair_in_list p1 p2 m
     | _ -> false
     end
-
-  (* helps proving that the last element in the stack is always root *)
-  (* do I really need this lemma? *)
-  lemma hd_rev_cons : forall l : list 'a, x : 'a.
-    l <> Nil -> hd (reverse (Cons x l)) = hd (reverse l)
+*)
 
   let schorr_waite (root: loc) (ghost graph : set loc) : unit
     requires { root <> null /\ S.mem root graph }
@@ -181,60 +180,63 @@ module SchorrWaite
   = 'Init:
     let t = ref root in
     let p = ref null in
-    let ghost stackNodes = ref Nil in
+    let ghost stackNodes = ref Seq.empty in
     let ghost pth = ref Nil in
     set_path_from_root !t !pth;
     let ghost unmarked_nodes = ref graph in
     let ghost c_false_nodes = ref graph in
     while !p <> null || (!t <> null && not !m[!t]) do
-      invariant { not (L.mem null !stackNodes) }
-      invariant { !stackNodes = Nil <-> !p = null }
+      invariant { forall i. 0 <= i < Seq.length !stackNodes -> Seq.get !stackNodes i <> null }
+      invariant { Seq.length !stackNodes = 0 <-> !p = null }
       invariant { S.mem !t graph }
       invariant { !p <> null -> S.mem !p graph }
-      invariant { !stackNodes <> Nil -> hd !stackNodes = !p }
+      invariant { Seq.length !stackNodes <> 0 -> Seq.get !stackNodes 0 = !p }
       invariant { forall n : loc. S.mem n graph /\ n <> null /\ not !m[n] -> S.mem n !unmarked_nodes }
       invariant { forall n : loc. S.mem n graph /\ n <> null /\ not !c[n] -> S.mem n !c_false_nodes }
-      invariant { forall n : loc. L.mem n !stackNodes -> S.mem n graph }
-      invariant { forall p1 p2 : loc. pair_in_list p1 p2 (Cons !t !stackNodes) ->
+      invariant { forall i. 0 <= i < Seq.length !stackNodes -> S.mem (Seq.get !stackNodes i) graph }
+      invariant { forall i.  0 <= i < Seq.length !stackNodes - 1 ->
+                  let p1 = Seq.get !stackNodes i in let p2 = Seq.get !stackNodes (i+1) in
       		  (!c[p2] -> (at !left 'Init)[p2] = !left[p2] /\ (at !right 'Init)[p2] = p1) /\
 		  (not !c[p2] -> (at !left 'Init)[p2] = p1 /\ (at !right 'Init)[p2] = !right[p2]) }
       invariant { !path_from_root[root] = Nil }
       (*invariant { not L.mem !t !stackNodes }*) (* this will be usefull to prove that !t is in graph after the push ---> but this is false! think of the case when the graph is cyclic *)
       (* I4d from Hubert and Marché's paper and something related to line 63-65 from Leino's *)
-      invariant { forall n : loc. S.mem n graph /\ n <> null /\ not L.mem n !stackNodes ->
+      invariant { forall n : loc. S.mem n graph -> n <> null ->
+                  (forall i. 0 <= i < Seq.length !stackNodes -> n <> Seq.get !stackNodes i) ->
       		  !left[n] = (at !left 'Init)[n] /\ !right[n] = (at !right 'Init)[n] }
       (* I4a from Hubert and Marché's paper; useful to prove that !stackNodes = !p::... *)
       invariant { stack_form !left !right !c !p !stackNodes }
       (* something like Leino's line 74; this is useful to prove that
        * the stack is empty iff p = null *)
-      invariant { !stackNodes <> Nil ->
-      		  let first = hd (reverse !stackNodes) in
+      invariant { Seq.length !stackNodes <> 0 ->
+      		  let first = last !stackNodes in
       		  if !c[first] then !right[first] = null
 		  else !left[first] = null }
-      invariant { !stackNodes <> Nil ->
-      		  hd (reverse !stackNodes) = root }
+      invariant { Seq.length !stackNodes <> 0 -> last !stackNodes = root }
       (* something like lines 75-76 from Leino's paper --> with this invariant I believe there
        * is no need to use 'stack_form' *)
-      invariant { forall k : int. 0 <= k < length !stackNodes - 1->
-      		  if !c[nth k !stackNodes] then !right[nth k !stackNodes] = nth (k+1) !stackNodes
-		  else !left[nth k !stackNodes] = nth (k+1) !stackNodes }
+      invariant { forall k : int. 0 <= k < Seq.length !stackNodes - 1->
+   		  if !c[Seq.get !stackNodes k]
+                  then !right[Seq.get !stackNodes k] = Seq.get !stackNodes (k+1)
+		  else !left [Seq.get !stackNodes k] = Seq.get !stackNodes (k+1) }
       (* all nodes in the stack are marked ---> I4a from Hubert and Marché's paper
        * and something alike line 57 from Leino's paper *)
-      invariant { forall n : loc. L.mem n !stackNodes -> !m[n] }
+      invariant { forall i. 0 <= i < Seq.length !stackNodes -> !m[Seq.get !stackNodes i] }
       (* stack has no duplicates ---> line 55 from Leino's paper *)
       invariant { distinct !stackNodes }
       (* something like Leino's line 68; I believe this is useful to prove
        * that in the pop case the left child of p is the initial one *)
-      invariant { forall n : loc. L.mem n !stackNodes ->
+      invariant { forall i. 0 <= i < Seq.length !stackNodes ->
+                  let n = Seq.get !stackNodes i in
       		  if !c[n] then !left[n] = (at !left 'Init)[n] else !right[n] = (at !right 'Init)[n] }
       (* lines 80-81 from Leino's paper *)
-      invariant { !stackNodes <> Nil -> if !c[!p] then (at !right 'Init)[!p] = !t
+      invariant { Seq.length !stackNodes <> 0 -> if !c[!p] then (at !right 'Init)[!p] = !t
       		  else (at !left 'Init)[!p] = !t }
       (* lines 78-79 from Leino's paper *)
-      invariant { forall k : int. 0 < k < length !stackNodes ->
-      		  if !c[nth k !stackNodes] then
-		    nth (k - 1) !stackNodes = (at !right 'Init)[nth k !stackNodes]
-		  else nth (k - 1) !stackNodes = (at !left 'Init)[nth k !stackNodes] }
+      invariant { forall k : int. 0 < k < Seq.length !stackNodes ->
+                  let n = Seq.get !stackNodes k in
+      		  if !c[n] then Seq.get !stackNodes (k - 1) = (at !right 'Init)[n]
+		           else Seq.get !stackNodes (k - 1) = (at !left  'Init)[n] }
       (* help establishing the next invariant for the push case -->
        * line 70 from Leino's paper *)
       invariant { !p <> null -> reachable_via root !p (at !left 'Init) (at !right 'Init) !pth }
@@ -252,15 +254,18 @@ module SchorrWaite
 		  reachable_via root n (at !left 'Init) (at !right 'Init) pth }
       (* lines 61-62 from Leinos' paper --> help establish the post that
        * all nodes reachable from root are marked *)
-      invariant { forall n : loc. S.mem n graph /\ n <> null /\ !m[n] /\
-      		  not (L.mem n !stackNodes) -> (* /\ n <> !t ---> do I really need this 'n <> !t'? *)
+      invariant { forall n : loc. S.mem n graph -> n <> null -> !m[n] ->
+      		  (forall i. 0 <= i < Seq.length !stackNodes -> n <> Seq.get !stackNodes i) ->
+                  (* /\ n <> !t ---> do I really need this 'n <> !t'? *)
 		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
       (* help establishing the previous invariant for the pop case --->
        * something like Leino's lines 57-59 *)
-      invariant { forall n : loc. L.mem n !stackNodes -> !c[n] ->
+      invariant { forall i. 0 <= i < Seq.length !stackNodes ->
+                  let n = Seq.get !stackNodes i in
+                  !c[n] ->
       		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
       (* termination proved using lexicographic order over a triple *)
-      variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, length !stackNodes }
+      variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, Seq.length !stackNodes }
       if !t = null || !m[!t] then begin
         if !c[!p] then begin (* pop *)
           let q = !t in
@@ -272,7 +277,7 @@ module SchorrWaite
         end else begin (* swing *)
 	  (* the following assertion is automatically discharged
 	   * and it is useful to prove that t is in the set graph *)
-	  assert { pair_in_list !t !p (Cons !t !stackNodes) };
+	  (* assert { pair_in_list !t !p (Seq.cons !t !stackNodes) }; *)
           let q = !t in
           t := get_right !p;
           set_right !p (get_left !p);
@@ -284,7 +289,7 @@ module SchorrWaite
         let q = !p in
 	(*if !p <> null then pth := !pth ++ (Cons q Nil);*)
         p := !t;
-	stackNodes := Cons !p !stackNodes;
+	stackNodes := Seq.cons !p !stackNodes;
         t := get_left !t;
         set_left !p q;
         set_m !p true;
