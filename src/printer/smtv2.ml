@@ -62,20 +62,22 @@ let ident_printer =
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
-      (** the new floating point theory *)
+      (** the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint";
+      "Float16"; "Float32"; "Float64"; "Float128";
       "RoundingMode";
       "roundNearestTiesToEven"; "RNE";
       "roundNearestTiesToAway"; "RNA";
       "roundTowardPositive";    "RTP";
       "roundTowardNegative";    "RTN";
       "roundTowardZero";        "RTZ";
-      "NaN"; "+oo"; "-oo";
-      "fp.eq"; "fp.abs"; "fp.neg"; "fp.add"; "fp.sub"; "fp.mul"; "fp.div";
-      "fp.fma"; "fp.sqrt"; "fp.rem"; "roundToIntegral"; "fp.min"; "fp.max";
-      "fp.leq"; "fp.lt"; "fp.geq"; "fp.gt";
-      "fp.isNormal"; "fp.isSubnormal"; "fp.isSignMinus"; "fp.isZero";
+      "NaN"; "+oo"; "-oo"; "+zero"; "-zero";
+      "fp.abs"; "fp.neg"; "fp.add"; "fp.sub"; "fp.mul"; "fp.div";
+      "fp.fma"; "fp.sqrt"; "fp.rem"; "fp.roundToIntegral"; "fp.min"; "fp.max";
+      "fp.leq"; "fp.lt"; "fp.geq"; "fp.gt"; "fp.eq";
+      "fp.isNormal"; "fp.isSubnormal"; "fp.isZero";
       "fp.isInfinite"; "fp.isNaN";
+      "fp.isNegative"; "fp.isPositive";
       "to_fp"; "to_fp_unsigned";
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
 
