@@ -33,12 +33,12 @@ theory Seq
 
   (** n-th element *)
 
-  function ([]) (seq 'a) int : 'a
-    (** [s[i]] is the ([i]+1)-th element of sequence [s]
+  function get (seq 'a) int : 'a
+    (** [get s i] is the ([i]+1)-th element of sequence [s]
         (the first element has index 0) *)
 
-  function get (s: seq 'a) (i: int) : 'a =
-    s[i]
+  function ([]) (s: seq 'a) (i: int) : 'a =
+    get s i
 
   (** equality *)
 
