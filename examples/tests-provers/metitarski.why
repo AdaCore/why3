@@ -58,3 +58,17 @@ goal G1: forall x:real. x >. 2.0 -> (pow x 3.0) *. 2.0 >. 20.0
 goal G2: forall x:real. x >. 2.0 -> x >. 5.0
 
 end
+
+
+theory PolyPaverExamples
+
+  use import real.Real
+  use import real.ExpLog
+
+  goal g1: forall a b : real.
+    -10.0 <= a <= 10.0 ->
+    -10.0 <= b <= 10.0 ->
+    b > a + 0.1 ->
+    exp a - exp b > (b-a) * exp ((a + b) / 2.0)
+
+end
