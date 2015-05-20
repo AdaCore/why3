@@ -131,9 +131,11 @@ module SchorrWaite
     exists p : list loc. reachable_via x y l r p
 
   (* auxiliary function the define the form of a stack *)
+(*
   function next (l r : map loc loc) (c : map loc bool) (p : loc) : loc =
     if c[p] then r[p] else l[p]
-
+*)
+(*
   inductive stack_form
      (l r : map loc loc) (c : map loc bool) (p : loc) (stack : stacknodes) =
   | stack_nil:
@@ -143,6 +145,7 @@ module SchorrWaite
       forall l r : map loc loc, c : map loc bool, p : loc, s : stacknodes.
        stack_form l r c (next l r c p) s ->
        stack_form l r c p (Seq.cons p s)
+*)
 
 (*
   predicate pair_in_list (p1 p2 : loc) (l : list loc)  =
@@ -205,7 +208,7 @@ module SchorrWaite
                   (forall i. 0 <= i < Seq.length !stackNodes -> n <> Seq.get !stackNodes i) ->
       		  !left[n] = (at !left 'Init)[n] /\ !right[n] = (at !right 'Init)[n] }
       (* I4a from Hubert and Marché's paper; useful to prove that !stackNodes = !p::... *)
-      invariant { stack_form !left !right !c !p !stackNodes }
+      (* invariant { stack_form !left !right !c !p !stackNodes } *)
       (* something like Leino's line 74; this is useful to prove that
        * the stack is empty iff p = null *)
       invariant { Seq.length !stackNodes <> 0 ->
@@ -215,7 +218,7 @@ module SchorrWaite
       invariant { Seq.length !stackNodes <> 0 -> last !stackNodes = root }
       (* something like lines 75-76 from Leino's paper --> with this invariant I believe there
        * is no need to use 'stack_form' *)
-      invariant { forall k : int. 0 <= k < Seq.length !stackNodes - 1->
+      invariant { forall k : int. 0 <= k < Seq.length !stackNodes - 1 ->
    		  if !c[Seq.get !stackNodes k]
                   then !right[Seq.get !stackNodes k] = Seq.get !stackNodes (k+1)
 		  else !left [Seq.get !stackNodes k] = Seq.get !stackNodes (k+1) }
