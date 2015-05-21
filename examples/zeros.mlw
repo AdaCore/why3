@@ -88,4 +88,25 @@ module AllZeros
     in
     check_from 0
 
+  (** divide-and-conqueer *)
+
+  predicate zero_interval (a: array int) (lo hi: int) =
+    forall i: int. lo <= i < hi -> a[i] = 0
+
+  use import int.ComputerDivision
+
+  let all_zeros5 (a: array int) : bool
+    ensures { result <-> all_zeros a a.length }
+  =
+    let rec check_between (lo hi: int) : bool
+      requires { 0 <= lo <= hi <= a.length }
+      variant  { hi - lo }
+      ensures  { result <-> zero_interval a lo hi }
+    =
+      hi <= lo ||
+      let mid = lo + div (hi - lo) 2 in
+      a[mid] = 0 && check_between lo mid && check_between (mid+1) hi
+    in
+    check_between 0 (Array.length a)
+
 end

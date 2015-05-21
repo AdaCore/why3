@@ -162,10 +162,7 @@ let rs_dup ({rs_name = {id_loc = loc}} as s) c =
       check_effects ?loc c;
       mk_rs id c RLlemma None
 
-let create_field id s v =
-  if not (List.exists (fun u -> pv_equal u v) s.its_mfields ||
-          List.exists (fun u -> pv_equal u v) s.its_ifields) then
-    invalid_arg "Expr.create_field";
+let create_projection id s v =
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let ity = ity_app s tyl s.its_regions in
@@ -173,18 +170,17 @@ let create_field id s v =
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
   let c = create_cty [arg] [] [q] Mexn.empty eff v.pv_ity in
-  mk_rs ls.ls_name c (RLls ls) (Some v)
+  let fld = if List.exists (pv_equal v) s.its_mfields then Some v else None in
+  mk_rs ls.ls_name c (RLls ls) fld
 
 let create_constructor ~constr id s fl =
   let exn = Invalid_argument "Expr.create_constructor" in
   let fs = List.fold_right (Spv.add_new exn) fl Spv.empty in
-  if s.its_private || s.its_def <> None then raise exn;
-  if s.its_mutable then begin
+  if s.its_privmut || s.its_def <> None then raise exn;
+  if s.its_mfields <> [] then begin
     if constr <> 1 then raise exn;
     let mfs = Spv.of_list s.its_mfields in
-    let ifs = Spv.of_list s.its_ifields in
-    let sfs = Spv.union mfs ifs in
-    if not (Spv.equal fs sfs) then raise exn
+    if not (Spv.subset mfs fs) then raise exn
   end else if constr < 1 then raise exn;
   let argl = List.map (fun a -> a.pv_vs.vs_ty) fl in
   let tyl = List.map ity_var s.its_ts.ts_args in
@@ -366,7 +362,7 @@ let e_locate_effect pr e = fst (find_effect pr None e)
 let localize_ghost_write v r el =
   let taints eff = Mreg.mem r eff.eff_taints in
   let writes eff = match Mreg.find_opt r eff.eff_writes with
-    | Some fds -> r.reg_its.its_private ||
+    | Some fds -> r.reg_its.its_privmut ||
         Spv.exists (fun fd -> not fd.pv_ghost) fds
     | None -> false in
   (* check if some component taints region r *)
