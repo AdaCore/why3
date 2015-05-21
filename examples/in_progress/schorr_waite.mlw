@@ -91,6 +91,20 @@ module SchorrWaite
   =
     stack[1 .. ]
 
+(*  let lemma cons_not_in (s : stacknodes) (t n : loc)
+    requires { not_in_stack n s }
+    ensures  { not_in_stack n s }
+  = for i = 0 to (Seq.length (cons t s)) - 1 do
+      invariant { not_in_stack (Seq.get (cons t s) i) s }
+      ()
+    done	*)
+
+  (* usefull to prove that right field of every node out of the stack
+     remains the same after the push case *)
+  lemma cons_not_in : forall s : stacknodes, n t : loc. (*?????*)
+    Seq.length s > 0 ->
+    not_in_stack n (cons t s) -> not_in_stack n s 
+
   function last (s: stacknodes) : loc =
     Seq.get s (Seq.length s - 1)
 
@@ -194,7 +208,9 @@ module SchorrWaite
     let ghost unmarked_nodes = ref graph in
     let ghost c_false_nodes = ref graph in
     while !p <> null || (!t <> null && not !m[!t]) do
-      invariant { forall i. 0 <= i < Seq.length !stackNodes -> Seq.get !stackNodes i <> null }
+      invariant { forall n. mem n graph -> not_in_stack n !stackNodes
+    \/ exists i : int. Seq.get !stackNodes i = n }
+      invariant { not_in_stack null !stackNodes }
       invariant { Seq.length !stackNodes = 0 <-> !p = null }
       invariant { S.mem !t graph }
       invariant { !p <> null -> S.mem !p graph }
@@ -209,7 +225,7 @@ module SchorrWaite
       invariant { !path_from_root[root] = Nil }
       (*invariant { not L.mem !t !stackNodes }*) (* this will be usefull to prove that !t is in graph after the push ---> but this is false! think of the case when the graph is cyclic *)
       (* I4d from Hubert and Marché's paper and something related to line 63-65 from Leino's *)
-      invariant { forall n : loc. S.mem n graph -> n <> null ->
+      invariant { forall n : loc. S.mem n graph -> (*n <> null -> *)
                   not_in_stack n !stackNodes ->
       		  !left[n] = (at !left 'Init)[n] /\ !right[n] = (at !right 'Init)[n] }
       (* I4a from Hubert and Marché's paper; useful to prove that !stackNodes = !p::... *)
@@ -264,9 +280,9 @@ module SchorrWaite
        * all nodes reachable from root are marked *)
       invariant { forall n : loc. S.mem n graph -> n <> null -> !m[n] ->
       		  not_in_stack n !stackNodes ->
-                  (* /\ n <> !t ---> do I really need this 'n <> !t'? *)
-		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
-                  (* (!left[n] <> null -> !m[!left[n]] /\ (!right[n] <> null -> !m[!right[n]]) *)
+                  (*n <> !t*) (*---> do I really need this 'n <> !t'? *)
+		  (*(forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }*)
+                  (!left[n] <> null -> !m[!left[n]]) /\ (!right[n] <> null -> !m[!right[n]]) }
 (* help establishing the previous invariant for the pop case --->
        * something like Leino's lines 57-59 *)
       invariant { forall i. 0 <= i < Seq.length !stackNodes ->
@@ -278,9 +294,34 @@ module SchorrWaite
       if !t = null || !m[!t] then begin
         if !c[!p] then begin (* pop *)
           let q = !t in
+	  assert { forall i. 0 <= i < Seq.length !stackNodes ->
+	  	   let n = Seq.get !stackNodes i in
+		   if !c[n] then
+		   (!left[n] = (at !left 'Init)[n]) else
+		   (!right[n] = (at !right 'Init)[n]) };
           t := !p;
+	  assert { forall i. 0 <= i < Seq.length !stackNodes ->
+	  	   let n = Seq.get !stackNodes i in
+		   if !c[n] then
+		   (!left[n] = (at !left 'Init)[n]) else
+		   (!right[n] = (at !right 'Init)[n]) };
+		   
+(*	  assert { !m[!p] /\ Seq.length !stackNodes <> 0 /\
+	  	   !p = Seq.get !stackNodes 0 /\
+		   (!left[!p] <> null -> !m[!left[!p]]) /\
+		   (!right[!p] <> null -> !m[!right[!p]]) }; *)
 	  stackNodes := tl_stackNodes !stackNodes;
           p := !right[!p];
+(*	  assert { !t <> null /\ not_in_stack !t !stackNodes /\
+		   S.mem !t graph /\
+		   !m[!t] /\ (!left[!t] <> null ->  !m[!left[!t]]) /\
+		   (!right[!t] <> null -> !m[!right[!t]]) }; *)
+(*          assert { forall n : loc. S.mem n graph -> n <> !t ->
+	  	   n <> null -> !m[n] -> not_in_stack n !stackNodes ->
+		   (!left[n] <> null -> !m[!left[n]]) /\
+		   (!right[n] <> null -> !m[!right[n]]) };*)
+          assert { not_in_stack !t !stackNodes /\ !t <> null /\
+	           !m[!t] /\ !c[!t] /\ (!left[!t] = (at !left 'Init)[!t]) };
           set_right !t q;
 	  pth := get_path_from_root !p;
         end else begin (* swing *)
@@ -306,6 +347,7 @@ module SchorrWaite
 	set_path_from_root !p !pth;
 	(* this is assertion is automatically discharged and it helps
  	 * proving that all marked nodes are reachable from root *)
+	assert { !p = Seq.get !stackNodes 0 };
 	assert { path (at !left 'Init) (at !right 'Init) root !p !pth };
         set_c !p false; (* if we assume at the pre-condition that all nodes start with c = 0,
 		   	 * then this redundant;
