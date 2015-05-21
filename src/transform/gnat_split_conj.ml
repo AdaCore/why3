@@ -11,7 +11,7 @@ let rec split acc f =
   | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
       f :: acc
   | Tbinop (Tand, f1, f2) ->
-      split (split acc f2) f1
+      split (split acc (t_label_copy f f2)) (t_label_copy f f1)
   | Tbinop (Timplies, f1, f2) ->
       let fn f2 = t_label_copy f (t_implies f1 f2) in
       apply_append fn acc (split [] f2)
@@ -49,7 +49,8 @@ and split_case forig c acc tl bl =
 
 let split_goal pr f =
   let make_prop f = [create_prop_decl Pgoal pr f] in
-  List.map make_prop (split [] f)
+  let l = split [] f in
+  List.map make_prop l
 
 let split_conj = Trans.goal_l split_goal
 

@@ -285,8 +285,9 @@ let rec extract_msg t =
          read_vc_labels t.t_label
 
 let get_extra_info task =
-   let info = extract_msg (Task.task_goal_fmla task) in
-   info.extra_node
+  let f = Task.task_goal_fmla task in
+  let info = extract_msg f in
+  info.extra_node
 
 let to_filename fmt check =
   List.iter (fun x ->
