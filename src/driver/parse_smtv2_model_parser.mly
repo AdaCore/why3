@@ -16,7 +16,8 @@
 
 output:
 | EOF { [] }
-| text_with_spaces LPAREN pairs RPAREN { $3 }
+| possible_space text { [] }
+| possible_space LPAREN pairs RPAREN { $3 }
 
 pairs:
 | possible_space { [] }
@@ -46,11 +47,6 @@ text_without_int:
 | STORE { "store" }
 | CONST { "const"  }
 | AS { "as" }
-
-text_with_spaces:
-| { "" }
-| text { $1 }
-| text SPACE text_with_spaces { $1 ^ $2 ^ $3 }
 
 value:
 | integer { $1 }
