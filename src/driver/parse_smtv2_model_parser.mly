@@ -23,7 +23,7 @@ pairs:
 | possible_space { [] }
 | possible_space LPAREN term SPACE value RPAREN pairs 
     { (Model_parser.create_model_element ~name:$3 ~value:$5 ())::$7 }
-
+    
 possible_space:
 | { "" }
 | SPACE { $1 }
@@ -96,7 +96,7 @@ array:
     STORE possible_space array possible_space integer SPACE integer
     possible_space 
   RPAREN 
-	{ Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
+    { Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
 
 array_skipped_part:
 | LPAREN term_list RPAREN {}

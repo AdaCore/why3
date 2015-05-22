@@ -73,8 +73,8 @@ let rec update_element_names_and_locations raw_model terms updated_model =
       
 (*
 *************************************************************** 
- **   Parser written using menhir 
- ****************************************************************
+**   Parser
+****************************************************************
 *)
 let get_position lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -107,9 +107,10 @@ let do_parsing model =
 let parse input printer_mapping =
   try
     let r = Str.regexp "unknown\\|sat" in
-    let start_m = Str.search_forward r input 0 in
+    ignore (Str.search_forward r input 0);
+    let match_end = Str.match_end () in
     let model_string = 
-      String.sub input start_m ((String.length input) - start_m) in
+      String.sub input match_end ((String.length input) - match_end) in
     
     let raw_model = do_parsing model_string in
     
