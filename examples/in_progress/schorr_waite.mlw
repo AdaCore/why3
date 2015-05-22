@@ -91,19 +91,15 @@ module SchorrWaite
   =
     stack[1 .. ]
 
-(*  let lemma cons_not_in (s : stacknodes) (t n : loc)
-    requires { not_in_stack n s }
-    ensures  { not_in_stack n s }
-  = for i = 0 to (Seq.length (cons t s)) - 1 do
-      invariant { not_in_stack (Seq.get (cons t s) i) s }
-      ()
-    done	*)
-
   (* usefull to prove that right field of every node out of the stack
      remains the same after the push case *)
-  lemma cons_not_in : forall s : stacknodes, n t : loc. (*?????*)
+  lemma cons_not_in: forall s: stacknodes, n t: loc. (*?????*)
     Seq.length s > 0 ->
-    not_in_stack n (cons t s) -> not_in_stack n s 
+    not_in_stack n (cons t s) -> not_in_stack n s
+
+  lemma tl_cons: forall s1 s2: stacknodes, p: loc.
+    Seq.length s2 > 0 ->
+    s1 = s2[1 ..] -> p = Seq.get s2 0 -> s2 = cons p s1
 
   function last (s: stacknodes) : loc =
     Seq.get s (Seq.length s - 1)
@@ -208,8 +204,8 @@ module SchorrWaite
     let ghost unmarked_nodes = ref graph in
     let ghost c_false_nodes = ref graph in
     while !p <> null || (!t <> null && not !m[!t]) do
-      invariant { forall n. mem n graph -> not_in_stack n !stackNodes
-    \/ exists i : int. Seq.get !stackNodes i = n }
+      invariant { forall n. mem n graph -> not_in_stack n !stackNodes \/
+                  exists i : int. Seq.get !stackNodes i = n }
       invariant { not_in_stack null !stackNodes }
       invariant { Seq.length !stackNodes = 0 <-> !p = null }
       invariant { S.mem !t graph }
@@ -252,7 +248,8 @@ module SchorrWaite
        * that in the pop case the left child of p is the initial one *)
       invariant { forall i. 0 <= i < Seq.length !stackNodes ->
                   let n = Seq.get !stackNodes i in
-      		  if !c[n] then !left[n] = (at !left 'Init)[n] else !right[n] = (at !right 'Init)[n] }
+      		  if !c[n] then !left[n] = (at !left 'Init)[n]
+		  else !right[n] = (at !right 'Init)[n] }
       (* lines 80-81 from Leino's paper *)
       invariant { Seq.length !stackNodes <> 0 -> if !c[!p] then (at !right 'Init)[!p] = !t
       		  else (at !left 'Init)[!p] = !t }
@@ -282,21 +279,30 @@ module SchorrWaite
       		  not_in_stack n !stackNodes ->
                   (*n <> !t*) (*---> do I really need this 'n <> !t'? *)
 		  (*(forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }*)
-                  (!left[n] <> null -> !m[!left[n]]) /\ (!right[n] <> null -> !m[!right[n]]) }
+                  (!left[n] <> null -> !m[!left[n]]) /\
+		  (!right[n] <> null -> !m[!right[n]]) }
 (* help establishing the previous invariant for the pop case --->
        * something like Leino's lines 57-59 *)
       invariant { forall i. 0 <= i < Seq.length !stackNodes ->
                   let n = Seq.get !stackNodes i in
                   !c[n] ->
-      		  (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) }
+		  (!left[n] <> null -> !m[!left[n]]) /\
+		  (!right[n] <> null -> !m[!right[n]]) }
+      (* (forall ch : loc. edge n ch !left !right /\ ch <> null -> !m[ch]) } *)
       (* termination proved using lexicographic order over a triple *)
-      variant   { S.cardinal !unmarked_nodes, S.cardinal !c_false_nodes, Seq.length !stackNodes }
+      variant   { S.cardinal !unmarked_nodes,
+      		  S.cardinal !c_false_nodes,
+		  Seq.length !stackNodes }
       if !t = null || !m[!t] then begin
         if !c[!p] then begin (* pop *)
           let q = !t in
           t := !p;
+	  assert { !p = Seq.get !stackNodes 0 };
+	  assert { Seq.length !stackNodes > 0 };
 	  stackNodes := tl_stackNodes !stackNodes;
+	  assert { not_in_stack !p !stackNodes };
           p := !right[!p];
+	  assert { !p = Seq.get !stackNodes 0 \/ !p = null };
           set_right !t q;
 	  pth := get_path_from_root !p;
         end else begin (* swing *)
@@ -324,9 +330,7 @@ module SchorrWaite
  	 * proving that all marked nodes are reachable from root *)
 	assert { !p = Seq.get !stackNodes 0 };
 	assert { path (at !left 'Init) (at !right 'Init) root !p !pth };
-        set_c !p false; (* if we assume at the pre-condition that all nodes start with c = 0,
-		   	 * then this redundant;
-			 * update: explicitly changing !c[p] to false and adding it to the
+        set_c !p false; (* update: explicitly changing !c[p] to false and adding it to the
 			 * set of false nodes (even if it is already there) helps in proving
 			 * the invariant that all nodes in the stack with !c=1 have their
 			 * children marked *)
