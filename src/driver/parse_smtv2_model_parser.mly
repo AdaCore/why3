@@ -17,6 +17,8 @@
 output:
 | EOF { [] }
 | possible_space text { [] }
+| possible_space LPAREN text { [] }
+    (* Error of the prover while getting counter-example *)
 | possible_space LPAREN pairs RPAREN { $3 }
 
 pairs:
