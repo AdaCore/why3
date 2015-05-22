@@ -5,7 +5,7 @@
     formalism for pointer aliasing should climb.
                                       -- Richard Bornat, 2000
 
-  Author: Mario Pereira (UBI, then Université Paris Sud)
+  Author: Mário Pereira (UBI, then Université Paris Sud)
 
   The code, specification, and invariants below follow those of
   the following two proofs:
@@ -289,10 +289,8 @@ module SchorrWaite
           let q = !t in
           t := !p;
           ghost stackNodes := tl_stackNodes !stackNodes;
-          assert { not_in_stack !p !stackNodes };
-          p := !right[!p];
-          assert { !p = Seq.get !stackNodes 0 \/ !p = null };
-          set_right !t q;
+           p := !right[!p];
+           set_right !t q;
           ghost pth := get_path_from_root !p;
         end else begin (* swing *)
           let q = !t in
