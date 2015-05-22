@@ -931,7 +931,7 @@ let () =
   if C.Mprover.is_empty (C.get_provers gconfig.Gconfig.config) then
     begin
       info_window `ERROR
-        "No prover configured.\nPlease run 'why3config --detect-provers' first"
+        "No prover configured.\nPlease run 'why3 config --detect-provers' first"
         ~callback:GMain.quit;
       GMain.main ();
       exit 2;

@@ -809,7 +809,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
-      Format.fprintf fmt "outdated config file; rerun why3config"
+      Format.fprintf fmt "outdated config file; rerun 'why3 config'"
   | NonUniqueId ->
     Format.fprintf fmt "InternalError : two provers share the same id"
   | ProverNotFound (config,fp) ->
