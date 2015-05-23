@@ -5,12 +5,11 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="3000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="60" memlimit="3000"/>
-<prover id="4" name="Z3" version="4.3.2" timelimit="5" memlimit="3000"/>
-<prover id="5" name="Z3" version="3.2" timelimit="35" memlimit="1000"/>
-<file name="../schorr_waite.mlw" expanded="true">
-<theory name="SchorrWaite" sum="c30a223fcdcc14a1d252bd689787ebda" expanded="true">
- <goal name="WP_parameter tl_stackNodes" expl="VC for tl_stackNodes" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<prover id="4" name="Z3" version="4.3.2" timelimit="5" memlimit="3500"/>
+<file name="../schorr_waite.mlw">
+<theory name="SchorrWaite" sum="c30a223fcdcc14a1d252bd689787ebda">
+ <goal name="WP_parameter tl_stackNodes" expl="VC for tl_stackNodes">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter tl_stackNodes.1" expl="1. postcondition">
   <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -42,21 +41,17 @@
   <transf name="split_goal_wp">
    <goal name="WP_parameter trans_path.1.1" expl="1. VC for trans_path">
    <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="7"/></proof>
-   <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter trans_path.1.2" expl="2. VC for trans_path">
    <proof prover="0" timelimit="5"><result status="valid" time="0.00" steps="9"/></proof>
-   <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter trans_path.2" expl="2. precondition">
   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="127"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter trans_path.3" expl="3. precondition">
   <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter trans_path.4" expl="4. postcondition">
   <proof prover="2"><result status="valid" time="0.31"/></proof>
@@ -65,7 +60,6 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter trans_path.6" expl="6. postcondition">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="113"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
@@ -76,8 +70,8 @@
  <goal name="path_edge_cons">
  <proof prover="2" timelimit="5"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter schorr_waite" expl="VC for schorr_waite" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter schorr_waite" expl="VC for schorr_waite">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter schorr_waite.1" expl="1. precondition">
   <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -153,7 +147,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.25" expl="25. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.26" expl="26. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -163,86 +156,69 @@
   </goal>
   <goal name="WP_parameter schorr_waite.28" expl="28. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.29" expl="29. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.30" expl="30. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.31" expl="31. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.32" expl="32. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.33" expl="33. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.34" expl="34. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.35" expl="35. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.36" expl="36. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.37" expl="37. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.38" expl="38. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.39" expl="39. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.40" expl="40. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.41" expl="41. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.42" expl="42. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.43" expl="43. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.44" expl="44. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.45" expl="45. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.46" expl="46. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.47" expl="47. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.48" expl="48. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.49" expl="49. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.50" expl="50. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -252,7 +228,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.52" expl="52. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.53" expl="53. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -274,7 +249,7 @@
   </goal>
   <goal name="WP_parameter schorr_waite.59" expl="59. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.60" expl="60. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -347,7 +322,7 @@
   </goal>
   <goal name="WP_parameter schorr_waite.83" expl="83. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.84" expl="84. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -363,7 +338,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.88" expl="88. precondition">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.89" expl="89. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
@@ -376,26 +350,21 @@
   </goal>
   <goal name="WP_parameter schorr_waite.92" expl="92. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.93" expl="93. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.94" expl="94. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.95" expl="95. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.96" expl="96. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.97" expl="97. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.98" expl="98. loop invariant preservation">
   <transf name="inline_goal">
@@ -403,19 +372,15 @@
    <transf name="split_goal_wp">
     <goal name="WP_parameter schorr_waite.98.1.1" expl="1. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.98"/></proof>
-    <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.06"/></proof>
     </goal>
     <goal name="WP_parameter schorr_waite.98.1.2" expl="2. loop invariant preservation">
     <proof prover="2"><result status="valid" time="1.04"/></proof>
-    <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.06"/></proof>
     </goal>
     <goal name="WP_parameter schorr_waite.98.1.3" expl="3. loop invariant preservation">
     <proof prover="2"><result status="valid" time="1.00"/></proof>
-    <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.07"/></proof>
     </goal>
     <goal name="WP_parameter schorr_waite.98.1.4" expl="4. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.95"/></proof>
-    <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.06"/></proof>
     </goal>
    </transf>
    </goal>
@@ -423,7 +388,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.99" expl="99. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.100" expl="100. loop invariant preservation">
   <transf name="split_goal_wp">
@@ -441,47 +405,39 @@
   </goal>
   <goal name="WP_parameter schorr_waite.101" expl="101. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.32"/></proof>
-  <proof prover="4" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.102" expl="102. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.43"/></proof>
-  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.103" expl="103. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.27"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.104" expl="104. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.105" expl="105. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.106" expl="106. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.23"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.107" expl="107. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.108" expl="108. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.22"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.109" expl="109. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.110" expl="110. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.111" expl="111. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.112" expl="112. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.113" expl="113. loop invariant preservation">
   <transf name="introduce_premises">
@@ -506,7 +462,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.115" expl="115. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.09"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.116" expl="116. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -528,7 +483,7 @@
   </goal>
   <goal name="WP_parameter schorr_waite.122" expl="122. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.123" expl="123. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -631,6 +586,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.152" expl="152. assertion">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.153" expl="153. assertion">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
@@ -733,6 +689,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.183" expl="183. assertion">
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.184" expl="184. assertion">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
@@ -832,7 +789,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.216" expl="216. precondition">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.217" expl="217. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
@@ -845,34 +801,27 @@
   </goal>
   <goal name="WP_parameter schorr_waite.220" expl="220. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.221" expl="221. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.222" expl="222. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.223" expl="223. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.224" expl="224. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.225" expl="225. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="4" timelimit="6" memlimit="1000" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.226" expl="226. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" timelimit="6" memlimit="1000" obsolete="true"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.227" expl="227. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.228" expl="228. loop invariant preservation">
   <transf name="split_goal_wp">
@@ -894,48 +843,39 @@
   </goal>
   <goal name="WP_parameter schorr_waite.229" expl="229. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.230" expl="230. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.231" expl="231. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="5" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.232" expl="232. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="4" timelimit="6" memlimit="1000" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.233" expl="233. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.234" expl="234. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" timelimit="6" memlimit="1000" obsolete="true"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.235" expl="235. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.236" expl="236. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" timelimit="6" memlimit="1000" obsolete="true"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.237" expl="237. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.238" expl="238. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.239" expl="239. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.240" expl="240. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.241" expl="241. loop invariant preservation">
   <transf name="split_goal_wp">
@@ -952,7 +892,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.243" expl="243. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.244" expl="244. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -974,7 +913,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.250" expl="250. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" timelimit="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.251" expl="251. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1030,7 +968,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.268" expl="268. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04" steps="20"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.269" expl="269. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
@@ -1046,7 +983,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.273" expl="273. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4" timelimit="60"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.274" expl="274. loop invariant preservation">
   <transf name="inline_goal">
@@ -1054,7 +990,6 @@
    <transf name="simplify_trivial_quantification">
     <goal name="WP_parameter schorr_waite.274.1.1" expl="1. VC for schorr_waite">
     <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="4" memlimit="3500"><result status="valid" time="0.00"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1074,7 +1009,6 @@
   </goal>
   <goal name="WP_parameter schorr_waite.279" expl="279. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.280" expl="280. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1084,102 +1018,78 @@
   </goal>
   <goal name="WP_parameter schorr_waite.282" expl="282. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.283" expl="283. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.284" expl="284. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.285" expl="285. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.286" expl="286. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.287" expl="287. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.288" expl="288. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.289" expl="289. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.290" expl="290. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.291" expl="291. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.292" expl="292. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.293" expl="293. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.294" expl="294. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.295" expl="295. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.296" expl="296. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.297" expl="297. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.298" expl="298. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.299" expl="299. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.300" expl="300. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.301" expl="301. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.302" expl="302. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.303" expl="303. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.304" expl="304. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.305" expl="305. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.306" expl="306. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.307" expl="307. precondition">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -1201,7 +1111,7 @@
   </goal>
   <goal name="WP_parameter schorr_waite.313" expl="313. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.314" expl="314. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1274,7 +1184,7 @@
   </goal>
   <goal name="WP_parameter schorr_waite.337" expl="337. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" memlimit="3500"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.338" expl="338. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1292,6 +1202,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.343" expl="343. assertion">
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.344" expl="344. assertion">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1362,129 +1273,130 @@
   <goal name="WP_parameter schorr_waite.366" expl="366. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.367" expl="367. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.367" expl="367. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.368" expl="368. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.368" expl="368. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.369" expl="369. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.369" expl="369. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.370" expl="370. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.370" expl="370. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.371" expl="371. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.371" expl="371. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.372" expl="372. loop variant decrease" expanded="true">
+  <goal name="WP_parameter schorr_waite.372" expl="372. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.373" expl="373. precondition" expanded="true">
+  <goal name="WP_parameter schorr_waite.373" expl="373. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.374" expl="374. assertion">
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.375" expl="375. assertion" expanded="true">
+  <goal name="WP_parameter schorr_waite.375" expl="375. assertion">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.376" expl="376. precondition" expanded="true">
+  <goal name="WP_parameter schorr_waite.376" expl="376. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.377" expl="377. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.377" expl="377. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.378" expl="378. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.378" expl="378. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.379" expl="379. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.379" expl="379. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.380" expl="380. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.380" expl="380. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.381" expl="381. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.381" expl="381. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.382" expl="382. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.382" expl="382. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.383" expl="383. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.383" expl="383. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.384" expl="384. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.384" expl="384. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.385" expl="385. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.385" expl="385. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.386" expl="386. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.386" expl="386. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.387" expl="387. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.387" expl="387. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.388" expl="388. loop invariant preservation" expanded="true">
-  <transf name="introduce_premises" expanded="true">
-   <goal name="WP_parameter schorr_waite.388.1" expl="1. VC for schorr_waite" expanded="true">
-   <transf name="split_goal_wp" expanded="true">
-    <goal name="WP_parameter schorr_waite.388.1.1" expl="1. VC for schorr_waite" expanded="true">
+  <goal name="WP_parameter schorr_waite.388" expl="388. loop invariant preservation">
+  <transf name="introduce_premises">
+   <goal name="WP_parameter schorr_waite.388.1" expl="1. VC for schorr_waite">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter schorr_waite.388.1.1" expl="1. VC for schorr_waite">
     <proof prover="2" timelimit="5"><result status="valid" time="0.05"/></proof>
     </goal>
-    <goal name="WP_parameter schorr_waite.388.1.2" expl="2. VC for schorr_waite" expanded="true">
+    <goal name="WP_parameter schorr_waite.388.1.2" expl="2. VC for schorr_waite">
     <proof prover="2"><result status="valid" time="0.05"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter schorr_waite.389" expl="389. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.389" expl="389. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.390" expl="390. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.390" expl="390. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.391" expl="391. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.391" expl="391. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.392" expl="392. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.392" expl="392. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.393" expl="393. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.393" expl="393. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.11" steps="34"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.394" expl="394. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.394" expl="394. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.395" expl="395. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.395" expl="395. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.396" expl="396. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.396" expl="396. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.397" expl="397. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.397" expl="397. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.398" expl="398. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.398" expl="398. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.399" expl="399. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.399" expl="399. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.400" expl="400. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.400" expl="400. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.401" expl="401. loop invariant preservation" expanded="true">
-  <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter schorr_waite.401.1" expl="1. loop invariant preservation" expanded="true">
-   <transf name="introduce_premises" expanded="true">
-    <goal name="WP_parameter schorr_waite.401.1.1" expl="1. VC for schorr_waite" expanded="true">
-    <transf name="split_goal_wp" expanded="true">
-     <goal name="WP_parameter schorr_waite.401.1.1.1" expl="1. VC for schorr_waite" expanded="true">
+  <goal name="WP_parameter schorr_waite.401" expl="401. loop invariant preservation">
+  <transf name="inline_goal">
+   <goal name="WP_parameter schorr_waite.401.1" expl="1. loop invariant preservation">
+   <transf name="introduce_premises">
+    <goal name="WP_parameter schorr_waite.401.1.1" expl="1. VC for schorr_waite">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter schorr_waite.401.1.1.1" expl="1. VC for schorr_waite">
      <proof prover="2"><result status="valid" time="0.04"/></proof>
      </goal>
-     <goal name="WP_parameter schorr_waite.401.1.1.2" expl="2. VC for schorr_waite" expanded="true">
+     <goal name="WP_parameter schorr_waite.401.1.1.2" expl="2. VC for schorr_waite">
      <proof prover="1"><result status="valid" time="0.04"/></proof>
      </goal>
     </transf>
@@ -1493,10 +1405,10 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter schorr_waite.402" expl="402. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter schorr_waite.402" expl="402. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.403" expl="403. loop variant decrease" expanded="true">
+  <goal name="WP_parameter schorr_waite.403" expl="403. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.404" expl="404. postcondition">
