@@ -446,9 +446,9 @@ let image_of_result ~obsolete result =
             if obsolete then !image_timeout_obs else !image_timeout
         | Call_provers.OutOfMemory ->
             if obsolete then !image_outofmemory_obs else !image_outofmemory
-        | Call_provers.StepsLimitExceeded ->
-            if obsolete then !image_stepslimitexceeded_obs
-            else !image_stepslimitexceeded
+        | Call_provers.StepLimitExceeded ->
+            if obsolete then !image_steplimitexceeded_obs
+            else !image_steplimitexceeded
         | Call_provers.Unknown _ ->
             if obsolete then !image_unknown_obs else !image_unknown
         | Call_provers.Failure _ ->
@@ -1120,7 +1120,7 @@ let bisect_proof_attempt pa =
         M.schedule_proof_attempt
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
-	  ~stepslimit:(-1)
+	  ~steplimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
@@ -1158,7 +1158,7 @@ let bisect_proof_attempt pa =
             M.schedule_proof_attempt
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
-	      ~stepslimit:(-1)
+	      ~steplimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
               ~command:(C.get_complete_command lp.S.prover_config (-1))

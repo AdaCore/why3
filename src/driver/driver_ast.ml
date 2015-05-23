@@ -58,7 +58,7 @@ type global =
   | RegexpInvalid of string
   | RegexpTimeout of string
   | RegexpOutOfMemory of string
-  | RegexpStepsLimitExceeded of string
+  | RegexpStepLimitExceeded of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
   | TimeRegexp of string
@@ -67,7 +67,7 @@ type global =
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
   | ExitCodeOutOfMemory of int
-  | ExitCodeStepsLimitExceeded of int
+  | ExitCodeStepLimitExceeded of int
   | ExitCodeUnknown of int * string
   | ExitCodeFailure of int * string
   | Filename of string

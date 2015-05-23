@@ -37,7 +37,7 @@
         "invalid", INVALID;
         "timeout", TIMEOUT;
         "outofmemory", OUTOFMEMORY;
-        "stepslimitexceeded", STEPSLIMITEXCEEDED;
+        "steplimitexceeded", STEPLIMITEXCEEDED;
         "time",    TIME;
         "unknown", UNKNOWN;
         "fail", FAIL;

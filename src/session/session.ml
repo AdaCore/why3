@@ -553,7 +553,7 @@ let save_result fmt r =
        | Call_provers.HighFailure -> "highfailure"
        | Call_provers.Timeout -> "timeout"
        | Call_provers.OutOfMemory -> "outofmemory"
-       | Call_provers.StepsLimitExceeded -> "stepslimitexceeded"
+       | Call_provers.StepLimitExceeded -> "steplimitexceeded"
        | Call_provers.Invalid -> "invalid")
     r.Call_provers.pr_time
     (opt pp_print_int "steps") steps
@@ -1173,7 +1173,8 @@ let load_result r =
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.HighFailure
-            | "stepslimitexceeded" -> Call_provers.StepsLimitExceeded
+            | "steplimitexceeded" -> Call_provers.StepLimitExceeded
+            | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
             | s ->
                 Warning.emit
                   "[Warning] Session.load_result: unexpected status '%s'@." s;

@@ -206,11 +206,13 @@ let running_provers_max m = m.running_provers_max
 
 exception StepsCommandNotSpecified of string
 
-let get_complete_command pc stepslimit =
-  let comm = if stepslimit < 0 then pc.command
+let get_complete_command pc steplimit =
+  let comm = if steplimit < 0 then pc.command
     else
       match pc.command_steps with
-      | None -> raise (StepsCommandNotSpecified "The solver is used with step limit and the command for running the solver with steplimit is not specified.")
+      | None -> raise (StepsCommandNotSpecified
+          "The solver is used with a step limit and the command for \
+            running the solver with a step limit is not specified.")
       | Some command_steps -> command_steps in
   String.concat " " (comm :: pc.extra_options)
 
