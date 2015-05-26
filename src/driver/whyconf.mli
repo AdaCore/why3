@@ -75,6 +75,7 @@ val loadpath: main -> string list
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int
+val cntexample: main -> bool
 val set_limits: main -> int -> int -> int -> main
 
 val plugins : main -> string list

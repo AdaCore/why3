@@ -130,6 +130,7 @@ module Make(O: OBSERVER) : sig
 (** {2 Actions} *)
 
   val run_prover :
+    cntexample:bool ->
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
     timelimit:int -> memlimit:int ->
@@ -139,10 +140,14 @@ module Make(O: OBSERVER) : sig
         will be started asynchronously when processors are available.
 
         ~context_unproved_goals_only indicates if prover must be run
-        on already proved goals or not *)
+        on already proved goals or not 
+	~cntexample indicates if prover should be asked to get counter-example
+	model
+    *)
 
 
   val run_external_proof :
+    ?cntexample:bool ->
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     O.key proof_attempt -> unit
@@ -157,10 +162,11 @@ module Make(O: OBSERVER) : sig
     | StatusChange of proof_attempt_status
 
   val run_external_proof_v3 :
+    ?cntexample:bool ->
     O.key Session.env_session -> t -> O.key Session.proof_attempt ->
     (O.key Session.proof_attempt -> Whyconf.prover ->
      int * int * int -> Call_provers.prover_result option -> run_external_status -> unit) ->
-    unit
+     unit
   (** [run_external_proof_v3 env_session sched pa callback] the
       callback is applied with [callback pa p limits old_result
       status]. run_external_proof_v3 don't change the existing proof
@@ -170,6 +176,7 @@ module Make(O: OBSERVER) : sig
 
 
   val prover_on_goal :
+    ?cntexample:bool ->
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     timelimit:int -> memlimit:int ->

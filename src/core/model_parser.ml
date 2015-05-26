@@ -92,7 +92,7 @@ let rec print_model fmt model =
   match model with
   | [] -> ()
   | m_element::t -> begin
-    fprintf fmt  "%s at %a = %a\n" 
+    fprintf fmt  "\n%s at %a = %a" 
       m_element.me_name print_location m_element print_model_value m_element.me_value;
     print_model fmt t
   end

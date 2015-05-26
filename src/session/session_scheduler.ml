@@ -345,8 +345,8 @@ let add_file env_session ?format f =
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
-let find_prover eS a =
-  match load_prover eS a.proof_prover with
+let find_prover ?(cntexample = false) eS a =
+  match load_prover ~cntexample eS a.proof_prover with
     | Some p -> Some (a.proof_prover, p,a)
     | None ->
         match O.uninstalled_prover eS a.proof_prover with
@@ -362,7 +362,7 @@ let find_prover eS a =
               with Not_found ->
                 (* we modify the prover in-place *)
                 Session.change_prover a new_p;
-                match load_prover eS new_p with
+                match load_prover ~cntexample eS new_p with
                   | Some p -> Some (new_p,p,a)
                   | None ->
                     (* should never happen because at loading, config
@@ -385,7 +385,7 @@ let find_prover eS a =
                   ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
                 in
                 O.init new_a.proof_key (Proof_attempt new_a);
-                match load_prover eS new_p with
+                match load_prover ~cntexample eS new_p with
                   | Some p -> Some (new_p,p,new_a)
                   | None ->
                     (* should never happen because at loading, config
@@ -451,8 +451,8 @@ let dummy_limits = (0,0,0)
 
 (** run_external_proof_v3 doesn't modify existing proof attempt, it can just
     create new one by find_prover *)
-let run_external_proof_v3 eS eT a callback =
-  match find_prover eS a with
+let run_external_proof_v3 ?(cntexample = false) eS eT a callback =
+  match find_prover eS a ~cntexample with
   | None ->
     callback a a.proof_prover dummy_limits None Starting;
     (* nothing to do *)
@@ -500,7 +500,7 @@ let run_external_proof_v3 eS eT a callback =
     end
 
 (** run_external_proof_v2 modify the session according to the current state *)
-let run_external_proof_v2 eS eT a callback =
+let run_external_proof_v2 ?(cntexample = false) eS eT a callback =
   let previous_res = ref (a.proof_state,a.proof_obsolete) in
   let callback a ap limits previous state =
     begin match state with
@@ -522,19 +522,19 @@ let run_external_proof_v2 eS eT a callback =
     end;
     callback a ap limits previous state
   in
-  run_external_proof_v3 eS eT a callback
+  run_external_proof_v3 eS eT a callback ~cntexample
 
 let running = function
   | Scheduled | Running -> true
   | Unedited | JustEdited | Interrupted
   | Done _ | InternalFailure _ -> false
 
-let run_external_proof_v2 eS eT a callback =
+let run_external_proof_v2 ?(cntexample = false) eS eT a callback =
   (* Perhaps the test a.proof_archived should be done somewhere else *)
   if a.proof_archived || running a.proof_state then () else
-  run_external_proof_v2 eS eT a callback
+  run_external_proof_v2 ~cntexample eS eT a callback
 
-let run_external_proof eS eT ?callback a =
+let run_external_proof ?(cntexample = false) eS eT ?callback a =
   let callback =
     match callback with
     | None -> fun _ _ _ _ _ -> ()
@@ -545,9 +545,9 @@ let run_external_proof eS eT ?callback a =
       | MissingFile _ -> c a a.proof_state
       | StatusChange s -> c a s
   in
-  run_external_proof_v2 eS eT a callback
+  run_external_proof_v2 ~cntexample eS eT a callback
 
-let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
+let prover_on_goal ?(cntexample = false) eS eT ?callback ~timelimit ~memlimit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
@@ -561,42 +561,42 @@ let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
       O.init ep.proof_key (Proof_attempt ep);
       ep
   in
-  run_external_proof eS eT ?callback a
+  run_external_proof ~cntexample eS eT ?callback a
 
 let prover_on_goal_or_children eS eT
-    ~context_unproved_goals_only ~timelimit ~memlimit p g =
+    ~context_unproved_goals_only ~timelimit ~memlimit p g ~cntexample =
   goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
-    (prover_on_goal eS eT ~timelimit ~memlimit p) g
+    (prover_on_goal ~cntexample eS eT ~timelimit ~memlimit p) g
 
-let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
+let run_prover ~cntexample eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
   match a with
     | Goal g ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~timelimit ~memlimit pr g
+          ~context_unproved_goals_only ~timelimit ~memlimit pr g ~cntexample
     | Theory th ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~timelimit ~memlimit pr)
+             ~context_unproved_goals_only ~timelimit ~memlimit pr ~cntexample)
           th.theory_goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
                (prover_on_goal_or_children eS eT
-                  ~context_unproved_goals_only ~timelimit ~memlimit pr)
+                  ~context_unproved_goals_only ~timelimit ~memlimit pr ~cntexample)
                th.theory_goals)
           file.file_theories
     | Proof_attempt a ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~timelimit ~memlimit pr a.proof_parent
+          ~context_unproved_goals_only ~timelimit ~memlimit pr a.proof_parent ~cntexample
     | Transf tr ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~timelimit ~memlimit pr)
+             ~context_unproved_goals_only ~timelimit ~memlimit pr ~cntexample)
           tr.transf_goals
     | Metas m ->
       prover_on_goal_or_children eS eT
-        ~context_unproved_goals_only ~timelimit ~memlimit pr m.metas_goal
+        ~context_unproved_goals_only ~timelimit ~memlimit pr m.metas_goal ~cntexample
 
 
 

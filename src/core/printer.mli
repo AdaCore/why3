@@ -36,6 +36,8 @@ type printer_args = {
   prelude    : prelude;
   th_prelude : prelude_map;
   blacklist  : blacklist;
+  cntexample : bool;
+    (* True if counter-example should be generated. *)
   mutable printer_mapping : printer_mapping;
 }
 

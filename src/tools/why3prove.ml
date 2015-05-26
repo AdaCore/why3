@@ -91,6 +91,8 @@ let opt_task = ref None
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 
+let opt_cntexmp = ref false
+
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " read the input file from stdin";
@@ -137,11 +139,13 @@ let option_list = [
   "--print-theory", Arg.Set opt_print_theory,
       " print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
-      " print namespaces of selected theories";
+      " print namespaces of selected theories"; 
   Debug.Args.desc_shortcut
     "parse_only" "--parse-only" " stop after parsing";
   Debug.Args.desc_shortcut
-    "type_only" "--type-only" " stop after type checking" ]
+    "type_only" "--type-only" " stop after type checking";
+  "--get-counterexample", Arg.Set opt_cntexmp,
+      " gets the counter-example model" ]
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
@@ -375,7 +379,7 @@ let do_input env drv = function
 
 let () =
   try
-    let load (f,ef) = load_driver env f ef in
+    let load (f,ef) = load_driver ~cntexample:!opt_cntexmp env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->

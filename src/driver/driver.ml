@@ -34,6 +34,7 @@ type driver = {
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_res_parser  : prover_result_parser;
   drv_tag         : int;
+  drv_cntexample  : bool;
 }
 
 (** parse a driver file *)
@@ -67,7 +68,7 @@ exception UnknownProp  of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
+let load_driver = let driver_tag = ref (-1) in fun ?(cntexample = false) env file extra_files ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
@@ -211,6 +212,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       prp_model_parser = Model_parser.lookup_model_parser !model_parser
     };
     drv_tag         = !driver_tag;
+    drv_cntexample  = cntexample; 
   }
 
 let syntax_map drv =
@@ -292,6 +294,7 @@ let print_task_prepared ?old drv fmt task =
       prelude     = drv.drv_prelude;
       th_prelude  = drv.drv_thprelude;
       blacklist   = drv.drv_blacklist;
+      cntexample  = drv.drv_cntexample;
       printer_mapping = get_default_printer_mapping;
     } in
   let printer = lookup_printer p printer_args in

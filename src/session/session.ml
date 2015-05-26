@@ -1871,7 +1871,7 @@ let remove_metas ?(notify=notify) m =
 (**                    Prover Loaded                **)
 (*****************************************************)
 
-let load_prover eS prover =
+let load_prover ?(cntexample = false) eS prover =
   try
     PHprover.find eS.loaded_provers prover
   with Not_found ->
@@ -1880,7 +1880,7 @@ let load_prover eS prover =
     let r = match r with
       | None -> None
       | Some pr ->
-        let dr = Driver.load_driver eS.env
+        let dr = Driver.load_driver ~cntexample eS.env
           pr.Whyconf.driver pr.Whyconf.extra_drivers in
         Some { prover_config = pr;
                prover_driver = dr}

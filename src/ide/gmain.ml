@@ -609,7 +609,7 @@ let update_tabs a =
               "Edited interactive proof. Run it with \"Replay\" button"
             | S.Done
                 ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
-              fprintf str_formatter "%a" Call_provers.print_prover_result r;
+              Call_provers.print_prover_result str_formatter r;
                   flush_str_formatter ()
             | S.Done r ->
               let out = r.Call_provers.pr_output in
@@ -974,6 +974,7 @@ let () = Queue.iter (open_file ~start:true) files
 let prover_on_selected_goals pr =
   let timelimit = gconfig.session_time_limit in
   let memlimit = gconfig.session_mem_limit in
+  let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
   List.iter
     (fun row ->
       try
@@ -981,7 +982,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit ~memlimit
+         ~timelimit ~memlimit ~cntexample
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"

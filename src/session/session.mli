@@ -230,7 +230,7 @@ type 'a env_session = private
 val update_env_session_config : 'a env_session -> Whyconf.config -> unit
 (** updates the configuration *)
 
-val load_prover : 'a env_session -> Whyconf.prover -> loaded_prover option
+val load_prover : ?cntexample:bool -> 'a env_session -> Whyconf.prover -> loaded_prover option
 (** load a prover *)
 
 val unload_provers : 'a env_session -> unit

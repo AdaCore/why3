@@ -131,8 +131,12 @@ let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps)" s
 
 let print_prover_result fmt
-  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s} =
+  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s; pr_model=m} =
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
+  if m <> [] then begin
+    fprintf fmt "\nCounter-example model:";
+    Model_parser.print_model fmt m
+  end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
       print_prover_status status out

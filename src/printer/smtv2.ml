@@ -330,10 +330,10 @@ let print_logic_decl info fmt (ls,def) =
     List.iter forget_var vsl
   end
 
-let print_info_model fmt info =
+let print_info_model args fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if info_model != [] then 
+  if info_model != [] && args.cntexample then 
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
@@ -365,7 +365,7 @@ let print_prop_decl args info fmt k pr f = match k with
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       fprintf fmt "@[(check-sat)@]@\n";
-      print_info_model fmt info;
+      print_info_model args fmt info;
       
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				queried_terms = info.info_model; }
@@ -425,10 +425,15 @@ let print_decls args =
   Printer.on_converter_map (fun cm ->
       Trans.fold print_decl ((sm, cm, []),[])))
 
+let set_produce_models fmt cntexample = 
+  if cntexample then
+    fprintf fmt "(set-option :produce-models true)@\n"
+  
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
   print_prelude fmt args.prelude;
+  set_produce_models fmt args.cntexample;
   print_th_prelude task fmt args.th_prelude;
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
