@@ -3,7 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.2" timelimit="10" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
@@ -177,9 +177,8 @@
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge.28" expl="28. loop invariant preservation">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.05"/></proof>
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="1.49"/></proof>
   </goal>
   <goal name="WP_parameter merge.29" expl="29. loop invariant preservation">
   <proof prover="2"><result status="valid" time="1.73" steps="626"/></proof>
@@ -228,7 +227,7 @@
   <proof prover="10"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge.37" expl="37. loop invariant preservation">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.07"/></proof>
+  <proof prover="1"><result status="valid" time="0.07"/></proof>
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   <proof prover="10" timelimit="10"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -238,7 +237,7 @@
   <proof prover="10"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge.39" expl="39. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="1.60" steps="593"/></proof>
+  <proof prover="2"><result status="valid" time="1.60"/></proof>
   <proof prover="3"><result status="valid" time="1.64"/></proof>
   </goal>
   <goal name="WP_parameter merge.40" expl="40. loop invariant preservation">
@@ -294,7 +293,7 @@
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge.49" expl="49. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="2.20" steps="449"/></proof>
+  <proof prover="2"><result status="valid" time="2.20" steps="473"/></proof>
   <proof prover="3"><result status="valid" time="0.41"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -442,7 +441,7 @@
     <proof prover="9"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="WP_parameter merge_using.11.1.2" expl="2. VC for merge_using">
-    <proof prover="1"><result status="valid" time="0.26"/></proof>
+    <proof prover="1" timelimit="5"><result status="valid" time="0.26"/></proof>
     <proof prover="2"><result status="valid" time="1.15" steps="379"/></proof>
     <proof prover="4"><result status="valid" time="0.12"/></proof>
     <proof prover="6"><result status="valid" time="1.15"/></proof>
@@ -681,7 +680,7 @@
   <proof prover="8"><result status="valid" time="0.31" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter bottom_up_mergesort.17" expl="17. assertion">
-  <proof prover="1"><result status="valid" time="1.09"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="1.09"/></proof>
   <proof prover="4"><result status="valid" time="0.34"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -727,7 +726,7 @@
    <proof prover="8" timelimit="10"><result status="valid" time="0.02" steps="48"/></proof>
    </goal>
    <goal name="WP_parameter bottom_up_mergesort.21.4" expl="4. assertion">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.51"/></proof>
+   <proof prover="1"><result status="valid" time="0.51"/></proof>
    <proof prover="4"><result status="valid" time="0.39"/></proof>
    <proof prover="9"><result status="valid" time="0.05"/></proof>
    </goal>
@@ -1281,7 +1280,6 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter naturalrec.19" expl="19. assertion">
-  <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="1.30"/></proof>
   </goal>
   <goal name="WP_parameter naturalrec.20" expl="20. precondition">

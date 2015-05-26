@@ -22,10 +22,13 @@ import "discrimination.gen"
 
 transformation "inline_trivial"
 transformation "eliminate_builtin"
-(* temporarily disabled: too much experimental
 transformation "detect_polymorphism"
+transformation "eliminate_definition"
+(* We could keep more definitions by using
+   transformation "eliminate_definition_if_poly"
+   instead, but some proofs are lost
+   (examples/logic/triangle_inequality.why)
 *)
-transformation "eliminate_definition_if_poly"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
 transformation "eliminate_epsilon"

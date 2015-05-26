@@ -22,7 +22,7 @@ type prover_answer =
       (** the task timeouts, ie it takes more time than specified *)
   | OutOfMemory
       (** the task runs out of memory *)
-  | StepsLimitExceeded
+  | StepLimitExceeded
       (** the task required more steps than the limit provided *)
   | Unknown of string
       (** The prover can't determine if the task is valid *)
@@ -63,21 +63,21 @@ val debug : Debug.flag
 type timeregexp
 (** The type of precompiled regular expressions for time parsing *)
 
-type stepsregexp
+type stepregexp
 (** The type of precompiled regular expressions for parsing of steps *)
 
 val timeregexp : string -> timeregexp
 (** Converts a regular expression with special markers '%h','%m',
     '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
-val stepsregexp : string -> int -> stepsregexp
-(** stepsregexp s n creates a regular expression for matching number of steps.
-s is regular expression, n is a group number with steps information *)
+val stepregexp : string -> int -> stepregexp
+(** [stepregexp s n] creates a regular expression to match the number of steps.
+    [s] is a regular expression, [n] is the group number with steps number. *)
 
 type prover_result_parser = {
   prp_regexps     : (Str.regexp * prover_answer) list;
   prp_timeregexps : timeregexp list;
-  prp_stepsregexp : stepsregexp list;
+  prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
   (* The parser for a model returned by the solver. *)
   prp_model_parser : Model_parser.model_parser;
@@ -96,7 +96,7 @@ val call_on_file :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
-  ?stepslimit : int ->
+  ?steplimit  : int ->
   res_parser  : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
   ?cleanup    : bool ->
@@ -108,7 +108,7 @@ val call_on_buffer :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
-  ?stepslimit : int ->
+  ?steplimit  : int ->
   res_parser  : prover_result_parser ->
   filename    : string ->
   printer_mapping : Printer.printer_mapping ->
@@ -117,7 +117,8 @@ val call_on_buffer :
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
     @param timelimit : set the available time limit (def. 0 : unlimited)
-    @param memlimit : set the available time limit (def. 0 : unlimited)
+    @param memlimit : set the available memory limit (def. 0 : unlimited)
+    @param steplimit : set the available step limit (def. -1 : unlimited)
 
     @param regexps : if the first field matches the prover output,
     the second field is the answer. Regexp groups present in

@@ -1,13 +1,11 @@
 
 (** Random Access Lists.
+    (Okasaki, "Purely Functional Data Structures", 10.1.2.)
 
     The code below uses polymorphic recursion (both in the logic
     and in the programs).
 
-    BUGS:
-    - induction_ty_lex has no effect on a goal involving polymorphic recursion
-    - a lemma function is not allowed to perform polymorphic recursion?
-
+    Author: Jean-Christophe Filliâtre (CNRS)
  *)
 
 module RandomAccessList
@@ -24,13 +22,13 @@ module RandomAccessList
   | Zero    (ral ('a, 'a))
   | One  'a (ral ('a, 'a))
 
-  function flatten (l: list ('a , 'a)) : list 'a
+  function flatten (l: list ('a, 'a)) : list 'a
   = match l with
     | Nil -> Nil
     | Cons (x, y) l1 -> Cons x (Cons y (flatten l1))
     end
 
-  let rec lemma length_flatten (l:list ('a,'a))
+  let rec lemma length_flatten (l:list ('a, 'a))
     ensures { length (flatten l) = 2 * length l }
     variant { l }
   = match l with

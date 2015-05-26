@@ -1,0 +1,321 @@
+
+(** Schorr-Waite algorithm
+
+    The Schorr-Waite algorithm is the first mountain that any
+    formalism for pointer aliasing should climb.
+                                      -- Richard Bornat, 2000
+
+  Author: Mário Pereira (UBI, then Université Paris Sud)
+
+  The code, specification, and invariants below follow those of
+  the following two proofs:
+
+  - Thierry Hubert and Claude Marché, using Caduceus and Coq
+
+    A case study of C source code verification: the Schorr-Waite algorithm.
+    SEFM 2005. http://www.lri.fr/~marche/hubert05sefm.ps
+
+  - Rustan Leino, using Dafny
+
+    Dafny: An Automatic Program Verifier for Functional Correctness.
+    LPAR-16.
+    http://research.microsoft.com/en-us/um/people/leino/papers/krml203.pdf
+*)
+
+module SchorrWaite
+
+  use import seq.Seq
+  use import map.Map
+  use import ref.Ref
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import set.Fset as S
+
+  (** Why3 has no support for arbitrary pointers,
+      so we introduce a small component-as-array memory model *)
+
+  (** the type of pointers and the null pointer *)
+  type loc
+  constant null: loc
+
+  (** each (non-null) location holds four fields: two Boolean marks m and c
+      and two pointers left and right *)
+  val m: ref (map loc bool)
+  val c: ref (map loc bool)
+  val left: ref (map loc loc)
+  val right: ref (map loc loc)
+
+  val get_left (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = !left[p] }
+
+  val set_left (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { left }
+    ensures  { !left = set (old !left) p v }
+
+  val get_right (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = !right[p] }
+
+  val set_right (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { right }
+    ensures  { !right = set (old !right) p v }
+
+  val get_m (p: loc) : bool
+    requires { p <> null }
+    ensures  { result = !m[p] }
+
+  val set_m (p: loc) (v: bool) : unit
+    requires { p <> null }
+    writes   { m }
+    ensures  { !m = set (old !m) p v }
+
+  val get_c (p: loc) : bool
+    requires { p <> null }
+    ensures  { result = !c[p] }
+
+  val set_c (p: loc) (v: bool) : unit
+    requires { p <> null }
+    writes   { c }
+    ensures  { !c = set (old !c) p v }
+
+  (** for the purpose of the proof, we add a fifth, ghost, field,
+      which records the path from the root (when relevant) *)
+  val ghost path_from_root : ref (map loc (list loc))
+
+  val get_path_from_root (p : loc) : list loc
+    ensures  { result = !path_from_root[p] }
+
+  val set_path_from_root (p: loc) (l : list loc) : unit
+    requires { p <> null }
+    writes   { path_from_root }
+    ensures  { !path_from_root = set (old !path_from_root) p l }
+
+  (** Stack of nodes, from the root to the current location, in
+      reverse order (i.e. the current location is the first element
+      in the stack) *)
+
+  type stacknodes = Seq.seq loc
+
+  predicate not_in_stack (n: loc) (s: stacknodes) =
+    forall i: int. 0 <= i < Seq.length s -> n <> Seq.get s i
+
+  let tl_stackNodes (stack: stacknodes) : stacknodes
+    requires { Seq.length stack > 0 }
+    ensures  { result = stack[1 .. ] }
+    ensures  { forall n. not_in_stack n stack -> not_in_stack n result }
+  =
+    stack[1 .. ]
+
+  (** two lemmas about stacks *)
+
+  let lemma cons_not_in (s: stacknodes) (n t: loc)
+    requires { not_in_stack n (cons t s) }
+    ensures  { not_in_stack n s }
+  =
+    assert { forall i: int. 0 <= i < Seq.length s ->
+             Seq.get s i = Seq.get (cons t s) (i+1) }
+
+  let lemma tl_cons (s1 s2: stacknodes) (p: loc)
+    requires { Seq.length s2 > 0 }
+    requires { s1 = s2[1 ..] }
+    requires { p = Seq.get s2 0 }
+    ensures  { s2 = cons p s1 }
+  = assert { Seq.(==) s2 (cons p s1) }
+
+  function last (s: stacknodes) : loc =
+    Seq.get s (Seq.length s - 1)
+
+  predicate distinct (s: stacknodes) =
+    forall i j. 0 <= i < Seq.length s -> 0 <= j < Seq.length s -> i <> j ->
+    Seq.get s i <> Seq.get s j
+
+  (** Paths *)
+
+  predicate edge (x y : loc) (left right : map loc loc) =
+    x <> null /\ (left[x] = y \/ right[x] = y)
+
+  inductive path (left right : map loc loc) (x y : loc) (p : list loc) =
+  | path_nil   : forall x : loc, l r : map loc loc. path l r x x Nil
+  | path_cons  : forall x y z : loc,
+                 l r : (map loc loc),
+                 p : list loc.
+                 edge x z l r -> path l r z y p ->
+                 path l r x y (Cons x p)
+
+  let rec lemma trans_path (x y z : loc) (l r : map loc loc) (p1 p2 : list loc)
+    variant  { length p1 }
+    requires { path l r x y p1 }
+    requires { path l r y z p2 }
+    ensures  { path l r x z (p1 ++ p2) }
+  = match p1 with
+    | Cons _ (Cons b _ as p') -> trans_path b y z l r p' p2
+    | _                       -> ()
+    end
+
+  lemma path_edge : forall x y : loc, left right : map loc loc.
+    edge x y left right -> path left right x y (Cons x Nil)
+
+  lemma path_edge_cons:
+    forall n x y : loc, left right : map loc loc, pth : list loc.
+    path left right n x pth -> edge x y left right ->
+    path left right n y (pth ++ (Cons x Nil))
+
+  predicate reachable (left right: map loc loc) (x y : loc) =
+    exists p : list loc. path left right x y p
+
+  (** Schorr-Waite algorithm *)
+
+  let schorr_waite (root: loc) (ghost graph : set loc) : unit
+    requires { root <> null /\ S.mem root graph }
+    (* graph is closed under left and right *)
+    requires { forall n : loc. S.mem n graph ->
+               n <> null /\
+               S.mem !left[n] graph /\
+               S.mem !right[n] graph }
+    (* graph starts with nothing marked *)
+    requires { forall x : loc. S.mem x graph -> not !m[x] }
+    (* the structure of the graph is not changed *)
+    ensures  { forall n : loc. S.mem n graph ->
+               (old !left)[n] = !left[n] /\
+               (old !right)[n] = !right[n] }
+    (* all the non-null vertices reachable from root
+       are marked at the end of the algorithm, and only these *)
+    ensures  { forall n : loc. S.mem n graph -> !m[n] ->
+               reachable (old !left) (old !right) root n }
+    ensures  { !m[root] }
+    ensures  { forall n : loc. S.mem n graph -> !m[n] ->
+          (forall ch : loc. edge n ch !left !right -> ch <> null -> !m[ch]) }
+  = 'Init:
+    let t = ref root in
+    let p = ref null in
+    let ghost stackNodes = ref Seq.empty in
+    let ghost pth = ref Nil in
+    ghost set_path_from_root !t !pth;
+    let ghost unmarked_nodes = ref graph in
+    let ghost c_false_nodes = ref graph in
+    while !p <> null || (!t <> null && not get_m !t) do
+      invariant { forall n. mem n graph -> not_in_stack n !stackNodes \/
+                  exists i : int. Seq.get !stackNodes i = n }
+      invariant { not_in_stack null !stackNodes }
+      invariant { Seq.length !stackNodes = 0 <-> !p = null }
+      invariant { S.mem !t graph }
+      invariant { !p <> null -> S.mem !p graph }
+      invariant { Seq.length !stackNodes <> 0 -> Seq.get !stackNodes 0 = !p }
+      invariant { forall n : loc. S.mem n graph -> not !m[n] ->
+                  S.mem n !unmarked_nodes }
+      invariant { forall n : loc. S.mem n graph -> not !c[n] ->
+                  S.mem n !c_false_nodes }
+      invariant { forall i. 0 <= i < Seq.length !stackNodes ->
+                  S.mem (Seq.get !stackNodes i) graph }
+      invariant { forall i.  0 <= i < Seq.length !stackNodes - 1 ->
+                  let p1 = Seq.get !stackNodes i in
+                  let p2 = Seq.get !stackNodes (i+1) in
+                  (!c[p2] -> (at !left 'Init)[p2] = !left[p2] /\
+                             (at !right 'Init)[p2] = p1) /\
+                  (not !c[p2] -> (at !left 'Init)[p2] = p1 /\
+                                 (at !right 'Init)[p2] = !right[p2]) }
+      invariant { !path_from_root[root] = Nil }
+      invariant { forall n : loc. S.mem n graph ->
+                  not_in_stack n !stackNodes ->
+                  !left[n] = (at !left 'Init)[n] /\
+                  !right[n] = (at !right 'Init)[n] }
+      (* something like Leino's line 74; this is useful to prove that
+       * the stack is empty iff p = null *)
+      invariant { Seq.length !stackNodes <> 0 ->
+                  let first = last !stackNodes in
+                  if !c[first] then !right[first] = null
+                  else !left[first] = null }
+      invariant { Seq.length !stackNodes <> 0 -> last !stackNodes = root }
+      (* something like lines 75-76 from Leino's paper *)
+      invariant { forall k : int. 0 <= k < Seq.length !stackNodes - 1 ->
+               if !c[Seq.get !stackNodes k]
+               then !right[Seq.get !stackNodes k] = Seq.get !stackNodes (k+1)
+               else !left [Seq.get !stackNodes k] = Seq.get !stackNodes (k+1) }
+      (* all nodes in the stack are marked
+       * (I4a in Hubert and Marché and something alike line 57 in Leino) *)
+      invariant { forall i. 0 <= i < Seq.length !stackNodes ->
+                  !m[Seq.get !stackNodes i] }
+      (* stack has no duplicates ---> line 55 from Leino's paper *)
+      invariant { distinct !stackNodes }
+      (* something like Leino's line 68 *)
+      invariant { forall i. 0 <= i < Seq.length !stackNodes ->
+                  let n = Seq.get !stackNodes i in
+                  if !c[n] then !left[n] = (at !left 'Init)[n]
+                  else !right[n] = (at !right 'Init)[n] }
+      (* lines 80-81 from Leino's paper *)
+      invariant { Seq.length !stackNodes <> 0 ->
+                  if !c[!p] then (at !right 'Init)[!p] = !t
+                  else (at !left 'Init)[!p] = !t }
+      (* lines 78-79 from Leino's paper *)
+      invariant { forall k : int. 0 < k < Seq.length !stackNodes ->
+                  let n = Seq.get !stackNodes k in
+                  if !c[n]
+                  then Seq.get !stackNodes (k - 1) = (at !right 'Init)[n]
+                  else Seq.get !stackNodes (k - 1) = (at !left  'Init)[n] }
+      (* line 70 from Leino's paper *)
+      invariant { !p <> null ->
+                  path (at !left 'Init) (at !right 'Init) root !p  !pth }
+      (* line 72 from Leino's paper *)
+      invariant { forall n : loc. S.mem n graph -> !m[n] ->
+                  reachable (at !left 'Init) (at !right 'Init) root n }
+      invariant { !p = null -> !t = root }
+      (* line 70 from Leino's paper *)
+      invariant { forall n : loc, pth : list loc.
+                  S.mem n graph -> !m[n] ->
+                  pth = !path_from_root[n] ->
+                  path (at !left 'Init) (at !right 'Init) root n pth }
+      (* lines 61-62 from Leinos' paper *)
+      invariant { forall n : loc. S.mem n graph -> n <> null -> !m[n] ->
+                  not_in_stack n !stackNodes ->
+                  (!left[n] <> null -> !m[!left[n]]) /\
+                  (!right[n] <> null -> !m[!right[n]]) }
+      (* something like Leino's lines 57-59 *)
+      invariant { forall i. 0 <= i < Seq.length !stackNodes ->
+                  let n = Seq.get !stackNodes i in
+                  !c[n] ->
+                  (!left[n] <> null -> !m[!left[n]]) /\
+                  (!right[n] <> null -> !m[!right[n]]) }
+      (* termination proved using lexicographic order over a triple *)
+      variant   { S.cardinal !unmarked_nodes,
+                  S.cardinal !c_false_nodes,
+                  Seq.length !stackNodes }
+      if !t = null || get_m !t then begin
+        if get_c !p then begin (* pop *)
+          let q = !t in
+          t := !p;
+          ghost stackNodes := tl_stackNodes !stackNodes;
+           p := !right[!p];
+           set_right !t q;
+          ghost pth := get_path_from_root !p;
+        end else begin (* swing *)
+          let q = !t in
+          t := get_right !p;
+          set_right !p (get_left !p);
+          set_left !p q;
+          ghost c_false_nodes := S.remove !p !c_false_nodes;
+          set_c !p true;
+        end
+      end else begin (* push *)
+        let q = !p in
+        p := !t;
+        ghost stackNodes := Seq.cons !p !stackNodes;
+        t := get_left !t;
+        set_left !p q;
+        set_m !p true;
+        ghost if !p <> root then pth := !pth ++ (Cons q Nil) else pth := Nil;
+        ghost set_path_from_root !p !pth;
+        assert { !p = Seq.get !stackNodes 0 };
+        assert { path (at !left 'Init) (at !right 'Init) root !p !pth };
+        set_c !p false;
+        ghost c_false_nodes := S.add !p !c_false_nodes;
+        ghost unmarked_nodes := S.remove !p !unmarked_nodes
+      end
+    done
+
+
+end

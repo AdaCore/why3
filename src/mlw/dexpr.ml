@@ -223,7 +223,7 @@ let rec print_dity pri fmt = function
         (print_dity 1) t1 (print_dity 0) t2
   | Dpur (s,tl) when is_ts_tuple s.its_ts ->
       Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity 0)) tl
-  | Dpur (s,tl) when s.its_mutable || s.its_regions <> [] ->
+  | Dpur (s,tl) when its_impure s ->
       Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
         Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
   | Dpur (s,tl) ->

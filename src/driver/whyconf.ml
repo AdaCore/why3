@@ -209,11 +209,13 @@ let cntexample m = m.cntexample
 
 exception StepsCommandNotSpecified of string
 
-let get_complete_command pc stepslimit =
-  let comm = if stepslimit < 0 then pc.command
+let get_complete_command pc steplimit =
+  let comm = if steplimit < 0 then pc.command
     else
       match pc.command_steps with
-      | None -> raise (StepsCommandNotSpecified "The solver is used with step limit and the command for running the solver with steplimit is not specified.")
+      | None -> raise (StepsCommandNotSpecified
+          "The solver is used with a step limit and the command for \
+            running the solver with a step limit is not specified.")
       | Some command_steps -> command_steps in
   String.concat " " (comm :: pc.extra_options)
 
@@ -815,7 +817,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
-      Format.fprintf fmt "outdated config file; rerun why3config"
+      Format.fprintf fmt "outdated config file; rerun 'why3 config'"
   | NonUniqueId ->
     Format.fprintf fmt "InternalError : two provers share the same id"
   | ProverNotFound (config,fp) ->

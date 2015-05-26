@@ -32,18 +32,9 @@ timeout "interrupted by timeout"
 (** Extra theories supported by CVC4 *)
 
 (* Disabled:
-   CVC4 division seems to be neither the Euclidean one, nor the Computer one
-
+   CVC4 seems less efficient with its built-in implementation than
+   with the axiomatic version
 theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
-end
-
-theory int.ComputerDivision
    syntax function div "(div %1 %2)"
    syntax function mod "(mod %1 %2)"
    remove prop Mod_bound

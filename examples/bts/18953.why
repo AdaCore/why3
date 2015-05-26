@@ -1,0 +1,17 @@
+
+
+theory T
+
+  use import int.Int
+
+  constant x:int
+
+  goal g1 : (=) x 42
+  goal g2 : (<) x 42
+  goal g3 : (>) x 42
+  goal g4 : (<=) x 42
+  goal g5 : (>=) x 42
+(* does not parse
+  goal g6 : (<>) x 42
+*)
+end

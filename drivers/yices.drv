@@ -1,5 +1,155 @@
-import "yices_bare.drv"
+
+(* Why3 driver for Yices (SMT-like syntax) *)
+
+prelude ";;; this is a prelude for Yices "
+
+printer "yices"
+filename "%f-%t-%g.ycs"
+
+valid "\\bunsat\\b"
+unknown "\\bunknown\\b\\|\\bsat\\b" ""
+unknown "feature not supported: non linear problem" "non linear arith"
+time "why3cpulimit time : %s s"
+
+(* À discuter *)
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_epsilon"
+
+transformation "simplify_formula"
+(*transformation "simplify_trivial_quantification"*)
+
+transformation "discriminate"
+transformation "encoding_smt"
+
 import "discrimination.gen"
+
+theory BuiltIn
+  syntax type int   "int"
+  syntax type real  "real"
+  syntax predicate (=)  "(= %1 %2)"
+
+  meta "encoding : kept" type int
+
+  (* could we do this? *)
+  (* meta "eliminate_algebraic" "keep_enums" *)
+end
+
+theory int.Int
+
+  prelude ";;; this is a prelude for Yices integer arithmetic"
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- 0 %1)"
+
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+end
+
+
+theory real.Real
+
+  prelude ";;; this is a prelude for Yices real arithmetic"
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  (* Yices division doesn't accept anything else than constant on
+  denominator so we don't use it (except for constant cf printer) *)
+  (* syntax function (/)  "(/ %1 %2)" *)
+  syntax function (-_) "(- 0 %1)"
+  (* syntax function inv  "(/ 1 %1)" *)
+
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+  meta "encoding : kept" type real
+
+end
+
+theory Bool
+   syntax type     bool  "bool"
+   syntax function True  "true"
+   syntax function False "false"
+   meta "encoding : kept" type bool
+end
+theory bool.Bool
+   syntax function andb  "(and %1 %2)"
+   syntax function orb   "(or %1 %2)"
+   syntax function notb  "(not %1)"
+end
+
+
+theory map.Map
+  syntax type map "(-> %1 %2)"
+  meta "encoding : lskept" function get
+  meta "encoding : lskept" function set
+
+  syntax function get    "(%1 %2)"
+  syntax function ([])   "(%1 %2)"
+  syntax function set    "(update %1 (%2) %3)"
+  syntax function ([<-]) "(update %1 (%2) %3)"
+
+
+  meta "encoding : lskept" function const
+
+end
 
 (*
 Local Variables:
@@ -7,4 +157,3 @@ mode: why
 compile-command: "unset LANG; make -C .. bench"
 End:
 *)
-

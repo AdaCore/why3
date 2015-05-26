@@ -138,8 +138,8 @@ let print_results fmt provers proofs =
 		| Call_provers.OutOfMemory ->
                   fprintf fmt "FF8000\">Out Of Memory (%dM)"
                     pr.S.proof_memlimit
-		| Call_provers.StepsLimitExceeded ->
-                  fprintf fmt "FF8000\">Steps limit exceeded"
+		| Call_provers.StepLimitExceeded ->
+                  fprintf fmt "FF8000\">Step limit exceeded"
 		| Call_provers.Unknown _ ->
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
 		| Call_provers.Failure _ ->

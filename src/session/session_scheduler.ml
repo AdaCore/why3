@@ -209,13 +209,13 @@ let idle_handler t =
     if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
       begin
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(timelimit,memlimit,stepslimit,old,inplace,command,driver,
-                               callback,goal) ->
+        | Action_proof_attempt(timelimit,memlimit,steplimit,
+              old,inplace,command,driver,callback,goal) ->
             begin
               try
                 let pre_call =
-                  Driver.prove_task
-                    ?old ~inplace ~command ~timelimit ~stepslimit ~memlimit driver goal
+                  Driver.prove_task ?old ~inplace ~command
+                    ~timelimit ~steplimit ~memlimit driver goal
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
@@ -257,8 +257,8 @@ let cancel_scheduled_proofs t =
   try
     while true do
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(_timelimit,_memlimit,_stepslimit,_old,_inplace,_command,
-                               _driver,callback,_goal) ->
+        | Action_proof_attempt(_timelimit,_memlimit,_steplimit,
+              _old,_inplace,_command,_driver,callback,_goal) ->
             callback Interrupted
         | Action_delayed _ as a->
             Queue.push a new_queue
@@ -275,15 +275,15 @@ let cancel_scheduled_proofs t =
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
-let schedule_proof_attempt ~timelimit ~memlimit ~stepslimit ?old ~inplace
+let schedule_proof_attempt ~timelimit ~memlimit ~steplimit ?old ~inplace
     ~command ~driver ~callback t goal =
   Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   callback Scheduled;
   Queue.push
-    (Action_proof_attempt(timelimit,memlimit,stepslimit,old,inplace,command,driver,
-                        callback,goal))
+    (Action_proof_attempt(timelimit,memlimit,steplimit,
+      old,inplace,command,driver,callback,goal))
     t.actions_queue;
   run_idle_handler t
 
@@ -293,7 +293,7 @@ let schedule_edition t command filename callback =
     { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown "")];
       Call_provers.prp_regexps = [];
       Call_provers.prp_timeregexps = [];
-      Call_provers.prp_stepsregexp = [];
+      Call_provers.prp_stepregexps = [];
       Call_provers.prp_model_parser = fun _ _ -> [] 
     } in
   let precall =
@@ -416,7 +416,7 @@ let adapt_limits a =
       match r with
       | Call_provers.OutOfMemory -> increased_time, a.proof_memlimit
       | Call_provers.Timeout -> a.proof_timelimit, increased_mem
-      | Call_provers.StepsLimitExceeded
+      | Call_provers.StepLimitExceeded
       | Call_provers.Valid
       | Call_provers.Unknown _
       | Call_provers.Invalid -> increased_time, increased_mem
@@ -466,7 +466,7 @@ let run_external_proof_v3 ?(cntexample = false) eS eT a callback =
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
-      let stepslimit =
+      let steplimit =
 	match a with
 	| { proof_state =
             Done { Call_provers.pr_answer = Call_provers.Valid;
@@ -475,10 +475,10 @@ let run_external_proof_v3 ?(cntexample = false) eS eT a callback =
 	| _ -> -1
       in
       let inplace = npc.prover_config.Whyconf.in_place in
-      let command = Whyconf.get_complete_command npc.prover_config stepslimit in
+      let command = Whyconf.get_complete_command npc.prover_config steplimit in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
-        callback a ap (timelimit,memlimit,stepslimit)
+        callback a ap (timelimit,memlimit,steplimit)
           (match previous_result with Done res -> Some res | _ -> None)
           (StatusChange result) in
       try
@@ -489,7 +489,7 @@ let run_external_proof_v3 ?(cntexample = false) eS eT a callback =
             if Sys.file_exists f then Some f
             else raise (NoFile f) in
         schedule_proof_attempt
-          ~timelimit ~memlimit ~stepslimit
+          ~timelimit ~memlimit ~steplimit
           ?old ~inplace ~command
           ~driver:npc.prover_driver
           ~callback:cb

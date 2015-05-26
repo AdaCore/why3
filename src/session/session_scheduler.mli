@@ -279,7 +279,7 @@ module Make(O: OBSERVER) : sig
         new one (does not change the session state). When finished,
         calls the callback with the reports which are 4-uples [(goal
         name, prover, limits, report)] where [limits] is a triple
-        [(timelimit, memlimit, stepslimit)] *)
+        [(timelimit, memlimit, steplimit)] *)
 
   val play_all :
     O.key env_session -> t -> callback:(unit-> unit) ->
@@ -293,7 +293,7 @@ module Make(O: OBSERVER) : sig
   val schedule_proof_attempt:
     timelimit:int ->
     memlimit:int ->
-    stepslimit:int ->
+    steplimit:int ->
     ?old:string ->
     inplace:bool ->
     command:string ->

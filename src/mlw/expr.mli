@@ -58,7 +58,7 @@ val create_rsymbol : preid -> ?ghost:bool -> ?kind:rs_kind -> cty -> rsymbol
 val create_constructor :
   constr:int -> preid -> itysymbol -> pvsymbol list -> rsymbol
 
-val create_field : preid -> itysymbol -> pvsymbol -> rsymbol
+val create_projection : preid -> itysymbol -> pvsymbol -> rsymbol
 
 val restore_rs : lsymbol -> rsymbol
 (** raises [Not_found] if the argument is not a [rs_logic] *)
