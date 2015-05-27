@@ -280,7 +280,7 @@ let set_main rc main =
   let section =
     set_int section "running_provers_max" main.running_provers_max in
   let section = set_stringl section "plugin" main.plugins in
-  let section = set_bool section "cntexample" main.cntexample in
+  let section = set_bool section "get-ce" main.cntexample in
   set_section rc "main" section
 
 exception NonUniqueId
@@ -514,7 +514,7 @@ let load_main dirname section =
     running_provers_max = get_int ~default:default_main.running_provers_max
       section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
-    cntexample = get_bool ~default:default_main.cntexample section "cntexample"
+    cntexample = get_bool ~default:default_main.cntexample section "get-ce"
   }
 
 let read_config_rc conf_file =

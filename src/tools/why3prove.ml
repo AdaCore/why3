@@ -144,7 +144,7 @@ let option_list = [
     "parse_only" "--parse-only" " stop after parsing";
   Debug.Args.desc_shortcut
     "type_only" "--type-only" " stop after type checking";
-  "--get-counterexample", Arg.Set opt_cntexmp,
+  "--get-ce", Arg.Set opt_cntexmp,
       " gets the counter-example model" ]
 
 let config, _, env =
