@@ -735,7 +735,8 @@ let rec effect_of_term t =
         | Some _ -> assert false
         | None -> ity in
       begin try match ity.ity_node, restore_rs fs with
-        | Ityreg _, ({rs_field = Some _} as rs) -> v, ity, Some rs
+        | Ityreg {reg_its = ts}, ({rs_field = Some f} as rs)
+          when List.exists (pv_equal f) ts.its_mfields -> v, ity, Some rs
         | _, {rs_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
             v, ity_full_inst (ity_match frz arg.pv_ity ity) res, None
         | _ -> quit () with Not_found -> quit () end
