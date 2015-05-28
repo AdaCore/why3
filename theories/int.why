@@ -334,6 +334,44 @@ theory NumOf
 
 end
 
+(** {2 Sum} *)
+
+theory Sum
+
+  use import Int
+  use HighOrd
+
+  function sum (a b: int) (f: int -> int) : int
+  (** sum of [f n] for [a <= n <= b] *)
+
+  axiom sum_def1:
+    forall f: int -> int, a b: int.
+    b < a -> sum a b f = 0
+
+  axiom sum_def2:
+    forall f: int -> int, a b: int.
+    a <= b -> sum a b f = sum a (b - 1) f + f b
+
+  lemma sum_left:
+    forall f: int -> int, a b: int.
+    a <= b -> sum a b f = f a + sum (a + 1) b f
+
+  lemma sum_ext:
+    forall f g: int -> int, a b: int.
+    (forall i. a <= i <= b -> f i = g i) ->
+    sum a b f = sum a b g
+
+  lemma sum_nonneg:
+    forall f: int -> int, a b: int.
+    (forall i. a <= i <= b -> 0 <= f i) ->
+    0 <= sum a b f
+
+  lemma sum_decomp:
+    forall f: int -> int, a b c: int. a <= b <= c ->
+    sum a c f = sum a b f + sum (b+1) c f
+
+end
+
 (** {2 Factorial function} *)
 
 theory Fact
