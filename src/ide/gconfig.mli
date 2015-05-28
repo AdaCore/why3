@@ -27,6 +27,7 @@ type t =
       mutable max_boxes : int;
       mutable saving_policy : int;
       mutable premise_color : string;
+      mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
       mutable iconset : string;
@@ -88,14 +89,14 @@ val image_valid : GdkPixbuf.pixbuf ref
 val image_invalid : GdkPixbuf.pixbuf ref
 val image_timeout : GdkPixbuf.pixbuf ref
 val image_outofmemory : GdkPixbuf.pixbuf ref
-val image_stepslimitexceeded : GdkPixbuf.pixbuf ref
+val image_steplimitexceeded : GdkPixbuf.pixbuf ref
 val image_unknown : GdkPixbuf.pixbuf ref
 val image_failure : GdkPixbuf.pixbuf ref
 val image_valid_obs : GdkPixbuf.pixbuf ref
 val image_invalid_obs : GdkPixbuf.pixbuf ref
 val image_timeout_obs : GdkPixbuf.pixbuf ref
 val image_outofmemory_obs : GdkPixbuf.pixbuf ref
-val image_stepslimitexceeded_obs : GdkPixbuf.pixbuf ref
+val image_steplimitexceeded_obs : GdkPixbuf.pixbuf ref
 val image_unknown_obs : GdkPixbuf.pixbuf ref
 val image_failure_obs : GdkPixbuf.pixbuf ref
 

@@ -24,7 +24,7 @@
 %token <string> INPUT (* never reaches the parser *)
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER
 %token VALID INVALID UNKNOWN FAIL
-%token TIMEOUT OUTOFMEMORY STEPSLIMITEXCEEDED TIME STEPS
+%token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
 %token BLACKLIST
 %token MODULE EXCEPTION VAL CONVERTER
@@ -57,7 +57,7 @@ global:
 | INVALID STRING { RegexpInvalid $2 }
 | TIMEOUT STRING { RegexpTimeout $2 }
 | OUTOFMEMORY STRING { RegexpOutOfMemory $2 }
-| STEPSLIMITEXCEEDED STRING { RegexpStepsLimitExceeded $2 }
+| STEPLIMITEXCEEDED STRING { RegexpStepLimitExceeded $2 }
 | TIME STRING  { TimeRegexp $2 }
 | STEPS STRING INTEGER { StepRegexp ($2, $3) }
 | UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
@@ -65,7 +65,7 @@ global:
 | VALID INTEGER { ExitCodeValid $2 }
 | INVALID INTEGER { ExitCodeInvalid $2 }
 | TIMEOUT INTEGER { ExitCodeTimeout $2 }
-| STEPSLIMITEXCEEDED INTEGER { ExitCodeStepsLimitExceeded $2 }
+| STEPLIMITEXCEEDED INTEGER { ExitCodeStepLimitExceeded $2 }
 | UNKNOWN INTEGER STRING { ExitCodeUnknown ($2, $3) }
 | FAIL INTEGER STRING { ExitCodeFailure ($2, $3) }
 | FILENAME STRING { Filename $2 }

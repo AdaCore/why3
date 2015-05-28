@@ -17,16 +17,16 @@ open Term
 
 type itysymbol = private {
   its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
-  its_private : bool;           (** is a private/abstract type *)
-  its_mutable : bool;           (** is a record with mutable fields *)
-  its_mfields : pvsymbol list;  (** mutable fields of a mutable type *)
-  its_ifields : pvsymbol list;  (** immutable fields of a mutable type *)
+  its_privmut : bool;           (** private mutable record type *)
+  its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** mutable shareable components *)
-  its_reg_vis : bool list;      (** non-ghost shareable components *)
-  its_arg_vis : bool list;      (** non-ghost type parameters *)
-  its_arg_upd : bool list;      (** updatable type parameters *)
+  its_arg_imm : bool list;      (** non-updatable type parameters *)
   its_arg_exp : bool list;      (** exposed type parameters *)
-  its_def     : ity option;     (** is a type alias *)
+  its_arg_vis : bool list;      (** non-ghost type parameters *)
+  its_arg_frz : bool list;      (** irreplaceable type parameters *)
+  its_reg_vis : bool list;      (** non-ghost shareable components *)
+  its_reg_frz : bool list;      (** irreplaceable shareable components *)
+  its_def     : ity option;     (** type alias *)
 }
 
 and ity = private {
@@ -93,17 +93,39 @@ val ity_hash : ity -> int
 val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
+exception ImpurePrivateField of ity
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
 (** creation of a symbol for type in programs *)
-val create_itysymbol :
-  preid -> (tvsymbol * bool * bool * bool) list ->
-    bool -> bool -> (region * bool) list ->
-    bool Mpv.t -> ity option -> itysymbol
+
+val create_itysymbol_pure : preid -> tvsymbol list -> itysymbol
+(** [create_itysymbol_pure id args] creates a new type symbol with
+    immutable type arguments and with no mutable fields or subregions.
+    This function should be used for all immutable non-updatable types:
+    abstract types, private immutable records, immutable records with
+    invariant, and recursive algebraic types. *)
+
+val create_itysymbol_alias : preid -> tvsymbol list -> ity -> itysymbol
+(** [create_itysymbol_alias id args def] creates a new type alias. *)
+
+val create_itysymbol_rich :
+  preid -> tvsymbol list -> bool -> Spv.t -> Spv.t -> itysymbol
+(** [create_itysymbol_rich id args privmut mfields ifields] creates
+    a new type symbol. Every mutable and immutable field is represented
+    by a [pvsymbol] of the corresponding ghost status in the [mfields]
+    or [ifields] set, respectively. The variables from [mfields] are
+    stored in the created type symbol and used in effects. If [privmut]
+    is [true], then all types in [mfields] and [ifields] must be pure. *)
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
+
+val its_mutable : itysymbol -> bool
+(** [its_mutable s] checks if [s] is a mutable record or an alias for one *)
+
+val its_impure : itysymbol -> bool
+(** [its_impure s] checks if [s] is mutable or has mutable components *)
 
 (** {2 Type constructors} *)
 
@@ -173,7 +195,6 @@ val ity_r_stale  : region -> Sreg.t -> ity -> bool
 val reg_r_stale  : region -> Sreg.t -> region -> bool
 
 val ity_closed    : ity -> bool
-val ity_immutable : ity -> bool
 
 (* detect non-ghost type variables and regions *)
 
@@ -261,7 +282,6 @@ exception AssignPrivate of region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
-exception WriteImmutable of region * pvsymbol
 exception GhostDivergence
 
 type effect = private {

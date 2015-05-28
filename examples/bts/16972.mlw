@@ -1,0 +1,18 @@
+
+module M
+
+  use import HighOrd
+
+  type t = A | B
+  type s = { field1 : t -> t ; field2 : t -> t }
+
+  function const (x:'b) : 'a -> 'b = \_:'a.x
+
+  predicate p (u:s) (a b:t) = u.field1 = const a /\ u.field2 = const b
+
+  let fail (u:s) : unit
+    requires { p u A A }
+    ensures { u.field1 = u.field2 }
+  = ()
+
+end

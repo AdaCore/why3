@@ -1,0 +1,15 @@
+
+module Swap
+
+  use import int.Int
+  use import ref.Ref
+
+  let swap (a b: ref int) : unit
+    writes  { a, b }
+    ensures { !a = old !b /\ !b = old !a }
+  =
+    a := !a + !b;
+    b := !a - !b;
+    a := !a - !b
+
+end

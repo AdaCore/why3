@@ -676,7 +676,10 @@ and wp_desc env e q xq = match e.e_node with
       let q = create_unit_post w in
       wp_label e (wp_expr env e1 q xq)
   | Erec (fdl, e1) ->
-      let fr = wp_rec_defn env fdl in
+      let eff = match e1.e_vty with
+        | VTarrow _ -> None
+        | VTvalue _ -> Some e1.e_effect in
+      let fr = wp_rec_defn ?eff env fdl in
       let fe = wp_expr env e1 q xq in
       let fr = wp_ands ~sym:true fr in
       wp_label e (wp_and ~sym:true fr fe)
@@ -896,7 +899,7 @@ and wp_fun_regs ps l = (* regions to refresh at the top of function WP *)
   let sbs = List.fold_left add_arg ps.ps_subst l.l_args in
   Mreg.map (fun _ -> ()) sbs.ity_subst_reg
 
-and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
+and wp_fun_defn ?eff env { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () and c = l.l_spec in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env =
@@ -910,9 +913,18 @@ and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv c.c_xpost) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
-  wp_forall args (quantify "init" env (wp_fun_regs ps l) f)
+  let keep_reg eff r =
+    Sreg.mem r eff.eff_writes || Sreg.mem r eff.eff_ghostw ||
+    (* the test below is probably useless, since the surface language does
+       not allow a function argument to be aliased with the context *)
+    List.exists (fun v -> reg_occurs r v.pv_ity.ity_vars) l.l_args in
+  let regs = wp_fun_regs ps l in
+  let regs = match eff with
+    | None -> regs
+    | Some e -> Sreg.filter (keep_reg e) regs in
+  wp_forall args (quantify "init" env regs f)
 
-and wp_rec_defn env fdl = List.map (wp_fun_defn env) fdl
+and wp_rec_defn ?eff env fdl = List.map (wp_fun_defn ?eff env) fdl
 
 (***
 let bool_to_prop env f =

@@ -63,11 +63,17 @@ let pp_url fmt lp =
     | _ ->
       Format.fprintf fmt "%s.html" fn
 
-let pp_anchor fmt id = match id.id_loc with
+let pp_anchor fmt id =
+  match id.id_loc with
   | None -> raise Not_found
-  | Some loc -> let _, l, _, _ = Loc.get loc in pp_tag fmt id.id_string l
+  | Some loc ->
+    let _, l, _, _ = Loc.get loc in pp_tag fmt id.id_string l
 
 let pp_locate fmt id =
-  let lp, _, _ =
-    try Mlw_module.restore_path id with Not_found -> Theory.restore_path id in
-  Format.fprintf fmt "%a#%a" pp_url lp pp_anchor id
+  match id.id_loc with
+  | None -> raise Not_found
+  | Some _loc ->
+    let lp, _, _ =
+      try Mlw_module.restore_path id with Not_found -> Theory.restore_path id
+    in
+    Format.fprintf fmt "%a#%a" pp_url lp pp_anchor id

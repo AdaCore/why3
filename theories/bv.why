@@ -325,9 +325,7 @@ end
 (** {2 Bit Vectors of common sizes, 8/16/32/64} *)
 
 theory BV64
-
   constant size_int : int = 64
-
   constant max_int : int = 0xFFFF_FFFF_FFFF_FFFF
 
   clone export BV_Gen with
@@ -336,9 +334,7 @@ theory BV64
 end
 
 theory BV32
-
   constant size_int : int = 32
-
   constant max_int : int = 0xFFFF_FFFF
 
   clone export BV_Gen with
@@ -349,6 +345,7 @@ end
 theory BV16
   constant size_int : int = 16
   constant max_int : int = 0xFFFF
+
   clone export BV_Gen with
     constant size_int = size_int,
     constant max_int = max_int
@@ -357,6 +354,7 @@ end
 theory BV8
   constant size_int : int = 8
   constant max_int : int = 0xFF
+
   clone export BV_Gen with
     constant size_int = size_int,
     constant max_int = max_int

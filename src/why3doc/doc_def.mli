@@ -22,6 +22,7 @@ val set_stdlib_url: string -> unit
 val output_file: string -> string
 
 val pp_anchor: Format.formatter -> ident -> unit
+  (* raises [Not_found] if ident has no location *)
 
 val pp_locate: Format.formatter -> ident -> unit
-  (* or raises [Not_found] *)
+  (* raises [Not_found] if ident has no location *)

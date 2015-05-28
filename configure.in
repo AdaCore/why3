@@ -111,7 +111,7 @@ AC_ARG_ENABLE(doc,
     enable_doc=yes)
 
 AC_ARG_ENABLE(html-doc,
-    AS_HELP_STRING([--enable-html-doc], [do not build HTML documentation]),,
+    AS_HELP_STRING([--disable-html-doc], [do not build HTML documentation]),,
     enable_html_doc=yes)
 
 # Experimental Jessie3 Frama-C plugin, disabled by default
@@ -171,8 +171,8 @@ OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
 echo "ocaml version is $OCAMLVERSION"
 
 case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.*|4.00.0)
-        AC_MSG_ERROR(You need Objective Caml 4.00.1 or higher);;
+  0.*|1.*|2.*|3.*|4.00.*)
+        AC_MSG_ERROR(You need Objective Caml 4.01.0 or higher);;
 esac
 
 # Ocaml library path

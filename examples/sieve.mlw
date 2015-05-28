@@ -1,0 +1,65 @@
+
+(** Sieve of Eratosthenes
+
+    Author: Martin Clochard
+
+    See also knuth_prime_numbers.mlw in the gallery.
+*)
+
+
+module Sieve
+
+  use import int.Int
+  use import array.Array
+  use import ref.Ref
+  use import number.Prime
+
+  predicate no_factor_lt (bnd num:int) =
+    num > 1 /\ forall k l. 1 < l < bnd /\ k > 1 -> num <> k * l
+
+  let incr (r:ref int) : unit
+    ensures { !r = old !r + 1 }
+  = r := !r + 1
+
+  let sieve (n:int) : array bool
+    requires { n > 1 }
+    returns { m -> length m = n /\ forall i. 0 <= i < n -> m[i] <-> prime i }
+  = let t = Array.make n true in
+    t[0] <- false;
+    t[1] <- false;
+    let i = ref 2 in
+    while !i < n do
+      invariant { 1 < !i <= n }
+      invariant { forall j. 0 <= j < n -> t[j] <-> no_factor_lt !i j }
+      variant { n - !i }
+      if t[!i] then begin
+        let s = ref (!i * !i) in
+        let ghost r = ref !i in
+        while !s < n do
+          invariant { 1 < !r <= n /\ !s = !r * !i }
+          invariant { forall j. 0 <= j < n ->
+            t[j] <-> (no_factor_lt !i j /\
+                      forall k. 1 < k < !r -> j <> k * !i) }
+          variant { n - !r }
+          t[!s] <- false;
+          s := !s + !i;
+          incr r
+        done;
+        assert { forall j. 0 <= j < n /\ t[j] ->
+          (forall k l. 1 < l < !i + 1 -> j = k * l /\ k > 1 ->
+            (if l = !i then k < !r && false else false) && false) &&
+          no_factor_lt (!i+1) j }
+      end else assert { forall j. 0 <= j < n /\ no_factor_lt !i j ->
+        (forall k l. 1 < l < !i + 1 -> j = k * l /\ k > 1 ->
+          (if l = !i then (forall k0 l. 1 < l < !i /\ k0 > 1 /\ !i = k0 * l ->
+              j = (k*k0) * l && false) && false
+                     else false) && false) && no_factor_lt (!i+1) j };
+      incr i
+    done;
+    assert { forall j. 0 <= j < n /\ no_factor_lt n j -> prime j };
+    assert { forall j. 0 <= j < n /\ prime j ->
+      forall k l. 1 < l < n /\ k > 1 -> j = k * l -> l >= j && false };
+    t
+
+end
+

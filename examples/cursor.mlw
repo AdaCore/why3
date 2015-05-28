@@ -12,8 +12,10 @@
   identical to to_do
 *)
 
-module IterableList
-  use import list.List
+module Cursor
+
+  use import int.Int
+  use import seq.Seq
 
   type t
     (** the collection *)
@@ -21,28 +23,26 @@ module IterableList
     (** the type of its elements *)
 
   type cursor = private {
-    mutable ghost done_: list elt; (** already processed *)
-    mutable ghost to_do: list elt; (** yet to be processed *)
+            ghost seq: seq elt;
+    mutable ghost i  : int;
   }
 
   predicate coherent t cursor
 
   val create (t: t) : cursor
-    ensures { result.done_ = Nil }
+    ensures { result.i = 0 }
     ensures { coherent t result }
 
-  val has_next (t: t) (c: cursor) : bool
+  val has_next (ghost t: t) (c: cursor) : bool
     requires { coherent t c }
-    ensures  { result <-> c.to_do <> Nil }
+    ensures  { result <-> 0 <= c.i < length c.seq }
 
-  val next (t: t) (c: cursor) : elt
-    requires { c.to_do <> Nil }
+  val next (ghost t: t) (c: cursor) : elt
     requires { coherent t c }
+    requires { 0 <= c.i < length c.seq }
     writes   { c }
-    ensures  { match old c.to_do with
-               | Nil -> false
-               | Cons x l -> result = x /\ c.done_ = Cons x (old c.done_) /\
-                             c.to_do = l end }
+    ensures  { result = c.seq[old c.i] }
+    ensures  { c.i = old c.i + 1 }
     ensures  { coherent t c }
 
 end
@@ -50,24 +50,25 @@ end
 module TestCursor
 
   use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Sum
+  use import int.Sum
+  use import seq.Seq
   use import ref.Refint
 
-  clone import IterableList with type elt = int
+  clone import Cursor with type elt = int
 
   (** sums all the remaining elements in the cursor *)
   let sum (t: t) (c: cursor) : int
     requires { coherent t c }
-    ensures  { result = old (sum c.to_do) }
+    requires { c.i = 0 }
+    ensures  { result = sum 0 (length c.seq - 1) (get c.seq) }
   =
     let s = ref 0 in
     'I:
     while has_next t c do
-      invariant { at (sum c.to_do) 'I = !s + sum c.to_do }
       invariant { coherent t c }
-      variant   { length c.to_do }
+      invariant { 0 <= c.i <= length c.seq }
+      invariant { !s = sum 0 (c.i - 1) (get c.seq) }
+      variant   { length c.seq - c.i }
       let x = next t c in
       s += x
     done;
@@ -150,7 +151,7 @@ module TestListCursor
 
 end
 
-(** {2 Iteration over a muable collection}
+(** {2 Iteration over a mutable collection}
 
     here we choose an array of integers *)
 
@@ -243,5 +244,22 @@ module TestArrayCursor
       s += x
     done;
     !s
+
+  let harness1 () : unit
+  =
+    let a = Array.make 42 0 in
+    let c = create a in
+    let x = next a c in
+    assert { x = 0 }
+
+(*
+  let harness2 () : unit
+  =
+    let a = Array.make 42 0 in
+    let c = create a in
+    a[1] <- 17;
+    let x = next a c in
+    assert { x = 0 }
+*)
 
 end

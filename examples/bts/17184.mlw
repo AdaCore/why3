@@ -1,0 +1,29 @@
+
+(*
+
+
+Error message: This expression has type t <> 'a 'b, but is expected to have type t 'a1 'a2
+
+Clone substitute every occurence of the type by the logic version, while
+we expect to use the program version in add.
+
+*)
+
+module A
+
+  type t
+
+  val add t : unit
+
+end
+
+module B
+
+  type t = { ghost a : unit }
+
+  clone A with type t = t
+
+(* FIXME !
+  let sub (x:t) : unit = A.add x
+*)
+end

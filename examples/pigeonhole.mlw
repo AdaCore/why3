@@ -1,8 +1,9 @@
 
-(** Pigeon hole principle (also know as Dirichlet's principle)
-    proved using a lemma function. *)
+(** Pigeonhole principle (also know as Dirichlet's drawer principle)
 
-module Dirichlet
+    Proved using a lemma function. *)
+
+module Pigeonhole
 
   use import HighOrd
   use import int.Int
@@ -18,7 +19,7 @@ module Dirichlet
     variant  { n }
   = if n = 0 then empty else add (n-1) (below (n-1))
 
-  let lemma dirichlet (n m: int) (f: int -> int)
+  let lemma pigeonhole (n m: int) (f: int -> int)
     requires { 0 <= m < n }
     requires { forall i. 0 <= i < n -> 0 <= f i < m }
     ensures  { exists i1, i2. 0 <= i1 < i2 < n /\ f i1 = f i2 }

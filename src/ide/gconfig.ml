@@ -46,6 +46,7 @@ type t =
       mutable saving_policy : int;
       (** 0 = always, 1 = never, 2 = ask *)
       mutable premise_color : string;
+      mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
       mutable iconset : string;
@@ -77,6 +78,7 @@ type ide = {
   ide_max_boxes : int;
   ide_saving_policy : int;
   ide_premise_color : string;
+  ide_neg_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
   ide_iconset : string;
@@ -100,6 +102,7 @@ let default_ide =
     ide_max_boxes = 16;
     ide_saving_policy = 2;
     ide_premise_color = "chartreuse";
+    ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
     ide_error_color = "orange";
     ide_iconset = "fatcow";
@@ -141,6 +144,9 @@ let load_ide section =
     ide_premise_color =
       get_string section ~default:default_ide.ide_premise_color
         "premise_color";
+    ide_neg_premise_color =
+      get_string section ~default:default_ide.ide_neg_premise_color
+        "neg_premise_color";
     ide_goal_color =
       get_string section ~default:default_ide.ide_goal_color
         "goal_color";
@@ -191,6 +197,7 @@ let load_config config original_config env =
     max_boxes = ide.ide_max_boxes;
     saving_policy = ide.ide_saving_policy ;
     premise_color = ide.ide_premise_color;
+    neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
     iconset = ide.ide_iconset;
@@ -234,6 +241,7 @@ let save_config t =
   let ide = set_int ide "max_boxes" t.max_boxes in
   let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "premise_color" t.premise_color in
+  let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "iconset" t.iconset in
@@ -279,14 +287,14 @@ let image_unknown = ref !image_default
 let image_invalid = ref !image_default
 let image_timeout = ref !image_default
 let image_outofmemory = ref !image_default
-let image_stepslimitexceeded = ref !image_default
+let image_steplimitexceeded = ref !image_default
 let image_failure = ref !image_default
 let image_valid_obs = ref !image_default
 let image_unknown_obs = ref !image_default
 let image_invalid_obs = ref !image_default
 let image_timeout_obs = ref !image_default
 let image_outofmemory_obs = ref !image_default
-let image_stepslimitexceeded_obs = ref !image_default
+let image_steplimitexceeded_obs = ref !image_default
 let image_failure_obs = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
@@ -326,14 +334,14 @@ let iconname_unknown = ref ""
 let iconname_invalid = ref ""
 let iconname_timeout = ref ""
 let iconname_outofmemory = ref ""
-let iconname_stepslimitexceeded = ref ""
+let iconname_steplimitexceeded = ref ""
 let iconname_failure = ref ""
 let iconname_valid_obs = ref ""
 let iconname_unknown_obs = ref ""
 let iconname_invalid_obs = ref ""
 let iconname_timeout_obs = ref ""
 let iconname_outofmemory_obs = ref ""
-let iconname_stepslimitexceeded_obs = ref ""
+let iconname_steplimitexceeded_obs = ref ""
 let iconname_failure_obs = ref ""
 let iconname_yes = ref ""
 let iconname_no = ref ""
@@ -383,14 +391,14 @@ let load_icon_names () =
   iconname_invalid := get_icon_name "invalid";
   iconname_timeout := get_icon_name "timeout";
   iconname_outofmemory := get_icon_name "outofmemory";
-  iconname_stepslimitexceeded := get_icon_name "stepslimitexceeded";
+  iconname_steplimitexceeded := get_icon_name "steplimitexceeded";
   iconname_failure := get_icon_name "failure";
   iconname_valid_obs := get_icon_name "valid_obs";
   iconname_unknown_obs := get_icon_name "unknown_obs";
   iconname_invalid_obs := get_icon_name "invalid_obs";
   iconname_timeout_obs := get_icon_name "timeout_obs";
   iconname_outofmemory_obs := get_icon_name "outofmemory_obs";
-  iconname_stepslimitexceeded_obs := get_icon_name "stepslimitexceeded_obs";
+  iconname_steplimitexceeded_obs := get_icon_name "steplimitexceeded_obs";
   iconname_failure_obs := get_icon_name "failure_obs";
   iconname_yes := get_icon_name "yes";
   iconname_no := get_icon_name "no";
@@ -418,14 +426,14 @@ let resize_images size =
   image_invalid := image ~size !iconname_invalid;
   image_timeout := image ~size !iconname_timeout;
   image_outofmemory := image ~size !iconname_outofmemory;
-  image_stepslimitexceeded := image ~size !iconname_stepslimitexceeded;
+  image_steplimitexceeded := image ~size !iconname_steplimitexceeded;
   image_failure := image ~size !iconname_failure;
   image_valid_obs := image ~size !iconname_valid_obs;
   image_unknown_obs := image ~size !iconname_unknown_obs;
   image_invalid_obs := image ~size !iconname_invalid_obs;
   image_timeout_obs := image ~size !iconname_timeout_obs;
   image_outofmemory_obs := image ~size !iconname_outofmemory_obs;
-  image_stepslimitexceeded_obs := image ~size !iconname_stepslimitexceeded_obs;
+  image_steplimitexceeded_obs := image ~size !iconname_steplimitexceeded_obs;
   image_failure_obs := image ~size !iconname_failure_obs;
   image_yes := image ~size !iconname_yes;
   image_no := image ~size !iconname_no;
@@ -491,8 +499,8 @@ let show_legend_window () =
   i "   External prover reached the time limit\n";
   ib image_outofmemory;
   i "   External prover ran out of memory\n";
-  ib image_stepslimitexceeded;
-  i "   External prover exceeded the steps limit\n";
+  ib image_steplimitexceeded;
+  i "   External prover exceeded the step limit\n";
   ib image_unknown;
   i "   External prover answer not conclusive\n";
   ib image_failure;
@@ -533,6 +541,7 @@ let show_about_window () =
                 "David Hauzar";
                 "Daisuke Ishii";
                 "Johannes Kanig";
+                "Mikhail Mandrykin";
                 "David Mentré";
                 "Benjamin Monate";
                 "Thi-Minh-Tuyen Nguyen";
