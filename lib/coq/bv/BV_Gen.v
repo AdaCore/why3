@@ -1500,4 +1500,3 @@ Lemma two_power_size_val : ((max_int + 1%Z)%Z = (bv.Pow2int.pow2 size_int)).
   unfold max_int.
   omega.
 Qed.
-

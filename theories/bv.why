@@ -98,7 +98,7 @@ theory Pow2int
 
 end
 
-(** {2 Generic theory of bitvectors (arbitrary length)} *)
+(** {2 Generic theory of Bit Vectors (arbitrary length)} *)
 
 theory BV_Gen
 
@@ -110,6 +110,8 @@ theory BV_Gen
 
   type t
 
+  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+      the least significant bit *)
   function nth t int : bool
 
   constant zero : t
@@ -123,7 +125,9 @@ theory BV_Gen
   predicate eq (v1 v2 : t) =
     forall n. 0 <= n < size_int -> nth v1 n = nth v2 n
 
-  axiom Extensionality: forall x y : t. eq x y -> x = y
+  axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+
+  (** Bitwise operators *)
 
   function bw_and (v1 v2 : t) : t
   axiom Nth_bw_and:
@@ -212,24 +216,18 @@ theory BV_Gen
   predicate uge (x y : t) =
     Int.(>=) (to_uint x) (to_uint y)
 
-  (** binary predicate for signed less than *)
   predicate slt (v1 v2 : t) =
     Int.(<) (to_int v1) (to_int v2)
 
-  (** binary predicate for signed less than or equal *)
   predicate sle (v1 v2 : t) =
     Int.(<=) (to_int v1) (to_int v2)
 
-  (**  binary predicate for signed greater than *)
   predicate sgt (v1 v2 : t) =
     Int.(>) (to_int v1) (to_int v2)
 
-  (**  binary predicate for signed greater than or equal *)
   predicate sge (v1 v2 : t) =
     Int.(>=) (to_int v1) (to_int v2)
 
-  (** [nth(_bv) b n] is the n-th bit of x (0 <= n < size). bit 0 is
-      the least significant bit *)
   function nth_bv t t: bool
 
   axiom Nth_bv_is_nth:
@@ -242,40 +240,34 @@ theory BV_Gen
   axiom Of_int_ones:
     ones = of_int max_int
 
-  (** addition modulo 2^m *)
+  (** Arithmetic operators *)
+
   function add (v1 v2 : t) : t
   axiom to_uint_add:
     forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
 
-  (** 2's complement subtraction modulo 2^m *)
   function sub (v1 v2 : t) : t
   axiom to_uint_sub:
     forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
 
-  (** 2's complement unary minus *)
   function neg (v1 : t) : t
   axiom to_uint_neg:
     forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
 
-  (** multiplication modulo 2^m *)
   function mul (v1 v2 : t) : t
   axiom to_uint_mul:
     forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
 
-  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
   function udiv (v1 v2 : t) : t
   axiom to_uint_udiv:
     forall v1 v2. to_uint (udiv v1 v2) = div (to_uint v1) (to_uint v2)
 
-  (** unsigned remainder from truncating division (undefined if divisor is 0) *)
   function urem (v1 v2 : t) : t
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
 
-  (** rotate right  *)
   function rotate_right (v n : t) : t
 
-  (** rotate left  *)
   function rotate_left (v n : t) : t
 
   axiom Nth_rotate_left :
@@ -285,9 +277,6 @@ theory BV_Gen
   axiom Nth_rotate_right :
     forall v n i. ult i size -> ult n (sub ones size) ->
       nth_bv (rotate_right v n) i = nth_bv v (urem (add i n) size)
-
-  (** The guard on n for the rotation is not necessary if size is a
-  power of two. *)
 
   (** logical shift right *)
   function lsr_bv t t : t

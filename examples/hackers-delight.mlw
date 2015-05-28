@@ -2,9 +2,12 @@
 
     *second edition *)
 
-module Hackers_delight
-  use import int.Int
-  use import bool.Bool
+(** {2 Utilitaries}
+    We introduce in this theory two functions that will help us
+    write properties on bit-manipulating procedures *)
+
+theory Utils
+
   use import bv.BV32
 
   constant one : t = of_int 1
@@ -14,19 +17,8 @@ module Hackers_delight
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
 
-  (** {2 ASCII cheksum }
-    In the beginning the encoding of an ascii character was done on 8
-    bits: the first 7 bits were used for the carracter itself while
-    the 8th bit was used as a cheksum: a mean to detect errors. The
-    cheksum value was the binary sum of the 7 other bits, allowing the
-    detections of any change of an odd number of bits in the initial
-    value. Let's prove it! *)
-
-  (** {6 Hamming distance } *)
-
-  (** In order to express these properties we start by introducing a
-      function that returns the number of 1-bit in a bitvector (p.82)
-      *)
+  (** We start by introducing a function that returns the number of
+      1-bit in a bitvector (p.82) *)
 
   function count (bv : t) : t =
     let x = sub bv (bw_and (lsr_bv bv one) (of_int 0x55555555)) in
@@ -38,12 +30,34 @@ module Hackers_delight
     let x = add x (lsr_bv x (of_int 16)) in
     bw_and x (of_int 0x0000003F)
 
-  (** We can verify our definition by, first, checking that there are no
-      1-bits in the bitvector "zero": *)
+  (** We then define the associated notion of distance, namely
+      "Hamming distance", that counts the number of bits that differ
+      between two bitvectors. *)
+
+  function hammingD (a b : t) : t = count (bw_xor a b)
+
+end
+
+(** {2 Correctness of Utils}
+    Before using our two functions let's first check that they are correct !
+*)
+
+module Utils_Spec
+  use import int.Int
+  use import int.NumOf
+  use import bv.BV32
+  use import Utils
+
+  (** {6 count correctness } *)
+
+  (** Let's start by checking that there are no 1-bits in the
+      bitvector "zero": *)
 
   lemma countZero: count zero = zero
 
-  (** And then, for b a bitvector with n 1-bits, checking that if its
+  lemma numOfZero: NumOf.numof (\i. nth zero i) 0 32 = 0
+
+  (** Now, for b a bitvector with n 1-bits, we check that if its
       first bit is 0 then shifting b by one on the right doesn't
       change the number of 1-bit. And if its first bit is one, then
       there are n-1 1-bits in the shifting of b by one on the right. *)
@@ -51,18 +65,6 @@ module Hackers_delight
   lemma countStep: forall b.
     (not (nth_bv b zero) <-> count (lsr_bv b one) = count b) /\
     (nth_bv b zero <-> count (lsr_bv b one) = sub (count b) one)
-
-  use import int.NumOf
-
-  lemma tointzero: to_uint zero = 0
-  lemma tointone: to_uint one = 1
-
-  lemma numOfZero: NumOf.numof (\i. nth zero i) 0 32 = 0
-
-  lemma numof_change_equiv:
-    forall p1 p2: int -> bool, a b: int.
-    (forall j: int. a <= j < b -> p1 j <-> p2 j) ->
-    numof p2 a b = numof p1 a b
 
   let rec lemma numof_shift (p q : int -> bool) (a b k: int) : unit
     requires {forall i. q i = p (i + k)}
@@ -72,15 +74,14 @@ module Hackers_delight
     if a < b then
     numof_shift p q a (b-1) k
 
-
-  let rec lemma countAux (bv : t) : unit
+  let rec lemma countSpec_Aux (bv : t) : unit
   variant {bv with ult}
   ensures {to_uint (count bv) = NumOf.numof (nth bv) 0 32}
   =
     if bv = zero then ()
     else
     begin
-      countAux (lsr_bv bv one);
+      countSpec_Aux (lsr_bv bv one);
       assert {
                  let x = (if nth_bv bv zero then 1 else 0) in
                   let f = nth bv in
@@ -93,31 +94,32 @@ module Hackers_delight
            }
     end
 
+  (** With these lemmas, we can now prove the correctness property of
+  count: *)
+
   lemma countSpec: forall b. to_uint (count b) = NumOf.numof
         (nth b) 0 32
 
-  (** We then define the associated notion of distance, namely
-      "Hamming distance", that counts the number of bits that differ
-      between two bitvectors. *)
-
-  function hammingD (a b : t) : t = count (bw_xor a b)
-
-  predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
+  (** {6 hammingD correctness } *)
 
   use HighOrd as HO
 
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
 
+  (** The correctness property can be express as the following: *)
   let lemma hamming_spec (a b : t) : unit
   ensures {to_uint (hammingD a b) = NumOf.numof (nth_diff a b) 0 32}
   =
    assert { forall i. 0 <= i < 32 -> nth (bw_xor a b) i <-> (nth_diff a b i) }
 
-  (** It is indeed a distance in the algebraic sense: *)
+  (** In addition we can prove that it is indeed a distance in the
+      algebraic sens: *)
 
   lemma symmetric: forall a b. hammingD a b = hammingD b a
 
   lemma separation: forall a b. hammingD a b = zero <-> a = b
+
+  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     variant {b - a}
@@ -133,16 +135,32 @@ module Hackers_delight
     numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >=
     numof (nth_diff a c) 0 32}
 
-  lemma triangleInequality: forall a b c. (* not proved ! :-( *)
+  lemma triangleInequality: forall a b c.
     uge (add (hammingD a b) (hammingD b c)) (hammingD a c)
 
+end
+
+module Hackers_delight
+  use import int.Int
+  use import int.NumOf
+  use import bool.Bool
+  use import bv.BV32
+  use import Utils
+
+  (** {2 ASCII cheksum }
+    In the beginning the encoding of an ascii character was done on 8
+    bits: the first 7 bits were used for the carracter itself while
+    the 8th bit was used as a cheksum: a mean to detect errors. The
+    cheksum value was the binary sum of the 7 other bits, allowing the
+    detections of any change of an odd number of bits in the initial
+    value. Let's prove it! *)
 
   (** {6 Checksum computation and correctness } *)
 
   (** A ascii character is valid if its number of bits is even.
       (Remember that a binary number is odd if and only if its first
       bit is 1) *)
-  predicate validAscii (b : t) = not (nth_bv (count b) zero)
+  predicate validAscii (b : t) = (nth_bv (count b) zero) = False
 
   (** The ascii checksum aim is to make any character valid in the
       sens that we just defined. One way to implement it is to count
