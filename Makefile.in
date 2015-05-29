@@ -1098,6 +1098,18 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
+ISABELLEVERSIONSPECIFIC=why3.ML Tools/why3 Why3_Number.thy
+
+ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
+ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
+
+ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
+
+$(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
+	for i in $(ISABELLEVERSIONSPECIFIC); do \
+		cp lib/isabelle/$$i.@ISABELLEVERSION@ lib/isabelle/$$i ; \
+	done
+
 ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
@@ -1147,7 +1159,7 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 ifneq (@enable_local@,yes)
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 endif
@@ -1171,44 +1183,44 @@ install_local:: lib/isabelle/last_build
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 
 $(ISABELLELIBS_INT): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/int.why
 	mkdir -p lib/isabelle/int
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
 
 $(ISABELLELIBS_BOOL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/bool.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/bool.why
 	mkdir -p lib/isabelle/bool
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
 
 $(ISABELLELIBS_REAL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/real.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/real.why
 	mkdir -p lib/isabelle/real
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
 
 $(ISABELLELIBS_NUMBER): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/number.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/number.why
 	mkdir -p lib/isabelle/number
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
 
 $(ISABELLELIBS_SET): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/set.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/set.why
 	mkdir -p lib/isabelle/set
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
 
 $(ISABELLELIBS_MAP): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/map.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/map.why
 	mkdir -p lib/isabelle/map
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
 
 $(ISABELLELIBS_LIST): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/list.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/list.why
 	mkdir -p lib/isabelle/list
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
 
 $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/option.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/option.why
 	mkdir -p lib/isabelle/option
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
 # do not update isabelle realizations systematically
 # opt byte: update-isabelle
