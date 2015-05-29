@@ -15,10 +15,6 @@ prelude "(set-logic AUFBVDTLIRA)"
 (* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *)
 (* transformation "split_intro" *)
 
-(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
-transformation "introduce_premises"
-transformation "intro_projections_counterexmp"
-
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
@@ -38,6 +34,10 @@ transformation "eliminate_epsilon"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
+
+(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
+transformation "introduce_premises"
+transformation "intro_projections_counterexmp"
 
 transformation "discriminate_if_poly"
 transformation "encoding_smt_if_poly"
