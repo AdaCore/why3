@@ -452,7 +452,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
             true)
        | SOME thms =>
            if length thms = length ts andalso
-             forall (Pattern.matches thy o apfst prop_of) (thms ~~ ts)
+             forall (Pattern.matches thy o apfst Thm.prop_of) (thms ~~ ts)
            then (thy, false)
            else error ("Failed to match axiom " ^ string_of_id id))
   | mk_decl realize (Typedecl ((s, id), args, opt_rhs)) thy =
@@ -490,10 +490,10 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
              add_const s,
              true)
         | SOME [th] =>
-            let val (s', _) = head_of_eqn' (prop_of th)
+            let val (s', _) = head_of_eqn' (Thm.prop_of th)
               handle TERM _ => error ("Bad equation for " ^ string_of_id id)
             in
-              if Pattern.matches thy (rename_const [(s', s)] (prop_of th), eqn)
+              if Pattern.matches thy (rename_const [(s', s)] (Thm.prop_of th), eqn)
               then (add_const_raw NONE (s, s') thy, false)
               else error ("Failed to match definition " ^ string_of_id id)
             end
@@ -502,7 +502,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
   | mk_decl _ (Datatype dts) thy =
       (case lookup_list (snd o #1) (lookup_type' thy) dts of
          NONE =>
-           (thy |> Datatype.add_datatype Datatype_Aux.default_config
+           (thy |> BNF_LFP_Compat.add_datatype [BNF_LFP_Compat.Keep_Nesting]
               (map (fn ((s, _), args, constrs) =>
                  ((Binding.name s, map (rpair dummyS) args, NoSyn),
                   map (fn ((s', _), Ts) =>
@@ -516,7 +516,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
            in
              (fold (fn (((s, id), args, constrs), s') =>
                 let
-                  val (args', constrs') = Datatype.the_spec thy s';
+                  val (args', constrs') = BNF_LFP_Compat.the_spec thy s';
                   fun err () = error ("Failed to match type " ^ string_of_id id);
                   val _ =
                     length args = length args' andalso
@@ -551,16 +551,16 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
             true)
        | SOME preds' =>
            let val cmap = map (fn (((s, id), _, _), th :: _) =>
-             (th |> concl_of |> HOLogic.dest_Trueprop |> head_of |>
+             (th |> Thm.concl_of |> HOLogic.dest_Trueprop |> head_of |>
               dest_Const |> fst handle TERM _ =>
                 error ("Bad introduction rule for " ^ string_of_id id),
               s)) preds'
            in
              app (fn (((_, id), _, intrs), intrs') =>
                if length intrs = length intrs' andalso
-                 forall2 (fn (_, t) => fn th =>
-                     Pattern.matches thy (rename_const cmap (prop_of th), t))
-                   intrs intrs'
+                 ListPair.all (fn ((_, t), th) =>
+                     Pattern.matches thy (rename_const cmap (Thm.prop_of th), t))
+                   (intrs, intrs')
                then ()
                else error ("Failed to match predicate " ^ string_of_id id)) preds';
              (fold (add_const_raw NONE o swap) cmap thy, false)
@@ -578,15 +578,15 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
              true)
         | SOME eqnss'' =>
             let val cmap = map2 (fn ((id, _), th :: _) => fn (s, _) =>
-              (th |> prop_of |> head_of_eqn' |> fst handle TERM _ =>
+              (th |> Thm.prop_of |> head_of_eqn' |> fst handle TERM _ =>
                  error ("Bad equation for " ^ string_of_id id),
                s)) eqnss'' eqnss'
             in
               app (fn ((id, eqns), eqns') =>
                 if length eqns = length eqns' andalso
-                  forall2 (fn t => fn th =>
-                      Pattern.matches thy (rename_const cmap (prop_of th), t))
-                    eqns eqns'
+                  ListPair.all (fn (t, th) =>
+                      Pattern.matches thy (rename_const cmap (Thm.prop_of th), t))
+                    (eqns, eqns')
                 then ()
                 else error ("Failed to match function " ^ string_of_id id)) eqnss'';
               (fold (add_const_raw NONE o swap) cmap thy, false)
@@ -809,7 +809,7 @@ fun prove_vc vc_name lthy =
   end;
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_open"}
+  Outer_Syntax.command @{command_keyword "why3_open"}
     "open a new Why3 environment and load a Why3-generated .xml file"
     (Resources.provide_parse_files "why3_open" --
      Scan.optional (Parse.reserved "constants" |-- Parse.!!! (Scan.repeat1
@@ -819,13 +819,13 @@ val _ =
      (Toplevel.theory o why3_open));
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_vc"}
+  Outer_Syntax.command @{command_keyword "why3_vc"}
     "enter into proof mode for a specific verification condition"
     (Parse.name >> (fn name =>
-      (Toplevel.local_theory_to_proof NONE (prove_vc name))));
+      (Toplevel.local_theory_to_proof NONE NONE (prove_vc name))));
 
 val _ =
-  Outer_Syntax.improper_command @{command_spec "why3_status"}
+  Outer_Syntax.command @{command_keyword "why3_status"}
     "show the name and state of all loaded verification conditions"
     (Scan.optional
        (Args.parens
@@ -835,34 +835,34 @@ val _ =
         Toplevel.keep (fn state => show_status (Toplevel.theory_of state) args)))
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_end"}
+  Outer_Syntax.command @{command_keyword "why3_end"}
     "close the current Why3 environment"
     (Scan.optional (@{keyword "("} |-- Parse.!!!
          (Parse.reserved "incomplete" --| @{keyword ")"}) >> K true) false >>
        (Toplevel.theory o close));
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_consts"}
+  Outer_Syntax.command @{command_keyword "why3_consts"}
     "associate Why3 constants with constants"
     (Scan.repeat1 (Parse.xname --| Args.$$$ "=" -- Parse.xname) >>
        (Toplevel.theory o fold add_why3_const));
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_types"}
+  Outer_Syntax.command @{command_keyword "why3_types"}
     "associate Why3 types with types"
     (Scan.repeat1 (Parse.xname --| Args.$$$ "=" -- Parse.xname) >>
        (Toplevel.theory o fold add_why3_type));
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_thms"}
+  Outer_Syntax.command @{command_keyword "why3_thms"}
     "associate Why3 axioms with theorems"
-    (Parse.and_list1 (Parse.xname --| Args.$$$ "=" -- Parse_Spec.xthms1) >>
+    (Parse.and_list1 (Parse.xname --| Args.$$$ "=" -- Parse.xthms1) >>
        (Toplevel.theory o fold add_why3_thm));
 
 val _ =
-  Outer_Syntax.command @{command_spec "why3_defs"}
+  Outer_Syntax.command @{command_keyword "why3_defs"}
     "associate Why3 definitions with definitions"
-    (Parse.and_list1 (Parse.xname --| Args.$$$ "=" -- Parse_Spec.xthms1) >>
+    (Parse.and_list1 (Parse.xname --| Args.$$$ "=" -- Parse.xthms1) >>
        (Toplevel.theory o fold add_why3_def));
 
 val setup = Theory.at_end (fn thy =>
