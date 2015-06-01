@@ -1110,6 +1110,9 @@ $(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
 		cp lib/isabelle/$$i.@ISABELLEVERSION@ lib/isabelle/$$i ; \
 	done
 
+clean::
+	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
+
 ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
