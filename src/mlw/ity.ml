@@ -518,22 +518,19 @@ let create_itysymbol_alias id args def =
 
 exception ImpurePrivateField of ity
 
-let create_itysymbol_rich id args pm mfld ifld =
+let create_itysymbol_rich id args pm flds =
   let ts = create_tysymbol id args None in
   let collect_vis fn acc =
-    let add f acc = if f.pv_ghost then acc else fn acc f.pv_ity in
-    Spv.fold add mfld (Spv.fold add ifld acc) in
-  let collect_all fn acc =
-    let add f acc = fn acc f.pv_ity in
-    Spv.fold add mfld (Spv.fold add ifld acc) in
+    Mpv.fold (fun f _ a -> if f.pv_ghost then a else fn a f.pv_ity) flds acc in
   let collect_imm fn acc =
-    let add f acc = fn acc f.pv_ity in
-    Spv.fold add ifld acc in
-  let mfld = Spv.elements mfld in
+    Mpv.fold (fun f m a -> if m then a else fn a f.pv_ity) flds acc in
+  let collect_all fn acc =
+    Mpv.fold (fun f _ a -> fn a f.pv_ity) flds acc in
   let sargs = Stv.of_list args in
   let dargs = collect_all ity_freevars Stv.empty in
   if not (Stv.subset dargs sargs) then
     raise (Ty.UnboundTypeVar (Stv.choose (Stv.diff dargs sargs)));
+  let mfld = Mpv.fold (fun f m l -> if m then f::l else l) flds [] in
   if pm then (* private mutable record *)
     let tl = List.map Util.ttrue args in
     let () = collect_all (fun () i -> if not i.ity_pure
