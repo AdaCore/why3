@@ -162,7 +162,8 @@ let rs_dup ({rs_name = {id_loc = loc}} as s) c =
       check_effects ?loc c;
       mk_rs id c RLlemma None
 
-let create_projection id s v =
+let create_projection s v =
+  let id = id_clone v.pv_vs.vs_name in
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let ity = ity_app s tyl s.its_regions in
@@ -170,8 +171,14 @@ let create_projection id s v =
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
   let c = create_cty [arg] [] [q] Mexn.empty eff v.pv_ity in
-  let fld = if List.exists (pv_equal v) s.its_mfields then Some v else None in
-  mk_rs ls.ls_name c (RLls ls) fld
+  mk_rs ls.ls_name c (RLls ls) (Some v)
+
+exception FieldExpected of rsymbol
+
+let mfield_of_rs s = match s.rs_cty.cty_args, s.rs_field with
+  | [{pv_ity = {ity_node = Ityreg {reg_its = ts}}}], Some f
+    when List.exists (pv_equal f) ts.its_mfields -> f
+  | _ -> raise (FieldExpected s)
 
 let create_constructor ~constr id s fl =
   let exn = Invalid_argument "Expr.create_constructor" in
@@ -538,12 +545,8 @@ let ext_c_app (ldl,c) el ityl ity =
 
 (* assignment *)
 
-exception FieldExpected of rsymbol
-
 let e_assign_raw al =
-  let conv (r,f,v) = match f.rs_field with
-    | None -> raise (FieldExpected f)
-    | Some f -> r, f, v in
+  let conv (r,f,v) = r, mfield_of_rs f, v in
   mk_expr (Eassign al) ity_unit (eff_assign (List.map conv al))
 
 let e_assign al =
@@ -1114,7 +1117,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ConstructorExpected s -> fprintf fmt
       "Function %a is not a constructor" print_rs s
   | FieldExpected s -> fprintf fmt
-      "Function %a is not a record field" print_rs s
+      "Function %a is not a mutable field" print_rs s
 (*
   | ItyExpected _e -> fprintf fmt
       "This expression is not a first-order value"
