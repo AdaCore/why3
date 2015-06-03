@@ -1,0 +1,85 @@
+theory float.GenericFloat
+   syntax function abs  "(fp.abs %1)"
+   syntax function neg  "(fp.neg %1)"
+
+   syntax function add  "(fp.add RNE %1 %2)"
+   syntax function sub  "(fp.sub RNE %1 %2)"
+   syntax function mul  "(fp.mul RNE %1 %2)"
+   syntax function div  "(fp.div RNE %1 %2)"
+   syntax function sqrt "(fp.sqrt RNE %1)"
+   syntax function rem  "(fp.rem %1 %2)"
+
+   (* remove prop zeroF_def *)
+   remove prop oneF_def
+
+   remove prop no_overflow_is_finite
+   remove prop round_no_overflow
+
+   remove prop Bounded_real_no_overflow
+   remove prop Round_monotonic
+   remove prop Round_idempotent
+   remove prop Round_to_real
+   remove prop Bounded_to_real
+
+   remove prop Exact_rounding_for_integers
+   remove prop round_of_zero
+
+   remove prop add
+   remove prop sub
+   remove prop mul
+   remove prop div
+   remove prop neg
+
+   syntax predicate is_normal    "(fp.isNormal %1)"
+   syntax predicate is_subnormal "(fp.isSubnormal %1)"
+   syntax predicate is_zero      "(fp.isZero %1)"
+   syntax predicate is_infinite  "(fp.isInfinite %1)"
+   syntax predicate is_nan       "(fp.isNaN %1)"
+
+   syntax predicate eq  "(fp.eq %1 %2)"
+   syntax predicate lt  "(fp.lt %1 %2)"
+   syntax predicate le  "(fp.leq %1 %2)"
+   syntax predicate gt  "(fp.gt %1 %2)"
+   syntax predicate ge  "(fp.geq %1 %2)"
+end
+
+theory float.Float32
+  syntax type t "Float32"
+
+  syntax function from_bv   "((_ to_fp 8 24) %1)"
+
+  syntax function from_sbv8  "((_ to_fp 8 24) RNE %1)"
+  syntax function from_sbv16 "((_ to_fp 8 24) RNE %1)"
+  syntax function from_sbv32 "((_ to_fp 8 24) RNE %1)"
+  syntax function from_sbv64 "((_ to_fp 8 24) RNE %1)"
+
+  (* syntax function from_real "((_ to_fp 8 24) RNE %1)" *)
+  (* syntax function round "(fp.to_real ((_ to_fp 8 24) RNE %1))" *)
+
+  (* wrong !
+     need an actual from signed int, aren't there any direct
+     way ? *)
+  (* syntax function from_int  "((_ to_fp 8 24) RNE ((_ int2bv 32) %1))" *)
+end
+
+theory float.Float64
+  syntax type t "Float64"
+
+  syntax function from_bv   "((_ to_fp 11 53) %1)"
+
+  syntax function from_sbv8  "((_ to_fp 11 53) RNE %1)"
+  syntax function from_sbv16 "((_ to_fp 11 53) RNE %1)"
+  syntax function from_sbv32 "((_ to_fp 11 53) RNE %1)"
+  syntax function from_sbv64 "((_ to_fp 11 53) RNE %1)"
+
+  (* syntax function from_real "((_ to_fp 11 53) RNE %1)" *)
+  (* syntax function round "(fp.to_real ((_ to_fp 11 53) RNE %1))" *)
+
+  (* wrong ! need an actual from signed int ! *)
+  syntax function from_int  "((_ to_fp 11 53) RNE ((_ int2bv 64) %1))"
+end
+
+theory float.FloatConverter
+   syntax function to_float32 "((_ to_fp 8 24) RNE %1)"
+   syntax function to_float64 "((_ to_fp 11 53) RNE %1)"
+end

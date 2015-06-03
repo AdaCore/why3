@@ -1,0 +1,229 @@
+module Test
+  use import float.Float32
+
+  let addt (x y z: t) : t
+    requires { lt x y }
+    requires { gt x z }
+    ensures { is_finite result }
+  =
+    x
+end
+
+module ProofInUse
+  use import float.Float32
+  use bv.BV32
+  use int.Int
+
+  constant f0d00001  : t = from_bv (BV32.of_int 0x3727C5AC)
+  constant f0d005    : t = from_bv (BV32.of_int 0x3BA3D70A)
+  constant f0d001    : t = from_bv (BV32.of_int 0x3A83126F)
+  constant f0d1      : t = from_bv (BV32.of_int 0x3DCCCCCD)
+  constant f0d25     : t = from_bv (BV32.of_int 0x3E800000)
+  constant f0d5      : t = from_bv (BV32.of_int 0x3F000000)
+  constant f0d9      : t = from_bv (BV32.of_int 0x3F666666)
+  constant f1d00001  : t = from_bv (BV32.of_int 0x3F800054)
+  constant f1d5      : t = from_bv (BV32.of_int 0x3FC00000)
+  constant f2        : t = from_bv (BV32.of_int 0x40000000)
+  constant f5        : t = from_bv (BV32.of_int 0x40A00000)
+  constant f10       : t = from_bv (BV32.of_int 0x41200000)
+  constant f12       : t = from_bv (BV32.of_int 0x41400000)
+  constant f16       : t = from_bv (BV32.of_int 0x41800000)
+  constant f180      : t = from_bv (BV32.of_int 0x43340000)
+  constant f360      : t = from_bv (BV32.of_int 0x43B40000)
+  constant f4096     : t = from_bv (BV32.of_int 0x45800000)
+  constant f1000     : t = from_bv (BV32.of_int 0x447A0000)
+  constant f1000000  : t = from_bv (BV32.of_int 0x49742400)
+  constant f7d3526e6 : t = from_bv (BV32.of_int 0x4AE06230)
+  constant f16777216 : t = from_bv (BV32.of_int 0x4B800000)
+
+  let range_add (x : t)
+    requires {le f10 x /\ le x f1000}
+    ensures  {ge result f12}
+  =
+     add x f2
+
+  (* CBMC can trivially show this is true *)
+  let range_mult (x : t)
+    requires {le f5 x /\ le x f10}
+    ensures  {ge result x}
+  =
+    sub (mul x f2) f5
+
+  (* CBMC can show this is true, but it takes a while (25 seconds) *)
+  let range_add_mult (x y z : t)
+    requires {le zeroF x /\ le x f180}
+    requires {le (neg f180) y /\ le y zeroF}
+    requires {le zeroF z /\ le z oneF}
+    requires {le zeroF (add x y)}
+    ensures {le zeroF result /\ le result f360}
+  =
+     add x (mul y z)
+
+  (* NOT TRUE. Counter-example posted to N131-061. *)
+  let guarded_div (x y : t)
+    requires {le zeroF x}
+    requires {lt f0d1 y}
+    requires {lt y oneF}
+    requires {ge (div x f1000) y}
+    ensures {lt result f1000}  (* Should Fail *)
+  =
+     div x y
+
+  (* NOT TRUE. Counter-example posted to N131-061. *)
+  (* needs power /!\ *)
+  (* let fibonacci (n : int) (x y : t) *)
+  (*   requires { 2 <= n <= 46) *)
+  (*   requires { lt x ((1.6181**(N-2))/2.2360 + 1.0)} *)
+  (*   requires { lt y (1.6181**(N-1))/2.2360 + 1.0} *)
+  (*   ensures {Res < (1.6181**N)/2.2360 + 1.0} (* Should Fail *) *)
+  (* = *)
+  (*    X + Y *)
+
+  (* CBMC can trivially show this is true *)
+  (* I have used 3.27680E+03f as a constant for s_scale *)
+  (* need power /!\ *)
+  (* let int_to_float_complex (x : BV16) (y : t) *)
+  (*   requires { le f0d25 y /\ le y oneF } *)
+  (* = *)
+  (*   let s_max = f10 in *)
+  (*   let s_msb = S_Max * f2 in *)
+  (*   let s_scale = f2 ** 16 / S_MSB in *)
+  (*   let res = (Float_32 X) / S_Scale in *)
+  (*    if Res >= S_Max then *)
+  (*       (Res - S_MSB) / y *)
+  (*    else *)
+  (*      Res / Y  (\* overflow check unprovable *\) *)
+
+  use bv.BV16
+
+  (* TODO : add spark implicit checks *)
+
+  (* CBMC can trivially show this is true *)
+  (* no translation into float for now *)
+  let int_to_float_simple (x : BV16.t)
+    requires { x <> BV16.zero }
+  =
+   let l = from_bv (BV32.of_int 0xf7d3526e6) in
+   assert { ge (from_sbv16 x) f0d9 }; (* pass *)
+   div l (from_sbv16 x)               (* OVERFLOW_CHECK:PASS *)
+
+   use import float.FloatConverter
+   use float.Float64
+
+  (* CBMC can trivially show this is true *)
+  (* missing conversion *)
+  let float_to_long_float (x : t)
+    requires {is_finite x}
+    ensures {Float64.is_finite result}
+  =
+    to_float64 x
+
+   (* CBMC can show this is true, but it takes a while (7 seconds) *)
+   (* no conversion *)
+   let incr_by_const (state : t) (x : int)
+     requires { Int.(<=) 0 x /\ Int.(<) x 1000000}
+     requires { eq zeroF state \/
+     (le f10 state /\ le state (mul (from_int x) f10))}
+     ensures {le f10 state /\ le state (mul (from_int (Int.(+) x 1)) f10)}
+   =
+     add state f10;
+
+  (* TODO: deal with unchecked conversion *)
+  (* I have manually verified this; there should be no RTE and the *)
+  (* postcondition will hold. A hand-coded smtlib instance takes around *)
+  (* 30 minutes on a modern solver. (Florian) *)
+  (* no unchecked conversion from float to anything *)
+  (* let approximate_inverse_square_root (x : t) *)
+  (*   requires { le f0d00001 x } *)
+  (*   ensures  { let tmp = (mul (mul result result) x in *)
+  (*              le (sub oneF f0d005) tmp /\ le tmp (add oneF f0d005) } *)
+  (* = *)
+  (*    (\* function To_Float is new Ada.Unchecked_Conversion (Source => Integer, *\) *)
+  (*    (\*                                                    Target => Float); *\) *)
+  (*    (\* function To_Int is new Ada.Unchecked_Conversion (Source => Float, *\) *)
+  (*    (\*                                                  Target => Integer); *\) *)
+  (*    let x2 = mul x f0d5 in *)
+  (*    let i = to_int x in *)
+  (*    let i = 0x5F3759DF - (i / 2) in *)
+  (*    let y = to_float i in *)
+  (*    let y = mul y (sub f1d5 (mul x2 (mul y y))) in *)
+  (*    (\* let y = mul y (sub 1.5 (mul x2 (mul y y))) in *\) *)
+  (*    (\* Second iteration can be enabled for more precision. *\) *)
+  (*    y *)
+
+  constant t_max : t = f4096
+
+  let angle_between (a_x a_y b_x b_y c_x c_y : t)
+    requires {le (neg t_max) a_x /\ le a_x t_max}
+    requires {le (neg t_max) a_y /\ le a_y t_max}
+    requires {le (neg t_max) b_x /\ le b_x t_max}
+    requires {le (neg t_max) b_y /\ le b_y t_max}
+    requires {le (neg t_max) c_x /\ le c_x t_max}
+    requires {le (neg t_max) c_y /\ le c_y t_max}
+    ensures {le (neg f1d00001) result /\ le result f1d00001} (* true *)
+    ensures {le (neg oneF) result /\ le result oneF}       (* probably not *)
+  =
+    let vec_ba_x = sub a_x b_x in
+    let vec_ba_y = sub a_y b_y in
+    let vec_bc_x = sub c_x b_x in
+    let vec_bc_y = sub c_y b_y in
+    let ba_dot_bc = add (mul vec_ba_x vec_bc_x)
+                        (mul vec_ba_y vec_bc_y) in
+    let length_ba = sqrt (add (mul (sub b_x a_x) (sub b_x a_x))
+                              (mul (sub b_y a_y) (sub b_y a_y))) in
+    let length_bc = sqrt (add (mul (sub b_x c_x) (sub b_x c_x))
+                              (mul (sub b_y c_y) (sub b_y c_y))) in
+    assume {lt length_ba f0d001};
+    assume {lt length_bc f0d001};
+    div ba_dot_bc (mul length_ba length_bc)
+
+   let user_rule_2 (x y z : t)
+      requires {ge x zeroF}
+      requires {ge y zeroF}
+      requires {ge z zeroF}
+      requires {le x f16777216}
+      requires {le y f16777216}
+      ensures {result}
+   =
+      le (neg (mul x y)) z
+
+   let user_rule_3 (x y : t)
+      requires {lt x y}
+      requires {gt y zeroF}
+      ensures {result}
+   =
+      le (div x y) oneF
+
+   let user_rule_4 (x y : t)
+     requires {le x y}
+     requires {gt y zeroF}
+     ensures {result}
+   =
+      le (div x y) oneF
+
+   (* User_Rule_5 requires square root, omitted for now *)
+
+   let user_rule_6 (x y z a : t)
+     requires {ge z zeroF}
+     requires {ge x y}
+     requires {ge y z}
+     requires {gt x z}
+     requires {le a zeroF}
+     ensures {result}
+   =
+      ge (div (sub x y) (sub x z)) a
+
+   (* User_Rule_7 (although very similar to 6) is surprisingly difficult *)
+   (* to verify. *)
+
+   let user_rule_7 (x y z a : t)
+     requires {ge z zeroF}
+     requires {ge x y}
+     requires {ge y z}
+     requires {gt x z}
+     requires {ge a oneF}
+     ensures {result}
+   =
+     le (div (sub x y) (sub x z)) a
+
+end
