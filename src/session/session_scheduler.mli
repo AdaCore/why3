@@ -130,7 +130,7 @@ module Make(O: OBSERVER) : sig
 (** {2 Actions} *)
 
   val run_prover :
-    cntexample:bool ->
+    O.key keygen ->
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
     timelimit:int -> memlimit:int ->
@@ -147,7 +147,6 @@ module Make(O: OBSERVER) : sig
 
 
   val run_external_proof :
-    ?cntexample:bool ->
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     O.key proof_attempt -> unit
@@ -162,7 +161,6 @@ module Make(O: OBSERVER) : sig
     | StatusChange of proof_attempt_status
 
   val run_external_proof_v3 :
-    ?cntexample:bool ->
     O.key Session.env_session -> t -> O.key Session.proof_attempt ->
     (O.key Session.proof_attempt -> Whyconf.prover ->
      int * int * int -> Call_provers.prover_result option -> run_external_status -> unit) ->
@@ -176,7 +174,6 @@ module Make(O: OBSERVER) : sig
 
 
   val prover_on_goal :
-    ?cntexample:bool ->
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     timelimit:int -> memlimit:int ->

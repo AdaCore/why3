@@ -209,7 +209,9 @@ let () = try
     in
     Task.add_meta task meta args
   in
-  opt_task := List.fold_left add_meta !opt_task !opt_metas
+  let metas = if !opt_cntexmp then (("get_counterexmp", None)::!opt_metas)
+    else !opt_metas in
+  opt_task := List.fold_left add_meta !opt_task metas
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
@@ -379,7 +381,7 @@ let do_input env drv = function
 
 let () =
   try
-    let load (f,ef) = load_driver ~cntexample:!opt_cntexmp env f ef in
+    let load (f,ef) = load_driver env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->

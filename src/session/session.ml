@@ -1837,6 +1837,18 @@ let pos_of_metas lms =
   List.fold_left (fun idpos (_,args) ->
     List.fold_left look_for_ident idpos args) empty_idpos lms
 
+let add_meta_to_task g meta meta_args =
+  (*let task = goal_task goal in
+  let task = Task.add_meta task meta meta_args in
+  goal.goal_task <- Some task 
+  *)
+  let goal,task = Task.task_separate_goal (goal_task g) in
+  let task = Task.add_meta task meta meta_args in
+  g.goal_task <- Some task
+
+
+    
+
 let add_registered_metas ~keygen env added0 g =
   let added = List.fold_left (fun ma (s,l) ->
     Mstr.change (function
@@ -1872,7 +1884,7 @@ let remove_metas ?(notify=notify) m =
 (**                    Prover Loaded                **)
 (*****************************************************)
 
-let load_prover ?(cntexample = false) eS prover =
+let load_prover eS prover =
   try
     PHprover.find eS.loaded_provers prover
   with Not_found ->
@@ -1881,7 +1893,7 @@ let load_prover ?(cntexample = false) eS prover =
     let r = match r with
       | None -> None
       | Some pr ->
-        let dr = Driver.load_driver ~cntexample eS.env
+        let dr = Driver.load_driver eS.env
           pr.Whyconf.driver pr.Whyconf.extra_drivers in
         Some { prover_config = pr;
                prover_driver = dr}

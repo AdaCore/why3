@@ -15,9 +15,8 @@
 
 type driver
 
-val load_driver : ?cntexample:bool -> Env.env -> string -> string list -> driver
+val load_driver :  Env.env -> string -> string list -> driver
 (** loads a driver from a file
-    @param bool true if the prover should be asked for a counter-example model
     @param env    environment to interpret theories
     @param string driver file name
     @param string list additional driver files containing only theories

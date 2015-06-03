@@ -39,12 +39,15 @@ let debug = Debug.lookup_flag "ide_info"
 
 let files = Queue.create ()
 let opt_parser = ref None
+let opt_cntexmp = ref false
 
 let spec = Arg.align [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
+  "--get-ce", Arg.Set opt_cntexmp,
+      " gets the counter-example model";
 (*
   "-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -980,9 +983,10 @@ let prover_on_selected_goals pr =
       try
        let a = get_any_from_row_reference row in
        M.run_prover
+	 MA.keygen
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit ~memlimit ~cntexample
+         ~timelimit ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"

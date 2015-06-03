@@ -175,8 +175,6 @@ type main = {
   (* max number of running prover processes *)
   plugins : string list;
   (* plugins to load, without extension, relative to [libdir]/plugins *)
-  cntexample : bool;
-  (* true provers should be asked for counter-example model *)
 }
 
 let libdir m =

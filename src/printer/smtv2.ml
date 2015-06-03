@@ -330,10 +330,10 @@ let print_logic_decl info fmt (ls,def) =
     List.iter forget_var vsl
   end
 
-let print_info_model args fmt info =
+let print_info_model cntexample fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if info_model != [] && args.cntexample then 
+  if info_model != [] && cntexample then 
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
@@ -351,7 +351,7 @@ let print_info_model args fmt info =
       info.info_model <- info_model
     end
 
-let print_prop_decl args info fmt k pr f = match k with
+let print_prop_decl cntexample args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -365,7 +365,7 @@ let print_prop_decl args info fmt k pr f = match k with
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       fprintf fmt "@[(check-sat)@]@\n";
-      print_info_model args fmt info;
+      print_info_model cntexample fmt info;
       
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				queried_terms = info.info_model; }
@@ -395,7 +395,7 @@ let print_data_decl info fmt (ts,cl) =
     print_ident ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl args info fmt d = match d.d_node with
+let print_decl cntexample args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata dl ->
@@ -412,12 +412,12 @@ let print_decl args info fmt d = match d.d_node with
       "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl args info fmt k pr f
+      print_prop_decl cntexample args info fmt k pr f
 
-let print_decls args =
+let print_decls cntexample args =
   let print_decl (sm, cm, model) fmt d =
     try let info = {info_syn = sm; info_converters = cm; info_model = model} in
-        print_decl args info fmt d; (sm, cm, info.info_model), []
+        print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
@@ -432,13 +432,16 @@ let set_produce_models fmt cntexample =
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
+
+  let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+
   print_prelude fmt args.prelude;
-  set_produce_models fmt args.cntexample;
+  set_produce_models fmt cntexample;
   print_th_prelude task fmt args.th_prelude;
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in
-  print (snd (Trans.apply (print_decls args) task));
+  print (snd (Trans.apply (print_decls cntexample args) task));
   pp_print_flush fmt ()
 
 let () = register_printer "smtv2" print_task
