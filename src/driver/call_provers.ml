@@ -101,7 +101,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : model_element list;
+  pr_model  : model;
 }
 
 type prover_result_parser = {
@@ -135,7 +135,7 @@ let print_steps fmt s =
 let print_prover_result fmt
   {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s; pr_model=m} =
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
-  if m <> [] then begin
+  if m <> Model_parser.empty_model then begin
     fprintf fmt "\nCounter-example model:";
     Model_parser.print_model fmt m
   end;

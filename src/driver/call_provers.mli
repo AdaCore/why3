@@ -44,7 +44,7 @@ type prover_result = {
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
   (** The model produced by a the solver *)
-  pr_model  : model_element list;
+  pr_model  : model;
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit

@@ -9,7 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Counter-example model values *)
+(*
+*************************************************************** 
+**  Counter-example model values
+****************************************************************
+*)
 type model_value =
  | Integer of string
  | Array of model_array
@@ -44,6 +48,12 @@ val array_add_element :
 
 val print_model_value : Format.formatter -> model_value -> unit
 
+
+(*
+*************************************************************** 
+**  Model elements
+***************************************************************
+*)
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = { 
@@ -73,13 +83,41 @@ val create_model_element :
     
     @param term : why term corresponding to the element *)
 
-val print_model : Format.formatter -> model_element list -> unit
+(*
+*************************************************************** 
+**  Model definitions
+***************************************************************
+*)   
+type model 
 
-val model_to_string : model_element list -> string
+val empty_model : model
 
-type model_parser = string ->  Printer.printer_mapping -> model_element list
+(*
+*************************************************************** 
+**  Quering the model
+***************************************************************
+*)
 
-val register_model_parser : desc:Pp.formatted -> string -> model_parser -> unit
+val print_model : Format.formatter -> model -> unit
+
+val model_to_string : model -> string
+
+
+(*
+*************************************************************** 
+** Registering model parser
+***************************************************************
+*)
+type model_parser =  string -> Printer.printer_mapping -> model
+(** Parses the input string into model elements, estabilishes 
+    a mapping between these elements and mapping from printer 
+    and builds model data structure.
+*)
+
+type raw_model_parser =  string -> model_element list
+(** Parses the input string into model elements. *)
+
+val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 
 val lookup_model_parser : string -> model_parser
 
