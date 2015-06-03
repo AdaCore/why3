@@ -977,7 +977,6 @@ let () = Queue.iter (open_file ~start:true) files
 let prover_on_selected_goals pr =
   let timelimit = gconfig.session_time_limit in
   let memlimit = gconfig.session_mem_limit in
-  let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
   List.iter
     (fun row ->
       try
