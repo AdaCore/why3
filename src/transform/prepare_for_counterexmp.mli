@@ -9,6 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
+val get_counterexmp : Task.task -> bool
+(**
+   Returns true if counter-example should be get for the task.
+*)
+
 val prepare_for_counterexmp :  Task.task Trans.trans
  (**
     Transformation that prepares the task for quering for 
