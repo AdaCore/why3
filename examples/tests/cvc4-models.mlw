@@ -1,5 +1,4 @@
 module M
-
   use import ref.Ref
 
   use import int.Int
@@ -13,7 +12,7 @@ module M
 
   val y "model_projected" "model_trace:y" :ref int
 
-  let incr ( x23 "model" "model_trace:my_x" : ref int ): unit
+  let incr ( x23 "model" "model_trace:x23" : ref int ): unit
   ensures { !x23 = old !x23 + 2 + !y }
   =
   #"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#
