@@ -294,7 +294,7 @@ let schedule_edition t command filename callback =
       Call_provers.prp_regexps = [];
       Call_provers.prp_timeregexps = [];
       Call_provers.prp_stepregexps = [];
-      Call_provers.prp_model_parser = fun _ _ -> [] 
+      Call_provers.prp_model_parser = fun _ _ -> Model_parser.empty_model 
     } in
   let precall =
     Call_provers.call_on_file ~command ~res_parser ~redirect:false filename ~printer_mapping:Printer.get_default_printer_mapping in

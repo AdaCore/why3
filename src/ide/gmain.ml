@@ -366,6 +366,8 @@ let () =
 (* views          *)
 (******************)
 
+let current_file = ref ""
+
 let scrolled_task_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
@@ -643,18 +645,28 @@ let update_tabs a =
       begin
         match a.S.proof_state with
 	  | S.Done r ->
-	    Model_parser.model_to_string r.Call_provers.pr_model
+	    Model_parser.model_to_string r.Call_provers.pr_model ^ "\n" ^
+	    (Model_parser.interleave_with_source 
+	      r.Call_provers.pr_model
+	      !current_file
+	      (Sysutil.file_contents !current_file))
 	  | _ -> ""
       end
     | _ -> ""
   in
+  (*
+  let counterexample_text =
+    try 
+      Sysutil.file_contents !current_file
+    with _  -> "" in
+  *)
 
- task_view#source_buffer#set_text task_text;
- task_view#scroll_to_mark `INSERT;
- edited_view#source_buffer#set_text edited_text;
- edited_view#scroll_to_mark `INSERT;
- output_view#source_buffer#set_text output_text;
- counterexample_view#source_buffer#set_text counterexample_text;
+  task_view#source_buffer#set_text task_text;
+  task_view#scroll_to_mark `INSERT;
+  edited_view#source_buffer#set_text edited_text;
+  edited_view#scroll_to_mark `INSERT;
+  output_view#source_buffer#set_text output_text;
+  counterexample_view#source_buffer#set_text counterexample_text;
 
 
 
@@ -1898,8 +1910,6 @@ let () = source_view#set_highlight_current_line true
 (*
 let () = source_view#source_buffer#set_text (source_text fname)
 *)
-
-let current_file = ref ""
 
 let set_current_file f =
   current_file := f;

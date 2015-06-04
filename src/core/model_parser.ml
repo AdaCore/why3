@@ -98,11 +98,12 @@ let create_model_element ~name ~value ?location ?term () =
     me_term = term;
   }
 
+(*
 let print_location fmt m_element =
     match m_element.me_location with
     | None -> fprintf fmt "\"no location\""
     | Some loc -> Loc.report_position fmt loc
-
+*)
 
 (*
 *************************************************************** 
@@ -129,16 +130,24 @@ type raw_model_parser =  string -> model_element list
 *)
 
 let print_model_element fmt m_element =
-  fprintf fmt  "    %s = %a\n" 
+  fprintf fmt  "%s = %a" 
       m_element.me_name print_model_value m_element.me_value
 
-let print_model_elements fmt line m_elements =
-  fprintf fmt "  Line %d:\n" line;
-  List.iter (print_model_element fmt) m_elements
+let print_model_elements ?(delimiter = "\n") fmt m_elements =
+  List.iter 
+    (fun m_element ->
+      print_model_element fmt m_element;
+      fprintf fmt "%s" delimiter
+    ) 
+    m_elements
 
 let print_model_file fmt filename model_file =
   fprintf fmt "File %s:\n" filename;
-  IntMap.iter (print_model_elements fmt) model_file
+  IntMap.iter 
+    (fun line m_elements ->
+      fprintf fmt "Line %d:\n" line;
+      print_model_elements fmt m_elements) 
+    model_file
 
 let print_model fmt model =
   StringMap.iter (print_model_file fmt) model
@@ -158,6 +167,51 @@ let get_elements model_file line_number =
     IntMap.find line_number model_file
   with Not_found ->
     []
+
+let make_int_to_line_map lines =
+  let (map, _) = List.fold_left
+    (fun (map, num_line) line -> (IntMap.add num_line line map, num_line+1))
+    (IntMap.empty, 1) 
+    lines in
+  map
+
+let get_padding line =
+  try 
+    let r = Str.regexp " *" in
+    ignore (Str.search_forward r line 0);
+    Str.matched_string line
+  with Not_found -> ""
+
+let interleave_line model_file (source_code, line_number) line =
+  try
+    let model_elements = IntMap.find line_number model_file in
+
+    print_model_elements str_formatter model_elements ~delimiter:"; ";
+    let line_model = 
+      (get_padding line) ^
+	"(* " ^ 
+	(flush_str_formatter ()) ^ 
+	"*)" in
+
+    (source_code ^ line_model ^ "\n" ^ line, line_number + 1)
+  with Not_found ->
+    (source_code ^ line, line_number + 1)
+  
+
+let interleave_with_source model filename source_code =
+  try
+    let model_file = StringMap.find  filename model in
+    (*let (_, model_file) = StringMap.choose model in*)
+    let lines = Str.split (Str.regexp "^") source_code in
+    (*let int_to_line_map = make_int_to_line_map lines in*)
+    let (source_code, _) = List.fold_left
+    (interleave_line model_file)
+    ("", 1)
+    lines in
+    source_code
+  with Not_found ->
+    source_code
+  
 
 (*
 *************************************************************** 
