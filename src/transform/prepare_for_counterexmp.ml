@@ -21,8 +21,9 @@ let prepare_for_counterexmp2 task =
     (* Counter-example will be queried, prepare the task *)
     Debug.dprintf debug "Get ce@.";
     let comp_trans = Trans.compose 
+      (Trans.goal Introduction.intros) 
       Intro_projections_counterexmp.intro_projections_counterexmp
-      (Trans.goal Introduction.intros) in
+    in
     (Trans.apply comp_trans) task
   end
 
