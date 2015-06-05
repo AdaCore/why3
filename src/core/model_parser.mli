@@ -102,6 +102,10 @@ val print_model : Format.formatter -> model -> unit
 
 val model_to_string : model -> string
 
+val print_model_json : Format.formatter -> model -> unit
+
+val model_to_string_json : model -> string
+
 val interleave_with_source : model -> string -> string -> string
 
 (*

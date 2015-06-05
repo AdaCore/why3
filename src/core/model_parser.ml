@@ -56,26 +56,29 @@ let array_add_element ~array ~index ~value =
     arr_indices = arr_index::array.arr_indices;
   }
 
-let rec print_indices fmt indices =
+let rec print_indices sanit_print fmt indices =
   match indices with
   | [] -> ()
   | index::tail ->
     fprintf fmt "; %d -> " index.arr_index_key;
-    print_model_value fmt index.arr_index_value;
-    print_indices fmt tail
+    print_model_value_sanit sanit_print fmt index.arr_index_value;
+    print_indices sanit_print fmt tail
 and
-print_array fmt arr = 
+print_array sanit_print fmt arr = 
   fprintf fmt "{others -> ";
-  print_model_value fmt arr.arr_others;
-  print_indices fmt arr.arr_indices;
+  print_model_value_sanit sanit_print fmt arr.arr_others;
+  print_indices sanit_print fmt arr.arr_indices;
   fprintf fmt "}"
 and
-print_model_value fmt value =
+print_model_value_sanit sanit_print fmt value =
   (* Prints model value. *)
   match value with
-  | Integer s -> fprintf fmt "%s" s  
-  | Other s -> fprintf fmt "%s" s
-  | Array a -> print_array fmt a
+  | Integer s -> sanit_print fmt s
+  | Other s -> sanit_print fmt s
+  | Array a -> print_array sanit_print fmt a
+
+let print_model_value fmt value =
+  print_model_value_sanit (fun fmt s -> fprintf fmt "%s" s) fmt value
 
 
 (*
@@ -168,13 +171,6 @@ let get_elements model_file line_number =
   with Not_found ->
     []
 
-let make_int_to_line_map lines =
-  let (map, _) = List.fold_left
-    (fun (map, num_line) line -> (IntMap.add num_line line map, num_line+1))
-    (IntMap.empty, 1) 
-    lines in
-  map
-
 let get_padding line =
   try 
     let r = Str.regexp " *" in
@@ -201,9 +197,7 @@ let interleave_line model_file (source_code, line_number) line =
 let interleave_with_source model filename source_code =
   try
     let model_file = StringMap.find  filename model in
-    (*let (_, model_file) = StringMap.choose model in*)
     let lines = Str.split (Str.regexp "^") source_code in
-    (*let int_to_line_map = make_int_to_line_map lines in*)
     let (source_code, _) = List.fold_left
     (interleave_line model_file)
     ("", 1)
@@ -211,7 +205,37 @@ let interleave_with_source model filename source_code =
     source_code
   with Not_found ->
     source_code
-  
+
+
+(*
+**  Quering the model - json
+*)
+let print_model_value_to_json fmt me_value =
+  fprintf fmt "%a" (print_model_value_sanit Json.string) me_value
+
+let print_model_element_json fmt me =
+  Json.print_json_field me.me_name print_model_value_to_json fmt me.me_value
+    
+let print_model_elements_json fmt model_elements =
+  Json.list print_model_element_json fmt model_elements
+    
+let print_model_elements_on_lines_json fmt model_file =
+  Json.map_bindings
+    (fun i -> string_of_int i)
+    print_model_elements_json
+    fmt
+    (IntMap.bindings model_file)
+    
+let print_model_json fmt model =
+  Json.map_bindings 
+    (fun s -> s) 
+    print_model_elements_on_lines_json
+    fmt 
+    (StringMap.bindings model)
+    
+let model_to_string_json model =
+  print_model_json str_formatter model;
+  flush_str_formatter ()
 
 (*
 *************************************************************** 
