@@ -54,3 +54,5 @@ and mdecl_node = private
   | MDlet  of let_defn
   | MDexn  of xsymbol
   | MDpure
+
+val create_type_decl : its_defn list -> mdecl

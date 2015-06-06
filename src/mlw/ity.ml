@@ -516,7 +516,7 @@ let create_itysymbol_alias id args def =
   create_its ~ts ~pm:false ~mfld:[] ~regs ~aimm:tl ~aexp:tl
     ~avis:tl ~afrz:tl ~rvis:rl ~rfrz:rl ~def:(Some def)
 
-exception ImpurePrivateField of ity
+exception ImpureField of ity
 
 let create_itysymbol_rich id args pm flds =
   let ts = create_tysymbol id args None in
@@ -531,13 +531,13 @@ let create_itysymbol_rich id args pm flds =
   if not (Stv.subset dargs sargs) then
     raise (Ty.UnboundTypeVar (Stv.choose (Stv.diff dargs sargs)));
   let mfld = Mpv.fold (fun f m l -> if m then f::l else l) flds [] in
-  if pm then (* private mutable record *)
+  if pm then begin (* private mutable record *)
     let tl = List.map Util.ttrue args in
-    let () = collect_all (fun () i -> if not i.ity_pure
-      then Loc.error ?loc:id.pre_loc (ImpurePrivateField i)) () in
+    Mpv.iter (fun {pv_vs = v; pv_ity = i} _ -> if not i.ity_pure
+      then Loc.error ?loc:v.vs_name.id_loc (ImpureField i)) flds;
     create_its ~ts ~pm ~mfld ~regs:[] ~aimm:tl ~aexp:tl ~avis:tl
       ~afrz:tl ~rvis:[] ~rfrz:[] ~def:None
-  else (* non-private updatable type *)
+  end else (* non-private updatable type *)
     let top_regs ity = ity_r_fold (fun s r -> Sreg.add r s) ity in
     let regs = Sreg.elements (collect_all top_regs Sreg.empty) in
     let check_args s = List.map (fun v -> Stv.mem v s) args in
@@ -1239,9 +1239,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Region %a is used twice" print_reg r
   | UnboundRegion r -> fprintf fmt
       "Unbound region %a" print_reg r
-  | ImpurePrivateField ity -> fprintf fmt
-      "Field type %a is mutable, it cannot be used in a private record"
-        print_ity_full ity
+  | ImpureField ity -> fprintf fmt
+      "Field type %a is mutable, it cannot be used in a type which is \
+        private, recursive, or has an invariant" print_ity_full ity
 (*
   | UnboundException xs -> fprintf fmt
       "This function raises %a but does not specify a post-condition for it"

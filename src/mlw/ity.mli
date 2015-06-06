@@ -93,7 +93,7 @@ val ity_hash : ity -> int
 val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
-exception ImpurePrivateField of ity
+exception ImpureField of ity
 exception DuplicateRegion of region
 exception UnboundRegion of region
 

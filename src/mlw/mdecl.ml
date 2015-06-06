@@ -40,11 +40,7 @@ let check_field stv f =
   if not (Stv.subset ftv stv) then Loc.error ?loc
     (Ty.UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
   if not f.pv_ity.ity_pure then Loc.error ?loc
-    (Ity.ImpurePrivateField f.pv_ity)
-  (* FIXME: the ImpurePrivateField error message in Ity is
-     too restrictive wrt all the cases we use check_field.
-     We should either provide different exceptions or rewrite
-     the message. *)
+    (Ity.ImpureField f.pv_ity)
 
 let check_invariant stv svs p =
   let ptv = t_ty_freevars Stv.empty p in
@@ -159,3 +155,146 @@ and mdecl_node =
   | MDlet  of let_defn
   | MDexn  of xsymbol
   | MDpure
+
+let md_equal : mdecl -> mdecl -> bool = (==)
+
+let get_news node pure =
+  let news_id s id = Sid.add_new (Decl.ClashIdent id) id s in
+  let news_rs news s = news_id news s.rs_name in
+  let news_pure news d = Sid.union news d.Decl.d_news in
+  let news = List.fold_left news_pure Sid.empty pure in
+  match node with
+  | MDtype dl ->
+      let news_itd news d =
+        let news = news_id news d.itd_its.its_ts.ts_name in
+        let news = List.fold_left news_rs news d.itd_fields in
+        List.fold_left news_rs news d.itd_constructors in
+      List.fold_left news_itd news dl
+  | MDlet (LDvar (v,_)) -> news_id news v.pv_vs.vs_name
+  | MDlet (LDsym (s,_)) -> news_id news s.rs_name
+  | MDlet (LDrec rdl) ->
+      let news_rd news d = news_id news d.rec_sym.rs_name in
+      List.fold_left news_rd news rdl
+  | MDexn xs -> news_id news xs.xs_name
+  | MDpure -> news
+
+let get_syms node pure =
+  let syms_ts s ts = Sid.add ts.ts_name s in
+  let syms_ls s ls = Sid.add ls.ls_name s in
+  let syms_ty s ty = ty_s_fold syms_ts s ty in
+  let syms_term s t = t_s_fold syms_ty syms_ls s t in
+  let syms_pure syms d = Sid.union syms d.Decl.d_syms in
+  let syms_vari syms (t,r) = Opt.fold syms_ls (syms_term syms t) r in
+  let syms = List.fold_left syms_pure Sid.empty pure in
+  let syms_its syms s = Sid.add s.its_ts.ts_name syms in
+  let syms_ity syms ity = ity_s_fold syms_its syms ity in
+  let syms_xs xs syms = Sid.add xs.xs_name syms in
+  let syms_pv syms v = syms_ity syms v.pv_ity in
+  let rec syms_pat syms p = match p.pat_node with
+    | Pwild | Pvar _ -> syms
+    | Papp (s,pl) ->
+        let syms = List.fold_left syms_ty syms s.ls_args in
+        List.fold_left syms_pat syms pl
+    | Por (p,q) -> syms_pat (syms_pat syms p) q
+    | Pas (p,_) -> syms_pat syms p in
+  let syms_cty syms c =
+    let add_tl syms tl = List.fold_left syms_term syms tl in
+    let add_xq xs ql syms = syms_xs xs (add_tl syms ql) in
+    let syms = add_tl (add_tl syms c.cty_pre) c.cty_post in
+    let syms = Mexn.fold add_xq c.cty_xpost syms in
+    Sexn.fold syms_xs c.cty_effect.eff_raises syms in
+  let rec syms_expr syms e = match e.e_node with
+    | Evar _ | Econst _ | Eabsurd -> syms
+    | Eassert (_,t) | Epure t -> syms_term syms t
+    | Eexec c -> syms_cexp syms c
+    | Eassign al ->
+        let syms_as syms (v,s,u) =
+          syms_pv (syms_pv (Sid.add s.rs_name syms) u) v in
+        List.fold_left syms_as syms al
+    | Elet (ld,e) ->
+        let esms = syms_expr Sid.empty e in
+        let esms = match ld with
+          | LDvar _ -> esms
+          | LDsym (s,_) -> Sid.remove s.rs_name esms
+          | LDrec rdl ->
+              let del_rd syms rd = Sid.remove rd.rec_sym.rs_name syms in
+              List.fold_left del_rd esms rdl in
+        syms_let_defn (Sid.union syms esms) ld
+    | Efor (i,_,invl,e) ->
+        syms_pv (List.fold_left syms_term (syms_expr syms e) invl) i
+    | Ewhile (d,invl,varl,e) ->
+        let syms = List.fold_left syms_vari (syms_expr syms e) varl in
+        List.fold_left syms_term (syms_eity syms d) invl
+    | Eif (c,d,e) ->
+        syms_expr (syms_expr (syms_eity syms c) d) e
+    | Ecase (d,bl) ->
+        let add_branch syms (p,e) =
+          syms_pat (syms_expr syms e) p.pp_pat in
+        List.fold_left add_branch (syms_eity syms d) bl
+    | Etry (d,xl) ->
+        let add_branch syms (xs,v,e) =
+          syms_xs xs (syms_pv (syms_expr syms e) v) in
+        List.fold_left add_branch (syms_expr syms d) xl
+    | Eraise (xs,e) ->
+        syms_xs xs (syms_eity syms e)
+  and syms_eity syms e =
+    syms_expr (syms_ity syms e.e_ity) e
+  and syms_city syms c =
+    let syms = syms_ity (syms_cexp syms c) c.c_cty.cty_result in
+    List.fold_left syms_pv syms c.c_cty.cty_args
+  and syms_cexp syms c = match c.c_node with
+    | Capp (s,vl) ->
+        let syms = List.fold_left syms_pv syms vl in
+        syms_cty (Sid.add s.rs_name syms) s.rs_cty
+    | Cfun e -> syms_cty (syms_expr syms e) c.c_cty
+    | Cany -> syms_cty syms c.c_cty
+  and syms_let_defn syms = function
+    | LDvar (_,e) -> syms_eity syms e
+    | LDsym (s,c) ->
+        let syms = match s.rs_logic with
+          | RLpv _ -> syms_ls (syms_ts syms ts_func) fs_func_app
+          | _ -> syms in
+        syms_city syms c
+    | LDrec rdl as ld ->
+        let add_rd syms rd =
+          let syms = List.fold_left syms_vari syms rd.rec_varl in
+          let syms = match rd.rec_sym.rs_logic with
+            | RLpv _ -> syms_ls (syms_ts syms ts_func) fs_func_app
+            | _ -> syms in
+          syms_city syms rd.rec_fun in
+        let dsms = List.fold_left add_rd Sid.empty rdl in
+        let dsms = match ls_decr_of_let_defn ld with
+          | Some ls -> Sid.remove ls.ls_name dsms | None -> dsms in
+        let del_rd syms rd = Sid.remove rd.rec_rsym.rs_name syms in
+        Sid.union syms (List.fold_left del_rd dsms rdl)
+  in
+  match node with
+  | MDtype dl ->
+      let syms_itd syms d =
+        (* the syms of the invariants are already in [pure] *)
+        let syms = Opt.fold syms_ity syms d.itd_its.its_def in
+        let add_fd syms s = syms_ity syms s.rs_cty.cty_result in
+        let add_cs syms s = List.fold_left syms_pv syms s.rs_cty.cty_args in
+        let syms = List.fold_left add_fd syms d.itd_fields in
+        List.fold_left add_cs syms d.itd_constructors in
+      List.fold_left syms_itd syms dl
+  | MDlet ld ->
+      let syms = syms_let_defn syms ld in
+      let vars = match ld with
+        | LDvar (_,e) -> e.e_effect.eff_reads
+        | LDsym (_,c) -> cty_reads c.c_cty
+        | LDrec rdl -> List.fold_left (fun s rd ->
+            Spv.union s (cty_reads rd.rec_fun.c_cty)) Spv.empty rdl in
+      Spv.fold (fun v s -> Sid.add v.pv_vs.vs_name s) vars syms
+  | MDexn xs -> syms_ity syms xs.xs_ity
+  | MDpure -> syms
+
+let mk_decl = let r = ref 0 in fun node pure ->
+  { md_node = node; md_pure = pure;
+    md_syms = get_syms node pure;
+    md_news = get_news node pure;
+    md_tag = (incr r; !r) }
+
+let create_type_decl dl =
+  let ldl = assert false (* TODO *) in
+  mk_decl (MDtype dl) ldl
