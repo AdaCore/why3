@@ -178,30 +178,35 @@ let get_padding line =
     Str.matched_string line
   with Not_found -> ""
 
-let interleave_line model_file (source_code, line_number) line =
+let interleave_line start_comment end_comment model_file (source_code, line_number) line =
   try
     let model_elements = IntMap.find line_number model_file in
 
     print_model_elements str_formatter model_elements ~delimiter:"; ";
-    let line_model = 
+    let cntexmp_line = 
       (get_padding line) ^
-	"(* " ^ 
+	start_comment ^ 
 	(flush_str_formatter ()) ^ 
-	"*)" in
+	end_comment in
 
-    (source_code ^ line_model ^ "\n" ^ line, line_number + 1)
+    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1)
   with Not_found ->
     (source_code ^ line, line_number + 1)
   
 
-let interleave_with_source model filename source_code =
+let interleave_with_source 
+    ?(start_comment="(* ") 
+    ?(end_comment=" *)") 
+    model 
+    filename 
+    source_code =
   try
     let model_file = StringMap.find  filename model in
     let lines = Str.split (Str.regexp "^") source_code in
     let (source_code, _) = List.fold_left
-    (interleave_line model_file)
-    ("", 1)
-    lines in
+      (interleave_line start_comment end_comment model_file)
+      ("", 1)
+      lines in
     source_code
   with Not_found ->
     source_code
