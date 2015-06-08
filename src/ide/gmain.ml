@@ -645,21 +645,26 @@ let update_tabs a =
       begin
         match a.S.proof_state with
 	  | S.Done r ->
-	    Model_parser.model_to_string r.Call_provers.pr_model ^ "\n" ^
-	    (Model_parser.interleave_with_source 
-	      r.Call_provers.pr_model
-	      !current_file
-	      (Sysutil.file_contents !current_file))
+	    if r.Call_provers.pr_model <> Model_parser.empty_model then begin
+	      Model_parser.model_to_string r.Call_provers.pr_model ^ "\n" ^
+		Model_parser.model_to_string_json r.Call_provers.pr_model ^ "\n\n" ^
+		(Model_parser.interleave_with_source 
+		   r.Call_provers.pr_model
+		   !current_file
+		   (Sysutil.file_contents !current_file))
+	    end else
+	      ""
 	  | _ -> ""
       end
     | _ -> ""
   in
-  (*
-  let counterexample_text =
-    try 
-      Sysutil.file_contents !current_file
-    with _  -> "" in
-  *)
+
+  let lang =
+    if Filename.check_suffix !current_file ".why" ||
+      Filename.check_suffix !current_file ".mlw"
+    then why_lang else any_lang !current_file
+  in
+  counterexample_view#source_buffer#set_language lang;
 
   task_view#source_buffer#set_text task_text;
   task_view#scroll_to_mark `INSERT;
