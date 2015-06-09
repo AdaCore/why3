@@ -66,7 +66,7 @@ let create_semi_constructor id s fl pjl invl =
   let get_pj p = match p.rs_logic with RLls s -> s | _ -> assert false in
   let mk_q {pv_vs = v} p = t_equ (fs_app (get_pj p) [t] v.vs_ty) (t_var v) in
   let q = create_post res (t_and_simp_l (List.map2 mk_q fl pjl)) in
-  let c = create_cty fl invl [q] Mexn.empty eff_empty ity in
+  let c = create_cty fl invl [q] Mexn.empty Mpv.empty eff_empty ity in
   create_rsymbol id c
 
 let create_flat_record_decl id args priv mut fldl invl =

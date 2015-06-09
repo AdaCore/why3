@@ -176,8 +176,8 @@ val ls_decr_of_let_defn : let_defn -> lsymbol option
 
 val c_app : rsymbol -> pvsymbol list -> ity list -> ity -> cexp
 
-val c_fun :
-  pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> cexp
+val c_fun : pvsymbol list ->
+  pre list -> post list -> post list Mexn.t -> pvsymbol Mpv.t -> expr -> cexp
 
 val c_any : cty -> cexp
 

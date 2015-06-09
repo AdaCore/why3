@@ -170,7 +170,7 @@ let create_projection s v =
   let arg = create_pvsymbol (id_fresh "arg") ity in
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
-  let c = create_cty [arg] [] [q] Mexn.empty eff v.pv_ity in
+  let c = create_cty [arg] [] [q] Mexn.empty Mpv.empty eff v.pv_ity in
   mk_rs ls.ls_name c (RLls ls) (Some v)
 
 exception FieldExpected of rsymbol
@@ -196,7 +196,7 @@ let create_constructor ~constr id s fl =
   let ls = create_fsymbol ~constr id argl ty in
   let argl = List.map (fun a -> t_var a.pv_vs) fl in
   let q = make_post (fs_app ls argl ty) in
-  let c = create_cty fl [] [q] Mexn.empty eff_empty ity in
+  let c = create_cty fl [] [q] Mexn.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let rs_of_ls ls =
@@ -205,7 +205,7 @@ let rs_of_ls ls =
   let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
   let q = make_post (t_app ls t_args ls.ls_value) in
   let ity = ity_of_ty (t_type q) in
-  let c = create_cty v_args [] [q] Mexn.empty eff_empty ity in
+  let c = create_cty v_args [] [q] Mexn.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
@@ -492,8 +492,11 @@ let e_exec ({c_cty = cty} as c) = match cty.cty_args with
 
 let c_any c = mk_cexp Cany c
 
-let c_fun args p q xq ({e_effect = eff} as e) =
-  mk_cexp (Cfun e) (create_cty args p q xq eff e.e_ity)
+let c_fun args p q xq old ({e_effect = eff} as e) =
+  (* reset variables are forbidden in post-conditions *)
+  let c = try create_cty args p q xq old eff e.e_ity with
+    | StaleVariable (v,r) -> localize_cover_stale v r [e] in
+  mk_cexp (Cfun e) c
 
 let c_app s vl ityl ity =
   mk_cexp (Capp (s,vl)) (cty_apply s.rs_cty vl ityl ity)
@@ -741,7 +744,8 @@ and c_rs_subst sm ({c_node = n; c_cty = c} as d) =
       let al = List.map (fun v -> v.pv_ity) c.cty_args in
       c_app (Mrs.find_def s s sm) vl al c.cty_result
   | Cfun e ->
-      c_fun c.cty_args c.cty_pre c.cty_post c.cty_xpost (e_rs_subst sm e))
+      c_fun c.cty_args c.cty_pre c.cty_post
+        c.cty_xpost c.cty_oldies (e_rs_subst sm e))
 
 and rec_fixp dl =
   let update sm (s,({c_cty = c} as d)) =
@@ -809,7 +813,7 @@ let let_rec fdl =
     (* create the clean rsymbol *)
     let id = id_clone s.rs_name in
     let c = create_cty c.cty_args pre
-      c.cty_post c.cty_xpost start_eff c.cty_result in
+      c.cty_post c.cty_xpost c.cty_oldies start_eff c.cty_result in
     let ns = create_rsymbol id ~ghost:(rs_ghost s) ~kind:RKnone c in
     let sm = Mrs.add_new (Invalid_argument "Expr.let_rec") s ns sm in
     sm, (ns, c_ghostify (rs_ghost s) d) in

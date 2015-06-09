@@ -712,7 +712,7 @@ let eff_read_post e rd =
   let _ = check_covers e.eff_covers rd in
   { e with eff_reads = Spv.union e.eff_reads rd }
 
-let eff_bind rd e = if Spv.is_empty rd then e else
+let eff_bind rd e = if Mpv.is_empty rd then e else
   { e with eff_reads = Mpv.set_diff e.eff_reads rd }
 
 let eff_read rd =
@@ -888,16 +888,18 @@ type cty = {
   cty_pre    : pre list;
   cty_post   : post list;
   cty_xpost  : post list Mexn.t;
+  cty_oldies : pvsymbol Mpv.t;
   cty_effect : effect;
   cty_result : ity;
   cty_freeze : ity_subst;
 }
 
-let cty_unsafe args pre post xpost effect result freeze = {
+let cty_unsafe args pre post xpost oldies effect result freeze = {
   cty_args   = args;
   cty_pre    = pre;
   cty_post   = post;
   cty_xpost  = xpost;
+  cty_oldies = oldies;
   cty_effect = effect;
   cty_result = result;
   cty_freeze = freeze;
@@ -939,17 +941,26 @@ let check_post exn ity post =
     | Teps _ -> Ty.ty_equal_check ty (t_type q)
     | _ -> raise exn) post
 
-let create_cty args pre post xpost effect result =
+let create_cty args pre post xpost oldies effect result =
   let exn = Invalid_argument "Ity.create_cty" in
   (* pre, post, and xpost are well-typed *)
   check_pre pre; check_post exn result post;
   Mexn.iter (fun xs xq -> check_post exn xs.xs_ity xq) xpost;
   (* the arguments must be pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
-  (* complete the reads and freeze the external context
-     FIXME/TODO: detect stale variables in post and xpost *)
-  let reads = spec_t_fold t_freepvs sarg pre post xpost in
-  let effect = eff_read_pre reads effect in
+  (* complete the reads and freeze the external context.
+     oldies must be fresh: collisions with args and external
+     reads are forbidden, to simplify instantiation later. *)
+  let preads = spec_t_fold t_freepvs sarg pre [] Mexn.empty in
+  let qreads = spec_t_fold t_freepvs Spv.empty [] post xpost in
+  let effect = eff_read_post effect qreads in
+  Mpv.iter (fun {pv_ghost = gh; pv_ity = o} {pv_ity = t} ->
+    if not (gh && o == ity_purify t) then raise exn) oldies;
+  let oldies = Mpv.set_inter oldies effect.eff_reads in
+  let effect = eff_bind oldies effect in
+  let preads = Mpv.fold (Util.const Spv.add) oldies preads in
+  if not (Mpv.set_disjoint preads oldies) then raise exn;
+  let effect = eff_read_pre preads effect in
   let freeze = Spv.diff effect.eff_reads sarg in
   let freeze = Spv.fold freeze_pv freeze isb_empty in
   check_tvs effect.eff_reads result pre post xpost;
@@ -984,11 +995,11 @@ let create_cty args pre post xpost effect result =
   let resets = Mreg.map (fun _ -> Sreg.empty) unknwn in
   let covers = Mreg.set_union resets effect.eff_covers in
   let effect = { effect with eff_covers = covers } in
-  cty_unsafe args pre post xpost effect result freeze
+  cty_unsafe args pre post xpost oldies effect result freeze
 
 let cty_apply c vl args res =
-  let vsb_add vsb {pv_vs = u} {pv_vs = v} =
-    if vs_equal u v then vsb else Mvs.add u (t_var v) vsb in
+  let vsb_add vsb {pv_vs = u} v =
+    if vs_equal u v.pv_vs then vsb else Mvs.add u v vsb in
   let match_v isb u v = ity_match isb u.pv_ity v.pv_ity in
   (* stage 1: apply c to vl *)
   let rec apply gh same isb vsb ul vl = match ul, vl with
@@ -1015,6 +1026,13 @@ let cty_apply c vl args res =
     | [], [] -> same, rul, rvl, vsb
     | _ -> invalid_arg "Ity.cty_apply" in
   let same, rcargs, rargs, vsb = cut same [] [] vsb cargs args in
+  let vsb, oldies = if Mvs.is_empty vsb then vsb, c.cty_oldies else
+    Mpv.fold (fun {pv_vs = o} v (s,m) ->
+      let id = id_clone o.vs_name in
+      let v = Mvs.find_def v v.pv_vs vsb in
+      let n = create_pvsymbol id ~ghost:true (ity_purify v.pv_ity) in
+      Mvs.add o n s, Mpv.add n v m) c.cty_oldies (vsb, Mpv.empty) in
+  let vsb = Mvs.map (fun v -> t_var v.pv_vs) vsb in
   let same = same && ity_equal c.cty_result res in
   if same && vl = [] then (* trivial *) c else
   let isb = if same then isb_empty else
@@ -1045,7 +1063,7 @@ let cty_apply c vl args res =
   let subst_l l = List.map subst_t l in
   cty_unsafe (List.rev rargs) (subst_l c.cty_pre)
     (subst_l c.cty_post) (Mexn.map subst_l c.cty_xpost)
-    effect res freeze
+    oldies effect res freeze
 
 let cty_add_reads c pvs =
   (* the external reads are already frozen and
