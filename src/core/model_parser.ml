@@ -215,14 +215,23 @@ let interleave_with_source
 (*
 **  Quering the model - json
 *)
-let print_model_value_to_json fmt me_value =
+let print_model_value_json fmt me_value =
   fprintf fmt "%a" (print_model_value_sanit Json.string) me_value
 
-let print_model_element_json fmt me =
-  Json.print_json_field me.me_name print_model_value_to_json fmt me.me_value
-    
+let model_elements_to_map_bindings model_elements =
+  List.fold_left 
+    (fun map_bindings me ->
+      (me.me_name, me.me_value)::map_bindings
+    )
+    [] 
+    model_elements
+
 let print_model_elements_json fmt model_elements =
-  Json.list print_model_element_json fmt model_elements
+  Json.map_bindings 
+    (fun i -> i)
+    print_model_value_json
+    fmt
+    (model_elements_to_map_bindings model_elements)
     
 let print_model_elements_on_lines_json fmt model_file =
   Json.map_bindings
@@ -241,6 +250,7 @@ let print_model_json fmt model =
 let model_to_string_json model =
   print_model_json str_formatter model;
   flush_str_formatter ()
+
 
 (*
 *************************************************************** 
