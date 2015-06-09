@@ -495,6 +495,7 @@ let c_any c = mk_cexp Cany c
 let c_fun args p q xq old ({e_effect = eff} as e) =
   (* reset variables are forbidden in post-conditions *)
   let c = try create_cty args p q xq old eff e.e_ity with
+    | BadGhostWrite (v,r) -> localize_ghost_write v r [e]
     | StaleVariable (v,r) -> localize_cover_stale v r [e] in
   mk_cexp (Cfun e) c
 
