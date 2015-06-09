@@ -332,7 +332,16 @@ let prove_task_prepared
   Buffer.reset buf;
   res
 
-let prove_task ~command ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
+let add_cntexample_meta task cntexample =
+  if not (cntexample) then task
+  else
+    let cnt_meta = lookup_meta "get_counterexmp" in
+    let g,task = Task.task_separate_goal task in
+    let task = Task.add_meta task cnt_meta [] in
+    Task.add_tdecl task g
+
+let prove_task ~command ?(cntexample=false) ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
+  let task = add_cntexample_meta task cntexample in
   let task = prepare_task drv task in
   prove_task_prepared ~command ?timelimit ?memlimit
                       ?steplimit ?old ?inplace drv task

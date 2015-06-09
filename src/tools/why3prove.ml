@@ -209,9 +209,7 @@ let () = try
     in
     Task.add_meta task meta args
   in
-  let metas = if !opt_cntexmp then (("get_counterexmp", None)::!opt_metas)
-    else !opt_metas in
-  opt_task := List.fold_left add_meta !opt_task metas
+  opt_task := List.fold_left add_meta !opt_task !opt_metas
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
@@ -280,7 +278,7 @@ let output_theory drv fname _tname th task dir =
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
-        let call = Driver.prove_task ~command ~timelimit ~memlimit drv task in
+        let call = Driver.prove_task ~command ~cntexample:!opt_cntexmp ~timelimit ~memlimit drv task in
         let res = Call_provers.wait_on_call (call ()) () in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string

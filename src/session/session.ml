@@ -1837,18 +1837,6 @@ let pos_of_metas lms =
   List.fold_left (fun idpos (_,args) ->
     List.fold_left look_for_ident idpos args) empty_idpos lms
 
-let add_meta_to_task g meta meta_args =
-  (*let task = goal_task goal in
-  let task = Task.add_meta task meta meta_args in
-  goal.goal_task <- Some task 
-  *)
-  let goal,task = Task.task_separate_goal (goal_task g) in
-  let task = Task.add_meta task meta meta_args in
-  g.goal_task <- Some task
-
-
-    
-
 let add_registered_metas ~keygen env added0 g =
   let added = List.fold_left (fun ma (s,l) ->
     Mstr.change (function

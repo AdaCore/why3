@@ -999,10 +999,9 @@ let prover_on_selected_goals pr =
       try
        let a = get_any_from_row_reference row in
        M.run_prover
-	 MA.keygen
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit ~memlimit
+         ~cntexample:!opt_cntexmp ~timelimit ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1108,13 +1107,14 @@ let bisect_proof_attempt pa =
         let npa = S.copy_external_proof ~notify ~keygen ~obsolete:true
           ~goal ~env_session:eS pa in
         MA.init_any (S.Metas metas);
-        M.run_external_proof eS sched npa
+        M.run_external_proof eS sched ~cntexample:!opt_cntexmp npa
         with e ->
           dprintf debug "Bisecting error:@\n%a@."
             Exn_printer.exn_printer e end
       | Eliminate_definition.BSstep (t,c) ->
         assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
+	  ~cntexample:!opt_cntexmp
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
 	  ~steplimit:(-1)
@@ -1153,6 +1153,7 @@ let bisect_proof_attempt pa =
             dprintf debug "Prover can't be loaded.@."
           | Some lp ->
             M.schedule_proof_attempt
+	      ~cntexample:!opt_cntexmp
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
 	      ~steplimit:(-1)
@@ -1163,7 +1164,7 @@ let bisect_proof_attempt pa =
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
     C.print_prover pa.S.proof_prover;
-  M.run_external_proof eS sched ~callback:first_callback pa
+  M.run_external_proof eS sched ~cntexample:!opt_cntexmp ~callback:first_callback pa
 
 let apply_bisect_on_selection () =
   List.iter

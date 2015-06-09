@@ -443,8 +443,6 @@ val remove_transformation : ?notify:'key notify -> 'key transf -> unit
   (** Remove a transformation *)
 
 (** {2 Metas} *)
-val add_meta_to_task : 'key goal -> Theory.meta -> Theory.meta_arg list -> unit
-
 val add_registered_metas :
   keygen:'key keygen ->
   'key env_session ->

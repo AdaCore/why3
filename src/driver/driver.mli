@@ -56,6 +56,7 @@ val print_theory :
 
 val prove_task :
   command    : string ->
+  ?cntexample : bool ->
   ?timelimit : int ->
   ?memlimit  : int ->
   ?steplimit : int ->
