@@ -880,7 +880,7 @@ let add_label ({pvm = pvm; old = old} as env) l =
   let ht = Hpv.create 3 in
   { env with old = Mstr.add l (pvm, ht) old }, ht
 
-let rebase_old pvm preold old fvs =
+let rebase_old {pvm = pvm} preold old fvs =
   let rebase v (_,{pv_vs = o}) sbs =
     if not (Mvs.mem o fvs) then sbs else match preold with
       | Some preold ->
@@ -888,16 +888,16 @@ let rebase_old pvm preold old fvs =
       | None -> raise (UnboundLabel "'0") in
   Hpv.fold rebase old Mvs.empty
 
-let rebase_pre pvm preold old pl =
+let rebase_pre env preold old pl =
   let pl = List.map to_fmla pl in
   let fvs = List.fold_left t_freevars Mvs.empty pl in
-  let sbs = rebase_old pvm preold old fvs in
+  let sbs = rebase_old env preold old fvs in
   List.map (t_subst sbs) pl
 
-let rebase_variant pvm preold old varl =
+let rebase_variant env preold old varl =
   let add s (t,_) = t_freevars s t in
   let fvs = List.fold_left add Mvs.empty varl in
-  let sbs = rebase_old pvm preold old fvs in
+  let sbs = rebase_old env preold old fvs in
   let conv (t,rel) = t_subst sbs t, rel in
   List.map conv varl
 
@@ -932,7 +932,7 @@ let cty_of_spec env bl dsp dity =
   let dsp = get_later env dsp ty in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_strong eff in
-  let p = rebase_pre env.pvm preold old dsp.ds_pre in
+  let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
   create_cty bl p q xq (get_oldies old) eff ity
@@ -1203,8 +1203,8 @@ and lambda uloc env pvl dsp dvl de =
   let env, old = add_label env "'0" in
   let dsp = get_later env dsp ty in
   let dvl = get_later env dvl in
-  let dvl = rebase_variant env.pvm preold old dvl in
-  let p = rebase_pre env.pvm preold old dsp.ds_pre in
+  let dvl = rebase_variant env preold old dvl in
+  let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
   c_fun pvl p q xq (get_oldies old) e, dsp, dvl
