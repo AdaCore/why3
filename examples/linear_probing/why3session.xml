@@ -2,58 +2,56 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
-<prover id="1" name="Z3" version="2.19" timelimit="6" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="15" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="6" memlimit="4000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.2" timelimit="10" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="6" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <file name="../linear_probing.mlw" expanded="true">
-<theory name="HashedTypeWithDummy" sum="4269429568f3fbb7d823360ad8d67d2f" expanded="true">
+<theory name="HashedTypeWithDummy" sum="4269429568f3fbb7d823360ad8d67d2f">
  <goal name="WP_parameter neq" expl="VC for neq">
  <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
 </theory>
-<theory name="LinearProbing" sum="e8dada3aec36f02f94624471fda598ef" expanded="true">
+<theory name="LinearProbing" sum="2fe5abd18e706fb724aa196d28359d87">
  <goal name="bucket_bounds">
  <proof prover="5"><result status="valid" time="0.02" steps="16"/></proof>
  </goal>
  <goal name="NumOfDummy.WP_parameter numof_eq" expl="VC for numof_eq">
  <transf name="split_goal_wp">
   <goal name="WP_parameter numof_eq.1" expl="1. variant decrease">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter numof_eq.2" expl="2. precondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter numof_eq.3" expl="3. precondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter numof_eq.4" expl="4. postcondition">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter numof_eq.5" expl="5. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="NumOfDummy.WP_parameter dummy_const" expl="VC for dummy_const">
  <transf name="split_goal_wp">
   <goal name="WP_parameter dummy_const.1" expl="1. variant decrease">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter dummy_const.2" expl="2. precondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter dummy_const.3" expl="3. precondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter dummy_const.4" expl="4. postcondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5" timelimit="5"><result status="timeout" time="6.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter dummy_const.5" expl="5. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
@@ -62,7 +60,7 @@
   <goal name="WP_parameter numof_update.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter numof_update.1.1" expl="1. VC for numof_update">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="23"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.06" steps="23"/></proof>
    </goal>
    <goal name="WP_parameter numof_update.1.2" expl="2. VC for numof_update">
    <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
@@ -72,7 +70,7 @@
   <goal name="WP_parameter numof_update.2" expl="2. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter numof_update.2.1" expl="1. VC for numof_update">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="78"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.05" steps="46"/></proof>
    </goal>
    <goal name="WP_parameter numof_update.2.2" expl="2. VC for numof_update">
    <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
@@ -80,261 +78,261 @@
   </transf>
   </goal>
   <goal name="WP_parameter numof_update.3" expl="3. postcondition">
-  <proof prover="3"><result status="valid" time="0.81"/></proof>
+  <proof prover="4"><result status="valid" time="1.02"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter create" expl="VC for create">
  <transf name="split_goal_wp">
   <goal name="WP_parameter create.1" expl="1. array creation size">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="1"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="1"/></proof>
   </goal>
   <goal name="WP_parameter create.2" expl="2. type invariant">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="2"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter create.3" expl="3. type invariant">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter create.4" expl="4. type invariant">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter create.5" expl="5. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter clear" expl="VC for clear">
  <transf name="split_goal_wp">
   <goal name="WP_parameter clear.1" expl="1. precondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter clear.2" expl="2. type invariant">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter clear.3" expl="3. type invariant">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter clear.4" expl="4. type invariant">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.04" steps="34"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.04" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter clear.5" expl="5. type invariant">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter clear.6" expl="6. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter clear.7" expl="7. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter find" expl="VC for find">
  <transf name="split_goal_wp">
   <goal name="WP_parameter find.1" expl="1. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.03" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter find.2" expl="2. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find.3" expl="3. postcondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find.4" expl="4. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter find.5" expl="5. index in array bounds">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find.6" expl="6. postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter find.7" expl="7. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter find.8" expl="8. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter find.9" expl="9. variant decrease">
   <transf name="split_goal_wp">
    <goal name="WP_parameter find.9.1" expl="1. VC for find">
-   <proof prover="5"><result status="valid" time="0.04" steps="24"/></proof>
+   <proof prover="6"><result status="valid" time="0.04" steps="25"/></proof>
    </goal>
    <goal name="WP_parameter find.9.2" expl="2. VC for find">
-   <proof prover="3"><result status="valid" time="0.09"/></proof>
+   <proof prover="4"><result status="valid" time="0.32"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter find.10" expl="10. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter find.11" expl="11. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter find.12" expl="12. precondition">
-  <proof prover="5"><result status="valid" time="0.06" steps="138"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="188"/></proof>
   </goal>
   <goal name="WP_parameter find.13" expl="13. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter find.14" expl="14. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter find.15" expl="15. postcondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="14"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter find.16" expl="16. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter find.17" expl="17. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="38"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter find.18" expl="18. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="4"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter find.19" expl="19. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter find.20" expl="20. precondition">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="4"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter find.21" expl="21. postcondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find.22" expl="22. postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find.23" expl="23. postcondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter mem" expl="VC for mem">
  <transf name="split_goal_wp">
   <goal name="WP_parameter mem.1" expl="1. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter mem.2" expl="2. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter mem.3" expl="3. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter mem.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.28"/></proof>
+  <proof prover="0" timelimit="6"><result status="valid" time="0.46"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter resize" expl="VC for resize">
  <transf name="split_goal_wp">
   <goal name="WP_parameter resize.1" expl="1. array creation size">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter resize.2" expl="2. type invariant">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter resize.3" expl="3. type invariant">
-  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter resize.4" expl="4. type invariant">
-  <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter resize.5" expl="5. type invariant">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter resize.6" expl="6. postcondition">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter resize.7" expl="7. loop invariant init">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.04" steps="43"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.04" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter resize.8" expl="8. loop invariant init">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.03" steps="15"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.03" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter resize.9" expl="9. loop invariant init">
   <transf name="split_goal_wp">
    <goal name="WP_parameter resize.9.1" expl="1. loop invariant init">
-   <proof prover="5"><result status="valid" time="0.04" steps="11"/></proof>
+   <proof prover="6"><result status="valid" time="0.04" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter resize.9.2" expl="2. loop invariant init">
-   <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+   <proof prover="6"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter resize.9.3" expl="3. loop invariant init">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter resize.9.4" expl="4. loop invariant init">
-   <proof prover="5"><result status="valid" time="0.02" steps="15"/></proof>
+   <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter resize.9.5" expl="5. loop invariant init">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter resize.9.6" expl="6. loop invariant init">
-   <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
+   <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter resize.10" expl="10. index in array bounds">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.03" steps="10"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter resize.11" expl="11. type invariant">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.03" steps="12"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter resize.12" expl="12. precondition">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter resize.13" expl="13. precondition">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.03" steps="43"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.03" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter resize.14" expl="14. assertion">
-  <proof prover="3"><result status="valid" time="0.14"/></proof>
+  <proof prover="4"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter resize.15" expl="15. index in array bounds">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.03" steps="17"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.03" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter resize.16" expl="16. assertion">
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="4"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter resize.17" expl="17. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.22"/></proof>
+  <proof prover="4"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter resize.18" expl="18. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  <proof prover="0" timelimit="6"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter resize.19" expl="19. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.26"/></proof>
+  <proof prover="0" timelimit="6"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="WP_parameter resize.20" expl="20. loop invariant preservation">
-  <proof prover="3" timelimit="20"><result status="valid" time="0.02"/></proof>
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter resize.21" expl="21. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.03" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter resize.22" expl="22. loop invariant preservation">
   <transf name="split_goal_wp">
    <goal name="WP_parameter resize.22.1" expl="1. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter resize.22.2" expl="2. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter resize.22.3" expl="3. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter resize.22.4" expl="4. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.16"/></proof>
+   <proof prover="4"><result status="valid" time="0.40"/></proof>
    </goal>
    <goal name="WP_parameter resize.22.5" expl="5. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.42"/></proof>
+   <proof prover="4"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="WP_parameter resize.22.6" expl="6. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter resize.23" expl="23. type invariant">
-  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter resize.24" expl="24. type invariant">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter resize.25" expl="25. type invariant">
   <transf name="split_goal_wp">
@@ -344,8 +342,8 @@
     <transf name="split_goal_wp">
      <goal name="WP_parameter resize.25.1.1.1" expl="1. VC for resize">
      <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
-     <proof prover="3"><result status="valid" time="0.01"/></proof>
-     <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+     <proof prover="4"><result status="valid" time="0.01"/></proof>
+     <proof prover="6"><result status="valid" time="0.02" steps="8"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.2" expl="2. VC for resize">
      <proof prover="2" memlimit="1000"><result status="valid" time="0.08"/></proof>
@@ -354,20 +352,17 @@
      <proof prover="2" memlimit="1000"><result status="valid" time="0.08"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.4" expl="4. VC for resize">
-     <proof prover="1"><result status="valid" time="0.03"/></proof>
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="4"><result status="valid" time="0.03"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.5" expl="5. VC for resize">
-     <proof prover="1"><result status="valid" time="0.02"/></proof>
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="4"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.6" expl="6. VC for resize">
-     <proof prover="1"><result status="valid" time="0.03"/></proof>
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="4"><result status="valid" time="0.03"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.7" expl="7. VC for resize">
      <proof prover="2" memlimit="1000"><result status="valid" time="0.10"/></proof>
-     <proof prover="5"><result status="valid" time="1.72" steps="256"/></proof>
+     <proof prover="6"><result status="valid" time="0.30" steps="158"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.8" expl="8. VC for resize">
      <proof prover="2" memlimit="1000"><result status="valid" time="0.35"/></proof>
@@ -379,120 +374,119 @@
   </transf>
   </goal>
   <goal name="WP_parameter resize.26" expl="26. type invariant">
-  <proof prover="5"><result status="valid" time="0.03" steps="11"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter resize.27" expl="27. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
  <transf name="split_goal_wp">
   <goal name="WP_parameter add.1" expl="1. VC for add">
-  <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter add.2" expl="2. VC for add">
-  <proof prover="5"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter add.3" expl="3. precondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="11"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter add.4" expl="4. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter add.5" expl="5. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter add.6" expl="6. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter add.7" expl="7. assertion">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="4"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="WP_parameter add.8" expl="8. type invariant">
-  <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter add.9" expl="9. type invariant">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.22"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter add.10" expl="10. type invariant">
   <transf name="inline_goal">
    <goal name="WP_parameter add.10.1" expl="1. type invariant">
    <transf name="split_goal_wp">
     <goal name="WP_parameter add.10.1.1" expl="1. VC for add">
-    <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="17"/></proof>
+    <proof prover="6" timelimit="1"><result status="valid" time="0.04" steps="17"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.2" expl="2. VC for add">
-    <proof prover="2" memlimit="1000"><result status="valid" time="1.14"/></proof>
-    <proof prover="3"><result status="valid" time="1.50"/></proof>
+    <proof prover="2" memlimit="1000"><result status="valid" time="2.27"/></proof>
+    <proof prover="4"><result status="valid" time="0.91"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.3" expl="3. VC for add">
-    <proof prover="3"><result status="valid" time="1.96"/></proof>
+    <proof prover="4"><result status="valid" time="1.11"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.4" expl="4. VC for add">
-    <proof prover="3"><result status="valid" time="0.82"/></proof>
+    <proof prover="4"><result status="valid" time="0.58"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.5" expl="5. VC for add">
-    <proof prover="3"><result status="valid" time="0.90"/></proof>
+    <proof prover="4"><result status="valid" time="0.21"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.6" expl="6. VC for add">
-    <proof prover="3"><result status="valid" time="1.52"/></proof>
+    <proof prover="4"><result status="valid" time="0.87"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.7" expl="7. VC for add">
-    <proof prover="2" timelimit="10"><result status="valid" time="0.90"/></proof>
+    <proof prover="2" timelimit="10"><result status="valid" time="1.80"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.8" expl="8. VC for add">
-    <proof prover="3"><result status="valid" time="0.87"/></proof>
+    <proof prover="4"><result status="valid" time="1.36"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter add.11" expl="11. type invariant">
-  <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter add.12" expl="12. postcondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="26"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter add.13" expl="13. type invariant">
-  <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter add.14" expl="14. type invariant">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="4"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter add.15" expl="15. type invariant">
-  <proof prover="3" timelimit="10"><result status="valid" time="0.66"/></proof>
-  <proof prover="4"><result status="valid" time="0.44"/></proof>
+  <proof prover="4" timelimit="10"><result status="valid" time="0.44"/></proof>
   </goal>
   <goal name="WP_parameter add.16" expl="16. postcondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="21"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter copy" expl="VC for copy">
  <transf name="split_goal_wp">
   <goal name="WP_parameter copy.1" expl="1. type invariant">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter copy.2" expl="2. type invariant">
   <metas>
-   <ts_pos name="option" arity="1" id="2511"
+   <ts_pos name="option" arity="1" id="2577"
     ip_theory="Option">
     <ip_library name="option"/>
     <ip_qualid name="option"/>
    </ts_pos>
-   <ts_pos name="list" arity="1" id="2515"
+   <ts_pos name="list" arity="1" id="2581"
     ip_theory="List">
     <ip_library name="list"/>
     <ip_qualid name="list"/>
    </ts_pos>
-   <ts_pos name="ref" arity="1" id="4567"
+   <ts_pos name="ref" arity="1" id="4633"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
    </ts_pos>
-   <ts_pos name="t" arity="0" id="6018"
+   <ts_pos name="t" arity="0" id="6084"
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
@@ -541,76 +535,76 @@
     <ip_library name="int"/>
     <ip_qualid name="mod"/>
    </ls_pos>
-   <ls_pos name="keym" id="2463"
+   <ls_pos name="keym" id="2529"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="keym"/>
    </ls_pos>
-   <ls_pos name="hash" id="2492"
+   <ls_pos name="hash" id="2558"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash"/>
    </ls_pos>
-   <ls_pos name="dummy" id="2501"
+   <ls_pos name="dummy" id="2567"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="dummy"/>
    </ls_pos>
-   <ls_pos name="mem" id="2539"
+   <ls_pos name="mem" id="2605"
     ip_theory="Mem">
     <ip_library name="list"/>
     <ip_qualid name="mem"/>
    </ls_pos>
-   <ls_pos name="get" id="3189"
+   <ls_pos name="get" id="3255"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="get"/>
    </ls_pos>
-   <ls_pos name="set" id="3192"
+   <ls_pos name="set" id="3258"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix []" id="3199"
+   <ls_pos name="mixfix []" id="3265"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="mixfix []"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="3212"
+   <ls_pos name="mixfix [&lt;-]" id="3278"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="const" id="3243"
+   <ls_pos name="const" id="3309"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="const"/>
    </ls_pos>
-   <ls_pos name="prefix !" id="4573"
+   <ls_pos name="prefix !" id="4639"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="prefix !"/>
    </ls_pos>
-   <ls_pos name="set" id="4740"
+   <ls_pos name="set" id="4806"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="4782"
+   <ls_pos name="mixfix [&lt;-]" id="4848"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="make" id="4883"
+   <ls_pos name="make" id="4949"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="make"/>
    </ls_pos>
-   <ls_pos name="numofd" id="5799"
+   <ls_pos name="numofd" id="5865"
     ip_theory="LinearProbing">
     <ip_qualid name="numofd"/>
    </ls_pos>
-   <ls_pos name="next" id="6625"
+   <ls_pos name="next" id="6691"
     ip_theory="LinearProbing">
     <ip_qualid name="next"/>
    </ls_pos>
@@ -798,41 +792,41 @@
     <ip_library name="int"/>
     <ip_qualid name="Mod_mult"/>
    </pr_pos>
-   <pr_pos name="hash_nonneg" id="2493"
+   <pr_pos name="hash_nonneg" id="2559"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash_nonneg"/>
    </pr_pos>
-   <pr_pos name="hash_eq" id="2496"
+   <pr_pos name="hash_eq" id="2562"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash_eq"/>
    </pr_pos>
-   <pr_pos name="Select_eq" id="3225"
+   <pr_pos name="Select_eq" id="3291"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_eq"/>
    </pr_pos>
-   <pr_pos name="Select_neq" id="3234"
+   <pr_pos name="Select_neq" id="3300"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_neq"/>
    </pr_pos>
-   <pr_pos name="Const" id="3245"
+   <pr_pos name="Const" id="3311"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Const"/>
    </pr_pos>
-   <pr_pos name="bucket_bounds" id="5460"
+   <pr_pos name="bucket_bounds" id="5526"
     ip_theory="LinearProbing">
     <ip_qualid name="bucket_bounds"/>
    </pr_pos>
-   <pr_pos name="numof_eq" id="5689"
+   <pr_pos name="numof_eq" id="5755"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="numof_eq"/>
    </pr_pos>
-   <pr_pos name="dummy_const" id="5795"
+   <pr_pos name="dummy_const" id="5861"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="dummy_const"/>
@@ -865,49 +859,49 @@
     <meta_arg_ls id="1923"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2463"/>
+    <meta_arg_ls id="2529"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2492"/>
+    <meta_arg_ls id="2558"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2501"/>
+    <meta_arg_ls id="2567"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2539"/>
+    <meta_arg_ls id="2605"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3189"/>
+    <meta_arg_ls id="3255"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3192"/>
+    <meta_arg_ls id="3258"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3199"/>
+    <meta_arg_ls id="3265"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3212"/>
+    <meta_arg_ls id="3278"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3243"/>
+    <meta_arg_ls id="3309"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4573"/>
+    <meta_arg_ls id="4639"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4740"/>
+    <meta_arg_ls id="4806"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4782"/>
+    <meta_arg_ls id="4848"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4883"/>
+    <meta_arg_ls id="4949"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5799"/>
+    <meta_arg_ls id="5865"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="6625"/>
+    <meta_arg_ls id="6691"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="1603"/>
@@ -1015,203 +1009,203 @@
     <meta_arg_pr id="1989"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2493"/>
+    <meta_arg_pr id="2559"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2496"/>
+    <meta_arg_pr id="2562"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3225"/>
+    <meta_arg_pr id="3291"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3234"/>
+    <meta_arg_pr id="3300"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3245"/>
+    <meta_arg_pr id="3311"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5460"/>
+    <meta_arg_pr id="5526"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5689"/>
+    <meta_arg_pr id="5755"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5795"/>
+    <meta_arg_pr id="5861"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2511"/>
+    <meta_arg_ts id="2577"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2515"/>
+    <meta_arg_ts id="2581"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="4567"/>
+    <meta_arg_ts id="4633"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="6018"/>
+    <meta_arg_ts id="6084"/>
    </meta>
    <goal name="WP_parameter copy.2" expl="2. type invariant">
    <transf name="eliminate_builtin">
     <goal name="WP_parameter copy.2.1" expl="1. type invariant">
-    <proof prover="3"><result status="valid" time="0.86"/></proof>
+    <proof prover="4"><result status="valid" time="0.33"/></proof>
     </goal>
    </transf>
    </goal>
   </metas>
   </goal>
   <goal name="WP_parameter copy.3" expl="3. type invariant">
-  <proof prover="3"><result status="valid" time="0.25"/></proof>
+  <proof prover="4"><result status="valid" time="1.18"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter find_dummy" expl="VC for find_dummy">
  <transf name="split_goal_wp">
   <goal name="WP_parameter find_dummy.1" expl="1. index in array bounds">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.2" expl="2. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.3" expl="3. postcondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.4" expl="4. postcondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.5" expl="5. postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.6" expl="6. variant decrease">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="57"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.08" steps="47"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.7" expl="7. precondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.8" expl="8. precondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.9" expl="9. precondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="43"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.04" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.10" expl="10. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter find_dummy.10.1" expl="1. precondition">
-   <proof prover="5"><result status="valid" time="0.56" steps="333"/></proof>
+   <proof prover="6"><result status="valid" time="0.40" steps="298"/></proof>
    </goal>
    <goal name="WP_parameter find_dummy.10.2" expl="2. precondition">
-   <proof prover="5"><result status="valid" time="0.13" steps="108"/></proof>
+   <proof prover="6"><result status="valid" time="0.13" steps="135"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter find_dummy.11" expl="11. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="59"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.12" expl="12. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.13" expl="13. postcondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.14" expl="14. postcondition">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6" timelimit="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter find_dummy.15" expl="15. postcondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter delete" expl="VC for delete">
  <transf name="split_goal_wp">
   <goal name="WP_parameter delete.1" expl="1. index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter delete.2" expl="2. variant decrease">
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.2.1" expl="1. VC for delete">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="35"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
    <goal name="WP_parameter delete.2.2" expl="2. VC for delete">
-   <proof prover="5"><result status="valid" time="0.07" steps="94"/></proof>
+   <proof prover="6"><result status="valid" time="0.07" steps="86"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter delete.3" expl="3. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter delete.4" expl="4. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter delete.5" expl="5. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter delete.6" expl="6. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter delete.7" expl="7. precondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter delete.8" expl="8. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter delete.9" expl="9. precondition">
-  <proof prover="5"><result status="valid" time="0.06" steps="64"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="108"/></proof>
   </goal>
   <goal name="WP_parameter delete.10" expl="10. precondition">
   <transf name="inline_goal">
    <goal name="WP_parameter delete.10.1" expl="1. precondition">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.36" steps="666"/></proof>
+   <proof prover="6" timelimit="5"><result status="valid" time="0.36" steps="572"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter delete.11" expl="11. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter delete.12" expl="12. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter delete.13" expl="13. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.13.1" expl="1. precondition">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter delete.13.2" expl="2. precondition">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter delete.13.3" expl="3. precondition">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="24"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.01" steps="24"/></proof>
    </goal>
    <goal name="WP_parameter delete.13.4" expl="4. precondition">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="103"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.14" steps="84"/></proof>
    </goal>
    <goal name="WP_parameter delete.13.5" expl="5. precondition">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
+   <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter delete.14" expl="14. postcondition">
-  <proof prover="5"><result status="valid" time="0.10" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.10" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter delete.15" expl="15. postcondition">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter delete.16" expl="16. precondition">
-  <proof prover="5"><result status="valid" time="0.06" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter delete.17" expl="17. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="28"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter delete.18" expl="18. index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter delete.19" expl="19. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter delete.20" expl="20. precondition">
   <transf name="split_goal_wp">
@@ -1221,20 +1215,20 @@
   </transf>
   </goal>
   <goal name="WP_parameter delete.21" expl="21. precondition">
-  <proof prover="5"><result status="valid" time="0.06" steps="33"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter delete.22" expl="22. precondition">
-  <proof prover="5"><result status="valid" time="0.05" steps="29"/></proof>
+  <proof prover="6"><result status="valid" time="0.05" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter delete.23" expl="23. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="39"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter delete.24" expl="24. index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter delete.25" expl="25. precondition">
-  <proof prover="5"><result status="valid" time="0.06" steps="33"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter delete.26" expl="26. precondition">
   <transf name="split_goal_wp">
@@ -1244,112 +1238,112 @@
   </transf>
   </goal>
   <goal name="WP_parameter delete.27" expl="27. precondition">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="4"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter delete.28" expl="28. variant decrease">
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.28.1" expl="1. VC for delete">
-   <proof prover="5"><result status="valid" time="0.12" steps="54"/></proof>
+   <proof prover="6"><result status="valid" time="0.12" steps="42"/></proof>
    </goal>
    <goal name="WP_parameter delete.28.2" expl="2. VC for delete">
-   <proof prover="3"><result status="valid" time="0.18"/></proof>
+   <proof prover="4"><result status="valid" time="0.18"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter delete.29" expl="29. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="36"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter delete.30" expl="30. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter delete.31" expl="31. precondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter delete.32" expl="32. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="40"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter delete.33" expl="33. precondition">
-  <proof prover="5"><result status="valid" time="0.07" steps="36"/></proof>
+  <proof prover="6"><result status="valid" time="0.07" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter delete.34" expl="34. precondition">
-  <proof prover="5"><result status="valid" time="0.08" steps="36"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter delete.35" expl="35. precondition">
-  <proof prover="5"><result status="valid" time="0.06" steps="43"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter delete.36" expl="36. precondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.30"/></proof>
+  <proof prover="0"><result status="valid" time="0.20"/></proof>
+  <proof prover="2" timelimit="15" memlimit="1000"><result status="valid" time="0.71"/></proof>
   </goal>
   <goal name="WP_parameter delete.37" expl="37. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="36"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter delete.38" expl="38. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.38.1" expl="1. precondition">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.37"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.97"/></proof>
    </goal>
    <goal name="WP_parameter delete.38.2" expl="2. precondition">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.42"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="1.15"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter delete.39" expl="39. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.39.1" expl="1. precondition">
-   <proof prover="3"><result status="valid" time="0.44"/></proof>
+   <proof prover="0"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="WP_parameter delete.39.2" expl="2. precondition">
-   <proof prover="3"><result status="valid" time="0.66"/></proof>
+   <proof prover="4"><result status="valid" time="0.66"/></proof>
    </goal>
    <goal name="WP_parameter delete.39.3" expl="3. precondition">
-   <proof prover="3"><result status="valid" time="0.33"/></proof>
+   <proof prover="0"><result status="valid" time="0.18"/></proof>
    </goal>
    <goal name="WP_parameter delete.39.4" expl="4. precondition">
-   <proof prover="2" memlimit="1000"><result status="valid" time="3.79"/></proof>
-   <proof prover="3"><result status="valid" time="1.79"/></proof>
+   <proof prover="4"><result status="valid" time="3.33"/></proof>
    </goal>
    <goal name="WP_parameter delete.39.5" expl="5. precondition">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.15"/></proof>
+   <proof prover="0"><result status="valid" time="3.58"/></proof>
+   <proof prover="4" timelimit="15"><result status="valid" time="13.08"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter delete.40" expl="40. postcondition">
-  <proof prover="3"><result status="valid" time="2.17"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="41"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter delete.41" expl="41. postcondition">
-  <proof prover="5"><result status="valid" time="0.10" steps="41"/></proof>
+  <proof prover="6"><result status="valid" time="0.10" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter delete.42" expl="42. postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter delete.42.1" expl="1. postcondition">
    <transf name="split_goal_wp">
     <goal name="WP_parameter delete.42.1.1" expl="1. VC for delete">
-    <proof prover="5"><result status="valid" time="0.03" steps="10"/></proof>
+    <proof prover="6"><result status="valid" time="0.03" steps="10"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.2" expl="2. VC for delete">
-    <proof prover="5"><result status="valid" time="0.06" steps="29"/></proof>
+    <proof prover="6"><result status="valid" time="0.06" steps="34"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.3" expl="3. VC for delete">
-    <proof prover="5"><result status="valid" time="0.06" steps="62"/></proof>
+    <proof prover="6"><result status="valid" time="0.06" steps="102"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.4" expl="4. VC for delete">
-    <proof prover="5"><result status="valid" time="0.04" steps="12"/></proof>
+    <proof prover="6"><result status="valid" time="0.04" steps="14"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.5" expl="5. VC for delete">
-    <proof prover="5"><result status="valid" time="0.04" steps="15"/></proof>
+    <proof prover="6"><result status="valid" time="0.04" steps="15"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.6" expl="6. VC for delete">
-    <proof prover="5"><result status="valid" time="0.06" steps="25"/></proof>
+    <proof prover="6"><result status="valid" time="0.06" steps="25"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.7" expl="7. VC for delete">
-    <proof prover="5"><result status="valid" time="0.32" steps="136"/></proof>
+    <proof prover="6"><result status="valid" time="0.32" steps="315"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.8" expl="8. VC for delete">
-    <proof prover="3"><result status="valid" time="0.28"/></proof>
+    <proof prover="4"><result status="valid" time="0.28"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1360,36 +1354,36 @@
  <goal name="WP_parameter remove" expl="VC for remove">
  <transf name="split_goal_wp">
   <goal name="WP_parameter remove.1" expl="1. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter remove.2" expl="2. precondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter remove.3" expl="3. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter remove.4" expl="4. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter remove.5" expl="5. assertion">
-  <proof prover="3"><result status="valid" time="0.19"/></proof>
+  <proof prover="4" timelimit="15"><result status="valid" time="5.97"/></proof>
   </goal>
   <goal name="WP_parameter remove.6" expl="6. type invariant">
-  <proof prover="5"><result status="valid" time="0.03" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter remove.7" expl="7. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter remove.8" expl="8. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter remove.9" expl="9. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="33"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter remove.10" expl="10. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter remove.10.1" expl="1. precondition">
-   <proof prover="3"><result status="valid" time="0.19"/></proof>
+   <proof prover="4"><result status="valid" time="1.45"/></proof>
    </goal>
    <goal name="WP_parameter remove.10.2" expl="2. precondition">
    <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.07"/></proof>
@@ -1397,66 +1391,66 @@
   </transf>
   </goal>
   <goal name="WP_parameter remove.11" expl="11. precondition">
-  <proof prover="5"><result status="valid" time="0.13" steps="144"/></proof>
+  <proof prover="6"><result status="valid" time="0.13" steps="217"/></proof>
   </goal>
   <goal name="WP_parameter remove.12" expl="12. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.13" expl="13. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.14" expl="14. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.15" expl="15. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.16" expl="16. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter remove.17" expl="17. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.18" expl="18. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="27"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter remove.19" expl="19. precondition">
-  <proof prover="5"><result status="valid" time="0.04" steps="34"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter remove.20" expl="20. precondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter remove.21" expl="21. precondition">
-  <proof prover="2" memlimit="1000"><result status="valid" time="0.70"/></proof>
-  <proof prover="3"><result status="valid" time="0.94"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="1.84"/></proof>
+  <proof prover="4"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="WP_parameter remove.22" expl="22. precondition">
-  <proof prover="3"><result status="valid" time="0.21"/></proof>
-  <proof prover="5"><result status="valid" time="0.52" steps="258"/></proof>
+  <proof prover="4"><result status="valid" time="1.08"/></proof>
+  <proof prover="6"><result status="valid" time="2.37" steps="1017"/></proof>
   </goal>
   <goal name="WP_parameter remove.23" expl="23. type invariant">
-  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  <proof prover="4"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter remove.24" expl="24. type invariant">
-  <proof prover="3"><result status="valid" time="0.38"/></proof>
+  <proof prover="4"><result status="valid" time="1.61"/></proof>
   </goal>
   <goal name="WP_parameter remove.25" expl="25. type invariant">
   <transf name="split_goal_wp">
    <goal name="WP_parameter remove.25.1" expl="1. type invariant">
-   <proof prover="5"><result status="valid" time="0.02" steps="30"/></proof>
+   <proof prover="6"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter remove.26" expl="26. type invariant">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="30"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter remove.27" expl="27. postcondition">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.03" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter remove.28" expl="28. postcondition">
-  <proof prover="3"><result status="valid" time="2.32"/></proof>
+  <proof prover="4"><result status="valid" time="0.27"/></proof>
   </goal>
  </transf>
  </goal>

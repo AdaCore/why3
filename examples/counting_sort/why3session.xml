@@ -3,215 +3,209 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
-<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
-<prover id="4" name="CVC3" version="2.2" timelimit="15" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
-<prover id="6" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
-<prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<file name="../counting_sort.mlw">
-<theory name="Spec" sum="36f9506a4494eadbd060233c2a1dcef6">
+<prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="0"/>
+<prover id="9" name="Z3" version="4.3.2" timelimit="5" memlimit="4000"/>
+<file name="../counting_sort.mlw" expanded="true">
+<theory name="Spec" sum="db70f973b78052e685a306f1ec49ced3">
  <goal name="WP_parameter eqlt" expl="VC for eqlt">
  <proof prover="3"><result status="valid" time="0.18"/></proof>
  </goal>
 </theory>
-<theory name="CountingSort" sum="febc1f0682761802dbe3a33827771031">
+<theory name="CountingSort" sum="76ebe1c323f0b6989e2aad5692dc9eb3">
  <goal name="WP_parameter counting_sort" expl="VC for counting_sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter counting_sort.1" expl="1. array creation size">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.2" expl="2. assertion">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.3" expl="3. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.4" expl="4. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.5" expl="5. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.6" expl="6. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.7" expl="7. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.04" steps="8"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.8" expl="8. index in array bounds">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.9" expl="9. loop invariant preservation">
   <proof prover="0" timelimit="10"><result status="valid" time="0.08"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.36" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.10" expl="10. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.11" expl="11. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.12" expl="12. loop invariant preservation">
   <transf name="inline_goal">
    <goal name="WP_parameter counting_sort.12.1" expl="1. loop invariant preservation">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="9" memlimit="1000"><result status="valid" time="0.05"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter counting_sort.13" expl="13. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.14" expl="14. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.15" expl="15. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.16" expl="16. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.17" expl="17. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.18" expl="18. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.19" expl="19. index in array bounds">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.20" expl="20. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.21" expl="21. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.22" expl="22. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.23" expl="23. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.24" expl="24. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="20"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.25" expl="25. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.26" expl="26. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.27" expl="27. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.28" expl="28. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.29" expl="29. assertion">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.11"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.30" expl="30. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.31" expl="31. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.06" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.06" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.32" expl="32. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.33" expl="33. index in array bounds">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
+  <proof prover="9"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.34" expl="34. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.35" expl="35. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.36" expl="36. index in array bounds">
   <proof prover="0" timelimit="60" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5" timelimit="15" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="6" timelimit="15" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="9" timelimit="15" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.37" expl="37. loop invariant preservation">
   <proof prover="0" timelimit="10"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.38" expl="38. assertion">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.39" expl="39. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.40" expl="40. loop invariant init">
-  <proof prover="5" timelimit="11" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="9" timelimit="11" memlimit="1000"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.41" expl="41. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.42" expl="42. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.43" expl="43. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.44" expl="44. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.45" expl="45. index in array bounds">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.46" expl="46. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.47" expl="47. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.48" expl="48. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.49" expl="49. loop invariant preservation">
-  <proof prover="5" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="9" timelimit="6" memlimit="1000"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.50" expl="50. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.51" expl="51. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.52" expl="52. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.53" expl="53. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.54" expl="54. loop invariant init">
-  <proof prover="5" timelimit="11" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="9" timelimit="11" memlimit="1000"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.55" expl="55. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.56" expl="56. index in array bounds">
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.57" expl="57. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="21"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.58" expl="58. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="33"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.59" expl="59. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.05" steps="33"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.05" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.60" expl="60. loop invariant preservation">
   <metas>
@@ -245,7 +239,7 @@
     <ip_library name="Mark"/>
     <ip_qualid name="&apos;mark"/>
    </ts_pos>
-   <ts_pos name="ref" arity="1" id="5298"
+   <ts_pos name="ref" arity="1" id="5364"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
@@ -297,57 +291,57 @@
     <ip_library name="int"/>
     <ip_qualid name="numof"/>
    </ls_pos>
-   <ls_pos name="get" id="2257"
+   <ls_pos name="get" id="2323"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="get"/>
    </ls_pos>
-   <ls_pos name="set" id="2260"
+   <ls_pos name="set" id="2326"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="const" id="2311"
+   <ls_pos name="const" id="2377"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="const"/>
    </ls_pos>
-   <ls_pos name="set" id="2706"
+   <ls_pos name="set" id="2772"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="2748"
+   <ls_pos name="mixfix [&lt;-]" id="2814"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="make" id="2849"
+   <ls_pos name="make" id="2915"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="make"/>
    </ls_pos>
-   <ls_pos name="sorted_sub" id="3038"
+   <ls_pos name="sorted_sub" id="3104"
     ip_theory="IntArraySorted">
     <ip_library name="array"/>
     <ip_qualid name="sorted_sub"/>
    </ls_pos>
-   <ls_pos name="sorted" id="3054"
+   <ls_pos name="sorted" id="3120"
     ip_theory="IntArraySorted">
     <ip_library name="array"/>
     <ip_qualid name="sorted"/>
    </ls_pos>
-   <ls_pos name="k" id="5042" ip_theory="Spec">
-    <ip_qualid name="k"/>
-   </ls_pos>
-   <ls_pos name="permut" id="5280"
-    ip_theory="Spec">
-    <ip_qualid name="permut"/>
-   </ls_pos>
-   <ls_pos name="prefix !" id="5304"
+   <ls_pos name="prefix !" id="5370"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="prefix !"/>
+   </ls_pos>
+   <ls_pos name="k" id="70550" ip_theory="Spec">
+    <ip_qualid name="k"/>
+   </ls_pos>
+   <ls_pos name="permut" id="70778"
+    ip_theory="Spec">
+    <ip_qualid name="permut"/>
    </ls_pos>
    <pr_pos name="Assoc" id="1478"
     ip_theory="Int">
@@ -503,21 +497,21 @@
     <ip_library name="int"/>
     <ip_qualid name="numof_strictly_increasing"/>
    </pr_pos>
-   <pr_pos name="Select_eq" id="2293"
+   <pr_pos name="Select_eq" id="2359"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_eq"/>
    </pr_pos>
-   <pr_pos name="Const" id="2313"
+   <pr_pos name="Const" id="2379"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Const"/>
    </pr_pos>
-   <pr_pos name="k_positive" id="5043"
+   <pr_pos name="k_positive" id="70551"
     ip_theory="Spec">
     <ip_qualid name="k_positive"/>
    </pr_pos>
-   <pr_pos name="eqlt" id="5275" ip_theory="Spec">
+   <pr_pos name="eqlt" id="70773" ip_theory="Spec">
     <ip_qualid name="eqlt"/>
    </pr_pos>
    <meta name="remove_logic">
@@ -548,37 +542,37 @@
     <meta_arg_ls id="1998"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2257"/>
+    <meta_arg_ls id="2323"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2260"/>
+    <meta_arg_ls id="2326"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2311"/>
+    <meta_arg_ls id="2377"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2706"/>
+    <meta_arg_ls id="2772"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2748"/>
+    <meta_arg_ls id="2814"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2849"/>
+    <meta_arg_ls id="2915"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3038"/>
+    <meta_arg_ls id="3104"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3054"/>
+    <meta_arg_ls id="3120"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5042"/>
+    <meta_arg_ls id="5370"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5280"/>
+    <meta_arg_ls id="70550"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5304"/>
+    <meta_arg_ls id="70778"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="1478"/>
@@ -668,16 +662,16 @@
     <meta_arg_pr id="2080"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2293"/>
+    <meta_arg_pr id="2359"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2313"/>
+    <meta_arg_pr id="2379"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5043"/>
+    <meta_arg_pr id="70551"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5275"/>
+    <meta_arg_pr id="70773"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="2"/>
@@ -695,311 +689,320 @@
     <meta_arg_ts id="61"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="5298"/>
+    <meta_arg_ts id="5364"/>
    </meta>
    <goal name="WP_parameter counting_sort.60" expl="60. loop invariant preservation">
    <transf name="eliminate_builtin">
     <goal name="WP_parameter counting_sort.60.1" expl="1. loop invariant preservation">
-    <proof prover="2" timelimit="6" memlimit="1000"><result status="valid" time="0.19"/></proof>
-    <proof prover="5" timelimit="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
+    <proof prover="9" timelimit="6" memlimit="1000"><result status="valid" time="0.51"/></proof>
     </goal>
    </transf>
    </goal>
   </metas>
   </goal>
   <goal name="WP_parameter counting_sort.61" expl="61. loop invariant preservation">
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.61"/></proof>
+  <proof prover="9" timelimit="15" memlimit="1000"><result status="valid" time="22.72"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.62" expl="62. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.63" expl="63. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.04" steps="15"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.04" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.64" expl="64. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.65" expl="65. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.66" expl="66. assertion">
   <proof prover="3" timelimit="11"><result status="valid" time="0.07"/></proof>
-  <proof prover="5" timelimit="11" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="9" timelimit="11" memlimit="1000"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.67" expl="67. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.68" expl="68. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceCountingSort" sum="f304df24de45c8e662b8fc20629c9d4d">
- <goal name="WP_parameter in_place_counting_sort" expl="VC for in_place_counting_sort">
- <transf name="split_goal_wp">
+<theory name="InPlaceCountingSort" sum="57d356c15d5e356384e4ab3c5a7e169e" expanded="true">
+ <goal name="WP_parameter in_place_counting_sort" expl="VC for in_place_counting_sort" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter in_place_counting_sort.1" expl="1. array creation size">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="3"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.2" expl="2. assertion">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.3" expl="3. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.4" expl="4. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.05"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.5" expl="5. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.6" expl="6. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.7" expl="7. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.8" expl="8. index in array bounds">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.05" steps="9"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.05" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.9" expl="9. loop invariant preservation">
   <proof prover="0" timelimit="10"><result status="valid" time="0.08"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="24"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.22" steps="143"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.10" expl="10. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.11" expl="11. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.12" expl="12. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.16" steps="116"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.16" steps="154"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.13" expl="13. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.14" expl="14. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.15" expl="15. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.16" expl="16. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="15"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.17" expl="17. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.18" expl="18. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.19" expl="19. index in array bounds">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter in_place_counting_sort.20" expl="20. loop invariant preservation">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="WP_parameter in_place_counting_sort.20" expl="20. assertion">
+  <proof prover="0" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" timelimit="10" memlimit="1000"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="9" timelimit="10" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.21" expl="21. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.22" expl="22. loop invariant preservation">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.23" expl="23. loop invariant preservation">
-  <transf name="inline_goal">
-   <goal name="WP_parameter in_place_counting_sort.23.1" expl="1. loop invariant preservation">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.01"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.24" expl="24. loop invariant preservation">
   <transf name="inline_goal">
    <goal name="WP_parameter in_place_counting_sort.24.1" expl="1. loop invariant preservation">
-   <proof prover="5" memlimit="1000"><result status="valid" time="0.10"/></proof>
+   <proof prover="9" memlimit="1000"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.25" expl="25. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.26" expl="26. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.27" expl="27. loop invariant preservation">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.28" expl="28. loop invariant preservation">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.29" expl="29. assertion">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.11"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.30" expl="30. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.31" expl="31. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.05" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.32" expl="32. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.33" expl="33. index in array bounds">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.34" expl="34. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.35" expl="35. index in array bounds">
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.36" expl="36. index in array bounds">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.37" expl="37. loop invariant preservation">
-  <proof prover="0" timelimit="10"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.38" expl="38. assertion">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.39" expl="39. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.40" expl="40. loop invariant init">
-  <proof prover="3"><result status="valid" time="2.66"/></proof>
-  <proof prover="5" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.41" expl="41. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.42" expl="42. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.43" expl="43. loop invariant init">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.44" expl="44. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.45" expl="45. index in array bounds">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.46" expl="46. loop invariant preservation">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.10"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.47" expl="47. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.48" expl="48. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.49" expl="49. loop invariant preservation">
-  <proof prover="5" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.50" expl="50. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.51" expl="51. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.52" expl="52. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.53" expl="53. loop invariant init">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.54" expl="54. loop invariant init">
-  <proof prover="5" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.55" expl="55. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.56" expl="56. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.57" expl="57. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.58" expl="58. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.59" expl="59. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.05" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter in_place_counting_sort.60" expl="60. loop invariant preservation">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter in_place_counting_sort.60.1" expl="1. VC for in_place_counting_sort">
-   <proof prover="2" timelimit="11" memlimit="1000"><result status="valid" time="0.29"/></proof>
+  <transf name="inline_goal">
+   <goal name="WP_parameter in_place_counting_sort.25.1" expl="1. loop invariant preservation">
+   <proof prover="9" memlimit="1000"><result status="valid" time="0.10"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter in_place_counting_sort.61" expl="61. loop invariant preservation">
-  <proof prover="5" timelimit="6" memlimit="1000"><result status="valid" time="3.17"/></proof>
+  <goal name="WP_parameter in_place_counting_sort.26" expl="26. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter in_place_counting_sort.62" expl="62. loop invariant preservation">
+  <goal name="WP_parameter in_place_counting_sort.27" expl="27. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.28" expl="28. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.29" expl="29. loop invariant preservation">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.30" expl="30. assertion">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.11"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.31" expl="31. type invariant">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.32" expl="32. postcondition">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.33" expl="33. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.34" expl="34. index in array bounds">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.35" expl="35. type invariant">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.36" expl="36. index in array bounds">
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.37" expl="37. index in array bounds">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.38" expl="38. loop invariant preservation">
+  <proof prover="0" timelimit="10"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.39" expl="39. assertion">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.40" expl="40. postcondition">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.41" expl="41. loop invariant init">
+  <proof prover="3"><result status="valid" time="5.30"/></proof>
+  <proof prover="9" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.42" expl="42. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.43" expl="43. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.44" expl="44. loop invariant init">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.45" expl="45. type invariant">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.46" expl="46. index in array bounds">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.47" expl="47. loop invariant preservation">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.48" expl="48. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.49" expl="49. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.50" expl="50. loop invariant preservation">
+  <proof prover="9" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.51" expl="51. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.52" expl="52. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.53" expl="53. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.54" expl="54. loop invariant init">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.55" expl="55. loop invariant init">
+  <proof prover="9" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.56" expl="56. type invariant">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.57" expl="57. index in array bounds">
+  <proof prover="9"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.58" expl="58. assertion">
+  <proof prover="0" timelimit="10" memlimit="1000"><result status="valid" time="2.04"/></proof>
+  <proof prover="3" timelimit="10"><result status="valid" time="5.00"/></proof>
+  <proof prover="8" timelimit="10" memlimit="1000"><result status="valid" time="0.29" steps="113"/></proof>
+  <proof prover="9" timelimit="10" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.59" expl="59. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.60" expl="60. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.61" expl="61. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.05" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.62" expl="62. loop invariant preservation" expanded="true">
+  <proof prover="9" timelimit="10" memlimit="1000"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.63" expl="63. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="13"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="9" timelimit="15" memlimit="1000"><result status="valid" time="11.54"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.64" expl="64. loop invariant preservation">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter in_place_counting_sort.65" expl="65. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.66" expl="66. loop invariant preservation">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_counting_sort.67" expl="67. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter in_place_counting_sort.66" expl="66. assertion">
+  <goal name="WP_parameter in_place_counting_sort.68" expl="68. assertion">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.08"/></proof>
-  <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter in_place_counting_sort.67" expl="67. type invariant">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
+  <goal name="WP_parameter in_place_counting_sort.69" expl="69. type invariant">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter in_place_counting_sort.68" expl="68. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.04" steps="14"/></proof>
+  <goal name="WP_parameter in_place_counting_sort.70" expl="70. postcondition">
+  <proof prover="8" memlimit="1000"><result status="valid" time="0.04" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="ff03e63effc79a3b1114a738f539d403">
+<theory name="Harness" sum="f153416b282ee262eb330f24f05df8ce">
  <goal name="WP_parameter harness" expl="VC for harness">
  <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="1. array creation size">
-  <proof prover="1" timelimit="20"><result status="valid" time="0.02" steps="2"/></proof>
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter harness.2" expl="2. index in array bounds">
-  <proof prover="1" timelimit="20"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter harness.3" expl="3. precondition">
-  <proof prover="1" timelimit="20"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter harness.4" expl="4. assertion">
-  <proof prover="6"><result status="valid" time="0.16"/></proof>
+  <proof prover="9" timelimit="10" memlimit="0"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="WP_parameter harness.5" expl="5. assertion">
-  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  <proof prover="9" timelimit="10" memlimit="0"><result status="valid" time="1.62"/></proof>
   </goal>
   <goal name="WP_parameter harness.6" expl="6. assertion">
-  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  <proof prover="9" timelimit="10" memlimit="0"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter harness.7" expl="7. assertion">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="9" timelimit="10" memlimit="0"><result status="valid" time="0.21"/></proof>
   </goal>
   <goal name="WP_parameter harness.8" expl="8. assertion">
-  <proof prover="0" timelimit="10"><result status="valid" time="2.02"/></proof>
+  <proof prover="3" timelimit="15"><result status="valid" time="0.28"/></proof>
+  <proof prover="8" timelimit="15" memlimit="1000"><result status="valid" time="1.65" steps="223"/></proof>
+  <proof prover="9" timelimit="15" memlimit="1000"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>

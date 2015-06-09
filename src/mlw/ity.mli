@@ -93,7 +93,7 @@ val ity_hash : ity -> int
 val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
-exception ImpurePrivateField of ity
+exception ImpureField of ity
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
@@ -110,13 +110,12 @@ val create_itysymbol_alias : preid -> tvsymbol list -> ity -> itysymbol
 (** [create_itysymbol_alias id args def] creates a new type alias. *)
 
 val create_itysymbol_rich :
-  preid -> tvsymbol list -> bool -> Spv.t -> Spv.t -> itysymbol
-(** [create_itysymbol_rich id args privmut mfields ifields] creates
-    a new type symbol. Every mutable and immutable field is represented
-    by a [pvsymbol] of the corresponding ghost status in the [mfields]
-    or [ifields] set, respectively. The variables from [mfields] are
-    stored in the created type symbol and used in effects. If [privmut]
-    is [true], then all types in [mfields] and [ifields] must be pure. *)
+  preid -> tvsymbol list -> bool -> bool Mpv.t -> itysymbol
+(** [create_itysymbol_rich id args privmut fields] creates a new type symbol.
+    Each field is represented by a [pvsymbol] mapped to its mutability status
+    in [fields]. The variables corresponding to mutable fields are stored in
+    the created type symbol and used in effects. If [privmut] is [true],
+    then all types in [fields] must be pure. *)
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)

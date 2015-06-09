@@ -615,18 +615,24 @@ else
         reason_isabelle_support=" (isabelle not found)"
     else
         AC_MSG_CHECKING(Isabelle version)
-        ISABELLEVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
+        ISABELLEDETECTEDVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
 
-        case $ISABELLEVERSION in
+        case $ISABELLEDETECTEDVERSION in
           2014*)
 	        enable_isabelle_support=yes
-                AC_MSG_RESULT($ISABELLEVERSION)
+                ISABELLEVERSION=2014
+                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
+                ;;
+          2015*)
+	        enable_isabelle_support=yes
+                ISABELLEVERSION=2015
+                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           *)
-                AC_MSG_RESULT($ISABELLEVERSION)
+                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle2013-2; Isabelle discarded)
-                reason_isabelle_support=" (need version 2013-2)"
+	        AC_MSG_WARN(You need Isabelle 2014 or 2015; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2014)"
                 ;;
         esac
     fi
@@ -864,7 +870,7 @@ if test "$enable_pvs_support" = yes ; then
 fi
 echo "    Isabelle                : $enable_isabelle_support$reason_isabelle_support"
 if test "$enable_isabelle_support" = yes ; then
-   echo "        Version             : $ISABELLEVERSION"
+   echo "        Version             : $ISABELLEVERSION ($ISABELLEDETECTEDVERSION)"
    echo "        Realization support : $enable_isabelle_libs$reason_isabelle_libs"
 fi
 if test "$enable_local" = yes ; then

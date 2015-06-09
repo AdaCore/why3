@@ -123,7 +123,8 @@ module InPlaceCountingSort
           0 <= f < v -> numeq a f 0 !j = numeq (at a 'L) f 0 (length a) }
         invariant { numeq a v 0 !j = i-1 }
         a[!j] <- v;
-        incr j
+        incr j;
+        assert {forall f. 0 <= f < v -> numeq a f 0 !j = numeq a f 0 (!j - 1)}
       done
     done;
     assert { !j = length a }

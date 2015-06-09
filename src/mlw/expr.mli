@@ -58,7 +58,7 @@ val create_rsymbol : preid -> ?ghost:bool -> ?kind:rs_kind -> cty -> rsymbol
 val create_constructor :
   constr:int -> preid -> itysymbol -> pvsymbol list -> rsymbol
 
-val create_projection : preid -> itysymbol -> pvsymbol -> rsymbol
+val create_projection : itysymbol -> pvsymbol -> rsymbol
 
 val restore_rs : lsymbol -> rsymbol
 (** raises [Not_found] if the argument is not a [rs_logic] *)
@@ -167,6 +167,10 @@ val let_sym :
 
 val let_rec :
   (rsymbol * cexp * variant list * rs_kind) list -> let_defn * rec_defn list
+
+val ls_decr_of_let_defn : let_defn -> lsymbol option
+(* returns the dummy predicate symbol used in the precondition of
+   the rec_rsym rsymbol to store the instantiated variant list *)
 
 (** {2 Callable expressions} *)
 

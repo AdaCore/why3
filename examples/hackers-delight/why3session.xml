@@ -5,47 +5,141 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <file name="../hackers-delight.mlw" expanded="true">
-<theory name="Hackers_delight" sum="f0a189c908de4dca4a7d7f3ad4145727" expanded="true">
+<theory name="Utils" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+</theory>
+<theory name="Utils_Spec" sum="3967722ffb6389d883275ccf0879b34f" expanded="true">
  <goal name="countZero" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.09"/></proof>
- </goal>
- <goal name="countStep" expanded="true">
- <proof prover="1"><result status="valid" time="4.98"/></proof>
- </goal>
- <goal name="symmetric" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
+ <goal name="numOfZero" expanded="true">
+ <proof prover="0"><result status="valid" time="0.87" steps="228"/></proof>
+ <proof prover="3"><result status="valid" time="0.78"/></proof>
+ </goal>
+ <goal name="countStep" expanded="true">
+ <proof prover="1" timelimit="30"><result status="valid" time="5.82"/></proof>
+ </goal>
+ <goal name="WP_parameter numof_shift" expl="VC for numof_shift" expanded="true">
+ <proof prover="1"><result status="valid" time="0.24"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.34"/></proof>
+ </goal>
+ <goal name="WP_parameter countSpec_Aux" expl="VC for countSpec_Aux" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter countSpec_Aux.1" expl="1. postcondition" expanded="true">
+  <proof prover="0"><result status="valid" time="0.89" steps="265"/></proof>
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.61"/></proof>
+  </goal>
+  <goal name="WP_parameter countSpec_Aux.2" expl="2. variant decrease" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.99"/></proof>
+  </goal>
+  <goal name="WP_parameter countSpec_Aux.3" expl="3. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter countSpec_Aux.3.1" expl="1. assertion" expanded="true">
+   <proof prover="3"><result status="valid" time="1.86"/></proof>
+   </goal>
+   <goal name="WP_parameter countSpec_Aux.3.2" expl="2. assertion" expanded="true">
+   <proof prover="3"><result status="valid" time="0.60"/></proof>
+   </goal>
+   <goal name="WP_parameter countSpec_Aux.3.3" expl="3. assertion" expanded="true">
+   <proof prover="0"><result status="valid" time="0.90" steps="158"/></proof>
+   </goal>
+   <goal name="WP_parameter countSpec_Aux.3.4" expl="4. assertion" expanded="true">
+   <proof prover="3" timelimit="15"><result status="valid" time="7.26"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter countSpec_Aux.4" expl="4. postcondition" expanded="true">
+  <proof prover="1"><result status="valid" time="0.57"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="countSpec" expanded="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="72"/></proof>
+ <proof prover="1"><result status="valid" time="0.10"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter hamming_spec" expl="VC for hamming_spec" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter hamming_spec.1" expl="1. assertion" expanded="true">
+  <proof prover="0"><result status="valid" time="0.25" steps="216"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter hamming_spec.2" expl="2. postcondition" expanded="true">
+  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="symmetric" expanded="true">
+ <proof prover="1"><result status="valid" time="0.11"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
  <goal name="separation" expanded="true">
- <proof prover="1"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.39"/></proof>
+ <proof prover="2"><result status="valid" time="0.12"/></proof>
+ </goal>
+ <goal name="WP_parameter numof_or" expl="VC for numof_or" expanded="true">
+ <proof prover="1"><result status="valid" time="0.53"/></proof>
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <proof prover="3"><result status="valid" time="0.30"/></proof>
+ </goal>
+ <goal name="WP_parameter triangleInequalityInt" expl="VC for triangleInequalityInt" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter triangleInequalityInt.1" expl="1. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter triangleInequalityInt.1.1" expl="1. VC for triangleInequalityInt" expanded="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter triangleInequalityInt.1.2" expl="2. VC for triangleInequalityInt" expanded="true">
+   <proof prover="2"><result status="valid" time="0.17"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter triangleInequalityInt.2" expl="2. postcondition" expanded="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="79"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="triangleInequality" expanded="true">
- <proof prover="0"><result status="timeout" time="4.88"/></proof>
- <proof prover="1"><result status="timeout" time="4.87"/></proof>
- <proof prover="2"><result status="timeout" time="5.00"/></proof>
+ <proof prover="1" timelimit="15"><result status="valid" time="2.35"/></proof>
  </goal>
+</theory>
+<theory name="Hackers_delight" sum="c8ec539e41c47d4d821a25e51a788371" expanded="true">
  <goal name="WP_parameter ascii" expl="VC for ascii" expanded="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="asciiProp" expanded="true">
- <proof prover="1"><result status="valid" time="1.41"/></proof>
+ <proof prover="1" timelimit="20"><result status="valid" time="0.85"/></proof>
+ <proof prover="2" timelimit="20"><result status="valid" time="2.11"/></proof>
  </goal>
  <goal name="iso" expanded="true">
- <proof prover="1"><result status="valid" time="0.25"/></proof>
+ <proof prover="1"><result status="valid" time="0.43"/></proof>
  </goal>
  <goal name="grayIsGray" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="nthGray" expanded="true">
  <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="3"><result status="valid" time="2.73"/></proof>
  </goal>
  <goal name="lastNthGray" expanded="true">
  <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="2.22"/></proof>
  </goal>
  <goal name="nthBinary" expanded="true">
- <proof prover="1"><result status="valid" time="0.48"/></proof>
+ <proof prover="1" timelimit="30"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="evenOdd" expanded="true">
  <proof prover="1"><result status="valid" time="0.14"/></proof>
@@ -60,6 +154,7 @@
  </goal>
  <goal name="DM3" expanded="true">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="DM4" expanded="true">
  <proof prover="1"><result status="valid" time="0.11"/></proof>
@@ -78,6 +173,7 @@
  </goal>
  <goal name="DMtest" expanded="true">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.18"/></proof>
  </goal>
  <goal name="Aa" expanded="true">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
@@ -92,9 +188,10 @@
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Ae" expanded="true">
- <proof prover="0"><result status="valid" time="0.05" steps="73"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="74"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="Af" expanded="true">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
@@ -108,7 +205,7 @@
  <proof prover="1"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="Ao" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.13"/></proof>
  </goal>
  <goal name="Aq" expanded="true">
  <proof prover="1"><result status="valid" time="0.08"/></proof>
@@ -118,7 +215,7 @@
  <proof prover="1"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="Au" expanded="true">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.13"/></proof>
  </goal>
  <goal name="Av" expanded="true">
  <proof prover="1"><result status="valid" time="0.12"/></proof>

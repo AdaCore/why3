@@ -151,7 +151,7 @@ LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection \
              parse_smtv2_model_parser parse_smtv2_model_lexer parse_smtv2_model
 
-LIB_MLW = ity expr dexpr
+LIB_MLW = ity expr dexpr mdecl
 
 LIB_PARSER = ptree glob parser typing lexer
 
@@ -844,7 +844,7 @@ ifeq (@enable_coq_support@,yes)
 
 ifeq (@enable_coq_libs@,yes)
 
-COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
+COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power NumOf
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 
@@ -872,13 +872,16 @@ COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 COQLIBS_SEQ_FILES = Seq
 COQLIBS_SEQ = $(addprefix lib/coq/seq/, $(COQLIBS_SEQ_FILES))
 
+COQLIBS_BV_FILES = Pow2int BV_Gen
+COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV)
 
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
@@ -903,6 +906,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_SEQ_FILES); do \
 	echo 'theory seq.'"$$f"' meta "realized_theory" "seq.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_BV_FILES); do \
+	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -928,6 +933,8 @@ install_no_local::
 	cp $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
 	mkdir -p $(LIBDIR)/why3/coq/seq
 	cp $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
+	mkdir -p $(LIBDIR)/why3/coq/bv
+	cp $(addsuffix .vo, $(COQLIBS_BV)) $(LIBDIR)/why3/coq/bv/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
@@ -961,6 +968,9 @@ update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theo
 
 update-coq-seq: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/seq.why
 	for f in $(COQLIBS_SEQ_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T seq.$$f -o lib/coq/seq/; done
+
+update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/bv.why
+	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T bv.$$f -o lib/coq/bv/; done
 
 update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
@@ -1102,6 +1112,21 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
+ISABELLEVERSIONSPECIFIC=why3.ML Tools/why3 Why3_Number.thy
+
+ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
+ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
+
+ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
+
+$(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
+	for i in $(ISABELLEVERSIONSPECIFIC); do \
+		cp lib/isabelle/$$i.@ISABELLEVERSION@ lib/isabelle/$$i ; \
+	done
+
+clean::
+	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
+
 ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
@@ -1151,7 +1176,10 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+ifneq (@enable_local@,yes)
+	cp -r lib/isabelle "$(LIBDIR)/why3"
+endif
 	@(if isabelle components -l | grep -q "$(ISABELLE_TARGET_DIR)$$"; then \
 	    echo "Building the Why3 heap for Isabelle/HOL:"; \
 	    isabelle build -bc Why3; \
@@ -1163,7 +1191,6 @@ lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS
 	  fi)
 
 install_no_local::
-	cp -r lib/isabelle "$(LIBDIR)/why3"
 	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
 
 install_no_local:: lib/isabelle/last_build
@@ -1173,44 +1200,44 @@ install_local:: lib/isabelle/last_build
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 
 $(ISABELLELIBS_INT): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/int.why
 	mkdir -p lib/isabelle/int
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
 
 $(ISABELLELIBS_BOOL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/bool.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/bool.why
 	mkdir -p lib/isabelle/bool
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
 
 $(ISABELLELIBS_REAL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/real.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/real.why
 	mkdir -p lib/isabelle/real
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
 
 $(ISABELLELIBS_NUMBER): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/number.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/number.why
 	mkdir -p lib/isabelle/number
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
 
 $(ISABELLELIBS_SET): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/set.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/set.why
 	mkdir -p lib/isabelle/set
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
 
 $(ISABELLELIBS_MAP): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/map.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/map.why
 	mkdir -p lib/isabelle/map
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
 
 $(ISABELLELIBS_LIST): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/list.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/list.why
 	mkdir -p lib/isabelle/list
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
 
 $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/option.why
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/option.why
 	mkdir -p lib/isabelle/option
-	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
 # do not update isabelle realizations systematically
 # opt byte: update-isabelle
@@ -1645,7 +1672,8 @@ STDLIBS = algebra \
 	real \
 	relations \
 	set \
-	sum
+	sum \
+	bv
 # function ? tptp ?
 
 STDMODS = array matrix hashtbl impset pqueue queue random ref stack string

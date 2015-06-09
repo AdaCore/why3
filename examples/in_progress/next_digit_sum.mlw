@@ -35,14 +35,18 @@ module M
 
   (* to allow provers to prove that an assignment does not change the
      interpretation on the left (or on the right); requires induction *)
-  lemma Interp_eq:
-    forall x1 x2 : M.map int int, i j : int.
-    (forall k : int. i <= k < j -> M.get x1 k = M.get x2 k) ->
-    interp x1 i j = interp x2 i j
+  let rec lemma interp_eq
+    (x1 x2 : M.map int int) (i j : int)
+    requires { forall k : int. i <= k < j -> M.get x1 k = M.get x2 k }
+    ensures  { interp x1 i j = interp x2 i j }
+    variant  { j - i }
+  = if i < j then interp_eq x1 x2 (i+1) j
 
   (* the sum of the elements of x[i..j[ *)
-  type map_int = M.map int int
-  clone export sum.Sum  with type container = map_int, function f = M.get
+  use int.Sum
+
+  function sum (m: M.map int int) (i j: int) : int =
+    Sum.sum i (j - 1) (\ k: int. M.get m k)
 
   lemma Sum_is_sum_digits_interp:
     forall x : M.map int int, i j : int.

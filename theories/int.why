@@ -332,6 +332,11 @@ theory NumOf
     not (p1 i) -> p2 i ->
     numof p2 a b > numof p1 a b
 
+  lemma numof_change_equiv:
+    forall p1 p2: int -> bool, a b: int.
+    (forall j: int. a <= j < b -> p1 j <-> p2 j) ->
+    numof p2 a b = numof p1 a b
+
 end
 
 (** {2 Sum} *)
@@ -360,6 +365,11 @@ theory Sum
     forall f g: int -> int, a b: int.
     (forall i. a <= i <= b -> f i = g i) ->
     sum a b f = sum a b g
+
+  lemma sum_le:
+    forall f g: int -> int, a b: int.
+    (forall i. a <= i <= b -> f i <= g i) ->
+    sum a b f <= sum a b g
 
   lemma sum_nonneg:
     forall f: int -> int, a b: int.
