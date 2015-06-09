@@ -71,6 +71,9 @@ fi
 perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
 # add uninstalled prover substitution policies
+
+COQVER=`bin/why3 --list-provers | sed -n -e 's/  Coq (\(.*\))/\1/p'`
+if test "$COQVER" != "" ; then
 cat >> why3.conf <<EOF
 
 [uninstalled_prover policy0]
@@ -79,7 +82,7 @@ name = "Coq"
 policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
-target_version = "8.4pl5"
+target_version = "$COQVER"
 version = "8.4pl4"
 
 [uninstalled_prover policy1]
@@ -88,7 +91,7 @@ name = "Coq"
 policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
-target_version = "8.4pl4"
+target_version = "$COQVER"
 version = "8.4pl5"
 
 [uninstalled_prover policy2]
@@ -97,10 +100,11 @@ name = "Coq"
 policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
-target_version = "8.4pl4"
+target_version = "$COQVER"
 version = "8.4pl2"
 
 EOF
+fi
 
 # run the bench
 make bench &> $OUT
