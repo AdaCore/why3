@@ -374,7 +374,7 @@ val get_edited_as_abs : 'key session -> 'k proof_attempt -> string option
 (** return the edited filename after concatenation to [session_dir] *)
 
 val update_edit_external_proof :
-  'key env_session -> 'key proof_attempt -> string
+  cntexample:bool -> 'key env_session -> 'key proof_attempt -> string
 (** return the absolute path of the edited file update with the
     current goal *)
 

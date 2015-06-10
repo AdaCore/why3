@@ -284,7 +284,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
-        Driver.print_task drv std_formatter task
+        Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =

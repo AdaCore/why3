@@ -2141,7 +2141,7 @@ let edit_selected_row r =
           "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
           0 time p.editor;
 *)
-        M.edit_proof e sched ~default_editor:gconfig.default_editor a
+        M.edit_proof ~cntexample:!opt_cntexmp e sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
     | S.Metas _ -> ()
 

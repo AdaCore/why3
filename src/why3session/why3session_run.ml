@@ -309,6 +309,7 @@ let run_one sched env config filters interactive_provers fname =
               env_session sched pa 
 	      callback in
           M.edit_proof_v3 env_session sched
+	    ~cntexample:false
             ~default_editor:"" (** TODO? *)
             ~callback:callback_edit a 
         else

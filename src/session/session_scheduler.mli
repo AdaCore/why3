@@ -231,12 +231,14 @@ module Make(O: OBSERVER) : sig
         must be applied also on alreadt proved goals *)
 
   val edit_proof :
+    cntexample:bool ->
     O.key env_session -> t ->
     default_editor:string ->
     O.key proof_attempt -> unit
   (** edits the given proof attempt using the appropriate editor *)
 
   val edit_proof_v3 :
+    cntexample:bool ->
     O.key env_session -> t ->
     default_editor:string ->
     callback:(O.key Session.proof_attempt ->  unit) ->
