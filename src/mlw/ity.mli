@@ -338,24 +338,29 @@ type cty = private {
   cty_pre    : pre list;
   cty_post   : post list;
   cty_xpost  : post list Mexn.t;
+  cty_oldies : pvsymbol Mpv.t;
   cty_effect : effect;
   cty_result : ity;
   cty_freeze : ity_subst;
 }
 
 val create_cty : pvsymbol list ->
-  pre list -> post list -> post list Mexn.t -> effect -> ity -> cty
-(** [create_cty args pre post xpost effect result] creates a cty.
+  pre list -> post list -> post list Mexn.t ->
+  pvsymbol Mpv.t -> effect -> ity -> cty
+(** [create_cty args pre post xpost oldies effect result] creates a cty.
     The [cty_xpost] field does not have to cover all raised exceptions.
     [cty_effect.eff_reads] is completed wrt the specification and [args].
     [cty_freeze] freezes every unbound pvsymbol in [cty_effect.eff_reads].
     All effects on regions outside [cty_effect.eff_reads] are removed.
     Fresh regions in [result] are reset. Every type variable in [pre],
-    [post], and [xpost] must come from [cty_reads], [args] or [result]. *)
+    [post], and [xpost] must come from [cty_reads], [args] or [result].
+    [oldies] maps ghost pure snapshots of the parameters and external
+    reads to the original pvsymbols: these snaphosts are removed from
+    [cty_effect.eff_reads] and replaced with the originals. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
 (** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
-    [pvl], [rest] and [res], then applies it to the arguments in [pvl],
+    [pvl], [rest], and [res], then applies it to the arguments in [pvl],
     and returns the computation type of the result, [rest -> res],
     with every type variable and region in [pvl] being frozen. *)
 

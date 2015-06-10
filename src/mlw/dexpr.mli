@@ -55,10 +55,16 @@ type dbinder = preid option * ghost * dity
 
 (** Specifications *)
 
-type 'a later = vsymbol Mstr.t -> 'a
-  (* Specification terms are parsed and typechecked after the program
-     expressions, when the types of locally bound program variables are
-     already established. *)
+exception UnboundLabel of string
+
+type register_old = pvsymbol -> string -> pvsymbol
+  (** Program variables occurring under [old] or [at] are passed to
+      a registrar function. The label string must be ['0] for [old]. *)
+
+type 'a later = pvsymbol Mstr.t -> register_old -> 'a
+  (** Specification terms are parsed and typechecked after the program
+      expressions, when the types of locally bound program variables are
+      already established. *)
 
 type dspec_final = {
   ds_pre     : term list;
