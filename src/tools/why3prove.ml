@@ -91,6 +91,8 @@ let opt_task = ref None
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 
+let opt_cntexmp = ref false
+
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " read the input file from stdin";
@@ -137,11 +139,13 @@ let option_list = [
   "--print-theory", Arg.Set opt_print_theory,
       " print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
-      " print namespaces of selected theories";
+      " print namespaces of selected theories"; 
   Debug.Args.desc_shortcut
     "parse_only" "--parse-only" " stop after parsing";
   Debug.Args.desc_shortcut
-    "type_only" "--type-only" " stop after type checking" ]
+    "type_only" "--type-only" " stop after type checking";
+  "--get-ce", Arg.Set opt_cntexmp,
+      " gets the counter-example model" ]
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
@@ -276,7 +280,7 @@ let output_theory drv fname _tname th task dir =
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
-        let call = Driver.prove_task ~command ~timelimit ~memlimit drv task in
+        let call = Driver.prove_task ~command ~cntexample:!opt_cntexmp ~timelimit ~memlimit drv task in
         let res = Call_provers.wait_on_call (call ()) () in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string

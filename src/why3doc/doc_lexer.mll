@@ -63,13 +63,17 @@
       (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
       (* is this a def point? *)
       try
-        match Glob.find loc with
-        | id, Glob.Def ->
-          fprintf fmt "<a name=\"%a\">%a</a>"
-            Doc_def.pp_anchor id Pp.html_string s
-        | id, Glob.Use ->
-          fprintf fmt "<a href=\"%a\">%a</a>"
-            Doc_def.pp_locate id Pp.html_string s
+        let id, def = Glob.find loc in
+        match id.Ident.id_loc with
+        | None -> raise Not_found
+        | Some _ ->
+          match def with
+          | Glob.Def ->
+            fprintf fmt "<a name=\"%a\">%a</a>"
+              Doc_def.pp_anchor id Pp.html_string s
+          | Glob.Use ->
+            fprintf fmt "<a href=\"%a\">%a</a>"
+              Doc_def.pp_locate id Pp.html_string s
       with Not_found ->
         (* otherwise, just print it *)
         pp_print_string fmt s

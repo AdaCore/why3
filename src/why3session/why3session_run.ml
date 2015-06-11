@@ -306,10 +306,11 @@ let run_one sched env config filters interactive_provers fname =
         if b then
           let callback_edit pa =
             M.run_external_proof_v3
-              env_session sched pa callback in
+              env_session sched pa 
+	      callback in
           M.edit_proof_v3 env_session sched
             ~default_editor:"" (** TODO? *)
-            ~callback:callback_edit a
+            ~callback:callback_edit a 
         else
           Todo.stop todo;
         if not (Queue.is_empty to_edit_queue) then

@@ -17,7 +17,6 @@ open Whyconf
 open Gconfig
 open Stdlib
 open Debug
-open Model_parser
 
 module C = Whyconf
 
@@ -40,12 +39,15 @@ let debug = Debug.lookup_flag "ide_info"
 
 let files = Queue.create ()
 let opt_parser = ref None
+let opt_cntexmp = ref false
 
 let spec = Arg.align [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
+  "--get-ce", Arg.Set opt_cntexmp,
+      " gets the counter-example model";
 (*
   "-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -342,12 +344,10 @@ let output_page,output_tab =
   3, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
-(*
 let counterexample_page,counterexample_tab =
   let label = GMisc.label ~text:"Counter-example" () in
   4, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-*)
 
 let (_ : GPack.box) =
   GPack.hbox ~packing:(source_tab#pack ~expand:false ?from:None ?fill:None
@@ -365,6 +365,8 @@ let () =
 (******************)
 (* views          *)
 (******************)
+
+let current_file = ref ""
 
 let scrolled_task_view =
   GBin.scrolled_window
@@ -402,7 +404,6 @@ let output_view =
     ~packing:scrolled_output_view#add
     ()
 
-(*
 let scrolled_counterexample_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
@@ -414,14 +415,11 @@ let counterexample_view =
     ~show_line_numbers:true
     ~packing:scrolled_counterexample_view#add
     ()
-*)
 
 let modifiable_sans_font_views = ref [goals_view#misc]
 let modifiable_mono_font_views =
   ref [task_view#misc;edited_view#misc;output_view#misc;
-(*
        counterexample_view#misc
-*)
 ]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
@@ -446,9 +444,9 @@ let image_of_result ~obsolete result =
             if obsolete then !image_timeout_obs else !image_timeout
         | Call_provers.OutOfMemory ->
             if obsolete then !image_outofmemory_obs else !image_outofmemory
-        | Call_provers.StepsLimitExceeded ->
-            if obsolete then !image_stepslimitexceeded_obs
-            else !image_stepslimitexceeded
+        | Call_provers.StepLimitExceeded ->
+            if obsolete then !image_steplimitexceeded_obs
+            else !image_steplimitexceeded
         | Call_provers.Unknown _ ->
             if obsolete then !image_unknown_obs else !image_unknown
         | Call_provers.Failure _ ->
@@ -573,20 +571,6 @@ let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
-let rec add_model str model =
-  match model with
-  | [] -> str
-  | m_element::t -> begin
-    let loc_string = match m_element.me_location with
-      | None -> "\"no location\""
-      | Some loc -> begin
-	Loc.report_position str_formatter loc;
-	flush_str_formatter ()
-      end in
-    let n_str = str ^ m_element.me_name ^ " at " ^ loc_string ^ " = " ^ m_element.me_value ^ "\n" in
-    add_model n_str t
-  end
-
 let goal_task_text g =
   if (Gconfig.config ()).intro_premises then
     let trans =
@@ -630,7 +614,7 @@ let update_tabs a =
               "Edited interactive proof. Run it with \"Replay\" button"
             | S.Done
                 ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
-              fprintf str_formatter "%a" Call_provers.print_prover_result r;
+              Call_provers.print_prover_result str_formatter r;
                   flush_str_formatter ()
             | S.Done r ->
               let out = r.Call_provers.pr_output in
@@ -654,28 +638,40 @@ let update_tabs a =
       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
     | _ -> ""
  in
-(*
+
   let counterexample_text =
     match a with
     | S.Proof_attempt a ->
       begin
         match a.S.proof_state with
 	  | S.Done r ->
-            add_model "" r.Call_provers.pr_model
+	    if r.Call_provers.pr_model <> Model_parser.empty_model then begin
+	      Model_parser.model_to_string r.Call_provers.pr_model ^ "\n" ^
+		Model_parser.model_to_string_json r.Call_provers.pr_model ^ "\n\n" ^
+		(Model_parser.interleave_with_source 
+		   r.Call_provers.pr_model
+		   !current_file
+		   (Sysutil.file_contents !current_file))
+	    end else
+	      ""
 	  | _ -> ""
       end
     | _ -> ""
   in
-*)
- task_view#source_buffer#set_text task_text;
- task_view#scroll_to_mark `INSERT;
- edited_view#source_buffer#set_text edited_text;
- edited_view#scroll_to_mark `INSERT;
- output_view#source_buffer#set_text output_text;
-(*
- counterexample_view#source_buffer#set_text counterexample_text;
-*)
-  ()
+
+  let lang =
+    if Filename.check_suffix !current_file ".why" ||
+      Filename.check_suffix !current_file ".mlw"
+    then why_lang else any_lang !current_file
+  in
+  counterexample_view#source_buffer#set_language lang;
+
+  task_view#source_buffer#set_text task_text;
+  task_view#scroll_to_mark `INSERT;
+  edited_view#source_buffer#set_text edited_text;
+  edited_view#scroll_to_mark `INSERT;
+  output_view#source_buffer#set_text output_text;
+  counterexample_view#source_buffer#set_text counterexample_text;
 
 
 
@@ -931,7 +927,7 @@ let () =
   if C.Mprover.is_empty (C.get_provers gconfig.Gconfig.config) then
     begin
       info_window `ERROR
-        "No prover configured.\nPlease run 'why3config --detect-provers' first"
+        "No prover configured.\nPlease run 'why3 config --detect-provers' first"
         ~callback:GMain.quit;
       GMain.main ();
       exit 2;
@@ -1005,7 +1001,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit ~memlimit
+         ~cntexample:!opt_cntexmp ~timelimit ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1111,16 +1107,17 @@ let bisect_proof_attempt pa =
         let npa = S.copy_external_proof ~notify ~keygen ~obsolete:true
           ~goal ~env_session:eS pa in
         MA.init_any (S.Metas metas);
-        M.run_external_proof eS sched npa
+        M.run_external_proof eS sched ~cntexample:!opt_cntexmp npa
         with e ->
           dprintf debug "Bisecting error:@\n%a@."
             Exn_printer.exn_printer e end
       | Eliminate_definition.BSstep (t,c) ->
         assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
+	  ~cntexample:!opt_cntexmp
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
-	  ~stepslimit:(-1)
+	  ~steplimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
@@ -1156,9 +1153,10 @@ let bisect_proof_attempt pa =
             dprintf debug "Prover can't be loaded.@."
           | Some lp ->
             M.schedule_proof_attempt
+	      ~cntexample:!opt_cntexmp
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
-	      ~stepslimit:(-1)
+	      ~steplimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
               ~command:(C.get_complete_command lp.S.prover_config (-1))
@@ -1166,7 +1164,7 @@ let bisect_proof_attempt pa =
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
     C.print_prover pa.S.proof_prover;
-  M.run_external_proof eS sched ~callback:first_callback pa
+  M.run_external_proof eS sched ~cntexample:!opt_cntexmp ~callback:first_callback pa
 
 let apply_bisect_on_selection () =
   List.iter
@@ -1919,8 +1917,6 @@ let () = source_view#set_highlight_current_line true
 let () = source_view#source_buffer#set_text (source_text fname)
 *)
 
-let current_file = ref ""
-
 let set_current_file f =
   current_file := f;
   file_info#set_text ("file: " ^ !current_file)
@@ -1938,6 +1934,9 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
 let premise_tag = source_view#buffer#create_tag
   ~name:"premise_tag" [`BACKGROUND gconfig.premise_color]
 
+let neg_premise_tag = source_view#buffer#create_tag
+  ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color]
+
 let goal_tag = source_view#buffer#create_tag
   ~name:"goal_tag" [`BACKGROUND gconfig.goal_color]
 
@@ -1947,6 +1946,7 @@ let error_tag = source_view#buffer#create_tag
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in
   buf#remove_tag premise_tag ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag neg_premise_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag goal_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag error_tag ~start:buf#start_iter ~stop:buf#end_iter
 
@@ -2001,13 +2001,17 @@ let rec color_locs ~color f =
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
    No t_fold, no t_open_quant! *)
 let rec color_t_locs f =
+  let premise_tag = function
+    | { Term. t_node = Term.Tnot _; t_loc = None } -> neg_premise_tag
+    | _ -> premise_tag
+  in
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        let b = color_locs ~color:premise_tag f1 in
+        let b = color_locs ~color:(premise_tag f1) f1 in
         color_t_locs f2 || b
     | Term.Tlet (t,fb) ->
         let _,f1 = Term.t_open_bound fb in
-        let b = color_locs ~color:premise_tag t in
+        let b = color_locs ~color:(premise_tag t) t in
         color_t_locs f1 || b
     | Term.Tquant (Term.Tforall,fq) ->
         let _,_,f1 = Term.t_open_quant fq in

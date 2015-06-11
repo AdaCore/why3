@@ -76,7 +76,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let model_parser = ref "no_model" in
   let transform = ref [] in
   let timeregexps = ref [] in
-  let stepsregexps = ref [] in
+  let stepregexps = ref [] in
   let blacklist = Queue.create () in
 
   let set_or_raise loc r v error = match !r with
@@ -90,19 +90,19 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
     | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
     | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
-    | RegexpStepsLimitExceeded s ->
-      add_to_list regexps (Str.regexp s, StepsLimitExceeded)
+    | RegexpStepLimitExceeded s ->
+      add_to_list regexps (Str.regexp s, StepLimitExceeded)
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
-      add_to_list stepsregexps (Call_provers.stepsregexp r ns)
+      add_to_list stepregexps (Call_provers.stepregexp r ns)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
     | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
-    | ExitCodeStepsLimitExceeded s ->
-      add_to_list exitcodes (s, StepsLimitExceeded)
+    | ExitCodeStepLimitExceeded s ->
+      add_to_list exitcodes (s, StepLimitExceeded)
     | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
@@ -206,7 +206,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       {
       prp_regexps     = List.rev !regexps;
       prp_timeregexps = List.rev !timeregexps;
-      prp_stepsregexp = List.rev !stepsregexps;
+      prp_stepregexps = List.rev !stepregexps;
       prp_exitcodes   = List.rev !exitcodes;
       prp_model_parser = Model_parser.lookup_model_parser !model_parser
     };
@@ -255,9 +255,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename ~printer_mapping drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit ?steplimit
+                   ?inplace ~filename ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ?stepslimit ~res_parser:drv.drv_res_parser
+    ~command ?timelimit ?memlimit ?steplimit ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace buffer
 
 (** print'n'prove *)
@@ -329,7 +330,7 @@ let file_name_of_task ?old ?inplace drv task =
 
 
 let prove_task_prepared
-  ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task =
+  ~command ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -339,22 +340,33 @@ let prove_task_prepared
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename ~printer_mapping drv buf in
+    call_on_buffer ~command ?timelimit ?memlimit ?steplimit
+                   ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task =
-  let task = prepare_task drv task in
-  prove_task_prepared ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task
+let add_cntexample_meta task cntexample =
+  if not (cntexample) then task
+  else
+    let cnt_meta = lookup_meta "get_counterexmp" in
+    let g,task = Task.task_separate_goal task in
+    let task = Task.add_meta task cnt_meta [] in
+    Task.add_tdecl task g
 
-let prove_task_server command ~timelimit ~memlimit ~stepslimit ?old ?inplace drv task =
+let prove_task ~command ?(cntexample=false) ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
+  let task = add_cntexample_meta task cntexample in
+  let task = prepare_task drv task in
+  prove_task_prepared ~command ?timelimit ?memlimit
+                      ?steplimit ?old ?inplace drv task
+
+let prove_task_server command ~timelimit ~memlimit ~steplimit ?old ?inplace drv task =
   let task = prepare_task drv task in
   let fn = file_name_of_task ?old ?inplace drv task in
   let res_parser = drv.drv_res_parser in
   let printer_mapping = get_default_printer_mapping in
   match inplace with
   | Some true ->
-     prove_file_server ~command ~res_parser ~timelimit ~memlimit ~stepslimit
+     prove_file_server ~command ~res_parser ~timelimit ~memlimit ~steplimit
      ~printer_mapping ?inplace fn
   | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
          let p = match drv.drv_printer with
@@ -372,7 +384,7 @@ let prove_task_server command ~timelimit ~memlimit ~stepslimit ?old ?inplace drv
          fprintf fmt "@[%a@]@?" (printer ?old:None) task;
          close_out outc;
          prove_file_server ~command ~res_parser ~timelimit ~memlimit
-         ~stepslimit ~printer_mapping fn
+         ~steplimit ~printer_mapping fn
 
 (* exception report *)
 

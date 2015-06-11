@@ -4,22 +4,34 @@
    prelude "(set-logic AUFNIRA)"
 *)
 
+(* Counterexamples: set model parser *)
+model_parser "smtv2"
+
+
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
 transformation "eliminate_builtin"
-(* temporarily disabled: too much experimental
 transformation "detect_polymorphism"
+transformation "eliminate_definition"
+(* We could keep more definitions by using
+   transformation "eliminate_definition_if_poly"
+   instead, but some proofs are lost
+   (examples/logic/triangle_inequality.why)
 *)
-transformation "eliminate_definition_if_poly"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
 transformation "eliminate_epsilon"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
+
+(* Prepare for counter-example query: get rid of some quantifiers (makes it 
+possible to query model values of the variables in premises) and introduce
+counter-example projections  *)
+transformation "prepare_for_counterexmp"
 
 transformation "discriminate_if_poly"
 transformation "encoding_smt_if_poly"

@@ -32,7 +32,8 @@ let spec =
    Arg.Unit (fun () -> set_remove Not_valid ();
      set_filter_verified_goal FT_Yes),
    " remove unsuccessful proof attempts \
-associated to proved goals (same as --filter-verified-goal --conservative)")::
+    associated to proved goals \
+    (same as --filter-verified-goal yes --conservative)")::
   ("--interactive",
    Arg.Unit (set_remove Interactive), " ask before replacing proof_attempt")::
   ("-i",

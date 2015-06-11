@@ -94,7 +94,9 @@ let read_opt_prover s =
   try
     let l = Strings.rev_split ',' s in
     match l with
-    | [altern;version;name] when List.for_all (fun s -> s.[0] <> '^') l ->
+    (** A prover specified uniquely *)
+    | [altern;version;name]
+      when List.for_all (fun s -> s = "" || s.[0] <> '^') l ->
       Prover {Whyconf.prover_name = name;
               prover_version = version;
               prover_altern = altern}

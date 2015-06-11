@@ -223,7 +223,7 @@ let rec print_dity pri fmt = function
         (print_dity 1) t1 (print_dity 0) t2
   | Dpur (s,tl) when is_ts_tuple s.its_ts ->
       Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity 0)) tl
-  | Dpur (s,tl) when s.its_mutable || s.its_regions <> [] ->
+  | Dpur (s,tl) when its_impure s ->
       Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
         Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
   | Dpur (s,tl) ->
@@ -307,7 +307,9 @@ type ghost = bool
 
 type dbinder = preid option * ghost * dity
 
-type 'a later = vsymbol Mstr.t -> 'a
+type register_old = pvsymbol -> string -> pvsymbol
+
+type 'a later = pvsymbol Mstr.t -> register_old -> 'a
   (* specification terms are parsed and typechecked after the program
      expressions, when the types of locally bound program variables are
      already established. *)
@@ -712,10 +714,8 @@ let create_assert = to_fmla
 
 let create_invariant pl = List.map to_fmla pl
 
-let create_pre = create_invariant
-
 let create_post ty ql = List.map (fun (v,f) ->
-  let f = (*Mlw_wp.remove_old*) (to_fmla f) in match v with
+  let f = to_fmla f in match v with
     | None -> Ity.create_post (create_vsymbol (id_fresh "result") ty) f
     | Some v -> Ty.ty_equal_check ty v.vs_ty; Ity.create_post v f) ql
 
@@ -735,7 +735,8 @@ let rec effect_of_term t =
         | Some _ -> assert false
         | None -> ity in
       begin try match ity.ity_node, restore_rs fs with
-        | Ityreg _, ({rs_field = Some _} as rs) -> v, ity, Some rs
+        | Ityreg {reg_its = ts}, ({rs_field = Some f} as rs)
+          when List.exists (pv_equal f) ts.its_mfields -> v, ity, Some rs
         | _, {rs_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
             v, ity_full_inst (ity_match frz arg.pv_ity ity) res, None
         | _ -> quit () with Not_found -> quit () end
@@ -770,8 +771,8 @@ let check_spec dsp ecty e =
   (* computed effect vs user effect *)
   let check_rwd = dsp.ds_checkrw in
   let uwrl, ue = effect_of_dspec dsp in
-  let ucty = create_cty ecty.cty_args ecty.cty_pre
-    ecty.cty_post ecty.cty_xpost ue ecty.cty_result in
+  let ucty = create_cty ecty.cty_args ecty.cty_pre ecty.cty_post
+    ecty.cty_xpost ecty.cty_oldies ue ecty.cty_result in
   let ueff = ucty.cty_effect and eeff = ecty.cty_effect in
   let urds = ueff.eff_reads and erds = eeff.eff_reads in
   (* check that every user effect actually happens *)
@@ -842,29 +843,80 @@ let check_fun rsym dsp e =
 type env = {
   rsm : rsymbol Mstr.t;
   pvm : pvsymbol Mstr.t;
-  vsm : vsymbol Mstr.t;
+  old : (pvsymbol Mstr.t * (let_defn * pvsymbol) Hpv.t) Mstr.t;
 }
 
 let env_empty = {
   rsm = Mstr.empty;
   pvm = Mstr.empty;
-  vsm = Mstr.empty;
+  old = Mstr.empty;
 }
 
-let add_rsymbol ({rsm = rsm; vsm = vsm} as env) rs =
+exception UnboundLabel of string
+
+let find_old pvm (ovm,old) v =
+  let n = v.pv_vs.vs_name.id_string in
+  (* if v is top-level, both ov and pv are None.
+     If v is local, ov and pv must be equal to v.
+     If they are not equal, then v is defined under the label,
+     so we return v and do not register an "oldie" for it. *)
+  let ov = Mstr.find_opt n ovm in
+  let pv = Mstr.find_opt n pvm in
+  if not (Opt.equal pv_equal ov pv) then v
+  else match Hpv.find_opt old v with
+    | Some (_,o) -> o
+    | None ->
+        let e = e_pure (t_var v.pv_vs) in
+        let id = id_clone v.pv_vs.vs_name in
+        let ld = let_var id ~ghost:true e in
+        Hpv.add old v ld; snd ld
+
+let register_old env v l =
+  find_old env.pvm (Mstr.find_exn (UnboundLabel l) l env.old) v
+
+let get_later env later = later env.pvm (register_old env)
+
+let add_label ({pvm = pvm; old = old} as env) l =
+  let ht = Hpv.create 3 in
+  { env with old = Mstr.add l (pvm, ht) old }, ht
+
+let rebase_old {pvm = pvm} preold old fvs =
+  let rebase v (_,{pv_vs = o}) sbs =
+    if not (Mvs.mem o fvs) then sbs else match preold with
+      | Some preold ->
+          Mvs.add o (t_var (find_old pvm preold v).pv_vs) sbs
+      | None -> raise (UnboundLabel "'0") in
+  Hpv.fold rebase old Mvs.empty
+
+let rebase_pre env preold old pl =
+  let pl = List.map to_fmla pl in
+  let fvs = List.fold_left t_freevars Mvs.empty pl in
+  let sbs = rebase_old env preold old fvs in
+  List.map (t_subst sbs) pl
+
+let rebase_variant env preold old varl =
+  let add s (t,_) = t_freevars s t in
+  let fvs = List.fold_left add Mvs.empty varl in
+  let sbs = rebase_old env preold old fvs in
+  let conv (t,rel) = t_subst sbs t, rel in
+  List.map conv varl
+
+let get_oldies old =
+  Hpv.fold (fun v (_,o) sbs -> Mpv.add o v sbs) old Mpv.empty
+
+let add_rsymbol ({rsm = rsm; pvm = pvm} as env) rs =
   let n = rs.rs_name.id_string in
-  let vsm = match rs.rs_logic with
-    | RLpv pv -> Mstr.add n pv.pv_vs vsm
-    | _ -> vsm in
-  { env with rsm = Mstr.add n rs rsm; vsm = vsm }
+  let pvm = match rs.rs_logic with
+    | RLpv pv -> Mstr.add n pv pvm
+    | _ -> pvm in
+  { env with rsm = Mstr.add n rs rsm; pvm = pvm }
 
-let add_pvsymbol ({pvm = pvm; vsm = vsm} as env) pv =
+let add_pvsymbol ({pvm = pvm} as env) pv =
   let n = pv.pv_vs.vs_name.id_string in
-  { env with pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
+  { env with pvm = Mstr.add n pv pvm }
 
-let add_pv_map ({pvm = pvm; vsm = vsm} as env) vm =
-  let um = Mstr.map (fun pv -> pv.pv_vs) vm in
-  { env with pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
+let add_pv_map ({pvm = pvm} as env) vm =
+  { env with pvm = Mstr.set_union vm pvm }
 
 let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 
@@ -875,13 +927,15 @@ let cty_of_spec env bl dsp dity =
   let ty = ty_of_ity ity in
   let bl = binders bl in
   let env = add_binders env bl in
-  let dsp = dsp env.vsm ty in
-  let _,eff = effect_of_dspec dsp in
+  let preold = Mstr.find_opt "'0" env.old in
+  let env, old = add_label env "'0" in
+  let dsp = get_later env dsp ty in
+  let _, eff = effect_of_dspec dsp in
   let eff = eff_strong eff in
-  let p = create_pre dsp.ds_pre in
+  let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  create_cty bl p q xq eff ity
+  create_cty bl p q xq (get_oldies old) eff ity
 
 (** Expressions *)
 
@@ -936,7 +990,8 @@ and try_cexp uloc env ghost de0 = match de0.de_node with
         | _ -> app (cexp uloc env ghost de) el in
       down de0 []
   | DEfun (bl,dsp,de) ->
-      let c, dsp, _ = lambda uloc env (binders bl) dsp de in
+      let dvl _ _ = [] in
+      let c, dsp, _ = lambda uloc env (binders bl) dsp dvl de in
       check_fun None dsp c;
       [], c_ghostify ghost c
   | DEany (bl,dsp,dity) ->
@@ -1037,8 +1092,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEwhile (de1,dinv,dvarl,de2) ->
       let e1 = expr uloc env de1 in
       let e2 = expr uloc env de2 in
-      let inv = dinv env.vsm in
-      let varl = dvarl env.vsm in
+      let inv = get_later env dinv in
+      let varl = get_later env dvarl in
       e_while e1 (create_invariant inv) varl e2
   | DEfor (id,de_from,dir,de_to,dinv,de) ->
       let e_from = expr uloc env de_from in
@@ -1046,7 +1101,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let v = create_pvsymbol id ity_int in
       let env = add_pvsymbol env v in
       let e = expr uloc env de in
-      let inv = dinv env.vsm in
+      let inv = get_later env dinv in
       e_for v e_from dir e_to (create_invariant inv) e
   | DEtry (de1,bl) ->
       let e1 = expr uloc env de1 in
@@ -1079,21 +1134,19 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEghost de ->
       e_ghostify true (expr uloc env de)
   | DEassert (ak,f) ->
-      e_assert ak (create_assert (f env.vsm))
+      e_assert ak (create_assert (get_later env f))
   | DEpure t ->
-      e_pure (t env.vsm)
+      e_pure (get_later env t)
   | DEabsurd ->
       e_absurd (ity_of_dity res)
   | DEtrue ->
       e_true
   | DEfalse ->
       e_false
-  | DEmark _ -> assert false (* TODO *)
-(*
-      let ld,v = create_let_defn_pv id Mlw_wp.e_now in
-      let env = add_pvsymbol env v in
-      e_let ld (expr uloc env de)
-*)
+  | DEmark ({pre_name = l},de) ->
+      let env, old = add_label env l in
+      let put _ (ld,_) e = e_let ld e in
+      Hpv.fold put old (expr uloc env de)
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
@@ -1117,15 +1170,15 @@ and rec_defn uloc env ghost {fds = dfdl} =
   let step1 env (id, gh, kind, bl, dsp, dvl, ({de_dvty = dvty} as de)) =
     let pvl = binders bl in
     let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
-    let cty = create_cty pvl [] [] Mexn.empty eff_empty ity in
+    let cty = create_cty pvl [] [] Mexn.empty Mpv.empty eff_empty ity in
     let rs = create_rsymbol id ~ghost:(gh || ghost) ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, dsp, dvl, de) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
   let step2 ({rs_cty = c} as rs, kind, dsp, dvl, de) (fdl, dspl) =
-    let lam, dsp, env = lambda uloc env c.cty_args dsp de in
+    let lam, dsp, dvl = lambda uloc env c.cty_args dsp dvl de in
     if c_ghost lam && not (rs_ghost rs) then Loc.errorm ?loc:rs.rs_name.id_loc
       "Function %s must be explicitly marked ghost" rs.rs_name.id_string;
-    (rs, lam, dvl env.vsm, kind)::fdl, dsp::dspl in
+    (rs, lam, dvl, kind)::fdl, dsp::dspl in
   (* check for unexpected aliases in case of trouble *)
   let fdl, dspl = try List.fold_right step2 fdl ([],[]) with
     | Loc.Located (_, Ity.TypeMismatch _) | Ity.TypeMismatch _ as exn ->
@@ -1142,15 +1195,19 @@ and rec_defn uloc env ghost {fds = dfdl} =
     add_rsymbol env s in
   ld, List.fold_left2 add_fd env rdl dspl
 
-and lambda uloc env pvl dsp de =
+and lambda uloc env pvl dsp dvl de =
   let env = add_binders env pvl in
   let e = expr uloc env de in
   let ty = ty_of_ity e.e_ity in
-  let dsp = dsp env.vsm ty in
-  let p = create_pre dsp.ds_pre in
+  let preold = Mstr.find_opt "'0" env.old in
+  let env, old = add_label env "'0" in
+  let dsp = get_later env dsp ty in
+  let dvl = get_later env dvl in
+  let dvl = rebase_variant env preold old dvl in
+  let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  c_fun pvl p q xq e, dsp, env
+  c_fun pvl p q xq (get_oldies old) e, dsp, dvl
 
 let rec_defn ?(keep_loc=true) drdf =
   reunify_regions ();
@@ -1172,7 +1229,7 @@ let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
       let e = expr uloc env_empty de in
       if e_ghost e && not ghost then Loc.errorm ?loc:id.pre_loc
         "Function %s must be explicitly marked ghost" id.pre_name;
-      let c = c_fun [] [] [] Mexn.empty e in
+      let c = c_fun [] [] [] Mexn.empty Mpv.empty e in
       (* the rsymbol will carry a single postcondition "the result
          is equal to the logical constant". Any user-written spec
          will be checked once, in-place, under Eexec. Since kind
@@ -1201,3 +1258,8 @@ let expr ?(keep_loc=true) de =
   reunify_regions ();
   let uloc = if keep_loc then None else Some None in
   expr uloc env_empty de
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | UnboundLabel s ->
+      Format.fprintf fmt "unbound label %s" s
+  | _ -> raise e)

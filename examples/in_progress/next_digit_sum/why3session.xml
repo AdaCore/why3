@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="10" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="10" memlimit="1000"/>
+<file name="../next_digit_sum.mlw" expanded="true">
+<theory name="M" sum="c34577c36db634d514063f7841bcae83" expanded="true">
+ <goal name="WP_parameter interp_eq" expl="VC for interp_eq">
+ <proof prover="0"><result status="valid" time="0.04" steps="31"/></proof>
+ </goal>
+ <goal name="Sum_is_sum_digits_interp">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.96"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.96"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.97"/></proof>
+ </goal>
+ <goal name="Sum_digits_a_set_eq">
+ <proof prover="0"><result status="valid" time="0.04" steps="42"/></proof>
+ </goal>
+ <goal name="Interp9_step">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.96"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="11.01"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
+ </goal>
+ <goal name="WP_parameter search_safety" expl="VC for search_safety">
+ <proof prover="0"><result status="valid" time="0.04" steps="41"/></proof>
+ </goal>
+ <goal name="WP_parameter search" expl="VC for search">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.92"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.07"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter search.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search.2" expl="2. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter search.3" expl="3. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter search.4" expl="4. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter search.5" expl="5. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search.6" expl="6. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter search.7" expl="7. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search.8" expl="8. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search.9" expl="9. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search.10" expl="10. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter search.11" expl="11. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search.12" expl="12. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter search.13" expl="13. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter search.14" expl="14. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter search.15" expl="15. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter search.16" expl="16. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter search.17" expl="17. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter search.18" expl="18. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.19" expl="19. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.20" expl="20. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.21" expl="21. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter search.22" expl="22. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.23" expl="23. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.24" expl="24. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter search.25" expl="25. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter search.26" expl="26. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter search.27" expl="27. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter search.28" expl="28. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter search.29" expl="29. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter search.30" expl="30. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter search.31" expl="31. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search.32" expl="32. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter search.33" expl="33. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter search.34" expl="34. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter search.35" expl="35. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter search.36" expl="36. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter search.37" expl="37. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter search.38" expl="38. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search.39" expl="39. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search.40" expl="40. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter search.41" expl="41. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter search.42" expl="42. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter search.43" expl="43. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search.44" expl="44. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search.45" expl="45. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter search.46" expl="46. assertion">
+  <proof prover="0"><result status="timeout" time="10.00"/></proof>
+  </goal>
+  <goal name="WP_parameter search.47" expl="47. assertion">
+  <proof prover="0"><result status="valid" time="0.09" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter search.48" expl="48. assertion">
+  <proof prover="0"><result status="valid" time="0.20" steps="47"/></proof>
+  </goal>
+  <goal name="WP_parameter search.49" expl="49. exceptional postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
+  </goal>
+  <goal name="WP_parameter search.50" expl="50. loop invariant init">
+  <proof prover="0"><result status="valid" time="5.09" steps="217"/></proof>
+  </goal>
+  <goal name="WP_parameter search.51" expl="51. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter search.52" expl="52. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter search.53" expl="53. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search.54" expl="54. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.55" expl="55. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.56" expl="56. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="10.01"/></proof>
+  </goal>
+  <goal name="WP_parameter search.57" expl="57. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.58" expl="58. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.59" expl="59. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
+  </goal>
+  <goal name="WP_parameter search.60" expl="60. assertion">
+  <proof prover="0"><result status="valid" time="4.64" steps="80"/></proof>
+  </goal>
+  <goal name="WP_parameter search.61" expl="61. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter search.62" expl="62. exceptional postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search.63" expl="63. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search.64" expl="64. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search.65" expl="65. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search.66" expl="66. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter search.67" expl="67. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Gt_digit_interp" expanded="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.03"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
+ </goal>
+ <goal name="Gt_digit_update">
+ <proof prover="1"><result status="valid" time="0.13"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Smallest_shape_1" expanded="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.02"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
+ </goal>
+ <goal name="Smallest_shape_2">
+ <proof prover="0" obsolete="true"><result status="timeout" time="10.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.02"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.96"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="Smallest_shape_2.1" expl="1.">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
+  </goal>
+  <goal name="Smallest_shape_2.2" expl="2.">
+  <proof prover="0" obsolete="true"><result status="timeout" time="10.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Smallest_nb_digits" expanded="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.01"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ </goal>
+ <goal name="Any_nb_digits_above_smallest_size" expanded="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="10.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.03"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
+ </goal>
+ <goal name="Completeness">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.96"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.03"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="Completeness.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.05" steps="20"/></proof>
+  </goal>
+  <goal name="Completeness.2" expl="2.">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.89"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter search_smallest" expl="VC for search_smallest">
+ <proof prover="0" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="10.14"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter search_smallest.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.2" expl="2. VC for search_smallest">
+  <proof prover="0"><result status="valid" time="0.05" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.3" expl="3. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.4" expl="4. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.5" expl="5. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.6" expl="6. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.7" expl="7. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.8" expl="8. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.9" expl="9. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.10" expl="10. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.11" expl="11. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.12" expl="12. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.13" expl="13. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.14" expl="14. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.15" expl="15. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.16" expl="16. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.17" expl="17. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.18" expl="18. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.19" expl="19. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.20" expl="20. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.21" expl="21. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.22" expl="22. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.23" expl="23. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.24" expl="24. type invariant">
+  <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.25" expl="25. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.26" expl="26. assertion">
+  <proof prover="0"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.27" expl="27. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="39"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.28" expl="28. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.29" expl="29. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.30" expl="30. assertion">
+  <proof prover="0"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.31" expl="31. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04" steps="39"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.32" expl="32. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.33" expl="33. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.34" expl="34. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.35" expl="35. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.36" expl="36. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.37" expl="37. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.38" expl="38. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.39" expl="39. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.40" expl="40. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.41" expl="41. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.42" expl="42. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.43" expl="43. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.44" expl="44. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.45" expl="45. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.46" expl="46. VC for search_smallest">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.47" expl="47. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.04" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.48" expl="48. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.49" expl="49. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.50" expl="50. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.51" expl="51. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.52" expl="52. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.53" expl="53. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.54" expl="54. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.55" expl="55. assertion">
+  <proof prover="0"><result status="valid" time="0.32" steps="71"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.56" expl="56. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.57" expl="57. assertion">
+  <proof prover="0"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.58" expl="58. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.92"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.59" expl="59. assertion">
+  <proof prover="0"><result status="valid" time="0.13" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.60" expl="60. assertion">
+  <proof prover="0"><result status="valid" time="0.31" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.61" expl="61. assertion">
+  <proof prover="0"><result status="valid" time="0.06" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.62" expl="62. exceptional postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.88"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.63" expl="63. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.56" steps="96"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.64" expl="64. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.65" expl="65. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.04" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.66" expl="66. assertion">
+  <proof prover="0"><result status="valid" time="4.85" steps="264"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.67" expl="67. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.68" expl="68. type invariant">
+  <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.69" expl="69. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.70" expl="70. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.71" expl="71. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.72" expl="72. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.73" expl="73. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.74" expl="74. assertion">
+  <proof prover="0"><result status="valid" time="5.10" steps="265"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.75" expl="75. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.76" expl="76. assertion">
+  <proof prover="0"><result status="valid" time="3.67" steps="87"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.77" expl="77. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.78" expl="78. type invariant">
+  <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.79" expl="79. exceptional postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.94"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.80" expl="80. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.94"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.81" expl="81. type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.82" expl="82. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.83" expl="83. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="9.97"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.84" expl="84. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter search_smallest.85" expl="85. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="10.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

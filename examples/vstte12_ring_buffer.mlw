@@ -221,3 +221,53 @@ module RingBufferSeq
     if b.first = n then b.first <- 0;
     r
 end
+
+module HarnessSeq
+
+  use import seq.Seq
+  use import RingBufferSeq
+
+  let harness () =
+    let b = create 10 0 in
+    push b 1;
+    push b 2;
+    push b 3;
+    let x = pop b in assert { x = 1 };
+    let x = pop b in assert { x = 2 };
+    let x = pop b in assert { x = 3 };
+    ()
+
+  let harness2 () =
+    let b = create 3 0 in
+    push b 1;
+    assert { sequence b == cons 1 empty };
+    push b 2;
+    assert { sequence b == cons 1 (cons 2 empty) };
+    push b 3;
+    assert { sequence b == cons 1 (cons 2 (cons 3 empty)) };
+    let x = pop b in assert { x = 1 };
+    assert { sequence b == cons 2 (cons 3 empty) };
+    push b 4;
+    assert { sequence b == cons 2 (cons 3 (cons 4 empty)) };
+    let x = pop b in assert { x = 2 };
+    assert { sequence b == cons 3 (cons 4 empty) };
+    let x = pop b in assert { x = 3 };
+    assert { sequence b == cons 4 empty };
+    let x = pop b in assert { x = 4 };
+    ()
+
+  use import int.Int
+
+  let test (x: int) (y: int) (z: int) =
+    let b = create 2 0 in
+    push b x;
+    push b y;
+    assert { sequence b == cons x (cons y empty) };
+    let h = pop b in assert { h = x };
+    assert { sequence b == cons y empty };
+    push b z;
+    assert { sequence b == cons y (cons z empty) };
+    let h = pop b in assert { h = y };
+    let h = pop b in assert { h = z }
+
+end

@@ -248,7 +248,7 @@ let print_report (g,p,(t,m,s),r) =
   | M.Result(new_res,old_res) ->
     (* begin match !opt_smoke with *)
     (*   | Session.SD_None -> *)
-        printf "%a instead of %a (timelimit=%d, memlimit=%d, stepslimit=%d)@."
+        printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
           print_result new_res print_result old_res t m s
     (*   | _ -> *)
     (*     printf "Smoke detected!!!@." *)

@@ -1,8 +1,24 @@
 
 * marks an incompatible change
 
-version 0.86, May 11th, 2015
+provers
+  o support for Isabelle 2015 (released May 25, 2015)
+
+Version 0.86.1, May 22, 2015
 ============================
+
+IDE
+  o improved task highlighting for negated premises
+    (contributed by Mikhail Mandrykin, AstraVer project)
+
+provers
+  o support for Gappa 1.2 (released May 19, 2015)
+
+bug fixes
+  o why3doc: garbled output
+
+version 0.86, May 11, 2015
+==========================
 
 core
   o steps limit for reliable replay of proofs, available for Alt-Ergo
@@ -30,15 +46,15 @@ provers
     http://www.lix.polytechnique.fr/~lengrand/Psyche/)
   o preliminary support for upcoming CVC4 1.5 (steps feature)
 
-IDE:
+IDE
   o config file not automatically saved anymore at exit. Configuration
     is saved on disk for future sessions if, and only if, preferences
     window is exited by hitting the "Save&Close" button
   o right part of main window organized in tabs.
   o better explanations and task highlighting
-    (contributed by Mikhail Mandrykin)
+    (contributed by Mikhail Mandrykin, AstraVer project)
 
-bug fixes:
+bug fixes
   o bug in interpreter in presence of nested mutable fields
   o IDE: proofs in progress should never be "cleaned"
   o IDE: display warnings after reload

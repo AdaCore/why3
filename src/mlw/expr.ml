@@ -162,29 +162,32 @@ let rs_dup ({rs_name = {id_loc = loc}} as s) c =
       check_effects ?loc c;
       mk_rs id c RLlemma None
 
-let create_field id s v =
-  if not (List.exists (fun u -> pv_equal u v) s.its_mfields ||
-          List.exists (fun u -> pv_equal u v) s.its_ifields) then
-    invalid_arg "Expr.create_field";
+let create_projection s v =
+  let id = id_clone v.pv_vs.vs_name in
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let ity = ity_app s tyl s.its_regions in
   let arg = create_pvsymbol (id_fresh "arg") ity in
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
-  let c = create_cty [arg] [] [q] Mexn.empty eff v.pv_ity in
+  let c = create_cty [arg] [] [q] Mexn.empty Mpv.empty eff v.pv_ity in
   mk_rs ls.ls_name c (RLls ls) (Some v)
+
+exception FieldExpected of rsymbol
+
+let mfield_of_rs s = match s.rs_cty.cty_args, s.rs_field with
+  | [{pv_ity = {ity_node = Ityreg {reg_its = ts}}}], Some f
+    when List.exists (pv_equal f) ts.its_mfields -> f
+  | _ -> raise (FieldExpected s)
 
 let create_constructor ~constr id s fl =
   let exn = Invalid_argument "Expr.create_constructor" in
   let fs = List.fold_right (Spv.add_new exn) fl Spv.empty in
-  if s.its_private || s.its_def <> None then raise exn;
-  if s.its_mutable then begin
+  if s.its_privmut || s.its_def <> None then raise exn;
+  if s.its_mfields <> [] then begin
     if constr <> 1 then raise exn;
     let mfs = Spv.of_list s.its_mfields in
-    let ifs = Spv.of_list s.its_ifields in
-    let sfs = Spv.union mfs ifs in
-    if not (Spv.equal fs sfs) then raise exn
+    if not (Spv.subset mfs fs) then raise exn
   end else if constr < 1 then raise exn;
   let argl = List.map (fun a -> a.pv_vs.vs_ty) fl in
   let tyl = List.map ity_var s.its_ts.ts_args in
@@ -193,8 +196,8 @@ let create_constructor ~constr id s fl =
   let ls = create_fsymbol ~constr id argl ty in
   let argl = List.map (fun a -> t_var a.pv_vs) fl in
   let q = make_post (fs_app ls argl ty) in
-  let c = create_cty fl [] [q] Mexn.empty eff_empty ity in
-  mk_rs (id_register id) c (RLls ls) None
+  let c = create_cty fl [] [q] Mexn.empty Mpv.empty eff_empty ity in
+  mk_rs ls.ls_name c (RLls ls) None
 
 let rs_of_ls ls =
   let v_args = List.map (fun ty ->
@@ -202,7 +205,7 @@ let rs_of_ls ls =
   let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
   let q = make_post (t_app ls t_args ls.ls_value) in
   let ity = ity_of_ty (t_type q) in
-  let c = create_cty v_args [] [q] Mexn.empty eff_empty ity in
+  let c = create_cty v_args [] [q] Mexn.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
@@ -366,7 +369,7 @@ let e_locate_effect pr e = fst (find_effect pr None e)
 let localize_ghost_write v r el =
   let taints eff = Mreg.mem r eff.eff_taints in
   let writes eff = match Mreg.find_opt r eff.eff_writes with
-    | Some fds -> r.reg_its.its_private ||
+    | Some fds -> r.reg_its.its_privmut ||
         Spv.exists (fun fd -> not fd.pv_ghost) fds
     | None -> false in
   (* check if some component taints region r *)
@@ -489,8 +492,12 @@ let e_exec ({c_cty = cty} as c) = match cty.cty_args with
 
 let c_any c = mk_cexp Cany c
 
-let c_fun args p q xq ({e_effect = eff} as e) =
-  mk_cexp (Cfun e) (create_cty args p q xq eff e.e_ity)
+let c_fun args p q xq old ({e_effect = eff} as e) =
+  (* reset variables are forbidden in post-conditions *)
+  let c = try create_cty args p q xq old eff e.e_ity with
+    | BadGhostWrite (v,r) -> localize_ghost_write v r [e]
+    | StaleVariable (v,r) -> localize_cover_stale v r [e] in
+  mk_cexp (Cfun e) c
 
 let c_app s vl ityl ity =
   mk_cexp (Capp (s,vl)) (cty_apply s.rs_cty vl ityl ity)
@@ -542,12 +549,8 @@ let ext_c_app (ldl,c) el ityl ity =
 
 (* assignment *)
 
-exception FieldExpected of rsymbol
-
 let e_assign_raw al =
-  let conv (r,f,v) = match f.rs_field with
-    | None -> raise (FieldExpected f)
-    | Some f -> r, f, v in
+  let conv (r,f,v) = r, mfield_of_rs f, v in
   mk_expr (Eassign al) ity_unit (eff_assign (List.map conv al))
 
 let e_assign al =
@@ -708,12 +711,12 @@ let rec e_rs_subst sm e =
       let d = e_rs_subst sm d in
       ity_equal_check d.e_ity v.pv_ity;
       if e_ghost d <> v.pv_ghost then Loc.errorm
-        "Expr.create_rec_defn: ghost status mismatch";
+        "Expr.let_rec: ghost status mismatch";
       e_let (LDvar (v,d)) (e_rs_subst sm e)
   | Elet (LDsym (s,d),e) ->
       let d = c_rs_subst sm d in
       if c_ghost d <> rs_ghost s then Loc.errorm
-        "Expr.create_rec_defn: ghost status mismatch";
+        "Expr.let_rec: ghost status mismatch";
       let ns = rs_dup s d.c_cty in
       e_let (LDsym (ns,d)) (e_rs_subst (Mrs.add s ns sm) e)
   | Elet (LDrec fdl,e) ->
@@ -742,12 +745,13 @@ and c_rs_subst sm ({c_node = n; c_cty = c} as d) =
       let al = List.map (fun v -> v.pv_ity) c.cty_args in
       c_app (Mrs.find_def s s sm) vl al c.cty_result
   | Cfun e ->
-      c_fun c.cty_args c.cty_pre c.cty_post c.cty_xpost (e_rs_subst sm e))
+      c_fun c.cty_args c.cty_pre c.cty_post
+        c.cty_xpost c.cty_oldies (e_rs_subst sm e))
 
 and rec_fixp dl =
   let update sm (s,({c_cty = c} as d)) =
     if c_ghost d <> rs_ghost s then Loc.errorm
-      "Expr.create_rec_defn: ghost status mismatch";
+      "Expr.let_rec: ghost status mismatch";
     let c = if List.length c.cty_pre < List.length s.rs_cty.cty_pre
             then c else cty_add_pre [List.hd s.rs_cty.cty_pre] c in
     if eff_equal c.cty_effect s.rs_cty.cty_effect then sm, (s,d)
@@ -764,7 +768,7 @@ let let_rec fdl =
   (* check that the all variants use the same order *)
   let varl1 = match fdl with
     | (_,_,vl,_)::_ -> List.rev vl
-    | [] -> invalid_arg "Expr.create_rec_defn" in
+    | [] -> invalid_arg "Expr.let_rec" in
   let no_int t = not (ty_equal (t_type t) ty_int) in
   let check_variant (_,_,vl,_) =
     let vl, varl1 = match List.rev vl, varl1 with
@@ -802,7 +806,7 @@ let let_rec fdl =
        not (ity_equal s.rs_cty.cty_result c.cty_result) ||
        (c_ghost d && not (rs_ghost s)) || c.cty_args = [] ||
        s.rs_logic <> RLnone
-    then invalid_arg "Expr.create_rec_defn";
+    then invalid_arg "Expr.let_rec";
     (* prepare the extra "decrease" precondition *)
     let pre = match ds with
       | Some ls -> ps_app ls (List.map fst varl) :: c.cty_pre
@@ -810,9 +814,10 @@ let let_rec fdl =
     (* create the clean rsymbol *)
     let id = id_clone s.rs_name in
     let c = create_cty c.cty_args pre
-      c.cty_post c.cty_xpost start_eff c.cty_result in
+      c.cty_post c.cty_xpost c.cty_oldies start_eff c.cty_result in
     let ns = create_rsymbol id ~ghost:(rs_ghost s) ~kind:RKnone c in
-    Mrs.add s ns sm, (ns, c_ghostify (rs_ghost s) d) in
+    let sm = Mrs.add_new (Invalid_argument "Expr.let_rec") s ns sm in
+    sm, (ns, c_ghostify (rs_ghost s) d) in
   let sm, dl = Lists.map_fold_left update Mrs.empty fdl in
   (* produce the recursive definition *)
   let conv (s,d) = s, c_rs_subst sm d in
@@ -823,6 +828,11 @@ let let_rec fdl =
     { rec_sym = s; rec_rsym = rs; rec_fun = d; rec_varl = varl } in
   let rdl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
   LDrec rdl, rdl
+
+let ls_decr_of_let_defn = function
+  | LDrec ({rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}};
+            rec_varl = _::_ }::_) -> Some ls
+  | _ -> None
 
 (* pretty-pringting *)
 
@@ -1118,7 +1128,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ConstructorExpected s -> fprintf fmt
       "Function %a is not a constructor" print_rs s
   | FieldExpected s -> fprintf fmt
-      "Function %a is not a record field" print_rs s
+      "Function %a is not a mutable field" print_rs s
 (*
   | ItyExpected _e -> fprintf fmt
       "This expression is not a first-order value"

@@ -1289,7 +1289,7 @@ let why3tac ?(timelimit=timelimit) s gl =
       | Call_provers.Failure s -> error ("Failure: " ^ s)
       | Call_provers.Timeout -> error "Timeout"
       | OutOfMemory -> error "Out Of Memory"
-      | StepsLimitExceeded -> error "Steps Limit reached"
+      | StepLimitExceeded -> error "Step Limit Exceeded"
       | HighFailure ->
           error ("Prover failure\n" ^ res.pr_output ^ "\n")
   with

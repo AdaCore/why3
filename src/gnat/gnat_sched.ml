@@ -42,7 +42,7 @@ let run_goal entry =
     base_prover.Whyconf.command
     ~timelimit:timeout
     ~memlimit:0
-    ~stepslimit:Gnat_config.steps
+    ~steplimit:Gnat_config.steps
     ?old:old ?inplace:inplace
     driver
     (Session.goal_task g)

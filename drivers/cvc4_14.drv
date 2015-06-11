@@ -18,11 +18,12 @@ import "discrimination.gen"
 
 transformation "inline_trivial"
 transformation "eliminate_builtin"
-(* temporarily disabled: too much experimental
 transformation "detect_polymorphism"
+(* We could keep more definitions by using
+   transformation "eliminate_definition_if_poly"
+   instead, but some proofs are lost
+   (examples/logic/triangle_inequality.why)
 *)
-(* transformation "eliminate_definition_if_poly" *)
-transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
 transformation "eliminate_epsilon"
@@ -41,24 +42,19 @@ transformation "introduce_premises"
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 timeout "interrupted by timeout"
 steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
-stepslimitexceeded "??"
-
+(**
+Unfortunately, there is no specific output message when CVC4 reaches its resource limit
+steplimitexceeded "??"
+*)
 
 (** Extra theories supported by CVC4 *)
 
 (* Disabled:
-   CVC4 division seems to be neither the Euclidean one, nor the Computer one
-
+   CVC4 seems less efficient with its built-in implementation than
+   with the axiomatic version
+*)
+(*
 theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
-end
-
-theory int.ComputerDivision
    syntax function div "(div %1 %2)"
    syntax function mod "(mod %1 %2)"
    remove prop Mod_bound
