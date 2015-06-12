@@ -9,6 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Wrappers for deprecated string functions of OCaml stdlib *)
+
+val create : int -> string
+val copy : string -> string
+val set : string -> int -> char -> unit
+
 (** Useful functions on string *)
 
 val rev_split : char -> string -> string list
@@ -20,4 +26,3 @@ val ends_with : string -> string -> bool
 
 val pad_right : char -> string -> int -> string
 (** chop or pad the given string on the right up to the given length *)
-
