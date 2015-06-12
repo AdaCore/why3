@@ -308,14 +308,14 @@ let print_task_prepared ?old drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ~cntexample drv fmt task =
+let print_task ?old ?(cntexample=false) drv fmt task =
   let task = prepare_task ~cntexample drv task in
   let _ = print_task_prepared ?old drv fmt task in
   ()
 
 let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
-  print_task ?old ~cntexample:false drv fmt task
+  print_task ?old drv fmt task
 
 let prove_task_prepared
     ~command ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =

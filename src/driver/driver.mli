@@ -47,7 +47,7 @@ val call_on_buffer :
 
 val print_task :
   ?old       : in_channel ->
-  cntexample : bool ->
+  ?cntexample : bool ->
   driver -> Format.formatter -> Task.task -> unit
 
 val print_theory :
