@@ -71,8 +71,9 @@ EMACS = @EMACS@
 #PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
-OFLAGS = -w Aer-41-44-45@5 -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w Aer-41-44-45@5 -dtypes -g -I lib/why3 $(INCLUDES)
+WARNINGS = Aer-41-44-45@5
+OFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
@@ -221,6 +222,11 @@ else
 src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
+
+# hide deprecated warnings for strings
+
+src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
+src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 
 # build targets
 
