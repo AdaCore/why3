@@ -43,9 +43,9 @@ let cmdline_split s =
     | '\\' -> cstate := Escape
     | c when is_blank c ->
         let n = Queue.length cur_arg in
-        let s = String.create n in
+        let s = Strings.create n in
         for i = 0 to pred n do
-          String.set s i (Queue.take cur_arg)
+          Strings.set s i (Queue.take cur_arg)
         done;
         argv := s :: !argv;
         cstate := Blank
@@ -104,4 +104,3 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | EmptyCommandLine ->
       Format.fprintf fmt "empty command line"
   | _ -> raise e)
-

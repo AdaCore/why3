@@ -9,7 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* useful function on string *)
+
+let create = String.create
+let copy = String.copy
+let set = String.set
+
+
 
 let rev_split c s =
   let rec aux acc i =
@@ -33,11 +38,10 @@ let ends_with s suf =
 let pad_right c s i =
   let sl = String.length s in
   if sl < i then
-    let p = String.create i in
+    let p = create i in
     String.blit s 0 p 0 sl;
     String.fill p sl (i-sl) c;
     p
   else if sl > i
   then String.sub s 0 i
   else s
-

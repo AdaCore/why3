@@ -478,7 +478,7 @@ let read_old_proof =
           Vernacular
         end in
       let len = pos_in ch - !start in
-      let s = String.create len in
+      let s = Strings.create len in
       seek_in ch !start;
       really_input ch s 0 len;
       Query (name, k, s)

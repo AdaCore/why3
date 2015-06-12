@@ -64,16 +64,16 @@ let escape_string s =
          | _ -> 1)
   done;
   if !n = String.length s then s else begin
-    let s' = String.create !n in
+    let s' = Strings.create !n in
     n := 0;
     for i = 0 to String.length s - 1 do
       let c = String.unsafe_get s i in
       begin match c with
         | ('"' | '\\' | '\n' | '\r' | '\t') ->
-          String.unsafe_set s' !n '\\'; incr n
+          Strings.set s' !n '\\'; incr n
         | _ -> ()
       end;
-      String.unsafe_set s' !n
+      Strings.set s' !n
         (match c with '\n' -> 'n' | '\r' -> 'r' | '\t' -> 't' | _ -> c);
       incr n
     done;
