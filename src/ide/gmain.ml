@@ -39,15 +39,12 @@ let debug = Debug.lookup_flag "ide_info"
 
 let files = Queue.create ()
 let opt_parser = ref None
-let opt_cntexmp = ref false
 
 let spec = Arg.align [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "--get-ce", Arg.Set opt_cntexmp,
-      " gets the counter-example model";
 (*
   "-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -994,6 +991,7 @@ let () = Queue.iter (open_file ~start:true) files
 let prover_on_selected_goals pr =
   let timelimit = gconfig.session_time_limit in
   let memlimit = gconfig.session_mem_limit in
+  let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
   List.iter
     (fun row ->
       try
@@ -1001,7 +999,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~cntexample:!opt_cntexmp ~timelimit ~memlimit
+         ~cntexample ~timelimit ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1076,6 +1074,7 @@ let bisect_proof_attempt pa =
   let timelimit = ref (-1) in
   let set_timelimit res =
     timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
+  let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
   let rec callback lp pa c = function
     | S.Running | S.Scheduled -> ()
     | S.Interrupted ->
@@ -1107,14 +1106,14 @@ let bisect_proof_attempt pa =
         let npa = S.copy_external_proof ~notify ~keygen ~obsolete:true
           ~goal ~env_session:eS pa in
         MA.init_any (S.Metas metas);
-        M.run_external_proof eS sched ~cntexample:!opt_cntexmp npa
+        M.run_external_proof eS sched ~cntexample npa
         with e ->
           dprintf debug "Bisecting error:@\n%a@."
             Exn_printer.exn_printer e end
       | Eliminate_definition.BSstep (t,c) ->
         assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
-	  ~cntexample:!opt_cntexmp
+	  ~cntexample
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
 	  ~steplimit:(-1)
@@ -1153,7 +1152,7 @@ let bisect_proof_attempt pa =
             dprintf debug "Prover can't be loaded.@."
           | Some lp ->
             M.schedule_proof_attempt
-	      ~cntexample:!opt_cntexmp
+	      ~cntexample
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
 	      ~steplimit:(-1)
@@ -1164,7 +1163,7 @@ let bisect_proof_attempt pa =
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
     C.print_prover pa.S.proof_prover;
-  M.run_external_proof eS sched ~cntexample:!opt_cntexmp ~callback:first_callback pa
+  M.run_external_proof eS sched ~cntexample ~callback:first_callback pa
 
 let apply_bisect_on_selection () =
   List.iter
@@ -2131,6 +2130,7 @@ let edit_selected_row r =
         ()
     | S.Proof_attempt a ->
         let e = env_session () in
+	let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
 (*
         let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
                     prover_altern = "" } in
@@ -2141,7 +2141,7 @@ let edit_selected_row r =
           "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
           0 time p.editor;
 *)
-        M.edit_proof ~cntexample:!opt_cntexmp e sched ~default_editor:gconfig.default_editor a
+        M.edit_proof ~cntexample e sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
     | S.Metas _ -> ()
 

@@ -175,6 +175,8 @@ type main = {
   (* max number of running prover processes *)
   plugins : string list;
   (* plugins to load, without extension, relative to [libdir]/plugins *)
+  cntexample : bool;
+  (* true provers should be asked for counter-example model *)
 }
 
 let libdir m =
@@ -203,6 +205,7 @@ let loadpath m =
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
+let cntexample m = m.cntexample
 
 exception StepsCommandNotSpecified of string
 
@@ -218,6 +221,9 @@ let get_complete_command pc steplimit =
 
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
+
+let set_cntexample m cntexample =
+  { m with cntexample = cntexample }
 
 let plugins m = m.plugins
 let set_plugins m pl =
@@ -258,6 +264,7 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
+    cntexample = true;
   }
 
 let default_main =
@@ -276,6 +283,7 @@ let set_main rc main =
   let section =
     set_int section "running_provers_max" main.running_provers_max in
   let section = set_stringl section "plugin" main.plugins in
+  let section = set_bool section "cntexample" main.cntexample in
   set_section rc "main" section
 
 exception NonUniqueId
@@ -509,6 +517,7 @@ let load_main dirname section =
     running_provers_max = get_int ~default:default_main.running_provers_max
       section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
+    cntexample = get_bool ~default:default_main.cntexample section "cntexample"
   }
 
 let read_config_rc conf_file =
