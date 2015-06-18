@@ -596,6 +596,12 @@ let is_e_void e = match e.e_node with
 
 let rs_func_app = rs_of_ls fs_func_app
 
+let ld_func_app =
+  let v_args = rs_func_app.rs_cty.cty_args in
+  let ity = rs_func_app.rs_cty.cty_result in
+  let c = create_cty v_args [] [] Mexn.empty Mpv.empty eff_empty ity in
+  LDsym (rs_func_app, c_any c)
+
 let e_func_app fn e =
   let c = rs_func_app.rs_cty in
   let mtch isb a e = ity_match isb a.pv_ity e.e_ity in

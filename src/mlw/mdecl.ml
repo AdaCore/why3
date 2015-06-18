@@ -293,8 +293,55 @@ let mk_decl = let r = ref 0 in fun node pure ->
   { md_node = node; md_pure = pure;
     md_syms = get_syms node pure;
     md_news = get_news node pure;
-    md_tag = (incr r; !r) }
+    md_tag  = (incr r; !r) }
 
 let create_type_decl dl =
   let ldl = assert false (* TODO *) in
   mk_decl (MDtype dl) ldl
+
+let create_let_decl ld = let _ = MDlet ld in assert false (* TODO *)
+
+let create_exn_decl xs = let _ = MDexn xs in assert false (* TODO *)
+
+let create_pure_decl _d = let _ = MDpure in assert false (* TODO *)
+
+(** {2 Built-in decls} *)
+
+let md_int  = mk_decl (MDtype [mk_itd its_int  [] [] []]) [(*TODO*)]
+let md_real = mk_decl (MDtype [mk_itd its_real [] [] []]) [(*TODO*)]
+let md_unit = mk_decl (MDtype [mk_itd its_unit [] [] []]) [(*TODO*)]
+let md_func = mk_decl (MDtype [mk_itd its_func [] [] []]) [(*TODO*)]
+let md_pred = mk_decl (MDtype [mk_itd its_pred [] [] []]) [(*TODO*)]
+
+let md_equ = mk_decl MDpure [(*TODO*)]
+
+let md_bool =
+  mk_decl (MDtype [mk_itd its_bool [] [rs_true;rs_false] []]) [(*TODO*)]
+
+let md_tuple _n = assert false (*TODO*)
+
+let md_func_app = mk_decl (MDlet ld_func_app) [(*TODO*)]
+
+(** {2 Known identifiers} *)
+
+type known_map = mdecl Mid.t
+
+let known_id kn id =
+  if not (Mid.mem id kn) then raise (Decl.UnknownIdent id)
+
+let merge_known kn1 kn2 =
+  let check_known id decl1 decl2 =
+    if md_equal decl1 decl2 then Some decl1
+    else raise (Decl.RedeclaredIdent id) in
+  Mid.union check_known kn1 kn2
+
+let known_add_decl kn0 d =
+  let kn = Mid.map (Util.const d) d.md_news in
+  let check id decl0 _ =
+    if md_equal decl0 d
+    then raise (Decl.KnownIdent id)
+    else raise (Decl.RedeclaredIdent id) in
+  let kn = Mid.union check kn0 kn in
+  let unk = Mid.set_diff d.md_syms kn in
+  if Sid.is_empty unk then kn else
+    raise (Decl.UnknownIdent (Sid.choose unk))

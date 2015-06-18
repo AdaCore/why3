@@ -56,3 +56,29 @@ and mdecl_node = private
   | MDpure
 
 val create_type_decl : its_defn list -> mdecl
+
+val create_let_decl : let_defn -> mdecl
+
+val create_exn_decl : xsymbol -> mdecl
+
+val create_pure_decl : Decl.decl -> mdecl
+
+(** {2 Built-in decls} *)
+
+val md_int : mdecl
+val md_real : mdecl
+val md_equ : mdecl
+val md_bool : mdecl
+val md_unit : mdecl
+val md_tuple : int -> mdecl
+val md_func : mdecl
+val md_pred : mdecl
+val md_func_app : mdecl
+
+(** {2 Known identifiers} *)
+
+type known_map = mdecl Mid.t
+
+val known_id : known_map -> ident -> unit
+val known_add_decl : known_map -> mdecl -> known_map
+val merge_known : known_map -> known_map -> known_map
