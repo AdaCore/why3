@@ -35,7 +35,48 @@ end
 
   let floc s e = Loc.extract (s,e)
 
-  let add_lab id l = { id with id_lab = l }
+  let model_label = Ident.create_label "model"
+
+  let is_model_label l =
+    match l with
+    | Lpos _ -> false
+    | Lstr lab ->
+      lab = model_label
+
+  let model_lab_present labels = 
+    try
+      ignore(List.find is_model_label labels);
+      true
+    with Not_found ->
+      false
+
+  let model_trace_regexp = Str.regexp "model_trace:"
+
+  let is_model_trace_label l =
+    match l with
+    | Lpos _ -> false
+    | Lstr lab -> 
+      try
+	ignore(Str.search_forward model_trace_regexp lab.lab_string 0);
+	true
+      with Not_found -> false
+
+  let model_trace_lab_present labels =
+    try
+      ignore(List.find is_model_trace_label labels);
+      true
+    with Not_found ->
+      false
+
+  let add_model_trace name labels =
+    if (model_lab_present labels) && (not (model_trace_lab_present labels)) then 
+      (Lstr (Ident.create_label ("model_trace:" ^ name)))::labels
+    else
+      labels  
+
+  let add_lab id l =
+    let l = add_model_trace id.id_str l in
+    { id with id_lab = l }
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
