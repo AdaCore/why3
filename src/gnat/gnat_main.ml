@@ -21,6 +21,7 @@
 
 open Why3
 open Term
+open Call_provers
 
 let rec search_labels t =
   let acc =
@@ -82,7 +83,7 @@ let rec handle_vc_result goal result prover_result manual_info =
    let task = Session.goal_task goal in
    match status with
    | Gnat_objectives.Proved ->
-       Gnat_report.register obj (Some task) prover_result true None ""
+       Gnat_report.register obj (Some task) prover_result true None "" ""
    | Gnat_objectives.Not_Proved ->
        let tracefile =
          match Gnat_config.proof_mode with
@@ -90,10 +91,19 @@ let rec handle_vc_result goal result prover_result manual_info =
            Gnat_objectives.Save_VCs.save_trace goal
          | _ -> ""
        in
+       let cntexmpfile = 
+	 match prover_result with
+	 | None ->
+	   ""
+	 | Some prover_result ->
+	   Gnat_objectives.Save_VCs.save_counterexample goal prover_result.pr_model
+       in
        Gnat_report.register obj (Some task) prover_result
-                            false manual_info tracefile
+         false manual_info tracefile cntexmpfile
    | Gnat_objectives.Work_Left ->
        List.iter (create_manual_or_schedule obj) (Gnat_objectives.next obj)
+   | Gnat_objectives.Counter_Example ->
+     Gnat_objectives.schedule_goal_with_prover ~cntexample:true goal Gnat_config.prover_ce
 
 and interpret_result pa pas =
    (* callback function for the scheduler, here we filter if an interesting
@@ -119,9 +129,8 @@ and create_manual_or_schedule obj goal =
                   let _ = Gnat_manual.create_prover_file goal obj p in
                   let pa = Gnat_manual.manual_attempt_of_goal goal in
                   let info = Gnat_manual.manual_proof_info (Opt.get pa) in
-                  Gnat_report.register obj None None false info ""
-  | _ ->
-      schedule_goal goal
+                  Gnat_report.register obj None None false info "" ""
+  | _ -> schedule_goal goal
 
 and schedule_goal (g : Gnat_objectives.goal) =
    (* schedule a goal for proof - the goal may not be scheduled actually,
@@ -157,12 +166,12 @@ and actually_schedule_goal g =
         be proven when it is incomplete or not corresponding to our
         original VC *)
      Gnat_manual.rewrite_goal g;
-  Gnat_objectives.schedule_goal g
+  Gnat_objectives.schedule_goal ~cntexample:false g
 
 let handle_obj obj =
    if Gnat_objectives.objective_status obj =
       Gnat_objectives.Proved then begin
-        Gnat_report.register obj None None true None ""
+        Gnat_report.register obj None None true None "" ""
    end else begin
       match Gnat_objectives.next obj with
       | [] -> ()

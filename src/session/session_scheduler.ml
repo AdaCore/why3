@@ -831,7 +831,7 @@ let rec transform eS sched ~context_unproved_goals_only ?callback tr a =
 (* method: edit current goal *)
 (*****************************)
 
-let edit_proof_v3 eS sched ~default_editor callback a =
+let edit_proof_v3 ~cntexample eS sched ~default_editor callback a =
   match find_prover eS a with
   | None ->
           (* nothing to do
@@ -849,12 +849,12 @@ let edit_proof_v3 eS sched ~default_editor callback a =
                               ed.Whyconf.editor_options)
         with Not_found -> default_editor
     in
-    let file = update_edit_external_proof eS a in
+    let file = update_edit_external_proof ~cntexample eS a in
     Debug.dprintf debug "[Editing] goal %s with command '%s' on file %s@."
       a.proof_parent.goal_name.Ident.id_string editor file;
     schedule_edition sched editor file (fun res -> callback a res)
 
-let edit_proof eS sched ~default_editor a =
+let edit_proof ~cntexample eS sched ~default_editor a =
   (* check that the state is not Scheduled or Running *)
   if a.proof_archived || running a.proof_state then ()
 (*
@@ -870,16 +870,16 @@ let edit_proof eS sched ~default_editor a =
         set_proof_state ~notify ~obsolete:false ~archived:false
           res a
     in
-    edit_proof_v3 eS sched ~default_editor callback a
+    edit_proof_v3 ~cntexample eS sched ~default_editor callback a
 
-let edit_proof_v3 eS sched ~default_editor ~callback a =
+let edit_proof_v3 ~cntexample eS sched ~default_editor ~callback a =
   let callback a res =
     match res with
     | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
       callback a
     | _ -> ()
   in
-  edit_proof_v3 eS sched ~default_editor callback a
+  edit_proof_v3 ~cntexample eS sched ~default_editor callback a
 
 
 (*************)

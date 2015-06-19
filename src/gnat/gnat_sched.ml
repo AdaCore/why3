@@ -13,16 +13,17 @@ end
 
  type queue_entry =
    { goal   : int Session.goal;
-     prover : Gnat_config.prover
+     prover : Gnat_config.prover;
+     cntexample : bool;
    }
 
 let goal_queue : queue_entry Queue.t =
   (* the queue which contains the goals to be proved *)
   Queue.create ()
 
-let add_goal prover g =
+let add_goal ~cntexample prover g =
   (* simple wrapper for Queue.add *)
-  Queue.add { goal = g; prover = prover } goal_queue
+  Queue.add { goal = g; prover = prover; cntexample = cntexample } goal_queue
 
 let run_goal entry =
   (* spawn a prover and return immediately. The return value is a tuple of type
@@ -40,6 +41,7 @@ let run_goal entry =
     | _ -> None, None, Gnat_config.timeout in
   Driver.prove_task_server
     base_prover.Whyconf.command
+    ~cntexample:entry.cntexample
     ~timelimit:timeout
     ~memlimit:0
     ~steplimit:Gnat_config.steps

@@ -1,4 +1,5 @@
 open Why3
+open Term
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -37,6 +38,7 @@ type status =
    | Proved
    | Not_Proved
    | Work_Left
+   | Counter_Example
 
 (* the session variable, it is initialized later on *)
 let my_session : key Session.env_session option ref = ref None
@@ -109,15 +111,20 @@ type objective_rec =
      to_be_proved       : GoalSet.t;
    (* when a goal is proved (or unproved), it is removed from this set *)
      mutable not_proved : bool;
-     (* when a goal is not proved, the objective is marked "not proved" by
-      * setting this boolean to "true" *)
+   (* when a goal is not proved, the objective is marked "not proved" by
+    * setting this boolean to "true" *)
+     mutable counter_example : bool;
+   (* when a goal is not proved and a counter-example for the goal should
+    * be got, the objective is marked "counter-example" by setting this
+    * boolean to "true" *)
    }
 (* an objective consists of to be scheduled and to be proved goals *)
 
 let empty_objective () =
    { to_be_scheduled = GoalSet.empty ();
      to_be_proved    = GoalSet.empty ();
-     not_proved      = false
+     not_proved      = false;
+     counter_example = false
    }
 
 (* The state of the module consists of these mutable structures *)
@@ -324,13 +331,18 @@ let register_result goal result =
    (* We first remove the goal from the list of goals to be tried. It may be
     * put back later, see below *)
    GoalSet.remove obj_rec.to_be_proved goal;
-   incr nb_goals_done;
-   if result then begin
-      (* goal has been proved, we only need to store that info *)
-     if not (GoalSet.is_empty obj_rec.to_be_proved) then obj, Work_Left
-     else if obj_rec.not_proved then obj, Not_Proved else obj, Proved
-   end else begin try
-         (* the goal was not proved. *)
+   if obj_rec.counter_example then begin
+     (* The prover run was scheduled just to get counter-example *)
+     obj_rec.counter_example <- false;
+     obj, Not_Proved
+   end else begin
+     incr nb_goals_done;
+     if result then begin
+     (* goal has been proved, we only need to store that info *)
+       if not (GoalSet.is_empty obj_rec.to_be_proved) then obj, Work_Left
+       else if obj_rec.not_proved then obj, Not_Proved else obj, Proved
+     end else begin try
+	 (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
          if Gnat_config.manual_prover = None &&
             not (all_provers_tried goal) then begin
@@ -352,17 +364,33 @@ let register_result goal result =
              obj, Work_Left
            end
          end
-      with Exit ->
+       with Exit ->
          (* if we cannot simplify, the objective has been disproved *)
          let n = GoalSet.count obj_rec.to_be_scheduled in
          GoalSet.reset obj_rec.to_be_scheduled;
          nb_goals_done := !nb_goals_done + n;
-         obj, Not_Proved
+	 
+	 match Gnat_config.ce_mode with 
+	 | On -> 
+	   begin
+	     (* The goal will be scheduled to get a counter-example *)
+	     obj_rec.not_proved <- true;
+	     obj_rec.counter_example <- true;
+	     GoalSet.add obj_rec.to_be_proved goal;
+	     (* The goal will be scheduled manually in Gnat_main.handle_result
+	        so it is not put to the obj_rec.to_be_scheduled *)
+	 
+             obj, Counter_Example
+	   end 
+	 | Off ->
+	   obj, Not_Proved
+   end
    end
 
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   if GoalSet.is_empty obj_rec.to_be_proved then
+   if obj_rec.counter_example then Counter_Example
+   else if GoalSet.is_empty obj_rec.to_be_proved then
      if obj_rec.not_proved then Not_Proved else Proved
    else if GoalSet.is_empty obj_rec.to_be_scheduled then
       Not_Proved
@@ -561,7 +589,7 @@ module Save_VCs = struct
       let ext = Driver.get_extension prover.Gnat_config.driver in
       Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
-   let save_vc goal prover =
+   let save_vc ~cntexample goal prover =
       let check = get_objective goal in
       let task = Session.goal_task goal in
       let dr = prover.Gnat_config.driver in
@@ -569,7 +597,7 @@ module Save_VCs = struct
       GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn
         (fun fmt ->
-          Driver.print_task dr vc_fn fmt task)
+          Driver.print_task ~cntexample dr vc_fn fmt task)
 
    let compute_trace =
      let rec compute_trace acc f =
@@ -600,19 +628,34 @@ module Save_VCs = struct
       end
       else ""
 
+   let save_counterexample goal counterexample =
+     let check = get_objective goal in
+     let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
+     if counterexample <> Model_parser.empty_model then begin
+       with_fmt_channel 
+	 ce_fn 
+	 (fun fmt -> Model_parser.print_model_json fmt counterexample);
+       ce_fn
+     end
+     else
+       ""
+
 end
 
 let goal_has_splits goal =
   not (Session.PHstr.is_empty goal.Session.goal_transformations)
 
-let schedule_goal g =
-   (* actually schedule the goal, ie call the prover. This function returns
-      immediately. *)
+let schedule_goal_with_prover ~cntexample g p =
+(* actually schedule the goal, i.e., call the prover. This function returns immediately. *)
+  if Gnat_config.debug then begin
+    Save_VCs.save_vc ~cntexample g p;
+  end;
+  Gnat_sched.add_goal ~cntexample p g
+
+let schedule_goal ~cntexample g =
+   (* actually schedule the goal, ie call the prover. This function returns immediately. *)
    let p = find_first_untried_prover g in
-   if Gnat_config.debug then begin
-      Save_VCs.save_vc g p;
-   end;
-   Gnat_sched.add_goal p g
+   schedule_goal_with_prover ~cntexample g p
 
 let clean_automatic_proofs =
   let seen = GoalSet.empty () in

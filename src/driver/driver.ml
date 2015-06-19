@@ -286,7 +286,16 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       add_tdecl task goal
   | task -> update task
 
-let prepare_task drv task =
+let add_cntexample_meta task cntexample =
+  if not (cntexample) then task
+  else
+    let cnt_meta = lookup_meta "get_counterexmp" in
+    let g,task = Task.task_separate_goal task in
+    let task = Task.add_meta task cnt_meta [] in
+    Task.add_tdecl task g
+
+let prepare_task ~cntexample drv task =
+  let task = add_cntexample_meta task cntexample in
   let lookup_transform t = lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task tr = Trans.apply tr task in
@@ -308,8 +317,8 @@ let print_task_prepared ?old drv filename fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old drv filename fmt task =
-  let task = prepare_task drv task in
+let print_task ?old ?(cntexample=false) drv filename fmt task =
+  let task = prepare_task ~cntexample drv task in
   let _ = print_task_prepared ?old drv filename fmt task in
   ()
 
@@ -328,7 +337,6 @@ let file_name_of_task ?old ?inplace drv task =
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         get_filename drv fn "T" pr.pr_name.id_string
 
-
 let prove_task_prepared
   ~command ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
@@ -345,22 +353,13 @@ let prove_task_prepared
   Buffer.reset buf;
   res
 
-let add_cntexample_meta task cntexample =
-  if not (cntexample) then task
-  else
-    let cnt_meta = lookup_meta "get_counterexmp" in
-    let g,task = Task.task_separate_goal task in
-    let task = Task.add_meta task cnt_meta [] in
-    Task.add_tdecl task g
-
 let prove_task ~command ?(cntexample=false) ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
-  let task = add_cntexample_meta task cntexample in
-  let task = prepare_task drv task in
+  let task = prepare_task ~cntexample drv task in
   prove_task_prepared ~command ?timelimit ?memlimit
                       ?steplimit ?old ?inplace drv task
 
-let prove_task_server command ~timelimit ~memlimit ~steplimit ?old ?inplace drv task =
-  let task = prepare_task drv task in
+let prove_task_server command ~cntexample ~timelimit ~memlimit ~steplimit ?old ?inplace drv task =
+  let task = prepare_task ~cntexample drv task in
   let fn = file_name_of_task ?old ?inplace drv task in
   let res_parser = drv.drv_res_parser in
   let printer_mapping = get_default_printer_mapping in
@@ -369,20 +368,10 @@ let prove_task_server command ~timelimit ~memlimit ~steplimit ?old ?inplace drv 
      prove_file_server ~command ~res_parser ~timelimit ~memlimit ~steplimit
      ~printer_mapping ?inplace fn
   | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
-         let p = match drv.drv_printer with
-           | None -> raise NoPrinter
-           | Some p -> p
-         in
-         let fmt = Format.formatter_of_out_channel outc in
-         let printer = lookup_printer p
-                                      { Printer.env = drv.drv_env;
-                                        prelude     = drv.drv_prelude;
-                                        th_prelude  = drv.drv_thprelude;
-                                        blacklist   = drv.drv_blacklist;
-                                        printer_mapping = printer_mapping;
-                                        filename    = fn } in
-         fprintf fmt "@[%a@]@?" (printer ?old:None) task;
+	 let fmt = Format.formatter_of_out_channel outc in
+	 let printer_mapping = print_task_prepared ?old:None drv fn fmt task in
          close_out outc;
+
          prove_file_server ~command ~res_parser ~timelimit ~memlimit
          ~steplimit ~printer_mapping fn
 

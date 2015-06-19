@@ -12,6 +12,10 @@ type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
 
+type ce_mode =
+  | On
+  | Off
+
 type prover =
   { driver : Driver.driver;
     prover : Whyconf.config_prover;
@@ -39,6 +43,7 @@ let opt_filename : string option ref = ref None
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
+let opt_ce_mode = ref Off
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -52,6 +57,16 @@ let opt_why3_conf_file : string option ref = ref None
 let set_why3_conf s =
   if s != "" then
     opt_why3_conf_file := Some s
+
+let set_ce_mode s =
+  if s = "on" then
+    opt_ce_mode := On
+  else if s = "off" then
+    opt_ce_mode := Off
+  else
+    Gnat_util.abort_with_message ~internal:true
+        "argument for option --counter-example should be one of\
+        (on|off)."
 
 let set_filename s =
    if !opt_filename = None then
@@ -164,6 +179,8 @@ let options = Arg.align [
           " Build user libraries for manual provers";
    "--why3-conf", Arg.String set_why3_conf,
           " Specify additionnal configuration file";
+   "--counter-example", Arg.String set_ce_mode,
+          "on if the counter-example for unproved VC should be get, off elsewhere";
 ]
 
 let () = Arg.parse options set_filename usage_msg
@@ -185,7 +202,7 @@ let shortcut_merge s1 s2 =
 (* Depending on what kinds of provers are requested, environment loading is a
  * bit different, hence we do this all together here *)
 
-let provers, config, env =
+let provers, prover_ce, config, env =
   (* this is a string list of the requested provers by the user *)
   let prover_str_list =
     match !opt_prover with
@@ -235,28 +252,32 @@ let provers, config, env =
        Gnat_util.abort_with_message ~internal:true
                                     ("Cannot read file" ^ conf_name ^ ".")
   in
-  (* now we build the Whyconf.config_prover for all requested provers *)
-  let base_provers =
-    try match prover_str_list with
-    | [] when !opt_prepare_shared -> []
-    | [] ->
+  (* now we build the Whyconf.config_prover for all requested provers
+   * and for the prover for counter-example generation *)
+  let base_provers, base_prover_ce =
+    try 
+      let filter_prover prover_string =
+	Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover_string) in
+      let base_provers = match prover_str_list with
+	| [] when !opt_prepare_shared -> []
+	| [] ->
         (* default provers are cvc4 and altergo. in this order *)
-        List.map (fun s ->
-          Whyconf.filter_one_prover config (Whyconf.mk_filter_prover s))
-          ["cvc4";"altergo"]
-    | l ->
-        List.map (fun s ->
-          Whyconf.filter_one_prover config (Whyconf.mk_filter_prover s)) l
+          List.map filter_prover ["cvc4";"altergo"]
+	| l ->
+        List.map filter_prover l in
+      (* the prover for counterexample generation *)
+      let base_prover_ce = filter_prover "cvc4_ce" in
+      base_provers, base_prover_ce
     with
     | Not_found ->
-          Gnat_util.abort_with_message ~internal:false
-            "Default prover not installed or not configured."
+      Gnat_util.abort_with_message ~internal:false
+        "Default prover not installed or not configured."
     | Whyconf.ProverNotFound _ ->
-          Gnat_util.abort_with_message ~internal:false
-            "Selected prover not installed or not configured."
+      Gnat_util.abort_with_message ~internal:false
+        "Selected prover not installed or not configured."
     | Whyconf.ProverAmbiguity _ ->
-          Gnat_util.abort_with_message ~internal:false
-            "Several provers match the selection." in
+      Gnat_util.abort_with_message ~internal:false
+        "Several provers match the selection." in
   let env =
     let config_main = Whyconf.get_main (config) in
     (* load plugins; may be needed for external provers *)
@@ -286,12 +307,14 @@ let provers, config, env =
         editor_options = [] }
     in
   (* now we build the prover record for each requested prover *)
+  let build_prover_rec base_prover =
+    { driver = prover_driver  base_prover;
+        prover = base_prover;
+        editor = prover_editor base_prover } in
   let provers =
-    List.map (fun base ->
-      { driver = prover_driver base;
-        prover = base;
-        editor = prover_editor base }) base_provers in
-  provers, config, env
+    List.map build_prover_rec base_provers in
+  let prover_ce = build_prover_rec base_prover_ce in
+  provers, prover_ce, config, env
 
 (* The function replaces %{f,t,T,m,l,d} to their corresponding values
    in the string cmd.
@@ -393,9 +416,12 @@ let () =
   (* check whether we are in prepare_shared mode, if so, do just that *)
   match !opt_prepare_shared, !opt_proof_dir with
   | (true, Some pdir) ->
-      List.iter (fun prover -> build_shared pdir prover.prover) provers;
-      exit 0
+    List.iter (fun prover -> build_shared pdir prover.prover) provers;
+    build_shared pdir prover_ce.prover;
+    exit 0
   | _ -> ()
+
+let ce_mode = !opt_ce_mode
 
 let manual_prover =
   (* sanity check - we found at least one prover, and don't allow combining

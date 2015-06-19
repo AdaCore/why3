@@ -66,6 +66,7 @@ type status =
    | Proved
    | Not_Proved
    | Work_Left
+   | Counter_Example
 (* These are the possible statuses of an objective.
    [Proved] means that all goals of that objectives are proved.
    [Not_Proved] means that a proof attempt for a goal of the objective that
@@ -78,6 +79,8 @@ type status =
                not, this means that all subgoals were proved up to now or if
                unproved could be further simplified, but there is some work
                left.
+   [Counter_Example] means that the objective cannot be proved and the
+               counter-example should be generated.
 *)
 
 val register_result : goal -> bool -> objective * status
@@ -110,9 +113,20 @@ val init : unit -> unit
 (* initialize the session, and return the session. The boolean is true when the
    session is new, otherwise "false" *)
 
-val schedule_goal : goal -> unit
+val schedule_goal : cntexample : bool -> goal -> unit
 (* schedule a goal for proof with default prover and
-   default timeout. The function returns immediately. *)
+   default timeout. The function returns immediately. 
+   @param cntexample indicates whether the prover should be queried for 
+     a counter-example.
+*)
+
+val schedule_goal_with_prover : cntexample : bool -> goal -> Gnat_config.prover -> unit
+(* schedule a goal for proof with given prover and
+   default timeout. The function returns immediately. 
+   @param cntexample indicates whether the prover should be queried for 
+     a counter-example.
+*)
+
 
 val do_scheduled_jobs :
    (key Session.proof_attempt -> Session.proof_attempt_status -> unit) ->
@@ -145,6 +159,10 @@ module Save_VCs : sig
    val save_trace : goal -> string
    (* save the trace to a file; return the trace file name, "" if no trace was
       saved*)
+
+   val save_counterexample : goal -> Model_parser.model -> string
+   (* save the counterexample to a file; return the counterexample file name, 
+      "" if no counter-example file was saved *)
 
    val vc_file : goal -> string
    (* get the file name for a given goal *)

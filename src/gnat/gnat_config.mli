@@ -14,6 +14,19 @@ type prover =
 val provers : prover list
 (* the provers, either the default prover, or as given by --prover *)
 
+val prover_ce : prover
+(* the prover for counter-examples generation *)
+
+type ce_mode =
+  | On
+  | Off
+(* In mode On, the counter-example will be generated
+   In mode Off, the counter-example will not be generated
+*)
+
+val ce_mode : ce_mode
+(* Reflects the value of the option --counter-example, default off *)
+
 val manual_prover : prover option
 (* Currently, if a manual prover is provided, it must be the only one. So in
    when dealing with manual proof, it makes sense to speak of "the prover" *)

@@ -98,9 +98,9 @@ and string = parse
         let nb = ref 0 in
         String.iter (fun c -> if c = '_' then incr nb) s;
         !nb in
-      let t = String.create (String.length s - count) in
+      let t = Strings.create (String.length s - count) in
       let i = ref 0 in
-      String.iter (fun c -> if c <> '_' then (t.[!i] <-c; incr i)) s;
+      String.iter (fun c -> if c <> '_' then (Strings.set t !i c; incr i)) s;
       t
     end else s
 }

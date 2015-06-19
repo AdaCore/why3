@@ -71,8 +71,8 @@ EMACS = @EMACS@
 #PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
-OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
+OFLAGS = -w Aer-41-44-45@5 -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w Aer-41-44-45@5 -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
