@@ -15,7 +15,7 @@ open Ty
 open Theory
 open Ity
 open Expr
-open Mdecl
+open Pdecl
 
 (** *)
 
@@ -89,22 +89,22 @@ let ns_find_xs ns s = match ns_find_prog_symbol ns s with
 
 (** {2 Module} *)
 
-type wmodule = {
-  mod_theory : theory;		        (* pure theory *)
-  mod_decls  : mdecl list;		(* module declarations *)
-  mod_export : namespace;		(* exported namespace *)
-  mod_known  : known_map;	        (* known identifiers *)
-  mod_local  : Sid.t;			(* locally declared idents *)
-  mod_used   : Sid.t;			(* used modules *)
+type pmodule = {
+  mod_theory : theory;      (* pure theory *)
+  mod_decls  : pdecl list;  (* module declarations *)
+  mod_export : namespace;   (* exported namespace *)
+  mod_known  : known_map;   (* known identifiers *)
+  mod_local  : Sid.t;       (* locally declared idents *)
+  mod_used   : Sid.t;       (* used modules *)
 }
 
 (** {2 Module under construction} *)
 
-type wmodule_uc = {
+type pmodule_uc = {
   muc_theory : theory_uc;
   muc_name   : string;
   muc_path   : string list;
-  muc_decls  : mdecl list;
+  muc_decls  : pdecl list;
   muc_prefix : string list;
   muc_import : namespace list;
   muc_export : namespace list;
@@ -162,10 +162,10 @@ let close_namespace uc ~import =
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
       { uc with
-	  muc_theory = th;
+          muc_theory = th;
           muc_prefix = prf;
-	  muc_import = i1 :: sti;
-	  muc_export = e1 :: ste; }
+          muc_import = i1 :: sti;
+          muc_export = e1 :: ste; }
   | _ ->
       assert false
 
@@ -219,17 +219,17 @@ let add_symbol add id v uc =
 let add_meta uc m al =
   { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
 
-let add_mdecl ~wp uc d =
+let add_pdecl ~wp uc d =
   let uc = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl uc.muc_known d;
-    muc_local = Sid.union uc.muc_local d.md_news } in
+    muc_local = Sid.union uc.muc_local d.pd_news } in
 (* TODO
   let uc = pdecl_ns uc d in
   let uc = pdecl_vc ~wp uc d in
 *)
   ignore wp; (* TODO *)
-  let th = List.fold_left Theory.add_decl uc.muc_theory d.md_pure in
+  let th = List.fold_left Theory.add_decl uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }
 
 (** {2 Builtin symbols} *)
@@ -239,11 +239,11 @@ let builtin_module =
   let ns = add_ts true its_int.its_ts.ts_name.id_string its_int ns in
   let ns = add_ts true its_real.its_ts.ts_name.id_string its_real ns in
   let kn = Mid.empty in
-  let kn = known_add_decl kn md_int in
-  let kn = known_add_decl kn md_real in
-  let kn = known_add_decl kn md_equ in {
+  let kn = known_add_decl kn pd_int in
+  let kn = known_add_decl kn pd_real in
+  let kn = known_add_decl kn pd_equ in {
     mod_theory = builtin_theory;
-    mod_decls  = [md_int; md_real; md_equ];
+    mod_decls  = [pd_int; pd_real; pd_equ];
     mod_export = ns;
     mod_known  = kn;
     mod_local  = builtin_theory.th_local;
@@ -251,16 +251,16 @@ let builtin_module =
 
 let bool_module =
   let uc = empty_module None (id_fresh "Bool") ["why3";"Bool"] in
-  let uc = add_mdecl ~wp:false uc md_bool in
+  let uc = add_pdecl ~wp:false uc pd_bool in
   let md = close_module uc in
   { md with mod_theory = bool_theory }
 
 let highord_module =
   let uc = empty_module None (id_fresh "HighOrd") ["why3";"HighOrd"] in
   let uc = use_export uc bool_module in
-  let uc = add_mdecl ~wp:false uc md_func in
-  let uc = add_mdecl ~wp:false uc md_pred in
-  let uc = add_mdecl ~wp:false uc md_func_app in
+  let uc = add_pdecl ~wp:false uc pd_func in
+  let uc = add_pdecl ~wp:false uc pd_pred in
+  let uc = add_pdecl ~wp:false uc pd_func_app in
   let md = close_module uc in
   { md with mod_theory = highord_theory }
 
@@ -272,12 +272,12 @@ let tuple_module_name s = Theory.tuple_theory_name s
 let unit_module =
   let uc = empty_module None (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
-  let uc = add_mdecl ~wp:false uc md_unit in
+  let uc = add_pdecl ~wp:false uc pd_unit in
   let md = close_module uc in
   { md with mod_theory = unit_theory }
 *)
 
-let add_mdecl_with_tuples _uc _md = assert false (*TODO*)
+let add_pdecl_with_tuples _uc _md = assert false (*TODO*)
 
 let create_module env ?(path=[]) n =
   let m = empty_module (Some env) n path in
@@ -291,12 +291,12 @@ let create_module env ?(path=[]) n =
 
 (** {2 WhyML language} *)
 
-type mlw_file = wmodule Mstr.t * theory Mstr.t
+type mlw_file = pmodule Mstr.t * theory Mstr.t
 
 let mlw_language =
   (Env.register_language Env.base_language snd : mlw_file Env.language)
 
-(* TODO 
+(* TODO
 let () = Env.add_builtin mlw_language (function
   | [s] when s = mod_prelude.mod_theory.th_name.id_string ->
       Mstr.singleton s mod_prelude,

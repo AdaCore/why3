@@ -14,7 +14,7 @@ open Ident
 open Theory
 open Ity
 open Expr
-open Mdecl
+open Pdecl
 
 (** *)
 
@@ -41,22 +41,22 @@ val ns_find_ns  : namespace -> string list -> namespace
 
 (** {2 Module} *)
 
-type wmodule = private {
-  mod_theory : theory;		        (* pure theory *)
-  mod_decls  : mdecl list;		(* module declarations *)
-  mod_export : namespace;		(* exported namespace *)
-  mod_known  : known_map;	        (* known identifiers *)
-  mod_local  : Sid.t;			(* locally declared idents *)
-  mod_used   : Sid.t;			(* used modules *)
+type pmodule = private {
+  mod_theory : theory;      (* pure theory *)
+  mod_decls  : pdecl list;  (* module declarations *)
+  mod_export : namespace;   (* exported namespace *)
+  mod_known  : known_map;   (* known identifiers *)
+  mod_local  : Sid.t;       (* locally declared idents *)
+  mod_used   : Sid.t;       (* used modules *)
 }
 
 (** {2 Module under construction} *)
 
-type wmodule_uc = private {
+type pmodule_uc = private {
   muc_theory : theory_uc;
   muc_name   : string;
   muc_path   : string list;
-  muc_decls  : mdecl list;
+  muc_decls  : pdecl list;
   muc_prefix : string list;
   muc_import : namespace list;
   muc_export : namespace list;
@@ -66,11 +66,11 @@ type wmodule_uc = private {
   muc_env    : Env.env option;
 }
 
-val create_module : Env.env -> ?path:string list -> preid -> wmodule_uc
-val close_module  : wmodule_uc -> wmodule
+val create_module : Env.env -> ?path:string list -> preid -> pmodule_uc
+val close_module  : pmodule_uc -> pmodule
 
-val open_namespace  : wmodule_uc -> string -> wmodule_uc
-val close_namespace : wmodule_uc -> import:bool -> wmodule_uc
+val open_namespace  : pmodule_uc -> string -> pmodule_uc
+val close_namespace : pmodule_uc -> import:bool -> pmodule_uc
 
 val restore_path : ident -> string list * string * string list
 (** [restore_path id] returns the triple (library path, module,
@@ -80,50 +80,50 @@ val restore_path : ident -> string list * string * string list
    If [id] is a module name, the third component is an empty list.
    Raises Not_found if the ident was never declared in/as a module. *)
 
-val restore_module : theory -> wmodule
+val restore_module : theory -> pmodule
 (** retrieves a module from its underlying theory
     raises [Not_found] if no such module exists *)
 
 (** {2 Use and clone} *)
 
-val use_export : wmodule_uc -> wmodule -> wmodule_uc
+val use_export : pmodule_uc -> pmodule -> pmodule_uc
 
 (** {2 Logic decls} *)
 
-val add_meta : wmodule_uc -> meta -> meta_arg list -> wmodule_uc
+val add_meta : pmodule_uc -> meta -> meta_arg list -> pmodule_uc
 
 (** {2 Program decls} *)
 
-val add_mdecl : wp:bool -> wmodule_uc -> mdecl -> wmodule_uc
-(** [add_mdecl ~wp m d] adds declaration [d] in module [m].
+val add_pdecl : wp:bool -> pmodule_uc -> pdecl -> pmodule_uc
+(** [add_pdecl ~wp m d] adds declaration [d] in module [m].
     If [wp] is [true], VC is computed and added to [m]. *)
 
 (** {2 Builtin symbols} *)
 
-val builtin_module : wmodule
+val builtin_module : pmodule
 
-val bool_module : wmodule
+val bool_module : pmodule
 
 (* TODO
-val unit_module : wmodule
+val unit_module : pmodule
 *)
 
-val highord_module : wmodule
+val highord_module : pmodule
 
-val tuple_module : int -> wmodule
+val tuple_module : int -> pmodule
 
 val tuple_module_name : string -> int option
 
-val add_mdecl_with_tuples : wmodule_uc -> mdecl -> wmodule_uc
+val add_pdecl_with_tuples : pmodule_uc -> pdecl -> pmodule_uc
 
 (** {2 WhyML language} *)
 
 open Env
 
-type mlw_file = wmodule Mstr.t * theory Mstr.t
+type mlw_file = pmodule Mstr.t * theory Mstr.t
 
 val mlw_language : mlw_file language
 
 exception ModuleNotFound of pathname * string
 
-val read_module : env -> pathname -> string -> wmodule
+val read_module : env -> pathname -> string -> pmodule

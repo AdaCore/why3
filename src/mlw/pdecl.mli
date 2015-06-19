@@ -41,44 +41,44 @@ val create_rec_variant_decl : itysymbol ->
 
 (** {2 Module declarations} *)
 
-type mdecl = private {
-  md_node : mdecl_node;
-  md_pure : Decl.decl list;
-  md_syms : Sid.t;
-  md_news : Sid.t;
-  md_tag  : int;
+type pdecl = private {
+  pd_node : pdecl_node;
+  pd_pure : Decl.decl list;
+  pd_syms : Sid.t;
+  pd_news : Sid.t;
+  pd_tag  : int;
 }
 
-and mdecl_node = private
-  | MDtype of its_defn list
-  | MDlet  of let_defn
-  | MDexn  of xsymbol
-  | MDpure
+and pdecl_node = private
+  | PDtype of its_defn list
+  | PDlet  of let_defn
+  | PDexn  of xsymbol
+  | PDpure
 
-val create_type_decl : its_defn list -> mdecl
+val create_type_decl : its_defn list -> pdecl
 
-val create_let_decl : let_defn -> mdecl
+val create_let_decl : let_defn -> pdecl
 
-val create_exn_decl : xsymbol -> mdecl
+val create_exn_decl : xsymbol -> pdecl
 
-val create_pure_decl : Decl.decl -> mdecl
+val create_pure_decl : Decl.decl -> pdecl
 
 (** {2 Built-in decls} *)
 
-val md_int : mdecl
-val md_real : mdecl
-val md_equ : mdecl
-val md_bool : mdecl
-val md_unit : mdecl
-val md_tuple : int -> mdecl
-val md_func : mdecl
-val md_pred : mdecl
-val md_func_app : mdecl
+val pd_int : pdecl
+val pd_real : pdecl
+val pd_equ : pdecl
+val pd_bool : pdecl
+val pd_unit : pdecl
+val pd_tuple : int -> pdecl
+val pd_func : pdecl
+val pd_pred : pdecl
+val pd_func_app : pdecl
 
 (** {2 Known identifiers} *)
 
-type known_map = mdecl Mid.t
+type known_map = pdecl Mid.t
 
 val known_id : known_map -> ident -> unit
-val known_add_decl : known_map -> mdecl -> known_map
+val known_add_decl : known_map -> pdecl -> known_map
 val merge_known : known_map -> known_map -> known_map
