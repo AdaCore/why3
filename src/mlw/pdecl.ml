@@ -159,24 +159,24 @@ and pdecl_node =
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
 let get_news node pure =
-  let news_id s id = Sid.add_new (Decl.ClashIdent id) id s in
+  let news_id news id = Sid.add_new (Decl.ClashIdent id) id news in
   let news_rs news s = news_id news s.rs_name in
+  let news = match node with
+    | PDtype dl ->
+        let news_itd news d =
+          let news = news_id news d.itd_its.its_ts.ts_name in
+          let news = List.fold_left news_rs news d.itd_fields in
+          List.fold_left news_rs news d.itd_constructors in
+        List.fold_left news_itd Sid.empty dl
+    | PDlet (LDvar (v,_)) -> news_id Sid.empty v.pv_vs.vs_name
+    | PDlet (LDsym (s,_)) -> news_id Sid.empty s.rs_name
+    | PDlet (LDrec rdl) ->
+        let news_rd news d = news_id news d.rec_sym.rs_name in
+        List.fold_left news_rd Sid.empty rdl
+    | PDexn xs -> news_id Sid.empty xs.xs_name
+    | PDpure -> Sid.empty in
   let news_pure news d = Sid.union news d.Decl.d_news in
-  let news = List.fold_left news_pure Sid.empty pure in
-  match node with
-  | PDtype dl ->
-      let news_itd news d =
-        let news = news_id news d.itd_its.its_ts.ts_name in
-        let news = List.fold_left news_rs news d.itd_fields in
-        List.fold_left news_rs news d.itd_constructors in
-      List.fold_left news_itd news dl
-  | PDlet (LDvar (v,_)) -> news_id news v.pv_vs.vs_name
-  | PDlet (LDsym (s,_)) -> news_id news s.rs_name
-  | PDlet (LDrec rdl) ->
-      let news_rd news d = news_id news d.rec_sym.rs_name in
-      List.fold_left news_rd news rdl
-  | PDexn xs -> news_id news xs.xs_name
-  | PDpure -> news
+  List.fold_left news_pure news pure
 
 let get_syms node pure =
   let syms_ts s ts = Sid.add ts.ts_name s in
@@ -312,20 +312,38 @@ let create_pure_decl d = mk_decl PDpure [d]
 
 (** {2 Built-in decls} *)
 
-let pd_int  = mk_decl (PDtype [mk_itd its_int  [] [] []]) [(*TODO*)]
-let pd_real = mk_decl (PDtype [mk_itd its_real [] [] []]) [(*TODO*)]
-let pd_unit = mk_decl (PDtype [mk_itd its_unit [] [] []]) [(*TODO*)]
-let pd_func = mk_decl (PDtype [mk_itd its_func [] [] []]) [(*TODO*)]
-let pd_pred = mk_decl (PDtype [mk_itd its_pred [] [] []]) [(*TODO*)]
+open Theory
 
-let pd_equ  = mk_decl PDpure [(*TODO*)]
+(* We must keep the builtin modules in sync with the builtin theories.
+   Therefore we match the exact contents of th_decls, and crash if it
+   is not what we expect. *)
 
-let pd_bool =
-  mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] []]) [(*TODO*)]
+let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
+  | [{td_node = Decl di}; {td_node = Decl dr}; {td_node = Decl de}] ->
+      mk_decl (PDtype [mk_itd its_int  [] [] []]) [di],
+      mk_decl (PDtype [mk_itd its_real [] [] []]) [dr],
+      mk_decl PDpure [de]
+  | _ -> assert false
+
+let pd_unit = match unit_theory.th_decls with
+  | [{td_node = Use _t0}; {td_node = Decl du}] ->
+      mk_decl (PDtype [mk_itd its_unit [] [] []]) [du]
+  | _ -> assert false
+
+let pd_func, pd_pred, pd_func_app = match highord_theory.th_decls with
+  | [{td_node = Use _bo};
+     {td_node = Decl df}; {td_node = Decl dp}; {td_node = Decl da}] ->
+      mk_decl (PDtype [mk_itd its_func [] [] []]) [df],
+      mk_decl (PDtype [mk_itd its_pred [] [] []]) [dp],
+      mk_decl (PDlet ld_func_app) [da]
+  | _ -> assert false
+
+let pd_bool = match bool_theory.th_decls with
+  | [{td_node = Decl db}] ->
+      mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] []]) [db]
+  | _ -> assert false
 
 let pd_tuple _n = assert false (*TODO*)
-
-let pd_func_app = mk_decl (PDlet ld_func_app) [(*TODO*)]
 
 (** {2 Known identifiers} *)
 
