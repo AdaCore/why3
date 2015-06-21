@@ -634,7 +634,7 @@ module Save_VCs = struct
      if counterexample <> Model_parser.empty_model then begin
        with_fmt_channel 
 	 ce_fn 
-	 (fun fmt -> Model_parser.print_model_json fmt counterexample);
+	 (fun fmt -> Format.fprintf fmt "%a@." Model_parser.print_model_json counterexample);
        ce_fn
      end
      else
