@@ -460,7 +460,7 @@ let print_path fmt sl =
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
-      "Theory %s not found in library %a" s print_path sl
+      "Module %s not found in library %a" s print_path sl
   | ModuleOrTheoryNotFound (sl,s) -> Format.fprintf fmt
       "Module/theory %s not found in library %a" s print_path sl
   | TooLateInvariant -> Format.fprintf fmt

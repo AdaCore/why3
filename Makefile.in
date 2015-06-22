@@ -71,8 +71,9 @@ EMACS = @EMACS@
 #PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
-OFLAGS = -w Aer-41-44-45@5 -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w Aer-41-44-45@5 -dtypes -g -I lib/why3 $(INCLUDES)
+WARNINGS = Aer-41-44-45@5
+OFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
@@ -151,7 +152,7 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 	     whyconf autodetection \
              parse_smtv2_model_parser parse_smtv2_model_lexer parse_smtv2_model
 
-LIB_MLW = ity expr dexpr mdecl
+LIB_MLW = ity expr dexpr pdecl pmodule
 
 LIB_PARSER = ptree glob parser typing lexer
 
@@ -228,6 +229,10 @@ endif
 src/driver/vc_client.o: src/driver/vc_client.c
 	ocamlopt -c $^
 	mv $(CURDIR)/vc_client.o $@
+
+# hide deprecated warnings for strings
+src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
+src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 
 # build targets
 
@@ -1035,7 +1040,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done

@@ -41,6 +41,7 @@ let get_material_args matl =
 
 let is_infinite_ty inf_ts ma_map =
   let rec inf_ty ty = match ty.ty_node with
+    | Tyapp (ts,[_;ty]) when ts_equal ts ts_func -> inf_ty ty
     | Tyapp (ts,_) when Mts.mem ts inf_ts -> true
     | Tyapp (ts,_) when not (Mts.mem ts ma_map) -> false
     | Tyapp (ts,l) ->

@@ -259,6 +259,7 @@ val is_e_void : expr -> bool
 val is_rs_tuple : rsymbol -> bool
 
 val rs_func_app : rsymbol
+val ld_func_app : let_defn
 val e_func_app : expr -> expr -> expr
 val e_func_app_l : expr -> expr list -> expr
 

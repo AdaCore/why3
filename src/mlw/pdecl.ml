@@ -142,41 +142,41 @@ let create_rec_variant_decl s cl =
 
 (** {2 Module declarations} *)
 
-type mdecl = {
-  md_node : mdecl_node;
-  md_pure : Decl.decl list;
-  md_syms : Sid.t;
-  md_news : Sid.t;
-  md_tag  : int;
+type pdecl = {
+  pd_node : pdecl_node;
+  pd_pure : Decl.decl list;
+  pd_syms : Sid.t;
+  pd_news : Sid.t;
+  pd_tag  : int;
 }
 
-and mdecl_node =
-  | MDtype of its_defn list
-  | MDlet  of let_defn
-  | MDexn  of xsymbol
-  | MDpure
+and pdecl_node =
+  | PDtype of its_defn list
+  | PDlet  of let_defn
+  | PDexn  of xsymbol
+  | PDpure
 
-let md_equal : mdecl -> mdecl -> bool = (==)
+let pd_equal : pdecl -> pdecl -> bool = (==)
 
 let get_news node pure =
-  let news_id s id = Sid.add_new (Decl.ClashIdent id) id s in
+  let news_id news id = Sid.add_new (Decl.ClashIdent id) id news in
   let news_rs news s = news_id news s.rs_name in
+  let news = match node with
+    | PDtype dl ->
+        let news_itd news d =
+          let news = news_id news d.itd_its.its_ts.ts_name in
+          let news = List.fold_left news_rs news d.itd_fields in
+          List.fold_left news_rs news d.itd_constructors in
+        List.fold_left news_itd Sid.empty dl
+    | PDlet (LDvar (v,_)) -> news_id Sid.empty v.pv_vs.vs_name
+    | PDlet (LDsym (s,_)) -> news_id Sid.empty s.rs_name
+    | PDlet (LDrec rdl) ->
+        let news_rd news d = news_id news d.rec_sym.rs_name in
+        List.fold_left news_rd Sid.empty rdl
+    | PDexn xs -> news_id Sid.empty xs.xs_name
+    | PDpure -> Sid.empty in
   let news_pure news d = Sid.union news d.Decl.d_news in
-  let news = List.fold_left news_pure Sid.empty pure in
-  match node with
-  | MDtype dl ->
-      let news_itd news d =
-        let news = news_id news d.itd_its.its_ts.ts_name in
-        let news = List.fold_left news_rs news d.itd_fields in
-        List.fold_left news_rs news d.itd_constructors in
-      List.fold_left news_itd news dl
-  | MDlet (LDvar (v,_)) -> news_id news v.pv_vs.vs_name
-  | MDlet (LDsym (s,_)) -> news_id news s.rs_name
-  | MDlet (LDrec rdl) ->
-      let news_rd news d = news_id news d.rec_sym.rs_name in
-      List.fold_left news_rd news rdl
-  | MDexn xs -> news_id news xs.xs_name
-  | MDpure -> news
+  List.fold_left news_pure news pure
 
 let get_syms node pure =
   let syms_ts s ts = Sid.add ts.ts_name s in
@@ -269,7 +269,7 @@ let get_syms node pure =
         Sid.union syms (List.fold_left del_rd dsms rdl)
   in
   match node with
-  | MDtype dl ->
+  | PDtype dl ->
       let syms_itd syms d =
         (* the syms of the invariants are already in [pure] *)
         let syms = Opt.fold syms_ity syms d.itd_its.its_def in
@@ -278,7 +278,7 @@ let get_syms node pure =
         let syms = List.fold_left add_fd syms d.itd_fields in
         List.fold_left add_cs syms d.itd_constructors in
       List.fold_left syms_itd syms dl
-  | MDlet ld ->
+  | PDlet ld ->
       let syms = syms_let_defn syms ld in
       let vars = match ld with
         | LDvar (_,e) -> e.e_effect.eff_reads
@@ -286,15 +286,85 @@ let get_syms node pure =
         | LDrec rdl -> List.fold_left (fun s rd ->
             Spv.union s (cty_reads rd.rec_fun.c_cty)) Spv.empty rdl in
       Spv.fold (fun v s -> Sid.add v.pv_vs.vs_name s) vars syms
-  | MDexn xs -> syms_ity syms xs.xs_ity
-  | MDpure -> syms
+  | PDexn xs -> syms_ity syms xs.xs_ity
+  | PDpure -> syms
 
 let mk_decl = let r = ref 0 in fun node pure ->
-  { md_node = node; md_pure = pure;
-    md_syms = get_syms node pure;
-    md_news = get_news node pure;
-    md_tag = (incr r; !r) }
+  { pd_node = node; pd_pure = pure;
+    pd_syms = get_syms node pure;
+    pd_news = get_news node pure;
+    pd_tag  = (incr r; !r) }
 
 let create_type_decl dl =
   let ldl = assert false (* TODO *) in
-  mk_decl (MDtype dl) ldl
+  mk_decl (PDtype dl) ldl
+
+let create_let_decl ld = let _ = PDlet ld in assert false (* TODO *)
+
+let create_exn_decl xs =
+  if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
+    "Top-level exception %a has a polymorphic type" print_xs xs;
+  if not xs.xs_ity.ity_pure then Loc.errorm ?loc:xs.xs_name.id_loc
+    "The type of top-level exception %a has mutable components" print_xs xs;
+  mk_decl (PDexn xs) []
+
+let create_pure_decl d = mk_decl PDpure [d]
+
+(** {2 Built-in decls} *)
+
+open Theory
+
+(* We must keep the builtin modules in sync with the builtin theories.
+   Therefore we match the exact contents of th_decls, and crash if it
+   is not what we expect. *)
+
+let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
+  | [{td_node = Decl di}; {td_node = Decl dr}; {td_node = Decl de}] ->
+      mk_decl (PDtype [mk_itd its_int  [] [] []]) [di],
+      mk_decl (PDtype [mk_itd its_real [] [] []]) [dr],
+      mk_decl PDpure [de]
+  | _ -> assert false
+
+let pd_unit = match unit_theory.th_decls with
+  | [{td_node = Use _t0}; {td_node = Decl du}] ->
+      mk_decl (PDtype [mk_itd its_unit [] [] []]) [du]
+  | _ -> assert false
+
+let pd_func, pd_pred, pd_func_app = match highord_theory.th_decls with
+  | [{td_node = Use _bo};
+     {td_node = Decl df}; {td_node = Decl dp}; {td_node = Decl da}] ->
+      mk_decl (PDtype [mk_itd its_func [] [] []]) [df],
+      mk_decl (PDtype [mk_itd its_pred [] [] []]) [dp],
+      mk_decl (PDlet ld_func_app) [da]
+  | _ -> assert false
+
+let pd_bool = match bool_theory.th_decls with
+  | [{td_node = Decl db}] ->
+      mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] []]) [db]
+  | _ -> assert false
+
+let pd_tuple _n = assert false (*TODO*)
+
+(** {2 Known identifiers} *)
+
+type known_map = pdecl Mid.t
+
+let known_id kn id =
+  if not (Mid.mem id kn) then raise (Decl.UnknownIdent id)
+
+let merge_known kn1 kn2 =
+  let check_known id decl1 decl2 =
+    if pd_equal decl1 decl2 then Some decl1
+    else raise (Decl.RedeclaredIdent id) in
+  Mid.union check_known kn1 kn2
+
+let known_add_decl kn0 d =
+  let kn = Mid.map (Util.const d) d.pd_news in
+  let check id decl0 _ =
+    if pd_equal decl0 d
+    then raise (Decl.KnownIdent id)
+    else raise (Decl.RedeclaredIdent id) in
+  let kn = Mid.union check kn0 kn in
+  let unk = Mid.set_diff d.pd_syms kn in
+  if Sid.is_empty unk then kn else
+    raise (Decl.UnknownIdent (Sid.choose unk))

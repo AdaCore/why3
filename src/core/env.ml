@@ -40,7 +40,7 @@ module Wenv = Weakhtbl.Make(struct type t = env let tag = env_tag end)
 (** Environment construction and utilisation *)
 
 let create_env = let c = ref (-1) in fun lp -> {
-  env_path = List.fold_right Sstr.add lp Sstr.empty;
+  env_path = Sstr.of_list lp;
   env_tag  = (incr c; Weakhtbl.create_tag !c)
 }
 
@@ -59,18 +59,18 @@ module Hpath = Hashtbl.Make(struct
 end)
 
 type 'a language = {
-  memo : 'a Hpath.t;
-  push : pathname -> 'a -> unit;
+  memo : 'a Hpath.t Wenv.t;
+  push : env -> pathname -> 'a -> unit;
   regf : format_info -> unit format_parser -> unit;
-  regb : (pathname -> unit) -> unit;
+  regb : (env -> pathname -> unit) -> unit;
   mutable fmts : unit format_parser Mstr.t;
-  mutable bins : (pathname -> unit) list;
+  mutable bins : (env -> pathname -> unit) list;
   mutable info : format_info list;
 }
 
 let base_language = {
-  memo = Hpath.create 17;
-  push = (fun _ _ -> ());
+  memo = Wenv.create 3;
+  push = (fun _ _ _ -> ());
   regf = (fun _ _ -> ());
   regb = (fun _ -> ());
   fmts = Mstr.empty;
@@ -80,19 +80,17 @@ let base_language = {
 
 exception LibraryConflict of pathname
 
-let store lang path c =
-  lang.push path c;
-  Hpath.add lang.memo path c
-
-let store lang path c = match path with
+let store lang env path c =
+  let ht = try Wenv.find lang.memo env with Not_found ->
+    let ht = Hpath.create 17 in Wenv.set lang.memo env ht; ht in
+  match path with
   | "why3" :: _ ->
       begin try
-        let d = Hpath.find lang.memo path in
-        if c != d then raise (LibraryConflict path)
-      with Not_found -> store lang path c end
+        if Hpath.find ht path != c then raise (LibraryConflict path)
+      with Not_found -> lang.push env path c; Hpath.add ht path c end
   | _ ->
-      assert (path = [] || not (Hpath.mem lang.memo path));
-      store lang path c
+      assert (path = [] || not (Hpath.mem ht path));
+      lang.push env path c; Hpath.add ht path c
 
 let register_format lang (ff,_,_ as inf) fp =
   lang.regf inf fp;
@@ -104,8 +102,8 @@ let add_builtin lang bp =
   lang.bins <- bp :: lang.bins
 
 let register_language parent convert = {
-  memo = Hpath.create 17;
-  push = (fun path c -> store parent path (convert c));
+  memo = Wenv.create 3;
+  push = (fun env path c -> store parent env path (convert c));
   regf = (fun inf fp -> register_format parent inf fp);
   regb = (fun bp -> add_builtin parent bp);
   fmts = Mstr.empty;
@@ -116,13 +114,13 @@ let register_language parent convert = {
 let extension_table = ref Mstr.empty
 
 let register_format ~desc lang ff extl fp =
-  let fp env path fn ch = store lang path (fp env path fn ch) in
+  let fp env path fn ch = store lang env path (fp env path fn ch) in
   register_format lang (ff,extl,desc) fp;
   let add_ext m e = Mstr.add e ff m in
   extension_table := List.fold_left add_ext !extension_table extl
 
 let add_builtin lang bp =
-  let bp path = store lang ("why3" :: path) (bp path) in
+  let bp env path = store lang env ("why3" :: path) (bp path) in
   add_builtin lang bp
 
 let list_formats lang =
@@ -154,9 +152,8 @@ let get_parser lang ff =
 
 let read_channel ?format lang env file ch =
   let ff = get_format ?format file in
-  let fp = get_parser lang ff in
-  fp env [] file ch;
-  Hpath.find lang.memo []
+  get_parser lang ff env [] file ch;
+  Hpath.find (Wenv.find lang.memo env) []
 
 let read_lib_file ?format lang env path file =
   let ff = get_format ?format file in
@@ -167,7 +164,7 @@ let read_lib_file ?format lang env path file =
 
 let read_file ?format lang env file =
   read_lib_file ?format lang env [] file;
-  Hpath.find lang.memo []
+  Hpath.find (Wenv.find lang.memo env) []
 
 (** Library file parsing *)
 
@@ -196,7 +193,7 @@ exception CircularDependency of pathname
 
 let read_library lang env = function
   | "why3" :: path ->
-      let read bp = try bp path with Not_found -> () in
+      let read bp = try bp env path with Not_found -> () in
       List.iter read lang.bins
   | path ->
       let file = locate_library env path in
@@ -217,9 +214,9 @@ let read_library lang env path =
 
 let read_library lang env path =
   let path = if path = [] then ["why3"] else path in
-  try Hpath.find lang.memo path with Not_found ->
+  try Hpath.find (Wenv.find lang.memo env) path with Not_found ->
   read_library lang env path;
-  try Hpath.find lang.memo path with Not_found ->
+  try Hpath.find (Wenv.find lang.memo env) path with Not_found ->
   raise (LibraryNotFound path)
 
 let read_theory env path s =
