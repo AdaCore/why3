@@ -125,3 +125,57 @@ module RAL
 
 end
 
+module RandomAccessListWithSeq
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import seq.Seq
+
+  type ral 'a =
+  | Empty
+  | Zero    (ral ('a, 'a))
+  | One  'a (ral ('a, 'a))
+
+  function flatten (s: seq ('a, 'a)) : seq 'a
+    = create (2 * length s)
+             (\ i: int. let (x0, x1) = s[div i 2] in
+                        if mod i 2 = 0 then x0 else x1)
+
+  function elements (l: ral 'a) : seq 'a
+    = match l with
+      | Empty    -> empty
+      | Zero l1  -> flatten (elements l1)
+      | One x l1 -> cons x (flatten (elements l1))
+      end
+
+  let rec size (l: ral 'a) : int
+    variant { l }
+    ensures { result = length (elements l) }
+  =
+    match l with
+    | Empty    -> 0
+    | Zero  l1 ->     2 * size l1
+    | One _ l1 -> 1 + 2 * size l1
+    end
+
+  let rec add (x: 'a) (l: ral 'a) : ral 'a
+    variant { l }
+    ensures { elements result == cons x (elements l) }
+    = match l with
+      | Empty    -> One x Empty
+      | Zero l1  -> One x l1
+      | One y l1 -> Zero (add (x, y) l1)
+      end
+
+  let rec get (i: int) (l: ral 'a) : 'a
+    requires { 0 <= i < length (elements l) }
+    variant  { i, l }
+    ensures  { (elements l)[i] = result }
+    = match l with
+      | Empty    -> absurd
+      | One x l1 -> if i = 0 then x else get (i-1) (Zero l1)
+      | Zero l1  -> let (x0, x1) = get (div i 2) l1 in
+                    if mod i 2 = 0 then x0 else x1
+      end
+
+end
