@@ -74,6 +74,7 @@ module RandomAccessList
     | Cons _ r -> if i > 0 then nth_flatten (i-1) r
     end
 
+
   let rec get (i: int) (l: ral 'a) : 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l }
@@ -83,6 +84,51 @@ module RandomAccessList
       | One x l1 -> if i = 0 then x else get (i-1) (Zero l1)
       | Zero l1  -> let (x0, x1) = get (div i 2) l1 in
                     if mod i 2 = 0 then x0 else x1
+      end
+
+
+   let rec tail (l: ral 'a) : ral 'a
+    requires { elements l <> Nil }
+    variant { l }
+    ensures {let m = elements l in
+             match nth 0 m with
+             | None -> false
+             | Some x -> m = Cons x (elements result)
+             end }
+    = match l with
+      | Empty    -> absurd
+      | One _ l1 -> Zero l1
+      | Zero  l1 -> let (_, x1) = get 0 l1 in One x1 (tail l1)
+      end
+
+  let rec set (y: 'a) (i: int) (l: ral 'a) : ral 'a
+    requires { 0 <= i < length (elements l) }
+    variant  { i, l}
+    ensures  { nth i (elements result) = Some y}
+    ensures  { forall j. 0 <= j < length (elements l) ->
+               j <> i -> nth j (elements result) = nth j (elements l) }
+    ensures  { length (elements result) = length (elements l) }
+    ensures  { match result, l with
+               | One _ _, One _ _ | Zero _, Zero _ -> true
+               | _                                 -> false
+               end }
+    = match l with
+      | Empty    -> absurd
+      | One x l1 -> if i = 0 then One y l1 else
+                    match set y (i-1) (Zero l1) with
+                    | Empty | One _ _ -> absurd
+                    | Zero l1         -> One x l1
+                    end
+      | Zero l1  ->
+          let (x0, x1) = get (div i 2) l1 in
+          let l1' = set (if mod i 2 = 0 then (y,x1) else (x0,y)) (div i 2) l1 in
+            assert { forall j. 0 <= j < length (elements l) -> j <> i ->
+               match nth (div j 2) (elements l1) with
+               | None -> false
+               | Some (x0,_) -> Some x0 = nth (2 * (div j 2)) (elements l)
+               end
+               && nth j (elements l) = nth j (elements (Zero l1')) };
+          Zero l1'
       end
 
 end
@@ -167,7 +213,7 @@ module RandomAccessListWithSeq
       | One y l1 -> Zero (add (x, y) l1)
       end
 
-  let rec get (i: int) (l: ral 'a) : 'a
+   let rec get (i: int) (l: ral 'a) : 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l }
     ensures  { (elements l)[i] = result }
@@ -176,6 +222,32 @@ module RandomAccessListWithSeq
       | One x l1 -> if i = 0 then x else get (i-1) (Zero l1)
       | Zero l1  -> let (x0, x1) = get (div i 2) l1 in
                     if mod i 2 = 0 then x0 else x1
+      end
+
+  let rec tail (l: ral 'a) : ral 'a
+    requires { not ((elements l) == empty) }
+    variant { l }
+    ensures { (elements l) == cons (elements l)[0] (elements result) }
+    = match l with
+      | Empty    -> absurd
+      | One _ l1 -> Zero l1
+      | Zero  l1 -> let (_, x1) = get 0 l1 in One x1 (tail l1)
+      end
+
+  let rec set (y: 'a) (i: int) (l: ral 'a) : ral 'a
+    requires { 0 <= i < length (elements l) }
+    variant  { i, l}
+    ensures  { elements result == set (elements l) i y}
+    = match l with
+      | Empty    -> absurd
+      | One x l1 -> if i = 0 then One y l1 else
+                    match set y (i-1) (Zero l1) with
+                    | Empty | One _ _ -> absurd
+                    | Zero l1 -> One x l1
+                    end
+      | Zero l1  -> let (x0, x1) = get (div i 2) l1 in
+                    Zero
+                    (set (if mod i 2 = 0 then (y,x1) else (x0,y)) (div i 2) l1)
       end
 
 end
