@@ -66,10 +66,10 @@ Local Open Scope ring_scope.
   syntax function ( * )  "(%1 * %2)%Z"
   syntax function (-_) "(-%1)%Z"
 
-  syntax predicate (<=) "is_true (%1 <= %2)%Z"
-  syntax predicate (<)  "is_true (%1 < %2)%Z"
-  syntax predicate (>=) "is_true (%1 >= %2)%Z"
-  syntax predicate (>)  "is_true (%1 > %2)%Z"
+  syntax predicate (<=) "(%1 <= %2)%Z"
+  syntax predicate (<)  "(%1 < %2)%Z"
+  syntax predicate (>=) "(%1 >= %2)%Z"
+  syntax predicate (>)  "(%1 > %2)%Z"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc
