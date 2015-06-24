@@ -75,7 +75,6 @@
         "ghost", GHOST;
         "invariant", INVARIANT;
         "loop", LOOP;
-        "model", MODEL;
         "module", MODULE;
         "mutable", MUTABLE;
         "private", PRIVATE;
@@ -157,8 +156,6 @@ rule token = parse
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
-  | "~'" (lident as id)
-      { OPAQUE_QUOTE_LIDENT id }
   | "'" (lident as id)
       { QUOTE_LIDENT id }
   | "'" (uident as id)
@@ -225,27 +222,38 @@ rule token = parse
       { raise (IllegalCharacter c) }
 
 {
-  let parse_logic_file env path lb =
-    open_file token (Lexing.from_string "") (Typing.open_file env path);
-    Loc.with_location (logic_file token) lb;
-    Typing.close_file ()
+  let debug = Debug.register_info_flag "print_modules"
+    ~desc:"Print@ program@ modules@ after@ typechecking."
 
-  let parse_program_file inc lb =
-    open_file token (Lexing.from_string "") inc;
-    Loc.with_location (program_file token) lb
+  open Stdlib
+  open Ident
+  open Theory
+  open Pmodule
 
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    parse_logic_file env path lb
+    Typing.open_file ~pure:false env path;
+    let mm = Loc.with_location (mlw_file token) lb in
+    if path = [] && Debug.test_flag debug then begin
+      let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
+      let mm = Mstr.fold add_m mm Mid.empty in
+      let print_m _ m = Format.eprintf
+        "@[<hov 2>module %a@\n%a@]@\nend@\n@." Pretty.print_th m.mod_theory
+        (Pp.print_list Pp.newline2 Pdecl.print_pdecl) m.mod_decls in
+      Mid.iter print_m mm
+    end;
+    mm
 
-  let () = Env.register_format Env.base_language "why" ["why"] read_channel
-    ~desc:"WhyML@ logical@ language"
+  let () = Env.register_format mlw_language "whyml" ["mlw"] read_channel
+    ~desc:"WhyML@ programming@ and@ specification@ language"
+
+  let read_channel env path file c =
+    let lb = Lexing.from_channel c in
+    Loc.set_file file lb;
+    Typing.open_file ~pure:true env path;
+    Loc.with_location (mlw_file token) lb
+
+  let () = Env.register_format mlw_language "whyml_spec" ["why"] read_channel
+    ~desc:"WhyML@ specification@ sublanguage"
 }
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. test"
-End:
-*)
-

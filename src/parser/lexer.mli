@@ -8,5 +8,3 @@
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
-
-val parse_program_file : Ptree.incremental -> Lexing.lexbuf -> unit

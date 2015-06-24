@@ -18,6 +18,11 @@ open Decl
 open Theory
 open Dterm
 open Env
+(*
+open Pdecl
+open Pmodule
+open Dexpr
+*)
 
 (** debug flags *)
 
@@ -31,7 +36,6 @@ let debug_type_only  = Debug.register_flag "type_only"
 
 exception UnboundTypeVar of string
 exception DuplicateTypeVar of string
-exception ClashTheory of string
 
 (** lazy declaration of tuples *)
 
@@ -99,12 +103,9 @@ let find_namespace_ns ns q =
 
 (** Parsing types *)
 
-let ty_of_pty ?(noop=true) uc pty =
+let ty_of_pty uc pty =
   let rec get_ty = function
-    | PTtyvar ({id_loc = loc}, true) when noop ->
-        Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
-          allowed@ in@ function@ and@ predicate@ prototypes"
-    | PTtyvar ({id_str = x}, _) ->
+    | PTtyvar {id_str = x} ->
         ty_var (tv_of_string x)
     | PTtyapp (q, tyl) ->
         let ts = find_tysymbol uc q in
@@ -119,16 +120,6 @@ let ty_of_pty ?(noop=true) uc pty =
         get_ty ty
   in
   get_ty pty
-
-let opaque_tvs args =
-  let rec opaque_tvs acc = function
-    | PTtyvar (id, true) -> Stv.add (tv_of_string id.id_str) acc
-    | PTtyvar (_, false) -> acc
-    | PTtyapp (_, pl)
-    | PTtuple pl -> List.fold_left opaque_tvs acc pl
-    | PTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
-    | PTparen ty -> opaque_tvs acc ty in
-  List.fold_left (fun acc (_,_,_,ty) -> opaque_tvs acc ty) Stv.empty args
 
 (** typing using destructive type variables
 
@@ -203,8 +194,6 @@ let chainable_op uc op =
       && not (ty_equal ty1 ty_bool)
       && not (ty_equal ty2 ty_bool)
   | _ -> false
-
-type global_vs = Ptree.qualid -> vsymbol option
 
 let mk_closure loc ls =
   let mk dt = Dterm.dterm ~loc dt in
@@ -353,11 +342,13 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tcast (e1, ty) ->
       DTcast (dterm uc gvars denv e1, ty_of_pty uc ty))
 
+(* TODO
 (** Export for program parsing *)
 
 let type_term uc gvars t =
   let t = dterm uc gvars denv_empty t in
   Dterm.term ~strict:true ~keep_loc:true t
+*)
 
 let type_fmla uc gvars f =
   let f = dterm uc gvars denv_empty f in
@@ -365,11 +356,11 @@ let type_fmla uc gvars f =
 
 (** Typing declarations *)
 
-let tyl_of_params ?(noop=false) uc pl =
+let tyl_of_params uc pl =
   let ty_of_param (loc,_,gh,ty) =
     if gh then Loc.errorm ~loc
       "ghost parameters are not allowed in pure declarations";
-    ty_of_pty ~noop uc ty in
+    ty_of_pty uc ty in
   List.map ty_of_param pl
 
 let add_types dl th =
@@ -400,7 +391,7 @@ let add_types dl th =
       let ts = match d.td_def with
         | TDalias ty ->
             let rec apply = function
-              | PTtyvar (v, _) ->
+              | PTtyvar v ->
                   begin
                     try ty_var (Hstr.find vars v.id_str) with Not_found ->
                       Loc.error ~loc:v.id_loc (UnboundTypeVar v.id_str)
@@ -456,7 +447,6 @@ let add_types dl th =
       | TDalgebraic cl ->
           let ht = Hstr.create 17 in
           let constr = List.length cl in
-          let opaque = Stv.of_list ts.ts_args in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let projection (_,id,_,_) fty = match id with
             | None -> None
@@ -468,16 +458,16 @@ let add_types dl th =
                   Some pj
                 with Not_found ->
                   let fn = create_user_id id in
-                  let pj = create_fsymbol ~opaque fn [ty] fty in
+                  let pj = create_fsymbol fn [ty] fty in
                   Hstr.replace csymbols x loc;
                   Hstr.replace ht x pj;
                   Some pj
           in
           let constructor (loc, id, pl) =
-            let tyl = tyl_of_params ~noop:true th' pl in
+            let tyl = tyl_of_params th' pl in
             let pjl = List.map2 projection pl tyl in
             Hstr.replace csymbols id.id_str loc;
-            create_fsymbol ~opaque ~constr (create_user_id id) tyl ty, pjl
+            create_fsymbol ~constr (create_user_id id) tyl ty, pjl
           in
           abstr, (ts, List.map constructor cl) :: algeb, alias
       | TDrecord _ ->
@@ -498,10 +488,10 @@ let add_types dl th =
         Loc.error ~loc:(Hstr.find csymbols s) (DuplicateRecordField (cs,ls))
 
 let prepare_typedef td =
-  if td.td_model then
-    Loc.errorm ~loc:td.td_loc "model types are not allowed in pure theories";
   if td.td_vis <> Public then
     Loc.errorm ~loc:td.td_loc "pure types cannot be abstract or private";
+  if td.td_mut then
+    Loc.errorm ~loc:td.td_loc "pure types cannot be mutable";
   if td.td_inv <> [] then
     Loc.errorm ~loc:td.td_loc "pure types cannot have invariants";
   match td.td_def with
@@ -529,14 +519,7 @@ let add_logics dl th =
     let v = create_user_id d.ld_ident in
     let pl = tyl_of_params th d.ld_params in
     let ty = Opt.map (ty_of_pty th) d.ld_type in
-    let opaque = opaque_tvs d.ld_params in
-    (* for abstract lsymbols fresh tyvars are opaque *)
-    let opaque = if d.ld_def = None && ty <> None then
-      let atvs = List.fold_left ty_freevars Stv.empty pl in
-      let vtvs = oty_freevars Stv.empty ty in
-      Stv.union opaque (Stv.diff vtvs atvs)
-    else opaque in
-    let ls = create_lsymbol ~opaque v pl ty in
+    let ls = create_lsymbol v pl ty in
     Hstr.add lsymbols id ls;
     Loc.try2 ~loc:d.ld_loc add_param_decl th ls
   in
@@ -560,54 +543,21 @@ let add_logics dl th =
     | Some e, None -> (* predicate *)
         let f = dterm th' (fun _ -> None) denv e in
         let f = fmla ~strict:true ~keep_loc:true f in
-        abst, (ls, vl, f) :: defn
+        abst, (make_ls_defn ls vl f) :: defn
     | Some e, Some ty -> (* function *)
         let e = { e with term_desc = Tcast (e, ty) } in
         let t = dterm th' (fun _ -> None) denv e in
         let t = term ~strict:true ~keep_loc:true t in
-        abst, (ls, vl, t) :: defn
+        abst, (make_ls_defn ls vl t) :: defn
   in
   let abst,defn = List.fold_right type_decl dl ([],[]) in
-  (* 3. detect opacity *)
-  let ldefns defn =
-    let ht = Hls.create 3 in
-    let add_ls (ls,_,_) =
-      let tvs = oty_freevars Stv.empty ls.ls_value in
-      let tvs = List.fold_left ty_freevars tvs ls.ls_args in
-      Hls.replace ht ls tvs in
-    List.iter add_ls defn;
-    let compared s ls args value =
-      let sbs = oty_match Mtv.empty ls.ls_value value in
-      let sbs = List.fold_left2 ty_match sbs ls.ls_args args in
-      let opq = try Hls.find ht ls with Not_found -> ls.ls_opaque in
-      Mtv.fold (fun _ ty s -> ty_freevars s ty) (Mtv.set_diff sbs opq) s in
-    let check_ld fixp (ls,_,t) =
-      let opq = Hls.find ht ls in
-      let npq = Stv.diff opq (t_app_fold compared Stv.empty t) in
-      Hls.replace ht ls npq;
-      fixp && Stv.equal opq npq in
-    let rec fixp () =
-      if not (List.fold_left check_ld true defn) then fixp () in
-    fixp ();
-    let mk_sbs sbs ({ls_name = id} as ls,_,_) =
-      let opaque = Stv.union ls.ls_opaque (Hls.find ht ls) in
-      if Stv.equal ls.ls_opaque opaque then sbs else
-      let nls = create_lsymbol ~opaque (id_clone id) ls.ls_args ls.ls_value in
-      Mls.add ls nls sbs in
-    let sbs = List.fold_left mk_sbs Mls.empty defn in
-    let mk_ld (ls,vl,t) =
-      let get_ls ls = Mls.find_def ls ls sbs in
-      make_ls_defn (get_ls ls) vl (t_s_map (fun ty -> ty) get_ls t) in
-    List.map mk_ld defn
-  in
   let th = List.fold_left add_param_decl th abst in
-  let th = if defn = [] then th else add_logic_decl th (ldefns defn) in
-  th
+  if defn = [] then th else add_logic_decl th defn
 
-let add_prop k loc s f th =
+let add_prop k s f th =
   let pr = create_prsymbol (create_user_id s) in
   let f = type_fmla th (fun _ -> None) f in
-  Loc.try4 ~loc add_prop_decl th k pr f
+  add_prop_decl th k pr f
 
 let loc_of_id id = Opt.get id.Ident.id_loc
 
@@ -618,8 +568,7 @@ let add_inductives s dl th =
     let id = d.in_ident.id_str in
     let v = create_user_id d.in_ident in
     let pl = tyl_of_params th d.in_params in
-    let opaque = opaque_tvs d.in_params in
-    let ps = create_psymbol ~opaque v pl in
+    let ps = create_psymbol v pl in
     Hstr.add psymbols id ps;
     Loc.try2 ~loc:d.in_loc add_param_decl th ps
   in
@@ -647,9 +596,9 @@ let add_inductives s dl th =
 
 (* parse declarations *)
 
-let find_theory env lenv q = match q with
+let find_theory env file q = match q with
   | Qident { id_str = id } -> (* local theory *)
-      begin try Mstr.find id lenv
+      begin try (Mstr.find id file).Pmodule.mod_theory
       with Not_found -> read_theory env [] id end
   | Qdot (p, { id_str = id }) -> (* theory in file f *)
       read_theory env (string_list_of_qualid p) id
@@ -708,7 +657,7 @@ let rec clone_ns kn sl path ns2 ns1 s =
   in
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
 
-let add_decl loc th = function
+let add_decl {Pmodule.muc_theory = th} _inth = function
   | Ptree.Dtype dl ->
       add_types dl th
   | Ptree.Dlogic dl ->
@@ -716,7 +665,7 @@ let add_decl loc th = function
   | Ptree.Dind (s, dl) ->
       add_inductives s dl th
   | Ptree.Dprop (k, s, f) ->
-      add_prop k loc s f th
+      add_prop k s f th
   | Ptree.Dmeta (id, al) ->
       let convert = function
         | Ptree.Mty (PTtyapp (q,[]))
@@ -727,12 +676,12 @@ let add_decl loc th = function
         | Ptree.Mpr q  -> MApr (find_prop th q)
         | Ptree.Mstr s -> MAstr s
         | Ptree.Mint i -> MAint i in
-      let add s = add_meta th (lookup_meta s) (List.map convert al) in
-      Loc.try1 ~loc add id.id_str
-
-let add_decl loc th d =
-  if Debug.test_flag debug_parse_only then th else
-  Loc.try3 ~loc add_decl loc th d
+      add_meta th (lookup_meta id.id_str) (List.map convert al)
+  | Ptree.Dval _
+  | Ptree.Dlet _
+  | Ptree.Dfun _
+  | Ptree.Drec _
+  | Ptree.Dexn _ -> assert false (* TODO *)
 
 let type_inst th t s =
   let add_inst s = function
@@ -783,10 +732,9 @@ let type_inst th t s =
   in
   List.fold_left add_inst empty_inst s
 
-let add_use_clone env lenv th loc (use, subst) =
-  if Debug.test_flag debug_parse_only then th else
+let use_clone loc {Pmodule.muc_theory = th} env file (use, subst) =
   let use_or_clone th =
-    let t = find_theory env lenv use.use_theory in
+    let t = find_theory env file use.use_theory in
     if Debug.test_flag Glob.flag then
       Glob.use (qloc_last use.use_theory) t.th_name;
     match subst with
@@ -795,61 +743,86 @@ let add_use_clone env lenv th loc (use, subst) =
         warn_clone_not_abstract loc t;
         clone_export th t (type_inst th t s)
   in
-  let use_or_clone th = match use.use_import with
-    | Some (import, use_as) ->
-        (* use T = namespace T use_export T end *)
-        let th = open_namespace th use_as in
-        let th = use_or_clone th in
-        close_namespace th import
-    | None ->
-        use_or_clone th
-  in
-  Loc.try1 ~loc use_or_clone th
-
-let close_theory lenv th =
-  if Debug.test_flag debug_parse_only then lenv else
-  let th = close_theory th in
-  if Debug.test_flag Glob.flag then Glob.def th.th_name;
-  let id = th.th_name.id_string in
-  let loc = th.th_name.Ident.id_loc in
-  if Mstr.mem id lenv then Loc.error ?loc (ClashTheory id);
-  Mstr.add id th lenv
-
-let close_namespace loc import th =
-  Loc.try2 ~loc close_namespace th import
+  match use.use_import with
+  | Some (import, use_as) ->
+      (* use T = namespace T use_export T end *)
+      let th = open_namespace th use_as in
+      let th = use_or_clone th in
+      close_namespace th import
+  | None ->
+      use_or_clone th
 
 (* incremental parsing *)
 
-let open_file, close_file =
-  let lenv = Stack.create () in
-  let uc   = Stack.create () in
-  let open_file env path =
-    Stack.push Mstr.empty lenv;
-    let open_theory id =
-      Stack.push (Theory.create_theory ~path (create_user_id id)) uc in
-    let close_theory () =
-      Stack.push (close_theory (Stack.pop lenv) (Stack.pop uc)) lenv in
-    let open_namespace name =
-      Stack.push (Theory.open_namespace (Stack.pop uc) name) uc in
-    let close_namespace loc imp =
-      Stack.push (close_namespace loc imp (Stack.pop uc)) uc in
-    let new_decl loc d =
-      Stack.push (add_decl loc (Stack.pop uc) d) uc in
-    let use_clone loc use =
-      let lenv = Stack.top lenv in
-      Stack.push (add_use_clone env lenv (Stack.pop uc) loc use) uc in
-    { open_theory = open_theory;
-      close_theory = close_theory;
-      open_namespace = open_namespace;
-      close_namespace = close_namespace;
-      new_decl = new_decl;
-      use_clone = use_clone;
-      open_module = (fun _ -> assert false);
-      close_module = (fun _ -> assert false);
-      new_pdecl = (fun _ -> assert false); }
-  in
-  let close_file () = Stack.pop lenv in
-  open_file, close_file
+open Pmodule
+
+type slice = {
+  env           : Env.env;
+  path          : Env.pathname;
+  pure          : bool;
+  mutable file  : pmodule Mstr.t;
+  mutable muc   : pmodule_uc option;
+  mutable inth  : bool;
+}
+
+let state = (Stack.create () : slice Stack.t)
+
+let open_file env path ~pure =
+  assert (Stack.is_empty state || (Stack.top state).muc <> None);
+  Stack.push { env = env; path = path; pure = pure;
+               file = Mstr.empty; muc = None; inth = false } state
+
+let close_file () =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc = None);
+  (Stack.pop state).file
+
+let open_module ({id_str = nm; id_loc = loc} as id) ~theory =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc = None);
+  let slice = Stack.top state in
+  if Mstr.mem nm slice.file then Loc.errorm ~loc
+    "module %s is already defined in this file" nm;
+  if slice.pure && not theory then Loc.errorm ~loc
+    "this file can only contain pure theories";
+  let muc = create_module slice.env ~path:slice.path (create_user_id id) in
+  slice.muc <- Some muc; slice.inth <- theory
+
+let close_module loc =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+  let slice = Stack.top state in
+  if Debug.test_noflag debug_parse_only then begin
+    let m = Loc.try1 ~loc close_module (Opt.get slice.muc) in
+    if Debug.test_flag Glob.flag then Glob.def m.mod_theory.th_name;
+    slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file;
+  end;
+  slice.muc <- None
+
+let open_namespace nm =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+  if Debug.test_noflag debug_parse_only then
+    let slice = Stack.top state in
+    slice.muc <- Some (open_namespace (Opt.get slice.muc) nm.id_str)
+
+let close_namespace loc ~import =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+  if Debug.test_noflag debug_parse_only then
+    let slice = Stack.top state in
+    let muc = Loc.try1 ~loc (close_namespace ~import) (Opt.get slice.muc) in
+    slice.muc <- Some muc
+
+let add_decl loc d =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+  if Debug.test_noflag debug_parse_only then
+    let slice = Stack.top state in
+    let muc = Loc.try3 ~loc add_decl (Opt.get slice.muc) slice.inth d in
+    ignore muc (* TODO *)
+
+let use_clone loc use =
+  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+  if Debug.test_noflag debug_parse_only then
+    let slice = Stack.top state in
+    let muc = Loc.try5 ~loc use_clone loc
+      (Opt.get slice.muc) slice.env slice.file use in
+    ignore muc (* TODO *)
 
 (** Exception printing *)
 
@@ -860,12 +833,4 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "unbound type variable '%s" s
   | DuplicateTypeVar s ->
       Format.fprintf fmt "duplicate type parameter '%s" s
-  | ClashTheory s ->
-      Format.fprintf fmt "clash with previous theory %s" s
   | _ -> raise e)
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.."
-End:
-*)

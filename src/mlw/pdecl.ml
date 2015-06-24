@@ -368,3 +368,7 @@ let known_add_decl kn0 d =
   let unk = Mid.set_diff d.pd_syms kn in
   if Sid.is_empty unk then kn else
     raise (Decl.UnknownIdent (Sid.choose unk))
+
+(** {2 Pretty-printing} *)
+
+let print_pdecl _fmt _d = assert false (* TODO *)

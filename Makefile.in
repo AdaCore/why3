@@ -154,7 +154,7 @@ LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 
 LIB_MLW = ity expr dexpr pdecl pmodule
 
-LIB_PARSER = ptree glob parser typing lexer
+LIB_PARSER = ptree glob typing parser lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		detect_polymorphism \
@@ -173,10 +173,6 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
-LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
-	    mlw_dexpr mlw_typing mlw_driver mlw_exec mlw_ocaml \
-	    mlw_main mlw_interp
-
 LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
@@ -187,10 +183,9 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
-	      $(addprefix src/whyml/, $(LIB_WHYML)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core driver mlw parser transform printer whyml session
+LIBDIRS = util core driver mlw parser transform printer session
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
@@ -453,7 +448,10 @@ install_no_local::
 
 TOOLSGENERATED = src/tools/why3wc.ml
 
-TOOLS_BIN = why3config why3execute why3extract why3prove \
+# TODO
+#TOOLS_BIN = why3config why3execute why3extract why3prove \
+#	    why3realize why3replay why3wc
+TOOLS_BIN = why3config why3prove \
 	    why3realize why3replay why3wc
 
 TOOLS_FILES = main $(TOOLS_BIN)
@@ -1384,8 +1382,9 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
 # build targets
 
-byte: bin/why3doc.byte
-opt:  bin/why3doc.opt
+# TODO
+#byte: bin/why3doc.byte
+#opt:  bin/why3doc.opt
 
 bin/why3doc.opt: lib/why3/why3.cmxa $(WHY3DOCCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -1412,7 +1411,8 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
 
-install_local:: bin/why3doc
+# TODO
+#install_local:: bin/why3doc
 
 ########
 # bench
@@ -1602,8 +1602,6 @@ MODULESTODOC = \
 	core/env core/task \
 	driver/whyconf driver/driver \
 	session/session session/session_tools session/session_scheduler \
-	whyml/mlw_ty whyml/mlw_expr whyml/mlw_decl whyml/mlw_module \
-	whyml/mlw_main
 #	transform/introduction \
 #	ide/db
 

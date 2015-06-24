@@ -10,21 +10,6 @@
 (********************************************************************)
 
 %{
-module Incremental = struct
-  let stack = Stack.create ()
-  let open_file inc = Stack.push inc stack
-  let close_file () = ignore (Stack.pop stack)
-  let open_theory id = (Stack.top stack).Ptree.open_theory id
-  let close_theory () = (Stack.top stack).Ptree.close_theory ()
-  let open_module id = (Stack.top stack).Ptree.open_module id
-  let close_module () = (Stack.top stack).Ptree.close_module ()
-  let open_namespace n = (Stack.top stack).Ptree.open_namespace n
-  let close_namespace l b = (Stack.top stack).Ptree.close_namespace l b
-  let new_decl loc d = (Stack.top stack).Ptree.new_decl loc d
-  let new_pdecl loc d = (Stack.top stack).Ptree.new_pdecl loc d
-  let use_clone loc use = (Stack.top stack).Ptree.use_clone loc use
-end
-
   open Ptree
 
   let infix  s = "infix "  ^ s
@@ -111,7 +96,7 @@ end
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 %token <Loc.position> POSITION
-%token <string> QUOTE_UIDENT QUOTE_LIDENT OPAQUE_QUOTE_LIDENT
+%token <string> QUOTE_UIDENT QUOTE_LIDENT
 
 (* keywords *)
 
@@ -125,7 +110,7 @@ end
 
 %token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK
 %token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
-%token FUN GHOST INVARIANT LOOP MODEL MODULE MUTABLE
+%token FUN GHOST INVARIANT LOOP MODULE MUTABLE
 %token PRIVATE RAISE RAISES READS REC REQUIRES RETURNS
 %token TO TRY VAL VARIANT WHILE WRITES
 
@@ -173,51 +158,33 @@ end
 
 (* Entry points *)
 
-%start <Ptree.incremental -> unit> open_file
-%start <unit> logic_file program_file
+%start <Pmodule.pmodule Stdlib.Mstr.t> mlw_file
 %%
 
 (* Theories, modules, namespaces *)
 
-open_file:
-(* Dummy token. Menhir does not accept epsilon. *)
-| EOF { Incremental.open_file }
-
-logic_file:
-| theory* EOF   { Incremental.close_file () }
-
-program_file:
-| theory_or_module* EOF { Incremental.close_file () }
-
-theory:
-| theory_head theory_decl* END  { Incremental.close_theory () }
+mlw_file:
+| theory_or_module* EOF { Typing.close_file () }
+(* TODO
+| module_decl* EOF { Typing.close_file () }
+*)
 
 theory_or_module:
-| theory                        { () }
-| module_head module_decl* END  { Incremental.close_module () }
-
-theory_head:
-| THEORY labels(uident)  { Incremental.open_theory $2 }
+| module_head module_decl* END
+    { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 module_head:
-| MODULE labels(uident)  { Incremental.open_module $2 }
-
-theory_decl:
-| decl            { Incremental.new_decl  (floc $startpos $endpos) $1 }
-| use_clone       { Incremental.use_clone (floc $startpos $endpos) $1 }
-| namespace_head theory_decl* END
-    { Incremental.close_namespace (floc $startpos($1) $endpos($1)) $1 }
+| THEORY labels(uident)  { Typing.open_module $2 ~theory:true  }
+| MODULE labels(uident)  { Typing.open_module $2 ~theory:false }
 
 module_decl:
-| decl            { Incremental.new_decl  (floc $startpos $endpos) $1 }
-| pdecl           { Incremental.new_pdecl (floc $startpos $endpos) $1 }
-| use_clone       { Incremental.use_clone (floc $startpos $endpos) $1 }
+| decl            { Typing.add_decl  (floc $startpos $endpos) $1 }
+| use_clone       { Typing.use_clone (floc $startpos $endpos) $1 }
 | namespace_head module_decl* END
-    { Incremental.close_namespace (floc $startpos($1) $endpos($1)) $1 }
+    { Typing.close_namespace (floc $startpos($1) $endpos($1)) ~import:$1 }
 
 namespace_head:
-| NAMESPACE boption(IMPORT) uident
-   { Incremental.open_namespace $3.id_str; $2 }
+| NAMESPACE boption(IMPORT) uident  { Typing.open_namespace $3; $2 }
 
 (* Use and clone *)
 
@@ -252,7 +219,6 @@ ns:
 
 decl:
 | TYPE with_list1(type_decl)                { Dtype $2 }
-| TYPE late_invariant                       { Dtype [$2] }
 | CONSTANT  constant_decl                   { Dlogic [$2] }
 | FUNCTION  function_decl  with_logic_decl* { Dlogic ($2::$3) }
 | PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
@@ -262,6 +228,7 @@ decl:
 | LEMMA labels(ident) COLON term            { Dprop (Decl.Plemma, $2, $4) }
 | GOAL  labels(ident) COLON term            { Dprop (Decl.Pgoal, $2, $4) }
 | META sident comma_list1(meta_arg)         { Dmeta ($2, $3) }
+| pdecl                                     { $1 }
 
 meta_arg:
 | TYPE      ty      { Mty $2 }
@@ -275,40 +242,44 @@ meta_arg:
 (* Type declarations *)
 
 type_decl:
-| labels(lident) ty_var* typedefn
-  { let model, vis, def, inv = $3 in
-    let vis = if model then Abstract else vis in
+| labels(lident) ty_var* typedefn invariant*
+  { let (vis, mut), def = $3 in
     { td_ident = $1; td_params = $2;
-      td_model = model; td_vis = vis; td_def = def;
-      td_inv = inv; td_loc = floc $startpos $endpos } }
-
-late_invariant:
-| labels(lident) ty_var* invariant+
-  { { td_ident = $1; td_params = $2;
-      td_model = false; td_vis = Public; td_def = TDabstract;
-      td_inv = $3; td_loc = floc $startpos $endpos } }
+      td_vis = vis; td_mut = mut;
+      td_inv = $4; td_def = def;
+      td_loc = floc $startpos $endpos } }
 
 ty_var:
 | labels(quote_lident) { $1 }
 
+(* TODO: should global "mutable" imply "private"?
+  "type t 'a = mutable { x : int }"
+    - if "x" is immutable then the type can only be private
+    - if "x" is automatically mutable then I don't like it
+    - if there are known mutable fields, then a global "mutable"
+      is redundant, unless it also means "private" *)
+(* TODO: what should be the syntax for mutable private records
+    without known fields? *)
 typedefn:
 | (* epsilon *)
-    { false, Public, TDabstract, [] }
-| model abstract bar_list1(type_case) invariant*
-    { $1, $2, TDalgebraic $3, $4 }
-| model abstract LEFTBRC semicolon_list1(type_field) RIGHTBRC invariant*
-    { $1, $2, TDrecord $4, $6 }
-| model abstract ty invariant*
-    { $1, $2, TDalias $3, $4 }
+    { (Public, false), TDabstract }
+| EQUAL vis_mut bar_list1(type_case)
+    { $2, TDalgebraic $3 }
+| EQUAL vis_mut LEFTBRC semicolon_list1(type_field) RIGHTBRC
+    { $2, TDrecord $4 }
+| EQUAL vis_mut ty
+    { $2, TDalias $3 }
 
-model:
-| EQUAL         { false }
-| MODEL         { true }
+vis_mut:
+| (* epsilon *)     { Public, false }
+| MUTABLE           { Public, true  }
+| abstract          { $1, false }
+| abstract MUTABLE  { $1, true }
+| MUTABLE abstract  { $2, true }
 
 abstract:
-| (* epsilon *) { Public }
-| PRIVATE       { Private }
-| ABSTRACT      { Abstract }
+| PRIVATE           { Private }
+| ABSTRACT          { Abstract }
 
 type_field:
 | field_modifiers labels(lident) cast
@@ -370,8 +341,7 @@ ty:
 
 ty_arg:
 | lqualid                           { PTtyapp ($1, []) }
-| quote_lident                      { PTtyvar ($1, false) }
-| opaque_quote_lident               { PTtyvar ($1, true) }
+| quote_lident                      { PTtyvar $1 }
 | LEFTPAR comma_list2(ty) RIGHTPAR  { PTtuple $2 }
 | LEFTPAR RIGHTPAR                  { PTtuple [] }
 | LEFTPAR ty RIGHTPAR               { PTparen $2 }
@@ -886,19 +856,12 @@ uident:
 
 lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
-| lident_keyword  { mk_id $1 $startpos $endpos }
-
-lident_keyword:
-| MODEL           { "model" }
 
 quote_uident:
 | QUOTE_UIDENT  { mk_id ("'" ^ $1) $startpos $endpos }
 
 quote_lident:
 | QUOTE_LIDENT  { mk_id $1 $startpos $endpos }
-
-opaque_quote_lident:
-| OPAQUE_QUOTE_LIDENT { mk_id $1 $startpos $endpos }
 
 (* Idents + symbolic operation names *)
 

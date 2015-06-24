@@ -795,6 +795,8 @@ let check_spec dsp ecty e =
   if check_rwd && bad_write eeff ueff then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
+  (* TODO FIXME : revise the requirements for explicit "raises".
+     Should we only require them at the top level? *)
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sexn.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sexn.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"

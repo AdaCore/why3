@@ -9,50 +9,22 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Typing environments *)
-
-open Stdlib
-open Term
-open Theory
-
 val debug_parse_only : Debug.flag
+
 val debug_type_only : Debug.flag
 
-(** incremental parsing *)
+val open_file : Env.env -> Env.pathname -> pure:bool -> unit
 
-val add_decl : Loc.position -> theory_uc -> Ptree.decl -> theory_uc
+val close_file : unit -> Pmodule.pmodule Stdlib.Mstr.t
 
-val add_use_clone :
-  Env.env -> theory Mstr.t -> theory_uc ->
-    Loc.position -> Ptree.use_clone -> theory_uc
+val open_module : Ptree.ident -> theory:bool -> unit
 
-val close_namespace : Loc.position -> bool -> theory_uc -> theory_uc
+val close_module : Ptree.loc -> unit
 
-val close_theory : theory Mstr.t -> theory_uc -> theory Mstr.t
+val open_namespace : Ptree.ident -> unit
 
-val open_file : Env.env -> Env.pathname -> Ptree.incremental
+val close_namespace : Ptree.loc -> import:bool -> unit
 
-val close_file : unit -> theory Mstr.t
+val add_decl : Ptree.loc -> Ptree.decl -> unit
 
-(***************************************************************************)
-(** The following is exported for program typing (src/whyml/mlw_typing.ml) *)
-(***************************************************************************)
-
-val create_user_id : Ptree.ident -> Ident.preid
-
-val qloc : Ptree.qualid -> Loc.position
-val string_list_of_qualid : Ptree.qualid -> string list
-val print_qualid : Format.formatter -> Ptree.qualid -> unit
-
-exception UnboundSymbol of Ptree.qualid
-
-val find_qualid :
-  ('a -> Ident.ident) -> ('b -> string list -> 'a) -> 'b -> Ptree.qualid -> 'a
-
-type global_vs = Ptree.qualid -> vsymbol option
-
-val type_term : theory_uc -> global_vs -> Ptree.term -> term
-
-val type_fmla : theory_uc -> global_vs -> Ptree.term -> term
-
-val type_inst : theory_uc -> theory -> Ptree.clone_subst list -> th_inst
+val use_clone : Ptree.loc -> Ptree.use_clone -> unit

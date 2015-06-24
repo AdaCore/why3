@@ -330,8 +330,10 @@ let do_theory env drv fname tname th glist elist =
         let l,t = Decl.open_ls_defn d in
         match l with
         | [] ->
+(* TODO
           let t = Mlw_interp.eval_global_term env th.th_known t in
           printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Mlw_interp.print_value t
+*) ()
         | _ ->
           eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;
           exit 1

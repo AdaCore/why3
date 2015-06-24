@@ -297,10 +297,11 @@ let add_pdecl_with_tuples _uc _md = assert false (*TODO*)
 
 (** {2 WhyML language} *)
 
-type mlw_file = pmodule Mstr.t * theory Mstr.t
+type mlw_file = pmodule Mstr.t
 
 let mlw_language =
-  (Env.register_language Env.base_language snd : mlw_file Env.language)
+  let conv mm = Mstr.map (fun m -> m.mod_theory) mm in
+  (Env.register_language Env.base_language conv : mlw_file Env.language)
 
 (* TODO
 let () = Env.add_builtin mlw_language (function
@@ -314,7 +315,7 @@ exception ModuleNotFound of Env.pathname * string
 
 let read_module env path s =
   let path = if path = [] then ["why3"; s] else path in
-  let mm, _ = Env.read_library mlw_language env path in
+  let mm = Env.read_library mlw_language env path in
   Mstr.find_exn (ModuleNotFound (path,s)) s mm
 
 let print_path fmt sl =

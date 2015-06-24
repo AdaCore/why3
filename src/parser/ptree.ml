@@ -42,10 +42,8 @@ type qualid =
   | Qident of ident
   | Qdot of qualid * ident
 
-type opacity = bool
-
 type pty =
-  | PTtyvar of ident * opacity
+  | PTtyvar of ident
   | PTtyapp of qualid * pty list
   | PTtuple of pty list
   | PTarrow of pty * pty
@@ -127,7 +125,7 @@ type type_def =
   | TDalgebraic of (loc * ident * param list) list
   | TDrecord    of field list
 
-type visibility = Public | Private | Abstract
+type visibility = Public | Private | Abstract (* = Private + ghost fields *)
 
 type invariant = term list
 
@@ -135,10 +133,10 @@ type type_decl = {
   td_loc    : loc;
   td_ident  : ident;
   td_params : ident list;
-  td_model  : bool;
-  td_vis    : visibility;
+  td_vis    : visibility; (* records only *)
+  td_mut    : bool;       (* records or abstract types *)
+  td_inv    : invariant;  (* records only *)
   td_def    : type_def;
-  td_inv    : invariant;
 }
 
 type logic_decl = {
@@ -165,13 +163,6 @@ type metarg =
   | Mint of int
 
 type use_clone = use * clone_subst list option
-
-type decl =
-  | Dtype of type_decl list
-  | Dlogic of logic_decl list
-  | Dind of Decl.ind_sign * ind_decl list
-  | Dprop of Decl.prop_kind * ident * term
-  | Dmeta of ident * metarg list
 
 (* program files *)
 
@@ -259,23 +250,14 @@ and fundef = ident * top_ghost * lambda
 
 and lambda = binder list * pty option * expr * spec
 
-type pdecl =
+type decl =
+  | Dtype of type_decl list
+  | Dlogic of logic_decl list
+  | Dind of Decl.ind_sign * ind_decl list
+  | Dprop of Decl.prop_kind * ident * term
+  | Dmeta of ident * metarg list
   | Dval of ident * top_ghost * type_v
   | Dlet of ident * top_ghost * expr
   | Dfun of ident * top_ghost * lambda
   | Drec of fundef list
   | Dexn of ident * pty
-
-(* incremental parsing *)
-
-type incremental = {
-  open_theory     : ident -> unit;
-  close_theory    : unit -> unit;
-  open_module     : ident -> unit;
-  close_module    : unit -> unit;
-  open_namespace  : string -> unit;
-  close_namespace : loc -> bool (*import:*) -> unit;
-  new_decl        : loc -> decl -> unit;
-  new_pdecl       : loc -> pdecl -> unit;
-  use_clone       : loc -> use_clone -> unit;
-}

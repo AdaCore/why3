@@ -120,7 +120,7 @@ val add_pdecl_with_tuples : pmodule_uc -> pdecl -> pmodule_uc
 
 open Env
 
-type mlw_file = pmodule Mstr.t * theory Mstr.t
+type mlw_file = pmodule Mstr.t
 
 val mlw_language : mlw_file language
 
