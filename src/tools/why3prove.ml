@@ -240,9 +240,8 @@ let output_task drv fname _tname th task dir =
   let i = try String.rindex dest '.' with _ -> String.length dest in
   let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
   let ext = String.sub dest i (String.length dest - i) in
-  let file = Filename.concat dir (name ^ ext) in
-  let cout = open_out file in
-  Driver.print_task drv ~cntexample:false file (formatter_of_out_channel cout) task;
+  let cout = open_out (Filename.concat dir (name ^ ext)) in
+  Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
 let output_task_prepared drv fname _tname th task dir =
@@ -255,10 +254,9 @@ let output_task_prepared drv fname _tname th task dir =
   let i = try String.rindex dest '.' with _ -> String.length dest in
   let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
   let ext = String.sub dest i (String.length dest - i) in
-  let file = Filename.concat dir (name ^ ext) in
-  let cout = open_out file in
+  let cout = open_out (Filename.concat dir (name ^ ext)) in
   (* TODO print the counterexample *)
-  let _counterexample = Driver.print_task_prepared drv file (formatter_of_out_channel cout) task in
+  let _counterexample = Driver.print_task_prepared drv (formatter_of_out_channel cout) task in
   close_out cout
 
 let output_theory drv fname _tname th task dir =
@@ -274,7 +272,7 @@ let output_theory drv fname _tname th task dir =
       Some (open_in backup)
     end else None in
   let cout = open_out file in
-  Driver.print_task ?old drv ~cntexample:false file (formatter_of_out_channel cout) task;
+  Driver.print_task ?old drv (formatter_of_out_channel cout) task;
   close_out cout
 
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
@@ -286,7 +284,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
-        Driver.print_task ~cntexample:!opt_cntexmp drv fname std_formatter task
+        Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =

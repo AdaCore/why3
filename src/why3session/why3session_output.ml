@@ -77,9 +77,8 @@ let run_one env config filters dir fname =
             let name = (String.sub dest 0 i) in
             let name = Ident.string_unique fname_printer name in
             let ext = String.sub dest i (String.length dest - i) in
-            let fn = Filename.concat dir (name ^ ext) in
-            let cout = open_out fn in
-            Driver.print_task lp.prover_driver fn
+            let cout = open_out (Filename.concat dir (name ^ ext)) in
+            Driver.print_task lp.prover_driver
               (formatter_of_out_channel cout) task;
             close_out cout
         ) th

@@ -101,7 +101,7 @@ let create_prover_file goal expl prover =
     compute_filename (prover_files_dir proj_name prover) th goal expl prover in
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
-  Driver.print_task prover.Gnat_config.driver filename fmt (goal_task goal);
+  Driver.print_task prover.Gnat_config.driver fmt (goal_task goal);
   close_out cout;
   let _ = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
                              ~archived:false ~timelimit:0 ~memlimit:0
@@ -155,7 +155,7 @@ let rewrite_goal g =
        let fmt = Format.formatter_of_out_channel cout in
        let prover = Opt.get Gnat_config.manual_prover in
        Driver.print_task ~old prover.Gnat_config.driver
-                         tmpfile fmt (Session.goal_task g);
+                         fmt (Session.goal_task g);
        close_out cout;
        close_in old;
        mv_file tmpfile fn;

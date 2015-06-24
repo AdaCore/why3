@@ -302,7 +302,7 @@ let prepare_task ~cntexample drv task =
   let task = update_task drv task in
   List.fold_left apply task transl
 
-let print_task_prepared ?old drv filename fmt task =
+let print_task_prepared ?old drv fmt task =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
@@ -312,19 +312,19 @@ let print_task_prepared ?old drv filename fmt task =
       th_prelude  = drv.drv_thprelude;
       blacklist   = drv.drv_blacklist;
       printer_mapping = get_default_printer_mapping;
-      filename    = filename } in
+    } in
   let printer = lookup_printer p printer_args in
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) drv filename fmt task =
+let print_task ?old ?(cntexample=false) drv fmt task =
   let task = prepare_task ~cntexample drv task in
-  let _ = print_task_prepared ?old drv filename fmt task in
+  let _ = print_task_prepared ?old drv fmt task in
   ()
 
-let print_theory ?old drv filename fmt th =
+let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
-  print_task ?old drv filename fmt task
+  print_task ?old drv fmt task
 
 let file_name_of_task ?old ?inplace drv task =
   match old, inplace with
@@ -343,8 +343,7 @@ let prove_task_prepared
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
   let filename = file_name_of_task ?old ?inplace drv task in
-  let printer_mapping =
-    print_task_prepared ?old:old_channel drv filename fmt task in
+  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
@@ -369,7 +368,7 @@ let prove_task_server command ~cntexample ~timelimit ~memlimit ~steplimit ?old ?
      ~printer_mapping ?inplace fn
   | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
 	 let fmt = Format.formatter_of_out_channel outc in
-	 let printer_mapping = print_task_prepared ?old:None drv fn fmt task in
+	 let printer_mapping = print_task_prepared ?old:None drv fmt task in
          close_out outc;
 
          prove_file_server ~command ~res_parser ~timelimit ~memlimit

@@ -48,7 +48,8 @@ OCAMLVERSION = @OCAMLVERSION@
 CC        = gcc
 COQC      = @COQC@
 COQDEP    = @COQDEP@
-CAMLP5O   = @CAMLP5O@
+COQCAMLP  = @COQCAMLP@
+COQCAMLPLIB = @COQCAMLPLIB@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 
 ifeq (@enable_menhirLib@,yes)
@@ -98,7 +99,7 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
 COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
 
-TARGET_EMACS = share/emacs/why3.elc
+TARGET_EMACS = share/emacs/why3-mode.elc
 
 ###############
 # main target
@@ -341,15 +342,15 @@ uninstall: clean_old_install
 	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
 
 clean_old_install::
-	rm -f $(DATADIR)/emacs/site-lisp/why3.el
+	rm -f $(DATADIR)/emacs/site-lisp/why3-mode.el
 ifneq ($(EMACS),no)
-	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
+	rm -f $(DATADIR)/emacs/site-lisp/why3-mode.elc
 endif
 
 install_no_local::
-	cp -f share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
+	cp -f share/emacs/why3-mode.el $(DATADIR)/emacs/site-lisp/why3-mode.el
 ifneq ($(EMACS),no)
-	cp -f share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
+	cp -f share/emacs/why3-mode.elc $(DATADIR)/emacs/site-lisp/why3-mode.elc
 endif
 
 
@@ -874,7 +875,7 @@ COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
-COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
+COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
@@ -901,8 +902,8 @@ lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
-	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
-	    $(CAMLP5O) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
+	$(if $(QUIET),@echo 'Camlp    $<' &&) \
+	    $(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \

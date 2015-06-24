@@ -1958,7 +1958,7 @@ let copy_external_proof
             let old = open_in file in
             let ch = open_out dst_file in
             let fmt = formatter_of_out_channel ch in
-            Driver.print_task ~old ~cntexample:false driver dst_file fmt task;
+            Driver.print_task ~old driver fmt task;
             close_in old;
             close_out ch;
             let dst_file = Sysutil.relativize_filename dir dst_file in
@@ -2006,7 +2006,7 @@ let update_edit_external_proof ~cntexample env_session a =
   in
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
-  Driver.print_task ~cntexample ?old driver file fmt goal;
+  Driver.print_task ~cntexample ?old driver fmt goal;
   Opt.iter close_in old;
   close_out ch;
   file

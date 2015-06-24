@@ -597,7 +597,7 @@ module Save_VCs = struct
       GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn
         (fun fmt ->
-          Driver.print_task ~cntexample dr vc_fn fmt task)
+          Driver.print_task ~cntexample dr fmt task)
 
    let compute_trace =
      let rec compute_trace acc f =
