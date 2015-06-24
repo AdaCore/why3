@@ -1,5 +1,4 @@
 open Why3
-open Term
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -371,7 +370,7 @@ let register_result goal result =
          nb_goals_done := !nb_goals_done + n;
 	 
 	 match Gnat_config.ce_mode with 
-	 | On -> 
+	 | Gnat_config.On -> 
 	   begin
 	     (* The goal will be scheduled to get a counter-example *)
 	     obj_rec.not_proved <- true;
@@ -382,7 +381,7 @@ let register_result goal result =
 	 
              obj, Counter_Example
 	   end 
-	 | Off ->
+	 | Gnat_config.Off ->
 	   obj, Not_Proved
    end
    end
