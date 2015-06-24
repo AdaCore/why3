@@ -916,12 +916,6 @@ let print_variant fmt varl =
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let print_list_next sep print fmt = function
-  | [] -> ()
-  | [x] -> print true fmt x
-  | x :: r -> print true fmt x; sep fmt ();
-      Pp.print_list sep (print false) fmt r
-
 let debug_print_labels = Debug.register_info_flag "print_labels"
   ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 
@@ -1096,7 +1090,7 @@ and print_let_defn fmt = function
         (print_cexp false 0 (*4*)) c
   | LDrec rdl ->
       List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdl;
-      print_list_next Pp.newline print_rec_fun fmt rdl;
+      Pp.print_list_next Pp.newline print_rec_fun fmt rdl;
       List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdl
 
 and print_rec_fun fst fmt fd =

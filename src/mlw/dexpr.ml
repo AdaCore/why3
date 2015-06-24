@@ -1246,11 +1246,6 @@ let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
       let e = expr uloc env_empty de in
       if e_ghost e && not ghost then Loc.errorm ?loc:id.pre_loc
         "Variable %s must be explicitly marked ghost" id.pre_name;
-(* TODO: this must be done at the declaration level
-      if not (ity_closed e.e_ity) then Loc.errorm ?loc:id.pre_loc
-        "Top-level variables must have monomorphic type";
-      if not (Eexec (Cfun | Cany)) then Loc.errorm ?loc:id.pre_loc
-        "Top-level computations must carry a specification"; *)
       fst (let_var id ~ghost e)
   | RKlemma, ([], _) -> Loc.errorm ?loc:id.pre_loc
       "Lemma-functions must have parameters"

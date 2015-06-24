@@ -327,7 +327,7 @@ let do_theory env drv fname tname th glist elist =
       | None -> eprintf "Symbol '%s' has no definition in theory '%s'.@." x tname;
         exit 1
       | Some d ->
-        let l,t = Decl.open_ls_defn d in
+        let l,_t = Decl.open_ls_defn d in
         match l with
         | [] ->
 (* TODO

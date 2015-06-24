@@ -101,20 +101,10 @@ val add_pdecl : wp:bool -> pmodule_uc -> pdecl -> pmodule_uc
 (** {2 Builtin symbols} *)
 
 val builtin_module : pmodule
-
 val bool_module : pmodule
-
-(* TODO
 val unit_module : pmodule
-*)
-
 val highord_module : pmodule
-
 val tuple_module : int -> pmodule
-
-val tuple_module_name : string -> int option
-
-val add_pdecl_with_tuples : pmodule_uc -> pdecl -> pmodule_uc
 
 (** {2 WhyML language} *)
 

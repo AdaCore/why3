@@ -69,7 +69,6 @@ val pd_int : pdecl
 val pd_real : pdecl
 val pd_equ : pdecl
 val pd_bool : pdecl
-val pd_unit : pdecl
 val pd_tuple : int -> pdecl
 val pd_func : pdecl
 val pd_pred : pdecl

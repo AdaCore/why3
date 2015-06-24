@@ -31,6 +31,10 @@ val print_list_or_default :
 val print_list_par :
   (Format.formatter -> unit -> 'a) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
+val print_list_next :
+  (Format.formatter -> unit -> unit) ->
+  (bool -> Format.formatter -> 'a -> unit) ->
+  Format.formatter -> 'a list -> unit
 val print_list_delim :
   start:(Format.formatter -> unit -> unit) ->
   stop:(Format.formatter -> unit -> unit) ->

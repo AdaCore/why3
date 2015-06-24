@@ -264,52 +264,70 @@ let highord_module =
   let m = close_module uc in
   { m with mod_theory = highord_theory }
 
-let tuple_module _n = assert false (* TODO *)
+let tuple_module = Hint.memo 17 (fun n ->
+  let nm = "Tuple" ^ string_of_int n in
+  let uc = empty_module None (id_fresh nm) ["why3";nm] in
+  let uc = add_pdecl uc (pd_tuple n) in
+  let m = close_module uc in
+  { m with mod_theory = tuple_theory n })
 
-let tuple_module_name s = Theory.tuple_theory_name s
-
-(* TODO
 let unit_module =
   let uc = empty_module None (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
-  let uc = add_pdecl uc pd_unit in
-  let m = close_module uc in
-  { m with mod_theory = unit_theory }
-*)
+  let td = create_alias_decl (id_fresh "unit") [] ity_unit in
+  let uc = add_pdecl uc (create_type_decl [td]) in
+  close_module uc
 
 let create_module env ?(path=[]) n =
   let m = empty_module (Some env) n path in
   let m = use_export m builtin_module in
   let m = use_export m bool_module in
-(* TODO
   let m = use_export m unit_module in
-*)
-  let m = use_export m highord_module in
   m
 
 let add_pdecl ~wp uc d =
+  let ids = Mid.set_diff d.pd_syms uc.muc_known in
+  let uc = Sid.fold (fun id uc ->
+    if id_equal id ts_func.ts_name then
+      use_export uc highord_module
+    else match is_ts_tuple_id id with
+    | Some n -> use_export uc (tuple_module n)
+    | None -> uc) ids uc in
   ignore wp; (* TODO *)
   let uc = add_pdecl uc d in
   let th = List.fold_left Theory.add_decl uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }
 
-let add_pdecl_with_tuples _uc _md = assert false (*TODO*)
-
 (** {2 WhyML language} *)
 
 type mlw_file = pmodule Mstr.t
 
-let mlw_language =
-  let conv mm = Mstr.map (fun m -> m.mod_theory) mm in
-  (Env.register_language Env.base_language conv : mlw_file Env.language)
+let convert =
+  let dummy_env = Env.create_env [] in
+  let convert mm = Mstr.map (fun m -> m.mod_theory) mm in
+  fun mm -> if Mstr.is_empty mm then Mstr.empty else
+    match (snd (Mstr.choose mm)).mod_theory.th_path with
+    | ("why3" :: _) as path ->
+        begin try Env.read_library Env.base_language dummy_env path
+        with Env.LibraryNotFound _ -> convert mm end
+    | _ -> convert mm
 
-(* TODO
-let () = Env.add_builtin mlw_language (function
-  | [s] when s = mod_prelude.mod_theory.th_name.id_string ->
-      Mstr.singleton s mod_prelude,
-      Mstr.singleton s mod_prelude.mod_theory
-  | _ -> raise Not_found)
-*)
+let mlw_language = Env.register_language Env.base_language convert
+
+open Theory
+
+let () =
+  let builtin s =
+    if s = unit_module.mod_theory.th_name.id_string then unit_module else
+    if s = builtin_theory.th_name.id_string then builtin_module else
+    if s = highord_theory.th_name.id_string then highord_module else
+    if s = bool_theory.th_name.id_string then bool_module else
+    match tuple_theory_name s with
+    | Some n -> tuple_module n
+    | None -> raise Not_found in
+  Env.add_builtin mlw_language (function
+    | [s] -> Mstr.singleton s (builtin s)
+    | _   -> raise Not_found)
 
 exception ModuleNotFound of Env.pathname * string
 

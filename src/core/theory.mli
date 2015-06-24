@@ -202,8 +202,6 @@ val builtin_theory : theory
 
 val bool_theory : theory
 
-val unit_theory : theory
-
 val highord_theory : theory
 
 val tuple_theory : int -> theory

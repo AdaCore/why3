@@ -12,6 +12,7 @@
 open Ident
 open Ty
 open Term
+open Decl
 open Ity
 open Expr
 
@@ -38,17 +39,17 @@ let check_field stv f =
   let loc = f.pv_vs.vs_name.id_loc in
   let ftv = ity_freevars Stv.empty f.pv_ity in
   if not (Stv.subset ftv stv) then Loc.error ?loc
-    (Ty.UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
+    (UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
   if not f.pv_ity.ity_pure then Loc.error ?loc
-    (Ity.ImpureField f.pv_ity)
+    (ImpureField f.pv_ity)
 
 let check_invariant stv svs p =
   let ptv = t_ty_freevars Stv.empty p in
   let pvs = t_freevars Mvs.empty p in
   if not (Stv.subset ptv stv) then Loc.error ?loc:p.t_loc
-    (Ty.UnboundTypeVar (Stv.choose (Stv.diff ptv stv)));
+    (UnboundTypeVar (Stv.choose (Stv.diff ptv stv)));
   if not (Mvs.set_submap pvs svs) then Loc.error ?loc:p.t_loc
-    (Decl.UnboundVar (fst (Mvs.choose (Mvs.set_diff pvs svs))))
+    (UnboundVar (fst (Mvs.choose (Mvs.set_diff pvs svs))))
 
 let check_pure_its s = not s.its_privmut &&
   s.its_mfields = [] && s.its_regions = [] &&
@@ -144,7 +145,7 @@ let create_rec_variant_decl s cl =
 
 type pdecl = {
   pd_node : pdecl_node;
-  pd_pure : Decl.decl list;
+  pd_pure : decl list;
   pd_syms : Sid.t;
   pd_news : Sid.t;
   pd_tag  : int;
@@ -159,7 +160,7 @@ and pdecl_node =
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
 let get_news node pure =
-  let news_id news id = Sid.add_new (Decl.ClashIdent id) id news in
+  let news_id news id = Sid.add_new (ClashIdent id) id news in
   let news_rs news s = news_id news s.rs_name in
   let news = match node with
     | PDtype dl ->
@@ -175,7 +176,7 @@ let get_news node pure =
         List.fold_left news_rd Sid.empty rdl
     | PDexn xs -> news_id Sid.empty xs.xs_name
     | PDpure -> Sid.empty in
-  let news_pure news d = Sid.union news d.Decl.d_news in
+  let news_pure news d = Sid.union news d.d_news in
   List.fold_left news_pure news pure
 
 let get_syms node pure =
@@ -183,7 +184,7 @@ let get_syms node pure =
   let syms_ls s ls = Sid.add ls.ls_name s in
   let syms_ty s ty = ty_s_fold syms_ts s ty in
   let syms_term s t = t_s_fold syms_ty syms_ls s t in
-  let syms_pure syms d = Sid.union syms d.Decl.d_syms in
+  let syms_pure syms d = Sid.union syms d.d_syms in
   let syms_vari syms (t,r) = Opt.fold syms_ls (syms_term syms t) r in
   let syms = List.fold_left syms_pure Sid.empty pure in
   let syms_its syms s = Sid.add s.its_ts.ts_name syms in
@@ -296,10 +297,42 @@ let mk_decl = let r = ref 0 in fun node pure ->
     pd_tag  = (incr r; !r) }
 
 let create_type_decl dl =
-  let ldl = assert false (* TODO *) in
-  mk_decl (PDtype dl) ldl
+  let add_itd ({itd_its = s} as itd) (abst,defn,proj) =
+    match itd.itd_fields, itd.itd_constructors with
+    | fl, ([{rs_logic = RLnone}]|[]) ->
+        let get_ld s ldd = match s.rs_logic with
+          | RLls s -> create_param_decl s :: ldd | _ -> assert false in
+        create_ty_decl s.its_ts :: abst, defn, List.fold_right get_ld fl proj
+    | fl, cl ->
+        let add s f = Mpv.add (Opt.get f.rs_field) f s in
+        let mf = List.fold_left add Mpv.empty fl in
+        let get_fd s = match s.rs_logic with
+          | RLls s -> s | _ -> assert false in
+        let get_pj v = Opt.map get_fd (Mpv.find_opt v mf) in
+        let get_cs s = match s.rs_logic with
+          | RLls cs -> cs, List.map get_pj s.rs_cty.cty_args
+          | _ -> assert false in
+        abst, (s.its_ts, List.map get_cs cl) :: defn, proj in
+  let abst,defn,proj = List.fold_right add_itd dl ([],[],[]) in
+  let defn = if defn = [] then [] else [create_data_decl defn] in
+  mk_decl (PDtype dl) (abst @ defn @ proj)
 
-let create_let_decl ld = let _ = PDlet ld in assert false (* TODO *)
+let create_let_decl ld =
+  let ls_of_rs s dl = match s.rs_logic with
+    | RLnone | RLlemma -> dl
+    | RLpv _ -> invalid_arg "Pdecl.create_let_decl"
+    | RLls s -> create_param_decl s :: dl in
+  let ldl = match ld with
+    | LDvar ({pv_vs = {vs_name = {id_loc = loc}}},e) ->
+        if not (ity_closed e.e_ity) then
+          Loc.errorm ?loc "Top-level variables must have monomorphic type";
+        if match e.e_node with Eexec _ -> false | _ -> true then
+          Loc.errorm ?loc "Top-level computations must carry a specification";
+        []
+    | LDrec rdl -> List.fold_right (fun d dl -> ls_of_rs d.rec_sym dl) rdl []
+    | LDsym (s,_) -> ls_of_rs s [] in
+  (* TODO: real function definitions and lemmas *)
+  mk_decl (PDlet ld) ldl
 
 let create_exn_decl xs =
   if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
@@ -325,11 +358,6 @@ let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
       mk_decl PDpure [de]
   | _ -> assert false
 
-let pd_unit = match unit_theory.th_decls with
-  | [{td_node = Use _t0}; {td_node = Decl du}] ->
-      mk_decl (PDtype [mk_itd its_unit [] [] []]) [du]
-  | _ -> assert false
-
 let pd_func, pd_pred, pd_func_app = match highord_theory.th_decls with
   | [{td_node = Use _bo};
      {td_node = Decl df}; {td_node = Decl dp}; {td_node = Decl da}] ->
@@ -343,32 +371,88 @@ let pd_bool = match bool_theory.th_decls with
       mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] []]) [db]
   | _ -> assert false
 
-let pd_tuple _n = assert false (*TODO*)
+let pd_tuple = Stdlib.Hint.memo 17 (fun n ->
+  match (tuple_theory n).th_decls with
+  | [{td_node = Decl dt}] ->
+      mk_decl (PDtype [mk_itd (its_tuple n) [] [rs_tuple n] []]) [dt]
+  | _ -> assert false)
 
 (** {2 Known identifiers} *)
 
 type known_map = pdecl Mid.t
 
 let known_id kn id =
-  if not (Mid.mem id kn) then raise (Decl.UnknownIdent id)
+  if not (Mid.mem id kn) then raise (UnknownIdent id)
 
 let merge_known kn1 kn2 =
   let check_known id decl1 decl2 =
     if pd_equal decl1 decl2 then Some decl1
-    else raise (Decl.RedeclaredIdent id) in
+    else raise (RedeclaredIdent id) in
   Mid.union check_known kn1 kn2
 
 let known_add_decl kn0 d =
   let kn = Mid.map (Util.const d) d.pd_news in
   let check id decl0 _ =
     if pd_equal decl0 d
-    then raise (Decl.KnownIdent id)
-    else raise (Decl.RedeclaredIdent id) in
+    then raise (KnownIdent id)
+    else raise (RedeclaredIdent id) in
   let kn = Mid.union check kn0 kn in
   let unk = Mid.set_diff d.pd_syms kn in
   if Sid.is_empty unk then kn else
-    raise (Decl.UnknownIdent (Sid.choose unk))
+    raise (UnknownIdent (Sid.choose unk))
 
 (** {2 Pretty-printing} *)
 
-let print_pdecl _fmt _d = assert false (* TODO *)
+open Format
+
+let print_its_defn fst fmt itd =
+  let s = itd.itd_its in
+  let print_args pr fmt tl = if tl <> [] then
+    fprintf fmt "@ %a" (Pp.print_list Pp.space pr) tl in
+  let print_regs pr fmt rl = if rl <> [] then
+    fprintf fmt "@ <%a>" (Pp.print_list Pp.comma pr) rl in
+  let print_field fmt f = fprintf fmt "%s%s%a%a : %a"
+    (if List.exists (pv_equal (Opt.get f.rs_field)) s.its_mfields
+      then "mutable " else "") (if rs_ghost f then "ghost " else "")
+    print_rs f Pretty.print_id_labels f.rs_name
+    print_ity f.rs_cty.cty_result in
+  let print_proj mf fmt f = match Mpv.find_opt f mf with
+    | Some f -> fprintf fmt "@ (%a)" print_field f
+    | _ when f.pv_ghost -> fprintf fmt "@ (ghost %a)" print_ity f.pv_ity
+    | _ -> fprintf fmt "@ %a" print_ity f.pv_ity in
+  let print_constr mf fmt c = fprintf fmt "@\n@[<hov 4}| %a%a%a@]"
+    print_rs c Pretty.print_id_labels c.rs_name
+    (Pp.print_list Pp.nothing (print_proj mf)) c.rs_cty.cty_args in
+  let print_defn fmt () =
+    match s.its_def, itd.itd_fields, itd.itd_constructors with
+    | Some ity, _, _ -> fprintf fmt " = %a" print_ity ity
+    | _, [], [] -> if s.its_privmut then fprintf fmt " = mutable {}"
+    | _, fl, [] -> fprintf fmt " = private%s { %a }"
+        (if s.its_privmut && s.its_mfields = [] then " mutable" else "")
+        (Pp.print_list Pp.semi print_field) fl
+    | _, fl, [_] when s.its_mfields <> [] || itd.itd_invariant <> [] ->
+        (* only records can have mutable fields or invariants *)
+        fprintf fmt " = { %a }"
+        (Pp.print_list Pp.semi print_field) fl
+    | _, fl, cl ->
+        let add s f = Mpv.add (Opt.get f.rs_field) f s in
+        let mf = List.fold_left add Mpv.empty fl in
+        Pp.print_list Pp.nothing (print_constr mf) fmt cl in
+  let print_inv fmt f = fprintf fmt
+    "@\n@  invariant { %a }" Pretty.print_term f in
+  fprintf fmt "@[<hov 2>%s %a%a%a%a%a%a@]"
+    (if fst then "type" else "with")
+    print_its s
+    Pretty.print_id_labels s.its_ts.ts_name
+    (print_args Pretty.print_tv) s.its_ts.ts_args
+    (print_regs print_reg) s.its_regions
+    print_defn ()
+    (Pp.print_list Pp.nothing print_inv) itd.itd_invariant
+
+let print_pdecl fmt d = match d.pd_node with
+  | PDtype dl -> Pp.print_list_next Pp.newline print_its_defn fmt dl
+  | PDlet ld -> print_let_defn fmt ld
+  | PDexn xs -> fprintf fmt
+      "@[<hov 2>exception %a%a of@ %a@]"
+        print_xs xs Pretty.print_id_labels xs.xs_name print_ity xs.xs_ity
+  | PDpure -> Pp.print_list Pp.newline2 Pretty.print_decl fmt d.pd_pure

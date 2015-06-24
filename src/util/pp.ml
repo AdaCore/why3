@@ -47,6 +47,12 @@ let print_list_delim ~start ~stop ~sep pr fmt = function
   | [] -> ()
   | l -> fprintf fmt "%a%a%a" start () (print_list sep pr) l stop ()
 
+let print_list_next sep print fmt = function
+  | [] -> ()
+  | [x] -> print true fmt x
+  | x :: r ->
+      print true fmt x; sep fmt ();
+      print_list sep (print false) fmt r
 
 let print_iter1 iter sep print fmt l =
   let first = ref true in
