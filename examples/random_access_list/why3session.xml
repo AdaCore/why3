@@ -7,8 +7,8 @@
 <prover id="4" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.3" timelimit="1" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="15" memlimit="1000"/>
-<file name="../random_access_list.mlw" expanded="true">
-<theory name="RandomAccessList" sum="10f317f24c1421f793cea88f1312650d" expanded="true">
+<file name="../random_access_list.mlw">
+<theory name="RandomAccessList" sum="d27743d57c1d4ea4700ca93cff755188">
  <goal name="WP_parameter length_flatten" expl="VC for length_flatten">
  <transf name="split_goal_wp">
   <goal name="WP_parameter length_flatten.1" expl="1. variant decrease">
@@ -51,7 +51,26 @@
  <proof prover="0"><result status="valid" time="0.34" steps="410"/></proof>
  </goal>
  <goal name="WP_parameter tail" expl="VC for tail">
- <proof prover="8"><result status="valid" time="0.12" steps="271"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter tail.1" expl="1. unreachable point">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.4" expl="4. variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.6" expl="6. postcondition">
+  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="WP_parameter set" expl="VC for set">
  <transf name="split_goal_wp">
@@ -59,7 +78,7 @@
   <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter set.2" expl="2. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="8" timelimit="10"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter set.3" expl="3. postcondition">
   <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="46"/></proof>
@@ -86,7 +105,7 @@
   <proof prover="8" timelimit="5"><result status="valid" time="0.03" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter set.11" expl="11. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.04" steps="99"/></proof>
+  <proof prover="8" timelimit="10"><result status="valid" time="0.02" steps="99"/></proof>
   </goal>
   <goal name="WP_parameter set.12" expl="12. postcondition">
   <proof prover="8" timelimit="5"><result status="valid" time="0.03" steps="60"/></proof>
@@ -117,10 +136,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter set.18" expl="18. postcondition">
-  <proof prover="8" timelimit="10"><result status="valid" time="0.87" steps="511"/></proof>
+  <proof prover="8" timelimit="5"><result status="valid" time="0.87" steps="511"/></proof>
   </goal>
   <goal name="WP_parameter set.19" expl="19. postcondition">
-  <proof prover="8" timelimit="10"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="8" timelimit="5"><result status="valid" time="0.04" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter set.20" expl="20. postcondition">
   <proof prover="8" timelimit="10"><result status="valid" time="0.03" steps="94"/></proof>
@@ -145,7 +164,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="RandomAccessListWithSeq" sum="0a2ddaba4620ea7f427c7e1c523e87b5" expanded="true">
+<theory name="RandomAccessListWithSeq" sum="98a44fae0089720a7e399a74aaafb1d9">
  <goal name="WP_parameter size" expl="VC for size">
  <transf name="split_goal_wp">
   <goal name="WP_parameter size.1" expl="1. postcondition">
@@ -212,22 +231,22 @@
  <goal name="WP_parameter tail" expl="VC for tail">
  <transf name="split_goal_wp">
   <goal name="WP_parameter tail.1" expl="1. unreachable point">
-  <proof prover="8"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="8"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter tail.2" expl="2. postcondition">
-  <proof prover="8"><result status="valid" time="0.05" steps="75"/></proof>
+  <proof prover="8"><result status="valid" time="0.04" steps="68"/></proof>
   </goal>
   <goal name="WP_parameter tail.3" expl="3. precondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter tail.4" expl="4. variant decrease">
-  <proof prover="8"><result status="valid" time="0.03" steps="34"/></proof>
+  <proof prover="8"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter tail.5" expl="5. precondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter tail.6" expl="6. postcondition">
-  <proof prover="8"><result status="valid" time="6.13" steps="521"/></proof>
+  <proof prover="8"><result status="valid" time="4.78" steps="526"/></proof>
   </goal>
  </transf>
  </goal>
@@ -264,7 +283,7 @@
   <proof prover="8"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter set.11" expl="11. postcondition">
-  <proof prover="8"><result status="valid" time="2.39" steps="610"/></proof>
+  <proof prover="8"><result status="valid" time="1.71" steps="610"/></proof>
   </goal>
  </transf>
  </goal>
