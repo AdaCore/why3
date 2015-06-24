@@ -39,12 +39,13 @@ let run_goal entry =
     | true, Some { Session.proof_edited_as = Some fn } ->
        Some fn, Some true, 0
     | _ -> None, None, Gnat_config.timeout in
+  let steplimit = Gnat_config.steps ~prover:base_prover.Whyconf.prover.Whyconf.prover_name in
   Driver.prove_task_server
-    base_prover.Whyconf.command
+    (Whyconf.get_complete_command base_prover steplimit)
     ~cntexample:entry.cntexample
     ~timelimit:timeout
     ~memlimit:0
-    ~steplimit:Gnat_config.steps
+    ~steplimit
     ?old:old ?inplace:inplace
     driver
     (Session.goal_task g)

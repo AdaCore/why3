@@ -463,10 +463,21 @@ let timeout =
          if !opt_steps <> None then 0
          else default_timeout
 
-let steps =
+let min a b =
+  if a <= b then
+    a
+  else
+    b
+
+let steps ~prover =
   match !opt_steps with
   | None -> -1
-  | Some c -> c
+  | Some c -> 
+    let prover = String.sub prover 0 (min 4 (String.length prover)) in 
+    if prover = "CVC4" then
+      50000 + c*250
+    else
+      c
 
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy

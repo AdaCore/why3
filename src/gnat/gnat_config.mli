@@ -36,8 +36,8 @@ val manual_prover : prover option
 val timeout : int
 (* value of the -t/--timeout option, default value 10 *)
 
-val steps : int
-(* value of the --steps option, default value is -1 *)
+val steps : prover : string -> int
+(* value of the --steps option adjusted for given prover, default value is -1 *)
 
 type proof_mode =
     Then_Split
