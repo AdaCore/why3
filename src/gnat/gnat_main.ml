@@ -91,7 +91,7 @@ let rec handle_vc_result goal result prover_result manual_info =
            Gnat_objectives.Save_VCs.save_trace goal
          | _ -> ""
        in
-       let cntexmpfile = 
+       let cntexmpfile =
 	 match prover_result with
 	 | None ->
 	   ""
@@ -103,7 +103,10 @@ let rec handle_vc_result goal result prover_result manual_info =
    | Gnat_objectives.Work_Left ->
        List.iter (create_manual_or_schedule obj) (Gnat_objectives.next obj)
    | Gnat_objectives.Counter_Example ->
-     Gnat_objectives.schedule_goal_with_prover ~cntexample:true goal Gnat_config.prover_ce
+     (* In this case, counter-example prover will be never None *)
+     let prover_ce = (Opt.get Gnat_config.prover_ce) in
+     Gnat_objectives.schedule_goal_with_prover ~cntexample:true goal
+       prover_ce
 
 and interpret_result pa pas =
    (* callback function for the scheduler, here we filter if an interesting

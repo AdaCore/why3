@@ -255,7 +255,7 @@ let provers, prover_ce, config, env =
   (* now we build the Whyconf.config_prover for all requested provers
    * and for the prover for counter-example generation *)
   let base_provers, base_prover_ce =
-    try 
+    try
       let filter_prover prover_string =
 	Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover_string) in
       let base_provers = match prover_str_list with
@@ -264,9 +264,13 @@ let provers, prover_ce, config, env =
         (* default provers are cvc4 and altergo. in this order *)
           List.map filter_prover ["cvc4";"altergo"]
 	| l ->
-        List.map filter_prover l in
+          List.map filter_prover l in
       (* the prover for counterexample generation *)
-      let base_prover_ce = filter_prover "cvc4_ce" in
+      let base_prover_ce =
+	if !opt_ce_mode = On then
+	  Some (filter_prover "cvc4_ce")
+	else
+	  None in
       base_provers, base_prover_ce
     with
     | Not_found ->
@@ -313,7 +317,10 @@ let provers, prover_ce, config, env =
         editor = prover_editor base_prover } in
   let provers =
     List.map build_prover_rec base_provers in
-  let prover_ce = build_prover_rec base_prover_ce in
+  let prover_ce = match base_prover_ce with
+    | Some base_prover_ce ->
+      Some (build_prover_rec base_prover_ce)
+    | None -> None in
   provers, prover_ce, config, env
 
 (* The function replaces %{f,t,T,m,l,d} to their corresponding values
@@ -417,7 +424,12 @@ let () =
   match !opt_prepare_shared, !opt_proof_dir with
   | (true, Some pdir) ->
     List.iter (fun prover -> build_shared pdir prover.prover) provers;
-    build_shared pdir prover_ce.prover;
+
+    let () = match prover_ce with
+    | Some prover_ce ->
+      build_shared pdir prover_ce.prover;
+    | None -> () in
+
     exit 0
   | _ -> ()
 
@@ -472,8 +484,8 @@ let min a b =
 let steps ~prover =
   match !opt_steps with
   | None -> -1
-  | Some c -> 
-    let prover = String.sub prover 0 (min 4 (String.length prover)) in 
+  | Some c ->
+    let prover = String.sub prover 0 (min 4 (String.length prover)) in
     if prover = "CVC4" then
       50000 + c*250
     else

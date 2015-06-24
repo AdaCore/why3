@@ -14,8 +14,10 @@ type prover =
 val provers : prover list
 (* the provers, either the default prover, or as given by --prover *)
 
-val prover_ce : prover
-(* the prover for counter-examples generation *)
+val prover_ce : prover option
+(* the prover for counter-examples generation
+   None if counter-example should not be generated
+*)
 
 type ce_mode =
   | On
