@@ -71,6 +71,7 @@ let create_semi_constructor id s fl pjl invl =
   create_rsymbol id c
 
 let create_flat_record_decl id args priv mut fldl invl =
+  (* TODO: replace Invalid_argument by well-located error messages *)
   let exn = Invalid_argument "Mdecl.create_flat_record_decl" in
   let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
   let add_fd fs (fm,fd) = Mpv.add_new exn fd fm fs in
@@ -117,6 +118,7 @@ let create_rec_record_decl s fldl =
   mk_itd s pjl [cs] []
 
 let create_variant_decl get_its cl =
+  (* TODO: replace Invalid_argument by well-located error messages *)
   let exn = Invalid_argument "Mdecl.create_variant_decl" in
   let pjl, fds = match cl with
     | cs::cl ->
@@ -302,7 +304,9 @@ let create_type_decl dl =
     | fl, ([{rs_logic = RLnone}]|[]) ->
         let get_ld s ldd = match s.rs_logic with
           | RLls s -> create_param_decl s :: ldd | _ -> assert false in
-        create_ty_decl s.its_ts :: abst, defn, List.fold_right get_ld fl proj
+        (* TODO: add axioms for the invariants *)
+        let proj = List.fold_right get_ld fl proj in
+        create_ty_decl s.its_ts :: abst, defn, proj
     | fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in
         let mf = List.fold_left add Mpv.empty fl in
@@ -420,7 +424,7 @@ let print_its_defn fst fmt itd =
     | Some f -> fprintf fmt "@ (%a)" print_field f
     | _ when f.pv_ghost -> fprintf fmt "@ (ghost %a)" print_ity f.pv_ity
     | _ -> fprintf fmt "@ %a" print_ity f.pv_ity in
-  let print_constr mf fmt c = fprintf fmt "@\n@[<hov 4}| %a%a%a@]"
+  let print_constr mf fmt c = fprintf fmt "@\n@[<hov 4>| %a%a%a@]"
     print_rs c Pretty.print_id_labels c.rs_name
     (Pp.print_list Pp.nothing (print_proj mf)) c.rs_cty.cty_args in
   let print_defn fmt () =
@@ -437,7 +441,7 @@ let print_its_defn fst fmt itd =
     | _, fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in
         let mf = List.fold_left add Mpv.empty fl in
-        Pp.print_list Pp.nothing (print_constr mf) fmt cl in
+        fprintf fmt " =%a" (Pp.print_list Pp.nothing (print_constr mf)) cl in
   let print_inv fmt f = fprintf fmt
     "@\n@  invariant { %a }" Pretty.print_term f in
   fprintf fmt "@[<hov 2>%s %a%a%a%a%a%a@]"

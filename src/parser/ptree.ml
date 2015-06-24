@@ -98,7 +98,7 @@ and term_desc =
 (*s Declarations. *)
 
 type use = {
-  use_theory : qualid;
+  use_module : qualid;
   use_import : (bool (* import *) * string (* as *)) option;
 }
 

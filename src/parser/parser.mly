@@ -195,11 +195,11 @@ use_clone:
 
 use:
 | boption(IMPORT) tqualid
-    { { use_theory = $2; use_import = Some ($1, qualid_last $2) } }
+    { { use_module = $2; use_import = Some ($1, qualid_last $2) } }
 | boption(IMPORT) tqualid AS uident
-    { { use_theory = $2; use_import = Some ($1, $4.id_str) } }
+    { { use_module = $2; use_import = Some ($1, $4.id_str) } }
 | EXPORT tqualid
-    { { use_theory = $2; use_import = None } }
+    { { use_module = $2; use_import = None } }
 
 clone_subst:
 | NAMESPACE ns EQUAL ns         { CSns    (floc $startpos $endpos, $2,$4) }

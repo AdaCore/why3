@@ -17,7 +17,7 @@ open Term
 open Decl
 open Theory
 open Dterm
-open Env
+open Ity
 (*
 open Pdecl
 open Pmodule
@@ -34,21 +34,21 @@ let debug_type_only  = Debug.register_flag "type_only"
 
 (** errors *)
 
+(*
 exception UnboundTypeVar of string
 exception DuplicateTypeVar of string
+*)
 
 (** lazy declaration of tuples *)
 
-let add_decl_with_tuples uc d =
-  if Debug.test_flag Glob.flag then Sid.iter Glob.def d.d_news;
-  add_decl_with_tuples uc d
-
+(*
 let add_ty_decl uc ts      = add_decl_with_tuples uc (create_ty_decl ts)
 let add_data_decl uc dl    = add_decl_with_tuples uc (create_data_decl dl)
 let add_param_decl uc ls   = add_decl_with_tuples uc (create_param_decl ls)
 let add_logic_decl uc dl   = add_decl_with_tuples uc (create_logic_decl dl)
 let add_ind_decl uc s dl   = add_decl_with_tuples uc (create_ind_decl s dl)
 let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
+*)
 
 (** symbol lookup *)
 
@@ -92,14 +92,18 @@ let find_psymbol_ns ns q =
   if ls.ls_value = None then ls else
     Loc.error ~loc:(qloc q) (PredicateSymbolExpected ls)
 
-let find_prop     uc q = find_prop_ns     (get_namespace uc) q
-let find_tysymbol uc q = find_tysymbol_ns (get_namespace uc) q
-let find_lsymbol  uc q = find_lsymbol_ns  (get_namespace uc) q
-let find_fsymbol  uc q = find_fsymbol_ns  (get_namespace uc) q
-let find_psymbol  uc q = find_psymbol_ns  (get_namespace uc) q
+let find_prop     uc q = find_prop_ns     (Theory.get_namespace uc) q
+let find_tysymbol uc q = find_tysymbol_ns (Theory.get_namespace uc) q
+let find_lsymbol  uc q = find_lsymbol_ns  (Theory.get_namespace uc) q
+let find_fsymbol  uc q = find_fsymbol_ns  (Theory.get_namespace uc) q
+let find_psymbol  uc q = find_psymbol_ns  (Theory.get_namespace uc) q
 
-let find_namespace_ns ns q =
-  find_qualid (fun _ -> Glob.dummy_id) ns_find_ns ns q
+let find_itysymbol_ns ns q =
+  find_qualid (fun s -> s.its_ts.ts_name) Pmodule.ns_find_its ns q
+
+let get_namespace uc = List.hd uc.Pmodule.muc_import
+
+let find_itysymbol uc q = find_itysymbol_ns (get_namespace uc) q
 
 (** Parsing types *)
 
@@ -356,6 +360,139 @@ let type_fmla uc gvars f =
 
 (** Typing declarations *)
 
+open Pdecl
+open Pmodule
+
+let add_pdecl ~wp uc d =
+  if Debug.test_flag Glob.flag then Sid.iter Glob.def d.pd_news;
+  add_pdecl ~wp uc d
+
+let add_decl uc d = add_pdecl ~wp:false uc (create_pure_decl d)
+
+let add_types uc tdl =
+  let add m d =
+    let x = d.td_ident.id_str in
+    Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol x)) x d m in
+  let def = List.fold_left add Mstr.empty tdl in
+  let hts = Hstr.create 5 in
+  let htd = Hstr.create 5 in
+  let rec visit ~alias ~alg x d = if not (Hstr.mem htd x) then
+    let id = create_user_id d.td_ident and loc = d.td_loc in
+    let args = List.map (fun id -> tv_of_string id.id_str) d.td_params in
+    match d.td_def with
+    | TDabstract ->
+        if d.td_inv <> [] then Loc.errorm ~loc
+          "Abstract non-record types cannot have invariants";
+        let itd = create_abstract_type_decl id args d.td_mut in
+        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+    | TDalias pty ->
+        if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
+          "Alias types cannot be abstract, private. or mutable";
+        if d.td_inv <> [] then Loc.errorm ~loc
+          "Alias types cannot have invariants";
+        let alias = Sstr.add x alias in
+        let ity = parse ~loc ~alias ~alg pty in
+        if not (Hstr.mem htd x) then
+        let itd = create_alias_decl id args ity in
+        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+    | TDalgebraic csl ->
+        if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
+          "Algebraic types cannot be abstract, private. or mutable";
+        if d.td_inv <> [] then Loc.errorm ~loc
+          "Algebraic types cannot have invariants";
+        let hfd = Hstr.create 5 in
+        let alias = Sstr.empty in
+        let alg = Mstr.add x (id,args) alg in
+        let get_pj (_, id, ghost, pty) = match id with
+          | Some ({id_str = n} as id) ->
+              let ity = parse ~loc ~alias ~alg pty in
+              let v = try Hstr.find hfd n with Not_found ->
+                let v = create_pvsymbol (create_user_id id) ~ghost ity in
+                Hstr.add hfd n v;
+                v in
+              if not (ity_equal v.pv_ity ity && ghost = v.pv_ghost) then
+                Loc.errorm ~loc "Conflicting definitions for field %s" n;
+              true, v
+          | None ->
+              let ity = parse ~loc ~alias ~alg pty in
+              false, create_pvsymbol (id_fresh "a") ~ghost ity in
+        let get_cs (_, id, pjl) = create_user_id id, List.map get_pj pjl in
+        let csl = List.map get_cs csl in
+        begin match try Some (Hstr.find hts x) with Not_found -> None with
+        | Some s ->
+            Hstr.add htd x (create_rec_variant_decl s csl)
+        | None ->
+            let itd = create_flat_variant_decl id args csl in
+            Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
+    | TDrecord fl ->
+        let alias = Sstr.empty in
+        let alg = Mstr.add x (id,args) alg in
+        let get_fd fd =
+          let id = create_user_id fd.f_ident in
+          let ity = parse ~loc ~alias ~alg fd.f_pty in
+          let ghost = d.td_vis = Abstract || fd.f_ghost in
+          fd.f_mutable, create_pvsymbol id ~ghost ity in
+        let fl = List.map get_fd fl in
+        begin match try Some (Hstr.find hts x) with Not_found -> None with
+        | Some s ->
+            if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
+              "Recursive types cannot be abstract, private. or mutable";
+            if d.td_inv <> [] then Loc.errorm ~loc
+              "Recursive types cannot have invariants";
+            let get_fd (mut, fd) = if mut then Loc.errorm ~loc
+              "Recursive types cannot have mutable fields" else fd in
+            Hstr.add htd x (create_rec_record_decl s (List.map get_fd fl))
+        | None ->
+            let priv = d.td_vis <> Public and mut = d.td_mut in
+            let add_fd m (_, {pv_vs = v}) =
+              Mstr.add v.vs_name.id_string v m in
+            let gvars = List.fold_left add_fd Mstr.empty fl in
+            let gvars q = match q with
+              | Qident x -> Mstr.find_opt x.id_str gvars | _ -> None in
+            let invl = List.map (type_fmla uc.muc_theory gvars) d.td_inv in
+            let itd = create_flat_record_decl id args priv mut fl invl in
+            Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
+
+  and parse ~loc ~alias ~alg pty =
+    let rec down = function
+      | PTtyvar id ->
+          ity_var (tv_of_string id.id_str)
+      | PTtyapp (q,tyl) ->
+          let s = match q with
+            | Qident {id_str = x} when Sstr.mem x alias ->
+                Loc.errorm ~loc "Cyclic type definition"
+            | Qident {id_str = x} when Mstr.mem x alg ->
+                let id, args = Mstr.find x alg in
+                let s = create_itysymbol_pure id args in
+                Hstr.add hts x s; s
+            | Qident {id_str = x} when Mstr.mem x def ->
+                let d = Mstr.find x def in
+                visit ~alias ~alg x d;
+                Hstr.find hts x
+            | _ ->
+                find_itysymbol uc q in
+          Loc.try2 ~loc:(qloc q) ity_app_fresh s (List.map down tyl)
+      | PTtuple tyl -> ity_tuple (List.map down tyl)
+      | PTarrow (ty1,ty2) -> ity_func (down ty1) (down ty2)
+      | PTparen ty -> down ty in
+    down pty in
+
+  Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
+  let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
+  add_pdecl ~wp:true uc (create_type_decl tdl)
+
+(* TODO
+    | ClashSymbol s ->
+        Loc.error ?loc:(look_for_loc tdl s) (ClashSymbol s)
+    | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
+        Loc.error ?loc:(look_for_loc tdl s) (RecordFieldMissing (cs,ls))
+    | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
+        Loc.error ?loc:(look_for_loc tdl s) (DuplicateRecordField (cs,ls))
+    | DuplicateVar { vs_name = { id_string = s }} ->
+        Loc.errorm ?loc:(look_for_loc tdl s)
+          "Field %s is used twice in the same constructor" s
+*)
+
 let tyl_of_params uc pl =
   let ty_of_param (loc,_,gh,ty) =
     if gh then Loc.errorm ~loc
@@ -363,167 +500,21 @@ let tyl_of_params uc pl =
     ty_of_pty uc ty in
   List.map ty_of_param pl
 
-let add_types dl th =
-  let def = List.fold_left
-    (fun def d ->
-      let id = d.td_ident.id_str in
-      Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d def)
-    Mstr.empty dl
-  in
-  let tysymbols = Hstr.create 17 in
-  let rec visit x =
-    let d = Mstr.find x def in
-    try
-      match Hstr.find tysymbols x with
-        | None -> Loc.errorm ~loc:d.td_loc "Cyclic type definition"
-        | Some ts -> ts
-    with Not_found ->
-      Hstr.add tysymbols x None;
-      let vars = Hstr.create 17 in
-      let vl = List.map (fun id ->
-        if Hstr.mem vars id.id_str then
-          Loc.error ~loc:id.id_loc (DuplicateTypeVar id.id_str);
-        let i = tv_of_string id.id_str in
-        Hstr.add vars id.id_str i;
-        i) d.td_params
-      in
-      let id = create_user_id d.td_ident in
-      let ts = match d.td_def with
-        | TDalias ty ->
-            let rec apply = function
-              | PTtyvar v ->
-                  begin
-                    try ty_var (Hstr.find vars v.id_str) with Not_found ->
-                      Loc.error ~loc:v.id_loc (UnboundTypeVar v.id_str)
-                  end
-              | PTtyapp (q, tyl) ->
-                  let ts = match q with
-                    | Qident x when Mstr.mem x.id_str def ->
-                        visit x.id_str
-                    | Qident _ | Qdot _ ->
-                        find_tysymbol th q
-                  in
-                  Loc.try2 ~loc:(qloc q) ty_app ts (List.map apply tyl)
-              | PTtuple tyl ->
-                  let ts = ts_tuple (List.length tyl) in
-                  ty_app ts (List.map apply tyl)
-              | PTarrow (ty1, ty2) ->
-                  ty_func (apply ty1) (apply ty2)
-              | PTparen ty ->
-                  apply ty
-            in
-            create_tysymbol id vl (Some (apply ty))
-        | TDabstract | TDalgebraic _ ->
-            create_tysymbol id vl None
-        | TDrecord _ ->
-            assert false
-      in
-      Hstr.add tysymbols x (Some ts);
-      ts
-  in
-  let th' =
-    let add_ts (abstr,alias) d =
-      let ts = visit d.td_ident.id_str in
-      if ts.ts_def = None then ts::abstr, alias else abstr, ts::alias in
-    let abstr,alias = List.fold_left add_ts ([],[]) dl in
-    try
-      let th = List.fold_left add_ty_decl th abstr in
-      let th = List.fold_left add_ty_decl th alias in
-      th
-    with ClashSymbol s ->
-      Loc.error ~loc:(Mstr.find s def).td_loc (ClashSymbol s)
-  in
-  let csymbols = Hstr.create 17 in
-  let decl d (abstr,algeb,alias) =
-    let ts = match Hstr.find tysymbols d.td_ident.id_str with
-      | None ->
-          assert false
-      | Some ts ->
-          ts
-    in
-    match d.td_def with
-      | TDabstract -> ts::abstr, algeb, alias
-      | TDalias _ -> abstr, algeb, ts::alias
-      | TDalgebraic cl ->
-          let ht = Hstr.create 17 in
-          let constr = List.length cl in
-          let ty = ty_app ts (List.map ty_var ts.ts_args) in
-          let projection (_,id,_,_) fty = match id with
-            | None -> None
-            | Some ({ id_str = x; id_loc = loc } as id) ->
-                try
-                  let pj = Hstr.find ht x in
-                  let ty = Opt.get pj.ls_value in
-                  ignore (Loc.try2 ~loc ty_equal_check ty fty);
-                  Some pj
-                with Not_found ->
-                  let fn = create_user_id id in
-                  let pj = create_fsymbol fn [ty] fty in
-                  Hstr.replace csymbols x loc;
-                  Hstr.replace ht x pj;
-                  Some pj
-          in
-          let constructor (loc, id, pl) =
-            let tyl = tyl_of_params th' pl in
-            let pjl = List.map2 projection pl tyl in
-            Hstr.replace csymbols id.id_str loc;
-            create_fsymbol ~constr (create_user_id id) tyl ty, pjl
-          in
-          abstr, (ts, List.map constructor cl) :: algeb, alias
-      | TDrecord _ ->
-          assert false
-  in
-  let abstr,algeb,alias = List.fold_right decl dl ([],[],[]) in
-  try
-    let th = List.fold_left add_ty_decl th abstr in
-    let th = if algeb = [] then th else add_data_decl th algeb in
-    let th = List.fold_left add_ty_decl th alias in
-    th
-  with
-    | ClashSymbol s ->
-        Loc.error ~loc:(Hstr.find csymbols s) (ClashSymbol s)
-    | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
-        Loc.error ~loc:(Hstr.find csymbols s) (RecordFieldMissing (cs,ls))
-    | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
-        Loc.error ~loc:(Hstr.find csymbols s) (DuplicateRecordField (cs,ls))
-
-let prepare_typedef td =
-  if td.td_vis <> Public then
-    Loc.errorm ~loc:td.td_loc "pure types cannot be abstract or private";
-  if td.td_mut then
-    Loc.errorm ~loc:td.td_loc "pure types cannot be mutable";
-  if td.td_inv <> [] then
-    Loc.errorm ~loc:td.td_loc "pure types cannot have invariants";
-  match td.td_def with
-  | TDabstract | TDalgebraic _ | TDalias _ ->
-      td
-  | TDrecord fl ->
-      let field { f_loc = loc; f_ident = id; f_pty = ty;
-                  f_mutable = mut; f_ghost = gh } =
-        if mut then Loc.errorm ~loc "a logic record field cannot be mutable";
-        if gh then Loc.errorm ~loc "a logic record field cannot be ghost";
-        loc, Some id, false, ty
-      in
-      (* constructor for type t is "mk t" (and not String.capitalize t) *)
-      let id = { td.td_ident with id_str = "mk " ^ td.td_ident.id_str } in
-      { td with td_def = TDalgebraic [td.td_loc, id, List.map field fl] }
-
-let add_types dl th =
-  add_types (List.map prepare_typedef dl) th
-
-let add_logics dl th =
+let add_logics uc dl =
+  let th = uc.muc_theory in
   let lsymbols = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
-  let create_symbol th d =
+  let create_symbol uc d =
     let id = d.ld_ident.id_str in
     let v = create_user_id d.ld_ident in
     let pl = tyl_of_params th d.ld_params in
     let ty = Opt.map (ty_of_pty th) d.ld_type in
     let ls = create_lsymbol v pl ty in
     Hstr.add lsymbols id ls;
-    Loc.try2 ~loc:d.ld_loc add_param_decl th ls
+    Loc.try2 ~loc:d.ld_loc add_decl uc (create_param_decl ls)
   in
-  let th' = List.fold_left create_symbol th dl in
+  let uc' = List.fold_left create_symbol uc dl in
+  let th' = uc'.muc_theory in
   (* 2. then type-check all definitions *)
   let type_decl d (abst,defn) =
     let id = d.ld_ident.id_str in
@@ -551,28 +542,25 @@ let add_logics dl th =
         abst, (make_ls_defn ls vl t) :: defn
   in
   let abst,defn = List.fold_right type_decl dl ([],[]) in
-  let th = List.fold_left add_param_decl th abst in
-  if defn = [] then th else add_logic_decl th defn
+  let add_param_decl uc s = add_decl uc (create_param_decl s) in
+  let add_logic_decl uc l = add_decl uc (create_logic_decl l) in
+  let uc = List.fold_left add_param_decl uc abst in
+  if defn = [] then uc else add_logic_decl uc defn
 
-let add_prop k s f th =
-  let pr = create_prsymbol (create_user_id s) in
-  let f = type_fmla th (fun _ -> None) f in
-  add_prop_decl th k pr f
-
-let loc_of_id id = Opt.get id.Ident.id_loc
-
-let add_inductives s dl th =
+let add_inductives uc s dl =
   (* 1. create all symbols and make an environment with these symbols *)
+  let th = uc.muc_theory in
   let psymbols = Hstr.create 17 in
-  let create_symbol th d =
+  let create_symbol uc d =
     let id = d.in_ident.id_str in
     let v = create_user_id d.in_ident in
     let pl = tyl_of_params th d.in_params in
     let ps = create_psymbol v pl in
     Hstr.add psymbols id ps;
-    Loc.try2 ~loc:d.in_loc add_param_decl th ps
+    Loc.try2 ~loc:d.in_loc add_decl uc (create_param_decl ps)
   in
-  let th' = List.fold_left create_symbol th dl in
+  let uc' = List.fold_left create_symbol uc dl in
+  let th' = uc'.muc_theory in
   (* 2. then type-check all definitions *)
   let propsyms = Hstr.create 17 in
   let type_decl d =
@@ -585,7 +573,8 @@ let add_inductives s dl th =
     in
     ps, List.map clause d.in_def
   in
-  try add_ind_decl th s (List.map type_decl dl)
+  let loc_of_id id = Opt.get id.Ident.id_loc in
+  try add_decl uc (create_ind_decl s (List.map type_decl dl))
   with
   | ClashSymbol s ->
       Loc.error ~loc:(Hstr.find propsyms s) (ClashSymbol s)
@@ -594,15 +583,44 @@ let add_inductives s dl th =
   | NonPositiveIndDecl (ls,pr,s) ->
       Loc.error ~loc:(loc_of_id pr.pr_name) (NonPositiveIndDecl (ls,pr,s))
 
+let add_prop uc k s f =
+  let th = uc.muc_theory in
+  let pr = create_prsymbol (create_user_id s) in
+  let f = type_fmla th (fun _ -> None) f in
+  add_decl uc (create_prop_decl k pr f)
+
 (* parse declarations *)
 
-let find_theory env file q = match q with
-  | Qident { id_str = id } -> (* local theory *)
-      begin try (Mstr.find id file).Pmodule.mod_theory
-      with Not_found -> read_theory env [] id end
-  | Qdot (p, { id_str = id }) -> (* theory in file f *)
-      read_theory env (string_list_of_qualid p) id
+let add_decl uc inth = function
+  | Ptree.Dtype dl ->
+      add_types uc dl
+  | Ptree.Dlogic dl ->
+      add_logics uc dl
+  | Ptree.Dind (s,dl) ->
+      add_inductives uc s dl
+  | Ptree.Dprop (k,s,f) ->
+      add_prop uc k s f
+  | Ptree.Dmeta (id,al) ->
+      let th = uc.muc_theory in
+      let convert = function
+        | Ptree.Mty (PTtyapp (q,[]))
+                       -> MAts (find_tysymbol th q)
+        | Ptree.Mty ty -> MAty (ty_of_pty th ty)
+        | Ptree.Mfs q  -> MAls (find_fsymbol th q)
+        | Ptree.Mps q  -> MAls (find_psymbol th q)
+        | Ptree.Mpr q  -> MApr (find_prop th q)
+        | Ptree.Mstr s -> MAstr s
+        | Ptree.Mint i -> MAint i in
+      add_meta uc (lookup_meta id.id_str) (List.map convert al)
+  | _ when inth ->
+      Loc.errorm "Program declarations are not allowed in pure theories"
+  | Ptree.Dval _
+  | Ptree.Dlet _
+  | Ptree.Dfun _
+  | Ptree.Drec _
+  | Ptree.Dexn _ -> assert false (* TODO *)
 
+(* TODO
 let rec clone_ns kn sl path ns2 ns1 s =
   let qualid fmt path = Pp.print_list
     (fun fmt () -> Format.pp_print_char fmt '.')
@@ -657,31 +675,8 @@ let rec clone_ns kn sl path ns2 ns1 s =
   in
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
 
-let add_decl {Pmodule.muc_theory = th} _inth = function
-  | Ptree.Dtype dl ->
-      add_types dl th
-  | Ptree.Dlogic dl ->
-      add_logics dl th
-  | Ptree.Dind (s, dl) ->
-      add_inductives s dl th
-  | Ptree.Dprop (k, s, f) ->
-      add_prop k s f th
-  | Ptree.Dmeta (id, al) ->
-      let convert = function
-        | Ptree.Mty (PTtyapp (q,[]))
-                       -> MAts (find_tysymbol th q)
-        | Ptree.Mty ty -> MAty (ty_of_pty th ty)
-        | Ptree.Mfs q  -> MAls (find_fsymbol th q)
-        | Ptree.Mps q  -> MAls (find_psymbol th q)
-        | Ptree.Mpr q  -> MApr (find_prop th q)
-        | Ptree.Mstr s -> MAstr s
-        | Ptree.Mint i -> MAint i in
-      add_meta th (lookup_meta id.id_str) (List.map convert al)
-  | Ptree.Dval _
-  | Ptree.Dlet _
-  | Ptree.Dfun _
-  | Ptree.Drec _
-  | Ptree.Dexn _ -> assert false (* TODO *)
+let find_namespace_ns ns q =
+  find_qualid (fun _ -> Glob.dummy_id) ns_find_ns ns q
 
 let type_inst th t s =
   let add_inst s = function
@@ -731,30 +726,35 @@ let type_inst th t s =
       { s with inst_goal = Spr.add pr s.inst_goal }
   in
   List.fold_left add_inst empty_inst s
+*)
 
-let use_clone loc {Pmodule.muc_theory = th} env file (use, subst) =
-  let use_or_clone th =
-    let t = find_theory env file use.use_theory in
+let use_clone loc uc env file (use, subst) =
+  let find_module env file q = match q with
+    | Qident { id_str = id } -> (* local module *)
+        begin try Mstr.find id file
+        with Not_found -> read_module env [] id end
+    | Qdot (p, { id_str = id }) -> (* module in file f *)
+        read_module env (string_list_of_qualid p) id in
+  let use_or_clone uc =
+    let m = find_module env file use.use_module in
     if Debug.test_flag Glob.flag then
-      Glob.use (qloc_last use.use_theory) t.th_name;
+      Glob.use (qloc_last use.use_module) m.mod_theory.th_name;
     match subst with
-    | None -> use_export th t
-    | Some s ->
-        warn_clone_not_abstract loc t;
-        clone_export th t (type_inst th t s)
+    | None -> use_export uc m
+    | Some _ ->
+        warn_clone_not_abstract loc m.mod_theory;
+        Loc.errorm ~loc "cloning coming soon" (* TODO *)
   in
   match use.use_import with
   | Some (import, use_as) ->
       (* use T = namespace T use_export T end *)
-      let th = open_namespace th use_as in
-      let th = use_or_clone th in
-      close_namespace th import
+      let uc = open_namespace uc use_as in
+      let uc = use_or_clone uc in
+      close_namespace uc ~import
   | None ->
-      use_or_clone th
+      use_or_clone uc
 
 (* incremental parsing *)
-
-open Pmodule
 
 type slice = {
   env           : Env.env;
@@ -814,7 +814,7 @@ let add_decl loc d =
   if Debug.test_noflag debug_parse_only then
     let slice = Stack.top state in
     let muc = Loc.try3 ~loc add_decl (Opt.get slice.muc) slice.inth d in
-    ignore muc (* TODO *)
+    slice.muc <- Some muc
 
 let use_clone loc use =
   assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
@@ -822,15 +822,17 @@ let use_clone loc use =
     let slice = Stack.top state in
     let muc = Loc.try5 ~loc use_clone loc
       (Opt.get slice.muc) slice.env slice.file use in
-    ignore muc (* TODO *)
+    slice.muc <- Some muc
 
 (** Exception printing *)
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundSymbol q ->
       Format.fprintf fmt "unbound symbol '%a'" print_qualid q
+(* TODO
   | UnboundTypeVar s ->
       Format.fprintf fmt "unbound type variable '%s" s
   | DuplicateTypeVar s ->
       Format.fprintf fmt "duplicate type parameter '%s" s
+*)
   | _ -> raise e)
