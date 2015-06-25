@@ -285,7 +285,7 @@ let create_module env ?(path=[]) n =
   let m = use_export m unit_module in
   m
 
-let add_pdecl ~wp uc d =
+let add_pdecl ~vc uc d =
   let ids = Mid.set_diff d.pd_syms uc.muc_known in
   let uc = Sid.fold (fun id uc ->
     if id_equal id ts_func.ts_name then
@@ -293,7 +293,7 @@ let add_pdecl ~wp uc d =
     else match is_ts_tuple_id id with
     | Some n -> use_export uc (tuple_module n)
     | None -> uc) ids uc in
-  ignore wp; (* TODO *)
+  ignore vc; (* TODO *)
   let uc = add_pdecl uc d in
   let th = List.fold_left Theory.add_decl uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }

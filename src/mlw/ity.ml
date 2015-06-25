@@ -1259,7 +1259,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Unbound region %a" print_reg r
   | ImpureField ity -> fprintf fmt
       "Field type %a is mutable, it cannot be used in a type which is \
-        private, recursive, or has an invariant" print_ity_full ity
+        private, recursive, or has an invariant" print_ity ity
 (*
   | UnboundException xs -> fprintf fmt
       "This function raises %a but does not specify a post-condition for it"

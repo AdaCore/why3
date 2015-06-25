@@ -71,7 +71,6 @@ let create_semi_constructor id s fl pjl invl =
   create_rsymbol id c
 
 let create_flat_record_decl id args priv mut fldl invl =
-  (* TODO: replace Invalid_argument by well-located error messages *)
   let exn = Invalid_argument "Mdecl.create_flat_record_decl" in
   let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
   let add_fd fs (fm,fd) = Mpv.add_new exn fd fm fs in
@@ -118,7 +117,6 @@ let create_rec_record_decl s fldl =
   mk_itd s pjl [cs] []
 
 let create_variant_decl get_its cl =
-  (* TODO: replace Invalid_argument by well-located error messages *)
   let exn = Invalid_argument "Mdecl.create_variant_decl" in
   let pjl, fds = match cl with
     | cs::cl ->
@@ -299,14 +297,32 @@ let mk_decl = let r = ref 0 in fun node pure ->
     pd_tag  = (incr r; !r) }
 
 let create_type_decl dl =
-  let add_itd ({itd_its = s} as itd) (abst,defn,proj) =
+  let add_itd ({itd_its = s} as itd) (abst,defn,rest) =
     match itd.itd_fields, itd.itd_constructors with
-    | fl, ([{rs_logic = RLnone}]|[]) ->
+    | [], [] when s.its_def <> None ->
+        abst, defn, create_ty_decl s.its_ts :: rest
+    | fl, _ when itd.itd_invariant <> [] ->
+        let {id_string = nm; id_loc = loc} = s.its_ts.ts_name in
+        let u = create_vsymbol (id_fresh "self")
+          (ty_app s.its_ts (List.map ty_var s.its_ts.ts_args)) in
+        let t = [t_var u] in
+        let get_ld s (ldd,sbs) = match s.rs_logic, s.rs_field with
+          | RLls s, Some v ->
+              create_param_decl s :: ldd,
+              Mvs.add v.pv_vs (t_app_infer s t) sbs
+          | _ -> assert false in
+        let proj, sbs = List.fold_right get_ld fl ([],Mvs.empty) in
+        let pr = create_prsymbol (id_fresh ?loc ("inv " ^ nm)) in
+        let inv = t_subst sbs (t_and_simp_l itd.itd_invariant) in
+        let inv = t_forall_close [u] [] inv in
+        let inv = create_prop_decl Paxiom pr inv in
+        create_ty_decl s.its_ts :: abst, defn, proj @ inv :: rest
+    | fl, [] ->
         let get_ld s ldd = match s.rs_logic with
-          | RLls s -> create_param_decl s :: ldd | _ -> assert false in
-        (* TODO: add axioms for the invariants *)
-        let proj = List.fold_right get_ld fl proj in
-        create_ty_decl s.its_ts :: abst, defn, proj
+          | RLls s -> create_param_decl s :: ldd
+          | _ -> assert false in
+        let rest = List.fold_right get_ld fl rest in
+        create_ty_decl s.its_ts :: abst, defn, rest
     | fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in
         let mf = List.fold_left add Mpv.empty fl in
@@ -316,10 +332,10 @@ let create_type_decl dl =
         let get_cs s = match s.rs_logic with
           | RLls cs -> cs, List.map get_pj s.rs_cty.cty_args
           | _ -> assert false in
-        abst, (s.its_ts, List.map get_cs cl) :: defn, proj in
-  let abst,defn,proj = List.fold_right add_itd dl ([],[],[]) in
+        abst, (s.its_ts, List.map get_cs cl) :: defn, rest in
+  let abst,defn,rest = List.fold_right add_itd dl ([],[],[]) in
   let defn = if defn = [] then [] else [create_data_decl defn] in
-  mk_decl (PDtype dl) (abst @ defn @ proj)
+  mk_decl (PDtype dl) (abst @ defn @ rest)
 
 let create_let_decl ld =
   let ls_of_rs s dl = match s.rs_logic with
@@ -420,9 +436,15 @@ let print_its_defn fst fmt itd =
       then "mutable " else "") (if rs_ghost f then "ghost " else "")
     print_rs f Pretty.print_id_labels f.rs_name
     print_ity f.rs_cty.cty_result in
+  let is_big ity = match ity.ity_node with
+    | Ityreg {reg_args = []; reg_regs = []}
+    | Ityapp (_,[],[]) | Itypur (_,[]) | Ityvar _ -> false
+    | Itypur (s,_) when is_ts_tuple s.its_ts -> false
+    | _ -> true in
   let print_proj mf fmt f = match Mpv.find_opt f mf with
     | Some f -> fprintf fmt "@ (%a)" print_field f
     | _ when f.pv_ghost -> fprintf fmt "@ (ghost %a)" print_ity f.pv_ity
+    | _ when is_big f.pv_ity -> fprintf fmt "@ (%a)" print_ity f.pv_ity
     | _ -> fprintf fmt "@ %a" print_ity f.pv_ity in
   let print_constr mf fmt c = fprintf fmt "@\n@[<hov 4>| %a%a%a@]"
     print_rs c Pretty.print_id_labels c.rs_name

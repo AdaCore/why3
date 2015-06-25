@@ -363,11 +363,11 @@ let type_fmla uc gvars f =
 open Pdecl
 open Pmodule
 
-let add_pdecl ~wp uc d =
+let add_pdecl ~vc uc d =
   if Debug.test_flag Glob.flag then Sid.iter Glob.def d.pd_news;
-  add_pdecl ~wp uc d
+  add_pdecl ~vc uc d
 
-let add_decl uc d = add_pdecl ~wp:false uc (create_pure_decl d)
+let add_decl uc d = add_pdecl ~vc:false uc (create_pure_decl d)
 
 let add_types uc tdl =
   let add m d =
@@ -403,21 +403,34 @@ let add_types uc tdl =
         let hfd = Hstr.create 5 in
         let alias = Sstr.empty in
         let alg = Mstr.add x (id,args) alg in
-        let get_pj (_, id, ghost, pty) = match id with
-          | Some ({id_str = n} as id) ->
+        let get_pj nms (_, id, ghost, pty) = match id with
+          | Some ({id_str = nm} as id) ->
+              let exn = Loc.Located (id.id_loc, Loc.Message ("Field " ^
+                nm ^ " is used more than once in the same constructor")) in
+              let nms = Sstr.add_new exn nm nms in
               let ity = parse ~loc ~alias ~alg pty in
-              let v = try Hstr.find hfd n with Not_found ->
+              let v = try Hstr.find hfd nm with Not_found ->
                 let v = create_pvsymbol (create_user_id id) ~ghost ity in
-                Hstr.add hfd n v;
+                Hstr.add hfd nm v;
                 v in
               if not (ity_equal v.pv_ity ity && ghost = v.pv_ghost) then
-                Loc.errorm ~loc "Conflicting definitions for field %s" n;
-              true, v
+                Loc.errorm ~loc "Conflicting definitions for field %s" nm;
+              nms, (true, v)
           | None ->
               let ity = parse ~loc ~alias ~alg pty in
-              false, create_pvsymbol (id_fresh "a") ~ghost ity in
-        let get_cs (_, id, pjl) = create_user_id id, List.map get_pj pjl in
-        let csl = List.map get_cs csl in
+              nms, (false, create_pvsymbol (id_fresh "a") ~ghost ity) in
+        let get_cs oms (_, id, pjl) =
+          let nms, pjl = Lists.map_fold_left get_pj Sstr.empty pjl in
+          if Sstr.equal oms nms then create_user_id id, pjl else
+            let df = Sstr.union (Sstr.diff oms nms) (Sstr.diff nms oms) in
+            Loc.errorm ~loc "Field %s is missing in some constructors"
+              (Sstr.choose df) in
+        let csl = match csl with
+          | (_, id, pjl)::csl ->
+              let oms, pjl = Lists.map_fold_left get_pj Sstr.empty pjl in
+              (create_user_id id, pjl) :: List.map (get_cs oms) csl
+          | [] -> assert false in
+        if not (Hstr.mem htd x) then
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
             Hstr.add htd x (create_rec_variant_decl s csl)
@@ -427,12 +440,17 @@ let add_types uc tdl =
     | TDrecord fl ->
         let alias = Sstr.empty in
         let alg = Mstr.add x (id,args) alg in
-        let get_fd fd =
+        let get_fd nms fd =
+          let {id_str = nm; id_loc = loc} = fd.f_ident in
+          let exn = Loc.Located (loc, Loc.Message ("Field " ^
+            nm ^ " is used more than once in a record")) in
+          let nms = Sstr.add_new exn nm nms in
           let id = create_user_id fd.f_ident in
           let ity = parse ~loc ~alias ~alg fd.f_pty in
           let ghost = d.td_vis = Abstract || fd.f_ghost in
-          fd.f_mutable, create_pvsymbol id ~ghost ity in
-        let fl = List.map get_fd fl in
+          nms, (fd.f_mutable, create_pvsymbol id ~ghost ity) in
+        let _,fl = Lists.map_fold_left get_fd Sstr.empty fl in
+        if not (Hstr.mem htd x) then
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
             if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
@@ -461,13 +479,16 @@ let add_types uc tdl =
           let s = match q with
             | Qident {id_str = x} when Sstr.mem x alias ->
                 Loc.errorm ~loc "Cyclic type definition"
+            | Qident {id_str = x} when Hstr.mem hts x ->
+                Hstr.find hts x
             | Qident {id_str = x} when Mstr.mem x alg ->
                 let id, args = Mstr.find x alg in
                 let s = create_itysymbol_pure id args in
-                Hstr.add hts x s; s
+                Hstr.add hts x s;
+                visit ~alias ~alg x (Mstr.find x def);
+                s
             | Qident {id_str = x} when Mstr.mem x def ->
-                let d = Mstr.find x def in
-                visit ~alias ~alg x d;
+                visit ~alias ~alg x (Mstr.find x def);
                 Hstr.find hts x
             | _ ->
                 find_itysymbol uc q in
@@ -479,19 +500,7 @@ let add_types uc tdl =
 
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
-  add_pdecl ~wp:true uc (create_type_decl tdl)
-
-(* TODO
-    | ClashSymbol s ->
-        Loc.error ?loc:(look_for_loc tdl s) (ClashSymbol s)
-    | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
-        Loc.error ?loc:(look_for_loc tdl s) (RecordFieldMissing (cs,ls))
-    | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
-        Loc.error ?loc:(look_for_loc tdl s) (DuplicateRecordField (cs,ls))
-    | DuplicateVar { vs_name = { id_string = s }} ->
-        Loc.errorm ?loc:(look_for_loc tdl s)
-          "Field %s is used twice in the same constructor" s
-*)
+  add_pdecl ~vc:true uc (create_type_decl tdl)
 
 let tyl_of_params uc pl =
   let ty_of_param (loc,_,gh,ty) =

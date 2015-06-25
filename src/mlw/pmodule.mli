@@ -94,9 +94,9 @@ val add_meta : pmodule_uc -> meta -> meta_arg list -> pmodule_uc
 
 (** {2 Program decls} *)
 
-val add_pdecl : wp:bool -> pmodule_uc -> pdecl -> pmodule_uc
-(** [add_pdecl ~wp m d] adds declaration [d] in module [m].
-    If [wp] is [true], VC is computed and added to [m]. *)
+val add_pdecl : vc:bool -> pmodule_uc -> pdecl -> pmodule_uc
+(** [add_pdecl ~vc m d] adds declaration [d] in module [m].
+    If [vc] is [true], VC is computed and added to [m]. *)
 
 (** {2 Builtin symbols} *)
 
