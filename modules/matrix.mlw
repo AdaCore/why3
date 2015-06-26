@@ -26,7 +26,7 @@ module Matrix
     ensures  { result = get a i }
 
   val set (a: matrix 'a) (i: index) (v: 'a) : unit writes {a}
-    requires { let r,c = i in 0 <= r < a.rows /\ 0 <= c < a.columns }
+    requires { valid_index a i }
     ensures  { let r,c = i in
              a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v) }
 
