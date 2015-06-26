@@ -85,18 +85,19 @@ let rec handle_vc_result goal result prover_result manual_info =
    | Gnat_objectives.Proved ->
        Gnat_report.register obj (Some task) prover_result true None "" ""
    | Gnat_objectives.Not_Proved ->
-       let tracefile =
+       let (tracefile, trace) =
          match Gnat_config.proof_mode with
          | Gnat_config.Then_Split | Gnat_config.Path_WP ->
            Gnat_objectives.Save_VCs.save_trace goal
-         | _ -> ""
+         | _ -> ("", Gnat_loc.S.empty)
        in
        let cntexmpfile =
 	 match prover_result with
 	 | None ->
 	   ""
 	 | Some prover_result ->
-	   Gnat_objectives.Save_VCs.save_counterexample goal prover_result.pr_model
+	   Gnat_objectives.Save_VCs.save_counterexample
+	     goal prover_result.pr_model ~trace
        in
        Gnat_report.register obj (Some task) prover_result
          false manual_info tracefile cntexmpfile

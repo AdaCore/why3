@@ -115,15 +115,15 @@ val init : unit -> unit
 
 val schedule_goal : cntexample : bool -> goal -> unit
 (* schedule a goal for proof with default prover and
-   default timeout. The function returns immediately. 
-   @param cntexample indicates whether the prover should be queried for 
+   default timeout. The function returns immediately.
+   @param cntexample indicates whether the prover should be queried for
      a counter-example.
 *)
 
 val schedule_goal_with_prover : cntexample : bool -> goal -> Gnat_config.prover -> unit
 (* schedule a goal for proof with given prover and
-   default timeout. The function returns immediately. 
-   @param cntexample indicates whether the prover should be queried for 
+   default timeout. The function returns immediately.
+   @param cntexample indicates whether the prover should be queried for
      a counter-example.
 *)
 
@@ -156,13 +156,19 @@ val matches_subp_filter : subp -> bool
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
-   val save_trace : goal -> string
-   (* save the trace to a file; return the trace file name, "" if no trace was
-      saved*)
+   val save_trace : goal -> (string * Gnat_loc.S.t)
+   (* compute the trace from the goal and save it to a file; return the trace
+      file name and the computed trace,
+      ("", _) if no trace was saved *)
 
-   val save_counterexample : goal -> Model_parser.model -> string
-   (* save the counterexample to a file; return the counterexample file name, 
-      "" if no counter-example file was saved *)
+   val save_counterexample : goal -> Model_parser.model ->
+     trace : Gnat_loc.S.t -> string
+   (* save the counterexample to a file; return the counterexample file name,
+      "" if no counter-example file was saved
+      @param trace the trace of source-code positions that should be saved.
+        Counter-example elements with different positions will not be saved.
+        Gnat_loc.S.empty if all counter-example elements should be saved
+   *)
 
    val vc_file : goal -> string
    (* get the file name for a given goal *)

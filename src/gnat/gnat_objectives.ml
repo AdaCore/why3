@@ -368,9 +368,9 @@ let register_result goal result =
          let n = GoalSet.count obj_rec.to_be_scheduled in
          GoalSet.reset obj_rec.to_be_scheduled;
          nb_goals_done := !nb_goals_done + n;
-	 
-	 match Gnat_config.ce_mode with 
-	 | Gnat_config.On -> 
+
+	 match Gnat_config.ce_mode with
+	 | Gnat_config.On ->
 	   begin
 	     (* The goal will be scheduled to get a counter-example *)
 	     obj_rec.not_proved <- true;
@@ -378,9 +378,9 @@ let register_result goal result =
 	     GoalSet.add obj_rec.to_be_proved goal;
 	     (* The goal will be scheduled manually in Gnat_main.handle_result
 	        so it is not put to the obj_rec.to_be_scheduled *)
-	 
+
              obj, Counter_Example
-	   end 
+	   end
 	 | Gnat_config.Off ->
 	   obj, Not_Proved
    end
@@ -623,16 +623,33 @@ module Save_VCs = struct
            Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
              (Gnat_loc.orig_loc l)) trace);
-        trace_fn
+	(trace_fn, trace)
       end
-      else ""
+      else ("", trace)
 
-   let save_counterexample goal counterexample =
-     let check = get_objective goal in
-     let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
+   let trace_to_list trace =
+     (* Build list of locations (pairs of filename and line number) from trace *)
+     Gnat_loc.S.fold
+       (fun loc list ->
+	 let sloc = Gnat_loc.orig_loc loc in
+	 let col = Gnat_loc.get_col sloc in
+	 let pos = Why3.Loc.user_position
+	   (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
+	 (pos::list)
+       )
+       trace
+       []
+
+   let save_counterexample goal counterexample ~trace  =
      if counterexample <> Model_parser.empty_model then begin
-       with_fmt_channel 
-	 ce_fn 
+       let check = get_objective goal in
+       let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
+       let counterexample = if Gnat_loc.S.cardinal trace = 0 then
+	   counterexample
+	 else
+	   Model_parser.model_for_positions counterexample ~positions:(trace_to_list trace) in
+       with_fmt_channel
+	 ce_fn
 	 (fun fmt -> Format.fprintf fmt "%a@." Model_parser.print_model_json counterexample);
        ce_fn
      end
