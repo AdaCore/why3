@@ -1,4 +1,4 @@
-open Gnat_json
+open Why3.Json
 
 let abort_with_message ~internal s =
   Format.printf "{%a, %a, %a}"
@@ -23,4 +23,3 @@ let colon_split s =
       !acc
    with Invalid_argument _ | Not_found ->
       String.sub s 0 (!last_index) :: !acc
-

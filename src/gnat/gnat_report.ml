@@ -1,5 +1,5 @@
 open Why3
-open Gnat_json
+open Why3.Json
 
 type msg =
   { check         : Gnat_expl.check;
@@ -96,7 +96,7 @@ let print_json_msg fmt m =
 let print_warning_list fmt l =
   match l with
   | [] -> ()
-  | l -> 
+  | l ->
     Format.fprintf fmt ", %a" (print_json_field "warnings" (list string)) l
 
 let print_messages () =
