@@ -183,8 +183,6 @@ type spec = {
   sp_diverge : bool;
 }
 
-type top_ghost = Gnone | Gghost | Glemma
-
 type expr = {
   expr_desc : expr_desc;
   expr_loc  : loc;
@@ -200,10 +198,10 @@ and expr_desc =
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
   | Einnfix of expr * ident * expr
-  | Elet of ident * top_ghost * expr * expr
-  | Efun of ident * top_ghost * lambda * expr
+  | Elet of ident * ghost * Expr.rs_kind * expr * expr
   | Erec of fundef list * expr
-  | Elam of lambda
+  | Efun of binder list * pty option * spec * expr
+  | Eany of param list * pty * spec
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -225,16 +223,11 @@ and expr_desc =
   | Eassert of Expr.assertion_kind * term
   | Emark of ident * expr
   | Ecast of expr * pty
-  | Eany of any
   | Eghost of expr
-  | Eabstract of spec * expr
   | Enamed of label * expr
 
-and fundef = ident * top_ghost * lambda
-
-and lambda = binder list * pty option * spec * expr
-
-and any = param list * pty * spec
+and fundef =
+  ident * ghost * Expr.rs_kind * binder list * pty option * spec * expr
 
 type decl =
   | Dtype of type_decl list
@@ -242,6 +235,6 @@ type decl =
   | Dind of Decl.ind_sign * ind_decl list
   | Dprop of Decl.prop_kind * ident * term
   | Dmeta of ident * metarg list
-  | Dlet of ident * top_ghost * expr
+  | Dlet of ident * ghost * Expr.rs_kind * expr
   | Drec of fundef list
   | Dexn of ident * pty

@@ -574,27 +574,33 @@ numeral:
 (* Program declarations *)
 
 pdecl:
-| VAL top_ghost labels(lident_rich) mk_expr(val_defn) { Dlet ($3, $2, $4) }
-| LET top_ghost labels(lident_rich) mk_expr(fun_defn) { Dlet ($3, $2, $4) }
-| LET top_ghost labels(lident_rich) EQUAL expr        { Dlet ($3, $2, $5) }
-| LET REC with_list1(rec_defn)                        { Drec $3 }
-| EXCEPTION labels(uident)                            { Dexn ($2, PTtuple []) }
-| EXCEPTION labels(uident) ty                         { Dexn ($2, $3) }
+| VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet ($4, $2, $3, $5) }
+| LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
+| LET ghost kind labels(lident_rich) EQUAL expr        { Dlet ($4, $2, $3, $6) }
+| LET REC with_list1(rec_defn)                         { Drec $3 }
+| EXCEPTION labels(uident)                             { Dexn ($2, PTtuple []) }
+| EXCEPTION labels(uident) ty                          { Dexn ($2, $3) }
 
-top_ghost:
-| (* epsilon *) { Gnone  }
-| GHOST         { Gghost }
-| LEMMA         { Glemma }
+ghost:
+| (* epsilon *) { false }
+| GHOST         { true }
+
+kind:
+| (* epsilon *) { Expr.RKnone }
+| FUNCTION      { Expr.RKfunc }
+| CONSTANT      { Expr.RKfunc }
+| PREDICATE     { Expr.RKpred }
+| LEMMA         { Expr.RKlemma }
 
 (* Function definitions *)
 
 rec_defn:
-| top_ghost labels(lident_rich) binders cast? spec EQUAL spec seq_expr
-    { $2, $1, ($3, $4, spec_union $5 $7, $8) }
+| ghost kind labels(lident_rich) binders cast? spec EQUAL spec seq_expr
+    { $3, $1, $2, $4, $5, spec_union $6 $8, $9 }
 
 fun_defn:
 | binders cast? spec EQUAL spec seq_expr
-    { Elam ($1, $2, spec_union $3 $5, $6) }
+    { Efun ($1, $2, spec_union $3 $5, $6) }
 
 val_defn:
 | params cast spec  { Eany ($1, $2, $3) }
@@ -637,38 +643,39 @@ expr_:
       | Eidapp (Qident id, [e1;e2]) when id.id_str = mixfix "[]" ->
           Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
       | _ -> raise Error }
-| LET top_ghost pattern EQUAL seq_expr IN seq_expr
-    { match $3.pat_desc with
-      | Pvar id -> Elet (id, $2, $5, $7)
-      | Pwild -> Elet (id_anonymous $3.pat_loc, $2, $5, $7)
-      | Ptuple [] -> Elet (id_anonymous $3.pat_loc, $2,
-          { $5 with expr_desc = Ecast ($5, PTtuple []) }, $7)
+| LET ghost kind pattern EQUAL seq_expr IN seq_expr
+    { match $4.pat_desc with
+      | Pvar id -> Elet (id, $2, $3, $6, $8)
+      | Pwild -> Elet (id_anonymous $4.pat_loc, $2, $3, $6, $8)
+      | Ptuple [] -> Elet (id_anonymous $4.pat_loc, $2, $3,
+          { $6 with expr_desc = Ecast ($6, PTtuple []) }, $8)
       | Pcast ({pat_desc = Pvar id}, ty) ->
-          Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
+          Elet (id, $2, $3, { $6 with expr_desc = Ecast ($6, ty) }, $8)
       | Pcast ({pat_desc = Pwild}, ty) ->
-          let id = id_anonymous $3.pat_loc in
-          Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
+          let id = id_anonymous $4.pat_loc in
+          Elet (id, $2, $3, { $6 with expr_desc = Ecast ($6, ty) }, $8)
       | _ ->
-          let e = match $2 with
-            | Glemma -> Loc.errorm ~loc:($3.pat_loc)
-                "`let lemma' cannot be used with complex patterns"
-            | Gghost -> { $5 with expr_desc = Eghost $5 }
-            | Gnone -> $5 in
-          Ematch (e, [$3, $7]) }
-| LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
-    { Elet ($3, $2, $5, $7) }
-| LET top_ghost labels(lident) mk_expr(fun_defn) IN seq_expr
-    { Elet ($3, $2, $4, $6) }
-| LET top_ghost labels(lident_op_id) mk_expr(fun_defn) IN seq_expr
-    { Elet ($3, $2, $4, $6) }
+          let e = if $2 then { $6 with expr_desc = Eghost $6 } else $6 in
+          (match $3 with
+          | Expr.RKnone -> Ematch (e, [$4, $8])
+          | _ -> Loc.errorm ~loc:($4.pat_loc)
+              "`let <kind>' cannot be used with complex patterns") }
+| LET ghost kind labels(lident_op_id) EQUAL seq_expr IN seq_expr
+    { Elet ($4, $2, $3, $6, $8) }
+| LET ghost kind labels(lident) mk_expr(fun_defn) IN seq_expr
+    { Elet ($4, $2, $3, $5, $7) }
+| LET ghost kind labels(lident_op_id) mk_expr(fun_defn) IN seq_expr
+    { Elet ($4, $2, $3, $5, $7) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
-    { Elam ($2, None, spec_union $3 $5, $6) }
+    { Efun ($2, None, spec_union $3 $5, $6) }
+| ABSTRACT spec seq_expr END
+    { Efun ([], None, $2, $3) }
 | ANY ty spec
     { Eany ([], $2, $3) }
-| VAL top_ghost labels(lident_rich) mk_expr(val_defn) IN seq_expr
-    { Elet ($3, $2, $4, $6) }
+| VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
+    { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH match_cases(seq_expr) END
     { Ematch ($2, $4) }
 | MATCH comma_list2(expr) WITH match_cases(seq_expr) END
@@ -691,8 +698,6 @@ expr_:
     { Etry ($2, $4) }
 | GHOST expr
     { Eghost $2 }
-| ABSTRACT spec seq_expr END
-    { Eabstract($2, $3) }
 | assertion_kind LEFTBRC term RIGHTBRC
     { Eassert ($1, $3) }
 | label expr %prec prec_named

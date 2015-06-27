@@ -634,28 +634,29 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let cs,fl = parse_record ~loc muc get_val fl in
       let d = expr_app loc (DErs cs) fl in
       if re then d else mk_let ~loc "_q " e1 d
-  | Ptree.Elet (id, gh, e1, e2) ->
-      let gh, kind = match gh with
-        | Gnone -> false, RKnone
-        | Gghost -> true, RKnone
-        | Glemma -> true, RKlemma in
+  | Ptree.Elet (id, gh, kind, e1, e2) ->
       let ld = create_user_id id, gh, kind, dexpr muc denv e1 in
-      DElet (ld, dexpr muc (denv_add_let denv ld) e2)
-  | Ptree.Efun (id, gh, lam, e2) ->
-      let gh, kind = match gh with
-        | Gnone -> false, RKnone
-        | Gghost -> true, RKnone
-        | Glemma -> true, RKlemma in
-      let e1 = Dexpr.dexpr (dlambda muc denv lam) in
-      let ld = create_user_id id, gh, kind, e1 in
       DElet (ld, dexpr muc (denv_add_let denv ld) e2)
   | Ptree.Erec (fdl, e1) ->
       let denv, rd = drec_defn muc denv fdl in
       DErec (rd, dexpr muc denv e1)
-  | Ptree.Elam lam ->
-      dlambda muc denv lam
-  | Ptree.Eany any ->
-      dany muc any
+  | Ptree.Efun (bl, pty, sp, e) ->
+      let bl = List.map (dbinder muc) bl in
+      let e = match pty with
+        | Some pty -> { e with expr_desc = Ecast (e, pty) }
+        | None -> e in
+      let ds = match sp.sp_variant with
+        | ({term_loc = loc},_)::_ ->
+            Loc.errorm ~loc "unexpected 'variant' clause"
+        | _ -> dspec muc sp in
+      DEfun (bl, ds, dexpr muc (denv_add_args denv bl) e)
+  | Ptree.Eany (pl, pty, sp) ->
+      let pl = List.map (dparam muc) pl in
+      let ds = match sp.sp_variant with
+        | ({term_loc = loc},_)::_ ->
+            Loc.errorm ~loc "unexpected 'variant' clause"
+        | _ -> dspec muc sp in
+      DEany (pl, ds, dity_of_ity (ity_of_pty muc pty))
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr muc denv e1 in
       let branch (pp, e) =
@@ -723,10 +724,6 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEtry (e1, List.map branch cl)
   | Ptree.Eghost e1 ->
       DEghost (dexpr muc denv e1)
-  | Ptree.Eabstract (sp, e1) ->
-      if sp.sp_variant <> [] then
-        Loc.errorm ~loc "unexpected 'variant' clause";
-      DEfun ([], dspec muc sp, dexpr muc denv e1)
   | Ptree.Eabsurd -> DEabsurd
   | Ptree.Eassert (ak, lexpr) ->
       DEassert (ak, dassert muc lexpr)
@@ -740,11 +737,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEcast (dexpr muc denv e1, ity_of_pty muc pty))
 
 and drec_defn muc denv fdl =
-  let prep (id, gh, (bl, pty, sp, e)) =
-    let gh, kind = match gh with
-      | Gnone -> false, RKnone
-      | Gghost -> true, RKnone
-      | Glemma -> true, RKlemma in
+  let prep (id, gh, kind, bl, pty, sp, e) =
     let bl = List.map (dbinder muc) bl in
     let dity = match pty with
       | Some pty -> dity_of_ity (ity_of_pty muc pty)
@@ -754,25 +747,6 @@ and drec_defn muc denv fdl =
       dspec muc sp, dv, dexpr muc denv e in
     create_user_id id, gh, kind, bl, dity, pre in
   Dexpr.drec_defn denv (List.map prep fdl)
-
-and dlambda muc denv (bl, pty, sp, e) =
-  let bl = List.map (dbinder muc) bl in
-  let e = match pty with
-    | Some pty -> { e with expr_desc = Ecast (e, pty) }
-    | None -> e in
-  let ds = match sp.sp_variant with
-    | ({term_loc = loc},_)::_ ->
-        Loc.errorm ~loc "unexpected 'variant' clause"
-    | _ -> dspec muc sp in
-  DEfun (bl, ds, dexpr muc (denv_add_args denv bl) e)
-
-and dany muc (pl, pty, sp) =
-  let pl = List.map (dparam muc) pl in
-  let ds = match sp.sp_variant with
-    | ({term_loc = loc},_)::_ ->
-        Loc.errorm ~loc "unexpected 'variant' clause"
-    | _ -> dspec muc sp in
-  DEany (pl, ds, dity_of_ity (ity_of_pty muc pty))
 
 (** Typing declarations *)
 
@@ -1039,11 +1013,7 @@ let add_decl muc inth d =
   | _ when inth ->
       (* TODO: should we allow "let function"? what about mixed letrecs? *)
       Loc.errorm "Program declarations are not allowed in pure theories"
-  | Ptree.Dlet (id, gh, e) ->
-      let gh, kind = match gh with
-        | Gnone -> false, RKnone
-        | Gghost -> true, RKnone
-        | Glemma -> true, RKlemma in
+  | Ptree.Dlet (id, gh, kind, e) ->
       let ld = create_user_id id, gh, kind, dexpr muc denv_empty e in
       add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
   | Ptree.Drec fdl ->
