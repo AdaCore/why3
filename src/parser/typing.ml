@@ -1046,22 +1046,6 @@ let add_decl muc inth d =
         | Glemma -> true, RKlemma in
       let ld = create_user_id id, gh, kind, dexpr muc denv_empty e in
       add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
-  | Ptree.Dfun (id, gh, lam) ->
-      let gh, kind = match gh with
-        | Gnone -> false, RKnone
-        | Gghost -> true, RKnone
-        | Glemma -> true, RKlemma in
-      let e = Dexpr.dexpr (dlambda muc denv_empty lam) in
-      let ld = create_user_id id, gh, kind, e in
-      add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
-  | Ptree.Dval (id, gh, any) ->
-      let gh, kind = match gh with
-        | Gnone -> false, RKnone
-        | Gghost -> true, RKnone
-        | Glemma -> true, RKlemma in
-      let e = Dexpr.dexpr (dany muc any) in
-      let ld = create_user_id id, gh, kind, e in
-      add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
   | Ptree.Drec fdl ->
       let _, rd = drec_defn muc denv_empty fdl in
       add_pdecl ~vc muc (create_let_decl (rec_defn ~keep_loc:true rd))

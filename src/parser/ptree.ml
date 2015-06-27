@@ -242,8 +242,6 @@ type decl =
   | Dind of Decl.ind_sign * ind_decl list
   | Dprop of Decl.prop_kind * ident * term
   | Dmeta of ident * metarg list
-  | Dval of ident * top_ghost * any
   | Dlet of ident * top_ghost * expr
-  | Dfun of ident * top_ghost * lambda
   | Drec of fundef list
   | Dexn of ident * pty

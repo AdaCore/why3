@@ -119,7 +119,7 @@
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LAMBDA LTGT
+%token DOT DOTDOT EQUAL LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -483,18 +483,29 @@ term_:
           let id = id_anonymous $2.pat_loc in
           Tlet (id, { $4 with term_desc = Tcast ($4, ty) }, $6)
       | _ -> Tmatch ($4, [$2, $6]) }
+| LET labels(lident_op_id) EQUAL term IN term
+    { Tlet ($2, $4, $6) }
+| LET labels(lident) mk_term(lam_defn) IN term
+    { Tlet ($2, $3, $5) }
+| LET labels(lident_op_id) mk_term(lam_defn) IN term
+    { Tlet ($2, $3, $5) }
 | MATCH term WITH match_cases(term) END
     { Tmatch ($2, $4) }
 | MATCH comma_list2(term) WITH match_cases(term) END
     { Tmatch (mk_term (Ttuple $2) $startpos($2) $endpos($2), $4) }
 | quant comma_list1(quant_vars) triggers DOT term
     { Tquant ($1, List.concat $2, $3, $5) }
+| FUN binders ARROW term
+    { Tquant (Tlambda, $2, [], $4) }
 | EPSILON
     { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
 | label term %prec prec_named
     { Tnamed ($1, $2) }
 | term cast
     { Tcast ($1, $2) }
+
+lam_defn:
+| binders EQUAL term  { Tquant (Tlambda, $1, [], $3) }
 
 term_arg: mk_term(term_arg_) { $1 }
 term_dot: mk_term(term_dot_) { $1 }
@@ -555,7 +566,6 @@ triggers:
 quant:
 | FORALL  { Tforall }
 | EXISTS  { Texists }
-| LAMBDA  { Tlambda }
 
 numeral:
 | INTEGER { Number.ConstInt $1 }
@@ -564,27 +574,17 @@ numeral:
 (* Program declarations *)
 
 pdecl:
-| VAL top_ghost labels(lident_rich) type_v          { Dval ($3, $2, $4) }
-| LET top_ghost labels(lident_rich) fun_defn        { Dfun ($3, $2, $4) }
-| LET top_ghost labels(lident_rich) EQUAL fun_expr  { Dfun ($3, $2, $5) }
-| LET REC with_list1(rec_defn)                      { Drec $3 }
-| EXCEPTION labels(uident)                          { Dexn ($2, PTtuple []) }
-| EXCEPTION labels(uident) ty                       { Dexn ($2, $3) }
+| VAL top_ghost labels(lident_rich) mk_expr(val_defn) { Dlet ($3, $2, $4) }
+| LET top_ghost labels(lident_rich) mk_expr(fun_defn) { Dlet ($3, $2, $4) }
+| LET top_ghost labels(lident_rich) EQUAL expr        { Dlet ($3, $2, $5) }
+| LET REC with_list1(rec_defn)                        { Drec $3 }
+| EXCEPTION labels(uident)                            { Dexn ($2, PTtuple []) }
+| EXCEPTION labels(uident) ty                         { Dexn ($2, $3) }
 
 top_ghost:
 | (* epsilon *) { Gnone  }
 | GHOST         { Gghost }
 | LEMMA         { Glemma }
-
-(* Function declarations *)
-
-type_v:
-| params cast spec  { ($1, $2, $3) }
-
-(*
-simple_type_c:
-| ty spec { PTpure $1, $2 }
-*)
 
 (* Function definitions *)
 
@@ -593,10 +593,11 @@ rec_defn:
     { $2, $1, ($3, $4, spec_union $5 $7, $8) }
 
 fun_defn:
-| binders cast? spec EQUAL spec seq_expr { ($1, $2, spec_union $3 $5, $6) }
+| binders cast? spec EQUAL spec seq_expr
+    { Elam ($1, $2, spec_union $3 $5, $6) }
 
-fun_expr:
-| FUN binders spec ARROW spec seq_expr { ($2, None, spec_union $3 $5, $6) }
+val_defn:
+| params cast spec  { Eany ($1, $2, $3) }
 
 (* Program expressions *)
 
@@ -656,15 +657,17 @@ expr_:
           Ematch (e, [$3, $7]) }
 | LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($3, $2, $5, $7) }
-| LET top_ghost labels(lident) fun_defn IN seq_expr
-    { Efun ($3, $2, $4, $6) }
-| LET top_ghost labels(lident_op_id) fun_defn IN seq_expr
-    { Efun ($3, $2, $4, $6) }
+| LET top_ghost labels(lident) mk_expr(fun_defn) IN seq_expr
+    { Elet ($3, $2, $4, $6) }
+| LET top_ghost labels(lident_op_id) mk_expr(fun_defn) IN seq_expr
+    { Elet ($3, $2, $4, $6) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
-| fun_expr
-    { Elam $1 }
-| VAL top_ghost labels(lident_rich) mk_expr(val_expr) IN seq_expr
+| FUN binders spec ARROW spec seq_expr
+    { Elam ($2, None, spec_union $3 $5, $6) }
+| ANY ty spec
+    { Eany ([], $2, $3) }
+| VAL top_ghost labels(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($3, $2, $4, $6) }
 | MATCH seq_expr WITH match_cases(seq_expr) END
     { Ematch ($2, $4) }
@@ -686,8 +689,6 @@ expr_:
     { Eraise ($3, Some $4) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, $4) }
-| ANY ty spec
-    { Eany ([], $2, $3) }
 | GHOST expr
     { Eghost $2 }
 | ABSTRACT spec seq_expr END
@@ -745,9 +746,6 @@ loop_annotation:
 
 exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }
-
-val_expr:
-| type_v { Eany $1 }
 
 assertion_kind:
 | ASSERT  { Expr.Assert }
