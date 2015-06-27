@@ -806,7 +806,8 @@ let eff_assign asl =
     eff_ghost  = ghost }
 
 let eff_strong ({eff_writes = wr} as e) =
-  let freeze r _ sbs = reg_freeze sbs r in
+  let freeze r _ sbs = List.fold_left reg_freeze
+    (List.fold_left ity_freeze sbs r.reg_args) r.reg_regs in
   let sbs = Mreg.fold freeze wr isb_empty in
   let frz = (freeze_of_writes wr).isb_reg in
   let cvr = Mreg.set_diff sbs.isb_reg frz in
