@@ -45,7 +45,6 @@ type lsymbol = {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
-  ls_opaque : Stv.t;
   ls_constr : int;
 }
 
@@ -63,29 +62,22 @@ let ls_equal : lsymbol -> lsymbol -> bool = (==)
 let ls_hash ls = id_hash ls.ls_name
 let ls_compare ls1 ls2 = id_compare ls1.ls_name ls2.ls_name
 
-let check_opaque opaque args value =
-  if Stv.is_empty opaque then opaque else
-  let diff s ty = ty_v_fold (fun s tv -> Stv.remove tv s) s ty in
-  let s = List.fold_left diff (Opt.fold diff opaque value) args in
-  if Stv.is_empty s then opaque else invalid_arg "Term.create_lsymbol"
-
 let check_constr constr _args value =
   if constr = 0 || (constr > 0 && value <> None)
   then constr else invalid_arg "Term.create_lsymbol"
 
-let create_lsymbol ?(opaque=Stv.empty) ?(constr=0) name args value = {
+let create_lsymbol ?(constr=0) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
-  ls_opaque = check_opaque opaque args value;
   ls_constr = check_constr constr args value;
 }
 
-let create_fsymbol ?opaque ?constr nm al vl =
-  create_lsymbol ?opaque ?constr nm al (Some vl)
+let create_fsymbol ?constr nm al vl =
+  create_lsymbol ?constr nm al (Some vl)
 
-let create_psymbol ?opaque nm al =
-  create_lsymbol ?opaque ~constr:0 nm al None
+let create_psymbol nm al =
+  create_lsymbol ~constr:0 nm al None
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
@@ -905,11 +897,10 @@ let fs_tuple_ids = Hid.create 17
 
 let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
-  let opaque = Stv.of_list ts.ts_args in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
   let id = id_fresh ("Tuple" ^ string_of_int n) in
-  let fs = create_fsymbol ~opaque ~constr:1 id tl ty in
+  let fs = create_fsymbol ~constr:1 id tl ty in
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
 

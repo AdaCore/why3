@@ -38,7 +38,6 @@ type lsymbol = private {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
-  ls_opaque : Stv.t;
   ls_constr : int;
 }
 
@@ -51,14 +50,11 @@ val ls_compare : lsymbol -> lsymbol -> int
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol :
-  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty option -> lsymbol
+val create_lsymbol : ?constr:int -> preid -> ty list -> ty option -> lsymbol
 
-val create_fsymbol :
-  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
+val create_fsymbol : ?constr:int -> preid -> ty list -> ty -> lsymbol
 
-val create_psymbol :
-  ?opaque:Stv.t -> preid -> ty list -> lsymbol
+val create_psymbol : preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 

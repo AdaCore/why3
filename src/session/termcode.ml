@@ -510,7 +510,6 @@ module Checksum = struct
     ident b ls.ls_name;
     list ty b ls.ls_args;
     option ty b ls.ls_value;
-    list tvsymbol b (Ty.Stv.elements ls.ls_opaque);
     int b ls.ls_constr
 
   (* start: T D R L I P (C M) *)
