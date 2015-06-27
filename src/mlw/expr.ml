@@ -578,7 +578,8 @@ let is_e_false e = match e.e_node with
   | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_false
   | _ -> false
 
-let rs_tuple = Hint.memo 17 (fun n -> rs_of_ls (fs_tuple n))
+let rs_tuple = Hint.memo 17 (fun n ->
+  ignore (its_tuple n); rs_of_ls (fs_tuple n))
 
 let is_rs_tuple rs = rs_equal rs (rs_tuple (List.length rs.rs_cty.cty_args))
 

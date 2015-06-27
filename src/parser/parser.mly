@@ -579,30 +579,24 @@ top_ghost:
 (* Function declarations *)
 
 type_v:
-| arrow_type_v  { $1 }
-| cast          { PTpure $1 }
+| params cast spec  { ($1, $2, $3) }
 
-arrow_type_v:
-| param params tail_type_c  { PTfunc ($1 @ $2, $3) }
-
-tail_type_c:
-| single_spec spec arrow_type_v { $3, spec_union $1 $2 }
-| COLON simple_type_c           { $2 }
-
+(*
 simple_type_c:
 | ty spec { PTpure $1, $2 }
+*)
 
 (* Function definitions *)
 
 rec_defn:
 | top_ghost labels(lident_rich) binders cast? spec EQUAL spec seq_expr
-    { $2, $1, ($3, $4, $8, spec_union $5 $7) }
+    { $2, $1, ($3, $4, spec_union $5 $7, $8) }
 
 fun_defn:
-| binders cast? spec EQUAL spec seq_expr { ($1, $2, $6, spec_union $3 $5) }
+| binders cast? spec EQUAL spec seq_expr { ($1, $2, spec_union $3 $5, $6) }
 
 fun_expr:
-| FUN binders spec ARROW spec seq_expr { ($2, None, $6, spec_union $3 $5) }
+| FUN binders spec ARROW spec seq_expr { ($2, None, spec_union $3 $5, $6) }
 
 (* Program expressions *)
 
@@ -619,12 +613,14 @@ expr_:
 | expr_arg_
     { match $1 with (* break the infix relation chain *)
       | Einfix (l,o,r) -> Einnfix (l,o,r) | d -> d }
+| expr AMPAMP expr
+    { Eand ($1, $3) }
+| expr BARBAR expr
+    { Eor ($1, $3) }
 | NOT expr %prec prec_prefix_op
     { Enot $2 }
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
-| l = expr ; o = lazy_op ; r = expr
-    { Elazy (l,o,r) }
 | l = expr ; o = infix_op ; r = expr
     { Einfix (l,o,r) }
 | expr_arg located(expr_arg)+ (* FIXME/TODO: "expr expr_arg" *)
@@ -677,9 +673,9 @@ expr_:
 | quote_uident COLON seq_expr
     { Emark ($1, $3) }
 | LOOP loop_annotation seq_expr END
-    { Eloop ($2, $3) }
+    { let inv, var = $2 in Eloop (inv, var, $3) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE
-    { Ewhile ($2, $4, $5) }
+    { let inv, var = $4 in Ewhile ($2, inv, var, $5) }
 | FOR lident EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
     { Efor ($2, $4, $5, $6, $8, $9) }
 | ABSURD
@@ -690,12 +686,12 @@ expr_:
     { Eraise ($3, Some $4) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, $4) }
-| ANY simple_type_c
-    { Eany $2 }
+| ANY ty spec
+    { Eany ([], $2, $3) }
 | GHOST expr
     { Eghost $2 }
 | ABSTRACT spec seq_expr END
-    { Eabstract($3, $2) }
+    { Eabstract($2, $3) }
 | assertion_kind LEFTBRC term RIGHTBRC
     { Eassert ($1, $3) }
 | label expr %prec prec_named
@@ -741,30 +737,26 @@ expr_sub:
 
 loop_annotation:
 | (* epsilon *)
-    { { loop_invariant = []; loop_variant = [] } }
+    { [], [] }
 | invariant loop_annotation
-    { let a = $2 in { a with loop_invariant = $1 :: a.loop_invariant } }
+    { let inv, var = $2 in $1 :: inv, var }
 | variant loop_annotation
-    { let a = $2 in { a with loop_variant = variant_union $1 a.loop_variant } }
+    { let inv, var = $2 in inv, variant_union $1 var }
 
 exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }
 
 val_expr:
-| tail_type_c { Eany $1 }
-
-%inline lazy_op:
-| AMPAMP  { LazyAnd }
-| BARBAR  { LazyOr }
+| type_v { Eany $1 }
 
 assertion_kind:
-| ASSERT  { Aassert }
-| ASSUME  { Aassume }
-| CHECK   { Acheck }
+| ASSERT  { Expr.Assert }
+| ASSUME  { Expr.Assume }
+| CHECK   { Expr.Check }
 
 for_direction:
-| TO      { To }
-| DOWNTO  { Downto }
+| TO      { Expr.To }
+| DOWNTO  { Expr.DownTo }
 
 (* Specification *)
 

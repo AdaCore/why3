@@ -11,7 +11,6 @@
 
 open Stdlib
 open Ident
-open Ty
 open Term
 open Ity
 open Expr
@@ -68,15 +67,15 @@ type 'a later = pvsymbol Mstr.t -> register_old -> 'a
 
 type dspec_final = {
   ds_pre     : term list;
-  ds_post    : (vsymbol option * term) list;
-  ds_xpost   : (vsymbol option * term) list Mexn.t;
-  ds_reads   : vsymbol list;
+  ds_post    : (pvsymbol * term) list;
+  ds_xpost   : (pvsymbol * term) list Mexn.t;
+  ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
   ds_checkrw : bool;
 }
 
-type dspec = ty -> dspec_final
+type dspec = ity -> dspec_final
   (* Computation specification is also parametrized by the result type.
      All vsymbols in the postcondition clauses in the [ds_post] field
      must have this type. All vsymbols in the exceptional postcondition

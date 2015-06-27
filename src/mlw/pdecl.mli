@@ -82,6 +82,8 @@ val known_id : known_map -> ident -> unit
 val known_add_decl : known_map -> pdecl -> known_map
 val merge_known : known_map -> known_map -> known_map
 
+val find_its_defn : known_map -> itysymbol -> its_defn
+
 (** {2 Pretty-printing *)
 
 val print_pdecl : Format.formatter -> pdecl -> unit

@@ -18,11 +18,9 @@ open Decl
 open Theory
 open Dterm
 open Ity
-(*
+open Expr
 open Pdecl
 open Pmodule
-open Dexpr
-*)
 
 (** debug flags *)
 
@@ -31,24 +29,6 @@ let debug_parse_only = Debug.register_flag "parse_only"
 
 let debug_type_only  = Debug.register_flag "type_only"
   ~desc:"Stop@ after@ type-checking."
-
-(** errors *)
-
-(*
-exception UnboundTypeVar of string
-exception DuplicateTypeVar of string
-*)
-
-(** lazy declaration of tuples *)
-
-(*
-let add_ty_decl uc ts      = add_decl_with_tuples uc (create_ty_decl ts)
-let add_data_decl uc dl    = add_decl_with_tuples uc (create_data_decl dl)
-let add_param_decl uc ls   = add_decl_with_tuples uc (create_param_decl ls)
-let add_logic_decl uc dl   = add_decl_with_tuples uc (create_logic_decl dl)
-let add_ind_decl uc s dl   = add_decl_with_tuples uc (create_ind_decl s dl)
-let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
-*)
 
 (** symbol lookup *)
 
@@ -92,38 +72,69 @@ let find_psymbol_ns ns q =
   if ls.ls_value = None then ls else
     Loc.error ~loc:(qloc q) (PredicateSymbolExpected ls)
 
-let find_prop     uc q = find_prop_ns     (Theory.get_namespace uc) q
-let find_tysymbol uc q = find_tysymbol_ns (Theory.get_namespace uc) q
-let find_lsymbol  uc q = find_lsymbol_ns  (Theory.get_namespace uc) q
-let find_fsymbol  uc q = find_fsymbol_ns  (Theory.get_namespace uc) q
-let find_psymbol  uc q = find_psymbol_ns  (Theory.get_namespace uc) q
+let find_prop     tuc q = find_prop_ns     (Theory.get_namespace tuc) q
+let find_tysymbol tuc q = find_tysymbol_ns (Theory.get_namespace tuc) q
+let find_lsymbol  tuc q = find_lsymbol_ns  (Theory.get_namespace tuc) q
+let find_fsymbol  tuc q = find_fsymbol_ns  (Theory.get_namespace tuc) q
+let find_psymbol  tuc q = find_psymbol_ns  (Theory.get_namespace tuc) q
 
 let find_itysymbol_ns ns q =
   find_qualid (fun s -> s.its_ts.ts_name) Pmodule.ns_find_its ns q
 
-let get_namespace uc = List.hd uc.Pmodule.muc_import
+let find_prog_symbol_ns ns p =
+  let get_id_ps = function
+    | PV pv -> pv.pv_vs.vs_name
+    | RS rs -> rs.rs_name
+    | XS xs -> xs.xs_name in
+  find_qualid get_id_ps ns_find_prog_symbol ns p
 
-let find_itysymbol uc q = find_itysymbol_ns (get_namespace uc) q
+let get_namespace muc = List.hd muc.Pmodule.muc_import
+
+let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
+let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
+
+let find_rsymbol muc q = match find_prog_symbol muc q with RS rs -> rs
+  | _ -> Loc.errorm ~loc:(qloc q) "program symbol expected"
+
+let find_xsymbol muc q = match find_prog_symbol muc q with XS xs -> xs
+  | _ -> Loc.errorm ~loc:(qloc q) "exception symbol expected"
 
 (** Parsing types *)
 
-let ty_of_pty uc pty =
+let ty_of_pty tuc pty =
   let rec get_ty = function
     | PTtyvar {id_str = x} ->
         ty_var (tv_of_string x)
     | PTtyapp (q, tyl) ->
-        let ts = find_tysymbol uc q in
+        let s = find_tysymbol tuc q in
         let tyl = List.map get_ty tyl in
-        Loc.try2 ~loc:(qloc q) ty_app ts tyl
+        Loc.try2 ~loc:(qloc q) ty_app s tyl
     | PTtuple tyl ->
-        let ts = ts_tuple (List.length tyl) in
-        ty_app ts (List.map get_ty tyl)
+        let s = its_tuple (List.length tyl) in
+        ty_app s.its_ts (List.map get_ty tyl)
     | PTarrow (ty1, ty2) ->
         ty_func (get_ty ty1) (get_ty ty2)
     | PTparen ty ->
         get_ty ty
   in
   get_ty pty
+
+let ity_of_pty muc pty =
+  let rec get_ity = function
+    | PTtyvar {id_str = x} ->
+        ity_var (tv_of_string x)
+    | PTtyapp (q, tyl) ->
+        let s = find_itysymbol muc q in
+        let tyl = List.map get_ity tyl in
+        Loc.try2 ~loc:(qloc q) ity_app_fresh s tyl
+    | PTtuple tyl ->
+        ity_tuple (List.map get_ity tyl)
+    | PTarrow (ty1, ty2) ->
+        ity_func (get_ity ty1) (get_ity ty2)
+    | PTparen ty ->
+        get_ity ty
+  in
+  get_ity pty
 
 (** typing using destructive type variables
 
@@ -142,36 +153,36 @@ let create_user_id {id_str = n; id_lab = label; id_loc = loc} =
   let label,loc = List.fold_left get_labels (Slab.empty,loc) label in
   id_user ~label n loc
 
-let parse_record ~loc uc get_val fl =
-  let fl = List.map (fun (q,e) -> find_lsymbol uc q, e) fl in
-  let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known uc) fl in
+let parse_record ~loc tuc get_val fl =
+  let fl = List.map (fun (q,e) -> find_lsymbol tuc q, e) fl in
+  let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known tuc) fl in
   let get_val pj = get_val cs pj (Mls.find_opt pj flm) in
   cs, List.map get_val pjl
 
-let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
+let rec dpattern tuc { pat_desc = desc; pat_loc = loc } =
   Dterm.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
     | Ptree.Pvar x -> DPvar (create_user_id x)
     | Ptree.Papp (q,pl) ->
-        let pl = List.map (dpattern uc) pl in
-        DPapp (find_lsymbol uc q, pl)
+        let pl = List.map (dpattern tuc) pl in
+        DPapp (find_lsymbol tuc q, pl)
     | Ptree.Ptuple pl ->
-        let pl = List.map (dpattern uc) pl in
+        let pl = List.map (dpattern tuc) pl in
         DPapp (fs_tuple (List.length pl), pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
-          | Some p -> dpattern uc p
+          | Some p -> dpattern tuc p
           | None -> Dterm.dpattern DPwild in
-        let cs,fl = parse_record ~loc uc get_val fl in
+        let cs,fl = parse_record ~loc tuc get_val fl in
         DPapp (cs,fl)
-    | Ptree.Pas (p, x) -> DPas (dpattern uc p, create_user_id x)
-    | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q)
-    | Ptree.Pcast (p, ty) -> DPcast (dpattern uc p, ty_of_pty uc ty))
+    | Ptree.Pas (p, x) -> DPas (dpattern tuc p, create_user_id x)
+    | Ptree.Por (p, q) -> DPor (dpattern tuc p, dpattern tuc q)
+    | Ptree.Pcast (p, ty) -> DPcast (dpattern tuc p, ty_of_pty tuc ty))
 
-let quant_var uc (loc, id, gh, ty) =
+let quant_var tuc (loc, id, gh, ty) =
   assert (not gh);
   let ty = match ty with
-    | Some ty -> dty_of_ty (ty_of_pty uc ty)
+    | Some ty -> dty_of_ty (ty_of_pty tuc ty)
     | None    -> dty_fresh () in
   Opt.map create_user_id id, ty, Some loc
 
@@ -189,10 +200,10 @@ let mk_var n dt =
 let mk_let ~loc n dt node =
   DTlet (dt, id_user n loc, Dterm.dterm ~loc node)
 
-let chainable_op uc op =
+let chainable_op tuc op =
   (* non-bool -> non-bool -> bool *)
   op.id_str = "infix =" || op.id_str = "infix <>" ||
-  match find_lsymbol uc (Qident op) with
+  match find_lsymbol tuc (Qident op) with
   | {ls_args = [ty1;ty2]; ls_value = ty} ->
       Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
       && not (ty_equal ty1 ty_bool)
@@ -207,7 +218,7 @@ let mk_closure loc ls =
   let vl = Lists.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
-let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
+let rec dterm tuc gvars denv {term_desc = desc; term_loc = loc} =
   let func_app e el =
     List.fold_left (fun e1 (loc, e2) ->
       DTfapp (Dterm.dterm ~loc e1, e2)) e el
@@ -218,9 +229,9 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
     | _, [] -> func_app (mk_closure loc ls) (List.rev_append al el)
   in
   let qualid_app q el = match gvars q with
-    | Some vs -> func_app (DTgvar vs) el
+    | Some v -> func_app (DTgvar v.pv_vs) el
     | None ->
-        let ls = find_lsymbol uc q in
+        let ls = find_lsymbol tuc q in
         apply_ls (qloc q) ls [] ls.ls_args el
   in
   let qualid_app q el = match q with
@@ -232,32 +243,32 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   in
   let rec unfold_app e1 e2 el = match e1.term_desc with
     | Tapply (e11,e12) ->
-        let e12 = dterm uc gvars denv e12 in
+        let e12 = dterm tuc gvars denv e12 in
         unfold_app e11 e12 ((e1.term_loc, e2)::el)
     | Tident q ->
         qualid_app q ((e1.term_loc, e2)::el)
     | _ ->
-        func_app (DTfapp (dterm uc gvars denv e1, e2)) el
+        func_app (DTfapp (dterm tuc gvars denv e1, e2)) el
   in
   Dterm.dterm ~loc (match desc with
   | Ptree.Tident q ->
       qualid_app q []
   | Ptree.Tidapp (q, tl) ->
-      let tl = List.map (dterm uc gvars denv) tl in
-      DTapp (find_lsymbol uc q, tl)
+      let tl = List.map (dterm tuc gvars denv) tl in
+      DTapp (find_lsymbol tuc q, tl)
   | Ptree.Tapply (e1, e2) ->
-      unfold_app e1 (dterm uc gvars denv e2) []
+      unfold_app e1 (dterm tuc gvars denv e2) []
   | Ptree.Ttuple tl ->
-      let tl = List.map (dterm uc gvars denv) tl in
+      let tl = List.map (dterm tuc gvars denv) tl in
       DTapp (fs_tuple (List.length tl), tl)
   | Ptree.Tinfix (e12, op2, e3)
   | Ptree.Tinnfix (e12, op2, e3) ->
       let make_app de1 op de2 = if op.id_str = "infix <>" then
         let op = { op with id_str = "infix =" } in
-        let ls = find_lsymbol uc (Qident op) in
+        let ls = find_lsymbol tuc (Qident op) in
         DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
       else
-        DTapp (find_lsymbol uc (Qident op), [de1;de2])
+        DTapp (find_lsymbol tuc (Qident op), [de1;de2])
       in
       let rec make_chain de1 = function
         | [op,de2] ->
@@ -268,42 +279,42 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
             DTbinop (DTand, de12, de23)
         | [] -> assert false in
       let rec get_chain e12 acc = match e12.term_desc with
-        | Tinfix (e1, op1, e2) when chainable_op uc op1 ->
-            get_chain e1 ((op1, dterm uc gvars denv e2) :: acc)
+        | Tinfix (e1, op1, e2) when chainable_op tuc op1 ->
+            get_chain e1 ((op1, dterm tuc gvars denv e2) :: acc)
         | _ -> e12, acc in
-      let ch = [op2, dterm uc gvars denv e3] in
-      let e1, ch = if chainable_op uc op2
+      let ch = [op2, dterm tuc gvars denv e3] in
+      let e1, ch = if chainable_op tuc op2
         then get_chain e12 ch else e12, ch in
-      make_chain (dterm uc gvars denv e1) ch
+      make_chain (dterm tuc gvars denv e1) ch
   | Ptree.Tconst c ->
       DTconst c
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm tuc gvars denv e1 in
       let denv = denv_add_let denv e1 id in
-      let e2 = dterm uc gvars denv e2 in
+      let e2 = dterm tuc gvars denv e2 in
       DTlet (e1, id, e2)
   | Ptree.Tmatch (e1, bl) ->
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm tuc gvars denv e1 in
       let branch (p, e) =
-        let p = dpattern uc p in
+        let p = dpattern tuc p in
         let denv = denv_add_pat denv p in
-        p, dterm uc gvars denv e in
+        p, dterm tuc gvars denv e in
       DTcase (e1, List.map branch bl)
   | Ptree.Tif (e1, e2, e3) ->
-      let e1 = dterm uc gvars denv e1 in
-      let e2 = dterm uc gvars denv e2 in
-      let e3 = dterm uc gvars denv e3 in
+      let e1 = dterm tuc gvars denv e1 in
+      let e2 = dterm tuc gvars denv e2 in
+      let e3 = dterm tuc gvars denv e3 in
       DTif (e1, e2, e3)
   | Ptree.Ttrue ->
       DTtrue
   | Ptree.Tfalse ->
       DTfalse
   | Ptree.Tunop (Ptree.Tnot, e1) ->
-      DTnot (dterm uc gvars denv e1)
+      DTnot (dterm tuc gvars denv e1)
   | Ptree.Tbinop (e1, op, e2) ->
-      let e1 = dterm uc gvars denv e1 in
-      let e2 = dterm uc gvars denv e2 in
+      let e1 = dterm tuc gvars denv e1 in
+      let e2 = dterm tuc gvars denv e2 in
       let op = match op with
         | Ptree.Tand -> DTand
         | Ptree.Tand_asym -> DTand_asym
@@ -313,9 +324,9 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
         | Ptree.Tiff -> DTiff in
       DTbinop (op, e1, e2)
   | Ptree.Tquant (q, uqu, trl, e1) ->
-      let qvl = List.map (quant_var uc) uqu in
+      let qvl = List.map (quant_var tuc) uqu in
       let denv = denv_add_quant denv qvl in
-      let dterm e = dterm uc gvars denv e in
+      let dterm e = dterm tuc gvars denv e in
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
       let q = match q with
@@ -325,54 +336,458 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       DTquant (q, qvl, trl, e1)
   | Ptree.Trecord fl ->
       let get_val cs pj = function
-        | Some e -> dterm uc gvars denv e
+        | Some e -> dterm tuc gvars denv e
         | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
-      let cs, fl = parse_record ~loc uc get_val fl in
+      let cs, fl = parse_record ~loc tuc get_val fl in
       DTapp (cs, fl)
   | Ptree.Tupdate (e1, fl) ->
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm tuc gvars denv e1 in
       let re = is_reusable e1 in
       let v = if re then e1 else mk_var "_q " e1 in
       let get_val _ pj = function
-        | Some e -> dterm uc gvars denv e
+        | Some e -> dterm tuc gvars denv e
         | None -> Dterm.dterm ~loc (DTapp (pj,[v])) in
-      let cs, fl = parse_record ~loc uc get_val fl in
+      let cs, fl = parse_record ~loc tuc get_val fl in
       let d = DTapp (cs, fl) in
       if re then d else mk_let ~loc "_q " e1 d
   | Ptree.Tnamed (Lpos uloc, e1) ->
-      DTuloc (dterm uc gvars denv e1, uloc)
+      DTuloc (dterm tuc gvars denv e1, uloc)
   | Ptree.Tnamed (Lstr lab, e1) ->
-      DTlabel (dterm uc gvars denv e1, Slab.singleton lab)
+      DTlabel (dterm tuc gvars denv e1, Slab.singleton lab)
   | Ptree.Tcast (e1, ty) ->
-      DTcast (dterm uc gvars denv e1, ty_of_pty uc ty))
+      DTcast (dterm tuc gvars denv e1, ty_of_pty tuc ty))
 
-(* TODO
-(** Export for program parsing *)
+(** typing program expressions *)
 
-let type_term uc gvars t =
-  let t = dterm uc gvars denv_empty t in
+open Dexpr
+
+(* records *)
+
+let find_record_field muc q =
+  match find_prog_symbol muc q with RS ({rs_field = Some _} as s) -> s
+  | _ -> Loc.errorm ~loc:(qloc q) "Not a record field: %a" print_qualid q
+
+let find_record_field2 muc (q,e) = find_record_field muc q, e
+
+let parse_record muc fll =
+  (* we assume that every rsymbol in fll was resolved
+     using find_record_field, so they are all fields *)
+  let ls_of_rs rs = match rs.rs_logic with
+    | RLls ls -> ls | _ -> assert false in
+  let rs = match fll with
+    | (rs, _)::_ -> rs
+    | [] -> raise EmptyRecord in
+  let its = match rs.rs_cty.cty_args with
+    | [{pv_ity = {ity_node = (Ityreg {reg_its = its}
+        | Ityapp (its,_,_) | Itypur (its,_))}}] -> its
+    | _ -> raise (BadRecordField (ls_of_rs rs)) in
+  let itd = find_its_defn muc.muc_known its in
+  let check v s = match s.rs_field with
+    | Some u -> pv_equal v u
+    | _ -> false in
+  let cs = match itd.itd_constructors with
+    | [cs] when Lists.equal check cs.rs_cty.cty_args itd.itd_fields -> cs
+    | _ -> raise (BadRecordField (ls_of_rs rs)) in
+  let pjs = Srs.of_list itd.itd_fields in
+  let flm = List.fold_left (fun m (pj,v) -> if Srs.mem pj pjs then
+    Mrs.add_new (DuplicateRecordField (ls_of_rs cs, ls_of_rs pj)) pj v m
+    else raise (BadRecordField (ls_of_rs pj))) Mrs.empty fll in
+  cs, itd.itd_fields, flm
+
+let parse_record ~loc muc get_val fl =
+  let fl = List.map (find_record_field2 muc) fl in
+  let cs,pjl,flm = Loc.try2 ~loc parse_record muc fl in
+  let get_val pj = get_val cs pj (Mrs.find_opt pj flm) in
+  cs, List.map get_val pjl
+
+(* patterns *)
+
+let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
+  Dexpr.dpattern ~loc (match desc with
+    | Ptree.Pwild -> DPwild
+    | Ptree.Pvar x -> DPvar (create_user_id x)
+    | Ptree.Papp (q,pl) ->
+        DPapp (find_rsymbol muc q, List.map (fun p -> dpattern muc p) pl)
+    | Ptree.Prec fl ->
+        let get_val _ _ = function
+          | Some p -> dpattern muc p
+          | None -> Dexpr.dpattern DPwild in
+        let cs,fl = parse_record ~loc muc get_val fl in
+        DPapp (cs,fl)
+    | Ptree.Ptuple pl ->
+        DPapp (rs_tuple (List.length pl), List.map (dpattern muc) pl)
+    | Ptree.Pcast (p, pty) -> DPcast (dpattern muc p, ity_of_pty muc pty)
+    | Ptree.Pas (p, x) -> DPas (dpattern muc p, create_user_id x)
+    | Ptree.Por (p, q) -> DPor (dpattern muc p, dpattern muc q))
+
+(* specifications *)
+
+let find_global_pv muc q = try match find_prog_symbol muc q with
+  | PV v -> Some v | _ -> None with _ -> None
+
+let find_local_pv muc lvm q = match q with
+  | Qdot _ -> find_global_pv muc q
+  | Qident id -> let ovs = Mstr.find_opt id.id_str lvm in
+      if ovs = None then find_global_pv muc q else ovs
+
+let type_term muc lvm t =
+  let gvars p = find_local_pv muc lvm p in
+  let t = dterm muc.muc_theory gvars Dterm.denv_empty t in
   Dterm.term ~strict:true ~keep_loc:true t
-*)
 
-let type_fmla uc gvars f =
-  let f = dterm uc gvars denv_empty f in
+let type_fmla muc lvm f =
+  let gvars p = find_local_pv muc lvm p in
+  let f = dterm muc.muc_theory gvars Dterm.denv_empty f in
   Dterm.fmla ~strict:true ~keep_loc:true f
+
+let dpre muc pl lvm =
+  let dpre f = type_fmla muc lvm f in
+  List.map dpre pl
+
+let dpost muc ql lvm ity =
+  let dpost (loc,pfl) = match pfl with
+    | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] ->
+        let v = create_pvsymbol (id_fresh "result") ity in
+        v, Loc.try3 ~loc type_fmla muc lvm f
+    | [{ pat_desc = Ptree.Pvar id }, f] ->
+        let v = create_pvsymbol (create_user_id id) ity in
+        let lvm = Mstr.add id.id_str v lvm in
+        v, Loc.try3 ~loc type_fmla muc lvm f
+    | _ ->
+        let v = create_pvsymbol (id_fresh "result") ity in
+        let i = { id_str = "(null)"; id_loc = loc; id_lab = [] } in
+        let t = { term_desc = Tident (Qident i); term_loc = loc } in
+        let f = { term_desc = Tmatch (t, pfl); term_loc = loc } in
+        let lvm = Mstr.add "(null)" v lvm in
+        v, Loc.try3 ~loc type_fmla muc lvm f in
+  List.map dpost ql
+
+let dxpost muc ql lvm =
+  let add_exn (q,pat,f) m =
+    let xs = find_xsymbol muc q in
+    Mexn.change (function
+      | Some l -> Some ((pat,f) :: l)
+      | None   -> Some ((pat,f) :: [])) xs m in
+  let mk_xpost loc xs pfl =
+    dpost muc [loc,pfl] lvm xs.xs_ity in
+  let exn_map (loc,xpfl) =
+    let m = List.fold_right add_exn xpfl Mexn.empty in
+    Mexn.mapi (fun xs pfl -> mk_xpost loc xs pfl) m in
+  let add_map ql m =
+    Mexn.union (fun _ l r -> Some (l @ r)) (exn_map ql) m in
+  List.fold_right add_map ql Mexn.empty
+
+let dreads muc rl lvm =
+  let dreads q = match find_local_pv muc lvm q with Some v -> v
+    | None -> Loc.errorm ~loc:(qloc q) "Not a variable: %a" print_qualid q in
+  List.map dreads rl
+
+let dwrites muc wl lvm =
+  let dwrites t = type_term muc lvm t in
+  List.map dwrites wl
+
+let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
+  | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
+  | s -> Loc.errorm ~loc:(qloc q) "Not an order relation: %a" Pretty.print_ls s
+
+let dvariant muc varl lvm _regold =
+  let dvar t = type_term muc lvm t in
+  let dvar (t,q) = dvar t, Opt.map (find_variant_ls muc) q in
+  List.map dvar varl
+
+let dspec muc sp lvm _regold ity = {
+  ds_pre     = dpre muc sp.sp_pre lvm;
+  ds_post    = dpost muc sp.sp_post lvm ity;
+  ds_xpost   = dxpost muc sp.sp_xpost lvm;
+  ds_reads   = dreads muc sp.sp_reads lvm;
+  ds_writes  = dwrites muc sp.sp_writes lvm;
+  ds_checkrw = sp.sp_checkrw;
+  ds_diverge = sp.sp_diverge; }
+
+let dassert muc f lvm _regold = type_fmla muc lvm f
+
+let dinvariant muc f lvm _regold = dpre muc f lvm
+
+(* abstract values *)
+
+let dbinder muc id gh pty =
+  let id = Opt.map create_user_id id in
+  let dity = match pty with
+    | Some pty -> dity_of_ity (ity_of_pty muc pty)
+    | None -> dity_fresh () in
+  id, gh, dity
+
+let dparam muc (_,id,gh,pty) = dbinder muc id gh (Some pty)
+
+let dbinder muc (_,id,gh,pty) = dbinder muc id gh pty
+
+(* expressions *)
+
+let is_reusable de = match de.de_node with
+  | DEvar _ | DEpv _ | DEconst _ | DEtrue | DEfalse -> true
+  | DErs {rs_logic = (RLls _|RLpv _); rs_cty = cty} ->
+      cty.cty_args = [] && cty.cty_result.ity_pure
+  | _ -> false
+
+let mk_var n de =
+  Dexpr.dexpr ?loc:de.de_loc (DEvar (n, de.de_dvty))
+
+let mk_let ~loc n de node =
+  let de1 = Dexpr.dexpr ~loc node in
+  DElet ((id_user n loc, false, RKnone, de), de1)
+
+let chainable_rs = function
+  | {rs_cty = { cty_args = [pv1;pv2]; cty_result = ity}} ->
+      ity_equal ity ity_bool
+      && not (ity_equal pv1.pv_ity ity_bool)
+      && not (ity_equal pv2.pv_ity ity_bool)
+  | _ -> false
+
+let chainable_qualid muc p = match find_prog_symbol muc p with
+  | RS s -> chainable_rs s
+  | _ -> false
+
+let chainable_op muc denv op =
+  (* non-bool -> non-bool -> bool *)
+  op.id_str = "infix =" || op.id_str = "infix <>" ||
+  match denv_get_opt denv op.id_str with
+  | Some (DEvar (_,t)) -> dvty_is_chainable t
+  | Some (DErs s) -> chainable_rs s
+  | Some _ -> false (* can never happen *)
+  | None -> chainable_qualid muc (Qident op)
+
+let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
+  let expr_app loc e el =
+    List.fold_left (fun e1 e2 ->
+      DEapp (Dexpr.dexpr ~loc e1, e2)) e el
+  in
+  let qualid_app loc q el = match find_prog_symbol muc q with
+    | PV pv -> expr_app loc (DEpv pv) el
+    | RS rs -> expr_app loc (DErs rs) el
+    | XS xs -> Loc.errorm ~loc:(qloc q)
+        "unexpected exception symbol %a" print_xs xs
+  in
+  let qualid_app loc q el = match q with
+    | Qident {id_str = n} ->
+        (match denv_get_opt denv n with
+        | Some d -> expr_app loc d el
+        | None -> qualid_app loc q el)
+    | _ -> qualid_app loc q el
+  in
+  Dexpr.dexpr ~loc (match desc with
+  | Ptree.Eident q ->
+      qualid_app loc q []
+  | Ptree.Eidapp (q, el) ->
+      qualid_app loc q (List.map (dexpr muc denv) el)
+  | Ptree.Eapply (e1, e2) ->
+      DEapp (dexpr muc denv e1, dexpr muc denv e2)
+  | Ptree.Etuple el ->
+      let e = DErs (rs_tuple (List.length el)) in
+      expr_app loc e (List.map (dexpr muc denv) el)
+  | Ptree.Einfix (e12, op2, e3)
+  | Ptree.Einnfix (e12, op2, e3) ->
+      let make_app de1 op de2 = if op.id_str = "infix <>" then
+        let oq = Qident { op with id_str = "infix =" } in
+        let dt = qualid_app op.id_loc oq [de1; de2] in
+        DEnot (Dexpr.dexpr ~loc dt)
+      else
+        qualid_app op.id_loc (Qident op) [de1; de2]
+      in
+      let rec make_chain n1 n2 de1 = function
+        | [op,de2] ->
+            make_app de1 op de2
+        | (op,de2) :: ch ->
+            let re = is_reusable de2 in
+            let v = if re then de2 else mk_var n1 de2 in
+            let de12 = Dexpr.dexpr ~loc (make_app de1 op v) in
+            let de23 = Dexpr.dexpr ~loc (make_chain n2 n1 v ch) in
+            let d = DEand (de12, de23) in
+            if re then d else mk_let ~loc n1 de2 d
+        | [] -> assert false in
+      let rec get_chain e12 acc = match e12.expr_desc with
+        | Ptree.Einfix (e1, op1, e2) when chainable_op muc denv op1 ->
+            get_chain e1 ((op1, dexpr muc denv e2) :: acc)
+        | _ -> e12, acc in
+      let ch = [op2, dexpr muc denv e3] in
+      let e1, ch = if chainable_op muc denv op2
+        then get_chain e12 ch else e12, ch in
+      make_chain "q1 " "q2 " (dexpr muc denv e1) ch
+  | Ptree.Econst c -> DEconst c
+  | Ptree.Erecord fl ->
+      let ls_of_rs rs = match rs.rs_logic with
+        | RLls ls -> ls | _ -> assert false in
+      let get_val cs pj = function
+        | None -> Loc.error ~loc
+            (Decl.RecordFieldMissing (ls_of_rs cs, ls_of_rs pj))
+        | Some e -> dexpr muc denv e in
+      let cs,fl = parse_record ~loc muc get_val fl in
+      expr_app loc (DErs cs) fl
+  | Ptree.Eupdate (e1, fl) ->
+      let e1 = dexpr muc denv e1 in
+      let re = is_reusable e1 in
+      let v = if re then e1 else mk_var "_q " e1 in
+      let get_val _ pj = function
+        | None ->
+            let pj = Dexpr.dexpr ~loc (DErs pj) in
+            Dexpr.dexpr ~loc (DEapp (pj, v))
+        | Some e -> dexpr muc denv e in
+      let cs,fl = parse_record ~loc muc get_val fl in
+      let d = expr_app loc (DErs cs) fl in
+      if re then d else mk_let ~loc "_q " e1 d
+  | Ptree.Elet (id, gh, e1, e2) ->
+      let gh, kind = match gh with
+        | Gnone -> false, RKnone
+        | Gghost -> true, RKnone
+        | Glemma -> true, RKlemma in
+      let ld = create_user_id id, gh, kind, dexpr muc denv e1 in
+      DElet (ld, dexpr muc (denv_add_let denv ld) e2)
+  | Ptree.Efun (id, gh, lam, e2) ->
+      let gh, kind = match gh with
+        | Gnone -> false, RKnone
+        | Gghost -> true, RKnone
+        | Glemma -> true, RKlemma in
+      let e1 = Dexpr.dexpr (dlambda muc denv lam) in
+      let ld = create_user_id id, gh, kind, e1 in
+      DElet (ld, dexpr muc (denv_add_let denv ld) e2)
+  | Ptree.Erec (fdl, e1) ->
+      let denv, rd = drec_defn muc denv fdl in
+      DErec (rd, dexpr muc denv e1)
+  | Ptree.Elam lam ->
+      dlambda muc denv lam
+  | Ptree.Eany any ->
+      dany muc any
+  | Ptree.Ematch (e1, bl) ->
+      let e1 = dexpr muc denv e1 in
+      let branch (pp, e) =
+        let pp = dpattern muc pp in
+        let denv = denv_add_pat denv pp in
+        pp, dexpr muc denv e in
+      DEcase (e1, List.map branch bl)
+  | Ptree.Eif (e1, e2, e3) ->
+      let e1 = dexpr muc denv e1 in
+      let e2 = dexpr muc denv e2 in
+      let e3 = dexpr muc denv e3 in
+      DEif (e1, e2, e3)
+  | Ptree.Enot e1 ->
+      DEnot (dexpr muc denv e1)
+  | Ptree.Eand (e1, e2) ->
+      DEand (dexpr muc denv e1, dexpr muc denv e2)
+  | Ptree.Eor (e1, e2) ->
+      DEor (dexpr muc denv e1, dexpr muc denv e2)
+  | Ptree.Etrue -> DEtrue
+  | Ptree.Efalse -> DEfalse
+  | Ptree.Esequence (e1, e2) ->
+      let e1 = dexpr muc denv e1 in
+      let e2 = dexpr muc denv e2 in
+      DElet ((id_user "_" loc, false, RKnone, e1), e2)
+  | Ptree.Eloop (inv, var, e1) ->
+      let e1 = dexpr muc denv e1 in
+      let inv = dinvariant muc inv in
+      let var = dvariant muc var in
+      DEwhile (Dexpr.dexpr DEtrue, inv, var, e1)
+  | Ptree.Ewhile (e1, inv, var, e2) ->
+      let e1 = dexpr muc denv e1 in
+      let e2 = dexpr muc denv e2 in
+      let inv = dinvariant muc inv in
+      let var = dvariant muc var in
+      DEwhile (e1, inv, var, e2)
+  | Ptree.Efor (id, efrom, dir, eto, inv, e1) ->
+      let efrom = dexpr muc denv efrom in
+      let eto = dexpr muc denv eto in
+      let inv = dinvariant muc inv in
+      let id = create_user_id id in
+      let denv = denv_add_var denv id (dity_of_ity ity_int) in
+      DEfor (id, efrom, dir, eto, inv, dexpr muc denv e1)
+  | Ptree.Eassign (e1, q, e2) ->
+      DEassign [dexpr muc denv e1, find_record_field muc q, dexpr muc denv e2]
+  | Ptree.Eraise (q, e1) ->
+      let xs = find_xsymbol muc q in
+      let e1 = match e1 with
+        | Some e1 -> dexpr muc denv e1
+        | None when ity_equal xs.xs_ity ity_unit ->
+            Dexpr.dexpr ~loc (DErs rs_void)
+        | _ -> Loc.errorm ~loc "exception argument expected" in
+      DEraise (xs, e1)
+  | Ptree.Etry (e1, cl) ->
+      let e1 = dexpr muc denv e1 in
+      let branch (q, pp, e) =
+        let xs = find_xsymbol muc q in
+        let pp = match pp with
+          | Some pp -> dpattern muc pp
+          | None when ity_equal xs.xs_ity ity_unit ->
+              Dexpr.dpattern ~loc (DPapp (rs_void, []))
+          | _ -> Loc.errorm ~loc "exception argument expected" in
+        let denv = denv_add_pat denv pp in
+        let e = dexpr muc denv e in
+        xs, pp, e in
+      DEtry (e1, List.map branch cl)
+  | Ptree.Eghost e1 ->
+      DEghost (dexpr muc denv e1)
+  | Ptree.Eabstract (sp, e1) ->
+      if sp.sp_variant <> [] then
+        Loc.errorm ~loc "unexpected 'variant' clause";
+      DEfun ([], dspec muc sp, dexpr muc denv e1)
+  | Ptree.Eabsurd -> DEabsurd
+  | Ptree.Eassert (ak, lexpr) ->
+      DEassert (ak, dassert muc lexpr)
+  | Ptree.Emark (id, e1) ->
+      DEmark (create_user_id id, dexpr muc denv e1)
+  | Ptree.Enamed (Lpos uloc, e1) ->
+      DEuloc (dexpr muc denv e1, uloc)
+  | Ptree.Enamed (Lstr lab, e1) ->
+      DElabel (dexpr muc denv e1, Slab.singleton lab)
+  | Ptree.Ecast (e1, pty) ->
+      DEcast (dexpr muc denv e1, ity_of_pty muc pty))
+
+and drec_defn muc denv fdl =
+  let prep (id, gh, (bl, pty, sp, e)) =
+    let gh, kind = match gh with
+      | Gnone -> false, RKnone
+      | Gghost -> true, RKnone
+      | Glemma -> true, RKlemma in
+    let bl = List.map (dbinder muc) bl in
+    let dity = match pty with
+      | Some pty -> dity_of_ity (ity_of_pty muc pty)
+      | None -> dity_fresh () in
+    let pre denv =
+      let dv = dvariant muc sp.sp_variant in
+      dspec muc sp, dv, dexpr muc denv e in
+    create_user_id id, gh, kind, bl, dity, pre in
+  Dexpr.drec_defn denv (List.map prep fdl)
+
+and dlambda muc denv (bl, pty, sp, e) =
+  let bl = List.map (dbinder muc) bl in
+  let e = match pty with
+    | Some pty -> { e with expr_desc = Ecast (e, pty) }
+    | None -> e in
+  let ds = match sp.sp_variant with
+    | ({term_loc = loc},_)::_ ->
+        Loc.errorm ~loc "unexpected 'variant' clause"
+    | _ -> dspec muc sp in
+  DEfun (bl, ds, dexpr muc (denv_add_args denv bl) e)
+
+and dany muc (pl, pty, sp) =
+  let pl = List.map (dparam muc) pl in
+  let ds = match sp.sp_variant with
+    | ({term_loc = loc},_)::_ ->
+        Loc.errorm ~loc "unexpected 'variant' clause"
+    | _ -> dspec muc sp in
+  DEany (pl, ds, dity_of_ity (ity_of_pty muc pty))
 
 (** Typing declarations *)
 
 open Pdecl
 open Pmodule
 
-let add_pdecl ~vc uc d =
+let add_pdecl ~vc muc d =
   if Debug.test_flag Glob.flag then Sid.iter Glob.def d.pd_news;
-  add_pdecl ~vc uc d
+  add_pdecl ~vc muc d
 
-let add_decl uc d = add_pdecl ~vc:false uc (create_pure_decl d)
+let add_decl muc d = add_pdecl ~vc:false muc (create_pure_decl d)
 
-let add_types uc tdl =
-  let add m d =
-    let x = d.td_ident.id_str in
-    Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol x)) x d m in
+let add_types muc tdl =
+  let add m ({td_ident = {id_str = x}; td_loc = loc} as d) =
+    Mstr.add_new (Loc.Located (loc, ClashSymbol x)) x d m in
   let def = List.fold_left add Mstr.empty tdl in
   let hts = Hstr.create 5 in
   let htd = Hstr.create 5 in
@@ -462,12 +877,14 @@ let add_types uc tdl =
             Hstr.add htd x (create_rec_record_decl s (List.map get_fd fl))
         | None ->
             let priv = d.td_vis <> Public and mut = d.td_mut in
-            let add_fd m (_, {pv_vs = v}) =
-              Mstr.add v.vs_name.id_string v m in
+            let add_fd m (_, v) = Mstr.add v.pv_vs.vs_name.id_string v m in
             let gvars = List.fold_left add_fd Mstr.empty fl in
             let gvars q = match q with
-              | Qident x -> Mstr.find_opt x.id_str gvars | _ -> None in
-            let invl = List.map (type_fmla uc.muc_theory gvars) d.td_inv in
+              | Qident x -> Mstr.find_opt x.id_str gvars
+              | _ -> None in
+            let invl = List.map (fun f ->
+              Dterm.fmla ~strict:true ~keep_loc:true
+                (dterm muc.muc_theory gvars Dterm.denv_empty f)) d.td_inv in
             let itd = create_flat_record_decl id args priv mut fl invl in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
 
@@ -491,7 +908,7 @@ let add_types uc tdl =
                 visit ~alias ~alg x (Mstr.find x def);
                 Hstr.find hts x
             | _ ->
-                find_itysymbol uc q in
+                find_itysymbol muc q in
           Loc.try2 ~loc:(qloc q) ity_app_fresh s (List.map down tyl)
       | PTtuple tyl -> ity_tuple (List.map down tyl)
       | PTarrow (ty1,ty2) -> ity_func (down ty1) (down ty2)
@@ -500,30 +917,28 @@ let add_types uc tdl =
 
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
-  add_pdecl ~vc:true uc (create_type_decl tdl)
+  add_pdecl ~vc:true muc (create_type_decl tdl)
 
-let tyl_of_params uc pl =
+let tyl_of_params tuc pl =
   let ty_of_param (loc,_,gh,ty) =
     if gh then Loc.errorm ~loc
       "ghost parameters are not allowed in pure declarations";
-    ty_of_pty uc ty in
+    ty_of_pty tuc ty in
   List.map ty_of_param pl
 
-let add_logics uc dl =
-  let th = uc.muc_theory in
+let add_logics muc dl =
+  let tuc = muc.muc_theory in
   let lsymbols = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
-  let create_symbol uc d =
+  let create_symbol muc d =
     let id = d.ld_ident.id_str in
     let v = create_user_id d.ld_ident in
-    let pl = tyl_of_params th d.ld_params in
-    let ty = Opt.map (ty_of_pty th) d.ld_type in
+    let pl = tyl_of_params tuc d.ld_params in
+    let ty = Opt.map (ty_of_pty tuc) d.ld_type in
     let ls = create_lsymbol v pl ty in
     Hstr.add lsymbols id ls;
-    Loc.try2 ~loc:d.ld_loc add_decl uc (create_param_decl ls)
-  in
-  let uc' = List.fold_left create_symbol uc dl in
-  let th' = uc'.muc_theory in
+    Loc.try2 ~loc:d.ld_loc add_decl muc (create_param_decl ls) in
+  let tuc = (List.fold_left create_symbol muc dl).muc_theory in
   (* 2. then type-check all definitions *)
   let type_decl d (abst,defn) =
     let id = d.ld_ident.id_str in
@@ -537,39 +952,36 @@ let add_logics uc dl =
     let add_var mvs (_,x,_,_) vs = match x with
       | Some {id_str = x} -> Mstr.add_new (DuplicateVar x) x (DTgvar vs) mvs
       | None -> mvs in
-    let denv = List.fold_left2 add_var denv_empty d.ld_params vl in
+    let denv = List.fold_left2 add_var Dterm.denv_empty d.ld_params vl in
     match d.ld_def, d.ld_type with
     | None, _ -> ls :: abst, defn
     | Some e, None -> (* predicate *)
-        let f = dterm th' (fun _ -> None) denv e in
+        let f = dterm tuc (fun _ -> None) denv e in
         let f = fmla ~strict:true ~keep_loc:true f in
         abst, (make_ls_defn ls vl f) :: defn
     | Some e, Some ty -> (* function *)
         let e = { e with term_desc = Tcast (e, ty) } in
-        let t = dterm th' (fun _ -> None) denv e in
+        let t = dterm tuc (fun _ -> None) denv e in
         let t = term ~strict:true ~keep_loc:true t in
-        abst, (make_ls_defn ls vl t) :: defn
-  in
+        abst, (make_ls_defn ls vl t) :: defn in
   let abst,defn = List.fold_right type_decl dl ([],[]) in
-  let add_param_decl uc s = add_decl uc (create_param_decl s) in
-  let add_logic_decl uc l = add_decl uc (create_logic_decl l) in
-  let uc = List.fold_left add_param_decl uc abst in
-  if defn = [] then uc else add_logic_decl uc defn
+  let add_param muc s = add_decl muc (create_param_decl s) in
+  let add_logic muc l = add_decl muc (create_logic_decl l) in
+  let muc = List.fold_left add_param muc abst in
+  if defn = [] then muc else add_logic muc defn
 
-let add_inductives uc s dl =
+let add_inductives muc s dl =
   (* 1. create all symbols and make an environment with these symbols *)
-  let th = uc.muc_theory in
+  let tuc = muc.muc_theory in
   let psymbols = Hstr.create 17 in
-  let create_symbol uc d =
+  let create_symbol muc d =
     let id = d.in_ident.id_str in
     let v = create_user_id d.in_ident in
-    let pl = tyl_of_params th d.in_params in
+    let pl = tyl_of_params tuc d.in_params in
     let ps = create_psymbol v pl in
     Hstr.add psymbols id ps;
-    Loc.try2 ~loc:d.in_loc add_decl uc (create_param_decl ps)
-  in
-  let uc' = List.fold_left create_symbol uc dl in
-  let th' = uc'.muc_theory in
+    Loc.try2 ~loc:d.in_loc add_decl muc (create_param_decl ps) in
+  let tuc = (List.fold_left create_symbol muc dl).muc_theory in
   (* 2. then type-check all definitions *)
   let propsyms = Hstr.create 17 in
   let type_decl d =
@@ -577,13 +989,12 @@ let add_inductives uc s dl =
     let ps = Hstr.find psymbols id in
     let clause (loc, id, f) =
       Hstr.replace propsyms id.id_str loc;
-      let f = type_fmla th' (fun _ -> None) f in
-      create_prsymbol (create_user_id id), f
-    in
-    ps, List.map clause d.in_def
-  in
+      let f = dterm tuc (fun _ -> None) Dterm.denv_empty f in
+      let f = Dterm.fmla ~strict:true ~keep_loc:true f in
+      create_prsymbol (create_user_id id), f in
+    ps, List.map clause d.in_def in
   let loc_of_id id = Opt.get id.Ident.id_loc in
-  try add_decl uc (create_ind_decl s (List.map type_decl dl))
+  try add_decl muc (create_ind_decl s (List.map type_decl dl))
   with
   | ClashSymbol s ->
       Loc.error ~loc:(Hstr.find propsyms s) (ClashSymbol s)
@@ -592,42 +1003,72 @@ let add_inductives uc s dl =
   | NonPositiveIndDecl (ls,pr,s) ->
       Loc.error ~loc:(loc_of_id pr.pr_name) (NonPositiveIndDecl (ls,pr,s))
 
-let add_prop uc k s f =
-  let th = uc.muc_theory in
+let add_prop muc k s f =
+  let tuc = muc.muc_theory in
   let pr = create_prsymbol (create_user_id s) in
-  let f = type_fmla th (fun _ -> None) f in
-  add_decl uc (create_prop_decl k pr f)
+  let f = dterm tuc (fun _ -> None) Dterm.denv_empty f in
+  let f = Dterm.fmla ~strict:true ~keep_loc:true f in
+  add_decl muc (create_prop_decl k pr f)
 
 (* parse declarations *)
 
-let add_decl uc inth = function
+let add_decl muc inth d =
+  let vc = muc.muc_path = [] &&
+    Debug.test_noflag debug_type_only in
+  match d with
   | Ptree.Dtype dl ->
-      add_types uc dl
+      add_types muc dl
   | Ptree.Dlogic dl ->
-      add_logics uc dl
+      add_logics muc dl
   | Ptree.Dind (s,dl) ->
-      add_inductives uc s dl
+      add_inductives muc s dl
   | Ptree.Dprop (k,s,f) ->
-      add_prop uc k s f
+      add_prop muc k s f
   | Ptree.Dmeta (id,al) ->
-      let th = uc.muc_theory in
+      let tuc = muc.muc_theory in
       let convert = function
         | Ptree.Mty (PTtyapp (q,[]))
-                       -> MAts (find_tysymbol th q)
-        | Ptree.Mty ty -> MAty (ty_of_pty th ty)
-        | Ptree.Mfs q  -> MAls (find_fsymbol th q)
-        | Ptree.Mps q  -> MAls (find_psymbol th q)
-        | Ptree.Mpr q  -> MApr (find_prop th q)
+                       -> MAts (find_tysymbol tuc q)
+        | Ptree.Mty ty -> MAty (ty_of_pty tuc ty)
+        | Ptree.Mfs q  -> MAls (find_fsymbol tuc q)
+        | Ptree.Mps q  -> MAls (find_psymbol tuc q)
+        | Ptree.Mpr q  -> MApr (find_prop tuc q)
         | Ptree.Mstr s -> MAstr s
         | Ptree.Mint i -> MAint i in
-      add_meta uc (lookup_meta id.id_str) (List.map convert al)
+      add_meta muc (lookup_meta id.id_str) (List.map convert al)
   | _ when inth ->
+      (* TODO: should we allow "let function"? what about mixed letrecs? *)
       Loc.errorm "Program declarations are not allowed in pure theories"
-  | Ptree.Dval _
-  | Ptree.Dlet _
-  | Ptree.Dfun _
-  | Ptree.Drec _
-  | Ptree.Dexn _ -> assert false (* TODO *)
+  | Ptree.Dlet (id, gh, e) ->
+      let gh, kind = match gh with
+        | Gnone -> false, RKnone
+        | Gghost -> true, RKnone
+        | Glemma -> true, RKlemma in
+      let ld = create_user_id id, gh, kind, dexpr muc denv_empty e in
+      add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
+  | Ptree.Dfun (id, gh, lam) ->
+      let gh, kind = match gh with
+        | Gnone -> false, RKnone
+        | Gghost -> true, RKnone
+        | Glemma -> true, RKlemma in
+      let e = Dexpr.dexpr (dlambda muc denv_empty lam) in
+      let ld = create_user_id id, gh, kind, e in
+      add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
+  | Ptree.Dval (id, gh, any) ->
+      let gh, kind = match gh with
+        | Gnone -> false, RKnone
+        | Gghost -> true, RKnone
+        | Glemma -> true, RKlemma in
+      let e = Dexpr.dexpr (dany muc any) in
+      let ld = create_user_id id, gh, kind, e in
+      add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
+  | Ptree.Drec fdl ->
+      let _, rd = drec_defn muc denv_empty fdl in
+      add_pdecl ~vc muc (create_let_decl (rec_defn ~keep_loc:true rd))
+  | Ptree.Dexn (id, pty) ->
+      let ity = ity_of_pty muc pty in
+      let xs = create_xsymbol (create_user_id id) ity in
+      add_pdecl ~vc muc (create_exn_decl xs)
 
 (* TODO
 let rec clone_ns kn sl path ns2 ns1 s =
@@ -687,15 +1128,15 @@ let rec clone_ns kn sl path ns2 ns1 s =
 let find_namespace_ns ns q =
   find_qualid (fun _ -> Glob.dummy_id) ns_find_ns ns q
 
-let type_inst th t s =
+let type_inst tuc t s =
   let add_inst s = function
     | CSns (loc,p,q) ->
       let ns1 = Opt.fold find_namespace_ns t.th_export p in
-      let ns2 = Opt.fold find_namespace_ns (get_namespace th) q in
+      let ns2 = Opt.fold find_namespace_ns (get_namespace tuc) q in
       Loc.try6 ~loc clone_ns t.th_known t.th_local [] ns2 ns1 s
     | CStsym (loc,p,[],PTtyapp (q,[])) ->
       let ts1 = find_tysymbol_ns t.th_export p in
-      let ts2 = find_tysymbol th q in
+      let ts2 = find_tysymbol tuc q in
       if Mts.mem ts1 s.inst_ts
       then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);
       { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
@@ -703,20 +1144,20 @@ let type_inst th t s =
       let ts1 = find_tysymbol_ns t.th_export p in
       let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
       let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
-      let def = Some (ty_of_pty th pty) in
+      let def = Some (ty_of_pty tuc pty) in
       let ts2 = Loc.try3 ~loc create_tysymbol id tvl def in
       if Mts.mem ts1 s.inst_ts
       then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);
       { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
     | CSfsym (loc,p,q) ->
       let ls1 = find_fsymbol_ns t.th_export p in
-      let ls2 = find_fsymbol th q in
+      let ls2 = find_fsymbol tuc q in
       if Mls.mem ls1 s.inst_ls
       then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
       { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
     | CSpsym (loc,p,q) ->
       let ls1 = find_psymbol_ns t.th_export p in
-      let ls2 = find_psymbol th q in
+      let ls2 = find_psymbol tuc q in
       if Mls.mem ls1 s.inst_ls
       then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
       { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
@@ -737,19 +1178,19 @@ let type_inst th t s =
   List.fold_left add_inst empty_inst s
 *)
 
-let use_clone loc uc env file (use, subst) =
+let use_clone loc muc env file (use, subst) =
   let find_module env file q = match q with
     | Qident { id_str = id } -> (* local module *)
         begin try Mstr.find id file
         with Not_found -> read_module env [] id end
     | Qdot (p, { id_str = id }) -> (* module in file f *)
         read_module env (string_list_of_qualid p) id in
-  let use_or_clone uc =
+  let use_or_clone muc =
     let m = find_module env file use.use_module in
     if Debug.test_flag Glob.flag then
       Glob.use (qloc_last use.use_module) m.mod_theory.th_name;
     match subst with
-    | None -> use_export uc m
+    | None -> use_export muc m
     | Some _ ->
         warn_clone_not_abstract loc m.mod_theory;
         Loc.errorm ~loc "cloning coming soon" (* TODO *)
@@ -757,11 +1198,11 @@ let use_clone loc uc env file (use, subst) =
   match use.use_import with
   | Some (import, use_as) ->
       (* use T = namespace T use_export T end *)
-      let uc = open_namespace uc use_as in
-      let uc = use_or_clone uc in
-      close_namespace uc ~import
+      let muc = open_namespace muc use_as in
+      let muc = use_or_clone muc in
+      close_namespace muc ~import
   | None ->
-      use_or_clone uc
+      use_or_clone muc
 
 (* incremental parsing *)
 
@@ -838,10 +1279,4 @@ let use_clone loc use =
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundSymbol q ->
       Format.fprintf fmt "unbound symbol '%a'" print_qualid q
-(* TODO
-  | UnboundTypeVar s ->
-      Format.fprintf fmt "unbound type variable '%s" s
-  | DuplicateTypeVar s ->
-      Format.fprintf fmt "duplicate type parameter '%s" s
-*)
   | _ -> raise e)

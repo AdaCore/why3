@@ -421,6 +421,18 @@ let known_add_decl kn0 d =
   if Sid.is_empty unk then kn else
     raise (UnknownIdent (Sid.choose unk))
 
+(** {2 Records/algebraics handling} *)
+
+let find_its_defn kn s =
+  match (Mid.find s.its_ts.ts_name kn).pd_node with
+  | PDtype dl ->
+      let rec search = function
+        | d::_ when its_equal s d.itd_its -> d
+        | _::dl -> search dl
+        | [] -> assert false in
+      search dl
+  | _ -> assert false
+
 (** {2 Pretty-printing} *)
 
 open Format

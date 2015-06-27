@@ -316,15 +316,15 @@ type 'a later = pvsymbol Mstr.t -> register_old -> 'a
 
 type dspec_final = {
   ds_pre     : term list;
-  ds_post    : (vsymbol option * term) list;
-  ds_xpost   : (vsymbol option * term) list Mexn.t;
-  ds_reads   : vsymbol list;
+  ds_post    : (pvsymbol * term) list;
+  ds_xpost   : (pvsymbol * term) list Mexn.t;
+  ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
   ds_checkrw : bool;
 }
 
-type dspec = ty -> dspec_final
+type dspec = ity -> dspec_final
   (* Computation specification is also parametrized by the result type.
      All vsymbols in the postcondition clauses in the [ds_post] field
      must have this type. All vsymbols in the exceptional postcondition
@@ -714,13 +714,10 @@ let create_assert = to_fmla
 
 let create_invariant pl = List.map to_fmla pl
 
-let create_post ty ql = List.map (fun (v,f) ->
-  let f = to_fmla f in match v with
-    | None -> Ity.create_post (create_vsymbol (id_fresh "result") ty) f
-    | Some v -> Ty.ty_equal_check ty v.vs_ty; Ity.create_post v f) ql
+let create_post ity ql = List.map (fun (v,f) ->
+  ity_equal_check ity v.pv_ity; Ity.create_post v.pv_vs (to_fmla f)) ql
 
-let create_xpost xql =
-  Mexn.mapi (fun xs ql -> create_post (ty_of_ity xs.xs_ity) ql) xql
+let create_xpost xql = Mexn.mapi (fun xs ql -> create_post xs.xs_ity ql) xql
 
 (** User effects *)
 
@@ -746,9 +743,7 @@ let rec effect_of_term t =
   | _ -> quit ()
 
 let effect_of_dspec dsp =
-  let add_read s v = Spv.add (try restore_pv v with Not_found ->
-    Loc.errorm "unsupported effect expression") s in
-  let pvs = List.fold_left add_read Spv.empty dsp.ds_reads in
+  let pvs = Spv.of_list dsp.ds_reads in
   let add_write (l,eff) t = match effect_of_term t with
     | v, {ity_node = Ityreg reg}, fd ->
         let fs = match fd with
@@ -926,16 +921,15 @@ let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 
 let cty_of_spec env bl dsp dity =
   let ity = ity_of_dity dity in
-  let ty = ty_of_ity ity in
   let bl = binders bl in
   let env = add_binders env bl in
   let preold = Mstr.find_opt "'0" env.old in
   let env, old = add_label env "'0" in
-  let dsp = get_later env dsp ty in
+  let dsp = get_later env dsp ity in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_strong eff in
   let p = rebase_pre env preold old dsp.ds_pre in
-  let q = create_post ty dsp.ds_post in
+  let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
   create_cty bl p q xq (get_oldies old) eff ity
 
@@ -1200,14 +1194,13 @@ and rec_defn uloc env ghost {fds = dfdl} =
 and lambda uloc env pvl dsp dvl de =
   let env = add_binders env pvl in
   let e = expr uloc env de in
-  let ty = ty_of_ity e.e_ity in
   let preold = Mstr.find_opt "'0" env.old in
   let env, old = add_label env "'0" in
-  let dsp = get_later env dsp ty in
+  let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
   let dvl = rebase_variant env preold old dvl in
   let p = rebase_pre env preold old dsp.ds_pre in
-  let q = create_post ty dsp.ds_post in
+  let q = create_post e.e_ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
   c_fun pvl p q xq (get_oldies old) e, dsp, dvl
 

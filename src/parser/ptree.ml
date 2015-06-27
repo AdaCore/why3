@@ -166,18 +166,7 @@ type use_clone = use * clone_subst list option
 
 (* program files *)
 
-type assertion_kind = Aassert | Aassume | Acheck
-
-type lazy_op = LazyAnd | LazyOr
-
-type variant = term * qualid option
-
-type loop_annotation = {
-  loop_invariant : invariant;
-  loop_variant   : variant list;
-}
-
-type for_direction = To | Downto
+type variant = (term * qualid option) list
 
 type pre = term
 type post = loc * (pattern * term) list
@@ -189,16 +178,10 @@ type spec = {
   sp_xpost   : xpost list;
   sp_reads   : qualid list;
   sp_writes  : term list;
-  sp_variant : variant list;
+  sp_variant : variant;
   sp_checkrw : bool;
   sp_diverge : bool;
 }
-
-type type_v =
-  | PTpure of pty
-  | PTfunc of param list * type_c
-
-and type_c = type_v * spec
 
 type top_ghost = Gnone | Gghost | Glemma
 
@@ -228,27 +211,30 @@ and expr_desc =
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
-  | Eloop of loop_annotation * expr
-  | Ewhile of expr * loop_annotation * expr
-  | Elazy of expr * lazy_op * expr
+  | Eloop of invariant * variant * expr
+  | Ewhile of expr * invariant * variant * expr
+  | Eand of expr * expr
+  | Eor of expr * expr
   | Enot of expr
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
   | Eraise of qualid * expr option
   | Etry of expr * (qualid * pattern option * expr) list
-  | Efor of ident * expr * for_direction * expr * invariant * expr
+  | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
-  | Eassert of assertion_kind * term
+  | Eassert of Expr.assertion_kind * term
   | Emark of ident * expr
   | Ecast of expr * pty
-  | Eany of type_c
+  | Eany of any
   | Eghost of expr
-  | Eabstract of expr * spec
+  | Eabstract of spec * expr
   | Enamed of label * expr
 
 and fundef = ident * top_ghost * lambda
 
-and lambda = binder list * pty option * expr * spec
+and lambda = binder list * pty option * spec * expr
+
+and any = param list * pty * spec
 
 type decl =
   | Dtype of type_decl list
@@ -256,7 +242,7 @@ type decl =
   | Dind of Decl.ind_sign * ind_decl list
   | Dprop of Decl.prop_kind * ident * term
   | Dmeta of ident * metarg list
-  | Dval of ident * top_ghost * type_v
+  | Dval of ident * top_ghost * any
   | Dlet of ident * top_ghost * expr
   | Dfun of ident * top_ghost * lambda
   | Drec of fundef list
