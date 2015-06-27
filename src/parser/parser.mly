@@ -103,7 +103,7 @@
 %token AS AXIOM CLONE COINDUCTIVE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
-%token LET MATCH META NAMESPACE NOT PROP PREDICATE
+%token LET MATCH META NOT PREDICATE PROP SCOPE
 %token THEN THEORY TRUE TYPE USE WITH
 
 (* program keywords *)
@@ -184,7 +184,7 @@ module_decl:
     { Typing.close_namespace (floc $startpos($1) $endpos($1)) ~import:$1 }
 
 namespace_head:
-| NAMESPACE boption(IMPORT) uident  { Typing.open_namespace $3; $2 }
+| SCOPE boption(IMPORT) uident  { Typing.open_namespace $3; $2 }
 
 (* Use and clone *)
 
@@ -202,7 +202,7 @@ use:
     { { use_module = $2; use_import = None } }
 
 clone_subst:
-| NAMESPACE ns EQUAL ns         { CSns    (floc $startpos $endpos, $2,$4) }
+| SCOPE     ns     EQUAL ns     { CSns    (floc $startpos $endpos, $2,$4) }
 | TYPE qualid ty_var* EQUAL ty  { CStsym  (floc $startpos $endpos, $2,$3,$5) }
 | CONSTANT  qualid EQUAL qualid { CSfsym  (floc $startpos $endpos, $2,$4) }
 | FUNCTION  qualid EQUAL qualid { CSfsym  (floc $startpos $endpos, $2,$4) }

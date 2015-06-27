@@ -46,7 +46,7 @@
         "let", LET;
         "match", MATCH;
         "meta", META;
-        "namespace", NAMESPACE;
+        "scope", SCOPE;
         "not", NOT;
         "predicate", PREDICATE;
         "prop", PROP;

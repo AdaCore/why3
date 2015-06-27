@@ -29,7 +29,7 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
 let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-            "namespace"; "import"; "export"; "end";
+            "scope"; "import"; "export"; "end";
             "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
             "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in

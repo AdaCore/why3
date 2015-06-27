@@ -36,8 +36,8 @@
   let is_keyword1 = make_table [ "as"; "axiom"; "clone"; "coinductive";
     "constant"; "else"; "end"; "epsilon"; "exists"; "export"; "false";
     "forall"; "function"; "goal"; "if"; "import"; "in"; "inductive";
-    "lemma"; "let"; "match"; "meta"; "namespace"; "not"; "predicate";
-    "prop"; "then"; "theory"; "true"; "type"; "use"; "with";
+    "lemma"; "let"; "match"; "meta"; "not"; "predicate"; "prop";
+    "scope"; "then"; "theory"; "true"; "type"; "use"; "with";
     (* programs *) "abstract"; "any";
     "begin"; "do"; "done"; "downto"; "exception";
     "for"; "fun"; "ghost"; "loop"; "model"; "module";
