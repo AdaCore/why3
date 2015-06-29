@@ -81,23 +81,23 @@ let find_psymbol  tuc q = find_psymbol_ns  (Theory.get_namespace tuc) q
 let find_itysymbol_ns ns q =
   find_qualid (fun s -> s.its_ts.ts_name) Pmodule.ns_find_its ns q
 
+let find_xsymbol_ns ns q =
+  find_qualid (fun s -> s.xs_name) Pmodule.ns_find_xs ns q
+
 let find_prog_symbol_ns ns p =
   let get_id_ps = function
     | PV pv -> pv.pv_vs.vs_name
-    | RS rs -> rs.rs_name
-    | XS xs -> xs.xs_name in
+    | RS rs -> rs.rs_name in
   find_qualid get_id_ps ns_find_prog_symbol ns p
 
 let get_namespace muc = List.hd muc.Pmodule.muc_import
 
+let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
 let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
 let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
 
 let find_rsymbol muc q = match find_prog_symbol muc q with RS rs -> rs
   | _ -> Loc.errorm ~loc:(qloc q) "program symbol expected"
-
-let find_xsymbol muc q = match find_prog_symbol muc q with XS xs -> xs
-  | _ -> Loc.errorm ~loc:(qloc q) "exception symbol expected"
 
 (** Parsing types *)
 
@@ -564,8 +564,6 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let qualid_app loc q el = match find_prog_symbol muc q with
     | PV pv -> expr_app loc (DEpv pv) el
     | RS rs -> expr_app loc (DErs rs) el
-    | XS xs -> Loc.errorm ~loc:(qloc q)
-        "unexpected exception symbol %a" print_xs xs
   in
   let qualid_app loc q el = match q with
     | Qident {id_str = n} ->

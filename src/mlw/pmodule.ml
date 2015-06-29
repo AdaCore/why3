@@ -23,17 +23,18 @@ open Pdecl
 type prog_symbol =
   | PV of pvsymbol
   | RS of rsymbol
-  | XS of xsymbol
 
 type namespace = {
   ns_ts : itysymbol   Mstr.t;  (* type symbols *)
   ns_ps : prog_symbol Mstr.t;  (* program symbols *)
+  ns_xs : xsymbol     Mstr.t;  (* exception symbols *)
   ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
 let empty_ns = {
   ns_ts = Mstr.empty;
   ns_ps = Mstr.empty;
+  ns_xs = Mstr.empty;
   ns_ns = Mstr.empty;
 }
 
@@ -45,7 +46,6 @@ let ns_replace eq chk x vo vn =
 let psym_equal p1 p2 = match p1,p2 with
   | PV p1, PV p2 -> pv_equal p1 p2
   | RS p1, RS p2 -> rs_equal p1 p2
-  | XS p1, XS p2 -> xs_equal p1 p2
   | _, _ -> false
 
 let rec merge_ns chk ns1 ns2 =
@@ -56,6 +56,7 @@ let rec merge_ns chk ns1 ns2 =
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_ts = ns_union its_equal ns1.ns_ts ns2.ns_ts;
     ns_ps = ns_union psym_equal ns1.ns_ps ns2.ns_ps;
+    ns_xs = ns_union xs_equal ns1.ns_xs ns2.ns_xs;
     ns_ns = Mstr.union fusion ns1.ns_ns ns2.ns_ns; }
 
 let add_ns chk x ns m = Mstr.change (function
@@ -66,8 +67,9 @@ let ns_add eq chk x vn m = Mstr.change (function
   | Some vo -> Some (ns_replace eq chk x vo vn)
   | None    -> Some vn) x m
 
+let add_xs chk x xs ns = { ns with ns_xs = ns_add xs_equal   chk x xs ns.ns_xs }
 let add_ts chk x ts ns = { ns with ns_ts = ns_add its_equal  chk x ts ns.ns_ts }
-let add_ps chk x pf ns = { ns with ns_ps = ns_add psym_equal chk x pf ns.ns_ps }
+let add_ps chk x ps ns = { ns with ns_ps = ns_add psym_equal chk x ps ns.ns_ps }
 let add_ns chk x nn ns = { ns with ns_ns = add_ns            chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
@@ -77,6 +79,7 @@ let rec ns_find get_map ns = function
 
 let ns_find_prog_symbol = ns_find (fun ns -> ns.ns_ps)
 let ns_find_ns          = ns_find (fun ns -> ns.ns_ns)
+let ns_find_xs          = ns_find (fun ns -> ns.ns_xs)
 let ns_find_its         = ns_find (fun ns -> ns.ns_ts)
 
 let ns_find_pv ns s = match ns_find_prog_symbol ns s with
@@ -84,9 +87,6 @@ let ns_find_pv ns s = match ns_find_prog_symbol ns s with
 
 let ns_find_rs ns s = match ns_find_prog_symbol ns s with
   | RS rs -> rs | _ -> raise Not_found
-
-let ns_find_xs ns s = match ns_find_prog_symbol ns s with
-  | XS xs -> xs | _ -> raise Not_found
 
 (** {2 Module} *)
 
@@ -236,7 +236,7 @@ let add_pdecl uc d =
   | PDlet (LDvar (v,_)) -> add_symbol add_ps v.pv_vs.vs_name (PV v) uc
   | PDlet (LDsym (s,_)) -> add_rs uc s
   | PDlet (LDrec l) -> List.fold_left (fun uc d -> add_rs uc d.rec_sym) uc l
-  | PDexn xs -> add_symbol add_ps xs.xs_name (XS xs) uc
+  | PDexn xs -> add_symbol add_xs xs.xs_name xs uc
   | PDpure -> uc
 
 (** {2 Builtin symbols} *)

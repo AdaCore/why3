@@ -21,11 +21,11 @@ open Pdecl
 type prog_symbol =
   | PV of pvsymbol
   | RS of rsymbol
-  | XS of xsymbol
 
 type namespace = {
   ns_ts : itysymbol   Mstr.t;  (* type symbols *)
   ns_ps : prog_symbol Mstr.t;  (* program symbols *)
+  ns_xs : xsymbol     Mstr.t;  (* exception symbols *)
   ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
