@@ -251,7 +251,7 @@ let rec ask_yn () =
 
 let ask_yn_nonblock ~callback =
   let b = Buffer.create 3 in
-  let s = String.create 1 in
+  let s = Strings.create 1 in
   Format.printf "(y/n)@.";
   fun () ->
     match Unix.select [Unix.stdin] [] [] 0. with

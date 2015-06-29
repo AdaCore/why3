@@ -268,7 +268,7 @@ axiom a: forall ... f1 <-> f2
 \end{whycode}
   then the user can declare
 \begin{whycode}
-meta "rewrite" axiom a
+meta "rewrite" prop a
 \end{whycode}
   to turn this axiom into a rewrite rule. Rewriting is always done
   from left to right. Beware that there is no check for termination
