@@ -625,7 +625,7 @@ module Save_VCs = struct
              (Gnat_loc.orig_loc l)) trace);
 	(trace_fn, trace)
       end
-      else ("", trace)
+      else ("", Gnat_loc.S.empty)
 
    let trace_to_list trace =
      (* Build list of locations (pairs of filename and line number) from trace *)
@@ -644,7 +644,7 @@ module Save_VCs = struct
      if counterexample <> Model_parser.empty_model then begin
        let check = get_objective goal in
        let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
-       let counterexample = if Gnat_loc.S.cardinal trace = 0 then
+       let counterexample = if trace = Gnat_loc.S.empty then
 	   counterexample
 	 else
 	   Model_parser.model_for_positions counterexample ~positions:(trace_to_list trace) in

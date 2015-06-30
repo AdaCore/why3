@@ -159,7 +159,7 @@ module Save_VCs : sig
    val save_trace : goal -> (string * Gnat_loc.S.t)
    (* compute the trace from the goal and save it to a file; return the trace
       file name and the computed trace,
-      ("", _) if no trace was saved *)
+      ("", Gnat_loc.S.empty) if no trace was saved *)
 
    val save_counterexample : goal -> Model_parser.model ->
      trace : Gnat_loc.S.t -> string
