@@ -118,8 +118,10 @@ Qed.
 
 Lemma numof_pred: forall p a, numof p (a - 1) a = (if p (a - 1)%Z then 1%Z else 0%Z).
   intros.
-  replace a with ((a - 1) + 1)%Z at 2 by omega.
+  replace (numof p (a - 1) a)%Z with (numof p (a - 1) ((a - 1) + 1))%Z.
   apply numof_succ.
+  repeat apply f_equal.
+  omega.
 Qed.
 
 (* Why3 goal *)
@@ -280,4 +282,3 @@ intros p1 p2 a b h1.
 apply le_ge_eq.
 split; apply numof_change_any; apply h1.
 Qed.
-
