@@ -1156,7 +1156,7 @@ $(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
 clean::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
 
-ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
+ISABELLELIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
 ISABELLELIBS_BOOL_FILES = Bool
