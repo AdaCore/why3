@@ -343,10 +343,20 @@ let add_loc orig_model new_model position =
     with Not_found ->
       new_model
 
-let model_for_positions model ~positions =
+let add_first_model_line filename model_file model =
+  let (line_num, cnt_info) = IntMap.min_binding model_file in
+  let mf = get_model_file model filename in
+  let mf = IntMap.add line_num cnt_info mf in
+  StringMap.add filename mf model
+
+let model_for_positions_and_decls model ~positions =
   (* Start with empty model and add locations from model that
      are in locations *)
-  List.fold_left (add_loc model) empty_model positions
+  let model_filtered = List.fold_left (add_loc model) empty_model positions in
+  (* For each file add mapping corresponding to the first line of the
+     counter-example from model to model_filtered.
+     This corresponds to function declarations *)
+  StringMap.fold add_first_model_line model model_filtered
 
 
 (*

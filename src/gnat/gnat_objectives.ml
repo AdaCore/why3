@@ -647,7 +647,8 @@ module Save_VCs = struct
        let counterexample = if trace = Gnat_loc.S.empty then
 	   counterexample
 	 else
-	   Model_parser.model_for_positions counterexample ~positions:(trace_to_list trace) in
+	   Model_parser.model_for_positions_and_decls
+	     counterexample ~positions:(trace_to_list trace) in
        with_fmt_channel
 	 ce_fn
 	 (fun fmt -> Format.fprintf fmt "%a@." Model_parser.print_model_json counterexample);

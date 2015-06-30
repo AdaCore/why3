@@ -119,10 +119,16 @@ val interleave_with_source :
 **  Filtering the model
 ***************************************************************
 *)
-val model_for_positions : model -> positions: Loc.position list -> model
+val model_for_positions_and_decls : model ->
+  positions: Loc.position list -> model
 (** Given a model and a list of source-code positions returns model
     that contains only elements from the input model that are on these
-    positions. Elements with other positions are filtered out.
+    positions plus for every file in the model, elements that are
+    in the positions of function declarations. Elements with other
+    positions are filtered out.
+
+    Assumes that for each file the element on the first line of the model
+    has position of function declaration.
 
     Only filename and line number is used to identify positions.
 *)
