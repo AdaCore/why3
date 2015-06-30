@@ -120,3 +120,13 @@ theory array.Array
   syntax function make "(make %1 %2)"
 
 end
+
+theory matrix.Matrix
+
+  syntax type matrix "(matrix %1)"
+
+  syntax function get "(matrix_get %1 %2)"
+  syntax function rows "(nrows %1 : int)"
+  syntax function columns "(ncols %1 : int)"
+
+end
