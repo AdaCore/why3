@@ -126,17 +126,17 @@ let simpl_divmod _ls t1 t2 _ty =
 let simpl_minmax _ls v1 v2 _ty =
   match v1,v2 with
   | Term t1, Term t2 ->
-    if t_equal t1 t2 then v1 else 
+    if t_equal t1 t2 then v1 else
       raise Undetermined
   (*
     t_app_value ls [v1;v2] ty
   *)
-  | _ -> 
+  | _ ->
     raise Undetermined
 (*
   t_app_value ls [v1;v2] ty
 *)
-      
+
 let eval_int_rel op _ls l _ty =
   match l with
   | [t1 ; t2] ->
@@ -162,7 +162,7 @@ let eval_int_uop op _ls l _ty =
         raise Undetermined
     (*       t_app_value ls l ty *)
     end
-  | _ -> assert false 
+  | _ -> assert false
 
 
 let built_in_theories =
@@ -584,7 +584,7 @@ and reduce_app engine st ls ~orig ty rem_cont =
   else
     if ls_equal ls fs_func_app then
       match st with
-      | t2 :: t1 :: rem_st -> 
+      | t2 :: t1 :: rem_st ->
         begin
           try
             reduce_func_app ~orig ty rem_st t1 t2 rem_cont
@@ -981,6 +981,9 @@ let extract_rule _km t =
       | Decl.Dparam _ | Decl.Dind _ -> ()
   in
 *)
+  (* TODO : verifier que les variables de droite, aussi bien term que type,
+     apparaissent a gauche *)
+
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->
