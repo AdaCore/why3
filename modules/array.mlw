@@ -49,11 +49,17 @@ module Array
   = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  function make (n: int) (v: ~'a) : array 'a =
-    { length = n; elts = M.const v }
+  function make (n: int) (v: ~'a) : array 'a
+  axiom make_length:
+    forall n:int, v:'a. length (make n v) = n
+  axiom make_elts:
+    forall n i:int, v:'a. get (make n v) i = v
+
 
   val make (n: int) (v: ~'a) : array 'a
-    requires { "expl:array creation size" n >= 0 } ensures { result = make n v }
+    requires { "expl:array creation size" n >= 0 }
+    ensures { length result = n }
+    ensures { forall i:int. result[i] = v }
 
   val append (a1: array ~'a) (a2: array 'a) : array 'a
     ensures { length result = length a1 + length a2 }
