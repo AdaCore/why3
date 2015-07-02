@@ -256,7 +256,7 @@ let get_syms node pure =
           | RLpv _ -> syms_ls (syms_ts syms ts_func) fs_func_app
           | _ -> syms in
         syms_city syms c
-    | LDrec rdl as ld ->
+    | LDrec rdl ->
         let add_rd syms rd =
           let syms = List.fold_left syms_vari syms rd.rec_varl in
           let syms = match rd.rec_sym.rs_logic with
@@ -264,10 +264,12 @@ let get_syms node pure =
             | _ -> syms in
           syms_city syms rd.rec_fun in
         let dsms = List.fold_left add_rd Sid.empty rdl in
-        let dsms = match ls_decr_of_let_defn ld with
-          | Some ls -> Sid.remove ls.ls_name dsms | None -> dsms in
-        let del_rd syms rd = Sid.remove rd.rec_rsym.rs_name syms in
-        Sid.union syms (List.fold_left del_rd dsms rdl)
+        let add_inner acc rd =
+          let acc = Sid.add rd.rec_rsym.rs_name acc in
+          match ls_decr_of_rec_defn rd with
+          | Some ls -> Sid.add ls.ls_name acc | None -> acc in
+        let inners = List.fold_left add_inner Sid.empty rdl in
+        Sid.union syms (Sid.diff dsms inners)
   in
   match node with
   | PDtype dl ->

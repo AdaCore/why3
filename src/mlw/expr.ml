@@ -774,33 +774,17 @@ let let_rec fdl =
     | t, None     -> ignore (t_type t)) vl) fdl;
   (* check that the all variants use the same order *)
   let varl1 = match fdl with
-    | (_,_,vl,_)::_ -> List.rev vl
+    | (_,_,vl,_)::_ -> vl
     | [] -> invalid_arg "Expr.let_rec" in
-  let no_int t = not (ty_equal (t_type t) ty_int) in
-  let check_variant (_,_,vl,_) =
-    let vl, varl1 = match List.rev vl, varl1 with
-      | (t, None)::vl, (t1, None)::varl1
-        when no_int t && no_int t1 -> vl, varl1
-      | _, _ -> vl, varl1 in
-    let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
-        Opt.equal ty_equal t1.t_ty t2.t_ty &&
-        Opt.equal ls_equal r1 r2) vl varl1
-      with Invalid_argument _ -> false in
-    if not res then Loc.errorm
-      "All functions in a recursive definition \
-        must use the same well-founded order for variant" in
+  let check_variant (_,_,vl,_) = match vl, varl1 with
+    | [], []
+    | (_,None)::_, (_,None)::_ -> ()
+    | (t1, Some r1)::_, (t2, Some r2)::_
+      when oty_equal t1.t_ty t2.t_ty && ls_equal r1 r2 -> ()
+    | _, _ -> Loc.errorm
+        "All functions in a recursive definition must use the same \
+        well-founded order for the first component of the variant" in
   List.iter check_variant (List.tl fdl);
-  (* create the dummy "decrease" predicate symbol *)
-  let add_a l (t,_) = t_type t :: l in
-  let ds = match varl1 with
-    | [] -> None
-    | (t,None)::vl when no_int t ->
-        let tv = create_tvsymbol (id_fresh "a") in
-        let al = List.fold_left add_a [ty_var tv] vl in
-        Some (create_lsymbol (id_fresh "DECR") al None)
-    | vl ->
-        let al = List.fold_left add_a [] vl in
-        Some (create_lsymbol (id_fresh "DECR") al None) in
   let start_eff = if varl1 = [] then
     eff_diverge eff_empty else eff_empty in
   (* create the first substitution *)
@@ -815,9 +799,13 @@ let let_rec fdl =
        s.rs_logic <> RLnone
     then invalid_arg "Expr.let_rec";
     (* prepare the extra "decrease" precondition *)
-    let pre = match ds with
-      | Some ls -> ps_app ls (List.map fst varl) :: c.cty_pre
-      | None -> c.cty_pre in
+    let pre = match varl with
+      | [] -> c.cty_pre
+      | _::_ ->
+          let tl = List.map fst varl in
+          let id = id_fresh ("DECR " ^ s.rs_name.id_string) in
+          let ps = create_psymbol id (List.map t_type tl) in
+          ps_app ps tl :: c.cty_pre in
     (* create the clean rsymbol *)
     let id = id_clone s.rs_name in
     let c = create_cty c.cty_args pre
@@ -836,9 +824,9 @@ let let_rec fdl =
   let rdl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
   LDrec rdl, rdl
 
-let ls_decr_of_let_defn = function
-  | LDrec ({rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}};
-            rec_varl = _::_ }::_) -> Some ls
+let ls_decr_of_rec_defn = function
+  | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}};
+      rec_varl = _::_ } -> Some ls
   | _ -> None
 
 (* pretty-pringting *)

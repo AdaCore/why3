@@ -168,7 +168,7 @@ val let_sym :
 val let_rec :
   (rsymbol * cexp * variant list * rs_kind) list -> let_defn * rec_defn list
 
-val ls_decr_of_let_defn : let_defn -> lsymbol option
+val ls_decr_of_rec_defn : rec_defn -> lsymbol option
 (* returns the dummy predicate symbol used in the precondition of
    the rec_rsym rsymbol to store the instantiated variant list *)
 
