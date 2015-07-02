@@ -235,7 +235,7 @@ type wp_env = {
   ps_int_gt  : Term.lsymbol;
   fs_int_pl  : Term.lsymbol;
   fs_int_mn  : Term.lsymbol;
-  letrec_var : term list Mint.t;
+  letrec_var : variant list Mint.t;
 }
 
 let decrease_alg ?loc env old_t t =
@@ -258,30 +258,25 @@ let decrease_alg ?loc env old_t t =
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
-let decrease_rel ?loc env old_t t = function
-  | Some ls -> ps_app ls [t; old_t]
-  | None when ty_equal (t_type old_t) ty_int
-           && ty_equal (t_type t) ty_int ->
-      t_and
-        (ps_app env.ps_int_le [t_nat_const 0; old_t])
-        (ps_app env.ps_int_lt [t; old_t])
-  | None -> decrease_alg ?loc env old_t t
+let decrease_def ?loc env old_t t =
+  if ty_equal (t_type old_t) ty_int && ty_equal (t_type t) ty_int
+  then t_and (ps_app env.ps_int_le [t_nat_const 0;old_t])
+             (ps_app env.ps_int_lt [t;old_t])
+  else decrease_alg ?loc env old_t t
 
 let decrease loc lab env olds varl =
-  let rec decr pr olds varl = match olds, varl with
-    | [], [] -> (* empty variant *)
-        t_true
-    | [old_t], [t, rel] ->
-        t_and_simp pr (decrease_rel ?loc env old_t t rel)
-    | old_t::_, (t,_)::_ when not (oty_equal old_t.t_ty t.t_ty) ->
-        Loc.errorm ?loc "cannot use lexicographic ordering"
-    | old_t::olds, (t,rel)::varl ->
-        let dt = t_and_simp pr (decrease_rel ?loc env old_t t rel) in
-        let pr = t_and_simp pr (t_equ old_t t) in
-        t_or_simp dt (decr pr olds varl)
-    | _ -> assert false
+  let rec decr olds varl = match olds , varl with
+    | (old_t,None)::olds, (t,None)::varl ->
+      let dt = decrease_def ?loc env old_t t in
+      if oty_equal old_t.t_ty t.t_ty
+      then t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds varl))
+      else dt
+    | (old_t,Some old_r)::olds, (t,Some r)::varl when ls_equal old_r r ->
+      let dt = ps_app r [t; old_t] in
+      t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds varl))
+    | _ -> t_false
   in
-  t_label ?loc lab (decr t_true olds varl)
+  t_label ?loc lab (decr olds varl)
 
 let expl_variant = Slab.add Split_goal.stop_split (Slab.singleton expl_variant)
 let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
@@ -845,7 +840,7 @@ and wp_desc env e q xq = match e.e_node with
   | Eloop (inv, varl, e1) ->
       (* TODO: what do we do about well-foundness? *)
       let i = wp_expl expl_loop_keep inv in
-      let olds = List.map (fun (t,_) -> t_at_old t) varl in
+      let olds = List.map (fun (t,r) -> t_at_old t , r) varl in
       let i = if varl = [] then i else
         let d = decrease e.e_loc expl_loopvar env olds varl in
         wp_and ~sym:true i d in
@@ -945,7 +940,7 @@ and wp_fun_defn ?eff env { fun_ps = ps ; fun_lambda = l } =
   let env =
     if c.c_letrec = 0 || c.c_variant = [] then env else
     let lab = t_var lab in
-    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
+    let t_at_lab (t,r) = t_app fs_at [t; lab] t.t_ty , r in
     let tl = List.map t_at_lab c.c_variant in
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
@@ -1890,7 +1885,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
            I => (OK /\ (NE => I' /\ V))
         *)
       let variant =
-        let old_vars = List.map (fun (t,_) -> Subst.term havoc_state t) varl in
+        let old_vars = List.map (fun (t,r) ->
+          Subst.term havoc_state t,r) varl in
         let new_vars =
           List.map (fun (t,rel) -> Subst.term wp1.post.s t,rel) varl in
         decrease e.e_loc expl_loopvar env old_vars new_vars
@@ -2044,7 +2040,7 @@ and fast_wp_fun_defn env { fun_lambda = l } =
   let prestate = Subst.save_label lab prestate in
   let env =
     if c.c_letrec = 0 || c.c_variant = [] then env else
-    let tl = List.map (fun (t,_) -> Subst.term prestate t) c.c_variant in
+    let tl = List.map (fun (t,r) -> Subst.term prestate t,r) c.c_variant in
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
   (* generate the initial state, using the overall effect of the function *)
