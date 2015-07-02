@@ -58,13 +58,17 @@ let add_opt_theory x =
       Queue.push (x, p, t, glist,elist) tlist;
       opt_theory := Some glist
 
-let add_opt_goal x = match !opt_theory with
-  | None ->
-      eprintf "Option '-G'/'--goal' requires a theory.@.";
-      exit 1
-  | Some glist ->
-      let l = Strings.split '.' x in
-      Queue.push (x, l) glist
+let add_opt_goal x =
+  let glist = match !opt_theory, !opt_input with
+    | None, None -> eprintf
+        "Option '-G'/'--goal' requires an input file or a library theory.@.";
+        exit 1
+    | None, Some _ ->
+        add_opt_theory "Top";
+        Opt.get !opt_theory
+    | Some glist, _ -> glist in
+  let l = Strings.split '.' x in
+  Queue.push (x, l) glist
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 

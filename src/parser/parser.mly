@@ -162,21 +162,22 @@
 %start <Pmodule.pmodule Stdlib.Mstr.t> mlw_file
 %%
 
-(* Theories, modules, namespaces *)
+(* Modules and namespaces *)
 
 mlw_file:
-| theory_or_module* EOF { Typing.close_file () }
-(* TODO
-| module_decl* EOF { Typing.close_file () }
-*)
+| mlw_module* EOF
+    { Typing.close_file () }
+| module_decl+ EOF
+    { let loc = floc $startpos($2) $endpos($2) in
+      Typing.close_module loc; Typing.close_file () }
 
-theory_or_module:
+mlw_module:
 | module_head module_decl* END
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 module_head:
-| THEORY labels(uident)  { Typing.open_module $2 ~theory:true  }
-| MODULE labels(uident)  { Typing.open_module $2 ~theory:false }
+| THEORY labels(uident)  { Typing.open_module $2 }
+| MODULE labels(uident)  { Typing.open_module $2 }
 
 module_decl:
 | decl            { Typing.add_decl  (floc $startpos $endpos) $1 }

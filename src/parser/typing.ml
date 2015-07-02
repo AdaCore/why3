@@ -1000,7 +1000,7 @@ let add_prop muc k s f =
 
 (* parse declarations *)
 
-let add_decl muc inth d =
+let add_decl muc d =
   let vc = muc.muc_path = [] &&
     Debug.test_noflag debug_type_only in
   match d with
@@ -1026,9 +1026,6 @@ let add_decl muc inth d =
         | Ptree.Mstr s -> MAstr s
         | Ptree.Mint i -> MAint i in
       add_meta muc (lookup_meta id.id_str) (List.map convert al)
-  | _ when inth ->
-      (* TODO: should we allow "let function"? what about mixed letrecs? *)
-      Loc.errorm "Program declarations are not allowed in pure theories"
   | Ptree.Dlet (id, gh, kind, e) ->
       let ld = create_user_id id, gh, kind, dexpr muc denv_empty e in
       add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
@@ -1179,32 +1176,27 @@ let use_clone loc muc env file (use, subst) =
 type slice = {
   env           : Env.env;
   path          : Env.pathname;
-  pure          : bool;
   mutable file  : pmodule Mstr.t;
   mutable muc   : pmodule_uc option;
-  mutable inth  : bool;
 }
 
 let state = (Stack.create () : slice Stack.t)
 
-let open_file env path ~pure =
+let open_file env path =
   assert (Stack.is_empty state || (Stack.top state).muc <> None);
-  Stack.push { env = env; path = path; pure = pure;
-               file = Mstr.empty; muc = None; inth = false } state
+  Stack.push { env = env; path = path; file = Mstr.empty; muc = None } state
 
 let close_file () =
   assert (not (Stack.is_empty state) && (Stack.top state).muc = None);
   (Stack.pop state).file
 
-let open_module ({id_str = nm; id_loc = loc} as id) ~theory =
+let open_module ({id_str = nm; id_loc = loc} as id) =
   assert (not (Stack.is_empty state) && (Stack.top state).muc = None);
   let slice = Stack.top state in
   if Mstr.mem nm slice.file then Loc.errorm ~loc
     "module %s is already defined in this file" nm;
-  if slice.pure && not theory then Loc.errorm ~loc
-    "this file can only contain pure theories";
   let muc = create_module slice.env ~path:slice.path (create_user_id id) in
-  slice.muc <- Some muc; slice.inth <- theory
+  slice.muc <- Some muc
 
 let close_module loc =
   assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
@@ -1230,10 +1222,19 @@ let close_namespace loc ~import =
     slice.muc <- Some muc
 
 let add_decl loc d =
-  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+  assert (not (Stack.is_empty state));
+  let slice = Stack.top state in
+  let muc = match slice.muc with
+    | Some muc -> muc
+    | None ->
+        assert (Mstr.is_empty slice.file);
+        if slice.path <> [] then Loc.errorm ~loc
+          "All declarations in library files must be inside modules";
+        let muc = create_module slice.env ~path:[] (id_fresh "Top") in
+        slice.muc <- Some muc;
+        muc in
   if Debug.test_noflag debug_parse_only then
-    let slice = Stack.top state in
-    let muc = Loc.try3 ~loc add_decl (Opt.get slice.muc) slice.inth d in
+    let muc = Loc.try2 ~loc add_decl muc d in
     slice.muc <- Some muc
 
 let use_clone loc use =

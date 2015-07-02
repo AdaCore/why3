@@ -230,7 +230,7 @@ rule token = parse
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    Typing.open_file ~pure:false env path;
+    Typing.open_file env path;
     let mm = Loc.with_location (mlw_file token) lb in
     if path = [] && Debug.test_flag debug then begin
       let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
@@ -242,15 +242,6 @@ rule token = parse
     end;
     mm
 
-  let () = Env.register_format mlw_language "whyml" ["mlw"] read_channel
+  let () = Env.register_format mlw_language "whyml" ["mlw";"why"] read_channel
     ~desc:"WhyML@ programming@ and@ specification@ language"
-
-  let read_channel env path file c =
-    let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
-    Typing.open_file ~pure:true env path;
-    Loc.with_location (mlw_file token) lb
-
-  let () = Env.register_format mlw_language "whyml_spec" ["why"] read_channel
-    ~desc:"WhyML@ specification@ sublanguage"
 }
