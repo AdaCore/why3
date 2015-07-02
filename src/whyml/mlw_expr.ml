@@ -956,11 +956,13 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
      first component. *)
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
-    match variant1 , vl with
-    | [] , [] -> ()
-    | (_,r1) :: _, (_,r2) :: _ when Opt.equal ls_equal r1 r2 -> ()
+    match variant1, vl with
+    | [], []
+    | (_,None)::_, (_,None)::_ -> ()
+    | (t1, Some r1)::_, (t2, Some r2)::_
+      when oty_equal t1.t_ty t2.t_ty && ls_equal r1 r2 -> ()
     | _ -> Loc.errorm "All functions in a recursive definition \
-      must use the same well-founded order for the first variant component"
+        must use the same well-founded order for the first variant component"
   in
   List.iter check_variant (List.tl defl);
   (* create the first list of fun_defns *)

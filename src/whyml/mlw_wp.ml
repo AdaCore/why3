@@ -265,15 +265,17 @@ let decrease_def ?loc env old_t t =
   else decrease_alg ?loc env old_t t
 
 let decrease loc lab env olds varl =
-  let rec decr olds varl = match olds , varl with
-    | (old_t,None)::olds, (t,None)::varl ->
-      let dt = decrease_def ?loc env old_t t in
-      if oty_equal old_t.t_ty t.t_ty
-      then t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds varl))
-      else dt
-    | (old_t,Some old_r)::olds, (t,Some r)::varl when ls_equal old_r r ->
-      let dt = ps_app r [t; old_t] in
-      t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds varl))
+  let rec decr olds varl = match olds, varl with
+    | (old_t, Some old_r)::olds, (t, Some r)::varl
+      when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
+        let dt = ps_app r [t; old_t] in
+        t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds varl))
+    | (old_t, None)::olds, (t, None)::varl
+      when oty_equal old_t.t_ty t.t_ty ->
+        let dt = decrease_def ?loc env old_t t in
+        t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds varl))
+    | (old_t, None)::_, (t, None)::_ ->
+        decrease_def ?loc env old_t t
     | _ -> t_false
   in
   t_label ?loc lab (decr olds varl)
