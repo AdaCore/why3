@@ -96,21 +96,21 @@
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 %token <Loc.position> POSITION
-%token <string> QUOTE_UIDENT QUOTE_LIDENT
+%token <string> QUOTE_LIDENT
 
 (* keywords *)
 
 %token AS AXIOM CLONE COINDUCTIVE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
-%token LET MATCH META NOT PREDICATE PROP SCOPE
+%token LET MATCH META NOT PREDICATE SCOPE
 %token THEN THEORY TRUE TYPE USE WITH
 
 (* program keywords *)
 
-%token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK
+%token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN CHECK
 %token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
-%token FUN GHOST INVARIANT LOOP MODULE MUTABLE
+%token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
 %token PRIVATE RAISE RAISES READS REC REQUIRES RETURNS
 %token TO TRY VAL VARIANT WHILE WRITES
 
@@ -147,6 +147,7 @@
 %right AND AMPAMP
 %nonassoc NOT
 %left EQUAL LTGT OP1
+%nonassoc AT OLD
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
 %left OP2
@@ -235,7 +236,9 @@ meta_arg:
 | CONSTANT  qualid  { Mfs $2 }
 | FUNCTION  qualid  { Mfs $2 }
 | PREDICATE qualid  { Mps $2 }
-| PROP      qualid  { Mpr $2 }
+| AXIOM     qualid  { Max $2 }
+| LEMMA     qualid  { Mlm $2 }
+| GOAL      qualid  { Mgl $2 }
 | STRING            { Mstr $1 }
 | INTEGER           { Mint (small_integer $1) }
 
@@ -460,6 +463,10 @@ term_:
       | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
 | NOT term
     { Tunop (Tnot, $2) }
+| OLD term
+    { Tat ($2, mk_id "0" $startpos($1) $endpos($1)) }
+| term AT uident
+    { Tat ($1, $3) }
 | prefix_op term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
 | l = term ; o = bin_op ; r = term
@@ -515,7 +522,6 @@ term_arg_:
 | numeral                   { Tconst $1 }
 | TRUE                      { Ttrue }
 | FALSE                     { Tfalse }
-| quote_uident              { Tident (Qident $1) }
 | o = oppref ; a = term_arg { Tidapp (Qident o, [a]) }
 | term_sub_                 { $1 }
 
@@ -576,7 +582,7 @@ numeral:
 pdecl:
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
-| LET ghost kind labels(lident_rich) EQUAL expr        { Dlet ($4, $2, $3, $6) }
+| LET ghost kind labels(lident_rich) EQUAL seq_expr    { Dlet ($4, $2, $3, $6) }
 | LET REC with_list1(rec_defn)                         { Drec $3 }
 | EXCEPTION labels(uident)                             { Dexn ($2, PTtuple []) }
 | EXCEPTION labels(uident) ty                          { Dexn ($2, $3) }
@@ -624,7 +630,7 @@ expr_:
     { Eand ($1, $3) }
 | expr BARBAR expr
     { Eor ($1, $3) }
-| NOT expr %prec prec_prefix_op
+| NOT expr
     { Enot $2 }
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
@@ -680,20 +686,18 @@ expr_:
     { Ematch ($2, $4) }
 | MATCH comma_list2(expr) WITH match_cases(seq_expr) END
     { Ematch (mk_expr (Etuple $2) $startpos($2) $endpos($2), $4) }
-| quote_uident COLON seq_expr
-    { Emark ($1, $3) }
-| LOOP loop_annotation seq_expr END
-    { let inv, var = $2 in Eloop (inv, var, $3) }
+| LABEL labels(uident) IN seq_expr
+    { Emark ($2, $4) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE
     { let inv, var = $4 in Ewhile ($2, inv, var, $5) }
 | FOR lident EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
     { Efor ($2, $4, $5, $6, $8, $9) }
 | ABSURD
     { Eabsurd }
-| RAISE uqualid
-    { Eraise ($2, None) }
-| RAISE LEFTPAR uqualid seq_expr RIGHTPAR
-    { Eraise ($3, Some $4) }
+| RAISE uqualid expr_arg?
+    { Eraise ($2, $3) }
+| RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
+    { Eraise ($3, $4) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, $4) }
 | GHOST expr
@@ -847,13 +851,10 @@ ident:
 | lident { $1 }
 
 uident:
-| UIDENT          { mk_id $1 $startpos $endpos }
+| UIDENT        { mk_id $1 $startpos $endpos }
 
 lident:
-| LIDENT          { mk_id $1 $startpos $endpos }
-
-quote_uident:
-| QUOTE_UIDENT  { mk_id ("'" ^ $1) $startpos $endpos }
+| LIDENT        { mk_id $1 $startpos $endpos }
 
 quote_lident:
 | QUOTE_LIDENT  { mk_id $1 $startpos $endpos }

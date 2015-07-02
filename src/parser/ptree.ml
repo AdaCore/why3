@@ -94,6 +94,7 @@ and term_desc =
   | Ttuple of term list
   | Trecord of (qualid * term) list
   | Tupdate of term * (qualid * term) list
+  | Tat of term * ident
 
 (*s Declarations. *)
 
@@ -158,7 +159,9 @@ type metarg =
   | Mty  of pty
   | Mfs  of qualid
   | Mps  of qualid
-  | Mpr  of qualid
+  | Max  of qualid
+  | Mlm  of qualid
+  | Mgl  of qualid
   | Mstr of string
   | Mint of int
 
@@ -209,7 +212,6 @@ and expr_desc =
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
-  | Eloop of invariant * variant * expr
   | Ewhile of expr * invariant * variant * expr
   | Eand of expr * expr
   | Eor of expr * expr

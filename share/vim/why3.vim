@@ -43,7 +43,7 @@ syn match    whyEndErr     "\<end\>"
 " Some convenient clusters
 syn cluster  whyAllErrs contains=whyBraceErr,whyBrackErr,whyParenErr,whyCommentErr,whyCountErr,whyDoErr,whyDoneErr,whyEndErr,whyThenErr,whyTheoryErr,whyModuleErr
 
-syn cluster  whyContained contains=whyTodo,whyImport,whyExport,whyTheoryContents,whyModuleContents,whyNamespaceContents,whyModuleKeyword
+syn cluster  whyContained contains=whyTodo,whyImport,whyExport,whyTheoryContents,whyModuleContents,whyScopeContents,whyModuleKeyword
 " ,whyPreDef,whyModParam,whyModParam1,whyPreMPRestr,whyMPRestr,whyMPRestr1,whyMPRestr2,whyMPRestr3,whyModRHS,whyFuncWith,whyFuncStruct,whyModTypeRestr,whyModTRWith,whyWith,whyWithRest,whyModType,whyFullMod,whyVal
 
 " Enclosing delimiters
@@ -70,18 +70,18 @@ syn region   whyNone matchgroup=whyKeyword start="\<if\>" matchgroup=whyKeyword 
 
 syn region   whyTheory matchgroup=whyKeyword start="\<theory\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment skipwhite skipempty nextgroup=whyTheoryContents
 syn region   whyModule matchgroup=whyKeyword start="\<module\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment skipwhite skipempty nextgroup=whyModuleContents
-syn region   whyNamespace matchgroup=whyKeyword start="\<namespace\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyImport skipwhite skipempty nextgroup=whyNamespaceContents
+syn region   whyScope matchgroup=whyKeyword start="\<scope\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyImport skipwhite skipempty nextgroup=whyScopeContents
 
 syn region   whyTheoryContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
 syn region   whyModuleContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
-syn region   whyNamespaceContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
+syn region   whyScopeContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
 
 syn region   whyNone matchgroup=whyKeyword start="\<\(use\|clone\)\>" matchgroup=whyModSpec end="\<\(\w\+\.\)*\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyString,whyImport,whyExport,whyModuleKeyword
 syn keyword  whyExport contained export
 syn keyword  whyImport contained import
 syn keyword  whyModuleKeyword contained module
 
-syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\|prop\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
+syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
 
 syn keyword  whyKeyword  as constant
 syn keyword  whyKeyword  else epsilon exists
@@ -92,7 +92,7 @@ syn keyword  whyKeyword  not predicate
 syn keyword  whyKeyword  then type with
 
 syn keyword  whyKeyword  any
-syn keyword  whyKeyword  exception fun ghost
+syn keyword  whyKeyword  exception fun ghost label
 syn keyword  whyKeyword  model mutable private
 syn keyword  whyKeyword  raise rec val while
 
@@ -102,7 +102,7 @@ syn keyword  whyType     bool int list map option real
 syn keyword  whyType     array ref unit
 
 syn keyword  whySpec     absurd assert assume check diverges ensures invariant
-syn keyword  whySpec     raises reads requires returns variant writes
+syn keyword  whySpec     raises reads requires returns variant writes at old
 
 syn match    whyConstructor  "(\s*)"
 syn match    whyConstructor  "\u\(\w\|'\)*\>"
@@ -149,8 +149,8 @@ syn sync match whyTheorySync  groupthere whyTheory  "\<end\>"
 syn sync match whyModuleSync  grouphere  whyModule  "\<module\>"
 syn sync match whyModuleSync  groupthere whyModule  "\<end\>"
 
-syn sync match whyNamespaceSync  grouphere  whyNamespace  "\<namespace\>"
-syn sync match whyNamespaceSync  groupthere whyNamespace  "\<end\>"
+syn sync match whyScopeSync   grouphere  whyScope   "\<scope\>"
+syn sync match whyScopeSync   groupthere whyScope   "\<end\>"
 
 " Define the default highlighting.
 " For version 5.7 and earlier: only when not done already

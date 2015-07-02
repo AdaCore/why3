@@ -394,6 +394,7 @@ val cty_add_post : cty -> post list -> cty
 
 val forget_reg : region -> unit   (* flush id_unique for a region *)
 val forget_pv  : pvsymbol -> unit (* flush for a program variable *)
+val forget_cty : cty -> unit      (* forget arguments and oldies *)
 
 val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)
 val print_reg : Format.formatter -> region -> unit    (* region *)
@@ -406,5 +407,5 @@ val print_pvty : Format.formatter -> pvsymbol -> unit (* pvsymbol : type *)
 val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
 
 val print_spec :
-  pvsymbol list -> pre list -> post list -> post list Mexn.t ->
-    effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)
+  pvsymbol list -> pre list -> post list -> post list Mexn.t -> pvsymbol Mpv.t
+    -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)

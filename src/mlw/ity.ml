@@ -1175,7 +1175,7 @@ exception FoundPrefix of pvsymbol list
 
 let unknown = create_pvsymbol (id_fresh "?") ity_unit
 
-let print_spec args pre post xpost eff fmt ity =
+let print_spec args pre post xpost oldies eff fmt ity =
   let dot fmt () = pp_print_char fmt '.' in
   let print_pfx reg fmt pfx = fprintf fmt "@[%a:@,%a@]"
     (Pp.print_list dot print_pv) pfx print_reg reg in
@@ -1206,6 +1206,8 @@ let print_spec args pre post xpost eff fmt ity =
         (Pp.print_list Pp.comma print_cvr) (Sreg.elements cvr) in
   let print_result fmt ity = fprintf fmt " :@ %a" print_ity ity in
   let print_pre fmt p = fprintf fmt "@\nrequires { @[%a@] }" print_term p in
+  let print_old fmt (o,v) =
+    fprintf fmt "@\nold { %a -> %a }" print_pv o print_pv v in
   let print_post fmt q =
     let v, q = open_post q in
     fprintf str_formatter "%a" print_vs v;
@@ -1225,18 +1227,24 @@ let print_spec args pre post xpost eff fmt ity =
   Pp.print_list_pre Pp.space print_pvty fmt args;
   Pp.print_option print_result fmt ity;
   if eff.eff_oneway then pp_print_string fmt " diverges";
-  if not (Spv.is_empty eff.eff_reads) then fprintf fmt "@\nreads  { %a }"
-    (Pp.print_list Pp.comma print_pv) (Spv.elements eff.eff_reads);
+  let reads = List.fold_right Spv.remove args eff.eff_reads in
+  if not (Spv.is_empty reads) then fprintf fmt "@\nreads  { %a }"
+    (Pp.print_list Pp.comma print_pv) (Spv.elements reads);
   if not (Mreg.is_empty eff.eff_writes) then fprintf fmt "@\nwrites { %a }"
     (Pp.print_list Pp.comma print_write) (Mreg.bindings eff.eff_writes);
   if not (Mreg.is_empty eff.eff_covers) then fprintf fmt "@\ncovers { %a }"
     (Pp.print_list Pp.comma print_raise) (Mreg.bindings eff.eff_covers);
   Pp.print_list Pp.nothing print_pre fmt pre;
+  Pp.print_list Pp.nothing print_old fmt (Mpv.bindings oldies);
   Pp.print_list Pp.nothing print_post fmt post;
   Pp.print_list Pp.nothing print_xpost fmt (Mexn.bindings xpost)
 
 let print_cty fmt c = print_spec c.cty_args c.cty_pre c.cty_post
-  c.cty_xpost c.cty_effect fmt (Some c.cty_result)
+  c.cty_xpost c.cty_oldies c.cty_effect fmt (Some c.cty_result)
+
+let forget_cty c =
+  List.iter forget_pv c.cty_args;
+  Mpv.iter (fun v _ -> forget_pv v) c.cty_oldies
 
 (** exception handling *)
 

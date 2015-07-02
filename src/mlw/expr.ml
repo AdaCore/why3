@@ -972,17 +972,20 @@ and print_capp pri s fmt vl = match extract_op s, vl with
 and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
   | Cany when exec && c.cty_args = [] ->
       fprintf fmt "@[<hov 2>any %a%a@]" print_ity c.cty_result
-        (print_spec [] c.cty_pre c.cty_post c.cty_xpost c.cty_effect) None
+        (print_spec [] c.cty_pre c.cty_post c.cty_xpost
+          c.cty_oldies c.cty_effect) None
   | Cany ->
-      fprintf fmt "@[<hov 2>any%a@]" print_cty c
+      fprintf fmt "@[<hov 2>any%a@]" print_cty c;
+      forget_cty c
   | Cfun e when exec && c.cty_args = [] ->
       fprintf fmt "@[<hov 2>abstract%a@\n%a@]@\nend"
-        (print_spec [] c.cty_pre c.cty_post c.cty_xpost eff_empty) None
-        print_expr e
+        (print_spec [] c.cty_pre c.cty_post c.cty_xpost
+          c.cty_oldies eff_empty) None print_expr e
   | Cfun e ->
       fprintf fmt "@[<hov 2>fun%a ->@\n%a@]"
-        (print_spec c.cty_args c.cty_pre c.cty_post c.cty_xpost eff_empty) None
-        print_expr e
+        (print_spec c.cty_args c.cty_pre c.cty_post c.cty_xpost
+          c.cty_oldies eff_empty) None print_expr e;
+      forget_cty c
   | Capp (s,[]) when rs_equal s rs_true ->
       pp_print_string fmt "true"
   | Capp (s,[]) when rs_equal s rs_false ->
@@ -1011,7 +1014,7 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
         print_let_defn ld print_expr e;
       forget_let_defn ld
-  | Eif (e0,e1,e2) when is_e_false e1 && is_e_false e2 ->
+  | Eif (e0,e1,e2) when is_e_false e1 && is_e_true e2 ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lexpr 4) e0
   | Eif (e0,e1,e2) when is_e_false e2 ->
       fprintf fmt (protect_on (pri > 3) "@[<hov 1>%a &&@ %a@]")
@@ -1019,6 +1022,9 @@ and print_enode pri fmt e = match e.e_node with
   | Eif (e0,e1,e2) when is_e_true e1 ->
       fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a ||@ %a@]")
         (print_lexpr 3) e0 (print_lexpr 2) e2
+  | Eif (e0,e1,e2) when is_e_void e2 ->
+      fprintf fmt (protect_on (pri > 0) "if %a then %a")
+        print_expr e0 print_expr e1
   | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_expr e0 print_expr e1 print_expr e2
@@ -1037,7 +1043,7 @@ and print_enode pri fmt e = match e.e_node with
         print_expr e0 (if ghost then ")" else "")
         (Pp.print_list Pp.newline print_branch) bl
   | Ewhile (d,inv,varl,e) ->
-      fprintf fmt "@[<hov 2]while %a do%a%a@\n%a@]@\ndone"
+      fprintf fmt "@[<hov 2>while %a do%a%a@\n%a@]@\ndone"
         print_expr d print_invariant inv print_variant varl print_expr e
   | Efor (pv,(pvfrom,dir,pvto),inv,e) ->
       fprintf fmt "@[<hov 2>for %a =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
@@ -1081,10 +1087,15 @@ and print_let_defn fmt = function
         (if v.pv_ghost then "ghost " else "")
         print_pv v print_id_labels v.pv_vs.vs_name
         (print_lexpr 0 (*4*)) e
-  | LDsym (s,{c_node = Cfun e; c_cty = c}) ->
+  | LDsym (s,{c_node = Cfun e; c_cty = ({cty_args = _::_} as c)}) ->
       fprintf fmt "@[<hov 2>let %a%a =@\n%a@]"
         print_rs_head s print_cty c
-        (print_lexpr 0 (*4*)) e
+        (print_lexpr 0 (*4*)) e;
+      forget_cty c
+  | LDsym (s,{c_node = Cany; c_cty = ({cty_args = _::_} as c)}) ->
+      fprintf fmt "@[<hov 2>val %a%a@]"
+        print_rs_head s print_cty c;
+      forget_cty c
   | LDsym (s,c) ->
       fprintf fmt "@[<hov 2>let %a =@\n%a@]"
         print_rs_head s
@@ -1102,26 +1113,8 @@ and print_rec_fun fst fmt fd =
     print_rs_head fd.rec_sym
     print_cty fd.rec_fun.c_cty
     print_variant fd.rec_varl
-    (print_lexpr 0 (*4*)) e
-
-(*
-let print_val_decl fmt = function
-  | ValV v ->
-      fprintf fmt "@[<hov 2>val %s%a%a :@ %a@]"
-        (if v.pv_ghost then "ghost " else "")
-        print_pv v print_id_labels v.pv_vs.vs_name
-        print_ity v.pv_ity
-  | ValS ({rs_logic = RLpv v; rs_cty = c} as s) ->
-      fprintf fmt "@[<hov 2>val %a%a@]" print_rs_head s
-        (print_spec c.cty_args c.cty_pre (List.tl c.cty_post) c.cty_xpost
-          (Spv.remove v c.cty_reads) c.cty_effect) (Some c.cty_result)
-  | ValS ({rs_logic = RLls _; rs_cty = c} as s) ->
-      fprintf fmt "@[<hov 2>val %a%a@]" print_rs_head s
-        (print_spec c.cty_args c.cty_pre (List.tl c.cty_post) c.cty_xpost
-          c.cty_reads c.cty_effect) (Some c.cty_result)
-  | ValS s ->
-      fprintf fmt "@[<hov 2>val %a%a@]" print_rs_head s print_cty s.rs_cty
-*)
+    (print_lexpr 0 (*4*)) e;
+  forget_cty fd.rec_fun.c_cty
 
 (* exception handling *)
 
@@ -1130,10 +1123,4 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Function %a is not a constructor" print_rs s
   | FieldExpected s -> fprintf fmt
       "Function %a is not a mutable field" print_rs s
-(*
-  | ItyExpected _e -> fprintf fmt
-      "This expression is not a first-order value"
-  | CtyExpected _e -> fprintf fmt
-      "This expression is not a function and cannot be applied"
-*)
   | _ -> raise e)

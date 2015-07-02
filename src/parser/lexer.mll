@@ -46,10 +46,9 @@
         "let", LET;
         "match", MATCH;
         "meta", META;
-        "scope", SCOPE;
         "not", NOT;
         "predicate", PREDICATE;
-        "prop", PROP;
+        "scope", SCOPE;
         "then", THEN;
         "theory", THEORY;
         "true", TRUE;
@@ -62,6 +61,7 @@
         "any", ANY;
         "assert", ASSERT;
         "assume", ASSUME;
+        "at", AT;
         "begin", BEGIN;
         "check", CHECK;
         "diverges", DIVERGES;
@@ -74,9 +74,10 @@
         "fun", FUN;
         "ghost", GHOST;
         "invariant", INVARIANT;
-        "loop", LOOP;
+        "label", LABEL;
         "module", MODULE;
         "mutable", MUTABLE;
+        "old", OLD;
         "private", PRIVATE;
         "raise", RAISE;
         "raises", RAISES;
@@ -158,8 +159,6 @@ rule token = parse
       { Lexlib.comment lexbuf; token lexbuf }
   | "'" (lident as id)
       { QUOTE_LIDENT id }
-  | "'" (uident as id)
-      { QUOTE_UIDENT id }
   | ","
       { COMMA }
   | "("

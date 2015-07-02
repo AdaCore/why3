@@ -852,6 +852,7 @@ let env_empty = {
 exception UnboundLabel of string
 
 let find_old pvm (ovm,old) v =
+  if v.pv_ity.ity_pure then v else
   let n = v.pv_vs.vs_name.id_string in
   (* if v is top-level, both ov and pv are None.
      If v is local, ov and pv must be equal to v.
@@ -882,7 +883,7 @@ let rebase_old {pvm = pvm} preold old fvs =
     if not (Mvs.mem o fvs) then sbs else match preold with
       | Some preold ->
           Mvs.add o (t_var (find_old pvm preold v).pv_vs) sbs
-      | None -> raise (UnboundLabel "'0") in
+      | None -> raise (UnboundLabel "0") in
   Hpv.fold rebase old Mvs.empty
 
 let rebase_pre env preold old pl =
@@ -923,8 +924,8 @@ let cty_of_spec env bl dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders bl in
   let env = add_binders env bl in
-  let preold = Mstr.find_opt "'0" env.old in
-  let env, old = add_label env "'0" in
+  let preold = Mstr.find_opt "0" env.old in
+  let env, old = add_label env "0" in
   let dsp = get_later env dsp ity in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_strong eff in
@@ -1193,9 +1194,9 @@ and rec_defn uloc env ghost {fds = dfdl} =
 
 and lambda uloc env pvl dsp dvl de =
   let env = add_binders env pvl in
+  let preold = Mstr.find_opt "0" env.old in
+  let env, old = add_label env "0" in
   let e = expr uloc env de in
-  let preold = Mstr.find_opt "'0" env.old in
-  let env, old = add_label env "'0" in
   let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
   let dvl = rebase_variant env preold old dvl in
