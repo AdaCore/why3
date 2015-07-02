@@ -7,8 +7,8 @@
 <prover id="4" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.3" timelimit="1" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="15" memlimit="1000"/>
-<file name="../random_access_list.mlw">
-<theory name="RandomAccessList" sum="d27743d57c1d4ea4700ca93cff755188">
+<file name="../random_access_list.mlw" expanded="true">
+<theory name="RandomAccessList" sum="d27743d57c1d4ea4700ca93cff755188" expanded="true">
  <goal name="WP_parameter length_flatten" expl="VC for length_flatten">
  <transf name="split_goal_wp">
   <goal name="WP_parameter length_flatten.1" expl="1. variant decrease">
@@ -72,8 +72,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter set" expl="VC for set">
- <transf name="split_goal_wp">
+ <goal name="WP_parameter set" expl="VC for set" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter set.1" expl="1. unreachable point">
   <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
@@ -122,13 +122,13 @@
   <goal name="WP_parameter set.16" expl="16. precondition">
   <proof prover="8" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter set.17" expl="17. assertion">
-  <transf name="split_goal_wp">
+  <goal name="WP_parameter set.17" expl="17. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter set.17.1" expl="1. assertion">
    <proof prover="8" timelimit="3"><result status="valid" time="0.87" steps="195"/></proof>
    </goal>
-   <goal name="WP_parameter set.17.2" expl="2. assertion">
-   <proof prover="8" timelimit="10"><result status="valid" time="3.11" steps="572"/></proof>
+   <goal name="WP_parameter set.17.2" expl="2. assertion" expanded="true">
+   <proof prover="1" timelimit="36"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="WP_parameter set.17.3" expl="3. assertion">
    <proof prover="4"><result status="valid" time="0.46"/></proof>
@@ -196,7 +196,7 @@
   <proof prover="8"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter add.4" expl="4. postcondition">
-  <proof prover="8"><result status="valid" time="3.44" steps="427"/></proof>
+  <proof prover="8"><result status="valid" time="2.74" steps="427"/></proof>
   </goal>
  </transf>
  </goal>
@@ -246,7 +246,7 @@
   <proof prover="8"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter tail.6" expl="6. postcondition">
-  <proof prover="8"><result status="valid" time="4.78" steps="526"/></proof>
+  <proof prover="8"><result status="valid" time="5.55" steps="526"/></proof>
   </goal>
  </transf>
  </goal>
