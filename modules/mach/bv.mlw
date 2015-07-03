@@ -1,0 +1,115 @@
+(* Reasoning on bitvectors with precondition enforcing absence of overflow *)
+module BVCheck_Gen
+  use import int.Int
+
+  type t
+
+  constant two_power_size : int
+  constant zero           : t
+
+  function to_uint t   : int
+  function of_int  int : t
+
+  function add  t t : t
+  function sub  t t : t
+  function mul  t t : t
+  function udiv t t : t
+  function urem t t : t
+
+  val int_check (a:int) : t
+    requires { 0 <= a < two_power_size }
+    ensures  { to_uint result = a }
+    ensures  { result = of_int a }
+
+  val add_check (a b:t) : t
+    requires { 0 <= to_uint a + to_uint b < two_power_size }
+    ensures  { to_uint result = to_uint a + to_uint b }
+    ensures  { result = add a b }
+
+  val sub_check (a b:t) : t
+    requires { 0 <= to_uint a - to_uint b < two_power_size }
+    ensures  { result = sub a b }
+    ensures  { to_uint result = to_uint a - to_uint b }
+
+  val mul_check (a b:t) : t
+    requires { 0 <= to_uint a * to_uint b < two_power_size }
+    ensures  { result = mul a b }
+    ensures  { to_uint result = to_uint a * to_uint b }
+
+  use import int.EuclideanDivision
+
+  val udiv_check (a b:t) : t
+    requires {b <> zero}
+    ensures  { to_uint result = div (to_uint a) (to_uint b) }
+    ensures  { result = udiv a b }
+
+  val urem_check (a b:t) : t
+    requires {b <> zero}
+    ensures  { to_uint result = mod (to_uint a) (to_uint b) }
+    ensures  { result = urem a b }
+
+end
+
+module BVCheck8
+  use export bv.BV8
+
+  clone export BVCheck_Gen with
+    type t = t,
+    function two_power_size = two_power_size,
+    function zero = zero,
+    function to_uint = to_uint,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem
+end
+
+module BVCheck16
+  use export bv.BV16
+
+  clone export BVCheck_Gen with
+    type t = t,
+    function two_power_size = two_power_size,
+    function zero = zero,
+    function to_uint = to_uint,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem
+end
+
+module BVCheck32
+  use export bv.BV32
+
+  clone export BVCheck_Gen with
+    type t = t,
+    function two_power_size = two_power_size,
+    function zero = zero,
+    function to_uint = to_uint,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem
+end
+
+module BVCheck64
+  use export bv.BV64
+
+  clone export BVCheck_Gen with
+    type t = t,
+    function two_power_size = two_power_size,
+    function zero = zero,
+    function to_uint = to_uint,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem
+end
