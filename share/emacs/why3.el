@@ -173,4 +173,4 @@
   ; (why3-menu)
   (run-hooks 'why3-mode-hook))
 
-(provide 'why3-mode)
+(provide 'why3)

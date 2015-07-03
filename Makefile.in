@@ -99,7 +99,7 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
 COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
 
-TARGET_EMACS = share/emacs/why3-mode.elc
+TARGET_EMACS = share/emacs/why3.elc
 
 ###############
 # main target
@@ -342,15 +342,15 @@ uninstall: clean_old_install
 	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
 
 clean_old_install::
-	rm -f $(DATADIR)/emacs/site-lisp/why3-mode.el
+	rm -f $(DATADIR)/emacs/site-lisp/why3.el
 ifneq ($(EMACS),no)
-	rm -f $(DATADIR)/emacs/site-lisp/why3-mode.elc
+	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
 endif
 
 install_no_local::
-	cp -f share/emacs/why3-mode.el $(DATADIR)/emacs/site-lisp/why3-mode.el
+	cp -f share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
 ifneq ($(EMACS),no)
-	cp -f share/emacs/why3-mode.elc $(DATADIR)/emacs/site-lisp/why3-mode.elc
+	cp -f share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
 endif
 
 
