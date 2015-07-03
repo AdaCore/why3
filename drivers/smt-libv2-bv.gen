@@ -55,6 +55,9 @@ theory bv.BV64
 
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 64)) (_ bv0 64)))"
+(* possible alternative definition :
+    "(= ((_ extract 0 0) (bvlshr %1 %2)) (_ bv1 1))"
+*)
 
   syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
   syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
