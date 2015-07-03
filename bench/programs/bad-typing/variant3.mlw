@@ -1,0 +1,19 @@
+
+(* Different instances of a polymorphic relation. *)
+
+module M
+  
+  use import list.List
+  
+  predicate rel (a b:list 'a)
+  
+  let rec aux (a:list int) : unit
+    variant { a with rel }
+  = aux2 Nil
+  
+  with aux2 (a:list unit) : unit
+    variant { a with rel }
+  = aux Nil
+  
+end
+
