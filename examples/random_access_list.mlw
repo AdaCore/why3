@@ -233,30 +233,31 @@ module RandomAccessListWithSeq
       | Zero  l1 -> let (_, x1) = lookup 0 l1 in One x1 (tail l1)
       end
 
-   function aux (i: int) (f: 'a -> 'a) : ('a,'a) -> ('a, 'a) =
-     \ z. let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
 
 
    function setf (s: seq 'a) (i:int) (f: 'a -> 'a) : seq 'a =
      set s i (f s[i])
 
 
-   let rec fupdate_aux (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a
+   function aux (i: int) (f: 'a -> 'a) : ('a,'a) -> ('a, 'a) =
+     \ z. let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
+
+   let rec fupdate (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l}
     ensures  { elements result == setf (elements l) i f}
     = match l with
       | Empty    -> absurd
       | One x l1 -> if i = 0 then One (f x) l1 else
-                    cons x (fupdate_aux f (i-1) (Zero l1))
-      | Zero l1  -> Zero (fupdate_aux (aux i f) (div i 2) l1)
+                    cons x (fupdate f (i-1) (Zero l1))
+      | Zero l1  -> Zero (fupdate (aux i f) (div i 2) l1)
       end
 
    function f (y: 'a) : 'a -> 'a = \ _. y
 
-   let fupdate (i:int) (y: 'a) (l: ral 'a) : ral 'a
+   let update (i:int) (y: 'a) (l: ral 'a) : ral 'a
    requires { 0 <= i < length (elements l) }
    ensures  { elements result == set (elements l) i y}
-   =  fupdate_aux (f y) i  l
+   =  fupdate (f y) i  l
 
 end

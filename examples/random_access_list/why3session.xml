@@ -164,7 +164,7 @@
  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="RandomAccessListWithSeq" sum="fcb68ecfcb876f1501923453e0387c2d">
+<theory name="RandomAccessListWithSeq" sum="270fa516a403a2453f40c174ff5ee8d1" expanded="true">
  <goal name="WP_parameter size" expl="VC for size">
  <transf name="split_goal_wp">
   <goal name="WP_parameter size.1" expl="1. postcondition">
@@ -225,36 +225,11 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter fupdate_aux" expl="VC for fupdate_aux">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter fupdate_aux.1" expl="1. unreachable point">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.2" expl="2. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.05" steps="99"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.3" expl="3. variant decrease">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.4" expl="4. precondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.5" expl="5. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.08" steps="115"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.6" expl="6. variant decrease">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.04" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.7" expl="7. precondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.06" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter fupdate_aux.8" expl="8. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="5.33" steps="559"/></proof>
-  </goal>
- </transf>
+ <goal name="WP_parameter fupdate" expl="VC for fupdate" expanded="true">
+ <proof prover="0"><result status="valid" time="3.77" steps="1222"/></proof>
  </goal>
- <goal name="WP_parameter fupdate" expl="VC for fupdate">
- <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+ <goal name="WP_parameter update" expl="VC for update">
+ <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
  </goal>
 </theory>
 </file>
