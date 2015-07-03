@@ -53,13 +53,13 @@ module RandomAccessList
     | One _ l1 -> 1 + 2 * size l1
     end
 
-  let rec add (x: 'a) (l: ral 'a) : ral 'a
+  let rec cons (x: 'a) (l: ral 'a) : ral 'a
     variant { l }
     ensures { elements result = Cons x (elements l) }
     = match l with
       | Empty    -> One x Empty
       | Zero l1  -> One x l1
-      | One y l1 -> Zero (add (x, y) l1)
+      | One y l1 -> Zero (cons (x, y) l1)
       end
 
   let rec lemma nth_flatten (i: int) (l: list ('a, 'a))
@@ -74,14 +74,14 @@ module RandomAccessList
     | Cons _ r -> if i > 0 then nth_flatten (i-1) r
     end
 
-  let rec get (i: int) (l: ral 'a) : 'a
+  let rec lookup (i: int) (l: ral 'a) : 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l }
     ensures  { nth i (elements l) = Some result }
     = match l with
       | Empty    -> absurd
-      | One x l1 -> if i = 0 then x else get (i-1) (Zero l1)
-      | Zero l1  -> let (x0, x1) = get (div i 2) l1 in
+      | One x l1 -> if i = 0 then x else lookup (i-1) (Zero l1)
+      | Zero l1  -> let (x0, x1) = lookup (div i 2) l1 in
                     if mod i 2 = 0 then x0 else x1
       end
 
@@ -95,10 +95,10 @@ module RandomAccessList
     = match l with
       | Empty    -> absurd
       | One _ l1 -> Zero l1
-      | Zero  l1 -> let (_, x1) = get 0 l1 in One x1 (tail l1)
+      | Zero  l1 -> let (_, x1) = lookup 0 l1 in One x1 (tail l1)
       end
 
-  let rec set (i: int) (y: 'a) (l: ral 'a) : ral 'a
+  let rec update (i: int) (y: 'a) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l}
     ensures  { nth i (elements result) = Some y}
@@ -112,13 +112,13 @@ module RandomAccessList
     = match l with
       | Empty    -> absurd
       | One x l1 -> if i = 0 then One y l1 else
-                    match set (i-1) y (Zero l1) with
+                    match update (i-1) y (Zero l1) with
                     | Empty | One _ _ -> absurd
                     | Zero l1         -> One x l1
                     end
       | Zero l1  ->
-          let (x0, x1) = get (div i 2) l1 in
-          let l1' = set (div i 2) (if mod i 2 = 0 then (y,x1) else (x0,y)) l1 in
+          let (x0, x1) = lookup (div i 2) l1 in
+          let l1' = update (div i 2) (if mod i 2 = 0 then (y,x1) else (x0,y)) l1 in
             assert { forall j. 0 <= j < length (elements l) -> j <> i ->
                match nth (div j 2) (elements l1) with
                | None -> false
@@ -158,13 +158,13 @@ module RAL
   let cons (x: 'a) (s: t 'a) : t 'a
     ensures { result.l = Cons x s.l }
   =
-    { r = add x s.r; l = Cons x s.l }
+    { r = cons x s.r; l = Cons x s.l }
 
-  let get (i: int) (s: t 'a) : 'a
+  let lookup (i: int) (s: t 'a) : 'a
     requires { 0 <= i < length s.l }
     ensures { Some result = nth i s.l }
   =
-    get i s.r
+    lookup i s.r
 
 end
 
@@ -203,23 +203,23 @@ module RandomAccessListWithSeq
     | One _ l1 -> 1 + 2 * size l1
     end
 
-  let rec add (x: 'a) (l: ral 'a) : ral 'a
+  let rec cons (x: 'a) (l: ral 'a) : ral 'a
     variant { l }
     ensures { elements result == cons x (elements l) }
     = match l with
       | Empty    -> One x Empty
       | Zero l1  -> One x l1
-      | One y l1 -> Zero (add (x, y) l1)
+      | One y l1 -> Zero (cons (x, y) l1)
       end
 
-  let rec get (i: int) (l: ral 'a) : 'a
+  let rec lookup (i: int) (l: ral 'a) : 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l }
     ensures  { (elements l)[i] = result }
     = match l with
       | Empty    -> absurd
-      | One x l1 -> if i = 0 then x else get (i-1) (Zero l1)
-      | Zero l1  -> let (x0, x1) = get (div i 2) l1 in
+      | One x l1 -> if i = 0 then x else lookup (i-1) (Zero l1)
+      | Zero l1  -> let (x0, x1) = lookup (div i 2) l1 in
                     if mod i 2 = 0 then x0 else x1
       end
 
@@ -230,24 +230,33 @@ module RandomAccessListWithSeq
     = match l with
       | Empty    -> absurd
       | One _ l1 -> Zero l1
-      | Zero  l1 -> let (_, x1) = get 0 l1 in One x1 (tail l1)
+      | Zero  l1 -> let (_, x1) = lookup 0 l1 in One x1 (tail l1)
       end
 
-  let rec set (i: int) (y: 'a) (l: ral 'a) : ral 'a
+   function aux (i: int) (f: 'a -> 'a) : ('a,'a) -> ('a, 'a) =
+     \ z. let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
+
+
+   function setf (s: seq 'a) (i:int) (f: 'a -> 'a) : seq 'a =
+     set s i (f s[i])
+
+
+   let rec fupdate_aux (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }
     variant  { i, l}
-    ensures  { elements result == set (elements l) i y}
+    ensures  { elements result == setf (elements l) i f}
     = match l with
       | Empty    -> absurd
-      | One x l1 ->
-          if i = 0 then One y l1 else
-          match set (i-1) y (Zero l1) with
-          | Empty | One _ _ -> absurd
-          | Zero l1 -> One x l1
-          end
-      | Zero l1  ->
-          let (x0, x1) = get (div i 2) l1 in
-          Zero (set (div i 2) (if mod i 2 = 0 then (y,x1) else (x0,y)) l1)
+      | One x l1 -> if i = 0 then One (f x) l1 else
+                    cons x (fupdate_aux f (i-1) (Zero l1))
+      | Zero l1  -> Zero (fupdate_aux (aux i f) (div i 2) l1)
       end
+
+   function f (y: 'a) : 'a -> 'a = \ _. y
+
+   let fupdate (i:int) (y: 'a) (l: ral 'a) : ral 'a
+   requires { 0 <= i < length (elements l) }
+   ensures  { elements result == set (elements l) i y}
+   =  fupdate_aux (f y) i  l
 
 end
