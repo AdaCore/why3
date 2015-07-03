@@ -21,7 +21,7 @@
 ;; font-lock
 
 (defun why3-regexp-opt (l)
-  (concat "\\<" (concat (regexp-opt l t) "\\>")))
+  (regexp-opt l 'words))
 
 (defconst why3-font-lock-keywords-1
   (list
@@ -175,4 +175,3 @@
   (run-hooks 'why3-mode-hook))
 
 (provide 'why3)
-
