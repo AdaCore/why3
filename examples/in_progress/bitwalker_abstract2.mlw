@@ -9,7 +9,45 @@ module Bitwalker
   use bv.BVConverter_32_64 as C32_64
   use bv.BVConverter_8_32 as C8_32
 
+(* file missing in repository
   use import mach.bv.BV
+*)
+  val int8_check (a:int) : BV8.t
+    requires { 0 <= a < BV8.two_power_size }
+    ensures  { BV8.to_uint result = a }
+    ensures  { result = BV8.of_int a }
+
+  val int32_check (a:int) : BV32.t
+    requires { 0 <= a < BV32.two_power_size }
+    ensures  { BV32.to_uint result = a }
+    ensures  { result = BV32.of_int a }
+
+  val int64_check (a:int) : BV64.t
+    requires { 0 <= a < BV64.two_power_size }
+    ensures  { BV64.to_uint result = a }
+    ensures  { result = BV64.of_int a }
+
+  val add32_check (a b:BV32.t) : BV32.t
+    requires { 0 <= BV32.to_uint a + BV32.to_uint b < BV32.two_power_size }
+    ensures  { BV32.to_uint result = BV32.to_uint a + BV32.to_uint b }
+    ensures  { result = BV32.add a b }
+
+  val sub32_check (a b:BV32.t) : BV32.t
+    requires { 0 <= BV32.to_uint a - BV32.to_uint b < BV32.two_power_size }
+    ensures  { BV32.to_uint result = BV32.to_uint a - BV32.to_uint b }
+    ensures  { result = BV32.sub a b }
+
+  val sub8_check (a b:BV8.t) : BV8.t
+    requires { 0 <= BV8.to_uint a - BV8.to_uint b < BV8.two_power_size }
+    ensures  { BV8.to_uint result = BV8.to_uint a - BV8.to_uint b }
+    ensures  { result = BV8.sub a b }
+
+  val udiv32_check (a b:BV32.t) : BV32.t
+    ensures  { result = BV32.udiv a b }
+
+  val urem32_check (a b:BV32.t) : BV32.t
+    ensures  { result = BV32.urem a b }
+
 
   function nth8_stream (stream : array BV8.t) (pos : int) : bool =
     BV8.nth stream[div pos 8] (7 - mod pos 8)
