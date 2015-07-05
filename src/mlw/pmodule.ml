@@ -302,21 +302,26 @@ let add_pdecl ~vc uc d =
 
 type mlw_file = pmodule Mstr.t
 
-let convert =
-  let dummy_env = Env.create_env [] in
-  let convert mm = Mstr.map (fun m -> m.mod_theory) mm in
-  fun mm -> if Mstr.is_empty mm then Mstr.empty else
-    match (snd (Mstr.choose mm)).mod_theory.th_path with
-    | ("why3" :: _) as path ->
-        begin try Env.read_library Env.base_language dummy_env path
-        with Env.LibraryNotFound _ -> convert mm end
-    | _ -> convert mm
+let convert mm =
+  let convert m = m.mod_theory in
+  if Mstr.is_empty mm then Mstr.empty else
+  match (snd (Mstr.choose mm)).mod_theory.th_path with
+  | "why3" :: path ->
+      begin try Env.base_language_builtin path
+      with Not_found -> Mstr.map convert mm end
+  | _ -> Mstr.map convert mm
 
 let mlw_language = Env.register_language Env.base_language convert
 
 open Theory
 
-let () =
+module Hpath = Exthtbl.Make(struct
+  type t = Env.pathname
+  let hash = Hashtbl.hash
+  let equal = (=)
+end)
+
+let mlw_language_builtin =
   let builtin s =
     if s = unit_module.mod_theory.th_name.id_string then unit_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
@@ -325,9 +330,11 @@ let () =
     match tuple_theory_name s with
     | Some n -> tuple_module n
     | None -> raise Not_found in
-  Env.add_builtin mlw_language (function
+  Hpath.memo 7 (function
     | [s] -> Mstr.singleton s (builtin s)
     | _   -> raise Not_found)
+
+let () = Env.add_builtin mlw_language mlw_language_builtin
 
 exception ModuleNotFound of Env.pathname * string
 

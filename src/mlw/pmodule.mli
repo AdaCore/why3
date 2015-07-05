@@ -114,6 +114,8 @@ type mlw_file = pmodule Mstr.t
 
 val mlw_language : mlw_file language
 
+val mlw_language_builtin : pathname -> mlw_file
+
 exception ModuleNotFound of pathname * string
 
 val read_module : env -> pathname -> string -> pmodule
