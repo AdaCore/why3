@@ -100,9 +100,12 @@ let print_th fmt th =
 let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
-let print_ls fmt ls =
-  if ls.ls_name.id_string = "mixfix []" then fprintf fmt "([])" else
-  if ls.ls_name.id_string = "mixfix [<-]" then fprintf fmt "([<-])" else
+let print_ls fmt ({ls_name = {id_string = nm}} as ls) =
+  if nm = "mixfix []" then pp_print_string fmt "([])" else
+  if nm = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+  if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
+  if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
+  if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
   match extract_op ls with
   | Some s -> fprintf fmt "(%s)" (escape_op s)
   | None   -> fprintf fmt "%s" (id_unique iprinter ls.ls_name)
@@ -233,6 +236,15 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
         (print_lterm 6) t1 print_term t2
   | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
       fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
+        (print_lterm 6) t1 (print_lterm 5) t2 (print_lterm 5) t3
+  | _, [t1;t2] when ls.ls_name.id_string = "mixfix [_..]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..]")
+        (print_lterm 6) t1 print_term t2
+  | _, [t1;t2] when ls.ls_name.id_string = "mixfix [.._]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[..%a]")
+        (print_lterm 6) t1 print_term t2
+  | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [_.._]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
         (print_lterm 6) t1 (print_lterm 5) t2 (print_lterm 5) t3
   | _, tl ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")

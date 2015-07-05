@@ -442,6 +442,113 @@ let c_ghostify gh ({c_cty = cty} as c) =
   let el = match c.c_node with Cfun e -> [e] | _ -> [] in
   mk_cexp c.c_node (try_effect el cty_ghostify gh cty)
 
+(* purify expressions *)
+
+let rs_true  = rs_of_ls fs_bool_true
+let rs_false = rs_of_ls fs_bool_false
+
+let is_e_true e = match e.e_node with
+  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_true
+  | _ -> false
+
+let is_e_false e = match e.e_node with
+  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_false
+  | _ -> false
+
+let t_void = t_tuple []
+
+let is_rlpv s = match s.rs_logic with
+  | RLpv _ -> true | _ -> false
+
+let copy_labels e t =
+  if e.e_loc = None && Slab.is_empty e.e_label then t else
+  let loc = if t.t_loc = None then e.e_loc else t.t_loc in
+  t_label ?loc (Slab.union e.e_label t.t_label) t
+
+let rec raw_of_expr e = copy_labels e (match e.e_node with
+  | _ when ity_equal e.e_ity ity_unit -> t_void
+    (* we do not check e.e_effect here, since we check the
+        effects later for the overall expression. The only
+        effect-hiding construction, Etry, is forbidden. *)
+  | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
+  | Evar v -> t_var v.pv_vs
+  | Econst n -> t_const n
+  | Epure t -> t
+  | Eexec {c_cty = {cty_args = al; cty_post = q::_}} ->
+      let v, f = open_post q in
+      let t = match f.t_node with
+        | Tapp (ps, [{t_node = Tvar u}; t])
+          when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t = 0 -> t
+        | Tbinop (Tiff, {t_node =
+            Tapp (ps,[{t_node = Tvar u}; {t_node = Tapp (fs,[])}])},f)
+          when ls_equal ps ps_equ && vs_equal v u &&
+                ls_equal fs fs_bool_true && t_v_occurs v f = 0 -> f
+        | _ -> raise Exit in
+      begin match t.t_node, al with
+        | Tapp (s, tl), _::_ ->
+            let rec down el vl = match el, vl with
+              | {t_node = Tvar u}::el, {pv_vs = v}::vl when vs_equal u v ->
+                  down el vl
+              | el, [] ->
+                  let tyl = List.map (fun v -> v.pv_vs.vs_ty) al in
+                  t_app_partial s (List.rev el) tyl t.t_ty
+              | _ ->
+                  t_lambda (List.map (fun v -> v.pv_vs) al) [] t in
+            down (List.rev tl) (List.rev al)
+        | _, _::_ ->
+            t_lambda (List.map (fun v -> v.pv_vs) al) [] t
+        | _, [] -> t end
+  | Eexec _ -> raise Exit
+  | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
+      t_subst_single v.pv_vs t_void (raw_of_expr e)
+  | Elet (LDvar (v,d),e) ->
+      t_let_close_simp v.pv_vs (pure_of_expr false d) (raw_of_expr e)
+  | Elet (LDsym (s,_),e) ->
+      (* TODO/FIXME: should we create a lambda-term for RLpv here instead
+          of failing? Why would anyone want to define a local let-function,
+          if it already has a pure logical meaning? *)
+      if is_rlpv s then raise Exit;
+      raw_of_expr e
+  | Elet (LDrec rdl,e) ->
+      if List.exists (fun rd -> is_rlpv rd.rec_sym) rdl then raise Exit;
+      raw_of_expr e
+  | Eif (e0,e1,e2) when is_e_false e1 && is_e_true e2 ->
+      t_not (pure_of_expr true e0)
+  | Eif (e0,e1,e2) when is_e_false e2 ->
+      t_and (pure_of_expr true e0) (pure_of_expr true e1)
+  | Eif (e0,e1,e2) when is_e_true e1 ->
+      t_or (pure_of_expr true e0) (pure_of_expr true e2)
+  | Eif (e0,e1,e2) ->
+      let prop = ity_equal e.e_ity ity_bool in
+      t_if (pure_of_expr true e0)
+        (pure_of_expr prop e1) (pure_of_expr prop e2)
+  | Ecase (d,bl) ->
+      let prop = ity_equal e.e_ity ity_bool in
+      let conv (p,e) = t_close_branch p.pp_pat (pure_of_expr prop e) in
+      t_case (pure_of_expr false d) (List.map conv bl)
+  | Etry _ | Eraise _ | Eabsurd -> raise Exit)
+
+and pure_of_expr prop e =
+  let t = raw_of_expr e in
+  match t.t_ty with
+  | Some _ when prop ->
+      t_label ?loc:t.t_loc Slab.empty (t_equ_simp t t_bool_true)
+  | None when not prop ->
+      t_label ?loc:t.t_loc Slab.empty (t_if_simp t t_bool_true t_bool_false)
+  | _ -> t
+
+let fmla_of_expr e =
+  if not (eff_pure e.e_effect) then None else
+  try Some (pure_of_expr true e) with Exit -> None
+
+let term_of_expr e =
+  if not (eff_pure e.e_effect) then None else
+  try Some (pure_of_expr false e) with Exit -> None
+
+let post_of_expr e =
+  if not (eff_pure e.e_effect) then None else
+  try Some (raw_of_expr e) with Exit -> None
+
 (* let-definitions *)
 
 let let_var id ?(ghost=false) e =
@@ -451,7 +558,19 @@ let let_var id ?(ghost=false) e =
 
 let let_sym id ?(ghost=false) ?(kind=RKnone) c =
   let c = c_ghostify ghost c in
-  let s = create_rsymbol id ~ghost:(c_ghost c) ~kind c.c_cty in
+  (* we do not compute implicit post-conditions for let-functions,
+     as this would be equivalent to auto-inlining of the generated
+     logical function definition. FIXME: Should we make exception
+     for local let-functions? We do have a mapping definition in
+     the antecedents of WP, but provers must perform beta-reduction
+     to apply it: auto-inlining might be really helpful here. *)
+  let cty = match c with
+    | {c_node = Cfun e; c_cty = {cty_post = []} as c}
+      when (kind = RKnone (*|| kind = RKlocal*)) ->
+        begin match post_of_expr e with
+        | Some t -> add_post c t | None -> c end
+    | _ -> c.c_cty in
+  let s = create_rsymbol id ~ghost:(c_ghost c) ~kind cty in
   LDsym (s,c), s
 
 let e_let ld e =
@@ -564,19 +683,8 @@ let e_assign al =
 
 (* built-in symbols *)
 
-let rs_true  = rs_of_ls fs_bool_true
-let rs_false = rs_of_ls fs_bool_false
-
 let e_true  = e_app rs_true  [] [] ity_bool
 let e_false = e_app rs_false [] [] ity_bool
-
-let is_e_true e = match e.e_node with
-  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_true
-  | _ -> false
-
-let is_e_false e = match e.e_node with
-  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_false
-  | _ -> false
 
 let rs_tuple = Hint.memo 17 (fun n ->
   ignore (its_tuple n); rs_of_ls (fs_tuple n))
@@ -864,10 +972,13 @@ let extract_op s =
 
 let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
 
-let print_rs fmt s =
-  if s.rs_name.id_string = "mixfix []" then pp_print_string fmt "([])" else
-  if s.rs_name.id_string = "mixfix []<-" then pp_print_string fmt "([]<-)" else
-  if s.rs_name.id_string = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+let print_rs fmt ({rs_name = {id_string = nm}} as s) =
+  if nm = "mixfix []" then pp_print_string fmt "([])" else
+  if nm = "mixfix []<-" then pp_print_string fmt "([]<-)" else
+  if nm = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+  if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
+  if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
+  if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
   match extract_op s, s.rs_logic with
   | Some s, _ ->
       let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
@@ -938,13 +1049,13 @@ and print_lexpr pri fmt e =
 and print_capp pri s fmt vl = match extract_op s, vl with
   | _, [] ->
       print_rs fmt s
-  | Some s, [t1] when tight_op s ->
-      fprintf fmt (protect_on (pri > 7) "%s%a") s print_pv t1
-  | Some s, [t1] ->
-      fprintf fmt (protect_on (pri > 4) "%s %a") s print_pv t1
-  | Some s, [t1;t2] ->
+  | Some o, [t1] when tight_op o ->
+      fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
+  | Some o, [t1] when String.get s.rs_name.id_string 0 = 'p' ->
+      fprintf fmt (protect_on (pri > 4) "%s %a") o print_pv t1
+  | Some o, [t1;t2] ->
       fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
-        print_pv t1 s print_pv t2
+        print_pv t1 o print_pv t2
   | _, [t1;t2] when s.rs_name.id_string = "mixfix []" ->
       fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
   | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix [<-]" ->
@@ -952,6 +1063,13 @@ and print_capp pri s fmt vl = match extract_op s, vl with
         print_pv t1 print_pv t2 print_pv t3
   | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix []<-" ->
       fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
+        print_pv t1 print_pv t2 print_pv t3
+  | _, [t1;t2] when s.rs_name.id_string = "mixfix [_..]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
+  | _, [t1;t2] when s.rs_name.id_string = "mixfix [.._]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
+  | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix [_.._]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
         print_pv t1 print_pv t2 print_pv t3
   | _, tl ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
@@ -1077,7 +1195,7 @@ and print_let_defn fmt = function
         (print_lexpr 0 (*4*)) e
   | LDsym (s,{c_node = Cfun e; c_cty = ({cty_args = _::_} as c)}) ->
       fprintf fmt "@[<hov 2>let %a%a =@\n%a@]"
-        print_rs_head s print_cty c
+        print_rs_head s print_cty s.rs_cty (*FIXME: c*)
         (print_lexpr 0 (*4*)) e;
       forget_cty c
   | LDsym (s,{c_node = Cany; c_cty = ({cty_args = _::_} as c)}) ->

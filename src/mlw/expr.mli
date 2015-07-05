@@ -244,6 +244,12 @@ val e_locate_effect : (effect -> bool) -> expr -> Loc.position option
 
 val proxy_label : label
 
+val e_rs_subst : rsymbol Mrs.t -> expr -> expr
+val c_rs_subst : rsymbol Mrs.t -> cexp -> cexp
+
+val term_of_expr : expr -> term option
+val fmla_of_expr : expr -> term option
+
 (** {2 Built-in symbols} *)
 
 val rs_true  : rsymbol
@@ -254,6 +260,7 @@ val e_tuple : expr list -> expr
 
 val rs_void : rsymbol
 val e_void : expr
+val t_void : term
 
 val is_e_void : expr -> bool
 val is_rs_tuple : rsymbol -> bool
