@@ -119,7 +119,9 @@ theory array.Array
   syntax function length "(size %1 : int)"
   syntax function elts "(get %1)"
   syntax function set "(set %1 %2 %3)"
+(* does not exist anymore
   syntax function make "(make %1 %2)"
+*)
 
 end
 
@@ -132,6 +134,8 @@ theory matrix.Matrix
   syntax function columns "(ncols %1 : int)"
   syntax function elts "(matrix_get_curry %1)"
   syntax function set "(matrix_set %1 %2 %3)"
+(* does not exist anymore
   syntax function make "(matrix_make %1 %2)"
+*)
 
 end

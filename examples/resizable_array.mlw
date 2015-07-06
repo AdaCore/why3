@@ -3,6 +3,7 @@ module ResizableArraySpec
 
   use import int.Int
   use import map.Map
+  use map.Const
 
   type rarray 'a model { mutable length: int; mutable data: map int 'a }
 
@@ -13,7 +14,7 @@ module ResizableArraySpec
   val make (len: int) (dummy: 'a) : rarray 'a
     requires { 0 <= len }
     ensures  { result.length = len }
-    ensures  { result.data = Map.const dummy }
+    ensures  { result.data = Const.const dummy }
     (* ensures  { forall i: int. 0 <= i < len -> result[i] = dummy } *)
 
   val length (r: rarray 'a) : int
@@ -55,11 +56,16 @@ module ResizableArrayImplem (* : ResizableArraySpec *)
   function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a =
     { r with data = A.set r.data i v }
 
-  function make (len: int) (dummy: 'a) : rarray 'a =
+(*
+function make (len: int) (dummy: 'a) : rarray 'a =
     { dummy = dummy; length = len; data = A.make len dummy }
+*)
 
   let make (len: int) (dummy: 'a) : rarray 'a
-    requires { 0 <= len } ensures { result = make len dummy }
+    requires { 0 <= len }
+    ensures { result.dummy = dummy }
+    ensures { result.length = len }
+    ensures { forall i:int. 0 <= i < len -> A.get result.data i = dummy }
     =
     { dummy = dummy; length = len; data = A.make len dummy }
 

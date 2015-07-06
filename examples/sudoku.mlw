@@ -614,6 +614,7 @@ module Test
   use import Solver
   use array.Array
   use import map.Map
+  use map.Const
 
   (** Solving the empty grid: easy, yet not trivial *)
   let test0 ()
@@ -645,7 +646,7 @@ module Test
 0 0 0 0 0 0 0 7 6
 *)
   constant solvable : grid =
-    (const 0)
+    (Const.const 0)
     [0<-2][2<-9][7<-1]
     [13<-6]
     [19<-5][20<-3][21<-8][23<-2][24<-7]

@@ -93,6 +93,7 @@ module MaxMatrixMemo
   use import int.Int
   use import int.MinMax
   use import map.Map
+  use map.Const
   use import ref.Ref
 
   constant n : int
@@ -149,10 +150,10 @@ module MaxMatrixMemo
     requires { pre (i, c) /\ inv table }
     ensures { post (i,c) result /\ inv table }
   = if i = n then
-      (0, const 0)
+      (0, Const.const 0)
     else begin
       let r = ref (-1) in
-      let sol = ref (const 0) in
+      let sol = ref (Const.const 0) in
       for j = 0 to n-1 do
         invariant {
           inv table /\
