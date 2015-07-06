@@ -16,7 +16,7 @@
 <file name="../mergesort_array.mlw" expanded="true">
 <theory name="Elt" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Merge" sum="8cf69a18a957f12ca10b0983694178ac">
+<theory name="Merge" sum="f74a571cba2d178cff9430cfa205e5f0">
  <goal name="WP_parameter merge" expl="VC for merge">
  <transf name="split_goal_wp">
   <goal name="WP_parameter merge.1" expl="1. postcondition">
@@ -237,7 +237,7 @@
   <proof prover="10"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge.39" expl="39. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="1.60"/></proof>
+  <proof prover="2"><result status="valid" time="1.60" steps="593"/></proof>
   <proof prover="3"><result status="valid" time="1.64"/></proof>
   </goal>
   <goal name="WP_parameter merge.40" expl="40. loop invariant preservation">
@@ -293,7 +293,7 @@
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge.49" expl="49. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="2.20" steps="473"/></proof>
+  <proof prover="2"><result status="valid" time="2.20" steps="449"/></proof>
   <proof prover="3"><result status="valid" time="0.41"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -490,7 +490,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="TopDownMergesort" sum="84157389ec7e6e31c7815d501480fe11">
+<theory name="TopDownMergesort" sum="922fab320c7b139966ac3aec4ab18b47">
  <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter mergesort_rec.1" expl="1. division by zero">
@@ -566,7 +566,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter mergesort_rec.13" expl="13. postcondition">
-  <proof prover="2"><result status="valid" time="0.31" steps="151"/></proof>
+  <proof prover="2"><result status="valid" time="0.31" steps="156"/></proof>
   <proof prover="8"><result status="valid" time="1.49" steps="459"/></proof>
   </goal>
   <goal name="WP_parameter mergesort_rec.14" expl="14. postcondition">
@@ -589,7 +589,7 @@
  <proof prover="9"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="BottomUpMergesort" sum="a6bce72f8da36cb440dbc9ba0613cd62">
+<theory name="BottomUpMergesort" sum="118377a4f46d4dfa609fb0951e6f3d4e">
  <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bottom_up_mergesort.1" expl="1. loop invariant init">
@@ -827,7 +827,7 @@
   <goal name="WP_parameter bottom_up_mergesort.32" expl="32. assertion">
   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="8"><result status="valid" time="0.02" steps="19"/></proof>
-  <proof prover="9"><result status="valid" time="0.57"/></proof>
+  <proof prover="9"><result status="valid" time="1.04"/></proof>
   </goal>
   <goal name="WP_parameter bottom_up_mergesort.33" expl="33. type invariant">
   <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
@@ -851,7 +851,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NaturalMergesort" sum="f5bd8d32ec48878b0768e6bbed72d199">
+<theory name="NaturalMergesort" sum="6754450ec8389180aa10a1c38a5b0a9e">
  <goal name="WP_parameter find_run" expl="VC for find_run">
  <transf name="split_goal_wp">
   <goal name="WP_parameter find_run.1" expl="1. loop invariant init">

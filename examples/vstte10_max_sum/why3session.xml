@@ -2,7 +2,6 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
@@ -12,66 +11,66 @@
 <prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../vstte10_max_sum.mlw" expanded="true">
-<theory name="MaxAndSum" sum="0903b8fc369268d9690be3a17bdc22b4" expanded="true">
- <goal name="WP_parameter max_sum" expl="VC for max_sum" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="MaxAndSum" sum="02c0e2a4611922f577686311ed3980ab">
+ <goal name="WP_parameter max_sum" expl="VC for max_sum">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter max_sum.1" expl="1. postcondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.2" expl="2. loop invariant init">
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.3" expl="3. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.4" expl="4. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.5" expl="5. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.6" expl="6. loop invariant preservation">
-  <proof prover="1" edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v"><result status="valid" time="1.11"/></proof>
+  <proof prover="1" edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v"><result status="valid" time="0.85"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.7" expl="7. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.8" expl="8. loop invariant preservation">
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.9" expl="9. postcondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="MaxAndSum2" sum="b2d4573188228a341199852d8a83ebc5" expanded="true">
- <goal name="WP_parameter max_sum" expl="VC for max_sum" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="MaxAndSum2" sum="a02bd891a5a0f9de9f1afd6feb54d035">
+ <goal name="WP_parameter max_sum" expl="VC for max_sum">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter max_sum.1" expl="1. postcondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.2" expl="2. loop invariant init">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.3" expl="3. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.4" expl="4. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.5" expl="5. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.6" expl="6. loop invariant preservation">
   <transf name="split_goal_wp">
    <goal name="WP_parameter max_sum.6.1" expl="1. VC for max_sum">
-   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   <proof prover="7"><result status="valid" time="0.02" steps="14"/></proof>
    </goal>
    <goal name="WP_parameter max_sum.6.2" expl="2. VC for max_sum">
    <proof prover="5"><result status="valid" time="0.02"/></proof>
@@ -82,42 +81,41 @@
   </transf>
   </goal>
   <goal name="WP_parameter max_sum.7" expl="7. index in array bounds">
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.8" expl="8. loop invariant preservation">
   <transf name="split_goal_wp">
    <goal name="WP_parameter max_sum.8.1" expl="1. VC for max_sum">
-   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   <proof prover="7"><result status="valid" time="0.02" steps="13"/></proof>
    </goal>
    <goal name="WP_parameter max_sum.8.2" expl="2. VC for max_sum">
    <proof prover="2" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="7"><result status="valid" time="0.04"/></proof>
+   <proof prover="7"><result status="valid" time="0.04" steps="48"/></proof>
    </goal>
    <goal name="WP_parameter max_sum.8.3" expl="3. VC for max_sum">
-   <proof prover="7"><result status="valid" time="0.01"/></proof>
+   <proof prover="7"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter max_sum.9" expl="9. postcondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="7"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="TestCase" sum="23699c03b95946bde2c97e403f1d271f" expanded="true">
- <goal name="WP_parameter test" expl="VC for test" expanded="true">
- <proof prover="0"><result status="valid" time="0.51"/></proof>
- <proof prover="3"><result status="valid" time="0.64"/></proof>
+<theory name="TestCase" sum="c0bf95db9dc2dbbb28bb2c752dafb92d">
+ <goal name="WP_parameter test" expl="VC for test">
+ <proof prover="3"><result status="valid" time="0.23"/></proof>
  <proof prover="4"><result status="valid" time="0.14"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter test_case" expl="VC for test_case" expanded="true">
+ <goal name="WP_parameter test_case" expl="VC for test_case">
  <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="7"><result status="valid" time="0.02"/></proof>
+ <proof prover="7"><result status="valid" time="0.02" steps="0"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>

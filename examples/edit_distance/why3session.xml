@@ -16,12 +16,12 @@
  <goal name="first_last_explicit">
  <transf name="induction_ty_lex">
   <goal name="first_last_explicit.1" expl="1.">
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="49"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="first_last">
- <proof prover="0" memlimit="0" edited="edit_distance_Word_first_last_1.v"><result status="valid" time="1.06"/></proof>
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_first_last_1.v"><result status="valid" time="0.83"/></proof>
  </goal>
  <goal name="key_lemma_right">
  <proof prover="0" memlimit="0" edited="edit_distance_Word_key_lemma_right_1.v"><result status="valid" time="1.04"/></proof>
@@ -31,7 +31,7 @@
   <goal name="dist_symetry.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01" steps="4"/></proof>
   <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="dist_symetry.2" expl="2.">
@@ -58,21 +58,21 @@
  </transf>
  </goal>
  <goal name="dist_concat_right">
- <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
  <goal name="min_dist_equal">
  <transf name="inline_goal">
   <goal name="min_dist_equal.1" expl="1.">
   <transf name="split_goal_wp">
    <goal name="min_dist_equal.1.1" expl="1.">
-   <proof prover="7"><result status="valid" time="0.03"/></proof>
+   <proof prover="7"><result status="valid" time="0.03" steps="55"/></proof>
    </goal>
    <goal name="min_dist_equal.1.2" expl="2.">
    <transf name="inversion_pr">
     <goal name="min_dist_equal.1.2.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.00"/></proof>
     <proof prover="6"><result status="valid" time="0.00"/></proof>
-    <proof prover="7"><result status="valid" time="0.02"/></proof>
+    <proof prover="7"><result status="valid" time="0.02" steps="15"/></proof>
     <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="min_dist_equal.1.2.2" expl="2.">
@@ -83,7 +83,7 @@
     </goal>
     <goal name="min_dist_equal.1.2.4" expl="4.">
     <proof prover="4"><result status="valid" time="0.02"/></proof>
-    <proof prover="7"><result status="valid" time="0.45"/></proof>
+    <proof prover="7"><result status="valid" time="0.45" steps="1306"/></proof>
     <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
     </goal>
    </transf>
@@ -100,21 +100,21 @@
   <goal name="min_dist_eps.1" expl="1.">
   <transf name="split_goal_wp">
    <goal name="min_dist_eps.1.1" expl="1.">
-   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   <proof prover="7"><result status="valid" time="0.02" steps="42"/></proof>
    </goal>
    <goal name="min_dist_eps.1.2" expl="2.">
    <transf name="inversion_pr">
     <goal name="min_dist_eps.1.2.1" expl="1.">
-    <proof prover="7"><result status="valid" time="0.02"/></proof>
+    <proof prover="7"><result status="valid" time="0.02" steps="10"/></proof>
     </goal>
     <goal name="min_dist_eps.1.2.2" expl="2.">
-    <proof prover="7"><result status="valid" time="0.13"/></proof>
+    <proof prover="7"><result status="valid" time="0.13" steps="550"/></proof>
     </goal>
     <goal name="min_dist_eps.1.2.3" expl="3.">
-    <proof prover="7"><result status="valid" time="0.01"/></proof>
+    <proof prover="7"><result status="valid" time="0.01" steps="16"/></proof>
     </goal>
     <goal name="min_dist_eps.1.2.4" expl="4.">
-    <proof prover="7"><result status="valid" time="0.02"/></proof>
+    <proof prover="7"><result status="valid" time="0.02" steps="20"/></proof>
     </goal>
    </transf>
    </goal>
@@ -127,7 +127,7 @@
   <goal name="min_dist_eps_length.1" expl="1.">
   <transf name="split_goal_wp">
    <goal name="min_dist_eps_length.1.1" expl="1.">
-   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   <proof prover="7"><result status="valid" time="0.02" steps="43"/></proof>
    <proof prover="8" memlimit="1000"><result status="timeout" time="5.97"/></proof>
    </goal>
    <goal name="min_dist_eps_length.1.2" expl="2.">
@@ -138,7 +138,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="EditDistance" sum="d35384e66d17b4ae766d0fe34051e41c" expanded="true">
+<theory name="EditDistance" sum="1d954575467b68f525164ff46d9b09cc" expanded="true">
  <goal name="suffix_length">
  <proof prover="0" timelimit="20" memlimit="0" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="0.93"/></proof>
  </goal>
@@ -274,7 +274,7 @@
   </goal>
   <goal name="WP_parameter distance.43" expl="43. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.76"/></proof>
-  <proof prover="7"><result status="valid" time="1.20" steps="1792"/></proof>
+  <proof prover="7"><result status="valid" time="1.45" steps="1795"/></proof>
   </goal>
   <goal name="WP_parameter distance.44" expl="44. loop invariant init">
   <proof prover="1"><result status="valid" time="0.58" steps="650"/></proof>

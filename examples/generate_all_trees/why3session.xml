@@ -12,38 +12,38 @@
 <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../generate_all_trees.mlw" expanded="true">
-<theory name="GenerateAllTrees" sum="cce9856072f58fe84c970ef538852283" expanded="true">
+<theory name="GenerateAllTrees" sum="40de658e90bbec7b0a323b33376303c6" expanded="true">
  <goal name="size_nonneg" expanded="true">
- <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="1.08"/></proof>
+ <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="0.86"/></proof>
  </goal>
  <goal name="size_left" expanded="true">
  <proof prover="7"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="all_trees_0" expanded="true">
- <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="1.12"/></proof>
+ <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="0.86"/></proof>
  </goal>
  <goal name="tree_diff" expanded="true">
- <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="WP_parameter combine" expl="VC for combine" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter combine.1" expl="1. postcondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter combine.2" expl="2. postcondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter combine.3" expl="3. postcondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter combine.4" expl="4. postcondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter combine.5" expl="5. variant decrease" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="41"/></proof>
   </goal>
   <goal name="WP_parameter combine.6" expl="6. precondition" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.04" steps="152"/></proof>
   </goal>
   <goal name="WP_parameter combine.7" expl="7. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
@@ -57,21 +57,21 @@
    <proof prover="5"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="WP_parameter combine.8.2" expl="2. postcondition" expanded="true">
-   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.84"/></proof>
+   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.84" steps="1582"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter combine.9" expl="9. variant decrease" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter combine.10" expl="10. precondition" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter combine.11" expl="11. precondition" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter combine.12" expl="12. postcondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.24"/></proof>
+  <proof prover="8"><result status="valid" time="0.24" steps="730"/></proof>
   </goal>
   <goal name="WP_parameter combine.13" expl="13. postcondition" expanded="true">
   <transf name="split_goal_wp" expanded="true">
@@ -79,23 +79,23 @@
    <proof prover="4"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="WP_parameter combine.13.2" expl="2. postcondition" expanded="true">
-   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="6.33"/></proof>
+   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="6.33" steps="17644"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter combine.14" expl="14. precondition" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter combine.15" expl="15. postcondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter combine.16" expl="16. postcondition" expanded="true">
   <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter combine.16.1" expl="1. postcondition" expanded="true">
-   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="212"/></proof>
    </goal>
    <goal name="WP_parameter combine.16.2" expl="2. postcondition" expanded="true">
-   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="37"/></proof>
    </goal>
   </transf>
   </goal>
@@ -104,58 +104,58 @@
  <goal name="WP_parameter all_trees" expl="VC for all_trees" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter all_trees.1" expl="1. array creation size" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.2" expl="2. index in array bounds" expanded="true">
-  <proof prover="8"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.3" expl="3. postcondition" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.4" expl="4. loop invariant init" expanded="true">
-  <proof prover="8"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.5" expl="5. type invariant" expanded="true">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.6" expl="6. index in array bounds" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.7" expl="7. loop invariant preservation" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.04" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.8" expl="8. loop invariant init" expanded="true">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.9" expl="9. loop invariant init" expanded="true">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.10" expl="10. loop invariant init" expanded="true">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="8"><result status="valid" time="0.04" steps="58"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.11" expl="11. type invariant" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.12" expl="12. index in array bounds" expanded="true">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.13" expl="13. index in array bounds" expanded="true">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.14" expl="14. index in array bounds" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.15" expl="15. precondition" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.16" expl="16. index in array bounds" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.17" expl="17. loop invariant preservation" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.18" expl="18. loop invariant preservation" expanded="true">
-  <proof prover="8"><result status="valid" time="0.08"/></proof>
+  <proof prover="8"><result status="valid" time="0.08" steps="103"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.19" expl="19. loop invariant preservation" expanded="true">
   <transf name="split_goal_wp" expanded="true">
@@ -165,18 +165,18 @@
    <proof prover="6"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="WP_parameter all_trees.19.2" expl="2. loop invariant preservation" expanded="true">
-   <proof prover="8"><result status="valid" time="4.39"/></proof>
+   <proof prover="8"><result status="valid" time="4.39" steps="2912"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter all_trees.20" expl="20. loop invariant preservation" expanded="true">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="97"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.21" expl="21. type invariant" expanded="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.22" expl="22. postcondition" expanded="true">
-  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
  </transf>
  </goal>

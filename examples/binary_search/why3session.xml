@@ -9,21 +9,21 @@
 <prover id="4" name="CVC4" version="1.3" timelimit="10" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <file name="../binary_search.mlw" expanded="true">
-<theory name="BinarySearch" sum="6edf021e1310395e54f253f514978225" expanded="true">
+<theory name="BinarySearch" sum="d28b8fa671775c83618c16f672708169" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.17" steps="55"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchAnyMidPoint" sum="cf35a6556f511e3fa459bea0349c2cf8" expanded="true">
+<theory name="BinarySearchAnyMidPoint" sum="060171fbe90dd5039a917ecd6eca872d" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.02" steps="39"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchInt32" sum="b978ced2b74f7ab893e5b3a8d23ebe1f" expanded="true">
+<theory name="BinarySearchInt32" sum="a262c15cb4d2436b3ce5f5f23a0c4cc8" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter binary_search.1" expl="1. integer overflow">
@@ -54,10 +54,10 @@
   <proof prover="5"><result status="valid" time="0.04" steps="99"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.10" expl="10. integer overflow">
-  <proof prover="5"><result status="valid" time="0.24" steps="116"/></proof>
+  <proof prover="5"><result status="valid" time="0.11" steps="116"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.11" expl="11. assertion">
-  <proof prover="5"><result status="valid" time="0.54" steps="136"/></proof>
+  <proof prover="5"><result status="valid" time="0.27" steps="136"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.12" expl="12. index in array bounds">
   <proof prover="5"><result status="valid" time="0.01" steps="91"/></proof>
@@ -74,7 +74,7 @@
   <goal name="WP_parameter binary_search.16" expl="16. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="2.58" steps="180"/></proof>
+  <proof prover="5"><result status="valid" time="1.36" steps="180"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.17" expl="17. loop variant decrease">
   <proof prover="5"><result status="valid" time="0.02" steps="99"/></proof>
@@ -94,7 +94,7 @@
   <goal name="WP_parameter binary_search.22" expl="22. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="2.43" steps="181"/></proof>
+  <proof prover="5"><result status="valid" time="1.31" steps="181"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.23" expl="23. loop variant decrease">
   <proof prover="5"><result status="valid" time="0.02" steps="101"/></proof>

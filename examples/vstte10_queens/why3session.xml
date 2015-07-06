@@ -10,7 +10,7 @@
 <prover id="5" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <file name="../vstte10_queens.mlw" expanded="true">
-<theory name="NQueens" sum="05ca6b285c56c769408f7ad47741cffe">
+<theory name="NQueens" sum="6f30d0501ca7b51e8970776cc6900eb0">
  <goal name="eq_board_set">
  <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
@@ -39,7 +39,7 @@
  <proof prover="4" timelimit="20"><result status="valid" time="0.02" steps="21"/></proof>
  </goal>
  <goal name="WP_parameter test8" expl="VC for test8">
- <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="0"/></proof>
+ <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter count_bt_queens" expl="VC for count_bt_queens">
  <proof prover="5"><result status="valid" time="0.06"/></proof>
@@ -48,10 +48,10 @@
  <proof prover="4" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter test_count_8" expl="VC for test_count_8">
- <proof prover="4" memlimit="1000"><result status="valid" time="0.01" steps="0"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="MachineArithmetic" sum="46f56a2ef8fda5724c437496801b4e23" expanded="true">
+<theory name="MachineArithmetic" sum="989e069842d63f71df9b02e860a97598" expanded="true">
  <goal name="WP_parameter mcheck_is_consistent" expl="VC for mcheck_is_consistent">
  <proof prover="0"><result status="valid" time="0.09"/></proof>
  </goal>
@@ -144,9 +144,9 @@
  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
  <goal name="WP_parameter test_mcount_8" expl="VC for test_mcount_8">
- <proof prover="4" memlimit="1000"><result status="valid" time="0.02" steps="7"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="6"><result status="valid" time="0.00" steps="6"/></proof>
+ <proof prover="6"><result status="valid" time="0.00" steps="11"/></proof>
  </goal>
 </theory>
 </file>
