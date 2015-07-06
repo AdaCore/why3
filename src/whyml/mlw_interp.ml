@@ -433,10 +433,11 @@ let built_in_theories =
       "mod", None, eval_int_op BigInt.euclidean_mod;
     ] ;
     ["map"],"Map", ["map", builtin_map_type],
-    [ "const", Some ls_map_const, eval_map_const;
-      "get", Some ls_map_get, eval_map_get;
+    [ "get", Some ls_map_get, eval_map_get;
       "set", Some ls_map_set, eval_map_set;
     ] ;
+    ["map"],"Const", [],
+    [ "const", Some ls_map_const, eval_map_const ] ;
   ]
 
 let add_builtin_th env (l,n,t,d) =

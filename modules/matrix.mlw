@@ -50,11 +50,14 @@ module Matrix
     if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
     set a i v
 
-  function make (r c: int) (v: 'a) : matrix 'a =
-    { rows = r; columns = c; elts = M.const (M.const v) }
+  function make (r c: int) (v: 'a) : matrix 'a
+  axiom make_rows: forall r c, v:'a. (make r c v).rows = r
+  axiom make_columns: forall r c, v:'a. (make r c v).columns = c
+  axiom make_elts: forall r c, v:'a, i j. get (make r c v) (i,j) = v
 
   val make (r c: int) (v: 'a) : matrix 'a
-    requires { r >= 0 /\ c >= 0 } ensures { result = make r c v }
+    requires { r >= 0 /\ c >= 0 }
+    ensures { result = make r c v }
 
   val copy (a: matrix 'a) : matrix 'a
     ensures  { result.rows = a.rows /\ result.columns = a.columns }
@@ -84,4 +87,3 @@ module Syntax
              a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v) }
 
 end
-

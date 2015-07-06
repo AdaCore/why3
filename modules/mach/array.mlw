@@ -50,12 +50,15 @@ module Array32
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  function make (n: int32) (v: ~'a) : array 'a =
-    { length = n; elts = M.const v }
+  function make (n: int32) (v: ~'a) : array 'a
+  axiom make_length:
+    forall n:int32, v:'a. length (make n v) = n
+  axiom make_elts:
+    forall n:int32, i:int, v:'a. get (make n v) i = v
 
   val make (n: int32) (v: ~'a) : array 'a
     requires { "expl:array creation size" to_int n >= 0 }
-    ensures  { result = make n v }
+    ensures { forall i:int. get result i = v }
 
   val append (a1: array ~'a) (a2: array 'a) : array 'a
     ensures { to_int result.length = to_int a1.length + to_int a2.length }
@@ -167,12 +170,15 @@ module Array31
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  function make (n: int31) (v: ~'a) : array 'a =
-    { length = n; elts = M.const v }
+  function make (n: int31) (v: ~'a) : array 'a
+  axiom make_length:
+    forall n:int31, v:'a. length (make n v) = n
+  axiom make_elts:
+    forall n:int31, i:int, v:'a. get (make n v) i = v
 
   val make (n: int31) (v: ~'a) : array 'a
     requires { "expl:array creation size" to_int n >= 0 }
-    ensures  { result = make n v }
+    ensures { forall i:int. get result i = v }
 
   val append (a1: array ~'a) (a2: array 'a) : array 'a
     ensures { to_int result.length = to_int a1.length + to_int a2.length }
@@ -284,12 +290,15 @@ module Array63
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  function make (n: int63) (v: ~'a) : array 'a =
-    { length = n; elts = M.const v }
+  function make (n: int63) (v: ~'a) : array 'a
+  axiom make_length:
+    forall n:int63, v:'a. length (make n v) = n
+  axiom make_elts:
+    forall n:int63, i:int, v:'a. get (make n v) i = v
 
   val make (n: int63) (v: ~'a) : array 'a
     requires { "expl:array creation size" to_int n >= 0 }
-    ensures  { result = make n v }
+    ensures { forall i:int. get result i = v }
 
   val append (a1: array ~'a) (a2: array 'a) : array 'a
     ensures { to_int result.length = to_int a1.length + to_int a2.length }
