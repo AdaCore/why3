@@ -23,7 +23,6 @@ theory BuiltIn
   prelude "
 Require Import ssreflect ssrbool ssrfun ssrnat seq eqtype ssrint.
 Require Import ssrint ssrwhy3.
-
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
@@ -72,22 +71,21 @@ theory int.Int
 
   prelude "
 Require Import ssralg ssrnum.
-
 Import GRing.Theory Num.Theory.
 Local Open Scope ring_scope."
 
-  syntax function zero "0%Z"
-  syntax function one  "1%Z"
+  syntax function zero "0%:Z"
+  syntax function one  "1%:Z"
 
-  syntax function (+)  "(%1 + %2)%Z"
-  syntax function (-)  "(%1 - %2)%Z"
-  syntax function ( * )  "(%1 * %2)%Z"
-  syntax function (-_) "(-%1)%Z"
+  syntax function (+)  "(%1 + %2)%R"
+  syntax function (-)  "(%1 - %2)%R"
+  syntax function ( * )  "(%1 * %2)%R"
+  syntax function (-_) "(-%1)%R"
 
-  syntax predicate (<=) "(%1 <= %2)%Z"
-  syntax predicate (<)  "(%1 < %2)%Z"
-  syntax predicate (>=) "(%1 >= %2)%Z"
-  syntax predicate (>)  "(%1 > %2)%Z"
+  syntax predicate (<=) "(%1 <= %2)%R"
+  syntax predicate (<)  "(%1 < %2)%R"
+  syntax predicate (>=) "(%1 >= %2)%R"
+  syntax predicate (>)  "(%1 > %2)%R"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc
