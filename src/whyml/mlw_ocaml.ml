@@ -26,20 +26,10 @@
   - singleton types
     record/constructor fields of type unit
 
+  - ghost code
+    remove it as much as possible (in types and function arguments)
+
   - preludes
-
-  - command line
-
-  - drivers:
-
-    we'd like to use both ocaml64.drv from the lib and a local
-    driver (specific to the files being extracted) but currently
-
-    - only one driver is allowed on the extraction command line
-
-    - import "ocaml64" in the local driver fails, because it's looking
-      for a file ocaml64 in the local directory (and not for ocaml64.drv
-      in the library)
 
 *)
 
@@ -173,6 +163,7 @@ type info = {
   th_known_map: Decl.known_map;
   mo_known_map: Mlw_decl.known_map;
   fname: string option;
+  unsafe_int: bool;
 }
 
 module Translate = struct
@@ -358,8 +349,8 @@ module Translate = struct
         assert false
     | Tapp (fs, tl) when is_fs_tuple fs ->
         ML.etuple (List.map (term info) tl)
-    | Tapp (fs, [t1; t2])
-      when ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
+    | Tapp (fs, [t1; t2]) when not info.unsafe_int
+        && ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
         ML.Esyntax ("(Why3__BigInt.eq %1 %2)", [term info t1; term info t2])
     | Tapp (fs, tl) ->
         begin match query_syntax info.info_syn fs.ls_name with
@@ -885,6 +876,8 @@ module Print = struct
         print_lident info fmt v
     | Ebool b ->
         fprintf fmt "%b" b
+    | Econst c when info.unsafe_int ->
+        fprintf fmt "%s" (BigInt.to_string (Number.compute_int c))
     | Econst c ->
         print_const ~paren fmt c
     | Etuple el ->
@@ -950,6 +943,12 @@ module Print = struct
     | Ewhile (e1, e2) ->
         fprintf fmt "@[<hv>while %a do@;<1 2>@[%a@]@ done@]"
           (print_expr info) e1 (print_expr info) e2
+    | Efor (x, vfrom, dir, vto, e1) when info.unsafe_int ->
+        fprintf fmt
+          "@[<hov 2>for %a = %a %s %a do@\n%a@\ndone@]"
+          (print_lident info) x  (print_lident info) vfrom
+          (if dir = To then "to" else "downto") (print_lident info) vto
+          (print_expr info) e1
     | Efor (x, vfrom, dir, vto, e1) ->
         fprintf fmt
           "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
@@ -1042,10 +1041,8 @@ end
 let extract_filename ?fname th =
   (modulename ?fname th.th_path th.th_name.Ident.id_string) ^ ".ml"
 
-(*
-let arith_meta = register_meta "ocaml arithmetic" [MTstring]
-  ~desc:"Specify@ OCaml@ arithmetic:@ 32, 64, or unsafe"
-*)
+let unsafe_int drv =
+  drv.Mlw_driver.drv_printer = Some "ocaml-unsafe-int"
 
 let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
@@ -1057,13 +1054,13 @@ let extract_theory drv ?old ?fname fmt th =
     current_module = None;
     th_known_map = th.th_known;
     mo_known_map = Mid.empty;
-    fname = Opt.map clean_fname fname; } in
+    fname = Opt.map clean_fname fname;
+    unsafe_int = unsafe_int drv; } in
   let decls = Translate.theory info th in
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     Print.print_theory_name th;
-  fprintf fmt
-    "open Why3extract@\n@\n";
+  if not info.unsafe_int then fprintf fmt "open Why3extract@\n@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   fprintf fmt "@."
 
@@ -1080,14 +1077,14 @@ let extract_module drv ?old ?fname fmt m =
     current_module = Some m;
     th_known_map = th.th_known;
     mo_known_map = m.mod_known;
-    fname = Opt.map clean_fname fname; } in
+    fname = Opt.map clean_fname fname;
+    unsafe_int = unsafe_int drv; } in
   let decls = Translate.theory info th in
   let mdecls = Translate.module_ info m in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
-  fprintf fmt
-    "open Why3extract@\n@\n";
+  if not info.unsafe_int then fprintf fmt "open Why3extract@\n@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."

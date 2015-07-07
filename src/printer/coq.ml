@@ -587,11 +587,11 @@ let rec intros_hyp n fmt f =
   match f.t_node with
     | Tbinop(Tand,f1,f2) ->
       fprintf fmt "(";
-      let m = intros_hyp n fmt f1 in
+      let (m,vsl1) = intros_hyp n fmt f1 in
       fprintf fmt ",";
-      let k = intros_hyp m fmt f2 in
+      let (k,vsl2) = intros_hyp m fmt f2 in
       fprintf fmt ")";
-      k
+      (k,vsl1@vsl2)
     | Tquant(Texists,fq) ->
       let vsl,_trl,f = t_open_quant fq in
       let rec aux n vsl =
@@ -603,12 +603,10 @@ let rec intros_hyp n fmt f =
             fprintf fmt ")";
             m
       in
-      let m = aux n vsl in
-      List.iter forget_var vsl;
-      m
+      aux n vsl
     | _ ->
       fprintf fmt "h%d" n;
-      n+1
+      (n+1,[])
 
 let rec do_intros n fmt fmla =
   match fmla.t_node with
@@ -625,8 +623,9 @@ let rec do_intros n fmt fmla =
       List.iter forget_var vsl
     | Tbinop(Timplies, f1, f2) ->
       fprintf fmt "@ ";
-      let m = intros_hyp n fmt f1 in
-      do_intros m fmt f2
+      let m,vsl = intros_hyp n fmt f1 in
+      do_intros m fmt f2;
+      List.iter forget_var vsl
     | _ -> ()
 
 let intros_params fmt params =
