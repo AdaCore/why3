@@ -482,7 +482,7 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
         | Tbinop (Tiff, {t_node =
             Tapp (ps,[{t_node = Tvar u}; {t_node = Tapp (fs,[])}])},f)
           when ls_equal ps ps_equ && vs_equal v u &&
-                ls_equal fs fs_bool_true && t_v_occurs v f = 0 -> f
+               ls_equal fs fs_bool_true && t_v_occurs v f = 0 -> f
         | _ -> raise Exit in
       begin match t.t_node, al with
         | Tapp (s, tl), _::_ ->
@@ -520,8 +520,7 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
       t_or (pure_of_expr true e0) (pure_of_expr true e2)
   | Eif (e0,e1,e2) ->
       let prop = ity_equal e.e_ity ity_bool in
-      t_if (pure_of_expr true e0)
-        (pure_of_expr prop e1) (pure_of_expr prop e2)
+      t_if (pure_of_expr true e0) (pure_of_expr prop e1) (pure_of_expr prop e2)
   | Ecase (d,bl) ->
       let prop = ity_equal e.e_ity ity_bool in
       let conv (p,e) = t_close_branch p.pp_pat (pure_of_expr prop e) in
@@ -529,25 +528,70 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
   | Etry _ | Eraise _ | Eabsurd -> raise Exit)
 
 and pure_of_expr prop e =
+  let loca f = t_label ?loc:e.e_loc Slab.empty f in
   let t = raw_of_expr e in
   match t.t_ty with
-  | Some _ when prop ->
-      t_label ?loc:t.t_loc Slab.empty (t_equ_simp t t_bool_true)
-  | None when not prop ->
-      t_label ?loc:t.t_loc Slab.empty (t_if_simp t t_bool_true t_bool_false)
+  | None when not prop -> loca (t_if_simp t t_bool_true t_bool_false)
+  | Some _ when prop -> loca (t_equ_simp t t_bool_true)
   | _ -> t
 
-let fmla_of_expr e =
+let term_of_expr ~prop e =
   if not (eff_pure e.e_effect) then None else
-  try Some (pure_of_expr true e) with Exit -> None
+  try Some (pure_of_expr prop e) with Exit -> None
 
-let term_of_expr e =
-  if not (eff_pure e.e_effect) then None else
-  try Some (pure_of_expr false e) with Exit -> None
+let post_of_term res t =
+  let loca f = t_label ?loc:t.t_loc Slab.empty f in
+  let f_of_t t = loca (t_equ_simp t t_bool_true) in
+  match res.t_ty, t.t_ty with
+  | Some _, Some _ -> loca (t_equ_simp res t)
+  | None,   None   -> loca (t_iff_simp res t)
+  | Some _, None   -> loca (t_iff_simp (f_of_t res) t)
+  | None,   Some _ -> loca (t_iff_simp res (f_of_t t))
 
-let post_of_expr e =
-  if not (eff_pure e.e_effect) then None else
-  try Some (raw_of_expr e) with Exit -> None
+let rec post_of_expr res e = match e.e_node with
+  | _ when ity_equal e.e_ity ity_unit -> t_true
+  | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
+  | Eabsurd -> copy_labels e t_false
+  | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
+      copy_labels e (t_subst_single v.pv_vs t_void (post_of_expr res e))
+  | Elet (LDvar (v,d),e) ->
+      copy_labels e (t_let_close_simp v.pv_vs
+        (pure_of_expr false d) (post_of_expr res e))
+  | Elet (LDsym (s,_),e) ->
+      if is_rlpv s then raise Exit;
+      copy_labels e (post_of_expr res e)
+  | Elet (LDrec rdl,e) ->
+      if List.exists (fun rd -> is_rlpv rd.rec_sym) rdl then raise Exit;
+      copy_labels e (post_of_expr res e)
+  | Eif (_,e1,e2) when is_e_true e1 || is_e_false e2 ||
+                      (is_e_false e1 && is_e_true e2) ->
+      post_of_term res (raw_of_expr e)
+  | Eif (e0,e1,e2) ->
+      t_if (pure_of_expr true e0) (post_of_expr res e1) (post_of_expr res e2)
+  | Ecase (d,bl) ->
+      let conv (p,e) = t_close_branch p.pp_pat (post_of_expr res e) in
+      t_case (pure_of_expr false d) (List.map conv bl)
+  | Etry _ | Eraise _ -> raise Exit
+  | _ -> post_of_term res (raw_of_expr e)
+
+let local_post_of_expr e =
+  if ity_equal e.e_ity ity_unit || not (eff_pure e.e_effect) then [] else
+  let res = create_vsymbol (id_fresh "result") (ty_of_ity e.e_ity) in
+  try [create_post res (post_of_expr (t_var res) e)] with Exit -> []
+
+let post_of_expr res e =
+  ty_equal_check (ty_of_ity e.e_ity)
+    (match res.t_ty with Some ty -> ty | None -> ty_bool);
+  if ity_equal e.e_ity ity_unit || not (eff_pure e.e_effect) then None
+  else try
+    (* we avoid capturing the free variables of res *)
+    let clone v _ = create_vsymbol (id_clone v.vs_name) v.vs_ty in
+    let sbs = Mvs.mapi clone (t_vars res) in
+    let res = t_subst (Mvs.map t_var sbs) res in
+    let q = post_of_expr res e in
+    let inverse o n m = Mvs.add n (t_var o) m in
+    Some (t_subst (Mvs.fold inverse sbs Mvs.empty) q)
+  with Exit -> None
 
 (* let-definitions *)
 
@@ -565,10 +609,9 @@ let let_sym id ?(ghost=false) ?(kind=RKnone) c =
      the antecedents of WP, but provers must perform beta-reduction
      to apply it: auto-inlining might be really helpful here. *)
   let cty = match c with
-    | {c_node = Cfun e; c_cty = {cty_post = []} as c}
+    | {c_node = Cfun e; c_cty = {cty_post = []}}
       when (kind = RKnone (*|| kind = RKlocal*)) ->
-        begin match post_of_expr e with
-        | Some t -> add_post c t | None -> c end
+        cty_add_post c.c_cty (local_post_of_expr e)
     | _ -> c.c_cty in
   let s = create_rsymbol id ~ghost:(c_ghost c) ~kind cty in
   LDsym (s,c), s
@@ -868,7 +911,7 @@ and rec_fixp dl =
     if c_ghost d <> rs_ghost s then Loc.errorm
       "Expr.let_rec: ghost status mismatch";
     let c = if List.length c.cty_pre < List.length s.rs_cty.cty_pre
-            then c else cty_add_pre [List.hd s.rs_cty.cty_pre] c in
+            then cty_add_pre [List.hd s.rs_cty.cty_pre] c else c in
     if eff_equal c.cty_effect s.rs_cty.cty_effect then sm, (s,d)
     else let n = rs_dup s c in Mrs.add s n sm, (n,d) in
   let sm, dl = Lists.map_fold_left update Mrs.empty dl in

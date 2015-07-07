@@ -759,6 +759,8 @@ let effect_of_dspec dsp =
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   wl, eff
 
+(* TODO: add warnings for empty postconditions (anywhere)
+    and empty exceptional postconditions (toplevel). *)
 let check_spec dsp ecty e =
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
                                             weff.eff_writes eff.eff_writes) in
@@ -790,8 +792,6 @@ let check_spec dsp ecty e =
   if check_rwd && bad_write eeff ueff then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
-  (* TODO FIXME : revise the requirements for explicit "raises".
-     Should we only require them at the top level? *)
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sexn.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sexn.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
@@ -935,11 +935,6 @@ let cty_of_spec env bl dsp dity =
   create_cty bl p q xq (get_oldies old) eff ity
 
 (** Expressions *)
-
-(*
-let implicit_post = Debug.register_flag "implicit_post"
-  ~desc:"Generate@ a@ postcondition@ for@ pure@ functions@ without@ one."
-*)
 
 let warn_unused s loc =
   if s = "" || s.[0] <> '_' then

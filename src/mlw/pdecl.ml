@@ -339,22 +339,99 @@ let create_type_decl dl =
   let defn = if defn = [] then [] else [create_data_decl defn] in
   mk_decl (PDtype dl) (abst @ defn @ rest)
 
+(* TODO: share with Eliminate_definition *)
+let rec t_insert hd t = match t.t_node with
+  | Tif (f1,t2,t3) ->
+      t_if f1 (t_insert hd t2) (t_insert hd t3)
+  | Tlet (t1,bt) ->
+      let v,t2 = t_open_bound bt in
+      t_let_close v t1 (t_insert hd t2)
+  | Tcase (tl,bl) ->
+      t_case tl (List.map (fun b ->
+        let pl,t1 = t_open_branch b in
+        t_close_branch pl (t_insert hd t1)) bl)
+  | _ when hd.t_ty = None -> t_iff_simp hd t
+  | _ -> t_equ_simp hd t
+
 let create_let_decl ld =
-  let ls_of_rs s dl = match s.rs_logic with
-    | RLnone | RLlemma -> dl
+  let conv_post t q =
+    let v,f = open_post q in t_subst_single v t f in
+  let conv_post t ql = List.map (conv_post t) ql in
+  let cty_axiom id cty f =
+    (* FIXME: this is unsound in presence of aliases *)
+    let add_old o v m = Mvs.add o.pv_vs (t_var v.pv_vs) m in
+    let sbs = Mpv.fold add_old cty.cty_oldies Mvs.empty in
+    let f = List.fold_right t_implies cty.cty_pre (t_subst sbs f) in
+    let args = List.map (fun v -> v.pv_vs) cty.cty_args in
+    let f = t_forall_close args [] f in
+    let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
+    create_prop_decl Paxiom (create_prsymbol id) f in
+  let cty_axiom id cty f axms =
+    if t_equal f t_true then axms
+    else cty_axiom id cty f :: axms in
+  let add_ls sm s ({c_cty = cty} as c) (abst,defn,axms) =
+    match s.rs_logic with
     | RLpv _ -> invalid_arg "Pdecl.create_let_decl"
-    | RLls s -> create_param_decl s :: dl in
-  let ldl = match ld with
+    | RLnone -> abst, defn, axms
+    | RLlemma ->
+        let f = if ity_equal cty.cty_result ity_unit then
+          t_and_simp_l (conv_post t_void cty.cty_post)
+        else match cty.cty_post with
+          | q::ql ->
+              let v, f = open_post q in
+              let fl = f :: conv_post (t_var v) ql in
+              t_exists_close [v] [] (t_and_simp_l fl)
+          | [] -> t_true in
+        abst, defn, cty_axiom (id_clone s.rs_name) cty f axms
+    | RLls ls ->
+        let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
+        let t = t_app ls (List.map t_var vl) ls.ls_value in
+        let f = t_and_simp_l (conv_post t cty.cty_post) in
+        let axms = cty_axiom (id_clone ls.ls_name) cty f axms in
+        let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
+        begin match c.c_node with
+        | Cany | Capp _ ->
+            create_param_decl ls :: abst, defn, axms
+        | Cfun e ->
+            let res = if c.c_cty.cty_pre <> [] then None else
+              term_of_expr ~prop:(ls.ls_value = None) e in
+            begin match res with
+            | Some f -> abst, (ls, vl, f) :: defn, axms
+            | None ->
+                let axms = match post_of_expr t e with
+                  | Some f ->
+                      let nm = ls.ls_name.id_string ^ "_def" in
+                      cty_axiom (id_derive nm ls.ls_name) cty f axms
+                  | None -> axms in
+                create_param_decl ls :: abst, defn, axms
+            end
+        end in
+  let abst, defn, axms = match ld with
     | LDvar ({pv_vs = {vs_name = {id_loc = loc}}},e) ->
         if not (ity_closed e.e_ity) then
           Loc.errorm ?loc "Top-level variables must have monomorphic type";
         if match e.e_node with Eexec _ -> false | _ -> true then
           Loc.errorm ?loc "Top-level computations must carry a specification";
-        []
-    | LDrec rdl -> List.fold_right (fun d dl -> ls_of_rs d.rec_sym dl) rdl []
-    | LDsym (s,_) -> ls_of_rs s [] in
-  (* TODO: real function definitions and lemmas *)
-  mk_decl (PDlet ld) ldl
+        [], [], []
+    | LDrec rdl ->
+        let add_rd sm d = Mrs.add d.rec_rsym d.rec_sym sm in
+        let sm = List.fold_left add_rd Mrs.empty rdl in
+        let add_rd d dl = add_ls sm d.rec_sym d.rec_fun dl in
+        List.fold_right add_rd rdl ([],[],[])
+    | LDsym (s,c) ->
+        add_ls Mrs.empty s c ([],[],[]) in
+  let defn = if defn = [] then [] else
+    let dl = List.map (fun (s,vl,t) -> make_ls_defn s vl t) defn in
+    try [create_logic_decl dl] with Decl.NoTerminationProof _ ->
+    let abst = List.map (fun (s,_) -> create_param_decl s) dl in
+    let mk_ax ({ls_name = id} as s, vl, t) =
+      let nm = id.id_string ^ "_def" in
+      let pr = create_prsymbol (id_derive nm id) in
+      let hd = t_app s (List.map t_var vl) t.t_ty in
+      let ax = t_forall_close vl [] (t_insert hd t) in
+      create_prop_decl Paxiom pr ax in
+    abst @ List.map mk_ax defn in
+  mk_decl (PDlet ld) (abst @ defn @ axms)
 
 let create_exn_decl xs =
   if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc

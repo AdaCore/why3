@@ -247,8 +247,8 @@ val proxy_label : label
 val e_rs_subst : rsymbol Mrs.t -> expr -> expr
 val c_rs_subst : rsymbol Mrs.t -> cexp -> cexp
 
-val term_of_expr : expr -> term option
-val fmla_of_expr : expr -> term option
+val term_of_expr : prop:bool -> expr -> term option
+val post_of_expr : term -> expr -> term option
 
 (** {2 Built-in symbols} *)
 
