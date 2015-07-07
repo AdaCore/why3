@@ -210,6 +210,7 @@ module BitsSpec
   type t = {
     ghost mdl: set int;
   }
+  invariant { forall i. mem i self.mdl -> 0 <= i < size }
 
   val empty () : t
     ensures { is_empty result.mdl }
@@ -311,35 +312,50 @@ module Bits "the 1-bits of an integer, as a set of integers"
     { bv = bw_and a.bv (bw_not b.bv);
       mdl = diff a.mdl b.mdl }
 
-  lemma not_neg: forall n. add (bw_not n) (of_int 1) = neg n
+  predicate bits_interval_is_zero_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
+  let mask = lsl_bv (lsr_bv ones (sub (of_int 32) n)) i in
+    bw_and a mask = zero
+
+  predicate bits_interval_is_one_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
+  let mask = lsl_bv (lsr_bv ones (sub (of_int 32) n)) i in
+    bw_and a mask = mask
+
+  predicate bits_interval_is_zero (a:BV32.t) (i : int) (n : int) =
+    forall j. i <= j < i + n -> nth a j = False
+
+  lemma bits_interval_is_zero_equ : forall a i n.
+    ule i (of_int 32) -> ule (add i n) (of_int 32) ->
+      bits_interval_is_zero a (to_uint i) (to_uint n) <-> bits_interval_is_zero_bv a i n
+
+  predicate bits_interval_is_one (a:BV32.t) (i : int) (n : int) =
+    forall j. i <= j < i + n -> nth a j = True
+
+  lemma bits_interval_is_one_equ : forall a i n.
+    ule i (of_int 32) /\ ule n (sub (of_int 32) i) ->
+      bits_interval_is_one a (to_uint i) (to_uint n) <-> bits_interval_is_one_bv a i n
+
+  (* let test (a:BV32.t) (m:BV32.t) : BV32.t *)
+  (*   requires { bits_interval_is_zero_bv a zero m } *)
+  (*   requires {nth_bv a m = True} *)
+  (*   ensures  {nth_bv result m = True} *)
+  (*   ensures  {forall i. i <> m -> nth_bv result i = False} *)
+  (* = *)
+  (*   bw_and a (neg a) *)
 
   let rightmost_bit_trick (a: t) : t
     requires { not (is_empty a.mdl) }
     ensures  { result.mdl = singleton (min_elt a.mdl) }
   =
-    let res = bw_and a.bv (neg a.bv) in
     let ghost n = min_elt a.mdl in
     let ghost n_bv = of_int n in
-    assert {forall i. ult i n_bv -> not (nth_bv a.bv i)};
+    assert {bits_interval_is_zero_bv a.bv zero n_bv};
     assert {nth_bv a.bv n_bv};
-    assert {forall i. ult i n_bv -> nth_bv (bw_not a.bv) i};
-    assert {
-       let mask = lsr_bv ones (BV32.sub BV32.size (BV32.add n_bv (BV32.of_int 1))) in
-       bw_and a.bv mask = mask
-    };
-    assert {not (nth_bv (bw_not a.bv) n_bv)};
     assert {nth_bv (neg a.bv) n_bv};
-    assert {forall i. 0 <= i < n -> not (nth a.bv i)};
-    assert {nth a.bv n};
-    assert {not (nth (bw_not a.bv) n)};
-    assert {forall i. 0 <= i < n -> nth (bw_not a.bv) i};
-    assert {forall i. n < i < 32 -> nth (bw_not a.bv) i = not (nth a.bv i)};
-
-    assert {nth (neg a.bv) n};
-    assert {forall i. n < i < 32 -> nth (BV32.neg a.bv) i = not (nth a.bv i)};
+    let res = bw_and a.bv (neg a.bv) in
     assert {forall i. 0 <= i < n -> not (nth res i)};
-    assert {forall i. n < i < 32 -> not (nth res i)};
-    assert {nth res n};
+    (* assert {bits_interval_is_zero res 0 n}; *)
+    assert {bits_interval_is_zero_bv res (add n_bv (of_int 1)) (sub (of_int 31) n_bv )};
+    assert {bits_interval_is_zero res (n + 1) (31 - n)};
     { bv = res;
       mdl = singleton n }
 
@@ -349,6 +365,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
   =
     { bv = bw_not (lsl_bv ones n);
       mdl = interval 0 (to_uint n) }
+
 end
 
 (*** Work in progress *)
@@ -367,17 +384,18 @@ module NQueensBits
                                   number of solutions *)
 
   let rec t (a b c: BitsSpec.t)
+    requires { n <= size }
     requires { 0 <= !k }
     requires { !k + S.cardinal a.mdl = n }
     requires { !s >= 0 }
     requires { forall i: int. S.mem i a.mdl <->
         ( 0 <= i < n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i) }
-    requires { forall i: int. i >= 0 ->
+    requires { forall i: int.  0 <= i < size ->
         ( not (S.mem i b.mdl) <->
-          forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k ) }
-    requires { forall i: int. i >= 0 ->
+          forall j: int. 0 <= j < !k -> i - !col[j] <> !k - j) }
+    requires { forall i: int. 0 <= i < size ->
         ( not (S.mem i c.mdl) <->
-          forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j ) }
+          forall j: int. 0 <= j < !k -> i - !col[j] <> j - !k ) }
     requires { partial_solution !k !col }
     variant { S.cardinal a.mdl }
     ensures { result = !s - old !s >= 0 }
@@ -392,6 +410,7 @@ module NQueensBits
   = if not (is_empty a) then begin
     let e = ref (diff (diff a b) c) in
     let f = ref 0 in
+    assert { forall u:solution. solution u /\ eq_prefix !col u !k -> S.mem u[!k] !e.mdl };
     'L:
     while not (is_empty !e) do
       variant { S.cardinal !e.mdl }
@@ -413,12 +432,35 @@ module NQueensBits
       let ghost min = ref 0 in
       let d = rightmost_bit_trick !e min in
       ghost col := !col[!k <- !min];
+
+      assert { 0 <= !col[!k] < size };
+      assert { not (S.mem !col[!k] b.mdl) };
+      assert { not (S.mem !col[!k] c.mdl) };
+
       ghost k := !k + 1;
+
+      assert { eq_prefix (at !col 'L) !col (!k-1) };
+      assert { forall i: int. S.mem i a.mdl -> (forall j: int. 0 <= j < !k-1 ->  !col[j] <> i) };
+      assert { forall i: int. S.mem i (S.remove (S.min_elt d.mdl) a.mdl) <-> (0 <= i < n /\ (forall j: int. 0 <= j < !k ->  !col[j] <> i)) };
+
+      let ghost b' = mul2 (add_singleton b d) in
+      assert { forall i: int.  0 <= i < size ->
+        S.mem i b'.mdl -> (i = !min + 1 \/ S.mem (i - 1) b.mdl) && not (forall j:int. 0 <= j < !k -> i - !col[j] <> !k - j) };
+
+      let ghost c' = div2 (add_singleton c d) in
+      assert { forall i: int.  0 <= i < size ->
+        S.mem i c'.mdl -> (i = !min - 1 \/ (i + 1 < size /\ S.mem (i + 1) c.mdl)) && not (forall j:int. 0 <= j < !k -> i - !col[j] <> j - !k) };
+
+      'M:
       f := !f + t (remove_singleton a d)
                   (mul2 (add_singleton b d)) (div2 (add_singleton c d));
       ghost k := !k - 1;
+
+      assert { forall i j. (at !s 'L) <= i < at !s 'M <= j < !s -> lt_sol !sol[i] !sol[j]};
+
       e := remove_singleton !e d
     done;
+    assert { forall u:solution. solution u /\ eq_prefix !col u !k -> S.mem u[!k] (at !e.mdl 'L) };
     !f
     end else begin
       ghost sol := !sol[!s <- !col];
@@ -447,5 +489,3 @@ module NQueensBits
     queens (BV32.of_int 8)
 
 end
-
-(***)
