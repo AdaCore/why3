@@ -183,6 +183,17 @@ module mach.int.Int63
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
 end
+module mach.int.Refint63
+  syntax val incr "Pervasives.incr"
+  syntax val decr "Pervasives.decr"
+  syntax val (+=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r + v))"
+  syntax val (-=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r - v))"
+  syntax val ( *= ) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r * v))"
+end
+module mach.int.MinMax63
+  syntax val min "Pervasives.min"
+  syntax val max "Pervasives.max"
+end
 
 (* TODO
    other mach.int.XXX modules *)
@@ -214,6 +225,22 @@ module mach.array.Array63
   syntax val  fill   "Array.fill"
   syntax val  blit   "Array.blit"
   syntax val  self_blit "Array.blit"
+end
+module mach.matrix.Matrix63
+  syntax type matrix "(%1 array array)"
+
+  syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
+
+  syntax function rows     "(Array.length %1)"
+  syntax function columns  "(Array.length %1.(0))"
+  syntax val rows          "Array.length"
+  syntax val columns       "(fun m -> Array.length m.(0))"
+  syntax val get           "(fun m i j -> m.(i).(j))"
+  syntax val set           "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val defensive_get "(fun m i j -> m.(i).(j))"
+  syntax val defensive_set "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val make          "Array.make_matrix"
+  syntax val copy          "(Array.map Array.copy)"
 end
 
 (* TODO
