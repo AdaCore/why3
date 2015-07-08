@@ -5,15 +5,15 @@
 <prover id="0" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <file name="../coincidence_count.mlw" expanded="true">
-<theory name="CoincidenceCount" sum="bb91af34e3378d77979707fd55da2144" expanded="true">
+<theory name="CoincidenceCount" sum="c8fb7856ca9e35d98067c6b03ff5c8e4" expanded="true">
  <goal name="drop_left" expanded="true">
- <proof prover="1"><result status="valid" time="0.31" steps="515"/></proof>
+ <proof prover="1"><result status="valid" time="0.80" steps="1147"/></proof>
  </goal>
  <goal name="not_mem_inter_r" expanded="true">
- <proof prover="1"><result status="valid" time="2.28" steps="468"/></proof>
+ <proof prover="1"><result status="valid" time="1.02" steps="585"/></proof>
  </goal>
  <goal name="not_mem_inter_l" expanded="true">
- <proof prover="1"><result status="valid" time="2.19" steps="468"/></proof>
+ <proof prover="1"><result status="valid" time="1.01" steps="585"/></proof>
  </goal>
  <goal name="WP_parameter coincidence_count" expl="VC for coincidence_count" expanded="true">
  <transf name="split_goal_wp" expanded="true">
@@ -79,7 +79,7 @@
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.20" expl="20. loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.70" steps="136"/></proof>
+  <proof prover="1"><result status="valid" time="0.70" steps="167"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.21" expl="21. loop variant decrease" expanded="true">
   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>

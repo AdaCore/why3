@@ -142,11 +142,21 @@ end
 
 theory map.Map
   syntax type map "(Array %1 %2)"
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
+  meta "encoding:ignore_polymorphism_ts" type map
 
   syntax function get   "(select %1 %2)"
   syntax function set   "(store %1 %2 %3)"
+  meta "encoding : lskept" function get
+  meta "encoding : lskept" function set
+  meta "encoding:ignore_polymorphism_ls" function get
+  meta "encoding:ignore_polymorphism_ls" function ([])
+  meta "encoding:ignore_polymorphism_ls" function set
+  meta "encoding:ignore_polymorphism_ls" function ([<-])
+
+  meta "encoding:ignore_polymorphism_pr" prop Select_eq
+  meta "encoding:ignore_polymorphism_pr" prop Select_neq
+  remove prop Select_eq
+  remove prop Select_neq
 end
 
 theory map.Const
