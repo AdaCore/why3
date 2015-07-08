@@ -19,12 +19,12 @@ module Matrix
     0 <= r < a.rows /\ 0 <= c < a.columns
 
   val get (a: matrix 'a) (r c: int) : 'a
-    requires { valid_index a r c }
+    requires { "expl:index in array bounds" valid_index a r c }
     ensures  { result = get a r c }
 
   val set (a: matrix 'a) (r c: int) (v: 'a) : unit
-    requires { valid_index a r c }
-    writes {a}
+    requires { "expl:index in array bounds" valid_index a r c }
+    writes   { a }
     ensures  { a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v)}
 
   val rows    (a: matrix 'a) : int ensures { result = a.rows    }
@@ -34,14 +34,14 @@ module Matrix
   exception OutOfBounds
 
   let defensive_get (a: matrix 'a) (r c: int) : 'a
-    ensures { valid_index a r c }
+    ensures { "expl:index in array bounds" valid_index a r c }
     ensures { result = get a r c }
     raises  { OutOfBounds -> not (valid_index a r c) }
   = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
     get a r c
 
   let defensive_set (a: matrix 'a) (r c: int) (v: 'a) : unit
-    ensures { valid_index a r c }
+    ensures { "expl:index in array bounds" valid_index a r c }
     ensures { a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v)}
     raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }
   = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
@@ -49,9 +49,9 @@ module Matrix
 
   val make (r c: int) (v: 'a) : matrix 'a
     requires { r >= 0 /\ c >= 0 }
-    ensures { result.rows = r }
-    ensures { result.columns = c }
-    ensures { forall i j. 0 <= i < r /\ 0 <= j < c -> get result i j = v }
+    ensures  { result.rows = r }
+    ensures  { result.columns = c }
+    ensures  { forall i j. 0 <= i < r /\ 0 <= j < c -> get result i j = v }
 
   val copy (a: matrix 'a) : matrix 'a
     ensures  { result.rows = a.rows /\ result.columns = a.columns }
