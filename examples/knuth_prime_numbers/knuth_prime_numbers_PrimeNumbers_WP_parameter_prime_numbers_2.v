@@ -106,31 +106,31 @@ Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
   ((number.Parity.odd n1) /\ ((no_prime_in (map.Map.get p5 (j - 1%Z)%Z)
   n1) /\ forall (i:Z), ((0%Z <= i)%Z /\ (i < k)%Z) ->
   ~ (number.Divisibility.divides (map.Map.get p5 i) n1))))))) ->
-  ((0%Z <= k)%Z /\ (k < p)%Z)))))).
-intros m h1 h2 p p1 (h3,(h4,h5)) (h6,h7) p2 (h8,h9) (h10,h11) p3
-        (h12,h13) o h14 n p4 j (h15,h16) (h17,((h18,h19),(h20,h21))) k n1 p5
-        (h22,((h23,h24),(h25,((h26,h27),(h28,(h29,h30)))))). 
+  (((0%Z <= k)%Z /\ (k < p)%Z) -> (((ZArith.BinInt.Z.rem n1 (map.Map.get p5
+  k)) = 0%Z) -> ~ (number.Prime.prime n1)))))))).
+intros m h1 h2 p p1 (h3,(h4,h5)) (h6,h7) p2 (h8,h9) (h10,h11) p3 (h12,h13) o
+h14 n p4 j (h15,h16) (h17,((h18,h19),(h20,h21))) k n1 p5
+(h22,((h23,h24),(h25,((h26,h27),(h28,(h29,h30)))))) (h31,h32) h33.
 (*
 intros m h1 h2 h3 (h4,h5) p (h6,h7) (h8,h9) p1 (h10,h11) o h12 n p2 j
         (h13,h14) (h15,((h16,h17),(h18,h19))) k n1 p3
         (h20,((h21,h22),(h23,((h24,h25),(h26,(h27,h28)))))) (h29,h30) h31.
 *)
-(*
+intro h0.
 intuition.
 red in h0. destruct h0.
-*)
 red in h25. decompose [and] h25. clear h25.
-apply H0 with (Map.get p3 k).
-assert (2 < Map.get p3 k)%Z.
+apply H0 with (Map.get p5 k).
+assert (2 < Map.get p5 k)%Z.
 rewrite <- H1.
 apply H3; omega.
 split. omega.
 assert (case: (k<j-1 \/ k=j-1)%Z) by omega. destruct case.
-apply Zlt_trans with (Map.get p3 (j-1))%Z; try omega.
+apply Zlt_trans with (Map.get p5 (j-1))%Z; try omega.
 apply H3; omega.
 subst k; auto.
 apply Divisibility.mod_divides_computer; auto.
-assert (2 < Map.get p3 k)%Z.
+assert (2 < Map.get p5 k)%Z.
 rewrite <- H1.
 apply H3; omega.
 omega.
