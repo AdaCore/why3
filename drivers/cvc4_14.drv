@@ -62,4 +62,18 @@ theory int.EuclideanDivision
 end
 *)
 
+theory map.Map
+  meta "encoding:ignore_polymorphism_ts" type map
+  meta "encoding:ignore_polymorphism_ls" function get
+  meta "encoding:ignore_polymorphism_ls" function ([])
+  meta "encoding:ignore_polymorphism_ls" function set
+  meta "encoding:ignore_polymorphism_ls" function ([<-])
+  meta "encoding:ignore_polymorphism_pr" prop Select_eq
+  meta "encoding:ignore_polymorphism_pr" prop Select_neq
+
+  remove prop Select_eq
+  remove prop Select_neq
+end
+
+
 import "cvc4_bv.gen"

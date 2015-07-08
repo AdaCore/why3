@@ -94,3 +94,30 @@ goal g: forall x:'a. x = x
 (* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolyProp -G g *)
 
 end
+
+
+theory Map
+
+  use import int.Int
+  use import map.Map
+
+  goal g: forall m:map int int.
+    let m' = m[0<-42][1<-42] in
+    m'[0] + m'[1] >= 0
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -D why3_smt -T Map -G g *)
+
+end
+
+
+
+theory TestTuple
+
+  use import int.Int
+  use import bool.Bool
+
+  type t = (int,bool)
+
+  goal g: forall x:t. match x with (a,b) -> a >= 0 /\ b end
+
+end
