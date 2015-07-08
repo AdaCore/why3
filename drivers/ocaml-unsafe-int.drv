@@ -135,10 +135,10 @@ module matrix.Matrix
   syntax function columns  "(Array.length %1.(0))"
   syntax val rows          "Array.length"
   syntax val columns       "(fun m -> Array.length m.(0))"
-  syntax val get           "(fun m (i,j) -> m.(i).(j))"
-  syntax val set           "(fun m (i,j) v -> m.(i).(j) <- v)"
-  syntax val defensive_get "(fun m (i,j) -> m.(i).(j))"
-  syntax val defensive_set "(fun m (i,j) v -> m.(i).(j) <- v)"
+  syntax val get           "(fun m i j -> m.(i).(j))"
+  syntax val set           "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val defensive_get "(fun m i j -> m.(i).(j))"
+  syntax val defensive_set "(fun m i j v -> m.(i).(j) <- v)"
   syntax val make          "Array.make_matrix"
   syntax val copy          "(Array.map Array.copy)"
 end
@@ -202,7 +202,7 @@ module mach.array.Array31
   syntax val  self_blit "Array.blit"
 end
 module mach.array.Array63
-  syntax type array  "(%1 array)"
+  syntax type array63 "(%1 array)"
 
   syntax val  make   "Array.make"
   syntax val  ([])   "Array.get"
