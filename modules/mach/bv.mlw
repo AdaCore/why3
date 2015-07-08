@@ -16,6 +16,12 @@ module BVCheck_Gen
   function udiv t t : t
   function urem t t : t
 
+  predicate eq t t
+  predicate ule t t
+  predicate ult t t
+  predicate uge t t
+  predicate ugt t t
+
   val int_check (a:int) : t
     requires { 0 <= a < two_power_size }
     ensures  { to_uint result = a }
@@ -48,6 +54,66 @@ module BVCheck_Gen
     ensures  { to_uint result = mod (to_uint a) (to_uint b) }
     ensures  { result = urem a b }
 
+  val eq_check (a b:t) : bool
+    ensures { match result with
+              | True -> to_uint a = to_uint b
+              | False -> to_uint a <> to_uint b
+              end }
+    ensures { match result with
+              | True -> eq a b
+              | False -> not (eq a b)
+              end }
+
+  val ne_check (a b:t) : bool
+    ensures { match result with
+              | True -> to_uint a <> to_uint b
+              | False -> to_uint a = to_uint b
+              end }
+    ensures { match result with
+              | True -> not (eq a b)
+              | False -> eq a b
+              end }
+
+  val le_check (a b:t) : bool
+    ensures { match result with
+              | True -> to_uint a <= to_uint b
+              | False -> to_uint a > to_uint b
+              end }
+    ensures { match result with
+              | True -> ule a b
+              | False -> not (ule a b)
+              end }
+
+  val lt_check (a b:t) : bool
+    ensures { match result with
+              | True -> to_uint a < to_uint b
+              | False -> to_uint a >= to_uint b
+              end }
+    ensures { match result with
+              | True -> ult a b
+              | False -> not (ult a b)
+              end }
+
+  val ge_check (a b:t) : bool
+    ensures { match result with
+              | True -> to_uint a >= to_uint b
+              | False -> to_uint a < to_uint b
+              end }
+    ensures { match result with
+              | True -> uge a b
+              | False -> not (uge a b)
+              end }
+
+  val gt_check (a b:t) : bool
+    ensures { match result with
+              | True -> to_uint a > to_uint b
+              | False -> to_uint a <= to_uint b
+              end }
+    ensures { match result with
+              | True -> ugt a b
+              | False -> not (ugt a b)
+              end }
+
 end
 
 module BVCheck8
@@ -63,7 +129,12 @@ module BVCheck8
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
-    function urem = urem
+    function urem = urem,
+    predicate eq = eq,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
 end
 
 module BVCheck16
@@ -79,7 +150,12 @@ module BVCheck16
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
-    function urem = urem
+    function urem = urem,
+    predicate eq = eq,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
 end
 
 module BVCheck32
@@ -95,7 +171,12 @@ module BVCheck32
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
-    function urem = urem
+    function urem = urem,
+    predicate eq = eq,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
 end
 
 module BVCheck64
@@ -111,5 +192,10 @@ module BVCheck64
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
-    function urem = urem
+    function urem = urem,
+    predicate eq = eq,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
 end
