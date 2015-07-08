@@ -161,8 +161,8 @@ theory Fset
     forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
 
   lemma subset_eq:
-     forall s1 s2 : set 'a.
-     subset s1 s2 -> cardinal s1 = cardinal s2 -> s1 == s2
+    forall s1 s2 : set 'a.
+    subset s1 s2 -> cardinal s1 = cardinal s2 -> s1 == s2
 
   lemma cardinal1:
     forall s: set 'a. cardinal s = 1 ->
