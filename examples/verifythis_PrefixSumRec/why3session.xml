@@ -8,6 +8,7 @@
 <prover id="3" name="Z3" version="3.2" timelimit="10" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <prover id="5" name="CVC4" version="1.3" timelimit="10" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <file name="../verifythis_PrefixSumRec.mlw" expanded="true">
 <theory name="PrefixSumRec" sum="6d81c9f0aa6d78cffe93173557ccd286" expanded="true">
  <goal name="Div_mod_2">
@@ -319,9 +320,8 @@
   <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter downsweep.11" expl="11. assertion">
-  <proof prover="0"><result status="valid" time="10.22"/></proof>
-  <proof prover="4"><result status="valid" time="0.23" steps="65"/></proof>
-  <proof prover="5"><result status="valid" time="0.83"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.55"/></proof>
+  <proof prover="6"><result status="valid" time="0.12" steps="58"/></proof>
   </goal>
   <goal name="WP_parameter downsweep.12" expl="12. variant decrease">
   <proof prover="4"><result status="valid" time="0.02" steps="22"/></proof>
@@ -341,10 +341,8 @@
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter downsweep.15" expl="15. precondition">
-  <proof prover="0"><result status="valid" time="1.15"/></proof>
-  <proof prover="3"><result status="valid" time="4.95"/></proof>
-  <proof prover="4"><result status="valid" time="0.06" steps="50"/></proof>
-  <proof prover="5"><result status="valid" time="0.34"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.23"/></proof>
+  <proof prover="6"><result status="valid" time="0.11" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter downsweep.16" expl="16. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
