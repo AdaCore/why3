@@ -7,6 +7,7 @@ imports
   Why3_Bool
   Why3_Number
   Why3_BV
+  Why3_Real
 begin
 
 end
