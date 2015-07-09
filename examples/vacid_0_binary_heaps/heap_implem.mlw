@@ -15,11 +15,12 @@ lemma Is_heap_min:
     is_heap_array a 0 n -> a[0] = min_bag (model (a, n))
 
 use import ref.Ref
+use map.Const
 
 (* implementation of heaps *)
 let create () : ref logic_heap
   ensures { is_heap !result /\ model !result = empty_bag }
-  = let x = (A.const 0, 0) in ref x
+  = let x = (Const.const 0, 0) in ref x
 
 exception Break
 

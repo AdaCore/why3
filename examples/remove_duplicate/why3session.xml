@@ -4,113 +4,122 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
-<file name="../remove_duplicate.mlw">
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<file name="../remove_duplicate.mlw" expanded="true">
 <theory name="Spec" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="RemoveDuplicateQuadratic" sum="fac7d356f768e601dbe19e875b3e8b12">
+<theory name="RemoveDuplicateQuadratic" sum="92f490700783263ffd90b70fce7e0325" expanded="true">
  <goal name="WP_parameter test_appears" expl="VC for test_appears">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="65"/></proof>
  </goal>
  <goal name="WP_parameter remove_duplicate" expl="VC for remove_duplicate">
  <transf name="split_goal_wp">
   <goal name="WP_parameter remove_duplicate.1" expl="1. array creation size">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.2" expl="2. array creation size">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.6" expl="6. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.7" expl="7. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.8" expl="8. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.9" expl="9. type invariant">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.9" expl="9. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.10" expl="10. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove_duplicate.10" expl="10. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.11" expl="11. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.11" expl="11. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.12" expl="12. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.13" expl="13. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.14" expl="14. type invariant">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.14" expl="14. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.15" expl="15. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.15" expl="15. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.16" expl="16. type invariant">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.16" expl="16. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.17" expl="17. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.17" expl="17. type invariant">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.18" expl="18. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.18" expl="18. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.19" expl="19. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.16"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.20" expl="20. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="84"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.21" expl="21. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.22" expl="22. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="52"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.23" expl="23. type invariant">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove_duplicate.23" expl="23. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.05" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.24" expl="24. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter remove_duplicate.24" expl="24. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.25" expl="25. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove_duplicate.25" expl="25. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.26" expl="26. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.27" expl="27. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.28" expl="28. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.29" expl="29. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="66"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.30" expl="30. type invariant">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove_duplicate.30" expl="30. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.31" expl="31. postcondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter remove_duplicate.31" expl="31. type invariant">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.32" expl="32. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.33" expl="33. postcondition">
-  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter remove_duplicate.34" expl="34. postcondition">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>

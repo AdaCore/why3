@@ -30,125 +30,108 @@
             
             (* use ref.Ref *)
             
-            (* use mach.int.Int32 *)
+            (* use mach.bv.BVCheck32 *)
             
             goal WP_parameter_max :
-              forall a:map int int32, len:int32.
-               to_int len > 0 ->
-                in_bounds 0 &&
-                 (forall o:int32.
-                   to_int o = 0 ->
-                    in_bounds 0 &&
-                     (forall o1:int32.
-                       to_int o1 = 0 ->
-                        in_bounds 0 &&
-                         (forall o2:int32.
-                           to_int o2 = 0 ->
-                            (forall x:int32.
-                              x = o2 ->
-                               in_bounds 1 &&
-                                (forall o3:int32.
-                                  to_int o3 = 1 ->
-                                   in_bounds (to_int len - to_int o3) &&
-                                    (forall o4:int32.
-                                      to_int o4 = (to_int len - to_int o3) ->
-                                       (forall y:int32.
-                                         y = o4 ->
-                                          ((0 <= to_int x /\ to_int x <= to_int y) /\
-                                            to_int y < to_int len) /\
-                                           (forall y1:int32, x1:int32.
-                                             (0 <= to_int x1 /\ to_int x1 <= to_int y1) /\
-                                              to_int y1 < to_int len ->
-                                              (forall result:bool.
-                                                (result = True <->
-                                                  not to_int x1 = to_int y1) ->
-                                                 (if result = True then forall result1:
-                                                                         bool.
-                                                                         (result1 =
-                                                                           True <->
-                                                                           to_int
-                                                                            (get a
-                                                                              (
-                                                                              to_int x1)) <=
-                                                                            to_int
-                                                                             (get a
-                                                                              (to_int
-                                                                              y1))) ->
-                                                                          (if result1 =
-                                                                              True then 
-                                                                          in_bounds 1 &&
-                                                                           (forall o5:
-                                                                             int32.
-                                                                             to_int o5 =
-                                                                              1 ->
-                                                                              in_bounds
-                                                                              (to_int
-                                                                              x1 +
-                                                                              to_int o5) &&
-                                                                              (forall o6:
-                                                                              int32.
-                                                                              to_int o6 =
-                                                                              (to_int
-                                                                              x1 +
-                                                                              to_int o5) ->
-                                                                              (forall x2:
-                                                                              int32.
-                                                                              x2 = o6 ->
-                                                                              ((0 <=
-                                                                              to_int x2 /\
-                                                                              to_int x2 <=
-                                                                              to_int y1) /\
-                                                                              to_int y1 <
-                                                                              to_int
+              forall a:map int t, len:t.
+               to_uint len > 0 ->
+                (0 <= 0 /\ 0 < two_power_size) &&
+                 (to_uint (of_int 0) = 0 ->
+                   (0 <= 0 /\ 0 < two_power_size) &&
+                    (to_uint (of_int 0) = 0 ->
+                      (0 <= 0 /\ 0 < two_power_size) && (let o = of_int 0 in
+                       to_uint o = 0 ->
+                        (forall x:t.
+                          x = o ->
+                           (0 <= 1 /\ 1 < two_power_size) && (let o1 = of_int 1 in
+                            to_uint o1 = 1 ->
+                             (0 <= (to_uint len - to_uint o1) /\
+                               (to_uint len - to_uint o1) < two_power_size) &&
+                              (let o2 = sub len o1 in
+                              to_uint o2 = (to_uint len - to_uint o1) ->
+                               (forall y:t.
+                                 y = o2 ->
+                                  ((0 <= to_uint x /\ to_uint x <= to_uint y) /\
+                                    to_uint y < to_uint len) /\
+                                   (forall y1:t, x1:t.
+                                     (0 <= to_uint x1 /\ to_uint x1 <= to_uint y1) /\
+                                      to_uint y1 < to_uint len ->
+                                      (forall result:bool.
+                                        match result with
+                                         | True -> not to_uint x1 = to_uint y1
+                                         | False -> to_uint x1 = to_uint y1
+                                         end /\
+                                         match result with
+                                         | True -> not eq x1 y1
+                                         | False -> eq x1 y1
+                                         end ->
+                                         (if result = True then let o3 = get a
+                                                                          (to_uint y1) in
+                                         let o4 = get a (to_uint x1) in
+                                         forall result1:bool.
+                                          match result1 with
+                                           | True -> to_uint o4 <= to_uint o3
+                                           | False -> to_uint o4 > to_uint o3
+                                           end /\
+                                           match result1 with
+                                           | True -> ule o4 o3
+                                           | False -> not ule o4 o3
+                                           end ->
+                                           (if result1 = True then (0 <= 1 /\
+                                                                     1 < two_power_size) &&
+                                                                    (let o5 = of_int 1 in
+                                                                    to_uint o5 = 1 ->
+                                                                     (0 <=
+                                                                       (to_uint x1 +
+                                                                         to_uint o5) /\
+                                                                       (to_uint x1 +
+                                                                         to_uint o5) <
+                                                                        two_power_size) &&
+                                                                      (let o6 = 
+                                                                      add x1 o5 in
+                                                                      to_uint o6 =
+                                                                       (to_uint x1 +
+                                                                         to_uint o5) ->
+                                                                       (forall x2:t.
+                                                                         x2 = o6 ->
+                                                                          ((0 <=
+                                                                             to_uint x2 /\
+                                                                             to_uint x2 <=
+                                                                              to_uint
+                                                                              y1) /\
+                                                                            to_uint y1 <
+                                                                             to_uint
                                                                               len) /\
-                                                                              0 <=
-                                                                              (to_int
+                                                                           0 <=
+                                                                            (to_uint y1 -
+                                                                              to_uint
+                                                                              x1) /\
+                                                                            (to_uint y1 -
+                                                                              to_uint
+                                                                              x2) <
+                                                                             (to_uint
                                                                               y1 -
-                                                                              to_int x1) /\
-                                                                              (to_int
-                                                                              y1 -
-                                                                              to_int x2) <
-                                                                              (to_int
-                                                                              y1 -
-                                                                              to_int x1))))
-                                                                          else 
-                                                                          in_bounds 1 &&
-                                                                           (forall o5:
-                                                                             int32.
-                                                                             to_int o5 =
-                                                                              1 ->
-                                                                              in_bounds
-                                                                              (to_int
-                                                                              y1 -
-                                                                              to_int o5) &&
-                                                                              (forall o6:
-                                                                              int32.
-                                                                              to_int o6 =
-                                                                              (to_int
-                                                                              y1 -
-                                                                              to_int o5) ->
-                                                                              (forall y2:
-                                                                              int32.
-                                                                              y2 = o6 ->
-                                                                              ((0 <=
-                                                                              to_int x1 /\
-                                                                              to_int x1 <=
-                                                                              to_int y2) /\
-                                                                              to_int y2 <
-                                                                              to_int
-                                                                              len) /\
-                                                                              0 <=
-                                                                              (to_int
-                                                                              y1 -
-                                                                              to_int x1) /\
-                                                                              (to_int
-                                                                              y2 -
-                                                                              to_int x1) <
-                                                                              (to_int
-                                                                              y1 -
-                                                                              to_int x1)))))
-                                                 else 0 <= to_int x1 /\
-                                                       to_int x1 < to_int len))))))))))
+                                                                              to_uint
+                                                                              x1))))
+                                           else (0 <= 1 /\ 1 < two_power_size) &&
+                                                 (let o5 = of_int 1 in
+                                                 to_uint o5 = 1 ->
+                                                  (0 <= (to_uint y1 - to_uint o5) /\
+                                                    (to_uint y1 - to_uint o5) <
+                                                     two_power_size) &&
+                                                   (let o6 = sub y1 o5 in
+                                                   to_uint o6 =
+                                                    (to_uint y1 - to_uint o5) ->
+                                                    (forall y2:t.
+                                                      y2 = o6 ->
+                                                       ((0 <= to_uint x1 /\
+                                                          to_uint x1 <= to_uint y2) /\
+                                                         to_uint y2 < to_uint len) /\
+                                                        0 <= (to_uint y1 - to_uint x1) /\
+                                                         (to_uint y2 - to_uint x1) <
+                                                          (to_uint y1 - to_uint x1)))))
+                                         else 0 <= to_uint x1 /\
+                                               to_uint x1 < to_uint len))))))))))
             end
-[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1 (WP_parameter max): Valid, Valid, Valid, Timeout, Timeout
+[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
+[jessie3] Task 1 (WP_parameter max): Valid, Timeout, Valid, Timeout, Timeout

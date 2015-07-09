@@ -108,10 +108,10 @@ module NQueensSets
     requires { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
       (forall i: int. mem i a <->
         (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
-      (forall i: int. i>=0 -> not (mem i b) <->
-        (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
-      (forall i: int. i>=0 -> not (mem i c) <->
-        (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
+      (forall i: int. i>=0 -> (not (mem i b) <->
+        (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k))) /\
+      (forall i: int. i>=0 -> (not (mem i c) <->
+        (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j))) /\
       partial_solution !k !col }
     ensures { result = !s - old !s >= 0 /\ !k = old !k /\
       sorted !sol (old !s) !s /\
@@ -161,6 +161,8 @@ module NQueensSets
   = t3 (interval 0 q) empty empty
 
 end
+
+(* obsolete :  see in_progress/nqueens.mlw
 
 (** {2 More realistic code with bitwise operations} *)
 
@@ -276,7 +278,6 @@ module Bits "the 1-bits of an integer, as a set of integers"
 
   lemma not_neg: forall n. add (bw_not n) (of_int 1) = neg n
 
-(***
   let rightmost_bit_trick (a: t) : t
     requires { not (is_empty a.mdl) }
     ensures  { result.mdl = singleton (min_elt a.mdl) }
@@ -306,7 +307,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
     assert {nth res n};
     { bv = res;
       mdl = singleton n }
-***)
+
 
   let below (n: BV32.t) : t
     requires { BV32.ule n (BV32.of_int 32) }
@@ -316,7 +317,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
       mdl = interval 0 (to_uint n) }
 end
 
-(*** Work in progress
+
 module NQueensBits
 
   use import BitsSpec
@@ -332,52 +333,59 @@ module NQueensBits
                                   number of solutions *)
 
   let rec t (a b c: BitsSpec.t)
-  variant { S.cardinal a.mdl }
-    requires { 0 <= !k /\ !k + S.cardinal a.mdl = n /\ !s >= 0 /\
-      (forall i: int. S.mem i a.mdl <->
-        (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
-      (forall i: int. i>=0 -> not (S.mem i b.mdl) <->
-        (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
-      (forall i: int. i>=0 -> not (S.mem i c.mdl) <->
-        (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
-      partial_solution !k !col }
-    ensures { result = !s - old !s >= 0 /\ !k = old !k /\
-      sorted !sol (old !s) !s /\
-      (forall u: solution.
-         ((solution u /\ eq_prefix !col u !k) <->
-          (exists i: int. old !s <= i < !s /\ eq_sol u !sol[i]))) /\
-      (* assigns *)
-      eq_prefix (old !col) !col !k /\
-      eq_prefix (old !sol) !sol (old !s) }
+    requires { 0 <= !k }
+    requires { !k + S.cardinal a.mdl = n }
+    requires { !s >= 0 }
+    requires { forall i: int. S.mem i a.mdl <->
+        ( 0 <= i < n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i) }
+    requires { forall i: int. i >= 0 ->
+        ( not (S.mem i b.mdl) <->
+          forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k ) }
+    requires { forall i: int. i >= 0 ->
+        ( not (S.mem i c.mdl) <->
+          forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j ) }
+    requires { partial_solution !k !col }
+    variant { S.cardinal a.mdl }
+    ensures { result = !s - old !s >= 0 }
+    ensures { !k = old !k }
+    ensures { sorted !sol (old !s) !s }
+    ensures { forall u: solution.
+        solution u /\ eq_prefix !col u !k <->
+        exists i: int. old !s <= i < !s /\ eq_sol u !sol[i] }
+    (* assigns *)
+    ensures { eq_prefix (old !col) !col !k }
+    ensures { eq_prefix (old !sol) !sol (old !s) }
   = if not (is_empty a) then begin
-      let e = ref (diff (diff a b) c) in
-      let f = ref 0 in
-   'L:while not (is_empty !e) do
-        invariant {
-          !f = !s - at !s 'L >= 0 /\ !k = at !k 'L /\
-          S.subset !e.mdl (S.diff (S.diff a.mdl b.mdl) c.mdl) /\
-          partial_solution !k !col /\
-          sorted !sol (at !s 'L) !s /\
-          (forall i j: int. S.mem i (S.diff (at !e.mdl 'L) !e.mdl) ->
-             S.mem j !e.mdl -> i < j) /\
-          (forall u: solution.
-           (solution u /\ eq_prefix !col u !k /\
+    let e = ref (diff (diff a b) c) in
+    let f = ref 0 in
+    'L:
+    while not (is_empty !e) do
+      variant { S.cardinal !e.mdl }
+      invariant { !f = !s - at !s 'L >= 0 }
+      invariant { !k = at !k 'L }
+      invariant { S.subset !e.mdl (S.diff (S.diff a.mdl b.mdl) c.mdl) }
+      invariant { partial_solution !k !col }
+      invariant { sorted !sol (at !s 'L) !s }
+      invariant { forall i j: int.
+        S.mem i (S.diff (at !e.mdl 'L) !e.mdl) /\ S.mem j !e.mdl -> i < j }
+      invariant { forall u: solution.
+        (solution u /\ eq_prefix !col u !k /\
             S.mem u[!k] (S.diff (at !e.mdl 'L) !e.mdl))
-           <->
-           (exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i])) /\
-          (* assigns *)
-          eq_prefix (at !col 'L) !col !k /\
-          eq_prefix (at !sol 'L) !sol (at !s 'L) }
-        variant { S.cardinal !e.mdl }
-        let ghost min = ref 0 in
-        let d = rightmost_bit_trick !e min in
-        ghost col := !col[!k <- !min];
-        ghost k := !k + 1;
-        f := !f + t (remove_singleton a d) (mul2 (add_singleton b d)) (div2 (add_singleton c d));
-        ghost k := !k - 1;
-        e := remove_singleton !e d
-      done;
-      !f
+        <->
+        exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i] }
+      (* assigns *)
+      invariant { eq_prefix (at !col 'L) !col !k }
+      invariant { eq_prefix (at !sol 'L) !sol (at !s 'L) }
+      let ghost min = ref 0 in
+      let d = rightmost_bit_trick !e min in
+      ghost col := !col[!k <- !min];
+      ghost k := !k + 1;
+      f := !f + t (remove_singleton a d)
+                  (mul2 (add_singleton b d)) (div2 (add_singleton c d));
+      ghost k := !k - 1;
+      e := remove_singleton !e d
+    done;
+    !f
     end else begin
       ghost sol := !sol[!s <- !col];
       ghost s := !s + 1;
@@ -385,17 +393,25 @@ module NQueensBits
     end
 
   let queens (q: BV32.t)
-    requires { BV32.to_uint q = n /\ BV32.ule q BV32.size /\ !s = 0 /\ !k = 0 }
-    ensures { result = !s /\ sorted !sol 0 !s /\
-      forall u: solution.
-        solution u <-> (exists i: int. 0 <= i < result /\ eq_sol u !sol[i]) }
-  = t (below q) (empty()) (empty())
+    requires { BV32.to_uint q = n }
+    requires { BV32.ule q BV32.size }
+    requires { !s = 0 }
+    requires { !k = 0 }
+    ensures  { result = !s }
+    ensures  { sorted !sol 0 !s }
+    ensures  { forall u: solution.
+      solution u <-> exists i: int. 0 <= i < result /\ eq_sol u !sol[i] }
+    =
+    t (below q) (empty()) (empty())
 
 
-  let test8 () requires { size=32 /\ n = 8 } =
+  let test8 ()
+    requires { size = 32 }
+    requires { n = 8 }
+  =
     s := 0; k := 0;
     queens (BV32.of_int 8)
 
 end
 
-***)
+*)

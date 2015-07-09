@@ -12,6 +12,7 @@ module HashtblImpl
   use import list.List
   use import list.Mem
   use import map.Map
+  use map.Const
   use import array.Array
 
   type key
@@ -47,17 +48,17 @@ module HashtblImpl
 
   let create (n: int) : t 'a
     requires { 1 <= n }
-    ensures  { result.view = Map.const None }
+    ensures  { result.view = Const.const None }
   =
-    { size = 0; data = make n Nil; view = Map.const None }
+    { size = 0; data = make n Nil; view = Const.const None }
 
   let clear (h: t 'a) : unit
     writes  { h.size, h.data.elts, h.view }
-    ensures { h.view = Map.const None }
+    ensures { h.view = Const.const None }
   =
     h.size <- 0;
     fill h.data 0 (length h.data) Nil;
-    h.view <- Map.const None
+    h.view <- Const.const None
 
   let resize (h: t 'a) : unit
     writes  { h.data }

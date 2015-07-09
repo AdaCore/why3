@@ -52,10 +52,6 @@ Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
 Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
   a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
-(* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (array a) :=
-  (mk_array n (map.Map.const v: (map.Map.map Z a))).
-
 Parameter n: Z.
 
 Axiom n_nonneg : (0%Z < n)%Z.
@@ -80,42 +76,48 @@ Ltac ae := why3 "Alt-Ergo,0.95.2," timelimit 5.
 Ltac z3 := why3 "Z3,4.3.1," timelimit 5.
 
 (* Why3 goal *)
-Theorem WP_parameter_distance : let o := n in ((0%Z <= o)%Z ->
-  (((0%Z < o)%Z \/ (0%Z = o)) -> ((0%Z < o)%Z -> forall (g:(map.Map.map Z
-  Z)), (((0%Z < o)%Z \/ (0%Z = o)) /\
-  (g = (map.Map.set (map.Map.const 0%Z: (map.Map.map Z Z)) 0%Z (-1%Z)%Z))) ->
-  let o1 := n in ((0%Z <= o1)%Z -> (((0%Z < o1)%Z \/ (0%Z = o1)) -> let o2 :=
+Theorem WP_parameter_distance : let o := n in ((0%Z <= o)%Z -> forall (g:Z)
+  (g1:(map.Map.map Z Z)), (((0%Z < g)%Z \/ (0%Z = g)) /\ ((g = o) /\
+  forall (i:Z), (((0%Z < i)%Z \/ (0%Z = i)) /\ (i < o)%Z) -> ((map.Map.get g1
+  i) = 0%Z))) -> ((0%Z < g)%Z -> forall (g2:(map.Map.map Z Z)),
+  (((0%Z < g)%Z \/ (0%Z = g)) /\ (g2 = (map.Map.set g1 0%Z (-1%Z)%Z))) ->
+  let o1 := n in ((0%Z <= o1)%Z -> forall (d:Z) (d1:(map.Map.map Z Z)),
+  (((0%Z < d)%Z \/ (0%Z = d)) /\ ((d = o1) /\ forall (i:Z), (((0%Z < i)%Z \/
+  (0%Z = i)) /\ (i < o1)%Z) -> ((map.Map.get d1 i) = 0%Z))) -> let o2 :=
   (n - 1%Z)%Z in (((1%Z < o2)%Z \/ (1%Z = o2)) -> forall (count:Z)
-  (d:(map.Map.map Z Z)) (g1:(map.Map.map Z Z)), ((((map.Map.get d
-  0%Z) = 0%Z) /\ (((map.Map.get g1 0%Z) = (-1%Z)%Z) /\
-  (((count + (map.Map.get d
+  (d2:(map.Map.map Z Z)) (g3:(map.Map.map Z Z)), ((((map.Map.get d2
+  0%Z) = 0%Z) /\ (((map.Map.get g3 0%Z) = (-1%Z)%Z) /\
+  (((count + (map.Map.get d2
   ((o2 + 1%Z)%Z - 1%Z)%Z))%Z < ((o2 + 1%Z)%Z - 1%Z)%Z)%Z \/
-  ((count + (map.Map.get d
+  ((count + (map.Map.get d2
   ((o2 + 1%Z)%Z - 1%Z)%Z))%Z = ((o2 + 1%Z)%Z - 1%Z)%Z)))) /\ ((forall (k:Z),
-  ((0%Z < k)%Z /\ (k < (o2 + 1%Z)%Z)%Z) -> ((((map.Map.get g1 (map.Map.get g1
-  k)) < (f k))%Z /\ ((((f k) < (map.Map.get g1 k))%Z \/
-  ((f k) = (map.Map.get g1 k))) /\ ((map.Map.get g1 k) < k)%Z)) /\
-  (((0%Z < (map.Map.get d k))%Z /\ ((map.Map.get d k) = ((map.Map.get d
-  (map.Map.get g1 k)) + 1%Z)%Z)) /\ forall (k':Z), (((map.Map.get g1
-  k) < k')%Z /\ (k' < k)%Z) -> ((map.Map.get d (map.Map.get g1
-  k)) < (map.Map.get d k'))%Z))) /\ forall (k:Z), (((0%Z < k)%Z \/
-  (0%Z = k)) /\ (k < (o2 + 1%Z)%Z)%Z) -> (path (map.Map.get d k) k))) ->
+  ((0%Z < k)%Z /\ (k < (o2 + 1%Z)%Z)%Z) -> ((((map.Map.get g3 (map.Map.get g3
+  k)) < (f k))%Z /\ ((((f k) < (map.Map.get g3 k))%Z \/
+  ((f k) = (map.Map.get g3 k))) /\ ((map.Map.get g3 k) < k)%Z)) /\
+  (((0%Z < (map.Map.get d2 k))%Z /\ ((map.Map.get d2 k) = ((map.Map.get d2
+  (map.Map.get g3 k)) + 1%Z)%Z)) /\ forall (k':Z), (((map.Map.get g3
+  k) < k')%Z /\ (k' < k)%Z) -> ((map.Map.get d2 (map.Map.get g3
+  k)) < (map.Map.get d2 k'))%Z))) /\ forall (k:Z), (((0%Z < k)%Z \/
+  (0%Z = k)) /\ (k < (o2 + 1%Z)%Z)%Z) -> (path (map.Map.get d2 k) k))) ->
   ((count < n)%Z -> forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
-  (k < n)%Z) -> forall (d':Z), (path d' k) -> ((map.Map.get d
-  k) <= d')%Z))))))).
-(* Why3 intros o h1 h2 h3 g (h4,h5) o1 h6 h7 o2 h8 count d g1
-        ((h9,(h10,h11)),(h12,h13)) h14 k (h15,h16) d' h17. *)
-intros o _ _ h3 g _ o1 h4 h5 o2 h6 count d g1 ((h7,(h8,h9)),(h10,h11)) h12 k
+  (k < n)%Z) -> forall (d':Z), (path d' k) -> ((map.Map.get d2
+  k) <= d')%Z))))).
+(*
+intros o _  _ h3 g            _ o1 h4 h5 o2 h6 count d g1 ((h7,(h8,h9)),(h10,h11)) h12 k
 (h13,h14) d' h15.
+*)
+intros o h1 g g1 (h2,(h3,h4)) h5 g2 (h6,h7) o1 h8 d d1 (h9,(h10,h11))
+        o2 h12 count d2 g3 ((h13,(h14,h15)),(h16,h17)) h18 k (h19,h20) d'
+        h21.
 subst o o1 o2.
-clear h4 h5 h6.
+(* clear h4 h5 h6. *)
 replace (n-1+1)%Z with n in * by omega.
-clear count h9 h12.
-generalize h13 h14 d' h15.
+(* clear count h9 h12. *)
+generalize h19 h20 d' h21.
 pattern k.
-apply Z_lt_induction; [clear k h13 h14 d' h15 | omega].
+apply Z_lt_induction; [clear k h19 h20 d' h21 | omega].
 intros k IH hk1 hk2 d' hd'.
-assert (case: (Map.get d k <= d' \/ d' < Map.get d k)%Z) by omega.
+assert (case: (Map.get d2 k <= d' \/ d' < Map.get d2 k)%Z) by omega.
 destruct case; auto.
 destruct hk1.
 (* 0 < k *)
@@ -123,14 +125,14 @@ inversion hd'.
 omega.
 subst i.
 assert (h: (0 < k < n)%Z) by omega.
-generalize (h10 k h). intros h10k.
+generalize (h16 k h). intros h16k.
 assert (case: (j < Map.get g1 k \/ j = Map.get g1 k \/ j > Map.get g1 k)%Z) by omega.
 destruct case.
 (* j < g[k] *)
 z3.
 destruct H5.
 (* j = g[k] *)
-ae.
+z3.
 (* j > g[k] *)
 z3.
 (* k = 0 *)

@@ -155,19 +155,24 @@ Release Notes (details in file CHANGES):
 
 == TODO ==
 
+* Document src/core/trans.mli, and fill the paragraph on
+  transformations in the tutorial: doc/api.tex, section 4.7 "Applying
+  transformations"
+
 * fix bug 18953 : (<>) not allowed as prefix form
 
 * finalize detect_polymorphism. Allow polymorphic tuples (supported by SMT ?)
 
 * integrate server feature done by Johannes
 
-* Coq realization of bitvector theory
+* DONE Coq realization of bitvector theory
 
 * make counter-examples feature more robust
 
-* support for both isabelle 2014 and 2015
+* DONE support for both isabelle 2014 and 2015
+  + bugfix for installation
 
-* review support for division operators by SMT provers
+* DONE review support for division operators by SMT provers
 
 * take some time to fix some bugs of the BTS: 18029 at least
 
@@ -176,7 +181,7 @@ Release Notes (details in file CHANGES):
   alt-ergo -replay <file>.agr
 
 * make the strategy feature public and documented. Possibly generate
-  default stratregies dynamically at the time of why3 config --detect,
+  default strategies dynamically at the time of why3 config --detect,
   using the provers detected : for that, we can annotated the provers in
   prover-detection-data.conf to tell if they should be used in the strategies,
   with which priority
@@ -187,7 +192,7 @@ Release Notes (details in file CHANGES):
 
   . or, on the contrary, favor splitting
 
-  . or, favor timelimt increase...
+  . or, favor timelimit increase...
 
 
 

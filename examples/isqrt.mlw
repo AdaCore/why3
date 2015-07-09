@@ -42,12 +42,12 @@ module NewtonMethod
     let y = ref x in
     let z = ref (div (x+1) 2) in
     while !z < !y do
-      invariant { !z > 0
-               /\ !y > 0
-               /\ !z = div (div x !y + !y) 2
-               /\ x < (!y + 1) * (!y + 1)
-               /\ x < (!z + 1) * (!z + 1) }
       variant { !y }
+      invariant { !z > 0 }
+      invariant { !y > 0 }
+      invariant { !z = div (div x !y + !y) 2 }
+      invariant { x < (!y + 1) * (!y + 1) }
+      invariant { x < (!z + 1) * (!z + 1) }
       y := !z;
       z := div (div x !z + !z) 2
     done;

@@ -961,7 +961,7 @@ COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 COQLIBS_SET_FILES = Set
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
-COQLIBS_MAP_FILES = Map Occ MapPermut MapInjection
+COQLIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
 COQLIBS_MAP = $(addprefix lib/coq/map/, $(COQLIBS_MAP_FILES))
 
 COQLIBS_LIST_FILES = List Length Mem Nth NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt NthNoOpt RevAppend Combine Distinct NumOcc Permut
@@ -1243,7 +1243,7 @@ ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix lib/isabelle/number/, $(ISAB
 ISABELLELIBS_SET_FILES = Set Fset
 ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix lib/isabelle/set/, $(ISABELLELIBS_SET_FILES)))
 
-ISABELLELIBS_MAP_FILES = Map Occ MapPermut MapInjection
+ISABELLELIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
 ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/map/, $(ISABELLELIBS_MAP_FILES)))
 
 ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt RevAppend Combine Distinct NumOcc Permut
@@ -1365,7 +1365,8 @@ clean::
 # Ocaml realizations
 #######################
 
-OCAMLLIBS_FILES = why3__BigInt_compat why3__BigInt why3__IntAux why3__Array
+OCAMLLIBS_FILES = why3__BigInt_compat why3__BigInt why3__IntAux why3__Array \
+	          why3__Matrix
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 

@@ -14,7 +14,7 @@
 </theory>
 <theory name="ResizableArraySpec" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="BagImpl" sum="e5c247f3bba7104c0837200325f56fbc" expanded="true">
+<theory name="BagImpl" sum="c074bbe9d2c1ec9b335517b85d5e7b49" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
@@ -22,7 +22,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
- <proof prover="2"><result status="valid" time="2.76"/></proof>
+ <proof prover="2"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="WP_parameter get" expl="VC for get">
  <proof prover="4"><result status="valid" time="0.00" steps="11"/></proof>
@@ -69,7 +69,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter remove.14" expl="14. assertion">
-  <proof prover="1"><result status="valid" time="0.64"/></proof>
+  <proof prover="1"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="WP_parameter remove.15" expl="15. assertion">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -93,7 +93,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="528e93ede1770450354a9703428c111b" expanded="true">
+<theory name="Harness" sum="f635e6da8b24a4255f98ac62c1ecc04e" expanded="true">
  <goal name="WP_parameter test1" expl="VC for test1">
  <transf name="split_goal_wp">
   <goal name="WP_parameter test1.1" expl="1. assertion">

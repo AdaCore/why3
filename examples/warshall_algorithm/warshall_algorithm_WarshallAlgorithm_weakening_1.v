@@ -39,30 +39,18 @@ Definition rows {a:Type} {a_WT:WhyType a} (v:(matrix a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition index := (Z* Z)%type.
+Definition get {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (r:Z) (c:Z): a :=
+  (map.Map.get (map.Map.get (elts a1) r) c).
 
 (* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (i:(Z*
-  Z)%type): a :=
-  match i with
-  | (r, c) => (map.Map.get (map.Map.get (elts a1) r) c)
-  end.
+Definition set {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (r:Z) (c:Z)
+  (v:a): (matrix a) := (mk_matrix (rows a1) (columns a1)
+  (map.Map.set (elts a1) r (map.Map.set (map.Map.get (elts a1) r) c v))).
 
 (* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (i:(Z* Z)%type)
-  (v:a): (matrix a) :=
-  match i with
-  | (r, c) => (mk_matrix (rows a1) (columns a1) (map.Map.set (elts a1) r
-      (map.Map.set (map.Map.get (elts a1) r) c v)))
-  end.
-
-(* Why3 assumption *)
-Definition valid_index {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (i:(Z*
-  Z)%type): Prop :=
-  match i with
-  | (r, c) => ((0%Z <= r)%Z /\ (r < (rows a1))%Z) /\ ((0%Z <= c)%Z /\
-      (c < (columns a1))%Z)
-  end.
+Definition valid_index {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (r:Z)
+  (c:Z): Prop := ((0%Z <= r)%Z /\ (r < (rows a1))%Z) /\ ((0%Z <= c)%Z /\
+  (c < (columns a1))%Z).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a} (r:Z) (c:Z) (v:a): (matrix a) :=
@@ -71,8 +59,8 @@ Definition make {a:Type} {a_WT:WhyType a} (r:Z) (c:Z) (v:a): (matrix a) :=
 
 (* Why3 assumption *)
 Inductive path: (matrix bool) -> Z -> Z -> Z -> Prop :=
-  | Path_empty : forall (m:(matrix bool)) (i:Z) (j:Z) (k:Z), ((get m (i,
-      j)) = true) -> (path m i j k)
+  | Path_empty : forall (m:(matrix bool)) (i:Z) (j:Z) (k:Z), ((get m i
+      j) = true) -> (path m i j k)
   | Path_cons : forall (m:(matrix bool)) (i:Z) (x:Z) (j:Z) (k:Z),
       ((0%Z <= x)%Z /\ (x < k)%Z) -> ((path m i x k) -> ((path m x j k) ->
       (path m i j k))).
@@ -80,6 +68,7 @@ Inductive path: (matrix bool) -> Z -> Z -> Z -> Prop :=
 (* Why3 goal *)
 Theorem weakening : forall (m:(matrix bool)) (i:Z) (j:Z) (k1:Z) (k2:Z),
   ((0%Z <= k1)%Z /\ (k1 <= k2)%Z) -> ((path m i j k1) -> (path m i j k2)).
+(* Why3 intros m i j k1 k2 (h1,h2) h3. *)
 intros m i j k1 k2 (h1,h2) h3.
 induction h3.
 apply Path_empty; auto.

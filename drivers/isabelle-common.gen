@@ -134,7 +134,11 @@ theory map.Map
   syntax function ([]) "<app>%1%2</app>"
   syntax function set "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
   syntax function ([<-]) "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
+end
+
+theory map.Const
   syntax function const "<app><const name=\"_type_constraint_\"><fun>%t0%t0</fun></const><abs name=\"\"><type name=\"dummy\"/>%1</abs></app>"
+
 end
 
 theory set.SetGen

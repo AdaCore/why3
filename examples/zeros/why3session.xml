@@ -7,7 +7,7 @@
 <prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <file name="../zeros.mlw" expanded="true">
-<theory name="SetZeros" sum="60a48f611ed3b9df1a065d4e414c9408">
+<theory name="SetZeros" sum="13c688e3d1763f7ffccd971bc837c950" expanded="true">
  <goal name="WP_parameter set_zeros" expl="VC for set_zeros">
  <transf name="split_goal_wp">
   <goal name="WP_parameter set_zeros.1" expl="1. postcondition">
@@ -40,26 +40,29 @@
   <proof prover="1" memlimit="0"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
   <goal name="WP_parameter harness.2" expl="2. assertion">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="WP_parameter harness.3" expl="3. assertion">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="AllZeros" sum="4d522333682d37ebf90b16bbe3ff5d1b" expanded="true">
- <goal name="WP_parameter all_zeros1" expl="VC for all_zeros1" expanded="true">
+<theory name="AllZeros" sum="88625c9f5a588991fb90fe64b9c7e65d" expanded="true">
+ <goal name="WP_parameter all_zeros1" expl="VC for all_zeros1">
  <proof prover="3"><result status="valid" time="0.02" steps="104"/></proof>
  </goal>
- <goal name="WP_parameter all_zeros2" expl="VC for all_zeros2" expanded="true">
- <proof prover="3"><result status="valid" time="0.00" steps="72"/></proof>
+ <goal name="WP_parameter all_zeros2" expl="VC for all_zeros2">
+ <proof prover="3"><result status="valid" time="0.00" steps="71"/></proof>
  </goal>
- <goal name="WP_parameter all_zeros3" expl="VC for all_zeros3" expanded="true">
+ <goal name="WP_parameter all_zeros3" expl="VC for all_zeros3">
  <proof prover="3"><result status="valid" time="0.01" steps="42"/></proof>
  </goal>
- <goal name="WP_parameter all_zeros4" expl="VC for all_zeros4" expanded="true">
+ <goal name="WP_parameter all_zeros4" expl="VC for all_zeros4">
  <proof prover="3"><result status="valid" time="0.02" steps="50"/></proof>
  </goal>
- <goal name="WP_parameter all_zeros5" expl="VC for all_zeros5" expanded="true">
- <proof prover="3" timelimit="61"><result status="valid" time="0.88" steps="292"/></proof>
+ <goal name="WP_parameter all_zeros5" expl="VC for all_zeros5">
+ <proof prover="3" timelimit="61"><result status="valid" time="0.24" steps="292"/></proof>
  </goal>
 </theory>
 </file>

@@ -44,11 +44,11 @@ function eval (f:prop_fmla) (v:idmap bool) : bool =
   end
 
 
+  use map.Const
+
   goal Test1 :
     let x = mk_ident 0 in
-    let v = IdMap.set (IdMap.const False) x True in
+    let v = IdMap.set (Const.const False) x True in
     eval (For (Fnot (Fatom x)) (Ffalse)) v = False
 
 end
-
-

@@ -38,6 +38,9 @@ theory map.Map
   remove prop Select_eq
   remove prop Select_neq
 
+end
+
+theory map.Const
   syntax function const "(LAMBDA (x:%v0): %1)"
   remove prop Const
 end
@@ -263,7 +266,7 @@ end
 
 theory list.Mem
   syntax predicate mem "member(%1, %2)"
-  
+
 end
 
 theory list.Nth

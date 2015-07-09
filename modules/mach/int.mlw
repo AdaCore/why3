@@ -225,6 +225,51 @@ module Int63
 *)
 end
 
+module Refint63
+
+  use import Int63
+  use export ref.Ref
+
+  let incr (r: ref int63) : unit
+    requires { "expl:integer overflow" to_int !r < max_int63 }
+    ensures  { to_int !r = to_int (old !r) + 1 }
+  = r := !r + of_int 1
+  let decr (r: ref int63) : unit
+    requires { "expl:integer overflow" min_int63 < to_int !r }
+    ensures  { to_int !r = to_int (old !r) - 1 }
+  = r := !r - of_int 1
+
+  let (+=) (r: ref int63) (v: int63) : unit
+    requires { "expl:integer overflow" in_bounds (to_int !r + to_int v) }
+    ensures { to_int !r = to_int (old !r) + to_int v }
+  = r := !r + v
+
+  let (-=) (r: ref int63) (v: int63) : unit
+    requires { "expl:integer overflow" in_bounds (to_int !r - to_int v) }
+    ensures  { to_int !r = to_int (old !r) - to_int v }
+  = r := !r - v
+
+  let ( *= ) (r: ref int63) (v: int63) : unit
+    requires { "expl:integer overflow" in_bounds (to_int !r * to_int v) }
+    ensures { to_int !r = to_int (old !r) * to_int v }
+  = r := !r * v
+
+end
+
+module MinMax63
+
+  use import Int63
+
+  let min (x y: int63) : int63
+    ensures { result = if to_int x <= to_int y then x else y }
+  = if x <= y then x else y
+
+  let max (x y: int63) : int63
+    ensures { result = if to_int x >= to_int y then x else y }
+  = if x >= y then x else y
+
+end
+
 module Int64
 
   use import int.Int

@@ -123,6 +123,7 @@ end
 module BellmanFord
 
   use import map.Map
+  use map.Const
   use import Graph
   use int.IntInf as D
 
@@ -132,7 +133,7 @@ module BellmanFord
   type distmap = map vertex D.t
 
   function initialize_single_source (s: vertex) : distmap =
-    (const D.Infinite)[s <- D.Finite 0]
+    (Const.const D.Infinite)[s <- D.Finite 0]
 
   (* [inv1 m pass via] means that we already performed [pass-1] steps
      of the main loop, and, in step [pass], we already processed edges

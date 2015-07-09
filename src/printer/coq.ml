@@ -45,33 +45,49 @@ let forget_all () = forget_all iprinter
 
 let tv_set = ref Sid.empty
 
+(* info *)
+
+type info = {
+  info_syn : syntax_map;
+  symbol_printers : (string * ident_printer) Mid.t;
+  realization : bool;
+  ssreflect: bool;
+}
+
 (* type variables *)
 
-let print_tv ~whytypes fmt tv =
+let print_tv info ~whytypes fmt tv =
   let n = id_unique iprinter tv.tv_name in
   fprintf fmt "%s" n;
-  if whytypes then fprintf fmt " %s_WT" n
+  if whytypes && not info.ssreflect then fprintf fmt " %s_WT" n
 
-let print_tv_binder ~whytypes ~implicit fmt tv =
+let print_tv_binder info ~whytypes ~implicit fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
-  if implicit then fprintf fmt "{%s:Type}" n else fprintf fmt "(%s:Type)" n;
-  if whytypes then fprintf fmt " {%s_WT:WhyType %s}" n n
+  if info.ssreflect then
+    fprintf fmt "{%s: why3Type}" n
+  else begin
+    if implicit then fprintf fmt "{%s:Type}" n else fprintf fmt "(%s:Type)" n;
+    if whytypes then fprintf fmt " {%s_WT:WhyType %s}" n n
+  end
 
-let print_tv_binders ~whytypes ~implicit fmt stv =
-  Stv.iter (fprintf fmt "@ %a" (print_tv_binder ~whytypes ~implicit)) stv
+let print_tv_binders info ~whytypes ~implicit fmt stv =
+  Stv.iter (fprintf fmt "@ %a" (print_tv_binder info ~whytypes ~implicit)) stv
 
-let print_tv_binders_list ~whytypes ~implicit fmt ltv =
-  List.iter (fprintf fmt "@ %a" (print_tv_binder ~whytypes ~implicit)) ltv
+let print_tv_binders_list info ~whytypes ~implicit fmt ltv =
+  List.iter (fprintf fmt "@ %a" (print_tv_binder info ~whytypes ~implicit)) ltv
 
-let print_params ~whytypes fmt stv =
+let print_params info ~whytypes fmt stv =
   if Stv.is_empty stv then () else
-    fprintf fmt "forall%a,@ " (print_tv_binders ~whytypes ~implicit:true) stv
+    fprintf fmt "forall%a,@ "
+      (print_tv_binders info ~whytypes ~implicit:true) stv
 
-let print_params_list ~whytypes fmt ltv =
+let print_params_list info ~whytypes fmt ltv =
   match ltv with
   | [] -> ()
-  | _ -> fprintf fmt "forall%a,@ " (print_tv_binders_list ~whytypes ~implicit:false) ltv
+  | _ ->
+    fprintf fmt "forall%a,@ "
+      (print_tv_binders_list info ~whytypes ~implicit:false) ltv
 
 let forget_tvs () =
   Sid.iter (forget_id iprinter) !tv_set;
@@ -92,14 +108,6 @@ let print_ls fmt ls =
 
 let print_pr fmt pr =
   fprintf fmt "%s" (id_unique iprinter pr.pr_name)
-
-(* info *)
-
-type info = {
-  info_syn : syntax_map;
-  symbol_printers : (string * ident_printer) Mid.t;
-  realization : bool;
-}
 
 let ls_ty_vars ls =
   let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
@@ -129,15 +137,15 @@ let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 (** Types *)
 
-let print_ts_tv fmt ts =
+let print_ts_tv info fmt ts =
   match ts.ts_args with
   | [] -> fprintf fmt "%a" print_ts ts
   | _ -> fprintf fmt "(%a %a)" print_ts ts
-    (print_list space (print_tv ~whytypes:false)) ts.ts_args
+    (print_list space (print_tv info ~whytypes:false)) ts.ts_args
 
 let rec print_ty info fmt ty =
   begin match ty.ty_node with
-  | Tyvar v -> print_tv ~whytypes:false fmt v
+  | Tyvar v -> print_tv info ~whytypes:false fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin
         match tl with
@@ -256,7 +264,9 @@ and print_tnode _opl opr info fmt t =
       let number_format = {
           Number.long_int_support = true;
           Number.extra_leading_zeros_support = true;
-          Number.dec_int_support = Number.Number_custom "%s%%Z";
+          Number.dec_int_support =
+            if info.ssreflect then Number.Number_custom "%s%%:Z"
+            else Number.Number_custom "%s%%Z";
           Number.hex_int_support = Number.Number_unsupported;
           Number.oct_int_support = Number.Number_unsupported;
           Number.bin_int_support = Number.Number_unsupported;
@@ -394,7 +404,8 @@ let print_expr info fmt =
 let print_constr info ts fmt (cs,_) =
   fprintf fmt "@[<hov 4>| %a : %a%a%a@]" print_ls cs
     (print_arrow_list (print_ty info)) cs.ls_args
-    print_ts ts (print_list_pre space (print_tv ~whytypes:false)) ts.ts_args
+    print_ts ts
+      (print_list_pre space (print_tv info ~whytypes:false)) ts.ts_args
 
 (*
 
@@ -593,11 +604,11 @@ let rec intros_hyp n fmt f =
   match f.t_node with
     | Tbinop(Tand,f1,f2) ->
       fprintf fmt "(";
-      let m = intros_hyp n fmt f1 in
+      let (m,vsl1) = intros_hyp n fmt f1 in
       fprintf fmt ",";
-      let k = intros_hyp m fmt f2 in
+      let (k,vsl2) = intros_hyp m fmt f2 in
       fprintf fmt ")";
-      k
+      (k,vsl1@vsl2)
     | Tquant(Texists,fq) ->
       let vsl,_trl,f = t_open_quant fq in
       let rec aux n vsl =
@@ -609,12 +620,10 @@ let rec intros_hyp n fmt f =
             fprintf fmt ")";
             m
       in
-      let m = aux n vsl in
-      List.iter forget_var vsl;
-      m
+      aux n vsl
     | _ ->
       fprintf fmt "h%d" n;
-      n+1
+      (n+1,[])
 
 let rec do_intros n fmt fmla =
   match fmla.t_node with
@@ -631,8 +640,9 @@ let rec do_intros n fmt fmla =
       List.iter forget_var vsl
     | Tbinop(Timplies, f1, f2) ->
       fprintf fmt "@ ";
-      let m = intros_hyp n fmt f1 in
-      do_intros m fmt f2
+      let m,vsl = intros_hyp n fmt f1 in
+      do_intros m fmt f2;
+      List.iter forget_var vsl
     | _ -> ()
 
 let intros_params fmt params =
@@ -688,23 +698,30 @@ let print_type_decl ~prev info fmt ts =
           fprintf fmt "(* Why3 goal *)@\n%s@\n" c
         | Some (Axiom _) ->
           fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Variable %a : %aType.@]@\n@[<hov 2>Hypothesis %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
-            print_ts ts (print_params_list ~whytypes:false) ts.ts_args
-            print_ts ts (print_params_list ~whytypes:true) ts.ts_args print_ts_tv ts
-            print_ts ts
+            print_ts ts (print_params_list info ~whytypes:false) ts.ts_args
+            print_ts ts (print_params_list info ~whytypes:true)
+              ts.ts_args (print_ts_tv info) ts print_ts ts
         | _ ->
           fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a : %aType.@]@\n%a@\n"
-            print_ts ts (print_params_list ~whytypes:false) ts.ts_args
+            print_ts ts (print_params_list info ~whytypes:false) ts.ts_args
             (print_previous_proof None info) prev
-      else
-        fprintf fmt "@[<hov 2>Axiom %a : %aType.@]@\n@[<hov 2>Parameter %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
-          print_ts ts (print_params_list ~whytypes:false) ts.ts_args
-          print_ts ts (print_params_list ~whytypes:true) ts.ts_args print_ts_tv ts
-          print_ts ts
+      else begin
+        fprintf fmt "@[<hov 2>Axiom %a : %aType.@]@\n"
+          print_ts ts (print_params_list info ~whytypes:false) ts.ts_args;
+        if not info.ssreflect then begin
+          fprintf fmt "@[<hov 2>Parameter %a_WhyType : %aWhyType %a.@]@\n"
+            print_ts ts (print_params_list info ~whytypes:true) ts.ts_args
+            (print_ts_tv info) ts;
+          fprintf fmt "Existing Instance %a_WhyType.@\n"
+            print_ts ts
+        end;
+        fprintf fmt "@\n"
+      end
     | Some ty ->
       fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a :=@ %a.@]@\n@\n"
         print_ts ts
           (print_list_pre space
-             (print_tv_binder ~whytypes:false ~implicit:false)) ts.ts_args
+             (print_tv_binder info ~whytypes:false ~implicit:false)) ts.ts_args
         (print_ty info) ty
 
 let print_type_decl ~prev info fmt ts =
@@ -718,18 +735,21 @@ let print_data_decl ~first info fmt ts csl =
   else fprintf fmt "@\nwith";
   fprintf fmt " %s%a :=@\n@[<hov>%a@]"
     name (print_list_pre space
-            (print_tv_binder ~whytypes:false ~implicit:false)) ts.ts_args
+            (print_tv_binder info ~whytypes:false ~implicit:false)) ts.ts_args
     (print_list newline (print_constr info ts)) csl;
   name
 
-let print_data_whytype_and_implicits fmt (name,ts,csl) =
-  fprintf fmt "@[<hov 2>Axiom %s_WhyType : %aWhyType %a.@]@\nExisting Instance %s_WhyType.@\n"
-    name (print_params_list ~whytypes:true) ts.ts_args print_ts_tv ts name;
+let print_data_whytype_and_implicits info fmt (name,ts,csl) =
+  if not info.ssreflect then
+    fprintf fmt "@[<hov 2>Axiom %s_WhyType : %aWhyType %a.@]@\nExisting Instance %s_WhyType.@\n"
+      name (print_params_list info ~whytypes:true) ts.ts_args
+      (print_ts_tv info) ts name;
   List.iter
     (fun (cs,_) ->
       let _, _, all_ty_params = ls_ty_vars cs in
       if not (Stv.is_empty all_ty_params) then
-        let print fmt tv = fprintf fmt "[%a]" (print_tv ~whytypes:false) tv in
+        let print fmt tv =
+          fprintf fmt "[%a]" (print_tv info ~whytypes:false) tv in
         fprintf fmt "@[<hov 2>Implicit Arguments %a@ [%a].@]@\n"
           print_ls cs
           (print_list space print) ts.ts_args)
@@ -750,7 +770,7 @@ let print_data_decls info fmt tl =
   if none then () else
     begin
       fprintf fmt ".@]@\n";
-      List.iter (print_data_whytype_and_implicits fmt) d
+      List.iter (print_data_whytype_and_implicits info fmt) d
     end
 
 let print_ls_type info fmt = function
@@ -765,7 +785,7 @@ let print_param_decl ~prev info fmt ls =
       fprintf fmt "(* Why3 goal *)@\n%s@\n" c
     | Some (Axiom _) ->
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Variable %a: %a%a%a.@]@\n@\n"
-        print_ls ls (print_params ~whytypes:true) all_ty_params
+        print_ls ls (print_params info ~whytypes:true) all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type info) ls.ls_value
     | (* Some Info *) _ when Mid.mem ls.ls_name info.info_syn ->
@@ -780,13 +800,13 @@ let print_param_decl ~prev info fmt ls =
       List.iter forget_var vl
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a: %a%a%a.@]@\n%a@\n"
-        print_ls ls (print_params ~whytypes:true) all_ty_params
+        print_ls ls (print_params info ~whytypes:true) all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type info) ls.ls_value
         (print_previous_proof None info) prev
   else
     fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n@\n"
-      print_ls ls (print_params ~whytypes:true) all_ty_params
+      print_ls ls (print_params info ~whytypes:true) all_ty_params
       (print_arrow_list (print_ty info)) ls.ls_args
       (print_ls_type info) ls.ls_value
 
@@ -799,7 +819,7 @@ let print_logic_decl info fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
   fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
     print_ls ls
-    (print_tv_binders ~whytypes:true ~implicit:true) all_ty_params
+    (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
     (print_list_pre space (print_vsty info)) vl
     (print_ls_type info) ls.ls_value
     (print_expr info) e;
@@ -812,7 +832,7 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
   fprintf fmt
     "(* Why3 goal *)@\n@[<hov 2>Lemma %s :@ %a%a.@]@\n"
     name
-    (print_params ~whytypes:true) all_ty_params
+    (print_params info ~whytypes:true) all_ty_params
     (print_expr info) def_formula;
   fprintf fmt "%a@\n"
     (print_previous_proof (Some (all_ty_params,def_formula)) info) prev
@@ -840,7 +860,7 @@ let print_recursive_decl info fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
   fprintf fmt "%a%a%a {struct %a}: %a :=@ %a@]"
     print_ls ls
-    (print_tv_binders ~whytypes:true ~implicit:true) all_ty_params
+    (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
     (print_list_pre space (print_vsty info)) vl
     print_vs (List.nth vl i)
     (print_ls_type info) ls.ls_value
@@ -869,7 +889,8 @@ let print_ind info fmt (pr,f) =
 let print_ind_decl info fmt ps bl =
   let _, _, all_ty_params = ls_ty_vars ps in
   fprintf fmt " %a%a: %aProp :=@ @[<hov>%a@]"
-    print_ls ps (print_tv_binders ~whytypes:true ~implicit:true) all_ty_params
+    print_ls ps
+    (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
     (print_arrow_list (print_ty info)) ps.ls_args
     (print_list newline (print_ind info)) bl
 
@@ -901,17 +922,17 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
   if stt <> "" then
     match prev with
     | Some (Axiom _) when stt = "Lemma" ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Hypothesis %a :@.%a%a.@]@\n@\n"
-        print_pr pr (print_params ~whytypes:true) params
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Hypothesis %a : %a%a.@]@\n@\n"
+        print_pr pr (print_params info ~whytypes:true) params
         (print_fmla info) f
     | _ ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a :@.%a%a.@]@\n%a@\n"
-        stt print_pr pr (print_params ~whytypes:true) params
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
+        stt print_pr pr (print_params info ~whytypes:true) params
         (print_fmla info) f
         (print_previous_proof (Some (params,f)) info) prev
   else
-    fprintf fmt "@[<hov 2>Axiom %a :@.%a%a.@]@\n@\n"
-      print_pr pr (print_params ~whytypes:true) params
+    fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
+      print_pr pr (print_params info ~whytypes:true) params
       (print_fmla info) f;
   forget_tvs ()
 
@@ -948,7 +969,7 @@ let print_decl ~old info fmt d =
 let print_decls ~old info fmt dl =
   fprintf fmt "@\n@[<hov>%a@]" (print_list nothing (print_decl ~old info)) dl
 
-let print_task printer_args realize ?old fmt task =
+let print_task printer_args ~realize ~ssreflect ?old fmt task =
   (* eprintf "Task:%a@.@." Pretty.print_task task; *)
   forget_all ();
   print_prelude fmt printer_args.prelude;
@@ -1000,6 +1021,7 @@ let print_task printer_args realize ?old fmt task =
     info_syn = get_syntax_map task;
     symbol_printers = symbol_printers;
     realization = realize;
+    ssreflect = ssreflect;
   }
   in
   let old = ref (match old with
@@ -1009,10 +1031,10 @@ let print_task printer_args realize ?old fmt task =
   output_remaining fmt !old
 
 let print_task_full args ?old fmt task =
-  print_task args false ?old fmt task
+  print_task args ~realize:false ~ssreflect:false ?old fmt task
 
 let print_task_real args ?old fmt task =
-  print_task args true  ?old fmt task
+  print_task args ~realize:true  ~ssreflect:false ?old fmt task
 
 let () = register_printer "coq" print_task_full
   ~desc:"Printer@ for@ the@ Coq@ proof@ assistant@ \
@@ -1020,6 +1042,13 @@ let () = register_printer "coq" print_task_full
 let () = register_printer "coq-realize" print_task_real
   ~desc:"Printer@ for@ the@ Coq@ proof@ assistant@ \
          (with@ realization@ capabilities)."
+
+let print_task_full_ssr args ?old fmt task =
+  print_task args ~realize:false ~ssreflect:true ?old fmt task
+let () = register_printer "coq-ssr" print_task_full_ssr
+  ~desc:"Printer@ for@ the@ Coq@ proof@ assistant,@ ssreflect@ extension\
+         (without@ realization@ capabilities)."
+
 
 (* specific printer for realization of theories *)
 (* OBSOLETE

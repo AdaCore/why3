@@ -186,17 +186,13 @@ module InPlaceRevSeq
   predicate no_repet (s: seq 'a) =
     forall i. 0 <= i < length s -> not (mem s[i] s[i+1 ..])
 
-  let rec ghost mem_decomp (x: 'a) (s: seq 'a) : (seq 'a, seq 'a)
-    requires { mem x s }
-    variant  { length s }
+  let rec ghost mem_decomp (x: 'a) (s: seq 'a) (i: int) : (seq 'a, seq 'a)
+    requires { 0 <= i < length s }
+    requires { mem x s[i .. ] }
+    variant  { length s - i }
     returns  { (s1,s2) -> s == s1 ++ cons x s2 }
-  = if length s = 0 then
-      absurd
-    else
-      let h = s[0] in
-      let t = s[1 .. ] in
-      if h = x then (empty, t)
-      else let (r1, r2) = mem_decomp x t in (cons h r1, r2)
+  =
+    if s[i] = x then (s[0 .. i], s[i+1 ..]) else mem_decomp x s (i+1)
 
   type loc
 
@@ -297,7 +293,7 @@ module InPlaceRevSeq
       let t = pM[1 .. ] in
       if mem h t then
          (* absurd case *)
-         let (l1,l2) = mem_decomp h t in
+         let (l1,l2) = mem_decomp h t 0 in
          list_seg_sublistl next (cons h l1) l2 p h;
          list_seg_functional next pM (cons h l2) p;
          assert { length pM > length (cons h l2) }
