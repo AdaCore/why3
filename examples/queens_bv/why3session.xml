@@ -135,7 +135,7 @@
  <proof prover="0"><result status="valid" time="4.70" steps="826"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="0a648b27d8d04b7b79675a7ab2a97888">
+<theory name="NQueensBits" sum="0a648b27d8d04b7b79675a7ab2a97888" expanded="true">
  <goal name="WP_parameter t" expl="VC for t">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t.1" expl="1. assertion">
@@ -253,7 +253,6 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter t.24" expl="24. assertion">
-  <proof prover="0" timelimit="120"><result status="valid" time="29.01" steps="3269"/></proof>
   <proof prover="3" timelimit="120"><result status="valid" time="2.65"/></proof>
   </goal>
   <goal name="WP_parameter t.25" expl="25. precondition">
@@ -341,7 +340,7 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter t.41" expl="41. precondition">
-  <proof prover="0" obsolete="true"><result status="timeout" time="2.65"/></proof>
+  <proof prover="0"><result status="valid" time="1.72" steps="660"/></proof>
   <proof prover="1"><result status="valid" time="1.57"/></proof>
   <proof prover="3"><result status="valid" time="0.21"/></proof>
   <proof prover="4"><result status="valid" time="0.14"/></proof>
@@ -382,22 +381,18 @@
    <proof prover="0" timelimit="30"><result status="valid" time="0.70" steps="212"/></proof>
    <proof prover="1" timelimit="30"><result status="valid" time="3.16"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="0.31"/></proof>
-   <proof prover="4" timelimit="30" obsolete="true"><result status="timeout" time="29.99"/></proof>
    </goal>
    <goal name="WP_parameter t.48.2" expl="2. loop invariant preservation">
    <proof prover="1" timelimit="30"><result status="valid" time="7.26"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="4.67"/></proof>
-   <proof prover="4" timelimit="30" obsolete="true"><result status="timeout" time="29.92"/></proof>
    </goal>
    <goal name="WP_parameter t.48.3" expl="3. loop invariant preservation">
    <proof prover="1" timelimit="30"><result status="valid" time="3.33"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="0.59"/></proof>
-   <proof prover="4" timelimit="30" obsolete="true"><result status="outofmemory" time="24.11"/></proof>
    </goal>
    <goal name="WP_parameter t.48.4" expl="4. loop invariant preservation">
    <proof prover="1" timelimit="30"><result status="valid" time="5.50"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="1.33"/></proof>
-   <proof prover="4" timelimit="30" obsolete="true"><result status="timeout" time="30.04"/></proof>
    </goal>
   </transf>
   </goal>
