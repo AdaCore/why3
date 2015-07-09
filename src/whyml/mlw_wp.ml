@@ -1886,12 +1886,13 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
            form is:
            I => (OK /\ (NE => I' /\ V))
         *)
-      let variant =
-        let old_vars = List.map (fun (t,r) ->
-          Subst.term havoc_state t,r) varl in
-        let new_vars =
-          List.map (fun (t,rel) -> Subst.term wp1.post.s t,rel) varl in
-        decrease e.e_loc expl_loopvar env old_vars new_vars
+      let variant = if varl = []
+        then t_true
+        else let old_vars = List.map (fun (t,r) ->
+            Subst.term havoc_state t,r) varl in
+          let new_vars =
+            List.map (fun (t,rel) -> Subst.term wp1.post.s t,rel) varl in
+          decrease e.e_loc expl_loopvar env old_vars new_vars
       in
       let preserv_inv =
         t_implies_simp inv_hypo
