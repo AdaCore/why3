@@ -34,32 +34,6 @@ theory S
 
 end
 
-(** {2 first task: termination of the algorithm} *)
-
-module NQueensSetsTermination
-
-  use import S
-  use import ref.Refint
-
-  let rec t (a b c : set int)
-    variant { cardinal a } =
-    if not (is_empty a) then begin
-      let e = ref (diff (diff a b) c) in
-      let f = ref 0 in
-      'L:
-      while not (is_empty !e) do
-        variant   { cardinal !e }
-        invariant { subset !e (diff (diff a b) c) }
-        let d = min_elt !e in
-        f += t (remove d a) (succ (add d b)) (pred (add d c));
-        e := remove d !e
-      done;
-      !f
-    end
-    else 1
-
-end
-
 (** {2 Formalization of the set of solutions of the N-queens problem} *)
 
 theory Solution
@@ -105,97 +79,6 @@ theory Solution
   lemma no_duplicate:
     forall s: solutions, a b: int. sorted s a b ->
     forall i j: int. a <= i < j < b -> not (eq_sol s[i] s[j])
-
-end
-
-
-(**
-
-{2 Abstract version of the code using sets (not ints)
-
-*)
-
-module NQueensSets
-
-  use import S
-  use import ref.Refint
-  use import Solution
-
-  val ghost col: ref solution  (** solution under construction *)
-  val ghost k  : ref int       (** current row in the current solution *)
-
-  val ghost sol: ref solutions (** all solutions *)
-  val ghost s  : ref int       (** next slot for a solution
-                                  = current number of solutions *)
-
-  let rec t (a b c : set int)
-    variant  { cardinal a }
-    requires { 0 <= !k }
-    requires { !k + cardinal a = n }
-    requires { !s >= 0 }
-    requires { forall i: int. mem i a <->
-      ( 0 <= i < n /\ forall j: int. 0 <= j < !k -> !col[j] <> i) }
-    requires { forall i: int. i >= 0 ->
-      ( not (mem i b) <->
-        (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) }
-    requires { forall i: int. i >= 0 ->
-      ( not (mem i c) <->
-        (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) }
-    requires { partial_solution !k !col }
-    ensures { result = !s - old !s >= 0 }
-    ensures { !k = old !k }
-    ensures { sorted !sol (old !s) !s }
-    ensures { forall t: solution.
-      ( (solution t /\ eq_prefix !col t !k) <->
-        (exists i: int. old !s <= i < !s /\ eq_sol t !sol[i])) }
-    (* assigns *)
-    ensures { eq_prefix (old !col) !col !k }
-    ensures { eq_prefix (old !sol) !sol (old !s) }
-  = if not (is_empty a) then begin
-      let e = ref (diff (diff a b) c) in
-      let f = ref 0 in
-      'L:
-      while not (is_empty !e) do
-        variant   { cardinal !e }
-        invariant { !f = !s - at !s 'L >= 0 }
-        invariant { !k = at !k 'L }
-        invariant { subset !e (diff (diff a b) c) }
-        invariant { partial_solution !k !col }
-        invariant { sorted !sol (at !s 'L) !s }
-        invariant { forall i j: int.
-          mem i (diff (at !e 'L) !e) /\ mem j !e -> i < j }
-        invariant { forall t: solution.
-          (solution t /\ eq_prefix !col t !k /\ mem t[!k] (diff (at !e 'L) !e))
-          <->
-          (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i]) }
-        (* assigns *)
-        invariant { eq_prefix (at !col 'L) !col !k }
-        invariant { eq_prefix (at !sol 'L) !sol (at !s 'L) }
-        let d = min_elt !e in
-        ghost col := !col[!k <- d];
-        ghost incr k;
-        f += t (remove d a) (succ (add d b)) (pred (add d c));
-        ghost decr k;
-        e := remove d !e
-      done;
-      !f
-    end else begin
-      ghost sol := !sol[!s <- !col];
-      ghost incr s;
-      1
-    end
-
-  let queens (q: int)
-    requires { 0 <= q = n }
-    requires { !s = 0 }
-    requires { !k = 0 }
-    ensures  { result = !s }
-    ensures  { sorted !sol 0 !s }
-    ensures  { forall t: solution.
-      solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i])
-    }
-  =
-  t (interval 0 q) empty empty
 
 end
 
@@ -368,138 +251,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
 
 end
 
-(*** Work in progress *)
 module NQueensBits
-
-  use import BitsSpec
-  use import ref.Ref
-  use import Solution
-  use import int.Int
-
-  val ghost col: ref solution  (* solution under construction *)
-  val ghost k  : ref int       (* current row in the current solution *)
-
-  val ghost sol: ref solutions (* all solutions *)
-  val ghost s  : ref int       (* next slot for a solution =
-                                  number of solutions *)
-
-  let rec t (a b c: BitsSpec.t)
-    requires { n <= size }
-    requires { 0 <= !k }
-    requires { !k + S.cardinal a.mdl = n }
-    requires { !s >= 0 }
-    requires { forall i: int. S.mem i a.mdl <->
-        ( 0 <= i < n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i) }
-    requires { forall i: int.  0 <= i < size ->
-        ( not (S.mem i b.mdl) <->
-          forall j: int. 0 <= j < !k -> i - !col[j] <> !k - j) }
-    requires { forall i: int. 0 <= i < size ->
-        ( not (S.mem i c.mdl) <->
-          forall j: int. 0 <= j < !k -> i - !col[j] <> j - !k ) }
-    requires { partial_solution !k !col }
-    variant { S.cardinal a.mdl }
-    ensures { result = !s - old !s >= 0 }
-    ensures { !k = old !k }
-    ensures { sorted !sol (old !s) !s }
-    ensures { forall i:int. old !s <= i < !s -> solution !sol[i] /\ eq_prefix !col !sol[i] !k }
-    ensures { forall u: solution.
-        solution u /\ eq_prefix !col u !k ->
-        exists i: int. old !s <= i < !s /\ eq_sol u !sol[i] }
-    (* assigns *)
-    ensures { eq_prefix (old !col) !col !k }
-    ensures { eq_prefix (old !sol) !sol (old !s) }
-  = if not (is_empty a) then begin
-    let e = ref (diff (diff a b) c) in
-    let f = ref 0 in
-    let ghost min = ref (-1) in
-    assert { forall u:solution. solution u /\ eq_prefix !col u !k -> S.mem u[!k] !e.mdl };
-    'L:
-    while not (is_empty !e) do
-      variant { S.cardinal !e.mdl }
-      invariant { not (S.is_empty !e.mdl) -> !min < S.min_elt !e.mdl }
-      invariant { !f = !s - at !s 'L >= 0 }
-      invariant { !k = at !k 'L }
-      invariant { S.subset !e.mdl (S.diff (S.diff a.mdl b.mdl) c.mdl) }
-      invariant { partial_solution !k !col }
-      invariant { sorted !sol (at !s 'L) !s }
-      invariant { forall i j: int.
-        S.mem i (S.diff (at !e.mdl 'L) !e.mdl) /\ S.mem j !e.mdl -> i < j }
-      invariant { forall i:int. at !s 'L <= i < !s -> solution !sol[i] /\ eq_prefix !col !sol[i] !k /\ 0 <= !sol[i][!k] <= !min }
-      invariant { forall u: solution.
-        (solution u /\ eq_prefix !col u !k /\ 0 <= u[!k] <= !min)
-        ->
-        exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i] }
-      (* invariant { forall u: solution. *)
-      (*   (solution u /\ eq_prefix !col u !k /\ *)
-      (*       S.mem u[!k] (S.diff (at !e.mdl 'L) !e.mdl)) *)
-      (*   -> *)
-      (*   exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i] } *)
-      (* assigns *)
-      invariant { eq_prefix (at !col 'L) !col !k }
-      invariant { eq_prefix (at !sol 'L) !sol (at !s 'L) }
-      'N:
-      let d = rightmost_bit_trick !e min in
-      ghost col := !col[!k <- !min];
-      assert { 0 <= !col[!k] < size };
-      assert { not (S.mem !col[!k] b.mdl) };
-      assert { not (S.mem !col[!k] c.mdl) };
-
-      ghost k := !k + 1;
-
-      assert { eq_prefix (at !col 'L) !col (!k-1) };
-      assert { forall i: int. S.mem i a.mdl -> (forall j: int. 0 <= j < !k-1 ->  !col[j] <> i) };
-      assert { forall i: int. S.mem i (S.remove (S.min_elt d.mdl) a.mdl) <-> (0 <= i < n /\ (forall j: int. 0 <= j < !k ->  !col[j] <> i)) };
-
-      let ghost b' = mul2 (add_singleton b d) in
-      assert { forall i: int.  0 <= i < size ->
-        S.mem i b'.mdl -> (i = !min + 1 \/ S.mem (i - 1) b.mdl) && not (forall j:int. 0 <= j < !k -> i - !col[j] <> !k - j) };
-
-      let ghost c' = div2 (add_singleton c d) in
-      assert { forall i: int.  0 <= i < size ->
-        S.mem i c'.mdl -> (i = !min - 1 \/ (i + 1 < size /\ S.mem (i + 1) c.mdl)) && not (forall j:int. 0 <= j < !k -> i - !col[j] <> j - !k) };
-
-      'M:
-      f := !f + t (remove_singleton a d)
-                  (mul2 (add_singleton b d)) (div2 (add_singleton c d));
-      ghost k := !k - 1;
-
-      assert { forall i j. (at !s 'L) <= i < at !s 'M <= j < !s -> (eq_prefix !sol[i] !sol[j] !k /\ !sol[i][!k] <= at !min 'N < !min = !sol[j][!k]) && lt_sol !sol[i] !sol[j]};
-
-      e := remove_singleton !e d
-    done;
-    assert { forall u:solution. solution u /\ eq_prefix !col u !k -> S.mem u[!k] (at !e.mdl 'L) };
-    !f
-    end else begin
-      ghost sol := !sol[!s <- !col];
-      ghost s := !s + 1;
-      1
-    end
-
-  let queens (q: BV32.t)
-    requires { BV32.to_uint q = n }
-    requires { BV32.ule q BV32.size }
-    requires { !s = 0 }
-    requires { !k = 0 }
-    ensures  { result = !s }
-    ensures  { sorted !sol 0 !s }
-    ensures  { forall u: solution.
-      solution u <-> exists i: int. 0 <= i < result /\ eq_sol u !sol[i] }
-    =
-    t (below q) (empty()) (empty())
-
-
-  let test8 ()
-    requires { size = 32 }
-    requires { n = 8 }
-  =
-    s := 0; k := 0;
-    queens (BV32.of_int 8)
-
-end
-
-
-(*** Work in progress *)
-module NQueensBitsAlt
 
   use import BitsSpec
   use import ref.Ref
@@ -553,19 +305,12 @@ module NQueensBitsAlt
       invariant { partial_solution k !col }
       invariant { sorted !sol (at !s 'L) !s }
       invariant { forall i: int. S.mem i (at !e.mdl 'L) /\ not (S.mem i !e.mdl) -> i <= !min }
-      (* invariant { forall i j: int. *)
-        (* S.mem i (S.diff (at !e.mdl 'L) !e.mdl) /\ S.mem j !e.mdl -> i < j } *)
       invariant { forall i:int. at !s 'L <= i < !s -> solution !sol[i] /\ eq_prefix !col !sol[i] k /\ 0 <= !sol[i][k] <= !min }
       invariant { forall u: solution.
         (solution u /\ eq_prefix !col u k /\ 0 <= u[k] <= !min)
         ->
         S.mem u[k] (at !e.mdl 'L) && not (S.mem u[k] !e.mdl) &&
         exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i] }
-      (* invariant { forall u: solution. *)
-      (*   (solution u /\ eq_prefix !col u k /\ *)
-      (*       S.mem u[k] (S.diff (at !e.mdl 'L) !e.mdl)) *)
-      (*   -> *)
-      (*   exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i] } *)
       (* assigns *)
       invariant { eq_prefix (at !col 'L) !col k }
       invariant { eq_prefix (at !sol 'L) !sol (at !s 'L) }
@@ -575,8 +320,6 @@ module NQueensBitsAlt
       assert { 0 <= !col[k] < size };
       assert { not (S.mem !col[k] b.mdl) };
       assert { not (S.mem !col[k] c.mdl) };
-
-      (* ghost k := k + 1; *)
 
       assert { eq_prefix (at !col 'L) !col k };
       assert { forall i: int. S.mem i a.mdl -> (forall j: int. 0 <= j < k ->  !col[j] <> i) };
@@ -593,7 +336,6 @@ module NQueensBitsAlt
       'M:
       f := !f + t (remove_singleton a d)
                   (mul2 (add_singleton b d)) (div2 (add_singleton c d)) (k + 1);
-      (* ghost k := k - 1; *)
 
       assert { forall i j. (at !s 'L) <= i < at !s 'M <= j < !s -> (eq_prefix !sol[i] !sol[j] k /\ !sol[i][k] <= at !min 'N < !min = !sol[j][k]) && lt_sol !sol[i] !sol[j]};
 
