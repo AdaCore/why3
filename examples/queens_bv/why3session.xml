@@ -20,17 +20,17 @@
 </theory>
 <theory name="BitsSpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Bits" sum="2c6dbbc852f8c746d08c2442fe9921e3" expanded="true">
+<theory name="Bits" sum="38f4786c9c18f4fc521a37a17e25dda7" expanded="true">
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="0"><result status="valid" time="0.11" steps="102"/></proof>
+ <proof prover="0"><result status="valid" time="0.11" steps="107"/></proof>
  <proof prover="1"><result status="valid" time="0.30"/></proof>
  </goal>
  <goal name="WP_parameter remove_singleton" expl="VC for remove_singleton">
- <proof prover="0"><result status="valid" time="0.62" steps="544"/></proof>
+ <proof prover="0"><result status="valid" time="0.62" steps="583"/></proof>
  <proof prover="1"><result status="valid" time="2.15"/></proof>
  </goal>
  <goal name="WP_parameter add_singleton" expl="VC for add_singleton">
@@ -41,7 +41,7 @@
   <goal name="WP_parameter mul2.1" expl="1. type invariant">
   <transf name="split_goal_wp">
    <goal name="WP_parameter mul2.1.1" expl="1. type invariant">
-   <proof prover="0"><result status="valid" time="2.82" steps="908"/></proof>
+   <proof prover="0"><result status="valid" time="2.82" steps="915"/></proof>
    </goal>
    <goal name="WP_parameter mul2.1.2" expl="2. type invariant">
    <proof prover="0"><result status="valid" time="0.05" steps="83"/></proof>
@@ -63,10 +63,10 @@
  </transf>
  </goal>
  <goal name="WP_parameter div2" expl="VC for div2">
- <proof prover="0"><result status="valid" time="0.13" steps="136"/></proof>
+ <proof prover="0"><result status="valid" time="0.13" steps="134"/></proof>
  </goal>
  <goal name="WP_parameter diff" expl="VC for diff">
- <proof prover="0"><result status="valid" time="0.24" steps="220"/></proof>
+ <proof prover="0"><result status="valid" time="0.24" steps="223"/></proof>
  <proof prover="1"><result status="valid" time="0.66"/></proof>
  </goal>
  <goal name="bits_interval_is_zero_equ">
@@ -76,38 +76,38 @@
  <goal name="WP_parameter rightmost_bit_trick" expl="VC for rightmost_bit_trick">
  <transf name="split_goal_wp">
   <goal name="WP_parameter rightmost_bit_trick.1" expl="1. assertion">
-  <proof prover="1"><result status="valid" time="2.98"/></proof>
+  <proof prover="1"><result status="valid" time="1.73"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.2" expl="2. assertion">
-  <proof prover="0"><result status="valid" time="0.07" steps="118"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="120"/></proof>
   <proof prover="1"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.3" expl="3. assertion">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
-  <proof prover="4"><result status="valid" time="0.07"/></proof>
+  <proof prover="4"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.4" expl="4. assertion">
-  <proof prover="0"><result status="valid" time="0.26" steps="148"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="133"/></proof>
   <proof prover="1"><result status="valid" time="0.78"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.5" expl="5. assertion">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
-  <proof prover="4"><result status="valid" time="0.11"/></proof>
+  <proof prover="4"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.6" expl="6. assertion">
-  <proof prover="1"><result status="valid" time="1.83"/></proof>
+  <proof prover="1"><result status="valid" time="4.29"/></proof>
   <proof prover="3"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.7" expl="7. type invariant">
   <transf name="split_goal_wp">
    <goal name="WP_parameter rightmost_bit_trick.7.1" expl="1. type invariant">
-   <proof prover="0"><result status="valid" time="0.15" steps="116"/></proof>
+   <proof prover="0"><result status="valid" time="0.15" steps="118"/></proof>
    <proof prover="1"><result status="valid" time="0.07"/></proof>
    <proof prover="3"><result status="valid" time="0.13"/></proof>
    <proof prover="4"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="WP_parameter rightmost_bit_trick.7.2" expl="2. type invariant">
-   <proof prover="0"><result status="valid" time="0.14" steps="208"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="212"/></proof>
    <proof prover="1"><result status="valid" time="0.24"/></proof>
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    <proof prover="4"><result status="valid" time="0.05"/></proof>
@@ -132,13 +132,14 @@
  </transf>
  </goal>
  <goal name="WP_parameter below" expl="VC for below">
- <proof prover="0"><result status="valid" time="8.24" steps="827"/></proof>
+ <proof prover="0"><result status="valid" time="5.26" steps="869"/></proof>
+ <proof prover="1"><result status="valid" time="1.14"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="c9cb2c3e4e06c5345f09b19c801a7da1" expanded="true">
- <goal name="WP_parameter t" expl="VC for t">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter t.1" expl="1. assertion">
+<theory name="NQueensBits" sum="a118c39f5de341751db6886f305251a0" expanded="true">
+ <goal name="WP_parameter t" expl="VC for t" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter t.1" expl="1. assertion" expanded="true">
   <proof prover="0" timelimit="30"><result status="valid" time="16.39" steps="2856"/></proof>
   </goal>
   <goal name="WP_parameter t.2" expl="2. loop invariant init">
@@ -391,7 +392,7 @@
    <proof prover="3" timelimit="30"><result status="valid" time="0.30"/></proof>
    </goal>
    <goal name="WP_parameter t.48.4" expl="4. loop invariant preservation">
-   <proof prover="1" timelimit="30"><result status="valid" time="3.20"/></proof>
+   <proof prover="1" timelimit="30"><result status="valid" time="2.14"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="0.69"/></proof>
    </goal>
   </transf>
@@ -403,7 +404,7 @@
    </goal>
    <goal name="WP_parameter t.49.2" expl="2. loop invariant preservation">
    <proof prover="0" timelimit="30"><result status="valid" time="2.21" steps="656"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.24"/></proof>
+   <proof prover="3" timelimit="30"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="WP_parameter t.49.3" expl="3. loop invariant preservation">
    <proof prover="3" timelimit="120"><result status="valid" time="36.11"/></proof>

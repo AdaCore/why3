@@ -7,7 +7,7 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <file name="../bv.why" expanded="true">
-<theory name="CheckBV64" sum="829d768585f601e0cf245a4aa38008fb" expanded="true">
+<theory name="CheckBV64" sum="984b69b5763fa5ce3b3d02acb41dfb6f" expanded="true">
  <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -252,12 +252,12 @@
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g3a">
- <proof prover="1"><result status="valid" time="0.94"/></proof>
+ <proof prover="1"><result status="valid" time="0.48"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g3b">
- <proof prover="1"><result status="valid" time="0.54"/></proof>
+ <proof prover="1"><result status="valid" time="0.38"/></proof>
  <transf name="compute_in_goal">
   <goal name="g3b.1" expl="1.">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -312,25 +312,25 @@
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_and">
- <proof prover="0"><result status="valid" time="0.15" steps="197"/></proof>
+ <proof prover="0"><result status="valid" time="0.15" steps="146"/></proof>
  <proof prover="1"><result status="valid" time="0.22"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_or">
- <proof prover="0"><result status="valid" time="0.18" steps="234"/></proof>
+ <proof prover="0"><result status="valid" time="0.18" steps="174"/></proof>
  <proof prover="1"><result status="valid" time="0.23"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_xor">
- <proof prover="0"><result status="valid" time="0.24" steps="372"/></proof>
+ <proof prover="0"><result status="valid" time="0.24" steps="270"/></proof>
  <proof prover="1"><result status="valid" time="0.28"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_not">
- <proof prover="0"><result status="valid" time="0.08" steps="130"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="118"/></proof>
  <proof prover="1"><result status="valid" time="0.16"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -344,18 +344,18 @@
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Lsr_Bv_nth_bv_low">
- <proof prover="0"><result status="valid" time="0.72" steps="591"/></proof>
- <proof prover="1"><result status="valid" time="1.19"/></proof>
+ <proof prover="0"><result status="valid" time="0.72" steps="567"/></proof>
+ <proof prover="1"><result status="valid" time="0.57"/></proof>
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.23"/></proof>
  </goal>
  <goal name="Lsr_Bv_nth_bv_high">
- <proof prover="0"><result status="valid" time="0.22" steps="266"/></proof>
+ <proof prover="0"><result status="valid" time="0.22" steps="246"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Asr_Bv_nth_bv_low">
- <proof prover="0"><result status="valid" time="0.96" steps="686"/></proof>
+ <proof prover="0"><result status="valid" time="0.96" steps="669"/></proof>
  <proof prover="1"><result status="valid" time="0.62"/></proof>
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  <proof prover="3"><result status="valid" time="0.18"/></proof>
@@ -374,7 +374,7 @@
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV32" sum="5f4c36e1952693ba0866d3f72b592a34" expanded="true">
+<theory name="CheckBV32" sum="a9a2973bc44339dff2ec16e592720715" expanded="true">
  <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.03" steps="69"/></proof>
  <proof prover="1"><result status="valid" time="0.03"/></proof>
@@ -592,7 +592,7 @@
  <proof prover="3"><result status="timeout" time="4.97"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV16" sum="881b770262d85eceb460339ccc802992" expanded="true">
+<theory name="CheckBV16" sum="3b0c1c90289d789cc126b03f48351651" expanded="true">
  <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.04" steps="69"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -810,7 +810,7 @@
  <proof prover="3"><result status="timeout" time="4.98"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV8" sum="56080a0c8e22726292bb41fe945d7c59" expanded="true">
+<theory name="CheckBV8" sum="43d23559fc0dab1ddcaccdbc246c181a" expanded="true">
  <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.04" steps="69"/></proof>
  <proof prover="1"><result status="valid" time="0.05"/></proof>
@@ -860,7 +860,7 @@
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="ok2" expanded="true">
- <proof prover="0" timelimit="15"><result status="valid" time="0.19" steps="148"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.19" steps="156"/></proof>
  <proof prover="1"><result status="valid" time="0.20"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
