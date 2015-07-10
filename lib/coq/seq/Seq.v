@@ -246,6 +246,12 @@ rewrite (Zabs2Nat.id (Datatypes.length l)). omega.
 Qed.
 
 (* Why3 goal *)
+Lemma snoc_last : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (x:a),
+  ((get (snoc s x) (length s)) = x).
+intros a a_WT s x.
+Admitted. (* TODO *)
+
+(* Why3 goal *)
 Definition mixfix_lb_dtdt_rb: forall {a:Type} {a_WT:WhyType a}, (seq a) ->
   Z -> Z -> (seq a).
 

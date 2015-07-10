@@ -946,7 +946,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
