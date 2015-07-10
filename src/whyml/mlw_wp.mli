@@ -9,13 +9,15 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Weakest preconditions} *)
+
 open Theory
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_decl
 open Mlw_expr
 
-(** WP-only builtins *)
+(** {2 WP-only builtins} *)
 
 val lemma_label : Ident.label
 
@@ -40,7 +42,7 @@ val remove_old : Term.term -> Term.term
 val full_invariant :
   Decl.known_map -> Mlw_decl.known_map -> Term.vsymbol -> ity -> Term.term
 
-(** Weakest preconditions *)
+(** {2 Weakest precondition computations} *)
 
 val wp_val:
   wp:bool -> Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
@@ -48,5 +50,3 @@ val wp_let:
   wp:bool -> Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
 val wp_rec:
   wp:bool -> Env.env -> known_map -> theory_uc -> fun_defn list -> theory_uc
-
-
