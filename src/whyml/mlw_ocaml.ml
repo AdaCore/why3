@@ -29,8 +29,6 @@
   - ghost code
     remove it as much as possible (in types and function arguments)
 
-  - preludes
-
 *)
 
 open Format
@@ -351,7 +349,8 @@ module Translate = struct
         ML.etuple (List.map (term info) tl)
     | Tapp (fs, [t1; t2]) when not info.unsafe_int
         && ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
-        ML.Esyntax ("(Why3__BigInt.eq %1 %2)", [term info t1; term info t2])
+        ML.Esyntax ("(Why3extract.Why3__BigInt.eq %1 %2)",
+                    [term info t1; term info t2])
     | Tapp (fs, tl) ->
         begin match query_syntax info.info_syn fs.ls_name with
         | Some s -> ML.Esyntax (s, List.map (term info) tl)
@@ -852,15 +851,16 @@ module Print = struct
   let print_const ~paren fmt c =
     let n = Number.compute_int c in
     if BigInt.eq n BigInt.zero then
-      fprintf fmt "Why3__BigInt.zero"
+      fprintf fmt "Why3extract.Why3__BigInt.zero"
     else if BigInt.eq n BigInt.one then
-      fprintf fmt "Why3__BigInt.one"
+      fprintf fmt "Why3extract.Why3__BigInt.one"
     else if BigInt.le min_int31 n && BigInt.le n max_int31 then
       let m = BigInt.to_int n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
+      fprintf fmt (protect_on paren "Why3extract.Why3__BigInt.of_int %d") m
     else
       let s = BigInt.to_string n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
+      fprintf fmt
+        (protect_on paren "Why3extract.Why3__BigInt.of_string \"%s\"") s
 
   let print_binop fmt = function
     | Band -> fprintf fmt "&&"
@@ -952,7 +952,7 @@ module Print = struct
           (print_expr info) e1
     | Efor (x, vfrom, dir, vto, e1) ->
         fprintf fmt
-          "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
+      "@[<hov 2>(Why3extract.Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
           (if dir = To then "to" else "downto")
           (print_lident info) vfrom (print_lident info) vto
           (print_lident info) x (print_expr info) e1
@@ -1045,6 +1045,14 @@ let extract_filename ?fname th =
 let unsafe_int drv =
   drv.Mlw_driver.drv_printer = Some "ocaml-unsafe-int"
 
+let print_preludes used fmt pm =
+  (* we do not print the same prelude twice *)
+  let ht = Hstr.create 5 in
+  let add l s = if Hstr.mem ht s then l else (Hstr.add ht s (); s :: l) in
+  let l = Sid.fold
+    (fun id l -> List.fold_left add l (Mid.find_def [] id pm)) used [] in
+  print_prelude fmt l
+
 let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
   let info = {
@@ -1061,7 +1069,9 @@ let extract_theory drv ?old ?fname fmt th =
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     Print.print_theory_name th;
-  if not info.unsafe_int then fprintf fmt "open Why3extract@\n@\n";
+  print_prelude fmt drv.Mlw_driver.drv_prelude;
+  print_preludes th.th_used fmt drv.Mlw_driver.drv_thprelude;
+  fprintf fmt "@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   fprintf fmt "@."
 
@@ -1085,7 +1095,10 @@ let extract_module drv ?old ?fname fmt m =
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
-  if not info.unsafe_int then fprintf fmt "open Why3extract@\n@\n";
+  print_prelude fmt drv.Mlw_driver.drv_prelude;
+  let used = Sid.union m.mod_used m.mod_theory.th_used in
+  print_preludes used fmt drv.Mlw_driver.drv_thprelude;
+  fprintf fmt "@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
