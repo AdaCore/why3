@@ -4,6 +4,8 @@
    prelude "(set-logic AUFNIRA)"
 *)
 
+prelude ";; produced by z3_432.drv ;;"
+
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
@@ -28,7 +30,7 @@ transformation "eliminate_epsilon"
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
 
-(* Prepare for counter-example query: get rid of some quantifiers (makes it 
+(* Prepare for counter-example query: get rid of some quantifiers (makes it
 possible to query model values of the variables in premises) and introduce
 counter-example projections  *)
 transformation "prepare_for_counterexmp"
