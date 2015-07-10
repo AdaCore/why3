@@ -892,10 +892,11 @@ module Print = struct
           (protect_on paren "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@]")
           (print_expr info) e1 (print_expr ~paren:true info) e2
     | Eif (e1, e2, e3) ->
-        fprintf fmt (protect_on paren "if @[%a@] then %a@ else %a")
+        fprintf fmt (protect_on paren
+        "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]")
           (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Elet (v, e1, e2) ->
-        fprintf fmt (protect_on paren "let %a = @[%a@] in@ %a")
+        fprintf fmt (protect_on paren "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a")
           (print_lident info) v (print_expr info) e1 (print_expr info) e2;
         forget_id v
     | Ematch (e1, [p, b1]) ->
