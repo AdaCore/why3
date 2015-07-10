@@ -196,34 +196,16 @@ module Bits "the 1-bits of an integer, as a set of integers"
       mdl = diff a.mdl b.mdl }
 
   predicate bits_interval_is_zero_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
-  let mask = lsl_bv (lsr_bv ones (sub (of_int 32) n)) i in
-    bw_and a mask = zero
+    eq_sub_bv a zero i n
 
   predicate bits_interval_is_one_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
-  let mask = lsl_bv (lsr_bv ones (sub (of_int 32) n)) i in
-    bw_and a mask = mask
+    eq_sub_bv a ones i n
 
   predicate bits_interval_is_zero (a:BV32.t) (i : int) (n : int) =
-    forall j. i <= j < i + n -> nth a j = False
-
-  lemma bits_interval_is_zero_equ : forall a i n.
-    ule i (of_int 32) -> ule (add i n) (of_int 32) ->
-      bits_interval_is_zero a (to_uint i) (to_uint n) <-> bits_interval_is_zero_bv a i n
+    eq_sub a zero i n
 
   predicate bits_interval_is_one (a:BV32.t) (i : int) (n : int) =
-    forall j. i <= j < i + n -> nth a j = True
-
-  lemma bits_interval_is_one_equ : forall a i n.
-    ule i (of_int 32) /\ ule n (sub (of_int 32) i) ->
-      bits_interval_is_one a (to_uint i) (to_uint n) <-> bits_interval_is_one_bv a i n
-
-  (* let test (a:BV32.t) (m:BV32.t) : BV32.t *)
-  (*   requires { bits_interval_is_zero_bv a zero m } *)
-  (*   requires {nth_bv a m = True} *)
-  (*   ensures  {nth_bv result m = True} *)
-  (*   ensures  {forall i. i <> m -> nth_bv result i = False} *)
-  (* = *)
-  (*   bw_and a (neg a) *)
+    eq_sub a ones i n
 
   let rightmost_bit_trick (a: t) : t
     requires { not (is_empty a.mdl) }
@@ -236,7 +218,6 @@ module Bits "the 1-bits of an integer, as a set of integers"
     assert {nth_bv (neg a.bv) n_bv};
     let res = bw_and a.bv (neg a.bv) in
     assert {forall i. 0 <= i < n -> not (nth res i)};
-    (* assert {bits_interval_is_zero res 0 n}; *)
     assert {bits_interval_is_zero_bv res (add n_bv (of_int 1)) (sub (of_int 31) n_bv )};
     assert {bits_interval_is_zero res (n + 1) (31 - n)};
     { bv = res;

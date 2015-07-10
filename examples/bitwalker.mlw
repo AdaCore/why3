@@ -46,27 +46,14 @@ module Bitwalker
   (*  *)
   function maxvalue (len : BV32.t) : BV64.t = BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig len)
 
-  lemma nth_ult_bv_pre:
-    forall x:BV64.t, len:BV32.t. BV32.ult len (BV32.of_int 64) ->
-    let mask = BV64.lsl_bv BV64.ones (C32_64.toBig len) in
-        BV64.ult x (maxvalue len)
-     <-> BV64.bw_and x mask = BV64.zero
-
-  lemma ttt:
-      forall x:BV64.t, len:BV32.t. BV32.ult len (BV32.of_int 64) ->
-    (forall j. BV32.ule len j /\ BV32.ult j (BV32.of_int 64) -> BV64.nth_bv x (C32_64.toBig j) = False) <->
-    BV64.bw_and x (BV64.lsl_bv BV64.ones (C32_64.toBig len)) = BV64.zero
-
-
-  lemma nth_ult_bv:
-    forall x:BV64.t, len:BV32.t. BV32.ult len (BV32.of_int 64) ->
-        (BV64.ult x (maxvalue len)
-     <-> (forall j. BV32.ule len j /\ BV32.ult j (BV32.of_int 64) -> BV64.nth_bv x (C32_64.toBig j) = False))
-
-  lemma nth_ult:
-    forall x:BV64.t, len:BV32.t. BV32.to_uint len < 64 ->
-      (BV64.to_uint x < BV64.to_uint (maxvalue len)
-  <-> (forall j:int. BV32.to_uint len <= j < 64 -> BV64.nth x j = False))
+  let lemma nth_ultpre0 (x:BV64.t) (len:BV32.t)
+    requires { BV32.to_uint len < 64}
+    ensures { BV64.eq_sub x BV64.zero (BV32.to_uint len) (64 - BV32.to_uint len)
+          <-> BV64.to_uint x < BV64.to_uint (maxvalue len) }
+  =
+    assert { BV32.ult len (BV32.of_int 64) };
+    assert { BV64.eq_sub_bv x BV64.zero (C32_64.toBig len) (BV64.sub (BV64.of_int 64) (C32_64.toBig len))
+         <-> BV64.ult x (maxvalue len) }
 
  (** return [value] with the bit of index [left] from the left set to [flag] *)
   let poke_64bit_bv (value : BV64.t) (left : BV32.t) (flag : bool)
