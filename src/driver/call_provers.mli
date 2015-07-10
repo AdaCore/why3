@@ -11,7 +11,9 @@
 
 open Model_parser
 
-(** Call provers and parse their outputs *)
+(** {1 Call provers and parse their outputs} *)
+
+(** {2 data types for prover answers} *)
 
 type prover_answer =
   | Valid
@@ -83,6 +85,7 @@ type prover_result_parser = {
   prp_model_parser : Model_parser.model_parser;
 }
 
+(** {2 Functions for calling external provers} *)
 type prover_call
 (** Type that represents a single prover run *)
 
