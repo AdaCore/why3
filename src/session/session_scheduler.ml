@@ -294,7 +294,7 @@ let schedule_edition t command filename callback =
       Call_provers.prp_regexps = [];
       Call_provers.prp_timeregexps = [];
       Call_provers.prp_stepregexps = [];
-      Call_provers.prp_model_parser = fun _ _ -> Model_parser.empty_model 
+      Call_provers.prp_model_parser = fun _ _ -> Model_parser.empty_model
     } in
   let precall =
     Call_provers.call_on_file ~command ~res_parser ~redirect:false filename ~printer_mapping:Printer.get_default_printer_mapping in
@@ -399,10 +399,11 @@ let find_prover eS a =
 (* to avoid corner cases when prover results are obtained very closely
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
-let adapt_limits a =
+let adapt_limits ~use_steps a =
   match a.proof_state with
   | Done { Call_provers.pr_answer = r;
-           Call_provers.pr_time = t } ->
+           Call_provers.pr_time = t;
+           Call_provers.pr_steps = s } ->
     (* increased time limit is 1 + twice the previous running time,
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
@@ -414,18 +415,23 @@ let adapt_limits a =
     let increased_mem = 3 * a.proof_memlimit / 2 in
     begin
       match r with
-      | Call_provers.OutOfMemory -> increased_time, a.proof_memlimit
-      | Call_provers.Timeout -> a.proof_timelimit, increased_mem
-      | Call_provers.StepLimitExceeded
-      | Call_provers.Valid
+      | Call_provers.OutOfMemory -> increased_time, a.proof_memlimit, -1
+      | Call_provers.Timeout -> a.proof_timelimit, increased_mem, -1
+      | Call_provers.Valid ->
+        let steplimit =
+          if use_steps && not a.proof_obsolete then s else -1
+        in
+        increased_time, increased_mem, steplimit
       | Call_provers.Unknown _
-      | Call_provers.Invalid -> increased_time, increased_mem
+      | Call_provers.StepLimitExceeded
+      | Call_provers.Invalid -> increased_time, increased_mem, -1
       | Call_provers.Failure _
       | Call_provers.HighFailure ->
         (* correct ? failures are supposed to appear quickly anyway... *)
-        a.proof_timelimit, a.proof_memlimit
+        a.proof_timelimit, a.proof_memlimit, -1
     end
-  | _ -> a.proof_timelimit, a.proof_memlimit
+  | _ -> a.proof_timelimit, a.proof_memlimit, -1
+
 
 
 type run_external_status =
@@ -451,7 +457,7 @@ let dummy_limits = (0,0,0)
 
 (** run_external_proof_v3 doesn't modify existing proof attempt, it can just
     create new one by find_prover *)
-let run_external_proof_v3 eS eT a ?(cntexample=false) callback =
+let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
   match find_prover eS a with
   | None ->
     callback a a.proof_prover dummy_limits None Starting;
@@ -465,15 +471,7 @@ let run_external_proof_v3 eS eT a ?(cntexample=false) callback =
       callback a ap dummy_limits None (MissingFile "unedited")
     end else begin
       let previous_result = a.proof_state in
-      let timelimit, memlimit = adapt_limits a in
-      let steplimit =
-	match a with
-	| { proof_state =
-            Done { Call_provers.pr_answer = Call_provers.Valid;
-                   Call_provers.pr_steps = s };
-	    proof_obsolete = false } when s >= 0 -> s
-	| _ -> -1
-      in
+      let timelimit, memlimit, steplimit = adapt_limits ~use_steps a in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config steplimit in
       let cb result =
@@ -500,7 +498,7 @@ let run_external_proof_v3 eS eT a ?(cntexample=false) callback =
     end
 
 (** run_external_proof_v2 modify the session according to the current state *)
-let run_external_proof_v2 eS eT a ~cntexample callback =
+let run_external_proof_v2 ~use_steps eS eT a ~cntexample callback =
   let previous_res = ref (a.proof_state,a.proof_obsolete) in
   let callback a ap limits previous state =
     begin match state with
@@ -522,17 +520,17 @@ let run_external_proof_v2 eS eT a ~cntexample callback =
     end;
     callback a ap limits previous state
   in
-  run_external_proof_v3 eS eT a ~cntexample callback
+  run_external_proof_v3 ~use_steps eS eT a ~cntexample callback
 
 let running = function
   | Scheduled | Running -> true
   | Unedited | JustEdited | Interrupted
   | Done _ | InternalFailure _ -> false
 
-let run_external_proof_v2 eS eT a ?(cntexample=false) callback =
+let run_external_proof_v2 ~use_steps eS eT a ?(cntexample=false) callback =
   (* Perhaps the test a.proof_archived should be done somewhere else *)
   if a.proof_archived || running a.proof_state then () else
-  run_external_proof_v2 eS eT a ~cntexample callback
+  run_external_proof_v2 ~use_steps eS eT a ~cntexample callback
 
 let run_external_proof eS eT ?(cntexample=false) ?callback a =
   let callback =
@@ -545,7 +543,7 @@ let run_external_proof eS eT ?(cntexample=false) ?callback a =
       | MissingFile _ -> c a a.proof_state
       | StatusChange s -> c a s
   in
-  run_external_proof_v2 eS eT a ~cntexample callback
+  run_external_proof_v2 ~use_steps:false eS eT a ~cntexample callback
 
 let prover_on_goal eS eT ?callback ?(cntexample=false) ~timelimit ~memlimit p g =
   let a =
@@ -628,7 +626,7 @@ type report =
 let push_report report (g,p,limits,r) =
   (g.goal_name,p,limits,r)::report
 
-let check_external_proof eS eT todo a =
+let check_external_proof ~use_steps eS eT todo a =
   let callback a ap limits old s =
     let g = a.proof_parent in
     match s with
@@ -648,7 +646,7 @@ let check_external_proof eS eT todo a =
         | None -> No_former_result res
         | Some old -> Result (res, old) in
       Todo._done todo (g, ap, limits, r) in
-  run_external_proof_v2 eS eT a callback
+  run_external_proof_v2 ~use_steps eS eT a callback
 
 let rec goal_iter_proof_attempt_with_release ~release f g =
   let iter g = goal_iter_proof_attempt_with_release ~release f g in
@@ -657,7 +655,7 @@ let rec goal_iter_proof_attempt_with_release ~release f g =
   Mmetas_args.iter (fun _ t -> iter t.metas_goal) g.goal_metas;
   if release then release_task g
 
-let check_all ?(release=false) ?filter eS eT ~callback =
+let check_all ?(release=false) ~use_steps ?filter eS eT ~callback =
   Debug.dprintf debug "[Sched] check all@.%a@." print_session eS.session;
   let todo = Todo.create [] push_report callback in
   Todo.start todo;
@@ -666,7 +664,7 @@ let check_all ?(release=false) ?filter eS eT ~callback =
       let c = match filter with
         | None -> true
         | Some f -> f a in
-      if c then check_external_proof eS eT todo a in
+      if c then check_external_proof ~use_steps eS eT todo a in
     goal_iter_proof_attempt_with_release ~release check g
   in
   PHstr.iter (fun _ file ->
