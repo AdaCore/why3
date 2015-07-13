@@ -90,7 +90,7 @@ let debug_print_term message t =
   let form = Debug.get_debug_formatter () in
   begin
     Debug.dprintf debug message;
-    if Debug.test_flag debug then 
+    if Debug.test_flag debug then
       Pretty.print_term form t;
     Debug.dprintf debug "@.";
   end
@@ -136,8 +136,8 @@ let collect_model_ls info ls =
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
 
 (** expr *)
-let rec print_term info fmt t = 
-  debug_print_term "Printing term: " t; 
+let rec print_term info fmt t =
+  debug_print_term "Printing term: " t;
 
   if Slab.mem model_label t.t_label then
     info.info_model <- (t) :: info.info_model;
@@ -191,20 +191,27 @@ let rec print_term info fmt t =
   | Tcase({t_node = Tvar v}, bl) ->
       print_branches info v print_term fmt bl
   | Tcase(t, bl) ->
-      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-        print_var subject (print_term info) t
-        (print_branches info subject print_term) bl;
-      forget_var subject
+    let ty = t_type t in
+    begin
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t fmt bl
+      | _ ->
+        let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+        fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+          print_var subject (print_term info) t
+          (print_branches info subject print_term) bl;
+        forget_var subject
+    end
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = 
-  debug_print_term "Printing formula: " f;  
+and print_fmla info fmt f =
+  debug_print_term "Printing formula: " f;
   if Slab.mem model_label f.t_label then
     info.info_model <- (f) :: info.info_model;
-  
+
   match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
@@ -266,12 +273,32 @@ and print_fmla info fmt f =
       forget_var subject
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
+and print_boolean_branches info subject fmt bl =
+  let error () = unsupportedTerm subject
+    "smtv2: bad pattern-matching on Boolean (compile_match missing?)"
+  in
+  match bl with
+  | [br1 ; br2] ->
+    let (p1,t1) = t_open_branch br1 in
+    let (_p2,t2) = t_open_branch br2 in
+    begin
+      match p1.pat_node with
+      | Papp(cs,_) ->
+        fprintf fmt "@[(ite (= %a %s) %a %a)@]"
+          (print_term info) subject
+          (String.lowercase cs.ls_name.id_string) (* dirty hack, sorry *)
+          (print_term info) t1
+          (print_term info) t2
+      | _ -> error ()
+    end
+  | _ -> error ()
+
 and print_branches info subject pr fmt bl = match bl with
   | [] -> assert false
   | br::bl ->
       let (p,t) = t_open_branch br in
       let error () = unsupportedPattern p
-        "smtv2: you must compile nested pattern matching" in
+        "smtv2: you must compile nested pattern-matching" in
       match p.pat_node with
       | Pwild -> pr info fmt t
       | Papp (cs,args) ->
@@ -333,13 +360,13 @@ let print_logic_decl info fmt (ls,def) =
 let print_info_model cntexample fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if info_model != [] && cntexample then 
+  if info_model != [] && cntexample then
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
             (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
       fprintf fmt "@[(get-value (";
-      List.iter (fun f -> 
+      List.iter (fun f ->
 	fprintf str_formatter "%a" (print_fmla info) f;
         let s = flush_str_formatter () in
         fprintf fmt "%s " s;
@@ -366,10 +393,10 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       fprintf fmt "@[(check-sat)@]@\n";
       print_info_model cntexample fmt info;
-      
+
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				queried_terms = info.info_model; }
-	  
+
   | Plemma| Pskip -> assert false
 
 
@@ -425,10 +452,10 @@ let print_decls cntexample args =
   Printer.on_converter_map (fun cm ->
       Trans.fold print_decl ((sm, cm, []),[])))
 
-let set_produce_models fmt cntexample = 
+let set_produce_models fmt cntexample =
   if cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
-  
+
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
