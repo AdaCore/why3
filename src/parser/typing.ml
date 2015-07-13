@@ -195,6 +195,12 @@ let quant_var tuc (loc, id, gh, ty) =
     | None    -> dty_fresh () in
   Opt.map create_user_id id, ty, Some loc
 
+let loc_cutoff loc13 loc23 loc2 =
+  let f,l,b,e = Loc.get loc13 in
+  let _,_,_,w = Loc.get loc23 in
+  let _,_,_,m = Loc.get loc2 in
+  Loc.user_position f l b (e - (w - m))
+
 let is_reusable dt = match dt.dt_node with
   | DTvar _ | DTgvar _ | DTconst _ | DTtrue | DTfalse -> true
   | DTapp (_,[]) -> true
@@ -208,16 +214,6 @@ let mk_var n dt =
 
 let mk_let ~loc n dt node =
   DTlet (dt, id_user n loc, Dterm.dterm ~loc node)
-
-let chainable_op tuc op =
-  (* non-bool -> non-bool -> bool *)
-  op.id_str = "infix =" || op.id_str = "infix <>" ||
-  match find_lsymbol tuc (Qident op) with
-  | {ls_args = [ty1;ty2]; ls_value = ty} ->
-      Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
-      && not (ty_equal ty1 ty_bool)
-      && not (ty_equal ty2 ty_bool)
-  | _ -> false
 
 let mk_closure loc ls =
   let mk dt = Dterm.dterm ~loc dt in
@@ -270,31 +266,25 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Ttuple tl ->
       let tl = List.map (dterm tuc gvars at denv) tl in
       DTapp (fs_tuple (List.length tl), tl)
-  | Ptree.Tinfix (e12, op2, e3)
-  | Ptree.Tinnfix (e12, op2, e3) ->
-      let make_app de1 op de2 = if op.id_str = "infix <>" then
-        let op = { op with id_str = "infix =" } in
-        let ls = find_lsymbol tuc (Qident op) in
-        DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
-      else
-        DTapp (find_lsymbol tuc (Qident op), [de1;de2])
-      in
-      let rec make_chain de1 = function
-        | [op,de2] ->
-            make_app de1 op de2
-        | (op,de2) :: ch ->
-            let de12 = Dterm.dterm ~loc (make_app de1 op de2) in
-            let de23 = Dterm.dterm ~loc (make_chain de2 ch) in
+  | Ptree.Tinfix (e1, op1, e23)
+  | Ptree.Tinnfix (e1, op1, e23) ->
+      let apply loc de1 op de2 =
+        if op.id_str = "infix <>" then
+          let op = { op with id_str = "infix =" } in
+          let ls = find_lsymbol tuc (Qident op) in
+          DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
+        else
+          DTapp (find_lsymbol tuc (Qident op), [de1;de2]) in
+      let rec chain loc de1 op1 = function
+        | { term_desc = Ptree.Tinfix (e2, op2, e3); term_loc = loc23 } ->
+            let de2 = dterm tuc gvars at denv e2 in
+            let loc12 = loc_cutoff loc loc23 e2.term_loc in
+            let de12 = Dterm.dterm ~loc:loc12 (apply loc12 de1 op1 de2) in
+            let de23 = Dterm.dterm ~loc:loc23 (chain loc23 de2 op2 e3) in
             DTbinop (DTand, de12, de23)
-        | [] -> assert false in
-      let rec get_chain e12 acc = match e12.term_desc with
-        | Tinfix (e1, op1, e2) when chainable_op tuc op1 ->
-            get_chain e1 ((op1, dterm tuc gvars at denv e2) :: acc)
-        | _ -> e12, acc in
-      let ch = [op2, dterm tuc gvars at denv e3] in
-      let e1, ch = if chainable_op tuc op2
-        then get_chain e12 ch else e12, ch in
-      make_chain (dterm tuc gvars at denv e1) ch
+        | e23 ->
+            apply loc de1 op1 (dterm tuc gvars at denv e23) in
+      chain loc (dterm tuc gvars at denv e1) op1 e23
   | Ptree.Tconst c ->
       DTconst c
   | Ptree.Tlet (x, e1, e2) ->
@@ -352,13 +342,13 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tupdate (e1, fl) ->
       let e1 = dterm tuc gvars at denv e1 in
       let re = is_reusable e1 in
-      let v = if re then e1 else mk_var "_q " e1 in
+      let v = if re then e1 else mk_var "q " e1 in
       let get_val _ pj = function
         | Some e -> dterm tuc gvars at denv e
         | None -> Dterm.dterm ~loc (DTapp (pj,[v])) in
       let cs, fl = parse_record ~loc tuc get_val fl in
       let d = DTapp (cs, fl) in
-      if re then d else mk_let ~loc "_q " e1 d
+      if re then d else mk_let ~loc "q " e1 d
   | Ptree.Tat (e1, l) ->
       DTlabel (dterm tuc gvars (Some l.id_str) denv e1, Slab.empty)
   | Ptree.Tnamed (Lpos uloc, e1) ->
@@ -542,10 +532,7 @@ let dbinder muc (_,id,gh,pty) = dbinder muc id gh pty
 (* expressions *)
 
 let is_reusable de = match de.de_node with
-  | DEvar _ | DEpv _ | DEconst _ | DEtrue | DEfalse -> true
-  | DErs {rs_logic = (RLls _|RLpv _); rs_cty = cty} ->
-      cty.cty_args = [] && cty.cty_result.ity_pure
-  | _ -> false
+  | DEvar _ | DEpv _ -> true | _ -> false
 
 let mk_var n de =
   Dexpr.dexpr ?loc:de.de_loc (DEvar (n, de.de_dvty))
@@ -553,26 +540,6 @@ let mk_var n de =
 let mk_let ~loc n de node =
   let de1 = Dexpr.dexpr ~loc node in
   DElet ((id_user n loc, false, RKnone, de), de1)
-
-let chainable_rs = function
-  | {rs_cty = { cty_args = [pv1;pv2]; cty_result = ity}} ->
-      ity_equal ity ity_bool
-      && not (ity_equal pv1.pv_ity ity_bool)
-      && not (ity_equal pv2.pv_ity ity_bool)
-  | _ -> false
-
-let chainable_qualid muc p = match find_prog_symbol muc p with
-  | RS s -> chainable_rs s
-  | _ -> false
-
-let chainable_op muc denv op =
-  (* non-bool -> non-bool -> bool *)
-  op.id_str = "infix =" || op.id_str = "infix <>" ||
-  match denv_get_opt denv op.id_str with
-  | Some (DEvar (_,t)) -> dvty_is_chainable t
-  | Some (DErs s) -> chainable_rs s
-  | Some _ -> false (* can never happen *)
-  | None -> chainable_qualid muc (Qident op)
 
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let expr_app loc e el =
@@ -600,34 +567,28 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Etuple el ->
       let e = DErs (rs_tuple (List.length el)) in
       expr_app loc e (List.map (dexpr muc denv) el)
-  | Ptree.Einfix (e12, op2, e3)
-  | Ptree.Einnfix (e12, op2, e3) ->
-      let make_app de1 op de2 = if op.id_str = "infix <>" then
-        let oq = Qident { op with id_str = "infix =" } in
-        let dt = qualid_app op.id_loc oq [de1; de2] in
-        DEnot (Dexpr.dexpr ~loc dt)
-      else
-        qualid_app op.id_loc (Qident op) [de1; de2]
-      in
-      let rec make_chain n1 n2 de1 = function
-        | [op,de2] ->
-            make_app de1 op de2
-        | (op,de2) :: ch ->
+  | Ptree.Einfix (e1, op1, e23)
+  | Ptree.Einnfix (e1, op1, e23) ->
+      let apply loc de1 op de2 =
+        if op.id_str = "infix <>" then
+          let oq = Qident { op with id_str = "infix =" } in
+          let dt = qualid_app op.id_loc oq [de1;de2] in
+          DEnot (Dexpr.dexpr ~loc dt)
+        else
+          qualid_app op.id_loc (Qident op) [de1;de2] in
+      let rec chain n1 n2 loc de1 op1 = function
+        | { expr_desc = Ptree.Einfix (e2, op2, e3); expr_loc = loc23 } ->
+            let de2 = dexpr muc denv e2 in
             let re = is_reusable de2 in
             let v = if re then de2 else mk_var n1 de2 in
-            let de12 = Dexpr.dexpr ~loc (make_app de1 op v) in
-            let de23 = Dexpr.dexpr ~loc (make_chain n2 n1 v ch) in
+            let loc12 = loc_cutoff loc loc23 e2.expr_loc in
+            let de12 = Dexpr.dexpr ~loc:loc12 (apply loc12 de1 op1 v) in
+            let de23 = Dexpr.dexpr ~loc:loc23 (chain n2 n1 loc23 v op2 e3) in
             let d = DEand (de12, de23) in
             if re then d else mk_let ~loc n1 de2 d
-        | [] -> assert false in
-      let rec get_chain e12 acc = match e12.expr_desc with
-        | Ptree.Einfix (e1, op1, e2) when chainable_op muc denv op1 ->
-            get_chain e1 ((op1, dexpr muc denv e2) :: acc)
-        | _ -> e12, acc in
-      let ch = [op2, dexpr muc denv e3] in
-      let e1, ch = if chainable_op muc denv op2
-        then get_chain e12 ch else e12, ch in
-      make_chain "q1 " "q2 " (dexpr muc denv e1) ch
+        | e23 ->
+            apply loc de1 op1 (dexpr muc denv e23) in
+      chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
   | Ptree.Econst c -> DEconst c
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
@@ -641,7 +602,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr muc denv e1 in
       let re = is_reusable e1 in
-      let v = if re then e1 else mk_var "_q " e1 in
+      let v = if re then e1 else mk_var "q " e1 in
       let get_val _ pj = function
         | None ->
             let pj = Dexpr.dexpr ~loc (DErs pj) in
@@ -649,7 +610,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
       let d = expr_app loc (DErs cs) fl in
-      if re then d else mk_let ~loc "_q " e1 d
+      if re then d else mk_let ~loc "q " e1 d
   | Ptree.Elet (id, gh, kind, e1, e2) ->
       let ld = create_user_id id, gh, kind, dexpr muc denv e1 in
       DElet (ld, dexpr muc (denv_add_let denv ld) e2)

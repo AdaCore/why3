@@ -146,7 +146,7 @@
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
-%left EQUAL LTGT OP1
+%right EQUAL LTGT OP1
 %nonassoc AT OLD
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
@@ -472,8 +472,10 @@ term_:
     { Tidapp (Qident $1, [$2]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
-| l = term ; o = infix_op ; r = term
+| l = term ; o = infix_op_1 ; r = term
     { Tinfix (l, o, r) }
+| l = term ; o = infix_op_234 ; r = term
+    { Tidapp (Qident o, [l; r]) }
 | term_arg located(term_arg)+ (* FIXME/TODO: "term term_arg" *)
     { let join f (a,_,e) = mk_term (Tapply (f,a)) $startpos e in
       (List.fold_left join $1 $2).term_desc }
@@ -635,8 +637,10 @@ expr_:
     { Enot $2 }
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
-| l = expr ; o = infix_op ; r = expr
+| l = expr ; o = infix_op_1 ; r = expr
     { Einfix (l,o,r) }
+| l = expr ; o = infix_op_234 ; r = expr
+    { Eidapp (Qident o, [l;r]) }
 | expr_arg located(expr_arg)+ (* FIXME/TODO: "expr expr_arg" *)
     { let join f (a,_,e) = mk_expr (Eapply (f,a)) $startpos e in
       (List.fold_left join $1 $2).expr_desc }
@@ -898,13 +902,15 @@ op_symbol:
 prefix_op:
 | op_symbol { mk_id (prefix $1)  $startpos $endpos }
 
-%inline infix_op:
+%inline infix_op_1:
 | o = OP1   { mk_id (infix o)    $startpos $endpos }
+| EQUAL     { mk_id (infix "=")  $startpos $endpos }
+| LTGT      { mk_id (infix "<>") $startpos $endpos }
+
+%inline infix_op_234:
 | o = OP2   { mk_id (infix o)    $startpos $endpos }
 | o = OP3   { mk_id (infix o)    $startpos $endpos }
 | o = OP4   { mk_id (infix o)    $startpos $endpos }
-| EQUAL     { mk_id (infix "=")  $startpos $endpos }
-| LTGT      { mk_id (infix "<>") $startpos $endpos }
 
 (* Qualified idents *)
 

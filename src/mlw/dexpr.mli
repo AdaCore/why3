@@ -25,10 +25,6 @@ val dity_of_ity : ity -> dity
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
-val dity_is_bool : dity -> bool
-
-val dvty_is_chainable : dvty -> bool
-
 (** Patterns *)
 
 type dpattern = private {

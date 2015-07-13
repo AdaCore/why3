@@ -167,18 +167,6 @@ let reunify_regions () =
   Queue.iter (fun (d1,d2) -> reunify d1 d2) unify_queue;
   Queue.clear unify_queue
 
-(** Chainable relations *)
-
-let rec dity_is_bool = function
-  | Dvar { contents = Dval dty } -> dity_is_bool dty
-  | Dpur (s,_) -> its_equal s its_bool
-  | _ -> false
-
-let dvty_is_chainable = function
-  | [t1;t2],t ->
-      dity_is_bool t && not (dity_is_bool t1) && not (dity_is_bool t2)
-  | _ -> false
-
 (** Built-in types *)
 
 let dity_int  = Dpur (its_int,  [])
