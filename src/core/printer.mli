@@ -28,7 +28,12 @@ type 'a pp = Format.formatter -> 'a -> unit
 in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
+  vc_line       : Loc.position option;
+  (* The position of the term corresponding to the line in the program
+     for that the VC was made *)
   queried_terms : Term.term list;
+  (* The list of terms that were queried for the counter-example
+     by the printer *)
 }
 
 type printer_args = {

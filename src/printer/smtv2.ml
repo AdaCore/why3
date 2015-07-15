@@ -80,8 +80,18 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let check_related_loc = ref None
-let check_funct_name = ref None
+(* Information about the line in the program for that the VC was made *)
+type vc_line_info = {
+  mutable vc_inside : bool;
+  (* true if the term corresponding to VC line is currently processed *)
+  mutable vc_loc : Loc.position option;
+  (* the position of VC line *)
+  mutable vc_func_name : string option;
+  (* the name of the function (just for the case VC is
+     postcondition or precondition) *)
+}
+
+let vc_line_info = { vc_inside = false; vc_loc = None; vc_func_name = None }
 
 module TermCmp = struct
   type t = term
@@ -140,7 +150,7 @@ let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let model_label = Ident.create_label "model"
-let model_vc_label = Ident.create_label "model_vc"
+let model_vc_line_label = Ident.create_label "model_vc"
 
 let collect_model_ls info ls =
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
@@ -174,25 +184,34 @@ let labels_at_vc_pos ~labels =
   with Not_found ->
     Slab.add
       (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" !check_funct_name)  ^ "@result"))
+	 ("model_trace:" ^ (Opt.get_def "" vc_line_info.vc_func_name)  ^ "@result"))
       labels
 
-let add_check_related t =
-  if Slab.mem model_vc_label t.t_label then begin
-    check_related_loc := t.t_loc;
+let check_enter_vc_line t =
+  (* Check whether the term corresponding to the line of VC is entered.
+     If it is entered, extract the location of VC line and if the VC is
+     postcondition or precondition of a function , extract the name of
+     the function.
+  *)
+  if Slab.mem model_vc_line_label t.t_label then begin
+    vc_line_info.vc_inside <- true;
+    vc_line_info.vc_loc <- t.t_loc;
     try
+      (* Extract the function name from "model_func" label *)
       let fun_label = get_label t.t_label (Str.regexp "model_func:") in
       let str_lab = fun_label.lab_string in
       let func_name_start = 11 in
       let func_name_len = (String.length str_lab) - 11 in
-      check_funct_name := Some (String.sub str_lab func_name_start func_name_len);
-    with Not_found -> ()
+      vc_line_info.vc_func_name <- Some (String.sub str_lab func_name_start func_name_len);
+    with Not_found ->
+      (* No label "model_func" => the VC is not postcondition or precondition *)
+      ()
   end
 
-let remove_check_related t =
-  if Slab.mem model_vc_label t.t_label then begin
-    check_related_loc := None;
-    check_funct_name := None;
+let check_exit_vc_line t =
+  (* Check whether the term corresponding to the line of VC is exited. *)
+  if Slab.mem model_vc_line_label t.t_label then begin
+    vc_line_info.vc_inside <- false;
   end
 
 (** expr *)
@@ -202,7 +221,7 @@ let rec print_term info fmt t =
   if Slab.mem model_label t.t_label then
     info.info_model <- S.add t info.info_model;
 
-  add_check_related t;
+  check_enter_vc_line t;
 
   let () = match t.t_node with
   | Tconst c ->
@@ -239,14 +258,14 @@ let rec print_term info fmt t =
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] ->
-	      let () = match !check_related_loc with
-		| None -> ()
-		| Some loc ->
-		  let labels = labels_at_vc_pos ~labels:ls.ls_name.id_label in
-		  let t_check_pos = t_label ~loc labels t in
-		  info.info_model <- S.add t_check_pos info.info_model;
-		  () in
-	      ();
+	    if vc_line_info.vc_inside then begin
+	      match vc_line_info.vc_loc with
+	      | None -> ()
+	      | Some loc ->
+		let labels = labels_at_vc_pos ~labels:ls.ls_name.id_label in
+		let t_check_pos = t_label ~loc labels t in
+		info.info_model <- S.add t_check_pos info.info_model;
+	    end;
 	    fprintf fmt "@[%a@]" print_ident ls.ls_name
           | _ ->
 	    fprintf fmt "@[(%a@ %a)@]"
@@ -273,7 +292,7 @@ let rec print_term info fmt t =
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
 
-  remove_check_related t;
+  check_exit_vc_line t;
 
 
 
@@ -282,7 +301,7 @@ and print_fmla info fmt f =
   if Slab.mem model_label f.t_label then
     info.info_model <- S.add f info.info_model;
 
-  add_check_related f;
+  check_enter_vc_line f;
 
   let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -345,7 +364,7 @@ and print_fmla info fmt f =
       forget_var subject
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
-  remove_check_related f
+  check_exit_vc_line f
 
 and print_branches info subject pr fmt bl = match bl with
   | [] -> assert false
@@ -450,6 +469,7 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
       print_info_model cntexample fmt model_list info;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
+				vc_line = vc_line_info.vc_loc;
 				queried_terms = model_list; }
 
   | Plemma| Pskip -> assert false
