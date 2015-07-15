@@ -102,6 +102,15 @@ module SmallestFibAbove
 
 end
 
+(**
+Zeckendorf's theorem states that every positive integer can be
+represented uniquely as the sum of one or more distinct Fibonacci
+numbers in such a way that the sum does not include any two
+consecutive Fibonacci numbers.
+
+Cf https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem
+*)
+
 module Zeckendorf
 
   use import int.Fibonacci
@@ -213,6 +222,38 @@ module Zeckendorf
       a := tmp
    done;
    !l
+
+  (* unicity proof *)
+
+  function snoc (l:list int) (x:int) : list int = match l with
+    | Nil -> Cons x Nil
+    | Cons y q -> Cons y (snoc q x)
+    end
+
+  let rec lemma zeckendorf_unique (l1 l2:list int) : unit
+    requires { wf 2 l1 /\ wf 2 l2 }
+    requires { sum l1 = sum l2 }
+    ensures { l1 = l2 }
+    variant { sum l1 }
+  = let rec decomp (k acc:int) (lc lb:list int) : (int,list int)
+      requires { wf k lc }
+      requires { k >= 2 /\ lc <> Nil }
+      requires { 0 <= acc = sum lb - sum lc < fib (k-1) }
+      returns { (x,p) -> fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
+      returns { (x,p) -> wf k p /\ x >= k /\ lc = snoc p x }
+      variant { lc }
+    = match lc with
+      | Nil -> absurd
+      | Cons x Nil -> (x,Nil)
+      | Cons x q -> let (y,p) = decomp (x+2) (acc+fib x) q lb in (y,Cons x p)
+      end in
+    match l1 , l2 with
+    | Nil , Nil -> ()
+    | Nil , l | l , Nil -> let _ = decomp 2 0 l l in absurd
+    | _ , _ -> let (_,q1) = decomp 2 0 l1 l1 in
+      let (_,q2) = decomp 2 0 l2 l2 in
+      zeckendorf_unique q1 q2
+    end
 
 end
 

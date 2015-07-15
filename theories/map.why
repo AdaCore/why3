@@ -28,6 +28,13 @@ theory Map
     forall b : 'b [m[a1 <- b][a2]].
     a1 <> a2 -> m[a1 <- b][a2] = m[a2]
 
+end
+
+
+theory Const
+
+  use import Map
+
   function const ~'b : map 'a 'b
 
   axiom Const : forall b:'b, a:'a. (const b)[a] = b
@@ -239,4 +246,3 @@ theory MapParam
 
 end
 *)
-

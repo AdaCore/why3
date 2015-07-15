@@ -119,6 +119,23 @@ module array.Array
   syntax val blit          "Why3__Array.blit"
 end
 
+module matrix.Matrix
+  syntax type matrix "(%1 Why3__Matrix.t)"
+
+  syntax function get "(Why3__Matrix.get %1 %2)"
+
+  syntax exception OutOfBounds "Why3__Matrix.OutOfBounds"
+
+  syntax val get           "Why3__Matrix.get"
+  syntax val set           "Why3__Matrix.set"
+  syntax val rows          "Why3__Matrix.rows"
+  syntax val columns       "Why3__Matrix.columns"
+  syntax val defensive_get "Why3__Matrix.defensive_get"
+  syntax val defensive_set "Why3__Matrix.defensive_set"
+  syntax val make          "Why3__Matrix.make"
+  syntax val copy          "Why3__Matrix.copy"
+end
+
 module mach.int.Int
   syntax val ( / ) "Why3__BigInt.computer_div"
   syntax val ( % ) "Why3__BigInt.computer_mod"

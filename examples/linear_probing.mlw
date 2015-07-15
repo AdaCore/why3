@@ -35,6 +35,7 @@ module LinearProbing
   use import option.Option
   use import list.Mem
   use import map.Map
+  use map.Const
   use import ref.Ref
   use import array.Array
 
@@ -118,7 +119,7 @@ module LinearProbing
     ensures  { forall x: key. not (Map.get result.view (keym x)) }
   =
     { size = 0; data = Array.make n dummy;
-      view = Map.const false; loc = Map.const 0; }
+      view = Const.const false; loc = Const.const 0; }
 
   let clear (h: t) : unit
     writes  { h.size, h.data.elts, h.view }
@@ -127,7 +128,7 @@ module LinearProbing
   =
     h.size <- 0;
     Array.fill h.data 0 (Array.length h.data) dummy;
-    h.view <- Map.const false
+    h.view <- Const.const false
 
   function next (n i: int) : int =
     let i = i+1 in if i = n then 0 else i
@@ -173,7 +174,7 @@ module LinearProbing
     let n = Array.length h.data in
     let n2 = 2 * n in
     let a = Array.make n2 dummy in
-    let ghost l = ref (Map.const 0) in
+    let ghost l = ref (Const.const 0) in
     for i = 0 to n - 1 do
       invariant { numofd a 0 n2 = numofd h.data 0 i + n2 - i }
       invariant { forall j: int. 0 <= j < n2 -> neq a[j] dummy ->
@@ -321,5 +322,3 @@ module LinearProbing
     end
 
 end
-
-

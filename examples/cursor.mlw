@@ -60,14 +60,14 @@ module TestCursor
   let sum (t: t) (c: cursor) : int
     requires { coherent t c }
     requires { c.i = 0 }
-    ensures  { result = sum 0 (length c.seq - 1) (get c.seq) }
+    ensures  { result = sum 0 (length c.seq) (get c.seq) }
   =
     let s = ref 0 in
     'I:
     while has_next t c do
       invariant { coherent t c }
       invariant { 0 <= c.i <= length c.seq }
-      invariant { !s = sum 0 (c.i - 1) (get c.seq) }
+      invariant { !s = sum 0 c.i (get c.seq) }
       variant   { length c.seq - c.i }
       let x = next t c in
       s += x

@@ -6,8 +6,6 @@ section {* Generic Maps *}
 
 why3_open "map/Map.xml"
 
-why3_vc Const by simp
-
 why3_vc Select_eq
   using assms
   by simp
@@ -15,6 +13,15 @@ why3_vc Select_eq
 why3_vc Select_neq
   using assms
   by simp
+
+why3_end
+
+
+section {* Constant Maps *}
+
+why3_open "map/Const.xml"
+
+why3_vc Const by simp
 
 why3_end
 

@@ -10,52 +10,57 @@ module Bitwalker
   use bv.BVConverter_8_32 as C8_32
 
   function nth64_inv (value : BV64.t) (i : BV32.t) : bool =
-    BV64.nth_bv value (C32_64.toBig (sub (of_int 63) i))
+     BV64.nth_bv value (C32_64.toBig (sub (of_int 63) i))
 
-  function nth8_inv (value : BV8.t) (i : BV8.t) : bool =
-    BV8.nth_bv value (BV8.sub (BV8.of_int 7) i)
+  function nth8_inv (value : BV8.t) (i : BV32.t) : bool =
+    if ugt i (of_int 7) then
+      False
+    else
+      BV8.nth_bv value (C8_32.toSmall (sub (of_int 7) i))
 
   function nth8_inv_stream (stream : array BV8.t) (pos : BV32.t) : bool =
-    nth8_inv (stream[ to_uint (udiv pos (of_int 8)) ]) (C8_32.toSmall (urem pos (of_int 8)))
+    if to_uint pos >= 8 * length stream then
+      False
+    else
+      nth8_inv stream[div (to_uint pos) 8] (urem pos (of_int 8))
 
-  let poke_64bit (value : BV64.t) (left : BV32.t) (flag : BV32.t) =
+  let poke_64bit (value : BV64.t) (left : BV32.t) (flag : bool) =
   requires{ ult left (of_int 64) }
-  ensures{ forall i. ult i (of_int 64) /\ i <> left ->
+  ensures{ forall i. i <> left ->
              nth64_inv result i = nth64_inv value i }
-  ensures{ flag <> zero <-> nth64_inv result left }
+  ensures{ flag = nth64_inv result left }
       let mask = BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig (sub (of_int 63) left)) in
-
-      if( flag = zero )
+      if flag
       then
-        BV64.bw_and value (BV64.bw_not mask)
-      else
         BV64.bw_or value mask
+      else
+        BV64.bw_and value (BV64.bw_not mask)
 
   let peek_8bit (byte : BV8.t) (left : BV32.t) =
   requires{ ult left (of_int 8) }
-  ensures{ result <> BV8.zero <-> nth8_inv byte (C8_32.toSmall left) }
+  ensures{ result = nth8_inv byte left }
       let mask = BV8.lsl_bv (BV8.of_int 1) (C8_32.toSmall (sub (of_int 7) left)) in
-      let flag = BV8.bw_and byte mask in
+      let flag = (BV8.bw_and byte mask <> BV8.zero) in
       flag
 
   let peek_8bit_array (addr : array BV8.t) (left : BV32.t) =
   requires{ 8 * (length addr) < two_power_size }
   requires{ to_uint left < 8 * length addr }
-  ensures{ result <> BV8.zero <-> nth8_inv_stream addr left }
-    peek_8bit (addr[ to_uint (udiv left (of_int 8)) ]) (urem left (of_int 8))
+  ensures{ result = nth8_inv_stream addr left }
+    peek_8bit (addr[ div (to_uint left) 8 ]) (urem left (of_int 8))
 
   let peek (start : BV32.t) (len : BV32.t) (addr : array BV8.t) =
-  (* requires \valid_read(addr + (0..size-1)); *) (* ?? *)
   requires{ ule len (of_int 64) }
   requires{ to_uint start + to_uint len < two_power_size }
   requires{ 8 * length addr < two_power_size }
   ensures{ to_uint (add start len) > (8 * length addr) -> result = BV64.zero }
   ensures{ to_uint (add start len) <= (8 * length addr) -> forall i. ult i len ->
-    nth8_inv_stream addr (add start i) <-> nth64_inv result (add (sub (of_int 64) len) i) }
+    nth8_inv_stream addr (add start i) = nth64_inv result (add (sub (of_int 64) len) i) }
   ensures{ to_uint (add start len) <= (8 * length addr) -> forall i. ult i (sub (of_int 64) len) ->
-    nth64_inv result i = False }
-  (* ensures{ to_uint (add start len) <= (8 * length addr) -> *)
-  (*   BV64.ult result (BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig len)) } *)
+             nth64_inv result i = False }
+  ensures{ to_uint (add start len) <= (8 * length addr) ->
+     len = (of_int 64)
+  \/ BV64.ult result (BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig len)) }
 
     if (to_uint (add start len) > ( 8 *length addr ))
     then
@@ -64,41 +69,241 @@ module Bitwalker
 
     let retval = ref BV64.zero in
     let i = ref zero in
-
     let lstart = sub (of_int 64) len in
 
     assert { ult start (sub ones len)};
 
-    while ult !i len do
-    variant{ !i with ugt }
-
-      invariant {ugt !i zero ->
-                        nth8_inv_stream addr (add start (sub !i (of_int 1)))
-                    <-> nth64_inv !retval (add lstart (sub !i (of_int 1)))}
+    while ult !i len do variant{ !i with ugt }
       invariant {forall j. ult j !i->
-        nth8_inv_stream addr (add start j) <-> nth64_inv !retval (add lstart j)}
+          nth8_inv_stream addr (add start j)
+        = nth64_inv !retval (add lstart j)}
       invariant {forall j. ult j lstart -> nth64_inv !retval j = False}
 
       assert {ult (add start !i) (add start len)};
-
-      assert {ult (add lstart !i) (of_int 64)};
-      assert {forall j. ult j !i -> (add lstart j) <> (add lstart !i) };
+      assert {forall j. ult j !i -> (add lstart j) <> (add lstart !i)};
 
       let flag = peek_8bit_array addr (add start !i) in
-      let temp = poke_64bit !retval (add lstart !i) (C8_32.toBig flag) in
-      assert {forall j. ult j !i -> ult (add lstart j) (of_int 64)};
-      assert {forall j. ult j !i -> nth64_inv !retval (add lstart j) <-> nth64_inv temp (add lstart j)};
-      retval := temp;
-      assert {forall j. ult j !i -> nth8_inv_stream addr (add start j) <-> nth64_inv !retval (add lstart j)};
-      assert {nth8_inv_stream addr (add start !i) <-> nth64_inv !retval (add lstart !i)};
+      retval := poke_64bit !retval (add lstart !i) flag;
 
+      assert {nth8_inv_stream addr (add start !i)
+            = nth64_inv !retval (add lstart !i)};
       assert {forall j. ult j (add !i (of_int 1)) -> ult j !i \/ j = !i};
 
       i := add !i (of_int 1)
-
-
     done;
 
+    (* missing an axiom in the sens of the following in the theory ? *)
+    (* axiom nth_mask: forall l b j. ule l size -> ult j l -> *)
+    (*           nth b (sub size j) = False -> *)
+    (*             bw_and (lsl_bv ones (sub size l)) b = zero}; *)
+    (* or even ? *)
+    (* axiom nth_mask: forall i m n v. ule m n -> ule n size -> ule m i /\ ult i n *)
+    (*     -> nth_bv v i = False *)
+    (*    <-> bw_and (bw_and (lsl_bv ones m) (lsr_bv ones (sub size n))) v = zero}; *)
+
+    (* assert {forall j b. ult j lstart -> nth64_inv b j = False -> *)
+    (*        BV64.bw_and (BV64.lsl_bv BV64.ones (C32_64.toBig len)) b = BV64.zero}; *)
+
+    assert {forall v i. ult i (of_int 64) ->
+             BV64.nth_bv v (BV64.sub (BV64.of_int 63) (C32_64.toBig i)) = nth64_inv v i };
+    assert {forall j b. BV64.uge j (C32_64.toBig len) -> BV64.ult j (BV64.of_int 64)-> BV64.nth_bv b j = False};
+    assert {BV64.bw_and (BV64.lsl_bv BV64.ones (C32_64.toBig len)) !retval = BV64.zero};
+
     !retval
+
+  let peek_64bit (value : BV64.t) (left : BV32.t)
+    requires {ult left (of_int 64)}
+    ensures {result = nth64_inv value left}
+  =
+     let mask = BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig (sub (of_int 63) left)) in
+     let flag = (BV64.bw_and value mask <> BV64.zero) in
+     flag
+
+  let poke_8bit (byte : BV8.t) (left : BV32.t) (flag : bool)
+  requires { ult left (of_int 8) }
+  ensures  { forall i. i <> left ->
+             nth8_inv result i = nth8_inv byte i }
+  ensures  { nth8_inv result left = flag }
+  =
+    let mask = BV8.lsl_bv (BV8.of_int 1) (BV8.sub (BV8.of_int 7) (C8_32.toSmall left)) in
+    if flag
+    then
+      BV8.bw_or byte mask
+    else
+      BV8.bw_and byte (BV8.bw_not mask)
+
+  let poke_8bit_array (addr : array BV8.t) (left : BV32.t) (flag : bool)
+    writes {addr}
+    requires { 8 * (length addr) < max_int }
+    requires { to_uint left < 8 * length addr }
+    ensures  { forall i. i <> left ->
+               nth8_inv_stream addr i = nth8_inv_stream (old addr) i}
+    ensures  { forall i. 0 <= i < 8 * length addr /\ i <> to_uint left ->
+               nth8_inv_stream addr (of_int i) = nth8_inv_stream (old addr) (of_int i) }
+    ensures  { nth8_inv_stream addr left = flag }
+  =
+    'Init:
+    let i = div (to_uint left) 8 in
+    let k = urem left (of_int 8) in
+    addr[i] <- poke_8bit addr[i] k flag;
+    assert {forall j. div (to_uint j) 8 <> i \/ urem j (of_int 8) <> k <-> j <> left};
+    assert { forall j l. j <> i \/ l <> k ->
+                nth8_inv addr[j] l
+              = nth8_inv (at addr 'Init)[j] l }
+
+  function maxvalue (len : BV32.t) : BV64.t = BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig len)
+
+  let poke (start : BV32.t) (len : BV32.t) (addr : array BV8.t) (value : BV64.t)
+    writes  { addr }
+    requires{ ult len (of_int 64) }
+    requires{ to_uint start + to_uint len < two_power_size }
+    requires{ 8 * length addr < two_power_size }
+    ensures { to_uint (add start len) > 8 * length addr -> result = -1 }
+    ensures { BV64.ule (maxvalue len) value /\ to_uint (add start len) <= 8 * length addr ->
+                result = -2 }
+    ensures { BV64.ugt (maxvalue len) value /\ to_uint (add start len) <= 8 * length addr ->
+                result = 0 }
+    ensures { BV64.ugt (maxvalue len) value /\ to_uint (add start len) <= 8 * length addr ->
+              forall i. ult i start ->
+                nth8_inv_stream (old addr) i
+              = nth8_inv_stream addr i }
+    ensures { BV64.ugt (maxvalue len) value /\ to_uint (add start len) <= 8 * length addr ->
+              forall i. ult i len ->
+                nth8_inv_stream addr (add start i)
+              = nth64_inv value (add (sub (of_int 64) len) i) }
+    ensures { BV64.ugt (maxvalue len) value /\ to_uint (add start len) <= 8 * length addr ->
+              forall i. ule (add start len) i /\ to_uint i < 8 * length addr ->
+                nth8_inv_stream addr i
+              = nth8_inv_stream (old addr) i }
+  =
+    if to_uint (add start len) > 8 * length addr
+    then
+      -1                        (*error: invalid_bit_sequence*)
+    else
+
+    if BV64.uge value (maxvalue len)
+    then
+      -2                        (*error: value_too_big*)
+    else
+
+    let lstart = sub (of_int 64) len in
+    let i = ref zero in
+
+    assert { ult start (sub ones len) };
+
+    'Init:
+    while ult !i len do variant { !i with ugt }
+      invariant {ule start (add start !i)}
+      invariant {ule (add start !i) (add start len)}
+      invariant {forall k. ult k start ->
+                   nth8_inv_stream addr k
+                 = nth8_inv_stream (at addr 'Init) k}
+      invariant {forall k. ult k !i ->
+                   nth8_inv_stream addr (add start k)
+                 = nth64_inv value (add lstart k)}
+      invariant {forall k. ule (add start !i) k /\ to_uint k < 8 * length addr ->
+                   nth8_inv_stream addr k
+                 = nth8_inv_stream (at addr 'Init) k}
+
+      assert {forall j. ult j !i -> (add lstart j) <> (add lstart !i)};
+
+      let flag = peek_64bit value (add lstart !i) in
+
+      poke_8bit_array addr (add start !i) flag;
+
+      assert {nth8_inv_stream addr (add start !i)
+            = nth64_inv value (add lstart !i)};
+      assert { forall k. ult k !i ->
+                   nth8_inv_stream addr (add start k)
+                 = nth64_inv value (add lstart k)};
+      assert {forall j. ult j (add !i (of_int 1)) -> ult j !i \/ j = !i};
+
+      i := add !i (of_int 1);
+    done;
+
+    0
+
+  let peekthenpoke (start len : BV32.t) (addr : array BV8.t)
+    requires {8 * length addr < two_power_size}
+    requires {ult len (of_int 64)}
+    requires {to_uint start + to_uint len <= 8 * length addr}
+    ensures {result = 0}
+    ensures {forall i. to_uint i < 8 * length addr ->
+               nth8_inv_stream addr i = nth8_inv_stream (old addr) i}
+  =
+    assert {to_uint (add start len) <= 8 * length addr};
+    'Init:
+    let value = peek start len addr in
+    let res = poke start len addr value in
+    assert {forall i. ult i len ->
+        nth8_inv_stream addr (add start i)
+      = nth8_inv_stream (at addr 'Init) (add start i)};
+
+    assert {forall i. ule start i /\ ult i (add start len) ->
+         ult (sub i start) len};
+
+    assert {forall i. ule start i /\ ult i (add start len) /\
+    (i = (add start (sub i start))) ->
+         nth8_inv_stream addr i
+       = nth8_inv_stream (at addr 'Init) i};
+    res
+
+  let pokethenpeek (start len : BV32.t) (addr : array BV8.t) (value : BV64.t)
+    writes   {addr}
+    requires {8 * length addr < two_power_size}
+    requires {ult len (of_int 64)}
+    requires {to_uint start + to_uint len <= 8 * length addr}
+    requires {BV64.ult value (maxvalue len)}
+    ensures  {result = value}
+  =
+    assert {to_uint (add start len) <= 8 * length addr};
+    let ghost lstart = sub (of_int 64) len in
+    let poke_result = poke start len addr value in
+    assert {poke_result = 0};
+    let peek_result = peek start len addr in
+
+    assert {forall i. ult i len ->
+        nth64_inv peek_result (add lstart i)
+      = nth64_inv value (add lstart i)};
+
+    assert {forall i. ule (sub (of_int 64) len) i /\ ult i (of_int 64) ->
+           ult (add i lstart) len};
+
+    assert {forall i. ule (sub (of_int 64) len) i /\ ult i (of_int 64) /\
+            i = (add lstart (sub i lstart)) ->
+              nth64_inv peek_result i
+            = nth64_inv value i};
+
+    assert {forall i. ult i (of_int 64) ->
+            nth64_inv peek_result i
+          = nth64_inv value i};
+
+    assert {
+           forall v w.
+           forall m n. ule m n /\ ule n size ->
+           (forall i. ule m i /\ ult i n -> nth_bv v i = nth_bv w i) ->
+             bw_and v (bw_and (lsl_bv ones m) (lsr_bv ones (sub size n)))
+           = bw_and w (bw_and (lsl_bv ones m) (lsr_bv ones (sub size n)))
+    };
+
+    assert {forall a b.
+            (forall i. nth_bv a (sub (of_int 31) i)
+                     = nth_bv b (sub (of_int 31) i))
+                    <->
+            (forall i. nth_bv a i = nth_bv b i)
+    };
+
+    assert {forall i. ult i (of_int 64) -> i = sub (of_int 63) (sub (of_int 63) i)};
+
+    assert {forall v i. BV64.ult i BV64.size ->
+           BV64.nth_bv v i = nth64_inv v (sub (of_int 63) (C32_64.toSmall i)) };
+
+    assert {forall i. BV64.ult i BV64.size ->
+            BV64.nth_bv peek_result i
+          = BV64.nth_bv value i};
+
+    assert {BV64.eq peek_result value};
+
+    peek_result
 
 end

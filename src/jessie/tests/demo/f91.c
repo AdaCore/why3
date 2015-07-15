@@ -50,8 +50,6 @@ int f91(int n) {
 
 /*
 Local Variables:
-compile-command: "make rec.why3ide"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 f91.c"
 End:
 */
-
-

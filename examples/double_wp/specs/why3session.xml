@@ -6,14 +6,14 @@
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../specs.mlw" expanded="true">
-<theory name="VM_instr_spec" sum="fe73772d4d0aefd456a2417e8dd9699e" expanded="true">
+<theory name="VM_instr_spec" sum="1943bb02f4cc9845a6d8ce25911e3161" expanded="true">
  <goal name="WP_parameter ifunf" expl="VC for ifunf">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ifunf.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter ifunf.2" expl="2. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
@@ -24,26 +24,26 @@
    <goal name="WP_parameter iconstf.1.1" expl="1. VC for iconstf">
    <transf name="compute_specified">
     <goal name="WP_parameter iconstf.1.1.1" expl="1. VC for iconstf">
-    <proof prover="2"><result status="valid" time="0.08"/></proof>
+    <proof prover="2"><result status="valid" time="0.08" steps="53"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter iconstf.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter iconstf.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter iconstf.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter iconstf.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter iconstf.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
@@ -54,26 +54,26 @@
    <goal name="WP_parameter ivarf.1.1" expl="1. VC for ivarf">
    <transf name="compute_specified">
     <goal name="WP_parameter ivarf.1.1.1" expl="1. VC for ivarf">
-    <proof prover="2"><result status="valid" time="0.40"/></proof>
+    <proof prover="2"><result status="valid" time="0.40" steps="71"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter ivarf.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter ivarf.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter ivarf.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter ivarf.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter ivarf.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
@@ -91,10 +91,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter create_binop.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter create_binop.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter create_binop.4" expl="4. precondition">
   <transf name="simplify_trivial_quantification">
@@ -108,35 +108,35 @@
   </transf>
   </goal>
   <goal name="WP_parameter create_binop.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter create_binop.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter iaddf" expl="VC for iaddf">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="37"/></proof>
  </goal>
  <goal name="WP_parameter isubf" expl="VC for isubf">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="37"/></proof>
  </goal>
  <goal name="WP_parameter imulf" expl="VC for imulf">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="37"/></proof>
  </goal>
  <goal name="WP_parameter inil" expl="VC for inil">
  <transf name="split_goal_wp">
   <goal name="WP_parameter inil.1" expl="1. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter inil.1.1" expl="1. VC for inil">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="6"/></proof>
    </goal>
    <goal name="WP_parameter inil.1.2" expl="2. VC for inil">
    <transf name="inline_goal">
     <goal name="WP_parameter inil.1.2.1" expl="1. VC for inil">
     <transf name="compute_specified">
      <goal name="WP_parameter inil.1.2.1.1" expl="1. VC for inil">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
+     <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
      </goal>
     </transf>
     </goal>
@@ -153,62 +153,62 @@
    <goal name="WP_parameter ibranchf.1.1" expl="1. VC for ibranchf">
    <transf name="compute_specified">
     <goal name="WP_parameter ibranchf.1.1.1" expl="1. VC for ibranchf">
-    <proof prover="2"><result status="valid" time="0.07"/></proof>
+    <proof prover="2"><result status="valid" time="0.07" steps="38"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter ibranchf.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter ibranchf.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter ibranchf.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter ibranchf.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter ibranchf.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter create_cjump" expl="VC for create_cjump">
  <transf name="split_goal_wp">
   <goal name="WP_parameter create_cjump.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.38"/></proof>
+  <proof prover="2"><result status="valid" time="0.38" steps="312"/></proof>
   </goal>
   <goal name="WP_parameter create_cjump.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter create_cjump.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter create_cjump.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  <proof prover="2"><result status="valid" time="0.23" steps="132"/></proof>
   </goal>
   <goal name="WP_parameter create_cjump.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter create_cjump.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter ibeqf" expl="VC for ibeqf">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.07" steps="108"/></proof>
  </goal>
  <goal name="WP_parameter ibnef" expl="VC for ibnef">
- <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="2"><result status="valid" time="0.09" steps="108"/></proof>
  </goal>
  <goal name="WP_parameter iblef" expl="VC for iblef">
- <proof prover="2"><result status="valid" time="0.10"/></proof>
+ <proof prover="2"><result status="valid" time="0.10" steps="140"/></proof>
  </goal>
  <goal name="WP_parameter ibgtf" expl="VC for ibgtf">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.07" steps="142"/></proof>
  </goal>
  <goal name="WP_parameter isetvarf" expl="VC for isetvarf">
  <transf name="split_goal_wp">
@@ -217,17 +217,17 @@
    <goal name="WP_parameter isetvarf.1.1" expl="1. VC for isetvarf">
    <transf name="compute_specified">
     <goal name="WP_parameter isetvarf.1.1.1" expl="1. VC for isetvarf">
-    <proof prover="1"><result status="valid" time="3.13"/></proof>
+    <proof prover="1"><result status="valid" time="2.43"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter isetvarf.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter isetvarf.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter isetvarf.4" expl="4. precondition">
   <transf name="simplify_trivial_quantification">
@@ -241,10 +241,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter isetvarf.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter isetvarf.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="23"/></proof>
   </goal>
  </transf>
  </goal>

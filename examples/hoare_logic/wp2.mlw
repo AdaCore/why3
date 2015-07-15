@@ -262,9 +262,10 @@ end
 theory TestSemantics
 
 use import Imp
+use map.Const
 
-function my_sigma : env = IdMap.const (Vint 0)
-function my_pi : env = IdMap.const (Vint 42)
+function my_sigma : env = Const.const (Vint 0)
+function my_pi : env = Const.const (Vint 42)
 
 goal Test13 :
   eval_term my_sigma my_pi (Tconst 13) = Vint 13
@@ -459,4 +460,3 @@ Local Variables:
 compile-command: "why3ide wp2.mlw"
 End:
 *)
-

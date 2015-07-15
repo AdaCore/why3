@@ -154,13 +154,13 @@ module MachineArithmetic
   use import mach.array.Array63
   use import mach.int.Int63
 
-  predicate is_board (board: array int63) (pos: int) =
+  predicate is_board (board: array63 int63) (pos: int) =
     forall q: int. 0 <= q < pos ->
     0 <= to_int board[q] < to_int (length board)
 
   exception MInconsistent
 
-  let mcheck_is_consistent (board: array int63) (pos: int63)
+  let mcheck_is_consistent (board: array63 int63) (pos: int63)
     requires { 0 <= to_int pos < to_int (length board) }
     requires { is_board board (to_int pos + 1) }
   = try
@@ -184,7 +184,7 @@ module MachineArithmetic
   use mach.peano.Peano as P
 
   let rec mcount_bt_queens
-    (solutions: ref P.t) (board: array int63) (n: int63) (pos: int63)
+    (solutions: ref P.t) (board: array63 int63) (n: int63) (pos: int63)
     requires { to_int (length board) = to_int n }
     requires { 0 <= to_int pos <= to_int n }
     requires { is_board board (to_int pos) }
@@ -205,7 +205,7 @@ module MachineArithmetic
         i := !i + of_int 1
       done
 
-  let mcount_queens (board: array int63) (n: int63) : P.t
+  let mcount_queens (board: array63 int63) (n: int63) : P.t
     requires { to_int (length board) = to_int n }
     ensures  { true }
   =

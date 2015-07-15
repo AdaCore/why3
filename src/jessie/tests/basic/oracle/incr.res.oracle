@@ -32,33 +32,32 @@
             
             (* use ref.Ref *)
             
-            (* use mach.int.Int32 *)
+            (* use mach.bv.BVCheck32 *)
             
             goal WP_parameter_f :
-              forall x:int32.
-               to_int x <= 1000000 ->
-                in_bounds 0 &&
-                 (forall o:int32.
-                   to_int o = 0 ->
-                    in_bounds 1 &&
-                     (forall o1:int32.
-                       to_int o1 = 1 ->
-                        in_bounds (to_int x + to_int o1) &&
-                         (forall o2:int32.
-                           to_int o2 = (to_int x + to_int o1) ->
-                            (forall us_retres:int32.
-                              us_retres = o2 -> to_int us_retres = (to_int x + 1)))))
+              forall x:t.
+               to_uint x <= 1000000 ->
+                (0 <= 0 /\ 0 < two_power_size) &&
+                 (to_uint (of_int 0) = 0 ->
+                   (0 <= 1 /\ 1 < two_power_size) && (let o = of_int 1 in
+                    to_uint o = 1 ->
+                     (0 <= (to_uint x + to_uint o) /\
+                       (to_uint x + to_uint o) < two_power_size) &&
+                      (let o1 = add x o in
+                      to_uint o1 = (to_uint x + to_uint o) ->
+                       (forall us_retres:t.
+                         us_retres = o1 -> to_uint us_retres = (to_uint x + 1)))))
             
             goal WP_parameter_h :
-              forall x:int32.
-               forall g:int32.
-                (0 <= to_int x /\ to_int x <= 1000000) /\
-                 0 <= to_int g /\ to_int g <= 1000000 ->
-                 in_bounds (to_int g + to_int x) &&
-                  (forall o:int32.
-                    to_int o = (to_int g + to_int x) ->
-                     (forall g1:int32. g1 = o -> to_int g1 = (to_int g + to_int x)))
+              forall x:t.
+               forall g:t.
+                (0 <= to_uint x /\ to_uint x <= 1000000) /\
+                 0 <= to_uint g /\ to_uint g <= 1000000 ->
+                 (0 <= (to_uint g + to_uint x) /\
+                   (to_uint g + to_uint x) < two_power_size) && (let o = add g x in
+                  to_uint o = (to_uint g + to_uint x) ->
+                   (forall g1:t. g1 = o -> to_uint g1 = (to_uint g + to_uint x)))
             end
-[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2 (WP_parameter h): Valid, Valid, Valid, Timeout, Timeout
+[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
+[jessie3] Task 1 (WP_parameter f): Valid, Timeout, Valid, Timeout, Timeout
+[jessie3] Task 2 (WP_parameter h): Valid, Timeout, Valid, Timeout, Valid

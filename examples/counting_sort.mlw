@@ -136,12 +136,13 @@ module Harness
   use import Spec
   use import InPlaceCountingSort
 
-  let harness () requires { k = 2 } =
-    (* a is [0;1;0] *)
+  let harness ()
+    requires { k = 2 }
+  = (* a is [0;1;0] *)
     let a = make 3 0 in
     a[1] <- 1;
     in_place_counting_sort a;
-    (* b is now [0;0;1] *)
+    (* a is now [0;0;1] *)
     assert { numeq a 0 0 3 = 2 };
     assert { numeq a 1 0 3 = 1 };
     assert { a[0] = 0 };

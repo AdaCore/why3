@@ -5,127 +5,126 @@
 <prover id="0" name="Coq" version="8.4pl4" timelimit="15" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.4pl5" timelimit="15" memlimit="1000"/>
 <file name="../foveoos11_challenge3.mlw" expanded="true">
-<theory name="TwoEqualElements" sum="ce5d7e9b02aa2dc3800a7bae315a8d1a" expanded="true">
- <goal name="WP_parameter two_equal_elements" expl="VC for two_equal_elements" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="TwoEqualElements" sum="b8052ebf1bf7ad4bf4e049203a4fbb90" expanded="true">
+ <goal name="WP_parameter two_equal_elements" expl="VC for two_equal_elements">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter two_equal_elements.1" expl="1. array creation size">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.2" expl="2. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.3" expl="3. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.4" expl="4. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.6" expl="6. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.7" expl="7. type invariant">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.8" expl="8. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.9" expl="9. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.10" expl="10. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="66"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.11" expl="11. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.12" expl="12. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="51"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.13" expl="13. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.14" expl="14. loop invariant preservation">
-  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_1.v"><result status="valid" time="12.01"/></proof>
+  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_1.v"><result status="valid" time="12.07"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.15" expl="15. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.16" expl="16. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="62"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.17" expl="17. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.14" steps="214"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.18" expl="18. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.11" steps="64"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.19" expl="19. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.20" expl="20. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.21" expl="21. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.22" expl="22. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="62"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.23" expl="23. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.24" expl="24. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.25" expl="25. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.26" expl="26. loop invariant preservation">
-  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_2.v"><result status="valid" time="4.08"/></proof>
+  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_2.v"><result status="valid" time="3.21"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.27" expl="27. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.28" expl="28. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.29" expl="29. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.30" expl="30. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.31" expl="31. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.32" expl="32. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.33" expl="33. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.34" expl="34. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.35" expl="35. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="58"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.36" expl="36. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="71"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.37" expl="37. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.14" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.38" expl="38. loop invariant preservation">
-  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_3.v"><result status="valid" time="36.77"/></proof>
+  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_3.v"><result status="valid" time="37.00"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.39" expl="39. loop invariant preservation">
-  <proof prover="3" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_4.v"><result status="valid" time="17.47"/></proof>
+  <proof prover="0" edited="foveoos11_challenge3_WP_TwoEqualElements_WP_parameter_two_equal_elements_4.v"><result status="valid" time="14.40"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.40" expl="40. postcondition">
   <transf name="split_goal_wp">
