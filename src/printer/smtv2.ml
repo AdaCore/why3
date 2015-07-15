@@ -80,17 +80,29 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
+let check_related_loc = ref None
+let check_funct_name = ref None
+
+module TermCmp = struct
+  type t = term
+  let compare a b =
+    if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
+    then 0 else 1
+end
+
+module S = Set.Make(TermCmp)
+
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
-  mutable info_model : term list;
+  mutable info_model : S.t;
 }
 
 let debug_print_term message t =
   let form = Debug.get_debug_formatter () in
   begin
     Debug.dprintf debug message;
-    if Debug.test_flag debug then 
+    if Debug.test_flag debug then
       Pretty.print_term form t;
     Debug.dprintf debug "@.";
   end
@@ -128,21 +140,71 @@ let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let model_label = Ident.create_label "model"
+let model_vc_label = Ident.create_label "model_vc"
 
 let collect_model_ls info ls =
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
+      S.add
+      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+
+let model_trace_regexp = Str.regexp "model_trace:"
+
+let label_starts_with regexp l =
+  try
+    ignore(Str.search_forward regexp l.lab_string 0);
+    true
+  with Not_found -> false
+
+let get_label labels regexp =
+  Slab.choose (Slab.filter (label_starts_with regexp) labels)
+
+
+let labels_at_vc_pos ~labels =
+  try
+    let trace_label = get_label labels model_trace_regexp in
+    try
+      ignore(Str.search_forward (Str.regexp "@") trace_label.lab_string 0);
+      labels
+    with Not_found ->
+      let other_labels = Slab.remove trace_label labels in
+      let new_label = Ident.create_label (trace_label.lab_string^"@"^"old") in
+      Slab.add new_label other_labels
+  with Not_found ->
+    Slab.add
+      (Ident.create_label
+	 ("model_trace:" ^ (Opt.get_def "" !check_funct_name)  ^ "@result"))
+      labels
+
+let add_check_related t =
+  if Slab.mem model_vc_label t.t_label then begin
+    check_related_loc := t.t_loc;
+    try
+      let fun_label = get_label t.t_label (Str.regexp "model_func:") in
+      let str_lab = fun_label.lab_string in
+      let func_name_start = 11 in
+      let func_name_len = (String.length str_lab) - 11 in
+      check_funct_name := Some (String.sub str_lab func_name_start func_name_len);
+    with Not_found -> ()
+  end
+
+let remove_check_related t =
+  if Slab.mem model_vc_label t.t_label then begin
+    check_related_loc := None;
+    check_funct_name := None;
+  end
 
 (** expr *)
-let rec print_term info fmt t = 
-  debug_print_term "Printing term: " t; 
+let rec print_term info fmt t =
+  debug_print_term "Printing term: " t;
 
   if Slab.mem model_label t.t_label then
-    info.info_model <- (t) :: info.info_model;
+    info.info_model <- S.add t info.info_model;
 
-  match t.t_node with
+  add_check_related t;
+
+  let () = match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
@@ -176,9 +238,19 @@ let rec print_term info fmt t =
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
-          | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
-          | _ -> fprintf fmt "@[(%a@ %a)@]"
-              print_ident ls.ls_name (print_list space (print_term info)) tl
+          | [] ->
+	      let () = match !check_related_loc with
+		| None -> ()
+		| Some loc ->
+		  let labels = labels_at_vc_pos ~labels:ls.ls_name.id_label in
+		  let t_check_pos = t_label ~loc labels t in
+		  info.info_model <- S.add t_check_pos info.info_model;
+		  () in
+	      ();
+	    fprintf fmt "@[%a@]" print_ident ls.ls_name
+          | _ ->
+	    fprintf fmt "@[(%a@ %a)@]"
+	      print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
@@ -199,13 +271,20 @@ let rec print_term info fmt t =
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
+  in
 
-and print_fmla info fmt f = 
-  debug_print_term "Printing formula: " f;  
+  remove_check_related t;
+
+
+
+and print_fmla info fmt f =
+  debug_print_term "Printing formula: " f;
   if Slab.mem model_label f.t_label then
-    info.info_model <- (f) :: info.info_model;
-  
-  match f.t_node with
+    info.info_model <- S.add f info.info_model;
+
+  add_check_related f;
+
+  let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -264,7 +343,9 @@ and print_fmla info fmt f =
         print_var subject (print_term info) t
         (print_branches info subject print_fmla) bl;
       forget_var subject
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
+
+  remove_check_related f
 
 and print_branches info subject pr fmt bl = match bl with
   | [] -> assert false
@@ -330,20 +411,20 @@ let print_logic_decl info fmt (ls,def) =
     List.iter forget_var vsl
   end
 
-let print_info_model cntexample fmt info =
+let print_info_model cntexample fmt model_list info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if info_model != [] && cntexample then 
+  if model_list != [] && cntexample then
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
             (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
       fprintf fmt "@[(get-value (";
-      List.iter (fun f -> 
+      List.iter (fun f ->
 	fprintf str_formatter "%a" (print_fmla info) f;
         let s = flush_str_formatter () in
         fprintf fmt "%s " s;
-      ) info_model;
+      ) model_list;
       fprintf fmt "))@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
@@ -364,12 +445,13 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
+      let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
-      print_info_model cntexample fmt info;
-      
+      print_info_model cntexample fmt model_list info;
+
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				queried_terms = info.info_model; }
-	  
+				queried_terms = model_list; }
+
   | Plemma| Pskip -> assert false
 
 
@@ -423,12 +505,12 @@ let print_decls cntexample args =
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
   Printer.on_converter_map (fun cm ->
-      Trans.fold print_decl ((sm, cm, []),[])))
+      Trans.fold print_decl ((sm, cm, S.empty),[])))
 
-let set_produce_models fmt cntexample = 
+let set_produce_models fmt cntexample =
   if cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
-  
+
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
