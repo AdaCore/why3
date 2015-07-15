@@ -313,6 +313,48 @@ let build_model raw_model printer_mapping =
 
 (*
 ***************************************************************
+**  Filtering the model
+***************************************************************
+*)
+
+let add_loc orig_model new_model position =
+  (* Add a given location from orig_model to new_model *)
+
+  let (file_name, line_num, _, _) = (Loc.get position) in
+  let orig_model_file = get_model_file orig_model file_name in
+  let new_model_file = get_model_file new_model file_name in
+
+  if IntMap.mem line_num new_model_file then
+    (* the location already is in new_model *)
+    new_model
+  else
+    try
+      (* get the location from original model *)
+      let line_map = IntMap.find line_num orig_model_file in
+      (* add the location to new model *)
+      let new_model_file = IntMap.add line_num line_map new_model_file in
+      StringMap.add file_name new_model_file new_model
+    with Not_found ->
+      new_model
+
+let add_first_model_line filename model_file model =
+  let (line_num, cnt_info) = IntMap.min_binding model_file in
+  let mf = get_model_file model filename in
+  let mf = IntMap.add line_num cnt_info mf in
+  StringMap.add filename mf model
+
+let model_for_positions_and_decls model ~positions =
+  (* Start with empty model and add locations from model that
+     are in locations *)
+  let model_filtered = List.fold_left (add_loc model) empty_model positions in
+  (* For each file add mapping corresponding to the first line of the
+     counter-example from model to model_filtered.
+     This corresponds to function declarations *)
+  StringMap.fold add_first_model_line model model_filtered
+
+
+(*
+***************************************************************
 ** Registering model parser
 ***************************************************************
 *)

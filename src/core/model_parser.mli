@@ -10,7 +10,7 @@
 (********************************************************************)
 
 (*
-*************************************************************** 
+***************************************************************
 **  Counter-example model values
 ****************************************************************
 *)
@@ -27,19 +27,19 @@ and model_array = {
   arr_indices : arr_index list;
 }
 
-val array_create_constant : 
-  value : model_value -> 
+val array_create_constant :
+  value : model_value ->
   model_array
 (** Creates constant array with all indices equal to the parameter value. *)
 
-val array_add_element : 
-  array : model_array -> 
-  index : model_value -> 
-  value : model_value -> 
+val array_add_element :
+  array : model_array ->
+  index : model_value ->
+  value : model_value ->
   model_array
-(** Adds an element to the array. 
+(** Adds an element to the array.
     @param array : the array to that the element will be added
-    
+
     @param index : the index on which the element will be added.
     Note that the index must be of value model_value.Integer
 
@@ -50,13 +50,13 @@ val print_model_value : Format.formatter -> model_value -> unit
 
 
 (*
-*************************************************************** 
+***************************************************************
 **  Model elements
 ***************************************************************
 *)
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
-type model_element = { 
+type model_element = {
   me_name     : string;
     (** The name of the source-code element.  *)
   me_value    : model_value;
@@ -67,33 +67,33 @@ type model_element = {
     (** Why term corresponding to the element.  *)
 }
 
-val create_model_element : 
-  name     : string -> 
-  value    : model_value -> 
-  ?location : Loc.position -> 
+val create_model_element :
+  name     : string ->
+  value    : model_value ->
+  ?location : Loc.position ->
   ?term     : Term.term ->
   unit ->
   model_element
-(** Creates a counter-example model element. 
+(** Creates a counter-example model element.
     @param name : the name of the source-code element
 
     @param value  : counter-example value for the element
 
-    @param location : source-code location of the element 
-    
+    @param location : source-code location of the element
+
     @param term : why term corresponding to the element *)
 
 (*
-*************************************************************** 
+***************************************************************
 **  Model definitions
 ***************************************************************
-*)   
-type model 
+*)
+type model
 
 val empty_model : model
 
 (*
-*************************************************************** 
+***************************************************************
 **  Quering the model
 ***************************************************************
 *)
@@ -106,22 +106,41 @@ val print_model_json : Format.formatter -> model -> unit
 
 val model_to_string_json : model -> string
 
-val interleave_with_source : 
+val interleave_with_source :
   ?start_comment:string ->
   ?end_comment:string ->
-  model -> 
-  string -> 
-  string -> 
+  model ->
+  string ->
+  string ->
   string
 
 (*
-*************************************************************** 
+***************************************************************
+**  Filtering the model
+***************************************************************
+*)
+val model_for_positions_and_decls : model ->
+  positions: Loc.position list -> model
+(** Given a model and a list of source-code positions returns model
+    that contains only elements from the input model that are on these
+    positions plus for every file in the model, elements that are
+    in the positions of function declarations. Elements with other
+    positions are filtered out.
+
+    Assumes that for each file the element on the first line of the model
+    has position of function declaration.
+
+    Only filename and line number is used to identify positions.
+*)
+
+(*
+***************************************************************
 ** Registering model parser
 ***************************************************************
 *)
 type model_parser =  string -> Printer.printer_mapping -> model
-(** Parses the input string into model elements, estabilishes 
-    a mapping between these elements and mapping from printer 
+(** Parses the input string into model elements, estabilishes
+    a mapping between these elements and mapping from printer
     and builds model data structure.
 *)
 
