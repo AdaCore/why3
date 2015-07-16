@@ -43,16 +43,18 @@ MLEXECFLAGS=
 $(BD)/prover: $(CMX) $(BD)/Prover.ml
 	echo $(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
 		-o $(BD)/prover $<
-# $(CMX) $(SRC)Prover.ml
 
 %.cmx: %.ml
-	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $*.ml
+	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
+
+$(BD)/Nat__Nat.ml: Nat.mlw
+	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $< -T Nat
 
 $(BD)/%__Types.ml: %.mlw
-	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $*.mlw -T Types
+	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $< -T Types
 
 $(BD)/%__Impl.ml: %.mlw
-	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $*.mlw -T Impl
+	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $< -T Impl
 
 
 .PHONY: clean depend .depend
@@ -66,4 +68,4 @@ include .depend
 
 clean:
 	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
-	rm -f $(BD)/*__Types.ml $(BD)/*__Impl.ml
+	rm -f $(BD)/*__*.ml
