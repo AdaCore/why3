@@ -95,6 +95,8 @@ val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
     does not have a requested association. Raises [IllegalFlagTrans] if
     the type of [m] is not [[MTstring]]. *)
 
+val on_flag_t : meta -> ('a,'b) flag_trans -> ('a -> 'b trans) -> 'a -> 'b trans
+
 (** Debug Transformations *)
 
 val print_meta : Debug.flag -> meta -> task trans

@@ -23,6 +23,10 @@ let meta_select_kept = register_meta_excl "select_kept" [MTstring]
       - all:  @[mark@ every@ closed@ type@ in@ the@ task.@]\
     @]"
 
+let meta_select_kept_default =
+  register_meta_excl "select_kept_default" [MTstring]
+  ~desc:"Default@ setting@ for@ select_kept"
+
 let meta_enco_kept = register_meta_excl "enco_kept" [MTstring]
   ~desc:"Specify@ the@ type@ protection@ transformation:@;  \
     @[\
@@ -52,7 +56,8 @@ let ft_enco_kept   = ((Hstr.create 17) : (Env.env,task)  Trans.flag_trans)
 let ft_enco_poly   = ((Hstr.create 17) : (Env.env,task)  Trans.flag_trans)
 
 let select_kept def env =
-  let select = Trans.on_flag meta_select_kept ft_select_kept def env in
+  let def = Trans.on_flag meta_select_kept_default ft_select_kept def in
+  let select = Trans.on_flag_t meta_select_kept ft_select_kept def env in
   let trans task =
     let add ty acc = create_meta Libencoding.meta_kept [MAty ty] :: acc in
     let decls = Sty.fold add (Trans.apply select task) [] in

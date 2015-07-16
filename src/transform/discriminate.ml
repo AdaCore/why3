@@ -55,6 +55,18 @@ let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
       - all:  @[mark@ every@ monomorphic@ instance@ in@ the@ task.@]\
     @]"
 
+let meta_select_inst_default =
+  register_meta_excl "select_inst_default" [MTstring]
+  ~desc:"Default@ setting@ for@ select_inst"
+
+let meta_select_lskept_default =
+  register_meta_excl "select_lskept_default" [MTstring]
+  ~desc:"Default@ setting@ for@ select_lskept"
+
+let meta_select_lsinst_default =
+  register_meta_excl "select_lsinst_default" [MTstring]
+  ~desc:"Default@ setting@ for@ select_lsinst"
+
 module OHTy = OrderedHashed(struct
   type t = ty
   let tag = ty_hash
@@ -294,9 +306,14 @@ let clear_metas = Trans.fold (fun hd task ->
     | _ -> add_tdecl task hd.task_decl) None
 
 let select_lsinst env =
-  let inst   = Trans.on_flag meta_select_inst   ft_select_inst   "none" env in
-  let lskept = Trans.on_flag meta_select_lskept ft_select_lskept "none" env in
-  let lsinst = Trans.on_flag meta_select_lsinst ft_select_lsinst "none" env in
+  let select m1 m2 ft =
+    Trans.on_flag_t m1 ft (Trans.on_flag m2 ft "none") env in
+  let inst   =
+    select meta_select_inst   meta_select_inst_default   ft_select_inst   in
+  let lskept =
+    select meta_select_lskept meta_select_lskept_default ft_select_lskept in
+  let lsinst =
+    select meta_select_lsinst meta_select_lsinst_default ft_select_lsinst in
   let trans task =
     let inst   = Trans.apply inst   task in
     let lskept = Trans.apply lskept task in
