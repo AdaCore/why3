@@ -16,7 +16,9 @@
   let prefix s = "prefix " ^ s
   let mixfix s = "mixfix " ^ s
 
-  let qualid_last = function Qident x | Qdot (_, x) -> x.id_str
+  let qualid_last = function Qident x | Qdot (_, x) -> x
+
+  let use_as q = function Some x -> x | None -> qualid_last q
 
   let floc s e = Loc.extract (s,e)
 
@@ -91,9 +93,9 @@
 (* Tokens *)
 
 %token <string> LIDENT UIDENT
-%token <Ptree.integer_constant> INTEGER
+%token <Number.integer_constant> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Ptree.real_constant> FLOAT
+%token <Number.real_constant> FLOAT
 %token <string> STRING
 %token <Loc.position> POSITION
 %token <string> QUOTE_LIDENT
@@ -179,32 +181,40 @@ module_head:
 | THEORY labels(uident)  { Typing.open_module $2 }
 | MODULE labels(uident)  { Typing.open_module $2 }
 
-module_decl:
-| decl            { Typing.add_decl  (floc $startpos $endpos) $1 }
-| use_clone       { Typing.use_clone (floc $startpos $endpos) $1 }
-| namespace_head module_decl* END
-    { Typing.close_namespace (floc $startpos($1) $endpos($1)) ~import:$1 }
+scope_head:
+| SCOPE boption(IMPORT) uident
+    { Typing.open_namespace (floc $startpos $endpos) $3; $2 }
 
-namespace_head:
-| SCOPE boption(IMPORT) uident  { Typing.open_namespace $3; $2 }
+module_decl:
+| scope_head module_decl* END
+    { Typing.close_namespace (floc $startpos($1) $endpos($1)) ~import:$1 }
+| d = pure_decl | d = prog_decl | d = meta_decl
+    { Typing.add_decl (floc $startpos $endpos) d }
+| use_clone { () }
 
 (* Use and clone *)
 
 use_clone:
-| USE use                                 { ($2, None) }
-| CLONE use                               { ($2, Some []) }
-| CLONE use WITH comma_list1(clone_subst) { ($2, Some $4) }
-
-use:
-| boption(IMPORT) tqualid
-    { { use_module = $2; use_import = Some ($1, qualid_last $2) } }
-| boption(IMPORT) tqualid AS uident
-    { { use_module = $2; use_import = Some ($1, $4.id_str) } }
-| EXPORT tqualid
-    { { use_module = $2; use_import = None } }
+| USE EXPORT tqualid
+    { Typing.add_decl (floc $startpos $endpos) (Duse $3) }
+| CLONE EXPORT tqualid clone_subst
+    { Typing.add_decl (floc $startpos $endpos) (Dclone ($3, $4)) }
+| USE boption(IMPORT) tqualid option(preceded(AS, uident))
+    { let loc = floc $startpos $endpos in
+      Typing.open_namespace loc (use_as $3 $4);
+      Typing.add_decl loc (Duse $3);
+      Typing.close_namespace loc ~import:$2 }
+| CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
+    { let loc = floc $startpos $endpos in
+      Typing.open_namespace loc (use_as $3 $4);
+      Typing.add_decl loc (Dclone ($3, $5));
+      Typing.close_namespace loc ~import:$2 }
 
 clone_subst:
-| SCOPE     ns     EQUAL ns     { CSns    (floc $startpos $endpos, $2,$4) }
+| (* epsilon *)                         { [] }
+| WITH comma_list1(single_clone_subst)  { $2 }
+
+single_clone_subst:
 | TYPE qualid ty_var* EQUAL ty  { CStsym  (floc $startpos $endpos, $2,$3,$5) }
 | CONSTANT  qualid EQUAL qualid { CSfsym  (floc $startpos $endpos, $2,$4) }
 | FUNCTION  qualid EQUAL qualid { CSfsym  (floc $startpos $endpos, $2,$4) }
@@ -213,24 +223,10 @@ clone_subst:
 | LEMMA     qualid              { CSlemma (floc $startpos $endpos, $2) }
 | GOAL      qualid              { CSgoal  (floc $startpos $endpos, $2) }
 
-ns:
-| uqualid { Some $1 }
-| DOT     { None }
+(* Meta declarations *)
 
-(* Theory declarations *)
-
-decl:
-| TYPE with_list1(type_decl)                { Dtype $2 }
-| CONSTANT  constant_decl                   { Dlogic [$2] }
-| FUNCTION  function_decl  with_logic_decl* { Dlogic ($2::$3) }
-| PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
-| INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
-| COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
-| AXIOM labels(ident) COLON term            { Dprop (Decl.Paxiom, $2, $4) }
-| LEMMA labels(ident) COLON term            { Dprop (Decl.Plemma, $2, $4) }
-| GOAL  labels(ident) COLON term            { Dprop (Decl.Pgoal, $2, $4) }
-| META sident comma_list1(meta_arg)         { Dmeta ($2, $3) }
-| pdecl                                     { $1 }
+meta_decl:
+| META sident comma_list1(meta_arg)  { Dmeta ($2, $3) }
 
 meta_arg:
 | TYPE      ty      { Mty $2 }
@@ -242,6 +238,19 @@ meta_arg:
 | GOAL      qualid  { Mgl $2 }
 | STRING            { Mstr $1 }
 | INTEGER           { Mint (small_integer $1) }
+
+(* Theory declarations *)
+
+pure_decl:
+| TYPE with_list1(type_decl)                { Dtype $2 }
+| CONSTANT  constant_decl                   { Dlogic [$2] }
+| FUNCTION  function_decl  with_logic_decl* { Dlogic ($2::$3) }
+| PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
+| INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
+| COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
+| AXIOM labels(ident) COLON term            { Dprop (Decl.Paxiom, $2, $4) }
+| LEMMA labels(ident) COLON term            { Dprop (Decl.Plemma, $2, $4) }
+| GOAL  labels(ident) COLON term            { Dprop (Decl.Pgoal, $2, $4) }
 
 (* Type declarations *)
 
@@ -584,7 +593,7 @@ numeral:
 
 (* Program declarations *)
 
-pdecl:
+prog_decl:
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) EQUAL seq_expr    { Dlet ($4, $2, $3, $6) }

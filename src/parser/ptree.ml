@@ -11,14 +11,6 @@
 
 (*s Parse trees. *)
 
-type loc = Loc.position
-
-(*s Logical terms and formulas *)
-
-type integer_constant = Number.integer_constant
-type real_constant = Number.real_constant
-type constant = Number.constant
-
 type label =
   | Lstr of Ident.label
   | Lpos of Loc.position
@@ -26,8 +18,10 @@ type label =
 type ident = {
   id_str : string;
   id_lab : label list;
-  id_loc : loc;
+  id_loc : Loc.position;
 }
+
+(*s Types *)
 
 type qualid =
   | Qident of ident
@@ -40,14 +34,11 @@ type pty =
   | PTarrow of pty * pty
   | PTparen of pty
 
-type ghost = bool
-
-type binder = loc * ident option * ghost * pty option
-type param  = loc * ident option * ghost * pty
+(*s Patterns *)
 
 type pattern = {
   pat_desc : pat_desc;
-  pat_loc  : loc;
+  pat_loc  : Loc.position;
 }
 
 and pat_desc =
@@ -60,15 +51,22 @@ and pat_desc =
   | Pas of pattern * ident
   | Pcast of pattern * pty
 
+(*s Logical terms and formulas *)
+
+type ghost = bool
+
+type binder = Loc.position * ident option * ghost * pty option
+type param  = Loc.position * ident option * ghost * pty
+
 type term = {
   term_desc : term_desc;
-  term_loc  : loc;
+  term_loc  : Loc.position;
 }
 
 and term_desc =
   | Ttrue
   | Tfalse
-  | Tconst of constant
+  | Tconst of Number.constant
   | Tident of qualid
   | Tidapp of qualid * term list
   | Tapply of term * term
@@ -88,84 +86,14 @@ and term_desc =
   | Tupdate of term * (qualid * term) list
   | Tat of term * ident
 
-(*s Declarations. *)
-
-type use = {
-  use_module : qualid;
-  use_import : (bool (* import *) * string (* as *)) option;
-}
-
-type clone_subst =
-  | CSns    of loc * qualid option * qualid option
-  | CStsym  of loc * qualid * ident list * pty
-  | CSfsym  of loc * qualid * qualid
-  | CSpsym  of loc * qualid * qualid
-  | CSvsym  of loc * qualid * qualid
-  | CSlemma of loc * qualid
-  | CSgoal  of loc * qualid
-
-type field = {
-  f_loc     : loc;
-  f_ident   : ident;
-  f_pty     : pty;
-  f_mutable : bool;
-  f_ghost   : bool
-}
-
-type type_def =
-  | TDabstract
-  | TDalias     of pty
-  | TDalgebraic of (loc * ident * param list) list
-  | TDrecord    of field list
-
-type visibility = Public | Private | Abstract (* = Private + ghost fields *)
+(*s Program expressions *)
 
 type invariant = term list
-
-type type_decl = {
-  td_loc    : loc;
-  td_ident  : ident;
-  td_params : ident list;
-  td_vis    : visibility; (* records only *)
-  td_mut    : bool;       (* records or abstract types *)
-  td_inv    : invariant;  (* records only *)
-  td_def    : type_def;
-}
-
-type logic_decl = {
-  ld_loc    : loc;
-  ld_ident  : ident;
-  ld_params : param list;
-  ld_type   : pty option;
-  ld_def    : term option;
-}
-
-type ind_decl = {
-  in_loc    : loc;
-  in_ident  : ident;
-  in_params : param list;
-  in_def    : (loc * ident * term) list;
-}
-
-type metarg =
-  | Mty  of pty
-  | Mfs  of qualid
-  | Mps  of qualid
-  | Max  of qualid
-  | Mlm  of qualid
-  | Mgl  of qualid
-  | Mstr of string
-  | Mint of int
-
-type use_clone = use * clone_subst list option
-
-(* program files *)
-
 type variant = (term * qualid option) list
 
 type pre = term
-type post = loc * (pattern * term) list
-type xpost = loc * (qualid * pattern * term) list
+type post = Loc.position * (pattern * term) list
+type xpost = Loc.position * (qualid * pattern * term) list
 
 type spec = {
   sp_pre     : pre list;
@@ -180,13 +108,13 @@ type spec = {
 
 type expr = {
   expr_desc : expr_desc;
-  expr_loc  : loc;
+  expr_loc  : Loc.position;
 }
 
 and expr_desc =
   | Etrue
   | Efalse
-  | Econst of constant
+  | Econst of Number.constant
   (* lambda-calculus *)
   | Eident of qualid
   | Eidapp of qualid * expr list
@@ -223,12 +151,75 @@ and expr_desc =
 and fundef =
   ident * ghost * Expr.rs_kind * binder list * pty option * spec * expr
 
+(*s Declarations *)
+
+type field = {
+  f_loc     : Loc.position;
+  f_ident   : ident;
+  f_pty     : pty;
+  f_mutable : bool;
+  f_ghost   : bool
+}
+
+type type_def =
+  | TDabstract
+  | TDalias     of pty
+  | TDalgebraic of (Loc.position * ident * param list) list
+  | TDrecord    of field list
+
+type visibility = Public | Private | Abstract (* = Private + ghost fields *)
+
+type type_decl = {
+  td_loc    : Loc.position;
+  td_ident  : ident;
+  td_params : ident list;
+  td_vis    : visibility; (* records only *)
+  td_mut    : bool;       (* records or abstract types *)
+  td_inv    : invariant;  (* records only *)
+  td_def    : type_def;
+}
+
+type logic_decl = {
+  ld_loc    : Loc.position;
+  ld_ident  : ident;
+  ld_params : param list;
+  ld_type   : pty option;
+  ld_def    : term option;
+}
+
+type ind_decl = {
+  in_loc    : Loc.position;
+  in_ident  : ident;
+  in_params : param list;
+  in_def    : (Loc.position * ident * term) list;
+}
+
+type metarg =
+  | Mty  of pty
+  | Mfs  of qualid
+  | Mps  of qualid
+  | Max  of qualid
+  | Mlm  of qualid
+  | Mgl  of qualid
+  | Mstr of string
+  | Mint of int
+
+type clone_subst =
+  | CStsym  of Loc.position * qualid * ident list * pty
+  | CSfsym  of Loc.position * qualid * qualid
+  | CSpsym  of Loc.position * qualid * qualid
+  | CSvsym  of Loc.position * qualid * qualid
+  | CSlemma of Loc.position * qualid
+  | CSgoal  of Loc.position * qualid
+
 type decl =
   | Dtype of type_decl list
   | Dlogic of logic_decl list
   | Dind of Decl.ind_sign * ind_decl list
   | Dprop of Decl.prop_kind * ident * term
-  | Dmeta of ident * metarg list
   | Dlet of ident * ghost * Expr.rs_kind * expr
   | Drec of fundef list
   | Dexn of ident * pty
+  | Dmeta of ident * metarg list
+  | Dclone of qualid * clone_subst list
+  | Duse of qualid

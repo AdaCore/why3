@@ -966,7 +966,15 @@ let add_prop muc k s f =
 
 (* parse declarations *)
 
-let add_decl muc d =
+let find_module env file q =
+  let m = match q with
+    | Qident {id_str = nm} ->
+        (try Mstr.find nm file with Not_found -> read_module env [] nm)
+    | Qdot (p, {id_str = nm}) -> read_module env (string_list_of_qualid p) nm in
+  if Debug.test_flag Glob.flag then Glob.use (qloc_last q) m.mod_theory.th_name;
+  m
+
+let add_decl muc env file d =
   let vc = muc.muc_path = [] &&
     Debug.test_noflag debug_type_only in
   match d with
@@ -1002,6 +1010,12 @@ let add_decl muc d =
       let ity = ity_of_pty muc pty in
       let xs = create_xsymbol (create_user_id id) ity in
       add_pdecl ~vc muc (create_exn_decl xs)
+  | Ptree.Duse use ->
+      use_export muc (find_module env file use)
+  | Ptree.Dclone (use, _subst) ->
+      let m = find_module env file use in
+      warn_clone_not_abstract (qloc use) m.mod_theory;
+      Loc.errorm "cloning coming soon" (* TODO *)
 
 (* TODO
 let rec clone_ns kn sl path ns2 ns1 s =
@@ -1111,32 +1125,6 @@ let type_inst tuc t s =
   List.fold_left add_inst empty_inst s
 *)
 
-let use_clone loc muc env file (use, subst) =
-  let find_module env file q = match q with
-    | Qident { id_str = id } -> (* local module *)
-        begin try Mstr.find id file
-        with Not_found -> read_module env [] id end
-    | Qdot (p, { id_str = id }) -> (* module in file f *)
-        read_module env (string_list_of_qualid p) id in
-  let use_or_clone muc =
-    let m = find_module env file use.use_module in
-    if Debug.test_flag Glob.flag then
-      Glob.use (qloc_last use.use_module) m.mod_theory.th_name;
-    match subst with
-    | None -> use_export muc m
-    | Some _ ->
-        warn_clone_not_abstract loc m.mod_theory;
-        Loc.errorm ~loc "cloning coming soon" (* TODO *)
-  in
-  match use.use_import with
-  | Some (import, use_as) ->
-      (* use T = namespace T use_export T end *)
-      let muc = open_namespace muc use_as in
-      let muc = use_or_clone muc in
-      close_namespace muc ~import
-  | None ->
-      use_or_clone muc
-
 (* incremental parsing *)
 
 type slice = {
@@ -1174,11 +1162,22 @@ let close_module loc =
   end;
   slice.muc <- None
 
-let open_namespace nm =
-  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
+let top_muc_on_demand loc slice = match slice.muc with
+  | Some muc -> muc
+  | None ->
+      assert (Mstr.is_empty slice.file);
+      if slice.path <> [] then Loc.errorm ~loc
+        "All declarations in library files must be inside modules";
+      let muc = create_module slice.env ~path:[] (id_fresh "Top") in
+      slice.muc <- Some muc;
+      muc
+
+let open_namespace loc nm =
+  assert (not (Stack.is_empty state));
+  let slice = Stack.top state in
+  let muc = top_muc_on_demand loc slice in
   if Debug.test_noflag debug_parse_only then
-    let slice = Stack.top state in
-    slice.muc <- Some (open_namespace (Opt.get slice.muc) nm.id_str)
+    slice.muc <- Some (open_namespace muc nm.id_str)
 
 let close_namespace loc ~import =
   assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
@@ -1190,25 +1189,9 @@ let close_namespace loc ~import =
 let add_decl loc d =
   assert (not (Stack.is_empty state));
   let slice = Stack.top state in
-  let muc = match slice.muc with
-    | Some muc -> muc
-    | None ->
-        assert (Mstr.is_empty slice.file);
-        if slice.path <> [] then Loc.errorm ~loc
-          "All declarations in library files must be inside modules";
-        let muc = create_module slice.env ~path:[] (id_fresh "Top") in
-        slice.muc <- Some muc;
-        muc in
+  let muc = top_muc_on_demand loc slice in
   if Debug.test_noflag debug_parse_only then
-    let muc = Loc.try2 ~loc add_decl muc d in
-    slice.muc <- Some muc
-
-let use_clone loc use =
-  assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
-  if Debug.test_noflag debug_parse_only then
-    let slice = Stack.top state in
-    let muc = Loc.try5 ~loc use_clone loc
-      (Opt.get slice.muc) slice.env slice.file use in
+    let muc = Loc.try4 ~loc add_decl muc slice.env slice.file d in
     slice.muc <- Some muc
 
 (** Exception printing *)

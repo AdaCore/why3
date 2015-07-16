@@ -19,12 +19,10 @@ val close_file : unit -> Pmodule.pmodule Stdlib.Mstr.t
 
 val open_module : Ptree.ident -> unit
 
-val close_module : Ptree.loc -> unit
+val close_module : Loc.position -> unit
 
-val open_namespace : Ptree.ident -> unit
+val open_namespace : Loc.position -> Ptree.ident -> unit
 
-val close_namespace : Ptree.loc -> import:bool -> unit
+val close_namespace : Loc.position -> import:bool -> unit
 
-val add_decl : Ptree.loc -> Ptree.decl -> unit
-
-val use_clone : Ptree.loc -> Ptree.use_clone -> unit
+val add_decl : Loc.position -> Ptree.decl -> unit
