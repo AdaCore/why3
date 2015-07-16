@@ -488,6 +488,8 @@ let steps ~prover =
     let prover = String.sub prover 0 (min 4 (String.length prover)) in
     if prover = "CVC4" then
       50000 + c*250
+    else if prover = "Z3" then
+      100000 + c*1500
     else
       c
 
