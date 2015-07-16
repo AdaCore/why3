@@ -132,7 +132,7 @@ val model_to_string :
 val print_model_json :
   ?me_name_trans:((string * model_element_type) -> string) ->
   Format.formatter ->
-  model:model ->
+  model ->
   unit
 (** Prints counter-example model to json format.
 

@@ -283,7 +283,7 @@ let print_model_elements_on_lines_json me_name_to_str fmt model_file =
 let print_model_json
     ?(me_name_trans = why_name_trans)
     fmt
-    ~model =
+    model =
   let me_name_to_str = fun me ->
     me_name_trans (me.me_name, me.me_type) in
   Json.map_bindings
@@ -295,7 +295,7 @@ let print_model_json
 let model_to_string_json
     ?(me_name_trans = why_name_trans)
     model =
-  print_model_json str_formatter ~me_name_trans ~model;
+  print_model_json str_formatter ~me_name_trans model;
   flush_str_formatter ()
 
 
