@@ -309,18 +309,27 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
       DTtrue
   | Ptree.Tfalse ->
       DTfalse
-  | Ptree.Tunop (Ptree.Tnot, e1) ->
+  | Ptree.Tnot e1 ->
       DTnot (dterm tuc gvars at denv e1)
-  | Ptree.Tbinop (e1, op, e2) ->
+  | Ptree.Tbinop (e1, Dterm.DTiff, e23)
+  | Ptree.Tbinnop (e1, Dterm.DTiff, e23) ->
+      let rec chain loc de1 = function
+        | { term_desc = Ptree.Tbinop (e2, DTiff, e3); term_loc = loc23 } ->
+            let de2 = dterm tuc gvars at denv e2 in
+            let loc12 = loc_cutoff loc loc23 e2.term_loc in
+            let de12 = Dterm.dterm ~loc:loc12 (DTbinop (DTiff, de1, de2)) in
+            let de23 = Dterm.dterm ~loc:loc23 (chain loc23 de2 e3) in
+            DTbinop (DTand, de12, de23)
+        | { term_desc = Ptree.Tbinop (_, DTimplies, _); term_loc = loc23 } ->
+            Loc.errorm ~loc:loc23 "An unparenthesized implication cannot be \
+              placed at the right hand side of an equivalence"
+        | e23 ->
+            DTbinop (DTiff, de1, (dterm tuc gvars at denv e23)) in
+      chain loc (dterm tuc gvars at denv e1) e23
+  | Ptree.Tbinop (e1, op, e2)
+  | Ptree.Tbinnop (e1, op, e2) ->
       let e1 = dterm tuc gvars at denv e1 in
       let e2 = dterm tuc gvars at denv e2 in
-      let op = match op with
-        | Ptree.Tand -> DTand
-        | Ptree.Tand_asym -> DTand_asym
-        | Ptree.Tor -> DTor
-        | Ptree.Tor_asym -> DTor_asym
-        | Ptree.Timplies -> DTimplies
-        | Ptree.Tiff -> DTiff in
       DTbinop (op, e1, e2)
   | Ptree.Tquant (q, uqu, trl, e1) ->
       let qvl = List.map (quant_var tuc) uqu in
@@ -328,10 +337,6 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
       let dterm e = dterm tuc gvars at denv e in
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
-      let q = match q with
-        | Ptree.Tforall -> DTforall
-        | Ptree.Texists -> DTexists
-        | Ptree.Tlambda -> DTlambda in
       DTquant (q, qvl, trl, e1)
   | Ptree.Trecord fl ->
       let get_val cs pj = function

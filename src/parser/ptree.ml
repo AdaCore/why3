@@ -23,15 +23,6 @@ type label =
   | Lstr of Ident.label
   | Lpos of Loc.position
 
-type quant =
-  | Tforall | Texists | Tlambda
-
-type binop =
-  | Tand | Tand_asym | Tor | Tor_asym | Timplies | Tiff
-
-type unop =
-  | Tnot
-
 type ident = {
   id_str : string;
   id_lab : label list;
@@ -83,10 +74,11 @@ and term_desc =
   | Tapply of term * term
   | Tinfix of term * ident * term
   | Tinnfix of term * ident * term
-  | Tbinop of term * binop * term
-  | Tunop of unop * term
+  | Tbinop of term * Dterm.dbinop * term
+  | Tbinnop of term * Dterm.dbinop * term
+  | Tnot of term
   | Tif of term * term * term
-  | Tquant of quant * binder list * term list list * term
+  | Tquant of Dterm.dquant * binder list * term list list * term
   | Tnamed of label * term
   | Tlet of ident * term * term
   | Tmatch of term * (pattern * term) list

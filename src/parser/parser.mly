@@ -461,9 +461,11 @@ term: t = mk_term(term_) { t }
 term_:
 | term_arg_
     { match $1 with (* break the infix relation chain *)
-      | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
+      | Tinfix (l,o,r) -> Tinnfix (l,o,r)
+      | Tbinop (l,o,r) -> Tbinnop (l,o,r)
+      | d -> d }
 | NOT term
-    { Tunop (Tnot, $2) }
+    { Tnot $2 }
 | OLD term
     { Tat ($2, mk_id "0" $startpos($1) $endpos($1)) }
 | term AT uident
@@ -506,7 +508,7 @@ term_:
 | quant comma_list1(quant_vars) triggers DOT term
     { Tquant ($1, List.concat $2, $3, $5) }
 | FUN binders ARROW term
-    { Tquant (Tlambda, $2, [], $4) }
+    { Tquant (Dterm.DTlambda, $2, [], $4) }
 | EPSILON
     { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
 | label term %prec prec_named
@@ -515,7 +517,7 @@ term_:
     { Tcast ($1, $2) }
 
 lam_defn:
-| binders EQUAL term  { Tquant (Tlambda, $1, [], $3) }
+| binders EQUAL term  { Tquant (Dterm.DTlambda, $1, [], $3) }
 
 term_arg: mk_term(term_arg_) { $1 }
 term_dot: mk_term(term_dot_) { $1 }
@@ -565,16 +567,16 @@ triggers:
 | LEFTSQ separated_nonempty_list(BAR,comma_list1(term)) RIGHTSQ { $2 }
 
 %inline bin_op:
-| ARROW   { Timplies }
-| LRARROW { Tiff }
-| OR      { Tor }
-| BARBAR  { Tor_asym }
-| AND     { Tand }
-| AMPAMP  { Tand_asym }
+| ARROW   { Dterm.DTimplies }
+| LRARROW { Dterm.DTiff }
+| OR      { Dterm.DTor }
+| BARBAR  { Dterm.DTor_asym }
+| AND     { Dterm.DTand }
+| AMPAMP  { Dterm.DTand_asym }
 
 quant:
-| FORALL  { Tforall }
-| EXISTS  { Texists }
+| FORALL  { Dterm.DTforall }
+| EXISTS  { Dterm.DTexists }
 
 numeral:
 | INTEGER { Number.ConstInt $1 }
