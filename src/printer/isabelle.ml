@@ -89,7 +89,7 @@ type info = {
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_altname_path info fmt id =
-  attribs "altname" string
+  attribs "altname" html_string
     (print_option (attrib "path" string))
     fmt (id.id_string, Mid.find_opt id info.theories)
 
