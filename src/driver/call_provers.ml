@@ -137,7 +137,7 @@ let print_prover_result fmt
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if m <> Model_parser.empty_model then begin
     fprintf fmt "\nCounter-example model:";
-    Model_parser.print_model fmt ~model:m ()
+    Model_parser.print_model fmt m
   end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."

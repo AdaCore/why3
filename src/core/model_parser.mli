@@ -112,8 +112,7 @@ val empty_model : model
 val print_model :
   ?me_name_trans:((string * model_element_type) -> string) ->
   Format.formatter ->
-  model:model ->
-  unit ->
+  model ->
   unit
 (** Prints the counter-example model
 

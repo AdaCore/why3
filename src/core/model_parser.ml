@@ -183,13 +183,13 @@ let why_name_trans (me_name, me_type) =
 let print_model
     ?(me_name_trans = why_name_trans)
     fmt
-    ~model () =
+    model =
   StringMap.iter (print_model_file fmt me_name_trans) model
 
 let model_to_string
     ?(me_name_trans = why_name_trans)
     model =
-  print_model ~me_name_trans str_formatter ~model ();
+  print_model ~me_name_trans str_formatter model;
   flush_str_formatter ()
 
 let get_model_file model filename =
