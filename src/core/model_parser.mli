@@ -17,7 +17,7 @@
 type model_value =
  | Integer of string
  | Array of model_array
- | Other of string
+ | Unparsed of string
 and  arr_index = {
   arr_index_key : int;
   arr_index_value : model_value;
@@ -54,11 +54,22 @@ val print_model_value : Format.formatter -> model_value -> unit
 **  Model elements
 ***************************************************************
 *)
+
+type model_element_type =
+| Result
+  (* Result of a function call (if the counter-example is for postcondition)  *)
+| Old
+  (* Old value of function argument (if the counter-example is for postcondition)  *)
+| Other
+
+
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
   me_name     : string;
     (** The name of the source-code element.  *)
+  me_type     : model_element_type;
+    (** The type of model element. *)
   me_value    : model_value;
     (** Counter-example value for the element. *)
   me_location : Loc.position option;
@@ -98,21 +109,68 @@ val empty_model : model
 ***************************************************************
 *)
 
-val print_model : Format.formatter -> model -> unit
+val print_model :
+  ?me_name_trans:((string * model_element_type) -> string) ->
+  Format.formatter ->
+  model:model ->
+  unit ->
+  unit
+(** Prints the counter-example model
 
-val model_to_string : model -> string
+    @param me_name_trans the transformation of the model elements
+      names. The input is a pair consisting of the name of model
+      element and type of the model element. The output is the
+      name of the model element that should be displayed.
+    @param model the counter-example model to print
+*)
 
-val print_model_json : Format.formatter -> model -> unit
+val model_to_string :
+  ?me_name_trans:((string * model_element_type) -> string) ->
+  model ->
+  string
+(** See print_model  *)
 
-val model_to_string_json : model -> string
+val print_model_json :
+  ?me_name_trans:((string * model_element_type) -> string) ->
+  Format.formatter ->
+  model:model ->
+  unit
+(** Prints counter-example model to json format.
+
+    @param me_name_trans see print_model
+    @model the counter-example model to print.
+*)
+
+val model_to_string_json :
+  ?me_name_trans:((string * model_element_type) -> string) ->
+  model ->
+  string
+(** See print_model_json *)
 
 val interleave_with_source :
   ?start_comment:string ->
   ?end_comment:string ->
+  ?me_name_trans:((string * model_element_type) -> string) ->
   model ->
-  string ->
-  string ->
+  filename:string ->
+  source_code:string ->
   string
+(** Given a source code and a counter-example model interleaves
+    the source code with information in about the counter-example.
+    That is, for each location in counter-example trace creates
+    a comment in the output source code with information about
+    values of counter-example model elements.
+
+    @param start_comment the string that starts a comment
+    @param end_comment the string that ends a comment
+    @param me_name_trans see print_model
+    @param model counter-example model
+    @param filename the file name of the source
+    @param source_code the input source code
+
+    @return the source code with added comments with information
+    about counter-example model
+*)
 
 (*
 ***************************************************************

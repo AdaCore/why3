@@ -643,12 +643,10 @@ let update_tabs a =
         match a.S.proof_state with
 	  | S.Done r ->
 	    if r.Call_provers.pr_model <> Model_parser.empty_model then begin
-	      Model_parser.model_to_string r.Call_provers.pr_model ^ "\n" ^
-		Model_parser.model_to_string_json r.Call_provers.pr_model ^ "\n\n" ^
-		(Model_parser.interleave_with_source 
-		   r.Call_provers.pr_model
-		   !current_file
-		   (Sysutil.file_contents !current_file))
+	      Model_parser.interleave_with_source
+		r.Call_provers.pr_model
+		~filename:!current_file
+		~source_code:(Sysutil.file_contents !current_file)
 	    end else
 	      ""
 	  | _ -> ""

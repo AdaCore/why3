@@ -137,7 +137,7 @@ let print_prover_result fmt
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if m <> Model_parser.empty_model then begin
     fprintf fmt "\nCounter-example model:";
-    Model_parser.print_model fmt m
+    Model_parser.print_model fmt ~model:m ()
   end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
@@ -168,8 +168,9 @@ type pre_prover_call = unit -> prover_call
 let save f = f ^ ".save"
 
 let debug_print_model model =
-  Debug.dprintf debug "Call_provers: %s@." (Model_parser.model_to_string model)
-  
+  let model_str = Model_parser.model_to_string model in
+  Debug.dprintf debug "Call_provers: %s@." model_str
+
 
 let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
   let ans = match ret with

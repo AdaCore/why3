@@ -43,7 +43,7 @@ end
     | Lstr lab ->
       lab = model_label
 
-  let model_lab_present labels = 
+  let model_lab_present labels =
     try
       ignore(List.find is_model_label labels);
       true
@@ -55,9 +55,9 @@ end
   let is_model_trace_label l =
     match l with
     | Lpos _ -> false
-    | Lstr lab -> 
+    | Lstr lab ->
       try
-	ignore(Str.search_forward model_trace_regexp lab.lab_string 0);
+	ignore(Str.search_forward model_trace_regexp lab.Ident.lab_string 0);
 	true
       with Not_found -> false
 
@@ -69,10 +69,10 @@ end
       false
 
   let add_model_trace name labels =
-    if (model_lab_present labels) && (not (model_trace_lab_present labels)) then 
+    if (model_lab_present labels) && (not (model_trace_lab_present labels)) then
       (Lstr (Ident.create_label ("model_trace:" ^ name)))::labels
     else
-      labels  
+      labels
 
   let add_lab id l =
     let l = add_model_trace id.id_str l in

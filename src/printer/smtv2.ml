@@ -87,7 +87,7 @@ type vc_line_info = {
   mutable vc_loc : Loc.position option;
   (* the position of VC line *)
   mutable vc_func_name : string option;
-  (* the name of the function (just for the case VC is
+  (* the name of the function. None if VC is not generated for
      postcondition or precondition) *)
 }
 
@@ -170,22 +170,46 @@ let label_starts_with regexp l =
 let get_label labels regexp =
   Slab.choose (Slab.filter (label_starts_with regexp) labels)
 
+let add_old lab_str =
+  try
+    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
+    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
+    if after = "@init" then
+      (String.sub lab_str 0 pos) ^ "@old"
+    else lab_str
+  with Not_found -> lab_str ^ "@old"
 
-let labels_at_vc_pos ~labels =
+let model_trace_for_postcondition ~labels =
+  (* Modifies the  model_trace label of a term in the postcondition:
+     - if term corresponds to the initial value of a function
+     parameter, model_trace label will have postfix @old
+     - if term corresponds to the return value of a function, add
+     model_trace label in a form function_name@result
+  *)
   try
     let trace_label = get_label labels model_trace_regexp in
-    try
-      ignore(Str.search_forward (Str.regexp "@") trace_label.lab_string 0);
+    let lab_str = add_old trace_label.lab_string in
+    if lab_str = trace_label.lab_string then
       labels
-    with Not_found ->
+    else
       let other_labels = Slab.remove trace_label labels in
-      let new_label = Ident.create_label (trace_label.lab_string^"@"^"old") in
-      Slab.add new_label other_labels
+      Slab.add
+	(Ident.create_label lab_str)
+	other_labels
   with Not_found ->
+    (* no model_trace label => the term represents the return value *)
     Slab.add
       (Ident.create_label
 	 ("model_trace:" ^ (Opt.get_def "" vc_line_info.vc_func_name)  ^ "@result"))
       labels
+
+let get_fun_name name =
+  let splitted = Str.bounded_split (Str.regexp_string ":") name 2 in
+  match splitted with
+  | _::[second] ->
+    second
+  | _ ->
+    ""
 
 let check_enter_vc_line t =
   (* Check whether the term corresponding to the line of VC is entered.
@@ -198,11 +222,8 @@ let check_enter_vc_line t =
     vc_line_info.vc_loc <- t.t_loc;
     try
       (* Extract the function name from "model_func" label *)
-      let fun_label = get_label t.t_label (Str.regexp "model_func:") in
-      let str_lab = fun_label.lab_string in
-      let func_name_start = 11 in
-      let func_name_len = (String.length str_lab) - 11 in
-      vc_line_info.vc_func_name <- Some (String.sub str_lab func_name_start func_name_len);
+      let fun_label = get_label t.t_label (Str.regexp "model_func") in
+      vc_line_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
     with Not_found ->
       (* No label "model_func" => the VC is not postcondition or precondition *)
       ()
@@ -262,7 +283,11 @@ let rec print_term info fmt t =
 	      match vc_line_info.vc_loc with
 	      | None -> ()
 	      | Some loc ->
-		let labels = labels_at_vc_pos ~labels:ls.ls_name.id_label in
+		let labels = match vc_line_info.vc_func_name with
+		  | None ->
+		    ls.ls_name.id_label
+		  | Some _ ->
+		    model_trace_for_postcondition ~labels:ls.ls_name.id_label in
 		let t_check_pos = t_label ~loc labels t in
 		info.info_model <- S.add t_check_pos info.info_model;
 	    end;
