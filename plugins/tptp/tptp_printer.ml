@@ -57,6 +57,7 @@ type info = {
   info_num : tptp_number;
   info_srt : ty Mty.t ref;
   info_urg : string list ref;
+  info_rules : Decl.Spr.t;
 }
 
 let complex_type = Wty.memoize 3 (fun ty ->
@@ -247,22 +248,34 @@ let print_decl info fmt d = match d.d_node with
       "TPTP does not support inductive predicates, use eliminate_inductive"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      let head = if info.info_fmt = FOF then "fof" else "tff" in
-      fprintf fmt "@[<hov 2>%s(%a, axiom,@ %a).@]@\n@\n"
-        head print_pr pr (print_fmla info) f
+(*
+    Format.eprintf "Dprop for %s: rewrite rules:" pr.pr_name.id_string;
+    Spr.iter (fun pr -> Format.eprintf " %s" pr.pr_name.id_string) info.info_rules;
+    Format.eprintf "@.";
+*)
+    let annotation = if Spr.mem pr info.info_rules then ",rewrite" else "" in
+    let head = if info.info_fmt = FOF then "fof" else "tff" in
+    fprintf fmt "@[<hov 2>%s(%a, axiom,@ %a%s).@]@\n@\n"
+      head print_pr pr (print_fmla info) f annotation
   | Dprop (Pgoal, pr, f) ->
       let head = if info.info_fmt = FOF then "fof" else "tff" in
       fprintf fmt "@[<hov 2>%s(%a, conjecture,@ %a).@]@\n"
         head print_pr pr (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
-let print_decls fm nm =
+let print_decls fm nm rew_rules =
+(*
+  Format.eprintf "rewrite rules:";
+  Spr.iter (fun pr -> Format.eprintf " %s" pr.pr_name.id_string) rew_rules;
+  Format.eprintf "@.";
+*)
   let print_decl (sm,fm,ct) fmt d =
     let info = { info_syn = sm;
                  info_fmt = fm;
                  info_num = nm;
                  info_srt = ref ct;
-                 info_urg = ref [] } in
+                 info_urg = ref [];
+                 info_rules = rew_rules } in
     try print_decl info fmt d;
         (sm,fm,!(info.info_srt)), !(info.info_urg)
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
@@ -272,7 +285,6 @@ let print_decls fm nm =
     Trans.fold print_decl ((sm,fm,Mty.empty),[]))
 
 let print_task fm nm =
-  let print_decls = print_decls fm nm in
   fun args ?old:_ fmt task ->
     (* In trans-based p-printing [forget_all] is a no-no *)
     (* forget_all ident_printer; *)
@@ -281,7 +293,10 @@ let print_task fm nm =
     let rec print = function
       | x :: r -> print r; Pp.string fmt x
       | [] -> () in
-    print (snd (Trans.apply print_decls task));
+    let print_decls_with_meta =
+      Trans.on_tagged_pr Compute.meta_rewrite (print_decls fm nm)
+    in
+    print (snd (Trans.apply print_decls_with_meta task));
     pp_print_flush fmt ()
 
 let () =
@@ -429,7 +444,9 @@ let print_dfg args ?old:_ fmt task =
     info_fmt = FOF;
     info_num = TPTP;
     info_urg = ref [];
-    info_srt = ref Mty.empty } in
+    info_srt = ref Mty.empty ;
+    info_rules = Spr.empty;
+  } in
   let dl = Task.task_decls task in
   let tl = List.filter (is_type info) dl in
   let fl = List.filter (is_function info) dl in
