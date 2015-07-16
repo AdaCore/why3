@@ -1,0 +1,379 @@
+module Spec
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  type symbol 'b0 = | Var_symbol 'b0
+    
+  
+  function nat_size_symbol (t:symbol 'b0) : nat =
+    match t with | Var_symbol v0 -> one_nat end
+  
+  with size_symbol (t:symbol 'b0) : int = match t with | Var_symbol v0 -> 1
+    end
+  
+  let rec lemma size_positive_lemma_symbol (t:symbol 'b0) : unit
+    ensures { size_symbol t > 0 } variant { nat_to_int (nat_size_symbol t) }
+    = match t with | Var_symbol v0 -> () end
+  
+  function rename_symbol (t:symbol 'b0) (s0:func 'b0 'c0) : symbol 'c0 =
+    match t with | Var_symbol v0 -> Var_symbol (s0 v0) end
+  
+  let rec lemma renaming_composition_lemma_symbol (t:symbol 'b0)
+    (s10:func 'b0 'c0) (s20:func 'c0 'd0) : unit
+    ensures { rename_symbol (rename_symbol t s10) s20 =
+      rename_symbol t (rcompose s10 s20) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let rec lemma renaming_identity_lemma_symbol (t:symbol 'b0) : unit
+    ensures { rename_symbol t identity = t } variant { size_symbol t } =
+    match t with | Var_symbol v0 -> () end
+  
+  (* Abstraction definition axiom :
+      function rename_subst_symbol (s0:func 'b0 (symbol 'c0))
+        (s10:func 'c0 'd0) : func 'b0 (symbol 'd0) =
+        (\ x:'b0.rename_symbol (s0 x) s10)
+      *)
+  function rename_subst_symbol (s0:func 'b0 (symbol 'c0))
+    (s10:func 'c0 'd0) : func 'b0 (symbol 'd0)
+  axiom rename_subst_symbol_definition :
+    forall s0:func 'b0 (symbol 'c0), s10:func 'c0 'd0, x:'b0.
+    rename_subst_symbol s0 s10 x = rename_symbol (s0 x) s10
+  
+  let lemma associativity_subst_rename_rename_lemma_symbol
+    (s1:func 'b0 (symbol 'c0)) (s20:func 'c0 'd0) (s30:func 'd0 'e0) : unit
+    ensures { rename_subst_symbol s1 (rcompose s20 s30) =
+      rename_subst_symbol (rename_subst_symbol s1 s20) s30 }
+    =
+    assert {
+      extensionalEqual (rename_subst_symbol s1 (rcompose s20 s30))
+        (rename_subst_symbol (rename_subst_symbol s1 s20) s30)
+      }
+  
+  let lemma associativity_rename_subst_rename_lemma_symbol (s1:func 'b0 'c0)
+    (s20:func 'c0 (symbol 'd0)) (s30:func 'd0 'e0) : unit
+    ensures { rcompose s1 (rename_subst_symbol s20 s30) =
+      rename_subst_symbol (rcompose s1 s20) s30 }
+    =
+    assert {
+      extensionalEqual (rcompose s1 (rename_subst_symbol s20 s30))
+        (rename_subst_symbol (rcompose s1 s20) s30)
+      }
+  
+  let lemma right_rename_subst_by_identity_lemma_symbol
+    (s0:func 'b0 (symbol 'c0)) : unit
+    ensures { rename_subst_symbol s0 identity = s0 } =
+    assert { extensionalEqual (rename_subst_symbol s0 identity) (s0) }
+  
+  function olifts_symbol (s:func 'b0 (symbol 'c0)) :
+    func (option 'b0) (symbol (option 'c0)) =
+    ocase (rename_subst_symbol s some) (Var_symbol None)
+  
+  let lemma olifts_composition_lemma_rename_subst_symbol (s1:func 'b0 'c0)
+    (s20:func 'c0 (symbol 'd0)) : unit
+    ensures { (olifts_symbol (rcompose s1 s20)) =
+      rcompose (olift s1) (olifts_symbol s20) }
+    =
+    assert {
+      forall x:option 'b0.
+        match x with | None ->
+          eval ((olifts_symbol (rcompose s1 s20))) x =
+            eval (rcompose (olift s1) (olifts_symbol s20)) x
+          | Some y ->
+          eval ((olifts_symbol (rcompose s1 s20))) x =
+            eval (rcompose s1 (rename_subst_symbol s20 some)) y =
+            eval ((rename_subst_symbol (olifts_symbol s20) identity)) (
+              rcompose s1 some y) =
+            eval (rcompose (olift s1) (olifts_symbol s20)) x
+        end
+      } ;
+    assert {
+      extensionalEqual ((olifts_symbol (rcompose s1 s20)))
+        (rcompose (olift s1) (olifts_symbol s20))
+      }
+  
+  let lemma olifts_composition_lemma_subst_rename_symbol
+    (s1:func 'b0 (symbol 'c0)) (s20:func 'c0 'd0) : unit
+    ensures { (olifts_symbol (rename_subst_symbol s1 s20)) =
+      rename_subst_symbol (olifts_symbol s1) (olift s20) }
+    =
+    assert {
+      forall x:option 'b0.
+        match x with | None ->
+          eval ((olifts_symbol (rename_subst_symbol s1 s20))) x =
+            eval (rename_subst_symbol (olifts_symbol s1) (olift s20)) x
+          | Some y ->
+          eval ((olifts_symbol (rename_subst_symbol s1 s20))) x =
+            eval (rename_subst_symbol s1 (rcompose s20 some)) y =
+            rename_symbol (rename_symbol (s1 y) some) (olift s20) =
+            eval (rename_subst_symbol (olifts_symbol s1) (olift s20)) x
+        end
+      } ;
+    assert {
+      extensionalEqual ((olifts_symbol (rename_subst_symbol s1 s20)))
+        (rename_subst_symbol (olifts_symbol s1) (olift s20))
+      }
+  
+  function subst_symbol (t:symbol 'b0) (s0:func 'b0 (symbol 'c0)) :
+    symbol 'c0 = match t with | Var_symbol v0 -> s0 v0 end
+  
+  let rec lemma rename_then_subst_composition_lemma_symbol (t:symbol 'b0)
+    (s10:func 'b0 'c0) (s20:func 'c0 (symbol 'd0)) : unit
+    ensures { subst_symbol (rename_symbol t s10) s20 =
+      subst_symbol t (rcompose s10 s20) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let rec lemma subst_then_rename_composition_lemma_symbol (t:symbol 'b0)
+    (s10:func 'b0 (symbol 'c0)) (s20:func 'c0 'd0) : unit
+    ensures { rename_symbol (subst_symbol t s10) s20 =
+      subst_symbol t (rename_subst_symbol s10 s20) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  (* Abstraction definition axiom :
+      function subst_compose_symbol (s0:func 'b0 (symbol 'c0))
+        (s10:func 'c0 (symbol 'd0)) : func 'b0 (symbol 'd0) =
+        (\ x:'b0.subst_symbol (s0 x) s10)
+      *)
+  function subst_compose_symbol (s0:func 'b0 (symbol 'c0))
+    (s10:func 'c0 (symbol 'd0)) : func 'b0 (symbol 'd0)
+  axiom subst_compose_symbol_definition :
+    forall s0:func 'b0 (symbol 'c0), s10:func 'c0 (symbol 'd0), x:'b0.
+    subst_compose_symbol s0 s10 x = subst_symbol (s0 x) s10
+  
+  let lemma associativity_rename_subst_subst_lemma_symbol (s1:func 'b0 'c0)
+    (s20:func 'c0 (symbol 'd0)) (s30:func 'd0 (symbol 'e0)) : unit
+    ensures { rcompose s1 (subst_compose_symbol s20 s30) =
+      subst_compose_symbol (rcompose s1 s20) s30 }
+    =
+    assert {
+      extensionalEqual (rcompose s1 (subst_compose_symbol s20 s30))
+        (subst_compose_symbol (rcompose s1 s20) s30)
+      }
+  
+  let lemma associativity_subst_rename_subst_lemma_symbol
+    (s1:func 'b0 (symbol 'c0)) (s20:func 'c0 'd0)
+    (s30:func 'd0 (symbol 'e0)) : unit
+    ensures { subst_compose_symbol s1 (rcompose s20 s30) =
+      subst_compose_symbol (rename_subst_symbol s1 s20) s30 }
+    =
+    assert {
+      extensionalEqual (subst_compose_symbol s1 (rcompose s20 s30))
+        (subst_compose_symbol (rename_subst_symbol s1 s20) s30)
+      }
+  
+  let lemma associativity_subst_subst_rename_lemma_symbol
+    (s1:func 'b0 (symbol 'c0)) (s20:func 'c0 (symbol 'd0))
+    (s30:func 'd0 'e0) : unit
+    ensures { subst_compose_symbol s1 (rename_subst_symbol s20 s30) =
+      rename_subst_symbol (subst_compose_symbol s1 s20) s30 }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_symbol s1 (rename_subst_symbol s20 s30))
+        (rename_subst_symbol (subst_compose_symbol s1 s20) s30)
+      }
+  
+  let lemma olifts_composition_lemma_subst_subst_symbol
+    (s1:func 'b0 (symbol 'c0)) (s20:func 'c0 (symbol 'd0)) : unit
+    ensures { (olifts_symbol (subst_compose_symbol s1 s20)) =
+      subst_compose_symbol (olifts_symbol s1) (olifts_symbol s20) }
+    =
+    assert {
+      forall x:option 'b0.
+        match x with | None ->
+          eval ((olifts_symbol (subst_compose_symbol s1 s20))) x =
+            eval
+              (subst_compose_symbol (olifts_symbol s1) (olifts_symbol s20)) x
+          | Some y ->
+          eval ((olifts_symbol (subst_compose_symbol s1 s20))) x =
+            eval (subst_compose_symbol s1 (rename_subst_symbol s20 some)) y =
+            subst_symbol (rename_symbol (s1 y) some)
+              (rename_subst_symbol (olifts_symbol s20) identity) =
+            eval
+              (subst_compose_symbol (olifts_symbol s1) (olifts_symbol s20)) x
+        end
+      } ;
+    assert {
+      extensionalEqual ((olifts_symbol (subst_compose_symbol s1 s20)))
+        (subst_compose_symbol (olifts_symbol s1) (olifts_symbol s20))
+      }
+  
+  let rec lemma subst_composition_lemma_symbol (t:symbol 'b0)
+    (s10:func 'b0 (symbol 'c0)) (s20:func 'c0 (symbol 'd0)) : unit
+    ensures { subst_symbol (subst_symbol t s10) s20 =
+      subst_symbol t (subst_compose_symbol s10 s20) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let lemma associativity_subst_subst_subst_lemma_symbol
+    (s1:func 'b0 (symbol 'c0)) (s20:func 'c0 (symbol 'd0))
+    (s30:func 'd0 (symbol 'e0)) : unit
+    ensures { subst_compose_symbol s1 (subst_compose_symbol s20 s30) =
+      subst_compose_symbol (subst_compose_symbol s1 s20) s30 }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_symbol s1 (subst_compose_symbol s20 s30))
+        (subst_compose_symbol (subst_compose_symbol s1 s20) s30)
+      }
+  
+  (* Abstraction definition axiom :
+      constant subst_id_symbol : func 'b0 (symbol 'b0) =
+        (\ x:'b0. Var_symbol x)*)
+  constant subst_id_symbol : func 'b0 (symbol 'b0)
+  axiom subst_id_symbol_definition :
+    forall x:'b0.
+      eval (subst_id_symbol : func 'b0 (symbol 'b0)) x = Var_symbol x
+  
+  function subst_of_rename_symbol (r:func 'b0 'c0) : func 'b0 (symbol 'c0) =
+    rcompose r subst_id_symbol
+  
+  let lemma olifts_identity_symbol (u:unit) : unit
+    ensures { (olifts_symbol (subst_id_symbol : func 'b0 (symbol 'b0))) =
+      subst_id_symbol }
+    =
+    assert {
+      forall x:option 'b0.
+        match x with
+          | None ->
+            eval ((olifts_symbol (subst_id_symbol : func 'b0 (symbol 'b0))))
+              x
+            = eval (subst_id_symbol) x
+          | Some y ->
+            eval ((olifts_symbol (subst_id_symbol : func 'b0 (symbol 'b0))))
+              x
+            = eval (subst_id_symbol) x
+        end
+      } ;
+    assert { extensionalEqual
+      ((olifts_symbol (subst_id_symbol : func 'b0 (symbol 'b0))))
+      (subst_id_symbol) }
+  
+  let lemma left_rename_subst_identity_lemma_symbol (s0:func 'b0 'c0) : unit
+    ensures {
+      rename_subst_symbol (subst_id_symbol : func 'b0 (symbol 'b0)) s0 =
+      subst_of_rename_symbol s0 }
+    =
+    assert {
+      extensionalEqual
+        (rename_subst_symbol (subst_id_symbol : func 'b0 (symbol 'b0)) s0)
+        (subst_of_rename_symbol s0)
+      }
+  
+  let rec lemma subst_identity_lemma_symbol (t:symbol 'b0) : unit
+    ensures { subst_symbol t subst_id_symbol = t } variant { size_symbol t }
+    = match t with | Var_symbol v0 -> () end
+  
+  let lemma left_subst_subst_identity_lemma_symbol
+    (s0:func 'b0 (symbol 'c0)) : unit
+    ensures {
+      subst_compose_symbol (subst_id_symbol : func 'b0 (symbol 'b0)) s0 = s0
+      }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_symbol (subst_id_symbol : func 'b0 (symbol 'b0)) s0)
+        (s0)
+      }
+  
+  let lemma right_subst_subst_by_identity_lemma_symbol
+    (s0:func 'b0 (symbol 'c0)) : unit
+    ensures { subst_compose_symbol s0 subst_id_symbol = s0 } =
+    assert { extensionalEqual (subst_compose_symbol s0 subst_id_symbol) (s0)
+      }
+  
+  let rec lemma renaming_preserve_size_symbol (t:symbol 'b0)
+    (s0:func 'b0 'c0) : unit
+    ensures { size_symbol (rename_symbol t s0) = size_symbol t }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  predicate is_symbol_free_var_in_symbol (x:'b0) (t:symbol 'b0) =
+    match t with | Var_symbol v0 -> v0 = x end
+  
+  let rec ghost rename_free_var_constructive_inversion_symbol_symbol (x:'c0)
+    (t:symbol 'b0) (s0:func 'b0 'c0) : 'b0
+    requires { is_symbol_free_var_in_symbol x (rename_symbol t s0) }
+    ensures { is_symbol_free_var_in_symbol result t /\ s0 result = x }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> v0 end
+  
+  with lemma rename_free_var_inversion_symbol_symbol (x:'c0) (t:symbol 'b0)
+    (s0:func 'b0 'c0) : unit
+    requires { is_symbol_free_var_in_symbol x (rename_symbol t s0) }
+    ensures { exists y:'b0. is_symbol_free_var_in_symbol y t /\ s0 y = x }
+    variant { 1 + size_symbol t } =
+    let sumx = rename_free_var_constructive_inversion_symbol_symbol x t s0 in
+    ()
+  
+  let rec lemma rename_free_var_propagation_symbol_symbol (x:'b0)
+    (t:symbol 'b0) (s0:func 'b0 'c0) : unit
+    ensures { is_symbol_free_var_in_symbol x t ->
+      is_symbol_free_var_in_symbol (s0 x) (rename_symbol t s0) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let rec ghost subst_free_var_constructive_inversion_symbol_symbol (x:'c0)
+    (t:symbol 'b0) (s0:func 'b0 (symbol 'c0)) : 'b0
+    requires { is_symbol_free_var_in_symbol x (subst_symbol t s0) }
+    ensures { let sumx = result in is_symbol_free_var_in_symbol sumx t /\
+      is_symbol_free_var_in_symbol x (s0 sumx) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> v0 end
+  
+  with lemma subst_free_var_inversion_symbol_symbol (x:'c0) (t:symbol 'b0)
+    (s0:func 'b0 (symbol 'c0)) : unit
+    requires { is_symbol_free_var_in_symbol x (subst_symbol t s0) }
+    ensures {
+      (exists y:'b0. is_symbol_free_var_in_symbol y t /\
+         is_symbol_free_var_in_symbol x (s0 y))
+      }
+    variant { 1 + size_symbol t } =
+    let sumx = subst_free_var_constructive_inversion_symbol_symbol x t s0 in
+    ()
+  
+  let rec lemma subst_free_var_propagation_symbol_symbol_symbol (x:'b0)
+    (y:'c0) (t:symbol 'b0) (s0:func 'b0 (symbol 'c0)):  unit
+    ensures {
+      is_symbol_free_var_in_symbol x t /\
+        is_symbol_free_var_in_symbol y (s0 x) ->
+      is_symbol_free_var_in_symbol y (subst_symbol t s0) }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let rec lemma free_var_equivalence_of_subst_symbol (t:symbol 'b0)
+    (s10:func 'b0 (symbol 'c0)) (s20:func 'b0 (symbol 'c0)) : unit
+    requires {
+      forall x:'b0. is_symbol_free_var_in_symbol x t -> s10 x = s20 x }
+    ensures { subst_symbol t s10 = subst_symbol t s20 }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let lemma free_var_equivalence_of_rename_symbol (t:symbol 'b0)
+    (s10:func 'b0 'c0) (s20:func 'b0 'c0) : unit
+    requires {
+      forall x:'b0. is_symbol_free_var_in_symbol x t -> s10 x = s20 x }
+    ensures { rename_symbol t s10 = rename_symbol t s20 } =
+    free_var_equivalence_of_subst_symbol t (subst_of_rename_symbol s10)
+      (subst_of_rename_symbol s20)
+  
+  let rec lemma free_var_derive_equivalence_of_subst_symbol (t:symbol 'b0)
+    (s10:func 'b0 (symbol 'c0)) (s20:func 'b0 (symbol 'c0)) : unit
+    ensures { forall x:'b0. is_symbol_free_var_in_symbol x t -> s10 x = s20 x
+      }
+    requires { subst_symbol t s10 = subst_symbol t s20 }
+    variant { size_symbol t } = match t with | Var_symbol v0 -> () end
+  
+  let lemma free_var_derive_equivalence_of_rename_symbol (t:symbol 'b0)
+    (s10:func 'b0 'c0) (s20:func 'b0 'c0) : unit
+    ensures { forall x:'b0. is_symbol_free_var_in_symbol x t -> s10 x = s20 x
+      }
+    requires { rename_symbol t s10 = rename_symbol t s20 } =
+    free_var_derive_equivalence_of_subst_symbol t
+      (subst_of_rename_symbol s10) (subst_of_rename_symbol s20);
+    assert {
+      forall x:'b0. (subst_of_rename_symbol s10 x:symbol 'c0) =
+        (subst_of_rename_symbol s20 x:symbol 'c0) ->
+        (Var_symbol (s10 x):symbol 'c0) = (Var_symbol (s20 x):symbol 'c0) &&
+        s10 x = s20 x
+      }
+  
+  
+end
+
+
