@@ -358,7 +358,7 @@ let create_let_decl ld =
     let v,f = open_post q in t_subst_single v t f in
   let conv_post t ql = List.map (conv_post t) ql in
   let cty_axiom id cty f =
-    (* FIXME: this is unsound in presence of aliases *)
+    (* the absence of aliases in checked in add_pdecl *)
     let add_old o v m = Mvs.add o.pv_vs (t_var v.pv_vs) m in
     let sbs = Mpv.fold add_old cty.cty_oldies Mvs.empty in
     let f = List.fold_right t_implies cty.cty_pre (t_subst sbs f) in

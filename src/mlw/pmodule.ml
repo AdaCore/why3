@@ -212,6 +212,32 @@ let close_module uc =
   store_module m;
   m
 
+let count_regions {muc_known = kn} {pv_ity = ity} mr =
+  let add_reg r mr = Mreg.change (fun n -> Some (n <> None)) r mr in
+  let meet mr1 mr2 = Mreg.union (fun _ x y -> Some (x || y)) mr1 mr2 in
+  let join mr1 mr2 = Mreg.union (fun _ _ _ -> Some true) mr1 mr2 in
+  let rec down mr ity = if ity.ity_pure then mr else
+    match ity.ity_node with
+    | Ityreg r -> fields (add_reg r mr) r.reg_its r.reg_args r.reg_regs
+    | Ityapp (s,tl,rl) -> fields mr s tl rl
+    | Itypur (s,tl) -> fields mr s tl []
+    | Ityvar _ -> mr
+  and fields mr s tl rl = if s.its_privmut then mr else
+    let add_arg isb v ity = ity_match isb (ity_var v) ity in
+    let isb = List.fold_left2 add_arg isb_empty s.its_ts.ts_args tl in
+    let isb = List.fold_left2 reg_match isb s.its_regions rl in
+    let add_ity mr ity = down mr (ity_full_inst isb ity) in
+    let add_proj mr f = add_ity mr f.rs_cty.cty_result in
+    let add_field mr v = add_ity mr v.pv_ity in
+    let d = find_its_defn kn s in
+    if d.itd_constructors = [] then
+      List.fold_left add_proj mr d.itd_fields
+    else
+      join mr (List.fold_left (fun mr c ->
+        meet mr (List.fold_left add_field Mreg.empty c.rs_cty.cty_args))
+        Mreg.empty d.itd_constructors) in
+  down mr ity
+
 let add_symbol add id v uc =
   store_path uc [] id;
   match uc.muc_import, uc.muc_export with
@@ -226,6 +252,16 @@ let add_pdecl uc d =
     muc_known = known_add_decl uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news } in
   let add_rs uc s = add_symbol add_ps s.rs_name (RS s) uc in
+  let add_rs_noalias uc s = match s.rs_logic with
+    | RLls _ | RLlemma ->
+        let sv = s.rs_cty.cty_effect.eff_reads in
+        let mr = Spv.fold (count_regions uc) sv Mreg.empty in
+        Mreg.iter (fun _ n ->
+          if n then Loc.errorm ?loc:s.rs_name.id_loc
+            "The type of this function contains an alias") mr;
+        add_rs uc s
+    | _ -> add_rs uc s in
+  let add_rd uc d = add_rs_noalias uc d.rec_sym in
   match d.pd_node with
   | PDtype tdl ->
       let add uc d =
@@ -234,8 +270,8 @@ let add_pdecl uc d =
         add_symbol add_ts d.itd_its.its_ts.ts_name d.itd_its uc in
       List.fold_left add uc tdl
   | PDlet (LDvar (v,_)) -> add_symbol add_ps v.pv_vs.vs_name (PV v) uc
-  | PDlet (LDsym (s,_)) -> add_rs uc s
-  | PDlet (LDrec l) -> List.fold_left (fun uc d -> add_rs uc d.rec_sym) uc l
+  | PDlet (LDsym (s,_)) -> add_rs_noalias uc s
+  | PDlet (LDrec l) -> List.fold_left add_rd uc l
   | PDexn xs -> add_symbol add_xs xs.xs_name xs uc
   | PDpure -> uc
 
