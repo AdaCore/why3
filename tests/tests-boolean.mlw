@@ -1,0 +1,22 @@
+
+module M
+
+  use import bool.Bool
+
+  let f (a b : bool)
+    ensures {
+      (andb (orb a b) (notb (andb a b)) = True)
+      <->
+      ( ( a = True \/ b = True ) /\ not ( a = True /\ b = True) )
+}
+  = ()
+
+  let g (a b : bool)
+    ensures {
+      (xorb a b = True)
+      <->
+      ( ( a = True \/ b = True ) /\ not ( a = True /\ b = True) )
+}
+  = ()
+
+end
