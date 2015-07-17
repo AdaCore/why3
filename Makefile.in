@@ -120,11 +120,6 @@ CLEANDIRS =
 CLEANLIBS =
 GENERATED =
 
-install_local::
-	ln -s -n -f ../drivers share/drivers
-	ln -s -n -f ../modules share/modules
-	ln -s -n -f ../theories share/theories
-
 ##############
 # Why3 library
 ##############
@@ -554,6 +549,17 @@ install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
+
+install_local:: share/drivers share/modules share/theories
+
+share/drivers:
+	ln -snf ../drivers share/drivers
+
+share/modules:
+	ln -snf ../modules share/modules
+
+share/theories:
+	ln -snf ../theories share/theories
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(TOOLSDEP)
