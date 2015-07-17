@@ -1095,6 +1095,7 @@ let spec_invariant env pvs vty spec =
 (** Abstract values *)
 
 let warn_unused s loc =
+  if not (Debug.test_flag Dterm.debug_ignore_unused_var) then
   if s = "" || s.[0] <> '_' then
   Warning.emit ?loc "unused variable %s" s
 

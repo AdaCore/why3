@@ -103,6 +103,8 @@ val dterm : ?loc:Loc.position -> dterm_node -> dterm
 
 (** Final stage *)
 
+val debug_ignore_unused_var : Debug.flag
+
 val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 
 val fmla : ?strict:bool -> ?keep_loc:bool -> dterm -> term
