@@ -245,8 +245,11 @@ let     ity_r_occurs r ity = Util.any ity_r_fold (reg_r_occurs r) ity
 let rec ity_r_stale reg cvr exp ity =
   exp && not ity.ity_pure && match ity.ity_node with
   | Ityreg r -> reg_r_stale reg cvr r
+  | Itypur (s,tl) when its_impure s ->
+      (* snapshot types expose every argument *)
+      List.exists (ity_r_stale reg cvr true) tl
+  | Itypur (s,tl) -> its_r_stale reg cvr s tl []
   | Ityapp (s,tl,rl) -> its_r_stale reg cvr s tl rl
-  | Itypur (_,tl) -> List.exists (ity_r_stale reg cvr true) tl
   | Ityvar _ -> false
 
 and reg_r_stale reg cvr r =
@@ -295,7 +298,7 @@ let rec ity_v_immutable vars imm ity =
       List.fold_left2 ity_v_immutable vars s.its_arg_imm tl
   | Ityvar _ -> vars
 
-let ity_v_immutable vars ity = ity_v_immutable vars true ity
+let ity_v_immutable vars ity = ity_v_immutable vars false ity
 
 (* detect exposed type variables *)
 
@@ -303,11 +306,16 @@ let rec ity_v_exposed vars exp ity =
   match ity.ity_node with
   | _ when not exp -> vars
   | Ityreg _ -> vars
+  | Itypur (s,tl) when its_impure s ->
+      (* snapshot types expose every argument *)
+      List.fold_left ity_v_exposed_true vars tl
   | Ityapp (s,tl,_) | Itypur (s,tl) ->
       List.fold_left2 ity_v_exposed vars s.its_arg_exp tl
   | Ityvar v -> Stv.add v vars
 
-let ity_v_exposed vars ity = ity_v_exposed vars true ity
+and ity_v_exposed_true vars ity = ity_v_exposed vars true ity
+
+let ity_v_exposed = ity_v_exposed_true
 
 (* smart constructors *)
 
