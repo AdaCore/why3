@@ -35,7 +35,7 @@ CMI=$(patsubst %,%.cmi,$(ML))
 OCAMLC=ocamlopt.opt
 INCLUDES=-I $(BD) $(INCLUDE)
 LIBS=nums.cmxa why3__BuiltIn.cmx int__Int.cmx array__Array.cmx
-WHY3INC=-L .
+WHY3FLAGS=-L . --debug ignore_unused_vars
 MLFLAGS=
 MLIFLAGS=
 MLEXECFLAGS=
@@ -48,13 +48,13 @@ $(BD)/prover: $(CMX) $(BD)/Prover.ml
 	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
 
 $(BD)/Nat__Nat.ml: Nat.mlw
-	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $< -T Nat
+	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Nat
 
 $(BD)/%__Types.ml: %.mlw
-	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $< -T Types
+	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Types
 
 $(BD)/%__Impl.ml: %.mlw
-	why3 $(WHY3INC) extract -D ocaml64 -o $(BD) $< -T Impl
+	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Impl
 
 
 .PHONY: clean depend .depend
@@ -64,7 +64,9 @@ depend: .depend
 .depend: Makefile $(patsubst %,%.ml,$(ML))
 	ocamldep.opt -I $(BD) $(patsubst %,%.ml,$(ML)) > .depend
 
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include .depend
+endif
 
 clean:
 	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
