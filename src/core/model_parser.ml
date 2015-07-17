@@ -16,7 +16,13 @@ open Ident
 open Printer
 
 (*
-*************************************************************** 
+let debug = Debug.register_info_flag "model_parser"
+  ~desc:"Print@ debugging@ messages@ about@ parsing@ \
+         the@ counter-example@ model."
+*)
+
+(*
+***************************************************************
 **  Counter-example model values
 ****************************************************************
 *)
@@ -24,7 +30,7 @@ open Printer
 type model_value =
  | Integer of string
  | Array of model_array
- | Other of string
+ | Unparsed of string
 and  arr_index = {
   arr_index_key : int;
   arr_index_value : model_value;
@@ -41,8 +47,8 @@ let array_create_constant ~value =
   }
 
 let array_add_element ~array ~index ~value =
-  (* 
-     Adds the element value to the array on specified index. 
+  (*
+     Adds the element value to the array on specified index.
   *)
   let int_index = match index with
     | Integer s -> int_of_string s
@@ -64,7 +70,7 @@ let rec print_indices sanit_print fmt indices =
     print_model_value_sanit sanit_print fmt index.arr_index_value;
     print_indices sanit_print fmt tail
 and
-print_array sanit_print fmt arr = 
+print_array sanit_print fmt arr =
   fprintf fmt "{others -> ";
   print_model_value_sanit sanit_print fmt arr.arr_others;
   print_indices sanit_print fmt arr.arr_indices;
@@ -74,7 +80,7 @@ print_model_value_sanit sanit_print fmt value =
   (* Prints model value. *)
   match value with
   | Integer s -> sanit_print fmt s
-  | Other s -> sanit_print fmt s
+  | Unparsed s -> sanit_print fmt s
   | Array a -> print_array sanit_print fmt a
 
 let print_model_value fmt value =
@@ -82,20 +88,41 @@ let print_model_value fmt value =
 
 
 (*
-*************************************************************** 
+***************************************************************
 **  Model elements
 ***************************************************************
 *)
-type model_element = { 
+type model_element_type =
+| Result
+| Old
+| Other
+
+type model_element = {
   me_name     : string;
+  me_type     : model_element_type;
   me_value    : model_value;
   me_location : Loc.position option;
   me_term     : Term.term option;
 }
 
+let split_me_name name =
+  let splitted = Str.bounded_split (Str.regexp_string "@") name 2 in
+  match splitted with
+  | [first] -> (first, "")
+  | first::[second] ->
+    (first, second)
+  | _ -> (* here, "_" can only stand for [] *)
+    ("", "")
+
 let create_model_element ~name ~value ?location ?term () =
+  let (name, type_s) = split_me_name name in
+  let t = match type_s with
+    | "result" -> Result
+    | "old" -> Old
+    | _ -> Other in
   {
     me_name = name;
+    me_type = t;
     me_value = value;
     me_location = location;
     me_term = term;
@@ -109,10 +136,10 @@ let print_location fmt m_element =
 *)
 
 (*
-*************************************************************** 
+***************************************************************
 **  Model definitions
 ***************************************************************
-*)   
+*)
 module IntMap = Map.Make(struct type t  = int let compare = compare end)
 module StringMap = Map.Make(String)
 
@@ -127,36 +154,42 @@ type model_parser =  string -> Printer.printer_mapping -> model
 type raw_model_parser =  string -> model_element list
 
 (*
-*************************************************************** 
+***************************************************************
 **  Quering the model
 ***************************************************************
 *)
+let print_model_element me_name_trans fmt m_element =
+  let me_name = me_name_trans (m_element.me_name, m_element.me_type) in
+  fprintf fmt  "%s = %a"
+      me_name print_model_value m_element.me_value
 
-let print_model_element fmt m_element =
-  fprintf fmt  "%s = %a" 
-      m_element.me_name print_model_value m_element.me_value
+let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
 
-let print_model_elements ?(delimiter = "\n") fmt m_elements =
-  List.iter 
-    (fun m_element ->
-      print_model_element fmt m_element;
-      fprintf fmt "%s" delimiter
-    ) 
-    m_elements
-
-let print_model_file fmt filename model_file =
-  fprintf fmt "File %s:\n" filename;
-  IntMap.iter 
+let print_model_file fmt me_name_trans filename model_file =
+  fprintf fmt "File %s:" filename;
+  IntMap.iter
     (fun line m_elements ->
-      fprintf fmt "Line %d:\n" line;
-      print_model_elements fmt m_elements) 
+      fprintf fmt "\nLine %d:\n" line;
+      print_model_elements me_name_trans fmt m_elements)
     model_file
 
-let print_model fmt model =
-  StringMap.iter (print_model_file fmt) model
+let why_name_trans (me_name, me_type) =
+  match me_type with
+  | Result -> "result"
+  | Old -> "old" ^ " " ^ me_name
+  | Other -> me_name
 
-let model_to_string model =
-  print_model str_formatter model;
+let print_model
+    ?(me_name_trans = why_name_trans)
+    fmt
+    model =
+  StringMap.iter (print_model_file fmt me_name_trans) model
+
+let model_to_string
+    ?(me_name_trans = why_name_trans)
+    model =
+  print_model ~me_name_trans str_formatter model;
   flush_str_formatter ()
 
 let get_model_file model filename =
@@ -172,39 +205,46 @@ let get_elements model_file line_number =
     []
 
 let get_padding line =
-  try 
+  try
     let r = Str.regexp " *" in
     ignore (Str.search_forward r line 0);
     Str.matched_string line
   with Not_found -> ""
 
-let interleave_line start_comment end_comment model_file (source_code, line_number) line =
+let interleave_line
+    start_comment
+    end_comment
+    me_name_trans
+    model_file
+    (source_code, line_number)
+    line =
   try
     let model_elements = IntMap.find line_number model_file in
-
-    print_model_elements str_formatter model_elements ~delimiter:"; ";
-    let cntexmp_line = 
+    print_model_elements me_name_trans str_formatter model_elements ~sep:"; ";
+    let cntexmp_line =
       (get_padding line) ^
-	start_comment ^ 
-	(flush_str_formatter ()) ^ 
+	start_comment ^
+	(flush_str_formatter ()) ^
 	end_comment in
 
     (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1)
   with Not_found ->
     (source_code ^ line, line_number + 1)
-  
 
-let interleave_with_source 
-    ?(start_comment="(* ") 
-    ?(end_comment=" *)") 
-    model 
-    filename 
-    source_code =
+
+let interleave_with_source
+    ?(start_comment="(* ")
+    ?(end_comment=" *)")
+    ?(me_name_trans = why_name_trans)
+    model
+    ~filename
+    ~source_code =
   try
     let model_file = StringMap.find  filename model in
     let lines = Str.split (Str.regexp "^") source_code in
     let (source_code, _) = List.fold_left
-      (interleave_line start_comment end_comment model_file)
+      (interleave_line
+	 start_comment end_comment me_name_trans model_file)
       ("", 1)
       lines in
     source_code
@@ -219,41 +259,48 @@ let print_model_value_json fmt me_value =
   fprintf fmt "%a" (print_model_value_sanit Json.string) me_value
 
 let model_elements_to_map_bindings model_elements =
-  List.fold_left 
+  List.fold_left
     (fun map_bindings me ->
-      (me.me_name, me.me_value)::map_bindings
+      (me, me.me_value)::map_bindings
     )
-    [] 
+    []
     model_elements
 
-let print_model_elements_json fmt model_elements =
-  Json.map_bindings 
-    (fun i -> i)
+let print_model_elements_json me_name_to_str fmt model_elements =
+  Json.map_bindings
+    me_name_to_str
     print_model_value_json
     fmt
     (model_elements_to_map_bindings model_elements)
-    
-let print_model_elements_on_lines_json fmt model_file =
+
+let print_model_elements_on_lines_json me_name_to_str fmt model_file =
   Json.map_bindings
     (fun i -> string_of_int i)
-    print_model_elements_json
+    (print_model_elements_json me_name_to_str)
     fmt
     (IntMap.bindings model_file)
-    
-let print_model_json fmt model =
-  Json.map_bindings 
-    (fun s -> s) 
-    print_model_elements_on_lines_json
-    fmt 
+
+let print_model_json
+    ?(me_name_trans = why_name_trans)
+    fmt
+    model =
+  let me_name_to_str = fun me ->
+    me_name_trans (me.me_name, me.me_type) in
+  Json.map_bindings
+    (fun s -> s)
+    (print_model_elements_on_lines_json me_name_to_str)
+    fmt
     (StringMap.bindings model)
-    
-let model_to_string_json model =
-  print_model_json str_formatter model;
+
+let model_to_string_json
+    ?(me_name_trans = why_name_trans)
+    model =
+  print_model_json str_formatter ~me_name_trans model;
   flush_str_formatter ()
 
 
 (*
-*************************************************************** 
+***************************************************************
 **  Building the model from raw model
 ***************************************************************
 *)
@@ -275,14 +322,14 @@ let rec extract_element_name labels raw_string regexp =
   | [] -> raw_string
   | label::labels_tail ->
     let l_string = label.lab_string in
-    begin 
-      try 
+    begin
+      try
 	ignore(Str.search_forward regexp l_string 0);
 	let end_pos = Str.match_end () in
 	String.sub l_string end_pos ((String.length l_string) - end_pos)
       with Not_found -> extract_element_name labels_tail raw_string regexp
     end
-    
+
 let get_element_name term raw_string  =
   let labels = Slab.elements term.t_label in
   let regexp = Str.regexp "model_trace:" in
@@ -293,32 +340,74 @@ let rec build_model_rec raw_model terms model =
 match raw_model with
   | [] -> model
   | model_element::raw_strings_tail ->
-    let (element_name, element_location, element_term, terms_tail) = 
+    let (element_name, element_location, element_term, terms_tail) =
       match terms with
       | [] -> (model_element.me_name, None, None, [])
-      | term::t_tail -> 
-        ((get_element_name term model_element.me_name), 
-         term.t_loc, 
+      | term::t_tail ->
+        ((get_element_name term model_element.me_name),
+         term.t_loc,
          Some term, t_tail) in
     let new_model_element = create_model_element
-      ~name:element_name 
-      ~value:model_element.me_value 
-      ?location:element_location 
-      ?term:element_term 
+      ~name:element_name
+      ~value:model_element.me_value
+      ?location:element_location
+      ?term:element_term
       () in
     let model = add_to_model model new_model_element in
-    build_model_rec 
-      raw_strings_tail 
-      terms_tail 
+    build_model_rec
+      raw_strings_tail
+      terms_tail
       model
-  
+
 
 let build_model raw_model printer_mapping =
   build_model_rec raw_model printer_mapping.queried_terms empty_model
 
 
 (*
-*************************************************************** 
+***************************************************************
+**  Filtering the model
+***************************************************************
+*)
+
+let add_loc orig_model new_model position =
+  (* Add a given location from orig_model to new_model *)
+
+  let (file_name, line_num, _, _) = (Loc.get position) in
+  let orig_model_file = get_model_file orig_model file_name in
+  let new_model_file = get_model_file new_model file_name in
+
+  if IntMap.mem line_num new_model_file then
+    (* the location already is in new_model *)
+    new_model
+  else
+    try
+      (* get the location from original model *)
+      let line_map = IntMap.find line_num orig_model_file in
+      (* add the location to new model *)
+      let new_model_file = IntMap.add line_num line_map new_model_file in
+      StringMap.add file_name new_model_file new_model
+    with Not_found ->
+      new_model
+
+let add_first_model_line filename model_file model =
+  let (line_num, cnt_info) = IntMap.min_binding model_file in
+  let mf = get_model_file model filename in
+  let mf = IntMap.add line_num cnt_info mf in
+  StringMap.add filename mf model
+
+let model_for_positions_and_decls model ~positions =
+  (* Start with empty model and add locations from model that
+     are in locations *)
+  let model_filtered = List.fold_left (add_loc model) empty_model positions in
+  (* For each file add mapping corresponding to the first line of the
+     counter-example from model to model_filtered.
+     This corresponds to function declarations *)
+  StringMap.fold add_first_model_line model model_filtered
+
+
+(*
+***************************************************************
 ** Registering model parser
 ***************************************************************
 *)

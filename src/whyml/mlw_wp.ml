@@ -302,7 +302,7 @@ let append_to_model_trace_label ~labels ~to_append =
     Slab.add new_trace_label labels_without_trace
   with Not_found -> labels
 
-(* The counter-example model related data needed for creating new 
+(* The counter-example model related data needed for creating new
    variable. *)
 type model_data = {
   md_append_to_model_trace : string;
@@ -311,10 +311,10 @@ type model_data = {
   md_loc                   : Loc.position option;
     (* The location of the new variable. *)
   md_context_labels         : Slab.t option;
-    (* The labels of an element that represents the context in 
+    (* The labels of an element that represents the context in
        that the variable is created.
-       Used in SPARK branch - the SPARK locations are kept in 
-       labels and when a new variable is created, these location 
+       Used in SPARK branch - the SPARK locations are kept in
+       labels and when a new variable is created, these location
        labels are copied from md_context_labels. *)
 }
 
@@ -322,21 +322,22 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
 (* Creates new counter-example model related data.
    @param loc : the location of the new variable
 
-   @param context_labels : The labels of an element that represents the context in that 
+   @param context_labels : The labels of an element that represents the context in that
    the variable is created.
-   Used in SPARK branch - the SPARK locations are kept in labels and when a new 
+   Used in SPARK branch - the SPARK locations are kept in labels and when a new
    variable is created, these location labels are copied from md_context_labels.
 
-   @param append_to_model_trace : The string that will be appended to the end of 
+   @param append_to_model_trace : The string that will be appended to the end of
    "model_trace:" label. It is used to specify the reason why the variable is created. *)
-  { 
+  {
     md_append_to_model_trace = append_to_model_trace;
     md_loc = loc;
     md_context_labels = context_labels;
   }
-    
+
 let mk_var id ty md =
-  let new_labels = append_to_model_trace_label ~labels:id.id_label ~to_append:md.md_append_to_model_trace in
+  let new_labels =
+    append_to_model_trace_label ~labels:id.id_label ~to_append:md.md_append_to_model_trace in
 
   create_vsymbol (id_fresh ~label:new_labels ?loc:md.md_loc id.id_string) ty
 
@@ -418,7 +419,7 @@ let quantify md env regs f =
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
     let md = match md.md_loc with
-      | None -> create_model_data 
+      | None -> create_model_data
 	?loc:id.id_loc ~context_labels:id.id_label md.md_append_to_model_trace
       | _ -> md in
     mk_var id ty md in
@@ -1137,7 +1138,7 @@ module Subst : sig
    (* [havoc md env regions s] generates a new state in which all regions in
       [regions] are touched and all other regions unchanged. The result pair
       (s',f) is the new state [s'] and a formula [f] which defines the new
-      values in [s'] with respect to the input state [s]. 
+      values in [s'] with respect to the input state [s].
       The parameter md can be used to pass information about new
       variables created in the new state.
 *)
@@ -1169,7 +1170,7 @@ module Subst : sig
       labeled subterms, these will be appropriately dealt with. *)
 
    val add_pvar : model_data option -> pvsymbol -> t -> t
-   (* [add_pvar md v s] adds the variable v to s, if it is mutable. 
+   (* [add_pvar md v s] adds the variable v to s, if it is mutable.
       The parameter md can be used to pass information about new
       variables created in the new state. *)
 
@@ -1202,16 +1203,16 @@ end = struct
     in
 
     let md = match md with
-      | None -> 
+      | None ->
 	create_model_data "fast wp - from region "
       | Some md -> md in
-    
+
     mk_var name reg.reg_ity md
 
   let fresh_var_from_var md vs =
     let md = match md with
-      | None -> 
-        create_model_data 
+      | None ->
+        create_model_data
 	  "fast wp - from var" ?loc:vs.vs_name.id_loc
       | Some md -> md in
 
@@ -1632,7 +1633,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
       let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call") in 
+      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call") in
       let state_after_call, call_glue =
         Subst.havoc md env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->

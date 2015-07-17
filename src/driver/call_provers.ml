@@ -168,8 +168,9 @@ type pre_prover_call = unit -> prover_call
 let save f = f ^ ".save"
 
 let debug_print_model model =
-  Debug.dprintf debug "Call_provers: %s@." (Model_parser.model_to_string model)
-  
+  let model_str = Model_parser.model_to_string model in
+  Debug.dprintf debug "Call_provers: %s@." model_str
+
 
 let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
   let ans = match ret with
