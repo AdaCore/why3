@@ -184,16 +184,18 @@ let ts_of_ls env ls decls =
   Sts.fold add_ts sts decls
 
 (* The Core of the transformation *)
-let map env d = match d.d_node with
-  | Dtype _ -> [d]
-  | Ddata _ -> Printer.unsupportedDecl d
+let map metas_rewrite_pr env d =
+  let decls,metas =
+    match d.d_node with
+    | Dtype _ -> [d],[]
+    | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
-  | Dparam ls ->
+    | Dparam ls ->
       let lls = Mtyl.values (Mls.find_def Mtyl.empty ls env) in
       let lds = List.map create_param_decl lls in
-      ts_of_ls env ls (d::lds)
-  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+      ts_of_ls env ls (d::lds),[]
+    | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let f = ls_defn_axiom ld in
       let substs = ty_quant env f in
       let conv_f tvar (defns,axioms) =
@@ -208,7 +210,7 @@ let map env d = match d.d_node with
               defns, create_prop_decl Paxiom pr f :: axioms
       in
       let defns,axioms = Ssubst.fold conv_f substs ([],[]) in
-      ts_of_ls env ls (List.rev_append defns axioms)
+      ts_of_ls env ls (List.rev_append defns axioms),[]
   | Dlogic _ -> Printer.unsupportedDecl d
       "Recursively-defined symbols are not supported, run eliminate_recursion"
   | Dind _ -> Printer.unsupportedDecl d
@@ -216,7 +218,7 @@ let map env d = match d.d_node with
   | Dprop (k,pr,f) ->
       let substs = ty_quant env f in
       let substs_len = Ssubst.cardinal substs in
-      let conv_f tvar task =
+      let conv_f tvar (task,metas) =
         (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
         (*   (t_ty_subst tvar Mvs.empty f) *)
         (*   print_env env; *)
@@ -224,18 +226,24 @@ let map env d = match d.d_node with
         let f = t_app_map (find_logic env) f in
         (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)
         (*   print_env menv; *)
-        let pr =
-          if substs_len = 1 then pr
-          else create_prsymbol (id_clone pr.pr_name) in
         (* Format.eprintf "undef ls : %a, ts : %a@." *)
         (*   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) *)
         (*   menv.undef_lsymbol *)
         (*   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) *)
         (*   menv.undef_tsymbol; *)
-        create_prop_decl k pr f :: task
+        if substs_len = 1 then
+          create_prop_decl k pr f :: task, metas
+        else
+          let pr' = create_prsymbol (id_clone pr.pr_name) in
+          create_prop_decl k pr' f :: task,
+          (if Spr.mem pr metas_rewrite_pr then
+              create_meta Compute.meta_rewrite [MApr pr'] :: metas
+           else metas)
       in
-      let task = Ssubst.fold conv_f substs [] in
-      task
+      Ssubst.fold conv_f substs ([],[])
+  in
+  List.rev_append (List.rev_map create_decl decls) metas
+
 
 let ft_select_inst =
   ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
@@ -334,7 +342,8 @@ let lsymbol_distinction =
     else
       let env = Lsmap.of_metas metas in
       (* Format.eprintf "instantiate %a@." print_env env; *)
-      Trans.decl (map env) None)
+      Trans.on_tagged_pr Compute.meta_rewrite (fun rewrite_pr ->
+        Trans.tdecl (map rewrite_pr env) None))
 
 let discriminate env = Trans.seq [
   Libencoding.monomorphise_goal;
