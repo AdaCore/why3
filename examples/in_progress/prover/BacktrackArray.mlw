@@ -16,19 +16,19 @@
       go back to the instant t. *)
 
 module Types
-  
+
   use import int.Int
   use import array.Array
   use import list.List
   use import Functions.Func
   use import Predicates.Pred
-  
+
   type timestamp 'a = {
     time : int ;
     size : int ;
     ghost table : func int (list 'a) ;
   }
-  
+
   type t 'a = {
     (* (-1) mean array resizing (doubling in size), i >= 0 mean
        update at case i. *)
@@ -38,11 +38,11 @@ module Types
     (* Invariant of stored data. *)
     ghost inv : pred 'a ;
   }
-  
+
 end
 
 module Logic
-  
+
   use import Types
   use import int.Int
   use import int.ComputerDivision
@@ -51,26 +51,26 @@ module Logic
   use import list.List
   use import Functions.Func
   use import Choice.Choice
-  
+
   function func_of_array (a:array ~'a) (def:'a) : func int 'a
   axiom func_of_array_def : forall a:array 'a,def:'a,x:int.
     func_of_array a def x = if (0 <= x < a.length)
     then M.get a.elts x
     else def
-  
+
   function current_timestamp (x:t ~'a) : timestamp 'a =
     { time = x.current_time ;
       size = x.buffer.length ;
       table = func_of_array x.buffer Nil ; }
-  
+
   predicate correct_table (sz:int) (b:func int (list 'a)) =
     forall x:int. x >= sz \/ x < 0 -> b x = Nil
-  
+
   function pop (l:list 'a) : list 'a = match l with
     | Nil -> default
     | Cons x q -> q
   end
-  
+
   function unroll (tm:int) (t0:int) (h:list int) (b:func int (list 'a))
     (sz:int) : timestamp 'a =
     if tm = 0
@@ -81,7 +81,7 @@ module Logic
         then unroll (tm-1) t0 q b (div sz 2)
         else unroll (tm-1) t0 q (b[x <- pop (b x)]) sz
       end
-  
+
   predicate unroll_correct (tm:int) (h:list int) (b:func int (list 'a)) (sz:int)
     = match h with
       | Nil -> tm = 0
@@ -92,23 +92,23 @@ module Logic
         else b x <> Nil /\ 0 <= x < sz
           /\ unroll_correct (tm-1) q (b[x <- pop (b x)]) sz
     end
-  
+
   predicate past_time (t:timestamp 'a) (tb:t 'a) =
     tb.current_time >= t.time /\
     unroll (tb.current_time - t.time) t.time
       tb.history (func_of_array tb.buffer Nil) tb.buffer.length = t
-  
+
   predicate precede (tb1:t 'a) (tb2:t 'a) =
     forall t:timestamp 'a. past_time t tb1 -> past_time t tb2
-  
+
   predicate before (t1 t2:timestamp 'a) =
     t1.time <= t2.time
-  
+
   predicate list_forall (p:pred 'a) (l:list 'a) = match l with
     | Nil -> true
     | Cons x q -> p x /\ list_forall p q
   end
-  
+
   predicate correct (tb:t 'a) =
     (forall t:timestamp 'a. past_time t tb -> t.size > 0) /\
     (forall t:timestamp 'a,i:int.
@@ -117,7 +117,7 @@ module Logic
       past_time t tb -> correct_table t.size t.table) /\
     unroll_correct tb.current_time tb.history
       (func_of_array tb.buffer Nil) tb.buffer.length
-  
+
   (* I MUST INTRODUCE THIS PREDICATE FOR ONLY ONE REASON :
      ABUSIVE RECORD DECONSTRUCTION IN ASSERTIONS. *)
   predicate backtrack_to (tbold:t 'a) (tbinter:t 'a) (tbnew:t 'a) =
@@ -129,11 +129,11 @@ module Logic
               && past_time tm tbnew) && (forall tm:timestamp 'a.
             past_time tm tbold -> past_time tm tbnew) &&
             precede tbold tbnew
-  
+
 end
 
 module Impl
-  
+
   use import Types
   use import Logic
   use import int.Int
@@ -144,14 +144,14 @@ module Impl
   use import Functions.Func
   use import Predicates.Pred
   use import Choice.Choice
-  
+
   (* extraction trick to speedup integer operations with
      constants. *)
   constant mone : int = -1
   constant zero : int = 0
   constant one : int = 1
   constant two : int = 2
-  
+
   let create (ghost p:pred ~'a) : t 'a
     ensures { forall t:timestamp 'a.
       past_time t result ->  t.table = const Nil }
@@ -167,8 +167,8 @@ module Impl
     } in
     assert { extensionalEqual (func_of_array res.buffer Nil) (const Nil) } ;
     res
-  
-  
+
+
   (* Internal utility (break some of the invariants),
      but useful in practice. *)
   let add_event (x:int) (tb:t 'a) : unit
@@ -178,8 +178,8 @@ module Impl
   =
     tb.history <- Cons x tb.history ;
     tb.current_time <- tb.current_time + one
-  
-  
+
+
   (* Internal utility. *)
   let resize_for (x:int) (tb:t ~'a) : unit
     writes { tb }
@@ -208,6 +208,8 @@ module Impl
         tbc.current_time = tb.current_time /\
         func_of_array tbc.buffer Nil = func_of_array tb.buffer Nil }
       requires { tbc.buffer.length = size }
+      variant { x - size }
+      writes { tb.history,tb.current_time,tbc.history,tbc.current_time,tbc.buffer }
       ensures { correct tbc }
       ensures { tbc.history = tb.history /\
         tbc.current_time = tb.current_time /\
@@ -216,8 +218,6 @@ module Impl
       ensures { result > x }
       ensures { result >= size }
       ensures { precede (old tbc) tbc }
-      writes { tb.history,tb.current_time,tbc.history,tbc.current_time,tbc.buffer }
-      variant { x - size }
     =
       'AuxInit:
       assert { past_time (current_timestamp tbc) tbc } ;
@@ -246,7 +246,7 @@ module Impl
     assert { extensionalEqual (func_of_array buf1 Nil)
       (func_of_array buf2 Nil) } ;
     tb.buffer <- buf2
-  
+
   let iadd (x:int) (b:'a) (tb:t 'a) : unit
     writes { tb.history,tb.current_time,tb.buffer.elts }
     requires { 0 <= x < tb.buffer.length }
@@ -271,7 +271,7 @@ module Impl
     assert { forall t:timestamp 'a.
       past_time t tb <-> past_time t (at tb 'Init) \/ t = current_timestamp tb } ;
     assert { precede (at tb 'Init) tb }
-  
+
   let add (x:int) (b:'a) (tb:t ~'a) : unit
     writes { tb, tb.buffer.elts }
     requires { correct tb }
@@ -286,8 +286,8 @@ module Impl
     if x >= length tb.buffer
     then resize_for x tb ;
     iadd x b tb
-  
-  
+
+
   let get (tb:t 'a) (x:int) : list 'a
     requires { correct tb }
     requires { x >= 0 }
@@ -298,7 +298,7 @@ module Impl
     then Nil
     else let res = tb.buffer[x] in
       (assert { res = table (current_timestamp tb) x } ; res )
-  
+
   let backtrack (t:timestamp 'a) (tb:t 'a) : unit
     writes { tb,tb.buffer.elts }
     requires { past_time t tb }
@@ -318,7 +318,6 @@ module Impl
       inv = tb.inv ;
     } in
     let rec unroll (delta:int) : unit
-      writes { tb.history,tb.buffer.elts,tbc,tbc.buffer.elts }
       requires { correct tbc }
       requires { past_time t tbc }
       requires { delta >= 0 }
@@ -327,6 +326,8 @@ module Impl
         (forall x:int. 0 <= x < final_size /\ x < tbc.buffer.length ->
           func_of_array tbc.buffer Nil x = func_of_array tb.buffer Nil x) }
       requires { tb.buffer.length <= final_size }
+      variant { delta }
+      writes { tb.history,tb.buffer.elts,tbc,tbc.buffer.elts }
       ensures { correct tbc }
       ensures { tbc.history = tb.history /\
         (forall x:int. 0 <= x < final_size ->
@@ -337,7 +338,6 @@ module Impl
       ensures { precede tbc (old tbc) }
       ensures { forall t2:timestamp 'a. before t2 t /\ past_time t2 (old tbc) ->
         past_time t2 tbc }
-      variant { delta }
     =
       'UInit:
       if delta <> zero
@@ -416,10 +416,10 @@ module Impl
     unroll (tm0 - t.time) ;
     assert { extensionalEqual (func_of_array tb.buffer Nil)
       (func_of_array tbc.buffer Nil) }
-  
+
   val ghost hack_func_of_array (a:array ~'a) (def:'a) : func int 'a
     ensures { result = func_of_array a def }
-  
+
   let stamp (tb:t ~'a) : timestamp 'a
     requires { correct tb }
     ensures { result = current_timestamp tb }
@@ -429,9 +429,8 @@ module Impl
       size = length tb.buffer ;
       table = hack_func_of_array tb.buffer Nil ;
     }
-  
+
   (* look for the correct syntax :
     meta "remove_program" val hack_func_of_array*)
-  
-end
 
+end

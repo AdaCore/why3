@@ -21,19 +21,19 @@ module Types
   type nl_fo_formula_list 'b0 'b1 =
     | NL_FOFNil
     | NL_FOFCons (nl_fo_formula 'b0 'b1) (nl_fo_formula_list 'b0 'b1)
-    
-  
+
+
   type nlimpl_fo_formula_list =
     { nlrepr_fo_formula_list_field : nl_fo_formula_list int int ;
       nlfree_var_symbol_set_abstraction_fo_formula_list_field : int ;
       nlfree_var_fo_term_set_abstraction_fo_formula_list_field : int ;
       ghost model_fo_formula_list_field : fo_formula_list int int ;
     }
-  
+
   type cons_fo_formula_list = | NLC_FOFNil
     | NLC_FOFCons (nlimpl_fo_formula) (nlimpl_fo_formula_list)
-  
-  
+
+
 end
 
 module Logic
@@ -64,14 +64,14 @@ module Logic
           let s = add_nat (nat_nlsize_fo_formula_list v1) s in
           let s = add_nat (nat_nlsize_fo_formula v0) s in s
     end
-  
+
   with nlsize_fo_formula_list (t:nl_fo_formula_list 'b0 'b1) : int =
     match t with | NL_FOFNil -> let s = 1 in s
       | NL_FOFCons v0 v1 ->
         let s = 1 in let s = nlsize_fo_formula_list v1 + s in
           let s = nlsize_fo_formula v0 + s in s
     end
-  
+
   let rec lemma nlsize_positive_lemma_fo_formula_list
     (t:nl_fo_formula_list 'b0 'b1) : unit
     ensures { nlsize_fo_formula_list t > 0 }
@@ -81,7 +81,7 @@ module Logic
         nlsize_positive_lemma_fo_formula v0 ;
           nlsize_positive_lemma_fo_formula_list v1 ; ()
     end
-  
+
   function nlmodel_fo_formula_list (t:nl_fo_formula_list 'b0 'b1)
     (fr0:func 'b0 (symbol 'c0)) (bnd0:func int (symbol 'c0))
     (fr1:func 'b1 (fo_term 'c0 'c1)) (bnd1:func int (fo_term 'c0 'c1)) :
@@ -98,7 +98,7 @@ module Logic
             ((rename_subst_fo_term fr1 identity identity))
             ((rename_subst_fo_term bnd1 identity identity)))
     end
-  
+
   let rec lemma nlmodel_subst_commutation_lemma_fo_formula_list
     (t:nl_fo_formula_list 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
     (bnd0:func int (symbol 'c0)) (s0:func 'c0 (symbol 'd0))
@@ -127,7 +127,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
+            subst_compose_symbol (rename_subst_symbol bnd0 identity)
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -142,7 +142,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity) 
+              (rename_subst_fo_term bnd1 identity identity)
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -161,7 +161,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
+            subst_compose_symbol (rename_subst_symbol bnd0 identity)
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -176,7 +176,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity) 
+              (rename_subst_fo_term bnd1 identity identity)
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -185,7 +185,7 @@ module Logic
             } ;
           ()
     end
-  
+
   let lemma nlmodel_rename_commutation_lemma_fo_formula_list
     (t:nl_fo_formula_list 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
     (bnd0:func int (symbol 'c0)) (s0:func 'c0 'd0)
@@ -202,13 +202,13 @@ module Logic
     =
     nlmodel_subst_commutation_lemma_fo_formula_list t fr0 bnd0
       (subst_of_rename_symbol s0) fr1 bnd1 (subst_of_rename_fo_term s1)
-  
+
   predicate correct_indexes_fo_formula_list (t:nl_fo_formula_list 'b0 'b1) =
     match t with | NL_FOFNil -> true
       | NL_FOFCons v0 v1 ->
         correct_indexes_fo_formula v0 /\ correct_indexes_fo_formula_list v1
     end
-  
+
   function bound_depth_of_symbol_in_fo_formula_list
     (t:nl_fo_formula_list 'b0 'b1) : int =
     match t with | NL_FOFNil -> 0
@@ -217,7 +217,7 @@ module Logic
           let b = bound_depth_of_symbol_in_fo_formula_list v1 in
           let a = if a > b then a else b in a
     end
-  
+
   with bound_depth_of_fo_term_in_fo_formula_list
     (t:nl_fo_formula_list 'b0 'b1) : int =
     match t with | NL_FOFNil -> 0
@@ -226,7 +226,7 @@ module Logic
           let b = bound_depth_of_fo_term_in_fo_formula_list v1 in
           let a = if a > b then a else b in a
     end
-  
+
   let rec lemma bound_depth_of_symbol_in_fo_formula_list_nonnegative
     (t:nl_fo_formula_list 'b0 'b1) : unit
     requires { correct_indexes_fo_formula_list t }
@@ -237,7 +237,7 @@ module Logic
         bound_depth_of_symbol_in_fo_formula_nonnegative v0 ;
           bound_depth_of_symbol_in_fo_formula_list_nonnegative v1 ; ()
     end
-  
+
   with lemma bound_depth_of_fo_term_in_fo_formula_list_nonnegative
     (t:nl_fo_formula_list 'b0 'b1) : unit
     requires { correct_indexes_fo_formula_list t }
@@ -248,7 +248,7 @@ module Logic
         bound_depth_of_fo_term_in_fo_formula_nonnegative v0 ;
           bound_depth_of_fo_term_in_fo_formula_list_nonnegative v1 ; ()
     end
-  
+
   let rec lemma model_equal_fo_formula_list (t:nl_fo_formula_list 'b0 'b1)
     (fr10:func 'b0 (symbol 'c0)) (fr20:func 'b0 (symbol 'c0))
     (bnd10:func int (symbol 'c0)) (bnd20:func int (symbol 'c0))
@@ -256,12 +256,12 @@ module Logic
     (bnd11:func int (fo_term 'c0 'c1)) (bnd21:func int (fo_term 'c0 'c1)) :
     unit
     requires {
-      forall i:int. 0 <= i < bound_depth_of_symbol_in_fo_formula_list t -> 
+      forall i:int. 0 <= i < bound_depth_of_symbol_in_fo_formula_list t ->
         bnd10 i = bnd20 i
       }
     requires { fr10 = fr20 }
     requires {
-      forall i:int. 0 <= i < bound_depth_of_fo_term_in_fo_formula_list t -> 
+      forall i:int. 0 <= i < bound_depth_of_fo_term_in_fo_formula_list t ->
         bnd11 i = bnd21 i
       }
     requires { fr11 = fr21 } requires { correct_indexes_fo_formula_list t }
@@ -289,7 +289,7 @@ module Logic
             ((rename_subst_fo_term bnd21 identity identity)) ;
           ()
     end
-  
+
   predicate nlimpl_fo_formula_list_ok (t:nlimpl_fo_formula_list) =
     nlmodel_fo_formula_list t.nlrepr_fo_formula_list_field subst_id_symbol
       (const (Var_symbol ((-1)))) subst_id_fo_term
@@ -308,13 +308,13 @@ module Logic
     (forall x:int.
        is_fo_term_free_var_in_fo_formula_list x t.model_fo_formula_list_field
        -> (x) < (t.nlfree_var_fo_term_set_abstraction_fo_formula_list_field))
-  
+
   predicate cons_ok_fo_formula_list (c:cons_fo_formula_list) =
     match c with | NLC_FOFNil -> true
       | NLC_FOFCons v0 v1 -> nlimpl_fo_formula_ok v0 /\
         nlimpl_fo_formula_list_ok v1
     end
-  
+
   predicate cons_rel_fo_formula_list (c:cons_fo_formula_list)
     (t:nlimpl_fo_formula_list) =
     match c with | NLC_FOFNil -> t.model_fo_formula_list_field = FOFNil
@@ -324,7 +324,7 @@ module Logic
           (rename_fo_formula_list v1.model_fo_formula_list_field identity
              identity)
     end
-  
+
   predicate cons_open_rel_fo_formula_list (c:cons_fo_formula_list)
     (t:nlimpl_fo_formula_list) =
     match c with
@@ -341,8 +341,8 @@ module Logic
                 (rename_fo_formula_list w1 identity identity)
         end
     end
-  
-  
+
+
 end
 
 module Impl
@@ -367,12 +367,14 @@ module Impl
   use import Firstorder_formula_list_spec.Spec
   use import Types
   use import Logic
-  let rec bind_var_symbol_in_fo_formula_list (t:nl_fo_formula_list int int)
+  let rec bind_var_symbol_in_fo_formula_list "W:diverges:N"
+    (t:nl_fo_formula_list int int)
     (x:int) (i:int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd0:func int (symbol 'b0)) (ghost fr1:func int (fo_term 'b0 'b1))
     (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_fo_formula_list int int
     requires { correct_indexes_fo_formula_list t }
     requires { bound_depth_of_symbol_in_fo_formula_list t <= i }
+    variant { nlsize_fo_formula_list t }
     ensures { bound_depth_of_symbol_in_fo_formula_list result <= i + 1 }
     ensures { correct_indexes_fo_formula_list result }
     ensures { bound_depth_of_fo_term_in_fo_formula_list t =
@@ -418,13 +420,15 @@ module Impl
                ((rename_subst_fo_term fr1 identity identity))
                ((rename_subst_fo_term bnd1 identity identity)))
     end
-  
-  with bind_var_fo_term_in_fo_formula_list (t:nl_fo_formula_list int int)
+
+  with bind_var_fo_term_in_fo_formula_list "W:diverges:N"
+    (t:nl_fo_formula_list int int)
     (x:int) (i:int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd0:func int (symbol 'b0)) (ghost fr1:func int (fo_term 'b0 'b1))
     (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_fo_formula_list int int
     requires { correct_indexes_fo_formula_list t }
     requires { bound_depth_of_fo_term_in_fo_formula_list t <= i }
+    variant { nlsize_fo_formula_list t }
     ensures { bound_depth_of_fo_term_in_fo_formula_list result <= i + 1 }
     ensures { correct_indexes_fo_formula_list result }
     ensures { bound_depth_of_symbol_in_fo_formula_list t =
@@ -476,8 +480,9 @@ module Impl
                ((rename_subst_fo_term fr1 identity identity))
                ((rename_subst_fo_term bnd1 identity identity)))
     end
-  
-  let rec unbind_var_symbol_in_fo_formula_list (t:nl_fo_formula_list int int)
+
+  let rec unbind_var_symbol_in_fo_formula_list "W:diverges:N"
+    (t:nl_fo_formula_list int int)
     (i:int) (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr1:func int (fo_term 'b0 'b1))
@@ -487,6 +492,7 @@ module Impl
     requires { bound_depth_of_symbol_in_fo_formula_list t <= i + 1 }
     requires { correct_indexes_symbol x }
     requires { bound_depth_of_symbol_in_symbol x = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
     ensures { bound_depth_of_symbol_in_fo_formula_list result <= i }
     ensures { bound_depth_of_fo_term_in_fo_formula_list result =
@@ -550,8 +556,9 @@ module Impl
                ((rename_subst_fo_term bnd11 identity identity))
                ((rename_subst_symbol bnd20 identity)))
     end
-  
-  with unbind_var_fo_term_in_fo_formula_list (t:nl_fo_formula_list int int)
+
+  with unbind_var_fo_term_in_fo_formula_list "W:diverges:N"
+    (t:nl_fo_formula_list int int)
     (i:int) (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr1:func int (fo_term 'b0 'b1))
@@ -563,6 +570,7 @@ module Impl
     requires { correct_indexes_fo_term x }
     requires { bound_depth_of_symbol_in_fo_term x = 0 }
     requires { bound_depth_of_fo_term_in_fo_term x = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
     ensures { bound_depth_of_fo_term_in_fo_formula_list result <= i }
     ensures { bound_depth_of_symbol_in_fo_formula_list result =
@@ -648,8 +656,9 @@ module Impl
                ((rename_subst_symbol bnd20 identity))
                ((rename_subst_fo_term bnd21 identity identity)))
     end
-  
-  let rec subst_base_symbol_in_fo_formula_list (t:nl_fo_formula_list int int)
+
+  let rec subst_base_symbol_in_fo_formula_list "W:diverges:N"
+    (t:nl_fo_formula_list int int)
     (x:int) (u:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr1:func int (fo_term 'b0 'b1))
@@ -658,6 +667,7 @@ module Impl
     requires { correct_indexes_fo_formula_list t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
      ensures { bound_depth_of_symbol_in_fo_formula_list result =
        bound_depth_of_symbol_in_fo_formula_list t }
@@ -722,8 +732,9 @@ module Impl
                ((rename_subst_fo_term bnd11 identity identity))
                ((rename_subst_symbol bnd20 identity)))
     end
-  
-  with subst_base_fo_term_in_fo_formula_list (t:nl_fo_formula_list int int)
+
+  with subst_base_fo_term_in_fo_formula_list "W:diverges:N"
+    (t:nl_fo_formula_list int int)
     (x:int) (u:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr1:func int (fo_term 'b0 'b1))
@@ -734,8 +745,9 @@ module Impl
     requires { correct_indexes_fo_term u }
     requires { bound_depth_of_symbol_in_fo_term u = 0 }
     requires { bound_depth_of_fo_term_in_fo_term u = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
-     ensures { bound_depth_of_symbol_in_fo_formula_list result =
+    ensures { bound_depth_of_symbol_in_fo_formula_list result =
        bound_depth_of_symbol_in_fo_formula_list t }
     ensures { bound_depth_of_fo_term_in_fo_formula_list result =
       bound_depth_of_fo_term_in_fo_formula_list t }
@@ -820,7 +832,7 @@ module Impl
                ((rename_subst_symbol bnd20 identity))
                ((rename_subst_fo_term bnd21 identity identity)))
     end
-  
+
   let construct_fo_formula_list (c:cons_fo_formula_list) :
     nlimpl_fo_formula_list requires { cons_ok_fo_formula_list c }
     ensures { nlimpl_fo_formula_list_ok result }
@@ -884,7 +896,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y && 
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
                x = y &&
                is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -899,7 +911,7 @@ module Impl
             ->
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y && 
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
                x = y &&
                is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -916,7 +928,7 @@ module Impl
             (forall y:int.
                (is_symbol_free_var_in_fo_formula_list y
                   v1.model_fo_formula_list_field
-               /\ eval (identity) y = x) -> x = eval (identity) y && 
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
                x = y &&
                is_symbol_free_var_in_fo_formula_list x
                  v1.model_fo_formula_list_field)
@@ -937,7 +949,7 @@ module Impl
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula_list y
                   v1.model_fo_formula_list_field
-               /\ eval (identity) y = x) -> x = eval (identity) y && 
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
                x = y &&
                is_fo_term_free_var_in_fo_formula_list x
                  v1.model_fo_formula_list_field)
@@ -1065,7 +1077,7 @@ module Impl
           (identity : func (int) (int)) } ;*)
         res
     end
-  
+
   let destruct_fo_formula_list (t:nlimpl_fo_formula_list) :
     cons_fo_formula_list requires { nlimpl_fo_formula_list_ok t }
     ensures { cons_ok_fo_formula_list result }
@@ -1200,7 +1212,7 @@ module Impl
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv0 ; 
+              model_fo_formula_field = ghost mrv0 ;
             }
           in
           let resv1 =
@@ -1208,7 +1220,7 @@ module Impl
               nlfree_var_symbol_set_abstraction_fo_formula_list_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_list_field =
                 fv1 ;
-              model_fo_formula_list_field = ghost mrv1 ; 
+              model_fo_formula_list_field = ghost mrv1 ;
             }
           in let res = NLC_FOFCons resv0 resv1 in
           free_var_equivalence_of_rename_fo_formula mv0 (identity)
@@ -1263,7 +1275,7 @@ module Impl
             } ;
           res
     end
-  
+
   let nlsubst_symbol_in_fo_formula_list (t:nlimpl_fo_formula_list) (x:int)
     (u:nlimpl_symbol) : nlimpl_fo_formula_list
     requires { nlimpl_fo_formula_list_ok t } requires { nlimpl_symbol_ok u }
@@ -1370,7 +1382,7 @@ module Impl
         (res.nlfree_var_fo_term_set_abstraction_fo_formula_list_field)
       } ;
     res
-  
+
   let nlsubst_fo_term_in_fo_formula_list (t:nlimpl_fo_formula_list) (x:int)
     (u:nlimpl_fo_term) : nlimpl_fo_formula_list
     requires { nlimpl_fo_formula_list_ok t } requires { nlimpl_fo_term_ok u }
@@ -1485,8 +1497,6 @@ module Impl
         (res.nlfree_var_fo_term_set_abstraction_fo_formula_list_field)
       } ;
     res
-  
-  
+
+
 end
-
-
