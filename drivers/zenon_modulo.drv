@@ -21,12 +21,7 @@ transformation "eliminate_epsilon"
 transformation "eliminate_if"
 transformation "eliminate_let"
 
-transformation "discriminate"
-transformation "encoding_tptp"
-
 theory BuiltIn
   syntax predicate (=)  "(%1 = %2)"
   meta "eliminate_algebraic" "no_index"
 end
-
-import "discrimination.gen"
