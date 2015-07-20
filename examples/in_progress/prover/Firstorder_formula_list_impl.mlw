@@ -1082,7 +1082,7 @@ module Impl
     match t.nlrepr_fo_formula_list_field with
       | NL_FOFNil ->
         assert { t.model_fo_formula_list_field = FOFNil } ;
-          let _ =
+          let () =
             match t.model_fo_formula_list_field with | FOFNil -> ()
               | FOFCons x0 x1 -> absurd
             end

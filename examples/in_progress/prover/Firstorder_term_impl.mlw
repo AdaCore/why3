@@ -1910,7 +1910,7 @@ module Impl
     match t.nlrepr_fo_term_list_field with
       | NL_FONil ->
         assert { t.model_fo_term_list_field = FONil } ;
-          let _ =
+          let () =
             match t.model_fo_term_list_field with | FONil -> ()
               | FOCons x0 x1 -> absurd
             end

@@ -56,6 +56,13 @@ let rec is_exec_term ctx t = match t.t_node with
       true
   | Tconst c ->
       is_exec_const c
+  | Tapp (ls, tl) when ls.ls_constr > 0 ->
+      begin match try Some (Mlw_expr.restore_pl ls) with Not_found -> None with
+      | Some pl ->
+          let test fd arg = fd.Mlw_expr.fd_ghost || is_exec_term ctx arg in
+          List.for_all2 test pl.Mlw_expr.pl_args tl
+      | None -> List.for_all (is_exec_term ctx) tl
+      end
   | Tapp (ls, tl) ->
       is_exec_lsymbol ctx ls && List.for_all (is_exec_term ctx) tl
   | Tif (t1, t2, t3) ->
@@ -148,6 +155,8 @@ let rec is_exec_expr ctx e =
         let aux f = is_exec_expr ctx f.fun_lambda.l_expr in
         List.for_all aux fdl &&
         is_exec_expr ctx e1
+    | Ecase (e1, [_, e2]) when e1.e_ghost ->
+        is_exec_expr ctx e2
     | Ecase (e1, bl) ->
         let aux (_, e) = is_exec_expr ctx e in
         is_exec_expr ctx e1 &&
@@ -163,11 +172,7 @@ let is_ghost_lv = function
   | LetV pv -> pv.pv_ghost
   | LetA ps -> ps.ps_ghost
 
-let is_exec_pdecl ctx pd =
-  (* don't traverse expr to check for executability: believe
-     the e_ghost field instead *)
-  let is_exec_expr _ctx e = not e.e_ghost in
-  match pd.pd_node with
+let is_exec_pdecl ctx pd = match pd.pd_node with
   | PDtype _
   | PDexn _
   | PDdata _ ->

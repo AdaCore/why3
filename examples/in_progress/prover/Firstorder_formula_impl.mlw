@@ -4259,7 +4259,7 @@ module Impl
           res
       | NL_FTrue ->
         assert { t.model_fo_formula_field = FTrue } ;
-          let _ =
+          let () =
             match t.model_fo_formula_field with | Forall x0 -> absurd
               | Exists x0 -> absurd | And x0 x1 -> absurd
               | Or x0 x1 -> absurd | Not x0 -> absurd | FTrue -> ()
@@ -4268,7 +4268,7 @@ module Impl
           in let res = NLC_FTrue in res
       | NL_FFalse ->
         assert { t.model_fo_formula_field = FFalse } ;
-          let _ =
+          let () =
             match t.model_fo_formula_field with | Forall x0 -> absurd
               | Exists x0 -> absurd | And x0 x1 -> absurd
               | Or x0 x1 -> absurd | Not x0 -> absurd | FTrue -> absurd
