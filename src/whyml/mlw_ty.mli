@@ -9,11 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Program Types} *)
+
 open Ident
 open Ty
 open Term
-
-(** *)
 
 (** {2 Individual types (first-order types w/o effects)} *)
 

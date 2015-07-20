@@ -302,7 +302,7 @@ let append_to_model_trace_label ~labels ~to_append =
     Slab.add new_trace_label labels_without_trace
   with Not_found -> labels    
 
-(* The counter-example model related data needed for creating new 
+(* The counter-example model related data needed for creating new
    variable. *)
 type model_data = {
   md_append_to_model_trace : string;
@@ -336,7 +336,9 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
   }
 
 let mk_var id ty md =
-  let new_labels = append_to_model_trace_label ~labels:id.id_label ~to_append:md.md_append_to_model_trace in
+  let new_labels =
+    append_to_model_trace_label ~labels:id.id_label ~to_append:md.md_append_to_model_trace in
+
   create_vsymbol (id_fresh ~label:new_labels ?loc:md.md_loc id.id_string) ty
 
 (* replace "contemporary" variables with fresh ones *)

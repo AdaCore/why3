@@ -9,13 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Program Declarations} *)
+
 open Ident
 open Term
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
-(** *)
 
 (** {2 Type declaration} *)
 

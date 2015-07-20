@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="3">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <file
+  name="../Functions.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Func"
+   locfile="../Functions.mlw"
+   loclnum="2" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="false">
+   <goal
+    name="update_eq"
+    locfile="../Functions.mlw"
+    loclnum="24" loccnumb="8" loccnume="17"
+    sum="f4c64226c9945e7b39a7b52b0c803754"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aupdateV0V1V2V1V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="update_neq"
+    locfile="../Functions.mlw"
+    loclnum="26" loccnumb="8" loccnume="18"
+    sum="f8f3f958d4cf31e78e09152722d10e81"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aupdateV0V1V2V3ainfix @!V0V3INainfix =V1V3F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter compose_associative"
+    locfile="../Functions.mlw"
+    loclnum="42" loccnumb="12" loccnume="31"
+    expl="VC for compose_associative"
+    sum="0d9e14b7aa4e9978fc7dd410fbed7641"
+    proved="true"
+    expanded="false"
+    shape="ainfix =acomposeacomposeV0V1V2acomposeV0acomposeV1V2AaextensionalEqualacomposeacomposeV0V1V2acomposeV0acomposeV1V2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for compose_associative"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter identity_neutral"
+    locfile="../Functions.mlw"
+    loclnum="47" loccnumb="12" loccnume="28"
+    expl="VC for identity_neutral"
+    sum="a6e7288adc844f4d246c94f10cbdd52f"
+    proved="true"
+    expanded="false"
+    shape="ainfix =acomposeaidentityV0V0Aainfix =acomposeV0aidentityV0AaextensionalEqualacomposeaidentityV0V0AaextensionalEqualacomposeV0aidentityV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for identity_neutral"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter const_compose_left"
+    locfile="../Functions.mlw"
+    loclnum="60" loccnumb="12" loccnume="30"
+    expl="VC for const_compose_left"
+    sum="2410904cc0cdd8ca053dd2216ac25858"
+    proved="true"
+    expanded="false"
+    shape="ainfix =acomposeaconstV1V0aconstV1AaextensionalEqualaconstV1acomposeaconstV1V0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for const_compose_left"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter const_compose_right"
+    locfile="../Functions.mlw"
+    loclnum="65" loccnumb="12" loccnume="31"
+    expl="VC for const_compose_right"
+    sum="3fa7a2d30933c0ee2436e129d9d7493f"
+    proved="true"
+    expanded="false"
+    shape="ainfix =acomposeV0aconstV1aconstainfix @!V0V1AaextensionalEqualaconstainfix @!V0V1acomposeV0aconstV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for const_compose_right"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

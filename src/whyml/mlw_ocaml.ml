@@ -29,8 +29,6 @@
   - ghost code
     remove it as much as possible (in types and function arguments)
 
-  - preludes
-
 *)
 
 open Format
@@ -255,7 +253,7 @@ module Translate = struct
     if has_syntax info ts.ts_name || is_record d then []
     else projections info d
 
-  let filter_ghost ls def al =
+  let filter_ghost_fields ls def al =
     let flt fd arg = if fd.Mlw_expr.fd_ghost then def else arg in
     try List.map2 flt (Mlw_expr.restore_pl ls).Mlw_expr.pl_args al
     with Not_found -> al
@@ -276,7 +274,7 @@ module Translate = struct
         | Some s -> ML.Psyntax (s, List.map (pat info) pl)
         | None ->
           let pat_void = Term.pat_app Mlw_expr.fs_void [] Mlw_ty.ty_unit in
-          let pl = filter_ghost cs pat_void pl in
+          let pl = filter_ghost_fields cs pat_void pl in
           let pjl = get_record info cs in
           if pjl = [] then
             ML.Papp (cs.ls_name, List.map (pat info) pl)
@@ -322,7 +320,7 @@ module Translate = struct
     let id = ls.ls_name in
     match tl with
       | tl when isconstr ->
-          let tl = filter_ghost ls Mlw_expr.t_void tl in
+          let tl = filter_ghost_fields ls Mlw_expr.t_void tl in
           let pjl = get_record info ls in
           if pjl = [] then
             ML.Econstr (id, List.map (term info) tl)
@@ -351,7 +349,8 @@ module Translate = struct
         ML.etuple (List.map (term info) tl)
     | Tapp (fs, [t1; t2]) when not info.unsafe_int
         && ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
-        ML.Esyntax ("(Why3__BigInt.eq %1 %2)", [term info t1; term info t2])
+        ML.Esyntax ("(Why3extract.Why3__BigInt.eq %1 %2)",
+                    [term info t1; term info t2])
     | Tapp (fs, tl) ->
         begin match query_syntax info.info_syn fs.ls_name with
         | Some s -> ML.Esyntax (s, List.map (term info) tl)
@@ -475,6 +474,13 @@ module Translate = struct
     | [fd] -> fd.fun_lambda.l_spec.c_letrec <> 0
     | _ -> true
 
+  let filter_ghost_params =
+    let dummy = create_pvsymbol (Ident.id_fresh "") ity_unit in
+    fun args ->
+    match List.filter (fun v -> not v.Mlw_ty.pv_ghost) args with
+    | [] -> [dummy]
+    | l -> l
+
   let rec expr info e =
     assert (not e.e_ghost);
     match e.e_node with
@@ -495,6 +501,13 @@ module Translate = struct
           let n = Number.compute_int (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])
+      | Eapp (e, v, _) when v.pv_ghost ->
+         (* ghost parameters are ignored *)
+         begin
+           match e.e_node with
+           | Eapp _ -> expr info e
+           | _ -> ML.Eapp (expr info e, [ML.enop])
+         end
       | Eapp (e, v, _) ->
           ML.Eapp (expr info e, [ML.Eident (pv_name v)])
       | Elet ({ let_expr = e1 }, e2) when e1.e_ghost ->
@@ -551,7 +564,8 @@ module Translate = struct
 
   and recdef info { fun_ps = ps; fun_lambda = lam } =
     assert (not ps.ps_ghost);
-    ps.ps_name, List.map (pvty info) lam.l_args, expr info lam.l_expr
+    let args = filter_ghost_params lam.l_args in
+    ps.ps_name, List.map (pvty info) args, expr info lam.l_expr
 
   and ebranch info ({ppat_pattern=p}, e) =
     pat info p, expr info e
@@ -781,7 +795,7 @@ module Print = struct
     | tvl -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
   let print_ty_arg info fmt ty = fprintf fmt "%a" (print_ty ~paren:true info) ty
-  let print_vs_arg info fmt vs = fprintf fmt "(%a)" (print_vsty info) vs
+  let print_vs_arg info fmt vs = fprintf fmt "@[(%a)@]" (print_vsty info) vs
 
   let print_type_decl info fst fmt (ts, args, def) =
     let print_constr fmt (cs, args) = match args with
@@ -852,15 +866,16 @@ module Print = struct
   let print_const ~paren fmt c =
     let n = Number.compute_int c in
     if BigInt.eq n BigInt.zero then
-      fprintf fmt "Why3__BigInt.zero"
+      fprintf fmt "Why3extract.Why3__BigInt.zero"
     else if BigInt.eq n BigInt.one then
-      fprintf fmt "Why3__BigInt.one"
+      fprintf fmt "Why3extract.Why3__BigInt.one"
     else if BigInt.le min_int31 n && BigInt.le n max_int31 then
       let m = BigInt.to_int n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
+      fprintf fmt (protect_on paren "Why3extract.Why3__BigInt.of_int %d") m
     else
       let s = BigInt.to_string n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
+      fprintf fmt
+        (protect_on paren "Why3extract.Why3__BigInt.of_string \"%s\"") s
 
   let print_binop fmt = function
     | Band -> fprintf fmt "&&"
@@ -892,10 +907,11 @@ module Print = struct
           (protect_on paren "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@]")
           (print_expr info) e1 (print_expr ~paren:true info) e2
     | Eif (e1, e2, e3) ->
-        fprintf fmt (protect_on paren "if @[%a@] then %a@ else %a")
+        fprintf fmt (protect_on paren
+        "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]")
           (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Elet (v, e1, e2) ->
-        fprintf fmt (protect_on paren "let %a = @[%a@] in@ %a")
+        fprintf fmt (protect_on paren "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a")
           (print_lident info) v (print_expr info) e1 (print_expr info) e2;
         forget_id v
     | Ematch (e1, [p, b1]) ->
@@ -951,7 +967,7 @@ module Print = struct
           (print_expr info) e1
     | Efor (x, vfrom, dir, vto, e1) ->
         fprintf fmt
-          "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
+      "@[<hov 2>(Why3extract.Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
           (if dir = To then "to" else "downto")
           (print_lident info) vfrom (print_lident info) vto
           (print_lident info) x (print_expr info) e1
@@ -1014,25 +1030,25 @@ module Print = struct
 
   let print_decl info fmt = function
     | Dtype dl ->
-        print_list_next newline (print_type_decl info) fmt dl;
-        fprintf fmt "@\n@\n"
+       print_list_next newline (print_type_decl info) fmt dl;
+       fprintf fmt "@\n@\n"
     | Dlet (isrec, dl) ->
-        let print_one fst fmt (ls, vl, e) =
-          fprintf fmt "@[<hv 2>%s %a @[%a@] =@ %a@]"
-            (if fst then if isrec then "let rec" else "let" else "and")
-            (print_lident info) ls
-            (print_list space (print_vs_arg info)) vl
-            (print_expr info) e;
-          forget_vars vl;
-          forget_tvs ()
-        in
-        print_list_next newline print_one fmt dl;
-        fprintf fmt "@\n@\n"
+       let print_one fst fmt (ls, vl, e) =
+         fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
+                 (if fst then if isrec then "let rec" else "let" else "and")
+                 (print_lident info) ls
+                 (print_list space (print_vs_arg info)) vl
+                 (print_expr info) e;
+         forget_vars vl;
+         forget_tvs ()
+       in
+       print_list_next newline print_one fmt dl;
+       fprintf fmt "@\n@\n"
     | Dexn (xs, None) ->
-        fprintf fmt "exception %a@\n@\n" (print_uident info) xs
+       fprintf fmt "exception %a@\n@\n" (print_uident info) xs
     | Dexn (xs, Some ty) ->
-        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-          (print_uident info) xs (print_ty info) ty
+       fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
+               (print_uident info) xs (print_ty info) ty
 
 end
 
@@ -1043,6 +1059,14 @@ let extract_filename ?fname th =
 
 let unsafe_int drv =
   drv.Mlw_driver.drv_printer = Some "ocaml-unsafe-int"
+
+let print_preludes used fmt pm =
+  (* we do not print the same prelude twice *)
+  let ht = Hstr.create 5 in
+  let add l s = if Hstr.mem ht s then l else (Hstr.add ht s (); s :: l) in
+  let l = Sid.fold
+    (fun id l -> List.fold_left add l (Mid.find_def [] id pm)) used [] in
+  print_prelude fmt l
 
 let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
@@ -1060,7 +1084,9 @@ let extract_theory drv ?old ?fname fmt th =
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     Print.print_theory_name th;
-  if not info.unsafe_int then fprintf fmt "open Why3extract@\n@\n";
+  print_prelude fmt drv.Mlw_driver.drv_prelude;
+  print_preludes th.th_used fmt drv.Mlw_driver.drv_thprelude;
+  fprintf fmt "@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   fprintf fmt "@."
 
@@ -1084,7 +1110,10 @@ let extract_module drv ?old ?fname fmt m =
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
-  if not info.unsafe_int then fprintf fmt "open Why3extract@\n@\n";
+  print_prelude fmt drv.Mlw_driver.drv_prelude;
+  let used = Sid.union m.mod_used m.mod_theory.th_used in
+  print_preludes used fmt drv.Mlw_driver.drv_thprelude;
+  fprintf fmt "@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."

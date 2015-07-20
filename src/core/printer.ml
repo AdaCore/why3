@@ -68,6 +68,7 @@ type 'a pp = Pp.formatter -> 'a -> unit
 
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
+  vc_line       : Loc.position option;
   queried_terms : Term.term list;
 }
 
@@ -76,7 +77,7 @@ type printer_args = {
   prelude    : prelude;
   th_prelude : prelude_map;
   blacklist  : blacklist;
-  mutable printer_mapping : printer_mapping; 
+  mutable printer_mapping : printer_mapping;
 }
 
 type printer = printer_args -> ?old:in_channel -> task pp
@@ -90,6 +91,7 @@ exception UnknownPrinter of string
 
 let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
+  vc_line = None;
   queried_terms = [];
 }
 

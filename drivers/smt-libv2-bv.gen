@@ -19,10 +19,12 @@ theory bv.BV_Gen
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
   syntax predicate eq "(= %1 %2)"
-  remove prop Extensionality
 
+  remove prop nth_out_of_bound
   remove prop Nth_zero
   remove prop Nth_ones
+  remove prop eq_sub_equiv
+  remove prop Extensionality
   remove prop Nth_bw_or
   remove prop Nth_bw_and
   remove prop Nth_bw_xor

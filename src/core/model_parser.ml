@@ -24,7 +24,7 @@ open Printer
 type model_value =
  | Integer of string
  | Array of model_array
- | Other of string
+ | Unparsed of string
 and  arr_index = {
   arr_index_key : int;
   arr_index_value : model_value;
@@ -74,7 +74,7 @@ print_model_value_sanit sanit_print fmt value =
   (* Prints model value. *)
   match value with
   | Integer s -> sanit_print fmt s
-  | Other s -> sanit_print fmt s
+  | Unparsed s -> sanit_print fmt s
   | Array a -> print_array sanit_print fmt a
 
 let print_model_value fmt value =
@@ -86,16 +86,37 @@ let print_model_value fmt value =
 **  Model elements
 ***************************************************************
 *)
+type model_element_type =
+| Result
+| Old
+| Other
+
 type model_element = {
   me_name     : string;
+  me_type     : model_element_type;
   me_value    : model_value;
   me_location : Loc.position option;
   me_term     : Term.term option;
 }
 
+let split_me_name name =
+  let splitted = Str.bounded_split (Str.regexp_string "@") name 2 in
+  match splitted with
+  | [first] -> (first, "")
+  | first::[second] ->
+    (first, second)
+  | _ -> (* here, "_" can only stand for [] *)
+    ("", "")
+
 let create_model_element ~name ~value ?location ?term () =
+  let (name, type_s) = split_me_name name in
+  let t = match type_s with
+    | "result" -> Result
+    | "old" -> Old
+    | _ -> Other in
   {
     me_name = name;
+    me_type = t;
     me_value = value;
     me_location = location;
     me_term = term;
@@ -131,32 +152,38 @@ type raw_model_parser =  string -> model_element list
 **  Quering the model
 ***************************************************************
 *)
-
-let print_model_element fmt m_element =
+let print_model_element me_name_trans fmt m_element =
+  let me_name = me_name_trans (m_element.me_name, m_element.me_type) in
   fprintf fmt  "%s = %a"
-      m_element.me_name print_model_value m_element.me_value
+      me_name print_model_value m_element.me_value
 
-let print_model_elements ?(delimiter = "\n") fmt m_elements =
-  List.iter
-    (fun m_element ->
-      print_model_element fmt m_element;
-      fprintf fmt "%s" delimiter
-    )
-    m_elements
+let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
 
-let print_model_file fmt filename model_file =
-  fprintf fmt "File %s:\n" filename;
+let print_model_file fmt me_name_trans filename model_file =
+  fprintf fmt "File %s:" filename;
   IntMap.iter
     (fun line m_elements ->
-      fprintf fmt "Line %d:\n" line;
-      print_model_elements fmt m_elements)
+      fprintf fmt "\nLine %d:\n" line;
+      print_model_elements me_name_trans fmt m_elements)
     model_file
 
-let print_model fmt model =
-  StringMap.iter (print_model_file fmt) model
+let why_name_trans (me_name, me_type) =
+  match me_type with
+  | Result -> "result"
+  | Old -> "old" ^ " " ^ me_name
+  | Other -> me_name
 
-let model_to_string model =
-  print_model str_formatter model;
+let print_model
+    ?(me_name_trans = why_name_trans)
+    fmt
+    model =
+  StringMap.iter (print_model_file fmt me_name_trans) model
+
+let model_to_string
+    ?(me_name_trans = why_name_trans)
+    model =
+  print_model ~me_name_trans str_formatter model;
   flush_str_formatter ()
 
 let get_model_file model filename =
@@ -178,11 +205,16 @@ let get_padding line =
     Str.matched_string line
   with Not_found -> ""
 
-let interleave_line start_comment end_comment model_file (source_code, line_number) line =
+let interleave_line
+    start_comment
+    end_comment
+    me_name_trans
+    model_file
+    (source_code, line_number)
+    line =
   try
     let model_elements = IntMap.find line_number model_file in
-
-    print_model_elements str_formatter model_elements ~delimiter:"; ";
+    print_model_elements me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
       (get_padding line) ^
 	start_comment ^
@@ -197,14 +229,16 @@ let interleave_line start_comment end_comment model_file (source_code, line_numb
 let interleave_with_source
     ?(start_comment="(* ")
     ?(end_comment=" *)")
+    ?(me_name_trans = why_name_trans)
     model
-    filename
-    source_code =
+    ~filename
+    ~source_code =
   try
     let model_file = StringMap.find  filename model in
     let lines = Str.split (Str.regexp "^") source_code in
     let (source_code, _) = List.fold_left
-      (interleave_line start_comment end_comment model_file)
+      (interleave_line
+	 start_comment end_comment me_name_trans model_file)
       ("", 1)
       lines in
     source_code
@@ -221,34 +255,41 @@ let print_model_value_json fmt me_value =
 let model_elements_to_map_bindings model_elements =
   List.fold_left
     (fun map_bindings me ->
-      (me.me_name, me.me_value)::map_bindings
+      (me, me.me_value)::map_bindings
     )
     []
     model_elements
 
-let print_model_elements_json fmt model_elements =
+let print_model_elements_json me_name_to_str fmt model_elements =
   Json.map_bindings
-    (fun i -> i)
+    me_name_to_str
     print_model_value_json
     fmt
     (model_elements_to_map_bindings model_elements)
 
-let print_model_elements_on_lines_json fmt model_file =
+let print_model_elements_on_lines_json me_name_to_str fmt model_file =
   Json.map_bindings
     (fun i -> string_of_int i)
-    print_model_elements_json
+    (print_model_elements_json me_name_to_str)
     fmt
     (IntMap.bindings model_file)
 
-let print_model_json fmt model =
+let print_model_json
+    ?(me_name_trans = why_name_trans)
+    fmt
+    model =
+  let me_name_to_str = fun me ->
+    me_name_trans (me.me_name, me.me_type) in
   Json.map_bindings
     (fun s -> s)
-    print_model_elements_on_lines_json
+    (print_model_elements_on_lines_json me_name_to_str)
     fmt
     (StringMap.bindings model)
 
-let model_to_string_json model =
-  print_model_json str_formatter model;
+let model_to_string_json
+    ?(me_name_trans = why_name_trans)
+    model =
+  print_model_json str_formatter ~me_name_trans model;
   flush_str_formatter ()
 
 

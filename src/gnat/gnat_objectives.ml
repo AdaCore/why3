@@ -651,7 +651,8 @@ module Save_VCs = struct
 	     counterexample ~positions:(trace_to_list trace) in
        with_fmt_channel
 	 ce_fn
-	 (fun fmt -> Format.fprintf fmt "%a@." Model_parser.print_model_json counterexample);
+	 (fun fmt -> Format.fprintf fmt "%a@." (Model_parser.print_model_json
+         ?me_name_trans:None) counterexample);
        ce_fn
      end
      else

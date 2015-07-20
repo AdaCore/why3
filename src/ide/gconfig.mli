@@ -40,6 +40,7 @@ type t =
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
+      mutable session_cntexample : bool;
     }
 
 val load_config : Whyconf.config -> Whyconf.config -> Why3.Env.env -> unit

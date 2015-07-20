@@ -140,7 +140,7 @@ module Make(O: OBSERVER) : sig
         will be started asynchronously when processors are available.
 
         ~context_unproved_goals_only indicates if prover must be run
-        on already proved goals or not 
+        on already proved goals or not
 	~cntexample indicates if prover should be asked to get counter-example
 	model
     *)
@@ -152,7 +152,7 @@ module Make(O: OBSERVER) : sig
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     O.key proof_attempt -> unit
   (** [run_external_proof es sched ?cntexample ?callback p] reruns an existing
-      proof attempt [p] 
+      proof attempt [p]
 
       ~cntexample indicates if prover should be asked to get counter-example
 	model
@@ -166,6 +166,7 @@ module Make(O: OBSERVER) : sig
     | StatusChange of proof_attempt_status
 
   val run_external_proof_v3 :
+    use_steps:bool ->
     O.key Session.env_session -> t -> O.key Session.proof_attempt ->
     ?cntexample : bool ->
     (O.key Session.proof_attempt -> Whyconf.prover ->
@@ -176,8 +177,8 @@ module Make(O: OBSERVER) : sig
       status]. run_external_proof_v3 don't change the existing proof
       attempt just can add new by O.uninstalled_prover. Be aware since
       the session is not modified there is no test to see if the
-      proof_attempt had already been started 
-      
+      proof_attempt had already been started
+
       ?cntexample indicates if prover should be asked to get counter-example
 	model
   *)
@@ -191,7 +192,7 @@ module Make(O: OBSERVER) : sig
     Whyconf.prover -> O.key goal -> unit
   (** [prover_on_goal es sched ?cntexample ?timelimit p g] same as
       {!redo_external_proof} but creates or reuses existing proof_attempt
-      
+
       ?cntexample indicates if prover should be asked to get counter-example
 	model
   *)
@@ -283,6 +284,7 @@ module Make(O: OBSERVER) : sig
 
   val check_all:
     ?release:bool -> (** Can all the goals be released at the end? def: false *)
+    use_steps:bool -> (** Replay use recorded number of proof steps *)
     ?filter:(O.key proof_attempt -> bool) ->
     O.key env_session -> t ->
     callback:((Ident.ident * Whyconf.prover * (int * int * int) * report) list -> unit) ->

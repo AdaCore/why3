@@ -102,17 +102,39 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
+(* Information about the line in the program for that the VC was made *)
+type vc_line_info = {
+  mutable vc_inside : bool;
+  (* true if the term corresponding to VC line is currently processed *)
+  mutable vc_loc : Loc.position option;
+  (* the position of VC line *)
+  mutable vc_func_name : string option;
+  (* the name of the function. None if VC is not generated for
+     postcondition or precondition) *)
+}
+
+let vc_line_info = { vc_inside = false; vc_loc = None; vc_func_name = None }
+
+module TermCmp = struct
+  type t = term
+  let compare a b =
+    if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
+    then 0 else 1
+end
+
+module S = Set.Make(TermCmp)
+
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
-  mutable info_model : term list;
+  mutable info_model : S.t;
 }
 
 let debug_print_term message t =
   let form = Debug.get_debug_formatter () in
   begin
     Debug.dprintf debug message;
-    if Debug.test_flag debug then 
+    if Debug.test_flag debug then
       Pretty.print_term form t;
     Debug.dprintf debug "@.";
   end
@@ -150,21 +172,101 @@ let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let model_label = Ident.create_label "model"
+let model_vc_line_label = Ident.create_label "model_vc"
 
 let collect_model_ls info ls =
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) :: info.info_model
+      S.add
+      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+
+let model_trace_regexp = Str.regexp "model_trace:"
+
+let label_starts_with regexp l =
+  try
+    ignore(Str.search_forward regexp l.lab_string 0);
+    true
+  with Not_found -> false
+
+let get_label labels regexp =
+  Slab.choose (Slab.filter (label_starts_with regexp) labels)
+
+let add_old lab_str =
+  try
+    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
+    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
+    if after = "@init" then
+      (String.sub lab_str 0 pos) ^ "@old"
+    else lab_str
+  with Not_found -> lab_str ^ "@old"
+
+let model_trace_for_postcondition ~labels =
+  (* Modifies the  model_trace label of a term in the postcondition:
+     - if term corresponds to the initial value of a function
+     parameter, model_trace label will have postfix @old
+     - if term corresponds to the return value of a function, add
+     model_trace label in a form function_name@result
+  *)
+  try
+    let trace_label = get_label labels model_trace_regexp in
+    let lab_str = add_old trace_label.lab_string in
+    if lab_str = trace_label.lab_string then
+      labels
+    else
+      let other_labels = Slab.remove trace_label labels in
+      Slab.add
+	(Ident.create_label lab_str)
+	other_labels
+  with Not_found ->
+    (* no model_trace label => the term represents the return value *)
+    Slab.add
+      (Ident.create_label
+	 ("model_trace:" ^ (Opt.get_def "" vc_line_info.vc_func_name)  ^ "@result"))
+      labels
+
+let get_fun_name name =
+  let splitted = Str.bounded_split (Str.regexp_string ":") name 2 in
+  match splitted with
+  | _::[second] ->
+    second
+  | _ ->
+    ""
+
+let check_enter_vc_line t =
+  (* Check whether the term corresponding to the line of VC is entered.
+     If it is entered, extract the location of VC line and if the VC is
+     postcondition or precondition of a function , extract the name of
+     the function.
+  *)
+  if Slab.mem model_vc_line_label t.t_label then begin
+    vc_line_info.vc_inside <- true;
+    vc_line_info.vc_loc <- t.t_loc;
+    try
+      (* Extract the function name from "model_func" label *)
+      let fun_label = get_label t.t_label (Str.regexp "model_func") in
+      vc_line_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
+    with Not_found ->
+      (* No label "model_func" => the VC is not postcondition or precondition *)
+      ()
+  end
+
+let check_exit_vc_line t =
+  (* Check whether the term corresponding to the line of VC is exited. *)
+  if Slab.mem model_vc_line_label t.t_label then begin
+    vc_line_info.vc_inside <- false;
+  end
 
 (** expr *)
-let rec print_term info fmt t = 
-  debug_print_term "Printing term: " t; 
+let rec print_term info fmt t =
+  debug_print_term "Printing term: " t;
 
   if Slab.mem model_label t.t_label then
-    info.info_model <- (t) :: info.info_model;
+    info.info_model <- S.add t info.info_model;
 
-  match t.t_node with
+  check_enter_vc_line t;
+
+  let () = match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
@@ -198,9 +300,23 @@ let rec print_term info fmt t =
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
-          | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
-          | _ -> fprintf fmt "@[(%a@ %a)@]"
-              print_ident ls.ls_name (print_list space (print_term info)) tl
+          | [] ->
+	    if vc_line_info.vc_inside then begin
+	      match vc_line_info.vc_loc with
+	      | None -> ()
+	      | Some loc ->
+		let labels = match vc_line_info.vc_func_name with
+		  | None ->
+		    ls.ls_name.id_label
+		  | Some _ ->
+		    model_trace_for_postcondition ~labels:ls.ls_name.id_label in
+		let t_check_pos = t_label ~loc labels t in
+		info.info_model <- S.add t_check_pos info.info_model;
+	    end;
+	    fprintf fmt "@[%a@]" print_ident ls.ls_name
+          | _ ->
+	    fprintf fmt "@[(%a@ %a)@]"
+	      print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
@@ -210,24 +326,38 @@ let rec print_term info fmt t =
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
-  | Tcase({t_node = Tvar v}, bl) ->
-      print_branches info v print_term fmt bl
   | Tcase(t, bl) ->
-      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-        print_var subject (print_term info) t
-        (print_branches info subject print_term) bl;
-      forget_var subject
+    let ty = t_type t in
+    begin
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t print_term fmt bl
+      | _ ->
+        match t.t_node with
+        | Tvar v -> print_branches info v print_term fmt bl
+        | _ ->
+          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+          fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+            print_var subject (print_term info) t
+            (print_branches info subject print_term) bl;
+          forget_var subject
+    end
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
+  in
 
-and print_fmla info fmt f = 
-  debug_print_term "Printing formula: " f;  
+  check_exit_vc_line t;
+
+
+and print_fmla info fmt f =
+  debug_print_term "Printing formula: " f;
   if Slab.mem model_label f.t_label then
-    info.info_model <- (f) :: info.info_model;
-  
-  match f.t_node with
+    info.info_model <- S.add f info.info_model;
+
+  check_enter_vc_line f;
+
+  let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -278,22 +408,53 @@ and print_fmla info fmt f =
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Tcase({t_node = Tvar v}, bl) ->
-      print_branches info v print_fmla fmt bl
   | Tcase(t, bl) ->
-      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-        print_var subject (print_term info) t
-        (print_branches info subject print_fmla) bl;
-      forget_var subject
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+    let ty = t_type t in
+    begin
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t print_fmla fmt bl
+      | _ ->
+        match t.t_node with
+        | Tvar v -> print_branches info v print_fmla fmt bl
+        | _ ->
+          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+          fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+            print_var subject (print_term info) t
+            (print_branches info subject print_fmla) bl;
+          forget_var subject
+    end
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
+
+  check_exit_vc_line f
+
+and print_boolean_branches info subject pr fmt bl =
+  let error () = unsupportedTerm subject
+    "smtv2: bad pattern-matching on Boolean (compile_match missing?)"
+  in
+  match bl with
+  | [br1 ; br2] ->
+    let (p1,t1) = t_open_branch br1 in
+    let (_p2,t2) = t_open_branch br2 in
+    begin
+      match p1.pat_node with
+      | Papp(cs,_) ->
+        let csname = if ls_equal cs fs_bool_true then "true" else "false" in
+        fprintf fmt "@[(ite (= %a %s) %a %a)@]"
+          (print_term info) subject
+          csname
+          (pr info) t1
+          (pr info) t2
+      | _ -> error ()
+    end
+  | _ -> error ()
 
 and print_branches info subject pr fmt bl = match bl with
   | [] -> assert false
   | br::bl ->
       let (p,t) = t_open_branch br in
       let error () = unsupportedPattern p
-        "smtv2: you must compile nested pattern matching" in
+        "smtv2: you must compile nested pattern-matching" in
       match p.pat_node with
       | Pwild -> pr info fmt t
       | Papp (cs,args) ->
@@ -352,20 +513,20 @@ let print_logic_decl info fmt (ls,def) =
     List.iter forget_var vsl
   end
 
-let print_info_model cntexample fmt info =
+let print_info_model cntexample fmt model_list info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if info_model != [] && cntexample then 
+  if model_list != [] && cntexample then
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
             (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
       fprintf fmt "@[(get-value (";
-      List.iter (fun f -> 
+      List.iter (fun f ->
 	fprintf str_formatter "%a" (print_fmla info) f;
         let s = flush_str_formatter () in
         fprintf fmt "%s " s;
-      ) info_model;
+      ) model_list;
       fprintf fmt "))@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
@@ -386,12 +547,13 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
+      let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
-      print_info_model cntexample fmt info;
-      
+      print_info_model cntexample fmt model_list info;
+
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				queried_terms = info.info_model; }
-	  
+				vc_line = vc_line_info.vc_loc;
+				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
 
@@ -445,12 +607,12 @@ let print_decls cntexample args =
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
   Printer.on_converter_map (fun cm ->
-      Trans.fold print_decl ((sm, cm, []),[])))
+      Trans.fold print_decl ((sm, cm, S.empty),[])))
 
-let set_produce_models fmt cntexample = 
+let set_produce_models fmt cntexample =
   if cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
-  
+
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)

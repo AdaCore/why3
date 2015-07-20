@@ -6,10 +6,10 @@ import "ocaml-gen.drv"
 (** Machine arithmetic *)
 
 module mach.int.Int32
-  syntax val of_int "Why3__BigInt.to_int"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int"
   syntax converter of_int "%1"
 
-  syntax function to_int "(Why3__BigInt.of_int %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int %1)"
 
   syntax type     int32     "int"
   syntax val      ( + )     "( + )"
@@ -27,10 +27,10 @@ module mach.int.Int32
 end
 
 module mach.int.UInt32
-  syntax val of_int "Why3__BigInt.to_int"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int"
   syntax converter of_int "%1"
 
-  syntax function to_int "(Why3__BigInt.of_int %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int %1)"
   syntax constant zero_unsigned "0"
 
   syntax type     uint32    "int"
@@ -63,10 +63,10 @@ module mach.int.UInt32
 end
 
 module mach.int.Int63
-  syntax val of_int "Why3__BigInt.to_int"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int"
   syntax converter of_int "%1"
 
-  syntax function to_int "(Why3__BigInt.of_int %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int %1)"
 
   syntax type     int63     "int"
   syntax val      ( + )     "( + )"
@@ -98,10 +98,10 @@ module mach.int.MinMax63
 end
 
 module mach.int.Int64
-  syntax val of_int "Why3__BigInt.to_int64"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int64"
   syntax converter of_int "%1L"
 
-  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int64 %1)"
 
   syntax type     int64     "Int64.t"
   syntax val      (+)       "Int64.add"
@@ -120,7 +120,7 @@ end
 
 module mach.peano.Peano
   syntax type t "int"
-  syntax val to_int "Why3__BigInt.of_int"
+  syntax val to_int "Why3extract.Why3__BigInt.of_int"
   syntax val zero "(fun _ -> 0)"
   syntax val succ "succ"
   syntax val pred "pred"
@@ -135,7 +135,7 @@ module mach.peano.Peano
   syntax val add "(fun x y _ _ -> x+y)"
   syntax val sub "(fun x y _ _ -> x-y)"
   syntax val mul "(fun x y _ _ -> x*y)"
-  syntax val of_int "(fun n _ _ -> Why3__BigInt.to_int n)"
+  syntax val of_int "(fun n _ _ -> Why3extract.Why3__BigInt.to_int n)"
   syntax val div "(/)"
   syntax val mod "(mod)"
   syntax val max "max"
@@ -144,7 +144,7 @@ end
 
 module mach.onetime.OneTime
   syntax type t "int"
-  syntax val to_int "Why3__BigInt.of_int"
+  syntax val to_int "Why3extract.Why3__BigInt.of_int"
   syntax val zero "(fun _ -> 0)"
   syntax val succ "succ"
   syntax val pred "pred"

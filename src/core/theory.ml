@@ -445,7 +445,7 @@ let warn_dubious_axiom uc k _ syms =
 *)
     with Exit -> ()
 
-let lab_w_conservative_extension_no = Ident.create_label "W:conservative_extension:N"
+let lab_w_non_conservative_extension_no = Ident.create_label "W:non_conservative_extension:N"
 
 let add_decl ?(warn=true) uc d =
   check_decl_opacity d; (* we don't care about tasks *)
@@ -458,7 +458,7 @@ let add_decl ?(warn=true) uc d =
     | Dind (_, dl) -> List.fold_left add_ind uc dl
     | Dprop ((k,pr,_) as p) ->
       if warn &&
-        not (Slab.mem lab_w_conservative_extension_no pr.pr_name.id_label)
+        not (Slab.mem lab_w_non_conservative_extension_no pr.pr_name.id_label)
       then warn_dubious_axiom uc k pr.pr_name d.d_syms;
       add_prop uc p
 

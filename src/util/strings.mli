@@ -9,13 +9,15 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Wrappers for deprecated string functions of OCaml stdlib *)
+(** {1 Additional Useful Functions on Character Strings} *)
+
+(** {2 Wrappers for deprecated string functions of OCaml stdlib} *)
 
 val create : int -> string
 val copy : string -> string
 val set : string -> int -> char -> unit
 
-(** Useful functions on string *)
+(** {2 Other useful functions on strings} *)
 
 val rev_split : char -> string -> string list
 

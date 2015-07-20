@@ -10,12 +10,12 @@ module M
   meta "inline : no" function projf
   meta "model_projection" function projf
 
-  val y "model_projected" "model_trace:y" :ref int
+  val y "model_projected" "model" "model_trace:y" :ref int
 
   let incr ( x23 "model" "model_trace:x23" : ref int ): unit
   ensures { !x23 = old !x23 + 2 + !y }
   =
-  #"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#
+  (*#"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#*)
   y := !y + 1;
   x23 := !x23 + 1;
   x23 := !x23 + 1
@@ -27,7 +27,7 @@ module M
   while "model" "model_trace:cond" !x > 0 do invariant { !x >= 0 } variant { !x } x := !x - 1 done
 
   use import map.Map
-  let test_map (x "model" "model_trace:x" : ref (map int int)) : unit
+  let test_map (x "model" : ref (map int int)) : unit
   ensures { !x[0] <> !x[1] }
   =
   x := Map.set !x 0 3 

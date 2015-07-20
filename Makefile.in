@@ -121,11 +121,6 @@ CLEANDIRS =
 CLEANLIBS =
 GENERATED =
 
-install_local::
-	ln -s -n -f ../drivers share/drivers
-	ln -s -n -f ../modules share/modules
-	ln -s -n -f ../theories share/theories
-
 ##############
 # Why3 library
 ##############
@@ -159,6 +154,7 @@ LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		detect_polymorphism \
+		reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
@@ -561,6 +557,17 @@ install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
+
+install_local:: share/drivers share/modules share/theories
+
+share/drivers:
+	ln -snf ../drivers share/drivers
+
+share/modules:
+	ln -snf ../modules share/modules
+
+share/theories:
+	ln -snf ../theories share/theories
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(TOOLSDEP)
@@ -1041,7 +1048,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1695,12 +1702,10 @@ MODULESTODOC = \
 	util/weakhtbl util/stdlib util/rc util/debug \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
-	driver/whyconf driver/driver \
+	driver/whyconf driver/call_provers driver/driver \
 	session/session session/session_tools session/session_scheduler \
 	whyml/mlw_ty whyml/mlw_expr whyml/mlw_decl whyml/mlw_module \
-	whyml/mlw_main
-#	transform/introduction \
-#	ide/db
+	whyml/mlw_wp
 
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 

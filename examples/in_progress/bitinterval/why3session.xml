@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<file name="../bitinterval.mlw" expanded="true">
+<theory name="BitInterval" sum="18200d09e060eeb168b77260b8d7745e" expanded="true">
+ <goal name="WP_parameter interval_eq_is_equ" expl="VC for interval_eq_is_equ" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter interval_eq_is_equ.1" expl="1. VC for interval_eq_is_equ">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.2" expl="2. VC for interval_eq_is_equ">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.3" expl="3. VC for interval_eq_is_equ">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.4" expl="4. assertion">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.74" steps="223"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.56"/></proof>
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.5" expl="5. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter interval_eq_is_equ.5.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.38" steps="350"/></proof>
+   </goal>
+   <goal name="WP_parameter interval_eq_is_equ.5.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="129"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.6" expl="6. assertion">
+  <proof prover="0"><result status="valid" time="1.96" steps="591"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.06"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.7" expl="7. assertion">
+  <proof prover="0"><result status="valid" time="2.97" steps="1110"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.04"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.8" expl="8. assertion" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.79"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.03"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter interval_eq_is_equ.8.1" expl="1. assertion" expanded="true">
+   <proof prover="0"><result status="timeout" time="3.57"/></proof>
+   <proof prover="1"><result status="unknown" time="5.72"/></proof>
+   <proof prover="2"><result status="unknown" time="0.03"/></proof>
+   <proof prover="3"><result status="timeout" time="4.95"/></proof>
+   </goal>
+   <goal name="WP_parameter interval_eq_is_equ.8.2" expl="2. assertion" expanded="true">
+   <proof prover="0"><result status="timeout" time="3.42"/></proof>
+   <proof prover="1"><result status="timeout" time="6.65"/></proof>
+   <proof prover="2"><result status="unknown" time="0.03"/></proof>
+   <proof prover="3"><result status="timeout" time="4.98"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter interval_eq_is_equ.9" expl="9. postcondition" expanded="true">
+  <proof prover="0"><result status="timeout" time="4.97"/></proof>
+  <proof prover="1"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2"><result status="unknown" time="0.04"/></proof>
+  <proof prover="3"><result status="timeout" time="4.98"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="interval_eq_is_equ_64" expanded="true">
+ </goal>
+ <goal name="nth_ult" expanded="true">
+ </goal>
+</theory>
+</file>
+</why3session>

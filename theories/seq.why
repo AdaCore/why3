@@ -91,6 +91,8 @@ theory Seq
     forall s: seq 'a, x: 'a, i: int. 0 <= i <= length s ->
     (snoc s x)[i] = if i < length s then s[i] else x
 
+  lemma snoc_last: forall s: seq 'a, x: 'a. (snoc s x)[length s] = x
+
   (** sub-sequence *)
 
   function ([_.._]) (seq 'a) int int : seq 'a

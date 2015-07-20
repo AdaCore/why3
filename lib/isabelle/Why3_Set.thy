@@ -174,6 +174,9 @@ why3_vc cardinal_subset
   using assms
   by (simp add: fcard_mono)
 
+why3_vc subset_eq
+by (metis H1 H2 fcard_seteq nat_int order_refl)
+
 why3_end
 
 end
