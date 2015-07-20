@@ -1,10 +1,10 @@
 
 module Types
-  
+
 end
 
 module Impl
-  
+
   use import Firstorder_semantics.Sem
   use import Firstorder_term_spec.Spec
   use import Firstorder_formula_spec.Spec
@@ -35,12 +35,13 @@ module Impl
   use import list.List
   use import set.Set as S
   use import BacktrackArray.Impl as BA
-  
+
   val ghost sdata_inv_hack (u:unit) : pred sdata
     ensures { result = sdata_inv }
-  
+
   let main (base:nlimpl_fo_formula_list) (gnum:int) : unit
     requires { nlimpl_fo_formula_list_ok base }
+    diverges
     ensures { forall m:model int 'st,rho:func int 'st.
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rho) }
     raises { Sat -> forall m:model int 'st,rho:func int 'st.
@@ -53,6 +54,7 @@ module Impl
       assert { root.model_tableau_field  = Root } ;
       let gnum = phip.final_goals_number in
       let rec aux (n:int) : prover_return
+        diverges
         returns { { contradictory_assignment = s } ->
         forall m:model int 'st,rho:func int 'st.
           let rhos = semantic_subst s m rho in
@@ -88,7 +90,5 @@ module Impl
         not(formula_list_conj_semantic basem m rho) }
     with Unsat -> ()
     end
-  
+
 end
-
-

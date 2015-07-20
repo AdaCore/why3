@@ -604,8 +604,7 @@ module Impl
   use import Firstorder_term_spec.Spec
   use import Types
   use import Logic
-  let rec bind_var_symbol_in_fo_term_list "W:diverges:N"
-    (t:nl_fo_term_list int int) (x:int)
+  let rec bind_var_symbol_in_fo_term_list (t:nl_fo_term_list int int) (x:int)
     (i:int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd0:func int (symbol 'b0)) (ghost fr3:func int (fo_term 'b0 'b3))
     (ghost bnd3:func int (fo_term 'b0 'b3)) : nl_fo_term_list int int
@@ -658,8 +657,7 @@ module Impl
                ((rename_subst_fo_term bnd3 identity identity)))
     end
 
-  with bind_var_fo_term_in_fo_term_list "W:diverges:N"
-    (t:nl_fo_term_list int int) (x:int)
+  with bind_var_fo_term_in_fo_term_list (t:nl_fo_term_list int int) (x:int)
     (i:int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd0:func int (symbol 'b0)) (ghost fr3:func int (fo_term 'b0 'b3))
     (ghost bnd3:func int (fo_term 'b0 'b3)) : nl_fo_term_list int int
@@ -718,8 +716,7 @@ module Impl
                ((rename_subst_fo_term bnd3 identity identity)))
     end
 
-  with bind_var_symbol_in_fo_term "W:diverges:N"
-    (t:nl_fo_term int int) (x:int) (i:int)
+  with bind_var_symbol_in_fo_term (t:nl_fo_term int int) (x:int) (i:int)
     (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0))
     (ghost fr3:func int (fo_term 'b0 'b3))
     (ghost bnd3:func int (fo_term 'b0 'b3)) : nl_fo_term int int
@@ -771,8 +768,7 @@ module Impl
                ((rename_subst_fo_term bnd3 identity identity)))
     end
 
-  with bind_var_fo_term_in_fo_term "W:diverges:N"
-    (t:nl_fo_term int int) (x:int) (i:int)
+  with bind_var_fo_term_in_fo_term (t:nl_fo_term int int) (x:int) (i:int)
     (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0))
     (ghost fr3:func int (fo_term 'b0 'b3))
     (ghost bnd3:func int (fo_term 'b0 'b3)) : nl_fo_term int int
@@ -814,8 +810,7 @@ module Impl
                ((rename_subst_fo_term bnd3 identity identity)))
     end
 
-  let rec unbind_var_symbol_in_fo_term_list "W:diverges:N"
-    (t:nl_fo_term_list int int)
+  let rec unbind_var_symbol_in_fo_term_list (t:nl_fo_term_list int int)
     (i:int) (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr3:func int (fo_term 'b0 'b3))
@@ -890,8 +885,7 @@ module Impl
                ((rename_subst_symbol bnd20 identity)))
     end
 
-  with unbind_var_fo_term_in_fo_term_list "W:diverges:N"
-    (t:nl_fo_term_list int int) (i:int)
+  with unbind_var_fo_term_in_fo_term_list (t:nl_fo_term_list int int) (i:int)
     (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr3:func int (fo_term 'b0 'b3))
@@ -990,8 +984,7 @@ module Impl
                ((rename_subst_fo_term bnd23 identity identity)))
     end
 
-  with unbind_var_symbol_in_fo_term "W:diverges:N"
-    (t:nl_fo_term int int) (i:int)
+  with unbind_var_symbol_in_fo_term (t:nl_fo_term int int) (i:int)
     (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr3:func int (fo_term 'b0 'b3))
@@ -1065,8 +1058,7 @@ module Impl
                ((rename_subst_symbol bnd20 identity)))
     end
 
-  with unbind_var_fo_term_in_fo_term "W:diverges:N"
-    (t:nl_fo_term int int) (i:int)
+  with unbind_var_fo_term_in_fo_term (t:nl_fo_term int int) (i:int)
     (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr3:func int (fo_term 'b0 'b3))

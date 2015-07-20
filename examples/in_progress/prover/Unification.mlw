@@ -1,6 +1,6 @@
 
 module Types
-  
+
   use import Functions.Func
   (*use import Assoc.Types as AS
   use import Assoc.Logic as AS
@@ -16,31 +16,31 @@ module Types
   use import Firstorder_term_impl.Types
   use import Firstorder_term_impl.Logic
   use import Firstorder_term_impl.Impl
-  
+
   type sdata = PConflict nlimpl_fo_term_list nlimpl_fo_term_list
     | Assign nlimpl_fo_term
-  
+
   type subst = BA.t sdata
   type timesubst = BA.timestamp sdata
-  
+
   type unifier_subst = {
     ghost unifier_base_model : func int (fo_term int int) ;
     ghost unifier : func int (fo_term int int) ;
   }
-  
+
   type unification_return = {
     ghost final_unifier : unifier_subst ;
     ghost unifier_factor : func int (fo_term int int) ;
   }
-  
+
   (*type unify_return = {
     ghost factor : func int (fo_term int int);
   }*)
-  
+
 end
 
 module Logic
-  
+
   use import int.Int
   use import Functions.Func
   use import option.Option
@@ -57,7 +57,7 @@ module Logic
   use import Firstorder_term_impl.Logic
   use import Firstorder_term_impl.Impl
   use import Types
-  
+
   constant sdata_inv : pred sdata
   axiom sdata_inv_def : forall x:sdata.
     sdata_inv x <-> match x with
@@ -71,7 +71,7 @@ module Logic
         (forall x:int. is_fo_term_free_var_in_fo_term x
           l.model_fo_term_field -> x >= 0)
     end
-  
+
   function smodel (l:timesubst) : func int (fo_term int int)
   axiom smodel_def : forall l:timesubst,x:int.
     smodel l x = match table l x with
@@ -79,32 +79,32 @@ module Logic
       | Cons (PConflict _ _) _ -> Var_fo_term x
       | Cons (Assign u) _ -> u.model_fo_term_field
     end
-  
+
   predicate unassigned (l:timesubst) (x:int) = match table l x with
     | Cons (Assign _) _ -> false
     | _ -> true
   end
-  
+
   let lemma smodel_depend_only_model (l1 l2:timesubst) : unit
     requires { l1.table = l2.table }
     ensures { smodel l1 = smodel l2 }
   =
     assert { extensionalEqual (smodel l1) (smodel l2) }
-  
+
   function sc (s1:func 'b (fo_term 'ls 'b)) (s2:func 'b (fo_term 'ls 'b)) :
     func 'b (fo_term 'ls 'b) =
     subst_compose_fo_term s1 subst_id_symbol s2
-  
+
   function st (t:fo_term 'ls 'b) (s:func 'b (fo_term 'ls 'b)) : fo_term 'ls 'b =
     subst_fo_term t subst_id_symbol s
-  
+
   function stl (t:fo_term_list 'ls 'b)
     (s:func 'b (fo_term 'ls 'b)) : fo_term_list 'ls 'b =
     subst_fo_term_list t subst_id_symbol s
-  
+
   (*
   (* power relation. *)
-  
+
   inductive power_rel (s:func 'b (fo_term 'ls 'b)) (n:int)
     (sr:func 'b (fo_term 'ls 'b)) =
     | Power0 : forall s:func 'b (fo_term 'ls 'b).
@@ -113,7 +113,7 @@ module Logic
       sr:func 'b (fo_term 'ls 'b).
       n >= 0 /\ power_rel s n sr ->
       power_rel s (n+1) (sc s sr)
-  
+
   let rec lemma power_rel_det (s:func 'b (fo_term 'ls 'b)) (n:int) : unit
     ensures { forall sr1 sr2:func 'b (fo_term 'ls 'b).
       power_rel s n sr1 /\ power_rel s n sr2 -> sr1 = sr2 }
@@ -121,7 +121,7 @@ module Logic
   =
     if n > 0
     then power_rel_det s (n-1)
-  
+
   let rec lemma power_rel_additive (s:func 'b (fo_term 'ls 'b)) (n m:int)
     (srm:func 'b (fo_term 'ls 'b)) : unit
     ensures { forall srn:func 'b (fo_term 'ls 'b).
@@ -131,7 +131,7 @@ module Logic
   =
     if n > 0
     then power_rel_additive s (n-1) m srm
-  
+
   let rec ghost power (s:func 'b (fo_term 'ls 'b)) (n:int) :
     func 'b (fo_term 'ls 'b)
     requires { n >= 0 }
@@ -141,7 +141,7 @@ module Logic
     if n = 0
     then subst_id_fo_term
     else sc s (power s (n-1))
-  
+
   let rec lemma power_fixed_point (s:func 'b (fo_term 'ls 'b)) (n:int)
     (x:'b) : unit
     requires { s x = Var_fo_term x }
@@ -152,11 +152,11 @@ module Logic
     if n > 0
     then power_fixed_point s (n-1) x
   *)
-  
+
   (* In other words : unifier is the idempotent limit reached by power
      iteration of the model of unifier_base, which is unifier_base_model,
      and iteration is an exponent reaching the fixed point. *)
-  
+
   predicate unifier_subst_ok (rho:subst) (u:unifier_subst) =
     smodel (BA.current_timestamp rho) = u.unifier_base_model /\
     (forall x:int. eval u.unifier_base_model x = Var_fo_term x ->
@@ -170,7 +170,7 @@ module Logic
     sc u.unifier u.unifier = u.unifier /\
     BA.correct rho /\
     rho.inv = sdata_inv
-  
+
   (*let rec lemma size_term_increase (t:fo_term int int) (x:int)
     (s:func int (fo_term int int)) : unit
     ensures { is_fo_term_free_var_in_fo_term x t ->
@@ -185,7 +185,7 @@ module Logic
       | Var_fo_term _ -> ()
       | App _ l -> size_list_increase l x s
     end
-  
+
   with lemma size_list_increase (t:fo_term_list int int) (x:int)
     (s:func int (fo_term int int)) : unit
     ensures { is_fo_term_free_var_in_fo_term_list x t ->
@@ -201,11 +201,11 @@ module Logic
       | FOCons u q -> size_term_increase u x s ;
         size_list_increase q x s
     end*)
-  
+
 end
 
 module Impl
-  
+
   use import int.Int
   use import Functions.Func
   use import option.Option
@@ -225,9 +225,9 @@ module Impl
   use import Logic
   use import ref.Ref
   use import list.Mem
-  
+
   exception UnificationFailure
-  
+
   (* Utility for a frequent reasoning that
      allow to decrease variant. *)
   (*let ghost checkit (rhob:subst) (rho:unifier_subst) (x:int) (*(it:int)*) : unit
@@ -266,7 +266,7 @@ module Impl
       power_rel rho0 it (sc rho0 sp) &&
       st tm sp = st mx (sc rho0 sp) = st mx rhoi =
       st mx (sc rho0 rhoi) = st tm rhoi && st tm sp = st tm rhoi }*)
-  
+
   let ghost bottomvar (rhob:subst) (ghost rho:unifier_subst) (x:int) : unit
     requires { unifier_subst_ok rhob rho }
     requires { unassigned (BA.current_timestamp rhob) x }
@@ -276,7 +276,7 @@ module Impl
   =
     assert { eval rho.unifier_base_model x = Var_fo_term x } ;
     assert { eval rho.unifier x = Var_fo_term x }
-  
+
   (* Check presence of a variable inside the fully substituted term. *)
   let rec check_unified_free_var (x:int) (t:nlimpl_fo_term)
     (rhob:subst) (ghost rho:unifier_subst)
@@ -291,11 +291,12 @@ module Impl
     (*requires { it >= 0 }*)
     requires { forall y:int. is_fo_term_free_var_in_fo_term y
       t.model_fo_term_field -> y >= 0 }
+    variant { 0 }
+    (*variant { it , size_fo_term t.model_fo_term_field }*)
     ensures { not(is_fo_term_free_var_in_fo_term x
       (st t.model_fo_term_field rho.unifier)) }
     raises { UnificationFailure (*->
       is_fo_term_free_var_in_fo_term x (st t.model_fo_term_field rho.unifier)*) }
-    (*variant { it , size_fo_term t.model_fo_term_field }*)
   =
     let tm = t.model_fo_term_field in
     let rho0 = rho.unifier in
@@ -327,7 +328,7 @@ module Impl
           st tm s = App fm (stl lm s) } ;
         check_unified_free_var_list x l rhob rho (*it*)
     end
-  
+
   with check_unified_free_var_list (x:int) (t:nlimpl_fo_term_list)
     (rhob:subst) (ghost rho:unifier_subst) (*(ghost it:int)*) : unit
     requires { nlimpl_fo_term_list_ok t }
@@ -340,12 +341,13 @@ module Impl
     (*requires { it >= 0 }*)
     requires { forall y:int. is_fo_term_free_var_in_fo_term_list y
       t.model_fo_term_list_field -> y >= 0 }
+   variant { 0 }
+    (*variant { it , size_fo_term_list t.model_fo_term_list_field }*)
     ensures { not(is_fo_term_free_var_in_fo_term_list x
         (stl t.model_fo_term_list_field rho.unifier)) }
     raises { UnificationFailure (*->
       is_fo_term_free_var_in_fo_term_list x
         (stl t.model_fo_term_list_field rho.unifier)*) }
-    (*variant { it , size_fo_term_list t.model_fo_term_list_field }*)
   =
     let tm = t.model_fo_term_list_field in
     let rho0 = rho.unifier in
@@ -359,7 +361,7 @@ module Impl
         check_unified_free_var x u rhob rho (*it*) ;
         check_unified_free_var_list x q rhob rho (*it*)
     end
-  
+
   (*
   (* to prevent : 1) expanding of t0 as a record,
      2) inlining of nlimpl_fo_term *)
@@ -367,39 +369,39 @@ module Impl
     forall x:int, t0:nlimpl_fo_term.
       AS.model rho x = Some t0 -> nlimpl_fo_term_ok t0
   *)
-  
+
   (* Unification core routine : set a variable to some equation. *)
-  
+
   let assign (z:int) (t:nlimpl_fo_term) (lv:ref (list int)) (rhob:subst)
     (ghost rho:unifier_subst) (ghost lp:pred int)
     (*(ghost fv s:S.set int)*) : unification_return
-    
+
     (* Invariant requirements. *)
     requires { z >= 0 }
     requires { nlimpl_fo_term_ok t }
     requires { unifier_subst_ok rhob rho }
-    
-    
+
+
     (* Essential requirement : the variable is not yet assigned. *)
     requires { unassigned (current_timestamp rhob) z }
     (* Essential requirement given the structure invariants :
        do not assign a variable to itself. *)
     requires { st t.model_fo_term_field rho.unifier <> Var_fo_term z }
-    
+
     requires { forall y:int. is_fo_term_free_var_in_fo_term y
       t.model_fo_term_field -> y >= 0 }
-    
+
     requires { forall x:int. mem x !lv ->
       lp x /\ x >= 0 }
     requires { forall x:int. unassigned (current_timestamp rhob) x -> lp x }
     ensures { forall x:int. mem x !lv ->
       lp x /\ x >= 0 }
     ensures { forall x:int. unassigned (current_timestamp rhob) x -> lp x }
-    
+
     (* Invariant ensures. *)
     ensures { unifier_subst_ok rhob result.final_unifier }
     ensures { precede (old rhob) rhob }
-    
+
     (* Unifier properties. *)
     ensures { sc rho.unifier result.unifier_factor =
       result.final_unifier.unifier }
@@ -415,7 +417,7 @@ module Impl
     ensures { let s0 = result.final_unifier.unifier in
       let s1 = rho.unifier in
       sc s0 s1 = s0 = sc s1 s0 }
-    
+
     (* Variant post-conditions. *)
     (*ensures { cardinal result.unassigned_set < cardinal s }
     ensures { forall x:int.
@@ -773,20 +775,20 @@ module Impl
       unifier_factor = uf (*;
       unassigned_set = remove z s*) } in
     res
-  
+
   (*
   meta "remove_logic" predicate ugly_hack
   *)
-  
+
   (* Forced because of the model fields. *)
   val ghost unassigned_vars (rhob:subst) : pred int
     ensures { forall x:int.
       result x <-> unassigned (current_timestamp rhob) x }
-  
+
   let rec unification_term (t1 t2:nlimpl_fo_term) (lv:ref (list int))
     (rhob:subst) (ghost rho:unifier_subst) (ghost lp:pred int)
     (*(ghost fv s:S.set int) (ghost it1 it2:int)*) : unification_return
-    
+
     (* Invariant requirements. *)
     requires { nlimpl_fo_term_ok t1 }
     requires { nlimpl_fo_term_ok t2 }
@@ -795,7 +797,7 @@ module Impl
       t1.model_fo_term_field -> y >= 0 }
     requires { forall y:int. is_fo_term_free_var_in_fo_term y
       t2.model_fo_term_field -> y >= 0 }
-    
+
     (* Variant requirements. *)
     (*requires { forall x:int.
       is_fo_term_free_var_in_fo_term x t1.model_fo_term_field -> mem x fv }
@@ -817,18 +819,18 @@ module Impl
       power_rel rho.unifier_base_model it2 sp ->
       st tm sp = st tm rho.unifier }
     requires { it2 >= 0 }*)
-    
+
     (* Invariant ensures. *)
     ensures { unifier_subst_ok rhob result.final_unifier }
     ensures { precede (old rhob) rhob }
-    
+
     requires { forall x:int. mem x !lv ->
       lp x /\ x >= 0 }
     requires { forall x:int. unassigned (current_timestamp rhob) x -> lp x }
     ensures { forall x:int. mem x !lv ->
       lp x /\ x >= 0 }
     ensures { forall x:int. unassigned (current_timestamp rhob) x -> lp x }
-    
+
     (* Unifier properties. *)
     (* The final unifier is obtained by composition with
        the first one and some given factor. *)
@@ -850,7 +852,7 @@ module Impl
     ensures { let s0 = result.final_unifier.unifier in
       let s1 = rho.unifier in
       sc s0 s1 = s0 = sc s1 s0 }
-    
+
     (* Variant postconditions. *)
     (*ensures { result.unassigned_set = s ->
       rho.unifier = result.final_unifier.unifier /\
@@ -869,6 +871,7 @@ module Impl
     (*-> forall s:func int (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' <> st t2.model_fo_term_field s'*) }
+    variant { 0 }
     (*variant { S.cardinal s , it1 + it2 ,
       size_fo_term t1.model_fo_term_field +
       size_fo_term t2.model_fo_term_field }*)
@@ -988,7 +991,7 @@ module Impl
           | _ -> assign x t1 lv rhob rho lp (*fv s*)
         end
     end
-  
+
   with unification_term_list (t1 t2:nlimpl_fo_term_list) (lv:ref (list int))
     (rhob:subst) (ghost rho:unifier_subst) (ghost lp:pred int)
     (*(ghost fv s:S.set int) (ghost it1 it2:int)*) :
@@ -1001,7 +1004,7 @@ module Impl
       t1.model_fo_term_list_field -> y >= 0 }
     requires { forall y:int. is_fo_term_free_var_in_fo_term_list y
       t2.model_fo_term_list_field -> y >= 0 }
-    
+
     (* Variant requirements. *)
     (*requires { forall x:int.
       is_fo_term_free_var_in_fo_term_list x t1.model_fo_term_list_field ->
@@ -1025,18 +1028,18 @@ module Impl
       power_rel rho.unifier_base_model it2 sp ->
       stl tm sp = stl tm rho.unifier }
     requires { it2 >= 0 }*)
-    
+
     (* Invariant ensures. *)
     ensures { unifier_subst_ok rhob result.final_unifier }
     ensures { precede (old rhob) rhob }
-    
+
     requires { forall x:int. mem x !lv ->
       lp x /\ x >= 0 }
     requires { forall x:int. unassigned (current_timestamp rhob) x -> lp x }
     ensures { forall x:int. mem x !lv ->
       lp x /\ x >= 0 }
     ensures { forall x:int. unassigned (current_timestamp rhob) x -> lp x }
-    
+
     (* Unifier properties. *)
     ensures { sc rho.unifier result.unifier_factor =
       result.final_unifier.unifier }
@@ -1053,7 +1056,7 @@ module Impl
     ensures { let s0 = result.final_unifier.unifier in
       let s1 = rho.unifier in
       sc s0 s1 = s0 = sc s1 s0 }
-    
+
     (* Variant postconditions. *)
     (*ensures { result.unassigned_set = s ->
       rho.unifier = result.final_unifier.unifier /\
@@ -1073,7 +1076,8 @@ module Impl
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' <>
         stl t2.model_fo_term_list_field s'*) }
-    (*variant { S.cardinal s , it1 + it2 ,
+    variant { 0 }
+     (*variant { S.cardinal s , it1 + it2 ,
       size_fo_term_list t1.model_fo_term_list_field +
       size_fo_term_list t2.model_fo_term_list_field }*)
   =
@@ -1149,7 +1153,7 @@ module Impl
           stl t1m s = FOCons (st um s) (stl qm s) } ;*)
         raise UnificationFailure
     end
-  
+
   let conflict (t1 t2:nlimpl_fo_term_list) (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { sdata_inv (PConflict t1 t2) }
     requires { unifier_subst_ok rhob rho }
@@ -1212,7 +1216,7 @@ module Impl
       | None -> backtrack t rhob ;
         assert { backtrack_to (at rhob 'Init) (at rhob 'Mid0) rhob }
     end
-  
+
   let rec conflicts (lv:list sdata) (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { list_forall sdata_inv lv }
     requires { unifier_subst_ok rhob rho }
@@ -1227,7 +1231,7 @@ module Impl
       | Cons (Assign _) q -> conflicts q rhob rho
       | Cons (PConflict t1 t2) q -> conflict t1 t2 rhob rho ; conflicts q rhob rho
     end
-  
+
   let rec unif_conflicts (lv:list int) (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { forall x:int. mem x lv -> x >= 0 }
     requires { unifier_subst_ok rhob rho }
@@ -1240,7 +1244,7 @@ module Impl
       | Nil -> ()
       | Cons v0 q -> conflicts (get rhob v0) rhob rho ; unif_conflicts q rhob rho
     end
-  
+
   let unify_term_list (t1 t2:nlimpl_fo_term_list) (watch:ref (list int))
     (rhob:subst) (ghost rho:unifier_subst) :
     unification_return
@@ -1268,13 +1272,13 @@ module Impl
     let u = unification_term_list t1 t2 watch rhob rho lp in
     unif_conflicts !watch rhob u.final_unifier ;
     u
-  
+
   (*let rec conflicts (lv:list sdata) (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { list_forall sdata_inv lv }
     requires { unifier_subst_ok rhob rho }
     ensures { unifier_subst_ok rhob rho }
     raises { UnificationFailure ->  }*)
-  
+
   (*
   let rec ghost term_free_var_set (t:fo_term int int) (it:int)
     (rho:unifier_subst) : set int
@@ -1299,7 +1303,7 @@ module Impl
           assert { forall y:int. is_fo_term_free_var_in_fo_term y (rho0 x) ->
             y = x } ;
           add x empty)
-        else 
+        else
           let t2 = eval rho0 x in
           (assert { forall sp:func int (fo_term int int).
             power_rel rho0 (it-1) sp ->
@@ -1311,7 +1315,7 @@ module Impl
         st t s = st t s2 <-> stl l s = stl l s2 } ;
         term_list_free_var_set l it rho
     end
-  
+
   with ghost term_list_free_var_set (t:fo_term_list int int) (it:int)
     (rho:unifier_subst) : set int
     requires { unifier_subst_ok rho }
@@ -1334,7 +1338,7 @@ module Impl
         union (term_free_var_set x it rho)
         (term_list_free_var_set q it rho)
     end
-  
+
   (* Two main
      functions, far more preferable for the user than
      the incredibly ugly functions before !
@@ -1342,7 +1346,7 @@ module Impl
        1) sound (if it returns, then it returns an unifier factor+
          if it fails, then there is no unifier factor)
        2) complete/terminating (either case is true) *)
-  
+
   let unify_term (t1 t2:nlimpl_fo_term) (rho:unifier_subst) : unify_return
     requires { nlimpl_fo_term_ok t1 }
     requires { nlimpl_fo_term_ok t2 }
@@ -1372,7 +1376,7 @@ module Impl
     let fv = union fv (term_free_var_set t2.model_fo_term_field it rho) in
     let res = unification_term t1 t2 rho fv fv it it in
     { usubst = res.final_unifier ; factor = res.unifier_factor }
-  
+
   let unify_term_list (t1 t2:nlimpl_fo_term_list) (rho:unifier_subst) :
     unify_return
     requires { nlimpl_fo_term_list_ok t1 }
@@ -1400,6 +1404,5 @@ module Impl
     let res = unification_term_list t1 t2 rho fv fv it it in
     { usubst = res.final_unifier ; factor = res.unifier_factor }
   *)
-  
-end
 
+end

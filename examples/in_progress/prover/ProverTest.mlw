@@ -1,10 +1,10 @@
 
 module Types
-  
+
 end
 
 module Impl
-  
+
   use import ProverMain.Impl
   use import Firstorder_symbol_impl.Types
   use import Firstorder_term_impl.Types
@@ -19,7 +19,7 @@ module Impl
   use import Firstorder_formula_impl.Impl
   use import Firstorder_formula_list_impl.Impl
   use import int.Int
-  
+
   let imply (a b:nlimpl_fo_formula) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok a }
     requires { nlimpl_fo_formula_ok b }
@@ -27,14 +27,14 @@ module Impl
   =
     construct_fo_formula (NLC_Or
       (construct_fo_formula (NLC_Not a)) b)
-  
+
   let equiv (a b:nlimpl_fo_formula) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok a }
     requires { nlimpl_fo_formula_ok b }
     ensures { nlimpl_fo_formula_ok result }
   =
     construct_fo_formula (NLC_And (imply a b) (imply b a))
-  
+
   let drinker () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -51,7 +51,7 @@ module Impl
     (* exists x, (c0 x -> forall x,c0 x) *)
     let phi4 = construct_fo_formula (NLC_Not phi3) in
     construct_fo_formula_list (NLC_FOFCons phi4 fonil)
-  
+
   let group () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -60,7 +60,7 @@ module Impl
     let c0 = construct_symbol (NLCVar_symbol 0) in (* c0 *)
     let c1 = construct_symbol (NLCVar_symbol 1) in (* e *)
     let neutral = construct_fo_term (NLC_App c1 fotnil) in
-    let rec aux (v1 v2 v3:nlimpl_fo_term) : nlimpl_fo_formula
+    let aux (v1 v2 v3:nlimpl_fo_term) : nlimpl_fo_formula
       requires { nlimpl_fo_term_ok v1 }
       requires { nlimpl_fo_term_ok v2 }
       requires { nlimpl_fo_term_ok v3 }
@@ -77,13 +77,13 @@ module Impl
     let v3 = construct_fo_term (NLCVar_fo_term 3) in (* t *)
     let v4 = construct_fo_term (NLCVar_fo_term 4) in (* u *)
     let v5 = construct_fo_term (NLCVar_fo_term 5) in (* v *)
-    
+
     (* forall x y, exists z. c0(x,y,z) *)
     let phimul = aux v0 v1 v2 in (* c0(x,y,z) *)
     let phimul = construct_fo_formula (NLC_Exists 2 phimul) in (* exists z,c0(x,y,z) *)
     let phimul = construct_fo_formula (NLC_Forall 1 phimul) in (* forall y,exists z. c0(x,y,z) *)
     let phimul = construct_fo_formula (NLC_Forall 0 phimul) in (* forall x y,exists z.c0(x,y,z) *)
-    
+
     (* forall x y z t u v.
       (* xy = t /\ yz = v -> (tz = u <-> xv = u) *)
       c0(x,y,t) /\ c0(y,z,v) -> (c0(t,z,u) <-> c0(x,v,u)) *)
@@ -104,18 +104,18 @@ module Impl
     let phiass = construct_fo_formula (NLC_Forall 2 phiass) in
     let phiass = construct_fo_formula (NLC_Forall 1 phiass) in
     let phiass = construct_fo_formula (NLC_Forall 0 phiass) in
-    
-    
+
+
     (* forall x. c0(e,x,x) /\ c0(x,e,x) *)
     let phin0 = aux neutral v0 v0 in
     let phin1 = aux v0 neutral v0 in
     let phin = construct_fo_formula (NLC_And phin0 phin1) in
     let phin = construct_fo_formula (NLC_Forall 0 phin) in
-    
+
     (* forall x. c0(x,x,e) *)
     let phi2 = aux v0 v0 neutral in
     let phi2 = construct_fo_formula (NLC_Forall 0 phi2) in
-    
+
     (* forall x y z. c0(x,y,z) -> c0(y,x,z) *)
     let phigh = aux v0 v1 v2 in
     let phig = aux v1 v0 v2 in
@@ -124,14 +124,14 @@ module Impl
     let phig = construct_fo_formula (NLC_Forall 1 phig) in
     let phig = construct_fo_formula (NLC_Forall 0 phig) in
     let phig = construct_fo_formula (NLC_Not phig) in
-    
+
     let l = construct_fo_formula_list (NLC_FOFCons phimul fonil) in
     let l = construct_fo_formula_list (NLC_FOFCons phiass l) in
     let l = construct_fo_formula_list (NLC_FOFCons phin l) in
     let l = construct_fo_formula_list (NLC_FOFCons phi2 l) in
     let l = construct_fo_formula_list (NLC_FOFCons phig l) in
     l
-  
+
   let bidon1 () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -141,7 +141,7 @@ module Impl
     let a = construct_fo_formula (NLC_PApp a fotnil) in
     let r = construct_fo_formula (NLC_Not (imply a a)) in
     construct_fo_formula_list (NLC_FOFCons r fonil)
-  
+
   let bidon2 () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -155,7 +155,7 @@ module Impl
     let a = construct_fo_formula (NLC_And a b) in
     let r = construct_fo_formula (NLC_Not (imply a o)) in
     construct_fo_formula_list (NLC_FOFCons r fonil)
-  
+
   let bidon3 () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -170,7 +170,7 @@ module Impl
     let r = imply (imply a (imply b c)) (imply (imply a b) (imply a c)) in
     let r = construct_fo_formula (NLC_Not r) in
     construct_fo_formula_list (NLC_FOFCons r fonil)
-  
+
   let bidon4 () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -185,7 +185,7 @@ module Impl
     let r = imply (imply a (imply b c)) (imply b (imply a c)) in
     let r = construct_fo_formula (NLC_Not r) in
     construct_fo_formula_list (NLC_FOFCons r fonil)
-  
+
   let pierce () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -198,7 +198,7 @@ module Impl
     let r = imply (imply (imply a b) a) a in
     let r = construct_fo_formula (NLC_Not r) in
     construct_fo_formula_list (NLC_FOFCons r fonil)
-  
+
   let generate (n:int) : nlimpl_fo_formula_list
     requires { n >= 0 }
     ensures { nlimpl_fo_formula_list_ok result }
@@ -215,7 +215,7 @@ module Impl
       if m = 0
       then equiv symb (aux0 n)
       else equiv symb (aux1 (m-1))
-    
+
     with aux0 (m:int) : nlimpl_fo_formula
       ensures { nlimpl_fo_formula_ok result }
       requires { m >= 0 }
@@ -229,7 +229,7 @@ module Impl
     in
     let r = construct_fo_formula (NLC_Not (aux1 n)) in
     construct_fo_formula_list (NLC_FOFCons r fonil)
-  
+
   let zenon5 () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -249,9 +249,9 @@ module Impl
     let l = construct_fo_formula_list (NLC_FOFCons e2 l) in
     let l = construct_fo_formula_list (NLC_FOFCons ng l) in
     l
-  
+
   (* Quite good ! *)
-  
+
   let zenon6 () : nlimpl_fo_formula_list
     ensures { nlimpl_fo_formula_list_ok result }
   =
@@ -289,7 +289,7 @@ module Impl
     let l = construct_fo_formula_list (NLC_FOFCons h4 l) in
     let l = construct_fo_formula_list (NLC_FOFCons g l) in
     l
-  
+
   let zenon10 (n:int) : nlimpl_fo_formula_list
     requires { n >= 0 }
     ensures { nlimpl_fo_formula_list_ok result }
@@ -321,10 +321,11 @@ module Impl
     let l = construct_fo_formula_list (NLC_FOFCons h fonil) in
     let l = construct_fo_formula_list (NLC_FOFCons g l) in
     l
-  
+
   use import FormulaTransformations.Impl as F
-  
+
   let test () : unit
+    diverges
     raises { F.Sat -> true }
     =
     (*let fonil = construct_fo_formula_list NLC_FOFNil in
@@ -351,6 +352,5 @@ module Impl
     let fl2 = construct_fo_formula_list (NLC_FOFCons phi0 fl1) in*)
     let _ = main (zenon10 2) 1 in
     ()
-  
-end
 
+end
