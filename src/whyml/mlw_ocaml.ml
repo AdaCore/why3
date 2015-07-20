@@ -629,7 +629,8 @@ module Translate = struct
     if has_syntax info ts.its_ts.ts_name || is_record d then []
     else pprojections info d
 
-  let pdecl info pd = match pd.pd_node with
+  let pdecl info pd =
+    match pd.pd_node with
     | PDval (LetV pv) when pv_equal pv Mlw_wp.pv_old ->
         []
     | PDval _ ->
@@ -643,7 +644,9 @@ module Translate = struct
               [ML.Dtype [id, type_args ts.ts_args, ML.Dalias (ity info ty)]]
         end
     | PDlet { let_sym = lv ; let_expr = e } ->
-        [ML.Dlet (false, [lv_name lv, [], expr info e])]
+       Debug.dprintf debug "extract 'let' declaration %s@."
+                     (lv_name lv).id_string;
+       [ML.Dlet (false, [lv_name lv, [], expr info e])]
     | PDdata tl ->
         begin match List.flatten (List.map (pdata_decl info) tl) with
           | [] -> []
@@ -656,6 +659,10 @@ module Translate = struct
             (ps1.ps_ghost || has_syntax info ps1.ps_name)
             (ps2.ps_ghost || has_syntax info ps2.ps_name) in
         let fdl = List.sort cmp fdl in
+        List.iter
+          (fun {fun_ps=ps} ->
+           Debug.dprintf debug "extract 'let rec' declaration %s@."
+                         ps.ps_name.id_string) fdl;
         [ML.Dlet (is_letrec fdl, List.map (recdef info) fdl)]
     | PDexn xs ->
         let id = xs.xs_name in
@@ -665,7 +672,21 @@ module Translate = struct
           [ML.Dexn (id, Some (ity info xs.xs_ity))]
 
   let pdecl info d =
-    if Mlw_exec.is_exec_pdecl info.exec d then pdecl info d else []
+    if Mlw_exec.is_exec_pdecl info.exec d then pdecl info d else
+      begin
+        begin match d.pd_node with
+        | PDlet { let_sym = lv } ->
+           Debug.dprintf debug "ignoring non-executable declaration %s@."
+                         (lv_name lv).id_string;
+        | PDrec fdl ->
+           List.iter
+             (fun {fun_ps=ps} ->
+              Debug.dprintf debug "ignoring non-executable declaration %s@."
+                            ps.ps_name.id_string) fdl
+        | _ -> ()
+        end;
+        []
+      end
 
   let module_ info m =
     List.flatten (List.map (pdecl info) m.mod_decls)
