@@ -356,20 +356,25 @@ exception IllegalFlagTrans of meta
 
 type ('a,'b) flag_trans = ('a -> 'b trans) Hstr.t
 
-let on_flag m ft def arg =
+let on_flag_find m ft s = try Hstr.find ft s with
+  | Not_found -> let l = Hstr.fold (fun s _ l -> s :: l) ft [] in
+      raise (UnknownFlagTrans (m,s,l))
+
+let on_flag_gen m ft def_name def arg =
   on_meta_excl m (fun alo ->
-    let s = match alo with
-      | None -> def
-      | Some [MAstr s] -> s
+    let t, tr_name = match alo with
+      | None -> def, Printf.sprintf "%s %s" m.meta_name def_name
+      | Some [MAstr s] ->
+          on_flag_find m ft s, Printf.sprintf "%s : %s" m.meta_name s
       | _ -> raise (IllegalFlagTrans m)
     in
-    let t = try Hstr.find ft s with
-      | Not_found ->
-          let l = Hstr.fold (fun s _ l -> s :: l) ft [] in
-          raise (UnknownFlagTrans (m,s,l))
-    in
-    let tr_name = Printf.sprintf "%s : %s" m.meta_name s in
     named tr_name (t arg))
+
+let on_flag m ft def arg =
+  let tdef x = on_flag_find m ft def x in
+  on_flag_gen m ft (Printf.sprintf ": %s" def) tdef arg
+
+let on_flag_t m ft def arg = on_flag_gen m ft "(default)" def arg
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownTrans s ->

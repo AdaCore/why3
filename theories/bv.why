@@ -114,18 +114,15 @@ theory BV_Gen
       the least significant bit *)
   function nth t int : bool
 
+  axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size_int -> nth x n = False
+
   constant zero : t
   axiom Nth_zero:
-    forall n:int. 0 <= n < size_int -> nth zero n = False
+    forall n:int. nth zero n = False
 
   constant ones : t
   axiom Nth_ones:
     forall n. 0 <= n < size_int -> nth ones n = True
-
-  predicate eq (v1 v2 : t) =
-    forall n. 0 <= n < size_int -> nth v1 n = nth v2 n
-
-  axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
 
   (** Bitwise operators *)
 
@@ -203,6 +200,8 @@ theory BV_Gen
 
   axiom to_uint_of_int :
     forall i. uint_in_range i -> to_uint (of_int i) = i
+
+  (* comparison operators *)
 
   predicate ult (x y : t) =
     Int.(<) (to_uint x) (to_uint y)
@@ -309,6 +308,25 @@ theory BV_Gen
 
   axiom two_power_size_val :
     two_power_size = pow2 size_int
+
+  (* equality axioms *)
+
+  predicate eq_sub_bv (a b:t) (i n:t) =
+  let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
+    bw_and b mask = bw_and a mask
+
+  predicate eq_sub (a b:t) (i n:int) =
+    forall j. i <= j < i + n -> nth a j = nth b j
+
+  axiom eq_sub_equiv: forall a b i n:t.
+      eq_sub    a b (to_uint i) (to_uint n)
+  <-> eq_sub_bv a b i n
+
+  predicate eq (v1 v2 : t) =
+    eq_sub v1 v2 0 size_int
+
+  axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+
 end
 
 (** {2 Bit Vectors of common sizes, 8/16/32/64} *)

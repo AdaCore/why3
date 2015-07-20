@@ -83,9 +83,18 @@ policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
-version = "8.4pl4"
+version = "8.4pl2"
 
 [uninstalled_prover policy1]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "$COQVER"
+version = "8.4pl4"
+
+[uninstalled_prover policy2]
 alternative = ""
 name = "Coq"
 policy = "upgrade"
@@ -101,7 +110,7 @@ policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
-version = "8.4pl2"
+version = "8.4pl6"
 
 EOF
 fi

@@ -81,6 +81,7 @@ theory Bag
 
   function card (bag 'a): int
 
+  axiom Card_nonneg: forall x: bag 'a. card x >= 0
   axiom Card_empty: card (empty_bag: bag 'a) = 0
   axiom Card_zero_empty: forall x: bag 'a. card x = 0 -> x = empty_bag
 
@@ -107,5 +108,12 @@ theory Bag
 
   lemma Add_diff: forall b: bag 'a, x:'a.
     mem x b -> add x (diff b (singleton x)) = b
+
+  (** arbitrary element *)
+
+  function choose (b: bag 'a) : 'a
+
+  axiom choose_mem: forall b: bag 'a.
+    empty_bag <> b -> mem (choose b) b
 
 end

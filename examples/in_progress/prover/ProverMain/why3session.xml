@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="3">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <prover
+  id="1"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../ProverMain.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Types"
+   locfile="../ProverMain.mlw"
+   loclnum="2" loccnumb="7" loccnume="12"
+   verified="true"
+   expanded="false">
+  </theory>
+  <theory
+   name="Impl"
+   locfile="../ProverMain.mlw"
+   loclnum="6" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter main"
+    locfile="../ProverMain.mlw"
+    loclnum="42" loccnumb="6" loccnume="10"
+    expl="VC for main"
+    sum="e3f42956f4851e9c5cd68f168108df99"
+    proved="true"
+    expanded="false"
+    shape="aformula_list_conj_semanticV3amk modelV10V11V12FIaformula_list_conj_semanticV3amk modelV13V14V15FANaformula_list_conj_semanticV3amk modelV16V17V18FINaformula_list_conj_semanticV3amk modelV19V20V21FANaformula_list_conj_semanticV3amk modelV28V29V30FANaformula_list_conj_semanticV3V34V33ANaformula_list_conj_semanticV25V35V33Aainfix =ainfix @!V33V37ainfix @!V36V37Iais_fo_term_free_var_in_fo_formula_listV37V25FANaformula_list_conj_semanticV25V35V36Aainfix =V35ainfix @!V26V34Lasemantic_substV27V35V33Lamk modelainterp_funainfix @!V26V34ainterp_predainfix @!V26V34Lamk modelV31V32FINaformula_list_conj_semanticV25V41asemantic_substV27V41V40Lamk modelV38V39FFANaformula_list_conj_semanticV25V57asemantic_substV53V57V56Lamk modelV54V55FINaformula_list_conj_semanticV25V61asemantic_substV53V61V60Lamk modelV58V59FFIacorrectV52AaprecedeV47V52Aainfix &lt;=c0V48Lamk tV51V50amk arrayV48V49V46FANaformula_list_conj_semanticV25V71asemantic_substV67V71V70Lamk modelV68V69FIacorrectV66AaprecedeV47V66ANaformula_list_conj_semanticV25V75asemantic_substV67V75V74Lamk modelV72V73FAainfix &lt;=c0V62FLamk tV65V64amk arrayV62V63V46FAatableau_semantic_withV8aTrueV79V80Iaformula_list_conj_semanticV25V79V80Lasemantic_substasubst_id_fo_termV79V78Lamk modelV76V77FAano_existential_listV25Aais_nnf_listV25Aais_simpl_listV25Aais_procedure_tableauV8Aaunifier_subst_okV47amk unifier_substasubst_id_fo_termasubst_id_fo_termAainfix &gt;=V81c0Iais_fo_term_free_var_in_tableauV81V8FAanlimpl_tableau_okV9Aainfix &gt;=V82c0Iais_fo_term_free_var_in_fo_formula_listV82V25FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV22V23V24V25Aainfix &gt;=c0c0ACfaConsaAssignwwtwainfix @!atableacurrent_timestampV47V83FAainfix =asmodelacurrent_timestampV47asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV47asubst_id_fo_termIacorrectV47Aainfix =V46asdata_invAapast_timeacurrent_timestampV47V47Aainfix =V86aconstaNilIapast_timeamk timestampV84V85V86V47FAainfix &lt;=c0V44Lamk tV42V43amk arrayV44V45V46FAainfix =V8aRootIaformula_list_conj_semanticV25ainfix @!V26V90V89Iaformula_list_conj_semanticV3V90V89Lamk modelV87V88FAano_existential_listV25Aais_simpl_listV25Aais_nnf_listV25ANais_fo_term_free_var_in_fo_formula_listV91V25FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV22V23V24V25FAanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+    <label
+     name="expl:VC for main"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter main.1"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="1. precondition"
+      sum="2c95c8200b69433ae7add81ae05f4b54"
+      proved="true"
+      expanded="false"
+      shape="preconditionanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.2"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="2. assertion"
+      sum="3eae17d0b8c820905182dc614a3209e2"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V18V17Iaformula_list_conj_semanticV3V18V17Lamk modelV15V16FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV19V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.3"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="3. assertion"
+      sum="341d17434efeee357259fa7cfe251541"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V23aconstaNilIapast_timeamk timestampV21V22V23V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V27V26Iaformula_list_conj_semanticV3V27V26Lamk modelV24V25FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV28V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter main.3.1"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="1."
+        sum="4ba3214fb98d33648f7ef50b71c734f3"
+        proved="true"
+        expanded="false"
+        shape="aextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V23aconstaNilIapast_timeamk timestampV21V22V23V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V27V26Iaformula_list_conj_semanticV3V27V26Lamk modelV24V25FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV28V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="4.73"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter main.3.2"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="2."
+        sum="333ab30836c088071722e5756cd58651"
+        proved="true"
+        expanded="false"
+        shape="ainfix =asmodelacurrent_timestampV20asubst_id_fo_termIaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V23aconstaNilIapast_timeamk timestampV21V22V23V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V27V26Iaformula_list_conj_semanticV3V27V26Lamk modelV24V25FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV28V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.32"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter main.4"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="4. assertion"
+      sum="5373820547f428148beaeb607fb99cdf"
+      proved="true"
+      expanded="false"
+      shape="assertionCfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.85"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.5"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="5. precondition"
+      sum="5a8b836d78194062bdc7d04f261447f9"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=c0c0ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.6"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="6. precondition"
+      sum="b821c7cbe26da794fcfa3e3eb411f3d2"
+      proved="true"
+      expanded="false"
+      shape="preconditionanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.7"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="7. precondition"
+      sum="287a5d4e4d798f665aedf42b1a80d542"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V21c0Iais_fo_term_free_var_in_fo_formula_listV21V13FICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V22FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V25aconstaNilIapast_timeamk timestampV23V24V25V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V29V28Iaformula_list_conj_semanticV3V29V28Lamk modelV26V27FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV30V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.29"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.8"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="8. precondition"
+      sum="8e0657d4beeadf3b2d37ca3ba68d849b"
+      proved="true"
+      expanded="false"
+      shape="preconditionanlimpl_tableau_okV9ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.24"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.9"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="9. precondition"
+      sum="b8008db91c2cd9ae5e7537ae6ce07b45"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V21c0Iais_fo_term_free_var_in_tableauV21V8FICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V22FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V25aconstaNilIapast_timeamk timestampV23V24V25V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V29V28Iaformula_list_conj_semanticV3V29V28Lamk modelV26V27FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV30V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.29"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.10"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="10. precondition"
+      sum="26dd9da44235f31d64053ead954dc6b5"
+      proved="true"
+      expanded="false"
+      shape="preconditionaunifier_subst_okV20amk unifier_substasubst_id_fo_termasubst_id_fo_termICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.30"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.11"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="11. precondition"
+      sum="6ce57e3376356c95c3985de40afe7406"
+      proved="true"
+      expanded="false"
+      shape="preconditionais_procedure_tableauV8ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.24"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.12"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="12. precondition"
+      sum="d8c4d9150d2148f644088b9baedafcf7"
+      proved="true"
+      expanded="false"
+      shape="preconditionais_simpl_listV13ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.13"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="13. precondition"
+      sum="5f983b334949a6165a8fb5590682b768"
+      proved="true"
+      expanded="false"
+      shape="preconditionais_nnf_listV13ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.14"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="14. precondition"
+      sum="74a7cad2e225fd7a98827ee31cb2fb1f"
+      proved="true"
+      expanded="false"
+      shape="preconditionano_existential_listV13ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V21FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V24aconstaNilIapast_timeamk timestampV22V23V24V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V28V27Iaformula_list_conj_semanticV3V28V27Lamk modelV25V26FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV29V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.15"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="15. precondition"
+      sum="dbba54358a46382257529fdee0512c55"
+      proved="true"
+      expanded="false"
+      shape="preconditionatableau_semantic_withV8aTrueV24V25Iaformula_list_conj_semanticV13V24V25Lasemantic_substasubst_id_fo_termV24V23Lamk modelV21V22FICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V26FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V29aconstaNilIapast_timeamk timestampV27V28V29V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V33V32Iaformula_list_conj_semanticV3V33V32Lamk modelV30V31FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV34V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.27"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.16"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="16. postcondition"
+      sum="156fb887c6cd712c08aae8d33833b866"
+      proved="true"
+      expanded="false"
+      shape="postconditionNaformula_list_conj_semanticV13V30asemantic_substV26V30V29Lamk modelV27V28FIacorrectV25AaprecedeV20V25ANaformula_list_conj_semanticV13V34asemantic_substV26V34V33Lamk modelV31V32FAainfix &lt;=c0V21FLamk tV24V23amk arrayV21V22V19FIatableau_semantic_withV8aTrueV38V39Iaformula_list_conj_semanticV13V38V39Lasemantic_substasubst_id_fo_termV38V37Lamk modelV35V36FAano_existential_listV13Aais_nnf_listV13Aais_simpl_listV13Aais_procedure_tableauV8Aaunifier_subst_okV20amk unifier_substasubst_id_fo_termasubst_id_fo_termAainfix &gt;=V40c0Iais_fo_term_free_var_in_tableauV40V8FAanlimpl_tableau_okV9Aainfix &gt;=V41c0Iais_fo_term_free_var_in_fo_formula_listV41V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13Aainfix &gt;=c0c0ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V42FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V45aconstaNilIapast_timeamk timestampV43V44V45V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V49V48Iaformula_list_conj_semanticV3V49V48Lamk modelV46V47FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV50V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.28"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.17"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="17. postcondition"
+      sum="4dcf2d956626b19a61540dd1479e5e09"
+      proved="true"
+      expanded="false"
+      shape="postconditionNaformula_list_conj_semanticV13V30asemantic_substV26V30V29Lamk modelV27V28FINaformula_list_conj_semanticV13V34asemantic_substV26V34V33Lamk modelV31V32FFIacorrectV25AaprecedeV20V25Aainfix &lt;=c0V21Lamk tV24V23amk arrayV21V22V19FIatableau_semantic_withV8aTrueV38V39Iaformula_list_conj_semanticV13V38V39Lasemantic_substasubst_id_fo_termV38V37Lamk modelV35V36FAano_existential_listV13Aais_nnf_listV13Aais_simpl_listV13Aais_procedure_tableauV8Aaunifier_subst_okV20amk unifier_substasubst_id_fo_termasubst_id_fo_termAainfix &gt;=V40c0Iais_fo_term_free_var_in_tableauV40V8FAanlimpl_tableau_okV9Aainfix &gt;=V41c0Iais_fo_term_free_var_in_fo_formula_listV41V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13Aainfix &gt;=c0c0ICfaConsaAssignwwtwainfix @!atableacurrent_timestampV20V42FIainfix =asmodelacurrent_timestampV20asubst_id_fo_termAaextensionalEqualasmodelacurrent_timestampV20asubst_id_fo_termIacorrectV20Aainfix =V19asdata_invAapast_timeacurrent_timestampV20V20Aainfix =V45aconstaNilIapast_timeamk timestampV43V44V45V20FAainfix &lt;=c0V17Lamk tV15V16amk arrayV17V18V19FIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V49V48Iaformula_list_conj_semanticV3V49V48Lamk modelV46V47FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV50V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.18"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="18. assertion"
+      sum="8f016cbc6ee9d1fe7c2521ab0d8889ae"
+      proved="true"
+      expanded="false"
+      shape="assertionNaformula_list_conj_semanticV3V19V18ANaformula_list_conj_semanticV13V20V18Aainfix =ainfix @!V18V22ainfix @!V21V22Iais_fo_term_free_var_in_fo_formula_listV22V13FANaformula_list_conj_semanticV13V20V21Aainfix =V20ainfix @!V14V19Lasemantic_substV15V20V18Lamk modelainterp_funainfix @!V14V19ainterp_predainfix @!V14V19Lamk modelV16V17FINaformula_list_conj_semanticV13V26asemantic_substV15V26V25Lamk modelV23V24FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V30V29Iaformula_list_conj_semanticV3V30V29Lamk modelV27V28FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV31V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter main.18.1"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="1. assertion"
+        sum="c7dde69c445e9095793c3ecc15f128f7"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =V20ainfix @!V14V19Lasemantic_substV15V20V18Lamk modelainterp_funainfix @!V14V19ainterp_predainfix @!V14V19Lamk modelV16V17FINaformula_list_conj_semanticV13V25asemantic_substV15V25V24Lamk modelV22V23FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V29V28Iaformula_list_conj_semanticV3V29V28Lamk modelV26V27FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV30V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.26"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter main.18.2"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="2. assertion"
+        sum="0646082182a522d599121f70d09c37ab"
+        proved="true"
+        expanded="false"
+        shape="assertionNaformula_list_conj_semanticV13V20V21Iainfix =V20ainfix @!V14V19Lasemantic_substV15V20V18Lamk modelainterp_funainfix @!V14V19ainterp_predainfix @!V14V19Lamk modelV16V17FINaformula_list_conj_semanticV13V25asemantic_substV15V25V24Lamk modelV22V23FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V29V28Iaformula_list_conj_semanticV3V29V28Lamk modelV26V27FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV30V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.34"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter main.18.3"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="3. assertion"
+        sum="b5b32c02153ff6bb0e8076b42757754e"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =ainfix @!V18V22ainfix @!V21V22Iais_fo_term_free_var_in_fo_formula_listV22V13FINaformula_list_conj_semanticV13V20V21Iainfix =V20ainfix @!V14V19Lasemantic_substV15V20V18Lamk modelainterp_funainfix @!V14V19ainterp_predainfix @!V14V19Lamk modelV16V17FINaformula_list_conj_semanticV13V26asemantic_substV15V26V25Lamk modelV23V24FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V30V29Iaformula_list_conj_semanticV3V30V29Lamk modelV27V28FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV31V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.30"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter main.18.4"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="4. assertion"
+        sum="3f589b5d38713453c0b9a8b7546c2eb7"
+        proved="true"
+        expanded="false"
+        shape="assertionNaformula_list_conj_semanticV13V20V18Iainfix =ainfix @!V18V22ainfix @!V21V22Iais_fo_term_free_var_in_fo_formula_listV22V13FINaformula_list_conj_semanticV13V20V21Iainfix =V20ainfix @!V14V19Lasemantic_substV15V20V18Lamk modelainterp_funainfix @!V14V19ainterp_predainfix @!V14V19Lamk modelV16V17FINaformula_list_conj_semanticV13V26asemantic_substV15V26V25Lamk modelV23V24FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V30V29Iaformula_list_conj_semanticV3V30V29Lamk modelV27V28FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV31V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.30"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter main.18.5"
+        locfile="../ProverMain.mlw"
+        loclnum="42" loccnumb="6" loccnume="10"
+        expl="5. assertion"
+        sum="030cd3a58698ecd65998efb304c006f7"
+        proved="true"
+        expanded="false"
+        shape="assertionNaformula_list_conj_semanticV3V19V18INaformula_list_conj_semanticV13V20V18Iainfix =ainfix @!V18V22ainfix @!V21V22Iais_fo_term_free_var_in_fo_formula_listV22V13FINaformula_list_conj_semanticV13V20V21Iainfix =V20ainfix @!V14V19Lasemantic_substV15V20V18Lamk modelainterp_funainfix @!V14V19ainterp_predainfix @!V14V19Lamk modelV16V17FINaformula_list_conj_semanticV13V26asemantic_substV15V26V25Lamk modelV23V24FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V30V29Iaformula_list_conj_semanticV3V30V29Lamk modelV27V28FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV31V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+        <label
+         name="expl:VC for main"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.30"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter main.19"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="19. postcondition"
+      sum="6a96cf9be3ba26ba8cdb4a94b0db9ba8"
+      proved="true"
+      expanded="false"
+      shape="postconditionNaformula_list_conj_semanticV3amk modelV16V17V18FINaformula_list_conj_semanticV3V22V21ANaformula_list_conj_semanticV13V23V21Aainfix =ainfix @!V21V25ainfix @!V24V25Iais_fo_term_free_var_in_fo_formula_listV25V13FANaformula_list_conj_semanticV13V23V24Aainfix =V23ainfix @!V14V22Lasemantic_substV15V23V21Lamk modelainterp_funainfix @!V14V22ainterp_predainfix @!V14V22Lamk modelV19V20FINaformula_list_conj_semanticV13V29asemantic_substV15V29V28Lamk modelV26V27FFIainfix =V8aRootIaformula_list_conj_semanticV13ainfix @!V14V33V32Iaformula_list_conj_semanticV3V33V32Lamk modelV30V31FAano_existential_listV13Aais_simpl_listV13Aais_nnf_listV13ANais_fo_term_free_var_in_fo_formula_listV34V13FAanlimpl_fo_formula_list_okamk nlimpl_fo_formula_listV10V11V12V13FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="4.62"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.20"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="20. postcondition"
+      sum="79b54351836d5b41a3fb3f59b9bdf176"
+      proved="true"
+      expanded="false"
+      shape="postconditionNaformula_list_conj_semanticV3amk modelV10V11V12FINaformula_list_conj_semanticV3amk modelV13V14V15FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.27"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter main.21"
+      locfile="../ProverMain.mlw"
+      loclnum="42" loccnumb="6" loccnume="10"
+      expl="21. exceptional postcondition"
+      sum="9d761e757895439aa971489e79422dbc"
+      proved="true"
+      expanded="false"
+      shape="exceptional postconditionaformula_list_conj_semanticV3amk modelV10V11V12FIaformula_list_conj_semanticV3amk modelV13V14V15FIanlimpl_fo_formula_list_okV4Iacons_rel_tableauaNLC_RootV9Aanlimpl_tableau_okV9Lamk nlimpl_tableauV5V6V7V8FIanlimpl_fo_formula_list_okV4Lamk nlimpl_fo_formula_listV0V1V2V3F">
+      <label
+       name="expl:VC for main"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.28"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

@@ -114,7 +114,7 @@
  <proof prover="9"><result status="valid" time="0.02" steps="14"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" sum="7a7298fc81eebed5a42eb7a0fb5b27c9" expanded="true">
+<theory name="SuffixSort" sum="0b9756b7136885e268e47a96f603570a" expanded="true">
  <goal name="WP_parameter compare" expl="VC for compare">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compare.1" expl="1. postcondition">
@@ -642,8 +642,13 @@
   <proof prover="11"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter sort.23" expl="23. loop invariant preservation">
-  <proof prover="12"><result status="valid" time="2.25" steps="411"/></proof>
-  <proof prover="13"><result status="valid" time="0.22"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="13" timelimit="10"><result status="valid" time="0.22"/></proof>
+  <transf name="inline_goal">
+   <goal name="WP_parameter sort.23.1" expl="1. loop invariant preservation">
+   <proof prover="12" timelimit="10"><result status="valid" time="0.48" steps="150"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="WP_parameter sort.24" expl="24. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>

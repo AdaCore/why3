@@ -429,7 +429,12 @@ let quant_vars ~strict env vl =
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
+
+let debug_ignore_unused_var = Debug.register_info_flag "ignore_unused_vars"
+  ~desc:"Suppress@ warnings@ on@ unused@ variables"
+
 let check_used_var t vs =
+  if not (Debug.test_flag debug_ignore_unused_var) then
   let s = vs.vs_name.id_string in
   if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s

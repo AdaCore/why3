@@ -304,21 +304,28 @@ let rec print_term info fmt t =
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
-  | Tcase({t_node = Tvar v}, bl) ->
-      print_branches info v print_term fmt bl
   | Tcase(t, bl) ->
-      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-        print_var subject (print_term info) t
-        (print_branches info subject print_term) bl;
-      forget_var subject
+    let ty = t_type t in
+    begin
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t print_term fmt bl
+      | _ ->
+        match t.t_node with
+        | Tvar v -> print_branches info v print_term fmt bl
+        | _ ->
+          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+          fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+            print_var subject (print_term info) t
+            (print_branches info subject print_term) bl;
+          forget_var subject
+    end
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
 
   check_exit_vc_line t;
-
 
 
 and print_fmla info fmt f =
@@ -379,24 +386,53 @@ and print_fmla info fmt f =
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Tcase({t_node = Tvar v}, bl) ->
-      print_branches info v print_fmla fmt bl
   | Tcase(t, bl) ->
-      let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-      fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-        print_var subject (print_term info) t
-        (print_branches info subject print_fmla) bl;
-      forget_var subject
+    let ty = t_type t in
+    begin
+      match ty.ty_node with
+      | Tyapp (ts,_) when ts_equal ts ts_bool ->
+        print_boolean_branches info t print_fmla fmt bl
+      | _ ->
+        match t.t_node with
+        | Tvar v -> print_branches info v print_fmla fmt bl
+        | _ ->
+          let subject = create_vsymbol (id_fresh "subject") (t_type t) in
+          fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+            print_var subject (print_term info) t
+            (print_branches info subject print_fmla) bl;
+          forget_var subject
+    end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
   check_exit_vc_line f
+
+and print_boolean_branches info subject pr fmt bl =
+  let error () = unsupportedTerm subject
+    "smtv2: bad pattern-matching on Boolean (compile_match missing?)"
+  in
+  match bl with
+  | [br1 ; br2] ->
+    let (p1,t1) = t_open_branch br1 in
+    let (_p2,t2) = t_open_branch br2 in
+    begin
+      match p1.pat_node with
+      | Papp(cs,_) ->
+        let csname = if ls_equal cs fs_bool_true then "true" else "false" in
+        fprintf fmt "@[(ite (= %a %s) %a %a)@]"
+          (print_term info) subject
+          csname
+          (pr info) t1
+          (pr info) t2
+      | _ -> error ()
+    end
+  | _ -> error ()
 
 and print_branches info subject pr fmt bl = match bl with
   | [] -> assert false
   | br::bl ->
       let (p,t) = t_open_branch br in
       let error () = unsupportedPattern p
-        "smtv2: you must compile nested pattern matching" in
+        "smtv2: you must compile nested pattern-matching" in
       match p.pat_node with
       | Pwild -> pr info fmt t
       | Papp (cs,args) ->
@@ -496,7 +532,6 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_line = vc_line_info.vc_loc;
 				queried_terms = model_list; }
-
   | Plemma| Pskip -> assert false
 
 

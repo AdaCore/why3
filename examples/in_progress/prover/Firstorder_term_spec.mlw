@@ -1,0 +1,1475 @@
+module Spec
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  type fo_term_list 'b0 'b3 =
+    | FONil
+    | FOCons (fo_term 'b0 'b3) (fo_term_list 'b0 'b3)
+    
+  
+  with fo_term 'b0 'b3 =
+    | Var_fo_term 'b3
+    | App (symbol 'b0) (fo_term_list 'b0 'b3)
+    
+  
+  function nat_size_fo_term_list (t:fo_term_list 'b0 'b3) : nat =
+    match t with | FONil -> let s = one_nat in s
+      | FOCons v0 v1 ->
+        let s = one_nat in let s = add_nat (nat_size_fo_term_list v1) s in
+          let s = add_nat (nat_size_fo_term v0) s in s
+    end
+  
+  with nat_size_fo_term (t:fo_term 'b0 'b3) : nat =
+    match t with | Var_fo_term v0 -> one_nat
+      | App v0 v1 ->
+        let s = one_nat in let s = add_nat (nat_size_fo_term_list v1) s in
+          let s = add_nat (nat_size_symbol v0) s in s
+    end
+  
+  with size_fo_term_list (t:fo_term_list 'b0 'b3) : int =
+    match t with | FONil -> let s = 1 in s
+      | FOCons v0 v1 ->
+        let s = 1 in let s = size_fo_term_list v1 + s in
+          let s = size_fo_term v0 + s in s
+    end
+  
+  with size_fo_term (t:fo_term 'b0 'b3) : int =
+    match t with | Var_fo_term v0 -> 1
+      | App v0 v1 ->
+        let s = 1 in let s = size_fo_term_list v1 + s in
+          let s = size_symbol v0 + s in s
+    end
+  
+  let rec lemma size_positive_lemma_fo_term_list (t:fo_term_list 'b0 'b3) :
+    unit ensures { size_fo_term_list t > 0 }
+    variant { nat_to_int (nat_size_fo_term_list t) } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        size_positive_lemma_fo_term v0 ;
+          size_positive_lemma_fo_term_list v1 ; ()
+    end
+  
+  with lemma size_positive_lemma_fo_term (t:fo_term 'b0 'b3) : unit
+    ensures { size_fo_term t > 0 }
+    variant { nat_to_int (nat_size_fo_term t) } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        size_positive_lemma_symbol v0 ; size_positive_lemma_fo_term_list v1 ;
+          ()
+    end
+  
+  function rename_fo_term_list (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0)
+    (s3:func 'b3 'c3) : fo_term_list 'c0 'c3 =
+    match t with | FONil -> FONil
+      | FOCons v0 v1 ->
+        FOCons (rename_fo_term v0 s0 s3) (rename_fo_term_list v1 s0 s3)
+    end
+  
+  with rename_fo_term (t:fo_term 'b0 'b3) (s0:func 'b0 'c0)
+    (s3:func 'b3 'c3) : fo_term 'c0 'c3 =
+    match t with | Var_fo_term v0 -> Var_fo_term (s3 v0)
+      | App v0 v1 -> App (rename_symbol v0 s0) (rename_fo_term_list v1 s0 s3)
+    end
+  
+  let rec lemma renaming_composition_lemma_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 'c0) (s13:func 'b3 'c3)
+    (s20:func 'c0 'd0) (s23:func 'c3 'd3) : unit
+    ensures { rename_fo_term_list (rename_fo_term_list t s10 s13) s20 s23 =
+      rename_fo_term_list t (rcompose s10 s20) (rcompose s13 s23) }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        renaming_composition_lemma_fo_term v0 s10 s13 s20 s23 ;
+          renaming_composition_lemma_fo_term_list v1 s10 s13 s20 s23 ; ()
+    end
+  
+  with lemma renaming_composition_lemma_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 'c0) (s13:func 'b3 'c3) (s20:func 'c0 'd0)
+    (s23:func 'c3 'd3) : unit
+    ensures { rename_fo_term (rename_fo_term t s10 s13) s20 s23 =
+      rename_fo_term t (rcompose s10 s20) (rcompose s13 s23) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        renaming_composition_lemma_symbol v0 s10 s20 ;
+          renaming_composition_lemma_fo_term_list v1 s10 s13 s20 s23 ; ()
+    end
+  
+  let rec lemma renaming_identity_lemma_fo_term_list
+    (t:fo_term_list 'b0 'b3) : unit
+    ensures { rename_fo_term_list t identity identity = t }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        renaming_identity_lemma_fo_term v0 ;
+          renaming_identity_lemma_fo_term_list v1 ; ()
+    end
+  
+  with lemma renaming_identity_lemma_fo_term (t:fo_term 'b0 'b3) : unit
+    ensures { rename_fo_term t identity identity = t }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        renaming_identity_lemma_symbol v0 ;
+          renaming_identity_lemma_fo_term_list v1 ; ()
+    end
+  
+  (* Abstraction definition axiom :
+      function rename_subst_fo_term (s0:func 'b3 (fo_term 'c0 'c3))
+        (s10:func 'c0 'd0) (s13:func 'c3 'd3) : func 'b3 (fo_term 'd0 'd3) =
+        (\ x:'b3.rename_fo_term (s0 x) s10 s13)
+      *)
+  function rename_subst_fo_term (s0:func 'b3 (fo_term 'c0 'c3))
+    (s10:func 'c0 'd0) (s13:func 'c3 'd3) : func 'b3 (fo_term 'd0 'd3)
+  axiom rename_subst_fo_term_definition :
+    forall s0:func 'b3 (fo_term 'c0 'c3), s10:func 'c0 'd0, s13:func 'c3 'd3,
+      x:'b3.
+    rename_subst_fo_term s0 s10 s13 x = rename_fo_term (s0 x) s10 s13
+  
+  let lemma associativity_subst_rename_rename_lemma_fo_term
+    (s1:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 'd0) (s23:func 'c3 'd3)
+    (s30:func 'd0 'e0) (s33:func 'd3 'e3) : unit
+    ensures { rename_subst_fo_term s1 (rcompose s20 s30) (rcompose s23 s33) =
+      rename_subst_fo_term (rename_subst_fo_term s1 s20 s23) s30 s33 }
+    =
+    assert {
+      extensionalEqual
+        (rename_subst_fo_term s1 (rcompose s20 s30) (rcompose s23 s33))
+        (rename_subst_fo_term (rename_subst_fo_term s1 s20 s23) s30 s33)
+      }
+  
+  let lemma associativity_rename_subst_rename_lemma_fo_term (s1:func 'b3 'c3)
+    (s20:func 'c0 (symbol 'd0)) (s23:func 'c3 (fo_term 'd0 'd3))
+    (s30:func 'd0 'e0) (s33:func 'd3 'e3) : unit
+    ensures { rcompose s1 (rename_subst_fo_term s23 s30 s33) =
+      rename_subst_fo_term (rcompose s1 s23) s30 s33 }
+    =
+    assert {
+      extensionalEqual (rcompose s1 (rename_subst_fo_term s23 s30 s33))
+        (rename_subst_fo_term (rcompose s1 s23) s30 s33)
+      }
+  
+  let lemma right_rename_subst_by_identity_lemma_fo_term
+    (s0:func 'b3 (fo_term 'c0 'c3)) : unit
+    ensures { rename_subst_fo_term s0 identity identity = s0 } =
+    assert {
+      extensionalEqual (rename_subst_fo_term s0 identity identity) (s0) }
+  
+  function olifts_fo_term (s:func 'b3 (fo_term 'c0 'c3)) :
+    func (option 'b3) (fo_term 'c0 (option 'c3)) =
+    ocase (rename_subst_fo_term s identity some) (Var_fo_term None)
+  
+  let lemma olifts_composition_lemma_rename_subst_fo_term (s1:func 'b3 'c3)
+    (s23:func 'c3 (fo_term 'd0 'd3)) : unit
+    ensures { (olifts_fo_term (rcompose s1 s23)) =
+      rcompose (olift s1) (olifts_fo_term s23) }
+    =
+    assert {
+      forall x:option 'b3.
+        match x with | None ->
+          eval ((olifts_fo_term (rcompose s1 s23))) x =
+            eval (rcompose (olift s1) (olifts_fo_term s23)) x
+          | Some y ->
+          eval ((olifts_fo_term (rcompose s1 s23))) x =
+            eval (rcompose s1 (rename_subst_fo_term s23 identity some)) y =
+            eval ((rename_subst_fo_term (olifts_fo_term s23) identity
+                    identity)) (rcompose s1 some y) =
+            eval (rcompose (olift s1) (olifts_fo_term s23)) x
+        end
+      } ;
+    assert {
+      extensionalEqual ((olifts_fo_term (rcompose s1 s23)))
+        (rcompose (olift s1) (olifts_fo_term s23))
+      }
+  
+  let lemma olifts_composition_lemma_subst_rename_fo_term
+    (s1:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 'd0) (s23:func 'c3 'd3) :
+    unit
+    ensures { (olifts_fo_term (rename_subst_fo_term s1 s20 s23)) =
+      rename_subst_fo_term (olifts_fo_term s1) s20 (olift s23) }
+    =
+    assert {
+      forall x:option 'b3.
+        match x with | None ->
+          eval ((olifts_fo_term (rename_subst_fo_term s1 s20 s23))) x =
+            eval (rename_subst_fo_term (olifts_fo_term s1) s20 (olift s23)) x
+          | Some y ->
+          eval ((olifts_fo_term (rename_subst_fo_term s1 s20 s23))) x =
+            eval (rename_subst_fo_term s1 s20 (rcompose s23 some)) y =
+            rename_fo_term (rename_fo_term (s1 y) identity some) s20
+              (olift s23) =
+            eval (rename_subst_fo_term (olifts_fo_term s1) s20 (olift s23)) x
+        end
+      } ;
+    assert {
+      extensionalEqual ((olifts_fo_term (rename_subst_fo_term s1 s20 s23)))
+        (rename_subst_fo_term (olifts_fo_term s1) s20 (olift s23))
+      }
+  
+  function subst_fo_term_list (t:fo_term_list 'b0 'b3)
+    (s0:func 'b0 (symbol 'c0)) (s3:func 'b3 (fo_term 'c0 'c3)) :
+    fo_term_list 'c0 'c3 =
+    match t with | FONil -> FONil
+      | FOCons v0 v1 ->
+        FOCons
+          (subst_fo_term v0 (rename_subst_symbol s0 identity)
+            (rename_subst_fo_term s3 identity identity))
+          (subst_fo_term_list v1 (rename_subst_symbol s0 identity)
+            (rename_subst_fo_term s3 identity identity))
+    end
+  
+  with subst_fo_term (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : fo_term 'c0 'c3 =
+    match t with | Var_fo_term v0 -> s3 v0
+      | App v0 v1 ->
+        App (subst_symbol v0 (rename_subst_symbol s0 identity))
+          (subst_fo_term_list v1 (rename_subst_symbol s0 identity)
+            (rename_subst_fo_term s3 identity identity))
+    end
+  
+  let rec lemma rename_then_subst_composition_lemma_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 'c0) (s13:func 'b3 'c3)
+    (s20:func 'c0 (symbol 'd0)) (s23:func 'c3 (fo_term 'd0 'd3)) : unit
+    ensures { subst_fo_term_list (rename_fo_term_list t s10 s13) s20 s23 =
+      subst_fo_term_list t (rcompose s10 s20) (rcompose s13 s23) }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        rename_then_subst_composition_lemma_fo_term v0 s10 s13
+          (rename_subst_symbol s20 identity)
+          (rename_subst_fo_term s23 identity identity) ;
+          rename_then_subst_composition_lemma_fo_term_list v1 s10 s13
+          (rename_subst_symbol s20 identity)
+          (rename_subst_fo_term s23 identity identity) ; ()
+    end
+  
+  with lemma rename_then_subst_composition_lemma_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 'c0) (s13:func 'b3 'c3) (s20:func 'c0 (symbol 'd0))
+    (s23:func 'c3 (fo_term 'd0 'd3)) : unit
+    ensures { subst_fo_term (rename_fo_term t s10 s13) s20 s23 =
+      subst_fo_term t (rcompose s10 s20) (rcompose s13 s23) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        rename_then_subst_composition_lemma_symbol v0 s10
+          (rename_subst_symbol s20 identity) ;
+          rename_then_subst_composition_lemma_fo_term_list v1 s10 s13
+          (rename_subst_symbol s20 identity)
+          (rename_subst_fo_term s23 identity identity) ; ()
+    end
+  
+  let rec lemma subst_then_rename_composition_lemma_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 (symbol 'c0))
+    (s13:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 'd0) (s23:func 'c3 'd3) :
+    unit
+    ensures { rename_fo_term_list (subst_fo_term_list t s10 s13) s20 s23 =
+      subst_fo_term_list t (rename_subst_symbol s10 s20)
+        (rename_subst_fo_term s13 s20 s23)
+      }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        subst_then_rename_composition_lemma_fo_term v0
+          (rename_subst_symbol s10 identity)
+          (rename_subst_fo_term s13 identity identity) s20 s23 ;
+          subst_then_rename_composition_lemma_fo_term_list v1
+          (rename_subst_symbol s10 identity)
+          (rename_subst_fo_term s13 identity identity) s20 s23 ; ()
+    end
+  
+  with lemma subst_then_rename_composition_lemma_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 (symbol 'c0)) (s13:func 'b3 (fo_term 'c0 'c3))
+    (s20:func 'c0 'd0) (s23:func 'c3 'd3) : unit
+    ensures { rename_fo_term (subst_fo_term t s10 s13) s20 s23 =
+      subst_fo_term t (rename_subst_symbol s10 s20)
+        (rename_subst_fo_term s13 s20 s23)
+      }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        subst_then_rename_composition_lemma_symbol v0
+          (rename_subst_symbol s10 identity) s20 ;
+          subst_then_rename_composition_lemma_fo_term_list v1
+          (rename_subst_symbol s10 identity)
+          (rename_subst_fo_term s13 identity identity) s20 s23 ; ()
+    end
+  
+  (* Abstraction definition axiom :
+      function subst_compose_fo_term (s0:func 'b3 (fo_term 'c0 'c3))
+        (s10:func 'c0 (symbol 'd0)) (s13:func 'c3 (fo_term 'd0 'd3)) :
+        func 'b3 (fo_term 'd0 'd3) = (\ x:'b3.subst_fo_term (s0 x) s10 s13)
+      *)
+  function subst_compose_fo_term (s0:func 'b3 (fo_term 'c0 'c3))
+    (s10:func 'c0 (symbol 'd0)) (s13:func 'c3 (fo_term 'd0 'd3)) :
+    func 'b3 (fo_term 'd0 'd3)
+  axiom subst_compose_fo_term_definition :
+    forall s0:func 'b3 (fo_term 'c0 'c3), s10:func 'c0 (symbol 'd0),
+      s13:func 'c3 (fo_term 'd0 'd3), x:'b3.
+    subst_compose_fo_term s0 s10 s13 x = subst_fo_term (s0 x) s10 s13
+  
+  let lemma associativity_rename_subst_subst_lemma_fo_term (s1:func 'b3 'c3)
+    (s20:func 'c0 (symbol 'd0)) (s23:func 'c3 (fo_term 'd0 'd3))
+    (s30:func 'd0 (symbol 'e0)) (s33:func 'd3 (fo_term 'e0 'e3)) : unit
+    ensures { rcompose s1 (subst_compose_fo_term s23 s30 s33) =
+      subst_compose_fo_term (rcompose s1 s23) s30 s33 }
+    =
+    assert {
+      extensionalEqual (rcompose s1 (subst_compose_fo_term s23 s30 s33))
+        (subst_compose_fo_term (rcompose s1 s23) s30 s33)
+      }
+  
+  let lemma associativity_subst_rename_subst_lemma_fo_term
+    (s1:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 'd0) (s23:func 'c3 'd3)
+    (s30:func 'd0 (symbol 'e0)) (s33:func 'd3 (fo_term 'e0 'e3)) : unit
+    ensures { subst_compose_fo_term s1 (rcompose s20 s30) (rcompose s23 s33)
+      = subst_compose_fo_term (rename_subst_fo_term s1 s20 s23) s30 s33 }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_fo_term s1 (rcompose s20 s30) (rcompose s23 s33))
+        (subst_compose_fo_term (rename_subst_fo_term s1 s20 s23) s30 s33)
+      }
+  
+  let lemma associativity_subst_subst_rename_lemma_fo_term
+    (s1:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 (symbol 'd0))
+    (s23:func 'c3 (fo_term 'd0 'd3)) (s30:func 'd0 'e0) (s33:func 'd3 'e3) :
+    unit
+    ensures {
+      subst_compose_fo_term s1 (rename_subst_symbol s20 s30)
+        (rename_subst_fo_term s23 s30 s33)
+      = rename_subst_fo_term (subst_compose_fo_term s1 s20 s23) s30 s33 }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_fo_term s1 (rename_subst_symbol s20 s30)
+           (rename_subst_fo_term s23 s30 s33))
+        (rename_subst_fo_term (subst_compose_fo_term s1 s20 s23) s30 s33)
+      }
+  
+  let lemma olifts_composition_lemma_subst_subst_fo_term
+    (s1:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 (symbol 'd0))
+    (s23:func 'c3 (fo_term 'd0 'd3)) : unit
+    ensures { (olifts_fo_term (subst_compose_fo_term s1 s20 s23)) =
+      subst_compose_fo_term (olifts_fo_term s1)
+        (rename_subst_symbol s20 identity) (olifts_fo_term s23) }
+    =
+    assert {
+      forall x:option 'b3.
+        match x with | None ->
+          eval ((olifts_fo_term (subst_compose_fo_term s1 s20 s23))) x =
+            eval
+              (subst_compose_fo_term (olifts_fo_term s1)
+                 (rename_subst_symbol s20 identity) (olifts_fo_term s23))
+              x
+          | Some y ->
+          eval ((olifts_fo_term (subst_compose_fo_term s1 s20 s23))) x =
+            eval
+              (subst_compose_fo_term s1 (rename_subst_symbol s20 identity)
+                 (rename_subst_fo_term s23 identity some))
+              y
+            =
+            subst_fo_term (rename_fo_term (s1 y) identity some)
+              (rename_subst_symbol s20 identity)
+              (rename_subst_fo_term (olifts_fo_term s23) identity identity) =
+            eval
+              (subst_compose_fo_term (olifts_fo_term s1)
+                 (rename_subst_symbol s20 identity) (olifts_fo_term s23))
+              x
+        end
+      } ;
+    assert {
+      extensionalEqual ((olifts_fo_term (subst_compose_fo_term s1 s20 s23)))
+        (subst_compose_fo_term (olifts_fo_term s1)
+           (rename_subst_symbol s20 identity) (olifts_fo_term s23))
+      }
+  
+  let rec lemma subst_composition_lemma_fo_term_list (t:fo_term_list 'b0 'b3)
+    (s10:func 'b0 (symbol 'c0)) (s13:func 'b3 (fo_term 'c0 'c3))
+    (s20:func 'c0 (symbol 'd0)) (s23:func 'c3 (fo_term 'd0 'd3)) : unit
+    ensures { subst_fo_term_list (subst_fo_term_list t s10 s13) s20 s23 =
+      subst_fo_term_list t (subst_compose_symbol s10 s20)
+        (subst_compose_fo_term s13 s20 s23)
+      }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        subst_composition_lemma_fo_term v0 (rename_subst_symbol s10 identity)
+          (rename_subst_fo_term s13 identity identity)
+          (rename_subst_symbol s20 identity)
+          (rename_subst_fo_term s23 identity identity) ;
+          subst_composition_lemma_fo_term_list v1
+          (rename_subst_symbol s10 identity)
+          (rename_subst_fo_term s13 identity identity)
+          (rename_subst_symbol s20 identity)
+          (rename_subst_fo_term s23 identity identity) ; ()
+    end
+  
+  with lemma subst_composition_lemma_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 (symbol 'c0)) (s13:func 'b3 (fo_term 'c0 'c3))
+    (s20:func 'c0 (symbol 'd0)) (s23:func 'c3 (fo_term 'd0 'd3)) : unit
+    ensures { subst_fo_term (subst_fo_term t s10 s13) s20 s23 =
+      subst_fo_term t (subst_compose_symbol s10 s20)
+        (subst_compose_fo_term s13 s20 s23)
+      }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        subst_composition_lemma_symbol v0 (rename_subst_symbol s10 identity)
+          (rename_subst_symbol s20 identity) ;
+          subst_composition_lemma_fo_term_list v1
+          (rename_subst_symbol s10 identity)
+          (rename_subst_fo_term s13 identity identity)
+          (rename_subst_symbol s20 identity)
+          (rename_subst_fo_term s23 identity identity) ; ()
+    end
+  
+  let lemma associativity_subst_subst_subst_lemma_fo_term
+    (s1:func 'b3 (fo_term 'c0 'c3)) (s20:func 'c0 (symbol 'd0))
+    (s23:func 'c3 (fo_term 'd0 'd3)) (s30:func 'd0 (symbol 'e0))
+    (s33:func 'd3 (fo_term 'e0 'e3)) : unit
+    ensures {
+      subst_compose_fo_term s1 (subst_compose_symbol s20 s30)
+        (subst_compose_fo_term s23 s30 s33)
+      = subst_compose_fo_term (subst_compose_fo_term s1 s20 s23) s30 s33 }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_fo_term s1 (subst_compose_symbol s20 s30)
+           (subst_compose_fo_term s23 s30 s33))
+        (subst_compose_fo_term (subst_compose_fo_term s1 s20 s23) s30 s33)
+      }
+  
+  (* Abstraction definition axiom :
+      constant subst_id_fo_term : func 'b3 (fo_term 'b0 'b3) =
+        (\ x:'b3. Var_fo_term x)*)
+  constant subst_id_fo_term : func 'b3 (fo_term 'b0 'b3)
+  axiom subst_id_fo_term_definition :
+    forall x:'b3.
+      eval (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3)) x = Var_fo_term x
+  
+  function subst_of_rename_fo_term (r:func 'b3 'c3) :
+    func 'b3 (fo_term 'c0 'c3) = rcompose r subst_id_fo_term
+  
+  let lemma olifts_identity_fo_term (u:unit) : unit
+    ensures {
+      (olifts_fo_term (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3))) =
+      subst_id_fo_term }
+    =
+    assert {
+      forall x:option 'b3.
+        match x with
+          | None ->
+            eval
+              ((olifts_fo_term
+                  (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3))))
+              x
+            = eval (subst_id_fo_term) x
+          | Some y ->
+            eval
+              ((olifts_fo_term
+                  (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3))))
+              x
+            = eval (subst_id_fo_term) x
+        end
+      } ;
+    assert { extensionalEqual
+      ((olifts_fo_term (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3))))
+      (subst_id_fo_term) }
+  
+  let lemma left_rename_subst_identity_lemma_fo_term (s0:func 'b0 'c0)
+    (s3:func 'b3 'c3) : unit
+    ensures {
+      rename_subst_fo_term (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3)) s0
+        s3
+      = subst_of_rename_fo_term s3 }
+    =
+    assert {
+      extensionalEqual
+        (rename_subst_fo_term (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3))
+           s0 s3)
+        (subst_of_rename_fo_term s3)
+      }
+  
+  let rec lemma subst_identity_lemma_fo_term_list (t:fo_term_list 'b0 'b3) :
+    unit
+    ensures { subst_fo_term_list t subst_id_symbol subst_id_fo_term = t }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        subst_identity_lemma_fo_term v0 ; subst_identity_lemma_fo_term_list
+          v1 ; ()
+    end
+  
+  with lemma subst_identity_lemma_fo_term (t:fo_term 'b0 'b3) : unit
+    ensures { subst_fo_term t subst_id_symbol subst_id_fo_term = t }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        subst_identity_lemma_symbol v0 ; subst_identity_lemma_fo_term_list
+          v1 ; ()
+    end
+  
+  let lemma left_subst_subst_identity_lemma_fo_term
+    (s0:func 'b0 (symbol 'c0)) (s3:func 'b3 (fo_term 'c0 'c3)) : unit
+    ensures {
+      subst_compose_fo_term (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3))
+        s0 s3
+      = s3 }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_fo_term
+           (subst_id_fo_term : func 'b3 (fo_term 'b0 'b3)) s0 s3)
+        (s3)
+      }
+  
+  let lemma right_subst_subst_by_identity_lemma_fo_term
+    (s0:func 'b3 (fo_term 'c0 'c3)) : unit
+    ensures { subst_compose_fo_term s0 subst_id_symbol subst_id_fo_term = s0
+      }
+    =
+    assert {
+      extensionalEqual
+        (subst_compose_fo_term s0 subst_id_symbol subst_id_fo_term) (s0)
+      }
+  
+  let rec lemma renaming_preserve_size_fo_term_list (t:fo_term_list 'b0 'b3)
+    (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    ensures { size_fo_term_list (rename_fo_term_list t s0 s3) =
+      size_fo_term_list t }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        renaming_preserve_size_fo_term v0 (s0) (s3) ;
+          renaming_preserve_size_fo_term_list v1 (s0) (s3) ; ()
+    end
+  
+  with lemma renaming_preserve_size_fo_term (t:fo_term 'b0 'b3)
+    (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    ensures { size_fo_term (rename_fo_term t s0 s3) = size_fo_term t }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        renaming_preserve_size_symbol v0 (s0) ;
+          renaming_preserve_size_fo_term_list v1 (s0) (s3) ; ()
+    end
+  
+  predicate is_symbol_free_var_in_fo_term_list (x:'b0)
+    (t:fo_term_list 'b0 'b3) =
+    match t with | FONil -> false
+      | FOCons v0 v1 ->
+        is_symbol_free_var_in_fo_term x v0 \/
+          is_symbol_free_var_in_fo_term_list x v1
+    end
+  
+  with is_fo_term_free_var_in_fo_term_list (x:'b3) (t:fo_term_list 'b0 'b3) =
+    match t with | FONil -> false
+      | FOCons v0 v1 ->
+        is_fo_term_free_var_in_fo_term x v0 \/
+          is_fo_term_free_var_in_fo_term_list x v1
+    end
+  
+  with is_symbol_free_var_in_fo_term (x:'b0) (t:fo_term 'b0 'b3) =
+    match t with | Var_fo_term v0 -> false
+      | App v0 v1 ->
+        is_symbol_free_var_in_symbol x v0 \/
+          is_symbol_free_var_in_fo_term_list x v1
+    end
+  
+  with is_fo_term_free_var_in_fo_term (x:'b3) (t:fo_term 'b0 'b3) =
+    match t with | Var_fo_term v0 -> v0 = x
+      | App v0 v1 -> is_fo_term_free_var_in_fo_term_list x v1
+    end
+  
+  let rec ghost rename_free_var_constructive_inversion_symbol_fo_term_list
+    (x:'c0) (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) :
+    'b0
+    requires {
+      is_symbol_free_var_in_fo_term_list x (rename_fo_term_list t s0 s3) }
+    ensures { is_symbol_free_var_in_fo_term_list result t /\ s0 result = x }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> absurd
+      | FOCons v0 v1 ->
+        if is_symbol_free_var_in_fo_term x (rename_fo_term v0 s0 s3)
+          then
+            let sumx =
+              rename_free_var_constructive_inversion_symbol_fo_term x v0 s0
+                s3
+            in sumx 
+          else
+            if is_symbol_free_var_in_fo_term_list x
+                 (rename_fo_term_list v1 s0 s3)
+              then
+                let sumx =
+                  rename_free_var_constructive_inversion_symbol_fo_term_list
+                    x v1 s0 s3
+                in sumx 
+              else absurd
+    end
+  
+  with lemma rename_free_var_inversion_symbol_fo_term_list (x:'c0)
+    (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    requires {
+      is_symbol_free_var_in_fo_term_list x (rename_fo_term_list t s0 s3) }
+    ensures {
+      exists y:'b0. is_symbol_free_var_in_fo_term_list y t /\ s0 y = x }
+    variant { 1 + size_fo_term_list t } =
+    let sumx =
+      rename_free_var_constructive_inversion_symbol_fo_term_list x t s0 s3
+    in ()
+  
+  with ghost rename_free_var_constructive_inversion_fo_term_fo_term_list
+    (x:'c3) (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) :
+    'b3
+    requires {
+      is_fo_term_free_var_in_fo_term_list x (rename_fo_term_list t s0 s3) }
+    ensures { is_fo_term_free_var_in_fo_term_list result t /\ s3 result = x }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> absurd
+      | FOCons v0 v1 ->
+        if is_fo_term_free_var_in_fo_term x (rename_fo_term v0 s0 s3)
+          then
+            let sumx =
+              rename_free_var_constructive_inversion_fo_term_fo_term x v0 s0
+                s3
+            in sumx 
+          else
+            if is_fo_term_free_var_in_fo_term_list x
+                 (rename_fo_term_list v1 s0 s3)
+              then
+                let sumx =
+                  rename_free_var_constructive_inversion_fo_term_fo_term_list
+                    x v1 s0 s3
+                in sumx 
+              else absurd
+    end
+  
+  with lemma rename_free_var_inversion_fo_term_fo_term_list (x:'c3)
+    (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    requires {
+      is_fo_term_free_var_in_fo_term_list x (rename_fo_term_list t s0 s3) }
+    ensures {
+      exists y:'b3. is_fo_term_free_var_in_fo_term_list y t /\ s3 y = x }
+    variant { 1 + size_fo_term_list t } =
+    let sumx =
+      rename_free_var_constructive_inversion_fo_term_fo_term_list x t s0 s3
+    in ()
+  
+  with ghost rename_free_var_constructive_inversion_symbol_fo_term (x:'c0)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : 'b0
+    requires { is_symbol_free_var_in_fo_term x (rename_fo_term t s0 s3) }
+    ensures { is_symbol_free_var_in_fo_term result t /\ s0 result = x }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> absurd
+      | App v0 v1 ->
+        if is_symbol_free_var_in_symbol x (rename_symbol v0 s0)
+          then
+            let sumx =
+              rename_free_var_constructive_inversion_symbol_symbol x v0 s0
+            in sumx 
+          else
+            if is_symbol_free_var_in_fo_term_list x
+                 (rename_fo_term_list v1 s0 s3)
+              then
+                let sumx =
+                  rename_free_var_constructive_inversion_symbol_fo_term_list
+                    x v1 s0 s3
+                in sumx 
+              else absurd
+    end
+  
+  with lemma rename_free_var_inversion_symbol_fo_term (x:'c0)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    requires { is_symbol_free_var_in_fo_term x (rename_fo_term t s0 s3) }
+    ensures { exists y:'b0. is_symbol_free_var_in_fo_term y t /\ s0 y = x }
+    variant { 1 + size_fo_term t } =
+    let sumx =
+      rename_free_var_constructive_inversion_symbol_fo_term x t s0 s3
+    in ()
+  
+  with ghost rename_free_var_constructive_inversion_fo_term_fo_term (x:'c3)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : 'b3
+    requires { is_fo_term_free_var_in_fo_term x (rename_fo_term t s0 s3) }
+    ensures { is_fo_term_free_var_in_fo_term result t /\ s3 result = x }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> v0
+      | App v0 v1 ->
+        if is_fo_term_free_var_in_fo_term_list x
+             (rename_fo_term_list v1 s0 s3)
+          then
+            let sumx =
+              rename_free_var_constructive_inversion_fo_term_fo_term_list x
+                v1 s0 s3
+            in sumx 
+          else absurd
+    end
+  
+  with lemma rename_free_var_inversion_fo_term_fo_term (x:'c3)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    requires { is_fo_term_free_var_in_fo_term x (rename_fo_term t s0 s3) }
+    ensures { exists y:'b3. is_fo_term_free_var_in_fo_term y t /\ s3 y = x }
+    variant { 1 + size_fo_term t } =
+    let sumx =
+      rename_free_var_constructive_inversion_fo_term_fo_term x t s0 s3
+    in ()
+  
+  let rec lemma rename_free_var_propagation_symbol_fo_term_list (x:'b0)
+    (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    ensures { is_symbol_free_var_in_fo_term_list x t ->
+      is_symbol_free_var_in_fo_term_list (s0 x) (rename_fo_term_list t s0 s3)
+      }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        rename_free_var_propagation_symbol_fo_term x v0 (s0) (s3) ;
+          rename_free_var_propagation_symbol_fo_term_list x v1 (s0) (s3) ; ()
+    end
+  
+  with lemma rename_free_var_propagation_fo_term_fo_term_list (x:'b3)
+    (t:fo_term_list 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    ensures { is_fo_term_free_var_in_fo_term_list x t ->
+      is_fo_term_free_var_in_fo_term_list (s3 x)
+        (rename_fo_term_list t s0 s3)
+      }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        rename_free_var_propagation_fo_term_fo_term x v0 (s0) (s3) ;
+          rename_free_var_propagation_fo_term_fo_term_list x v1 (s0) (s3) ;
+          ()
+    end
+  
+  with lemma rename_free_var_propagation_symbol_fo_term (x:'b0)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    ensures { is_symbol_free_var_in_fo_term x t ->
+      is_symbol_free_var_in_fo_term (s0 x) (rename_fo_term t s0 s3) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        rename_free_var_propagation_symbol_symbol x v0 (s0) ;
+          rename_free_var_propagation_symbol_fo_term_list x v1 (s0) (s3) ; ()
+    end
+  
+  with lemma rename_free_var_propagation_fo_term_fo_term (x:'b3)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 'c0) (s3:func 'b3 'c3) : unit
+    ensures { is_fo_term_free_var_in_fo_term x t ->
+      is_fo_term_free_var_in_fo_term (s3 x) (rename_fo_term t s0 s3) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        () ; rename_free_var_propagation_fo_term_fo_term_list x v1 (s0)
+          (s3) ; ()
+    end
+  
+  let rec ghost subst_free_var_constructive_inversion_symbol_fo_term_list
+    (x:'c0) (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : sum ('b0) ('b3)
+    requires {
+      is_symbol_free_var_in_fo_term_list x (subst_fo_term_list t s0 s3) }
+    ensures { let sumx = result in
+      match sumx with | Left sumx ->
+        is_symbol_free_var_in_fo_term_list sumx t /\
+          is_symbol_free_var_in_symbol x (s0 sumx)
+        | Right sumx ->
+        is_fo_term_free_var_in_fo_term_list sumx t /\
+          is_symbol_free_var_in_fo_term x (s3 sumx)
+      end }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> absurd
+      | FOCons v0 v1 ->
+        if is_symbol_free_var_in_fo_term x
+             (subst_fo_term v0 (rename_subst_symbol s0 identity)
+                (rename_subst_fo_term s3 identity identity))
+          then
+            let sumx =
+              subst_free_var_constructive_inversion_symbol_fo_term x v0
+                (rename_subst_symbol s0 identity)
+                (rename_subst_fo_term s3 identity identity)
+            in
+            match sumx with | Left sumx ->
+              let y =
+                rename_free_var_constructive_inversion_symbol_symbol x
+                  (eval s0 sumx) identity 
+                in assert { y = x } ; Left sumx
+              | Right sumx ->
+              Right
+                (let y =
+                   rename_free_var_constructive_inversion_symbol_fo_term x
+                     (eval s3 sumx) identity identity 
+                in assert { y = x } ; sumx)
+            end 
+          else
+            if is_symbol_free_var_in_fo_term_list x
+                 (subst_fo_term_list v1 (rename_subst_symbol s0 identity)
+                    (rename_subst_fo_term s3 identity identity))
+              then
+                let sumx =
+                  subst_free_var_constructive_inversion_symbol_fo_term_list x
+                    v1 (rename_subst_symbol s0 identity)
+                    (rename_subst_fo_term s3 identity identity)
+                in
+                match sumx with | Left sumx ->
+                  let y =
+                    rename_free_var_constructive_inversion_symbol_symbol x
+                      (eval s0 sumx) identity 
+                    in assert { y = x } ; Left sumx
+                  | Right sumx ->
+                  Right
+                    (let y =
+                       rename_free_var_constructive_inversion_symbol_fo_term
+                         x (eval s3 sumx) identity identity 
+                    in assert { y = x } ; sumx)
+                end 
+              else absurd
+    end
+  
+  with lemma subst_free_var_inversion_symbol_fo_term_list (x:'c0)
+    (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : unit
+    requires {
+      is_symbol_free_var_in_fo_term_list x (subst_fo_term_list t s0 s3) }
+    ensures {
+      (exists y:'b0. is_symbol_free_var_in_fo_term_list y t /\
+         is_symbol_free_var_in_symbol x (s0 y))
+      \/
+      (exists y:'b3. is_fo_term_free_var_in_fo_term_list y t /\
+         is_symbol_free_var_in_fo_term x (s3 y))
+      }
+    variant { 1 + size_fo_term_list t } =
+    let sumx =
+      subst_free_var_constructive_inversion_symbol_fo_term_list x t s0 s3
+    in match sumx with | Left sumx -> () | Right sumx -> () end
+  
+  with ghost subst_free_var_constructive_inversion_fo_term_fo_term_list
+    (x:'c3) (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : 'b3
+    requires {
+      is_fo_term_free_var_in_fo_term_list x (subst_fo_term_list t s0 s3) }
+    ensures { let sumx = result in is_fo_term_free_var_in_fo_term_list sumx t
+      /\ is_fo_term_free_var_in_fo_term x (s3 sumx) }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> absurd
+      | FOCons v0 v1 ->
+        if is_fo_term_free_var_in_fo_term x
+             (subst_fo_term v0 (rename_subst_symbol s0 identity)
+                (rename_subst_fo_term s3 identity identity))
+          then
+            let sumx =
+              subst_free_var_constructive_inversion_fo_term_fo_term x v0
+                (rename_subst_symbol s0 identity)
+                (rename_subst_fo_term s3 identity identity)
+            in
+            let y =
+              rename_free_var_constructive_inversion_fo_term_fo_term x
+                (eval s3 sumx) identity identity 
+            in assert { y = x } ; sumx 
+          else
+            if is_fo_term_free_var_in_fo_term_list x
+                 (subst_fo_term_list v1 (rename_subst_symbol s0 identity)
+                    (rename_subst_fo_term s3 identity identity))
+              then
+                let sumx =
+                  subst_free_var_constructive_inversion_fo_term_fo_term_list
+                    x v1 (rename_subst_symbol s0 identity)
+                    (rename_subst_fo_term s3 identity identity)
+                in
+                let y =
+                  rename_free_var_constructive_inversion_fo_term_fo_term x
+                    (eval s3 sumx) identity identity 
+                in assert { y = x } ; sumx 
+              else absurd
+    end
+  
+  with lemma subst_free_var_inversion_fo_term_fo_term_list (x:'c3)
+    (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : unit
+    requires {
+      is_fo_term_free_var_in_fo_term_list x (subst_fo_term_list t s0 s3) }
+    ensures {
+      (exists y:'b3. is_fo_term_free_var_in_fo_term_list y t /\
+         is_fo_term_free_var_in_fo_term x (s3 y))
+      }
+    variant { 1 + size_fo_term_list t } =
+    let sumx =
+      subst_free_var_constructive_inversion_fo_term_fo_term_list x t s0 s3
+    in ()
+  
+  with ghost subst_free_var_constructive_inversion_symbol_fo_term (x:'c0)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : sum ('b0) ('b3)
+    requires { is_symbol_free_var_in_fo_term x (subst_fo_term t s0 s3) }
+    ensures { let sumx = result in
+      match sumx with | Left sumx ->
+        is_symbol_free_var_in_fo_term sumx t /\
+          is_symbol_free_var_in_symbol x (s0 sumx)
+        | Right sumx ->
+        is_fo_term_free_var_in_fo_term sumx t /\
+          is_symbol_free_var_in_fo_term x (s3 sumx)
+      end }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> Right (v0)
+      | App v0 v1 ->
+        if is_symbol_free_var_in_symbol x
+             (subst_symbol v0 (rename_subst_symbol s0 identity))
+          then
+            let sumx =
+              subst_free_var_constructive_inversion_symbol_symbol x v0
+                (rename_subst_symbol s0 identity)
+            in
+            let y =
+              rename_free_var_constructive_inversion_symbol_symbol x
+                (eval s0 sumx) identity 
+            in assert { y = x } ; Left sumx 
+          else
+            if is_symbol_free_var_in_fo_term_list x
+                 (subst_fo_term_list v1 (rename_subst_symbol s0 identity)
+                    (rename_subst_fo_term s3 identity identity))
+              then
+                let sumx =
+                  subst_free_var_constructive_inversion_symbol_fo_term_list x
+                    v1 (rename_subst_symbol s0 identity)
+                    (rename_subst_fo_term s3 identity identity)
+                in
+                match sumx with | Left sumx ->
+                  let y =
+                    rename_free_var_constructive_inversion_symbol_symbol x
+                      (eval s0 sumx) identity 
+                    in assert { y = x } ; Left sumx
+                  | Right sumx ->
+                  Right
+                    (let y =
+                       rename_free_var_constructive_inversion_symbol_fo_term
+                         x (eval s3 sumx) identity identity 
+                    in assert { y = x } ; sumx)
+                end 
+              else absurd
+    end
+  
+  with lemma subst_free_var_inversion_symbol_fo_term (x:'c0)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : unit
+    requires { is_symbol_free_var_in_fo_term x (subst_fo_term t s0 s3) }
+    ensures {
+      (exists y:'b0. is_symbol_free_var_in_fo_term y t /\
+         is_symbol_free_var_in_symbol x (s0 y))
+      \/
+      (exists y:'b3. is_fo_term_free_var_in_fo_term y t /\
+         is_symbol_free_var_in_fo_term x (s3 y))
+      }
+    variant { 1 + size_fo_term t } =
+    let sumx = subst_free_var_constructive_inversion_symbol_fo_term x t s0 s3
+    in match sumx with | Left sumx -> () | Right sumx -> () end
+  
+  with ghost subst_free_var_constructive_inversion_fo_term_fo_term (x:'c3)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : 'b3
+    requires { is_fo_term_free_var_in_fo_term x (subst_fo_term t s0 s3) }
+    ensures { let sumx = result in is_fo_term_free_var_in_fo_term sumx t /\
+      is_fo_term_free_var_in_fo_term x (s3 sumx) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> v0
+      | App v0 v1 ->
+        if is_fo_term_free_var_in_fo_term_list x
+             (subst_fo_term_list v1 (rename_subst_symbol s0 identity)
+                (rename_subst_fo_term s3 identity identity))
+          then
+            let sumx =
+              subst_free_var_constructive_inversion_fo_term_fo_term_list x v1
+                (rename_subst_symbol s0 identity)
+                (rename_subst_fo_term s3 identity identity)
+            in
+            let y =
+              rename_free_var_constructive_inversion_fo_term_fo_term x
+                (eval s3 sumx) identity identity 
+            in assert { y = x } ; sumx 
+          else absurd
+    end
+  
+  with lemma subst_free_var_inversion_fo_term_fo_term (x:'c3)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)) : unit
+    requires { is_fo_term_free_var_in_fo_term x (subst_fo_term t s0 s3) }
+    ensures {
+      (exists y:'b3. is_fo_term_free_var_in_fo_term y t /\
+         is_fo_term_free_var_in_fo_term x (s3 y))
+      }
+    variant { 1 + size_fo_term t } =
+    let sumx =
+      subst_free_var_constructive_inversion_fo_term_fo_term x t s0 s3
+    in ()
+  
+  let rec lemma subst_free_var_propagation_symbol_symbol_fo_term_list (x:'b0)
+    (y:'c0) (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)):  unit
+    ensures {
+      is_symbol_free_var_in_fo_term_list x t /\
+        is_symbol_free_var_in_symbol y (s0 x) ->
+      is_symbol_free_var_in_fo_term_list y (subst_fo_term_list t s0 s3) }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        subst_free_var_propagation_symbol_symbol_fo_term x y v0
+          ((rename_subst_symbol s0 identity))
+          ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_symbol_symbol y (eval s0 x) identity ;
+          assert { is_symbol_free_var_in_symbol y (s0 x) ->
+            is_symbol_free_var_in_symbol y
+              (eval ((rename_subst_symbol s0 identity)) x)
+            } ;
+          subst_free_var_propagation_symbol_symbol_fo_term_list x y v1
+            ((rename_subst_symbol s0 identity))
+            ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_symbol_symbol y (eval s0 x) identity ;
+          assert { is_symbol_free_var_in_symbol y (s0 x) ->
+            is_symbol_free_var_in_symbol y
+              (eval ((rename_subst_symbol s0 identity)) x)
+            } ;
+          ()
+    end
+  
+  with lemma subst_free_var_propagation_fo_term_symbol_fo_term_list (x:'b3)
+    (y:'c0) (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)):  unit
+    ensures {
+      is_fo_term_free_var_in_fo_term_list x t /\
+        is_symbol_free_var_in_fo_term y (s3 x) ->
+      is_symbol_free_var_in_fo_term_list y (subst_fo_term_list t s0 s3) }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        subst_free_var_propagation_fo_term_symbol_fo_term x y v0
+          ((rename_subst_symbol s0 identity))
+          ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_symbol_fo_term y (eval s3 x) identity
+            identity ;
+          assert { is_symbol_free_var_in_fo_term y (s3 x) ->
+            is_symbol_free_var_in_fo_term y
+              (eval ((rename_subst_fo_term s3 identity identity)) x)
+            } ;
+          subst_free_var_propagation_fo_term_symbol_fo_term_list x y v1
+            ((rename_subst_symbol s0 identity))
+            ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_symbol_fo_term y (eval s3 x) identity
+            identity ;
+          assert { is_symbol_free_var_in_fo_term y (s3 x) ->
+            is_symbol_free_var_in_fo_term y
+              (eval ((rename_subst_fo_term s3 identity identity)) x)
+            } ;
+          ()
+    end
+  
+  with lemma subst_free_var_propagation_fo_term_fo_term_fo_term_list (x:'b3)
+    (y:'c3) (t:fo_term_list 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)):  unit
+    ensures {
+      is_fo_term_free_var_in_fo_term_list x t /\
+        is_fo_term_free_var_in_fo_term y (s3 x) ->
+      is_fo_term_free_var_in_fo_term_list y (subst_fo_term_list t s0 s3) }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        subst_free_var_propagation_fo_term_fo_term_fo_term x y v0
+          ((rename_subst_symbol s0 identity))
+          ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_fo_term_fo_term y (eval s3 x) identity
+            identity ;
+          assert { is_fo_term_free_var_in_fo_term y (s3 x) ->
+            is_fo_term_free_var_in_fo_term y
+              (eval ((rename_subst_fo_term s3 identity identity)) x)
+            } ;
+          subst_free_var_propagation_fo_term_fo_term_fo_term_list x y v1
+            ((rename_subst_symbol s0 identity))
+            ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_fo_term_fo_term y (eval s3 x) identity
+            identity ;
+          assert { is_fo_term_free_var_in_fo_term y (s3 x) ->
+            is_fo_term_free_var_in_fo_term y
+              (eval ((rename_subst_fo_term s3 identity identity)) x)
+            } ;
+          ()
+    end
+  
+  with lemma subst_free_var_propagation_symbol_symbol_fo_term (x:'b0) (y:'c0)
+    (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)):  unit
+    ensures {
+      is_symbol_free_var_in_fo_term x t /\
+        is_symbol_free_var_in_symbol y (s0 x) ->
+      is_symbol_free_var_in_fo_term y (subst_fo_term t s0 s3) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        subst_free_var_propagation_symbol_symbol_symbol x y v0
+          ((rename_subst_symbol s0 identity)) ;
+          rename_free_var_propagation_symbol_symbol y (eval s0 x) identity ;
+          assert { is_symbol_free_var_in_symbol y (s0 x) ->
+            is_symbol_free_var_in_symbol y
+              (eval ((rename_subst_symbol s0 identity)) x)
+            } ;
+          subst_free_var_propagation_symbol_symbol_fo_term_list x y v1
+            ((rename_subst_symbol s0 identity))
+            ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_symbol_symbol y (eval s0 x) identity ;
+          assert { is_symbol_free_var_in_symbol y (s0 x) ->
+            is_symbol_free_var_in_symbol y
+              (eval ((rename_subst_symbol s0 identity)) x)
+            } ;
+          ()
+    end
+  
+  with lemma subst_free_var_propagation_fo_term_symbol_fo_term (x:'b3)
+    (y:'c0) (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)):  unit
+    ensures {
+      is_fo_term_free_var_in_fo_term x t /\
+        is_symbol_free_var_in_fo_term y (s3 x) ->
+      is_symbol_free_var_in_fo_term y (subst_fo_term t s0 s3) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        () ;
+          subst_free_var_propagation_fo_term_symbol_fo_term_list x y v1
+            ((rename_subst_symbol s0 identity))
+            ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_symbol_fo_term y (eval s3 x) identity
+            identity ;
+          assert { is_symbol_free_var_in_fo_term y (s3 x) ->
+            is_symbol_free_var_in_fo_term y
+              (eval ((rename_subst_fo_term s3 identity identity)) x)
+            } ;
+          ()
+    end
+  
+  with lemma subst_free_var_propagation_fo_term_fo_term_fo_term (x:'b3)
+    (y:'c3) (t:fo_term 'b0 'b3) (s0:func 'b0 (symbol 'c0))
+    (s3:func 'b3 (fo_term 'c0 'c3)):  unit
+    ensures {
+      is_fo_term_free_var_in_fo_term x t /\
+        is_fo_term_free_var_in_fo_term y (s3 x) ->
+      is_fo_term_free_var_in_fo_term y (subst_fo_term t s0 s3) }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        () ;
+          subst_free_var_propagation_fo_term_fo_term_fo_term_list x y v1
+            ((rename_subst_symbol s0 identity))
+            ((rename_subst_fo_term s3 identity identity)) ;
+          rename_free_var_propagation_fo_term_fo_term y (eval s3 x) identity
+            identity ;
+          assert { is_fo_term_free_var_in_fo_term y (s3 x) ->
+            is_fo_term_free_var_in_fo_term y
+              (eval ((rename_subst_fo_term s3 identity identity)) x)
+            } ;
+          ()
+    end
+  
+  let rec lemma free_var_equivalence_of_subst_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 (symbol 'c0))
+    (s20:func 'b0 (symbol 'c0)) (s13:func 'b3 (fo_term 'c0 'c3))
+    (s23:func 'b3 (fo_term 'c0 'c3)) : unit
+    requires {
+      forall x:'b0. is_symbol_free_var_in_fo_term_list x t -> s10 x = s20 x }
+    requires {
+      forall x:'b3. is_fo_term_free_var_in_fo_term_list x t -> s13 x = s23 x
+      }
+    ensures { subst_fo_term_list t s10 s13 = subst_fo_term_list t s20 s23 }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        assert {
+          forall x:'b0. is_symbol_free_var_in_fo_term x v0 ->
+            is_symbol_free_var_in_fo_term_list x t
+          } ;
+          assert {
+            forall x:'b3. is_fo_term_free_var_in_fo_term x v0 ->
+              is_fo_term_free_var_in_fo_term_list x t
+            } ;
+          free_var_equivalence_of_subst_fo_term v0
+            ((rename_subst_symbol s10 identity))
+            ((rename_subst_symbol s20 identity))
+            ((rename_subst_fo_term s13 identity identity))
+            ((rename_subst_fo_term s23 identity identity)) ;
+          assert {
+            forall x:'b0. is_symbol_free_var_in_fo_term_list x v1 ->
+              is_symbol_free_var_in_fo_term_list x t
+            } ;
+          assert {
+            forall x:'b3. is_fo_term_free_var_in_fo_term_list x v1 ->
+              is_fo_term_free_var_in_fo_term_list x t
+            } ;
+          free_var_equivalence_of_subst_fo_term_list v1
+            ((rename_subst_symbol s10 identity))
+            ((rename_subst_symbol s20 identity))
+            ((rename_subst_fo_term s13 identity identity))
+            ((rename_subst_fo_term s23 identity identity)) ;
+          ()
+    end
+  
+  with lemma free_var_equivalence_of_subst_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 (symbol 'c0)) (s20:func 'b0 (symbol 'c0))
+    (s13:func 'b3 (fo_term 'c0 'c3)) (s23:func 'b3 (fo_term 'c0 'c3)) : unit
+    requires {
+      forall x:'b0. is_symbol_free_var_in_fo_term x t -> s10 x = s20 x }
+    requires {
+      forall x:'b3. is_fo_term_free_var_in_fo_term x t -> s13 x = s23 x }
+    ensures { subst_fo_term t s10 s13 = subst_fo_term t s20 s23 }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        assert {
+          forall x:'b0. is_symbol_free_var_in_symbol x v0 ->
+            is_symbol_free_var_in_fo_term x t
+          } ;
+          free_var_equivalence_of_subst_symbol v0
+            ((rename_subst_symbol s10 identity))
+            ((rename_subst_symbol s20 identity)) ;
+          assert {
+            forall x:'b0. is_symbol_free_var_in_fo_term_list x v1 ->
+              is_symbol_free_var_in_fo_term x t
+            } ;
+          assert {
+            forall x:'b3. is_fo_term_free_var_in_fo_term_list x v1 ->
+              is_fo_term_free_var_in_fo_term x t
+            } ;
+          free_var_equivalence_of_subst_fo_term_list v1
+            ((rename_subst_symbol s10 identity))
+            ((rename_subst_symbol s20 identity))
+            ((rename_subst_fo_term s13 identity identity))
+            ((rename_subst_fo_term s23 identity identity)) ;
+          ()
+    end
+  
+  let lemma free_var_equivalence_of_rename_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 'c0) (s20:func 'b0 'c0)
+    (s13:func 'b3 'c3) (s23:func 'b3 'c3) : unit
+    requires {
+      forall x:'b0. is_symbol_free_var_in_fo_term_list x t -> s10 x = s20 x }
+    requires {
+      forall x:'b3. is_fo_term_free_var_in_fo_term_list x t -> s13 x = s23 x
+      }
+    ensures { rename_fo_term_list t s10 s13 = rename_fo_term_list t s20 s23 }
+    =
+    free_var_equivalence_of_subst_fo_term_list t (subst_of_rename_symbol s10)
+      (subst_of_rename_symbol s20) (subst_of_rename_fo_term s13)
+      (subst_of_rename_fo_term s23)
+  
+  let lemma free_var_equivalence_of_rename_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 'c0) (s20:func 'b0 'c0) (s13:func 'b3 'c3)
+    (s23:func 'b3 'c3) : unit
+    requires {
+      forall x:'b0. is_symbol_free_var_in_fo_term x t -> s10 x = s20 x }
+    requires {
+      forall x:'b3. is_fo_term_free_var_in_fo_term x t -> s13 x = s23 x }
+    ensures { rename_fo_term t s10 s13 = rename_fo_term t s20 s23 } =
+    free_var_equivalence_of_subst_fo_term t (subst_of_rename_symbol s10)
+      (subst_of_rename_symbol s20) (subst_of_rename_fo_term s13)
+      (subst_of_rename_fo_term s23)
+  
+  let rec lemma free_var_derive_equivalence_of_subst_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 (symbol 'c0))
+    (s20:func 'b0 (symbol 'c0)) (s13:func 'b3 (fo_term 'c0 'c3))
+    (s23:func 'b3 (fo_term 'c0 'c3)) : unit
+    ensures {
+      forall x:'b0. is_symbol_free_var_in_fo_term_list x t -> s10 x = s20 x }
+    ensures {
+      forall x:'b3. is_fo_term_free_var_in_fo_term_list x t -> s13 x = s23 x
+      }
+    requires { subst_fo_term_list t s10 s13 = subst_fo_term_list t s20 s23 }
+    variant { size_fo_term_list t } =
+    match t with | FONil -> ()
+      | FOCons v0 v1 ->
+        free_var_derive_equivalence_of_subst_fo_term v0
+          ((rename_subst_symbol s10 identity))
+          ((rename_subst_symbol s20 identity))
+          ((rename_subst_fo_term s13 identity identity))
+          ((rename_subst_fo_term s23 identity identity));
+          assert {
+            (forall x:'b0, y0:'c0. is_symbol_free_var_in_fo_term x v0 ->
+               rename_symbol (s10 x) identity =
+               eval ((rename_subst_symbol s10 identity)) x =
+               eval ((rename_subst_symbol s20 identity)) x =
+               rename_symbol (s20 x) identity && s10 x =
+               rename_symbol (rename_symbol (s10 x) identity) identity =
+               rename_symbol (rename_symbol (s20 x) identity) identity =
+               s20 x && s10 x = s20 x)
+            &&
+            forall x:'b0. is_symbol_free_var_in_fo_term x v0 -> s10 x = s20 x
+            };
+          assert {
+            (forall x:'b3, y0:'c0, y3:'c3.
+               is_fo_term_free_var_in_fo_term x v0 ->
+               rename_fo_term (s13 x) identity identity =
+               eval ((rename_subst_fo_term s13 identity identity)) x =
+               eval ((rename_subst_fo_term s23 identity identity)) x =
+               rename_fo_term (s23 x) identity identity && s13 x =
+               rename_fo_term (rename_fo_term (s13 x) identity identity)
+                 identity identity
+               =
+               rename_fo_term (rename_fo_term (s23 x) identity identity)
+                 identity identity
+               = s23 x && s13 x = s23 x)
+            &&
+            forall x:'b3. is_fo_term_free_var_in_fo_term x v0 -> s13 x =
+              s23 x
+            } ;
+          free_var_derive_equivalence_of_subst_fo_term_list v1
+            ((rename_subst_symbol s10 identity))
+            ((rename_subst_symbol s20 identity))
+            ((rename_subst_fo_term s13 identity identity))
+            ((rename_subst_fo_term s23 identity identity));
+          assert {
+            (forall x:'b0, y0:'c0. is_symbol_free_var_in_fo_term_list x v1 ->
+               rename_symbol (s10 x) identity =
+               eval ((rename_subst_symbol s10 identity)) x =
+               eval ((rename_subst_symbol s20 identity)) x =
+               rename_symbol (s20 x) identity && s10 x =
+               rename_symbol (rename_symbol (s10 x) identity) identity =
+               rename_symbol (rename_symbol (s20 x) identity) identity =
+               s20 x && s10 x = s20 x)
+            &&
+            forall x:'b0. is_symbol_free_var_in_fo_term_list x v1 -> s10 x =
+              s20 x
+            };
+          assert {
+            (forall x:'b3, y0:'c0, y3:'c3.
+               is_fo_term_free_var_in_fo_term_list x v1 ->
+               rename_fo_term (s13 x) identity identity =
+               eval ((rename_subst_fo_term s13 identity identity)) x =
+               eval ((rename_subst_fo_term s23 identity identity)) x =
+               rename_fo_term (s23 x) identity identity && s13 x =
+               rename_fo_term (rename_fo_term (s13 x) identity identity)
+                 identity identity
+               =
+               rename_fo_term (rename_fo_term (s23 x) identity identity)
+                 identity identity
+               = s23 x && s13 x = s23 x)
+            &&
+            forall x:'b3. is_fo_term_free_var_in_fo_term_list x v1 -> s13 x =
+              s23 x
+            } ;
+          ()
+    end
+  
+  with lemma free_var_derive_equivalence_of_subst_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 (symbol 'c0)) (s20:func 'b0 (symbol 'c0))
+    (s13:func 'b3 (fo_term 'c0 'c3)) (s23:func 'b3 (fo_term 'c0 'c3)) : unit
+    ensures {
+      forall x:'b0. is_symbol_free_var_in_fo_term x t -> s10 x = s20 x }
+    ensures {
+      forall x:'b3. is_fo_term_free_var_in_fo_term x t -> s13 x = s23 x }
+    requires { subst_fo_term t s10 s13 = subst_fo_term t s20 s23 }
+    variant { size_fo_term t } =
+    match t with | Var_fo_term v0 -> ()
+      | App v0 v1 ->
+        free_var_derive_equivalence_of_subst_symbol v0
+          ((rename_subst_symbol s10 identity))
+          ((rename_subst_symbol s20 identity));
+          assert {
+            (forall x:'b0, y0:'c0. is_symbol_free_var_in_symbol x v0 ->
+               rename_symbol (s10 x) identity =
+               eval ((rename_subst_symbol s10 identity)) x =
+               eval ((rename_subst_symbol s20 identity)) x =
+               rename_symbol (s20 x) identity && s10 x =
+               rename_symbol (rename_symbol (s10 x) identity) identity =
+               rename_symbol (rename_symbol (s20 x) identity) identity =
+               s20 x && s10 x = s20 x)
+            &&
+            forall x:'b0. is_symbol_free_var_in_symbol x v0 -> s10 x = s20 x
+            } ;
+          free_var_derive_equivalence_of_subst_fo_term_list v1
+            ((rename_subst_symbol s10 identity))
+            ((rename_subst_symbol s20 identity))
+            ((rename_subst_fo_term s13 identity identity))
+            ((rename_subst_fo_term s23 identity identity));
+          assert {
+            (forall x:'b0, y0:'c0. is_symbol_free_var_in_fo_term_list x v1 ->
+               rename_symbol (s10 x) identity =
+               eval ((rename_subst_symbol s10 identity)) x =
+               eval ((rename_subst_symbol s20 identity)) x =
+               rename_symbol (s20 x) identity && s10 x =
+               rename_symbol (rename_symbol (s10 x) identity) identity =
+               rename_symbol (rename_symbol (s20 x) identity) identity =
+               s20 x && s10 x = s20 x)
+            &&
+            forall x:'b0. is_symbol_free_var_in_fo_term_list x v1 -> s10 x =
+              s20 x
+            };
+          assert {
+            (forall x:'b3, y0:'c0, y3:'c3.
+               is_fo_term_free_var_in_fo_term_list x v1 ->
+               rename_fo_term (s13 x) identity identity =
+               eval ((rename_subst_fo_term s13 identity identity)) x =
+               eval ((rename_subst_fo_term s23 identity identity)) x =
+               rename_fo_term (s23 x) identity identity && s13 x =
+               rename_fo_term (rename_fo_term (s13 x) identity identity)
+                 identity identity
+               =
+               rename_fo_term (rename_fo_term (s23 x) identity identity)
+                 identity identity
+               = s23 x && s13 x = s23 x)
+            &&
+            forall x:'b3. is_fo_term_free_var_in_fo_term_list x v1 -> s13 x =
+              s23 x
+            } ;
+          ()
+    end
+  
+  let lemma free_var_derive_equivalence_of_rename_fo_term_list
+    (t:fo_term_list 'b0 'b3) (s10:func 'b0 'c0) (s20:func 'b0 'c0)
+    (s13:func 'b3 'c3) (s23:func 'b3 'c3) : unit
+    ensures {
+      forall x:'b0. is_symbol_free_var_in_fo_term_list x t -> s10 x = s20 x }
+    ensures {
+      forall x:'b3. is_fo_term_free_var_in_fo_term_list x t -> s13 x = s23 x
+      }
+    requires { rename_fo_term_list t s10 s13 = rename_fo_term_list t s20 s23
+      }
+    =
+    free_var_derive_equivalence_of_subst_fo_term_list t
+      (subst_of_rename_symbol s10) (subst_of_rename_symbol s20)
+      (subst_of_rename_fo_term s13) (subst_of_rename_fo_term s23);
+    assert {
+      forall x:'b0. (subst_of_rename_symbol s10 x:symbol 'c0) =
+        (subst_of_rename_symbol s20 x:symbol 'c0) ->
+        (Var_symbol (s10 x):symbol 'c0) = (Var_symbol (s20 x):symbol 'c0) &&
+        s10 x = s20 x
+      };
+    assert {
+      forall x:'b3. (subst_of_rename_fo_term s13 x:fo_term 'c0 'c3) =
+        (subst_of_rename_fo_term s23 x:fo_term 'c0 'c3) ->
+        (Var_fo_term (s13 x):fo_term 'c0 'c3) =
+        (Var_fo_term (s23 x):fo_term 'c0 'c3) && s13 x = s23 x
+      }
+  
+  let lemma free_var_derive_equivalence_of_rename_fo_term (t:fo_term 'b0 'b3)
+    (s10:func 'b0 'c0) (s20:func 'b0 'c0) (s13:func 'b3 'c3)
+    (s23:func 'b3 'c3) : unit
+    ensures {
+      forall x:'b0. is_symbol_free_var_in_fo_term x t -> s10 x = s20 x }
+    ensures {
+      forall x:'b3. is_fo_term_free_var_in_fo_term x t -> s13 x = s23 x }
+    requires { rename_fo_term t s10 s13 = rename_fo_term t s20 s23 } =
+    free_var_derive_equivalence_of_subst_fo_term t
+      (subst_of_rename_symbol s10) (subst_of_rename_symbol s20)
+      (subst_of_rename_fo_term s13) (subst_of_rename_fo_term s23);
+    assert {
+      forall x:'b0. (subst_of_rename_symbol s10 x:symbol 'c0) =
+        (subst_of_rename_symbol s20 x:symbol 'c0) ->
+        (Var_symbol (s10 x):symbol 'c0) = (Var_symbol (s20 x):symbol 'c0) &&
+        s10 x = s20 x
+      };
+    assert {
+      forall x:'b3. (subst_of_rename_fo_term s13 x:fo_term 'c0 'c3) =
+        (subst_of_rename_fo_term s23 x:fo_term 'c0 'c3) ->
+        (Var_fo_term (s13 x):fo_term 'c0 'c3) =
+        (Var_fo_term (s23 x):fo_term 'c0 'c3) && s13 x = s23 x
+      }
+  
+  
+end
+
+

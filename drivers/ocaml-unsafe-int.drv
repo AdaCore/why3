@@ -47,31 +47,25 @@ theory int.MinMax
   syntax function max "(Pervasives.max %1 %2)"
 end
 
-(* FIXME
-theory int.Lex2
-  syntax predicate lt_nat "(Why3__BigInt.lt_nat %1 %2)"
-  syntax predicate lex    "(Why3__BigInt.lex %1 %2)"
-end
-
-theory int.EuclideanDivision
-  syntax function div "(Why3__BigInt.euclidean_div %1 %2)"
-  syntax function mod "(Why3__BigInt.euclidean_mod %1 %2)"
-end
+(* TODO
+   - int.EuclideanDivision
+   - number.Gcd
+*)
 
 theory int.Power
-  syntax function power "(Why3__BigInt.power %1 %2)"
+  prelude "let rec power x n = if n = 0 then 1 else x * power x (n-1)"
+  syntax function power "(power %1 %2)"
 end
 
 theory int.Fact
-  syntax function fact "(Why3__IntAux.fact %1)"
+  prelude "let rec fact n = if n <= 1 then 1 else n * fact (n-1)"
+  syntax function fact "(fact %1)"
 end
 
 theory int.Fibonacci
-  syntax function fib "(Why3__IntAux.fib %1)"
+  prelude "let rec fib n = if n <= 1 then n else fib (n-2) + fib (n-1)"
+  syntax function fib "(fib %1)"
 end
-
-TODO number.Gcd
-*)
 
 (* WhyML *)
 
@@ -243,24 +237,3 @@ module mach.matrix.Matrix63
   syntax val copy          "(Array.map Array.copy)"
 end
 
-(* TODO
-module string.Char
-  syntax type char "Pervasives.char"
-  syntax val chr "Why3__BigInt.chr"
-  syntax val code "Why3__BigInt.code"
-  syntax function uppercase "Char.uppercase"
-  syntax function lowercase "Char.lowercase"
-end
-
-module io.StdIO
-  syntax val print_char "Pervasives.print_char"
-  syntax val print_int "Why3__BigInt.print"
-  syntax val print_newline "Pervasives.print_newline"
-end
-
-module random.Random
-
-  syntax val random_int    "Why3__BigInt.random_int"
-
-end
-*)

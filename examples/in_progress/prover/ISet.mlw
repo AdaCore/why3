@@ -1,0 +1,108 @@
+
+module Types
+  
+  use import list.List
+  
+  type iset = list int
+  
+end
+
+module Logic
+  
+  use import list.List
+  use import list.Mem
+  use import Types
+  use import int.Int
+  
+  inductive iset_ok (l:iset) =
+    | Set_empty : iset_ok Nil
+    | Set_one : forall x:int. iset_ok (Cons x Nil)
+    | Set_two : forall x y:int,q:iset.
+      iset_ok (Cons y q) /\ x < y -> iset_ok (Cons x (Cons y q))
+  
+  let rec lemma iset_ok_char (x:int) (l:iset) : unit
+    ensures { iset_ok (Cons x l) <-> iset_ok l /\ forall y:int.
+      mem y l -> x < y }
+    variant { l }
+  =
+    match l with
+      | Nil -> ()
+      | Cons z q -> iset_ok_char z q ;
+        assert { (forall y:int. mem y l -> x < y) -> x < z }
+    end
+  
+end
+
+module Impl
+  
+  use import list.List
+  use import list.Mem
+  use import Types
+  use import int.Int
+  use import Logic
+  
+  (* Very stupid integer sets. *)
+  
+  let rec insert (x:int) (l:list int) : list int
+    requires { iset_ok l }
+    variant { l }
+    ensures { iset_ok result }
+    ensures { forall y:int. mem y result <->
+      y = x \/ mem y l }
+  =
+    match l with
+      | Nil -> Cons x Nil
+      | Cons y q -> if x < y
+        then Cons x l
+        else if x > y
+        then Cons y (insert x q)
+        else l
+    end
+  
+  let rec remove (x:int) (l:iset) : iset
+    requires { iset_ok l }
+    variant { l }
+    ensures { iset_ok result }
+    ensures { forall y:int. mem y result <->
+      mem y l /\ y <> x }
+  =
+    match l with
+      | Nil -> Nil
+      | Cons y q ->
+        assert { forall z:int. mem z q ->
+          y <= z } ;
+        if y = x
+        then remove x q
+        else Cons y (remove x q)
+    end
+  
+  let rec merge (l1 l2:iset) : iset
+    requires { iset_ok l1 }
+    requires { iset_ok l2 }
+    variant { l1 , l2 }
+    ensures { iset_ok result }
+    ensures { forall y:int. mem y result <->
+      mem y l1 \/ mem y l2 }
+  =
+    match l1 with
+      | Nil -> l2
+      | Cons x q1 -> match l2 with
+        | Nil -> l1
+        | Cons y q2 ->
+          assert { forall z:int.
+            mem z q1 -> x <= z } ;
+          assert { forall z:int.
+            mem z q2 -> y <= z } ;
+          if x < y
+          then ( assert { forall z:int. mem z l2 -> x <= z } ;
+            Cons x (merge q1 l2) )
+          else if x > y
+          then ( assert { forall z:int. mem z l1 -> y <= z } ;
+            Cons y (merge l1 q2) )
+          else Cons x (merge q1 q2)
+        end
+    end
+  
+end
+
+

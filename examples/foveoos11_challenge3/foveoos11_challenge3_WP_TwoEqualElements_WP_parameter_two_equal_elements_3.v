@@ -52,14 +52,6 @@ Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
 Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
   a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
-Parameter make: forall {a:Type} {a_WT:WhyType a}, Z -> a -> (array a).
-
-Axiom make_length : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (v:a),
-  ((length (make n v)) = n).
-
-Axiom make_elts : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (i:Z) (v:a),
-  ((get (make n v) i) = v).
-
 (* Why3 assumption *)
 Definition appear_twice (a:(array Z)) (v:Z) (u:Z): Prop := exists i:Z,
   ((0%Z <= i)%Z /\ (i < u)%Z) /\ (((get a i) = v) /\ exists j:Z,
@@ -73,59 +65,73 @@ Theorem WP_parameter_two_equal_elements : forall (a:Z) (a1:(map.Map.map Z Z))
   i) < n)%Z)) /\ exists v1:Z, (appear_twice a2 v1 (n + 2%Z)%Z) /\
   exists v2:Z, (appear_twice a2 v2 (n + 2%Z)%Z) /\ ~ (v2 = v1)))) ->
   ((0%Z <= n)%Z -> forall (deja_vu:Z) (deja_vu1:(map.Map.map Z bool)),
-  ((0%Z <= deja_vu)%Z /\ ((deja_vu = n) /\ forall (i:Z),
-  ((map.Map.get deja_vu1 i) = false))) -> let o := (n + 1%Z)%Z in
-  ((0%Z <= o)%Z -> forall (v2:Z) (v1:Z) (deja_vu2:(map.Map.map Z bool)),
-  forall (i:Z), ((0%Z <= i)%Z /\ (i <= o)%Z) -> ((((v1 = (-1%Z)%Z) ->
-  (v2 = (-1%Z)%Z)) /\ (((~ (v1 = (-1%Z)%Z)) -> (appear_twice a2 v1 i)) /\
-  (((~ (v2 = (-1%Z)%Z)) -> ((appear_twice a2 v2 i) /\ ~ (v2 = v1))) /\
-  ((forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) -> ((((map.Map.get deja_vu2
-  v) = true) /\ exists j:Z, ((0%Z <= j)%Z /\ (j < i)%Z) /\ ((map.Map.get a1
-  j) = v)) \/ ((~ ((map.Map.get deja_vu2 v) = true)) /\ forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < i)%Z) -> ~ ((map.Map.get a1 j) = v)))) /\
-  (((v1 = (-1%Z)%Z) -> forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) ->
-  ~ (appear_twice a2 v i)) /\ ((v2 = (-1%Z)%Z) -> forall (v:Z),
-  ((0%Z <= v)%Z /\ (v < n)%Z) -> ((~ (v = v1)) -> ~ (appear_twice a2 v
-  i)))))))) -> (((0%Z <= i)%Z /\ (i < a)%Z) -> let v := (map.Map.get a1 i) in
-  (((0%Z <= deja_vu)%Z /\ ((0%Z <= v)%Z /\ (v < deja_vu)%Z)) ->
-  ((~ ((map.Map.get deja_vu2 v) = true)) -> (((0%Z <= v)%Z /\
-  (v < deja_vu)%Z) -> forall (deja_vu3:(map.Map.map Z bool)),
-  ((0%Z <= deja_vu)%Z /\ (deja_vu3 = (map.Map.set deja_vu2 v true))) ->
-  ((v1 = (-1%Z)%Z) -> forall (v3:Z), ((0%Z <= v3)%Z /\ (v3 < n)%Z) ->
-  ~ (appear_twice a2 v3 (i + 1%Z)%Z)))))))))).
+  ((0%Z <= deja_vu)%Z /\ ((deja_vu = n) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i < n)%Z) -> ((map.Map.get deja_vu1 i) = false))) -> let o :=
+  (n + 1%Z)%Z in ((0%Z <= o)%Z -> forall (v2:Z) (v1:Z) (deja_vu2:(map.Map.map
+  Z bool)), forall (i:Z), ((0%Z <= i)%Z /\ (i <= o)%Z) ->
+  ((((v1 = (-1%Z)%Z) -> (v2 = (-1%Z)%Z)) /\ (((~ (v1 = (-1%Z)%Z)) ->
+  (appear_twice a2 v1 i)) /\ (((~ (v2 = (-1%Z)%Z)) -> ((appear_twice a2 v2
+  i) /\ ~ (v2 = v1))) /\ ((forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) ->
+  ((((map.Map.get deja_vu2 v) = true) /\ exists j:Z, ((0%Z <= j)%Z /\
+  (j < i)%Z) /\ ((map.Map.get a1 j) = v)) \/ ((~ ((map.Map.get deja_vu2
+  v) = true)) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) ->
+  ~ ((map.Map.get a1 j) = v)))) /\ (((v1 = (-1%Z)%Z) -> forall (v:Z),
+  ((0%Z <= v)%Z /\ (v < n)%Z) -> ~ (appear_twice a2 v i)) /\
+  ((v2 = (-1%Z)%Z) -> forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) ->
+  ((~ (v = v1)) -> ~ (appear_twice a2 v i)))))))) -> (((0%Z <= i)%Z /\
+  (i < a)%Z) -> let v := (map.Map.get a1 i) in (((0%Z <= deja_vu)%Z /\
+  ((0%Z <= v)%Z /\ (v < deja_vu)%Z)) -> ((~ ((map.Map.get deja_vu2
+  v) = true)) -> (((0%Z <= v)%Z /\ (v < deja_vu)%Z) ->
+  forall (deja_vu3:(map.Map.map Z bool)), ((0%Z <= deja_vu)%Z /\
+  (deja_vu3 = (map.Map.set deja_vu2 v true))) -> ((v1 = (-1%Z)%Z) ->
+  forall (v3:Z), ((0%Z <= v3)%Z /\ (v3 < n)%Z) -> ~ (appear_twice a2 v3
+  (i + 1%Z)%Z)))))))))).
+(* Why3 intros a a1 n a2 (h1,((h2,h3),(h4,(v1,(h5,(v2,(h6,h7))))))) h8
+        deja_vu deja_vu1 (h9,(h10,h11)) o h12 v21 v11 deja_vu2 i (h13,h14)
+        (h15,(h16,(h17,(h18,(h19,h20))))) (h21,h22) v (h23,(h24,h25)) h26
+        (h27,h28) deja_vu3 (h29,h30) h31 v3 (h32,h33). *)
 intros a a1 n a2 (h1,((h2,h3),(h4,(v1,(h5,(v2,(h6,h7))))))) h8
         deja_vu deja_vu1 (h9,(h10,h11)) o h12 v3 v4 deja_vu2 i (h13,h14)
         (h15,(h16,(h17,(h18,(h19,h20))))) (h21,h22) v (h23,(h24,h25)) h26
         (h27,h28) deja_vu3 (h29,h30) h31 v5 (h32,h33).
-(*
-intros a a1 n a2 (h1,((h2,h3),(h4,(v1,(h5,(v2,(h6,h7))))))) h8 h9 o
-        h10 v22 v12 deja_vu i (h11,h12) (h13,(h14,(h15,(h16,(h17,h18)))))
-        (h19,h20) v (h21,(h22,h23)) h24 (h25,h26) deja_vu1 (h27,h28) h29 v3
-        (h30,h31).
-*)
 intro h0.
-intuition.
-destruct (h18 (Map.get a1 i)); intuition.
-subst v; auto with zarith.
-red in h0.
+destruct (h18 (Map.get a1 i));
+  [auto with zarith | tauto | destruct H as (H1 & H2)].
 destruct h0 as (i0,(h00,(h01,(j,(h02,(h03,h04)))))).
 assert (v5 <> Map.get a1 i).
-assert (case: (i0 < i \/ j < i)%Z) by omega. destruct case.
-red; intro.
-apply (H4 i0). omega. unfold get in h01; simpl in h01. omega.
-red; intro; apply (H4 j). omega. unfold get in h04; simpl in h04. omega.
-apply (H0 v5); auto.
-red; exists i0; intuition.
-assert (case: (i0 < i \/ i0 = i)%Z) by omega. destruct case.
+  assert (case: (i0 < i \/ j < i)%Z) by omega. 
+  destruct case.
+    red; intro.
+    apply (H2 i0).   
+      omega. 
+    unfold get in h01; simpl in h01; omega.
+  red; intro; apply (H2 j). 
+    omega. 
+  unfold get in h04; simpl in h04; omega.
+
+apply (h19 h31 v5); auto.
+red; exists i0.
+split.
+  split.
+    omega.
+  assert (case: (i0 < i \/ i0 = i)%Z) by omega. 
+  destruct case.
+    auto.
+  subst i0.
+  unfold get in h01; simpl in h01.
+  omega.
+split.
+  auto.
+exists j.
+split.
+  split.
+    omega.
+  assert (case: (j < i \/ j = i)%Z) by omega. 
+  destruct case.
+    auto.
+  subst j.
+  unfold get in h04; simpl in h04.
+  omega.
 auto.
-subst i0.
-unfold get in h01; simpl in h01.
-omega.
-exists j; intuition.
-assert (case: (j < i \/ j = i)%Z) by omega. destruct case.
-auto.
-subst j.
-unfold get in h04; simpl in h04.
-omega.
 Qed.
 

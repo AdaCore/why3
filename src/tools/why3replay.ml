@@ -38,6 +38,7 @@ let opt_file = ref None
 let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
+let opt_use_steps = ref false
 let opt_bench = ref false
 let opt_provers = ref []
 
@@ -71,6 +72,9 @@ let option_list = [
   ("--force",
    Arg.Set opt_force,
    " same as -f");
+  ("--use-steps",
+   Arg.Set opt_use_steps,
+   " replay using recorded number of proof steps (when possible)");
   ("--obsolete-only",
    Arg.Set opt_obsolete_only,
    " replay only if session is obsolete") ;
@@ -316,13 +320,15 @@ let add_to_check_no_smoke config some_merge_miss found_obs env_session sched =
       end
   in
   if !opt_provers = [] then
-    M.check_all ~release:true ~callback env_session sched
+    M.check_all ~release:true ~use_steps:!opt_use_steps
+      ~callback env_session sched
   else
     let filter a =
       List.exists
         (fun p -> Whyconf.filter_prover p a.Session.proof_prover)
         !opt_provers in
-    M.check_all ~release:true ~filter ~callback env_session sched
+    M.check_all ~release:true ~use_steps:!opt_use_steps
+      ~filter ~callback env_session sched
 
 let add_to_check_smoke env_session sched =
   let callback report =
@@ -346,7 +352,8 @@ let add_to_check_smoke env_session sched =
       exit 1
     end
   in
-  M.check_all ~release:true ~callback env_session sched
+  M.check_all ~release:true ~use_steps:!opt_use_steps
+    ~callback env_session sched
 
 let add_to_check config some_merge_miss found_obs =
   match !opt_smoke with
@@ -358,7 +365,7 @@ let add_to_check config some_merge_miss found_obs =
 
 let transform_smoke env_session =
   let trans tr_name s =
-    Session_tools.filter_proof_attempt 
+    Session_tools.filter_proof_attempt
       (fun p -> Opt.inhabited (S.proof_verified p)) s.S.session;
     Session_tools.transform_proof_attempt ~keygen:O.create s tr_name
   in

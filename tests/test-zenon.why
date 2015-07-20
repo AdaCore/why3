@@ -1,0 +1,14 @@
+
+theory T
+
+  use import set.Set
+
+  meta "rewrite" prop mem_empty
+
+  meta "rewrite" prop add_def1
+
+  meta "rewrite" prop union_def1
+
+  goal g: mem 1 (add 2 (add 1 (add 0 empty)))
+
+end

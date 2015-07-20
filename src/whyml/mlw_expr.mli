@@ -9,13 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Program Expressions} *)
+
 open Stdlib
 open Ident
 open Term
 open Mlw_ty
 open Mlw_ty.T
 
-(** *)
 
 (** {2 Program/logic symbols} *)
 
