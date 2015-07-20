@@ -681,8 +681,9 @@ module Translate = struct
         | PDrec fdl ->
            List.iter
              (fun {fun_ps=ps} ->
-              Debug.dprintf debug "ignoring non-executable declaration %s@."
-                            ps.ps_name.id_string) fdl
+              Debug.dprintf debug
+                "ignoring non-executable declaration %s (ghost = %b)@."
+                ps.ps_name.id_string ps.ps_ghost) fdl
         | _ -> ()
         end;
         []

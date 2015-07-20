@@ -163,7 +163,11 @@ let is_ghost_lv = function
   | LetV pv -> pv.pv_ghost
   | LetA ps -> ps.ps_ghost
 
-let is_exec_pdecl ctx pd = match pd.pd_node with
+let is_exec_pdecl ctx pd =
+  (* don't traverse expr to check for executability: believe
+     the e_ghost field instead *)
+  let is_exec_expr _ctx e = not e.e_ghost in
+  match pd.pd_node with
   | PDtype _
   | PDexn _
   | PDdata _ ->
