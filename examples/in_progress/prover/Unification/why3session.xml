@@ -9,7 +9,6 @@
 <prover id="6" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Spass" version="3.7" timelimit="30" memlimit="1000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="30" memlimit="1000"/>
-<prover id="9" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <prover id="10" name="Vampire" version="0.6" timelimit="30" memlimit="1000"/>
 <file name="../Unification.mlw" expanded="true">
 <theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -117,8 +116,6 @@
   </goal>
   <goal name="WP_parameter check_unified_free_var.17" expl="17. precondition">
   <proof prover="1"><result status="valid" time="0.81"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter check_unified_free_var.18" expl="18. postcondition">
   <proof prover="5"><result status="valid" time="0.12" steps="21"/></proof>
@@ -139,14 +136,9 @@
   </goal>
   <goal name="WP_parameter check_unified_free_var.24" expl="24. precondition">
   <proof prover="1"><result status="valid" time="0.48"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter check_unified_free_var.25" expl="25. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="132"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
  </transf>
  </goal>
@@ -174,8 +166,6 @@
   </goal>
   <goal name="WP_parameter check_unified_free_var_list.8" expl="8. precondition">
   <proof prover="1"><result status="valid" time="0.67"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter check_unified_free_var_list.9" expl="9. variant decrease">
   </goal>
@@ -187,14 +177,9 @@
   </goal>
   <goal name="WP_parameter check_unified_free_var_list.12" expl="12. precondition">
   <proof prover="1"><result status="valid" time="0.70"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter check_unified_free_var_list.13" expl="13. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="125"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
  </transf>
  </goal>
@@ -719,12 +704,10 @@
   <proof prover="1" timelimit="30"><result status="valid" time="29.01"/></proof>
   <proof prover="7"><result status="valid" time="5.70"/></proof>
   <proof prover="8"><result status="valid" time="0.78"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   <proof prover="10"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.16" expl="16. assertion">
   <proof prover="6"><result status="valid" time="0.82"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.17" expl="17. assertion">
   <proof prover="5"><result status="valid" time="0.17" steps="110"/></proof>
@@ -733,8 +716,6 @@
   </goal>
   <goal name="WP_parameter unification_term.19" expl="19. precondition">
   <proof prover="1"><result status="valid" time="2.97"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.20" expl="20. precondition">
   <proof prover="1"><result status="valid" time="0.69"/></proof>
@@ -744,7 +725,6 @@
   </goal>
   <goal name="WP_parameter unification_term.22" expl="22. precondition">
   <proof prover="1"><result status="valid" time="4.09"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.23" expl="23. precondition">
   <proof prover="5"><result status="valid" time="0.13" steps="102"/></proof>
@@ -768,10 +748,7 @@
   <proof prover="3"><result status="valid" time="1.11"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.30" expl="30. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.26" steps="234"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.31" expl="31. postcondition">
   <proof prover="5"><result status="valid" time="0.15" steps="40"/></proof>
@@ -797,14 +774,12 @@
   </goal>
   <goal name="WP_parameter unification_term.38" expl="38. precondition">
   <proof prover="8"><result status="valid" time="0.71"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.39" expl="39. assertion">
   <proof prover="5"><result status="valid" time="0.14" steps="97"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.40" expl="40. assertion">
   <proof prover="6"><result status="valid" time="1.01"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.41" expl="41. assertion">
   <proof prover="5"><result status="valid" time="0.12" steps="115"/></proof>
@@ -825,8 +800,6 @@
   </goal>
   <goal name="WP_parameter unification_term.47" expl="47. precondition">
   <proof prover="1"><result status="valid" time="0.78"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.48" expl="48. precondition">
   <proof prover="5"><result status="valid" time="0.12" steps="46"/></proof>
@@ -902,10 +875,7 @@
   <proof prover="3"><result status="valid" time="0.82"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.72" expl="72. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.31" steps="402"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.73" expl="73. postcondition">
   <proof prover="5"><result status="valid" time="0.11" steps="41"/></proof>
@@ -1123,7 +1093,6 @@
   </goal>
   <goal name="WP_parameter unification_term.144" expl="144. assertion">
   <proof prover="6"><result status="valid" time="0.97"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.145" expl="145. assertion">
   <proof prover="5"><result status="valid" time="0.18" steps="114"/></proof>
@@ -1144,8 +1113,6 @@
   </goal>
   <goal name="WP_parameter unification_term.151" expl="151. precondition">
   <proof prover="1"><result status="valid" time="0.67"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.152" expl="152. precondition">
   <proof prover="1"><result status="valid" time="0.60"/></proof>
@@ -1311,294 +1278,153 @@
   <proof prover="5"><result status="valid" time="0.09" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.206" expl="206. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="89"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.207" expl="207. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="26"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.208" expl="208. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="99"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.209" expl="209. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.210" expl="210. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.211" expl="211. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.212" expl="212. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="110"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.213" expl="213. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.56" steps="242"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.214" expl="214. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="107"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.215" expl="215. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="44"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.216" expl="216. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.18" steps="128"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.217" expl="217. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.218" expl="218. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.219" expl="219. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="60"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.220" expl="220. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.25" steps="225"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.221" expl="221. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.222" expl="222. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.29" steps="233"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.223" expl="223. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="63"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.224" expl="224. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.225" expl="225. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.226" expl="226. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="33"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.227" expl="227. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.228" expl="228. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.229" expl="229. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.230" expl="230. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="110"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.231" expl="231. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.49" steps="242"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.232" expl="232. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="107"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.233" expl="233. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="44"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.234" expl="234. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="128"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.235" expl="235. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.236" expl="236. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.237" expl="237. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="60"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.238" expl="238. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="225"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.239" expl="239. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.240" expl="240. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.24" steps="233"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.241" expl="241. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="63"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.242" expl="242. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.243" expl="243. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.244" expl="244. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="33"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.245" expl="245. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="34"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.246" expl="246. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="115"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.247" expl="247. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.248" expl="248. precondition">
   <proof prover="8"><result status="valid" time="0.66"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.249" expl="249. assertion">
   <proof prover="6"><result status="valid" time="0.83"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.250" expl="250. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.23" steps="109"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.251" expl="251. variant decrease" expanded="true">
   </goal>
   <goal name="WP_parameter unification_term.252" expl="252. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="25"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.253" expl="253. precondition">
   <proof prover="1"><result status="valid" time="3.93"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.254" expl="254. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="25"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.255" expl="255. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.18" steps="129"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.256" expl="256. precondition">
   <proof prover="1" timelimit="30"><result status="valid" time="5.46"/></proof>
@@ -1606,789 +1432,404 @@
   <proof prover="7"><result status="valid" time="18.40"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.257" expl="257. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="40"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.258" expl="258. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="156"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.259" expl="259. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="72"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.260" expl="260. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.261" expl="261. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.262" expl="262. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="64"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.263" expl="263. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.23" steps="286"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.264" expl="264. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.265" expl="265. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.43" steps="335"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.266" expl="266. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.267" expl="267. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.268" expl="268. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.269" expl="269. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.270" expl="270. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.271" expl="271. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.272" expl="272. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.273" expl="273. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="113"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.274" expl="274. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="180"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.275" expl="275. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="114"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.276" expl="276. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="36"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.277" expl="277. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="141"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.278" expl="278. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.279" expl="279. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.280" expl="280. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="52"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.281" expl="281. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.26" steps="436"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.282" expl="282. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.283" expl="283. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.59" steps="465"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.284" expl="284. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="53"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.285" expl="285. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.286" expl="286. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.287" expl="287. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.08" steps="25"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.288" expl="288. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.07" steps="20"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.289" expl="289. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.08" steps="20"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.290" expl="290. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="20"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.291" expl="291. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="107"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.292" expl="292. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.18" steps="173"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.293" expl="293. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="105"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.294" expl="294. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="35"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.295" expl="295. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="132"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.296" expl="296. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.297" expl="297. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.298" expl="298. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="51"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.299" expl="299. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="244"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.300" expl="300. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.301" expl="301. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.35" steps="286"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.302" expl="302. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="52"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.303" expl="303. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.304" expl="304. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.08" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.305" expl="305. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.07" steps="24"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.306" expl="306. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.18" steps="176"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.307" expl="307. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.19" steps="183"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.308" expl="308. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="128"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.309" expl="309. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.18" steps="172"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.310" expl="310. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="134"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.311" expl="311. variant decrease" expanded="true">
   </goal>
   <goal name="WP_parameter unification_term.312" expl="312. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="159"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.313" expl="313. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.20" steps="196"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.314" expl="314. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.315" expl="315. precondition">
   <proof prover="1"><result status="valid" time="1.04"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.316" expl="316. precondition">
   <proof prover="1"><result status="valid" time="1.24"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.317" expl="317. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="42"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.318" expl="318. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.24" steps="190"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.319" expl="319. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="32"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.320" expl="320. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="32"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.321" expl="321. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="67"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.322" expl="322. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="129"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.323" expl="323. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="32"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.324" expl="324. postcondition">
   <proof prover="1"><result status="valid" time="0.69"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.325" expl="325. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="74"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.326" expl="326. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="32"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.327" expl="327. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="32"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.328" expl="328. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="26"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.329" expl="329. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="43"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.330" expl="330. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="34"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.331" expl="331. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="116"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.332" expl="332. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.333" expl="333. precondition">
   <proof prover="8"><result status="valid" time="0.52"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.334" expl="334. assertion">
   <proof prover="6"><result status="valid" time="1.08"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.335" expl="335. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="109"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.336" expl="336. variant decrease" expanded="true">
   </goal>
   <goal name="WP_parameter unification_term.337" expl="337. precondition">
   <proof prover="1"><result status="valid" time="3.95"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.338" expl="338. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="25"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.339" expl="339. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="25"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.340" expl="340. precondition">
   <proof prover="1"><result status="valid" time="5.64"/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.341" expl="341. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.19" steps="128"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.342" expl="342. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="40"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.343" expl="343. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="155"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.344" expl="344. assertion">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="72"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.345" expl="345. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.346" expl="346. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.347" expl="347. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="64"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.348" expl="348. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.24" steps="285"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.349" expl="349. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.350" expl="350. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.48" steps="336"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.351" expl="351. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.352" expl="352. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.353" expl="353. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.354" expl="354. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="29"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.355" expl="355. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.356" expl="356. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.357" expl="357. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.358" expl="358. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="114"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.359" expl="359. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.21" steps="181"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.360" expl="360. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.13" steps="113"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.361" expl="361. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="36"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.362" expl="362. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.15" steps="139"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.363" expl="363. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.364" expl="364. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.365" expl="365. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="52"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.366" expl="366. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.29" steps="434"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.367" expl="367. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.368" expl="368. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.48" steps="467"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.369" expl="369. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.16" steps="53"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.370" expl="370. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.371" expl="371. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.372" expl="372. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="25"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.373" expl="373. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="20"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.374" expl="374. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="20"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.375" expl="375. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="20"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.376" expl="376. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="108"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.377" expl="377. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.17" steps="174"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.378" expl="378. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.14" steps="104"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.379" expl="379. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="35"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.380" expl="380. precondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="131"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.381" expl="381. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.07" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.382" expl="382. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.09" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.383" expl="383. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="51"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.384" expl="384. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.18" steps="243"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.385" expl="385. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.08" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.386" expl="386. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.47" steps="287"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.387" expl="387. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="52"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.388" expl="388. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.389" expl="389. postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="30"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term.390" expl="390. exceptional postcondition">
-  <proof prover="1" obsolete="true"><undone/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="24"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
  </transf>
  </goal>
@@ -2457,13 +1898,9 @@
   </goal>
   <goal name="WP_parameter unification_term_list.19" expl="19. precondition">
   <proof prover="1"><result status="valid" time="1.38"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.20" expl="20. precondition">
   <proof prover="1"><result status="valid" time="1.23"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.21" expl="21. precondition">
   <proof prover="5"><result status="valid" time="0.15" steps="31"/></proof>
@@ -2520,8 +1957,6 @@
   </goal>
   <goal name="WP_parameter unification_term_list.39" expl="39. postcondition">
   <proof prover="1"><result status="valid" time="0.83"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.40" expl="40. postcondition">
   <proof prover="5"><result status="valid" time="0.22" steps="93"/></proof>
@@ -2538,14 +1973,10 @@
   <goal name="WP_parameter unification_term_list.44" expl="44. exceptional postcondition">
   <proof prover="1"><result status="valid" time="0.56"/></proof>
   <proof prover="5"><result status="valid" time="0.10" steps="21"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.45" expl="45. exceptional postcondition">
   <proof prover="1"><result status="valid" time="0.56"/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="31"/></proof>
-  <proof prover="6" obsolete="true"><undone/></proof>
-  <proof prover="9" obsolete="true"><undone/></proof>
   </goal>
  </transf>
  </goal>
