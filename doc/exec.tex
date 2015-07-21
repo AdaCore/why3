@@ -92,6 +92,19 @@ For instance, it could be
            -I `why3 --print-libdir`/why3 why3extract.cmxa \
            ...
 \end{verbatim}
+To make the compilation process easier, one can write a
+\texttt{Makefile} which can include informations about Why3
+configuration as follows.
+\begin{whycode}
+WHY3SHARE=$(shell why3 --print-datadir)
+
+include $(WHY3SHARE)/Makefile.config
+
+maxsum:
+        ocamlopt $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa \
+                -o maxsum maxsum__MaxAndSum.ml main.ml
+\end{whycode}
+
 
 
 %%% Local Variables:
