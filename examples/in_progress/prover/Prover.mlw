@@ -1,22 +1,22 @@
 
 module Types
-  
+
   use import Functions.Func
   use import Firstorder_term_spec.Spec
-  
+
   (* The prover return a contradictory assignment.
      To be perfectly correct, its initial
      input (even before preprocessing) should not
      contain any free variable of kind term. *)
-  
+
   type prover_return = {
     ghost contradictory_assignment : func int (fo_term int int) ;
   }
-  
+
 end
 
 module Logic
-  
+
   use import FormulaTransformations.Types
   use import FormulaTransformations.Logic
   use import Firstorder_formula_list_spec.Spec
@@ -27,12 +27,12 @@ module Logic
   use import Functions.Func
   use import bool.Bool
   use import Firstorder_semantics.Sem
-  
+
   predicate is_atom_list (phil:fo_formula_list 'ls 'b) = match phil with
     | FOFNil -> true
     | FOFCons x q -> is_atom x /\ is_atom_list q
   end
-  
+
   let lemma is_atom_subst (phi:fo_formula 'ls 'b)
     (sigma:func 'b (fo_term 'ls 'c)) : unit
     requires { is_atom phi }
@@ -43,7 +43,7 @@ module Logic
       | Not (PApp _ _ ) -> ()
       | _ -> absurd
     end
-  
+
   let rec lemma is_atom_list_subst (phil:fo_formula_list 'ls 'b)
     (sigma:func 'b (fo_term 'ls 'c)) : unit
     requires { is_atom_list phil }
@@ -54,13 +54,13 @@ module Logic
       | FOFNil -> ()
       | FOFCons x q -> is_atom_list_subst q sigma
     end
-  
+
   predicate is_procedure_tableau (t:tableau 'ls 'b) = match t with
     | Root -> true
     | Node tnext phi0 phib -> is_procedure_tableau tnext /\
       is_atom phi0 /\ is_atom_list phib
   end
-  
+
   let rec lemma is_procedure_tableau_subst (t:tableau 'ls 'b)
     (sigma:func 'b (fo_term 'ls 'c)) : unit
     requires { is_procedure_tableau t }
@@ -71,7 +71,7 @@ module Logic
       | Root -> ()
       | Node tnext phi0 phib -> is_procedure_tableau_subst tnext sigma
     end
-  
+
   (*let rec lemma tableau_semantic_increasing (t:tableau 'ls 'b)
     (b1 b2:bool) (m:model 'ls 'st) (rho:func 'b 'st) : unit
     requires { implb b1 b2 = True }
@@ -85,11 +85,11 @@ module Logic
         tableau_semantic_increasing tnext (tableau_node b1 phib phi0 m rho)
           (tableau_node b2 phib phi0 m rho) m rho
     end*)
-  
+
 end
 
 module Impl
-  
+
   use import Firstorder_semantics.Sem
   use import Firstorder_symbol_spec.Spec
   use import Firstorder_symbol_impl.Types
@@ -128,9 +128,9 @@ module Impl
   use import Logic
   use import ref.Ref
   use import list.List
-  
+
   exception Failure
-  
+
   let rec merge (phi1 phi2:nlimpl_fo_formula_list) : nlimpl_fo_formula_list
     requires { nlimpl_fo_formula_list_ok phi1 }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
@@ -170,7 +170,7 @@ module Impl
           is_fo_term_free_var_in_fo_formula_list x phi1m && x >= 0 } ;
         merge q phi3
     end
-  
+
   (* extend the current tableau branch by the given formula list.
      equivalent to contraction of empty branches
      until a non-empty branch is found. *)
@@ -243,7 +243,7 @@ module Impl
             \/ is_fo_term_free_var_in_fo_formula_list x qbm) && x >= 0 } ;
         Some ftab
     end
-  
+
   let rec branch_conflict_atom (p1:int) (t1:nlimpl_fo_term_list) (tab:nlimpl_tableau)
     (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { nlimpl_fo_term_list_ok t1 }
@@ -289,7 +289,7 @@ module Impl
           | _ -> absurd
         end
     end
-  
+
   let rec branch_conflict_neg_atom (p1:int) (t1:nlimpl_fo_term_list) (tab:nlimpl_tableau)
     (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { nlimpl_fo_term_list_ok t1 }
@@ -340,7 +340,7 @@ module Impl
           | _ -> absurd
         end
     end
-  
+
   let rec clause_conflicts (phil:nlimpl_fo_formula_list) (tab:nlimpl_tableau)
     (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
@@ -398,13 +398,13 @@ module Impl
           | _ -> absurd
         end
     end
-  
+
   (* base:set of initial (preprocessed) formula.
      tab:context still to be proved.
      Return: nothing, if successful, base is unsatisfiable.
      May fail without justification.
    *)
-  
+
   let rec decompose (base:nlimpl_fo_formula_list)
       (tab:nlimpl_tableau)
       (unifb:subst)
@@ -432,23 +432,23 @@ module Impl
     requires { nlimpl_fo_formula_list_ok remaining }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
       remaining.model_fo_formula_list_field -> x >= 0 }
-    
+
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
     requires { no_existential_list base.model_fo_formula_list_field }
-    
+
     requires { is_simpl phi0.model_fo_formula_field }
     requires { no_existential phi0.model_fo_formula_field }
     requires { is_nnf phi0.model_fo_formula_field }
-    
+
     requires { is_atom_list clause.model_fo_formula_list_field }
-    
+
     requires { is_simpl_list remaining.model_fo_formula_list_field }
     requires { is_nnf_list remaining.model_fo_formula_list_field }
     requires { no_existential_list remaining.model_fo_formula_list_field }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -459,7 +459,7 @@ module Impl
         formula_semantic phi0.model_fo_formula_field m rhos \/
         formula_list_disj_semantic clause.model_fo_formula_list_field m rhos \/
         formula_list_disj_semantic remaining.model_fo_formula_list_field m rhos }
-    
+    diverges
     ensures { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
@@ -537,7 +537,7 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi3m /\
             r2 y = x -> match y with None -> x = fresh && x >= 0
               | Some y -> x = y &&
-                is_fo_term_free_var_in_fo_formula (Some x) phi3m && 
+                is_fo_term_free_var_in_fo_formula (Some x) phi3m &&
                 is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 end &&
               x >= 0) &&
           (is_fo_term_free_var_in_fo_formula x phi2m ->
@@ -551,7 +551,7 @@ module Impl
       | NLC_Not phi1 -> assert { is_atom phi0m } ;
         decompose_literal base tab unifb unif fresh phi0 clause remaining depth goalnum
     end
-  
+
   with decompose_literal (base:nlimpl_fo_formula_list)
       (tab:nlimpl_tableau)
       (unifb:subst)
@@ -579,21 +579,21 @@ module Impl
     requires { nlimpl_fo_formula_list_ok remaining }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
       remaining.model_fo_formula_list_field -> x >= 0 }
-    
+
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
     requires { no_existential_list base.model_fo_formula_list_field }
-    
+
     requires { is_atom phi0.model_fo_formula_field }
-    
+
     requires { is_atom_list clause.model_fo_formula_list_field }
-    
+
     requires { is_simpl_list remaining.model_fo_formula_list_field }
     requires { is_nnf_list remaining.model_fo_formula_list_field }
     requires { no_existential_list remaining.model_fo_formula_list_field }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -604,7 +604,8 @@ module Impl
         formula_semantic phi0.model_fo_formula_field m rhos \/
         formula_list_disj_semantic clause.model_fo_formula_list_field m rhos \/
         formula_list_disj_semantic remaining.model_fo_formula_list_field m rhos }
-    
+
+    diverges
     ensures { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
@@ -689,7 +690,7 @@ module Impl
         assert { clsem = FOFCons phi0m clausem } ;
         decompose base tab unifb unif fresh phi1 clse qr depth goalnum
     end
-  
+
   (* find a contradiction with the current leaf of the tableau,
      if it is a non-negated literal. *)
   with contradiction_atom (base:nlimpl_fo_formula_list)
@@ -723,20 +724,20 @@ module Impl
     requires { nlimpl_fo_term_list_ok t }
     requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
       t.model_fo_term_list_field -> x >= 0 }
-    
+
     requires { tab.model_tableau_field =
       Node tnext (PApp (Var_symbol p) t.model_fo_term_list_field) phit }
-    
+
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
-    requires { no_existential_list base.model_fo_formula_list_field }  
-    
+    requires { no_existential_list base.model_fo_formula_list_field }
+
     requires { is_atom_list phil.model_fo_formula_list_field }
     requires { is_atom_list phiacc.model_fo_formula_list_field }
-    
-    
+
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -745,12 +746,13 @@ module Impl
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
         formula_list_disj_semantic clsem m rhos }
-    
+
     requires { forall m:model int 'st, rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_disj_semantic clsem m rhos <->
         formula_list_disj_semantic phil.model_fo_formula_list_field m rhos \/
         formula_list_disj_semantic phiacc.model_fo_formula_list_field m rhos }
+    diverges
     ensures { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
@@ -888,7 +890,7 @@ module Impl
           | _ -> absurd (* phi0 is literal. *)
         end
     end
-  
+
   (* find a contradiction with the current leaf of the tableau,
      if it is a negated literal. *)
   with contradiction_neg_atom (base:nlimpl_fo_formula_list)
@@ -922,20 +924,20 @@ module Impl
     requires { nlimpl_fo_term_list_ok t }
     requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
       t.model_fo_term_list_field -> x >= 0 }
-    
+
     requires { tab.model_tableau_field =
       Node tnext (Not (PApp (Var_symbol p) t.model_fo_term_list_field)) phit }
-    
+
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
-    requires { no_existential_list base.model_fo_formula_list_field }  
-    
+    requires { no_existential_list base.model_fo_formula_list_field }
+
     requires { is_atom_list phil.model_fo_formula_list_field }
     requires { is_atom_list phiacc.model_fo_formula_list_field }
-    
-    
+
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -944,7 +946,7 @@ module Impl
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
         formula_list_disj_semantic clsem m rhos }
-    
+
     requires { forall m:model int 'st, rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_disj_semantic clsem m rhos <->
@@ -954,6 +956,7 @@ module Impl
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
     ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
     raises { Failure -> precede (old unifb) unifb /\ correct unifb }
   =
     let basem = base.model_fo_formula_list_field in
@@ -1085,12 +1088,12 @@ module Impl
           | _ -> absurd (* phi0 is literal. *)
         end
     end
-  
+
   (* Technically speaking, the entry point of the main loop.
      Should be called with a preprocessed set of formula
      independent of the interpretation (no free variable),
      and a empty unificator (identity substitution). *)
-  
+
   with extend_branch (base:nlimpl_fo_formula_list)
       (tab:nlimpl_tableau)
       (unifb:subst)
@@ -1106,12 +1109,12 @@ module Impl
     requires { forall x:int. is_fo_term_free_var_in_tableau x
       tab.model_tableau_field -> x >= 0 }
     requires { unifier_subst_ok unifb unif }
-    
+
     requires { is_procedure_tableau tab.model_tableau_field }
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
     requires { no_existential_list base.model_fo_formula_list_field }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -1120,6 +1123,7 @@ module Impl
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
     ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
     raises { Failure -> precede (old unifb) unifb /\ correct unifb }
   =
     let tabm = tab.model_tableau_field in
@@ -1178,7 +1182,7 @@ module Impl
           | _ -> absurd
         end
     end
-  
+
   (* Look for a contradiction inside the current branch. *)
   with contradiction_find_atom (base:nlimpl_fo_formula_list)
       (tab0 tab1 tab:nlimpl_tableau)
@@ -1210,21 +1214,21 @@ module Impl
     requires { nlimpl_fo_formula_list_ok philist }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
       philist.model_fo_formula_list_field -> x >= 0 }
-    
+
     requires { is_procedure_tableau tab0.model_tableau_field }
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
     requires { no_existential_list base.model_fo_formula_list_field }
-    
+
     requires { is_atom_list philist.model_fo_formula_list_field }
-    
+
     requires { tab0.model_tableau_field =
       Node tab1.model_tableau_field
            (PApp (Var_symbol p) t.model_fo_term_list_field)
            philist.model_fo_formula_list_field }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -1240,11 +1244,12 @@ module Impl
         tableau_semantic_with tab.model_tableau_field False m rhos) ->
       (tableau_semantic_with tab0.model_tableau_field True m rhos <->
        tableau_semantic_with tab0.model_tableau_field False m rhos) }
-    
+
     ensures { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
     ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
     raises { Failure -> precede (old unifb) unifb /\ correct unifb }
   =
     let tab0m = tab0.model_tableau_field in
@@ -1383,8 +1388,8 @@ module Impl
           | _ -> absurd (* atomic. *)
         end
     end
-  
-  
+
+
   (* Look for a contradiction inside the current branch,
      negated version. *)
   with contradiction_find_neg_atom (base:nlimpl_fo_formula_list)
@@ -1417,21 +1422,21 @@ module Impl
     requires { nlimpl_fo_formula_list_ok philist }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
       philist.model_fo_formula_list_field -> x >= 0 }
-    
+
     requires { is_procedure_tableau tab0.model_tableau_field }
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
     requires { no_existential_list base.model_fo_formula_list_field }
-    
+
     requires { is_atom_list philist.model_fo_formula_list_field }
-    
+
     requires { tab0.model_tableau_field =
       Node tab1.model_tableau_field
            (Not (PApp (Var_symbol p) t.model_fo_term_list_field))
            philist.model_fo_formula_list_field }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
@@ -1447,11 +1452,12 @@ module Impl
         tableau_semantic_with tab.model_tableau_field False m rhos) ->
       (tableau_semantic_with tab0.model_tableau_field True m rhos <->
        tableau_semantic_with tab0.model_tableau_field False m rhos) }
-    
+
     ensures { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
     ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
     raises { Failure -> precede (old unifb) unifb /\ correct unifb }
   =
     let tab0m = tab0.model_tableau_field in
@@ -1585,9 +1591,9 @@ module Impl
           | _ -> absurd (* atomic. *)
         end
     end
-  
+
   (* Iterate through every lemma of the base formula set. *)
-  
+
   with select_lemma (base:nlimpl_fo_formula_list) (basecursor:nlimpl_fo_formula_list)
     (tab:nlimpl_tableau)
     (unifb:subst)
@@ -1607,30 +1613,31 @@ module Impl
     requires { nlimpl_fo_formula_list_ok basecursor }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
       basecursor.model_fo_formula_list_field -> x >= 0 }
-    
+
     requires { is_procedure_tableau tab.model_tableau_field }
-    
+
     requires { is_simpl_list base.model_fo_formula_list_field }
     requires { is_nnf_list base.model_fo_formula_list_field }
     requires { no_existential_list base.model_fo_formula_list_field }
-    
+
     requires { is_simpl_list basecursor.model_fo_formula_list_field }
     requires { is_nnf_list basecursor.model_fo_formula_list_field }
     requires { no_existential_list basecursor.model_fo_formula_list_field }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       formula_list_conj_semantic base.model_fo_formula_list_field m rho ->
         formula_list_conj_semantic basecursor.model_fo_formula_list_field m rho }
-    
+
     requires { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst unif.unifier m rho in
       formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
         tableau_semantic_with tab.model_tableau_field True m rhos }
-    
+
     ensures { forall m:model int 'st,rho:func int 'st.
       let rhos = semantic_subst result.contradictory_assignment m rho in
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
     ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
     raises { Failure -> precede (old unifb) unifb /\ correct unifb }
   =
     if number = 0
@@ -1653,7 +1660,5 @@ module Impl
           assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
           select_lemma base q tab unifb unif fresh depth goalnum (number-1) end
     end
-  
+
 end
-
-

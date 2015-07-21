@@ -582,9 +582,8 @@ let print_data_decl info fmt (ts,cl) =
 let print_decl cntexample args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
+  | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-    (*unsupportedDecl d
-      "smtv2 : algebraic type are not supported" *)
     fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
       (print_list space (print_data_decl info)) dl
   | Dparam ls ->

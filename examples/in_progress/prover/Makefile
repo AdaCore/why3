@@ -34,15 +34,16 @@ CMX=$(patsubst %,%.cmx,$(ML))
 CMI=$(patsubst %,%.cmi,$(ML))
 OCAMLC=ocamlopt.opt
 INCLUDES=-I $(BD) $(INCLUDE)
-LIBS=nums.cmxa why3__BuiltIn.cmx int__Int.cmx array__Array.cmx
-WHY3FLAGS=-L . --debug ignore_unused_vars
+LIBS=unix.cmxa $(BIGINTLIB).cmxa why3extract.cmxa
+LIBSOLD=$(BD)/why3__BuiltIn.cmx $(BD)/int__Int.cmx $(BD)/array__Array.cmx
+WHY3FLAGS=-L . --debug ignore_unused_vars --debug extraction
 MLFLAGS=
 MLIFLAGS=
 MLEXECFLAGS=
 
-$(BD)/prover: $(CMX) $(BD)/Prover.ml
-	echo $(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
-		-o $(BD)/prover $<
+$(BD)/prover: $(CMX) run.cmx
+	$(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
+		-o $(BD)/prover $^
 
 %.cmx: %.ml
 	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
@@ -57,7 +58,7 @@ $(BD)/%__Impl.ml: %.mlw
 	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Impl
 
 
-.PHONY: clean depend .depend
+.PHONY: clean depend
 
 depend: .depend
 

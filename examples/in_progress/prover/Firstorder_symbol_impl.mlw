@@ -156,8 +156,10 @@ module Impl
   use import Logic
   let rec bind_var_symbol_in_symbol (t:nl_symbol int) (x:int) (i:int)
     (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0)) :
-    nl_symbol int requires { correct_indexes_symbol t }
+    nl_symbol int
+    requires { correct_indexes_symbol t }
     requires { bound_depth_of_symbol_in_symbol t <= i }
+    variant { nlsize_symbol t }
     ensures { bound_depth_of_symbol_in_symbol result <= i + 1 }
     ensures { correct_indexes_symbol result }
     ensures { nlmodel_symbol result fr0 bnd0 =
@@ -172,10 +174,13 @@ module Impl
   let rec unbind_var_symbol_in_symbol (t:nl_symbol int) (i:int)
     (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0)) (ghost bnd20:func int (symbol 'b0)) :
-    nl_symbol int requires { i >= 0 } requires { correct_indexes_symbol t }
+    nl_symbol int
+    requires { i >= 0 }
+    requires { correct_indexes_symbol t }
     requires { bound_depth_of_symbol_in_symbol t <= i + 1 }
     requires { correct_indexes_symbol x }
     requires { bound_depth_of_symbol_in_symbol x = 0 }
+    variant { nlsize_symbol t }
     ensures { correct_indexes_symbol result }
     ensures { bound_depth_of_symbol_in_symbol result <= i }
     ensures { nlmodel_symbol result fr0 bnd10 =
@@ -190,11 +195,12 @@ module Impl
   let subst_base_symbol_in_symbol (t:nl_symbol int) (x:int)
     (u:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0)) (ghost bnd20:func int (symbol 'b0)) :
-    nl_symbol int requires { correct_indexes_symbol t }
+    nl_symbol int
+    requires { correct_indexes_symbol t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
     ensures { correct_indexes_symbol result }
-     ensures { bound_depth_of_symbol_in_symbol result =
+    ensures { bound_depth_of_symbol_in_symbol result =
        bound_depth_of_symbol_in_symbol t }
     ensures { nlmodel_symbol result fr0 bnd10 =
       nlmodel_symbol t (update fr0 x (nlmodel_symbol u fr0 bnd20)) bnd10 }

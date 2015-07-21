@@ -1,37 +1,37 @@
 
 module Types
-  
+
   use import Firstorder_formula_impl.Types
   use import Firstorder_formula_list_impl.Types
   use import Firstorder_term_impl.Types
   use import list.List
   use import Functions.Func
   use import Firstorder_semantics.Sem
-  
+
   (* ghost field: explicitly to get rid of the existential. *)
-  
+
   type skolemization_return 'st = {
     skolemized : nlimpl_fo_formula ;
     skolem_bound : int ;
     free_var_list : list int ;
     ghost model_transformer : func (model int 'st) (model int 'st) ;
   }
-  
+
   type skolemization_list_return 'st = {
     skolemized_l : nlimpl_fo_formula_list ;
     skolem_bound_l : int ;
     ghost model_transformer_l : func (model int 'st) (model int 'st) ;
   }
-  
+
   type skolemization_env_return 'st = {
     skolemized_fv_list : nlimpl_fo_term_list ;
     ghost skolem_env : func (list 'st) (func int 'st) ;
   }
-  
+
 end
 
 module Logic
-  
+
   use import Firstorder_formula_spec.Spec
   use import Firstorder_term_spec.Spec
   use import Firstorder_symbol_spec.Spec
@@ -39,15 +39,15 @@ module Logic
   use import Functions.Func
   use import option.Option
   use import OptionFuncs.Funcs
-  
+
   predicate is_atom (phi:fo_formula 'ls 'b) = match phi with
     | PApp _ _ -> true
     | Not (PApp _ _) -> true
     | _ -> false
   end
-  
+
   (* Negational normal form. *)
-  
+
   predicate is_nnf (phi:fo_formula 'ls 'b) = match phi with
     | Not (PApp _ _) -> true
     | Not _ -> false
@@ -59,12 +59,12 @@ module Logic
     | FTrue -> true
     | FFalse -> true
   end
-  
+
   predicate is_nnf_list (phis:fo_formula_list 'ls 'b) = match phis with
     | FOFNil -> true
     | FOFCons x q -> is_nnf x /\ is_nnf_list q
   end
-  
+
   let rec lemma is_nnf_subst (phi:fo_formula 'ls 'b) (f:func 'b (fo_term 'ls 'c)) : unit
     requires { is_nnf phi }
     ensures { is_nnf (subst_fo_formula phi subst_id_symbol f) }
@@ -89,15 +89,15 @@ module Logic
       | FTrue -> ()
       | FFalse -> ()
     end
-  
+
   let lemma is_nnf_renaming (phi:fo_formula 'ls 'b) (f:func 'b 'c) : unit
     requires { is_nnf phi }
     ensures { is_nnf (rename_fo_formula phi identity f) }
   =
     is_nnf_subst phi (rcompose f subst_id_fo_term)
-  
+
   (* Simplified formula. *)
-  
+
   predicate is_simpl (phi:fo_formula 'ls 'b) = match phi with
     | Not u -> is_simpl u
     | PApp _ _ -> true
@@ -108,12 +108,12 @@ module Logic
     | FTrue -> false
     | FFalse -> false
   end
-  
+
   predicate is_simpl_list (phis:fo_formula_list 'ls 'b) = match phis with
     | FOFNil -> true
     | FOFCons x q -> is_simpl x /\ is_simpl_list q
   end
-  
+
   let rec lemma is_simpl_subst (phi:fo_formula 'ls 'b) (f:func 'b (fo_term 'ls 'c)) : unit
     requires { is_simpl phi }
     ensures { is_simpl (subst_fo_formula phi subst_id_symbol f) }
@@ -135,22 +135,22 @@ module Logic
       | FTrue -> absurd
       | FFalse -> absurd
     end
-  
+
   let lemma is_simpl_renaming (phi:fo_formula 'ls 'b) (f:func 'b 'c) : unit
     requires { is_simpl phi }
     ensures { is_simpl (rename_fo_formula phi identity f) }
   =
     is_simpl_subst phi (rcompose f subst_id_fo_term)
-  
+
   (* Simplified formula, + true/false allowed at top. *)
-  
+
   predicate is_simpl_extended (phi:fo_formula 'ls 'b) =
     is_simpl phi \/ phi = FTrue \/ phi = FFalse
-  
+
   lemma is_simpl_extended_renaming :
     forall phi:fo_formula 'ls 'b,f:func 'b 'c.
       is_simpl_extended phi -> is_simpl_extended (rename_fo_formula phi identity f)
-  
+
   predicate no_existential (phi:fo_formula 'ls 'b) = match phi with
       | Not u -> no_existential u
       | PApp _ _ -> true
@@ -161,12 +161,12 @@ module Logic
       | FTrue -> true
       | FFalse -> true
     end
-  
+
   predicate no_existential_list (phis:fo_formula_list 'ls 'b) = match phis with
     | FOFNil -> true
     | FOFCons x q -> no_existential x /\ no_existential_list q
   end
-  
+
   let rec lemma no_existential_subst (phi:fo_formula 'ls 'b) (f:func 'b (fo_term 'ls 'c)) : unit
     requires { no_existential phi }
     ensures { no_existential (subst_fo_formula phi subst_id_symbol f) }
@@ -186,18 +186,18 @@ module Logic
       | FTrue -> ()
       | FFalse -> ()
     end
-  
+
   let lemma no_existential_renaming (phi:fo_formula 'ls 'b) (f:func 'b 'c) : unit
     requires { no_existential phi }
     ensures { no_existential (rename_fo_formula phi identity f) }
   =
     no_existential_subst phi (rcompose f subst_id_fo_term)
-  
+
   (* Skolemization environment. *)
-  
+
   use import Choice.Choice
   use import list.List
-  
+
   (* Hack to force possibility of instantiation of extend_env
      definition axiom ! *)
   function extend_env_selection (g:func (list 'st) (func 'b 'st))
@@ -216,11 +216,11 @@ module Logic
       | Cons z q -> extend_env_selection g x y z q
       | Nil -> default
     end
-  
+
 end
 
 module Impl
-  
+
   use import Types
   use import Logic
   use import Functions.Func
@@ -248,9 +248,9 @@ module Impl
   use import bool.Bool
   use import list.Mem
   use import int.Int
-  
+
   exception Unsat
-  
+
   let smart_and (phi1 phi2:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi1 }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula x
@@ -288,7 +288,7 @@ module Impl
             phi0
         end
     end
-  
+
   let smart_or (phi1 phi2:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi1 }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula x
@@ -326,7 +326,7 @@ module Impl
             phi0
         end
     end
-  
+
   let smart_forall (x:int) (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi }
     requires { forall y:int. is_fo_term_free_var_in_fo_formula y
@@ -366,7 +366,7 @@ module Impl
             && xf <> x && S.mem xf fvp } ;
         phi0
     end
-  
+
   let smart_exists (x:int) (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi }
     requires { forall y:int. is_fo_term_free_var_in_fo_formula y phi.model_fo_formula_field
@@ -407,10 +407,10 @@ module Impl
             S.mem xf fvp) } ;
         phi0
     end
-  
+
   (* Put in negational normal form and
      simplify formula (e.g. true/false removal/propagation to toplevel) *)
-  
+
   let rec nnf_simpl (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi }
     requires { forall x:int.
@@ -450,7 +450,7 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
            ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
              | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
-               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') && 
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m ->
            (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
              ocase identity x y = xf) && S.mem xf fvp') &&
@@ -468,17 +468,17 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
            ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
              | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
-               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') && 
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m ->
            (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
              ocase identity x y = xf) && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
-        
+
         let phi' = nnf_simpl phi0 fvp' in
         let phi'' = smart_exists x phi' fvp in
         phi''
     end
-  
+
   with nnf_neg_simpl (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi }
     requires { forall x:int. is_fo_term_free_var_in_fo_formula x
@@ -515,7 +515,7 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
            ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
              | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
-               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') && 
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m ->
            (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
              ocase identity x y = xf) && S.mem xf fvp') &&
@@ -533,17 +533,17 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
            ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
              | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
-               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') && 
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m ->
            (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
              ocase identity x y = xf) && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
-        
+
         let phi' = nnf_neg_simpl phi0 fvp' in
         let phi'' = smart_forall x phi' fvp in
         phi''
     end
-  
+
   (* gnum : take care of eliminated starting points. *)
   let rec nnf_simpl_list (phis:nlimpl_fo_formula_list) (gnum:int)
     (ghost fvp:set int) :  (nlimpl_fo_formula_list,int)
@@ -583,11 +583,11 @@ module Impl
             (res,gnum'+1)
         end
     end
-  
+
   use import ISet.Logic
   use import ISet.Impl
   use import Choice.Choice
-  
+
   let rec term_free_vars (t:nlimpl_fo_term) (ghost fvp:set int) : list int
     requires { nlimpl_fo_term_ok t }
     requires { forall x:int. is_fo_term_free_var_in_fo_term x t.model_fo_term_field ->
@@ -603,7 +603,7 @@ module Impl
       | NLCVar_fo_term x -> Cons x Nil
       | NLC_App _ l -> term_list_free_vars l fvp
     end
-  
+
   with term_list_free_vars (l:nlimpl_fo_term_list) (ghost fvp:set int): list int
     requires { nlimpl_fo_term_list_ok l }
     requires { forall x:int.
@@ -620,7 +620,7 @@ module Impl
       | NLC_FONil -> Nil
       | NLC_FOCons t q -> merge (term_free_vars t fvp) (term_list_free_vars q fvp)
     end
-  
+
   let rec skolem_parameters (l:list int) (acc:skolemization_env_return 'st)
     (ghost fvp:set int) : skolemization_env_return 'st
     requires { iset_ok l }
@@ -671,9 +671,9 @@ module Impl
         } in
         skolem_parameters q acc' fvp
     end
-  
+
   (* Not sufficient yet. *)
-  
+
   let rec skolemize (phi:nlimpl_fo_formula) (skb:int) (b:bool)
     (ghost fvp:set int) : skolemization_return 'st
     requires { nlimpl_fo_formula_ok phi }
@@ -847,7 +847,7 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
            ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
              | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
-               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') && 
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m ->
            (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
              ocase identity x y = xf) && S.mem xf fvp') &&
@@ -900,7 +900,7 @@ module Impl
           (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
            ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
              | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
-               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') && 
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
           (is_fo_term_free_var_in_fo_formula xf phi0m ->
            (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
              ocase identity x y = xf) && S.mem xf fvp') &&
@@ -921,7 +921,7 @@ module Impl
           is_fo_term_free_var_in_fo_formula (Some y) res1m ->
             (forall z:int.
               is_fo_term_free_var_in_fo_formula z resm /\ r0 z = Some y ->
-              z <> x && z = y ) && 
+              z <> x && z = y ) &&
             (is_fo_term_free_var_in_fo_formula y resm /\ y <> x) && mem y fvl } ;
         let transf = skolem_model_transformer res1m skb' skparamsm skenv in
         let symb = construct_symbol (NLCVar_symbol skb') in
@@ -987,7 +987,7 @@ module Impl
                is_fo_term_free_var_in_fo_formula z resm /\
                is_symbol_free_var_in_fo_term ls (sub1 z))))
              && ls < skb' + 1 } ;
-        
+
         (* Two point of views : either why3 do not deconstruct
            records enough, either too much. *)
         assert { forall m:model int 'st.
@@ -1017,7 +1017,7 @@ module Impl
           model_transformer = transf2 ;
           free_var_list = fvl }
     end
-  
+
   let rec skolemize_list (phil:nlimpl_fo_formula_list) (skb:int)
     (ghost fvp:set int) : skolemization_list_return 'st
     requires { nlimpl_fo_formula_list_ok phil }
@@ -1099,20 +1099,20 @@ module Impl
           skolem_bound_l = resq.skolem_bound_l ;
           model_transformer_l = transf }
     end
-  
+
   (* No need for it in the logic... *)
-  
+
   type preprocessing_return 'st = {
     preprocessed : nlimpl_fo_formula_list ;
     final_goals_number : int ;
     ghost model_transf : func (model int 'st) (model int 'st) ;
   }
-  
+
   type fvr = {
     ghost sr : set int ;
     lr : list int ;
   }
-  
+
   let rec term_free_vars_noghost (t:nlimpl_fo_term) : fvr
     requires { nlimpl_fo_term_ok t }
     ensures { forall x:int.
@@ -1126,7 +1126,7 @@ module Impl
       | NLCVar_fo_term x -> { sr = S.singleton x ; lr = Cons x Nil }
       | NLC_App _ l -> term_list_free_vars_noghost l
     end
-  
+
   with term_list_free_vars_noghost (l:nlimpl_fo_term_list) : fvr
     requires { nlimpl_fo_term_list_ok l }
     ensures { forall x:int.
@@ -1142,7 +1142,7 @@ module Impl
         let r2 = term_list_free_vars_noghost q in
         { lr = merge r1.lr r2.lr ; sr = S.union r1.sr r2.sr }
     end
-  
+
   let rec collect_free_var_formula (phi:nlimpl_fo_formula) : fvr
     requires { nlimpl_fo_formula_ok phi }
     ensures { iset_ok result.lr }
@@ -1205,7 +1205,7 @@ module Impl
             && xf <> x && mem xf res.lr } ;
         res
     end
-  
+
   let rec collect_free_var_formula_list (phil:nlimpl_fo_formula_list) : fvr
     requires { nlimpl_fo_formula_list_ok phil }
     ensures { iset_ok result.lr }
@@ -1221,8 +1221,8 @@ module Impl
         { lr = merge fvr1.lr fvr2.lr ;
           sr = S.union fvr1.sr fvr2.sr }
     end
-  
-  
+
+
   let rec exists_quantify (l:list int) (phi:nlimpl_fo_formula) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok phi }
     requires { is_simpl phi.model_fo_formula_field }
@@ -1265,12 +1265,12 @@ module Impl
           formula_semantic phi'm m rho } ;
         exists_quantify q phi'
     end
-  
+
   type comb_ret = {
     form : nlimpl_fo_formula ;
     llen : int ;
   }
-  
+
   let rec combine_with (l:nlimpl_fo_formula_list) (phi0:nlimpl_fo_formula)
     (ghost fvp:set int) : comb_ret
     requires { nlimpl_fo_formula_list_ok l }
@@ -1283,6 +1283,7 @@ module Impl
     requires { is_nnf_list l.model_fo_formula_list_field }
     requires { is_simpl phi0.model_fo_formula_field }
     requires { is_nnf phi0.model_fo_formula_field }
+    variant { 0 }
     ensures { nlimpl_fo_formula_ok result.form }
     ensures { is_simpl result.form.model_fo_formula_field }
     ensures { is_nnf result.form.model_fo_formula_field }
@@ -1308,12 +1309,12 @@ module Impl
         assert { phirm = And phi0m phi'm } ;
         { form = phir ; llen = cr.llen + 1 }
     end
-  
+
   type split_ret = {
     forms : nlimpl_fo_formula_list ;
     total_goals : int ;
   }
-  
+
   let rec split (phi:nlimpl_fo_formula) (l:nlimpl_fo_formula_list) (lnum:int) (gnum:int) : split_ret
     requires { nlimpl_fo_formula_ok phi }
     requires { forall x:int. not(is_fo_term_free_var_in_fo_formula x
@@ -1327,6 +1328,7 @@ module Impl
     requires { is_simpl_list l.model_fo_formula_list_field }
     requires { is_nnf_list l.model_fo_formula_list_field }
     requires { no_existential_list l.model_fo_formula_list_field }
+    variant { 0 }
     ensures { forall m:model int 'st,rho:func int 'st.
       formula_list_conj_semantic result.forms.model_fo_formula_list_field m rho
       <-> (formula_semantic phi.model_fo_formula_field m rho /\
@@ -1374,7 +1376,7 @@ module Impl
             then 1
             else 0 }
     end
-  
+
   (* Prover preprocessing function:
      From a set of formulas,
      return an equi-satisfiable
@@ -1384,9 +1386,9 @@ module Impl
      in negational normal form, without existential quantifiers.
      Potentially raises an exception when the input set of formulas
      was (trivially) unsatisfiable. *)
-  
+
   exception Sat
-  
+
   let preprocessing (phil:nlimpl_fo_formula_list) (gnum:int) : preprocessing_return 'st
     requires { nlimpl_fo_formula_list_ok phil }
     ensures { nlimpl_fo_formula_list_ok result.preprocessed }
@@ -1432,8 +1434,8 @@ module Impl
           final_goals_number = spl.total_goals ;
           model_transf = tr }
     end
-    
-  
+
+
   (*
   let preprocessing (phil:nlimpl_fo_formula_list) : preprocessing_return 'st
     requires { nlimpl_fo_formula_list_ok phil }
@@ -1455,12 +1457,11 @@ module Impl
     let fvp = s.sr in
     let phil' = nnf_simpl_list phil fvp in
     TODO
-    
+
     let skr =
       (skolemize_list phil' phil'.nlfree_var_symbol_set_abstraction_fo_formula_list_field fvp:
         skolemization_list_return 'st) in
     { preprocessed = skr.skolemized_l ;
       model_transf = skr.model_transformer_l }*)
-  
-end
 
+end

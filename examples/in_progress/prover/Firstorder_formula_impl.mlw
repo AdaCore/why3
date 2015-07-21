@@ -847,8 +847,7 @@ module Impl
   use import Firstorder_formula_spec.Spec
   use import Types
   use import Logic
-  let rec bind_var_symbol_in_fo_formula "W:diverges:N"
-    (t:nl_fo_formula int int) (x:int)
+  let rec bind_var_symbol_in_fo_formula (t:nl_fo_formula int int) (x:int)
     (i:int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd0:func int (symbol 'b0)) (ghost fr1:func int (fo_term 'b0 'b1))
     (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_fo_formula int int
@@ -1031,8 +1030,7 @@ module Impl
                ((rename_subst_fo_term bnd1 identity identity)))
     end
 
-  with bind_var_fo_term_in_fo_formula "W:diverges:N"
-    (t:nl_fo_formula int int) (x:int)
+  with bind_var_fo_term_in_fo_formula (t:nl_fo_formula int int) (x:int)
     (i:int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd0:func int (symbol 'b0)) (ghost fr1:func int (fo_term 'b0 'b1))
     (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_fo_formula int int
@@ -1248,8 +1246,7 @@ module Impl
                ((rename_subst_fo_term bnd1 identity identity)))
     end
 
-  let rec unbind_var_symbol_in_fo_formula "W:diverges:N"
-    (t:nl_fo_formula int int) (i:int)
+  let rec unbind_var_symbol_in_fo_formula (t:nl_fo_formula int int) (i:int)
     (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr1:func int (fo_term 'b0 'b1))
@@ -1510,8 +1507,7 @@ module Impl
                ((rename_subst_symbol bnd20 identity)))
     end
 
-  with unbind_var_fo_term_in_fo_formula "W:diverges:N"
-    (t:nl_fo_formula int int) (i:int)
+  with unbind_var_fo_term_in_fo_formula (t:nl_fo_formula int int) (i:int)
     (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
     (ghost bnd10:func int (symbol 'b0))
     (ghost fr1:func int (fo_term 'b0 'b1))

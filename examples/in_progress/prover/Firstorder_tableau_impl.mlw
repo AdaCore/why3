@@ -576,6 +576,7 @@ module Impl
     requires { bound_depth_of_symbol_in_tableau t <= i + 1 }
     requires { correct_indexes_symbol x }
     requires { bound_depth_of_symbol_in_symbol x = 0 }
+    variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
     ensures { bound_depth_of_symbol_in_tableau result <= i }
     ensures { bound_depth_of_fo_term_in_tableau result =
@@ -677,6 +678,7 @@ module Impl
     requires { correct_indexes_fo_term x }
     requires { bound_depth_of_symbol_in_fo_term x = 0 }
     requires { bound_depth_of_fo_term_in_fo_term x = 0 }
+    variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
     ensures { bound_depth_of_fo_term_in_tableau result <= i }
     ensures { bound_depth_of_symbol_in_tableau result =
@@ -808,8 +810,9 @@ module Impl
     requires { correct_indexes_tableau t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
+    variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
-     ensures { bound_depth_of_symbol_in_tableau result =
+    ensures { bound_depth_of_symbol_in_tableau result =
        bound_depth_of_symbol_in_tableau t }
     ensures { bound_depth_of_fo_term_in_tableau result =
       bound_depth_of_fo_term_in_tableau t }
@@ -909,8 +912,9 @@ module Impl
     requires { correct_indexes_fo_term u }
     requires { bound_depth_of_symbol_in_fo_term u = 0 }
     requires { bound_depth_of_fo_term_in_fo_term u = 0 }
+    variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
-     ensures { bound_depth_of_symbol_in_tableau result =
+    ensures { bound_depth_of_symbol_in_tableau result =
        bound_depth_of_symbol_in_tableau t }
     ensures { bound_depth_of_fo_term_in_tableau result =
       bound_depth_of_fo_term_in_tableau t }

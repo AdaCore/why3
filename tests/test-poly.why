@@ -110,6 +110,20 @@ theory Map
 end
 
 
+theory TestBool
+
+  use import bool.Bool
+
+  goal g : forall b:bool.  b = b
+
+(*
+
+bin/why3prove tests/test-poly.why -D why3_smt -T TestBool -G g
+
+*)
+
+end
+
 
 theory TestTuple
 
