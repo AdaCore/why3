@@ -671,19 +671,20 @@ module Translate = struct
         else
           [ML.Dexn (id, Some (ity info xs.xs_ity))]
 
+  let warn_non_ghost_non_exec ps =
+    if not ps.ps_ghost then
+      Warning.emit ?loc:ps.ps_name.id_loc
+        "Cannot extract code from non-ghost function %s: body is not executable"
+        ps.ps_name.id_string
+
   let pdecl info d =
     if Mlw_exec.is_exec_pdecl info.exec d then pdecl info d else
       begin
         begin match d.pd_node with
-        | PDlet { let_sym = lv } ->
-           Debug.dprintf debug "ignoring non-executable declaration %s@."
-                         (lv_name lv).id_string;
+        | PDlet { let_sym = LetA ps } -> warn_non_ghost_non_exec ps
         | PDrec fdl ->
            List.iter
-             (fun {fun_ps=ps} ->
-              Debug.dprintf debug
-                "ignoring non-executable declaration %s (ghost = %b)@."
-                ps.ps_name.id_string ps.ps_ghost) fdl
+             (fun {fun_ps=ps} -> warn_non_ghost_non_exec ps) fdl
         | _ -> ()
         end;
         []

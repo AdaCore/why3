@@ -40,7 +40,7 @@ OCAMLC=ocamlopt.opt
 INCLUDES=-I $(BD) $(INCLUDE)
 LIBS=unix.cmxa $(BIGINTLIB).cmxa why3extract.cmxa
 LIBSOLD=$(BD)/why3__BuiltIn.cmx $(BD)/int__Int.cmx $(BD)/array__Array.cmx
-WHY3FLAGS=-L . --debug ignore_unused_vars --debug extraction
+WHY3FLAGS=-L . --debug ignore_unused_vars
 MLFLAGS=
 MLIFLAGS=
 MLEXECFLAGS=
@@ -70,7 +70,7 @@ endif
 
 replay:
 	for i in $(MLWUTIL) $(MLWIMPL); do \
-		why3 replay -L . $$i ; \
+		why3 replay -q -L . $$i ; \
 	done
 
 depend: .depend
