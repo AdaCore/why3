@@ -905,9 +905,10 @@ let remove_metas t =
 *)
 let proof_removable a =
   match a.proof_state with
+  | Scheduled | Running -> false
   | Done pr ->
     a.proof_obsolete || pr.Call_provers.pr_answer <> Call_provers.Valid
-  | _ -> false
+  | Unedited | JustEdited | Interrupted | InternalFailure _ -> true
 
 
 let rec clean = function
