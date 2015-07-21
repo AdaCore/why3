@@ -300,7 +300,7 @@ let append_to_model_trace_label ~labels ~to_append =
     let labels_without_trace = Slab.remove trace_label labels in
     let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_append) in
     Slab.add new_trace_label labels_without_trace
-  with Not_found -> labels    
+  with Not_found -> labels
 
 (* The counter-example model related data needed for creating new
    variable. *)

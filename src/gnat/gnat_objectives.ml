@@ -640,6 +640,12 @@ module Save_VCs = struct
        trace
        []
 
+   let spark_name_trans (me_name, me_type) =
+     match me_type with
+     | Model_parser.Result -> me_name ^ "'"  ^ "Result"
+     | Model_parser.Old -> me_name ^ "'" ^ "Old"
+     | Model_parser.Other -> me_name
+
    let save_counterexample goal counterexample ~trace  =
      if counterexample <> Model_parser.empty_model then begin
        let check = get_objective goal in
@@ -651,8 +657,8 @@ module Save_VCs = struct
 	     counterexample ~positions:(trace_to_list trace) in
        with_fmt_channel
 	 ce_fn
-	 (fun fmt -> Format.fprintf fmt "%a@." (Model_parser.print_model_json
-         ?me_name_trans:None) counterexample);
+	 (fun fmt -> Format.fprintf fmt "%a@."
+	   (Model_parser.print_model_json ~me_name_trans:spark_name_trans) counterexample);
        ce_fn
      end
      else
