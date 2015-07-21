@@ -71,12 +71,12 @@ endif
 replay:
 	@printf "===================================\n"
 	@printf "Starting time (UTC): "
-	@printf "===================================\n"
 	@date --utc +%H:%M
-	for i in $(MLWUTIL) $(MLWIMPL); do \
+	@printf "===================================\n"
+	@for i in $(MLWUTIL) $(MLWIMPL); do \
 		printf "Replaying $$i..." ; \
 		why3 $(WHY3FLAGS) replay -q $$i ; \
-	done
+	 done
 	@printf "===================================\n"
 	@printf "Ending time (UTC): "
 	@date --utc +%H:%M
