@@ -26,7 +26,7 @@ and pr_term_list fmt tl =
   match tl with
   | NL_FONil -> fprintf fmt "()"
   | NL_FOCons(t,tl) ->
-      fprintf fmt "@[(%a%a)@]" pr_term t pr_term_list_tail tl
+      fprintf fmt "@[<hov 2>(%a%a)@]" pr_term t pr_term_list_tail tl
 
 and pr_term_list_tail fmt tl =
   match tl with
@@ -38,21 +38,23 @@ let pr_term_impl fmt t = pr_term fmt t.nlrepr_fo_term_field
 
 let rec pr_formula fmt f =
   match f with
-  | NL_Forall f -> fprintf fmt "@[(forall@ %a)@]" pr_formula f
-  | NL_Exists f  -> fprintf fmt "@[(exists@ %a)@]" pr_formula f
-  | NL_And(f1,f2) -> fprintf fmt "@[(%a@ and %a)@]" pr_formula f1 pr_formula f2
-  | NL_Or(f1,f2) -> fprintf fmt "@[(%a@ or %a)@]" pr_formula f1 pr_formula f2
-  | NL_Not f -> fprintf fmt "@[(not@ %a)@]" pr_formula f
+  | NL_Forall f -> fprintf fmt "@[<hov 2>(forall@ %a)@]" pr_formula f
+  | NL_Exists f  -> fprintf fmt "@[<hov 2>(exists@ %a)@]" pr_formula f
+  | NL_And(f1,f2) ->
+    fprintf fmt "@[<hov 2>(%a@ and %a)@]" pr_formula f1 pr_formula f2
+  | NL_Or(f1,f2) ->
+    fprintf fmt "@[<hov 2>(%a@ or %a)@]" pr_formula f1 pr_formula f2
+  | NL_Not f -> fprintf fmt "@[<hov 2>(not@ %a)@]" pr_formula f
   | NL_FTrue -> fprintf fmt "true"
   | NL_FFalse -> fprintf fmt "false"
   | NL_PApp(s,tl) ->
-    fprintf fmt "@[%a%a@]" pr_symbol s pr_term_list tl
+    fprintf fmt "@[<hov 2>%a%a@]" pr_symbol s pr_term_list tl
 
 and pr_formula_list fmt l =
   match l with
   | NL_FOFNil -> fprintf fmt "[]"
   | NL_FOFCons(f,l) ->
-    fprintf fmt "@[[%a%a]@]" pr_formula f pr_formula_list_tail l
+    fprintf fmt "@[<hov 2>[ %a%a ]@]" pr_formula f pr_formula_list_tail l
 
 and pr_formula_list_tail fmt l =
   match l with
@@ -84,6 +86,20 @@ let () =
   run_test "bidon4" (ProverTest__Impl.bidon4 ());
   run_test "pierce" (ProverTest__Impl.pierce ());
   run_test "zenon5" (ProverTest__Impl.zenon5 ());
-(* too long  run_test "zenon6" (ProverTest__Impl.zenon6 ()); *)
+(* too long -> sat ?
+  run_test "zenon6" (ProverTest__Impl.zenon6 ());
+*)
   run_test "zenon10 2" (ProverTest__Impl.zenon10 (n 2));
-(* too long run_test "zenon10 3" (ProverTest__Impl.zenon10 (n 3)) *)
+(* too long -> sat !
+  run_test "zenon10 3" (ProverTest__Impl.zenon10 (n 3))
+*)
+  run_test "zenon10 4" (ProverTest__Impl.zenon10 (n 4));
+  run_test "zenon10 6" (ProverTest__Impl.zenon10 (n 6));
+  run_test "zenon10 8" (ProverTest__Impl.zenon10 (n 8));
+  run_test "zenon10 10" (ProverTest__Impl.zenon10 (n 10));
+  run_test "zenon10 12" (ProverTest__Impl.zenon10 (n 12));
+(* warning: the following needs around 6 minutes *)
+(*
+  run_test "zenon10 14" (ProverTest__Impl.zenon10 (n 14));
+*)
+  printf "End of tests.@."
