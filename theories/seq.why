@@ -328,8 +328,14 @@ theory Permut
 
   (** {2 Lemmas about permut} *)
 
+  lemma permut_refl: forall s: seq 'a, l u: int.
+    permut s s l u
+
+  lemma permut_sym: forall s1 s2: seq 'a, l u: int.
+    permut s1 s2 l u -> permut s2 s1 l u
+
   lemma permut_trans:
-    forall s1 s2 s3: seq 'a. forall l u: int.
+    forall s1 s2 s3: seq 'a, l u: int.
     permut s1 s2 l u -> permut s2 s3 l u -> permut s1 s3 l u
 
   lemma permut_exists:
@@ -338,6 +344,11 @@ theory Permut
     exists j: int. l <= j < u /\ s1[j] = s2[i]
 
   (** {2 Lemmas about permut_all} *)
+
+  use import Mem
+
+  lemma permut_all_mem: forall s1 s2: seq 'a. permut_all s1 s2 ->
+    forall x. mem x s1 <-> mem x s2
 
   lemma exchange_permut_all:
     forall s1 s2: seq 'a, i j: int.
