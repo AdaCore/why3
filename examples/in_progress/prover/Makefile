@@ -70,7 +70,8 @@ endif
 
 replay:
 	for i in $(MLWUTIL) $(MLWIMPL); do \
-		why3 replay -q -L . $$i ; \
+		echo "Replaying $$i..." ; \
+		why3 $(WHY3FLAGS) replay -q $$i ; \
 	done
 
 depend: .depend
