@@ -1,81 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="3">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <file
-  name="../Nat.mlw"
-  verified="true"
-  expanded="false">
-  <theory
-   name="Nat"
-   locfile="../Nat.mlw"
-   loclnum="4" loccnumb="7" loccnume="10"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter nat_to_int_nonnegative"
-    locfile="../Nat.mlw"
-    loclnum="16" loccnumb="16" loccnume="38"
-    expl="VC for nat_to_int_nonnegative"
-    sum="ae73b295b4e2a88502ad350954cfbeed"
-    proved="true"
-    expanded="false"
-    shape="Cainfix &gt;=anat_to_intV0c0aONatainfix &gt;=anat_to_intV0c0Iainfix &gt;=anat_to_intV1c0ACfaONatainfix =V2V1aSNatVV0aSNatVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for nat_to_int_nonnegative"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter add_nat_simulate_add_int"
-    locfile="../Nat.mlw"
-    loclnum="22" loccnumb="16" loccnume="40"
-    expl="VC for add_nat_simulate_add_int"
-    sum="9aa8422d92d15dc123028099186254db"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =anat_to_intaadd_natV0V1ainfix +anat_to_intV0anat_to_intV1aONatainfix =anat_to_intaadd_natV0V1ainfix +anat_to_intV0anat_to_intV1Iainfix =anat_to_intaadd_natV2V1ainfix +anat_to_intV2anat_to_intV1ACfaONatainfix =V3V2aSNatVV0aSNatVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for add_nat_simulate_add_int"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="one_nat_value"
-    locfile="../Nat.mlw"
-    loclnum="30" loccnumb="8" loccnume="21"
-    sum="b7a28f100e0900df80a8b5a5256c7aa9"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anat_to_intaone_natc1">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<file name="../Nat.mlw">
+<theory name="Nat" sum="93803c23acf28091314de05391da648a">
+ <goal name="WP_parameter nat_to_int_nonnegative" expl="VC for nat_to_int_nonnegative">
+ <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+ </goal>
+ <goal name="WP_parameter add_nat_simulate_add_int" expl="VC for add_nat_simulate_add_int">
+ <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+ </goal>
+ <goal name="one_nat_value">
+ <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>
