@@ -20,6 +20,8 @@ ifeq ($(BENCH),yes)
 endif
 
 
+MLWUTIL=Nat
+
 MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
 	Firstorder_formula_impl Firstorder_formula_list_impl \
 	Firstorder_tableau_impl Unification FormulaTransformations \
@@ -28,7 +30,7 @@ MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
 MLWIMPL=$(MLWTYPES) ProverMain ProverTest
 
 BD=build
-MLUTIL=$(BD)/Nat__Nat
+MLUTIL=$(patsubst %,$(BD)/%__Nat,$(MLWUTIL))
 MLTYPES=$(patsubst %,$(BD)/%__Types,$(MLWTYPES))
 MLIMPL=$(patsubst %,$(BD)/%__Impl,$(MLWIMPL))
 MLALL=$(MLUTIL) $(MLTYPES) $(MLIMPL)
@@ -43,6 +45,8 @@ MLFLAGS=
 MLIFLAGS=
 MLEXECFLAGS=
 
+.PHONY: clean depend extract replay
+
 $(BD)/prover: $(CMX) run.cmx
 	$(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
 		-o $(BD)/prover $^
@@ -55,11 +59,6 @@ $(ML):
 %.cmx: %.ml
 	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
 
-
-.PHONY: clean depend
-
-depend: .depend
-
 .depend: Makefile $(ML)
 	ocamldep.opt -I $(BD) $(ML) > .depend
 
@@ -68,6 +67,13 @@ ifneq "$(MAKECMDGOALS:extract%=extract)" "extract"
 include .depend
 endif
 endif
+
+replay:
+	for i in $(MLWUTIL) $(MLWIMPL); do \
+		why3 replay -L . $$i ; \
+	done
+
+depend: .depend
 
 clean:
 	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
