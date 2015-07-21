@@ -2,7 +2,6 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
@@ -13,7 +12,7 @@
 </theory>
 <theory name="Logic" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Impl" sum="912254bd92898e43625ff2fe63e01900" expanded="true">
+<theory name="Impl" sum="8789e1ae5c5a202e347c47b77ffa1afc" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.11" steps="82"/></proof>
  </goal>
@@ -199,7 +198,6 @@
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter iadd.7" expl="7. assertion" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="4.21"/></proof>
   </goal>
   <goal name="WP_parameter iadd.8" expl="8. assertion">
   <proof prover="1"><result status="valid" time="0.17"/></proof>
@@ -432,11 +430,7 @@
     <goal name="WP_parameter backtrack.32.1.4" expl="4. VC for backtrack">
     <transf name="inline_goal">
      <goal name="WP_parameter backtrack.32.1.4.1" expl="1. VC for backtrack">
-     <transf name="compute_in_goal">
-      <goal name="WP_parameter backtrack.32.1.4.1.1" expl="1. VC for backtrack">
-      <proof prover="5"><result status="valid" time="1.55"/></proof>
-      </goal>
-     </transf>
+     <proof prover="1" timelimit="30"><result status="valid" time="1.41"/></proof>
      </goal>
     </transf>
     </goal>

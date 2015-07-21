@@ -69,12 +69,18 @@ endif
 endif
 
 replay:
-	date --utc "+%Y-%m-%d"
+	@printf "===================================\n"
+	@printf "Starting time (UTC): "
+	@printf "===================================\n"
+	@date --utc +%H:%M
 	for i in $(MLWUTIL) $(MLWIMPL); do \
-		echo "Replaying $$i..." ; \
+		printf "Replaying $$i..." ; \
 		why3 $(WHY3FLAGS) replay -q $$i ; \
 	done
-	date "--utc +%Y-%m-%d"
+	@printf "===================================\n"
+	@printf "Ending time (UTC): "
+	@date --utc +%H:%M
+	@printf "===================================\n"
 
 depend: .depend
 
