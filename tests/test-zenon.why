@@ -9,10 +9,19 @@ theory T
 
   meta "rewrite" prop union_def1
 
+  meta "rewrite_def" predicate subset
+
+  meta "rewrite_def" function singleton
+
   type t
   constant a:t
   constant b:t
   constant c:t
-  goal g: mem a (add b (add a (add c empty)))
+
+  goal g1: mem a (add b (add a (add c empty)))
+
+  goal g2: mem a (add b (add a (singleton c)))
+
+  goal g3: subset empty (singleton c)
 
 end
