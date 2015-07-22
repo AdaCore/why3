@@ -1,6 +1,6 @@
 
 module Sem
-
+  
   use import Choice.Choice
   use import Functions.Func
   use export HighOrd
@@ -13,26 +13,26 @@ module Sem
   use import list.List
   use import option.Option
   use import OptionFuncs.Funcs
-
-  type model 'fsymb 'st = {
-    interp_fun : func 'fsymb (func (list 'st) 'st) ;
-    interp_pred : func 'fsymb (pred (list 'st)) ;
+  
+  type model 'ls 'st = {
+    interp_fun : func 'ls (func (list 'st) 'st) ;
+    interp_pred : func 'ls (pred (list 'st)) ;
   }
-
-  function term_semantic (t:fo_term 'fsymb 'b) (m:model 'fsymb 'st)
+  
+  function term_semantic (t:fo_term 'ls 'b) (m:model 'ls 'st)
     (rho:func 'b 'st) : 'st = match t with
       | Var_fo_term x -> rho x
       | App (Var_symbol f) l -> let ifun = m.interp_fun in
         ifun f (term_list_semantic l m rho)
     end
-
-  with term_list_semantic (t:fo_term_list 'fsymb 'b) (m:model 'fsymb 'st)
+  
+  with term_list_semantic (t:fo_term_list 'ls 'b) (m:model 'ls 'st)
     (rho:func 'b 'st) : list 'st = match t with
       | FONil -> Nil
       | FOCons x q -> Cons (term_semantic x m rho) (term_list_semantic q m rho)
     end
-
-  predicate formula_semantic (t:fo_formula 'fsymb 'b) (m:model 'fsymb 'st)
+  
+  predicate formula_semantic (t:fo_formula 'ls 'b) (m:model 'ls 'st)
     (rho:func 'b 'st) = match t with
       | Forall t -> forall x:'st.
         formula_semantic t m (ocase rho x)
@@ -46,29 +46,29 @@ module Sem
       | PApp (Var_symbol p) l -> let ipred = m.interp_pred in
         ipred p (term_list_semantic l m rho)
     end
-
-  predicate formula_list_conj_semantic (t:fo_formula_list 'fsymb 'b)
-    (m:model 'fsymb 'st) (rho:func 'b 'st) = match t with
+  
+  predicate formula_list_conj_semantic (t:fo_formula_list 'ls 'b)
+    (m:model 'ls 'st) (rho:func 'b 'st) = match t with
       | FOFNil -> true
       | FOFCons x q -> formula_semantic x m rho /\
         formula_list_conj_semantic q m rho
     end
-
-  predicate formula_list_disj_semantic (t:fo_formula_list 'fsymb 'b)
-    (m:model 'fsymb 'st) (rho:func 'b 'st) = match t with
+  
+  predicate formula_list_disj_semantic (t:fo_formula_list 'ls 'b)
+    (m:model 'ls 'st) (rho:func 'b 'st) = match t with
       | FOFNil -> false
       | FOFCons x q -> formula_semantic x m rho \/
         formula_list_disj_semantic q m rho
     end
-
-  predicate tableau_node (b:bool) (phib:fo_formula_list 'fsymb 'b)
-    (phi0:fo_formula 'fsymb 'b) (m:model 'fsymb 'st) (rho:func 'b 'st) =
+  
+  predicate tableau_node (b:bool) (phib:fo_formula_list 'ls 'b)
+    (phi0:fo_formula 'ls 'b) (m:model 'ls 'st) (rho:func 'b 'st) =
     ( b = True /\ formula_semantic phi0 m rho)
       \/ formula_list_disj_semantic phib m rho
-
+  
   (* This one work by accumulation, as it is related to a context. *)
-  predicate tableau_semantic_with (t:tableau 'fsymb 'b)
-    (b:bool) (m:model 'fsymb 'st) (rho:func 'b 'st) =
+  predicate tableau_semantic_with (t:tableau 'ls 'b)
+    (b:bool) (m:model 'ls 'st) (rho:func 'b 'st) =
     match t with
       | Root -> b = True
       | Node tnext phi0 phib ->
@@ -77,17 +77,17 @@ module Sem
           else False in
         tableau_semantic_with tnext b' m rho
     end
-
+  
   (* Abstraction-definition axiom :
-     function semantic_subst (s:func 'b (fo_term 'fsymb 'c))
-       (m:model 'fsymb 'st) (rho:func 'c 'st) : func 'b 'st =
+     function semantic_subst (s:func 'b (fo_term 'ls 'c))
+       (m:model 'ls 'st) (rho:func 'c 'st) : func 'b 'st =
          (\ x:'b. term_semantic (s x) m rho) *)
-  function semantic_subst (s:func 'b (fo_term 'fsymb 'c))
-    (m:model 'fsymb 'st) (rho:func 'c 'st) : func 'b 'st
-  axiom semantic_subst_def : forall s:func 'b (fo_term 'fsymb 'c),
-    m:model 'fsymb 'st, rho:func 'c 'st, x:'b.
+  function semantic_subst (s:func 'b (fo_term 'ls 'c))
+    (m:model 'ls 'st) (rho:func 'c 'st) : func 'b 'st
+  axiom semantic_subst_def : forall s:func 'b (fo_term 'ls 'c),
+    m:model 'ls 'st, rho:func 'c 'st, x:'b.
       semantic_subst s m rho x = term_semantic (s x) m rho
-
+  
   (*(* Abstraction-definition axiom :
      constant symbol_name : func (symbol 'b) 'b =
        (\ x:symbol 'b. match x with Var_symbol x -> x end) *)
@@ -104,26 +104,26 @@ module Sem
       (rcompose symbol_name subst_id_symbol) } ;
     assert { extensionalEqual (identity:func 'b 'b)
       (rcompose subst_id_symbol symbol_name) }*)
-
+  
   function model_rename (r:func 'b 'c) (m:model 'c 'st) :
     model 'b 'st = {
     interp_fun = rcompose r m.interp_fun ;
     interp_pred = rcompose r m.interp_pred ;
   }
-
+  
   lemma model_rename_id : forall m:model 'b 'st.
     model_rename identity m = m
-
+  
   (* semantic commutation with substitution.
      Required for example for
      universal quantification elimination deduction rule:
      forall x. phi -> phi[x <- t] come from this lemma
      (*and generally speaking, quantifier handling*) *)
-
-  let rec lemma term_semantic_subst_commutation (t:fo_term 'fsymb 'b)
-    (m:model 'fsymb2 'st) (rho : func 'c 'st)
-    (thetal:func 'fsymb 'fsymb2)
-    (theta:func 'b (fo_term 'fsymb2 'c)) : unit
+  
+  let rec lemma term_semantic_subst_commutation (t:fo_term 'ls 'b)
+    (m:model 'ls2 'st) (rho : func 'c 'st)
+    (thetal:func 'ls 'ls2)
+    (theta:func 'b (fo_term 'ls2 'c)) : unit
     ensures { term_semantic (
       subst_fo_term t (rcompose thetal subst_id_symbol) theta) m rho =
       term_semantic t (model_rename thetal m) (semantic_subst theta m rho) }
@@ -141,11 +141,11 @@ module Sem
         assert { eval m.interp_fun (thetal f) l2 =
             eval m2.interp_fun f l2 }
     end
-
-  with lemma term_list_semantic_subst_commutation (t:fo_term_list 'fsymb 'b)
-    (m:model 'fsymb2 'st) (rho : func 'c 'st)
-    (thetal:func 'fsymb 'fsymb2)
-    (theta:func 'b (fo_term 'fsymb2 'c)) : unit
+  
+  with lemma term_list_semantic_subst_commutation (t:fo_term_list 'ls 'b)
+    (m:model 'ls2 'st) (rho : func 'c 'st)
+    (thetal:func 'ls 'ls2)
+    (theta:func 'b (fo_term 'ls2 'c)) : unit
     ensures { term_list_semantic (
       subst_fo_term_list t (rcompose thetal subst_id_symbol) theta) m rho =
       term_list_semantic t (model_rename thetal m)
@@ -157,10 +157,10 @@ module Sem
       | FOCons x q -> term_semantic_subst_commutation x m rho thetal theta ;
         term_list_semantic_subst_commutation q m rho thetal theta
     end
-
-  let lemma term_list_semantic_rename_commutation (t:fo_term_list 'fsymb 'b)
-    (m:model 'fsymb2 'st) (rho:func 'c 'st)
-    (thetal:func 'fsymb 'fsymb2) (theta:func 'b 'c) : unit
+  
+  let lemma term_list_semantic_rename_commutation (t:fo_term_list 'ls 'b)
+    (m:model 'ls2 'st) (rho:func 'c 'st)
+    (thetal:func 'ls 'ls2) (theta:func 'b 'c) : unit
     ensures { term_list_semantic (
       rename_fo_term_list t thetal theta) m rho =
       term_list_semantic t (model_rename thetal m)
@@ -169,19 +169,19 @@ module Sem
     let p1 = rcompose theta rho in
     let p2 = semantic_subst (rcompose theta subst_id_fo_term) m rho in
     assert { extensionalEqual p1 p2 && p1 = p2 }
-
-  let lemma term_semantic_rename_commutation (t:fo_term 'fsymb 'b)
-    (m:model 'fsymb2 'st) (rho:func 'c 'st)
-    (thetal:func 'fsymb 'fsymb2) (theta:func 'b 'c) : unit
+  
+  let lemma term_semantic_rename_commutation (t:fo_term 'ls 'b)
+    (m:model 'ls2 'st) (rho:func 'c 'st)
+    (thetal:func 'ls 'ls2) (theta:func 'b 'c) : unit
     ensures { term_semantic (rename_fo_term t thetal theta) m rho =
       term_semantic t (model_rename thetal m) (rcompose theta rho) }
   =
     assert { extensionalEqual (rcompose theta rho)
       (semantic_subst (subst_of_rename_fo_term theta) m rho) }
-
-
-  let lemma semantic_lifting_commutation (theta:func 'b (fo_term 'fsymb 'c))
-    (rho : func 'c 'st) (m:model 'fsymb 'st) (x:'st) : unit
+  
+  
+  let lemma semantic_lifting_commutation (theta:func 'b (fo_term 'ls 'c))
+    (rho : func 'c 'st) (m:model 'ls 'st) (x:'st) : unit
     ensures { semantic_subst (olifts_fo_term theta) m (ocase rho x) =
       ocase (semantic_subst theta m rho) x }
   =
@@ -195,21 +195,21 @@ module Sem
       | Some z -> p1 (Some z) = p2 (Some z) end
         && p1 x = p2 x } ;
     assert { extensionalEqual p1 p2 }
-
-  let lemma formula_semantic_subst_commutation (t0:fo_formula 'fsymb 'b)
-    (m0:model 'fsymb2 'st)
-    (thetal0:func 'fsymb 'fsymb2)
-    (theta0:func 'b (fo_term 'fsymb2 'c))
+  
+  let lemma formula_semantic_subst_commutation (t0:fo_formula 'ls 'b)
+    (m0:model 'ls2 'st)
+    (thetal0:func 'ls 'ls2)
+    (theta0:func 'b (fo_term 'ls2 'c))
     (rho:func 'c 'st) : unit
     ensures { formula_semantic (
       subst_fo_formula t0 (rcompose thetal0 subst_id_symbol) theta0) m0 rho
       <-> formula_semantic t0
         (model_rename thetal0 m0) (semantic_subst theta0 m0 rho) }
   =
-    let rec ghost aux (t:fo_formula 'fsymb3 'b2)
-      (m:model 'fsymb4 'st)
-      (thetal:func 'fsymb3 'fsymb4)
-      (theta:func 'b2 (fo_term 'fsymb4 'c2)) : unit
+    let rec ghost aux (t:fo_formula 'ls3 'b2)
+      (m:model 'ls4 'st)
+      (thetal:func 'ls3 'ls4)
+      (theta:func 'b2 (fo_term 'ls4 'c2)) : unit
       ensures { forall rho:func 'c2 'st.
         formula_semantic (
           subst_fo_formula t (rcompose thetal subst_id_symbol) theta) m rho
@@ -257,10 +257,10 @@ module Sem
              formula_semantic t2 m rho) }
       end in
     aux t0 m0 thetal0 theta0
-
+  
   let lemma formula_semantic_rename_commutation
-    (t:fo_formula 'fsymb 'b) (m:model 'fsymb2 'st)
-    (thetal:func 'fsymb 'fsymb2)
+    (t:fo_formula 'ls 'b) (m:model 'ls2 'st)
+    (thetal:func 'ls 'ls2)
     (theta:func 'b 'c) (rho:func 'c 'st) : unit
     ensures { formula_semantic (rename_fo_formula t thetal theta) m rho
       <-> formula_semantic t (model_rename thetal m) (rcompose theta rho) }
@@ -270,10 +270,10 @@ module Sem
       subst_fo_formula t (rcompose thetal subst_id_symbol) thetas } ;
     let p1 = rcompose theta rho in let p2 = semantic_subst thetas m rho in
     assert { extensionalEqual p1 p2 && p1 = p2 }
-
+  
   let lemma formula_semantic_term_subst_commutation
-    (t:fo_formula 'fsymb 'b) (m:model 'fsymb 'st)
-    (theta:func 'b (fo_term 'fsymb 'c)) (rho:func 'c 'st) : unit
+    (t:fo_formula 'ls 'b) (m:model 'ls 'st)
+    (theta:func 'b (fo_term 'ls 'c)) (rho:func 'c 'st) : unit
     ensures {
       formula_semantic (subst_fo_formula t subst_id_symbol theta) m rho <->
       formula_semantic t m (semantic_subst theta m rho) }
@@ -282,19 +282,19 @@ module Sem
     let rho2 = semantic_subst theta m rho in
     assert { formula_semantic t2 m rho <->
       formula_semantic t (model_rename identity m) rho2 }
-
+  
   let lemma formula_semantic_term_rename_commutation
-    (t:fo_formula 'fsymb 'b) (m:model 'fsymb 'st)
+    (t:fo_formula 'ls 'b) (m:model 'ls 'st)
     (theta:func 'b 'c) (rho:func 'c 'st) : unit
     ensures { formula_semantic (rename_fo_formula t identity theta) m rho <->
       formula_semantic t m (rcompose theta rho) }
   =
     ()
-
+  
   let rec lemma formula_list_conj_semantic_subst_commutation
-    (t:fo_formula_list 'fsymb 'b) (m:model 'fsymb2 'st)
-    (thetal:func 'fsymb 'fsymb2)
-    (theta:func 'b (fo_term 'fsymb2 'c)) (rho:func 'c 'st) : unit
+    (t:fo_formula_list 'ls 'b) (m:model 'ls2 'st)
+    (thetal:func 'ls 'ls2)
+    (theta:func 'b (fo_term 'ls2 'c)) (rho:func 'c 'st) : unit
     ensures { formula_list_conj_semantic (
       subst_fo_formula_list t (rcompose thetal subst_id_symbol) theta) m rho
       <-> formula_list_conj_semantic t
@@ -303,11 +303,11 @@ module Sem
   =
     match t with | FOFNil -> () | FOFCons _ q ->
       formula_list_conj_semantic_subst_commutation q m thetal theta rho end
-
+  
   let rec lemma formula_list_disj_semantic_subst_commutation
-    (t:fo_formula_list 'fsymb 'b) (m:model 'fsymb2 'st)
-    (thetal:func 'fsymb 'fsymb2)
-    (theta:func 'b (fo_term 'fsymb2 'c)) (rho:func 'c 'st) : unit
+    (t:fo_formula_list 'ls 'b) (m:model 'ls2 'st)
+    (thetal:func 'ls 'ls2)
+    (theta:func 'b (fo_term 'ls2 'c)) (rho:func 'c 'st) : unit
     ensures { formula_list_disj_semantic (
       subst_fo_formula_list t (rcompose thetal subst_id_symbol) theta) m rho
       <-> formula_list_disj_semantic t
@@ -317,30 +317,30 @@ module Sem
     match t with | FOFNil -> () | FOFCons _ q ->
       formula_list_disj_semantic_subst_commutation q m thetal theta rho end
 
-
+  
   let lemma formula_list_conj_semantic_term_subst_commutation
-    (t:fo_formula_list 'fsymb 'b) (m:model 'fsymb 'st)
-    (theta:func 'b (fo_term 'fsymb 'c)) (rho:func 'c 'st) : unit
+    (t:fo_formula_list 'ls 'b) (m:model 'ls 'st)
+    (theta:func 'b (fo_term 'ls 'c)) (rho:func 'c 'st) : unit
     ensures { formula_list_conj_semantic
         (subst_fo_formula_list t subst_id_symbol theta) m rho <->
       formula_list_conj_semantic t m (semantic_subst theta m rho) }
   =
     formula_list_conj_semantic_subst_commutation t m identity theta rho
-
+  
   let lemma formula_list_disj_semantic_term_subst_commutation
-    (t:fo_formula_list 'fsymb 'b) (m:model 'fsymb 'st)
-    (theta:func 'b (fo_term 'fsymb 'c)) (rho:func 'c 'st) : unit
+    (t:fo_formula_list 'ls 'b) (m:model 'ls 'st)
+    (theta:func 'b (fo_term 'ls 'c)) (rho:func 'c 'st) : unit
     ensures { formula_list_disj_semantic
         (subst_fo_formula_list t subst_id_symbol theta) m rho <->
       formula_list_disj_semantic t m (semantic_subst theta m rho) }
   =
     formula_list_disj_semantic_subst_commutation t m identity theta rho
-
+  
   let rec lemma tableau_semantic_subst_commutation
-    (t:tableau 'fsymb 'b) (m:model 'fsymb2 'st)
+    (t:tableau 'ls 'b) (m:model 'ls2 'st)
     (b:bool)
-    (thetal:func 'fsymb 'fsymb2)
-    (theta:func 'b (fo_term 'fsymb2 'c)) (rho:func 'c 'st) : unit
+    (thetal:func 'ls 'ls2)
+    (theta:func 'b (fo_term 'ls2 'c)) (rho:func 'c 'st) : unit
     ensures { tableau_semantic_with (
       subst_tableau t (rcompose thetal subst_id_symbol) theta) b m rho
       <-> tableau_semantic_with t b
@@ -358,20 +358,20 @@ module Sem
           else False in
         tableau_semantic_subst_commutation tnext m b' thetal theta rho
     end
-
+  
   let lemma tableau_semantic_term_subst_commutation
-    (t:tableau 'fsymb 'b) (b:bool) (m:model 'fsymb 'st)
-    (theta:func 'b (fo_term 'fsymb 'c)) (rho:func 'c 'st) : unit
+    (t:tableau 'ls 'b) (b:bool) (m:model 'ls 'st)
+    (theta:func 'b (fo_term 'ls 'c)) (rho:func 'c 'st) : unit
     ensures { tableau_semantic_with (
       subst_tableau t subst_id_symbol theta) b m rho <->
       tableau_semantic_with t b m (semantic_subst theta m rho) }
   =
     tableau_semantic_subst_commutation t m b identity theta rho
-
+  
   let rec lemma term_semantic_depend_only_free_var
-    (t:fo_term 'fsymb 'b) (m1 m2:model 'fsymb 'st)
+    (t:fo_term 'ls 'b) (m1 m2:model 'ls 'st)
     (rho1 rho2:func 'b 'st) : unit
-    requires { forall f:'fsymb. is_symbol_free_var_in_fo_term f t ->
+    requires { forall f:'ls. is_symbol_free_var_in_fo_term f t ->
       eval m1.interp_fun f = eval m2.interp_fun f /\
       eval m1.interp_pred f = eval m2.interp_pred f }
     requires { forall x:'b. is_fo_term_free_var_in_fo_term x t ->
@@ -382,11 +382,11 @@ module Sem
     match t with Var_fo_term x -> () | App (Var_symbol f) l ->
       term_list_semantic_depend_only_free_var l m1 m2 rho1 rho2 ;
       assert { is_symbol_free_var_in_fo_term f t } end
-
+  
   with lemma term_list_semantic_depend_only_free_var
-    (t:fo_term_list 'fsymb 'b) (m1 m2:model 'fsymb 'st)
+    (t:fo_term_list 'ls 'b) (m1 m2:model 'ls 'st)
     (rho1 rho2:func 'b 'st) : unit
-    requires { forall f:'fsymb. is_symbol_free_var_in_fo_term_list f t ->
+    requires { forall f:'ls. is_symbol_free_var_in_fo_term_list f t ->
       eval m1.interp_fun f = eval m2.interp_fun f /\
       eval m1.interp_pred f = eval m2.interp_pred f }
     requires { forall x:'b. is_fo_term_free_var_in_fo_term_list x t ->
@@ -397,19 +397,19 @@ module Sem
     match t with FONil -> () | FOCons x q ->
       term_semantic_depend_only_free_var x m1 m2 rho1 rho2 ;
       term_list_semantic_depend_only_free_var q m1 m2 rho1 rho2 end
-
+  
   let lemma formula_semantic_depend_only_free_var
-    (t:fo_formula 'fsymb0 'b0) (m1 m2:model 'fsymb0 'st0)
+    (t:fo_formula 'ls0 'b0) (m1 m2:model 'ls0 'st0)
     (rho1 rho2:func 'b0 'st0) : unit
-    requires { forall f:'fsymb0. is_symbol_free_var_in_fo_formula f t ->
+    requires { forall f:'ls0. is_symbol_free_var_in_fo_formula f t ->
       eval m1.interp_fun f = eval m2.interp_fun f /\
       eval m1.interp_pred f = eval m2.interp_pred f }
     requires { forall x:'b0. is_fo_term_free_var_in_fo_formula x t ->
       rho1 x = rho2 x }
     ensures { formula_semantic t m1 rho1 <-> formula_semantic t m2 rho2 }
   =
-    let rec aux (t:fo_formula 'fsymb 'b) (m1 m2:model 'fsymb 'st) : unit
-      requires { forall f:'fsymb. is_symbol_free_var_in_fo_formula f t ->
+    let rec aux (t:fo_formula 'ls 'b) (m1 m2:model 'ls 'st) : unit
+      requires { forall f:'ls. is_symbol_free_var_in_fo_formula f t ->
         eval m1.interp_fun f = eval m2.interp_fun f /\
         eval m1.interp_pred f = eval m2.interp_pred f }
       ensures { forall rho1 rho2:func 'b 'st.
@@ -456,11 +456,11 @@ module Sem
               eval m2.interp_pred p (term_list_semantic l m2 rho2)) }
       end in
     aux t m1 m2
-
+  
   let rec lemma formula_list_conj_semantic_depend_only_free_var
-    (t:fo_formula_list 'fsymb 'b) (m1 m2:model 'fsymb 'st)
+    (t:fo_formula_list 'ls 'b) (m1 m2:model 'ls 'st)
     (rho1 rho2:func 'b 'st) : unit
-    requires { forall f:'fsymb. is_symbol_free_var_in_fo_formula_list f t ->
+    requires { forall f:'ls. is_symbol_free_var_in_fo_formula_list f t ->
       eval m1.interp_fun f = eval m2.interp_fun f /\
       eval m1.interp_pred f = eval m2.interp_pred f }
     requires { forall x:'b. is_fo_term_free_var_in_fo_formula_list x t ->
@@ -472,11 +472,11 @@ module Sem
     match t with FOFNil -> () | FOFCons x q ->
       formula_semantic_depend_only_free_var x m1 m2 rho1 rho2 ;
       formula_list_conj_semantic_depend_only_free_var q m1 m2 rho1 rho2 end
-
+  
   let rec lemma formula_list_disj_semantic_depend_only_free_var
-    (t:fo_formula_list 'fsymb 'b) (m1 m2:model 'fsymb 'st)
+    (t:fo_formula_list 'ls 'b) (m1 m2:model 'ls 'st)
     (rho1 rho2:func 'b 'st) : unit
-    requires { forall f:'fsymb. is_symbol_free_var_in_fo_formula_list f t ->
+    requires { forall f:'ls. is_symbol_free_var_in_fo_formula_list f t ->
       eval m1.interp_fun f = eval m2.interp_fun f /\
       eval m1.interp_pred f = eval m2.interp_pred f }
     requires { forall x:'b. is_fo_term_free_var_in_fo_formula_list x t ->
@@ -488,79 +488,79 @@ module Sem
     match t with FOFNil -> () | FOFCons x q ->
       formula_semantic_depend_only_free_var x m1 m2 rho1 rho2 ;
       formula_list_disj_semantic_depend_only_free_var q m1 m2 rho1 rho2 end
-
-  predicate formula_list_mem (phi:fo_formula 'fsymb 'b)
-    (l:fo_formula_list 'fsymb 'b) = match l with
+  
+  predicate formula_list_mem (phi:fo_formula 'ls 'b)
+    (l:fo_formula_list 'ls 'b) = match l with
       | FOFNil -> false | FOFCons x q -> x = phi \/ formula_list_mem phi q end
-
+  
   let rec lemma formula_list_conj_semantic_other_def
-    (l:fo_formula_list 'fsymb 'b) (m:model 'fsymb 'st)
+    (l:fo_formula_list 'ls 'b) (m:model 'ls 'st)
     (rho:func 'b 'st) : unit
     ensures { formula_list_conj_semantic l m rho <->
-      (forall phi:fo_formula 'fsymb 'b.
+      (forall phi:fo_formula 'ls 'b.
         formula_list_mem phi l -> formula_semantic phi m rho) }
     variant { size_fo_formula_list l }
   = match l with FOFNil -> () | FOFCons _ q ->
     formula_list_conj_semantic_other_def q m rho end
-
+  
   let rec lemma formula_list_disj_semantic_other_def
-    (l:fo_formula_list 'fsymb 'b) (m:model 'fsymb 'st)
+    (l:fo_formula_list 'ls 'b) (m:model 'ls 'st)
     (rho:func 'b 'st) : unit
     ensures { formula_list_disj_semantic l m rho <->
-      (exists phi:fo_formula 'fsymb 'b.
+      (exists phi:fo_formula 'ls 'b.
         formula_list_mem phi l /\ formula_semantic phi m rho) }
     variant { size_fo_formula_list l }
   = match l with FOFNil -> () | FOFCons x q ->
     formula_list_disj_semantic_other_def q m rho end
-
+  
   (* Problem : validity/unsatifiability are not even axiomatizable in why3,
      since we would have to introduce it from a type quantification.
      However, we can define a demonstrability predicate and show for it
      the same elimination principle as unsatisfiability. *)
-
+  
   (* Demonstration object (not directly a predicate,
      so we can actually construct the proof object ourselves). *)
-
+  
   (* G |- A can be read as : for every model+interpretation,
      if /\G is true then A too.
      Which in particular mean : if G |- false, G have no model,
      so we can use G |- false instead of unsat predicate as long
      as it can represent all our demonstration steps. *)
-
-  (*type demonstration 'fsymb 'b =
+  
+  (*type demonstration 'ls 'b =
     | Axiom
-    | ModusPonens (demonstration 'fsymb 'b) (demonstration 'fsymb 'b)
-      (fo_formula 'fsymb 'b)
-    | Abstraction (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-      (fo_formula 'fsymb 'b)
-    | ConjunctionIntro (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-      (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-    | ConjunctionLeft (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-    | ConjunctionRight (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-    | DisjunctionLeft (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-      (fo_formula 'fsymb 'b)
-    | DisjunctionRight (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b)
-      (fo_formula 'fsymb 'b)
-    | DisjunctionElim (demonstration 'fsymb 'b) (demonstration 'fsymb 'b)
-      (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b) (fo_formula 'fsymb 'b)
-    | UniversalInstantiation (demonstration 'fsymb 'b)
-      (fo_formula 'fsymb (option 'b)) (fo_term 'fsymb 'b)
-    | Instantiation (demonstration 'fsymb 'b)
-      (fo_formula_list 'fsymb 'b)
-      (fo_formula 'fsymb 'b) 'b (fo_term 'fsymb 'b)
-    | ExistentialIntroduction (demonstration 'fsymb 'b)
-      (fo_formula 'fsymb (option 'b)) (fo_term 'fsymb 'b)
-    | ExistentialElimination (demonstration 'fsymb 'b)
-      (demonstration 'fsymb 'b)
-      (fo_formula 'fsymb (option 'b)) (fo_formula 'fsymb (option 'b))
-    | PointlessExistential (demonstration 'fsymb 'b)
-    | ExFalso (demonstration 'fsymb 'b)
+    | ModusPonens (demonstration 'ls 'b) (demonstration 'ls 'b)
+      (fo_formula 'ls 'b)
+    | Abstraction (demonstration 'ls 'b) (fo_formula 'ls 'b)
+      (fo_formula 'ls 'b)
+    | ConjunctionIntro (demonstration 'ls 'b) (fo_formula 'ls 'b)
+      (demonstration 'ls 'b) (fo_formula 'ls 'b)
+    | ConjunctionLeft (demonstration 'ls 'b) (fo_formula 'ls 'b)
+    | ConjunctionRight (demonstration 'ls 'b) (fo_formula 'ls 'b)
+    | DisjunctionLeft (demonstration 'ls 'b) (fo_formula 'ls 'b)
+      (fo_formula 'ls 'b)
+    | DisjunctionRight (demonstration 'ls 'b) (fo_formula 'ls 'b)
+      (fo_formula 'ls 'b)
+    | DisjunctionElim (demonstration 'ls 'b) (demonstration 'ls 'b)
+      (demonstration 'ls 'b) (fo_formula 'ls 'b) (fo_formula 'ls 'b)
+    | UniversalInstantiation (demonstration 'ls 'b)
+      (fo_formula 'ls (option 'b)) (fo_term 'ls 'b)
+    | Instantiation (demonstration 'ls 'b)
+      (fo_formula_list 'ls 'b)
+      (fo_formula 'ls 'b) 'b (fo_term 'ls 'b)
+    | ExistentialIntroduction (demonstration 'ls 'b)
+      (fo_formula 'ls (option 'b)) (fo_term 'ls 'b)
+    | ExistentialElimination (demonstration 'ls 'b)
+      (demonstration 'ls 'b)
+      (fo_formula 'ls (option 'b)) (fo_formula 'ls (option 'b))
+    | PointlessExistential (demonstration 'ls 'b)
+    | ExFalso (demonstration 'ls 'b)
     | Trivial
-    | Weakening (demonstration 'fsymb 'b) (fo_formula_list 'fsymb 'b)
-    | Skolemization (demonstration 'fsymb 'b) (fo_formula 'fsymb 'b) 'fsymb*)
-
-  (*predicate is_skolem_axiom (phi:fo_formula 'fsymb 'b) (f:'fsymb)
-    (env:fo_term_list 'fsymb 'b) =
+    | Weakening (demonstration 'ls 'b) (fo_formula_list 'ls 'b)
+    | Skolemization (demonstration 'ls 'b) (fo_formula 'ls 'b) 'ls*)
+  
+  (*predicate is_skolem_axiom (phi:fo_formula 'ls 'b) (f:'ls)
+    (env:fo_term_list 'ls 'b) =
     match phi with
       | Forall phi2 -> is_skolem_axiom phi2 f
         (FOCons (Var_fo_term None) (rename_fo_term_list env identity some))
@@ -570,7 +570,7 @@ module Sem
         not(is_symbol_free_var_in_fo_formula f phi2)
       | _ -> false
     end*)
-
+  
   (*(* Hack to force possibility of instantiation of extend_env
      definition axiom ! *)
   function extend_env_selection (g:func (list 'st) (func 'b 'st))
@@ -590,63 +590,63 @@ module Sem
       | Cons y q -> extend_env_selection g x y q
       | Nil -> default
     end
-
+  
   lemma extend_env_none : forall g:func (list 'st) (func 'b 'st),
     y:'st,l:list 'st. extend_env g (Cons y l) None = y
   lemma extend_env_some : forall g:func (list 'st) (func 'b 'st),
     x:'b,y:'st,l:list 'st. extend_env g (Cons y l) (Some x) = g l x*)
-
+  
   (* Abstraction-definition axiom :
-    function skolem_predicate (phi:fo_formula 'fsymb (option 'b))
-      (m:model 'fsymb 'st) (rho:func 'b 'st) : pred 'st =
+    function skolem_predicate (phi:fo_formula 'ls (option 'b))
+      (m:model 'ls 'st) (rho:func 'b 'st) : pred 'st =
       (\ x:'st. formula_semantic phi m (ocase rho x) ) *)
-  function skolem_predicate (phi:fo_formula 'fsymb (option 'b))
-    (m:model 'fsymb 'st) (rho:func 'b 'st) : pred 'st
-  axiom skolem_predicate_def : forall phi:fo_formula 'fsymb (option 'b),
-    m:model 'fsymb 'st,rho:func 'b 'st,x:'st.
+  function skolem_predicate (phi:fo_formula 'ls (option 'b))
+    (m:model 'ls 'st) (rho:func 'b 'st) : pred 'st
+  axiom skolem_predicate_def : forall phi:fo_formula 'ls (option 'b),
+    m:model 'ls 'st,rho:func 'b 'st,x:'st.
     skolem_predicate phi m rho x <-> formula_semantic phi m (ocase rho x)
-
+  
   (* Abstraction-definition axiom :
-    function skolem_function (phi:fo_formula 'fsymb (option 'b))
-      (m:model 'fsymb 'st) (g:func (list 'st) (func 'b 'st)) : func (list 'st) 'st
+    function skolem_function (phi:fo_formula 'ls (option 'b))
+      (m:model 'ls 'st) (g:func (list 'st) (func 'b 'st)) : func (list 'st) 'st
       = (\ l:list 'st. choice (skolem_predicate phi m rho (g l)) ) *)
-  function skolem_function (phi:fo_formula 'fsymb (option 'b))
-    (m:model 'fsymb 'st) (g:func (list 'st) (func 'b 'st)) : func (list 'st) 'st
-  axiom skolem_function_def : forall phi:fo_formula 'fsymb (option 'b),
-    m:model 'fsymb 'st,g:func (list 'st) (func 'b 'st),l:list 'st.
+  function skolem_function (phi:fo_formula 'ls (option 'b))
+    (m:model 'ls 'st) (g:func (list 'st) (func 'b 'st)) : func (list 'st) 'st
+  axiom skolem_function_def : forall phi:fo_formula 'ls (option 'b),
+    m:model 'ls 'st,g:func (list 'st) (func 'b 'st),l:list 'st.
     skolem_function phi m g l = choice (skolem_predicate phi m (g l))
-
+  
   (* Abstraction-definition axiom :
-    function skolem_transformer (phi:fo_formula 'fsymb (option 'b)) (f:'fsymb)
-      (g:func (list 'st) (func 'b 'st)) : func (model 'fsymb 'st) (model 'fsymb 'st) =
-      (\ m:model 'fsymb 'st.
+    function skolem_transformer (phi:fo_formula 'ls (option 'b)) (f:'ls)
+      (g:func (list 'st) (func 'b 'st)) : func (model 'ls 'st) (model 'ls 'st) =
+      (\ m:model 'ls 'st.
         {
           interp_fun = m.interp_fun[f <- skolem_function phi m g] ;
           interp_pred = m.interp_pred ;
         }) *)
-
-  function skolem_transformer (phi:fo_formula 'fsymb (option 'b)) (f:'fsymb)
-    (g:func (list 'st) (func 'b 'st)) : func (model 'fsymb 'st) (model 'fsymb 'st)
-  axiom skolem_transformer_def : forall phi:fo_formula 'fsymb (option 'b),f:'fsymb,
-    g:func (list 'st) (func 'b 'st), m:model 'fsymb 'st.
+  
+  function skolem_transformer (phi:fo_formula 'ls (option 'b)) (f:'ls)
+    (g:func (list 'st) (func 'b 'st)) : func (model 'ls 'st) (model 'ls 'st)
+  axiom skolem_transformer_def : forall phi:fo_formula 'ls (option 'b),f:'ls,
+    g:func (list 'st) (func 'b 'st), m:model 'ls 'st.
     skolem_transformer phi f g m = {
       interp_fun = m.interp_fun[f <- skolem_function phi m g] ;
       interp_pred = m.interp_pred ;
     }
-
-  let ghost skolem_model_transformer (phi:fo_formula 'fsymb (option 'b)) (f:'fsymb)
-    (vars:fo_term_list 'fsymb 'b)
-    (g:func (list 'st) (func 'b 'st)) : func (model 'fsymb 'st) (model 'fsymb 'st)
+  
+  let ghost skolem_model_transformer (phi:fo_formula 'ls (option 'b)) (f:'ls)
+    (vars:fo_term_list 'ls 'b)
+    (g:func (list 'st) (func 'b 'st)) : func (model 'ls 'st) (model 'ls 'st)
     requires { not(is_symbol_free_var_in_fo_formula f phi) }
-    requires { forall m:model 'fsymb 'st, rho:func 'b 'st,x:'b.
+    requires { forall m:model 'ls 'st, rho:func 'b 'st,x:'b.
       is_fo_term_free_var_in_fo_formula (Some x) phi ->
         g (term_list_semantic vars m rho) x = rho x }
     requires { not(is_symbol_free_var_in_fo_term_list f vars) }
-    ensures { forall m:model 'fsymb 'st.
+    ensures { forall m:model 'ls 'st.
       m.interp_pred = (result m).interp_pred }
-    ensures { forall m:model 'fsymb 'st,f0:'fsymb.
+    ensures { forall m:model 'ls 'st,f0:'ls.
       f0 <> f -> eval m.interp_fun f0 = eval (result m).interp_fun f0 }
-    ensures { forall m:model 'fsymb 'st,rho:func 'b 'st.
+    ensures { forall m:model 'ls 'st,rho:func 'b 'st.
       formula_semantic (Exists phi) m rho ->
       formula_semantic (subst_fo_formula phi subst_id_symbol
         (ocase subst_id_fo_term (App (Var_symbol f) vars))) (result m) rho }
@@ -655,7 +655,7 @@ module Sem
     let skt = App (Var_symbol f) vars in
     let sks = ocase subst_id_fo_term skt in
     let phi' = subst_fo_formula phi subst_id_symbol sks in
-    assert { forall m:model 'fsymb 'st,rho:func 'b 'st.
+    assert { forall m:model 'ls 'st,rho:func 'b 'st.
       let semf = skolem_function phi m g in
       let skm = skf m in
       let em = term_list_semantic vars m rho in
@@ -675,7 +675,7 @@ module Sem
        s1 None = s2 None &&
        (forall y:'b. s1 (Some y) = s2 (Some y)) &&
        extensionalEqual s1 s2 &&
-       (forall f':'fsymb. is_symbol_free_var_in_fo_formula f' phi ->
+       (forall f':'ls. is_symbol_free_var_in_fo_formula f' phi ->
           eval m.interp_fun f' = eval skm.interp_fun f' /\
           eval m.interp_pred f' = eval skm.interp_pred f') &&
        (forall x:'st.
@@ -691,22 +691,22 @@ module Sem
          formula_semantic phi' skm rho)
     } ;
     skf
-
+  
   (*
-  let ghost skolemized_model (phi0:fo_formula 'fsymb0 'b0) (f0:'fsymb0)
-    (m0:model 'fsymb0 'st) : model 'fsymb0 'st
+  let ghost skolemized_model (phi0:fo_formula 'ls0 'b0) (f0:'ls0)
+    (m0:model 'ls0 'st) : model 'ls0 'st
     requires { is_skolem_axiom phi0 f0 FONil }
     requires { forall x:'b0. not(is_fo_term_free_var_in_fo_formula x phi0) }
     ensures { forall rho:func 'b0 'st.
       formula_semantic phi0 result rho }
     ensures { m0.interp_pred = result.interp_pred }
-    ensures { forall f':'fsymb0. f0 <> f' ->
+    ensures { forall f':'ls0. f0 <> f' ->
       eval m0.interp_fun f' = eval result.interp_fun f' }
   =
-    let rec aux (phi:fo_formula 'fsymb 'b) (f:'fsymb)
-      (env:fo_term_list 'fsymb 'b)
+    let rec aux (phi:fo_formula 'ls 'b) (f:'ls)
+      (env:fo_term_list 'ls 'b)
       (g:func (list 'st) (func 'b 'st))
-      (m:model 'fsymb 'st) : model 'fsymb 'st
+      (m:model 'ls 'st) : model 'ls 'st
       requires { is_skolem_axiom phi f env }
       requires { forall rho:func 'b 'st,x:'b.
         is_fo_term_free_var_in_fo_formula x phi ->
@@ -715,7 +715,7 @@ module Sem
       ensures { forall rho:func 'b 'st.
         formula_semantic phi result rho }
       ensures { m.interp_pred = result.interp_pred }
-      ensures { forall f':'fsymb. f <> f' ->
+      ensures { forall f':'ls. f <> f' ->
         eval m.interp_fun f' = eval result.interp_fun f' }
       variant { size_fo_formula phi }
     =
@@ -762,7 +762,7 @@ module Sem
               s1 None = s2 None &&
               (forall y:'b. s1 (Some y) = s2 (Some y)) &&
               extensionalEqual s1 s2 &&
-            (forall f':'fsymb. is_symbol_free_var_in_fo_formula f' phi2 ->
+            (forall f':'ls. is_symbol_free_var_in_fo_formula f' phi2 ->
               eval m.interp_fun f' = eval skm.interp_fun f' /\
               eval m.interp_pred f' = eval skm.interp_pred f') &&
             (forall x:'st.
@@ -780,9 +780,9 @@ module Sem
         | _ -> absurd
       end in
     aux phi0 f0 FONil default m0*)
-
-  (*predicate deducible_from (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) =
+  
+  (*predicate deducible_from (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) (d:demonstration 'ls 'b) =
     match d with
       | Axiom -> formula_list_mem phi gamma
       | ModusPonens d1 d2 phi2 -> deducible_from gamma phi2 d1 /\
@@ -827,7 +827,7 @@ module Sem
       | Trivial -> phi = FTrue
       | Weakening d gamma2 ->
         deducible_from gamma2 phi d /\
-        (forall phi0:fo_formula 'fsymb 'b.
+        (forall phi0:fo_formula 'ls 'b.
           formula_list_mem phi0 gamma2 ->
           formula_list_mem phi0 gamma)
       | Skolemization d phis f ->
@@ -837,17 +837,17 @@ module Sem
         is_skolem_axiom phis f FONil /\
         (forall x:'b. not(is_fo_term_free_var_in_fo_formula x phis))
     end
-
-  let lemma deducible_correct (gamma0:fo_formula_list 'fsymb 'b0)
-    (phi0:fo_formula 'fsymb 'b0) (d0:demonstration 'fsymb 'b0)
-    (m0:model 'fsymb 'st0) (rho0:func 'b0 'st0) : unit
+  
+  let lemma deducible_correct (gamma0:fo_formula_list 'ls 'b0)
+    (phi0:fo_formula 'ls 'b0) (d0:demonstration 'ls 'b0)
+    (m0:model 'ls 'st0) (rho0:func 'b0 'st0) : unit
     requires { deducible_from gamma0 phi0 d0 }
     requires { formula_list_conj_semantic gamma0 m0 rho0 }
     ensures { formula_semantic phi0 m0 rho0 }
   =
-    let rec ghost aux (gamma:fo_formula_list 'fsymb 'b)
-      (phi:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b)
-      (m:model 'fsymb 'st) : unit
+    let rec ghost aux (gamma:fo_formula_list 'ls 'b)
+      (phi:fo_formula 'ls 'b) (d:demonstration 'ls 'b)
+      (m:model 'ls 'st) : unit
       requires { deducible_from gamma phi d }
       ensures { forall rho:func 'b 'st.
         formula_list_conj_semantic gamma m rho ->
@@ -915,56 +915,56 @@ module Sem
         | _ -> absurd
       end in
     aux gamma0 phi0 d0 m0
-
-  predicate entail (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) =
-    exists d:demonstration 'fsymb 'b.
+  
+  predicate entail (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) =
+    exists d:demonstration 'ls 'b.
       deducible_from gamma phi d
-
-  predicate unsat (gamma:fo_formula_list 'fsymb 'b) =
+  
+  predicate unsat (gamma:fo_formula_list 'ls 'b) =
     entail gamma FFalse
-
-  predicate valid (phi:fo_formula 'fsymb 'b) =
+  
+  predicate valid (phi:fo_formula 'ls 'b) =
     entail FOFNil phi
-
-  lemma entail_correct : forall gamma:fo_formula_list 'fsymb 'b,
-    phi:fo_formula 'fsymb 'b,m:model 'fsymb 'st,rho:func 'b 'st.
+  
+  lemma entail_correct : forall gamma:fo_formula_list 'ls 'b,
+    phi:fo_formula 'ls 'b,m:model 'ls 'st,rho:func 'b 'st.
     entail gamma phi ->
       formula_list_conj_semantic gamma m rho -> formula_semantic phi m rho
-
-  lemma unsat_correct : forall gamma:fo_formula_list 'fsymb 'b,
-    m:model 'fsymb 'st,rho:func 'b 'st.
+  
+  lemma unsat_correct : forall gamma:fo_formula_list 'ls 'b,
+    m:model 'ls 'st,rho:func 'b 'st.
     unsat gamma -> not(formula_list_conj_semantic gamma m rho)
-
-  lemma valid_correct : forall phi:fo_formula 'fsymb 'b,
-    m:model 'fsymb 'st,rho:func 'b 'st.
+  
+  lemma valid_correct : forall phi:fo_formula 'ls 'b,
+    m:model 'ls 'st,rho:func 'b 'st.
     valid phi -> formula_semantic phi m rho
-
-  function imply (phi1 phi2:fo_formula 'fsymb 'b) : fo_formula 'fsymb 'b =
+  
+  function imply (phi1 phi2:fo_formula 'ls 'b) : fo_formula 'ls 'b =
     Or (Not phi1) phi2
-
-  function equiv (phi1 phi2:fo_formula 'fsymb 'b) : fo_formula 'fsymb 'b =
+  
+  function equiv (phi1 phi2:fo_formula 'ls 'b) : fo_formula 'ls 'b =
     And (imply phi1 phi2) (imply phi2 phi1)
-
-  type sequent 'fsymb 'b = {
-    demo : demonstration 'fsymb 'b ;
-    context : fo_formula_list 'fsymb 'b ;
-    conclusion : fo_formula 'fsymb 'b ;
+  
+  type sequent 'ls 'b = {
+    demo : demonstration 'ls 'b ;
+    context : fo_formula_list 'ls 'b ;
+    conclusion : fo_formula 'ls 'b ;
   }
-
-  predicate sequent_correct (s:sequent 'fsymb 'b) =
+  
+  predicate sequent_correct (s:sequent 'ls 'b) =
     deducible_from s.context s.conclusion s.demo
-
-  let ghost make_axiom (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost make_axiom (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) : sequent 'ls 'b
     requires { formula_list_mem phi gamma }
     ensures { sequent_correct result }
     ensures { result.context = gamma }
     ensures { result.conclusion = phi }
   = { demo = Axiom ; context = gamma ; conclusion = phi }
-
-  let ghost make_abstraction (s:sequent 'fsymb 'b) :
-    sequent 'fsymb 'b
+  
+  let ghost make_abstraction (s:sequent 'ls 'b) :
+    sequent 'ls 'b
     requires { sequent_correct s }
     requires { match s.context with FOFNil -> false | _ -> true end }
     ensures { sequent_correct result }
@@ -974,8 +974,8 @@ module Sem
       | FOFCons x q -> { demo = Abstraction s.demo x s.conclusion ;
         context = q ; conclusion = imply x s.conclusion }
     end
-
-  let ghost modus_ponens (s1 s2:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost modus_ponens (s1 s2:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s1 /\ sequent_correct s2 }
     requires { match s1.conclusion with
       | Or (Not phi1) phi2 -> s2.conclusion = phi1
@@ -991,15 +991,15 @@ module Sem
         context = s1.context ;
         conclusion = phi2 }
     | _ -> absurd end
-
-  let ghost make_classical (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost make_classical (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) : sequent 'ls 'b
     ensures { sequent_correct result }
     ensures { result.context = gamma }
     ensures { result.conclusion = Or (Not phi) phi }
   = make_abstraction (make_axiom (FOFCons phi gamma) phi)
-
-  let ghost disjunction_elimination (s1 s2 s3:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost disjunction_elimination (s1 s2 s3:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s1 /\ sequent_correct s2 /\ sequent_correct s3 }
     requires { match s1.conclusion , s2.conclusion , s3.conclusion with
       | Or phi1 phi2 , Or (Not phi1') phi3 , Or (Not phi2') phi3' ->
@@ -1019,9 +1019,9 @@ module Sem
           conclusion = phi3 ; }
       | _ -> absurd
     end
-
-  let ghost disjunction_left (s:sequent 'fsymb 'b) (phi2:fo_formula 'fsymb 'b) :
-    sequent 'fsymb 'b
+  
+  let ghost disjunction_left (s:sequent 'ls 'b) (phi2:fo_formula 'ls 'b) :
+    sequent 'ls 'b
     requires { sequent_correct s }
     ensures { sequent_correct result }
     ensures { result.conclusion = Or s.conclusion phi2 }
@@ -1030,9 +1030,9 @@ module Sem
     { demo = DisjunctionLeft s.demo s.conclusion phi2 ;
       context = s.context ;
       conclusion = Or s.conclusion phi2 }
-
-  let ghost disjunction_right (phi1:fo_formula 'fsymb 'b) (s:sequent 'fsymb 'b) :
-    sequent 'fsymb 'b
+  
+  let ghost disjunction_right (phi1:fo_formula 'ls 'b) (s:sequent 'ls 'b) :
+    sequent 'ls 'b
     requires { sequent_correct s }
     ensures { sequent_correct result }
     ensures { result.conclusion = Or phi1 s.conclusion }
@@ -1041,8 +1041,8 @@ module Sem
     { demo = DisjunctionRight s.demo phi1 s.conclusion ;
       context = s.context ;
       conclusion = Or phi1 s.conclusion }
-
-  let ghost conjunction (s1 s2:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost conjunction (s1 s2:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s1 /\ sequent_correct s2 }
     requires { s1.context = s2.context }
     ensures { sequent_correct result }
@@ -1052,8 +1052,8 @@ module Sem
     { demo = ConjunctionIntro s1.demo s1.conclusion s2.demo s2.conclusion ;
       context = s1.context ;
       conclusion = And s1.conclusion s2.conclusion }
-
-  let ghost conjunction_left (s:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost conjunction_left (s:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s }
     requires { match s.conclusion with And _ _ -> true | _ -> false end }
     ensures { sequent_correct result }
@@ -1066,8 +1066,8 @@ module Sem
         conclusion = phi1 }
       | _ -> absurd
     end
-
-  let ghost conjunction_right (s:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost conjunction_right (s:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s }
     requires { match s.conclusion with And _ _ -> true | _ -> false end }
     ensures { sequent_correct result }
@@ -1080,25 +1080,25 @@ module Sem
         conclusion = phi1 }
       | _ -> absurd
     end
-
-  let ghost exfalso (s:sequent 'fsymb 'b) (phi:fo_formula 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost exfalso (s:sequent 'ls 'b) (phi:fo_formula 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s }
     requires { match s.conclusion with FFalse -> true | _ -> false end }
     ensures { sequent_correct result }
     ensures { result.context = s.context }
     ensures { result.conclusion = phi }
   = { demo = ExFalso s.demo ; context = s.context ; conclusion = phi }
-
-  let ghost make_trivial (gamma:fo_formula_list 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost make_trivial (gamma:fo_formula_list 'ls 'b) : sequent 'ls 'b
     ensures { sequent_correct result }
     ensures { result.context = gamma }
     ensures { result.conclusion = FTrue }
   = { demo = Trivial ; context = gamma ; conclusion = FTrue }
-
-  let ghost weaken (gamma:fo_formula_list 'fsymb 'b)
-    (s:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost weaken (gamma:fo_formula_list 'ls 'b)
+    (s:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s }
-    requires { forall phi:fo_formula 'fsymb 'b.
+    requires { forall phi:fo_formula 'ls 'b.
       formula_list_mem phi s.context -> formula_list_mem phi gamma }
     ensures { sequent_correct result }
     ensures { result.context = gamma }
@@ -1106,8 +1106,8 @@ module Sem
   = { demo = Weakening s.demo s.context ;
       context = gamma ;
       conclusion = s.conclusion }
-
-  let ghost skolem_elim (f:'fsymb) (s:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost skolem_elim (f:'ls) (s:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s }
     requires { match s.context with FOFCons phis gamma ->
       is_skolem_axiom phis f FONil /\
@@ -1124,8 +1124,8 @@ module Sem
         context = gamma ;
         conclusion = s.conclusion }
       | _ -> absurd end
-
-  let ghost conjunction_commutative (s:sequent 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost conjunction_commutative (s:sequent 'ls 'b) : sequent 'ls 'b
     requires { sequent_correct s }
     requires { match s.conclusion with And _ _ -> true | _ -> false end }
     ensures { sequent_correct result }
@@ -1133,21 +1133,21 @@ module Sem
     ensures { match s.conclusion with And phi1 phi2 ->
       result.conclusion = And phi2 phi1 | _ -> false end }
   = conjunction (conjunction_right s) (conjunction_left s)
-
-  let ghost equiv_reflexive (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) : sequent 'fsymb 'b
+  
+  let ghost equiv_reflexive (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) : sequent 'ls 'b
     ensures { sequent_correct result }
     ensures { result.context = gamma }
     ensures { result.conclusion = equiv phi phi }
   =
     let u = make_classical gamma phi in
     conjunction u u
-
+  
   (*
-
-  let ghost imply_or_morphism (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2 phi3 phi4:fo_formula 'fsymb 'b)
-    (d1 d2:demonstration 'fsymb 'b) : demonstration 'fsymb 'b
+  
+  let ghost imply_or_morphism (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2 phi3 phi4:fo_formula 'ls 'b)
+    (d1 d2:demonstration 'ls 'b) : demonstration 'ls 'b
     requires { deducible_from gamma (imply phi1 phi3) d1 }
     requires { deducible_from gamma (imply phi2 phi4) d2 }
     ensures { deducible_from gamma
@@ -1170,10 +1170,10 @@ module Sem
         (disjunction_left gamma121 phi3 phi4 d1))
       (make_abstraction gamma12 phi2 o34
         (disjunction_right gamma122 phi3 phi4 d2))
-
-  let ghost equiv_or_morphism (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2 phi3 phi4:fo_formula 'fsymb 'b)
-    (d1 d2:demonstration 'fsymb 'b) : demonstration 'fsymb 'b
+  
+  let ghost equiv_or_morphism (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2 phi3 phi4:fo_formula 'ls 'b)
+    (d1 d2:demonstration 'ls 'b) : demonstration 'ls 'b
     requires { deducible_from gamma (equiv phi1 phi3) d1 }
     requires { deducible_from gamma (equiv phi2 phi4) d2 }
     ensures { deducible_from gamma
@@ -1188,12 +1188,12 @@ module Sem
       (conjunction_right gamma (imply phi2 phi4) (imply phi4 phi2) d2) in
     conjunction (imply o12 o34) (imply o34 o12) way1 way2
   *)
-
-
+  
+  
   (*
-  let ghost disjunction_commutation (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) :
-    demonstration 'fsymb 'b
+  let ghost disjunction_commutation (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b) (d:demonstration 'ls 'b) :
+    demonstration 'ls 'b
     requires { deducible_from gamma (Or phi1 phi2) d }
     ensures { deducible_from gamma (Or phi2 phi1) result }
   =
@@ -1204,10 +1204,10 @@ module Sem
     let d1 = make_abstraction gamma phi1 o d1 in
     let d2 = make_abstraction gamma phi2 o d2 in
     disjunction_elimination gamma phi1 phi2 o d d1 d2
-
-  let ghost disjunction_associative_r (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2 phi3:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) :
-    demonstration 'fsymb 'b
+  
+  let ghost disjunction_associative_r (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2 phi3:fo_formula 'ls 'b) (d:demonstration 'ls 'b) :
+    demonstration 'ls 'b
     requires { deducible_from gamma (Or (Or phi1 phi2) phi3) d }
     ensures { deducible_from gamma (Or phi1 (Or phi2 phi3)) result }
   =
@@ -1232,10 +1232,10 @@ module Sem
     let d12 = make_abstraction gamma o12 oa d12 in
     let d3 = make_abstraction gamma phi3 oa d3 in
     disjunction_elimination gamma o12 phi3 oa d d12 d3
-
-  let ghost disjunction_associative_l (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2 phi3:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) :
-    demonstration 'fsymb 'b
+  
+  let ghost disjunction_associative_l (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2 phi3:fo_formula 'ls 'b) (d:demonstration 'ls 'b) :
+    demonstration 'ls 'b
     requires { deducible_from gamma (Or phi1 (Or phi2 phi3)) d }
     ensures { deducible_from gamma (Or (Or phi1 phi2) phi3) result }
   =
@@ -1261,11 +1261,11 @@ module Sem
     let d1 = make_abstraction gamma phi1 oa d1 in
     disjunction_elimination gamma phi1 o23 oa d d1 d23
   *)
-
+  
   (*
-  let ghost double_negation_elimination (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) :
-    demonstration 'fsymb 'b
+  let ghost double_negation_elimination (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) (d:demonstration 'ls 'b) :
+    demonstration 'ls 'b
     requires { deducible_from gamma (Not (Not phi)) d }
     ensures { deducible_from gamma phi result }
   =
@@ -1275,147 +1275,147 @@ module Sem
     let d2 = disjunction_left gamma nnphi phi d in
     disjunction_elimination gamma nphi phi phi d0 d2 d0
   *)
-
-  (*let ghost false_neutral_left_disjunction (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) :
-    demonstration 'fsymb 'b
+  
+  (*let ghost false_neutral_left_disjunction (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) (d:demonstration 'ls 'b) :
+    demonstration 'ls 'b
     requires { deducible_from gamma (Or FFalse phi) d }
     ensures { deducible_from gamma phi result }
   =
     let d1 = Abstraction (ExFalso Axiom) FFalse phi in
     let d2 = Abstraction Axiom phi phi in
     DisjunctionElim d d1 d2 FFalse phi
-
-  let ghost false_neutral_right_disjunction (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) (d:demonstration 'fsymb 'b) :
-    demonstration 'fsymb 'b
+  
+  let ghost false_neutral_right_disjunction (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) (d:demonstration 'ls 'b) :
+    demonstration 'ls 'b
     requires { deducible_from gamma (Or phi FFalse) d }
     ensures { deducible_from gamma phi result }
   =
     false_neutral_left_disjunction gamma phi
       (disjunction_commutation gamma phi FFalse d)*)
-
+  
   (*(* Now we do not need the demonstration object anymore. *)
-
-  let lemma entail_axiom (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) : unit
+  
+  let lemma entail_axiom (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) : unit
     requires { formula_list_mem phi gamma }
     ensures { entail gamma phi }
   =
     ()
-
-  let lemma entail_modus_ponens (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b) : unit
+  
+  let lemma entail_modus_ponens (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b) : unit
     requires { entail gamma phi1 /\ entail gamma (Or (Not phi1) phi2) }
     ensures { entail gamma phi2 }
   =
-    assert { forall d1 d2:demonstration 'fsymb 'b.
+    assert { forall d1 d2:demonstration 'ls 'b.
       deducible_from gamma phi1 d1 /\
       deducible_from gamma (Or (Not phi1) phi2) d2 ->
       deducible_from gamma phi2 (ModusPonens d1 d2 phi1) }
-
-  let lemma entail_abstraction (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b) : unit
+  
+  let lemma entail_abstraction (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b) : unit
     requires { entail (FOFCons phi1 gamma) phi2 }
     ensures { entail gamma (Or (Not phi1) phi2) }
   =
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from (FOFCons phi1 gamma) phi2 d ->
       deducible_from gamma (Or (Not phi1) phi2) (Abstraction d phi1 phi2) }
-
-  let lemma entail_conjunction (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b) : unit
+  
+  let lemma entail_conjunction (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b) : unit
     ensures { entail gamma (And phi1 phi2)
       <-> entail gamma phi1 /\ entail gamma phi2 }
   =
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from gamma (And phi1 phi2) d ->
       deducible_from gamma phi1 (ConjunctionLeft d phi2) /\
       deducible_from gamma phi2 (ConjunctionRight d phi1) } ;
-    assert { forall d1 d2:demonstration 'fsymb 'b.
+    assert { forall d1 d2:demonstration 'ls 'b.
       deducible_from gamma phi1 d1 /\
       deducible_from gamma phi2 d2 ->
       deducible_from gamma (And phi1 phi2) (ConjunctionIntro d1 phi1 d2 phi2) }
-
-  let lemma entail_disjunction_left (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b)
+  
+  let lemma entail_disjunction_left (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b)
     requires { entail gamma phi1 }
     ensures { entail gamma (Or phi1 phi2) }
   =
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from gamma phi1 d ->
       deducible_from gamma (Or phi1 phi2) (DisjunctionLeft d phi1 phi2) }
-
-  let lemma entail_disjunction_right (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b)
+  
+  let lemma entail_disjunction_right (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b)
     requires { entail gamma phi2 }
     ensures { entail gamma (Or phi1 phi2) }
   =
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from gamma phi2 d ->
       deducible_from gamma (Or phi1 phi2) (DisjunctionRight d phi1 phi2) }
-
-  let lemma entail_disjunction_elim (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2 phi3:fo_formula 'fsymb 'b)
+  
+  let lemma entail_disjunction_elim (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2 phi3:fo_formula 'ls 'b)
     requires { entail gamma (Or phi1 phi2) }
     requires { entail gamma (Or (Not phi1) phi3) }
     requires { entail gamma (Or (Not phi2) phi3) }
     ensures { entail gamma phi3 }
   =
-    assert { forall d1 d2 d3:demonstration 'fsymb 'b.
+    assert { forall d1 d2 d3:demonstration 'ls 'b.
       deducible_from gamma (Or phi1 phi2) d1 /\
       deducible_from gamma (Or (Not phi1) phi3) d2 /\
       deducible_from gamma (Or (Not phi2) phi3) d3 ->
       deducible_from gamma phi3 (DisjunctionElim d1 d2 d3 phi1 phi2) }
-
-  let lemma entail_universal_instantiation (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb (option 'b)) (t:fo_term 'fsymb 'b)
+  
+  let lemma entail_universal_instantiation (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls (option 'b)) (t:fo_term 'ls 'b)
     requires { entail gamma (Forall phi) }
     ensures { entail gamma (subst_fo_formula phi
       (ocase subst_id_fo_term t)) }
   =
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from gamma (Forall phi) d ->
       deducible_from gamma (subst_fo_formula phi
         (ocase subst_id_fo_term t)) (UniversalInstantiation d phi t) }
-
-  let lemma entail_instantiation (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb 'b) (x:'b) (t:fo_term 'fsymb 'b)
+  
+  let lemma entail_instantiation (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls 'b) (x:'b) (t:fo_term 'ls 'b)
     requires { entail gamma phi }
     ensures { let s = subst_id_fo_term[x<-t] in
       entail (subst_fo_formula_list gamma s) (subst_fo_formula phi s) }
   =
     let s = subst_id_fo_term[x<-t] in
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from gamma phi d ->
       deducible_from (subst_fo_formula_list gamma s)
         (subst_fo_formula phi s) (Instantiation d gamma phi x t) }
-
-  let lemma entail_existential_introduction (gamma:fo_formula_list 'fsymb 'b)
-    (phi:fo_formula 'fsymb (option 'b)) (t:fo_term 'fsymb 'b)
+  
+  let lemma entail_existential_introduction (gamma:fo_formula_list 'ls 'b)
+    (phi:fo_formula 'ls (option 'b)) (t:fo_term 'ls 'b)
     requires { entail gamma (subst_fo_formula phi
       (ocase subst_id_fo_term t)) }
     ensures { entail gamma (Exists phi) }
   =
-    assert { forall d:demonstration 'fsymb 'b.
+    assert { forall d:demonstration 'ls 'b.
       deducible_from gamma (subst_fo_formula phi
         (ocase subst_id_fo_term t)) d ->
       deducible_from gamma (Exists phi) (ExistentialIntroduction d phi t) }
-
-  let lemma entail_existential_elimination (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb (option 'b))
+  
+  let lemma entail_existential_elimination (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls (option 'b))
     requires { entail gamma (Forall (Or (Not phi1) phi2)) }
     requires { entail gamma (Exists phi1) }
     ensures { entail gamma (Exists phi2) }
   =
-    assert { forall d1 d2:demonstration 'fsymb 'b.
+    assert { forall d1 d2:demonstration 'ls 'b.
       deducible_from gamma (Forall (Or (Not phi1) phi2)) d1 /\
       deducible_from gamma (Exists phi1) d2 ->
       deducible_from gamma (Exists phi2)
         (ExistentialElimination d1 d2 phi1 phi2) }
-
-  let lemma disjunction_commutative (gamma:fo_formula_list 'fsymb 'b)
-    (phi1 phi2:fo_formula 'fsymb 'b)
+  
+  let lemma disjunction_commutative (gamma:fo_formula_list 'ls 'b)
+    (phi1 phi2:fo_formula 'ls 'b)
     requires { entail gamma (Or phi1 phi2) }
     ensures { entail gamma (Or phi2 phi1) }
   =
@@ -1426,3 +1426,4 @@ module Sem
     entail_disjunction_elim gamma phi1 phi2 (Or phi2 phi1)*)
   *)
 end
+

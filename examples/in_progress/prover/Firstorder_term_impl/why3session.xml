@@ -3,12 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="2" name="CVC3" version="2.4.1" timelimit="60" memlimit="1000"/>
-<prover id="4" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
-<prover id="6" name="Vampire" version="0.6" timelimit="120" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="10" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="11" name="Spass" version="3.7" timelimit="60" memlimit="1000"/>
-<prover id="12" name="Eprover" version="1.8-001" timelimit="120" memlimit="1000"/>
+<prover id="12" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <file name="../Firstorder_term_impl.mlw" expanded="true">
 <theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -220,9 +218,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" sum="8fbfe04f53fa102c08e83f42f16fca72" expanded="true">
+<theory name="Impl" sum="8fbfe04f53fa102c08e83f42f16fca72">
  <goal name="WP_parameter bind_var_symbol_in_fo_term_list" expl="VC for bind_var_symbol_in_fo_term_list">
- <proof prover="9"><result status="valid" time="1.50" steps="603"/></proof>
+ <proof prover="9"><result status="valid" time="1.16" steps="603"/></proof>
  </goal>
  <goal name="WP_parameter bind_var_fo_term_in_fo_term_list" expl="VC for bind_var_fo_term_in_fo_term_list">
  <proof prover="10"><result status="valid" time="0.81"/></proof>
@@ -354,12 +352,12 @@
   <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter bind_var_fo_term_in_fo_term.18" expl="18. postcondition">
-  <proof prover="10"><result status="valid" time="0.92"/></proof>
+  <proof prover="10"><result status="valid" time="0.51"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter unbind_var_symbol_in_fo_term_list" expl="VC for unbind_var_symbol_in_fo_term_list">
- <proof prover="10"><result status="valid" time="1.13"/></proof>
+ <proof prover="10"><result status="valid" time="0.87"/></proof>
  </goal>
  <goal name="WP_parameter unbind_var_fo_term_in_fo_term_list" expl="VC for unbind_var_fo_term_in_fo_term_list">
  <proof prover="10"><result status="valid" time="0.71"/></proof>
@@ -430,7 +428,7 @@
   <proof prover="9"><result status="valid" time="0.07" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_term.22" expl="22. precondition">
-  <proof prover="9"><result status="valid" time="0.44" steps="155"/></proof>
+  <proof prover="9"><result status="valid" time="0.25" steps="155"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_term.23" expl="23. precondition">
   <proof prover="9"><result status="valid" time="0.12" steps="78"/></proof>
@@ -551,7 +549,7 @@
   <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_fo_term_in_fo_term.32" expl="32. postcondition">
-  <proof prover="10"><result status="valid" time="0.60"/></proof>
+  <proof prover="10"><result status="valid" time="0.26"/></proof>
   </goal>
  </transf>
  </goal>
@@ -618,10 +616,10 @@
   <proof prover="9"><result status="valid" time="0.09" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_term_list.21" expl="21. postcondition">
-  <proof prover="10"><result status="valid" time="0.84"/></proof>
+  <proof prover="10"><result status="valid" time="0.47"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_term_list.22" expl="22. postcondition">
-  <proof prover="10"><result status="valid" time="0.83"/></proof>
+  <proof prover="10"><result status="valid" time="0.54"/></proof>
   </goal>
  </transf>
  </goal>
@@ -694,10 +692,10 @@
   <proof prover="9"><result status="valid" time="0.09" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.23" expl="23. postcondition">
-  <proof prover="10"><result status="valid" time="0.60"/></proof>
+  <proof prover="10"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.24" expl="24. postcondition">
-  <proof prover="10"><result status="valid" time="0.57"/></proof>
+  <proof prover="10"><result status="valid" time="0.28"/></proof>
   </goal>
  </transf>
  </goal>
@@ -758,7 +756,7 @@
   <proof prover="9"><result status="valid" time="0.05" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_term.19" expl="19. precondition">
-  <proof prover="9"><result status="valid" time="0.41" steps="149"/></proof>
+  <proof prover="9"><result status="valid" time="0.25" steps="149"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_term.20" expl="20. precondition">
   <proof prover="9"><result status="valid" time="0.07" steps="60"/></proof>
@@ -776,7 +774,7 @@
   <proof prover="9"><result status="valid" time="0.12" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_term.25" expl="25. postcondition">
-  <proof prover="9"><result status="valid" time="0.18" steps="50"/></proof>
+  <proof prover="9"><result status="valid" time="0.06" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
@@ -870,7 +868,7 @@
   <proof prover="9"><result status="valid" time="0.07" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_fo_term_in_fo_term.30" expl="30. postcondition">
-  <proof prover="10"><result status="valid" time="0.62"/></proof>
+  <proof prover="10"><result status="valid" time="0.26"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1000,7 +998,7 @@
    <proof prover="9"><result status="valid" time="0.10" steps="62"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_term.6.5" expl="5. assertion">
-   <proof prover="11" timelimit="5"><result status="valid" time="0.71"/></proof>
+   <proof prover="11" timelimit="5"><result status="valid" time="0.50"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_term.6.6" expl="6. assertion">
    <proof prover="9"><result status="valid" time="0.07" steps="13"/></proof>
@@ -1165,7 +1163,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="73"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_term_list.35" expl="35. postcondition">
-  <proof prover="9" timelimit="1"><result status="valid" time="0.52" steps="805"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.33" steps="805"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_term_list.36" expl="36. postcondition">
   <proof prover="9" timelimit="1"><result status="valid" time="0.09" steps="51"/></proof>
@@ -1263,17 +1261,16 @@
    <goal name="WP_parameter destruct_fo_term.28.1" expl="1. postcondition">
    <transf name="split_goal_wp">
     <goal name="WP_parameter destruct_fo_term.28.1.1" expl="1. VC for destruct_fo_term">
-    <proof prover="9"><result status="valid" time="0.27" steps="224"/></proof>
+    <proof prover="9"><result status="valid" time="0.11" steps="224"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_term.28.1.2" expl="2. VC for destruct_fo_term">
-    <proof prover="9"><result status="valid" time="0.20" steps="61"/></proof>
+    <proof prover="9"><result status="valid" time="0.07" steps="61"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_term.28.1.3" expl="3. VC for destruct_fo_term">
     <proof prover="9"><result status="valid" time="0.17" steps="51"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_term.28.1.4" expl="4. VC for destruct_fo_term">
-    <proof prover="6"><result status="valid" time="0.24"/></proof>
-    <proof prover="12"><result status="valid" time="0.66"/></proof>
+    <proof prover="12" timelimit="120"><result status="valid" time="0.31"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_term.28.1.5" expl="5. VC for destruct_fo_term">
     <proof prover="9"><result status="valid" time="0.13" steps="39"/></proof>
@@ -1288,10 +1285,10 @@
     <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_term.28.1.9" expl="9. VC for destruct_fo_term">
-    <proof prover="9"><result status="valid" time="0.28" steps="270"/></proof>
+    <proof prover="9"><result status="valid" time="0.11" steps="270"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_term.28.1.10" expl="10. VC for destruct_fo_term">
-    <proof prover="9"><result status="valid" time="0.27" steps="270"/></proof>
+    <proof prover="9"><result status="valid" time="0.11" steps="270"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1301,7 +1298,7 @@
   <proof prover="9" timelimit="1"><result status="valid" time="0.20" steps="138"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_term.30" expl="30. postcondition">
-  <proof prover="9" timelimit="1"><result status="valid" time="0.24" steps="177"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.11" steps="177"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1337,8 +1334,8 @@
   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10" expl="10. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.1" expl="1. assertion">
-   <proof prover="2"><result status="valid" time="4.06"/></proof>
-   <proof prover="11"><result status="valid" time="18.51"/></proof>
+   <proof prover="2"><result status="valid" time="8.78"/></proof>
+   <proof prover="11"><result status="valid" time="8.24"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.2" expl="2. assertion">
    <proof prover="9"><result status="valid" time="0.32" steps="185"/></proof>
@@ -1353,20 +1350,20 @@
    <proof prover="9"><result status="valid" time="0.10" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="5.18"/></proof>
+   <proof prover="2"><result status="valid" time="2.14"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11" expl="11. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11.1" expl="1. assertion">
-   <proof prover="4"><result status="valid" time="0.55"/></proof>
+   <proof prover="12"><result status="valid" time="0.71"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11.2" expl="2. assertion">
    <proof prover="9"><result status="valid" time="0.11" steps="74"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11.3" expl="3. assertion">
-   <proof prover="10"><result status="valid" time="1.38"/></proof>
+   <proof prover="10"><result status="valid" time="0.67"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1405,7 +1402,7 @@
    <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.7.2" expl="2. VC for nlsubst_fo_term_in_fo_term_list">
-   <proof prover="10"><result status="valid" time="0.45"/></proof>
+   <proof prover="10"><result status="valid" time="0.25"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1430,26 +1427,26 @@
    <proof prover="9"><result status="valid" time="0.10" steps="67"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.3" expl="3. assertion">
-   <proof prover="9"><result status="valid" time="1.35" steps="371"/></proof>
+   <proof prover="9"><result status="valid" time="0.71" steps="371"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.4" expl="4. assertion">
-   <proof prover="4"><result status="valid" time="2.89"/></proof>
+   <proof prover="12"><result status="valid" time="1.07"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.5" expl="5. assertion">
    <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="1.21"/></proof>
+   <proof prover="2"><result status="valid" time="0.87"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13" expl="13. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.1" expl="1. assertion">
-   <proof prover="9"><result status="valid" time="1.28" steps="369"/></proof>
+   <proof prover="9"><result status="valid" time="0.86" steps="369"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.2" expl="2. assertion">
-   <proof prover="4"><result status="valid" time="3.37"/></proof>
+   <proof prover="12"><result status="valid" time="1.16"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.3" expl="3. assertion">
    <proof prover="9"><result status="valid" time="0.10" steps="63"/></proof>
@@ -1458,7 +1455,7 @@
    <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.5" expl="5. assertion">
-   <proof prover="9"><result status="valid" time="1.19" steps="355"/></proof>
+   <proof prover="9"><result status="valid" time="0.82" steps="355"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1503,11 +1500,11 @@
   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10" expl="10. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.1" expl="1. assertion">
-   <proof prover="2"><result status="valid" time="1.31"/></proof>
-   <proof prover="11"><result status="valid" time="14.26"/></proof>
+   <proof prover="2"><result status="valid" time="8.63"/></proof>
+   <proof prover="11"><result status="valid" time="6.37"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.2" expl="2. assertion">
-   <proof prover="9"><result status="valid" time="0.41" steps="185"/></proof>
+   <proof prover="9"><result status="valid" time="0.19" steps="185"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.3" expl="3. assertion">
    <proof prover="9"><result status="valid" time="0.14" steps="85"/></proof>
@@ -1519,14 +1516,14 @@
    <proof prover="9"><result status="valid" time="0.10" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="4.84"/></proof>
+   <proof prover="2"><result status="valid" time="2.27"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_symbol_in_fo_term.11" expl="11. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_fo_term.11.1" expl="1. assertion">
-   <proof prover="4"><result status="valid" time="0.43"/></proof>
+   <proof prover="12"><result status="valid" time="1.02"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_term.11.2" expl="2. assertion">
    <proof prover="9"><result status="valid" time="0.12" steps="74"/></proof>
@@ -1568,7 +1565,7 @@
   <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.6" expl="6. postcondition">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.40"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.20"/></proof>
   <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.7" expl="7. postcondition">
@@ -1577,7 +1574,7 @@
    <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.7.2" expl="2. VC for nlsubst_fo_term_in_fo_term">
-   <proof prover="10"><result status="valid" time="0.46"/></proof>
+   <proof prover="10"><result status="valid" time="0.26"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1602,26 +1599,26 @@
    <proof prover="9"><result status="valid" time="0.08" steps="67"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.3" expl="3. assertion">
-   <proof prover="9"><result status="valid" time="1.04" steps="371"/></proof>
+   <proof prover="9"><result status="valid" time="0.64" steps="371"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.4" expl="4. assertion">
-   <proof prover="4"><result status="valid" time="0.37"/></proof>
+   <proof prover="12"><result status="valid" time="0.37"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.5" expl="5. assertion">
    <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="1.18"/></proof>
+   <proof prover="2"><result status="valid" time="0.80"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13" expl="13. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.1" expl="1. assertion">
-   <proof prover="9"><result status="valid" time="1.24" steps="369"/></proof>
+   <proof prover="9"><result status="valid" time="0.85" steps="369"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.2" expl="2. assertion">
-   <proof prover="4"><result status="valid" time="1.43"/></proof>
+   <proof prover="12"><result status="valid" time="0.78"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.3" expl="3. assertion">
    <proof prover="9"><result status="valid" time="0.10" steps="63"/></proof>
@@ -1630,7 +1627,7 @@
    <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.5" expl="5. assertion">
-   <proof prover="9"><result status="valid" time="1.15" steps="355"/></proof>
+   <proof prover="9"><result status="valid" time="0.54" steps="355"/></proof>
    </goal>
   </transf>
   </goal>

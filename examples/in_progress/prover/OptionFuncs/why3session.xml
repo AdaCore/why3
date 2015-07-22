@@ -1,46 +1,249 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<file name="../OptionFuncs.mlw" expanded="true">
-<theory name="Funcs" sum="ad1de2222a12642f93f29217a94a1509" expanded="true">
- <goal name="ocase_some">
- <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
- </goal>
- <goal name="ocase_none">
- <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
- </goal>
- <goal name="WP_parameter compose_ocase_some" expl="VC for compose_ocase_some">
- <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
- </goal>
- <goal name="olift_def">
- <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
- </goal>
- <goal name="olift_none">
- <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
- </goal>
- <goal name="olift_some">
- <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
- </goal>
- <goal name="olift_none_inversion">
- <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
- </goal>
- <goal name="WP_parameter olift_some_inversion" expl="VC for olift_some_inversion">
- <proof prover="1"><result status="valid" time="0.02" steps="60"/></proof>
- </goal>
- <goal name="WP_parameter olift_identity" expl="VC for olift_identity">
- <proof prover="1"><result status="valid" time="0.02" steps="43"/></proof>
- </goal>
- <goal name="WP_parameter olift_composition" expl="VC for olift_composition">
- <proof prover="1"><result status="valid" time="0.04" steps="104"/></proof>
- </goal>
- <goal name="olift_some_commutation">
- <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
- </goal>
- <goal name="WP_parameter olift_update" expl="VC for olift_update">
- <proof prover="1"><result status="valid" time="0.21" steps="241"/></proof>
- </goal>
-</theory>
-</file>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="3">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <file
+  name="../OptionFuncs.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Funcs"
+   locfile="../OptionFuncs.mlw"
+   loclnum="2" loccnumb="7" loccnume="12"
+   verified="true"
+   expanded="false">
+   <goal
+    name="ocase_some"
+    locfile="../OptionFuncs.mlw"
+    loclnum="19" loccnumb="8" loccnume="18"
+    sum="fdf4cd7bb2de95e150365e53a910c0d9"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aocaseV0V1aSomeV2ainfix @!V0V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="ocase_none"
+    locfile="../OptionFuncs.mlw"
+    loclnum="21" loccnumb="8" loccnume="18"
+    sum="f733208f4e4380521a1545ff11d657f0"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aocaseV0V1aNoneV1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter compose_ocase_some"
+    locfile="../OptionFuncs.mlw"
+    loclnum="23" loccnumb="12" loccnume="30"
+    expl="VC for compose_ocase_some"
+    sum="762ee7daaaeb32217a7bea6625d2cc45"
+    proved="true"
+    expanded="false"
+    shape="ainfix =arcomposeasomeaocaseV0V1V0AaextensionalEqualarcomposeasomeaocaseV0V1V0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for compose_ocase_some"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="olift_def"
+    locfile="../OptionFuncs.mlw"
+    loclnum="33" loccnumb="8" loccnume="17"
+    sum="9e8fdf54a3a221e10ec0a9ac69613e78"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aoliftV0V1aomapV0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="olift_none"
+    locfile="../OptionFuncs.mlw"
+    loclnum="35" loccnumb="8" loccnume="18"
+    sum="dd803e1932e257acb27b97fc8e7e4f60"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aoliftV0aNoneaNoneF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="olift_some"
+    locfile="../OptionFuncs.mlw"
+    loclnum="36" loccnumb="8" loccnume="18"
+    sum="0c6ceaec8c62d39a245e8f8baf4358a1"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @!aoliftV0aSomeV1aSomeainfix @!V0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="olift_none_inversion"
+    locfile="../OptionFuncs.mlw"
+    loclnum="37" loccnumb="8" loccnume="28"
+    sum="d9949d69d266911a74d46eaeee0e9714"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V1aNoneqainfix =ainfix @!aoliftV0V1aNoneF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter olift_some_inversion"
+    locfile="../OptionFuncs.mlw"
+    loclnum="38" loccnumb="12" loccnume="32"
+    expl="VC for olift_some_inversion"
+    sum="dc22f54225f3bdc64da631b1b312ce4a"
+    proved="true"
+    expanded="false"
+    shape="CCfaNoneainfix =ainfix @!V0V3V2aSomeVV1qainfix =ainfix @!aoliftV0V1aSomeV2aNoneCfaNoneainfix =ainfix @!V0V5V2aSomeVV1qainfix =ainfix @!aoliftV0V1aSomeV2aSomeVV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for olift_some_inversion"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter olift_identity"
+    locfile="../OptionFuncs.mlw"
+    loclnum="47" loccnumb="12" loccnume="26"
+    expl="VC for olift_identity"
+    sum="4e1777e084c891eb03723e1c6cc57110"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aoliftaidentityaidentityAaextensionalEqualaoliftaidentityaidentity">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for olift_identity"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter olift_composition"
+    locfile="../OptionFuncs.mlw"
+    loclnum="52" loccnumb="12" loccnume="29"
+    expl="VC for olift_composition"
+    sum="14d9130b0f0fccf4e43b9dac06495b13"
+    proved="true"
+    expanded="false"
+    shape="ainfix =acomposeaoliftV0aoliftV1aoliftacomposeV0V1AaextensionalEqualacomposeaoliftV0aoliftV1aoliftacomposeV0V1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for olift_composition"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="olift_some_commutation"
+    locfile="../OptionFuncs.mlw"
+    loclnum="57" loccnumb="8" loccnume="30"
+    sum="b645fe3a9ae79924d94abba815db1016"
+    proved="true"
+    expanded="false"
+    shape="ainfix =acomposeasomeV0acomposeaoliftV0asomeF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter olift_update"
+    locfile="../OptionFuncs.mlw"
+    loclnum="60" loccnumb="12" loccnume="24"
+    expl="VC for olift_update"
+    sum="76dc33a7ebb3190ad2a7949440fec1dd"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aoliftamixfix [&lt;-]V0V1V2aupdateaoliftV0aSomeV1aSomeV2AaextensionalEqualaoliftamixfix [&lt;-]V0V1V2aupdateaoliftV0aSomeV1aSomeV2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for olift_update"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
 </why3session>

@@ -1283,9 +1283,7 @@ module Impl
     requires { is_nnf_list l.model_fo_formula_list_field }
     requires { is_simpl phi0.model_fo_formula_field }
     requires { is_nnf phi0.model_fo_formula_field }
-    (* this variant does not work: we now nothing about the size of
-       the list returned by destruct_fo_formula_list :-( *)
-    variant { nlsize_fo_formula_list l.nlrepr_fo_formula_list_field }
+    variant { size_fo_formula_list l.model_fo_formula_list_field }
     ensures { nlimpl_fo_formula_ok result.form }
     ensures { is_simpl result.form.model_fo_formula_field }
     ensures { is_nnf result.form.model_fo_formula_field }
@@ -1330,9 +1328,7 @@ module Impl
     requires { is_simpl_list l.model_fo_formula_list_field }
     requires { is_nnf_list l.model_fo_formula_list_field }
     requires { no_existential_list l.model_fo_formula_list_field }
-    (* this variant does not work: we now nothing about the size of
-       the formula returned by destruct_fo_formula :-( *)
-    variant { nlsize_fo_formula phi.nlrepr_fo_formula_field }
+    variant { size_fo_formula phi.model_fo_formula_field }
     ensures { forall m:model int 'st,rho:func int 'st.
       formula_list_conj_semantic result.forms.model_fo_formula_list_field m rho
       <-> (formula_semantic phi.model_fo_formula_field m rho /\

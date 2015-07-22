@@ -3,7 +3,6 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
@@ -12,7 +11,7 @@
 </theory>
 <theory name="Logic" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Impl" sum="8789e1ae5c5a202e347c47b77ffa1afc" expanded="true">
+<theory name="Impl" sum="915f2729db9ec2d3726d5cb6a70d8272" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.11" steps="82"/></proof>
  </goal>
@@ -47,16 +46,16 @@
    <goal name="WP_parameter resize_for.8.1" expl="1. postcondition">
    <transf name="split_goal_wp">
     <goal name="WP_parameter resize_for.8.1.1" expl="1. VC for resize_for">
-    <proof prover="3"><result status="valid" time="0.05"/></proof>
+    <proof prover="6"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="WP_parameter resize_for.8.1.2" expl="2. VC for resize_for">
-    <proof prover="3"><result status="valid" time="0.06"/></proof>
+    <proof prover="6"><result status="valid" time="0.05"/></proof>
     </goal>
     <goal name="WP_parameter resize_for.8.1.3" expl="3. VC for resize_for">
-    <proof prover="3"><result status="valid" time="0.06"/></proof>
+    <proof prover="6"><result status="valid" time="0.05"/></proof>
     </goal>
     <goal name="WP_parameter resize_for.8.1.4" expl="4. VC for resize_for">
-    <proof prover="1"><result status="valid" time="1.49"/></proof>
+    <proof prover="1"><result status="valid" time="0.80"/></proof>
     </goal>
    </transf>
    </goal>
@@ -91,16 +90,16 @@
    <goal name="WP_parameter resize_for.17.1" expl="1. precondition">
    <transf name="split_goal_wp">
     <goal name="WP_parameter resize_for.17.1.1" expl="1. VC for resize_for">
-    <proof prover="3"><result status="valid" time="0.06"/></proof>
+    <proof prover="6"><result status="valid" time="0.05"/></proof>
     </goal>
     <goal name="WP_parameter resize_for.17.1.2" expl="2. VC for resize_for">
-    <proof prover="3"><result status="valid" time="0.06"/></proof>
+    <proof prover="6"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="WP_parameter resize_for.17.1.3" expl="3. VC for resize_for">
-    <proof prover="3"><result status="valid" time="0.06"/></proof>
+    <proof prover="6"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="WP_parameter resize_for.17.1.4" expl="4. VC for resize_for">
-    <proof prover="1"><result status="valid" time="0.70"/></proof>
+    <proof prover="1"><result status="valid" time="0.49"/></proof>
     </goal>
    </transf>
    </goal>
@@ -140,7 +139,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.29" expl="29. precondition">
-  <proof prover="4"><result status="valid" time="0.44" steps="86"/></proof>
+  <proof prover="4"><result status="valid" time="0.22" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.30" expl="30. precondition">
   <proof prover="4"><result status="valid" time="0.11" steps="11"/></proof>
@@ -167,7 +166,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.38" expl="38. postcondition">
-  <proof prover="4"><result status="valid" time="1.08" steps="94"/></proof>
+  <proof prover="4"><result status="valid" time="0.85" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.39" expl="39. postcondition">
   <proof prover="4"><result status="valid" time="0.41" steps="106"/></proof>
@@ -177,8 +176,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter iadd" expl="VC for iadd" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter iadd" expl="VC for iadd">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter iadd.1" expl="1. index in array bounds">
   <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -197,10 +196,29 @@
   <goal name="WP_parameter iadd.6" expl="6. assertion">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter iadd.7" expl="7. assertion" expanded="true">
+  <goal name="WP_parameter iadd.7" expl="7. assertion">
+  <transf name="introduce_premises">
+   <goal name="WP_parameter iadd.7.1" expl="1. VC for iadd">
+   <transf name="inline_goal">
+    <goal name="WP_parameter iadd.7.1.1" expl="1. VC for iadd">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter iadd.7.1.1.1" expl="1. VC for iadd">
+     <proof prover="1"><result status="valid" time="0.42"/></proof>
+     </goal>
+     <goal name="WP_parameter iadd.7.1.1.2" expl="2. VC for iadd">
+     <proof prover="4"><result status="valid" time="0.03" steps="15"/></proof>
+     </goal>
+     <goal name="WP_parameter iadd.7.1.1.3" expl="3. VC for iadd">
+     <proof prover="1"><result status="valid" time="0.25"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="WP_parameter iadd.8" expl="8. assertion">
-  <proof prover="1"><result status="valid" time="0.17"/></proof>
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter iadd.9" expl="9. postcondition">
   <proof prover="4"><result status="valid" time="0.08" steps="12"/></proof>
@@ -213,13 +231,13 @@
     <proof prover="1"><result status="valid" time="0.10"/></proof>
     </goal>
     <goal name="WP_parameter iadd.10.1.2" expl="2. VC for iadd">
-    <proof prover="1"><result status="valid" time="0.58"/></proof>
+    <proof prover="1"><result status="valid" time="0.30"/></proof>
     </goal>
     <goal name="WP_parameter iadd.10.1.3" expl="3. VC for iadd">
-    <proof prover="1"><result status="valid" time="0.45"/></proof>
+    <proof prover="1"><result status="valid" time="0.23"/></proof>
     </goal>
     <goal name="WP_parameter iadd.10.1.4" expl="4. VC for iadd">
-    <proof prover="1"><result status="valid" time="1.21"/></proof>
+    <proof prover="1"><result status="valid" time="0.72"/></proof>
     </goal>
    </transf>
    </goal>
@@ -324,11 +342,11 @@
   <goal name="WP_parameter backtrack.5" expl="5. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter backtrack.5.1" expl="1. assertion">
-   <proof prover="1"><result status="valid" time="0.76"/></proof>
+   <proof prover="1"><result status="valid" time="0.44"/></proof>
    </goal>
    <goal name="WP_parameter backtrack.5.2" expl="2. assertion">
-   <proof prover="1"><result status="valid" time="0.69"/></proof>
-   <proof prover="4"><result status="valid" time="1.84" steps="392"/></proof>
+   <proof prover="1"><result status="valid" time="0.48"/></proof>
+   <proof prover="4"><result status="valid" time="0.95" steps="392"/></proof>
    </goal>
    <goal name="WP_parameter backtrack.5.3" expl="3. assertion">
    <proof prover="1"><result status="valid" time="0.10"/></proof>
@@ -349,7 +367,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.10" expl="10. precondition">
-  <proof prover="4"><result status="valid" time="0.31" steps="97"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="97"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.11" expl="11. precondition">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
@@ -382,7 +400,7 @@
   <proof prover="4"><result status="valid" time="0.05" steps="61"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.21" expl="21. postcondition">
-  <proof prover="1"><result status="valid" time="0.86"/></proof>
+  <proof prover="1"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.22" expl="22. assertion">
   <proof prover="4"><result status="valid" time="0.07" steps="38"/></proof>
@@ -391,7 +409,7 @@
   <proof prover="4"><result status="valid" time="0.21" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.24" expl="24. unreachable point">
-  <proof prover="4"><result status="valid" time="0.26" steps="54"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="54"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.25" expl="25. index in array bounds">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
@@ -400,10 +418,10 @@
   <proof prover="4"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.27" expl="27. assertion">
-  <proof prover="4"><result status="valid" time="0.59" steps="270"/></proof>
+  <proof prover="4"><result status="valid" time="0.30" steps="270"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.28" expl="28. assertion">
-  <proof prover="1"><result status="valid" time="0.30"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.29" expl="29. variant decrease">
   <proof prover="4"><result status="valid" time="0.04" steps="28"/></proof>
@@ -448,7 +466,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.36" expl="36. precondition">
-  <proof prover="5"><result status="valid" time="2.53"/></proof>
+  <proof prover="5"><result status="valid" time="1.63"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.37" expl="37. precondition">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
@@ -485,7 +503,7 @@
   <proof prover="4"><result status="valid" time="0.39" steps="349"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.48" expl="48. assertion">
-  <proof prover="1"><result status="valid" time="0.88"/></proof>
+  <proof prover="1"><result status="valid" time="0.54"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.49" expl="49. variant decrease">
   <proof prover="4"><result status="valid" time="0.02" steps="26"/></proof>
@@ -535,7 +553,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.62" expl="62. postcondition">
-  <proof prover="1"><result status="valid" time="0.51"/></proof>
+  <proof prover="1"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.63" expl="63. postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
@@ -592,7 +610,7 @@
   <proof prover="4"><result status="valid" time="0.07" steps="51"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.81" expl="81. postcondition">
-  <proof prover="4"><result status="valid" time="0.46" steps="110"/></proof>
+  <proof prover="4"><result status="valid" time="0.29" steps="110"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.82" expl="82. postcondition">
   <proof prover="4"><result status="valid" time="0.07" steps="40"/></proof>
@@ -601,13 +619,13 @@
   <proof prover="4"><result status="valid" time="0.12" steps="41"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.84" expl="84. postcondition">
-  <proof prover="4"><result status="valid" time="0.58" steps="75"/></proof>
+  <proof prover="4"><result status="valid" time="0.36" steps="75"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.85" expl="85. postcondition">
   <proof prover="6"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.86" expl="86. precondition">
-  <proof prover="4"><result status="valid" time="0.42" steps="85"/></proof>
+  <proof prover="4"><result status="valid" time="0.23" steps="85"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.87" expl="87. precondition">
   <proof prover="4"><result status="valid" time="0.08" steps="24"/></proof>
@@ -629,7 +647,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.93" expl="93. postcondition">
-  <proof prover="4"><result status="valid" time="0.59" steps="101"/></proof>
+  <proof prover="4"><result status="valid" time="0.33" steps="101"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.94" expl="94. postcondition">
   <proof prover="4"><result status="valid" time="0.06" steps="31"/></proof>
