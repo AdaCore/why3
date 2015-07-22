@@ -144,10 +144,20 @@ module IntMap = Map.Make(struct type t  = int let compare = compare end)
 module StringMap = Map.Make(String)
 
 type model_file = model_element list IntMap.t
-type model = model_file StringMap.t
+type model_files = model_file StringMap.t
+type model = {
+  vc_term_loc : Loc.position option;
+  model_files : model_files;
+}
 
 let empty_model = StringMap.empty
 let empty_model_file = IntMap.empty
+let is_model_empty model =
+  model.model_files = empty_model
+let default_model = {
+  vc_term_loc = None;
+  model_files = empty_model;
+}
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
@@ -184,7 +194,7 @@ let print_model
     ?(me_name_trans = why_name_trans)
     fmt
     model =
-  StringMap.iter (print_model_file fmt me_name_trans) model
+  StringMap.iter (print_model_file fmt me_name_trans) model.model_files
 
 let model_to_string
     ?(me_name_trans = why_name_trans)
@@ -203,6 +213,19 @@ let get_elements model_file line_number =
     IntMap.find line_number model_file
   with Not_found ->
     []
+
+let print_model_vc_term
+    ?(me_name_trans = why_name_trans)
+    ?(sep = "\n")
+    fmt
+    model =
+  match model.vc_term_loc with
+  | None -> ()
+  | Some pos ->
+    let (filename, line_number, _, _) = Loc.get pos in
+    let model_file = get_model_file model.model_files filename in
+    let model_elements = get_elements model_file line_number in
+    print_model_elements ~sep me_name_trans fmt model_elements
 
 let get_padding line =
   try
@@ -240,7 +263,7 @@ let interleave_with_source
     ~filename
     ~source_code =
   try
-    let model_file = StringMap.find  filename model in
+    let model_file = StringMap.find  filename model.model_files in
     let lines = Str.split (Str.regexp "^") source_code in
     let (source_code, _) = List.fold_left
       (interleave_line
@@ -290,7 +313,7 @@ let print_model_json
     (fun s -> s)
     (print_model_elements_on_lines_json me_name_to_str)
     fmt
-    (StringMap.bindings model)
+    (StringMap.bindings model.model_files)
 
 let model_to_string_json
     ?(me_name_trans = why_name_trans)
@@ -359,9 +382,12 @@ match raw_model with
       terms_tail
       model
 
-
 let build_model raw_model printer_mapping =
-  build_model_rec raw_model printer_mapping.queried_terms empty_model
+  let model_files = build_model_rec raw_model printer_mapping.queried_terms empty_model in
+  {
+    vc_term_loc = printer_mapping.Printer.vc_term_loc;
+    model_files = model_files;
+  }
 
 
 (*
@@ -399,11 +425,13 @@ let add_first_model_line filename model_file model =
 let model_for_positions_and_decls model ~positions =
   (* Start with empty model and add locations from model that
      are in locations *)
-  let model_filtered = List.fold_left (add_loc model) empty_model positions in
+  let model_filtered = List.fold_left (add_loc model.model_files) empty_model positions in
   (* For each file add mapping corresponding to the first line of the
      counter-example from model to model_filtered.
      This corresponds to function declarations *)
-  StringMap.fold add_first_model_line model model_filtered
+  let model_filtered = StringMap.fold add_first_model_line model.model_files model_filtered in
+  { vc_term_loc = model.vc_term_loc;
+    model_files = model_filtered }
 
 
 (*

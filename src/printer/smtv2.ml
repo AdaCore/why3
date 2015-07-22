@@ -534,7 +534,7 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
       print_info_model cntexample fmt model_list info;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term = vc_term_info.vc_loc;
+				vc_term_loc = vc_term_info.vc_loc;
 				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
