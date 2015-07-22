@@ -49,10 +49,19 @@ open Why3
    VC.
    *)
 
+type prover_stat =
+  {
+    mutable count     : int;
+    mutable max_time  : float;
+    mutable max_steps : int;
+  }
+
+type stats = prover_stat Whyconf.Hprover.t
+
 val register :
      Gnat_expl.check
   -> Task.task option                  (* task of the last goal *)
-  -> Call_provers.prover_result option (* extra information about the run *)
+  -> stats option                      (* extra information about the run *)
   -> bool                              (* if the goal was proved or not *)
   -> (string * string) option           (* (for manual provers) *)
                                        (* pair of (vc_file, editor_cmd) *)

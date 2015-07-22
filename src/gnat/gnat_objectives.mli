@@ -41,10 +41,6 @@ val add_to_objective : objective -> goal -> unit
    registered as well. Only do the registering if the objective is to de
    discharged (ie, if the --limit-subp / --limit-line directives apply). *)
 
-val add_objective    : objective -> unit
-(* register an objective without associating a goal (useful for trivial
-   goals) *)
-
 val set_not_interesting : goal -> unit
 (* Goals can be not interesting, when they are trivial *)
 
@@ -182,3 +178,6 @@ val clean_automatic_proofs : goal -> unit
 (* deletes previous proof attempts of the selected provers for this goal *)
 
 val goal_has_splits : goal -> bool
+
+val extract_stats : objective -> Gnat_report.stats
+

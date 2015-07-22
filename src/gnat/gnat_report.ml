@@ -1,11 +1,19 @@
 open Why3
 open Why3.Json
 
+type prover_stat =
+  {
+    mutable count     : int;
+    mutable max_time  : float;
+    mutable max_steps : int;
+  }
+
+type stats = prover_stat Whyconf.Hprover.t
+
 type msg =
   { check         : Gnat_expl.check;
     result        : bool;
-    time          : float;
-    steps         : int;
+    stats         : stats option;
     extra_info    : int option;
     tracefile     : string;
     cntexmpfile   : string;
@@ -28,15 +36,7 @@ let add_warning ?loc s =
 
 let () = Warning.set_hook add_warning
 
-let register check task result valid manual tracefile cntexmpfile =
-  let time =
-    match result with
-    | None -> 0.0
-    | Some r -> r.Call_provers.pr_time in
-  let steps = match result with
-    | Some r ->
-      r.Call_provers.pr_steps
-    | _ -> 0 in
+let register check task stats valid manual tracefile cntexmpfile =
   let extra_info =
     if valid then None
     else begin match task with
@@ -47,8 +47,7 @@ let register check task result valid manual tracefile cntexmpfile =
   { check         = check;
     result        = valid;
     extra_info    = extra_info;
-    time          = time;
-    steps         = steps;
+    stats         = stats;
     tracefile     = tracefile;
     cntexmpfile   = cntexmpfile;
     manual_proof  = manual } in
@@ -82,13 +81,30 @@ let print_manual_proof_info fmt info =
                    (Sys.getcwd () ^ Filename.dir_sep ^ fname)
      (print_json_field "editor_cmd" string) cmd
 
+let print_prover_stats fmt stat =
+  Format.fprintf fmt "{ %a, %a, %a }"
+   (print_json_field "count" int) stat.count
+   (print_json_field "max_steps" int) stat.max_steps
+   (print_json_field "max_time" float) stat.max_time
+
+let print_stats fmt stats =
+  match stats with
+  | None -> ()
+  | Some s ->
+      let kv_list = Whyconf.Hprover.fold (fun k v acc -> (k,v)::acc) s [] in
+      let get_name pr = pr.Whyconf.prover_name in
+      Format.fprintf fmt ", ";
+      print_json_field "stats"
+      (map_bindings get_name print_prover_stats) fmt kv_list
+
 let print_json_msg fmt m =
-  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a}"
+  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a}"
     (print_json_field "id" int) m.check.Gnat_expl.id
     (print_json_field "reason" string)
       (Gnat_expl.reason_to_ada m.check.Gnat_expl.reason)
     (print_json_field "result" bool) m.result
     (print_json_field "extra_info" int) (get_info m.extra_info)
+    print_stats m.stats
     print_trace_file m.tracefile
     print_cntexmp_file m.cntexmpfile
     print_manual_proof_info m.manual_proof

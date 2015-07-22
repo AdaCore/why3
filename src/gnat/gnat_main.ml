@@ -83,7 +83,8 @@ let rec handle_vc_result goal result prover_result manual_info =
    let task = Session.goal_task goal in
    match status with
    | Gnat_objectives.Proved ->
-       Gnat_report.register obj (Some task) prover_result true None "" ""
+       let stats = Gnat_objectives.extract_stats obj in
+       Gnat_report.register obj (Some task) (Some stats) true None "" ""
    | Gnat_objectives.Not_Proved ->
        let (tracefile, trace) =
          match Gnat_config.proof_mode with
@@ -99,7 +100,7 @@ let rec handle_vc_result goal result prover_result manual_info =
 	   Gnat_objectives.Save_VCs.save_counterexample
 	     goal prover_result.pr_model ~trace
        in
-       Gnat_report.register obj (Some task) prover_result
+       Gnat_report.register obj (Some task) None
          false manual_info tracefile cntexmpfile
    | Gnat_objectives.Work_Left ->
        List.iter (create_manual_or_schedule obj) (Gnat_objectives.next obj)
