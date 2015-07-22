@@ -1,98 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="3">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <file
-  name="../Predicates.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Pred"
-   locfile="../Predicates.mlw"
-   loclnum="2" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="true">
-   <goal
-    name="pupdate_eq"
-    locfile="../Predicates.mlw"
-    loclnum="28" loccnumb="8" loccnume="18"
-    sum="4fbbad823c921a0976d31b533f332113"
-    proved="true"
-    expanded="false"
-    shape="ainfix =V2aTrueqainfix @?apupdateV0V1V2V1F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="pupdate_neq"
-    locfile="../Predicates.mlw"
-    loclnum="30" loccnumb="8" loccnume="19"
-    sum="85d3eeb4bdc34b8071e51cc31b968be0"
-    proved="true"
-    expanded="false"
-    shape="ainfix @?V0V3qainfix @?apupdateV0V1V2V3INainfix =V1V3F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter pcompose_associative"
-    locfile="../Predicates.mlw"
-    loclnum="40" loccnumb="12" loccnume="32"
-    expl="VC for pcompose_associative"
-    sum="11d7f37592465e0f487bcf78f6d86262"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apcomposeapcomposeV0V1V2apcomposeV0acomposeV1V2AapredExtensionalEqualapcomposeapcomposeV0V1V2apcomposeV0acomposeV1V2F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for pcompose_associative"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter identity_neutral"
-    locfile="../Predicates.mlw"
-    loclnum="45" loccnumb="12" loccnume="28"
-    expl="VC for identity_neutral"
-    sum="e8d1199b71be08cd108921b5205c4783"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apcomposeV0aidentityV0AapredExtensionalEqualapcomposeV0aidentityV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for identity_neutral"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<file name="../Predicates.mlw" expanded="true">
+<theory name="Pred" sum="ac803a6d54d377b1900e06a191a70737" expanded="true">
+ <goal name="pupdate_eq">
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="pupdate_neq">
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter pcompose_associative" expl="VC for pcompose_associative">
+ <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
+ </goal>
+ <goal name="WP_parameter identity_neutral" expl="VC for identity_neutral">
+ <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

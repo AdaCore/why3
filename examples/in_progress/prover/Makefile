@@ -73,7 +73,7 @@ replay:
 	@printf "Starting time (UTC): "
 	@date --utc +%H:%M
 	@printf "===================================\n"
-	@for i in $(MLWUTIL) $(MLWIMPL); do \
+	@for i in *.mlw; do \
 		printf "Replaying $$i..." ; \
 		why3 $(WHY3FLAGS) replay -q $$i ; \
 	 done
