@@ -2,7 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
@@ -13,10 +15,19 @@
 <file name="../Unification.mlw" expanded="true">
 <theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Logic" sum="b01e009c5905fbd54c873ff6594d7347" expanded="true">
- <goal name="WP_parameter smodel_depend_only_model" expl="VC for smodel_depend_only_model" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter smodel_depend_only_model.1" expl="1. assertion" expanded="true">
+<theory name="Logic" sum="74970561ecd4b10cc94e84f608303190">
+ <goal name="WP_parameter smodel_depend_only_model" expl="VC for smodel_depend_only_model">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter smodel_depend_only_model.1" expl="1. assertion">
+  <transf name="inline_goal">
+   <goal name="WP_parameter smodel_depend_only_model.1.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.27"/></proof>
+   <proof prover="1"><result status="valid" time="0.22"/></proof>
+   <proof prover="2"><result status="valid" time="0.13"/></proof>
+   <proof prover="6"><result status="valid" time="0.32"/></proof>
+   <proof prover="7" timelimit="5"><result status="valid" time="1.63"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="WP_parameter smodel_depend_only_model.2" expl="2. postcondition">
   <proof prover="5"><result status="valid" time="0.08" steps="13"/></proof>
