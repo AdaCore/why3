@@ -20,8 +20,6 @@ ifeq ($(BENCH),yes)
 endif
 
 
-MLWUTIL=Nat
-
 MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
 	Firstorder_formula_impl Firstorder_formula_list_impl \
 	Firstorder_tableau_impl Unification FormulaTransformations \
@@ -30,10 +28,9 @@ MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
 MLWIMPL=$(MLWTYPES) ProverMain ProverTest
 
 BD=build
-MLUTIL=$(patsubst %,$(BD)/%__Nat,$(MLWUTIL))
 MLTYPES=$(patsubst %,$(BD)/%__Types,$(MLWTYPES))
 MLIMPL=$(patsubst %,$(BD)/%__Impl,$(MLWIMPL))
-MLALL=$(MLUTIL) $(MLTYPES) $(MLIMPL)
+MLALL=$(MLTYPES) $(MLIMPL)
 ML=$(patsubst %,%.ml,$(MLALL))
 CMX=$(patsubst %,%.cmx,$(MLALL))
 OCAMLC=ocamlopt.opt
