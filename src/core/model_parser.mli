@@ -144,6 +144,16 @@ val print_model_vc_term :
     @model the counter-example model.
 *)
 
+val model_vc_term_to_string :
+  ?me_name_trans: ((string * model_element_type) -> string) ->
+  ?sep: string ->
+  model ->
+  string
+(** Gets string with counter-example model elements related to term that
+    triggers VC.
+    See print_model_vc_term
+*)
+
 val print_model_json :
   ?me_name_trans:((string * model_element_type) -> string) ->
   Format.formatter ->

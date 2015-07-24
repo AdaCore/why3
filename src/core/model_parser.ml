@@ -227,6 +227,13 @@ let print_model_vc_term
     let model_elements = get_elements model_file line_number in
     print_model_elements ~sep me_name_trans fmt model_elements
 
+let model_vc_term_to_string
+    ?(me_name_trans = why_name_trans)
+    ?(sep = "\n")
+    model =
+  print_model_vc_term ~me_name_trans ~sep str_formatter model;
+  flush_str_formatter ()
+
 let get_padding line =
   try
     let r = Str.regexp " *" in
