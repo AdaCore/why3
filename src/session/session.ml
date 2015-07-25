@@ -1194,7 +1194,7 @@ let load_result r =
           Call_provers.pr_output = "";
           Call_provers.pr_status = Unix.WEXITED 0;
 	  Call_provers.pr_steps = steps;
-	  Call_provers.pr_model = Model_parser.empty_model
+	  Call_provers.pr_model = Model_parser.default_model
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited
