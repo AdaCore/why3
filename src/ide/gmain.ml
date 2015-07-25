@@ -642,7 +642,7 @@ let update_tabs a =
       begin
         match a.S.proof_state with
 	  | S.Done r ->
-	    if r.Call_provers.pr_model <> Model_parser.empty_model then begin
+	    if Model_parser.is_model_empty r.Call_provers.pr_model then begin
 	      Model_parser.interleave_with_source
 		r.Call_provers.pr_model
 		~filename:!current_file

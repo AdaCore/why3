@@ -20,55 +20,68 @@ ifeq ($(BENCH),yes)
 endif
 
 
-MLW=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
+MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
 	Firstorder_formula_impl Firstorder_formula_list_impl \
 	Firstorder_tableau_impl Unification FormulaTransformations \
-	Prover ProverMain ProverTest
+	Prover
+
+MLWIMPL=$(MLWTYPES) ProverMain ProverTest
 
 BD=build
-MLUTIL=$(BD)/Nat__Nat
-MLTYPES=$(patsubst %,$(BD)/%__Types,$(MLW))
-MLIMPL=$(patsubst %,$(BD)/%__Impl,$(MLW))
-ML=$(MLUTIL) $(MLTYPES) $(MLIMPL)
-CMX=$(patsubst %,%.cmx,$(ML))
-CMI=$(patsubst %,%.cmi,$(ML))
+MLTYPES=$(patsubst %,$(BD)/%__Types,$(MLWTYPES))
+MLIMPL=$(patsubst %,$(BD)/%__Impl,$(MLWIMPL))
+MLALL=$(MLTYPES) $(MLIMPL)
+ML=$(patsubst %,%.ml,$(MLALL))
+CMX=$(patsubst %,%.cmx,$(MLALL))
 OCAMLC=ocamlopt.opt
 INCLUDES=-I $(BD) $(INCLUDE)
 LIBS=unix.cmxa $(BIGINTLIB).cmxa why3extract.cmxa
 LIBSOLD=$(BD)/why3__BuiltIn.cmx $(BD)/int__Int.cmx $(BD)/array__Array.cmx
-WHY3FLAGS=-L . --debug ignore_unused_vars --debug extraction
+WHY3FLAGS=-L . --debug ignore_unused_vars
 MLFLAGS=
 MLIFLAGS=
 MLEXECFLAGS=
+
+.PHONY: clean depend extract replay
 
 $(BD)/prover: $(CMX) run.cmx
 	$(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
 		-o $(BD)/prover $^
 
+extract: $(ML)
+
+$(ML):
+	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) ProverTest.mlw
+
 %.cmx: %.ml
 	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
 
-$(BD)/Nat__Nat.ml: Nat.mlw
-	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Nat
-
-$(BD)/%__Types.ml: %.mlw
-	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Types
-
-$(BD)/%__Impl.ml: %.mlw
-	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) $< -T Impl
-
-
-.PHONY: clean depend
-
-depend: .depend
-
-.depend: Makefile $(patsubst %,%.ml,$(ML))
-	ocamldep.opt -I $(BD) $(patsubst %,%.ml,$(ML)) > .depend
+.depend: Makefile $(ML)
+	ocamldep.opt -I $(BD) $(ML) > .depend
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+ifneq "$(MAKECMDGOALS:extract%=extract)" "extract"
 include .depend
 endif
+endif
+
+replay:
+	@printf "===================================\n"
+	@printf "Starting time (UTC): "
+	@date --utc +%H:%M
+	@printf "===================================\n"
+	@for i in *.mlw; do \
+		printf "Replaying $$i..." ; \
+		why3 $(WHY3FLAGS) replay -q $$i ; \
+	 done
+	@printf "===================================\n"
+	@printf "Ending time (UTC): "
+	@date --utc +%H:%M
+	@printf "===================================\n"
+
+depend: .depend
 
 clean:
 	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
 	rm -f $(BD)/*__*.ml
+	rm -f *~ *.o *.cmi *.cmx build/prover

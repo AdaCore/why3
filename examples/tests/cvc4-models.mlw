@@ -13,7 +13,7 @@ module M
   val y "model_projected" "model" "model_trace:y" :ref int
 
   let incr ( x23 "model" "model_trace:x23" : ref int ): unit
-  ensures { !x23 = old !x23 + 2 + !y }
+  ensures { "model_vc" "model_func" !x23 = old !x23 + 2 + !y }
   =
   (*#"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#*)
   y := !y + 1;
@@ -30,13 +30,13 @@ module M
   let test_map (x "model" : ref (map int int)) : unit
   ensures { !x[0] <> !x[1] }
   =
-  x := Map.set !x 0 3 
+  x := Map.set !x 0 3
 
 
   type r = {f:int; g:bool}
   let test_record (x "model" "model_trace:x" : ref r) : unit
   ensures { !x.g }
   =
-  x := { !x with f = 6} 
+  x := { !x with f = 6}
 
 end

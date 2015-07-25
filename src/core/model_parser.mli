@@ -101,7 +101,8 @@ val create_model_element :
 *)
 type model
 
-val empty_model : model
+val is_model_empty : model -> bool
+val default_model : model
 
 (*
 ***************************************************************
@@ -128,6 +129,30 @@ val model_to_string :
   model ->
   string
 (** See print_model  *)
+
+val print_model_vc_term :
+  ?me_name_trans: ((string * model_element_type) -> string) ->
+  ?sep: string ->
+  Format.formatter ->
+  model ->
+  unit
+(** Prints counter-example model elements related to term that
+    triggers VC.
+
+    @param sep separator of counter-example model elements
+    @param me_name_trans see print_model
+    @model the counter-example model.
+*)
+
+val model_vc_term_to_string :
+  ?me_name_trans: ((string * model_element_type) -> string) ->
+  ?sep: string ->
+  model ->
+  string
+(** Gets string with counter-example model elements related to term that
+    triggers VC.
+    See print_model_vc_term
+*)
 
 val print_model_json :
   ?me_name_trans:((string * model_element_type) -> string) ->

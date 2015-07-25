@@ -1,1179 +1,169 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="3">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC4"
-  version="1.0"/>
- <file
-  name="../Firstorder_tableau_spec.mlw"
-  verified="true"
-  expanded="false">
-  <theory
-   name="Spec"
-   locfile="../Firstorder_tableau_spec.mlw"
-   loclnum="1" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter size_positive_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="32" loccnumb="16" loccnume="43"
-    expl="VC for size_positive_lemma_tableau"
-    sum="2957465bceee3b9f9006d78877980807"
-    proved="true"
-    expanded="false"
-    shape="Cainfix &gt;asize_tableauV0c0aRootainfix &gt;asize_tableauV0c0Iainfix &gt;asize_fo_formula_listV3c0Iainfix &gt;asize_fo_formulaV2c0Iainfix &gt;asize_tableauV1c0Aainfix &lt;anat_to_intanat_size_tableauV1anat_to_intanat_size_tableauV0Aainfix &lt;=c0anat_to_intanat_size_tableauV0aNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for size_positive_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.16"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter renaming_composition_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="49" loccnumb="16" loccnume="50"
-    expl="VC for renaming_composition_lemma_tableau"
-    sum="1efb8faa62d97ed8d42921a6c0e3e4d0"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =arename_tableauarename_tableauV0V1V2V3V4arename_tableauV0arcomposeV1V3arcomposeV2V4aRootainfix =arename_tableauarename_tableauV0V1V2V3V4arename_tableauV0arcomposeV1V3arcomposeV2V4Iainfix =arename_fo_formula_listarename_fo_formula_listV7V1V2V3V4arename_fo_formula_listV7arcomposeV1V3arcomposeV2V4Iainfix =arename_fo_formulaarename_fo_formulaV6V1V2V3V4arename_fo_formulaV6arcomposeV1V3arcomposeV2V4Iainfix =arename_tableauarename_tableauV5V1V2V3V4arename_tableauV5arcomposeV1V3arcomposeV2V4Aainfix &lt;asize_tableauV5asize_tableauV0Aainfix &lt;=c0asize_tableauV0aNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for renaming_composition_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter renaming_identity_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="62" loccnumb="16" loccnume="47"
-    expl="VC for renaming_identity_lemma_tableau"
-    sum="4df7df01ce417ef575c129eb763ca945"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =arename_tableauV0aidentityaidentityV0aRootainfix =arename_tableauV0aidentityaidentityV0Iainfix =arename_fo_formula_listV3aidentityaidentityV3Iainfix =arename_fo_formulaV2aidentityaidentityV2Iainfix =arename_tableauV1aidentityaidentityV1Aainfix &lt;asize_tableauV1asize_tableauV0Aainfix &lt;=c0asize_tableauV0aNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for renaming_identity_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_then_subst_composition_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="85" loccnumb="16" loccnume="59"
-    expl="VC for rename_then_subst_composition_lemma_tableau"
-    sum="d948eb1505d9dba6c30a1f6498bb69a6"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =asubst_tableauarename_tableauV0V1V2V3V4asubst_tableauV0arcomposeV1V3arcomposeV2V4aRootainfix =asubst_tableauarename_tableauV0V1V2V3V4asubst_tableauV0arcomposeV1V3arcomposeV2V4Iainfix =asubst_fo_formula_listarename_fo_formula_listV7V1V2V13V12asubst_fo_formula_listV7arcomposeV1V13arcomposeV2V12Larename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityIainfix =asubst_fo_formulaarename_fo_formulaV6V1V2V11V10asubst_fo_formulaV6arcomposeV1V11arcomposeV2V10Larename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityIainfix =asubst_tableauarename_tableauV5V1V2V9V8asubst_tableauV5arcomposeV1V9arcomposeV2V8Aainfix &lt;asize_tableauV5asize_tableauV0Aainfix &lt;=c0asize_tableauV0Larename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityaNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for rename_then_subst_composition_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.90"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_then_rename_composition_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="104" loccnumb="16" loccnume="59"
-    expl="VC for subst_then_rename_composition_lemma_tableau"
-    sum="d460a42d242c4723625b739a3405db39"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =arename_tableauasubst_tableauV0V1V2V3V4asubst_tableauV0arename_subst_symbolV1V3arename_subst_fo_termV2V3V4aRootainfix =arename_tableauasubst_tableauV0V1V2V3V4asubst_tableauV0arename_subst_symbolV1V3arename_subst_fo_termV2V3V4Iainfix =arename_fo_formula_listasubst_fo_formula_listV7V13V12V3V4asubst_fo_formula_listV7arename_subst_symbolV13V3arename_subst_fo_termV12V3V4Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityIainfix =arename_fo_formulaasubst_fo_formulaV6V11V10V3V4asubst_fo_formulaV6arename_subst_symbolV11V3arename_subst_fo_termV10V3V4Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityIainfix =arename_tableauasubst_tableauV5V9V8V3V4asubst_tableauV5arename_subst_symbolV9V3arename_subst_fo_termV8V3V4Aainfix &lt;asize_tableauV5asize_tableauV0Aainfix &lt;=c0asize_tableauV0Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityaNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_then_rename_composition_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.68"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_composition_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="126" loccnumb="16" loccnume="47"
-    expl="VC for subst_composition_lemma_tableau"
-    sum="e56fa6086762e10739db1428b9c515b0"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =asubst_tableauasubst_tableauV0V1V2V3V4asubst_tableauV0asubst_compose_symbolV1V3asubst_compose_fo_termV2V3V4aRootainfix =asubst_tableauasubst_tableauV0V1V2V3V4asubst_tableauV0asubst_compose_symbolV1V3asubst_compose_fo_termV2V3V4Iainfix =asubst_fo_formula_listasubst_fo_formula_listV7V19V18V17V16asubst_fo_formula_listV7asubst_compose_symbolV19V17asubst_compose_fo_termV18V17V16Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityIainfix =asubst_fo_formulaasubst_fo_formulaV6V15V14V13V12asubst_fo_formulaV6asubst_compose_symbolV15V13asubst_compose_fo_termV14V13V12Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityIainfix =asubst_tableauasubst_tableauV5V11V10V9V8asubst_tableauV5asubst_compose_symbolV11V9asubst_compose_fo_termV10V9V8Aainfix &lt;asize_tableauV5asize_tableauV0Aainfix &lt;=c0asize_tableauV0Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityaNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_composition_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.60"/>
-    </proof>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter subst_composition_lemma_tableau.1"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="126" loccnumb="16" loccnume="47"
-      expl="1. postcondition"
-      sum="8664bf15ed12c7e89b39d401c3d37572"
-      proved="true"
-      expanded="false"
-      shape="postconditionCainfix =asubst_tableauasubst_tableauV0V1V2V3V4asubst_tableauV0asubst_compose_symbolV1V3asubst_compose_fo_termV2V3V4aRoottaNodeVVVV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_composition_lemma_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_composition_lemma_tableau.2"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="126" loccnumb="16" loccnume="47"
-      expl="2. variant decrease"
-      sum="9da6c6f8fc82cdcb32e2b53b2bddb235"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaRootainfix &lt;asize_tableauV5asize_tableauV0Aainfix &lt;=c0asize_tableauV0Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityaNodeVVVV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_composition_lemma_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_composition_lemma_tableau.3"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="126" loccnumb="16" loccnume="47"
-      expl="3. postcondition"
-      sum="237a1c49d62b215cfd67206c54be4f9b"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaRootainfix =asubst_tableauasubst_tableauV0V1V2V3V4asubst_tableauV0asubst_compose_symbolV1V3asubst_compose_fo_termV2V3V4Iainfix =asubst_fo_formula_listasubst_fo_formula_listV7V19V18V17V16asubst_fo_formula_listV7asubst_compose_symbolV19V17asubst_compose_fo_termV18V17V16Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityIainfix =asubst_fo_formulaasubst_fo_formulaV6V15V14V13V12asubst_fo_formulaV6asubst_compose_symbolV15V13asubst_compose_fo_termV14V13V12Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityIainfix =asubst_tableauasubst_tableauV5V11V10V9V8asubst_tableauV5asubst_compose_symbolV11V9asubst_compose_fo_termV10V9V8Larename_subst_symbolV1aidentityLarename_subst_fo_termV2aidentityaidentityLarename_subst_symbolV3aidentityLarename_subst_fo_termV4aidentityaidentityaNodeVVVV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_composition_lemma_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter subst_identity_lemma_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="152" loccnumb="16" loccnume="44"
-    expl="VC for subst_identity_lemma_tableau"
-    sum="babb95ce7ac0236962e8d91d76a57530"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =asubst_tableauV0asubst_id_symbolasubst_id_fo_termV0aRootainfix =asubst_tableauV0asubst_id_symbolasubst_id_fo_termV0Iainfix =asubst_fo_formula_listV3asubst_id_symbolasubst_id_fo_termV3Iainfix =asubst_fo_formulaV2asubst_id_symbolasubst_id_fo_termV2Iainfix =asubst_tableauV1asubst_id_symbolasubst_id_fo_termV1Aainfix &lt;asize_tableauV1asize_tableauV0Aainfix &lt;=c0asize_tableauV0aNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_identity_lemma_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.20"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter renaming_preserve_size_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="161" loccnumb="16" loccnume="46"
-    expl="VC for renaming_preserve_size_tableau"
-    sum="834f3dc1532b6abf9133a212c5bcedca"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =asize_tableauarename_tableauV0V1V2asize_tableauV0aRootainfix =asize_tableauarename_tableauV0V1V2asize_tableauV0Iainfix =asize_fo_formula_listarename_fo_formula_listV5V1V2asize_fo_formula_listV5Iainfix =asize_fo_formulaarename_fo_formulaV4V1V2asize_fo_formulaV4Iainfix =asize_tableauarename_tableauV3V1V2asize_tableauV3Aainfix &lt;asize_tableauV3asize_tableauV0Aainfix &lt;=c0asize_tableauV0aNodeVVVV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for renaming_preserve_size_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.14"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_free_var_constructive_inversion_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="188" loccnumb="16" loccnume="69"
-    expl="VC for rename_free_var_constructive_inversion_symbol_tableau"
-    sum="60957aca0b8329e3f8cba5666318331c"
-    proved="true"
-    expanded="false"
-    shape="CfaRootiiifainfix =ainfix @!V2V7V0Aais_symbol_free_var_in_tableauV7V1Iainfix =ainfix @!V2V7V0Aais_symbol_free_var_in_fo_formula_listV7V6FAais_symbol_free_var_in_fo_formula_listV0arename_fo_formula_listV6V2V3ais_symbol_free_var_in_fo_formula_listV0arename_fo_formula_listV6V2V3ainfix =ainfix @!V2V8V0Aais_symbol_free_var_in_tableauV8V1Iainfix =ainfix @!V2V8V0Aais_symbol_free_var_in_fo_formulaV8V5FAais_symbol_free_var_in_fo_formulaV0arename_fo_formulaV5V2V3ais_symbol_free_var_in_fo_formulaV0arename_fo_formulaV5V2V3ainfix =ainfix @!V2V9V0Aais_symbol_free_var_in_tableauV9V1Iainfix =ainfix @!V2V9V0Aais_symbol_free_var_in_tableauV9V4FAais_symbol_free_var_in_tableauV0arename_tableauV4V2V3Aainfix &lt;asize_tableauV4asize_tableauV1Aainfix &lt;=c0asize_tableauV1ais_symbol_free_var_in_tableauV0arename_tableauV4V2V3aNodeVVVV1Iais_symbol_free_var_in_tableauV0arename_tableauV1V2V3F">
-    <label
-     name="expl:VC for rename_free_var_constructive_inversion_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.19"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_free_var_inversion_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="220" loccnumb="13" loccnume="53"
-    expl="VC for rename_free_var_inversion_symbol_tableau"
-    sum="7189a5ab7aaa67ece0e012ebc7037a16"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix @!V2V5V0Aais_symbol_free_var_in_tableauV5V1EIainfix =ainfix @!V2V4V0Aais_symbol_free_var_in_tableauV4V1FAais_symbol_free_var_in_tableauV0arename_tableauV1V2V3Aainfix &lt;asize_tableauV1ainfix +c1asize_tableauV1Aainfix &lt;=c0ainfix +c1asize_tableauV1Iais_symbol_free_var_in_tableauV0arename_tableauV1V2V3F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for rename_free_var_inversion_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_free_var_constructive_inversion_fo_term_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="229" loccnumb="13" loccnume="67"
-    expl="VC for rename_free_var_constructive_inversion_fo_term_tableau"
-    sum="140d87a612e85e9f6e6b9d58d641f9bc"
-    proved="true"
-    expanded="false"
-    shape="CfaRootiiifainfix =ainfix @!V3V7V0Aais_fo_term_free_var_in_tableauV7V1Iainfix =ainfix @!V3V7V0Aais_fo_term_free_var_in_fo_formula_listV7V6FAais_fo_term_free_var_in_fo_formula_listV0arename_fo_formula_listV6V2V3ais_fo_term_free_var_in_fo_formula_listV0arename_fo_formula_listV6V2V3ainfix =ainfix @!V3V8V0Aais_fo_term_free_var_in_tableauV8V1Iainfix =ainfix @!V3V8V0Aais_fo_term_free_var_in_fo_formulaV8V5FAais_fo_term_free_var_in_fo_formulaV0arename_fo_formulaV5V2V3ais_fo_term_free_var_in_fo_formulaV0arename_fo_formulaV5V2V3ainfix =ainfix @!V3V9V0Aais_fo_term_free_var_in_tableauV9V1Iainfix =ainfix @!V3V9V0Aais_fo_term_free_var_in_tableauV9V4FAais_fo_term_free_var_in_tableauV0arename_tableauV4V2V3Aainfix &lt;asize_tableauV4asize_tableauV1Aainfix &lt;=c0asize_tableauV1ais_fo_term_free_var_in_tableauV0arename_tableauV4V2V3aNodeVVVV1Iais_fo_term_free_var_in_tableauV0arename_tableauV1V2V3F">
-    <label
-     name="expl:VC for rename_free_var_constructive_inversion_fo_term_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.17"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_free_var_inversion_fo_term_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="261" loccnumb="13" loccnume="54"
-    expl="VC for rename_free_var_inversion_fo_term_tableau"
-    sum="f6e3dee129c6aaa09bdc91b19e4c4447"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix @!V3V5V0Aais_fo_term_free_var_in_tableauV5V1EIainfix =ainfix @!V3V4V0Aais_fo_term_free_var_in_tableauV4V1FAais_fo_term_free_var_in_tableauV0arename_tableauV1V2V3Aainfix &lt;asize_tableauV1ainfix +c1asize_tableauV1Aainfix &lt;=c0ainfix +c1asize_tableauV1Iais_fo_term_free_var_in_tableauV0arename_tableauV1V2V3F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for rename_free_var_inversion_fo_term_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_free_var_propagation_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="270" loccnumb="16" loccnume="58"
-    expl="VC for rename_free_var_propagation_symbol_tableau"
-    sum="10200d9c4d188dc89baa9f2f2abba1c2"
-    proved="true"
-    expanded="false"
-    shape="Cais_symbol_free_var_in_tableauainfix @!V2V0arename_tableauV1V2V3Iais_symbol_free_var_in_tableauV0V1aRootais_symbol_free_var_in_tableauainfix @!V2V0arename_tableauV1V2V3Iais_symbol_free_var_in_tableauV0V1Iais_symbol_free_var_in_fo_formula_listainfix @!V2V0arename_fo_formula_listV6V2V3Iais_symbol_free_var_in_fo_formula_listV0V6Iais_symbol_free_var_in_fo_formulaainfix @!V2V0arename_fo_formulaV5V2V3Iais_symbol_free_var_in_fo_formulaV0V5Iais_symbol_free_var_in_tableauainfix @!V2V0arename_tableauV4V2V3Iais_symbol_free_var_in_tableauV0V4Aainfix &lt;asize_tableauV4asize_tableauV1Aainfix &lt;=c0asize_tableauV1aNodeVVVV1F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for rename_free_var_propagation_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.23"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter rename_free_var_propagation_fo_term_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="283" loccnumb="13" loccnume="56"
-    expl="VC for rename_free_var_propagation_fo_term_tableau"
-    sum="c18faab219b6330e69cb24d34b37ecb3"
-    proved="true"
-    expanded="false"
-    shape="Cais_fo_term_free_var_in_tableauainfix @!V3V0arename_tableauV1V2V3Iais_fo_term_free_var_in_tableauV0V1aRootais_fo_term_free_var_in_tableauainfix @!V3V0arename_tableauV1V2V3Iais_fo_term_free_var_in_tableauV0V1Iais_fo_term_free_var_in_fo_formula_listainfix @!V3V0arename_fo_formula_listV6V2V3Iais_fo_term_free_var_in_fo_formula_listV0V6Iais_fo_term_free_var_in_fo_formulaainfix @!V3V0arename_fo_formulaV5V2V3Iais_fo_term_free_var_in_fo_formulaV0V5Iais_fo_term_free_var_in_tableauainfix @!V3V0arename_tableauV4V2V3Iais_fo_term_free_var_in_tableauV0V4Aainfix &lt;asize_tableauV4asize_tableauV1Aainfix &lt;=c0asize_tableauV1aNodeVVVV1F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for rename_free_var_propagation_fo_term_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.22"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_constructive_inversion_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="296" loccnumb="16" loccnume="68"
-    expl="VC for subst_free_var_constructive_inversion_symbol_tableau"
-    sum="d4914afa90818759e25c189e0454ae4f"
-    proved="true"
-    expanded="false"
-    shape="CfaRootiiifCCainfix =V14V0aVar_symbolVainfix @!V2V10Aais_symbol_free_var_in_tableauV10V1Aainfix =V13V0Iainfix =ainfix @!V11V13V0ACainfix =V15V13aVar_symbolVV12FACainfix =ainfix @!V11V16V0aVar_symbolVV12Lainfix @!V2V10LaidentityaLeftVais_symbol_free_var_in_fo_termV0ainfix @!V3V17Aais_fo_term_free_var_in_tableauV17V1Aainfix =V20V0Iainfix =ainfix @!V18V20V0Aais_symbol_free_var_in_fo_termV20V19FAais_symbol_free_var_in_fo_termV0arename_fo_termV19V18aidentityLainfix @!V3V17LaidentityaRightVV9ICCainfix =V22V0aVar_symbolVainfix @!V8V21Aais_symbol_free_var_in_fo_formula_listV21V6aLeftVais_symbol_free_var_in_fo_termV0ainfix @!V7V23Aais_fo_term_free_var_in_fo_formula_listV23V6aRightVV9FAais_symbol_free_var_in_fo_formula_listV0asubst_fo_formula_listV6V8V7Larename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityais_symbol_free_var_in_fo_formula_listV0asubst_fo_formula_listV6arename_subst_symbolV2aidentityarename_subst_fo_termV3aidentityaidentityCCainfix =V31V0aVar_symbolVainfix @!V2V27Aais_symbol_free_var_in_tableauV27V1Aainfix =V30V0Iainfix =ainfix @!V28V30V0ACainfix =V32V30aVar_symbolVV29FACainfix =ainfix @!V28V33V0aVar_symbolVV29Lainfix @!V2V27LaidentityaLeftVais_symbol_free_var_in_fo_termV0ainfix @!V3V34Aais_fo_term_free_var_in_tableauV34V1Aainfix =V37V0Iainfix =ainfix @!V35V37V0Aais_symbol_free_var_in_fo_termV37V36FAais_symbol_free_var_in_fo_termV0arename_fo_termV36V35aidentityLainfix @!V3V34LaidentityaRightVV26ICCainfix =V39V0aVar_symbolVainfix @!V25V38Aais_symbol_free_var_in_fo_formulaV38V5aLeftVais_symbol_free_var_in_fo_termV0ainfix @!V24V40Aais_fo_term_free_var_in_fo_formulaV40V5aRightVV26FAais_symbol_free_var_in_fo_formulaV0asubst_fo_formulaV5V25V24Larename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityais_symbol_free_var_in_fo_formulaV0asubst_fo_formulaV5arename_subst_symbolV2aidentityarename_subst_fo_termV3aidentityaidentityCCainfix =V48V0aVar_symbolVainfix @!V2V44Aais_symbol_free_var_in_tableauV44V1Aainfix =V47V0Iainfix =ainfix @!V45V47V0ACainfix =V49V47aVar_symbolVV46FACainfix =ainfix @!V45V50V0aVar_symbolVV46Lainfix @!V2V44LaidentityaLeftVais_symbol_free_var_in_fo_termV0ainfix @!V3V51Aais_fo_term_free_var_in_tableauV51V1Aainfix =V54V0Iainfix =ainfix @!V52V54V0Aais_symbol_free_var_in_fo_termV54V53FAais_symbol_free_var_in_fo_termV0arename_fo_termV53V52aidentityLainfix @!V3V51LaidentityaRightVV43ICCainfix =V56V0aVar_symbolVainfix @!V42V55Aais_symbol_free_var_in_tableauV55V4aLeftVais_symbol_free_var_in_fo_termV0ainfix @!V41V57Aais_fo_term_free_var_in_tableauV57V4aRightVV43FAais_symbol_free_var_in_tableauV0asubst_tableauV4V42V41Aainfix &lt;asize_tableauV4asize_tableauV1Aainfix &lt;=c0asize_tableauV1Larename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityais_symbol_free_var_in_tableauV0asubst_tableauV4arename_subst_symbolV2aidentityarename_subst_fo_termV3aidentityaidentityaNodeVVVV1Iais_symbol_free_var_in_tableauV0asubst_tableauV1V2V3F">
-    <label
-     name="expl:VC for subst_free_var_constructive_inversion_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.61"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_inversion_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="380" loccnumb="13" loccnume="52"
-    expl="VC for subst_free_var_inversion_symbol_tableau"
-    sum="d8dfa31cc20aab784143ed319a7154d9"
-    proved="true"
-    expanded="false"
-    shape="Cais_symbol_free_var_in_fo_termV0ainfix @!V3V6Aais_fo_term_free_var_in_tableauV6V1EOCainfix =V8V0aVar_symbolVainfix @!V2V7Aais_symbol_free_var_in_tableauV7V1EaLeftVais_symbol_free_var_in_fo_termV0ainfix @!V3V10Aais_fo_term_free_var_in_tableauV10V1EOCainfix =V12V0aVar_symbolVainfix @!V2V11Aais_symbol_free_var_in_tableauV11V1EaRightVV4ICCainfix =V14V0aVar_symbolVainfix @!V2V13Aais_symbol_free_var_in_tableauV13V1aLeftVais_symbol_free_var_in_fo_termV0ainfix @!V3V15Aais_fo_term_free_var_in_tableauV15V1aRightVV4FAais_symbol_free_var_in_tableauV0asubst_tableauV1V2V3Aainfix &lt;asize_tableauV1ainfix +c1asize_tableauV1Aainfix &lt;=c0ainfix +c1asize_tableauV1Iais_symbol_free_var_in_tableauV0asubst_tableauV1V2V3F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_free_var_inversion_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_constructive_inversion_fo_term_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="395" loccnumb="13" loccnume="66"
-    expl="VC for subst_free_var_constructive_inversion_fo_term_tableau"
-    sum="11bdc22175266ea9bf2c9c8d02ceaffc"
-    proved="true"
-    expanded="false"
-    shape="CfaRootiiifais_fo_term_free_var_in_fo_termV0ainfix @!V3V8Aais_fo_term_free_var_in_tableauV8V1Aainfix =V11V0Iainfix =ainfix @!V9V11V0Aais_fo_term_free_var_in_fo_termV11V10FAais_fo_term_free_var_in_fo_termV0arename_fo_termV10aidentityV9Lainfix @!V3V8LaidentityIais_fo_term_free_var_in_fo_termV0ainfix @!V7V8Aais_fo_term_free_var_in_fo_formula_listV8V6FAais_fo_term_free_var_in_fo_formula_listV0asubst_fo_formula_listV6arename_subst_symbolV2aidentityV7Larename_subst_fo_termV3aidentityaidentityais_fo_term_free_var_in_fo_formula_listV0asubst_fo_formula_listV6arename_subst_symbolV2aidentityarename_subst_fo_termV3aidentityaidentityais_fo_term_free_var_in_fo_termV0ainfix @!V3V13Aais_fo_term_free_var_in_tableauV13V1Aainfix =V16V0Iainfix =ainfix @!V14V16V0Aais_fo_term_free_var_in_fo_termV16V15FAais_fo_term_free_var_in_fo_termV0arename_fo_termV15aidentityV14Lainfix @!V3V13LaidentityIais_fo_term_free_var_in_fo_termV0ainfix @!V12V13Aais_fo_term_free_var_in_fo_formulaV13V5FAais_fo_term_free_var_in_fo_formulaV0asubst_fo_formulaV5arename_subst_symbolV2aidentityV12Larename_subst_fo_termV3aidentityaidentityais_fo_term_free_var_in_fo_formulaV0asubst_fo_formulaV5arename_subst_symbolV2aidentityarename_subst_fo_termV3aidentityaidentityais_fo_term_free_var_in_fo_termV0ainfix @!V3V18Aais_fo_term_free_var_in_tableauV18V1Aainfix =V21V0Iainfix =ainfix @!V19V21V0Aais_fo_term_free_var_in_fo_termV21V20FAais_fo_term_free_var_in_fo_termV0arename_fo_termV20aidentityV19Lainfix @!V3V18LaidentityIais_fo_term_free_var_in_fo_termV0ainfix @!V17V18Aais_fo_term_free_var_in_tableauV18V4FAais_fo_term_free_var_in_tableauV0asubst_tableauV4arename_subst_symbolV2aidentityV17Aainfix &lt;asize_tableauV4asize_tableauV1Aainfix &lt;=c0asize_tableauV1Larename_subst_fo_termV3aidentityaidentityais_fo_term_free_var_in_tableauV0asubst_tableauV4arename_subst_symbolV2aidentityarename_subst_fo_termV3aidentityaidentityaNodeVVVV1Iais_fo_term_free_var_in_tableauV0asubst_tableauV1V2V3F">
-    <label
-     name="expl:VC for subst_free_var_constructive_inversion_fo_term_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.42"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_inversion_fo_term_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="449" loccnumb="13" loccnume="53"
-    expl="VC for subst_free_var_inversion_fo_term_tableau"
-    sum="abb8cbceca92172cf9b4a0c96cdad7e9"
-    proved="true"
-    expanded="false"
-    shape="ais_fo_term_free_var_in_fo_termV0ainfix @!V3V5Aais_fo_term_free_var_in_tableauV5V1EIais_fo_term_free_var_in_fo_termV0ainfix @!V3V4Aais_fo_term_free_var_in_tableauV4V1FAais_fo_term_free_var_in_tableauV0asubst_tableauV1V2V3Aainfix &lt;asize_tableauV1ainfix +c1asize_tableauV1Aainfix &lt;=c0ainfix +c1asize_tableauV1Iais_fo_term_free_var_in_tableauV0asubst_tableauV1V2V3F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_free_var_inversion_fo_term_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="462" loccnumb="16" loccnume="64"
-    expl="VC for subst_free_var_propagation_symbol_symbol_tableau"
-    sum="81dc2eaa812844d41a6797f5cc5a5c1d"
-    proved="true"
-    expanded="false"
-    shape="Cais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4ICainfix =V5V1aVar_symbolVainfix @!V3V0Aais_symbol_free_var_in_tableauV0V2aRootais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4ICainfix =V18V1aVar_symbolVainfix @!V3V0Aais_symbol_free_var_in_tableauV0V2ACainfix =V19V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V20V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V16V21ainfix @!V16V1aVar_symbolVV17ICainfix =V22V1aVar_symbolVV17Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formula_listV1asubst_fo_formula_listV8V15arename_subst_fo_termV4aidentityaidentityICainfix =V23V1aVar_symbolVainfix @!V15V0Aais_symbol_free_var_in_fo_formula_listV0V8Larename_subst_symbolV3aidentityACainfix =V24V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V25V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V13V26ainfix @!V13V1aVar_symbolVV14ICainfix =V27V1aVar_symbolVV14Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV7V12arename_subst_fo_termV4aidentityaidentityICainfix =V28V1aVar_symbolVainfix @!V12V0Aais_symbol_free_var_in_fo_formulaV0V7Larename_subst_symbolV3aidentityACainfix =V29V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V30V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V10V31ainfix @!V10V1aVar_symbolVV11ICainfix =V32V1aVar_symbolVV11Lainfix @!V3V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV6V9arename_subst_fo_termV4aidentityaidentityICainfix =V33V1aVar_symbolVainfix @!V9V0Aais_symbol_free_var_in_tableauV0V6Aainfix &lt;asize_tableauV6asize_tableauV2Aainfix &lt;=c0asize_tableauV2Larename_subst_symbolV3aidentityaNodeVVVV2F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.63"/>
-    </proof>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.1"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="462" loccnumb="16" loccnume="64"
-      expl="1. postcondition"
-      sum="3e6fb084b25273a53b9228a7655e2375"
-      proved="true"
-      expanded="false"
-      shape="postconditionCais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4ICainfix =V5V1aVar_symbolVainfix @!V3V0Aais_symbol_free_var_in_tableauV0V2aRoottaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.2"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="462" loccnumb="16" loccnume="64"
-      expl="2. variant decrease"
-      sum="c3f4ee9489c3f230ff902fd5bc9eea2c"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaRootainfix &lt;asize_tableauV5asize_tableauV2Aainfix &lt;=c0asize_tableauV2Larename_subst_symbolV3aidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.3"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="462" loccnumb="16" loccnume="64"
-      expl="3. assertion"
-      sum="2bec7feaf369f5c77e849a95d5176039"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootCainfix =V11V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V12V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V9V13ainfix @!V9V1aVar_symbolVV10ICainfix =V14V1aVar_symbolVV10Lainfix @!V3V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5V8arename_subst_fo_termV4aidentityaidentityICainfix =V15V1aVar_symbolVainfix @!V8V0Aais_symbol_free_var_in_tableauV0V5Larename_subst_symbolV3aidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.4"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="462" loccnumb="16" loccnume="64"
-      expl="4. assertion"
-      sum="d707c4ff499e31e1f2842197c4527076"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootCainfix =V14V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V15V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V12V16ainfix @!V12V1aVar_symbolVV13ICainfix =V17V1aVar_symbolVV13Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6V11arename_subst_fo_termV4aidentityaidentityICainfix =V18V1aVar_symbolVainfix @!V11V0Aais_symbol_free_var_in_fo_formulaV0V6Larename_subst_symbolV3aidentityICainfix =V19V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V20V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V9V21ainfix @!V9V1aVar_symbolVV10ICainfix =V22V1aVar_symbolVV10Lainfix @!V3V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5V8arename_subst_fo_termV4aidentityaidentityICainfix =V23V1aVar_symbolVainfix @!V8V0Aais_symbol_free_var_in_tableauV0V5Larename_subst_symbolV3aidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.5"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="462" loccnumb="16" loccnume="64"
-      expl="5. assertion"
-      sum="6a8e6ddaca753c5ff7ea3b7965f9d749"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootCainfix =V17V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V18V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V15V19ainfix @!V15V1aVar_symbolVV16ICainfix =V20V1aVar_symbolVV16Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formula_listV1asubst_fo_formula_listV7V14arename_subst_fo_termV4aidentityaidentityICainfix =V21V1aVar_symbolVainfix @!V14V0Aais_symbol_free_var_in_fo_formula_listV0V7Larename_subst_symbolV3aidentityICainfix =V22V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V23V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V12V24ainfix @!V12V1aVar_symbolVV13ICainfix =V25V1aVar_symbolVV13Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6V11arename_subst_fo_termV4aidentityaidentityICainfix =V26V1aVar_symbolVainfix @!V11V0Aais_symbol_free_var_in_fo_formulaV0V6Larename_subst_symbolV3aidentityICainfix =V27V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V28V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V9V29ainfix @!V9V1aVar_symbolVV10ICainfix =V30V1aVar_symbolVV10Lainfix @!V3V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5V8arename_subst_fo_termV4aidentityaidentityICainfix =V31V1aVar_symbolVainfix @!V8V0Aais_symbol_free_var_in_tableauV0V5Larename_subst_symbolV3aidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.6"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="462" loccnumb="16" loccnume="64"
-      expl="6. postcondition"
-      sum="1c9a124353fdd6660c82df9775979967"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaRootais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4ICainfix =V17V1aVar_symbolVainfix @!V3V0Aais_symbol_free_var_in_tableauV0V2ICainfix =V18V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V19V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V15V20ainfix @!V15V1aVar_symbolVV16ICainfix =V21V1aVar_symbolVV16Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formula_listV1asubst_fo_formula_listV7V14arename_subst_fo_termV4aidentityaidentityICainfix =V22V1aVar_symbolVainfix @!V14V0Aais_symbol_free_var_in_fo_formula_listV0V7Larename_subst_symbolV3aidentityICainfix =V23V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V24V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V12V25ainfix @!V12V1aVar_symbolVV13ICainfix =V26V1aVar_symbolVV13Lainfix @!V3V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6V11arename_subst_fo_termV4aidentityaidentityICainfix =V27V1aVar_symbolVainfix @!V11V0Aais_symbol_free_var_in_fo_formulaV0V6Larename_subst_symbolV3aidentityICainfix =V28V1aVar_symbolVainfix @!arename_subst_symbolV3aidentityV0ICainfix =V29V1aVar_symbolVainfix @!V3V0ICainfix =ainfix @!V9V30ainfix @!V9V1aVar_symbolVV10ICainfix =V31V1aVar_symbolVV10Lainfix @!V3V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5V8arename_subst_fo_termV4aidentityaidentityICainfix =V32V1aVar_symbolVainfix @!V8V0Aais_symbol_free_var_in_tableauV0V5Larename_subst_symbolV3aidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_symbol_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.18"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="499" loccnumb="13" loccnume="62"
-    expl="VC for subst_free_var_propagation_fo_term_symbol_tableau"
-    sum="cc9caada67359dec5eae6216073e5ed0"
-    proved="true"
-    expanded="false"
-    shape="Cais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2aRootais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2Aais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V15V1arename_fo_termV16V15aidentityIais_symbol_free_var_in_fo_termV1V16Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formula_listV1asubst_fo_formula_listV7arename_subst_symbolV3aidentityV14Iais_symbol_free_var_in_fo_termV1ainfix @!V14V0Aais_fo_term_free_var_in_fo_formula_listV0V7Larename_subst_fo_termV4aidentityaidentityAais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V12V1arename_fo_termV13V12aidentityIais_symbol_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_symbol_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityAais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V9V1arename_fo_termV10V9aidentityIais_symbol_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_symbol_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Aainfix &lt;asize_tableauV5asize_tableauV2Aainfix &lt;=c0asize_tableauV2Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.39"/>
-    </proof>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.1"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="499" loccnumb="13" loccnume="62"
-      expl="1. postcondition"
-      sum="86aec785b4dfba80d67952131f8e5778"
-      proved="true"
-      expanded="false"
-      shape="postconditionCais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2aRoottaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.2"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="499" loccnumb="13" loccnume="62"
-      expl="2. variant decrease"
-      sum="bb3a55fac1292993a61092bc22fa8ec3"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaRootainfix &lt;asize_tableauV5asize_tableauV2Aainfix &lt;=c0asize_tableauV2Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.3"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="499" loccnumb="13" loccnume="62"
-      expl="3. assertion"
-      sum="8cab24c13931e9850561b20aa2545967"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V9V1arename_fo_termV10V9aidentityIais_symbol_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_symbol_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.4"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="499" loccnumb="13" loccnume="62"
-      expl="4. assertion"
-      sum="4431b3d55f8f127effa7373000640742"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V12V1arename_fo_termV13V12aidentityIais_symbol_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_symbol_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityIais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V9V1arename_fo_termV10V9aidentityIais_symbol_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_symbol_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.5"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="499" loccnumb="13" loccnume="62"
-      expl="5. assertion"
-      sum="bbdc835dca54460d62d0451ab047af90"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V15V1arename_fo_termV16V15aidentityIais_symbol_free_var_in_fo_termV1V16Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formula_listV1asubst_fo_formula_listV7arename_subst_symbolV3aidentityV14Iais_symbol_free_var_in_fo_termV1ainfix @!V14V0Aais_fo_term_free_var_in_fo_formula_listV0V7Larename_subst_fo_termV4aidentityaidentityIais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V12V1arename_fo_termV13V12aidentityIais_symbol_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_symbol_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityIais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V9V1arename_fo_termV10V9aidentityIais_symbol_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_symbol_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.6"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="499" loccnumb="13" loccnume="62"
-      expl="6. postcondition"
-      sum="9994100147756977386fb91e508092f9"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaRootais_symbol_free_var_in_tableauV1asubst_tableauV2V3V4Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2Iais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V15V1arename_fo_termV16V15aidentityIais_symbol_free_var_in_fo_termV1V16Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formula_listV1asubst_fo_formula_listV7arename_subst_symbolV3aidentityV14Iais_symbol_free_var_in_fo_termV1ainfix @!V14V0Aais_fo_term_free_var_in_fo_formula_listV0V7Larename_subst_fo_termV4aidentityaidentityIais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V12V1arename_fo_termV13V12aidentityIais_symbol_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_symbol_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_symbol_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityIais_symbol_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_symbol_free_var_in_fo_termV1ainfix @!V4V0Iais_symbol_free_var_in_fo_termainfix @!V9V1arename_fo_termV10V9aidentityIais_symbol_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_symbol_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_symbol_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_symbol_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.15"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="539" loccnumb="13" loccnume="63"
-    expl="VC for subst_free_var_propagation_fo_term_fo_term_tableau"
-    sum="341c70aac8bedc9db8b6bb72798e7ff5"
-    proved="true"
-    expanded="false"
-    shape="Cais_fo_term_free_var_in_tableauV1asubst_tableauV2V3V4Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2aRootais_fo_term_free_var_in_tableauV1asubst_tableauV2V3V4Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2Aais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V15V1arename_fo_termV16aidentityV15Iais_fo_term_free_var_in_fo_termV1V16Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formula_listV1asubst_fo_formula_listV7arename_subst_symbolV3aidentityV14Iais_fo_term_free_var_in_fo_termV1ainfix @!V14V0Aais_fo_term_free_var_in_fo_formula_listV0V7Larename_subst_fo_termV4aidentityaidentityAais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V12V1arename_fo_termV13aidentityV12Iais_fo_term_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_fo_term_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityAais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V9V1arename_fo_termV10aidentityV9Iais_fo_term_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_fo_term_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Aainfix &lt;asize_tableauV5asize_tableauV2Aainfix &lt;=c0asize_tableauV2Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.81"/>
-    </proof>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.1"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="539" loccnumb="13" loccnume="63"
-      expl="1. postcondition"
-      sum="dd764861a1b862f19ce1a49a646f88cc"
-      proved="true"
-      expanded="false"
-      shape="postconditionCais_fo_term_free_var_in_tableauV1asubst_tableauV2V3V4Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2aRoottaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.2"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="539" loccnumb="13" loccnume="63"
-      expl="2. variant decrease"
-      sum="a352931e4592308f060793d9b7fdb452"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaRootainfix &lt;asize_tableauV5asize_tableauV2Aainfix &lt;=c0asize_tableauV2Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.3"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="539" loccnumb="13" loccnume="63"
-      expl="3. assertion"
-      sum="4dc92b1081e932e5e770ef2048859dc3"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V9V1arename_fo_termV10aidentityV9Iais_fo_term_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_fo_term_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.4"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="539" loccnumb="13" loccnume="63"
-      expl="4. assertion"
-      sum="addba83594bd19d4f0e07ab4835d56a8"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V12V1arename_fo_termV13aidentityV12Iais_fo_term_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_fo_term_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityIais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V9V1arename_fo_termV10aidentityV9Iais_fo_term_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_fo_term_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.5"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="539" loccnumb="13" loccnume="63"
-      expl="5. assertion"
-      sum="151ccdbc7d1aa53438f983b854618114"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaRootais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V15V1arename_fo_termV16aidentityV15Iais_fo_term_free_var_in_fo_termV1V16Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formula_listV1asubst_fo_formula_listV7arename_subst_symbolV3aidentityV14Iais_fo_term_free_var_in_fo_termV1ainfix @!V14V0Aais_fo_term_free_var_in_fo_formula_listV0V7Larename_subst_fo_termV4aidentityaidentityIais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V12V1arename_fo_termV13aidentityV12Iais_fo_term_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_fo_term_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityIais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V9V1arename_fo_termV10aidentityV9Iais_fo_term_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_fo_term_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.6"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="539" loccnumb="13" loccnume="63"
-      expl="6. postcondition"
-      sum="8fc714f893774a7ee7da907cdb79ed50"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaRootais_fo_term_free_var_in_tableauV1asubst_tableauV2V3V4Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Aais_fo_term_free_var_in_tableauV0V2Iais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V15V1arename_fo_termV16aidentityV15Iais_fo_term_free_var_in_fo_termV1V16Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formula_listV1asubst_fo_formula_listV7arename_subst_symbolV3aidentityV14Iais_fo_term_free_var_in_fo_termV1ainfix @!V14V0Aais_fo_term_free_var_in_fo_formula_listV0V7Larename_subst_fo_termV4aidentityaidentityIais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V12V1arename_fo_termV13aidentityV12Iais_fo_term_free_var_in_fo_termV1V13Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_fo_formulaV1asubst_fo_formulaV6arename_subst_symbolV3aidentityV11Iais_fo_term_free_var_in_fo_termV1ainfix @!V11V0Aais_fo_term_free_var_in_fo_formulaV0V6Larename_subst_fo_termV4aidentityaidentityIais_fo_term_free_var_in_fo_termV1ainfix @!arename_subst_fo_termV4aidentityaidentityV0Iais_fo_term_free_var_in_fo_termV1ainfix @!V4V0Iais_fo_term_free_var_in_fo_termainfix @!V9V1arename_fo_termV10aidentityV9Iais_fo_term_free_var_in_fo_termV1V10Lainfix @!V4V0LaidentityIais_fo_term_free_var_in_tableauV1asubst_tableauV5arename_subst_symbolV3aidentityV8Iais_fo_term_free_var_in_fo_termV1ainfix @!V8V0Aais_fo_term_free_var_in_tableauV0V5Larename_subst_fo_termV4aidentityaidentityaNodeVVVV2F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for subst_free_var_propagation_fo_term_fo_term_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.14"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter free_var_equivalence_of_subst_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="579" loccnumb="16" loccnume="53"
-    expl="VC for free_var_equivalence_of_subst_tableau"
-    sum="ebbf1a8becdbd55cce9b0c4e640a72a5"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =asubst_tableauV0V1V3asubst_tableauV0V2V4aRootainfix =asubst_tableauV0V1V3asubst_tableauV0V2V4Iainfix =asubst_fo_formula_listV7V19V17asubst_fo_formula_listV7V18V16Aainfix =ainfix @!V17V20ainfix @!V16V20Iais_fo_term_free_var_in_fo_formula_listV20V7FAainfix =ainfix @!V19V21ainfix @!V18V21Iais_symbol_free_var_in_fo_formula_listV21V7FLarename_subst_symbolV1aidentityLarename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityLarename_subst_fo_termV4aidentityaidentityAais_fo_term_free_var_in_tableauV22V0Iais_fo_term_free_var_in_fo_formula_listV22V7FAais_symbol_free_var_in_tableauV23V0Iais_symbol_free_var_in_fo_formula_listV23V7FIainfix =asubst_fo_formulaV6V15V13asubst_fo_formulaV6V14V12Aainfix =ainfix @!V13V24ainfix @!V12V24Iais_fo_term_free_var_in_fo_formulaV24V6FAainfix =ainfix @!V15V25ainfix @!V14V25Iais_symbol_free_var_in_fo_formulaV25V6FLarename_subst_symbolV1aidentityLarename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityLarename_subst_fo_termV4aidentityaidentityAais_fo_term_free_var_in_tableauV26V0Iais_fo_term_free_var_in_fo_formulaV26V6FAais_symbol_free_var_in_tableauV27V0Iais_symbol_free_var_in_fo_formulaV27V6FIainfix =asubst_tableauV5V11V9asubst_tableauV5V10V8Aainfix =ainfix @!V9V28ainfix @!V8V28Iais_fo_term_free_var_in_tableauV28V5FAainfix =ainfix @!V11V29ainfix @!V10V29Iais_symbol_free_var_in_tableauV29V5FAainfix &lt;asize_tableauV5asize_tableauV0Aainfix &lt;=c0asize_tableauV0Larename_subst_symbolV1aidentityLarename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityLarename_subst_fo_termV4aidentityaidentityAais_fo_term_free_var_in_tableauV30V0Iais_fo_term_free_var_in_tableauV30V5FAais_symbol_free_var_in_tableauV31V0Iais_symbol_free_var_in_tableauV31V5FaNodeVVVV0Iainfix =ainfix @!V3V32ainfix @!V4V32Iais_fo_term_free_var_in_tableauV32V0FAainfix =ainfix @!V1V33ainfix @!V2V33Iais_symbol_free_var_in_tableauV33V0FF">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for free_var_equivalence_of_subst_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.35"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter free_var_equivalence_of_rename_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="632" loccnumb="12" loccnume="50"
-    expl="VC for free_var_equivalence_of_rename_tableau"
-    sum="cf76f528c390e18477465fc773f0483f"
-    proved="true"
-    expanded="false"
-    shape="ainfix =arename_tableauV0V1V3arename_tableauV0V2V4Iainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Aainfix =ainfix @!V6V9ainfix @!V5V9Iais_fo_term_free_var_in_tableauV9V0FAainfix =ainfix @!V8V10ainfix @!V7V10Iais_symbol_free_var_in_tableauV10V0FLasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =ainfix @!V3V11ainfix @!V4V11Iais_fo_term_free_var_in_tableauV11V0FAainfix =ainfix @!V1V12ainfix @!V2V12Iais_symbol_free_var_in_tableauV12V0FF">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for free_var_equivalence_of_rename_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.17"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter free_var_derive_equivalence_of_subst_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="644" loccnumb="16" loccnume="60"
-    expl="VC for free_var_derive_equivalence_of_subst_tableau"
-    sum="20e1cb4e18a74a978465442afc504d5a"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =ainfix @!V3V5ainfix @!V4V5Iais_fo_term_free_var_in_tableauV5V0FAainfix =ainfix @!V1V6ainfix @!V2V6Iais_symbol_free_var_in_tableauV6V0FaRootainfix =ainfix @!V3V22ainfix @!V4V22Iais_fo_term_free_var_in_tableauV22V0FAainfix =ainfix @!V1V23ainfix @!V2V23Iais_symbol_free_var_in_tableauV23V0FAainfix =ainfix @!V3V24ainfix @!V4V24Iais_fo_term_free_var_in_fo_formula_listV24V9FAainfix =ainfix @!V3V25ainfix @!V4V25Aainfix =arename_fo_termarename_fo_termainfix @!V4V25aidentityaidentityaidentityaidentityainfix @!V4V25Aainfix =arename_fo_termarename_fo_termainfix @!V3V25aidentityaidentityaidentityaidentityarename_fo_termarename_fo_termainfix @!V4V25aidentityaidentityaidentityaidentityAainfix =ainfix @!V3V25arename_fo_termarename_fo_termainfix @!V3V25aidentityaidentityaidentityaidentityAainfix =ainfix @!arename_subst_fo_termV4aidentityaidentityV25arename_fo_termainfix @!V4V25aidentityaidentityAainfix =ainfix @!arename_subst_fo_termV3aidentityaidentityV25ainfix @!arename_subst_fo_termV4aidentityaidentityV25Aainfix =arename_fo_termainfix @!V3V25aidentityaidentityainfix @!arename_subst_fo_termV3aidentityaidentityV25Iais_fo_term_free_var_in_fo_formula_listV25V9FAainfix =ainfix @!V1V26ainfix @!V2V26Iais_symbol_free_var_in_fo_formula_listV26V9FAainfix =ainfix @!V1V27ainfix @!V2V27Aainfix =CaVar_symbolainfix @!aidentityainfix @!aidentityV28aVar_symbolVainfix @!V2V27ainfix @!V2V27Aainfix =CaVar_symbolainfix @!aidentityainfix @!aidentityV29aVar_symbolVainfix @!V1V27CaVar_symbolainfix @!aidentityainfix @!aidentityV30aVar_symbolVainfix @!V2V27Aainfix =ainfix @!V1V27CaVar_symbolainfix @!aidentityainfix @!aidentityV31aVar_symbolVainfix @!V1V27Aainfix =ainfix @!arename_subst_symbolV2aidentityV27CaVar_symbolainfix @!aidentityV32aVar_symbolVainfix @!V2V27Aainfix =ainfix @!arename_subst_symbolV1aidentityV27ainfix @!arename_subst_symbolV2aidentityV27Aainfix =CaVar_symbolainfix @!aidentityV33aVar_symbolVainfix @!V1V27ainfix @!arename_subst_symbolV1aidentityV27Iais_symbol_free_var_in_fo_formula_listV27V9FIainfix =ainfix @!V19V34ainfix @!V18V34Iais_fo_term_free_var_in_fo_formula_listV34V9FAainfix =ainfix @!V21V35ainfix @!V20V35Iais_symbol_free_var_in_fo_formula_listV35V9FAainfix =asubst_fo_formula_listV9V21V19asubst_fo_formula_listV9V20V18Larename_subst_symbolV1aidentityLarename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityLarename_subst_fo_termV4aidentityaidentityAainfix =ainfix @!V3V36ainfix @!V4V36Iais_fo_term_free_var_in_fo_formulaV36V8FAainfix =ainfix @!V3V37ainfix @!V4V37Aainfix =arename_fo_termarename_fo_termainfix @!V4V37aidentityaidentityaidentityaidentityainfix @!V4V37Aainfix =arename_fo_termarename_fo_termainfix @!V3V37aidentityaidentityaidentityaidentityarename_fo_termarename_fo_termainfix @!V4V37aidentityaidentityaidentityaidentityAainfix =ainfix @!V3V37arename_fo_termarename_fo_termainfix @!V3V37aidentityaidentityaidentityaidentityAainfix =ainfix @!arename_subst_fo_termV4aidentityaidentityV37arename_fo_termainfix @!V4V37aidentityaidentityAainfix =ainfix @!arename_subst_fo_termV3aidentityaidentityV37ainfix @!arename_subst_fo_termV4aidentityaidentityV37Aainfix =arename_fo_termainfix @!V3V37aidentityaidentityainfix @!arename_subst_fo_termV3aidentityaidentityV37Iais_fo_term_free_var_in_fo_formulaV37V8FAainfix =ainfix @!V1V38ainfix @!V2V38Iais_symbol_free_var_in_fo_formulaV38V8FAainfix =ainfix @!V1V39ainfix @!V2V39Aainfix =CaVar_symbolainfix @!aidentityainfix @!aidentityV40aVar_symbolVainfix @!V2V39ainfix @!V2V39Aainfix =CaVar_symbolainfix @!aidentityainfix @!aidentityV41aVar_symbolVainfix @!V1V39CaVar_symbolainfix @!aidentityainfix @!aidentityV42aVar_symbolVainfix @!V2V39Aainfix =ainfix @!V1V39CaVar_symbolainfix @!aidentityainfix @!aidentityV43aVar_symbolVainfix @!V1V39Aainfix =ainfix @!arename_subst_symbolV2aidentityV39CaVar_symbolainfix @!aidentityV44aVar_symbolVainfix @!V2V39Aainfix =ainfix @!arename_subst_symbolV1aidentityV39ainfix @!arename_subst_symbolV2aidentityV39Aainfix =CaVar_symbolainfix @!aidentityV45aVar_symbolVainfix @!V1V39ainfix @!arename_subst_symbolV1aidentityV39Iais_symbol_free_var_in_fo_formulaV39V8FIainfix =ainfix @!V15V46ainfix @!V14V46Iais_fo_term_free_var_in_fo_formulaV46V8FAainfix =ainfix @!V17V47ainfix @!V16V47Iais_symbol_free_var_in_fo_formulaV47V8FAainfix =asubst_fo_formulaV8V17V15asubst_fo_formulaV8V16V14Larename_subst_symbolV1aidentityLarename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityLarename_subst_fo_termV4aidentityaidentityAainfix =ainfix @!V3V48ainfix @!V4V48Iais_fo_term_free_var_in_tableauV48V7FAainfix =ainfix @!V3V49ainfix @!V4V49Aainfix =arename_fo_termarename_fo_termainfix @!V4V49aidentityaidentityaidentityaidentityainfix @!V4V49Aainfix =arename_fo_termarename_fo_termainfix @!V3V49aidentityaidentityaidentityaidentityarename_fo_termarename_fo_termainfix @!V4V49aidentityaidentityaidentityaidentityAainfix =ainfix @!V3V49arename_fo_termarename_fo_termainfix @!V3V49aidentityaidentityaidentityaidentityAainfix =ainfix @!arename_subst_fo_termV4aidentityaidentityV49arename_fo_termainfix @!V4V49aidentityaidentityAainfix =ainfix @!arename_subst_fo_termV3aidentityaidentityV49ainfix @!arename_subst_fo_termV4aidentityaidentityV49Aainfix =arename_fo_termainfix @!V3V49aidentityaidentityainfix @!arename_subst_fo_termV3aidentityaidentityV49Iais_fo_term_free_var_in_tableauV49V7FAainfix =ainfix @!V1V50ainfix @!V2V50Iais_symbol_free_var_in_tableauV50V7FAainfix =ainfix @!V1V51ainfix @!V2V51Aainfix =CaVar_symbolainfix @!aidentityainfix @!aidentityV52aVar_symbolVainfix @!V2V51ainfix @!V2V51Aainfix =CaVar_symbolainfix @!aidentityainfix @!aidentityV53aVar_symbolVainfix @!V1V51CaVar_symbolainfix @!aidentityainfix @!aidentityV54aVar_symbolVainfix @!V2V51Aainfix =ainfix @!V1V51CaVar_symbolainfix @!aidentityainfix @!aidentityV55aVar_symbolVainfix @!V1V51Aainfix =ainfix @!arename_subst_symbolV2aidentityV51CaVar_symbolainfix @!aidentityV56aVar_symbolVainfix @!V2V51Aainfix =ainfix @!arename_subst_symbolV1aidentityV51ainfix @!arename_subst_symbolV2aidentityV51Aainfix =CaVar_symbolainfix @!aidentityV57aVar_symbolVainfix @!V1V51ainfix @!arename_subst_symbolV1aidentityV51Iais_symbol_free_var_in_tableauV51V7FIainfix =ainfix @!V11V58ainfix @!V10V58Iais_fo_term_free_var_in_tableauV58V7FAainfix =ainfix @!V13V59ainfix @!V12V59Iais_symbol_free_var_in_tableauV59V7FAainfix =asubst_tableauV7V13V11asubst_tableauV7V12V10Aainfix &lt;asize_tableauV7asize_tableauV0Aainfix &lt;=c0asize_tableauV0Larename_subst_symbolV1aidentityLarename_subst_symbolV2aidentityLarename_subst_fo_termV3aidentityaidentityLarename_subst_fo_termV4aidentityaidentityaNodeVVVV0Iainfix =asubst_tableauV0V1V3asubst_tableauV0V2V4F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for free_var_derive_equivalence_of_subst_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.84"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter free_var_derive_equivalence_of_rename_tableau"
-    locfile="../Firstorder_tableau_spec.mlw"
-    loclnum="763" loccnumb="12" loccnume="57"
-    expl="VC for free_var_derive_equivalence_of_rename_tableau"
-    sum="07fa024115a09102424dc6196dc72fa8"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix @!V3V9ainfix @!V4V9Iais_fo_term_free_var_in_tableauV9V0FAainfix =ainfix @!V1V10ainfix @!V2V10Iais_symbol_free_var_in_tableauV10V0FAainfix =ainfix @!V3V11ainfix @!V4V11Aainfix =ainfix @!V3V11ainfix @!V4V11Iainfix =ainfix @!asubst_of_rename_fo_termV3V11ainfix @!asubst_of_rename_fo_termV4V11FAainfix =ainfix @!V1V12ainfix @!V2V12Aainfix =ainfix @!V1V12ainfix @!V2V12Iainfix =ainfix @!asubst_of_rename_symbolV1V12ainfix @!asubst_of_rename_symbolV2V12FIainfix =ainfix @!V6V13ainfix @!V5V13Iais_fo_term_free_var_in_tableauV13V0FAainfix =ainfix @!V8V14ainfix @!V7V14Iais_symbol_free_var_in_tableauV14V0FAainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Lasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =arename_tableauV0V1V3arename_tableauV0V2V4F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for free_var_derive_equivalence_of_rename_tableau"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.69"/>
-    </proof>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter free_var_derive_equivalence_of_rename_tableau.1"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="763" loccnumb="12" loccnume="57"
-      expl="1. precondition"
-      sum="97efc079906e65c9cae13ebcadf0e86c"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Lasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =arename_tableauV0V1V3arename_tableauV0V2V4F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for free_var_derive_equivalence_of_rename_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter free_var_derive_equivalence_of_rename_tableau.2"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="763" loccnumb="12" loccnume="57"
-      expl="2. assertion"
-      sum="95120910fe4386e378dfbd1935387892"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix =ainfix @!V1V9ainfix @!V2V9Aainfix =ainfix @!V1V9ainfix @!V2V9Iainfix =ainfix @!asubst_of_rename_symbolV1V9ainfix @!asubst_of_rename_symbolV2V9FIainfix =ainfix @!V6V10ainfix @!V5V10Iais_fo_term_free_var_in_tableauV10V0FAainfix =ainfix @!V8V11ainfix @!V7V11Iais_symbol_free_var_in_tableauV11V0FIainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Lasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =arename_tableauV0V1V3arename_tableauV0V2V4F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for free_var_derive_equivalence_of_rename_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter free_var_derive_equivalence_of_rename_tableau.3"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="763" loccnumb="12" loccnume="57"
-      expl="3. assertion"
-      sum="01d806eaa6a09219826a40fba564d1a4"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix =ainfix @!V3V9ainfix @!V4V9Aainfix =ainfix @!V3V9ainfix @!V4V9Iainfix =ainfix @!asubst_of_rename_fo_termV3V9ainfix @!asubst_of_rename_fo_termV4V9FIainfix =ainfix @!V1V10ainfix @!V2V10Aainfix =ainfix @!V1V10ainfix @!V2V10Iainfix =ainfix @!asubst_of_rename_symbolV1V10ainfix @!asubst_of_rename_symbolV2V10FIainfix =ainfix @!V6V11ainfix @!V5V11Iais_fo_term_free_var_in_tableauV11V0FAainfix =ainfix @!V8V12ainfix @!V7V12Iais_symbol_free_var_in_tableauV12V0FIainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Lasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =arename_tableauV0V1V3arename_tableauV0V2V4F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for free_var_derive_equivalence_of_rename_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter free_var_derive_equivalence_of_rename_tableau.4"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="763" loccnumb="12" loccnume="57"
-      expl="4. postcondition"
-      sum="00843c3b363be03e6229b0bd7c34395b"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =ainfix @!V1V9ainfix @!V2V9Iais_symbol_free_var_in_tableauV9V0FIainfix =ainfix @!V3V10ainfix @!V4V10Aainfix =ainfix @!V3V10ainfix @!V4V10Iainfix =ainfix @!asubst_of_rename_fo_termV3V10ainfix @!asubst_of_rename_fo_termV4V10FIainfix =ainfix @!V1V11ainfix @!V2V11Aainfix =ainfix @!V1V11ainfix @!V2V11Iainfix =ainfix @!asubst_of_rename_symbolV1V11ainfix @!asubst_of_rename_symbolV2V11FIainfix =ainfix @!V6V12ainfix @!V5V12Iais_fo_term_free_var_in_tableauV12V0FAainfix =ainfix @!V8V13ainfix @!V7V13Iais_symbol_free_var_in_tableauV13V0FIainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Lasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =arename_tableauV0V1V3arename_tableauV0V2V4F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for free_var_derive_equivalence_of_rename_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.38"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.99"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter free_var_derive_equivalence_of_rename_tableau.5"
-      locfile="../Firstorder_tableau_spec.mlw"
-      loclnum="763" loccnumb="12" loccnume="57"
-      expl="5. postcondition"
-      sum="06b12185cf4f0402890f082859b292a7"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =ainfix @!V3V9ainfix @!V4V9Iais_fo_term_free_var_in_tableauV9V0FIainfix =ainfix @!V3V10ainfix @!V4V10Aainfix =ainfix @!V3V10ainfix @!V4V10Iainfix =ainfix @!asubst_of_rename_fo_termV3V10ainfix @!asubst_of_rename_fo_termV4V10FIainfix =ainfix @!V1V11ainfix @!V2V11Aainfix =ainfix @!V1V11ainfix @!V2V11Iainfix =ainfix @!asubst_of_rename_symbolV1V11ainfix @!asubst_of_rename_symbolV2V11FIainfix =ainfix @!V6V12ainfix @!V5V12Iais_fo_term_free_var_in_tableauV12V0FAainfix =ainfix @!V8V13ainfix @!V7V13Iais_symbol_free_var_in_tableauV13V0FIainfix =asubst_tableauV0V8V6asubst_tableauV0V7V5Lasubst_of_rename_symbolV1Lasubst_of_rename_symbolV2Lasubst_of_rename_fo_termV3Lasubst_of_rename_fo_termV4Iainfix =arename_tableauV0V1V3arename_tableauV0V2V4F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for free_var_derive_equivalence_of_rename_tableau"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="3.68"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.99"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<file name="../Firstorder_tableau_spec.mlw" expanded="true">
+<theory name="Spec" sum="04ae47ccff643d8e6498166eda7f9b58">
+ <goal name="WP_parameter size_positive_lemma_tableau" expl="VC for size_positive_lemma_tableau">
+ <proof prover="2"><result status="valid" time="0.16" steps="70"/></proof>
+ </goal>
+ <goal name="WP_parameter renaming_composition_lemma_tableau" expl="VC for renaming_composition_lemma_tableau">
+ <proof prover="2"><result status="valid" time="0.15" steps="74"/></proof>
+ </goal>
+ <goal name="WP_parameter renaming_identity_lemma_tableau" expl="VC for renaming_identity_lemma_tableau">
+ <proof prover="2"><result status="valid" time="0.10" steps="48"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_then_subst_composition_lemma_tableau" expl="VC for rename_then_subst_composition_lemma_tableau">
+ <proof prover="2"><result status="valid" time="0.94" steps="116"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_then_rename_composition_lemma_tableau" expl="VC for subst_then_rename_composition_lemma_tableau">
+ <proof prover="2"><result status="valid" time="0.25" steps="239"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_composition_lemma_tableau" expl="VC for subst_composition_lemma_tableau">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_composition_lemma_tableau.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_composition_lemma_tableau.2" expl="2. variant decrease">
+  <proof prover="2"><result status="valid" time="0.10" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_composition_lemma_tableau.3" expl="3. postcondition">
+  <proof prover="2"><result status="valid" time="0.11" steps="50"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_identity_lemma_tableau" expl="VC for subst_identity_lemma_tableau">
+ <proof prover="2"><result status="valid" time="0.20" steps="96"/></proof>
+ </goal>
+ <goal name="WP_parameter renaming_preserve_size_tableau" expl="VC for renaming_preserve_size_tableau">
+ <proof prover="2"><result status="valid" time="0.14" steps="65"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_tableau" expl="VC for rename_free_var_constructive_inversion_symbol_tableau">
+ <proof prover="2"><result status="valid" time="0.19" steps="171"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_inversion_symbol_tableau" expl="VC for rename_free_var_inversion_symbol_tableau">
+ <proof prover="2"><result status="valid" time="0.10" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_constructive_inversion_fo_term_tableau" expl="VC for rename_free_var_constructive_inversion_fo_term_tableau">
+ <proof prover="2"><result status="valid" time="0.17" steps="171"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_inversion_fo_term_tableau" expl="VC for rename_free_var_inversion_fo_term_tableau">
+ <proof prover="2"><result status="valid" time="0.10" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_propagation_symbol_tableau" expl="VC for rename_free_var_propagation_symbol_tableau">
+ <proof prover="2"><result status="valid" time="0.23" steps="221"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_propagation_fo_term_tableau" expl="VC for rename_free_var_propagation_fo_term_tableau">
+ <proof prover="2"><result status="valid" time="0.22" steps="221"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_tableau" expl="VC for subst_free_var_constructive_inversion_symbol_tableau">
+ <proof prover="2"><result status="valid" time="0.29" steps="840"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_inversion_symbol_tableau" expl="VC for subst_free_var_inversion_symbol_tableau">
+ <proof prover="2"><result status="valid" time="0.12" steps="54"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_constructive_inversion_fo_term_tableau" expl="VC for subst_free_var_constructive_inversion_fo_term_tableau">
+ <proof prover="2"><result status="valid" time="0.20" steps="448"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_inversion_fo_term_tableau" expl="VC for subst_free_var_inversion_fo_term_tableau">
+ <proof prover="2"><result status="valid" time="0.08" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau" expl="VC for subst_free_var_propagation_symbol_symbol_tableau">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.2" expl="2. variant decrease">
+  <proof prover="2"><result status="valid" time="0.11" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.3" expl="3. assertion">
+  <proof prover="2"><result status="valid" time="0.09" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.4" expl="4. assertion">
+  <proof prover="2"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.5" expl="5. assertion">
+  <proof prover="2"><result status="valid" time="0.08" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_tableau.6" expl="6. postcondition">
+  <proof prover="2"><result status="valid" time="0.18" steps="174"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau" expl="VC for subst_free_var_propagation_fo_term_symbol_tableau">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.2" expl="2. variant decrease">
+  <proof prover="2"><result status="valid" time="0.10" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.3" expl="3. assertion">
+  <proof prover="2"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.4" expl="4. assertion">
+  <proof prover="2"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.5" expl="5. assertion">
+  <proof prover="2"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_tableau.6" expl="6. postcondition">
+  <proof prover="2"><result status="valid" time="0.15" steps="242"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau" expl="VC for subst_free_var_propagation_fo_term_fo_term_tableau">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.2" expl="2. variant decrease">
+  <proof prover="2"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.3" expl="3. assertion">
+  <proof prover="2"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.4" expl="4. assertion">
+  <proof prover="2"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.5" expl="5. assertion">
+  <proof prover="2"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_tableau.6" expl="6. postcondition">
+  <proof prover="2"><result status="valid" time="0.14" steps="264"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter free_var_equivalence_of_subst_tableau" expl="VC for free_var_equivalence_of_subst_tableau">
+ <proof prover="2"><result status="valid" time="0.17" steps="563"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_equivalence_of_rename_tableau" expl="VC for free_var_equivalence_of_rename_tableau">
+ <proof prover="2"><result status="valid" time="0.17" steps="251"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_derive_equivalence_of_subst_tableau" expl="VC for free_var_derive_equivalence_of_subst_tableau">
+ <proof prover="2"><result status="valid" time="0.39" steps="935"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_derive_equivalence_of_rename_tableau" expl="VC for free_var_derive_equivalence_of_rename_tableau">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter free_var_derive_equivalence_of_rename_tableau.1" expl="1. precondition">
+  <proof prover="2"><result status="valid" time="0.09" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter free_var_derive_equivalence_of_rename_tableau.2" expl="2. assertion">
+  <proof prover="2"><result status="valid" time="0.12" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter free_var_derive_equivalence_of_rename_tableau.3" expl="3. assertion">
+  <proof prover="2"><result status="valid" time="0.12" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter free_var_derive_equivalence_of_rename_tableau.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.85"/></proof>
+  </goal>
+  <goal name="WP_parameter free_var_derive_equivalence_of_rename_tableau.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.87"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

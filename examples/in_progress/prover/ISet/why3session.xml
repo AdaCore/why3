@@ -1,1084 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="3">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Spass"
-  version="3.5"/>
- <file
-  name="../ISet.mlw"
-  verified="true"
-  expanded="false">
-  <theory
-   name="Types"
-   locfile="../ISet.mlw"
-   loclnum="2" loccnumb="7" loccnume="12"
-   verified="true"
-   expanded="false">
-  </theory>
-  <theory
-   name="Logic"
-   locfile="../ISet.mlw"
-   loclnum="10" loccnumb="7" loccnume="12"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter iset_ok_char"
-    locfile="../ISet.mlw"
-    loclnum="23" loccnumb="16" loccnume="28"
-    expl="VC for iset_ok_char"
-    sum="163d6548cb2bf4ebcb027c1e88eae9bf"
-    proved="true"
-    expanded="false"
-    shape="Cainfix &lt;V0V2IamemV2V1FAaiset_okV1qaiset_okaConsV0V1aNilainfix &lt;V0V5IamemV5V1FAaiset_okV1qaiset_okaConsV0V1Aainfix &lt;V0V3Iainfix &lt;V0V6IamemV6V1FIainfix &lt;V3V7IamemV7V4FAaiset_okV4qaiset_okaConsV3V4ACfaNilainfix =V8V4aConswVV1aConsVVV1F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for iset_ok_char"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter iset_ok_char.1"
-      locfile="../ISet.mlw"
-      loclnum="23" loccnumb="16" loccnume="28"
-      expl="1. postcondition"
-      sum="cd14569ec0b36b8e1126883a3488a371"
-      proved="true"
-      expanded="false"
-      shape="postconditionCainfix &lt;V0V2IamemV2V1FAaiset_okV1qaiset_okaConsV0V1aNiltaConsVVV1F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for iset_ok_char"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter iset_ok_char.2"
-      locfile="../ISet.mlw"
-      loclnum="23" loccnumb="16" loccnume="28"
-      expl="2. variant decrease"
-      sum="66dbdb9b5a4840998fbd88aa10396fbc"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV1aConsVVV1F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for iset_ok_char"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter iset_ok_char.3"
-      locfile="../ISet.mlw"
-      loclnum="23" loccnumb="16" loccnume="28"
-      expl="3. assertion"
-      sum="b422b26c693fe8bd805b6ae3874272b6"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaNilainfix &lt;V0V2Iainfix &lt;V0V4IamemV4V1FIainfix &lt;V2V5IamemV5V3FAaiset_okV3qaiset_okaConsV2V3aConsVVV1F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for iset_ok_char"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter iset_ok_char.4"
-      locfile="../ISet.mlw"
-      loclnum="23" loccnumb="16" loccnume="28"
-      expl="4. postcondition"
-      sum="31d5bd295b1a5ea70b8a698c7e74d5a1"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilainfix &lt;V0V4IamemV4V1FAaiset_okV1qaiset_okaConsV0V1Iainfix &lt;V0V2Iainfix &lt;V0V5IamemV5V1FIainfix &lt;V2V6IamemV6V3FAaiset_okV3qaiset_okaConsV2V3aConsVVV1F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for iset_ok_char"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
-  <theory
-   name="Impl"
-   locfile="../ISet.mlw"
-   loclnum="36" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter insert"
-    locfile="../ISet.mlw"
-    loclnum="46" loccnumb="10" loccnume="16"
-    expl="VC for insert"
-    sum="ce5c8f6c3589060381b37ac2dc155101"
-    proved="true"
-    expanded="false"
-    shape="CamemV3V1Oainfix =V3V0qamemV3V2FAaiset_okV2LaConsV0aNilaNiliiamemV6V1Oainfix =V6V0qamemV6V1FAaiset_okV1amemV9V1Oainfix =V9V0qamemV9V8FAaiset_okV8LaConsV4V7IamemV10V5Oainfix =V10V0qamemV10V7FAaiset_okV7FAaiset_okV5ACfaNilainfix =V11V5aConswVV1ainfix &gt;V0V4amemV13V1Oainfix =V13V0qamemV13V12FAaiset_okV12LaConsV0V1ainfix &lt;V0V4aConsVVV1Iaiset_okV1F">
-    <label
-     name="expl:VC for insert"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter insert.1"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="1. postcondition"
-      sum="7dffc688887496c3d09bcf0529b44aaa"
-      proved="true"
-      expanded="false"
-      shape="postconditionCaiset_okV2LaConsV0aNilaNiltaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.2"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="2. postcondition"
-      sum="44b9eb040285efba747095f673363686"
-      proved="true"
-      expanded="false"
-      shape="postconditionCamemV3V1Oainfix =V3V0qamemV3V2FLaConsV0aNilaNiltaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.3"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="3. postcondition"
-      sum="63b2f5ea46633bced9df6e38a91e0361"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilaiset_okV4LaConsV0V1Iainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.4"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="4. postcondition"
-      sum="f90a5d4b31c5acbe3fad1969a846150b"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilamemV5V1Oainfix =V5V0qamemV5V4FLaConsV0V1Iainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.5"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="5. variant decrease"
-      sum="402691d227b58a4e0c65917285f8cd39"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV1Iainfix &gt;V0V2INainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.6"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="6. precondition"
-      sum="9f0e8cb1bc7cf51226faf1e407be46a0"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilaiset_okV3Iainfix &gt;V0V2INainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.7"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="7. postcondition"
-      sum="286109db6594e23384a418544a3a0c13"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilaiset_okV5LaConsV2V4IamemV6V3Oainfix =V6V0qamemV6V4FAaiset_okV4FIaiset_okV3Iainfix &gt;V0V2INainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.8"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="8. postcondition"
-      sum="799f62ae20d534646e1ef42efd25d456"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilamemV6V1Oainfix =V6V0qamemV6V5FLaConsV2V4IamemV7V3Oainfix =V7V0qamemV7V4FAaiset_okV4FIaiset_okV3Iainfix &gt;V0V2INainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.9"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="9. postcondition"
-      sum="7fe9599c7bd65ba691b2e044eca88acb"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilaiset_okV1INainfix &gt;V0V2INainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insert.10"
-      locfile="../ISet.mlw"
-      loclnum="46" loccnumb="10" loccnume="16"
-      expl="10. postcondition"
-      sum="9bed5ac28ba1324ad6b694ad6bcfd0b4"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilamemV4V1Oainfix =V4V0qamemV4V1FINainfix &gt;V0V2INainfix &lt;V0V2aConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for insert"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter remove"
-    locfile="../ISet.mlw"
-    loclnum="62" loccnumb="10" loccnume="16"
-    expl="VC for remove"
-    sum="d57211703c20bab02f6c9e58ac84ac0f"
-    proved="true"
-    expanded="false"
-    shape="CNainfix =V3V0AamemV3V1qamemV3V2FAaiset_okV2LaNilaNiliNainfix =V8V0AamemV8V1qamemV8V7FAaiset_okV7LaConsV4V6INainfix =V9V0AamemV9V5qamemV9V6FAaiset_okV6FAaiset_okV5ACfaNilainfix =V10V5aConswVV1Nainfix =V12V0AamemV12V1qamemV12V11FAaiset_okV11INainfix =V13V0AamemV13V5qamemV13V11FAaiset_okV11FAaiset_okV5ACfaNilainfix =V14V5aConswVV1ainfix =V4V0Aainfix &lt;=V4V15IamemV15V5FaConsVVV1Iaiset_okV1F">
-    <label
-     name="expl:VC for remove"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter remove.1"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="1. postcondition"
-      sum="d32215ff908bbe767f52dda602cbc863"
-      proved="true"
-      expanded="false"
-      shape="postconditionCaiset_okV2LaNilaNiltaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.2"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="2. postcondition"
-      sum="16fce5b59f6d0f5e0f47a6ee56a32cf6"
-      proved="true"
-      expanded="false"
-      shape="postconditionCNainfix =V3V0AamemV3V1qamemV3V2FLaNilaNiltaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.3"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="3. assertion"
-      sum="125317bb9d5cea191f1d0aaaaa6d9a12"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaNilainfix &lt;=V2V4IamemV4V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.4"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="4. variant decrease"
-      sum="b0c85ab744c2ed4dfc54b25dded05748"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV1Iainfix =V2V0Iainfix &lt;=V2V5IamemV5V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.5"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="5. precondition"
-      sum="702979891f09c2e4cd12143b4dab911b"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilaiset_okV3Iainfix =V2V0Iainfix &lt;=V2V4IamemV4V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.6"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="6. postcondition"
-      sum="358c3e570441f23e88cf837444cff298"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilaiset_okV4INainfix =V5V0AamemV5V3qamemV5V4FAaiset_okV4FIaiset_okV3Iainfix =V2V0Iainfix &lt;=V2V6IamemV6V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.7"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="7. postcondition"
-      sum="d6e28f447ea60d59a7cbecbb2abeca45"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilNainfix =V5V0AamemV5V1qamemV5V4FINainfix =V6V0AamemV6V3qamemV6V4FAaiset_okV4FIaiset_okV3Iainfix =V2V0Iainfix &lt;=V2V7IamemV7V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.8"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="8. variant decrease"
-      sum="79797f0eb668aee9038b9f24151c74c8"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV1INainfix =V2V0Iainfix &lt;=V2V5IamemV5V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.9"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="9. precondition"
-      sum="1b8062c623cdfaf3ee253b70e5879841"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilaiset_okV3INainfix =V2V0Iainfix &lt;=V2V4IamemV4V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.10"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="10. postcondition"
-      sum="432efc204ed25772a671a7aa24e8cef0"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilaiset_okV5LaConsV2V4INainfix =V6V0AamemV6V3qamemV6V4FAaiset_okV4FIaiset_okV3INainfix =V2V0Iainfix &lt;=V2V7IamemV7V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter remove.11"
-      locfile="../ISet.mlw"
-      loclnum="62" loccnumb="10" loccnume="16"
-      expl="11. postcondition"
-      sum="74cf160b046bb25496ecb4e63a6f4845"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilNainfix =V6V0AamemV6V1qamemV6V5FLaConsV2V4INainfix =V7V0AamemV7V3qamemV7V4FAaiset_okV4FIaiset_okV3INainfix =V2V0Iainfix &lt;=V2V8IamemV8V3FaConsVVV1Iaiset_okV1F">
-      <label
-       name="expl:VC for remove"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter merge"
-    locfile="../ISet.mlw"
-    loclnum="79" loccnumb="10" loccnume="15"
-    expl="VC for merge"
-    sum="a4cbd93ffdc910858b2987d9f52e8a52"
-    proved="true"
-    expanded="false"
-    shape="CamemV2V1OamemV2V0qamemV2V1FAaiset_okV1aNilCamemV5V1OamemV5V0qamemV5V0FAaiset_okV0aNiliiamemV10V1OamemV10V0qamemV10V9FAaiset_okV9LaConsV3V8IamemV11V7OamemV11V4qamemV11V8FAaiset_okV8FAaiset_okV7Aaiset_okV4ACfaNilainfix =V12V7aConswVV1Aainfix =V0V4OCfaNilainfix =V13V4aConswVV0amemV16V1OamemV16V0qamemV16V15FAaiset_okV15LaConsV6V14IamemV17V7OamemV17V0qamemV17V14FAaiset_okV14FAaiset_okV7Aaiset_okV0ACfaNilainfix =V18V7aConswVV1OCfaNilainfix =V19V0aConswVV0Aainfix &lt;=V6V20IamemV20V0Fainfix &gt;V3V6amemV23V1OamemV23V0qamemV23V22FAaiset_okV22LaConsV3V21IamemV24V1OamemV24V4qamemV24V21FAaiset_okV21FAaiset_okV1Aaiset_okV4ACfaNilainfix =V25V1aConswVV1Aainfix =V0V4OCfaNilainfix =V26V4aConswVV0Aainfix &lt;=V3V27IamemV27V1Fainfix &lt;V3V6Aainfix &lt;=V6V28IamemV28V7FAainfix &lt;=V3V29IamemV29V4FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-    <label
-     name="expl:VC for merge"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter merge.1"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="1. postcondition"
-      sum="ca26d14a4b9343b4d2cff4b9daec76e8"
-      proved="true"
-      expanded="false"
-      shape="postconditionCaiset_okV1aNiltaConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.2"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="2. postcondition"
-      sum="c29c92b1a8796059b36e6ead8d1226a6"
-      proved="true"
-      expanded="false"
-      shape="postconditionCamemV2V1OamemV2V0qamemV2V1FaNiltaConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.3"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="3. postcondition"
-      sum="70105453d5f0a8edfb7c40f620dbbbab"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCaiset_okV0aNiltaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.4"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="4. postcondition"
-      sum="99bd9d1d9f1475050d0fd1b351dfb2ff"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCamemV4V1OamemV4V0qamemV4V0FaNiltaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.5"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="5. assertion"
-      sum="e2631528f20db576b21f81c8a9380037"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaNilCtaNilainfix &lt;=V2V6IamemV6V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.6"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="6. assertion"
-      sum="9aef7cc0bcd247207638cecf5da21709"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaNilCtaNilainfix &lt;=V4V6IamemV6V5FIainfix &lt;=V2V7IamemV7V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.7"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="7. assertion"
-      sum="51bfc7477963e433b281f3f8b71d53ff"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaNilCtaNilainfix &lt;=V2V6IamemV6V1FIainfix &lt;V2V4Iainfix &lt;=V4V7IamemV7V5FIainfix &lt;=V2V8IamemV8V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.8"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="8. variant decrease"
-      sum="7a32e0d31dcc41bcad3f844ebb603b7a"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCtaNilCfaNilainfix =V6V1aConswVV1Aainfix =V0V3OCfaNilainfix =V7V3aConswVV0Iainfix &lt;=V2V8IamemV8V1FIainfix &lt;V2V4Iainfix &lt;=V4V9IamemV9V5FIainfix &lt;=V2V10IamemV10V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.9"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="9. precondition"
-      sum="6373bee97e9f14f723f9349417909a81"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilCtaNilaiset_okV3Iainfix &lt;=V2V6IamemV6V1FIainfix &lt;V2V4Iainfix &lt;=V4V7IamemV7V5FIainfix &lt;=V2V8IamemV8V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.10"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="10. precondition"
-      sum="6851b4ff4a2d0afa45e0d8ad09fafd0b"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilCtaNilaiset_okV1Iainfix &lt;=V2V6IamemV6V1FIainfix &lt;V2V4Iainfix &lt;=V4V7IamemV7V5FIainfix &lt;=V2V8IamemV8V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.11"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="11. postcondition"
-      sum="70c7b8c3ea504ec4176e1c92600fe1bf"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCtaNilaiset_okV7LaConsV2V6IamemV8V1OamemV8V3qamemV8V6FAaiset_okV6FIaiset_okV1Aaiset_okV3Iainfix &lt;=V2V9IamemV9V1FIainfix &lt;V2V4Iainfix &lt;=V4V10IamemV10V5FIainfix &lt;=V2V11IamemV11V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="3.12"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.12"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="12. postcondition"
-      sum="f0674d2bc4df6613583535b63e4fc225"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCtaNilamemV8V1OamemV8V0qamemV8V7FLaConsV2V6IamemV9V1OamemV9V3qamemV9V6FAaiset_okV6FIaiset_okV1Aaiset_okV3Iainfix &lt;=V2V10IamemV10V1FIainfix &lt;V2V4Iainfix &lt;=V4V11IamemV11V5FIainfix &lt;=V2V12IamemV12V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.13"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="13. assertion"
-      sum="ff2fb04bc33fd0fddf702684f396e9c7"
-      proved="true"
-      expanded="false"
-      shape="assertionCtaNilCtaNilainfix &lt;=V4V6IamemV6V0FIainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V7IamemV7V5FIainfix &lt;=V2V8IamemV8V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.14"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="14. variant decrease"
-      sum="f10b595a0b9a6594d8572c738b923b69"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCtaNilCfaNilainfix =V6V5aConswVV1OCfaNilainfix =V7V0aConswVV0Iainfix &lt;=V4V8IamemV8V0FIainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V9IamemV9V5FIainfix &lt;=V2V10IamemV10V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.15"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="15. precondition"
-      sum="01c5ef46037fb0f1fa4ba981db5efabf"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilCtaNilaiset_okV0Iainfix &lt;=V4V6IamemV6V0FIainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V7IamemV7V5FIainfix &lt;=V2V8IamemV8V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.16"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="16. precondition"
-      sum="6157af2c54d255c9eaf1c48cacc6b2fc"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilCtaNilaiset_okV5Iainfix &lt;=V4V6IamemV6V0FIainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V7IamemV7V5FIainfix &lt;=V2V8IamemV8V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.17"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="17. postcondition"
-      sum="c84561fc78c3d1848599f06f084fc368"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCtaNilaiset_okV7LaConsV4V6IamemV8V5OamemV8V0qamemV8V6FAaiset_okV6FIaiset_okV5Aaiset_okV0Iainfix &lt;=V4V9IamemV9V0FIainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V10IamemV10V5FIainfix &lt;=V2V11IamemV11V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="2.85"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.18"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="18. postcondition"
-      sum="b83b1ae010cd8c5ec5e4290ad632fc10"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCtaNilamemV8V1OamemV8V0qamemV8V7FLaConsV4V6IamemV9V5OamemV9V0qamemV9V6FAaiset_okV6FIaiset_okV5Aaiset_okV0Iainfix &lt;=V4V10IamemV10V0FIainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V11IamemV11V5FIainfix &lt;=V2V12IamemV12V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.19"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="19. variant decrease"
-      sum="3fd608715b4d7c15523e180fb6b0cc0e"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCtaNilCfaNilainfix =V6V5aConswVV1Aainfix =V0V3OCfaNilainfix =V7V3aConswVV0INainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V8IamemV8V5FIainfix &lt;=V2V9IamemV9V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.20"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="20. precondition"
-      sum="ce6010fdc222e5f677e92c571f884099"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilCtaNilaiset_okV3INainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V6IamemV6V5FIainfix &lt;=V2V7IamemV7V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.21"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="21. precondition"
-      sum="8ad4a8e9bb530695051bd9cd1334a56b"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilCtaNilaiset_okV5INainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V6IamemV6V5FIainfix &lt;=V2V7IamemV7V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.22"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="22. postcondition"
-      sum="2193ac907367ace765d1cbec7faf6755"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCtaNilaiset_okV7LaConsV2V6IamemV8V5OamemV8V3qamemV8V6FAaiset_okV6FIaiset_okV5Aaiset_okV3INainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V9IamemV9V5FIainfix &lt;=V2V10IamemV10V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.19"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter merge.23"
-      locfile="../ISet.mlw"
-      loclnum="79" loccnumb="10" loccnume="15"
-      expl="23. postcondition"
-      sum="c81df992364ae01cce9a5b96b937c361"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCtaNilamemV8V1OamemV8V0qamemV8V7FLaConsV2V6IamemV9V5OamemV9V3qamemV9V6FAaiset_okV6FIaiset_okV5Aaiset_okV3INainfix &gt;V2V4INainfix &lt;V2V4Iainfix &lt;=V4V10IamemV10V5FIainfix &lt;=V2V11IamemV11V3FaConsVVV1aConsVVV0Iaiset_okV1Aaiset_okV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<file name="../ISet.mlw">
+<theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Logic" sum="1832f7e6a08d37d0e5b072192d8369d1">
+ <goal name="WP_parameter iset_ok_char" expl="VC for iset_ok_char">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter iset_ok_char.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter iset_ok_char.2" expl="2. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter iset_ok_char.3" expl="3. assertion">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter iset_ok_char.4" expl="4. postcondition">
+  <proof prover="2"><result status="valid" time="0.11" steps="281"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Impl" sum="61afd21cdb72c87a2b0d61cab5d79bb6">
+ <goal name="WP_parameter insert" expl="VC for insert">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter insert.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.2" expl="2. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.3" expl="3. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.4" expl="4. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.5" expl="5. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.6" expl="6. precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.7" expl="7. postcondition">
+  <proof prover="2"><result status="valid" time="0.04" steps="101"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.8" expl="8. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.9" expl="9. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.10" expl="10. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter remove" expl="VC for remove">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter remove.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.2" expl="2. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.3" expl="3. assertion">
+  <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.4" expl="4. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.5" expl="5. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.6" expl="6. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.7" expl="7. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.8" expl="8. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.9" expl="9. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.10" expl="10. postcondition">
+  <proof prover="2"><result status="valid" time="0.04" steps="88"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.11" expl="11. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter merge" expl="VC for merge">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter merge.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.2" expl="2. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.3" expl="3. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.4" expl="4. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.5" expl="5. assertion">
+  <proof prover="2"><result status="valid" time="0.02" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.6" expl="6. assertion">
+  <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.7" expl="7. assertion">
+  <proof prover="2"><result status="valid" time="0.04" steps="86"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.8" expl="8. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.9" expl="9. precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.10" expl="10. precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.11" expl="11. postcondition">
+  <proof prover="2"><result status="valid" time="0.42" steps="891"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.12" expl="12. postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.13" expl="13. assertion">
+  <proof prover="2"><result status="valid" time="0.04" steps="87"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.14" expl="14. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.15" expl="15. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.16" expl="16. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.17" expl="17. postcondition">
+  <proof prover="2"><result status="valid" time="0.37" steps="739"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.18" expl="18. postcondition">
+  <proof prover="2"><result status="valid" time="0.03" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.19" expl="19. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.20" expl="20. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.21" expl="21. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.22" expl="22. postcondition">
+  <proof prover="2"><result status="valid" time="0.32" steps="835"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.23" expl="23. postcondition">
+  <proof prover="2"><result status="valid" time="0.03" steps="61"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>
