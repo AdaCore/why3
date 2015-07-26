@@ -152,10 +152,26 @@ val matches_subp_filter : subp -> bool
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
+   type prover_stat =
+     {
+       mutable count     : int;
+       mutable max_time  : float;
+       mutable max_steps : int;
+     }
+
+   type stats = prover_stat Whyconf.Hprover.t
+
+   val extract_stats : objective -> stats
+
    val save_trace : goal -> (string * Gnat_loc.S.t)
    (* compute the trace from the goal and save it to a file; return the trace
       file name and the computed trace,
       ("", Gnat_loc.S.empty) if no trace was saved *)
+
+   val spark_counterexample_transform :
+     (string * Model_parser.model_element_type) -> string
+   (* Transformation of counter-example model elements names to SPARK syntax.
+   *)
 
    val save_counterexample : goal -> Model_parser.model ->
      trace : Gnat_loc.S.t -> string
@@ -178,6 +194,3 @@ val clean_automatic_proofs : goal -> unit
 (* deletes previous proof attempts of the selected provers for this goal *)
 
 val goal_has_splits : goal -> bool
-
-val extract_stats : objective -> Gnat_report.stats
-

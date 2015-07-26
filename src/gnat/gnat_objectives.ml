@@ -565,6 +565,72 @@ let matches_subp_filter subp =
 
 module Save_VCs = struct
 
+   type prover_stat =
+     {
+       mutable count     : int;
+       mutable max_time  : float;
+       mutable max_steps : int;
+    }
+
+   type stats = prover_stat Whyconf.Hprover.t
+
+   exception Found of Whyconf.prover *  Call_provers.prover_result
+
+   let find_successful_proof goal =
+  (* given a goal, find a successful proof attempt for exactly this goal (not
+     counting transformations *)
+  try
+    Session.PHprover.iter (fun prover pa ->
+      match pa.Session.proof_obsolete, pa.Session.proof_state with
+      | false, Session.Done
+         ({ Call_provers.pr_answer = Call_provers.Valid } as pr) ->
+          raise (Found (prover, pr))
+      | _ -> ()) goal.Session.goal_external_proofs;
+    raise Exit
+  with Found (prover, pr) -> prover, pr
+
+
+let add_to_prover_stat pr stat =
+  (* add the result of the prover run to the statistics record for some prover
+     *)
+  stat.count <- stat.count + 1;
+  if pr.Call_provers.pr_time > stat.max_time then
+    stat.max_time <- pr.Call_provers.pr_time;
+  if pr.Call_provers.pr_steps > stat.max_steps then
+    stat.max_steps <- pr.Call_provers.pr_steps
+
+let add_to_stat prover pr stat =
+  (* add the result pr of the prover run of "prover" to the statistics table *)
+  if Whyconf.Hprover.mem stat prover then
+    add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
+  else
+    Whyconf.Hprover.add stat prover
+      { count = 1;
+        max_time = pr.Call_provers.pr_time;
+        max_steps = pr.Call_provers.pr_steps }
+
+
+   let rec extract_stat_goal stat goal =
+     assert (goal.Session.goal_verified <> None);
+     try
+       let prover, pr = find_successful_proof goal in
+       add_to_stat prover pr stat
+     with Exit ->
+       try
+	 Session.PHstr.iter (fun _ tr ->
+           if tr.Session.transf_verified <> None then
+             List.iter (extract_stat_goal stat) tr.Session.transf_goals;
+          (* need to exit here so once we found a transformation that proves
+           * the goal, don't try further *)
+           raise Exit) goal.Session.goal_transformations;
+       with Exit -> ()
+
+   let extract_stats (obj : objective) =
+     let stats = Whyconf.Hprover.create 5 in
+     let obj_rec = Gnat_expl.HCheck.find explmap obj in
+     GoalSet.iter (extract_stat_goal stats) obj_rec.toplevel;
+     stats
+
    let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 
    module GM = GoalMap
@@ -647,14 +713,14 @@ module Save_VCs = struct
        trace
        []
 
-   let spark_name_trans (me_name, me_type) =
+   let spark_counterexample_transform (me_name, me_type) =
      match me_type with
      | Model_parser.Result -> me_name ^ "'"  ^ "Result"
      | Model_parser.Old -> me_name ^ "'" ^ "Old"
      | Model_parser.Other -> me_name
 
    let save_counterexample goal counterexample ~trace  =
-     if counterexample <> Model_parser.empty_model then begin
+     if not (Model_parser.is_model_empty counterexample) then begin
        let check = get_objective goal in
        let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
        let counterexample = if trace = Gnat_loc.S.empty then
@@ -665,7 +731,8 @@ module Save_VCs = struct
        with_fmt_channel
 	 ce_fn
 	 (fun fmt -> Format.fprintf fmt "%a@."
-	   (Model_parser.print_model_json ~me_name_trans:spark_name_trans) counterexample);
+	   (Model_parser.print_model_json
+	      ~me_name_trans:spark_counterexample_transform) counterexample);
        ce_fn
      end
      else
@@ -673,13 +740,15 @@ module Save_VCs = struct
 
 end
 
+open Save_VCs
+
 let goal_has_splits goal =
   not (Session.PHstr.is_empty goal.Session.goal_transformations)
 
 let schedule_goal_with_prover ~cntexample g p =
 (* actually schedule the goal, i.e., call the prover. This function returns immediately. *)
   if Gnat_config.debug then begin
-    Save_VCs.save_vc ~cntexample g p;
+    save_vc ~cntexample g p;
   end;
   Gnat_sched.add_goal ~cntexample p g
 
@@ -734,61 +803,3 @@ let all_split_leaf_goals () =
 let add_to_objective = add_to_objective ~toplevel:true
 (* we mask the add_to_objective function here and fix it's toplevel argument to
    "true", so that outside calls always set toplevel to true *)
-
-exception Found of Whyconf.prover *  Call_provers.prover_result
-
-let find_successful_proof goal =
-  (* given a goal, find a successful proof attempt for exactly this goal (not
-     counting transformations *)
-  try
-    Session.PHprover.iter (fun prover pa ->
-      match pa.Session.proof_obsolete, pa.Session.proof_state with
-      | false, Session.Done
-         ({ Call_provers.pr_answer = Call_provers.Valid } as pr) ->
-          raise (Found (prover, pr))
-      | _ -> ()) goal.Session.goal_external_proofs;
-    raise Exit
-  with Found (prover, pr) -> prover, pr
-
-open Gnat_report
-
-let add_to_prover_stat pr stat =
-  (* add the result of the prover run to the statistics record for some prover
-     *)
-  stat.count <- stat.count + 1;
-  if pr.Call_provers.pr_time > stat.max_time then
-    stat.max_time <- pr.Call_provers.pr_time;
-  if pr.Call_provers.pr_steps > stat.max_steps then
-    stat.max_steps <- pr.Call_provers.pr_steps
-
-let add_to_stat prover pr stat =
-  (* add the result pr of the prover run of "prover" to the statistics table *)
-  if Whyconf.Hprover.mem stat prover then
-    add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
-  else
-    Whyconf.Hprover.add stat prover
-      { count = 1;
-        max_time = pr.Call_provers.pr_time;
-        max_steps = pr.Call_provers.pr_steps }
-
-let rec extract_stat_goal stat goal =
-  assert (goal.Session.goal_verified <> None);
-  try
-    let prover, pr = find_successful_proof goal in
-    add_to_stat prover pr stat
-  with Exit ->
-    try
-      Session.PHstr.iter (fun _ tr ->
-        if tr.Session.transf_verified <> None then
-          List.iter (extract_stat_goal stat) tr.Session.transf_goals;
-          (* need to exit here so once we found a transformation that proves
-           * the goal, don't try further *)
-          raise Exit) goal.Session.goal_transformations;
-    with Exit -> ()
-
-let extract_stats (obj : objective) =
-  let stats = Whyconf.Hprover.create 5 in
-   let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   GoalSet.iter (extract_stat_goal stats) obj_rec.toplevel;
-   stats
-

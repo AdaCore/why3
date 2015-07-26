@@ -1,4 +1,5 @@
 open Why3
+open Gnat_objectives
 
 (* This unit serves to
    - store the proof results which should be output at the end;
@@ -49,19 +50,11 @@ open Why3
    VC.
    *)
 
-type prover_stat =
-  {
-    mutable count     : int;
-    mutable max_time  : float;
-    mutable max_steps : int;
-  }
-
-type stats = prover_stat Whyconf.Hprover.t
-
 val register :
      Gnat_expl.check
   -> Task.task option                  (* task of the last goal *)
-  -> stats option                      (* extra information about the run *)
+  -> Model_parser.model option         (* counter-example model *)
+  -> Save_VCs.stats option             (* extra information about the run *)
   -> bool                              (* if the goal was proved or not *)
   -> (string * string) option           (* (for manual provers) *)
                                        (* pair of (vc_file, editor_cmd) *)

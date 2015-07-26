@@ -1,14 +1,6 @@
 open Why3
 open Why3.Json
-
-type prover_stat =
-  {
-    mutable count     : int;
-    mutable max_time  : float;
-    mutable max_steps : int;
-  }
-
-type stats = prover_stat Whyconf.Hprover.t
+open Gnat_objectives.Save_VCs
 
 type msg =
   { check         : Gnat_expl.check;
@@ -16,6 +8,7 @@ type msg =
     stats         : stats option;
     extra_info    : int option;
     tracefile     : string;
+    cntexmp_vc    : string;
     cntexmpfile   : string;
     manual_proof  : (string * string) option
   }
@@ -36,19 +29,28 @@ let add_warning ?loc s =
 
 let () = Warning.set_hook add_warning
 
-let register check task stats valid manual tracefile cntexmpfile =
+let register check task model stats valid manual tracefile cntexmpfile =
   let extra_info =
     if valid then None
     else begin match task with
       | None -> None
       | Some t -> Gnat_expl.get_extra_info t
     end in
+  let cntexmp_vc =
+    match model with
+    | None -> ""
+    | Some m ->
+      Model_parser.model_vc_term_to_string
+	~me_name_trans:spark_counterexample_transform
+	~sep:" and "
+	m in
   let msg =
   { check         = check;
     result        = valid;
     extra_info    = extra_info;
     stats         = stats;
     tracefile     = tracefile;
+    cntexmp_vc    = cntexmp_vc;
     cntexmpfile   = cntexmpfile;
     manual_proof  = manual } in
   msg_set := msg :: !msg_set
@@ -63,6 +65,13 @@ let print_trace_file fmt trace  =
   else begin
     Format.fprintf fmt ", ";
     print_json_field "tracefile" string fmt trace
+  end
+
+let print_cntexmp_vc fmt cnt_vc =
+  if cnt_vc = "" then ()
+  else begin
+    Format.fprintf fmt ", ";
+    print_json_field "cntexmp_vc" string fmt cnt_vc
   end
 
 let print_cntexmp_file fmt cnt  =
@@ -98,7 +107,7 @@ let print_stats fmt stats =
       (map_bindings get_name print_prover_stats) fmt kv_list
 
 let print_json_msg fmt m =
-  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a}"
+  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a%a}"
     (print_json_field "id" int) m.check.Gnat_expl.id
     (print_json_field "reason" string)
       (Gnat_expl.reason_to_ada m.check.Gnat_expl.reason)
@@ -106,6 +115,7 @@ let print_json_msg fmt m =
     (print_json_field "extra_info" int) (get_info m.extra_info)
     print_stats m.stats
     print_trace_file m.tracefile
+    print_cntexmp_vc m.cntexmp_vc
     print_cntexmp_file m.cntexmpfile
     print_manual_proof_info m.manual_proof
 
