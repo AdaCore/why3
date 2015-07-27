@@ -95,9 +95,31 @@ let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None }
 
 module TermCmp = struct
   type t = term
+
+  let before loc1 loc2 =
+  (* Return true if loc1 is strictly before loc2 *)
+    match loc1 with
+    | None -> false
+    | Some loc1 ->
+      match loc2 with
+      | None -> false
+      | Some loc2 ->
+	let (_, line1, col1, _) = Loc.get loc1 in
+	  let (_, line2, col2, _) = Loc.get loc2 in
+	  if line1 <> line2 then
+	    if line1 < line2 then true
+	    else false
+	  else
+	    if col1 < col2 then true
+	    else false
+
   let compare a b =
     if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
-    then 0 else 1
+    then 0 else
+      (* Order the terms accoridng to their source code locations  *)
+      if before a.t_loc b.t_loc then 1
+      else -1
+
 end
 
 module S = Set.Make(TermCmp)
