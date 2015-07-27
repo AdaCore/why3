@@ -91,8 +91,6 @@ type vc_term_info = {
      is not generated for postcondition or precondition) *)
 }
 
-let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None }
-
 module TermCmp = struct
   type t = term
 
@@ -128,6 +126,7 @@ type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
   mutable info_model : S.t;
+  info_vc_term : vc_term_info;
 }
 
 let debug_print_term message t =
@@ -204,7 +203,7 @@ let add_old lab_str =
     else lab_str
   with Not_found -> lab_str ^ "@old"
 
-let model_trace_for_postcondition ~labels =
+let model_trace_for_postcondition ~labels info =
   (* Modifies the  model_trace label of a term in the postcondition:
      - if term corresponds to the initial value of a function
      parameter, model_trace label will have postfix @old
@@ -225,7 +224,7 @@ let model_trace_for_postcondition ~labels =
     (* no model_trace label => the term represents the return value *)
     Slab.add
       (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" vc_term_info.vc_func_name)  ^ "@result"))
+	 ("model_trace:" ^ (Opt.get_def "" info.info_vc_term.vc_func_name)  ^ "@result"))
       labels
 
 let get_fun_name name =
@@ -236,13 +235,14 @@ let get_fun_name name =
   | _ ->
     ""
 
-let check_enter_vc_term t =
+let check_enter_vc_term t info =
   (* Check whether the term that triggers VC is entered.
      If it is entered, extract the location of the term and if the VC is
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
   if Slab.mem model_vc_term_label t.t_label then begin
+    let vc_term_info = info.info_vc_term in
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc;
     try
@@ -255,10 +255,10 @@ let check_enter_vc_term t =
       ()
   end
 
-let check_exit_vc_term t =
+let check_exit_vc_term t info =
   (* Check whether the term triggering VC is exited. *)
   if Slab.mem model_vc_term_label t.t_label then begin
-    vc_term_info.vc_inside <- false;
+    info.info_vc_term.vc_inside <- false;
   end
 
 (** expr *)
@@ -268,7 +268,7 @@ let rec print_term info fmt t =
   if Slab.mem model_label t.t_label then
     info.info_model <- S.add t info.info_model;
 
-  check_enter_vc_term t;
+  check_enter_vc_term t info;
 
   let () = match t.t_node with
   | Tconst c ->
@@ -305,6 +305,7 @@ let rec print_term info fmt t =
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] ->
+	    let vc_term_info = info.info_vc_term in
 	    if vc_term_info.vc_inside then begin
 	      match vc_term_info.vc_loc with
 	      | None -> ()
@@ -313,7 +314,7 @@ let rec print_term info fmt t =
 		  | None ->
 		    ls.ls_name.id_label
 		  | Some _ ->
-		    model_trace_for_postcondition ~labels:ls.ls_name.id_label in
+		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
 		let t_check_pos = t_label ~loc labels t in
 		info.info_model <- S.add t_check_pos info.info_model;
 	    end;
@@ -351,7 +352,7 @@ let rec print_term info fmt t =
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
 
-  check_exit_vc_term t;
+  check_exit_vc_term t info;
 
 
 and print_fmla info fmt f =
@@ -359,7 +360,7 @@ and print_fmla info fmt f =
   if Slab.mem model_label f.t_label then
     info.info_model <- S.add f info.info_model;
 
-  check_enter_vc_term f;
+  check_enter_vc_term f info;
 
   let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -430,7 +431,7 @@ and print_fmla info fmt f =
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
-  check_exit_vc_term f
+  check_exit_vc_term f info
 
 and print_boolean_branches info subject pr fmt bl =
   let error () = unsupportedTerm subject
@@ -556,7 +557,7 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
       print_info_model cntexample fmt model_list info;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term_loc = vc_term_info.vc_loc;
+				vc_term_loc = info.info_vc_term.vc_loc;
 				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
@@ -603,8 +604,14 @@ let print_decl cntexample args info fmt d = match d.d_node with
 
 let print_decls cntexample args =
   let print_decl (sm, cm, model) fmt d =
-    try let info = {info_syn = sm; info_converters = cm; info_model = model} in
-        print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
+    try
+      let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None } in
+      let info = {
+	info_syn = sm;
+	info_converters = cm;
+	info_model = model;
+	info_vc_term = vc_term_info} in
+      print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
