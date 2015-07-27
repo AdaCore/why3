@@ -126,6 +126,7 @@ type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
   mutable info_model : S.t;
+  mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
 }
 
@@ -241,7 +242,7 @@ let check_enter_vc_term t info =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if Slab.mem model_vc_term_label t.t_label then begin
+  if info.info_in_goal && Slab.mem model_vc_term_label t.t_label then begin
     let vc_term_info = info.info_vc_term in
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc;
@@ -257,7 +258,7 @@ let check_enter_vc_term t info =
 
 let check_exit_vc_term t info =
   (* Check whether the term triggering VC is exited. *)
-  if Slab.mem model_vc_term_label t.t_label then begin
+  if info.info_in_goal && Slab.mem model_vc_term_label t.t_label then begin
     info.info_vc_term.vc_inside <- false;
   end
 
@@ -551,7 +552,9 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
         | None -> ()
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
+      info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
+      info.info_in_goal <- false;
       let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
       print_info_model cntexample fmt model_list info;
@@ -610,6 +613,7 @@ let print_decls cntexample args =
 	info_syn = sm;
 	info_converters = cm;
 	info_model = model;
+	info_in_goal = false;
 	info_vc_term = vc_term_info} in
       print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
