@@ -215,13 +215,13 @@ clone_subst:
 | WITH comma_list1(single_clone_subst)  { $2 }
 
 single_clone_subst:
-| TYPE qualid ty_var* EQUAL ty  { CStsym  (floc $startpos $endpos, $2,$3,$5) }
-| CONSTANT  qualid EQUAL qualid { CSfsym  (floc $startpos $endpos, $2,$4) }
-| FUNCTION  qualid EQUAL qualid { CSfsym  (floc $startpos $endpos, $2,$4) }
-| PREDICATE qualid EQUAL qualid { CSpsym  (floc $startpos $endpos, $2,$4) }
-| VAL       qualid EQUAL qualid { CSvsym  (floc $startpos $endpos, $2,$4) }
-| LEMMA     qualid              { CSlemma (floc $startpos $endpos, $2) }
-| GOAL      qualid              { CSgoal  (floc $startpos $endpos, $2) }
+| TYPE qualid ty_var* EQUAL ty  { CStsym  ($2,$3,$5) }
+| CONSTANT  qualid EQUAL qualid { CSfsym  ($2,$4) }
+| FUNCTION  qualid EQUAL qualid { CSfsym  ($2,$4) }
+| PREDICATE qualid EQUAL qualid { CSpsym  ($2,$4) }
+| VAL       qualid EQUAL qualid { CSvsym  ($2,$4) }
+| LEMMA     qualid              { CSlemma ($2) }
+| GOAL      qualid              { CSgoal  ($2) }
 
 (* Meta declarations *)
 

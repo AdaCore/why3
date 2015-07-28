@@ -11,6 +11,9 @@
 
 open Stdlib
 open Ident
+open Ty
+open Term
+open Decl
 open Theory
 open Ity
 open Expr
@@ -42,22 +45,36 @@ val ns_find_ns  : namespace -> string list -> namespace
 (** {2 Module} *)
 
 type pmodule = private {
-  mod_theory : theory;      (* pure theory *)
-  mod_decls  : pdecl list;  (* module declarations *)
-  mod_export : namespace;   (* exported namespace *)
-  mod_known  : known_map;   (* known identifiers *)
-  mod_local  : Sid.t;       (* locally declared idents *)
-  mod_used   : Sid.t;       (* used modules *)
+  mod_theory : theory;        (* pure theory *)
+  mod_units  : mod_unit list; (* module declarations *)
+  mod_export : namespace;     (* exported namespace *)
+  mod_known  : known_map;     (* known identifiers *)
+  mod_local  : Sid.t;         (* locally declared idents *)
+  mod_used   : Sid.t;         (* used modules *)
+}
+
+and mod_unit =
+  | Udecl  of pdecl
+  | Uuse   of pmodule
+  | Uinst  of mod_inst
+  | Umeta  of meta * meta_arg list
+  | Uscope of string * bool * mod_unit list
+
+and mod_inst = private {
+  mi_mod : pmodule;
+  mi_ts  : itysymbol Mts.t;
+  mi_ls  : lsymbol Mls.t;
+  mi_pr  : prsymbol Mpr.t;
+  mi_pv  : pvsymbol Mpv.t;
+  mi_rs  : rsymbol Mrs.t;
+  mi_xs  : xsymbol Mexn.t;
 }
 
 (** {2 Module under construction} *)
 
 type pmodule_uc = private {
   muc_theory : theory_uc;
-  muc_name   : string;
-  muc_path   : string list;
-  muc_decls  : pdecl list;
-  muc_prefix : string list;
+  muc_units  : mod_unit list;
   muc_import : namespace list;
   muc_export : namespace list;
   muc_known  : known_map;
@@ -87,6 +104,8 @@ val restore_module : theory -> pmodule
 (** {2 Use and clone} *)
 
 val use_export : pmodule_uc -> pmodule -> pmodule_uc
+
+val clone_export : pmodule_uc -> pmodule -> Theory.th_inst -> pmodule_uc
 
 (** {2 Logic decls} *)
 
@@ -119,3 +138,8 @@ val mlw_language_builtin : pathname -> mlw_file
 exception ModuleNotFound of pathname * string
 
 val read_module : env -> pathname -> string -> pmodule
+
+(** {2 Pretty-printing} *)
+
+val print_unit : Format.formatter -> mod_unit -> unit
+val print_module : Format.formatter -> pmodule -> unit

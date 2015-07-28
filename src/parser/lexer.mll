@@ -233,12 +233,9 @@ rule token = parse
     Typing.open_file env path;
     let mm = Loc.with_location (mlw_file token) lb in
     if path = [] && Debug.test_flag debug then begin
+      let print_m _ m = Format.eprintf "%a@\n@." print_module m in
       let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
-      let mm = Mstr.fold add_m mm Mid.empty in
-      let print_m _ m = Format.eprintf
-        "@[<hov 2>module %a@\n%a@]@\nend@\n@." Pretty.print_th m.mod_theory
-        (Pp.print_list Pp.newline2 Pdecl.print_pdecl) m.mod_decls in
-      Mid.iter print_m mm
+      Mid.iter print_m (Mstr.fold add_m mm Mid.empty)
     end;
     mm
 

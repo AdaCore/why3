@@ -80,7 +80,7 @@ let find_prop     tuc q = find_prop_ns     (Theory.get_namespace tuc) q
 
 let find_prop_of_kind k tuc q =
   let pr = find_prop tuc q in
-  match (Mid.find pr.pr_name (Theory.get_known tuc)).d_node with
+  match (Mid.find pr.pr_name tuc.uc_known).d_node with
   | Dprop (l,_,_) when l = k -> pr
   | _ -> Loc.errorm ~loc:(qloc q) "proposition %a is not %s"
       print_qualid q (match k with
@@ -164,7 +164,7 @@ let create_user_id {id_str = n; id_lab = label; id_loc = loc} =
 
 let parse_record ~loc tuc get_val fl =
   let fl = List.map (fun (q,e) -> find_lsymbol tuc q, e) fl in
-  let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known tuc) fl in
+  let cs,pjl,flm = Loc.try2 ~loc parse_record tuc.uc_known fl in
   let get_val pj = get_val cs pj (Mls.find_opt pj flm) in
   cs, List.map get_val pjl
 
@@ -974,8 +974,53 @@ let find_module env file q =
   if Debug.test_flag Glob.flag then Glob.use (qloc_last q) m.mod_theory.th_name;
   m
 
+let type_inst ({muc_theory = tuc} as muc) {mod_theory = t} s =
+  let add_inst s = function
+    | CStsym (p,[],PTtyapp (q,[])) ->
+        let ts1 = find_tysymbol_ns t.th_export p in
+        let ts2 = find_tysymbol tuc q in
+        if Mts.mem ts1 s.inst_ts then
+          Loc.error ~loc:(qloc p) (ClashSymbol ts1.ts_name.id_string);
+        { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
+    | CStsym (p,tvl,pty) ->
+        let ts1 = find_tysymbol_ns t.th_export p in
+        let id = id_user (ts1.ts_name.id_string ^ "_subst") (qloc p) in
+        let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
+        let ts2 = Loc.try3 ~loc:(qloc p)
+          create_itysymbol_alias id tvl (ity_of_pty muc pty) in
+        if Mts.mem ts1 s.inst_ts then
+          Loc.error ~loc:(qloc p) (ClashSymbol ts1.ts_name.id_string);
+        { s with inst_ts = Mts.add ts1 ts2.its_ts s.inst_ts }
+    | CSfsym (p,q) ->
+        let ls1 = find_fsymbol_ns t.th_export p in
+        let ls2 = find_fsymbol tuc q in
+        if Mls.mem ls1 s.inst_ls then
+          Loc.error ~loc:(qloc p) (ClashSymbol ls1.ls_name.id_string);
+        { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+    | CSpsym (p,q) ->
+        let ls1 = find_psymbol_ns t.th_export p in
+        let ls2 = find_psymbol tuc q in
+        if Mls.mem ls1 s.inst_ls then
+          Loc.error ~loc:(qloc p) (ClashSymbol ls1.ls_name.id_string);
+        { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+    | CSvsym (p,_) ->
+        Loc.errorm ~loc:(qloc p)
+          "program symbol instantiation is not supported yet" (* TODO *)
+    | CSlemma p ->
+        let pr = find_prop_ns t.th_export p in
+        if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal then
+          Loc.error ~loc:(qloc p) (ClashSymbol pr.pr_name.id_string);
+        { s with inst_lemma = Spr.add pr s.inst_lemma }
+    | CSgoal p ->
+        let pr = find_prop_ns t.th_export p in
+        if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal then
+          Loc.error ~loc:(qloc p) (ClashSymbol pr.pr_name.id_string);
+        { s with inst_goal = Spr.add pr s.inst_goal }
+  in
+  List.fold_left add_inst empty_inst s
+
 let add_decl muc env file d =
-  let vc = muc.muc_path = [] &&
+  let vc = muc.muc_theory.uc_path = [] &&
     Debug.test_noflag debug_type_only in
   match d with
   | Ptree.Dtype dl ->
@@ -1012,118 +1057,10 @@ let add_decl muc env file d =
       add_pdecl ~vc muc (create_exn_decl xs)
   | Ptree.Duse use ->
       use_export muc (find_module env file use)
-  | Ptree.Dclone (use, _subst) ->
+  | Ptree.Dclone (use, inst) ->
       let m = find_module env file use in
       warn_clone_not_abstract (qloc use) m.mod_theory;
-      Loc.errorm "cloning coming soon" (* TODO *)
-
-(* TODO
-let rec clone_ns kn sl path ns2 ns1 s =
-  let qualid fmt path = Pp.print_list
-    (fun fmt () -> Format.pp_print_char fmt '.')
-    Format.pp_print_string fmt (List.rev path) in
-  let s = Mstr.fold (fun nm ns1 acc ->
-    let ns2 = Mstr.find_def empty_ns nm ns2.ns_ns in
-    clone_ns kn sl (nm::path) ns2 ns1 acc) ns1.ns_ns s
-  in
-  let inst_ts = Mstr.fold (fun nm ts1 acc ->
-    match Mstr.find_opt nm ns2.ns_ts with
-    | Some ts2 when ts_equal ts1 ts2 -> acc
-    | Some _ when not (Sid.mem ts1.ts_name sl) ->
-        raise (NonLocal ts1.ts_name)
-    | Some _ when ts1.ts_def <> None ->
-        raise (CannotInstantiate ts1.ts_name)
-    | Some ts2 ->
-        begin match (Mid.find ts1.ts_name kn).d_node with
-          | Decl.Dtype _ -> Mts.add_new (ClashSymbol nm) ts1 ts2 acc
-          | _ -> raise (CannotInstantiate ts1.ts_name)
-        end
-    | None when not (Sid.mem ts1.ts_name sl) -> acc
-    | None when ts1.ts_def <> None -> acc
-    | None ->
-        begin match (Mid.find ts1.ts_name kn).d_node with
-          | Decl.Dtype _ -> Loc.errorm
-              "type symbol %a not found in the target theory"
-              qualid (nm::path)
-          | _ -> acc
-        end)
-    ns1.ns_ts s.inst_ts
-  in
-  let inst_ls = Mstr.fold (fun nm ls1 acc ->
-    match Mstr.find_opt nm ns2.ns_ls with
-    | Some ls2 when ls_equal ls1 ls2 -> acc
-    | Some _ when not (Sid.mem ls1.ls_name sl) ->
-       raise (NonLocal ls1.ls_name)
-    | Some ls2 ->
-        begin match (Mid.find ls1.ls_name kn).d_node with
-          | Decl.Dparam _ -> Mls.add_new (ClashSymbol nm) ls1 ls2 acc
-          | _ -> raise (CannotInstantiate ls1.ls_name)
-        end
-    | None when not (Sid.mem ls1.ls_name sl) -> acc
-    | None ->
-        begin match (Mid.find ls1.ls_name kn).d_node with
-          | Decl.Dparam _ -> Loc.errorm
-              "%s symbol %a not found in the target theory"
-              (if ls1.ls_value <> None then "function" else "predicate")
-              qualid (nm::path)
-          | _ -> acc
-        end)
-    ns1.ns_ls s.inst_ls
-  in
-  { s with inst_ts = inst_ts; inst_ls = inst_ls }
-
-let find_namespace_ns ns q =
-  find_qualid (fun _ -> Glob.dummy_id) ns_find_ns ns q
-
-let type_inst tuc t s =
-  let add_inst s = function
-    | CSns (loc,p,q) ->
-      let ns1 = Opt.fold find_namespace_ns t.th_export p in
-      let ns2 = Opt.fold find_namespace_ns (get_namespace tuc) q in
-      Loc.try6 ~loc clone_ns t.th_known t.th_local [] ns2 ns1 s
-    | CStsym (loc,p,[],PTtyapp (q,[])) ->
-      let ts1 = find_tysymbol_ns t.th_export p in
-      let ts2 = find_tysymbol tuc q in
-      if Mts.mem ts1 s.inst_ts
-      then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);
-      { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
-    | CStsym (loc,p,tvl,pty) ->
-      let ts1 = find_tysymbol_ns t.th_export p in
-      let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
-      let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
-      let def = Some (ty_of_pty tuc pty) in
-      let ts2 = Loc.try3 ~loc create_tysymbol id tvl def in
-      if Mts.mem ts1 s.inst_ts
-      then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);
-      { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
-    | CSfsym (loc,p,q) ->
-      let ls1 = find_fsymbol_ns t.th_export p in
-      let ls2 = find_fsymbol tuc q in
-      if Mls.mem ls1 s.inst_ls
-      then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
-      { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
-    | CSpsym (loc,p,q) ->
-      let ls1 = find_psymbol_ns t.th_export p in
-      let ls2 = find_psymbol tuc q in
-      if Mls.mem ls1 s.inst_ls
-      then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
-      { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
-    | CSvsym (loc,_,_) ->
-      Loc.errorm ~loc "program symbol instantiation \
-        is not supported in pure theories"
-    | CSlemma (loc,p) ->
-      let pr = find_prop_ns t.th_export p in
-      if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-      then Loc.error ~loc (ClashSymbol pr.pr_name.id_string);
-      { s with inst_lemma = Spr.add pr s.inst_lemma }
-    | CSgoal (loc,p) ->
-      let pr = find_prop_ns t.th_export p in
-      if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-      then Loc.error ~loc (ClashSymbol pr.pr_name.id_string);
-      { s with inst_goal = Spr.add pr s.inst_goal }
-  in
-  List.fold_left add_inst empty_inst s
-*)
+      clone_export muc m (type_inst muc m inst)
 
 (* incremental parsing *)
 

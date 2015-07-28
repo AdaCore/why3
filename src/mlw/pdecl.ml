@@ -440,7 +440,9 @@ let create_exn_decl xs =
     "The type of top-level exception %a has mutable components" print_xs xs;
   mk_decl (PDexn xs) []
 
-let create_pure_decl d = mk_decl PDpure [d]
+let create_pure_decl d = match d.d_node with
+  | Dtype _ | Ddata _ -> invalid_arg "Pdecl.create_pure_decl"
+  | Dparam _ | Dlogic _ | Dind _ | Dprop _ -> mk_decl PDpure [d]
 
 (** {2 Built-in decls} *)
 

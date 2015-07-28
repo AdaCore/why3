@@ -205,12 +205,12 @@ type metarg =
   | Mint of int
 
 type clone_subst =
-  | CStsym  of Loc.position * qualid * ident list * pty
-  | CSfsym  of Loc.position * qualid * qualid
-  | CSpsym  of Loc.position * qualid * qualid
-  | CSvsym  of Loc.position * qualid * qualid
-  | CSlemma of Loc.position * qualid
-  | CSgoal  of Loc.position * qualid
+  | CStsym  of qualid * ident list * pty
+  | CSfsym  of qualid * qualid
+  | CSpsym  of qualid * qualid
+  | CSvsym  of qualid * qualid
+  | CSlemma of qualid
+  | CSgoal  of qualid
 
 type decl =
   | Dtype of type_decl list

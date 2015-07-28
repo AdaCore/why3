@@ -287,8 +287,6 @@ let close_theory uc = match uc.uc_export with
   | _ -> raise CloseTheory
 
 let get_namespace uc = List.hd uc.uc_import
-let get_known uc = uc.uc_known
-let get_rev_decls uc = uc.uc_decls
 
 let open_namespace uc s = match uc.uc_import with
   | ns :: _ -> { uc with

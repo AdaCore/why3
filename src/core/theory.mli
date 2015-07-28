@@ -116,7 +116,17 @@ val td_hash : tdecl -> int
 
 (** {2 Constructors and utilities} *)
 
-type theory_uc  (** a theory under construction *)
+type theory_uc = private {
+  uc_name   : ident;
+  uc_path   : string list;
+  uc_decls  : tdecl list;
+  uc_prefix : string list;
+  uc_import : namespace list;
+  uc_export : namespace list;
+  uc_known  : known_map;
+  uc_local  : Sid.t;
+  uc_used   : Sid.t;
+}
 
 val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
@@ -125,8 +135,6 @@ val open_namespace  : theory_uc -> string -> theory_uc
 val close_namespace : theory_uc -> bool (* import *) -> theory_uc
 
 val get_namespace : theory_uc -> namespace
-val get_known : theory_uc -> known_map
-val get_rev_decls : theory_uc -> tdecl list
 
 val restore_path : ident -> string list * string * string list
 (** [restore_path id] returns the triple (library path, theory,
