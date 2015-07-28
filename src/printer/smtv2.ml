@@ -113,13 +113,33 @@ type vc_term_info = {
      is not generated for postcondition or precondition) *)
 }
 
-let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None }
-
 module TermCmp = struct
   type t = term
+
+  let before loc1 loc2 =
+  (* Return true if loc1 is strictly before loc2 *)
+    match loc1 with
+    | None -> false
+    | Some loc1 ->
+      match loc2 with
+      | None -> false
+      | Some loc2 ->
+	let (_, line1, col1, _) = Loc.get loc1 in
+	  let (_, line2, col2, _) = Loc.get loc2 in
+	  if line1 <> line2 then
+	    if line1 < line2 then true
+	    else false
+	  else
+	    if col1 < col2 then true
+	    else false
+
   let compare a b =
     if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
-    then 0 else 1
+    then 0 else
+      (* Order the terms accoridng to their source code locations  *)
+      if before a.t_loc b.t_loc then 1
+      else -1
+
 end
 
 module S = Set.Make(TermCmp)
@@ -128,6 +148,8 @@ type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
   mutable info_model : S.t;
+  mutable info_in_goal : bool;
+  info_vc_term : vc_term_info;
 }
 
 let debug_print_term message t =
@@ -204,7 +226,7 @@ let add_old lab_str =
     else lab_str
   with Not_found -> lab_str ^ "@old"
 
-let model_trace_for_postcondition ~labels =
+let model_trace_for_postcondition ~labels info =
   (* Modifies the  model_trace label of a term in the postcondition:
      - if term corresponds to the initial value of a function
      parameter, model_trace label will have postfix @old
@@ -225,7 +247,7 @@ let model_trace_for_postcondition ~labels =
     (* no model_trace label => the term represents the return value *)
     Slab.add
       (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" vc_term_info.vc_func_name)  ^ "@result"))
+	 ("model_trace:" ^ (Opt.get_def "" info.info_vc_term.vc_func_name)  ^ "@result"))
       labels
 
 let get_fun_name name =
@@ -236,13 +258,14 @@ let get_fun_name name =
   | _ ->
     ""
 
-let check_enter_vc_term t =
+let check_enter_vc_term t info =
   (* Check whether the term that triggers VC is entered.
      If it is entered, extract the location of the term and if the VC is
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if Slab.mem model_vc_term_label t.t_label then begin
+  if info.info_in_goal && Slab.mem model_vc_term_label t.t_label then begin
+    let vc_term_info = info.info_vc_term in
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc;
     try
@@ -255,10 +278,10 @@ let check_enter_vc_term t =
       ()
   end
 
-let check_exit_vc_term t =
+let check_exit_vc_term t info =
   (* Check whether the term triggering VC is exited. *)
-  if Slab.mem model_vc_term_label t.t_label then begin
-    vc_term_info.vc_inside <- false;
+  if info.info_in_goal && Slab.mem model_vc_term_label t.t_label then begin
+    info.info_vc_term.vc_inside <- false;
   end
 
 (** expr *)
@@ -268,7 +291,7 @@ let rec print_term info fmt t =
   if Slab.mem model_label t.t_label then
     info.info_model <- S.add t info.info_model;
 
-  check_enter_vc_term t;
+  check_enter_vc_term t info;
 
   let () = match t.t_node with
   | Tconst c ->
@@ -305,6 +328,7 @@ let rec print_term info fmt t =
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] ->
+	    let vc_term_info = info.info_vc_term in
 	    if vc_term_info.vc_inside then begin
 	      match vc_term_info.vc_loc with
 	      | None -> ()
@@ -313,7 +337,7 @@ let rec print_term info fmt t =
 		  | None ->
 		    ls.ls_name.id_label
 		  | Some _ ->
-		    model_trace_for_postcondition ~labels:ls.ls_name.id_label in
+		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
 		let t_check_pos = t_label ~loc labels t in
 		info.info_model <- S.add t_check_pos info.info_model;
 	    end;
@@ -351,7 +375,7 @@ let rec print_term info fmt t =
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
 
-  check_exit_vc_term t;
+  check_exit_vc_term t info;
 
 
 and print_fmla info fmt f =
@@ -359,7 +383,7 @@ and print_fmla info fmt f =
   if Slab.mem model_label f.t_label then
     info.info_model <- S.add f info.info_model;
 
-  check_enter_vc_term f;
+  check_enter_vc_term f info;
 
   let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -430,7 +454,7 @@ and print_fmla info fmt f =
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
-  check_exit_vc_term f
+  check_exit_vc_term f info
 
 and print_boolean_branches info subject pr fmt bl =
   let error () = unsupportedTerm subject
@@ -550,13 +574,15 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
         | None -> ()
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
+      info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
+      info.info_in_goal <- false;
       let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
       print_info_model cntexample fmt model_list info;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term_loc = vc_term_info.vc_loc;
+				vc_term_loc = info.info_vc_term.vc_loc;
 				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
@@ -603,8 +629,15 @@ let print_decl cntexample args info fmt d = match d.d_node with
 
 let print_decls cntexample args =
   let print_decl (sm, cm, model) fmt d =
-    try let info = {info_syn = sm; info_converters = cm; info_model = model} in
-        print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
+    try
+      let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None } in
+      let info = {
+	info_syn = sm;
+	info_converters = cm;
+	info_model = model;
+	info_in_goal = false;
+	info_vc_term = vc_term_info} in
+      print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in

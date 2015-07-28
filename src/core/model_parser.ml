@@ -285,7 +285,7 @@ let print_model_value_json fmt me_value =
 let model_elements_to_map_bindings model_elements =
   List.fold_left
     (fun map_bindings me ->
-      (me, me.me_value)::map_bindings
+      List.append map_bindings [(me, me.me_value)]
     )
     []
     model_elements
