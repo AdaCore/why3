@@ -383,13 +383,14 @@ let localize_ghost_write v r el =
     Loc.error ?loc (BadGhostWrite (v,r))) el;
   raise (BadGhostWrite (v,r))
 
-(* localize a cover effect *)
-let localize_cover_stale v r el =
-  let covers eff = match Mreg.find_opt r eff.eff_covers with
-    | Some cvr -> ity_r_stale r cvr v.pv_ity
-    | None -> false in
-  List.iter (fun e -> if covers e.e_effect then
-    let loc = e_locate_effect covers e in
+(* localize a reset effect *)
+let localize_reset_stale v r el =
+  let resets eff =
+    if Sreg.mem r eff.eff_resets then
+      ity_r_stale (Sreg.singleton r) eff.eff_covers v.pv_ity
+    else false in
+  List.iter (fun e -> if resets e.e_effect then
+    let loc = e_locate_effect resets e in
     Loc.error ?loc (StaleVariable (v,r))) el;
   raise (StaleVariable (v,r))
 
@@ -403,7 +404,7 @@ let localize_divergence el =
 
 let try_effect el fn x y = try fn x y with
   | BadGhostWrite (v,r) -> localize_ghost_write v r el
-  | StaleVariable (v,r) -> localize_cover_stale v r el
+  | StaleVariable (v,r) -> localize_reset_stale v r el
   | GhostDivergence     -> localize_divergence el
 
 (* smart constructors *)
@@ -658,7 +659,7 @@ let c_fun args p q xq old ({e_effect = eff} as e) =
   (* reset variables are forbidden in post-conditions *)
   let c = try create_cty args p q xq old eff e.e_ity with
     | BadGhostWrite (v,r) -> localize_ghost_write v r [e]
-    | StaleVariable (v,r) -> localize_cover_stale v r [e] in
+    | StaleVariable (v,r) -> localize_reset_stale v r [e] in
   mk_cexp (Cfun e) c
 
 let c_app s vl ityl ity =

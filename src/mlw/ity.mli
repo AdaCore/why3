@@ -190,8 +190,8 @@ val reg_v_occurs : tvsymbol -> region -> bool
 val ity_r_occurs : region -> ity -> bool
 val reg_r_occurs : region -> region -> bool
 
-val ity_r_stale  : region -> Sreg.t -> ity -> bool
-val reg_r_stale  : region -> Sreg.t -> region -> bool
+val ity_r_stale  : Sreg.t -> 'a Mreg.t -> ity -> bool
+val reg_r_stale  : Sreg.t -> 'a Mreg.t -> region -> bool
 
 val ity_closed    : ity -> bool
 
@@ -281,13 +281,15 @@ exception AssignPrivate of region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
+exception IllegalAssign of region * region * region
 exception GhostDivergence
 
 type effect = private {
   eff_reads  : Spv.t;         (* known variables *)
   eff_writes : Spv.t Mreg.t;  (* modifications to specific fields *)
-  eff_covers : Sreg.t Mreg.t; (* confinement of regions to covers *)
   eff_taints : Sreg.t;        (* ghost modifications *)
+  eff_covers : Sreg.t;        (* surviving writes *)
+  eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sexn.t;        (* raised exceptions *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
@@ -311,8 +313,8 @@ val eff_read_single_pre  : pvsymbol -> effect -> effect
 val eff_read_single_post : effect -> pvsymbol -> effect
 val eff_bind_single      : pvsymbol -> effect -> effect
 
-val eff_reset : effect -> region -> effect  (* confine to an empty cover *)
-val eff_strong : effect -> effect (* confine all subregions under writes *)
+(* val eff_reset : effect -> region -> effect  (* confine to an empty cover *) *)
+val eff_reset_overwritten : effect -> effect (* confine all subregions under writes *)
 
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
