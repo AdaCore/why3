@@ -76,6 +76,10 @@ type model_element = {
     (** Source-code location of the element. *)
   me_term     : Term.term option;
     (** Why term corresponding to the element.  *)
+  me_text_info: bool;
+    (** True if the model element represents just textual
+        information and not source-code element.
+        In this case, just me_name is printed, not its value.*)
 }
 
 val create_model_element :

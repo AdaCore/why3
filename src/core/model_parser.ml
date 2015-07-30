@@ -103,6 +103,7 @@ type model_element = {
   me_value    : model_value;
   me_location : Loc.position option;
   me_term     : Term.term option;
+  me_text_info: bool;
 }
 
 let split_me_name name =
@@ -126,6 +127,7 @@ let create_model_element ~name ~value ?location ?term () =
     me_value = value;
     me_location = location;
     me_term = term;
+    me_text_info = false;
   }
 
 (*
@@ -169,8 +171,11 @@ type raw_model_parser =  string -> model_element list
 ***************************************************************
 *)
 let print_model_element me_name_trans fmt m_element =
-  let me_name = me_name_trans (m_element.me_name, m_element.me_type) in
-  fprintf fmt  "%s = %a"
+  if m_element.me_text_info then
+    fprintf fmt "%s" m_element.me_name
+  else
+    let me_name = me_name_trans (m_element.me_name, m_element.me_type) in
+    fprintf fmt  "%s = %a"
       me_name print_model_value m_element.me_value
 
 let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
@@ -220,7 +225,7 @@ let print_model_vc_term
     fmt
     model =
   match model.vc_term_loc with
-  | None -> ()
+  | None -> fprintf fmt "error: cannot get location of the check"
   | Some pos ->
     let (filename, line_number, _, _) = Loc.get pos in
     let model_file = get_model_file model.model_files filename in
@@ -389,8 +394,34 @@ match raw_model with
       terms_tail
       model
 
+let handle_contradictory_vc model_files vc_term_loc =
+  (* The VC is contradictory if the location of the term that triggers VC
+     was collected nad there are no model elements in this location.
+     If this is the case, add model element saying that VC is contradictory
+     to this location. *)
+  match vc_term_loc with
+  | None -> model_files
+  | Some pos ->
+    let (filename, line_number, _, _) = Loc.get pos in
+    let model_file = get_model_file model_files filename in
+    let model_elements = get_elements model_file line_number in
+    if model_elements = [] then
+      (* The vc is contradictory  *)
+      let me = {
+	me_name = "the check fails with all inputs";
+	me_type = Other;
+	me_value = Unparsed "";
+	me_location = Some pos;
+	me_term = None;
+	me_text_info = true;
+      } in
+      add_to_model model_files me
+    else
+      model_files
+
 let build_model raw_model printer_mapping =
   let model_files = build_model_rec raw_model printer_mapping.queried_terms empty_model in
+  let model_files = handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
   {
     vc_term_loc = printer_mapping.Printer.vc_term_loc;
     model_files = model_files;
