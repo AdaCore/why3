@@ -128,7 +128,7 @@ and expr_desc =
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
-  | Eassign of expr * qualid * expr
+  | Eassign of (expr * qualid * expr) list
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr

@@ -660,11 +660,22 @@ expr_:
 | IF seq_expr THEN expr %prec prec_no_else
     { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
 | expr LARROW expr
-    { match $1.expr_desc with
-      | Eidapp (q, [e1]) -> Eassign (e1, q, $3)
-      | Eidapp (Qident id, [e1;e2]) when id.id_str = mixfix "[]" ->
-          Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
-      | _ -> raise Error }
+    { let loc = floc $startpos $endpos in
+      let rec down ll rl = match ll, rl with
+        | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl -> (e1,q,e2) :: down ll rl
+        | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_
+          when id.id_str = mixfix "[]" -> Loc.errorm ~loc
+            "Parallel array assignments are not allowed"
+        | {expr_loc = loc}::_, _::_ -> Loc.errorm ~loc
+            "Invalid left expression in an assignment"
+        | [], [] -> []
+        | _ -> Loc.errorm ~loc "Invalid parallel assignment" in
+      match $1.expr_desc, $3.expr_desc with
+        | Eidapp (Qident id, [e1;e2]), _ when id.id_str = mixfix "[]" ->
+            Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
+        | Etuple ll, Etuple rl -> Eassign (down ll rl)
+        | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
+        | _, _ -> Eassign (down [$1] [$3]) }
 | LET ghost kind pattern EQUAL seq_expr IN seq_expr
     { match $4.pat_desc with
       | Pvar id -> Elet (id, $2, $3, $6, $8)

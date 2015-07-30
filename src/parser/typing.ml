@@ -676,8 +676,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let id = create_user_id id in
       let denv = denv_add_var denv id (dity_of_ity ity_int) in
       DEfor (id, efrom, dir, eto, inv, dexpr muc denv e1)
-  | Ptree.Eassign (e1, q, e2) ->
-      DEassign [dexpr muc denv e1, find_record_field muc q, dexpr muc denv e2]
+  | Ptree.Eassign asl ->
+      let mk_assign (e1,q,e2) =
+        dexpr muc denv e1, find_record_field muc q, dexpr muc denv e2 in
+      DEassign (List.map mk_assign asl)
   | Ptree.Eraise (q, e1) ->
       let xs = find_xsymbol muc q in
       let e1 = match e1 with
