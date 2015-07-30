@@ -40,10 +40,13 @@ let register check task model stats valid manual tracefile cntexmpfile =
     match model with
     | None -> ""
     | Some m ->
-      Model_parser.model_vc_term_to_string
-	~me_name_trans:spark_counterexample_transform
-	~sep:" and "
-	m in
+      if not (Model_parser.is_model_empty m) then
+	Model_parser.model_vc_term_to_string
+	  ~me_name_trans:spark_counterexample_transform
+	  ~sep:" and "
+	  m
+      else ""
+  in
   let msg =
   { check         = check;
     result        = valid;
