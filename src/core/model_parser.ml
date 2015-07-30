@@ -224,13 +224,14 @@ let print_model_vc_term
     ?(sep = "\n")
     fmt
     model =
-  match model.vc_term_loc with
-  | None -> fprintf fmt "error: cannot get location of the check"
-  | Some pos ->
-    let (filename, line_number, _, _) = Loc.get pos in
-    let model_file = get_model_file model.model_files filename in
-    let model_elements = get_elements model_file line_number in
-    print_model_elements ~sep me_name_trans fmt model_elements
+  if not (is_model_empty model) then
+    match model.vc_term_loc with
+    | None -> fprintf fmt "error: cannot get location of the check"
+    | Some pos ->
+      let (filename, line_number, _, _) = Loc.get pos in
+      let model_file = get_model_file model.model_files filename in
+      let model_elements = get_elements model_file line_number in
+      print_model_elements ~sep me_name_trans fmt model_elements
 
 let model_vc_term_to_string
     ?(me_name_trans = why_name_trans)
