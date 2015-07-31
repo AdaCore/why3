@@ -218,13 +218,14 @@ let print_model_vc_term
     ?(sep = "\n")
     fmt
     model =
-  match model.vc_term_loc with
-  | None -> fprintf fmt "error: cannot get location of the check"
-  | Some pos ->
-    let (filename, line_number, _, _) = Loc.get pos in
-    let model_file = get_model_file model.model_files filename in
-    let model_elements = get_elements model_file line_number in
-    print_model_elements ~sep me_name_trans fmt model_elements
+  if not (is_model_empty model) then
+    match model.vc_term_loc with
+    | None -> fprintf fmt "error: cannot get location of the check"
+    | Some pos ->
+      let (filename, line_number, _, _) = Loc.get pos in
+      let model_file = get_model_file model.model_files filename in
+      let model_elements = get_elements model_file line_number in
+      print_model_elements ~sep me_name_trans fmt model_elements
 
 let model_vc_term_to_string
     ?(me_name_trans = why_name_trans)
@@ -390,28 +391,34 @@ match raw_model with
 
 let handle_contradictory_vc model_files vc_term_loc =
   (* The VC is contradictory if the location of the term that triggers VC
-     was collected nad there are no model elements in this location.
+     was collected, model_files is not empty, and there are no model elements
+     in this location.
      If this is the case, add model element saying that VC is contradictory
      to this location. *)
-  match vc_term_loc with
-  | None -> model_files
-  | Some pos ->
-    let (filename, line_number, _, _) = Loc.get pos in
-    let model_file = get_model_file model_files filename in
-    let model_elements = get_elements model_file line_number in
-    if model_elements = [] then
-      (* The vc is contradictory  *)
-      let me = {
-	me_name = "the check fails with all inputs";
-	me_type = Other;
-	me_value = Unparsed "";
-	me_location = Some pos;
-	me_term = None;
-	me_text_info = true;
-      } in
-      add_to_model model_files me
-    else
-      model_files
+  if model_files = empty_model then
+    (* If the counterexample model was not collected, then model_files
+       is empty and this does not mean that VC is contradictory. *)
+    model_files
+  else
+    match vc_term_loc with
+    | None -> model_files
+    | Some pos ->
+      let (filename, line_number, _, _) = Loc.get pos in
+      let model_file = get_model_file model_files filename in
+      let model_elements = get_elements model_file line_number in
+      if model_elements = [] then
+      (* The vc is contradictory, add special model element  *)
+	let me = {
+	  me_name = "the check fails with all inputs";
+	  me_type = Other;
+	  me_value = Unparsed "";
+	  me_location = Some pos;
+	  me_term = None;
+	  me_text_info = true;
+	} in
+	add_to_model model_files me
+      else
+	model_files
 
 let build_model raw_model printer_mapping =
   let model_files = build_model_rec raw_model printer_mapping.queried_terms empty_model in
