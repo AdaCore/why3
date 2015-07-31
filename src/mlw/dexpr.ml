@@ -38,7 +38,7 @@ and dvar =
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let dity_of_dvty (argl,res) =
-  List.fold_right (fun a d -> Dpur (its_func, [a;d])) argl res
+  List.fold_right (fun a d -> Dapp (its_func, [a;d], [])) argl res
 
 let dvar_fresh n = ref (Dtvs (create_tvsymbol (id_fresh n)))
 
@@ -169,10 +169,10 @@ let reunify_regions () =
 
 (** Built-in types *)
 
-let dity_int  = Dpur (its_int,  [])
-let dity_real = Dpur (its_real, [])
-let dity_bool = Dpur (its_bool, [])
-let dity_unit = Dpur (its_unit, [])
+let dity_int  = Dapp (its_int,  [], [])
+let dity_real = Dapp (its_real, [], [])
+let dity_bool = Dapp (its_bool, [], [])
+let dity_unit = Dapp (its_unit, [], [])
 
 let dvty_int  = [], dity_int
 let dvty_real = [], dity_real
@@ -206,21 +206,18 @@ let rec print_dity pri fmt = function
   | Durg (ity,d) ->
       Format.fprintf fmt (protect_on (pri > 1) "%a@ @@%s")
         (print_dity 0) d (Ident.id_unique rprinter (reg_of_ity ity).reg_name)
-  | Dpur (s,[t1;t2]) when its_equal s its_func ->
+  | Dapp (s,[t1;t2],[]) when its_equal s its_func ->
       Format.fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
         (print_dity 1) t1 (print_dity 0) t2
-  | Dpur (s,tl) when is_ts_tuple s.its_ts ->
+  | Dapp (s,tl,[]) when is_ts_tuple s.its_ts ->
       Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity 0)) tl
-  | Dpur (s,tl) when its_impure s ->
-      Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
-  | Dpur (s,tl) ->
-      Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
   | Dapp (s,tl,rl) ->
       Format.fprintf fmt (protect_on (pri > 1) "%a%a%a")
         Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
           (print_regs (print_dity 0)) rl
+  | Dpur (s,tl) ->
+      Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
+        Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
 
 let print_dity fmt d = print_dity 0 fmt d
 

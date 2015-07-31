@@ -39,9 +39,9 @@ and ity_node = private
   | Ityreg of region
     (** record with mutable fields and shareable components *)
   | Ityapp of itysymbol * ity list * region list
-    (** algebraic type with shareable components *)
+    (** immutable type or algebraic type with shareable components *)
   | Itypur of itysymbol * ity list
-    (** immutable type or a snapshot of a mutable type *)
+    (** pure snapshot of a mutable type *)
   | Ityvar of tvsymbol
     (** type variable *)
 
@@ -139,13 +139,14 @@ val ity_reg : region -> ity
 val ity_var : tvsymbol -> ity
 
 val ity_pur : itysymbol -> ity list -> ity
-(** [ity_pur] may be applied to mutable type symbols to create a snapshot *)
+(** [ity_pur s tl] creates
+  - an [Itypur] snapshot type if [its_impure s] is true
+  - an [Ityapp (s,tl,[])] type otherwise *)
 
 val ity_app : itysymbol -> ity list -> region list -> ity
 (** [ity_app s tl rl] creates
-  - a fresh region and an [Ityreg] type if [s] is mutable
-  - an [Itypur] type if [s] is not mutable and [rl] is empty
-  - an [Ityapp] type otherwise *)
+  - an [Ityreg] type with a fresh region if [its_mutable s] is true
+  - an [Ityapp (s,tl,rl)] type otherwise *)
 
 val ity_app_fresh : itysymbol -> ity list -> ity
 (** [ity_app_fresh] creates fresh regions where needed *)

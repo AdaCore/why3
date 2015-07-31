@@ -224,7 +224,7 @@ let count_regions {muc_known = kn} {pv_ity = ity} mr =
     | Ityreg r -> fields (add_reg r mr) r.reg_its r.reg_args r.reg_regs
     | Ityapp (s,tl,rl) -> fields mr s tl rl
     | Itypur (s,tl) -> fields mr s tl []
-    | Ityvar _ -> mr
+    | Ityvar _ -> assert false
   and fields mr s tl rl = if s.its_privmut then mr else
     let add_arg isb v ity = ity_match isb (ity_var v) ity in
     let isb = List.fold_left2 add_arg isb_empty s.its_ts.ts_args tl in
