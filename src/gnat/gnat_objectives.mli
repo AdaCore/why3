@@ -76,7 +76,7 @@ type status =
                unproved could be further simplified, but there is some work
                left.
    [Counter_Example] means that the objective cannot be proved and the
-               counter-example should be generated.
+               counterexample should be generated.
 *)
 
 val register_result : goal -> bool -> objective * status
@@ -113,14 +113,14 @@ val schedule_goal : cntexample : bool -> goal -> unit
 (* schedule a goal for proof with default prover and
    default timeout. The function returns immediately.
    @param cntexample indicates whether the prover should be queried for
-     a counter-example.
+     a counterexample.
 *)
 
 val schedule_goal_with_prover : cntexample : bool -> goal -> Gnat_config.prover -> unit
 (* schedule a goal for proof with given prover and
    default timeout. The function returns immediately.
    @param cntexample indicates whether the prover should be queried for
-     a counter-example.
+     a counterexample.
 *)
 
 
@@ -170,16 +170,16 @@ module Save_VCs : sig
 
    val spark_counterexample_transform :
      (string * Model_parser.model_element_type) -> string
-   (* Transformation of counter-example model elements names to SPARK syntax.
+   (* Transformation of counterexample model elements names to SPARK syntax.
    *)
 
    val save_counterexample : goal -> Model_parser.model ->
      trace : Gnat_loc.S.t -> string
    (* save the counterexample to a file; return the counterexample file name,
-      "" if no counter-example file was saved
+      "" if no counterexample file was saved
       @param trace the trace of source-code positions that should be saved.
-        Counter-example elements with different positions will not be saved.
-        Gnat_loc.S.empty if all counter-example elements should be saved
+        Counterexample elements with different positions will not be saved.
+        Gnat_loc.S.empty if all counterexample elements should be saved
    *)
 
    val vc_file : goal -> string

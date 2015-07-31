@@ -15,19 +15,19 @@ val provers : prover list
 (* the provers, either the default prover, or as given by --prover *)
 
 val prover_ce : prover option
-(* the prover for counter-examples generation
-   None if counter-example should not be generated
+(* the prover for counterexamples generation
+   None if counterexample should not be generated
 *)
 
 type ce_mode =
   | On
   | Off
-(* In mode On, the counter-example will be generated
-   In mode Off, the counter-example will not be generated
+(* In mode On, the counterexample will be generated
+   In mode Off, the counterexample will not be generated
 *)
 
 val ce_mode : ce_mode
-(* Reflects the value of the option --counter-example, default off *)
+(* Reflects the value of the option --counterexample, default off *)
 
 val manual_prover : prover option
 (* Currently, if a manual prover is provided, it must be the only one. So in

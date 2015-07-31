@@ -117,8 +117,8 @@ type objective_rec =
    (* when a goal is not proved, the objective is marked "not proved" by
     * setting this boolean to "true" *)
      mutable counter_example : bool;
-   (* when a goal is not proved and a counter-example for the goal should
-    * be got, the objective is marked "counter-example" by setting this
+   (* when a goal is not proved and a counterexample for the goal should
+    * be got, the objective is marked "counterexample" by setting this
     * boolean to "true" *)
    }
 (* an objective consists of to be scheduled and to be proved goals *)
@@ -338,7 +338,7 @@ let register_result goal result =
     * put back later, see below *)
    GoalSet.remove obj_rec.to_be_proved goal;
    if obj_rec.counter_example then begin
-     (* The prover run was scheduled just to get counter-example *)
+     (* The prover run was scheduled just to get counterexample *)
      obj_rec.counter_example <- false;
      obj, Not_Proved
    end else begin
@@ -379,7 +379,7 @@ let register_result goal result =
 	 match Gnat_config.ce_mode with
 	 | Gnat_config.On ->
 	   begin
-	     (* The goal will be scheduled to get a counter-example *)
+	     (* The goal will be scheduled to get a counterexample *)
 	     obj_rec.not_proved <- true;
 	     obj_rec.counter_example <- true;
 	     GoalSet.add obj_rec.to_be_proved goal;

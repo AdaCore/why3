@@ -65,7 +65,7 @@ let set_ce_mode s =
     opt_ce_mode := Off
   else
     Gnat_util.abort_with_message ~internal:true
-        "argument for option --counter-example should be one of\
+        "argument for option --counterexample should be one of\
         (on|off)."
 
 let set_filename s =
@@ -179,8 +179,8 @@ let options = Arg.align [
           " Build user libraries for manual provers";
    "--why3-conf", Arg.String set_why3_conf,
           " Specify additionnal configuration file";
-   "--counter-example", Arg.String set_ce_mode,
-          "on if the counter-example for unproved VC should be get, off elsewhere";
+   "--counterexample", Arg.String set_ce_mode,
+          "on if the counterexample for unproved VC should be get, off elsewhere";
 ]
 
 let () = Arg.parse options set_filename usage_msg
@@ -253,7 +253,7 @@ let provers, prover_ce, config, env =
                                     ("Cannot read file" ^ conf_name ^ ".")
   in
   (* now we build the Whyconf.config_prover for all requested provers
-   * and for the prover for counter-example generation *)
+   * and for the prover for counterexample generation *)
   let base_provers, base_prover_ce =
     try
       let filter_prover prover_string =

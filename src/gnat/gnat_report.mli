@@ -53,13 +53,13 @@ open Gnat_objectives
 val register :
      Gnat_expl.check
   -> Task.task option                  (* task of the last goal *)
-  -> Model_parser.model option         (* counter-example model *)
+  -> Model_parser.model option         (* counterexample model *)
   -> Save_VCs.stats option             (* extra information about the run *)
   -> bool                              (* if the goal was proved or not *)
   -> (string * string) option           (* (for manual provers) *)
                                        (* pair of (vc_file, editor_cmd) *)
   -> string                            (* the name of the trace file *)
-  -> string                            (* the name of the counter-example file *)
+  -> string                            (* the name of the counterexample file *)
     -> unit
 (* register a proof result for the given objective, and the given result (the
    boolean). The task may be used to improve the localization of the message.
