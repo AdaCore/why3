@@ -771,7 +771,7 @@ let eff_write rd wr =
 exception IllegalAssign of region * region * region
 
 let rec ity_skel_check t1 t2 =
-  if t1.ity_pure then ity_equal_check t1 t2 else
+  if not (ity_equal t1 t2) then
   match t1.ity_node, t2.ity_node with
   |(Ityreg {reg_its = s1; reg_args = l1},
     Ityreg {reg_its = s2; reg_args = l2}
@@ -802,46 +802,40 @@ let eff_assign asl =
     Spv.add r (Spv.add v s)) Spv.empty asl in
   check_taints taint reads;
   (* compute the region transitions under writes *)
-  let rec reg2 fw rl r =
-    let fs = Mreg.find_def Mpv.empty r writes in
-    if Mpv.is_empty fs
-      then reg_r_fold (reg2 fw) (r::rl) r
-      else under_reg fw (r::rl) r fs
-  and ity2 fw rl t =
-    ity_r_fold (reg2 fw) rl t
-  and under_reg fw rl ({reg_its = s} as r) fs =
-    let ity3 rl frz t = if frz then ity2 fw rl t else rl in
-    let reg3 rl frz r = if frz then reg2 fw rl r else rl in
-    let rl = dfold2 ity3 reg3 rl s.its_arg_frz r.reg_args
-                                 s.its_reg_frz r.reg_regs in
-    let sbs = its_match_regs s r.reg_args r.reg_regs in
-    let add_mfld rl f =
+  let reg_rexp {reg_its = s; reg_args = tl; reg_regs = rl} fs =
+    let ity_rexp xl t = ity_r_fold (fun l r -> r :: l) xl t in
+    let sbs = its_match_regs s tl rl in
+    let mfield xl f =
       let tf = ity_full_inst sbs f.pv_ity in
-      let tt = if not fw then tf else
-        match Mpv.find_opt f fs with
-        | Some tt -> ity_skel_check tf tt; tt
-        | _ -> tf in
-      ity2 fw rl tt in
-    List.fold_left add_mfld rl s.its_mfields in
+      let tt = Mpv.find_def tf f fs in
+      ity_skel_check tf tt; ity_rexp xl tt in
+    let xl = List.fold_left mfield [] s.its_mfields in
+    let freg xl frz r = if frz then r :: xl else xl in
+    let farg xl frz t = if frz then ity_rexp xl t else xl in
+    dfold2 farg freg xl s.its_arg_frz tl s.its_reg_frz rl in
+  let rec stitch pl rf rt fs =
+    let link pl rf rt =
+      stitch ((rf,rt)::pl) rf rt (Mreg.find_def Mpv.empty rt writes) in
+    List.fold_left2 link pl (reg_rexp rf Mpv.empty) (reg_rexp rt fs) in
   let add_write r fs m =
-    let rl1 = under_reg false [] r fs in
-    let rl2 = under_reg true  [] r fs in
-    Mint.change (fun m -> Some (match m with
-      | Some m -> Mreg.add r (rl1,rl2) m
-      | _ -> Mreg.singleton r (rl1,rl2))) (- List.length rl1) m in
+    let pl = stitch [] r r fs in
+    let fit m = Some (match m with
+      | Some m -> Mreg.add r pl m
+      | None -> Mreg.singleton r pl) in
+    Mint.change fit (- List.length pl) m in
   let m = Mreg.fold add_write writes Mint.empty in
   (* compute resets as non-identity region transitions *)
   let add_bind r1 r2 m = Mreg.change (function
     | (Some r3) as v when reg_equal r2 r3 -> v
     | Some r3 -> raise (IllegalAssign (r1,r2,r3))
     | None -> Some r2) r1 m in
-  let add_pair (rst, mt, mf) r1 r2 =
+  let add_pair (rst, mt, mf) (r1,r2) =
     let rst = if reg_equal r1 r2 then rst
     else Sreg.add r1 (Sreg.add r2 rst) in
     rst, add_bind r1 r2 mt, add_bind r2 r1 mf in
-  let add_write r (rl1,rl2) ((rst,_,_) as acc) =
+  let add_write r pl ((rst,_,_) as acc) =
     if Sreg.mem r rst then acc else
-    List.fold_left2 add_pair acc rl1 rl2 in
+    List.fold_left add_pair acc pl in
   let add_level _ mpl acc =
     Mreg.fold add_write mpl acc in
   let resets,_,_ = Mint.fold add_level m (Sreg.empty,Mreg.empty,Mreg.empty) in
