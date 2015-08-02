@@ -1,0 +1,24 @@
+
+
+theory T
+
+  use import int.Int
+
+  constant n : int
+
+  constant a : int
+  constant b : int
+  constant c : int
+  constant d : int
+  constant e : int
+  constant f : int
+
+  goal G : (n * a + b) * (n * c + d) =
+     n*n*a*c + n*(a*d+b*c) + b*d
+
+
+  goal G3 : (n * n * a + n * b + c) * (n * n * d + n * e + f) =
+     n*n*n*n*a*d + n*n*n*(a*e+b*d) + n*n*(a*f + b*e+c*d) +
+     n*(b*f+c*e) + c*f
+
+end
