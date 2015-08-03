@@ -119,8 +119,12 @@ let default_post vty ef =
   let vs = create_vsymbol (id_fresh "result") (ty_of_vty vty) in
   create_post vs t_true, Mexn.mapi default_exn_post ef.eff_raises
 
-let wp_label e f =
-  let loc = if f.t_loc = None then e.e_loc else f.t_loc in
+let wp_label ?(override=false) e f =
+  let loc =
+    if e.e_loc = None then f.t_loc
+    else if f.t_loc = None then e.e_loc
+    else if override then e.e_loc else f.t_loc
+  in
   let lab = Ident.Slab.union e.e_label f.t_label in
   t_label ?loc lab f
 
@@ -1645,8 +1649,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let call_regs = regs_of_writes spec.c_effect in
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
-      let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call") in
+      let pre =
+        wp_label ~override:true e (Subst.term state_before_call spec.c_pre) in
+      let md =
+        Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call")
+      in
       let state_after_call, call_glue =
         Subst.havoc md env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->
