@@ -11,26 +11,28 @@
 
 val intro_projections_counterexmp :  Task.task Trans.trans
  (**
-    Transformation that for each declared abstract function and predicate 
-    p labeled with label "model_projected" for that it exists a projection
-    function f creates declaration of new constant c and axiom stating that
-    c = f p
+    Transformation that for each declared abstract function or predicate
+    p labeled with label "model_projected" creates a declaration of new
+    constant c labeled with label "model" and declaration of new axiom.
+    If there exists a projection function f for p, the axiom states that
+    c = f p, otherwise it states that c = p.
 
-    Projection functions are functions tagged with meta "model_projection".
-    Function f is projection function for abstract function and predicate p
+    Projection functions are functions tagged with metas "model_projection"
+    and "inline : no" (the latter is needed just to prevent inlinng of this
+    function).
+    Function f is projection function for abstract function or predicate p
     if f is tagged with meta "model_projection" and has a single argument
     of the same type as is the type of p.
 
     This transformation is needed in situations when we want to display not
     value of a variable, but value of a projection function applied to a variable.
-    
+    This is needed, e.g., in cases when the type of a variable is abstract.
+
     Note that since Why3 supports namespaces (different projection functions
     can have the same name) and input languages of solvers typically not,
     Why3 renames projection functions to avoid name clashes.
     This is why it is not possible to just store the name of the projection
     function in a label and than query the solver directly for the value of
     the projection.
-    Also, it means that this transformation should thus be executed before 
-    this renaming.
+    Also, it means that this transformation must be executed before this renaming.
  *)
-  
