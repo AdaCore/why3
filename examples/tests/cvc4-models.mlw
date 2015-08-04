@@ -34,9 +34,31 @@ module M
 
 
   type r = {f:int; g:bool}
-  let test_record (x "model" "model_trace:x" : ref r) : unit
+  let test_record1 (x "model" "model_trace:x" : r) : int
+  ensures { "model_vc" "model_func" result = 1 }
+  =
+  if x.g then
+    x.f
+  else
+    1
+
+  let test_record2 (x "model" "model_trace:x" : ref r) : unit
   ensures { !x.g }
   =
   x := { !x with f = 6}
+
+  let test_record3 (x "model" "model_trace:x" : ref r) : r
+  ensures { "model_vc" "model_func" result.g }
+  =
+  x := { !x with f = 6 };
+  !x
+
+  val re "model" : ref r
+
+  let test_record4 (x "model" "model_trace:x" : ref r) : r
+  ensures { "model_vc" "model_func" result = !re }
+  =
+  x := { !x with f = 6 };
+  !x
 
 end
