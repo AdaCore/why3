@@ -317,7 +317,9 @@ let rec print_term info fmt t =
 		  | Some _ ->
 		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
 		let t_check_pos = t_label ~loc labels t in
-		info.info_model <- S.add t_check_pos info.info_model;
+		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
+		(*info.info_model <- S.add t_check_pos info.info_model;*)
+		()
 	    end;
 	    fprintf fmt "@[%a@]" print_ident ls.ls_name
           | _ ->
@@ -540,7 +542,7 @@ let print_info_model cntexample fmt model_list info =
       info.info_model <- info_model
     end
 
-let print_prop_decl cntexample args info fmt k pr f = match k with
+let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -560,7 +562,7 @@ let print_prop_decl cntexample args info fmt k pr f = match k with
       print_info_model cntexample fmt model_list info;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term_loc = info.info_vc_term.vc_loc;
+				vc_term_loc = vc_loc;
 				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
@@ -587,7 +589,7 @@ let print_data_decl info fmt (ts,cl) =
     print_ident ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc cntexample args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
@@ -603,9 +605,9 @@ let print_decl cntexample args info fmt d = match d.d_node with
       "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl cntexample args info fmt k pr f
+      print_prop_decl vc_loc cntexample args info fmt k pr f
 
-let print_decls cntexample args =
+let print_decls vc_loc cntexample args =
   let print_decl (sm, cm, model) fmt d =
     try
       let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None } in
@@ -615,7 +617,7 @@ let print_decls cntexample args =
 	info_model = model;
 	info_in_goal = false;
 	info_vc_term = vc_term_info} in
-      print_decl cntexample args info fmt d; (sm, cm, info.info_model), []
+      print_decl vc_loc cntexample args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
@@ -632,6 +634,7 @@ let print_task args ?old:_ fmt task =
   (* forget_all ident_printer; *)
 
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
 
   print_prelude fmt args.prelude;
   set_produce_models fmt cntexample;
@@ -639,7 +642,7 @@ let print_task args ?old:_ fmt task =
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in
-  print (snd (Trans.apply (print_decls cntexample args) task));
+  print (snd (Trans.apply (print_decls vc_loc cntexample args) task));
   pp_print_flush fmt ()
 
 let () = register_printer "smtv2" print_task

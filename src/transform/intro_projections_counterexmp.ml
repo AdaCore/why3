@@ -33,13 +33,37 @@ let debug_decl decl =
 *)
 
 (* Label for terms that should be in counterexample *)
-let label_model = Ident.create_label "model"
+let model_label = Ident.create_label "model"
 (* Label for terms that should be projected in counterexample *)
-let label_model_proj = Ident.create_label "model_projected"
+let model_proj_label = Ident.create_label "model_projected"
 
 (* Meta to tag projection functions *)
 let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
   ~desc:"Declares@ the@ projection."
+
+let intro_const_equal_to_term
+    ~term
+    ~const_label
+    ~const_loc
+    ~const_name
+    ~axiom_name
+    =
+  (** See documentation of the function in file intro_projections_counterexmp.mli. *)
+
+  (* Create declaration of new constant *)
+  (*let lab_new = Slab.add model_label labels in*)
+  let id_new = Ident.id_user ~label:const_label const_name const_loc in
+  let ls_new_constant =  Term.create_lsymbol id_new [] term.t_ty in
+  let decl_new_constant = Decl.create_param_decl ls_new_constant in
+  let t_new_constant = Term.t_app ls_new_constant [] term.t_ty in
+
+  (* Create declaration of the axiom about the constant: t_new_constant = t_rhs *)
+  let id_axiom = Decl.create_prsymbol (Ident.id_fresh axiom_name) in
+  let fla_axiom = Term.t_equ t_new_constant term in
+  let decl_axiom = Decl.create_prop_decl Decl.Paxiom id_axiom fla_axiom in
+
+  (* Return the declaration of new constant and the axiom *)
+  decl_new_constant::decl_axiom::[]
 
 let intro_proj_for_ls map_projs ls_projected =
   (* Returns list of declarations for projection of ls_projected
@@ -57,48 +81,31 @@ let intro_proj_for_ls map_projs ls_projected =
      @param map_projs maps types to projection function for these types
      @param ls_projected the label symbol that should be projected
   *)
-  if not (Slab.mem label_model_proj ls_projected.ls_name.id_label) then
+  if not (Slab.mem model_proj_label ls_projected.ls_name.id_label) then
     (* ls_projected has not a label "model_projected" *)
     []
   else
     match ls_projected.ls_value with
     | None -> []
     | Some ty_projected ->
-      let create_proj_decls t_rhs =
-	(* Creates projection declarations. That is:
-	   - declaration for new constant t_new_constant
-	   - declaration for axiom stating that t_new_constant = t_rhs. *)
-
-	(* Create declaration of new constant *)
-	let name_new_constant = ls_projected.ls_name.id_string^"_proj_constant" in
-	let lab_new = Slab.add label_model Slab.empty in
-	let id_new = Ident.id_derive ~label:lab_new name_new_constant ls_projected.ls_name in
-	let ls_new_constant =  Term.create_lsymbol id_new [] t_rhs.t_ty in
-	let decl_new_constant = Decl.create_param_decl ls_new_constant in
-	let t_new_constant = Term.t_app ls_new_constant [] t_rhs.t_ty in
-
-	(* Create the declaration of the axiom about the constant: t_new_constant = t_rhs *)
-	let name_axiom = ls_projected.ls_name.id_string^"_proj_axiom" in
-	let id_axiom = Decl.create_prsymbol (Ident.id_fresh name_axiom) in
-	let fla_axiom = Term.t_equ t_new_constant t_rhs in
-	let decl_axiom = Decl.create_prop_decl Decl.Paxiom id_axiom fla_axiom in
-
-	(* Add the declaration of new constant and the axiom *)
-	decl_new_constant::decl_axiom::[]
-      in
-
-      (* t_rhs is a term corresponding to
+      (* t_proj is a term corresponding to
          - ls_projected (the label symbol being projected) - if there is no
 	   projection function for its type
          - application of projection function f to ls_projected  *)
-      let t_rhs =
+      let t_proj =
 	let t_projected = Term.t_app ls_projected [] ls_projected.ls_value in
 	try
 	  let f = Ty.Mty.find ty_projected map_projs in
 	  Term.t_app f [t_projected] f.ls_value
 	with Not_found -> t_projected in
 
-      create_proj_decls t_rhs
+      (* introduce new constant c and axiom stating c = t_proj *)
+      let const_label = Slab.add model_label ls_projected.ls_name.id_label in
+      let const_loc = Opt.get ls_projected.ls_name.id_loc in
+      let const_name = ls_projected.ls_name.id_string^"_proj_constant" in
+      let axiom_name = ls_projected.ls_name.id_string^"_proj_axiom" in
+
+      intro_const_equal_to_term ~term:t_proj ~const_label ~const_loc ~const_name ~axiom_name
 
 let introduce_projs map_projs decl =
   match decl.d_node with
