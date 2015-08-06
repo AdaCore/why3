@@ -288,14 +288,14 @@ let close_theory uc = match uc.uc_export with
 
 let get_namespace uc = List.hd uc.uc_import
 
-let open_namespace uc s = match uc.uc_import with
+let open_scope uc s = match uc.uc_import with
   | ns :: _ -> { uc with
       uc_prefix =        s :: uc.uc_prefix;
       uc_import =       ns :: uc.uc_import;
       uc_export = empty_ns :: uc.uc_export; }
   | [] -> assert false
 
-let close_namespace uc import =
+let close_scope uc ~import =
   match uc.uc_prefix, uc.uc_import, uc.uc_export with
   | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in

@@ -1111,18 +1111,18 @@ let top_muc_on_demand loc slice = match slice.muc with
       slice.muc <- Some muc;
       muc
 
-let open_namespace loc nm =
+let open_scope loc nm =
   assert (not (Stack.is_empty state));
   let slice = Stack.top state in
   let muc = top_muc_on_demand loc slice in
   if Debug.test_noflag debug_parse_only then
-    slice.muc <- Some (open_namespace muc nm.id_str)
+    slice.muc <- Some (open_scope muc nm.id_str)
 
-let close_namespace loc ~import =
+let close_scope loc ~import =
   assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
   if Debug.test_noflag debug_parse_only then
     let slice = Stack.top state in
-    let muc = Loc.try1 ~loc (close_namespace ~import) (Opt.get slice.muc) in
+    let muc = Loc.try1 ~loc (close_scope ~import) (Opt.get slice.muc) in
     slice.muc <- Some muc
 
 let add_decl loc d =

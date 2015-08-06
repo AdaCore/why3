@@ -183,11 +183,11 @@ module_head:
 
 scope_head:
 | SCOPE boption(IMPORT) uident
-    { Typing.open_namespace (floc $startpos $endpos) $3; $2 }
+    { Typing.open_scope (floc $startpos $endpos) $3; $2 }
 
 module_decl:
 | scope_head module_decl* END
-    { Typing.close_namespace (floc $startpos($1) $endpos($1)) ~import:$1 }
+    { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
 | d = pure_decl | d = prog_decl | d = meta_decl
     { Typing.add_decl (floc $startpos $endpos) d }
 | use_clone { () }
@@ -201,14 +201,14 @@ use_clone:
     { Typing.add_decl (floc $startpos $endpos) (Dclone ($3, $4)) }
 | USE boption(IMPORT) tqualid option(preceded(AS, uident))
     { let loc = floc $startpos $endpos in
-      Typing.open_namespace loc (use_as $3 $4);
+      Typing.open_scope loc (use_as $3 $4);
       Typing.add_decl loc (Duse $3);
-      Typing.close_namespace loc ~import:$2 }
+      Typing.close_scope loc ~import:$2 }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
-      Typing.open_namespace loc (use_as $3 $4);
+      Typing.open_scope loc (use_as $3 $4);
       Typing.add_decl loc (Dclone ($3, $5));
-      Typing.close_namespace loc ~import:$2 }
+      Typing.close_scope loc ~import:$2 }
 
 clone_subst:
 | (* epsilon *)                         { [] }

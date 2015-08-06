@@ -193,16 +193,16 @@ let get_theory uc = uc.muc_theory
 let get_namespace uc = List.hd uc.muc_import
 let get_known uc = uc.muc_known
 
-let open_namespace uc s = match uc.muc_import with
+let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
-      muc_theory = Theory.open_namespace uc.muc_theory s;
+      muc_theory = Theory.open_scope uc.muc_theory s;
       muc_prefix =        s :: uc.muc_prefix;
       muc_import =       ns :: uc.muc_import;
       muc_export = empty_ns :: uc.muc_export; }
   | [] -> assert false
 
-let close_namespace uc import =
-  let th = Theory.close_namespace uc.muc_theory import in (* catches errors *)
+let close_scope uc import =
+  let th = Theory.close_scope uc.muc_theory import in (* catches errors *)
   match uc.muc_prefix, uc.muc_import, uc.muc_export with
   | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in

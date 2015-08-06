@@ -86,8 +86,8 @@ type pmodule_uc = private {
 val create_module : Env.env -> ?path:string list -> preid -> pmodule_uc
 val close_module  : pmodule_uc -> pmodule
 
-val open_namespace  : pmodule_uc -> string -> pmodule_uc
-val close_namespace : pmodule_uc -> import:bool -> pmodule_uc
+val open_scope  : pmodule_uc -> string -> pmodule_uc
+val close_scope : pmodule_uc -> import:bool -> pmodule_uc
 
 val restore_path : ident -> string list * string * string list
 (** [restore_path id] returns the triple (library path, module,

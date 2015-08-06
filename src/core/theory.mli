@@ -131,8 +131,8 @@ type theory_uc = private {
 val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
 
-val open_namespace  : theory_uc -> string -> theory_uc
-val close_namespace : theory_uc -> bool (* import *) -> theory_uc
+val open_scope  : theory_uc -> string -> theory_uc
+val close_scope : theory_uc -> import:bool -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 

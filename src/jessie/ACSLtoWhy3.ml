@@ -748,8 +748,8 @@ and predicate_named ~label p = predicate ~label p.content
 
 let use th1 th2 =
   let name = th2.Theory.th_name in
-  Theory.close_namespace
-    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
+  Theory.close_scope
+    (Theory.use_export (Theory.open_scope th1 name.Ident.id_string) th2)
     true
 
 let add_decl th d =
@@ -1330,17 +1330,17 @@ let add_pdecl m d =
 
 let use m th =
   let name = th.Theory.th_name in
-  Mlw_module.close_namespace
+  Mlw_module.close_scope
     (Mlw_module.use_export_theory
-       (Mlw_module.open_namespace m name.Ident.id_string)
+       (Mlw_module.open_scope m name.Ident.id_string)
        th)
     true
 
 let use_module m modul =
   let name = modul.Mlw_module.mod_theory.Theory.th_name in
-  Mlw_module.close_namespace
+  Mlw_module.close_scope
     (Mlw_module.use_export
-       (Mlw_module.open_namespace m name.Ident.id_string)
+       (Mlw_module.open_scope m name.Ident.id_string)
        modul)
     true
 

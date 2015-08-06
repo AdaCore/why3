@@ -155,16 +155,16 @@ let close_module, restore_module =
      m),
   (fun th -> Hid.find h th.th_name)
 
-let open_namespace uc s = match uc.muc_import with
+let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
-      muc_theory = Theory.open_namespace uc.muc_theory s;
+      muc_theory = Theory.open_scope uc.muc_theory s;
       muc_units  = [Uscope (s, false, uc.muc_units)];
       muc_import =       ns :: uc.muc_import;
       muc_export = empty_ns :: uc.muc_export; }
   | [] -> assert false
 
-let close_namespace uc ~import =
-  let th = Theory.close_namespace uc.muc_theory import in
+let close_scope uc ~import =
+  let th = Theory.close_scope uc.muc_theory ~import in
   match List.rev uc.muc_units, uc.muc_import, uc.muc_export with
   | Uscope (s,_,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in

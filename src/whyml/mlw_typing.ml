@@ -1172,7 +1172,7 @@ let use_clone_pure env mth uc loc (use,inst) =
   if Debug.test_flag Glob.flag then Glob.use s.id_loc th.th_name;
   (* open namespace, if any *)
   let uc = match use.use_import with
-    | Some (_, use_as) -> Theory.open_namespace uc use_as
+    | Some (_, use_as) -> Theory.open_scope uc use_as
     | None -> uc in
   (* use or clone *)
   let uc = match inst with
@@ -1182,7 +1182,7 @@ let use_clone_pure env mth uc loc (use,inst) =
         Theory.clone_export uc th (Typing.type_inst uc th inst) in
   (* close namespace, if any *)
   match use.use_import with
-    | Some (import, _) -> Theory.close_namespace uc import
+    | Some (import, _) -> Theory.close_scope uc import
     | None -> uc
 
 let use_clone_pure env mth uc loc use =
@@ -1198,7 +1198,7 @@ let use_clone env mmd mth uc loc (use,inst) =
     (match mth with Module m -> m.mod_theory.th_name | Theory th -> th.th_name);
   (* open namespace, if any *)
   let uc = match use.use_import with
-    | Some (_, use_as) -> open_namespace uc use_as
+    | Some (_, use_as) -> open_scope uc use_as
     | None -> uc in
   (* use or clone *)
   let uc = match mth, inst with
@@ -1235,7 +1235,7 @@ let use_clone env mmd mth uc loc (use,inst) =
         clone_export_theory uc th (Typing.type_inst (get_theory uc) th inst) in
   (* close namespace, if any *)
   match use.use_import with
-    | Some (import, _) -> close_namespace uc import
+    | Some (import, _) -> close_scope uc import
     | None -> uc
 
 let use_clone env mmd mth uc loc use =
@@ -1277,12 +1277,12 @@ let open_file, close_file =
       Stack.push (close_theory (Stack.pop lenv) (Stack.pop tuc)) lenv in
     let close_module () = ignore (Stack.pop inm);
       Stack.push (close_module (Stack.pop lenv) (Stack.pop muc)) lenv in
-    let open_namespace name = if Stack.top inm
-      then Stack.push (Mlw_module.open_namespace (Stack.pop muc) name) muc
-      else Stack.push (Theory.open_namespace (Stack.pop tuc) name) tuc in
-    let close_namespace imp = if Stack.top inm
-      then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp) muc
-      else Stack.push (Theory.close_namespace (Stack.pop tuc) imp) tuc in
+    let open_scope name = if Stack.top inm
+      then Stack.push (Mlw_module.open_scope (Stack.pop muc) name) muc
+      else Stack.push (Theory.open_scope (Stack.pop tuc) name) tuc in
+    let close_scope imp = if Stack.top inm
+      then Stack.push (Mlw_module.close_scope (Stack.pop muc) imp) muc
+      else Stack.push (Theory.close_scope (Stack.pop tuc) imp) tuc in
     let new_decl loc d = if Stack.top inm
       then Stack.push (add_decl ~wp loc (Stack.pop muc) d) muc
       else Stack.push (Typing.add_decl loc (Stack.pop tuc) d) tuc in
@@ -1295,8 +1295,8 @@ let open_file, close_file =
       close_theory = close_theory;
       open_module = open_module;
       close_module = close_module;
-      open_namespace = open_namespace;
-      close_namespace = (fun loc imp -> Loc.try1 ~loc close_namespace imp);
+      open_scope = open_scope;
+      close_scope = (fun loc imp -> Loc.try1 ~loc close_scope imp);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
       use_clone = use_clone; }

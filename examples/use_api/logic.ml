@@ -201,9 +201,9 @@ let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
    in theory th1 under construction *)
 let use th1 th2 =
   let name = th2.Theory.th_name in
-  Theory.close_namespace
-    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
-    true
+  Theory.close_scope
+    (Theory.use_export (Theory.open_scope th1 name.Ident.id_string) th2)
+    ~import:true
 
 let () = printf "@[adding goal 3@]@."
 (* use import int.Int *)

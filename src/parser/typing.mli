@@ -21,8 +21,8 @@ val open_module : Ptree.ident -> unit
 
 val close_module : Loc.position -> unit
 
-val open_namespace : Loc.position -> Ptree.ident -> unit
+val open_scope : Loc.position -> Ptree.ident -> unit
 
-val close_namespace : Loc.position -> import:bool -> unit
+val close_scope : Loc.position -> import:bool -> unit
 
 val add_decl : Loc.position -> Ptree.decl -> unit

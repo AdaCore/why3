@@ -70,8 +70,8 @@ type module_uc (* a module under construction *)
 val create_module : Env.env -> ?path:string list -> preid -> module_uc
 val close_module  : module_uc -> modul
 
-val open_namespace  : module_uc -> string -> module_uc
-val close_namespace : module_uc -> bool -> module_uc
+val open_scope  : module_uc -> string -> module_uc
+val close_scope : module_uc -> bool -> module_uc
 
 val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace
