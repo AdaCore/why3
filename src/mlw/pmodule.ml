@@ -518,8 +518,7 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dind (s, idl) ->
       let get_ls (ls,_) = cl_clone_ls inst cl ls in
       let get_case (pr,f) =
-        if Spr.mem pr inst.inst_lemma || Spr.mem pr inst.inst_goal
-          then raise (CannotInstantiate pr.pr_name);
+        if Mpr.mem pr inst.inst_pr then raise (CannotInstantiate pr.pr_name);
         let pr' = create_prsymbol (id_clone pr.pr_name) in
         cl.pr_table <- Mpr.add pr pr' cl.pr_table;
         pr', cl_trans_fmla cl f in
@@ -528,13 +527,15 @@ let clone_decl inst cl uc d = match d.d_node with
       let d = create_ind_decl s (List.map2 get_ind lls idl) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dprop (k,pr,f) ->
-      let k' = match k with
-        | Pskip | Pgoal -> Pskip
-        | Plemma when Spr.mem pr inst.inst_goal -> Pskip
-        | Paxiom when Spr.mem pr inst.inst_goal -> Pgoal
-        | Paxiom when Spr.mem pr inst.inst_lemma -> Plemma
-        | Paxiom -> Paxiom (* TODO: Plemma *)
-        | Plemma -> Paxiom in
+      let k' = match k, Mpr.find_opt pr inst.inst_pr with
+        | _, Some Pskip -> invalid_arg "Pmodule.clone_export"
+        | (Pskip | Pgoal), _ -> Pskip
+        | Paxiom, Some Pgoal -> Pgoal
+        | Plemma, Some Pgoal -> Pskip
+        | (Paxiom | Plemma), Some Paxiom -> Paxiom
+        | (Paxiom | Plemma), Some Plemma -> Plemma
+        | Paxiom, None -> Paxiom (* TODO: Plemma *)
+        | Plemma, None -> Paxiom in
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
       let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
@@ -560,8 +561,7 @@ let clone_export uc m inst =
     if not (Sid.mem id m.mod_local) then raise (NonLocal id) in
   Mts.iter (fun ts _ -> check_local ts.ts_name) inst.inst_ts;
   Mls.iter (fun ls _ -> check_local ls.ls_name) inst.inst_ls;
-  Spr.iter (fun pr -> check_local pr.pr_name) inst.inst_goal;
-  Spr.iter (fun pr -> check_local pr.pr_name) inst.inst_lemma;
+  Mpr.iter (fun pr _ -> check_local pr.pr_name) inst.inst_pr;
   let cl = empty_clones m.mod_local in
   let rec add_unit uc u = match u with
     | Udecl d -> clone_pdecl inst cl uc d

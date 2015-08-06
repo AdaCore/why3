@@ -209,6 +209,7 @@ type clone_subst =
   | CSfsym  of qualid * qualid
   | CSpsym  of qualid * qualid
   | CSvsym  of qualid * qualid
+  | CSaxiom of qualid
   | CSlemma of qualid
   | CSgoal  of qualid
 

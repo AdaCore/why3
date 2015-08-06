@@ -81,6 +81,7 @@ let find_prop     tuc q = find_prop_ns     (Theory.get_namespace tuc) q
 let find_prop_of_kind k tuc q =
   let pr = find_prop tuc q in
   match (Mid.find pr.pr_name tuc.uc_known).d_node with
+  | Dind _ when k = Paxiom -> pr
   | Dprop (l,_,_) when l = k -> pr
   | _ -> Loc.errorm ~loc:(qloc q) "proposition %a is not %s"
       print_qualid q (match k with
@@ -981,43 +982,41 @@ let type_inst ({muc_theory = tuc} as muc) {mod_theory = t} s =
     | CStsym (p,[],PTtyapp (q,[])) ->
         let ts1 = find_tysymbol_ns t.th_export p in
         let ts2 = find_tysymbol tuc q in
-        if Mts.mem ts1 s.inst_ts then
-          Loc.error ~loc:(qloc p) (ClashSymbol ts1.ts_name.id_string);
-        { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
+        { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
+            (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.inst_ts }
     | CStsym (p,tvl,pty) ->
         let ts1 = find_tysymbol_ns t.th_export p in
         let id = id_user (ts1.ts_name.id_string ^ "_subst") (qloc p) in
         let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
         let ts2 = Loc.try3 ~loc:(qloc p)
           create_itysymbol_alias id tvl (ity_of_pty muc pty) in
-        if Mts.mem ts1 s.inst_ts then
-          Loc.error ~loc:(qloc p) (ClashSymbol ts1.ts_name.id_string);
-        { s with inst_ts = Mts.add ts1 ts2.its_ts s.inst_ts }
+        { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
+            (ClashSymbol ts1.ts_name.id_string) ts1 ts2.its_ts s.inst_ts }
     | CSfsym (p,q) ->
         let ls1 = find_fsymbol_ns t.th_export p in
         let ls2 = find_fsymbol tuc q in
-        if Mls.mem ls1 s.inst_ls then
-          Loc.error ~loc:(qloc p) (ClashSymbol ls1.ls_name.id_string);
-        { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+        { s with inst_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
+            (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.inst_ls }
     | CSpsym (p,q) ->
         let ls1 = find_psymbol_ns t.th_export p in
         let ls2 = find_psymbol tuc q in
-        if Mls.mem ls1 s.inst_ls then
-          Loc.error ~loc:(qloc p) (ClashSymbol ls1.ls_name.id_string);
-        { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+        { s with inst_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
+            (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.inst_ls }
     | CSvsym (p,_) ->
         Loc.errorm ~loc:(qloc p)
           "program symbol instantiation is not supported yet" (* TODO *)
+    | CSaxiom p ->
+        let pr = find_prop_ns t.th_export p in
+        { s with inst_pr = Loc.try4 ~loc:(qloc p) Mpr.add_new
+            (ClashSymbol pr.pr_name.id_string) pr Paxiom s.inst_pr }
     | CSlemma p ->
         let pr = find_prop_ns t.th_export p in
-        if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal then
-          Loc.error ~loc:(qloc p) (ClashSymbol pr.pr_name.id_string);
-        { s with inst_lemma = Spr.add pr s.inst_lemma }
+        { s with inst_pr = Loc.try4 ~loc:(qloc p) Mpr.add_new
+            (ClashSymbol pr.pr_name.id_string) pr Plemma s.inst_pr }
     | CSgoal p ->
         let pr = find_prop_ns t.th_export p in
-        if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal then
-          Loc.error ~loc:(qloc p) (ClashSymbol pr.pr_name.id_string);
-        { s with inst_goal = Spr.add pr s.inst_goal }
+        { s with inst_pr = Loc.try4 ~loc:(qloc p) Mpr.add_new
+            (ClashSymbol pr.pr_name.id_string) pr Pgoal s.inst_pr }
   in
   List.fold_left add_inst empty_inst s
 

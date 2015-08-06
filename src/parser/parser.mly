@@ -164,7 +164,7 @@
 %start <Pmodule.pmodule Stdlib.Mstr.t> mlw_file
 %%
 
-(* Modules and namespaces *)
+(* Modules and scopes *)
 
 mlw_file:
 | mlw_module* EOF
@@ -220,6 +220,7 @@ single_clone_subst:
 | FUNCTION  qualid EQUAL qualid { CSfsym  ($2,$4) }
 | PREDICATE qualid EQUAL qualid { CSpsym  ($2,$4) }
 | VAL       qualid EQUAL qualid { CSvsym  ($2,$4) }
+| AXIOM     qualid              { CSaxiom ($2) }
 | LEMMA     qualid              { CSlemma ($2) }
 | GOAL      qualid              { CSgoal  ($2) }
 

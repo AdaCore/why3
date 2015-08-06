@@ -166,19 +166,12 @@ val use_export : theory_uc -> theory -> theory_uc
 (** {2 Clone} *)
 
 type th_inst = {
-  inst_ts    : tysymbol Mts.t; (* old to new *)
-  inst_ls    : lsymbol  Mls.t;
-  inst_lemma : Spr.t;
-  inst_goal  : Spr.t;
+  inst_ts : tysymbol  Mts.t; (* old to new *)
+  inst_ls : lsymbol   Mls.t;
+  inst_pr : prop_kind Mpr.t;
 }
 
 val empty_inst : th_inst
-
-val create_inst :
-  ts    : (tysymbol * tysymbol) list ->
-  ls    : (lsymbol  * lsymbol)  list ->
-  lemma : prsymbol list ->
-  goal  : prsymbol list -> th_inst
 
 val warn_clone_not_abstract : Loc.position -> theory -> unit
 

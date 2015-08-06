@@ -448,27 +448,16 @@ let use_export uc th =
 (** Clone *)
 
 type th_inst = {
-  inst_ts    : tysymbol Mts.t;
-  inst_ls    : lsymbol  Mls.t;
-  inst_lemma : Spr.t;
-  inst_goal  : Spr.t;
+  inst_ts : tysymbol  Mts.t; (* old to new *)
+  inst_ls : lsymbol   Mls.t;
+  inst_pr : prop_kind Mpr.t;
 }
 
 let empty_inst = {
-  inst_ts    = Mts.empty;
-  inst_ls    = Mls.empty;
-  inst_lemma = Spr.empty;
-  inst_goal  = Spr.empty;
+  inst_ts = Mts.empty;
+  inst_ls = Mls.empty;
+  inst_pr = Mpr.empty;
 }
-
-let create_inst ~ts ~ls ~lemma ~goal =
-  let add_ts acc (tso,tsn) = Mts.add tso tsn acc in
-  let add_ls acc (lso,lsn) = Mls.add lso lsn acc in
-  let add_pr acc lem = Spr.add lem acc in {
-    inst_ts    = List.fold_left add_ts Mts.empty ts;
-    inst_ls    = List.fold_left add_ls Mls.empty ls;
-    inst_lemma = List.fold_left add_pr Spr.empty lemma;
-    inst_goal  = List.fold_left add_pr Spr.empty goal }
 
 exception CannotInstantiate of ident
 
@@ -552,7 +541,7 @@ let cl_init_ls cl ls ls' =
     with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
-let cl_init_pr cl pr =
+let cl_init_pr cl pr _ =
   let id = pr.pr_name in
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id)
 
@@ -560,8 +549,7 @@ let cl_init th inst =
   let cl = empty_clones th.th_local in
   Mts.iter (cl_init_ts cl) inst.inst_ts;
   Mls.iter (cl_init_ls cl) inst.inst_ls;
-  Spr.iter (cl_init_pr cl) inst.inst_lemma;
-  Spr.iter (cl_init_pr cl) inst.inst_goal;
+  Mpr.iter (cl_init_pr cl) inst.inst_pr;
   cl
 
 (* clone declarations *)
@@ -614,9 +602,8 @@ let cl_logic cl inst ldl =
 
 let cl_ind cl inst (s, idl) =
   let add_case (pr,f) =
-    if Spr.mem pr inst.inst_lemma || Spr.mem pr inst.inst_goal
-      then raise (CannotInstantiate pr.pr_name)
-      else cl_find_pr cl pr, cl_trans_fmla cl f
+    if Mpr.mem pr inst.inst_pr then raise (CannotInstantiate pr.pr_name);
+    cl_find_pr cl pr, cl_trans_fmla cl f
   in
   let add_ind (ps,la) =
     if Mls.mem ps inst.inst_ls
@@ -626,13 +613,15 @@ let cl_ind cl inst (s, idl) =
   create_ind_decl s (List.map add_ind idl)
 
 let cl_prop cl inst (k,pr,f) =
-  let k' = match k with
-    | Pskip | Pgoal -> Pskip
-    | Plemma when Spr.mem pr inst.inst_goal -> Pskip
-    | Paxiom when Spr.mem pr inst.inst_goal -> Pgoal
-    | Paxiom when Spr.mem pr inst.inst_lemma -> Plemma
-    | Paxiom | Plemma -> Paxiom
-  in
+  let k' = match k, Mpr.find_opt pr inst.inst_pr with
+    | _, Some Pskip -> invalid_arg "Theory.clone_export"
+    | (Pskip | Pgoal), _ -> Pskip
+    | Paxiom, Some Pgoal -> Pgoal
+    | Plemma, Some Pgoal -> Pskip
+    | (Paxiom | Plemma), Some Paxiom -> Paxiom
+    | (Paxiom | Plemma), Some Plemma -> Plemma
+    | Paxiom, None -> Paxiom (* TODO: Plemma *)
+    | Plemma, None -> Paxiom in
   let pr' = cl_find_pr cl pr in
   let f' = cl_trans_fmla cl f in
   create_prop_decl k' pr' f'
