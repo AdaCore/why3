@@ -103,11 +103,11 @@ type pmodule = {
 and mod_unit =
   | Udecl  of pdecl
   | Uuse   of pmodule
-  | Uinst  of mod_inst
+  | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
   | Uscope of string * bool * mod_unit list
 
-and mod_inst = private {
+and mod_inst = {
   mi_mod : pmodule;
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
@@ -166,6 +166,9 @@ let open_scope uc s = match uc.muc_import with
 let close_scope uc ~import =
   let th = Theory.close_scope uc.muc_theory ~import in
   match List.rev uc.muc_units, uc.muc_import, uc.muc_export with
+  | [Uscope (_,_,ul1)], _ :: sti, _ :: ste -> (* empty scope *)
+      { uc with muc_theory = th;  muc_units  = ul1;
+                muc_import = sti; muc_export = ste; }
   | Uscope (s,_,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
@@ -368,17 +371,18 @@ let rec cl_find_its cl its =
     match its.its_def with
     | Some _ -> cl_make_its_alias cl its
     | None -> its
-  else try Mts.find its.its_ts cl.ts_table
-  with Not_found -> cl_make_its_pure cl its
+  else (*try*) Mts.find its.its_ts cl.ts_table
+(*  with Not_found -> cl_make_its_pure cl its*)
 
 and cl_find_ts cl ts =
   if not (Sid.mem ts.ts_name cl.cl_local) then
     match ts.ts_def with
     | Some _ -> (cl_make_its_alias cl (restore_its ts)).its_ts
     | None -> ts
-  else try (Mts.find ts cl.ts_table).its_ts
-  with Not_found -> (cl_make_its_pure cl (restore_its ts)).its_ts
+  else (*try*) (Mts.find ts cl.ts_table).its_ts
+(*  with Not_found -> (cl_make_its_pure cl (restore_its ts)).its_ts*)
 
+(*
 and cl_make_its_pure cl ({its_ts = ts} as its) =
   let id = id_clone ts.ts_name in
   let nts = match its.its_def with
@@ -386,6 +390,7 @@ and cl_make_its_pure cl ({its_ts = ts} as its) =
     | None -> create_itysymbol_pure id ts.ts_args in
   cl.ts_table <- Mts.add its.its_ts nts cl.ts_table;
   nts
+*)
 
 and cl_make_its_alias cl its =
   let odf = Opt.get its.its_def in
@@ -427,9 +432,9 @@ let cl_find_ls cl ls =
     ls'
 *)
 
-let _cl_trans_fmla cl f = t_s_map (cl_trans_ty cl) (cl_find_ls cl) f
+let cl_trans_fmla cl f = t_s_map (cl_trans_ty cl) (cl_find_ls cl) f
 
-let _cl_find_pr cl pr =
+let cl_find_pr cl pr =
   if not (Sid.mem pr.pr_name cl.cl_local) then pr
   else (*try*) Mpr.find pr cl.pr_table
 (*
@@ -439,18 +444,19 @@ let _cl_find_pr cl pr =
     pr'
 *)
 
-let _cl_find_pv cl pv =
+let cl_find_pv cl pv =
   if not (Sid.mem pv.pv_vs.vs_name cl.cl_local) then pv
   else Mpv.find pv cl.pv_table
 
-let _cl_find_rs cl rs =
+let cl_find_rs cl rs =
   if not (Sid.mem rs.rs_name cl.cl_local) then rs
   else Mrs.find rs cl.rs_table
 
-let _cl_find_xs cl xs =
+let cl_find_xs cl xs =
   if not (Sid.mem xs.xs_name cl.cl_local) then xs
   else Mexn.find xs cl.xs_table
 
+(*
 (* initialize the clone structure *)
 
 let cl_init_ts cl ({ts_name = id} as ts) ts' =
@@ -460,36 +466,136 @@ let cl_init_ts cl ({ts_name = id} as ts) ts' =
     then raise (BadInstance (id, ts'.ts_name));
 *)
   cl.ts_table <- Mts.add ts (restore_its ts') cl.ts_table
+*)
 
-let cl_init_ls cl ({ls_name = id} as ls) ls' =
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-(* TODO: check later
-  let mtch sb ty ty' =
-    try ty_match sb ty' (cl_trans_ty cl ty)
-    with TypeMismatch _ -> raise (BadInstance (id, ls'.ls_name))
-  in
-  let sb = match ls.ls_value,ls'.ls_value with
+let cl_clone_ls inst cl ls =
+  if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
+  let constr = ls.ls_constr in
+  let id  = id_clone ls.ls_name in
+  let at = List.map (cl_trans_ty cl) ls.ls_args in
+  let vt = Opt.map (cl_trans_ty cl) ls.ls_value in
+  let ls' = create_lsymbol ~constr id at vt in
+  cl.ls_table <- Mls.add ls ls' cl.ls_table;
+  ls'
+
+let cl_add_ls cl ({ls_name = id} as ls) ({ls_name = id'} as ls') =
+  let mtch sb ty ty' = try ty_match sb ty' (cl_trans_ty cl ty)
+    with TypeMismatch _ -> raise (BadInstance (id, id')) in
+  let sbs = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'
     | None, None -> Mtv.empty
-    | _ -> raise (BadInstance (id, ls'.ls_name))
-  in
-  ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
-    with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
-*)
+    | _ -> raise (BadInstance (id, id')) in
+  ignore (try List.fold_left2 mtch sbs ls.ls_args ls'.ls_args
+    with Invalid_argument _ -> raise (BadInstance (id, id')));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
-let cl_init_pr cl {pr_name = id} =
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id)
-
-let _cl_init th inst =
-  let cl = empty_clones th.th_local in
-  Mts.iter (cl_init_ts cl) inst.inst_ts;
-  Mls.iter (cl_init_ls cl) inst.inst_ls;
-  Spr.iter (cl_init_pr cl) inst.inst_lemma;
-  Spr.iter (cl_init_pr cl) inst.inst_goal;
-  cl
+let cl_found_ls inst cl uc ls =
+  let nls = match Mls.find_opt ls inst.inst_ls with
+    | None ->
+        let ns = Theory.get_namespace uc.muc_theory in
+        (try Some (ns_find_ls ns [ls.ls_name.id_string])
+        with Not_found -> None)
+    | nls -> nls in
+  match nls with
+  | Some ls' -> cl_add_ls cl ls ls'; true
+  | None -> false
 
 (* clone declarations *)
+
+let clone_decl inst cl uc d = match d.d_node with
+  | Dtype _ | Ddata _ -> assert false
+  | Dparam ls ->
+      if cl_found_ls inst cl uc ls then uc else
+      let d = create_param_decl (cl_clone_ls inst cl ls) in
+      add_pdecl ~vc:false uc (create_pure_decl d)
+  | Dlogic ldl ->
+      let get_ls (ls,_) = ignore (cl_clone_ls inst cl ls) in
+      let get_logic (_,ld) =
+        Opt.get (ls_defn_of_axiom (cl_trans_fmla cl (ls_defn_axiom ld))) in
+      List.iter get_ls ldl;
+      let d = create_logic_decl (List.map get_logic ldl) in
+      add_pdecl ~vc:false uc (create_pure_decl d)
+  | Dind (s, idl) ->
+      let get_ls (ls,_) = cl_clone_ls inst cl ls in
+      let get_case (pr,f) =
+        if Spr.mem pr inst.inst_lemma || Spr.mem pr inst.inst_goal
+          then raise (CannotInstantiate pr.pr_name);
+        let pr' = create_prsymbol (id_clone pr.pr_name) in
+        cl.pr_table <- Mpr.add pr pr' cl.pr_table;
+        pr', cl_trans_fmla cl f in
+      let get_ind ls (_,la) = ls, List.map get_case la in
+      let lls = List.map get_ls idl in
+      let d = create_ind_decl s (List.map2 get_ind lls idl) in
+      add_pdecl ~vc:false uc (create_pure_decl d)
+  | Dprop (k,pr,f) ->
+      let k' = match k with
+        | Pskip | Pgoal -> Pskip
+        | Plemma when Spr.mem pr inst.inst_goal -> Pskip
+        | Paxiom when Spr.mem pr inst.inst_goal -> Pgoal
+        | Paxiom when Spr.mem pr inst.inst_lemma -> Plemma
+        | Paxiom -> Paxiom (* TODO: Plemma *)
+        | Plemma -> Paxiom in
+      let pr' = create_prsymbol (id_clone pr.pr_name) in
+      cl.pr_table <- Mpr.add pr pr' cl.pr_table;
+      let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
+      add_pdecl ~vc:false uc (create_pure_decl d)
+
+let clone_pdecl inst cl uc d = match d.pd_node with
+  | PDtype _tdl -> assert false (* TODO *)
+  | PDlet _ld -> assert false (* TODO *)
+  | PDexn xs ->
+      let ity = cl_trans_ity cl xs.xs_ity in
+      let xs' = create_xsymbol (id_clone xs.xs_name) ity in
+      cl.xs_table <- Mexn.add xs xs' cl.xs_table;
+      add_pdecl ~vc:false uc (create_exn_decl xs')
+  | PDpure ->
+      List.fold_left (clone_decl inst cl) uc d.pd_pure
+
+let add_clone uc mi =
+  (* TODO: add TDclone to the muc_theory *)
+  { uc with muc_units = Uclone mi :: uc.muc_units }
+
+let clone_export uc m inst =
+  let check_local id =
+    if not (Sid.mem id m.mod_local) then raise (NonLocal id) in
+  Mts.iter (fun ts _ -> check_local ts.ts_name) inst.inst_ts;
+  Mls.iter (fun ls _ -> check_local ls.ls_name) inst.inst_ls;
+  Spr.iter (fun pr -> check_local pr.pr_name) inst.inst_goal;
+  Spr.iter (fun pr -> check_local pr.pr_name) inst.inst_lemma;
+  let cl = empty_clones m.mod_local in
+  let rec add_unit uc u = match u with
+    | Udecl d -> clone_pdecl inst cl uc d
+    | Uuse m -> use_export uc m
+    | Uclone mi ->
+        add_clone uc { mi_mod = mi.mi_mod;
+          mi_ts = Mts.map (cl_find_its cl) mi.mi_ts;
+          mi_ls = Mls.map (cl_find_ls cl) mi.mi_ls;
+          mi_pr = Mpr.map (cl_find_pr cl) mi.mi_pr;
+          mi_pv = Mpv.map (cl_find_pv cl) mi.mi_pv;
+          mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
+          mi_xs = Mexn.map (cl_find_xs cl) mi.mi_xs}
+    | Umeta (m,al) ->
+        let cl_marg = function
+          | MAty ty -> MAty (cl_trans_ty cl ty)
+          | MAts ts -> MAts (cl_find_ts cl ts)
+          | MAls ls -> MAls (cl_find_ls cl ls)
+          | MApr pr -> MApr (cl_find_pr cl pr)
+          | a -> a in
+        add_meta uc m (List.map cl_marg al)
+    | Uscope (n,import,ul) ->
+        let uc = open_scope uc n in
+        let uc = List.fold_left add_unit uc ul in
+        close_scope ~import uc in
+  let uc = List.fold_left add_unit uc m.mod_units in
+  let mi = {
+    mi_mod = m;
+    mi_ts  = cl.ts_table;
+    mi_ls  = cl.ls_table;
+    mi_pr  = cl.pr_table;
+    mi_pv  = cl.pv_table;
+    mi_rs  = cl.rs_table;
+    mi_xs  = cl.xs_table} in
+  add_clone uc mi
 
 (*
 let cl_type cl inst ts =
@@ -570,73 +676,7 @@ let cl_decl cl inst d = match d.d_node with
   | Dlogic ldl -> cl_logic cl inst ldl
   | Dind idl -> cl_ind cl inst idl
   | Dprop p -> cl_prop cl inst p
-
-let cl_marg cl = function
-  | MAty ty -> MAty (cl_trans_ty cl ty)
-  | MAts ts -> MAts (cl_find_ts cl ts)
-  | MAls ls -> MAls (cl_find_ls cl ls)
-  | MApr pr -> MApr (cl_find_pr cl pr)
-  | a -> a
-
-let cl_smap cl sm = {
-  sm_ts = Mts.map (cl_find_ts cl) sm.sm_ts;
-  sm_ls = Mls.map (cl_find_ls cl) sm.sm_ls;
-  sm_pr = Mpr.map (cl_find_pr cl) sm.sm_pr}
-
-let cl_tdecl cl inst td = match td.td_node with
-  | Decl d -> Decl (cl_decl cl inst d)
-  | Use th -> Use th
-  | Clone (th,sm) -> Clone (th, cl_smap cl sm)
-  | Meta (id,al) -> Meta (id, List.map (cl_marg cl) al)
-
-let clone_theory cl add_td acc th inst =
-  let add acc td =
-    let td =
-      try  Some (mk_tdecl (cl_tdecl cl inst td))
-      with EmptyDecl -> None
-    in
-    Opt.fold add_td acc td
-  in
-  let acc = List.fold_left add acc th.th_decls in
-  let sm = {
-    sm_ts = cl.ts_table;
-    sm_ls = cl.ls_table;
-    sm_pr = cl.pr_table}
-  in
-  add_td acc (mk_tdecl (Clone (th, sm)))
-
-let clone_export muc m inst =
-  let cl = cl_init th inst in
-  let uc = clone_theory cl add_tdecl uc th inst in
-
-  let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
-  let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
-
-  let f_ts p ts =
-    try let ts = Mts.find ts cl.ts_table in store_path uc p ts.ts_name; ts
-    with Not_found -> ts in
-  let f_ls p ls =
-    try let ls = Mls.find ls cl.ls_table in store_path uc p ls.ls_name; ls
-    with Not_found -> ls in
-  let f_pr p pr =
-    try let pr = Mpr.find pr cl.pr_table in store_path uc p pr.pr_name; pr
-    with Not_found -> pr in
-
-  let rec f_ns p ns = {
-    ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.ns_ts);
-    ns_ls = Mstr.map (f_ls p) (Mstr.filter g_ls ns.ns_ls);
-    ns_pr = Mstr.map (f_pr p) ns.ns_pr;
-    ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.ns_ns; } in
-
-  let ns = f_ns [] th.th_export in
-
-  match uc.uc_import, uc.uc_export with
-    | i0 :: sti, e0 :: ste -> { uc with
-        uc_import = merge_ns false ns i0 :: sti;
-        uc_export = merge_ns true  ns e0 :: ste; }
-    | _ -> assert false
 *)
-let clone_export _muc _m _inst = assert false (* TODO *)
 
 (** {2 WhyML language} *)
 
@@ -695,14 +735,14 @@ let print_mname fmt {mod_theory = th} =
 let rec print_unit fmt = function
   | Udecl d -> Pdecl.print_pdecl fmt d
   | Uuse m -> Format.fprintf fmt "use export %a" print_mname m
-  | Uinst mi -> Format.fprintf fmt "clone export %a with ..."
+  | Uclone mi -> Format.fprintf fmt "clone export %a with ..."
       print_mname mi.mi_mod
   | Umeta (m,al) -> Format.fprintf fmt "@[<hov 2>meta %s %a@]"
       m.meta_name (Pp.print_list Pp.comma Pretty.print_meta_arg) al
   | Uscope (s,i,[Uuse m]) -> Format.fprintf fmt "use%s %a%s"
       (if i then " import" else "") print_mname m
       (if s = m.mod_theory.th_name.id_string then "" else " as " ^ s)
-  | Uscope (s,i,[Uinst mi]) -> Format.fprintf fmt "clone%s %a%s with ..."
+  | Uscope (s,i,[Uclone mi]) -> Format.fprintf fmt "clone%s %a%s with ..."
       (if i then " import" else "") print_mname mi.mi_mod
       (if s = mi.mi_mod.mod_theory.th_name.id_string then "" else " as " ^ s)
   | Uscope (s,i,ul) -> Format.fprintf fmt "@[<hov 2>scope%s %s@\n%a@]@\nend"

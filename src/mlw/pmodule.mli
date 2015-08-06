@@ -56,7 +56,7 @@ type pmodule = private {
 and mod_unit =
   | Udecl  of pdecl
   | Uuse   of pmodule
-  | Uinst  of mod_inst
+  | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
   | Uscope of string * bool * mod_unit list
 
