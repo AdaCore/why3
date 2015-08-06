@@ -27,6 +27,28 @@ val lab_hash : label -> int
 
 val create_label : string -> label
 
+(* functions for working with counterexample model labels *)
+
+val append_to_model_trace_label : labels : Slab.t ->
+  to_append : string ->
+  Slab.t
+(** The returned set of labels will contain the same set of labels
+    as argument labels except that a label of the form "model_trace:*"
+    will be "model_trace:*to_append."*)
+
+val append_to_model_element_name : labels : Slab.t ->
+  to_append : string ->
+  Slab.t
+(** The returned set of labels will contain the same set of labels
+    as argument labels except that a label of the form "model_trace:name@context"
+    will be "model_trace:nameto_append@context."*)
+
+val get_model_element_name : labels : Slab.t -> string
+(** If labels contain a label of the form "model_trace:name@*",
+    return name.
+    Throws Not_found if there is no element name (there is no
+    label of the form "model_trace:+". *)
+
 (** {2 Identifiers} *)
 
 type ident = private {
@@ -107,4 +129,3 @@ val char_to_alnum : char -> string
 val char_to_lalnum : char -> string
 val char_to_alnumus : char -> string
 val char_to_lalnumus : char -> string
-

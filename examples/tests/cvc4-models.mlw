@@ -3,12 +3,19 @@ module M
 
   use import int.Int
 
-  function projf (l : int) : int
+  function projf1 "model_trace:.projf1" (l : int) : int
   =
-  l+100
+  l+10
 
-  meta "inline : no" function projf
-  meta "model_projection" function projf
+  function projf2 "model_trace:projf2" (l : int) : int
+  =
+  l-10
+
+  meta "inline : no" function projf1
+  meta "model_projection" function projf1
+
+  meta "inline : no" function projf2
+  meta "model_projection" function projf2
 
   val y "model_projected" "model" "model_trace:y" :ref int
 

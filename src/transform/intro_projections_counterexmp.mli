@@ -24,6 +24,18 @@ val intro_projections_counterexmp :  Task.task Trans.trans
     if f is tagged with meta "model_projection" and has a single argument
     of the same type as is the type of p.
 
+    Projections can be given names by labeling projection function by label
+    of the form "model_trace:proj_name".
+    If predicate p has has a label of the form "model_trace:p_name@*",
+    the constant will have a label of the form "model_trace:p_nameproj_name@*".
+    This is especially usefull when projetions are projecting record type
+    to its elements (there is one projection for every record element with
+    name ".record_element_name".
+
+    Note that in order this work, projection functions cannot be inlined.
+    If inlining transformation is performed, projection functions must
+    be marked with meta "inline : no".
+
     This transformation is needed in situations when we want to display not
     value of a variable, but value of a projection function applied to a variable.
     This is needed, e.g., in cases when the type of a variable is abstract.

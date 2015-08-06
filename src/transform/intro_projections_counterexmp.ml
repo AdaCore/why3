@@ -13,7 +13,7 @@ open Ident
 open Term
 open Decl
 
-(*
+
 (* Debugging functions *)
 let debug = Debug.register_info_flag "intro_projections_counterexmp"
   ~desc:"Print@ debugging@ messages@ about@ introducing@ projections@ for@ counterexamples."
@@ -30,7 +30,6 @@ let debug_decl decl =
   Pretty.print_decl Format.str_formatter decl;
   let s = Format.flush_str_formatter () in
   Debug.dprintf debug "Declaration %s @." s
-*)
 
 (* Label for terms that should be in counterexample *)
 let model_label = Ident.create_label "model"
@@ -69,13 +68,14 @@ let intro_proj_for_ls map_projs ls_projected =
   (* Returns list of declarations for projection of ls_projected
      if it has a  label "model_projected", otherwise returns [].
 
-     The declarations include:
+     There can be more projection functions for ls_projected. For
+     each projection function f the declarations include:
      - declaration of new constant with labels of ls_projected
        and label "model"
      - declaration of axiom saying that the new constant is equal to
        ls_projected projected by its projection function
 
-     The projection function for ls_declared is stored in map_projs
+     The projection functions for ls_declared are stored in map_projs
      with key ls_projected.ls_value
 
      @param map_projs maps types to projection function for these types
@@ -88,24 +88,31 @@ let intro_proj_for_ls map_projs ls_projected =
     match ls_projected.ls_value with
     | None -> []
     | Some ty_projected ->
-      (* t_proj is a term corresponding to
-         - ls_projected (the label symbol being projected) - if there is no
-	   projection function for its type
-         - application of projection function f to ls_projected  *)
-      let t_proj =
-	let t_projected = Term.t_app ls_projected [] ls_projected.ls_value in
-	try
-	  let f = Ty.Mty.find ty_projected map_projs in
-	  Term.t_app f [t_projected] f.ls_value
-	with Not_found -> t_projected in
+      let introduce_constant t_proj proj_name =
+	  (* introduce new constant c and axiom stating c = t_proj  *)
+	  let const_label = Slab.add model_label ls_projected.ls_name.id_label in
+	  let const_label = append_to_model_element_name ~labels:const_label ~to_append:proj_name in
+	  let const_loc = Opt.get ls_projected.ls_name.id_loc in
+	  let const_name = ls_projected.ls_name.id_string^"_proj_constant_"^proj_name in
+	  let axiom_name = ls_projected.ls_name.id_string^"_proj_axiom_"^proj_name in
+	  intro_const_equal_to_term ~term:t_proj ~const_label ~const_loc ~const_name ~axiom_name in
 
-      (* introduce new constant c and axiom stating c = t_proj *)
-      let const_label = Slab.add model_label ls_projected.ls_name.id_label in
-      let const_loc = Opt.get ls_projected.ls_name.id_loc in
-      let const_name = ls_projected.ls_name.id_string^"_proj_constant" in
-      let axiom_name = ls_projected.ls_name.id_string^"_proj_axiom" in
-
-      intro_const_equal_to_term ~term:t_proj ~const_label ~const_loc ~const_name ~axiom_name
+      let t_projected = Term.t_app ls_projected [] ls_projected.ls_value in
+      try
+	let fs = Ty.Mty.find ty_projected map_projs in
+	(* Introduce constant c for each projectin function f stating that c = f t_projected *)
+	List.fold_left
+	  (fun l f ->
+	    let proj_name =
+	      try
+		get_model_element_name ~labels:f.ls_name.id_label
+	      with Not_found -> "" in
+	    List.append l (introduce_constant (Term.t_app f [t_projected] f.ls_value) proj_name))
+	  []
+	  fs
+      with Not_found ->
+	(* There are no projection functions, introduce constant c and and axiom stating c = t_projected *)
+	introduce_constant t_projected ""
 
 let introduce_projs map_projs decl =
   match decl.d_node with
@@ -132,7 +139,13 @@ let build_projections_map projs =
   let build_map ls_proj proj_map =
     match ls_proj.ls_args with
     | [ty_proj_arg] ->
-      Ty.Mty.add ty_proj_arg ls_proj proj_map
+      let projs_for_ty =
+	try
+	  Ty.Mty.find ty_proj_arg proj_map
+	with Not_found -> []
+      in
+      let projs_for_ty = List.append projs_for_ty [ls_proj] in
+      Ty.Mty.add ty_proj_arg projs_for_ty proj_map
     | _ -> assert false
   in
   Sls.fold build_map projs Ty.Mty.empty
@@ -147,8 +160,8 @@ let intro_projections_counterexmp =
 
 let () = Trans.register_transform "intro_projections_counterexmp" intro_projections_counterexmp
   ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ with@ label@ model_projected@ \
-creates@ declaration@ of@ new@ constant@ c@ with@ label@ model@ and@ an@ axiom;@ if@ there@ exists@ \
-projection@ function@ f@ for@ p,@ the@ axiom@ is@ c = f p,@ otherwise@ it@ is@ c = p."
+and@ projectin@ funtion@ f@ for@ p@ creates@ declaration@ of@ new@ constant@ c@ with@ label@ model@ and@ an@ axiom@ \
+c = f p,@ if@ there@ is@ no@ projection@ function@ creates@ constant@ c@ and@ axiom@ c = p."
 
 (*
 Local Variables:
