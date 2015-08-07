@@ -527,15 +527,16 @@ let clone_decl inst cl uc d = match d.d_node with
       let d = create_ind_decl s (List.map2 get_ind lls idl) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dprop (k,pr,f) ->
-      let k' = match k, Mpr.find_opt pr inst.inst_pr with
+      let skip, k' = match k, Mpr.find_opt pr inst.inst_pr with
         | _, Some Pskip -> invalid_arg "Pmodule.clone_export"
-        | (Pskip | Pgoal), _ -> Pskip
-        | Paxiom, Some Pgoal -> Pgoal
-        | Plemma, Some Pgoal -> Pskip
-        | (Paxiom | Plemma), Some Paxiom -> Paxiom
-        | (Paxiom | Plemma), Some Plemma -> Plemma
-        | Paxiom, None -> Paxiom (* TODO: Plemma *)
-        | Plemma, None -> Paxiom in
+        | (Pskip | Pgoal), _ -> true, Pskip
+        | Plemma, Some Pgoal -> true, Pskip
+        | Paxiom, Some Pgoal -> false, Pgoal
+        | (Paxiom | Plemma), Some Paxiom -> false, Paxiom
+        | (Paxiom | Plemma), Some Plemma -> false, Plemma
+        | Paxiom, None -> false, Paxiom (* TODO: Plemma *)
+        | Plemma, None -> false, Paxiom in
+      if skip then uc else
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
       let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
@@ -567,21 +568,22 @@ let clone_export uc m inst =
     | Udecl d -> clone_pdecl inst cl uc d
     | Uuse m -> use_export uc m
     | Uclone mi ->
-        add_clone uc { mi_mod = mi.mi_mod;
+        begin try add_clone uc { mi_mod = mi.mi_mod;
           mi_ts = Mts.map (cl_find_its cl) mi.mi_ts;
           mi_ls = Mls.map (cl_find_ls cl) mi.mi_ls;
           mi_pr = Mpr.map (cl_find_pr cl) mi.mi_pr;
           mi_pv = Mpv.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
           mi_xs = Mexn.map (cl_find_xs cl) mi.mi_xs}
+        with Not_found -> uc end
     | Umeta (m,al) ->
-        let cl_marg = function
+        begin try add_meta uc m (List.map (function
           | MAty ty -> MAty (cl_trans_ty cl ty)
           | MAts ts -> MAts (cl_find_ts cl ts)
           | MAls ls -> MAls (cl_find_ls cl ls)
           | MApr pr -> MApr (cl_find_pr cl pr)
-          | a -> a in
-        add_meta uc m (List.map cl_marg al)
+          | a -> a) al)
+        with Not_found -> uc end
     | Uscope (n,import,ul) ->
         let uc = open_scope uc n in
         let uc = List.fold_left add_unit uc ul in

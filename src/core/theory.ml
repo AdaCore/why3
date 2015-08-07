@@ -462,14 +462,14 @@ let empty_inst = {
 exception CannotInstantiate of ident
 
 type clones = {
-  cl_local : Sid.t;
+  clone_th : theory;
   mutable ts_table : tysymbol Mts.t;
   mutable ls_table : lsymbol Mls.t;
   mutable pr_table : prsymbol Mpr.t;
 }
 
-let empty_clones s = {
-  cl_local = s;
+let empty_clones th = {
+  clone_th = th;
   ts_table = Mts.empty;
   ls_table = Mls.empty;
   pr_table = Mpr.empty;
@@ -478,7 +478,7 @@ let empty_clones s = {
 (* populate the clone structure *)
 
 let rec cl_find_ts cl ts =
-  if not (Sid.mem ts.ts_name cl.cl_local) then
+  if not (Sid.mem ts.ts_name cl.clone_th.th_local) then
     let td = Opt.map (cl_trans_ty cl) ts.ts_def in
     if Opt.equal ty_equal ts.ts_def td then ts else
     create_tysymbol (id_clone ts.ts_name) ts.ts_args td
@@ -492,7 +492,7 @@ let rec cl_find_ts cl ts =
 and cl_trans_ty cl ty = ty_s_map (cl_find_ts cl) ty
 
 let cl_find_ls cl ls =
-  if not (Sid.mem ls.ls_name cl.cl_local) then ls
+  if not (Sid.mem ls.ls_name cl.clone_th.th_local) then ls
   else try Mls.find ls cl.ls_table
   with Not_found ->
     let constr = ls.ls_constr in
@@ -505,13 +505,14 @@ let cl_find_ls cl ls =
 
 let cl_trans_fmla cl f = t_s_map (cl_trans_ty cl) (cl_find_ls cl) f
 
+let cl_clone_pr cl pr =
+  let pr' = create_prsymbol (id_clone pr.pr_name) in
+  cl.pr_table <- Mpr.add pr pr' cl.pr_table;
+  pr'
+
 let cl_find_pr cl pr =
-  if not (Sid.mem pr.pr_name cl.cl_local) then pr
-  else try Mpr.find pr cl.pr_table
-  with Not_found ->
-    let pr' = create_prsymbol (id_clone pr.pr_name) in
-    cl.pr_table <- Mpr.add pr pr' cl.pr_table;
-    pr'
+  if not (Sid.mem pr.pr_name cl.clone_th.th_local) then pr else
+  try Mpr.find pr cl.pr_table with Not_found -> raise EmptyDecl
 
 (* initialize the clone structure *)
 
@@ -520,14 +521,14 @@ exception BadInstance of ident * ident
 
 let cl_init_ts cl ts ts' =
   let id = ts.ts_name in
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
+  if not (Sid.mem id cl.clone_th.th_local) then raise (NonLocal id);
   if List.length ts.ts_args <> List.length ts'.ts_args
     then raise (BadInstance (id, ts'.ts_name));
   cl.ts_table <- Mts.add ts ts' cl.ts_table
 
 let cl_init_ls cl ls ls' =
   let id = ls.ls_name in
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
+  if not (Sid.mem id cl.clone_th.th_local) then raise (NonLocal id);
   let mtch sb ty ty' =
     try ty_match sb ty' (cl_trans_ty cl ty)
     with TypeMismatch _ -> raise (BadInstance (id, ls'.ls_name))
@@ -543,10 +544,10 @@ let cl_init_ls cl ls ls' =
 
 let cl_init_pr cl pr _ =
   let id = pr.pr_name in
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id)
+  if not (Sid.mem id cl.clone_th.th_local) then raise (NonLocal id)
 
 let cl_init th inst =
-  let cl = empty_clones th.th_local in
+  let cl = empty_clones th in
   Mts.iter (cl_init_ts cl) inst.inst_ts;
   Mls.iter (cl_init_ls cl) inst.inst_ls;
   Mpr.iter (cl_init_pr cl) inst.inst_pr;
@@ -603,7 +604,7 @@ let cl_logic cl inst ldl =
 let cl_ind cl inst (s, idl) =
   let add_case (pr,f) =
     if Mpr.mem pr inst.inst_pr then raise (CannotInstantiate pr.pr_name);
-    cl_find_pr cl pr, cl_trans_fmla cl f
+    cl_clone_pr cl pr, cl_trans_fmla cl f
   in
   let add_ind (ps,la) =
     if Mls.mem ps inst.inst_ls
@@ -615,14 +616,14 @@ let cl_ind cl inst (s, idl) =
 let cl_prop cl inst (k,pr,f) =
   let k' = match k, Mpr.find_opt pr inst.inst_pr with
     | _, Some Pskip -> invalid_arg "Theory.clone_export"
-    | (Pskip | Pgoal), _ -> Pskip
+    | (Pskip | Pgoal), _ -> raise EmptyDecl
+    | Plemma, Some Pgoal -> raise EmptyDecl
     | Paxiom, Some Pgoal -> Pgoal
-    | Plemma, Some Pgoal -> Pskip
     | (Paxiom | Plemma), Some Paxiom -> Paxiom
     | (Paxiom | Plemma), Some Plemma -> Plemma
     | Paxiom, None -> Paxiom (* TODO: Plemma *)
     | Plemma, None -> Paxiom in
-  let pr' = cl_find_pr cl pr in
+  let pr' = cl_clone_pr cl pr in
   let f' = cl_trans_fmla cl f in
   create_prop_decl k' pr' f'
 
@@ -691,6 +692,8 @@ let clone_export uc th inst =
 
   let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
   let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
+  let g_pr _ pr = not (Mid.mem pr.pr_name th.th_local &&
+    let k, _ = find_prop_decl th.th_known pr in k = Pgoal || k = Pskip) in
 
   let f_ts p ts =
     try let ts = Mts.find ts cl.ts_table in store_path uc p ts.ts_name; ts
@@ -705,7 +708,7 @@ let clone_export uc th inst =
   let rec f_ns p ns = {
     ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.ns_ts);
     ns_ls = Mstr.map (f_ls p) (Mstr.filter g_ls ns.ns_ls);
-    ns_pr = Mstr.map (f_pr p) ns.ns_pr;
+    ns_pr = Mstr.map (f_pr p) (Mstr.filter g_pr ns.ns_pr);
     ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.ns_ns; } in
 
   let ns = f_ns [] th.th_export in
