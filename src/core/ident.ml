@@ -46,15 +46,18 @@ let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
 
 let model_trace_regexp = Str.regexp "model_trace:"
 
-let is_model_trace_label l =
+let is_model_trace_label label =
   try
-    ignore(Str.search_forward model_trace_regexp l.lab_string 0);
+    ignore(Str.search_forward model_trace_regexp label.lab_string 0);
     true
   with Not_found -> false
 
+let get_model_trace_label labels =
+  Slab.choose (Slab.filter is_model_trace_label labels)
+
 let transform_model_trace_label labels trans_fun =
   try
-    let trace_label = Slab.choose (Slab.filter is_model_trace_label labels) in
+    let trace_label = get_model_trace_label labels in
     let labels_without_trace = Slab.remove trace_label labels in
     let new_trace_label = create_label (trans_fun trace_label.lab_string) in
     Slab.add new_trace_label labels_without_trace
@@ -73,7 +76,7 @@ let append_to_model_trace_label ~labels ~to_append =
     transform_model_trace_label labels trans
 
 let get_model_element_name ~labels =
-  let trace_label = Slab.choose (Slab.filter is_model_trace_label labels) in
+  let trace_label = get_model_trace_label labels in
   let splitted1 = Str.bounded_split (Str.regexp_string ":") trace_label.lab_string 2 in
   match splitted1 with
   | [_; content] ->
