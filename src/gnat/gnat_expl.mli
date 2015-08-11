@@ -15,6 +15,7 @@ type reason =
    | VC_Length_Check
    | VC_Discriminant_Check
    | VC_Tag_Check
+   | VC_Task_Termination
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
