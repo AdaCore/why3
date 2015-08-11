@@ -13,16 +13,20 @@ val intro_projections_counterexmp :  Task.task Trans.trans
  (**
     Transformation that for each declared abstract function or predicate
     p labeled with label "model_projected" creates a declaration of new
-    constant c labeled with label "model" and declaration of new axiom.
-    If there exists a projection function f for p, the axiom states that
-    c = f p, otherwise it states that c = p.
+    constant c labeled with label "model" and declaration of new axiom
+    stating that c = f p where f is projection for p.
 
-    Projection functions are functions tagged with metas "model_projection"
-    and "inline : no" (the latter is needed just to prevent inlinng of this
-    function).
-    Function f is projection function for abstract function or predicate p
-    if f is tagged with meta "model_projection" and has a single argument
-    of the same type as is the type of p.
+    Projections are composed from projection functions. Projection function
+    is a function with a single argument tagged with metas "model_projection".
+    Projection f for abstract function or predicate p is defined as:
+    f = pf_n ... pf_1 id where id is identity function and pf_i for i = 1 .. n
+    are projection functions for that it holds that the argument of pf_1 is of
+    the same type as p, the return value of pf_i is of the same type as the argument
+    of pf_i+1, for all i, j = 1 .. n pf_i <> pf_j, and there is no projection
+    function pf that could further project f.
+    projected.
+    That is, projection for p is identify if there is no projection function with
+    an argument of the same type as p.
 
     Projections can be given names by labeling projection function by label
     of the form "model_trace:proj_name".
