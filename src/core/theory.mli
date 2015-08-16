@@ -179,10 +179,6 @@ val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
-val create_null_clone : theory -> tdecl
-
-val is_empty_sm : symbol_map -> bool
-
 (** {2 Meta} *)
 
 val create_meta : meta -> meta_arg list -> tdecl

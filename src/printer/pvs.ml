@@ -834,12 +834,12 @@ let print_task printer_args realize ?old fmt task =
           (th, (f, if s2 = "" then String.concat "." f else s2)) mid
       | _ -> assert false
     ) Mid.empty task in
-  (* two cases: task is clone T with [] or task is a real goal *)
+  (* two cases: task is use T or task is a real goal *)
     let rec upd_realized_theories = function
     | Some { Task.task_decl = { Theory.td_node =
                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
         get_th_name pr.pr_name, [], realized_theories
-    | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
+    | Some { Task.task_decl = { Theory.td_node = Theory.Use th }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
        let id = th.Theory.th_name in
        get_th_name id,

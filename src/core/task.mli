@@ -29,8 +29,8 @@ val tds_empty : tdecl_set
 
 val mk_tds : Stdecl.t -> tdecl_set
 
-type clone_map = tdecl_set Mid.t
-type meta_map = tdecl_set Mmeta.t
+type clone_map = tdecl_set Mid.t    (* Use and Clone *)
+type meta_map = tdecl_set Mmeta.t   (* Meta *)
 
 (** Task *)
 
@@ -40,7 +40,7 @@ and task_hd = private {
   task_decl  : tdecl;        (* last declaration *)
   task_prev  : task;         (* context *)
   task_known : known_map;    (* known identifiers *)
-  task_clone : clone_map;    (* cloning history *)
+  task_clone : clone_map;    (* use/clone history *)
   task_meta  : meta_map;     (* meta properties *)
   task_tag   : Weakhtbl.tag; (* unique magical tag *)
 }
@@ -116,7 +116,7 @@ val task_separate_goal : task -> tdecl * task
 (** {2 selectors} *)
 
 val on_meta : meta -> ('a -> meta_arg list -> 'a) -> 'a -> task -> 'a
-val on_theory : theory -> ('a -> symbol_map -> 'a) -> 'a -> task -> 'a
+val on_cloned_theory : theory -> ('a -> symbol_map -> 'a) -> 'a -> task -> 'a
 
 val on_meta_excl : meta -> task -> meta_arg list option
 val on_used_theory : theory -> task -> bool

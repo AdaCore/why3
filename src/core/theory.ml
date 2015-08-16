@@ -722,19 +722,6 @@ let clone_export uc th inst =
 let clone_theory add_td acc th inst =
   clone_theory (cl_init th inst) add_td acc th inst
 
-let create_null_clone th =
-  let sm = {
-    sm_ts = Mts.empty;
-    sm_ls = Mls.empty;
-    sm_pr = Mpr.empty}
-  in
-  mk_tdecl (Clone (th,sm))
-
-let is_empty_sm sm =
-  Mts.is_empty sm.sm_ts &&
-  Mls.is_empty sm.sm_ls &&
-  Mpr.is_empty sm.sm_pr
-
 (** Meta properties *)
 
 let get_meta_arg_type = function

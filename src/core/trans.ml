@@ -170,8 +170,9 @@ let on_meta_tds t fn =
   let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_meta_tds task t) task
 
-let on_theory th fn =
+let on_cloned_theory th fn =
   let add td acc = match td.td_node with
+    | Use _ -> acc
     | Clone (_,sm) -> sm::acc
     | _ -> assert false
   in
@@ -185,8 +186,12 @@ let on_meta t fn =
   on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set []))
 
 let on_used_theory th fn =
-  let td = create_null_clone th in
-  on_theory_tds th (fun tds -> fn (Stdecl.mem td tds.tds_set))
+  let check td = match td.td_node with
+    | Use _ -> true
+    | Clone _ -> false
+    | _ -> assert false
+  in
+  on_theory_tds th (fun tds -> fn (Stdecl.exists check tds.tds_set))
 
 let on_meta_excl t fn =
   if not t.meta_excl then raise (NotExclusiveMeta t);

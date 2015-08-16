@@ -259,7 +259,14 @@ exception NoPrinter
 let update_task = let ht = Hint.create 5 in fun drv ->
   let update task0 =
     Mid.fold (fun _ (th,s) task ->
-      Task.on_theory th (fun task sm ->
+      let task = if Task.on_used_theory th task0 then
+        Stdecl.fold (fun tdm task ->
+          add_tdecl task tdm
+        ) s task
+      else
+        task
+      in
+      Task.on_cloned_theory th (fun task sm ->
         Stdecl.fold (fun tdm task ->
           add_tdecl task (clone_meta tdm sm)
         ) s task

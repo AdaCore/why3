@@ -568,6 +568,19 @@ module Checksum = struct
     | Theory.MAstr s -> char b 's'; string b s
     | Theory.MAint i -> char b 'i'; int b i
 
+  let tdecl b d = match d.Theory.td_node with
+    | Theory.Decl d -> decl b d
+    | Theory.Use th
+    | Theory.Clone (th, _) ->
+        char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
+    | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
+
+(* not used anymore
+
+  NOTE: if we come back to checksumming theories, use the separate recursive
+        [tdecl] function for it. [Use] in a theory requires a recursive call
+        (as below), [Use] in a task is just a witness declaration.
+
   let rec tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
     | Theory.Use th ->
@@ -594,7 +607,6 @@ module Checksum = struct
         Ident.Wid.set table t.Theory.th_name v;
         v
 
-(* not used anymore
   let theory ~version t = match version with
     | CV1 -> assert false
     | CV2 -> theory_v2 t

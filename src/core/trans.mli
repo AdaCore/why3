@@ -69,10 +69,10 @@ val add_tdecls : tdecl list -> task trans
 (* Dependent Transformations *)
 
 val on_meta : meta -> (meta_arg list list -> 'a trans) -> 'a trans
-val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
-
 val on_meta_excl : meta -> (meta_arg list option -> 'a trans) -> 'a trans
+
 val on_used_theory : theory -> (bool -> 'a trans) -> 'a trans
+val on_cloned_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
 
 val on_tagged_ty : meta -> (Sty.t -> 'a trans) -> 'a trans
 val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans

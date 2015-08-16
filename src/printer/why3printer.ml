@@ -370,8 +370,6 @@ let print_tdecl fmt td = match td.td_node with
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_qt th
-  | Clone (th,sm) when is_empty_sm sm ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_qt th
   | Clone (th,sm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
