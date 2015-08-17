@@ -35,8 +35,16 @@ open Gnat_objectives
                 "extra_info" : int,
                 "trace_file" : string,
                 "vc_file"    : string,
-                "editor_cmd" : string
+                "editor_cmd" : string,
+                "stats"      : stats_rec
                 }
+
+     stats_rec = { [prover_name : stats_entry] }
+
+    stats_entry = { "count" : int,
+                    "max_steps" : int,
+                    "max_time" : float }
+
 
    The field "id" contains the id of the VC. The field "reason" identifies the
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
@@ -48,6 +56,9 @@ open Gnat_objectives
    present, "vc_file" contains the name of a VC file to be used for manual
    proof, and "editor_cmd" the command to spawn for an external editor for this
    VC.
+   The optional field "stats" contains a mapping from each prover name to a
+   stat record, which indicates the number of VCs proved by this prover, with
+   max time and steps.
    *)
 
 val register :
