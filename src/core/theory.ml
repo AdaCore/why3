@@ -720,6 +720,15 @@ let clone_export uc th inst =
 let clone_theory add_td acc th inst =
   clone_theory (cl_init th inst) add_td acc th inst
 
+let add_clone_unsafe uc th tsm lsm prm =
+  let sm = {sm_ts = tsm; sm_ls = lsm; sm_pr = prm} in
+  add_tdecl uc (mk_tdecl (Clone (th, sm)))
+
+let add_clone_internal =
+  let used = ref false in fun () -> if !used
+    then invalid_arg "Theory.add_clone_internal"
+    else begin used := true; add_clone_unsafe end
+
 (** Meta properties *)
 
 let get_meta_arg_type = function

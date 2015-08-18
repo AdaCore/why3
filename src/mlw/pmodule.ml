@@ -550,9 +550,14 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDpure ->
       List.fold_left (clone_decl inst cl) uc d.pd_pure
 
+let theory_add_clone = Theory.add_clone_internal ()
+
 let add_clone uc mi =
-  (* TODO: add TDclone to the muc_theory *)
-  { uc with muc_units = Uclone mi :: uc.muc_units }
+  let tuc = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory
+    (Mts.map (fun s -> s.its_ts) mi.mi_ts) mi.mi_ls mi.mi_pr in
+  { uc with
+      muc_theory = tuc;
+      muc_units  = Uclone mi :: uc.muc_units }
 
 let clone_export uc m inst =
   let check_local id =

@@ -179,6 +179,9 @@ val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
+val add_clone_internal : unit -> theory_uc -> theory ->
+  tysymbol Mts.t -> lsymbol Mls.t -> prsymbol Mpr.t -> theory_uc
+
 (** {2 Meta} *)
 
 val create_meta : meta -> meta_arg list -> tdecl
