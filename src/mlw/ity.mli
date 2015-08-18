@@ -237,6 +237,9 @@ val isb_empty : ity_subst
 val ity_match : ity_subst -> ity -> ity -> ity_subst
 val reg_match : ity_subst -> region -> region -> ity_subst
 
+val its_match_args : itysymbol -> ity list -> ity_subst
+val its_match_regs : itysymbol -> ity list -> region list -> ity_subst
+
 val ity_freeze : ity_subst -> ity -> ity_subst (* self-match *)
 val reg_freeze : ity_subst -> region -> ity_subst (* self-match *)
 

@@ -62,7 +62,7 @@ and mod_unit =
 
 and mod_inst = private {
   mi_mod : pmodule;
-  mi_ts  : itysymbol Mts.t;
+  mi_ts  : ity Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
   mi_pv  : pvsymbol Mpv.t;

@@ -159,11 +159,13 @@ let create_tysymbol name args def =
   ignore (Opt.map (ty_v_all check) def);
   mk_ts name args def
 
+let ts_match_args s tl =
+  try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty
+  with Invalid_argument _ -> raise (BadTypeArity (s, List.length tl))
+
 let ty_app s tl = match s.ts_def with
   | Some ty ->
-      let mv = try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty with
-        | Invalid_argument _ -> raise (BadTypeArity (s, List.length tl)) in
-      ty_full_inst mv ty
+      ty_full_inst (ts_match_args s tl) ty
   | None ->
       if List.length s.ts_args <> List.length tl then
         raise (BadTypeArity (s, List.length tl));

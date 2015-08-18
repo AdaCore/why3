@@ -342,8 +342,10 @@ let print_decl fmt d = match d.d_node with
   | Dind (s, il) -> print_list_next nothing (print_ind_decl s) fmt il
   | Dprop p   -> print_prop_decl fmt p
 
-let print_inst_ts fmt (ts1,ts2) =
-  fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
+let print_inst_ts fmt (ts1,ty2) =
+  fprintf fmt "type %a%a = %a" print_ts ts1
+    (print_list_pre space print_tv) ts1.ts_args
+    print_ty ty2; forget_tvs ()
 
 let print_inst_ls fmt (ls1,ls2) =
   fprintf fmt "%s %a = %a" (ls_kind ls1) print_ls ls1 print_ls ls2

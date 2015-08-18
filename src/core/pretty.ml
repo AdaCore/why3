@@ -420,8 +420,10 @@ let print_logic_decl      = print_logic_decl true
 let print_next_ind_decl   = print_ind_decl Ind false
 let print_ind_decl fmt s  = print_ind_decl s true fmt
 
-let print_inst_ts fmt (ts1,ts2) =
-  fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
+let print_inst_ts fmt (ts1,ty2) =
+  fprintf fmt "type %a%a = %a" print_ts ts1
+    (print_list_pre space print_tv) ts1.ts_args
+    print_ty ty2; forget_tvs ()
 
 let print_inst_ls fmt (ls1,ls2) =
   fprintf fmt "%s %a = %a" (ls_kind ls1) print_ls ls1 print_ls ls2

@@ -976,21 +976,22 @@ let find_module env file q =
   if Debug.test_flag Glob.flag then Glob.use (qloc_last q) m.mod_theory.th_name;
   m
 
-let type_inst ({muc_theory = tuc} as muc) {mod_theory = t} s =
+let type_inst ({muc_theory = tuc} as _muc) {mod_theory = t} s =
   let add_inst s = function
     | CStsym (p,[],PTtyapp (q,[])) ->
         let ts1 = find_tysymbol_ns t.th_export p in
         let ts2 = find_tysymbol tuc q in
+        let ty2 = ty_app ts2 (List.map ty_var ts1.ts_args) in
         { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
-            (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.inst_ts }
+            (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.inst_ts }
     | CStsym (p,tvl,pty) ->
         let ts1 = find_tysymbol_ns t.th_export p in
-        let id = id_user (ts1.ts_name.id_string ^ "_subst") (qloc p) in
         let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
-        let ts2 = Loc.try3 ~loc:(qloc p)
-          create_itysymbol_alias id tvl (ity_of_pty muc pty) in
+        let ts2 = Loc.try3 ~loc:(qloc p) create_tysymbol
+          (id_clone ts1.ts_name) tvl (Some (ty_of_pty tuc pty)) in
+        let ty2 = ty_app ts2 (List.map ty_var ts1.ts_args) in
         { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
-            (ClashSymbol ts1.ts_name.id_string) ts1 ts2.its_ts s.inst_ts }
+            (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.inst_ts }
     | CSfsym (p,q) ->
         let ls1 = find_fsymbol_ns t.th_export p in
         let ls2 = find_fsymbol tuc q in

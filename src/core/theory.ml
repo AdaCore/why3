@@ -171,7 +171,7 @@ and tdecl_node =
   | Meta  of meta * meta_arg list
 
 and symbol_map = {
-  sm_ts : tysymbol Mts.t;
+  sm_ts : ty Mts.t;
   sm_ls : lsymbol Mls.t;
   sm_pr : prsymbol Mpr.t;
 }
@@ -192,7 +192,7 @@ module Hstdecl = Hashcons.Make (struct
     | _,_ -> false
 
   let eq_smap sm1 sm2 =
-    Mts.equal ts_equal sm1.sm_ts sm2.sm_ts &&
+    Mts.equal ty_equal sm1.sm_ts sm2.sm_ts &&
     Mls.equal ls_equal sm1.sm_ls sm2.sm_ls &&
     Mpr.equal pr_equal sm1.sm_pr sm2.sm_pr
 
@@ -205,7 +205,7 @@ module Hstdecl = Hashcons.Make (struct
         t1 = t2 && Lists.equal eq_marg al1 al2
     | _,_ -> false
 
-  let hs_cl_ts _ ts acc = Hashcons.combine acc (ts_hash ts)
+  let hs_cl_ty _ ty acc = Hashcons.combine acc (ty_hash ty)
   let hs_cl_ls _ ls acc = Hashcons.combine acc (ls_hash ls)
   let hs_cl_pr _ pr acc = Hashcons.combine acc (pr_hash pr)
 
@@ -218,7 +218,7 @@ module Hstdecl = Hashcons.Make (struct
     | MAint i -> Hashtbl.hash i
 
   let hs_smap sm h =
-    Mts.fold hs_cl_ts sm.sm_ts
+    Mts.fold hs_cl_ty sm.sm_ts
       (Mls.fold hs_cl_ls sm.sm_ls
         (Mpr.fold hs_cl_pr sm.sm_pr h))
 
@@ -308,18 +308,17 @@ let close_scope uc ~import =
 
 (* Base constructors *)
 
-let known_ts kn ts = match ts.ts_def with
-  | Some ty -> ty_s_fold (fun () ts -> known_id kn ts.ts_name) () ty
-  | None -> known_id kn ts.ts_name
+let known_ty kn ty =
+  ty_s_fold (fun () ts -> known_id kn ts.ts_name) () ty
 
 let known_clone kn sm =
-  Mts.iter (fun _ ts -> known_ts kn ts) sm.sm_ts;
+  Mts.iter (fun _ ty -> known_ty kn ty) sm.sm_ts;
   Mls.iter (fun _ ls -> known_id kn ls.ls_name) sm.sm_ls;
   Mpr.iter (fun _ pr -> known_id kn pr.pr_name) sm.sm_pr
 
 let known_meta kn al =
   let check = function
-    | MAty ty -> ty_s_fold (fun () ts -> known_id kn ts.ts_name) () ty
+    | MAty ty -> known_ty kn ty
     | MAts ts -> known_id kn ts.ts_name
     | MAls ls -> known_id kn ls.ls_name
     | MApr pr -> known_id kn pr.pr_name
@@ -403,12 +402,11 @@ let warn_dubious_axiom uc k p syms =
         (fun id ->
           if Sid.mem id uc.uc_local then
           match (Ident.Mid.find id uc.uc_known).d_node with
-          | Dtype { ts_def = None } | Dparam _ ->
-            raise Exit
+          | Dtype { ts_def = None } | Dparam _ -> raise Exit
           | _ -> ())
         syms;
-      Warning.emit ?loc:p.id_loc "axiom %s does not contain any local abstract symbol"
-        p.id_string
+      Warning.emit ?loc:p.id_loc
+        "axiom %s does not contain any local abstract symbol" p.id_string
     with Exit -> ()
 
 let add_decl ?(warn=true) uc d =
@@ -448,8 +446,8 @@ let use_export uc th =
 (** Clone *)
 
 type th_inst = {
-  inst_ts : tysymbol  Mts.t; (* old to new *)
-  inst_ls : lsymbol   Mls.t;
+  inst_ts : ty Mts.t; (* old to new *)
+  inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
 }
 
@@ -462,14 +460,14 @@ let empty_inst = {
 exception CannotInstantiate of ident
 
 type clones = {
-  clone_th : theory;
-  mutable ts_table : tysymbol Mts.t;
+  cl_local : Sid.t;
+  mutable ts_table : ty Mts.t;
   mutable ls_table : lsymbol Mls.t;
   mutable pr_table : prsymbol Mpr.t;
 }
 
 let empty_clones th = {
-  clone_th = th;
+  cl_local = th.th_local;
   ts_table = Mts.empty;
   ls_table = Mls.empty;
   pr_table = Mpr.empty;
@@ -477,24 +475,40 @@ let empty_clones th = {
 
 (* populate the clone structure *)
 
-let rec cl_find_ts cl ts =
-  if not (Sid.mem ts.ts_name cl.clone_th.th_local) then
-    let td = Opt.map (cl_trans_ty cl) ts.ts_def in
-    if Opt.equal ty_equal ts.ts_def td then ts else
-    create_tysymbol (id_clone ts.ts_name) ts.ts_args td
-  else try Mts.find ts cl.ts_table
-  with Not_found ->
-    let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
-    let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
-    cl.ts_table <- Mts.add ts ts' cl.ts_table;
-    ts'
+let rec sm_trans_ty tsm ty = match ty.ty_node with
+  | Tyapp (ts, tyl) ->
+      let tyl = List.map (sm_trans_ty tsm) tyl in
+      begin match Mts.find_opt ts tsm with
+      | Some ty -> ty_inst (ts_match_args ts tyl) ty
+      | None -> ty_app ts tyl
+      end
+  | Tyvar _ -> ty
 
-and cl_trans_ty cl ty = ty_s_map (cl_find_ts cl) ty
+let cl_trans_ty cl ty = sm_trans_ty cl.ts_table ty
+
+let sm_find_ts tsm ({ts_args = tvl} as ts) =
+  let check v ty = match ty.ty_node with
+    | Tyvar u -> tv_equal u v
+    | _ -> false in
+  match (Mts.find ts tsm).ty_node with
+  | Tyapp (ts, tyl) when Lists.equal check tvl tyl -> ts
+  | _ -> raise Not_found
+
+let cl_find_ts cl ts =
+  if not (Sid.mem ts.ts_name cl.cl_local) then ts else
+  try sm_find_ts cl.ts_table ts with Not_found -> raise EmptyDecl
+
+let cl_clone_ts cl ts =
+  (* cl_clone_ts is only called for local non-instantiated symbols *)
+  let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
+  let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
+  let ty' = ty_app ts' (List.map ty_var ts.ts_args) in
+  cl.ts_table <- Mts.add ts ty' cl.ts_table;
+  ts'
 
 let cl_find_ls cl ls =
-  if not (Sid.mem ls.ls_name cl.clone_th.th_local) then ls
-  else try Mls.find ls cl.ls_table
-  with Not_found ->
+  if not (Sid.mem ls.ls_name cl.cl_local) then ls else
+  try Mls.find ls cl.ls_table with Not_found ->
     let constr = ls.ls_constr in
     let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
@@ -505,46 +519,43 @@ let cl_find_ls cl ls =
 
 let cl_trans_fmla cl f = t_s_map (cl_trans_ty cl) (cl_find_ls cl) f
 
+let cl_find_pr cl pr =
+  if not (Sid.mem pr.pr_name cl.cl_local) then pr else
+  try Mpr.find pr cl.pr_table with Not_found -> raise EmptyDecl
+
 let cl_clone_pr cl pr =
   let pr' = create_prsymbol (id_clone pr.pr_name) in
   cl.pr_table <- Mpr.add pr pr' cl.pr_table;
   pr'
 
-let cl_find_pr cl pr =
-  if not (Sid.mem pr.pr_name cl.clone_th.th_local) then pr else
-  try Mpr.find pr cl.pr_table with Not_found -> raise EmptyDecl
-
 (* initialize the clone structure *)
 
 exception NonLocal of ident
-exception BadInstance of ident * ident
+exception BadInstance of ident
 
-let cl_init_ts cl ts ts' =
-  let id = ts.ts_name in
-  if not (Sid.mem id cl.clone_th.th_local) then raise (NonLocal id);
-  if List.length ts.ts_args <> List.length ts'.ts_args
-    then raise (BadInstance (id, ts'.ts_name));
-  cl.ts_table <- Mts.add ts ts' cl.ts_table
+let cl_init_ts cl ({ts_name = id} as ts) ty =
+  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
+  let stv = Stv.of_list ts.ts_args in
+  if not (ty_v_all (fun v -> Stv.mem v stv) ty) then raise (BadInstance id);
+  cl.ts_table <- Mts.add ts ty cl.ts_table
 
-let cl_init_ls cl ls ls' =
-  let id = ls.ls_name in
-  if not (Sid.mem id cl.clone_th.th_local) then raise (NonLocal id);
+let cl_init_ls cl ({ls_name = id} as ls) ls' =
+  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let mtch sb ty ty' =
     try ty_match sb ty' (cl_trans_ty cl ty)
-    with TypeMismatch _ -> raise (BadInstance (id, ls'.ls_name))
+    with TypeMismatch _ -> raise (BadInstance id)
   in
   let sb = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'
     | None, None -> Mtv.empty
-    | _ -> raise (BadInstance (id, ls'.ls_name))
+    | _ -> raise (BadInstance id)
   in
   ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
-    with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
+    with Invalid_argument _ -> raise (BadInstance id));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
-let cl_init_pr cl pr _ =
-  let id = pr.pr_name in
-  if not (Sid.mem id cl.clone_th.th_local) then raise (NonLocal id)
+let cl_init_pr cl {pr_name = id} _ =
+  if not (Sid.mem id cl.cl_local) then raise (NonLocal id)
 
 let cl_init th inst =
   let cl = empty_clones th in
@@ -559,25 +570,18 @@ let cl_type cl inst ts =
   if Mts.mem ts inst.inst_ts then
     if ts.ts_def = None then raise EmptyDecl
     else raise (CannotInstantiate ts.ts_name);
-  create_ty_decl (cl_find_ts cl ts)
+  create_ty_decl (cl_clone_ts cl ts)
 
 let cl_data cl inst tdl =
   let add_ls ls =
-    if Mls.mem ls inst.inst_ls then
-      raise (CannotInstantiate ls.ls_name);
-    cl_find_ls cl ls
-  in
-  let add_constr (ls,pl) =
-    add_ls ls, List.map (Opt.map add_ls) pl
-  in
-  let add_type (ts,csl) =
-    if Mts.mem ts inst.inst_ts then
-      raise (CannotInstantiate ts.ts_name);
-    let ts' = cl_find_ts cl ts in
-    let td' = List.map add_constr csl in
-    (ts',td')
-  in
-  create_data_decl (List.map add_type tdl)
+    if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
+    cl_find_ls cl ls in
+  let add_constr (ls,pl) = add_ls ls, List.map (Opt.map add_ls) pl in
+  let add_type ts' (_,csl) = ts', List.map add_constr csl in
+  let get_type (ts,_) =
+    if Mts.mem ts inst.inst_ts then raise (CannotInstantiate ts.ts_name);
+    cl_clone_ts cl ts in
+  create_data_decl (List.map2 add_type (List.map get_type tdl) tdl)
 
 let extract_ls_defn f =
   let vl,_,f = match f.t_node with
@@ -640,7 +644,7 @@ let cl_marg cl = function
   | a -> a
 
 let cl_smap cl sm = {
-  sm_ts = Mts.map (cl_find_ts cl) sm.sm_ts;
+  sm_ts = Mts.map (cl_trans_ty cl) sm.sm_ts;
   sm_ls = Mls.map (cl_find_ls cl) sm.sm_ls;
   sm_pr = Mpr.map (cl_find_pr cl) sm.sm_pr}
 
@@ -689,7 +693,7 @@ let clone_export uc th inst =
 
   let f_ts p ts =
     if Mid.mem ts.ts_name th.th_local then
-    try let ts = Mts.find ts cl.ts_table in
+    try let ts = sm_find_ts cl.ts_table ts in
         store_path uc p ts.ts_name; Some ts
     with Not_found -> None else Some ts in
   let f_ls p ls =
@@ -760,13 +764,13 @@ let add_meta uc s al = add_tdecl uc (create_meta s al)
 let clone_meta tdt th sm = match tdt.td_node with
   | Meta (t,al) ->
       let find_ts ts = if Mid.mem ts.ts_name th.th_local
-        then Mts.find ts sm.sm_ts else ts in
+        then sm_find_ts sm.sm_ts ts else ts in
       let find_ls ls = if Mid.mem ls.ls_name th.th_local
         then Mls.find ls sm.sm_ls else ls in
       let find_pr pr = if Mid.mem pr.pr_name th.th_local
         then Mpr.find pr sm.sm_pr else pr in
       let cl_marg = function
-        | MAty ty -> MAty (ty_s_map find_ts ty)
+        | MAty ty -> MAty (sm_trans_ty sm.sm_ts ty)
         | MAts ts -> MAts (find_ts ts)
         | MAls ls -> MAls (find_ls ls)
         | MApr pr -> MApr (find_pr pr)
@@ -842,12 +846,11 @@ let print_meta_arg_type fmt = function
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | NonLocal id ->
-      Format.fprintf fmt "Non-local ident: %s" id.id_string
+      Format.fprintf fmt "Non-local symbol: %s" id.id_string
   | CannotInstantiate id ->
-      Format.fprintf fmt "Cannot instantiate a defined ident %s" id.id_string
-  | BadInstance (id1, id2) ->
-      Format.fprintf fmt "Cannot instantiate ident %s with %s"
-        id1.id_string id2.id_string
+      Format.fprintf fmt "Cannot instantiate a defined symbol %s" id.id_string
+  | BadInstance id ->
+      Format.fprintf fmt "Illegal instantiation for symbol %s" id.id_string
   | CloseTheory ->
       Format.fprintf fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->
