@@ -82,7 +82,6 @@ type prop_kind =
   | Plemma    (** prove, use as a premise *)
   | Paxiom    (** do not prove, use as a premise *)
   | Pgoal     (** prove, do not use as a premise *)
-  | Pskip     (** do not prove, do not use as a premise *)
 
 type prop_decl = prop_kind * prsymbol * term
 

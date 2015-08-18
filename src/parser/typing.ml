@@ -85,8 +85,7 @@ let find_prop_of_kind k tuc q =
   | Dprop (l,_,_) when l = k -> pr
   | _ -> Loc.errorm ~loc:(qloc q) "proposition %a is not %s"
       print_qualid q (match k with
-        | Plemma -> "a lemma" | Paxiom -> "an axiom"
-        | Pgoal  -> "a goal"  | Pskip  -> assert false (* what? *))
+        | Plemma -> "a lemma" | Paxiom -> "an axiom" | Pgoal -> "a goal")
 
 let find_itysymbol_ns ns q =
   find_qualid (fun s -> s.its_ts.ts_name) Pmodule.ns_find_its ns q

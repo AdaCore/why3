@@ -541,7 +541,6 @@ module Checksum = struct
           | Decl.Plemma -> "PL"
           | Decl.Paxiom -> "PA"
           | Decl.Pgoal  -> "PG"
-          | Decl.Pskip  -> "PS"
         in
         string b tag;
         ident b n.Decl.pr_name;

@@ -391,7 +391,6 @@ let sprint_pkind = function
   | Paxiom -> "axiom"
   | Plemma -> "lemma"
   | Pgoal  -> "goal"
-  | Pskip  -> "skip"
 
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 

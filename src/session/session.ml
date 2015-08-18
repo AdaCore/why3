@@ -1710,7 +1710,7 @@ let add_file ~keygen env ?format filename =
       raw_add_theory ~keygen ~expanded:true ~checksum rfile thname
     in
     let parent = Parent_theory rtheory in
-    let tasks = List.rev (Task.split_theory theory None None) in
+    let tasks = Task.split_theory theory None None in
     let goals = List.fold_left (add_goal parent) [] tasks in
     rtheory.theory_goals <- List.rev goals;
     rtheory.theory_verified <- theory_verified rtheory;
@@ -2250,7 +2250,7 @@ let recover_theory_tasks env_session th =
   let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
   let theory = Opt.get_exn NoTask th.theory_task in
   th.theory_checksum <- None (* Some (Tc.theory_checksum theory) *);
-  let tasks = List.rev (Task.split_theory theory None None) in
+  let tasks = Task.split_theory theory None None in
   List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
 
 let rec theory_goal g =

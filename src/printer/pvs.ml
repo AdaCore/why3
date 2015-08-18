@@ -767,8 +767,7 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Paxiom when info.realization -> "LEMMA" (* axiom_or_lemma prev *)
     | Paxiom -> "AXIOM"
     | Plemma -> "LEMMA"
-    | Pgoal -> "THEOREM"
-    | Pskip -> assert false (* impossible *) in
+    | Pgoal -> "THEOREM" in
   print_name fmt pr.pr_name;
   fprintf fmt "@[<hov 2>%a%a: %s %a@]@\n@\n"
     print_pr pr print_params params kind (print_fmla info) f;

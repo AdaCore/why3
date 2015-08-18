@@ -396,7 +396,7 @@ let create_decl d = mk_tdecl (Decl d)
 
 let warn_dubious_axiom uc k p syms =
   match k with
-  | Plemma | Pgoal | Pskip -> ()
+  | Plemma | Pgoal -> ()
   | Paxiom ->
     try
       Sid.iter
@@ -615,14 +615,11 @@ let cl_ind cl inst (s, idl) =
 
 let cl_prop cl inst (k,pr,f) =
   let k' = match k, Mpr.find_opt pr inst.inst_pr with
-    | _, Some Pskip -> invalid_arg "Theory.clone_export"
-    | (Pskip | Pgoal), _ -> raise EmptyDecl
+    | Pgoal, _ -> raise EmptyDecl
     | Plemma, Some Pgoal -> raise EmptyDecl
-    | Paxiom, Some Pgoal -> Pgoal
-    | (Paxiom | Plemma), Some Paxiom -> Paxiom
-    | (Paxiom | Plemma), Some Plemma -> Plemma
-    | Paxiom, None -> Paxiom (* TODO: Plemma *)
-    | Plemma, None -> Paxiom in
+    | Plemma, _ -> Plemma
+    | Paxiom, Some k -> k
+    | Paxiom, None -> Paxiom (* TODO: Plemma *) in
   let pr' = cl_clone_pr cl pr in
   let f' = cl_trans_fmla cl f in
   create_prop_decl k' pr' f'
@@ -690,25 +687,26 @@ let clone_export uc th inst =
   let cl = cl_init th inst in
   let uc = clone_theory cl add_tdecl uc th inst in
 
-  let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
-  let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
-  let g_pr _ pr = not (Mid.mem pr.pr_name th.th_local &&
-    let k, _ = find_prop_decl th.th_known pr in k = Pgoal || k = Pskip) in
-
   let f_ts p ts =
-    try let ts = Mts.find ts cl.ts_table in store_path uc p ts.ts_name; ts
-    with Not_found -> ts in
+    if Mid.mem ts.ts_name th.th_local then
+    try let ts = Mts.find ts cl.ts_table in
+        store_path uc p ts.ts_name; Some ts
+    with Not_found -> None else Some ts in
   let f_ls p ls =
-    try let ls = Mls.find ls cl.ls_table in store_path uc p ls.ls_name; ls
-    with Not_found -> ls in
+    if Mid.mem ls.ls_name th.th_local then
+    try let ls = Mls.find ls cl.ls_table in
+        store_path uc p ls.ls_name; Some ls
+    with Not_found -> None else Some ls in
   let f_pr p pr =
-    try let pr = Mpr.find pr cl.pr_table in store_path uc p pr.pr_name; pr
-    with Not_found -> pr in
+    if Mid.mem pr.pr_name th.th_local then
+    try let pr = Mpr.find pr cl.pr_table in
+        store_path uc p pr.pr_name; Some pr
+    with Not_found -> None else Some pr in
 
   let rec f_ns p ns = {
-    ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.ns_ts);
-    ns_ls = Mstr.map (f_ls p) (Mstr.filter g_ls ns.ns_ls);
-    ns_pr = Mstr.map (f_pr p) (Mstr.filter g_pr ns.ns_pr);
+    ns_ts = Mstr.map_filter (f_ts p) ns.ns_ts;
+    ns_ls = Mstr.map_filter (f_ls p) ns.ns_ls;
+    ns_pr = Mstr.map_filter (f_pr p) ns.ns_pr;
     ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.ns_ns; } in
 
   let ns = f_ns [] th.th_export in
@@ -750,11 +748,14 @@ let create_meta m al =
 
 let add_meta uc s al = add_tdecl uc (create_meta s al)
 
-let clone_meta tdt sm = match tdt.td_node with
+let clone_meta tdt th sm = match tdt.td_node with
   | Meta (t,al) ->
-      let find_ts ts = Mts.find_def ts ts sm.sm_ts in
-      let find_ls ls = Mls.find_def ls ls sm.sm_ls in
-      let find_pr pr = Mpr.find_def pr pr sm.sm_pr in
+      let find_ts ts = if Mid.mem ts.ts_name th.th_local
+        then Mts.find ts sm.sm_ts else ts in
+      let find_ls ls = if Mid.mem ls.ls_name th.th_local
+        then Mls.find ls sm.sm_ls else ls in
+      let find_pr pr = if Mid.mem pr.pr_name th.th_local
+        then Mpr.find pr sm.sm_pr else pr in
       let cl_marg = function
         | MAty ty -> MAty (ty_s_map find_ts ty)
         | MAts ts -> MAts (find_ts ts)
@@ -762,36 +763,9 @@ let clone_meta tdt sm = match tdt.td_node with
         | MApr pr -> MApr (find_pr pr)
         | a -> a
       in
-      mk_tdecl (Meta (t, List.map cl_marg al))
-  | _ -> invalid_arg "clone_meta"
-
-(** access to meta *)
-
-(*
-let theory_meta = Opt.fold (fun _ t -> t.task_meta) Mmeta.empty
-
-let find_meta_tds th (t : meta) = mm_find (theory_meta th) t
-
-let on_meta meta fn acc theory =
-  let add td acc = match td.td_node with
-    | Meta (_,ma) -> fn acc ma
-    | _ -> assert false
-  in
-  let tds = find_meta_tds theory meta in
-  Stdecl.fold add tds.tds_set acc
-*)
-
-(*
-let on_meta _meta fn acc theory =
-  let tdecls = theory.th_decls in
-  List.fold_left
-    (fun acc td ->
-       match td.td_node with
-         | Meta (_,ma) -> fn acc ma
-         | _ -> acc)
-    acc tdecls
-*)
-
+      begin try Some (mk_tdecl (Meta (t, List.map cl_marg al)))
+      with Not_found -> None end
+  | _ -> invalid_arg "Theory.clone_meta"
 
 (** Base theories *)
 

@@ -528,14 +528,11 @@ let clone_decl inst cl uc d = match d.d_node with
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dprop (k,pr,f) ->
       let skip, k' = match k, Mpr.find_opt pr inst.inst_pr with
-        | _, Some Pskip -> invalid_arg "Pmodule.clone_export"
-        | (Pskip | Pgoal), _ -> true, Pskip
-        | Plemma, Some Pgoal -> true, Pskip
-        | Paxiom, Some Pgoal -> false, Pgoal
-        | (Paxiom | Plemma), Some Paxiom -> false, Paxiom
-        | (Paxiom | Plemma), Some Plemma -> false, Plemma
-        | Paxiom, None -> false, Paxiom (* TODO: Plemma *)
-        | Plemma, None -> false, Paxiom in
+        | Pgoal, _ -> true, Pgoal
+        | Plemma, Some Pgoal -> true, Pgoal
+        | Plemma, _ -> false, Plemma
+        | Paxiom, Some k -> false, k
+        | Paxiom, None -> false, Paxiom (* TODO: Plemma *) in
       if skip then uc else
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;

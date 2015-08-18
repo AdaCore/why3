@@ -879,7 +879,6 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Paxiom -> ""
     | Plemma -> "Lemma"
     | Pgoal -> "Theorem"
-    | Pskip -> assert false (* impossible *)
   in
   if stt <> "" then
     match prev with

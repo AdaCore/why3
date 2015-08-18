@@ -320,7 +320,7 @@ let do_theory env drv fname tname th glist elist =
     let drv = Opt.get drv in
     let prs = Queue.fold add Decl.Spr.empty glist in
     let sel = if Decl.Spr.is_empty prs then None else Some prs in
-    let tasks = List.rev (split_theory th sel !opt_task) in
+    let tasks = Task.split_theory th sel !opt_task in
     List.iter (do_tasks env drv fname tname th) tasks;
     let eval (x,l) =
       let ls = try ns_find_ls th.th_export l with Not_found ->

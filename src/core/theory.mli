@@ -185,13 +185,12 @@ val create_meta : meta -> meta_arg list -> tdecl
 
 val add_meta : theory_uc -> meta -> meta_arg list -> theory_uc
 
-val clone_meta : tdecl -> symbol_map -> tdecl
-(** [clone_meta td_meta sm] produces from [td_meta]
-    a new Meta tdecl instantiated with respect to [sm]. *)
-
-(*
-val on_meta: meta-> ('a -> meta_arg list -> 'a) -> 'a -> theory -> 'a
-*)
+val clone_meta : tdecl -> theory -> symbol_map -> tdecl option
+(** [clone_meta td_meta th sm] produces from [td_meta]
+    a new [Meta] tdecl instantiated with respect to [sm].
+    Returns [None] if [td_meta] mentions proposition symbols
+    that were not cloned (e.g. goals) or type symbols that
+    were cloned into complex types. *)
 
 (** {2 Base theories} *)
 

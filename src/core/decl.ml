@@ -288,7 +288,6 @@ type prop_kind =
   | Plemma    (* prove, use as a premise *)
   | Paxiom    (* do not prove, use as a premise *)
   | Pgoal     (* prove, do not use as a premise *)
-  | Pskip     (* do not prove, do not use as a premise *)
 
 type prop_decl = prop_kind * prsymbol * term
 
@@ -352,7 +351,7 @@ module Hsdecl = Hashcons.Make (struct
   let hs_ind (ps,al) = Hashcons.combine_list hs_prop (ls_hash ps) al
 
   let hs_kind = function
-    | Plemma -> 11 | Paxiom -> 13 | Pgoal  -> 17 | Pskip  -> 19
+    | Plemma -> 11 | Paxiom -> 13 | Pgoal -> 17
 
   let hash d = match d.d_node with
     | Dtype  s -> ts_hash s

@@ -322,7 +322,7 @@ unsupportedDecl d
       fprintf fmt "@[<hv 2>{ %a@ }@]@\n" (print_fmla info) f
 *)
       fprintf fmt "@[<hv 2>%a@]@\n" (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) ->
+  | Dprop (Plemma, _, _) ->
       unsupportedDecl d
         "gappa: lemmas are not supported"
 *)
@@ -392,7 +392,7 @@ let prepare info defs ((eqs,hyps,goal) as acc) d =
             | Goal_none -> (eqs,hyps,filter_goal pr f)
             | _ -> assert false
         end
-    | Dprop ((Plemma|Pskip), _, _) ->
+    | Dprop (Plemma, _, _) ->
         unsupportedDecl d
           "gappa: lemmas are not supported"
 

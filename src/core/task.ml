@@ -116,7 +116,6 @@ let find_meta_tds task (t : meta) = mm_find (task_meta task) t
 (* constructors with checks *)
 
 exception LemmaFound
-exception SkipFound
 exception GoalFound
 exception GoalNotFound
 
@@ -144,8 +143,7 @@ let check_task task = match find_goal task with
   | None    -> task
 
 let check_decl = function
-  | { d_node = Dprop (Plemma,_,_)} -> raise LemmaFound
-  | { d_node = Dprop (Pskip,_,_)}  -> raise SkipFound
+  | {d_node = Dprop (Plemma,_,_)} -> raise LemmaFound
   | d -> d
 
 let new_decl task d td =
@@ -185,7 +183,7 @@ let add_tdecl task td = match td.td_node with
 
 let rec flat_tdecl task td = match td.td_node with
   | Decl { d_node = Dprop (Plemma,pr,f) } -> add_prop_decl task Paxiom pr f
-  | Decl { d_node = Dprop ((Pgoal|Pskip),_,_) } -> task
+  | Decl { d_node = Dprop (Pgoal,_,_) } -> task
   | Decl d -> new_decl task d td
   | Use th -> use_export task th td
   | Clone (th,_) -> new_clone task th td
@@ -204,16 +202,22 @@ let add_meta task t al = new_meta task t (create_meta t al)
 
 (* split theory *)
 
-let split_tdecl names (res,task) td = match td.td_node with
-  | Decl { d_node = Dprop ((Pgoal|Plemma),pr,f) }
-    when Opt.fold (fun _ -> Spr.mem pr) true names ->
-      let res = add_prop_decl task Pgoal pr f :: res in
-      res, flat_tdecl task td
-  | _ ->
-      res, flat_tdecl task td
-
 let split_theory th names init =
-  fst (List.fold_left (split_tdecl names) ([],init) th.th_decls)
+  let facts = ref Spr.empty in
+  let named pr = match names with Some s -> Spr.mem pr s | _ -> true in
+  let split (task, acc) td = flat_tdecl task td, match td.td_node with
+    | Clone (th, sm) -> (* do not reprove instantiations of lemmas *)
+        Mpr.iter (fun o n -> match find_prop_decl th.th_known o with
+          | (Plemma|Pgoal), _ -> facts := Spr.add n !facts
+          | _ -> ()) sm.sm_pr;
+        acc
+    | Decl { d_node = Dprop ((Plemma|Pgoal),pr,f) } when named pr ->
+        (pr, add_prop_decl task Pgoal pr f) :: acc
+    | _ -> acc in
+  let _, tasks = List.fold_left split (init, []) th.th_decls in
+  let filter acc (pr, task) =
+    if Spr.mem pr !facts then acc else task :: acc in
+  List.fold_left filter [] tasks
 
 (* Generic utilities *)
 
@@ -357,7 +361,6 @@ let on_tagged_pr t task =
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | LemmaFound ->   Format.fprintf fmt "Task cannot contain a lemma"
-  | SkipFound ->    Format.fprintf fmt "Task cannot contain a skip"
   | GoalFound ->    Format.fprintf fmt "The task already ends with a goal"
   | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
   | NotTaggingMeta m ->

@@ -393,7 +393,6 @@ let print_prop_decl info fmt (k, pr, f) =
     | Paxiom -> "axiom"
     | Plemma -> "lemma"
     | Pgoal -> "lemma"
-    | Pskip -> assert false (* impossible *)
   in
   print_statement stt (print_pr info) pr info fmt f
 

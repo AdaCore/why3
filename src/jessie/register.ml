@@ -92,7 +92,7 @@ let process () =
     List.iter (fun th ->
       ACSLtoWhy3.Self.result "running theory 1:";
       ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
-      let tasks = List.rev (Task.split_theory th None None) in
+      let tasks = Task.split_theory th None None in
       ACSLtoWhy3.Self.result "@[<h 0>Provers: %a@]"
         (Pp.print_list Pp.comma
            (fun fmt (_n,p,_d) ->

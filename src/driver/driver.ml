@@ -251,26 +251,23 @@ let call_on_buffer ~command ?timelimit ?memlimit ?steplimit
     ~command ?timelimit ?memlimit ?steplimit ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace buffer
 
-
 (** print'n'prove *)
 
 exception NoPrinter
 
 let update_task = let ht = Hint.create 5 in fun drv ->
   let update task0 =
-    Mid.fold (fun _ (th,s) task ->
-      let task = if Task.on_used_theory th task0 then
-        Stdecl.fold (fun tdm task ->
-          add_tdecl task tdm
-        ) s task
-      else
-        task
-      in
-      Task.on_cloned_theory th (fun task sm ->
-        Stdecl.fold (fun tdm task ->
-          add_tdecl task (clone_meta tdm sm)
-        ) s task
-      ) task task0
+    Mid.fold (fun _ (th,tdms) task ->
+      let tdcs = (Task.find_clone_tds task0 th).tds_set in
+      Stdecl.fold (fun tdc task ->
+        Stdecl.fold (fun tdm task -> match tdc.td_node with
+          | Use _ -> add_tdecl task tdm
+          | Clone (_,sm) ->
+              let tdm = Theory.clone_meta tdm th sm in
+              Opt.fold add_tdecl task tdm
+          | _ -> assert false
+        ) tdms task
+      ) tdcs task
     ) drv.drv_meta task0
   in
   function

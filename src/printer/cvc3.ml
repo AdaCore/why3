@@ -256,7 +256,7 @@ let print_decl info fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[%% %a@]@\n" Loc.gen_report_position loc
         | None -> ());
       fprintf fmt "  @[%a;@]@]@\n" (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) -> assert false
+  | Dprop (Plemma, _, _) -> assert false
 
 let print_decls =
   let print_decl (sm,ct) fmt d =

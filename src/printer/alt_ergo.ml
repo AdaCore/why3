@@ -315,7 +315,7 @@ let print_prop_decl info fmt k pr f = match k with
   | Pgoal ->
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         print_ident pr.pr_name (print_fmla info) f
-  | Plemma| Pskip -> assert false
+  | Plemma -> assert false
 
 let print_prop_decl info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs

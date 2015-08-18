@@ -79,9 +79,13 @@ val add_prop_decl : task -> prop_kind -> prsymbol -> term -> task
 (** {2 utilities} *)
 
 val split_theory : theory -> Spr.t option -> task -> task list
-  (** [split_theory th s t] returns the tasks of [th] added to [t]
-      that end by one of [s]. They are in the opposite order than
-      in the theory *)
+  (** [split_theory th s t] returns the list of proof tasks that
+      correspond to goals in [th], in the order of appearance.
+      If set [s] is not empty, then only the goals in [s] are
+      proved. The goals which are instances of already proved
+      propositions (introduced by cloning) are not proved.
+      Task [t] is the task prefix that can be used to add
+      some metas to every generated proof task. *)
 
 (** {2 realization utilities} *)
 
@@ -133,5 +137,4 @@ exception NotExclusiveMeta of meta
 
 exception GoalNotFound
 exception GoalFound
-exception SkipFound
 exception LemmaFound
