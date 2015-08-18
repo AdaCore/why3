@@ -462,11 +462,39 @@ let iter_leafs goal f =
 
 let iter_leaf_goals subp f = iter_leafs subp.subp_goal f
 
-let find_first_untried_prover g =
+exception Prover_Found of Gnat_config.prover
+
+let find_obsolete_valid_proof g =
+  (* if there is an obsolete valid proof of goal g with prover p, such that p
+     is among the selected provers, return [Some p], otherwise return None *)
+  try
+    Session.goal_iter (fun child ->
+      match child with
+      | Session.Proof_attempt
+        ({ Session.proof_obsolete = true;
+          proof_state = Session.Done
+            { Call_provers.pr_answer = Call_provers.Valid }}
+        as pa) ->
+          begin
+            match Gnat_config.is_selected_prover pa.Session.proof_prover with
+            | Some p -> raise (Prover_Found p)
+            | None -> ()
+          end
+      | _ -> ()) g;
+    None
+  with Prover_Found p -> Some p
+
+let find_best_untried_prover g =
+  (* return the manual prover, if there is one. Otherwise, if an obsolete valid
+     proof exists, try that prover first. Otherwise, just try the first not yet
+     tried prover. *)
   match Gnat_config.manual_prover with
   | Some p -> p
   | None ->
-    List.find (fun p -> not (has_been_tried_by g p)) Gnat_config.provers
+      match find_obsolete_valid_proof g with
+      | Some p -> p
+      | None ->
+          List.find (fun p -> not (has_been_tried_by g p)) Gnat_config.provers
 
 let apply_split_goal_if_needed g =
    (* before doing any proofs, we apply "split" to all "main goals" (see
@@ -754,7 +782,7 @@ let schedule_goal_with_prover ~cntexample g p =
 
 let schedule_goal ~cntexample g =
    (* actually schedule the goal, ie call the prover. This function returns immediately. *)
-   let p = find_first_untried_prover g in
+   let p = find_best_untried_prover g in
    schedule_goal_with_prover ~cntexample g p
 
 let clean_automatic_proofs =

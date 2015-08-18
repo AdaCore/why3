@@ -14,6 +14,10 @@ type prover =
 val provers : prover list
 (* the provers, either the default prover, or as given by --prover *)
 
+val is_selected_prover : Whyconf.prover -> prover option
+(* test if the given prover is a selected prover, i.e. in the [provers] list
+   above *)
+
 val prover_ce : prover option
 (* the prover for counterexamples generation
    None if counterexample should not be generated

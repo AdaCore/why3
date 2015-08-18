@@ -525,3 +525,8 @@ let () =
   let curdir = Sys.getcwd () in
   Unix.putenv "TEMP" curdir;
   Unix.putenv "TEMPDIR" curdir
+
+let is_selected_prover p =
+  try
+    Some (List.find (fun g -> g.prover.Whyconf.prover = p) provers)
+  with Not_found -> None
