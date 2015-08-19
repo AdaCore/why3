@@ -299,6 +299,7 @@ let mk_decl = let r = ref 0 in fun node pure ->
     pd_tag  = (incr r; !r) }
 
 let create_type_decl dl =
+  if dl = [] then invalid_arg "Pdecl.create_type_decl";
   let add_itd ({itd_its = s} as itd) (abst,defn,rest) =
     match itd.itd_fields, itd.itd_constructors with
     | [], [] when s.its_def <> None ->
