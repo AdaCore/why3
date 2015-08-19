@@ -20,6 +20,8 @@ val map_fold_left :
 val map_fold_right :
   ('a -> 'acc -> 'b * 'acc) -> 'a list -> 'acc -> 'b list * 'acc
 
+val map_filter : ('a -> 'b option) -> 'a list -> 'b list
+
 val equal : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
 
 val compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
