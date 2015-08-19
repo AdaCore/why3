@@ -704,14 +704,19 @@ let clone_export uc th inst =
 
   let f_ts p ts =
     if Mid.mem ts.ts_name th.th_local then
+    if Mts.mem ts inst.inst_ts then None else
+    if Mts.mem ts inst.inst_ty then None else
     try let ts = Mts.find ts cl.ts_table in
         store_path uc p ts.ts_name; Some ts
     with Not_found -> None else Some ts in
+
   let f_ls p ls =
     if Mid.mem ls.ls_name th.th_local then
+    if Mls.mem ls inst.inst_ls then None else
     try let ls = Mls.find ls cl.ls_table in
         store_path uc p ls.ls_name; Some ls
     with Not_found -> None else Some ls in
+
   let f_pr p pr =
     if Mid.mem pr.pr_name th.th_local then
     try let pr = Mpr.find pr cl.pr_table in
