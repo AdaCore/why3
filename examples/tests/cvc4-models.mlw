@@ -1,16 +1,49 @@
 module M
   use import ref.Ref
-
+  use import list.List
   use import int.Int
 
-  function projf (l : int) : int
-  =
-  l+100
+  type int_type = Integer int
 
-  meta "inline : no" function projf
-  meta "model_projection" function projf
+  function projfi "model_trace:.projfi" (l : int) : int
+  meta "inline : no" function projfi
+  meta "model_projection" function projfi
+
+  function projfl "model_trace:.projfl" (l : list int_type) : int
+  =
+  match l with
+  | Nil -> 0
+  | Cons (Integer n) _ -> n
+  | _ -> 0
+  end
+
+  function projf1 "model_trace:.projf1" (l : int) : bool
+  =
+  l > 0
+
+  function projf2 "model_trace:.projf2" (l : int) : bool
+  =
+  l <= 0
+
+  meta "inline : no" function projfl
+  meta "model_projection" function projfl
+
+  meta "inline : no" function projf1
+  meta "model_projection" function projf1
+
+  meta "inline : no" function projf2
+  meta "model_projection" function projf2
 
   val y "model_projected" "model" "model_trace:y" :ref int
+
+  let proj_test ( l "model_projected" : list int_type) : int
+  ensures { result > 0  }
+  =
+  match l with
+  | Nil -> 1
+  | Cons (Integer n) _ -> n
+  | _ -> 1
+  end
 
   let incr ( x23 "model" "model_trace:x23" : ref int ): unit
   ensures { "model_vc" "model_func" !x23 = old !x23 + 2 + !y }
@@ -34,9 +67,31 @@ module M
 
 
   type r = {f:int; g:bool}
-  let test_record (x "model" "model_trace:x" : ref r) : unit
+  let test_record1 (x "model" "model_trace:x" : r) : int
+  ensures { "model_vc" "model_func" result = 1 }
+  =
+  if x.g then
+    x.f
+  else
+    1
+
+  let test_record2 (x "model" "model_trace:x" : ref r) : unit
   ensures { !x.g }
   =
   x := { !x with f = 6}
+
+  let test_record3 (x "model" "model_trace:x" : ref r) : r
+  ensures { "model_vc" "model_func" result.g }
+  =
+  x := { !x with f = 6 };
+  !x
+
+  val re "model" : ref r
+
+  let test_record4 (x "model" "model_trace:x" : ref r) : r
+  ensures { "model_vc" "model_func" result = !re }
+  =
+  x := { !x with f = 6 };
+  !x
 
 end

@@ -289,23 +289,6 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
-let model_trace_regexp = Str.regexp "model_trace:"
-
-let is_model_trace_label l =
-  try
-    ignore(Str.search_forward model_trace_regexp l.lab_string 0);
-    true
-  with Not_found -> false
-
-(* Appends the string to_append to the label that begins with "model_trace:" *)
-let append_to_model_trace_label ~labels ~to_append =
-  try
-    let trace_label = Slab.choose (Slab.filter is_model_trace_label labels) in
-    let labels_without_trace = Slab.remove trace_label labels in
-    let new_trace_label = Ident.create_label (trace_label.lab_string^"@"^to_append) in
-    Slab.add new_trace_label labels_without_trace
-  with Not_found -> labels
-
 (* The counter-example model related data needed for creating new
    variable. *)
 type model_data = {
@@ -341,7 +324,7 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
 
 let mk_var id ty md =
   let new_labels =
-    append_to_model_trace_label ~labels:id.id_label ~to_append:md.md_append_to_model_trace in
+    append_to_model_trace_label ~labels:id.id_label ~to_append:("@"^md.md_append_to_model_trace) in
 
   create_vsymbol (id_fresh ~label:new_labels ?loc:md.md_loc id.id_string) ty
 

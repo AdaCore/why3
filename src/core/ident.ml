@@ -42,6 +42,54 @@ let lab_equal : label -> label -> bool = (==)
 let lab_hash lab = lab.lab_tag
 let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
 
+(* functions for working with counterexample model labels *)
+
+let model_trace_regexp = Str.regexp "model_trace:"
+
+let is_model_trace_label label =
+  try
+    ignore(Str.search_forward model_trace_regexp label.lab_string 0);
+    true
+  with Not_found -> false
+
+let get_model_trace_label labels =
+  Slab.choose (Slab.filter is_model_trace_label labels)
+
+let transform_model_trace_label labels trans_fun =
+  try
+    let trace_label = get_model_trace_label labels in
+    let labels_without_trace = Slab.remove trace_label labels in
+    let new_trace_label = create_label (trans_fun trace_label.lab_string) in
+    Slab.add new_trace_label labels_without_trace
+  with Not_found -> labels
+
+let append_to_model_element_name ~labels ~to_append =
+  let trans lab_str =
+    let splitted = Str.bounded_split (Str.regexp_string "@") lab_str 2 in
+    match splitted with
+    | [before; after] -> before ^ to_append ^ "@" ^ after
+    | _ -> lab_str^to_append in
+  transform_model_trace_label labels trans
+
+let append_to_model_trace_label ~labels ~to_append =
+    let trans lab_str = lab_str ^ to_append in
+    transform_model_trace_label labels trans
+
+let get_model_element_name ~labels =
+  let trace_label = get_model_trace_label labels in
+  let splitted1 = Str.bounded_split (Str.regexp_string ":") trace_label.lab_string 2 in
+  match splitted1 with
+  | [_; content] ->
+    begin
+      let splitted2 = Str.bounded_split (Str.regexp_string "@") content 2 in
+      match splitted2 with
+      | [el_name; _] -> el_name
+      | [el_name] -> el_name
+      | _ -> raise Not_found
+    end;
+  | _ -> assert false
+
+
 (** Identifiers *)
 
 type ident = {

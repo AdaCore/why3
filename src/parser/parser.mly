@@ -36,12 +36,14 @@ end
   let floc s e = Loc.extract (s,e)
 
   let model_label = Ident.create_label "model"
+  let model_projected = Ident.create_label "model_projected"
 
   let is_model_label l =
     match l with
     | Lpos _ -> false
     | Lstr lab ->
-      lab = model_label
+      (lab = model_label) || (lab = model_projected)
+
 
   let model_lab_present labels =
     try

@@ -1,0 +1,220 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
+open Decl
+open Term
+open Ident
+
+(** For see intro_vc_vars_counterexmp.mli for detailed description
+    of this transformation. *)
+
+let meta_vc_location =
+  Theory.register_meta_excl "vc_location" [Theory.MTstring]
+  ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
+
+let model_label = Ident.create_label "model"
+  (* Identifies terms that should be in counterexample and should not be projected. *)
+let model_projected_label = Ident.create_label "model_projected"
+  (* Identifies terms that should be in counterexample and should be projected. *)
+let model_vc_term_label = Ident.create_label "model_vc"
+  (* Identifies the term that triggers the VC. *)
+let model_trace_regexp = Str.regexp "model_trace:"
+  (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
+
+(* Information about the term that triggers VC.  *)
+type vc_term_info = {
+  mutable vc_inside : bool;
+  (* true if the term that triggers VC is currently processed *)
+  mutable vc_loc : Loc.position option;
+  (* the position of the term that triggers VC *)
+  mutable vc_func_name : string option;
+  (* the name of the function for that VC was made. None if VC
+     is not generated for postcondition or precondition) *)
+}
+
+let label_starts_with regexp l =
+  try
+    ignore(Str.search_forward regexp l.lab_string 0);
+    true
+  with Not_found -> false
+
+let get_label labels regexp =
+  Slab.choose (Slab.filter (label_starts_with regexp) labels)
+
+let get_fun_name name =
+  let splitted = Str.bounded_split (Str.regexp_string ":") name 2 in
+  match splitted with
+  | _::[second] ->
+    second
+  | _ ->
+    ""
+
+let check_enter_vc_term t info =
+  (* Check whether the term that triggers VC is entered.
+     If it is entered, extract the location of the term and if the VC is
+     postcondition or precondition of a function, extract the name of
+     the corresponding function.
+  *)
+  if Slab.mem model_vc_term_label t.t_label then begin
+    info.vc_inside <- true;
+    info.vc_loc <- t.t_loc;
+    try
+      (* Label "model_func" => the VC is postcondition or precondition *)
+      (* Extract the function name from "model_func" label *)
+      let fun_label = get_label t.t_label (Str.regexp "model_func") in
+      info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
+    with Not_found ->
+      (* No label "model_func" => the VC is not postcondition or precondition *)
+      ()
+  end
+
+let check_exit_vc_term t info =
+  (* Check whether the term triggering VC is exited. *)
+  if Slab.mem model_vc_term_label t.t_label then begin
+    info.vc_inside <- false;
+  end
+
+let add_old lab_str =
+  try
+    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
+    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
+    if after = "@init" then
+      (String.sub lab_str 0 pos) ^ "@old"
+    else lab_str
+  with Not_found -> lab_str ^ "@old"
+
+let model_trace_for_postcondition ~labels info =
+  (* Modifies the  model_trace label of a term in the postcondition:
+     - if term corresponds to the initial value of a function
+     parameter, model_trace label will have postfix @old
+     - if term corresponds to the return value of a function, add
+     model_trace label in a form function_name@result
+  *)
+  try
+    let trace_label = get_label labels model_trace_regexp in
+    let lab_str = add_old trace_label.lab_string in
+    if lab_str = trace_label.lab_string then
+      labels
+    else
+      let other_labels = Slab.remove trace_label labels in
+      Slab.add
+	(Ident.create_label lab_str)
+	other_labels
+  with Not_found ->
+    (* no model_trace label => the term represents the return value *)
+    Slab.add
+      (Ident.create_label
+	 ("model_trace:" ^ (Opt.get_def "" info.vc_func_name)  ^ "@result"))
+      labels
+
+let rec do_intro info t =
+  check_enter_vc_term t info;
+
+  let defs = match t.t_node with
+    | Tapp (ls, tl) ->
+      begin
+	match tl with
+	| [] ->
+	  if info.vc_inside then begin
+	    match info.vc_loc with
+	    | None -> []
+	    | Some loc ->
+	      (* variable inside the term that triggers VC.
+		 Introduce new constant equal to this variable that contains
+	         all labels necessary for collecting it for counterexample*)
+	      let const_label = match info.vc_func_name with
+		| None ->
+		  ls.ls_name.id_label
+		| Some _ ->
+		  model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
+	      let const_label = if (Slab.mem model_label const_label) then const_label
+		else Slab.add model_projected_label const_label in
+	      let const_name = ls.ls_name.id_string^"_vc_constant" in
+	      let axiom_name = ls.ls_name.id_string^"_vc_axiom" in
+	      Intro_projections_counterexmp.intro_const_equal_to_term
+		~term:t ~const_label ~const_loc:loc ~const_name ~axiom_name
+	  end
+	  else []
+	| _ ->
+	  List.fold_left
+	    (fun defs term ->
+	      List.append defs (do_intro info term))
+	    []
+	    tl
+      end;
+    | Tbinop (_, f1, f2) ->
+      List.append (do_intro info f1) (do_intro info f2)
+    | Tquant (_, fq) ->
+      let _, _, f = t_open_quant fq in
+      do_intro info f
+    | Tlet (t, tb) ->
+      let _, f = t_open_bound tb in
+      List.append (do_intro info t) (do_intro info f)
+    | Tnot f ->
+      do_intro info f
+    | Tif (f1, f2, f3) ->
+      List.append
+	(List.append (do_intro info f1) (do_intro info f2))
+	(do_intro info f3)
+    | Tcase (t, _) ->
+      do_intro info t
+      (* todo: handle the second argument of Tcase *)
+    | _ -> [] in
+
+  check_exit_vc_term t info;
+
+  defs
+
+let do_intro_vc_vars_counterexmp info pr f =
+  List.append (do_intro info f) [(create_prop_decl Pgoal pr f)]
+
+let intro_vc_vars_counterexmp2 task =
+  let info = {
+    vc_inside = false;
+    vc_loc = None;
+    vc_func_name = None;
+  } in
+  (* Do introduction and find location of term triggering VC *)
+  let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info) in
+  let task = (Trans.apply do_intro_trans) task in
+
+  (* Pass meta with location of the term triggering VC to printer  *)
+  let vc_loc_meta = Theory.lookup_meta "vc_location" in
+  let g,task = Task.task_separate_goal task in
+  let pos_str = match info.vc_loc with
+    | None -> ""
+    | Some loc ->
+      let (file, line, col1, col2) = Loc.get loc in
+      file ^ ":" ^ (string_of_int line) ^ ":" ^ (string_of_int col1) ^ ":" ^ (string_of_int col2)
+  in
+  let task = Task.add_meta task vc_loc_meta [Theory.MAstr pos_str] in
+  Task.add_tdecl task g
+
+let intro_vc_vars_counterexmp = Trans.store intro_vc_vars_counterexmp2
+
+let () = Trans.register_transform "intro_vc_vars_counterexmp"
+  intro_vc_vars_counterexmp
+  ~desc:"Introduce."
+
+let get_location_of_vc task =
+  let meta_args = Task.on_meta_excl meta_vc_location task in
+  match meta_args with
+  | Some [Theory.MAstr loc_str] ->
+    let splitted = Str.bounded_split (Str.regexp_string ":") loc_str 4 in
+    let loc =  match splitted with
+      | [filename; line; col1; col2] ->
+	let line = int_of_string line in
+	let col1 = int_of_string col1 in
+	let col2 = int_of_string col2 in
+        Some (Loc.user_position filename line col1 col2)
+      | _ -> None in
+    loc
+  | _ -> None

@@ -11,7 +11,7 @@ let get_counterexmp task =
   let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
   not (Theory.Stdecl.is_empty ce_meta.tds_set)
 
-let prepare_for_counterexmp2 task = 
+let prepare_for_counterexmp2 task =
   if not (get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)
     Debug.dprintf debug "Not get ce@.";
@@ -20,9 +20,12 @@ let prepare_for_counterexmp2 task =
   else begin
     (* Counter-example will be queried, prepare the task *)
     Debug.dprintf debug "Get ce@.";
-    let comp_trans = Trans.compose 
-      (Trans.goal Introduction.intros) 
-      Intro_projections_counterexmp.intro_projections_counterexmp
+    let comp_trans = Trans.compose
+      (Trans.goal Introduction.intros)
+      (Trans.compose
+	 Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp
+	 Intro_projections_counterexmp.intro_projections_counterexmp
+      )
     in
     (Trans.apply comp_trans) task
   end
