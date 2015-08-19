@@ -576,7 +576,7 @@ let cl_init th inst =
 (* clone declarations *)
 
 let cl_type cl inst ts =
-  if Mts.mem ts inst.inst_ts then
+  if Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty then
     if ts.ts_def = None then raise EmptyDecl
     else raise (CannotInstantiate ts.ts_name);
   create_ty_decl (cl_clone_ts cl ts)
@@ -588,7 +588,8 @@ let cl_data cl inst tdl =
   let add_constr (ls,pl) = add_ls ls, List.map (Opt.map add_ls) pl in
   let add_type ts' (_,csl) = ts', List.map add_constr csl in
   let get_type (ts,_) =
-    if Mts.mem ts inst.inst_ts then raise (CannotInstantiate ts.ts_name);
+    if Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty then
+      raise (CannotInstantiate ts.ts_name);
     cl_clone_ts cl ts in
   create_data_decl (List.map2 add_type (List.map get_type tdl) tdl)
 
@@ -607,10 +608,8 @@ let cl_param cl inst ls =
 
 let cl_logic cl inst ldl =
   let add_logic (ls,ld) =
-    if Mls.mem ls inst.inst_ls then
-      raise (CannotInstantiate ls.ls_name);
-    let f = ls_defn_axiom ld in
-    extract_ls_defn (cl_trans_fmla cl f)
+    if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
+    extract_ls_defn (cl_trans_fmla cl (ls_defn_axiom ld))
   in
   create_logic_decl (List.map add_logic ldl)
 
