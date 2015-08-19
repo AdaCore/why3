@@ -60,9 +60,10 @@ and mod_unit =
   | Umeta  of meta * meta_arg list
   | Uscope of string * bool * mod_unit list
 
-and mod_inst = private {
+and mod_inst = {
   mi_mod : pmodule;
-  mi_ts  : ity Mts.t;
+  mi_ty  : ity Mts.t;
+  mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
   mi_pv  : pvsymbol Mpv.t;

@@ -981,17 +981,30 @@ let type_inst ({muc_theory = tuc} as _muc) {mod_theory = t} s =
     | CStsym (p,[],PTtyapp (q,[])) ->
         let ts1 = find_tysymbol_ns t.th_export p in
         let ts2 = find_tysymbol tuc q in
-        let ty2 = ty_app ts2 (List.map ty_var ts1.ts_args) in
+        if Mts.mem ts1 s.inst_ty then Loc.error ~loc:(qloc p)
+          (ClashSymbol ts1.ts_name.id_string);
         { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
-            (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.inst_ts }
+            (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.inst_ts }
     | CStsym (p,tvl,pty) ->
         let ts1 = find_tysymbol_ns t.th_export p in
         let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
         let ts2 = Loc.try3 ~loc:(qloc p) create_tysymbol
           (id_clone ts1.ts_name) tvl (Some (ty_of_pty tuc pty)) in
         let ty2 = ty_app ts2 (List.map ty_var ts1.ts_args) in
-        { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
-            (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.inst_ts }
+        let check v ty = match ty.ty_node with
+          | Tyvar u -> tv_equal u v | _ -> false in
+        begin match ty2.ty_node with
+        | Tyapp (ts2, tyl) when Lists.equal check tvl tyl ->
+            if Mts.mem ts1 s.inst_ty then Loc.error ~loc:(qloc p)
+              (ClashSymbol ts1.ts_name.id_string);
+            { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
+                (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.inst_ts }
+        | _ ->
+            if Mts.mem ts1 s.inst_ts then Loc.error ~loc:(qloc p)
+              (ClashSymbol ts1.ts_name.id_string);
+            { s with inst_ty = Loc.try4 ~loc:(qloc p) Mts.add_new
+                (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.inst_ty }
+        end
     | CSfsym (p,q) ->
         let ls1 = find_fsymbol_ns t.th_export p in
         let ls2 = find_fsymbol tuc q in

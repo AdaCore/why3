@@ -420,10 +420,13 @@ let print_logic_decl      = print_logic_decl true
 let print_next_ind_decl   = print_ind_decl Ind false
 let print_ind_decl fmt s  = print_ind_decl s true fmt
 
-let print_inst_ts fmt (ts1,ty2) =
+let print_inst_ty fmt (ts1,ty2) =
   fprintf fmt "type %a%a = %a" print_ts ts1
     (print_list_pre space print_tv) ts1.ts_args
     print_ty ty2; forget_tvs ()
+
+let print_inst_ts fmt (ts1,ts2) =
+  fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
 
 let print_inst_ls fmt (ls1,ls2) =
   fprintf fmt "%s %a = %a" (ls_kind ls1) print_ls ls1 print_ls ls2
@@ -460,12 +463,14 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
   | Clone (th,sm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
+      let ym = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ty [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]"
-        print_qt th (print_list comma print_inst_ts) tm
-                    (print_list comma print_inst_ls) lm
-                    (print_list comma print_inst_pr) pm
+      fprintf fmt "@[<hov 2>(* clone %a with %a%a%a%a *)@]"
+        print_qt th (print_list_suf comma print_inst_ts) tm
+                    (print_list_suf comma print_inst_ty) ym
+                    (print_list_suf comma print_inst_ls) lm
+                    (print_list_suf comma print_inst_pr) pm
   | Meta (m,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
         m.meta_name (print_list comma print_meta_arg) al

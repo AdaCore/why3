@@ -109,7 +109,8 @@ and mod_unit =
 
 and mod_inst = {
   mi_mod : pmodule;
-  mi_ts  : ity Mts.t;
+  mi_ty  : ity Mts.t;
+  mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
   mi_pv  : pvsymbol Mpv.t;
@@ -344,7 +345,8 @@ let add_pdecl ~vc uc d =
 
 type clones = {
   cl_local : Sid.t;
-  mutable ts_table : ity Mts.t;
+  mutable ty_table : ity Mts.t;
+  mutable ts_table : itysymbol Mts.t;
   mutable ls_table : lsymbol Mls.t;
   mutable pr_table : prsymbol Mpr.t;
   mutable rn_table : region Mreg.t;
@@ -355,6 +357,7 @@ type clones = {
 
 let empty_clones m = {
   cl_local = m.mod_local;
+  ty_table = Mts.empty;
   ts_table = Mts.empty;
   ls_table = Mls.empty;
   pr_table = Mpr.empty;
@@ -366,28 +369,26 @@ let empty_clones m = {
 
 (* populate the clone structure *)
 
-let rec sm_trans_ty tsm ty = match ty.ty_node with
+let rec sm_trans_ty tym tsm ty = match ty.ty_node with
   | Tyapp (s, tl) ->
-      let tl = List.map (sm_trans_ty tsm) tl in
+      let tl = List.map (sm_trans_ty tym tsm) tl in
       begin match Mts.find_opt s tsm with
+      | Some its -> ty_app its.its_ts tl
+      | None -> begin match Mts.find_opt s tym with
       | Some ity -> ty_inst (ts_match_args s tl) (ty_of_ity ity)
       | None -> ty_app s tl
-      end
+      end end
   | Tyvar _ -> ty
 
-let cl_trans_ty cl ty = sm_trans_ty cl.ts_table ty
+let cl_trans_ty cl ty = sm_trans_ty cl.ty_table cl.ts_table ty
 
-let sm_find_ts tsm ({ts_args = vl} as s) =
-  let check v ty = match ty.ty_node with
-    | Tyvar u -> tv_equal u v
-    | _ -> false in
-  match (ty_of_ity (Mts.find s tsm)).ty_node with
-  | Tyapp (s, tl) when Lists.equal check vl tl -> s
-  | _ -> raise Not_found
+let cl_find_its cl its =
+  if not (Sid.mem its.its_ts.ts_name cl.cl_local) then its
+  else Mts.find its.its_ts cl.ts_table
 
-let cl_find_ts cl s =
-  if not (Sid.mem s.ts_name cl.cl_local) then s else
-  sm_find_ts cl.ts_table s
+let cl_find_ts cl ts =
+  if not (Sid.mem ts.ts_name cl.cl_local) then ts
+  else (Mts.find ts cl.ts_table).its_ts
 
 let rec cl_trans_ity cl ity = match ity.ity_node with
   | Ityreg r ->
@@ -396,15 +397,19 @@ let rec cl_trans_ity cl ity = match ity.ity_node with
       let tl = List.map (cl_trans_ity cl) tl in
       let rl = List.map (cl_trans_reg cl) rl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
+      | Some its -> ity_app its tl rl
+      | None -> begin match Mts.find_opt s.its_ts cl.ty_table with
       | Some ity -> ity_full_inst (its_match_regs s tl rl) ity
       | None -> ity_app s tl rl
-      end
+      end end
   | Itypur (s, tl) ->
       let tl = List.map (cl_trans_ity cl) tl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
+      | Some its -> ity_pur its tl
+      | None -> begin match Mts.find_opt s.its_ts cl.ty_table with
       | Some ity -> ity_full_inst (its_match_args s tl) (ity_purify ity)
       | None -> ity_pur s tl
-      end
+      end end
   | Ityvar _ -> ity
 
 and cl_trans_reg cl reg =
@@ -417,6 +422,9 @@ and cl_trans_reg cl reg =
   let tl = List.map (cl_trans_ity cl) reg.reg_args in
   let rl = List.map (cl_trans_reg cl) reg.reg_regs in
   let r = match Mts.find_opt reg.reg_its.its_ts cl.ts_table with
+    | Some its ->
+        create_region (id_clone reg.reg_name) its tl rl
+    | None -> begin match Mts.find_opt reg.reg_its.its_ts cl.ty_table with
     | Some {ity_node = Ityreg r} ->
         let sbs = its_match_regs reg.reg_its tl rl in
         let tl = List.map (ity_full_inst sbs) r.reg_args in
@@ -424,7 +432,8 @@ and cl_trans_reg cl reg =
         create_region (id_clone reg.reg_name) r.reg_its tl rl
     | Some _ -> assert false
     | None ->
-        create_region (id_clone reg.reg_name) reg.reg_its tl rl in
+        create_region (id_clone reg.reg_name) reg.reg_its tl rl
+    end in
   cl.rn_table <- Mreg.add reg r cl.rn_table;
   r
 
@@ -521,9 +530,14 @@ let clone_decl inst cl uc d = match d.d_node with
       let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
       add_pdecl ~vc:false uc (create_pure_decl d)
 
+let clone_type_decl _inst _cl _tdl = assert false
 let clone_pdecl inst cl uc d = match d.pd_node with
-  | PDtype _tdl -> assert false (* TODO *)
-  | PDlet _ld -> assert false (* TODO *)
+  | PDtype tdl ->
+      let tdl = clone_type_decl inst cl tdl in
+      if tdl = [] then uc else
+      add_pdecl ~vc:false uc (create_type_decl tdl)
+  | PDlet _ld ->
+      assert false (* TODO *)
   | PDexn xs ->
       let ity = cl_trans_ity cl xs.xs_ity in
       let xs' = create_xsymbol (id_clone xs.xs_name) ity in
@@ -535,10 +549,13 @@ let clone_pdecl inst cl uc d = match d.pd_node with
 let theory_add_clone = Theory.add_clone_internal ()
 
 let add_clone uc mi =
-  let tuc = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory
-              (Mts.map ty_of_ity mi.mi_ts) mi.mi_ls mi.mi_pr in
+  let sm = {
+    sm_ty = Mts.map ty_of_ity mi.mi_ty;
+    sm_ts = Mts.map (fun s -> s.its_ts) mi.mi_ts;
+    sm_ls = mi.mi_ls;
+    sm_pr = mi.mi_pr } in
   { uc with
-      muc_theory = tuc;
+      muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
       muc_units  = Uclone mi :: uc.muc_units }
 
 let clone_export uc m inst =
@@ -553,7 +570,8 @@ let clone_export uc m inst =
     | Uuse m -> use_export uc m
     | Uclone mi ->
         begin try add_clone uc { mi_mod = mi.mi_mod;
-          mi_ts = Mts.map (cl_trans_ity cl) mi.mi_ts;
+          mi_ty = Mts.map (cl_trans_ity cl) mi.mi_ty;
+          mi_ts = Mts.map (cl_find_its cl) mi.mi_ts;
           mi_ls = Mls.map (cl_find_ls cl) mi.mi_ls;
           mi_pr = Mpr.map (cl_find_pr cl) mi.mi_pr;
           mi_pv = Mpv.map (cl_find_pv cl) mi.mi_pv;
@@ -575,6 +593,7 @@ let clone_export uc m inst =
   let uc = List.fold_left add_unit uc m.mod_units in
   let mi = {
     mi_mod = m;
+    mi_ty  = cl.ty_table;
     mi_ts  = cl.ts_table;
     mi_ls  = cl.ls_table;
     mi_pr  = cl.pr_table;

@@ -95,14 +95,15 @@ and tdecl = private {
   td_tag  : int;
 }
 
-and tdecl_node = private
+and tdecl_node =
   | Decl  of decl
   | Use   of theory
   | Clone of theory * symbol_map
   | Meta  of meta * meta_arg list
 
-and symbol_map = private {
-  sm_ts : ty Mts.t;
+and symbol_map = {
+  sm_ty : ty Mts.t;
+  sm_ts : tysymbol Mts.t;
   sm_ls : lsymbol Mls.t;
   sm_pr : prsymbol Mpr.t;
 }
@@ -166,7 +167,8 @@ val use_export : theory_uc -> theory -> theory_uc
 (** {2 Clone} *)
 
 type th_inst = {
-  inst_ts : ty Mts.t; (* old to new *)
+  inst_ty : ty Mts.t;
+  inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
 }
@@ -179,8 +181,7 @@ val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
-val add_clone_internal : unit -> theory_uc -> theory ->
-  ty Mts.t -> lsymbol Mls.t -> prsymbol Mpr.t -> theory_uc
+val add_clone_internal : unit -> theory_uc -> theory -> symbol_map -> theory_uc
 
 (** {2 Meta} *)
 
