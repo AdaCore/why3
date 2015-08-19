@@ -400,7 +400,7 @@ param:
 
 binder:
 | anon_binder
-    { error_param (floc $startpos $endpos) }
+    { let l,i = $1 in [l, i, false, None] }
 | ty_arg
     { match $1 with
       | PTtyapp (Qident id, [])
@@ -441,9 +441,9 @@ binder_vars_rest:
             (Loc.join l l3, Some (add_lab id ($2::$3))) :: bl
         | _ -> assert false) $4 }
 | binder_vars_head anon_binder binder_var*
-   { List.rev_append $1 ($2 :: $3) }
+    { List.rev_append $1 ($2 :: $3) }
 | anon_binder binder_var*
-   { $1 :: $2 }
+    { $1 :: $2 }
 
 binder_vars_head:
 | ty {
