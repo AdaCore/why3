@@ -743,7 +743,13 @@ let add_to_stat prover pr stat =
 
    let spark_counterexample_transform (me_name, me_type) =
      match me_type with
-     | Model_parser.Result -> me_name ^ "'"  ^ "Result"
+     | Model_parser.Result ->
+       begin
+	 let splitted = Str.bounded_split (Str.regexp_string ".") me_name 2 in
+	 match splitted with
+	 | [before; after] -> before ^ "'Result" ^ "." ^ after
+	 | _ -> me_name ^ "'Result"
+       end
      | Model_parser.Old -> me_name ^ "'" ^ "Old"
      | Model_parser.Other -> me_name
 
