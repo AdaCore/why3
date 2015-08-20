@@ -135,9 +135,15 @@ theory bool.Bool
    syntax function notb  "(not %1)"
 end
 
+theory HighOrd
+  syntax type (->) "(-> %1 %2)"
+  meta "material_type_arg" type (->), 1
+
+  syntax function (@)  "(%1 %2)"
+  meta "encoding : lskept" function (@)
+end
 
 theory map.Map
-  syntax type map "(-> %1 %2)"
   meta "encoding : lskept" function get
   meta "encoding : lskept" function set
 
@@ -146,14 +152,5 @@ theory map.Map
   syntax function set    "(update %1 (%2) %3)"
   syntax function ([<-]) "(update %1 (%2) %3)"
 
-
   meta "encoding : lskept" function const
-
 end
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)

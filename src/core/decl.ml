@@ -717,7 +717,6 @@ let check_foundness kn d =
 let rec ts_extract_pos kn sts ts =
   assert (ts.ts_def = None);
   if ts_equal ts ts_func then [false;true] else
-  if ts_equal ts ts_pred then [false] else
   if Sts.mem ts sts then List.map Util.ttrue ts.ts_args else
   match find_constructors kn ts with
     | [] ->

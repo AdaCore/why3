@@ -33,14 +33,14 @@ theory SetGen
 
   predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
 
-  axiom empty_def1: is_empty (empty : set 'a)
+  axiom empty_def: is_empty (empty : set 'a)
 
   lemma mem_empty: forall x:'a. mem x empty <-> false
 
   (** addition *)
   function add 'a (set 'a) : set 'a
 
-  axiom add_def1:
+  axiom add_def:
     forall x y: 'a. forall s: set 'a.
     mem x (add y s) <-> x = y \/ mem x s
 
@@ -49,7 +49,7 @@ theory SetGen
   (** removal *)
   function remove 'a (set 'a) : set 'a
 
-  axiom remove_def1:
+  axiom remove_def:
     forall x y : 'a, s : set 'a.
     mem x (remove y s) <-> x <> y /\ mem x s
 
@@ -65,21 +65,21 @@ theory SetGen
   (** union *)
   function union (set 'a) (set 'a) : set 'a
 
-  axiom union_def1:
+  axiom union_def:
     forall s1 s2: set 'a, x: 'a.
     mem x (union s1 s2) <-> mem x s1 \/ mem x s2
 
   (** intersection *)
   function inter (set 'a) (set 'a) : set 'a
 
-  axiom inter_def1:
+  axiom inter_def:
     forall s1 s2: set 'a, x: 'a.
     mem x (inter s1 s2) <-> mem x s1 /\ mem x s2
 
   (** difference *)
   function diff (set 'a) (set 'a) : set 'a
 
-  axiom diff_def1:
+  axiom diff_def:
     forall s1 s2: set 'a, x: 'a.
     mem x (diff s1 s2) <-> mem x s1 /\ not (mem x s2)
 
@@ -98,12 +98,44 @@ end
 
 theory Set
 
-  clone export SetGen
+  use import map.Map
 
-  (** the set of all x of type 'a *)
-  constant all: set 'a
+  type set 'a = map 'a bool
 
-  axiom all_def: forall x: 'a. mem x all
+  predicate mem (x:'a) (s:set 'a) = s[x]
+
+  constant empty : set 'a = const false
+
+  constant all : set 'a = const true
+
+  function add (x:'a) (s:set 'a) : set 'a = s[x <- true]
+
+  function remove (x:'a) (s:set 'a) : set 'a =  s[x <- false]
+
+  function union (s1 s2: set 'a) : set 'a =
+    fun x -> s1[x] \/ s2[x]
+
+  function inter (s1 s2: set 'a) : set 'a =
+    fun x -> s1[x] /\ s2[x]
+
+  function diff (s1 s2: set 'a) : set 'a =
+    fun x -> s1[x] /\ not s2[x]
+
+  function complement (s: set 'a) : set 'a =
+    fun x -> not s[x]
+
+(* dubious axiom: extensionality should be postulated on maps instead
+  axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
+*)
+
+  clone export SetGen with type set = set,
+    predicate mem = mem, axiom extensionality,
+    constant empty = empty, lemma empty_def,
+    function add = add, lemma add_def,
+    function remove = remove, lemma remove_def,
+    function union = union, lemma union_def,
+    function inter = inter, lemma inter_def,
+    function diff = diff, lemma diff_def
 
 end
 
@@ -185,11 +217,11 @@ theory FsetComprehension
   (** { f x | x in U } *)
   function map (f: 'a -> 'b) (u: set 'a) : set 'b
 
-  axiom map_def:
+  axiom map_def1:
     forall f: 'a -> 'b, u: set 'a.
     forall y: 'b. mem y (map f u) <-> (exists x: 'a. mem x u /\ y = f x)
 
-  lemma map_def1:
+  lemma map_def2:
     forall f: 'a -> 'b, u: set 'a.
     forall x: 'a. mem x u -> mem (f x) (map f u)
 
@@ -246,6 +278,7 @@ theory Fsetint
 
   axiom min_elt_def1:
     forall s: set int. not (is_empty s) -> mem (min_elt s) s
+
   axiom min_elt_def2:
     forall s: set int. forall x: int. mem x s -> min_elt s <= x
 
@@ -253,6 +286,7 @@ theory Fsetint
 
   axiom max_elt_def1:
     forall s: set int. not (is_empty s) -> mem (max_elt s) s
+
   axiom max_elt_def2:
     forall s: set int. forall x: int. mem x s -> x <= max_elt s
 
@@ -328,61 +362,5 @@ theory FsetSum "Sum of the elements of a container limited to a finite set of ke
   lemma Sum_eq :
     forall c1 c2 : container, s : set key.
     (forall k : key. S.mem k s -> f c1 k = f c2 k) -> sum c1 s = sum c2 s
-
-end
-
-
-(** {2 Sets realized as maps} *)
-
-theory SetMap
-
-  use import map.Map
-  use import bool.Bool
-
-  type set 'a = map 'a bool
-
-  predicate mem (x:'a) (s:set 'a) = s[x] = True
-
-  constant empty : set 'a = const False
-
-  predicate is_empty (s : set 'a) = forall x : 'a. not (mem x s)
-
-  goal Empty_def1 : is_empty(empty : set 'a)
-
-  function add (x:'a) (s:set 'a) : set 'a = s[x <- True]
-
-  function remove (x:'a) (s:set 'a) : set 'a =  s[x <- False]
-
-  function union (set 'a) (set 'a) : set 'a
-
-  axiom Union_def :
-    forall s1 s2 : set 'a. forall x : 'a.
-    (union s1 s2)[x] = orb s1[x] s2[x]
-
-  function inter (set 'a) (set 'a) : set 'a
-
-  axiom Inter_def :
-    forall s1 s2 : set 'a. forall x : 'a.
-    (inter s1 s2)[x] = andb s1[x] s2[x]
-
-  function diff (set 'a) (set 'a) : set 'a
-
-  axiom Diff_def1 :
-    forall s1 s2 : set 'a. forall x : 'a.
-    (diff s1 s2)[x] = andb s1[x] (notb s2[x])
-
-  predicate equal(s1 s2 : set 'a) = forall x : 'a. s1[x] = s2[x]
-
-(* dubious axiom: extensionality should be postulated on maps instead
-  axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
-*)
-
-  predicate subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
-
-  function complement (set 'a) : set 'a
-
-  axiom Complement_def :
-    forall s : set 'a. forall x : 'a.
-    (complement s)[x] = notb s[x]
 
 end

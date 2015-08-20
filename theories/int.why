@@ -216,9 +216,11 @@ theory Exponentiation
   type t
   constant one : t
   function (*) t t : t
+
   clone export algebra.CommutativeMonoid
     with type t = t, constant unit = one, function op = (*)
 
+  (* TODO: implement with let rec once let cloning is done *)
   function power t int : t
 
   axiom Power_0 : forall x: t. power x 0 = one
@@ -233,7 +235,7 @@ theory Exponentiation
     power x (n+m) = power x n * power x m
 
   lemma Power_mult : forall x:t, n m : int. 0 <= n -> 0 <= m ->
-    power x (Int.( * ) n m) = power (power x n) m
+    power x (Int.(*) n m) = power (power x n) m
 
   lemma Power_mult2 : forall x y: t, n: int. 0 <= n ->
     power (x * y) n = power x n * power y n
@@ -257,8 +259,13 @@ theory Power
 
   use import Int
 
-  clone export Exponentiation with type t = int, constant one = one,
-    function (*) = (*), goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
+  (* TODO: remove once power is implemented in Exponentiation *)
+  val function power int int : int
+
+  clone export Exponentiation with
+    type t = int, constant one = one,
+    function (*) = (*), function power = power,
+    goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
 
   lemma Power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
@@ -274,20 +281,12 @@ theory NumOf
 
   use import Int
 
-  function numof (p: int -> bool) (a b: int) : int
   (** number of [n] such that [a <= n < b] and [p n] *)
-
-  axiom Numof_empty :
-    forall p: int -> bool, a b: int.
-    b <= a -> numof p a b = 0
-
-  axiom Numof_right_no_add :
-    forall p : int -> bool, a b : int.
-    a < b -> not (p (b-1)) -> numof p a b = numof p a (b-1)
-
-  axiom Numof_right_add :
-    forall p : int -> bool, a b : int.
-    a < b -> p (b-1) -> numof p a b = 1 + numof p a (b-1)
+  let rec function numof (p: int -> bool) (a b: int) : int
+    variant { b - a }
+  = if b <= a then 0 else
+    if p (b - 1) then 1 + numof p a (b - 1) else
+                          numof p a (b - 1)
 
   lemma Numof_bounds :
     forall p : int -> bool, a b : int. a < b -> 0 <= numof p a b <= b - a
@@ -351,39 +350,38 @@ theory Sum
 
   use import Int
 
-  function sum (a b: int) (f: int -> int) : int
-  (** sum of [f n] for [a <= n <= b] *)
-
-  axiom sum_def1:
-    forall f: int -> int, a b: int.
-    b < a -> sum a b f = 0
-
-  axiom sum_def2:
-    forall f: int -> int, a b: int.
-    a <= b -> sum a b f = sum a (b - 1) f + f b
+  (** sum of [f n] for [a <= n < b] *)
+  let rec function sum (f: int -> int) (a b: int) : int
+    variant { b - a }
+  = if b <= a then 0 else sum f a (b - 1) + f (b - 1)
 
   lemma sum_left:
     forall f: int -> int, a b: int.
-    a <= b -> sum a b f = f a + sum (a + 1) b f
+    a < b -> sum f a b = f a + sum f (a + 1) b
 
   lemma sum_ext:
     forall f g: int -> int, a b: int.
-    (forall i. a <= i <= b -> f i = g i) ->
-    sum a b f = sum a b g
+    (forall i. a <= i < b -> f i = g i) ->
+    sum f a b = sum g a b
 
   lemma sum_le:
     forall f g: int -> int, a b: int.
-    (forall i. a <= i <= b -> f i <= g i) ->
-    sum a b f <= sum a b g
+    (forall i. a <= i < b -> f i <= g i) ->
+    sum f a b <= sum g a b
+
+  lemma sum_zero:
+    forall f: int -> int, a b: int.
+    (forall i. a <= i < b -> f i = 0) ->
+    sum f a b = 0
 
   lemma sum_nonneg:
     forall f: int -> int, a b: int.
-    (forall i. a <= i <= b -> 0 <= f i) ->
-    0 <= sum a b f
+    (forall i. a <= i < b -> 0 <= f i) ->
+    0 <= sum f a b
 
   lemma sum_decomp:
     forall f: int -> int, a b c: int. a <= b <= c ->
-    sum a c f = sum a b f + sum (b+1) c f
+    sum f a c = sum f a b + sum f b c
 
 end
 

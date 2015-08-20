@@ -71,7 +71,6 @@ val pd_equ : pdecl
 val pd_bool : pdecl
 val pd_tuple : int -> pdecl
 val pd_func : pdecl
-val pd_pred : pdecl
 val pd_func_app : pdecl
 
 (** {2 Known identifiers} *)

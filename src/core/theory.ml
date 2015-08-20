@@ -815,7 +815,6 @@ let highord_theory =
   let uc = empty_theory (id_fresh "HighOrd") ["why3";"HighOrd"] in
   let uc = use_export uc bool_theory in
   let uc = add_ty_decl uc ts_func in
-  let uc = add_ty_decl uc ts_pred in
   let uc = add_param_decl uc fs_func_app in
   close_theory uc
 

@@ -302,7 +302,6 @@ let highord_module =
   let uc = empty_module None (id_fresh "HighOrd") ["why3";"HighOrd"] in
   let uc = use_export uc bool_module in
   let uc = add_pdecl uc pd_func in
-  let uc = add_pdecl uc pd_pred in
   let uc = add_pdecl uc pd_func_app in
   let m = close_module uc in
   { m with mod_theory = highord_theory }

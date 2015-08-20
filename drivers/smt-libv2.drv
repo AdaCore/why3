@@ -140,8 +140,15 @@ theory real.Truncate
 end
 *)
 
+theory HighOrd
+  syntax type     (->) "(Array %1 %2)"
+  meta "material_type_arg" type (->), 1
+
+  syntax function (@)  "(select %1 %2)"
+  meta "encoding : lskept" function (@)
+end
+
 theory map.Map
-  syntax type map "(Array %1 %2)"
   meta "encoding : lskept" function get
   meta "encoding : lskept" function set
   meta "encoding : lskept" function const

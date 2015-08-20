@@ -603,14 +603,13 @@ let its_int  = its_of_ts ts_int  true
 let its_real = its_of_ts ts_real true
 let its_bool = its_of_ts ts_bool true
 let its_func = its_of_ts ts_func true
-let its_pred = its_of_ts ts_pred true
 
 let ity_int  = ity_pur its_int  []
 let ity_real = ity_pur its_real []
 let ity_bool = ity_pur its_bool []
 
 let ity_func a b = ity_pur its_func [a;b]
-let ity_pred a   = ity_pur its_pred [a]
+let ity_pred a   = ity_pur its_func [a;ity_bool]
 
 let its_tuple = Hint.memo 17 (fun n -> its_of_ts (ts_tuple n) false)
 

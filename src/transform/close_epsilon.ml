@@ -15,8 +15,7 @@ open Term
 
 let is_func_ty t =
   match t.Ty.ty_node with
-  | Ty.Tyapp (s,_) ->
-      Ty.ts_equal s Ty.ts_func || Ty.ts_equal s Ty.ts_pred
+  | Ty.Tyapp (s,_) -> Ty.ts_equal s Ty.ts_func
   | _ -> false
 
 type lambda_match =

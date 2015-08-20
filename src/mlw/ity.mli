@@ -211,7 +211,6 @@ val its_real : itysymbol
 val its_bool : itysymbol
 val its_unit : itysymbol
 val its_func : itysymbol
-val its_pred : itysymbol
 
 val ity_int  : ity
 val ity_real : ity

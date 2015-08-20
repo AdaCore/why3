@@ -129,7 +129,6 @@ val ty_real : ty
 val ty_bool : ty
 
 val ts_func : tysymbol
-val ts_pred : tysymbol
 
 val ty_func : ty -> ty -> ty
 val ty_pred : ty -> ty (* ty_pred 'a == ty_func 'a bool *)

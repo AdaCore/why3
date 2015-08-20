@@ -168,9 +168,14 @@ theory algebra.AC
   remove prop Assoc
 end
 
-theory map.Map
-  syntax type  map "(%1,%2) farray"
+theory HighOrd
+  syntax type     (->) "(%1,%2) farray"
+  meta "material_type_arg" type (->), 1
 
+  syntax function (@)  "(%1[%2])"
+end
+
+theory map.Map
   syntax function get "(%1[%2])"
   syntax function set "(%1[%2 <- %3])"
 
