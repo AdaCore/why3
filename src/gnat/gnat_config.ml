@@ -24,12 +24,14 @@ type prover =
 
 let gnatprove_why3conf_file = "why3.conf"
 
+let builtin_provers = ["altergo"; "cvc4"; "z3"]
+
 let is_builtin_prover =
-  let builtin_provers =
-    Sstr.add "altergo" (Sstr.add "cvc4" Sstr.empty) in
+  let builtin_provers_set =
+    List.fold_left (fun acc x -> Sstr.add x acc) Sstr.empty builtin_provers in
   (fun s ->
     let s = String.lowercase s in
-    Sstr.mem s builtin_provers)
+    Sstr.mem s builtin_provers_set)
 
 let default_timeout = 1
 
