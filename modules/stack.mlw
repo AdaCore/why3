@@ -8,7 +8,7 @@ module Stack
   use import list.List
   use import list.Length as L
 
-  type t 'a model { mutable elts: list 'a }
+  type t 'a = abstract { mutable elts: list 'a }
 
   val create () : t 'a ensures { result.elts = Nil }
 

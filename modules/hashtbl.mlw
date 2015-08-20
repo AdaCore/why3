@@ -14,7 +14,7 @@ module Hashtbl
 
   type key
 
-  type t 'a model { mutable contents: map key (list 'a) }
+  type t 'a = abstract { mutable contents: map key (list 'a) }
 
   function ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
 

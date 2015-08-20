@@ -1,4 +1,3 @@
-
 (** {1 Characters and Strings} *)
 
 (** {2 Characters} *)
@@ -7,33 +6,31 @@ module Char
 
   use import int.Int
 
-  type char model { code : int }
+  type char = private { code : int }
+    invariant { 0 <= code <= 255 }
 
-  function uppercase char : char
-  function lowercase char : char
+  val function uppercase char : char
+  val function lowercase char : char
 
   axiom uppercase_alpha:
-    forall c:int. 97 <= c <= 122 ->
-      uppercase { code = c } = { code = c - 32 }
+    forall c:char. 97 <= c.code <= 122 ->
+      (uppercase c).code = c.code - 32
 
   axiom uppercase_other:
-    forall c:int. 0 <= c < 97 \/ 122 < c <= 127 ->
-      uppercase { code = c } = { code = c }
+    forall c:char. 0 <= c.code < 97 \/ 122 < c.code <= 127 ->
+      (uppercase c).code = c.code
 
   axiom lowercase_alpha:
-    forall c:int. 65 <= c <= 90 ->
-      lowercase { code = c } = { code = c + 32 }
+    forall c:char. 65 <= c.code <= 90 ->
+      (lowercase c).code = c.code + 32
 
   axiom lowercase_other:
-    forall c:int. 0 <= c < 65 \/ 90 < c <= 127 ->
-      lowercase { code = c } = { code = c }
+    forall c:char. 0 <= c.code < 65 \/ 90 < c.code <= 127 ->
+      (lowercase c).code = c.code
 
   val chr (x:int) : char
     requires { 0 <= x <= 255 }
-    ensures  { result = { code = x } }
-
-  val code (c:char) : int
-    ensures  { result = c.code /\ 0 <= c.code <= 255 }
+    ensures  { result.code = x }
 
   (*** TODO
      - compare ?
@@ -49,14 +46,16 @@ module String
   use import Char
   use import map.Map as M
 
-  type string model { length: int; mutable chars: map int char }
-    invariant { self.length >= 0 }
+  type string = private {
+    mutable ghost chars: map int char;
+                 length: int
+  } invariant { length >= 0 }
 
   val create (len:int) : string
     requires { len >= 0 } ensures { length result = len }
 
-  function ([]) (s: string) (i :int) : char = M.([]) s.chars i
-  function get (s: string) (i :int) : char = M.([]) s.chars i
+  function ([]) (s: string) (i: int) : char = M.([]) s.chars i
+  function get  (s: string) (i: int) : char = M.([]) s.chars i
 
   val make (len:int) (c:char) : string
     requires { len >= 0 }
@@ -71,12 +70,10 @@ module String
 
   val set (s:string) (i:int) (v:char) : unit writes {s}
     requires { 0 <= i < length s }
-    ensures  { s.chars = (old s.chars)[i <- v] }
+    ensures  { s.chars = old s.chars[i <- v] }
 
   val unsafe_set (s:string) (i:int) (v:char) : unit writes {s}
-    ensures { s.chars = (old s.chars)[i <- v] }
-
-  val length (s:string) : int ensures { result = length s }
+    ensures { s.chars = old s.chars[i <- v] }
 
   val copy (s:string) : string
     ensures { length result = length s }
@@ -114,8 +111,10 @@ module Buffer
   use import String as S
   use import map.Map as M
 
-  type t model { mutable length: int; mutable contents: map int char }
-    invariant { self.length >= 0 }
+  type t = private {
+    ghost mutable  chars: map int char;
+          mutable length: int
+  } invariant { length >= 0 }
 
   val create (size:int) : t
     requires { size >= 0 } ensures { result.length = 0 }
@@ -127,15 +126,15 @@ module Buffer
   val add_char (b:t) (c:char) : unit writes {b}
     ensures { length b = old (length b) + 1 }
     ensures { forall i: int.
-      0 <= i < length b -> b.contents[i] = (old b.contents)[i] }
-    ensures { b.contents[length b - 1] = c }
+      0 <= i < length b -> b.chars[i] = old b.chars[i] }
+    ensures { b.chars[length b - 1] = c }
 
   val add_string (b:t) (s:string) : unit writes {b}
     ensures { length b = old (length b) + S.length s }
     ensures { forall i: int.
-      0 <= i < old (length b) -> b.contents[i] = (old b.contents)[i] }
+      0 <= i < old (length b) -> b.chars[i] = old b.chars[i] }
     ensures { forall i: int.
-      0 <= i < S.length s -> b.contents[old (length b) + i] = S.get s i }
+      0 <= i < S.length s -> b.chars[old (length b) + i] = S.get s i }
 
   (*** TODO
      - add_substring

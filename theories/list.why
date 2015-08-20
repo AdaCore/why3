@@ -16,7 +16,7 @@ theory Length
   use import int.Int
   use import List
 
-  function length (l: list 'a) : int =
+  let rec function length (l: list 'a) : int variant {l} =
     match l with
     | Nil      -> 0
     | Cons _ r -> 1 + length r
@@ -65,10 +65,11 @@ theory Nth
   use import option.Option
   use import int.Int
 
-  function nth (n: int) (l: list 'a) : option 'a = match l with
+  let rec function nth (n: int) (l: list 'a) : option 'a variant {l} =
+    match l with
     | Nil      -> None
     | Cons x r -> if n = 0 then Some x else nth (n - 1) r
-  end
+    end
 
 end
 
@@ -111,12 +112,12 @@ theory HdTl
   use import List
   use import option.Option
 
-  function hd (l: list 'a) : option 'a = match l with
+  let function hd (l: list 'a) : option 'a = match l with
     | Nil      -> None
     | Cons h _ -> Some h
   end
 
-  function tl (l: list 'a) : option (list 'a) = match l with
+  let function tl (l: list 'a) : option (list 'a) = match l with
     | Nil      -> None
     | Cons _ t -> Some t
   end
@@ -162,10 +163,11 @@ theory Append
 
   use import List
 
-  function (++) (l1 l2: list 'a) : list 'a = match l1 with
+  let rec function (++) (l1 l2: list 'a) : list 'a variant {l1} =
+    match l1 with
     | Nil -> l2
     | Cons x1 r1 -> Cons x1 (r1 ++ l2)
-  end
+    end
 
   lemma Append_assoc:
     forall l1 "induction" l2 l3: list 'a.
@@ -216,10 +218,11 @@ theory Reverse
   use import List
   use import Append
 
-  function reverse (l: list 'a) : list 'a = match l with
+  let rec function reverse (l: list 'a) : list 'a variant {l} =
+    match l with
     | Nil      -> Nil
     | Cons x r -> reverse r ++ Cons x Nil
-  end
+    end
 
   lemma reverse_append:
     forall l1 l2: list 'a, x: 'a.
@@ -255,7 +258,7 @@ theory RevAppend
 
   use import List
 
-  function rev_append (s t: list 'a) : list 'a =
+  let rec function rev_append (s t: list 'a) : list 'a variant {s} =
     match s with
     | Cons x r -> rev_append r (Cons x t)
     | Nil -> t
@@ -266,8 +269,6 @@ theory RevAppend
   lemma rev_append_append_l:
     forall r "induction" s t: list 'a.
       rev_append (r ++ s) t = rev_append s (rev_append r t)
-
-
 
   use import int.Int
   use import Length
@@ -281,7 +282,6 @@ theory RevAppend
   lemma rev_append_def:
     forall r "induction" s: list 'a. rev_append r s = reverse r ++ s
 
-
   lemma rev_append_append_r:
     forall r s t: list 'a.
       rev_append r (s ++ t) = rev_append (rev_append s r) t
@@ -294,8 +294,9 @@ theory Combine
 
   use import List
 
-  function combine (x: list 'a) (y: list 'b) : list ('a, 'b) =
-    match x, y with
+  let rec function combine (x: list 'a) (y: list 'b) : list ('a, 'b)
+    variant {x}
+  = match x, y with
     | Cons x0 x, Cons y0 y -> Cons (x0, y0) (combine x y)
     | _ -> Nil
     end
@@ -495,7 +496,7 @@ theory Prefix
   use import List
   use import int.Int
 
-  function prefix (n: int) (l: list 'a) : list 'a =
+  let rec function prefix (n: int) (l: list 'a) : list 'a variant {l} =
     if n <= 0 then Nil else
     match l with
     | Nil -> Nil
@@ -509,10 +510,11 @@ theory Sum
   use import List
   use import int.Int
 
-  function sum (l: list int) : int = match l with
-  | Nil -> 0
-  | Cons x r -> x + sum r
-  end
+  let rec function sum (l: list int) : int variant {l} =
+    match l with
+    | Nil -> 0
+    | Cons x r -> x + sum r
+    end
 
 end
 

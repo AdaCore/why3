@@ -128,8 +128,6 @@ theory Seq
 
   (** sequence comprehension *)
 
-  use HighOrd
-
   function create (len: int) (f: int -> 'a) : seq 'a
 
   axiom create_length:
@@ -231,12 +229,11 @@ end
 theory Occ
 
   use import int.Int
-  use  int.NumOf as N
-  use import HighOrd
+  use int.NumOf as N
   use import Seq
 
   function occ (x: 'a) (s: seq 'a) (l u: int) : int =
-    N.numof (\ i. s[i] = x) l u
+    N.numof (fun i -> s[i] = x) l u
 
   (* TODO: lemmas for cons, snoc, etc. *)
 

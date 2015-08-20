@@ -13,12 +13,24 @@ theory Int
   constant zero : int = 0
   constant one  : int = 1
 
-  predicate (< ) int int
-  predicate (> ) (x y : int) = y < x
-  predicate (<=) (x y : int) = x < y \/ x = y
+  val (=) (x y : int) : bool ensures { result <-> x = y }
 
-  clone export algebra.OrderedUnitaryCommutativeRing with type t = int,
-    constant zero = zero, constant one = one, predicate (<=) = (<=)
+  val function  (-_) int : int
+  val function  (+)  int int : int
+  val function  (*)  int int : int
+  val predicate (<)  int int : bool
+
+  let function  (-)  (x y : int) = x + -y
+  let predicate (>)  (x y : int) = y < x
+  let predicate (<=) (x y : int) = x < y || x = y
+  let predicate (>=) (x y : int) = y <= x
+
+  clone export algebra.OrderedUnitaryCommutativeRing with
+    type t = int, constant zero = zero, constant one = one,
+    function (-_) = (-_), function (+) = (+),
+    function (*) = (*), predicate (<=) = (<=),
+    lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
+    lemma NonTrivialRing, lemma ZeroLessOne
 
 end
 
@@ -28,7 +40,7 @@ theory Abs
 
   use import Int
 
-  function abs (x:int) : int = if x >= 0 then x else -x
+  let function abs (x:int) : int = if x >= 0 then x else -x
 
   lemma Abs_le: forall x y:int. abs x <= y <-> -y <= x <= y
 
@@ -46,10 +58,8 @@ theory MinMax
 
   use import Int
   clone export relations.MinMax with type t = int, predicate le = (<=),
-    goal TotalOrder.Refl,
-    goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm,
-    goal TotalOrder.Total
+    goal TotalOrder.Refl, goal TotalOrder.Trans,
+    goal TotalOrder.Antisymm, goal TotalOrder.Total
 
 end
 
@@ -78,12 +88,11 @@ rounds up when divisor is negative.
 
 theory EuclideanDivision
 
-
   use import Int
   use import Abs
 
-  function div int int : int
-  function mod int int : int
+  val function div (x y: int) : int
+  val function mod (x y: int) : int
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
@@ -153,8 +162,8 @@ theory ComputerDivision
   use import Int
   use import Abs
 
-  function div int int : int
-  function mod int int : int
+  val function div (x y: int) : int
+  val function mod (x y: int) : int
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
@@ -207,7 +216,7 @@ theory Exponentiation
   type t
   constant one : t
   function (*) t t : t
-  clone algebra.CommutativeMonoid
+  clone export algebra.CommutativeMonoid
     with type t = t, constant unit = one, function op = (*)
 
   function power t int : t
@@ -249,9 +258,7 @@ theory Power
   use import Int
 
   clone export Exponentiation with type t = int, constant one = one,
-    function (*) = (*), goal CommutativeMonoid.Assoc,
-    goal CommutativeMonoid.Unit_def_l, goal CommutativeMonoid.Unit_def_r,
-    goal CommutativeMonoid.Comm.Comm
+    function (*) = (*), goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
 
   lemma Power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
@@ -266,8 +273,6 @@ end
 theory NumOf
 
   use import Int
-  use HighOrd
-  use import Bool
 
   function numof (p: int -> bool) (a b: int) : int
   (** number of [n] such that [a <= n < b] and [p n] *)
@@ -279,6 +284,7 @@ theory NumOf
   axiom Numof_right_no_add :
     forall p : int -> bool, a b : int.
     a < b -> not (p (b-1)) -> numof p a b = numof p a (b-1)
+
   axiom Numof_right_add :
     forall p : int -> bool, a b : int.
     a < b -> p (b-1) -> numof p a b = 1 + numof p a (b-1)
@@ -344,7 +350,6 @@ end
 theory Sum
 
   use import Int
-  use HighOrd
 
   function sum (a b: int) (f: int -> int) : int
   (** sum of [f n] for [a <= n <= b] *)
@@ -439,7 +444,7 @@ theory IntInf
 
   type t = Finite int | Infinite
 
-  function add (x: t) (y: t) : t =
+  let function add (x: t) (y: t) : t =
     match x with
       | Infinite -> Infinite
       | Finite x ->
@@ -449,7 +454,14 @@ theory IntInf
         end
     end
 
-  predicate lt (x y: t) =
+  let predicate eq (x y: t) =
+    match x, y with
+      | Infinite, Infinite -> true
+      | Finite x, Finite y -> x = y
+      | _, _ -> false
+    end
+
+  let predicate lt (x y: t) =
     match x with
       | Infinite -> false
       | Finite x ->
@@ -459,7 +471,7 @@ theory IntInf
         end
     end
 
-  predicate le (x y: t) = lt x y \/ x = y
+  let predicate le (x y: t) = lt x y || eq x y
 
   clone export relations.TotalOrder with type t = t, predicate rel = le,
     lemma Refl, lemma Antisymm, lemma Trans, lemma Total

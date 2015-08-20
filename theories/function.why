@@ -27,6 +27,7 @@ end
 theory Bijective
 
   clone export Injective
-  clone Surjective as S with namespace . = .
+  clone Surjective as S with type v = v, type a = a,
+    function to_ = to_, function from = from
 
 end

@@ -16,9 +16,12 @@ theory Real
   predicate (< ) real real
   predicate (> ) (x y : real) = y < x
   predicate (<=) (x y : real) = x < y \/ x = y
+  predicate (>=) (x y : real) = y <= x
 
   clone export algebra.OrderedField with type t = real,
-    constant zero = zero, constant one = one, predicate (<=) = (<=)
+    constant zero = zero, constant one = one, predicate (<=) = (<=),
+    lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
+    lemma NonTrivialRing, lemma ZeroLessOne
 
 (***
   lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
@@ -82,10 +85,8 @@ theory MinMax
 
   use import Real
   clone export relations.MinMax with type t = real, predicate le = (<=),
-    goal TotalOrder.Refl,
-    goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm,
-    goal TotalOrder.Total
+    goal TotalOrder.Refl, goal TotalOrder.Trans,
+    goal TotalOrder.Antisymm, goal TotalOrder.Total
 
 end
 
@@ -234,8 +235,7 @@ theory PowerInt
 
   clone export int.Exponentiation with
     type t = real, constant one = Real.one, function (*) = Real.(*),
-    goal CommutativeMonoid.Assoc, goal CommutativeMonoid.Unit_def_l,
-    goal CommutativeMonoid.Unit_def_r, goal CommutativeMonoid.Comm.Comm
+    goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
 
   lemma Pow_ge_one:
     forall x:real, n:int. 0 <= n /\ 1.0 <=. x -> 1.0 <=. power x n

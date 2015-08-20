@@ -112,25 +112,24 @@ end
 theory SetComprehension
 
   use export Set
-  use HighOrd as HO
 
   (** { x | p x } *)
-  function comprehension (p: HO.pred 'a) : set 'a
+  function comprehension (p: 'a -> bool) : set 'a
 
   axiom comprehension_def:
-    forall p: HO.pred 'a.
+    forall p: 'a -> bool.
     forall x: 'a. mem x (comprehension p) <-> p x
 
   (** { x | x in U and p(x) } *)
-  function filter (p: HO.pred 'a) (u: set 'a) : set 'a =
-    comprehension (\ x: 'a. p x /\ mem x u)
+  function filter (p: 'a -> bool) (u: set 'a) : set 'a =
+    comprehension (fun (x: 'a) -> p x /\ mem x u)
 
   (** { f x | x in U } *)
-  function map (f: HO.func 'a 'b) (u: set 'a) : set 'b =
-    comprehension (\ y: 'b. exists x: 'a. mem x u /\ y = f x)
+  function map (f: 'a  -> 'b) (u: set 'a) : set 'b =
+    comprehension (fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x)
 
   lemma map_def:
-    forall f: HO.func 'a 'b, u: set 'a.
+    forall f: 'a -> 'b, u: set 'a.
     forall x: 'a. mem x u -> mem (f x) (map f u)
 
 end
@@ -172,31 +171,30 @@ theory FsetComprehension
 
   use export Fset
   use import int.Int
-  use HighOrd as HO
 
   (** { x | x in U and p(x) } *)
-  function filter (p: HO.pred 'a) (u: set 'a) : set 'a
+  function filter (p: 'a -> bool) (u: set 'a) : set 'a
 
   axiom filter_def:
-    forall p: HO.pred 'a, u: set 'a.
+    forall p: 'a -> bool, u: set 'a.
     forall x: 'a. mem x (filter p u) <-> (p x /\ mem x u)
 
   lemma filter_cardinal:
-    forall p: HO.pred 'a, u: set 'a. cardinal (filter p u) <= cardinal u
+    forall p: 'a -> bool, u: set 'a. cardinal (filter p u) <= cardinal u
 
   (** { f x | x in U } *)
-  function map (f: HO.func 'a 'b) (u: set 'a) : set 'b
+  function map (f: 'a -> 'b) (u: set 'a) : set 'b
 
   axiom map_def:
-    forall f: HO.func 'a 'b, u: set 'a.
+    forall f: 'a -> 'b, u: set 'a.
     forall y: 'b. mem y (map f u) <-> (exists x: 'a. mem x u /\ y = f x)
 
   lemma map_def1:
-    forall f: HO.func 'a 'b, u: set 'a.
+    forall f: 'a -> 'b, u: set 'a.
     forall x: 'a. mem x u -> mem (f x) (map f u)
 
   lemma map_cardinal:
-    forall f: HO.func 'a 'b, u: set 'a. cardinal (map f u) <= cardinal u
+    forall f: 'a -> 'b, u: set 'a. cardinal (map f u) <= cardinal u
 
 end
 
