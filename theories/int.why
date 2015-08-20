@@ -393,26 +393,10 @@ theory Fact
 
   use import Int
 
-  function fact int : int
-
-  axiom fact0: fact 0 = 1
-  axiom factn: forall n:int. n >= 1 -> fact n = n * fact (n-1)
-
-(* in the new system it will be:
-
-  let rec function fact (n:int) : int =
+  let rec function fact (n: int) : int
     requires { n >= 0 }
     variant  { n }
   = if n = 0 then 1 else n * fact (n-1)
-
- with the semantics
-
- function fact int : int
- axiom fact_def : \forall n:int [fact n].
-   n >= 0 -> fact n = if n = 0 then 1 else n * fact (n-1)
-
-*)
-
 
 end
 
@@ -422,17 +406,15 @@ theory Iter
 
   use import Int
 
-  type t
-  function f t : t
-
-  function iter int t : t
   (** [iter k x] is [f^k(x)] *)
+  let rec function iter (f: 'a -> 'a) (k: int) (x: 'a) : 'a
+    requires { k >= 0 }
+    variant  { k }
+  = if k = 0 then x else iter f (k - 1) (f x)
 
-  axiom iter_0: forall x: t. iter 0 x = x
-  axiom iter_s: forall k: int, x: t. 0 < k -> iter k x = iter (k-1) (f x)
+  lemma iter_1: forall f, x: 'a. iter f 1 x = f x
 
-  lemma iter_1: forall x: t. iter 1 x = f x
-  lemma iter_s2: forall k: int, x: t. 0 < k -> iter k x = f (iter (k-1) x)
+  lemma iter_s: forall f, k, x: 'a. 0 < k -> iter f k x = f (iter f (k - 1) x)
 
 end
 
@@ -523,10 +505,11 @@ theory Fibonacci "Fibonacci numbers"
 
   use import Int
 
-  function fib int : int
-
-  axiom fib0: fib 0 = 0
-  axiom fib1: fib 1 = 1
-  axiom fibn: forall n:int. n >= 2 -> fib n = fib (n-1) + fib (n-2)
+  let rec function fib (n: int) : int
+    requires { n >= 0 }
+    variant  { n }
+  = if n = 0 then 0 else
+    if n = 1 then 1 else
+    fib (n-1) + fib (n-2)
 
 end
