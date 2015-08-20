@@ -318,8 +318,10 @@ let unit_module =
   let uc = empty_module None (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  let uc = add_pdecl uc (create_type_decl [td]) in
-  close_module uc
+  let pd = create_type_decl [td] in
+  let uc = add_pdecl uc pd in
+  let th = List.fold_left add_decl uc.muc_theory pd.pd_pure in
+  close_module { uc with muc_theory = th }
 
 let create_module env ?(path=[]) n =
   let m = empty_module (Some env) n path in
