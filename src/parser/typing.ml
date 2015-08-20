@@ -812,7 +812,7 @@ let add_types muc tdl =
               let oms, pjl = Lists.map_fold_left get_pj Sstr.empty pjl in
               (create_user_id id, pjl) :: List.map (get_cs oms) csl
           | [] -> assert false in
-        if not (Hstr.mem htd x) then
+(*      if not (Hstr.mem htd x) then *)
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
             Hstr.add htd x (create_rec_variant_decl s csl)
@@ -832,7 +832,7 @@ let add_types muc tdl =
           let ghost = d.td_vis = Abstract || fd.f_ghost in
           nms, (fd.f_mutable, create_pvsymbol id ~ghost ity) in
         let _,fl = Lists.map_fold_left get_fd Sstr.empty fl in
-        if not (Hstr.mem htd x) then
+(*      if not (Hstr.mem htd x) then *)
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
             if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
@@ -865,7 +865,7 @@ let add_types muc tdl =
                 let id, args = Mstr.find x alg in
                 let s = create_itysymbol_pure id args in
                 Hstr.add hts x s;
-                visit ~alias ~alg x (Mstr.find x def);
+(*              visit ~alias ~alg x (Mstr.find x def); *)
                 s
             | Qident {id_str = x} when Mstr.mem x def ->
                 visit ~alias ~alg x (Mstr.find x def);
