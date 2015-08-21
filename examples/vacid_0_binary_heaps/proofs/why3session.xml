@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="0"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="3" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Spass" version="3.7" timelimit="10" memlimit="0"/>
@@ -14,11 +15,10 @@
 <prover id="15" name="Z3" version="4.3.2" timelimit="3" memlimit="1000"/>
 <prover id="16" name="Alt-Ergo" version="0.99.1" timelimit="3" memlimit="1000"/>
 <prover id="17" name="Eprover" version="1.8-001" timelimit="10" memlimit="0"/>
-<prover id="18" name="Coq" version="8.4pl6" timelimit="5" memlimit="0"/>
 <file name="../heapsort.mlw">
 <theory name="HeapSort" sum="0011415fa841e7181538a01d09bd9faf">
  <goal name="Min_of_sorted">
- <proof prover="18" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.47"/></proof>
+ <proof prover="0" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.11"/></proof>
  </goal>
  <goal name="WP_parameter heapSort" expl="VC for heapSort">
  <transf name="split_goal_wp">
@@ -154,7 +154,7 @@
   </goal>
   <goal name="WP_parameter heapSort.19" expl="19. assertion">
   <proof prover="5" timelimit="30"><result status="valid" time="0.05"/></proof>
-  <proof prover="13"><result status="valid" time="3.34" steps="219"/></proof>
+  <proof prover="13"><result status="valid" time="2.39" steps="219"/></proof>
   </goal>
   <goal name="WP_parameter heapSort.20" expl="20. loop invariant preservation">
   <transf name="split_goal_wp">
@@ -231,7 +231,7 @@
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="Child_parent">
- <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="2.20"/></proof>
+ <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="1.81"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.00"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.08" steps="20"/></proof>
@@ -260,13 +260,13 @@
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="Is_heap_when_node_modified">
- <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="3.96"/></proof>
+ <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="2.05"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.05"/></proof>
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.14" steps="92"/></proof>
  </goal>
  <goal name="Is_heap_add_last">
- <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.33"/></proof>
+ <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.19"/></proof>
  <proof prover="10" timelimit="17" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -278,19 +278,19 @@
  <goal name="Left_sup_el">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.01"/></proof>
- <proof prover="14" timelimit="14" memlimit="0"><result status="valid" time="0.49"/></proof>
+ <proof prover="14" timelimit="14" memlimit="0"><result status="valid" time="0.30"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="Right_sup_el">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.01"/></proof>
- <proof prover="14" timelimit="14" memlimit="0"><result status="valid" time="0.68"/></proof>
+ <proof prover="14" timelimit="14" memlimit="0"><result status="valid" time="0.31"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="Is_heap_relation">
- <proof prover="18" edited="heap_Heap_Is_heap_relation_1.v"><result status="valid" time="1.57"/></proof>
+ <proof prover="0" edited="heap_Heap_Is_heap_relation_1.v"><result status="valid" time="0.86"/></proof>
  </goal>
 </theory>
 </file>
@@ -322,7 +322,7 @@
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   <proof prover="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   <proof prover="12"><result status="valid" time="0.00"/></proof>
-  <proof prover="14" timelimit="13" memlimit="0"><result status="valid" time="2.79"/></proof>
+  <proof prover="14" timelimit="13" memlimit="0"><result status="valid" time="1.73"/></proof>
   <proof prover="15" memlimit="0"><result status="valid" time="0.00"/></proof>
   <proof prover="16" memlimit="0"><result status="valid" time="0.01" steps="0"/></proof>
   </goal>
@@ -394,26 +394,26 @@
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Elements_union">
- <proof prover="18" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="1.35"/></proof>
+ <proof prover="0" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.92"/></proof>
  </goal>
  <goal name="Elements_add1">
+ <proof prover="0" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.86"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.00"/></proof>
- <proof prover="18" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="1.14"/></proof>
  </goal>
  <goal name="Elements_remove_last">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="15" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
- <proof prover="17" timelimit="12"><result status="valid" time="0.50"/></proof>
+ <proof prover="17" timelimit="12"><result status="valid" time="0.25"/></proof>
  </goal>
  <goal name="Occ_elements">
- <proof prover="18" timelimit="3" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="1.64"/></proof>
+ <proof prover="0" timelimit="3" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.93"/></proof>
  </goal>
  <goal name="Elements_set_outside">
- <proof prover="18" timelimit="30" edited="elements_Elements_Elements_set_outside_1.v"><result status="valid" time="2.01"/></proof>
+ <proof prover="0" timelimit="30" edited="elements_Elements_Elements_set_outside_1.v"><result status="valid" time="1.09"/></proof>
  </goal>
  <goal name="Elements_set_inside">
- <proof prover="18" timelimit="30" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="1.69"/></proof>
+ <proof prover="0" timelimit="30" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="1.01"/></proof>
  </goal>
  <goal name="Elements_set_inside2">
  <proof prover="15" memlimit="0"><result status="valid" time="0.06"/></proof>
@@ -424,7 +424,7 @@
 <file name="../heap_implem.mlw">
 <theory name="Implementation" sum="cef03ce8ce6cd46a4f64086c14b1969e">
  <goal name="Is_heap_min">
- <proof prover="18" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.98"/></proof>
+ <proof prover="0" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -444,8 +444,8 @@
   <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.05" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter insert.2" expl="2. assertion">
-  <proof prover="2" timelimit="25"><result status="valid" time="9.69"/></proof>
-  <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="1.68" steps="211"/></proof>
+  <proof prover="2" timelimit="25"><result status="valid" time="5.56"/></proof>
+  <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="1.08" steps="212"/></proof>
   </goal>
   <goal name="WP_parameter insert.3" expl="3. assertion">
   <proof prover="10" memlimit="0"><result status="valid" time="0.03"/></proof>
@@ -493,7 +493,7 @@
    <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.05" steps="47"/></proof>
    </goal>
    <goal name="WP_parameter insert.5.5" expl="5. VC for insert">
-   <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="3.00" steps="260"/></proof>
+   <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="1.39" steps="260"/></proof>
    </goal>
    <goal name="WP_parameter insert.5.6" expl="6. VC for insert">
    <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -522,7 +522,7 @@
   <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter insert.8" expl="8. assertion">
-  <proof prover="2" memlimit="0"><result status="valid" time="0.52"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.18"/></proof>
   <proof prover="10" memlimit="0"><result status="valid" time="0.03"/></proof>
   <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.04"/></proof>
   <proof prover="16" memlimit="0"><result status="valid" time="0.02" steps="15"/></proof>
@@ -530,7 +530,7 @@
   <goal name="WP_parameter insert.9" expl="9. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter insert.9.1" expl="1. VC for insert">
-   <proof prover="2" timelimit="15"><result status="valid" time="0.45"/></proof>
+   <proof prover="2" timelimit="15"><result status="valid" time="0.21"/></proof>
    <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.08" steps="95"/></proof>
    </goal>
    <goal name="WP_parameter insert.9.2" expl="2. VC for insert">
@@ -552,7 +552,7 @@
   <proof prover="16" timelimit="30" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.2" expl="2. assertion">
-  <proof prover="18" timelimit="3" edited="heap_implem_WP_Implementation_WP_parameter_extractMin_3.v"><result status="valid" time="1.15"/></proof>
+  <proof prover="0" timelimit="3" edited="heap_implem_WP_Implementation_WP_parameter_extractMin_3.v"><result status="valid" time="1.15"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.3" expl="3. loop invariant init">
   <transf name="split_goal_wp">
@@ -634,7 +634,7 @@
   <proof prover="16" timelimit="30" memlimit="0"><result status="valid" time="0.06" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.11" expl="11. assertion">
-  <proof prover="2" memlimit="0"><result status="valid" time="0.25"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.09"/></proof>
   <proof prover="15" memlimit="0"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.12" expl="12. postcondition">
@@ -651,9 +651,9 @@
    <proof prover="17"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.12.3" expl="3. VC for extractMin">
-   <proof prover="2" timelimit="5"><result status="valid" time="0.29"/></proof>
+   <proof prover="2" timelimit="5"><result status="valid" time="0.13"/></proof>
    <proof prover="10" memlimit="0"><result status="valid" time="0.26"/></proof>
-   <proof prover="14" timelimit="15"><result status="valid" time="2.02"/></proof>
+   <proof prover="14" timelimit="15"><result status="valid" time="1.04"/></proof>
    </goal>
   </transf>
   </goal>
@@ -700,7 +700,7 @@
    <proof prover="17"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.14.3" expl="3. VC for extractMin">
-   <proof prover="2" timelimit="52" memlimit="0"><result status="valid" time="42.04"/></proof>
+   <proof prover="2" timelimit="52" memlimit="0"><result status="valid" time="18.85"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.14.4" expl="4. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -750,7 +750,7 @@
    </goal>
    <goal name="WP_parameter extractMin.19.3" expl="3. VC for extractMin">
    <proof prover="2" timelimit="5"><result status="valid" time="0.15"/></proof>
-   <proof prover="14"><result status="valid" time="1.50"/></proof>
+   <proof prover="14"><result status="valid" time="0.79"/></proof>
    </goal>
   </transf>
   </goal>
@@ -779,7 +779,7 @@
    <proof prover="17"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.21.3" expl="3. VC for extractMin">
-   <proof prover="2" timelimit="60" memlimit="0"><result status="valid" time="42.70"/></proof>
+   <proof prover="2" timelimit="60" memlimit="0"><result status="valid" time="19.51"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.21.4" expl="4. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -795,7 +795,7 @@
    <goal name="WP_parameter extractMin.21.6" expl="6. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
    <proof prover="10" memlimit="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="16" memlimit="0"><result status="valid" time="0.45" steps="53"/></proof>
+   <proof prover="16" memlimit="0"><result status="valid" time="0.19" steps="53"/></proof>
    </goal>
   </transf>
   </goal>
@@ -809,7 +809,7 @@
   <proof prover="16" timelimit="30" memlimit="0"><result status="valid" time="0.12" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.24" expl="24. assertion">
-  <proof prover="2" memlimit="0"><result status="valid" time="0.19"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.07"/></proof>
   <proof prover="10" memlimit="0"><result status="valid" time="0.03"/></proof>
   <proof prover="16" timelimit="30" memlimit="0"><result status="valid" time="0.04" steps="20"/></proof>
   </goal>
@@ -828,7 +828,7 @@
    </goal>
    <goal name="WP_parameter extractMin.26.3" expl="3. VC for extractMin">
    <proof prover="2" timelimit="15"><result status="valid" time="0.20"/></proof>
-   <proof prover="10" timelimit="15"><result status="valid" time="0.29"/></proof>
+   <proof prover="10" timelimit="15"><result status="valid" time="0.11"/></proof>
    </goal>
   </transf>
   </goal>
@@ -885,7 +885,7 @@
    <proof prover="17"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.28.3" expl="3. VC for extractMin">
-   <proof prover="2" timelimit="300"><result status="valid" time="34.97"/></proof>
+   <proof prover="2" timelimit="300"><result status="valid" time="16.78"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.28.4" expl="4. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
@@ -900,7 +900,7 @@
    <goal name="WP_parameter extractMin.28.6" expl="6. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.06"/></proof>
    <proof prover="10" memlimit="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="16" memlimit="0"><result status="valid" time="0.42" steps="51"/></proof>
+   <proof prover="16" memlimit="0"><result status="valid" time="0.18" steps="51"/></proof>
    </goal>
   </transf>
   </goal>
@@ -984,7 +984,7 @@
 <theory name="Model" sum="07a651016419eb767b00d90c6a315f31">
  <goal name="Model_empty">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.03"/></proof>
- <proof prover="7"><result status="valid" time="4.00"/></proof>
+ <proof prover="7"><result status="valid" time="2.33"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="14" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -993,7 +993,7 @@
  </goal>
  <goal name="Model_singleton">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
- <proof prover="7"><result status="valid" time="1.58"/></proof>
+ <proof prover="7"><result status="valid" time="0.74"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.03"/></proof>
  <proof prover="14" timelimit="10" memlimit="0"><result status="valid" time="0.25"/></proof>
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -1001,7 +1001,7 @@
  <proof prover="17" timelimit="18"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="Model_set">
- <proof prover="18" edited="heap_model_Model_Model_set_1.v"><result status="valid" time="1.81"/></proof>
+ <proof prover="0" edited="heap_model_Model_Model_set_1.v"><result status="valid" time="1.02"/></proof>
  </goal>
  <goal name="Model_add_last">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>

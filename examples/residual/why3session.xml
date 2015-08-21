@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.4pl6" timelimit="5" memlimit="1000"/>
 <file name="../residual.mlw" expanded="true">
 <theory name="Residuals" sum="73f85796368c2abe6fb49b99a77ed47b" expanded="true">
  <goal name="WP_parameter accepts_epsilon" expl="VC for accepts_epsilon">
@@ -58,7 +58,7 @@
  </transf>
  </goal>
  <goal name="inversion_mem_star_gen" expanded="true">
- <proof prover="5" edited="residual_Residuals_inversion_mem_star_gen_1.v"><result status="valid" time="0.85"/></proof>
+ <proof prover="0" edited="residual_Residuals_inversion_mem_star_gen_1.v"><result status="valid" time="0.85"/></proof>
  </goal>
  <goal name="inversion_mem_star">
  <proof prover="4"><result status="valid" time="0.02" steps="106"/></proof>
@@ -106,7 +106,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="59"/></proof>
   </goal>
   <goal name="WP_parameter residual.9" expl="9. postcondition" expanded="true">
-  <proof prover="5" edited="residual_Residuals_WP_parameter_residual_1.v"><result status="valid" time="1.14"/></proof>
+  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_1.v"><result status="valid" time="1.14"/></proof>
   </goal>
   <goal name="WP_parameter residual.10" expl="10. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -115,16 +115,16 @@
   <proof prover="4"><result status="valid" time="0.01" steps="59"/></proof>
   </goal>
   <goal name="WP_parameter residual.11" expl="11. postcondition" expanded="true">
-  <proof prover="5" edited="residual_Residuals_WP_parameter_residual_3.v"><result status="valid" time="1.09"/></proof>
+  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_3.v"><result status="valid" time="1.09"/></proof>
   </goal>
   <goal name="WP_parameter residual.12" expl="12. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="1.15"/></proof>
+  <proof prover="2"><result status="valid" time="0.76"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.01" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter residual.13" expl="13. postcondition" expanded="true">
-  <proof prover="5" edited="residual_Residuals_WP_parameter_residual_2.v"><result status="valid" time="1.04"/></proof>
+  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_2.v"><result status="valid" time="1.04"/></proof>
   </goal>
  </transf>
  </goal>
