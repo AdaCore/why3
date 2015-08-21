@@ -124,7 +124,7 @@ and expr_desc =
   | Elet of ident * ghost * Expr.rs_kind * expr * expr
   | Erec of fundef list * expr
   | Efun of binder list * pty option * spec * expr
-  | Eany of param list * pty * spec
+  | Eany of param list * Expr.rs_kind * pty option * spec
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list

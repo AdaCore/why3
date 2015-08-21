@@ -624,7 +624,7 @@ fun_defn:
     { Efun ($1, $2, spec_union $3 $5, $6) }
 
 val_defn:
-| params cast spec  { Eany ($1, $2, $3) }
+| params cast? spec  { Eany ($1, Expr.RKnone, $2, $3) }
 
 (* Program expressions *)
 
@@ -707,7 +707,7 @@ expr_:
 | ABSTRACT spec seq_expr END
     { Efun ([], None, $2, $3) }
 | ANY ty spec
-    { Eany ([], $2, $3) }
+    { Eany ([], Expr.RKnone, Some $2, $3) }
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH match_cases(seq_expr) END

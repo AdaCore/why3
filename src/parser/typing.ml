@@ -546,6 +546,15 @@ let mk_let ~loc n de node =
   let de1 = Dexpr.dexpr ~loc node in
   DElet ((id_user n loc, false, RKnone, de), de1)
 
+let update_any kind e = match e.expr_desc with
+  | Ptree.Eany (pl, _, pty, sp) ->
+      { e with expr_desc = Ptree.Eany (pl, kind, pty, sp) }
+  | _ -> e
+
+let local_kind = function
+  | RKfunc | RKpred -> RKlocal
+  | k -> k
+
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let expr_app loc e el =
     List.fold_left (fun e1 e2 ->
@@ -617,9 +626,14 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let d = expr_app loc (DErs cs) fl in
       if re then d else mk_let ~loc "q " e1 d
   | Ptree.Elet (id, gh, kind, e1, e2) ->
+      let e1 = update_any kind e1 in
+      let kind = local_kind kind in
       let ld = create_user_id id, gh, kind, dexpr muc denv e1 in
       DElet (ld, dexpr muc (denv_add_let denv ld) e2)
   | Ptree.Erec (fdl, e1) ->
+      let update_kind (id, gh, k, bl, pty, sp, e) =
+        id, gh, local_kind k, bl, pty, sp, e in
+      let fdl = List.map update_kind fdl in
       let denv, rd = drec_defn muc denv fdl in
       DErec (rd, dexpr muc denv e1)
   | Ptree.Efun (bl, pty, sp, e) ->
@@ -632,13 +646,18 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
             Loc.errorm ~loc "unexpected 'variant' clause"
         | _ -> dspec muc sp in
       DEfun (bl, ds, dexpr muc (denv_add_args denv bl) e)
-  | Ptree.Eany (pl, pty, sp) ->
+  | Ptree.Eany (pl, kind, pty, sp) ->
       let pl = List.map (dparam muc) pl in
       let ds = match sp.sp_variant with
         | ({term_loc = loc},_)::_ ->
             Loc.errorm ~loc "unexpected 'variant' clause"
         | _ -> dspec muc sp in
-      DEany (pl, ds, dity_of_ity (ity_of_pty muc pty))
+      let ity = match kind, pty with
+        | _, Some pty -> ity_of_pty muc pty
+        | RKlemma, None -> ity_unit
+        | RKpred, None -> ity_bool
+        | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
+      DEany (pl, ds, dity_of_ity ity)
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr muc denv e1 in
       let branch (pp, e) =
@@ -1060,6 +1079,7 @@ let add_decl muc env file d =
         | Ptree.Mint i -> MAint i in
       add_meta muc (lookup_meta id.id_str) (List.map convert al)
   | Ptree.Dlet (id, gh, kind, e) ->
+      let e = update_any kind e in
       let ld = create_user_id id, gh, kind, dexpr muc denv_empty e in
       add_pdecl ~vc muc (create_let_decl (let_defn ~keep_loc:true ld))
   | Ptree.Drec fdl ->
