@@ -113,7 +113,7 @@ Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(zipper a))
 (** The proof starts here *)
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 30.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 30.
 Import Distinct.
 
 Lemma distinct1:

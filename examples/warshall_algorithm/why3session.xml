@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="6" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.4pl6" timelimit="6" memlimit="1000"/>
 <file name="../warshall_algorithm.mlw" expanded="true">
 <theory name="WarshallAlgorithm" sum="a10533dc4dc4a8037238c5e134ff946b" expanded="true">
  <goal name="weakening" expanded="true">
- <proof prover="0" edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v"><result status="valid" time="0.97"/></proof>
+ <proof prover="3" edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v"><result status="valid" time="0.97"/></proof>
  </goal>
  <goal name="decomposition" expanded="true">
- <proof prover="0" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="1.53"/></proof>
+ <proof prover="3" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="1.53"/></proof>
  </goal>
  <goal name="WP_parameter transitive_closure" expl="VC for transitive_closure">
  <transf name="split_goal_wp">
@@ -46,10 +46,10 @@
   <goal name="WP_parameter transitive_closure.7" expl="7. type invariant">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter transitive_closure.8" expl="8. precondition">
+  <goal name="WP_parameter transitive_closure.8" expl="8. index in array bounds">
   <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter transitive_closure.9" expl="9. precondition">
+  <goal name="WP_parameter transitive_closure.9" expl="9. index in array bounds">
   <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter transitive_closure.10" expl="10. loop invariant preservation">
@@ -72,13 +72,13 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter transitive_closure.11" expl="11. precondition">
+  <goal name="WP_parameter transitive_closure.11" expl="11. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter transitive_closure.12" expl="12. precondition">
+  <goal name="WP_parameter transitive_closure.12" expl="12. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter transitive_closure.13" expl="13. precondition">
+  <goal name="WP_parameter transitive_closure.13" expl="13. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter transitive_closure.14" expl="14. loop invariant preservation">
@@ -94,7 +94,7 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter transitive_closure.15" expl="15. precondition">
+  <goal name="WP_parameter transitive_closure.15" expl="15. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter transitive_closure.16" expl="16. loop invariant preservation">

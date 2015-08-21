@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
 <prover id="1" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="0"/>
 <file name="../arm.mlw" expanded="true">
 <theory name="M" sum="d97450a6c255beed8bf40f7d503e79cd" expanded="true">
  <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
@@ -37,7 +37,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.10" expl="10. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="1.14" steps="80"/></proof>
+  <proof prover="2"><result status="valid" time="1.65" steps="80"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.11" expl="11. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
@@ -61,11 +61,11 @@
 </theory>
 <theory name="InsertionSortExample" sum="035a2f3e51417e24f6e447e2c9f5b21b" expanded="true">
  <goal name="WP_parameter path_init_l2" expl="VC for path_init_l2">
- <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
  <proof prover="1"><result status="valid" time="0.14"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
  </goal>
  <goal name="WP_parameter path_l2_exit" expl="VC for path_l2_exit">
- <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="9"/></proof>
+ <proof prover="3" timelimit="10"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
 </theory>
 </file>
