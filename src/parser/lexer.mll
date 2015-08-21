@@ -187,6 +187,8 @@ rule token = parse
       { AND }
   | "\\/"
       { OR }
+  | "\\"
+      { LAMBDA }
   | "."
       { DOT }
   | ".."

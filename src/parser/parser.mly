@@ -121,7 +121,7 @@
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LTGT
+%token DOT DOTDOT EQUAL LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -153,7 +153,7 @@
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
 %left OP2
-%left OP3
+%left OP3 LAMBDA
 %left OP4
 %nonassoc prec_prefix_op
 %nonassoc LEFTSQ
@@ -587,6 +587,7 @@ triggers:
 quant:
 | FORALL  { Dterm.DTforall }
 | EXISTS  { Dterm.DTexists }
+| LAMBDA  { Dterm.DTlambda }
 
 numeral:
 | INTEGER { Number.ConstInt $1 }
@@ -906,6 +907,7 @@ lident_op:
 | op_symbol UNDERSCORE    { prefix $1 }
 | EQUAL                   { infix "=" }
 | OPPREF                  { prefix $1 }
+| LAMBDA                  { infix "\\" }
 | LEFTSQ RIGHTSQ          { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
 | LEFTSQ RIGHTSQ LARROW   { mixfix "[]<-" }
@@ -934,6 +936,7 @@ prefix_op:
 | o = OP2   { mk_id (infix o)    $startpos $endpos }
 | o = OP3   { mk_id (infix o)    $startpos $endpos }
 | o = OP4   { mk_id (infix o)    $startpos $endpos }
+| LAMBDA    { mk_id (infix "\\") $startpos $endpos }
 
 (* Qualified idents *)
 
