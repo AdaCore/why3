@@ -42,6 +42,15 @@ theory Map
 
 end
 
+theory MapExt
+
+  predicate (==) (m1 m2: 'a -> 'b) = forall x: 'a. m1 x = m2 x
+
+  axiom extensionality:
+    forall m1 m2: 'a -> 'b. m1 == m2 -> m1 = m2
+
+end
+
 (** {2 Sorted Maps (indexed by integers)} *)
 
 theory MapSorted
