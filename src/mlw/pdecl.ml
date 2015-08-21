@@ -354,9 +354,19 @@ let rec t_insert hd t = match t.t_node with
   | _ when hd.t_ty = None -> t_iff_simp hd t
   | _ -> t_equ_simp hd t
 
+let rec t_subst_fmla v t f = t_label_copy f (match f.t_node with
+  | Tapp (ps, [{t_node = Tvar u}; t1])
+    when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t1 = 0 ->
+      t_iff_simp t (t_equ_simp t1 t_bool_true)
+  | Tvar u when vs_equal u v -> t_if t t_bool_true t_bool_false
+  | _ -> t_map (t_subst_fmla v t) f)
+
 let create_let_decl ld =
   let conv_post t q =
-    let v,f = open_post q in t_subst_single v t f in
+    let v,f = open_post q in
+    match t.t_ty with
+      | Some _ -> t_subst_single v t f
+      | None -> t_subst_fmla v t f in
   let conv_post t ql = List.map (conv_post t) ql in
   let cty_axiom id cty f =
     (* the absence of aliases in checked in add_pdecl *)

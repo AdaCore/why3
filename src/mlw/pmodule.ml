@@ -319,7 +319,7 @@ let unit_module =
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
   let pd = create_type_decl [td] in
   let uc = add_pdecl uc pd in
-  let th = List.fold_left add_decl uc.muc_theory pd.pd_pure in
+  let th = List.fold_left (add_decl ~warn:false) uc.muc_theory pd.pd_pure in
   close_module { uc with muc_theory = th }
 
 let create_module env ?(path=[]) n =
@@ -339,7 +339,7 @@ let add_pdecl ~vc uc d =
     | None -> uc) ids uc in
   ignore vc; (* TODO *)
   let uc = add_pdecl uc d in
-  let th = List.fold_left add_decl uc.muc_theory d.pd_pure in
+  let th = List.fold_left (add_decl ~warn:true) uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }
 
 (** {2 Cloning} *)
