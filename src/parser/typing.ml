@@ -339,9 +339,9 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
       let e1 = dterm e1 in
       DTquant (q, qvl, trl, e1)
   | Ptree.Trecord fl ->
-      let get_val cs pj = function
+      let get_val _cs pj = function
         | Some e -> dterm tuc gvars at denv e
-        | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
+        | None -> Loc.error ~loc (RecordFieldMissing pj) in
       let cs, fl = parse_record ~loc tuc get_val fl in
       DTapp (cs, fl)
   | Ptree.Tupdate (e1, fl) ->
@@ -396,7 +396,7 @@ let parse_record muc fll =
     | _ -> raise (BadRecordField (ls_of_rs rs)) in
   let pjs = Srs.of_list itd.itd_fields in
   let flm = List.fold_left (fun m (pj,v) -> if Srs.mem pj pjs then
-    Mrs.add_new (DuplicateRecordField (ls_of_rs cs, ls_of_rs pj)) pj v m
+    Mrs.add_new (DuplicateRecordField (ls_of_rs pj)) pj v m
     else raise (BadRecordField (ls_of_rs pj))) Mrs.empty fll in
   cs, itd.itd_fields, flm
 
@@ -607,9 +607,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
         | RLls ls -> ls | _ -> assert false in
-      let get_val cs pj = function
-        | None -> Loc.error ~loc
-            (Decl.RecordFieldMissing (ls_of_rs cs, ls_of_rs pj))
+      let get_val _cs pj = function
+        | None -> Loc.error ~loc (Decl.RecordFieldMissing (ls_of_rs pj))
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
       expr_app loc (DErs cs) fl

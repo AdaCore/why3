@@ -574,9 +574,9 @@ let () = Exn_printer.register
       fprintf fmt "Bad constructor: %a" print_ls ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" print_ls ls
-  | Decl.RecordFieldMissing (_cs,ls) ->
+  | Decl.RecordFieldMissing ls ->
       fprintf fmt "Field %a is missing" print_ls ls
-  | Decl.DuplicateRecordField (_cs,ls) ->
+  | Decl.DuplicateRecordField ls ->
       fprintf fmt "Field %a is used twice in the same constructor" print_ls ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt
