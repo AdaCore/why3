@@ -383,7 +383,7 @@ let rec sm_trans_ty tym tsm ty = match ty.ty_node with
       end end
   | Tyvar _ -> ty
 
-let cl_trans_ty cl ty = sm_trans_ty cl.ty_table cl.ts_table ty
+let clone_ty cl ty = sm_trans_ty cl.ty_table cl.ts_table ty
 
 let cl_find_its cl its =
   if not (Sid.mem its.its_ts.ts_name cl.cl_local) then its
@@ -393,12 +393,12 @@ let cl_find_ts cl ts =
   if not (Sid.mem ts.ts_name cl.cl_local) then ts
   else (Mts.find ts cl.ts_table).its_ts
 
-let rec cl_trans_ity cl ity = match ity.ity_node with
+let rec clone_ity cl ity = match ity.ity_node with
   | Ityreg r ->
-      ity_reg (cl_trans_reg cl r)
+      ity_reg (clone_reg cl r)
   | Ityapp (s, tl, rl) ->
-      let tl = List.map (cl_trans_ity cl) tl in
-      let rl = List.map (cl_trans_reg cl) rl in
+      let tl = List.map (clone_ity cl) tl in
+      let rl = List.map (clone_reg cl) rl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
       | Some its -> ity_app its tl rl
       | None -> begin match Mts.find_opt s.its_ts cl.ty_table with
@@ -406,7 +406,7 @@ let rec cl_trans_ity cl ity = match ity.ity_node with
       | None -> ity_app s tl rl
       end end
   | Itypur (s, tl) ->
-      let tl = List.map (cl_trans_ity cl) tl in
+      let tl = List.map (clone_ity cl) tl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
       | Some its -> ity_pur its tl
       | None -> begin match Mts.find_opt s.its_ts cl.ty_table with
@@ -415,15 +415,15 @@ let rec cl_trans_ity cl ity = match ity.ity_node with
       end end
   | Ityvar _ -> ity
 
-and cl_trans_reg cl reg =
+and clone_reg cl reg =
   (* FIXME: what about top-level non-instantiated regions?
      We cannot check in cl.cl_local to see if they are there.
      Instead, we should prefill cl.pv_table and cl.rn_table
      with all top-level pvsymbols (local or external) before
      descending into a let_defn. *)
   try Mreg.find reg cl.rn_table with Not_found ->
-  let tl = List.map (cl_trans_ity cl) reg.reg_args in
-  let rl = List.map (cl_trans_reg cl) reg.reg_regs in
+  let tl = List.map (clone_ity cl) reg.reg_args in
+  let rl = List.map (clone_reg cl) reg.reg_regs in
   let r = match Mts.find_opt reg.reg_its.its_ts cl.ts_table with
     | Some its ->
         create_region (id_clone reg.reg_name) its tl rl
@@ -444,9 +444,9 @@ let cl_find_ls cl ls =
   if not (Sid.mem ls.ls_name cl.cl_local) then ls
   else Mls.find ls cl.ls_table
 
-let cl_trans_term cl mv t = t_gen_map (cl_trans_ty cl) (cl_find_ls cl) mv t
+let clone_term cl mv t = t_gen_map (clone_ty cl) (cl_find_ls cl) mv t
 
-let cl_trans_fmla cl f = cl_trans_term cl Mvs.empty f (* for closed terms *)
+let clone_fmla cl f = clone_term cl Mvs.empty f (* for closed terms *)
 
 let cl_find_pr cl pr =
   if not (Sid.mem pr.pr_name cl.cl_local) then pr
@@ -464,12 +464,12 @@ let cl_find_xs cl xs =
   if not (Sid.mem xs.xs_name cl.cl_local) then xs
   else Mexn.find xs cl.xs_table
 
-let cl_clone_ls inst cl ls =
+let clone_ls inst cl ls =
   if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
   let constr = ls.ls_constr in
   let id = id_clone ls.ls_name in
-  let at = List.map (cl_trans_ty cl) ls.ls_args in
-  let vt = Opt.map (cl_trans_ty cl) ls.ls_value in
+  let at = List.map (clone_ty cl) ls.ls_args in
+  let vt = Opt.map (clone_ty cl) ls.ls_value in
   let ls' = create_lsymbol ~constr id at vt in
   cl.ls_table <- Mls.add ls ls' cl.ls_table;
   ls'
@@ -495,7 +495,7 @@ let cl_init_ts cl ({ts_name = id} as ts) ts' =
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  let mtch sb ty ty' = try ty_match sb ty' (cl_trans_ty cl ty)
+  let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
     with TypeMismatch _ -> raise (BadInstance id) in
   let sbs = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'
@@ -522,22 +522,22 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dtype _ | Ddata _ -> assert false (* impossible *)
   | Dparam ls ->
       if Mls.mem ls inst.inst_ls then uc else
-      let d = create_param_decl (cl_clone_ls inst cl ls) in
+      let d = create_param_decl (clone_ls inst cl ls) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dlogic ldl ->
-      let get_ls (ls,_) = ignore (cl_clone_ls inst cl ls) in
+      let get_ls (ls,_) = ignore (clone_ls inst cl ls) in
       let get_logic (_,ld) =
-        Opt.get (ls_defn_of_axiom (cl_trans_fmla cl (ls_defn_axiom ld))) in
+        Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
       List.iter get_ls ldl;
       let d = create_logic_decl (List.map get_logic ldl) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dind (s, idl) ->
-      let get_ls (ls,_) = cl_clone_ls inst cl ls in
+      let get_ls (ls,_) = clone_ls inst cl ls in
       let get_case (pr,f) =
         if Mpr.mem pr inst.inst_pr then raise (CannotInstantiate pr.pr_name);
         let pr' = create_prsymbol (id_clone pr.pr_name) in
         cl.pr_table <- Mpr.add pr pr' cl.pr_table;
-        pr', cl_trans_fmla cl f in
+        pr', clone_fmla cl f in
       let get_ind ls (_,la) = ls, List.map get_case la in
       let lls = List.map get_ls idl in
       let d = create_ind_decl s (List.map2 get_ind lls idl) in
@@ -552,7 +552,7 @@ let clone_decl inst cl uc d = match d.d_node with
       if skip then uc else
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
-      let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
+      let d = create_prop_decl k' pr' (clone_fmla cl f) in
       add_pdecl ~vc:false uc (create_pure_decl d)
 
 let cl_save_ls cl s s' =
@@ -636,7 +636,7 @@ let clone_type_decl inst cl tdl =
         if d.itd_invariant = [] then [] else
         let add mv u (_,v) = Mvs.add u.pv_vs v.pv_vs mv in
         let mv = List.fold_left2 add Mvs.empty pjl fdl in
-        List.map (cl_trans_term cl mv) d.itd_invariant in
+        List.map (clone_term cl mv) d.itd_invariant in
       let itd = create_flat_record_decl id' ts.ts_args priv mut fdl inv in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
@@ -655,7 +655,7 @@ let clone_type_decl inst cl tdl =
           List.iter down tl
       | Ityvar _ -> () in
     down ity;
-    cl_trans_ity cl ity in
+    clone_ity cl ity in
 
   Mits.iter (visit Sits.empty) def;
   Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl
@@ -692,13 +692,13 @@ let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
   (* non-instantiated global variables are not in sm *)
 
 let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
-  create_pvsymbol (id_clone vs.vs_name) ~ghost (cl_trans_ity cl ity)
+  create_pvsymbol (id_clone vs.vs_name) ~ghost (clone_ity cl ity)
 
 let clone_invl cl sm invl =
-  List.map (fun t -> cl_trans_term cl sm.sm_vs t) invl
+  List.map (fun t -> clone_term cl sm.sm_vs t) invl
 
 let clone_varl cl sm varl = List.map (fun (t,r) ->
-  cl_trans_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
+  clone_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
 
 let clone_cty cl sm cty =
   let args = List.map (clone_pv cl) cty.cty_args in
@@ -717,17 +717,16 @@ let clone_cty cl sm cty =
   let reads = Spv.union reads (Mpv.map ignore olds) in
   let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
-    Mreg.add (cl_trans_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
+    Mreg.add (clone_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
-  let add_reset reg s = Sreg.add (cl_trans_reg cl reg) s in
+  let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
   let eff = eff_ghostify cty.cty_effect.eff_ghost eff in
   let add_raise xs eff = eff_raise eff (cl_find_xs cl xs) in
   let eff = Sexn.fold add_raise cty.cty_effect.eff_raises eff in
   let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
-  let res = cl_trans_ity cl cty.cty_result in
-  create_cty args pre post xpost olds eff res
+  create_cty args pre post xpost olds eff (clone_ity cl cty.cty_result)
 
 let sm_save_args sm c c' =
   List.fold_left2 sm_save_pv sm c.cty_args c'.cty_args
@@ -808,18 +807,18 @@ let rec clone_expr cl sm e = e_label_copy e (e_ghostify (e_ghost e)
         cl_find_xs cl xs, v', clone_expr cl (sm_save_pv sm v v') e in
       e_try (clone_expr cl sm d) (List.map conv_br xl)
   | Eraise (xs, e) ->
-      e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (cl_trans_ity cl e.e_ity)
+      e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
   | Eassert (k, f) ->
-      e_assert k (cl_trans_term cl sm.sm_vs f)
+      e_assert k (clone_term cl sm.sm_vs f)
   | Epure t ->
-      e_pure (cl_trans_term cl sm.sm_vs t)
-  | Eabsurd -> e_absurd (cl_trans_ity cl e.e_ity)))
+      e_pure (clone_term cl sm.sm_vs t)
+  | Eabsurd -> e_absurd (clone_ity cl e.e_ity)))
 
 and clone_cexp cl sm c = c_ghostify (cty_ghost c.c_cty) (match c.c_node with
   | Capp (s,vl) ->
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
-      let al = List.map (fun v -> cl_trans_ity cl v.pv_ity) c.c_cty.cty_args in
-      let res = cl_trans_ity cl c.c_cty.cty_result in
+      let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
+      let res = clone_ity cl c.c_cty.cty_result in
       c_app (Mrs.find_def s s sm.sm_rs) vl al res
   | Cfun e ->
       let cty = clone_cty cl sm c.c_cty in
@@ -883,7 +882,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~vc:false uc (create_let_decl ld)
   | PDexn xs ->
-      let ity = cl_trans_ity cl xs.xs_ity in
+      let ity = clone_ity cl xs.xs_ity in
       let xs' = create_xsymbol (id_clone xs.xs_name) ity in
       cl.xs_table <- Mexn.add xs xs' cl.xs_table;
       add_pdecl ~vc:false uc (create_exn_decl xs')
@@ -909,7 +908,7 @@ let clone_export uc m inst =
     | Uuse m -> use_export uc m
     | Uclone mi ->
         begin try add_clone uc { mi_mod = mi.mi_mod;
-          mi_ty = Mts.map (cl_trans_ity cl) mi.mi_ty;
+          mi_ty = Mts.map (clone_ity cl) mi.mi_ty;
           mi_ts = Mts.map (cl_find_its cl) mi.mi_ts;
           mi_ls = Mls.map (cl_find_ls cl) mi.mi_ls;
           mi_pr = Mpr.map (cl_find_pr cl) mi.mi_pr;
@@ -919,7 +918,7 @@ let clone_export uc m inst =
         with Not_found -> uc end
     | Umeta (m,al) ->
         begin try add_meta uc m (List.map (function
-          | MAty ty -> MAty (cl_trans_ty cl ty)
+          | MAty ty -> MAty (clone_ty cl ty)
           | MAts ts -> MAts (cl_find_ts cl ts)
           | MAls ls -> MAls (cl_find_ls cl ls)
           | MApr pr -> MApr (cl_find_pr cl pr)
