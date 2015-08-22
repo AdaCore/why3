@@ -678,6 +678,9 @@ let sm_save_rs cl sm s s' =
   | RLpv v, RLpv v' -> sm_save_pv sm v v'
   | _ -> sm
 
+let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
+  (* non-instantiated global variables are not in sm *)
+
 let clone_varl cl sm varl = List.map (fun (t,r) ->
   cl_trans_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
 
@@ -686,16 +689,15 @@ let clone_cty cl sm cty =
       ~ghost:v.pv_ghost (cl_trans_ity cl v.pv_ity) in
   let args = List.map conv_pv cty.cty_args in
   let sm_args = List.fold_left2 sm_save_pv sm cty.cty_args args in
-  let add_old o n (sm, olds) =
-    let o' = conv_pv o in
-    sm_save_pv sm o o', Mpv.add o' (Mvs.find n.pv_vs sm_args.sm_pv) olds in
+  let add_old o n (sm, olds) = let o' = conv_pv o in
+    sm_save_pv sm o o', Mpv.add o' (sm_find_pv sm_args n) olds in
   let sm_olds, olds = Mpv.fold add_old cty.cty_oldies (sm_args, Mpv.empty) in
   let conv_pre tl = List.map (cl_trans_term cl sm_args.sm_vs) tl in
   let conv_post tl = List.map (cl_trans_term cl sm_olds.sm_vs) tl in
   let add_xpost xs tl q = Mexn.add (cl_find_xs cl xs) (conv_post tl) q in
   let pre = conv_pre cty.cty_pre and post = conv_post cty.cty_post in
   let xpost = Mexn.fold add_xpost cty.cty_xpost Mexn.empty in
-  let add_read v s = Spv.add (Mvs.find v.pv_vs sm_args.sm_pv) s in
+  let add_read v s = Spv.add (sm_find_pv sm_args v) s in
   let reads = Spv.fold add_read cty.cty_effect.eff_reads Spv.empty in
   let reads = Mpv.fold (fun v _ s -> Spv.add v s) olds reads in
   let add_write reg fs m =
@@ -716,11 +718,8 @@ let sm_save_args sm c c' =
   List.fold_left2 sm_save_pv sm c.cty_args c'.cty_args
 
 let sm_save_olds sm c c' =
-  let add_rev o n rev = Mpv.add n o rev in
-  let revs = Mpv.fold add_rev c'.cty_oldies Mpv.empty in
-  let add_old o n sm =
-    let o' = Mpv.find (Mvs.find n.pv_vs sm.sm_pv) revs in
-    sm_save_pv sm o o' in
+  let revs = Mpv.fold (fun o n m -> Mpv.add n o m) c'.cty_oldies Mpv.empty in
+  let add_old o n sm = sm_save_pv sm o (Mpv.find (sm_find_pv sm n) revs) in
   Mpv.fold add_old c.cty_oldies sm
 
 let rs_kind s = match s.rs_logic with
@@ -731,7 +730,7 @@ let rs_kind s = match s.rs_logic with
   | RLlemma -> RKlemma
 
 let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
-  | Evar v -> e_var (Mvs.find v.pv_vs sm.sm_pv)
+  | Evar v -> e_var (sm_find_pv sm v)
   | Econst c -> e_const c
   | Eexec c -> e_exec (clone_cexp cl sm c)
   | Eassign _ ->
@@ -756,12 +755,10 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
 
 and clone_cexp cl sm c = match c.c_node with
   | Capp (s,vl) ->
-      let s = if not (Sid.mem s.rs_name cl.cl_local) then s
-        else Mrs.find s sm.sm_rs in
-      let vl = List.map (fun v -> Mvs.find v.pv_vs sm.sm_pv) vl in
+      let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> cl_trans_ity cl v.pv_ity) c.c_cty.cty_args in
       let res = cl_trans_ity cl c.c_cty.cty_result in
-      c_app s vl al res
+      c_app (Mrs.find_def s s sm.sm_rs) vl al res
   | Cfun e ->
       let cty = clone_cty cl sm c.c_cty in
       let sm = sm_save_args sm c.c_cty cty in
@@ -816,14 +813,12 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         | LDsym (_,c) -> cty_reads c.c_cty
         | LDrec rdl -> List.fold_left (fun spv {rec_rsym = s} ->
             Spv.union spv (cty_reads s.rs_cty)) Spv.empty rdl in
-      let reads = Spv.filter (fun v ->
-        not (Sid.mem v.pv_vs.vs_name cl.cl_local)) reads in
-      let frz = Spv.fold (fun v s -> ity_freeze s v.pv_ity) reads isb_empty in
+      let frz = Spv.fold (fun v isb ->
+        if Sid.mem v.pv_vs.vs_name cl.cl_local then isb
+        else ity_freeze isb v.pv_ity) reads isb_empty in
       cl.rn_table <- Mreg.set_union cl.rn_table frz.isb_reg;
-      let sm = Spv.fold (fun v sm -> sm_save_pv sm v v) reads (sm_of_cl cl) in
-      let sm, ld = clone_let_defn cl sm ld in
-      let mpv = Spv.fold (fun v m -> Mvs.remove v.pv_vs m) reads sm.sm_pv in
-      cl.pv_table <- mpv; cl.rs_table <- sm.sm_rs;
+      let sm, ld = clone_let_defn cl (sm_of_cl cl) ld in
+      cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~vc:false uc (create_let_decl ld)
   | PDexn xs ->
       let ity = cl_trans_ity cl xs.xs_ity in
