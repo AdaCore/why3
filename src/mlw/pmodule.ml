@@ -668,6 +668,11 @@ let sm_of_cl cl = {
   sm_pv = cl.pv_table;
   sm_rs = cl.rs_table }
 
+let sm_save_vs sm v v' = {
+  sm_vs = Mvs.add v v'.pv_vs sm.sm_vs;
+  sm_pv = Mvs.add v v' sm.sm_pv;
+  sm_rs = sm.sm_rs }
+
 let sm_save_pv sm v v' = {
   sm_vs = Mvs.add v.pv_vs v'.pv_vs sm.sm_vs;
   sm_pv = Mvs.add v.pv_vs v' sm.sm_pv;
@@ -683,25 +688,30 @@ let sm_save_rs cl sm s s' =
 let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
   (* non-instantiated global variables are not in sm *)
 
+let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
+  create_pvsymbol (id_clone vs.vs_name) ~ghost (cl_trans_ity cl ity)
+
+let clone_invl cl sm invl =
+  List.map (fun t -> cl_trans_term cl sm.sm_vs t) invl
+
 let clone_varl cl sm varl = List.map (fun (t,r) ->
   cl_trans_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
 
 let clone_cty cl sm cty =
-  let conv_pv v = create_pvsymbol (id_clone v.pv_vs.vs_name)
-      ~ghost:v.pv_ghost (cl_trans_ity cl v.pv_ity) in
-  let args = List.map conv_pv cty.cty_args in
+  let args = List.map (clone_pv cl) cty.cty_args in
   let sm_args = List.fold_left2 sm_save_pv sm cty.cty_args args in
-  let add_old o n (sm, olds) = let o' = conv_pv o in
+  let add_old o n (sm, olds) = let o' = clone_pv cl o in
     sm_save_pv sm o o', Mpv.add o' (sm_find_pv sm_args n) olds in
   let sm_olds, olds = Mpv.fold add_old cty.cty_oldies (sm_args, Mpv.empty) in
-  let conv_pre tl = List.map (cl_trans_term cl sm_args.sm_vs) tl in
-  let conv_post tl = List.map (cl_trans_term cl sm_olds.sm_vs) tl in
-  let add_xpost xs tl q = Mexn.add (cl_find_xs cl xs) (conv_post tl) q in
-  let pre = conv_pre cty.cty_pre and post = conv_post cty.cty_post in
-  let xpost = Mexn.fold add_xpost cty.cty_xpost Mexn.empty in
+  let pre = clone_invl cl sm_args cty.cty_pre in
+  let post = clone_invl cl sm_olds cty.cty_post in
+  let xpost = Mexn.fold (fun xs fl q ->
+    let xs = cl_find_xs cl xs in
+    let fl = clone_invl cl sm_olds fl in
+    Mexn.add xs fl q) cty.cty_xpost Mexn.empty in
   let add_read v s = Spv.add (sm_find_pv sm_args v) s in
   let reads = Spv.fold add_read cty.cty_effect.eff_reads Spv.empty in
-  let reads = Mpv.fold (fun v _ s -> Spv.add v s) olds reads in
+  let reads = Spv.union reads (Mpv.map ignore olds) in
   let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
     Mreg.add (cl_trans_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
@@ -731,31 +741,78 @@ let rs_kind s = match s.rs_logic with
   | RLls _ -> RKfunc
   | RLlemma -> RKlemma
 
-let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
+let clone_ppat cl sm ~ghost pp =
+  let rec conv_pat p = match p.pat_node with
+    | Term.Pwild -> PPwild
+    | Term.Pvar v -> PPvar (id_clone v.vs_name)
+    | Term.Por (p1,p2) -> PPor (conv_pat p1, conv_pat p2)
+    | Term.Pas (p,v) -> PPas (conv_pat p, id_clone v.vs_name)
+    | Term.Papp (s,pl) ->
+        PPapp (restore_rs (cl_find_ls cl s), List.map conv_pat pl) in
+  let pre = conv_pat pp.pp_pat in
+  (* FIXME: if we clone pp using its own ghost status pp.pp_ghost,
+     we may ghostify too many variables. This may happen if we have
+     a match over a non-ghost expression with a single branch with
+     a ghostifying pattern (= some ghost subvalue is deep-matched).
+     Since there is only one branch, this match will be non-ghost,
+     and all non-ghost variables in the pattern must stay so, too.
+
+     To avoid the problem, we pass to create_prog_pattern the ghost
+     status of the matched expression. This, however, may also break,
+     if someone created a match over a non-ghost expression with a
+     single branch with an artificially ghostified pattern (that is,
+     by calling create_prog_pattern ~ghost:true). In this case, we
+     may not ghostify some variables which were ghost in the original
+     pattern, and perform unnecessary computations in the cloned code.
+     This exploit is only possible via API, since Dexpr always passes
+     to create_prog_pattern the ghost status of the matched expr. *)
+  let vm, pp' = create_prog_pattern pre ~ghost pp.pp_ity in
+  let save v sm = sm_save_vs sm v (Mstr.find v.vs_name.id_string vm) in
+  Svs.fold save pp.pp_pat.pat_vars sm, pp'
+
+let rec clone_expr cl sm e = e_label_copy e (e_ghostify (e_ghost e)
+  (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
   | Econst c -> e_const c
   | Eexec c -> e_exec (clone_cexp cl sm c)
-  | Eassign _ ->
-      assert false (* TODO *)
+  | Eassign asl ->
+      let conv (r,f,v) =
+        e_var (sm_find_pv sm r), cl_find_rs cl f, e_var (sm_find_pv sm v) in
+      e_assign (List.map conv asl)
   | Elet (ld, e) ->
       let sm, ld = clone_let_defn cl sm ld in
       e_let ld (clone_expr cl sm e)
   | Eif (e1, e2, e3) ->
       e_if (clone_expr cl sm e1) (clone_expr cl sm e2) (clone_expr cl sm e3)
-  | Ecase _ ->
-      (* do not forget to e_ghostify the matched expr *)
-      assert false (* TODO *)
-  | Ewhile _ | Efor _ | Etry _ ->
-      assert false (* TODO *)
+  | Ecase (d, bl) ->
+      let ghost = e_ghost d in
+      let conv_br (pp, e) =
+        let sm, pp = clone_ppat cl sm ~ghost pp in
+        pp, clone_expr cl sm e in
+      e_case (clone_expr cl sm d) (List.map conv_br bl)
+  | Ewhile (c,invl,varl,e) ->
+      e_while (clone_expr cl sm c) (clone_invl cl sm invl)
+              (clone_varl cl sm varl) (clone_expr cl sm e)
+  | Efor (i, (f,dir,t), invl, e) ->
+      let i' = clone_pv cl i in
+      let ism = sm_save_pv sm i i' in
+      e_for i'
+        (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
+        (clone_invl cl ism invl) (clone_expr cl ism e)
+  | Etry (d, xl) ->
+      let conv_br (xs, v, e) =
+        let v' = clone_pv cl v in
+        cl_find_xs cl xs, v', clone_expr cl (sm_save_pv sm v v') e in
+      e_try (clone_expr cl sm d) (List.map conv_br xl)
   | Eraise (xs, e) ->
       e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (cl_trans_ity cl e.e_ity)
   | Eassert (k, f) ->
       e_assert k (cl_trans_term cl sm.sm_vs f)
   | Epure t ->
       e_pure (cl_trans_term cl sm.sm_vs t)
-  | Eabsurd -> e_absurd (cl_trans_ity cl e.e_ity))
+  | Eabsurd -> e_absurd (cl_trans_ity cl e.e_ity)))
 
-and clone_cexp cl sm c = match c.c_node with
+and clone_cexp cl sm c = c_ghostify (cty_ghost c.c_cty) (match c.c_node with
   | Capp (s,vl) ->
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> cl_trans_ity cl v.pv_ity) c.c_cty.cty_args in
@@ -768,7 +825,7 @@ and clone_cexp cl sm c = match c.c_node with
       c_fun cty.cty_args cty.cty_pre cty.cty_post
         cty.cty_xpost cty.cty_oldies (clone_expr cl sm e)
   | Cany ->
-      c_any (clone_cty cl sm c.c_cty)
+      c_any (clone_cty cl sm c.c_cty))
 
 and clone_let_defn cl sm ld = match ld with
   | LDvar (v,e) ->
