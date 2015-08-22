@@ -351,6 +351,7 @@ type clones = {
   mutable ls_table : lsymbol Mls.t;
   mutable pr_table : prsymbol Mpr.t;
   mutable rn_table : region Mreg.t;
+  mutable fd_table : pvsymbol Mpv.t;
   mutable pv_table : pvsymbol Mvs.t;
   mutable rs_table : rsymbol Mrs.t;
   mutable xs_table : xsymbol Mexn.t;
@@ -363,6 +364,7 @@ let empty_clones m = {
   ls_table = Mls.empty;
   pr_table = Mpr.empty;
   rn_table = Mreg.empty;
+  fd_table = Mpv.empty;
   pv_table = Mvs.empty;
   rs_table = Mrs.empty;
   xs_table = Mexn.empty;
@@ -556,9 +558,9 @@ let clone_decl inst cl uc d = match d.d_node with
 let cl_save_rs cl s s' =
   cl.rs_table <- Mrs.add s s' cl.rs_table;
   begin match s.rs_field, s'.rs_field with
-  | Some v, Some v' -> cl.pv_table <- Mvs.add v.pv_vs v' cl.pv_table
-  | None, None -> ()
-  | _ -> assert false
+  | Some v, Some v' -> cl.fd_table <- Mpv.add v v' cl.fd_table
+  | None, _ -> () (* can instantiate a non-field with a field *)
+  | _ -> assert false (* but not vice versa *)
   end;
   match s.rs_logic, s'.rs_logic with
   | RLls s, RLls s' -> cl.ls_table <- Mls.add s s' cl.ls_table
@@ -701,8 +703,8 @@ let clone_cty cl sm cty =
   let reads = Spv.fold add_read cty.cty_effect.eff_reads Spv.empty in
   let reads = Mpv.fold (fun v _ s -> Spv.add v s) olds reads in
   let add_write reg fs m =
-    let add_f f s = Spv.add (Mvs.find f.pv_vs cl.pv_table) s in
-    Mreg.add (cl_trans_reg cl reg) (Spv.fold add_f fs Spv.empty) m in
+    let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
+    Mreg.add (cl_trans_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
   let add_reset reg s = Sreg.add (cl_trans_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
