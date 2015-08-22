@@ -113,7 +113,7 @@ and mod_inst = {
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
-  mi_pv  : pvsymbol Mpv.t;
+  mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mexn.t;
 }
@@ -351,7 +351,7 @@ type clones = {
   mutable ls_table : lsymbol Mls.t;
   mutable pr_table : prsymbol Mpr.t;
   mutable rn_table : region Mreg.t;
-  mutable pv_table : pvsymbol Mpv.t;
+  mutable pv_table : pvsymbol Mvs.t;
   mutable rs_table : rsymbol Mrs.t;
   mutable xs_table : xsymbol Mexn.t;
 }
@@ -363,7 +363,7 @@ let empty_clones m = {
   ls_table = Mls.empty;
   pr_table = Mpr.empty;
   rn_table = Mreg.empty;
-  pv_table = Mpv.empty;
+  pv_table = Mvs.empty;
   rs_table = Mrs.empty;
   xs_table = Mexn.empty;
 }
@@ -442,7 +442,9 @@ let cl_find_ls cl ls =
   if not (Sid.mem ls.ls_name cl.cl_local) then ls
   else Mls.find ls cl.ls_table
 
-let cl_trans_fmla cl f = t_s_map (cl_trans_ty cl) (cl_find_ls cl) f
+let cl_trans_term cl mv t = t_gen_map (cl_trans_ty cl) (cl_find_ls cl) mv t
+
+let cl_trans_fmla cl f = cl_trans_term cl Mvs.empty f (* for closed terms *)
 
 let cl_find_pr cl pr =
   if not (Sid.mem pr.pr_name cl.cl_local) then pr
@@ -450,7 +452,7 @@ let cl_find_pr cl pr =
 
 let cl_find_pv cl pv =
   if not (Sid.mem pv.pv_vs.vs_name cl.cl_local) then pv
-  else Mpv.find pv cl.pv_table
+  else Mvs.find pv.pv_vs cl.pv_table
 
 let cl_find_rs cl rs =
   if not (Sid.mem rs.rs_name cl.cl_local) then rs
@@ -551,6 +553,19 @@ let clone_decl inst cl uc d = match d.d_node with
       let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
       add_pdecl ~vc:false uc (create_pure_decl d)
 
+let cl_save_rs cl s s' =
+  cl.rs_table <- Mrs.add s s' cl.rs_table;
+  begin match s.rs_field, s'.rs_field with
+  | Some v, Some v' -> cl.pv_table <- Mvs.add v.pv_vs v' cl.pv_table
+  | None, None -> ()
+  | _ -> assert false
+  end;
+  match s.rs_logic, s'.rs_logic with
+  | RLls s, RLls s' -> cl.ls_table <- Mls.add s s' cl.ls_table
+  | RLlemma, RLlemma -> () (* TODO: update cl.pr_table? *)
+  | RLnone, RLnone -> ()
+  | _ -> assert false
+
 let clone_type_decl inst cl tdl =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
@@ -563,15 +578,9 @@ let clone_type_decl inst cl tdl =
     let cloned = Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty in
     let conv_pj v = create_pvsymbol
       (id_clone v.pv_vs.vs_name) ~ghost:v.pv_ghost (conv_ity alg v.pv_ity) in
-    let save_rs o n =
-      cl.rs_table <- Mrs.add o n cl.rs_table;
-      match o.rs_logic, n.rs_logic with
-      | RLls o, RLls n -> cl.ls_table <- Mls.add o n cl.ls_table;
-      | RLnone, RLnone -> () (* constructors with invariants *)
-      | _ -> assert false in
     let save_itd itd =
-      List.iter2 save_rs d.itd_constructors itd.itd_constructors;
-      List.iter2 save_rs d.itd_fields itd.itd_fields;
+      List.iter2 (cl_save_rs cl) d.itd_constructors itd.itd_constructors;
+      List.iter2 (cl_save_rs cl) d.itd_fields itd.itd_fields;
       Hits.add htd s (Some itd) in
     (* alias *)
     if s.its_def <> None then begin
@@ -620,19 +629,9 @@ let clone_type_decl inst cl tdl =
       let fdl = List.map (fun v -> Spv.mem v mfld, conv_pj v) pjl in
       let inv =
         if d.itd_invariant = [] then [] else
-        if d.itd_fields = [] then
-          List.map (cl_trans_fmla cl) d.itd_invariant else
-        let ovl = List.map (fun v -> v.pv_vs) pjl in
-        let nvl = List.map (fun (_,v) -> t_var v.pv_vs) fdl in
-        let conv_inv f =
-          let f = t_exists_close ovl [] f in
-          match (cl_trans_fmla cl f).t_node with
-          | Tquant (Texists, tq) ->
-              let xvl,_,f = t_open_quant tq in
-              let add s xv nv = Mvs.add xv nv s in
-              t_subst (List.fold_left2 add Mvs.empty xvl nvl) f
-          | _ -> assert false (* can't be *) in
-        List.map conv_inv d.itd_invariant in
+        let add mv u (_,v) = Mvs.add u.pv_vs v.pv_vs mv in
+        let mv = List.fold_left2 add Mvs.empty pjl fdl in
+        List.map (cl_trans_term cl mv) d.itd_invariant in
       let itd = create_flat_record_decl id' ts.ts_args priv mut fdl inv in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
@@ -656,13 +655,176 @@ let clone_type_decl inst cl tdl =
   Mits.iter (visit Sits.empty) def;
   Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl
 
+type smap = {
+  sm_vs : vsymbol Mvs.t;
+  sm_pv : pvsymbol Mvs.t;
+  sm_rs : rsymbol Mrs.t;
+}
+
+let sm_of_cl cl = {
+  sm_vs = Mvs.map (fun v -> v.pv_vs) cl.pv_table;
+  sm_pv = cl.pv_table;
+  sm_rs = cl.rs_table }
+
+let sm_save_pv sm v v' = {
+  sm_vs = Mvs.add v.pv_vs v'.pv_vs sm.sm_vs;
+  sm_pv = Mvs.add v.pv_vs v' sm.sm_pv;
+  sm_rs = sm.sm_rs }
+
+let sm_save_rs cl sm s s' =
+  let sm = { sm with sm_rs = Mrs.add s s' sm.sm_rs } in
+  match s.rs_logic, s'.rs_logic with
+  | RLls s, RLls s' -> cl.ls_table <- Mls.add s s' cl.ls_table; sm
+  | RLpv v, RLpv v' -> sm_save_pv sm v v'
+  | _ -> sm
+
+let clone_varl cl sm varl = List.map (fun (t,r) ->
+  cl_trans_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
+
+let clone_cty cl sm cty =
+  let conv_pv v = create_pvsymbol (id_clone v.pv_vs.vs_name)
+      ~ghost:v.pv_ghost (cl_trans_ity cl v.pv_ity) in
+  let args = List.map conv_pv cty.cty_args in
+  let sm_args = List.fold_left2 sm_save_pv sm cty.cty_args args in
+  let add_old o n (sm, olds) =
+    let o' = conv_pv o in
+    sm_save_pv sm o o', Mpv.add o' (Mvs.find n.pv_vs sm_args.sm_pv) olds in
+  let sm_olds, olds = Mpv.fold add_old cty.cty_oldies (sm_args, Mpv.empty) in
+  let conv_pre tl = List.map (cl_trans_term cl sm_args.sm_vs) tl in
+  let conv_post tl = List.map (cl_trans_term cl sm_olds.sm_vs) tl in
+  let add_xpost xs tl q = Mexn.add (cl_find_xs cl xs) (conv_post tl) q in
+  let pre = conv_pre cty.cty_pre and post = conv_post cty.cty_post in
+  let xpost = Mexn.fold add_xpost cty.cty_xpost Mexn.empty in
+  let add_read v s = Spv.add (Mvs.find v.pv_vs sm_args.sm_pv) s in
+  let reads = Spv.fold add_read cty.cty_effect.eff_reads Spv.empty in
+  let reads = Mpv.fold (fun v _ s -> Spv.add v s) olds reads in
+  let add_write reg fs m =
+    let add_f f s = Spv.add (Mvs.find f.pv_vs cl.pv_table) s in
+    Mreg.add (cl_trans_reg cl reg) (Spv.fold add_f fs Spv.empty) m in
+  let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
+  let add_reset reg s = Sreg.add (cl_trans_reg cl reg) s in
+  let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
+  let eff = eff_reset (eff_write reads writes) resets in
+  let eff = eff_ghostify cty.cty_effect.eff_ghost eff in
+  let add_raise xs eff = eff_raise eff (cl_find_xs cl xs) in
+  let eff = Sexn.fold add_raise cty.cty_effect.eff_raises eff in
+  let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
+  let res = cl_trans_ity cl cty.cty_result in
+  create_cty args pre post xpost olds eff res
+
+let sm_save_args sm c c' =
+  List.fold_left2 sm_save_pv sm c.cty_args c'.cty_args
+
+let sm_save_olds sm c c' =
+  let add_rev o n rev = Mpv.add n o rev in
+  let revs = Mpv.fold add_rev c'.cty_oldies Mpv.empty in
+  let add_old o n sm =
+    let o' = Mpv.find (Mvs.find n.pv_vs sm.sm_pv) revs in
+    sm_save_pv sm o o' in
+  Mpv.fold add_old c.cty_oldies sm
+
+let rs_kind s = match s.rs_logic with
+  | RLnone -> RKnone
+  | RLpv _ -> RKlocal
+  | RLls { ls_value = None } -> RKpred
+  | RLls _ -> RKfunc
+  | RLlemma -> RKlemma
+
+let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
+  | Evar v -> e_var (Mvs.find v.pv_vs sm.sm_pv)
+  | Econst c -> e_const c
+  | Eexec c -> e_exec (clone_cexp cl sm c)
+  | Eassign _ ->
+      assert false (* TODO *)
+  | Elet (ld, e) ->
+      let sm, ld = clone_let_defn cl sm ld in
+      e_let ld (clone_expr cl sm e)
+  | Eif (e1, e2, e3) ->
+      e_if (clone_expr cl sm e1) (clone_expr cl sm e2) (clone_expr cl sm e3)
+  | Ecase _ ->
+      (* do not forget to e_ghostify the matched expr *)
+      assert false (* TODO *)
+  | Ewhile _ | Efor _ | Etry _ ->
+      assert false (* TODO *)
+  | Eraise (xs, e) ->
+      e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (cl_trans_ity cl e.e_ity)
+  | Eassert (k, f) ->
+      e_assert k (cl_trans_term cl sm.sm_vs f)
+  | Epure t ->
+      e_pure (cl_trans_term cl sm.sm_vs t)
+  | Eabsurd -> e_absurd (cl_trans_ity cl e.e_ity))
+
+and clone_cexp cl sm c = match c.c_node with
+  | Capp (s,vl) ->
+      let s = if not (Sid.mem s.rs_name cl.cl_local) then s
+        else Mrs.find s sm.sm_rs in
+      let vl = List.map (fun v -> Mvs.find v.pv_vs sm.sm_pv) vl in
+      let al = List.map (fun v -> cl_trans_ity cl v.pv_ity) c.c_cty.cty_args in
+      let res = cl_trans_ity cl c.c_cty.cty_result in
+      c_app s vl al res
+  | Cfun e ->
+      let cty = clone_cty cl sm c.c_cty in
+      let sm = sm_save_args sm c.c_cty cty in
+      let sm = sm_save_olds sm c.c_cty cty in
+      c_fun cty.cty_args cty.cty_pre cty.cty_post
+        cty.cty_xpost cty.cty_oldies (clone_expr cl sm e)
+  | Cany ->
+      c_any (clone_cty cl sm c.c_cty)
+
+and clone_let_defn cl sm ld = match ld with
+  | LDvar (v,e) ->
+      let e' = clone_expr cl sm e in
+      let ld, v' = let_var (id_clone v.pv_vs.vs_name) ~ghost:v.pv_ghost e' in
+      sm_save_pv sm v v', ld
+  | LDsym (s,c) ->
+      let c' = clone_cexp cl sm c in
+      let ld, s' = let_sym (id_clone s.rs_name)
+        ~ghost:(rs_ghost s) ~kind:(rs_kind s) c' in
+      sm_save_rs cl sm s s', ld
+  | LDrec rdl ->
+      let conv_rs mrs {rec_rsym = rs} =
+        let rs' = create_rsymbol (id_clone rs.rs_name)
+          ~ghost:(rs_ghost rs) (clone_cty cl sm rs.rs_cty) in
+        Mrs.add rs rs' mrs, rs' in
+      let mrs, rsyml = Lists.map_fold_left conv_rs sm.sm_rs rdl in
+      let rsm = { sm with sm_rs = mrs } in
+      let conv_rd ({rec_fun = c} as rd) ({rs_cty = cty} as rs) =
+        let pre = if rd.rec_varl = [] then cty.cty_pre
+          else List.tl cty.cty_pre (* remove DECR *) in
+        let rsm = sm_save_args rsm c.c_cty cty in
+        let varl = clone_varl cl rsm rd.rec_varl in
+        let rsm = sm_save_olds rsm c.c_cty cty in
+        let e = match c.c_node with
+          | Cfun e -> clone_expr cl rsm e
+          | _ -> assert false (* can't be *) in
+        let c = c_fun cty.cty_args pre
+          cty.cty_post cty.cty_xpost cty.cty_oldies e in
+        rs, c, varl, rs_kind rd.rec_sym in
+      let ld, rdl' = let_rec (List.map2 conv_rd rdl rsyml) in
+      let sm = List.fold_left2 (fun sm d d' ->
+        sm_save_rs cl sm d.rec_sym d'.rec_sym) sm rdl rdl' in
+      sm, ld
+
 let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let tdl = clone_type_decl inst cl tdl in
       if tdl = [] then uc else
       add_pdecl ~vc:false uc (create_type_decl tdl)
-  | PDlet _ld ->
-      assert false (* TODO *)
+  | PDlet ld ->
+      let reads = match ld with
+        | LDvar (_,e) -> e.e_effect.eff_reads
+        | LDsym (_,c) -> cty_reads c.c_cty
+        | LDrec rdl -> List.fold_left (fun spv {rec_rsym = s} ->
+            Spv.union spv (cty_reads s.rs_cty)) Spv.empty rdl in
+      let reads = Spv.filter (fun v ->
+        not (Sid.mem v.pv_vs.vs_name cl.cl_local)) reads in
+      let frz = Spv.fold (fun v s -> ity_freeze s v.pv_ity) reads isb_empty in
+      cl.rn_table <- Mreg.set_union cl.rn_table frz.isb_reg;
+      let sm = Spv.fold (fun v sm -> sm_save_pv sm v v) reads (sm_of_cl cl) in
+      let sm, ld = clone_let_defn cl sm ld in
+      let mpv = Spv.fold (fun v m -> Mvs.remove v.pv_vs m) reads sm.sm_pv in
+      cl.pv_table <- mpv; cl.rs_table <- sm.sm_rs;
+      add_pdecl ~vc:false uc (create_let_decl ld)
   | PDexn xs ->
       let ity = cl_trans_ity cl xs.xs_ity in
       let xs' = create_xsymbol (id_clone xs.xs_name) ity in
@@ -694,7 +856,7 @@ let clone_export uc m inst =
           mi_ts = Mts.map (cl_find_its cl) mi.mi_ts;
           mi_ls = Mls.map (cl_find_ls cl) mi.mi_ls;
           mi_pr = Mpr.map (cl_find_pr cl) mi.mi_pr;
-          mi_pv = Mpv.map (cl_find_pv cl) mi.mi_pv;
+          mi_pv = Mvs.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
           mi_xs = Mexn.map (cl_find_xs cl) mi.mi_xs}
         with Not_found -> uc end

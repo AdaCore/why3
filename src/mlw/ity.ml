@@ -765,7 +765,9 @@ let eff_write rd wr =
                                 eff_covers = Mreg.domain wr }
 
 (*TODO: should we use it and what semantics to give? *)
-(*let eff_reset e r = { e with eff_resets = Sreg.add r e.eff_resets }*)
+let eff_reset ({eff_writes = wr} as e) rs =
+  if not (Mreg.set_disjoint wr rs) then invalid_arg "Ity.eff_reset";
+  { e with eff_resets = Sreg.union rs e.eff_resets }
 
 exception IllegalAssign of region * region * region
 

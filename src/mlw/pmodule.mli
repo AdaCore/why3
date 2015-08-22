@@ -66,7 +66,7 @@ and mod_inst = {
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
-  mi_pv  : pvsymbol Mpv.t;
+  mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mexn.t;
 }
