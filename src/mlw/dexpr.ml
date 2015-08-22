@@ -1048,9 +1048,9 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_if (expr uloc env de1) (expr uloc env de2) (expr uloc env de3)
   | DEcase (de1,bl) ->
       let e1 = expr uloc env de1 in
+      let ghost = e_ghost e1 in
       let mk_branch (dp,de) =
-        let vm, pat = create_prog_pattern
-          dp.dp_pat ~ghost:(e_ghost e1) e1.e_ity in
+        let vm, pat = create_prog_pattern dp.dp_pat ~ghost e1.e_ity in
         let e = expr uloc (add_pv_map env vm) de in
         Mstr.iter (fun _ v -> check_used_pv e v) vm;
         pat, e in
@@ -1060,7 +1060,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let bl = if Pattern.is_exhaustive [t_var v] pl then bl else begin
         if List.length bl > 1 then Warning.emit ?loc:de0.de_loc
           "Non-exhaustive pattern matching, asserting `absurd'";
-        let _,pp = create_prog_pattern PPwild e1.e_ity in
+        let _,pp = create_prog_pattern PPwild ~ghost e1.e_ity in
         (pp, e_absurd (ity_of_dity res)) :: bl end in
       e_case e1 (List.rev bl)
   | DEassign al ->

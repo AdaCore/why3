@@ -234,7 +234,7 @@ let create_prog_pattern pp ?(ghost=false) ity =
     try
       let pv = Hstr.find hv id.pre_name in
       ity_equal_check ity pv.pv_ity;
-      if (pv.pv_ghost <> ghost) then invalid_arg "Expr.make_pattern";
+      if (pv.pv_ghost <> ghost) then invalid_arg "Expr.create_prog_pattern";
       pv
     with Not_found ->
       let pv = create_pvsymbol id ~ghost ity in
