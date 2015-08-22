@@ -23,8 +23,8 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
 
 (* Why3 assumption *)
 Inductive color  :=
-  | Blue : color 
-  | White : color 
+  | Blue : color
+  | White : color
   | Red : color .
 Axiom color_WhyType : WhyType color.
 Existing Instance color_WhyType.
@@ -64,7 +64,7 @@ Axiom nb_occ_store_eq_eq : forall (a:(map.Map.map Z color)) (i:Z) (j:Z) (k:Z)
 
 Open Scope Z_scope.
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 15.
+Ltac ae := why3 "Alt-Ergo,0.95.2," timelimit 15.
 
 (* Why3 goal *)
 Theorem nb_occ_store_eq_neq : forall (a:(map.Map.map Z color)) (i:Z) (j:Z)
@@ -80,5 +80,3 @@ rewrite nb_occ_split with (i:=k) (j:=k+1) (k:=j); auto with zarith.
 rewrite nb_occ_store_outside_down with (i:=k+1); auto with zarith.
 ae.
 Qed.
-
-
