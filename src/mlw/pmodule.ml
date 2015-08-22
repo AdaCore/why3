@@ -555,6 +555,9 @@ let clone_decl inst cl uc d = match d.d_node with
       let d = create_prop_decl k' pr' (cl_trans_fmla cl f) in
       add_pdecl ~vc:false uc (create_pure_decl d)
 
+let cl_save_ls cl s s' =
+  cl.ls_table <- Mls.add_new (CannotInstantiate s.ls_name) s s' cl.ls_table
+
 let cl_save_rs cl s s' =
   cl.rs_table <- Mrs.add s s' cl.rs_table;
   begin match s.rs_field, s'.rs_field with
@@ -563,7 +566,7 @@ let cl_save_rs cl s s' =
   | _ -> assert false (* but not vice versa *)
   end;
   match s.rs_logic, s'.rs_logic with
-  | RLls s, RLls s' -> cl.ls_table <- Mls.add s s' cl.ls_table
+  | RLls s, RLls s' -> cl_save_ls cl s s'
   | RLlemma, RLlemma -> () (* TODO: update cl.pr_table? *)
   | RLnone, RLnone -> ()
   | _ -> assert false
@@ -681,7 +684,7 @@ let sm_save_pv sm v v' = {
 let sm_save_rs cl sm s s' =
   let sm = { sm with sm_rs = Mrs.add s s' sm.sm_rs } in
   match s.rs_logic, s'.rs_logic with
-  | RLls s, RLls s' -> cl.ls_table <- Mls.add s s' cl.ls_table; sm
+  | RLls s, RLls s' -> cl_save_ls cl s s'; sm
   | RLpv v, RLpv v' -> sm_save_pv sm v v'
   | _ -> sm
 
