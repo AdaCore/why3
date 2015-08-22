@@ -37,7 +37,7 @@ end
 
 module Bounded_int
 
-  use export int.Int
+  use import int.Int
 
   type t
 
@@ -62,7 +62,7 @@ module Bounded_int
     requires { "expl:integer overflow" in_bounds (to_int a - to_int b) }
     ensures  { to_int result = to_int a - to_int b }
 
-  val ( *) (a:t) (b:t) : t
+  val (*) (a:t) (b:t) : t
     requires { "expl:integer overflow" in_bounds (to_int a * to_int b) }
     ensures  { to_int result = to_int a * to_int b }
 

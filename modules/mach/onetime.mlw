@@ -5,7 +5,7 @@ module OneTime
 
   use import int.Int
 
-  type t model { v: int; mutable ghost valid: bool }
+  type t = abstract { v: int; mutable valid: bool }
 
   val to_int (x: t) : int
     ensures { result = x.v }

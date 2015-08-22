@@ -5,7 +5,7 @@ module Peano
 
   use import int.Int
 
-  type t model { v: int }
+  type t = abstract { v: int }
 
   val to_int (x: t) : int
     ensures { result = x.v }
