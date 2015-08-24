@@ -248,7 +248,7 @@ let big_int_of_const c =
 let big_int_of_value v =
   match v with
     | Vnum i -> i
-    | _ -> assert false
+    | _ -> raise NotNum
 
 let eval_true _ls _l = Vbool true
 
