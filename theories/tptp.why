@@ -48,6 +48,7 @@ theory Rat
   predicate (< ) (x y : rat)
   predicate (> ) (x y : rat) = y < x
   predicate (<=) (x y : rat) = x < y \/ x = y
+  predicate (>=) (x y : rat) = y <= x
 
   clone export algebra.OrderedField
     with type t = rat, predicate (<=) = (<=)

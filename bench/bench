@@ -46,9 +46,9 @@ drivers () {
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
 	echo -n "  $f... "
 	# running Why
-	if ! echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f - > /dev/null 2>&1; then
+	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null 2>&1; then
 	    echo "why FAILED"
-            echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f -
+            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f -
 	    exit 1
 	fi
 	echo "ok"

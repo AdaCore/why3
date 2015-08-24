@@ -263,7 +263,7 @@ end
 
 theory list.Mem
   syntax predicate mem "member(%1, %2)"
-  
+
 end
 
 theory list.Nth
@@ -297,30 +297,29 @@ theory set.Set
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      empty_def1
+  remove prop      empty_def
 
   syntax function add "add(%1, %2)"
-  remove prop     add_def1
+  remove prop     add_def
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_def1
+  remove prop     remove_def
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_def1
+  remove prop     union_def
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_def1
+  remove prop     inter_def
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_def1
+  remove prop     diff_def
   remove prop     subset_diff
 
   (* TODO: choose *)
 
   syntax function all "fullset"
-  remove prop     all_def
 end
 
 theory set.Fset
@@ -334,24 +333,24 @@ theory set.Fset
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      empty_def1
+  remove prop      empty_def
 
   syntax function add "add(%1, %2)"
-  remove prop     add_def1
+  remove prop     add_def
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_def1
+  remove prop     remove_def
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_def1
+  remove prop     union_def
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_def1
+  remove prop     inter_def
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_def1
+  remove prop     diff_def
   remove prop     subset_diff
 
   (* TODO: choose *)
