@@ -238,6 +238,9 @@ and comment_line = parse
 
 {
 
+  let parse c =
+    let lb = Lexing.from_channel c in Loc.with_location (tptp_file token) lb
+
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
@@ -254,4 +257,3 @@ Local Variables:
 compile-command: "unset LANG; make -C ../.. test"
 End:
 *)
-
