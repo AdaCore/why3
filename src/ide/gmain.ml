@@ -643,10 +643,13 @@ let update_tabs a =
         match a.S.proof_state with
 	  | S.Done r ->
 	    if not (Model_parser.is_model_empty r.Call_provers.pr_model) then begin
-	      Model_parser.interleave_with_source
-		r.Call_provers.pr_model
-		~filename:!current_file
-		~source_code:(Sysutil.file_contents !current_file)
+	      "Counterexample:\n" ^
+		(Model_parser.model_to_string r.Call_provers.pr_model) ^
+		"\n\nSource code interleaved with counterexample:" ^
+		(Model_parser.interleave_with_source
+		   r.Call_provers.pr_model
+		   ~filename:!current_file
+		   ~source_code:(Sysutil.file_contents !current_file))
 	    end else
 	      ""
 	  | _ -> ""
