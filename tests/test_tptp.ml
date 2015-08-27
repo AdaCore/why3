@@ -67,31 +67,69 @@ let pr_decl fmt d =
 let pr_file fmt a =
   Pp.print_list Pp.newline pr_decl fmt a
 
-let rec load file =
-  let ch = open_in file in
-  let ast = Tptp_lexer.parse ch in
-  close_in ch;
-  let ast =
-    List.fold_left
-      (fun acc d ->
-        match d with
-        | Formula _ -> d::acc
-        | Include(file,_,_) ->
-          let fn = String.sub file 1 (String.length file - 2) in
-          let ast = load fn in
-          List.rev_append ast acc)
-      [] ast
-  in List.rev ast
+exception Unsupported of string
 
+let unsupported s = raise (Unsupported s)
+
+let check_op op =
+  match op with
+  | BOequ -> unsupported "BOequ"
+  | BOnequ -> unsupported "BOnequ"
+  | BOimp -> ()
+  | BOpmi -> unsupported "BOpmi"
+  | BOand -> ()
+  | BOor -> ()
+  | BOnand -> ()
+  | BOnor -> ()
+
+let rec check_expr e = match e.e_node with
+  | Elet(e1,e2) -> unsupported "let"
+  | Eite(e1,e2,e3) -> unsupported "ite"
+  | Eqnt(q,vl,e) -> unsupported "qnt"
+  | Ebin(op,e1,e2) -> check_op op; check_expr e1; check_expr e2
+  | Enot e -> check_expr e
+  | Eequ(e1,e2) -> unsupported "equ"
+  | Eapp(w,el) -> List.iter check_expr el
+  | Edef(w,el) -> unsupported "def"
+  | Evar v -> ()
+  | Edob d -> unsupported "dob"
+  | Enum n -> unsupported "num"
+
+let check_top_formula f =
+  match f with
+  | LogicFormula e -> check_expr e
+  | TypedAtom _ -> unsupported "TypedAtom"
+  | Sequent _ -> unsupported "Sequent"
+
+let check_role _r = ()
+
+let check_kind k =
+  match k with
+  | TFF -> unsupported "TFF"
+  | FOF -> ()
+  | CNF -> ()
+
+let check_decl d =
+  match d with
+  | Include _ -> unsupported "Include"
+  | Formula(kind,_,role,top_formula,_) ->
+    check_kind kind; check_role role; check_top_formula top_formula
+
+let check_file a = List.iter check_decl a
 
 let () =
   if Array.length Sys.argv <> 2 then
     eprintf "Usage: %s <file>@." Sys.argv.(0)
   else
+    let file = Sys.argv.(1) in
     try
-      let ast = load Sys.argv.(1) in
+      let ast = Tptp_lexer.load file in
+      check_file ast;
       printf "%a@." pr_file ast
-    with e ->
+    with
+    | Tptp_lexer.FileNotFound f -> eprintf "File not found: %s@." f
+    | Unsupported s -> eprintf "File %s: '%s' is not supported@." file s
+    | e ->
       eprintf "Parsing error: %a@." Exn_printer.exn_printer e
 
 (*
