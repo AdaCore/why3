@@ -77,7 +77,7 @@ let run_test name l =
   let t = Unix.gettimeofday () -. t in
   Format.printf "Unsat (time = %.02f)@.@." t
 
-let () =
+let run_all_tests () =
   run_test "drinker" (ProverTest__Impl.drinker ());
   run_test "group" (ProverTest__Impl.group ());
   run_test "bidon1" (ProverTest__Impl.bidon1 ());
@@ -103,3 +103,31 @@ let () =
   run_test "zenon10 14" (ProverTest__Impl.zenon10 (n 14));
 *)
   printf "End of tests.@."
+
+let run_file file =
+  try
+    let _ast = Tptp_lexer.load file in
+  (* check_file ast; *)
+  (* printf "%a@." pr_file ast; *)
+    printf "File '%s' is OK.@." file;
+    exit 0
+  with
+  | Tptp_lexer.FileNotFound f ->
+    eprintf "File not found: %s@." f; exit 2
+(*
+  | Unsupported s ->
+      eprintf "File %s: '%s' is not supported@." file s; exit 1
+*)
+  | e ->
+    eprintf "Parsing error: %a@." Why3.Exn_printer.exn_printer e;
+    exit 2
+
+let () =
+  if Array.length Sys.argv = 1 then run_all_tests ()
+  else
+    if Array.length Sys.argv = 2 then run_file Sys.argv.(1)
+    else
+      begin
+        eprintf "Usage: %s [file]@\nInternal tests are run if no file is given@." Sys.argv.(0);
+        exit 2
+      end

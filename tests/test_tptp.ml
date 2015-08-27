@@ -85,7 +85,7 @@ let check_op op =
 let rec check_expr e = match e.e_node with
   | Elet(e1,e2) -> unsupported "let"
   | Eite(e1,e2,e3) -> unsupported "ite"
-  | Eqnt(q,vl,e) -> unsupported "qnt"
+  | Eqnt(q,vl,e) -> check_expr e
   | Ebin(op,e1,e2) -> check_op op; check_expr e1; check_expr e2
   | Enot e -> check_expr e
   | Eequ(e1,e2) -> unsupported "equ"
@@ -101,7 +101,19 @@ let check_top_formula f =
   | TypedAtom _ -> unsupported "TypedAtom"
   | Sequent _ -> unsupported "Sequent"
 
-let check_role _r = ()
+let check_role r =
+  match r with
+  | Axiom -> ()
+  | Hypothesis -> ()
+  | Definition -> unsupported "Definition"
+  | Assumption -> ()
+  | Corollary -> ()
+  | Lemma -> ()
+  | Theorem -> ()
+  | Conjecture -> ()
+  | Negated_conjecture -> ()
+  | Type -> unsupported "Type"
+
 
 let check_kind k =
   match k with
@@ -119,18 +131,26 @@ let check_file a = List.iter check_decl a
 
 let () =
   if Array.length Sys.argv <> 2 then
-    eprintf "Usage: %s <file>@." Sys.argv.(0)
+    begin
+      eprintf "Usage: %s <file>@." Sys.argv.(0);
+      exit 2
+    end
   else
     let file = Sys.argv.(1) in
     try
       let ast = Tptp_lexer.load file in
       check_file ast;
-      printf "%a@." pr_file ast
+      (* printf "%a@." pr_file ast; *)
+      printf "File '%s' is OK.@." file;
+      exit 0
     with
-    | Tptp_lexer.FileNotFound f -> eprintf "File not found: %s@." f
-    | Unsupported s -> eprintf "File %s: '%s' is not supported@." file s
+    | Tptp_lexer.FileNotFound f ->
+      eprintf "File not found: %s@." f; exit 2
+    | Unsupported s ->
+      eprintf "File %s: '%s' is not supported@." file s; exit 1
     | e ->
-      eprintf "Parsing error: %a@." Exn_printer.exn_printer e
+      eprintf "Parsing error: %a@." Exn_printer.exn_printer e;
+      exit 2
 
 (*
 Local Variables:
