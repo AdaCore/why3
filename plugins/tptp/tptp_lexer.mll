@@ -273,8 +273,7 @@ let load file =
           match d with
           | Formula _ -> d::acc
           | Include(file,_,_) ->
-            let fn = String.sub file 1 (String.length file - 2) in
-            let ast = aux fn in
+            let ast = aux file in
             List.rev_append ast acc)
         [] ast
     in List.rev ast

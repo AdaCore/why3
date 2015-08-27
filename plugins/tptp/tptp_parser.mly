@@ -14,6 +14,8 @@ open Tptp_ast
 
 let mk_expr n s e = { e_node = n; e_loc = Why3.Loc.extract (s,e) }
 
+let remove_quotes s = String.sub s 1 (String.length s - 2)
+
 exception UnsupportedRole of string
 
 let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
@@ -61,7 +63,7 @@ input:
 | kind LEFTPAR name COMMA role COMMA top_formula annotation RIGHTPAR DOT
   { Formula ($1, $3, $5, $7, Why3.Loc.extract ($startpos, $endpos)) }
 | INCLUDE LEFTPAR SINGLE_QUOTED formula_selection RIGHTPAR DOT
-  { Include ($3, $4, Why3.Loc.extract ($startpos, $endpos)) }
+  { Include (remove_quotes $3, $4, Why3.Loc.extract ($startpos, $endpos)) }
 
 kind:
 | TFFK { TFF }
