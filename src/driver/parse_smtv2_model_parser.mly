@@ -2,13 +2,13 @@
 %}
 
 %start <Model_parser.model_element list> output
-
 %token <string> SPACE
 %token <string> ATOM
 %token STORE
 %token CONST
 %token AS
 %token <string> INT_STR
+%token <int> BITVECTOR_VALUE
 %token <string> MINUS_INT_STR
 %token LPAREN RPAREN
 %token EOF
@@ -54,6 +54,7 @@ value:
 | integer { $1 }
 | other_val_str { Model_parser.Unparsed $1 }
 | array { Model_parser.Array $1 }
+| bitvector { Model_parser.Bitvector $1 }
 
 integer:
 | INT_STR { Model_parser.Integer $1 }
@@ -100,6 +101,12 @@ array:
     possible_space
   RPAREN
     { Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
+
+(* Example:
+   (_ bv2048 16) *)
+bitvector:
+| BITVECTOR_VALUE
+    { $1 }
 
 array_skipped_part:
 | LPAREN term_list RPAREN {}
