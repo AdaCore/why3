@@ -1,684 +1,1108 @@
 
+(* Define what is a semantic model. *)
 module Model
   
   use import logic_syntax.Defs
+  use import logic_typing.Sig
   use import list.List
   use import support.HO
   
-  type model 'univ = {
+  (* 'u: intended to be the universe domain, both for types
+      and terms. *)
+  type model 'u = {
     (* Type symbols: interpreted as any-ary functions. *)
-    ty_funs : ty_symbol -> list 'univ -> 'univ;
-    (* Interpretation of types as (non-empty) domains:
-       ty_doms (ty semantics) is the domain of ty's interpretation. *)
-    ty_doms : 'univ -> 'univ -> bool;
+    ty_funs : ty_symbol -> list 'u -> 'u;
+    (* Interpretations of types as universe sub-domains:
+       ty_doms ty is the domain of type ty. *)
+    ty_doms : 'u -> 'u -> bool;
     (* Interpretation of logical symbols.
-       The two sequences of arguments corresponds respectively
-       to types and elements arguments *)
-    ls_eval : lsymbol -> list 'univ -> list 'univ -> 'univ;
-    (* Constructor test. *)
-    ls_case : lsymbol -> list 'univ -> 'univ -> bool;
-    (* Projections for invertible symbols (e.g constructors). *)
-    ls_proj : lsymbol -> list 'univ -> 'univ -> list 'univ;
-    (* Interpretation of choice operator (epsilon). *)
-    i_eps : 'univ -> ('univ -> bool) -> 'univ;
-    (* Builtin sort for proposition, with two members true and false. *)
-    i_prop : 'univ;
-    i_true : 'univ;
-    i_false : 'univ;
+       First sequence is type arguments, second is regular arguments. *)
+    ls_eval : lsymbol -> list 'u -> list 'u -> 'u;
+    (* Constructor test function.
+       ls_case f tyl x is intended to check whether x belong to the span
+       of constructor f applied to polymorphic arguments tyl. *)
+    ls_case : lsymbol -> list 'u -> 'u -> bool;
+    (* Constructor projections: inverses for constructors. *)
+    ls_proj : lsymbol -> list 'u -> 'u -> list 'u;
+    (* Interpretation of choice operator (epsilon). The first
+       argument allows for parameterization on the type. *)
+    i_eps : 'u -> ('u -> bool) -> 'u;
+    (* Interpretations of builtin constants true and false. *)
+    i_true : 'u;
+    i_false : 'u;
   }
   
-  (* Valuations for variables. *)
-  type ty_valuation 'univ = ty_var -> 'univ
-  type valuation 'tv 'univ = 'tv -> 'univ
+  (* Interpretation of the proposition sort. *)
+  function i_prop (m:model 'u) : 'u = m.ty_funs tys_prop Nil
+  
+  (* Valuations. *)
+  type ty_val 'u = ty_var -> 'u
+  type valuation 'tv 'u = 'tv -> 'u
   
   (* Definition of a valid model. *)
-  predicate model_ok (m:model 'univ) =
-    (* Choice operator fall in the right type interpretation. In particular,
-       it implies that every type interpretation is inhabited. *)
-    (forall ty s. m.ty_doms ty (m.i_eps ty s)) /\
-    (* Choice operator fall in the input set when possible. *)
-    (forall ty s x. m.ty_doms ty x /\ s x -> s (m.i_eps ty s)) /\
-    (* true and false are distinct inhabitant of prop. *)
+  predicate valid_model (m:model 'u) =
+    (* Choice operator falls in the right interpretation.
+       In particular, every type interpretation must be inhabited. *)
+    (forall tys s. m.ty_doms tys (m.i_eps tys s)) /\
+    (* Whenever possible, choice operator fall in the input set. *)
+    (forall tys s x. m.ty_doms tys x /\ s x -> s (m.i_eps tys s)) /\
+    (* true and false are distinct. *)
     m.i_true <> m.i_false /\
+    (* true and false belong to the interpretation of prop. *)
     m.ty_doms m.i_prop m.i_true /\ m.ty_doms m.i_prop m.i_false
   
-  (* Extends type domain interpretation to lists. *)
-  predicate tyl_doms (m:model 'univ) (a:list 'univ) (b:list 'univ) =
-    match a with
+  (* Extension of type interpretation to list. *)
+  predicate tyl_doms (m:model 'u) (a:list 'u) (b:list 'u) = match a with
     | Nil -> b = Nil
-    | Cons x q -> exists y r. b = Cons y r /\
-      m.ty_doms x y /\ tyl_doms m q r
+    | Cons x q -> exists y r. b = Cons y r /\ m.ty_doms x y /\ tyl_doms m q r
     end
-  
-  (*let rec lemma tyl_doms_independence (m1 m2:model 'univ)
-    (a b:list 'univ) : unit
-    requires { m1.ty_doms = m2.ty_doms }
-    ensures { tyl_doms m1 a b <-> tyl_doms m2 a b }
-    variant { a }
-  = match a , b with
-    | Nil , _ | _ , Nil -> ()
-    | Cons _ qa , Cons _ qb -> tyl_doms_independence m1 m2 qa qb
-    end*)
   
 end
 
-(* Definition of types/formulas semantics. *)
+(* Definition of types/pattern/terms interpretation in a given
+   model/valuation. *)
 module Sem
   
   use import logic_syntax.Defs
-  use import logic_syntax.VarsIn
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Nth
-  use import option.Option
   use import support.HO
+  use import support.HOList
+  use import support.PartialMap
   use import support.Bind
   use import support.Choice
-  use import support.PartialMap
-  use import Model
+  use import list.List
+  use import list.Nth
+  use import option.Option
+  use export Model
   
-  function ty_sem (m:model 'univ) (tyv:ty_valuation 'univ) (ty:ty) : 'univ =
+  (* Type interpretation: straightforward. *)
+  function ty_sem (m:model 'u) (tyv:ty_val 'u) (ty:ty) : 'u =
     match ty with
     | TyVar x -> tyv x
     | TyApp f tyl -> m.ty_funs f (tyl_sem m tyv tyl)
     end
   
-  with tyl_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (tyl:list ty) : list 'univ =
+  with tyl_sem (m:model 'u) (tyv:ty_val 'u) (tyl:list ty) : list 'u =
     match tyl with
     | Cons x q -> Cons (ty_sem m tyv x) (tyl_sem m tyv q)
     | Nil -> Nil
     end
   
-  predicate pat_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (p:pattern) (u:'univ) (sigma:pat_var -> option 'univ) =
+  let rec lemma tyl_sem_def (m:model 'u) (tyv:ty_val 'u) (tyl:list ty) : unit
+    ensures { tyl_sem m tyv tyl = map (ty_sem m tyv) tyl }
+    variant { tyl }
+  = match tyl with Cons _ q -> tyl_sem_def m tyv q | _ -> () end
+  
+  (* Pattern interpretation: First as a filter. *)
+  predicate pat_accept (m:model 'u) (tyv:ty_val 'u) (p:pattern) (u:'u) =
     match p with
-    | PWild -> sigma = const None
-    | PVar x -> sigma = (const None)[x <- Some u]
-    | PAs p x -> exists sigma'.
-      pat_sem m tyv p u sigma' /\ sigma = sigma'[x <- Some u]
+    | PWild | PVar _ -> true
+    | PAs p _ -> pat_accept m tyv p u
     | PApp f tyl args -> m.ls_case f (tyl_sem m tyv tyl) u /\
-      patl_sem m tyv args (m.ls_proj f (tyl_sem m tyv tyl) u) sigma
-    | POr p1 p2 -> pat_sem m tyv p1 u sigma \/
-      (pat_sem m tyv p2 u sigma /\ not pat_accept m tyv p1 u)
+      patl_accept m tyv args (m.ls_proj f (tyl_sem m tyv tyl) u)
+    | POr p1 p2 -> pat_accept m tyv p1 u \/ pat_accept m tyv p2 u
     end
   
-  with patl_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (pl:list pattern) (u:list 'univ) (sigma:pat_var -> option 'univ) =
-    match pl with
-    | Nil -> u = Nil /\ sigma = const None
-    | Cons x q -> exists y r s1 s2. u = Cons y r /\
-      pat_sem m tyv x y s1 /\ patl_sem m tyv q r s2 /\ sigma = extend s1 s2
+  with patl_accept (m:model 'u) (tyv:ty_val 'u) (p:list pattern) (u:list 'u) =
+    match p with
+    | Nil -> u = Nil
+    | Cons x q -> exists y r. u = Cons y r /\
+      pat_accept m tyv x y /\ patl_accept m tyv q r
     end
   
-  with pat_accept (m:model 'univ) (tyv:ty_valuation 'univ)
-    (p:pattern) (u:'univ) =
-    exists sigma. pat_sem m tyv p u sigma
-  
-  with patl_accept (m:model 'univ) (tyv:ty_valuation 'univ)
-    (p:list pattern) (u:list 'univ) =
-    exists sigma. patl_sem m tyv p u sigma
-  
-  predicate br_accept (m:model 'univ) (tyv:ty_valuation 'univ)
-    (br:branch 'tv) (u:'univ) =
+  predicate br_accept (m:model 'u) (tyv:ty_val 'u) (br:branch 'v) (u:'u) =
     let (p,_) = br in pat_accept m tyv p u
   
-  predicate brl_accept (m:model 'univ) (tyv:ty_valuation 'univ)
-    (brl:list (branch 'tv)) (u:'univ) =
+  
+  predicate brl_accept (m:model 'u) (tyv:ty_val 'u)
+    (brl:list (branch 'v)) (u:'u) =
     match brl with
     | Nil -> false
     | Cons x q -> br_accept m tyv x u \/ brl_accept m tyv q u
     end
   
-  (* Universal/existential quantifiers must be made relative with respect
-     to their type arguments. *)
-  predicate wty_assignment (m:model 'univ) (tyv:ty_valuation 'univ)
-    (l:list ty) (f:int -> 'univ) =
-    forall n. 0 <= n < length l -> match nth n l with
-      | None -> false
-      | Some ty -> m.ty_doms (ty_sem m tyv ty) (f n)
+  (* Pattern interpretation: Second as a valuation extension builder. *)
+  function pat_sem (m:model 'u) (tyv:ty_val 'u)
+    (p:pattern) (u:'u) : pat_var -> option 'u =
+    match p with
+    | PWild -> const None
+    | PVar x -> (const None)[x <- Some u]
+    | PAs p x -> (pat_sem m tyv p u)[x <- Some u]
+    | PApp f tyl args -> patl_sem m tyv args (m.ls_proj f (tyl_sem m tyv tyl) u)
+    | POr p1 p2 -> if pat_accept m tyv p1 u
+      then pat_sem m tyv p1 u
+      else pat_sem m tyv p2 u
+    end
+  
+  with patl_sem (m:model 'u) (tyv:ty_val 'u)
+    (patl:list pattern) (lu:list 'u) : pat_var -> option 'u =
+    match patl , lu with
+    | Nil , _ | _ , Nil -> const None
+    | Cons x q , Cons y r ->
+      let s1 = pat_sem m tyv x y in
+      let s2 = patl_sem m tyv q r in
+      extend s1 s2
+    end
+  
+  (* Universal/existential quantifications must be made relative with respect
+     to their type arguments. This predicate state explicitly the
+     extra hypothesis. *)
+  predicate wty_assignment (m:model 'u) (tyv:ty_val 'u)
+    (l:list 'u) (f:int -> 'u) =
+    forall n. match nth n l with
+      | Some ty -> m.ty_doms ty (f n)
+      | _ -> true
       end
   
-  function t_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (tv:valuation 'tv 'univ) (t:term 'tv) : 'univ =
+  (* Term interpretation. *)
+  function t_sem (m:model 'u) (tyv:ty_val 'u)
+    (tv:valuation 'v 'u) (t:term 'v) : 'u =
     match t with
     | TVar x -> tv x
     | TApp f tyl tl -> m.ls_eval f (tyl_sem m tyv tyl) (tl_sem m tyv tv tl)
-    | TIf b t e -> if t_sem m tyv tv b = m.i_true
+    | TIf b t e -> if f_sem m tyv tv b
       then t_sem m tyv tv t
       else t_sem m tyv tv e
     | TLet t1 t2 -> let x = t_sem m tyv tv t1 in
       t_sem m tyv (bfold tv (const x)) t2
     | TCase t brl -> brl_sem m tyv tv brl (t_sem m tyv tv t)
     | TEps ty t -> m.i_eps (ty_sem m tyv ty) (p_sem m tyv tv t)
-    | TForall fty tq -> if (forall f. wty_assignment m tyv fty f ->
-      t_sem m tyv (bfold tv f) tq = m.i_true)
+    | TForall fty tq ->
+      if (forall f. wty_assignment m tyv (tyl_sem m tyv fty) f ->
+                    f_sem m tyv (bfold tv f) tq)
       then m.i_true
       else m.i_false
-    | TExists fty tq -> if (exists f. wty_assignment m tyv fty f /\
-      t_sem m tyv (bfold tv f) tq = m.i_true)
+    | TExists fty tq ->
+      if (exists f. wty_assignment m tyv (tyl_sem m tyv fty) f /\
+                    f_sem m tyv (bfold tv f) tq)
       then m.i_true
       else m.i_false
-    | TAnd a b -> if t_sem m tyv tv a = m.i_true /\ t_sem m tyv tv b = m.i_true
+    | TAnd a b -> if f_sem m tyv tv a /\ f_sem m tyv tv b
       then m.i_true
       else m.i_false
-    | TOr a b -> if t_sem m tyv tv a = m.i_true \/ t_sem m tyv tv b = m.i_true
+    | TOr a b -> if f_sem m tyv tv a \/ f_sem m tyv tv b
       then m.i_true
       else m.i_false
     | TImplies a b ->
-      if (t_sem m tyv tv a = m.i_true -> t_sem m tyv tv b = m.i_true)
+      if (f_sem m tyv tv a -> f_sem m tyv tv b)
       then m.i_true
       else m.i_false
     | TIff a b ->
-      if (t_sem m tyv tv a = m.i_true <-> t_sem m tyv tv b = m.i_true)
+      if (f_sem m tyv tv a <-> f_sem m tyv tv b)
       then m.i_true
       else m.i_false
-    | TNot a -> if t_sem m tyv tv a = m.i_true
+    | TNot a -> if f_sem m tyv tv a
       then m.i_false
       else m.i_true
     | TTrue -> m.i_true
     | TFalse -> m.i_false
     end
   
-  with p_sem (m:model 'univ) (tyv:ty_valuation 'univ) (tv:valuation 'tv 'univ)
-    (t:term (bind 'tv unit)) : 'univ -> bool =
-    \x. t_sem m tyv (bfold tv (const x)) t = m.i_true
+  (* Shortcuts for terms that are actually formula.
+     For such terms, the boolean interpretation is usually
+     more desirable. *)
+  with f_sem (m:model 'u) (tyv:ty_val 'u) (tv:valuation 'v 'u)
+    (t:term 'v) = t_sem m tyv tv t = m.i_true
   
-  with tl_sem (m:model 'univ) (tyv:ty_valuation 'univ) (tv:valuation 'tv 'univ)
-    (l:list (term 'tv)) : list 'univ =
+  (* Technical shortcut for epsilon: interpretation of term
+     with a bound variable as a set. *)
+  with p_sem (m:model 'u) (tyv:ty_val 'u) (tv:valuation 'v 'u)
+    (t:term (bind 'v unit)) : 'u -> bool =
+    \x. f_sem m tyv (bfold tv (const x)) t
+  
+  with tl_sem (m:model 'u) (tyv:ty_val 'u) (tv:valuation 'v 'u)
+    (l:list (term 'v)) : list 'u =
     match l with
     | Cons x q -> Cons (t_sem m tyv tv x) (tl_sem m tyv tv q)
     | Nil -> Nil
     end
   
-  with brl_sem (m:model 'univ) (tyv:ty_valuation 'univ) (tv:valuation 'tv 'univ)
-    (l:list (branch 'tv)) (x:'univ) : 'univ =
+  with brl_sem (m:model 'u) (tyv:ty_val 'u) (tv:valuation 'v 'u)
+    (l:list (branch 'v)) (x:'u) : 'u =
     match l with
-    | Cons b q -> br_sem m tyv tv b x (brl_sem m tyv tv q x)
-    | Nil -> m.i_false
+    | Cons br q -> br_sem m tyv tv br x (brl_sem m tyv tv q x)
+    | Nil -> default
     end
   
-  with br_sem (m:model 'univ) (tyv:ty_valuation 'univ) (tv:valuation 'tv 'univ)
-    (b:branch 'tv) (x:'univ) (cont:'univ) : 'univ =
-    match b with
-    | (pat,right) -> if (exists sigma. pat_sem m tyv pat x sigma)
-      then let sigma = choice (pat_sem m tyv pat x) in
+  with br_sem (m:model 'u) (tyv:ty_val 'u) (tv:valuation 'v 'u)
+    (br:branch 'v) (x:'u) (cont:'u) : 'u =
+    let (pat,right) = br in if pat_accept m tyv pat x
+      then let sigma = pat_sem m tyv pat x in
         let sigma_c = complete sigma default in
         t_sem m tyv (bfold tv sigma_c) right
       else cont
-    end
   
-  (* Independence of semantics with respects to model assignement to
-     non-free variables. *)
+  let rec lemma tl_sem_def (m:model 'u) (tyv:ty_val 'u) (tv:valuation 'v 'u)
+    (l:list (term 'v)) : unit
+    ensures { tl_sem m tyv tv l = map (t_sem m tyv tv) l }
+    variant { l }
+  = match l with Cons _ q -> tl_sem_def m tyv tv q | _ -> () end
   
-  predicate model_ty_congruence (s1:ty_var -> bool) (s2:ty_symbol -> bool)
-    (m1 m2:model 'univ) (tyv1 tyv2:ty_valuation 'univ) =
-    (forall x. s1 x -> tyv1 x = tyv2 x) /\
-    (forall tys. s2 tys -> m1.ty_funs tys = m2.ty_funs tys) /\
-    m1.ty_doms = m2.ty_doms
+  lemma f_sem_def_if : forall m:model 'u,tyv tv,b t e:term 'v.
+    f_sem m tyv tv (TIf b t e) <->
+      if f_sem m tyv tv b then f_sem m tyv tv t else f_sem m tyv tv e
   
-  let rec lemma ty_sem_independence (m1 m2:model 'univ)
-    (tyv1 tyv2:ty_valuation 'univ)
-    (s1:ty_var -> bool) (s2:ty_symbol -> bool) (ty:ty)
-    requires { ty_vars_in s1 s2 ty }
-    requires { model_ty_congruence s1 s2 m1 m2 tyv1 tyv2 }
-    ensures { ty_sem m1 tyv1 ty = ty_sem m2 tyv2 ty }
-    variant { ty }
-  = match ty with
-    | TyApp _ tyl -> tyl_sem_independence m1 m2 tyv1 tyv2 s1 s2 tyl
-    | _ -> ()
-    end
+  lemma f_sem_let : forall m:model 'u,tyv tv,t1:term 'v,t2.
+    f_sem m tyv tv (TLet t1 t2) <->
+      f_sem m tyv (bfold tv (const (t_sem m tyv tv t1))) t2
   
-  with lemma tyl_sem_independence (m1 m2:model 'univ)
-    (tyv1 tyv2:ty_valuation 'univ)
-    (s1:ty_var -> bool) (s2:ty_symbol -> bool) (tyl:list ty)
-    requires { tyl_vars_in s1 s2 tyl }
-    requires { model_ty_congruence s1 s2 m1 m2 tyv1 tyv2 }
-    ensures { tyl_sem m1 tyv1 tyl = tyl_sem m2 tyv2 tyl }
-    variant { tyl }
-  = match tyl with
-    | Cons x q -> ty_sem_independence m1 m2 tyv1 tyv2 s1 s2 x;
-      tyl_sem_independence m1 m2 tyv1 tyv2 s1 s2 q
-    | _ -> ()
-    end
+  lemma f_sem_forall : forall m:model 'u,tyv tv tyl,t:term (bind 'v int).
+    valid_model m ->
+    (f_sem m tyv tv (TForall tyl t) <->
+      forall fty. wty_assignment m tyv (tyl_sem m tyv tyl) fty ->
+        f_sem m tyv (bfold tv fty) t)
   
-  let rec lemma tyl_sem_len (m:model 'univ) (tyv:ty_valuation 'univ)
-    (tyl:list ty) : unit
-    ensures { length (tyl_sem m tyv tyl) = length tyl }
-    variant { tyl }
-  = match tyl with
-    | Cons _ q -> tyl_sem_len m tyv q
-    | _ -> ()
-    end
+  lemma f_sem_exists : forall m:model 'u,tyv tv tyl,t:term (bind 'v int).
+    valid_model m ->
+    (f_sem m tyv tv (TExists tyl t) <->
+      exists fty. wty_assignment m tyv (tyl_sem m tyv tyl) fty /\
+        f_sem m tyv (bfold tv fty) t)
   
-  let rec lemma tyl_sem_nth (m:model 'univ) (tyv:ty_valuation 'univ)
-    (tyl:list ty) (n:int) (d1:int -> ty) (d2:int -> 'univ) : unit
-    requires { 0 <= n < length tyl }
-    ensures { ty_sem m tyv (list_nth tyl d1 n) =
-      list_nth (tyl_sem m tyv tyl) d2 n }
-    variant { tyl }
-  = match tyl with
-    | Cons _ q -> if n > 0
-      then tyl_sem_nth m tyv q (n-1) d1 d2
-    | _ -> ()
-    end
+  lemma f_sem_binop : forall m:model 'u,tyv tv,a b:term 'v.
+    valid_model m ->
+    (f_sem m tyv tv (TAnd a b) <->
+     f_sem m tyv tv a /\ f_sem m tyv tv b) /\
+    (f_sem m tyv tv (TOr a b) <->
+     f_sem m tyv tv a \/ f_sem m tyv tv b) /\
+    (f_sem m tyv tv (TImplies a b) <->
+     (f_sem m tyv tv a -> f_sem m tyv tv b)) /\
+    (f_sem m tyv tv (TIff a b) <->
+     (f_sem m tyv tv a <-> f_sem m tyv tv b))
+  
+  lemma f_sem_not : forall m:model 'u,tyv tv,a:term 'v.
+    valid_model m -> (f_sem m tyv tv (TNot a) <-> not f_sem m tyv tv a)
+  
+  lemma f_sem_tf : forall m:model 'u,tyv tv.
+    valid_model m -> f_sem m tyv tv (TTrue:term 'v) /\ not f_sem m tyv tv TFalse
   
 end
 
-module TySemSubst
+(* Behaviour of substitution with respect to semantics.
+   Proofs in next module. *)
+module SemSubst
   
-  use import logic_syntax.Defs
-  use import logic_syntax.Substs
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Nth
-  use import option.Option
+  clone import support.Dummy as DSemSubst
   use import support.HO
-  use import support.Bind
-  use import support.Choice
-  use import Model
-  use import Sem
+  use import logic_syntax.Substs
+  use export Sem
   
-  let rec lemma ty_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+  axiom ty_subst_sem : forall m:model 'u,tyv f ty.
+    ty_sem m tyv (ty_subst f id ty) =
+    ty_sem m (compose (ty_sem m tyv) f) ty
+    /\ forall _:d.true
+  
+  axiom tyl_subst_sem : forall m:model 'u,tyv f tyl.
+    tyl_sem m tyv (tyl_subst f id tyl) =
+    tyl_sem m (compose (ty_sem m tyv) f) tyl
+    /\ forall _:d.true
+  
+  axiom pat_subst_accept : forall m:model 'u,tyv f g pat x.
+    pat_accept m tyv (pat_subst f g id id pat) x <->
+    pat_accept m (compose (ty_sem m tyv) g) pat x
+    /\ forall _:d.true
+  
+  axiom patl_subst_accept : forall m:model 'u,tyv f g patl lx.
+    patl_accept m tyv (patl_subst f g id id patl) lx <->
+    patl_accept m (compose (ty_sem m tyv) g) patl lx
+    /\ forall _:d.true
+  
+  axiom br_subst_accept : forall m:model 'u,tyv,f:'v -> term 'w,g br x.
+    br_accept m tyv (br_subst f g id id br) x <->
+    br_accept m (compose (ty_sem m tyv) g) br x
+    /\ forall _:d.true
+  
+  axiom brl_subst_accept : forall m:model 'u,tyv,f:'v -> term 'w,g brl x.
+    brl_accept m tyv (brl_subst f g id id brl) x <->
+    brl_accept m (compose (ty_sem m tyv) g) brl x
+    /\ forall _:d.true
+  
+  axiom pat_subst_sem : forall m:model 'u,tyv f pat x.
+    pat_sem m tyv (pat_subst id f id id pat) x =
+    pat_sem m (compose (ty_sem m tyv) f) pat x
+    /\ forall _:d.true
+  
+  axiom patl_subst_sem : forall m:model 'u,tyv f patl lx.
+    patl_sem m tyv (patl_subst id f id id patl) lx =
+    patl_sem m (compose (ty_sem m tyv) f) patl lx
+    /\ forall _:d.true
+  
+  axiom t_map_sem : forall m:model 'u,tyv tv,f:'v -> 'w,g t.
+    t_sem m tyv tv (t_map f g id id t) =
+    t_sem m (compose tyv g) (compose tv f) t
+    /\ forall _:d.true
+  
+  axiom t_subst_sem : forall m:model 'u,tyv tv,f:'v -> term 'w,g t.
+    t_sem m tyv tv (t_subst f g id id t) =
+    t_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) t
+    /\ forall _:d.true
+  
+  axiom tl_map_sem : forall m:model 'u,tyv tv,f:'v -> 'w,g tl.
+    tl_sem m tyv tv (tl_map f g id id tl) =
+    tl_sem m (compose tyv g) (compose tv f) tl
+    /\ forall _:d.true
+  
+  axiom tl_subst_sem : forall m:model 'u,tyv tv,f:'v -> term 'w,g tl.
+    tl_sem m tyv tv (tl_subst f g id id tl) =
+    tl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) tl
+    /\ forall _:d.true
+  
+  axiom br_map_sem : forall m:model 'u,tyv tv,f:'v -> 'w,g br x cont.
+    br_sem m tyv tv (br_map f g id id br) x cont =
+    br_sem m (compose tyv g) (compose tv f) br x cont
+    /\ forall _:d.true
+  
+  axiom br_subst_sem : forall m:model 'u,tyv tv,f:'v -> term 'w,g br x cont.
+    br_sem m tyv tv (br_subst f g id id br) x cont =
+    br_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) br x cont
+    /\ forall _:d.true
+  
+  axiom brl_map_sem : forall m:model 'u,tyv tv,f:'v -> 'w,g brl x.
+    brl_sem m tyv tv (brl_map f g id id brl) x =
+    brl_sem m (compose tyv g) (compose tv f) brl x
+    /\ forall _:d.true
+  
+  axiom brl_subst_sem : forall m:model 'u,tyv tv,f:'v -> term 'w,g brl x.
+    brl_sem m tyv tv (brl_subst f g id id brl) x =
+    brl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) brl x
+    /\ forall _:d.true
+  
+end
+
+module SemSubstProofs
+  
+  use import list.List
+  use import support.HOFull
+  use import support.BindFull
+  use import logic_syntax.MapAsSubst
+  use import Sem
+  use import support.NoDiscriminate
+  
+  let rec lemma ty_subst_sem (m:model 'u) (tyv:ty_val 'u)
     (f:int -> ty) (ty:ty) : unit
     ensures { ty_sem m (compose (ty_sem m tyv) f) ty =
-      ty_sem m tyv (ty_subst f identity ty) }
+      ty_sem m tyv (ty_subst f id ty) }
     variant { ty }
   = match ty with
     | TyApp _ tyl -> tyl_subst_sem m tyv f tyl
     | _ -> ()
     end
   
-  with lemma tyl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
+  with lemma tyl_subst_sem (m:model 'u) (tyv:ty_val 'u)
     (f:int -> ty) (tyl:list ty) : unit
     ensures { tyl_sem m (compose (ty_sem m tyv) f) tyl =
-      tyl_sem m tyv (tyl_subst f identity tyl) }
+      tyl_sem m tyv (tyl_subst f id tyl) }
     variant { tyl }
   = match tyl with
     | Cons x q -> ty_subst_sem m tyv f x;tyl_subst_sem m tyv f q
     | _ -> ()
     end
   
-end
-
-module SemSubst
-  
-  use import logic_syntax.Defs
-  use import logic_syntax.Substs
-  use import logic_syntax.SubstList
-  (* BIG PROBLEM HERE:
-     Importing this module makes it visible in all dependencies,
-     which lose a lot of proofs.
-     However, we need it only temporarily here to make some other proofs.
-     ==> Problem of large contexts.
-     FIX: split the module in two, with the extension requiring commutations
-     out. *)
-  use import logic_syntax.Commutations
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Nth
-  use import option.Option
-  use import support.HO
-  use import support.Bind
-  use import support.Choice
-  use import support.PartialMap
-  use import Model
-  use import Sem
-  use import TySemSubst
-  
-  let rec lemma pat_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:int -> ty) (pat:pattern) : unit
-    ensures { forall x s.
-      pat_sem m tyv (pat_subst identity f identity identity pat) x s <->
-      pat_sem m (compose (ty_sem m tyv) f) pat x s }
+  let rec lemma pat_subst_accept (m:model 'u) (tyv:ty_val 'u)
+    (f:pat_var -> pat_var) (g:int -> ty) (x:'u) (pat:pattern) : unit
+    ensures { pat_accept m tyv (pat_subst f g id id pat) x <->
+      pat_accept m (compose (ty_sem m tyv) g) pat x }
     variant { pat }
-  = let ghost rc = pat_subst_sem m tyv f in
+  = let ghost rc = pat_subst_accept m tyv f g x in
     match pat with
-    | PWild | PVar _ -> ()
-    | PAs p _ -> rc p
     | POr p1 p2 -> rc p1;rc p2
-    | PApp _ _ pl -> patl_subst_sem m tyv f pl
+    | PAs p _ -> rc p
+    | PWild | PVar _ -> ()
+    | PApp cs tyl patl ->
+      let tya = m.ls_proj cs (tyl_sem m tyv (tyl_subst g id tyl)) x in
+      patl_subst_accept m tyv f g tya patl
     end
   
-  with lemma patl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:int -> ty) (pl:list pattern) : unit
-    ensures { forall lx s.
-      patl_sem m tyv (patl_subst identity f identity identity pl) lx s <->
-      patl_sem m (compose (ty_sem m tyv) f) pl lx s }
-    variant { pl }
-  = match pl with
-    | Cons x q -> pat_subst_sem m tyv f x;patl_subst_sem m tyv f q
+  with lemma patl_subst_accept (m:model 'u) (tyv:ty_val 'u)
+    (f:pat_var -> pat_var) (g:int -> ty) (lx:list 'u) (patl:list pattern) : unit
+    ensures { patl_accept m tyv (patl_subst f g id id patl) lx <->
+      patl_accept m (compose (ty_sem m tyv) g) patl lx }
+    variant { patl }
+  = match patl , lx with
+    | Cons hp qp , Cons hx qx -> pat_subst_accept m tyv f g hx hp;
+      patl_subst_accept m tyv f g qx qp
+    | Nil , Nil -> "keep_on_simp" ()
     | _ -> ()
     end
   
-  let rec lemma t_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-     (f:'tv1 -> 'tv2) (t:term 'tv1) : unit
-    ensures { forall rho.
-      t_sem m tyv rho (t_map f identity identity identity t) =
-      t_sem m tyv (compose rho f) t }
-    variant { t }
-  = let ghost rc = t_map_sem m tyv f in
-    match t with
-    | TApp _ _ tl -> tl_map_sem m tyv f tl
-    | TIf b t e -> rc b;rc t;rc e
-    | TLet t1 t2 -> rc t1;t_map_sem m tyv (bmap f) t2;
-      assert { forall rho.
-        let v0 = t_sem m tyv rho (t_map f identity identity identity t1) in
-        let cv0 = const v0 in let g0 = bfold rho cv0 in
-        t_sem m tyv g0 (t_map (bmap f) identity identity identity t2) =
-        t_sem m tyv (bfold (compose rho f) cv0) t2 }
-    | TCase t brl -> rc t;brl_map_sem m tyv f brl
-    | TEps _ t -> t_map_sem m tyv (bmap f) t;
-      assert { forall rho.
-        let tm = t_map (bmap f) identity identity identity t in
-        (forall x. t_sem m tyv (bfold rho (const x)) tm =
-          t_sem m tyv (compose (bfold rho (const x)) (bmap f)) t =
-          t_sem m tyv (bfold (compose rho f) (const x)) t) &&
-        extensional_equal (p_sem m tyv rho tm)
-                          (p_sem m tyv (compose rho f) t) };
-    | TForall _ t | TExists _ t -> t_map_sem m tyv (bmap f) t;
-      assert { forall rho fv. let g0 = bfold rho fv in
-        t_sem m tyv g0 (t_map (bmap f) identity identity identity t) =
-        t_sem m tyv (bfold (compose rho f) fv) t };
-    | TAnd a b | TOr a b | TImplies a b | TIff a b -> rc a;rc b
-    | TNot t -> rc t
-    | TTrue | TFalse | TVar _ -> ()
+  let lemma br_subst_accept (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> term 'w) (g:int -> ty) (br:branch 'v) (x:'u) : unit
+    ensures { br_accept m tyv (br_subst f g id id br) x <->
+      br_accept m (compose (ty_sem m tyv) g) br x }
+  = ()
+  
+  let rec lemma brl_subst_accept (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> term 'w) (g:int -> ty) (brl:list (branch 'v)) (x:'u) : unit
+    ensures { brl_accept m tyv (brl_subst f g id id brl) x <->
+      brl_accept m (compose (ty_sem m tyv) g) brl x }
+    variant { brl }
+  = match brl with Cons _ q -> brl_subst_accept m tyv f g q x | _ -> () end
+  
+  let rec lemma pat_subst_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:int -> ty) (x:'u) (pat:pattern) : unit
+    ensures { pat_sem m tyv (pat_subst id f id id pat) x =
+      pat_sem m (compose (ty_sem m tyv) f) pat x }
+    variant { pat }
+  = let ghost rc = pat_subst_sem m tyv f x in
+    match pat with
+    | PVar _ | PWild -> ()
+    | POr a b -> rc a;rc b
+    | PAs p _ -> rc p
+    | PApp cs tyl patl ->
+      let lx = m.ls_proj cs (tyl_sem m tyv (tyl_subst f id tyl)) x in
+      patl_subst_sem m tyv f lx patl
     end
   
-  with lemma tl_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:'tv1 -> 'tv2) (tl:list (term 'tv1)) : unit
-    ensures { forall rho.
-      tl_sem m tyv rho (tl_map f identity identity identity tl) =
-      tl_sem m tyv (compose rho f) tl }
+  with lemma patl_subst_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:int -> ty) (lx:list 'u) (patl:list pattern) : unit
+    ensures { patl_sem m tyv (patl_subst id f id id patl) lx =
+      patl_sem m (compose (ty_sem m tyv) f) patl lx }
+    variant { patl }
+  = match patl , lx with
+    | Cons hp qp , Cons hx qx -> pat_subst_sem m tyv f hx hp;
+      patl_subst_sem m tyv f qx qp
+    | Nil , Nil -> "keep_on_simp" ()
+    | _ -> ()
+    end
+  
+  let lemma ty_map_sem (m:model 'u) (tyv:ty_val 'u) (g:int -> int) : unit
+    ensures { compose tyv g = compose (ty_sem m tyv) (compose TyVar g) }
+  = assert { extensional_equal (compose tyv g)
+      (compose (ty_sem m tyv) (compose TyVar g)) }
+  
+  let rec lemma t_map_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> 'w) (g:int -> int) (t:term 'v) : unit
+    ensures { forall tv. t_sem m tyv tv (t_map f g id id t) =
+      t_sem m (compose tyv g) (compose tv f) t }
+    variant { t }
+  = let ghost rc = t_map_sem m tyv f g in
+    match t with
+    | TVar _ -> ()
+    | TApp _ _ tl -> tl_map_sem m tyv f g tl
+    | TIf b t e -> rc b;rc t;rc e
+    | TLet t1 t2 -> rc t1;t_map_sem m tyv (bmap f) g t2
+    | TCase t brl -> rc t;brl_map_sem m tyv f g brl
+    | TEps _ tb -> t_map_sem m tyv (bmap f) g tb;
+      assert { forall tv.
+        extensional_equal (p_sem m tyv tv (t_map (bmap f) g id id tb))
+          (p_sem m (compose tyv g) (compose tv f) tb)
+      }
+    | TForall _ t | TExists _ t -> t_map_sem m tyv (bmap f) g t;
+      assert { forall tv. f_sem m tyv tv (t_map (bmap f) g id id t) <->
+        f_sem m (compose tyv g) (compose tv (bmap f)) t }
+    | TAnd a b | TOr a b | TImplies a b | TIff a b -> rc a;rc b
+    | TNot a -> rc a
+    | TTrue | TFalse -> ()
+    end
+  
+  with lemma tl_map_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> 'w) (g:int -> int) (tl:list (term 'v)) : unit
+    ensures { forall tv. tl_sem m tyv tv (tl_map f g id id tl) =
+      tl_sem m (compose tyv g) (compose tv f) tl }
     variant { tl }
   = match tl with
-    | Cons x q -> t_map_sem m tyv f x;tl_map_sem m tyv f q
+    | Cons x q -> t_map_sem m tyv f g x;tl_map_sem m tyv f g q
     | _ -> ()
     end
   
-  with lemma brl_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:'tv1 -> 'tv2) (brl:list (branch 'tv1)) : unit
-    ensures { forall rho x.
-      brl_sem m tyv rho (brl_map f identity identity identity brl) x =
-      brl_sem m tyv (compose rho f) brl x }
+  with lemma br_map_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> 'w) (g:int -> int) (br:branch 'v) : unit
+    ensures { forall tv x cont. br_sem m tyv tv (br_map f g id id br) x cont =
+      br_sem m (compose tyv g) (compose tv f) br x cont }
+    variant { br }
+  = let (_,right) = br in t_map_sem m tyv (bmap f) g right
+  
+  with lemma brl_map_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> 'w) (g:int -> int) (brl:list (branch 'v)) : unit
+    ensures { forall tv x. brl_sem m tyv tv (brl_map f g id id brl) x =
+      brl_sem m (compose tyv g) (compose tv f) brl x }
     variant { brl }
   = match brl with
-    | Cons x q -> br_map_sem m tyv f x;brl_map_sem m tyv f q
+    | Cons br q -> br_map_sem m tyv f g br;brl_map_sem m tyv f g q
     | _ -> ()
     end
   
-  with lemma br_map_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:'tv1 -> 'tv2) (br:branch 'tv1) : unit
-    ensures { forall rho x cont.
-      br_sem m tyv rho (br_map f identity identity identity br) x cont =
-      br_sem m tyv (compose rho f) br x cont }
-    variant { br }
-  = match br with
-    | (pat,right) -> t_map_sem m tyv (bmap f) right;
-      let tr = t_map (bmap f) identity identity identity right in
-      assert { forall rho x s.
-        pat_sem m tyv pat x s -> let sc = complete s default in
-        t_sem m tyv (bfold rho sc) tr =
-        t_sem m tyv (bfold (compose rho f) sc) right }
-    end
+  let lemma t_sem_lift (m:model 'u) (tyv:ty_val 'u) (tv1:valuation 'w 'u)
+    (tv2:'w2 -> 'u) (f:'v -> term 'w) : unit
+    ensures { compose (t_sem m tyv (bfold tv1 tv2)) (t_lift f) =
+      bfold (compose (t_sem m tyv tv1) f) tv2 }
+  = assert { let f1 = compose (t_sem m tyv (bfold tv1 tv2)) (t_lift f) in
+      let f2 = bfold (compose (t_sem m tyv tv1) f) tv2 in
+      (forall x. f1 x <> f2 x -> match x with
+        | Old y -> t_lift f x = t_map Old id id id (f y) && false
+        | Fresh y -> t_lift f x = TVar (Fresh y) && false
+        end && false) && extensional_equal f1 f2 }
   
-  let lemma term_lift_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (rho:valuation 'tv2 'univ) (f:'tv1 -> term 'tv2) (cmpl:'ntv -> 'univ) : unit
-    ensures { compose (t_sem m tyv (bfold rho cmpl)) (term_lift f) =
-      bfold (compose (t_sem m tyv rho) f) cmpl }
-  = assert { let g0 = bfold rho cmpl in
-      let f1 = compose (t_sem m tyv g0) (term_lift f) in
-      let f2 = bfold (compose (t_sem m tyv rho) f) cmpl in
-      not extensional_equal f1 f2 -> (forall x. f1 x <> f2 x ->
-        match x with
-        | Fresh y -> term_lift f x = TVar (Fresh y) && false
-        | Old y -> term_lift f x = t_map Old identity identity identity (f y)
-          && false end && false ) && false }
-  
-  let rec lemma t_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-     (f:'tv1 -> term 'tv2) (g:int -> ty) (t:term 'tv1) : unit
-    ensures { forall rho.
-      t_sem m tyv rho (t_subst f g identity identity t) =
-      t_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv rho) f) t }
+  let rec lemma t_subst_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> term 'w) (g:int -> ty) (t:term 'v) : unit
+    ensures { forall tv. t_sem m tyv tv (t_subst f g id id t) =
+      t_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) t }
     variant { t }
   = let ghost rc = t_subst_sem m tyv f g in
     match t with
+    | TVar _ -> ()
     | TApp _ _ tl -> tl_subst_sem m tyv f g tl
     | TIf b t e -> rc b;rc t;rc e
-    | TLet t1 t2 -> rc t1;t_subst_sem m tyv (term_lift f) g t2;
-      assert { forall rho.
-        let v0 = t_sem m tyv rho (t_subst f g identity identity t1) in
-        let cv0 = const v0 in let g0 = bfold rho cv0 in
-        t_sem m tyv g0 (t_subst (term_lift f) g identity identity t2) =
+    | TLet t1 t2 -> rc t1;t_subst_sem m tyv (t_lift f) g t2;
+      assert { forall tv.
+        let v0 = t_sem m tyv tv (t_subst f g id id t1) in
+        t_sem m tyv (bfold tv (const v0)) (t_subst (t_lift f) g id id t2) =
         t_sem m (compose (ty_sem m tyv) g)
-                (bfold (compose (t_sem m tyv rho) f) cv0) t2 }
+                (bfold (compose (t_sem m tyv tv) f) (const v0)) t2 }
+        
     | TCase t brl -> rc t;brl_subst_sem m tyv f g brl
-    | TEps _ t -> t_subst_sem m tyv (term_lift f) g t;
-      let ts = t_subst (term_lift f) g identity identity t in
-      assert { forall rho.
-        extensional_equal (p_sem m tyv rho ts)
-                          (p_sem m (compose (ty_sem m tyv) g)
-                                   (compose (t_sem m tyv rho) f) t) };
-    | TForall tyl t | TExists tyl t -> t_subst_sem m tyv (term_lift f) g t;
-      let ts = t_subst (term_lift f) g identity identity t in
-      let tyls = tyl_subst g identity tyl in
-      assert { let g0 = compose (ty_sem m tyv) g in
-        (forall fv.
-          not (wty_assignment m g0 tyl fv <->
-               wty_assignment m tyv tyls fv) ->
-          length tyl = length tyls && (forall n. 0 <= n < length tyl ->
-            match nth n tyl , nth n tyls with
-            | Some ty1 , Some ty2 -> ty2 = ty_subst g identity ty1 &&
-              m.ty_doms (ty_sem m tyv ty2) (fv n) <->
-              m.ty_doms (ty_sem m g0 ty1) (fv n)
-            | _ -> false
-            end) && false
-          ) &&
-       (forall rho fv.
-          t_sem m tyv (bfold rho fv) ts =
-          t_sem m g0 (bfold (compose (t_sem m tyv rho) f) fv) t) &&
-       (forall rho.
-         ((forall fv. wty_assignment m g0 tyl fv ->
-           t_sem m g0 (bfold (compose (t_sem m tyv rho) f) fv) t = m.i_true) <->
-         (forall fv. wty_assignment m tyv (tyl_subst g identity tyl) fv ->
-           t_sem m tyv (bfold rho fv) ts = m.i_true)) /\
-         ((exists fv. wty_assignment m g0 tyl fv /\
-           t_sem m g0 (bfold (compose (t_sem m tyv rho) f) fv) t = m.i_true) <->
-         (exists fv. wty_assignment m tyv (tyl_subst g identity tyl) fv /\
-           t_sem m tyv (bfold rho fv) ts = m.i_true))) }
+    | TEps _ tb -> t_subst_sem m tyv (t_lift f) g tb;
+      assert { forall tv.
+        extensional_equal (p_sem m tyv tv (t_subst (t_lift f) g id id tb))
+          (p_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) tb)
+      }
+    | TForall _ t | TExists _ t -> t_subst_sem m tyv (t_lift f) g t;
+      assert { forall tv. f_sem m tyv tv (t_subst (t_lift f) g id id t) <->
+        f_sem m (compose (ty_sem m tyv) g)
+                (compose (t_sem m tyv tv) (t_lift f)) t }
     | TAnd a b | TOr a b | TImplies a b | TIff a b -> rc a;rc b
-    | TNot t -> rc t
-    | TTrue | TFalse | TVar _ -> ()
+    | TNot a -> rc a
+    | TTrue | TFalse -> ()
     end
   
-  with lemma tl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:'tv1 -> term 'tv2) (g:int -> ty) (tl:list (term 'tv1)) : unit
-    ensures { forall rho.
-      tl_sem m tyv rho (tl_subst f g identity identity tl) =
-      tl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv rho) f) tl }
+  with lemma tl_subst_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> term 'w) (g:int -> ty) (tl:list (term 'v)) : unit
+    ensures { forall tv. tl_sem m tyv tv (tl_subst f g id id tl) =
+      tl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) tl }
     variant { tl }
   = match tl with
     | Cons x q -> t_subst_sem m tyv f g x;tl_subst_sem m tyv f g q
     | _ -> ()
     end
   
-  with lemma brl_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:'tv1 -> term 'tv2) (g:int -> ty) (brl:list (branch 'tv1)) : unit
-    ensures { forall rho x.
-      brl_sem m tyv rho (brl_subst f g identity identity brl) x =
-      brl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv rho) f) brl x }
+  with lemma br_subst_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> term 'w) (g:int -> ty) (br:branch 'v) : unit
+    ensures { forall tv x c. br_sem m tyv tv (br_subst f g id id br) x c =
+      br_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) br x c }
+    variant { br }
+  = let (_,right) = br in t_subst_sem m tyv (t_lift f) g right
+  
+  with lemma brl_subst_sem (m:model 'u) (tyv:ty_val 'u)
+    (f:'v -> term 'w) (g:int -> ty) (brl:list (branch 'v)) : unit
+    ensures { forall tv x. brl_sem m tyv tv (brl_subst f g id id brl) x =
+       brl_sem m (compose (ty_sem m tyv) g) (compose (t_sem m tyv tv) f) brl x }
     variant { brl }
   = match brl with
     | Cons x q -> br_subst_sem m tyv f g x;brl_subst_sem m tyv f g q
     | _ -> ()
     end
   
-  with lemma br_subst_sem (m:model 'univ) (tyv:ty_valuation 'univ)
-    (f:'tv1 -> term 'tv2) (g:int -> ty) (br:branch 'tv1) : unit
-    ensures { forall rho x cont.
-      br_sem m tyv rho (br_subst f g identity identity br) x cont =
-      br_sem m (compose (ty_sem m tyv) g)
-               (compose (t_sem m tyv rho) f) br x cont }
-    variant { br }
-  = match br with
-    | (pat,right) -> t_subst_sem m tyv (term_lift f) g right;
-      let tr = t_subst (term_lift f) g identity identity right in
-      let pr = pat_subst identity g identity identity pat in
-      pat_subst_sem m tyv g pat;
-      assert { forall x. extensional_equal (pat_sem m tyv pr x)
-        (pat_sem m (compose (ty_sem m tyv) g) pat x) };
-      assert { forall rho x s. pat_sem m tyv pr x s ->
-        let sc = complete s default in
-        t_sem m tyv (bfold rho sc) tr =
-        t_sem m (compose (ty_sem m tyv) g)
-                (bfold (compose (t_sem m tyv rho) f) sc) right };
-    end
+  clone SemSubst with type DSemSubst.d = unit,
+    goal ty_subst_sem,
+    goal tyl_subst_sem,
+    goal pat_subst_accept,
+    goal patl_subst_accept,
+    goal br_subst_accept,
+    goal brl_subst_accept,
+    goal pat_subst_sem,
+    goal patl_subst_sem,
+    goal t_map_sem,
+    goal t_subst_sem,
+    goal tl_map_sem,
+    goal tl_subst_sem,
+    goal br_map_sem,
+    goal br_subst_sem,
+    goal brl_map_sem,
+    goal brl_subst_sem
   
 end
 
+(* Independence of interpretations with respect to values that falls out
+   of a term free variables. In other words,
+   extensionality for interpretations.
+   Split in 3 parts: defs,props,proofs. *)
 
-(* Typing judgement can be transported semantically. *)
-module WellTyped
+module SemCongDefs
   
   use import logic_syntax.Defs
-  use import logic_syntax.Substs
+  use import support.HO
+  use export Model
+  
+  predicate ty_congruence (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) =
+    equalizer a tyv tyv2 /\
+    equalizer b m.ty_funs m2.ty_funs
+  
+  predicate ls_congruence (a:lsymbol -> bool) (m m2:model 'u) =
+    equalizer a m.ls_eval m2.ls_eval /\
+    equalizer a m.ls_case m2.ls_case /\
+    equalizer a m.ls_proj m2.ls_proj
+  
+  predicate i_congruence (m m2:model 'u) =
+    m.i_true = m2.i_true /\
+    m.i_false = m2.i_false /\
+    m.i_eps = m2.i_eps /\
+    m.ty_doms = m2.ty_doms
+    
+  
+end
+
+module SemCong
+  
+  clone import support.Dummy as DSemCong
+  use export SemCongDefs
+  use export Sem
+  use import support.HO
+  use import list.List
   use import logic_syntax.VarsIn
-  use import int.Int
+  
+  axiom ty_sem_congruence : forall a b,m m2:model 'u,tyv tyv2 ty.
+    ty_congruence a b m m2 tyv tyv2 /\ ty_vars_in a b ty ->
+    ty_sem m tyv ty = ty_sem m2 tyv2 ty
+    /\ forall _:d.true
+  
+  axiom tyl_sem_congruence : forall a b,m m2:model 'u,tyv tyv2 tyl.
+    ty_congruence a b m m2 tyv tyv2 /\ tyl_vars_in a b tyl ->
+    tyl_sem m tyv tyl = tyl_sem m2 tyv2 tyl
+    /\ forall _:d.true
+  
+  axiom pat_sem_congruence : forall a b c d,m m2:model 'u,tyv tyv2 pat x.
+    pat_vars_in a b c d pat /\ ty_congruence b c m m2 tyv tyv2 /\
+    ls_congruence d m m2 ->
+    (pat_accept m tyv pat x <-> pat_accept m2 tyv2 pat x) /\
+    pat_sem m tyv pat x = pat_sem m2 tyv2 pat x
+    /\ forall _:d.true
+  
+  axiom patl_sem_congruence : forall a b c d,m m2:model 'u,tyv tyv2 patl lx.
+    patl_vars_in a b c d patl /\ ty_congruence b c m m2 tyv tyv2 /\
+    ls_congruence d m m2 ->
+    (patl_accept m tyv patl lx <-> patl_accept m2 tyv2 patl lx) /\
+    patl_sem m tyv patl lx = patl_sem m2 tyv2 patl lx
+    /\ forall _:d.true
+  
+  axiom t_sem_congruence :
+    forall a b c d,m m2:model 'u,tyv tyv2 tv tv2,t:term 'v.
+      t_vars_in a b c d t /\ ty_congruence b c m m2 tyv tyv2 /\
+      ls_congruence d m m2 /\ equalizer a tv tv2 /\ i_congruence m m2 ->
+      t_sem m tyv tv t = t_sem m2 tyv2 tv2 t
+      /\ forall _:d.true
+  
+  axiom tl_sem_congruence :
+    forall a b c d,m m2:model 'u,tyv tyv2 tv tv2,tl:list (term 'v).
+      tl_vars_in a b c d tl /\ ty_congruence b c m m2 tyv tyv2 /\
+      ls_congruence d m m2 /\ equalizer a tv tv2 /\ i_congruence m m2 ->
+      tl_sem m tyv tv tl = tl_sem m2 tyv2 tv2 tl
+      /\ forall _:d.true
+  
+  axiom br_sem_congruence :
+    forall a b c d,m m2:model 'u,tyv tyv2 tv tv2,br:branch 'v,x cont.
+      br_vars_in a b c d br /\ ty_congruence b c m m2 tyv tyv2 /\
+      ls_congruence d m m2 /\ equalizer a tv tv2 /\ i_congruence m m2 ->
+      br_sem m tyv tv br x cont = br_sem m2 tyv2 tv2 br x cont
+      /\ forall _:d.true
+  
+  axiom brl_sem_congruence :
+    forall a b c d,m m2:model 'u,tyv tyv2 tv tv2,brl:list (branch 'v),x.
+    brl_vars_in a b c d brl /\ ty_congruence b c m m2 tyv tyv2 /\
+    ls_congruence d m m2 /\ equalizer a tv tv2 /\ i_congruence m m2 ->
+    brl_sem m tyv tv brl x = brl_sem m2 tyv2 tv2 brl x
+    /\ forall _:d.true
+  
+end
+
+module SemCongProofs
+  
+  use import SemCongDefs
+  use import support.HOFull
+  use import support.Bind
+  use import support.PartialMap
+  use import support.Choice
+  use import logic_syntax.VarsIn
+  use import list.List
+  use import Sem
+  use import support.NoDiscriminate
+  
+  let rec lemma ty_sem_congruence (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) (ty:ty) : unit
+    requires { ty_vars_in a b ty }
+    requires { ty_congruence a b m m2 tyv tyv2 }
+    ensures { ty_sem m tyv ty = ty_sem m2 tyv2 ty }
+    variant { ty }
+  = match ty with
+    | TyApp _ l -> tyl_sem_congruence a b m m2 tyv tyv2 l
+    | _ -> ()
+    end
+  
+  with lemma tyl_sem_congruence (a:ty_var -> bool) (b:ty_symbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) (tyl:list ty) : unit
+    requires { tyl_vars_in a b tyl }
+    requires { ty_congruence a b m m2 tyv tyv2 }
+    ensures { tyl_sem m tyv tyl = tyl_sem m2 tyv2 tyl }
+    variant { tyl }
+  = match tyl with
+    | Cons x q -> ty_sem_congruence a b m m2 tyv tyv2 x;
+      tyl_sem_congruence a b m m2 tyv tyv2 q
+    | _ -> ()
+    end
+  
+  let rec lemma pat_sem_congruence (a:pat_var -> bool) (b:ty_var -> bool)
+    (c:ty_symbol -> bool) (d:lsymbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u)
+    (pat:pattern) (x:'u) : unit
+    requires { pat_vars_in a b c d pat }
+    requires { ty_congruence b c m m2 tyv tyv2 /\ ls_congruence d m m2 }
+    ensures { pat_accept m tyv pat x <-> pat_accept m2 tyv2 pat x }
+    ensures { pat_sem m tyv pat x = pat_sem m2 tyv2 pat x }
+    variant { pat }
+  = let ghost rc = pat_sem_congruence a b c d m m2 tyv tyv2 in
+    match pat with
+    | POr p1 p2 -> rc p1 x;rc p2 x
+    | PAs p _ -> rc p x
+    | PApp f tyl args ->
+      let ty_a = tyl_sem m tyv tyl in
+      patl_sem_congruence a b c d m m2 tyv tyv2 args (m.ls_proj f ty_a x)
+    | _ -> ()
+    end
+  
+  with lemma patl_sem_congruence (a:pat_var -> bool) (b:ty_var -> bool)
+    (c:ty_symbol -> bool) (d:lsymbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u)
+    (patl:list pattern) (lx:list 'u) : unit
+    requires { patl_vars_in a b c d patl }
+    requires { ty_congruence b c m m2 tyv tyv2 /\ ls_congruence d m m2 }
+    ensures { patl_accept m tyv patl lx <-> patl_accept m2 tyv2 patl lx }
+    ensures { patl_sem m tyv patl lx = patl_sem m2 tyv2 patl lx }
+    variant { patl }
+  = match patl , lx with
+    | Cons hp qp , Cons hx qx ->
+      pat_sem_congruence a b c d m m2 tyv tyv2 hp hx;
+      patl_sem_congruence a b c d m m2 tyv tyv2 qp qx
+    | Nil , Nil -> "keep_on_simp" ()
+    | _ , _ -> ()
+    end
+  
+  let lemma equalizer_ext (a:'v -> bool) (tv tv2:'v -> 'o) (ext:'w -> 'o)
+    requires { equalizer a tv tv2 }
+    ensures { equalizer (bfold a all) (bfold tv ext) (bfold tv2 ext) }
+  = ()
+  
+  let rec lemma t_sem_congruence (a:'v -> bool) (b:ty_var -> bool)
+    (c:ty_symbol -> bool) (d:lsymbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) (t:term 'v) : unit
+    requires { t_vars_in a b c d t /\ i_congruence m m2 }
+    requires { ty_congruence b c m m2 tyv tyv2 /\ ls_congruence d m m2 }
+    ensures { forall tv tv2.
+      equalizer a tv tv2 -> t_sem m tyv tv t = t_sem m2 tyv2 tv2 t }
+    variant { t }
+  = let ghost rc = t_sem_congruence a b c d m m2 tyv tyv2 in
+    match t with
+    | TVar _ | TTrue | TFalse -> ()
+    | TApp _ _ tl -> tl_sem_congruence a b c d m m2 tyv tyv2 tl
+    | TIf b t e -> rc b;rc t;rc e
+    | TLet t1 t2 -> rc t1;t_sem_congruence (bfold a all) b c d m m2 tyv tyv2 t2;
+      assert { forall tv tv2. equalizer a tv tv2 ->
+        let ex = (const (t_sem m tyv tv t1):unit -> 'u) in
+        equalizer (bfold a all) (bfold tv ex) (bfold tv2 ex) &&
+        t_sem m tyv tv t = t_sem m2 tyv2 tv2 t }
+    | TCase t brl -> rc t;brl_sem_congruence a b c d m m2 tyv tyv2 brl
+    | TEps _ t2 -> t_sem_congruence (bfold a all) b c d m m2 tyv tyv2 t2;
+      assert { forall tv tv2. equalizer a tv tv2 ->
+        (forall c. let cc = (const c:unit -> 'u) in
+          equalizer (bfold a all) (bfold tv cc) (bfold tv2 cc) &&
+          t_sem m tyv (bfold tv cc) t2 = t_sem m2 tyv2 (bfold tv2 cc) t2) &&
+        extensional_equal (p_sem m tyv tv t2) (p_sem m2 tyv2 tv2 t2) }
+    | TForall tyl t2 | TExists tyl t2 ->
+      t_sem_congruence (bfold a all) b c d m m2 tyv tyv2 t2;
+      let l = tyl_sem m tyv tyl in
+      assert { forall fty. let l = tyl_sem m tyv tyl in
+        wty_assignment m tyv l fty <-> wty_assignment m2 tyv2 l fty };
+      assert { forall tv tv2 fty. equalizer a tv tv2 ->
+          equalizer (bfold a all) (bfold tv fty) (bfold tv2 fty) &&
+        f_sem m tyv (bfold tv fty) t2 <-> f_sem m2 tyv2 (bfold tv2 fty) t2 };
+      match t with
+      | TForall _ _ -> assert { forall tv tv2. equalizer a tv tv2 ->
+        (forall fty. wty_assignment m tyv l fty ->
+          f_sem m tyv (bfold tv fty) t2) <->
+        (forall fty. wty_assignment m2 tyv2 l fty ->
+          f_sem m2 tyv2 (bfold tv2 fty) t2) };
+      | TExists _ _ -> assert { forall tv tv2. equalizer a tv tv2 ->
+        (exists fty. wty_assignment m tyv l fty /\
+          f_sem m tyv (bfold tv fty) t2) <->
+        (exists fty. wty_assignment m2 tyv2 l fty /\
+          f_sem m2 tyv2 (bfold tv2 fty) t2) }
+      | _ -> absurd
+      end
+    | TAnd a b | TOr a b | TImplies a b | TIff a b -> rc a;rc b
+    | TNot a -> rc a
+    end
+  
+  with lemma tl_sem_congruence (a:'v -> bool) (b:ty_var -> bool)
+    (c:ty_symbol -> bool) (d:lsymbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) (tl:list (term 'v)) : unit
+    requires { tl_vars_in a b c d tl /\ i_congruence m m2 }
+    requires { ty_congruence b c m m2 tyv tyv2 /\ ls_congruence d m m2 }
+    ensures { forall tv tv2.
+      equalizer a tv tv2 -> tl_sem m tyv tv tl = tl_sem m2 tyv2 tv2 tl }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_sem_congruence a b c d m m2 tyv tyv2 x;
+      tl_sem_congruence a b c d m m2 tyv tyv2 q
+    | _ -> ()
+    end
+  
+  with lemma br_sem_congruence (a:'v -> bool) (b:ty_var -> bool)
+    (c:ty_symbol -> bool) (d:lsymbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) (br:branch 'v) : unit
+    requires { br_vars_in a b c d br /\ i_congruence m m2 }
+    requires { ty_congruence b c m m2 tyv tyv2 /\ ls_congruence d m m2 }
+    ensures { forall tv tv2 x cont. equalizer a tv tv2 ->
+      br_sem m tyv tv br x cont = br_sem m2 tyv2 tv2 br x cont }
+    variant { br }
+  = let (pat,right) = br in
+    t_sem_congruence (bfold a all) b c d m m2 tyv tyv2 right;
+    assert { forall tv tv2 x cont.
+      let sigma_c = complete (pat_sem m tyv pat x) default in
+      equalizer a tv tv2 -> equalizer (bfold a all) (bfold tv sigma_c)
+        (bfold tv2 sigma_c) &&
+      br_sem m tyv tv br x cont = br_sem m2 tyv2 tv2 br x cont }
+  
+  with lemma brl_sem_congruence (a:'v -> bool) (b:ty_var -> bool)
+    (c:ty_symbol -> bool) (d:lsymbol -> bool)
+    (m m2:model 'u) (tyv tyv2:ty_val 'u) (brl:list (branch 'v)) : unit
+    requires { brl_vars_in a b c d brl /\ i_congruence m m2 }
+    requires { ty_congruence b c m m2 tyv tyv2 /\ ls_congruence d m m2 }
+    ensures { forall tv tv2 x. equalizer a tv tv2 ->
+      brl_sem m tyv tv brl x = brl_sem m2 tyv2 tv2 brl x }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_sem_congruence a b c d m m2 tyv tyv2 x;
+      brl_sem_congruence a b c d m m2 tyv tyv2 q
+    | _ -> ()
+    end
+  
+  clone SemCong with type DSemCong.d = unit,
+    goal ty_sem_congruence,
+    goal tyl_sem_congruence,
+    goal pat_sem_congruence,
+    goal patl_sem_congruence,
+    goal t_sem_congruence,
+    goal tl_sem_congruence,
+    goal br_sem_congruence,
+    goal brl_sem_congruence
+  
+end
+
+(* model-signature coherence. *)
+module SigCoherence
+  
+  use import logic_syntax.Defs
+  use export logic_typing.Sig
   use import list.List
   use import list.Length
-  use import list.Nth
-  use import option.Option
-  use import support.HO
-  use import support.Bind
+  use export Sem
   use import support.Choice
-  use import support.PartialMap
-  use import Model
-  use import Sem
-  use import TySemSubst
-  use import logic_typing.Env
-  use import logic_typing.Pattern
-  use import logic_typing.Term
+  use import support.HOList
   
-  function ty_inst_args (m:model 'univ) (sig:signature)
-    (f:lsymbol) (tyl:list 'univ) : list 'univ =
+  function ty_sem_args (sig:signature) (m:model 'u)
+    (f:lsymbol) (tyl:list 'u) : list 'u =
     tyl_sem m (list_nth tyl default) (sig.ls_args f)
   
-  function ty_inst_ret (m:model 'univ) (sig:signature)
-    (f:lsymbol) (tyl:list 'univ) : 'univ =
+  function ty_sem_ret (sig:signature) (m:model 'u)
+    (f:lsymbol) (tyl:list 'u) : 'u =
     ty_sem m (list_nth tyl default) (sig.ls_ret f)
   
-  (* Coherence between a model and the signature. *)
-  predicate model_sig_coherence (m:model 'univ) (sig:signature) =
+  predicate coherence (sig:signature) (m:model 'u) =
     (* Functions respect their type scheme. *)
-    (forall f tyl args. sig.ls_belong f ->
-      let ty_a = ty_inst_args m sig f tyl in
-      let ty_r = ty_inst_ret m sig f tyl in
+    (forall f tyl args. sig.ls_belong f /\ length tyl = sig.ls_ty_arity f ->
+      let ty_a = ty_sem_args sig m f tyl in
+      let ty_r = ty_sem_ret sig m f tyl in
       tyl_doms m ty_a args -> m.ty_doms ty_r (m.ls_eval f tyl args)) /\
-    (* Propositional type symbol is mapped to semantic proposition sort. *)
-    m.ty_funs sig.tys_prop Nil = m.i_prop /\
-    (* ls_case is equivalent to belonging to the span of a constructor. *)
-    (forall ty_alg f ty_a args.
-      let ty_args = ty_inst_args m sig f ty_a in
-      sig.tys_belong ty_alg /\ sig.tys_constr ty_alg f /\
-      tyl_doms m ty_args args -> m.ls_case f ty_a (m.ls_eval f ty_a args)) /\
-    (forall ty_alg f ty_a x.
-      sig.tys_belong ty_alg /\ sig.tys_constr ty_alg f /\
-      m.ty_doms (m.ty_funs ty_alg ty_a) x /\ m.ls_case f ty_a x ->
-      let args = m.ls_proj f ty_a x in
-      let ty_args = ty_inst_args m sig f ty_a in
-      tyl_doms m ty_args args /\ x = m.ls_eval f ty_a args) /\
-    (* ls_case (e.g, constructor application) is discriminating. *)
-    (forall ty_alg f g ty_a u.
-      sig.tys_belong ty_alg /\
-      sig.tys_constr ty_alg f /\ sig.tys_constr ty_alg g /\ f <> g /\
-      m.ty_doms (m.ty_funs ty_alg ty_a) u ->
-      not m.ls_case f ty_a u \/ not m.ls_case g ty_a u) /\
-    (* All elements in a complete algebraic type can be
-       inverted to some constructor. *)
-    (forall ty_alg ty_a x.
-      sig.tys_constr_complete ty_alg /\ m.ty_doms (m.ty_funs ty_alg ty_a) x ->
-      exists f. sig.tys_constr ty_alg f /\ m.ls_case f ty_a x) /\
-    (* Constructors are injective. *)
-    (forall f ty_a args.
-      sig.ls_constr f -> m.ls_proj f ty_a (m.ls_eval f ty_a args) = args) /\
-    (* Semantics for equality. *)
-    (forall ty_a x y. m.ty_doms ty_a x /\ m.ty_doms ty_a y ->
-      m.ls_eval sig.ls_equ (Cons ty_a Nil) (Cons x (Cons y Nil)) = m.i_true <->
+    (* ls_case is equivalent to belonging to the span of a constructor,
+       + projection behavior (includes constructor injectivity). *)
+    (forall f tyl args. sig.ls_constr f /\
+      tyl_doms m (ty_sem_args sig m f tyl) args /\
+      length tyl = sig.ls_ty_arity f ->
+        let r = m.ls_eval f tyl args in
+        m.ls_case f tyl r /\ m.ls_proj f tyl r = args) /\
+    (forall f tyl x. sig.ls_constr f /\
+      length tyl = sig.ls_ty_arity f /\
+      ty_doms m (ty_sem_ret sig m f tyl) x /\ m.ls_case f tyl x ->
+      let args = m.ls_proj f tyl x in
+      m.ls_eval f tyl args = x /\ tyl_doms m (ty_sem_args sig m f tyl) args) /\
+    (* All elements in a complete algebraic type can be inverted to some
+       constructor. *)
+    (forall tys tyl x.
+      sig.tys_belong tys /\ sig.tys_constr_complete tys /\
+      length tyl = sig.tys_arity tys /\ m.ty_doms (m.ty_funs tys tyl) x ->
+        exists f ty_a ty_r. sig.tys_constr tys f /\
+          length ty_a = sig.ls_ty_arity f /\
+          sig.ls_ret f = TyApp tys ty_r /\
+          tyl = tyl_sem m (list_nth ty_a default) ty_r /\
+          m.ls_case f ty_a x) /\
+    (* Interpretation of equality. *)
+    (forall ty x y. m.ty_doms ty x /\ m.ty_doms ty y /\
+      m.ls_eval ls_equ (Cons ty Nil) (Cons x (Cons y Nil)) = m.i_true <->
       x = y)
   
-  predicate valuation_coherence (m:model 'univ)
-    (tyv:ty_valuation 'univ) (env:ty_env 'tv) (v:valuation 'tv 'univ) =
+  (* Valuation coherence. *)
+  predicate v_coherence (m:model 'u) (tyv:ty_val 'u)
+    (env:ty_env 'v) (v:valuation 'v 'u) =
     forall x. env.tv_belong x -> m.ty_doms (ty_sem m tyv (env.tv_ty x)) (v x)
   
-  (* Relation between semantics of syntactically instantiated
-     arguments/return types and semantically instantiated ones. *)
-  let lemma ty_args_ret_subst_sem (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (f:lsymbol) (tyl:list ty) : unit
+  (* Coherence of a valuation extension. *)
+  predicate assignment_coherence (m:model 'u) (tyv:ty_val 'u)
+    (v_ext:'nv -> 'u) (v_new:'nv -> bool) (ty_ext:'nv -> ty) =
+    forall x. v_new x -> m.ty_doms (ty_sem m tyv (ty_ext x)) (v_ext x)
+  
+end
+
+(* Syntactic well-typedness => Semantic well-typedness.
+   In other words, t : ty => the interpretation of t falls into ty's one.
+   Proofs in next module. *)
+module WellTyped
+  
+  clone import support.Dummy as DWellTyped
+  use import logic_typing.Pattern
+  use import logic_typing.Term
+  use import support.Bind
+  use import support.PartialMap
+  use import support.Choice
+  use import option.Option
+  use import list.Length
+  use export SigCoherence
+  
+  (* Relation between type arguments instantiated syntactically and
+     semantically. *)
+  axiom ty_sem_inst : forall sig,m:model 'u, tyv f tyl.
+    sig_wf sig /\ sig.ls_belong f /\ length tyl = sig.ls_ty_arity f ->
+    let tyl_s = tyl_sem m tyv tyl in
+      tyl_sem m tyv (ty_args sig f tyl) = ty_sem_args sig m f tyl_s /\
+      ty_sem m tyv (ty_ret sig f tyl) = ty_sem_ret sig m f tyl_s
+    /\ forall _:d.true
+  
+  (* Small but useful lemma: a valuation can be coherently extended. *)
+  axiom coherence_extension : forall m tyv,tv:valuation 'v 'u,env,
+    v_ext:'nv -> 'u,v_new ty_ext.
+    let tv' = bfold tv v_ext in let env' = ext_env env v_new ty_ext in
+    v_coherence m tyv env tv /\ assignment_coherence m tyv v_ext v_new ty_ext ->
+    v_coherence m tyv env' tv'
+    /\ forall _:d.true
+  
+  (* A syntactically exhaustive pattern-matching is semantically
+     exhaustive. *)
+  axiom exhaustive_sem : forall sig,m:model 'u,tyv,env:ty_env 'v,brl tyc ty x.
+    sig_wf sig /\ coherence sig m /\ brl_wf sig env brl tyc ty /\
+    ty_wf sig tyc /\ exhaustive sig brl tyc /\ m.ty_doms (ty_sem m tyv tyc) x ->
+    brl_accept m tyv brl x
+    /\ forall _:d.true
+  
+  (* Well-typed patterns generate coherent valuation extension. *)
+  axiom pat_coherent_type : forall sig ty,m:model 'u,tyv pat x.
+    sig_wf sig /\ coherence sig m /\ pat_wty sig pat ty /\
+    pat_no_conflict sig pat ty /\ m.ty_doms (ty_sem m tyv ty) x /\
+    pat_accept m tyv pat x ->
+    let dom = domain(pat_ty_collector sig pat ty) in
+    dom = domain (pat_sem m tyv pat x) /\
+    let nv = complete (pat_sem m tyv pat x) default in
+    let nty = complete (pat_ty_collector sig pat ty) default in
+    assignment_coherence m tyv nv dom nty
+    /\ forall _:d.true
+  
+  axiom patl_coherent_type : forall sig tyl,m:model 'u,tyv patl lx.
+    sig_wf sig /\ coherence sig m /\ patl_wty sig patl tyl /\
+    patl_no_conflict sig patl tyl /\ tyl_doms m (tyl_sem m tyv tyl) lx /\
+    patl_accept m tyv patl lx ->
+    let dom = domain(patl_ty_collector sig patl tyl) in
+    dom = domain (patl_sem m tyv patl lx) /\
+    let nv = complete (patl_sem m tyv patl lx) default in
+    let nty = complete (patl_ty_collector sig patl tyl) default in
+    assignment_coherence m tyv nv dom nty
+    /\ forall _:d.true
+  
+end
+
+module WellTypedProofs
+  
+  use import SemCong
+  use import SemSubst
+  use import support.HOExt
+  use import support.HOListFull
+  use import support.Choice
+  use import support.Bind
+  use import support.FiniteFull
+  use import support.PartialMap
+  use import logic_syntax.VarsIn
+  use import logic_syntax.FreeVars
+  use import logic_syntax.Substs
+  use import logic_typing.PatternProps
+  use import logic_typing.TermProps
+  use import logic_typing.ConstrRetType
+  use import logic_typing.TyWfSubst
+  use import option.Option
+  use import int.Int
+  use import list.List
+  use import list.NthLength
+  use import SigCoherence
+  use import support.NoDiscriminate
+  
+  meta compute_max_steps 0x1000000
+  
+  let lemma ty_sem_inst (sig:signature) (m:model 'u) (tyv:ty_val 'u)
+    (f:lsymbol) (tyl:list ty) : unit
     requires { sig_wf sig /\ sig.ls_belong f /\ length tyl = sig.ls_ty_arity f }
     ensures { let tyl_s = tyl_sem m tyv tyl in
-      tyl_sem m tyv (ty_args sig f tyl) = ty_inst_args m sig f tyl_s /\
-      ty_sem m tyv (ty_ret sig f tyl) = ty_inst_ret m sig f tyl_s }
+      tyl_sem m tyv (ty_args sig f tyl) = ty_sem_args sig m f tyl_s /\
+      ty_sem m tyv (ty_ret sig f tyl) = ty_sem_ret sig m f tyl_s }
   = assert { let tyl_s = tyl_sem m tyv tyl in
       let tyv1 = list_nth tyl_s default in
       let tyv2 = compose (ty_sem m tyv) (list_nth tyl default) in
       let n = sig.ls_ty_arity f in
-      model_ty_congruence (range 0 n) sig.tys_belong m m tyv1 tyv2 }
+      ty_congruence (range 0 n) sig.tys_belong m m tyv1 tyv2 }
   
-  predicate assignment_coherence (m:model 'univ) (tyv:ty_valuation 'univ)
-    (v_ext:'ntv -> 'univ) (v_new:'ntv -> bool) (ty_ext:'ntv -> ty) =
+  predicate assignment_coherence (m:model 'u) (tyv:ty_val 'u)
+    (v_ext:'nv -> 'u) (v_new:'nv -> bool) (ty_ext:'nv -> ty) =
     forall x. v_new x -> m.ty_doms (ty_sem m tyv (ty_ext x)) (v_ext x)
   
   (* Preservation of valuation coherence by well-typed extension. *)
-  let lemma coherence_extension (m:model 'univ) (tyv:ty_valuation 'univ)
-    (tv:valuation 'tv 'univ) (tv':valuation (bind 'tv 'ntv) 'univ)
-    (env:ty_env 'tv) (env':ty_env (bind 'tv 'ntv))
-    (v_ext:'ntv -> 'univ) (v_new:'ntv -> bool) (ty_ext:'ntv -> ty)
-    requires { valuation_coherence m tyv env tv }
+  let lemma coherence_extension (m:model 'u) (tyv:ty_val 'u)
+    (tv:valuation 'v 'u) (tv':valuation (bind 'v 'nv) 'u)
+    (env:ty_env 'v) (env':ty_env (bind 'v 'nv))
+    (v_ext:'nv -> 'u) (v_new:'nv -> bool) (ty_ext:'nv -> ty)
+    requires { v_coherence m tyv env tv }
     requires { assignment_coherence m tyv v_ext v_new ty_ext }
     requires { tv' = bfold tv v_ext }
     requires { env' = ext_env env v_new ty_ext }
-    ensures { valuation_coherence m tyv env' tv' }
+    ensures { v_coherence m tyv env' tv' }
   = ()
   
-  (* Syntactic pattern exhaustiveness => semantic pattern exhaustiveness.
-     Method: Start with a trivial skeletal pattern (wildcard) matching x,
-       refine it through every case of the pattern-matching.
-       If the pattern-matching does not semantically accept x, it is always
-       possible to refine the skeletal shape to a point where a given case
-       does not accept the shape anymore. Once done through the whole
-       pattern-matching, we have a skeletal shape that is NOT accepted by
-       any case, which is an obvious contradication.
-       
-       Note: again, there is a bit of trouble with extension to incomplete
-       algebraic types. We cannot simply use pat_accept to represent
-       acceptation by a skeletal pattern.
-   *)
-   
-   predicate skeleton_accept (sig:signature) (m:model 'univ)
-     (tyv:ty_valuation 'univ) (pat:pattern) (ty:ty) (x:'univ) = match pat with
+  (* Syntactic pattern-matching exhaustiveness ==> Semantic pattern-matching
+     exhaustiveness.
+     Method: start with a wildcard skeletal pattern, and refine it as a
+       counter-example for every branch. It is always feasible if we have
+       a counter-example in the type interpretation, and the resulting
+       skeleton is trivially a counter-example to syntactic exhaustiveness
+       definition. *)
+  
+  (* 1st: need to redefine acceptation for skeleton. Indeed, variables
+     have a different meaning in skeletal patterns: accept exactly values
+     not corresponding to any known constructor. *)
+  predicate skeleton_accept (sig:signature) (ty:ty) (m:model 'u)
+     (tyv:ty_val 'u) (pat:pattern) (x:'u) = match pat with
      | PWild -> true
      | PVar _ -> match ty with
-       | TyApp tys tyl -> (forall f. sig.tys_constr tys f ->
-         not m.ls_case f (tyl_sem m tyv tyl) x)
+       | TyApp tys tyl -> (forall f ty_a tylr. sig.tys_constr tys f /\
+         length ty_a = sig.ls_ty_arity f /\
+         sig.ls_ret f = TyApp tys tylr /\
+         tyl_sem m tyv tyl = tyl_sem m (list_nth ty_a default) tylr ->
+         not m.ls_case f ty_a x)
        | TyVar _ -> true
        end
      | PApp f tyl args -> let prj = (m.ls_proj f (tyl_sem m tyv tyl) x) in
        m.ls_case f (tyl_sem m tyv tyl) x /\
-      skeleton_l_accept sig m tyv args (ty_args sig f tyl) prj
+      skeleton_l_accept sig (ty_args sig f tyl) m tyv args prj
      | _ -> false
      end
    
-   with skeleton_l_accept (sig:signature) (m:model 'univ)
-     (tyv:ty_valuation 'univ)
-     (patl:list pattern) (tyl:list ty) (lx:list 'univ) =
+   with skeleton_l_accept (sig:signature) (tyl:list ty) (m:model 'u)
+     (tyv:ty_val 'u) (patl:list pattern) (lx:list 'u) =
      match patl , lx , tyl with
      | Nil , Nil , Nil -> true
      | Cons hp qp , Cons hx qx , Cons hty qty ->
-       skeleton_accept sig m tyv hp hty hx /\
-       skeleton_l_accept sig m tyv qp qty qx
+       skeleton_accept sig hty m tyv hp hx /\
+       skeleton_l_accept sig qty m tyv qp qx
      | _ -> false
      end
    
@@ -698,9 +1122,10 @@ module WellTyped
        pat_refine y x /\ patl_refine r q
      end
   
-  (* Some properties of skeleton pattern refinement. *)
-  let rec lemma pat_refine_self (sig:signature) (p:pattern) (ty:ty) : unit
-    requires { skeleton_wty sig p ty }
+  (* Some properties of skeleton pattern refinement:
+     reflexivity and transitivity. *)
+  let rec lemma pat_refine_self (sig:signature) (p:pattern) (ty:ty) : unit 
+    requires { skeleton sig ty p }
     ensures { pat_refine p p }
     variant { p }
   = match p with
@@ -708,187 +1133,214 @@ module WellTyped
     | _ -> ()
     end
   
-  with lemma patl_refine_self (sig:signature) (l:list pattern)
-    (tyl:list ty) : unit
-    requires { skeleton_l_wty sig l tyl }
+  with lemma patl_refine_self (sig:signature) (l:list pattern) (tyl:list ty)
+    requires { skeleton_l sig tyl l }
     ensures { patl_refine l l }
     variant { l }
   = match l , tyl with
     | Cons x q , Cons hty qty -> pat_refine_self sig x hty;
       patl_refine_self sig q qty
-    | Nil , Nil -> ()
-    | _ -> absurd
+    | _ -> ()
     end
   
-  let rec lemma pat_refine_trans (sig:signature)
-    (p1 p2 p3:pattern) (ty:ty) : unit
-    requires { skeleton_wty sig p1 ty /\ pat_refine p1 p2 }
-    requires { skeleton_wty sig p2 ty /\ pat_refine p2 p3 }
+  let rec lemma pat_refine_trans (p1 p2 p3:pattern) : unit
+    requires { pat_refine p1 p2 }
+    requires { pat_refine p2 p3 }
     ensures { pat_refine p1 p3 }
     variant { p1 }
   = match p1 , p2 , p3 with
-    | PApp f tyl l1 , PApp _ _ l2 , PApp _ _ l3 ->
-      patl_refine_trans sig l1 l2 l3 (ty_args sig f tyl)
+    | PApp _ _ l1 , PApp _ _ l2 , PApp _ _ l3 -> patl_refine_trans l1 l2 l3
     | _ , _ , _ -> ()
     end
   
-  with lemma patl_refine_trans (sig:signature)
-    (l1 l2 l3:list pattern) (tyl:list ty) : unit
-    requires { skeleton_l_wty sig l1 tyl /\ patl_refine l1 l2 }
-    requires { skeleton_l_wty sig l2 tyl /\ patl_refine l2 l3 }
+  with lemma patl_refine_trans (l1 l2 l3:list pattern) : unit
+    requires { patl_refine l1 l2 }
+    requires { patl_refine l2 l3 }
     ensures { patl_refine l1 l3 }
     variant { l1 }
-  = match l1 , l2 , l3 , tyl with
-    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 , Cons hty qty ->
-      pat_refine_trans sig x1 x2 x3 hty ; patl_refine_trans sig q1 q2 q3 qty
-    | Nil , Nil , Nil , Nil -> ()
-    | _ , _ , _ , _ -> absurd
+  = match l1 , l2 , l3 with
+    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 ->
+      pat_refine_trans x1 x2 x3 ; patl_refine_trans q1 q2 q3
+    | Nil , Nil , Nil -> ()
+    | _ , _ , _ -> absurd
     end
   
-  let rec lemma pat_refine_skeleton_match (sig:signature)
-    (p1 p2 p3:pattern) (ty:ty) : unit
-    requires { skeleton_wty sig p1 ty /\ pat_refine p1 p2 }
-    requires { pat_skeleton_match p1 p3 }
-    ensures { pat_skeleton_match p2 p3 }
+  (* If a skeleton is accepted by a pattern, all the skeleton it refines are
+     as well. *)
+  let rec lemma pat_refine_skeleton_match (p1 p2 p3:pattern) : unit
+    requires { pat_refine p1 p2 }
+    requires { pat_skeleton_match p3 p1 }
+    ensures { pat_skeleton_match p3 p2 }
     variant { p3 }
   = match p1 , p2 , p3 with
     | _ , PWild , _ -> ()
     | PWild , _ , _ -> absurd
     | _ , _ , (PWild | PVar _) -> ()
-    | _ , _ , PAs p3 _ -> pat_refine_skeleton_match sig p1 p2 p3 ty
+    | _ , _ , PAs p3 _ -> pat_refine_skeleton_match p1 p2 p3
     | _ , _ , POr p3 p4 ->
-      let u = if pat_skeleton_match p1 p3 then p3 else p4 in
-      pat_refine_skeleton_match sig p1 p2 u ty
-    | PApp f tyl l1 , PApp _ _ l2 , PApp _ _ l3 ->
-      patl_refine_skeleton_match sig l1 l2 l3 (ty_args sig f tyl)
+      let u = if pat_skeleton_match p3 p1 then p3 else p4 in
+      pat_refine_skeleton_match p1 p2 u
+    | PApp _ _ l1 , PApp _ _ l2 , PApp _ _ l3 ->
+      patl_refine_skeleton_match l1 l2 l3
     | _ -> absurd
     end
   
-  with lemma patl_refine_skeleton_match (sig:signature)
-    (l1 l2 l3:list pattern) (tyl:list ty) : unit
-    requires { skeleton_l_wty sig l1 tyl /\ patl_refine l1 l2 }
-    requires { patl_skeleton_match l1 l3 }
-    ensures { patl_skeleton_match l2 l3 }
+  with lemma patl_refine_skeleton_match (l1 l2 l3:list pattern) : unit
+    requires { patl_refine l1 l2 }
+    requires { patl_skeleton_match l3 l1 }
+    ensures { patl_skeleton_match l3 l2 }
     variant { l3 }
-  = match l1 , l2 , l3 , tyl with
-    | Nil , Nil , Nil , Nil -> ()
-    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 , Cons hty qty ->
-      patl_refine_skeleton_match sig q1 q2 q3 qty;
-      pat_refine_skeleton_match sig x1 x2 x3 hty
-    | Nil , _ , _ , _ | _ , Nil , _ , _ | _ , _ , Nil , _ | _ , _ , _ , Nil ->
-      "keep_on_simp" absurd
-    | _ , _ , _ , _ -> absurd
+  = match l1 , l2 , l3 with
+    | Nil , Nil , Nil -> ()
+    | Cons x1 q1 , Cons x2 q2 , Cons x3 q3 ->
+      patl_refine_skeleton_match q1 q2 q3; pat_refine_skeleton_match x1 x2 x3
+    | Nil , _ , _ | _ , Nil , _ | _ , _ , Nil -> "keep_on_simp" absurd
+    | _ , _ , _ -> absurd
     end
   
   (* Build a list of wildcard patterns. *)
-  let rec ghost pat_wild_list (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (args:list 'univ) (tyl:list ty) : list pattern
+  let rec ghost pat_wild_list (m:model 'u) (sig:signature)
+    (tyv:ty_val 'u) (args:list 'u) (tyl:list ty) : list pattern
     requires { tyl_doms m (tyl_sem m tyv tyl) args }
-    ensures { patl_wty sig result tyl }
-    ensures { skeleton_l_wty sig result tyl }
-    ensures { skeleton_l_accept sig m tyv result tyl args }
+    ensures { skeleton_l sig tyl result }
+    ensures { skeleton_l_accept sig tyl m tyv result args }
     variant { tyl }
   = match args , tyl with
-    | Nil , Nil -> let res = Nil in
-      assert { patl_sem m tyv res args (const None) }; res
-    | Cons _ q1 , Cons _ q2 ->
-      let qr = pat_wild_list m sig tyv q1 q2 in
-      let res = Cons PWild qr in
-      res
+    | Nil , Nil -> Nil
+    | Cons _ q1 , Cons _ q2 -> Cons PWild (pat_wild_list m sig tyv q1 q2)
     | _ , _ -> absurd
     end
   
-  function is_constructor (m:model 'univ) (sig:signature)
-    (ty_alg:ty_symbol) (tyl:list 'univ) (x:'univ) : lsymbol -> bool =
-    \f. m.ls_case f tyl x /\ sig.tys_constr ty_alg f
+  function is_constructor (m:model 'u) (sig:signature)
+    (ty_alg:ty_symbol) (tyls:list 'u) (x:'u) : lsymbol -> bool =
+    \f. exists tyl tylr. m.ls_case f tyl x /\ sig.tys_constr ty_alg f /\
+      length tyl = sig.ls_ty_arity f /\ sig.ls_ret f = TyApp ty_alg tylr /\
+      tyls = tyl_sem m (list_nth tyl default) tylr
   meta rewrite_def function is_constructor
-  predicate eis_constructor (m:model 'univ) (sig:signature)
-    (ty_alg:ty_symbol) (tyl:list 'univ) (x:'univ) =
-    exists g. is_constructor m sig ty_alg tyl x g
+  predicate eis_constructor (m:model 'u) (sig:signature)
+    (ty_alg:ty_symbol) (tyls:list 'u) (x:'u) =
+    exists g. is_constructor m sig ty_alg tyls x g
+  function is_constructor_tyargs (m:model 'u) (sig:signature)
+    (g:lsymbol) (tylr:list ty) (tyls:list 'u) (x:'u) : list 'u -> bool =
+    \tyl. m.ls_case g tyl x /\ length tyl = sig.ls_ty_arity g
+      /\ tyls = tyl_sem m (list_nth tyl default) tylr
+  meta rewrite_def function is_constructor_tyargs
+  function is_constructor_styargs (sig:signature)
+    (tys:ty_symbol) (g:lsymbol) (tyl:list ty) : list ty -> bool =
+    \tyl2. ty_ret sig g tyl2 = TyApp tys tyl /\ length tyl2 = length tyl
+  meta rewrite_def function is_constructor_styargs
   
-  (* Skeleton refinement through a pattern. *)
-  let rec ghost pat_refine_unaccepted (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (x:'univ) (coh pat:pattern) (ty:ty) : pattern
-    requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
-    requires { pat_wty sig pat ty /\ skeleton_wty sig coh ty }
-    requires { skeleton_accept sig m tyv coh ty x }
+  (* Lemma near identical to constructor syntactic type injectivity,
+     but for the model. *)
+  let rec ghost constr_unique (sig:signature) (m:model 'u) (n:int) (l:list ty)
+    (dom:int -> bool) (f g:int -> 'u) : unit
+    requires { distinct_tyv l /\ finite dom }
+    requires { tyl_sem m f l = tyl_sem m g l }
+    requires { tyl_vars_in (range 0 n) sig.tys_belong l }
+    requires { subset dom (range 0 n) }
+    requires { forall x. dom x -> not tyl_tyv_free_var l x }
+    requires { cardinal dom + length l = n }
+    requires { equalizer dom f g }
+    ensures { equalizer (range 0 n) f g }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons (TyApp _ _) _ -> absurd
+    | Cons (TyVar x) q -> constr_unique sig m n q (update dom x true) f g
+    end
+  
+  let rec ghost nth_extensional (l1 l2:list 'a) : unit
+    requires { forall i. nth i l1 = nth i l2 }
+    ensures { l1 = l2 }
+    variant { l1 }
+  = match l1 , l2 with
+    | Nil , Nil -> ()
+    | Cons _ q , Cons _ r ->
+      assert { forall i. nth i q <> nth i r -> i >= 0 &&
+        nth i q = nth (i+1) l1 = nth i r && false };
+      nth_extensional q r
+    | _ -> absurd
+    end
+  
+  function bool_to_int (b:bool) : int = if b then 1 else 0
+  constant ty_sem_ho : model 'u -> ty_val 'u -> ty -> 'u = ty_sem
+  
+  (* The big part: actual skeleton refinement through a pattern. *)
+  let rec ghost pat_refine_unaccepted (m:model 'u) (sig:signature)
+    (tyv:ty_val 'u) (x:'u) (coh pat:pattern) (ty:ty) : pattern
+    requires { sig_wf sig /\ coherence sig m }
+    requires { pat_wty sig pat ty /\ skeleton sig ty coh }
+    requires { skeleton_accept sig ty m tyv coh x }
     requires { m.ty_doms (ty_sem m tyv ty) x }
     requires { not pat_accept m tyv pat x }
-    ensures { skeleton_accept sig m tyv result ty x }
-    ensures { pat_refine result coh /\ skeleton_wty sig result ty }
-    ensures { not pat_skeleton_match result pat }
-    variant { pat }
+    requires { ty_wf sig ty }
+    ensures { skeleton_accept sig ty m tyv result x }
+    ensures { pat_refine result coh /\ skeleton sig ty result }
+    ensures { not pat_skeleton_match pat result }
+    variant { pat , bool_to_int (coh = PWild) }
   = match coh , pat with
     | PApp f tylf lf , PApp g tylg lg ->
       if f = g
-      then match sig.ls_ret f , sig.ls_ret g with
-        | TyApp ty_alg1 _ , TyApp ty_alg2 _ ->
-          assert { sig.tys_belong ty_alg1 && sig.tys_belong ty_alg2 &&
-            sig.tys_constr ty_alg1 f && sig.tys_constr ty_alg2 g &&
-            TyApp ty_alg1 tylf = ty = TyApp ty_alg2 tylg &&
-            ty_alg1 = ty_alg2 && tylf = tylg };
-          let tyl_s = tyl_sem m tyv tylf in
-          let ty_a = ty_args sig f tylf in
-          let lx = m.ls_proj f tyl_s x in
-          assert { tyl_doms m (ty_inst_args m sig f tyl_s) lx };
-          let l_coh = patl_refine_unaccepted m sig tyv lx lf lg ty_a in
-          let res = PApp g tylg l_coh in
-          res
-        | _ -> absurd
-      end else coh
-    | PWild , PApp f tyl lf ->
-      match sig.ls_ret f with
-      | TyApp ty_alg _ -> assert { sig.tys_belong ty_alg &&
-          sig.tys_constr ty_alg f && ty = TyApp ty_alg tyl &&
-          tys_alg sig ty_alg };
-        let tyl_s = tyl_sem m tyv tyl in
-        if eis_constructor m sig ty_alg tyl_s x
-        then let g = choose (is_constructor m sig ty_alg tyl_s x) in
+      then let tyl_s = tyl_sem m tyv tylf in
+        let ty_a = ty_args sig f tylf in
+        let lx = m.ls_proj f tyl_s x in
+        PApp g tylg (patl_refine_unaccepted m sig tyv lx lf lg ty_a)
+      else coh
+    | PWild , PApp f _ _ ->
+      match ty , sig.ls_ret f with
+      | TyApp tys0 tylx , TyApp ty_alg _ ->
+        assert { tys0 = ty_alg && sig.tys_constr ty_alg f &&
+          length tylx = sig.tys_arity ty_alg };
+        let tylxs = tyl_sem m tyv tylx in
+        if eis_constructor m sig ty_alg tylxs x
+        then let g = choose (is_constructor m sig ty_alg tylxs x) in
           match sig.ls_ret g with
-          | TyApp ty_algg _ -> assert { sig.tys_constr ty_algg g &&
-            ty_algg = ty_alg && ty_ret sig g tyl = ty };
-            let ty_a = ty_args sig g tyl in
-            let lx = m.ls_proj g tyl_s x in
-            assert { tyl_doms m (ty_inst_args m sig g tyl_s) lx };
-            let lg = pat_wild_list m sig tyv lx ty_a in
-            if f = g
-            then begin
-              let l_coh = patl_refine_unaccepted m sig tyv lx lg lf ty_a in
-              let res = PApp g tyl l_coh in
-              res
-            end else begin
-              let res = PApp g tyl lg in
-              res
-            end
+          | TyApp tys0 tylg ->
+            assert { tys0 = ty_alg && sig.tys_constr ty_alg g &&
+            length tylg = sig.ls_ty_arity g = sig.tys_arity ty_alg };
+            let ty_a = choose (is_constructor_tyargs m sig g tylg tylxs x) in
+            let sty_a = choose (is_constructor_styargs sig ty_alg g tylx) in
+            let fty_a = list_nth ty_a default in
+            let sfty_a = compose (ty_sem_ho m tyv) (ls_app_ty_subst sty_a) in
+            assert { tyl_subst (ls_app_ty_subst sty_a) id tylg = tylx };
+            constr_unique sig m (length tylx) tylg none fty_a sfty_a;
+            let ty_b = tyl_sem m tyv sty_a in
+            assert { forall i. nth i ty_a <> nth i ty_b ->
+              match nth i ty_a , nth i ty_b with
+              | None , None -> false
+              | Some x , Some y -> fty_a i = x && sfty_a i = y && false
+              | _ , _ -> length ty_a <> length ty_b && false
+              end && false };
+            nth_extensional ty_a ty_b;
+            let gty_a = ty_args sig g sty_a in
+            assert { tyl_sem m tyv gty_a = ty_sem_args sig m g ty_a };
+            let lx = m.ls_proj g (tyl_sem m tyv sty_a) x in
+            let lg = pat_wild_list m sig tyv lx gty_a in
+            pat_refine_unaccepted m sig tyv x (PApp g sty_a lg) pat ty
           | _ -> absurd
           end
-        else let (u:pat_var) = choose all in
-          PVar u
+        else begin
+          (* In this case, the algebraic type ty_alg may not be complete. *)
+          assert { sig.tys_constr_complete ty_alg ->
+            sig.tys_belong ty_alg && length tylxs = sig.tys_arity ty_alg &&
+            m.ty_doms (m.ty_funs ty_alg tylxs) x && false };
+          PVar default
+        end
       | _ -> absurd
       end
-    | _ , PWild -> assert { pat_sem m tyv pat x (const None) };absurd
-    | _ , PVar y -> assert { pat_sem m tyv pat x ((const None)[y <- Some x]) };
-      absurd
-    | _ , PAs pat2 y ->
-      assert { pat_accept m tyv pat2 x ->
-        (forall s. pat_sem m tyv pat2 x s ->
-          pat_sem m tyv pat x (s[y <- Some x]) && false) && false };
+    | _ , (PWild | PVar _) -> absurd
+    | _ , PAs pat2 _ ->
       let res = pat_refine_unaccepted m sig tyv x coh pat2 ty in
-      assert { pat_skeleton_match res pat -> match res , coh , pat2 with
+      assert { pat_skeleton_match pat res -> match res , coh , pat2 with
         | PWild , _ , _ | _ , PWild , _ | _ , _ , PWild ->
           ("keep_on_simp" true) && false
-        | _ -> false end && false
-      };
+        | _ -> false end && false };
       res
     | _ , POr p1 p2 ->
-      assert { pat_accept m tyv p1 x -> (forall s.
-        pat_sem m tyv p1 x s -> pat_sem m tyv pat x s && false) && false };
-      assert { pat_accept m tyv p2 x -> (forall s.
-        pat_sem m tyv p2 x s -> pat_sem m tyv pat x s && false) && false };
       let coh1 = pat_refine_unaccepted m sig tyv x coh p1 ty in
       let coh2 = pat_refine_unaccepted m sig tyv x coh1 p2 ty in
-      assert { pat_skeleton_match coh2 pat ->
-        not pat_skeleton_match coh2 p1 && match coh2 , p1 with
+      assert { pat_skeleton_match pat coh2 ->
+        not pat_skeleton_match p1 coh2 && match coh2 , p1 with
           | PWild , _ | _ , PWild -> ("keep_on_simp" true) && false
           | _ -> false end && false };
       coh2
@@ -896,27 +1348,22 @@ module WellTyped
     | _ -> absurd
     end
   
-  with ghost patl_refine_unaccepted (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (lx:list 'univ) (cohl patl:list pattern)
+  with ghost patl_refine_unaccepted (m:model 'u) (sig:signature)
+    (tyv:ty_val 'u) (lx:list 'u) (cohl patl:list pattern)
     (tyl:list ty) : list pattern
-    requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
+    requires { sig_wf sig /\ coherence sig m }
     requires { patl_wty sig patl tyl }
-    requires { skeleton_l_accept sig m tyv cohl tyl lx }
-    requires { skeleton_l_wty sig cohl tyl }
+    requires { skeleton_l_accept sig tyl m tyv cohl lx }
+    requires { skeleton_l sig tyl cohl }
     requires { tyl_doms m (tyl_sem m tyv tyl) lx }
     requires { not patl_accept m tyv patl lx }
-    ensures { skeleton_l_accept sig m tyv result tyl lx }
-    ensures { patl_refine result cohl /\ skeleton_l_wty sig result tyl }
-    ensures { not patl_skeleton_match result patl }
-    variant { patl }
+    requires { tyl_wf sig tyl }
+    ensures { skeleton_l_accept sig tyl m tyv result lx }
+    ensures { patl_refine result cohl /\ skeleton_l sig tyl result }
+    ensures { not patl_skeleton_match patl result }
+    variant { patl , false }
   = match cohl , patl , lx , tyl with
     | Cons ch cq , Cons ph pq , Cons xh xq , Cons th tq ->
-      assert { forall hs qs,hp,qp.
-        pat_accept m tyv hp hs /\ patl_accept m tyv qp qs ->
-        not patl_accept m tyv (Cons hp qp) (Cons hs qs) ->
-        (forall s1 s2. pat_sem m tyv hp hs s1 /\ patl_sem m tyv qp qs s2 ->
-          patl_sem m tyv (Cons hp qp) (Cons hs qs) (extend s1 s2) && false) &&
-        false };
       if not pat_accept m tyv ph xh
       then Cons (pat_refine_unaccepted m sig tyv xh ch ph th) cq
       else Cons ch (patl_refine_unaccepted m sig tyv xq cq pq tq)
@@ -925,20 +1372,19 @@ module WellTyped
     | _ , _ , _ , _ -> absurd
     end
   
-  meta remove_logic function is_constructor
-  meta remove_logic predicate eis_constructor
-  
-  let rec ghost brl_refine_unaccepted (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (env:ty_env 'tv) (x:'univ) (coh:pattern)
-    (brl:list (branch 'tv)) (tyc ty:ty) : pattern
-    requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
+  (* Refine skeleton counter-example through a full pattern-matching. *)
+  let rec ghost brl_refine_unaccepted (m:model 'u) (sig:signature)
+    (tyv:ty_val 'u) (env:ty_env 'v) (x:'u) (coh:pattern)
+    (brl:list (branch 'v)) (tyc ty:ty) : pattern
+    requires { sig_wf sig /\ coherence sig m }
     requires { brl_wf sig env brl tyc ty }
-    requires { skeleton_accept sig m tyv coh tyc x /\ skeleton_wty sig coh tyc }
+    requires { skeleton_accept sig tyc m tyv coh x /\ skeleton sig tyc coh }
     requires { m.ty_doms (ty_sem m tyv tyc) x }
     requires { not brl_accept m tyv brl x }
-    ensures { skeleton_accept sig m tyv result tyc x }
-    ensures { pat_refine result coh /\ skeleton_wty sig result tyc }
-    ensures { not case_skeleton_match result brl }
+    requires { ty_wf sig tyc }
+    ensures { skeleton_accept sig tyc m tyv result x }
+    ensures { pat_refine result coh /\ skeleton sig tyc result }
+    ensures { not case_skeleton_match brl result }
     variant { brl }
   = match brl with
     | Nil -> coh
@@ -948,76 +1394,166 @@ module WellTyped
       coh2
     end
   
-  (* Finally we get there: a syntactically exhaustive pattern-matching is
-     semantically exhaustive. *)
-  
-  let lemma exhaustive_matching_accept (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (env:ty_env 'tv) (brl:list (branch 'tv))
-    (tyc ty:ty) (x:'univ) : unit
-    requires { model_ok m /\ sig_wf sig /\ model_sig_coherence m sig }
-    requires { brl_wf sig env brl tyc ty /\ exhaustive sig brl tyc }
-    requires { m.ty_doms (ty_sem m tyv tyc) x }
+  (* Finally get to the point: syntactically exhaustive pattern-matching
+     is semantically exhaustive. *)
+  let lemma exhaustive_sem (sig:signature) (m:model 'u) (tyv:ty_val 'u)
+    (env:ty_env 'v) (brl:list (branch 'v)) (tyc ty:ty) (x:'u) : unit
+    requires { sig_wf sig /\ coherence sig m }
+    requires { brl_wf sig env brl tyc ty /\ ty_wf sig tyc }
+    requires { exhaustive sig brl tyc /\ m.ty_doms (ty_sem m tyv tyc) x }
     ensures { brl_accept m tyv brl x }
   = if not brl_accept m tyv brl x
     then let _ = brl_refine_unaccepted m sig tyv env x PWild brl tyc ty in
       absurd
   
-  (* Next step: the semantic mapping build by a pattern
-     respect its type mapping. *)
-  
-  let rec lemma pat_coherent_type (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (pat:pattern) (ty:ty) (y:pat_var) (x:'univ) : unit
-    requires { sig_wf sig /\ model_ok m /\ model_sig_coherence m sig }
+  let rec lemma pat_coherent_type (m:model 'u) (sig:signature)
+    (tyv:ty_val 'u) (pat:pattern) (ty:ty) (x:'u) : unit
+    requires { sig_wf sig /\ coherence sig m }
     requires { pat_wty sig pat ty /\ pat_no_conflict sig pat ty }
-    requires { m.ty_doms (ty_sem m tyv ty) x }
-    ensures { forall s. pat_sem m tyv pat x s ->
-      match s y , pat_ty_collector sig pat ty y with
+    requires { m.ty_doms (ty_sem m tyv ty) x /\ pat_accept m tyv pat x }
+    ensures { (forall y. match pat_ty_collector sig pat ty y ,
+                              pat_sem m tyv pat x y with
       | None , None -> true
       | None , _ | _ , None -> false
-      | Some sy , Some sty -> m.ty_doms (ty_sem m tyv sty) sy
-      end }
+      | Some sty , Some sy -> m.ty_doms (ty_sem m tyv sty) sy
+      end) && let dom = domain(pat_ty_collector sig pat ty) in
+      extensional_equal dom (domain (pat_sem m tyv pat x)) &&
+      dom = domain (pat_sem m tyv pat x) &&
+      let nv = complete (pat_sem m tyv pat x) default in
+      let nty = complete (pat_ty_collector sig pat ty) default in
+      assignment_coherence m tyv nv dom nty
+    }
     variant { pat }
   = match pat with
     | PWild -> ()
     | PVar _ -> ()
-    | PAs p _ -> pat_coherent_type m sig tyv p ty y x
-    | POr p1 p2 -> pat_coherent_type m sig tyv p1 ty y x;
-      pat_coherent_type m sig tyv p2 ty y x
-    | PApp f tyl pl -> if pat_accept m tyv pat x
-      then begin
-        let tyl_s = tyl_sem m tyv tyl in
-        let lx = m.ls_proj f tyl_s x in
-        let ty_a = ty_args sig f tyl in
-        match sig.ls_ret f with
-        | TyApp ty_alg _ -> assert { sig.tys_belong ty_alg &&
-            sig.tys_constr ty_alg f && ty = TyApp ty_alg tyl &&
-            tys_alg sig ty_alg && tyl_doms m (ty_inst_args m sig f tyl_s) lx };
-          patl_coherent_type m sig tyv pl ty_a y lx
-        | _ -> absurd
-        end
-      end
+    | PAs p _ -> pat_coherent_type m sig tyv p ty x
+    | POr p1 p2 -> if pat_accept m tyv p1 x
+      then pat_coherent_type m sig tyv p1 ty x
+      else pat_coherent_type m sig tyv p2 ty x
+    | PApp f tyl pl ->
+      let tyl_s = tyl_sem m tyv tyl in
+      let lx = m.ls_proj f tyl_s x in
+      let ty_a = ty_args sig f tyl in
+      patl_coherent_type m sig tyv pl ty_a lx
     end
   
-  with lemma patl_coherent_type (m:model 'univ) (sig:signature)
-    (tyv:ty_valuation 'univ) (patl:list pattern) (tyl:list ty)
-    (y:pat_var) (lx:list 'univ) : unit
-    requires { sig_wf sig /\ model_ok m /\ model_sig_coherence m sig }
+  with lemma patl_coherent_type (m:model 'u) (sig:signature)
+    (tyv:ty_val 'u) (patl:list pattern) (tyl:list ty) (lx:list 'u) : unit
+    requires { sig_wf sig /\ coherence sig m }
     requires { patl_wty sig patl tyl /\ patl_no_conflict sig patl tyl }
-    requires { tyl_doms m (tyl_sem m tyv tyl) lx }
-    ensures { forall s. patl_sem m tyv patl lx s ->
-      match s y , patl_ty_collector sig patl tyl y with
+    requires { tyl_doms m (tyl_sem m tyv tyl) lx /\ patl_accept m tyv patl lx }
+    ensures { (forall y. match patl_ty_collector sig patl tyl y ,
+                    patl_sem m tyv patl lx y with
       | None , None -> true
       | None , _ | _ , None -> false
-      | Some sy , Some sty -> m.ty_doms (ty_sem m tyv sty) sy
-      end }
+      | Some sty , Some sy -> m.ty_doms (ty_sem m tyv sty) sy
+      end) && let dom = domain(patl_ty_collector sig patl tyl) in
+      extensional_equal dom (domain (patl_sem m tyv patl lx)) &&
+      dom = domain (patl_sem m tyv patl lx) &&
+      let nv = complete (patl_sem m tyv patl lx) default in
+      let nty = complete (patl_ty_collector sig patl tyl) default in
+      assignment_coherence m tyv nv dom nty }
     variant { patl }
   = match patl , tyl , lx with
     | Cons hp qp , Cons ht qt , Cons hx qx ->
-      pat_coherent_type m sig tyv hp ht y hx;
-      patl_coherent_type m sig tyv qp qt y qx
+      pat_coherent_type m sig tyv hp ht hx;
+      patl_coherent_type m sig tyv qp qt qx
     | Nil , Nil , Nil -> ()
     | _ -> absurd
     end
+  
+  let rec lemma t_coherent_type (sig:signature) (m:model 'u)
+    (tyv:ty_val 'u) (t:term 'v) : unit
+    requires { sig_wf sig /\ valid_model m /\ coherence sig m }
+    ensures { forall env rho ty. env_wf sig env /\
+      v_coherence m tyv env rho /\ t_wf sig env t ty ->
+      m.ty_doms (ty_sem m tyv ty) (t_sem m tyv rho t) }
+    variant { t }
+  = let ghost rc = t_coherent_type sig m tyv in
+    match t with
+    | TApp _ _ tl -> tl_coherent_type sig m tyv tl
+    | TIf b t e -> rc b;rc t;rc e
+    | TLet t1 t2 -> rc t1;t_coherent_type sig m tyv t2;
+      assert { forall env rho ty. env_wf sig env /\
+        v_coherence m tyv env rho /\ t_wf sig env t ty ->
+        not m.ty_doms (ty_sem m tyv ty) (t_sem m tyv rho t) ->
+        (forall ty0. let env' = ext_env env all (const ty0) in 
+          t_wf sig env t1 ty0 /\ t_wf sig env' t2 ty ->
+          let ext = (const (t_sem m tyv rho t1):unit -> 'u) in
+          assignment_coherence m tyv ext all (const ty0) &&
+          v_coherence m tyv env' (bfold rho ext) && false) && false }
+    | TCase tc brl -> rc tc;brl_coherent_type sig m tyv brl
+    | _ -> ()
+    end
+  
+  with lemma tl_coherent_type (sig:signature) (m:model 'u)
+    (tyv:ty_val 'u) (tl:list (term 'v)) : unit
+    requires { sig_wf sig /\ valid_model m /\ coherence sig m }
+    ensures { forall env rho tyl. env_wf sig env /\
+      v_coherence m tyv env rho /\ tl_wf sig env tl tyl ->
+      tyl_doms m (tyl_sem m tyv tyl) (tl_sem m tyv rho tl) }
+    variant { tl }
+  = match tl with
+    | Cons x q -> t_coherent_type sig m tyv x;tl_coherent_type sig m tyv q;
+      assert { forall env rho tyl. env_wf sig env /\
+        v_coherence m tyv env rho /\ tl_wf sig env tl tyl /\
+        not tyl_doms m (tyl_sem m tyv tyl) (tl_sem m tyv rho tl) ->
+        match tyl with
+        | Nil -> ("keep_on_simp" true) && false | _ -> false end && false }
+    | _ -> ()
+    end
+  
+  with lemma brl_coherent_type (sig:signature) (m:model 'u)
+    (tyv:ty_val 'u) (brl:list (branch 'v)) : unit
+    requires { sig_wf sig /\ valid_model m /\ coherence sig m }
+    ensures { forall env rho tyc ty x. env_wf sig env /\
+      v_coherence m tyv env rho /\ brl_wf sig env brl tyc ty /\ ty_wf sig tyc /\
+      m.ty_doms (ty_sem m tyv tyc) x /\ brl_accept m tyv brl x ->
+      m.ty_doms (ty_sem m tyv ty) (brl_sem m tyv rho brl x) }
+    variant { brl }
+  = match brl with
+    | Cons x q -> br_coherent_type sig m tyv x;brl_coherent_type sig m tyv q
+    | _ -> ()
+    end
+  
+  with lemma br_coherent_type (sig:signature) (m:model 'u)
+    (tyv:ty_val 'u) (br:branch 'v) : unit
+    requires { sig_wf sig /\ valid_model m /\ coherence sig m }
+    ensures { forall env rho tyc ty x cont. env_wf sig env /\
+      v_coherence m tyv env rho /\ br_wf sig env br tyc ty /\ ty_wf sig tyc /\
+      m.ty_doms (ty_sem m tyv tyc) x /\ br_accept m tyv br x ->
+      m.ty_doms (ty_sem m tyv ty) (br_sem m tyv rho br x cont) }
+    variant { br }
+  = match br with
+    | (pat,right) -> t_coherent_type sig m tyv right;
+      assert { forall env rho tyc ty x cont. env_wf sig env /\
+        v_coherence m tyv env rho /\ br_wf sig env br tyc ty /\ ty_wf sig tyc /\
+        m.ty_doms (ty_sem m tyv tyc) x /\ br_accept m tyv br x ->
+        not m.ty_doms (ty_sem m tyv ty) (br_sem m tyv rho br x cont) ->
+        let dom = domain (pat_ty_collector sig pat tyc) in
+        let ext = complete (pat_sem m tyv pat x) default in
+        let nty = complete (pat_ty_collector sig pat tyc) default in
+        assignment_coherence m tyv ext dom nty &&
+        v_coherence m tyv (ext_env env dom nty) (bfold rho ext) && false }
+    end
+  
+  clone WellTyped with type DWellTyped.d = unit,
+    goal ty_sem_inst,
+    goal coherence_extension,
+    goal exhaustive_sem,
+    goal pat_coherent_type,
+    goal patl_coherent_type
+  
+end
+
+(*
+
+(* Typing judgement can be transported semantically. *)
+module WellTyped
+  
+  meta remove_logic function is_constructor
+  meta remove_logic predicate eis_constructor
   
   (* Main theorem of this module: semantic transportation of typing judgements.
      A well-typed term t with type T, in a model M coherent with
@@ -1116,5 +1652,5 @@ module WellTyped
     | _ -> ()
     end
   
-end
+end*)
 
