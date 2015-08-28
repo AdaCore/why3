@@ -132,7 +132,7 @@ let add_var env (v,_ty) =
   let n = env.var_cnt in
   { env with
     var_cnt = Why3extract.Why3__BigInt.succ n;
-    var_assoc = (v,n)::env.var_assoc }
+    var_assoc = (v,n)::env.var_assoc }, n
 
 let find_sym env s =
   try
@@ -143,6 +143,25 @@ let find_sym env s =
     { env with
       sym_cnt = Why3extract.Why3__BigInt.succ n;
       sym_assoc = (s,n)::env.sym_assoc }, n
+
+let rec tr_term env e =
+  match e.e_node with
+  | Elet(e1,e2) -> unsupported "let"
+  | Eite(e1,e2,e3) -> unsupported "ite"
+  | Eqnt(q,vl,e) -> ill_typed "quantifier in term"
+  | Ebin(op,e1,e2) -> ill_typed "bin op in term"
+  | Enot e -> ill_typed "'not' in term"
+  | Eequ(e1,e2) -> ill_typed "'equ' in term"
+  | Eapp(w,el) -> unsupported "app in term"
+  | Edef(w,el) -> unsupported "def"
+  | Edob d -> unsupported "dob"
+  | Enum n -> unsupported "num"
+  | Evar v ->
+    let v = find_var env v in
+    let o =
+      Firstorder_term_impl__Types.NLCVar_fo_term v
+    in
+    env,Firstorder_term_impl__Impl.construct_fo_term o
 
 let rec mk_bin_op op phi1 phi2 =
   let phi =
@@ -161,20 +180,41 @@ let rec mk_bin_op op phi1 phi2 =
   in
   Firstorder_formula_impl__Impl.construct_fo_formula phi
 
-let rec tr_fmla env f =
-  match f.e_node with
+let rec tr_fmla env e =
+  match e.e_node with
   | Elet(e1,e2) -> unsupported "let"
   | Eite(e1,e2,e3) -> unsupported "ite"
   | Eqnt(q,vl,e) ->
-    let env1 = List.fold_left add_var env vl in
+    let env1,nl =
+      List.fold_right
+        (fun v (env,vl) ->
+          let env,n = add_var env v in
+          (env,n::vl))
+        vl (env,[])
+    in
     let env2,phi = tr_fmla env1 e in
-    let env = { env2 with var_cnt = env.var_cnt; var_assoc = env.var_assoc } in
+    (* suppressing quantified variables from the env *)
+    let env =
+      { env2 with var_cnt = env.var_cnt; var_assoc = env.var_assoc }
+    in
     let phi = match q with
       | Qforall ->
-        Firstorder_formula_impl__Types.NLC_Forall
-          (Why3extract.Why3__BigInt.zero, phi) (* FIXME ! *)
-      | Qexists -> assert false (* TODO *)
-    in env, Firstorder_formula_impl__Impl.construct_fo_formula phi
+        List.fold_right
+          (fun n phi ->
+            let o =
+              Firstorder_formula_impl__Types.NLC_Forall (n,phi)
+            in
+            Firstorder_formula_impl__Impl.construct_fo_formula o)
+          nl phi
+      | Qexists ->
+        List.fold_right
+          (fun n phi ->
+            let o =
+              Firstorder_formula_impl__Types.NLC_Exists (n,phi)
+            in
+            Firstorder_formula_impl__Impl.construct_fo_formula o)
+          nl phi
+    in env, phi
   | Ebin(op,e1,e2) ->
     let env1,phi1 = tr_fmla env e1 in
     let env2,phi2 = tr_fmla env e2 in
@@ -183,18 +223,29 @@ let rec tr_fmla env f =
     let env1,phi1 = tr_fmla env e in
     env1,mk_not phi1
   | Eequ(e1,e2) -> unsupported "equ"
-  | Eapp(w,el) -> unsupported "app" (* TODO *)
+  | Eapp(w,el) ->
+    let fotnil =
+      let o = Firstorder_term_impl__Types.NLC_FONil in
+      Firstorder_term_impl__Impl.construct_fo_term_list o
+    in
+    let env,tl =
+      List.fold_right
+        (fun e (env,acc) ->
+          let env,t = tr_term env e in
+          let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
+          (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+        el
+        (env,fotnil)
+    in
+    let env,sym = find_sym env w in
+    let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
+    let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
+    let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
+    env,Firstorder_formula_impl__Impl.construct_fo_formula o
   | Edef(w,el) -> unsupported "def"
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
   | Evar v -> ill_typed "var in formula"
-(*
-    let v = find_var env v in
-    let o =
-      Firstorder_term_impl__Types.NLCVar_fo_term v
-    in
-    env,Firstorder_term_impl__Impl.construct_fo_term o
-*)
 
 let empty_env () =
 { var_cnt = Why3extract.Why3__BigInt.zero;
@@ -244,7 +295,8 @@ let run_file file =
   try
     let ast = Tptp_lexer.load file in
     printf "File '%s' is OK.@." file;
-    let _l = tr_file ast in
+    let _,l = tr_file ast in
+    run_test (Filename.basename file) l;
     exit 0
   with
   | Tptp_lexer.FileNotFound f ->
