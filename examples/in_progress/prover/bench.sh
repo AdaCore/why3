@@ -1,9 +1,8 @@
 #!/bin/sh
 # tests for the safe prover
 
-timelimit=2
+timelimit=60
 memlimit=1000
-file=$1
 
 report="report.txt"
 reperr="report_errors.txt"
@@ -12,6 +11,9 @@ TMP=bench.out
 TMPERR=bench.err
 
 WHY3CPULIMIT=../../../lib/why3-cpulimit
+
+run_dir () {
+for file in `ls $1/*.p`; do
 $WHY3CPULIMIT $timelimit $memlimit -s build/prover $file 2> $TMPERR > $TMP
 ret=$?
 if test "$ret" != "0" -a "$ret" != 152 ; then
@@ -45,3 +47,8 @@ else
     time=`sed -n -e 's|.*time : \(.*\) s.*|\1|p' $TMPERR`
     printf "SPASS: $res $time\n" >> $report
 fi
+done
+}
+
+
+run_dir $1
