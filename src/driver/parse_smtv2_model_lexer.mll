@@ -5,6 +5,7 @@
 
 let atom = [^'('')'' ''\t''\n']
 let space = [' ''\t''\n']
+let num = ['0'-'9']+
 
 rule token = parse
   | '\n'
@@ -18,8 +19,9 @@ rule token = parse
       { LPAREN }
   | ')'
       { RPAREN }
-  | ['0'-'9']+ as integer
+  | num as integer
       { INT_STR (integer) }
+  | "(_ bv"(num as bv_value)" "num")" { BITVECTOR_VALUE (int_of_string bv_value)  }
   | '-'space*(['0'-'9']+ as integer) { MINUS_INT_STR ("-"^integer) }
   | atom+ as at { ATOM (at) }
   | eof
@@ -27,4 +29,3 @@ rule token = parse
     (* | space { SPACE } *)
   | _
 	{ raise SyntaxError }
-
