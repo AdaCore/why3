@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Isabelle" version="2014" timelimit="2" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="2" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.4" timelimit="2" memlimit="1000"/>
+<prover id="3" name="Vampire" version="0.6" timelimit="2" memlimit="1000"/>
+<file name="../PGCD.mlw" expanded="true">
+<theory name="PGCD" sum="2f961ae95bba7ce8e0cebe0d69d8bb94" expanded="true">
+ <goal name="is_gcd_self" expanded="true">
+ <proof prover="2"><result status="valid" time="0.11"/></proof>
+ <proof prover="3"><result status="valid" time="0.24"/></proof>
+ </goal>
+ <goal name="common_div_a_b" expanded="true">
+ <proof prover="0" edited="PGCD_PGCD_common_div_a_b_1.xml"><result status="valid" time="9.39"/></proof>
+ </goal>
+ <goal name="common_div_b_a" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+ </goal>
+ <goal name="common_div_commutes" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
+ </goal>
+ <goal name="gcd_commutes" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+ </goal>
+ <goal name="gcd_a_b" expanded="true">
+ <proof prover="0" edited="PGCD_PGCD_gcd_a_b_1.xml"><result status="valid" time="9.83"/></proof>
+ </goal>
+ <goal name="gcd_b_a" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="28"/></proof>
+ </goal>
+ <goal name="WP_parameter pgcd" expl="VC for pgcd" expanded="true">
+ <proof prover="1"><result status="valid" time="0.10" steps="86"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

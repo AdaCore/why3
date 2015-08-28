@@ -5,9 +5,7 @@
 <prover id="0" name="Coq" version="8.4pl4" timelimit="30" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Gappa" version="1.1.1" timelimit="5" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
@@ -37,7 +35,7 @@
  </goal>
  <goal name="nth_j6">
  <proof prover="1"><result status="valid" time="0.07" steps="100"/></proof>
- <proof prover="4"><result status="valid" time="0.59"/></proof>
+ <proof prover="4"><result status="valid" time="0.56"/></proof>
  <proof prover="9" timelimit="5"><result status="valid" time="0.11" steps="102"/></proof>
  </goal>
  <goal name="nth_j7">
@@ -49,44 +47,44 @@
  <proof prover="9"><result status="valid" time="0.53" steps="124"/></proof>
  </goal>
  <goal name="nth_const1">
- <proof prover="1"><result status="valid" time="0.78" steps="199"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="3.40" steps="258"/></proof>
+ <proof prover="1"><result status="valid" time="0.60" steps="199"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="3.38" steps="258"/></proof>
  </goal>
  <goal name="nth_const2">
  <proof prover="1"><result status="valid" time="0.19" steps="191"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="1.76" steps="254"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="1.53" steps="254"/></proof>
  </goal>
  <goal name="nth_const3">
  <proof prover="1"><result status="valid" time="0.10" steps="98"/></proof>
- <proof prover="4"><result status="valid" time="0.59"/></proof>
+ <proof prover="4"><result status="valid" time="0.44"/></proof>
  <proof prover="8"><result status="valid" time="0.74"/></proof>
  <proof prover="9" timelimit="60"><result status="valid" time="0.08" steps="98"/></proof>
  <proof prover="10"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="nth_const4">
  <proof prover="1"><result status="valid" time="0.10" steps="99"/></proof>
- <proof prover="4"><result status="valid" time="0.64"/></proof>
- <proof prover="8"><result status="valid" time="0.77"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="0.07" steps="99"/></proof>
+ <proof prover="4"><result status="valid" time="0.48"/></proof>
+ <proof prover="8"><result status="valid" time="0.76"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="0.09" steps="99"/></proof>
  <proof prover="10"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="nth_const5">
  <proof prover="1"><result status="valid" time="0.11" steps="99"/></proof>
- <proof prover="4"><result status="valid" time="0.66"/></proof>
- <proof prover="8"><result status="valid" time="0.78"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="0.07" steps="99"/></proof>
+ <proof prover="4"><result status="valid" time="0.49"/></proof>
+ <proof prover="8"><result status="valid" time="0.74"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="0.20" steps="99"/></proof>
  <proof prover="10"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="nth_const6">
- <proof prover="1"><result status="valid" time="0.10" steps="99"/></proof>
- <proof prover="4"><result status="valid" time="0.65"/></proof>
- <proof prover="8"><result status="valid" time="0.76"/></proof>
+ <proof prover="1"><result status="valid" time="0.09" steps="99"/></proof>
+ <proof prover="4"><result status="valid" time="0.48"/></proof>
+ <proof prover="8"><result status="valid" time="0.79"/></proof>
  <proof prover="9" timelimit="60"><result status="valid" time="0.10" steps="99"/></proof>
  <proof prover="10"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="nth_const7">
  <proof prover="1"><result status="valid" time="0.11" steps="99"/></proof>
- <proof prover="4"><result status="valid" time="0.65"/></proof>
+ <proof prover="4"><result status="valid" time="0.47"/></proof>
  <proof prover="8"><result status="valid" time="0.73"/></proof>
  <proof prover="9" timelimit="60"><result status="valid" time="0.06" steps="99"/></proof>
  <proof prover="10"><result status="valid" time="0.07"/></proof>
@@ -108,9 +106,7 @@
  <goal name="sign_const">
  <proof prover="1"><result status="valid" time="0.03" steps="79"/></proof>
  <proof prover="2"><result status="valid" time="0.04"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
- <proof prover="5"><result status="valid" time="0.04"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
@@ -118,20 +114,18 @@
  <proof prover="10"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="exp_const">
- <proof prover="0" edited="double_of_int_DoubleOfInt_exp_const_1.v"><result status="valid" time="1.34"/></proof>
+ <proof prover="0" edited="double_of_int_DoubleOfInt_exp_const_1.v"><result status="valid" time="1.31"/></proof>
  </goal>
  <goal name="to_nat_mantissa_1">
  <proof prover="1"><result status="valid" time="0.05" steps="91"/></proof>
- <proof prover="3"><result status="valid" time="0.62"/></proof>
- <proof prover="4"><result status="valid" time="0.63"/></proof>
- <proof prover="6" timelimit="10"><result status="valid" time="2.89"/></proof>
- <proof prover="8"><result status="valid" time="0.74"/></proof>
+ <proof prover="4"><result status="valid" time="0.46"/></proof>
+ <proof prover="6" timelimit="10"><result status="valid" time="2.87"/></proof>
+ <proof prover="8"><result status="valid" time="0.76"/></proof>
  <proof prover="9"><result status="valid" time="0.20" steps="111"/></proof>
  <proof prover="10"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="mantissa_const_nth2">
  <proof prover="1"><result status="valid" time="0.04" steps="84"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.08"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
@@ -140,28 +134,25 @@
  </goal>
  <goal name="mantissa_const_to_nat51">
  <proof prover="1"><result status="valid" time="0.18" steps="134"/></proof>
- <proof prover="3"><result status="valid" time="0.85"/></proof>
- <proof prover="4"><result status="valid" time="0.65"/></proof>
- <proof prover="6" timelimit="11"><result status="valid" time="3.09"/></proof>
- <proof prover="8"><result status="valid" time="0.76"/></proof>
- <proof prover="9"><result status="valid" time="0.27" steps="144"/></proof>
- <proof prover="10"><result status="valid" time="0.10"/></proof>
+ <proof prover="4"><result status="valid" time="0.47"/></proof>
+ <proof prover="6" timelimit="11"><result status="valid" time="3.06"/></proof>
+ <proof prover="8"><result status="valid" time="0.75"/></proof>
+ <proof prover="9"><result status="valid" time="0.22" steps="144"/></proof>
+ <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="mantissa_const">
  <proof prover="1"><result status="valid" time="0.08" steps="106"/></proof>
  <proof prover="4"><result status="valid" time="0.60"/></proof>
- <proof prover="9"><result status="valid" time="0.47" steps="149"/></proof>
+ <proof prover="9"><result status="valid" time="0.45" steps="149"/></proof>
  <proof prover="10"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="real1075m1023">
- <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="real1075m1023_2">
  <proof prover="1"><result status="valid" time="0.02" steps="84"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
@@ -174,190 +165,169 @@
  <proof prover="9" timelimit="60"><result status="valid" time="0.08" steps="116"/></proof>
  </goal>
  <goal name="const_value0">
- <proof prover="1"><result status="valid" time="0.49" steps="138"/></proof>
- <proof prover="2"><result status="valid" time="0.24"/></proof>
- <proof prover="5"><result status="valid" time="0.08"/></proof>
- <proof prover="9"><result status="valid" time="0.53" steps="136"/></proof>
+ <proof prover="1"><result status="valid" time="0.41" steps="138"/></proof>
+ <proof prover="2"><result status="valid" time="0.23"/></proof>
+ <proof prover="9"><result status="valid" time="0.50" steps="136"/></proof>
  </goal>
  <goal name="const_value">
  <proof prover="1"><result status="valid" time="0.04" steps="87"/></proof>
  <proof prover="2"><result status="valid" time="0.05"/></proof>
- <proof prover="3"><result status="valid" time="0.13"/></proof>
  <proof prover="4"><result status="valid" time="0.05"/></proof>
- <proof prover="5"><result status="valid" time="0.05"/></proof>
- <proof prover="6" timelimit="10"><result status="valid" time="2.74"/></proof>
- <proof prover="8"><result status="valid" time="0.78"/></proof>
+ <proof prover="6" timelimit="10"><result status="valid" time="2.75"/></proof>
+ <proof prover="8"><result status="valid" time="0.75"/></proof>
  <proof prover="9"><result status="valid" time="0.03" steps="87"/></proof>
  <proof prover="10"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="nth_0_30">
- <proof prover="2"><result status="valid" time="0.45"/></proof>
- <proof prover="4"><result status="valid" time="1.00"/></proof>
- <proof prover="5"><result status="valid" time="0.18"/></proof>
+ <proof prover="2"><result status="valid" time="0.46"/></proof>
+ <proof prover="4"><result status="valid" time="0.96"/></proof>
  </goal>
  <goal name="nth_jpxor_0_30">
  <proof prover="1"><result status="valid" time="0.08" steps="98"/></proof>
  <proof prover="2"><result status="valid" time="0.06"/></proof>
  <proof prover="4"><result status="valid" time="0.11"/></proof>
- <proof prover="5"><result status="valid" time="0.05"/></proof>
  <proof prover="9"><result status="valid" time="0.09" steps="98"/></proof>
  <proof prover="10"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="nth_var31">
- <proof prover="4"><result status="valid" time="0.65"/></proof>
- <proof prover="9" timelimit="125"><result status="valid" time="5.22" steps="300"/></proof>
- <proof prover="10"><result status="valid" time="0.15"/></proof>
+ <proof prover="4"><result status="valid" time="0.64"/></proof>
+ <proof prover="9" timelimit="125"><result status="valid" time="5.18" steps="300"/></proof>
+ <proof prover="10"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="to_nat_sub_0_30">
- <proof prover="3"><result status="valid" time="0.67"/></proof>
- <proof prover="4"><result status="valid" time="0.76"/></proof>
- <proof prover="6" timelimit="10"><result status="valid" time="3.22"/></proof>
- <proof prover="8"><result status="valid" time="0.81"/></proof>
- <proof prover="10"><result status="valid" time="0.21"/></proof>
+ <proof prover="4"><result status="valid" time="0.57"/></proof>
+ <proof prover="6" timelimit="10"><result status="valid" time="3.20"/></proof>
+ <proof prover="8"><result status="valid" time="0.84"/></proof>
+ <proof prover="10"><result status="valid" time="0.16"/></proof>
  </goal>
  <goal name="jpxorx_pos">
- <proof prover="1"><result status="valid" time="0.70" steps="148"/></proof>
+ <proof prover="1"><result status="valid" time="0.63" steps="148"/></proof>
  <proof prover="2"><result status="valid" time="0.06"/></proof>
- <proof prover="3"><result status="valid" time="0.13"/></proof>
  <proof prover="4"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.04"/></proof>
- <proof prover="6"><result status="valid" time="0.12"/></proof>
- <proof prover="8"><result status="valid" time="0.16"/></proof>
- <proof prover="9"><result status="valid" time="1.60" steps="151"/></proof>
+ <proof prover="6"><result status="valid" time="0.11"/></proof>
+ <proof prover="8"><result status="valid" time="0.12"/></proof>
+ <proof prover="9"><result status="valid" time="1.52" steps="151"/></proof>
  <proof prover="10"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="from_int2c_to_nat_sub_pos">
- <proof prover="0" timelimit="60" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_pos_1.v"><result status="valid" time="3.21"/></proof>
+ <proof prover="0" timelimit="60" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_pos_1.v"><result status="valid" time="3.17"/></proof>
  </goal>
  <goal name="lemma1_pos">
- <proof prover="0" timelimit="6" edited="double_of_int_DoubleOfInt_lemma1_pos_1.v"><result status="valid" time="5.37"/></proof>
+ <proof prover="0" timelimit="6" edited="double_of_int_DoubleOfInt_lemma1_pos_1.v"><result status="valid" time="4.78"/></proof>
  </goal>
  <goal name="jpxorx_neg">
  <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.13"/></proof>
  <proof prover="4"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
  <proof prover="6"><result status="valid" time="0.13"/></proof>
  <proof prover="8"><result status="valid" time="0.19"/></proof>
  <proof prover="10"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="from_int2c_to_nat_sub_neg">
- <proof prover="0" timelimit="5" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_neg_1.v"><result status="valid" time="3.51"/></proof>
+ <proof prover="0" timelimit="5" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_neg_1.v"><result status="valid" time="3.50"/></proof>
  </goal>
  <goal name="lemma1_neg">
- <proof prover="0" timelimit="10" edited="double_of_int_DoubleOfInt_lemma1_neg_1.v"><result status="valid" time="1.15"/></proof>
+ <proof prover="0" timelimit="10" edited="double_of_int_DoubleOfInt_lemma1_neg_1.v"><result status="valid" time="1.20"/></proof>
  </goal>
  <goal name="lemma1">
  <proof prover="1"><result status="valid" time="0.06" steps="95"/></proof>
  <proof prover="2"><result status="valid" time="0.32"/></proof>
- <proof prover="3"><result status="valid" time="0.14"/></proof>
  <proof prover="4"><result status="valid" time="0.09"/></proof>
- <proof prover="5"><result status="valid" time="0.16"/></proof>
  <proof prover="6"><result status="valid" time="0.13"/></proof>
  <proof prover="8"><result status="valid" time="0.19"/></proof>
  <proof prover="9"><result status="valid" time="0.04" steps="94"/></proof>
  <proof prover="10"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="nth_var_0_31">
- <proof prover="4" timelimit="10"><result status="valid" time="0.85"/></proof>
- <proof prover="10"><result status="valid" time="0.52"/></proof>
+ <proof prover="4" timelimit="10"><result status="valid" time="0.66"/></proof>
+ <proof prover="10"><result status="valid" time="0.46"/></proof>
  </goal>
  <goal name="to_nat_bv32_bv64_aux">
- <proof prover="0" timelimit="5" edited="double_of_int_DoubleOfInt_to_nat_bv32_bv64_aux_1.v"><result status="valid" time="3.25"/></proof>
+ <proof prover="0" timelimit="5" edited="double_of_int_DoubleOfInt_to_nat_bv32_bv64_aux_1.v"><result status="valid" time="3.17"/></proof>
  </goal>
  <goal name="to_nat_bv32_bv64">
  <proof prover="1"><result status="valid" time="0.06" steps="90"/></proof>
  <proof prover="2"><result status="valid" time="0.06"/></proof>
- <proof prover="3"><result status="valid" time="0.14"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
  <proof prover="6"><result status="valid" time="0.12"/></proof>
- <proof prover="8"><result status="valid" time="0.19"/></proof>
+ <proof prover="8"><result status="valid" time="0.14"/></proof>
  <proof prover="9"><result status="valid" time="0.04" steps="89"/></proof>
  <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="to_nat_var_0_31">
- <proof prover="3"><result status="valid" time="0.16"/></proof>
- <proof prover="4"><result status="valid" time="0.56"/></proof>
+ <proof prover="4"><result status="valid" time="0.61"/></proof>
  <proof prover="6" timelimit="11"><result status="valid" time="0.14"/></proof>
  <proof prover="8"><result status="valid" time="0.18"/></proof>
  <proof prover="10"><result status="valid" time="0.16"/></proof>
  </goal>
  <goal name="nth_var32to63">
- <proof prover="4"><result status="valid" time="0.86"/></proof>
+ <proof prover="4"><result status="valid" time="0.65"/></proof>
  <proof prover="10"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="nth_var3">
- <proof prover="1"><result status="valid" time="1.21" steps="146"/></proof>
- <proof prover="4"><result status="valid" time="0.71"/></proof>
+ <proof prover="1"><result status="valid" time="1.08" steps="146"/></proof>
+ <proof prover="4"><result status="valid" time="0.56"/></proof>
  <proof prover="8"><result status="valid" time="0.88"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="1.37" steps="144"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="1.28" steps="144"/></proof>
  <proof prover="10"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="lemma2">
- <proof prover="0" timelimit="60" edited="double_of_int_DoubleOfInt_lemma2_1.v"><result status="valid" time="4.09"/></proof>
+ <proof prover="0" timelimit="60" edited="double_of_int_DoubleOfInt_lemma2_1.v"><result status="valid" time="3.97"/></proof>
  </goal>
  <goal name="nth_var4">
- <proof prover="1"><result status="valid" time="1.29" steps="148"/></proof>
- <proof prover="4"><result status="valid" time="0.59"/></proof>
- <proof prover="8"><result status="valid" time="0.83"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="1.38" steps="146"/></proof>
+ <proof prover="1"><result status="valid" time="1.11" steps="148"/></proof>
+ <proof prover="4"><result status="valid" time="0.62"/></proof>
+ <proof prover="8"><result status="valid" time="0.85"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="1.28" steps="146"/></proof>
  <proof prover="10"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="nth_var5">
- <proof prover="1"><result status="valid" time="1.29" steps="148"/></proof>
- <proof prover="4"><result status="valid" time="0.60"/></proof>
+ <proof prover="1"><result status="valid" time="1.10" steps="148"/></proof>
+ <proof prover="4"><result status="valid" time="0.63"/></proof>
  <proof prover="8"><result status="valid" time="0.85"/></proof>
- <proof prover="9" timelimit="5"><result status="valid" time="1.37" steps="146"/></proof>
+ <proof prover="9" timelimit="5"><result status="valid" time="1.26" steps="146"/></proof>
  <proof prover="10"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="nth_var6">
- <proof prover="1"><result status="valid" time="1.30" steps="148"/></proof>
- <proof prover="4"><result status="valid" time="0.58"/></proof>
+ <proof prover="1"><result status="valid" time="1.10" steps="148"/></proof>
+ <proof prover="4"><result status="valid" time="0.59"/></proof>
  <proof prover="8"><result status="valid" time="0.83"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="1.36" steps="146"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="1.28" steps="146"/></proof>
  <proof prover="10"><result status="valid" time="0.15"/></proof>
  </goal>
  <goal name="nth_var7">
- <proof prover="1"><result status="valid" time="1.26" steps="148"/></proof>
- <proof prover="4"><result status="valid" time="0.79"/></proof>
- <proof prover="8"><result status="valid" time="0.84"/></proof>
- <proof prover="9" timelimit="60"><result status="valid" time="1.34" steps="146"/></proof>
- <proof prover="10"><result status="valid" time="0.14"/></proof>
+ <proof prover="1"><result status="valid" time="1.08" steps="148"/></proof>
+ <proof prover="4"><result status="valid" time="0.59"/></proof>
+ <proof prover="8"><result status="valid" time="0.82"/></proof>
+ <proof prover="9" timelimit="60"><result status="valid" time="1.23" steps="146"/></proof>
+ <proof prover="10"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="nth_var8">
  <proof prover="1"><result status="valid" time="0.06" steps="93"/></proof>
  <proof prover="2"><result status="valid" time="0.08"/></proof>
- <proof prover="3"><result status="valid" time="0.12"/></proof>
  <proof prover="4"><result status="valid" time="0.09"/></proof>
- <proof prover="5"><result status="valid" time="0.07"/></proof>
- <proof prover="6"><result status="valid" time="0.12"/></proof>
+ <proof prover="6"><result status="valid" time="0.11"/></proof>
  <proof prover="8"><result status="valid" time="0.20"/></proof>
  <proof prover="9"><result status="valid" time="0.04" steps="93"/></proof>
  <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="lemma3">
- <proof prover="0" edited="double_of_int_DoubleOfInt_lemma3_1.v"><result status="valid" time="2.66"/></proof>
- <proof prover="4"><result status="valid" time="0.88"/></proof>
- <proof prover="10"><result status="valid" time="0.17"/></proof>
+ <proof prover="0" edited="double_of_int_DoubleOfInt_lemma3_1.v"><result status="valid" time="2.52"/></proof>
+ <proof prover="4"><result status="valid" time="0.65"/></proof>
+ <proof prover="10"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="nth_var9">
  <proof prover="1"><result status="valid" time="0.10" steps="95"/></proof>
  <proof prover="2"><result status="valid" time="0.08"/></proof>
- <proof prover="3"><result status="valid" time="0.14"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="5"><result status="valid" time="0.07"/></proof>
- <proof prover="6"><result status="valid" time="0.13"/></proof>
- <proof prover="8"><result status="valid" time="0.20"/></proof>
+ <proof prover="6"><result status="valid" time="0.11"/></proof>
+ <proof prover="8"><result status="valid" time="0.13"/></proof>
  <proof prover="9"><result status="valid" time="0.11" steps="95"/></proof>
  <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="lemma4">
  <proof prover="1"><result status="valid" time="0.06" steps="93"/></proof>
  <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.05" steps="93"/></proof>
@@ -366,71 +336,59 @@
  <goal name="sign_var">
  <proof prover="1"><result status="valid" time="0.07" steps="93"/></proof>
  <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.06" steps="93"/></proof>
  <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="var_value0">
- <proof prover="0" edited="double_of_int_DoubleOfInt_var_value0_1.v"><result status="valid" time="2.74"/></proof>
+ <proof prover="0" edited="double_of_int_DoubleOfInt_var_value0_1.v"><result status="valid" time="2.40"/></proof>
  </goal>
  <goal name="from_int_sum">
  <proof prover="1"><result status="valid" time="0.05" steps="92"/></proof>
  <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.14"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.07" steps="92"/></proof>
  </goal>
  <goal name="var_value3">
  <proof prover="1"><result status="valid" time="0.10" steps="94"/></proof>
- <proof prover="2"><result status="valid" time="0.29"/></proof>
- <proof prover="5"><result status="valid" time="0.13"/></proof>
+ <proof prover="2"><result status="valid" time="0.27"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="8"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="distr_pow52">
- <proof prover="2"><result status="valid" time="0.24"/></proof>
- <proof prover="5"><result status="valid" time="0.08"/></proof>
+ <proof prover="2"><result status="valid" time="0.19"/></proof>
  </goal>
  <goal name="var_value4">
- <proof prover="1"><result status="valid" time="0.97" steps="96"/></proof>
- <proof prover="2"><result status="valid" time="0.30"/></proof>
- <proof prover="5"><result status="valid" time="0.13"/></proof>
+ <proof prover="1"><result status="valid" time="0.84" steps="96"/></proof>
+ <proof prover="2"><result status="valid" time="0.27"/></proof>
  </goal>
  <goal name="pow31">
  <proof prover="1"><result status="valid" time="0.08" steps="89"/></proof>
- <proof prover="2"><result status="valid" time="0.21"/></proof>
- <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="5"><result status="valid" time="0.09"/></proof>
+ <proof prover="2"><result status="valid" time="0.20"/></proof>
+ <proof prover="4"><result status="valid" time="0.08"/></proof>
  <proof prover="9"><result status="valid" time="0.05" steps="89"/></proof>
  <proof prover="10"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="lemma5">
  <proof prover="1"><result status="valid" time="0.07" steps="94"/></proof>
- <proof prover="2"><result status="valid" time="0.23"/></proof>
- <proof prover="3"><result status="valid" time="0.68"/></proof>
- <proof prover="4"><result status="valid" time="0.11"/></proof>
- <proof prover="5"><result status="valid" time="0.11"/></proof>
+ <proof prover="2"><result status="valid" time="0.22"/></proof>
+ <proof prover="4"><result status="valid" time="0.09"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
- <proof prover="8"><result status="valid" time="0.81"/></proof>
+ <proof prover="8"><result status="valid" time="0.75"/></proof>
  <proof prover="9"><result status="valid" time="0.04" steps="94"/></proof>
- <proof prover="10"><result status="valid" time="0.11"/></proof>
+ <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="MainResult">
- <proof prover="1"><result status="valid" time="1.40" steps="134"/></proof>
- <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.69"/></proof>
- <proof prover="4"><result status="valid" time="0.11"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
- <proof prover="6" timelimit="11"><result status="valid" time="3.44"/></proof>
- <proof prover="8"><result status="valid" time="0.81"/></proof>
- <proof prover="9"><result status="valid" time="0.35" steps="133"/></proof>
- <proof prover="10"><result status="valid" time="0.11"/></proof>
+ <proof prover="1"><result status="valid" time="1.18" steps="134"/></proof>
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <proof prover="4"><result status="valid" time="0.09"/></proof>
+ <proof prover="6" timelimit="11"><result status="valid" time="2.93"/></proof>
+ <proof prover="8"><result status="valid" time="0.78"/></proof>
+ <proof prover="9"><result status="valid" time="0.32" steps="133"/></proof>
+ <proof prover="10"><result status="valid" time="0.09"/></proof>
  </goal>
 </theory>
 </file>

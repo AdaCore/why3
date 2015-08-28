@@ -2,13 +2,13 @@
 %}
 
 %start <Model_parser.model_element list> output
-
 %token <string> SPACE
 %token <string> ATOM
 %token STORE
 %token CONST
 %token AS
 %token <string> INT_STR
+%token <int> BITVECTOR_VALUE
 %token <string> MINUS_INT_STR
 %token LPAREN RPAREN
 %token EOF
@@ -54,6 +54,7 @@ value:
 | integer { $1 }
 | other_val_str { Model_parser.Unparsed $1 }
 | array { Model_parser.Array $1 }
+| bitvector { Model_parser.Bitvector $1 }
 
 integer:
 | INT_STR { Model_parser.Integer $1 }
@@ -85,20 +86,27 @@ other_than_const_array:
 | CONST { "const"  }
 
 (* Example:
-   (store (store ((as const (Array Int Int)) 0) 1 2) 3 4) *)
+   (store (store ((as const (Array Int Int)) 0) 1 2) 3 4)
+   (store (store ((as const (Array Int Int)) false) 1 true) 3 true) *)
 array:
 | LPAREN possible_space
     LPAREN possible_space
       AS SPACE CONST possible_space array_skipped_part possible_space
     RPAREN possible_space
-    integer possible_space
+    value possible_space
   RPAREN
     { Model_parser.array_create_constant ~value:$13 }
 | LPAREN possible_space
-    STORE possible_space array possible_space integer SPACE integer
+    STORE possible_space array possible_space value SPACE integer
     possible_space
   RPAREN
     { Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
+
+(* Example:
+   (_ bv2048 16) *)
+bitvector:
+| BITVECTOR_VALUE
+    { $1 }
 
 array_skipped_part:
 | LPAREN term_list RPAREN {}

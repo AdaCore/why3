@@ -17,6 +17,7 @@
 type model_value =
  | Integer of string
  | Array of model_array
+ | Bitvector of int
  | Unparsed of string
 and  arr_index = {
   arr_index_key : int;

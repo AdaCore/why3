@@ -65,6 +65,11 @@ module M
   =
   x := Map.set !x 0 3
 
+  (* Multi-dimensional maps *)
+  let test_map2 (x "model" : ref (map int (map int int))) : unit
+  ensures { !x[0][0] <> !x[1][1] }
+  =
+  x := Map.set !x 0 (Map.get !x 1)
 
   type r = {f:int; g:bool}
   let test_record1 (x "model" "model_trace:x" : r) : int

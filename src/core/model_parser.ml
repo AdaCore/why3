@@ -24,6 +24,7 @@ open Printer
 type model_value =
  | Integer of string
  | Array of model_array
+ | Bitvector of int
  | Unparsed of string
 and  arr_index = {
   arr_index_key : int;
@@ -76,6 +77,7 @@ print_model_value_sanit sanit_print fmt value =
   | Integer s -> sanit_print fmt s
   | Unparsed s -> sanit_print fmt s
   | Array a -> print_array sanit_print fmt a
+  | Bitvector v -> sanit_print fmt (string_of_int v)
 
 let print_model_value fmt value =
   print_model_value_sanit (fun fmt s -> fprintf fmt "%s" s) fmt value

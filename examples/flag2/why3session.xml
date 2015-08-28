@@ -5,11 +5,11 @@
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
 <prover id="5" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <file name="../flag2.mlw" expanded="true">
 <theory name="Flag" sum="c1ec1f194b21ec850301e36bd710ffc5" expanded="true">
  <goal name="nb_occ_split" expanded="true">
@@ -21,40 +21,40 @@
  <goal name="nb_occ_store_outside_up" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1" edited="flag2_WP_Flag_nb_occ_store_outside_up_1.v"><result status="valid" time="1.43"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+ <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
  <goal name="nb_occ_store_outside_down" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1" edited="flag2_WP_Flag_nb_occ_store_outside_down_1.v"><result status="valid" time="1.48"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+ <proof prover="8"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
  <goal name="nb_occ_store_eq_eq" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
  <proof prover="7"><result status="valid" time="0.11"/></proof>
+ <proof prover="8"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
  <goal name="nb_occ_store_eq_neq" expanded="true">
- <proof prover="1" timelimit="10" edited="flag2_WP_Flag_nb_occ_store_eq_neq_1.v"><result status="valid" time="5.50"/></proof>
+ <proof prover="1" timelimit="10" edited="flag2_WP_Flag_nb_occ_store_eq_neq_1.v"><result status="valid" time="4.58"/></proof>
  </goal>
  <goal name="nb_occ_store_neq_eq" expanded="true">
- <proof prover="6"><result status="valid" time="1.37"/></proof>
+ <proof prover="6"><result status="valid" time="1.03"/></proof>
  <proof prover="7"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="nb_occ_store_neq_neq" expanded="true">
- <proof prover="6"><result status="valid" time="1.59"/></proof>
+ <proof prover="6"><result status="valid" time="1.13"/></proof>
  <proof prover="7"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="WP_parameter swap" expl="VC for swap" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter swap.1" expl="1. postcondition" expanded="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="2"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter swap.2" expl="2. postcondition" expanded="true">
-  <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter swap.3" expl="3. postcondition" expanded="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter swap.4" expl="4. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
@@ -65,135 +65,135 @@
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter dutch_flag.1" expl="1. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="1"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.2" expl="2. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="3"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.3" expl="3. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.4" expl="4. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="3"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.5" expl="5. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.6" expl="6. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.7" expl="7. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="23"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.8" expl="8. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.9" expl="9. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="27"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.03" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.10" expl="10. loop variant decrease" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.11" expl="11. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.12" expl="12. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.13" expl="13. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.14" expl="14. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.15" expl="15. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.16" expl="16. loop variant decrease" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.17" expl="17. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.18" expl="18. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.19" expl="19. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.20" expl="20. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.21" expl="21. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.22" expl="22. loop variant decrease" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.23" expl="23. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter dutch_flag.24" expl="24. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
  </transf>
  </goal>

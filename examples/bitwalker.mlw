@@ -56,13 +56,13 @@ module Bitwalker
          <-> BV64.ult x (maxvalue len) }
 
  (** return [value] with the bit of index [left] from the left set to [flag] *)
-  let poke_64bit_bv (value : BV64.t) (left : BV32.t) (flag : bool)
+  let poke_64bit_bv (value : BV64.t) (left : BV32.t) (flag : bool) : BV64.t
     requires { BV32.to_uint left < 64 }
     ensures  { forall i. 0 <= i < 64 /\ i <> 63 - BV32.to_uint left ->
                  BV64.nth result i = BV64.nth value i }
     ensures  { flag = BV64.nth result (63 - BV32.to_uint left) }
   =
-    assert {BV32.ult left (BV32.of_int 64) };
+    assert { BV32.ult left (BV32.of_int 64) };
     abstract
     ensures { forall i:BV32.t. i <> BV32.sub (BV32.of_int 63) left ->
                BV64.nth_bv result (C32_64.toBig i) =
@@ -81,7 +81,7 @@ module Bitwalker
 
 
   (* return the bit of [byte] at position [left] starting from the left *)
-  let peek_8bit_bv (byte : BV8.t) (left : BV32.t)
+  let peek_8bit_bv (byte : BV8.t) (left : BV32.t) : bool
     requires { 0 <= BV32.to_uint left < 8 }
     ensures  { result = BV8.nth byte (7 - BV32.to_uint left) }
   =
@@ -97,27 +97,27 @@ module Bitwalker
     end
 
   (* return the bit of the [left]/8 element of [addr] at position mod [left] 8 starting from the left *)
-  let peek_8bit_array (addr : array BV8.t) (left : BV32.t)
-    requires{ 8 * (length addr) < BV32.two_power_size }
-    requires{ BV32.to_uint left < 8 * length addr }
-    ensures{ result = nth8_stream addr (BV32.to_uint left) }
+  let peek_8bit_array (addr : array BV8.t) (left : BV32.t) : bool
+    requires { 8 * (length addr) < BV32.two_power_size }
+    requires { BV32.to_uint left < 8 * length addr }
+    ensures  { result = nth8_stream addr (BV32.to_uint left) }
   =
     peek_8bit_bv (addr[ BV32.to_uint (BV32.udiv_check left (BV32.int_check 8)) ]) (BV32.urem_check left (BV32.int_check 8))
 
   (* return a bitvector of 64 bits with its [len] bits of the right
     set to the bits between [start] and [start] + [len] of [addr] *)
   let peek (start : BV32.t) (len : BV32.t) (addr : array BV8.t) : BV64.t
-    requires{ BV32.to_uint len <= 64 }
-    requires{ BV32.to_uint start + BV32.to_uint len < BV32.two_power_size }
-    requires{ 8 * length addr < BV32.two_power_size }
-    ensures{BV32.to_uint start + BV32.to_uint len > (8 * length addr) -> result = BV64.zero}
-    ensures{BV32.to_uint start + BV32.to_uint len <= (8 * length addr) ->
-            (forall i:int. 0 <= i < BV32.to_uint len ->
-              BV64.nth result i
-            = nth8_stream addr (BV32.to_uint start + BV32.to_uint len - i - 1))
-         /\ (forall i:int. BV32.to_uint len <= i < 64 ->
-              BV64.nth result i
-            = False)}
+    requires { BV32.to_uint len <= 64 }
+    requires { BV32.to_uint start + BV32.to_uint len < BV32.two_power_size }
+    requires { 8 * length addr < BV32.two_power_size }
+    ensures  { BV32.to_uint start + BV32.to_uint len > (8 * length addr) ->
+      result = BV64.zero }
+    ensures  { BV32.to_uint start + BV32.to_uint len <= (8 * length addr) ->
+      (forall i:int. 0 <= i < BV32.to_uint len ->
+         BV64.nth result i
+         = nth8_stream addr (BV32.to_uint start + BV32.to_uint len - i - 1))
+      /\
+      (forall i:int. BV32.to_uint len <= i < 64 -> BV64.nth result i = False) }
   =
     if (BV32.to_uint (BV32.add_check start len) > ( 8 *length addr ))
     then

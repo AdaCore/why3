@@ -238,10 +238,49 @@ and comment_line = parse
 
 {
 
+let parse file c =
+  let lb = Lexing.from_channel c in
+  Loc.set_file file lb;
+  Loc.with_location (tptp_file token) lb
+
+exception FileNotFound of string
+
+let load file =
+  let dir = Filename.dirname file in
+  let tptplib =
+    try Some (Sys.getenv "TPTP")
+    with Not_found -> None
+  in
+  let rec aux file =
+    let ch,file =
+      try (open_in file, file)
+      with Sys_error _ ->
+        if not (Filename.is_relative file) then raise (FileNotFound file) else
+        try let f = Filename.concat dir file in (open_in f,f)
+        with Sys_error _ ->
+          match tptplib with
+          | None ->
+            raise (FileNotFound (file ^ " (warning: $TPTP was not set)"))
+          | Some d ->
+            try let f = Filename.concat d file in (open_in f,f)
+            with Sys_error _ -> raise (FileNotFound file)
+    in
+    let ast = parse file ch in
+    close_in ch;
+    let ast =
+      List.fold_left
+        (fun acc d ->
+          match d with
+          | Formula _ -> d::acc
+          | Include(file,_,_) ->
+            let ast = aux file in
+            List.rev_append ast acc)
+        [] ast
+    in List.rev ast
+  in aux file
+
   let read_channel env path file c =
-    let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
-    let ast = Loc.with_location (tptp_file token) lb in
+    let ast = parse file c in
     Tptp_typing.typecheck env path ast
 
   let () = Env.register_format Env.base_language "tptp" ["p";"ax"] read_channel
@@ -254,4 +293,3 @@ Local Variables:
 compile-command: "unset LANG; make -C ../.. test"
 End:
 *)
-

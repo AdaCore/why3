@@ -77,7 +77,7 @@ let run_test name l =
   let t = Unix.gettimeofday () -. t in
   Format.printf "Unsat (time = %.02f)@.@." t
 
-let () =
+let run_all_tests () =
   run_test "drinker" (ProverTest__Impl.drinker ());
   run_test "group" (ProverTest__Impl.group ());
   run_test "bidon1" (ProverTest__Impl.bidon1 ());
@@ -103,3 +103,306 @@ let () =
   run_test "zenon10 14" (ProverTest__Impl.zenon10 (n 14));
 *)
   printf "End of tests.@."
+
+open Tptp_ast
+
+exception Unsupported of string
+
+let unsupported s = raise (Unsupported s)
+
+exception Ill_Typed of string
+
+let ill_typed s = raise (Ill_Typed s)
+
+let mk_not f =
+  let o = Firstorder_formula_impl__Types.NLC_Not f in
+  Firstorder_formula_impl__Impl.construct_fo_formula o
+
+type env =
+  { cnf : bool;
+    var_cnt : Why3extract.Why3__BigInt.t;
+    var_assoc : (string * Why3extract.Why3__BigInt.t) list;
+    sym_cnt : Why3extract.Why3__BigInt.t;
+    sym_assoc : (string * Why3extract.Why3__BigInt.t) list }
+
+let find_var env v =
+  try
+    let n = List.assoc v env.var_assoc in
+    env,n
+  with Not_found ->
+    if env.cnf then
+      let n = env.var_cnt in
+      { env with
+        var_cnt = Why3extract.Why3__BigInt.succ n;
+        var_assoc = (v,n)::env.var_assoc }, n
+    else
+      ill_typed ("unknown variable id " ^ v)
+
+let add_var env (v,_ty) =
+  let n = env.var_cnt in
+  { env with
+    var_cnt = Why3extract.Why3__BigInt.succ n;
+    var_assoc = (v,n)::env.var_assoc }, n
+
+let find_sym env s =
+  try
+    let n = List.assoc s env.sym_assoc in
+    env,n
+  with Not_found ->
+    let n = env.sym_cnt in
+    { env with
+      sym_cnt = Why3extract.Why3__BigInt.succ n;
+      sym_assoc = (s,n)::env.sym_assoc }, n
+
+let rec tr_term env e =
+  match e.e_node with
+  | Elet(e1,e2) -> unsupported "let"
+  | Eite(e1,e2,e3) -> unsupported "ite"
+  | Eqnt(q,vl,e) -> ill_typed "quantifier in term"
+  | Ebin(op,e1,e2) -> ill_typed "bin op in term"
+  | Enot e -> ill_typed "'not' in term"
+  | Eequ(e1,e2) -> ill_typed "'equ' in term"
+  | Eapp(w,el) ->
+    let fotnil =
+      let o = Firstorder_term_impl__Types.NLC_FONil in
+      Firstorder_term_impl__Impl.construct_fo_term_list o
+    in
+    let env,tl =
+      List.fold_right
+        (fun e (env,acc) ->
+          let env,t = tr_term env e in
+          let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
+          (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+        el
+        (env,fotnil)
+    in
+    let env,sym = find_sym env w in
+    let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
+    let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
+    let o = Firstorder_term_impl__Types.NLC_App (sym, tl) in
+    env,Firstorder_term_impl__Impl.construct_fo_term o
+  | Edef(w,el) -> unsupported "def"
+  | Edob d -> unsupported "dob"
+  | Enum n -> unsupported "num"
+  | Evar v ->
+    let env,v = find_var env v in
+    let o =
+      Firstorder_term_impl__Types.NLCVar_fo_term v
+    in
+    env,Firstorder_term_impl__Impl.construct_fo_term o
+
+let rec mk_bin_op op phi1 phi2 =
+  let phi =
+    match op with
+    | BOequ -> unsupported "BOequ"
+    | BOnequ -> unsupported "BOnequ"
+    | BOimp ->
+      Firstorder_formula_impl__Types.NLC_Or (mk_not phi1, phi2)
+    | BOpmi -> unsupported "BOpmi"
+    | BOand ->  Firstorder_formula_impl__Types.NLC_And (phi1, phi2)
+    | BOor -> Firstorder_formula_impl__Types.NLC_Or (phi1, phi2)
+    | BOnand ->
+      Firstorder_formula_impl__Types.NLC_Not (mk_bin_op BOand phi1 phi2)
+    | BOnor ->
+      Firstorder_formula_impl__Types.NLC_Not (mk_bin_op BOor phi1 phi2)
+  in
+  Firstorder_formula_impl__Impl.construct_fo_formula phi
+
+let rec tr_fmla env e =
+  match e.e_node with
+  | Elet(e1,e2) -> unsupported "let"
+  | Eite(e1,e2,e3) -> unsupported "ite"
+  | Eqnt(q,vl,e) ->
+    let env1,nl =
+      List.fold_right
+        (fun v (env,vl) ->
+          let env,n = add_var env v in
+          (env,n::vl))
+        vl (env,[])
+    in
+    let env2,phi = tr_fmla env1 e in
+    (* suppressing quantified variables from the env *)
+    let env =
+      { env2 with var_cnt = env.var_cnt; var_assoc = env.var_assoc }
+    in
+    let phi = match q with
+      | Qforall ->
+        List.fold_right
+          (fun n phi ->
+            let o =
+              Firstorder_formula_impl__Types.NLC_Forall (n,phi)
+            in
+            Firstorder_formula_impl__Impl.construct_fo_formula o)
+          nl phi
+      | Qexists ->
+        List.fold_right
+          (fun n phi ->
+            let o =
+              Firstorder_formula_impl__Types.NLC_Exists (n,phi)
+            in
+            Firstorder_formula_impl__Impl.construct_fo_formula o)
+          nl phi
+    in env, phi
+  | Ebin(op,e1,e2) ->
+    let env1,phi1 = tr_fmla env e1 in
+    let env2,phi2 = tr_fmla env1 e2 in
+    env2, mk_bin_op op phi1 phi2
+  | Enot e ->
+    let env1,phi1 = tr_fmla env e in
+    env1,mk_not phi1
+  | Eequ(e1,e2) -> unsupported "equ"
+  | Eapp(w,el) ->
+    let fotnil =
+      let o = Firstorder_term_impl__Types.NLC_FONil in
+      Firstorder_term_impl__Impl.construct_fo_term_list o
+    in
+    let env,tl =
+      List.fold_right
+        (fun e (env,acc) ->
+          let env,t = tr_term env e in
+          let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
+          (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+        el
+        (env,fotnil)
+    in
+    let env,sym = find_sym env w in
+    let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
+    let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
+    let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
+    env,Firstorder_formula_impl__Impl.construct_fo_formula o
+  | Edef(w,el) -> unsupported "def"
+  | Edob d -> unsupported "dob"
+  | Enum n -> unsupported "num"
+  | Evar v -> ill_typed "var in formula"
+
+let tr_cnf env e =
+  let rec tr env e =
+    match e.e_node with
+    | Elet(e1,e2) -> unsupported "let in cnf"
+    | Eite(e1,e2,e3) -> unsupported "ite in cnf"
+    | Eqnt(q,vl,e) -> unsupported "qnt in cnf"
+    | Ebin(op,e1,e2) ->
+      let env1,phi1 = tr env e1 in
+      let env2,phi2 = tr env1 e2 in
+      env2, mk_bin_op op phi1 phi2
+    | Enot e ->
+      let env1,phi1 = tr env e in
+      env1,mk_not phi1
+    | Eequ(e1,e2) -> unsupported "equ"
+    | Eapp(w,el) ->
+      let fotnil =
+        let o = Firstorder_term_impl__Types.NLC_FONil in
+        Firstorder_term_impl__Impl.construct_fo_term_list o
+      in
+      let env,tl =
+        List.fold_right
+          (fun e (env,acc) ->
+            let env,t = tr_term env e in
+            let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
+            (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+          el
+          (env,fotnil)
+      in
+      let env,sym = find_sym env w in
+      let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
+      let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
+      let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
+      env,Firstorder_formula_impl__Impl.construct_fo_formula o
+    | Edef(w,el) -> unsupported "def in cnf"
+    | Edob d -> unsupported "dob in cnf"
+    | Enum n -> unsupported "num in cnf"
+    | Evar v -> ill_typed "var in cnf"
+  in
+  let env,phi = tr env e in
+  let phi =
+    List.fold_right
+      (fun (_,n) phi ->
+        let o =
+          Firstorder_formula_impl__Types.NLC_Forall (n,phi)
+        in
+        Firstorder_formula_impl__Impl.construct_fo_formula o)
+      env.var_assoc phi
+  in
+  { env with
+    var_cnt = Why3extract.Why3__BigInt.zero;
+    var_assoc = [] }, phi
+
+let empty_env () =
+{ cnf = false;
+  var_cnt = Why3extract.Why3__BigInt.zero;
+  var_assoc = [];
+  sym_cnt = Why3extract.Why3__BigInt.zero;
+  sym_assoc = [] }
+
+let tr_top_formula env kind role f =
+  match f with
+  | TypedAtom _ -> unsupported "TypedAtom"
+  | Sequent _ -> unsupported "Sequent"
+  | LogicFormula e ->
+    let env,f =
+      match kind with
+      | FOF -> tr_fmla { env with cnf = false } e
+      | CNF -> tr_cnf { env with cnf = true } e
+      | TFF -> assert false
+    in
+    let phi =
+      match role with
+      | Axiom -> f
+      | Hypothesis -> f
+      | Definition -> unsupported "Definition"
+      | Assumption -> f
+      | Corollary -> unsupported "corollary" (* mk_not f ? *)
+      | Lemma -> unsupported "lemma" (* mk_not f ? *)
+      | Theorem -> unsupported "theorem" (* mk_not f ? *)
+      | Conjecture -> mk_not f
+      | Negated_conjecture -> f
+      | Type -> unsupported "Type"
+    in env,phi
+
+let tr_decl (env,acc) d =
+  match d with
+  | Include _ -> unsupported "Include"
+  | Formula(TFF,_,role,top_formula,_) -> unsupported "TFF"
+  | Formula(kind,_,role,top_formula,_) ->
+    let env,phi = tr_top_formula env kind role top_formula in
+    let o = Firstorder_formula_list_impl__Types.NLC_FOFCons (phi, acc) in
+    let acc = Firstorder_formula_list_impl__Impl.construct_fo_formula_list o in
+    env,acc
+
+let tr_file a =
+  let fonil =
+    let o = Firstorder_formula_list_impl__Types.NLC_FOFNil in
+    Firstorder_formula_list_impl__Impl.construct_fo_formula_list o
+  in
+  List.fold_left tr_decl (empty_env (),fonil) a
+
+let run_file file =
+  try
+    let ast = Tptp_lexer.load file in
+    printf "File '%s': parsing OK.@." file;
+    let _,l = tr_file ast in
+    run_test (Filename.basename file) l;
+    exit 0
+  with
+  | Tptp_lexer.FileNotFound f ->
+    eprintf "File not found: %s@." f; exit 2
+  | Unsupported s ->
+      eprintf "File %s: '%s' is not supported@." file s; exit 1
+  | e ->
+    eprintf "Parsing error: %a@." Why3.Exn_printer.exn_printer e;
+    exit 2
+
+let () =
+  printf "The safe prover, version 0.0.0@.";
+  if Array.length Sys.argv = 1 then run_all_tests ()
+  else
+    if Array.length Sys.argv = 2 then
+      let arg = Sys.argv.(1) in
+      match arg with
+      | "-version" -> exit 0
+      | _ -> run_file arg
+    else
+      begin
+        eprintf "Usage: %s [file]@\nInternal tests are run if no file is given@." Sys.argv.(0);
+        exit 2
+      end

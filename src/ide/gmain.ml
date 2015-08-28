@@ -643,10 +643,13 @@ let update_tabs a =
         match a.S.proof_state with
 	  | S.Done r ->
 	    if not (Model_parser.is_model_empty r.Call_provers.pr_model) then begin
-	      Model_parser.interleave_with_source
-		r.Call_provers.pr_model
-		~filename:!current_file
-		~source_code:(Sysutil.file_contents !current_file)
+	      "Counterexample:\n" ^
+		(Model_parser.model_to_string r.Call_provers.pr_model) ^
+		"\n\nSource code interleaved with counterexample:" ^
+		(Model_parser.interleave_with_source
+		   r.Call_provers.pr_model
+		   ~filename:!current_file
+		   ~source_code:(Sysutil.file_contents !current_file))
 	    end else
 	      ""
 	  | _ -> ""
@@ -1620,7 +1623,11 @@ let string_of_desc desc =
   in Pp.string_of print_trans_desc desc
 
 let () =
-  let add_submenu_transform name get_trans () =
+  let transformations =
+    List.sort (fun (x,_) (y,_) -> String.compare x y)
+      (List.rev_append (Trans.list_transforms_l ()) (Trans.list_transforms ()))
+  in
+  let add_submenu_transform name filter () =
     let submenu = tools_factory#add_submenu name in
     let submenu = new GMenu.factory submenu ~accel_group in
     let iter ((name,_) as desc) =
@@ -1629,31 +1636,21 @@ let () =
         ~label:(sanitize_markup name) ~callback () in
       ii#misc#set_tooltip_text (string_of_desc desc)
     in
-    let trans = get_trans () in
-    let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
+    let trans = List.filter filter transformations in
     List.iter iter trans
   in
-  let add_splitting =
-    add_submenu_transform
-      "splitting transformations" Trans.list_transforms_l
-  in
-  let add_non_splitting text filt =
-    add_submenu_transform text
-      (fun () -> let l = Trans.list_transforms () in List.filter filt l)
-  in
   add_gui_item
-    (add_non_splitting "non-splitting transformations (a-e)"
+    (add_submenu_transform "transformations (a-e)"
        (fun (x,_) -> x < "eliminate"));
   add_gui_item
-    (add_non_splitting "eliminate"
+    (add_submenu_transform "transformations (eliminate)"
        (fun (x,_) -> x >= "eliminate" && x < "eliminatf"));
   add_gui_item
-    (add_non_splitting "non-splitting transformations (e-i)"
-       (fun (x,_) -> x >= "eliminatf" && x < "j"));
+    (add_submenu_transform "transformations (e-r)"
+       (fun (x,_) -> x >= "eliminatf" && x < "s"));
   add_gui_item
-    (add_non_splitting "non-splitting transformations (j-z)"
-       (fun (x,_) -> x >= "j"));
-  add_gui_item add_splitting;
+    (add_submenu_transform "transformations (s-z)"
+       (fun (x,_) -> x >= "s"));
   add_tool_separator ();
   add_tool_item "Bisect in selection" apply_bisect_on_selection
 

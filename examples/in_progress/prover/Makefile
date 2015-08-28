@@ -34,8 +34,8 @@ MLALL=$(MLTYPES) $(MLIMPL)
 ML=$(patsubst %,%.ml,$(MLALL))
 CMX=$(patsubst %,%.cmx,$(MLALL))
 OCAMLC=ocamlopt.opt
-INCLUDES=-I $(BD) $(INCLUDE)
-LIBS=unix.cmxa $(BIGINTLIB).cmxa why3extract.cmxa
+INCLUDES=-I $(BD) $(INCLUDEALL) -I ../../../plugins/tptp
+LIBS=unix.cmxa nums.cmxa $(BIGINTLIB).cmxa dynlink.cmxa str.cmxa menhirLib.cmx zip.cmxa why3.cmxa why3extract.cmxa tptp_ast.cmx tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
 LIBSOLD=$(BD)/why3__BuiltIn.cmx $(BD)/int__Int.cmx $(BD)/array__Array.cmx
 WHY3FLAGS=-L . --debug ignore_unused_vars
 MLFLAGS=
@@ -45,6 +45,7 @@ MLEXECFLAGS=
 .PHONY: clean depend extract replay
 
 $(BD)/prover: $(CMX) run.cmx
+	echo "WHY3SHARE="$(WHY3SHARE)
 	$(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
 		-o $(BD)/prover $^
 

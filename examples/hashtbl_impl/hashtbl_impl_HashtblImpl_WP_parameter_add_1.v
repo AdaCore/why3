@@ -103,7 +103,7 @@ Definition size {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): Z :=
   | (mk_t x x1 x2) => x
   end.
 
-Require Import Why3. Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 3.
+Require Import Why3. Ltac ae := why3 "Alt-Ergo,0.95.2," timelimit 3.
 
 (* Why3 goal *)
 Theorem WP_parameter_add : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
@@ -143,4 +143,3 @@ destruct h.
 ae.
 ae.
 Qed.
-

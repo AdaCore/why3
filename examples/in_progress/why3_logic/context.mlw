@@ -1,0 +1,23 @@
+
+module Ctx
+  
+  (* Variable contexts. *)
+  
+  use import support.HO
+  
+  type context 'p 'l
+  function c_ldom (context 'p 'l) : 'l -> bool
+  function c_pdom (context 'p 'l) : 'p -> bool
+  function c_ltp (context 'p 'l) : 'l -> 'p
+  function c_ptl (context 'p 'l) : 'p -> 'l
+  axiom context_inv : forall c:context 'p 'l.
+    maps_to c.c_ldom c.c_ltp c.c_pdom /\
+    maps_to c.c_pdom c.c_ptl c.c_ldom /\
+    (forall x. c.c_ldom x -> c.c_ptl (c.c_ltp x) = x) /\
+    (forall x. c.c_pdom x -> c.c_ltp (c.c_ptl x) = x)
+  
+  predicate context_inj (c1:context 'p 'l1) (f:'l1 -> 'l2) (c2:context 'p 'l2) =
+    forall x. c1.c_pdom x -> c2.c_pdom x /\ c2.c_ptl x = f (c1.c_ptl x)
+  
+end
+

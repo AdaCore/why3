@@ -1,0 +1,124 @@
+
+module Not_found
+  
+  exception Not_found
+  
+end
+
+module FMap
+  
+  use import support.HO
+  use import support.Finite
+  use import Not_found
+  use import option.Option
+  use mach.peano.Peano as P
+  
+  (* Program representation of a key. *)
+  type key
+  (* Logic representation of a key. The model projection need to be known
+     here to recover the right modelisation as the assocation maps
+     depends only on that part of the key. *)
+  type key_l
+  function k_m key : key_l
+  
+  (* Finite associaton table. *)
+  type t 'a
+  function domain (t 'a) : key_l -> bool
+  function bindings (t 'a) : key_l -> 'a
+  axiom t_inv : forall m:t 'a. finite m.domain
+  
+  (* Immediate implementation of sets on top of fmap. *)
+  type s = t unit
+  
+  val empty () : t 'a
+    ensures { result.domain = none }
+  
+  val is_empty (m:t 'a) : bool
+    ensures { result -> m.domain = none }
+    ensures { forall x. m.domain x -> not result }
+  
+  val mem (x:key) (m:t 'a) : bool
+    ensures { result <-> m.domain (k_m x) }
+  
+  val add (x:key) (b:'a) (m:t 'a) : t 'a
+    ensures { result.domain = update m.domain x.k_m true }
+    ensures { result.bindings = update m.bindings x.k_m b }
+  
+  val singleton (x:key) (b:'a) : t 'a
+    ensures { result.domain = update none x.k_m true }
+    ensures { result.bindings x.k_m = b }
+  
+  val remove (x:key) (m:t 'a) : t 'a
+    ensures { result.domain = update m.domain x.k_m false }
+    ensures { result.bindings = m.bindings }
+  
+  val cardinal (m:t 'a) : P.t
+    ensures { finite m.domain }
+    ensures { result.P.v = cardinal m.domain }
+  
+  val find (x:key) (m:t 'a) : 'a
+    ensures { m.domain x.k_m /\ m.bindings x.k_m = result }
+    raises { Not_found -> not m.domain x.k_m }
+  
+  val set_union (m1 m2:t 'a) : t 'a
+    ensures { forall x. result.domain x <-> m1.domain x \/ m2.domain x }
+    ensures { result.bindings = ho_ite m1.domain m1.bindings m2.bindings }
+  
+  val set_inter (m1 m2:t 'a) : t 'a
+    ensures { forall x. result.domain x <-> m1.domain x /\ m2.domain x }
+    ensures { result.bindings = m1.bindings }
+  
+  val set_diff (m1 m2:t 'a) : t 'a
+    ensures { forall x. result.domain x <-> m1.domain x /\ not m2.domain x }
+    ensures { result.bindings = m1.bindings }
+  
+  val set_submap (m1 m2:t 'a) : bool
+    ensures { result <-> subset m1.domain m2.domain }
+  
+  val set_disjoint (m1 m2:t 'a) : bool
+    ensures { result <-> forall x. not (m1.domain x /\ m2.domain x) }
+  
+  val set_equal (m1 m2:t 'a) : bool
+    ensures { result -> m1.domain = m2.domain }
+    ensures { forall x. m1.domain x <> m2.domain x -> not result }
+  
+  val find_def (d:'a) (x:key) (m:t 'a) : 'a
+    ensures { m.domain x.k_m -> result = m.bindings x.k_m }
+    ensures { not m.domain x.k_m -> result = d }
+  
+  val find_opt (x:key) (m:t 'a) : option 'a
+    ensures { m.domain x.k_m -> result = Some (m.bindings x.k_m) }
+    ensures { not m.domain x.k_m -> result = None }
+    ensures { match result with
+      | None -> not m.domain x.k_m
+      | Some u -> u = m.bindings x.k_m
+      end }
+  
+  val domain (m:t 'a) : s
+    ensures { result.domain = m.domain }
+  
+  val is_num_elt (n:P.t) (m:t 'a) : bool
+    ensures { finite m.domain }
+    ensures { result <-> cardinal m.domain = n.P.v }
+  
+  type enumeration 'a
+  function e_domain (enumeration 'a) : key_l -> bool
+  function e_bindings (enumeration 'a) : key_l -> 'a
+  function e_first (enumeration 'a) : key_l
+  
+  axiom e_inv : forall e:enumeration 'a.
+    not e.e_domain e.e_first -> e.e_domain = none
+  
+  val val_enum (e:enumeration 'a) : option (key,'a)
+    ensures { match result with
+      | None -> e.e_domain = none
+      | Some (k0,v) -> k0.k_m = e.e_first /\ v = e.e_bindings k0.k_m /\
+        e.e_domain k0.k_m
+      end }
+  
+  val start_enum (m:t 'a) : enumeration 'a
+    ensures { result.e_domain = m.domain }
+    ensures { result.e_bindings = m.bindings }
+  
+end
+
