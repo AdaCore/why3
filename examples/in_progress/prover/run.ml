@@ -152,7 +152,25 @@ let rec tr_term env e =
   | Ebin(op,e1,e2) -> ill_typed "bin op in term"
   | Enot e -> ill_typed "'not' in term"
   | Eequ(e1,e2) -> ill_typed "'equ' in term"
-  | Eapp(w,el) -> unsupported "app in term"
+  | Eapp(w,el) ->
+    let fotnil =
+      let o = Firstorder_term_impl__Types.NLC_FONil in
+      Firstorder_term_impl__Impl.construct_fo_term_list o
+    in
+    let env,tl =
+      List.fold_right
+        (fun e (env,acc) ->
+          let env,t = tr_term env e in
+          let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
+          (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+        el
+        (env,fotnil)
+    in
+    let env,sym = find_sym env w in
+    let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
+    let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
+    let o = Firstorder_term_impl__Types.NLC_App (sym, tl) in
+    env,Firstorder_term_impl__Impl.construct_fo_term o
   | Edef(w,el) -> unsupported "def"
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
@@ -294,7 +312,7 @@ let tr_file a =
 let run_file file =
   try
     let ast = Tptp_lexer.load file in
-    printf "File '%s' is OK.@." file;
+    printf "File '%s': parsing OK.@." file;
     let _,l = tr_file ast in
     run_test (Filename.basename file) l;
     exit 0
@@ -308,9 +326,14 @@ let run_file file =
     exit 2
 
 let () =
+  printf "The safe prover, version 0.0.0@.";
   if Array.length Sys.argv = 1 then run_all_tests ()
   else
-    if Array.length Sys.argv = 2 then run_file Sys.argv.(1)
+    if Array.length Sys.argv = 2 then
+      let arg = Sys.argv.(1) in
+      match arg with
+      | "-version" -> exit 0
+      | _ -> run_file arg
     else
       begin
         eprintf "Usage: %s [file]@\nInternal tests are run if no file is given@." Sys.argv.(0);
