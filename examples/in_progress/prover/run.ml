@@ -119,14 +119,24 @@ let mk_not f =
   Firstorder_formula_impl__Impl.construct_fo_formula o
 
 type env =
-  { var_cnt : Why3extract.Why3__BigInt.t;
+  { cnf : bool;
+    var_cnt : Why3extract.Why3__BigInt.t;
     var_assoc : (string * Why3extract.Why3__BigInt.t) list;
     sym_cnt : Why3extract.Why3__BigInt.t;
     sym_assoc : (string * Why3extract.Why3__BigInt.t) list }
 
 let find_var env v =
-  try List.assoc v env.var_assoc
-  with Not_found -> ill_typed ("unknown variable id " ^ v)
+  try
+    let n = List.assoc v env.var_assoc in
+    env,n
+  with Not_found ->
+    if env.cnf then
+      let n = env.var_cnt in
+      { env with
+        var_cnt = Why3extract.Why3__BigInt.succ n;
+        var_assoc = (v,n)::env.var_assoc }, n
+    else
+      ill_typed ("unknown variable id " ^ v)
 
 let add_var env (v,_ty) =
   let n = env.var_cnt in
@@ -175,7 +185,7 @@ let rec tr_term env e =
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
   | Evar v ->
-    let v = find_var env v in
+    let env,v = find_var env v in
     let o =
       Firstorder_term_impl__Types.NLCVar_fo_term v
     in
@@ -235,8 +245,8 @@ let rec tr_fmla env e =
     in env, phi
   | Ebin(op,e1,e2) ->
     let env1,phi1 = tr_fmla env e1 in
-    let env2,phi2 = tr_fmla env e2 in
-    env1, mk_bin_op op phi1 phi2
+    let env2,phi2 = tr_fmla env1 e2 in
+    env2, mk_bin_op op phi1 phi2
   | Enot e ->
     let env1,phi1 = tr_fmla env e in
     env1,mk_not phi1
@@ -265,18 +275,76 @@ let rec tr_fmla env e =
   | Enum n -> unsupported "num"
   | Evar v -> ill_typed "var in formula"
 
+let tr_cnf env e =
+  let rec tr env e =
+    match e.e_node with
+    | Elet(e1,e2) -> unsupported "let in cnf"
+    | Eite(e1,e2,e3) -> unsupported "ite in cnf"
+    | Eqnt(q,vl,e) -> unsupported "qnt in cnf"
+    | Ebin(op,e1,e2) ->
+      let env1,phi1 = tr env e1 in
+      let env2,phi2 = tr env1 e2 in
+      env2, mk_bin_op op phi1 phi2
+    | Enot e ->
+      let env1,phi1 = tr env e in
+      env1,mk_not phi1
+    | Eequ(e1,e2) -> unsupported "equ"
+    | Eapp(w,el) ->
+      let fotnil =
+        let o = Firstorder_term_impl__Types.NLC_FONil in
+        Firstorder_term_impl__Impl.construct_fo_term_list o
+      in
+      let env,tl =
+        List.fold_right
+          (fun e (env,acc) ->
+            let env,t = tr_term env e in
+            let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
+            (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+          el
+          (env,fotnil)
+      in
+      let env,sym = find_sym env w in
+      let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
+      let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
+      let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
+      env,Firstorder_formula_impl__Impl.construct_fo_formula o
+    | Edef(w,el) -> unsupported "def in cnf"
+    | Edob d -> unsupported "dob in cnf"
+    | Enum n -> unsupported "num in cnf"
+    | Evar v -> ill_typed "var in cnf"
+  in
+  let env,phi = tr env e in
+  let phi =
+    List.fold_right
+      (fun (_,n) phi ->
+        let o =
+          Firstorder_formula_impl__Types.NLC_Forall (n,phi)
+        in
+        Firstorder_formula_impl__Impl.construct_fo_formula o)
+      env.var_assoc phi
+  in
+  { env with
+    var_cnt = Why3extract.Why3__BigInt.zero;
+    var_assoc = [] }, phi
+
 let empty_env () =
-{ var_cnt = Why3extract.Why3__BigInt.zero;
+{ cnf = false;
+  var_cnt = Why3extract.Why3__BigInt.zero;
   var_assoc = [];
   sym_cnt = Why3extract.Why3__BigInt.zero;
   sym_assoc = [] }
 
-let tr_top_formula env role f =
+let tr_top_formula env kind role f =
   match f with
   | TypedAtom _ -> unsupported "TypedAtom"
   | Sequent _ -> unsupported "Sequent"
   | LogicFormula e ->
-    let env,f = tr_fmla env e in
+    let env,f =
+      match kind with
+      | FOF -> tr_fmla { env with cnf = false } e
+      | CNF -> tr_cnf { env with cnf = true } e
+      | TFF -> assert false
+    in
     let phi =
       match role with
       | Axiom -> f
@@ -295,12 +363,11 @@ let tr_decl (env,acc) d =
   match d with
   | Include _ -> unsupported "Include"
   | Formula(TFF,_,role,top_formula,_) -> unsupported "TFF"
-  | Formula(FOF,_,role,top_formula,_) ->
-    let env,phi = tr_top_formula env role top_formula in
+  | Formula(kind,_,role,top_formula,_) ->
+    let env,phi = tr_top_formula env kind role top_formula in
     let o = Firstorder_formula_list_impl__Types.NLC_FOFCons (phi, acc) in
     let acc = Firstorder_formula_list_impl__Impl.construct_fo_formula_list o in
     env,acc
-  | Formula(CNF,_,role,top_formula,_) -> unsupported "CNF"
 
 let tr_file a =
   let fonil =
