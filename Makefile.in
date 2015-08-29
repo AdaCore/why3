@@ -1422,6 +1422,28 @@ install_no_local::
 
 install_local:: bin/why3doc
 
+#########
+# trywhy3
+#########
+
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
+          -syntax camlp4o
+
+src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
+	js_of_ocaml +weak.js +nat.js $^
+
+src/trywhy3/trywhy3.byte: lib/why3/why3.cma src/trywhy3/trywhy3.cmo
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+src/trywhy3/%.cmo: src/trywhy3/%.ml
+	$(JSOCAMLC) $(BFLAGS) -c $<
+
+src/trywhy3/%.cmi: src/trywhy3/%.mli
+	$(JSOCAMLC) $(BFLAGS) -c $<
+
+clean::
+	rm -f src/trywhy3/trywhy3.byte
+
 ########
 # bench
 ########
