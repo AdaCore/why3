@@ -2,8 +2,8 @@
 
 
 let examples =
-  ["Drinkers paradox",
-"theory T
+  [ "Drinkers paradox","
+theory T
 
    (** Type of all persons *)
    type person
@@ -16,8 +16,25 @@ let examples =
    goal drinkers_paradox: exists x:person. drinks x -> forall y:person. drinks y
 
 end
-"
+";
+   "Simple Arithmetic","
+theory T
+
+   use import int.Int
+
+   goal g: exists x:int. x*(x+1) = 42
+
+end
+";
   ]
+
+(** registering the std lib *)
+
+let () =
+  List.iter
+    (fun (name,content) ->
+      Sys_js.register_file ~name ~content;
+    ) Theories.theories
 
 (** Rendering in the browser *)
 
@@ -44,16 +61,48 @@ let () =
 
 open Why3
 
-let run textbox preview _ =
+(* TODO: loading from standard library.
+
+   piste: utiliser Sys_js.register_autoload et
+   XmlHttpRequest.get
+
+*)
+let env = Env.create_env ["/theories" (*; "/modules"*)]
+
+(*
+let bad_suffix path name =
+  match path with
+  | "/theories" -> not (Filename.check_suffix name ".why")
+  | "/modules" -> not (Filename.check_suffix name ".mlw")
+  | _ -> true
+
+let load_file_from_the_web (path,name) =
+  if bad_suffix path name then None else
+  let t = XmlHttpRequest.get
+    ("http://why3.lri.fr/try" ^ path ^ "/" ^ name)
+  in
+  let c = ref "" in
+  Lwt.on_success t
+    (fun frame ->
+      let content = frame. XmlHttpRequest.content in
+      (* useless ?
+         Sys_js.register_file ~name:(path ^ "/" ^ name) ~content; *)
+      c := content);
+  Some !c
+
+let () = Sys_js.register_autoload ~path:"/theories" load_file_from_the_web
+*)
+
+let run textbox preview (_ : D.mouseEvent Js.t) : bool Js.t =
   let text = Js.to_string (textbox##value) in
   let ch = open_out temp_file_name in
   output_string ch text;
   close_out ch;
-  let env = Env.create_env [] in
   let answer =
     try
-      let _x = Env.read_file Env.base_language env temp_file_name in
-      "parsing and typing OK"
+      let x = Env.read_file Env.base_language env temp_file_name in
+      Pp.sprintf "parsing and typing OK, %d theories"
+        (Stdlib.Mstr.cardinal x)
     with
     | Loc.Located(loc,Parser.Error) ->
       let (_,l,b,e) = Loc.get loc in
@@ -87,7 +136,7 @@ let onload (_event : #Dom_html.event Js.t) : bool Js.t =
       Dom.appendChild body b;
       b##onclick <-
         D.handler
-        (fun _ ->
+        (fun (_ : D.mouseEvent Js.t) ->
           textbox##textContent <- Js.some (Js.string text);
           Js._false))
     examples;
