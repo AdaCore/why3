@@ -1,12 +1,14 @@
 
+(*
 #load "unix.cma"
 #directory "../util"
 #load "sysutil.cmo"
+*)
 
 open Format
 
 let gen_dir fmt d suffix =
-  let dir = "../.." ^ d in
+  let dir = "." ^ d in
   let t = Sys.readdir dir in
   for i = 0 to Array.length t - 1 do
     let file = t.(i) in

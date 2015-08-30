@@ -50,9 +50,8 @@ let html_of_string (s:string) =
   d##createElement (Js.string "p") <|
       [node (d##createTextNode (Js.string s))]
 
-let replace_child p n =
-  Js.Opt.iter (p##firstChild) (fun c -> Dom.removeChild p c);
-  Dom.appendChild p n
+let rec removeChildren p =
+  Js.Opt.iter (p##lastChild) (fun c -> Dom.removeChild p c; removeChildren p)
 
 let temp_file_name = "/input.mlw"
 
@@ -67,7 +66,7 @@ open Why3
    XmlHttpRequest.get
 
 *)
-let env = Env.create_env ["/theories" (*; "/modules"*)]
+let env = Env.create_env ["/theories" ; "/modules"]
 
 (*
 let bad_suffix path name =
@@ -98,25 +97,47 @@ let run textbox preview (_ : D.mouseEvent Js.t) : bool Js.t =
   let ch = open_out temp_file_name in
   output_string ch text;
   close_out ch;
-  let answer =
+  let answer = ref [] in
+  let push_answer s = answer := s :: !answer in
+  begin
     try
       let x = Env.read_file Env.base_language env temp_file_name in
-      Pp.sprintf "parsing and typing OK, %d theories"
-        (Stdlib.Mstr.cardinal x)
+      push_answer
+        (Pp.sprintf "parsing and typing OK, %d theories"
+           (Stdlib.Mstr.cardinal x));
+      Stdlib.Mstr.iter
+        (fun _thname th ->
+          let tasks = Task.split_theory th None None in
+          List.iter
+            (fun task ->
+              let (id,expl,_) = Termcode.goal_expl_task ~root:true task in
+              let expl = match expl with
+                | Some s -> s
+                | None -> id.Ident.id_string
+              in
+              push_answer
+                (Pp.sprintf "Goal: %s@\n" expl))
+            tasks)
+        x
     with
     | Loc.Located(loc,Parser.Error) ->
       let (_,l,b,e) = Loc.get loc in
-      Pp.sprintf "syntax error line %d, columns %d-%d" l b e
+      push_answer
+        (Pp.sprintf "syntax error line %d, columns %d-%d" l b e)
     | Loc.Located(loc,e') ->
       let (_,l,b,e) = Loc.get loc in
-      Pp.sprintf
-        "error line %d, columns %d-%d: %a" l b e Exn_printer.exn_printer e'
+      push_answer
+        (Pp.sprintf
+           "error line %d, columns %d-%d: %a" l b e Exn_printer.exn_printer e')
     | e ->
-      Pp.sprintf
-        "unexpected exception: %a (%s)" Exn_printer.exn_printer e
-        (Printexc.to_string e)
-  in
-  replace_child preview (html_of_string answer);
+      push_answer
+        (Pp.sprintf
+           "unexpected exception: %a (%s)" Exn_printer.exn_printer e
+           (Printexc.to_string e))
+  end;
+  removeChildren preview;
+  List.iter
+    (fun s -> Dom.appendChild preview (html_of_string s)) (List.rev !answer);
   Js._false
 
 let onload (_event : #Dom_html.event Js.t) : bool Js.t =
