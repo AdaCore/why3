@@ -29,6 +29,7 @@ outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 timeout "interrupted by timeout"
 (* stop reporting Z3 2.19 warnings as errors *)
 fail "^(error \"\\(\\(W\\(A\\(R\\(N\\(I\\(N[^G]\\|[^N]\\)\\|[^I]\\)\\|[^N]\\)\\|[^R]\\)\\|[^A]\\)\\|[^W]\\).*\\)\")" "Error: \\1"
+fail "(error \".*number of configured allocations exceeded\")"
 
 
 (** Extra theories supported by Z3 *)
