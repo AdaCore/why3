@@ -33,7 +33,7 @@ type model_value =
  | Bitvector of int
  | Unparsed of string
 and  arr_index = {
-  arr_index_key : int;
+  arr_index_key : model_value;
   arr_index_value : model_value;
 }
 and model_array = {
@@ -51,11 +51,8 @@ let array_add_element ~array ~index ~value =
   (*
      Adds the element value to the array on specified index.
   *)
-  let int_index = match index with
-    | Integer s -> int_of_string s
-    | _ -> raise Not_found in
   let arr_index = {
-    arr_index_key = int_index;
+    arr_index_key = index;
     arr_index_value = value
   } in
   {
@@ -67,7 +64,7 @@ let rec print_indices sanit_print fmt indices =
   match indices with
   | [] -> ()
   | index::tail ->
-    fprintf fmt "; %d -> " index.arr_index_key;
+    fprintf fmt "; %a -> " (print_model_value_sanit sanit_print) index.arr_index_key;
     print_model_value_sanit sanit_print fmt index.arr_index_value;
     print_indices sanit_print fmt tail
 and
