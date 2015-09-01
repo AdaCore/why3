@@ -1427,7 +1427,7 @@ install_local:: bin/why3doc
 #########
 
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
-          -syntax camlp4o -I src/trywhy3
+           -syntax camlp4o -I src/trywhy3
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	js_of_ocaml +weak.js +nat.js $^
