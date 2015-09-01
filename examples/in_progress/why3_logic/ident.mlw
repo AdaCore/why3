@@ -115,6 +115,9 @@ module Ident
     pre_loc : option position;
   }
   
+  (* TODO (long term): add a mechanism to get back identifier
+     fields (mainly labels) from their names. *)
+  
   (* Similar mechanism for identifier generation. *)
   type id_set model { mutable ids : ident_name -> bool }
   type id_set_snapshot model { ids_s : ident_name -> bool }

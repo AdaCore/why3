@@ -1,0 +1,214 @@
+
+module Vs
+  
+  use import support.HO
+  use import ident.String
+  use import ident.Ident
+  use import ident.Label
+  use import list.List
+  use import option.Option
+  use import ty.Tv
+  use import ty.Ty
+  
+  (* Toplevel declaration: ident class of term variables. *)
+  constant vs_id_class_name : ident_name
+  axiom vs_id_class_name_distinct :
+    vs_id_class_name <> tv_id_class_name /\
+    vs_id_class_name <> ts_id_class_name
+  val ghost vs_id_class () : id_class
+    ensures { result.id_class_name = vs_id_class_name }
+  
+  (* Type variable symbols. *)
+  type vsymbol
+  function vs_name vsymbol : ident
+  function vs_ty vsymbol : ty
+  function vs_idn (vs:vsymbol) : ident_name = vs.vs_name.id_name
+  axiom vs_inv : forall x. exists y z.
+    x.vs_name.id_class = Cons y z /\ y.id_class_name = vs_id_class_name
+  
+  val vs_name (vs:vsymbol) : ident
+    ensures { result = vs.vs_name }
+  
+  val vs_ty (vs:vsymbol) : ty
+    ensures { result = vs.vs_ty }
+  
+  val vs_equal (vs1 vs2:vsymbol) : bool
+    ensures { vs1.vs_idn = vs2.vs_idn -> result }
+    ensures { result -> vs1 = vs2 }
+  
+  val create_vs_symbol (ghost idc:list id_class) (p:preid) : vsymbol
+    writes { ids }
+    ensures { result.vs_name.id_string = p.pre_name }
+    ensures { result.vs_name.id_label = p.pre_label.Mlab.domain }
+    ensures { result.vs_name.id_loc = p.pre_loc }
+    ensures { exists y. result.vs_name.id_class = Cons y idc /\
+                        y.id_class_name = vs_id_class_name }
+    ensures { not (old ids).ids result.vs_idn }
+    ensures { subset (old ids).ids ids.ids }
+    ensures { ids.ids result.vs_idn }
+  
+  clone extmap.FMap as Mvs with
+    type key = tvsymbol,
+    type key_l = ident_name,
+    function k_m = tv_idn
+  
+end
+
+module Ls
+  
+  use import int.Int
+  use import list.List
+  use import option.Option
+  use import ident.Ident
+  use import logic_syntax.Defs as D
+  use import logic_syntax.FreeVars
+  use logic_typing.Sig as E
+  use import context.Ctx
+  use import support.HO
+  use import support.HOList
+  use import signature.Sig
+  use import ty.Tv
+  use import ty.Ty
+  
+  (* Split the logical view of logic symbols in two parts:
+     constant and non-constant symbols. *)
+  predicate ls_constant D.lsymbol
+  
+  (* Global growing correspondance between logic symbols and
+     their identifiers names. *)
+  type ls_ctx model {
+    mutable ctls : context ident_name D.lsymbol;
+  }
+  type ls_ctx_snapshot model {
+    ctls_s : context ident_name D.lsymbol;
+  }
+  val ghost ls_ctx : ls_ctx
+  val ghost ls_ctx_snapshot () : ls_ctx_snapshot
+    ensures { result.ctls_s = ls_ctx.ctls }
+  val ghost ls_ctx_growth (s:ls_ctx_snapshot) : unit
+    ensures { sub_context s.ctls_s ls_ctx.ctls }
+  
+  type lsymbol
+  function ls_name lsymbol : ident
+  function ls_m lsymbol : D.lsymbol
+  function ls_constr lsymbol : int
+  function ls_ctv lsymbol : context ident_name int
+  function ls_ty_arity lsymbol : int
+  function ls_args lsymbol : list D.ty
+  function ls_ret lsymbol : D.ty
+  axiom ls_inv : forall ls. not ls.ls_m.ls_constant /\
+    ls.ls_ctv.c_ldom = range 0 ls.ls_ty_arity /\
+    (* Additional requirement with respect to general signature:
+       any bound type variable must be relevant to the symbol scheme.
+       This enforces subsitution unicity for application. *)
+    forall n. 0 <= n < ls.ls_ty_arity ->
+      ty_tyv_free_var ls.ls_ret n \/ tyl_tyv_free_var ls.ls_args n
+  
+  function ls_idn (ls:lsymbol) : ident_name = ls.ls_name.id_name
+  
+  type const
+  function cst_m const : D.lsymbol
+  axiom const_inv : forall c. c.cst_m.ls_constant
+  
+  val ls_name (ls:lsymbol) : ident
+    ensures { result = ls.ls_name }
+  
+  val ghost ls_cty (sym_c:sym_ctx) (ls:lsymbol) : ty_ctx
+    requires { sym_c.d_ls ls.ls_m }
+    ensures { result.cty_sym = sym_c }
+    ensures { result.cty_tv = ls.ls_ctv }
+  
+  val ls_args (ghost cty:ty_ctx) (ls:lsymbol) : list ty
+    requires { cty.cty_sym.d_ls ls.ls_m }
+    requires { cty.cty_tv = ls.ls_ctv }
+    ensures { map (cty.cty_m) result = ls.ls_args }
+  
+  val ls_value (ghost cty:ty_ctx) (ls:lsymbol) : option ty
+    requires { cty.cty_sym.d_ls ls.ls_m }
+    requires { cty.cty_tv = ls.ls_ctv }
+    ensures { match result with
+      | None -> ls.ls_ret = E.ty_prop
+      | Some u -> ls.ls_ret = cty.cty_m u
+      end }
+  
+  val ls_constr (ls:lsymbol) : int
+    ensures { result >= 0 }
+    ensures { result = ls.ls_constr }
+    ensures { result <> 0 -> let sig = global_sig.sig_m in
+      sig.E.ls_constr ls.ls_m /\ match sig.E.ls_ret ls.ls_m with
+        | D.TyVar _ -> false
+        | D.TyApp tys _ -> tys <> E.tys_prop /\
+          result = global_sig.tsc_n tys
+        end }
+  
+  val ghost ls_inv (ls:lsymbol) : unit
+    ensures { not ls_constant ls.ls_m /\ let sig = global_sig.sig_m in
+      sig.E.ls_belong ls.ls_m /\ ls.ls_ty_arity = sig.E.ls_ty_arity ls.ls_m /\
+      ls.ls_ret = sig.E.ls_ret ls.ls_m /\ ls.ls_args = sig.E.ls_args ls.ls_m /\
+      ls.ls_ctv.c_ldom = range 0 ls.ls_ty_arity /\
+      (forall n. 0 <= n < ls.ls_ty_arity ->
+        ty_tyv_free_var ls.ls_ret n \/ tyl_tyv_free_var ls.ls_args n) /\
+      ls.ls_constr >= 0 /\ (ls.ls_constr <> 0 <-> sig.E.ls_constr ls.ls_m) /\
+      ls.ls_constr <> 0 -> match sig.E.ls_ret ls.ls_m with
+      | D.TyVar _ -> false
+      | D.TyApp tys _ -> tys <> E.tys_prop /\
+        ls.ls_constr = global_sig.tsc_n tys
+      end /\
+      let ctls = ls_ctx.ctls in
+      ctls.c_ldom ls.ls_m /\ ctls.c_pdom ls.ls_idn /\
+      ctls.c_ltp ls.ls_m = ls.ls_idn /\ ctls.c_ptl ls.ls_idn = ls.ls_m }
+  
+  val ghost const_inv (cst:const) : unit
+    ensures { ls_constant cst.cst_m /\ let sig = global_sig.sig_m in
+      sig.E.ls_belong cst.cst_m /\ sig.E.ls_ty_arity cst.cst_m = 0 /\
+      sig.E.ls_args cst.cst_m = Nil /\ not sig.E.ls_constr cst.cst_m }
+  
+  val ls_equal (a b:lsymbol) : bool
+    ensures { result -> a = b }
+    ensures { a.ls_m = b.ls_m -> result }
+    ensures { a.ls_idn = b.ls_idn -> result }
+  
+  val create_lsymbol (ghost cty:ty_ctx) (ghost ty_ar:int)
+    (constr:int) (p:preid) (tyl:list ty) (vl:option ty) : lsymbol
+    writes { global_sig , ids , ls_ctx }
+    requires { cty.cty_tv.c_ldom = range 0 ty_ar }
+    requires { for_all cty.cty_d tyl /\ match vl with
+      | None -> true
+      | Some ty -> cty.cty_d ty
+      end }
+    requires { constr = 0 -> forall n. 0 <= n < ty_ar ->
+      tyl_tyv_free_var (map (cty.cty_m) tyl) n \/ match vl with
+      | None -> false
+      | Some u -> ty_tyv_free_var (cty.cty_m u) n
+      end }
+    requires { constr >= 0 }
+    requires { constr <> 0 -> match vl with
+      | None -> false
+      | Some ty -> match cty.cty_m ty with
+        | D.TyVar _ -> false
+        | D.TyApp tys tyl -> E.tys_alg global_sig.sig_m tys ->
+          constr = global_sig.tsc_n tys /\
+          not global_sig.sig_m.E.tys_constr_complete tys /\
+          E.distinct_tyv tyl /\ ty_ar = global_sig.sig_m.E.tys_arity tys
+        end
+      end }
+    ensures { not (old ids).ids result.ls_idn }
+    ensures { not (old global_sig).sig_m.E.ls_belong result.ls_m }
+    ensures { result.ls_ty_arity = ty_ar }
+    ensures { result.ls_constr = constr }
+    ensures { result.ls_args = map (cty.cty_m) tyl }
+    ensures { match vl with
+      | None -> result.ls_ret = E.ty_prop
+      | Some u -> result.ls_ret = cty.cty_m u
+      end }
+    ensures { result.ls_ctv = cty.cty_tv }
+    ensures { constr = 0 ->
+      global_sig.sig_m.E.ls_constr = (old global_sig).sig_m.E.ls_constr }
+    ensures { constr > 0 -> global_sig.sig_m.E.ls_constr =
+      update (old global_sig).sig_m.E.ls_constr result.ls_m true }
+  
+  val ls_ty_freevars (ls:lsymbol) : Mtv.s
+    ensures { result.Mtv.domain = ls.ls_ctv.c_pdom }
+  
+end
+
