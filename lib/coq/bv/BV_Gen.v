@@ -200,10 +200,10 @@ simpl; auto.
 simpl.
 intros.
 case Z.eq_dec.
-intros; elimtype False; destruct H. 
+intros; elimtype False; destruct H.
 omega.
 subst n0.
-auto with zarith. 
+auto with zarith.
 intro; rewrite IHv;auto.
 intuition; auto with zarith.
 right.
@@ -312,9 +312,8 @@ Definition lsr: t -> Z -> t.
 Defined.
 
 Lemma bshiftRl_iter_nth_low : forall b s m,
-                                (Z.of_nat s < size_int)%Z ->
-                                (0 <= m < size_int)%Z ->
-                                (m + Z.of_nat s < size_int)%Z ->
+                                (0 <= Z.of_nat s)%Z ->
+                                (0 <= m)%Z ->
    nth_aux (BshiftRl_iter last_bit b s) m = nth_aux b (m + Z.of_nat s).
   induction s.
   simpl.
@@ -329,37 +328,45 @@ Lemma bshiftRl_iter_nth_low : forall b s m,
 Qed.
 
 (* Why3 goal *)
-Lemma Lsr_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  (s < size_int)%Z) -> (((0%Z <= n)%Z /\ (n < size_int)%Z) ->
-  (((n + s)%Z < size_int)%Z -> ((nth (lsr b s) n) = (nth b (n + s)%Z)))).
-  unfold nth, lsr.
-  intros.
-  assert ((n + s)%Z = (n + Z.of_nat (Z.to_nat s))%Z).
-  rewrite Z2Nat.id with (n := s); omega.
-  rewrite H2.
-  apply bshiftRl_iter_nth_low; omega.
+Lemma Lsr_nth_low : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
+  (((0%Z <= n)%Z /\ (n < (size_int - s)%Z)%Z) -> ((nth (lsr b s) n) = (nth b
+  (n + s)%Z))).
+intros b n s h1 (h2,h3).
+assert ((n + s)%Z = (n + Z.of_nat (Z.to_nat s))%Z).
+rewrite Z2Nat.id with (n := s); omega.
+rewrite H.
+apply bshiftRl_iter_nth_low; omega.
 Qed.
 
-Lemma bshiftRl_iter_nth_high : forall (b:t) (s:nat) (n:Z) ,
-  (Z.of_nat s < size_int)%Z -> (size_int <= (n + Z.of_nat s)%Z)%Z -> ((nth_aux (BshiftRl_iter last_bit b s) n) = false).
+(* Why3 goal *)
+Lemma Lsr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
+  ((size_int <= (n + s)%Z)%Z -> ((nth (lsr b s) n) = false)).
+  intros b n s h1 h2.
+  case (Z_le_gt_dec 0 n); intro.
+  unfold nth,lsr.
+  cut (nth_aux b (n + Z.of_nat (Z.to_nat s)) = false).
+  intro.
+  rewrite <-H.
+  apply bshiftRl_iter_nth_low; omega.
+  rewrite Z2Nat.id by omega.
+  apply nth_out_of_bound; omega.
+  apply nth_out_of_bound; omega.
+Qed.
+
+Lemma bshiftRl_iter_nth : forall b s m,
+                                (0 <= Z.of_nat s)%Z ->
+                                (0 <= m)%Z ->
+   nth_aux (BshiftRl_iter last_bit b s) m = nth_aux b (m + Z.of_nat s).
   induction s.
   simpl.
-  rewrite size_int_S; intros; apply nth_high; rewrite Nat2Z.inj_succ; omega.
+  intros; rewrite <- Zplus_0_r_reverse; easy.
   rewrite Nat2Z.inj_succ; intros.
   simpl BshiftRl_iter.
   unfold BshiftRl, Bhigh.
   rewrite nth_aux_tl by omega.
   rewrite nth_aux_shiftin_false.
+  rewrite <- Zplus_succ_r_reverse, <- Z.add_succ_l.
   apply IHs; omega.
-Qed.
-
-(* Why3 goal *)
-Lemma Lsr_nth_high : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  (s < size_int)%Z) -> (((0%Z <= n)%Z /\ (n < size_int)%Z) ->
-  ((size_int <= (n + s)%Z)%Z -> ((nth (lsr b s) n) = false))).
-  unfold nth, lsr.
-  intros.
-  apply bshiftRl_iter_nth_high; rewrite Z2Nat.id with (n := s); omega.
 Qed.
 
 (* Why3 goal *)
@@ -421,8 +428,8 @@ Qed.
 (* end of Vector helpers *)
 
 Lemma BshiftRa_iter_nth_low : forall (b:t) (s:nat) (n:Z),
-  (Z.of_nat s < size_int)%Z -> (0%Z <= n < size_int)%Z ->
-  (0%Z <= (n + Z.of_nat s)%Z < size_int)%Z -> (nth_aux (BshiftRa_iter last_bit b s) n) = (nth_aux b (n + Z.of_nat s)%Z).
+  (0%Z <= n < (size_int - (Z.of_nat s)))%Z ->
+  (nth_aux (BshiftRa_iter last_bit b s) n) = (nth_aux b (n + Z.of_nat s)%Z).
   induction s.
   simpl.
   intros; rewrite <- Zplus_0_r_reverse; easy.
@@ -439,15 +446,14 @@ Lemma BshiftRa_iter_nth_low : forall (b:t) (s:nat) (n:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma Asr_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  (s < size_int)%Z) -> (((0%Z <= n)%Z /\ (n < size_int)%Z) ->
-  (((0%Z <= (n + s)%Z)%Z /\ ((n + s)%Z < size_int)%Z) -> ((nth (asr b s)
-  n) = (nth b (n + s)%Z)))).
+Lemma Asr_nth_low : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
+  (((0%Z <= n)%Z /\ (n < (size_int - s)%Z)%Z) -> ((nth (asr b s) n) = (nth b
+  (n + s)%Z))).
   unfold nth, lsr.
   intros.
   assert ((n + s)%Z = (n + Z.of_nat (Z.to_nat s))%Z).
   rewrite Z2Nat.id with (n := s); omega.
-  rewrite H2.
+  rewrite H1.
   apply BshiftRa_iter_nth_low; omega.
 Qed.
 
@@ -460,14 +466,14 @@ Lemma bshiftra_iter_last : forall {l} (v : Bvector (S l)) s, Vector.last (Bshift
 Qed.
 
 Lemma BhiftRa_iter_nth_high : forall (b:t) (s:nat) (n:Z),
-  (Z.of_nat s < size_int)%Z -> (0%Z <= n < size_int)%Z ->
+  (0%Z <= n < size_int)%Z ->
   (size_int <= n + Z.of_nat s)%Z -> ((nth_aux (BshiftRa_iter last_bit b s) n) = nth_aux b
   (size_int - 1%Z))%Z.
   induction s.
   simpl BshiftRa_iter.
   simpl (Z.of_nat 0).
   intros.
-  assert (n = size_int - 1)%Z by omega; rewrite H2; trivial.
+  assert (n = size_int - 1)%Z by omega; rewrite H1; trivial.
   rewrite Nat2Z.inj_succ; intros.
   simpl BshiftRa_iter.
   unfold BshiftRa, Bhigh.
@@ -486,14 +492,12 @@ Lemma BhiftRa_iter_nth_high : forall (b:t) (s:nat) (n:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma Asr_nth_high : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  (s < size_int)%Z) -> (((0%Z <= n)%Z /\ (n < size_int)%Z) ->
-  ((size_int <= (n + s)%Z)%Z -> ((nth (asr b s) n) = (nth b
-  (size_int - 1%Z)%Z)))).
+Lemma Asr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
+  (((0%Z <= n)%Z /\ (n < size_int)%Z) -> ((size_int <= (n + s)%Z)%Z ->
+  ((nth (asr b s) n) = (nth b (size_int - 1%Z)%Z)))).
   unfold nth, asr.
   intros.
   apply BhiftRa_iter_nth_high.
-  rewrite Z2Nat.id; omega.
   omega.
   rewrite Z2Nat.id; omega.
 Qed.
@@ -503,80 +507,56 @@ Definition lsl: t -> Z -> t.
   exact (fun v m => BshiftL_iter last_bit v (Z.to_nat m)).
 Defined.
 
-Lemma bshiftL_iter_nth_high : forall {l} v s m, (0 <= m - Z.of_nat s < Z.of_nat (S l))%Z -> (m < Z.of_nat (S l))%Z -> nth_aux (BshiftL_iter l v s) m = nth_aux v (m - Z.of_nat s).
+Lemma bshiftL_iter_nth_high : forall {l} v s m, (0 <= Z.of_nat s)%Z -> (m < Z.of_nat (S l))%Z -> (Z.of_nat s <= m)%Z -> nth_aux (BshiftL_iter l v s) m = nth_aux v (m - Z.of_nat s).
   induction s; intros.
   simpl.
-  rewrite <- Zminus_0_l_reverse; easy.
+  rewrite <-Zminus_0_l_reverse; reflexivity.
   simpl.
   case Z.eq_dec; intro.
   symmetry; apply nth_low.
   rewrite e; simpl; apply Pos2Z.neg_is_neg.
-  case (Z.eq_dec (Z.pred m) (Z.of_nat l)).
-  intro.
+  rewrite Nat2Z.inj_succ in H, H1.
+  case (Z.eq_dec (Z.pred m) (Z.of_nat l));intro.
   rewrite Nat2Z.inj_succ in H0.
   assert False by omega; easy.
-  intro.
   rewrite nth_aux_shiftout_not_last by omega.
-  rewrite Zpos_P_of_succ_nat.
-  rewrite Z.sub_succ_r.
-  rewrite <- Z.sub_pred_l.
-  rewrite Nat2Z.inj_succ in H, H.
+  rewrite Zpos_P_of_succ_nat, Z.sub_succ_r, <- Z.sub_pred_l.
   apply IHs; omega.
 Qed.
 
 (* Why3 goal *)
 Lemma Lsl_nth_high : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  (s < size_int)%Z) -> (((0%Z <= n)%Z /\ (n < size_int)%Z) ->
-  (((0%Z <= (n - s)%Z)%Z /\ ((n - s)%Z < size_int)%Z) -> ((nth (lsl b s)
-  n) = (nth b (n - s)%Z)))).
+  ((s <= n)%Z /\ (n < size_int)%Z)) -> ((nth (lsl b s) n) = (nth b
+  (n - s)%Z)).
   intros.
-  unfold lsl.
-  unfold nth.
-  rewrite size_int_S in H, H0, H1.
+  unfold lsl, nth.
   assert ((n - s)%Z = (n - Z.of_nat (Z.to_nat s))%Z).
   rewrite Z2Nat.id with (n := s); omega.
-  rewrite H2.
-  apply (bshiftL_iter_nth_high b (Z.to_nat s) n).
-  rewrite Nat2Z.inj_succ.
-  omega.
-  rewrite Nat2Z.inj_succ.
-  omega.
+  rewrite H0.
+  unfold size_int, size in H.
+  apply (bshiftL_iter_nth_high b (Z.to_nat s) n); auto with zarith.
 Qed.
 
-Lemma Lsl_nth_low_aux : forall x (b : t) (n : int),
-   (Z.of_nat x < size_int)%Z ->
-   (0 <= n)%Z ->
-   (n < size_int)%Z ->
-   (n - Z.of_nat x < 0)%Z -> nth (lsl b (Z.of_nat x)) n = false.
+Lemma Lsl_nth_low_aux : forall {l} x b (n : int),
+                          (0 <= n < Z.of_nat x)%Z -> nth_aux (BshiftL_iter l b x) n = false.
   induction x.
   simpl; intros; assert False by omega; easy.
   rewrite Nat2Z.inj_succ; intros.
-  unfold nth, lsl.
-  rewrite Z2Nat.inj_succ by omega.
   simpl.
-  case Z.eq_dec.
+  case Z.eq_dec;intro.
   trivial.
-  intro.
-  rewrite nth_aux_shiftout_not_last.
+  case (Z.eq_dec (Z.pred n) (Z.of_nat l));intro.
+  apply nth_high; omega.
+  rewrite nth_aux_shiftout_not_last by auto.
   apply IHx; omega.
-  assert (last_bit = pred size) by easy.
-  rewrite H3.
-  rewrite Nat2Z.inj_pred.
-  unfold size_int in H, H1.
-  omega.
-  unfold size.
-  omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Lsl_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  (s < size_int)%Z) -> (((0%Z <= n)%Z /\ (n < size_int)%Z) ->
-  (((n - s)%Z < 0%Z)%Z -> ((nth (lsl b s) n) = false))).
+Lemma Lsl_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= n)%Z /\ (n < s)%Z) ->
+  ((nth (lsl b s) n) = false).
   intros.
-  assert (s = Z.of_nat (Z.to_nat s)).
-  symmetry; apply Z2Nat.id; omega.
-  rewrite H2.
-  apply Lsl_nth_low_aux; omega.
+  apply Lsl_nth_low_aux.
+  rewrite Z2Nat.id; omega.
 Qed.
 
 (* Why3 goal *)
@@ -1519,11 +1499,361 @@ Definition eq_sub_bv (a:t) (b:t) (i:t) (n:t): Prop := let mask :=
 Definition eq_sub (a:t) (b:t) (i:Z) (n:Z): Prop := forall (j:Z),
   ((i <= j)%Z /\ (j < (i + n)%Z)%Z) -> ((nth a j) = (nth b j)).
 
+Lemma in_range_1 : uint_in_range 1.
+  split; auto with zarith.
+  change (Z.succ 0 <= max_int)%Z; apply Zlt_le_succ.
+  unfold max_int, size_int, size.
+  apply Zlt_succ_pred.
+  apply Z.le_lt_trans with (m := Z.of_nat (S last_bit)).
+  rewrite Nat2Z.inj_succ; auto with zarith.
+  apply id_lt_pow2.
+Qed.
+
+Lemma max_int_neq_1 : max_int + 1 <> 0.
+  intro; symmetry in H; revert H.
+  apply Z.lt_neq, Zle_lt_succ, max_int_nat.
+Qed.
+
+(* mask (S n) = lsl (mask n) 1 + 1 *)
+Lemma mask_succ :
+  forall n,
+    sub (lsl (of_int 1) (Z.of_nat (S n))) (of_int 1%Z)
+    = add (lsl (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) (Z.of_nat 1)) (of_int 1%Z).
+  intro; apply to_uint_extensionality.
+  rewrite to_uint_add.
+  rewrite to_uint_lsl_aux.
+  assert (Pow2int.pow2 (Z.of_nat 1) = 2) as tmp by auto with zarith; rewrite tmp.
+  symmetry; rewrite to_uint_sub; symmetry.
+  rewrite to_uint_of_int by (apply in_range_1).
+  rewrite mod1_is_mod by (apply Zle_gt_succ, max_int_nat).
+  rewrite mod1_is_mod by (apply Zle_gt_succ, max_int_nat).
+  rewrite mod1_is_mod by (apply Zle_gt_succ, max_int_nat).
+  rewrite Z.mul_mod_idemp_l by (apply max_int_neq_1).
+  rewrite Z.mul_sub_distr_r.
+  rewrite <- Zminus_mod_idemp_l.
+  rewrite to_uint_lsl_aux.
+  rewrite mod1_is_mod by (apply Zle_gt_succ, max_int_nat).
+  rewrite Z.mul_mod_idemp_l by (apply max_int_neq_1).
+  rewrite Zmult_assoc_reverse, (Int.Comm1 (Pow2int.pow2 (Z.of_nat n)) 2).
+  rewrite <-Pow2int.Power_s by omega.
+  rewrite <-mod1_is_mod with (x := to_uint (of_int 1) * Pow2int.pow2 (Z.of_nat n + 1)) by (apply Zle_gt_succ, max_int_nat).
+  rewrite Z.add_1_r with (n := Z.of_nat n).
+  rewrite <- Nat2Z.inj_succ.
+  rewrite <-to_uint_lsl_aux.
+  rewrite Zplus_mod_idemp_l.
+  rewrite <-Z.sub_sub_distr.
+  assert (1 * 2 - 1 = to_uint (of_int 1)).
+  simpl; symmetry; apply to_uint_of_int; apply in_range_1.
+  rewrite H.
+  rewrite <-mod1_is_mod by (apply Zle_gt_succ, max_int_nat).
+  apply to_uint_sub.
+Qed.
+
+Lemma mask_succ_tmp :
+  forall n,
+    add (lsl (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) (Z.of_nat 1)) (of_int 1%Z)
+    = bw_or (lsl (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) (Z.of_nat 1)) (of_int 1%Z).
+  intro.
+
+  Lemma add_and_or :
+    forall v, nth v 0 = false ->
+              add v (of_int 1) = bw_or v (of_int 1).
+    Definition add_aux {l} (v w : Vector.t bool l) : Vector.t bool l.
+      exact (nat_to_bvec l (Z.to_nat (mod1 (Z.of_nat (bvec_to_nat l v) + Z.of_nat (bvec_to_nat l w)) (Pow2int.pow2 (Z.of_nat l))))).
+    Defined.
+    Lemma add_is_add_aux : forall v w, add v w = add_aux v w.
+      unfold add, add_aux, of_int, to_uint, max_int, size_int.
+      rewrite <-Z.sub_sub_distr; auto.
+    Qed.
+    Lemma add_and_or_aux :
+      forall {l} v, @nth_aux l v 0 = false ->
+                    add_aux v (nat_to_bvec l 1)
+                    = Vector.map2 (fun x y => x || y) v (nat_to_bvec l 1).
+      destruct v; auto.
+      intro.
+      assert (h = false) as hf by auto; rewrite hf.
+      simpl.
+      unfold add_aux.
+      change (
+          nat_to_bvec (S n)
+                      (Z.to_nat
+                         (mod1
+                            (Z.of_nat (2 * (bvec_to_nat n v)) +
+                             Z.of_nat (1 + 2 * (bvec_to_nat n (nat_to_bvec n 0))))
+                            (Pow2int.pow2 (Z.of_nat (S n))))) =
+          true :: Vector.map2 (fun x y : bool => x || y) v (nat_to_bvec n 0)).
+      rewrite <-Nat_to_bvec_zero, bvec_to_nat_zero.
+      change (Z.of_nat (1 + 2 * 0)) with 1.
+      set (mod1 (Z.of_nat (2 * bvec_to_nat n v) + 1)
+           (Pow2int.pow2 (Z.of_nat (S n)))).
+      simpl nat_to_bvec.
+      rewrite Z2Nat.id by (apply mod1_nat, Z.lt_le_pred, max_int_nat).
+      assert (Z.odd z = true).
+      subst z.
+      rewrite Zodd_mod, mod1_is_mod by auto with zarith.
+      rewrite Nat2Z.inj_succ, <- Z.add_1_r, Pow2int.Power_s by auto with zarith.
+      rewrite Int.Comm1, (mod_mod_mult _ 2 _)by auto with zarith.
+      rewrite <-Zodd_mod, Int.Comm, Nat2Z.inj_mul, Z.odd_add_mul_2; trivial.
+      rewrite H0.
+      cut (nat_to_bvec n (Div2.div2 (Z.to_nat z))
+           = Vector.map2 (fun x y : bool => x || y) v (Vector.const false n)).
+      intro t; rewrite t; trivial.
+      case (Z_lt_le_dec (Z.of_nat (2 * bvec_to_nat n v) + 1) (Pow2int.pow2 (Z.of_nat (S n)))); intro.
+      subst z.
+      revert H0.
+      rewrite mod1_out by auto with zarith.
+      rewrite Z.add_1_r.
+      intro.
+      rewrite <-Nat2Z.inj_succ, Nat2Z.id.
+      rewrite Z.odd_succ, <-even_is_even in H0.
+      rewrite <-(Div2.even_div2 _ H0), Div2.div2_double.
+      Lemma nat_to_bvec_bvec_to_nat:
+        forall {l} v, nat_to_bvec l (bvec_to_nat l v) = v.
+        intros; apply bvec_to_nat_extensionality.
+        apply bvec_to_nat_nat_to_bvec.
+        apply Z.lt_le_pred.
+        rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l) - 1); [apply max_int_nat|auto with zarith]).
+        apply inj_lt, bvec_to_nat_range.
+      Qed.
+      rewrite nat_to_bvec_bvec_to_nat.
+      Lemma tmp2:
+        forall {l} v,
+          Vector.map2 (fun x y : bool => x || y) v (Vector.const false l) = v.
+        induction v; auto.
+        simpl.
+        rewrite orb_false_r.
+        rewrite IHv; trivial.
+      Qed.
+      symmetry; apply tmp2.
+      absurd (Z.of_nat (bvec_to_nat n v) < Pow2int.pow2 (Z.of_nat n)).
+      apply Zle_not_lt.
+      rewrite Nat2Z.inj_succ in l.
+      rewrite <- Z.add_1_r, Pow2int.Power_s in l by auto with zarith.
+      apply Zle_lt_succ in l.
+      rewrite <-Z.add_1_r, Zplus_assoc_reverse, Nat2Z.inj_mul in l.
+      simpl (1 + 1) in l.
+      rewrite Zred_factor3 in l.
+      rewrite <-(Z.mul_lt_mono_pos_l 2) in l by omega.
+      rewrite Z.add_1_l in l.
+      apply Zlt_succ_le in l; trivial.
+      rewrite Z2Nat.inj_lt, Nat2Z.id.
+      apply (bvec_to_nat_range v).
+      auto with zarith.
+      transitivity (Pow2int.pow2 (Z.of_nat n) - 1).
+      apply max_int_nat.
+      auto with zarith.
+    Qed.
+    intros.
+    rewrite add_is_add_aux.
+    apply add_and_or_aux.
+    trivial.
+  Qed.
+  simpl.
+  apply add_and_or.
+  intros; apply Lsl_nth_low; auto with zarith.
+Qed.
+
+Lemma mask_succ_2 :
+  forall n,
+    sub (lsl (of_int 1) (Z.of_nat (S n))) (of_int 1%Z)
+  = bw_or (lsl (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) (Z.of_nat 1)) (of_int 1%Z).
+  intro; rewrite mask_succ.
+  apply mask_succ_tmp.
+Qed.
+
+  (* Lemma lsl_Succ : *)
+  (*   forall v n, to_uint (lsl v (Z.of_nat n)) * 2 = to_uint (lsl v (Z.of_nat (S n))). *)
+  (*   intros. *)
+
+Lemma nth_bit_pred_high :
+  forall n i,
+    to_uint i < size_int ->
+    to_uint i < Z.of_nat n ->
+    nth_bv (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) i = true.
+  induction n;intros.
+  assert (Z.of_nat 0 <= to_uint i) by apply to_uint_bounds.
+  omega.
+  rewrite Nth_bv_is_nth.
+  rewrite mask_succ_2; simpl.
+  unfold bw_or, nth.
+  rewrite <-nth_aux_map2.
+  Focus 2.
+  split; auto with zarith.
+  apply to_uint_bounds.
+
+  apply orb_true_iff.
+  case (Z_lt_le_dec (to_uint i) 1); intro.
+  right.
+  assert (to_uint i = 0).
+  pose (to_uint_bounds i).
+  unfold uint_in_range in u; auto with zarith.
+  rewrite H1; apply nth_zero_is_hd.
+
+  left.
+  rewrite Lsl_nth_high; auto with zarith.
+
+  assert (to_uint i - 1 = to_uint (sub i (of_int 1))).
+  rewrite to_uint_sub by auto with zarith.
+  rewrite to_uint_of_int by (apply in_range_1).
+  rewrite mod1_out; trivial.
+  split; auto with zarith.
+  apply Z.lt_lt_pred, Zle_lt_succ, to_uint_bounds.
+
+  rewrite H1, <-Nth_bv_is_nth.
+  apply IHn; rewrite <-H1; rewrite Nat2Z.inj_succ in H0; omega.
+Qed.
+
+Lemma nth_bit_pred_low :
+  forall n i,
+    to_uint i >= Z.of_nat n ->
+    nth_bv (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) i = false.
+  induction n;intros.
+  assert (lsl (of_int 1) (Z.of_nat 0) = of_int 1) as h by auto with zarith; rewrite h.
+  assert (sub (of_int 1) (of_int 1) = of_int 0).
+  apply to_uint_extensionality.
+  rewrite to_uint_sub, to_uint_of_int, to_uint_of_int.
+  apply mod1_out.
+  rewrite two_power_size_val.
+  split; [omega|apply Pow2int.pow2pos, Z.lt_le_incl, size_int_pos].
+  split; [easy|apply max_int_nat].
+  apply in_range_1.
+  rewrite H0, <-Of_int_zero.
+  apply Nth_zero.
+
+  rewrite Nat2Z.inj_succ in H.
+  rewrite Nth_bv_is_nth, mask_succ_2; simpl.
+
+  unfold bw_or, nth.
+  case (Z_lt_ge_dec (to_uint i) size_int); intro.
+  rewrite <-nth_aux_map2 by (split; auto with zarith).
+
+  apply orb_false_iff.
+  split.
+  rewrite Lsl_nth_high; auto with zarith.
+  assert (to_uint i - 1 = to_uint (sub i (of_int 1))).
+  rewrite to_uint_sub by auto with zarith.
+  rewrite to_uint_of_int by (apply in_range_1).
+  rewrite mod1_out; trivial.
+  split; auto with zarith.
+  apply Z.lt_lt_pred, Zle_lt_succ, to_uint_bounds.
+  rewrite H0,<-Nth_bv_is_nth.
+  apply IHn.
+  rewrite <-H0; omega.
+  assert (to_uint i > 0) by omega.
+  Lemma one_nth: forall {l},
+    nat_to_bvec (S l) 1
+    = Vector.cons bool true l (Vector.const false _).
+    intro.
+    change (Bcons (Z.odd (Z.of_nat 1)) l (nat_to_bvec l (Div2.div2 1)) = true :: Vector.const false l).
+    assert (Z.odd (Z.of_nat 1) = true) by auto with zarith.
+    rewrite H.
+    assert (Div2.div2 1 = 0%nat) by auto with zarith.
+    rewrite H0.
+    assert (nat_to_bvec l 0 = Vector.const false l).
+    induction l.
+    auto.
+    change (Bcons (Z.odd (Z.of_nat 0)) l (nat_to_bvec l (Div2.div2 0)) = false :: Vector.const false l).
+    rewrite <-IHl; auto.
+    rewrite H1; trivial.
+  Qed.
+  unfold of_int, size.
+  rewrite one_nth.
+  rewrite nth_cons_pred by auto with zarith.
+  apply Nth_zero_aux.
+  apply nth_aux_out_of_bound.
+  fold size_int; omega.
+Qed.
+
+Lemma mask_correctness :
+  forall (i:t) (n:t),
+    let mask := lsl_bv (sub (lsl_bv (of_int 1%Z) n) (of_int 1%Z)) i in
+    forall (j:Z),
+      (j < size_int -> (to_uint i) <= j -> j < (to_uint i + to_uint n)%Z -> nth mask j = true)
+   /\ (j < to_uint i \/ j >= to_uint i + to_uint n -> nth mask j = false).
+  split;intros.
+  rewrite lsl_bv_is_lsl.
+  pose (to_uint_bounds i).
+  pose (size_int_in_range).
+  unfold uint_in_range in u, u0.
+  rewrite Lsl_nth_high; auto with zarith.
+  assert (j - to_uint i = to_uint (sub (of_int j) i)).
+  rewrite to_uint_sub by omega.
+  rewrite to_uint_of_int by (split; auto with zarith).
+  rewrite mod1_out by (split; auto with zarith); trivial.
+  rewrite H2.
+  rewrite <-Nth_bv_is_nth by omega.
+  apply nth_bit_pred_high; auto with zarith.
+  rewrite <-H2.
+  fold (to_uint n); auto with zarith.
+  destruct H.
+  case (Z_lt_le_dec j 0); intro.
+  apply nth_low; easy.
+  rewrite lsl_bv_is_lsl.
+  apply Lsl_nth_low; auto with zarith.
+
+  rewrite lsl_bv_is_lsl.
+  pose (to_uint_bounds i) as u; unfold uint_in_range in u.
+  pose (to_uint_bounds n) as v; unfold uint_in_range in v.
+  pose size_int_in_range as w; unfold uint_in_range in w.
+  assert (0 <= j) by auto with zarith.
+
+  case (Z_lt_ge_dec j size_int); intro.
+  case (Z_lt_ge_dec j (to_uint i)); intro.
+
+  apply Lsl_nth_low; auto.
+
+  rewrite Lsl_nth_high; auto with zarith.
+  rewrite lsl_bv_is_lsl.
+  assert (j - to_uint i = to_uint (sub (of_int j) i)).
+  rewrite to_uint_sub.
+  rewrite to_uint_of_int by (unfold uint_in_range; auto with zarith).
+  rewrite mod1_out; auto with zarith.
+  rewrite H1.
+  rewrite <-Nth_bv_is_nth.
+  apply nth_bit_pred_low.
+  fold (to_uint n).
+  rewrite <-H1; auto with zarith.
+
+  apply nth_high; auto.
+Qed.
+
 (* Why3 goal *)
 Lemma eq_sub_equiv : forall (a:t) (b:t) (i:t) (n:t), (eq_sub a b (to_uint i)
   (to_uint n)) <-> (eq_sub_bv a b i n).
-intros a b i n.
-admit.
+  intros a b i n.
+  unfold eq_sub, eq_sub_bv.
+  transitivity (eq_aux (bw_and b (lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i))
+                       (bw_and a (lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i))); unfold eq_aux.
+  Focus 2.
+  split.
+  apply Extensionality_aux.
+  intro e; rewrite e; reflexivity.
+  split; intros.
+
+  fold nth; rewrite Nth_bw_and, Nth_bw_and by auto.
+  case (Z_lt_ge_dec n0 (to_uint i + to_uint n)); intro.
+  case (Z_le_gt_dec (to_uint i) n0); intro.
+
+  rewrite H; auto.
+
+  rewrite (match (mask_correctness i n n0) with conj a b => b (or_introl (Z.gt_lt _ _ g)) end).
+  rewrite andb_false_r, andb_false_r; reflexivity.
+
+  rewrite (match (mask_correctness i n n0) with conj a b => b (or_intror g) end).
+  rewrite andb_false_r, andb_false_r; reflexivity.
+
+  case (Z_lt_ge_dec j size_int); intro.
+
+  pose (to_uint_bounds i) as u; unfold uint_in_range in u.
+  assert (0 <= j < Z.of_nat size) by auto with zarith.
+  pose (H j H1).
+  fold nth in e; rewrite Nth_bw_and, Nth_bw_and in e by auto.
+  destruct H0.
+  rewrite (match (mask_correctness i n j) with conj a b => a l H0 H2 end) in e.
+  rewrite andb_true_r, andb_true_r in e.
+  auto.
+
+  unfold nth, nth; rewrite nth_high, nth_high by auto with zarith; reflexivity.
 Qed.
 
 (* Why3 goal *)
@@ -1532,4 +1862,3 @@ Lemma Extensionality : forall (x:t) (y:t), (eq_sub x y 0%Z size_int) ->
   intros x y.
   apply Extensionality_aux.
 Qed.
-

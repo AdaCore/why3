@@ -149,30 +149,30 @@ theory BV_Gen
   function lsr t int : t
 
   axiom Lsr_nth_low:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s < size_int ->
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size_int - s ->
       nth (lsr b s) n = nth b (n+s)
 
   axiom Lsr_nth_high:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
+    forall b:t,n s:int. 0 <= s -> n+s >= size_int ->
       nth (lsr b s) n = False
 
   function asr t int : t
 
   axiom Asr_nth_low:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n+s < size_int ->
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size_int - s ->
       nth (asr b s) n = nth b (n+s)
 
   axiom Asr_nth_high:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size_int -> size_int <= n+s ->
       nth (asr b s) n = nth b (size_int-1)
 
   function lsl t int : t
 
   axiom Lsl_nth_high:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n-s < size_int -> nth (lsl b s) n = nth b (n-s)
+    forall b:t,n s:int. 0 <= s <= n < size_int -> nth (lsl b s) n = nth b (n-s)
 
   axiom Lsl_nth_low:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n-s < 0 -> nth (lsl b s) n = False
+    forall b:t,n s:int. 0 <= n < s -> nth (lsl b s) n = False
 
   use import Pow2int
   use import int.EuclideanDivision
