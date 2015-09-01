@@ -46,26 +46,38 @@ module Sig
       equalizer (tys_alg so) s.tsc_n_s global_sig.tsc_n }
   
   (* Allowed symbols domain, e.g symbol contexts. *)
-  type sym_context
-  function d_tys sym_context : ty_symbol -> bool
-  function d_ls sym_context : lsymbol -> bool
-  function d_constr sym_context : lsymbol -> bool
-  axiom sym_context_inv : forall sc ls. sc.d_constr ls -> sc.d_ls ls
+  type sym_ctx
+  function d_tys sym_ctx : ty_symbol -> bool
+  function d_ls sym_ctx : lsymbol -> bool
+  function d_constr sym_ctx : lsymbol -> bool
+  axiom sym_ctx_inv : forall sc ls. sc.d_constr ls -> sc.d_ls ls
   
-  predicate sub_sym_context (s1 s2:sym_context) =
+  predicate sub_sym_ctx (s1 s2:sym_ctx) =
     subset s1.d_tys s2.d_tys /\
     subset s1.d_ls s2.d_ls /\
     subset s1.d_constr s2.d_constr
   
-  predicate sym_ctx_wf (sig:S.signature) (s:sym_context) =
-    subset s.d_tys sig.tys_belong /\
-    subset s.d_ls sig.ls_belong /\
-    subset s.d_constr sig.ls_constr /\
-    (forall ls. s.d_ls ls -> ty_vars_in all s.d_tys (sig.ls_ret ls) /\
-      tyl_vars_in all s.d_tys (sig.ls_args ls))
+  predicate sym_prj_wf (sig:S.signature) (dtys:ty_symbol -> bool)
+    (dls:lsymbol -> bool) (dconstr:lsymbol -> bool) =
+    subset dtys sig.tys_belong /\
+    subset dls sig.ls_belong /\
+    subset dconstr sig.ls_constr /\
+    (forall ls. dls ls -> ty_vars_in all dtys (sig.ls_ret ls) /\
+      tyl_vars_in all dtys (sig.ls_args ls))
   
-  val ghost sym_bounds (sym_c:sym_context) : unit
+  predicate sym_ctx_wf (sig:S.signature) (s:sym_ctx) =
+    sym_prj_wf sig s.d_tys s.d_ls s.d_constr
+  
+  val ghost sym_bounds (sym_c:sym_ctx) : unit
     ensures { sym_ctx_wf global_sig.sig_m sym_c }
+  
+  val ghost make_sym_ctx (dtys:ty_symbol -> bool)
+                         (dls:lsymbol -> bool)
+                         (dconstr:lsymbol -> bool) : sym_ctx
+    requires { sym_prj_wf global_sig.sig_m dtys dls dconstr }
+    ensures { result.d_tys = dtys }
+    ensures { result.d_ls = dls }
+    ensures { result.d_constr = dconstr }
   
 end
 
