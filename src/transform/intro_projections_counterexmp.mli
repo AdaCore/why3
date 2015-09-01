@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-val intro_projections_counterexmp :  Task.task Trans.trans
+val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
  (**
     Transformation that for each declared abstract function or predicate
     p labeled with label "model_projected" creates a declaration of new
