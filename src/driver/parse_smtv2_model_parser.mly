@@ -85,9 +85,16 @@ other_than_const_array:
 | INT_STR { $1 }
 | CONST { "const"  }
 
-(* Example:
-   (store (store ((as const (Array Int Int)) 0) 1 2) 3 4)
-   (store (store ((as const (Array Int Int)) false) 1 true) 3 true) *)
+(* Examples:
+   (1) Map from int to int:
+     (store (store ((as const (Array Int Int)) 0) 1 2) 3 4)
+   (2) Map from int to bool:
+     (store (store ((as const (Array Int Int)) false) 1 true) 3 true)
+   (3) Map from int to map from int to int (all elemets are 0):
+     ((as const (Array Int (Array Int Int))) ((as const (Array Int Int)) 0))
+   (4) Map from int to map from int to int (element [1][1] is 3, all others are 0)
+     (store (store ((as const (Array Int (Array Int Int))) ((as const (Array Int Int)) 0)) 0 (store ((as const (Array Int Int)) 0) 0 3)) 1 (store ((as const (Array Int Int)) 0) 1 3))
+*)
 array:
 | LPAREN possible_space
     LPAREN possible_space
@@ -97,16 +104,16 @@ array:
   RPAREN
     { Model_parser.array_create_constant ~value:$13 }
 | LPAREN possible_space
-    STORE possible_space array possible_space value SPACE integer
+    STORE possible_space array possible_space value SPACE value
     possible_space
   RPAREN
     { Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
+
+array_skipped_part:
+| LPAREN term_list RPAREN {}
 
 (* Example:
    (_ bv2048 16) *)
 bitvector:
 | BITVECTOR_VALUE
     { $1 }
-
-array_skipped_part:
-| LPAREN term_list RPAREN {}
