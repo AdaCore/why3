@@ -322,11 +322,22 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
     md_context_labels = context_labels;
   }
 
-let mk_var id ty md =
-  let new_labels =
-    append_to_model_trace_label ~labels:id.id_label ~to_append:("@"^md.md_append_to_model_trace) in
+let model_proj_label = Ident.create_label "model_projected"
+let model_label = Ident.create_label "model"
 
-  create_vsymbol (id_fresh ~label:new_labels ?loc:md.md_loc id.id_string) ty
+let mk_var id ty md =
+  let new_labels, loc = match md with
+    | None ->
+      (* If there is no model data remove model labels (prevents counter-example
+	 projections of this variable, displaying this variable in counterexample, ...) *)
+      let new_labels = Slab.filter (fun l -> (l <> model_label) && (l <> model_proj_label) ) id.id_label in
+      (new_labels, None)
+    | Some md -> begin
+      (append_to_model_trace_label ~labels:id.id_label ~to_append:("@"^md.md_append_to_model_trace), md.md_loc)
+    end
+  in
+
+  create_vsymbol (id_fresh ~label:new_labels ?loc id.id_string) ty
 
 (* replace "contemporary" variables with fresh ones *)
 let rec subst_at_now now mvs t = match t.t_node with
@@ -379,7 +390,7 @@ let update_term env (mreg : vsymbol Mreg.t) f =
     | t -> Some t in
   let vars = Mvs.mapi_filter update (t_vars f) in
   (* [vv'] : modified variable -> fresh variable *)
-  let new_var vs _ = mk_var vs.vs_name vs.vs_ty (create_model_data ?loc:f.t_loc ~context_labels:f.t_label "model_quantify") in
+  let new_var vs _ = mk_var vs.vs_name vs.vs_ty (Some (create_model_data ?loc:f.t_loc ~context_labels:f.t_label "model_quantify")) in
   let vv' = Mvs.mapi new_var vars in
   (* update modified variables *)
   let update v t f = wp_let (Mvs.find v vv') t f in
@@ -409,7 +420,7 @@ let quantify md env regs f =
       | None -> create_model_data
 	?loc:id.id_loc ~context_labels:id.id_label md.md_append_to_model_trace
       | _ -> md in
-    mk_var id ty md in
+    mk_var id ty (Some md) in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
   let f = update_term env mreg f in
@@ -1189,20 +1200,9 @@ end = struct
       with Not_found -> reg.reg_name
     in
 
-    let md = match md with
-      | None ->
-	create_model_data "fast wp - from region "
-      | Some md -> md in
-
     mk_var name reg.reg_ity md
 
   let fresh_var_from_var md vs =
-    let md = match md with
-      | None ->
-        create_model_data
-	  "fast wp - from var" ?loc:vs.vs_name.id_loc
-      | Some md -> md in
-
     mk_var vs.vs_name (ity_of_vs vs) md
 
   let is_simple_var = get_single_region_of_var
