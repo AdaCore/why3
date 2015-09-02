@@ -58,11 +58,13 @@ end
 
 (** registering the std lib *)
 
+(*
 let () =
   List.iter
     (fun (name,content) ->
       Sys_js.register_file ~name ~content;
     ) Theories.theories
+*)
 
 
 (** Rendering in the browser *)
@@ -95,45 +97,52 @@ let ul nl =
 end
 
 let temp_file_name = "/input.mlw"
+let why3_conf_file = "/why3.conf"
 
 let () =
-  Sys_js.register_file ~name:temp_file_name ~content:"";
+  Sys_js.register_file ~name:temp_file_name ~content:""
 
 open Why3
+open Format
 
-(* TODO: loading from standard library.
+(* reads the config file *)
+let config : Whyconf.config = Whyconf.read_config (Some why3_conf_file)
+(* the [main] section of the config file *)
+let main : Whyconf.main = Whyconf.get_main config
+(* all the provers detected, from the config file *)
+let provers : Whyconf.config_prover Whyconf.Mprover.t =
+  Whyconf.get_provers config
 
-   piste: utiliser Sys_js.register_autoload et
-   XmlHttpRequest.get
+(* One prover named Alt-Ergo in the config file *)
+let alt_ergo : Whyconf.config_prover =
+  if Whyconf.Mprover.is_empty provers then begin
+    eprintf "Prover Alt-Ergo not installed or not configured@.";
+    exit 0
+  end else snd (Whyconf.Mprover.choose provers)
 
-*)
-let env = Env.create_env ["/theories" ; "/modules"]
+(* builds the environment from the [loadpath] *)
+let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
-(*
-let bad_suffix path name =
-  match path with
-  | "/theories" -> not (Filename.check_suffix name ".why")
-  | "/modules" -> not (Filename.check_suffix name ".mlw")
-  | _ -> true
 
-let load_file_from_the_web (path,name) =
-  if bad_suffix path name then None else
-  let t = XmlHttpRequest.get
-    ("http://why3.lri.fr/try" ^ path ^ "/" ^ name)
-  in
-  let c = ref "" in
-  Lwt.on_success t
-    (fun frame ->
-      let content = frame. XmlHttpRequest.content in
-      (* useless ?
-         Sys_js.register_file ~name:(path ^ "/" ^ name) ~content; *)
-      c := content);
-  Some !c
+let alt_ergo_driver : Driver.driver =
+  try
+    Printexc.record_backtrace true;
+    Driver.load_driver env alt_ergo.Whyconf.driver []
+  with e ->
+    let s = Printexc.get_backtrace () in
+    eprintf "Failed to load driver for alt-ergo: %a@.%s@."
+      Exn_printer.exn_printer e s;
+  exit 1
 
-let () = Sys_js.register_autoload ~path:"/theories" load_file_from_the_web
-*)
 
-let split_trans = Why3.Trans.lookup_transform_l "split_goal_wp" env
+let run_alt_ergo_on_task t =
+  (* printing the task in a string *)
+  Driver.print_task alt_ergo_driver str_formatter t;
+  let text = flush_str_formatter () in
+  (* TODO ! *)
+  text
+
+let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
 let run textbox preview (_ : D.mouseEvent Js.t) : bool Js.t =
   let text = Js.to_string (textbox##value) in
@@ -142,6 +151,7 @@ let run textbox preview (_ : D.mouseEvent Js.t) : bool Js.t =
   close_out ch;
   let answer =
     try
+      (* TODO: add a function Env.read_string or Env.read_from_lexbuf ? *)
       let theories = Env.read_file Env.base_language env temp_file_name in
 (*
       Html.par
@@ -167,14 +177,15 @@ let run textbox preview (_ : D.mouseEvent Js.t) : bool Js.t =
                     | Some s -> s
                     | None -> id.Ident.id_string
                   in
-                  [Html.of_string ("Goal: " ^ expl)])
+                  let result = run_alt_ergo_on_task task in
+                  [Html.of_string (expl ^" : " ^ result)])
                 tasks
             in
             [ Html.of_string ("Theory " ^ thname); Html.ul tasks]
             :: acc)
           theories []
       in
-      Html.par [Html.ul theories]
+      Html.ul theories
 (*
       Stdlib.Mstr.iter
         (fun _thname th ->
@@ -236,7 +247,7 @@ let onload (_event : #Dom_html.event Js.t) : bool Js.t =
       b##onclick <-
         D.handler
         (fun (_ : D.mouseEvent Js.t) ->
-          textbox##textContent <- Js.some (Js.string text);
+          textbox##value <- Js.string text;
           Js._false))
     examples;
   Dom.appendChild output (D.createBr Html.d);
