@@ -2,39 +2,894 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="500"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="500"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="500"/>
+<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="500"/>
 <file name="../bitcount.mlw" expanded="true">
-<theory name="BitCount" sum="0d9d73b08093ae48a117681fef57eaa0" expanded="true">
- <goal name="WP_parameter count" expl="VC for count" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter count.1" expl="1. precondition" expanded="true">
-  <proof prover="0"><result status="timeout" time="5.00"/></proof>
-  <proof prover="1"><result status="unknown" time="2.82"/></proof>
-  <proof prover="2"><result status="timeout" time="5.03"/></proof>
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+<theory name="BitCount8bit_fact" sum="6e1617617ff22071093f7f463819a2f2">
+ <goal name="nth_as_bv_is_int">
+ <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.18" steps="114"/></proof>
+ <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="0.38"/></proof>
+ </goal>
+ <goal name="WP_parameter step1" expl="VC for step1">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter step1.1" expl="1. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step1.1.1" expl="1. assertion">
+   <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <proof prover="3" timelimit="25" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter step1.1.2" expl="2. assertion">
+   <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.20"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter count.2" expl="2. precondition" expanded="true">
-  <proof prover="0"><result status="timeout" time="5.00"/></proof>
-  <proof prover="1"><result status="unknown" time="3.19"/></proof>
-  <proof prover="2"><result status="timeout" time="5.03"/></proof>
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <goal name="WP_parameter step1.2" expl="2. postcondition">
+  <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="4.82"/></proof>
   </goal>
-  <goal name="WP_parameter count.3" expl="3. precondition" expanded="true">
-  <proof prover="0"><result status="timeout" time="5.00"/></proof>
-  <proof prover="1"><result status="timeout" time="4.99"/></proof>
-  <proof prover="2"><result status="timeout" time="5.04"/></proof>
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
-  </goal>
-  <goal name="WP_parameter count.4" expl="4. postcondition" expanded="true">
-  <proof prover="0"><result status="timeout" time="5.01"/></proof>
-  <proof prover="1"><result status="timeout" time="5.00"/></proof>
-  <proof prover="2"><result status="timeout" time="5.83"/></proof>
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <goal name="WP_parameter step1.3" expl="3. postcondition">
+  <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="1.96"/></proof>
   </goal>
  </transf>
+ </goal>
+ <goal name="WP_parameter step2" expl="VC for step2">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter step2.1" expl="1. precondition">
+  <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.04" steps="73"/></proof>
+  <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="25" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step2.2" expl="2. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step2.2.1" expl="1. precondition">
+   <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step2.3" expl="3. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step2.3.1" expl="1. VC for step2">
+   <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.05" steps="77"/></proof>
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="25" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.3.2" expl="2. VC for step2">
+   <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.04" steps="77"/></proof>
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   <proof prover="3" timelimit="25" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step2.4" expl="4. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step2.5" expl="5. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step2.5.1" expl="1. assertion">
+   <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.10" steps="129"/></proof>
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="1.37"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.2" expl="2. assertion">
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="4.81"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.3" expl="3. assertion">
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.56"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.4" expl="4. assertion">
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.5" expl="5. assertion">
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="19.97"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step2.6" expl="6. postcondition">
+  <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="10.24"/></proof>
+  <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.18"/></proof>
+  <proof prover="3" timelimit="25" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter step2.7" expl="7. postcondition">
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="2.26"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.09"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter prove" expl="VC for prove">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter prove.1" expl="1. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="72"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.2" expl="2. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="72"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.3" expl="3. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="72"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.4" expl="4. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="76"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.5" expl="5. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="76"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.6" expl="6. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="76"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.7" expl="7. assertion">
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.62"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.8" expl="8. postcondition">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.30"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter count" expl="VC for count">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter count.1" expl="1. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter count.1.1" expl="1. VC for count">
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter count.1.2" expl="2. VC for count">
+   <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.03" steps="78"/></proof>
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="0.10"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter count.2" expl="2. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter count.2.1" expl="1. VC for count">
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="0.80"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="WP_parameter count.2.2" expl="2. VC for count">
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.09"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter count.3" expl="3. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter count.3.1" expl="1. VC for count">
+   <proof prover="0" timelimit="25" memlimit="1000"><result status="valid" time="0.06" steps="97"/></proof>
+   <proof prover="1" timelimit="25" memlimit="1000"><result status="valid" time="1.04"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="WP_parameter count.3.2" expl="2. VC for count">
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.09"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter count.4" expl="4. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter count.4.1" expl="1. precondition">
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter count.5" expl="5. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="81"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter count.6" expl="6. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter count.6.1" expl="1. precondition">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="81"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter count.7" expl="7. postcondition">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="BitCount32bit_fact" sum="8095de06f0bc258232018afd12a70892">
+ <goal name="WP_parameter step1" expl="VC for step1">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter step1.1" expl="1. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step1.1.1" expl="1. assertion">
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter step1.1.2" expl="2. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="24.46"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step1.2" expl="2. postcondition">
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="10.29"/></proof>
+  </goal>
+  <goal name="WP_parameter step1.3" expl="3. postcondition">
+  <proof prover="1" memlimit="1000"><result status="valid" time="3.50"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter step2" expl="VC for step2">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter step2.1" expl="1. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step2.1.1" expl="1. VC for step2">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="73"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.1.2" expl="2. VC for step2">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="73"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step2.2" expl="2. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.03" steps="73"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="50" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step2.3" expl="3. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step2.3.1" expl="1. VC for step2">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="77"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.3.2" expl="2. VC for step2">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="77"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step2.4" expl="4. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="77"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter step2.5" expl="5. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step2.5.1" expl="1. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.07" steps="149"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="1.75"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.2" expl="2. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="5.85"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.3" expl="3. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="1.75"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.4" expl="4. assertion">
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter step2.5.5" expl="5. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="11.17"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step2.6" expl="6. postcondition">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="WP_parameter step2.7" expl="7. postcondition">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.14"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter step3" expl="VC for step3">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter step3.1" expl="1. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step3.1.1" expl="1. VC for step3">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="74"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.1.2" expl="2. VC for step3">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.02" steps="74"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step3.2" expl="2. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step3.3" expl="3. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter step3.4" expl="4. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step3.4.1" expl="1. VC for step3">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.4.2" expl="2. VC for step3">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step3.5" expl="5. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter step3.6" expl="6. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step3.7" expl="7. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step3.7.1" expl="1. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.10" steps="154"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="1.05"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.2" expl="2. assertion">
+   <proof prover="1" memlimit="1000"><result status="valid" time="4.38"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.3" expl="3. assertion">
+   <proof prover="1" memlimit="1000"><result status="valid" time="4.79"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.13"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.4" expl="4. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="89"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.5" expl="5. assertion">
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.6" expl="6. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.03" steps="90"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="18.22"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.7" expl="7. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.23"/></proof>
+   </goal>
+   <goal name="WP_parameter step3.7.8" expl="8. assertion">
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.24"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step3.8" expl="8. postcondition">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="WP_parameter step3.9" expl="9. postcondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.46" steps="170"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.11"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter step4" expl="VC for step4">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter step4.1" expl="1. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step4.1.1" expl="1. VC for step4">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="75"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.1.2" expl="2. VC for step4">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="75"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step4.2" expl="2. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="75"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.3" expl="3. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="75"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.4" expl="4. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="75"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.5" expl="5. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step4.5.1" expl="1. VC for step4">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="79"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.5.2" expl="2. VC for step4">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="79"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step4.6" expl="6. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="79"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.7" expl="7. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.05" steps="79"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.8" expl="8. precondition">
+  <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.04" steps="79"/></proof>
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.9" expl="9. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter step4.9.1" expl="1. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.11" steps="143"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.75"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.2" expl="2. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="4.71"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.3" expl="3. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="5.88"/></proof>
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.13"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.4" expl="4. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.06" steps="90"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="1.18"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.5" expl="5. assertion">
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.6" expl="6. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="0.05" steps="91"/></proof>
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="6.95"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.7" expl="7. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="1.05"/></proof>
+   </goal>
+   <goal name="WP_parameter step4.9.8" expl="8. assertion">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="1.13"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter step4.10" expl="10. postcondition">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="WP_parameter step4.11" expl="11. postcondition">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.15"/></proof>
+  <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter prove" expl="VC for prove">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter prove.1" expl="1. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.2" expl="2. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.3" expl="3. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.4" expl="4. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.5" expl="5. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.6" expl="6. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.7" expl="7. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.8" expl="8. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.9" expl="9. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.10" expl="10. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter prove.11" expl="11. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter prove.11.1" expl="1. VC for prove">
+   <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter prove.11.2" expl="2. VC for prove">
+   <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="1.34"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter prove.12" expl="12. postcondition">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.51"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter count" expl="VC for count">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter count.1" expl="1. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.2" expl="2. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="79"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter count.3" expl="3. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.4" expl="4. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.5" expl="5. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.56" steps="243"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.87"/></proof>
+  </goal>
+  <goal name="WP_parameter count.6" expl="6. assertion">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.35" steps="159"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.80"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.7" expl="7. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.11"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.8" expl="8. precondition">
+  <proof prover="1" memlimit="1000"><result status="valid" time="1.27"/></proof>
+  </goal>
+  <goal name="WP_parameter count.9" expl="9. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.16"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.10" expl="10. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.25"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.11" expl="11. assertion">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.07" steps="100"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.26"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter count.12" expl="12. precondition">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.82"/></proof>
+  </goal>
+  <goal name="WP_parameter count.13" expl="13. assertion">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="2.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.14" expl="14. assertion">
+  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.26"/></proof>
+  </goal>
+  <goal name="WP_parameter count.15" expl="15. precondition">
+  <proof prover="1" memlimit="1000"><result status="valid" time="3.49"/></proof>
+  </goal>
+  <goal name="WP_parameter count.16" expl="16. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="100"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.10"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.25"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.17" expl="17. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="100"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.10"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.24"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter count.18" expl="18. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="100"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.32"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter count.19" expl="19. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="100"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.44"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter count.20" expl="20. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="100"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.76"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter count.21" expl="21. postcondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="114"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.09"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.30"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Hamming" sum="093369ce293369ee7682563464e42cfc">
+ <goal name="WP_parameter hammingD" expl="VC for hammingD">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter hammingD.1" expl="1. assertion">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter hammingD.2" expl="2. postcondition">
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="symmetric">
+ <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="15.17"/></proof>
+ <proof prover="3" timelimit="20" memlimit="1000"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="numof_ytpmE">
+ <proof prover="2" memlimit="1000"><result status="valid" time="2.34"/></proof>
+ </goal>
+ <goal name="WP_parameter separation" expl="VC for separation">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter separation.1" expl="1. assertion">
+  <proof prover="0" memlimit="1000"><result status="valid" time="1.42" steps="412"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter separation.2" expl="2. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter separation.2.1" expl="1. postcondition">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="74"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter separation.2.2" expl="2. postcondition">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.85" steps="286"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter numof_or" expl="VC for numof_or">
+ <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.62"/></proof>
+ </goal>
+ <goal name="WP_parameter triangleInequalityInt" expl="VC for triangleInequalityInt">
+ <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="6.90"/></proof>
+ </goal>
+ <goal name="triangleInequality">
+ <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.04"/></proof>
+ </goal>
+</theory>
+<theory name="AsciiCode" sum="01883260a767c14d70dd00fc9fafa67c" expanded="true">
+ <goal name="WP_parameter bv_even" expl="VC for bv_even">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter bv_even.1" expl="1. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter bv_even.2" expl="2. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter bv_even.3" expl="3. assertion">
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="6.45"/></proof>
+  </goal>
+  <goal name="WP_parameter bv_even.4" expl="4. assertion">
+  <proof prover="1" memlimit="1000"><result status="valid" time="2.58"/></proof>
+  </goal>
+  <goal name="WP_parameter bv_even.5" expl="5. postcondition">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.09"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="bv_odd">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="81"/></proof>
+ <proof prover="1" memlimit="1000"><result status="valid" time="0.06"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter numof_or" expl="VC for numof_or">
+ <proof prover="1" memlimit="1000"><result status="valid" time="0.69"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.33"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter count_or" expl="VC for count_or">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter count_or.1" expl="1. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter count_or.2" expl="2. assertion">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.19" steps="118"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter count_or.3" expl="3. assertion">
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter count_or.4" expl="4. assertion">
+  <proof prover="1" timelimit="20" memlimit="1000"><result status="valid" time="12.94"/></proof>
+  </goal>
+  <goal name="WP_parameter count_or.5" expl="5. postcondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.06" steps="75"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter ascii" expl="VC for ascii">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter ascii.1" expl="1. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.59" steps="193"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="2.61"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter ascii.2" expl="2. assertion">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter ascii.3" expl="3. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter ascii.3.1" expl="1. assertion">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.07" steps="112"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter ascii.3.2" expl="2. assertion">
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.09"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ascii.4" expl="4. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter ascii.4.1" expl="1. assertion">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.08" steps="114"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="WP_parameter ascii.4.2" expl="2. assertion">
+   <proof prover="0" timelimit="20" memlimit="1000"><result status="valid" time="3.82" steps="245"/></proof>
+   </goal>
+   <goal name="WP_parameter ascii.4.3" expl="3. assertion">
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="WP_parameter ascii.4.4" expl="4. assertion">
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ascii.5" expl="5. assertion">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="78"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter ascii.6" expl="6. postcondition">
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.10"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter ascii.7" expl="7. postcondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.16" steps="104"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter tmp" expl="VC for tmp">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter tmp.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="71"/></proof>
+  </goal>
+  <goal name="WP_parameter tmp.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="71"/></proof>
+  </goal>
+  <goal name="WP_parameter tmp.3" expl="3. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter tmp.3.1" expl="1. postcondition">
+   <proof prover="3"><result status="valid" time="0.81"/></proof>
+   </goal>
+   <goal name="WP_parameter tmp.3.2" expl="2. postcondition">
+   <proof prover="3"><result status="valid" time="1.08"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter tmp.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="2.32" steps="568"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter asciiProp" expl="VC for asciiProp">
+ <proof prover="0"><result status="valid" time="0.23" steps="236"/></proof>
+ <proof prover="1"><result status="valid" time="0.42"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 </file>
