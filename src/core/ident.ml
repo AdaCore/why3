@@ -140,6 +140,9 @@ let id_fresh ?(label = Slab.empty) ?loc nm =
 let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
 
+let id_lab label id =
+  create_ident id.id_string label id.id_loc
+
 let id_clone ?(label = Slab.empty) id =
   let ll = Slab.union label id.id_label in
   create_ident id.id_string ll id.id_loc

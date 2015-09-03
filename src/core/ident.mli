@@ -87,6 +87,9 @@ val id_fresh : ?label:Slab.t -> ?loc:Loc.position -> string -> preid
 (* create a localized pre-ident *)
 val id_user : ?label:Slab.t -> string -> Loc.position -> preid
 
+(* create a duplicate pre-ident with given labels *)
+val id_lab : Slab.t -> ident -> preid
+
 (* create a duplicate pre-ident *)
 val id_clone : ?label:Slab.t -> ident -> preid
 
