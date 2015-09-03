@@ -267,8 +267,7 @@ module Ty
   
   val ty_inst (ghost cty0 cty1:ty_ctx) (m:Mtv.t ty) (ty:ty) : ty
     requires { cty0.cty_d ty }
-    requires { forall x. cty0.cty_tv.c_pdom x /\ m.Mtv.domain x ->
-      cty1.cty_d (m.Mtv.bindings x) }
+    requires { forall x. m.Mtv.domain x -> cty1.cty_d (m.Mtv.bindings x) }
     ensures { cty1.cty_d result /\
       cty1.cty_m result = ty_subst (make_ty_subst cty1 m) id (cty0.cty_m ty) }
   
@@ -280,8 +279,7 @@ module Ty
      raises otherwise. *)
   val ty_match (ghost cty0 cty1:ty_ctx) (s:Mtv.t ty) (pat ty:ty) : Mtv.t ty
     requires { cty0.cty_d pat /\ cty1.cty_d ty }
-    requires { forall x. cty0.cty_tv.c_pdom x /\ s.Mtv.domain x ->
-      cty1.cty_d (s.Mtv.bindings x) }
+    requires { forall x. s.Mtv.domain x -> cty1.cty_d (s.Mtv.bindings x) }
     (* Correct instantiation. *)
     ensures {
       ty_subst (make_ty_subst cty1 result) id (cty0.cty_m pat) = cty1.cty_m ty }
@@ -295,11 +293,12 @@ module Ty
                       ty_tyv_free_var (cty0.cty_m pat) (cty0.cty_tv.c_ptl x))) }
     (* Increase. *)
     ensures { equalizer s.Mtv.domain s.Mtv.bindings result.Mtv.bindings }
-    ensures { forall x. cty0.cty_tv.c_pdom x /\ result.Mtv.domain x ->
-      cty1.cty_d (result.Mtv.bindings x) }
+    (* Invariant. *)
+    ensures { forall x. result.Mtv.domain x ->
+      ty1.cty_d (result.Mtv.bindings x) }
     (* Failure. *)
     raises { TypeMismatch _ -> forall f.
-      (forall x. cty0.cty_tv.c_pdom x /\ s.Mtv.domain x ->
+      (forall x. s.Mtv.domain x ->
         f (cty0.cty_tv.c_ptl x) = cty1.cty_m (s.Mtv.bindings x)) ->
       ty_subst f id (cty0.cty_m pat) <> cty1.cty_m ty }
   
@@ -307,7 +306,7 @@ module Ty
   let ty_match_sure (ghost cty0 cty1:ty_ctx) (ghost f:int -> D.ty)
     (s:Mtv.t ty) (pat ty:ty) : Mtv.t ty
     requires { cty0.cty_d pat /\ cty1.cty_d ty }
-    requires { forall x. cty0.cty_tv.c_pdom x /\ s.Mtv.domain x ->
+    requires { forall x. s.Mtv.domain x ->
       cty1.cty_d (s.Mtv.bindings x) /\
       f (cty0.cty_tv.c_ptl x) = cty1.cty_m (s.Mtv.bindings x) }
     requires { ty_subst f id (cty0.cty_m pat) = cty1.cty_m ty }
@@ -320,13 +319,13 @@ module Ty
       (s.Mtv.domain x \/ (cty0.cty_tv.c_pdom x /\
                       ty_tyv_free_var (cty0.cty_m pat) (cty0.cty_tv.c_ptl x))) }
     ensures { equalizer s.Mtv.domain s.Mtv.bindings result.Mtv.bindings }
-    ensures { forall x. cty0.cty_tv.c_pdom x /\ result.Mtv.domain x ->
+    ensures { forall x. result.Mtv.domain x ->
       cty1.cty_d (result.Mtv.bindings x) }
   = try ty_match cty0 cty1 s pat ty
     with TypeMismatch _ -> absurd
     end
   
-  val ty_free_vars (ghost cty:ty_ctx) (s:Mtv.s) (ty:ty) : Mtv.s
+  val ty_freevars (ghost cty:ty_ctx) (s:Mtv.s) (ty:ty) : Mtv.s
     requires { cty.cty_d ty }
     ensures { let ctv = cty.cty_tv in
       forall x. result.Mtv.domain x <->
