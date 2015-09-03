@@ -61,10 +61,24 @@ let rec add_quant kn (vl,tl,f) v =
     | _ -> []
   in
   match cl with
-    | [ls,_] ->
+    | [ls,pjl] ->
         let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
-        let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
-        let nvl = List.map mk_v ls.ls_args in
+        let mk_v ty pj =
+	  (* The name of the field corresponding to the variable that is created  *)
+	  let field_name = begin match pj with
+	    | Some pj_ls ->
+	      begin
+		try
+		  Ident.get_model_element_name ~labels:pj_ls.ls_name.id_label
+		with Not_found -> pj_ls.ls_name.id_string
+	      end
+	    | _ -> ""
+	  end in
+	  let label = Ident.append_to_model_element_name
+	    ~labels:v.vs_name.id_label ~to_append:("." ^ field_name) in
+	  create_vsymbol (id_clone ~label v.vs_name) (ty_inst s ty) in
+
+        let nvl = List.map2 mk_v ls.ls_args pjl in
         let t = fs_app ls (List.map t_var nvl) ty in
         let f = t_let_close_simp v t f in
         let tl = tr_map (t_subst_single v t) tl in
@@ -114,7 +128,7 @@ let eval_match ~inline kn t =
   let rec eval stop env t =
     let stop = stop || Slab.mem Split_goal.stop_split t.t_label in
     let eval = eval stop in
-    t_label_copy t (match t.t_node with
+    match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
         cs_equ kn env (eval env t1) (eval env t2)
     | Tapp (ls, [t1]) when is_projection kn ls ->
@@ -142,7 +156,7 @@ let eval_match ~inline kn t =
           else List.fold_left (add_quant kn) ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
-        t_map_simp (eval env) t)
+        t_map_simp (eval env) t
   in
   eval false Mvs.empty t
 
