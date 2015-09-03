@@ -49,6 +49,10 @@ val get_model_element_name : labels : Slab.t -> string
     Throws Not_found if there is no element name (there is no
     label of the form "model_trace:+". *)
 
+val get_model_trace_label : labels : Slab.t -> Slab.elt
+(** Return label of the for "model_trace:*".
+    Throws Not_found if there is no such label.*)
+
 (** {2 Identifiers} *)
 
 type ident = private {
