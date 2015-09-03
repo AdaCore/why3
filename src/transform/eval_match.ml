@@ -62,6 +62,7 @@ let rec add_quant kn (vl,tl,f) v =
   in
   match cl with
     | [ls,pjl] ->
+	(* there is only one constructor *)
         let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty pj =
 	  (* The name of the field corresponding to the variable that is created  *)
@@ -76,7 +77,7 @@ let rec add_quant kn (vl,tl,f) v =
 	  end in
 	  let label = Ident.append_to_model_element_name
 	    ~labels:v.vs_name.id_label ~to_append:("." ^ field_name) in
-	  create_vsymbol (id_clone ~label v.vs_name) (ty_inst s ty) in
+	  create_vsymbol (id_lab label v.vs_name) (ty_inst s ty) in
 
         let nvl = List.map2 mk_v ls.ls_args pjl in
         let t = fs_app ls (List.map t_var nvl) ty in
@@ -128,7 +129,7 @@ let eval_match ~inline kn t =
   let rec eval stop env t =
     let stop = stop || Slab.mem Split_goal.stop_split t.t_label in
     let eval = eval stop in
-    match t.t_node with
+    let t_eval_matched = (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
         cs_equ kn env (eval env t1) (eval env t2)
     | Tapp (ls, [t1]) when is_projection kn ls ->
@@ -156,7 +157,18 @@ let eval_match ~inline kn t =
           else List.fold_left (add_quant kn) ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
-        t_map_simp (eval env) t
+        t_map_simp (eval env) t) in
+
+    (* Copy all labels of t to t_eval_matched except for "model_trace:*" label.
+       This label is not copied if both t and t_eval_matched contain it. *)
+    let t =
+      (try
+	 let _ = Ident.get_model_trace_label ~labels:t_eval_matched.t_label in
+	 let original_mt_label = Ident.get_model_trace_label ~labels:t.t_label in
+	 (* If both t_eval_matched and t contain model_trace label, remove it *)
+	 t_label_remove original_mt_label t
+       with Not_found -> t) in
+    t_label_copy t t_eval_matched
   in
   eval false Mvs.empty t
 
