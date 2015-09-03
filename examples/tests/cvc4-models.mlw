@@ -53,7 +53,7 @@ module M
 
   (*** In all cases, records are decomposed using match eval ***)
 
-  type r = {f "field_f" :int; g:bool}
+  type r = {f "model_trace:field_f" :int; g:bool}
 
   (* Projection functions *)
   function projf_r_f "model_trace:.f" (x : r) : int
