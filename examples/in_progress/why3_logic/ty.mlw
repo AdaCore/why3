@@ -295,7 +295,7 @@ module Ty
     ensures { equalizer s.Mtv.domain s.Mtv.bindings result.Mtv.bindings }
     (* Invariant. *)
     ensures { forall x. result.Mtv.domain x ->
-      ty1.cty_d (result.Mtv.bindings x) }
+      cty1.cty_d (result.Mtv.bindings x) }
     (* Failure. *)
     raises { TypeMismatch _ -> forall f.
       (forall x. s.Mtv.domain x ->
