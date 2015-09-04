@@ -69,10 +69,10 @@ let rec print_indices fmt indices =
     print_indices fmt tail
 and
 print_array fmt arr =
-  fprintf fmt "[others -> ";
+  fprintf fmt "(others => ";
   print_model_value fmt arr.arr_others;
   print_indices fmt arr.arr_indices;
-  fprintf fmt "]"
+  fprintf fmt ")"
 and
 print_model_value_sanit sanit_print fmt value =
   (* Prints model value. *)

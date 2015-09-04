@@ -49,6 +49,10 @@ val get_model_element_name : labels : Slab.t -> string
     Throws Not_found if there is no element name (there is no
     label of the form "model_trace:+". *)
 
+val get_model_trace_label : labels : Slab.t -> Slab.elt
+(** Return label of the for "model_trace:*".
+    Throws Not_found if there is no such label.*)
+
 (** {2 Identifiers} *)
 
 type ident = private {
@@ -82,6 +86,9 @@ val id_fresh : ?label:Slab.t -> ?loc:Loc.position -> string -> preid
 
 (* create a localized pre-ident *)
 val id_user : ?label:Slab.t -> string -> Loc.position -> preid
+
+(* create a duplicate pre-ident with given labels *)
+val id_lab : Slab.t -> ident -> preid
 
 (* create a duplicate pre-ident *)
 val id_clone : ?label:Slab.t -> ident -> preid
