@@ -44,13 +44,8 @@ let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
 
 (* functions for working with counterexample model labels *)
 
-let model_trace_regexp = Str.regexp "model_trace:"
-
 let is_model_trace_label label =
-  try
-    ignore(Str.search_forward model_trace_regexp label.lab_string 0);
-    true
-  with Not_found -> false
+  Lexlib.has_prefix "model_trace:" label.lab_string
 
 let get_model_trace_label ~labels =
   Slab.choose (Slab.filter is_model_trace_label labels)
