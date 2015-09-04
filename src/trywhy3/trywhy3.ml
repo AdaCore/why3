@@ -163,23 +163,33 @@ let run textbox preview (_ : D.mouseEvent Js.t) : bool Js.t =
         Stdlib.Mstr.fold
           (fun thname th acc ->
             let tasks = Task.split_theory th None None in
-            let tasks = List.fold_left
-              (fun acc t ->
+            let tasks = List.map
+              (fun t ->
+                let (id,expl,_) = Termcode.goal_expl_task ~root:true t in
+                let expl = match expl with
+                  | Some s -> s
+                  | None -> id.Ident.id_string
+                in
                 let tl = Trans.apply split_trans t in
-                List.rev_append tl acc)
-              [] tasks
-            in
-            let tasks =
-              List.rev_map
-                (fun task ->
-                  let (id,expl,_) = Termcode.goal_expl_task ~root:false task in
-                  let expl = match expl with
-                    | Some s -> s
-                    | None -> id.Ident.id_string
-                  in
-                  let result = run_alt_ergo_on_task task in
-                  [Html.of_string (expl ^" : " ^ result)])
-                tasks
+                let tasks =
+                  List.map
+                    (fun task ->
+                      let (id,expl,_) = Termcode.goal_expl_task ~root:false task in
+                      let expl = match expl with
+                        | Some s -> s
+                        | None -> id.Ident.id_string
+                      in
+                      let result = run_alt_ergo_on_task task in
+                      let result =
+                        if String.length result > 80 then
+                          "..." ^ String.sub result (String.length result - 80) 80
+                        else result
+                      in
+                      [Html.of_string (expl ^" : " ^ result)])
+                    tl
+                in
+                [Html.of_string expl; Html.ul tasks])
+              tasks
             in
             [ Html.of_string ("Theory " ^ thname); Html.ul tasks]
             :: acc)
