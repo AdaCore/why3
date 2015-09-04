@@ -66,7 +66,7 @@ let rec add_quant kn (vl,tl,f) v =
         let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty pj =
 	  (* The name of the field corresponding to the variable that is created  *)
-	  let field_name = begin match pj with
+	  let field_name = (match pj with
 	    | Some pj_ls ->
 	      begin
 		try
@@ -74,17 +74,22 @@ let rec add_quant kn (vl,tl,f) v =
 		with Not_found -> pj_ls.ls_name.id_string
 	      end
 	    | _ -> ""
-	  end in
+	  ) in
+	  let field_str = if field_name <> "" then "." ^ field_name
+	    else "" in
 	  let label = Ident.append_to_model_element_name
-	    ~labels:v.vs_name.id_label ~to_append:("." ^ field_name) in
+	    ~labels:v.vs_name.id_label ~to_append:(field_str) in
 	  create_vsymbol (id_lab label v.vs_name) (ty_inst s ty) in
 
         let nvl = List.map2 mk_v ls.ls_args pjl in
         let t = fs_app ls (List.map t_var nvl) ty in
         let f = t_let_close_simp v t f in
         let tl = tr_map (t_subst_single v t) tl in
+        (* in case any of the fields is also a record, we recurse over the new
+           variables. *)
         List.fold_left (add_quant kn) (vl,tl,f) nvl
     | _ ->
+        (* zero or more than one constructor *)
         (v::vl, tl, f)
 
 let let_map fn env t1 tb =
