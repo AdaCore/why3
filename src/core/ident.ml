@@ -87,6 +87,7 @@ let get_model_element_name ~labels =
       | [el_name] -> el_name
       | _ -> raise Not_found
     end;
+  | [_] -> ""
   | _ -> assert false
 
 
