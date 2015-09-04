@@ -103,4 +103,19 @@ and string = parse
       String.iter (fun c -> if c <> '_' then (Strings.set t !i c; incr i)) s;
       t
     end else s
+
+let has_prefix pref s =
+  let l = String.length pref in
+  if String.length s < l then false else
+    try
+      for i = 0 to l - 1 do if s.[i] <> pref.[i] then raise Exit done;
+      true
+    with Exit -> false
+
+let remove_prefix pref s =
+  let l = String.length pref in
+  if String.length s < l then raise Not_found else
+  for i = 0 to l - 1 do if s.[i] <> pref.[i] then raise Not_found done;
+  String.sub s l (String.length s - l)
+
 }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<file name="../term.mlw" expanded="true">
+<theory name="Vs" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Ls" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Term" sum="4a7d61a3f4a3792bfc97b177c2b61c32">
+ <goal name="WP_parameter fused_alt" expl="VC for fused_alt">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter fused_alt.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter fused_alt.2" expl="2. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter fused_alt.2.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="36"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="58"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.23" steps="34"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="45"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="103"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.6" expl="6. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="34"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.7" expl="7. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="45"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.8" expl="8. assertion">
+   <proof prover="0"><result status="valid" time="0.20" steps="103"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.9" expl="9. assertion">
+   <proof prover="0"><result status="valid" time="0.19" steps="24"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.10" expl="10. assertion">
+   <proof prover="0"><result status="valid" time="0.22" steps="33"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.11" expl="11. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="61"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.12" expl="12. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="32"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.13" expl="13. assertion">
+   <proof prover="0"><result status="valid" time="0.24" steps="97"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.14" expl="14. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="33"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.15" expl="15. assertion">
+   <proof prover="0"><result status="valid" time="0.19" steps="61"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.16" expl="16. assertion">
+   <proof prover="0"><result status="valid" time="0.18" steps="32"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.17" expl="17. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="97"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.18" expl="18. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="47"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.19" expl="19. assertion">
+   <proof prover="0"><result status="valid" time="0.06" steps="38"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.20" expl="20. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="43"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.21" expl="21. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="47"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.22" expl="22. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="38"/></proof>
+   </goal>
+   <goal name="WP_parameter fused_alt.2.23" expl="23. assertion">
+   <proof prover="0"><result status="valid" time="0.06" steps="43"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter fused_alt.3" expl="3. postcondition">
+  <proof prover="1"><result status="valid" time="0.55"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter fused_inj" expl="VC for fused_inj">
+ <proof prover="0"><result status="valid" time="0.31" steps="141"/></proof>
+ </goal>
+ <goal name="WP_parameter trigger_irrelevant" expl="VC for trigger_irrelevant">
+ <proof prover="0"><result status="valid" time="0.18" steps="82"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

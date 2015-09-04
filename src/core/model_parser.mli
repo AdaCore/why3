@@ -20,7 +20,7 @@ type model_value =
  | Bitvector of int
  | Unparsed of string
 and  arr_index = {
-  arr_index_key : int;
+  arr_index_key : model_value;
   arr_index_value : model_value;
 }
 and model_array = {

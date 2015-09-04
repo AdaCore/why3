@@ -13,44 +13,18 @@ module Tv
   val ghost tv_id_class () : id_class
     ensures { result.id_class_name = tv_id_class_name }
   
-  (* Contexts for type variables. Represents the type variables allowed at
-     a given location and the correspondance with their models.
-     TODO: implements a type for general variable contexts, which is
-     basically a bijection between two domains on different types:
-     ident_name & int for type variable context,
-     ident_name & 'a for term variable context. *)
-  type tv_context
-  (*function ctv_m tv_context : context *)
-  function tv_dom tv_context : ident_name -> bool
-  function tv_fun tv_context : ident_name -> int
-  function tv_rfun tv_context : int -> ident_name
-  axiom tv_context_inv : forall ctv id.
-    ctv.tv_dom id -> ctv.tv_rfun (ctv.tv_fun id) = id
-  val ghost tv_bounds (ctv:tv_context) : unit
-    ensures { subset ctv.tv_dom ids.ids }
-  val ghost tv_make_context (dm:ident_name -> bool)
-    (fn:ident_name -> int) (rfn:int -> ident_name) : tv_context
-    requires { forall x. dm x -> rfn (fn x) = x }
-    ensures { result.tv_dom = dm }
-    ensures { result.tv_fun = fn }
-    ensures { result.tv_rfun = rfn }
-  
-  (* Context injection in another. *)
-  predicate tv_ctx_inj (tv1:tv_context) (f:int -> int) (tv2:tv_context) =
-    forall i. tv1.tv_dom i -> tv2.tv_dom i /\ tv2.tv_fun i = f (tv1.tv_fun i)
-  
+  (* Type variable symbols. *)
   type tvsymbol
   function tv_name tvsymbol : ident
   function tv_idn (vty:tvsymbol) : ident_name = vty.tv_name.id_name
   axiom tv_inv : forall x. exists y z.
     x.tv_name.id_class = Cons y z /\ y.id_class_name = tv_id_class_name
-    
   
   val tv_name (vty:tvsymbol) : ident
     ensures { result = vty.tv_name }
   
   val tv_equal (vty1 vty2:tvsymbol) : bool
-    ensures { vty1.tv_name.id_name = vty2.tv_name.id_name -> result }
+    ensures { vty1.tv_idn = vty2.tv_idn -> result }
     ensures { result -> vty1 = vty2 }
   
   val create_tv_symbol (ghost idc:list id_class) (p:preid) : tvsymbol
@@ -60,9 +34,9 @@ module Tv
     ensures { result.tv_name.id_loc = p.pre_loc }
     ensures { exists y. result.tv_name.id_class = Cons y idc /\
                         y.id_class_name = tv_id_class_name }
-    ensures { not (old ids).ids result.tv_name.id_name }
+    ensures { not (old ids).ids result.tv_idn }
     ensures { subset (old ids).ids ids.ids }
-    ensures { ids.ids result.tv_name.id_name }
+    ensures { ids.ids result.tv_idn }
   
   val tv_of_string (s:string) : tvsymbol
     writes { ids }
@@ -72,107 +46,298 @@ module Tv
     ensures { exists y. result.tv_name.id_class = Cons y Nil /\
                         y.id_class_name = tv_id_class_name }
     ensures { subset (old ids).ids ids.ids }
-    ensures { ids.ids result.tv_name.id_name }
+    ensures { ids.ids result.tv_idn }
+  
+  clone extmap.FMap as Mtv with
+    type key = tvsymbol,
+    type key_l = ident_name,
+    function k_m = tv_idn
   
 end
 
 module Ty
   
-  use import logic_syntax.Defs as D
-  use import logic_syntax.Maps
-  use import list.List
-  use import list.Length
-  use import support.HO
-  use import support.HOList
+  use import ident.Label
   use import ident.Ident
+  use import context.Ctx
   use import signature.Sig
   use import Tv
+  use import logic_syntax.Defs as D
+  use import logic_syntax.Substs
+  use import logic_syntax.VarsIn
+  use import logic_syntax.FreeVars
+  use logic_typing.Sig as E
+  use import option.Option
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import int.Int
+  use import support.Choice
+  use import support.HO
+  use import support.HOList
   
+  (* Types. *)
+  type ty
   
+  (* Type contexts: gives meaning to types by interpreting their variables. *)
+  type ty_ctx
+  function cty_tv ty_ctx : context ident_name int
+  function cty_sym ty_ctx : sym_ctx
+  function cty_d ty_ctx : ty -> bool
+  function cty_m ty_ctx : ty -> D.ty
+  
+  (* Contexts are bounded upward by identifier sets. *)
+  val ghost cty_ubounds (cty:ty_ctx) : unit
+    ensures { subset cty.cty_tv.c_pdom ids.ids }
+    ensures { sym_ctx_wf global_sig.sig_m cty.cty_sym }
+    ensures { context_inv cty.cty_tv }
+  (* Contexts are bounded downward by the free variables of
+     their member types. *)
+  val ghost cty_lbounds (cty:ty_ctx) : unit
+    ensures { forall ty. cty.cty_d ty ->
+      ty_vars_in cty.cty_tv.c_ldom cty.cty_sym.d_tys (cty.cty_m ty) }
+  (* Can make any context as long as the upward bound is respected. *)
+  val ghost make_cty (ctv:context ident_name int) (sym_c:sym_ctx) : ty_ctx
+    requires { subset ctv.c_pdom ids.ids }
+    ensures { result.cty_tv = ctv /\ result.cty_sym = sym_c }
+  (* Transfer model function between contexts in injection relation. *)
+  val ghost map_cty (cty1:ty_ctx) (f:int -> int) (cty2:ty_ctx) : unit
+    requires { context_inj cty1.cty_tv f cty2.cty_tv }
+    requires { sub_sym_ctx cty1.cty_sym cty2.cty_sym }
+    ensures { forall ty. cty1.cty_d ty ->
+      cty2.cty_d ty /\ cty2.cty_m ty = ty_map f id (cty1.cty_m ty) }
+  (* Transfer model function between contexts in inclusion relation. *)
+  val ghost sub_cty (cty1 cty2:ty_ctx) : unit
+    requires { sub_context cty1.cty_tv cty2.cty_tv }
+    requires { sub_sym_ctx cty1.cty_sym cty2.cty_sym }
+    ensures { forall ty. cty1.cty_d ty ->
+      cty2.cty_d ty /\ cty2.cty_m ty = cty1.cty_m ty }
+  (* TODO: context shrinking via free variables membership & an
+     injection/inclusion relation. At least relevant for logic symbols type
+     schemes: they have a basic binding context, which may be shrinked
+     (from the point of view of type symbols) in case the symbol
+     is used in a smaller context later on. *)
+  
+  (* dummy type context to default create_tysymbol parameter. *)
+  constant dummy_ty_ctx : ty_ctx
+  
+  (* Fresh toplevel declaration: identifier class for type symbols. *)
   constant ts_id_class_name : ident_name
   axiom ts_id_class_name_distinct : ts_id_class_name <> tv_id_class_name
   val ghost ts_id_class () : id_class
     ensures { result.id_class_name = ts_id_class_name }
   
-  (* Type symbol may be defined or abstract (expanded alias). *)
+  (* Global growing correspondance between abstract type symbols and
+     their identifiers names. *)
+  type tys_ctx model {
+    mutable cts : context ident_name D.ty_symbol;
+  }
+  type tys_ctx_snapshot model {
+    cts_s : context ident_name D.ty_symbol;
+  }
+  val ghost tys_ctx : tys_ctx
+  val ghost tys_ctx_snapshot () : tys_ctx_snapshot
+    ensures { result.cts_s = tys_ctx.cts }
+  val ghost tys_ctx_growth (s:tys_ctx_snapshot) : unit
+    ensures { sub_context s.cts_s tys_ctx.cts }
+  
+  (* Type symbols: either abstract or alias. *)
   type tysymbol
   function ts_name tysymbol : ident
   function ts_arity tysymbol : int
-  function ts_abs tysymbol : bool
+  predicate ts_alias tysymbol
+  (* In case abstract: name in the logical world. *)
   function ts_m tysymbol : D.ty_symbol
+  (* In case alias: fixed definition context & actual definition. *)
+  function ts_def_ctx tysymbol : ty_ctx
   function ts_def tysymbol : D.ty
-  axiom tv_inv : forall x. exists y z.
-    x.ts_name.id_class = Cons y z /\ y.id_class_name = ts_id_class_name
   
   function ts_idn (tys:tysymbol) : ident_name = tys.ts_name.id_name
+  
+  axiom ts_inv : forall x. (exists y z.
+    x.ts_name.id_class = Cons y z /\ y.id_class_name = ts_id_class_name) /\
+    (x.ts_alias -> let dc = x.ts_def_ctx in
+         dc.cty_tv.c_ldom = range 0 x.ts_arity /\
+         ty_vars_in dc.cty_tv.c_ldom dc.cty_sym.d_tys x.ts_def) /\
+    x.ts_m <> E.tys_prop
+  
+  val ghost ts_inv (x:tysymbol) : unit
+    ensures { exists y z.
+      x.ts_name.id_class = Cons y z /\ y.id_class_name = ts_id_class_name }
+    ensures { (x.ts_alias -> let dc = x.ts_def_ctx in
+                   dc.cty_tv.c_ldom = range 0 x.ts_arity /\
+                   ty_vars_in dc.cty_tv.c_ldom dc.cty_sym.d_tys x.ts_def) }
+    ensures { not x.ts_alias -> let cts = tys_ctx.cts in
+      cts.c_ldom x.ts_m /\ cts.c_pdom x.ts_idn /\
+      cts.c_ltp x.ts_m = x.ts_idn /\ cts.c_ptl x.ts_idn = x.ts_m }
+    ensures { not x.ts_alias -> let gs = global_sig.sig_m in
+      gs.E.tys_belong x.ts_m /\ gs.E.tys_arity x.ts_m = x.ts_arity }
+    ensures { x.ts_m <> E.tys_prop }
+  
+  (* Type symbols procedures. *)
   
   val ts_name (tys:tysymbol) : ident
     ensures { result = tys.ts_name }
   
-  (* Correspondance from type symbols to identifiers.
-     FIXME ? using a logical function imply that all identifiers
-     can be pulled back to a type symbols, e.g that the cardinality
-     of the ident_name type is lower than the cardinality of the
-     type symbol type, which is a priori not evident.
-     (otherwise, type symbol generation simply cannot be implemented)
-     The other technique is to use a growing map, but this is much
-     more convoluted. *)
-  function tys_idn (tys:D.ty_symbol) : ident_name
+  val ts_args (tys:tysymbol) : list tvsymbol
+    ensures { length result = tys.ts_arity }
+    ensures { ts_alias tys ->
+      tys.ts_def_ctx.cty_tv.c_ldom = range 0 tys.ts_arity
+      /\ forall n. 0 <= n < tys.ts_arity ->
+          match nth n result with
+          | None -> false
+          | Some u -> u.tv_idn = tys.ts_def_ctx.cty_tv.c_ltp n
+          end }
   
-  (* TODO: type symbol generation: function from global signature ty_symbols to
-     identifiers & reciprocal. *)
+  val ts_def (tys:tysymbol) : option ty
+    returns { None -> not ts_alias tys
+      | Some ty -> ts_alias tys /\ let cty = tys.ts_def_ctx in
+        cty.cty_d ty /\ cty.cty_m ty = tys.ts_def }
   
-  (* Context mechanism: a type has sense only in a context. *)
-  type ty
+  val ts_equal (tys1 tys2:tysymbol) : bool
+    ensures { not tys1.ts_alias /\ not tys2.ts_alias /\
+      tys1.ts_m = tys2.ts_m -> result }
+    ensures { tys1.ts_idn = tys2.ts_idn -> result }
+    ensures { result -> tys1 = tys2 }
   
-  (* Type context: allowed type variables/symbols and
-     variable name -> integer correspondance.
-     From the point of view of types, corresponds to a domain and
-     an interpretation. *)
-  type ty_ctx model {
-    cty_tv : tv_context;
-    cty_sym : sym_context;
-    cty_d : ty -> bool;
-    cty_m : ty -> D.ty;
-  }
+  val create_tysymbol (ghost idc:list id_class) (ghost cty:ty_ctx)
+    (p:preid) (args:list tvsymbol) (def:option ty) : tysymbol
+    writes { ids , global_sig , tys_ctx }
+    requires { match def with
+      | None -> true
+      | Some ty -> cty.cty_tv.c_ldom = range 0 (length args) /\
+        (forall n. 0 <= n < length args ->
+          match nth n args with
+          | None -> false
+          | Some u -> u.tv_idn = cty.cty_tv.c_ltp n
+          end) /\
+        cty.cty_d ty
+      end }
+    ensures { result.ts_name.id_string = p.pre_name }
+    ensures { result.ts_name.id_label = p.pre_label.Mlab.domain }
+    ensures { result.ts_name.id_loc = p.pre_loc }
+    ensures { exists y. result.ts_name.id_class = Cons y idc /\
+                        y.id_class_name = ts_id_class_name }
+    ensures { not (old ids).ids result.ts_idn }
+    ensures { subset (old ids).ids ids.ids }
+    ensures { ids.ids result.ts_idn }
+    ensures { result.ts_arity = length args }
+    ensures { match def with
+      | None -> not result.ts_alias /\
+        not ((old global_sig).sig_m.E.tys_belong result.ts_m)
+      | Some ty -> result.ts_alias /\ result.ts_def = cty.cty_m ty
+      end }
+    ensures { result.ts_def_ctx = cty }
   
-  type ty_node =
-    | Tyvar tvsymbol
-    | Tyapp tysymbol (list ty)
-  
-  val ty_var (ghost cty:ty_ctx) (vty:tvsymbol) : ty
-    requires { cty.cty_tv.tv_dom vty.tv_idn }
-    ensures { cty.cty_m result = D.TyVar (cty.cty_tv.tv_fun vty.tv_idn) }
+  val ty_var (ghost cty:ty_ctx) (tvs:tvsymbol) : ty
+    requires { cty.cty_tv.c_pdom tvs.tv_idn }
     ensures { cty.cty_d result }
+    ensures { cty.cty_m result = D.TyVar (cty.cty_tv.c_ptl tvs.tv_idn) }
   
   val ty_app (ghost cty:ty_ctx) (tys:tysymbol) (tyl:list ty) : ty
-    requires { for_all cty.cty_d tyl /\ length tyl = tys.ts_arity }
-    requires { if tys.ts_abs
-      then cty.cty_sym.d_tys tys.ts_m
-      else false (* TODO: enable application to defined type symbols. *) }
-    ensures { cty.cty_d result }
-    ensures { if tys.ts_abs
-      then cty.cty_m result = D.TyApp tys.ts_m (map cty.cty_m tyl)
-      else false (* TODO. *) }
+    requires { if tys.ts_alias
+      then sub_sym_ctx tys.ts_def_ctx.cty_sym cty.cty_sym
+      else cty.cty_sym.d_tys tys.ts_m /\ for_all cty.cty_d tyl }
+    ensures { cty.cty_d result /\
+      if tys.ts_alias
+      then let sub = compose cty.cty_m (list_nth tyl default) in
+        cty.cty_m result = ty_subst sub id tys.ts_def
+      else cty.cty_m result = D.TyApp tys.ts_m (map cty.cty_m tyl) }
   
-  (* context creation. *)
-  val ghost make_ty_ctx (ctv:tv_context) (cts:sym_context) : ty_ctx
-    ensures { result.cty_tv = ctv /\ result.cty_sym = cts }
+  type ty_node = Tyvar tvsymbol | Tyapp tysymbol (list ty)
   
-  (* Context injection in another and effect on model. *)
-  val ghost ty_ctx_inj (cty1:ty_ctx) (f:int -> int) (cty2:ty_ctx) : ty_ctx
-    requires { tv_ctx_inj cty1.cty_tv f cty2.cty_tv }
-    requires { sub_sym_context cty1.cty_sym cty2.cty_sym }
-    ensures { subset cty1.cty_d cty2.cty_d }
-    ensures { forall ty. cty1.cty_d ty ->
-      cty2.cty_m ty = ty_map f id (cty1.cty_m ty) }
-  
-  val ghost ty_node (ghost cty:ty_ctx) (ty:ty) : ty_node
+  val ty_node (ghost cty:ty_ctx) (ty:ty) : ty_node
     requires { cty.cty_d ty }
-    returns { Tyvar vty -> cty.cty_m ty = D.TyVar (cty.cty_tv.tv_fun vty.tv_idn)
-      | Tyapp tys tyl -> tys.ts_abs /\
-        cty.cty_m ty = D.TyApp tys.ts_m (map cty.cty_m tyl) /\
-        for_all cty.cty_d tyl }
+    returns { Tyvar tvs -> cty.cty_tv.c_pdom tvs.tv_idn /\
+        cty.cty_m ty = D.TyVar (cty.cty_tv.c_ptl tvs.tv_idn)
+      | Tyapp tys tyl -> for_all cty.cty_d tyl /\ not tys.ts_alias /\
+        cty.cty_sym.d_tys tys.ts_m /\
+        cty.cty_m ty = D.TyApp tys.ts_m (map cty.cty_m tyl) }
+  
+  val ty_equal (ty1 ty2:ty) : bool
+    ensures { result -> ty1 = ty2 }
+    ensures { forall cty. cty.cty_d ty1 /\ cty.cty_d ty2 /\
+      cty.cty_m ty1 = cty.cty_m ty2 -> result }
+  
+  function make_ty_subst (cty:ty_ctx) (m:Mtv.t ty) : int -> D.ty =
+    \n. let id = cty.cty_tv.c_ltp n in
+        if cty.cty_tv.c_ldom n /\ m.Mtv.domain id
+        then cty.cty_m (m.Mtv.bindings id)
+        else D.TyVar n
+  
+  val ty_inst (ghost cty0 cty1:ty_ctx) (m:Mtv.t ty) (ty:ty) : ty
+    requires { cty0.cty_d ty }
+    requires { forall x. m.Mtv.domain x -> cty1.cty_d (m.Mtv.bindings x) }
+    ensures { cty1.cty_d result /\
+      cty1.cty_m result = ty_subst (make_ty_subst cty1 m) id (cty0.cty_m ty) }
+  
+  exception TypeMismatch (ty,ty)
+  
+  (* Match a type [ty] against a type pattern [pat],
+     with an already known partial instantiation [s].
+     Return a minimal extension of s that yield ty if possible,
+     raises otherwise. *)
+  val ty_match (ghost cty0 cty1:ty_ctx) (s:Mtv.t ty) (pat ty:ty) : Mtv.t ty
+    requires { cty0.cty_d pat /\ cty1.cty_d ty }
+    requires { forall x. s.Mtv.domain x -> cty1.cty_d (s.Mtv.bindings x) }
+    (* Correct instantiation. *)
+    ensures {
+      ty_subst (make_ty_subst cty1 result) id (cty0.cty_m pat) = cty1.cty_m ty }
+    (* Unicity. *)
+    ensures { forall f. ty_subst f id (cty0.cty_m pat) = cty1.cty_m ty ->
+      equalizer (ty_tyv_free_var (cty0.cty_m pat))
+                (make_ty_subst cty1 result) f }
+    (* Minimality. *)
+    ensures { forall x. result.Mtv.domain x <->
+      (s.Mtv.domain x \/ (cty0.cty_tv.c_pdom x /\
+                      ty_tyv_free_var (cty0.cty_m pat) (cty0.cty_tv.c_ptl x))) }
+    (* Increase. *)
+    ensures { equalizer s.Mtv.domain s.Mtv.bindings result.Mtv.bindings }
+    (* Invariant. *)
+    ensures { forall x. result.Mtv.domain x ->
+      cty1.cty_d (result.Mtv.bindings x) }
+    (* Failure. *)
+    raises { TypeMismatch _ -> forall f.
+      (forall x. s.Mtv.domain x ->
+        f (cty0.cty_tv.c_ptl x) = cty1.cty_m (s.Mtv.bindings x)) ->
+      ty_subst f id (cty0.cty_m pat) <> cty1.cty_m ty }
+  
+  (* no-raise wrapper. *)
+  let ty_match_sure (ghost cty0 cty1:ty_ctx) (ghost f:int -> D.ty)
+    (s:Mtv.t ty) (pat ty:ty) : Mtv.t ty
+    requires { cty0.cty_d pat /\ cty1.cty_d ty }
+    requires { forall x. s.Mtv.domain x ->
+      cty1.cty_d (s.Mtv.bindings x) /\
+      f (cty0.cty_tv.c_ptl x) = cty1.cty_m (s.Mtv.bindings x) }
+    requires { ty_subst f id (cty0.cty_m pat) = cty1.cty_m ty }
+    ensures {
+      ty_subst (make_ty_subst cty1 result) id (cty0.cty_m pat) = cty1.cty_m ty }
+    ensures { forall f. ty_subst f id (cty0.cty_m pat) = cty1.cty_m ty ->
+      equalizer (ty_tyv_free_var (cty0.cty_m pat))
+                (make_ty_subst cty1 result) f }
+    ensures { forall x. result.Mtv.domain x <->
+      (s.Mtv.domain x \/ (cty0.cty_tv.c_pdom x /\
+                      ty_tyv_free_var (cty0.cty_m pat) (cty0.cty_tv.c_ptl x))) }
+    ensures { equalizer s.Mtv.domain s.Mtv.bindings result.Mtv.bindings }
+    ensures { forall x. result.Mtv.domain x ->
+      cty1.cty_d (result.Mtv.bindings x) }
+  = try ty_match cty0 cty1 s pat ty
+    with TypeMismatch _ -> absurd
+    end
+  
+  val ty_freevars (ghost cty:ty_ctx) (s:Mtv.s) (ty:ty) : Mtv.s
+    requires { cty.cty_d ty }
+    ensures { let ctv = cty.cty_tv in
+      forall x. result.Mtv.domain x <->
+        (s.Mtv.domain x \/
+          (ctv.c_pdom x /\ ty_tyv_free_var (cty.cty_m ty) (ctv.c_ptl x))) }
+  
+  val ty_closed (ghost cty:ty_ctx) (ty:ty) : bool
+    requires { cty.cty_d ty }
+    ensures { result -> ty_tyv_free_var (cty.cty_m ty) = none }
+    ensures { forall x. ty_tyv_free_var (cty.cty_m ty) x -> not result }
+  
+  (* TODO: builtins. *)
   
 end
 

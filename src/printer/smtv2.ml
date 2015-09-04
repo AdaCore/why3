@@ -338,7 +338,7 @@ let rec print_term info fmt t =
 		    ls.ls_name.id_label
 		  | Some _ ->
 		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
-		let t_check_pos = t_label ~loc labels t in
+		let _t_check_pos = t_label ~loc labels t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- S.add t_check_pos info.info_model;*)
 		()

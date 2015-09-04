@@ -15,15 +15,23 @@ open Term
 (*          explanations       *)
 (*******************************)
 
+
+(*
 let expl_regexp = Str.regexp "expl:\\(.*\\)"
+*)
 
 let collect_expls lab =
   Ident.Slab.fold
     (fun lab acc ->
        let lab = lab.Ident.lab_string in
+(*
        if Str.string_match expl_regexp lab 0
        then Str.matched_group 1 lab :: acc
-       else acc)
+       else acc
+*)
+       try
+         let s = Lexlib.remove_prefix "expl:" lab in s :: acc
+       with Not_found -> acc)
     lab
     []
 

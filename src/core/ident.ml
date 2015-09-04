@@ -52,12 +52,12 @@ let is_model_trace_label label =
     true
   with Not_found -> false
 
-let get_model_trace_label labels =
+let get_model_trace_label ~labels =
   Slab.choose (Slab.filter is_model_trace_label labels)
 
 let transform_model_trace_label labels trans_fun =
   try
-    let trace_label = get_model_trace_label labels in
+    let trace_label = get_model_trace_label ~labels in
     let labels_without_trace = Slab.remove trace_label labels in
     let new_trace_label = create_label (trans_fun trace_label.lab_string) in
     Slab.add new_trace_label labels_without_trace
@@ -76,7 +76,7 @@ let append_to_model_trace_label ~labels ~to_append =
     transform_model_trace_label labels trans
 
 let get_model_element_name ~labels =
-  let trace_label = get_model_trace_label labels in
+  let trace_label = get_model_trace_label ~labels in
   let splitted1 = Str.bounded_split (Str.regexp_string ":") trace_label.lab_string 2 in
   match splitted1 with
   | [_; content] ->
@@ -87,6 +87,7 @@ let get_model_element_name ~labels =
       | [el_name] -> el_name
       | _ -> raise Not_found
     end;
+  | [_] -> ""
   | _ -> assert false
 
 
@@ -139,6 +140,9 @@ let id_fresh ?(label = Slab.empty) ?loc nm =
 
 let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
+
+let id_lab label id =
+  create_ident id.id_string label id.id_loc
 
 let id_clone ?(label = Slab.empty) id =
   let ll = Slab.union label id.id_label in
