@@ -1,7 +1,7 @@
 /* Global objects */
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/chrome");
-editor.getSession().setMode("ace/mode/ocaml");
+editor.getSession().setMode("ace/mode/why3");
 var Range = ace.require("ace/range").Range;
 var selectedRange = null;
 var marker = null;
