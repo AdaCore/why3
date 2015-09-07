@@ -56,21 +56,26 @@ val print_model_value : Format.formatter -> model_value -> unit
 ***************************************************************
 *)
 
-type model_element_type =
+type model_element_kind =
 | Result
   (* Result of a function call (if the counter-example is for postcondition)  *)
 | Old
   (* Old value of function argument (if the counter-example is for postcondition)  *)
 | Other
 
+(** Information about the name of the model element *)
+type model_element_name = {
+  men_name   : string;
+    (** The name of the source-code element.  *)
+  men_kind   : model_element_kind;
+    (** The kind of model element. *)
+}
 
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name     : string;
-    (** The name of the source-code element.  *)
-  me_type     : model_element_type;
-    (** The type of model element. *)
+  me_name     : model_element_name;
+    (** Information about the name of the model element  *)
   me_value    : model_value;
     (** Counter-example value for the element. *)
   me_location : Loc.position option;
@@ -116,27 +121,26 @@ val default_model : model
 *)
 
 val print_model :
-  ?me_name_trans:((string * model_element_type) -> string) ->
+  ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->
   unit
 (** Prints the counter-example model
 
     @param me_name_trans the transformation of the model elements
-      names. The input is a pair consisting of the name of model
-      element and type of the model element. The output is the
-      name of the model element that should be displayed.
+      names. The input is information about model element name. The
+      output is the name of the model element that should be displayed.
     @param model the counter-example model to print
 *)
 
 val model_to_string :
-  ?me_name_trans:((string * model_element_type) -> string) ->
+  ?me_name_trans:(model_element_name -> string) ->
   model ->
   string
 (** See print_model  *)
 
 val print_model_vc_term :
-  ?me_name_trans: ((string * model_element_type) -> string) ->
+  ?me_name_trans: (model_element_name -> string) ->
   ?sep: string ->
   Format.formatter ->
   model ->
@@ -150,7 +154,7 @@ val print_model_vc_term :
 *)
 
 val model_vc_term_to_string :
-  ?me_name_trans: ((string * model_element_type) -> string) ->
+  ?me_name_trans: (model_element_name -> string) ->
   ?sep: string ->
   model ->
   string
@@ -160,7 +164,7 @@ val model_vc_term_to_string :
 *)
 
 val print_model_json :
-  ?me_name_trans:((string * model_element_type) -> string) ->
+  ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->
   unit
@@ -171,7 +175,7 @@ val print_model_json :
 *)
 
 val model_to_string_json :
-  ?me_name_trans:((string * model_element_type) -> string) ->
+  ?me_name_trans:(model_element_name -> string) ->
   model ->
   string
 (** See print_model_json *)
@@ -179,7 +183,7 @@ val model_to_string_json :
 val interleave_with_source :
   ?start_comment:string ->
   ?end_comment:string ->
-  ?me_name_trans:((string * model_element_type) -> string) ->
+  ?me_name_trans:(model_element_name -> string) ->
   model ->
   filename:string ->
   source_code:string ->

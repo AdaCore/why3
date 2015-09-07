@@ -93,14 +93,19 @@ print_model_value fmt value =
 **  Model elements
 ***************************************************************
 *)
-type model_element_type =
+
+type model_element_kind =
 | Result
 | Old
 | Other
 
+type model_element_name = {
+  men_name   : string;
+  men_kind   : model_element_kind;
+}
+
 type model_element = {
-  me_name     : string;
-  me_type     : model_element_type;
+  me_name     : model_element_name;
   me_value    : model_value;
   me_location : Loc.position option;
   me_term     : Term.term option;
@@ -111,20 +116,23 @@ let split_me_name name =
   let splitted = Str.bounded_split (Str.regexp_string "@") name 2 in
   match splitted with
   | [first] -> (first, "")
-  | first::[second] ->
-    (first, second)
+  | [first;second] ->
+      (first, second)
   | _ -> (* here, "_" can only stand for [] *)
     ("", "")
 
 let create_model_element ~name ~value ?location ?term () =
   let (name, type_s) = split_me_name name in
-  let t = match type_s with
+  let me_kind = match type_s with
     | "result" -> Result
     | "old" -> Old
     | _ -> Other in
+  let me_name = {
+    men_name = name;
+    men_kind = me_kind;
+  } in
   {
-    me_name = name;
-    me_type = t;
+    me_name = me_name;
     me_value = value;
     me_location = location;
     me_term = term;
@@ -173,9 +181,9 @@ type raw_model_parser =  string -> model_element list
 *)
 let print_model_element me_name_trans fmt m_element =
   if m_element.me_text_info then
-    fprintf fmt "%s" m_element.me_name
+    fprintf fmt "%s" m_element.me_name.men_name
   else
-    let me_name = me_name_trans (m_element.me_name, m_element.me_type) in
+    let me_name = me_name_trans m_element.me_name in
     fprintf fmt  "%s = %a"
       me_name print_model_value m_element.me_value
 
@@ -190,11 +198,11 @@ let print_model_file fmt me_name_trans filename model_file =
       print_model_elements me_name_trans fmt m_elements)
     model_file
 
-let why_name_trans (me_name, me_type) =
-  match me_type with
+let why_name_trans me_name =
+  match me_name.men_kind with
   | Result -> "result"
-  | Old -> "old" ^ " " ^ me_name
-  | Other -> me_name
+  | Old    -> "old" ^ " " ^ me_name.men_name
+  | Other  -> me_name.men_name
 
 let print_model
     ?(me_name_trans = why_name_trans)
@@ -322,7 +330,7 @@ let print_model_json
     fmt
     model =
   let me_name_to_str = fun me ->
-    me_name_trans (me.me_name, me.me_type) in
+    me_name_trans me.me_name in
   Json.map_bindings
     (fun s -> s)
     (print_model_elements_on_lines_json me_name_to_str)
@@ -379,9 +387,9 @@ match raw_model with
   | model_element::raw_strings_tail ->
     let (element_name, element_location, element_term, terms_tail) =
       match terms with
-      | [] -> (model_element.me_name, None, None, [])
+      | [] -> (model_element.me_name.men_name, None, None, [])
       | term::t_tail ->
-        ((get_element_name term model_element.me_name),
+        ((get_element_name term model_element.me_name.men_name),
          term.t_loc,
          Some term, t_tail) in
     let new_model_element = create_model_element
@@ -415,9 +423,12 @@ let handle_contradictory_vc model_files vc_term_loc =
       let model_elements = get_elements model_file line_number in
       if model_elements = [] then
       (* The vc is contradictory, add special model element  *)
+	let me_name = {
+	  men_name = "the check fails with all inputs";
+	  men_kind = Other;
+	} in
 	let me = {
-	  me_name = "the check fails with all inputs";
-	  me_type = Other;
+	  me_name = me_name;
 	  me_value = Unparsed "";
 	  me_location = Some pos;
 	  me_term = None;
