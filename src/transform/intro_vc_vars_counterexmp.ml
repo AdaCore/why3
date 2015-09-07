@@ -24,8 +24,10 @@ let model_label = Ident.create_label "model"
   (* Identifies terms that should be in counterexample and should not be projected. *)
 let model_projected_label = Ident.create_label "model_projected"
   (* Identifies terms that should be in counterexample and should be projected. *)
-let model_vc_term_label = Ident.create_label "model_vc"
+let model_vc_label = Ident.create_label "model_vc"
   (* Identifies the term that triggers the VC. *)
+let model_vc_post_label = Ident.create_label "model_vc_post"
+(* Identifies the postcondition that triggers the VC. *)
 let model_trace_regexp = Str.regexp "model_trace:"
   (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
 
@@ -35,9 +37,8 @@ type vc_term_info = {
   (* true if the term that triggers VC is currently processed *)
   mutable vc_loc : Loc.position option;
   (* the position of the term that triggers VC *)
-  mutable vc_func_name : string option;
-  (* the name of the function for that VC was made. None if VC
-     is not generated for postcondition or precondition) *)
+  mutable vc_pre_or_post : bool;
+  (* true if VC was generated for precondition or postcondition *)
 }
 
 let label_starts_with regexp l =
@@ -49,13 +50,8 @@ let label_starts_with regexp l =
 let get_label labels regexp =
   Slab.choose (Slab.filter (label_starts_with regexp) labels)
 
-let get_fun_name name =
-  let splitted = Str.bounded_split (Str.regexp_string ":") name 2 in
-  match splitted with
-  | _::[second] ->
-    second
-  | _ ->
-    ""
+let is_model_vc_label l = if l = model_vc_label || l = model_vc_post_label then true
+  else false
 
 let check_enter_vc_term t info =
   (* Check whether the term that triggers VC is entered.
@@ -63,22 +59,15 @@ let check_enter_vc_term t info =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if Slab.mem model_vc_term_label t.t_label then begin
+  if Slab.exists is_model_vc_label t.t_label then begin
     info.vc_inside <- true;
     info.vc_loc <- t.t_loc;
-    try
-      (* Label "model_func" => the VC is postcondition or precondition *)
-      (* Extract the function name from "model_func" label *)
-      let fun_label = get_label t.t_label (Str.regexp "model_func") in
-      info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
-    with Not_found ->
-      (* No label "model_func" => the VC is not postcondition or precondition *)
-      ()
+    info.vc_pre_or_post <- Slab.mem model_vc_post_label t.t_label;
   end
 
 let check_exit_vc_term t info =
   (* Check whether the term triggering VC is exited. *)
-  if Slab.mem model_vc_term_label t.t_label then begin
+  if Slab.exists is_model_vc_label t.t_label then begin
     info.vc_inside <- false;
   end
 
@@ -91,12 +80,14 @@ let add_old lab_str =
     else lab_str
   with Not_found -> lab_str ^ "@old"
 
-let model_trace_for_postcondition ~labels info =
+let model_trace_for_postcondition ~labels =
   (* Modifies the  model_trace label of a term in the postcondition:
      - if term corresponds to the initial value of a function
      parameter, model_trace label will have postfix @old
      - if term corresponds to the return value of a function, add
      model_trace label in a form function_name@result
+     Returns labels with model_trace label modified if there
+     exist model_trace label in labels, labels otherwise.
   *)
   try
     let trace_label = get_label labels model_trace_regexp in
@@ -109,11 +100,7 @@ let model_trace_for_postcondition ~labels info =
 	(Ident.create_label lab_str)
 	other_labels
   with Not_found ->
-    (* no model_trace label => the term represents the return value *)
-    Slab.add
-      (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" info.vc_func_name)  ^ "@result"))
-      labels
+    labels
 
 let rec do_intro info t =
   check_enter_vc_term t info;
@@ -127,20 +114,23 @@ let rec do_intro info t =
 	    match info.vc_loc with
 	    | None -> []
 	    | Some loc ->
-	      (* variable inside the term that triggers VC.
-		 Introduce new constant equal to this variable that contains
-	         all labels necessary for collecting it for counterexample*)
-	      let const_label = match info.vc_func_name with
-		| None ->
-		  ls.ls_name.id_label
-		| Some _ ->
-		  model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
-	      let const_label = if (Slab.mem model_label const_label) then const_label
-		else Slab.add model_projected_label const_label in
-	      let const_name = ls.ls_name.id_string^"_vc_constant" in
-	      let axiom_name = ls.ls_name.id_string^"_vc_axiom" in
-	      Intro_projections_counterexmp.intro_const_equal_to_term
-		~term:t ~const_label ~const_loc:loc ~const_name ~axiom_name
+	      (* variable inside the term T that triggers VC.
+		 If the variable should be in counterexample, introduce new constant
+		 in location loc with all labels necessary for collecting the it for
+		 counterexample and make it equal to the variable *)
+	      let is_counterexample_label l = if
+		  l = model_label || l = model_projected_label then true else false in
+	      if Slab.exists is_counterexample_label ls.ls_name.id_label then
+		let const_label = if info.vc_pre_or_post then
+		    model_trace_for_postcondition ~labels:ls.ls_name.id_label
+		  else
+		    ls.ls_name.id_label in
+		let const_name = ls.ls_name.id_string^"_vc_constant" in
+		let axiom_name = ls.ls_name.id_string^"_vc_axiom" in
+		Intro_projections_counterexmp.intro_const_equal_to_term
+		  ~term:t ~const_label ~const_loc:loc ~const_name ~axiom_name
+	      else
+		[]
 	  end
 	  else []
 	| _ ->
@@ -180,7 +170,7 @@ let intro_vc_vars_counterexmp2 task =
   let info = {
     vc_inside = false;
     vc_loc = None;
-    vc_func_name = None;
+    vc_pre_or_post = false;
   } in
   (* Do introduction and find location of term triggering VC *)
   let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info) in
