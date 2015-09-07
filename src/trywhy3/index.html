@@ -57,9 +57,9 @@
 	</li>
 	<li><a href="#">Examples</a>
 	  <ul>
-	    <li><a href="#" onclick="drinkers();">Drinker's paradox</a></li>
-	    <li><a href="#" onclick="simplearith();">Simple Arithmetic</a></li>
-	    <li><a href="#" onclick="isqrt();">Integral square root</a></li>
+	    <li><a href="#"><div id="drinkers">Drinker's paradox</div></a></li>
+	    <li><a href="#"><div id="simplearith">Simple Arithmetic</div></a></li>
+	    <li><a href="#"><div id="isqrt">Integral square root</div></a></li>
 	  </ul>
 	</li>
 	<li><a href="#">Why3</a>
@@ -71,19 +71,18 @@
 	<li><a href="#">Preferences</a>
 	  <ul>
 	    <li><a href="#"
+		   onclick="document.getElementById('radio-wide').click();"
+		   >
+		<input id="radio-wide" type="radio" name="view"
+		       value="wide" checked="checked" onchange="widescreenView();"
+		   />Split Vertically</a>
+	    </li>
+	    <li><a href="#"
 		   onclick="document.getElementById('radio-std').click();"
 		   >
 		<input id="radio-std" type="radio" name="view" value="std"
-		       checked="checked" onchange="standardView();"
+		       onchange="standardView();"
 		   />Split Horizontally</a></li>
-	    <li><a href="#"
-		   onclick="document.getElementById('radio-wide').click();"
-		   >
-		<input  id="radio-wide" type="radio" name="view"
-		       value="wide" onchange="widescreenView();"
-		   />Split Vertically</a>
-	    </li>
-	    <li></li>
 	  </ul>
 	</li>
 	<li style="float:right;"><a href="#">Help</a></li>

@@ -1,10 +1,7 @@
 
-
-module D = Dom_html
-
 module Html = struct
 
-let d = D.document
+let d = Dom_html.document
 
 let node x = (x : #Dom.node Js.t :> Dom.node Js.t)
 
@@ -192,6 +189,29 @@ let () =
     get_opt (Dom_html.document ## getElementById (Js.string "prove"))
   in
   button ## onclick <- handler
+
+let add_file_example buttonname file =
+  let handler = Dom.handler
+    (fun _ev ->
+      let text = Sysutil.file_contents file in
+      let global = Js.Unsafe.global in
+      let editor = Js.Unsafe.get global (Js.string "editor") in
+      Js.Unsafe.set global (Js.string "loadedBuffer") (Js.string text);
+      let loaded = Filename.basename file in
+      Js.Unsafe.set global (Js.string "loadedFilename") (Js.string loaded);
+      ignore (Js.Unsafe.meth_call global "replaceWithLoaded" [| |]);
+      ignore (Js.Unsafe.meth_call editor "focus" [| |]);
+      Js._false)
+  in
+  let button =
+    get_opt (Dom_html.document ## getElementById (Js.string buttonname))
+  in
+  button ## onclick <- handler
+
+let () =
+  add_file_example "drinkers" "/drinkers.why";
+  add_file_example "simplearith" "/simplearith.why";
+  add_file_example "isqrt" "/isqrt.mlw"
 
 
 (*

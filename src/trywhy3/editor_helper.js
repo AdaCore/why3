@@ -36,14 +36,6 @@ function moveToError ()
 editor.on("focus", moveToError);
 
 
-
-function clearConsole ()
-{
-    document.getElementById("console").innerHTML = "";
-    editor.focus();
-}
-
-
 function openFile ()
 {
     document.getElementById("file-selector").click();
@@ -119,31 +111,7 @@ function realOpenFile (ev)
     editor.focus();
 }
 
-function drinkers(ev)
-{
-  loadedBuffer = "theory T\n\
-\n\
-   (** Type of all persons *)\n\
-   type person\n\
-\n\
-   (** Predicate saying that some person drinks *)\n\
-   predicate drinks person\n\
-\n\
-   (** Paradox: there exists a person x such that\n\
-                if x drinks, then everybody drinks *)\n\
-   goal drinkers_paradox: \n\
-     exists x:person. drinks x ->\n\
-       forall y:person. drinks y\n\
-\n\
-end\n\
-";
-  loadedFilename = "drinkers.why";
-  replaceWithLoaded();
-  editor.focus();
-}
-
 fileSelector.addEventListener("change", realOpenFile, false);
-
 
 var saveFile = (function ()
 {

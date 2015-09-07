@@ -1432,6 +1432,9 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=why3.conf:/ \
 		--file=alt_ergo.drv:/ \
+		--file=drinkers.why:/ \
+		--file=simplearith.why:/ \
+		--file=isqrt.mlw:/ \
 		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
 		+weak.js +nat.js $^
 
