@@ -1,8 +1,8 @@
 #!/bin/sh
 # tests for the safe prover
 
-timelimit=1
-memlimit=1000
+timelimit=60
+memlimit=4000
 
 report="report.txt"
 reperr="report_errors.txt"
@@ -11,6 +11,7 @@ report_xml="why3session.xml"
 TMP=bench.out
 
 WHY3CPULIMIT=../../../lib/why3-cpulimit
+export TPTP=/home/marche/TPTP-v6.2.0
 
 run_dir () {
 cat << EOF > $report_xml
@@ -27,7 +28,7 @@ cat << EOF > $report_xml
 <file name="$1.why">
 <theory name="Goals">
 EOF
-for file in `ls $1/???00*.p`; do
+for file in `ls $1/*.p`; do
 $WHY3CPULIMIT $timelimit $memlimit -s build/prover $file > $TMP 2>&1
 ret=$?
 if test "$ret" != "0" -a "$ret" != 152 ; then
@@ -89,7 +90,7 @@ else
     fi
     printf "SPASS: $res $time\n" >> $report
     # zenon modulo
-    $WHY3CPULIMIT `expr $timelimit + 1` $memlimit -s zenon_modulo-0.4.1 -p0 -itptp -max-size $memlimit"M" -max-time $timelimit"s" $file > $TMP 2>&1
+    $WHY3CPULIMIT `expr $timelimit + 1` $memlimit -s zenon_modulo -p0 -itptp -max-size $memlimit"M" -max-time $timelimit"s" $file > $TMP 2>&1
     ret=$?
     time=`sed -n -e 's|.*time : \(.*\) s.*|\1|p' $TMP`
     if grep "PROOF-FOUND" $TMP > /dev/null ; then
