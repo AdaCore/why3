@@ -103,7 +103,7 @@ let run_alt_ergo_on_task t =
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
-let prove text =
+let prove global text =
   let ch = open_out temp_file_name in
   output_string ch text;
   close_out ch;
@@ -148,13 +148,17 @@ let prove text =
     in
     Html.ul theories
   with
+(*
   | Loc.Located(loc,Parser.Error) ->
     let (_,l,b,e) = Loc.get loc in
     Html.par
       [Html.of_string
           (Pp.sprintf "syntax error line %d, columns %d-%d" l b e)]
+*)
   | Loc.Located(loc,e') ->
     let (_,l,b,e) = Loc.get loc in
+    ignore (Js.Unsafe.meth_call global "highlightError"
+	      (Array.map Js.Unsafe.inject [| l-1; b; l-1; e |]));
     Html.par
       [Html.of_string
           (Pp.sprintf
@@ -173,7 +177,7 @@ let () =
       let global = Js.Unsafe.global in
       let editor = Js.Unsafe.get global (Js.string "editor") in
       let code = Js.to_string (Js.Unsafe.meth_call editor "getValue" [| |]) in
-      let answer = prove code in
+      let answer = prove global code in
       (* remove the previous answer if any *)
       let console =
         get_opt (Dom_html.document ## getElementById (Js.string "console"))
@@ -181,6 +185,7 @@ let () =
       Js.Opt.iter (console##lastChild) (Dom.removeChild console);
       (* put the new answer *)
       Dom.appendChild console answer;
+      ignore (Js.Unsafe.meth_call editor "focus" [| |]);
       Js._false)
   in
   let button =
