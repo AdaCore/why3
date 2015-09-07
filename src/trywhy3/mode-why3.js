@@ -80,7 +80,7 @@ var Why3HighlightRules = function() {
             },
             {
                 token : "keyword.operator",
-                regex : "&&|\\|\\||<>|="
+                regex : "&&|\\|\\||/\\\\|\\\\/|->|<->"
             },
             {
                 token : "paren.lparen",
