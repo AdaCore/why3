@@ -70,11 +70,7 @@ let rec add_quant kn (vl,tl,f) v =
 	    | Some pj_ls ->
 	      begin
 		try
-		  let tl = Ident.get_model_trace_label ~labels:pj_ls.ls_name.id_label in
-		  let splitted = Str.bounded_split (Str.regexp_string ":") tl.lab_string 2 in
-		  match splitted with
-		  | [_; t_str] -> t_str
-		  | _ -> ""
+		  Ident.get_model_trace_string ~labels:pj_ls.ls_name.id_label
 		with Not_found -> pj_ls.ls_name.id_string
 	      end
 	    | _ -> ""

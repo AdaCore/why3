@@ -360,26 +360,6 @@ let add_to_model model model_element =
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
-(* Estabilish mapping to why3 code *)
-let rec extract_element_name labels raw_string regexp =
-  match labels with
-  | [] -> raw_string
-  | label::labels_tail ->
-    let l_string = label.lab_string in
-    begin
-      try
-	ignore(Str.search_forward regexp l_string 0);
-	let end_pos = Str.match_end () in
-	String.sub l_string end_pos ((String.length l_string) - end_pos)
-      with Not_found -> extract_element_name labels_tail raw_string regexp
-    end
-
-let get_element_name term raw_string  =
-  let labels = Slab.elements term.t_label in
-  let regexp = Str.regexp "model_trace:" in
-  extract_element_name labels raw_string regexp
-
-
 let rec build_model_rec raw_model terms model =
 match raw_model with
   | [] -> model
@@ -388,6 +368,10 @@ match raw_model with
       match terms with
       | [] -> (model_element.me_name.men_name, None, None, [])
       | term::t_tail ->
+	let get_element_name term raw_string  =
+	  try
+	    get_model_trace_string ~labels:term.t_label
+	  with Not_found -> raw_string in
         ((get_element_name term model_element.me_name.men_name),
          term.t_loc,
          Some term, t_tail) in

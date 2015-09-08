@@ -90,6 +90,13 @@ let get_model_element_name ~labels =
   | [_] -> ""
   | _ -> assert false
 
+let get_model_trace_string ~labels =
+  let tl = get_model_trace_label ~labels in
+  let splitted = Str.bounded_split (Str.regexp_string ":") tl.lab_string 2 in
+  match splitted with
+  | [_; t_str] -> t_str
+  | _ -> ""
+
 
 (** Identifiers *)
 
