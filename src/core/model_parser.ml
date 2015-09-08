@@ -112,17 +112,16 @@ type model_element = {
   me_text_info: bool;
 }
 
-let split_me_name name =
-  let splitted = Str.bounded_split (Str.regexp_string "@") name 2 in
+let split_model_trace_name mt_name =
+  (** Mt_name is of the form "name[@type[@*]]". Return (name, type) *)
+  let splitted = Str.bounded_split (Str.regexp_string "@") mt_name 3 in
   match splitted with
   | [first] -> (first, "")
-  | [first;second] ->
-      (first, second)
-  | _ -> (* here, "_" can only stand for [] *)
-    ("", "")
+  | first::second::_ -> (first, second)
+  | [] -> ("", "")
 
 let create_model_element ~name ~value ?location ?term () =
-  let (name, type_s) = split_me_name name in
+  let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
     | "result" -> Result
     | "old" -> Old
