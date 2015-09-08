@@ -28,10 +28,10 @@ type metarg =
 
 type th_rule =
   | Rprelude   of string
-  | Rsyntaxts  of qualid * string
-  | Rsyntaxfs  of qualid * string
-  | Rsyntaxps  of qualid * string
-  | Rconverter of qualid * string
+  | Rsyntaxts  of qualid * string * bool
+  | Rsyntaxfs  of qualid * string * bool
+  | Rsyntaxps  of qualid * string * bool
+  | Rconverter of qualid * string * bool
   | Rremovepr  of qualid
   | Rmeta      of string * metarg list
 

@@ -497,7 +497,7 @@ module Translate = struct
               { e_node = Eapp ({ e_node = Earrow a }, pv', _) })
         when pv_equal pv' pv
              && Mid.mem a.ps_name info.converters && is_int_constant e1 ->
-          let s = Mid.find a.ps_name info.converters in
+          let s = fst (Mid.find a.ps_name info.converters) in
           let n = Number.compute_int (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])

@@ -27,6 +27,7 @@
       [ "theory", THEORY;
         "end", END;
         "syntax", SYNTAX;
+        "overriding", OVERRIDING;
         "remove", REMOVE;
         "meta", META;
         "prelude", PRELUDE;

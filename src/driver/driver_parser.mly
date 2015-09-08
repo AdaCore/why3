@@ -22,7 +22,7 @@
 %token <string> STRING
 %token <string> OPERATOR
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
@@ -78,16 +78,20 @@ theory:
 | THEORY loc(tqualid) list(loc(trule)) END
     { { thr_name = $2; thr_rules = $3 } }
 
+syntax:
+| OVERRIDING SYNTAX { true }
+| SYNTAX            { false }
+
 trule:
-| PRELUDE STRING                   { Rprelude   ($2) }
-| SYNTAX TYPE      qualid STRING   { Rsyntaxts  ($3, $4) }
-| SYNTAX CONSTANT  qualid STRING   { Rsyntaxfs  ($3, $4) }
-| SYNTAX FUNCTION  qualid STRING   { Rsyntaxfs  ($3, $4) }
-| SYNTAX PREDICATE qualid STRING   { Rsyntaxps  ($3, $4) }
-| SYNTAX CONVERTER qualid STRING   { Rconverter ($3, $4) }
-| REMOVE PROP qualid               { Rremovepr  ($3) }
-| META ident meta_args             { Rmeta      ($2, $3) }
-| META STRING meta_args            { Rmeta      ($2, $3) }
+| PRELUDE STRING                 { Rprelude   ($2) }
+| syntax TYPE      qualid STRING { Rsyntaxts  ($3, $4, $1) }
+| syntax CONSTANT  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
+| syntax FUNCTION  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
+| syntax PREDICATE qualid STRING { Rsyntaxps  ($3, $4, $1) }
+| syntax CONVERTER qualid STRING { Rconverter ($3, $4, $1) }
+| REMOVE PROP qualid             { Rremovepr  ($3) }
+| META ident meta_args           { Rmeta      ($2, $3) }
+| META STRING meta_args          { Rmeta      ($2, $3) }
 
 meta_args: separated_nonempty_list(COMMA,meta_arg) { $1 }
 
