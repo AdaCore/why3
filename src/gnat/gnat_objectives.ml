@@ -743,16 +743,17 @@ let add_to_stat prover pr stat =
        []
 
    let spark_counterexample_transform me_name =
+     let append_after_var_name access to_append =
+       (* Access can be either var_name or var_name.rec_fields *)
+       let splitted = Str.bounded_split (Str.regexp_string ".") access 2 in
+       match splitted with
+       | [var_name; field_access] -> var_name ^ to_append ^ "." ^ field_access
+       | _ -> access ^ to_append in
+
      match me_name.men_kind with
-     | Result ->
-       begin
-	 let splitted = Str.bounded_split (Str.regexp_string ".") me_name.men_name 2 in
-	 match splitted with
-	 | [before; after] -> before ^ "'Result" ^ "." ^ after
-	 | _ -> me_name.men_name ^ "'Result"
-       end
-     | Old -> me_name.men_name ^ "'" ^ "Old"
-     | Other -> me_name.men_name
+     | Model_parser.Result -> append_after_var_name me_name.men_name "'Result"
+     | Model_parser.Old -> append_after_var_name me_name.men_name "'Old"
+     | Model_parser.Other -> me_name.men_name
 
    let save_counterexample goal counterexample ~trace  =
      if not (is_model_empty counterexample) then begin
