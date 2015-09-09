@@ -59,7 +59,7 @@ let ls_selects_def_of_ts acc ts =
     (fun _ -> create_vsymbol (id_fresh "x") ty_type) ts.ts_args
   in
   let tvars = List.map t_var vars in
-  (** type to int *)
+  (* type to int *)
   let id = id_hash ts.ts_name in
   let acc =
     let t = fs_app ls tvars ty_type in
@@ -68,7 +68,7 @@ let ls_selects_def_of_ts acc ts =
     let prsymbol = create_prsymbol (id_clone ts.ts_name) in
     create_prop_decl Paxiom prsymbol f :: acc
   in
-  (** select *)
+  (* select *)
   let ls_selects = ls_selects_of_ts ts in
   let fmlas = List.rev_map2
     (fun ls_select value ->
@@ -142,7 +142,7 @@ module Transform = struct
       (* creates a new lsymbol with the same name but a different type *)
       Term.create_lsymbol (id_clone lsymbol.ls_name) args lsymbol.ls_value)
 
-  (** {1 transformations} *)
+  (* {1 transformations} *)
     (** todo use callback for this one *)
   let rec f_open_all_quant q f = match f.t_node with
     | Tquant (q', f) when q' = q ->

@@ -1,4 +1,5 @@
 open Why3
+open Model_parser
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -741,31 +742,31 @@ let add_to_stat prover pr stat =
        trace
        []
 
-   let spark_counterexample_transform (me_name, me_type) =
-     match me_type with
-     | Model_parser.Result ->
+   let spark_counterexample_transform me_name =
+     match me_name.men_kind with
+     | Result ->
        begin
-	 let splitted = Str.bounded_split (Str.regexp_string ".") me_name 2 in
+	 let splitted = Str.bounded_split (Str.regexp_string ".") me_name.men_name 2 in
 	 match splitted with
 	 | [before; after] -> before ^ "'Result" ^ "." ^ after
-	 | _ -> me_name ^ "'Result"
+	 | _ -> me_name.men_name ^ "'Result"
        end
-     | Model_parser.Old -> me_name ^ "'" ^ "Old"
-     | Model_parser.Other -> me_name
+     | Old -> me_name.men_name ^ "'" ^ "Old"
+     | Other -> me_name.men_name
 
    let save_counterexample goal counterexample ~trace  =
-     if not (Model_parser.is_model_empty counterexample) then begin
+     if not (is_model_empty counterexample) then begin
        let check = get_objective goal in
        let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
        let counterexample = if trace = Gnat_loc.S.empty then
 	   counterexample
 	 else
-	   Model_parser.model_for_positions_and_decls
+	   model_for_positions_and_decls
 	     counterexample ~positions:(trace_to_list trace) in
        with_fmt_channel
 	 ce_fn
 	 (fun fmt -> Format.fprintf fmt "%a@."
-	   (Model_parser.print_model_json
+	   (print_model_json
 	      ~me_name_trans:spark_counterexample_transform) counterexample);
        ce_fn
      end

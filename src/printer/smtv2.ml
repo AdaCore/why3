@@ -32,23 +32,23 @@ let ident_printer =
      "funs";"extrafuns";"extrasorts";"extrapreds";"language";
      "notes";"preds";"sorts";"status";"theory";"Int";"Real";"Bool";
      "Array";"U";"select";"store"]*)
-    (** smtlib2 V2 p71 *)
-    [(** Base SMT-LIB tokens *)
+    (* smtlib2 V2 p71 *)
+    [(* Base SMT-LIB tokens *)
       "assert"; "check-sat"; "declare-fun"; "declare-sort"; "define-fun";
       "define-sort"; "get-value"; "get-assignment"; "get-assertions";
       "get-proof"; "get-unsat-core"; "exit"; "ite"; "let"; "!"; "_";
       "set-logic"; "set-info"; "get-info"; "set-option"; "get-option";
       "push"; "pop"; "as";
 
-      (** extended commands *)
+      (* extended commands *)
       "declare-datatypes"; "get-model"; "echo"; "assert-rewrite";
       "assert-reduction"; "assert-propagation"; "declare-sorts";
       "declare-funs"; "declare-preds"; "define"; "declare-const";
       "simplify";
 
-      (** attributes *)
+      (* attributes *)
 
-      (** operators, including theory symbols *)
+      (* operators, including theory symbols *)
       "and"; "distinct"; "exists"; "forall"; "is_int"; "not"; "or"; "select";
       "store"; "to_int"; "to_real"; "xor";
 
@@ -92,7 +92,7 @@ let ident_printer =
       "abs";
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
-      (** From Z3 *)
+      (* From Z3 *)
       "map"; "bv"; "subset"; "union"
       ]
   in
@@ -251,7 +251,7 @@ let model_trace_for_postcondition ~labels info =
       labels
 
 let get_fun_name name =
-  let splitted = Str.bounded_split (Str.regexp_string ":") name 2 in
+  let splitted = Strings.bounded_split ':' name 2 in
   match splitted with
   | _::[second] ->
     second

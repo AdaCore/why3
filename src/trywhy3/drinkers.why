@@ -1,0 +1,15 @@
+theory T
+
+   (** Type of all persons *)
+   type person
+
+   (** Predicate saying that some person drinks *)
+   predicate drinks person
+
+   (** Paradox: there exists a person x such that if x drinks,
+       then everybody drinks *)
+   goal drinkers_paradox:
+     exists x:person. drinks x ->
+       forall y:person. drinks y
+
+end

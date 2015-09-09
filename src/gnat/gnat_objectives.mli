@@ -169,7 +169,7 @@ module Save_VCs : sig
       ("", Gnat_loc.S.empty) if no trace was saved *)
 
    val spark_counterexample_transform :
-     (string * Model_parser.model_element_type) -> string
+     Model_parser.model_element_name -> string
    (* Transformation of counterexample model elements names to SPARK syntax.
    *)
 

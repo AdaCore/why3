@@ -181,7 +181,7 @@ let is_valid pr =
 
 let to_edit_queue = Queue.create ()
 
-let is_successful env = (** means all goals proved*)
+let is_successful env = (* means all goals proved*)
   try
     let rec iter = function
         | File f -> file_iter iter f
@@ -310,7 +310,7 @@ let run_one sched env config filters interactive_provers fname =
 	      callback in
           M.edit_proof_v3 env_session sched
 	    ~cntexample:false
-            ~default_editor:"" (** TODO? *)
+            ~default_editor:"" (* TODO? *)
             ~callback:callback_edit a
         else
           Todo.stop todo;

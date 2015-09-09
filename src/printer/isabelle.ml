@@ -326,9 +326,9 @@ let print_logic_decl info fmt ((ls, _) as d) =
   forget_tvs ()
 
 let print_logic_decl info fmt d =
-  (** During realization the definition of a "builtin" symbol is
-      printed and an equivalence lemma with associated Isabelle function is
-      requested *)
+  (* During realization the definition of a "builtin" symbol is
+     printed and an equivalence lemma with associated Isabelle function is
+     requested *)
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     print_logic_decl info fmt d
   else if info.realization then

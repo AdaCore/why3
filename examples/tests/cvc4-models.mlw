@@ -11,7 +11,7 @@ module M
   val y "model" "model_trace:y" :ref int
 
   let incr ( x23 "model" "model_trace:x23" : ref int ): unit
-  ensures { "model_vc" "model_func" !x23 = old !x23 + 2 + !y }
+  ensures { "model_vc_post" !x23 = old !x23 + 2 + !y }
   =
   (*#"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#*)
   y := !y + 1;
@@ -68,7 +68,7 @@ module M
   meta "model_projection" function projf_r_g
 
   let record_match_eval_test1 (x "model" "model_trace:x" : r) : int
-  ensures { "model_vc" "model_func" result = 1 }
+  ensures { "model_vc_post" result = 1 }
   =
   if x.g then
     x.f
@@ -86,7 +86,7 @@ module M
   x := { !x with f = 6}
 
   let record_match_eval_test4 (x "model" "model_trace:x" : ref r) : r
-  ensures { "model_vc" "model_func" result.g }
+  ensures { "model_vc_post" result.g }
   =
   x := { !x with f = 6 };
   !x
@@ -94,7 +94,7 @@ module M
   val re "model_projected" : ref r
 
   let test_record_match_eval_test5 (x "model" "model_trace:x" : ref r) : r
-  ensures { "model_vc" "model_func" result = !re }
+  ensures { "model_vc_post" result = !re }
   =
   x := { !x with f = 6 };
   !x

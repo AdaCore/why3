@@ -96,17 +96,15 @@ let rec add_quant kn (vl,tl,f) v =
 	    | Some pj_ls ->
 	      begin
 		try
-		  Ident.get_model_element_name ~labels:pj_ls.ls_name.id_label
+		  Ident.get_model_trace_string ~labels:pj_ls.ls_name.id_label
 		with Not_found -> pj_ls.ls_name.id_string
 	      end
 	    | _ -> ""
 	  ) in
-	  let field_str = if field_name <> "" then "." ^ field_name
-	    else "" in
+	  let field_str = if field_name = "" then "" else "." ^ field_name in
 	  let label = Ident.append_to_model_element_name
 	    ~labels:v.vs_name.id_label ~to_append:(field_str) in
 	  create_vsymbol (id_lab label v.vs_name) (ty_inst s ty) in
-
         let nvl = List.map2 mk_v ls.ls_args pjl in
         let t = fs_app ls (List.map t_var nvl) ty in
         let f = t_let_close_simp v t f in

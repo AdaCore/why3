@@ -173,7 +173,7 @@ type gp_label =
   | Gp_Shape of string
 
 let read_label s =
-    if Strings.starts_with s "GP_" then
+    if Strings.has_prefix "GP_" s then
        match Gnat_util.colon_split s with
        | ["GP_Reason"; reason] ->
              Some (Gp_Reason (reason_from_string reason))
@@ -261,7 +261,7 @@ let read_vc_labels s =
      if b.check_reason = Some VC_Loop_Invariant then begin
         Ident.Slab.iter (fun x ->
            let s = x.Ident.lab_string in
-           if Strings.starts_with s "expl:" then
+           if Strings.has_prefix "expl:" s then
               if s = "expl:loop invariant init" then
                  b.check_reason <- Some VC_Loop_Invariant_Init
               else

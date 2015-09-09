@@ -89,7 +89,7 @@ module Mmeta_args = Extmap.Make(struct
 
   let compare_meta_arg x y =
     match x,y with
-  (** These hash are in fact tag *)
+    (* These hash are in fact tag *)
     | MAty  x, MAty  y -> compare (ty_hash x) (ty_hash y)
     | MAts  x, MAts  y -> compare (ts_hash x) (ts_hash y)
     | MAls  x, MAls  y -> compare (ls_hash x) (ls_hash y)
@@ -404,9 +404,9 @@ module PTreeT = struct
     | Session s ->
       let l = ref [] in
       session_iter (fun a -> l := (Any a)::!l) s;
-      (** Previously "" was `Filename.basename s.session_dir` but
-          the tree depend on the filename given in input and not the content
-          which is not easy for diffing
+      (* Previously "" was `Filename.basename s.session_dir` but
+         the tree depend on the filename given in input and not the content
+         which is not easy for diffing
       *)
       "",!l
 
@@ -664,7 +664,7 @@ and save_metas ctxt fmt _ m =
       save_string ts.ts_name.id_string (List.length ts.ts_args)
       (ts_hash ts) save_pos pos in
   let save_ls_pos fmt ls pos =
-    (** TODO: add the signature? *)
+    (* TODO: add the signature? *)
     fprintf fmt "@\n@[<hov 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</ls_pos>"
       save_string ls.ls_name.id_string
       (ls_hash ls) save_pos pos
@@ -1137,7 +1137,7 @@ let int_attribute field r =
   try
     int_of_string (List.assoc field r.Xml.attributes)
   with Not_found | Invalid_argument _ ->
-    (** TODO: use real error *)
+    (* TODO: use real error *)
     eprintf "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name;
     assert false
@@ -1307,7 +1307,7 @@ and load_proof_or_transf ctxt mg a =
              [] a.Xml.elements);
         (* already done by raw_add_transformation:
            Hashtbl.add mg.transformations trname mtr *)
-        (** The attribute "proved" is required but not read *)
+        (* The attribute "proved" is required but not read *)
         mtr.transf_verified <- transf_verified mtr
     | "metas" -> load_metas ctxt mg a;
     | "label" -> ()
@@ -1349,7 +1349,7 @@ and load_metas ctxt mg a =
             let idpos_ts = Mts.add ts pos idpos.idpos_ts in
             { idpos with idpos_ts = idpos_ts }
           | "ls_pos" ->
-            (** TODO signature? *)
+            (* TODO signature? *)
             let ls = Term.create_lsymbol (Ident.id_fresh name) [] None in
             Hint.add hls intid ls;
             let idpos_ls = Mls.add ls pos idpos.idpos_ls in
@@ -1427,7 +1427,7 @@ and load_metas ctxt mg a =
     List.hd (load_goal ctxt (Parent_metas metas) [] goal);
   (* already done by raw_add_transformation:
      Hashtbl.add mg.transformations trname mtr *)
-  (** The attribute "proved" is required but not read *)
+  (* The attribute "proved" is required but not read *)
   metas.metas_verified <- metas_verified metas
 
 
@@ -1467,7 +1467,7 @@ let load_file ~keygen session old_provers f =
         mf.file_verified <- file_verified mf;
         old_provers
     | "prover" ->
-      (** The id is just for the session file *)
+      (* The id is just for the session file *)
         let id = string_attribute "id" f in
         begin
           try
@@ -1495,7 +1495,7 @@ let load_session ~keygen session xml =
       let shape_version = int_attribute_def "shape_version" xml 1 in
       session.session_shape_version <- shape_version;
       Debug.dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
-      (** just to keep the old_provers somewhere *)
+      (* just to keep the old_provers somewhere *)
       let old_provers =
         List.fold_left (load_file ~keygen session) Mint.empty xml.Xml.elements
       in
@@ -1620,7 +1620,7 @@ let read_session_with_keys ~keygen dir =
   let xml_filename = Filename.concat dir db_filename in
   let session = empty_session dir in
   let use_shapes =
-  (** If the xml is present we read it, otherwise we consider it empty *)
+  (* If the xml is present we read it, otherwise we consider it empty *)
     if Sys.file_exists xml_filename then
       try
         Tc.reset_dict ();
@@ -1682,7 +1682,7 @@ let read_file env ?format fn =
   let ltheories =
     Mstr.fold
       (fun name th acc ->
-        (** Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
+        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
         let th_name =
           Ident.id_register (Ident.id_derive name th.Theory.th_name) in
          match th.Theory.th_name.Ident.id_loc with
@@ -1851,7 +1851,7 @@ let add_registered_metas ~keygen env added0 g =
     let add_meta task (s,l) =
       let m = Theory.lookup_meta s in
       Task.add_meta task m l in
-    (** add before the goal *)
+    (* add before the goal *)
     let task = List.fold_left add_meta task0 added0 in
     let task = add_tdecl task goal in
     let idpos = pos_of_metas added0 in
@@ -1924,16 +1924,16 @@ let copy_external_proof
   let nprover = match prover with
     | None -> a.proof_prover
     | Some prover -> prover in
-  (** copy or generate the edit file if needed *)
+  (* copy or generate the edit file if needed *)
   let edit =
     match edit, a.proof_edited_as, session with
       | Some edit, _, _ -> edit
       | _, None, _ -> None
-      | _, _, None -> (** In the other case a session is needed *)
+      | _, _, None -> (* In the other case a session is needed *)
         None
       | _, Some file, Some session ->
         assert (file != "");
-        (** Copy the edited file *)
+        (* Copy the edited file *)
         let dir = session.session_dir in
         let file = Filename.concat dir file in
         if not (Sys.file_exists file) then None else
@@ -1944,7 +1944,7 @@ let copy_external_proof
             let dst_file = Sysutil.relativize_filename dir dst_file in
             Some dst_file
           | (_, _, None,_)| (_, _, _, None) ->
-            (** In the other cases an env_session and a task are needed *)
+            (* In the other cases an env_session and a task are needed *)
             None
           | _, _, Some task, Some env_session ->
             match load_prover env_session nprover with
@@ -2079,11 +2079,11 @@ exception Pr_not_found of prsymbol
 
 
 let merge_metas_in_task ~theories env task from_metas =
-  (** Find in the new task the new symbol (ts,ls,pr) *)
-  (** We order the position bottom up and find the ident as we go
-      through the task *)
+  (* Find in the new task the new symbol (ts,ls,pr) *)
+  (* We order the position bottom up and find the ident as we go
+     through the task *)
 
-  (** hashtbl that will contain the conversion *)
+  (* hashtbl that will contain the conversion *)
   let hts = Hts.create 4 in
   let hls = Hls.create 4 in
   let hpr = Hpr.create 10 in
@@ -2138,7 +2138,7 @@ let merge_metas_in_task ~theories env task from_metas =
       meta_name
       (Pp.print_list Pp.space Pretty.print_meta_arg) meta_args in
 
-  (** Now convert the metas to the new symbol *)
+  (* Now convert the metas to the new symbol *)
   let add_meta ((metas,task) as acc) meta_name meta_args =
     let conv_ts ts = Hts.find_exn hts (Ts_not_found ts) ts in
     let conv_ls ls = Hls.find_exn hls (Ls_not_found ls) ls in
@@ -2222,9 +2222,9 @@ type 'key update_context =
 
 let rec recover_sub_tasks ~theories env_session task g =
   g.goal_task <- Some task;
-  (** Check that the sum and shape don't change (the order is kept)
-      It seems an acceptable limitation. Non-deterministic transformation seems
-      ugly.
+  (* Check that the sum and shape don't change (the order is kept)
+     It seems an acceptable limitation. Non-deterministic transformation seems
+     ugly.
   *)
   let version = env_session.session.session_shape_version in
   let sum = Termcode.task_checksum ~version task in
@@ -2243,8 +2243,8 @@ let rec recover_sub_tasks ~theories env_session task g =
   Mmetas_args.iter (fun _ t ->
       let task,_metas,_to_idpos,_obsolete =
         merge_metas_in_task ~theories env_session task t in
-      (** It is better to keep the original metas and idpos *)
-      (** If it is obsolete the next task will see it *)
+      (* It is better to keep the original metas and idpos *)
+      (* If it is obsolete the next task will see it *)
       recover_sub_tasks ~theories env_session task t.metas_goal
     ) g.goal_metas
 
@@ -2599,14 +2599,14 @@ and add_metas_to_goal ~keygen env to_goal from_metas =
       from_metas.metas_added from_metas.metas_idpos
   in
   let goal,task0 = Task.task_separate_goal (goal_task to_goal) in
-  (** add before the goal *)
+  (* add before the goal *)
   let task =
     try
       Mstr.fold_left
         (fun task name s ->
           let m = Theory.lookup_meta name in
           Smeta_args.fold_left
-            (fun task l -> Task.add_meta task m l) (** TODO: try with *)
+            (fun task l -> Task.add_meta task m l) (* TODO: try with *)
             task s)
         task0 from_metas.metas_added
     with exn ->

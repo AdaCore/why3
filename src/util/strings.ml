@@ -15,7 +15,6 @@ let copy = String.copy
 let set = String.set
 
 
-
 let rev_split c s =
   let rec aux acc i =
     try
@@ -26,6 +25,18 @@ let rev_split c s =
   aux [] 0
 
 let split c s = List.rev (rev_split c s)
+
+let rev_bounded_split c s n =
+  let rec aux acc i n =
+    if n = 1 then acc else
+    try
+      let j = String.index_from s i c in
+      aux ((String.sub s i (j-i))::acc) (j+1) (n-1)
+    with Not_found -> (String.sub s i (String.length s - i))::acc
+      | Invalid_argument _ -> ""::acc in
+  aux [] 0 n
+
+let bounded_split c s n = List.rev (rev_bounded_split c s n)
 
 let ends_with s suf =
   let rec aux s suf suflen offset i =
@@ -46,16 +57,19 @@ let pad_right c s i =
   then String.sub s 0 i
   else s
 
-let starts_with s pref =
-   let plen = String.length pref in
-   let slen = String.length s in
-   if plen > slen then false
-   else try
-      for i = 0 to plen - 1 do
-         if s.[i] <> pref.[i] then raise Exit;
-      done;
-      true
-   with Exit -> false
-
 let slice s start end_ =
   String.sub s start (end_ - start)
+
+let has_prefix pref s =
+  let l = String.length pref in
+  if String.length s < l then false else
+    try
+      for i = 0 to l - 1 do if s.[i] <> pref.[i] then raise Exit done;
+      true
+    with Exit -> false
+
+let remove_prefix pref s =
+  let l = String.length pref in
+  if String.length s < l then raise Not_found else
+  for i = 0 to l - 1 do if s.[i] <> pref.[i] then raise Not_found done;
+  String.sub s l (String.length s - l)
