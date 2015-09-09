@@ -1,6 +1,19 @@
 
 (*
 
+  small helpers
+
+ *)
+
+let get_opt o =
+  Js.Opt.get o (fun () -> assert false)
+
+let log s =
+  Firebug.console ## log (Js.string s)
+
+
+(*
+
   module for generating HTML elements
 
 *)
@@ -30,17 +43,13 @@ let ul nl =
 
 end
 
-let get_opt o =
-  Js.Opt.get o (fun () -> assert false)
+(*
 
-let log s =
-  Firebug.console ## log (Js.string s)
+  Interface to Why3 and Alt-Ergo
 
-let temp_file_name = "/input.mlw"
-let why3_conf_file = "/why3.conf"
+*)
 
-let () =
-  Sys_js.register_file ~name:temp_file_name ~content:""
+let why3_conf_file = "/trywhy3.conf"
 
 open Why3
 open Format
@@ -63,7 +72,6 @@ let alt_ergo : Whyconf.config_prover =
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
-
 let alt_ergo_driver : Driver.driver =
   try
     Printexc.record_backtrace true;
@@ -73,7 +81,6 @@ let alt_ergo_driver : Driver.driver =
     eprintf "Failed to load driver for alt-ergo: %a@.%s@."
       Exn_printer.exn_printer e s;
   exit 1
-
 
 let run_alt_ergo_on_task t =
   (* printing the task in a string *)
@@ -181,6 +188,18 @@ let why3_execute (modules,_theories) =
 
 *)
 
+
+(*
+
+   Connecting why3 calls to the interface
+
+ *)
+
+let temp_file_name = "/input.mlw"
+
+let () =
+  Sys_js.register_file ~name:temp_file_name ~content:""
+
 let run_why3 f lang global text =
   let ch = open_out temp_file_name in
   output_string ch text;
@@ -190,13 +209,6 @@ let run_why3 f lang global text =
     let theories = Env.read_file lang env temp_file_name in
     f theories
   with
-(*
-  | Loc.Located(loc,Parser.Error) ->
-    let (_,l,b,e) = Loc.get loc in
-    Html.par
-      [Html.of_string
-          (Pp.sprintf "syntax error line %d, columns %d-%d" l b e)]
-*)
   | Loc.Located(loc,e') ->
     let (_,l,b,e) = Loc.get loc in
     ignore (Js.Unsafe.meth_call global "highlightError"
@@ -239,6 +251,13 @@ let add_why3_cmd buttonname f lang =
 let () =
   add_why3_cmd "prove" why3_prove Env.base_language;
   add_why3_cmd "run" why3_execute Mlw_module.mlw_language
+
+
+(*
+
+  Predefined examples
+
+*)
 
 let add_file_example buttonname file =
   let handler = Dom.handler

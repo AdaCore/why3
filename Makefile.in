@@ -1430,8 +1430,8 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
            -syntax camlp4o -I src/trywhy3
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml --extern-fs -I src/trywhy3 -I . --file=why3.conf:/ \
-		--file=alt_ergo.drv:/ \
+	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
+		--file=try_alt_ergo.drv:/ \
 		--file=drinkers.why:/ \
 		--file=simplearith.why:/ \
 		--file=isqrt.mlw:/ \
