@@ -88,7 +88,7 @@ type timeout_action =
   | Any_timeout of (unit -> bool)
 
 type t =
-    { (** Actions that wait some idle time *)
+    { (* Actions that wait some idle time *)
       actions_queue : action Queue.t;
       (** Quota of action slot *)
       mutable maximum_running_proofs : int;
@@ -138,7 +138,7 @@ let timeout_handler t =
   Debug.dprintf debug "[Sched] Timeout handler called@.";
   assert (not t.timeout_handler_running);
   t.timeout_handler_running <- true;
-  (** Check if some action ended *)
+  (* Check if some action ended *)
   let l = List.fold_left
     (fun acc c ->
        match c with
@@ -153,7 +153,7 @@ let timeout_handler t =
              if b then c::acc else acc)
     [] t.running_proofs
   in
-  (** Check if some new actions must be started *)
+  (* Check if some new actions must be started *)
   let l =
     if List.length l < t.maximum_running_proofs then
       begin try
@@ -167,7 +167,7 @@ let timeout_handler t =
     else l
   in
   t.running_proofs <- l;
-  (** Call the running check *)
+  (* Call the running check *)
   t.running_check <- List.fold_left
     (fun acc check -> if check () then check::acc else acc)
     [] t.running_check;
@@ -921,7 +921,7 @@ let rec clean = function
         else metas_iter clean m)
       g
   | Goal g ->
-    (** don't iter on proof_attempt if the goal is not proved *)
+    (* don't iter on proof_attempt if the goal is not proved *)
     iter_goal (fun _ -> ()) (transf_iter clean) (metas_iter clean) g
   | Proof_attempt a -> clean (Goal a.proof_parent)
   | any -> iter clean any

@@ -96,7 +96,7 @@ let get_to_prover pk session config =
   match pk with
     | Some pk -> To_prover pk
     | None when !opt_to_known
-           -> (** We are in the case --to-known-prover *)
+           -> (* We are in the case --to-known-prover *)
       assert (!opt_to_known);
       let known_provers = get_provers config in
       let provers = get_used_provers session in
@@ -130,7 +130,7 @@ let run_one ~action env config filters pk fname =
       let prn = match prover with
         | None -> pr
         | Some prover ->
-      (** If such a prover already exists on the goal *)
+      (* If such a prover already exists on the goal *)
           let exists =
             (PHprover.mem pr.proof_parent.goal_external_proofs prover) in
           let replace = not exists || match !opt_replace with
@@ -139,7 +139,7 @@ let run_one ~action env config filters pk fname =
               interactive
                 (PHprover.find pr.proof_parent.goal_external_proofs prover)
             | Not_valid ->
-              let rm = 
+              let rm =
                 PHprover.find pr.proof_parent.goal_external_proofs prover
               in
               not (Opt.inhabited (proof_verified rm))
@@ -153,8 +153,8 @@ let run_one ~action env config filters pk fname =
         | Some b -> set_archived prn b end;
       raise Exit
     with
-      | NoAlt -> () (** a known prover or no alternative has been found *)
-      | Exit  ->    (** normal or existing prover not replaced *)
+      | NoAlt -> () (* a known prover or no alternative has been found *)
+      | Exit  ->    (* normal or existing prover not replaced *)
         match action with
           | CopyArchive -> set_archived pr true
           | Mod when to_prover <> SameProver -> remove_external_proof pr
@@ -173,13 +173,13 @@ let run ~action () =
   let env,config,should_exit1 = read_env_spec () in
   let filters,should_exit2 = read_filter_spec config in
   if should_exit1 || should_exit2 then exit 1;
-  (** sanitize --to-prover and --to-known-prover for Copy* *)
+  (* sanitize --to-prover and --to-known-prover for Copy* *)
   if action<>Mod && (!opt_to_prover <> None) = (!opt_to_known) then begin
     eprintf "The option --to-prover@ and@ --to-known-prover@ are@ exclusive@ \
 but@ one@ is@ needed.@.";
     exit 1
   end;
-  (** get the provers *)
+  (* get the provers *)
   let pk = read_to_prover config in
   try
     iter_files (run_one ~action env config filters pk)

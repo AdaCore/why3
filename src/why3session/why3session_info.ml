@@ -404,7 +404,7 @@ let print_hist stats =
         " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n"
         pf (string_of_prover p);
       let fmt = formatter_of_out_channel ch in
-      (** The time is also accumulated in order to obtain the total cpu time
+      (* The time is also accumulated in order to obtain the total cpu time
           taken to reach the given number of proved goal *)
       fprintf fmt "0.01 0@\n";
       let (_ : float * int) =

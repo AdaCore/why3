@@ -299,7 +299,7 @@ let latex_longtable n fmt depth name provers t=
   fprintf fmt "{| l |";
   for _i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "}@.";
-  (** First head *)
+  (* First head *)
   print_head n depth provers fmt;
   fprintf fmt "\\hline \\endfirsthead @.";
   (** Other heads : "Continued... " added *)

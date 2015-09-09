@@ -430,7 +430,7 @@ let read_comment =
   let end_comment = Str.regexp ".*\\*)" in
   fun ch ->
     let line = ref "" in
-    (** look for "( * name" *)
+    (* look for "( * name" *)
     let name =
       try
         while true do
@@ -442,7 +442,7 @@ let read_comment =
         done;
         assert false
       with StringValue name -> name in
-    (** look for end of comment *)
+    (* look for end of comment *)
     while not (Str.string_match end_comment (!line) 0) do
       line := input_line ch
     done;
@@ -828,9 +828,9 @@ let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
     (print_equivalence_lemma ~prev info fmt name d; forget_tvs ())
 
 let print_logic_decl ~old info fmt d =
-  (** During realization the definition of a "builtin" symbol is
-      printed and an equivalence lemma with associated coq function is
-      requested *)
+  (* During realization the definition of a "builtin" symbol is
+     printed and an equivalence lemma with associated coq function is
+     requested *)
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_logic_decl info fmt d; forget_tvs ())
   else if info.realization then

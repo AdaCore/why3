@@ -828,11 +828,11 @@ let project_dir =
           in
           Debug.dprintf debug
             "[GUI] using '%s' as directory for the project@." d;
-          Queue.push fname files; (** we need to open [fname] *)
+          Queue.push fname files; (* we need to open [fname] *)
           d
         end
         else begin
-          (** The first argument is not a directory and it's not the
+          (* The first argument is not a directory and it's not the
               only file *)
           Format.eprintf
             "[Error] @[When@ more@ than@ one@ file@ is@ given@ on@ the@ \
@@ -1082,7 +1082,7 @@ let bisect_proof_attempt pa =
       dprintf debug "Bisecting interrupted.@."
     | S.Unedited | S.JustEdited -> assert false
     | S.InternalFailure exn ->
-      (** Perhaps the test can be considered false in this case? *)
+      (* Perhaps the test can be considered false in this case? *)
       dprintf debug "Bisecting interrupted by an error %a.@."
         Exn_printer.exn_printer exn
     | S.Done res ->
@@ -1119,16 +1119,16 @@ let bisect_proof_attempt pa =
           ~memlimit:pa.S.proof_memlimit
 	  ~steplimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
-          (** It is dangerous, isn't it? to be in place for bisecting? *)
+          (* It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
           ~command:(C.get_complete_command lp.S.prover_config (-1))
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
-    (** Run once the complete goal in order to verify its validity and
-        update the proof attempt *)
+    (* Run once the complete goal in order to verify its validity and
+       update the proof attempt *)
   let first_callback pa = function
-    (** this pa can be different than the first pa *)
+    (* this pa can be different than the first pa *)
     | S.Running | S.Scheduled -> ()
     | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
@@ -2036,10 +2036,10 @@ let reload () =
   try
     erase_color_loc source_view;
     current_file := "";
-    (** create a new environnement
-        (in order to reload the files which are "use") *)
+    (* create a new environnement
+       (in order to reload the files which are "use") *)
     gconfig.env <- Env.create_env (Env.get_loadpath gconfig.env);
-    (** reload the session *)
+    (* reload the session *)
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =
       (* use_shapes is true since session is in memory *)

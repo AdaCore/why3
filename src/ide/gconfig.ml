@@ -21,7 +21,7 @@ let () = (***** TODO TODO make that work, it seems not called!!! *)
   let why3_handler exn =
     Format.eprintf "@[Why3ide callback raised an exception:@\n%a@]@.@."
       Exn_printer.exn_printer exn;
-    (** print the stack trace if asked to (can't be done by the usual way) *)
+    (* print the stack trace if asked to (can't be done by the usual way) *)
     if Debug.test_flag Debug.stack_trace then
       Printf.eprintf "Backtrace:\n%t\n%!" Printexc.print_backtrace
   in
@@ -283,7 +283,7 @@ let incr_font_size n =
 *)
 
 let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ())
-(** dumb pixbuf *)
+(* dumb pixbuf *)
 let image_undone = ref !image_default
 let image_scheduled = ref !image_default
 let image_running = ref !image_default
@@ -1026,17 +1026,17 @@ let preferences (c : t) =
   in
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
-  (** page "general settings" **)
+  (* page "general settings" **)
   general_settings c notebook;
-  (** page "appearance" **)
+  (* page "appearance" **)
   appearance_settings c notebook;
-  (*** page "editors" **)
+  (* page "editors" **)
   editors_page c notebook;
-  (** page "Provers" **)
+  (* page "Provers" **)
   provers_page c notebook;
-  (*** page "uninstalled provers" *)
+  (* page "uninstalled provers" *)
   alternatives_frame c notebook;
-  (** page "Colors" **)
+  (* page "Colors" **)
 (*
   let label2 = GMisc.label ~text:"Colors" () in
   let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
@@ -1050,7 +1050,7 @@ let preferences (c : t) =
          c)
   in
 *)
-  (** bottom button **)
+  (* bottom button **)
   dialog#add_button "Save&Close" `SAVE ;
   dialog#add_button "Close" `CLOSE ;
   let ( answer : [`SAVE | `CLOSE | `DELETE_EVENT ]) = dialog#run () in

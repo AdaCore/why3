@@ -96,7 +96,7 @@ let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
   let config,_,_ = Args.initialize ~extra_help option_list command usage_msg in
 
-  (** listings *)
+  (* listings *)
 
   let sort_pair (x,_) (y,_) = String.compare x y in
   let opt_list = ref false in

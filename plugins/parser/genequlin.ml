@@ -60,7 +60,7 @@ let scanf s =
 
 (** the main function *)
 let read_channel env path filename cin =
-  (** Find the int theory and the needed operation *)
+  (* Find the int theory and the needed operation *)
   let th_int = Env.read_theory env ["int"] "Int" in
   let leq = ns_find_ls th_int.th_export ["infix <"] in
   let plus_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix +"] in
@@ -73,7 +73,7 @@ let read_channel env path filename cin =
       t_app_infer neg_symbol [t_nat_const (-n)]
   in
 
-  (** create a contraint : polynome <= constant *)
+  (* create a contraint : polynome <= constant *)
   let create_lit lvar k lits _ =
     let left = List.fold_left (fun acc e ->
       let const = (Random.int k) - (k/2) in
@@ -83,7 +83,7 @@ let read_channel env path filename cin =
     let rconst = (Random.int k) - (k/2) in
     t_and_simp lits (t_app leq [left;t_int_const rconst] None) in
 
-  (** create a set of constraints *)
+  (* create a set of constraints *)
   let create_fmla nvar m k =
     let lvar = Util.mapi (fun _ -> create_vsymbol (id_fresh "x") Ty.ty_int)
       1 nvar in
@@ -91,7 +91,7 @@ let read_channel env path filename cin =
     let lits = Util.foldi (create_lit lt k) t_true 1 m in
     t_forall_close lvar [] (t_implies_simp lits t_false) in
 
-  (** read the first line *)
+  (* read the first line *)
   let line = ref 0 in
   begin try
     let seed = input_line cin in
@@ -100,16 +100,16 @@ let read_channel env path filename cin =
     Printf.eprintf "error file %s line 1\n" filename;
     exit 1
   end;
-  (** Create the theory *)
+  (* Create the theory *)
   let th_uc_loc = Loc.user_position filename 1 0 0 in
   let th_uc = create_theory ~path (id_user "EqLin" th_uc_loc) in
   let th_uc = Theory.use_export th_uc th_int in
-  (** Read one line and add it to the theory *)
+  (* Read one line and add it to the theory *)
   let fold th_uc s =
     let nvar,m,k =
       try
         incr line;
-        (** Dont use scanf because I don't know how to link it in plugin
+        (* Dont use scanf because I don't know how to link it in plugin
             (without segfault) *)
         (* Scanf.sscanf s "%i %i %i" (fun nvar m k -> nvar,m,k) *)
         scanf s
@@ -120,9 +120,9 @@ let read_channel env path filename cin =
     let fmla = create_fmla nvar m k in
     let th_uc = Theory.add_prop_decl th_uc Decl.Pgoal goal_id fmla in
     th_uc in
-  (** Read all the file *)
+  (* Read all the file *)
   let th_uc = Sysutil.fold_channel fold th_uc cin in
-  (** Return the map with the theory *)
+  (* Return the map with the theory *)
   Mstr.singleton "EquLin" (close_theory th_uc)
 
 let () = Env.register_format Env.base_language "equlin" ["equlin"] read_channel
