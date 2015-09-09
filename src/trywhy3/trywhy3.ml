@@ -156,8 +156,35 @@ let why3_execute (modules,_theories) =
     Stdlib.Mstr.fold
       (fun _k m acc ->
         let th = m.Mlw_module.mod_theory in
-        let name = th.Theory.th_name.Ident.id_string in
-        [Html.of_string ("Module " ^ name)] :: acc)
+        let modname = th.Theory.th_name.Ident.id_string in
+        try
+          let ps =
+            Mlw_module.ns_find_ps m.Mlw_module.mod_export ["main"]
+          in
+          let moduleans = Html.of_string ("Module " ^ modname ^ ": ") in
+          let ans =
+            match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
+            | None ->
+              [moduleans;
+               Html.ul
+                 [[Html.of_string "function main has no definition"]]]
+            | Some d ->
+              try
+                [moduleans;
+                 Html.ul
+                   [[Html.of_string
+                        (Pp.sprintf "%a"
+                           (Mlw_interp.eval_global_symbol env m) d)]]]
+              with e ->
+                [moduleans;
+                 Html.ul
+                   [[Html.of_string
+                        (Pp.sprintf
+                           "exception during execution of function main : %a (%s)"
+                         Exn_printer.exn_printer e
+                           (Printexc.to_string e))]]]
+          in ans :: acc
+        with Not_found -> acc)
       modules []
   in
   Html.ul mods
