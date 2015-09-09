@@ -29,7 +29,8 @@ val split : char -> string -> string list
 
 val bounded_split : char -> string -> int -> string list
 (** [bounded_split c s n] do the same as [split c s] but splits into
-    [n] substring at most *)
+    [n] substring at most.
+    The concatenation of returned substrings is equal to the string s.*)
 
 val ends_with : string -> string -> bool
 (** test if a string ends with another *)
