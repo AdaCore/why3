@@ -28,11 +28,12 @@ let split c s = List.rev (rev_split c s)
 
 let rev_bounded_split c s n =
   let rec aux acc i n =
-    if n = 1 then acc else
+    let get_rest_of_s = (String.sub s i (String.length s - i)) in
+    if n = 1 then get_rest_of_s::acc else
     try
       let j = String.index_from s i c in
       aux ((String.sub s i (j-i))::acc) (j+1) (n-1)
-    with Not_found -> (String.sub s i (String.length s - i))::acc
+    with Not_found -> get_rest_of_s::acc
       | Invalid_argument _ -> ""::acc in
   aux [] 0 n
 
