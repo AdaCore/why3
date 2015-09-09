@@ -810,7 +810,7 @@ let () = w#show ()
 (** TODO remove that should done only in session *)
 let project_dir =
   let fname = Queue.pop files in
-  (** The remaining files in [files] are going to be open *)
+  (* The remaining files in [files] are going to be open *)
   if Sys.file_exists fname then
     begin
       if Sys.is_directory fname then

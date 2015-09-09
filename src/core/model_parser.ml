@@ -113,8 +113,8 @@ type model_element = {
 }
 
 let split_model_trace_name mt_name =
-  (** Mt_name is of the form "name[@type[@*]]". Return (name, type) *)
-  let splitted = Str.bounded_split (Str.regexp_string "@") mt_name 3 in
+  (* Mt_name is of the form "name[@type[@*]]". Return (name, type) *)
+  let splitted = Strings.bounded_split '@' mt_name 3 in
   match splitted with
   | [first] -> (first, "")
   | first::second::_ -> (first, second)

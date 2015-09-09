@@ -138,14 +138,8 @@ let expl_loopvar   = Ident.create_label "expl:loop variant decrease"
 let expl_variant   = Ident.create_label "expl:variant decrease"
 
 let lab_has_expl =
-(*
-  let expl_regexp = Str.regexp "expl:\\(.*\\)" in
-*)
   Slab.exists
-    (fun l -> Lexlib.has_prefix "expl:" l.lab_string)
-(*
-       Str.string_match expl_regexp l.lab_string 0)
-*)
+    (fun l -> Strings.has_prefix "expl:" l.lab_string)
 
 let rec wp_expl l f =
   if lab_has_expl f.t_label then f

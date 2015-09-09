@@ -50,7 +50,7 @@ let intro_const_equal_to_term
     ~const_name
     ~axiom_name
     =
-  (** See documentation of the function in file intro_projections_counterexmp.mli. *)
+  (* See documentation of the function in file intro_projections_counterexmp.mli. *)
 
   (* Create declaration of new constant *)
   (*let lab_new = Slab.add model_label labels in*)

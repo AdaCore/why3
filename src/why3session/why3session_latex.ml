@@ -302,16 +302,16 @@ let latex_longtable n fmt depth name provers t=
   (* First head *)
   print_head n depth provers fmt;
   fprintf fmt "\\hline \\endfirsthead @.";
-  (** Other heads : "Continued... " added *)
+  (* Other heads : "Continued... " added *)
   fprintf fmt "\\multicolumn{%d}{r}{\\textit{Continued from previous page}} \
 \\\\ @." (List.length provers + 1) ;
   fprintf fmt "\\hline @.";
   print_head n depth provers fmt;
   fprintf fmt "\\hline \\endhead @.";
-  (** Other foots : "Continued..." added *)
+  (* Other foots : "Continued..." added *)
   fprintf fmt "\\hline \\multicolumn{%d}{r}{\\textit{Continued on next page}} \
 \\\\ @." (List.length provers);
-  (** Last foot : nothing *)
+  (* Last foot : nothing *)
   fprintf fmt "\\endfoot \\endlastfoot @.";
   if n == 1 then
     List.iter (goal_latex_stat fmt provers 0 depth 0) t.S.theory_goals

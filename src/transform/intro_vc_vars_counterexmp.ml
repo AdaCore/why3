@@ -198,7 +198,7 @@ let get_location_of_vc task =
   let meta_args = Task.on_meta_excl meta_vc_location task in
   match meta_args with
   | Some [Theory.MAstr loc_str] ->
-    let splitted = Str.bounded_split (Str.regexp_string ":") loc_str 4 in
+    let splitted = Strings.bounded_split ':' loc_str 4 in
     let loc =  match splitted with
       | [filename; line; col1; col2] ->
 	let line = int_of_string line in

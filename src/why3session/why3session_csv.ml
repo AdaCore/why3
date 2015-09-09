@@ -111,7 +111,7 @@ let rec print_line fmt provers a =
         fprintf fmt ",%a" print_cell pa
       with Not_found ->
         fprintf fmt ",") provers;
-    fprintf fmt "\n@?" (** no @\n since we use Pp.wnl *)
+    fprintf fmt "\n@?" (* no @\n since we use Pp.wnl *)
   | _ -> () end;
   Session.iter (print_line fmt provers) a
 
@@ -195,20 +195,20 @@ let print_provers_time (provers_time : float list Whyconf.Hprover.t) fmt =
     let sorted = List.fast_sort Pervasives.compare l in
     (ref sorted,ref 0)) l in
   let rec print_line (l : (float list ref * int ref) list) =
-    (** get the minimum *)
+    (* get the minimum *)
     let lmin = List.fold_left (fun acc (e,_) ->
       match !e with
       | [] -> acc
       | a::_ -> min a acc) max_float l in
-    if lmin = max_float then () (** finished *)
+    if lmin = max_float then () (* finished *)
     else begin
-      (** remove the minimum and increase the number of proved *)
+      (* remove the minimum and increase the number of proved *)
       let rec remove nb = function
         | [] -> []
         | a::e when a = lmin -> incr nb; remove nb e
         | e -> e in
       List.iter (fun (e,nb) -> e:=remove nb !e) l;
-      (** Print the current number of proved *)
+      (* Print the current number of proved *)
       fprintf fmt "%f,%a\n@?" lmin
         (Pp.print_list Pp.comma (fun fmt (_,nb) -> pp_print_int fmt (!nb)))
         l;
@@ -251,7 +251,7 @@ let print_file out f : unit =
 
 let print_args fmt args =
   (Pp.print_iter1 Array.iter
-     (fun fmt () -> Format.pp_print_string fmt " ") (** no @\n *)
+     (fun fmt () -> Format.pp_print_string fmt " ") (* no @\n *)
      (fun fmt -> Format.fprintf fmt "%S"))
    fmt args
 
@@ -271,10 +271,10 @@ let call_gnuplot arg1 arg2 csv_file gp_file =
 let run_by_time_gen dir canonical_name iter =
   let to_remove = Stack.create () in
   let canonical_name = Filename.concat dir canonical_name in
-  (** compute stats *)
+  (* compute stats *)
   let provers_time = Whyconf.Hprover.create 5 in
   iter provers_time;
-  (** print .csv if necessary *)
+  (* print .csv if necessary *)
   let csv_file =
      if !opt_gnuplot = [] || !opt_print_csv then
        let fname = canonical_name ^ ".csv" in
@@ -290,7 +290,7 @@ let run_by_time_gen dir canonical_name iter =
      else None
   in
 
-  (** create .gp if necessary *)
+  (* create .gp if necessary *)
   let nb_provers = Whyconf.Hprover.length provers_time in
   let gp_file =
     if List.mem GP !opt_gnuplot
@@ -307,7 +307,7 @@ let run_by_time_gen dir canonical_name iter =
     else None
   in
 
-  (** output .png, .pdf, .csv and run .qt if necessary *)
+  (* output .png, .pdf, .csv and run .qt if necessary *)
   if List.mem PNG !opt_gnuplot then
     call_gnuplot
       "set terminal pngcairo size 600, 400"
@@ -328,7 +328,7 @@ let run_by_time_gen dir canonical_name iter =
       "set terminal qt persist"
       ""
       csv_file gp_file;
-  (** Clean up temporary files *)
+  (* Clean up temporary files *)
   Stack.iter Sys.remove to_remove
 
 

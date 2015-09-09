@@ -22,9 +22,24 @@ val set : string -> int -> char -> unit
 val rev_split : char -> string -> string list
 
 val split : char -> string -> string list
+(** [split c s] splits [s] into substrings, taking as delimiter the
+    character [c], and returns the list of substrings.  An occurrence of
+    the delimiter at the beginning or at the end of the string is
+    ignored. *)
+
+val bounded_split : char -> string -> int -> string list
+(** [bounded_split c s n] do the same as [split c s] but splits into
+    [n] substring at most *)
 
 val ends_with : string -> string -> bool
 (** test if a string ends with another *)
 
 val pad_right : char -> string -> int -> string
 (** chop or pad the given string on the right up to the given length *)
+
+val has_prefix : string -> string -> bool
+(** [has_prefix pref s] returns true if s [s] starts with prefix [pref] *)
+
+val remove_prefix : string -> string -> string
+(** [remove_prefix pref s] removes the prefix [pref] from [s]. Raises
+    [Not_found if [s] does not start with [pref] *)

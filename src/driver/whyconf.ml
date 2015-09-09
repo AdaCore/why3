@@ -673,7 +673,7 @@ let merge_config config filename =
       let plugins =
         (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
       { config.main with loadpath = loadpath; plugins = plugins } in
-  (** get more strategies *)
+  (* get more strategies *)
   let more_strategies = get_strategies rc in
   let strategies =
     List.fold_left load_strategy config.strategies more_strategies

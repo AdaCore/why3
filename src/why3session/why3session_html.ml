@@ -382,7 +382,7 @@ struct
       base_dst
     with Not_found ->
       eprintf "Default %s@." basename;
-      (** default printer *)
+      (* default printer *)
       let base = try Filename.chop_extension basename with _ -> basename in
       let base_dst = base^".txt" in
       if !opt_context then
@@ -529,7 +529,7 @@ $(function () {\
     iter_files (run_file context print_session);
     if !opt_context then
       let data_dir = Whyconf.datadir (Whyconf.get_main config) in
-      (** copy images *)
+      (* copy images *)
       let img_dir_src = Filename.concat data_dir "images" in
       let img_dir_src = Filename.concat img_dir_src "boomy" in
       let img_dir_dst = Filename.concat !output_dir "images" in
@@ -539,7 +539,7 @@ $(function () {\
         let to_  = Filename.concat img_dir_dst img_name in
         Sysutil.copy_file from to_)
         ["folder16.png";"file16.png";"wizard16.png";"configure16.png"];
-      (** copy javascript *)
+      (* copy javascript *)
       let js_dir_src = Filename.concat data_dir "javascript" in
       let js_dir_dst = Filename.concat !output_dir "javascript" in
       Sysutil.copy_dir js_dir_src js_dir_dst

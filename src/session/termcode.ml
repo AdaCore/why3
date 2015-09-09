@@ -21,7 +21,7 @@ let collect_expls lab =
     (fun lab acc ->
        let lab = lab.Ident.lab_string in
        try
-         let s = Lexlib.remove_prefix "expl:" lab in s :: acc
+         let s = Strings.remove_prefix "expl:" lab in s :: acc
        with Not_found -> acc)
     lab
     []

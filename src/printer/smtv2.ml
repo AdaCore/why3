@@ -229,7 +229,7 @@ let model_trace_for_postcondition ~labels info =
       labels
 
 let get_fun_name name =
-  let splitted = Str.bounded_split (Str.regexp_string ":") name 2 in
+  let splitted = Strings.bounded_split ':' name 2 in
   match splitted with
   | _::[second] ->
     second

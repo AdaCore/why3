@@ -365,7 +365,7 @@ let detect_exec env main data acc exec_name =
     match data.prover_command with
     | None ->
       (* Empty prover *)
-      if good || old then begin (** Known version with error *)
+      if good || old then begin (* Known version with error *)
         known_version env exec_name;
         eprintf "Found prover %s version %s%s@."
           data.prover_name ver
