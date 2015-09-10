@@ -1436,6 +1436,14 @@ ALTERGOMODS=util/numbers util/version util/options parsing/why_parser parsing/wh
 TRYWHY3CMO=lib/why3/why3.cma
 # $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 
+trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
+
+%.fr.html: %.prehtml
+	yamlpp -l fr $< -o $@
+
+%.en.html: %.prehtml
+	yamlpp -l en $< -o $@
+
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
