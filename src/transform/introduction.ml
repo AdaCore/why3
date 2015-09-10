@@ -23,7 +23,7 @@ open Decl
 let rec intros pr f = match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
-      (* f is going to be removed, preserve its labels (and possibly also location) in f2  *)
+      (* f is going to be removed, preserve its labels and location in f2  *)
       let f2 = t_label_copy f f2 in
       let l = Split_goal.split_pos_intro f1 in
       List.fold_right
@@ -34,14 +34,15 @@ let rec intros pr f = match f.t_node with
         l
         (intros pr f2)
   | Tquant (Tforall,fq) ->
-      let vsl,_trl,f = t_open_quant fq in
+      let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
-      let f = t_subst subst f in
+      (* preserve labels and location of f  *)
+      let f = t_label_copy f (t_subst subst f_t) in
       dl @ intros pr f
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
