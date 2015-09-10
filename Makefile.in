@@ -1177,6 +1177,9 @@ ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/map/, $(ISABELLELI
 ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt RevAppend Combine Distinct NumOcc Permut
 ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix lib/isabelle/list/, $(ISABELLELIBS_LIST_FILES)))
 
+ISABELLELIBS_BV_FILES = Pow2int BV8 BV16 BV32 BV64 BVConverter_32_64 BVConverter_16_64 BVConverter_8_64 BVConverter_16_32 BVConverter_8_32 BVConverter_8_16
+ISABELLELIBS_BV = $(addsuffix .xml, $(addprefix lib/isabelle/bv/, $(ISABELLELIBS_BV_FILES)))
+
 drivers/isabelle-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
@@ -1197,6 +1200,8 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_OPTION_FILES); do \
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_BV_FILES); do \
+	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	) > $@
 
 ifeq (@enable_local@,yes)
@@ -1205,7 +1210,7 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
 ifneq (@enable_local@,yes)
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 endif
@@ -1226,7 +1231,7 @@ install_no_local:: lib/isabelle/last_build
 
 install_local:: lib/isabelle/last_build
 
-update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
 
 $(ISABELLELIBS_INT): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/int.why
@@ -1267,6 +1272,11 @@ $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realization
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/option.why
 	mkdir -p lib/isabelle/option
 	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
+
+$(ISABELLELIBS_BV): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/bv.why
+	mkdir -p lib/isabelle/bv
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o lib/isabelle/bv/
 
 # do not update isabelle realizations systematically
 # opt byte: update-isabelle
