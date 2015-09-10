@@ -5,12 +5,9 @@
 
  *)
 
-let get_opt o =
-  Js.Opt.get o (fun () -> assert false)
+let get_opt o = Js.Opt.get o (fun () -> assert false)
 
-let log s =
-  Firebug.console ## log (Js.string s)
-
+let log s = Firebug.console ## log (Js.string s)
 
 (*
 
@@ -86,9 +83,14 @@ let run_alt_ergo_on_task t =
   (* printing the task in a string *)
   Driver.print_task alt_ergo_driver str_formatter t;
   let text = flush_str_formatter () in
-  (* TODO ! *)
-(* from Alt-Ergo:
+  let lb = Lexing.from_string text in
+(* from Alt-Ergo *)
+(* does not work yet: it requires zarith
+   --> investigate how to compile alt-ergo with nums instead
   let a = Why_parser.file Why_lexer.token lb in
+*)
+(* TODO ! *)
+(*
   let ltd, typ_env = Why_typing.file false Why_typing.empty_env a in
   let declss = Why_typing.split_goals ltd in
   SAT.start ();
@@ -173,7 +175,7 @@ let why3_execute (modules,_theories) =
                 [moduleans;
                  Html.ul
                    [[Html.of_string
-                        (Pp.sprintf "%a"
+                        (Pp.sprintf "Execution of main () returns:@\n%a"
                            (Mlw_interp.eval_global_symbol env m) d)]]]
               with e ->
                 [moduleans;
