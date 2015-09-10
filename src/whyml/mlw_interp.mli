@@ -15,8 +15,8 @@ type value
 
 val print_value: Format.formatter -> value -> unit
 
-val eval_global_term: 
+val eval_global_term:
   Env.env -> Decl.known_map -> Term.term -> value
 
 val eval_global_symbol:
-  Env.env -> Mlw_module.modul -> Mlw_expr.fun_defn -> unit
+  Env.env -> Mlw_module.modul -> Format.formatter -> Mlw_expr.fun_defn -> unit

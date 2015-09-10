@@ -1522,8 +1522,23 @@ install_local:: bin/why3doc
 # trywhy3
 #########
 
+ALTERGODIR=src/trywhy3/alt-ergo-0.99.1
+
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
-           -syntax camlp4o -I src/trywhy3
+           -syntax camlp4o -I src/trywhy3 -I $(ALTERGODIR)/src/parsing
+
+ALTERGOMODS=util/numbers util/version util/options parsing/why_parser parsing/why_lexer
+
+TRYWHY3CMO=lib/why3/why3.cma
+# $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+
+trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
+
+%.fr.html: %.prehtml
+	yamlpp -l fr $< -o $@
+
+%.en.html: %.prehtml
+	yamlpp -l en $< -o $@
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
@@ -1534,7 +1549,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
 		+weak.js +nat.js $^
 
-src/trywhy3/trywhy3.byte: lib/why3/why3.cma src/trywhy3/trywhy3.cmo
+src/trywhy3/trywhy3.byte: $(TRYWHY3CMO) src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 src/trywhy3/%.cmo: src/trywhy3/%.ml

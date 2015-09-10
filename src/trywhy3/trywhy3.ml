@@ -5,12 +5,9 @@
 
  *)
 
-let get_opt o =
-  Js.Opt.get o (fun () -> assert false)
+let get_opt o = Js.Opt.get o (fun () -> assert false)
 
-let log s =
-  Firebug.console ## log (Js.string s)
-
+let log s = Firebug.console ## log (Js.string s)
 
 (*
 
@@ -86,9 +83,14 @@ let run_alt_ergo_on_task t =
   (* printing the task in a string *)
   Driver.print_task alt_ergo_driver str_formatter t;
   let text = flush_str_formatter () in
-  (* TODO ! *)
-(* from Alt-Ergo:
+  let lb = Lexing.from_string text in
+(* from Alt-Ergo *)
+(* does not work yet: it requires zarith
+   --> investigate how to compile alt-ergo with nums instead
   let a = Why_parser.file Why_lexer.token lb in
+*)
+(* TODO ! *)
+(*
   let ltd, typ_env = Why_typing.file false Why_typing.empty_env a in
   let declss = Why_typing.split_goals ltd in
   SAT.start ();
@@ -156,8 +158,35 @@ let why3_execute (modules,_theories) =
     Stdlib.Mstr.fold
       (fun _k m acc ->
         let th = m.Mlw_module.mod_theory in
-        let name = th.Theory.th_name.Ident.id_string in
-        [Html.of_string ("Module " ^ name)] :: acc)
+        let modname = th.Theory.th_name.Ident.id_string in
+        try
+          let ps =
+            Mlw_module.ns_find_ps m.Mlw_module.mod_export ["main"]
+          in
+          let moduleans = Html.of_string ("Module " ^ modname ^ ": ") in
+          let ans =
+            match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
+            | None ->
+              [moduleans;
+               Html.ul
+                 [[Html.of_string "function main has no definition"]]]
+            | Some d ->
+              try
+                [moduleans;
+                 Html.ul
+                   [[Html.of_string
+                        (Pp.sprintf "Execution of main () returns:@\n%a"
+                           (Mlw_interp.eval_global_symbol env m) d)]]]
+              with e ->
+                [moduleans;
+                 Html.ul
+                   [[Html.of_string
+                        (Pp.sprintf
+                           "exception during execution of function main : %a (%s)"
+                         Exn_printer.exn_printer e
+                           (Printexc.to_string e))]]]
+          in ans :: acc
+        with Not_found -> acc)
       modules []
   in
   Html.ul mods
