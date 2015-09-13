@@ -128,7 +128,7 @@ type pmodule_uc = {
   muc_known  : known_map;
   muc_local  : Sid.t;
   muc_used   : Sid.t;
-  muc_env    : Env.env option;
+  muc_env    : Env.env;
 }
 
 let empty_module env n p = {
@@ -253,7 +253,7 @@ let add_symbol add id v uc =
       muc_export = add true  id.id_string v e0 :: ste }
   | _ -> assert false
 
-let add_pdecl uc d =
+let add_pdecl_no_logic uc d =
   let uc = { uc with
     muc_units = Udecl d :: uc.muc_units;
     muc_known = known_add_decl uc.muc_known d;
@@ -282,65 +282,74 @@ let add_pdecl uc d =
   | PDexn xs -> add_symbol add_xs xs.xs_name xs uc
   | PDpure -> uc
 
+let add_pdecl uc d =
+  let uc = add_pdecl_no_logic uc d in
+  let th = List.fold_left (add_decl ~warn:true) uc.muc_theory d.pd_pure in
+  { uc with muc_theory = th }
+
 (** {2 Builtin symbols} *)
 
+let dummy_env = Env.create_env []
+
 let builtin_module =
-  let uc = empty_module None (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
-  let uc = add_pdecl uc pd_int in
-  let uc = add_pdecl uc pd_real in
-  let uc = add_pdecl uc pd_equ in
+  let uc = empty_module dummy_env (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
+  let uc = add_pdecl_no_logic uc pd_int in
+  let uc = add_pdecl_no_logic uc pd_real in
+  let uc = add_pdecl_no_logic uc pd_equ in
   let m = close_module uc in
   { m with mod_theory = builtin_theory }
 
 let bool_module =
-  let uc = empty_module None (id_fresh "Bool") ["why3";"Bool"] in
-  let uc = add_pdecl uc pd_bool in
+  let uc = empty_module dummy_env (id_fresh "Bool") ["why3";"Bool"] in
+  let uc = add_pdecl_no_logic uc pd_bool in
   let m = close_module uc in
   { m with mod_theory = bool_theory }
 
 let highord_module =
-  let uc = empty_module None (id_fresh "HighOrd") ["why3";"HighOrd"] in
+  let uc = empty_module dummy_env (id_fresh "HighOrd") ["why3";"HighOrd"] in
   let uc = use_export uc bool_module in
-  let uc = add_pdecl uc pd_func in
-  let uc = add_pdecl uc pd_func_app in
+  let uc = add_pdecl_no_logic uc pd_func in
+  let uc = add_pdecl_no_logic uc pd_func_app in
   let m = close_module uc in
   { m with mod_theory = highord_theory }
 
 let tuple_module = Hint.memo 17 (fun n ->
   let nm = "Tuple" ^ string_of_int n in
-  let uc = empty_module None (id_fresh nm) ["why3";nm] in
-  let uc = add_pdecl uc (pd_tuple n) in
+  let uc = empty_module dummy_env (id_fresh nm) ["why3";nm] in
+  let uc = add_pdecl_no_logic uc (pd_tuple n) in
   let m = close_module uc in
   { m with mod_theory = tuple_theory n })
 
 let unit_module =
-  let uc = empty_module None (id_fresh "Unit") ["why3";"Unit"] in
+  let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  let pd = create_type_decl [td] in
-  let uc = add_pdecl uc pd in
-  let th = List.fold_left (add_decl ~warn:false) uc.muc_theory pd.pd_pure in
-  close_module { uc with muc_theory = th }
+  close_module (add_pdecl uc (create_type_decl [td]))
 
 let create_module env ?(path=[]) n =
-  let m = empty_module (Some env) n path in
+  let m = empty_module env n path in
   let m = use_export m builtin_module in
   let m = use_export m bool_module in
   let m = use_export m unit_module in
   m
 
+let add_use uc d = Sid.fold (fun id uc ->
+  if id_equal id ts_func.ts_name then
+    use_export uc highord_module
+  else match is_ts_tuple_id id with
+  | Some n -> use_export uc (tuple_module n)
+  | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
+
 let add_pdecl ~vc uc d =
-  let ids = Mid.set_diff d.pd_syms uc.muc_known in
-  let uc = Sid.fold (fun id uc ->
-    if id_equal id ts_func.ts_name then
-      use_export uc highord_module
-    else match is_ts_tuple_id id with
-    | Some n -> use_export uc (tuple_module n)
-    | None -> uc) ids uc in
-  ignore vc; (* TODO *)
-  let uc = add_pdecl uc d in
-  let th = List.fold_left (add_decl ~warn:true) uc.muc_theory d.pd_pure in
-  { uc with muc_theory = th }
+  let uc = add_use uc d in
+  let dl = if vc then Vc.vc uc.muc_env uc.muc_known d else [] in
+  (* verification conditions might contain built-in symbols which
+     do not occur in the original declaration, so we call add_use.
+     However, we expect int.Int or any other library theory to
+     be in the context: importing them automatically seems to be
+     too invasive for the namespace. *)
+  let uc = List.fold_left (fun uc d -> add_pdecl (add_use uc d) d) uc dl in
+  add_pdecl uc d
 
 (** {2 Cloning} *)
 
