@@ -129,7 +129,7 @@ theory Set
 *)
 
   clone export SetGen with type set = set,
-    predicate mem = mem, axiom extensionality,
+    predicate mem = mem, lemma extensionality,
     constant empty = empty, lemma empty_def,
     function add = add, lemma add_def,
     function remove = remove, lemma remove_def,

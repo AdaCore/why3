@@ -46,8 +46,10 @@ theory MapExt
 
   predicate (==) (m1 m2: 'a -> 'b) = forall x: 'a. m1 x = m2 x
 
-  axiom extensionality:
+  lemma extensionality:
     forall m1 m2: 'a -> 'b. m1 == m2 -> m1 = m2
+  (* This lemma is actually provable in Why3, because of how
+     eliminate_epsilon handles equality to a lambda-term. *)
 
 end
 
