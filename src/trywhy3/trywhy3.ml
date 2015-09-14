@@ -85,10 +85,7 @@ let run_alt_ergo_on_task t =
   let text = flush_str_formatter () in
   let lb = Lexing.from_string text in
 (* from Alt-Ergo *)
-(* does not work yet: it requires zarith
-   --> investigate how to compile alt-ergo with nums instead
-  let a = Why_parser.file Why_lexer.token lb in
-*)
+  let _a = Why_parser.file Why_lexer.token lb in
 (* TODO ! *)
 (*
   let ltd, typ_env = Why_typing.file false Why_typing.empty_env a in

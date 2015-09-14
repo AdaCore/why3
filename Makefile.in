@@ -1426,15 +1426,16 @@ install_local:: bin/why3doc
 # trywhy3
 #########
 
-ALTERGODIR=src/trywhy3/alt-ergo-0.99.1
+ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
 
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
            -syntax camlp4o -I src/trywhy3 -I $(ALTERGODIR)/src/parsing
 
-ALTERGOMODS=util/numbers util/version util/options parsing/why_parser parsing/why_lexer
+ALTERGOMODS=util/numsNumbers util/numbers \
+	util/version util/myUnix util/config util/options \
+	parsing/why_parser parsing/why_lexer
 
-TRYWHY3CMO=lib/why3/why3.cma
-# $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+TRYWHY3CMO=lib/why3/why3.cma $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
 
