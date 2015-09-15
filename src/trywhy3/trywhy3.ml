@@ -84,30 +84,24 @@ let run_alt_ergo_on_task t =
   Driver.print_task alt_ergo_driver str_formatter t;
   let text = flush_str_formatter () in
   let lb = Lexing.from_string text in
-(* from Alt-Ergo *)
-  let _a = Why_parser.file Why_lexer.token lb in
+(* from Alt-Ergo, src/main/frontend.ml *)
+  let a = Why_parser.file Why_lexer.token lb in
 (* TODO ! *)
+  Parsing.clear_parser ();
+  let ltd, _typ_env = Why_typing.file false Why_typing.empty_env a in
+  match Why_typing.split_goals ltd with
+  | [d] ->
+    let d = Cnf.make (List.map (fun (f, env) -> f, true) d) in
 (*
-  let ltd, typ_env = Why_typing.file false Why_typing.empty_env a in
-  let declss = Why_typing.split_goals ltd in
-  SAT.start ();
-  let declss = List.map (List.map fst) declss in
-  let report = FE.print_status in
-  let pruning =
-    List.map
-      (fun d ->
-        if select () > 0 then Pruning.split_and_prune (select ()) d
-        else [List.map (fun f -> f,true) d])
-  in
+  SAT.reset_steps ();
   List.iter
-    (List.iter
-       (fun dcl ->
-	 let cnf = Cnf.make dcl in
-	 ignore (Queue.fold (FE.process_decl report)
-		   (SAT.empty (), true, Explanation.empty) cnf)
-       )) (pruning declss)
+    (fun cnf ->
+      ignore (Queue.fold (FE.process_decl FE.print_status)
+		(SAT.empty (), true, Explanation.empty) cnf)
+    ) d
 *)
-  text
+    "Alt-Ergo: " ^ string_of_int (Queue.length d) ^ " command(s) to process"
+  | _ -> "error: zero or more than 1 goal to solve"
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
