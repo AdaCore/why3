@@ -79,13 +79,8 @@ let rec fmla_find_subst boundvars var sign f =
         let vs,f' = t_open_bound fb in
         let boundvars = Svs.add vs boundvars in
         fmla_find_subst boundvars var sign f'
-    | Tcase (_,fbs) ->
-        let iter_fb fb =
-          let patl,f = t_open_branch fb in
-          let boundvars = patl.pat_vars in
-          fmla_find_subst boundvars var sign f in
-        List.iter iter_fb fbs
-    | Tbinop (_, _, _) | Tif ( _, _, _) | Tapp _ | Tfalse | Ttrue-> ()
+    | Tbinop (_, _, _) | Tif ( _, _, _)  | Tcase (_, _)
+    | Tapp _ | Tfalse | Ttrue -> ()
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let rec fmla_quant sign f = function
