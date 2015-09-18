@@ -130,6 +130,7 @@ and cexp = private {
 
 and cexp_node = private
   | Capp of rsymbol * pvsymbol list
+  | Cpur of lsymbol * pvsymbol list
   | Cfun of expr
   | Cany
 
@@ -176,6 +177,8 @@ val ls_decr_of_rec_defn : rec_defn -> lsymbol option
 
 val c_app : rsymbol -> pvsymbol list -> ity list -> ity -> cexp
 
+val c_pur : lsymbol -> pvsymbol list -> ity list -> ity -> cexp
+
 val c_fun : pvsymbol list ->
   pre list -> post list -> post list Mexn.t -> pvsymbol Mpv.t -> expr -> cexp
 
@@ -186,6 +189,8 @@ type ext_cexp = let_defn list * cexp
 val ext_c_sym : rsymbol -> ext_cexp
 
 val ext_c_app : ext_cexp -> expr list -> ity list -> ity -> ext_cexp
+
+val ext_c_pur : lsymbol -> expr list -> ity list -> ity -> ext_cexp
 
 (** {2 Expression constructors} *)
 

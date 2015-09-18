@@ -269,6 +269,14 @@ let specialize_rs {rs_cty = cty} =
   let spec ity = spec_ity hv hr cty.cty_freeze ity in
   List.map (fun v -> spec v.pv_ity) cty.cty_args, spec cty.cty_result
 
+let specialize_ls {ls_args = args; ls_value = res} =
+  let hv = Htv.create 3 and hr = Hreg.create 3 in
+  let rec ity ty = match ty.ty_node with
+    | Tyapp (s,tl) -> ity_app_fresh (restore_its s) (List.map ity tl)
+    | Tyvar v -> ity_var v in
+  let spec ty = spec_ity hv hr isb_empty (ity ty) in
+  List.map spec args, Opt.fold (Util.const spec) dity_bool res
+
 (** Patterns *)
 
 type dpattern = {
@@ -329,6 +337,7 @@ and dexpr_node =
   | DEvar of string * dvty
   | DEpv of pvsymbol
   | DErs of rsymbol
+  | DEls of lsymbol
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dspec later * dexpr
@@ -568,6 +577,8 @@ let dexpr ?loc node =
         [], specialize_pv pv
     | DErs rs ->
         specialize_rs rs
+    | DEls ls ->
+        specialize_ls ls
     | DEconst (Number.ConstInt _) ->
         dvty_int
     | DEconst (Number.ConstReal _) ->
@@ -955,15 +966,19 @@ and cexp uloc env ghost ({de_loc = loc} as de) =
   Loc.try4 ?loc try_cexp uloc env ghost de
 
 and try_cexp uloc env ghost de0 = match de0.de_node with
-  | DEvar _ | DErs _ | DEapp _ ->
+  | DEvar _ | DErs _ | DEls _ | DEapp _ ->
+      let argl, res = de0.de_dvty in
+      let argl = List.map ity_of_dity argl in
+      let res = ity_of_dity res in
       let app (ldl,c) el =
-        let argl, res = de0.de_dvty in
-        ext_c_app (ldl, c_ghostify ghost c) el
-          (List.map ity_of_dity argl) (ity_of_dity res) in
+        ext_c_app (ldl, c_ghostify ghost c) el argl res in
       let rec down de el = match de.de_node with
         | DEapp (de1,de2) -> down de1 (expr uloc env de2 :: el)
         | DEvar (n,_) -> app (ext_c_sym (get_rs env n)) el
         | DErs s -> app (ext_c_sym s) el
+        | DEls _ when not res.ity_pure ->
+            Loc.errorm "This expression must have pure type"
+        | DEls s -> ext_c_pur s el argl res
         | _ -> app (cexp uloc env ghost de) el in
       down de0 []
   | DEfun (bl,dsp,de) ->
@@ -1005,7 +1020,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e1 = expr uloc env de1 in
       let e2 = expr uloc env de2 in
       e_app rs_func_app [e1; e2] [] (ity_of_dity res)
-  | DEvar _ | DErs _ | DEapp _ | DEfun _ | DEany _ ->
+  | DEvar _ | DErs _ | DEls _ | DEapp _ | DEfun _ | DEany _ ->
       let ldl,c = try_cexp uloc env false de0 in
       List.fold_right e_let_check ldl (e_exec c)
   | DElet ((id,_,_,{de_dvty = ([],_)}) as dldf,de) ->

@@ -560,9 +560,11 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
     List.fold_left (fun e1 e2 ->
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
-  let qualid_app loc q el = match find_prog_symbol muc q with
-    | PV pv -> expr_app loc (DEpv pv) el
-    | RS rs -> expr_app loc (DErs rs) el
+  let qualid_app loc q el =
+    let e = try match find_prog_symbol muc q with
+      | PV pv -> DEpv pv | RS rs -> DErs rs with
+      | _ -> DEls (find_lsymbol muc.muc_theory q) in
+    expr_app loc e el
   in
   let qualid_app loc q el = match q with
     | Qident {id_str = n} ->

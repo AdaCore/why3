@@ -91,6 +91,7 @@ and dexpr_node =
   | DEvar of string * dvty
   | DEpv of pvsymbol
   | DErs of rsymbol
+  | DEls of lsymbol
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dspec later * dexpr

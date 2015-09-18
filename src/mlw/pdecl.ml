@@ -247,6 +247,8 @@ let get_syms node pure =
     | Capp (s,vl) ->
         let syms = List.fold_left syms_pv syms vl in
         syms_cty (Sid.add s.rs_name syms) s.rs_cty
+    | Cpur (s,vl) ->
+        List.fold_left syms_pv (Sid.add s.ls_name syms) vl
     | Cfun e -> syms_cty (syms_expr syms e) c.c_cty
     | Cany -> syms_cty syms c.c_cty
   and syms_let_defn syms = function
@@ -401,7 +403,9 @@ let create_let_decl ld =
         let axms = cty_axiom (id_clone ls.ls_name) cty f axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
-        | Cany | Capp _ ->
+        | Cany | Capp _ | Cpur _ ->
+            (* TODO: should we produce definitions for Capp and Cpur
+               when possible? If yes, remove the redundant axioms. *)
             create_param_decl ls :: abst, defn, axms
         | Cfun e ->
             let res = if c.c_cty.cty_pre <> [] then None else

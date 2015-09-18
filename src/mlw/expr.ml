@@ -310,6 +310,7 @@ and cexp = {
 
 and cexp_node =
   | Capp of rsymbol * pvsymbol list
+  | Cpur of lsymbol * pvsymbol list
   | Cfun of expr
   | Cany
 
@@ -665,6 +666,16 @@ let c_fun args p q xq old ({e_effect = eff} as e) =
 let c_app s vl ityl ity =
   mk_cexp (Capp (s,vl)) (cty_apply s.rs_cty vl ityl ity)
 
+let c_pur s vl ityl ity =
+  if not ity.ity_pure then invalid_arg "Expr.c_pur";
+  let v_args = List.map (create_pvsymbol (id_fresh "u")) ityl in
+  let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
+  let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
+  let q = make_post (t_app s t_args res) in
+  let eff = eff_ghostify true eff_empty in
+  let cty = create_cty v_args [] [q] Mexn.empty Mpv.empty eff ity in
+  mk_cexp (Cpur (s,vl)) cty
+
 let proxy_label = create_label "whyml_proxy_symbol"
 let proxy_labels = Slab.singleton proxy_label
 
@@ -706,9 +717,22 @@ let ext_c_app (ldl,c) el ityl ity =
   match c.c_node with
     | Capp (s,ul) ->
         ldl, mk_cexp (Capp (s, ul @ vl)) (cty_apply c.c_cty vl ityl ity)
+    | Cpur (s,ul) ->
+        ldl, mk_cexp (Cpur (s, ul @ vl)) (cty_apply c.c_cty vl ityl ity)
     | Cfun _ | Cany ->
         let ld, s = let_sym (id_fresh ~label:proxy_labels "h") c in
         ldl @ [ld], c_app s vl ityl ity
+
+let ext_c_pur s el ityl ity =
+  let rec args hd al el = match al, el with
+    | _::al, e::el ->
+        let hd, v = mk_proxy ~ghost:true e hd in
+        let hd, vl = args hd al el in
+        hd, v::vl
+    | _, [] -> hd, []
+    | _ -> invalid_arg "Expr.ext_c_pur" in
+  let ldl, vl = args [] s.ls_args el in
+  ldl, c_pur s vl ityl ity
 
 (* assignment *)
 
@@ -903,6 +927,9 @@ and c_rs_subst sm ({c_node = n; c_cty = c} as d) =
   | Capp (s,vl) ->
       let al = List.map (fun v -> v.pv_ity) c.cty_args in
       c_app (Mrs.find_def s s sm) vl al c.cty_result
+  | Cpur (s,vl) ->
+      let al = List.map (fun v -> v.pv_ity) c.cty_args in
+      c_pur s vl al c.cty_result
   | Cfun e ->
       c_fun c.cty_args c.cty_pre c.cty_post
         c.cty_xpost c.cty_oldies (e_rs_subst sm e))
@@ -1005,7 +1032,7 @@ let forget_let_defn = function
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
 let extract_op s =
-  let s = s.rs_name.id_string in
+  let s = s.id_string in
   let len = String.length s in
   if len < 7 then None else
   let inf = String.sub s 0 6 in
@@ -1023,7 +1050,7 @@ let print_rs fmt ({rs_name = {id_string = nm}} as s) =
   if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
   if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
   if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
-  match extract_op s, s.rs_logic with
+  match extract_op s.rs_name, s.rs_logic with
   | Some s, _ ->
       let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
       let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
@@ -1072,7 +1099,45 @@ let ambig_cty c =
   let sres = ity_freeze isb_empty c.cty_result in
   not (Mtv.set_submap sres.isb_tv sarg.isb_tv)
 
+let ambig_ls s =
+  let sarg = List.fold_left ty_freevars Stv.empty s.ls_args in
+  let sres = Opt.fold ty_freevars Stv.empty s.ls_value in
+  not (Stv.subset sres sarg)
+
 let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
+
+let print_apply pri print s id fmt vl = match extract_op id, vl with
+  | _, [] ->
+      print fmt s
+  | Some o, [t1] when tight_op o ->
+      fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
+  | Some o, [t1] when String.get id.id_string 0 = 'p' ->
+      fprintf fmt (protect_on (pri > 4) "%s %a") o print_pv t1
+  | Some o, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
+        print_pv t1 o print_pv t2
+  | _, [t1;t2] when id.id_string = "mixfix []" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
+  | _, [t1;t2;t3] when id.id_string = "mixfix [<-]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
+        print_pv t1 print_pv t2 print_pv t3
+  | _, [t1;t2;t3] when id.id_string = "mixfix []<-" ->
+      fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
+        print_pv t1 print_pv t2 print_pv t3
+  | _, [t1;t2] when id.id_string = "mixfix [_..]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
+  | _, [t1;t2] when id.id_string = "mixfix [.._]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
+  | _, [t1;t2;t3] when id.id_string = "mixfix [_.._]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
+        print_pv t1 print_pv t2 print_pv t3
+  | _, tl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
+        print s (Pp.print_list Pp.space print_pv) tl
+
+let print_capp pri s fmt vl = print_apply pri print_rs s s.rs_name fmt vl
+
+let print_cpur pri s fmt vl = print_apply pri print_ls s s.ls_name fmt vl
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
@@ -1089,35 +1154,6 @@ and print_lexpr pri fmt e =
       (Pp.print_option print_loc) e.e_loc (print_elab 0) e
     else print_elab pri fmt e in
   print_eloc pri fmt e
-
-and print_capp pri s fmt vl = match extract_op s, vl with
-  | _, [] ->
-      print_rs fmt s
-  | Some o, [t1] when tight_op o ->
-      fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
-  | Some o, [t1] when String.get s.rs_name.id_string 0 = 'p' ->
-      fprintf fmt (protect_on (pri > 4) "%s %a") o print_pv t1
-  | Some o, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
-        print_pv t1 o print_pv t2
-  | _, [t1;t2] when s.rs_name.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
-        print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix []<-" ->
-      fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
-        print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2] when s.rs_name.id_string = "mixfix [_..]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
-  | _, [t1;t2] when s.rs_name.id_string = "mixfix [.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix [_.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
-        print_pv t1 print_pv t2 print_pv t3
-  | _, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print_rs s (Pp.print_list Pp.space print_pv) tl
 
 and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
   | Cany when exec && c.cty_args = [] ->
@@ -1150,6 +1186,11 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
         (print_capp 5 (Hrs.find_def ht_rs s s)) vl print_ity c.cty_result
   | Capp (s,vl) ->
       print_capp pri (Hrs.find_def ht_rs s s) fmt vl
+  | Cpur (s,vl) when exec && c.cty_args = [] && ambig_ls s ->
+      fprintf fmt (protect_on (pri > 0) "%a:%a")
+        (print_cpur 5 s) vl print_ity c.cty_result
+  | Cpur (s,vl) ->
+      print_cpur pri s fmt vl
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v

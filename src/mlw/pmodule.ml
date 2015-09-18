@@ -829,6 +829,11 @@ and clone_cexp cl sm c = c_ghostify (cty_ghost c.c_cty) (match c.c_node with
       let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
       let res = clone_ity cl c.c_cty.cty_result in
       c_app (Mrs.find_def s s sm.sm_rs) vl al res
+  | Cpur (s,vl) ->
+      let vl = List.map (fun v -> sm_find_pv sm v) vl in
+      let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
+      let res = clone_ity cl c.c_cty.cty_result in
+      c_pur (cl_find_ls cl s) vl al res
   | Cfun e ->
       let cty = clone_cty cl sm c.c_cty in
       let sm = sm_save_args sm c.c_cty cty in
