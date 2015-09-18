@@ -1460,6 +1460,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 		--file=try_alt_ergo.drv:/ \
 		--file=drinkers.why:/ \
 		--file=simplearith.why:/ \
+		--file=bin_mult.mlw:/ \
 		--file=isqrt.mlw:/ \
 		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
 		+weak.js +nat.js $^

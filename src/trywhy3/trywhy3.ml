@@ -91,7 +91,7 @@ let run_alt_ergo_on_task t =
   let ltd, _typ_env = Why_typing.file false Why_typing.empty_env a in
   match Why_typing.split_goals ltd with
   | [d] ->
-    let d = Cnf.make (List.map (fun (f, env) -> f, true) d) in
+    let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
 (*
   SAT.reset_steps ();
   List.iter
@@ -181,33 +181,6 @@ let why3_execute (modules,_theories) =
       modules []
   in
   Html.ul mods
-
-(* from ../tools/why3execute.ml
-
-  let do_exec (mid,name) =
-    let m = try Mstr.find mid mm with Not_found ->
-      eprintf "Module '%s' not found.@." mid;
-      exit 1 in
-    let ps =
-      try Mlw_module.ns_find_ps m.Mlw_module.mod_export [name]
-      with Not_found ->
-        eprintf "Function '%s' not found in module '%s'.@." name mid;
-        exit 1 in
-    match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
-    | None ->
-      eprintf "Function '%s.%s' has no definition.@." mid name;
-      exit 1
-    | Some d ->
-      try
-        printf "@[<hov 2>Execution of %s.%s ():@\n" mid name;
-        Mlw_interp.eval_global_symbol env m d;
-      with e when Debug.test_noflag Debug.stack_trace ->
-        printf "@\n@]@.";
-        raise e in
-  Queue.iter do_exec opt_exec
-
-*)
-
 
 (*
 
@@ -299,7 +272,8 @@ let add_file_example buttonname file =
 
 let () =
   add_file_example "drinkers" "/drinkers.why";
-  add_file_example "simplearith" "/simplearith.why";
+(*  add_file_example "simplearith" "/simplearith.why";*)
+  add_file_example "bin_mult" "/bin_mult.mlw";
   add_file_example "isqrt" "/isqrt.mlw"
 
 
