@@ -964,7 +964,12 @@ let let_rec fdl =
         "All functions in a recursive definition must use the same \
         well-founded order for the first component of the variant" in
   List.iter check_variant (List.tl fdl);
-  let start_eff = if varl1 = [] then
+  (* if we have a top-level total let-function definition and
+     no variants are supplied, then we expect the definition
+     to be terminating with respect to Decl.check_termination *)
+  let impure (_,d,_,k) =
+    (k <> RKfunc && k <> RKpred) || d.c_cty.cty_pre <> [] in
+  let start_eff = if varl1 = [] && List.exists impure fdl then
     eff_diverge eff_empty else eff_empty in
   (* create the first substitution *)
   let update sm (s,({c_cty = c} as d),varl,_) =
