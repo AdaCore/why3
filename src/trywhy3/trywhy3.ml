@@ -1,19 +1,12 @@
 
-(*
-
-  small helpers
-
- *)
+(* simple helpers *)
 
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 let log s = Firebug.console ## log (Js.string s)
 
-(*
 
-  module for generating HTML elements
-
-*)
+(* module for generating HTML elements *)
 
 module Html = struct
 
@@ -40,11 +33,8 @@ let ul nl =
 
 end
 
-(*
 
-  Interface to Why3 and Alt-Ergo
-
-*)
+(* Interface to Why3 and Alt-Ergo *)
 
 let why3_conf_file = "/trywhy3.conf"
 
@@ -79,6 +69,18 @@ let alt_ergo_driver : Driver.driver =
       Exn_printer.exn_printer e s;
   exit 1
 
+module SAT = (val (Sat_solvers.get_current ()) : Sat_solvers.S)
+module FE = Frontend.Make (SAT)
+
+let print_status fmt _d status steps =
+  match status with
+  | FE.Unsat _dep ->
+    fprintf fmt "Proved (%Ld steps)" steps
+  | FE.Inconsistent -> ()
+    (* fprintf fmt "Inconsistent assumption" *)
+  | FE.Unknown _t | FE.Sat _t ->
+      fprintf fmt "Unknown (%Ld steps)@." steps
+
 let run_alt_ergo_on_task t =
   (* printing the task in a string *)
   Driver.print_task alt_ergo_driver str_formatter t;
@@ -93,14 +95,14 @@ let run_alt_ergo_on_task t =
   | [d] ->
     let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
 (*
-  SAT.reset_steps ();
-  List.iter
-    (fun cnf ->
-      ignore (Queue.fold (FE.process_decl FE.print_status)
-		(SAT.empty (), true, Explanation.empty) cnf)
-    ) d
+    fprintf str_formatter
+      "Alt-Ergo: %d command(s) to process" (Queue.length d);
 *)
-    "Alt-Ergo: " ^ string_of_int (Queue.length d) ^ " command(s) to process"
+    SAT.reset_steps ();
+    let _x = Queue.fold (FE.process_decl (print_status str_formatter))
+      (SAT.empty (), true, Explanation.empty) d
+    in
+    flush_str_formatter ()
   | _ -> "error: zero or more than 1 goal to solve"
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
@@ -182,11 +184,8 @@ let why3_execute (modules,_theories) =
   in
   Html.ul mods
 
-(*
 
-   Connecting why3 calls to the interface
-
- *)
+(* Connecting Why3 calls to the interface *)
 
 let temp_file_name = "/input.mlw"
 
@@ -246,11 +245,7 @@ let () =
   add_why3_cmd "run" why3_execute Mlw_module.mlw_language
 
 
-(*
-
-  Predefined examples
-
-*)
+(* Predefined examples *)
 
 let add_file_example buttonname file =
   let handler = Dom.handler
@@ -274,7 +269,8 @@ let () =
   add_file_example "drinkers" "/drinkers.why";
 (*  add_file_example "simplearith" "/simplearith.why";*)
   add_file_example "bin_mult" "/bin_mult.mlw";
-  add_file_example "isqrt" "/isqrt.mlw"
+  add_file_example "isqrt" "/isqrt.mlw";
+  Options.set_steps_bound 100
 
 
 (*
