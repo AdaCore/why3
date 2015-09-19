@@ -182,7 +182,46 @@ theory Mem
 
 end
 
+theory Distinct
+  use import int.Int
+  use import Seq
+
+  predicate distinct (s : seq 'a) =
+    forall i j. 0 <= i < length s -> 0 <= j < length s ->
+    i <> j -> s[i] <> s[j]
+
+end
+
+theory ToFset
+  use import int.Int
+  use import Seq as S
+  use import set.Fset
+
+  function to_set (s: seq 'a) : set 'a
+
+  axiom to_set_empty: to_set (S.empty: seq 'a) = (empty: set 'a)
+
+  axiom to_set_add: forall s: seq 'a. length s > 0 ->
+    to_set s = add s[0] (to_set s[1 ..])
+
+  lemma to_set_cardinal: forall s: seq 'a.
+    cardinal (to_set s) <= length s
+
+  lemma to_set_mem: forall s: seq 'a, i: int. 0 <= i < length s ->
+    mem s[i] (to_set s)
+
+  lemma to_set_snoc: forall s: seq 'a, x: 'a.
+    to_set (snoc s x) = add x (to_set s)
+
+  use import Distinct
+
+  lemma to_set_cardinal_distinct: forall s: seq 'a. distinct s ->
+    cardinal (to_set s) = length s
+
+end
+
 (** {2 Sorted Sequences} *)
+
 theory Sorted
 
   use import Seq
