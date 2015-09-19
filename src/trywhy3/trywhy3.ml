@@ -16,6 +16,13 @@ let node x = (x : #Dom.node Js.t :> Dom.node Js.t)
 
 let of_string s = node (d##createTextNode (Js.string s))
 
+let img i =
+  let x = Dom_html.createImg d in
+  x##src <- Js.string i;
+  x##height <- 12;
+  (* X##align <- Js.string "bottom"; *)
+  node x
+
 let par nl =
   let x = d##createElement (Js.string "p") in
   List.iter (Dom.appendChild x) nl;
@@ -81,6 +88,14 @@ let print_status fmt _d status steps =
   | FE.Unknown _t | FE.Sat _t ->
       fprintf fmt "Unknown (%Ld steps)@." steps
 
+type prover_answer = Valid | Unknown of string | Error of string
+
+let report_status report _d status _steps =
+  match status with
+  | FE.Unsat _dep -> report Valid
+  | FE.Inconsistent -> ()
+  | FE.Unknown _t | FE.Sat _t -> report (Unknown "unknown")
+
 let run_alt_ergo_on_task t =
   (* printing the task in a string *)
   Driver.print_task alt_ergo_driver str_formatter t;
@@ -99,11 +114,21 @@ let run_alt_ergo_on_task t =
       "Alt-Ergo: %d command(s) to process" (Queue.length d);
 *)
     SAT.reset_steps ();
-    let _x = Queue.fold (FE.process_decl (print_status str_formatter))
-      (SAT.empty (), true, Explanation.empty) d
-    in
-    flush_str_formatter ()
-  | _ -> "error: zero or more than 1 goal to solve"
+    (* let _x = Queue.fold (FE.process_decl (print_status str_formatter)) *)
+    (*   (SAT.empty (), true, Explanation.empty) d *)
+    (* in *)
+    let stat = ref (Error "no answer from Alt-Ergo") in
+    let f s = stat := s in
+    begin
+      try
+        let _x = Queue.fold (FE.process_decl (report_status f))
+          (SAT.empty (), true, Explanation.empty) d
+        in
+        !stat
+    (* flush_str_formatter () *)
+      with Sat_solvers.StepsLimitReached -> Unknown "steps limit reached"
+    end
+  | _ -> Error "zero or more than 1 goal to solve"
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
@@ -129,18 +154,23 @@ let why3_prove theories =
                     | None -> id.Ident.id_string
                   in
                   let result = run_alt_ergo_on_task task in
-                  let result =
-                    if String.length result > 80 then
-                      "..." ^ String.sub result (String.length result - 80) 80
-                    else result
+                  (* let result = *)
+                  (*   if String.length result > 80 then *)
+                  (*     "..." ^ String.sub result (String.length result - 80) 80 *)
+                  (*   else result *)
+                  (* in *)
+                  let img,res = match result with
+                    | Valid -> "accept", expl
+                    | Unknown s -> "help", expl ^ " (" ^ s ^ ")"
+                    | Error s -> "bug", expl ^ " (" ^ s ^ ")"
                   in
-                  [Html.of_string (expl ^" : " ^ result)])
+                  [Html.img (img ^ "32.png") ; Html.of_string (" " ^ res)])
                 tl
             in
             [Html.of_string expl; Html.ul tasks])
           tasks
         in
-        [ Html.of_string ("Theory " ^ thname); Html.ul tasks]
+        [ Html.of_string thname; Html.ul tasks]
         :: acc)
       theories []
   in
