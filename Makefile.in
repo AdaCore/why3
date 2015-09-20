@@ -1477,6 +1477,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 		--file=drinkers.why:/ \
 		--file=simplearith.why:/ \
 		--file=bin_mult.mlw:/ \
+		--file=fact.mlw:/ \
 		--file=isqrt.mlw:/ \
 		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
 		+weak.js +nat.js $^

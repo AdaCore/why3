@@ -23,6 +23,10 @@ let img i =
   (* X##align <- Js.string "bottom"; *)
   node x
 
+let img_accept () = img "accept32.png"
+let img_help () = img "help32.png"
+let img_bug () = img "bug32.png"
+
 let par nl =
   let x = d##createElement (Js.string "p") in
   List.iter (Dom.appendChild x) nl;
@@ -103,20 +107,12 @@ let run_alt_ergo_on_task t =
   let lb = Lexing.from_string text in
 (* from Alt-Ergo, src/main/frontend.ml *)
   let a = Why_parser.file Why_lexer.token lb in
-(* TODO ! *)
   Parsing.clear_parser ();
   let ltd, _typ_env = Why_typing.file false Why_typing.empty_env a in
   match Why_typing.split_goals ltd with
   | [d] ->
     let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
-(*
-    fprintf str_formatter
-      "Alt-Ergo: %d command(s) to process" (Queue.length d);
-*)
     SAT.reset_steps ();
-    (* let _x = Queue.fold (FE.process_decl (print_status str_formatter)) *)
-    (*   (SAT.empty (), true, Explanation.empty) d *)
-    (* in *)
     let stat = ref (Error "no answer from Alt-Ergo") in
     let f s = stat := s in
     begin
@@ -125,7 +121,6 @@ let run_alt_ergo_on_task t =
           (SAT.empty (), true, Explanation.empty) d
         in
         !stat
-    (* flush_str_formatter () *)
       with Sat_solvers.StepsLimitReached -> Unknown "steps limit reached"
     end
   | _ -> Error "zero or more than 1 goal to solve"
@@ -154,27 +149,68 @@ let why3_prove theories =
                     | None -> id.Ident.id_string
                   in
                   let result = run_alt_ergo_on_task task in
-                  (* let result = *)
-                  (*   if String.length result > 80 then *)
-                  (*     "..." ^ String.sub result (String.length result - 80) 80 *)
-                  (*   else result *)
-                  (* in *)
                   let img,res = match result with
-                    | Valid -> "accept", expl
-                    | Unknown s -> "help", expl ^ " (" ^ s ^ ")"
-                    | Error s -> "bug", expl ^ " (" ^ s ^ ")"
+                    | Valid -> Html.img_accept, expl
+                    | Unknown s -> Html.img_help, expl ^ " (" ^ s ^ ")"
+                    | Error s -> Html.img_bug, expl ^ " (" ^ s ^ ")"
                   in
-                  [Html.img (img ^ "32.png") ; Html.of_string (" " ^ res)])
+                  [img (); Html.of_string (" " ^ res)])
                 tl
             in
             [Html.of_string expl; Html.ul tasks])
           tasks
         in
-        [ Html.of_string thname; Html.ul tasks]
-        :: acc)
+        let loc =
+          Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+        in
+        (loc,[ Html.of_string thname; Html.ul tasks]) :: acc)
       theories []
   in
-  Html.ul theories
+  let s =
+    List.sort
+      (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
+      theories
+  in
+  Html.ul (List.rev_map snd s)
+
+let execute_symbol m fmt ps =
+  match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
+  | None ->
+    fprintf fmt "function '%s' has no definition"
+      ps.Mlw_expr.ps_name.Ident.id_string
+  | Some d ->
+    let lam = d.Mlw_expr.fun_lambda in
+    match lam.Mlw_expr.l_args with
+    | [pvs] when
+        Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
+      begin
+        let spec = lam.Mlw_expr.l_spec in
+        let eff = spec.Mlw_ty.c_effect in
+        let writes = eff.Mlw_ty.eff_writes in
+        let body = lam.Mlw_expr.l_expr in
+        try
+          let res, _final_env =
+            Mlw_interp.eval_global_expr env m.Mlw_module.mod_known
+              m.Mlw_module.mod_theory.Theory.th_known writes body
+          in
+          match res with
+          | Mlw_interp.Normal v -> Mlw_interp.print_value fmt v
+          | Mlw_interp.Excep(x,v) ->
+            fprintf fmt "exception %s(%a)"
+              x.Mlw_ty.xs_name.Ident.id_string Mlw_interp.print_value v
+          | Mlw_interp.Irred e ->
+            fprintf fmt "cannot execute expression@ @[%a@]"
+              Mlw_pretty.print_expr e
+          | Mlw_interp.Fun _ ->
+            fprintf fmt "result is a function"
+        with e ->
+          fprintf fmt
+            "failure during execution of function: %a (%s)"
+            Exn_printer.exn_printer e
+            (Printexc.to_string e)
+    end
+  | _ ->
+    fprintf fmt "Only functions with one unit argument can be executed"
 
 let why3_execute (modules,_theories) =
   let mods =
@@ -186,33 +222,21 @@ let why3_execute (modules,_theories) =
           let ps =
             Mlw_module.ns_find_ps m.Mlw_module.mod_export ["main"]
           in
-          let moduleans = Html.of_string ("Module " ^ modname ^ ": ") in
-          let ans =
-            match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
-            | None ->
-              [moduleans;
-               Html.ul
-                 [[Html.of_string "function main has no definition"]]]
-            | Some d ->
-              try
-                [moduleans;
-                 Html.ul
-                   [[Html.of_string
-                        (Pp.sprintf "Execution of main () returns:@\n%a"
-                           (Mlw_interp.eval_global_symbol env m) d)]]]
-              with e ->
-                [moduleans;
-                 Html.ul
-                   [[Html.of_string
-                        (Pp.sprintf
-                           "exception during execution of function main : %a (%s)"
-                         Exn_printer.exn_printer e
-                           (Printexc.to_string e))]]]
-          in ans :: acc
+          let result = Pp.sprintf "%a" (execute_symbol m) ps in
+          let loc =
+            Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+          in
+          (loc,[Html.of_string (modname ^ ".main() returns " ^ result)])
+          :: acc
         with Not_found -> acc)
       modules []
   in
-  Html.ul mods
+  let s =
+    List.sort
+      (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
+      mods
+  in
+  Html.ul (List.rev_map snd s)
 
 
 (* Connecting Why3 calls to the interface *)
@@ -299,6 +323,7 @@ let () =
   add_file_example "drinkers" "/drinkers.why";
 (*  add_file_example "simplearith" "/simplearith.why";*)
   add_file_example "bin_mult" "/bin_mult.mlw";
+  add_file_example "fact" "/fact.mlw";
   add_file_example "isqrt" "/isqrt.mlw";
   Options.set_steps_bound 100
 

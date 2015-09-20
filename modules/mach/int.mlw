@@ -13,12 +13,12 @@ module Int
   use export int.ComputerDivision
 
   let (/) (x: int) (y: int)
-    requires { "expl:division by zero" y <> 0 }
+    requires { "expl:check division by zero" y <> 0 }
     ensures  { result = div x y }
   = div x y
 
   let (%) (x: int) (y: int)
-    requires { "expl:division by zero" y <> 0 }
+    requires { "expl:check modulo by zero" y <> 0 }
     ensures  { result = mod x y }
   = mod x y
 
