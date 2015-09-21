@@ -73,9 +73,10 @@ let run_test name l =
   Format.printf "Running the test '%s'@." name;
   Format.printf "Formulas: %a@." pr_formula_list_impl l;
   let t = Unix.gettimeofday () in
-  ProverMain__Impl.main l (n 1);
+  let n = ProverMain__Impl.main l (n 1) in
   let t = Unix.gettimeofday () -. t in
-  Format.printf "Unsat (time = %.02f)@.@." t
+  Format.printf "Unsat (time = %.02f, depth=%s)@.@." t
+                (Why3extract.Why3__BigInt.to_string n)
 
 let run_all_tests () =
   run_test "drinker" (ProverTest__Impl.drinker ());

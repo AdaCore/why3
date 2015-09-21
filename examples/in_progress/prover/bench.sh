@@ -45,6 +45,7 @@ else
         printf "<proof prover=\"0\"><result status=\"timeout\" time=\"$time\"/></proof>\n" >> $report_xml
         printf "Not proved $time\n" >> $report
     fi
+    continue
     # zenon
     $WHY3CPULIMIT `expr $timelimit + 1` $memlimit -s zenon-0.8.0 -p0 -itptp -max-size $memlimit"M" -max-time $timelimit"s" $file > $TMP 2>&1
     ret=$?
