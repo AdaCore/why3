@@ -60,7 +60,10 @@ type model_element_kind =
 | Result
   (* Result of a function call (if the counter-example is for postcondition)  *)
 | Old
-  (* Old value of function argument (if the counter-example is for postcondition)  *)
+  (* Old value of function argument (if the counter-example is for postcondition) *)
+| Error_message
+  (* The model element represents error message, not source-code element.
+     The error message is saved in the name of the model element.*)
 | Other
 
 (** Information about the name of the model element *)
@@ -82,10 +85,6 @@ type model_element = {
     (** Source-code location of the element. *)
   me_term     : Term.term option;
     (** Why term corresponding to the element.  *)
-  me_text_info: bool;
-    (** True if the model element represents just textual
-        information and not source-code element.
-        In this case, just me_name is printed, not its value.*)
 }
 
 val create_model_element :
@@ -169,6 +168,41 @@ val print_model_json :
   model ->
   unit
 (** Prints counter-example model to json format.
+
+    The format is the following:
+    - counterexample is JSON object with fields indexed by names of files
+      storing values of counterexample_file
+    - counterexample_file is JSON object with fields indexed by line numbers
+      storing values of counterexample_line
+    - counterexample_line is JSON array (ordered list) with elements
+      corresponding to counterexample_element
+    - counterexample_element is JSON object with following fields
+      - "name": name of counterexample element
+      - "value": value of counterexample element
+      - "kind": kind of counterexample element:
+        - "result": Result of a function call (if the counter-example is for postcondition)
+        - "result": Old value of function argument (if the counter-example is for postcondition)
+        - "error_message": The model element represents error message, not source-code element.
+            The error message is saved in the name of the model element
+        - "other"
+
+    Example:
+    {
+      "records.adb": {
+          "84": [
+            {
+              "name": "A.A",
+              "value": "255",
+              "kind": "other"
+            },
+            {
+              "name": "B.B",
+              "value": "0",
+              "kind": "other"
+            }
+          ]
+      }
+    }
 
     @param me_name_trans see print_model
     @model the counter-example model to print.
