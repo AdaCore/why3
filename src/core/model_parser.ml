@@ -91,6 +91,7 @@ print_model_value fmt value =
 type model_element_kind =
 | Result
 | Old
+| Error_message
 | Other
 
 type model_element_name = {
@@ -103,7 +104,6 @@ type model_element = {
   me_value    : model_value;
   me_location : Loc.position option;
   me_term     : Term.term option;
-  me_text_info: bool;
 }
 
 let split_model_trace_name mt_name =
@@ -129,7 +129,6 @@ let create_model_element ~name ~value ?location ?term () =
     me_value = value;
     me_location = location;
     me_term = term;
-    me_text_info = false;
   }
 
 (*
@@ -173,9 +172,10 @@ type raw_model_parser =  string -> model_element list
 ***************************************************************
 *)
 let print_model_element me_name_trans fmt m_element =
-  if m_element.me_text_info then
+  match m_element.me_name.men_kind with
+  | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
-  else
+  | _ ->
     let me_name = me_name_trans m_element.me_name in
     fprintf fmt  "%s = %a"
       me_name print_model_value m_element.me_value
@@ -195,7 +195,7 @@ let why_name_trans me_name =
   match me_name.men_kind with
   | Result -> "result"
   | Old    -> "old" ^ " " ^ me_name.men_name
-  | Other  -> me_name.men_name
+  | _  -> me_name.men_name
 
 let print_model
     ?(me_name_trans = why_name_trans)
@@ -293,23 +293,32 @@ let interleave_with_source
 (*
 **  Quering the model - json
 *)
-let print_model_value_json fmt me_value =
-  fprintf fmt "%a" (print_model_value_sanit Json.string) me_value
-
-let model_elements_to_map_bindings model_elements =
-  List.fold_left
-    (fun map_bindings me ->
-      List.append map_bindings [(me, me.me_value)]
-    )
-    []
-    model_elements
+let print_model_element_json me_name_to_str fmt me =
+  let print_value fmt =
+    fprintf fmt "%a" (print_model_value_sanit Json.string) me.me_value in
+  let print_kind fmt =
+    match me.me_name.men_kind with
+    | Result -> fprintf fmt "%a" Json.string "result"
+    | Old -> fprintf fmt "%a" Json.string "old"
+    | Error_message -> fprintf fmt "%a" Json.string "error_message"
+    | Other -> fprintf fmt "%a" Json.string "other" in
+  let print_name fmt =
+    Json.string fmt (me_name_to_str me) in
+  let print_value_or_kind_or_name fmt printer =
+    printer fmt in
+  Json.map_bindings
+    (fun s -> s)
+    print_value_or_kind_or_name
+    fmt
+    [("name", print_name);
+     ("value", print_value);
+     ("kind", print_kind)]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
-  Json.map_bindings
-    me_name_to_str
-    print_model_value_json
+  Json.list
+    (print_model_element_json me_name_to_str)
     fmt
-    (model_elements_to_map_bindings model_elements)
+    model_elements
 
 let print_model_elements_on_lines_json me_name_to_str fmt model_file =
   Json.map_bindings
@@ -402,14 +411,13 @@ let handle_contradictory_vc model_files vc_term_loc =
       (* The vc is contradictory, add special model element  *)
 	let me_name = {
 	  men_name = "the check fails with all inputs";
-	  men_kind = Other;
+	  men_kind = Error_message;
 	} in
 	let me = {
 	  me_name = me_name;
 	  me_value = Unparsed "";
 	  me_location = Some pos;
 	  me_term = None;
-	  me_text_info = true;
 	} in
 	add_to_model model_files me
       else
