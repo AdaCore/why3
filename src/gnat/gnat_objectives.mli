@@ -171,16 +171,7 @@ module Save_VCs : sig
    val spark_counterexample_transform :
      Model_parser.model_element_name -> string
    (* Transformation of counterexample model elements names to SPARK syntax.
-   *)
-
-   val save_counterexample : goal -> Model_parser.model ->
-     trace : Gnat_loc.S.t -> string
-   (* save the counterexample to a file; return the counterexample file name,
-      "" if no counterexample file was saved
-      @param trace the trace of source-code positions that should be saved.
-        Counterexample elements with different positions will not be saved.
-        Gnat_loc.S.empty if all counterexample elements should be saved
-   *)
+      This is now handled in gnat2why. See Flow_Error_Messages.Error_Msg_Proof.Do_Pretty_Cntexmp*)
 
    val vc_file : goal -> string
    (* get the file name for a given goal *)

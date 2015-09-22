@@ -729,50 +729,10 @@ let add_to_stat prover pr stat =
       end
       else ("", Gnat_loc.S.empty)
 
-   let trace_to_list trace =
-     (* Build list of locations (pairs of filename and line number) from trace *)
-     Gnat_loc.S.fold
-       (fun loc list ->
-	 let sloc = Gnat_loc.orig_loc loc in
-	 let col = Gnat_loc.get_col sloc in
-	 let pos = Why3.Loc.user_position
-	   (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
-	 (pos::list)
-       )
-       trace
-       []
-
    let spark_counterexample_transform me_name =
-     let append_after_var_name access to_append =
-       (* Access can be either var_name or var_name.rec_fields *)
-       let splitted = Str.bounded_split (Str.regexp_string ".") access 2 in
-       match splitted with
-       | [var_name; field_access] -> var_name ^ to_append ^ "." ^ field_access
-       | _ -> access ^ to_append in
-
-     match me_name.men_kind with
-     | Model_parser.Result -> append_after_var_name me_name.men_name "'Result"
-     | Model_parser.Old -> append_after_var_name me_name.men_name "'Old"
-     | Model_parser.Other -> me_name.men_name
-
-   let save_counterexample goal counterexample ~trace  =
-     if not (is_model_empty counterexample) then begin
-       let check = get_objective goal in
-       let ce_fn = Pp.sprintf "%a.ce" Gnat_expl.to_filename check in
-       let counterexample = if trace = Gnat_loc.S.empty then
-	   counterexample
-	 else
-	   model_for_positions_and_decls
-	     counterexample ~positions:(trace_to_list trace) in
-       with_fmt_channel
-	 ce_fn
-	 (fun fmt -> Format.fprintf fmt "%a@."
-	   (print_model_json
-	      ~me_name_trans:spark_counterexample_transform) counterexample);
-       ce_fn
-     end
-     else
-       ""
+     (* Just return the name of the model element. Transformation of model
+        element names to SPARK syntax is now handled in gnat2why. *)
+     me_name.men_name
 
 end
 

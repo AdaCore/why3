@@ -70,7 +70,6 @@ val register :
   -> (string * string) option           (* (for manual provers) *)
                                        (* pair of (vc_file, editor_cmd) *)
   -> string                            (* the name of the trace file *)
-  -> string                            (* the name of the counterexample file *)
     -> unit
 (* register a proof result for the given objective, and the given result (the
    boolean). The task may be used to improve the localization of the message.

@@ -22,6 +22,7 @@
 open Why3
 open Term
 open Call_provers
+open Model_parser
 
 let rec search_labels t =
   let acc =
@@ -84,7 +85,7 @@ let rec handle_vc_result goal result prover_result manual_info =
    match status with
    | Gnat_objectives.Proved ->
        let stats = Gnat_objectives.Save_VCs.extract_stats obj in
-       Gnat_report.register obj (Some task) None (Some stats) true None "" ""
+       Gnat_report.register obj (Some task) None (Some stats) true None ""
    | Gnat_objectives.Not_Proved ->
        let (tracefile, trace) =
          match Gnat_config.proof_mode with
@@ -92,19 +93,31 @@ let rec handle_vc_result goal result prover_result manual_info =
            Gnat_objectives.Save_VCs.save_trace goal
          | _ -> ("", Gnat_loc.S.empty)
        in
-       let cntexmpfile =
-	 match prover_result with
-	 | None ->
-	   ""
-	 | Some prover_result ->
-	   Gnat_objectives.Save_VCs.save_counterexample
-	     goal prover_result.pr_model ~trace
-       in
        let model = match prover_result with
 	 | None -> None
-	 | Some r -> Some (r.pr_model) in
+	 | Some r ->
+	   let filter_model m trace =
+	     if trace = Gnat_loc.S.empty then
+	       m
+	     else
+	       let trace_to_list trace =
+		 (* Build list of locations (pairs of filename and line number) from trace *)
+		 Gnat_loc.S.fold
+		   (fun loc list ->
+		     let sloc = Gnat_loc.orig_loc loc in
+		     let col = Gnat_loc.get_col sloc in
+		     let pos = Why3.Loc.user_position
+		       (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
+		     (pos::list)
+		   )
+		   trace
+		   [] in
+	       model_for_positions_and_decls m ~positions:(trace_to_list trace)
+	   in
+	   Some (filter_model r.pr_model trace)
+       in
        Gnat_report.register obj (Some task) model None
-         false manual_info tracefile cntexmpfile
+         false manual_info tracefile
    | Gnat_objectives.Work_Left ->
        List.iter (create_manual_or_schedule obj) (Gnat_objectives.next obj)
    | Gnat_objectives.Counter_Example ->
@@ -138,7 +151,7 @@ and create_manual_or_schedule obj goal =
                   let _ = Gnat_manual.create_prover_file goal obj p in
                   let pa = Gnat_manual.manual_attempt_of_goal goal in
                   let info = Gnat_manual.manual_proof_info (Opt.get pa) in
-                  Gnat_report.register obj None None None false info "" ""
+                  Gnat_report.register obj None None None false info ""
   | _ -> schedule_goal goal
 
 and schedule_goal (g : Gnat_objectives.goal) =
@@ -180,7 +193,7 @@ and actually_schedule_goal g =
 let handle_obj obj =
    if Gnat_objectives.objective_status obj =
       Gnat_objectives.Proved then begin
-        Gnat_report.register obj None None None true None "" ""
+        Gnat_report.register obj None None None true None ""
    end else begin
       match Gnat_objectives.next obj with
       | [] -> ()
