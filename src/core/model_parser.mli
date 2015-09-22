@@ -181,7 +181,7 @@ val print_model_json :
       - "value": value of counterexample element
       - "kind": kind of counterexample element:
         - "result": Result of a function call (if the counter-example is for postcondition)
-        - "result": Old value of function argument (if the counter-example is for postcondition)
+        - "old": Old value of function argument (if the counter-example is for postcondition)
         - "error_message": The model element represents error message, not source-code element.
             The error message is saved in the name of the model element
         - "other"
