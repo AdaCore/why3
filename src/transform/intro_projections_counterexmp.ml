@@ -105,6 +105,13 @@ let intro_proj_for_ls env map_projs ls_projected =
 	   Parameter proj_name is the name of the projection
 	   Parameter applied_proj_f is a set of projection functions already applied to the term *)
 
+	let get_record_field_suffix projection =
+	  let proj_name =
+	    try
+	      get_model_element_name ~labels:projection.ls_name.id_label
+	    with Not_found -> "" in
+	  if proj_name = "" then proj_name else "."^proj_name in
+
 	match (Opt.get term.t_ty).ty_node with
 	| Tyapp (ts, [t_from; t_to]) when ts.ts_name.id_string = "map" -> begin
 	  (* If the term is of map type, check whether t_to (and t_from - to be done later) can be projected.
@@ -171,11 +178,7 @@ let intro_proj_for_ls env map_projs ls_projected =
 		  let proj_axiom = Decl.create_prop_decl Decl.Paxiom proj_axiom_id fla_axiom in
 
 		  (* Recursively call projecting of the term proj_map -> proj_map_projections  *)
-		  let pf_1_name =
-		    try
-		      get_model_element_name ~labels:pf_1.ls_name.id_label
-		    with Not_found -> "" in
-		  let proj_name = proj_name^pf_1_name in
+		  let proj_name = proj_name^(get_record_field_suffix pf_1) in
 		  let applied_projs = Term.Sls.add pf_1 applied_projs in
 		  let proj_map_projections_defs = projections_for_term proj_map_t proj_name applied_projs map_projs in
 
@@ -204,11 +207,7 @@ let intro_proj_for_ls env map_projs ls_projected =
 		  introduce_constant term proj_name
 		else
 		  let t_applied = Term.t_app pf_1 [term] pf_1.ls_value in
-		  let pf_1_name =
-		    try
-		      get_model_element_name ~labels:pf_1.ls_name.id_label
-		    with Not_found -> "" in
-		  let proj_name = proj_name^pf_1_name in
+		  let proj_name = proj_name^(get_record_field_suffix pf_1) in
 		  let applied_projs = Term.Sls.add pf_1 applied_projs in
 		  (* Return declarations for projections of t_applied = pf_1 term *)
 		  let t_applied_projs = projections_for_term t_applied proj_name applied_projs map_projs in
