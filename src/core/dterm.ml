@@ -204,9 +204,7 @@ let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
 
 let denv_get_opt denv n = Mstr.find_opt n denv
 
-let dty_of_dterm dt = match dt.dt_dty with
-  | None -> Loc.error ?loc:dt.dt_loc TermExpected
-  | Some dty -> dty
+let dty_of_dterm dt = Opt.get_def dty_bool dt.dt_dty
 
 let denv_empty = Mstr.empty
 
