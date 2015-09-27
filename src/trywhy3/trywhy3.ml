@@ -231,20 +231,22 @@ let why3_execute (modules,_theories) =
         with Not_found -> acc)
       modules []
   in
-  let s =
-    List.sort
-      (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
-      mods
-  in
-  Html.ul (List.rev_map snd s)
+  match mods with
+  | [] -> Html.par [Html.of_string "No main function found"]
+  | _ ->
+    let s =
+      List.sort
+        (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
+        mods
+    in
+    Html.ul (List.rev_map snd s)
 
 
 (* Connecting Why3 calls to the interface *)
 
 let temp_file_name = "/input.mlw"
 
-let () =
-  Sys_js.register_file ~name:temp_file_name ~content:""
+let () = Sys_js.register_file ~name:temp_file_name ~content:""
 
 let run_why3 f lang global text =
   let ch = open_out temp_file_name in
@@ -271,21 +273,28 @@ let run_why3 f lang global text =
              "unexpected exception: %a (%s)" Exn_printer.exn_printer e
              (Printexc.to_string e))]
 
-let add_why3_cmd buttonname f lang =
+let add_why3_cmd buttonname f input_lang =
   let handler = Dom.handler
     (fun _ev ->
-      log "why3 prove is running";
       let global = Js.Unsafe.global in
       let editor = Js.Unsafe.get global (Js.string "editor") in
+      let lang =
+        Js.to_string
+          (Js.Unsafe.meth_call editor "getAttribute"
+             [| Js.Unsafe.inject (Js.string "lang") |])
+      in
       let code = Js.to_string (Js.Unsafe.meth_call editor "getValue" [| |]) in
-      let answer = run_why3 f lang global code in
-      (* remove the previous answer if any *)
+      log ("Why3 is running, lang = " ^ lang);
+      let answer = run_why3 f input_lang global code in
+      log "Why3 answer given";
       let console =
         get_opt (Dom_html.document ## getElementById (Js.string "console"))
       in
+      (* remove the previous answer if any *)
       Js.Opt.iter (console##lastChild) (Dom.removeChild console);
       (* put the new answer *)
       Dom.appendChild console answer;
+      (* give the focus back to the editor *)
       ignore (Js.Unsafe.meth_call editor "focus" [| |]);
       Js._false)
   in
