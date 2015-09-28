@@ -160,20 +160,14 @@ why3_open "real/Truncate.xml"
 subsection {* Roundings up and down *}
 
 why3_vc Ceil_up
-proof -
-  show ?C1 by linarith
-  show ?C2 by (simp add:ceiling_def) (linarith)
-qed
+  by (simp_all add: ceiling_correct)
 
 why3_vc Ceil_int by auto
 
 why3_vc Floor_int by auto
 
 why3_vc Floor_down
-proof -
-  show ?C1 by linarith
-  show ?C2 by linarith
-qed
+  by (simp_all add: floor_correct [simplified])
 
 why3_vc Ceil_monotonic
   using assms
@@ -186,73 +180,31 @@ why3_vc Floor_monotonic
 subsection {* Rounding towards zero *}
 
 why3_vc Real_of_truncate
-proof -
-  show ?C1
-    apply (simp add:ceiling_def truncate_def)
-    apply (linarith)
-    done
-  show ?C2
-    apply (simp add:ceiling_def truncate_def)
-    apply (linarith)
-    done
-qed
+  using floor_correct [of x] ceiling_correct [of x]
+  by (simp_all add: truncate_def)
 
 why3_vc Truncate_int by (simp add:truncate_def)
 
 why3_vc Truncate_up_neg
-proof -
-  show ?C1
-    apply (simp add:ceiling_def truncate_def)
-    apply (linarith)
-    done
-  show ?C2
-    using assms
-    unfolding truncate_def ceiling_def
-    apply (simp)
-    apply (linarith)
-    done
-qed
+  using assms ceiling_correct [of x]
+  by (simp_all add: truncate_def)
 
 why3_vc Truncate_down_pos
-proof -
-  show ?C1
-    using assms
-    apply (simp add:ceiling_def truncate_def)
-    apply (linarith)
-    done
-  show ?C2
-    apply (simp add:ceiling_def truncate_def)
-    apply (linarith)
-    done
-qed
+  using assms floor_correct [of x]
+  by (simp_all add: truncate_def)
 
 why3_vc Truncate_monotonic
-proof -
-  { fix a b
-    assume "\<not> a > (0::int)" and "(0::int) \<le> b"
-    from this have "a \<le> b" by arith
-  } note neg_lesseq_nonneg = this
-  show ?C1 using assms
+  using assms
   unfolding truncate_def
-  apply (simp add:floor_mono ceiling_mono neg_lesseq_nonneg)
-  done
-qed
+  by (simp add: floor_mono ceiling_mono order_trans [of "\<lceil>x\<rceil>" 0 "\<lfloor>y\<rfloor>"])
 
 why3_vc Truncate_monotonic_int1
-proof -
-  show ?C1 using assms
-  apply (simp add:truncate_def)
-  apply (linarith)
-  done
-qed
+  using assms
+  by (simp add: truncate_def floor_le_iff ceiling_le_iff)
 
 why3_vc Truncate_monotonic_int2
-proof -
-  show ?C1 using assms
-  apply (simp add:truncate_def)
-  apply (linarith)
-  done
-qed
+  using assms
+  by (simp add: truncate_def le_floor_iff le_ceiling_iff)
 
 why3_end
 
@@ -318,45 +270,25 @@ why3_vc Power_0 by auto
 why3_vc Power_1 by auto
 
 why3_vc Power_s
-proof -
-  { have "nat (n + 1) = Suc (nat n)" using assms by auto
-  } note l1 = this
-  show ?C1
-  apply (simp add:l1)
-  done
-qed
+  using assms
+  by (simp add: nat_add_distrib)
 
 why3_vc Power_sum
-proof -
-  { have "nat (n + m) = nat n + nat m" using assms by auto
-  } note l2 = this
-  show ?C1
-  apply (simp add:l2 Power.monoid_mult_class.power_add)
-  done
-qed
+  using assms
+  by (simp add: nat_add_distrib power_add)
 
 why3_vc Pow_ge_one using assms by auto
 
 why3_vc Power_mult
-proof -
-  { have "nat (n * m) = nat n * nat m"
-    using assms
-    by (simp add:Nat_Transfer.transfer_nat_int_functions)
-  } note l3 = this
-  show ?C1
-  apply (simp add:l3 Power.monoid_mult_class.power_mult)
-  done
-qed
+  using assms
+  by (simp add: nat_mult_distrib power_mult)
 
 why3_vc Power_mult2 by (simp only:Power.comm_monoid_mult_class.power_mult_distrib)
 
 why3_vc Power_s_alt
 proof -
-  { have "nat n = Suc (nat (n -1))" using assms by auto
-  } note l4 = this
-  show ?C1
-  apply (simp add:l4)
-  done
+  have "nat n = Suc (nat (n - 1))" using assms by auto
+  then show ?thesis by simp
 qed
 
 why3_end
@@ -406,23 +338,12 @@ why3_vc Cos_plus_pi by auto
 
 why3_vc Pi_interval
 proof -
-  { have "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196 < pi
-" by (approximation 670)
-  } note pi_greater = this
-  { have "pi < 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197
-" by (approximation 670)
-  } note pi_less = this
-  (* explicitly remove exponentiation from the above lemmas *)
-  have a: "10 ^ 200 = (100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000::real)" by simp
-  from pi_less have pi_less': "pi < 314159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197 /
-         100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-     by (simp only: a)
-  also from pi_greater have pi_greater': "314159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196 /
-    100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-    < pi" by (simp only: a)
-  (* the rest is easy *)
-  show ?C1 by (simp only: pi_greater')
-  show ?C2 by (simp only: pi_less')
+  have "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196 < pi"
+    by (approximation 670)
+  then show ?C1 by simp
+  have "pi < 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197"
+    by (approximation 670)
+  then show ?C2 by simp
 qed
 
 why3_vc Sin_plus_pi by auto
