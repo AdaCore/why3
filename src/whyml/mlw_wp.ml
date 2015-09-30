@@ -611,6 +611,13 @@ let rec track_values state names lesson cond f = match f.t_node with
       let l, f1 = track_values state names lesson cond f1 in
       let l, f2 = track_values state names l cond f2 in
       l, t_label_copy f (t_and_simp f1 f2)
+  | Tbinop ((Tor|Tiff) as o, f1, f2) ->
+      let _, f1 = track_values state names lesson cond f1 in
+      let _, f2 = track_values state names lesson cond f2 in
+      lesson, t_label_copy f (t_binary_simp o f1 f2)
+  | Tnot f1 ->
+      let _, f1 = track_values state names lesson cond f1 in
+      lesson, t_label_copy f (t_not_simp f1)
   | Tif (fc, f1, f2) ->
       let _, f1 = track_values state names lesson cond f1 in
       let _, f2 = track_values state names lesson cond f2 in
@@ -642,14 +649,13 @@ let rec track_values state names lesson cond f = match f.t_node with
       let names = Mvs.add v p1 names in
       let l, f1 = track_values state names lesson cond f1 in
       l, t_label_copy f (t_let_simp t1 (cb v f1))
-  | Tquant (Tforall, qf) ->
+  | Tquant (q, qf) ->
       let vl, trl, f1, cb = t_open_quant_cb qf in
       let add_vs s vs = Mvs.add vs (next_point state) s in
       let names = List.fold_left add_vs names vl in
       let l, f1 = track_values state names lesson cond f1 in
-      l, t_label_copy f (t_forall_simp (cb vl trl f1))
-  | Tbinop ((Tor|Tiff),_,_) | Tquant (Texists,_)
-  | Tapp _ | Tnot _ | Ttrue | Tfalse -> lesson, f
+      l, t_label_copy f (t_quant_simp q (cb vl trl f1))
+  | Tapp _ | Ttrue | Tfalse -> lesson, f
   | Tvar _ | Tconst _ | Teps _ -> assert false
 
 let track_values lkm km f =
