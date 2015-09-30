@@ -164,10 +164,21 @@ val model_vc_term_to_string :
 
 val print_model_json :
   ?me_name_trans:(model_element_name -> string) ->
+  ?vc_line_trans:(int -> string) ->
   Format.formatter ->
   model ->
   unit
 (** Prints counter-example model to json format.
+
+    @param me_name_trans see print_model
+    @param vc_line_trans the transformation of the line corresponding to the term
+      that triggers VC to the name of JSON field storing counterexample information
+      related to this term.
+      It can be used to store the counterexample information related to this term
+      in dedicated JSON field in cases where the exact line of this term cannot be
+      computed - this can happen when VC is splitted.
+      By default, string_of_int
+    @model the counter-example model to print.
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -203,13 +214,11 @@ val print_model_json :
           ]
       }
     }
-
-    @param me_name_trans see print_model
-    @model the counter-example model to print.
 *)
 
 val model_to_string_json :
   ?me_name_trans:(model_element_name -> string) ->
+  ?vc_line_trans:(int -> string) ->
   model ->
   string
 (** See print_model_json *)
