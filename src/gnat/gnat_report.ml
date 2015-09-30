@@ -64,7 +64,9 @@ let print_cntexmp_model fmt model =
     if not (Model_parser.is_model_empty m) then begin
       Format.fprintf fmt ", ";
       print_json_field "cntexmp"
-	(Model_parser.print_model_json ~me_name_trans:spark_counterexample_transform)
+	(Model_parser.print_model_json
+	   ~me_name_trans:spark_counterexample_transform
+	   ~vc_line_trans:(fun _ -> "vc_line"))
 	fmt
 	m
     end
