@@ -53,6 +53,7 @@ module Impl
       let phip0m = phip0.model_fo_formula_list_field in
       assert { root.model_tableau_field  = Root } ;
       let gnum = phip.final_goals_number in
+      let gnum = if gnum <= 0 then (-1) else gnum in
       let rec aux (n:int) : (int, prover_return)
         diverges
         returns { (_,{ contradictory_assignment = s }) ->
