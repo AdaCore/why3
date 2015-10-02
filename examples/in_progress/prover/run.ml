@@ -343,7 +343,7 @@ let tr_top_formula env kind role f =
     let env,f =
       match kind with
       | FOF -> tr_fmla { env with cnf = false } e
-      | CNF -> tr_cnf { env with cnf = true } e
+      | CNF -> assert false (* tr_cnf { env with cnf = true } e *)
       | TFF -> assert false
     in
     let phi =
@@ -364,6 +364,7 @@ let tr_decl (env,acc) d =
   match d with
   | Include _ -> unsupported "Include"
   | Formula(TFF,_,role,top_formula,_) -> unsupported "TFF"
+  | Formula(CNF,_,role,top_formula,_) -> unsupported "CNF"
   | Formula(kind,_,role,top_formula,_) ->
     let env,phi = tr_top_formula env kind role top_formula in
     let o = Firstorder_formula_list_impl__Types.NLC_FOFCons (phi, acc) in
@@ -460,29 +461,42 @@ let pr_fof_top_formula fmt name kind role f =
      | FOF -> fprintf fmt "@[fof(%s,@ %a,@ %a).@]@\n"
                       name pr_role role pr_fof_expr e
      | CNF ->
-        let r,f = match role with
-          | Negated_conjecture -> Conjecture, {e with e_node = Enot e}
-          | _ -> role,e
+        let r = match role with
+          | Conjecture -> unsupported "conjecture in CNF format"
+          | Negated_conjecture -> Axiom
+          | Axiom -> role
+          | Hypothesis | Definition | Assumption
+          | Corollary|Lemma|Theorem|Type -> unsupported "role"
         in
         begin
           match get_vars e with
           | [] -> fprintf fmt "@[fof(%s,@ %a,@ %a).@]@\n"
-                          name pr_role r pr_fof_expr f
+                          name pr_role r pr_fof_expr e
           | l -> fprintf fmt "@[fof(%s,@ %a,@ (![%a]: %a)).@]@\n"
                          name pr_role r
                          (print_list comma pp_print_string) l
-                         pr_fof_expr f
+                         pr_fof_expr e
         end
      | TFF -> assert false
 
-let pr_fof_decl fmt d =
+let pr_fof_decl fmt k d =
   match d with
   | Include _ -> unsupported "Include"
   | Formula(TFF,_,role,top_formula,_) -> unsupported "TFF"
   | Formula(kind,name,role,top_formula,_) ->
-    pr_fof_top_formula fmt name kind role top_formula
+    pr_fof_top_formula fmt name kind role top_formula;
+    match k with
+    | None -> Some kind
+    | Some k' -> if k'=kind then k else unsupported "mixed CNF/FOF"
 
-let pr_fof fmt a = List.iter (pr_fof_decl fmt) a
+
+let pr_fof fmt a =
+  let k = List.fold_left (pr_fof_decl fmt) None a in
+  match k with
+  | Some CNF ->
+    fprintf fmt "fof(contradiction,conjecture,$false).@."
+  | None -> unsupported "empty file ??"
+  | _ -> fprintf fmt "@."
 
 let run_file ~print file =
   try
