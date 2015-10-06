@@ -320,15 +320,12 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
     md_context_labels = context_labels;
   }
 
-let model_proj_label = Ident.create_label "model_projected"
-let model_label = Ident.create_label "model"
-
 let mk_var id ty md =
   let new_labels, loc = match md with
     | None ->
       (* If there is no model data remove model labels (prevents counter-example
 	 projections of this variable, displaying this variable in counterexample, ...) *)
-      let new_labels = Slab.filter (fun l -> (l <> model_label) && (l <> model_proj_label) ) id.id_label in
+      let new_labels = Ident.remove_model_labels ~labels:id.id_label in
       (new_labels, None)
     | Some md -> begin
       (append_to_model_trace_label ~labels:id.id_label ~to_append:("@"^md.md_append_to_model_trace), md.md_loc)
@@ -615,6 +612,13 @@ let rec track_values state names lesson cond f = match f.t_node with
       let l, f1 = track_values state names lesson cond f1 in
       let l, f2 = track_values state names l cond f2 in
       l, t_label_copy f (t_and_simp f1 f2)
+  | Tbinop ((Tor|Tiff) as o, f1, f2) ->
+      let _, f1 = track_values state names lesson cond f1 in
+      let _, f2 = track_values state names lesson cond f2 in
+      lesson, t_label_copy f (t_binary_simp o f1 f2)
+  | Tnot f1 ->
+      let _, f1 = track_values state names lesson cond f1 in
+      lesson, t_label_copy f (t_not_simp f1)
   | Tif (fc, f1, f2) ->
       let _, f1 = track_values state names lesson cond f1 in
       let _, f2 = track_values state names lesson cond f2 in
@@ -646,14 +650,13 @@ let rec track_values state names lesson cond f = match f.t_node with
       let names = Mvs.add v p1 names in
       let l, f1 = track_values state names lesson cond f1 in
       l, t_label_copy f (t_let_simp t1 (cb v f1))
-  | Tquant (Tforall, qf) ->
+  | Tquant (q, qf) ->
       let vl, trl, f1, cb = t_open_quant_cb qf in
       let add_vs s vs = Mvs.add vs (next_point state) s in
       let names = List.fold_left add_vs names vl in
       let l, f1 = track_values state names lesson cond f1 in
-      l, t_label_copy f (t_forall_simp (cb vl trl f1))
-  | Tbinop ((Tor|Tiff),_,_) | Tquant (Texists,_)
-  | Tapp _ | Tnot _ | Ttrue | Tfalse -> lesson, f
+      l, t_label_copy f (t_quant_simp q (cb vl trl f1))
+  | Tapp _ | Ttrue | Tfalse -> lesson, f
   | Tvar _ | Tconst _ | Teps _ -> assert false
 
 let track_values lkm km f =
@@ -782,7 +785,7 @@ and wp_desc env e q xq = match e.e_node with
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract (create_model_data "any") env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let w = wp_abstract (create_model_data ?loc:e.e_loc "any") env spec.c_effect spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p w
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
@@ -1858,9 +1861,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* EX: spec.xpost *)
       let pre_any_label = fresh_mark () in
       let prestate = Subst.save_label pre_any_label s in
-      let md = Some (create_model_data "any") in
       let poststate, glue =
-        Subst.havoc md env (regs_of_writes spec.c_effect) prestate in
+        Subst.havoc None env (regs_of_writes spec.c_effect) prestate in
       let post = { s = poststate; ne = spec.c_post } in
       let xpost =
         Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in

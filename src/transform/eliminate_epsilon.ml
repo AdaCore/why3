@@ -22,23 +22,26 @@ let is_canonical x f =
     | Tbinop (Tiff, {t_node = Tapp (ls, [hd; t])}, f)
       when ls_equal ls ps_equ && t_equal t t_bool_true -> hd,f
     | _ -> raise Exit in
-  let check_arg v t = match t.t_node with
-    | Tvar u when vs_equal u v -> ()
+  let rvl = List.rev vl in
+  let rec match_args vl tl = match vl, tl with
+    | [], _ -> let tvs = List.fold_left t_freevars Mvs.empty tl in
+        if Mvs.set_disjoint tvs (Svs.of_list rvl) then tl else raise Exit
+    | v :: vl, {t_node = Tvar u} :: tl when vs_equal u v -> match_args vl tl
     | _ -> raise Exit in
-  let ls = match e.t_node with
-    | Tapp (ls,tl) -> List.iter2 check_arg vl tl; ls
+  let canon = match e.t_node with
+    | Tapp (ls,tl) -> ls, match_args rvl (List.rev tl)
     | _ -> raise Exit in
   let rec check_head hd vl = match hd.t_node, vl with
     | Tapp (ls, [hd; {t_node = Tvar u}]), v :: vl
       when ls_equal ls fs_func_app && vs_equal u v -> check_head hd vl
     | Tvar y, [] when vs_equal y x -> ()
     | _ -> raise Exit in
-  check_head hd (List.rev vl);
-  ls
+  check_head hd rvl;
+  canon
 
 let is_canonical x f =
   try Some (is_canonical x f)
-  with Exit | Invalid_argument _ -> None
+  with Exit -> None
 
 let get_canonical ls =
   let ty = Opt.get_def Ty.ty_bool ls.ls_value in
@@ -98,10 +101,14 @@ let rec lift_f el acc t0 = match t0.t_node with
       let vl = Mvs.keys (t_vars t0) in
       let vs, f = t_open_bound fb in
       let acc, t = match is_canonical vs f with
-        | Some ls ->
+        | Some (ls, rargs) ->
             let abst, axml = acc in
             let ld, ax, cs = get_canonical ls in
-            (ld :: abst, ax :: axml), fs_app cs [] vs.vs_ty
+            let args, ty = List.fold_left (fun (args, ty) x ->
+              x::args, Ty.ty_func (t_type x) ty) ([], vs.vs_ty) rargs in
+            let apply f x = t_app_infer fs_func_app [f;x] in
+            let ap = List.fold_left apply (fs_app cs [] ty) args in
+            (ld :: abst, ax :: axml), ap
         | None ->
             let (abst,axml), f = lift_f el acc f in
             let tyl = List.map (fun x -> x.vs_ty) vl in

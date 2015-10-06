@@ -10,7 +10,7 @@ report_xml="why3session.xml"
 
 TMP=bench.out
 
-WHY3CPULIMIT=../../../lib/why3-cpulimit
+WHY3CPULIMIT=../../../../lib/why3-cpulimit
 export TPTP=/home/marche/TPTP-v6.2.0
 
 run_dir () {
@@ -31,7 +31,7 @@ cat << EOF > $report_xml
 EOF
 for file in `ls $1/*.p`; do
 # reprint in TPTP/FOF without include
-build/prover -print $file > $TMP 2>&1
+../build/prover -print $file > $TMP 2>&1
 ret=$?
 if test "$ret" != "0" ; then
     printf "$file: ret code=$ret\n" >> $reperr
@@ -40,7 +40,7 @@ else
     printf "<goal name=\"$file\">\n" >> $report_xml
     printf "$file:\n"  >> $report
     # safeprover
-    $WHY3CPULIMIT $timelimit $memlimit -s build/prover tmp.p > $TMP 2>&1
+    $WHY3CPULIMIT $timelimit $memlimit -s ../build/prover tmp.p > $TMP 2>&1
     time=`sed -n -e 's|.*time : \(.*\) s.*|\1|p' $TMP`
     if grep "Unsat" $TMP > /dev/null ; then
         printf "<proof prover=\"0\"><result status=\"valid\" time=\"$time\"/></proof>\n" >> $report_xml

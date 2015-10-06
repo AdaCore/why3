@@ -23,6 +23,7 @@ open Printer
 
 type model_value =
  | Integer of string
+ | Decimal of (string * string)
  | Array of model_array
  | Bitvector of int
  | Unparsed of string
@@ -74,6 +75,10 @@ print_model_value_sanit sanit_print fmt value =
   (* Prints model value. *)
   match value with
   | Integer s -> sanit_print fmt s
+  | Decimal (int_part, fract_part) ->
+    sanit_print fmt int_part;
+    sanit_print fmt ".";
+    sanit_print fmt fract_part;
   | Unparsed s -> sanit_print fmt s
   | Array a ->
     print_array str_formatter a;
