@@ -16,6 +16,7 @@
 *)
 type model_value =
  | Integer of string
+ | Decimal of (string * string)
  | Array of model_array
  | Bitvector of int
  | Unparsed of string
@@ -171,13 +172,16 @@ val print_model_json :
 (** Prints counter-example model to json format.
 
     @param me_name_trans see print_model
-    @param vc_line_trans the transformation of the line corresponding to the term
-      that triggers VC to the name of JSON field storing counterexample information
-      related to this term.
-      It can be used to store the counterexample information related to this term
-      in dedicated JSON field in cases where the exact line of this term cannot be
-      computed - this can happen when VC is splitted.
-      By default, string_of_int
+    @param vc_line_trans the transformation from the line number corresponding
+      to the term that triggers VC before splitting VC to the name of JSON field
+      storing counterexample information related to this term. By default, this
+      information is stored in JSON field corresponding to this line, i.e.,
+      the transformation is string_of_int.
+      Note that the exact line of the construct that triggers VC may not be
+      known. This can happen if the term that triggers VC spans multiple lines
+      and it is splitted.
+      This transformation can be used to store the counterexample information
+      related to this term in dedicated JSON field.
     @model the counter-example model to print.
 
     The format is the following:
