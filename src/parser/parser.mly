@@ -10,7 +10,7 @@
 (********************************************************************)
 
 %{
-module Incremental = struct
+module Increment = struct
   let stack = Stack.create ()
   let open_file inc = Stack.push inc stack
   let close_file () = ignore (Stack.pop stack)
@@ -181,43 +181,43 @@ end
 
 open_file:
 (* Dummy token. Menhir does not accept epsilon. *)
-| EOF { Incremental.open_file }
+| EOF { Increment.open_file }
 
 logic_file:
-| theory* EOF   { Incremental.close_file () }
+| theory* EOF   { Increment.close_file () }
 
 program_file:
-| theory_or_module* EOF { Incremental.close_file () }
+| theory_or_module* EOF { Increment.close_file () }
 
 theory:
-| theory_head theory_decl* END  { Incremental.close_theory () }
+| theory_head theory_decl* END  { Increment.close_theory () }
 
 theory_or_module:
 | theory                        { () }
-| module_head module_decl* END  { Incremental.close_module () }
+| module_head module_decl* END  { Increment.close_module () }
 
 theory_head:
-| THEORY labels(uident)  { Incremental.open_theory $2 }
+| THEORY labels(uident)  { Increment.open_theory $2 }
 
 module_head:
-| MODULE labels(uident)  { Incremental.open_module $2 }
+| MODULE labels(uident)  { Increment.open_module $2 }
 
 theory_decl:
-| decl            { Incremental.new_decl  (floc $startpos $endpos) $1 }
-| use_clone       { Incremental.use_clone (floc $startpos $endpos) $1 }
+| decl            { Increment.new_decl  (floc $startpos $endpos) $1 }
+| use_clone       { Increment.use_clone (floc $startpos $endpos) $1 }
 | namespace_head theory_decl* END
-    { Incremental.close_namespace (floc $startpos($1) $endpos($1)) $1 }
+    { Increment.close_namespace (floc $startpos($1) $endpos($1)) $1 }
 
 module_decl:
-| decl            { Incremental.new_decl  (floc $startpos $endpos) $1 }
-| pdecl           { Incremental.new_pdecl (floc $startpos $endpos) $1 }
-| use_clone       { Incremental.use_clone (floc $startpos $endpos) $1 }
+| decl            { Increment.new_decl  (floc $startpos $endpos) $1 }
+| pdecl           { Increment.new_pdecl (floc $startpos $endpos) $1 }
+| use_clone       { Increment.use_clone (floc $startpos $endpos) $1 }
 | namespace_head module_decl* END
-    { Incremental.close_namespace (floc $startpos($1) $endpos($1)) $1 }
+    { Increment.close_namespace (floc $startpos($1) $endpos($1)) $1 }
 
 namespace_head:
 | NAMESPACE boption(IMPORT) uident
-   { Incremental.open_namespace $3.id_str; $2 }
+   { Increment.open_namespace $3.id_str; $2 }
 
 (* Use and clone *)
 
