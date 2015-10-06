@@ -106,11 +106,9 @@ let intro_proj_for_ls env map_projs ls_projected =
 	   Parameter applied_proj_f is a set of projection functions already applied to the term *)
 
 	let get_record_field_suffix projection =
-	  let proj_name =
-	    try
-	      get_model_element_name ~labels:projection.ls_name.id_label
-	    with Not_found -> "" in
-	  if proj_name = "" then proj_name else "."^proj_name in
+	  try
+	    get_model_element_name ~labels:projection.ls_name.id_label
+	  with Not_found -> "" in
 
 	match (Opt.get term.t_ty).ty_node with
 	| Tyapp (ts, [t_from; t_to]) when ts.ts_name.id_string = "map" -> begin

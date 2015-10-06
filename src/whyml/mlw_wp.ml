@@ -316,15 +316,12 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
     md_context_labels = context_labels;
   }
 
-let model_proj_label = Ident.create_label "model_projected"
-let model_label = Ident.create_label "model"
-
 let mk_var id ty md =
   let new_labels, loc = match md with
     | None ->
       (* If there is no model data remove model labels (prevents counter-example
 	 projections of this variable, displaying this variable in counterexample, ...) *)
-      let new_labels = Slab.filter (fun l -> (l <> model_label) && (l <> model_proj_label) ) id.id_label in
+      let new_labels = Ident.remove_model_labels ~labels:id.id_label in
       (new_labels, None)
     | Some md -> begin
       (append_to_model_trace_label ~labels:id.id_label ~to_append:("@"^md.md_append_to_model_trace), md.md_loc)
