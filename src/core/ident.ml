@@ -44,6 +44,12 @@ let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
 
 (* functions for working with counterexample model labels *)
 
+let model_proj_label = create_label "model_projected"
+let model_label = create_label "model"
+
+let remove_model_labels ~labels =
+  Slab.filter (fun l -> (l <> model_label) && (l <> model_proj_label) ) labels
+
 let is_model_trace_label label =
   Strings.has_prefix "model_trace:" label.lab_string
 
