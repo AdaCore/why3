@@ -778,7 +778,7 @@ and wp_desc env e q xq = match e.e_node with
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
       (* TODO: propagate call labels into tyc.c_post *)
-      let w = wp_abstract (create_model_data "any") env spec.c_effect spec.c_post spec.c_xpost q xq in
+      let w = wp_abstract (create_model_data ?loc:e.e_loc "any") env spec.c_effect spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p w
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
@@ -1838,9 +1838,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* EX: spec.xpost *)
       let pre_any_label = fresh_mark () in
       let prestate = Subst.save_label pre_any_label s in
-      let md = Some (create_model_data "any") in
       let poststate, glue =
-        Subst.havoc md env (regs_of_writes spec.c_effect) prestate in
+        Subst.havoc None env (regs_of_writes spec.c_effect) prestate in
       let post = { s = poststate; ne = spec.c_post } in
       let xpost =
         Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in
