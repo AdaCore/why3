@@ -271,6 +271,11 @@ let rec tr_fmla env e =
     let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
     let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
     env,Firstorder_formula_impl__Impl.construct_fo_formula o
+  | Edef(DP(DPfalse),[]) ->
+     let o =
+      Firstorder_formula_impl__Types.NLC_FFalse
+    in
+    env,Firstorder_formula_impl__Impl.construct_fo_formula o
   | Edef(w,el) -> unsupported "def"
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
@@ -343,7 +348,7 @@ let tr_top_formula env kind role f =
     let env,f =
       match kind with
       | FOF -> tr_fmla { env with cnf = false } e
-      | CNF -> assert false (* tr_cnf { env with cnf = true } e *)
+      | CNF -> (* assert false *) tr_cnf { env with cnf = true } e
       | TFF -> assert false
     in
     let phi =
@@ -465,7 +470,8 @@ let pr_fof_top_formula fmt name kind role f =
           | Conjecture -> unsupported "conjecture in CNF format"
           | Negated_conjecture -> Axiom
           | Axiom -> role
-          | Hypothesis | Definition | Assumption
+          | Hypothesis -> role
+          | Definition | Assumption
           | Corollary|Lemma|Theorem|Type -> unsupported "role"
         in
         begin
