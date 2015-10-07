@@ -1,21 +1,8 @@
-
-(* module BitCountSpec_2 *)
-
-(*   use import bv.BV32 *)
-(*   use import int.NumOf *)
-
-(*   function count_logic (a : t) : int *)
-
-(*   val count (bv:t) : t *)
-(*     ensures { to_uint result = count__logic bv } *)
-
-(* end *)
-
 module BitCount8bit_fact
 
   use import int.Int
   use import int.NumOf
-  use import mach.bv.BVCheck8
+  use import bv.BV8
   use import ref.Ref
 
   function nth_as_bv (a i : t) : t =
@@ -95,15 +82,15 @@ module BitCount8bit_fact
   =
     let x = ref n in
 
-    x := sub_check !x (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55));
+    x := sub !x (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55));
     let ghost x1 = !x in
 
-    x := add_check
+    x := add
                (bw_and !x (of_int 0x33))
                (bw_and (lsr_bv !x (of_int 2)) (of_int (0x33)));
     let ghost x2 = !x in
 
-    x := bw_and (add_check !x (lsr_bv !x (of_int 4))) (of_int 0x0F);
+    x := bw_and (add !x (lsr_bv !x (of_int 4))) (of_int 0x0F);
 
     prove n x1 x2 !x;
 
@@ -115,7 +102,7 @@ module BitCount32bit_fact
 
   use import int.Int
   use import int.NumOf
-  use import mach.bv.BVCheck32
+  use import bv.BV32
   use import ref.Ref
 
   function count_logic (bv:t) : int = numof (nth bv) 0 32
@@ -260,43 +247,43 @@ module BitCount32bit_fact
   =
     let x = ref n in
 
-    assert { ule (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55555555)) !x };
+    (* assert { ule (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55555555)) !x }; *)
 
     (* x = x - ( (x >> 1) & 0x55555555) *)
-    x := sub_check !x (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55555555));
+    x := sub !x (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55555555));
     let ghost x1 = !x in
 
-    assert { ule (bw_and !x (of_int 0x33333333))
-                 (of_int 0x33333333) };
-    assert { ule (bw_and (lsr_bv !x (of_int 2)) (of_int (0x33333333)))
-                 (of_int (0x33333333)) };
+    (* assert { ule (bw_and !x (of_int 0x33333333)) *)
+    (*              (of_int 0x33333333) }; *)
+    (* assert { ule (bw_and (lsr_bv !x (of_int 2)) (of_int (0x33333333))) *)
+    (*              (of_int (0x33333333)) }; *)
 
     (* x = (x & 0x33333333) + ((x >> 2) & 0x33333333) *)
-    x := add_check
+    x := add
            (bw_and !x (of_int 0x33333333))
            (bw_and (lsr_bv !x (of_int 2)) (of_int (0x33333333)));
     let ghost x2 = !x in
 
-     assert { ule !x (of_int 0x6666_6666) };
-     assert { ule (lsr_bv !x (of_int 4)) (of_int 0x0666_6666) };
+     (* assert { ule !x (of_int 0x6666_6666) }; *)
+     (* assert { ule (lsr_bv !x (of_int 4)) (of_int 0x0666_6666) }; *)
 
     (* x = (x + (x >> 4)) & 0x0F0F0F0F *)
-    x := bw_and (add_check !x (lsr_bv !x (of_int 4))) (of_int 0x0F0F0F0F);
+    x := bw_and (add !x (lsr_bv !x (of_int 4))) (of_int 0x0F0F0F0F);
     let ghost x3 = !x in
 
-    assert {ult !x (of_int 0x0F0F0F0F)};
-    assert {ult (lsr_bv !x (of_int 8)) (of_int 0x000F0F0F)};
-    assert {uint_in_range 0x0F0F0F0F /\ uint_in_range 0x000F0F0F};
+    (* assert {ult !x (of_int 0x0F0F0F0F)}; *)
+    (* assert {ult (lsr_bv !x (of_int 8)) (of_int 0x000F0F0F)}; *)
+    (* assert {uint_in_range 0x0F0F0F0F /\ uint_in_range 0x000F0F0F}; *)
 
     (* x = x + (x >> 8) *)
-    x := add_check !x (lsr_bv !x (of_int 8));
+    x := add !x (lsr_bv !x (of_int 8));
     let ghost x4 = !x in
 
-    assert {ult !x (of_int 0x0F000000)};
-    assert {ult (lsr_bv !x (of_int 8)) (of_int 0x000F0000)};
+    (* assert {ult !x (of_int 0x0F000000)}; *)
+    (* assert {ult (lsr_bv !x (of_int 8)) (of_int 0x000F0000)}; *)
 
     (* x = x + (x >> 16) *)
-    x := add_check !x (lsr_bv !x (of_int 16));
+    x := add !x (lsr_bv !x (of_int 16));
 
     prove n x1 x2 x3 x4 !x;
 
@@ -363,9 +350,9 @@ module AsciiCode
   use import BitCount32bit_fact
 
   constant one : t = of_int 1
-  constant lastbit : t = sub size one
+  constant lastbit : t = sub size_bv one
 
-  (* let lastbit () = (sub_check size one) : t *)
+  (* let lastbit () = (sub_check size_bv one) : t *)
 
   (** {2 ASCII cheksum }
     In the beginning the encoding of an ascii character was done on 8
@@ -410,7 +397,7 @@ module AsciiCode
     requires { bw_and b c = zero }
     ensures  { count_logic (bw_or b c) = count_logic b + count_logic c }
   =
-    assert { forall i. ult i size ->
+    assert { forall i. ult i size_bv ->
                not (nth_bv b i) \/ not (nth_bv c i) };
     assert { forall i. not (nth_bv b (of_int i)) \/ not (nth_bv c (of_int i))
           -> not (nth b i) \/ not (nth c i) };
@@ -474,7 +461,7 @@ module GrayCode
   use Hamming
 
   constant one : t = of_int 1
-  constant lastbit : t = sub size one
+  constant lastbit : t = sub size_bv one
 
   (** {2 Gray code}
     Gray codes are bit-wise representations of integers with the
@@ -535,7 +522,7 @@ module GrayCode
       integer *)
 
   lemma nthBinary: forall b i.
-    ult i size ->
+    ult i size_bv ->
       nth_bv (fromGray b) i <-> even (count_logic (lsr_bv b i))
 
   (** The last property that we check is that if an integer is even

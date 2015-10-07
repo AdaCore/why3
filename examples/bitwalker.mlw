@@ -16,22 +16,6 @@ module Bitwalker
   use import mach.bv.BV
 *)
 
-  predicate in_small_range (x:BV32.t) = BV32.ule x (BV32.of_int BV8.max_int)
-
-  predicate in_small_range2 (x:BV64.t) = BV64.ule x (BV64.of_int BV32.max_int)
-
-  lemma toBig_to_uint: forall x:BV8.t.
-     BV32.to_uint (C8_32.toBig x) = BV8.to_uint x
-
-  lemma toSmall_to_uint: forall x:BV32.t. in_small_range x ->
-     BV32.to_uint x = BV8.to_uint (C8_32.toSmall x)
-
-  lemma toBig_to_uint2: forall x:BV32.t.
-     BV64.to_uint (C32_64.toBig x) = BV32.to_uint x
-
-  lemma toSmall_to_uint2: forall x:BV64.t. in_small_range2 x ->
-     BV64.to_uint x = BV32.to_uint (C32_64.toSmall x)
-
   function nth8_stream (stream : array BV8.t) (pos : int) : bool =
     BV8.nth stream[div pos 8] (7 - mod pos 8)
 

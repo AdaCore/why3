@@ -332,7 +332,7 @@ module NQueensBits
 
   let queens (q: BV32.t)
     requires { BV32.to_uint q = n }
-    requires { BV32.ule q BV32.size }
+    requires { BV32.ule q BV32.size_bv }
     requires { !s = 0 }
     ensures  { result = !s }
     ensures  { sorted !sol 0 !s }
