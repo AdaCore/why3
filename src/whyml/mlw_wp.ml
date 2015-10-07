@@ -316,6 +316,11 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
     md_context_labels = context_labels;
   }
 
+let create_model_data_opt ~loc ?context_labels append_to_model_trace =
+  match loc with
+  | None -> None
+  | Some loc -> Some (create_model_data ~loc ?context_labels append_to_model_trace)
+
 let mk_var id ty md =
   let new_labels, loc = match md with
     | None ->
@@ -381,7 +386,7 @@ let update_term env (mreg : vsymbol Mreg.t) f =
     | t -> Some t in
   let vars = Mvs.mapi_filter update (t_vars f) in
   (* [vv'] : modified variable -> fresh variable *)
-  let new_var vs _ = mk_var vs.vs_name vs.vs_ty (Some (create_model_data ?loc:f.t_loc ~context_labels:f.t_label "model_quantify")) in
+  let new_var vs _ = mk_var vs.vs_name vs.vs_ty (create_model_data_opt ~loc:f.t_loc ~context_labels:f.t_label "model_quantify") in
   let vv' = Mvs.mapi new_var vars in
   (* update modified variables *)
   let update v t f = wp_let (Mvs.find v vv') t f in
@@ -408,10 +413,16 @@ let quantify md env regs f =
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
     let md = match md.md_loc with
-      | None -> create_model_data
-	?loc:id.id_loc ~context_labels:id.id_label md.md_append_to_model_trace
-      | _ -> md in
-    mk_var id ty (Some md) in
+      | None ->
+	(
+	  match id.id_loc with
+	  | None -> None
+	  | Some l ->
+	    Some (create_model_data
+		    ~loc:l ~context_labels:id.id_label md.md_append_to_model_trace)
+	)
+      | _ -> Some md in
+    mk_var id ty md in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
   let f = update_term env mreg f in
@@ -1617,7 +1628,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
       let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "call") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "call" in
       let state_after_call, call_glue =
         Subst.havoc md env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->
@@ -1670,7 +1681,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             e_label_copy e e2
          else e2 in
       let wp1 = fast_wp_expr env s (vs, xresult) e1 in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "let") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "let" in
       let wp1posts =
         match sym with
         | LetV v -> Subst.add_pvar md v wp1.post.s
@@ -1706,7 +1717,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           (t_implies_subst cond_res wp1.post.ne
             (t_if_simp test wp2.ok wp3.ok)) in
       let ok = wp_label e ok in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "if") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "if" in
       let state, f2, f3 = Subst.merge md wp1.post.s wp2.post.s wp3.post.s in
       let ne =
         t_and_subst cond_res wp1.post.ne
@@ -1744,7 +1755,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let s, ne =
         try
           let p = Mexn.find ex wp1.exn in
-	  let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "raise") in
+	  let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "raise" in
           let s, r1, r2 = Subst.merge md s p.s wp1.post.s in
           let ne =
             wp_or (t_and_simp p.ne r1)
@@ -1776,7 +1787,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         Mexn.fold (fun ex post acc -> try
           let _, e2 = Mexn.find ex handlers in
           let wp2 = fast_wp_expr env post.s r e2 in
-	  let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "try") in
+	  let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "try" in
           let s,f1,f2 = Subst.merge md s wp1.post.s wp2.post.s in
           let ne =
              wp_or
@@ -1858,7 +1869,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                        inv => (ok(e1) /\ (ne(e1) => inv' /\ var))) *)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "loop") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "loop" in
       let havoc_state, glue = Subst.havoc md env (regs_of_writes e1.e_effect) s in
       let init_inv = t_label_add expl_loop_init (Subst.term s inv) in
       let inv_hypo =
@@ -1905,7 +1916,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           (t_implies_subst cond_res wp1.post.ne
                            (build_case (fun wp -> wp.ok) wps))
       in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "case") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "case" in
       let state, fl =
         Subst.merge_l md wp1.post.s (List.map (fun wp -> wp.post.s) wps) in
       let posts = List.map2 (fun f wp -> t_and_simp f wp.post.ne) fl wps in
@@ -1949,7 +1960,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         wp_expl expl_loop_init
           (Subst.term s (t_subst_single x (t_var v1) inv)) in
       let init_inv = t_implies_simp v1_le_v2 init_inv in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "loop") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "loop" in
       let havoc_state, glue = Subst.havoc md env (regs_of_writes e1.e_effect) s in
       let inv_hypo =
         t_and_simp_l
@@ -1997,7 +2008,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let res, t = get_term e1 in
       let t = fs_app pl.pl_ls [t] pv.pv_vs.vs_ty in
       let wp1 = fast_wp_expr env s (res, xresult) e1 in
-      let md = Some (create_model_data ?loc:e1.e_loc ~context_labels:e1.e_label "assign") in
+      let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "assign" in
       let s2, glue = Subst.havoc md env (Sreg.singleton reg) wp1.post.s in
       let t = Subst.term s2 t in
       let ne =
