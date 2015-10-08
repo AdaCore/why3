@@ -76,13 +76,11 @@ print_model_value_sanit sanit_print fmt value =
   match value with
   | Integer s -> sanit_print fmt s
   | Decimal (int_part, fract_part) ->
-    sanit_print fmt int_part;
-    sanit_print fmt ".";
-    sanit_print fmt fract_part;
+    sanit_print fmt (int_part^"."^fract_part)
   | Unparsed s -> sanit_print fmt s
   | Array a ->
     print_array str_formatter a;
-    sanit_print fmt (flush_str_formatter ());
+    sanit_print fmt (flush_str_formatter ())
   | Bitvector v -> sanit_print fmt (string_of_int v)
 and
 print_model_value fmt value =

@@ -4,7 +4,7 @@ module BVCheck_Gen
 
   type t
 
-  constant size_int : int
+  constant size : int
 
   constant two_power_size : int
   constant zero           : t
@@ -52,17 +52,17 @@ module BVCheck_Gen
     ensures  { to_uint result = to_uint a * to_uint b }
 
   val lsl_check (a b:t) : t
-    requires { 0 <= to_uint b < size_int }
+    requires { 0 <= to_uint b < size }
     ensures  { result = lsl_bv a b }
     ensures  { result = lsl a (to_uint b) }
 
   val lsr_check (a b:t) : t
-    requires { 0 <= to_uint b < size_int }
+    requires { 0 <= to_uint b < size }
     ensures  { result = lsr_bv a b }
     ensures  { result = lsr a (to_uint b) }
 
   val asr_check (a b:t) : t
-    requires { 0 <= to_uint b < size_int }
+    requires { 0 <= to_uint b < size }
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
@@ -145,7 +145,7 @@ module BVCheck8
 
   clone export BVCheck_Gen with
     type t = t,
-    constant size_int = size_int,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -173,7 +173,7 @@ module BVCheck16
 
   clone export BVCheck_Gen with
     type t = t,
-    constant size_int = size_int,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -201,7 +201,7 @@ module BVCheck32
 
   clone export BVCheck_Gen with
     type t = t,
-    constant size_int = size_int,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -229,7 +229,7 @@ module BVCheck64
 
   clone export BVCheck_Gen with
     type t = t,
-    constant size_int = size_int,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,

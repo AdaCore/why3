@@ -23,6 +23,8 @@ theory bv.BV_Gen
   remove prop nth_out_of_bound
   remove prop Nth_zero
   remove prop Nth_ones
+  remove prop two_power_size_val
+  remove prop max_int_val
   remove prop eq_sub_equiv
   remove prop Extensionality
   remove prop Nth_bw_or
@@ -102,6 +104,11 @@ theory bv.BV8
 
   syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
   syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+end
+
+theory bv.BVConverter_Gen
+  remove prop toSmall_to_uint
+  remove prop toBig_to_uint
 end
 
 theory bv.BVConverter_32_64
