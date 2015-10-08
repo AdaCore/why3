@@ -20,7 +20,7 @@ rule token = parse
       { LPAREN }
   | ')'
       { RPAREN }
-  | "(_ bv"(num as bv_value)" "num")" { BITVECTOR_VALUE (int_of_string bv_value)  }
+  | "(_ bv"(num as bv_value)" "num")" { BITVECTOR_VALUE bv_value }
   | num as integer
       { INT_STR (integer) }
   | '-'space*(num as integer) { MINUS_INT_STR ("-"^integer) }
