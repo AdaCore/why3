@@ -97,7 +97,10 @@ let rec add_quant kn (vl,tl,f) v =
 	      begin
 		try
 		  Ident.get_model_trace_string ~labels:pj_ls.ls_name.id_label
-		with Not_found -> "."^pj_ls.ls_name.id_string
+		with Not_found ->
+		  (* No traceability information to SPARK code => the record field
+		     will not be included in counterexample. *)
+		  "@hide_field"
 	      end
 	    | _ -> ""
 	  ) in
