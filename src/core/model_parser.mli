@@ -18,7 +18,7 @@ type model_value =
  | Integer of string
  | Decimal of (string * string)
  | Array of model_array
- | Bitvector of int
+ | Bitvector of string
  | Unparsed of string
 and  arr_index = {
   arr_index_key : model_value;

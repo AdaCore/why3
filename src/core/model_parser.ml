@@ -25,7 +25,7 @@ type model_value =
  | Integer of string
  | Decimal of (string * string)
  | Array of model_array
- | Bitvector of int
+ | Bitvector of string
  | Unparsed of string
 and  arr_index = {
   arr_index_key : model_value;
@@ -81,7 +81,7 @@ print_model_value_sanit sanit_print fmt value =
   | Array a ->
     print_array str_formatter a;
     sanit_print fmt (flush_str_formatter ())
-  | Bitvector v -> sanit_print fmt (string_of_int v)
+  | Bitvector v -> sanit_print fmt v
 and
 print_model_value fmt value =
   print_model_value_sanit (fun fmt s -> fprintf fmt "%s" s) fmt value

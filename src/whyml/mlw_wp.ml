@@ -1647,8 +1647,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let pre =
         wp_label ~override:true e (Subst.term state_before_call spec.c_pre) in
       let md =
-        create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "call"
-      in
+	create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "call" in
       let state_after_call, call_glue =
         Subst.havoc md env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->

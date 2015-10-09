@@ -102,10 +102,12 @@ let rec lift_f el acc t0 = match t0.t_node with
       let vs, f = t_open_bound fb in
       let acc, t = match is_canonical vs f with
         | Some (ls, rargs) ->
-            let abst, axml = acc in
             let ld, ax, cs = get_canonical ls in
-            let args, ty = List.fold_left (fun (args, ty) x ->
-              x::args, Ty.ty_func (t_type x) ty) ([], vs.vs_ty) rargs in
+            let args, ty, acc = List.fold_left (fun (args, ty, acc) x ->
+                let acc, y = lift_f el acc x in
+                y :: args, Ty.ty_func (t_type y) ty, acc
+              ) ([], vs.vs_ty, acc) rargs in
+            let abst, axml = acc in
             let apply f x = t_app_infer fs_func_app [f;x] in
             let ap = List.fold_left apply (fs_app cs [] ty) args in
             (ld :: abst, ax :: axml), ap

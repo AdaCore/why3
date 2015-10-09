@@ -7,7 +7,7 @@
 %token STORE
 %token CONST
 %token AS
-%token <int> BITVECTOR_VALUE
+%token <string> BITVECTOR_VALUE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
 %token <string * string> DEC_STR
