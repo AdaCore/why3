@@ -418,13 +418,21 @@ let rec reduce engine c =
       | Term { t_node = Tfalse } ->
         { value_stack = st ;
           cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
-      | Term t1 ->
-        { value_stack =
-            Term
-              (t_label_copy orig
-                 (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
-          cont_stack = rem ;
-        }
+      | Term t1 -> begin
+          match t1.t_node , t2.t_node , t3.t_node with
+          | Tapp (ls,[b0;{ t_node = Tapp (ls1,_) }]) , Tapp(ls2,_) , Tapp(ls3,_)
+            when ls_equal ls ps_equ && ls_equal ls1 fs_bool_true &&
+              ls_equal ls2 fs_bool_true && ls_equal ls3 fs_bool_false ->
+            { value_stack = Term (t_label_copy orig b0) :: st;
+              cont_stack = rem }
+          | _ ->
+            { value_stack =
+                Term
+                  (t_label_copy orig
+                     (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
+              cont_stack = rem ;
+            }
+        end
       | Int _ -> assert false (* would be ill-typed *)
     end
   | [], (Klet _, _) :: _ -> assert false
@@ -668,19 +676,11 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
               let lhs = t_label_copy teq (t_app ps_equ [lhs;tr] None) in
               t_label_copy t (t_binary Tiff lhs body) in
             let elim body vh t2 =
-              match rem_cont with
-              | (Keval (tr,_),_) :: (Kapp (ls,_),_) :: rem_cont
-                when t_equal tr t_bool_true && ls_equal ls ps_equ ->
-                { value_stack = rem_st;
-                  cont_stack =
-                    (Keval(body,Mvs.add vh t2 Mvs.empty),
-                     t_label_copy orig body) :: rem_cont }
-              | _ ->
-                let body = t_if body t_bool_true t_bool_false in
-                { value_stack = rem_st;
-                  cont_stack =
-                  (Keval(body,Mvs.add vh t2 Mvs.empty),
-                  t_label_copy orig body) :: rem_cont } in
+              let body = t_if body t_bool_true t_bool_false in
+              { value_stack = rem_st;
+                cont_stack =
+                (Keval(body,Mvs.add vh t2 Mvs.empty),
+                t_label_copy orig body) :: rem_cont } in
             process lhs body equ elim
           | _ -> raise Undetermined
         end
@@ -881,6 +881,11 @@ and reduce_term_equ ~orig st t1 t2 cont =
       { value_stack = Term (t_label_copy orig t_false) :: st;
         cont_stack = cont;
       }
+  | Tif (b,{ t_node = Tapp(ls1,_) },{ t_node = Tapp(ls2,_) }) , Tapp(ls3,_)
+    when ls_equal ls3 fs_bool_true && ls_equal ls1 fs_bool_true &&
+         ls_equal ls2 fs_bool_false ->
+    { value_stack = Term (t_label_copy orig b) :: st;
+      cont_stack = cont }
   | _ -> raise Undetermined
 
 
