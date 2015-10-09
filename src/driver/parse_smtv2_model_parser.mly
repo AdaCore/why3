@@ -7,9 +7,11 @@
 %token STORE
 %token CONST
 %token AS
+%token <string> BITVECTOR_VALUE
 %token <string> INT_STR
-%token <int> BITVECTOR_VALUE
 %token <string> MINUS_INT_STR
+%token <string * string> DEC_STR
+%token <string * string> MINUS_DEC_STR
 %token LPAREN RPAREN
 %token EOF
 %%
@@ -52,6 +54,7 @@ text_without_int:
 
 value:
 | integer { $1 }
+| decimal { $1 }
 | other_val_str { Model_parser.Unparsed $1 }
 | array { Model_parser.Array $1 }
 | bitvector { Model_parser.Bitvector $1 }
@@ -60,6 +63,11 @@ integer:
 | INT_STR { Model_parser.Integer $1 }
 | LPAREN possible_space MINUS_INT_STR possible_space RPAREN
     { Model_parser.Integer $3 }
+
+decimal:
+| DEC_STR { Model_parser.Decimal $1 }
+| LPAREN possible_space MINUS_DEC_STR possible_space RPAREN
+    { Model_parser.Decimal ($3) }
 
 (* Everything that cannot be integer (positive and negative) and array. *)
 other_val_str:

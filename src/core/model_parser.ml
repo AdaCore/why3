@@ -29,8 +29,9 @@ let debug = Debug.register_info_flag "model_parser"
 
 type model_value =
  | Integer of string
+ | Decimal of (string * string)
  | Array of model_array
- | Bitvector of int
+ | Bitvector of string
  | Unparsed of string
 and  arr_index = {
   arr_index_key : model_value;
@@ -64,25 +65,29 @@ let rec print_indices fmt indices =
   match indices with
   | [] -> ()
   | index::tail ->
-    fprintf fmt "; %a -> " print_model_value index.arr_index_key;
+    fprintf fmt "%a => " print_model_value index.arr_index_key;
     print_model_value fmt index.arr_index_value;
+    fprintf fmt ", ";
     print_indices fmt tail
 and
 print_array fmt arr =
-  fprintf fmt "(others => ";
-  print_model_value fmt arr.arr_others;
+  fprintf fmt "(";
   print_indices fmt arr.arr_indices;
+  fprintf fmt "others => ";
+  print_model_value fmt arr.arr_others;
   fprintf fmt ")"
 and
 print_model_value_sanit sanit_print fmt value =
   (* Prints model value. *)
   match value with
   | Integer s -> sanit_print fmt s
+  | Decimal (int_part, fract_part) ->
+    sanit_print fmt (int_part^"."^fract_part)
   | Unparsed s -> sanit_print fmt s
   | Array a ->
     print_array str_formatter a;
-    sanit_print fmt (flush_str_formatter ());
-  | Bitvector v -> sanit_print fmt (string_of_int v)
+    sanit_print fmt (flush_str_formatter ())
+  | Bitvector v -> sanit_print fmt v
 and
 print_model_value fmt value =
   print_model_value_sanit (fun fmt s -> fprintf fmt "%s" s) fmt value
@@ -326,29 +331,47 @@ let print_model_elements_json me_name_to_str fmt model_elements =
     fmt
     model_elements
 
-let print_model_elements_on_lines_json me_name_to_str fmt model_file =
+let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
+    (file_name, model_file) =
   Json.map_bindings
-    (fun i -> string_of_int i)
+    (fun i ->
+      match model.vc_term_loc with
+      | None ->
+	string_of_int i
+      | Some pos ->
+	let (vc_file_name, line, _, _) = Loc.get pos in
+	if file_name = vc_file_name && i = line then
+	  vc_line_trans i
+	else
+	  string_of_int i
+    )
     (print_model_elements_json me_name_to_str)
     fmt
     (IntMap.bindings model_file)
 
 let print_model_json
     ?(me_name_trans = why_name_trans)
+    ?(vc_line_trans = (fun i -> string_of_int i))
     fmt
     model =
   let me_name_to_str = fun me ->
     me_name_trans me.me_name in
+  let model_files_bindings = List.fold_left
+    (fun bindings (file_name, model_file) ->
+      List.append bindings [(file_name, (file_name, model_file))])
+    []
+    (StringMap.bindings model.model_files) in
   Json.map_bindings
     (fun s -> s)
-    (print_model_elements_on_lines_json me_name_to_str)
+    (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
     fmt
-    (StringMap.bindings model.model_files)
+    model_files_bindings
 
 let model_to_string_json
     ?(me_name_trans = why_name_trans)
+    ?(vc_line_trans = (fun i -> string_of_int i))
     model =
-  print_model_json str_formatter ~me_name_trans model;
+  print_model_json str_formatter ~me_name_trans ~vc_line_trans model;
   flush_str_formatter ()
 
 

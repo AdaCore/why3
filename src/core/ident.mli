@@ -29,6 +29,9 @@ val create_label : string -> label
 
 (* functions for working with counterexample model labels *)
 
+val remove_model_labels : labels : Slab.t -> Slab.t
+(** Returns a copy of labels without labels "model" and "model_projected". *)
+
 val append_to_model_trace_label : labels : Slab.t ->
   to_append : string ->
   Slab.t

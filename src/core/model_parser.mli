@@ -16,8 +16,9 @@
 *)
 type model_value =
  | Integer of string
+ | Decimal of (string * string)
  | Array of model_array
- | Bitvector of int
+ | Bitvector of string
  | Unparsed of string
 and  arr_index = {
   arr_index_key : model_value;
@@ -164,10 +165,24 @@ val model_vc_term_to_string :
 
 val print_model_json :
   ?me_name_trans:(model_element_name -> string) ->
+  ?vc_line_trans:(int -> string) ->
   Format.formatter ->
   model ->
   unit
 (** Prints counter-example model to json format.
+
+    @param me_name_trans see print_model
+    @param vc_line_trans the transformation from the line number corresponding
+      to the term that triggers VC before splitting VC to the name of JSON field
+      storing counterexample information related to this term. By default, this
+      information is stored in JSON field corresponding to this line, i.e.,
+      the transformation is string_of_int.
+      Note that the exact line of the construct that triggers VC may not be
+      known. This can happen if the term that triggers VC spans multiple lines
+      and it is splitted.
+      This transformation can be used to store the counterexample information
+      related to this term in dedicated JSON field.
+    @model the counter-example model to print.
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -203,13 +218,11 @@ val print_model_json :
           ]
       }
     }
-
-    @param me_name_trans see print_model
-    @model the counter-example model to print.
 *)
 
 val model_to_string_json :
   ?me_name_trans:(model_element_name -> string) ->
+  ?vc_line_trans:(int -> string) ->
   model ->
   string
 (** See print_model_json *)
