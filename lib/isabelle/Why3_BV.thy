@@ -231,7 +231,7 @@ why3_open "bv/BV8.xml"
   types
     t=word8
 
-why3_vc size_int_pos by simp
+why3_vc size_pos by simp
 
 why3_vc nth_out_of_bound
   using assms
@@ -301,6 +301,10 @@ why3_vc to_uint_of_int
 why3_vc Nth_bv_is_nth
   by (simp add: bv_nth_def unat_def)
 
+why3_vc Nth_bv_is_nth2
+  using assms
+  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+
 why3_vc Of_int_zero by simp
 
 why3_vc Of_int_ones by (simp add: max_word_eq)
@@ -352,6 +356,8 @@ why3_vc to_uint_lsl
     uint_word_ariths mult_ac uint_pow pull_mods)
 
 why3_vc two_power_size_val by simp
+
+why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
@@ -396,7 +402,7 @@ why3_open "bv/BV16.xml"
   types
     t=word16
 
-why3_vc size_int_pos by simp
+why3_vc size_pos by simp
 
 why3_vc nth_out_of_bound
   using assms
@@ -466,6 +472,10 @@ why3_vc to_uint_of_int
 why3_vc Nth_bv_is_nth
   by (simp add: bv_nth_def unat_def)
 
+why3_vc Nth_bv_is_nth2
+  using assms
+  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+
 why3_vc Of_int_zero by simp
 
 why3_vc Of_int_ones by (simp add: max_word_eq)
@@ -517,6 +527,8 @@ why3_vc to_uint_lsl
     uint_word_ariths mult_ac uint_pow pull_mods)
 
 why3_vc two_power_size_val by simp
+
+why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
@@ -561,7 +573,7 @@ why3_open "bv/BV32.xml"
   types
     t=word32
 
-why3_vc size_int_pos by simp
+why3_vc size_pos by simp
 
 why3_vc nth_out_of_bound
   using assms
@@ -631,6 +643,10 @@ why3_vc to_uint_of_int
 why3_vc Nth_bv_is_nth
   by (simp add: bv_nth_def unat_def)
 
+why3_vc Nth_bv_is_nth2
+  using assms
+  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+
 why3_vc Of_int_zero by simp
 
 why3_vc Of_int_ones by (simp add: max_word_eq)
@@ -682,6 +698,8 @@ why3_vc to_uint_lsl
     uint_word_ariths mult_ac uint_pow pull_mods)
 
 why3_vc two_power_size_val by simp
+
+why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
@@ -726,7 +744,7 @@ why3_open "bv/BV64.xml"
   types
     t=word64
 
-why3_vc size_int_pos by simp
+why3_vc size_pos by simp
 
 why3_vc nth_out_of_bound
   using assms
@@ -796,6 +814,10 @@ why3_vc to_uint_of_int
 why3_vc Nth_bv_is_nth
   by (simp add: bv_nth_def unat_def)
 
+why3_vc Nth_bv_is_nth2
+  using assms
+  by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
+
 why3_vc Of_int_zero by simp
 
 why3_vc Of_int_ones by (simp add: max_word_eq)
@@ -848,6 +870,8 @@ why3_vc to_uint_lsl
 
 why3_vc two_power_size_val by simp
 
+why3_vc max_int_val by simp
+
 why3_vc Extensionality
   using assms
   by (simp add: eq_sub_def bv_nth_def word_eq_iff all_nat)
@@ -864,6 +888,13 @@ why3_open "bv/BVConverter_32_64.xml"
     toBig = ucast
     toSmall = ucast
 
+why3_vc toSmall_to_uint
+  using assms
+  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+
+why3_vc toBig_to_uint
+  by (simp add: uint_up_ucast is_up)
+
 why3_end
 
 
@@ -871,6 +902,13 @@ why3_open "bv/BVConverter_16_64.xml"
   constants
     toBig = ucast
     toSmall = ucast
+
+why3_vc toSmall_to_uint
+  using assms
+  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+
+why3_vc toBig_to_uint
+  by (simp add: uint_up_ucast is_up)
 
 why3_end
 
@@ -880,6 +918,13 @@ why3_open "bv/BVConverter_8_64.xml"
     toBig = ucast
     toSmall = ucast
 
+why3_vc toSmall_to_uint
+  using assms
+  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+
+why3_vc toBig_to_uint
+  by (simp add: uint_up_ucast is_up)
+
 why3_end
 
 
@@ -887,6 +932,13 @@ why3_open "bv/BVConverter_16_32.xml"
   constants
     toBig = ucast
     toSmall = ucast
+
+why3_vc toSmall_to_uint
+  using assms
+  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+
+why3_vc toBig_to_uint
+  by (simp add: uint_up_ucast is_up)
 
 why3_end
 
@@ -896,6 +948,13 @@ why3_open "bv/BVConverter_8_32.xml"
     toBig = ucast
     toSmall = ucast
 
+why3_vc toSmall_to_uint
+  using assms
+  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+
+why3_vc toBig_to_uint
+  by (simp add: uint_up_ucast is_up)
+
 why3_end
 
 
@@ -903,6 +962,13 @@ why3_open "bv/BVConverter_8_16.xml"
   constants
     toBig = ucast
     toSmall = ucast
+
+why3_vc toSmall_to_uint
+  using assms
+  by (simp add: BV16.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
+
+why3_vc toBig_to_uint
+  by (simp add: uint_up_ucast is_up)
 
 why3_end
 
