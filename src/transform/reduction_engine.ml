@@ -519,6 +519,7 @@ and reduce_match st u ~orig tbl sigma cont =
 
 
 and reduce_eval st t ~orig sigma rem =
+  let orig = t_label_copy orig t in
   match t.t_node with
   | Tvar v ->
     begin
@@ -533,13 +534,13 @@ and reduce_eval st t ~orig sigma rem =
           Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
           assert false
         *)
-        { value_stack = Term (t_label_copy orig t) :: st ;
+        { value_stack = Term orig :: st ;
           cont_stack = rem;
         }
     end
   | Tif(t1,t2,t3) ->
     { value_stack = st;
-      cont_stack = (Keval(t1,sigma),t1) :: (Kif(t2,t3,sigma),t) :: rem;
+      cont_stack = (Keval(t1,sigma),t1) :: (Kif(t2,t3,sigma),orig) :: rem;
     }
   | Tlet(t1,tb) ->
     let v,t2 = t_open_bound tb in
@@ -574,7 +575,7 @@ and reduce_eval st t ~orig sigma rem =
       cont_stack = List.rev_append args ((Kapp(ls,t.t_ty),orig) :: rem);
     }
   | Ttrue | Tfalse | Tconst _ ->
-    { value_stack = Term (t_label_copy orig t) :: st;
+    { value_stack = Term orig :: st;
       cont_stack = rem;
     }
 
