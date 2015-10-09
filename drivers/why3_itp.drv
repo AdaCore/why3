@@ -1,0 +1,25 @@
+(* Why3 driver for then internal interactive theorem prover *)
+
+printer "why3_itp"
+filename "%f-%t-%g.why"
+
+theory BuiltIn
+  syntax type  int  "int"
+  syntax type  real "real"
+  syntax predicate (=)  "(%1 = %2)"
+end
+
+
+theory int.Int
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (-_) "(-%1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 <  %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 >  %2)"
+
+end

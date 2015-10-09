@@ -73,9 +73,9 @@ let print_pr fmt pr =
 
 (* info *)
 
-type info = { info_syn : syntax_map }
+type info = { info_syn : syntax_map ; itp : bool; }
 
-let info = ref { info_syn = Mid.empty }
+let info = ref { info_syn = Mid.empty ; itp = false ; }
 
 let query_syntax id = query_syntax !info.info_syn id
 let query_remove id = Mid.mem id !info.info_syn
@@ -248,11 +248,11 @@ let print_constr fmt (cs,pjl) =
 
 let print_type_decl fmt ts = match ts.ts_def with
   | None ->
-      fprintf fmt "@[<hov 2>type %a%a%a@]@\n@\n"
+      fprintf fmt "@[<hov 2>type %a%a%a@]@\n"
         print_ts ts print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
   | Some ty ->
-      fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n@\n"
+      fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n"
         print_ts ts print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args print_ty ty
 
@@ -261,7 +261,7 @@ let print_type_decl fmt ts =
     (print_type_decl fmt ts; forget_tvs ())
 
 let print_data_decl fst fmt (ts,csl) =
-  fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n@\n"
+  fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n"
     (if fst then "type" else "with") print_ts ts
     print_ident_labels ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
@@ -273,11 +273,16 @@ let print_data_decl first fmt d =
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
-let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
+let print_ls_kind ~fst fmt ls =
+  if not !info.itp then
+    fprintf fmt "%s "
+            (if fst then
+               if ls.ls_value = None then "predicate" else "function"
+             else "with")
 
 let print_param_decl fmt ls =
-  fprintf fmt "@[<hov 2>%s %a%a%a%a@]@\n@\n"
-    (ls_kind ls) print_ls ls
+  fprintf fmt "@[<hov 2>%a%a%a%a%a@]@\n"
+    (print_ls_kind ~fst:true) ls print_ls ls
     print_ident_labels ls.ls_name
     (print_list nothing print_ty_arg) ls.ls_args
     (print_option print_ls_type) ls.ls_value
@@ -288,8 +293,8 @@ let print_param_decl fmt ls =
 
 let print_logic_decl fst fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
-  fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]@\n@\n"
-    (if fst then ls_kind ls else "with") print_ls ls
+  fprintf fmt "@[<hov 2>%a%a%a%a%a =@ %a@]@\n"
+    (print_ls_kind ~fst) ls print_ls ls
     print_ident_labels ls.ls_name
     (print_list nothing print_vs_arg) vl
     (print_option print_ls_type) ls.ls_value print_term e;
@@ -308,7 +313,7 @@ let ind_sign = function
   | Coind -> "coinductive"
 
 let print_ind_decl s fst fmt (ps,bl) =
-  fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]@\n@\n"
+  fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]@\n"
     (if fst then ind_sign s else "with") print_ls ps
     print_ident_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
@@ -318,10 +323,11 @@ let print_ind_decl s first fmt d =
   if not (query_remove (fst d).ls_name) then
     (print_ind_decl s first fmt d; forget_tvs ())
 
-let print_pkind = Pretty.print_pkind
+let print_pkind fmt k =
+  if not !info.itp then fprintf fmt "%a " Pretty.print_pkind k
 
 let print_prop_decl fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a%a : %a@]@\n@\n" print_pkind k
+  fprintf fmt "@[<hov 2>%a%a%a : %a@]@\n" print_pkind k
     print_pr pr print_ident_labels pr.pr_name print_term f
 
 let print_prop_decl fmt (k,pr,f) = match k with
@@ -346,7 +352,8 @@ let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
 
 let print_inst_ls fmt (ls1,ls2) =
-  fprintf fmt "%s %a = %a" (ls_kind ls1) print_ls ls1 print_ls ls2
+  fprintf fmt "%a%a = %a"
+          (print_ls_kind ~fst:true) ls1 print_ls ls1 print_ls ls2
 
 let print_inst_pr fmt (pr1,pr2) =
   fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
@@ -354,7 +361,7 @@ let print_inst_pr fmt (pr1,pr2) =
 let print_meta_arg fmt = function
   | MAty ty -> fprintf fmt "type %a" print_ty ty; forget_tvs ()
   | MAts ts -> fprintf fmt "type %a" print_ts ts
-  | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
+  | MAls ls -> fprintf fmt "%a%a" (print_ls_kind ~fst:true) ls print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i
@@ -367,7 +374,7 @@ let print_qt fmt th =
 
 let print_tdecl fmt td = match td.td_node with
   | Decl d ->
-      print_decl fmt d
+      fprintf fmt "%a@\n" print_decl d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_qt th
   | Clone (th,sm) when is_empty_sm sm ->
@@ -386,7 +393,7 @@ let print_tdecl fmt td = match td.td_node with
 
 let print_tdecls =
   let print_tdecl sm fmt td =
-    info := {info_syn = sm}; print_tdecl fmt td; sm, [] in
+    info := {info_syn = sm; itp = false}; print_tdecl fmt td; sm, [] in
   let print_tdecl = Printer.sprint_tdecl print_tdecl in
   let print_tdecl task acc = print_tdecl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm -> Trans.fold print_tdecl (sm,[]))
@@ -405,3 +412,21 @@ let print_task args ?old:_ fmt task =
 
 let () = register_printer "why3" print_task
   ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."
+
+let print_sequent args ?old:_ fmt =
+  Trans.apply
+    (Printer.on_syntax_map
+       (fun sm ->
+        info := {info_syn = sm; itp = true};
+        Trans.store
+          (fun task ->
+           let task = Trans.apply (Trans.goal Introduction.intros) task in
+           print_th_prelude task fmt args.th_prelude;
+           let ut = Task.used_symbols (Task.used_theories task) in
+           let ld = Task.local_decls task ut in
+           List.iter (print_decl fmt) ld;
+           fprintf fmt "@\n@.")))
+
+
+let () = register_printer "why3_itp" print_sequent
+  ~desc:"Print@ the@ goal@ in@ a@ format@ dedicated@ to@ ITP."
