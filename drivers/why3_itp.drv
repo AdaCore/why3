@@ -23,3 +23,12 @@ theory int.Int
   syntax predicate (>)  "(%1 >  %2)"
 
 end
+
+theory map.Map
+
+  syntax function get "%1[%2]"
+  syntax function ([]) "%1[%2]"
+  syntax function set "{%1 with [%2] = %3}"
+  syntax function ([<-]) "{%1 with [%2] = %3}"
+
+end
