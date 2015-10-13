@@ -270,52 +270,27 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
 * prepare the OPAM package
- - update opam/url: url and checksum of why-0.86.tar.gz
+ - update opam/why3-base/url: url and checksum of why-0.86.tar.gz
    (use "md5sum distrib/why3-0.86.tar.gz")
- - update opam/descr if necessary
- - update opam/opam with correct dependencies and such
+ - update opam/why3-base/descr and opam/why3/descr if necessary
+ - update opam/why3-base/opam with correct dependencies
+ - update opam/why3/opam with the dependency on why3-base
+ - test with "opam pin add why3 --kind=git .../why3/.git"
+   (it runs "opam install why3")
 
-* test the OPAM package
-
-  . with opam 1.2:
-    opam pin add why3 --kind=git <...>/why3/.git
-    (it runs "opam install why3")
-  . with opam < 1.2:
-
-    - first step: have a local copy of opam-repository if not done yet, e.g.:
-
-        git clone git@github.com:claudemarche/opam-repository.git
-        cd opam-repository/
-        git remote add opam https://github.com/ocaml/opam-repository.git
-
-      or, if you already have one, make sure it is up-to-date:
-
-        git fetch opam
-        git reset --hard opam/master
-        git push
-
-    - second step: copy why3 opam files into it :
-
-      cd packages/why3
-      cp -r <source why3>/opam why3.0.86
-
-    - second step:
-
-      opam repository add local <...>/opam-repository
-      opam install why3
-      (* test it, e.g.
-         cp example/quicksort.mlw ~/tmp
-         why3 ide ~/tmp/quicksort.mlw *)
-      opam remove why3
-      opam repository remove local
-
-
-* make a pull request on OPAM
-
-  git add why3.0.86
-  git commit -am "new package version why3 0.86"
-  git push
-  sur github: creer un pull request
+* upload the OPAM package
+ - clone https://github.com/ocaml/opam-repository
+   git clone git@github.com:.../opam-repository.git
+   cd opam-repository/
+   git remote add opam https://github.com/ocaml/opam-repository.git
+ - reinitialize the repository if not fresh:
+   git fetch opam
+   git reset --hard opam/master
+   git push
+ - cd packages/why3-base; cp -r .../opam/why3-base why3-base.0.86
+ - cd packages/why3; cp -r .../opam/why3 why3.0.86
+ - commit and push
+ - make a pull request on github
 
 * inform Jerry James <loganjerry@gmail.com> so that he can produce the
   Fedora package
