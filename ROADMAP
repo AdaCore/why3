@@ -219,70 +219,61 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
 
 == Final preparation ==
 
-* faire une passe sur le BTS
+* check the BTS
 * do "make update-coq" and "make", fix Coq realizations if needed
 * check that nightly bench is OK
 * check that "make xml-validate-local" is OK
   (see below : copy the dtd on the web)
+
 * put 0.86 in file Version, and then run ./config.status
 * check/update the content of the About dialog in src/ide/gconfig.ml
   around lines 550-600
 * check headers
 * check the file CHANGES, add the release date
-* manual in PDF:
-** update the date in doc/manual.tex (near \whyversion{})
-** check that macro \todo is commented out in doc/macros.tex
-** and then "make doc"
-  (check that manual in HTML is also generated, doc/html/index.html)
-* do "make dist"
-* test distrib/why3-0.86.tar.gz
-* move distrib from Why3 site to Inria forge:
-** upload distrib/why3-0.86.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
-* put on the web page
- - the manual in PDF
-   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.86.pdf
 
- - the HTML version of the manual (content of doc/html)
-   cp -r doc/html /users/www-perso/projets/why3/doc-0.86
-
- - why3session.dtd
-   cp -f share/why3session.dtd /users/www-perso/projets/why3/
-
- - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
-   make stdlibdoc
-   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.86
-   ln -s -n -f /users/www-perso/projets/why3/stdlib-0.86 \
-            /users/www-perso/projets/why3/stdlib
- - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
-    make apidoc
-    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.86
-    ln -s -n -f /users/www-perso/projets/why3/api-0.86 \
-      /users/www-perso/projets/why3/api
-
- - update the main HTML page (sources are in repository why3-www)
-   edit index.html, change at least all occurrences of 0.85 by 0.86, and
-     update the url for download
-   make (to check validity)
-   make export
+* generate documentation
+ - update the date in doc/manual.tex (near \whyversion{})
+ - check that macro \todo is commented out in doc/macros.tex
+ - do "make doc"
+   (check that manual in HTML is also generated, doc/html/index.html)
+ - do "make stdlibdoc"
+ - do "make apidoc"
 
 * make a last commit:
  - git commit -am "release 0.86"
- - add tag 0.86 to the git repository, using
-   git tag 0.86
- - do not forget to push it using
-   git push
-   git push --tags
+ - git tag 0.86
+* do "make dist"
+* test distrib/why3-0.86.tar.gz
+* push the commit:
+ - git push
+ - git push --tags
+* upload distrib/why3-0.86.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
+
+* upload the documentation on the web page
+ - cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.86.pdf
+ - cp -r doc/html /users/www-perso/projets/why3/doc-0.86
+ - cp share/why3session.dtd /users/www-perso/projets/why3/
+ - cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.86
+   ln -s -n -f /users/www-perso/projets/why3/stdlib-0.86 \
+      /users/www-perso/projets/why3/stdlib
+ - cp -r doc/apidoc /users/www-perso/projets/why3/api-0.86
+   ln -s -n -f /users/www-perso/projets/why3/api-0.86 \
+      /users/www-perso/projets/why3/api
+
+* update the main HTML page (sources are in repository why3-www)
+ - edit index.html, change at least all occurrences of 0.85 by 0.86, and
+   update the url for download
+ - make (to check validity)
+ - make export
 
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
-
 * prepare the OPAM package
-
-. update opam/url: url and checksum of why-0.86.tar.gz
+ - update opam/url: url and checksum of why-0.86.tar.gz
    (use "md5sum distrib/why3-0.86.tar.gz")
-. update opam/descr if necessary
-. update opam/opam with correct dependencies and such
+ - update opam/descr if necessary
+ - update opam/opam with correct dependencies and such
 
 * test the OPAM package
 
