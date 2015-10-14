@@ -7,14 +7,11 @@ Require list.Length.
 Require int.Int.
 Require list.Mem.
 Require map.Map.
+Require map.Const.
 Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
@@ -115,6 +112,10 @@ Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
 
 Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
+
+Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
+  (infix_eqeq s1 s2)).
 
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
@@ -405,6 +406,8 @@ Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
   ((map.Map.get m1 v) = (Finite x)) -> forall (l:(list vertex)), (path s l
   v) -> (((list.Length.length l) < (i + 1%Z)%Z)%Z -> (x <= (path_weight l
   v))%Z))))).
+(* Why3 intros o h1 m i (h2,h3) h4 es h5 es1 m1 (h6,h7) o1 h8 h9 h10 v h11 x
+        h12 l h13 h14. *)
 intros o h1 m i (h2,h3) h4 es h5 es1 m1 (h6,h7) o1 h8 h9 h10 v h11 x
         h12 l hpath hlength.
 destruct (path_right_inversion s v l hpath) as [(hg1,hg2) | (y, (l', (hg1, (hg2, hg3))))].
