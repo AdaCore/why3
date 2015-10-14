@@ -447,8 +447,6 @@ module Translate = struct
         | None -> ML.Tapp (ts.ts_name, List.map (ity info) tl)
         end
 
-  let ity_mark = ity_pur Mlw_wp.ts_mark []
-
   let is_underscore pv =
     pv.pv_vs.vs_name.id_string = "_" && ity_equal pv.pv_ity ity_unit
 
@@ -631,7 +629,7 @@ module Translate = struct
 
   let pdecl info pd =
     match pd.pd_node with
-    | PDval (LetV pv) when pv_equal pv Mlw_wp.pv_old ->
+    | PDval (LetV pv) when pv_equal pv Mlw_decl.pv_old ->
         []
     | PDval _ ->
         []

@@ -1346,7 +1346,7 @@ let eval_global_expr env mkm tkm _writes e =
   let add_glob _ d ((venv,renv) as acc) =
     match d.Mlw_decl.pd_node with
       | Mlw_decl.PDval (Mlw_expr.LetV pvs)
-        when not (pv_equal pvs Mlw_wp.pv_old) ->
+        when not (pv_equal pvs Mlw_decl.pv_old) ->
         let ity = pvs.pv_ity in
         let v = any_value_of_type env (ty_of_ity ity) in
         let renv,v = to_program_value env renv (VTvalue ity) v in
