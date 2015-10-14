@@ -11,6 +11,7 @@ type reason =
    | VC_Length_Check
    | VC_Discriminant_Check
    | VC_Tag_Check
+   | VC_Ceiling_Interrupt
    | VC_Task_Termination
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
@@ -67,6 +68,7 @@ let reason_from_string s =
    | "VC_LENGTH_CHECK"              -> VC_Length_Check
    | "VC_DISCRIMINANT_CHECK"        -> VC_Discriminant_Check
    | "VC_TAG_CHECK"                 -> VC_Tag_Check
+   | "VC_CEILING_INTERRUPT"         -> VC_Ceiling_Interrupt
    | "VC_TASK_TERMINATION"          -> VC_Task_Termination
    (* VC_Assert_Kind - assertions *)
    | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
@@ -105,6 +107,7 @@ let reason_to_ada reason =
    | VC_Length_Check              -> "VC_LENGTH_CHECK"
    | VC_Discriminant_Check        -> "VC_DISCRIMINANT_CHECK"
    | VC_Tag_Check                 -> "VC_TAG_CHECK"
+   | VC_Ceiling_Interrupt         -> "VC_CEILING_INTERRUPT"
    | VC_Task_Termination          -> "VC_TASK_TERMINATION"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
@@ -140,6 +143,7 @@ let reason_to_string reason =
    | VC_Length_Check              -> "length_check"
    | VC_Discriminant_Check        -> "discriminant_check"
    | VC_Tag_Check                 -> "tag_check"
+   | VC_Ceiling_Interrupt         -> "ceiling_interrupt"
    | VC_Task_Termination          -> "task_termination"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "initial_condition"
