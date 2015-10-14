@@ -195,6 +195,7 @@ end
 theory ToFset
   use import int.Int
   use import Seq as S
+  use import Mem as SM
   use import set.Fset
 
   function to_set (s: seq 'a) : set 'a
@@ -207,8 +208,8 @@ theory ToFset
   lemma to_set_cardinal: forall s: seq 'a.
     cardinal (to_set s) <= length s
 
-  lemma to_set_mem: forall s: seq 'a, i: int. 0 <= i < length s ->
-    mem s[i] (to_set s)
+  lemma to_set_mem: forall s: seq 'a, e: 'a.
+    SM.mem e s <-> mem e (to_set s)
 
   lemma to_set_snoc: forall s: seq 'a, x: 'a.
     to_set (snoc s x) = add x (to_set s)
