@@ -116,7 +116,13 @@ let load_driver env file extra_files =
     | Rconverter _ ->
         Loc.errorm "Syntax converter cannot be used in pure theories"
     | Rremovepr (q) ->
-        ignore (find_pr th q)
+      ignore (find_pr th q)
+    | Rremoveall ->
+      let it key _ = match (Mid.find key th.th_known).Decl.d_node with
+        | Decl.Dprop (_,symb,_) -> ignore symb
+        | _ -> ()
+      in
+      Mid.iter it th.th_local
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->

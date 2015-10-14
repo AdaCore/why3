@@ -33,6 +33,7 @@ type th_rule =
   | Rsyntaxps  of qualid * string * bool
   | Rconverter of qualid * string * bool
   | Rremovepr  of qualid
+  | Rremoveall
   | Rmeta      of string * metarg list
 
 type theory_rules = {

@@ -47,6 +47,7 @@
         "predicate", PREDICATE;
         "type", TYPE;
         "prop", PROP;
+        "allprops", ALL;
         "filename", FILENAME;
         "transformation", TRANSFORM;
         "plugin", PLUGIN;

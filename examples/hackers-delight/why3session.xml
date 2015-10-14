@@ -10,14 +10,14 @@
 <file name="../hackers-delight.mlw" expanded="true">
 <theory name="Utils" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Utils_Spec" sum="3f0ae9505cd1d20116a2836d82f8ab3d" expanded="true">
+<theory name="Utils_Spec" sum="48173d335d17e665b5bf6ed0b7333c02" expanded="true">
  <goal name="countZero">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="numOfZero">
  <proof prover="0"><result status="valid" time="0.47" steps="239"/></proof>
- <proof prover="3"><result status="valid" time="0.33"/></proof>
+ <proof prover="3"><result status="valid" time="0.18"/></proof>
  </goal>
  <goal name="countStep">
  <proof prover="1" timelimit="30"><result status="valid" time="4.95"/></proof>
@@ -30,14 +30,14 @@
  <goal name="WP_parameter countSpec_Aux" expl="VC for countSpec_Aux">
  <transf name="split_goal_wp">
   <goal name="WP_parameter countSpec_Aux.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.47" steps="265"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="86"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.28"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter countSpec_Aux.2" expl="2. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.41"/></proof>
+  <proof prover="3"><result status="valid" time="0.66"/></proof>
   </goal>
   <goal name="WP_parameter countSpec_Aux.3" expl="3. assertion">
   <transf name="split_goal_wp">
@@ -69,7 +69,7 @@
  <goal name="WP_parameter hamming_spec" expl="VC for hamming_spec" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter hamming_spec.1" expl="1. assertion" expanded="true">
-  <proof prover="0"><result status="valid" time="2.43" steps="944"/></proof>
+  <proof prover="0"><result status="valid" time="2.43" steps="956"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter hamming_spec.2" expl="2. postcondition">
@@ -83,7 +83,7 @@
  </goal>
  <goal name="separation">
  <proof prover="1"><result status="valid" time="0.19"/></proof>
- <proof prover="2"><result status="valid" time="0.52"/></proof>
+ <proof prover="2"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="WP_parameter numof_or" expl="VC for numof_or">
  <proof prover="1"><result status="valid" time="0.53"/></proof>
@@ -93,8 +93,8 @@
  <goal name="WP_parameter triangleInequalityInt" expl="VC for triangleInequalityInt" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter triangleInequalityInt.1" expl="1. assertion" expanded="true">
-  <proof prover="2" timelimit="70"><result status="valid" time="0.77"/></proof>
-  <proof prover="4"><result status="valid" time="0.75"/></proof>
+  <proof prover="2" timelimit="70"><result status="valid" time="1.34"/></proof>
+  <proof prover="4"><result status="valid" time="1.31"/></proof>
   </goal>
   <goal name="WP_parameter triangleInequalityInt.2" expl="2. postcondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.05" steps="79"/></proof>
@@ -107,14 +107,14 @@
  <proof prover="1" timelimit="15"><result status="valid" time="2.35"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight" sum="c1471f5279d8e24b7242c18b19325bf4" expanded="true">
+<theory name="Hackers_delight" sum="144a5949c45c6cffa10ffc47afc51177" expanded="true">
  <goal name="WP_parameter ascii" expl="VC for ascii">
  <proof prover="1"><result status="valid" time="0.09"/></proof>
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="asciiProp">
  <proof prover="1" timelimit="20"><result status="valid" time="0.66"/></proof>
- <proof prover="2" timelimit="20"><result status="valid" time="2.72"/></proof>
+ <proof prover="2" timelimit="20"><result status="valid" time="1.69"/></proof>
  </goal>
  <goal name="iso">
  <proof prover="1"><result status="valid" time="0.43"/></proof>

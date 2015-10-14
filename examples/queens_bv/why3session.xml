@@ -20,7 +20,7 @@
 </theory>
 <theory name="BitsSpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Bits" sum="89d1f7f114f012f8e0dea70cfcddc67e">
+<theory name="Bits" sum="6cd5db16655631752af29773c65bc6c2">
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
@@ -31,7 +31,7 @@
  </goal>
  <goal name="WP_parameter remove_singleton" expl="VC for remove_singleton">
  <proof prover="0"><result status="valid" time="0.90" steps="668"/></proof>
- <proof prover="1"><result status="valid" time="1.73"/></proof>
+ <proof prover="1"><result status="valid" time="2.29"/></proof>
  </goal>
  <goal name="WP_parameter add_singleton" expl="VC for add_singleton">
  <proof prover="1"><result status="valid" time="1.17"/></proof>
@@ -127,7 +127,7 @@
  <proof prover="1"><result status="valid" time="1.52"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="3a6aea3add6d6b05881981ce9401f001" expanded="true">
+<theory name="NQueensBits" sum="cfb4c367c0c6e2b8f7d6a8cce009c9e4" expanded="true">
  <goal name="WP_parameter t" expl="VC for t" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter t.1" expl="1. assertion" expanded="true">
@@ -2192,7 +2192,7 @@
   </goal>
   <goal name="WP_parameter t.19" expl="19. assertion">
   <proof prover="0"><result status="valid" time="0.25" steps="156"/></proof>
-  <proof prover="1"><result status="valid" time="1.29"/></proof>
+  <proof prover="1"><result status="valid" time="0.87"/></proof>
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -2208,7 +2208,7 @@
   <goal name="WP_parameter t.22" expl="22. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter t.22.1" expl="1. assertion">
-   <proof prover="1" timelimit="30"><result status="valid" time="4.35"/></proof>
+   <proof prover="1" timelimit="30"><result status="valid" time="5.89"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="0.31"/></proof>
    <proof prover="4" timelimit="30"><result status="valid" time="0.87"/></proof>
    </goal>
@@ -2334,7 +2334,7 @@
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter t.45" expl="45. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="1.22"/></proof>
+  <proof prover="1"><result status="valid" time="0.97"/></proof>
   <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter t.46" expl="46. loop invariant preservation">
