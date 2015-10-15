@@ -1566,6 +1566,10 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 # test targets
 ###############
 
+test-itp.opt: src/printer/itp.ml lib/why3/why3.cmxa
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
+	$(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $<
+
 test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null \
