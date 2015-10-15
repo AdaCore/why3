@@ -16,6 +16,7 @@ type reason =
    | VC_Discriminant_Check
    | VC_Tag_Check
    | VC_Ceiling_Interrupt
+   | VC_Interrupt_Reserved
    | VC_Task_Termination
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
