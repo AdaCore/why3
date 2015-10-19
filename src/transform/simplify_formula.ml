@@ -57,12 +57,14 @@ exception Subst_found of term
 
 let rec fmla_find_subst boundvars var sign f =
   let fnF = fmla_find_subst boundvars var in
+  let test ls vs t tv =
+    sign && ls_equal ls ps_equ && vs_equal vs var &&
+      not (t_equal t tv) && not (t_boundvars_in boundvars t) in
   match f.t_node with
     | Tapp (ls,[{t_node=Tvar vs} as tv;t])
+        when test ls vs t tv -> raise (Subst_found t)
     | Tapp (ls,[t;{t_node=Tvar vs} as tv])
-        when sign && ls_equal ls ps_equ && vs_equal vs var
-          && not (t_equal t tv) && not (t_boundvars_in boundvars t) ->
-        raise (Subst_found t)
+        when test ls vs t tv -> raise (Subst_found t)
     | Tbinop (Tor, f1, f2)  when not sign -> (fnF sign f1); (fnF sign f2)
     | Tbinop (Tand, f1, f2) when sign ->  (fnF sign f1); (fnF sign f2)
     | Tbinop (Timplies, f1, f2) when not sign ->
