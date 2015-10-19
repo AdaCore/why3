@@ -8,7 +8,7 @@
 <prover id="6" name="CVC4" version="1.3" timelimit="1" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="15" memlimit="1000"/>
 <file name="../random_access_list.mlw" expanded="true">
-<theory name="RandomAccessList" sum="d27743d57c1d4ea4700ca93cff755188">
+<theory name="RandomAccessList" sum="4f5e850e802b209157f63926846d59e0">
  <goal name="WP_parameter length_flatten" expl="VC for length_flatten">
  <transf name="split_goal_wp">
   <goal name="WP_parameter length_flatten.1" expl="1. variant decrease">
@@ -48,7 +48,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter lookup" expl="VC for lookup">
- <proof prover="0"><result status="valid" time="0.47" steps="410"/></proof>
+ <proof prover="0"><result status="valid" time="0.47" steps="411"/></proof>
  </goal>
  <goal name="WP_parameter tail" expl="VC for tail">
  <transf name="split_goal_wp">
@@ -150,7 +150,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="RAL" sum="ef67f0d6811c1a4189d9e2bd83248eb7">
+<theory name="RAL" sum="68d66c52d340259fd15f339e2cda179f">
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
@@ -164,7 +164,7 @@
  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="RandomAccessListWithSeq" sum="589c3d682561c016fc9c428710f13f01" expanded="true">
+<theory name="RandomAccessListWithSeq" sum="701496b887c032d33ad42fbd0e63f7fa" expanded="true">
  <goal name="WP_parameter size" expl="VC for size">
  <transf name="split_goal_wp">
   <goal name="WP_parameter size.1" expl="1. postcondition">
@@ -201,7 +201,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter lookup" expl="VC for lookup">
- <proof prover="0"><result status="valid" time="0.44" steps="406"/></proof>
+ <proof prover="0"><result status="valid" time="0.44" steps="407"/></proof>
  </goal>
  <goal name="WP_parameter tail" expl="VC for tail">
  <transf name="split_goal_wp">
@@ -226,7 +226,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter fupdate" expl="VC for fupdate" expanded="true">
- <proof prover="0"><result status="valid" time="3.27" steps="1211"/></proof>
+ <proof prover="0"><result status="valid" time="3.27" steps="1202"/></proof>
  </goal>
  <goal name="WP_parameter update" expl="VC for update">
  <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>

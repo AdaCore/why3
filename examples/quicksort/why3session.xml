@@ -7,7 +7,7 @@
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <file name="../quicksort.mlw" expanded="true">
-<theory name="Quicksort" sum="0b9ddc79cdebd564c82b376792bb2f48">
+<theory name="Quicksort" sum="5b432ba1f90d70d1a49b78aad8b388f6">
  <goal name="WP_parameter quick_rec" expl="VC for quick_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter quick_rec.1" expl="1. index in array bounds">
@@ -82,7 +82,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter quick_rec.23" expl="23. loop invariant preservation">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.44" steps="139"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.30" steps="139"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.24" expl="24. loop invariant preservation">
   <proof prover="3" timelimit="5"><result status="valid" time="0.07" steps="106"/></proof>
@@ -145,10 +145,10 @@
      <proof prover="3"><result status="valid" time="0.02" steps="30"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.34.1.1.2" expl="2. VC for quick_rec">
-     <proof prover="3"><result status="valid" time="5.81" steps="189"/></proof>
+     <proof prover="3"><result status="valid" time="2.60" steps="189"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.34.1.1.3" expl="3. VC for quick_rec">
-     <proof prover="3"><result status="valid" time="2.89" steps="261"/></proof>
+     <proof prover="3"><result status="valid" time="1.34" steps="261"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.34.1.1.4" expl="4. VC for quick_rec">
      <proof prover="3"><result status="valid" time="0.03" steps="50"/></proof>
@@ -175,10 +175,10 @@
      <proof prover="4"><result status="valid" time="0.03" steps="40"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.37.1.1.2" expl="2. VC for quick_rec">
-     <proof prover="3"><result status="valid" time="6.22" steps="257"/></proof>
+     <proof prover="3"><result status="valid" time="3.04" steps="257"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.37.1.1.3" expl="3. VC for quick_rec">
-     <proof prover="3" timelimit="30"><result status="valid" time="19.68" steps="403"/></proof>
+     <proof prover="3" timelimit="30"><result status="valid" time="9.90" steps="403"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.37.1.1.4" expl="4. VC for quick_rec">
      <proof prover="4"><result status="valid" time="0.10" steps="69"/></proof>
@@ -190,13 +190,13 @@
   </transf>
   </goal>
   <goal name="WP_parameter quick_rec.38" expl="38. assertion">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.63" steps="258"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.26" steps="258"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.39" expl="39. postcondition">
-  <proof prover="3" timelimit="15"><result status="valid" time="1.43" steps="166"/></proof>
+  <proof prover="3" timelimit="15"><result status="valid" time="0.65" steps="166"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.40" expl="40. postcondition">
-  <proof prover="0"><result status="valid" time="1.54"/></proof>
+  <proof prover="0"><result status="valid" time="0.93"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.41" expl="41. postcondition">
   <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
@@ -210,17 +210,17 @@
  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
 </theory>
-<theory name="Shuffle" sum="7babe54be5831190a901955213ea71eb">
+<theory name="Shuffle" sum="f3b7e3f2a850fb4e2150cebbc7a66990">
  <goal name="WP_parameter shuffle" expl="VC for shuffle">
  <proof prover="3" timelimit="1"><result status="valid" time="0.03" steps="42"/></proof>
  </goal>
 </theory>
-<theory name="QuicksortWithShuffle" sum="5ad1d35b92a3e5db9e1e51aacc1c468b">
+<theory name="QuicksortWithShuffle" sum="3c39e4b82189469e41f726f4a135b6c2">
  <goal name="WP_parameter qs" expl="VC for qs">
  <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="Quicksort3way" sum="3fc95bf25b6221f1980dff61bc8aea31">
+<theory name="Quicksort3way" sum="631dea6df2ab2fe27629d4e001f3dae8">
  <goal name="WP_parameter quick_rec" expl="VC for quick_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter quick_rec.1" expl="1. index in array bounds">
@@ -257,13 +257,13 @@
   <proof prover="3"><result status="valid" time="0.03" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.12" expl="12. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="1.16" steps="126"/></proof>
+  <proof prover="3"><result status="valid" time="0.52" steps="126"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.13" expl="13. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.79" steps="126"/></proof>
+  <proof prover="3"><result status="valid" time="0.39" steps="126"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.14" expl="14. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.81" steps="125"/></proof>
+  <proof prover="3"><result status="valid" time="0.35" steps="125"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.15" expl="15. loop invariant preservation">
   <proof prover="3" timelimit="30"><result status="valid" time="0.08" steps="104"/></proof>
@@ -284,13 +284,13 @@
   <proof prover="3"><result status="valid" time="0.03" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.21" expl="21. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="1.50" steps="191"/></proof>
+  <proof prover="3"><result status="valid" time="0.80" steps="191"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.22" expl="22. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.96" steps="191"/></proof>
+  <proof prover="3"><result status="valid" time="0.50" steps="191"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.23" expl="23. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.69" steps="189"/></proof>
+  <proof prover="3"><result status="valid" time="0.40" steps="189"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.24" expl="24. loop invariant preservation">
   <proof prover="3" timelimit="30"><result status="valid" time="0.08" steps="104"/></proof>
@@ -350,7 +350,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.36" expl="36. assertion">
-  <proof prover="3"><result status="valid" time="1.26" steps="256"/></proof>
+  <proof prover="3"><result status="valid" time="0.53" steps="256"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.37" expl="37. variant decrease">
   <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
@@ -812,7 +812,7 @@
    <goal name="WP_parameter quick_rec.39" expl="39. assertion">
    <transf name="eliminate_builtin">
     <goal name="WP_parameter quick_rec.39.1" expl="1. assertion">
-    <proof prover="3" timelimit="30"><result status="valid" time="7.14" steps="591"/></proof>
+    <proof prover="3" timelimit="30"><result status="valid" time="3.76" steps="591"/></proof>
     </goal>
    </transf>
    </goal>
@@ -822,7 +822,7 @@
   <proof prover="3"><result status="valid" time="0.16" steps="173"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.41" expl="41. postcondition">
-  <proof prover="3"><result status="valid" time="0.40" steps="109"/></proof>
+  <proof prover="3"><result status="valid" time="0.18" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter quick_rec.42" expl="42. postcondition">
   <proof prover="3"><result status="valid" time="0.10" steps="156"/></proof>
@@ -842,7 +842,7 @@
  <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="576ec12f8373314c74b4de3aee6ca213">
+<theory name="Test" sum="e1a781141a45a489c831f0bc86a0ae17">
  <goal name="WP_parameter test1" expl="VC for test1">
  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>

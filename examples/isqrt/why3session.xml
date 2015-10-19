@@ -9,13 +9,13 @@
 <prover id="7" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" memlimit="0"/>
 <file name="../isqrt.mlw" expanded="true">
-<theory name="Square" sum="f4d6a9140e0db787e9bc4b9d36fab093" expanded="true">
+<theory name="Square" sum="cc4289accaabbdc40efcd836055c6241" expanded="true">
  <goal name="sqr_increasing">
- <proof prover="6" memlimit="1000"><result status="valid" time="0.48"/></proof>
+ <proof prover="6" memlimit="1000"><result status="valid" time="0.17"/></proof>
  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Simple" sum="a7ff81f6d5e3cf6796b5999fb4de82c8" expanded="true">
+<theory name="Simple" sum="e86e6a3432e7d148b0201a205c4c5e85" expanded="true">
  <goal name="WP_parameter isqrt" expl="VC for isqrt">
  <proof prover="6" timelimit="2"><result status="valid" time="0.02"/></proof>
  <proof prover="8" timelimit="2"><result status="valid" time="0.01"/></proof>
@@ -25,7 +25,7 @@
  <proof prover="8" timelimit="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="NewtonMethod" sum="953479e9ec38cd73427d8ebb14335e31" expanded="true">
+<theory name="NewtonMethod" sum="5594ef5fe359fe5a9a25d101ccd870d4" expanded="true">
  <goal name="WP_parameter sqrt" expl="VC for sqrt">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sqrt.1" expl="1. postcondition">
@@ -72,16 +72,16 @@
   <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.8" expl="8. assertion">
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.66"/></proof>
+  <proof prover="6" memlimit="1000"><result status="valid" time="0.32"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.9" expl="9. assertion">
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.83"/></proof>
+  <proof prover="6" memlimit="1000"><result status="valid" time="0.33"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.10" expl="10. assertion">
-  <proof prover="5"><result status="valid" time="0.49" steps="20"/></proof>
+  <proof prover="5"><result status="valid" time="0.21" steps="20"/></proof>
   <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
@@ -161,7 +161,7 @@
   <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.19" expl="19. postcondition">
-  <proof prover="4"><result status="valid" time="0.56"/></proof>
+  <proof prover="4"><result status="valid" time="0.23"/></proof>
   </goal>
  </transf>
  </goal>
