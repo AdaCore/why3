@@ -1,0 +1,18 @@
+
+theory Test
+
+  (*
+
+  Examples from http://michalkonecny.github.io/polypaver/_site/index.html
+
+*)
+
+  use import real.Real
+  use import real.ExpLog
+
+  goal g1:
+    forall a b:real.
+      -10.0 <= a <= 10.0 /\ -10.0 <= b <= 10.0 /\ b > a + 0.1 ->
+      exp a - exp b > (b-a) * exp ((a + b) / 2.0)
+
+end
