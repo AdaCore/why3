@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="30" memlimit="4000"/>
-<prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Coq" version="8.4pl6" timelimit="5" memlimit="1000"/>
 <prover id="5" name="Z3" version="2.19" timelimit="3" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="5" memlimit="4000"/>
 <prover id="7" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
@@ -45,16 +45,16 @@
  <proof prover="11"><result status="valid" time="0.08" steps="80"/></proof>
  </goal>
  <goal name="to_nat_of_zero2">
- <proof prover="1" edited="bitvector_BitVector_to_nat_of_zero2_1.v"><result status="valid" time="0.97"/></proof>
+ <proof prover="4" edited="bitvector_BitVector_to_nat_of_zero2_1.v"><result status="valid" time="0.97"/></proof>
  </goal>
  <goal name="to_nat_of_zero">
- <proof prover="1" timelimit="30" edited="bitvector_BitVector_to_nat_of_zero_1.v"><result status="valid" time="2.95"/></proof>
+ <proof prover="4" timelimit="30" edited="bitvector_BitVector_to_nat_of_zero_1.v"><result status="valid" time="2.95"/></proof>
  </goal>
  <goal name="to_nat_of_one">
- <proof prover="1" edited="bitvector_BitVector_to_nat_of_one_1.v"><result status="valid" time="1.84"/></proof>
+ <proof prover="4" edited="bitvector_BitVector_to_nat_of_one_1.v"><result status="valid" time="1.84"/></proof>
  </goal>
  <goal name="to_nat_sub_footprint">
- <proof prover="1" timelimit="7" edited="bitvector_BitVector_to_nat_sub_footprint_1.v"><result status="valid" time="3.82"/></proof>
+ <proof prover="4" timelimit="7" edited="bitvector_BitVector_to_nat_sub_footprint_1.v"><result status="valid" time="3.82"/></proof>
  </goal>
  <goal name="nth_from_int_low_even">
  <proof prover="2"><result status="valid" time="0.02" steps="68"/></proof>
@@ -98,8 +98,8 @@
  <proof prover="11"><result status="valid" time="0.20" steps="83"/></proof>
  </goal>
  <goal name="nth_from_int2c_plus_pow2">
- <proof prover="1" timelimit="10" edited="bitvector_BitVector_nth_from_int2c_plus_pow2_1.v"><result status="valid" time="1.34"/></proof>
  <proof prover="2"><result status="valid" time="0.12" steps="85"/></proof>
+ <proof prover="4" timelimit="10" edited="bitvector_BitVector_nth_from_int2c_plus_pow2_1.v"><result status="valid" time="1.34"/></proof>
  <proof prover="11"><result status="valid" time="0.65" steps="120"/></proof>
  </goal>
 </theory>
