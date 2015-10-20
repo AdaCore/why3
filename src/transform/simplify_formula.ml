@@ -12,7 +12,9 @@
 open Term
 open Decl
 
-let rec fmla_simpl f = TermTF.t_map_simp (fun t -> t) fmla_simpl f
+let rec fmla_simpl f = TermTF.t_map_simp t_fmla_simpl fmla_simpl f
+
+and t_fmla_simpl t = TermTF.t_map t_fmla_simpl fmla_simpl t
 
 let decl_l d =
   match d.d_node with
@@ -24,9 +26,9 @@ let decl_l d =
           | Ttrue, Pgoal -> []
           | _ -> [[create_prop_decl k pr f]]
         end
-    | _ -> [[DeclTF.decl_map (fun t -> t) fmla_simpl d]]
+    | _ -> [[DeclTF.decl_map t_fmla_simpl fmla_simpl d]]
 
-let simplify_formula = Trans.rewriteTF (fun t -> t) fmla_simpl None
+let simplify_formula = Trans.rewriteTF t_fmla_simpl fmla_simpl None
 
 let simplify_formula_and_task = Trans.decl_l decl_l None
 
@@ -108,7 +110,7 @@ let rec fmla_remove_quant f =
             let vsl, f' = fmla_quant sign f' vsl in
             let f' = fmla_remove_quant f' in
             t_quant k (close vsl [] f')
-    | _ -> TermTF.t_map (fun t -> t) fmla_remove_quant f
+    | _ -> Term.t_map fmla_remove_quant f
 
 (*let fmla_remove_quant f =
   Format.eprintf "@[<hov>%a =>|@\n" Pretty.print_fmla f;
@@ -119,7 +121,7 @@ let rec fmla_remove_quant f =
 *)
 
 let simplify_trivial_quantification =
-  Trans.rewriteTF (fun t -> t) fmla_remove_quant None
+  Trans.rewrite fmla_remove_quant None
 
 let () = Trans.register_transform
   "simplify_trivial_quantification" simplify_trivial_quantification
@@ -208,5 +210,5 @@ let fmla_cond_subst filter f =
           | _ -> ()
         done;
         fmla_unflatten conj f subf
-    | _ -> TermTF.t_map (fun t -> t) aux f in
+    | _ -> t_map aux f in
   aux f
