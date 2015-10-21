@@ -11,6 +11,8 @@
 
 (** Explanations *)
 
+val arg_extra_expl_prefix : string * Arg.spec * string
+
 val goal_expl_task:
   root:bool -> Task.task -> Ident.ident * string option * Task.task
 

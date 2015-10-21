@@ -50,6 +50,7 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<file> add file to the project (ignored if it is already there)";
 *)
+  Termcode.arg_extra_expl_prefix
 ]
 
 let usage_str = sprintf
