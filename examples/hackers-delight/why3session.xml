@@ -6,7 +6,6 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.3" timelimit="70" memlimit="1000"/>
 <file name="../hackers-delight.mlw" expanded="true">
 <theory name="Utils" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -66,9 +65,9 @@
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter hamming_spec" expl="VC for hamming_spec" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter hamming_spec.1" expl="1. assertion" expanded="true">
+ <goal name="WP_parameter hamming_spec" expl="VC for hamming_spec">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter hamming_spec.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="2.43" steps="956"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -90,13 +89,12 @@
  <proof prover="2"><result status="valid" time="0.06"/></proof>
  <proof prover="3"><result status="valid" time="0.14"/></proof>
  </goal>
- <goal name="WP_parameter triangleInequalityInt" expl="VC for triangleInequalityInt" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter triangleInequalityInt.1" expl="1. assertion" expanded="true">
+ <goal name="WP_parameter triangleInequalityInt" expl="VC for triangleInequalityInt">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter triangleInequalityInt.1" expl="1. assertion">
   <proof prover="2" timelimit="70"><result status="valid" time="1.34"/></proof>
-  <proof prover="4"><result status="valid" time="1.31"/></proof>
   </goal>
-  <goal name="WP_parameter triangleInequalityInt.2" expl="2. postcondition" expanded="true">
+  <goal name="WP_parameter triangleInequalityInt.2" expl="2. postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="79"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
