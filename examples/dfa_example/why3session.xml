@@ -3,14 +3,13 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.4pl4" timelimit="8" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="8" memlimit="4000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
 <prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
-<prover id="6" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
-<prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="8" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="8" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
 <file name="../dfa_example.mlw" expanded="true">
-<theory name="DfaExample" sum="664b149b9dfe62c43b205fb79b9f4fae" expanded="true">
+<theory name="DfaExample" sum="660b70fa1d4035d9e6c3f57fd8521252" expanded="true">
  <goal name="nil_notin_r1">
  <proof prover="0" edited="dfa_example_DfaExample_nil_notin_r1_1.v"><result status="valid" time="0.86"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
@@ -19,88 +18,96 @@
  <goal name="WP_parameter all_in_r0" expl="VC for all_in_r0">
  <proof prover="5"><result status="valid" time="0.40" steps="1040"/></proof>
  </goal>
- <goal name="ends_with_one">
+ <goal name="words_in_r1_end_with_one">
+ <proof prover="8"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="WP_parameter words_in_r1_suffix_in_r1" expl="VC for words_in_r1_suffix_in_r1">
  <transf name="split_goal_wp">
-  <goal name="ends_with_one.1" expl="1.">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.76"/></proof>
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter words_in_r1_suffix_in_r1.1" expl="1. assertion">
+  <proof prover="7"><result status="valid" time="0.04" steps="78"/></proof>
   </goal>
-  <goal name="ends_with_one.2" expl="2.">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter words_in_r1_suffix_in_r1.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="0.15"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="zero_w_in_r1">
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <goal name="WP_parameter zero_w_in_r1" expl="VC for zero_w_in_r1">
+ <proof prover="8"><result status="valid" time="0.38"/></proof>
  </goal>
- <goal name="one_w_in_r1">
- <proof prover="4"><result status="valid" time="0.20"/></proof>
+ <goal name="WP_parameter one_w_in_r1" expl="VC for one_w_in_r1">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter one_w_in_r1.1" expl="1. postcondition">
+  <proof prover="7"><result status="valid" time="0.28" steps="385"/></proof>
+  </goal>
+  <goal name="WP_parameter one_w_in_r1.2" expl="2. assertion">
+  <proof prover="7"><result status="valid" time="0.68" steps="895"/></proof>
+  </goal>
+  <goal name="WP_parameter one_w_in_r1.3" expl="3. assertion">
+  <proof prover="7"><result status="valid" time="0.04" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter one_w_in_r1.4" expl="4. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter one_w_in_r1.4.1" expl="1. postcondition">
+   <proof prover="7"><result status="valid" time="0.25" steps="337"/></proof>
+   </goal>
+   <goal name="WP_parameter one_w_in_r1.4.2" expl="2. postcondition">
+   <proof prover="7"><result status="valid" time="0.01" steps="11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="zero_w_in_r2">
- <proof prover="4"><result status="valid" time="0.50"/></proof>
- <proof prover="5"><result status="valid" time="0.27" steps="993"/></proof>
+ <proof prover="7"><result status="valid" time="0.04" steps="75"/></proof>
  </goal>
  <goal name="one_w_in_r2">
- <proof prover="4"><result status="valid" time="0.47"/></proof>
- <proof prover="5"><result status="valid" time="0.21" steps="577"/></proof>
+ <proof prover="7"><result status="valid" time="0.03" steps="76"/></proof>
  </goal>
  <goal name="WP_parameter astate1" expl="VC for astate1">
  <transf name="split_goal_wp">
   <goal name="WP_parameter astate1.1" expl="1. postcondition">
-  <proof prover="2" timelimit="20" memlimit="1000"><result status="valid" time="0.09"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter astate1.2" expl="2. variant decrease">
-  <proof prover="5"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter astate1.3" expl="3. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter astate1.3.1" expl="1. postcondition">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
-   <proof prover="7" timelimit="20"><result status="valid" time="0.04" steps="9"/></proof>
+   <proof prover="7"><result status="valid" time="0.04" steps="9"/></proof>
    </goal>
    <goal name="WP_parameter astate1.3.2" expl="2. postcondition">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="7"><result status="valid" time="0.06" steps="48"/></proof>
    </goal>
    <goal name="WP_parameter astate1.3.3" expl="3. postcondition">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
    <proof prover="7"><result status="valid" time="0.05" steps="37"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter astate1.4" expl="4. variant decrease">
-  <proof prover="5"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter astate1.5" expl="5. postcondition">
-  <proof prover="4"><result status="valid" time="0.10"/></proof>
-  <proof prover="7"><result status="valid" time="0.12" steps="246"/></proof>
+  <proof prover="7"><result status="valid" time="0.12" steps="244"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter astate2" expl="VC for astate2">
  <transf name="split_goal_wp">
   <goal name="WP_parameter astate2.1" expl="1. postcondition">
-  <proof prover="2" memlimit="1000"><result status="valid" time="0.09"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
   <goal name="WP_parameter astate2.2" expl="2. variant decrease">
-  <proof prover="5"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter astate2.3" expl="3. postcondition">
-  <proof prover="2" memlimit="1000"><result status="valid" time="0.09"/></proof>
-  <proof prover="4"><result status="valid" time="0.16"/></proof>
+  <proof prover="7"><result status="valid" time="0.06" steps="197"/></proof>
   </goal>
   <goal name="WP_parameter astate2.4" expl="4. variant decrease">
-  <proof prover="5"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="7"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter astate2.5" expl="5. postcondition">
-  <proof prover="4"><result status="valid" time="0.13"/></proof>
-  <proof prover="7"><result status="valid" time="0.12" steps="152"/></proof>
+  <proof prover="7"><result status="valid" time="0.12" steps="151"/></proof>
   </goal>
  </transf>
  </goal>
