@@ -210,7 +210,7 @@ let get_location_of_vc task =
        even on windows that's not allowed. *)
     let split = Strings.rev_split ':' loc_str in
     let loc =  match split with
-      | col2 :: col1 :: line :: (_ :: _) as rest ->
+      | col2 :: col1 :: line :: ((_ :: _) as rest) ->
 	let line = int_of_string line in
 	let col1 = int_of_string col1 in
 	let col2 = int_of_string col2 in
