@@ -22,25 +22,34 @@ theory bv.BV_Gen
 
   (* Warning: we should NOT remove all the axioms using "allprops" *)
 
+  remove prop size_pos
   remove prop nth_out_of_bound
   remove prop Nth_zero
   remove prop Nth_ones
   remove prop two_power_size_val
   remove prop max_int_val
-  remove prop eq_sub_equiv
   remove prop Nth_bw_or
   remove prop Nth_bw_and
   remove prop Nth_bw_xor
   remove prop Nth_bw_not
+  remove prop Lsr_nth_low
+  remove prop Lsr_nth_high
+  remove prop lsr_zero
+  remove prop Asr_nth_low
+  remove prop Asr_nth_high
+  remove prop asr_zero
+  remove prop Lsl_nth_low
+  remove prop Lsl_nth_high
+  remove prop lsl_zero
   remove prop Nth_rotate_left
   remove prop Nth_rotate_right
 
   remove prop to_uint_extensionality
   remove prop to_uint_bounds
-  remove prop to_int_extensionality
+  remove prop to_sint_extensionality
 
-  remove prop Of_int_zero
-  remove prop Of_int_ones
+  remove prop of_uint_zero
+  remove prop of_uint_ones
 
   remove prop to_uint_add
   remove prop to_uint_add_bounded

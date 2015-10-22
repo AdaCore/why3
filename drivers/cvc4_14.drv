@@ -46,6 +46,22 @@ steplimitexceeded "??"
 
 (** Extra theories supported by CVC4 *)
 
+theory float.GenericFloat
+
+ prelude "; ---- floats ---- "
+
+ syntax type t "Real"
+
+ syntax function to_real "%1"
+
+end
+
+theory float.FloatConverter
+
+ syntax function to_float64 "%1"
+
+end
+
 (* Disabled:
    CVC4 seems less efficient with its built-in implementation than
    with the axiomatic version

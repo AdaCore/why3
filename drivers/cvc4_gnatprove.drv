@@ -20,31 +20,15 @@ theory _gnatprove_standard_th.Integer
    remove prop bool_ge_axiom
 end
 
-theory _gnatprove_standard_th.Floating_Func
-   syntax function bool_eq "(= %1 %2)"
-   syntax function bool_neq "(not (= %1 %2))"
-   syntax function bool_lt "(< %1 %2)"
-   syntax function bool_le "(<= %1 %2)"
-   syntax function bool_gt "(> %1 %2)"
-   syntax function bool_ge "(>= %1 %2)"
-
-   remove prop Bool_real__lt_axiom
-   remove prop Bool_real__le_axiom
-   remove prop Bool_real__gt_axiom
-   remove prop Bool_real__ge_axiom
-   remove prop Bool_real__eq_axiom
-   remove prop Bool_real__neq_axiom
-end
-
 theory _gnatprove_standard_th.Boolean_Func
    syntax function bool_eq "(= %1 %2)"
 end
 
-theory ada__model_th.Discrete_Base_Theory
-  syntax function bool_eq "(= %1 %2)"
+theory ada__model.Finite_Float_Literal
+  remove prop l_bin
 end
 
-theory ada__model_th.Floating_Point_Theory
+theory ada__model_th.Discrete_Base_Theory
   syntax function bool_eq "(= %1 %2)"
 end
 

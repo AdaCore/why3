@@ -1,0 +1,483 @@
+(** {1 Formalization of Floating-Point Arithmetic}
+  Full float theory (with infinities and NaN) only RNE rounding mode. Special values are not axiomatized. *)
+
+theory GenericFloat
+
+  type t
+
+  (** Constants *)
+
+  constant zeroF     : t      (* +0.0 *)  (* why not plus and minus zero ? *)
+  constant oneF      : t      (* never used ! *)
+  constant max_value : t      (* largest finite float *)
+
+  (**  arithmetic functions *)
+
+  function abs       t   : t
+  function neg       t   : t
+
+  function add       t t : t
+  function sub       t t : t
+  function mul       t t : t
+  function div       t t : t
+
+  (* what about fma ? *)
+  (* add axioms for those *)
+  function sqrt      t   : t
+  function rem       t t : t
+
+  function ceil      t   : t (* ada : when 0, has the sign of 0 /!\ test smtlib *)
+  function floor     t   : t (* same as above *)
+  function truncate  t   : t (* The function yields the value ceil x
+                                when x is negative, and floor x otherwise *)
+  function rounding  t   : t
+
+  function min       t t : t    (* /!\ no axioms for min & max yet /!\ *)
+  function max       t t : t
+
+  (*** Conversion to/from other sorts ***)
+
+  (* unchecked convertion from bv type of equivalent size *)
+  type bv
+
+  function from_bv bv : t
+  function to_bv   t  : bv      (* uninterpreted function *)
+
+  (* with unsigned int as bitvector *)
+  use bv.BV8
+  use bv.BV16
+  use bv.BV32
+  use bv.BV64
+
+  function of_ubv8  BV8.t  : t
+  function of_ubv16 BV16.t : t
+  function of_ubv32 BV32.t : t
+  function of_ubv64 BV64.t : t
+
+  (* /!\ axioms for those *)
+  function to_ubv8  t : BV8.t
+  function to_ubv16 t : BV16.t
+  function to_ubv32 t : BV32.t
+  function to_ubv64 t : BV64.t
+
+  (* with signed int as bitvectors *)
+  (* function of_sbv8  BV8.t  : t *)
+  (* function of_sbv16 BV16.t : t *)
+  (* function of_sbv32 BV32.t : t *)
+  (* function of_sbv64 BV64.t : t *)
+
+  (* function to_sbv8  t : BV8.t *)
+  (* function to_sbv16 t : BV16.t *)
+  (* function to_sbv32 t : BV32.t *)
+  (* function to_sbv64 t : BV64.t *)
+
+  (* with int *)
+  function of_int (x : int) : t
+  function to_int (x : t) : int
+
+  axiom zero_of_int : zeroF = of_int 0
+
+  (* with real *)
+
+  (* function from_real real : t *)
+  function to_real   t    : real
+
+  (**  *)
+
+  (* axiom zeroF_from_real : zeroF         = from_real 0.0 *)
+  axiom zeroF_to_real   : to_real zeroF = 0.0
+
+  (** arithmetic axiomatisations *)
+
+  function round real : real    (* specific to axiomatisation, to be
+                                   ignored by prover with native support *)
+
+  constant max_real   : real    (* defined when cloning *)
+
+  axiom max_to_real   : max_real = to_real max_value
+  (* axiom max_from_real : max_value = from_real max_real *)
+
+  use import real.Real
+  use real.Abs
+
+  predicate in_range (x:real) = - max_real <= x <= max_real
+
+  (* is_finite will guard all axioms, we're not specifying anything
+     for special values. It remains uninterpreted for the
+     axiomatisation (mapped in the driver tho), axioms have to
+     propagate it. The only way to have is_finite x is if x is by
+     propagation or by construction (right now only from using a
+     constant or a prover with native support). *)
+
+  predicate is_finite (x:t)
+
+  axiom is_finite: forall x (* [in_range (to_real x)] *). is_finite x -> in_range (to_real x)
+
+  axiom is_finite_zero: is_finite zeroF
+  axiom is_finite_one : is_finite oneF
+  axiom is_finite_max : is_finite max_value
+
+  (* used by z3 to axiomatize to_bv *)
+  axiom to_bv: forall x:bv. is_finite (from_bv x) -> to_bv (from_bv x) = x
+  axiom to_bv2: forall x:t [from_bv (to_bv x)]. is_finite x -> from_bv (to_bv x) = x
+
+  (* used as a condition to propagate is_finite *)
+  predicate no_overflow (x:real) = in_range (round x)
+
+  use real.FromInt
+
+  axiom of_int_is_finite: forall x:int. no_overflow (FromInt.from_int x) ->
+        is_finite (of_int x)
+
+  axiom of_int_to_real: forall x:int. no_overflow (FromInt.from_int x) ->
+        to_real (of_int x) = round (FromInt.from_int x)
+
+  (* to_int and rounding *)
+  axiom to_int_rounding: forall x:t.
+    is_finite x ->
+      FromInt.from_int (to_int x) = to_real (rounding x)
+
+  (* axiom from_real_finite: forall x. no_overflow x -> is_finite (from_real x) *)
+  (* axiom from_real_finite: forall x. no_overflow (to_real x) -> is_finite x *)
+
+  (* Axioms on round *)
+
+  (* axiom round_no_overflow: *)
+  (*   forall x:real. no_overflow x -> *)
+  (*     to_real (from_real x) = round x *)
+
+  (* axiom is_finite_no_overflow: forall x:real. *)
+  (*   is_finite (from_real x) -> no_overflow x *)
+
+  axiom Bounded_real_no_overflow :
+    forall x:real. in_range x -> no_overflow x
+
+  axiom Round_monotonic :
+    forall x y:real. x <= y -> round x <= round y
+
+  axiom Round_idempotent :
+    forall x:real[round(round x)]. round (round x) = round x
+
+  (* axiom Round_to_real : *)
+  (*   forall x:t [round (to_real x)]. round (to_real x) = to_real x *)
+
+  (* axiom Round_from_real : *)
+  (*   forall x:real. from_real (round x) = from_real x *)
+
+  constant max_representable_integer : int (* defined when cloning *)
+
+  (* round and integers *)
+
+  use int.Int
+
+  axiom Exact_rounding_for_integers:
+    forall i:int.
+      Int.(<=) (Int.(-_) max_representable_integer) i /\
+      Int.(<=) i max_representable_integer ->
+        round (FromInt.from_int i) = FromInt.from_int i
+
+  (** {3 Comparisons} *)
+
+  (** Comparison predicates *)
+
+  predicate eq t t
+
+  axiom eq: forall x y.
+      is_finite x /\ is_finite y -> eq x y <-> to_real x = to_real y
+
+  predicate lt t t
+
+  axiom lt: forall x y.
+    is_finite x /\ is_finite y -> lt x y <-> to_real x < to_real y
+
+  predicate le t t
+
+  axiom le: forall x y.
+    is_finite x /\ is_finite y -> le x y <-> to_real x <= to_real y
+
+  predicate gt t t
+
+  axiom gt: forall x y.
+    is_finite x /\ is_finite y -> gt x y <-> to_real x > to_real y
+
+  predicate ge t t
+
+  axiom ge: forall x y.
+    is_finite x /\ is_finite y -> ge x y <-> to_real x >= to_real y
+
+  predicate is_zero (x:t) = eq x zeroF
+
+  predicate is_positive t
+
+  predicate is_negative t
+
+  axiom positive_to_real: forall x[is_positive x|to_real x >= 0.0].
+    is_finite x -> is_positive x -> to_real x >= 0.0
+  axiom to_real_positive: forall x[is_positive x].
+    is_finite x -> to_real x > 0.0 -> is_positive x
+
+  axiom negative_to_real: forall x [is_negative x|to_real x <= 0.0].
+    is_finite x -> is_negative x -> to_real x <= 0.0
+  axiom to_real_negative: forall x [is_negative x].
+    is_finite x -> to_real x < 0.0 -> is_negative x
+
+  axiom negative_xor_positive: forall x. not (is_positive x /\ is_negative x)
+  axiom negative_or_positive: forall x. is_finite x -> is_positive x \/ is_negative x
+
+  (** {3 binary operations} *)
+
+  axiom add: forall x y:t [add x y].
+   is_finite x -> is_finite y -> no_overflow (to_real x + to_real y) ->
+    is_finite (add x y) /\ to_real (add x y) = round (to_real x + to_real y)
+
+  axiom sub: forall x y:t.
+  is_finite x -> is_finite y -> no_overflow (to_real x - to_real y) ->
+    is_finite (sub x y) /\ to_real (sub x y) = round (to_real x - to_real y)
+
+  axiom mul: forall x y:t.
+  is_finite x -> is_finite y -> no_overflow (to_real x * to_real y) ->
+    is_finite (mul x y) /\ to_real (mul x y) = round (to_real x * to_real y)
+
+  axiom div: forall x y:t.
+  is_finite x -> is_finite y -> no_overflow (to_real x / to_real y) /\ not is_zero y ->
+    is_finite (div x y) /\ to_real (div x y) = round (to_real x / to_real y)
+
+  axiom neg: forall x:t.
+    is_finite x -> is_finite (neg x) /\ to_real (neg x) = - to_real x
+
+  axiom abs: forall x:t.
+    is_finite x -> is_finite (abs x) /\  to_real (abs x) = Abs.abs (to_real x)
+
+  (* For now, 0 is mapped to 0+ in smtlib drivers and we use the fact
+  that Spark2014 does not differentiate between the two *)
+
+  axiom of_ubv8_is_finite : forall x. is_finite (of_ubv8  x)
+  axiom of_ubv16_is_finite: forall x. is_finite (of_ubv16 x)
+  axiom of_ubv32_is_finite: forall x. is_finite (of_ubv32 x)
+  axiom of_ubv64_is_finite: forall x. is_finite (of_ubv64 x)
+
+  axiom of_ubv8_monotonic :
+    forall x y. BV8.ule  x y -> le (of_ubv8 x)  (of_ubv8 y)
+  axiom of_ubv16_monotonic:
+    forall x y. BV16.ule x y -> le (of_ubv16 x) (of_ubv16 y)
+  axiom of_ubv32_monotonic:
+    forall x y. BV32.ule x y -> le (of_ubv32 x) (of_ubv32 y)
+  axiom of_ubv64_monotonic:
+    forall x y. BV64.ule x y -> le (of_ubv64 x) (of_ubv64 y)
+
+  axiom of_ubv8_to_real : forall x.
+    to_real (of_ubv8 x)  = FromInt.from_int (BV8.to_uint x)
+  axiom of_ubv16_to_real: forall x.
+    to_real (of_ubv16 x) = FromInt.from_int (BV16.to_uint x)
+  (* axiom of_ubv8_to_real : forall x. *)
+  (*   to_real (of_ubv32 x) = round FromInt.from_int (BV32.to_uint x) *)
+  axiom of_ubv64_to_real: forall x.
+    to_real (of_ubv64 x) = round (FromInt.from_int (BV64.to_uint x))
+
+  (* _____________ *)
+
+
+  axiom eq_to_int: forall x y. is_finite x -> is_finite y -> eq x y ->
+    to_int x = to_int y
+
+  use import real.RealInfix
+  use real.Truncate
+
+  axiom truncate_neg: forall x:t.
+    is_finite x -> is_negative x -> truncate x = ceil x
+
+  axiom truncate_pos: forall x:t.
+    is_finite x -> is_positive x -> truncate x = floor x
+
+  axiom to_int_of_int: forall i:int.
+    Int.(<=) (Int.(-_) max_representable_integer) i /\
+    Int.(<=) i max_representable_integer ->
+      to_int (of_int i) = i
+
+  (* /!\ minus zero won't satisfy this *)
+  predicate is_int (x:t) = x = (of_int (to_int x))
+
+  axiom of_int_is_int: forall x. is_int (of_int x)
+
+  (* ceil axioms *)
+  axiom ceil_is_int: forall x:t. is_int (ceil x) (* ok with not guarding with is_finite x ? *)
+
+  (* zero's sign is kept so '=' instead of eq is OK *)
+  axiom ceil_of_int: forall i:int. ceil (of_int i) = of_int i
+
+  axiom ceil_le: forall x:t. le x (ceil x)
+
+  axiom ceil_lest: forall x y:t. le x y /\ is_int y -> le (ceil x) y
+
+  axiom ceil_to_int: forall x:t.
+    le (neg (of_int max_representable_integer)) x /\
+    lt x (of_int max_representable_integer) ->
+      to_int (ceil x) = Truncate.ceil (to_real x)
+
+  (* floor axioms *)
+  axiom floor_is_int: forall x:t. is_int (floor x)
+
+  axiom floor_of_int: forall i:int. floor (of_int i) = of_int i
+
+  axiom floor_le: forall x:t. le (floor x) x
+
+  axiom floor_lest: forall x y:t. le y x /\ is_int y -> le y (floor x)
+
+  axiom floor_to_int: forall x:t.
+    lt (neg (of_int max_representable_integer)) x /\
+    le x (of_int max_representable_integer) ->
+      to_int (floor x) = Truncate.floor (to_real x)
+  (* or ?  to_real (floor x) = FromInt.from_int (Truncate.floor (to_real x)) *)
+
+  (* rounding *)
+
+  (* todo : give bit-stream for float32 and float64 *)
+  (* are the *_is_finite needed ? not bothersome ? *)
+  constant two : t
+  (* axiom two_is_finite : is_finite two *)
+  axiom two_is_int    : is_int two
+  axiom two_to_real   : to_real two = 2.0
+
+  constant half : t
+  axiom half_is_finite : is_finite half
+  axiom half_to_real   : to_real half = 0.5
+
+  axiom to_int_down:
+    forall x:t. lt x (div (add (ceil x) (floor x)) two) -> to_int x = to_int (floor x)
+
+  axiom to_int_up:
+    forall x:t. gt x (div (add (ceil x) (floor x)) two) -> to_int x = to_int (ceil x)
+
+  axiom to_int_down_tie:
+    forall x:t. eq x (div (add (ceil x) (floor x)) two) /\ is_negative x ->
+      to_int x = to_int (floor x)
+
+  axiom to_int_up_tie:
+    forall x:t. eq x (div (add (ceil x) (floor x)) two) /\ is_positive x ->
+      to_int x = to_int (ceil x)
+
+  axiom to_int_near_int:
+    forall i x:t. is_int i -> lt (neg half) x /\ lt x half ->
+      to_int (add i x) = to_int i
+
+  axiom to_int_monotonic: forall x y:t.
+    le x y -> Int.(<=) (to_int x) (to_int y)
+
+  (* are those two really ok ? *)
+  axiom to_int_monotonic_int1:
+    forall x:t, i:int. le x (of_int i) -> Int.(<=) (to_int x) i
+
+  axiom to_int_monotonic_int2:
+    forall x:t, i:int. le (of_int i) x -> Int.(<=) i (to_int x)
+
+  (* axiom floor: forall x:t. *)
+  (*   to_real (floor x) = FromInt.from_int (Truncate.floor (to_real x)) *)
+
+  axiom truncate_is_finite : forall x:t. is_finite x -> is_finite (truncate x)
+  axiom ceil_is_finite     : forall x:t. is_finite x -> is_finite (ceil x)
+  axiom floor_is_finite    : forall x:t. is_finite x -> is_finite (floor x)
+  axiom rounding_is_finite : forall x:t. is_finite x -> is_finite (rounding x)
+
+  (* axiom Rounding_down: *)
+  (*   forall x:t. to_real x -. FromInt.from_int (Truncate.floor (to_real x)) <. 0.5 -> *)
+  (*     rounding x = floor x *)
+
+  (* axiom Rounding_up: *)
+  (*   forall x:t. FromInt.from_int (Truncate.ceil (to_real x)) -. to_real x <. 0.5 -> *)
+  (*     rounding x = ceil x *)
+
+  (* axiom Rounding_neg_tie: *)
+  (*   forall x:t. to_real x -. FromInt.from_int (Truncate.floor (to_real x)) = 0.5 /\ to_real x <. 0.0 -> *)
+  (*     rounding x = floor x *)
+
+  (* axiom Rounding_pos_tie: *)
+  (*   forall x:t. FromInt.from_int (Truncate.ceil (to_real x)) -. to_real x = 0.5 /\ to_real x >. 0.0 -> *)
+  (*     rounding x = ceil x *)
+
+  (* _____________ *)
+
+end
+
+theory Float32
+  use bv.BV32
+
+  type t
+
+  function from_bv BV32.t : t
+
+  constant max_representable_integer : int = 16777216
+  constant max_real : real = 0x1.FFFFFEp127
+
+  clone export GenericFloat with
+    type t           = t,
+    type bv          = BV32.t,
+    constant max_real = max_real,
+    constant max_representable_integer = max_representable_integer,
+    function from_bv = from_bv
+
+  (* axiom zeroF_bv: zeroF = from_bv BV32.zero *)
+  (* axiom max_bv  : max_value = from_bv (BV32.of_uint 0x7F7F_FFFF) *)
+  axiom of_ubv32_to_real : forall x.
+    to_real (of_ubv32 x) = round (FromInt.from_int (BV32.to_uint x))
+
+  axiom two_bv: two = from_bv (BV32.of_uint 0x4000_0000)
+
+  use import real.Real
+  lemma round_bound :
+    forall x : real [round x].
+      x - 0x1p-24 * Abs.abs(x) - 0x1p-150 <= round x <= x + 0x1p-24 * Abs.abs(x) + 0x1p-150
+end
+
+theory Float64
+  use bv.BV64
+
+  type t
+
+  function from_bv BV64.t : t
+
+  constant max_representable_integer : int = 9007199254740992
+  constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
+
+  clone export GenericFloat with
+    type t           = t,
+    type bv          = BV64.t,
+    constant max_real = max_real,
+    constant max_representable_integer = max_representable_integer,
+    function from_bv = from_bv
+
+  (* axiom zeroF_bv: zeroF = from_bv BV64.zero *)
+  (* axiom max_bv  : max_value   = from_bv (BV64.of_uint 0x7FEF_FFFF_FFFF_FFFF) *)
+  axiom of_ubv32_to_real : forall x.
+    to_real (of_ubv32 x) = FromInt.from_int (BV32.to_uint x)
+
+  axiom two_bv: two = from_bv (BV64.of_uint 0x4000_0000_0000_0000)
+
+  use import real.Real
+  axiom round_bound :
+    forall x : real [round x].
+      x - 0x1p-53 * Abs.abs(x) - 0x1p-1075 <= round x <= x + 0x1p-53 * Abs.abs(x) + 0x1p-1075
+end
+
+theory FloatConverter
+
+  use Float64
+  use Float32
+
+  function to_float64 Float32.t : Float64.t
+  function to_float32 Float64.t : Float32.t
+
+  lemma round_double_single :
+  forall x : real [ Float32.round x ].
+    Float64.round (Float32.round x) = Float32.round x
+
+  lemma to_float64_exact:
+    forall x:Float32.t. Float32.is_finite x ->
+      Float64.is_finite (to_float64 x)
+   /\ Float64.to_real (to_float64 x) = Float32.to_real x
+
+  lemma to_float32_conv:
+    forall x:Float64.t. Float64.is_finite x -> Float32.no_overflow (Float64.to_real x) ->
+      Float32.is_finite (to_float32 x)
+   /\ Float32.to_real (to_float32 x) = Float32.round (Float64.to_real x)
+
+end
