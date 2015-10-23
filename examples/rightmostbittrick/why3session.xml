@@ -6,140 +6,96 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="25" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="25" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.2" timelimit="25" memlimit="1000"/>
-<prover id="4" name="CVC4_nobv" version="1.4" timelimit="5" memlimit="1000"/>
 <file name="../rightmostbittrick.mlw" expanded="true">
-<theory name="Rmbt" sum="22df8c7ca2050e5b953f124af6c44263" expanded="true">
+<theory name="Rmbt" sum="0fc617e41642d752fa5c59917fa533b2" expanded="true">
  <goal name="WP_parameter min_elt" expl="VC for min_elt">
  <transf name="split_goal_wp">
   <goal name="WP_parameter min_elt.1" expl="1. loop invariant init">
-  <proof prover="0"><result status="timeout" time="25.03"/></proof>
   <proof prover="1"><result status="valid" time="0.21"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.2" expl="2. loop invariant preservation">
-  <proof prover="0"><result status="timeout" time="25.02"/></proof>
   <proof prover="1"><result status="valid" time="1.64"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.3" expl="3. loop variant decrease">
   <proof prover="0"><result status="valid" time="1.44" steps="355"/></proof>
   <proof prover="1"><result status="valid" time="0.55"/></proof>
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="timeout" time="24.98"/></proof>
-  <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.4" expl="4. postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="73"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.5" expl="5. postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="73"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.6" expl="6. postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="73"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.7" expl="7. postcondition">
-  <proof prover="0"><result status="timeout" time="25.00"/></proof>
-  <proof prover="1"><result status="unknown" time="1.31"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="timeout" time="5.99"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.8" expl="8. postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter min_elt.9" expl="9. postcondition">
-  <proof prover="0"><result status="timeout" time="25.02"/></proof>
-  <proof prover="1"><result status="unknown" time="1.43"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="timeout" time="5.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter rightmost_bit_trick" expl="VC for rightmost_bit_trick" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter rightmost_bit_trick" expl="VC for rightmost_bit_trick">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter rightmost_bit_trick.1" expl="1. precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="70"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.2" expl="2. assertion">
-  <proof prover="0"><result status="timeout" time="25.02"/></proof>
-  <proof prover="1"><result status="unknown" time="11.22"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.07"/></proof>
-  <proof prover="4"><result status="timeout" time="5.03"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.3" expl="3. assertion">
-  <proof prover="0"><result status="timeout" time="25.02"/></proof>
-  <proof prover="1"><result status="timeout" time="24.98"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.07"/></proof>
-  <proof prover="4"><result status="timeout" time="5.03"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.4" expl="4. postcondition">
   <proof prover="0"><result status="valid" time="0.20" steps="140"/></proof>
   <proof prover="1"><result status="valid" time="0.11"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="timeout" time="25.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.5" expl="5. postcondition">
-  <proof prover="0" timelimit="45"><result status="timeout" time="45.04"/></proof>
   <proof prover="1"><result status="valid" time="0.19"/></proof>
-  <proof prover="2"><result status="unknown" time="0.06"/></proof>
-  <proof prover="3"><result status="timeout" time="24.92"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.6" expl="6. postcondition">
   <proof prover="0"><result status="valid" time="0.02" steps="80"/></proof>
   <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="2"><result status="unknown" time="0.06"/></proof>
-  <proof prover="3"><result status="timeout" time="24.86"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.7" expl="7. postcondition">
-  <proof prover="0" timelimit="45"><result status="timeout" time="45.05"/></proof>
   <proof prover="1"><result status="valid" time="0.27"/></proof>
-  <proof prover="2"><result status="unknown" time="0.07"/></proof>
-  <proof prover="3"><result status="timeout" time="24.96"/></proof>
-  <proof prover="4"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.8" expl="8. postcondition" expanded="true">
-  <proof prover="0" timelimit="45"><result status="timeout" time="45.05"/></proof>
+  <goal name="WP_parameter rightmost_bit_trick.8" expl="8. postcondition">
   <proof prover="1"><result status="valid" time="0.89"/></proof>
-  <proof prover="2"><result status="unknown" time="0.07"/></proof>
-  <proof prover="3"><result status="timeout" time="24.97"/></proof>
-  <proof prover="4"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.9" expl="9. postcondition" expanded="true">
+  <goal name="WP_parameter rightmost_bit_trick.9" expl="9. postcondition">
   <proof prover="0"><result status="valid" time="0.15" steps="177"/></proof>
   <proof prover="1"><result status="valid" time="0.12"/></proof>
-  <proof prover="2"><result status="unknown" time="0.07"/></proof>
-  <proof prover="3"><result status="timeout" time="25.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.07"/></proof>
   </goal>
  </transf>
  </goal>
