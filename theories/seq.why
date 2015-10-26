@@ -369,6 +369,7 @@ theory Permut
   (** {2 Lemmas about permut} *)
 
   lemma permut_refl: forall s: seq 'a, l u: int.
+    0 <= l <= length s -> 0 <= u <= length s ->
     permut s s l u
 
   lemma permut_sym: forall s1 s2: seq 'a, l u: int.
