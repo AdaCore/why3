@@ -33,6 +33,9 @@ let () = reset_gc ()
 
 let debug = Debug.lookup_flag "ide_info"
 
+let debug_show_text_cntexmp = Debug.register_info_flag "show_text_cntexmp"
+  ~desc:"Print@ textual@ counterexample@ before@ printing@ counterexample@ interleaved@ with@ cource@ code."
+
 (************************)
 (* parsing command line *)
 (************************)
@@ -644,13 +647,19 @@ let update_tabs a =
         match a.S.proof_state with
 	  | S.Done r ->
 	    if not (Model_parser.is_model_empty r.Call_provers.pr_model) then begin
-	      "Counterexample:\n" ^
-		(Model_parser.model_to_string r.Call_provers.pr_model) ^
-		"\n\nSource code interleaved with counterexample:" ^
+	      let cntexample_text =
+		if Debug.test_flag debug_show_text_cntexmp then
+		  "Counterexample:\n" ^
+		    (Model_parser.model_to_string r.Call_provers.pr_model) ^
+		    "\n\nSource code interleaved with counterexample:"
+		else
+		  "" in
+	      let cntexample_text = cntexample_text ^
 		(Model_parser.interleave_with_source
 		   r.Call_provers.pr_model
 		   ~filename:!current_file
-		   ~source_code:(Sysutil.file_contents !current_file))
+		   ~source_code:(Sysutil.file_contents !current_file)) in
+	      cntexample_text
 	    end else
 	      ""
 	  | _ -> ""
@@ -671,6 +680,7 @@ let update_tabs a =
   edited_view#scroll_to_mark `INSERT;
   output_view#source_buffer#set_text output_text;
   counterexample_view#source_buffer#set_text counterexample_text;
+  counterexample_view#scroll_to_mark `INSERT;
 
 
 
