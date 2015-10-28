@@ -32,6 +32,10 @@ val bounded_split : char -> string -> int -> string list
     [n] substring at most.
     The concatenation of returned substrings is equal to the string s.*)
 
+val join : string -> string list -> string
+(** [join sep l] joins all the strings in [l] together, in the same
+    order, separating them by [sep] *)
+
 val ends_with : string -> string -> bool
 (** test if a string ends with another *)
 

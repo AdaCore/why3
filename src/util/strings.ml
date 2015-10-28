@@ -39,6 +39,12 @@ let rev_bounded_split c s n =
 
 let bounded_split c s n = List.rev (rev_bounded_split c s n)
 
+let rec join sep l =
+  match l with
+  | [] -> ""
+  | [x] -> x
+  | x :: rest -> x ^ sep ^ join sep rest
+
 let ends_with s suf =
   let rec aux s suf suflen offset i =
     i >= suflen || (s.[i + offset] = suf.[i]
