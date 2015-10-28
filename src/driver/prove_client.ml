@@ -66,15 +66,19 @@ let bool_of_timeout_string s =
   if s = "1" then true else false
 
 let read_answer s =
-  let l = Strings.rev_split ';' s in
+  let l = Strings.split ';' s in
   match l with
-  | [ out_file ; timeout_s; time_s; exit_s; id ] ->
-    { id = int_of_string id;
-      out_file = out_file;
-      time = float_of_string time_s;
-      exit_code = int_of_string exit_s;
-      timeout = bool_of_timeout_string timeout_s;
-    }
+  | id :: exit_s :: time_s :: timeout_s :: ( (_ :: _) as rest) ->
+      (* same trick we use in other parsing code. The file name may contain
+         ';'. Luckily, the file name comes last, so we still split on ';', and
+         put the pieces back together afterwards *)
+      let out_file = Strings.join ";" rest in
+      { id = int_of_string id;
+        out_file = out_file;
+        time = float_of_string time_s;
+        exit_code = int_of_string exit_s;
+        timeout = bool_of_timeout_string timeout_s;
+      }
   |_  ->
         assert false
 
