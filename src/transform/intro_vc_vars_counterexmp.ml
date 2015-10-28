@@ -194,12 +194,6 @@ let () = Trans.register_transform "intro_vc_vars_counterexmp"
   intro_vc_vars_counterexmp
   ~desc:"Introduce."
 
-let rec string_join sep l =
-  match l with
-  | [] -> ""
-  | [x] -> x
-  | x :: rest -> x ^ sep ^ string_join sep rest
-
 let get_location_of_vc task =
   let meta_args = Task.on_meta_excl meta_vc_location task in
   match meta_args with
@@ -214,7 +208,7 @@ let get_location_of_vc task =
 	let line = int_of_string line in
 	let col1 = int_of_string col1 in
 	let col2 = int_of_string col2 in
-	let filename = string_join ":" (List.rev rest) in
+	let filename = Strings.join ":" (List.rev rest) in
         Some (Loc.user_position filename line col1 col2)
       | _ -> None in
     loc
