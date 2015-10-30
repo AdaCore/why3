@@ -506,7 +506,7 @@ let set_proof_state a =
           a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
-  (* TODO find a better way to signal arhived row *)
+  (* TODO find a better way to signal archived row *)
   let t = if a.S.proof_archived then t ^ " (archived)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
 
@@ -582,6 +582,11 @@ let goal_task_text g =
   else
     task_text (S.goal_task g)
 
+let file_contents f =
+  try
+    Sysutil.file_contents f
+  with Invalid_argument s -> s
+
 let update_tabs a =
   let task_text =
     match a with
@@ -599,7 +604,7 @@ let update_tabs a =
         let env = env_session () in
         match S.get_edited_as_abs env.S.session a with
         | None -> ""
-        | Some f -> Sysutil.file_contents f
+        | Some f -> file_contents f
       end
     | _ -> ""
   in
@@ -658,7 +663,7 @@ let update_tabs a =
 		(Model_parser.interleave_with_source
 		   r.Call_provers.pr_model
 		   ~filename:!current_file
-		   ~source_code:(Sysutil.file_contents !current_file)) in
+		   ~source_code:(file_contents !current_file)) in
 	      cntexample_text
 	    end else
 	      ""
@@ -1972,7 +1977,7 @@ let scroll_to_file f =
         then why_lang else any_lang f
       in
       source_view#source_buffer#set_language lang;
-      source_view#source_buffer#set_text (Sysutil.file_contents f);
+      source_view#source_buffer#set_text (file_contents f);
       set_current_file f;
     end
 
