@@ -4,15 +4,11 @@
 printer "metitarski"
 filename "%f-%t-%g.tptp"
 
-valid   "^SZS status Theorem"
-valid   "^SZS status Unsatisfiable"
-unknown "^SZS status CounterSatisfiable" ""
-unknown "^SZS status Satisfiable" ""
-timeout "^SZS status Timeout"
-unknown "^SZS status GaveUp" ""
-fail    "^SZS status Error" ""
-
+valid 0
+invalid 111
+timeout "Gave up on deciding conjecture: TIMED OUT"
 time "why3cpulimit time : %s s"
+unknown 1 "toto"
 
 (* to be improved *)
 
