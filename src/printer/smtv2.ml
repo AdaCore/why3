@@ -176,11 +176,33 @@ let model_label = Ident.create_label "model"
 let model_vc_term_label = Ident.create_label "model_vc"
   (* This label identifies the term that triggers the VC. *)
 
+let add_model_element el info_model =
+(** Add element el (term) to info_model.
+    If an element with the same hash (the same set of labels + the same
+    location) as the element el already exists in info_model, replace it with el.
+
+    The reason is that  we do not want to display two model elements with the same
+    name in the same location and usually it is better to display the last one.
+
+    Note that two model elements can have the same name and location if why is used
+    as an intemediate language and the locations are locations in the source language.
+    Then, more why constructs (terms) can represent a single construct in the source
+    language and more terms have thus the same model name and location. This happens,
+    e.g., if why code is generated from SPARK. There, the first iteration of while
+    cycle is unrolled in some cases. If the task contains both a term representing a
+    variable in the first iteration of unrolled loop and a term representing the variable
+    in the subsequent loop iterations, only the latter is relevant for the counterexample
+    and it is the one that comes after the former one (and that is why we always keep the
+    last term).
+*)
+  let info_model = S.remove el info_model in
+  S.add el info_model
+
 let collect_model_ls info ls =
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
-      S.add
+      add_model_element
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
 
 let model_trace_regexp = Str.regexp "model_trace:"
@@ -267,7 +289,7 @@ let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
 
   if Slab.mem model_label t.t_label then
-    info.info_model <- S.add t info.info_model;
+    info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info;
 
@@ -318,7 +340,7 @@ let rec print_term info fmt t =
 		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
 		let _t_check_pos = t_label ~loc labels t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
-		(*info.info_model <- S.add t_check_pos info.info_model;*)
+		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
 	    end;
 	    fprintf fmt "@[%a@]" print_ident ls.ls_name
@@ -361,7 +383,7 @@ let rec print_term info fmt t =
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
   if Slab.mem model_label f.t_label then
-    info.info_model <- S.add f info.info_model;
+    info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info;
 
