@@ -47,6 +47,9 @@ module type S = sig
   val add_new : exn -> elt -> t -> t
   val is_num_elt : int -> t -> bool
   val of_list : elt list -> t
+  val contains: t -> elt -> bool
+  val add_left: t -> elt -> t
+  val remove_left: t -> elt -> t
 end
 
 module MakeOfMap (M: Extmap.S) = struct
@@ -91,6 +94,9 @@ module MakeOfMap (M: Extmap.S) = struct
   let add_new e x s = M.add_new e x () s
   let is_num_elt n m = M.is_num_elt n m
   let of_list l = List.fold_left (fun acc a -> add a acc) empty l
+  let contains = M.contains
+  let add_left s e = M.add e () s
+  let remove_left s e = M.remove e s
 end
 
 module type OrderedType = Set.OrderedType

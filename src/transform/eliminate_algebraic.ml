@@ -169,7 +169,7 @@ and rewriteF kn state av sign f = match f.t_node with
       let vl, tr, f1, close = t_open_quant_cb bf in
       let tr = TermTF.tr_map (rewriteT kn state)
                       (rewriteF kn state Svs.empty sign) tr in
-      let av = List.fold_left (fun s v -> Svs.add v s) av vl in
+      let av = List.fold_right Svs.add vl av in
       let f1 = rewriteF kn state av sign f1 in
       t_quant_simp q (close vl tr f1)
   | Tbinop (o, _, _) when (o = Tand && sign) || (o = Tor && not sign) ->
@@ -330,7 +330,7 @@ let add_tags mts (state,task) (ts,csl) =
     let sts = Sts.add ts sts in
     let add s (ls,_) = List.fold_left (mat_ty sts) s ls.ls_args in
     let stv = List.fold_left add Stv.empty csl in
-    List.map (fun v -> Stv.mem v stv) ts.ts_args
+    List.map (Stv.contains stv) ts.ts_args
   and mat_ty sts stv ty = match ty.ty_node with
     | Tyvar tv -> Stv.add tv stv
     | Tyapp (ts,tl) ->

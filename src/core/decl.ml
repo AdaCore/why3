@@ -455,8 +455,8 @@ let create_data_decl tdl =
     if cl = [] then raise (EmptyAlgDecl ts);
     if ts.ts_def <> None then raise (IllegalTypeAlias ts);
     let news = news_id news ts.ts_name in
-    let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
-      (Opt.fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
+    let pjs = List.fold_left (fun s (_,pl) ->
+      List.fold_left (Opt.fold Sls.add_left) s pl) Sls.empty cl in
     let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
     List.fold_left (check_constr ts ty cll pjs) (syms,news) cl
@@ -744,9 +744,8 @@ let check_positivity kn d = match d.d_node with
           | Tyapp (ts,tl) ->
               let check pos ty =
                 if pos then check_ty ty else
-                if ty_s_any (fun ts -> Sts.mem ts tss) ty
-                then raise (NonPositiveTypeDecl (tys,cs,ty))
-              in
+                if ty_s_any (Sts.contains tss) ty then
+                  raise (NonPositiveTypeDecl (tys,cs,ty)) in
               List.iter2 check (ts_extract_pos kn Sts.empty ts) tl
         in
         List.iter check_ty cs.ls_args
@@ -776,7 +775,7 @@ let parse_record kn fll =
   let cs, pjl = match find_constructors kn ts with
     | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField fs)) pjl
     | _ -> raise (BadRecordField fs) in
-  let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
+  let pjs = Sls.of_list pjl in
   let flm = List.fold_left (fun m (pj,v) ->
     if not (Sls.mem pj pjs) then raise (BadRecordField pj) else
     Mls.add_new (DuplicateRecordField pj) pj v m) Mls.empty fll in

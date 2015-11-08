@@ -143,7 +143,7 @@ let ty_v_all pr ty = Util.all ty_v_fold pr ty
 let ty_v_any pr ty = Util.any ty_v_fold pr ty
 
 let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
-let ty_freevars s ty = ty_v_fold (fun s v -> Stv.add v s) s ty
+let ty_freevars s ty = ty_v_fold Stv.add_left s ty
 let ty_closed ty = ty_v_all Util.ffalse ty
 
 (* smart constructors *)

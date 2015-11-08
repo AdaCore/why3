@@ -538,7 +538,7 @@ exception BadInstance of ident
 let cl_init_ty cl ({ts_name = id} as ts) ty =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let stv = Stv.of_list ts.ts_args in
-  if not (ty_v_all (fun v -> Stv.mem v stv) ty) then raise (BadInstance id);
+  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance id);
   cl.ty_table <- Mts.add ts ty cl.ty_table
 
 let cl_init_ts cl ({ts_name = id} as ts) ts' =

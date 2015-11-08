@@ -235,7 +235,7 @@ let ft_select_lsinst =
   ((Hstr.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
 
 let metas_from_env env =
-  let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
+  let fold_inst tyl _ s = List.fold_right Sty.add tyl s in
   let fold_ls _ insts s = Mtyl.fold fold_inst insts s in
   let sty = Mls.fold fold_ls env Sty.empty in
   let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
