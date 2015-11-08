@@ -135,7 +135,7 @@ let ity_of_pty muc pty =
     | PTtyapp (q, tyl) ->
         let s = find_itysymbol muc q in
         let tyl = List.map get_ity tyl in
-        Loc.try2 ~loc:(qloc q) ity_app_fresh s tyl
+        Loc.try3 ~loc:(qloc q) ity_app s tyl []
     | PTtuple tyl ->
         ity_tuple (List.map get_ity tyl)
     | PTarrow (ty1, ty2) ->
@@ -384,8 +384,7 @@ let parse_record muc fll =
     | (rs, _)::_ -> rs
     | [] -> raise EmptyRecord in
   let its = match rs.rs_cty.cty_args with
-    | [{pv_ity = {ity_node = (Ityreg {reg_its = its}
-        | Ityapp (its,_,_) | Itypur (its,_))}}] -> its
+    | [{pv_ity = {ity_node = (Ityreg {reg_its = s} | Ityapp (s,_,_))}}] -> s
     | _ -> raise (BadRecordField (ls_of_rs rs)) in
   let itd = find_its_defn muc.muc_known its in
   let check v s = match s.rs_field with
@@ -892,7 +891,7 @@ let add_types muc tdl =
                 Hstr.find hts x
             | _ ->
                 find_itysymbol muc q in
-          Loc.try2 ~loc:(qloc q) ity_app_fresh s (List.map down tyl)
+          Loc.try3 ~loc:(qloc q) ity_app s (List.map down tyl) []
       | PTtuple tyl -> ity_tuple (List.map down tyl)
       | PTarrow (ty1,ty2) -> ity_func (down ty1) (down ty2)
       | PTparen ty -> down ty in

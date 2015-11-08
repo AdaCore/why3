@@ -24,7 +24,6 @@ type dity =
   | Durg of ity * dity        (* undestructible "user" region, for global refs *)
   | Dreg of dvar ref * dity   (* destructible "fresh" region *)
   | Dapp of itysymbol * dity list * dity list
-  | Dpur of itysymbol * dity list
 
 and dvar =
   | Dtvs of tvsymbol          (* unassigned fresh type variable *)
@@ -47,20 +46,15 @@ let dreg_fresh dity = Dreg (dvar_fresh "rho", dity)
 let dity_of_ity ity =
   let hr = Hreg.create 3 in
   let rec dity ity = match ity.ity_node with
-    | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dreg rl)
-    | Itypur (s,tl)    -> Dpur (s, List.map dity tl)
-    | Ityvar v -> Dutv v
+    | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dity rl)
+    | Ityvar (v,_) -> Dutv v
     | Ityreg r -> dreg r
   and dreg reg =
     try Hreg.find hr reg with Not_found ->
     let {reg_its = s; reg_args = tl; reg_regs = rl} = reg in
-    let d = Dapp (s, List.map dity tl, List.map dreg rl) in
+    let d = Dapp (s, List.map dity tl, List.map dity rl) in
     let r = dreg_fresh d in Hreg.add hr reg r; r in
   dity ity
-
-let reg_of_ity = function
-  | {ity_node = Ityreg reg} -> reg
-  | _ -> assert false
 
 let rec ity_of_dity = function
   | Dvar ({contents = Dval d})
@@ -75,17 +69,14 @@ let rec ity_of_dity = function
   | Dutv v -> ity_var v
   | Durg (ity,_) -> ity
   | Dapp (s,tl,rl) ->
-      let reg_of_dity r = reg_of_ity (ity_of_dity r) in
-      ity_app s (List.map ity_of_dity tl) (List.map reg_of_dity rl)
-  | Dpur (s,tl) ->
-      ity_pur s (List.map ity_of_dity tl)
+      ity_app s (List.map ity_of_dity tl) (List.map ity_of_dity rl)
 
 (** Destructive type unification *)
 
 let rec occur_check v = function
   | Dvar {contents = Dval d} | Dreg (_,d) | Durg (_,d) -> occur_check v d
   | Dvar {contents = Dtvs u} | Dutv u -> if tv_equal u v then raise Exit
-  | Dapp (_,dl,_) | Dpur (_,dl) -> List.iter (occur_check v) dl
+  | Dapp (_,dl,_) -> List.iter (occur_check v) dl
 
 let rec dity_unify d1 d2 = match d1,d2 with
   | Dvar {contents = Dval d1}, d2
@@ -102,8 +93,7 @@ let rec dity_unify d1 d2 = match d1,d2 with
       r := Dval d
   | Dutv u, Dutv v when tv_equal u v ->
       ()
-  |(Dapp (s1,dl1,_), Dapp (s2,dl2,_)
-  | Dpur (s1,dl1),   Dpur (s2,dl2)) when its_equal s1 s2 ->
+  | Dapp (s1,dl1,_), Dapp (s2,dl2,_) when its_equal s1 s2 ->
       List.iter2 dity_unify dl1 dl2
   | _ -> raise Exit
 
@@ -124,7 +114,6 @@ let rec dity_refresh ht = function
       let r = dreg_fresh (dity_refresh ht d) in
       Htv.add ht v r; r end
   | Dreg _ -> assert false
-  | Dpur (s,dl) ->    Dpur (s, List.map (dity_refresh ht) dl)
   | Dapp (s,dl,rl) -> Dapp (s, List.map (dity_refresh ht) dl,
                                List.map (dity_refresh ht) rl)
   | Dvar {contents = Dval d} -> dity_refresh (Htv.create 3) d
@@ -155,8 +144,6 @@ let rec reunify d1 d2 = match d1,d2 with
   | Dapp (_,dl1,rl1), Dapp (_,dl2,rl2) ->
       List.iter2 reunify dl1 dl2;
       List.iter2 reunify rl1 rl2
-  | Dpur (_,dl1), Dpur (_,dl2) ->
-      List.iter2 reunify dl1 dl2
   | _ -> assert false
 
 let reunify_regions () =
@@ -204,6 +191,8 @@ let rec print_dity pri fmt = function
       Format.fprintf fmt (protect_on (pri > 1) "%a@ @@%s")
         (print_dity 0) d (Ident.id_unique rprinter v.tv_name)
   | Durg (ity,d) ->
+      let reg_of_ity = function
+        | {ity_node = Ityreg reg} -> reg | _ -> assert false in
       Format.fprintf fmt (protect_on (pri > 1) "%a@ @@%s")
         (print_dity 0) d (Ident.id_unique rprinter (reg_of_ity ity).reg_name)
   | Dapp (s,[t1;t2],[]) when its_equal s its_func ->
@@ -215,9 +204,11 @@ let rec print_dity pri fmt = function
       Format.fprintf fmt (protect_on (pri > 1) "%a%a%a")
         Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
           (print_regs (print_dity 0)) rl
+(*
   | Dpur (s,tl) ->
       Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
         Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
+*)
 
 let print_dity fmt d = print_dity 0 fmt d
 
@@ -231,7 +222,6 @@ let specialize_scheme tvs (argl,res) =
     | Dvar {contents = Dtvs v} | Dutv v as d -> get_tv v d
     | Dreg ({contents = Dtvs v},d) -> get_reg v d
     | Dapp (s,dl,rl) -> Dapp (s, List.map spec_dity dl, List.map spec_dity rl)
-    | Dpur (s,dl)    -> Dpur (s, List.map spec_dity dl)
   and get_tv v d = try Htv.find hv v with Not_found ->
     let nd = dity_fresh () in
     (* can't return d, might differ in regions *)
@@ -245,14 +235,13 @@ let specialize_scheme tvs (argl,res) =
 let spec_ity hv hr frz ity =
   let rec dity ity = match ity.ity_node with
     | Ityreg r -> dreg r
-    | Ityvar v -> if Mtv.mem v frz.isb_tv then Dutv v else get_tv v
-    | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dreg rl)
-    | Itypur (s,tl)    -> Dpur (s, List.map dity tl)
+    | Ityvar (v,_) -> if Mtv.mem v frz.isb_var then Dutv v else get_tv v
+    | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dity rl)
   and get_tv v = try Htv.find hv v with Not_found ->
     let nd = dity_fresh () in Htv.add hv v nd; nd
   and dreg reg = try Hreg.find hr reg with Not_found ->
     let {reg_its = s; reg_args = tl; reg_regs = rl} = reg in
-    let d = Dapp (s, List.map dity tl, List.map dreg rl) in
+    let d = Dapp (s, List.map dity tl, List.map dity rl) in
     let r = if Mreg.mem reg frz.isb_reg then
       Durg (ity_reg reg, d) else dreg_fresh d in
     Hreg.add hr reg r; r in
@@ -272,7 +261,7 @@ let specialize_rs {rs_cty = cty} =
 let specialize_ls {ls_args = args; ls_value = res} =
   let hv = Htv.create 3 and hr = Hreg.create 3 in
   let rec ity ty = match ty.ty_node with
-    | Tyapp (s,tl) -> ity_app_fresh (restore_its s) (List.map ity tl)
+    | Tyapp (s,tl) -> ity_app (restore_its s) (List.map ity tl) []
     | Tyvar v -> ity_var v in
   let spec ty = spec_ity hv hr isb_empty (ity ty) in
   List.map spec args, Opt.fold (Util.const spec) dity_bool res
@@ -390,7 +379,7 @@ let freeze_dvty frozen (argl,res) =
     | Dvar { contents = Dval d } -> add l d
     | Dvar { contents = Dtvs _ } as d -> d :: l
     | Dutv _ as d -> d :: l
-    | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add l tl in
+    | Dapp (_,tl,_) -> List.fold_left add l tl in
   List.fold_left add (add frozen res) argl
 
 let free_vars frozen (argl,res) =
@@ -399,7 +388,7 @@ let free_vars frozen (argl,res) =
     | Dvar { contents = Dval d } -> add s d
     | Dvar { contents = Dtvs v }
     | Dutv v -> if is_frozen frozen v then s else Stv.add v s
-    | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add s tl in
+    | Dapp (_,tl,_) -> List.fold_left add s tl in
   List.fold_left add (add Stv.empty res) argl
 
 let denv_add_mono { frozen = frozen; locals = locals } id dvty =
@@ -426,7 +415,7 @@ let denv_add_rec denv frozen0 id ((argl,res) as dvty) =
     | Dvar { contents = Dval d } -> is_explicit d
     | Dvar { contents = Dtvs _ } -> false
     | Dutv _ -> true
-    | Dapp (_,tl,_) | Dpur (_,tl) -> List.for_all is_explicit tl in
+    | Dapp (_,tl,_) -> List.for_all is_explicit tl in
   if List.for_all is_explicit argl && is_explicit res
   then denv_add_rec_poly denv frozen0 id dvty
   else denv_add_rec_mono denv id dvty
@@ -848,7 +837,7 @@ let env_empty = {
 exception UnboundLabel of string
 
 let find_old pvm (ovm,old) v =
-  if v.pv_ity.ity_pure then v else
+  if v.pv_ity.ity_imm then v else
   let n = v.pv_vs.vs_name.id_string in
   (* if v is top-level, both ov and pv are None.
      If v is local, ov and pv must be equal to v.
@@ -925,6 +914,7 @@ let cty_of_spec env bl dsp dity =
   let dsp = get_later env dsp ity in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_reset_overwritten eff in
+  let eff = eff_reset eff (ity_freeregs Sreg.empty ity) in
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
@@ -976,7 +966,7 @@ and try_cexp uloc env ghost de0 = match de0.de_node with
         | DEapp (de1,de2) -> down de1 (expr uloc env de2 :: el)
         | DEvar (n,_) -> app (ext_c_sym (get_rs env n)) el
         | DErs s -> app (ext_c_sym s) el
-        | DEls _ when not res.ity_pure ->
+        | DEls _ when not res.ity_imm ->
             Loc.errorm "This expression must have pure type"
         | DEls s -> ext_c_pur s el argl res
         | _ -> app (cexp uloc env ghost de) el in

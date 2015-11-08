@@ -166,7 +166,8 @@ let create_projection s v =
   let id = id_clone v.pv_vs.vs_name in
   let eff = eff_ghostify v.pv_ghost eff_empty in
   let tyl = List.map ity_var s.its_ts.ts_args in
-  let ity = ity_app s tyl s.its_regions in
+  let rgl = List.map ity_reg s.its_regions in
+  let ity = ity_app s tyl rgl in
   let arg = create_pvsymbol (id_fresh "arg") ity in
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
@@ -191,12 +192,16 @@ let create_constructor ~constr id s fl =
   end else if constr < 1 then raise exn;
   let argl = List.map (fun a -> a.pv_vs.vs_ty) fl in
   let tyl = List.map ity_var s.its_ts.ts_args in
-  let ity = ity_app s tyl s.its_regions in
+  let rgl = List.map ity_reg s.its_regions in
+  let ity = ity_app s tyl rgl in
   let ty = ty_of_ity ity in
   let ls = create_fsymbol ~constr id argl ty in
   let argl = List.map (fun a -> t_var a.pv_vs) fl in
   let q = make_post (fs_app ls argl ty) in
-  let c = create_cty fl [] [q] Mexn.empty Mpv.empty eff_empty ity in
+  let eff = match ity.ity_node with
+    | Ityreg r -> eff_reset eff_empty (Sreg.singleton r)
+    | _ -> eff_empty in
+  let c = create_cty fl [] [q] Mexn.empty Mpv.empty eff ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let rs_of_ls ls =
@@ -442,7 +447,7 @@ let e_ghostify gh ({e_effect = eff} as e) =
 let c_ghostify gh ({c_cty = cty} as c) =
   if cty.cty_effect.eff_ghost || not gh then c else
   let el = match c.c_node with Cfun e -> [e] | _ -> [] in
-  mk_cexp c.c_node (try_effect el cty_ghostify gh cty)
+  mk_cexp c.c_node (try_effect el Ity.cty_ghostify gh cty)
 
 (* purify expressions *)
 
@@ -645,8 +650,8 @@ let e_exec ({c_cty = cty} as c) = match cty.cty_args with
   | _::_ as al ->
       check_effects cty; check_state cty;
       (* no need to check eff_covers since we are completely pure *)
-      if List.exists (fun a -> not a.pv_ity.ity_pure) al ||
-        not cty.cty_result.ity_pure then Loc.errorm "This function \
+      if List.exists (fun a -> not a.pv_ity.ity_imm) al ||
+        not cty.cty_result.ity_imm then Loc.errorm "This function \
             has mutable type signature, it cannot be used as pure";
       let ghost = List.exists (fun a -> a.pv_ghost) al in
       let effect = eff_bind (Spv.of_list al) cty.cty_effect in
@@ -667,8 +672,8 @@ let c_app s vl ityl ity =
   mk_cexp (Capp (s,vl)) (cty_apply s.rs_cty vl ityl ity)
 
 let c_pur s vl ityl ity =
-  if not ity.ity_pure then invalid_arg "Expr.c_pur";
-  let v_args = List.map (create_pvsymbol (id_fresh "u")) ityl in
+  if not (ity_pure ity) then invalid_arg "Expr.c_pur";
+  let v_args = List.map (create_pvsymbol ~ghost:false (id_fresh "u")) ityl in
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
   let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
   let q = make_post (t_app s t_args res) in
@@ -871,7 +876,7 @@ let e_raise xs e ity =
 (* snapshots, assertions, "any" *)
 
 let e_pure t =
-  let ity = Opt.fold (fun _ -> ity_of_ty) ity_bool t.t_ty in
+  let ity = Opt.fold (Util.const ity_of_ty_pure) ity_bool t.t_ty in
   let eff = eff_ghostify true (eff_read (t_freepvs Spv.empty t)) in
   mk_expr (Epure t) ity eff
 
@@ -1099,10 +1104,12 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
 let ambig_cty c =
-  let sarg = List.fold_left (fun s v ->
-    ity_freeze s v.pv_ity) isb_empty c.cty_args in
+  let freeze_pv v s = ity_freeze s v.pv_ity in
+  let sarg = Spv.fold freeze_pv c.cty_effect.eff_reads isb_empty in
   let sres = ity_freeze isb_empty c.cty_result in
-  not (Mtv.set_submap sres.isb_tv sarg.isb_tv)
+  not (Mtv.set_submap sres.isb_var sarg.isb_var) ||
+  not (Mtv.set_submap sres.isb_pur
+       (Mtv.set_union sarg.isb_var sarg.isb_pur))
 
 let ambig_ls s =
   let sarg = List.fold_left ty_freevars Stv.empty s.ls_args in

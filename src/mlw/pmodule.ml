@@ -223,11 +223,10 @@ let count_regions {muc_known = kn} {pv_ity = ity} mr =
   let add_reg r mr = Mreg.change (fun n -> Some (n <> None)) r mr in
   let meet mr1 mr2 = Mreg.union (fun _ x y -> Some (x || y)) mr1 mr2 in
   let join mr1 mr2 = Mreg.union (fun _ _ _ -> Some true) mr1 mr2 in
-  let rec down mr ity = if ity.ity_pure then mr else
+  let rec down mr ity = if ity.ity_imm then mr else
     match ity.ity_node with
     | Ityreg r -> fields (add_reg r mr) r.reg_its r.reg_args r.reg_regs
     | Ityapp (s,tl,rl) -> fields mr s tl rl
-    | Itypur (s,tl) -> fields mr s tl []
     | Ityvar _ -> assert false
   and fields mr s tl rl = if s.its_privmut then mr else
     let add_arg isb v ity = ity_match isb (ity_var v) ity in
@@ -407,20 +406,13 @@ let rec clone_ity cl ity = match ity.ity_node with
       ity_reg (clone_reg cl r)
   | Ityapp (s, tl, rl) ->
       let tl = List.map (clone_ity cl) tl in
-      let rl = List.map (clone_reg cl) rl in
+      let rl = List.map (clone_ity cl) rl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
-      | Some its -> ity_app its tl rl
-      | None -> begin match Mts.find_opt s.its_ts cl.ty_table with
+      | Some its -> ity_app_pure its tl rl
+      | None -> (* creative indentation *)
+      begin match Mts.find_opt s.its_ts cl.ty_table with
       | Some ity -> ity_full_inst (its_match_regs s tl rl) ity
-      | None -> ity_app s tl rl
-      end end
-  | Itypur (s, tl) ->
-      let tl = List.map (clone_ity cl) tl in
-      begin match Mts.find_opt s.its_ts cl.ts_table with
-      | Some its -> ity_pur its tl
-      | None -> begin match Mts.find_opt s.its_ts cl.ty_table with
-      | Some ity -> ity_full_inst (its_match_args s tl) (ity_purify ity)
-      | None -> ity_pur s tl
+      | None -> ity_app_pure s tl rl
       end end
   | Ityvar _ -> ity
 
@@ -432,15 +424,16 @@ and clone_reg cl reg =
      descending into a let_defn. *)
   try Mreg.find reg cl.rn_table with Not_found ->
   let tl = List.map (clone_ity cl) reg.reg_args in
-  let rl = List.map (clone_reg cl) reg.reg_regs in
+  let rl = List.map (clone_ity cl) reg.reg_regs in
   let r = match Mts.find_opt reg.reg_its.its_ts cl.ts_table with
     | Some its ->
         create_region (id_clone reg.reg_name) its tl rl
-    | None -> begin match Mts.find_opt reg.reg_its.its_ts cl.ty_table with
+    | None -> (* creative indentation *)
+    begin match Mts.find_opt reg.reg_its.its_ts cl.ty_table with
     | Some {ity_node = Ityreg r} ->
         let sbs = its_match_regs reg.reg_its tl rl in
         let tl = List.map (ity_full_inst sbs) r.reg_args in
-        let rl = List.map (reg_full_inst sbs) r.reg_regs in
+        let rl = List.map (ity_full_inst sbs) r.reg_regs in
         create_region (id_clone reg.reg_name) r.reg_its tl rl
     | Some _ -> assert false
     | None ->
@@ -484,22 +477,18 @@ let clone_ls inst cl ls =
   ls'
 
 let cl_init_ty cl ({ts_name = id} as ts) ty =
-  let rec restore_ity ty = match ty.ty_node with
-    | Tyapp (s,tl) ->
-        ity_app_fresh (restore_its s) (List.map restore_ity tl)
-    | Tyvar v -> ity_var v in
-  let its = restore_its ts and ity = restore_ity ty in
+  let its = restore_its ts and ity = ity_of_ty ty in
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let stv = Stv.of_list ts.ts_args in
-  if not (Stv.subset (ity_freevars Stv.empty ity) stv) ||
-     its_impure its || not ity.ity_pure then raise (BadInstance id);
+  if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
+    its_pure its && ity_immutable ity) then raise (BadInstance id);
   cl.ty_table <- Mts.add ts ity cl.ty_table
 
 let cl_init_ts cl ({ts_name = id} as ts) ts' =
   let its = restore_its ts and its' = restore_its ts' in
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  if List.length ts.ts_args <> List.length ts'.ts_args ||
-     its_impure its || its_impure its' then raise (BadInstance id);
+  if not (List.length ts.ts_args = List.length ts'.ts_args &&
+    its_pure its && its_pure its') then raise (BadInstance id);
   cl.ts_table <- Mts.add its.its_ts its' cl.ts_table
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
@@ -638,7 +627,7 @@ let clone_type_decl inst cl tdl =
       if cloned then raise (CannotInstantiate id);
       let mfld = Spv.of_list s.its_mfields in
       let priv = d.itd_constructors = [] in
-      let mut = its_mutable s in
+      let mut = not (its_immutable s) in
       let pjl = List.map (fun fd -> Opt.get fd.rs_field) d.itd_fields in
       let fdl = List.map (fun v -> Spv.mem v mfld, conv_pj v) pjl in
       let inv =
@@ -654,7 +643,7 @@ let clone_type_decl inst cl tdl =
   and conv_ity alg ity =
     let rec down ity = match ity.ity_node with
       | Ityreg {reg_its = s; reg_args = tl}
-      | Ityapp (s,tl,_) | Itypur (s,tl) ->
+      | Ityapp (s,tl,_) ->
           if Sits.mem s alg then begin
             if not (Mts.mem s.its_ts cl.ts_table) then
             let id = id_clone s.its_ts.ts_name in
@@ -891,7 +880,9 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let frz = Spv.fold (fun v isb ->
         if Sid.mem v.pv_vs.vs_name cl.cl_local then isb
         else ity_freeze isb v.pv_ity) reads isb_empty in
-      cl.rn_table <- Mreg.set_union cl.rn_table frz.isb_reg;
+      let frz = Mreg.map (fun ity -> match ity.ity_node with
+        | Ityreg r -> r | _ -> assert false) frz.isb_reg in
+      cl.rn_table <- Mreg.set_union cl.rn_table frz;
       let sm, ld = clone_let_defn cl (sm_of_cl cl) ld in
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~vc:false uc (create_let_decl ld)

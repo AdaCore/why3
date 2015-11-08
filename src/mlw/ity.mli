@@ -16,14 +16,15 @@ open Term
 (** {2 Individual types (first-order types without effects)} *)
 
 type itysymbol = private {
-  its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
-  its_privmut : bool;           (** private mutable record type *)
+  its_ts      : tysymbol;       (** logical type symbol *)
+  its_privmut : bool;           (** private mutable type *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
-  its_regions : region list;    (** mutable shareable components *)
-  its_arg_imm : bool list;      (** non-updatable type parameters *)
+  its_regions : region list;    (** shareable components *)
+  its_arg_imm : bool list;      (** non-updatable parameters *)
   its_arg_exp : bool list;      (** exposed type parameters *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
   its_arg_frz : bool list;      (** irreplaceable type parameters *)
+  its_reg_exp : bool list;      (** exposed shareable components *)
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_reg_frz : bool list;      (** irreplaceable shareable components *)
   its_def     : ity option;     (** type alias *)
@@ -31,25 +32,23 @@ type itysymbol = private {
 
 and ity = private {
   ity_node : ity_node;
-  ity_pure : bool;
+  ity_imm  : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
 and ity_node = private
   | Ityreg of region
     (** record with mutable fields and shareable components *)
-  | Ityapp of itysymbol * ity list * region list
-    (** immutable type or algebraic type with shareable components *)
-  | Itypur of itysymbol * ity list
-    (** pure snapshot of a mutable type *)
-  | Ityvar of tvsymbol
-    (** type variable *)
+  | Ityapp of itysymbol * ity list * ity list
+    (** immutable type with shareable components *)
+  | Ityvar of tvsymbol * bool
+    (** type variable and its purity status *)
 
 and region = private {
   reg_name : ident;
   reg_its  : itysymbol;
   reg_args : ity list;
-  reg_regs : region list;
+  reg_regs : ity list;
 }
 
 and pvsymbol = private {
@@ -120,11 +119,22 @@ val create_itysymbol_rich :
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
 
-val its_mutable : itysymbol -> bool
-(** [its_mutable s] checks if [s] is a mutable record or an alias for one *)
+(* {2 Basic properties} *)
 
-val its_impure : itysymbol -> bool
-(** [its_impure s] checks if [s] is mutable or has mutable components *)
+val its_immutable : itysymbol -> bool
+(** an immutable type symbol is not a mutable record nor an alias for one *)
+
+val its_pure : itysymbol -> bool
+(** a pure type symbol is immutable and has no mutable components *)
+
+val ity_immutable : ity -> bool
+(** an immutable type contains no regions (returns the [ity_imm] field) *)
+
+val ity_pure : ity -> bool
+(** a pure type is immutable and all type variables in it are pure *)
+
+val ity_closed : ity -> bool
+(** a closed type contains no type variables *)
 
 (** {2 Type constructors} *)
 
@@ -132,38 +142,44 @@ exception BadItyArity of itysymbol * int
 exception BadRegArity of itysymbol * int
 exception NonUpdatable of itysymbol * ity
 
-val create_region : preid -> itysymbol -> ity list -> region list -> region
-(** the type symbol must be mutable, aliases are allowed *)
+val create_region : preid -> itysymbol -> ity list -> ity list -> region
+(** [create_region id s tl rl] creates a fresh region.
+    Type symbol [s] must be a mutable record or an alias for one.
+    If [rl] is empty, fresh subregions are created when needed. *)
+
+val ity_app : itysymbol -> ity list -> ity list -> ity
+(** [ity_app s tl rl] creates
+    - an [Ityapp] type, if [s] is immutable, or
+    - an [Ityreg] type on top of a fresh region, otherwise.
+    If [rl] is empty, fresh subregions are created when needed. *)
+
+val ity_app_pure : itysymbol -> ity list -> ity list -> ity
+(** [ity_app s tl rl] creates an [Ityapp] type.
+    If [rl] is empty, pure snapshots are substituted when needed. *)
 
 val ity_reg : region -> ity
+
 val ity_var : tvsymbol -> ity
 
-val ity_pur : itysymbol -> ity list -> ity
-(** [ity_pur s tl] creates
-  - an [Itypur] snapshot type if [its_impure s] is true
-  - an [Ityapp (s,tl,[])] type otherwise *)
-
-val ity_app : itysymbol -> ity list -> region list -> ity
-(** [ity_app s tl rl] creates
-  - an [Ityreg] type with a fresh region if [its_mutable s] is true
-  - an [Ityapp (s,tl,rl)] type otherwise *)
-
-val ity_app_fresh : itysymbol -> ity list -> ity
-(** [ity_app_fresh] creates fresh regions where needed *)
-
-val ty_of_ity : ity -> ty
-(** all aliases expanded, all regions removed *)
-
-val ity_of_ty : ty -> ity
-(** snapshot type, raises [Invalid_argument] for any non-its *)
+val ity_var_pure : tvsymbol -> ity
 
 val ity_purify : ity -> ity
-(** snapshot type *)
+(** replaces regions with pure snapshots and variables with pure variables. *)
+
+val ity_of_ty : ty -> ity
+(** fresh regions are created when needed and all variables are impure.
+    Raises [Invalid_argument] for any non-its tysymbol. *)
+
+val ity_of_ty_pure : ty -> ity
+(** pure snapshots are substituted when needed and all variables are pure.
+    Raises [Invalid_argument] for any non-its tysymbol. *)
+
+val ty_of_ity : ity -> ty
 
 (** {2 Generic traversal functions} *)
 
-val ity_fold : ('a -> ity -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
-val reg_fold : ('a -> ity -> 'a) -> ('a -> region -> 'a) -> 'a -> region -> 'a
+val ity_fold : ('a -> ity -> 'a) -> 'a -> ity -> 'a
+val reg_fold : ('a -> ity -> 'a) -> 'a -> region -> 'a
 
 (** {2 Traversal functions on type symbols} *)
 
@@ -175,31 +191,30 @@ val reg_s_fold : ('a -> itysymbol -> 'a) -> 'a -> region -> 'a
 val ity_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ity -> 'a
 val reg_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> region -> 'a
 
-(** {2 Traversal functions on top regions} *)
-
-val ity_r_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
-val reg_r_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
-
-(** {2 Miscellaneous type utilities} *)
-
 val ity_freevars : Stv.t -> ity -> Stv.t
 val reg_freevars : Stv.t -> region -> Stv.t
 
 val ity_v_occurs : tvsymbol -> ity -> bool
 val reg_v_occurs : tvsymbol -> region -> bool
 
+(** {2 Traversal functions on top regions} *)
+
+val ity_r_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_r_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
+
+val ity_freeregs : Sreg.t -> ity -> Sreg.t
+val reg_freeregs : Sreg.t -> region -> Sreg.t
+
 val ity_r_occurs : region -> ity -> bool
 val reg_r_occurs : region -> region -> bool
 
-val ity_r_stale  : Sreg.t -> 'a Mreg.t -> ity -> bool
-val reg_r_stale  : Sreg.t -> 'a Mreg.t -> region -> bool
+(** {2 Utility functions on exposed regions} *)
 
-val ity_closed    : ity -> bool
+val ity_r_reachable : region -> ity -> bool
+val reg_r_reachable : region -> region -> bool
 
-(* detect non-ghost type variables and regions *)
-
-val ity_r_visible : Sreg.t -> ity -> Sreg.t
-val ity_v_visible : Stv.t  -> ity -> Stv.t
+val ity_r_stale : Sreg.t -> 'a Mreg.t -> ity -> bool
+val reg_r_stale : Sreg.t -> 'a Mreg.t -> region -> bool
 
 (** {2 Built-in types} *)
 
@@ -225,19 +240,21 @@ val ity_tuple : ity list -> ity
 (** {2 Type matching and instantiation} *)
 
 type ity_subst = private {
-  isb_tv  : ity Mtv.t;
-  isb_reg : region Mreg.t;
+  isb_var : ity Mtv.t;
+  isb_pur : ity Mtv.t;
+  isb_reg : ity Mreg.t;
 }
 
 exception TypeMismatch of ity * ity * ity_subst
+exception ImpureType of tvsymbol * ity
 
 val isb_empty : ity_subst
 
 val ity_match : ity_subst -> ity -> ity -> ity_subst
-val reg_match : ity_subst -> region -> region -> ity_subst
+val reg_match : ity_subst -> region -> ity -> ity_subst
 
 val its_match_args : itysymbol -> ity list -> ity_subst
-val its_match_regs : itysymbol -> ity list -> region list -> ity_subst
+val its_match_regs : itysymbol -> ity list -> ity list -> ity_subst
 
 val ity_freeze : ity_subst -> ity -> ity_subst (* self-match *)
 val reg_freeze : ity_subst -> region -> ity_subst (* self-match *)
@@ -246,7 +263,7 @@ val ity_equal_check : ity -> ity -> unit
 val reg_equal_check : region -> region -> unit
 
 val ity_full_inst : ity_subst -> ity -> ity
-val reg_full_inst : ity_subst -> region -> region
+val reg_full_inst : ity_subst -> region -> ity
 
 (** {2 Program variables} *)
 
@@ -279,6 +296,7 @@ val create_xsymbol : preid -> ity -> xsymbol
 
 (** {2 Effects} *)
 
+exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
 exception StaleVariable of pvsymbol * region
@@ -317,7 +335,7 @@ val eff_read_single_post : effect -> pvsymbol -> effect
 val eff_bind_single      : pvsymbol -> effect -> effect
 
 val eff_reset : effect -> Sreg.t -> effect   (* confine to an empty cover *)
-val eff_reset_overwritten : effect -> effect (* confine all subregions under writes *)
+val eff_reset_overwritten : effect -> effect (* confine regions under writes *)
 
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
@@ -360,7 +378,7 @@ val create_cty : pvsymbol list ->
     Fresh regions in [result] are reset. Every type variable in [pre],
     [post], and [xpost] must come from [cty_reads], [args] or [result].
     [oldies] maps ghost pure snapshots of the parameters and external
-    reads to the original pvsymbols: these snaphosts are removed from
+    reads to the original pvsymbols: these snapshots are removed from
     [cty_effect.eff_reads] and replaced with the originals. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty

@@ -40,7 +40,7 @@ let check_field stv f =
   let ftv = ity_freevars Stv.empty f.pv_ity in
   if not (Stv.subset ftv stv) then Loc.error ?loc
     (UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
-  if not f.pv_ity.ity_pure then Loc.error ?loc
+  if not f.pv_ity.ity_imm then Loc.error ?loc
     (ImpureField f.pv_ity)
 
 let check_invariant stv svs p =
@@ -61,13 +61,18 @@ let check_pure_its s = not s.its_privmut &&
   s.its_def = None
 
 let create_semi_constructor id s fl pjl invl =
-  let ity = ity_app s (List.map ity_var s.its_ts.ts_args) s.its_regions in
+  let tvl = List.map ity_var s.its_ts.ts_args in
+  let rgl = List.map ity_reg s.its_regions in
+  let ity = ity_app s tvl rgl in
   let res = create_vsymbol (id_fresh "result") (ty_of_ity ity) in
   let t = t_var res in
   let get_pj p = match p.rs_logic with RLls s -> s | _ -> assert false in
   let mk_q {pv_vs = v} p = t_equ (fs_app (get_pj p) [t] v.vs_ty) (t_var v) in
   let q = create_post res (t_and_simp_l (List.map2 mk_q fl pjl)) in
-  let c = create_cty fl invl [q] Mexn.empty Mpv.empty eff_empty ity in
+  let eff = match ity.ity_node with
+    | Ityreg r -> eff_reset eff_empty (Sreg.singleton r)
+    | _ -> eff_empty in
+  let c = create_cty fl invl [q] Mexn.empty Mpv.empty eff ity in
   create_rsymbol id c
 
 let create_flat_record_decl id args priv mut fldl invl =
@@ -458,7 +463,7 @@ let create_let_decl ld =
 let create_exn_decl xs =
   if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
     "Top-level exception %a has a polymorphic type" print_xs xs;
-  if not xs.xs_ity.ity_pure then Loc.errorm ?loc:xs.xs_name.id_loc
+  if not xs.xs_ity.ity_imm then Loc.errorm ?loc:xs.xs_name.id_loc
     "The type of top-level exception %a has mutable components" print_xs xs;
   mk_decl (PDexn xs) []
 
@@ -551,8 +556,8 @@ let print_its_defn fst fmt itd =
     print_ity f.rs_cty.cty_result in
   let is_big ity = match ity.ity_node with
     | Ityreg {reg_args = []; reg_regs = []}
-    | Ityapp (_,[],[]) | Itypur (_,[]) | Ityvar _ -> false
-    | Itypur (s,_) when is_ts_tuple s.its_ts -> false
+    | Ityapp (_,[],[]) | Ityvar _ -> false
+    | Ityapp (s,_,[]) when is_ts_tuple s.its_ts -> false
     | _ -> true in
   let print_proj mf fmt f = match Mpv.find_opt f mf with
     | Some f -> fprintf fmt "@ (%a)" print_field f

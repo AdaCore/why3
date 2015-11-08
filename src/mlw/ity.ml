@@ -17,14 +17,15 @@ open Term
 (** {2 Individual types (first-order types without effects)} *)
 
 type itysymbol = {
-  its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
-  its_privmut : bool;           (** private mutable record type *)
+  its_ts      : tysymbol;       (** logical type symbol *)
+  its_privmut : bool;           (** private mutable type *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
-  its_regions : region list;    (** mutable shareable components *)
-  its_arg_imm : bool list;      (** non-updatable type parameters *)
+  its_regions : region list;    (** shareable components *)
+  its_arg_imm : bool list;      (** non-updatable parameters *)
   its_arg_exp : bool list;      (** exposed type parameters *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
   its_arg_frz : bool list;      (** irreplaceable type parameters *)
+  its_reg_exp : bool list;      (** exposed shareable components *)
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_reg_frz : bool list;      (** irreplaceable shareable components *)
   its_def     : ity option;     (** type alias *)
@@ -32,25 +33,23 @@ type itysymbol = {
 
 and ity = {
   ity_node : ity_node;
-  ity_pure : bool;
+  ity_imm  : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
 and ity_node =
   | Ityreg of region
     (** record with mutable fields and shareable components *)
-  | Ityapp of itysymbol * ity list * region list
-    (** immutable type or algebraic type with shareable components *)
-  | Itypur of itysymbol * ity list
-    (** pure snapshot of a mutable type *)
-  | Ityvar of tvsymbol
-    (** type variable *)
+  | Ityapp of itysymbol * ity list * ity list
+    (** immutable type with shareable components *)
+  | Ityvar of tvsymbol * bool
+    (** type variable and its purity status *)
 
 and region = {
   reg_name : ident;
   reg_its  : itysymbol;
   reg_args : ity list;
-  reg_regs : region list;
+  reg_regs : ity list;
 }
 
 and pvsymbol = {
@@ -116,138 +115,145 @@ let ity_compare ity1 ity2 = Pervasives.compare (ity_hash ity1) (ity_hash ity2)
 let reg_compare reg1 reg2 = id_compare reg1.reg_name reg2.reg_name
 let pv_compare  pv1  pv2  = id_compare pv1.pv_vs.vs_name pv2.pv_vs.vs_name
 
-let its_mutable s = s.its_privmut || s.its_mfields <> [] ||
-  match s.its_def with Some {ity_node = Ityreg _} -> true | _ -> false
-
-let its_impure s = its_mutable s || s.its_regions <> [] ||
-  match s.its_def with Some ity -> not ity.ity_pure | None -> false
-
 exception NonUpdatable of itysymbol * ity
 
 let check_its_args s tl =
   assert (s.its_def = None);
-  let check_imm acc imm ity =
-    if imm && not ity.ity_pure then raise (NonUpdatable (s,ity));
-    acc && ity.ity_pure in
-  List.fold_left2 check_imm true s.its_arg_imm tl
+  let check imm ity =
+    if imm && not ity.ity_imm then raise (NonUpdatable (s,ity)) in
+  List.iter2 check s.its_arg_imm tl
 
 module Hsity = Hashcons.Make (struct
   type t = ity
 
   let equal ity1 ity2 = match ity1.ity_node, ity2.ity_node with
-    | Ityvar v1, Ityvar v2 -> tv_equal v1 v2
+    | Ityvar (v1,p1), Ityvar (v2,p2) -> tv_equal v1 v2 && p1 = p2
     | Ityreg r1, Ityreg r2 -> reg_equal r1 r2
-    | Itypur (s1,l1), Itypur (s2,l2) ->
-        its_equal s1 s2 &&
-        List.for_all2 ity_equal l1 l2
     | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) ->
         its_equal s1 s2 &&
         List.for_all2 ity_equal l1 l2 &&
-        List.for_all2 reg_equal r1 r2
+        List.for_all2 ity_equal r1 r2
     | _ -> false
 
   let hash ity = match ity.ity_node with
-    | Ityvar v -> tv_hash v
+    | Ityvar (v,p) ->
+        Hashcons.combine (tv_hash v) (Hashtbl.hash p)
     | Ityreg r -> reg_hash r
-    | Itypur (s,tl) ->
-        Hashcons.combine_list ity_hash (its_hash s) tl
     | Ityapp (s,tl,rl) ->
-        Hashcons.combine_list reg_hash
+        Hashcons.combine_list ity_hash
           (Hashcons.combine_list ity_hash (its_hash s) tl) rl
 
-  let pure ity = match ity.ity_node with
+  let immutable ity = match ity.ity_node with
     | Ityvar _ -> true
     | Ityreg _ -> false
-    | Itypur (s,tl) -> check_its_args s tl
-    | Ityapp (s,tl,[]) -> check_its_args s tl
-    | Ityapp (s,tl,_::_) -> check_its_args s tl && false
+    | Ityapp (s,tl,rl) ->
+        check_its_args s tl;
+        let imm ity = ity.ity_imm in
+        List.for_all imm tl && List.for_all imm rl
 
   let tag n ity = { ity with
-    ity_pure = pure ity;
-    ity_tag  = Weakhtbl.create_tag n }
+    ity_imm = immutable ity;
+    ity_tag = Weakhtbl.create_tag n }
 end)
 
 let mk_ity node = {
   ity_node = node;
-  ity_pure = true;
+  ity_imm  = true;
   ity_tag  = Weakhtbl.dummy_tag;
 }
 
 let mk_reg name s tl rl = {
   reg_name = id_register name;
   reg_its  = s;
-  reg_args = (ignore (check_its_args s tl); tl);
+  reg_args = (check_its_args s tl; tl);
   reg_regs = rl;
 }
 
-let ity_var v = Hsity.hashcons (mk_ity (Ityvar v))
-let ity_reg r = Hsity.hashcons (mk_ity (Ityreg r))
-
-let ity_pur_unsafe s tl    = Hsity.hashcons (mk_ity (Itypur (s,tl)))
+let ity_reg r              = Hsity.hashcons (mk_ity (Ityreg r))
+let ity_var v              = Hsity.hashcons (mk_ity (Ityvar (v,false)))
+let ity_var_pure v         = Hsity.hashcons (mk_ity (Ityvar (v,true)))
 let ity_app_unsafe s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
+
+(* immutability and purity *)
+
+let its_immutable s = not s.its_privmut && s.its_mfields = [] &&
+  match s.its_def with Some {ity_node = Ityreg _} -> false | _ -> true
+
+let its_pure s = its_immutable s && s.its_regions = [] &&
+  match s.its_def with Some ity -> ity.ity_imm | None -> true
+
+let ity_immutable ity = ity.ity_imm
+
+let rec ity_pure ity = match ity.ity_node with
+  | Ityreg _ -> false
+  | Ityapp (_,tl,rl) -> List.for_all ity_pure tl && List.for_all ity_pure rl
+  | Ityvar (_,p) -> p
+
+let ity_pure ity = ity_immutable ity && ity_pure ity
+
+let rec ity_purify ity = match ity.ity_node with
+  | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl} | Ityapp (s,tl,rl) ->
+      ity_app_unsafe s (List.map ity_purify tl) (List.map ity_purify rl)
+  | Ityvar (v,_) -> ity_var_pure v
+
+let rec ty_of_ity ity = match ity.ity_node with
+  | Ityreg {reg_its = s; reg_args = tl} | Ityapp (s,tl,_) ->
+      ty_app s.its_ts (List.map ty_of_ity tl)
+  | Ityvar (v,_) -> ty_var v
 
 (* generic traversal functions *)
 
-let dfold fn1 fn2 acc l1 l2 =
-  List.fold_left fn2 (List.fold_left fn1 acc l1) l2
+let dfold fn acc l1 l2 =
+  List.fold_left fn (List.fold_left fn acc l1) l2
 
-let dfold2 fn1 fn2 acc l1 r1 l2 r2 =
-  List.fold_left2 fn2 (List.fold_left2 fn1 acc l1 r1) l2 r2
+let dfold2 fn acc l1 r1 l2 r2 =
+  List.fold_left2 fn (List.fold_left2 fn acc l1 r1) l2 r2
 
-let ity_fold fnt fnr acc ity = match ity.ity_node with
-  | Ityapp (_,tl,rl) -> dfold fnt fnr acc tl rl
-  | Itypur (_,tl) -> List.fold_left fnt acc tl
-  | Ityreg r -> fnr acc r
+let ity_fold fn acc ity = match ity.ity_node with
+  | Ityreg {reg_args = tl; reg_regs = rl}
+  | Ityapp (_,tl,rl) -> dfold fn acc tl rl
   | Ityvar _ -> acc
 
-let reg_fold fnt fnr acc r = dfold fnt fnr acc r.reg_args r.reg_regs
+let reg_fold fn acc reg = dfold fn acc reg.reg_args reg.reg_regs
 
 (* symbol-wise fold *)
 
 let rec ity_s_fold fn acc ity = match ity.ity_node with
-  | Ityapp (s,_,_) | Itypur (s,_) ->
-      ity_fold (ity_s_fold fn) (reg_s_fold fn) (fn acc s) ity
-  | Ityreg r -> reg_s_fold fn acc r
+  | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
+  | Ityapp (s,tl,rl) -> dfold (ity_s_fold fn) (fn acc s) tl rl
   | Ityvar _ -> acc
 
-and reg_s_fold fn acc r =
-  reg_fold (ity_s_fold fn) (reg_s_fold fn) (fn acc r.reg_its) r
+let reg_s_fold fn acc r = reg_fold (ity_s_fold fn) (fn acc r.reg_its) r
 
 (* traversal functions on type variables *)
 
 let rec ity_v_fold fn acc ity = match ity.ity_node with
-  | Ityapp (_,tl,_) | Itypur (_,tl) | Ityreg {reg_args = tl} ->
+  | Ityreg {reg_args = tl} | Ityapp (_,tl,_) ->
       List.fold_left (ity_v_fold fn) acc tl
-  | Ityvar v -> fn acc v
+  | Ityvar (v,_) -> fn acc v
 
 let reg_v_fold fn acc r = List.fold_left (ity_v_fold fn) acc r.reg_args
 
-let ity_freevars s ity = ity_v_fold (fun s v -> Stv.add v s) s ity
-let reg_freevars s reg = reg_v_fold (fun s v -> Stv.add v s) s reg
+let ity_freevars s ity = ity_v_fold Stv.add_left s ity
+let reg_freevars s reg = reg_v_fold Stv.add_left s reg
 
 let ity_v_occurs v ity = Util.any ity_v_fold (tv_equal v) ity
 let reg_v_occurs v reg = Util.any reg_v_fold (tv_equal v) reg
 
 let ity_closed ity = Util.all ity_v_fold Util.ffalse ity
 
-(* traversal functions on regions *)
+(* traversal functions on top regions *)
 
 let rec ity_r_fold fn acc ity =
-  if ity.ity_pure then acc else
+  if ity.ity_imm then acc else
   match ity.ity_node with
+  | Ityapp (_,tl,rl) -> dfold (ity_r_fold fn) acc tl rl
   | Ityreg r -> fn acc r
-  | Ityapp (s,tl,rl) -> its_r_fold fn acc s tl rl
-  | Itypur (_,tl) ->
-      (* snapshot types expose all arguments *)
-      List.fold_left (ity_r_fold fn) acc tl
-  | Ityvar _ -> assert false
+  | Ityvar _ -> acc
 
-and its_r_fold fn acc s tl rl =
-  let add_arg acc exp t = if exp then ity_r_fold fn acc t else acc in
-  List.fold_left2 add_arg (List.fold_left fn acc rl) s.its_arg_exp tl
+let reg_r_fold fn acc reg = reg_fold (ity_r_fold fn) acc reg
 
-let reg_r_fold fn acc reg =
-  its_r_fold fn acc reg.reg_its reg.reg_args reg.reg_regs
+let ity_top_regs regs ity = ity_r_fold Sreg.add_left regs ity
 
 let rec reg_freeregs s reg = reg_r_fold reg_freeregs (Sreg.add reg s) reg
 let     ity_freeregs s ity = ity_r_fold reg_freeregs s ity
@@ -256,67 +262,87 @@ let rec reg_r_occurs r reg = reg_equal r reg ||
                              Util.any reg_r_fold (reg_r_occurs r) reg
 let     ity_r_occurs r ity = Util.any ity_r_fold (reg_r_occurs r) ity
 
-let rec reg_r_stale rst cvr reg = Sreg.mem reg rst || not (Mreg.mem reg cvr) &&
-                                  Util.any reg_r_fold (reg_r_stale rst cvr) reg
-let     ity_r_stale rst cvr ity = Util.any ity_r_fold (reg_r_stale rst cvr) ity
+(* traversal functions on exposed regions *)
 
-(* detect exposed type variables and regions *)
-
-let rec ity_v_exposed vars ity = match ity.ity_node with
-  | Ityreg _ -> vars
-  | Ityapp (s,tl,_) ->
-      let add_arg vars exp t = if exp then ity_v_exposed vars t else vars in
-      List.fold_left2 add_arg vars s.its_arg_exp tl
-  | Itypur (_,tl) ->
-      (* snapshot types expose all arguments *)
-      List.fold_left ity_v_exposed vars tl
-  | Ityvar v -> Stv.add v vars
-
-let ity_r_exposed regs ity = ity_r_fold (fun s r -> Sreg.add r s) regs ity
-let reg_r_exposed regs reg = reg_r_fold (fun s r -> Sreg.add r s) regs reg
-
-(* detect non-ghost type variables and regions *)
-
-let rec ity_visible fnv fnr acc vis ity =
-  if not vis then acc else
+let rec ity_exp_fold fn acc ity =
+  if ity.ity_imm then acc else
   match ity.ity_node with
-  | Ityreg r ->
-      reg_visible fnv fnr acc vis r
+  | Ityapp (s,tl,rl) -> its_exp_fold fn acc s tl rl
+  | Ityreg r -> fn acc r
+  | Ityvar _ -> acc
+
+and its_exp_fold fn acc s tl rl =
+  let fn a x t = if x then ity_exp_fold fn a t else a in
+  dfold2 fn acc s.its_arg_exp tl s.its_reg_exp rl
+
+let reg_exp_fold fn acc reg =
+  its_exp_fold fn acc reg.reg_its reg.reg_args reg.reg_regs
+
+let ity_exp_regs regs ity = ity_exp_fold Sreg.add_left regs ity
+
+let rec reg_rch_regs s reg = reg_exp_fold reg_rch_regs (Sreg.add reg s) reg
+let     ity_rch_regs s ity = ity_exp_fold reg_rch_regs s ity
+
+let rec reg_r_reachable r reg = reg_equal r reg ||
+                                Util.any reg_exp_fold (reg_r_reachable r) reg
+let     ity_r_reachable r ity = Util.any ity_exp_fold (reg_r_reachable r) ity
+
+let rec reg_r_stale rs cv reg = Sreg.mem reg rs || not (Mreg.mem reg cv) &&
+                                Util.any reg_exp_fold (reg_r_stale rs cv) reg
+let     ity_r_stale rs cv ity = Util.any ity_exp_fold (reg_r_stale rs cv) ity
+
+(* traversal functions on non-ghost regions *)
+
+let rec ity_vis_fold fn acc ity =
+  if ity.ity_imm then acc else
+  match ity.ity_node with
+  | Ityapp (s,tl,rl) -> its_vis_fold fn acc s tl rl
+  | Ityreg r -> reg_vis_fold fn acc r
+  | Ityvar _ -> acc
+
+and its_vis_fold fn acc s tl rl =
+  let fn a v t = if v then ity_vis_fold fn a t else a in
+  dfold2 fn acc s.its_arg_vis tl s.its_reg_vis rl
+
+and reg_vis_fold fn acc reg =
+  its_exp_fold fn (fn acc reg) reg.reg_its reg.reg_args reg.reg_regs
+
+let ity_vis_regs regs ity = ity_vis_fold Sreg.add_left regs ity
+
+(* collect exposed type variables *)
+
+let rec ity_exp_vars vars ity = match ity.ity_node with
   | Ityapp (s,tl,rl) ->
-      dfold2 (ity_visible fnv fnr) (reg_visible fnv fnr)
-        acc s.its_arg_vis tl s.its_reg_vis rl
-  | Itypur (s,tl) ->
-      (* nothing requires snapshot types to be exclusively ghost,
-         as we can soundly extract them into the same OCaml types
-         as the original mutable WhyML types. TODO: verify this *)
-      List.fold_left2 (ity_visible fnv fnr) acc s.its_arg_vis tl
-  | Ityvar v -> fnv acc v
+      let fn a x t = if x then ity_exp_vars a t else a in
+      dfold2 fn vars s.its_arg_exp tl s.its_reg_exp rl
+  | Ityvar (v,false) -> Stv.add v vars
+  | Ityvar (_,true) | Ityreg _ -> vars
 
-and reg_visible fnv fnr acc vis r =
-  if not vis then acc else
-  dfold2 (ity_visible fnv fnr) (reg_visible fnv fnr)
-    (fnr acc r) r.reg_its.its_arg_vis r.reg_args
-                r.reg_its.its_reg_vis r.reg_regs
+(* collect non-ghost type variables *)
 
-let ity_v_visible vars ity =
-  ity_visible (fun s v -> Stv.add v s) Util.const vars true ity
+let rec ity_vis_vars vars ity = match ity.ity_node with
+  | Ityreg {reg_its = s; reg_args = tl} | Ityapp (s,tl,_) ->
+      let fn a v t = if v then ity_vis_vars a t else a in
+      List.fold_left2 fn vars s.its_arg_vis tl
+  | Ityvar (v,false) -> Stv.add v vars
+  | Ityvar (_,true) -> vars
 
-let ity_r_visible regs ity = if ity.ity_pure then regs else
-  ity_visible Util.const (fun s r -> Sreg.add r s) regs true ity
+(* collect non-updatable type variables *)
 
-(* detect non-updatable type variables *)
+let rec ity_realvars vars ity = match ity.ity_node with
+  | Ityreg {reg_args = tl} | Ityapp (_,tl,_) ->
+      List.fold_left ity_realvars vars tl
+  | Ityvar (v,false) -> Stv.add v vars
+  | Ityvar (_,true) -> vars
 
-let rec ity_v_immutable vars imm ity =
-  if imm then ity_freevars vars ity else
-  match ity.ity_node with
-  | Ityreg {reg_its = s; reg_args = tl}
-  | Ityapp (s,tl,_) | Itypur (s,tl) ->
-      List.fold_left2 ity_v_immutable vars s.its_arg_imm tl
+let rec ity_imm_vars vars ity = match ity.ity_node with
+  | Ityreg {reg_its = s; reg_args = tl} | Ityapp (s,tl,_) ->
+      let fn a i t = if i then ity_realvars a t
+                          else ity_imm_vars a t in
+      List.fold_left2 fn vars s.its_arg_imm tl
   | Ityvar _ -> vars
 
-let ity_v_immutable vars ity = ity_v_immutable vars false ity
-
-(* smart constructors *)
+(* type matching *)
 
 exception BadItyArity of itysymbol * int
 exception BadRegArity of itysymbol * int
@@ -324,13 +350,17 @@ exception BadRegArity of itysymbol * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
+exception ImpureType of tvsymbol * ity
+
 type ity_subst = {
-  isb_tv  : ity Mtv.t;
-  isb_reg : region Mreg.t;
+  isb_var : ity Mtv.t;
+  isb_pur : ity Mtv.t;
+  isb_reg : ity Mreg.t;
 }
 
 let isb_empty = {
-  isb_tv  = Mtv.empty;
+  isb_var = Mtv.empty;
+  isb_pur = Mtv.empty;
   isb_reg = Mreg.empty;
 }
 
@@ -343,14 +373,15 @@ let reg_equal_check r1 r2 = if not (reg_equal r1 r2) then
   raise (TypeMismatch (ity_reg r1, ity_reg r2, isb_empty))
 
 let ity_full_inst sbs ity =
-  let freg r = Mreg.find r sbs.isb_reg in
   let rec inst ity = match ity.ity_node with
+    | Ityreg r -> Mreg.find r sbs.isb_reg
     | Ityapp (s,tl,rl) ->
-        ity_app_unsafe s (List.map inst tl) (List.map freg rl)
-    | Itypur (s,tl) -> ity_pur_unsafe s (List.map inst tl)
-    | Ityvar v -> Mtv.find v sbs.isb_tv
-    | Ityreg r -> ity_reg (freg r) in
-  if ity.ity_pure && ity_closed ity then ity else inst ity
+        ity_app_unsafe s (List.map inst tl) (List.map inst rl)
+    | Ityvar (v,false) -> Mtv.find v sbs.isb_var
+    | Ityvar (v,true) ->
+        try Mtv.find v sbs.isb_pur with Not_found ->
+        ity_purify (Mtv.find v sbs.isb_var) in
+  if ity.ity_imm && ity_closed ity then ity else inst ity
 
 let reg_full_inst sbs reg = Mreg.find reg sbs.isb_reg
 
@@ -363,53 +394,77 @@ let rec ity_match sbs ity1 ity2 =
   let set = add_or_keep ity_equal ity2 in
   match ity1.ity_node, ity2.ity_node with
   | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) when its_equal s1 s2 ->
-      dfold2 ity_match reg_match sbs l1 l2 r1 r2
-  | Itypur (s1,l1), Itypur (s2,l2) when its_equal s1 s2 ->
-      List.fold_left2 ity_match sbs l1 l2
-  | Ityreg r1, Ityreg r2 when its_equal r1.reg_its r2.reg_its ->
-      reg_match sbs r1 r2
-  | Ityvar v1, _ -> { sbs with
-      isb_tv = Mtv.change set v1 sbs.isb_tv }
+      dfold2 ity_match sbs l1 l2 r1 r2
+  | Ityreg r1, _ ->
+      reg_match sbs r1 ity2
+  | Ityvar (v1, false), _ ->
+      if Mtv.mem v1 sbs.isb_pur &&
+         not (ity_equal (ity_purify ity2) (Mtv.find v1 sbs.isb_pur))
+      then raise Exit;
+      { sbs with isb_var = Mtv.change set v1 sbs.isb_var }
+  | Ityvar (v1, true), _ when ity_pure ity2 ->
+      if Mtv.mem v1 sbs.isb_var &&
+         not (ity_equal ity2 (ity_purify (Mtv.find v1 sbs.isb_var)))
+      then raise Exit;
+      { sbs with isb_pur = Mtv.change set v1 sbs.isb_pur }
+  | Ityvar (v1, true), _ -> raise (ImpureType (v1, ity2))
   | _ -> raise Exit
 
-and reg_match sbs reg1 reg2 =
-  let known = ref false in
-  let eq reg reg2 = known := true; reg_equal reg reg2 in
-  let sbs = { sbs with isb_reg = Mreg.change
-    (add_or_keep eq reg2) reg1 sbs.isb_reg } in
-  if !known then sbs else dfold2 ity_match reg_match sbs
-    reg1.reg_args reg2.reg_args reg1.reg_regs reg2.reg_regs
+and reg_match sbs reg1 ity2 =
+  let seen = ref false in
+  let set = add_or_keep (fun o n -> seen := true; ity_equal o n) ity2 in
+  let sbs = { sbs with isb_reg = Mreg.change set reg1 sbs.isb_reg } in
+  if !seen then sbs else
+  match ity2.ity_node with
+  | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl} | Ityapp (s,tl,rl)
+    when its_equal reg1.reg_its s ->
+      dfold2 ity_match sbs reg1.reg_args tl reg1.reg_regs rl
+  | _ -> raise Exit
 
 let ity_match sbs ity1 ity2 = try ity_match sbs ity1 ity2
-  with Exit -> raise (TypeMismatch (ity1,ity2,sbs))
+  with Exit -> raise (TypeMismatch (ity1, ity2, sbs))
 
-let reg_match sbs reg1 reg2 = try
-    if its_equal reg1.reg_its reg2.reg_its
-    then reg_match sbs reg1 reg2 else raise Exit;
-  with Exit -> raise (TypeMismatch (ity_reg reg1, ity_reg reg2, sbs))
+let reg_match sbs reg1 ity2 = try reg_match sbs reg1 ity2
+  with Exit -> raise (TypeMismatch (ity_reg reg1, ity2, sbs))
 
 let ity_freeze sbs ity = ity_match sbs ity ity
-let reg_freeze sbs reg = reg_match sbs reg reg
+let reg_freeze sbs reg = reg_match sbs reg (ity_reg reg)
 
-let rec ty_of_ity ity = match ity.ity_node with
-  | Ityvar v -> ty_var v
-  | Itypur (s,tl) | Ityapp (s,tl,_)
-  | Ityreg {reg_its = s; reg_args = tl} ->
-      ty_app s.its_ts (List.map ty_of_ity tl)
+(* raw type constructors *)
 
-let rec ity_purify ity = match ity.ity_node with
-  | _ when ity.ity_pure -> ity
-  | Ityvar _ -> assert false
-  | Ityapp (s,tl,[]) ->
-      ity_app_unsafe s (List.map ity_purify tl) []
-  | Itypur (s,tl)
-  | Ityapp (s,tl,_::_)
-  | Ityreg {reg_its = s; reg_args = tl} ->
-      ity_pur_unsafe s (List.map ity_purify tl)
+let ity_app_raw sbs id s tl rl = match s.its_def with
+  | Some { ity_node = Ityreg r } ->
+      let tl = List.map (ity_full_inst sbs) r.reg_args in
+      let rl = List.map (ity_full_inst sbs) r.reg_regs in
+      ity_reg (mk_reg id r.reg_its tl rl)
+  | None when s.its_privmut || s.its_mfields <> [] ->
+      ity_reg (mk_reg id s tl rl)
+  | Some ity -> ity_full_inst sbs ity
+  | None -> ity_app_unsafe s tl rl
+
+let create_region_raw sbs id s tl rl =
+  match (ity_app_raw sbs id s tl rl).ity_node with
+  | Ityreg r -> r
+  | _ -> invalid_arg "Ity.create_region"
+
+let ity_app_pure_raw sbs s tl rl = match s.its_def with
+  | Some { ity_node = Ityreg r } ->
+      let tl = List.map (ity_full_inst sbs) r.reg_args in
+      let rl = List.map (ity_full_inst sbs) r.reg_regs in
+      ity_app_unsafe r.reg_its tl rl
+  | Some ity -> ity_full_inst sbs ity
+  | None -> ity_app_unsafe s tl rl
+
+(* smart type constructors *)
+
+let its_check_args s tl =
+  if List.length s.its_ts.ts_args <> List.length tl
+  then raise (BadItyArity (s, List.length tl))
 
 let its_match_args s tl =
   try {
-    isb_tv  = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty;
+    isb_var = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty;
+    isb_pur = Mtv.empty;
     isb_reg = Mreg.empty }
   with Invalid_argument _ -> raise (BadItyArity (s, List.length tl))
 
@@ -417,82 +472,53 @@ let its_match_regs s tl rl =
   try List.fold_left2 reg_match (its_match_args s tl) s.its_regions rl
   with Invalid_argument _ -> raise (BadRegArity (s, List.length rl))
 
-let its_check_args s tl =
-  if List.length s.its_ts.ts_args <> List.length tl
-  then raise (BadItyArity (s, List.length tl))
+let its_inst_regs fresh_reg s tl =
+  let rec ity_inst sbs ity = match ity.ity_node with
+    | Ityreg r ->
+        reg_inst sbs r
+    | Ityapp (s,tl,rl) ->
+        let sbs, tl = Lists.map_fold_left ity_inst sbs tl in
+        let sbs, rl = Lists.map_fold_left ity_inst sbs rl in
+        sbs, ity_app_unsafe s tl rl
+    | Ityvar (v, false) ->
+        sbs, Mtv.find v sbs.isb_var
+    | Ityvar (v,true) ->
+        try sbs, Mtv.find v sbs.isb_pur with Not_found ->
+        sbs, ity_purify (Mtv.find v sbs.isb_var)
+  and reg_inst sbs r =
+    try sbs, Mreg.find r sbs.isb_reg with Not_found ->
+    let sbs, tl = Lists.map_fold_left ity_inst sbs r.reg_args in
+    let sbs, rl = Lists.map_fold_left ity_inst sbs r.reg_regs in
+    let ity = fresh_reg (id_clone r.reg_name) r.reg_its tl rl in
+    { sbs with isb_reg = Mreg.add r ity sbs.isb_reg }, ity in
+  Lists.map_fold_left reg_inst (its_match_args s tl) s.its_regions
 
-let ity_pur s tl = match s.its_def with
-  | Some ity ->
-      ity_full_inst (its_match_args s tl) (ity_purify ity)
-  | None (* when its_impure s -> *)
-    when s.its_privmut || s.its_mfields <> [] || s.its_regions <> [] ->
-      its_check_args s tl;
-      ity_pur_unsafe s tl
-  | None ->
-      its_check_args s tl;
-      ity_app_unsafe s tl []
-
-let create_region sbs id s tl rl = match s.its_def with
-  | Some { ity_node = Ityreg r } ->
-      let tl = List.map (ity_full_inst sbs) r.reg_args in
-      let rl = List.map (reg_full_inst sbs) r.reg_regs in
-      mk_reg id r.reg_its tl rl
-  | None when s.its_privmut || s.its_mfields <> [] ->
-      mk_reg id s tl rl
-  | _ ->
-      invalid_arg "Ity.create_region"
-
-let ity_app sbs s tl rl =
-  if its_mutable s then
-    ity_reg (create_region sbs (id_fresh "rho") s tl rl)
-  else match s.its_def with
-    | Some ity -> ity_full_inst sbs ity
-    | None -> ity_app_unsafe s tl rl
-
-let rec ity_inst_fresh sbs ity = match ity.ity_node with
-  | Ityvar v ->
-      sbs, Mtv.find v sbs.isb_tv
-  | Itypur (s,tl) ->
-      let sbs, tl = Lists.map_fold_left ity_inst_fresh sbs tl in
-      sbs, ity_pur_unsafe s tl
-  | Ityapp (s,tl,rl) ->
-      let sbs, tl = Lists.map_fold_left ity_inst_fresh sbs tl in
-      let sbs, rl = Lists.map_fold_left reg_inst_fresh sbs rl in
-      sbs, ity_app_unsafe s tl rl
-  | Ityreg r when Mreg.mem r sbs.isb_reg ->
-      sbs, ity_reg (Mreg.find r sbs.isb_reg)
-  | Ityreg r ->
-      let sbs, r = reg_inst_fresh sbs r in
-      sbs, ity_reg r
-
-and reg_inst_fresh sbs r =
-  let sbs, tl = Lists.map_fold_left ity_inst_fresh sbs r.reg_args in
-  let sbs, rl = Lists.map_fold_left reg_inst_fresh sbs r.reg_regs in
-  let reg = mk_reg (id_clone r.reg_name) r.reg_its tl rl in
-  reg_match sbs r reg, reg
-
-let its_match_regs_quick s tl rl =
-  if s.its_def = None && s.its_regions = [] && rl = []
-  then (its_check_args s tl; isb_empty (* won't be used *))
-  else its_match_regs s tl rl
-
-let ity_app_fresh s tl =
-  let sbs, rl =
-    if s.its_regions = [] then its_match_regs_quick s tl [], [] else
-    Lists.map_fold_left reg_inst_fresh (its_match_args s tl) s.its_regions in
-  ity_app sbs s tl rl
+let its_match_smart fresh_reg s tl rl =
+  if rl <> [] then its_match_regs s tl rl, rl else
+  if s.its_regions = [] && s.its_def = None
+  then (its_check_args s tl; isb_empty, [])
+  else its_inst_regs fresh_reg s tl
 
 let create_region id s tl rl =
-  create_region (its_match_regs_quick s tl rl) id s tl rl
+  let fresh id s tl rl = ity_reg (mk_reg id s tl rl) in
+  let sbs, rl = its_match_smart fresh s tl rl in
+  create_region_raw sbs id s tl rl
 
 let ity_app s tl rl =
-  ity_app (its_match_regs_quick s tl rl) s tl rl
+  let fresh id s tl rl = ity_reg (mk_reg id s tl rl) in
+  let sbs, rl = its_match_smart fresh s tl rl in
+  ity_app_raw sbs (id_fresh "rho") s tl rl
+
+let ity_app_pure s tl rl =
+  let pure _ s tl rl = ity_app_unsafe s tl rl in
+  let sbs, rl = its_match_smart pure s tl rl in
+  ity_app_pure_raw sbs s tl rl
 
 (* itysymbol creation *)
 
 let create_its, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rvis ~rfrz ~def ->
+  (fun ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rexp ~rvis ~rfrz ~def ->
     let its = {
       its_ts      = ts;
       its_privmut = pm;
@@ -502,6 +528,7 @@ let create_its, restore_its =
       its_arg_exp = aexp;
       its_arg_vis = avis;
       its_arg_frz = afrz;
+      its_reg_exp = rexp;
       its_reg_vis = rvis;
       its_reg_frz = rfrz;
       its_def     = def;
@@ -515,29 +542,36 @@ let rec ity_of_ty ty = match ty.ty_node with
   | Tyapp (s,tl) ->
       let s = try restore_its s with Not_found ->
         invalid_arg "Ity.ity_of_ty" in
-      let tl = List.map ity_of_ty tl in
-      if s.its_privmut || s.its_mfields <> [] || s.its_regions <> []
-      then ity_pur_unsafe s tl
-      else ity_app_unsafe s tl []
+      ity_app s (List.map ity_of_ty tl) []
+
+let rec ity_of_ty_pure ty = match ty.ty_node with
+  | Tyvar v -> ity_var_pure v
+  | Tyapp (s,tl) ->
+      let s = try restore_its s with Not_found ->
+        invalid_arg "Ity.ity_of_ty_pure" in
+      ity_app_pure s (List.map ity_of_ty_pure tl) []
 
 let its_of_ts ts imm =
   let tl = List.map Util.ttrue ts.ts_args in
   let il = if imm then tl else List.map Util.ffalse ts.ts_args in
-  create_its ~ts ~pm:false ~mfld:[] ~regs:[] ~aimm:il ~aexp:tl ~avis:tl
-          ~afrz:tl ~rvis:[] ~rfrz:[] ~def:(Opt.map ity_of_ty ts.ts_def)
+  let def = match ts.ts_def with None -> None | Some def ->
+    let def = ity_of_ty def in assert def.ity_imm; Some def in
+  create_its ~ts ~pm:false ~mfld:[] ~regs:[] ~aimm:il ~aexp:tl
+    ~avis:tl ~afrz:tl ~rexp:[] ~rvis:[] ~rfrz:[] ~def
 
 let create_itysymbol_pure id args =
   its_of_ts (create_tysymbol id args None) true
 
 let create_itysymbol_alias id args def =
   let ts = create_tysymbol id args (Some (ty_of_ity def)) in
-  let regs = Sreg.elements (match def.ity_node with
-    | Ityreg reg -> reg_r_exposed Sreg.empty reg
-    | _          -> ity_r_exposed Sreg.empty def) in
+  let ity = match def.ity_node with (* ignore the top region *)
+    | Ityreg r -> ity_app_pure r.reg_its r.reg_args r.reg_regs
+    | _ -> def in
+  let regs = Sreg.elements (ity_top_regs Sreg.empty ity) in
   let tl = List.map Util.ttrue args in
   let rl = List.map Util.ttrue regs in
   create_its ~ts ~pm:false ~mfld:[] ~regs ~aimm:tl ~aexp:tl
-    ~avis:tl ~afrz:tl ~rvis:rl ~rfrz:rl ~def:(Some def)
+    ~avis:tl ~afrz:tl ~rexp:rl ~rvis:rl ~rfrz:rl ~def:(Some def)
 
 exception ImpureField of ity
 
@@ -556,23 +590,23 @@ let create_itysymbol_rich id args pm flds =
   let mfld = Mpv.fold (fun f m l -> if m then f::l else l) flds [] in
   if pm then begin (* private mutable record *)
     let tl = List.map Util.ttrue args in
-    Mpv.iter (fun {pv_vs = v; pv_ity = i} _ -> if not i.ity_pure
+    Mpv.iter (fun {pv_vs = v; pv_ity = i} _ -> if not i.ity_imm
       then Loc.error ?loc:v.vs_name.id_loc (ImpureField i)) flds;
     create_its ~ts ~pm ~mfld ~regs:[] ~aimm:tl ~aexp:tl ~avis:tl
-      ~afrz:tl ~rvis:[] ~rfrz:[] ~def:None
+      ~afrz:tl ~rexp:[] ~rvis:[] ~rfrz:[] ~def:None
   end else (* non-private updatable type *)
-    let phantom_vs = Stv.diff sargs dargs in
-    let regs = Sreg.elements (collect_all ity_r_exposed Sreg.empty) in
-    let check_args s = List.map (fun v -> Stv.mem v s) args in
-    let check_regs s = List.map (fun r -> Sreg.mem r s) regs in
-    let aimm = check_args (collect_all ity_v_immutable Stv.empty) in
-    let aexp = check_args (collect_all ity_v_exposed phantom_vs) in
-    let avis = check_args (collect_vis ity_v_visible Stv.empty) in
-    let rvis = check_regs (collect_vis ity_r_visible Sreg.empty) in
-    let afrz = check_args (collect_imm ity_v_exposed phantom_vs) in
-    let rfrz = check_regs (collect_imm ity_r_exposed Sreg.empty) in
-    create_its ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rvis
-      ~rfrz ~def:None
+    let regs = Sreg.elements (collect_all ity_top_regs Sreg.empty) in
+    let check_args s = List.map (Stv.contains s) args in
+    let check_regs s = List.map (Sreg.contains s) regs in
+    let aimm = check_args (collect_all ity_imm_vars Stv.empty) in
+    let aexp = check_args (collect_all ity_exp_vars Stv.empty) in
+    let rexp = check_regs (collect_all ity_exp_regs Sreg.empty) in
+    let avis = check_args (collect_vis ity_vis_vars Stv.empty) in
+    let rvis = check_regs (collect_vis ity_vis_regs Sreg.empty) in
+    let afrz = check_args (collect_imm ity_exp_vars Stv.empty) in
+    let rfrz = check_regs (collect_imm ity_exp_regs Sreg.empty) in
+    create_its ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rexp
+      ~rvis ~rfrz ~def:None
 
 (** pvsymbol creation *)
 
@@ -604,16 +638,16 @@ let its_real = its_of_ts ts_real true
 let its_bool = its_of_ts ts_bool true
 let its_func = its_of_ts ts_func true
 
-let ity_int  = ity_pur its_int  []
-let ity_real = ity_pur its_real []
-let ity_bool = ity_pur its_bool []
+let ity_int  = ity_app its_int  [] []
+let ity_real = ity_app its_real [] []
+let ity_bool = ity_app its_bool [] []
 
-let ity_func a b = ity_pur its_func [a;b]
-let ity_pred a   = ity_pur its_func [a;ity_bool]
+let ity_func a b = ity_app its_func [a;b] []
+let ity_pred a   = ity_app its_func [a;ity_bool] []
 
 let its_tuple = Hint.memo 17 (fun n -> its_of_ts (ts_tuple n) false)
 
-let ity_tuple tl = ity_pur (its_tuple (List.length tl)) tl
+let ity_tuple tl = ity_app (its_tuple (List.length tl)) tl []
 
 let ts_unit  = ts_tuple  0
 let its_unit = its_tuple 0
@@ -635,7 +669,7 @@ let xs_compare xs1 xs2 = id_compare xs1.xs_name xs2.xs_name
 let create_xsymbol id ity =
   if not (ity_closed ity) then Loc.errorm ?loc:id.pre_loc
     "Exception %s has a polymorphic type" id.pre_name;
-  if not ity.ity_pure then Loc.errorm ?loc:id.pre_loc
+  if not ity.ity_imm then Loc.errorm ?loc:id.pre_loc
     "The type of exception %s has mutable components" id.pre_name;
   { xs_name = id_register id; xs_ity = ity; }
 
@@ -649,6 +683,7 @@ module Mexn = Exn.M
 
 (* effects *)
 
+exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
 exception BadGhostWrite of pvsymbol * region
@@ -695,14 +730,14 @@ let eff_pure e =
 
 let check_covers {eff_resets = rst; eff_covers = cvr} pvs =
   if not (Mreg.is_empty rst) then Spv.iter (fun v ->
-    if ity_r_stale rst cvr v.pv_ity then
-      Sreg.iter (fun r -> if ity_r_stale (Sreg.singleton r) cvr v.pv_ity
-        then raise (StaleVariable (v,r))) rst) pvs
+    if ity_r_stale rst cvr v.pv_ity then Sreg.iter (fun r ->
+      if ity_r_stale (Sreg.singleton r) cvr v.pv_ity then
+        raise (StaleVariable (v,r))) rst) pvs
 
 let check_taints tnt pvs =
   if not (Sreg.is_empty tnt) then Spv.iter (fun v ->
-    ity_visible Util.const (fun () r -> if Sreg.mem r tnt
-      then raise (BadGhostWrite (v,r))) () (not v.pv_ghost) v.pv_ity) pvs
+    if not v.pv_ghost then ity_vis_fold (fun () r ->
+      if Sreg.mem r tnt then raise (BadGhostWrite (v,r))) () v.pv_ity) pvs
 
 let visible_writes e =
   Mreg.subdomain (fun {reg_its = {its_privmut = priv}} fs ->
@@ -710,7 +745,7 @@ let visible_writes e =
 
 let visible_reads e =
   Spv.fold (fun {pv_ghost = gh; pv_ity = ity} s ->
-    if gh then s else ity_r_visible s ity) e.eff_reads Sreg.empty
+    if gh then s else ity_vis_regs s ity) e.eff_reads Sreg.empty
 
 let reset_taints e =
   let tnt = if e.eff_ghost then visible_writes e else
@@ -753,10 +788,13 @@ let eff_bind_single v e = eff_bind (Spv.singleton v) e
 let check_mutable_field fn r f =
   if not (List.memq f r.reg_its.its_mfields) then invalid_arg fn
 
+let read_regs rd =
+  Spv.fold (fun v s -> ity_rch_regs s v.pv_ity) rd Sreg.empty
+
 (*TODO? add the third arg (resets) and check the invariants *)
 let eff_write rd wr =
   if Mreg.is_empty wr then { eff_empty with eff_reads = rd } else
-  let kn = Spv.fold (fun v s -> ity_freeregs s v.pv_ity) rd Sreg.empty in
+  let kn = read_regs rd in
   let wr = Mreg.filter (fun ({reg_its = {its_privmut = p}} as r) fs ->
     if not p && Spv.is_empty fs then invalid_arg "Ity.eff_write";
     Spv.iter (check_mutable_field "Ity.eff_write" r) fs;
@@ -774,12 +812,14 @@ exception IllegalAssign of region * region * region
 let rec ity_skel_check t1 t2 =
   if not (ity_equal t1 t2) then
   match t1.ity_node, t2.ity_node with
-  |(Ityreg {reg_its = s1; reg_args = l1},
-    Ityreg {reg_its = s2; reg_args = l2}
-  | Ityapp (s1,l1,_), Ityapp (s2,l2,_)
-  | Itypur (s1,l1), Itypur (s2,l2)) when its_equal s1 s2 ->
-      List.iter2 ity_skel_check l1 l2
-  | Ityvar _, _ -> assert false
+  | Ityreg {reg_its = s1; reg_args = tl1; reg_regs = rl1},
+    Ityreg {reg_its = s2; reg_args = tl2; reg_regs = rl2}
+  | Ityapp (s1,tl1,rl1), Ityapp (s2,tl2,rl2)
+    when its_equal s1 s2 ->
+      List.iter2 ity_skel_check tl1 tl2;
+      List.iter2 ity_skel_check rl1 rl2
+  | Ityvar (v1,p1), Ityvar (v2,p2)
+    when tv_equal v1 v2 && p1 = p2 -> ()
   | _ -> raise (TypeMismatch (t1,t2,isb_empty))
 
 let eff_assign asl =
@@ -804,16 +844,15 @@ let eff_assign asl =
   check_taints taint reads;
   (* compute the region transitions under writes *)
   let reg_rexp {reg_its = s; reg_args = tl; reg_regs = rl} fs =
-    let ity_rexp xl t = ity_r_fold (fun l r -> r :: l) xl t in
+    let ity_rexp xl t = ity_exp_fold (fun l r -> r :: l) xl t in
     let sbs = its_match_regs s tl rl in
     let mfield xl f =
       let tf = ity_full_inst sbs f.pv_ity in
       let tt = Mpv.find_def tf f fs in
       ity_skel_check tf tt; ity_rexp xl tt in
     let xl = List.fold_left mfield [] s.its_mfields in
-    let freg xl frz r = if frz then r :: xl else xl in
-    let farg xl frz t = if frz then ity_rexp xl t else xl in
-    dfold2 farg freg xl s.its_arg_frz tl s.its_reg_frz rl in
+    let frozen xl frz t = if frz then ity_rexp xl t else xl in
+    dfold2 frozen xl s.its_arg_frz tl s.its_reg_frz rl in
   let rec stitch pl rf rt fs =
     let link pl rf rt =
       stitch ((rf,rt)::pl) rf rt (Mreg.find_def Mpv.empty rt writes) in
@@ -855,12 +894,11 @@ let eff_reset_overwritten ({eff_writes = wr} as e) =
     invalid_arg "Ity.eff_reset_overwritten";
   let rec reg2 regs reg =
     if Mreg.mem reg wr then regs else
-    reg_r_fold reg2 (Sreg.add reg regs) reg in
-  let ity2 regs ity = ity_r_fold reg2 regs ity in
+    reg_exp_fold reg2 (Sreg.add reg regs) reg in
+  let ity2 regs ity = ity_exp_fold reg2 regs ity in
   let add_write ({reg_its = s} as r) fs (svv, rst) =
-    let ity3 svv frz t = if frz then ity2 svv t else svv in
-    let reg3 svv frz r = if frz then reg2 svv r else svv in
-    let svv = dfold2 ity3 reg3 (Sreg.add r svv)
+    let frozen svv frz t = if frz then ity2 svv t else svv in
+    let svv = dfold2 frozen (Sreg.add r svv)
       s.its_arg_frz r.reg_args s.its_reg_frz r.reg_regs in
     let sbs = its_match_regs s r.reg_args r.reg_regs in
     let add_mfld (svv,rst) f =
@@ -923,8 +961,9 @@ let eff_inst sbs e =
      the values are still updated at the same program points and with
      the same postconditions, as in the initial verified code. *)
   let inst src = Mreg.fold (fun r v acc ->
-    let r = reg_full_inst sbs r in
-    Mreg.add_new (IllegalAlias r) r v acc) src Mreg.empty in
+    let t = reg_full_inst sbs r in match t.ity_node with
+      | Ityreg r -> Mreg.add_new (IllegalAlias r) r v acc
+      | _ -> raise (IllegalSnapshot t)) src Mreg.empty in
   let writes = inst e.eff_writes in
   let resets = inst e.eff_resets in
   let taints = inst e.eff_taints in
@@ -938,8 +977,9 @@ let eff_inst sbs e =
      one of the original regions. *)
   let sreg = Mreg.set_diff sbs.isb_reg e.eff_writes in
   let sreg = Mreg.set_diff sreg e.eff_resets in
-  let dst = Mreg.fold (fun _ r s -> Sreg.add r s) sreg Sreg.empty in
-  let dst = Mtv.fold (fun _ i s -> ity_freeregs s i) sbs.isb_tv dst in
+  let dst = Mreg.fold (fun _ i s -> match i.ity_node with
+    | Ityreg r -> Sreg.add r s | _ -> s) sreg Sreg.empty in
+  let dst = Mtv.fold (fun _ i s -> ity_freeregs s i) sbs.isb_var dst in
   ignore (Mreg.inter (fun r _ _ -> raise (IllegalAlias r)) dst impact);
   { e with eff_writes = writes; eff_taints = taints;
            eff_covers = covers; eff_resets = resets }
@@ -1056,17 +1096,12 @@ let create_cty args pre post xpost oldies effect result =
      be removed (we cannot create a real regular alias to a
      ghost location), but it is simpler to just recast them
      as ghost, to keep the type signature consistent. *)
-  let known = List.fold_right freeze_pv args freeze in
-  let filter m = Mreg.set_inter m known.isb_reg in
+  let rknown = read_regs effect.eff_reads in
+  let vknown = ity_rch_regs rknown result in
   let effect = reset_taints { effect with
-    eff_writes = filter effect.eff_writes;
-    eff_covers = filter effect.eff_covers;
-    eff_resets = filter effect.eff_resets } in
-  (* reset every fresh region in the result *)
-  let resreg = ity_freeregs Sreg.empty result in
-  let resets = Mreg.set_diff resreg known.isb_reg in
-  let resets = Sreg.union resets effect.eff_resets in
-  let effect = { effect with eff_resets = resets } in
+    eff_writes = Mreg.set_inter effect.eff_writes rknown;
+    eff_covers = Mreg.set_inter effect.eff_covers rknown;
+    eff_resets = Mreg.set_inter effect.eff_resets vknown} in
   cty_unsafe args pre post xpost oldies effect result freeze
 
 let cty_apply c vl args res =
@@ -1118,15 +1153,9 @@ let cty_apply c vl args res =
   let reads = List.fold_right Spv.add vl Spv.empty in
   let reads = List.fold_right Spv.add rargs reads in
   let effect = eff_read_pre reads effect in
-  (* stage 4: reset the new fresh regions in the result *)
-  let effect = if ity_equal c.cty_result res then effect else
-    let known = List.fold_right freeze_pv rargs freeze in
-    let resreg = ity_freeregs Sreg.empty res in
-    let resets = Mreg.set_diff resreg known.isb_reg in
-    let resets = Mreg.set_union resets effect.eff_resets in
-    { effect with eff_resets = resets } in
-  (* stage 5: instantiate the specification *)
-  let tsb = Mtv.map ty_of_ity isb.isb_tv in
+  (* stage 4: instantiate the specification *)
+  let tsb = Mtv.map ty_of_ity
+    (Mtv.set_union isb.isb_var isb.isb_pur) in
   let same = same || Mtv.for_all (fun v {ty_node = n} ->
     match n with Tyvar u -> tv_equal u v | _ -> false) tsb in
   let subst_t = if same then (fun t -> t_subst vsb t) else
@@ -1180,51 +1209,74 @@ let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let print_its fmt s = print_ts fmt s.its_ts
 
-let rec print_ity pri fmt ity = match ity.ity_node with
-  | Ityvar v -> print_tv fmt v
+let rec print_ity pur pri fmt ity = match ity.ity_node with
+  | Ityvar (v,p) when pur || not p -> print_tv fmt v
+  | Ityvar (v,_) -> fprintf fmt "{%a}" print_tv v
   | Ityapp (s,[t1;t2],[]) when its_equal s its_func ->
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
-        (print_ity 1) t1 (print_ity 0) t2
+        (print_ity pur 1) t1 (print_ity pur 0) t2
   | Ityapp (s,tl,[]) when is_ts_tuple s.its_ts ->
-      fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_ity 0)) tl
-  | Ityapp (s,tl,_)
-  | Ityreg {reg_its = s; reg_args = tl} ->
-      fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
-        print_its s (print_args (print_ity 2)) tl
-  | Itypur (s,tl) ->
+      fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_ity pur 0)) tl
+  | Ityapp (s,tl,_) when not (pur || its_immutable s) && ity_pure ity ->
+      fprintf fmt "{%a%a}" print_its s (print_args (print_ity true 2)) tl
+  | Ityapp (s,tl,_) when not (pur || its_immutable s) ->
       fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
-        print_its s (print_args (print_ity 2)) tl
+        print_its s (print_args (print_ity pur 2)) tl
+  | Ityapp (s,tl,_) | Ityreg {reg_its = s; reg_args = tl} ->
+      fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
+        print_its s (print_args (print_ity pur 2)) tl
 
-let print_ity fmt ity = print_ity 0 fmt ity
+let print_ity fmt ity = print_ity false 0 fmt ity
 
-let rec print_ity_node sb pri fmt ity = match ity.ity_node with
-  | Ityvar v ->
-      begin match Mtv.find_opt v sb.isb_tv with
-        | Some ity -> print_ity_node isb_empty pri fmt ity
+let rec print_ity_node sb pur pri fmt ity = match ity.ity_node with
+  | Ityvar (v,false) ->
+      begin match Mtv.find_opt v sb.isb_var with
+        | Some ity -> print_ity_node isb_empty pur pri fmt ity
         | None -> print_tv fmt v
       end
+  | Ityvar (v,true) ->
+      begin match Mtv.find_opt v sb.isb_pur with
+        | Some ity -> print_ity_node isb_empty pur pri fmt ity
+        | None -> (* creative indentation *)
+      begin match Mtv.find_opt v sb.isb_var with
+        | Some ity -> print_ity_node isb_empty pur pri fmt (ity_purify ity)
+        | None when not pur -> fprintf fmt "{%a}" print_tv v
+        | None -> print_tv fmt v
+      end end
   | Ityapp (s,[t1;t2],[]) when its_equal s its_func ->
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
-        (print_ity_node sb 1) t1 (print_ity_node sb 0) t2
+        (print_ity_node sb pur 1) t1 (print_ity_node sb pur 0) t2
   | Ityapp (s,tl,[]) when is_ts_tuple s.its_ts ->
-      fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_ity_node sb 0)) tl
+      fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_ity_node sb pur 0)) tl
+  | Ityapp (s,tl,_) when pur ->
+      fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
+        print_its s (print_args (print_ity_node sb pur 2)) tl
+  | Ityapp (s,tl,rl) when its_immutable s ->
+      fprintf fmt (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a")
+        print_its s (print_args (print_ity_node sb pur 2)) tl
+        (print_regs (print_ity_node sb pur 0)) rl
+  | Ityapp (s,tl,_) when ity_pure ity ->
+      fprintf fmt "{%a%a}"
+        print_its s (print_args (print_ity_node sb true 2)) tl
   | Ityapp (s,tl,rl) ->
-      fprintf fmt (protect_on (pri > 1) "%a%a%a")
-        print_its s (print_args (print_ity_node sb 2)) tl
-        (print_regs (print_reg_node sb)) rl
-  | Itypur (s,tl) ->
-      fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
-        print_its s (print_args (print_ity_node sb 2)) tl
+      fprintf fmt (protect_on (pri > 1 && (tl <> [] || rl <> [])) "{%a}%a%a")
+        print_its s (print_args (print_ity_node sb pur 2)) tl
+        (print_regs (print_ity_node sb pur 0)) rl
   | Ityreg r ->
-      fprintf fmt (protect_on (pri > 1) "%a") (print_reg_node sb) r
+      begin match Mreg.find_opt r sb.isb_reg with
+        | Some ity -> print_ity_node isb_empty pur pri fmt ity
+        | None -> fprintf fmt (protect_on (pri > 1) "%a") (print_reg_node sb) r
+      end
 
-and print_reg_node sb fmt r = print_reg fmt (Mreg.find_def r r sb.isb_reg)
+and print_reg_node sb fmt r = fprintf fmt "%a%a%a@ %a" print_its r.reg_its
+  (print_args (print_ity_node sb false 2)) r.reg_args
+  (print_regs (print_ity_node sb false 0)) r.reg_regs print_reg_name r
 
-and print_reg fmt r = fprintf fmt "%a%a%a@ %a"
-  print_its r.reg_its (print_args (print_ity_node isb_empty 2)) r.reg_args
-  (print_regs print_reg) r.reg_regs print_reg_name r
+and print_reg fmt r = fprintf fmt "%a%a%a@ %a" print_its r.reg_its
+  (print_args (print_ity_node isb_empty false 2)) r.reg_args
+  (print_regs (print_ity_node isb_empty false 0)) r.reg_regs print_reg_name r
 
-let print_ity_full fmt ity = print_ity_node isb_empty 0 fmt ity
+let print_ity_full fmt ity = print_ity_node isb_empty false 0 fmt ity
 
 let print_pv fmt v = print_vs fmt v.pv_vs
 
@@ -1247,12 +1299,12 @@ let print_spec args pre post xpost oldies eff fmt ity =
     (Pp.print_list dot print_pv) pfx print_reg reg in
   let rec find_prefix pfx reg ity = match ity.ity_node with
     | Ityreg r when reg_equal reg r -> raise (FoundPrefix pfx)
-    | Ityreg r when reg_r_occurs reg r ->
+    | Ityreg r when reg_r_reachable reg r ->
         let sbs = its_match_regs r.reg_its r.reg_args r.reg_regs in
         List.iter (fun fd -> let ity = ity_full_inst sbs fd.pv_ity in
           find_prefix (fd::pfx) reg ity) r.reg_its.its_mfields;
         raise (FoundPrefix (unknown::pfx))
-    | _ when ity_r_occurs reg ity ->
+    | _ when ity_r_reachable reg ity ->
         raise (FoundPrefix (unknown::pfx))
     | _ -> () in
   let find_prefix reg = try
@@ -1330,6 +1382,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Region %a is used twice" print_reg r
   | UnboundRegion r -> fprintf fmt
       "Unbound region %a" print_reg r
+  | ImpureType (v,ity) -> fprintf fmt
+      "Cannot instantiate pure type variable %a with type %a"
+        print_tv v print_ity ity
   | ImpureField ity -> fprintf fmt
       "Field type %a is mutable, it cannot be used in a type which is \
         private, recursive, or has an invariant" print_ity ity
@@ -1340,7 +1395,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
 *)
   | TypeMismatch (t1,t2,s) -> fprintf fmt
       "Type mismatch between %a and %a"
-        (print_ity_node s 0) t1 print_ity_full t2
+        (print_ity_node s false 0) t1 print_ity_full t2
   | StaleVariable (v, _r) -> fprintf fmt
       "This expression prohibits further usage of the variable %a \
         or any function that depends on it" print_pv v
@@ -1359,6 +1414,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
         v.pv_vs.vs_name.id_string
   | GhostDivergence -> fprintf fmt
       "This ghost expression may not terminate"
+  | IllegalSnapshot t -> fprintf fmt
+      "This application expects a mutable type but receives %a"
+        print_ity t
   | IllegalAlias _reg -> fprintf fmt
       "This application creates an illegal alias"
   | IllegalAssign (r1,r2,r3) -> fprintf fmt
