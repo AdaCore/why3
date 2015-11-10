@@ -653,9 +653,11 @@ let e_exec ({c_cty = cty} as c) = match cty.cty_args with
       if List.exists (fun a -> not a.pv_ity.ity_imm) al ||
         not cty.cty_result.ity_imm then Loc.errorm "This function \
             has mutable type signature, it cannot be used as pure";
+      let func a ity = ity_func a.pv_ity ity in
+      let ity = List.fold_right func al cty.cty_result in
       let ghost = List.exists (fun a -> a.pv_ghost) al in
       let effect = eff_bind (Spv.of_list al) cty.cty_effect in
-      mk_expr (Eexec c) (cty_purify cty) (eff_ghostify ghost effect)
+      mk_expr (Eexec c) ity (eff_ghostify ghost effect)
   | [] ->
       mk_expr (Eexec c) cty.cty_result cty.cty_effect
 

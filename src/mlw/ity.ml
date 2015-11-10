@@ -483,7 +483,6 @@ let its_inst_regs fresh_reg s tl =
     | Ityvar (v, false) ->
         sbs, Mtv.find v sbs.isb_var
     | Ityvar (v,true) ->
-        try sbs, Mtv.find v sbs.isb_pur with Not_found ->
         sbs, ity_purify (Mtv.find v sbs.isb_var)
   and reg_inst sbs r =
     try sbs, Mreg.find r sbs.isb_reg with Not_found ->
@@ -1338,8 +1337,9 @@ let print_spec args pre post xpost oldies eff fmt ity =
     forget_var v in
   let print_xpost fmt (xs,ql) =
     Pp.print_list Pp.nothing (print_xpost xs) fmt ql in
-  Pp.print_list_pre Pp.space print_pvty fmt args;
-  Pp.print_option print_result fmt ity;
+  fprintf fmt "@[<hov 4>%a%a@]"
+    (Pp.print_list_pre Pp.space print_pvty) args
+    (Pp.print_option print_result) ity;
   if eff.eff_oneway then pp_print_string fmt " diverges";
   let reads = List.fold_right Spv.remove args eff.eff_reads in
   if not (Spv.is_empty reads) then fprintf fmt "@\nreads  { %a }"

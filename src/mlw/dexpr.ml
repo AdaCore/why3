@@ -19,73 +19,190 @@ open Expr
 (** Program types *)
 
 type dity =
-  | Dutv of tvsymbol          (* undestructible "user" type variable *)
   | Dvar of dvar ref          (* destructible "fresh" type variable *)
-  | Durg of ity * dity        (* undestructible "user" region, for global refs *)
-  | Dreg of dvar ref * dity   (* destructible "fresh" region *)
+  | Dutv of tvsymbol          (* undestructible "user" type variable *)
+  | Durg of dity * region     (* undestructible "user" region *)
   | Dapp of itysymbol * dity list * dity list
 
 and dvar =
-  | Dtvs of tvsymbol          (* unassigned fresh type variable *)
-  | Dval of dity              (* destructive binding *)
+  | Dval of dity              (* i am equal to dity *)
+  | Dpur of dity              (* i am equal to the purified dity *)
+  | Dsim of dity * tvsymbol   (* our purified types are equal *)
+  | Dreg of dity * tvsymbol   (* unassigned region *)
+  | Dtvs of        tvsymbol   (* unassigned variable *)
 
-(* In Dapp, the second dity list only contains Dreg's and Durg's.
-   In Dreg and Durg, the dity field is a Dapp of the region's type.
-   In Dreg, the dvar field leads to another Dreg or Durg.
-   In Durg, the ity field is an Ityreg. *)
+(* In Dreg and Durg, the dity field is a Dapp of the region's type. *)
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let dity_of_dvty (argl,res) =
   List.fold_right (fun a d -> Dapp (its_func, [a;d], [])) argl res
 
-let dvar_fresh n = ref (Dtvs (create_tvsymbol (id_fresh n)))
+let dity_fresh () =
+  Dvar (ref (Dtvs (create_tvsymbol (id_fresh "mu"))))
 
-let dreg_fresh dity = Dreg (dvar_fresh "rho", dity)
+let dity_reg d =
+  Dvar (ref (Dreg (d, create_tvsymbol (id_fresh "rho"))))
+
+let rec dity_sim = function
+  | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+  | Durg (d,_) -> dity_sim d
+  | d -> Dvar (ref (Dsim (d, create_tvsymbol (id_fresh "eta"))))
+
+let rec dity_pur = function
+  | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+  | Durg (d,_) -> dity_pur d
+  | d -> Dvar (ref (Dpur d))
+
+let app_map fn s tl rl = Dapp (s, List.map fn tl, List.map fn rl)
 
 let dity_of_ity ity =
   let hr = Hreg.create 3 in
   let rec dity ity = match ity.ity_node with
-    | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dity rl)
-    | Ityvar (v,_) -> Dutv v
-    | Ityreg r -> dreg r
-  and dreg reg =
-    try Hreg.find hr reg with Not_found ->
-    let {reg_its = s; reg_args = tl; reg_regs = rl} = reg in
-    let d = Dapp (s, List.map dity tl, List.map dity rl) in
-    let r = dreg_fresh d in Hreg.add hr reg r; r in
+    | Ityvar (v,false) -> Dutv v
+    | Ityvar (v,true)  -> dity_pur (Dutv v)
+    | Ityapp (s,tl,rl) -> app_map dity s tl rl
+    | Ityreg ({reg_its = s; reg_args = tl; reg_regs = rl} as r) ->
+        try Hreg.find hr r with Not_found ->
+        let d = dity_reg (app_map dity s tl rl) in
+        Hreg.add hr r d; d in
   dity ity
 
 let rec ity_of_dity = function
-  | Dvar ({contents = Dval d})
-  | Dreg ({contents = Dval d}, _) ->
-      ity_of_dity d
+  | Dutv v -> ity_var v
+  | Durg (_,r) -> ity_reg r
+  | Dvar {contents = Dval d} -> ity_of_dity d
+  | Dvar {contents = Dpur d} -> ity_purify (ity_of_dity d)
+  | Dvar ({contents = Dsim (d,_)} as r) ->
+      let rec refresh ity = match ity.ity_node with
+        | Ityreg {reg_its = s; reg_args = tl} | Ityapp (s,tl,_) ->
+            ity_app s (List.map refresh tl) []
+        | Ityvar (v,_) -> ity_var v in
+      let rec dity ity = match ity.ity_node with
+        | Ityreg r ->
+            Durg (app_map dity r.reg_its r.reg_args r.reg_regs, r)
+        | Ityapp (s,tl,rl) -> app_map dity s tl rl
+        | Ityvar (v,true)  -> dity_pur (Dutv v)
+        | Ityvar (v,false) -> Dutv v in
+      let t = refresh (ity_of_dity d) in
+      r := Dval (dity t); t
+  | Dvar ({contents = Dreg (Dapp (s,tl,rl) as d,_)} as r) ->
+      let reg = create_region (id_fresh "rho") s
+        (List.map ity_of_dity tl) (List.map ity_of_dity rl) in
+      r := Dval (Durg (d, reg)); ity_reg reg
   | Dvar r ->
       let v = create_tvsymbol (id_fresh "xi") in
       r := Dval (Dutv v); ity_var v
-  | Dreg (r, d) ->
-      let ity = ity_of_dity d in
-      r := Dval (Durg (ity, d)); ity
-  | Dutv v -> ity_var v
-  | Durg (ity,_) -> ity
   | Dapp (s,tl,rl) ->
-      ity_app s (List.map ity_of_dity tl) (List.map ity_of_dity rl)
+      ity_app_pure s (List.map ity_of_dity tl) (List.map ity_of_dity rl)
 
 (** Destructive type unification *)
 
 let rec occur_check v = function
-  | Dvar {contents = Dval d} | Dreg (_,d) | Durg (_,d) -> occur_check v d
-  | Dvar {contents = Dtvs u} | Dutv u -> if tv_equal u v then raise Exit
-  | Dapp (_,dl,_) -> List.iter (occur_check v) dl
+  | Dvar {contents = (Dval d|Dpur d)} | Durg (d,_) ->
+      occur_check v d
+  | Dvar {contents = (Dsim (d,u)|Dreg (d,u))} ->
+      if tv_equal u v then raise Exit else occur_check v d
+  | Dvar {contents = Dtvs u} | Dutv u ->
+      if tv_equal u v then raise Exit
+  | Dapp (_,dl,_) ->
+      List.iter (occur_check v) dl
 
-let rec dity_unify d1 d2 = match d1,d2 with
-  | Dvar {contents = Dval d1}, d2
-  | d1, Dvar {contents = Dval d2}
-  | Durg (_,d1), Durg (_,d2) | Durg (_,d1), Dreg (_,d2)
-  | Dreg (_,d1), Durg (_,d2) | Dreg (_,d1), Dreg (_,d2) ->
-      dity_unify d1 d2
+let rec dity_unify_weak d1 d2 = match d1,d2 with
+  | Dvar {contents = (Dval d1|Dpur d1|Dsim (d1,_)|Dreg (d1,_))}, d2
+  | d1, Dvar {contents = (Dval d2|Dpur d2|Dsim (d2,_)|Dreg (d2,_))}
+  | Durg (d1,_), d2 | d1, Durg (d2,_) ->
+      dity_unify_weak d1 d2
   | Dvar {contents = Dtvs u},
     Dvar {contents = Dtvs v} when tv_equal u v ->
+      ()
+  | Dvar ({contents = Dtvs v} as r), d
+  | d, Dvar ({contents = Dtvs v} as r) ->
+      occur_check v d;
+      r := Dsim (d,v)
+  | Dutv u, Dutv v when tv_equal u v ->
+      ()
+  | Dapp (s1,dl1,_), Dapp (s2,dl2,_) when its_equal s1 s2 ->
+      List.iter2 dity_unify_weak dl1 dl2
+  | _ -> raise Exit
+
+let rec dity_refresh = function
+  | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+  | Durg (d,_) -> dity_refresh d
+  | Dutv _ as d -> d
+  | Dvar {contents = Dtvs _} -> dity_fresh ()
+  | Dapp (s,dl,_) ->
+      let dl = List.map dity_refresh dl in
+      let mv = List.fold_right2 Mtv.add s.its_ts.ts_args dl Mtv.empty in
+      let hr = Hreg.create 3 in
+      let rec ity_inst ity = match ity.ity_node with
+        | Ityreg r -> reg_inst r
+        | Ityvar (v, false) -> Mtv.find v mv
+        | Ityvar (v, true) -> dity_pur (Mtv.find v mv)
+        | Ityapp (s,tl,rl) -> app_map ity_inst s tl rl
+      and reg_inst ({reg_its = s; reg_args = tl; reg_regs = rl} as r) =
+        try Hreg.find hr r with Not_found ->
+        let d = dity_reg (app_map ity_inst s tl rl) in
+        Hreg.replace hr r d; d in
+      let d = Dapp (s, dl, List.map reg_inst s.its_regions) in
+      if its_immutable s then d else dity_reg d
+
+let rec dity_unify_asym d1 d2 = match d1,d2 with
+  | Durg _, _ | Dutv _, _ -> raise Exit (* we cannot be pure then *)
+  | d1, Dvar {contents = (Dval d2|Dpur d2|Dsim (d2,_)|Dreg (d2,_))}
+  | d1, Durg (d2,_)
+  | Dvar {contents = Dval d1}, d2 ->
+      dity_unify_asym d1 d2
+  | Dvar {contents = Dpur d1}, d2 ->
+      dity_unify_weak d1 d2
+  | Dvar ({contents = Dsim (d1,_)} as r), d2 ->
+      dity_unify_weak d1 d2;
+      r := Dpur d1
+  | Dvar ({contents = Dreg (d1,_)} as r), d2 ->
+      dity_unify_asym d1 d2;
+      r := Dval d1
+  | Dvar ({contents = Dtvs u} as r),
+    Dvar {contents = Dtvs v} when tv_equal u v ->
+      r := Dpur (dity_fresh ())
+  | Dvar ({contents = Dtvs v} as r), d ->
+      occur_check v d;
+      r := Dpur d
+  | d (* not a Dvar! *), Dvar ({contents = Dtvs v} as r) ->
+      occur_check v d;
+      let d2 = dity_refresh d in
+      dity_unify_asym d d2;
+      r := Dval d2
+  | Dapp (s1,dl1,rl1), Dapp (s2,dl2,rl2) when its_equal s1 s2 ->
+      List.iter2 dity_unify_asym dl1 dl2;
+      List.iter2 dity_unify_asym rl1 rl2
+  | _ -> raise Exit
+
+let rec dity_unify d1 d2 = match d1,d2 with
+  | Dvar {contents = Dval d1}, d2 | d1, Dvar {contents = Dval d2} ->
+      dity_unify d1 d2
+  | Dvar ({contents = Dpur d2}), d1 (* yes, it's d2 on the left *)
+  | d1, Dvar ({contents = Dpur d2}) ->
+      dity_unify_asym d1 d2
+  | Dvar ({contents = Dsim (_,u)}),
+    Dvar ({contents = Dsim (_,v)}) when tv_equal u v ->
+      ()
+  | Dvar ({contents = Dsim (d1,v)} as r), d
+  | d, Dvar ({contents = Dsim (d1,v)} as r) ->
+      occur_check v d; (* not necessary? *)
+      dity_unify_weak d1 d;
+      r := Dval d
+  | Dvar {contents = Dreg (_,u)},
+    Dvar {contents = Dreg (_,v)} when tv_equal u v ->
+      ()
+  | Dvar ({contents = Dreg (d1,v)} as r),
+    ((Dapp _ as d2 | Durg (d2,_) | Dvar {contents = Dreg (d2,_)}) as d)
+  | ((Dapp _ as d1 | Durg (d1,_)) as d),
+    Dvar ({contents = Dreg (d2,v)} as r) ->
+      occur_check v d; (* not necessary! *)
+      dity_unify d1 d2;
+      r := Dval d
+  | Dvar ({contents = Dtvs u}),
+    Dvar ({contents = Dtvs v}) when tv_equal u v ->
       ()
   | Dvar ({contents = Dtvs v} as r), d
   | d, Dvar ({contents = Dtvs v} as r) ->
@@ -93,66 +210,12 @@ let rec dity_unify d1 d2 = match d1,d2 with
       r := Dval d
   | Dutv u, Dutv v when tv_equal u v ->
       ()
-  | Dapp (s1,dl1,_), Dapp (s2,dl2,_) when its_equal s1 s2 ->
-      List.iter2 dity_unify dl1 dl2
+  | Durg (_,r1), Durg (_,r2) when reg_equal r1 r2 ->
+      ()
+  | Dapp (s1,dl1,rl1), Dapp (s2,dl2,rl2) when its_equal s1 s2 ->
+      List.iter2 dity_unify dl1 dl2;
+      List.iter2 dity_unify rl1 rl2
   | _ -> raise Exit
-
-(** Reunify regions *)
-
-let dtvs_queue : dvar ref Queue.t = Queue.create ()
-
-let unify_queue : (dity * dity) Queue.t = Queue.create ()
-
-let dity_fresh () =
-  let r = dvar_fresh "mu" in
-  Queue.add r dtvs_queue;
-  Dvar r
-
-let rec dity_refresh ht = function
-  | Dreg ({contents = Dtvs v},d) ->
-      begin try Htv.find ht v with Not_found ->
-      let r = dreg_fresh (dity_refresh ht d) in
-      Htv.add ht v r; r end
-  | Dreg _ -> assert false
-  | Dapp (s,dl,rl) -> Dapp (s, List.map (dity_refresh ht) dl,
-                               List.map (dity_refresh ht) rl)
-  | Dvar {contents = Dval d} -> dity_refresh (Htv.create 3) d
-  |(Dvar {contents = Dtvs _} | Dutv _ | Durg _) as d -> d
-
-let dity_refresh d = dity_refresh (Htv.create 3) d
-
-let dity_unify_weak = dity_unify
-
-let dity_unify d1 d2 = dity_unify d1 d2; Queue.add (d1,d2) unify_queue
-
-let rec reunify d1 d2 = match d1,d2 with
-  | Dvar {contents = Dval d1}, d2
-  | d1, Dvar {contents = Dval d2}
-  | Dreg ({contents = Dval d1},_), d2
-  | d1, Dreg ({contents = Dval d2},_) ->
-      reunify d1 d2
-  | Dvar _, Dvar _ | Dutv _, Dutv _ | Durg _, Durg _ ->
-      ()
-  | Dreg ({contents = Dtvs u},_),
-    Dreg ({contents = Dtvs v},_) when tv_equal u v ->
-      ()
-  | Dreg (r, d1), (Dreg (_, d2) as d)
-  | Dreg (r, d1), (Durg (_, d2) as d)
-  | (Durg (_, d1) as d), Dreg (r, d2) ->
-      reunify d1 d2;
-      r := Dval d
-  | Dapp (_,dl1,rl1), Dapp (_,dl2,rl2) ->
-      List.iter2 reunify dl1 dl2;
-      List.iter2 reunify rl1 rl2
-  | _ -> assert false
-
-let reunify_regions () =
-  Queue.iter (fun r -> match !r with
-    | Dval d -> r := Dval (dity_refresh d)
-    | Dtvs _ -> ()) dtvs_queue;
-  Queue.clear dtvs_queue;
-  Queue.iter (fun (d1,d2) -> reunify d1 d2) unify_queue;
-  Queue.clear unify_queue
 
 (** Built-in types *)
 
@@ -180,71 +243,86 @@ let print_regs pr fmt rl = if rl <> [] then
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_dity pri fmt = function
-  | Dvar {contents = Dval d}
-  | Dreg ({contents = Dval d},_) ->
-      print_dity pri fmt d
-  | Dvar {contents = Dtvs v}
-  | Dutv v ->
+let rec print_dity pur pri fmt = function
+  | Dvar {contents = Dval d} ->
+      print_dity pur pri fmt d
+  | Dvar {contents = (Dpur d|Dsim (d,_)|Dreg (d,_))}
+  | Durg (d,_) when pur ->
+      print_dity pur pri fmt d
+  | Dvar {contents = Dtvs v} | Dutv v ->
       Pretty.print_tv fmt v
-  | Dreg ({contents = Dtvs v},d) ->
-      Format.fprintf fmt (protect_on (pri > 1) "%a@ @@%s")
-        (print_dity 0) d (Ident.id_unique rprinter v.tv_name)
-  | Durg (ity,d) ->
-      let reg_of_ity = function
-        | {ity_node = Ityreg reg} -> reg | _ -> assert false in
-      Format.fprintf fmt (protect_on (pri > 1) "%a@ @@%s")
-        (print_dity 0) d (Ident.id_unique rprinter (reg_of_ity ity).reg_name)
+  | Dvar {contents = Dpur d} ->
+      Format.fprintf fmt "{%a}" (print_dity true 0) d
+  | Dvar {contents = Dsim (d,_)} ->
+      Format.fprintf fmt "[%a]" (print_dity true 0) d
+  | Dvar {contents = Dreg (Dapp (s,tl,rl),{tv_name = id})}
+  | Durg (Dapp (s,tl,rl),{reg_name = id}) ->
+      Format.fprintf fmt
+        (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a@ @@%s")
+        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+          (print_regs (print_dity pur 0)) rl (Ident.id_unique rprinter id)
+  | Dvar {contents = Dreg _} | Durg _ -> assert false
   | Dapp (s,[t1;t2],[]) when its_equal s its_func ->
       Format.fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
-        (print_dity 1) t1 (print_dity 0) t2
+        (print_dity pur 1) t1 (print_dity pur 0) t2
   | Dapp (s,tl,[]) when is_ts_tuple s.its_ts ->
-      Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity 0)) tl
+      Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity pur 0)) tl
+  | Dapp (s,tl,_) when pur ->
+      Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
+        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+  | Dapp (s,tl,rl) when its_immutable s ->
+      Format.fprintf fmt
+        (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a")
+        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+          (print_regs (print_dity pur 0)) rl
   | Dapp (s,tl,rl) ->
-      Format.fprintf fmt (protect_on (pri > 1) "%a%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
-          (print_regs (print_dity 0)) rl
-(*
-  | Dpur (s,tl) ->
-      Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity 2)) tl
-*)
+      Format.fprintf fmt
+        (protect_on (pri > 1 && (tl <> [] || rl <> [])) "{%a}%a%a")
+        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+          (print_regs (print_dity pur 0)) rl
 
-let print_dity fmt d = print_dity 0 fmt d
+let print_dity fmt d = print_dity false 0 fmt d
 
 (* Specialization of symbols *)
 
 let specialize_scheme tvs (argl,res) =
-  let hv = Htv.create 3 and hr = Htv.create 3 in
+  let hv = Htv.create 3 in
   let rec spec_dity = function
-    | Durg _ as d -> d
-    | Dvar {contents = Dval d} | Dreg ({contents = Dval d},_) -> spec_dity d
-    | Dvar {contents = Dtvs v} | Dutv v as d -> get_tv v d
-    | Dreg ({contents = Dtvs v},d) -> get_reg v d
-    | Dapp (s,dl,rl) -> Dapp (s, List.map spec_dity dl, List.map spec_dity rl)
-  and get_tv v d = try Htv.find hv v with Not_found ->
-    let nd = dity_fresh () in
-    (* can't return d, might differ in regions *)
-    if not (Stv.mem v tvs) then dity_unify_weak nd d;
-    Htv.add hv v nd; nd
-  and get_reg v d = try Htv.find hr v with Not_found ->
-    let r = dreg_fresh (spec_dity d) in
-    Htv.add hr v r; r in
+    | Dvar {contents = Dval d} -> spec_dity d
+    | Dvar {contents = Dpur d} -> dity_pur (spec_dity d)
+    | Dvar {contents = Dsim (d,v)} ->
+        (try Htv.find hv v with Not_found ->
+        let nd = dity_sim (spec_dity d) in
+        Htv.add hv v nd; nd)
+    | Dvar {contents = Dreg (d,v)} ->
+        (try Htv.find hv v with Not_found ->
+        let nd = dity_reg (spec_dity d) in
+        Htv.add hv v nd; nd)
+    | Dvar {contents = Dtvs v} | Dutv v as d ->
+        (try Htv.find hv v with Not_found ->
+        (* even if v is frozen, it is polymorphic in its regions *)
+        let nd = if Stv.mem v tvs then dity_fresh () else dity_sim d in
+        Htv.add hv v nd; nd)
+    | Dapp (s,dl,rl) -> app_map spec_dity s dl rl
+    | Durg _ as d -> d in
   List.map spec_dity argl, spec_dity res
 
 let spec_ity hv hr frz ity =
   let rec dity ity = match ity.ity_node with
-    | Ityreg r -> dreg r
-    | Ityvar (v,_) -> if Mtv.mem v frz.isb_var then Dutv v else get_tv v
-    | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dity rl)
-  and get_tv v = try Htv.find hv v with Not_found ->
-    let nd = dity_fresh () in Htv.add hv v nd; nd
-  and dreg reg = try Hreg.find hr reg with Not_found ->
-    let {reg_its = s; reg_args = tl; reg_regs = rl} = reg in
-    let d = Dapp (s, List.map dity tl, List.map dity rl) in
-    let r = if Mreg.mem reg frz.isb_reg then
-      Durg (ity_reg reg, d) else dreg_fresh d in
-    Hreg.add hr reg r; r in
+    | Ityreg r ->
+        (try Hreg.find hr r with Not_found ->
+        let d = app_map dity r.reg_its r.reg_args r.reg_regs in
+        let nd = if Mreg.mem r frz.isb_reg then Durg (d,r) else dity_reg d in
+        Hreg.add hr r nd; nd)
+    | Ityvar (v,pure) ->
+        let nd = try Htv.find hv v with Not_found ->
+          let nd =
+            if Mtv.mem v frz.isb_var then Dutv v else
+            if Mtv.mem v frz.isb_pur then dity_sim (Dutv v) else
+            dity_fresh () in
+          Htv.add hv v nd; nd in
+        if pure then dity_pur nd else nd
+    | Ityapp (s,tl,rl) -> app_map dity s tl rl in
   dity ity
 
 let specialize_pv {pv_ity = ity} =
@@ -260,11 +338,9 @@ let specialize_rs {rs_cty = cty} =
 
 let specialize_ls {ls_args = args; ls_value = res} =
   let hv = Htv.create 3 and hr = Hreg.create 3 in
-  let rec ity ty = match ty.ty_node with
-    | Tyapp (s,tl) -> ity_app (restore_its s) (List.map ity tl) []
-    | Tyvar v -> ity_var v in
-  let spec ty = spec_ity hv hr isb_empty (ity ty) in
-  List.map spec args, Opt.fold (Util.const spec) dity_bool res
+  let spec_val _ ty = spec_ity hv hr isb_empty (ity_of_ty_pure ty) in
+  let spec_arg ty = dity_sim (spec_val () ty) in
+  List.map spec_arg args, Opt.fold spec_val dity_bool res
 
 (** Patterns *)
 
@@ -375,19 +451,19 @@ let is_frozen frozen v =
 
 let freeze_dvty frozen (argl,res) =
   let rec add l = function
-    | Dreg (_,d) | Durg (_,d)
-    | Dvar { contents = Dval d } -> add l d
-    | Dvar { contents = Dtvs _ } as d -> d :: l
+    | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+    | Durg (d,_) -> add l d
+    | Dvar {contents = Dtvs _}
     | Dutv _ as d -> d :: l
     | Dapp (_,tl,_) -> List.fold_left add l tl in
   List.fold_left add (add frozen res) argl
 
 let free_vars frozen (argl,res) =
   let rec add s = function
-    | Dreg (_,d) | Durg (_,d)
-    | Dvar { contents = Dval d } -> add s d
-    | Dvar { contents = Dtvs v }
-    | Dutv v -> if is_frozen frozen v then s else Stv.add v s
+    | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+    | Durg (d,_) -> add s d
+    | Dvar {contents = Dtvs v} | Dutv v ->
+        if is_frozen frozen v then s else Stv.add v s
     | Dapp (_,tl,_) -> List.fold_left add s tl in
   List.fold_left add (add Stv.empty res) argl
 
@@ -411,9 +487,9 @@ let denv_add_rec_poly { frozen = frozen; locals = locals } frozen0 id dvty =
 
 let denv_add_rec denv frozen0 id ((argl,res) as dvty) =
   let rec is_explicit = function
-    | Dreg (_,d) | Durg (_,d)
-    | Dvar { contents = Dval d } -> is_explicit d
-    | Dvar { contents = Dtvs _ } -> false
+    | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+    | Durg (d,_) -> is_explicit d
+    | Dvar {contents = Dtvs _} -> false
     | Dutv _ -> true
     | Dapp (_,tl,_) -> List.for_all is_explicit tl in
   if List.for_all is_explicit argl && is_explicit res
@@ -426,7 +502,7 @@ let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
     | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
-    | DEvar _ | DErs _ | DEfun _ | DEany _ -> true
+    | DEvar _ | DErs _ | DEls _ | DEfun _ | DEany _ -> true
     | _ -> false in
   if is_value de
   then denv_add_poly denv id dvty
@@ -467,11 +543,6 @@ let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
     "This pattern has type %a,@ but is expected to have type %a"
     print_dity dp_dity print_dity dity
 
-let dpat_expected_type_weak {dp_dity = dp_dity; dp_loc = loc} dity =
-  try dity_unify_weak dp_dity dity with Exit -> Loc.errorm ?loc
-    "This pattern has type %a,@ but is expected to have type %a"
-    print_dity dp_dity print_dity dity
-
 let dexpr_expected_type {de_dvty = dvty; de_loc = loc} dity =
   let res = dity_of_dvty dvty in
   try dity_unify res dity with Exit -> Loc.errorm ?loc
@@ -503,7 +574,7 @@ let drec_defn denv0 prel =
   let denv1 = List.fold_left add denv0 prel in
   let parse (id,gh,pk,bl,res,pre) =
     let dsp, dvl, de = pre (denv_add_args denv1 bl) in
-    dexpr_expected_type_weak de res;
+    dexpr_expected_type de res;
     (id,gh,pk,bl,dsp,dvl,de) in
   let fdl = List.map parse prel in
   let add denv (id,_,_,bl,_,_,{de_dvty = dvty}) =
@@ -553,7 +624,7 @@ let dpattern ?loc node =
         let vars = Mstr.add_new (Dterm.DuplicateVar n) n dity vars in
         mk_dpat (PPas (pat, id)) dity vars
     | DPcast (dp, ity) ->
-        dpat_expected_type_weak dp (dity_of_ity ity);
+        dpat_expected_type dp (dity_of_ity ity);
         dp
   in
   Loc.try1 ?loc dpat node
@@ -662,7 +733,7 @@ let dexpr ?loc node =
     | DEfalse ->
         dvty_bool
     | DEcast (de,ity) ->
-        dexpr_expected_type_weak de (dity_of_ity ity);
+        dexpr_expected_type de (dity_of_ity ity);
         de.de_dvty
     | DEmark (_,de)
     | DEuloc (de,_)
@@ -1191,12 +1262,10 @@ and lambda uloc env pvl dsp dvl de =
   c_fun pvl p q xq (get_oldies old) e, dsp, dvl
 
 let rec_defn ?(keep_loc=true) drdf =
-  reunify_regions ();
   let uloc = if keep_loc then None else Some None in
   fst (rec_defn uloc env_empty false drdf)
 
 let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
-  reunify_regions ();
   let uloc = if keep_loc then None else Some None in
   match kind, de.de_dvty with
   | _, (_::_, _) ->
@@ -1231,7 +1300,6 @@ let let_defn ?(keep_loc=true) (id,ghost,kind,de) =
   | RKlocal, _ -> invalid_arg "Dexpr.let_defn"
 
 let expr ?(keep_loc=true) de =
-  reunify_regions ();
   let uloc = if keep_loc then None else Some None in
   expr uloc env_empty de
 
