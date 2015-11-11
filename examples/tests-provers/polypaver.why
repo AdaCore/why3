@@ -17,7 +17,7 @@ theory TestReal
   use import real.ExpLog
 
   goal exp_hyp:
-    forall x:real. 0.01 < X < 5.1785 ->
+    forall x:real. 0.01 < x < 5.1785 ->
       (3.0 + sqr x / 11.0) * ((exp x - exp (-x))/2.0) <
         x * (2.0 + (exp x + exp (-x))/2.0 + sqr x / 11.0)
 
