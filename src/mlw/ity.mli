@@ -45,7 +45,7 @@ and ity_node = private
     (** type variable and its purity status *)
 
 and region = private {
-  reg_name : ident;
+  reg_vs   : vsymbol;
   reg_its  : itysymbol;
   reg_args : ity list;
   reg_regs : ity list;

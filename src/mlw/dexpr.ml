@@ -256,7 +256,7 @@ let rec print_dity pur pri fmt = function
   | Dvar {contents = Dsim (d,_)} ->
       Format.fprintf fmt "[%a]" (print_dity true 0) d
   | Dvar {contents = Dreg (Dapp (s,tl,rl),{tv_name = id})}
-  | Durg (Dapp (s,tl,rl),{reg_name = id}) ->
+  | Durg (Dapp (s,tl,rl),{reg_vs = {vs_name = id}}) ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a@ @@%s")
         Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
