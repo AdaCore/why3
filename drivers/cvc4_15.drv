@@ -12,9 +12,6 @@ prelude "(set-logic AUFBVDTLIRA)"
    does not seem to include DT
 *)
 
-(* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *)
-(* transformation "split_intro" *)
-
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
@@ -24,9 +21,7 @@ import "discrimination.gen"
 
 transformation "inline_trivial"
 transformation "eliminate_builtin"
-(* temporarily disabled: too much experimental
 transformation "detect_polymorphism"
-*)
 transformation "eliminate_definition_if_poly"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
