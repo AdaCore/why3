@@ -92,7 +92,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
     | RegexpStepLimitExceeded s ->
       add_to_list regexps (Str.regexp s, StepLimitExceeded)
-    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
+    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown (t, None))
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
@@ -103,7 +103,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
     | ExitCodeStepLimitExceeded s ->
       add_to_list exitcodes (s, StepLimitExceeded)
-    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
+    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown (t, None))
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
     | Printer s -> set_or_raise loc printer s "printer"

@@ -96,25 +96,29 @@ let rec handle_vc_result goal result prover_result manual_info =
        let model = match prover_result with
 	 | None -> None
 	 | Some r ->
-	   let filter_model m trace =
-	     if trace = Gnat_loc.S.empty then
-	       m
-	     else
-	       let trace_to_list trace =
+	   match r.pr_answer with
+	     (* Resource limit was hit, the model is not useful *)
+	   | Unknown (_, Some Resourceout) -> None
+	   | _ ->
+	     let filter_model m trace =
+	       if trace = Gnat_loc.S.empty then
+		 m
+	       else
+		 let trace_to_list trace =
 		 (* Build list of locations (pairs of filename and line number) from trace *)
-		 Gnat_loc.S.fold
-		   (fun loc list ->
-		     let sloc = Gnat_loc.orig_loc loc in
-		     let col = Gnat_loc.get_col sloc in
-		     let pos = Why3.Loc.user_position
-		       (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
-		     (pos::list)
-		   )
-		   trace
-		   [] in
-	       model_for_positions_and_decls m ~positions:(trace_to_list trace)
-	   in
-	   Some (filter_model r.pr_model trace)
+		   Gnat_loc.S.fold
+		     (fun loc list ->
+		       let sloc = Gnat_loc.orig_loc loc in
+		       let col = Gnat_loc.get_col sloc in
+		       let pos = Why3.Loc.user_position
+			 (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
+		       (pos::list)
+		     )
+		     trace
+		     [] in
+		 model_for_positions_and_decls m ~positions:(trace_to_list trace)
+	     in
+	     Some (filter_model r.pr_model trace)
        in
        Gnat_report.register obj (Some task) model None
          false manual_info tracefile

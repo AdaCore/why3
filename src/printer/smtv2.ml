@@ -604,6 +604,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
       print_info_model cntexample fmt model_list info;
+      (* (get-info :reason-unknown) *)
+      fprintf fmt "@[(get-info :reason-unknown)@]@\n";
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
