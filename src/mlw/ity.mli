@@ -17,7 +17,8 @@ open Term
 
 type itysymbol = private {
   its_ts      : tysymbol;       (** logical type symbol *)
-  its_privmut : bool;           (** private mutable type *)
+  its_private : bool;           (** private type *)
+  its_mutable : bool;           (** mutable type *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_imm : bool list;      (** non-updatable parameters *)
@@ -92,29 +93,29 @@ val ity_hash : ity -> int
 val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
-exception ImpureField of ity
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
-(** creation of a symbol for type in programs *)
+(** creation of a type symbol in programs *)
 
-val create_itysymbol_pure : preid -> tvsymbol list -> itysymbol
-(** [create_itysymbol_pure id args] creates a new type symbol with
-    immutable type arguments and with no mutable fields or subregions.
-    This function should be used for all immutable non-updatable types:
-    abstract types, private immutable records, immutable records with
-    invariant, and recursive algebraic types. *)
+val create_itysymbol_plain :
+  priv:bool -> mut:bool -> preid -> tvsymbol list -> bool Mpv.t -> itysymbol
+(** [create_itysymbol_plain ~priv ~mut id args fields] creates a new type
+    symbol for a non-recursive algebraic type, including private and/or
+    mutable records. Every known field is represented by a [pvsymbol]
+    mapped to its mutability status in [fields]. Variables corresponding
+    to mutable fields are stored in the created type symbol and used in
+    effects. The [priv] flag should be set to [true] for private records.
+    The [mut] flag should be set to [true] to mark the new type as mutable
+    even if it does not have known mutable fields. Abstract types are
+    considered to be private immutable records with no fields. *)
 
 val create_itysymbol_alias : preid -> tvsymbol list -> ity -> itysymbol
 (** [create_itysymbol_alias id args def] creates a new type alias. *)
 
-val create_itysymbol_rich :
-  preid -> tvsymbol list -> bool -> bool Mpv.t -> itysymbol
-(** [create_itysymbol_rich id args privmut fields] creates a new type symbol.
-    Each field is represented by a [pvsymbol] mapped to its mutability status
-    in [fields]. The variables corresponding to mutable fields are stored in
-    the created type symbol and used in effects. If [privmut] is [true],
-    then all types in [fields] must be pure. *)
+val create_itysymbol_rec : preid -> tvsymbol list -> itysymbol
+(** [create_itysymbol_rec id args] creates a new type symbol for
+    a recursively defined type. *)
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)

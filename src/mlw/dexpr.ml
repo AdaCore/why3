@@ -805,6 +805,8 @@ let effect_of_dspec dsp =
         let fs = match fd with
           | Some fd -> Spv.singleton (Opt.get fd.rs_field)
           | None -> Spv.of_list reg.reg_its.its_mfields in
+        if not reg.reg_its.its_private && Spv.is_empty fs then
+          Loc.errorm ?loc:t.t_loc "mutable expression expected";
         let rd = Spv.singleton v and wr = Mreg.singleton reg fs in
         let e = Loc.try2 ?loc:t.t_loc eff_write rd wr in
         (e,t)::l, eff_union_par eff e

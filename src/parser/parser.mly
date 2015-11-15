@@ -266,20 +266,12 @@ type_decl:
 ty_var:
 | labels(quote_lident) { $1 }
 
-(* TODO: should global "mutable" imply "private"?
-  "type t 'a = mutable { x : int }"
-    - if "x" is immutable then the type can only be private
-    - if "x" is automatically mutable then I don't like it
-    - if there are known mutable fields, then a global "mutable"
-      is redundant, unless it also means "private" *)
-(* TODO: what should be the syntax for mutable private records
-    without known fields? *)
 typedefn:
 | (* epsilon *)
-    { (Public, false), TDabstract }
+    { (Abstract, false), TDrecord [] }
 | EQUAL vis_mut bar_list1(type_case)
     { $2, TDalgebraic $3 }
-| EQUAL vis_mut LEFTBRC semicolon_list1(type_field) RIGHTBRC
+| EQUAL vis_mut LEFTBRC loption(semicolon_list1(type_field)) RIGHTBRC
     { $2, TDrecord $4 }
 | EQUAL vis_mut ty
     { $2, TDalias $3 }

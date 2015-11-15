@@ -18,7 +18,8 @@ open Term
 
 type itysymbol = {
   its_ts      : tysymbol;       (** logical type symbol *)
-  its_privmut : bool;           (** private mutable type *)
+  its_private : bool;           (** private type *)
+  its_mutable : bool;           (** mutable type *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_imm : bool list;      (** non-updatable parameters *)
@@ -176,11 +177,9 @@ let ity_app_unsafe s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
 
 (* immutability and purity *)
 
-let its_immutable s = not s.its_privmut && s.its_mfields = [] &&
-  match s.its_def with Some {ity_node = Ityreg _} -> false | _ -> true
+let its_immutable s = not s.its_mutable
 
-let its_pure s = its_immutable s && s.its_regions = [] &&
-  match s.its_def with Some ity -> ity.ity_imm | None -> true
+let its_pure s = not s.its_mutable && s.its_regions = []
 
 let ity_immutable ity = ity.ity_imm
 
@@ -441,7 +440,7 @@ let ity_app_raw sbs id s tl rl = match s.its_def with
       let tl = List.map (ity_full_inst sbs) r.reg_args in
       let rl = List.map (ity_full_inst sbs) r.reg_regs in
       ity_reg (mk_reg id r.reg_its tl rl)
-  | None when s.its_privmut || s.its_mfields <> [] ->
+  | None when s.its_mutable ->
       ity_reg (mk_reg id s tl rl)
   | Some ity -> ity_full_inst sbs ity
   | None -> ity_app_unsafe s tl rl
@@ -521,10 +520,12 @@ let ity_app_pure s tl rl =
 
 let create_its, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rexp ~rvis ~rfrz ~def ->
+  (fun ~ts ~priv ~mut ~mfld ~regs ~aimm ~aexp
+       ~avis ~afrz ~rexp ~rvis ~rfrz ~def ->
     let its = {
       its_ts      = ts;
-      its_privmut = pm;
+      its_private = priv;
+      its_mutable = mut;
       its_mfields = mfld;
       its_regions = regs;
       its_arg_imm = aimm;
@@ -554,62 +555,61 @@ let rec ity_of_ty_pure ty = match ty.ty_node with
         invalid_arg "Ity.ity_of_ty_pure" in
       ity_app_pure s (List.map ity_of_ty_pure tl) []
 
-let its_of_ts ts imm =
+let its_of_ts ts priv =
+  assert (ts.ts_def = None);
   let tl = List.map Util.ttrue ts.ts_args in
-  let il = if imm then tl else List.map Util.ffalse ts.ts_args in
-  let def = match ts.ts_def with None -> None | Some def ->
-    let def = ity_of_ty def in assert def.ity_imm; Some def in
-  create_its ~ts ~pm:false ~mfld:[] ~regs:[] ~aimm:il ~aexp:tl
-    ~avis:tl ~afrz:tl ~rexp:[] ~rvis:[] ~rfrz:[] ~def
+  let il = if priv then tl else List.map Util.ffalse ts.ts_args in
+  create_its ~ts ~priv ~mut:false ~mfld:[] ~regs:[] ~aimm:il
+    ~aexp:tl ~avis:tl ~afrz:tl ~rexp:[] ~rvis:[] ~rfrz:[] ~def:None
 
-let create_itysymbol_pure id args =
-  its_of_ts (create_tysymbol id args None) true
+let create_itysymbol_rec id args =
+  let ts = create_tysymbol id args None in
+  let tl = List.map Util.ttrue ts.ts_args in
+  create_its ~ts ~priv:false ~mut:false ~mfld:[] ~regs:[] ~aimm:tl
+    ~aexp:tl ~avis:tl ~afrz:tl ~rexp:[] ~rvis:[] ~rfrz:[] ~def:None
 
 let create_itysymbol_alias id args def =
   let ts = create_tysymbol id args (Some (ty_of_ity def)) in
-  let ity = match def.ity_node with (* ignore the top region *)
-    | Ityreg r -> ity_app_pure r.reg_its r.reg_args r.reg_regs
-    | _ -> def in
+  let mut, ity = match def.ity_node with (* ignore the top region *)
+    | Ityreg r -> true, ity_app_pure r.reg_its r.reg_args r.reg_regs
+    | _ -> false, def in
   let regs = Sreg.elements (ity_top_regs Sreg.empty ity) in
   let tl = List.map Util.ttrue args in
   let rl = List.map Util.ttrue regs in
-  create_its ~ts ~pm:false ~mfld:[] ~regs ~aimm:tl ~aexp:tl
+  create_its ~ts ~priv:false ~mut ~mfld:[] ~regs ~aimm:tl ~aexp:tl
     ~avis:tl ~afrz:tl ~rexp:rl ~rvis:rl ~rfrz:rl ~def:(Some def)
 
-exception ImpureField of ity
-
-let create_itysymbol_rich id args pm flds =
+let create_itysymbol_plain ~priv ~mut id args flds =
   let ts = create_tysymbol id args None in
-  let collect_vis fn acc =
-    Mpv.fold (fun f _ a -> if f.pv_ghost then a else fn a f.pv_ity) flds acc in
-  let collect_imm fn acc =
-    Mpv.fold (fun f m a -> if m then a else fn a f.pv_ity) flds acc in
   let collect_all fn acc =
     Mpv.fold (fun f _ a -> fn a f.pv_ity) flds acc in
+  let collect_imm fn acc =
+    Mpv.fold (fun f m a -> if m then a else fn a f.pv_ity) flds acc in
+  let collect_vis fn acc =
+    Mpv.fold (fun f _ a -> if f.pv_ghost then a else fn a f.pv_ity) flds acc in
   let sargs = Stv.of_list args in
   let dargs = collect_all ity_freevars Stv.empty in
   if not (Stv.subset dargs sargs) then
     raise (Ty.UnboundTypeVar (Stv.choose (Stv.diff dargs sargs)));
   let mfld = Mpv.fold (fun f m l -> if m then f::l else l) flds [] in
-  if pm then begin (* private mutable record *)
+  let regs = Sreg.elements (collect_all ity_top_regs Sreg.empty) in
+  let check_args s = List.map (Stv.contains s) args in
+  let check_regs s = List.map (Sreg.contains s) regs in
+  let rexp = check_regs (collect_all ity_exp_regs Sreg.empty) in
+  let rvis = check_regs (collect_vis ity_vis_regs Sreg.empty) in
+  let rfrz = check_regs (collect_imm ity_exp_regs Sreg.empty) in
+  let mut = mut || mfld <> [] in
+  if priv then (* private record *)
     let tl = List.map Util.ttrue args in
-    Mpv.iter (fun {pv_vs = v; pv_ity = i} _ -> if not i.ity_imm
-      then Loc.error ?loc:v.vs_name.id_loc (ImpureField i)) flds;
-    create_its ~ts ~pm ~mfld ~regs:[] ~aimm:tl ~aexp:tl ~avis:tl
-      ~afrz:tl ~rexp:[] ~rvis:[] ~rfrz:[] ~def:None
-  end else (* non-private updatable type *)
-    let regs = Sreg.elements (collect_all ity_top_regs Sreg.empty) in
-    let check_args s = List.map (Stv.contains s) args in
-    let check_regs s = List.map (Sreg.contains s) regs in
+    create_its ~ts ~priv ~mut ~mfld ~regs ~aimm:tl ~aexp:tl
+      ~avis:tl ~afrz:tl ~rexp ~rvis ~rfrz ~def:None
+  else (* non-private updatable type *)
     let aimm = check_args (collect_all ity_imm_vars Stv.empty) in
     let aexp = check_args (collect_all ity_exp_vars Stv.empty) in
-    let rexp = check_regs (collect_all ity_exp_regs Sreg.empty) in
     let avis = check_args (collect_vis ity_vis_vars Stv.empty) in
-    let rvis = check_regs (collect_vis ity_vis_regs Sreg.empty) in
     let afrz = check_args (collect_imm ity_exp_vars Stv.empty) in
-    let rfrz = check_regs (collect_imm ity_exp_regs Sreg.empty) in
-    create_its ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rexp
-      ~rvis ~rfrz ~def:None
+    create_its ~ts ~priv ~mut ~mfld ~regs ~aimm ~aexp ~avis ~afrz
+      ~rexp ~rvis ~rfrz ~def:None
 
 (** pvsymbol creation *)
 
@@ -743,7 +743,7 @@ let check_taints tnt pvs =
       if Sreg.mem r tnt then raise (BadGhostWrite (v,r))) () v.pv_ity) pvs
 
 let visible_writes e =
-  Mreg.subdomain (fun {reg_its = {its_privmut = priv}} fs ->
+  Mreg.subdomain (fun {reg_its = {its_private = priv}} fs ->
     priv || Spv.exists (fun fd -> not fd.pv_ghost) fs) e.eff_writes
 
 let visible_reads e =
@@ -798,8 +798,9 @@ let read_regs rd =
 let eff_write rd wr =
   if Mreg.is_empty wr then { eff_empty with eff_reads = rd } else
   let kn = read_regs rd in
-  let wr = Mreg.filter (fun ({reg_its = {its_privmut = p}} as r) fs ->
-    if not p && Spv.is_empty fs then invalid_arg "Ity.eff_write";
+  let wr = Mreg.filter (fun ({reg_its = s} as r) fs ->
+    if Spv.is_empty fs && not (s.its_private && s.its_mutable)
+    then invalid_arg "Ity.eff_write";
     Spv.iter (check_mutable_field "Ity.eff_write" r) fs;
     Sreg.mem r kn) wr in
   reset_taints { eff_empty with eff_reads = rd; eff_writes = wr;
@@ -833,7 +834,7 @@ let eff_assign asl =
   let writes = List.fold_left (fun wr (r,f,v) ->
     let r = get_reg r and ity = v.pv_ity in
     check_mutable_field "Ity.eff_assign" r f;
-    if r.reg_its.its_privmut then raise (AssignPrivate r);
+    if r.reg_its.its_private then raise (AssignPrivate r);
     Mreg.change (fun fs -> Some (match fs with
       | Some fs -> Mpv.add_new (DuplicateField (r,f)) f ity fs
       | None    -> Mpv.singleton f ity)) r wr) Mreg.empty asl in
@@ -1387,11 +1388,8 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundRegion r -> fprintf fmt
       "Unbound region %a" print_reg r
   | ImpureType (v,ity) -> fprintf fmt
-      "Cannot instantiate pure type variable %a with type %a"
+      "Cannot instantiate pure type variable {%a} with type %a"
         print_tv v print_ity ity
-  | ImpureField ity -> fprintf fmt
-      "Field type %a is mutable, it cannot be used in a type which is \
-        private, recursive, or has an invariant" print_ity ity
 (*
   | UnboundException xs -> fprintf fmt
       "This function raises %a but does not specify a post-condition for it"

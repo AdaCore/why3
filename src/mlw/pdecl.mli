@@ -24,20 +24,47 @@ type its_defn = private {
   itd_invariant    : term list;
 }
 
-val create_abstract_type_decl : preid -> tvsymbol list -> bool -> its_defn
-
-val create_alias_decl : preid -> tvsymbol list -> ity -> its_defn
-
-val create_flat_record_decl : preid -> tvsymbol list ->
-  bool -> bool -> (bool * pvsymbol) list -> term list -> its_defn
+val create_plain_record_decl : priv:bool -> mut:bool ->
+  preid -> tvsymbol list -> (bool * pvsymbol) list -> term list -> its_defn
+(** [create_plain_record_decl ~priv ~mut id args fields inv] creates
+    a declaration for a non-recursive record type, possibly private
+    and/or mutable. The known record fields are listed with their
+    mutability status. The [priv] flag should be set to [true] for
+    private records. The [mut] flag should be set to [true] to mark
+    the new type as mutable even if it has no known mutable fields.
+    This is the case for private mutable records with no known mutable
+    fields, as well as for non-private records that have an invariant:
+    marking such a type as mutable gives every value of this type a
+    distinct identity, allowing us to track values with broken invariants.
+    The [inv] parameter contains the list of invariant formulas that may
+    only depend on free variables from [fields]. If the type is private,
+    then every field occurring in [inv] must have an immutable type.
+    Abstract types are considered to be private records with no fields. *)
 
 val create_rec_record_decl : itysymbol -> pvsymbol list -> its_defn
+(** [create_rec_record_decl its fields] creates a declaration for
+    a recursive record type. The type symbol should be created using
+    [Ity.create_itysymbol_rec]. All fields must be immutable. *)
 
-val create_flat_variant_decl : preid -> tvsymbol list ->
-  (preid * (bool * pvsymbol) list) list -> its_defn
+val create_plain_variant_decl :
+  preid -> tvsymbol list -> (preid * (bool * pvsymbol) list) list -> its_defn
+(** [create_plain_variant_decl id args constructors] creates a declaration
+    for a non-recursive algebraic type. Each constructor field carries a
+    Boolean flag denoting whether a projection function should be generated
+    for this field. Any such field must be present in each constructor, so
+    that the projection function is total. *)
 
-val create_rec_variant_decl : itysymbol ->
-  (preid * (bool * pvsymbol) list) list -> its_defn
+val create_rec_variant_decl :
+  itysymbol -> (preid * (bool * pvsymbol) list) list -> its_defn
+(** [create_rec_variant_decl id args constructors] creates a declaration
+    for a recursive algebraic type. The type symbol should be created using
+    [Ity.create_itysymbol_rec]. Each constructor field carries a Boolean flag
+    denoting whether a projection function should be generated for this field.
+    Any such field must be present in each constructor, so that the projection
+    function is total. All fields must be immutable. *)
+
+val create_alias_decl : preid -> tvsymbol list -> ity -> its_defn
+(** [create_alias_decl id args def] creates a new alias type declaration. *)
 
 (** {2 Module declarations} *)
 

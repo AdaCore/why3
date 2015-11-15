@@ -228,10 +228,9 @@ let count_regions {muc_known = kn} {pv_ity = ity} mr =
     | Ityreg r -> fields (add_reg r mr) r.reg_its r.reg_args r.reg_regs
     | Ityapp (s,tl,rl) -> fields mr s tl rl
     | Ityvar _ -> assert false
-  and fields mr s tl rl = if s.its_privmut then mr else
-    let add_arg isb v ity = ity_match isb (ity_var v) ity in
-    let isb = List.fold_left2 add_arg isb_empty s.its_ts.ts_args tl in
-    let isb = List.fold_left2 reg_match isb s.its_regions rl in
+  and fields mr s tl rl =
+    if s.its_private && rl = [] then mr else
+    let isb = its_match_regs s tl rl in
     let add_ity mr ity = down mr (ity_full_inst isb ity) in
     let add_proj mr f = add_ity mr f.rs_cty.cty_result in
     let add_field mr v = add_ity mr v.pv_ity in
@@ -596,14 +595,15 @@ let clone_type_decl inst cl tdl =
     if d.itd_fields = [] && d.itd_constructors = [] &&
                             d.itd_invariant = [] then begin
       if cloned then Hits.add htd s None else begin
-        let itd = create_abstract_type_decl id' ts.ts_args s.its_privmut in
+        let itd = create_plain_record_decl id' ts.ts_args
+          ~priv:s.its_private ~mut:s.its_mutable [] [] in
         cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
         save_itd itd
       end
     end else
     (* variant *)
-    if s.its_mfields = [] && d.itd_constructors <> [] &&
-                             d.itd_invariant = [] then begin
+    if not s.its_mutable && d.itd_constructors <> [] &&
+                            d.itd_invariant = [] then begin
       if cloned then raise (CannotInstantiate id);
       let conv_fd m fd =
         let v = Opt.get fd.rs_field in Mpv.add v (conv_pj v) m in
@@ -618,15 +618,13 @@ let clone_type_decl inst cl tdl =
           let itd = create_rec_variant_decl s' csl in
           save_itd itd
       | None ->
-          let itd = create_flat_variant_decl id' ts.ts_args csl in
+          let itd = create_plain_variant_decl id' ts.ts_args csl in
           cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
           save_itd itd
     end else begin
     (* flat record *)
       if cloned then raise (CannotInstantiate id);
       let mfld = Spv.of_list s.its_mfields in
-      let priv = d.itd_constructors = [] in
-      let mut = not (its_immutable s) in
       let pjl = List.map (fun fd -> Opt.get fd.rs_field) d.itd_fields in
       let fdl = List.map (fun v -> Spv.mem v mfld, conv_pj v) pjl in
       let inv =
@@ -634,7 +632,8 @@ let clone_type_decl inst cl tdl =
         let add mv u (_,v) = Mvs.add u.pv_vs v.pv_vs mv in
         let mv = List.fold_left2 add Mvs.empty pjl fdl in
         List.map (clone_term cl mv) d.itd_invariant in
-      let itd = create_flat_record_decl id' ts.ts_args priv mut fdl inv in
+      let itd = create_plain_record_decl id' ts.ts_args
+        ~priv:s.its_private ~mut:s.its_mutable fdl inv in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
     end
@@ -646,7 +645,7 @@ let clone_type_decl inst cl tdl =
           if Sits.mem s alg then begin
             if not (Mts.mem s.its_ts cl.ts_table) then
             let id = id_clone s.its_ts.ts_name in
-            let s = create_itysymbol_pure id s.its_ts.ts_args in
+            let s = create_itysymbol_rec id s.its_ts.ts_args in
             cl.ts_table <- Mts.add s.its_ts s cl.ts_table
           end else Opt.iter (visit alg s) (Mits.find_opt s def);
           List.iter down tl

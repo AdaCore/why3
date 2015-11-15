@@ -40,25 +40,30 @@ let check_field stv f =
   let ftv = ity_freevars Stv.empty f.pv_ity in
   if not (Stv.subset ftv stv) then Loc.error ?loc
     (UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
-  if not f.pv_ity.ity_imm then Loc.error ?loc
-    (ImpureField f.pv_ity)
+  if not f.pv_ity.ity_imm then Loc.errorm ?loc
+    "This field has non-pure type, it cannot be used \
+     in a recursive type definition"
 
-let check_invariant stv svs p =
+let check_invariant stv svs mfs p =
   let ptv = t_ty_freevars Stv.empty p in
   let pvs = t_freevars Mvs.empty p in
   if not (Stv.subset ptv stv) then Loc.error ?loc:p.t_loc
     (UnboundTypeVar (Stv.choose (Stv.diff ptv stv)));
   if not (Mvs.set_submap pvs svs) then Loc.error ?loc:p.t_loc
-    (UnboundVar (fst (Mvs.choose (Mvs.set_diff pvs svs))))
+    (UnboundVar (fst (Mvs.choose (Mvs.set_diff pvs svs))));
+  if not (Mvs.set_disjoint pvs mfs) then Loc.errorm ?loc:p.t_loc
+    "This invariant of a private type depends on a non-pure field %a"
+    Pretty.print_vs (fst (Mvs.choose (Mvs.set_inter pvs mfs)))
 
-let check_pure_its s = not s.its_privmut &&
+let its_recursive s =
+  not s.its_private && not s.its_mutable &&
   s.its_mfields = [] && s.its_regions = [] &&
   List.for_all (fun x -> x) s.its_arg_imm &&
   List.for_all (fun x -> x) s.its_arg_exp &&
   List.for_all (fun x -> x) s.its_arg_vis &&
   List.for_all (fun x -> x) s.its_arg_frz &&
-  s.its_reg_vis = [] && s.its_reg_frz = [] &&
-  s.its_def = None
+  s.its_reg_exp = [] && s.its_reg_vis = [] &&
+  s.its_reg_frz = [] && s.its_def = None
 
 let create_semi_constructor id s fl pjl invl =
   let tvl = List.map ity_var s.its_ts.ts_args in
@@ -75,45 +80,26 @@ let create_semi_constructor id s fl pjl invl =
   let c = create_cty fl invl [q] Mexn.empty Mpv.empty eff ity in
   create_rsymbol id c
 
-let create_flat_record_decl id args priv mut fldl invl =
-  let exn = Invalid_argument "Mdecl.create_flat_record_decl" in
+let create_plain_record_decl ~priv ~mut id args fldl invl =
+  let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
   let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
   let add_fd fs (fm,fd) = Mpv.add_new exn fd fm fs in
   let flds = List.fold_left add_fd Mpv.empty fldl in
-  let fmut = List.exists fst fldl in
   let fldl = List.map snd fldl in
-  let mut = mut || fmut in
-  if not priv && fldl = [] then raise exn;
-  if not priv && mut && not fmut then raise exn;
   let stv = Stv.of_list args in
+  let mfs = if not priv then Svs.empty else List.fold_left (fun s v ->
+    if v.pv_ity.ity_imm then s else Svs.add v.pv_vs s) Svs.empty fldl in
   let svs = List.fold_left (fun s v -> Svs.add v.pv_vs s) Svs.empty fldl in
-  List.iter (check_invariant stv svs) invl;
-  let s = if not mut && (priv || invl <> []) then begin
-    (* a type with an invariant must be declared as mutable in order
-       to accept mutable subvalues (we need a head region to track the
-       values that must be rechecked if a change is made to a subvalue).
-       If we have an immutable type with an invariant, then we create
-       an opaque type symbol for it, and forbid subregions. *)
-    List.iter (check_field stv) fldl;
-    create_itysymbol_pure id args
-  end else
-    create_itysymbol_rich id args (priv && mut) flds in
+  List.iter (check_invariant stv svs mfs) invl;
+  let s = create_itysymbol_plain ~priv ~mut id args flds in
   let pjl = List.map (create_projection s) fldl in
   let cl = if priv then [] else if invl <> [] then
     [create_semi_constructor cid s fldl pjl invl] else
     [create_constructor ~constr:1 cid s fldl] in
   mk_itd s pjl cl invl
 
-let create_abstract_type_decl id args mut =
-  (* = create_flat_record_decl id args true mut [] [] *)
-  let s = if mut
-    then create_itysymbol_rich id args true Mpv.empty
-    else create_itysymbol_pure id args in
-  mk_itd s [] [] []
-
 let create_rec_record_decl s fldl =
-  if not (check_pure_its s) || fldl = [] then
-    invalid_arg "Mdecl.create_rec_record_decl";
+  if not (its_recursive s) then invalid_arg "Pdecl.create_rec_record_decl";
   let id = s.its_ts.ts_name in
   let cid = id_fresh ?loc:id.id_loc ("mk " ^ id.id_string) in
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fldl;
@@ -122,7 +108,7 @@ let create_rec_record_decl s fldl =
   mk_itd s pjl [cs] []
 
 let create_variant_decl get_its cl =
-  let exn = Invalid_argument "Mdecl.create_variant_decl" in
+  let exn = Invalid_argument "Pdecl.create_variant_decl" in
   let pjl, fds = match cl with
     | cs::cl ->
         let add_fd (pjs,fds) (pj,f) =
@@ -137,11 +123,12 @@ let create_variant_decl get_its cl =
   let mk_cs (cid,fl) = create_constructor ~constr cid s (List.map snd fl) in
   mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs cl) []
 
-let create_flat_variant_decl id args cl =
-  create_variant_decl (fun fds -> create_itysymbol_rich id args false fds) cl
+let create_plain_variant_decl id args cl =
+  create_variant_decl (fun fds ->
+    create_itysymbol_plain ~priv:false ~mut:false id args fds) cl
 
 let create_rec_variant_decl s cl =
-  if not (check_pure_its s) then invalid_arg "Mdecl.create_rec_variant_decl";
+  if not (its_recursive s) then invalid_arg "Pdecl.create_rec_variant_decl";
   let stv = Stv.of_list s.its_ts.ts_args in
   let check_field fd _ = check_field stv fd in
   create_variant_decl (fun fds -> Mpv.iter check_field fds; s) cl
@@ -570,13 +557,13 @@ let print_its_defn fst fmt itd =
   let print_defn fmt () =
     match s.its_def, itd.itd_fields, itd.itd_constructors with
     | Some ity, _, _ -> fprintf fmt " = %a" print_ity ity
-    | _, [], [] -> if s.its_privmut then fprintf fmt " = mutable {}"
+    | _, [], [] when not s.its_mutable -> ()
     | _, fl, [] -> fprintf fmt " = private%s { %a }"
-        (if s.its_privmut && s.its_mfields = [] then " mutable" else "")
+        (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
-    | _, fl, [_] when s.its_mfields <> [] || itd.itd_invariant <> [] ->
-        (* only records can have mutable fields or invariants *)
-        fprintf fmt " = { %a }"
+    | _, fl, [{rs_name = {id_string = n}}]
+      when n = "mk " ^ s.its_ts.ts_name.id_string -> fprintf fmt " =%s { %a }"
+        (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
     | _, fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in

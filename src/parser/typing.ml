@@ -781,14 +781,9 @@ let add_types muc tdl =
     let id = create_user_id d.td_ident and loc = d.td_loc in
     let args = List.map (fun id -> tv_of_string id.id_str) d.td_params in
     match d.td_def with
-    | TDabstract ->
-        if d.td_inv <> [] then Loc.errorm ~loc
-          "Abstract non-record types cannot have invariants";
-        let itd = create_abstract_type_decl id args d.td_mut in
-        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDalias pty ->
         if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
-          "Alias types cannot be abstract, private. or mutable";
+          "Alias types cannot be abstract, private, or mutable";
         if d.td_inv <> [] then Loc.errorm ~loc
           "Alias types cannot have invariants";
         let alias = Sstr.add x alias in
@@ -798,7 +793,7 @@ let add_types muc tdl =
         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDalgebraic csl ->
         if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
-          "Algebraic types cannot be abstract, private. or mutable";
+          "Algebraic types cannot be abstract, private, or mutable";
         if d.td_inv <> [] then Loc.errorm ~loc
           "Algebraic types cannot have invariants";
         let hfd = Hstr.create 5 in
@@ -836,7 +831,7 @@ let add_types muc tdl =
         | Some s ->
             Hstr.add htd x (create_rec_variant_decl s csl)
         | None ->
-            let itd = create_flat_variant_decl id args csl in
+            let itd = create_plain_variant_decl id args csl in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
     | TDrecord fl ->
         let alias = Sstr.empty in
@@ -855,19 +850,21 @@ let add_types muc tdl =
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
             if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
-              "Recursive types cannot be abstract, private. or mutable";
+              "Recursive types cannot be abstract, private, or mutable";
             if d.td_inv <> [] then Loc.errorm ~loc
               "Recursive types cannot have invariants";
             let get_fd (mut, fd) = if mut then Loc.errorm ~loc
               "Recursive types cannot have mutable fields" else fd in
             Hstr.add htd x (create_rec_record_decl s (List.map get_fd fl))
         | None ->
-            let priv = d.td_vis <> Public and mut = d.td_mut in
+            (* empty records are automatically private, otherwise they are
+               just unit types that can be neither constructed nor refined *)
+            let priv = d.td_vis <> Public || fl = [] and mut = d.td_mut in
             let add_fd m (_, v) = Mstr.add v.pv_vs.vs_name.id_string v m in
             let gvars = List.fold_left add_fd Mstr.empty fl in
             let type_inv f = type_fmla_pure muc gvars Dterm.denv_empty f in
             let invl = List.map type_inv d.td_inv in
-            let itd = create_flat_record_decl id args priv mut fl invl in
+            let itd = create_plain_record_decl ~priv ~mut id args fl invl in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
 
   and parse ~loc ~alias ~alg pty =
@@ -882,7 +879,7 @@ let add_types muc tdl =
                 Hstr.find hts x
             | Qident {id_str = x} when Mstr.mem x alg ->
                 let id, args = Mstr.find x alg in
-                let s = create_itysymbol_pure id args in
+                let s = create_itysymbol_rec id args in
                 Hstr.add hts x s;
 (*              visit ~alias ~alg x (Mstr.find x def); *)
                 s

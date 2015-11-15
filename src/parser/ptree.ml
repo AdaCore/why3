@@ -162,7 +162,6 @@ type field = {
 }
 
 type type_def =
-  | TDabstract
   | TDalias     of pty
   | TDalgebraic of (Loc.position * ident * param list) list
   | TDrecord    of field list

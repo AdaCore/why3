@@ -177,19 +177,16 @@ let create_projection s v =
 exception FieldExpected of rsymbol
 
 let mfield_of_rs s = match s.rs_cty.cty_args, s.rs_field with
-  | [{pv_ity = {ity_node = Ityreg {reg_its = ts}}}], Some f
-    when List.exists (pv_equal f) ts.its_mfields -> f
+  | [{pv_ity = {ity_node = Ityreg {reg_its = its}}}], Some f
+    when List.exists (pv_equal f) its.its_mfields -> f
   | _ -> raise (FieldExpected s)
 
 let create_constructor ~constr id s fl =
   let exn = Invalid_argument "Expr.create_constructor" in
   let fs = List.fold_right (Spv.add_new exn) fl Spv.empty in
-  if s.its_privmut || s.its_def <> None then raise exn;
-  if s.its_mfields <> [] then begin
-    if constr <> 1 then raise exn;
-    let mfs = Spv.of_list s.its_mfields in
-    if not (Spv.subset mfs fs) then raise exn
-  end else if constr < 1 then raise exn;
+  if List.exists (fun f -> not (Spv.mem f fs)) s.its_mfields ||
+    s.its_private || s.its_def <> None || constr < 1 ||
+    (s.its_mutable && constr > 1) then raise exn;
   let argl = List.map (fun a -> a.pv_vs.vs_ty) fl in
   let tyl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in
@@ -375,7 +372,7 @@ let e_locate_effect pr e = fst (find_effect pr None e)
 let localize_ghost_write v r el =
   let taints eff = Mreg.mem r eff.eff_taints in
   let writes eff = match Mreg.find_opt r eff.eff_writes with
-    | Some fds -> r.reg_its.its_privmut ||
+    | Some fds -> r.reg_its.its_private ||
         Spv.exists (fun fd -> not fd.pv_ghost) fds
     | None -> false in
   (* check if some component taints region r *)
