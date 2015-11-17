@@ -290,7 +290,7 @@ let schedule_proof_attempt ~cntexample ~timelimit ~memlimit ~steplimit ?old ~inp
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
   let res_parser =
-    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown "")];
+    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown ("", None))];
       Call_provers.prp_regexps = [];
       Call_provers.prp_timeregexps = [];
       Call_provers.prp_stepregexps = [];
@@ -861,7 +861,7 @@ let edit_proof ~cntexample eS sched ~default_editor a =
   else
     let callback a res =
       match res with
-      | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
+      | Done {Call_provers.pr_answer = Call_provers.Unknown ("", None)} ->
         set_proof_state ~notify ~obsolete:true ~archived:false
           JustEdited a
       | _ ->
@@ -873,7 +873,7 @@ let edit_proof ~cntexample eS sched ~default_editor a =
 let edit_proof_v3 ~cntexample eS sched ~default_editor ~callback a =
   let callback a res =
     match res with
-    | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
+    | Done {Call_provers.pr_answer = Call_provers.Unknown ("", None)} ->
       callback a
     | _ -> ()
   in

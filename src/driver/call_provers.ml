@@ -16,6 +16,29 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+type reason_unknown =
+  | Resourceout
+  | Other
+
+type prover_answer =
+  | Valid
+  | Invalid
+  | Timeout
+  | OutOfMemory
+  | StepLimitExceeded
+  | Unknown of (string * reason_unknown option)
+  | Failure of string
+  | HighFailure
+
+type prover_result = {
+  pr_answer : prover_answer;
+  pr_status : Unix.process_status;
+  pr_output : string;
+  pr_time   : float;
+  pr_steps  : int;		(* -1 if unknown *)
+  pr_model  : model;
+}
+
 (** time regexp "%h:%m:%s" *)
 type timeunit =
   | Hour
@@ -83,26 +106,15 @@ let rec grep_steps out = function
       with _ -> grep_steps out l
     end
 
-(** *)
-
-type prover_answer =
-  | Valid
-  | Invalid
-  | Timeout
-  | OutOfMemory
-  | StepLimitExceeded
-  | Unknown of string
-  | Failure of string
-  | HighFailure
-
-type prover_result = {
-  pr_answer : prover_answer;
-  pr_status : Unix.process_status;
-  pr_output : string;
-  pr_time   : float;
-  pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : model;
-}
+let grep_reason_unknown out =
+  try
+    let re = Str.regexp "^(:reason-unknown \\([^)]*\\)" in
+    ignore (Str.search_forward re out 0);
+    match  (Str.matched_group 1 out) with
+    | "resourceout" -> Resourceout
+    | _ -> Other
+  with Not_found ->
+    Other
 
 type prover_result_parser = {
   prp_regexps     : (Str.regexp * prover_answer) list;
@@ -118,9 +130,9 @@ let print_prover_answer fmt = function
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown "" -> fprintf fmt "Unknown"
+  | Unknown ("", _) -> fprintf fmt "Unknown"
   | Failure "" -> fprintf fmt "Failure"
-  | Unknown s -> fprintf fmt "Unknown (%s)" s
+  | Unknown (s, _) -> fprintf fmt "Unknown (%s)" s
   | Failure s -> fprintf fmt "Failure (%s)" s
   | HighFailure -> fprintf fmt "HighFailure"
 
@@ -151,7 +163,7 @@ let rec grep out l = match l with
         ignore (Str.search_forward re out 0);
         match pa with
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
-        | Unknown s -> Unknown (Str.replace_matched s out)
+        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false
       with Not_found -> grep out l end
@@ -188,6 +200,10 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
+  let reason_unknown = grep_reason_unknown out in
+  let ans = match ans with
+    | Unknown (s, _) -> Unknown (s, Some reason_unknown)
+    | _ -> ans in
   let ans = match ans with
     | Unknown _ | HighFailure when on_timelimit && timelimit > 0
       && time >= (0.9 *. float timelimit) -> Timeout

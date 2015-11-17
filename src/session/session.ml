@@ -1168,7 +1168,7 @@ let load_result r =
           match status with
             | "valid" -> Call_provers.Valid
             | "invalid" -> Call_provers.Invalid
-            | "unknown" -> Call_provers.Unknown ""
+            | "unknown" -> Call_provers.Unknown ("", None)
             | "timeout" -> Call_provers.Timeout
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
@@ -1194,7 +1194,7 @@ let load_result r =
           Call_provers.pr_output = "";
           Call_provers.pr_status = Unix.WEXITED 0;
 	  Call_provers.pr_steps = steps;
-	  Call_provers.pr_model = Model_parser.default_model
+	  Call_provers.pr_model = Model_parser.default_model;
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited
