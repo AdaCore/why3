@@ -124,15 +124,20 @@ type prover_result_parser = {
   prp_model_parser : Model_parser.model_parser;
 }
 
+let print_unknown_reason fmt r =
+  match r with
+  | Some Resourceout -> fprintf fmt " because of resource limit reached "
+  | _ -> ()
+
 let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown ("", _) -> fprintf fmt "Unknown"
+  | Unknown ("", r) -> fprintf fmt "Unknown%a" print_unknown_reason r
   | Failure "" -> fprintf fmt "Failure"
-  | Unknown (s, _) -> fprintf fmt "Unknown (%s)" s
+  | Unknown (s, r) -> fprintf fmt "Unknown %a(%s)" print_unknown_reason r s
   | Failure s -> fprintf fmt "Failure (%s)" s
   | HighFailure -> fprintf fmt "HighFailure"
 
