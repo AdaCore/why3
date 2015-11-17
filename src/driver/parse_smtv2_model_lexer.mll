@@ -13,6 +13,7 @@ rule token = parse
     { token lexbuf }
   | space+ as space_str
       { SPACE (space_str) }
+  | "mk_t__ref" { MK_T_REF }
   | "store" { STORE }
   | "const" { CONST }
   | "as" { AS }

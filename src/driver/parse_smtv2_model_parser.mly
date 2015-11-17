@@ -13,6 +13,7 @@
 %token <string * string> DEC_STR
 %token <string * string> MINUS_DEC_STR
 %token LPAREN RPAREN
+%token MK_T_REF
 %token EOF
 %%
 
@@ -53,6 +54,7 @@ text_without_int:
 | AS { "as" }
 
 value:
+| LPAREN MK_T_REF SPACE value RPAREN { $4 }
 | integer { $1 }
 | decimal { $1 }
 | other_val_str { Model_parser.Unparsed $1 }
