@@ -24,23 +24,21 @@ open Term
 open Call_provers
 open Model_parser
 
-let rec search_labels t =
-  let acc =
-   match t.t_node with
-   | Tbinop (Timplies,_, t) -> search_labels t
-   | Tlet (_,tb) | Teps tb ->
-         let _, t = t_open_bound tb in
-         search_labels t
-   | Tquant (_,tq) ->
-         let _,_,t = t_open_quant tq in
-         search_labels t
-   | Tnot t ->
-         search_labels t
-   | _ -> None
-  in
-  match acc with
-  | None -> Gnat_expl.extract_check t.t_label
-  | Some _ -> acc
+
+let search_labels =
+  let extract_wrap l =
+    match Gnat_expl.extract_check l with
+    | None -> []
+    | Some x -> [x] in
+  let search = Termcode.search_labels extract_wrap in
+  fun f ->
+    try
+    begin match search f with
+    | [] -> None
+    | [x] -> Some x
+    | _ -> assert false
+    end
+  with Exit -> None
 
 let rec is_trivial fml =
    (* Check wether the formula is trivial.  *)
