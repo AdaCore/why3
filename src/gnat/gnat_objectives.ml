@@ -221,8 +221,8 @@ let strategy =
 
 let parent_transform_name goal =
    match goal.Session.goal_parent with
-   | Session.Parent_transf t -> Some t.Session.transf_name
-   | _ -> None
+   | Session.Parent_transf t -> t.Session.transf_name
+   | _ -> assert false
 
 let rev_strategy = List.rev strategy
 
@@ -246,21 +246,38 @@ let next_transform =
   in
   (fun trans -> Hashtbl.find h trans)
 
+exception Found_Trans of string
+
+let get_first_transform_of_goal g =
+  (* return a random transformation that has been applied to the goal. If only
+     gnatprove was run on this file, there is only one transformation. *)
+  try
+    Session.PHstr.iter (fun k _ -> raise (Found_Trans k))
+    g.Session.goal_transformations;
+    assert false
+  with Found_Trans s -> s
+
 let find_next_transformation goal =
-  match parent_transform_name goal with
-  | None -> List.hd strategy
-  | Some s ->
-      try next_transform s
+  (* the "then" branch corresponds to the "normal" case where only gnatprove
+     was applied *)
+  if Session.PHstr.is_empty goal.Session.goal_transformations then
+      try next_transform (parent_transform_name goal)
       with Not_found ->
         Gnat_util.abort_with_message ~internal:true
           "unknown transformation found"
+  else
+    (* in the other case, we just apply the transformation that's there *)
+    get_first_transform_of_goal goal
 
 let is_full_split_goal goal =
-   (* check whether the goal has been obtained by the last transformation in
-      the transformation list *)
-   match parent_transform_name goal with
-   | Some name when name = last_transform -> true
-   | _ -> false
+   (* check whether other transformations should be applied to the goal. If the
+      transformation is part of the strategy, we check if it is the last one.
+      Otherwise, the goal is fully split if there are no transformations
+      applied to it (that we could follow) *)
+  if not (Session.PHstr.is_empty goal.Session.goal_transformations) then false
+  else
+    let s = parent_transform_name goal in
+    not (List.mem s strategy) || s = last_transform
 
 let has_already_been_applied trans goal =
    (* check whether the goal has already been split by the given
