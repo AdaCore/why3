@@ -28,7 +28,7 @@ A block with more than one exec fields is now the same thing than if you
 split the block into blocks containing one fields.
 
 New message field that allows to print a message when a prover is
-detected. If a message is not present, we print ", Ok." if the version
+detected. If a message is not present, we print ", OK." if the version
 is good (version_good) and not old, and " (it is an old version)." if
 the version is old (version_old).
 
@@ -401,8 +401,14 @@ let detect_exec env main data acc exec_name =
     if good || old then begin
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
-        (Opt.get_def (if old then
-            " (old version, please consider upgrading)." else ", Ok.")
+        (Opt.get_def
+	   (if old then
+	      " (old version, please consider upgrading)."
+	    else
+	      if data.prover_altern <> "" then
+		" (alternative: " ^ data.prover_altern ^ ")"
+	      else
+		", OK.")
            data.message);
       known_version env exec_name;
       add_prover_shortcuts env prover;
