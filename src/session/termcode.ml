@@ -31,21 +31,27 @@ let concat_expls = function
   | [l] -> Some l
   | l :: ls -> Some (l ^ " (" ^ String.concat ". " ls ^ ")")
 
-let rec get_expls_fmla acc f =
-  if f.t_ty <> None then acc
-  else if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc
-  else
-    let res = collect_expls f.Term.t_label in
-    if res = [] then match f.t_node with
-      | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
-      | Term.Tbinop (Term.Timplies, _, f) -> get_expls_fmla acc f
-      | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
-        Term.t_fold get_expls_fmla acc f
-      | _ -> raise Exit
-    else if acc = [] then res
-    else raise Exit
 
-let get_expls_fmla f = try get_expls_fmla [] f with Exit -> []
+let search_labels callback =
+  let rec aux acc f =
+    if f.t_ty <> None then acc
+    else if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc
+    else
+      let res = callback f.Term.t_label in
+      if res = [] then match f.t_node with
+        | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
+        | Term.Tbinop (Term.Timplies, _, f) -> aux acc f
+        | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
+          Term.t_fold aux acc f
+        | _ -> raise Exit
+      else if acc = [] then res
+      else raise Exit
+  in
+  aux []
+
+let get_expls_fmla =
+  let search = search_labels collect_expls in
+  fun f -> try search f with Exit -> []
 
 let goal_expl_task ~root task =
   let gid = (Task.task_goal task).Decl.pr_name in
