@@ -13,6 +13,14 @@
 
 val goal_expl_task: root:bool -> Task.task -> Ident.ident * string option
 
+val search_labels :
+  (Ident.Slab.t -> 'a list) -> Term.term -> 'a list
+  (* [search_labels callback f] traverses [f] in a top-down manner and calls the
+     [callback] on the label set of all encountered nodes. As soon as the
+     callback returns a non-empty list, the traversal is stopped and that list
+     is returned. Raises exception Exit if the entire term has been traversed.
+   *)
+
 (** Shapes *)
 
 val reset_dict : unit -> unit
