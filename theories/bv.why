@@ -148,6 +148,15 @@ theory BV_Gen
     forall v:t, n:int. 0 <= n < size ->
       nth (bw_not v) n = notb (nth v n)
 
+  (** Shift operators *)
+
+  (** Warning: shift operators of an amount greater than or equal to
+      the size are specified here, in concordance with SMTLIB. This is
+      not necessarily the case in hardware, where the amount of the
+      shift might be taken modulo the size, eg. [lsr x 64] might be
+      equal to [x], whereas in this theory it is 0.
+  *)
+
   function lsr t int : t
 
   axiom Lsr_nth_low:
@@ -184,8 +193,24 @@ theory BV_Gen
 
   lemma lsl_zero: forall x. lsr x 0 = x
 
-  use import Pow2int
   use import int.EuclideanDivision
+
+  function rotate_right t int : t
+
+  axiom Nth_rotate_right :
+    forall v n i. 0 <= i < size -> 0 <= n ->
+      nth (rotate_right v n) i = nth v (mod (i + n) size)
+
+  function rotate_left t int : t
+
+  axiom Nth_rotate_left :
+    forall v n i. 0 <= i < size -> 0 <= n ->
+      nth (rotate_left v n) i = nth v (mod (i - n) size)
+
+
+(* Conversions from/to integers *)
+
+  use import Pow2int
 
   constant two_power_size : int
   constant max_int : int
@@ -328,17 +353,16 @@ theory BV_Gen
     forall v n : t.
          to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
 
-  function rotate_right (v n : t) : t
+  function rotate_right_bv (v n : t) : t
 
-  function rotate_left (v n : t) : t
+  function rotate_left_bv (v n : t) : t
 
-  axiom Nth_rotate_left :
-    forall v n i. ult i size_bv -> ult n (sub ones size_bv) ->
-      nth_bv v i = nth_bv (rotate_left v n) (urem (add i n) size_bv)
+  axiom rotate_left_bv_is_rotate_left :
+    forall v n. rotate_left_bv v n = rotate_left v (to_uint n)
 
-  axiom Nth_rotate_right :
-    forall v n i. ult i size_bv -> ult n (sub ones size_bv) ->
-      nth_bv (rotate_right v n) i = nth_bv v (urem (add i n) size_bv)
+  axiom rotate_right_bv_is_rotate_right :
+    forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
+
 
   (* equality axioms *)
 

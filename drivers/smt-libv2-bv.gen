@@ -44,8 +44,8 @@ theory bv.BV64
     "(= ((_ extract 0 0) (bvlshr %1 %2)) (_ bv1 1))"
 *)
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
 end
 
 theory bv.BV32
@@ -57,8 +57,8 @@ theory bv.BV32
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 32)) (_ bv0 32)))"
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
 end
 
 theory bv.BV16
@@ -70,8 +70,8 @@ theory bv.BV16
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 16)) (_ bv0 16)))"
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
 end
 
 theory bv.BV8
@@ -83,8 +83,8 @@ theory bv.BV8
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 8)) (_ bv0 8)))"
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
 end
 
 theory bv.BVConverter_Gen
