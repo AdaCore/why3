@@ -191,7 +191,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= n < s ->
       nth (lsl b s) n = False
 
-  lemma lsl_zero: forall x. lsr x 0 = x
+  lemma lsl_zero: forall x. lsl x 0 = x
 
   use import int.EuclideanDivision
 
