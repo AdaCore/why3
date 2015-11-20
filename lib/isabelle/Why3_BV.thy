@@ -192,12 +192,17 @@ where "lsl v i \<equiv> v << nat i"
 abbreviation (input) lsl_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
 where "lsl_bv v n \<equiv> v << unat n"
 
-abbreviation (input) rotate_left :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
-where "rotate_left v n \<equiv> word_rotl (unat n) v"
+abbreviation (input) rotate_left :: "'a::len0 word \<Rightarrow> int \<Rightarrow> 'a word"
+where "rotate_left v n \<equiv> word_rotl (nat n) v"
 
-abbreviation (input) rotate_right :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
-where "rotate_right v n \<equiv> word_rotr (unat n) v"
+abbreviation (input) rotate_right :: "'a::len0 word \<Rightarrow> int \<Rightarrow> 'a word"
+where "rotate_right v n \<equiv> word_rotr (nat n) v"
 
+abbreviation (input) rotate_left_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
+where "rotate_left_bv v n \<equiv> word_rotl (unat n) v"
+
+abbreviation (input) rotate_right_bv :: "'a::len0 word \<Rightarrow> 'a word \<Rightarrow> 'a word"
+where "rotate_right_bv v n \<equiv> word_rotr (unat n) v"
 
 type_synonym word8 = "8 word"
 
@@ -223,6 +228,8 @@ why3_open "bv/BV8.xml"
     lsl_bv=lsl_bv
     rotate_left=rotate_left
     rotate_right=rotate_right
+    rotate_left_bv=rotate_left_bv
+    rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
     to_uint=uint
