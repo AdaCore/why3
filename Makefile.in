@@ -638,6 +638,7 @@ gallery::
 GALLERYSUBS=avl
 
 gallery-subs::
+	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for d in $(GALLERYSUBS) ; do \
 	  echo "exporting examples/$$d"; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
@@ -654,7 +655,7 @@ gallery-subs::
 	x=$*/why3session.xml; \
 	d=`dirname $$x`; \
 	f=`basename $$d`; \
-	why3 session html $$x; \
+	why3 session html $$d; \
 	echo "exporting $$f"; \
 	mkdir -p $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
@@ -1201,8 +1202,8 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_OPTION_FILES); do \
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
-	for f in $(ISABELLELIBS_BV_FILES); do \
-	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
+#	for f in $(ISABELLELIBS_BV_FILES); do \
+#	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	) > $@
 
 ifeq (@enable_local@,yes)
@@ -1211,7 +1212,8 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
+lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+# $(ISABELLELIBS_BV)
 ifneq (@enable_local@,yes)
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 endif

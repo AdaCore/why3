@@ -336,7 +336,7 @@ why3_vc to_uint_urem
   by (simp add: uint_mod emod_def)
 
 why3_vc Nth_rotate_left
-  using assms rotl_nth [of "unat n" v "unat i"]
+  using assms rotl_nth [of "nat n" v "nat i"]
   apply (simp add: ult_def unat_mod)
   apply (simp only: word_arith_nat_add unat_of_nat)
   apply (simp add: mod_mod_cancel uint_nat)
@@ -401,6 +401,8 @@ why3_open "bv/BV16.xml"
     lsl_bv=lsl_bv
     rotate_left=rotate_left
     rotate_right=rotate_right
+    rotate_left_bv=rotate_left_bv
+    rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
     to_uint=uint
@@ -572,6 +574,8 @@ why3_open "bv/BV32.xml"
     lsl_bv=lsl_bv
     rotate_left=rotate_left
     rotate_right=rotate_right
+    rotate_left_bv=rotate_left_bv
+    rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
     to_uint=uint
@@ -743,6 +747,8 @@ why3_open "bv/BV64.xml"
     lsl_bv=lsl_bv
     rotate_left=rotate_left
     rotate_right=rotate_right
+    rotate_left_bv=rotate_left_bv
+    rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
     to_uint=uint
