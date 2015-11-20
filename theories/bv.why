@@ -228,9 +228,9 @@ theory BV_Gen
   axiom to_int_extensionality:
     forall v,v':t. to_int v = to_int v' -> v = v'
 
-(*
+(**)
   predicate uint_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
-*)
+(**)
 
   axiom to_uint_bounds :
 (*

@@ -8,7 +8,7 @@
 <prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
 <file name="../bv.why" expanded="true">
-<theory name="CheckBV64" sum="3667990497edb88e067efe68d8b0bb8b" expanded="true">
+<theory name="CheckBV64" sum="924d69a2ab94b2c86fe8c9ed16a284ed" expanded="true">
  <goal name="ok_zero" expanded="true">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -246,7 +246,7 @@
  </goal>
  <goal name="f2" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="1.17"/></proof>
+ <proof prover="1"><result status="unknown" time="0.77"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="5.01"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
@@ -323,19 +323,19 @@
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_and" expanded="true">
- <proof prover="0"><result status="valid" time="0.15" steps="164"/></proof>
+ <proof prover="0"><result status="valid" time="0.31" steps="157"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_or" expanded="true">
- <proof prover="0"><result status="valid" time="0.18" steps="190"/></proof>
+ <proof prover="0"><result status="valid" time="0.43" steps="190"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Nth_Bv_bw_xor" expanded="true">
- <proof prover="0"><result status="valid" time="0.54" steps="234"/></proof>
+ <proof prover="0"><result status="valid" time="0.34" steps="234"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -385,7 +385,7 @@
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV32" sum="32c898047541b7dddb4509df1082a714" expanded="true">
+<theory name="CheckBV32" sum="a20bb735a9bd80ad59aa332112583db0" expanded="true">
  <goal name="ok_zero" expanded="true">
  <proof prover="0"><result status="valid" time="0.03" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.03"/></proof>
@@ -553,7 +553,7 @@
  </goal>
  <goal name="smoke1" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1" timelimit="15"><result status="unknown" time="0.43"/></proof>
+ <proof prover="1" timelimit="15"><result status="unknown" time="0.75"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="4.99"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
@@ -588,7 +588,7 @@
  </goal>
  <goal name="smoke6" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.98"/></proof>
+ <proof prover="1"><result status="unknown" time="1.25"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
  <proof prover="3"><result status="timeout" time="4.99"/></proof>
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
@@ -608,7 +608,7 @@
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV16" sum="48ef2f5bab124330528a2a0693742385" expanded="true">
+<theory name="CheckBV16" sum="1e2b04b4b36c64a8073154d136a386e5" expanded="true">
  <goal name="ok_zero" expanded="true">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -804,7 +804,7 @@
  </goal>
  <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="0.78"/></proof>
+ <proof prover="1"><result status="unknown" time="0.53"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="5.01"/></proof>
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
@@ -831,7 +831,7 @@
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV8" sum="a92468f6e69e618390432ba249f6522a" expanded="true">
+<theory name="CheckBV8" sum="a04987af6bd7d770f56a439329cbebc9" expanded="true">
  <goal name="ok_zero" expanded="true">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.05"/></proof>
@@ -1027,7 +1027,7 @@
  </goal>
  <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.51"/></proof>
+ <proof prover="1"><result status="unknown" time="0.72"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="4.99"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
