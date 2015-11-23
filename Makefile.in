@@ -656,6 +656,7 @@ gallery-subs::
 	d=`dirname $$x`; \
 	f=`basename $$d`; \
 	why3 session html $$d; \
+	rm $$d/*.bak; \
 	echo "exporting $$f"; \
 	mkdir -p $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
