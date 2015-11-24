@@ -33,7 +33,7 @@ let mk_itd s f c i = {
 }
 
 let create_alias_decl id args ity =
-  mk_itd (create_itysymbol_alias id args ity) [] [] []
+  mk_itd (create_alias_itysymbol id args ity) [] [] []
 
 let check_field stv f =
   let loc = f.pv_vs.vs_name.id_loc in
@@ -44,26 +44,16 @@ let check_field stv f =
     "This field has non-pure type, it cannot be used \
      in a recursive type definition"
 
-let check_invariant stv svs mfs p =
-  let ptv = t_ty_freevars Stv.empty p in
-  let pvs = t_freevars Mvs.empty p in
-  if not (Stv.subset ptv stv) then Loc.error ?loc:p.t_loc
-    (UnboundTypeVar (Stv.choose (Stv.diff ptv stv)));
-  if not (Mvs.set_submap pvs svs) then Loc.error ?loc:p.t_loc
-    (UnboundVar (fst (Mvs.choose (Mvs.set_diff pvs svs))));
-  if not (Mvs.set_disjoint pvs mfs) then Loc.errorm ?loc:p.t_loc
-    "This invariant of a private type depends on a non-pure field %a"
-    Pretty.print_vs (fst (Mvs.choose (Mvs.set_inter pvs mfs)))
-
-let its_recursive s =
+let its_recursive s = not s.its_nonfree &&
   not s.its_private && not s.its_mutable &&
   s.its_mfields = [] && s.its_regions = [] &&
   List.for_all (fun x -> x) s.its_arg_imm &&
   List.for_all (fun x -> x) s.its_arg_exp &&
   List.for_all (fun x -> x) s.its_arg_vis &&
   List.for_all (fun x -> x) s.its_arg_frz &&
-  s.its_reg_exp = [] && s.its_reg_vis = [] &&
-  s.its_reg_frz = [] && s.its_def = None
+  s.its_reg_imm = [] && s.its_reg_exp = [] &&
+  s.its_reg_vis = [] && s.its_reg_frz = [] &&
+  s.its_def = None
 
 let create_semi_constructor id s fl pjl invl =
   let tvl = List.map ity_var s.its_ts.ts_args in
@@ -86,12 +76,7 @@ let create_plain_record_decl ~priv ~mut id args fldl invl =
   let add_fd fs (fm,fd) = Mpv.add_new exn fd fm fs in
   let flds = List.fold_left add_fd Mpv.empty fldl in
   let fldl = List.map snd fldl in
-  let stv = Stv.of_list args in
-  let mfs = if not priv then Svs.empty else List.fold_left (fun s v ->
-    if v.pv_ity.ity_imm then s else Svs.add v.pv_vs s) Svs.empty fldl in
-  let svs = List.fold_left (fun s v -> Svs.add v.pv_vs s) Svs.empty fldl in
-  List.iter (check_invariant stv svs mfs) invl;
-  let s = create_itysymbol_plain ~priv ~mut id args flds in
+  let s = create_plain_record_itysymbol ~priv ~mut id args flds invl in
   let pjl = List.map (create_projection s) fldl in
   let cl = if priv then [] else if invl <> [] then
     [create_semi_constructor cid s fldl pjl invl] else
@@ -109,29 +94,29 @@ let create_rec_record_decl s fldl =
 
 let create_variant_decl get_its cl =
   let exn = Invalid_argument "Pdecl.create_variant_decl" in
-  let pjl, fds = match cl with
+  let get_pjs (_,fl) = List.fold_left (fun s (p,f) ->
+    if p then Spv.add f s else s) Spv.empty fl in
+  let get_fds (_,fl) = List.fold_left (fun s (_,f) ->
+    Spv.add_new exn f s) Spv.empty fl in
+  let pjl = match cl with
     | cs::cl ->
-        let add_fd (pjs,fds) (pj,f) =
-          (if pj then Spv.add f pjs else pjs), Mpv.add_new exn f false fds in
-        let get_cs (_,fl) = List.fold_left add_fd (Spv.empty,Mpv.empty) fl in
-        let pjs, fds = get_cs cs in
-        let add_cs fds cs = let npjs, nfds = get_cs cs in
-          if Spv.equal pjs npjs then Mpv.set_union fds nfds else raise exn in
-        Spv.elements pjs, List.fold_left add_cs fds cl
+        let pjs = get_pjs cs in
+        List.iter (fun cs ->
+          if not (Spv.equal (get_pjs cs) pjs) then raise exn) cl;
+        Spv.elements pjs
     | [] -> raise exn in
-  let s = get_its fds and constr = List.length cl in
+  let s = get_its (List.map get_fds cl) and constr = List.length cl in
   let mk_cs (cid,fl) = create_constructor ~constr cid s (List.map snd fl) in
   mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs cl) []
 
 let create_plain_variant_decl id args cl =
-  create_variant_decl (fun fds ->
-    create_itysymbol_plain ~priv:false ~mut:false id args fds) cl
+  create_variant_decl (create_plain_variant_itysymbol id args) cl
 
 let create_rec_variant_decl s cl =
   if not (its_recursive s) then invalid_arg "Pdecl.create_rec_variant_decl";
   let stv = Stv.of_list s.its_ts.ts_args in
-  let check_field fd _ = check_field stv fd in
-  create_variant_decl (fun fds -> Mpv.iter check_field fds; s) cl
+  let get_its fdl = List.iter (Spv.iter (check_field stv)) fdl; s in
+  create_variant_decl get_its cl
 
 (** {2 Module declarations} *)
 

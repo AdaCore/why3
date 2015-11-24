@@ -1039,7 +1039,7 @@ and try_cexp uloc env ghost de0 = match de0.de_node with
         | DEapp (de1,de2) -> down de1 (expr uloc env de2 :: el)
         | DEvar (n,_) -> app (ext_c_sym (get_rs env n)) el
         | DErs s -> app (ext_c_sym s) el
-        | DEls _ when not res.ity_imm ->
+        | DEls _ when not (ity_pure res) ->
             Loc.errorm "This expression must have pure type"
         | DEls s -> ext_c_pur s el argl res
         | _ -> app (cexp uloc env ghost de) el in

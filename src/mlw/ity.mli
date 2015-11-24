@@ -17,6 +17,7 @@ open Term
 
 type itysymbol = private {
   its_ts      : tysymbol;       (** logical type symbol *)
+  its_nonfree : bool;           (** has an invariant *)
   its_private : bool;           (** private type *)
   its_mutable : bool;           (** mutable type *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
@@ -24,7 +25,8 @@ type itysymbol = private {
   its_arg_imm : bool list;      (** non-updatable parameters *)
   its_arg_exp : bool list;      (** exposed type parameters *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
-  its_arg_frz : bool list;      (** irreplaceable type parameters *)
+  its_arg_frz : bool list;      (** irreplaceable parameters *)
+  its_reg_imm : bool list;      (** non-updatable components *)
   its_reg_exp : bool list;      (** exposed shareable components *)
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_reg_frz : bool list;      (** irreplaceable shareable components *)
@@ -98,24 +100,31 @@ exception UnboundRegion of region
 
 (** creation of a type symbol in programs *)
 
-val create_itysymbol_plain :
-  priv:bool -> mut:bool -> preid -> tvsymbol list -> bool Mpv.t -> itysymbol
-(** [create_itysymbol_plain ~priv ~mut id args fields] creates a new type
-    symbol for a non-recursive algebraic type, including private and/or
-    mutable records. Every known field is represented by a [pvsymbol]
-    mapped to its mutability status in [fields]. Variables corresponding
-    to mutable fields are stored in the created type symbol and used in
+val create_plain_record_itysymbol : priv:bool -> mut:bool ->
+  preid -> tvsymbol list -> bool Mpv.t -> term list -> itysymbol
+(** [create_plain_record_itysymbol ~priv ~mut id args fields inv] creates
+    a new type symbol for a non-recursive record type, possibly private
+    or mutable. Every known field is represented by a [pvsymbol] mapped
+    to its mutability status in [fields]. Variables corresponding to
+    mutable fields are stored in the created type symbol and used in
     effects. The [priv] flag should be set to [true] for private records.
     The [mut] flag should be set to [true] to mark the new type as mutable
-    even if it does not have known mutable fields. Abstract types are
-    considered to be private immutable records with no fields. *)
+    even if it does not have known mutable fields. The [inv] parameter
+    contains the list of invariant formulas that may only depend on
+    variables from [fields]. Abstract types are considered to be private
+    immutable records with no fields. *)
 
-val create_itysymbol_alias : preid -> tvsymbol list -> ity -> itysymbol
-(** [create_itysymbol_alias id args def] creates a new type alias. *)
+val create_plain_variant_itysymbol :
+  preid -> tvsymbol list -> Spv.t list -> itysymbol
+(** [create_plain_variant_itysymbol id args fields] creates a new type
+    symbol for a non-recursive algebraic type. *)
 
-val create_itysymbol_rec : preid -> tvsymbol list -> itysymbol
-(** [create_itysymbol_rec id args] creates a new type symbol for
+val create_rec_itysymbol : preid -> tvsymbol list -> itysymbol
+(** [create_rec_itysymbol id args] creates a new type symbol for
     a recursively defined type. *)
+
+val create_alias_itysymbol : preid -> tvsymbol list -> ity -> itysymbol
+(** [create_alias_itysymbol id args def] creates a new type alias. *)
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
@@ -141,7 +150,6 @@ val ity_closed : ity -> bool
 
 exception BadItyArity of itysymbol * int
 exception BadRegArity of itysymbol * int
-exception NonUpdatable of itysymbol * ity
 
 val create_region : preid -> itysymbol -> ity list -> ity list -> region
 (** [create_region id s tl rl] creates a fresh region.
@@ -214,8 +222,8 @@ val reg_r_occurs : region -> region -> bool
 val ity_r_reachable : region -> ity -> bool
 val reg_r_reachable : region -> region -> bool
 
-val ity_r_stale : Sreg.t -> 'a Mreg.t -> ity -> bool
-val reg_r_stale : Sreg.t -> 'a Mreg.t -> region -> bool
+val ity_r_stale : Sreg.t -> Sreg.t -> ity -> bool
+val reg_r_stale : Sreg.t -> Sreg.t -> region -> bool
 
 (** {2 Built-in types} *)
 
@@ -300,6 +308,7 @@ val create_xsymbol : preid -> ity -> xsymbol
 exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
+exception IllegalUpdate of pvsymbol * region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol

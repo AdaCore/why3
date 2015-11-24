@@ -386,6 +386,14 @@ let localize_ghost_write v r el =
     Loc.error ?loc (BadGhostWrite (v,r))) el;
   raise (BadGhostWrite (v,r))
 
+(* localize a write into an immutable position *)
+let localize_immut_write v r el =
+  let writes eff = Mreg.mem r eff.eff_writes in
+  List.iter (fun e -> if writes e.e_effect then
+    let loc = e_locate_effect writes e in
+    Loc.error ?loc (IllegalUpdate (v,r))) el;
+  raise (IllegalUpdate (v,r))
+
 (* localize a reset effect *)
 let localize_reset_stale v r el =
   let resets eff =
@@ -407,6 +415,7 @@ let localize_divergence el =
 
 let try_effect el fn x y = try fn x y with
   | BadGhostWrite (v,r) -> localize_ghost_write v r el
+  | IllegalUpdate (v,r) -> localize_immut_write v r el
   | StaleVariable (v,r) -> localize_reset_stale v r el
   | GhostDivergence     -> localize_divergence el
 
@@ -664,6 +673,7 @@ let c_fun args p q xq old ({e_effect = eff} as e) =
   (* reset variables are forbidden in post-conditions *)
   let c = try create_cty args p q xq old eff e.e_ity with
     | BadGhostWrite (v,r) -> localize_ghost_write v r [e]
+    | IllegalUpdate (v,r) -> localize_immut_write v r [e]
     | StaleVariable (v,r) -> localize_reset_stale v r [e] in
   mk_cexp (Cfun e) c
 

@@ -879,7 +879,7 @@ let add_types muc tdl =
                 Hstr.find hts x
             | Qident {id_str = x} when Mstr.mem x alg ->
                 let id, args = Mstr.find x alg in
-                let s = create_itysymbol_rec id args in
+                let s = create_rec_itysymbol id args in
                 Hstr.add hts x s;
 (*              visit ~alias ~alg x (Mstr.find x def); *)
                 s
