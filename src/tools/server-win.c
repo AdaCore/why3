@@ -111,6 +111,14 @@ void shutdown_with_msg(char* msg) {
   logging_shutdown(msg);
 }
 
+void send_msg_to_client(pclient client,
+                        char* id,
+                        unsigned int exitcode,
+                        double cpu_time,
+                        bool timeout,
+                        char* outfile);
+//send msg to [client] about the result of VC [id]
+
 void add_to_completion_port(HANDLE h, ULONG_PTR key) {
    HANDLE tmp = CreateIoCompletionPort(h, completion_port, key, 1);
    if (tmp == NULL) {
@@ -367,7 +375,15 @@ void run_request (prequest r) {
                      &si,
                      &pi)) {
        log_msg(cmd);
-       shutdown_with_msg("error when running CreateProcess");
+       CloseHandle(outfilehandle);
+       CloseHandle(ghJob);
+       send_msg_to_client(client,
+                          r->id,
+                          0,
+                          0,
+                          0,
+                          outfile);
+      return;
    }
    if (!AssignProcessToJobObject(ghJob,pi.hProcess)) {
      shutdown_with_msg("failed to assign process to job object");
