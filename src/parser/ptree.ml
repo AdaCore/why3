@@ -27,7 +27,7 @@ type quant =
   | Tforall | Texists | Tlambda
 
 type binop =
-  | Tand | Tand_asym | Tor | Tor_asym | Timplies | Tiff
+  | Tand | Tand_asym | Tor | Tor_asym | Timplies | Tiff | Tby | Tso
 
 type unop =
   | Tnot
