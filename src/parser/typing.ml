@@ -313,9 +313,9 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       let e2 = dterm uc gvars denv e2 in
       let k op = DTbinop (op, e1, e2) in
       let et () =
-        let loc = e1.dt_loc in
+        let loc = e2.dt_loc in
         let top = Dterm.dterm ?loc DTtrue in
-        Dterm.dterm ?loc (DTbinop (DTor_asym,e1,top)) in
+        Dterm.dterm ?loc (DTbinop (DTor_asym,e2,top)) in
       begin match op with
       | Ptree.Tand -> k DTand
       | Ptree.Tand_asym -> k DTand_asym
@@ -323,8 +323,8 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       | Ptree.Tor_asym -> k DTor_asym
       | Ptree.Timplies -> k DTimplies
       | Ptree.Tiff -> k DTiff
-      | Ptree.Tby -> DTbinop (DTimplies, et (), e2)
-      | Ptree.Tso -> DTbinop (DTand, e2,et ())
+      | Ptree.Tby -> DTbinop (DTimplies, et (), e1)
+      | Ptree.Tso -> DTbinop (DTand, e1,et ())
       end
   | Ptree.Tquant (q, uqu, trl, e1) ->
       let qvl = List.map (quant_var uc) uqu in
