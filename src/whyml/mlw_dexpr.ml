@@ -937,7 +937,7 @@ let check_user_effect ?ps e spec args dsp =
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect" in
   if dsp.ds_checkrw then begin
-    let reads = Spv.remove Mlw_wp.pv_old e.e_syms.syms_pv in
+    let reads = Spv.remove Mlw_decl.pv_old e.e_syms.syms_pv in
     let reads = Spv.diff reads (spec_pvset Spv.empty spec) in
     Spv.iter check_read (Spv.diff reads args);
     Sreg.iter check_write eeff.eff_writes;

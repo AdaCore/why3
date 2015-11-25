@@ -3,165 +3,157 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
 <file name="../bitvectors.why" expanded="true">
-<theory name="TestBV" sum="e016325049a7116c37a2cb173b273bf5" expanded="true">
+<theory name="TestBV" sum="4865db8e2eaaed56c326f2db4d1f8135" expanded="true">
  <goal name="g1">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="f1">
+ <goal name="f1" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="3.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="4.97"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
  <goal name="g2">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="f2">
+ <goal name="f2" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="3.10"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="5.01"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
  <goal name="g3">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g4">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g3a">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g3b">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="f3c" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="timeout" time="4.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="g3aa">
+ <goal name="g3aa" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="1.32"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="g3bb">
+ <goal name="g3bb" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.50"/></proof>
  <proof prover="2"><result status="unknown" time="0.03"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="f3cc">
+ <goal name="f3cc" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="3.60"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
  <goal name="g4a">
- <proof prover="0"><result status="valid" time="0.14" steps="164"/></proof>
+ <proof prover="0"><result status="valid" time="0.14" steps="85"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g4b">
- <proof prover="0"><result status="valid" time="0.28" steps="164"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="85"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g4aa" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="3.26"/></proof>
+ <proof prover="2"><result status="unknown" time="0.00"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="g4bb">
+ <goal name="g4bb" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.63"/></proof>
+ <proof prover="2"><result status="unknown" time="0.00"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
  <goal name="g5a">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g5b">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g5aa">
+ <goal name="g5aa" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="1.36"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="g5bb">
+ <goal name="g5bb" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="1.92"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
  <goal name="g6a">
- <proof prover="0"><result status="valid" time="0.03" steps="75"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="72"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g6b">
- <proof prover="0"><result status="valid" time="0.02" steps="75"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g7a">
+ <goal name="g7a" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="2.51"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="4.92"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="g7b">
+ <goal name="g7b" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="1.94"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
  <goal name="g8a">
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="g8b">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g8aa">
+ <goal name="g8aa" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="5.03"/></proof>
+ <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="g8bb">
+ <goal name="g8bb" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
  <goal name="gtt">
- <proof prover="0"><result status="valid" time="0.13" steps="125"/></proof>
+ <proof prover="0"><result status="valid" time="0.13" steps="80"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="gttt">
+ <goal name="gttt" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="1.98"/></proof>
+ <proof prover="2"><result status="unknown" time="0.02"/></proof>
+ <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
  <goal name="not_not">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="not_and">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
 </file>

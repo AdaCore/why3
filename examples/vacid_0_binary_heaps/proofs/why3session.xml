@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="0"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" memlimit="0"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="3" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Spass" version="3.7" timelimit="10" memlimit="0"/>
@@ -16,9 +16,9 @@
 <prover id="16" name="Alt-Ergo" version="0.99.1" timelimit="3" memlimit="1000"/>
 <prover id="17" name="Eprover" version="1.8-001" timelimit="10" memlimit="0"/>
 <file name="../heapsort.mlw">
-<theory name="HeapSort" sum="0011415fa841e7181538a01d09bd9faf">
+<theory name="HeapSort" sum="b7357fb30d1c45e86360d924e72ce6fc">
  <goal name="Min_of_sorted">
- <proof prover="0" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.11"/></proof>
+ <proof prover="1" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.11"/></proof>
  </goal>
  <goal name="WP_parameter heapSort" expl="VC for heapSort">
  <transf name="split_goal_wp">
@@ -290,7 +290,7 @@
  <proof prover="16" timelimit="5" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="Is_heap_relation">
- <proof prover="0" edited="heap_Heap_Is_heap_relation_1.v"><result status="valid" time="0.86"/></proof>
+ <proof prover="1" edited="heap_Heap_Is_heap_relation_1.v"><result status="valid" time="0.86"/></proof>
  </goal>
 </theory>
 </file>
@@ -315,7 +315,7 @@
 </theory>
 </file>
 <file name="../test_harness.mlw">
-<theory name="TestHarness" sum="da17f8d54ce784bfb5f060dc3fd820ea">
+<theory name="TestHarness" sum="042445c1246c83a0d5b43c7b15cd4003">
  <goal name="WP_parameter testHarness" expl="VC for testHarness">
  <transf name="split_goal_wp">
   <goal name="WP_parameter testHarness.1" expl="1. array creation size">
@@ -394,10 +394,10 @@
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Elements_union">
- <proof prover="0" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.92"/></proof>
+ <proof prover="1" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.92"/></proof>
  </goal>
  <goal name="Elements_add1">
- <proof prover="0" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.86"/></proof>
+ <proof prover="1" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.86"/></proof>
  <proof prover="10" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Elements_remove_last">
@@ -407,13 +407,13 @@
  <proof prover="17" timelimit="12"><result status="valid" time="0.25"/></proof>
  </goal>
  <goal name="Occ_elements">
- <proof prover="0" timelimit="3" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.93"/></proof>
+ <proof prover="1" timelimit="3" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.93"/></proof>
  </goal>
  <goal name="Elements_set_outside">
- <proof prover="0" timelimit="30" edited="elements_Elements_Elements_set_outside_1.v"><result status="valid" time="1.09"/></proof>
+ <proof prover="1" timelimit="30" edited="elements_Elements_Elements_set_outside_1.v"><result status="valid" time="1.09"/></proof>
  </goal>
  <goal name="Elements_set_inside">
- <proof prover="0" timelimit="30" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="1.01"/></proof>
+ <proof prover="1" timelimit="30" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="1.01"/></proof>
  </goal>
  <goal name="Elements_set_inside2">
  <proof prover="15" memlimit="0"><result status="valid" time="0.06"/></proof>
@@ -422,9 +422,9 @@
 </theory>
 </file>
 <file name="../heap_implem.mlw">
-<theory name="Implementation" sum="cef03ce8ce6cd46a4f64086c14b1969e">
+<theory name="Implementation" sum="bf31488f3ab964de1e65dc19dd58eccf">
  <goal name="Is_heap_min">
- <proof prover="0" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.98"/></proof>
+ <proof prover="1" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -552,7 +552,7 @@
   <proof prover="16" timelimit="30" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.2" expl="2. assertion">
-  <proof prover="0" timelimit="3" edited="heap_implem_WP_Implementation_WP_parameter_extractMin_3.v"><result status="valid" time="1.15"/></proof>
+  <proof prover="1" timelimit="3" edited="heap_implem_WP_Implementation_WP_parameter_extractMin_3.v"><result status="valid" time="0.91"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.3" expl="3. loop invariant init">
   <transf name="split_goal_wp">
@@ -1001,7 +1001,7 @@
  <proof prover="17" timelimit="18"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="Model_set">
- <proof prover="0" edited="heap_model_Model_Model_set_1.v"><result status="valid" time="1.02"/></proof>
+ <proof prover="1" edited="heap_model_Model_Model_set_1.v"><result status="valid" time="1.02"/></proof>
  </goal>
  <goal name="Model_add_last">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>

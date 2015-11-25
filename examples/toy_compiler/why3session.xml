@@ -12,13 +12,13 @@
 </theory>
 <theory name="StackMachine" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Compiler" sum="6acf050ddf3769e01738e37ea9befce1" expanded="true">
+<theory name="Compiler" sum="1141ac4b4db1758507a7060c9a16a1f7" expanded="true">
  <goal name="WP_parameter soundness_gen" expl="VC for soundness_gen" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter soundness_gen.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.57"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="45"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.2" expl="2. postcondition">
@@ -28,60 +28,60 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.4" expl="4. variant decrease">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="38"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.26"/></proof>
+  <proof prover="3"><result status="valid" time="0.26" steps="153"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.6" expl="6. variant decrease">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.7" expl="7. variant decrease">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="38"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.8" expl="8. postcondition">
-  <proof prover="3"><result status="valid" time="0.31"/></proof>
+  <proof prover="3"><result status="valid" time="0.31" steps="169"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.9" expl="9. variant decrease">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.10" expl="10. variant decrease">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="38"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter soundness_gen.11" expl="11. postcondition">
-  <proof prover="3"><result status="valid" time="0.40"/></proof>
+  <proof prover="3"><result status="valid" time="0.40" steps="169"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter soundness" expl="VC for soundness" expanded="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.82"/></proof>
- <proof prover="3"><result status="valid" time="0.03"/></proof>
- <proof prover="4"><result status="valid" time="0.24"/></proof>
+ <proof prover="2"><result status="valid" time="0.13"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="15"/></proof>
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
 </file>

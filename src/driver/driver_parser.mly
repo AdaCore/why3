@@ -28,7 +28,7 @@
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
 %token BLACKLIST
 %token MODULE EXCEPTION VAL CONVERTER
-%token FUNCTION PREDICATE TYPE PROP FILENAME TRANSFORM PLUGIN
+%token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
 %token LEFTPAR_STAR_RIGHTPAR COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
 
@@ -90,6 +90,7 @@ trule:
 | syntax PREDICATE qualid STRING { Rsyntaxps  ($3, $4, $1) }
 | syntax CONVERTER qualid STRING { Rconverter ($3, $4, $1) }
 | REMOVE PROP qualid             { Rremovepr  ($3) }
+| REMOVE ALL                     { Rremoveall }
 | META ident meta_args           { Rmeta      ($2, $3) }
 | META STRING meta_args          { Rmeta      ($2, $3) }
 

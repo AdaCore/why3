@@ -424,8 +424,8 @@ fun read_decl ctxt = variant
          (get_name'' atts, expand_cases ctxt (read_prop ctxt t)))) xs))];
 
 fun rename_const ps = map_aterms
-  (fn t as Const (s, T) => (case AList.lookup (op =) ps s of
-          SOME s' => Free (s', T)
+  (fn t as Const (p as (_, T)) => (case AList.lookup (op =) ps p of
+          SOME s => Free (s, T)
         | NONE => t)
     | t => t);
 
@@ -490,10 +490,10 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
              add_const s,
              true)
         | SOME [th] =>
-            let val (s', _) = head_of_eqn' (Thm.prop_of th)
+            let val p as (s', _) = head_of_eqn' (Thm.prop_of th)
               handle TERM _ => error ("Bad equation for " ^ string_of_id id)
             in
-              if Pattern.matches thy (rename_const [(s', s)] (Thm.prop_of th), eqn)
+              if Pattern.matches thy (rename_const [(p, s)] (Thm.prop_of th), eqn)
               then (add_const_raw NONE (s, s') thy, false)
               else error ("Failed to match definition " ^ string_of_id id)
             end
@@ -552,7 +552,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
        | SOME preds' =>
            let val cmap = map (fn (((s, id), _, _), th :: _) =>
              (th |> Thm.concl_of |> HOLogic.dest_Trueprop |> head_of |>
-              dest_Const |> fst handle TERM _ =>
+              dest_Const handle TERM _ =>
                 error ("Bad introduction rule for " ^ string_of_id id),
               s)) preds'
            in
@@ -563,7 +563,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
                    (intrs, intrs')
                then ()
                else error ("Failed to match predicate " ^ string_of_id id)) preds';
-             (fold (add_const_raw NONE o swap) cmap thy, false)
+             (fold (add_const_raw NONE o swap o apfst fst) cmap thy, false)
            end)
   | mk_decl _ (Function eqnss) thy =
       let val eqnss' = map (head_of_eqn o hd o snd) eqnss
@@ -578,7 +578,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
              true)
         | SOME eqnss'' =>
             let val cmap = map2 (fn ((id, _), th :: _) => fn (s, _) =>
-              (th |> Thm.prop_of |> head_of_eqn' |> fst handle TERM _ =>
+              (th |> Thm.prop_of |> head_of_eqn' handle TERM _ =>
                  error ("Bad equation for " ^ string_of_id id),
                s)) eqnss'' eqnss'
             in
@@ -589,7 +589,7 @@ fun mk_decl _ (Axiom ((s, id), ts)) thy =
                     (eqns, eqns')
                 then ()
                 else error ("Failed to match function " ^ string_of_id id)) eqnss'';
-              (fold (add_const_raw NONE o swap) cmap thy, false)
+              (fold (add_const_raw NONE o swap o apfst fst) cmap thy, false)
             end
       end
   | mk_decl _ _ thy = (thy, true);

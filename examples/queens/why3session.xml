@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="0"/>
 <prover id="1" name="CVC4" version="1.2" timelimit="25" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.4pl6" timelimit="5" memlimit="0"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="6" name="CVC3" version="2.2" timelimit="10" memlimit="0"/>
 <prover id="7" name="Z3" version="4.3.1" timelimit="25" memlimit="1000"/>
@@ -14,7 +14,7 @@
 <file name="../queens.mlw" expanded="true">
 <theory name="S" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="NQueensSetsTermination" sum="0cd363eba6077e51a128137dd8ae8a0f" expanded="true">
+<theory name="NQueensSetsTermination" sum="b44f56b69863b041a34e03255cab618a" expanded="true">
  <goal name="WP_parameter t" expl="VC for t">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t.1" expl="1. loop invariant init">
@@ -54,7 +54,7 @@
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="NQueensSets" sum="f02f1fe1a41ccc26bfe52023c4a32dab" expanded="true">
+<theory name="NQueensSets" sum="8441d968bed235b87289f0fdcd9a077e" expanded="true">
  <goal name="WP_parameter t3" expl="VC for t3">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t3.1" expl="1. loop invariant init">
@@ -105,7 +105,7 @@
    <proof prover="11" timelimit="5"><result status="valid" time="0.28" steps="290"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.7" expl="7. VC for t3">
-   <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"><result status="valid" time="1.76"/></proof>
+   <proof prover="3" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"><result status="valid" time="1.76"/></proof>
    <proof prover="10"><result status="valid" time="2.08" steps="621"/></proof>
    <proof prover="11"><result status="valid" time="0.30" steps="290"/></proof>
    </goal>
@@ -113,14 +113,14 @@
    <proof prover="11"><result status="valid" time="0.49" steps="383"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.9" expl="9. VC for t3">
-   <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"><result status="valid" time="3.15"/></proof>
+   <proof prover="3" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"><result status="valid" time="2.71"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.10" expl="10. VC for t3">
    <proof prover="1"><result status="valid" time="0.11"/></proof>
    <proof prover="11"><result status="valid" time="0.16" steps="172"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.11" expl="11. VC for t3">
-   <proof prover="0" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"><result status="valid" time="2.91"/></proof>
+   <proof prover="3" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"><result status="valid" time="2.91"/></proof>
    </goal>
    <goal name="WP_parameter t3.3.12" expl="12. VC for t3">
    <transf name="inline_goal">
@@ -180,10 +180,10 @@
    <proof prover="6"><result status="valid" time="0.18"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.6" expl="6. VC for t3">
-   <proof prover="0" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"><result status="valid" time="2.87"/></proof>
+   <proof prover="3" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"><result status="valid" time="2.87"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.7" expl="7. VC for t3">
-   <proof prover="0" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"><result status="valid" time="1.60"/></proof>
+   <proof prover="3" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"><result status="valid" time="1.60"/></proof>
    </goal>
    <goal name="WP_parameter t3.4.8" expl="8. VC for t3">
    <proof prover="6" timelimit="55"><result status="valid" time="3.70"/></proof>
@@ -243,7 +243,7 @@
    <proof prover="11"><result status="valid" time="0.01" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.5" expl="5. VC for t3">
-   <proof prover="0" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_2.v"><result status="valid" time="2.02"/></proof>
+   <proof prover="3" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_2.v"><result status="valid" time="1.68"/></proof>
    </goal>
    <goal name="WP_parameter t3.6.6" expl="6. VC for t3">
    <proof prover="1"><result status="valid" time="0.02"/></proof>

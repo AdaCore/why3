@@ -33,6 +33,9 @@ let () = reset_gc ()
 
 let debug = Debug.lookup_flag "ide_info"
 
+let debug_show_text_cntexmp = Debug.register_info_flag "show_text_cntexmp"
+  ~desc:"Print@ textual@ counterexample@ before@ printing@ counterexample@ interleaved@ with@ cource@ code."
+
 (************************)
 (* parsing command line *)
 (************************)
@@ -50,6 +53,7 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<file> add file to the project (ignored if it is already there)";
 *)
+  Termcode.arg_extra_expl_prefix
 ]
 
 let usage_str = sprintf
@@ -502,7 +506,7 @@ let set_proof_state a =
           a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
-  (* TODO find a better way to signal arhived row *)
+  (* TODO find a better way to signal archived row *)
   let t = if a.S.proof_archived then t ^ " (archived)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
 
@@ -578,6 +582,11 @@ let goal_task_text g =
   else
     task_text (S.goal_task g)
 
+let file_contents f =
+  try
+    Sysutil.file_contents f
+  with Invalid_argument s -> s
+
 let update_tabs a =
   let task_text =
     match a with
@@ -595,7 +604,7 @@ let update_tabs a =
         let env = env_session () in
         match S.get_edited_as_abs env.S.session a with
         | None -> ""
-        | Some f -> Sysutil.file_contents f
+        | Some f -> file_contents f
       end
     | _ -> ""
   in
@@ -643,13 +652,19 @@ let update_tabs a =
         match a.S.proof_state with
 	  | S.Done r ->
 	    if not (Model_parser.is_model_empty r.Call_provers.pr_model) then begin
-	      "Counterexample:\n" ^
-		(Model_parser.model_to_string r.Call_provers.pr_model) ^
-		"\n\nSource code interleaved with counterexample:" ^
+	      let cntexample_text =
+		if Debug.test_flag debug_show_text_cntexmp then
+		  "Counterexample:\n" ^
+		    (Model_parser.model_to_string r.Call_provers.pr_model) ^
+		    "\n\nSource code interleaved with counterexample:"
+		else
+		  "" in
+	      let cntexample_text = cntexample_text ^
 		(Model_parser.interleave_with_source
 		   r.Call_provers.pr_model
 		   ~filename:!current_file
-		   ~source_code:(Sysutil.file_contents !current_file))
+		   ~source_code:(file_contents !current_file)) in
+	      cntexample_text
 	    end else
 	      ""
 	  | _ -> ""
@@ -670,6 +685,7 @@ let update_tabs a =
   edited_view#scroll_to_mark `INSERT;
   output_view#source_buffer#set_text output_text;
   counterexample_view#source_buffer#set_text counterexample_text;
+  counterexample_view#scroll_to_mark `INSERT;
 
 
 
@@ -1961,7 +1977,7 @@ let scroll_to_file f =
         then why_lang else any_lang f
       in
       source_view#source_buffer#set_language lang;
-      source_view#source_buffer#set_text (Sysutil.file_contents f);
+      source_view#source_buffer#set_text (file_contents f);
       set_current_file f;
     end
 

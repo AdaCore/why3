@@ -41,6 +41,13 @@ and pdecl_node = private
   | PDrec  of fun_defn list
   | PDexn  of xsymbol
 
+(** {2 Marks} *)
+
+val ts_mark : Ty.tysymbol
+val ty_mark : Ty.ty
+val ity_mark : ity
+val pv_old : pvsymbol
+
 (** {2 Declaration constructors} *)
 
 type pre_field = preid option * field

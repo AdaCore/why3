@@ -4,9 +4,10 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<file name="../specs.mlw">
-<theory name="VM_instr_spec" sum="0026ac60532458ef2c1820e41513949a">
+<file name="../specs.mlw" expanded="true">
+<theory name="VM_instr_spec" sum="35c896b28352ff0d938e2fb239a6d705" expanded="true">
  <goal name="WP_parameter ifunf" expl="VC for ifunf">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ifunf.1" expl="1. assertion">
@@ -136,7 +137,7 @@
     <goal name="WP_parameter inil.1.2.1" expl="1. VC for inil">
     <transf name="compute_specified">
      <goal name="WP_parameter inil.1.2.1.1" expl="1. VC for inil">
-     <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
+     <proof prover="2"><result status="valid" time="0.06"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1187,7 +1188,7 @@
    <goal name="WP_parameter isetvarf.4.1" expl="1. VC for isetvarf">
    <transf name="compute_specified">
     <goal name="WP_parameter isetvarf.4.1.1" expl="1. VC for isetvarf">
-    <proof prover="3"><result status="valid" time="0.25" steps="36"/></proof>
+    <proof prover="3"><result status="valid" time="0.12" steps="36"/></proof>
     </goal>
    </transf>
    </goal>

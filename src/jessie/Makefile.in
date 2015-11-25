@@ -52,7 +52,7 @@ tests: tests/ptests_config
 tests/ptests_config: Makefile
 	rm -rf tests/ptests_config
 	echo "DEFAULT_SUITES="$(TESTS) > tests/ptests_config
-	echo "TOPLEVEL_PATH="$(FRAMAC_TOPLEVEL) >> tests/ptests_config
+	echo "TOPLEVEL_PATH=$(FRAMAC_TOPLEVEL) -load-module ./Jessie3.cma" >> tests/ptests_config
 	echo "FRAMAC_SHARE="$(FRAMAC_SHARE) >> tests/ptests_config
 	echo "FRAMAC_PLUGIN=." >> tests/ptests_config
 	echo "FRAMAC_PLUGIN_GUI=./gui" >> tests/ptests_config
@@ -64,3 +64,5 @@ clean:
 	rm -f $(addsuffix .cmo, $(MODULES))
 	rm -f $(addsuffix .cmx, $(MODULES))
 	rm -f Jessie3.cma Jessie3.cmxs
+
+register.cmx: ACSLtoWhy3.cmx

@@ -11,7 +11,7 @@
 <prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <file name="../sudoku.mlw" expanded="true">
-<theory name="Grid" sum="18456e55a9756c842f02c171147a1cbc" expanded="true">
+<theory name="Grid" sum="dd1d50eda582d7f4d6d542b0712fe253" expanded="true">
  <goal name="grid_eq_sub">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -32,13 +32,13 @@
  <proof prover="5"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" sum="b451697fae2946d32627d0735c184fe3" expanded="true">
+<theory name="TheClassicalSudokuGrid" sum="be8917526b56185d0131e65ea0a7e8dc" expanded="true">
  <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku">
- <proof prover="2" timelimit="6"><result status="valid" time="1.10"/></proof>
- <proof prover="3" timelimit="6"><result status="valid" time="1.06"/></proof>
+ <proof prover="2" timelimit="6"><result status="valid" time="0.78"/></proof>
+ <proof prover="3" timelimit="6"><result status="valid" time="0.71"/></proof>
  </goal>
 </theory>
-<theory name="Solver" sum="b1bec1641773a564052d7886b9a23fa3" expanded="true">
+<theory name="Solver" sum="1d6790a01a7467a84a2c94984a1a7f39" expanded="true">
  <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
  <transf name="split_goal_wp">
   <goal name="WP_parameter check_valid_chunk.1" expl="1. index in array bounds">
@@ -508,7 +508,7 @@
   </goal>
   <goal name="WP_parameter solve_aux.53" expl="53. assertion">
   <proof prover="2" timelimit="30"><result status="valid" time="0.17"/></proof>
-  <proof prover="3" timelimit="30"><result status="valid" time="0.46"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="WP_parameter solve_aux.54" expl="54. variant decrease">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -573,7 +573,7 @@
   </goal>
   <goal name="WP_parameter solve_aux.63" expl="63. loop invariant preservation">
   <proof prover="4"><result status="valid" time="2.99" steps="192"/></proof>
-  <proof prover="5"><result status="valid" time="0.94"/></proof>
+  <proof prover="5"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="WP_parameter solve_aux.64" expl="64. exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.32"/></proof>
@@ -588,7 +588,7 @@
   <goal name="WP_parameter solve_aux.66" expl="66. assertion">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="2"><result status="valid" time="0.47"/></proof>
-  <proof prover="3"><result status="valid" time="0.56"/></proof>
+  <proof prover="3"><result status="valid" time="0.36"/></proof>
   <proof prover="4"><result status="valid" time="0.18" steps="89"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -612,8 +612,8 @@
   </goal>
   <goal name="WP_parameter solve_aux.71" expl="71. assertion">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.54"/></proof>
-  <proof prover="3"><result status="valid" time="0.85"/></proof>
+  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  <proof prover="3"><result status="valid" time="0.60"/></proof>
   <proof prover="4"><result status="valid" time="0.16" steps="84"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -639,7 +639,7 @@
   <goal name="WP_parameter solve_aux.76" expl="76. assertion">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.37"/></proof>
-  <proof prover="3"><result status="valid" time="0.75"/></proof>
+  <proof prover="3"><result status="valid" time="0.33"/></proof>
   <proof prover="4"><result status="valid" time="0.16" steps="79"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -701,7 +701,7 @@
  <proof prover="4"><result status="valid" time="0.10" steps="48"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="8351ae643fa75ec6f93e5f543be80ac2" expanded="true">
+<theory name="Test" sum="af6a17d261da76da02f8f97ef561bb9c" expanded="true">
  <goal name="WP_parameter test0" expl="VC for test0">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>

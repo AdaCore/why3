@@ -18,6 +18,7 @@ open Theory
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
+open Mlw_decl
 
 let debug = Debug.register_info_flag "whyml_wp"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
@@ -31,11 +32,6 @@ let no_eval = Debug.register_flag "wp_no_eval"
 let lemma_label = Ident.create_label "why3:lemma"
 
 (** Marks *)
-
-let ts_mark = create_tysymbol (id_fresh "'mark") [] None
-let ty_mark = ty_app ts_mark []
-
-let ity_mark = ity_pur ts_mark []
 
 let fresh_mark () = create_vsymbol (id_fresh "'mark") ty_mark
 
@@ -70,7 +66,6 @@ let e_now = e_ghost (e_lapp fs_now [] (ity_pur ts_mark []))
 
 (* [vs_old] appears in the postconditions given to the core API,
    which expects every vsymbol to be a pure part of a pvsymbol *)
-let pv_old = create_pvsymbol ~ghost:true (id_fresh "%old") ity_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 

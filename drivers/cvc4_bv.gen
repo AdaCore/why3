@@ -5,74 +5,22 @@ theory bv.BV64
   syntax function of_int "((_ int2bv 64) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 64)) (+ (- 18446744073709551616) (bv2nat %1)) (bv2nat %1))"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-  remove prop to_int_extensionality
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end
 
 theory bv.BV32
   syntax function of_int "((_ int2bv 32) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 32)) (+ (- 4294967296) (bv2nat %1)) (bv2nat %1))"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-  remove prop to_int_extensionality
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end
 
 theory bv.BV16
   syntax function of_int "((_ int2bv 16) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 16)) (+ (- 65536) (bv2nat %1)) (bv2nat %1))"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-  remove prop to_int_extensionality
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end
 
 theory bv.BV8
   syntax function of_int "((_ int2bv 8) %1)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (bvslt %1 (_ bv0 8)) (+ (- 256) (bv2nat %1)) (bv2nat %1))"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-  remove prop to_int_extensionality
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end

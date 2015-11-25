@@ -132,7 +132,7 @@ let why3_prove theories =
     Stdlib.Mstr.fold
       (fun thname th acc ->
         let tasks = Task.split_theory th None None in
-        let tasks = List.map
+        let tasks = List.rev_map
           (fun t ->
             let (id,expl,_) = Termcode.goal_expl_task ~root:true t in
             let expl = match expl with
@@ -278,10 +278,12 @@ let add_why3_cmd buttonname f input_lang =
     (fun _ev ->
       let global = Js.Unsafe.global in
       let editor = Js.Unsafe.get global (Js.string "editor") in
-      let lang =
+      let lang = "en"
+(*
         Js.to_string
           (Js.Unsafe.meth_call editor "getAttribute"
              [| Js.Unsafe.inject (Js.string "lang") |])
+*)
       in
       let code = Js.to_string (Js.Unsafe.meth_call editor "getValue" [| |]) in
       log ("Why3 is running, lang = " ^ lang);

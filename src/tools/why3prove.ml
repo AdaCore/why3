@@ -139,11 +139,12 @@ let option_list = [
   "--print-theory", Arg.Set opt_print_theory,
       " print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
-      " print namespaces of selected theories"; 
+      " print namespaces of selected theories";
   Debug.Args.desc_shortcut
     "parse_only" "--parse-only" " stop after parsing";
   Debug.Args.desc_shortcut
     "type_only" "--type-only" " stop after type checking";
+  Termcode.arg_extra_expl_prefix;
   "--get-ce", Arg.Set opt_cntexmp,
       " gets the counter-example model" ]
 

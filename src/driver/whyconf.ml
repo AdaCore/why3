@@ -271,7 +271,7 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
-    cntexample = true;
+    cntexample = false;  (* no counter-examples by default *)
   }
 
 let default_main =

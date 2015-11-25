@@ -11,7 +11,6 @@ model_parser "smtv2"
 
 
 import "smt-libv2.drv"
-import "smt-libv2-bv.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -84,67 +83,19 @@ end
 theory bv.BV64
   syntax converter of_int "((_ int2bv 64) %1)"
   syntax function to_uint "(bv2int %1)"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end
 
 theory bv.BV32
   syntax converter of_int "((_ int2bv 32) %1)"
   syntax function to_uint "(bv2int %1)"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end
 
 theory bv.BV16
   syntax converter of_int "((_ int2bv 16) %1)"
   syntax function to_uint "(bv2int %1)"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end
 
 theory bv.BV8
   syntax converter of_int "((_ int2bv 8) %1)"
   syntax function to_uint "(bv2int %1)"
-  remove prop to_uint_of_int
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
 end

@@ -154,6 +154,12 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
         add_meta th td meta
+    | Rremoveall ->
+      let it key _ = match (Mid.find key th.th_known).d_node with
+        | Dprop (_,symb,_) -> add_meta th (remove_prop symb) meta
+        | _ -> ()
+      in
+      Mid.iter it th.th_local
     | Rconverter (q,s,b) ->
         let cs = syntax_converter (find_ls th q) s b in
         add_meta th cs meta

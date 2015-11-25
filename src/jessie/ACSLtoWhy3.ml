@@ -421,9 +421,9 @@ let bound_vars = Hashtbl.create 257
 let create_lvar v =
   let id = Ident.id_fresh v.lv_name in
   let vs = Term.create_vsymbol id (logic_type v.lv_type) in
-(*
+(**)
   Self.result "create logic variable %d" v.lv_id;
-*)
+(**)
   Hashtbl.add bound_vars v.lv_id vs;
   vs
 
@@ -437,13 +437,13 @@ let get_lvar lv =
 let program_vars = Hashtbl.create 257
 
 let create_var_full v =
+(**)
+ Self.result "create program variable %s (%d)" v.vname v.vid;
+(**)
   let id = Ident.id_fresh v.vname in
   let ty,def = ctype_and_default v.vtype in
   let def = Mlw_expr.e_app (mk_ref ty) [def] in
   let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
-(*
-  Self.result "create program variable %s (%d)" v.vname v.vid;
-*)
   Hashtbl.add program_vars v.vid (vs,true,ty);
   let_defn,vs
 
@@ -949,12 +949,12 @@ let binop op e1 e2 =
 let unop op e =
   let ls,ty,ty' =
     match op with
-      | Neg -> (** Unary minus *)
+      | Neg -> (* Unary minus *)
         Self.not_yet_implemented "unop Neg"
       (*        neg32_fun, mlw_int32_type, mlw_int32_type*)
-      | BNot -> (** Bitwise complement (~) *)
+      | BNot -> (* Bitwise complement (~) *)
         Self.not_yet_implemented "unop BNot"
-      | LNot -> (** Logical Not (!) *)
+      | LNot -> (* Logical Not (!) *)
         Self.not_yet_implemented "unop LNot"
   in
   Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty] ty') [e]
@@ -1299,15 +1299,20 @@ let global (theories,lemmas,functions) g =
      let sym = Mlw_expr.LetV pv in
      (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
 
-    | GVarDecl(_funspec,vi,_location) ->
+    | GFunDecl(_funspec,vi,_location) ->
       begin match vi.vname with
         | "Frama_C_bzero" | "Frama_C_copy_block" ->
           (theories,lemmas,functions)
         | _ ->
-          let _,pv = create_var_full vi in
-          let sym = Mlw_expr.LetV pv in
-          (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
+(*
+          let f = fundecl vi in
+ *)
+          (theories,lemmas,functions)
       end
+    | GVarDecl(vi,_location) ->
+       let _,pv = create_var_full vi in
+       let sym = Mlw_expr.LetV pv in
+       (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
     | GAnnot (a, loc) ->
       let (t,l) = logic_decl ~in_axiomatic:false a loc (theories,lemmas) in
       (t,l,functions)
