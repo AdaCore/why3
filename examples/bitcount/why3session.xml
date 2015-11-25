@@ -5,11 +5,10 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="30" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="30" memlimit="1000"/>
 <file name="../bitcount.mlw" expanded="true">
-<theory name="BitCount8bit_fact" sum="5751fad0b4d740cb2042ca2423c25c5e">
+<theory name="BitCount8bit_fact" sum="5751fad0b4d740cb2042ca2423c25c5e" expanded="true">
  <goal name="nth_as_bv_is_int">
  <proof prover="0"><result status="valid" time="0.18" steps="95"/></proof>
  </goal>
@@ -73,7 +72,7 @@
    <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="WP_parameter step2.5.5" expl="5. assertion">
-   <proof prover="5" timelimit="30"><result status="valid" time="7.94"/></proof>
+   <proof prover="5"><result status="valid" time="7.94"/></proof>
    </goal>
   </transf>
   </goal>
@@ -138,7 +137,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BitCounting32" sum="9f25f7ff7a6a81cbcd2f8a85a25ec49b">
+<theory name="BitCounting32" sum="9f25f7ff7a6a81cbcd2f8a85a25ec49b" expanded="true">
  <goal name="WP_parameter proof0" expl="VC for proof0">
  <transf name="split_goal_wp">
   <goal name="WP_parameter proof0.1" expl="1. assertion">
@@ -379,7 +378,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Hamming" sum="dfdc0f1acb686591cb859b028bb81cbe">
+<theory name="Hamming" sum="dfdc0f1acb686591cb859b028bb81cbe" expanded="true">
  <goal name="WP_parameter hammingD" expl="VC for hammingD">
  <transf name="split_goal_wp">
   <goal name="WP_parameter hammingD.1" expl="1. assertion">
@@ -424,7 +423,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="AsciiCode" sum="65a00d71812a6ba057f736c4159b37f1">
+<theory name="AsciiCode" sum="65a00d71812a6ba057f736c4159b37f1" expanded="true">
  <goal name="WP_parameter bv_even" expl="VC for bv_even">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bv_even.1" expl="1. assertion">
@@ -463,7 +462,7 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter count_or.4" expl="4. assertion">
-  <proof prover="5"><result status="valid" time="2.21"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="2.21"/></proof>
   </goal>
   <goal name="WP_parameter count_or.5" expl="5. postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="74"/></proof>
@@ -538,44 +537,6 @@
  <goal name="asciiProp">
  <proof prover="0"><result status="valid" time="0.40" steps="235"/></proof>
  <proof prover="2"><result status="valid" time="0.05"/></proof>
- </goal>
-</theory>
-<theory name="GrayCode" sum="6a0d92707e1971d288ea37b644e08ee7" expanded="true">
- <goal name="iso">
- <proof prover="2"><result status="valid" time="0.46"/></proof>
- </goal>
- <goal name="WP_parameter grayIsGray" expl="VC for grayIsGray" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter grayIsGray.1" expl="1. assertion">
-  <proof prover="0"><result status="timeout" time="5.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
-  </goal>
-  <goal name="WP_parameter grayIsGray.2" expl="2. assertion" expanded="true">
-  </goal>
-  <goal name="WP_parameter grayIsGray.3" expl="3. assertion" expanded="true">
-  </goal>
-  <goal name="WP_parameter grayIsGray.4" expl="4. assertion">
-  <proof prover="0"><result status="timeout" time="4.99"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="timeout" time="5.11"/></proof>
-  </goal>
-  <goal name="WP_parameter grayIsGray.5" expl="5. postcondition" expanded="true">
-  </goal>
- </transf>
- </goal>
- <goal name="nthGray">
- <proof prover="0"><result status="valid" time="1.38" steps="555"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="lastNthGray">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="nthBinary" expanded="true">
- </goal>
- <goal name="evenOdd">
- <proof prover="5"><result status="valid" time="0.68"/></proof>
  </goal>
 </theory>
 </file>
