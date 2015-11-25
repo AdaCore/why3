@@ -210,9 +210,7 @@ HANDLE open_temp_file(char** outfile) {
 }
 
 void run_request (prequest r) {
-   unsigned int cmdlen = 0;
-   int i;
-   char* cmd;
+   char cmd[4096];
    char* outfile;
    pproc proc;
    int key;
@@ -234,35 +232,105 @@ void run_request (prequest r) {
    ZeroMemory(&si, sizeof(si));
    si.cb = sizeof(si);
    ZeroMemory(&pi, sizeof(pi));
-   cmdlen += strlen(r->cmd) + 3;
-   for (i = 0; i < r->numargs; i++) {
-      cmdlen += strlen(r->args[i]) + 3;
-   }
-   // CreateProcess does not allow more than 32767 bytes for command line parameter
-   if (cmdlen > 32767) {
-     shutdown_with_msg("Error: parameter's length exceeds CreateProcess limits");
-   }
-   cmd = (char*) malloc(sizeof(char) * cmdlen + 1);
-   if (cmd == NULL) {
-     shutdown_with_msg("Error: when allocating memory");
-   }
    outfilehandle = open_temp_file(&outfile);
    // set the stdout for the childprocess
    si.hStdOutput = outfilehandle;
    si.hStdError = outfilehandle;
    // if we don't set that flag, the stdout we just set won't even be looked at
    si.dwFlags = STARTF_USESTDHANDLES;
-   *cmd = '\0';
-   strcat(cmd, "\"");
-   strcat(cmd, r->cmd);
-   strcat(cmd, "\"");
-   strcat(cmd, " ");
-   // ??? fix escaping of command line, see N409-041
-   for (i = 0; i < r->numargs; i++) {
-     strcat(cmd, "\"");
-     strcat(cmd, r->args[i]);
-     strcat(cmd, "\"");
-     if (i < r->numargs - 1) strcat(cmd, " ");
+   /* Compute command line string. When a parameter contains a " or a space we
+      should quote it with doublequotes.  Double quotes inside the string should
+      be escaped by a backslash.  All backslashes precedind a " should also be
+      escaped.  */
+
+   /* First copy the command name */
+   strcpy (cmd, r->cmd);
+   strcat (cmd, " ");
+
+   /* Now take care of the arguments */
+   {
+     int k;
+     for (k = 0; k < r->numargs; k++)
+       {
+         char *ca = r->args[k]; /* current arg */
+         int ca_index; /* index of the current character in ca */
+         int need_quote = 1; /* set to 1 if quotes are needed */
+
+         /* Should we quote the string ? */
+         if (strlen(ca) > 0)
+            need_quote = 0;
+
+         for (ca_index = 0; ca_index < strlen(ca); ca_index++)
+           {
+             if (ca[ca_index] == ' ' || ca[ca_index] == '"')
+               {
+                 need_quote = 1;
+                 break;
+               }
+           }
+
+         /* Do quoting if necessary. Note it is important not to quote
+            arguments that do not need it as some buggy implementations
+            such vxsim will see for example -p as "-p" :-). */
+         if (need_quote == 1)
+           {
+             int cl_index = strlen(cmd);
+
+             /* Open the double quoted string */
+             cmd[cl_index] = '"'; cl_index++;
+
+             for (ca_index = 0; ca_index < strlen(ca); ca_index++)
+               {
+
+                 /* We have a double in the argument. It should be escaped
+                    along with all previous backslashes.  */
+                 if (ca[ca_index] == '"')
+                   {
+                     /* We have blackslashes before the double quote.
+                        They should be quoted.  */
+                     if (ca_index > 0 && ca[ca_index - 1] == '\\')
+                       {
+                         int j;
+                         for (j = ca_index - 1; j >= 0 && ca[j] == '\\' ;j--)
+                           {
+                             cmd[cl_index] = '\\'; cl_index++;
+                           }
+                       }
+
+                     cmd[cl_index] = '\\'; cl_index++;
+                     cmd[cl_index] = '"';  cl_index++;
+                   }
+                 else
+                   {
+                     /* This is not a double quote so just add the character */
+                     cmd[cl_index] = ca[ca_index]; cl_index++;
+
+                     /* We have blackslashes before the ending double quote.
+                        They should be quoted.  */
+                     if (ca[ca_index] == '\\' && ca_index + 1 == strlen(ca))
+                       {
+                         int j;
+                         for (j = ca_index; j >= 0 && ca[j] == '\\' ;j--)
+                           {
+                             cmd[cl_index] = '\\'; cl_index++;
+                           }
+                       }
+                   }
+               }
+
+             /* Close the doublequoted string */
+             cmd[cl_index] = '"'; cl_index++;
+             cmd[cl_index] = ' '; cl_index++;
+             cmd[cl_index] = '\0';
+           }
+         else
+           /* The argument does not need quoting. Just append it to the command
+              line */
+           {
+             strcat (cmd, ca);
+             strcat (cmd, " ");
+           }
+       }
    }
    if (r->timeout!=0||r->memlimit!=0) {
      ULONGLONG timeout;
@@ -321,7 +389,6 @@ void run_request (prequest r) {
           sizeof( portassoc ) ) ) {
      shutdown_with_msg( "Could not associate job with IO completion port");
    }
-   free(cmd);
 
    /* Let's resume the process */
    ResumeThread(pi.hThread);
