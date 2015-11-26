@@ -3,7 +3,7 @@ module Rmbt
   use import ref.Ref
   use import bv.BV32
 
-  let ghost min_elt (a : t) : t
+  let ghost rightmost_position_set (a : t) : t
     requires { a <> zero }
     ensures  { ult result (of_int 32) }
     ensures  { eq_sub_bv a zero zero result }
@@ -27,7 +27,7 @@ module Rmbt
     ensures  { eq_sub result zero (!p+1) 32 }
     ensures  { nth result !p }
   =
-    let ghost p_bv = min_elt x in
+    let ghost p_bv = rightmost_position_set x in
     ghost p := to_uint p_bv;
     assert { nth_bv (neg x) p_bv };
     let res = bw_and x (neg x) in
