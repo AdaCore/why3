@@ -313,16 +313,7 @@ theory BV_Gen
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
 
-  (** Bitvector alternative for nth and shifts *)
-  function nth_bv t t: bool
-
-  axiom Nth_bv_is_nth:
-    forall x i.
-      nth x (to_uint i) = nth_bv x i
-
-  axiom Nth_bv_is_nth2:
-    forall x i. 0 <= i < two_power_size ->
-      nth_bv x (of_int i) = nth x i
+  (** Bitvector alternatives for shifts, rotations and nth *)
 
   (** logical shift right *)
   function lsr_bv t t : t
@@ -353,6 +344,7 @@ theory BV_Gen
     forall v n : t.
          to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
 
+  (** rotations *)
   function rotate_right_bv (v n : t) : t
 
   function rotate_left_bv (v n : t) : t
@@ -363,12 +355,28 @@ theory BV_Gen
   axiom rotate_right_bv_is_rotate_right :
     forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
 
+  (** nth_bv *)
+  function nth_bv t t: bool
+
+  axiom nth_bv_def:
+    forall x i.
+      nth_bv x i = not (bw_and (lsr_bv x i) (of_int 1) = zero)
+
+  axiom Nth_bv_is_nth:
+    forall x i.
+      nth x (to_uint i) = nth_bv x i
+
+  axiom Nth_bv_is_nth2:
+    forall x i. 0 <= i < two_power_size ->
+      nth_bv x (of_int i) = nth x i
 
   (* equality axioms *)
 
-  predicate eq_sub_bv (a b:t) (i n:t) =
-  let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
-    bw_and b mask = bw_and a mask
+  predicate eq_sub_bv t t t t
+
+  axiom eq_sub_bv_def: forall a b i n.
+    let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
+      eq_sub_bv a b i n = (bw_and b mask = bw_and a mask)
 
   predicate eq_sub (a b:t) (i n:int) =
     forall j. i <= j < i + n -> nth a j = nth b j
@@ -398,9 +406,6 @@ theory BV64
 
   meta "remove_prop" prop two_power_size_val
   meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
 
 end
 
@@ -416,9 +421,6 @@ theory BV32
 
   meta "remove_prop" prop two_power_size_val
   meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
 
 end
 
@@ -434,9 +436,6 @@ theory BV16
 
   meta "remove_prop" prop two_power_size_val
   meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
 
 end
 
@@ -452,9 +451,6 @@ theory BV8
 
   meta "remove_prop" prop two_power_size_val
   meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
 
 end
 

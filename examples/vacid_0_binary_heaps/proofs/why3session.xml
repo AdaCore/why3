@@ -2,21 +2,21 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.4pl6" timelimit="5" memlimit="0"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="3" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="7" name="Spass" version="3.7" timelimit="10" memlimit="0"/>
-<prover id="8" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="10" name="Yices" version="1.0.38" timelimit="10" memlimit="1000"/>
-<prover id="11" name="Z3" version="3.2" timelimit="15" memlimit="1000"/>
-<prover id="12" name="Gappa" version="1.1.1" timelimit="10" memlimit="0"/>
-<prover id="13" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="14" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
-<prover id="15" name="Z3" version="4.3.2" timelimit="3" memlimit="1000"/>
-<prover id="16" name="Alt-Ergo" version="0.99.1" timelimit="3" memlimit="1000"/>
-<prover id="17" name="Eprover" version="1.8-001" timelimit="10" memlimit="0"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="0"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="3" steplimit="1" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="7" name="Spass" version="3.7" timelimit="10" steplimit="1" memlimit="0"/>
+<prover id="8" name="Z3" version="4.3.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="10" name="Yices" version="1.0.38" timelimit="10" steplimit="1" memlimit="1000"/>
+<prover id="11" name="Z3" version="3.2" timelimit="15" steplimit="1" memlimit="1000"/>
+<prover id="12" name="Gappa" version="1.1.1" timelimit="10" steplimit="1" memlimit="0"/>
+<prover id="13" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="14" name="Vampire" version="0.6" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="15" name="Z3" version="4.3.2" timelimit="3" steplimit="1" memlimit="1000"/>
+<prover id="16" name="Alt-Ergo" version="0.99.1" timelimit="3" steplimit="1" memlimit="1000"/>
+<prover id="17" name="Eprover" version="1.8-001" timelimit="10" steplimit="1" memlimit="0"/>
 <file name="../heapsort.mlw">
-<theory name="HeapSort" sum="b7357fb30d1c45e86360d924e72ce6fc">
+<theory name="HeapSort" sum="9c2fa0e6c0d92d2a002dd9f0c0f63f95">
  <goal name="Min_of_sorted">
  <proof prover="1" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.11"/></proof>
  </goal>
@@ -295,7 +295,7 @@
 </theory>
 </file>
 <file name="../bag_of_integers.why">
-<theory name="Bag_integers" sum="796b00175e30295b0c9ff000d886e4b4">
+<theory name="Bag_integers" sum="c6a5503758ac17839636e662391ad545">
  <goal name="Min_bag_union1">
  <proof prover="7" timelimit="39"><result status="valid" time="0.02"/></proof>
  <proof prover="11" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
@@ -315,7 +315,7 @@
 </theory>
 </file>
 <file name="../test_harness.mlw">
-<theory name="TestHarness" sum="042445c1246c83a0d5b43c7b15cd4003">
+<theory name="TestHarness" sum="06a27ea95dd253ccd6b0bf1754ea9665">
  <goal name="WP_parameter testHarness" expl="VC for testHarness">
  <transf name="split_goal_wp">
   <goal name="WP_parameter testHarness.1" expl="1. array creation size">
@@ -389,7 +389,7 @@
 </theory>
 </file>
 <file name="../elements.why">
-<theory name="Elements" sum="62a321e61b82922d968f3c6000c0c991">
+<theory name="Elements" sum="17fd0b43142cdea5b8de8ebf1bb3efee">
  <goal name="Elements_singleton">
  <proof prover="15" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -403,7 +403,7 @@
  <goal name="Elements_remove_last">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="15" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
- <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
+ <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="9"/></proof>
  <proof prover="17" timelimit="12"><result status="valid" time="0.25"/></proof>
  </goal>
  <goal name="Occ_elements">
@@ -417,12 +417,12 @@
  </goal>
  <goal name="Elements_set_inside2">
  <proof prover="15" memlimit="0"><result status="valid" time="0.06"/></proof>
- <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="33"/></proof>
+ <proof prover="16" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="34"/></proof>
  </goal>
 </theory>
 </file>
 <file name="../heap_implem.mlw">
-<theory name="Implementation" sum="bf31488f3ab964de1e65dc19dd58eccf">
+<theory name="Implementation" sum="322e041e7468d24a1fcfab5ca52f254c">
  <goal name="Is_heap_min">
  <proof prover="1" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
@@ -573,7 +573,7 @@
    <goal name="WP_parameter extractMin.3.3" expl="3. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.13"/></proof>
    <proof prover="15" memlimit="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="16" memlimit="0"><result status="valid" time="0.15" steps="83"/></proof>
+   <proof prover="16" memlimit="0"><result status="valid" time="0.15" steps="85"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.3.4" expl="4. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.16"/></proof>
@@ -652,7 +652,7 @@
    </goal>
    <goal name="WP_parameter extractMin.12.3" expl="3. VC for extractMin">
    <proof prover="2" timelimit="5"><result status="valid" time="0.13"/></proof>
-   <proof prover="10" memlimit="0"><result status="valid" time="0.26"/></proof>
+   <proof prover="10" memlimit="0"><result status="valid" time="0.10"/></proof>
    <proof prover="14" timelimit="15"><result status="valid" time="1.04"/></proof>
    </goal>
   </transf>
@@ -885,7 +885,7 @@
    <proof prover="17"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.28.3" expl="3. VC for extractMin">
-   <proof prover="2" timelimit="300"><result status="valid" time="16.78"/></proof>
+   <proof prover="2" timelimit="300"><result status="valid" time="19.92"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.28.4" expl="4. VC for extractMin">
    <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
@@ -981,7 +981,7 @@
 </theory>
 </file>
 <file name="../heap_model.why">
-<theory name="Model" sum="07a651016419eb767b00d90c6a315f31">
+<theory name="Model" sum="86cb5604bda95464b033ec793352c213">
  <goal name="Model_empty">
  <proof prover="2" timelimit="5" memlimit="0"><result status="valid" time="0.03"/></proof>
  <proof prover="7"><result status="valid" time="2.33"/></proof>

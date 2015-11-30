@@ -2,175 +2,175 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../bv.why" expanded="true">
-<theory name="CheckBV64" sum="924d69a2ab94b2c86fe8c9ed16a284ed" expanded="true">
- <goal name="ok_zero" expanded="true">
+<theory name="CheckBV64" sum="b9ff31a9cc8d49933e063bf81de8eefc" expanded="true">
+ <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones" expanded="true">
+ <goal name="ok_ones">
  <proof prover="0"><result status="valid" time="0.03" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_zero2" expanded="true">
+ <goal name="ok_zero2">
  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones2" expanded="true">
+ <goal name="ok_ones2">
  <proof prover="0"><result status="valid" time="0.03" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_size" expanded="true">
+ <goal name="ok_size">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_max" expanded="true">
+ <goal name="ok_max">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_tpsize" expanded="true">
+ <goal name="ok_tpsize">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok1" expanded="true">
+ <goal name="ok1">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok2" expanded="true">
+ <goal name="ok2">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok3" expanded="true">
+ <goal name="ok3">
  <proof prover="1"><result status="valid" time="0.16"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok5" expanded="true">
+ <goal name="ok5">
  <proof prover="0"><result status="valid" time="0.08" steps="79"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok6" expanded="true">
+ <goal name="ok6">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok7" expanded="true">
+ <goal name="ok7">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok8" expanded="true">
+ <goal name="ok8">
  <proof prover="1"><result status="valid" time="0.17"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok9" expanded="true">
+ <goal name="ok9">
  <proof prover="0"><result status="valid" time="0.10" steps="82"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok10" expanded="true">
+ <goal name="ok10">
  <proof prover="0"><result status="valid" time="0.16" steps="112"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok12" expanded="true">
+ <goal name="ok12">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok13" expanded="true">
+ <goal name="ok13">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok14" expanded="true">
+ <goal name="ok14">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok15" expanded="true">
+ <goal name="ok15">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok16" expanded="true">
+ <goal name="ok16">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok17" expanded="true">
+ <goal name="ok17">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok18" expanded="true">
+ <goal name="ok18">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok19" expanded="true">
+ <goal name="ok19">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok20" expanded="true">
+ <goal name="ok20">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok21" expanded="true">
+ <goal name="ok21">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok22" expanded="true">
+ <goal name="ok22">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok23" expanded="true">
+ <goal name="ok23">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok24" expanded="true">
+ <goal name="ok24">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok25" expanded="true">
+ <goal name="ok25">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok26" expanded="true">
+ <goal name="ok26">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok27" expanded="true">
+ <goal name="ok27">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok28" expanded="true">
+ <goal name="ok28">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="trap" expanded="true">
+ <goal name="trap">
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="smoke1" expanded="true">
@@ -203,7 +203,7 @@
  </goal>
  <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.50"/></proof>
+ <proof prover="1"><result status="timeout" time="5.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
  <proof prover="3"><result status="timeout" time="5.00"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
@@ -229,7 +229,7 @@
  <proof prover="3"><result status="timeout" time="4.98"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="g1" expanded="true">
+ <goal name="g1">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -240,7 +240,7 @@
  <proof prover="3"><result status="timeout" time="5.01"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="g2" expanded="true">
+ <goal name="g2">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -251,23 +251,23 @@
  <proof prover="3"><result status="timeout" time="5.01"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="g3" expanded="true">
+ <goal name="g3">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g4" expanded="true">
+ <goal name="g4">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g3a" expanded="true">
- <proof prover="1"><result status="valid" time="0.11"/></proof>
+ <goal name="g3a">
+ <proof prover="1"><result status="valid" time="2.12"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g3b" expanded="true">
- <proof prover="1"><result status="valid" time="0.10"/></proof>
- <transf name="compute_in_goal" expanded="true">
-  <goal name="g3b.1" expl="1." expanded="true">
+ <goal name="g3b">
+ <proof prover="1"><result status="valid" time="0.46"/></proof>
+ <transf name="compute_in_goal">
+  <goal name="g3b.1" expl="1.">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -275,32 +275,32 @@
  </goal>
  <goal name="f3" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="1.31"/></proof>
+ <proof prover="1"><result status="unknown" time="3.36"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="4.93"/></proof>
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="g4a" expanded="true">
+ <goal name="g4a">
  <proof prover="0"><result status="valid" time="0.06" steps="85"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g4b" expanded="true">
+ <goal name="g4b">
  <proof prover="0"><result status="valid" time="0.05" steps="85"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g5a" expanded="true">
+ <goal name="g5a">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g5b" expanded="true">
+ <goal name="g5b">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g7" expanded="true">
+ <goal name="g7">
  <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -314,241 +314,241 @@
  <proof prover="3"><result status="timeout" time="5.00"/></proof>
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="g8a" expanded="true">
+ <goal name="g8a">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="g8b" expanded="true">
+ <goal name="g8b">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Nth_Bv_bw_and" expanded="true">
- <proof prover="0"><result status="valid" time="0.31" steps="157"/></proof>
+ <goal name="Nth_Bv_bw_and">
+ <proof prover="0"><result status="valid" time="0.31" steps="174"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="Nth_Bv_bw_or" expanded="true">
- <proof prover="0"><result status="valid" time="0.28" steps="190"/></proof>
- <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <goal name="Nth_Bv_bw_or">
+ <proof prover="0"><result status="valid" time="0.28" steps="200"/></proof>
+ <proof prover="1"><result status="valid" time="0.31"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="Nth_Bv_bw_xor" expanded="true">
+ <goal name="Nth_Bv_bw_xor">
  <proof prover="0"><result status="valid" time="0.34" steps="234"/></proof>
- <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="1"><result status="valid" time="0.30"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Nth_Bv_bw_not" expanded="true">
+ <goal name="Nth_Bv_bw_not">
  <proof prover="0"><result status="valid" time="0.08" steps="116"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="not_not" expanded="true">
+ <goal name="not_not">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="not_and" expanded="true">
+ <goal name="not_and">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Lsr_Bv_nth_bv_low" expanded="true">
+ <goal name="Lsr_Bv_nth_bv_low">
  <proof prover="0"><result status="valid" time="0.16" steps="126"/></proof>
- <proof prover="1"><result status="valid" time="0.08"/></proof>
- <proof prover="2"><result status="valid" time="0.04"/></proof>
- <proof prover="4"><result status="valid" time="0.16"/></proof>
+ <proof prover="1"><result status="valid" time="0.20"/></proof>
+ <proof prover="2"><result status="valid" time="0.68"/></proof>
+ <proof prover="4"><result status="valid" time="0.28"/></proof>
  </goal>
- <goal name="Lsr_Bv_nth_bv_high" expanded="true">
+ <goal name="Lsr_Bv_nth_bv_high">
  <proof prover="0"><result status="valid" time="0.22" steps="107"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Asr_Bv_nth_bv_low" expanded="true">
+ <goal name="Asr_Bv_nth_bv_low">
  <proof prover="0"><result status="valid" time="0.21" steps="136"/></proof>
- <proof prover="1"><result status="valid" time="0.08"/></proof>
- <proof prover="2"><result status="valid" time="0.08"/></proof>
- <proof prover="4"><result status="valid" time="0.13"/></proof>
+ <proof prover="1"><result status="valid" time="0.21"/></proof>
+ <proof prover="2"><result status="valid" time="0.67"/></proof>
+ <proof prover="4"><result status="valid" time="0.28"/></proof>
  </goal>
- <goal name="Asr_Bv_nth_bv_high" expanded="true">
- <proof prover="1"><result status="valid" time="0.08"/></proof>
+ <goal name="Asr_Bv_nth_bv_high">
+ <proof prover="1"><result status="valid" time="0.22"/></proof>
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Lsl_Bv_nth_bv_high" expanded="true">
- <proof prover="2"><result status="valid" time="0.10"/></proof>
- <proof prover="4"><result status="valid" time="0.20"/></proof>
+ <goal name="Lsl_Bv_nth_bv_high">
+ <proof prover="2"><result status="valid" time="0.72"/></proof>
+ <proof prover="4"><result status="valid" time="0.36"/></proof>
  </goal>
- <goal name="Lsl_Bv_nth_bv_low" expanded="true">
+ <goal name="Lsl_Bv_nth_bv_low">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV32" sum="a20bb735a9bd80ad59aa332112583db0" expanded="true">
- <goal name="ok_zero" expanded="true">
+<theory name="CheckBV32" sum="903badf6ef832602d2aa6cf1040bcdc8" expanded="true">
+ <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.03" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones" expanded="true">
+ <goal name="ok_ones">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_zero2" expanded="true">
+ <goal name="ok_zero2">
  <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones2" expanded="true">
+ <goal name="ok_ones2">
  <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.10"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_size" expanded="true">
+ <goal name="ok_size">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_max" expanded="true">
+ <goal name="ok_max">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_tpsize" expanded="true">
+ <goal name="ok_tpsize">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok1" expanded="true">
+ <goal name="ok1">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok2" expanded="true">
+ <goal name="ok2">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok3" expanded="true">
+ <goal name="ok3">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok5" expanded="true">
+ <goal name="ok5">
  <proof prover="0"><result status="valid" time="0.14" steps="79"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok6" expanded="true">
+ <goal name="ok6">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok7" expanded="true">
+ <goal name="ok7">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok8" expanded="true">
+ <goal name="ok8">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok9" expanded="true">
+ <goal name="ok9">
  <proof prover="0"><result status="valid" time="0.10" steps="82"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok10" expanded="true">
+ <goal name="ok10">
  <proof prover="0"><result status="valid" time="0.14" steps="112"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok12" expanded="true">
+ <goal name="ok12">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok13" expanded="true">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
+ <goal name="ok13">
+ <proof prover="1"><result status="valid" time="0.45"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok14" expanded="true">
+ <goal name="ok14">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok15" expanded="true">
+ <goal name="ok15">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok16" expanded="true">
+ <goal name="ok16">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok17" expanded="true">
+ <goal name="ok17">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok18" expanded="true">
+ <goal name="ok18">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok19" expanded="true">
+ <goal name="ok19">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok20" expanded="true">
+ <goal name="ok20">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok21" expanded="true">
+ <goal name="ok21">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok22" expanded="true">
+ <goal name="ok22">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok23" expanded="true">
+ <goal name="ok23">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok24" expanded="true">
+ <goal name="ok24">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok25" expanded="true">
+ <goal name="ok25">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok26" expanded="true">
+ <goal name="ok26">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok27" expanded="true">
+ <goal name="ok27">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok28" expanded="true">
+ <goal name="ok28">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="trap" expanded="true">
+ <goal name="trap">
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="smoke1" expanded="true">
@@ -581,7 +581,7 @@
  </goal>
  <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.49"/></proof>
+ <proof prover="1"><result status="unknown" time="3.12"/></proof>
  <proof prover="2"><result status="unknown" time="0.01"/></proof>
  <proof prover="3"><result status="timeout" time="5.03"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
@@ -608,170 +608,170 @@
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV16" sum="1e2b04b4b36c64a8073154d136a386e5" expanded="true">
- <goal name="ok_zero" expanded="true">
+<theory name="CheckBV16" sum="6fb3928dff38099c4680ef361ff6a9f4" expanded="true">
+ <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones" expanded="true">
+ <goal name="ok_ones">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_zero2" expanded="true">
+ <goal name="ok_zero2">
  <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones2" expanded="true">
+ <goal name="ok_ones2">
  <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_size" expanded="true">
+ <goal name="ok_size">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_max" expanded="true">
+ <goal name="ok_max">
  <proof prover="0"><result status="valid" time="0.03" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_tpsize" expanded="true">
+ <goal name="ok_tpsize">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok1" expanded="true">
+ <goal name="ok1">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok2" expanded="true">
+ <goal name="ok2">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok3" expanded="true">
+ <goal name="ok3">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok5" expanded="true">
+ <goal name="ok5">
  <proof prover="0"><result status="valid" time="0.05" steps="79"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok6" expanded="true">
+ <goal name="ok6">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok7" expanded="true">
+ <goal name="ok7">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok8" expanded="true">
+ <goal name="ok8">
  <proof prover="1"><result status="valid" time="0.15"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok9" expanded="true">
+ <goal name="ok9">
  <proof prover="0"><result status="valid" time="0.14" steps="82"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok10" expanded="true">
+ <goal name="ok10">
  <proof prover="0"><result status="valid" time="0.24" steps="112"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok12" expanded="true">
+ <goal name="ok12">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok13" expanded="true">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
+ <goal name="ok13">
+ <proof prover="1"><result status="valid" time="0.46"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok14" expanded="true">
+ <goal name="ok14">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok15" expanded="true">
+ <goal name="ok15">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok16" expanded="true">
+ <goal name="ok16">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok17" expanded="true">
+ <goal name="ok17">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok18" expanded="true">
+ <goal name="ok18">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok19" expanded="true">
+ <goal name="ok19">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok20" expanded="true">
+ <goal name="ok20">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok21" expanded="true">
+ <goal name="ok21">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok22" expanded="true">
+ <goal name="ok22">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok23" expanded="true">
+ <goal name="ok23">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok24" expanded="true">
+ <goal name="ok24">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok25" expanded="true">
+ <goal name="ok25">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok26" expanded="true">
+ <goal name="ok26">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok27" expanded="true">
+ <goal name="ok27">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok28" expanded="true">
+ <goal name="ok28">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="trap" expanded="true">
+ <goal name="trap">
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="smoke1" expanded="true">
@@ -804,7 +804,7 @@
  </goal>
  <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="unknown" time="0.53"/></proof>
+ <proof prover="1"><result status="unknown" time="2.92"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="5.01"/></proof>
  <proof prover="4"><result status="timeout" time="4.99"/></proof>
@@ -831,170 +831,170 @@
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
  </goal>
 </theory>
-<theory name="CheckBV8" sum="a04987af6bd7d770f56a439329cbebc9" expanded="true">
- <goal name="ok_zero" expanded="true">
+<theory name="CheckBV8" sum="ddc2bd6c15b0f7a1894b94a412e1977f" expanded="true">
+ <goal name="ok_zero">
  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.05"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones" expanded="true">
+ <goal name="ok_ones">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.05"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_zero2" expanded="true">
+ <goal name="ok_zero2">
  <proof prover="0"><result status="valid" time="0.03" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_ones2" expanded="true">
+ <goal name="ok_ones2">
  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
  <proof prover="1"><result status="valid" time="0.12"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_size" expanded="true">
+ <goal name="ok_size">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_max" expanded="true">
+ <goal name="ok_max">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok_tpsize" expanded="true">
+ <goal name="ok_tpsize">
  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok1" expanded="true">
+ <goal name="ok1">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok2" expanded="true">
+ <goal name="ok2">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok3" expanded="true">
+ <goal name="ok3">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok5" expanded="true">
+ <goal name="ok5">
  <proof prover="0"><result status="valid" time="0.04" steps="79"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok6" expanded="true">
+ <goal name="ok6">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok7" expanded="true">
+ <goal name="ok7">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok8" expanded="true">
+ <goal name="ok8">
  <proof prover="1"><result status="valid" time="0.15"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok9" expanded="true">
+ <goal name="ok9">
  <proof prover="0"><result status="valid" time="0.14" steps="82"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok10" expanded="true">
+ <goal name="ok10">
  <proof prover="0"><result status="valid" time="0.25" steps="112"/></proof>
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok12" expanded="true">
+ <goal name="ok12">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok13" expanded="true">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
+ <goal name="ok13">
+ <proof prover="1"><result status="valid" time="0.46"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok14" expanded="true">
+ <goal name="ok14">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok15" expanded="true">
+ <goal name="ok15">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok16" expanded="true">
+ <goal name="ok16">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok17" expanded="true">
+ <goal name="ok17">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok18" expanded="true">
+ <goal name="ok18">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok19" expanded="true">
+ <goal name="ok19">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok20" expanded="true">
+ <goal name="ok20">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok21" expanded="true">
+ <goal name="ok21">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok22" expanded="true">
+ <goal name="ok22">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok23" expanded="true">
+ <goal name="ok23">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok24" expanded="true">
+ <goal name="ok24">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok25" expanded="true">
+ <goal name="ok25">
  <proof prover="1"><result status="valid" time="0.07"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok26" expanded="true">
+ <goal name="ok26">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok27" expanded="true">
+ <goal name="ok27">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="ok28" expanded="true">
+ <goal name="ok28">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="trap" expanded="true">
+ <goal name="trap">
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="smoke1" expanded="true">
@@ -1027,7 +1027,7 @@
  </goal>
  <goal name="smoke5" expanded="true">
  <proof prover="0"><result status="timeout" time="5.01"/></proof>
- <proof prover="1"><result status="unknown" time="0.50"/></proof>
+ <proof prover="1"><result status="timeout" time="4.99"/></proof>
  <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="3"><result status="timeout" time="4.99"/></proof>
  <proof prover="4"><result status="timeout" time="5.00"/></proof>
