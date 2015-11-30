@@ -1045,15 +1045,20 @@ let eff_union_seq e1 e2 =
 
 (* NOTE: do not export this function *)
 let eff_inst sbs e =
-  (* all modified or reset regions in e must be instantiated into
+  (* All modified or reset regions in e must be instantiated into
      distinct regions. We allow regions that are not affected directly
      to be aliased, even if they contain modified or reset subregions:
      the values are still updated at the same program points and with
-     the same postconditions, as in the initial verified code. *)
-  let inst src = Mreg.fold (fun r v acc ->
-    let t = reg_full_inst sbs r in match t.ity_node with
-      | Ityreg r -> Mreg.add_new (IllegalAlias r) r v acc
-      | _ -> raise (IllegalSnapshot t)) src Mreg.empty in
+     the same postconditions, as in the initial verified code.
+     Every modified or reset region must be instantiated into a region,
+     not a snapshot. Also, every region containing a modified or reset
+     region, must also be instantiated into a region and not a snapshot.
+     The latter is not necessary for soundness, but simplifies VCgen. *)
+  let inst src = Mreg.fold (fun p v acc -> Mreg.fold (fun q t acc ->
+    match t.ity_node with
+    | Ityapp _ when reg_r_reachable p q -> raise (IllegalSnapshot t)
+    | Ityreg r when reg_equal p q -> Mreg.add_new (IllegalAlias r) r v acc
+    | _ -> acc) sbs.isb_reg acc) src Mreg.empty in
   let writes = inst e.eff_writes in
   let resets = inst e.eff_resets in
   let taints = inst e.eff_taints in
@@ -1069,7 +1074,7 @@ let eff_inst sbs e =
   let sreg = Mreg.set_diff sreg e.eff_resets in
   let dst = Mreg.fold (fun _ i s -> match i.ity_node with
     | Ityreg r -> Sreg.add r s | _ -> s) sreg Sreg.empty in
-  let dst = Mtv.fold (fun _ i s -> ity_freeregs s i) sbs.isb_var dst in
+  let dst = Mtv.fold (fun _ i s -> ity_rch_regs s i) sbs.isb_var dst in
   ignore (Mreg.inter (fun r _ _ -> raise (IllegalAlias r)) dst impact);
   { e with eff_writes = writes; eff_taints = taints;
            eff_covers = covers; eff_resets = resets }

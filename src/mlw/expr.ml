@@ -654,11 +654,12 @@ let e_let ld e =
 
 let e_exec ({c_cty = cty} as c) = match cty.cty_args with
   | _::_ as al ->
+      (* unlike for RLpv or RLls, we do not purify the signature,
+         so the regions are now frozen and we have to forbid all
+         effects, including allocation/reset *)
       check_effects cty; check_state cty;
-      (* no need to check eff_covers since we are completely pure *)
-      if List.exists (fun a -> not a.pv_ity.ity_imm) al ||
-        not cty.cty_result.ity_imm then Loc.errorm "This function \
-            has mutable type signature, it cannot be used as pure";
+      if not (Sreg.is_empty cty.cty_effect.eff_resets) then Loc.errorm
+        "This function has side effects, it cannot be used as pure";
       let func a ity = ity_func a.pv_ity ity in
       let ity = List.fold_right func al cty.cty_result in
       let ghost = List.exists (fun a -> a.pv_ghost) al in

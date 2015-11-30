@@ -219,6 +219,7 @@ let close_module uc =
   store_module m;
   m
 
+(*
 let count_regions {muc_known = kn} {pv_ity = ity} mr =
   let add_reg r mr = Mreg.change (fun n -> Some (n <> None)) r mr in
   let meet mr1 mr2 = Mreg.union (fun _ x y -> Some (x || y)) mr1 mr2 in
@@ -242,6 +243,7 @@ let count_regions {muc_known = kn} {pv_ity = ity} mr =
         meet mr (List.fold_left add_field Mreg.empty c.rs_cty.cty_args))
         Mreg.empty d.itd_constructors) in
   down mr ity
+*)
 
 let add_symbol add id v uc =
   store_path uc [] id;
@@ -257,16 +259,7 @@ let add_pdecl_no_logic uc d =
     muc_known = known_add_decl uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news } in
   let add_rs uc s = add_symbol add_ps s.rs_name (RS s) uc in
-  let add_rs_noalias uc s = match s.rs_logic with
-    | RLls _ | RLlemma ->
-        let sv = s.rs_cty.cty_effect.eff_reads in
-        let mr = Spv.fold (count_regions uc) sv Mreg.empty in
-        Mreg.iter (fun _ n ->
-          if n then Loc.errorm ?loc:s.rs_name.id_loc
-            "The type of this function contains an alias") mr;
-        add_rs uc s
-    | _ -> add_rs uc s in
-  let add_rd uc d = add_rs_noalias uc d.rec_sym in
+  let add_rd uc d = add_rs uc d.rec_sym in
   match d.pd_node with
   | PDtype tdl ->
       let add uc d =
@@ -275,7 +268,7 @@ let add_pdecl_no_logic uc d =
         add_symbol add_ts d.itd_its.its_ts.ts_name d.itd_its uc in
       List.fold_left add uc tdl
   | PDlet (LDvar (v,_)) -> add_symbol add_ps v.pv_vs.vs_name (PV v) uc
-  | PDlet (LDsym (s,_)) -> add_rs_noalias uc s
+  | PDlet (LDsym (s,_)) -> add_rs uc s
   | PDlet (LDrec l) -> List.fold_left add_rd uc l
   | PDexn xs -> add_symbol add_xs xs.xs_name xs uc
   | PDpure -> uc
