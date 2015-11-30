@@ -1298,8 +1298,8 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_OPTION_FILES); do \
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
-#	for f in $(ISABELLELIBS_BV_FILES); do \
-#	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_BV_FILES); do \
+	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	) > $@
 
 ifeq (@enable_local@,yes)
@@ -1308,8 +1308,7 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
-# $(ISABELLELIBS_BV)
+lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
 ifneq (@enable_local@,yes)
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 endif
