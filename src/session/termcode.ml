@@ -22,20 +22,28 @@ let arg_extra_expl_prefix =
    Arg.String (fun s -> expl_prefixes := s :: !expl_prefixes),
    "<s> register s as an additional prefix for VC explanations")
 
+let match_prefix prefix lab =
+  (* Return the list of all labels that match the given prefix. Raise Not_found
+     if none is found *)
+  let acc =
+    Ident.Slab.fold
+      (fun lab acc ->
+        try
+          let lab = lab.Ident.lab_string in
+          let s = Strings.remove_prefix prefix lab in
+          s :: acc
+        with Not_found -> acc
+      ) lab []
+    in
+    if acc = [] then raise Not_found else acc
+
 let collect_expls lab =
-  Ident.Slab.fold
-    (fun lab acc ->
-       let lab = lab.Ident.lab_string in
-       let rec aux l =
-         match l with
-           | [] -> acc
-           | p :: r ->
-              try
-                let s = Strings.remove_prefix p lab in s :: acc
-              with Not_found -> aux r
-       in aux !expl_prefixes)
-    lab
-    []
+  (* return the list of labels that match any of the provided prefixes, but
+     return the empty list if any prefix is not matched at all *)
+  try
+    List.fold_left (fun acc x -> List.rev_append (match_prefix x lab) acc) []
+    !expl_prefixes
+  with Not_found -> []
 
 let concat_expls = function
   | [] -> None
