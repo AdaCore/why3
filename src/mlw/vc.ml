@@ -59,7 +59,7 @@ let name_regions kn wr mvs =
   let mreg = Mvs.fold fill mvs Mreg.empty in
   let complete r nm _ = if nm <> None then nm else
     let ty = ty_app r.reg_its.its_ts (List.map ty_of_ity r.reg_args) in
-    Some (t_var (create_vsymbol (id_clone r.reg_vs.vs_name) ty)) in
+    Some (t_var (create_vsymbol (id_clone r.reg_name) ty)) in
   Mreg.merge complete mreg aff
 
 let rec havoc kn wr mreg t ity =

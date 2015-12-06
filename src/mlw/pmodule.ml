@@ -415,20 +415,21 @@ and clone_reg cl reg =
      with all top-level pvsymbols (local or external) before
      descending into a let_defn. *)
   try Mreg.find reg cl.rn_table with Not_found ->
-  let id = id_clone reg.reg_vs.vs_name in
   let tl = List.map (clone_ity cl) reg.reg_args in
   let rl = List.map (clone_ity cl) reg.reg_regs in
   let r = match Mts.find_opt reg.reg_its.its_ts cl.ts_table with
-    | Some its -> create_region id its tl rl
+    | Some its ->
+        create_region (id_clone reg.reg_name) its tl rl
     | None -> (* creative indentation *)
     begin match Mts.find_opt reg.reg_its.its_ts cl.ty_table with
     | Some {ity_node = Ityreg r} ->
         let sbs = its_match_regs reg.reg_its tl rl in
         let tl = List.map (ity_full_inst sbs) r.reg_args in
         let rl = List.map (ity_full_inst sbs) r.reg_regs in
-        create_region id r.reg_its tl rl
+        create_region (id_clone reg.reg_name) r.reg_its tl rl
     | Some _ -> assert false
-    | None -> create_region id reg.reg_its tl rl
+    | None ->
+        create_region (id_clone reg.reg_name) reg.reg_its tl rl
     end in
   cl.rn_table <- Mreg.add reg r cl.rn_table;
   r

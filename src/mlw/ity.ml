@@ -49,7 +49,7 @@ and ity_node =
     (** type variable and its purity status *)
 
 and region = {
-  reg_vs   : vsymbol;
+  reg_name : ident;
   reg_its  : itysymbol;
   reg_args : ity list;
   reg_regs : ity list;
@@ -73,7 +73,7 @@ end)
 
 module Reg = MakeMSHW (struct
   type t = region
-  let tag reg = reg.reg_vs.vs_name.id_tag
+  let tag reg = reg.reg_name.id_tag
 end)
 
 module PVsym = MakeMSHW (struct
@@ -110,12 +110,12 @@ let pv_equal  : pvsymbol  -> pvsymbol  -> bool = (==)
 
 let its_hash its = id_hash its.its_ts.ts_name
 let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
-let reg_hash reg = id_hash reg.reg_vs.vs_name
+let reg_hash reg = id_hash reg.reg_name
 let pv_hash  pv  = id_hash pv.pv_vs.vs_name
 
 let its_compare its1 its2 = id_compare its1.its_ts.ts_name its2.its_ts.ts_name
 let ity_compare ity1 ity2 = Pervasives.compare (ity_hash ity1) (ity_hash ity2)
-let reg_compare reg1 reg2 = id_compare reg1.reg_vs.vs_name reg2.reg_vs.vs_name
+let reg_compare reg1 reg2 = id_compare reg1.reg_name reg2.reg_name
 let pv_compare  pv1  pv2  = id_compare pv1.pv_vs.vs_name pv2.pv_vs.vs_name
 
 module Hsity = Hashcons.Make (struct
@@ -156,8 +156,8 @@ let mk_ity node = {
   ity_tag  = Weakhtbl.dummy_tag;
 }
 
-let mk_reg v s tl rl = {
-  reg_vs   = v;
+let mk_reg name s tl rl = {
+  reg_name = id_register name;
   reg_its  = s;
   reg_args = tl;
   reg_regs = rl;
@@ -192,10 +192,6 @@ let rec ty_of_ity ity = match ity.ity_node with
   | Ityreg {reg_its = s; reg_args = tl} | Ityapp (s,tl,_) ->
       ty_app s.its_ts (List.map ty_of_ity tl)
   | Ityvar (v,_) -> ty_var v
-
-let mk_reg id s tl rl =
-  let ty = ty_app s.its_ts (List.map ty_of_ity tl) in
-  mk_reg (create_vsymbol id ty) s tl rl
 
 (* generic traversal functions *)
 
@@ -511,7 +507,7 @@ let its_inst_regs fresh_reg s tl =
     try sbs, Mreg.find r sbs.isb_reg with Not_found ->
     let sbs, tl = Lists.map_fold_left ity_inst sbs r.reg_args in
     let sbs, rl = Lists.map_fold_left ity_inst sbs r.reg_regs in
-    let ity = fresh_reg r.reg_vs.vs_name r.reg_its tl rl in
+    let ity = fresh_reg (id_clone r.reg_name) r.reg_its tl rl in
     { sbs with isb_reg = Mreg.add r ity sbs.isb_reg }, ity in
   Lists.map_fold_left reg_inst (its_match_args s tl) s.its_regions
 
@@ -522,12 +518,12 @@ let its_match_smart fresh_reg s tl rl =
   else its_inst_regs fresh_reg s tl
 
 let create_region id s tl rl =
-  let fresh id s tl rl = ity_reg (mk_reg (id_clone id) s tl rl) in
+  let fresh id s tl rl = ity_reg (mk_reg id s tl rl) in
   let sbs, rl = its_match_smart fresh s tl rl in
   create_region_raw sbs id s tl rl
 
 let ity_app s tl rl =
-  let fresh id s tl rl = ity_reg (mk_reg (id_clone id) s tl rl) in
+  let fresh id s tl rl = ity_reg (mk_reg id s tl rl) in
   let sbs, rl = its_match_smart fresh s tl rl in
   ity_app_raw sbs (id_fresh "rho") s tl rl
 
@@ -1289,10 +1285,10 @@ let rprinter = create_ident_printer []
 let xprinter = create_ident_printer []
   ~sanitizer:(sanitizer char_to_ualpha char_to_alnumus)
 
-let forget_reg r = forget_id rprinter r.reg_vs.vs_name
+let forget_reg r = forget_id rprinter r.reg_name
 
 let print_reg_name fmt r =
-  fprintf fmt "@@%s" (id_unique rprinter r.reg_vs.vs_name)
+  fprintf fmt "@@%s" (id_unique rprinter r.reg_name)
 
 let print_args pr fmt tl = if tl <> [] then
   fprintf fmt "@ %a" (Pp.print_list Pp.space pr) tl
