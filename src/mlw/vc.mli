@@ -9,4 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-val vc : Env.env -> Pdecl.known_map -> Pdecl.pdecl -> Pdecl.pdecl list
+open Term
+open Ity
+open Pdecl
+
+val havoc_fast : known_map -> effect -> term Mvs.t -> term list
+
+val vc : Env.env -> known_map -> pdecl -> pdecl list

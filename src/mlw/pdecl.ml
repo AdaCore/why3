@@ -94,6 +94,8 @@ let create_rec_record_decl s fldl =
 
 let create_variant_decl get_its cl =
   let exn = Invalid_argument "Pdecl.create_variant_decl" in
+  let get_pjl (_,fl) = List.fold_right (fun (p,f) l ->
+    if p then f::l else l) fl [] in
   let get_pjs (_,fl) = List.fold_left (fun s (p,f) ->
     if p then Spv.add f s else s) Spv.empty fl in
   let get_fds (_,fl) = List.fold_left (fun s (_,f) ->
@@ -103,7 +105,7 @@ let create_variant_decl get_its cl =
         let pjs = get_pjs cs in
         List.iter (fun cs ->
           if not (Spv.equal (get_pjs cs) pjs) then raise exn) cl;
-        Spv.elements pjs
+        get_pjl cs
     | [] -> raise exn in
   let s = get_its (List.map get_fds cl) and constr = List.length cl in
   let mk_cs (cid,fl) = create_constructor ~constr cid s (List.map snd fl) in
