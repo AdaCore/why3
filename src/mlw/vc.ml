@@ -112,11 +112,28 @@ let rec havoc kn wr mreg t ity =
       end
 
 let havoc_fast kn {eff_writes = wr; eff_covers = cv} mvs =
+  if Sreg.is_empty cv then [] else
   let mreg = name_regions kn cv mvs in
   let update v nt acc =
     let t, fl = havoc kn wr mreg (t_var v) (restore_pv v).pv_ity in
     (if t_equal nt t then fl else t_equ nt t :: fl) @ acc in
   Mvs.fold update mvs []
+
+let clone_vs {vs_name = id; vs_ty = ty} =
+  t_var (create_vsymbol (id_clone id) ty)
+
+let _step_back wr1 rd2 wr2 mvs =
+  if Mreg.is_empty wr1 then Mvs.empty else
+  let back v t =
+    let ity = (restore_pv v).pv_ity in
+    if not (ity_affected wr1 ity) then None else
+    if not (ity_affected wr2 ity) then Some t else
+    Some (clone_vs v) in
+  let mvs = Mvs.mapi_filter back mvs in
+  let add {pv_vs = v; pv_ity = ity} acc =
+    if Mvs.mem v mvs || not (ity_affected wr1 ity)
+    then acc else Mvs.add v (clone_vs v) acc in
+  Spv.fold add rd2 mvs
 
 let vc _env kn d = match d.pd_node with
   | PDlet (LDsym (s,{c_cty = {cty_effect = eff}})) ->
