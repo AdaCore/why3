@@ -965,14 +965,18 @@ let eff_assign asl =
     Mreg.fold add_write mpl acc in
   let resets,_,_ = Mint.fold add_level m (Sreg.empty,Mreg.empty,Mreg.empty) in
   (* construct the effect *)
-  { eff_reads  = reads;
+  let effect = {
+    eff_reads  = reads;
     eff_writes = Mreg.map Mpv.domain writes;
     eff_taints = taint;
     eff_covers = Mreg.domain (Mreg.set_diff writes resets);
     eff_resets = resets;
     eff_raises = Sexn.empty;
     eff_oneway = false;
-    eff_ghost  = ghost }
+    eff_ghost  = ghost } in
+  (* verify that we can rebuild every value *)
+  check_writes effect reads;
+  effect
 
 let eff_reset_overwritten ({eff_writes = wr} as e) =
   if not (Sreg.is_empty e.eff_resets) then
