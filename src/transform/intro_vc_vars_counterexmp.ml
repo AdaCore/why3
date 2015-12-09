@@ -84,8 +84,7 @@ let model_trace_for_postcondition ~labels =
   (* Modifies the  model_trace label of a term in the postcondition:
      - if term corresponds to the initial value of a function
      parameter, model_trace label will have postfix @old
-     - if term corresponds to the return value of a function, add
-     model_trace label in a form function_name@result
+
      Returns labels with model_trace label modified if there
      exist model_trace label in labels, labels otherwise.
   *)
