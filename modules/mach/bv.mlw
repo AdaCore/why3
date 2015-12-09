@@ -4,6 +4,8 @@ module BVCheck_Gen
 
   type t
 
+  constant size : int
+
   constant two_power_size : int
   constant zero           : t
 
@@ -15,6 +17,13 @@ module BVCheck_Gen
   function mul  t t : t
   function udiv t t : t
   function urem t t : t
+
+  function lsl    t int : t
+  function lsl_bv t t   : t
+  function lsr    t int : t
+  function lsr_bv t t   : t
+  function asr    t int : t
+  function asr_bv t t   : t
 
   predicate eq t t
   predicate ule t t
@@ -41,6 +50,21 @@ module BVCheck_Gen
     requires { 0 <= to_uint a * to_uint b < two_power_size }
     ensures  { result = mul a b }
     ensures  { to_uint result = to_uint a * to_uint b }
+
+  val lsl_check (a b:t) : t
+    requires { 0 <= to_uint b < size }
+    ensures  { result = lsl_bv a b }
+    ensures  { result = lsl a (to_uint b) }
+
+  val lsr_check (a b:t) : t
+    requires { 0 <= to_uint b < size }
+    ensures  { result = lsr_bv a b }
+    ensures  { result = lsr a (to_uint b) }
+
+  val asr_check (a b:t) : t
+    requires { 0 <= to_uint b < size }
+    ensures  { result = asr_bv a b }
+    ensures  { result = asr a (to_uint b) }
 
   use import int.EuclideanDivision
 
@@ -121,6 +145,7 @@ module BVCheck8
 
   clone export BVCheck_Gen with
     type t = t,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -130,6 +155,12 @@ module BVCheck8
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
     predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
@@ -142,6 +173,7 @@ module BVCheck16
 
   clone export BVCheck_Gen with
     type t = t,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -151,6 +183,12 @@ module BVCheck16
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
     predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
@@ -163,6 +201,7 @@ module BVCheck32
 
   clone export BVCheck_Gen with
     type t = t,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -172,6 +211,12 @@ module BVCheck32
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
     predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
@@ -184,6 +229,7 @@ module BVCheck64
 
   clone export BVCheck_Gen with
     type t = t,
+    constant size = size,
     function two_power_size = two_power_size,
     function zero = zero,
     function to_uint = to_uint,
@@ -193,6 +239,12 @@ module BVCheck64
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
     predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,

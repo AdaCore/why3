@@ -12,7 +12,7 @@ theory Utils
 
   constant one : t = of_int 1
   constant two : t = of_int 2
-  constant lastbit : t = sub size one
+  constant lastbit : t = sub size_bv one
 
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
@@ -238,7 +238,7 @@ module Hackers_delight
       integer *)
 
   lemma nthBinary: forall b i.
-    ult i size ->
+    ult i size_bv ->
       nth_bv (fromGray b) i <-> nth_bv (count (lsr_bv b i)) zero
 
   (** The last property that we check is that if an integer is even
@@ -342,17 +342,17 @@ module Hackers_delight
   (** {6 Shifts and rotates} *)
   (** shift right and arithmetic shift right (p.20)*)
 
-  lemma SR1: forall x n. ult n size ->
+  lemma SR1: forall x n. ult n size_bv ->
     bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
   = asr_bv x n
 
   (** rotate vs shift (p.37)*)
 
   lemma RS_left: forall x.
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left x one
+    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left_bv x one
 
   lemma RS_right: forall x.
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right x one
+    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right_bv x one
 
   (** {6 bound propagation (p.73)} *)
 

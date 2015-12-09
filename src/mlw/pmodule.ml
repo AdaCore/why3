@@ -290,7 +290,9 @@ let create_module env ?(path=[]) n =
 let add_pdecl ~wp uc d =
   ignore wp; (* TODO *)
   let uc = add_pdecl uc d in
-  let th = List.fold_left Theory.add_decl uc.muc_theory d.pd_pure in
+  let th =
+    List.fold_left (Theory.add_decl ~warn:false) uc.muc_theory d.pd_pure
+  in
   { uc with muc_theory = th }
 
 let add_pdecl_with_tuples _uc _md = assert false (*TODO*)

@@ -1,19 +1,12 @@
 
-(*
-
-  small helpers
-
- *)
+(* simple helpers *)
 
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 let log s = Firebug.console ## log (Js.string s)
 
-(*
 
-  module for generating HTML elements
-
-*)
+(* module for generating HTML elements *)
 
 module Html = struct
 
@@ -22,6 +15,17 @@ let d = Dom_html.document
 let node x = (x : #Dom.node Js.t :> Dom.node Js.t)
 
 let of_string s = node (d##createTextNode (Js.string s))
+
+let img i =
+  let x = Dom_html.createImg d in
+  x##src <- Js.string i;
+  x##height <- 12;
+  (* X##align <- Js.string "bottom"; *)
+  node x
+
+let img_accept () = img "accept32.png"
+let img_help () = img "help32.png"
+let img_bug () = img "bug32.png"
 
 let par nl =
   let x = d##createElement (Js.string "p") in
@@ -40,11 +44,8 @@ let ul nl =
 
 end
 
-(*
 
-  Interface to Why3 and Alt-Ergo
-
-*)
+(* Interface to Why3 and Alt-Ergo *)
 
 let why3_conf_file = "/trywhy3.conf"
 
@@ -79,38 +80,50 @@ let alt_ergo_driver : Driver.driver =
       Exn_printer.exn_printer e s;
   exit 1
 
+module SAT = (val (Sat_solvers.get_current ()) : Sat_solvers.S)
+module FE = Frontend.Make (SAT)
+
+let print_status fmt _d status steps =
+  match status with
+  | FE.Unsat _dep ->
+    fprintf fmt "Proved (%Ld steps)" steps
+  | FE.Inconsistent -> ()
+    (* fprintf fmt "Inconsistent assumption" *)
+  | FE.Unknown _t | FE.Sat _t ->
+      fprintf fmt "Unknown (%Ld steps)@." steps
+
+type prover_answer = Valid | Unknown of string | Error of string
+
+let report_status report _d status _steps =
+  match status with
+  | FE.Unsat _dep -> report Valid
+  | FE.Inconsistent -> ()
+  | FE.Unknown _t | FE.Sat _t -> report (Unknown "unknown")
+
 let run_alt_ergo_on_task t =
   (* printing the task in a string *)
   Driver.print_task alt_ergo_driver str_formatter t;
   let text = flush_str_formatter () in
   let lb = Lexing.from_string text in
-(* from Alt-Ergo *)
-(* does not work yet: it requires zarith
-   --> investigate how to compile alt-ergo with nums instead
+(* from Alt-Ergo, src/main/frontend.ml *)
   let a = Why_parser.file Why_lexer.token lb in
-*)
-(* TODO ! *)
-(*
-  let ltd, typ_env = Why_typing.file false Why_typing.empty_env a in
-  let declss = Why_typing.split_goals ltd in
-  SAT.start ();
-  let declss = List.map (List.map fst) declss in
-  let report = FE.print_status in
-  let pruning =
-    List.map
-      (fun d ->
-        if select () > 0 then Pruning.split_and_prune (select ()) d
-        else [List.map (fun f -> f,true) d])
-  in
-  List.iter
-    (List.iter
-       (fun dcl ->
-	 let cnf = Cnf.make dcl in
-	 ignore (Queue.fold (FE.process_decl report)
-		   (SAT.empty (), true, Explanation.empty) cnf)
-       )) (pruning declss)
-*)
-  text
+  Parsing.clear_parser ();
+  let ltd, _typ_env = Why_typing.file false Why_typing.empty_env a in
+  match Why_typing.split_goals ltd with
+  | [d] ->
+    let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
+    SAT.reset_steps ();
+    let stat = ref (Error "no answer from Alt-Ergo") in
+    let f s = stat := s in
+    begin
+      try
+        let _x = Queue.fold (FE.process_decl (report_status f))
+          (SAT.empty (), true, Explanation.empty) d
+        in
+        !stat
+      with Sat_solvers.StepsLimitReached -> Unknown "steps limit reached"
+    end
+  | _ -> Error "zero or more than 1 goal to solve"
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
@@ -119,7 +132,7 @@ let why3_prove theories =
     Stdlib.Mstr.fold
       (fun thname th acc ->
         let tasks = Task.split_theory th None None in
-        let tasks = List.map
+        let tasks = List.rev_map
           (fun t ->
             let (id,expl,_) = Termcode.goal_expl_task ~root:true t in
             let expl = match expl with
@@ -136,22 +149,68 @@ let why3_prove theories =
                     | None -> id.Ident.id_string
                   in
                   let result = run_alt_ergo_on_task task in
-                  let result =
-                    if String.length result > 80 then
-                      "..." ^ String.sub result (String.length result - 80) 80
-                    else result
+                  let img,res = match result with
+                    | Valid -> Html.img_accept, expl
+                    | Unknown s -> Html.img_help, expl ^ " (" ^ s ^ ")"
+                    | Error s -> Html.img_bug, expl ^ " (" ^ s ^ ")"
                   in
-                  [Html.of_string (expl ^" : " ^ result)])
+                  [img (); Html.of_string (" " ^ res)])
                 tl
             in
             [Html.of_string expl; Html.ul tasks])
           tasks
         in
-        [ Html.of_string ("Theory " ^ thname); Html.ul tasks]
-        :: acc)
+        let loc =
+          Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+        in
+        (loc,[ Html.of_string thname; Html.ul tasks]) :: acc)
       theories []
   in
-  Html.ul theories
+  let s =
+    List.sort
+      (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
+      theories
+  in
+  Html.ul (List.rev_map snd s)
+
+let execute_symbol m fmt ps =
+  match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
+  | None ->
+    fprintf fmt "function '%s' has no definition"
+      ps.Mlw_expr.ps_name.Ident.id_string
+  | Some d ->
+    let lam = d.Mlw_expr.fun_lambda in
+    match lam.Mlw_expr.l_args with
+    | [pvs] when
+        Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
+      begin
+        let spec = lam.Mlw_expr.l_spec in
+        let eff = spec.Mlw_ty.c_effect in
+        let writes = eff.Mlw_ty.eff_writes in
+        let body = lam.Mlw_expr.l_expr in
+        try
+          let res, _final_env =
+            Mlw_interp.eval_global_expr env m.Mlw_module.mod_known
+              m.Mlw_module.mod_theory.Theory.th_known writes body
+          in
+          match res with
+          | Mlw_interp.Normal v -> Mlw_interp.print_value fmt v
+          | Mlw_interp.Excep(x,v) ->
+            fprintf fmt "exception %s(%a)"
+              x.Mlw_ty.xs_name.Ident.id_string Mlw_interp.print_value v
+          | Mlw_interp.Irred e ->
+            fprintf fmt "cannot execute expression@ @[%a@]"
+              Mlw_pretty.print_expr e
+          | Mlw_interp.Fun _ ->
+            fprintf fmt "result is a function"
+        with e ->
+          fprintf fmt
+            "failure during execution of function: %a (%s)"
+            Exn_printer.exn_printer e
+            (Printexc.to_string e)
+    end
+  | _ ->
+    fprintf fmt "Only functions with one unit argument can be executed"
 
 let why3_execute (modules,_theories) =
   let mods =
@@ -163,71 +222,31 @@ let why3_execute (modules,_theories) =
           let ps =
             Mlw_module.ns_find_ps m.Mlw_module.mod_export ["main"]
           in
-          let moduleans = Html.of_string ("Module " ^ modname ^ ": ") in
-          let ans =
-            match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
-            | None ->
-              [moduleans;
-               Html.ul
-                 [[Html.of_string "function main has no definition"]]]
-            | Some d ->
-              try
-                [moduleans;
-                 Html.ul
-                   [[Html.of_string
-                        (Pp.sprintf "Execution of main () returns:@\n%a"
-                           (Mlw_interp.eval_global_symbol env m) d)]]]
-              with e ->
-                [moduleans;
-                 Html.ul
-                   [[Html.of_string
-                        (Pp.sprintf
-                           "exception during execution of function main : %a (%s)"
-                         Exn_printer.exn_printer e
-                           (Printexc.to_string e))]]]
-          in ans :: acc
+          let result = Pp.sprintf "%a" (execute_symbol m) ps in
+          let loc =
+            Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+          in
+          (loc,[Html.of_string (modname ^ ".main() returns " ^ result)])
+          :: acc
         with Not_found -> acc)
       modules []
   in
-  Html.ul mods
-
-(* from ../tools/why3execute.ml
-
-  let do_exec (mid,name) =
-    let m = try Mstr.find mid mm with Not_found ->
-      eprintf "Module '%s' not found.@." mid;
-      exit 1 in
-    let ps =
-      try Mlw_module.ns_find_ps m.Mlw_module.mod_export [name]
-      with Not_found ->
-        eprintf "Function '%s' not found in module '%s'.@." name mid;
-        exit 1 in
-    match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
-    | None ->
-      eprintf "Function '%s.%s' has no definition.@." mid name;
-      exit 1
-    | Some d ->
-      try
-        printf "@[<hov 2>Execution of %s.%s ():@\n" mid name;
-        Mlw_interp.eval_global_symbol env m d;
-      with e when Debug.test_noflag Debug.stack_trace ->
-        printf "@\n@]@.";
-        raise e in
-  Queue.iter do_exec opt_exec
-
-*)
+  match mods with
+  | [] -> Html.par [Html.of_string "No main function found"]
+  | _ ->
+    let s =
+      List.sort
+        (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
+        mods
+    in
+    Html.ul (List.rev_map snd s)
 
 
-(*
-
-   Connecting why3 calls to the interface
-
- *)
+(* Connecting Why3 calls to the interface *)
 
 let temp_file_name = "/input.mlw"
 
-let () =
-  Sys_js.register_file ~name:temp_file_name ~content:""
+let () = Sys_js.register_file ~name:temp_file_name ~content:""
 
 let run_why3 f lang global text =
   let ch = open_out temp_file_name in
@@ -254,21 +273,30 @@ let run_why3 f lang global text =
              "unexpected exception: %a (%s)" Exn_printer.exn_printer e
              (Printexc.to_string e))]
 
-let add_why3_cmd buttonname f lang =
+let add_why3_cmd buttonname f input_lang =
   let handler = Dom.handler
     (fun _ev ->
-      log "why3 prove is running";
       let global = Js.Unsafe.global in
       let editor = Js.Unsafe.get global (Js.string "editor") in
+      let lang = "en"
+(*
+        Js.to_string
+          (Js.Unsafe.meth_call editor "getAttribute"
+             [| Js.Unsafe.inject (Js.string "lang") |])
+*)
+      in
       let code = Js.to_string (Js.Unsafe.meth_call editor "getValue" [| |]) in
-      let answer = run_why3 f lang global code in
-      (* remove the previous answer if any *)
+      log ("Why3 is running, lang = " ^ lang);
+      let answer = run_why3 f input_lang global code in
+      log "Why3 answer given";
       let console =
         get_opt (Dom_html.document ## getElementById (Js.string "console"))
       in
+      (* remove the previous answer if any *)
       Js.Opt.iter (console##lastChild) (Dom.removeChild console);
       (* put the new answer *)
       Dom.appendChild console answer;
+      (* give the focus back to the editor *)
       ignore (Js.Unsafe.meth_call editor "focus" [| |]);
       Js._false)
   in
@@ -282,11 +310,7 @@ let () =
   add_why3_cmd "run" why3_execute Mlw_module.mlw_language
 
 
-(*
-
-  Predefined examples
-
-*)
+(* Predefined examples *)
 
 let add_file_example buttonname file =
   let handler = Dom.handler
@@ -308,8 +332,11 @@ let add_file_example buttonname file =
 
 let () =
   add_file_example "drinkers" "/drinkers.why";
-  add_file_example "simplearith" "/simplearith.why";
-  add_file_example "isqrt" "/isqrt.mlw"
+(*  add_file_example "simplearith" "/simplearith.why";*)
+  add_file_example "bin_mult" "/bin_mult.mlw";
+  add_file_example "fact" "/fact.mlw";
+  add_file_example "isqrt" "/isqrt.mlw";
+  Options.set_steps_bound 100
 
 
 (*

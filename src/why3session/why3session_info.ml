@@ -406,7 +406,7 @@ let print_hist stats =
       let fmt = formatter_of_out_channel ch in
       (* The time is also accumulated in order to obtain the total cpu time
           taken to reach the given number of proved goal *)
-      fprintf fmt "0.1 0@\n";
+      (* fprintf fmt "0.1 0@\n"; *)
       let (_ : float * int) =
         Mfloat.fold
           (fun t c (acct,accc) ->

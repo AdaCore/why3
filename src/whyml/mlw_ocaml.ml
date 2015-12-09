@@ -447,8 +447,6 @@ module Translate = struct
         | None -> ML.Tapp (ts.ts_name, List.map (ity info) tl)
         end
 
-  let ity_mark = ity_pur Mlw_wp.ts_mark []
-
   let is_underscore pv =
     pv.pv_vs.vs_name.id_string = "_" && ity_equal pv.pv_ity ity_unit
 
@@ -497,7 +495,7 @@ module Translate = struct
               { e_node = Eapp ({ e_node = Earrow a }, pv', _) })
         when pv_equal pv' pv
              && Mid.mem a.ps_name info.converters && is_int_constant e1 ->
-          let s = Mid.find a.ps_name info.converters in
+          let s = fst (Mid.find a.ps_name info.converters) in
           let n = Number.compute_int (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])
@@ -631,7 +629,7 @@ module Translate = struct
 
   let pdecl info pd =
     match pd.pd_node with
-    | PDval (LetV pv) when pv_equal pv Mlw_wp.pv_old ->
+    | PDval (LetV pv) when pv_equal pv Mlw_decl.pv_old ->
         []
     | PDval _ ->
         []

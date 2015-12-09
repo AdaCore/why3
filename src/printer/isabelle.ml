@@ -48,17 +48,16 @@ let opt_string_of_bool b = if b then Some "true" else None
 let black_list =
   ["o"; "O"]
 
+let isanitize = sanitizer' char_to_alpha char_to_alnumus char_to_alnum
+
 let fresh_printer () =
-  let isanitize = sanitizer' char_to_alpha char_to_alnumus char_to_alnum in
   create_ident_printer black_list ~sanitizer:isanitize
 
 let iprinter = fresh_printer ()
 
-let thprinter = fresh_printer ()
+let forget_ids () = forget_all iprinter
 
-let forget_ids () =
-  forget_all iprinter;
-  forget_all thprinter
+let string_of_id id = isanitize id.id_string
 
 (* type variables *)
 
@@ -90,7 +89,7 @@ type info = {
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_altname_path info fmt id =
-  attribs "altname" string
+  attribs "altname" html_string
     (print_option (attrib "path" string))
     fmt (id.id_string, Mid.find_opt id info.theories)
 
@@ -419,7 +418,7 @@ let print_decls info fmt dl =
   print_list nothing (print_decl info) fmt dl
 
 let make_thname th = String.concat "." (th.Theory.th_path @
-  [id_unique thprinter th.Theory.th_name])
+  [string_of_id th.Theory.th_name])
 
 let print_task printer_args realize fmt task =
   forget_ids ();
@@ -439,11 +438,11 @@ let print_task printer_args realize fmt task =
   let rec upd_realized_theories = function
     | Some { Task.task_decl = { Theory.td_node =
                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
-        id_unique thprinter pr.pr_name, realized_theories
+        string_of_id pr.pr_name, realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
         let id = th.Theory.th_name in
-        String.concat "." (th.Theory.th_path @ [id_unique thprinter id]),
+        String.concat "." (th.Theory.th_path @ [string_of_id id]),
         Mid.remove id realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Meta _ };
              Task.task_prev = task } ->

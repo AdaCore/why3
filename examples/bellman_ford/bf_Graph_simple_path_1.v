@@ -8,116 +8,120 @@ Require int.Int.
 Require list.Mem.
 Require list.Append.
 
-Axiom set : forall (a:Type) {a_WT:WhyType a}, Type.
+Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Existing Instance set_WhyType.
 
-Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (@set a a_WT) -> Prop.
+Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(@set a a_WT)) (s2:(@set
-  a a_WT)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
+  a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
 
-Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set
-  a a_WT)) (s2:(@set a a_WT)), (infix_eqeq s1 s2) -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a} (s1:(@set a a_WT)) (s2:(@set
-  a a_WT)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
-
-Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(@set
-  a a_WT)), (subset s s).
-
-Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set
-  a a_WT)) (s2:(@set a a_WT)) (s3:(@set a a_WT)), (subset s1 s2) -> ((subset
-  s2 s3) -> (subset s1 s3)).
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, (@set a a_WT).
+Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:(@set a a_WT)): Prop :=
+Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
+  a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
+
+Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+  (subset s s).
+
+Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)) (s3:(set a)), (subset s1 s2) -> ((subset s2 s3) -> (subset s1
+  s3)).
+
+Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
+
+(* Why3 assumption *)
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
   forall (x:a), ~ (mem x s).
 
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(@set
-  a a_WT))).
+Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
+  a))).
 
 Axiom mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
-  (empty :(@set a a_WT))).
+  (empty : (set a))).
 
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (@set a a_WT) -> (@set
-  a a_WT).
+Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
 Axiom add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
-  forall (s:(@set a a_WT)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
+  forall (s:(set a)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
 
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (@set a a_WT)
-  -> (@set a a_WT).
+Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
 Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
-  (s:(@set a a_WT)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
+  (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
 
-Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(@set
-  a a_WT)), (subset (remove x s) s).
+Axiom add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), (mem x s) -> ((add x (remove x s)) = s).
 
-Parameter union: forall {a:Type} {a_WT:WhyType a}, (@set a a_WT) -> (@set
-  a a_WT) -> (@set a a_WT).
+Axiom remove_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), ((remove x (add x s)) = (remove x s)).
 
-Axiom union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set
-  a a_WT)) (s2:(@set a a_WT)) (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/
-  (mem x s2)).
+Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), (subset (remove x s) s).
 
-Parameter inter: forall {a:Type} {a_WT:WhyType a}, (@set a a_WT) -> (@set
-  a a_WT) -> (@set a a_WT).
+Parameter union: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
+  a).
 
-Axiom inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set
-  a a_WT)) (s2:(@set a a_WT)) (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\
-  (mem x s2)).
+Axiom union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)) (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
 
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, (@set a a_WT) -> (@set
-  a a_WT) -> (@set a a_WT).
+Parameter inter: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
+  a).
 
-Axiom diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set a a_WT))
-  (s2:(@set a a_WT)) (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x
-  s2)).
+Axiom inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)) (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
 
-Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set
-  a a_WT)) (s2:(@set a a_WT)), (subset (diff s1 s2) s1).
+Parameter diff: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
+  a).
 
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (@set a a_WT) -> a.
+Axiom diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)) (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
 
-Axiom choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(@set
-  a a_WT)), (~ (is_empty s)) -> (mem (choose s) s).
+Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset (diff s1 s2) s1).
 
-Parameter cardinal: forall {a:Type} {a_WT:WhyType a}, (@set a a_WT) -> Z.
+Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
 
-Axiom cardinal_nonneg : forall {a:Type} {a_WT:WhyType a}, forall (s:(@set
-  a a_WT)), (0%Z <= (cardinal s))%Z.
+Axiom choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+  (~ (is_empty s)) -> (mem (choose s) s).
 
-Axiom cardinal_empty : forall {a:Type} {a_WT:WhyType a}, forall (s:(@set
-  a a_WT)), ((cardinal s) = 0%Z) <-> (is_empty s).
+Parameter cardinal: forall {a:Type} {a_WT:WhyType a}, (set a) -> Z.
+
+Axiom cardinal_nonneg : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+  (0%Z <= (cardinal s))%Z.
+
+Axiom cardinal_empty : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+  ((cardinal s) = 0%Z) <-> (is_empty s).
 
 Axiom cardinal_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
-  forall (s:(@set a a_WT)), (~ (mem x s)) -> ((cardinal (add x
+  forall (s:(set a)), (~ (mem x s)) -> ((cardinal (add x
   s)) = (1%Z + (cardinal s))%Z).
 
 Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
-  forall (s:(@set a a_WT)), (mem x s) ->
-  ((cardinal s) = (1%Z + (cardinal (remove x s)))%Z).
+  forall (s:(set a)), (mem x s) -> ((cardinal s) = (1%Z + (cardinal (remove x
+  s)))%Z).
 
-Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(@set
-  a a_WT)) (s2:(@set a a_WT)), (subset s1 s2) ->
-  ((cardinal s1) <= (cardinal s2))%Z.
+Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
 
-Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(@set a a_WT)),
+Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
+  (infix_eqeq s1 s2)).
+
+Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
 
 Axiom vertex : Type.
 Parameter vertex_WhyType : WhyType vertex.
 Existing Instance vertex_WhyType.
 
-Parameter vertices: (@set vertex vertex_WhyType).
+Parameter vertices: (set vertex).
 
-Parameter edges: (@set (vertex* vertex)%type _).
+Parameter edges: (set (vertex* vertex)%type).
 
 (* Why3 assumption *)
 Definition edge (x:vertex) (y:vertex): Prop := (mem (x, y) edges).
@@ -132,111 +136,118 @@ Axiom s_in_graph : (mem s vertices).
 Axiom vertices_cardinal_pos : (0%Z < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
-Inductive path : vertex -> (list vertex) -> vertex -> Prop :=
-  | Path_empty : forall (x:vertex), (path x nil x)
+Inductive path: vertex -> (list vertex) -> vertex -> Prop :=
+  | Path_empty : forall (x:vertex), (path x Init.Datatypes.nil x)
   | Path_cons : forall (x:vertex) (y:vertex) (z:vertex) (l:(list vertex)),
-      (edge x y) -> ((path y l z) -> (path x (cons x l) z)).
+      (edge x y) -> ((path y l z) -> (path x (Init.Datatypes.cons x l) z)).
 
 Axiom path_right_extension : forall (x:vertex) (y:vertex) (z:vertex)
   (l:(list vertex)), (path x l y) -> ((edge y z) -> (path x
-  (List.app l (cons y nil)) z)).
+  (Init.Datatypes.app l (Init.Datatypes.cons y Init.Datatypes.nil)) z)).
 
 Axiom path_right_inversion : forall (x:vertex) (z:vertex) (l:(list vertex)),
-  (path x l z) -> (((x = z) /\ (l = nil)) \/ exists y:vertex,
+  (path x l z) -> (((x = z) /\ (l = Init.Datatypes.nil)) \/ exists y:vertex,
   exists l':(list vertex), (path x l' y) /\ ((edge y z) /\
-  (l = (List.app l' (cons y nil))))).
+  (l = (Init.Datatypes.app l' (Init.Datatypes.cons y Init.Datatypes.nil))))).
 
 Axiom path_trans : forall (x:vertex) (y:vertex) (z:vertex) (l1:(list vertex))
   (l2:(list vertex)), (path x l1 y) -> ((path y l2 z) -> (path x
-  (List.app l1 l2) z)).
+  (Init.Datatypes.app l1 l2) z)).
 
-Axiom empty_path : forall (x:vertex) (y:vertex), (path x nil y) -> (x = y).
+Axiom empty_path : forall (x:vertex) (y:vertex), (path x Init.Datatypes.nil
+  y) -> (x = y).
 
 Axiom path_decomposition : forall (x:vertex) (y:vertex) (z:vertex)
-  (l1:(list vertex)) (l2:(list vertex)), (path x (List.app l1 (cons y l2))
-  z) -> ((path x l1 y) /\ (path y (cons y l2) z)).
+  (l1:(list vertex)) (l2:(list vertex)), (path x
+  (Init.Datatypes.app l1 (Init.Datatypes.cons y l2)) z) -> ((path x l1 y) /\
+  (path y (Init.Datatypes.cons y l2) z)).
 
 Parameter weight: vertex -> vertex -> Z.
 
 (* Why3 assumption *)
 Fixpoint path_weight (l:(list vertex)) (dst:vertex) {struct l}: Z :=
   match l with
-  | nil => 0%Z
-  | (cons x nil) => (weight x dst)
-  | (cons x ((cons y _) as r)) => ((weight x y) + (path_weight r dst))%Z
+  | Init.Datatypes.nil => 0%Z
+  | (Init.Datatypes.cons x Init.Datatypes.nil) => (weight x dst)
+  | (Init.Datatypes.cons x ((Init.Datatypes.cons y _) as r)) => ((weight x
+      y) + (path_weight r dst))%Z
   end.
 
 Axiom path_weight_right_extension : forall (x:vertex) (y:vertex)
-  (l:(list vertex)), ((path_weight (List.app l (cons x nil))
+  (l:(list vertex)),
+  ((path_weight (Init.Datatypes.app l (Init.Datatypes.cons x Init.Datatypes.nil))
   y) = ((path_weight l x) + (weight x y))%Z).
 
 Axiom path_weight_decomposition : forall (y:vertex) (z:vertex)
   (l1:(list vertex)) (l2:(list vertex)),
-  ((path_weight (List.app l1 (cons y l2)) z) = ((path_weight l1
-  y) + (path_weight (cons y l2) z))%Z).
+  ((path_weight (Init.Datatypes.app l1 (Init.Datatypes.cons y l2))
+  z) = ((path_weight l1 y) + (path_weight (Init.Datatypes.cons y l2) z))%Z).
 
 Axiom path_in_vertices : forall (v1:vertex) (v2:vertex) (l:(list vertex)),
   (mem v1 vertices) -> ((path v1 l v2) -> (mem v2 vertices)).
 
 (* Why3 assumption *)
-Definition pigeon_set (s1:(@set vertex vertex_WhyType)): Prop :=
-  forall (l:(list vertex)), (forall (e:vertex), (list.Mem.mem e l) -> (mem e
-  s1)) -> (((cardinal s1) < (list.Length.length l))%Z -> exists e:vertex,
+Definition pigeon_set (s1:(set vertex)): Prop := forall (l:(list vertex)),
+  (forall (e:vertex), (list.Mem.mem e l) -> (mem e s1)) ->
+  (((cardinal s1) < (list.Length.length l))%Z -> exists e:vertex,
   exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
-  (l = (List.app l1 (cons e (List.app l2 (cons e l3)))))).
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3)))))).
 
-Axiom Induction : (forall (s1:(@set vertex vertex_WhyType)), (is_empty s1) ->
-  (pigeon_set s1)) -> ((forall (s1:(@set vertex vertex_WhyType)), (pigeon_set
-  s1) -> forall (t:vertex), (~ (mem t s1)) -> (pigeon_set (add t s1))) ->
-  forall (s1:(@set vertex vertex_WhyType)), (pigeon_set s1)).
+Axiom Induction : (forall (s1:(set vertex)), (is_empty s1) -> (pigeon_set
+  s1)) -> ((forall (s1:(set vertex)), (pigeon_set s1) -> forall (t:vertex),
+  (~ (mem t s1)) -> (pigeon_set (add t s1))) -> forall (s1:(set vertex)),
+  (pigeon_set s1)).
 
-Axiom corner : forall (s1:(@set vertex vertex_WhyType)) (l:(list vertex)),
+Axiom corner : forall (s1:(set vertex)) (l:(list vertex)),
   ((list.Length.length l) = (cardinal s1)) -> ((forall (e:vertex),
   (list.Mem.mem e l) -> (mem e s1)) -> ((exists e:vertex,
   (exists l1:(list vertex), (exists l2:(list vertex),
   (exists l3:(list vertex),
-  (l = (List.app l1 (cons e (List.app l2 (cons e l3))))))))) \/
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3))))))))) \/
   forall (e:vertex), (mem e s1) -> (list.Mem.mem e l))).
 
-Axiom pigeon_0 : (pigeon_set (empty :(@set vertex vertex_WhyType))).
+Axiom pigeon_0 : (pigeon_set (empty : (set vertex))).
 
-Axiom pigeon_1 : forall (s1:(@set vertex vertex_WhyType)), (pigeon_set s1) ->
+Axiom pigeon_1 : forall (s1:(set vertex)), (pigeon_set s1) ->
   forall (t:vertex), (pigeon_set (add t s1)).
 
-Axiom pigeon_2 : forall (s1:(@set vertex vertex_WhyType)), (pigeon_set s1).
+Axiom pigeon_2 : forall (s1:(set vertex)), (pigeon_set s1).
 
-Axiom pigeonhole : forall (s1:(@set vertex vertex_WhyType))
-  (l:(list vertex)), (forall (e:vertex), (list.Mem.mem e l) -> (mem e s1)) ->
+Axiom pigeonhole : forall (s1:(set vertex)) (l:(list vertex)),
+  (forall (e:vertex), (list.Mem.mem e l) -> (mem e s1)) ->
   (((cardinal s1) < (list.Length.length l))%Z -> exists e:vertex,
   exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
-  (l = (List.app l1 (cons e (List.app l2 (cons e l3)))))).
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3)))))).
 
 Axiom long_path_decomposition_pigeon1 : forall (l:(list vertex)) (v:vertex),
-  (path s l v) -> ((~ (l = nil)) -> forall (v1:vertex), (list.Mem.mem v1
-  (cons v l)) -> (mem v1 vertices)).
+  (path s l v) -> ((~ (l = Init.Datatypes.nil)) -> forall (v1:vertex),
+  (list.Mem.mem v1 (Init.Datatypes.cons v l)) -> (mem v1 vertices)).
 
 Axiom long_path_decomposition_pigeon2 : forall (l:(list vertex)) (v:vertex),
-  (forall (v1:vertex), (list.Mem.mem v1 (cons v l)) -> (mem v1 vertices)) ->
-  (((cardinal vertices) < (list.Length.length (cons v l)))%Z ->
+  (forall (v1:vertex), (list.Mem.mem v1 (Init.Datatypes.cons v l)) -> (mem v1
+  vertices)) ->
+  (((cardinal vertices) < (list.Length.length (Init.Datatypes.cons v l)))%Z ->
   exists e:vertex, exists l1:(list vertex), exists l2:(list vertex),
   exists l3:(list vertex),
-  ((cons v l) = (List.app l1 (cons e (List.app l2 (cons e l3)))))).
+  ((Init.Datatypes.cons v l) = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3)))))).
 
 Axiom long_path_decomposition_pigeon3 : forall (l:(list vertex)) (v:vertex),
   (exists e:vertex, (exists l1:(list vertex), (exists l2:(list vertex),
   (exists l3:(list vertex),
-  ((cons v l) = (List.app l1 (cons e (List.app l2 (cons e l3))))))))) ->
+  ((Init.Datatypes.cons v l) = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3))))))))) ->
   ((exists l1:(list vertex), (exists l2:(list vertex),
-  (l = (List.app l1 (cons v l2))))) \/ exists n:vertex,
-  exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
-  (l = (List.app l1 (cons n (List.app l2 (cons n l3)))))).
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons v l2))))) \/
+  exists n:vertex, exists l1:(list vertex), exists l2:(list vertex),
+  exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons n (Init.Datatypes.app l2 (Init.Datatypes.cons n l3)))))).
 
 Axiom long_path_decomposition : forall (l:(list vertex)) (v:vertex), (path s
   l v) -> (((cardinal vertices) <= (list.Length.length l))%Z ->
   ((exists l1:(list vertex), (exists l2:(list vertex),
-  (l = (List.app l1 (cons v l2))))) \/ exists n:vertex,
-  exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
-  (l = (List.app l1 (cons n (List.app l2 (cons n l3))))))).
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons v l2))))) \/
+  exists n:vertex, exists l1:(list vertex), exists l2:(list vertex),
+  exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons n (Init.Datatypes.app l2 (Init.Datatypes.cons n l3))))))).
 
 Require Import Why3. Ltac ae := why3 "alt-ergo".
 
@@ -289,5 +300,4 @@ apply (IH (length (app l1 (cons u l3))) H1 (app l1 (cons u l3))).
 omega.
 assumption.
 Qed.
-
 

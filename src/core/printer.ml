@@ -279,18 +279,21 @@ let print_prelude_for_theory th fmt pm =
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
 exception KnownConverterSyntax of lsymbol
+exception TooManyTypeOverride of tysymbol
+exception TooManyLogicOverride of lsymbol
+exception TooManyConverterOverride of lsymbol
 
-let meta_syntax_type = register_meta "syntax_type" [MTtysymbol; MTstring]
+let meta_syntax_type = register_meta "syntax_type" [MTtysymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ type@ symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax type'@ rule."
 
-let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring]
+let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ function/predicate@ \
          symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax function'@ \
          or@ 'syntax predicate'@ rules."
 
-let meta_syntax_converter = register_meta "syntax_converter" [MTlsymbol; MTstring]
+let meta_syntax_converter = register_meta "syntax_converter" [MTlsymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ converter@ \ symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax converter'@ \
          rules."
@@ -313,38 +316,64 @@ let meta_realized_theory = register_meta "realized_theory" [MTstring; MTstring]
 
 let check_syntax_type ts s = check_syntax s (List.length ts.ts_args)
 
-let syntax_type ts s =
+let syntax_type ts s b =
   check_syntax_type ts s;
-  create_meta meta_syntax_type [MAts ts; MAstr s]
+  create_meta meta_syntax_type [MAts ts; MAstr s; MAint (if b then 1 else 0)]
 
-let syntax_logic ls s =
+let syntax_logic ls s b =
   check_syntax_logic ls s;
-  create_meta meta_syntax_logic [MAls ls; MAstr s]
+  create_meta meta_syntax_logic [MAls ls; MAstr s; MAint (if b then 1 else 0)]
 
-let syntax_converter ls s =
+let syntax_converter ls s b =
   check_syntax_logic ls s;
-  create_meta meta_syntax_converter [MAls ls; MAstr s]
+  create_meta meta_syntax_converter [MAls ls; MAstr s; MAint (if b then 1 else 0)]
 
 let remove_prop pr =
   create_meta meta_remove_prop [MApr pr]
 
-type syntax_map = string Mid.t
-type converter_map = string Mls.t
+type syntax_map = (string * int) Mid.t
+type converter_map = (string * int) Mls.t
+
+let change_override e e' rs ov = function
+  | None         -> Some (rs,ov)
+  | Some (_,0)   ->
+    begin match ov with
+      | 0 -> raise e
+      | 1 -> Some (rs, 2)
+      | _ -> assert false
+    end
+  | Some (rs',1) ->
+    begin match ov with
+      | 0 -> Some (rs',2)
+      | 1 -> raise e'
+      | _ -> assert false
+    end
+  | Some (_,2)   -> raise e'
+  | _            -> assert false
 
 let sm_add_ts sm = function
-  | [MAts ts; MAstr rs] -> Mid.add_new (KnownTypeSyntax ts) ts.ts_name rs sm
+  | [MAts ts; MAstr rs; MAint ov] ->
+    Mid.change
+      (change_override (KnownTypeSyntax ts) (TooManyTypeOverride ts)
+         rs ov) ts.ts_name sm
   | _ -> assert false
 
 let sm_add_ls sm = function
-  | [MAls ls; MAstr rs] -> Mid.add_new (KnownLogicSyntax ls) ls.ls_name rs sm
+  | [MAls ls; MAstr rs; MAint ov] ->
+    Mid.change
+      (change_override (KnownLogicSyntax ls) (TooManyLogicOverride ls)
+         rs ov) ls.ls_name sm
   | _ -> assert false
 
 let sm_add_pr sm = function
-  | [MApr pr] -> Mid.add pr.pr_name "" sm
+  | [MApr pr] -> Mid.add pr.pr_name ("",0) sm
   | _ -> assert false
 
 let cm_add_ls cm = function
-  | [MAls ls; MAstr rs] -> Mls.add_new (KnownConverterSyntax ls) ls rs cm
+  | [MAls ls; MAstr rs; MAint ov] ->
+    Mls.change
+      (change_override (KnownConverterSyntax ls) (TooManyConverterOverride ls)
+         rs ov) ls cm
   | _ -> assert false
 
 let get_syntax_map task =
@@ -367,9 +396,11 @@ let add_converter_map td cm = match td.td_node with
   | Meta (m, args) when meta_equal m meta_syntax_converter -> cm_add_ls cm args
   | _ -> cm
 
-let query_syntax sm id = Mid.find_opt id sm
+let query_syntax sm id =
+  try Some (fst (Mid.find id sm)) with Not_found -> None
 
-let query_converter cm ls = Mls.find_opt ls cm
+let query_converter cm ls =
+  try Some (fst (Mls.find ls cm)) with Not_found -> None
 
 let on_syntax_map fn =
   Trans.on_meta meta_syntax_type (fun sts ->
@@ -445,6 +476,15 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
         Pretty.print_ls ls
   | KnownConverterSyntax ls ->
       fprintf fmt "Converter syntax for logical symbol %a is already defined"
+        Pretty.print_ls ls
+  | TooManyTypeOverride ts ->
+      fprintf fmt "Too many syntax overriding for type symbol %a"
+        Pretty.print_ts ts
+  | TooManyLogicOverride ls ->
+      fprintf fmt "Too many syntax overriding for logic symbol %a"
+        Pretty.print_ls ls
+  | TooManyConverterOverride ls ->
+      fprintf fmt "Too many syntax converter overriding for logic symbol %a"
         Pretty.print_ls ls
   | BadSyntaxIndex i ->
       fprintf fmt "Bad argument index %d, must start with 1" i

@@ -12,7 +12,6 @@
 (** {1 Weakest preconditions} *)
 
 open Theory
-open Mlw_ty
 open Mlw_ty.T
 open Mlw_decl
 open Mlw_expr
@@ -20,9 +19,6 @@ open Mlw_expr
 (** {2 WP-only builtins} *)
 
 val lemma_label : Ident.label
-
-val ts_mark : Ty.tysymbol
-val ty_mark : Ty.ty
 
 val fs_at  : Term.lsymbol
 val fs_old : Term.lsymbol
@@ -36,7 +32,6 @@ val th_mark_old : Theory.theory
 val fs_now : Term.lsymbol
 val e_now : expr
 
-val pv_old : pvsymbol
 val remove_old : Term.term -> Term.term
 
 val full_invariant :

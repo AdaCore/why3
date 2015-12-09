@@ -46,12 +46,28 @@ module DfaExample
       all_in_r0 r
     end
 
-  lemma ends_with_one:
+  lemma words_in_r1_end_with_one:
     forall w: list char.
     mem w r1 <-> exists w': list char. w = w' ++ Cons One Nil
 
-  lemma zero_w_in_r1: forall w: list char. mem w r1 <-> mem (Cons Zero w) r1
-  lemma one_w_in_r1: forall w: list char. mem w r2 <-> mem (Cons One w) r1
+  let lemma words_in_r1_suffix_in_r1 (c c':char) (w: list char)
+    requires { mem (Cons c (Cons c' w)) r1 }
+    ensures  { mem (Cons c' w) r1 }
+  = assert { exists w'. (Cons c (Cons c' w))  = w' ++ Cons One Nil }
+
+  let lemma zero_w_in_r1 (w: list char)
+    ensures { mem w r1 <-> mem (Cons Zero w) r1 }
+  = assert { mem (Cons Zero w) r1 ->
+             exists w'. (Cons Zero w)  = w' ++ Cons One Nil }
+
+  let lemma one_w_in_r1 (w: list char)
+    ensures { mem w r2 <-> mem (Cons One w) r1 }
+  = match w with
+    | Nil -> ()
+    | Cons c r ->
+      assert { mem w r2 -> mem w r1 };
+      assert { mem (Cons One (Cons c r)) r1 -> mem w r1 }
+    end
 
   lemma zero_w_in_r2: forall w: list char. mem w r1 <-> mem (Cons Zero w) r2
   lemma one_w_in_r2: forall w: list char. mem w r2 <-> mem (Cons One w) r2

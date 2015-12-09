@@ -5,10 +5,13 @@ module M
 
   function sqr (x:int) : int = x * x
 
+  lemma sqr_sum :
+    forall x y : int. sqr(x+y) = sqr x + 2*x*y + sqr y
+
   let isqrt (x:int) : int
     requires { x >= 0 }
     ensures { result >= 0 }
-    ensures { result <= x < sqr (result + 1) }
+    ensures { sqr result <= x < sqr (result + 1) }
   = let count = ref 0 in
     let sum = ref 1 in
     while !sum <= x do

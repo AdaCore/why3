@@ -73,9 +73,10 @@ let run_test name l =
   Format.printf "Running the test '%s'@." name;
   Format.printf "Formulas: %a@." pr_formula_list_impl l;
   let t = Unix.gettimeofday () in
-  ProverMain__Impl.main l (n 1);
+  let n = ProverMain__Impl.main l (n 1) in
   let t = Unix.gettimeofday () -. t in
-  Format.printf "Unsat (time = %.02f)@.@." t
+  Format.printf "Unsat (time = %.02f, depth=%s)@.@." t
+                (Why3extract.Why3__BigInt.to_string n)
 
 let run_all_tests () =
   run_test "drinker" (ProverTest__Impl.drinker ());
@@ -270,6 +271,11 @@ let rec tr_fmla env e =
     let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
     let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
     env,Firstorder_formula_impl__Impl.construct_fo_formula o
+  | Edef(DP(DPfalse),[]) ->
+     let o =
+      Firstorder_formula_impl__Types.NLC_FFalse
+    in
+    env,Firstorder_formula_impl__Impl.construct_fo_formula o
   | Edef(w,el) -> unsupported "def"
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
@@ -342,7 +348,7 @@ let tr_top_formula env kind role f =
     let env,f =
       match kind with
       | FOF -> tr_fmla { env with cnf = false } e
-      | CNF -> tr_cnf { env with cnf = true } e
+      | CNF -> (* assert false *) tr_cnf { env with cnf = true } e
       | TFF -> assert false
     in
     let phi =
@@ -363,6 +369,7 @@ let tr_decl (env,acc) d =
   match d with
   | Include _ -> unsupported "Include"
   | Formula(TFF,_,role,top_formula,_) -> unsupported "TFF"
+  | Formula(CNF,_,role,top_formula,_) -> unsupported "CNF"
   | Formula(kind,_,role,top_formula,_) ->
     let env,phi = tr_top_formula env kind role top_formula in
     let o = Firstorder_formula_list_impl__Types.NLC_FOFCons (phi, acc) in
@@ -376,12 +383,141 @@ let tr_file a =
   in
   List.fold_left tr_decl (empty_env (),fonil) a
 
-let run_file file =
+(*** output in FOF format *)
+
+let comma fmt () = fprintf fmt ",@ "
+
+let rec print_list_pre sep print fmt = function
+  | [] -> ()
+  | x :: r -> sep fmt (); print fmt x; print_list_pre sep print fmt r
+
+let print_list sep print fmt = function
+  | [] -> ()
+  | [x] -> print fmt x
+  | x :: r -> print fmt x; print_list_pre sep print fmt r
+
+let pr_var fmt (v,_) = pp_print_string fmt v
+
+let rec pr_fof_expr fmt e =
+  match e.e_node with
+  | Elet(e1,e2) -> unsupported "let"
+  | Eite(e1,e2,e3) -> unsupported "ite"
+  | Eqnt(q,vl,e) ->
+     let q = match q with Qforall -> "!" | Qexists -> "?" in
+     fprintf fmt "@[(%s[%a]:@ %a)@]" q
+        (print_list comma pr_var) vl pr_fof_expr e
+  | Ebin(op,e1,e2) ->
+     let s = match op with
+       | BOand -> "&" | BOor -> "|" | BOimp -> "=>"
+       | _ -> unsupported "binop"
+     in
+     fprintf fmt "@[(%a@ %s %a)@]" pr_fof_expr e1 s pr_fof_expr e2
+  | Enot e -> fprintf fmt "~@ %a" pr_fof_expr e
+  | Eequ(e1,e2) -> unsupported "equ"
+  | Eapp(w,[]) -> fprintf fmt "%s" w
+  | Eapp(w,el) ->
+     fprintf fmt "@[%s(%a)@]" w (print_list comma pr_fof_expr) el
+  | Edef(w,el) -> unsupported "def"
+  | Edob d -> unsupported "dob"
+  | Enum n -> unsupported "num"
+  | Evar v -> fprintf fmt "%s" v
+
+let rec add x l =
+  match l with
+  | [] -> [x]
+  | y :: r as l -> if x = y then l else y :: add x r
+
+let get_vars e =
+  let rec aux env e =
+    match e.e_node with
+    | Elet(e1,e2) -> unsupported "let"
+    | Eite(e1,e2,e3) -> unsupported "ite"
+    | Eqnt(q,vl,e) -> unsupported "quant in cnf"
+    | Ebin(op,e1,e2) -> aux (aux env e1) e2
+    | Enot e -> aux env e
+    | Eequ(e1,e2) -> unsupported "equ"
+    | Eapp(w,el) -> List.fold_left aux env el
+    | Edef(w,el) -> unsupported "def"
+    | Edob d -> unsupported "dob"
+    | Enum n -> unsupported "num"
+    | Evar v -> add v env
+  in
+  aux [] e
+
+let pr_role fmt r =
+  match r with
+  | Axiom -> fprintf fmt "axiom"
+  | Hypothesis -> fprintf fmt "hypothesis"
+  | Definition -> unsupported "Definition"
+  | Assumption -> fprintf fmt "assumption"
+  | Corollary -> unsupported "corollary"
+  | Lemma -> unsupported "lemma"
+  | Theorem -> unsupported "theorem"
+  | Conjecture -> fprintf fmt "conjecture"
+  | Negated_conjecture -> fprintf fmt "negated_conjecture"
+  | Type -> unsupported "Type"
+
+let pr_fof_top_formula fmt name kind role f =
+  match f with
+  | TypedAtom _ -> unsupported "TypedAtom"
+  | Sequent _ -> unsupported "Sequent"
+  | LogicFormula e ->
+     match kind with
+     | FOF -> fprintf fmt "@[fof(%s,@ %a,@ %a).@]@\n"
+                      name pr_role role pr_fof_expr e
+     | CNF ->
+        let r = match role with
+          | Conjecture -> unsupported "conjecture in CNF format"
+          | Negated_conjecture -> Axiom
+          | Axiom -> role
+          | Hypothesis -> role
+          | Definition | Assumption
+          | Corollary|Lemma|Theorem|Type -> unsupported "role"
+        in
+        begin
+          match get_vars e with
+          | [] -> fprintf fmt "@[fof(%s,@ %a,@ %a).@]@\n"
+                          name pr_role r pr_fof_expr e
+          | l -> fprintf fmt "@[fof(%s,@ %a,@ (![%a]: %a)).@]@\n"
+                         name pr_role r
+                         (print_list comma pp_print_string) l
+                         pr_fof_expr e
+        end
+     | TFF -> assert false
+
+let pr_fof_decl fmt k d =
+  match d with
+  | Include _ -> unsupported "Include"
+  | Formula(TFF,_,role,top_formula,_) -> unsupported "TFF"
+  | Formula(kind,name,role,top_formula,_) ->
+    pr_fof_top_formula fmt name kind role top_formula;
+    match k with
+    | None -> Some kind
+    | Some k' -> if k'=kind then k else unsupported "mixed CNF/FOF"
+
+
+let pr_fof fmt a =
+  let k = List.fold_left (pr_fof_decl fmt) None a in
+  match k with
+  | Some CNF ->
+    fprintf fmt "fof(contradiction,conjecture,$false).@."
+  | None -> unsupported "empty file ??"
+  | _ -> fprintf fmt "@."
+
+let run_file ~print file =
   try
     let ast = Tptp_lexer.load file in
     printf "File '%s': parsing OK.@." file;
-    let _,l = tr_file ast in
-    run_test (Filename.basename file) l;
+    if print then
+      begin
+        let ch = open_out "tmp.p" in
+        let fmt = formatter_of_out_channel ch in
+        pr_fof fmt ast;
+        close_out ch
+      end
+    else
+      let _,l = tr_file ast in
+      run_test (Filename.basename file) l;
     exit 0
   with
   | Tptp_lexer.FileNotFound f ->
@@ -393,16 +529,25 @@ let run_file file =
     exit 2
 
 let () =
-  printf "The safe prover, version 0.0.0@.";
+  printf "The safe prover, version 0.0.1@.";
   if Array.length Sys.argv = 1 then run_all_tests ()
   else
-    if Array.length Sys.argv = 2 then
+    try
       let arg = Sys.argv.(1) in
       match arg with
       | "-version" -> exit 0
-      | _ -> run_file arg
-    else
+      | "-print" ->
+         if Array.length Sys.argv <> 3 then raise Exit;
+         run_file ~print:true Sys.argv.(2)
+      | _ ->
+         if Array.length Sys.argv <> 2 then raise Exit;
+         run_file ~print:false arg
+    with Exit ->
       begin
-        eprintf "Usage: %s [file]@\nInternal tests are run if no file is given@." Sys.argv.(0);
+        eprintf "Usage: %s [options] [file]@\n\
+                  -version: prints the version@\n\
+                  -print  : reprints the file in TPTP/FOF without includes@\n\
+                 Internal tests are run if no file is given@."
+                Sys.argv.(0);
         exit 2
       end

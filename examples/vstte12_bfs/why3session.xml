@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="0"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="10" memlimit="0"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
 <prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
@@ -45,7 +45,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BFS" sum="5846be4f5e134b08034954a2eaf8f555" expanded="true">
+<theory name="BFS" sum="1c4e9affeb06eecd52118ffdf9845b83" expanded="true">
  <goal name="WP_parameter fill_next" expl="VC for fill_next">
  <transf name="split_goal_wp">
   <goal name="WP_parameter fill_next.1" expl="1. loop invariant init">
@@ -63,7 +63,7 @@
    <proof prover="9" memlimit="0"><result status="valid" time="0.02" steps="23"/></proof>
    </goal>
    <goal name="WP_parameter fill_next.3.3" expl="3. VC for fill_next">
-   <proof prover="9" memlimit="0"><result status="valid" time="0.04" steps="148"/></proof>
+   <proof prover="9" memlimit="0"><result status="valid" time="0.04" steps="149"/></proof>
    </goal>
    <goal name="WP_parameter fill_next.3.4" expl="4. VC for fill_next">
    <proof prover="6"><result status="valid" time="0.01"/></proof>
@@ -88,7 +88,7 @@
    <goal name="WP_parameter fill_next.5.4" expl="4. VC for fill_next">
    <transf name="inline_goal">
     <goal name="WP_parameter fill_next.5.4.1" expl="1. VC for fill_next">
-    <proof prover="9" memlimit="0"><result status="valid" time="0.06" steps="111"/></proof>
+    <proof prover="9" memlimit="0"><result status="valid" time="0.06" steps="112"/></proof>
     </goal>
    </transf>
    </goal>
@@ -103,10 +103,10 @@
    <proof prover="9" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
    <goal name="WP_parameter fill_next.7.2" expl="2. VC for fill_next">
-   <proof prover="9" memlimit="0"><result status="valid" time="0.07" steps="257"/></proof>
+   <proof prover="9" memlimit="0"><result status="valid" time="0.07" steps="261"/></proof>
    </goal>
    <goal name="WP_parameter fill_next.7.3" expl="3. VC for fill_next">
-   <proof prover="9" memlimit="0"><result status="valid" time="0.06" steps="82"/></proof>
+   <proof prover="9" memlimit="0"><result status="valid" time="0.06" steps="85"/></proof>
    </goal>
   </transf>
   </goal>
@@ -196,7 +196,6 @@
    </goal>
    <goal name="WP_parameter bfs.5.3" expl="3. VC for bfs">
    <proof prover="5"><result status="valid" time="2.77"/></proof>
-   <proof prover="7"><result status="timeout" time="4.97"/></proof>
    </goal>
    <goal name="WP_parameter bfs.5.4" expl="4. VC for bfs">
    <proof prover="9" memlimit="0"><result status="valid" time="0.01" steps="17"/></proof>
@@ -224,7 +223,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter bfs.8" expl="8. postcondition">
-  <proof prover="0" edited="vstte12_bfs_WP_BFS_WP_parameter_bfs_1.v"><result status="valid" time="1.24"/></proof>
+  <proof prover="1" edited="vstte12_bfs_WP_BFS_WP_parameter_bfs_1.v"><result status="valid" time="0.95"/></proof>
   </goal>
  </transf>
  </goal>

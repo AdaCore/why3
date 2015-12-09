@@ -18,6 +18,7 @@ open Theory
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
+open Mlw_decl
 
 let debug = Debug.register_info_flag "whyml_wp"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
@@ -31,11 +32,6 @@ let no_eval = Debug.register_flag "wp_no_eval"
 let lemma_label = Ident.create_label "why3:lemma"
 
 (** Marks *)
-
-let ts_mark = create_tysymbol (id_fresh "'mark") [] None
-let ty_mark = ty_app ts_mark []
-
-let ity_mark = ity_pur ts_mark []
 
 let fresh_mark () = create_vsymbol (id_fresh "'mark") ty_mark
 
@@ -70,7 +66,6 @@ let e_now = e_ghost (e_lapp fs_now [] (ity_pur ts_mark []))
 
 (* [vs_old] appears in the postconditions given to the core API,
    which expects every vsymbol to be a pure part of a pvsymbol *)
-let pv_old = create_pvsymbol ~ghost:true (id_fresh "%old") ity_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 
@@ -623,6 +618,13 @@ let rec track_values state names lesson cond f = match f.t_node with
       let l, f1 = track_values state names lesson cond f1 in
       let l, f2 = track_values state names l cond f2 in
       l, t_label_copy f (t_and_simp f1 f2)
+  | Tbinop ((Tor|Tiff) as o, f1, f2) ->
+      let _, f1 = track_values state names lesson cond f1 in
+      let _, f2 = track_values state names lesson cond f2 in
+      lesson, t_label_copy f (t_binary_simp o f1 f2)
+  | Tnot f1 ->
+      let _, f1 = track_values state names lesson cond f1 in
+      lesson, t_label_copy f (t_not_simp f1)
   | Tif (fc, f1, f2) ->
       let _, f1 = track_values state names lesson cond f1 in
       let _, f2 = track_values state names lesson cond f2 in
@@ -654,14 +656,13 @@ let rec track_values state names lesson cond f = match f.t_node with
       let names = Mvs.add v p1 names in
       let l, f1 = track_values state names lesson cond f1 in
       l, t_label_copy f (t_let_simp t1 (cb v f1))
-  | Tquant (Tforall, qf) ->
+  | Tquant (q, qf) ->
       let vl, trl, f1, cb = t_open_quant_cb qf in
       let add_vs s vs = Mvs.add vs (next_point state) s in
       let names = List.fold_left add_vs names vl in
       let l, f1 = track_values state names lesson cond f1 in
-      l, t_label_copy f (t_forall_simp (cb vl trl f1))
-  | Tbinop ((Tor|Tiff),_,_) | Tquant (Texists,_)
-  | Tapp _ | Tnot _ | Ttrue | Tfalse -> lesson, f
+      l, t_label_copy f (t_quant_simp q (cb vl trl f1))
+  | Tapp _ | Ttrue | Tfalse -> lesson, f
   | Tvar _ | Tconst _ | Teps _ -> assert false
 
 let track_values lkm km f =
@@ -1474,21 +1475,22 @@ type res_type = vsymbol * vsymbol Mexn.t
    poststate [post.s]. Also, open the postcondition and replace the result
    variable by [result_var]. In [post.s], [lab] is used to define the prestate.
 *)
-let apply_state_to_single_post glue lab result_var post =
+let apply_state_to_single_post glue lab expl result_var post =
   (* get the result var of the post *)
   let res, ne = open_post post.ne in
   (* substitute result_var and replace "old" label with new label *)
   let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
   (* apply the prestate = replace previously "old" variables *)
-  { post with ne = t_and_simp glue (Subst.term post.s ne) }
+  { post with ne = t_and_simp glue (wp_expl expl (Subst.term post.s ne)) }
 
 (* Given normal and exceptional [post,xpost], each with its
    own poststate, place all [(x)post.ne] in the state defined by [(x)post.s].*)
 let apply_state_to_post glue lab result_vars post xpost =
   let result, xresult = result_vars in
-  let f = apply_state_to_single_post glue lab in
-  let a = f result post in
-  let b = Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost in
+  let f expl = apply_state_to_single_post glue lab expl in
+  let a = f expl_post result post in
+  let b = Mexn.mapi (fun ex post ->
+                        f expl_xpost (Mexn.find ex xresult) post) xpost in
   a, b
 
 let all_exns xmap_list =
@@ -1602,7 +1604,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
   | Eabsurd ->
       (* OK: false *)
       (* NE: false *)
-      { ok = t_false;
+      { ok = wp_label e (wp_expl expl_absurd t_absurd);
         post = { ne = t_false ; s = s };
         exn = Mexn.empty }
   | Eassert (kind, f) ->
@@ -1610,7 +1612,13 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
       let f = wp_label e (Subst.term s f) in
-      let ok = if kind = Aassume then t_true else f in
+      let expl =
+        match kind with
+        | Aassume -> expl_assume
+        | Acheck  -> expl_check
+        | Aassert -> expl_assert
+      in
+      let ok = wp_expl expl (if kind = Aassume then t_true else f) in
       let ne = if kind = Acheck then t_true else f in
       { ok = ok;
         post = { ne = ne; s = s };
@@ -1626,7 +1634,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
       let pre =
-        wp_label ~override:true e (Subst.term state_before_call spec.c_pre) in
+        wp_label ~override:true e
+          (wp_expl expl_pre (Subst.term state_before_call spec.c_pre)) in
       let md =
 	create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "call" in
       let state_after_call, call_glue =
@@ -1841,7 +1850,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let regs = regs_of_writes e1.e_effect in
       let glue = Subst.extract_glue env regs pre_abstr_state wp1.post.s in
       let post = { post with ne = t_and_simp glue post.ne } in
-      let ok = t_and_simp_l [wp1.ok; (Subst.term s spec.c_pre); ok_post] in
+      let pre = wp_expl expl_pre (Subst.term s spec.c_pre) in
+      let ok = t_and_simp_l [wp1.ok; pre ; ok_post] in
       { ok = wp_label e ok;
         post = post;
         exn = xpost
@@ -1859,7 +1869,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in
       let post, xpost =
         apply_state_to_post glue pre_any_label r post xpost in
-      let pre = Subst.term s spec.c_pre in
+      let pre = wp_expl expl_pre (Subst.term s spec.c_pre) in
       { ok = wp_label e pre;
         post = post;
         exn = xpost;

@@ -16,22 +16,6 @@ module Bitwalker
   use import mach.bv.BV
 *)
 
-  predicate in_small_range (x:BV32.t) = BV32.ule x (BV32.of_int BV8.max_int)
-
-  predicate in_small_range2 (x:BV64.t) = BV64.ule x (BV64.of_int BV32.max_int)
-
-  lemma toBig_to_uint: forall x:BV8.t.
-     BV32.to_uint (C8_32.toBig x) = BV8.to_uint x
-
-  lemma toSmall_to_uint: forall x:BV32.t. in_small_range x ->
-     BV32.to_uint x = BV8.to_uint (C8_32.toSmall x)
-
-  lemma toBig_to_uint2: forall x:BV32.t.
-     BV64.to_uint (C32_64.toBig x) = BV32.to_uint x
-
-  lemma toSmall_to_uint2: forall x:BV64.t. in_small_range2 x ->
-     BV64.to_uint x = BV32.to_uint (C32_64.toSmall x)
-
   function nth8_stream (stream : array BV8.t) (pos : int) : bool =
     BV8.nth stream[div pos 8] (7 - mod pos 8)
 
@@ -79,8 +63,37 @@ module Bitwalker
       end
     end
 
+ (** return [value] with the bit of index [left] from the left set to [flag] *)
+(* version where [left] is an int and not a bitvector, which
+  is closer to the result of the SPARK translation from signed
+  integers *)
+  let poke_64bit (value : BV64.t) (left : int) (flag : bool) : BV64.t
+    requires { 0 <= left < 64 }
+    ensures  { forall i. 0 <= i < 64 /\ i <> 63 - left ->
+                 BV64.nth result i = BV64.nth value i }
+    ensures  { flag = BV64.nth result (63 - left) }
+  =
+    let ghost left_bv = BV64.of_int left in
+    assert { BV64.ult left_bv (BV64.of_int 64) };
+    assert { (BV64.sub (BV64.of_int 63) left_bv) = BV64.of_int (63 - left) };
+    abstract
+    ensures { forall i:BV64.t. BV64.ule i (BV64.of_int 63) ->
+               i <> BV64.sub (BV64.of_int 63) left_bv ->
+               BV64.nth_bv result i = BV64.nth_bv value i }
+    ensures { flag = BV64.nth_bv result (BV64.sub (BV64.of_int 63) left_bv) }
+      let mask =
+        BV64.lsl_bv (BV64.int_check 1) (BV64.of_int (63 - left))
+      in
+      match flag with
+      | True -> BV64.bw_or value mask
+      | False -> BV64.bw_and value (BV64.bw_not mask)
+      end
+    end
 
-  (* return the bit of [byte] at position [left] starting from the left *)
+
+  (* return the bit of [byte] at position [left] starting from the
+  left *)
+
   let peek_8bit_bv (byte : BV8.t) (left : BV32.t) : bool
     requires { 0 <= BV32.to_uint left < 8 }
     ensures  { result = BV8.nth byte (7 - BV32.to_uint left) }

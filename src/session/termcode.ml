@@ -15,14 +15,25 @@ open Term
 (*          explanations       *)
 (*******************************)
 
+let expl_prefixes = ref ["expl:"]
+
+let arg_extra_expl_prefix =
+  ("--extra-expl-prefix",
+   Arg.String (fun s -> expl_prefixes := s :: !expl_prefixes),
+   "<s> register s as an additional prefix for VC explanations")
 
 let collect_expls lab =
   Ident.Slab.fold
     (fun lab acc ->
        let lab = lab.Ident.lab_string in
-       try
-         let s = Strings.remove_prefix "expl:" lab in s :: acc
-       with Not_found -> acc)
+       let rec aux l =
+         match l with
+           | [] -> acc
+           | p :: r ->
+              try
+                let s = Strings.remove_prefix p lab in s :: acc
+              with Not_found -> aux r
+       in aux !expl_prefixes)
     lab
     []
 

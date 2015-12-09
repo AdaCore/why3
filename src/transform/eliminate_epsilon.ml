@@ -13,32 +13,59 @@ open Ident
 open Term
 open Decl
 
-let is_canonical x f =
+(* Canonical forms for epsilon terms. *)
+type canonical =
+  | Id                             (* identity lambda    (\x (x_i). x (x_i)) *)
+  | Eta of term                    (* eta-expansed term  (\(x_i). t (x_i))
+                                      (x_i not in t's free variables)        *)
+  | Partial of lsymbol * term list (* partial application
+                                      (\(x_i). f (arguments) (x_i))
+                                      (x_i not free in arguments)            *)
+  | Nothing                        (* No canonical form found. *)
+
+let canonicalize x f =
   let vl,_,f = match f.t_node with
     | Tquant (Tforall,b) -> t_open_quant b
     | _ -> [],[],f in
   let hd,e = match f.t_node with
     | Tapp (ls, [hd; t]) when ls_equal ls ps_equ -> hd,t
     | Tbinop (Tiff, {t_node = Tapp (ls, [hd; t])}, f)
-      when ls_equal ls ps_equ && t_equal t t_bool_true -> hd,f
+      when ls_equal ls ps_equ && t_equal t t_bool_true ->
+        hd, begin match f.t_node with
+            | Tapp (ls, [t1;t2])
+              when ls_equal ls ps_equ && t_equal t2 t_bool_true -> t1
+            | _ -> f
+            end
     | _ -> raise Exit in
-  let check_arg v t = match t.t_node with
-    | Tvar u when vs_equal u v -> ()
+  let rvl = List.rev vl in
+  let rec match_args tl vl = match tl, vl with
+    | _, [] -> let tvs = List.fold_left t_freevars Mvs.empty tl in
+        if Mvs.set_disjoint tvs (Svs.of_list rvl) then tl else raise Exit
+    | {t_node = Tvar u} :: tl, v :: vl when vs_equal u v -> match_args tl vl
     | _ -> raise Exit in
-  let ls = match e.t_node with
-    | Tapp (ls,tl) -> List.iter2 check_arg vl tl; ls
+  let rec match_apps e vl = match e.t_node, vl with
+    | _, [] ->
+        if Mvs.set_disjoint (t_freevars Mvs.empty e) (Svs.of_list rvl)
+        then Eta e
+        else raise Exit
+    | Tvar u, [v] when vs_equal u v -> Id
+    | Tapp (ls, [fn; {t_node = Tvar u}]), v :: vl
+      when ls_equal ls fs_func_app ->
+        if vs_equal u v then match_apps fn vl else raise Exit
+    | Tapp (ls,tl), vl -> Partial (ls, match_args (List.rev tl) vl)
     | _ -> raise Exit in
+  let canon = match_apps e rvl in
   let rec check_head hd vl = match hd.t_node, vl with
     | Tapp (ls, [hd; {t_node = Tvar u}]), v :: vl
       when ls_equal ls fs_func_app && vs_equal u v -> check_head hd vl
     | Tvar y, [] when vs_equal y x -> ()
     | _ -> raise Exit in
-  check_head hd (List.rev vl);
-  ls
+  check_head hd rvl;
+  canon
 
-let is_canonical x f =
-  try Some (is_canonical x f)
-  with Exit | Invalid_argument _ -> None
+let canonicalize x f =
+  try canonicalize x f
+  with Exit -> Nothing
 
 let get_canonical ls =
   let ty = Opt.get_def Ty.ty_bool ls.ls_value in
@@ -55,6 +82,17 @@ let get_canonical ls =
   let nm = ls.ls_name.id_string ^ "_closure_def" in
   let pr = create_prsymbol (id_derive nm ls.ls_name) in
   let ax = create_prop_decl Paxiom pr (t_forall_close vl [] f) in
+  create_param_decl cs, ax, cs
+
+let id_canonical =
+  let ty = Ty.ty_var (Ty.tv_of_string "a") in
+  let tyf = Ty.ty_func ty ty in
+  let cs = create_fsymbol (id_fresh "identity") [] tyf in
+  let vs = create_vsymbol (id_fresh "y") ty in
+  let tvs = t_var vs in
+  let eq = t_equ (t_func_app (fs_app cs [] tyf) tvs) tvs in
+  let pr = create_prsymbol (id_fresh "identity_def") in
+  let ax = create_prop_decl Paxiom pr (t_forall_close [vs] [] eq) in
   create_param_decl cs, ax, cs
 
 let get_canonical =
@@ -80,11 +118,11 @@ let rec lift_f el acc t0 = match t0.t_node with
   | Tapp (ps, [{t_node = Teps fb} as t2; t1]))
     when ls_equal ps ps_equ && to_elim el t2 ->
       let vs, f = t_open_bound fb in
-      if is_canonical vs f <> None then
+      if canonicalize vs f <> Nothing then
         match t1.t_node with
         | Teps fb when to_elim el t1 ->
             let vs, f = t_open_bound fb in
-            if is_canonical vs f <> None then
+            if canonicalize vs f <> Nothing then
               t_map_fold (lift_f el) acc t0
             else
               let f = t_let_close_simp vs t2 f in
@@ -97,12 +135,23 @@ let rec lift_f el acc t0 = match t0.t_node with
   | Teps fb when to_elim el t0 ->
       let vl = Mvs.keys (t_vars t0) in
       let vs, f = t_open_bound fb in
-      let acc, t = match is_canonical vs f with
-        | Some ls ->
+      let acc, t = match canonicalize vs f with
+        | Id ->
+            let ld, ax, cs = id_canonical in
             let abst, axml = acc in
-            let ld, ax, cs = get_canonical ls in
             (ld :: abst, ax :: axml), fs_app cs [] vs.vs_ty
-        | None ->
+        | Eta t -> lift_f el acc t
+        | Partial (ls, rargs) ->
+            let ld, ax, cs = get_canonical ls in
+            let args, ty, acc = List.fold_left (fun (args, ty, acc) x ->
+                let acc, y = lift_f el acc x in
+                y :: args, Ty.ty_func (t_type y) ty, acc
+              ) ([], vs.vs_ty, acc) rargs in
+            let abst, axml = acc in
+            let apply f x = t_app_infer fs_func_app [f;x] in
+            let ap = List.fold_left apply (fs_app cs [] ty) args in
+            (ld :: abst, ax :: axml), ap
+        | Nothing ->
             let (abst,axml), f = lift_f el acc f in
             let tyl = List.map (fun x -> x.vs_ty) vl in
             let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in

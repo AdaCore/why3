@@ -107,8 +107,9 @@ let print_head n depth provers fmt =
 
 let print_tabular_head n depth provers fmt =
   fprintf fmt "\\begin{tabular}";
-  fprintf fmt "{| l |";
-  for _i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
+  fprintf fmt "{|l|";
+  for _i = 0 to depth do fprintf fmt "l|" done;
+  for _i = 1 to (List.length provers) do fprintf fmt "c|" done;
   fprintf fmt "}@.";
   print_head n depth provers fmt
 

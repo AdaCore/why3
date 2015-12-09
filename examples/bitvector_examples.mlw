@@ -119,10 +119,10 @@ theory Hackers_delight
   (* rotate en shift *)
 
   goal RS_left: forall x.
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left x (of_int 1)
+    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left_bv x (of_int 1)
 
   goal RS_right: forall x.
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right x (of_int 1)
+    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right_bv x (of_int 1)
 
   (* bound propagation *)
 
@@ -214,11 +214,11 @@ module Hackers_delight_mod
   (* rotate en shift *)
 
   let rs_left (x : t) =
-  ensures{ result = rotate_left x (of_int 1) }
+  ensures{ result = rotate_left_bv x (of_int 1) }
     bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31))
 
   let rs_right (x : t) =
-  ensures{ result = rotate_right x (of_int 1) }
+  ensures{ result = rotate_right_bv x (of_int 1) }
     bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31))
 
   (* bound propagation *)

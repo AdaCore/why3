@@ -20,24 +20,41 @@ theory bv.BV_Gen
   syntax function asr_bv "(bvashr %1 %2)"
   syntax predicate eq "(= %1 %2)"
 
+  (* Warning: we should NOT remove all the axioms using "allprops" *)
+
   remove prop nth_out_of_bound
   remove prop Nth_zero
   remove prop Nth_ones
+  remove prop two_power_size_val
+  remove prop max_int_val
   remove prop eq_sub_equiv
-  remove prop Extensionality
   remove prop Nth_bw_or
   remove prop Nth_bw_and
   remove prop Nth_bw_xor
   remove prop Nth_bw_not
   remove prop Nth_rotate_left
   remove prop Nth_rotate_right
-  remove prop Nth_bv_is_nth
-  remove prop Lsr_nth_low
-  remove prop Lsr_nth_high
-  remove prop Asr_nth_low
-  remove prop Asr_nth_high
-  remove prop Lsl_nth_low
-  remove prop Lsl_nth_high
+
+  remove prop to_uint_extensionality
+  remove prop to_uint_bounds
+  remove prop to_int_extensionality
+
+  remove prop Of_int_zero
+  remove prop Of_int_ones
+
+  remove prop to_uint_add
+  remove prop to_uint_add_bounded
+  remove prop to_uint_sub
+  remove prop to_uint_sub_bounded
+  remove prop to_uint_neg
+  remove prop to_uint_mul
+  remove prop to_uint_mul_bounded
+  remove prop to_uint_udiv
+  remove prop to_uint_urem
+  remove prop to_uint_lsr
+  remove prop to_uint_lsl
+
+  remove prop Extensionality
 
   syntax predicate ult "(bvult %1 %2)"
   syntax predicate ule "(bvule %1 %2)"
@@ -61,8 +78,8 @@ theory bv.BV64
     "(= ((_ extract 0 0) (bvlshr %1 %2)) (_ bv1 1))"
 *)
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
 end
 
 theory bv.BV32
@@ -74,8 +91,8 @@ theory bv.BV32
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 32)) (_ bv0 32)))"
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
 end
 
 theory bv.BV16
@@ -87,8 +104,8 @@ theory bv.BV16
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 16)) (_ bv0 16)))"
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
 end
 
 theory bv.BV8
@@ -100,8 +117,12 @@ theory bv.BV8
   syntax function nth_bv
     "(not (= (bvand (bvlshr %1 %2) (_ bv1 8)) (_ bv0 8)))"
 
-  syntax function rotate_left "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
-  syntax function rotate_right "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
+end
+
+theory bv.BVConverter_Gen
+   remove allprops
 end
 
 theory bv.BVConverter_32_64
@@ -135,75 +156,5 @@ theory bv.BVConverter_8_16
 end
 
 theory bv.Pow2int
-
-  remove prop Power_0
-  remove prop Power_s
-  remove prop Power_1
-  remove prop Power_sum
-  remove prop pow2pos
-  remove prop pow2_0
-  remove prop pow2_1
-  remove prop pow2_2
-  remove prop pow2_3
-  remove prop pow2_4
-  remove prop pow2_5
-  remove prop pow2_6
-  remove prop pow2_7
-  remove prop pow2_8
-  remove prop pow2_9
-  remove prop pow2_10
-  remove prop pow2_11
-  remove prop pow2_12
-  remove prop pow2_13
-  remove prop pow2_14
-  remove prop pow2_15
-  remove prop pow2_16
-  remove prop pow2_17
-  remove prop pow2_18
-  remove prop pow2_19
-  remove prop pow2_20
-  remove prop pow2_21
-  remove prop pow2_22
-  remove prop pow2_23
-  remove prop pow2_24
-  remove prop pow2_25
-  remove prop pow2_26
-  remove prop pow2_27
-  remove prop pow2_28
-  remove prop pow2_29
-  remove prop pow2_30
-  remove prop pow2_31
-  remove prop pow2_32
-  remove prop pow2_33
-  remove prop pow2_34
-  remove prop pow2_35
-  remove prop pow2_36
-  remove prop pow2_37
-  remove prop pow2_38
-  remove prop pow2_39
-  remove prop pow2_40
-  remove prop pow2_41
-  remove prop pow2_42
-  remove prop pow2_43
-  remove prop pow2_44
-  remove prop pow2_45
-  remove prop pow2_46
-  remove prop pow2_47
-  remove prop pow2_48
-  remove prop pow2_49
-  remove prop pow2_50
-  remove prop pow2_51
-  remove prop pow2_52
-  remove prop pow2_53
-  remove prop pow2_54
-  remove prop pow2_55
-  remove prop pow2_56
-  remove prop pow2_57
-  remove prop pow2_58
-  remove prop pow2_59
-  remove prop pow2_60
-  remove prop pow2_61
-  remove prop pow2_62
-  remove prop pow2_63
-  remove prop pow2_64
+  remove allprops
 end

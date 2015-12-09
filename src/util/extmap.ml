@@ -75,6 +75,7 @@ module type S =
       (key -> 'a option -> 'b option -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     val translate : (key -> key) -> 'a t -> 'a t
     val add_new : exn -> key -> 'a -> 'a t -> 'a t
+    val replace : exn -> key -> 'a -> 'a t -> 'a t
     val keys: 'a t -> key list
     val values: 'a t -> 'a list
     val of_list : (key * 'a) list -> 'a t
@@ -579,6 +580,10 @@ module type S =
     let add_new e x v m = change (function
       | Some _ -> raise e
       | None -> Some v) x m
+
+    let replace e x v m = change (function
+      | Some _ -> Some v
+      | None -> raise e) x m
 
     let is_num_elt n m =
       try

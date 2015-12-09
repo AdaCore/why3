@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
 <prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
+<prover id="5" name="Coq" version="8.4pl6" timelimit="10" memlimit="1000"/>
 <file name="../insertion_sort_naive.mlw" expanded="true">
-<theory name="InsertionSortNaive" sum="99cf76a8390a50be9a6e0569b9751d29">
+<theory name="InsertionSortNaive" sum="e5e29e5ec84b82cb79a31084ea5e3dc7">
  <goal name="WP_parameter sort" expl="VC for sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sort.1" expl="1. postcondition">
@@ -148,7 +148,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InsertionSortNaiveGen" sum="dfa65b663b93f593b95f0061f701eb46">
+<theory name="InsertionSortNaiveGen" sum="207380e9e144e82f25dbc4e1801cf601">
  <goal name="WP_parameter sort" expl="VC for sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sort.1" expl="1. postcondition">
@@ -249,7 +249,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InsertionSortParam" sum="f5bb8e16e720ae82d76b8bc7910a1de5">
+<theory name="InsertionSortParam" sum="760e1bbae2d71ab23823f34b15f4a806">
  <goal name="WP_parameter sort" expl="VC for sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sort.1" expl="1. postcondition">
@@ -350,7 +350,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InsertionSortParamBad" sum="555dfa2d5848d193663377f70db6a7f6" expanded="true">
+<theory name="InsertionSortParamBad" sum="591b4c1ac466374772c8b3aa5d63920d" expanded="true">
  <goal name="WP_parameter sort" expl="VC for sort" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter sort.1" expl="1. postcondition">
@@ -415,7 +415,7 @@
   <proof prover="3"><result status="valid" time="0.09" steps="77"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. loop invariant preservation" expanded="true">
-  <proof prover="0" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_1.v"><result status="valid" time="1.39"/></proof>
+  <proof prover="5" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_1.v"><result status="valid" time="1.39"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. loop invariant preservation">
   <transf name="inline_goal">
@@ -431,7 +431,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. loop invariant preservation" expanded="true">
-  <proof prover="0" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_2.v"><result status="valid" time="1.34"/></proof>
+  <proof prover="5" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_2.v"><result status="valid" time="1.34"/></proof>
   </goal>
   <goal name="WP_parameter sort.26" expl="26. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>

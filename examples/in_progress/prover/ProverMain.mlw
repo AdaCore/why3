@@ -39,7 +39,7 @@ module Impl
   val ghost sdata_inv_hack (u:unit) : pred sdata
     ensures { result = sdata_inv }
 
-  let main (base:nlimpl_fo_formula_list) (gnum:int) : unit
+  let main (base:nlimpl_fo_formula_list) (gnum:int) : int
     requires { nlimpl_fo_formula_list_ok base }
     diverges
     ensures { forall m:model int 'st,rho:func int 'st.
@@ -53,9 +53,10 @@ module Impl
       let phip0m = phip0.model_fo_formula_list_field in
       assert { root.model_tableau_field  = Root } ;
       let gnum = phip.final_goals_number in
-      let rec aux (n:int) : prover_return
+      let gnum = if gnum <= 0 then (-1) else gnum in
+      let rec aux (n:int) : (int, prover_return)
         diverges
-        returns { { contradictory_assignment = s } ->
+        returns { (_,{ contradictory_assignment = s }) ->
         forall m:model int 'st,rho:func int 'st.
           let rhos = semantic_subst s m rho in
           not(formula_list_conj_semantic phip0.model_fo_formula_list_field m rhos) }
@@ -70,11 +71,11 @@ module Impl
           (subst_id_fo_term) &&
           (smodel (BA.current_timestamp unifb)) = subst_id_fo_term } ;
         assert { forall x:int. unassigned (BA.current_timestamp unifb) x } ;
-        try extend_branch phip0 root unifb unif 0 n gnum
-        with Failure -> aux (n+3)
+        try (n,extend_branch phip0 root unifb unif 0 n gnum)
+        with Failure -> aux (n+1)
         end
       in
-      let r = aux 0 in
+      let n,r = aux 0 in
       let s = r.contradictory_assignment in
       let basem = base.model_fo_formula_list_field in
       let tr = phip.model_transf in
@@ -87,8 +88,9 @@ module Impl
         (forall x:int. is_fo_term_free_var_in_fo_formula_list x phip0m ->
           rho x = rhos x) &&
         not(formula_list_conj_semantic phip0m m' rho) &&
-        not(formula_list_conj_semantic basem m rho) }
-    with Unsat -> ()
+        not(formula_list_conj_semantic basem m rho) };
+      n
+    with Unsat -> 0
     end
 
 end

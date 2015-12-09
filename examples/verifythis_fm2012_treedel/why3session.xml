@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" memlimit="4000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="4000"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
@@ -11,7 +11,7 @@
 <prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="5" memlimit="4000"/>
 <file name="../verifythis_fm2012_treedel.mlw" expanded="true">
-<theory name="Memory" sum="0f104ddd86097ccf76ae76adcdadc089" expanded="true">
+<theory name="Memory" sum="5daa8990107cc2c6cd7eafbcd7cdb582" expanded="true">
  <goal name="WP_parameter get_left" expl="VC for get_left">
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -40,7 +40,7 @@
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Treedel" sum="5d500373388044b9cccce0d2cf20e12c" expanded="true">
+<theory name="Treedel" sum="a89065eba410f4d4e612fb2600f873cd" expanded="true">
  <goal name="inorder_zip">
  <transf name="induction_ty_lex">
   <goal name="inorder_zip.1" expl="1.">
@@ -55,7 +55,7 @@
    <proof prover="8"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="inorder_zip.1.2" expl="2.">
-   <proof prover="2"><result status="valid" time="1.41"/></proof>
+   <proof prover="2"><result status="valid" time="1.04"/></proof>
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    <proof prover="6"><result status="valid" time="0.06" steps="116"/></proof>
    </goal>
@@ -82,7 +82,7 @@
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="main_lemma">
- <proof prover="0" edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"><result status="valid" time="12.71"/></proof>
+ <proof prover="1" edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"><result status="valid" time="12.71"/></proof>
  </goal>
  <goal name="WP_parameter search_tree_delete_min" expl="VC for search_tree_delete_min">
  <transf name="split_goal_wp">
@@ -118,7 +118,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="18"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   <proof prover="8"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -127,17 +127,17 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="41"/></proof>
-  <proof prover="7"><result status="valid" time="2.87"/></proof>
-  <proof prover="8"><result status="valid" time="0.36"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="31"/></proof>
+  <proof prover="7"><result status="valid" time="0.96"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.6" expl="6. postcondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4" timelimit="30" memlimit="1000"><result status="valid" time="4.51"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.27" steps="1017"/></proof>
-  <proof prover="7"><result status="valid" time="3.91"/></proof>
+  <proof prover="6"><result status="valid" time="0.27" steps="979"/></proof>
+  <proof prover="7"><result status="valid" time="0.99"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.7" expl="7. precondition">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -152,7 +152,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   <proof prover="8"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -188,23 +188,23 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.12"/></proof>
   <proof prover="5"><result status="valid" time="0.10"/></proof>
-  <proof prover="6"><result status="valid" time="0.08" steps="282"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="192"/></proof>
   <proof prover="7"><result status="valid" time="2.93"/></proof>
-  <proof prover="8"><result status="valid" time="0.26"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.13" expl="13. assertion">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="86"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="78"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.14" expl="14. precondition">
   <proof prover="2"><result status="valid" time="0.09"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="105"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="93"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   <proof prover="8"><result status="valid" time="0.08"/></proof>
   </goal>
@@ -247,9 +247,9 @@
   <goal name="WP_parameter search_tree_delete_min.19" expl="19. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.10" steps="445"/></proof>
+  <proof prover="6"><result status="valid" time="0.10" steps="391"/></proof>
   <proof prover="7"><result status="valid" time="2.97"/></proof>
-  <proof prover="8"><result status="valid" time="1.74"/></proof>
+  <proof prover="8"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.20" expl="20. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -265,7 +265,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="86"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="78"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.22" expl="22. assertion">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -299,7 +299,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.05" steps="107"/></proof>
+  <proof prover="6"><result status="valid" time="0.05" steps="95"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   <proof prover="8"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -308,9 +308,9 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.11"/></proof>
   <proof prover="5"><result status="valid" time="0.09"/></proof>
-  <proof prover="6"><result status="valid" time="0.20" steps="216"/></proof>
-  <proof prover="7"><result status="valid" time="2.71"/></proof>
-  <proof prover="8"><result status="valid" time="1.53"/></proof>
+  <proof prover="6"><result status="valid" time="0.20" steps="178"/></proof>
+  <proof prover="7"><result status="valid" time="0.99"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.27" expl="27. precondition">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -325,7 +325,7 @@
   <transf name="split_goal_wp">
    <goal name="WP_parameter search_tree_delete_min.28.1" expl="1. VC for search_tree_delete_min">
    <proof prover="3"><result status="valid" time="0.05"/></proof>
-   <proof prover="6"><result status="valid" time="0.10" steps="126"/></proof>
+   <proof prover="6"><result status="valid" time="0.10" steps="114"/></proof>
    </goal>
    <goal name="WP_parameter search_tree_delete_min.28.2" expl="2. VC for search_tree_delete_min">
    <proof prover="3"><result status="valid" time="0.09"/></proof>
@@ -338,7 +338,7 @@
    <proof prover="3"><result status="valid" time="0.08"/></proof>
    <proof prover="4"><result status="valid" time="0.08"/></proof>
    <proof prover="5"><result status="valid" time="0.08"/></proof>
-   <proof prover="7"><result status="valid" time="3.64"/></proof>
+   <proof prover="7"><result status="valid" time="0.94"/></proof>
    </goal>
    <goal name="WP_parameter search_tree_delete_min.28.4" expl="4. VC for search_tree_delete_min">
    <proof prover="3"><result status="valid" time="0.10"/></proof>

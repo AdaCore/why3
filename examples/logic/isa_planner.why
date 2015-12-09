@@ -1,0 +1,431 @@
+
+(** Benchmarks goals for proof by induction
+    From http://dream.inf.ed.ac.uk/projects/isaplanner/
+*)
+
+theory Nat
+
+  type nat = Zero | Suc nat
+
+  function (+) (x y: nat) : nat = match x with
+  | Zero -> y
+  | Suc xs -> Suc (xs + y)
+  end
+
+  function ( * ) (x y: nat) : nat = match y with
+  | Zero -> Zero
+  | Suc ys -> x + x * ys
+  end
+
+  function (-) (x y: nat) : nat = match x with
+  | Zero -> Zero
+  | Suc xs -> match y with
+              | Zero -> Suc xs
+              | Suc ys -> xs - ys
+	      end
+  end
+
+  predicate ( < ) (x y: nat) = match y with
+  | Zero -> false
+  | Suc ys -> match x with
+              | Zero -> true
+              | Suc xs -> xs < ys end
+  end
+
+  predicate ( <= ) (x y: nat) = match x with
+  | Zero -> true
+  | Suc xs -> match y with
+              | Zero -> false
+              | Suc ys -> xs <= ys
+	     end
+  end
+
+  function max (x y: nat) : nat = match x with
+  | Zero -> y
+  | Suc xs -> match y with
+              | Zero -> Suc xs
+              | Suc ys -> Suc (max xs ys) end end
+
+  function min (x y: nat) : nat = match x with
+  | Zero -> Zero
+  | Suc xs -> match y with
+              | Zero -> y
+              | Suc ys -> Suc (min xs ys) end end
+
+end
+
+theory List
+  use import Nat
+
+  type list 'a = Nil | Cons 'a  (list 'a)
+
+  function len (l : list 'a) : nat = match l with
+  | Nil -> Zero
+  | Cons _ s -> Suc (len s)
+  end
+
+  predicate mem (x: 'a) (l: list 'a) = match l with
+  | Nil      -> false
+  | Cons y ys -> if x = y then true else mem x ys
+  end
+
+  function (++) (l r : list 'a) : list 'a  = match l with
+  | Nil -> r
+  | Cons x ls -> Cons x (ls ++ r)
+  end
+
+  function rev (l: list 'a) : list 'a = match l with
+  | Nil       -> Nil
+  | Cons x xs -> rev xs ++ Cons x Nil
+  end
+
+  function insert (x : 'a) (l : list 'a) : list 'a = match l with
+  | Nil -> Cons x Nil
+  | Cons h t -> if x = h then Cons x t else Cons h (insert x t)
+  end
+
+  function delete (x: 'a) (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons h t -> if x = h then delete x t else Cons h (delete x t)
+  end
+
+  function take (n: nat) (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons h t -> match n with
+                 | Zero -> Nil
+                 | Suc m ->  Cons h (take m t)
+                end
+  end
+
+  function drop (n: nat) (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons h t -> match n with
+                 | Zero -> Cons h t
+                 | Suc m ->  drop m t
+                end
+  end
+
+  function last (l : list 'a) : 'a
+  axiom last_single :
+  	forall x: 'a. last (Cons x Nil) = x
+  axiom last_cons :
+    	forall x: 'a, l : list 'a. l <> Nil -> last (Cons x l)  = last l
+
+  function butlast (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons _ Nil -> Nil
+  | Cons x xs -> Cons x (butlast xs)
+  end
+
+  function zip (l r : list 'a) : list ('a, 'a) = match r with
+  | Nil -> Nil
+  | Cons y rs -> match l with
+                 | Nil -> Nil
+                 | Cons x ls -> Cons (x,y) (zip ls rs)
+                 end
+  end
+
+  function count (x: 'a) (l: list 'a) : nat = match l with
+  | Nil -> Zero
+  | Cons y ys -> if x = y then Suc (count x ys) else count x ys
+  end
+
+  use import HighOrd
+
+  function map (f: 'a -> 'b) (l: list 'a) : list 'b = match l with
+  | Nil      -> Nil
+  | Cons x xs -> Cons (f x) (map f xs)
+  end
+
+  function filter (p: 'a -> bool) (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons x xs -> if p x then Cons x (filter p xs) else filter p xs
+  end
+
+  function takeWhile (p: 'a -> bool) (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons x xs -> if p x then Cons x (takeWhile p xs) else Nil
+  end
+
+  function dropWhile (p: 'a -> bool) (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons x xs -> if p x then (dropWhile p xs) else (Cons x xs)
+  end
+
+  predicate pfalse (x: 'a) = false
+
+  function dropWhile_False (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons x xs -> if pfalse x then (dropWhile_False xs) else (Cons x xs)
+  end
+
+  predicate ptrue (x: 'a) = true
+
+ function takeWhile_True (l : list 'a) : list 'a = match l with
+  | Nil -> Nil
+  | Cons x xs -> if ptrue x then Cons x (takeWhile_True xs) else Nil
+  end
+
+ (******************** INSERTION SORT WITH NAT LIST ***************)
+
+  predicate sorted (l : list nat) = match l with
+  | Nil -> true
+  | Cons x xs -> match xs with
+                | Nil -> true
+                | Cons y _ -> x <= y && sorted xs
+                end
+  end
+
+  function insert_nat (n : nat) (l : list nat) : list nat = match l with
+  | Nil -> Cons n Nil
+  | Cons h t -> if n < h then Cons n (Cons h t) else Cons h (insert_nat n t)
+  end
+
+  function insertion_sort_aux (x : nat) (l : list nat) : list nat =
+  match l with
+  | Nil -> Cons x Nil
+  | Cons y ys ->
+    if x <= y then Cons x (Cons y ys) else Cons y (insertion_sort_aux x ys)
+  end
+
+  function insertion_sort (l : list nat) : list nat = match l with
+  | Nil -> Nil
+  | Cons x xs -> insertion_sort_aux x (insertion_sort xs)
+  end
+
+end
+
+theory Tree
+
+  use import Nat
+
+  type tree 'a =
+  | Leaf
+  | Node (tree 'a) 'a (tree 'a)
+
+  function mirror (t: tree 'a) : tree 'a = match t with
+  | Leaf -> Leaf
+  | Node l x r -> Node (mirror r) x (mirror l)
+  end
+
+  function nodes (t: tree 'a) : nat = match t with
+  | Leaf -> Zero
+  | Node l _ r-> (Suc Zero) + nodes l + nodes r
+  end
+
+  function height (t: tree 'a) : nat = match t with
+  | Leaf -> Zero
+  | Node l _ r -> Suc (max (height l) (height r))
+  end
+
+end
+
+(******************************************************************************)
+(************************** ISAPLANNER THEOREMS *******************************)
+(******************************************************************************)
+
+(*Pas d'induction(13): 4, 5, 11, 13, 16, 17, 35, 39, 40, 42, 44, 45, 46 *)
+(*Induction sur une variable(22): 2, 3, 6, 7, 8, 10, 12, 14, 15, 18, 19,
+  21, 26, 27, 28, 29, 30, 32, 36, 37, 38, 43 *)
+(*Induction sur plusieurs variables à cause de raisonnement par cas (9):
+  1, 9, 22, 23, 24, 25, 31, 33, 34, *)
+(*Problème résolu avec un lemme supplémentaire (2): 20(15), 47(23)  *)
+(******************************************************************************)
+theory IsaPlanner_all
+
+  use import Nat
+  use import List
+  use import Tree
+
+  goal P1: forall l: list 'a, n : nat.
+  take n l ++ drop n l = l
+
+  goal P2: forall l m: list 'a, x: 'a.
+  count x l + count x m =  count  x (l ++ m)
+
+  goal P3: forall l m: list 'a, x: 'a.
+  count x l <= count x (l ++ m)
+
+  goal P4: forall l: list 'a, x: 'a.
+  Suc Zero + count x l = count x (Cons x l)
+
+  goal P5: forall l: list 'a, x y : 'a.
+  x = y -> Suc Zero + count x l = count x (Cons y l)
+
+  goal P6: forall n m: nat.
+  n - (n + m) = Zero
+
+  goal P7: forall n m: nat.
+  (n + m) - n = m
+
+  goal P8: forall  k "induction" n m: nat.
+  (k + m) - (k + n) = (m - n)
+
+  goal P9: forall i j k: nat.
+  (i - j) - k = i - (j + k)
+
+  goal P10: forall m: nat.
+  m - m = Zero
+
+  goal P11: forall l: list 'a.
+  drop Zero l = l
+
+  goal P12: forall f: 'a -> 'b, l, n.
+  drop n (map f l) = map f (drop n l)
+
+  goal P13: forall n: nat, x: 'a, ls: list 'a.
+  drop (Suc n) (Cons x ls) = drop n ls
+
+  goal P14: forall p, xs ys: list 'a.
+  filter p (xs ++ ys) = filter p xs ++ filter p ys
+
+  goal P15: forall l: list nat, n: nat.
+  len (insertion_sort_aux n l) = Suc (len l)
+
+  goal P16: forall l: list 'a, x: 'a.
+  l = Nil -> last (Cons x l) = x
+
+  goal P17: forall n: nat.
+  (n <= Zero) <-> (n = Zero)
+
+  goal P18: forall i m: nat.
+  i < (Suc (i + m))
+
+  goal P19: forall l: list 'a, n: nat.
+  len (drop n l) = (len l) - n
+
+  (* requires the lemma
+      forall l: list nat, n: nat. len (insertion_sort_aux n l) = Suc (len l) *)
+  goal P20: forall l: list nat.
+  len (insertion_sort l) = len l
+
+  goal P21: forall n m: nat.
+  n <= (n + m)
+
+  goal P22: forall a "induction" b "induction" c "induction": nat .
+  max (max a b) c = max a (max b c)
+
+  goal P23: forall a b: nat.
+  max a b = max b a
+
+  goal P24: forall a b: nat.
+  (max a b = a) <-> b <= a
+
+  goal P25: forall a b: nat.
+  (max a b = b) <-> a <= b
+
+  goal P26: forall l t: list 'a, x: 'a.
+  mem x l -> mem x (l ++ t)
+
+  goal P27: forall l t: list 'a, x: 'a.
+  mem x t -> mem x (l ++ t)
+
+  goal P28: forall l: list 'a, x: 'a.
+  mem x (l ++ Cons x Nil)
+
+  goal P29: forall l : list nat, x : nat.
+  mem x (insert_nat x l)
+
+  goal P30: forall l: list 'a, x: 'a.
+  mem x (insert x l)
+
+  goal P31: forall a "induction" b "induction" c "induction": nat.
+  min (min a b) c = min a (min b c)
+
+  goal P32: forall a b: nat.
+  min a b = min b a
+
+  goal P33: forall a b: nat.
+  (min a b = a) <-> a <= b
+
+  goal P34: forall a b: nat.
+  (min a b = b) <-> b <= a
+
+  goal P35: forall xs : list 'a.
+  dropWhile_False xs = xs
+
+  goal P36: forall xs: list 'a.
+  takeWhile_True xs = xs
+
+  goal P37: forall l: list 'a, x: 'a.
+  not mem x (delete x l)
+
+  goal P38: forall l: list 'a, n: 'a.
+  count n (l ++ Cons n Nil) = Suc (count n l)
+
+  goal P39: forall t: list 'a, n h: 'a.
+  count n (Cons h Nil) + count n t = count n (Cons h t)
+
+  goal P40: forall xs: list 'a.
+  take Zero xs = Nil
+
+  goal P41: forall f, xs : list 'a, n: nat.
+  take n (map f xs : list 'b) = map f (take n xs)
+
+  goal P42: forall xs: list 'a, n: nat, x: 'a.
+  take (Suc n) (Cons x xs) = Cons x (take n xs)
+
+  goal P43: forall p, xs : list 'a.
+  takeWhile p xs ++ dropWhile p xs = xs
+
+  goal P44: forall xs ys: list 'a, x: 'a.
+  zip (Cons x xs) ys =
+      	      	  match ys with
+      	      	    | Nil -> Nil
+		    | Cons y ys -> Cons (x,y) (zip xs ys)
+   		  end
+
+  goal P45: forall xs ys: list 'a, x y: 'a .
+  zip (Cons x xs) (Cons y ys) = Cons (x, y) (zip xs ys)
+
+  goal P46: forall ys: list 'a.
+  zip Nil ys = Nil
+
+  (* requires P23: forall a b: nat. max a b = max b a *)
+  goal P47: forall a : tree 'a.
+  height (mirror a) = height a
+
+end
+
+theory IsaPlanner_beyond
+
+  use import Nat
+  use import List
+  use import Tree
+
+  goal P48: forall xs : list 'a.
+  xs <> Nil  -> butlast xs ++ (Cons (last xs) Nil) = xs
+
+  goal P49: forall xs ys: list 'a .
+  butlast (xs ++ ys) = (if ys = Nil then butlast xs else xs ++ butlast ys)
+
+  goal P50: forall xs : list 'a.
+  butlast xs = take ((len xs) - (Suc Zero)) xs
+
+  goal P51: forall xs : list 'a, x: 'a.
+  butlast (xs ++ Cons x Nil) = xs
+
+  goal P52: forall l : list 'a, n: 'a.
+  count n l = count n (rev l)
+
+  goal P53: forall l : list nat, x : nat.
+  count x l = count x (insertion_sort l)
+
+  goal P54: forall m n: nat.
+  (m + n) - n = m
+
+  goal P55: forall i "induction" k "induction" j "induction" : nat.
+  (i - j) - k = i - (k - j)
+
+  goal P56: forall xs ys: list 'a, n: nat.
+  drop n (xs ++ ys) = drop n xs ++ drop (n - (len xs)) ys
+
+  goal P57: forall n "induction" m "induction": nat,
+  xs "induction": list nat.
+  drop n (drop m xs) = drop (n + m) xs
+
+  goal P58: forall xs "induction": list 'a,
+  m "induction" n "induction": nat.
+  drop n (take m xs) = take (m - n) (drop n xs)
+
+end

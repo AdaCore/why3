@@ -625,6 +625,7 @@ module Impl
             let tab' = construct_tableau (NLC_Node tab phi0 clause) in
             let tab'm = tab'.model_tableau_field in
             assert { tab'm = Node tabm phi0m clausem } ;
+            if depth = 0 then raise Failure else
             select_lemma base base tab' unifb unif fresh (depth-1) goalnum (-1)
           | NLC_Node tnext phi1 phib ->
             let clse = construct_fo_formula_list (NLC_FOFCons phi0 clause) in
@@ -1092,7 +1093,7 @@ module Impl
   (* Technically speaking, the entry point of the main loop.
      Should be called with a preprocessed set of formula
      independent of the interpretation (no free variable),
-     and a empty unificator (identity substitution). *)
+     and a empty unifier (identity substitution). *)
 
   with extend_branch (base:nlimpl_fo_formula_list)
       (tab:nlimpl_tableau)

@@ -1,7 +1,12 @@
 
 * marks an incompatible change
 
-library
+Tools
+  * add a command-line option --extra-expl-prefix to specify
+    additional possible prefixes for VC explanations.  (Available for
+    why3 commands "prove" and "ide".)
+
+Library
   * improved bitvectors theories
 
 Encodings
@@ -9,12 +14,20 @@ Encodings
     cases of equality and maps) then the translation to SMT-LIB
     format is direct
 
-provers
-  o support for Zenon_modulo 0.4.1 (released Jul 2, 2015)
-  o support for Zenon 0.8.0 (released Oct 21, 2014)
-  o support for Isabelle 2015 (released May 25, 2015)
-  o support for Coq 8.4pl6 (released April 9, 2015)
+Provers
   o discarded support for Alt-Ergo versions older than 0.95.2
+  o support for Coq 8.4pl6 (released Apr 9, 2015)
+  o support for Gappa 1.2.0 (released May 19, 2015)
+  o support for Isabelle 2015 (released May 25, 2015)
+  o support for Z3 4.4.0 (released Apr 29, 2015)
+  o support for Zenon 0.8.0 (released Oct 21, 2014)
+  o support for Zenon_modulo 0.4.1 (released Jul 2, 2015)
+
+Version 0.86.2, October 13, 2015
+================================
+
+bug fixes
+  o assorted bug fixes
 
 Version 0.86.1, May 22, 2015
 ============================
