@@ -14,92 +14,94 @@ open Ty
 open Term
 open Decl
 
-let apply_rev_append fn acc l =
-  List.fold_left (fun l e -> fn e :: l) acc l
+type split = {
+  right_only : bool;
+  byso_split : bool;
+  side_split : bool;
+  stop_split : bool;
+  asym_split : bool;
+  comp_match : known_map option;
+}
 
-let apply_append fn acc l = apply_rev_append fn acc (List.rev l)
+(* Represent monoid of formula interpretation for conjonction and disjunction *)
+module M = struct
 
-let apply_append2 fn acc l1 l2 =
-  Lists.fold_product (fun l e1 e2 -> fn e1 e2 :: l)
-    acc (List.rev l1) (List.rev l2)
+  (* Multiplication tree *)
+  type comb = Base of term | Op of comb * comb
 
-let split_case forig spl pos side nside acc tl bl =
-  let c = if pos then t_true else t_false in
-  let bl = List.rev_map t_open_branch_cb bl in
-  let bll,bls,_,_ = List.fold_left (fun (bll,bls,el,els) (pl,f,close) ->
-    let spf = spl [] f in
-    let ns = !nside in
-    let () = nside := [] in
-    let brc = close pl c and brt = close pl t_true in
-    let add br = List.map (fun rl -> br::rl) in
-    let bll = add brc bll and bls = add brt bls in
-    let app e = apply_append (fun f -> close pl f :: e) in
-    let bll = app el bll spf and bls = app els bls ns in
-    bll, bls, brc::el, brt::els) ([],[],[],[]) bl
-  in
-  let fn bl = t_label_copy forig (t_case tl bl) in
-  side := apply_append fn !side bls;
-  apply_append fn acc bll
+  (* zero: false for /\, true for \/
+     unit: true for /\, false for \/ *)
+  type monoid = Zero of term | Unit | Comb of comb
 
-let compiled = Ident.create_label "split_goal: compiled match"
+  (* inject formula into monoid. *)
+  let (!+) a = Comb (Base a)
 
-let pat_condition kn tv cseen p = match p.pat_node with
-  | Pwild ->
-      let csl,sbs = match p.pat_ty.ty_node with
-        | Tyapp (ts,_) ->
-            Decl.find_constructors kn ts,
-            let ty = ty_app ts (List.map ty_var ts.ts_args) in
-            ty_match Mtv.empty ty p.pat_ty
-        | _ -> assert false in
-      let csall = Sls.of_list (List.rev_map fst csl) in
-      let csnew = Sls.diff csall cseen in
-      assert (not (Sls.is_empty csnew));
-      let add_cs cs g =
-        let mk_v ty = create_vsymbol (id_fresh "w") (ty_inst sbs ty) in
-        let vl = List.map mk_v cs.ls_args in
-        let f = t_equ tv (fs_app cs (List.map t_var vl) p.pat_ty) in
-        t_or_simp g (t_exists_close_simp vl [] f) in
-      let g = Sls.fold add_cs csnew t_false in
-      csall, [], g
-  | Papp (cs, pl) ->
-      let vl = List.map (function
-        | {pat_node = Pvar v} -> v | _ -> assert false) pl in
-      let g = t_equ tv (fs_app cs (List.map t_var vl) p.pat_ty) in
-      Sls.add cs cseen, vl, g
-  | _ -> assert false
+  (* monoid law. *)
+  let (++) a b = match a, b with
+    | Zero _, _ | _, Unit -> a
+    | _, Zero _ | Unit, _ -> b
+    | Comb ca, Comb cb -> Comb (Op (ca, cb))
 
-let case_dispatch ~reboot ~direct ~compil kn forig t bl =
-  match kn with
-  | None -> direct forig t bl
-  | Some kn ->
-    if Slab.mem compiled forig.t_label then
-      let lab = Slab.remove compiled forig.t_label in
-      let forig = t_label ?loc:forig.t_loc lab forig in
-      compil kn forig t bl
-    else
-      let mk_let = t_let_close_simp in
-      let mk_case t bl = t_label_add compiled (t_case_close t bl) in
-      let mk_b b = let p,f = t_open_branch b in [p], f in
-      let f = Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl) in
-      reboot f
+  (* (base -> base) morphism application. *)
+  let rec cmap f = function
+    | Base a -> Base (f a)
+    | Op (a,b) -> Op (cmap f a, cmap f b)
 
-let split_case_2 kn forig spl pos acc t bl =
-  let vs = create_vsymbol (id_fresh "q") (t_type t) in
-  let tv = t_var vs in
-  let conn f = t_label_copy forig (t_let_close_simp vs t f) in
-  let qn = if pos then t_forall_close_simp else t_exists_close_simp in
-  let jn = if pos then t_implies_simp else t_and_simp in
-  let _, dc = List.fold_left (fun (cseen,dc) b ->
-    let p, f = t_open_branch b in
-    let cseen, vl, g = pat_condition kn tv cseen p in
-    let f = conn (qn vl [] (jn g f)) in
-    cseen, f :: dc) (Sls.empty,[]) bl
-  in
-  List.fold_left spl acc dc
+  (* (base -> general) morphism application *)
+  let rec cbind f = function
+    | Base a -> f a
+    | Op (a,b) -> Op (cbind f a, cbind f b)
 
-(* TODO. *)
-let forward_case_2 kn forig cls = assert false
-let forward_case forig cls = assert false
+  (* Apply morphism phi from monoid 1 to monoid 2
+     (law may change)
+     Implicit morphism phi must respect:
+     phi(zero_1) = f0 (term representing the zero)
+     phi(unit_1) = unit_2
+     phi(x `law_1` y) = phi(x) `law_2` phi(y)
+     phi(a) = f a (for base values, and f a is a base value)
+     Intended: monotone context closure, negation *)
+  let map f0 f = function
+    | Zero t -> f0 t
+    | Unit -> Unit
+    | Comb c -> Comb (cmap f c)
+
+  (* Apply bimorphism phi from monoids 1 and 2 to monoid 3
+     Implicit bimorphism phi must respect:
+     - partial applications of phi (phi(a,_) and phi(_,b)) are morphisms
+     - phi(zero,b) = f0_ 'term for zero' b (for b a base value,
+                                            f0_ _ b is a base value)
+     - phi(a,zero) = f_0 'term for zero' a (for a a base value,
+                                            f_0 a _ is a base value)
+     - phi(zero,zero) = f00 'term for first zero' 'term for second zero'
+     - phi(a,b) = f a b (for a,b base value, and f a b is a base value)
+     Intended: /\, \/ and ->
+   *)
+  let bimap f00 f0_ f_0 f a b = match a, b with
+    | Unit, _ | _, Unit -> Unit
+    | Zero t1, Zero t2 -> f00 t1 t2
+    | Zero t1, Comb cb ->  Comb (cmap (f0_ t1) cb)
+    | Comb ca, Zero t2 -> Comb (cmap (f_0 t2) ca)
+    | Comb ca, Comb cb -> Comb (cbind (fun x -> cmap (f x) cb) ca)
+
+  let rec to_list m acc = match m with
+    | Base a -> a :: acc
+    | Op (a,b) -> to_list a (to_list b acc)
+
+  let to_list = function
+    | Zero t -> [t]
+    | Unit -> []
+    | Comb c -> to_list c []
+
+end
+
+type split_ret = {
+  pos : M.monoid;
+  neg : M.monoid;
+  bwd : term;
+  fwd : term;
+  side : M.monoid;
+}
+
 
 let stop_split = Ident.create_label "stop_split"
 
@@ -110,220 +112,239 @@ let keep f = Slab.mem Term.keep_on_simp_label f.t_label
 let unstop f =
   t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
 
-type split = {
-  right_only : bool;
-  (* make_proof mode does not create logically equivalent formula. *)
-  make_proof : bool;
-  stop_label : bool;
-  respect_as : bool;
-  comp_match : known_map option;
-}
+let rec drop_byso f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) },f) ->
+      drop_byso f
+  | Tbinop (Tand,f,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) }) ->
+      drop_byso f
+  | _ -> t_map drop_byso f
 
-let rec split_pos ro acc f = match f.t_node with
-  | _ when ro.stop_label && stop f -> unstop f :: acc
-  | Ttrue -> if keep f then f::acc else acc
-  | Tfalse -> f::acc
-  | Tapp _ -> f::acc
-  | Tbinop (Tand,f1,f2) when ro.respect_as && asym f1 ->
-      split_pos ro (split_pos ro acc (t_implies f1 f2)) f1
-  | Tbinop (Tand,f1,f2) ->
-      split_pos ro (split_pos ro acc f2) f1
-  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f1,{ t_node = Ttrue }) },f2)
-      when ro.make_proof && asym f1 ->
-        split_pos ro (split_pos ro acc (t_implies f1 f2)) f1
-  | Tbinop (Timplies,f1,f2) when ro.right_only ->
-      let side = ref acc in
-      let f1 = forward ro side f1 in
-      let fn f2 = t_label_copy f (t_implies f1 f2) in
-      apply_append fn !side (split_pos ro [] f2)
-  | Tbinop (Timplies,f1,f2) ->
-      let fn f1 f2 = t_label_copy f (t_implies f1 f2) in
-      let side = ref acc in
-      let l1 = split_neg ro side [] f1 in
-      apply_append2 fn !side l1 (split_pos ro [] f2)
-  | Tbinop (Tiff,f1,f2) ->
-      let f12 = t_label_copy f (t_implies f1 f2) in
-      let f21 = t_label_copy f (t_implies f2 f1) in
-      split_pos ro (split_pos ro acc f21) f12
-  | Tbinop (Tor,_,{ t_node = Ttrue }) when ro.right_only && not (keep f) -> acc
-  | Tbinop (Tor,_,_) when ro.right_only -> f::acc
-  | Tbinop (Tor,f1,f2) ->
-      let fn f1 f2 = t_label_copy f (t_or f1 f2) in
-      apply_append2 fn acc (split_pos ro [] f1) (split_pos ro [] f2)
-  | Tnot f1 ->
-      let fn f1 = t_label_copy f (t_not f1) in
-      let side = ref acc in
-      let l1 = split_neg ro side [] f1 in
-      apply_append fn !side l1
-  | Tif (fif,fthen,felse) ->
-      let fit = t_label_copy f (t_implies fif fthen) in
-      let fie = t_label_copy f (t_implies (t_not fif) felse) in
-      split_pos ro (split_pos ro acc fie) fit
-  | Tlet (t,fb) ->
-      let vs,f1,close = t_open_bound_cb fb in
-      let fn f1 = t_label_copy f (t_let t (close vs f1)) in
-      apply_append fn acc (split_pos ro [] f1)
-  | Tcase (tl,bl) ->
-      let spl = split_pos ro in
-      let reboot = spl acc in
-      let direct f tl bl = split_case f spl true (ref []) (ref []) acc tl bl in
-      let compil kn f tl bl = split_case_2 kn f spl true acc tl bl in
-      case_dispatch ~reboot ~direct ~compil ro.comp_match f tl bl
-  | Tquant (Tforall,fq) ->
-      let vsl,trl,f1,close = t_open_quant_cb fq in
-      let fn f1 = t_label_copy f (t_forall (close vsl trl f1)) in
-      apply_append fn acc (split_pos ro [] f1)
-  | Tquant (Texists,_) -> f::acc
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
-
-and split_neg ro side acc f = match f.t_node with
-  | _ when ro.stop_label && stop f -> unstop f :: acc
-  | Ttrue -> f::acc
-  | Tfalse -> if keep f then f::acc else acc
-  | Tapp _ -> f::acc
-  | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
-    when ro.make_proof && asym f2 ->
-      side := split_pos ro !side (t_implies f1 f2);
-      split_neg ro side acc (t_and f1 f2)
-  | Tbinop (Tand,_,_) when ro.right_only -> f::acc
-  | Tbinop (Tand,f1,f2) ->
-      let fn f1 f2 = t_label_copy f (t_and f1 f2) in
-      apply_append2 fn acc (split_neg ro side [] f1) (split_neg ro side [] f2)
-  | Tbinop (Timplies,f1,f2) when ro.respect_as && asym f1 ->
-      split_neg ro side (split_neg ro side acc (t_and f1 f2)) (t_not f1)
-  | Tbinop (Timplies,f1,f2) ->
-      split_neg ro side (split_neg ro side acc f2) (t_not f1)
-  | Tbinop (Tiff,f1,f2) ->
-      let f12 = t_label_copy f (t_and f1 f2) in
-      let f21 = t_label_copy f (t_and (t_not f1) (t_not f2)) in
-      split_neg ro side (split_neg ro side acc f21) f12
-  | Tbinop (Tor,f1,f2) when ro.respect_as && asym f1 ->
-      split_neg ro side (split_neg ro side acc (t_and (t_not f1) f2)) f1
-  | Tbinop (Tor,f1,f2) ->
-      split_neg ro side (split_neg ro side acc f2) f1
-  | Tnot f1 ->
-      let fn f1 = t_label_copy f (t_not f1) in
-      apply_append fn acc (split_pos ro [] f1)
-  | Tif (fif,fthen,felse) ->
-      let fit = t_label_copy f (t_and fif fthen) in
-      let fie = t_label_copy f (t_and (t_not fif) felse) in
-      split_neg ro side (split_neg ro side acc fie) fit
-  | Tlet (t,fb) ->
-      let vs,f1,close = t_open_bound_cb fb in
-      let fn f1 = t_label_copy f (t_let t (close vs f1)) in
-      let nside = ref [] in
-      let acc = apply_append fn acc (split_neg ro nside [] f1) in
-      side := apply_append fn !side !nside;
-      acc
-  | Tcase (tl,bl) -> 
-      let reboot f = split_neg ro side acc f in
-      let direct f tl bl =
-        let nside = ref [] in
-        split_case f (split_neg ro nside) false side nside acc tl bl
-      in
-      let compil kn f tl bl =
-        split_case_2 kn f (split_neg ro side) false acc tl bl
-      in
-      case_dispatch ~reboot ~direct ~compil ro.comp_match f tl bl
-  | Tquant (Texists,fq) ->
-      let vsl,trl,f1,close = t_open_quant_cb fq in
-      let fn f1 = t_label_copy f (t_exists (close vsl trl f1)) in
-      let fn2 f1 = t_label_copy f (t_forall (close vsl trl f1)) in
-      let nside = ref [] in
-      let acc = apply_append fn acc (split_neg ro nside [] f1) in
-      side := apply_append fn2 !side !nside;
-      acc
-  | Tquant (Tforall,_) -> f::acc
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
-
-and forward ro side f =
+let rec split_core sp f =
+  let rc = split_core sp in
   let (~-) = t_label_copy f in
-  let (!!) = forward ro side in
-  match f.t_node with
-  | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
-    when asym f2 ->
-      let f1 = !!f1 in
-      let fn f = - t_implies f1 f in
-      side := apply_append fn !side (split_pos ro [] f2);
-      - t_and f1 !!f2
-  | Tbinop (Tand,f1,f2) -> - t_and !!f1 !!f2
-  | Tbinop (Tor,f1,f2) -> - t_or !!f1 !!f2
-  | Tbinop (Timplies,f1,f2) -> - t_implies f1 !!f2
-  | Tlet (t,fb) ->
-      let vs,f1,close = t_open_bound_cb fb in
-      let nside = ref [] in
-      let f1 = forward ro nside f1 in
-      let fn f = - t_let t (close vs f) in
-      side := apply_append fn !side !nside;
-      fn f1
-  | Tquant (q,fq) ->
-      let vsl,trl,f1,close = t_open_quant_cb fq in
-      let nside = ref [] in
-      let f1 = forward ro nside f1 in
-      let fn f = - t_forall_close vsl trl f in
-      side := apply_append fn !side !nside;
-      - t_quant q (close vsl trl f1)
-  | Tcase (t,bl) ->
-      let blt = List.map (fun br ->
-        let pl,f,close = t_open_branch_cb br in
-        let nside = ref [] in
-        let f = forward ro nside f in
-        (close pl f,(pl,!nside))
-      ) bl in
-      let bl, cls = List.split blt in
-      side := if ro.comp_match <> None
-              then forward_case_2 (Opt.get ro.comp_match) f cls
-              else forward_case f cls;
-      - t_case t bl
-  | _ -> f
+  let ro = sp.right_only in
+  let alias fo1 unop f1 = if fo1 == f1 then f else - unop f1 in
+  let alias2 fo1 fo2 binop f1 f2 =
+    if fo1 == f1 && fo2 == f2 then f else - binop f1 f2 in
+  let open M in
+  let bimap = bimap (fun t _ -> Zero t) in
+  let neg _ a = t_not a and cpy _ a = a in
+  let iclose fw ng ps =
+    if ro
+    then map (fun _ -> !+ (t_not fw)) (t_implies fw) ps
+    else bimap cpy neg t_implies ng ps
+  in
+  let fclose vsl trl ps = map (fun t -> Zero t) (t_forall_close vsl trl) ps in
+  let ret pos neg bwd fwd side = { pos; neg; bwd; fwd; side } in
+  let r = match f.t_node with
+  | _ when sp.stop_split && stop f ->
+      let f = unstop f in
+      let df = drop_byso f in
+      ret !+f !+df f df Unit
+  | Ttrue -> ret (if keep f then !+f else Unit) (Zero f) f f Unit
+  | Tfalse -> ret (Zero f) (if keep f then !+f else Unit) f f Unit
+  | Tapp _ -> ret !+f !+f f f Unit
+    (* f1 so f2 *)
+  | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) }) ->
+      if not (sp.byso_split && asym f2) then rc f1 else
+      let (&&&) f1 f2 = - t_and f1 f2 in
+      let sf1 = rc f1 and sf2 = rc f2 in
+      let fwd = sf1.fwd &&& sf2.fwd in
+      let neg = if ro then !+fwd else bimap cpy cpy (&&&) sf1.neg sf2.neg in
+      let close = iclose sf1.fwd sf1.neg in
+      let lside =
+        if sp.side_split
+        then close sf2.pos
+        else !+(t_implies sf1.fwd sf2.bwd)
+      in
+      ret sf1.pos neg sf1.bwd fwd (sf1.side ++ lside ++ close sf2.side)
+  | Tbinop (Tand,f1,f2) ->
+      let (&&&) = alias2 f1 f2 t_and in
+      let sf1 = rc f1 and sf2 = rc f2 in
+      let fwd = sf1.fwd &&& sf2.fwd and bwd = sf1.bwd &&& sf2.bwd in
+      let neg = if ro then !+fwd else bimap cpy cpy (&&&) sf1.neg sf2.neg in
+      (* If asymetric, must close f2 & f2 side-condition by f1 in context. *)
+      let close =
+        if sp.asym_split && asym f1
+        then iclose sf1.fwd sf1.neg
+        else fun x -> x
+      in
+      ret (sf1.pos ++ close sf2.pos) neg bwd fwd (sf1.side ++ close sf2.side)
+  (* f1 by f2 *)
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1) ->
+      if not (sp.byso_split && asym f2) then rc f1 else
+      let sf1 = rc f1 and sf2 = rc f2 in
+      let close = iclose sf2.fwd sf2.neg in
+      let lside =
+        if sp.side_split
+        then close sf1.pos
+        else !+(t_implies sf2.fwd sf1.bwd)
+      in
+      ret sf2.pos sf1.neg sf2.bwd sf1.fwd (sf2.side ++ lside ++ close sf1.side)
+  | Tbinop (Timplies,f1,f2) ->
+      let (>->) = alias2 f1 f2 t_implies in
+      let sf1 = rc f1 and sf2 = rc f2 in
+      let fwd = sf1.bwd >-> sf2.fwd and bwd = sf1.fwd >-> sf2.bwd in
+      let close =
+        if ro
+        then map (fun _ -> !+ (- t_not sf1.fwd)) ((>->) sf1.fwd)
+        else bimap cpy (fun _ a -> - t_not a) (>->) sf1.neg
+      in
+      let neg1 = map (fun t -> !+(t_label_copy t t_true)) t_not sf1.pos in
+      let neg2 = if not (sp.asym_split && asym f1) then sf2.neg else
+        if ro
+        then map (fun _ -> !+(sf1.fwd)) (t_and sf1.fwd) sf2.neg
+        else bimap cpy cpy t_and sf1.neg sf2.neg
+      in
+      let neg = neg1 ++ neg2 in
+      ret (close sf2.pos) neg bwd fwd (sf1.side ++ close sf2.side)
+  | Tbinop (Tor,f1,f2) ->
+      let (|||) = alias2 f1 f2 t_or in
+      let sf1 = rc f1 and sf2 = rc f2 in
+      let fwd = sf1.fwd ||| sf2.fwd and bwd = sf1.bwd ||| sf2.bwd in
+      let pos = if ro then !+bwd else bimap cpy cpy (|||) sf1.pos sf2.pos in
+      let side2, neg2 =
+        if sp.asym_split && asym f1
+        then if ro
+          then
+            let n1 = t_not sf1.bwd in
+            map (fun _ -> !+(sf1.bwd)) ((|||) sf1.bwd) sf2.side,
+            map (fun _ -> !+n1) (t_and n1) sf2.neg
+          else
+            let n1 =
+              map (fun t -> Zero (t_label_copy t t_true)) t_not sf1.pos in
+            bimap cpy cpy (|||) sf1.pos sf2.side,
+            bimap neg cpy t_and n1 sf2.neg
+        else sf2.side, sf2.neg
+      in
+      ret pos (sf1.neg ++ neg2) bwd fwd (sf1.side ++ side2)
+  | Tbinop (Tiff,f1,f2) ->
+      let sf1 = rc f1 and sf2 = rc f2 in
+      let df = if sf1.fwd == sf1.bwd && sf2.fwd == sf2.bwd
+        then alias2 f1 f2 t_iff sf1.fwd sf2.fwd else drop_byso f in
+      let pos = iclose sf1.fwd sf1.neg sf2.pos
+                ++ iclose sf2.fwd sf2.neg sf1.pos in
+      let conj f f1 n1 f2 n2 =
+        let (&&&) f1 f2 = t_and (f f1) (f f2) in
+        if ro then !+(f1 &&& f2) else let f_ _ = f in bimap f_ f_ (&&&) n1 n2 
+      in
+      let neg_top = conj (fun x -> x) sf1.fwd sf1.neg sf2.fwd sf2.neg in
+      let neg_bot = conj t_not sf1.bwd sf1.pos sf2.bwd sf2.pos in
+      ret pos (neg_top ++ neg_bot) df df (sf1.side ++ sf2.side)
+  | Tif (fif,fthen,felse) ->
+      let sfi = rc fif and sft = rc fthen and sfe = rc felse in
+      let dfi = if sfi.fwd == sfi.bwd then sfi.fwd else drop_byso fif in
+      let rebuild fif2 fthen2 felse2 =
+        if fif == fif2 && fthen == fthen2 && felse == felse2 then f else
+        t_if fif2 fthen2 felse2
+      in
+      let fwd = rebuild dfi sft.fwd sfe.fwd in
+      let bwd = rebuild dfi sft.bwd sfe.bwd in
+      let pos, neg, side_branch =
+        if ro
+        then
+          let negated = t_not sfi.bwd in
+          let pthen_close =
+            map (fun _ -> !+(t_not sfi.fwd)) (t_implies sfi.fwd) in
+          let pelse_close = map (fun _ -> !+(sfi.bwd)) (t_implies negated) in
+          let pos = pthen_close sft.pos ++ pelse_close sfe.pos in
+          let side = pthen_close sft.side ++ pelse_close sfe.side in
+          let neg_then = map (fun _ -> !+(sfi.fwd)) (t_and sfi.fwd) sft.neg in
+          let neg_else = map (fun _ -> !+(negated)) (t_and negated) sfe.neg in
+          pos, neg_then ++ neg_else, side
+        else
+          let negated =
+            map (fun t -> Zero (t_label_copy t t_true)) t_not sfi.pos in
+          let pos_close = bimap cpy neg t_implies in
+          let pos = pos_close sfi.neg sft.pos ++ pos_close negated sfe.pos in
+          let side = pos_close sfi.neg sft.side ++ pos_close negated sfe.side in
+          let neg_close = bimap cpy cpy t_and in
+          let neg = neg_close sfi.neg sft.neg ++ neg_close negated sfe.neg in
+          pos, neg, side
+      in
+      ret pos neg bwd fwd (sfi.side ++ side_branch)
+  | Tnot f1 ->
+      let sf = rc f1 in
+      let (!) f = - t_not f in
+      let (|>) zero = map (fun t -> !+(t_label_copy t zero)) (!) in
+      ret (t_false |> sf.neg) (t_true |> sf.pos) !(sf.fwd) !(sf.bwd) sf.side
+  | Tlet (t, fb) ->
+      let vs, f1, close = t_open_bound_cb fb in
+      let (!) f = alias fb (t_let t) (close vs f) in
+      let sf = rc f1 in
+      let (!!) = map (fun t -> Zero t) (!) in
+      ret !!(sf.pos) !!(sf.neg) !(sf.bwd) !(sf.fwd) !!(sf.side)
+  | Tcase _ -> assert false (* TODO: handle pattern-matching. *)
+  | Tquant (qn,fq) ->
+      let vsl, trl, f1, close = t_open_quant_cb fq in
+      let close f = alias fq (t_quant qn) (close vsl trl f) in
+      let sf = rc f1 in
+      let bwd = close sf.bwd and fwd = close sf.fwd in
+      let pos, neg = match qn with
+        | Tforall -> map (fun t -> Zero t) close sf.pos, !+fwd
+        | Texists -> !+bwd, map (fun t -> Zero t) close sf.neg
+      in
+      ret pos neg bwd fwd (fclose vsl trl sf.side)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  in
+  match r with
+  | { side = M.Zero _ as side } ->
+      { pos = Unit; neg = Unit; fwd = t_false; bwd = t_true; side }
+  | _ -> r
+
 
 let full_split kn = {
-  make_proof = false;
   right_only = false;
-  stop_label = false;
-  respect_as = true;
+  byso_split = false;
+  side_split = false;
+  stop_split = false;
+  asym_split = true;
   comp_match = kn;
 }
 
 let right_split kn = { (full_split kn) with right_only = true }
-let wp_split kn    = { (right_split kn) with stop_label = true }
-let intro_split kn = { (wp_split kn) with respect_as = false }
-let proof_split kn = { (wp_split kn) with make_proof = true }
+let wp_split kn    = { (right_split kn) with stop_split = true }
+let intro_split kn = { (wp_split kn) with asym_split = false }
+let proof_split kn = { (wp_split kn) with byso_split = true }
+let total_split kn = { (proof_split kn) with right_only = false }
 
-let split_pos_full ?known_map f = split_pos (full_split known_map) [] f
-let split_neg_full ?known_map f = split_neg (full_split known_map) (ref []) [] f
+let split_pos sp f = M.to_list (split_core sp f).pos
+let split_neg sp f = M.to_list (split_core sp f).neg
+let split_proof sp f =
+  let core = split_core sp f in M.to_list (M.(++) core.pos core.side)
 
-let split_pos_right ?known_map f = split_pos (right_split known_map) [] f
-let split_neg_right ?known_map f =
-  split_neg (right_split known_map) (ref []) [] f
+let split_pos_full ?known_map f = split_pos (full_split known_map) f
+let split_neg_full ?known_map f = split_neg (full_split known_map) f
 
-let split_pos_wp ?known_map f = split_pos (wp_split known_map) [] f
-let split_neg_wp ?known_map f = split_neg (wp_split known_map) (ref []) [] f
+let split_pos_right ?known_map f = split_pos (right_split known_map) f
+let split_neg_right ?known_map f = split_neg (right_split known_map) f
 
-let split_pos_intro ?known_map f = split_pos (intro_split known_map) [] f
-let split_neg_intro ?known_map f =
-  split_neg (intro_split known_map) (ref []) [] f
+let split_pos_wp ?known_map f = split_pos (wp_split known_map) f
+let split_neg_wp ?known_map f = split_neg (wp_split known_map) f
 
-let split_goal ro pr f =
+let split_pos_intro ?known_map f = split_pos (intro_split known_map) f
+let split_neg_intro ?known_map f = split_neg (intro_split known_map) f
+
+let split_goal sp pr f =
   let make_prop f = [create_prop_decl Pgoal pr f] in
-  List.map make_prop (split_pos ro [] f)
+  List.map make_prop (split_proof sp f)
 
-let split_axiom ro pr f =
+let split_axiom sp pr f =
   let make_prop f =
     let pr = create_prsymbol (id_clone pr.pr_name) in
     create_prop_decl Paxiom pr f in
-  let ro = { ro with respect_as = false } in
-  match split_pos ro [] f with
+  let sp = { sp with asym_split = false; byso_split = false } in
+  match split_pos sp f with
     | [f] -> [create_prop_decl Paxiom pr f]
     | fl  -> List.map make_prop fl
 
-let split_all ro d = match d.d_node with
-  | Dprop (Pgoal, pr,f) ->  split_goal  ro pr f
-  | Dprop (Paxiom,pr,f) -> [split_axiom ro pr f]
+let split_all sp d = match d.d_node with
+  | Dprop (Pgoal, pr,f) ->  split_goal  sp pr f
+  | Dprop (Paxiom,pr,f) -> [split_axiom sp pr f]
   | _ -> [[d]]
 
-let split_premise ro d = match d.d_node with
-  | Dprop (Paxiom,pr,f) ->  split_axiom ro pr f
+let split_premise sp d = match d.d_node with
+  | Dprop (Paxiom,pr,f) ->  split_axiom sp pr f
   | _ -> [d]
 
 let prep_goal split = Trans.store (fun t ->
@@ -345,6 +366,7 @@ let split_goal_full  = prep_goal full_split
 let split_goal_right = prep_goal right_split
 let split_goal_wp    = prep_goal wp_split
 let split_proof      = prep_goal proof_split
+let split_proof_full = prep_goal total_split
 
 let split_all_full  = prep_all full_split
 let split_all_right = prep_all right_split
@@ -385,6 +407,8 @@ let () = Trans.register_transform_l "split_goal_wp_old"
   ~desc:"transitional, to be removed as soon as all sessions migrate"
 
 let () = Trans.register_transform_l "split_proof" split_proof
+  ~desc:"experimental"
+let () = Trans.register_transform_l "split_proof_full" split_proof_full
   ~desc:"experimental"
 
 let ls_of_var v =

@@ -324,7 +324,7 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       | Ptree.Timplies -> k DTimplies
       | Ptree.Tiff -> k DTiff
       | Ptree.Tby -> DTbinop (DTimplies, et (), e1)
-      | Ptree.Tso -> DTbinop (DTand, e1,et ())
+      | Ptree.Tso -> DTbinop (DTand, e1, et ())
       end
   | Ptree.Tquant (q, uqu, trl, e1) ->
       let qvl = List.map (quant_var uc) uqu in
