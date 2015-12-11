@@ -21,6 +21,9 @@ open Term
 open Decl
 
 let rec intros pr f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
+      when Slab.mem Term.asym_label f2.t_label ->
+        [create_prop_decl Pgoal pr f]
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
       (* f is going to be removed, preserve its labels and location in f2  *)
