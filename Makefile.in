@@ -1444,12 +1444,13 @@ install_no_local::
 .PHONY: bench test
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
-  share/Makefile.config bin/why3extract
+  share/Makefile.config
+# temporarily disabled dependency: bin/why3extract
 	$(MAKE) test-api-logic.@OCAMLBEST@
-	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
-	$(MAKE) test-api-mlw.@OCAMLBEST@
+#	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
+#	$(MAKE) test-api-mlw.@OCAMLBEST@
 	$(MAKE) test-session.@OCAMLBEST@
-	$(MAKE) test-ocaml-extraction
+#	$(MAKE) test-ocaml-extraction
 	# desactivé car requiert findlib
 	# if test -d examples/runstrat ; then \
 	#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
