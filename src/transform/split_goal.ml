@@ -105,7 +105,7 @@ type split_ret = {
 
 let stop_split = Ident.create_label "stop_split"
 let compiled = Ident.create_label "split_goal: compiled match"
-let case_label = Ident.create_label "case"
+let case_label = Ident.create_label "case_split"
 
 let stop f = Slab.mem stop_split f.t_label
 let asym f = Slab.mem Term.asym_label f.t_label
@@ -342,7 +342,7 @@ let rec split_core sp f =
 let full_split kn = {
   right_only = false;
   byso_split = false;
-  side_split = false;
+  side_split = true;
   stop_split = false;
   asym_split = true;
   comp_match = kn;
