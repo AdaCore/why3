@@ -78,7 +78,16 @@ let handle_finished_call callback entry res =
      in the session and call the callback *)
   let g = entry.goal in
   let prover = entry.prover.Gnat_config.prover.Whyconf.prover in
-  let pas = (Session.Done res) in
+  let res =
+    (* we do not want to store succesful counter example proofs in the session,
+       so we mark them unknown *)
+    if entry.cntexample then
+      { res with
+        Call_provers.pr_answer =
+          Call_provers.Unknown ("counter_example", Some Call_provers.Other)
+      }
+    else res in
+  let pas = Session.Done res in
   let edit =
     match Session.PHprover.find_opt g.Session.goal_external_proofs prover with
     | Some pa -> pa.Session.proof_edited_as
