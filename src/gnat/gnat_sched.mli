@@ -9,9 +9,10 @@ module Keygen : sig
    val keygen : ?parent:'a -> unit -> key
 end
 
-val add_goal : cntexample : bool -> Gnat_config.prover -> int Session.goal -> unit
-(* add a goal to the Goal queue. This function returs immediately. 
-   @param cntexample indicates whether the prover should be queried for 
+val add_goal :
+  cntexample : bool -> Gnat_config.prover -> int Session.goal -> unit
+(* add a goal to the Goal queue. This function returs immediately.
+   @param cntexample indicates whether the prover should be queried for
      a counterexample. *)
 
 val run :
