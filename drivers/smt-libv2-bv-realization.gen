@@ -1,6 +1,4 @@
-(* Why3 driver for SMT-LIB2, common part of bit-vector theories *)
-
-prelude ";;; SMT-LIB2 driver: bit-vectors, common part"
+(* Why3 driver checking compatibility of BV theories with SMT-LIB2 *)
 
 theory bv.BV_Gen
   syntax function bw_and "(bvand %1 %2)"
@@ -20,42 +18,6 @@ theory bv.BV_Gen
   syntax function asr_bv "(bvashr %1 %2)"
   syntax predicate eq "(= %1 %2)"
 
-  (* Warning: we should NOT remove all the axioms using "allprops" *)
-
-  remove prop nth_out_of_bound
-  remove prop Nth_zero
-  remove prop Nth_ones
-  remove prop two_power_size_val
-  remove prop max_int_val
-  remove prop eq_sub_equiv
-  remove prop Nth_bw_or
-  remove prop Nth_bw_and
-  remove prop Nth_bw_xor
-  remove prop Nth_bw_not
-  remove prop Nth_rotate_left
-  remove prop Nth_rotate_right
-
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-  remove prop to_int_extensionality
-
-  remove prop Of_int_zero
-  remove prop Of_int_ones
-
-  remove prop to_uint_add
-  remove prop to_uint_add_bounded
-  remove prop to_uint_sub
-  remove prop to_uint_sub_bounded
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_mul_bounded
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
-
-  remove prop Extensionality
-
   syntax predicate ult "(bvult %1 %2)"
   syntax predicate ule "(bvule %1 %2)"
   syntax predicate ugt "(bvugt %1 %2)"
@@ -64,7 +26,81 @@ theory bv.BV_Gen
   syntax predicate sle "(bvsle %1 %2)"
   syntax predicate sgt "(bvsgt %1 %2)"
   syntax predicate sge "(bvsge %1 %2)"
+
+  (** Removing the axioms that should be proved instead
+    the one that are commented out are instead kept
+  *)
+
+  remove prop size_pos
+  remove prop nth_out_of_bound
+  remove prop Nth_zero
+  remove prop Nth_ones
+  remove prop Nth_bw_and
+  remove prop Nth_bw_or
+  remove prop Nth_bw_xor
+  remove prop Nth_bw_not
+  remove prop Lsr_nth_low
+  remove prop Lsr_nth_high
+  remove prop lsr_zero
+  remove prop Asr_nth_low
+  remove prop Asr_nth_high
+  remove prop asr_zero
+  remove prop Lsl_nth_high
+  remove prop Lsl_nth_low
+  remove prop lsl_zero
+  remove prop Nth_rotate_right
+  remove prop Nth_rotate_left
+
+(* Conversions from/to integers *)
+
+  remove prop two_power_size_val
+  remove prop max_int_val
+
+  remove prop to_uint_extensionality
+  remove prop to_int_extensionality
+
+  remove prop to_uint_bounds
+  remove prop to_uint_of_int
+
+  remove prop Of_int_zero
+  remove prop Of_int_ones
+
+  (** Arithmetic operators *)
+
+  remove prop to_uint_add
+  remove prop to_uint_add_bounded
+
+  remove prop to_uint_sub
+  remove prop to_uint_sub_bounded
+
+  remove prop to_uint_neg
+
+  remove prop to_uint_mul
+  remove prop to_uint_mul_bounded
+
+  remove prop to_uint_udiv
+  remove prop to_uint_urem
+
+  (* kept: Nth_bv_is_nth *)
+  (* kept: Nth_bv_is_nth2 *)
+  (* kept: lsr_bv_is_lsr *)
+
+  remove prop to_uint_lsr
+
+  (* kept: asr_bv_is_asr *)
+  (* kept: lsl_bv_is_lsl *)
+
+  remove prop to_uint_lsl
+
+  (* kept: rotate_left_bv_is_rotate_left *)
+  (* kept: rotate_right_bv_is_rotate_right *)
+
+  remove prop eq_sub_equiv
+  remove prop Extensionality
+
+
 end
+
 
 theory bv.BV64
   syntax type t "(_ BitVec 64)"

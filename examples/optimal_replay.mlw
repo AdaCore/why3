@@ -57,7 +57,7 @@ module OptimalReplay
            0 < d[k] = d[g[k]] + 1 /\
            forall k': int. g[k] < k' < k -> d[g[k]] < d[k'] }
       (* could be deduced from above, but avoids induction *)
-      invariant { forall k: int. 0 <= k < i -> path d[k] k }
+      invariant { forall k: int. 0 <= k < i -> distance d[k] k }
       let j = ref (i-1) in
       while g[!j] >= f i do
         invariant { f i <= !j < i /\ !count + d[!j] <= i-1 }

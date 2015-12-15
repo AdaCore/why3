@@ -29,6 +29,79 @@ module HeightCPS
 
 end
 
+(** with a while loop, manually obtained by compiling out recursion *)
+
+module Iteration
+
+  use import int.Int
+  use import int.MinMax
+  use import list.List
+  use import bintree.Tree
+  use import bintree.Size
+  use import bintree.Height
+  use import ref.Ref
+
+  type cont 'a = Id | Kleft (tree 'a) (cont 'a) | Kright int (cont 'a)
+
+  type what 'a = Argument (tree 'a) | Result int
+
+  predicate is_id (k: cont 'a) =
+    match k with Id -> true | _ -> false end
+
+  predicate is_result (w: what 'a) =
+    match w with Result _ -> true | _ -> false end
+
+  function evalk (k: cont 'a) (r: int) : int =
+    match k with
+    | Id         -> r
+    | Kleft  l k -> evalk k (1 + max (height l) r)
+    | Kright x k -> evalk k (1 + max x r)
+    end
+
+  function evalw (w: what 'a) : int =
+    match w with
+    | Argument t -> height t
+    | Result   x -> x
+    end
+
+  function sizek (k: cont 'a) : int =
+    match k with
+    | Id         -> 0
+    | Kleft  t k -> 3 + 4 * size t + sizek k
+    | Kright _ k -> 1 + sizek k
+    end
+
+  lemma sizek_nonneg: forall k: cont 'a. sizek k >= 0
+
+  function sizew (w: what 'a) : int =
+    match w with
+    | Argument t -> 1 + 4 * size t
+    | Result   _ -> 0
+    end
+
+  lemma helper1: forall t: tree 'a. 4 * size t >= 0
+  lemma sizew_nonneg: forall w: what 'a. sizew w >= 0
+
+  let height1 (t: tree 'a) : int
+    ensures { result = height t }
+  =
+    let w = ref (Argument t) in
+    let k = ref Id in
+    while not (is_id !k && is_result !w) do
+      invariant { evalk !k (evalw !w) = height t }
+      variant   { sizek !k + sizew !w }
+      match !w, !k with
+      | Argument Empty,        _ -> w := Result 0
+      | Argument (Node l _ r), _ -> w := Argument l; k := Kleft r !k
+      | Result _, Id             -> absurd
+      | Result v, Kleft r k0     -> w := Argument r; k := Kright v k0
+      | Result v, Kright hl k0   -> w := Result (1 + max hl v); k := k0
+      end
+    done;
+    match !w with Result r -> r | _ -> absurd end
+
+end
+
 (** Computing the height of a tree with an explicit stack
     (code: Andrei Paskevich / proof: Jean-Christophe Filliâtre) *)
 
@@ -72,3 +145,4 @@ module HeightStack
   = height_stack 0 (Cons (0, t) Nil)
 
 end
+
