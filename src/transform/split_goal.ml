@@ -260,24 +260,26 @@ let rec split_core sp f =
       ret pos neg bwd fwd side
   | Tnot f1 ->
       let sf = rc f1 in
-      let (!) f = - t_not f in
+      let (!) = alias f1 t_not in
       let (|>) zero = map (fun t -> !+(t_label_copy t zero)) (!) in
       ret (t_false |> sf.neg) (t_true |> sf.pos) !(sf.fwd) !(sf.bwd) sf.side
   | Tlet (t,fb) ->
-      let vs, f1, close = t_open_bound_cb fb in
-      let (!) f = alias fb (t_let t) (close vs f) in
+      let vs, f1 = t_open_bound fb in
+      let (!) = alias f1 (t_let_close vs t) in
       let sf = rc f1 in
       let (!!) = map (fun t -> Zero t) (!) in
       ret !!(sf.pos) !!(sf.neg) !(sf.bwd) !(sf.fwd) !!(sf.side)
   | Tcase (t,bl) ->
       let k join =
+        let case_close bl2 =
+          if Lists.equal (==) bl bl2 then f else t_case t bl2 in
         let sbl = List.map (fun b ->
           let p, f, close = t_open_branch_cb b in
           p, close, split_core sp f) bl in
         let blfwd = List.map (fun (p, close, sf) -> close p sf.fwd) sbl in
-        let fwd = t_case t blfwd in
+        let fwd = case_close blfwd in
         let blbwd = List.map (fun (p, close, sf) -> close p sf.bwd) sbl in
-        let bwd = t_case t blbwd in
+        let bwd = case_close blbwd in
         let pos, neg, side = join sbl in
         ret pos neg bwd fwd side
       in
@@ -340,8 +342,8 @@ let rec split_core sp f =
             split_core sp f
       end
   | Tquant (qn,fq) ->
-      let vsl, trl, f1, close = t_open_quant_cb fq in
-      let close f = alias fq (t_quant qn) (close vsl trl f) in
+      let vsl, trl, f1 = t_open_quant fq in
+      let close = alias f1 (t_quant_close qn vsl trl) in
       let sf = rc f1 in
       let bwd = close sf.bwd and fwd = close sf.fwd in
       let pos, neg = match qn with
