@@ -6,7 +6,7 @@
 void resize_readbuf(preadbuf b, int newcapacity);
 
 preadbuf init_readbuf(int capacity) {
-  assert (capacity = 1);
+  assert (capacity >= 1);
   preadbuf buf;
   buf = (preadbuf) malloc(sizeof(t_readbuf));
   buf->capacity = capacity;
