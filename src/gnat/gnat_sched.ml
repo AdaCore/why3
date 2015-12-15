@@ -81,7 +81,7 @@ let handle_finished_call callback entry res =
   let res =
     (* we do not want to store succesful counter example proofs in the session,
        so we mark them unknown *)
-    if entry.cntexample then
+    if entry.cntexample && res.Call_provers.pr_answer = Call_provers.Valid then
       { res with
         Call_provers.pr_answer =
           Call_provers.Unknown ("counter_example", Some Call_provers.Other)
