@@ -283,7 +283,26 @@ let rec split_core sp f =
       in
       begin match sp.comp_match with
       | None ->
-          let join _ = assert false in (* TODO: 'naive' split *)
+          let join sbl =
+            let rec zip_all bf_top bf_bot = function
+              | [] -> Unit, Unit, Unit, [], []
+              | (p, close, sf) :: q ->
+                let c_top = close p t_true and c_bot = close p t_false in
+                let dp_top = c_top :: bf_top and dp_bot = c_bot :: bf_bot in
+                let pos, neg, side, af_top, af_bot = zip_all dp_top dp_bot q in
+                let fzip bf af mid =
+                  t_case t (List.rev_append bf (close p mid::af)) in
+                let zip bf mid af =
+                  map (fun t -> !+(fzip bf af t)) (fzip bf af) mid in
+                zip bf_top sf.pos af_top ++ pos,
+                zip bf_bot sf.neg af_bot ++ neg,
+                zip bf_top sf.side af_top ++ side,
+                c_top :: af_top,
+                c_bot :: af_bot
+            in
+            let pos, neg, side, _, _ = zip_all [] [] sbl in
+            pos, neg, side
+          in
           k join
       | Some kn ->
           if Slab.mem compiled f.t_label
