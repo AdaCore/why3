@@ -23,6 +23,18 @@ type split = {
   comp_match : known_map option;
 }
 
+let stop_split = Ident.create_label "stop_split"
+let compiled = Ident.create_label "split_goal: compiled match"
+let case_label = Ident.create_label "case_split"
+
+let stop f = Slab.mem stop_split f.t_label
+let asym f = Slab.mem Term.asym_label f.t_label
+let keep f = Slab.mem Term.keep_on_simp_label f.t_label
+let case f = Slab.mem case_label f.t_label
+
+let unstop f =
+  t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
+
 (* Represent monoid of formula interpretation for conjonction and disjunction *)
 module M = struct
 
@@ -36,10 +48,28 @@ module M = struct
   (* inject formula into monoid. *)
   let (!+) a = Comb (Base a)
 
+  let rec filter c = match c with
+    | Base a when keep a -> Some c
+    | Base _ -> None
+    | Op (a,b) ->
+        match filter a, filter b with
+        | None, u | u, None -> u
+        | Some a, Some b -> Some (Op (a,b))
+
   (* monoid law. *)
-  let (++) a b = match a, b with
-    | Zero _, _ | _, Unit -> a
-    | _, Zero _ | Unit, _ -> b
+  let (++) a b =
+    match a, b with
+    | _, Unit -> a
+    | Unit, _ -> b
+    | Zero ta, Comb b -> begin match filter b with
+        | None -> a
+        | Some b -> Comb (Op (Base ta,b))
+        end
+    | Comb a, Zero tb -> begin match filter a with
+        | None -> b
+        | Some a -> Comb (Op (a,Base tb))
+        end
+    | Zero _, Zero _ -> a
     | Comb ca, Comb cb -> Comb (Op (ca, cb))
 
   (* (base -> base) morphism application. *)
@@ -102,19 +132,6 @@ type split_ret = {
   side : M.monoid;
 }
 
-
-let stop_split = Ident.create_label "stop_split"
-let compiled = Ident.create_label "split_goal: compiled match"
-let case_label = Ident.create_label "case_split"
-
-let stop f = Slab.mem stop_split f.t_label
-let asym f = Slab.mem Term.asym_label f.t_label
-let keep f = Slab.mem Term.keep_on_simp_label f.t_label
-let case f = Slab.mem case_label f.t_label
-
-let unstop f =
-  t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
-
 let rec drop_byso f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) },f) ->
       drop_byso f
@@ -175,11 +192,11 @@ let rec split_core sp f =
   let ret pos neg bwd fwd side = { pos; neg; bwd; fwd; side } in
   let r = match f.t_node with
   | _ when sp.stop_split && stop f ->
-      let f = unstop f in
       let df = drop_byso f in
-      ret !+f !+df f df Unit
-  | Ttrue -> ret (if keep f then !+f else Unit) (Zero f) f f Unit
-  | Tfalse -> ret (Zero f) (if keep f then !+f else Unit) f f Unit
+      ret !+(unstop f) !+(unstop df) f df Unit
+  | (Ttrue | Tfalse) when keep f -> ret !+f !+f f f Unit
+  | Ttrue -> ret Unit (Zero f) f f Unit
+  | Tfalse -> ret (Zero f) Unit f f Unit
   | Tapp _ -> let uf = !+f in ret uf uf f f Unit
     (* f1 so f2 *)
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) }) ->
@@ -370,27 +387,38 @@ let full_split kn = {
 }
 
 let right_split kn = { (full_split kn) with right_only = true }
-let wp_split kn    = { (right_split kn) with stop_split = true }
-let intro_split kn = { (wp_split kn) with asym_split = false }
-let proof_split kn = { (wp_split kn) with byso_split = true }
-let total_split kn = { (proof_split kn) with right_only = false }
+let full_proof  kn = { (full_split kn) with stop_split = true;
+                                            byso_split = true }
+let right_proof kn = { (full_proof kn) with right_only = true }
+let full_intro  kn = { (full_split kn) with asym_split = false;
+                                            stop_split = true }
+let right_intro kn = { (full_intro kn) with right_only = true }
 
-let split_pos sp f = M.to_list (split_core sp f).pos
-let split_neg sp f = M.to_list (split_core sp f).neg
+let split_pos sp f =
+  let core = split_core sp f in
+  assert (core.side = Unit);
+  to_list core.pos
+
+let split_neg sp f =
+  let core = split_core sp f in
+  assert (core.side = Unit);
+  to_list core.neg
+
 let split_proof sp f =
-  let core = split_core sp f in M.to_list (M.(++) core.pos core.side)
+  let core = split_core sp f in
+  to_list (core.pos ++ core.side)
 
-let split_pos_full ?known_map f = split_pos (full_split known_map) f
-let split_neg_full ?known_map f = split_neg (full_split known_map) f
-
+let split_pos_full  ?known_map f = split_pos (full_split known_map)  f
 let split_pos_right ?known_map f = split_pos (right_split known_map) f
+
+let split_neg_full  ?known_map f = split_neg (full_split known_map)  f
 let split_neg_right ?known_map f = split_neg (right_split known_map) f
 
-let split_pos_wp ?known_map f = split_pos (wp_split known_map) f
-let split_neg_wp ?known_map f = split_neg (wp_split known_map) f
+let split_proof_full  ?known_map f = split_proof (full_proof known_map)  f
+let split_proof_right ?known_map f = split_proof (right_proof known_map) f
 
-let split_pos_intro ?known_map f = split_pos (intro_split known_map) f
-let split_neg_intro ?known_map f = split_neg (intro_split known_map) f
+let split_intro_full  ?known_map f = split_pos (full_intro known_map)  f
+let split_intro_right ?known_map f = split_pos (right_intro known_map) f
 
 let split_goal sp pr f =
   let make_prop f = [create_prop_decl Pgoal pr f] in
@@ -429,19 +457,17 @@ let prep_premise split = Trans.store (fun t ->
   let trans = Trans.decl (split_premise split) None in
   Trans.apply trans t)
 
-let split_goal_full  = prep_goal full_split
-let split_goal_right = prep_goal right_split
-let split_goal_wp    = prep_goal wp_split
-let split_proof      = prep_goal proof_split
-let split_proof_full = prep_goal total_split
+let split_goal_full  = prep_goal full_proof
+let split_goal_right = prep_goal right_proof
+let split_goal_wp    = split_goal_right
 
-let split_all_full  = prep_all full_split
-let split_all_right = prep_all right_split
-let split_all_wp    = prep_all wp_split
+let split_all_full  = prep_all full_proof
+let split_all_right = prep_all right_proof
+let split_all_wp    = split_all_right
 
-let split_premise_full  = prep_premise full_split
-let split_premise_right = prep_premise right_split
-let split_premise_wp    = prep_premise wp_split
+let split_premise_full  = prep_premise full_proof
+let split_premise_right = prep_premise right_proof
+let split_premise_wp    = split_premise_right
 
 let () = Trans.register_transform_l "split_goal_full" split_goal_full
   ~desc:"Put@ the@ goal@ in@ a@ conjunctive@ form,@ \
@@ -462,63 +488,9 @@ let () = Trans.register_transform "split_premise_right" split_premise_right
   ~desc:"Same@ as@ split_all_right,@ but@ split@ only@ premises."
 
 let () = Trans.register_transform_l "split_goal_wp" split_goal_wp
-  ~desc:"Same@ as@ split_goal_right,@ but@ stops@ at@ \
-    the@ `stop_split'@ label@ and@ removes@ the@ label."
+  ~desc:"Same@ as@ split_goal_right."
 let () = Trans.register_transform_l "split_all_wp" split_all_wp
   ~desc:"Same@ as@ split_goal_wp,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_wp" split_premise_wp
   ~desc:"Same@ as@ split_all_wp,@ but@ split@ only@ premises."
 
-let () = Trans.register_transform_l "split_goal_wp_old"
-  (Trans.goal_l (split_goal (wp_split None)))
-  ~desc:"transitional, to be removed as soon as all sessions migrate"
-
-let () = Trans.register_transform_l "split_proof" split_proof
-  ~desc:"experimental"
-let () = Trans.register_transform_l "split_proof_full" split_proof_full
-  ~desc:"experimental"
-
-let ls_of_var v =
-  create_fsymbol (id_fresh ("spl_" ^ v.vs_name.id_string)) [] v.vs_ty
-
-let split_intro known_map pr f =
-  let rec split_intro dl acc f =
-    let rsp = split_intro dl in
-    match f.t_node with
-    | Ttrue when not (keep f) -> acc
-    | Tbinop (Tand,f1,f2) when asym f1 ->
-        rsp (rsp acc (t_implies f1 f2)) f1
-    | Tbinop (Tand,f1,f2) ->
-        rsp (rsp acc f2) f1
-    | Tbinop (Timplies,f1,f2) ->
-        let pp = create_prsymbol (id_fresh (pr.pr_name.id_string ^ "_spl")) in
-        let dl = create_prop_decl Paxiom pp f1 :: dl in
-        split_intro dl acc f2
-    | Tbinop (Tiff,f1,f2) ->
-        rsp (rsp acc (t_implies f2 f1)) (t_implies f1 f2)
-    | Tif (fif,fthen,felse) ->
-        rsp (rsp acc (t_implies (t_not fif) felse)) (t_implies fif fthen)
-    | Tlet (t,fb) -> let vs,f = t_open_bound fb in
-        let ls = ls_of_var vs in
-        let f  = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
-        let dl = create_logic_decl [make_ls_defn ls [] t] :: dl in
-        split_intro dl acc f
-    | Tquant (Tforall,fq) -> let vsl,_,f = t_open_quant fq in
-        let lls = List.map ls_of_var vsl in
-        let add s vs ls = Mvs.add vs (fs_app ls [] vs.vs_ty) s in
-        let f = t_subst (List.fold_left2 add Mvs.empty vsl lls) f in
-        let add dl ls = create_param_decl ls :: dl in
-        let dl = List.fold_left add dl lls in
-        split_intro dl acc f
-    | _ ->
-        let goal f = List.rev (create_prop_decl Pgoal pr f :: dl) in
-        List.rev_append (List.rev_map goal (split_pos_wp ~known_map f)) acc
-  in
-  split_intro [] [] f
-
-let split_intro = Trans.store (fun t ->
-  Trans.apply (Trans.goal_l (split_intro (Task.task_known t))) t)
-
-let () = Trans.register_transform_l "split_intro" split_intro
-  ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
-    the@ implication@ antecedents@ to@ premises."

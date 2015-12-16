@@ -214,12 +214,12 @@ module TheClassicalSudokuGrid
     ss[71]<-60; ss[72]<-54; ss[73]<-54; ss[74]<-54; ss[75]<-57;
     ss[76]<-57; ss[77]<-57; ss[78]<-60; ss[79]<-60; ss[80]<-60;
     (* square offset *)
-    let so = Array.make 9 0 in
-    so[ 0]<-0; so[ 1]<-1; so[ 2]<-2; so[ 3]<-9; so[ 4]<-10;
-    so[ 5]<-11; so[ 6]<-18; so[ 7]<-19; so[ 8]<-20;
+    let sqo = Array.make 9 0 in
+    sqo[ 0]<-0; sqo[ 1]<-1; sqo[ 2]<-2; sqo[ 3]<-9; sqo[ 4]<-10;
+    sqo[ 5]<-11; sqo[ 6]<-18; sqo[ 7]<-19; sqo[ 8]<-20;
     { column_start = cs; column_offsets = co;
       row_start    = rs; row_offsets    = ro;
-      square_start = ss; square_offsets = so; }
+      square_start = ss; square_offsets = sqo; }
 
 end
 

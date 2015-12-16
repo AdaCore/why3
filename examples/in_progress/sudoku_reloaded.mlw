@@ -323,12 +323,12 @@ module TheClassicalSudokuGrid
     ss[n72]<-n54; ss[n73]<-n54; ss[n74]<-n54; ss[n75]<-n57; ss[n76]<-n57;
     ss[n77]<-n57; ss[n78]<-n60; ss[n79]<-n60; ss[n80]<-n60;
     (* square offset *)
-    let so = Array31.make n9 n0 in
-    so[n00]<-n00; so[n01]<-n01; so[n02]<-n02; so[n03]<-n09; so[n04]<-n10;
-    so[n05]<-n11; so[n06]<-n18; so[n07]<-n19; so[n08]<-n20;
+    let sqo = Array31.make n9 n0 in
+    sqo[n00]<-n00; sqo[n01]<-n01; sqo[n02]<-n02; sqo[n03]<-n09; sqo[n04]<-n10;
+    sqo[n05]<-n11; sqo[n06]<-n18; sqo[n07]<-n19; sqo[n08]<-n20;
     { column_start = cs; column_offsets = co;
       row_start    = rs; row_offsets    = ro;
-      square_start = ss; square_offsets = so; }
+      square_start = ss; square_offsets = sqo; }
 
 end
 
