@@ -1909,67 +1909,22 @@ wc:
 #########
 
 NAME = why3-@VERSION@
-
 # see .gitattributes for the list of files that are not distributed
-EXTRA_DIST = configure doc/manual.pdf
+MORE_DIST = configure doc/manual.pdf
+EXTRANAME = why3-extra-@VERSION@
+EXTRA_DIST = share/images/boomy.rc share/images/boomy share/javascript
 
-dist: $(EXTRA_DIST)
+dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
+	rm -rf distrib/$(EXTRANAME)/ distrib/$(EXTRANAME).tar.gz
 	mkdir -p distrib/
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
-	for f in $(EXTRA_DIST); do cp $$f distrib/$(NAME)/$$f; done
+	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+	mkdir distrib/$(EXTRANAME)
+	cp -r $(EXTRA_DIST) distrib/$(EXTRANAME)
+	cd distrib; tar cf $(EXTRANAME).tar $(EXTRANAME); gzip -f --best $(EXTRANAME).tar
 
-
-# distrib export: source export-doc export-www export-examples export-examples-c linux
-#
-# export-www:
-# 	echo "<#def version>$(VERSION)</#def>" > /users/demons/filliatr/www/why/version.prehtml
-# 	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
-# 	$(MAKE) -C /users/demons/filliatr/www/why install
-#
-#
-# tarball:
-# 	mkdir -p export
-# 	cd export; rm -rf $(NAME) $(NAME).tar.gz
-# 	$(MAKE) export/$(NAME).tar.gz
-#
-# EXFILES = lib/coq*/*.v examples/*/*.v examples/*/*.mlw
-#
-# export-examples:
-# 	cp --parents $(EXFILES) $(WWW)
-# 	$(MAKE) -C $(WWW)/examples clean depend
-# 	echo "*** faire make all dans $(WWW)/examples ***"
-#
-# export-examples-c:
-# 	mkdir -p $(WWW)/caduceus/examples
-# 	cd examples-c; cp --parents */*.c */*.h $(WWW)/caduceus/examples
-# 	mkdir -p $(WWW)/caduceus/examples/bench
-# 	cp bench/c/good/*.c $(WWW)/caduceus/examples/bench
-# 	rm -f $(WWW)/caduceus/examples/bench/test.c
-#
-# export-doc: $(DOC)
-# 	cp doc/manual.ps doc/manual.html $(WWW)/manual
-# 	cp doc/logic_syntax.bnf $(WWW)/manual
-# 	(cd $(WWW)/manual; hacha manual.html)
-# 	cp doc/caduceus.ps doc/caduceus.html $(WWW)/caduceus/manual
-# 	(cd $(WWW)/caduceus/manual; hacha caduceus.html)
-# 	cp doc/krakatoa.pdf doc/krakatoa.html $(WWWKRAKATOA)/manual
-# 	(cd $(WWWKRAKATOA)/manual; hacha krakatoa.html)
-#
-# OSTYPE  ?= linux
-#
-# BINARYNAME = $(NAME)-$(OSTYPE)
-#
-# linux: binary
-#
-# ALLBINARYFILES = $(FILES) $(BINARYFILES)
-#
-# binary: $(ALLBINARYFILES)
-# 	mkdir -p export/$(BINARYNAME)
-# 	cp --parents $(ALLBINARYFILES) export/$(BINARYNAME)
-# 	(cd export; tar czf $(BINARYNAME).tar.gz $(BINARYNAME))
-# 	cp export/$(BINARYNAME).tar.gz $(FTP)
 
 ###############
 # file headers
