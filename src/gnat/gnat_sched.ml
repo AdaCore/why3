@@ -84,7 +84,7 @@ let handle_finished_call callback entry res =
     if entry.cntexample && res.Call_provers.pr_answer = Call_provers.Valid then
       { res with
         Call_provers.pr_answer =
-          Call_provers.Unknown ("counter_example", Some Call_provers.Other)
+          Call_provers.Unknown "counter_example"
       }
     else res in
   let pas = Session.Done res in
