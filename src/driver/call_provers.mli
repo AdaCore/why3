@@ -15,6 +15,13 @@ open Model_parser
 
 (** {2 data types for prover answers} *)
 
+(** The reason why unknown was reported *)
+type reason_unknown =
+  | Resourceout
+  (** Out of resources  *)
+  | Other
+  (** Other reason *)
+
 type prover_answer =
   | Valid
       (** The task is valid according to the prover *)
@@ -26,7 +33,7 @@ type prover_answer =
       (** the task runs out of memory *)
   | StepLimitExceeded
       (** the task required more steps than the limit provided *)
-  | Unknown of string
+  | Unknown of (string * reason_unknown option)
       (** The prover can't determine if the task is valid *)
   | Failure of string
       (** The prover reports a failure *)
@@ -45,8 +52,8 @@ type prover_result = {
   (** The time taken by the prover *)
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
-  (** The model produced by a the solver *)
   pr_model  : model;
+  (** The model produced by a the solver *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit

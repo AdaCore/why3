@@ -96,6 +96,7 @@ and 'a proof_attempt = private
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
+      mutable proof_steplimit : int;
       mutable proof_memlimit : int;
       mutable proof_obsolete : bool;
       mutable proof_archived : bool;
@@ -346,6 +347,7 @@ val add_external_proof :
   obsolete:bool ->
   archived:bool ->
   timelimit:int ->
+  steplimit:int ->
   memlimit:int ->
   edit:string option ->
   'key goal ->
@@ -388,6 +390,7 @@ val copy_external_proof :
   ?obsolete:bool ->
   ?archived:bool ->
   ?timelimit:int ->
+  ?steplimit:int ->
   ?memlimit:int ->
   ?edit:string option ->
   ?goal:'key goal ->
