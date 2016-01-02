@@ -115,7 +115,7 @@ void poll_list_remove(int fd) {
 
 int open_temp_file(char* dir, char** outfile) {
   char* template;
-  int len;
+  size_t len;
   len = strlen(dir);
   template = (char*) malloc(sizeof(char) * (len + 12));
   strcpy(template, dir);
@@ -319,7 +319,7 @@ void send_msg_to_client(pclient client,
                         bool timeout,
                         char* outfile) {
    char* msgbuf;
-   int len = 0;
+   size_t len = 0;
    int used;
    //len of id + semicolon
    len += strlen(id) + 1;
