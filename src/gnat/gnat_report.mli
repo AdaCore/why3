@@ -21,9 +21,9 @@ open Gnat_objectives
    field contains the reason for it. The "internal" field is present and
    meaningful only if the "error" field is present. If the "internal" field is
    present and set to "true", the error is an internal error which exhibits
-   some misbehavior of the tool. If the field absent or set to "false", the
-   error should be interpreted as a misuse of the tool (e.g. invalid command
-   line options).
+   some misbehavior of the tool. If the field is absent or set to "false", the
+   error should be interpreted as a misuse of the tool (e.g. invalid
+   command-line options).
 
    The "warnings" field is optional. If present, it contains a list of warnings
    that occured during execution of gnatwhy3.
