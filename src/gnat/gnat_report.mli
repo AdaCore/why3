@@ -5,7 +5,7 @@ open Gnat_objectives
    - store the proof results which should be output at the end;
    - output them in JSON format.
 
-   The output format is the following:
+   The output format is:
 
      file = { "error"    : string,
               "internal" : bool,
