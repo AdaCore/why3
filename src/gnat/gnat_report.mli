@@ -3,7 +3,7 @@ open Gnat_objectives
 
 (* This unit serves to
    - store the proof results which should be output at the end;
-   - output them in JSON fomat.
+   - output them in JSON format.
 
    The output format is the following:
 
@@ -19,7 +19,7 @@ open Gnat_objectives
 
    If the "error" field is present, some error happened and the value of that
    field contains the reason for it. The "internal" field is present and
-   meaningful only of the "error" field ir present. If the "internal" field is
+   meaningful only if the "error" field is present. If the "internal" field is
    present and set to "true", the error is an internal error which exhibits
    some misbehavior of the tool. If the field absent or set to "false", the
    error should be interpreted as a misuse of the tool (e.g. invalid command
@@ -50,8 +50,8 @@ open Gnat_objectives
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
    the VC has been proved or not. The field "extra_info" specifies more
    precisely the part of the VC, it may be "0" if no extra information is
-   availabe. The field "trace_file" is optional and contains the name of a file
-   which contains some explanation of the VC. The fields "vc_file" and
+   available. The field "trace_file" is optional and contains the name of a
+   file which contains some explanation of the VC. The fields "vc_file" and
    "editor_cmd" are both optional and should be present at the same time. If
    present, "vc_file" contains the name of a VC file to be used for manual
    proof, and "editor_cmd" the command to spawn for an external editor for this
