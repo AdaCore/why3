@@ -12,8 +12,8 @@ open Gnat_objectives
               "warnings" : list string,
               "results"  : list result }
 
-   The "error", "internal" and warnings fields are optional.  If the error
-   field is present, the "results" and "warnings" field will be empty. If the
+   The "error", "internal" and "warnings" fields are optional. If the "error"
+   field is present, the "results" and "warnings" fields will be empty; if the
    "error" field is not present, the "results" field contains the list of proof
    results.
 
