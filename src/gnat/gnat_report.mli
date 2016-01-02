@@ -41,9 +41,9 @@ open Gnat_objectives
 
      stats_rec = { [prover_name : stats_entry] }
 
-    stats_entry = { "count" : int,
-                    "max_steps" : int,
-                    "max_time" : float }
+     stats_entry = { "count"     : int,
+                     "max_steps" : int,
+                     "max_time"  : float }
 
 
    The field "id" contains the id of the VC. The field "reason" identifies the
@@ -67,7 +67,7 @@ val register :
   -> Model_parser.model option         (* counterexample model *)
   -> Save_VCs.stats option             (* extra information about the run *)
   -> bool                              (* if the goal was proved or not *)
-  -> (string * string) option           (* (for manual provers) *)
+  -> (string * string) option          (* (for manual provers) *)
                                        (* pair of (vc_file, editor_cmd) *)
   -> string                            (* the name of the trace file *)
     -> unit
