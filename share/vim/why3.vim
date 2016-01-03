@@ -83,12 +83,12 @@ syn keyword  whyModuleKeyword contained module
 
 syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\|prop\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
 
-syn keyword  whyKeyword  as constant
+syn keyword  whyKeyword  as by constant
 syn keyword  whyKeyword  else epsilon exists
 syn keyword  whyKeyword  forall function
 syn keyword  whyKeyword  if in inductive coinductive
 syn keyword  whyKeyword  let meta
-syn keyword  whyKeyword  not predicate
+syn keyword  whyKeyword  not predicate so
 syn keyword  whyKeyword  then type with
 
 syn keyword  whyKeyword  any

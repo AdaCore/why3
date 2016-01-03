@@ -21,11 +21,14 @@ open Term
 open Decl
 
 let rec intros pr f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
+      when Slab.mem Term.asym_label f2.t_label ->
+        [create_prop_decl Pgoal pr f]
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
       (* f is going to be removed, preserve its labels and location in f2  *)
       let f2 = t_label_copy f f2 in
-      let l = Split_goal.split_pos_intro f1 in
+      let l = Split_goal.split_intro_right f1 in
       List.fold_right
         (fun f acc ->
            let id = create_prsymbol (id_fresh "H") in
@@ -60,12 +63,15 @@ let intros pr f =
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   Mtv.values decls @ intros pr (t_ty_subst subst Mvs.empty f)
 
-let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
+let introduce_premises = Trans.goal intros
+
+let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+let split_intro =
+  Trans.compose_l Split_goal.split_goal_wp (Trans.singleton introduce_premises)
+
+let () = Trans.register_transform_l "split_intro" split_intro
+  ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
+    the@ implication@ antecedents@ to@ premises."

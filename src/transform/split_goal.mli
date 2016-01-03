@@ -29,21 +29,25 @@ val split_neg_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_neg_right] works as [split_neg_full] but does not split
  disjunctions and implications under conjunctions *)
 
-val split_pos_wp : ?known_map:Decl.known_map -> Term.term -> Term.term list
-(** [split_pos_wp] works as [split_pos_right] but stops at
- the `[stop_split]' label and removes the label *)
+val split_proof_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
+(** [split_proof_full f] returns a list of formulas whose conjunction implies f.
+    The reverse implication also holds when f does not contain the by/so
+    connectives. In this case, [split_pos_wp] works as [split_pos_full]
+    but stops at the [stop_split] label and removes it. *)
 
-val split_neg_wp : ?known_map:Decl.known_map -> Term.term -> Term.term list
-(** [split_neg_wp] works as [split_neg_right] but stops at
- the `[stop_split]' label and removes the label *)
+val split_proof_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
+(** [split_proof_right f] returns a list of formulas whose conjunction
+    implies f. The reverse implication also holds when f does not contain
+    the by/so connectives. In this case, [split_pos_wp] works as
+    [split_pos_right] but stops at the [stop_split] label and removes it. *)
 
-val split_pos_intro : ?known_map:Decl.known_map -> Term.term -> Term.term list
-(** [split_pos_intro] works as [split_pos_wp] but does not
- respect the `asym_split' label *)
+val split_intro_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
+(** [split_intro_full] works as [split_pos_full] but does not respect
+    the [asym_split] label, stops at the [stop_split] label and removes it *)
 
-val split_neg_intro : ?known_map:Decl.known_map -> Term.term -> Term.term list
-(** [split_neg_intro] works as [split_neg_wp] but does not
- respect the `asym_split' label *)
+val split_intro_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
+(** [split_intro_right] works as [split_pos_right] but does not respect
+    the [asym_split] label, stops at the [stop_split] label and removes it *)
 
 val split_goal_full : Task.task Trans.tlist
 val split_all_full : Task.task Trans.tlist
@@ -57,5 +61,3 @@ val split_goal_wp : Task.task Trans.tlist
 val split_all_wp : Task.task Trans.tlist
 val split_premise_wp : Task.task Trans.trans
 
-val split_intro : Task.task Trans.tlist
-(** [split_intro] is [split_goal_wp] with skolemization and formula separation *)

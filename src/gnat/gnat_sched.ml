@@ -98,6 +98,7 @@ let handle_finished_call callback entry res =
          ~obsolete:false
          ~archived:false
          ~timelimit:Gnat_config.timeout
+	 ~steplimit:(Gnat_config.steps ~prover:prover.Whyconf.prover_name)
          ~memlimit:0
          ~edit
          g

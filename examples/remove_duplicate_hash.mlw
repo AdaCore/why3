@@ -1,0 +1,94 @@
+
+
+(** {1 Removing duplicate elements in an array, using a mutable set}
+
+    Given an array [a] of size [n], returns a fresh array containing
+    the elements of [a] without duplicates, using a mutable set
+    (typically a hash table).
+
+*)
+
+(** {2 Specification} *)
+
+module Spec
+
+  use export int.Int
+  use export array.Array
+
+  (** v appears in [a[0..s-1]] *)
+  predicate appears (v: 'a) (a: array 'a) (s: int) =
+    exists i: int. 0 <= i < s /\ a[i] = v
+
+  (** [a[0..s-1]] contains no duplicate element *)
+  predicate nodup (a: array 'a) (s: int) =
+    forall i: int. 0 <= i < s -> not (appears a[i] a i)
+
+end
+
+module MutableSet
+
+  use import set.Fset
+
+  type elt
+
+  type t = private { ghost mutable s: set elt }
+
+  val create () : t
+    ensures { is_empty result.s }
+
+  val add (t: t) (x: elt) : unit
+    writes  { t.s }
+    ensures { t.s = add x (old t.s) }
+
+  val contains (t: t) (x: elt) : bool
+    ensures { result <-> mem x t.s }
+
+  val clear (t: t) : unit
+    writes  { t.s }
+    ensures { is_empty t.s }
+
+  val size (t: t) : int
+    ensures { result = cardinal t.s }
+
+end
+
+(** {2 Quadratic implementation, without extra space} *)
+
+module RemoveDuplicate
+
+  use import Spec
+  use import set.Fset
+  use import MutableSet
+  use import ref.Refint
+  use import array.Array
+
+  let remove_duplicate (a: array elt) : array elt
+    requires { 1 <= length a }
+    ensures  { nodup result (length result) }
+    ensures  { forall x: elt.
+               appears x a (length a) <-> appears x result (length result) }
+  =
+    let s = MutableSet.create () in
+    for i = 0 to Array.length a - 1 do
+      invariant { forall x: elt. appears x a i <-> mem x s.s }
+      MutableSet.add s a[i]
+    done;
+    'L:
+    let r = Array.make (MutableSet.size s) a[0] in
+    MutableSet.clear s;
+    let j = ref 0 in
+    for i = 0 to Array.length a - 1 do
+      invariant { forall x: elt. appears x a i <-> mem x s.s }
+      invariant { forall x: elt. mem x s.s <-> appears x r !j }
+      invariant { nodup r !j }
+      invariant { 0 <= !j = cardinal s.s <= length r }
+      invariant { subset s.s (at s.s 'L) }
+      if not (MutableSet.contains s a[i]) then begin
+        MutableSet.add s a[i];
+        r[!j] <- a[i];
+        incr j
+      end
+    done;
+    r
+
+end

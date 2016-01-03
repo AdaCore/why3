@@ -22,7 +22,11 @@ module M
   ensures { !x < old !x }
   =
   incr x;
-  while "model" "model_trace:cond" !x > 0 do invariant { !x >= 0 } variant { !x } x := !x - 1 done
+  while "model" "model_trace:cond" !x > 0 do
+  invariant { !x >= 0 }
+  variant { !x }
+    x := !x - 1
+  done
 
   (**************************************
    ** Getting counterexamples for maps **

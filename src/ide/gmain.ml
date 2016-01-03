@@ -1016,7 +1016,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~cntexample ~timelimit ~memlimit
+         ~cntexample ~timelimit ~steplimit:(-1) ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1541,11 +1541,11 @@ let test_strategy () =
     Whyconf.filter_one_prover config fp
   in
   [|
-    Strategy.Icall_prover(altergo.Whyconf.prover,1,1000);
-    Strategy.Icall_prover(cvc4.Whyconf.prover,1,1000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,1,-1,1000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,1,0,1000);
     Strategy.Itransform(split_transformation,0); (* goto 0 on success *)
-    Strategy.Icall_prover(altergo.Whyconf.prover,10,4000);
-    Strategy.Icall_prover(cvc4.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,10,-1,4000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,10,-1,4000);
   |]
 
 (*

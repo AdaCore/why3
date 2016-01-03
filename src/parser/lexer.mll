@@ -26,6 +26,7 @@
       [
         "as", AS;
         "axiom", AXIOM;
+        "by", BY;
         "clone", CLONE;
         "coinductive", COINDUCTIVE;
         "constant", CONSTANT;
@@ -50,6 +51,7 @@
         "not", NOT;
         "predicate", PREDICATE;
         "prop", PROP;
+        "so", SO;
         "then", THEN;
         "theory", THEORY;
         "true", TRUE;

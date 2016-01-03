@@ -104,7 +104,7 @@ let create_prover_file goal expl prover =
   Driver.print_task prover.Gnat_config.driver fmt (goal_task goal);
   close_out cout;
   let _ = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
-                             ~archived:false ~timelimit:0 ~memlimit:0
+                             ~archived:false ~timelimit:0 ~steplimit:(-1) ~memlimit:0
                              ~edit:(Some filename) goal
                              prover.Gnat_config.prover.Whyconf.prover
                              Unedited in

@@ -93,6 +93,7 @@ let add_proofs_attempts g =
           ~obsolete:true
           ~archived:false
           ~timelimit:5
+	  ~steplimit:(-1)
           ~memlimit:1000
           ~edit:None
           g p.Whyconf.prover Session.Scheduled
@@ -106,5 +107,3 @@ let () =
 
 (* save the session on disk *)
 let () = Session.save_session config env_session.Session.session
-
-

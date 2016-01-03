@@ -1,13 +1,28 @@
 
 * marks an incompatible change
 
+Language
+  * Add new logical connectives "by" and "so" as keywords
+
 Tools
   * add a command-line option --extra-expl-prefix to specify
     additional possible prefixes for VC explanations.  (Available for
     why3 commands "prove" and "ide".)
 
+Transformations
+  * All split transformations respect the "stop_split" label now.
+    split_*_wp is a synonym for split_*_right
+  * split_*_right split the left-hand side subformulas
+    when they carry the "case_split" label
+  * split_intro is now the composition of split_goal_right and
+    introduce_premises
+
 Library
   * improved bitvectors theories
+
+API
+  * Renamed functions in Split_goal
+  * split_intro moved to Introduction
 
 Encodings
   * When a task has no polymorphic object (except for the special

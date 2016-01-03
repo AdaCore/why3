@@ -1285,7 +1285,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     match res.pr_answer with
       | Valid -> admit_as_an_axiom gl
       | Invalid -> error "Invalid"
-      | Unknown s -> error ("Don't know: " ^ s)
+      | Call_provers.Unknown (s, _) -> error ("Don't know: " ^ s)
       | Call_provers.Failure s -> error ("Failure: " ^ s)
       | Call_provers.Timeout -> error "Timeout"
       | OutOfMemory -> error "Out Of Memory"

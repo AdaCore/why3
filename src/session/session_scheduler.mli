@@ -133,7 +133,7 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
     cntexample : bool ->
-    timelimit:int -> memlimit:int ->
+    timelimit:int -> steplimit:int -> memlimit:int ->
     Whyconf.prover -> O.key any -> unit
     (** [run_prover es sched p a] runs prover [p] on all goals under [a]
         the proof attempts are only scheduled for running, and they
@@ -188,7 +188,7 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     ?cntexample : bool ->
-    timelimit:int -> memlimit:int ->
+    timelimit:int -> steplimit:int -> memlimit:int ->
     Whyconf.prover -> O.key goal -> unit
   (** [prover_on_goal es sched ?cntexample ?timelimit p g] same as
       {!redo_external_proof} but creates or reuses existing proof_attempt
@@ -298,7 +298,7 @@ module Make(O: OBSERVER) : sig
 
   val play_all :
     O.key env_session -> t -> callback:(unit-> unit) ->
-    timelimit:int -> memlimit:int -> Whyconf.prover list -> unit
+    timelimit:int -> steplimit:int -> memlimit:int -> Whyconf.prover list -> unit
     (** [play_all es sched l] runs every prover of list [l] on all
         goals and sub-goals of the session, with the given time limit.
         [callback] is called when all tasks are finished.
