@@ -3,10 +3,10 @@
 #include <string.h>
 #include "readbuf.h"
 
-void resize_readbuf(preadbuf b, int newcapacity);
+void resize_readbuf(preadbuf b, size_t newcapacity);
 
-preadbuf init_readbuf(int capacity) {
-  assert (capacity >= 1);
+preadbuf init_readbuf(size_t capacity) {
+  assert (capacity > 0);
   preadbuf buf;
   buf = (preadbuf) malloc(sizeof(t_readbuf));
   buf->capacity = capacity;
@@ -15,24 +15,24 @@ preadbuf init_readbuf(int capacity) {
   return buf;
 }
 
-void resize_readbuf(preadbuf b, int newcapacity) {
+void resize_readbuf(preadbuf b, size_t newcapacity) {
   b->data = (char*) realloc(b->data, sizeof(char) * newcapacity);
   b->capacity = newcapacity;
 }
 
-char* prepare_read(preadbuf b, int size) {
+char* prepare_read(preadbuf b, size_t size) {
   if (b->len + size > b->capacity) {
      resize_readbuf(b, (b->capacity + size) * 2);
   }
   return b->data + b->len;
 }
 
-void have_read(preadbuf b, int size) {
+void have_read(preadbuf b, size_t size) {
   assert(b->capacity >= b->len + size);
   b->len += size;
 }
 
-void have_taken(preadbuf b, int size) {
+void have_taken(preadbuf b, size_t size) {
   assert (size <= b->len);
   memcpy(b->data, b->data+size, b->len - size);
   b->len -= size;
