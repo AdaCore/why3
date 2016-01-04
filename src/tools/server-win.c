@@ -113,7 +113,7 @@ void shutdown_with_msg(char* msg) {
 
 void send_msg_to_client(pclient client,
                         char* id,
-                        unsigned int exitcode,
+                        DWORD exitcode,
                         double cpu_time,
                         bool timeout,
                         char* outfile);
@@ -460,7 +460,7 @@ void free_process(pproc proc) {
 
 void send_msg_to_client(pclient client,
                         char* id,
-                        unsigned int exitcode,
+                        DWORD exitcode,
                         double cpu_time,
                         bool timeout,
                         char* outfile) {
@@ -478,7 +478,7 @@ void send_msg_to_client(pclient client,
    if (msgbuf == NULL) {
      shutdown_with_msg("error when allocating buffer for client msg");
    }
-   used = snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
+   used = snprintf(msgbuf, len, "%s;%lu;%.2f;%d;%s\n",
                    id, exitcode, cpu_time, (timeout?1:0), outfile);
    if (used >= len) {
       shutdown_with_msg("message for client too long");
@@ -502,7 +502,7 @@ void schedule_new_jobs() {
 }
 
 void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) {
-   unsigned int exitcode;
+   DWORD exitcode;
    FILETIME ft_start, ft_stop, ft_system, ft_user;
    ULARGE_INTEGER ull_system, ull_user;
    double cpu_time;

@@ -314,7 +314,7 @@ void write_to_client(pclient client, struct pollfd* entry) {
 
 void send_msg_to_client(pclient client,
                         char* id,
-                        unsigned int exitcode,
+                        int exitcode,
                         double cpu_time,
                         bool timeout,
                         char* outfile) {
