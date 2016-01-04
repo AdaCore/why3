@@ -7,8 +7,6 @@
 // <have_read>. You can then inspect the read buffer and call "have taken" to
 // indicate how many bytes have been taken out.
 
-#include <stdbool.h>
-
 typedef struct {
   char* data;
   int len;
