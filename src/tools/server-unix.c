@@ -189,7 +189,7 @@ void setup_child_pipe() {
 /* Returns the size in bytes of the sun_path field of a struct
    sockaddr_un. This should be defined in macro UNIX_PATH_MAX, which is not
    always defined. */
-int unix_path_max() {
+size_t unix_path_max() {
   return sizeof(struct sockaddr_un) - offsetof(struct sockaddr_un, sun_path);
 }
 
