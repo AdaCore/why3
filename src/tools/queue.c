@@ -6,7 +6,7 @@
 void simple_push(pqueue q, void* elt);
 void resize_queue(pqueue q);
 
-pqueue init_queue(int capacity) {
+pqueue init_queue(unsigned int capacity) {
   assert (capacity > 0);
   pqueue res = (pqueue) malloc(sizeof(t_queue));
   res->capacity = capacity;
@@ -31,7 +31,7 @@ void simple_push(pqueue q, void* elt) {
 }
 
 void resize_queue(pqueue q) {
-  int old_cap, new_cap, old_p, new_p;
+  unsigned int old_cap, new_cap, old_p, new_p;
   old_cap = q->capacity;
   old_p = q->pointer;
   new_cap = 2 * old_cap;
@@ -55,7 +55,7 @@ bool queue_is_empty(pqueue q) {
   return (q->len == 0);
 }
 
-int queue_length(pqueue q) {
+unsigned int queue_length(pqueue q) {
   return (q->len);
 }
 
