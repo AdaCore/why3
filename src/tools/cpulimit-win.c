@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
       /* Normal case others should not happen. */ break;
     case WAIT_ABANDONED:
       printf("Wait abandonned"); break;
-    };
+    }
 
   GetExitCodeProcess(pi.hProcess, (LPDWORD) &ex);
 
