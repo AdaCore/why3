@@ -78,10 +78,6 @@ val register :
 
 val print_messages : unit -> unit
 (* print all messages that have been registered so far. Also
-   print the result file.
-
-   The return value describes whether "warning messages" have been issued
-   (= unproved checks).
-   ??? The return value is unit; how it can describe anything? *)
+   print the result file. *)
 
 val add_warning : ?loc:Loc.position -> string -> unit
