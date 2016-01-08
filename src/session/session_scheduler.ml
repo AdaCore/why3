@@ -862,7 +862,7 @@ let edit_proof ~cntexample eS sched ~default_editor a =
   else
     let callback a res =
       match res with
-      | Done {Call_provers.pr_answer = Call_provers.Unknown ("", None)} ->
+      | Done {Call_provers.pr_answer = Call_provers.Unknown ("", _)} ->
         set_proof_state ~notify ~obsolete:true ~archived:false
           JustEdited a
       | _ ->
@@ -874,7 +874,7 @@ let edit_proof ~cntexample eS sched ~default_editor a =
 let edit_proof_v3 ~cntexample eS sched ~default_editor ~callback a =
   let callback a res =
     match res with
-    | Done {Call_provers.pr_answer = Call_provers.Unknown ("", None)} ->
+    | Done {Call_provers.pr_answer = Call_provers.Unknown ("", _)} ->
       callback a
     | _ -> ()
   in
