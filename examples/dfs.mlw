@@ -76,12 +76,12 @@ module DFS
   predicate all_descendants_are_marked (marked: marks) =
     root <> null ->
     marked[root] = True &&
-    forall x y: loc. edge x y -> marked[x] = True -> marked[y] = True
+    forall x y: loc. edge x y -> marked[x] = True -> y <> null -> marked[y] = True
 
   lemma reformulation:
     forall marked: marks.
     all_descendants_are_marked marked ->
-    forall x: loc. x <> null -> path root x -> marked[x] = True
+    forall x: loc. x <> null -> path root x -> marked[x] = True /\ root <> null
 
   let traverse () : unit
     requires { forall x: loc. x <> null ->
@@ -90,7 +90,7 @@ module DFS
     ensures  { all_descendants_are_marked !marked }
     ensures  { forall x: loc. x <> null -> !busy[x] = False }
   =
-    (* assert { well_colored !marked !busy }; *)
+    assert { well_colored !marked !busy };
     dfs root
 
 end
