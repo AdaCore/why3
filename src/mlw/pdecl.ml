@@ -186,6 +186,7 @@ let get_syms node pure =
   let rec syms_expr syms e = match e.e_node with
     | Evar _ | Econst _ | Eabsurd -> syms
     | Eassert (_,t) | Epure t -> syms_term syms t
+    | Eghost e -> syms_expr syms e
     | Eexec c -> syms_cexp syms c
     | Eassign al ->
         let syms_as syms (v,s,u) =

@@ -171,8 +171,8 @@ let parse_record ~loc tuc get_val fl =
 let rec dpattern tuc { pat_desc = desc; pat_loc = loc } =
   Dterm.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
-    | Ptree.Pvar x -> DPvar (create_user_id x)
-    | Ptree.Papp (q,pl) ->
+    | Ptree.Pvar (x, false) -> DPvar (create_user_id x)
+    | Ptree.Papp (q, pl) ->
         let pl = List.map (dpattern tuc) pl in
         DPapp (find_lsymbol tuc q, pl)
     | Ptree.Ptuple pl ->
@@ -184,12 +184,14 @@ let rec dpattern tuc { pat_desc = desc; pat_loc = loc } =
           | None -> Dterm.dpattern DPwild in
         let cs,fl = parse_record ~loc tuc get_val fl in
         DPapp (cs,fl)
-    | Ptree.Pas (p, x) -> DPas (dpattern tuc p, create_user_id x)
+    | Ptree.Pas (p, x, false) -> DPas (dpattern tuc p, create_user_id x)
     | Ptree.Por (p, q) -> DPor (dpattern tuc p, dpattern tuc q)
-    | Ptree.Pcast (p, ty) -> DPcast (dpattern tuc p, ty_of_pty tuc ty))
+    | Ptree.Pcast (p, ty) -> DPcast (dpattern tuc p, ty_of_pty tuc ty)
+    | Ptree.Pvar (_, true) | Ptree.Pas (_, _, true) -> Loc.errorm ~loc
+        "ghost variables are only allowed in programs")
 
 let quant_var tuc (loc, id, gh, ty) =
-  assert (not gh);
+  if gh then Loc.errorm ~loc "ghost variables are only allowed in programs";
   let ty = match ty with
     | Some ty -> dty_of_ty (ty_of_pty tuc ty)
     | None    -> dty_fresh () in
@@ -410,8 +412,8 @@ let parse_record ~loc muc get_val fl =
 let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
   Dexpr.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
-    | Ptree.Pvar x -> DPvar (create_user_id x)
-    | Ptree.Papp (q,pl) ->
+    | Ptree.Pvar (x, gh) -> DPvar (create_user_id x, gh)
+    | Ptree.Papp (q, pl) ->
         DPapp (find_rsymbol muc q, List.map (fun p -> dpattern muc p) pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
@@ -422,7 +424,7 @@ let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
     | Ptree.Ptuple pl ->
         DPapp (rs_tuple (List.length pl), List.map (dpattern muc) pl)
     | Ptree.Pcast (p, pty) -> DPcast (dpattern muc p, ity_of_pty muc pty)
-    | Ptree.Pas (p, x) -> DPas (dpattern muc p, create_user_id x)
+    | Ptree.Pas (p, x, gh) -> DPas (dpattern muc p, create_user_id x, gh)
     | Ptree.Por (p, q) -> DPor (dpattern muc p, dpattern muc q))
 
 (* specifications *)
@@ -459,7 +461,7 @@ let dpost muc ql lvm old ity =
     | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] ->
         let v = create_pvsymbol (id_fresh "result") ity in
         v, Loc.try3 ~loc type_fmla muc lvm old f
-    | [{ pat_desc = Ptree.Pvar id }, f] ->
+    | [{ pat_desc = Ptree.Pvar (id,false) }, f] ->
         let v = create_pvsymbol (create_user_id id) ity in
         let lvm = Mstr.add id.id_str v lvm in
         v, Loc.try3 ~loc type_fmla muc lvm old f
@@ -546,8 +548,8 @@ let mk_let ~loc n de node =
   DElet ((id_user n loc, false, RKnone, de), de1)
 
 let update_any kind e = match e.expr_desc with
-  | Ptree.Eany (pl, _, pty, sp) ->
-      { e with expr_desc = Ptree.Eany (pl, kind, pty, sp) }
+  | Ptree.Eany (pl, _, pty, msk, sp) ->
+      { e with expr_desc = Ptree.Eany (pl, kind, pty, msk, sp) }
   | _ -> e
 
 let local_kind = function
@@ -631,12 +633,12 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let ld = create_user_id id, gh, kind, dexpr muc denv e1 in
       DElet (ld, dexpr muc (denv_add_let denv ld) e2)
   | Ptree.Erec (fdl, e1) ->
-      let update_kind (id, gh, k, bl, pty, sp, e) =
-        id, gh, local_kind k, bl, pty, sp, e in
+      let update_kind (id, gh, k, bl, pty, msk, sp, e) =
+        id, gh, local_kind k, bl, pty, msk, sp, e in
       let fdl = List.map update_kind fdl in
       let denv, rd = drec_defn muc denv fdl in
       DErec (rd, dexpr muc denv e1)
-  | Ptree.Efun (bl, pty, sp, e) ->
+  | Ptree.Efun (bl, pty, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
       let e = match pty with
         | Some pty -> { e with expr_desc = Ecast (e, pty) }
@@ -645,8 +647,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | ({term_loc = loc},_)::_ ->
             Loc.errorm ~loc "unexpected 'variant' clause"
         | _ -> dspec muc sp in
-      DEfun (bl, ds, dexpr muc (denv_add_args denv bl) e)
-  | Ptree.Eany (pl, kind, pty, sp) ->
+      DEfun (bl, msk, ds, dexpr muc (denv_add_args denv bl) e)
+  | Ptree.Eany (pl, kind, pty, msk, sp) ->
       let pl = List.map (dparam muc) pl in
       let ds = match sp.sp_variant with
         | ({term_loc = loc},_)::_ ->
@@ -657,7 +659,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | RKlemma, None -> ity_unit
         | RKpred, None -> ity_bool
         | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
-      DEany (pl, ds, dity_of_ity ity)
+      DEany (pl, msk, ds, dity_of_ity ity)
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr muc denv e1 in
       let branch (pp, e) =
@@ -679,6 +681,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Etrue -> DEtrue
   | Ptree.Efalse -> DEfalse
   | Ptree.Esequence (e1, e2) ->
+      let e1 = { e1 with expr_desc = Ecast (e1, PTtuple []) } in
       let e1 = dexpr muc denv e1 in
       let e2 = dexpr muc denv e2 in
       DElet ((id_user "_" loc, false, RKnone, e1), e2)
@@ -735,7 +738,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEcast (dexpr muc denv e1, ity_of_pty muc pty))
 
 and drec_defn muc denv fdl =
-  let prep (id, gh, kind, bl, pty, sp, e) =
+  let prep (id, gh, kind, bl, pty, msk, sp, e) =
     let bl = List.map (dbinder muc) bl in
     let dity = match pty with
       | Some pty -> dity_of_ity (ity_of_pty muc pty)
@@ -743,7 +746,7 @@ and drec_defn muc denv fdl =
     let pre denv =
       let dv = dvariant muc sp.sp_variant in
       dspec muc sp, dv, dexpr muc denv e in
-    create_user_id id, gh, kind, bl, dity, pre in
+    create_user_id id, gh, kind, bl, dity, msk, pre in
   Dexpr.drec_defn denv (List.map prep fdl)
 
 (** Typing declarations *)

@@ -70,20 +70,21 @@ val rs_ghost : rsymbol -> bool
 type prog_pattern = private {
   pp_pat   : pattern;
   pp_ity   : ity;
+  pp_mask  : mask;
   pp_ghost : bool;
 }
 
 type pre_pattern =
   | PPwild
-  | PPvar of preid
+  | PPvar of preid * bool
   | PPapp of rsymbol * pre_pattern list
+  | PPas  of pre_pattern * preid * bool
   | PPor  of pre_pattern * pre_pattern
-  | PPas  of pre_pattern * preid
 
 exception ConstructorExpected of rsymbol
 
 val create_prog_pattern :
-  pre_pattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * prog_pattern
+  pre_pattern -> ity -> mask -> pvsymbol Mstr.t * prog_pattern
 
 (** {2 Program expressions} *)
 
@@ -102,6 +103,7 @@ type assign = pvsymbol * rsymbol * pvsymbol (* region * field * value *)
 type expr = private {
   e_node   : expr_node;
   e_ity    : ity;
+  e_mask   : mask;
   e_effect : effect;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
@@ -120,6 +122,7 @@ and expr_node = private
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eraise  of xsymbol * expr
   | Eassert of assertion_kind * term
+  | Eghost  of expr
   | Epure   of term
   | Eabsurd
 
@@ -152,12 +155,6 @@ val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
-val e_ghost : expr -> bool
-val c_ghost : cexp -> bool
-
-val e_ghostify : bool -> expr -> expr
-val c_ghostify : bool -> cexp -> cexp
-
 (** {2 Definitions} *)
 
 val let_var :
@@ -176,21 +173,12 @@ val ls_decr_of_rec_defn : rec_defn -> lsymbol option
 (** {2 Callable expressions} *)
 
 val c_app : rsymbol -> pvsymbol list -> ity list -> ity -> cexp
-
 val c_pur : lsymbol -> pvsymbol list -> ity list -> ity -> cexp
 
-val c_fun : pvsymbol list ->
+val c_fun : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mexn.t -> pvsymbol Mpv.t -> expr -> cexp
 
 val c_any : cty -> cexp
-
-type ext_cexp = let_defn list * cexp
-
-val ext_c_sym : rsymbol -> ext_cexp
-
-val ext_c_app : ext_cexp -> expr list -> ity list -> ity -> ext_cexp
-
-val ext_c_pur : lsymbol -> expr list -> ity list -> ity -> ext_cexp
 
 (** {2 Expression constructors} *)
 
@@ -202,6 +190,7 @@ val e_nat_const : int -> expr
 val e_exec : cexp -> expr
 
 val e_app : rsymbol -> expr list -> ity list -> ity -> expr
+val e_pur : lsymbol -> expr list -> ity list -> ity -> expr
 
 val e_let : let_defn -> expr -> expr
 
@@ -232,9 +221,11 @@ val e_while : expr -> invariant list -> variant list -> expr -> expr
 val e_for : pvsymbol ->
   expr -> for_direction -> expr -> invariant list -> expr -> expr
 
-val e_pure : term -> expr
-
 val e_assert : assertion_kind -> term -> expr
+
+val e_ghostify : bool -> expr -> expr
+
+val e_pure : term -> expr
 
 val e_absurd : ity -> expr
 
@@ -254,6 +245,9 @@ val c_rs_subst : rsymbol Mrs.t -> cexp -> cexp
 
 val term_of_expr : prop:bool -> expr -> term option
 val post_of_expr : term -> expr -> term option
+
+val e_ghost : expr -> bool
+val c_ghost : cexp -> bool
 
 (** {2 Built-in symbols} *)
 
@@ -278,9 +272,6 @@ val e_func_app_l : expr -> expr list -> expr
 (** {2 Pretty-printing} *)
 
 val forget_rs  : rsymbol -> unit (* flush id_unique for a program symbol *)
-
 val print_rs   : Format.formatter -> rsymbol -> unit  (* program symbol *)
-
 val print_expr : Format.formatter -> expr -> unit     (* expression *)
-
 val print_let_defn : Format.formatter -> let_defn -> unit

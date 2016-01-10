@@ -691,6 +691,7 @@ let clone_varl cl sm varl = List.map (fun (t,r) ->
   clone_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
 
 let clone_cty cl sm cty =
+  let res = clone_ity cl cty.cty_result in
   let args = List.map (clone_pv cl) cty.cty_args in
   let sm_args = List.fold_left2 sm_save_pv sm cty.cty_args args in
   let add_old o n (sm, olds) = let o' = clone_pv cl o in
@@ -703,8 +704,9 @@ let clone_cty cl sm cty =
     let fl = clone_invl cl sm_olds fl in
     Mexn.add xs fl q) cty.cty_xpost Mexn.empty in
   let add_read v s = Spv.add (sm_find_pv sm_args v) s in
-  let reads = Spv.fold add_read cty.cty_effect.eff_reads Spv.empty in
-  let reads = Spv.union reads (Mpv.map ignore olds) in
+  let reads = Spv.fold add_read (cty_reads cty) Spv.empty in
+  let reads = List.fold_right add_read cty.cty_args reads in
+  let reads = Spv.union reads (Mpv.domain olds) in
   let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
     Mreg.add (clone_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
@@ -712,11 +714,11 @@ let clone_cty cl sm cty =
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
-  let eff = eff_ghostify cty.cty_effect.eff_ghost eff in
   let add_raise xs eff = eff_raise eff (cl_find_xs cl xs) in
   let eff = Sexn.fold add_raise cty.cty_effect.eff_raises eff in
   let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
-  create_cty args pre post xpost olds eff (clone_ity cl cty.cty_result)
+  let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
+  cty_ghostify (cty_ghost cty) cty
 
 let sm_save_args sm c c' =
   List.fold_left2 sm_save_pv sm c.cty_args c'.cty_args
@@ -733,37 +735,21 @@ let rs_kind s = match s.rs_logic with
   | RLls _ -> RKfunc
   | RLlemma -> RKlemma
 
-let clone_ppat cl sm ~ghost pp =
+let clone_ppat cl sm pp mask =
   let rec conv_pat p = match p.pat_node with
     | Term.Pwild -> PPwild
-    | Term.Pvar v -> PPvar (id_clone v.vs_name)
+    | Term.Pvar v -> PPvar (id_clone v.vs_name, (restore_pv v).pv_ghost)
+    | Term.Pas (p,v) ->
+        PPas (conv_pat p, id_clone v.vs_name, (restore_pv v).pv_ghost)
     | Term.Por (p1,p2) -> PPor (conv_pat p1, conv_pat p2)
-    | Term.Pas (p,v) -> PPas (conv_pat p, id_clone v.vs_name)
     | Term.Papp (s,pl) ->
         PPapp (restore_rs (cl_find_ls cl s), List.map conv_pat pl) in
   let pre = conv_pat pp.pp_pat in
-  (* FIXME: if we clone pp using its own ghost status pp.pp_ghost,
-     we may ghostify too many variables. This may happen if we have
-     a match over a non-ghost expression with a single branch with
-     a ghostifying pattern (= some ghost subvalue is deep-matched).
-     Since there is only one branch, this match will be non-ghost,
-     and all non-ghost variables in the pattern must stay so, too.
-
-     To avoid the problem, we pass to create_prog_pattern the ghost
-     status of the matched expression. This, however, may also break,
-     if someone created a match over a non-ghost expression with a
-     single branch with an artificially ghostified pattern (that is,
-     by calling create_prog_pattern ~ghost:true). In this case, we
-     may not ghostify some variables which were ghost in the original
-     pattern, and perform unnecessary computations in the cloned code.
-     This exploit is only possible via API, since Dexpr always passes
-     to create_prog_pattern the ghost status of the matched expr. *)
-  let vm, pp' = create_prog_pattern pre ~ghost pp.pp_ity in
+  let vm, pp' = create_prog_pattern pre pp.pp_ity mask in
   let save v sm = sm_save_vs sm v (Mstr.find v.vs_name.id_string vm) in
   Svs.fold save pp.pp_pat.pat_vars sm, pp'
 
-let rec clone_expr cl sm e = e_label_copy e (e_ghostify (e_ghost e)
-  (match e.e_node with
+let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
   | Econst c -> e_const c
   | Eexec c -> e_exec (clone_cexp cl sm c)
@@ -777,11 +763,11 @@ let rec clone_expr cl sm e = e_label_copy e (e_ghostify (e_ghost e)
   | Eif (e1, e2, e3) ->
       e_if (clone_expr cl sm e1) (clone_expr cl sm e2) (clone_expr cl sm e3)
   | Ecase (d, bl) ->
-      let ghost = e_ghost d in
+      let d = clone_expr cl sm d in
       let conv_br (pp, e) =
-        let sm, pp = clone_ppat cl sm ~ghost pp in
+        let sm, pp = clone_ppat cl sm pp d.e_mask in
         pp, clone_expr cl sm e in
-      e_case (clone_expr cl sm d) (List.map conv_br bl)
+      e_case d (List.map conv_br bl)
   | Ewhile (c,invl,varl,e) ->
       e_while (clone_expr cl sm c) (clone_invl cl sm invl)
               (clone_varl cl sm varl) (clone_expr cl sm e)
@@ -800,11 +786,13 @@ let rec clone_expr cl sm e = e_label_copy e (e_ghostify (e_ghost e)
       e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
   | Eassert (k, f) ->
       e_assert k (clone_term cl sm.sm_vs f)
+  | Eghost e ->
+      e_ghostify true (clone_expr cl sm e)
   | Epure t ->
       e_pure (clone_term cl sm.sm_vs t)
-  | Eabsurd -> e_absurd (clone_ity cl e.e_ity)))
+  | Eabsurd -> e_absurd (clone_ity cl e.e_ity))
 
-and clone_cexp cl sm c = c_ghostify (cty_ghost c.c_cty) (match c.c_node with
+and clone_cexp cl sm c = match c.c_node with
   | Capp (s,vl) ->
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
@@ -819,10 +807,10 @@ and clone_cexp cl sm c = c_ghostify (cty_ghost c.c_cty) (match c.c_node with
       let cty = clone_cty cl sm c.c_cty in
       let sm = sm_save_args sm c.c_cty cty in
       let sm = sm_save_olds sm c.c_cty cty in
-      c_fun cty.cty_args cty.cty_pre cty.cty_post
-        cty.cty_xpost cty.cty_oldies (clone_expr cl sm e)
+      c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
+        cty.cty_post cty.cty_xpost cty.cty_oldies (clone_expr cl sm e)
   | Cany ->
-      c_any (clone_cty cl sm c.c_cty))
+      c_any (clone_cty cl sm c.c_cty)
 
 and clone_let_defn cl sm ld = match ld with
   | LDvar (v,e) ->
@@ -850,8 +838,8 @@ and clone_let_defn cl sm ld = match ld with
         let e = match c.c_node with
           | Cfun e -> clone_expr cl rsm e
           | _ -> assert false (* can't be *) in
-        let c = c_fun cty.cty_args pre
-          cty.cty_post cty.cty_xpost cty.cty_oldies e in
+        let c = c_fun ~mask:c.c_cty.cty_mask cty.cty_args
+          pre cty.cty_post cty.cty_xpost cty.cty_oldies e in
         rs, c, varl, rs_kind rd.rec_sym in
       let ld, rdl' = let_rec (List.map2 conv_rd rdl rsyml) in
       let sm = List.fold_left2 (fun sm d d' ->

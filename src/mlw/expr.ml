@@ -65,13 +65,12 @@ type rs_kind =
   | RKpred    (* top-level let-predicate *)
   | RKlemma   (* top-level or local let-lemma *)
 
+let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
+
 let check_effects ?loc c =
-  (* TODO/FIXME: prove that we can indeed ignore resets.
-     Normally, resets neither consult nor change the
-     external state, and do not affect the specification. *)
   if c.cty_effect.eff_oneway then Loc.errorm ?loc
     "This function may not terminate, it cannot be used as pure";
-  if not (eff_pure c.cty_effect) then Loc.errorm ?loc
+  if not (cty_pure c) then Loc.errorm ?loc
     "This function has side effects, it cannot be used as pure"
 
 let check_reads ?loc c =
@@ -147,6 +146,7 @@ let create_rsymbol ({pre_loc=loc} as id) ?(ghost=false) ?(kind=RKnone) c =
 
 let rs_dup ({rs_name = {id_loc = loc}} as s) c =
   let id = id_register (id_clone s.rs_name) in
+  let c = cty_ghostify ?loc (rs_ghost s) c in
   match s.rs_logic with
   | RLnone ->
       mk_rs id c RLnone None
@@ -210,62 +210,65 @@ let rs_of_ls ls =
   let c = create_cty v_args [] [q] Mexn.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
-let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
-
 (** {2 Program patterns} *)
 
 type prog_pattern = {
   pp_pat   : pattern;
   pp_ity   : ity;
+  pp_mask  : mask;
   pp_ghost : bool;
 }
 
 type pre_pattern =
   | PPwild
-  | PPvar of preid
+  | PPvar of preid * bool
   | PPapp of rsymbol * pre_pattern list
+  | PPas  of pre_pattern * preid * bool
   | PPor  of pre_pattern * pre_pattern
-  | PPas  of pre_pattern * preid
 
 exception ConstructorExpected of rsymbol
 
-let create_prog_pattern pp ?(ghost=false) ity =
-  let hv = Hstr.create 3 in
-  let gh = ref false in
-  let find id ghost ity =
-    try
-      let pv = Hstr.find hv id.pre_name in
-      ity_equal_check ity pv.pv_ity;
-      if (pv.pv_ghost <> ghost) then invalid_arg "Expr.create_prog_pattern";
-      pv
-    with Not_found ->
-      let pv = create_pvsymbol id ~ghost ity in
-      Hstr.add hv id.pre_name pv; pv
-  in
-  let rec make ghost ity = function
-    | PPwild ->
-        pat_wild (ty_of_ity ity)
-    | PPvar id ->
-        pat_var (find id ghost ity).pv_vs
+let create_prog_pattern pp ity mask =
+  let ghost = ref false in
+  let hg = Hstr.create 3 in
+  let mark {pre_name = nm} gh = if gh then Hstr.replace hg nm () in
+  let rec scan mask = function
     | PPapp ({rs_logic = RLls ls} as rs, ppl) when ls.ls_constr > 0 ->
-        if ghost && ls.ls_constr > 1 then gh := true;
-        let sbs = ity_match isb_empty rs.rs_cty.cty_result ity in
-        let mtch arg pp = let ghost = ghost || arg.pv_ghost in
-          make ghost (ity_full_inst sbs arg.pv_ity) pp in
-        let ppl = try List.map2 mtch rs.rs_cty.cty_args ppl with
-          | Invalid_argument _ ->
-              raise (Term.BadArity (ls, List.length ppl)) in
-        pat_app ls ppl (ty_of_ity ity)
-    | PPapp (rs, _) ->
-        raise (ConstructorExpected rs)
-    | PPor (pp1,pp2) ->
-        pat_or (make ghost ity pp1) (make ghost ity pp2)
-    | PPas (pp,id) ->
-        pat_as (make ghost ity pp) (find id ghost ity).pv_vs
-  in
-  let pat = make ghost ity pp in
-  Hstr.fold Mstr.add hv Mstr.empty,
-  { pp_pat = pat; pp_ity = ity; pp_ghost = ghost || !gh }
+        if mask = MaskGhost && ls.ls_constr > 1 then ghost := true;
+        let maskl = match mask with
+          | MaskGhost -> List.map (Util.const MaskGhost) ls.ls_args
+          | MaskVisible -> List.map mask_of_pv rs.rs_cty.cty_args
+          | MaskTuple maskl when is_fs_tuple ls &&
+              List.length ls.ls_args = List.length maskl -> maskl
+          | MaskTuple _ -> invalid_arg "Expr.create_prog_pattern" in
+        begin try List.iter2 scan maskl ppl with Invalid_argument _ ->
+          raise (Term.BadArity (ls, List.length ppl)) end
+    | PPapp (rs,_) -> raise (ConstructorExpected rs)
+    | PPvar (id,gh) -> mark id (gh || mask_ghost mask)
+    | PPas (pp,id,gh) -> mark id (gh || mask_ghost mask); scan mask pp
+    | PPor (pp1,pp2) -> scan mask pp1; scan mask pp2
+    | PPwild -> () in
+  scan mask pp;
+  let hv = Hstr.create 3 in
+  let find ({pre_name = nm} as id) ity =
+    try let v = Hstr.find hv nm in
+      ity_equal_check ity v.pv_ity; v.pv_vs
+    with Not_found ->
+      let v = create_pvsymbol id ~ghost:(Hstr.mem hg nm) ity in
+      Hstr.add hv nm v; v.pv_vs in
+  let rec make ity = function
+    | PPapp ({rs_cty = cty; rs_logic = RLls ls}, ppl) ->
+        let sbs = ity_match isb_empty cty.cty_result ity in
+        let make arg pp = make (ity_full_inst sbs arg.pv_ity) pp in
+        pat_app ls (List.map2 make cty.cty_args ppl) (ty_of_ity ity)
+    | PPapp (rs,_) -> raise (ConstructorExpected rs)
+    | PPvar (id,_) -> pat_var (find id ity)
+    | PPas (pp,id,_) -> pat_as (make ity pp) (find id ity)
+    | PPor (pp1,pp2) -> pat_or (make ity pp1) (make ity pp2)
+    | PPwild -> pat_wild (ty_of_ity ity) in
+  let pat = make ity pp in
+  let mvs = Hstr.fold Mstr.add hv Mstr.empty in
+  mvs, {pp_pat = pat; pp_ity = ity; pp_mask = mask; pp_ghost = !ghost}
 
 (** {2 Program expressions} *)
 
@@ -284,6 +287,7 @@ type assign = pvsymbol * rsymbol * pvsymbol (* region * field * value *)
 type expr = {
   e_node   : expr_node;
   e_ity    : ity;
+  e_mask   : mask;
   e_effect : effect;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
@@ -302,6 +306,7 @@ and expr_node =
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eraise  of xsymbol * expr
   | Eassert of assertion_kind * term
+  | Eghost  of expr
   | Epure   of term
   | Eabsurd
 
@@ -346,7 +351,7 @@ let c_ghost c = c.c_cty.cty_effect.eff_ghost
 let e_fold fn acc e = match e.e_node with
   | Evar _ | Econst _ | Eexec _ | Eassign _
   | Eassert _ | Epure _ | Eabsurd -> acc
-  | Eraise (_,e) | Efor (_,_,_,e)
+  | Eraise (_,e) | Efor (_,_,_,e) | Eghost e
   | Elet ((LDsym _|LDrec _), e) -> fn acc e
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
@@ -421,9 +426,10 @@ let try_effect el fn x y = try fn x y with
 
 (* smart constructors *)
 
-let mk_expr node ity eff = {
+let mk_expr node ity mask eff = {
   e_node   = node;
   e_ity    = ity;
+  e_mask   = if eff.eff_ghost then MaskGhost else mask;
   e_effect = eff;
   e_label  = Slab.empty;
   e_loc    = None;
@@ -435,25 +441,27 @@ let mk_cexp node cty = {
 }
 
 let e_var ({pv_ity = ity; pv_ghost = ghost} as v) =
-  mk_expr (Evar v) ity (eff_ghostify ghost (eff_read_single v))
+  let eff = eff_ghostify ghost (eff_read_single v) in
+  mk_expr (Evar v) ity MaskVisible eff
 
 let e_const c =
   let ity = match c with
     | Number.ConstInt  _ -> ity_int
     | Number.ConstReal _ -> ity_real in
-  mk_expr (Econst c) ity eff_empty
+  mk_expr (Econst c) ity MaskVisible eff_empty
 
 let e_nat_const n =
   e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
 
 let e_ghostify gh ({e_effect = eff} as e) =
-  if eff.eff_ghost || not gh then e else
-  mk_expr e.e_node e.e_ity (try_effect [e] eff_ghostify gh eff)
+  if not gh then e else
+  let eff = try_effect [e] eff_ghostify gh eff in
+  mk_expr (Eghost e) e.e_ity e.e_mask eff
 
-let c_ghostify gh ({c_cty = cty} as c) =
-  if cty.cty_effect.eff_ghost || not gh then c else
+let c_cty_ghostify gh ({c_cty = cty} as c) =
+  if not gh || cty.cty_effect.eff_ghost then cty else
   let el = match c.c_node with Cfun e -> [e] | _ -> [] in
-  mk_cexp c.c_node (try_effect el Ity.cty_ghostify gh cty)
+  try_effect el Ity.cty_ghostify gh cty
 
 (* purify expressions *)
 
@@ -487,6 +495,7 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
   | Evar v -> t_var v.pv_vs
   | Econst n -> t_const n
   | Epure t -> t
+  | Eghost e -> raw_of_expr e
   | Eexec {c_cty = {cty_args = al; cty_post = q::_}} ->
       let v, f = open_post q in
       let t = match f.t_node with
@@ -609,12 +618,12 @@ let post_of_expr res e =
 (* let-definitions *)
 
 let let_var id ?(ghost=false) e =
-  let e = e_ghostify ghost e in
+  let ghost = ghost || mask_ghost e.e_mask in
   let v = create_pvsymbol id ~ghost e.e_ity in
   LDvar (v,e), v
 
 let let_sym id ?(ghost=false) ?(kind=RKnone) c =
-  let c = c_ghostify ghost c in
+  let cty = c_cty_ghostify ghost c in
   (* we do not compute implicit post-conditions for let-functions,
      as this would be equivalent to auto-inlining of the generated
      logical function definition. FIXME: Should we make exception
@@ -624,9 +633,9 @@ let let_sym id ?(ghost=false) ?(kind=RKnone) c =
   let cty = match c with
     | {c_node = Cfun e; c_cty = {cty_post = []}}
       when (kind = RKnone (*|| kind = RKlocal*)) ->
-        cty_add_post c.c_cty (local_post_of_expr e)
-    | _ -> c.c_cty in
-  let s = create_rsymbol id ~ghost:(c_ghost c) ~kind cty in
+        cty_add_post cty (local_post_of_expr e)
+    | _ -> cty in
+  let s = create_rsymbol id ~kind cty in
   LDsym (s,c), s
 
 let e_let ld e =
@@ -637,9 +646,9 @@ let e_let ld e =
   let bind_rd d eff = bind_rs d.rec_sym eff in
   let eff = match ld with
     | LDvar (v,d) ->
-        eff_union_seq d.e_effect (bind_pv v e.e_effect)
+        try_effect [d;e] eff_union_seq d.e_effect (bind_pv v e.e_effect)
     | LDsym (s,c) ->
-        eff_read_pre (cty_reads c.c_cty) (bind_rs s e.e_effect)
+        try_effect [e] eff_read_pre (cty_reads c.c_cty) (bind_rs s e.e_effect)
     | LDrec dl ->
         let e_effect = List.fold_right bind_rd dl e.e_effect in
         (* We do not use the effect of rec_fun, because it does not
@@ -647,8 +656,9 @@ let e_let ld e =
            We do not use the effect of rec_sym, because it contains
            the RLpv variable when we define a local let-function. *)
         let add s d = Spv.union s (cty_reads d.rec_rsym.rs_cty) in
-        eff_read_pre (List.fold_left add Spv.empty dl) e_effect in
-  mk_expr (Elet (ld,e)) e.e_ity eff
+        let rd = List.fold_left add Spv.empty dl in
+        try_effect [e] eff_read_pre rd e_effect in
+  mk_expr (Elet (ld,e)) e.e_ity e.e_mask eff
 
 (* callable expressions *)
 
@@ -656,33 +666,38 @@ let e_exec ({c_cty = cty} as c) = match cty.cty_args with
   | _::_ as al ->
       (* unlike for RLpv or RLls, we do not purify the signature,
          so the regions are now frozen and we have to forbid all
-         effects, including allocation/reset *)
+         effects, including allocation *)
       check_effects cty; check_state cty;
       if not (Sreg.is_empty cty.cty_effect.eff_resets) then Loc.errorm
         "This function has side effects, it cannot be used as pure";
       let func a ity = ity_func a.pv_ity ity in
       let ity = List.fold_right func al cty.cty_result in
       let ghost = List.exists (fun a -> a.pv_ghost) al in
-      let effect = eff_bind (Spv.of_list al) cty.cty_effect in
-      mk_expr (Eexec c) ity (eff_ghostify ghost effect)
+      let eff = eff_ghostify ghost cty.cty_effect in
+      mk_expr (Eexec c) ity MaskVisible eff
   | [] ->
-      mk_expr (Eexec c) cty.cty_result cty.cty_effect
+      mk_expr (Eexec c) cty.cty_result cty.cty_mask cty.cty_effect
 
 let c_any c = mk_cexp Cany c
 
-let c_fun args p q xq old ({e_effect = eff} as e) =
+let c_fun ?(mask=MaskVisible) args p q xq old ({e_effect = eff} as e) =
+  let mask = mask_union mask e.e_mask in
   (* reset variables are forbidden in post-conditions *)
-  let c = try create_cty args p q xq old eff e.e_ity with
+  let c = try create_cty ~mask args p q xq old eff e.e_ity with
     | BadGhostWrite (v,r) -> localize_ghost_write v r [e]
     | IllegalUpdate (v,r) -> localize_immut_write v r [e]
     | StaleVariable (v,r) -> localize_reset_stale v r [e] in
   mk_cexp (Cfun e) c
 
 let c_app s vl ityl ity =
-  mk_cexp (Capp (s,vl)) (cty_apply s.rs_cty vl ityl ity)
+  let cty = cty_apply s.rs_cty vl ityl ity in
+  let cty = match s.rs_logic with
+    | RLls ls when ityl = [] && is_fs_tuple ls -> cty_tuple vl
+    | _ -> cty in
+  mk_cexp (Capp (s,vl)) cty
 
 let c_pur s vl ityl ity =
-  if not (ity_pure ity) then invalid_arg "Expr.c_pur";
+  if not (ity_pure ity) then Loc.errorm "This expression must have pure type";
   let v_args = List.map (create_pvsymbol ~ghost:false (id_fresh "u")) ityl in
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
   let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
@@ -694,72 +709,34 @@ let c_pur s vl ityl ity =
 let proxy_label = create_label "whyml_proxy_symbol"
 let proxy_labels = Slab.singleton proxy_label
 
-let mk_proxy ~ghost e hd = match e.e_node with
+let mk_proxy e hd = match e.e_node with
   | Evar v when Slab.is_empty e.e_label -> hd, v
   | _ ->
       let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
-      let ld, v = let_var id ~ghost e in
-      ld::hd, v
+      let ld, v = let_var id e in ld::hd, v
+
+let add_proxy e (hd,vl) = let hd, v = mk_proxy e hd in hd, v::vl
 
 let let_head hd e = List.fold_left (fun e ld -> e_let ld e) e hd
 
 let e_app s el ityl ity =
-  let rec args al el = match al, el with
-    | {pv_ghost = ghost}::al, e::el ->
-        let hd, vl = args al el in
-        let hd, v = mk_proxy ~ghost e hd in
-        hd, v::vl
-    | _, [] -> [], []
-    | _ -> invalid_arg "Expr.e_app" in
-  let hd, vl = args s.rs_cty.cty_args el in
+  let hd, vl = List.fold_right add_proxy el ([],[]) in
   let_head hd (e_exec (c_app s vl ityl ity))
 
-type ext_cexp = let_defn list * cexp
-
-let ext_c_sym s = [], mk_cexp (Capp (s,[])) s.rs_cty
-
-let ext_c_app (ldl,c) el ityl ity =
-  let ghost = c_ghost c in
-  let rec args hd al el = match al, el with
-    | {pv_ghost = gh}::al, e::el ->
-        let ghost = gh || ghost in
-        let hd, v = mk_proxy ~ghost e hd in
-        let hd, vl = args hd al el in
-        hd, v::vl
-    | _, [] -> hd, []
-    | _ -> invalid_arg "Expr.ext_c_app" in
-  let ldl, vl = args ldl c.c_cty.cty_args el in
-  match c.c_node with
-    | Capp (s,ul) ->
-        ldl, mk_cexp (Capp (s, ul @ vl)) (cty_apply c.c_cty vl ityl ity)
-    | Cpur (s,ul) ->
-        ldl, mk_cexp (Cpur (s, ul @ vl)) (cty_apply c.c_cty vl ityl ity)
-    | Cfun _ | Cany ->
-        let ld, s = let_sym (id_fresh ~label:proxy_labels "h") c in
-        ldl @ [ld], c_app s vl ityl ity
-
-let ext_c_pur s el ityl ity =
-  let rec args hd al el = match al, el with
-    | _::al, e::el ->
-        let hd, v = mk_proxy ~ghost:true e hd in
-        let hd, vl = args hd al el in
-        hd, v::vl
-    | _, [] -> hd, []
-    | _ -> invalid_arg "Expr.ext_c_pur" in
-  let ldl, vl = args [] s.ls_args el in
-  ldl, c_pur s vl ityl ity
+let e_pur s el ityl ity =
+  let hd, vl = List.fold_right add_proxy el ([],[]) in
+  let_head hd (e_exec (c_pur s vl ityl ity))
 
 (* assignment *)
 
 let e_assign_raw al =
   let conv (r,f,v) = r, mfield_of_rs f, v in
-  mk_expr (Eassign al) ity_unit (eff_assign (List.map conv al))
+  mk_expr (Eassign al) ity_unit MaskVisible (eff_assign (List.map conv al))
 
 let e_assign al =
   let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
-    let ghost = e_ghost r || rs_ghost f || e_ghost v in
-    let hv, v = mk_proxy ~ghost v hv in
-    let hr, r = mk_proxy ~ghost r hr in
+    let hv, v = mk_proxy v hv in
+    let hr, r = mk_proxy r hr in
     hr, hv, (r,f,v)::al) al ([],[],[]) in
   (* first pants, THEN your shoes *)
   let_head hv (let_head hr (e_assign_raw al))
@@ -807,10 +784,12 @@ let e_func_app_l fn el = List.fold_left e_func_app fn el
 let e_if e0 e1 e2 =
   ity_equal_check e0.e_ity ity_bool;
   ity_equal_check e1.e_ity e2.e_ity;
-  let eff = eff_union_par e1.e_effect e2.e_effect in
-  let eff = eff_union_seq e0.e_effect eff in
-  let eff = eff_ghostify (e_ghost e0) eff in
-  mk_expr (Eif (e0,e1,e2)) e1.e_ity eff
+  let eff = try_effect [e1;e2] eff_union_par e1.e_effect e2.e_effect in
+  let eff = try_effect [e0;e1;e2] eff_union_seq e0.e_effect eff in
+  let ghost = mask_ghost e0.e_mask && e1.e_node <> Eabsurd &&
+                                      e2.e_node <> Eabsurd in
+  let eff = try_effect [e0;e1;e2] eff_ghostify ghost eff in
+  mk_expr (Eif (e0,e1,e2)) e1.e_ity (mask_union e1.e_mask e2.e_mask) eff
 
 let e_and e1 e2 = e_if e1 e2 e_false
 let e_or e1 e2 = e_if e1 e_true e2
@@ -824,29 +803,32 @@ let e_for_raw v ((f,_,t) as bounds) inv e =
   ity_equal_check t.pv_ity ity_int;
   ity_equal_check e.e_ity ity_unit;
   let vars = List.fold_left t_freepvs Spv.empty inv in
-  let eff = eff_read_pre vars e.e_effect in
-  let eff = eff_ghostify (v.pv_ghost || f.pv_ghost || t.pv_ghost) eff in
-  ignore (eff_union_seq eff eff); (* check resets *)
+  let ghost = v.pv_ghost || f.pv_ghost || t.pv_ghost in
+  let eff = try_effect [e] eff_read_pre vars e.e_effect in
+  let eff = try_effect [e] eff_ghostify ghost eff in
+  ignore (try_effect [e] eff_union_seq eff eff);
   let eff = eff_bind_single v eff in
   let eff = eff_read_single_pre t eff in
   let eff = eff_read_single_pre f eff in
-  mk_expr (Efor (v,bounds,inv,e)) e.e_ity eff
+  mk_expr (Efor (v,bounds,inv,e)) e.e_ity MaskVisible eff
 
 let e_for v f dir t inv e =
-  let ghost = v.pv_ghost || e_ghost f || e_ghost t || e_ghost e in
-  let hd, t = mk_proxy ~ghost t [] in
-  let hd, f = mk_proxy ~ghost f hd in
+  let hd, t = mk_proxy t [] in
+  let hd, f = mk_proxy f hd in
   let_head hd (e_for_raw v (f,dir,t) inv e)
 
 let e_while d inv vl e =
   ity_equal_check d.e_ity ity_bool;
   ity_equal_check e.e_ity ity_unit;
-  let vars = List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty vl in
-  let eff = eff_read_pre (List.fold_left t_freepvs vars inv) e.e_effect in
-  let eff = eff_ghostify (e_ghost d) (eff_union_seq d.e_effect eff) in
+  let add_v s (t,_) = t_freepvs s t in
+  let vars = List.fold_left add_v Spv.empty vl in
+  let vars = List.fold_left t_freepvs vars inv in
+  let eff = try_effect [e] eff_read_pre vars e.e_effect in
+  let eff = try_effect [d;e] eff_union_seq d.e_effect eff in
+  let eff = try_effect [d;e] eff_ghostify (mask_ghost d.e_mask) eff in
   let eff = if vl = [] then eff_diverge eff else eff in
-  ignore (eff_union_seq eff eff); (* check resets *)
-  mk_expr (Ewhile (d,inv,vl,e)) e.e_ity eff
+  ignore (try_effect [d;e] eff_union_seq eff eff);
+  mk_expr (Ewhile (d,inv,vl,e)) e.e_ity MaskVisible eff
 
 (* match-with, try-with, raise *)
 
@@ -855,65 +837,77 @@ let e_case e bl =
     | (_,d)::_ -> d.e_ity
     | [] -> invalid_arg "Expr.e_case" in
   List.iter (fun (p,d) ->
-    if e_ghost e && not p.pp_ghost then
+    if mask_spill e.e_mask p.pp_mask then
       Loc.errorm "Non-ghost pattern in a ghost position";
     ity_equal_check d.e_ity ity;
     ity_equal_check e.e_ity p.pp_ity) bl;
-  let ghost = List.exists (fun (p,_) -> p.pp_ghost) bl &&
-    List.fold_left (fun n (_,d) -> match d.e_node with
-      | Eabsurd -> n | _ -> succ n) 0 bl > 1 in
+  let check (p,d) = p.pp_ghost && d.e_node <> Eabsurd in
+  let ghost = List.exists check bl and dl = List.map snd bl in
+  let add_mask mask d = mask_union mask d.e_mask in
+  let mask = List.fold_left add_mask MaskVisible dl in
   let eff = List.fold_left (fun eff (p,d) ->
     let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
-    eff_union_par eff (eff_bind pvs d.e_effect)) eff_empty bl in
-  let eff = eff_ghostify ghost (eff_union_seq e.e_effect eff) in
-  mk_expr (Ecase (e,bl)) ity eff
+    let dff = eff_bind pvs d.e_effect in
+    try_effect dl eff_union_par eff dff) eff_empty bl in
+  let eff = try_effect (e::dl) eff_union_seq e.e_effect eff in
+  let eff = try_effect (e::dl) eff_ghostify ghost eff in
+  mk_expr (Ecase (e,bl)) ity mask eff
 
 let e_try e xl =
   List.iter (fun (xs,v,d) ->
     ity_equal_check v.pv_ity xs.xs_ity;
     ity_equal_check d.e_ity e.e_ity) xl;
+  let ghost = e.e_effect.eff_ghost in
   let eeff = List.fold_left (fun eff (xs,_,_) ->
     eff_catch eff xs) e.e_effect xl in
+  let dl = List.map (fun (_,_,d) -> d) xl in
+  let add_mask mask d = mask_union mask d.e_mask in
+  let mask = List.fold_left add_mask e.e_mask dl in
   let xeff = List.fold_left (fun eff (_,v,d) ->
-    eff_union_par eff (eff_bind_single v d.e_effect)) eff_empty xl in
-  let eff = eff_ghostify (e_ghost e) (eff_union_seq eeff xeff) in
-  mk_expr (Etry (e,xl)) e.e_ity eff
+    let dff = eff_bind_single v d.e_effect in
+    try_effect dl eff_union_par eff dff) eff_empty xl in
+  let eff = try_effect (e::dl) eff_union_seq eeff xeff in
+  let eff = try_effect (e::dl) eff_ghostify ghost eff in
+  mk_expr (Etry (e,xl)) e.e_ity mask eff
 
 let e_raise xs e ity =
   ity_equal_check e.e_ity xs.xs_ity;
-  mk_expr (Eraise (xs,e)) ity (eff_raise e.e_effect xs)
+  let ghost = mask_spill e.e_mask xs.xs_mask in
+  let eff = eff_ghostify ghost (eff_raise eff_empty xs) in
+  let eff = try_effect [e] eff_union_seq e.e_effect eff in
+  mk_expr (Eraise (xs,e)) ity MaskVisible eff
 
 (* snapshots, assertions, "any" *)
 
 let e_pure t =
   let ity = Opt.fold (Util.const ity_of_ty_pure) ity_bool t.t_ty in
   let eff = eff_ghostify true (eff_read (t_freepvs Spv.empty t)) in
-  mk_expr (Epure t) ity eff
+  mk_expr (Epure t) ity MaskGhost eff
 
 let e_assert ak f =
   let eff = eff_read (t_freepvs Spv.empty f) in
-  mk_expr (Eassert (ak, t_prop f)) ity_unit eff
+  mk_expr (Eassert (ak, t_prop f)) ity_unit MaskVisible eff
 
-let e_absurd ity = mk_expr Eabsurd ity eff_empty
+let e_absurd ity = mk_expr Eabsurd ity MaskVisible eff_empty
 
 (* recursive definitions *)
 
 let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
-  cty_add_reads d.c_cty (List.fold_left add Spv.empty varl)
+  cty_read_pre (List.fold_left add Spv.empty varl) d.c_cty
 
-let rec e_rs_subst sm e =
-  e_label_copy e (e_ghostify (e_ghost e) (match e.e_node with
+let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Evar _ | Econst _ | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
+  | Eghost e -> e_ghostify true (e_rs_subst sm e)
   | Eexec c -> e_exec (c_rs_subst sm c)
   | Elet (LDvar (v,d),e) ->
       let d = e_rs_subst sm d in
       ity_equal_check d.e_ity v.pv_ity;
-      if e_ghost d <> v.pv_ghost then Loc.errorm
+      if mask_ghost d.e_mask && not v.pv_ghost then Loc.errorm
         "Expr.let_rec: ghost status mismatch";
       e_let (LDvar (v,d)) (e_rs_subst sm e)
   | Elet (LDsym (s,d),e) ->
       let d = c_rs_subst sm d in
-      if c_ghost d <> rs_ghost s then Loc.errorm
+      if c_ghost d && not (rs_ghost s) then Loc.errorm
         "Expr.let_rec: ghost status mismatch";
       let ns = rs_dup s d.c_cty in
       e_let (LDsym (ns,d)) (e_rs_subst (Mrs.add s ns sm) e)
@@ -934,28 +928,26 @@ let rec e_rs_subst sm e =
   | Ecase (d,bl) -> e_case (e_rs_subst sm d)
       (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
   | Etry (d,xl) -> e_try (e_rs_subst sm d)
-      (List.map (fun (xs,v,e) -> xs, v, e_rs_subst sm e) xl)))
+      (List.map (fun (xs,v,e) -> xs, v, e_rs_subst sm e) xl))
 
-and c_rs_subst sm ({c_node = n; c_cty = c} as d) =
-  c_ghostify (cty_ghost c) (match n with
-  | Cany -> d
+and c_rs_subst sm ({c_node = n; c_cty = c} as d) = match n with
+  | Cany | Cpur _ -> d
   | Capp (s,vl) ->
       let al = List.map (fun v -> v.pv_ity) c.cty_args in
       c_app (Mrs.find_def s s sm) vl al c.cty_result
-  | Cpur (s,vl) ->
-      let al = List.map (fun v -> v.pv_ity) c.cty_args in
-      c_pur s vl al c.cty_result
   | Cfun e ->
-      c_fun c.cty_args c.cty_pre c.cty_post
-        c.cty_xpost c.cty_oldies (e_rs_subst sm e))
+      c_fun ~mask:c.cty_mask c.cty_args c.cty_pre
+        c.cty_post c.cty_xpost c.cty_oldies (e_rs_subst sm e)
 
 and rec_fixp dl =
-  let update sm (s,({c_cty = c} as d)) =
-    if c_ghost d <> rs_ghost s then Loc.errorm
+  let update sm (s,d) =
+    if cty_ghost d.c_cty && not (rs_ghost s) then Loc.errorm
       "Expr.let_rec: ghost status mismatch";
+    let c = c_cty_ghostify (rs_ghost s) d in
     let c = if List.length c.cty_pre < List.length s.rs_cty.cty_pre
             then cty_add_pre [List.hd s.rs_cty.cty_pre] c else c in
-    if eff_equal c.cty_effect s.rs_cty.cty_effect then sm, (s,d)
+    if eff_equal c.cty_effect s.rs_cty.cty_effect &&
+       mask_equal c.cty_mask s.rs_cty.cty_mask then sm, (s,d)
     else let n = rs_dup s c in Mrs.add s n sm, (n,d) in
   let sm, dl = Lists.map_fold_left update Mrs.empty dl in
   if Mrs.is_empty sm then dl else
@@ -994,8 +986,10 @@ let let_rec fdl =
     if (match d.c_node with Cfun _ -> false | _ -> true) ||
        not (Lists.equal same s.rs_cty.cty_args c.cty_args) ||
        not (ity_equal s.rs_cty.cty_result c.cty_result) ||
-       (c_ghost d && not (rs_ghost s)) || c.cty_args = [] ||
-       s.rs_logic <> RLnone
+       mask_spill c.cty_mask s.rs_cty.cty_mask ||
+       (c_ghost d && not (rs_ghost s)) ||
+       s.rs_logic <> RLnone ||
+       c.cty_args = []
     then invalid_arg "Expr.let_rec";
     (* prepare the extra "decrease" precondition *)
     let pre = match varl with
@@ -1007,11 +1001,11 @@ let let_rec fdl =
           ps_app ps tl :: c.cty_pre in
     (* create the clean rsymbol *)
     let id = id_clone s.rs_name in
-    let c = create_cty c.cty_args pre
+    let c = create_cty ~mask:c.cty_mask c.cty_args pre
       c.cty_post c.cty_xpost c.cty_oldies start_eff c.cty_result in
     let ns = create_rsymbol id ~ghost:(rs_ghost s) ~kind:RKnone c in
     let sm = Mrs.add_new (Invalid_argument "Expr.let_rec") s ns sm in
-    sm, (ns, c_ghostify (rs_ghost s) d) in
+    sm, (ns, d) in
   let sm, dl = Lists.map_fold_left update Mrs.empty fdl in
   (* produce the recursive definition *)
   let conv (s,d) = s, c_rs_subst sm d in
@@ -1115,7 +1109,8 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
 
 let ambig_cty c =
   let freeze_pv v s = ity_freeze s v.pv_ity in
-  let sarg = Spv.fold freeze_pv c.cty_effect.eff_reads isb_empty in
+  let sarg = List.fold_right freeze_pv c.cty_args isb_empty in
+  let sarg = Spv.fold freeze_pv c.cty_effect.eff_reads sarg in
   let sres = ity_freeze isb_empty c.cty_result in
   not (Mtv.set_submap sres.isb_var sarg.isb_var) ||
   not (Mtv.set_submap sres.isb_pur
@@ -1220,8 +1215,7 @@ and print_enode pri fmt e = match e.e_node with
   | Eexec c -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->
-      fprintf fmt (protect_on (pri > 0) "%s%a;@\n%a")
-        (if v.pv_ghost && not (e_ghost e2) then "ghost " else "")
+      fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
         print_expr e1 print_expr e2
   | Elet (ld, e) ->
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
@@ -1250,11 +1244,8 @@ and print_enode pri fmt e = match e.e_node with
         (Pp.print_list Pp.comma print_right) al
   | Ecase (e0,bl) ->
       (* Elet and Ecase are ghost-containers *)
-      let ghost = e_ghost e0 && not (e_ghost e) in
-      fprintf fmt "match %s%a%s with@\n@[<hov>%a@]@\nend"
-        (if ghost then "ghost (" else "")
-        print_expr e0 (if ghost then ")" else "")
-        (Pp.print_list Pp.newline print_branch) bl
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+        print_expr e0 (Pp.print_list Pp.newline print_branch) bl
   | Ewhile (d,inv,varl,e) ->
       fprintf fmt "@[<hov 2>while %a do%a%a@\n%a@]@\ndone"
         print_expr d print_invariant inv print_variant varl print_expr e
@@ -1278,6 +1269,8 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "assume { %a }" print_term f
   | Eassert (Check,f) ->
       fprintf fmt "check { %a }" print_term f
+  | Eghost e ->
+      fprintf fmt "ghost ( %a )" print_expr e
   | Epure t ->
       fprintf fmt "pure { %a }" print_term t
 

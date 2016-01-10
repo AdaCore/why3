@@ -36,6 +36,8 @@ type pty =
 
 (*s Patterns *)
 
+type ghost = bool
+
 type pattern = {
   pat_desc : pat_desc;
   pat_loc  : Loc.position;
@@ -43,17 +45,15 @@ type pattern = {
 
 and pat_desc =
   | Pwild
-  | Pvar of ident
+  | Pvar of ident * ghost
   | Papp of qualid * pattern list
   | Prec of (qualid * pattern) list
   | Ptuple of pattern list
+  | Pas of pattern * ident * ghost
   | Por of pattern * pattern
-  | Pas of pattern * ident
   | Pcast of pattern * pty
 
 (*s Logical terms and formulas *)
-
-type ghost = bool
 
 type binder = Loc.position * ident option * ghost * pty option
 type param  = Loc.position * ident option * ghost * pty
@@ -123,8 +123,8 @@ and expr_desc =
   | Einnfix of expr * ident * expr
   | Elet of ident * ghost * Expr.rs_kind * expr * expr
   | Erec of fundef list * expr
-  | Efun of binder list * pty option * spec * expr
-  | Eany of param list * Expr.rs_kind * pty option * spec
+  | Efun of binder list * pty option * Ity.mask * spec * expr
+  | Eany of param list * Expr.rs_kind * pty option * Ity.mask * spec
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -148,8 +148,8 @@ and expr_desc =
   | Eghost of expr
   | Enamed of label * expr
 
-and fundef =
-  ident * ghost * Expr.rs_kind * binder list * pty option * spec * expr
+and fundef = ident * ghost * Expr.rs_kind *
+  binder list * pty option * Ity.mask * spec * expr
 
 (*s Declarations *)
 

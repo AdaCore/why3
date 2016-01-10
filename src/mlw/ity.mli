@@ -292,9 +292,26 @@ val pvs_of_vss : Spv.t -> Svs.t -> Spv.t
 
 (** {2 Exception symbols} *)
 
+type mask =
+  | MaskVisible
+  | MaskTuple of mask list
+  | MaskGhost
+
+
+val mask_ghost : mask -> bool
+
+val mask_of_pv : pvsymbol -> mask
+
+val mask_union : mask -> mask -> mask
+
+val mask_equal : mask -> mask -> bool
+
+val mask_spill : mask -> mask -> bool
+
 type xsymbol = private {
   xs_name : ident;
   xs_ity  : ity; (** closed and immutable *)
+  xs_mask : mask;
 }
 
 module Mexn : Extmap.S with type key = xsymbol
@@ -302,9 +319,9 @@ module Sexn : Extset.S with module M = Mexn
 
 val xs_compare : xsymbol -> xsymbol -> int
 val xs_equal : xsymbol -> xsymbol -> bool
-val xs_hash: xsymbol -> int
+val xs_hash : xsymbol -> int
 
-val create_xsymbol : preid -> ity -> xsymbol
+val create_xsymbol : preid -> ?mask:mask -> ity -> xsymbol
 
 (** {2 Effects} *)
 
@@ -320,8 +337,8 @@ exception GhostDivergence
 
 type effect = private {
   eff_reads  : Spv.t;         (* known variables *)
-  eff_writes : Spv.t Mreg.t;  (* modifications to specific fields *)
-  eff_taints : Sreg.t;        (* ghost modifications *)
+  eff_writes : Spv.t Mreg.t;  (* writes to fields *)
+  eff_taints : Sreg.t;        (* ghost code writes *)
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sexn.t;        (* raised exceptions *)
@@ -347,16 +364,15 @@ val eff_read_single_pre  : pvsymbol -> effect -> effect
 val eff_read_single_post : effect -> pvsymbol -> effect
 val eff_bind_single      : pvsymbol -> effect -> effect
 
-val eff_reset : effect -> Sreg.t -> effect   (* confine to an empty cover *)
-val eff_reset_overwritten : effect -> effect (* confine regions under writes *)
+val eff_reset : effect -> Sreg.t -> effect    (* confine to an empty cover *)
+val eff_reset_overwritten : effect -> effect  (* confine regions under writes *)
 
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
 
-val eff_diverge : effect -> effect            (* forbidden if ghost *)
-val eff_ghostify : bool -> effect -> effect   (* forbidden if diverges *)
-
-val eff_contagious : effect -> bool           (* ghost and raising exceptions *)
+val eff_diverge : effect -> effect                (* forbidden if ghost *)
+val eff_ghostify : bool -> effect -> effect       (* forbidden if diverges *)
+val eff_ghostify_weak : bool -> effect -> effect  (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
@@ -377,13 +393,15 @@ type cty = private {
   cty_oldies : pvsymbol Mpv.t;
   cty_effect : effect;
   cty_result : ity;
+  cty_mask   : mask;
   cty_freeze : ity_subst;
 }
 
-val create_cty : pvsymbol list ->
+val create_cty : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mexn.t ->
   pvsymbol Mpv.t -> effect -> ity -> cty
-(** [create_cty args pre post xpost oldies effect result] creates a cty.
+(** [create_cty ?mask args pre post xpost oldies effect result] creates
+    a computation type. [post] and [mask] must be consistent with [result].
     The [cty_xpost] field does not have to cover all raised exceptions.
     [cty_effect.eff_reads] is completed wrt the specification and [args].
     [cty_freeze] freezes every unbound pvsymbol in [cty_effect.eff_reads].
@@ -400,8 +418,16 @@ val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
     and returns the computation type of the result, [rest -> res],
     with every type variable and region in [pvl] being frozen. *)
 
+val cty_tuple : pvsymbol list -> cty
+(** [cty_tuple pvl] returns a nullary tuple-valued cty with
+    an appropriate [cty_mask]. *)
+
 val cty_ghost : cty -> bool
 (** [cty_ghost cty] returns [cty.cty_effect.eff_ghost] *)
+
+val cty_pure : cty -> bool
+(** [cty_pure cty] verifies that [cty] has no side effects
+    except allocations. *)
 
 val cty_ghostify : bool -> cty -> cty
 (** [cty_ghostify ghost cty] ghostifies the effect of [cty]. *)
@@ -409,8 +435,13 @@ val cty_ghostify : bool -> cty -> cty
 val cty_reads : cty -> Spv.t
 (** [cty_reads cty] returns the set of external dependencies of [cty]. *)
 
-val cty_add_reads : cty -> Spv.t -> cty
-(** [cty_add_reads cty pvs] adds [pvs] to [cty.cty_effect.eff_reads].
+val cty_read_pre : Spv.t -> cty -> cty
+(** [cty_read_pre pvs cty] adds [pvs] to [cty.cty_effect.eff_reads].
+    This function performs capture: if some variables in [pvs] occur
+    in [cty.cty_args], they are not frozen. *)
+
+val cty_read_post : cty -> Spv.t -> cty
+(** [cty_read_post cty pvs] adds [pvs] to [cty.cty_effect.eff_reads].
     This function performs capture: if some variables in [pvs] occur
     in [cty.cty_args], they are not frozen. *)
 

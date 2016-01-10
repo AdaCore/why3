@@ -36,10 +36,10 @@ type dpattern = private {
 
 type dpattern_node =
   | DPwild
-  | DPvar  of preid
+  | DPvar  of preid * bool
   | DPapp  of rsymbol * dpattern list
+  | DPas   of dpattern * preid * bool
   | DPor   of dpattern * dpattern
-  | DPas   of dpattern * preid
   | DPcast of dpattern * ity
 
 (** Binders *)
@@ -94,8 +94,8 @@ and dexpr_node =
   | DEls of lsymbol
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr
-  | DEfun of dbinder list * dspec later * dexpr
-  | DEany of dbinder list * dspec later * dity
+  | DEfun of dbinder list * mask * dspec later * dexpr
+  | DEany of dbinder list * mask * dspec later * dity
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
@@ -124,7 +124,7 @@ and dlet_defn = preid * ghost * rs_kind * dexpr
 and drec_defn = private { fds : dfun_defn list }
 
 and dfun_defn = preid * ghost * rs_kind *
-  dbinder list * dspec later * variant list later * dexpr
+  dbinder list * mask * dspec later * variant list later * dexpr
 
 (** Environment *)
 
@@ -151,7 +151,7 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
 type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
-  dity * (denv -> dspec later * variant list later * dexpr)
+  dity * mask * (denv -> dspec later * variant list later * dexpr)
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 

@@ -486,17 +486,15 @@ term_:
 | IF term THEN term ELSE term
     { Tif ($2, $4, $6) }
 | LET pattern EQUAL term IN term
-    { match $2.pat_desc with
-      | Pvar id -> Tlet (id, $4, $6)
-      | Pwild -> Tlet (id_anonymous $2.pat_loc, $4, $6)
-      | Ptuple [] -> Tlet (id_anonymous $2.pat_loc,
-          { $4 with term_desc = Tcast ($4, PTtuple []) }, $6)
-      | Pcast ({pat_desc = Pvar id}, ty) ->
-          Tlet (id, { $4 with term_desc = Tcast ($4, ty) }, $6)
-      | Pcast ({pat_desc = Pwild}, ty) ->
-          let id = id_anonymous $2.pat_loc in
-          Tlet (id, { $4 with term_desc = Tcast ($4, ty) }, $6)
-      | _ -> Tmatch ($4, [$2, $6]) }
+    { let cast ty = { $4 with term_desc = Tcast ($4, ty) } in
+      let pat, def = match $2.pat_desc with
+        | Ptuple [] -> { $2 with pat_desc = Pwild }, cast (PTtuple [])
+        | Pcast ({pat_desc = (Pvar (_,false)|Pwild)} as p, ty) -> p, cast ty
+        | _ -> $2, $4 in
+      match pat.pat_desc with
+      | Pvar (id,false) -> Tlet (id, def, $6)
+      | Pwild -> Tlet (id_anonymous pat.pat_loc, def, $6)
+      | _ -> Tmatch (def, [pat, $6]) }
 | LET labels(lident_op_id) EQUAL term IN term
     { Tlet ($2, $4, $6) }
 | LET labels(lident) mk_term(lam_defn) IN term
@@ -608,15 +606,16 @@ kind:
 (* Function definitions *)
 
 rec_defn:
-| ghost kind labels(lident_rich) binders cast? spec EQUAL spec seq_expr
-    { $3, $1, $2, $4, $5, spec_union $6 $8, $9 }
+| ghost kind labels(lident_rich) binders ret_opt spec EQUAL spec seq_expr
+    { $3, $1, $2, $4, fst $5, snd $5, spec_union $6 $8, $9 }
 
 fun_defn:
-| binders cast? spec EQUAL spec seq_expr
-    { Efun ($1, $2, spec_union $3 $5, $6) }
+| binders ret_opt spec EQUAL spec seq_expr
+    { Efun ($1, fst $2, snd $2, spec_union $3 $5, $6) }
 
 val_defn:
-| params cast? spec  { Eany ($1, Expr.RKnone, $2, $3) }
+| params ret_opt spec
+    { Eany ($1, Expr.RKnone, fst $2, snd $2, $3) }
 
 (* Program expressions *)
 
@@ -669,23 +668,33 @@ expr_:
         | Etuple ll, Etuple rl -> Eassign (down ll rl)
         | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
         | _, _ -> Eassign (down [$1] [$3]) }
-| LET ghost kind pattern EQUAL seq_expr IN seq_expr
-    { match $4.pat_desc with
-      | Pvar id -> Elet (id, $2, $3, $6, $8)
-      | Pwild -> Elet (id_anonymous $4.pat_loc, $2, $3, $6, $8)
-      | Ptuple [] -> Elet (id_anonymous $4.pat_loc, $2, $3,
-          { $6 with expr_desc = Ecast ($6, PTtuple []) }, $8)
-      | Pcast ({pat_desc = Pvar id}, ty) ->
-          Elet (id, $2, $3, { $6 with expr_desc = Ecast ($6, ty) }, $8)
-      | Pcast ({pat_desc = Pwild}, ty) ->
-          let id = id_anonymous $4.pat_loc in
-          Elet (id, $2, $3, { $6 with expr_desc = Ecast ($6, ty) }, $8)
-      | _ ->
-          let e = if $2 then { $6 with expr_desc = Eghost $6 } else $6 in
-          (match $3 with
-          | Expr.RKnone -> Ematch (e, [$4, $8])
-          | _ -> Loc.errorm ~loc:($4.pat_loc)
-              "`let <kind>' cannot be used with complex patterns") }
+| LET ghost kind let_pattern EQUAL seq_expr IN seq_expr
+    { let re_pat pat d = { pat with pat_desc = d } in
+      let rec ghostify pat = match pat.pat_desc with
+        (* let_pattern marks the opening variable with Ptuple [_] *)
+        | Ptuple [{pat_desc = Pvar (id,_)}] -> re_pat pat (Pvar (id,$2))
+        | Ptuple (p::pl) -> re_pat pat (Ptuple (ghostify p :: pl))
+        | Pas (p,id,gh) -> re_pat pat (Pas (ghostify p, id, gh))
+        | Por (p1,p2) -> re_pat pat (Por (ghostify p1, p2))
+        | Pcast (p,t) -> re_pat pat (Pcast (ghostify p, t))
+        | _ when $2 -> Loc.errorm ~loc:(floc $startpos($2) $endpos($2))
+            "illegal ghost qualifier" (* $4 does not start with a Pvar *)
+        | _ -> pat in
+      let pat = ghostify $4 in
+      let kind = match pat.pat_desc with
+        | _ when $3 = Expr.RKnone -> $3
+        | Pvar (_,_) | Pcast ({pat_desc = Pvar (_,_)},_) -> $3
+        | _ -> Loc.errorm ~loc:(floc $startpos($3) $endpos($3))
+            "illegal kind qualifier" in
+      let cast ty = { $6 with expr_desc = Ecast ($6, ty) } in
+      let pat, def = match pat.pat_desc with
+        | Ptuple [] -> re_pat pat Pwild, cast (PTtuple [])
+        | Pcast ({pat_desc = (Pvar _|Pwild)} as pat, ty) -> pat, cast ty
+        | _ -> pat, $6 in
+      match pat.pat_desc with
+      | Pvar (id, gh) -> Elet (id, gh, kind, def, $8)
+      | Pwild -> Elet (id_anonymous pat.pat_loc, false, kind, def, $8)
+      | _ -> Ematch (def, [pat, $8]) }
 | LET ghost kind labels(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
 | LET ghost kind labels(lident) mk_expr(fun_defn) IN seq_expr
@@ -695,11 +704,11 @@ expr_:
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
-    { Efun ($2, None, spec_union $3 $5, $6) }
+    { Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, $6) }
 | ABSTRACT spec seq_expr END
-    { Efun ([], None, $2, $3) }
-| ANY ty spec
-    { Eany ([], Expr.RKnone, Some $2, $3) }
+    { Efun ([], None, Ity.MaskVisible, $2, $3) }
+| ANY return spec
+    { Eany ([], Expr.RKnone, Some (fst $2), snd $2, $3) }
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH match_cases(seq_expr) END
@@ -814,7 +823,7 @@ single_spec:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      [mk_pat (Pvar id) $startpos $endpos, $1] }
+      [mk_pat (Pvar (id,false)) $startpos $endpos, $1] }
 
 raises:
 | uqualid ARROW term
@@ -835,6 +844,30 @@ variant:
 single_variant:
 | term preceded(WITH,lqualid)? { $1, $2 }
 
+ret_opt:
+| (* epsilon *)     { None, Ity.MaskVisible }
+| COLON return      { Some (fst $2), snd $2 }
+
+return:
+| ret_arg           { $1 }
+| lqualid ty_arg+   { PTtyapp ($1, $2), Ity.MaskVisible }
+| ret_arg ARROW ty  { PTarrow (fst $1, $3),
+                      if Ity.mask_ghost (snd $1) then
+                        raise Error else Ity.MaskVisible }
+| GHOST ty          { $2, Ity.MaskGhost }
+
+ret_arg:
+| lqualid                               { PTtyapp ($1, []), Ity.MaskVisible }
+| quote_lident                          { PTtyvar $1, Ity.MaskVisible }
+| LEFTPAR RIGHTPAR                      { PTtuple [], Ity.MaskVisible }
+| LEFTPAR ret_sub RIGHTPAR              { PTparen (fst $2), snd $2 }
+| LEFTPAR comma_list2(ret_sub) RIGHTPAR { PTtuple (List.map fst $2),
+                                    Ity.MaskTuple (List.map snd $2) }
+
+ret_sub:
+| ty                { $1, Ity.MaskVisible }
+| GHOST ty          { $2, Ity.MaskGhost }
+
 (* Patterns *)
 
 mk_pat(X): X { mk_pat $1 $startpos $endpos }
@@ -853,16 +886,45 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(pat_uni_) AS labels(lident)    { Pas ($1,$3) }
-| mk_pat(pat_uni_) cast                 { Pcast($1,$2) }
+| mk_pat(pat_uni_) AS ghost labels(lident)
+                                        { Pas ($1,$4,$3) }
+| mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
 pat_arg_:
+| pat_arg_shared_                       { $1 }
+| labels(lident)                        { Pvar ($1,false) }
+| GHOST labels(lident)                  { Pvar ($2,true) }
+
+pat_arg_shared_:
 | UNDERSCORE                            { Pwild }
-| labels(lident)                        { Pvar $1 }
 | uqualid                               { Papp ($1,[]) }
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
 | LEFTPAR pattern_ RIGHTPAR             { $2 }
 | LEFTBRC field_list1(pattern) RIGHTBRC { Prec $2 }
+
+(* let-patterns that cannot start with "ghost" *)
+
+let_pattern: mk_pat(let_pattern_) { $1 }
+
+let_pattern_:
+| let_pat_conj_                         { $1 }
+| mk_pat(let_pat_conj_) BAR pattern     { Por ($1,$3) }
+
+let_pat_conj_:
+| let_pat_uni_                          { $1 }
+| mk_pat(let_pat_uni_) COMMA comma_list1(mk_pat(pat_uni_))
+                                        { Ptuple ($1::$3) }
+
+let_pat_uni_:
+| let_pat_arg_                          { $1 }
+| uqualid pat_arg+                      { Papp ($1,$2) }
+| mk_pat(let_pat_uni_) AS ghost labels(lident)
+                                        { Pas ($1,$4,$3) }
+| mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
+
+let_pat_arg_:
+| pat_arg_shared_ { $1 }
+| labels(lident)  { Ptuple [{pat_desc = Pvar ($1,false); pat_loc = $1.id_loc}] }
 
 (* Idents *)
 
