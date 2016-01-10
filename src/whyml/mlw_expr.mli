@@ -67,7 +67,8 @@ val pl_clone : Theory.symbol_map -> symbol_map
 type ppattern = private {
   ppat_pattern : pattern;
   ppat_ity     : ity;
-  ppat_ghost   : bool;
+  ppat_ghost   : bool;  (* matches a ghost value *)
+  ppat_fail    : bool;  (* refutable under ghost *)
 }
 
 type pre_ppattern =
