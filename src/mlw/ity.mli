@@ -297,7 +297,6 @@ type mask =
   | MaskTuple of mask list
   | MaskGhost
 
-
 val mask_ghost : mask -> bool
 
 val mask_of_pv : pvsymbol -> mask
@@ -376,6 +375,8 @@ val eff_ghostify_weak : bool -> effect -> effect  (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
+
+val mask_adjust : effect -> ity -> mask -> mask
 
 (** {2 Computation types (higher-order types with effects)} *)
 

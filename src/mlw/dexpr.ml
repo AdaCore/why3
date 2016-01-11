@@ -1226,7 +1226,7 @@ and rec_defn uloc env ghost {fds = dfdl} =
     if c_ghost lam && not (rs_ghost rs) then Loc.errorm ?loc
       "Function %s must be explicitly marked ghost" nm;
     if mask_spill lam.c_cty.cty_mask c.cty_mask then Loc.errorm ?loc
-      "Function %s returns more ghost results than expected" nm;
+      "Function %s returns unexpected ghost results" nm;
     (rs, lam, dvl, kind)::fdl, dsp::dspl in
   (* check for unexpected aliases in case of trouble *)
   let fdl, dspl = try List.fold_right step2 fdl ([],[]) with
@@ -1279,7 +1279,7 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
         "Function %s must be explicitly marked ghost" nm;
       let spl = mask_spill c.c_cty.cty_mask (mask_of_fun de) in
       if spl && not ghost then Loc.errorm ?loc
-        "Function %s returns more ghost results than expected" nm;
+        "Function %s returns unexpected ghost results" nm;
       fst (let_sym id ~ghost ~kind c)
   | (RKfunc | RKpred), ([], _) ->
       (* FIXME: let ghost constant c = <effectful> *)

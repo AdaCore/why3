@@ -436,7 +436,7 @@ let try_effect el fn x y = try fn x y with
 let mk_expr node ity mask eff = {
   e_node   = node;
   e_ity    = ity;
-  e_mask   = if eff.eff_ghost then MaskGhost else mask;
+  e_mask   = mask_adjust eff ity mask;
   e_effect = eff;
   e_label  = Slab.empty;
   e_loc    = None;
@@ -687,10 +687,10 @@ let e_exec ({c_cty = cty} as c) = match cty.cty_args with
 
 let c_any c = mk_cexp Cany c
 
-let c_fun ?(mask=MaskVisible) args p q xq old ({e_effect = eff} as e) =
+let c_fun ?(mask=MaskVisible) args p q xq old e =
   let mask = mask_union mask e.e_mask in
   (* reset variables are forbidden in post-conditions *)
-  let c = try create_cty ~mask args p q xq old eff e.e_ity with
+  let c = try create_cty ~mask args p q xq old e.e_effect e.e_ity with
     | BadGhostWrite (v,r) -> localize_ghost_write v r [e]
     | IllegalUpdate (v,r) -> localize_immut_write v r [e]
     | StaleVariable (v,r) -> localize_reset_stale v r [e] in

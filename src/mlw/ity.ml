@@ -741,10 +741,10 @@ type mask =
 
 let mask_of_pv v = if v.pv_ghost then MaskGhost else MaskVisible
 
-let rec mask_norm mask = match mask with
+let rec mask_reduce mask = match mask with
   | MaskVisible | MaskGhost -> mask
   | MaskTuple l ->
-      let l = List.map mask_norm l in
+      let l = List.map mask_reduce l in
       if List.for_all ((=) MaskVisible) l then MaskVisible else
       if List.for_all ((=) MaskGhost) l then MaskGhost else
       MaskTuple l
@@ -770,8 +770,8 @@ let mask_equal : mask -> mask -> bool = (=)
 
 let rec mask_sub mask1 mask2 = match mask1, mask2 with
   | MaskVisible, _ | _, MaskGhost -> true
-  | MaskGhost, _ -> mask_norm mask2 = MaskGhost
-  | _, MaskVisible -> mask_norm mask1 = MaskVisible
+  | MaskGhost, _ -> mask_reduce mask2 = MaskGhost
+  | _, MaskVisible -> mask_reduce mask1 = MaskVisible
   | MaskTuple l1, MaskTuple l2 -> Lists.equal mask_sub l1 l2
 
 let mask_spill mask1 mask2 = not (mask_sub mask1 mask2)
@@ -792,7 +792,7 @@ let create_xsymbol id ?(mask=MaskVisible) ity =
   if not ity.ity_imm then Loc.errorm ?loc:id.pre_loc
     "The type of exception %s has mutable components" id.pre_name;
   mask_check (Invalid_argument "Ity.create_xsymbol") ity mask;
-  { xs_name = id_register id; xs_ity = ity; xs_mask = mask_norm mask }
+  { xs_name = id_register id; xs_ity = ity; xs_mask = mask_reduce mask }
 
 module Exn = MakeMSH (struct
   type t = xsymbol
@@ -1133,6 +1133,10 @@ let eff_inst sbs e =
   { e with eff_writes = writes; eff_taints = taints;
            eff_covers = covers; eff_resets = resets }
 
+let mask_adjust eff ity mask =
+  if eff.eff_ghost then MaskGhost else
+  if ity_equal ity ity_unit then MaskVisible else mask
+
 (** specification *)
 
 type pre = term   (* precondition: pre_fmla *)
@@ -1164,7 +1168,7 @@ let cty_unsafe args pre post xpost oldies effect result mask freeze = {
   cty_oldies = oldies;
   cty_effect = effect;
   cty_result = result;
-  cty_mask   = if effect.eff_ghost then MaskGhost else mask;
+  cty_mask   = mask_adjust effect result mask;
   cty_freeze = freeze;
 }
 
@@ -1214,7 +1218,7 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
   Mexn.iter (fun xs xq -> check_post exn xs.xs_ity xq) xpost;
   (* mask is consistent with result *)
   mask_check exn result mask;
-  let mask = mask_norm mask in
+  let mask = mask_reduce mask in
   (* the arguments are pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
   (* complete the reads and freeze the external context.
@@ -1323,7 +1327,7 @@ let cty_tuple args =
   let vs = create_vsymbol (id_fresh "result") ty in
   let tl = List.map (fun v -> t_var v.pv_vs) args in
   let post = create_post vs (t_equ (t_var vs) (t_tuple tl)) in
-  let mask = mask_norm (MaskTuple (List.map mask_of_pv args)) in
+  let mask = mask_reduce (MaskTuple (List.map mask_of_pv args)) in
   let res = ity_tuple (List.map (fun v -> v.pv_ity) args) in
   let eff = eff_ghostify (mask = MaskGhost) eff_empty in
   let frz = List.fold_right freeze_pv args isb_empty in
