@@ -67,11 +67,16 @@ val rs_ghost : rsymbol -> bool
 
 (** {2 Program patterns} *)
 
+type pat_ghost =
+  | PGfail  (* refutable ghost subpattern before "|" *)
+  | PGlast  (* refutable ghost subpattern otherwise  *)
+  | PGnone  (* every ghost subpattern is irrefutable *)
+
 type prog_pattern = private {
-  pp_pat   : pattern;
-  pp_ity   : ity;
-  pp_mask  : mask;
-  pp_ghost : bool;
+  pp_pat  : pattern;    (* pure pattern *)
+  pp_ity  : ity;        (* type of the matched value *)
+  pp_mask : mask;       (* mask of the matched value *)
+  pp_fail : pat_ghost;  (* refutable ghost subpattern *)
 }
 
 type pre_pattern =

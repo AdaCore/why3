@@ -212,11 +212,16 @@ let rs_of_ls ls =
 
 (** {2 Program patterns} *)
 
+type pat_ghost =
+  | PGfail  (* refutable ghost subpattern before "|" *)
+  | PGlast  (* refutable ghost subpattern otherwise  *)
+  | PGnone  (* every ghost subpattern is irrefutable *)
+
 type prog_pattern = {
-  pp_pat   : pattern;
-  pp_ity   : ity;
-  pp_mask  : mask;
-  pp_ghost : bool;
+  pp_pat  : pattern;    (* pure pattern *)
+  pp_ity  : ity;        (* type of the matched value *)
+  pp_mask : mask;       (* mask of the matched value *)
+  pp_fail : pat_ghost;  (* refutable ghost subpattern *)
 }
 
 type pre_pattern =
@@ -229,26 +234,28 @@ type pre_pattern =
 exception ConstructorExpected of rsymbol
 
 let create_prog_pattern pp ity mask =
-  let ghost = ref false in
+  let fail = ref PGnone in
   let hg = Hstr.create 3 in
-  let mark {pre_name = nm} gh = if gh then Hstr.replace hg nm () in
-  let rec scan mask = function
-    | PPapp ({rs_logic = RLls ls} as rs, ppl) when ls.ls_constr > 0 ->
-        if mask = MaskGhost && ls.ls_constr > 1 then ghost := true;
-        let maskl = match mask with
+  let mark {pre_name = nm} gh mask =
+    if gh || mask_ghost mask then Hstr.replace hg nm () in
+  let rec scan gp mask = function
+    | PPapp ({rs_logic = RLls ls} as rs, pl) when ls.ls_constr > 0 ->
+        if mask = MaskGhost && ls.ls_constr > 1 && !fail <> PGfail
+        then fail := gp; (* we do not replace PGfail with PGlast *)
+        let ml = match mask with
           | MaskGhost -> List.map (Util.const MaskGhost) ls.ls_args
           | MaskVisible -> List.map mask_of_pv rs.rs_cty.cty_args
-          | MaskTuple maskl when is_fs_tuple ls &&
-              List.length ls.ls_args = List.length maskl -> maskl
+          | MaskTuple ml when is_fs_tuple ls &&
+              List.length ls.ls_args = List.length ml -> ml
           | MaskTuple _ -> invalid_arg "Expr.create_prog_pattern" in
-        begin try List.iter2 scan maskl ppl with Invalid_argument _ ->
-          raise (Term.BadArity (ls, List.length ppl)) end
+        (try List.iter2 (scan gp) ml pl with Invalid_argument _ ->
+          raise (Term.BadArity (ls, List.length pl)))
     | PPapp (rs,_) -> raise (ConstructorExpected rs)
-    | PPvar (id,gh) -> mark id (gh || mask_ghost mask)
-    | PPas (pp,id,gh) -> mark id (gh || mask_ghost mask); scan mask pp
-    | PPor (pp1,pp2) -> scan mask pp1; scan mask pp2
+    | PPvar (id,gh) -> mark id gh mask
+    | PPas (pp,id,gh) -> mark id gh mask; scan gp mask pp
+    | PPor (pp1,pp2) -> scan PGfail mask pp1; scan gp mask pp2
     | PPwild -> () in
-  scan mask pp;
+  scan PGlast mask pp;
   let hv = Hstr.create 3 in
   let find ({pre_name = nm} as id) ity =
     try let v = Hstr.find hv nm in
@@ -268,7 +275,7 @@ let create_prog_pattern pp ity mask =
     | PPwild -> pat_wild (ty_of_ity ity) in
   let pat = make ity pp in
   let mvs = Hstr.fold Mstr.add hv Mstr.empty in
-  mvs, {pp_pat = pat; pp_ity = ity; pp_mask = mask; pp_ghost = !ghost}
+  mvs, {pp_pat = pat; pp_ity = ity; pp_mask = mask; pp_fail = !fail}
 
 (** {2 Program expressions} *)
 
@@ -841,8 +848,17 @@ let e_case e bl =
       Loc.errorm "Non-ghost pattern in a ghost position";
     ity_equal_check d.e_ity ity;
     ity_equal_check e.e_ity p.pp_ity) bl;
-  let check (p,d) = p.pp_ghost && d.e_node <> Eabsurd in
-  let ghost = List.exists check bl and dl = List.map snd bl in
+  (* absurd branches can be eliminated, any pattern with
+     a refutable ghost subpattern makes the whole match
+     ghost, unless it is the last branch, in which case
+     the pattern is actually irrefutable *)
+  let rec scan last = function
+    | (_,{e_node = Eabsurd})::bl -> scan last bl
+    | ({pp_fail = PGnone},_)::bl -> last || scan last bl
+    | ({pp_fail = PGlast},_)::bl -> last || scan true bl
+    | ({pp_fail = PGfail},_)::_  -> true
+    | [] -> false in
+  let ghost = scan false bl and dl = List.map snd bl in
   let add_mask mask d = mask_union mask d.e_mask in
   let mask = List.fold_left add_mask MaskVisible dl in
   let eff = List.fold_left (fun eff (p,d) ->
