@@ -778,10 +778,11 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
         (clone_invl cl ism invl) (clone_expr cl ism e)
   | Etry (d, xl) ->
-      let conv_br (xs, v, e) =
-        let v' = clone_pv cl v in
-        cl_find_xs cl xs, v', clone_expr cl (sm_save_pv sm v v') e in
-      e_try (clone_expr cl sm d) (List.map conv_br xl)
+      let conv_br xs (vl, e) m =
+        let vl' = List.map (clone_pv cl) vl in
+        let sm = List.fold_left2 sm_save_pv sm vl vl' in
+        Mexn.add (cl_find_xs cl xs) (vl', clone_expr cl sm e) m in
+      e_try (clone_expr cl sm d) (Mexn.fold conv_br xl Mexn.empty)
   | Eraise (xs, e) ->
       e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
   | Eassert (k, f) ->
@@ -815,7 +816,8 @@ and clone_cexp cl sm c = match c.c_node with
 and clone_let_defn cl sm ld = match ld with
   | LDvar (v,e) ->
       let e' = clone_expr cl sm e in
-      let ld, v' = let_var (id_clone v.pv_vs.vs_name) ~ghost:v.pv_ghost e' in
+      let id = id_clone v.pv_vs.vs_name in
+      let ld, v' = let_var id ~ghost:v.pv_ghost e' in
       sm_save_pv sm v v', ld
   | LDsym (s,c) ->
       let c' = clone_cexp cl sm c in
@@ -867,8 +869,9 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~vc:false uc (create_let_decl ld)
   | PDexn xs ->
+      let id = id_clone xs.xs_name in
       let ity = clone_ity cl xs.xs_ity in
-      let xs' = create_xsymbol (id_clone xs.xs_name) ity in
+      let xs' = create_xsymbol id ~mask:xs.xs_mask ity in
       cl.xs_table <- Mexn.add xs xs' cl.xs_table;
       add_pdecl ~vc:false uc (create_exn_decl xs')
   | PDpure ->

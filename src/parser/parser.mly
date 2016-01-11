@@ -589,8 +589,8 @@ prog_decl:
 | LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) EQUAL seq_expr    { Dlet ($4, $2, $3, $6) }
 | LET REC with_list1(rec_defn)                         { Drec $3 }
-| EXCEPTION labels(uident)                             { Dexn ($2, PTtuple []) }
-| EXCEPTION labels(uident) ty                          { Dexn ($2, $3) }
+| EXCEPTION labels(uident)            { Dexn ($2, PTtuple [], Ity.MaskVisible) }
+| EXCEPTION labels(uident) return     { Dexn ($2, fst $3, snd $3) }
 
 ghost:
 | (* epsilon *) { false }

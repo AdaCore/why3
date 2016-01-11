@@ -159,17 +159,20 @@ let get_news node pure =
   List.fold_left news_pure news pure
 
 let get_syms node pure =
-  let syms_ts s ts = Sid.add ts.ts_name s in
-  let syms_ls s ls = Sid.add ls.ls_name s in
-  let syms_ty s ty = ty_s_fold syms_ts s ty in
-  let syms_term s t = t_s_fold syms_ty syms_ls s t in
+  let syms_ts syms s = Sid.add s.ts_name syms in
+  let syms_ls syms s = Sid.add s.ls_name syms in
+  let syms_ty syms ty = ty_s_fold syms_ts syms ty in
+  let syms_term syms t = t_s_fold syms_ty syms_ls syms t in
+  let syms_tl syms tl = List.fold_left syms_term syms tl in
   let syms_pure syms d = Sid.union syms d.d_syms in
   let syms_vari syms (t,r) = Opt.fold syms_ls (syms_term syms t) r in
+  let syms_varl syms varl = List.fold_left syms_vari syms varl in
   let syms = List.fold_left syms_pure Sid.empty pure in
   let syms_its syms s = Sid.add s.its_ts.ts_name syms in
   let syms_ity syms ity = ity_s_fold syms_its syms ity in
   let syms_xs xs syms = Sid.add xs.xs_name syms in
   let syms_pv syms v = syms_ity syms v.pv_ity in
+  let syms_pvl syms vl = List.fold_left syms_pv syms vl in
   let rec syms_pat syms p = match p.pat_node with
     | Pwild | Pvar _ -> syms
     | Papp (s,pl) ->
@@ -178,7 +181,7 @@ let get_syms node pure =
     | Por (p,q) -> syms_pat (syms_pat syms p) q
     | Pas (p,_) -> syms_pat syms p in
   let syms_cty syms c =
-    let add_tl syms tl = List.fold_left syms_term syms tl in
+    let add_tl syms tl = syms_tl syms tl in
     let add_xq xs ql syms = syms_xs xs (add_tl syms ql) in
     let syms = add_tl (add_tl syms c.cty_pre) c.cty_post in
     let syms = Mexn.fold add_xq c.cty_xpost syms in
@@ -202,10 +205,10 @@ let get_syms node pure =
               List.fold_left del_rd esms rdl in
         syms_let_defn (Sid.union syms esms) ld
     | Efor (i,_,invl,e) ->
-        syms_pv (List.fold_left syms_term (syms_expr syms e) invl) i
+        syms_pv (syms_tl (syms_expr syms e) invl) i
     | Ewhile (d,invl,varl,e) ->
-        let syms = List.fold_left syms_vari (syms_expr syms e) varl in
-        List.fold_left syms_term (syms_eity syms d) invl
+        let syms = syms_varl (syms_expr syms e) varl in
+        syms_tl (syms_eity syms d) invl
     | Eif (c,d,e) ->
         syms_expr (syms_expr (syms_eity syms c) d) e
     | Ecase (d,bl) ->
@@ -213,22 +216,23 @@ let get_syms node pure =
           syms_pat (syms_expr syms e) p.pp_pat in
         List.fold_left add_branch (syms_eity syms d) bl
     | Etry (d,xl) ->
-        let add_branch syms (xs,v,e) =
-          syms_xs xs (syms_pv (syms_expr syms e) v) in
-        List.fold_left add_branch (syms_expr syms d) xl
+        let add_branch xs (vl,e) syms =
+          syms_xs xs (syms_pvl (syms_expr syms e) vl) in
+        Mexn.fold add_branch xl (syms_expr syms d)
     | Eraise (xs,e) ->
         syms_xs xs (syms_eity syms e)
   and syms_eity syms e =
     syms_expr (syms_ity syms e.e_ity) e
   and syms_city syms c =
-    let syms = syms_ity (syms_cexp syms c) c.c_cty.cty_result in
-    List.fold_left syms_pv syms c.c_cty.cty_args
+    let syms = syms_cexp syms c in
+    let syms = syms_pvl syms c.c_cty.cty_args in
+    syms_ity syms c.c_cty.cty_result
   and syms_cexp syms c = match c.c_node with
     | Capp (s,vl) ->
-        let syms = List.fold_left syms_pv syms vl in
-        syms_cty (Sid.add s.rs_name syms) s.rs_cty
+        let syms = syms_cty syms s.rs_cty in
+        syms_pvl (Sid.add s.rs_name syms) vl
     | Cpur (s,vl) ->
-        List.fold_left syms_pv (Sid.add s.ls_name syms) vl
+        syms_pvl (Sid.add s.ls_name syms) vl
     | Cfun e -> syms_cty (syms_expr syms e) c.c_cty
     | Cany -> syms_cty syms c.c_cty
   and syms_let_defn syms = function
@@ -240,7 +244,7 @@ let get_syms node pure =
         syms_city syms c
     | LDrec rdl ->
         let add_rd syms rd =
-          let syms = List.fold_left syms_vari syms rd.rec_varl in
+          let syms = syms_varl syms rd.rec_varl in
           let syms = match rd.rec_sym.rs_logic with
             | RLpv _ -> syms_ls (syms_ts syms ts_func) fs_func_app
             | _ -> syms in
@@ -259,7 +263,7 @@ let get_syms node pure =
         (* the syms of the invariants are already in [pure] *)
         let syms = Opt.fold syms_ity syms d.itd_its.its_def in
         let add_fd syms s = syms_ity syms s.rs_cty.cty_result in
-        let add_cs syms s = List.fold_left syms_pv syms s.rs_cty.cty_args in
+        let add_cs syms s = syms_pvl syms s.rs_cty.cty_args in
         let syms = List.fold_left add_fd syms d.itd_fields in
         List.fold_left add_cs syms d.itd_constructors in
       List.fold_left syms_itd syms dl

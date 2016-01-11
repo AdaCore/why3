@@ -219,7 +219,7 @@ type decl =
   | Dprop of Decl.prop_kind * ident * term
   | Dlet of ident * ghost * Expr.rs_kind * expr
   | Drec of fundef list
-  | Dexn of ident * pty
+  | Dexn of ident * pty * Ity.mask
   | Dmeta of ident * metarg list
   | Dclone of qualid * clone_subst list
   | Duse of qualid

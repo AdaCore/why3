@@ -1085,9 +1085,9 @@ let add_decl muc env file d =
   | Ptree.Drec fdl ->
       let _, rd = drec_defn muc denv_empty fdl in
       add_pdecl ~vc muc (create_let_decl (rec_defn ~keep_loc:true rd))
-  | Ptree.Dexn (id, pty) ->
+  | Ptree.Dexn (id, pty, mask) ->
       let ity = ity_of_pty muc pty in
-      let xs = create_xsymbol (create_user_id id) ity in
+      let xs = create_xsymbol (create_user_id id) ~mask ity in
       add_pdecl ~vc muc (create_exn_decl xs)
   | Ptree.Duse use ->
       use_export muc (find_module env file use)

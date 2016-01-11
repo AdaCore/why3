@@ -1153,30 +1153,58 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_for v e_from dir e_to (create_invariant inv) e
   | DEtry (de1,bl) ->
       let e1 = expr uloc env de1 in
-      let add_branch (m,l) (xs,dp,de) =
-        let vm, pat = create_prog_pattern dp.dp_pat xs.xs_ity MaskVisible in
+      let add_branch m (xs,dp,de) =
+        let vm, pat = create_prog_pattern dp.dp_pat xs.xs_ity xs.xs_mask in
         let e = expr uloc (add_pv_map env vm) de in
         Mstr.iter (fun _ v -> check_used_pv e v) vm;
-        try Mexn.add xs ((pat,e) :: Mexn.find xs m) m, l
-        with Not_found -> Mexn.add xs [pat,e] m, (xs::l) in
-      let xsm, xsl = List.fold_left add_branch (Mexn.empty,[]) bl in
-      let mk_branch xs = match Mexn.find xs xsm with
+        Mexn.add xs ((pat, e) :: Mexn.find_def [] xs m) m in
+      let xsm = List.fold_left add_branch Mexn.empty bl in
+      let is_simple p = match p.pat_node with
+        | Papp (fs,[]) -> is_fs_tuple fs
+        | Pvar _ | Pwild -> true | _ -> false in
+      let conv_simple p (ity,ghost) = match p.pat_node with
+        | Pvar v -> Ity.restore_pv v
+        | _ -> create_pvsymbol (id_fresh "_") ~ghost ity in
+      let mk_branch xs = function
         | [{ pp_pat = { pat_node = Pvar v }}, e] ->
-            xs, Ity.restore_pv v, e
+            [Ity.restore_pv v], e
+        | [{ pp_pat = { pat_node = (Pwild | Papp (_,[])) }}, e]
+          when ity_equal xs.xs_ity ity_unit ->
+            [], e
         | [{ pp_pat = { pat_node = Pwild }}, e] ->
-            xs, create_pvsymbol (id_fresh "_") xs.xs_ity, e
-        | [{ pp_pat = { pat_node = Papp (fs,[]) }}, e]
-          when ls_equal fs (Term.fs_tuple 0) ->
-            xs, create_pvsymbol (id_fresh "_") xs.xs_ity, e
+            let ghost = mask_ghost xs.xs_mask in
+            [create_pvsymbol (id_fresh "_") ~ghost xs.xs_ity], e
+        | [{ pp_pat = { pat_node = Papp (fs,(_::_::_ as pl)) }}, e]
+          when is_fs_tuple fs && List.for_all is_simple pl ->
+            let tyl = match xs.xs_ity.ity_node with (* tuple *)
+              | Ityapp (_,tyl,_) -> tyl | _ -> assert false in
+            let ghl = match xs.xs_mask with
+              | MaskTuple ml -> List.map mask_ghost ml
+              | MaskVisible -> List.map Util.ffalse pl
+              | MaskGhost -> List.map Util.ttrue pl in
+            List.map2 conv_simple pl (List.combine tyl ghl), e
         | bl ->
-            let v = create_pvsymbol (id_fresh "res") xs.xs_ity in
+            let id = id_fresh "q" in
+            let vl = match xs.xs_mask with
+              | _ when ity_equal xs.xs_ity ity_unit -> []
+              | MaskGhost -> [create_pvsymbol id ~ghost:true xs.xs_ity]
+              | MaskVisible -> [create_pvsymbol id ~ghost:false xs.xs_ity]
+              | MaskTuple ml ->
+                  let mk_var ity m =
+                    create_pvsymbol id ~ghost:(mask_ghost m) ity in
+                  let tyl = match xs.xs_ity.ity_node with (* tuple *)
+                    | Ityapp (_,tyl,_) -> tyl | _ -> assert false in
+                  List.map2 mk_var tyl ml in
+            let t, e = match vl with
+              | [] -> t_void, e_void | [v] -> t_var v.pv_vs, e_var v
+              | vl -> t_tuple (List.map (fun v -> t_var v.pv_vs) vl),
+                      e_tuple (List.map e_var vl) in
             let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
-            let bl = if Pattern.is_exhaustive [t_var v.pv_vs] pl then bl
-              else let _,pp = create_prog_pattern PPwild v.pv_ity MaskVisible in
-              (pp, e_raise xs (e_var v) (ity_of_dity res)) :: bl in
-            xs, v, e_case (e_var v) (List.rev bl)
-      in
-      e_try e1 (List.rev_map mk_branch xsl)
+            let bl = if Pattern.is_exhaustive [t] pl then bl else
+              let _,pp = create_prog_pattern PPwild xs.xs_ity xs.xs_mask in
+              (pp, e_raise xs e (ity_of_dity res)) :: bl in
+            vl, e_case e (List.rev bl) in
+      e_try e1 (Mexn.mapi mk_branch xsm)
   | DEraise (xs,de) ->
       e_raise xs (expr uloc env de) (ity_of_dity res)
   | DEghost de ->

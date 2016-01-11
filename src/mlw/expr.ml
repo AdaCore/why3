@@ -310,7 +310,7 @@ and expr_node =
   | Ecase   of expr * (prog_pattern * expr) list
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant list * expr
-  | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Etry    of expr * (pvsymbol list * expr) Mexn.t
   | Eraise  of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
@@ -363,7 +363,7 @@ let e_fold fn acc e = match e.e_node with
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
   | Ecase (d,bl) -> List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl
-  | Etry (d,xl) -> List.fold_left (fun acc (_,_,e) -> fn acc e) (fn acc d) xl
+  | Etry (d,xl) -> Mexn.fold (fun _ (_,e) acc -> fn acc e) xl (fn acc d)
 
 exception FoundExpr of Loc.position option * expr
 
@@ -863,25 +863,34 @@ let e_case e bl =
   let mask = List.fold_left add_mask MaskVisible dl in
   let eff = List.fold_left (fun eff (p,d) ->
     let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
-    let dff = eff_bind pvs d.e_effect in
-    try_effect dl eff_union_par eff dff) eff_empty bl in
+    let deff = eff_bind pvs d.e_effect in
+    try_effect dl eff_union_par eff deff) eff_empty bl in
   let eff = try_effect (e::dl) eff_union_seq e.e_effect eff in
   let eff = try_effect (e::dl) eff_ghostify ghost eff in
   mk_expr (Ecase (e,bl)) ity mask eff
 
 let e_try e xl =
-  List.iter (fun (xs,v,d) ->
-    ity_equal_check v.pv_ity xs.xs_ity;
+  let get_mask = function
+    | [] -> ity_unit, MaskVisible
+    | [v] -> v.pv_ity, mask_of_pv v
+    | vl -> ity_tuple (List.map (fun v -> v.pv_ity) vl),
+            MaskTuple (List.map mask_of_pv vl) in
+  Mexn.iter (fun xs (vl,d) ->
+    let ity, mask = get_mask vl in
+    if mask_spill xs.xs_mask mask then
+      Loc.errorm "Non-ghost pattern in a ghost position";
+    ity_equal_check ity xs.xs_ity;
     ity_equal_check d.e_ity e.e_ity) xl;
   let ghost = e.e_effect.eff_ghost in
-  let eeff = List.fold_left (fun eff (xs,_,_) ->
-    eff_catch eff xs) e.e_effect xl in
-  let dl = List.map (fun (_,_,d) -> d) xl in
+  let eeff = Mexn.fold (fun xs _ eff ->
+    eff_catch eff xs) xl e.e_effect in
+  let dl = Mexn.fold (fun _ (_,d) l -> d::l) xl [] in
   let add_mask mask d = mask_union mask d.e_mask in
   let mask = List.fold_left add_mask e.e_mask dl in
-  let xeff = List.fold_left (fun eff (_,v,d) ->
-    let dff = eff_bind_single v d.e_effect in
-    try_effect dl eff_union_par eff dff) eff_empty xl in
+  let xeff = Mexn.fold (fun _ (vl,d) eff ->
+    let add s v = Spv.add_new (Invalid_argument "Expr.e_try") v s in
+    let deff = eff_bind (List.fold_left add Spv.empty vl) d.e_effect in
+    try_effect dl eff_union_par eff deff) xl eff_empty in
   let eff = try_effect (e::dl) eff_union_seq eeff xeff in
   let eff = try_effect (e::dl) eff_ghostify ghost eff in
   mk_expr (Etry (e,xl)) e.e_ity mask eff
@@ -944,7 +953,7 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Ecase (d,bl) -> e_case (e_rs_subst sm d)
       (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
   | Etry (d,xl) -> e_try (e_rs_subst sm d)
-      (List.map (fun (xs,v,e) -> xs, v, e_rs_subst sm e) xl))
+      (Mexn.map (fun (v,e) -> v, e_rs_subst sm e) xl))
 
 and c_rs_subst sm ({c_node = n; c_cty = c} as d) = match n with
   | Cany | Cpur _ -> d
@@ -1275,6 +1284,7 @@ and print_enode pri fmt e = match e.e_node with
   | Eraise (xs,e) ->
       fprintf fmt "raise (%a %a)" print_xs xs print_expr e
   | Etry (e,bl) ->
+      let bl = Mexn.bindings bl in
       fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
         print_expr e (Pp.print_list Pp.newline print_xbranch) bl
   | Eabsurd ->
@@ -1294,14 +1304,14 @@ and print_branch fmt ({pp_pat = p},e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
   Svs.iter forget_var p.pat_vars
 
-and print_xbranch fmt (xs,v,e) =
-  if Spv.mem v e.e_effect.eff_reads then begin
-    fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" print_xs xs print_pv v print_expr e;
-    forget_pv v
-  end else if ity_equal v.pv_ity ity_unit then
-    fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_xs xs print_expr e
-  else
-    fprintf fmt "@[<hov 4>| %a _ ->@ %a@]" print_xs xs print_expr e
+and print_xbranch fmt (xs,(vl,e)) =
+  let pvs = Spv.inter (Spv.of_list vl) e.e_effect.eff_reads in
+  let print_var fmt v =
+    if Spv.mem v pvs then fprintf fmt " %a" print_pv v
+    else pp_print_string fmt " _" in
+  fprintf fmt "@[<hov 4>| %a%a ->@ %a@]" print_xs xs
+    (Pp.print_list Pp.nothing print_var) vl print_expr e;
+  Spv.iter forget_pv pvs
 
 and print_let_defn fmt = function
   | LDvar (v,e) ->

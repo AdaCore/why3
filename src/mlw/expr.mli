@@ -124,7 +124,7 @@ and expr_node = private
   | Ecase   of expr * (prog_pattern * expr) list
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant list * expr
-  | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Etry    of expr * (pvsymbol list * expr) Mexn.t
   | Eraise  of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
@@ -217,7 +217,7 @@ val is_e_false : expr -> bool
 
 val e_raise : xsymbol -> expr -> ity -> expr
 
-val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
+val e_try : expr -> (pvsymbol list * expr) Mexn.t -> expr
 
 val e_case : expr -> (prog_pattern * expr) list -> expr
 
