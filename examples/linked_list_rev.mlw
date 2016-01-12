@@ -166,6 +166,34 @@ module InPlaceRev
     assert { list_seg l2 !next l2M null };
     l1
 
+
+
+  let in_place_reverse (l:loc) (ghost lM:list loc) : loc
+    requires { list_seg l !next lM null }
+    ensures  { list_seg result !next (reverse lM) null }
+  = 'Init:
+    let p = ref l in
+    let ghost pM = ref lM in
+    let r = ref null in
+    let ghost rM = ref (Nil : list loc) in
+    while !p <> null do
+      invariant { list_seg !p !next !pM null }
+      invariant { list_seg !r !next !rM null }
+      invariant { disjoint !pM !rM }
+      invariant { (reverse !pM) ++ !rM = reverse lM }
+      variant   { !pM }
+      let n = get !next !p in
+      next := set !next !p !r;
+      assert { list_seg !r !next !rM null };
+      r := !p;
+      p := n;
+      match !pM with
+      | Nil -> absurd
+      | Cons h t -> rM := Cons h !rM; pM := t
+      end
+      done;
+    !r
+
 end
 
 (** Using sequences instead of lists *)
@@ -175,6 +203,7 @@ module InPlaceRevSeq
   use import int.Int
   use map.Map
   use import seq.Seq
+  use import seq.Reverse
   use import ref.Ref
 
   predicate mem (x: 'a) (s: seq 'a) =
@@ -192,7 +221,8 @@ module InPlaceRevSeq
     variant  { length s - i }
     returns  { (s1,s2) -> s == s1 ++ cons x s2 }
   =
-    if s[i] = x then (s[0 .. i], s[i+1 ..]) else mem_decomp x s (i+1)
+    if s[i] = x then (s[0 .. i], s[i+1 ..])
+    else begin (* assert { mem x s[i+1 .. ] }; *) mem_decomp x s (i+1) end
 
   type loc
 
@@ -334,6 +364,30 @@ module InPlaceRevSeq
     assert { list_seg !next !p (cons !p empty) l2 };
     assert { list_seg !next l2 l2M null };
     l1
+
+  let in_place_reverse (l:loc) (ghost lM: seq loc) : loc
+    requires { list_seg !next l lM null }
+    ensures  { list_seg !next result (reverse lM) null }
+  = 'Init:
+    let p = ref l in
+    let ghost pM = ref lM in
+    let r = ref null in
+    let ghost rM = ref (empty: seq loc) in
+    while !p <> null do
+      invariant { list_seg !next !p !pM null }
+      invariant { list_seg !next !r !rM null }
+      invariant { disjoint !pM !rM }
+      invariant { (reverse !pM) ++ !rM == reverse lM }
+      variant   { length !pM }
+      let n = acc next !p in
+      upd next !p !r;
+      assert { list_seg !next !r !rM null };
+      r := !p;
+      p := n;
+      rM := cons !pM[0] !rM;
+      pM := !pM[ 1 .. ]
+    done;
+    !r
 
 end
 
