@@ -166,6 +166,34 @@ module InPlaceRev
     assert { list_seg l2 !next l2M null };
     l1
 
+
+
+  let in_place_reverse (l:loc) (ghost lM:list loc) : loc
+    requires { list_seg l !next lM null }
+    ensures  { list_seg result !next (reverse lM) null }
+  = 'Init:
+    let p = ref l in
+    let ghost pM = ref lM in
+    let r = ref null in
+    let ghost rM = ref (Nil : list loc) in
+    while !p <> null do
+      invariant { list_seg !p !next !pM null }
+      invariant { list_seg !r !next !rM null }
+      invariant { disjoint !pM !rM }
+      invariant { (reverse !pM) ++ !rM = reverse lM }
+      variant   { !pM }
+      let n = get !next !p in
+      next := set !next !p !r;
+      assert { list_seg !r !next !rM null };
+      r := !p;
+      p := n;
+      match !pM with
+      | Nil -> absurd
+      | Cons h t -> rM := Cons h !rM; pM := t
+      end
+      done;
+    !r
+
 end
 
 (** Using sequences instead of lists *)
