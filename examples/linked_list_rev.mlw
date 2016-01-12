@@ -210,19 +210,28 @@ module InPlaceRevSeq
     exists i. 0 <= i < length s /\ s[i] = x
 
   predicate disjoint (s1: seq 'a) (s2: seq 'a) =
-    forall x:'a. not (mem x s1 /\ mem x s2)
+    (* forall x:'a. not (mem x s1 /\ mem x s2) *)
+    forall i1. 0 <= i1 < length s1 ->
+    forall i2. 0 <= i2 < length s2 ->
+    s1[i1] <> s2[i2]
 
   predicate no_repet (s: seq 'a) =
     forall i. 0 <= i < length s -> not (mem s[i] s[i+1 ..])
 
-  let rec ghost mem_decomp (x: 'a) (s: seq 'a) (i: int) : (seq 'a, seq 'a)
-    requires { 0 <= i < length s }
-    requires { mem x s[i .. ] }
-    variant  { length s - i }
+  lemma non_empty_seq:
+    forall s: seq 'a. length s > 0 ->
+    s == cons s[0] s[1 .. ]
+
+  let rec ghost mem_decomp (x: 'a) (s: seq 'a) : (seq 'a, seq 'a)
+    requires { mem x s }
+    variant  { length s }
     returns  { (s1,s2) -> s == s1 ++ cons x s2 }
   =
-    if s[i] = x then (s[0 .. i], s[i+1 ..])
-    else begin (* assert { mem x s[i+1 .. ] }; *) mem_decomp x s (i+1) end
+    if s[0] = x then (empty, s[1 ..])
+    else begin
+      assert { s == cons s[0] s[1 .. ] };
+      let (s1, s2) = mem_decomp x s[1 .. ] in (cons s[0] s1, s2)
+    end
 
   type loc
 
@@ -255,10 +264,6 @@ module InPlaceRevSeq
     next2 = Map.set next1 q v ->
     not (mem q pM) ->
     list_seg next2 p pM r
-
-  lemma non_empty_seq:
-    forall s: seq 'a. length s > 0 ->
-    s == cons s[0] s[1 .. ]
 
   let rec lemma list_seg_functional (next: next) (l1 l2: seq loc) (p: loc)
     requires { list_seg next p l1 null }
@@ -323,7 +328,7 @@ module InPlaceRevSeq
       let t = pM[1 .. ] in
       if mem h t then
          (* absurd case *)
-         let (l1,l2) = mem_decomp h t 0 in
+         let (l1,l2) = mem_decomp h t in
          list_seg_sublistl next (cons h l1) l2 p h;
          list_seg_functional next pM (cons h l2) p;
          assert { length pM > length (cons h l2) }
@@ -346,6 +351,7 @@ module InPlaceRevSeq
     let p = ref l1 in
     let ghost pM = ref l1M in
     let ghost l1pM = ref (empty : seq loc) in
+    ghost list_seg_no_repet !next l1 l1M;
     while acc next !p <> null do
       invariant { !p <> null }
       invariant { list_seg !next l1 !l1pM !p }
@@ -354,6 +360,7 @@ module InPlaceRevSeq
       invariant { disjoint !l1pM !pM }
       variant   { length !pM }
       assert { length !pM > 0 };
+      assert { not (mem !p !l1pM) };
       let t = !pM[ 1 .. ] in
       l1pM := !l1pM ++ cons !p empty;
       pM := t;
