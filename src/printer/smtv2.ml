@@ -70,8 +70,8 @@ let ident_printer =
       "abs";
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
-      (** From Z3 *)
-      "map"; "bv"; "subset"; "union"
+      (* From Z3 *)
+      "map"; "bv"; "subset"; "union"; "default"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
