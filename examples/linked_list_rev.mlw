@@ -222,7 +222,7 @@ module InPlaceRevSeq
     returns  { (s1,s2) -> s == s1 ++ cons x s2 }
   =
     if s[i] = x then (s[0 .. i], s[i+1 ..])
-    else begin assert { mem x s[i+1 .. ] }; mem_decomp x s (i+1) end
+    else begin (* assert { mem x s[i+1 .. ] }; *) mem_decomp x s (i+1) end
 
   type loc
 
