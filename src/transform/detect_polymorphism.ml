@@ -50,7 +50,7 @@ let check_ls ign_ls ls =
   List.fold_left
     (fun acc ty -> acc || not (Ty.ty_closed ty))
     false
-    ls.Term.ls_args
+    (Opt.fold (fun acc x -> x :: acc) ls.Term.ls_args ls.Term.ls_value)
 
 let detect_polymorphism_in_decl ign_ts ign_ls ign_pr d =
   Debug.dprintf debug "[detect_polymorphism] |sts|=%d |sls|=%d |spr|=%d@."
