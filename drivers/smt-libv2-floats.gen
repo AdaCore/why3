@@ -18,15 +18,15 @@ theory float.GenericFloat
    syntax function min "(fp.min %1 %2)"
    syntax function max "(fp.max %1 %2)"
 
-   syntax function to_ubv8  "((_ fp.to_ubv 8) RNE %1)"
-   syntax function to_ubv16 "((_ fp.to_ubv 16) RNE %1)"
-   syntax function to_ubv32 "((_ fp.to_ubv 32) RNE %1)"
-   syntax function to_ubv64 "((_ fp.to_ubv 64) RNE %1)"
+   syntax function to_ubv8  "((_ fp.to_ubv 8) RNA %1)"
+   syntax function to_ubv16 "((_ fp.to_ubv 16) RNA %1)"
+   syntax function to_ubv32 "((_ fp.to_ubv 32) RNA %1)"
+   syntax function to_ubv64 "((_ fp.to_ubv 64) RNA %1)"
 
-   (* syntax function to_sbv8  "((_ fp.to_sbv 8) RNE %1)" *)
-   (* syntax function to_sbv16 "((_ fp.to_sbv 16) RNE %1)" *)
-   (* syntax function to_sbv32 "((_ fp.to_sbv 32) RNE %1)" *)
-   (* syntax function to_sbv64 "((_ fp.to_sbv 64) RNE %1)" *)
+   (* syntax function to_sbv8  "((_ fp.to_sbv 8) RNA %1)" *)
+   (* syntax function to_sbv16 "((_ fp.to_sbv 16) RNA %1)" *)
+   (* syntax function to_sbv32 "((_ fp.to_sbv 32) RNA %1)" *)
+   (* syntax function to_sbv64 "((_ fp.to_sbv 64) RNA %1)" *)
 
    syntax function to_int   "(to_int (fp.to_real %1))"
    syntax function to_real  "(fp.to_real %1)"
