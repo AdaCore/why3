@@ -217,10 +217,13 @@ val reg_freeregs : Sreg.t -> region -> Sreg.t
 val ity_r_occurs : region -> ity -> bool
 val reg_r_occurs : region -> region -> bool
 
-(** {2 Traversal functions on exposed regions} *)
+(** {2 Traversal functions on exposed and reachable regions} *)
 
 val ity_exp_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
 val reg_exp_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
+
+val ity_rch_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_rch_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
 
 val ity_r_reachable : region -> ity -> bool
 val reg_r_reachable : region -> region -> bool

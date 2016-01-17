@@ -17,18 +17,27 @@ open Ity
 open Expr
 open Pdecl
 
-let rec reg_affected wr reg = Mreg.mem reg wr ||
-                              Util.any reg_exp_fold (reg_affected wr) reg
-let     ity_affected wr ity = Util.any ity_exp_fold (reg_affected wr) ity
+(* basic tools *)
+
+let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
+
+let ity_of_vs v = (restore_pv v).pv_ity
+
+let clone_vs v = t_var (create_vsymbol (id_clone v.vs_name) v.vs_ty)
+
+(* a type is affected if a modified region is reachable from it *)
+
+let _reg_affected wr reg = Util.any reg_rch_fold (Mreg.contains wr) reg
+let ity_affected wr ity = Util.any ity_rch_fold (Mreg.contains wr) ity
 
 let rec reg_aff_regs wr s reg =
   let q = reg_exp_fold (reg_aff_regs wr) Sreg.empty reg in
-  let s = Sreg.union s q in
-  if not (Sreg.is_empty q) || Mreg.mem reg wr then Sreg.add reg s else s
+  let affect = not (Sreg.is_empty q) || Mreg.mem reg wr in
+  Sreg.union s (if affect then Sreg.add reg q else q)
 
 let ity_aff_regs wr s ity = ity_exp_fold (reg_aff_regs wr) s ity
 
-let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
+(* express shared region values as "v.f1.f2.f3" when possible *)
 
 let rec explore_paths kn aff mreg t ity =
   if ity.ity_imm then mreg else
@@ -53,18 +62,32 @@ and explore_its kn aff mreg t s tl rl =
   List.fold_left follow mreg (find_its_defn kn s).itd_fields
 
 let name_regions kn wr mvs =
-  let collect v _ aff = ity_aff_regs wr aff (restore_pv v).pv_ity in
+  let collect v _ aff = ity_aff_regs wr aff (ity_of_vs v) in
   let aff = Mvs.fold collect mvs Sreg.empty in
-  let fill v t mreg = explore_paths kn aff mreg t (restore_pv v).pv_ity in
+  let fill v t mreg = explore_paths kn aff mreg t (ity_of_vs v) in
   let mreg = Mvs.fold fill mvs Mreg.empty in
   let complete r nm _ = if nm <> None then nm else
     let ty = ty_app r.reg_its.its_ts (List.map ty_of_ity r.reg_args) in
     Some (t_var (create_vsymbol (id_clone r.reg_name) ty)) in
   Mreg.merge complete mreg aff
 
+(* produce a rebuilding postcondition after a write effect *)
+
+type 'a nested_list =
+  | NLflat of 'a nested_list list
+  | NLcons of 'a * 'a nested_list
+  | NLnil
+
+let rec nl_flatten nl acc = match nl with
+  | NLflat l -> List.fold_right nl_flatten l acc
+  | NLcons (elm, nl) -> elm :: nl_flatten nl acc
+  | NLnil -> acc
+
+let cons_t_simp nt t fl =
+  if t_equal nt t then fl else NLcons (t_equ nt t, fl)
+
 let rec havoc kn wr mreg t ity =
-  if not (ity_affected wr ity) then t, [] else
-  let split l = let tl, fll = List.split l in tl, List.concat fll in
+  if not (ity_affected wr ity) then t, NLnil else
   match ity.ity_node with
   | Ityvar _ -> assert false
   | Ityreg ({reg_its = s} as r) when s.its_nonfree || Mreg.mem r wr ->
@@ -73,13 +96,13 @@ let rec havoc kn wr mreg t ity =
       let wfs = Mreg.find_def Mpv.empty r wr in
       let nt = Mreg.find r mreg in
       let field rs =
-        if Mpv.mem (Opt.get rs.rs_field) wfs then [] else
+        if Mpv.mem (Opt.get rs.rs_field) wfs then NLnil else
         let ity = ity_full_inst isb rs.rs_cty.cty_result in
         let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
         let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
         let t, fl = havoc kn wr mreg t ity in
-        if t_equal nt t then fl else t_equ nt t :: fl in
-      nt, List.concat (List.map field itd.itd_fields)
+        cons_t_simp nt t fl in
+      nt, NLflat (List.map field itd.itd_fields)
   | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
   | Ityapp (s,tl,rl) ->
       let itd = find_its_defn kn s in
@@ -90,8 +113,8 @@ let rec havoc kn wr mreg t ity =
           let field rs =
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
             havoc kn wr mreg (t_app_infer (ls_of_rs rs) [t]) ity in
-          let tl, fl = split (List.map field itd.itd_fields) in
-          fs_app cs tl (ty_of_ity ity), fl
+          let tl, fl = List.split (List.map field itd.itd_fields) in
+          fs_app cs tl (ty_of_ity ity), NLflat fl
       | cl ->
           let ty = ty_of_ity ity in
           let branch ({rs_cty = cty} as rs) =
@@ -103,29 +126,34 @@ let rec havoc kn wr mreg t ity =
             let vl = List.map2 get_pjv cty.cty_args ityl in
             let p = pat_app cs (List.map pat_var vl) ty in
             let get_hv v ity = havoc kn wr mreg (t_var v) ity in
-            let tl, fl = split (List.map2 get_hv vl ityl) in
+            let tl, fl = List.split (List.map2 get_hv vl ityl) in
+            let fl = List.fold_right nl_flatten fl [] in
             (p, fs_app cs tl ty), (p, t_and_simp_l fl) in
           let tbl, fbl = List.split (List.map branch cl) in
-          let f = t_case_close_simp t fbl in
-          let f = if t_equal f t_true then [] else [f] in
-          t_case_close t tbl, f
+          let t = t_case_close t tbl and f = t_case_close_simp t fbl in
+          t, if t_equal f t_true then NLnil else NLcons (f, NLnil)
       end
 
 let havoc_fast kn {eff_writes = wr; eff_covers = cv} mvs =
   if Sreg.is_empty cv then [] else
   let mreg = name_regions kn cv mvs in
+(*
+  Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
+    (fun fmt (v,t) -> Format.fprintf fmt "(%a -> %a)"
+      Pretty.print_vs v Pretty.print_term t)) (Mvs.bindings mvs);
+  Format.printf "@[regs = %a@]@." (Pp.print_list Pp.space
+    (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
+      Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg);
+*)
   let update v nt acc =
-    let t, fl = havoc kn wr mreg (t_var v) (restore_pv v).pv_ity in
-    (if t_equal nt t then fl else t_equ nt t :: fl) @ acc in
+    let t, fl = havoc kn wr mreg (t_var v) (ity_of_vs v) in
+    nl_flatten (cons_t_simp nt t fl) acc in
   Mvs.fold update mvs []
-
-let clone_vs {vs_name = id; vs_ty = ty} =
-  t_var (create_vsymbol (id_clone id) ty)
 
 let _step_back wr1 rd2 wr2 mvs =
   if Mreg.is_empty wr1 then Mvs.empty else
   let back v t =
-    let ity = (restore_pv v).pv_ity in
+    let ity = ity_of_vs v in
     if not (ity_affected wr1 ity) then None else
     if not (ity_affected wr2 ity) then Some t else
     Some (clone_vs v) in
@@ -136,13 +164,15 @@ let _step_back wr1 rd2 wr2 mvs =
   Spv.fold add rd2 mvs
 
 let vc _env kn d = match d.pd_node with
-  | PDlet (LDsym (s,{c_cty = {cty_effect = eff}})) ->
+  | PDlet (LDsym (s,{c_cty = {cty_args = al; cty_effect = eff}})) ->
       let add_read v mvs =
+        if ity_r_stale eff.eff_resets eff.eff_covers v.pv_ity then mvs else
         let nm = v.pv_vs.vs_name.id_string ^ "_new" in
         let id = id_derive nm v.pv_vs.vs_name in
         let nv = create_vsymbol id v.pv_vs.vs_ty in
         Mvs.add v.pv_vs (t_var nv) mvs in
-      let mvs = Spv.fold add_read eff.eff_reads Mvs.empty in
+      let mvs = List.fold_right add_read al Mvs.empty in
+      let mvs = Spv.fold add_read eff.eff_reads mvs in
       let f = t_and_simp_l (havoc_fast kn eff mvs) in
       let fvs = Mvs.domain (t_freevars Mvs.empty f) in
       let f = t_forall_close (Svs.elements fvs) [] f in

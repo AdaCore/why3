@@ -278,13 +278,15 @@ let     ity_rch_regs s ity = ity_exp_fold reg_rch_regs s ity
 let rec reg_rch_fold fn a reg = reg_exp_fold (reg_rch_fold fn) (fn a reg) reg
 let     ity_rch_fold fn a ity = ity_exp_fold (reg_rch_fold fn) a ity
 
-let rec reg_r_reachable r reg = reg_equal r reg ||
-                                Util.any reg_exp_fold (reg_r_reachable r) reg
-let     ity_r_reachable r ity = Util.any ity_exp_fold (reg_r_reachable r) ity
+let reg_r_reachable r reg = Util.any reg_rch_fold (reg_equal r) reg
+let ity_r_reachable r ity = Util.any ity_rch_fold (reg_equal r) ity
 
-let rec reg_r_stale rs cv reg = Sreg.mem reg rs || not (Sreg.mem reg cv) &&
-                                Util.any reg_exp_fold (reg_r_stale rs cv) reg
-let     ity_r_stale rs cv ity = Util.any ity_exp_fold (reg_r_stale rs cv) ity
+let rec reg_unc_fold cv fn a r = if Sreg.mem r cv then a else
+                                 reg_exp_fold (reg_unc_fold cv fn) (fn a r) r
+let     ity_unc_fold cv fn a t = ity_exp_fold (reg_unc_fold cv fn) a t
+
+let reg_r_stale rs cv reg = Util.any (reg_unc_fold cv) (Sreg.contains rs) reg
+let ity_r_stale rs cv ity = Util.any (ity_unc_fold cv) (Sreg.contains rs) ity
 
 (* collect exposed and reachable type variables *)
 
