@@ -25,6 +25,53 @@ let ity_of_vs v = (restore_pv v).pv_ity
 
 let clone_vs v = t_var (create_vsymbol (id_clone v.vs_name) v.vs_ty)
 
+(* explanations *)
+
+let _vc_label e f =
+  let loc = if f.t_loc = None then e.e_loc else f.t_loc in
+  let lab = Ident.Slab.union e.e_label f.t_label in
+  t_label ?loc lab f
+
+let _expl_pre       = Ident.create_label "expl:precondition"
+let _expl_post      = Ident.create_label "expl:postcondition"
+let _expl_xpost     = Ident.create_label "expl:exceptional postcondition"
+let _expl_assume    = Ident.create_label "expl:assumption"
+let _expl_assert    = Ident.create_label "expl:assertion"
+let _expl_check     = Ident.create_label "expl:check"
+let _expl_absurd    = Ident.create_label "expl:unreachable point"
+let _expl_type_inv  = Ident.create_label "expl:type invariant"
+let _expl_loop_init = Ident.create_label "expl:loop invariant init"
+let _expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
+let _expl_loopvar   = Ident.create_label "expl:loop variant decrease"
+let _expl_variant   = Ident.create_label "expl:variant decrease"
+
+let lab_has_expl = let expl_regexp = Str.regexp "expl:\\(.*\\)" in
+  Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
+
+(* VCgen environment *)
+
+type vc_env = {
+  known_map : Pdecl.known_map;
+  ps_int_le : Term.lsymbol;
+  ps_int_ge : Term.lsymbol;
+  ps_int_lt : Term.lsymbol;
+  ps_int_gt : Term.lsymbol;
+  fs_int_pl : Term.lsymbol;
+  fs_int_mn : Term.lsymbol;
+}
+
+let mk_env {Theory.th_export = ns} kn = {
+  known_map = kn;
+  ps_int_le = Theory.ns_find_ls ns ["infix <="];
+  ps_int_ge = Theory.ns_find_ls ns ["infix >="];
+  ps_int_lt = Theory.ns_find_ls ns ["infix <"];
+  ps_int_gt = Theory.ns_find_ls ns ["infix >"];
+  fs_int_pl = Theory.ns_find_ls ns ["infix +"];
+  fs_int_mn = Theory.ns_find_ls ns ["infix -"];
+}
+
+let mk_env env kn = mk_env (Env.read_theory env ["int"] "Int") kn
+
 (* a type is affected if a modified region is reachable from it *)
 
 let _reg_affected wr reg = Util.any reg_rch_fold (Mreg.contains wr) reg
@@ -163,6 +210,23 @@ let _step_back wr1 rd2 wr2 mvs =
     then acc else Mvs.add v (clone_vs v) acc in
   Spv.fold add rd2 mvs
 
+(* classical WP *)
+
+let mk_vc_decl id f =
+  let {id_string = nm; id_label = label; id_loc = loc} = id in
+  let label = if lab_has_expl label then label else
+    Slab.add (Ident.create_label ("expl:VC for " ^ nm)) label in
+  let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  create_pure_decl (create_prop_decl Pgoal pr f)
+
+let vc env kn d = match d.pd_node with
+  | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
+      let env = mk_env env kn in
+      let f = assert false in
+      [mk_vc_decl s.rs_name f]
+  | _ -> []
+
+(*
 let vc _env kn d = match d.pd_node with
   | PDlet (LDsym (s,{c_cty = {cty_args = al; cty_effect = eff}})) ->
       let add_read v mvs =
@@ -179,4 +243,4 @@ let vc _env kn d = match d.pd_node with
       let pr = create_prsymbol (id_fresh (s.rs_name.id_string ^ "_havoc")) in
       [create_pure_decl (create_prop_decl Pgoal pr f)]
   | _ -> []
-
+*)
