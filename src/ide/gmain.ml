@@ -1530,6 +1530,7 @@ let split_strategy =
 let inline_strategy =
   [| Strategy.Itransform(inline_transformation,1) |]
 
+(*
 let test_strategy () =
   let config = gconfig.Gconfig.config in
   let altergo =
@@ -1541,12 +1542,13 @@ let test_strategy () =
     Whyconf.filter_one_prover config fp
   in
   [|
-    Strategy.Icall_prover(altergo.Whyconf.prover,1,-1,1000);
-    Strategy.Icall_prover(cvc4.Whyconf.prover,1,0,1000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,1,1000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,1,1000);
     Strategy.Itransform(split_transformation,0); (* goto 0 on success *)
-    Strategy.Icall_prover(altergo.Whyconf.prover,10,-1,4000);
-    Strategy.Icall_prover(cvc4.Whyconf.prover,10,-1,4000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,10,4000);
   |]
+ *)
 
 (*
 let strategies () :
