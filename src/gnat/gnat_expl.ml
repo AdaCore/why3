@@ -41,7 +41,13 @@ type reason =
 type subp_entity = Gnat_loc.loc
 
 type id = int
-type check = { id : id; reason : reason; sloc : Gnat_loc.loc; shape : string }
+type check =
+  { id             : id;
+    reason         : reason;
+    sloc           : Gnat_loc.loc;
+    shape          : string;
+    already_proved : bool
+  }
 
 let check_compare a b =
   let c = Pervasives.compare a.id b.id in
@@ -53,8 +59,8 @@ let check_equal a b =
 
 let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.reason)
 
-let mk_check ?shape:shape reason id sloc =
-  { reason = reason; id = id ; sloc = sloc ;
+let mk_check ?shape:shape reason id sloc ap =
+  { reason = reason; id = id ; sloc = sloc ; already_proved = ap;
     shape = match shape with None -> "" | Some s -> s }
 
 let get_loc c = c.sloc
@@ -183,6 +189,7 @@ type gp_label =
   | Gp_Reason of reason
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
+  | Gp_Already_Proved
 
 let read_label s =
     if Strings.has_prefix "GP_" s then
@@ -221,6 +228,10 @@ let read_label s =
           begin
             Some (Gp_Shape shape)
           end
+       | ["GP_Already_Proved"] ->
+          begin
+            Some (Gp_Already_Proved)
+          end
        | _ ->
           let msg = "found malformed GNATprove label, " in
           let s =
@@ -229,11 +240,12 @@ let read_label s =
     else None
 
 type my_expl =
-   { mutable check_id : int option;
-     mutable check_reason : reason option;
-     mutable extra_node : int option;
-     mutable check_sloc : Gnat_loc.loc option;
-     mutable shape : string option
+   { mutable check_id       : int option;
+     mutable check_reason   : reason option;
+     mutable extra_node     : int option;
+     mutable check_sloc     : Gnat_loc.loc option;
+     mutable shape          : string option;
+     mutable already_proved : bool
    }
 (* The type that is used to extract information from a VC, is filled up field
    by field *)
@@ -242,11 +254,12 @@ let read_vc_labels s =
    (* This function takes a set of labels and extracts a "node_info" from that
       set. We start with an empty record; We fill it up by iterating over all
       labels of the node. *)
-   let b = { check_id      = None;
-             check_reason  = None;
-             check_sloc    = None;
-             extra_node    = None;
-             shape         = None;
+   let b = { check_id       = None;
+             check_reason   = None;
+             check_sloc     = None;
+             extra_node     = None;
+             shape          = None;
+             already_proved = false;
            } in
    Ident.Slab.iter
      (fun x ->
@@ -265,6 +278,8 @@ let read_vc_labels s =
                  "read_vc_labels: GP_Subp unexpected here"
         | Some Gp_Shape shape ->
            b.shape <- Some shape
+        | Some Gp_Already_Proved ->
+           b.already_proved <- true
         | None ->
             ()
      ) s;
@@ -286,8 +301,9 @@ let extract_check s =
      | { check_id = Some id ;
          check_reason = Some reason;
          check_sloc = Some sloc;
-         shape = shape } ->
-           Some (mk_check ?shape reason id sloc)
+         shape = shape;
+         already_proved = ap; } ->
+           Some (mk_check ?shape reason id sloc ap)
      | _ -> None
 
 let extract_sloc s = (read_vc_labels s).check_sloc
