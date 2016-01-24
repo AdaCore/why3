@@ -386,8 +386,10 @@ val mask_adjust : effect -> ity -> mask -> mask
 type pre = term   (** precondition: pre_fmla *)
 type post = term  (** postcondition: eps result . post_fmla *)
 
-val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
+val open_post_with : term -> post -> term
+
+val create_post : vsymbol -> term -> post
 
 type cty = private {
   cty_args   : pvsymbol list;

@@ -1150,6 +1150,10 @@ let open_post f = match f.t_node with
   | Teps bf -> t_open_bound bf
   | _ -> invalid_arg "Ity.open_post"
 
+let open_post_with t f = match f.t_node with
+  | Teps bf -> t_open_bound_with t bf
+  | _ -> invalid_arg "Ity.open_post_with"
+
 type cty = {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;

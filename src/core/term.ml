@@ -755,6 +755,11 @@ let t_open_bound (v,b,t) =
   let m,v = vs_rename b.bv_subst v in
   v, t_subst_unsafe m t
 
+let t_open_bound_with e (v,b,t) =
+  vs_check v e;
+  let m = Mvs.add v e b.bv_subst in
+  t_subst_unsafe m t
+
 let t_open_branch (p,b,t) =
   let m,p = pat_rename b.bv_subst p in
   p, t_subst_unsafe m t
@@ -861,10 +866,11 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
-let asym_label = create_label "asym_split"
+let asym_split = create_label "asym_split"
+let stop_split = create_label "stop_split"
 
-let t_and_asym t1 t2 = t_and (t_label_add asym_label t1) t2
-let t_or_asym  t1 t2 = t_or  (t_label_add asym_label t1) t2
+let t_and_asym t1 t2 = t_and (t_label_add asym_split t1) t2
+let t_or_asym  t1 t2 = t_or  (t_label_add asym_split t1) t2
 
 (* closing constructors *)
 
@@ -1408,9 +1414,9 @@ let t_pred_app_beta lam t = t_pred_app_beta_l lam [t]
 
 (* constructors with propositional simplification *)
 
-let keep_on_simp_label = create_label "keep_on_simp"
-let can_simp t = not (Slab.mem keep_on_simp_label t.t_label)
-let can_simp_left t = can_simp t && not (Slab.mem asym_label t.t_label)
+let keep_on_simp = create_label "keep_on_simp"
+let can_simp t = not (Slab.mem keep_on_simp t.t_label)
+let can_simp_left t = can_simp t && not (Slab.mem asym_split t.t_label)
 
 let t_not_simp f = match f.t_node with
   | Ttrue  -> t_label_copy f t_false
@@ -1420,8 +1426,8 @@ let t_not_simp f = match f.t_node with
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
-  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
+  | _, Ttrue  when can_simp f2 -> t_label_remove asym_split f1
+  | Tfalse, _ when can_simp f2 -> t_label_remove asym_split f1
   | _, Tfalse when can_simp_left f1 -> f2
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and f1 f2
@@ -1429,10 +1435,10 @@ let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
 let t_and_simp_l l = List.fold_right t_and_simp l t_true
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
+  | Ttrue, _  when can_simp f2 -> t_label_remove asym_split f1
   | _, Ttrue  when can_simp_left f1 -> f2
   | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_split f1
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or f1 f2
 
@@ -1440,8 +1446,8 @@ let t_or_simp_l l = List.fold_right t_or_simp l t_false
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
-  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
+  | _, Ttrue  when can_simp f2 -> t_label_remove asym_split f1
+  | Tfalse, _ when can_simp f2 -> t_label_remove asym_split f1
 (*| _, Tfalse when can_simp f1 -> f2*)
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and_asym f1 f2
@@ -1449,10 +1455,10 @@ let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
 let t_and_asym_simp_l l = List.fold_right t_and_asym_simp l t_true
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
+  | Ttrue, _  when can_simp f2 -> t_label_remove asym_split f1
 (*| _, Ttrue  when can_simp f1 -> f2*)
   | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_split f1
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or_asym f1 f2
 

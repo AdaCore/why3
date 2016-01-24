@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-val stop_split : Ident.label
-
 val split_pos_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_pos_full f] returns a list [[g1;..;gk]] such that
  [f] is logically equivalent to [g1 /\ .. /\ gk] and the length

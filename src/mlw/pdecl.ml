@@ -348,11 +348,10 @@ let rec t_subst_fmla v t f = t_label_copy f (match f.t_node with
   | _ -> t_map (t_subst_fmla v t) f)
 
 let create_let_decl ld =
-  let conv_post t q =
-    let v,f = open_post q in
-    match t.t_ty with
-      | Some _ -> t_subst_single v t f
-      | None -> t_subst_fmla v t f in
+  let conv_post t q = match t.t_ty with
+      | Some _ -> open_post_with q t
+      | None -> let v,f = open_post q in
+                t_subst_fmla v t f in
   let conv_post t ql = List.map (conv_post t) ql in
   let cty_axiom id cty f =
     (* we do not care about aliases for pure symbols *)

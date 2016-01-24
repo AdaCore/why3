@@ -88,11 +88,9 @@ let split_case_2 kn forig spl pos acc t bl =
     let f = Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl) in
     spl acc f
 
-let stop_split = Ident.create_label "stop_split"
-
-let stop f = Slab.mem stop_split f.t_label
-let asym f = Slab.mem Term.asym_label f.t_label
-let keep f = Slab.mem Term.keep_on_simp_label f.t_label
+let stop f = Slab.mem Term.stop_split f.t_label
+let asym f = Slab.mem Term.asym_split f.t_label
+let keep f = Slab.mem Term.keep_on_simp f.t_label
 
 let unstop f =
   t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f

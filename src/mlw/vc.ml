@@ -48,6 +48,104 @@ let _expl_variant   = Ident.create_label "expl:variant decrease"
 let lab_has_expl = let expl_regexp = Str.regexp "expl:\\(.*\\)" in
   Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
 
+(*
+let rec vc_expl l f =
+  if lab_has_expl f.t_label then f
+  else match f.t_node with
+    | _ when Slab.mem Split_goal.stop_split f.t_label -> t_label_add l f
+    | Tbinop (Tand,f1,f2) -> t_label_copy f (t_and (vc_expl l f1) (vc_expl l f2))
+    | Teps _ -> t_label_add l f (* post-condition, push down later *)
+    | _ -> f
+
+(* propositional connectives *)
+
+let vc_and ~sym f1 f2 =
+  if sym then t_and(*_simp*) f1 f2 else t_and_asym(*_simp*) f1 f2
+
+let vc_and_l ~sym fl =
+  if sym then t_and_l(*simp_l*) fl else t_and_asym_l(*_simp_l*) fl
+
+let vc_implies f1 f2 = t_implies(*_simp*) f1 f2
+
+let vc_let v t f = t_let_close_simp v t f
+
+let vc_forall vl f = t_forall_close_simp vl [] f
+
+type defn_fmla =
+  | DFdefn of term
+  | DFfmla of term
+  | DFdffm of term * term
+
+let df_atom v f = match f.t_node with
+  | Tapp (ps, [{t_node = Tvar u}; t])
+    when ls_equal ps ps_equ && vs_equal u v && t_v_occurs v t = 0 ->
+         DFdefn t
+  | _ -> DFfmla f
+
+let df_and_left df1 f2 = match df1 with
+  | DFdefn t -> DFdffm (t, f2)
+  | DFfmla f1 -> DFfmla (t_and f1 f2)
+  | DFdffm (t,f1) -> DFdffm (t, t_and f1 f2)
+
+let df_and_right f1 df2 = match df2 with
+  | DFdefn t -> DFdffm (t, f1)
+  | DFfmla f2 -> DFfmla (t_and f1 f2)
+  | DFdffm (t,f2) -> DFdffm (t, t_and f1 f2)
+
+let df_implies df1 f2 = match df1 with
+  | DFdefn t -> DFdffm (t, f2)
+  | DFfmla f1 -> DFfmla (t_implies f1 f2)
+  | DFdffm (t,f1) -> DFdffm (t, t_implies f1 f2)
+
+let df_forall v df1 f2 = match df1 with
+  | DFdefn t -> t_let_close_simp v t f2
+  | DFfmla f1 -> t_forall_close_simp [v] [] (t_implies f1 f2)
+  | DFfmla (t,f1) -> t_let_close_simp v t (t_implies f1 f2)
+
+let df_label_copy e df = match df with
+  | DFdefn _ -> df
+  | DFfmla f -> DFfmla (t_label_copy e f)
+  | DFdffm (t,f) -> DFdffm (t, t_label_copy e f)
+
+let vc_forall_post v p f =
+  (* we optimize for the case when a postcondition
+     is of the form (... /\ result = t /\ ...) *)
+  let rec down p = match p.t_node with
+    | Tbinop (Tand,f1,f2) ->
+        df_label_copy p (match down f1 with
+          | DFfmla f1 -> df_and_right f1 (down f2)
+          | df1 -> df_and_left df1 f2)
+    | _ -> df_atom v p in
+  if ty_equal v.vs_ty ty_unit then
+    t_subst_single v t_void (t_implies p f)
+  else df_forall v (down p) f
+
+let t_and_subst v t1 t2 =
+  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
+     definition. Otherwise return [t1 /\ t2] *)
+  match is_equality_for v t1 with
+  | Some t -> t_subst_single v t t2
+  | None -> t_and t1 t2
+
+let t_implies_subst v t1 t2 =
+  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
+     definition. Otherwise return [t1 -> t2] *)
+  match is_equality_for v t1 with
+  | Some t -> t_subst_single v t t2
+  | None -> t_implies_simp t1 t2
+
+let open_unit_post q =
+  let v, q = open_post q in
+  t_subst_single v t_void q
+
+let create_unit_post =
+  let v = create_vsymbol (id_fresh "void") ty_unit in
+  fun q -> create_post v q
+
+let vs_result e =
+  create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_ity e.e_ity)
+*)
+
 (* VCgen environment *)
 
 type vc_env = {
@@ -212,17 +310,40 @@ let _step_back wr1 rd2 wr2 mvs =
 
 (* classical WP *)
 
+let (*rec*) _slow _env _e _q _xq = assert false (* TODO *)
+
+and vc_fun _env _c _e = assert false (* TODO *)
+(*
+  let args = List.map (fun pv -> pv.pv_vs) c.cty_args in
+(* TODO: let rec with variants
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
+    let lab = t_var lab in
+    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
+    let tl = List.map t_at_lab c.c_variant in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
+*)
+  let q = old_mark lab (vc_expl expl_post c.cty_post) in
+  let conv p = old_mark lab (vc_expl expl_xpost p) in
+  let f = slow env e q (Mexn.map conv c.cty_xpost) in
+  (* TODO: oldies *)
+  let f = vc_implies c.cty_pre f in
+  vc_forall args (vc_implies (t_and_simp_l c.cty_pre) f)
+*)
+
 let mk_vc_decl id f =
   let {id_string = nm; id_label = label; id_loc = loc} = id in
   let label = if lab_has_expl label then label else
     Slab.add (Ident.create_label ("expl:VC for " ^ nm)) label in
   let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  let f = t_forall_close (Mvs.keys (t_freevars Mvs.empty f)) [] f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
 let vc env kn d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn in
-      let f = assert false in
+      let f = vc_fun env cty e in
       [mk_vc_decl s.rs_name f]
   | _ -> []
 

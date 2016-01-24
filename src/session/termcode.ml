@@ -34,7 +34,7 @@ let concat_expls = function
 
 let rec get_expls_fmla acc f =
   if f.t_ty <> None then acc
-  else if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc
+  else if Ident.Slab.mem Term.stop_split f.Term.t_label then acc
   else
     let res = collect_expls f.Term.t_label in
     if res = [] then match f.t_node with

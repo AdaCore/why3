@@ -161,6 +161,8 @@ val t_open_bound : term_bound -> vsymbol * term
 val t_open_branch : term_branch -> pattern * term
 val t_open_quant : term_quant -> vsymbol list * trigger * term
 
+val t_open_bound_with : term -> term_bound -> term
+
 (** open bindings with optimized closing callbacks *)
 
 val t_open_bound_cb :
@@ -219,7 +221,9 @@ val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],
     n must be non-negative *)
 
-val asym_label : label
+val stop_split : label
+val asym_split : label
+
 val t_and_asym : term -> term -> term
 val t_or_asym : term -> term -> term
 
@@ -237,7 +241,7 @@ val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
-val keep_on_simp_label : label
+val keep_on_simp : label
 
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
