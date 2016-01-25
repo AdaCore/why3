@@ -9,10 +9,16 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Ident
 open Term
 open Decl
 
-let rec fmla_simpl f = TermTF.t_map_simp t_fmla_simpl fmla_simpl f
+let labset = Slab.of_list [keep_on_simp_label;asym_label]
+
+let rec fmla_simpl f =
+  let f = if Slab.disjoint f.t_label labset then f else
+    t_label ?loc:f.t_loc (Slab.diff f.t_label labset) f in
+  TermTF.t_map_simp t_fmla_simpl fmla_simpl f
 
 and t_fmla_simpl t = TermTF.t_map t_fmla_simpl fmla_simpl t
 
