@@ -1,0 +1,97 @@
+
+module Order
+
+  use import HighOrd
+
+  predicate reflexive (o:'a -> 'a -> bool) = forall x. o x x
+  predicate antisymetric (o:'a -> 'a -> bool) =
+    forall x y. o x y /\ o y x -> x = y
+  predicate transitive (o:'a -> 'a -> bool) =
+    forall x y z. o x y /\ o y z -> o x z
+  predicate total (o:'a -> 'a -> bool) = forall x y. o x y \/ o y x
+
+  predicate preorder (o:'a -> 'a -> bool) =
+    reflexive o /\ transitive o
+
+  predicate order (o:'a -> 'a -> bool) =
+    reflexive o /\ antisymetric o /\ transitive o
+
+  predicate lower (o:'a -> 'a -> bool) (x y:'a) = o x y /\ not o y x
+
+  predicate upper_bound (o:'a -> 'a -> bool) (s:'a -> bool) (u:'a) =
+    forall x. s x -> o x u
+
+  predicate lower_bound (o:'a -> 'a -> bool) (s:'a -> bool) (l:'a) =
+    forall x. s x -> o l x
+
+  predicate maximum (o:'a -> 'a -> bool) (s:'a -> bool) (u:'a) =
+    upper_bound o s u /\ s u
+
+  lemma maximum_unique : forall o s,u1 u2:'a.
+    antisymetric o /\ maximum o s u1 /\ maximum o s u2 -> u1 = u2
+
+  predicate minimum (o:'a -> 'a -> bool) (s:'a -> bool) (u:'a) =
+    lower_bound o s u /\ s u
+
+  lemma minimum_unique : forall o s,l1 l2:'a.
+    antisymetric o /\ minimum o s l1 /\ minimum o s l2 -> l1 = l2
+
+  predicate supremum (o:'a -> 'a -> bool) (s:'a -> bool) (x:'a) =
+    minimum o (upper_bound o s) x
+
+  predicate infimum (o:'a -> 'a -> bool) (s:'a -> bool) (x:'a) =
+    maximum o (lower_bound o s) x
+
+  predicate maximal (o:'a -> 'a -> bool) (x:'a) = forall y. o x y -> o y x
+
+  predicate minimal (o:'a -> 'a -> bool) (x:'a) = forall y. o y x -> o x y
+
+end
+
+(* Monotonicity & inflationary functions. *)
+module Mono
+
+  use import HighOrd
+
+  predicate monotone (o1:'a -> 'a -> bool) (f:'a -> 'b) (o2:'b -> 'b -> bool) =
+    forall x y. o1 x y -> o2 (f x) (f y)
+
+  predicate inflationary (o:'a -> 'a -> bool) (f:'a -> 'a) = forall x. o x (f x)
+
+end
+
+module Chain
+
+  use import HighOrd
+  use import Order
+
+  (* chain for a relation = subset on which the relation is half-total. *)
+  predicate chain (o:'a -> 'a -> bool) (s:'a -> bool) =
+    forall x y. s x /\ s y -> o x y \/ o y x
+
+  (* a relation is chain-bounded if any
+     chain has an upper bound for this relation. *)
+  predicate chain_bounded (o:'a -> 'a -> bool) =
+    forall s. chain o s -> exists y. upper_bound o s y
+
+  (* chain-complete = chain-bounded + minimal upper bound.
+     Note: in particular, it has a minimum element. *)
+  predicate chain_complete (o:'a -> 'a -> bool) =
+    forall s. chain o s -> exists y. supremum o s y
+
+end
+
+(* Well-foundedness. *)
+module Wf
+
+  use import Order
+
+  inductive acc ('a -> 'a -> bool) 'a =
+    | Acc : forall r,x:'a. (forall y. r y x -> acc r y) -> acc r x
+
+  predicate wf (o:'a -> 'a -> bool) = forall x. acc o x
+
+  predicate well_order (o:'a -> 'a -> bool) =
+    order o /\ total o /\ wf (lower o)
+
+end

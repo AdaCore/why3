@@ -1,0 +1,4253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<file name="../game.mlw" expanded="true">
+<theory name="Game" sum="d8a205e13f1b904ff0f81d7d34940a89">
+ <goal name="strat_next_is_ub_builder">
+ <transf name="split_goal_wp">
+  <goal name="strat_next_is_ub_builder.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.03" steps="53"/></proof>
+  </goal>
+  <goal name="strat_next_is_ub_builder.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="strat_next_is_ub_builder.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+  <goal name="strat_next_is_ub_builder.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="strat_next_is_ub_builder.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="start_by_chain">
+ <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
+ </goal>
+</theory>
+<theory name="StratProps" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="StratProofs" sum="03d1ecf97cd8d3cbdc20295ffe6c6bd0" expanded="true">
+ <goal name="WP_parameter ext" expl="VC for ext">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter ext.1" expl="1. assertion">
+  <transf name="inline_goal">
+   <goal name="WP_parameter ext.1.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ext.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="pext">
+ <transf name="split_goal_wp">
+  <goal name="pext.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="pext.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="have_uniform_winning_strat_alternate_def">
+ <transf name="split_goal_wp">
+  <goal name="have_uniform_winning_strat_alternate_def.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.04" steps="70"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.13" steps="260"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.6" expl="6.">
+  <proof prover="1"><result status="valid" time="2.02" steps="1483"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.7" expl="7.">
+  <proof prover="1"><result status="valid" time="0.03" steps="19"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.8" expl="8.">
+  <proof prover="0"><result status="valid" time="0.25"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.9" expl="9.">
+  <proof prover="1"><result status="valid" time="0.81" steps="1217"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.06" steps="24"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.11" expl="11.">
+  <transf name="induction_pr">
+   <goal name="have_uniform_winning_strat_alternate_def.11.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_uniform_winning_strat_alternate_def.11.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_uniform_winning_strat_alternate_def.11.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.03" steps="13"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="have_uniform_winning_strat_alternate_def.11.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_uniform_winning_strat_alternate_def.11.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_uniform_winning_strat_alternate_def.11.2.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.04" steps="37"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="have_uniform_winning_strat_alternate_def.11.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_uniform_winning_strat_alternate_def.11.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_uniform_winning_strat_alternate_def.11.3.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.05" steps="81"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.04" steps="35"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.13" expl="13.">
+  <proof prover="0"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.14" expl="14.">
+  <proof prover="1"><result status="valid" time="0.03" steps="15"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.15" expl="15.">
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="have_uniform_winning_strat_alternate_def.17" expl="17.">
+  <proof prover="1"><result status="valid" time="0.03" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="remove_subchains">
+ <transf name="split_goal_wp">
+  <goal name="remove_subchains.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="remove_subchains.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="remove_subchains.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="remove_subchains.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.03" steps="61"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="add_subchains">
+ <proof prover="1"><result status="valid" time="0.03" steps="44"/></proof>
+ </goal>
+ <goal name="have_winning_strat_local_criterion">
+ <transf name="split_goal_wp">
+  <goal name="have_winning_strat_local_criterion.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.03" steps="11"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.03" steps="22"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.03" steps="39"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.7" expl="7.">
+  <proof prover="1"><result status="valid" time="0.18" steps="343"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.07" steps="131"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.9" expl="9.">
+  <proof prover="1"><result status="valid" time="1.68" steps="1208"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.10" expl="10.">
+  <proof prover="0"><result status="valid" time="0.56"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.80" steps="942"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.44" steps="618"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.13" expl="13.">
+  <proof prover="1"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.14" expl="14.">
+  <proof prover="1"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.15" expl="15.">
+  <proof prover="1"><result status="valid" time="0.87" steps="848"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.08" steps="78"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.17" expl="17.">
+  <proof prover="1"><result status="valid" time="0.10" steps="89"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.18" expl="18.">
+  <proof prover="1"><result status="valid" time="0.72" steps="661"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.19" expl="19.">
+  <proof prover="1"><result status="valid" time="0.05" steps="33"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.20" expl="20.">
+  <proof prover="1"><result status="valid" time="0.80" steps="824"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.21" expl="21.">
+  <proof prover="0"><result status="valid" time="0.51"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.22" expl="22.">
+  <proof prover="1"><result status="valid" time="0.41" steps="657"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.23" expl="23.">
+  <proof prover="1"><result status="valid" time="1.05" steps="422"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.24" expl="24.">
+  <proof prover="0"><result status="valid" time="0.63"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.25" expl="25.">
+  <proof prover="1"><result status="valid" time="0.14" steps="148"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.26" expl="26.">
+  <proof prover="1"><result status="valid" time="1.65" steps="1328"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.27" expl="27.">
+  <proof prover="1"><result status="valid" time="0.11" steps="153"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.28" expl="28.">
+  <proof prover="1"><result status="valid" time="0.05" steps="27"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.29" expl="29.">
+  <proof prover="1"><result status="valid" time="1.07" steps="1153"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.30" expl="30.">
+  <proof prover="1"><result status="valid" time="0.07" steps="41"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.31" expl="31.">
+  <proof prover="1"><result status="valid" time="0.77" steps="623"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.32" expl="32.">
+  <proof prover="1"><result status="valid" time="0.28" steps="418"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.33" expl="33.">
+  <proof prover="1"><result status="valid" time="0.05" steps="43"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.34" expl="34.">
+  <proof prover="1"><result status="valid" time="0.35" steps="485"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.35" expl="35.">
+  <proof prover="0"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.36" expl="36.">
+  <proof prover="1"><result status="valid" time="0.43" steps="500"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.37" expl="37.">
+  <proof prover="1"><result status="valid" time="0.32" steps="458"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.38" expl="38.">
+  <proof prover="4"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.39" expl="39.">
+  <proof prover="1"><result status="valid" time="0.07" steps="65"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.40" expl="40.">
+  <proof prover="1"><result status="valid" time="0.06" steps="47"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.41" expl="41.">
+  <proof prover="1"><result status="valid" time="0.07" steps="54"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.42" expl="42.">
+  <proof prover="1"><result status="valid" time="0.06" steps="41"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.43" expl="43.">
+  <proof prover="1"><result status="valid" time="0.16" steps="270"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.44" expl="44.">
+  <proof prover="1"><result status="valid" time="0.39" steps="517"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.45" expl="45.">
+  <proof prover="0"><result status="valid" time="0.38"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.46" expl="46.">
+  <proof prover="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.47" expl="47.">
+  <proof prover="1"><result status="valid" time="0.15" steps="196"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.48" expl="48.">
+  <proof prover="1"><result status="valid" time="0.65" steps="642"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.49" expl="49.">
+  <proof prover="1"><result status="valid" time="2.17" steps="1599"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.50" expl="50.">
+  <proof prover="0"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.51" expl="51.">
+  <proof prover="1"><result status="valid" time="2.72" steps="3818"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.52" expl="52.">
+  <proof prover="1"><result status="valid" time="0.28" steps="302"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.53" expl="53.">
+  <proof prover="1"><result status="valid" time="0.15" steps="153"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.54" expl="54.">
+  <proof prover="1"><result status="valid" time="0.23" steps="205"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.55" expl="55.">
+  <proof prover="1"><result status="valid" time="0.24" steps="274"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.56" expl="56.">
+  <proof prover="1"><result status="valid" time="0.55" steps="645"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.57" expl="57.">
+  <proof prover="1"><result status="valid" time="0.12" steps="206"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.58" expl="58.">
+  <proof prover="3"><result status="valid" time="0.43"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.59" expl="59.">
+  <proof prover="1"><result status="valid" time="2.01" steps="1556"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.60" expl="60.">
+  <proof prover="1"><result status="valid" time="1.37" steps="1627"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.61" expl="61.">
+  <proof prover="1"><result status="valid" time="0.05" steps="37"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.62" expl="62.">
+  <proof prover="4"><result status="valid" time="1.27"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.63" expl="63.">
+  <proof prover="1"><result status="valid" time="0.23" steps="238"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.64" expl="64.">
+  <proof prover="1"><result status="valid" time="0.07" steps="42"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.65" expl="65.">
+  <proof prover="1"><result status="valid" time="0.37" steps="365"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.66" expl="66.">
+  <proof prover="1"><result status="valid" time="0.07" steps="46"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.67" expl="67.">
+  <proof prover="0"><result status="valid" time="0.39"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.68" expl="68.">
+  <proof prover="1"><result status="valid" time="0.18" steps="217"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.69" expl="69.">
+  <proof prover="1"><result status="valid" time="0.17" steps="241"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.70" expl="70.">
+  <proof prover="1"><result status="valid" time="0.91" steps="969"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.71" expl="71.">
+  <proof prover="1"><result status="valid" time="0.07" steps="50"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.72" expl="72.">
+  <proof prover="1"><result status="valid" time="0.15" steps="131"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.73" expl="73.">
+  <proof prover="1"><result status="valid" time="0.13" steps="109"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.74" expl="74.">
+  <proof prover="1"><result status="valid" time="0.08" steps="65"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.75" expl="75.">
+  <proof prover="1"><result status="valid" time="0.13" steps="343"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.76" expl="76.">
+  <proof prover="1"><result status="valid" time="0.23" steps="262"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.77" expl="77.">
+  <proof prover="1"><result status="valid" time="0.19" steps="258"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.78" expl="78.">
+  <proof prover="1"><result status="valid" time="0.12" steps="174"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.79" expl="79.">
+  <proof prover="1"><result status="valid" time="0.15" steps="294"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.80" expl="80.">
+  <proof prover="1"><result status="valid" time="0.07" steps="125"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.81" expl="81.">
+  <proof prover="1"><result status="valid" time="0.29" steps="490"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.82" expl="82.">
+  <proof prover="1"><result status="valid" time="0.05" steps="33"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.83" expl="83.">
+  <proof prover="1"><result status="valid" time="0.05" steps="31"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.84" expl="84.">
+  <proof prover="1"><result status="valid" time="0.09" steps="192"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.85" expl="85.">
+  <proof prover="1"><result status="valid" time="0.09" steps="243"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.86" expl="86.">
+  <proof prover="1"><result status="valid" time="0.04" steps="33"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.87" expl="87.">
+  <proof prover="1"><result status="valid" time="0.17" steps="334"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.88" expl="88.">
+  <proof prover="1"><result status="valid" time="0.05" steps="52"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.89" expl="89.">
+  <proof prover="1"><result status="valid" time="0.21" steps="299"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.90" expl="90.">
+  <proof prover="1"><result status="valid" time="0.11" steps="224"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.91" expl="91.">
+  <proof prover="1"><result status="valid" time="0.04" steps="39"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.92" expl="92.">
+  <proof prover="1"><result status="valid" time="0.11" steps="262"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.93" expl="93.">
+  <proof prover="1"><result status="valid" time="0.76" steps="565"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.94" expl="94.">
+  <proof prover="0"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.95" expl="95.">
+  <proof prover="1"><result status="valid" time="0.07" steps="36"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.96" expl="96.">
+  <proof prover="1"><result status="valid" time="0.16" steps="159"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.97" expl="97.">
+  <proof prover="1"><result status="valid" time="0.16" steps="199"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.98" expl="98.">
+  <proof prover="1"><result status="valid" time="0.05" steps="37"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.99" expl="99.">
+  <proof prover="1"><result status="valid" time="1.16" steps="643"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.100" expl="100.">
+  <proof prover="1"><result status="valid" time="0.17" steps="276"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.101" expl="101.">
+  <proof prover="1"><result status="valid" time="0.26" steps="434"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.102" expl="102.">
+  <proof prover="1"><result status="valid" time="0.13" steps="156"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.103" expl="103.">
+  <proof prover="1"><result status="valid" time="1.23" steps="1442"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.104" expl="104.">
+  <proof prover="1"><result status="valid" time="0.07" steps="32"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.105" expl="105.">
+  <proof prover="1"><result status="valid" time="0.14" steps="151"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.106" expl="106.">
+  <proof prover="1"><result status="valid" time="0.12" steps="104"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.107" expl="107.">
+  <transf name="induction_pr">
+   <goal name="have_winning_strat_local_criterion.107.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_winning_strat_local_criterion.107.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_winning_strat_local_criterion.107.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.02" steps="0"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.107.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_winning_strat_local_criterion.107.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_winning_strat_local_criterion.107.2.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.03" steps="27"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.107.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_winning_strat_local_criterion.107.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_winning_strat_local_criterion.107.3.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.09" steps="184"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.108" expl="108.">
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.109" expl="109.">
+  <proof prover="1"><result status="valid" time="0.08" steps="70"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.110" expl="110.">
+  <proof prover="1"><result status="valid" time="0.30" steps="364"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.111" expl="111.">
+  <proof prover="1"><result status="valid" time="0.34" steps="435"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.112" expl="112.">
+  <proof prover="1"><result status="valid" time="0.07" steps="89"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.113" expl="113.">
+  <proof prover="1"><result status="valid" time="0.08" steps="87"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.114" expl="114.">
+  <proof prover="1"><result status="valid" time="0.07" steps="93"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.115" expl="115.">
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.116" expl="116.">
+  <proof prover="1"><result status="valid" time="0.23" steps="321"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.117" expl="117.">
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.118" expl="118.">
+  <proof prover="1"><result status="valid" time="0.05" steps="22"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.119" expl="119.">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.120" expl="120.">
+  <proof prover="1"><result status="valid" time="0.04" steps="16"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.121" expl="121.">
+  <proof prover="1"><result status="valid" time="0.04" steps="6"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.122" expl="122.">
+  <proof prover="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.123" expl="123.">
+  <proof prover="0"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.124" expl="124.">
+  <proof prover="1"><result status="valid" time="0.05" steps="20"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.125" expl="125.">
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.126" expl="126.">
+  <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.127" expl="127.">
+  <proof prover="1"><result status="valid" time="0.05" steps="26"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.128" expl="128.">
+  <proof prover="1"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.129" expl="129.">
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.130" expl="130.">
+  <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.131" expl="131.">
+  <proof prover="1"><result status="valid" time="0.05" steps="61"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.132" expl="132.">
+  <proof prover="0"><result status="valid" time="2.91"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.133" expl="133.">
+  <proof prover="1"><result status="valid" time="0.14" steps="210"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.134" expl="134.">
+  <proof prover="1"><result status="valid" time="0.05" steps="25"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.135" expl="135.">
+  <proof prover="1"><result status="valid" time="0.24" steps="226"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.136" expl="136.">
+  <proof prover="1"><result status="valid" time="0.07" steps="58"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.137" expl="137.">
+  <proof prover="1"><result status="valid" time="0.11" steps="114"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.138" expl="138.">
+  <proof prover="1"><result status="valid" time="0.07" steps="70"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.139" expl="139.">
+  <proof prover="0"><result status="valid" time="0.28"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.140" expl="140.">
+  <proof prover="1"><result status="valid" time="0.23" steps="310"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.141" expl="141.">
+  <proof prover="1"><result status="valid" time="0.67" steps="1064"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.142" expl="142.">
+  <proof prover="1"><result status="valid" time="0.09" steps="126"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.143" expl="143.">
+  <proof prover="1"><result status="valid" time="0.04" steps="40"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.144" expl="144.">
+  <proof prover="1"><result status="valid" time="0.21" steps="244"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.145" expl="145.">
+  <proof prover="0"><result status="valid" time="0.54"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.146" expl="146.">
+  <proof prover="1"><result status="valid" time="0.59" steps="996"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.147" expl="147.">
+  <proof prover="1"><result status="valid" time="0.17" steps="228"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.148" expl="148.">
+  <proof prover="1"><result status="valid" time="0.05" steps="25"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.149" expl="149.">
+  <proof prover="1"><result status="valid" time="0.40" steps="505"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.150" expl="150.">
+  <proof prover="1"><result status="valid" time="0.27" steps="606"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.151" expl="151.">
+  <proof prover="1"><result status="valid" time="0.13" steps="203"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.152" expl="152.">
+  <proof prover="1"><result status="valid" time="0.68" steps="705"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.153" expl="153.">
+  <proof prover="1"><result status="valid" time="2.40" steps="1587"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.154" expl="154.">
+  <proof prover="0"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.155" expl="155.">
+  <proof prover="1"><result status="valid" time="0.08" steps="89"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.156" expl="156.">
+  <transf name="split_goal_wp">
+   <goal name="have_winning_strat_local_criterion.156.1" expl="1.">
+   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.156.2" expl="2.">
+   <proof prover="1"><result status="valid" time="0.36" steps="450"/></proof>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.156.3" expl="3.">
+   <proof prover="1"><result status="valid" time="0.12" steps="196"/></proof>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.156.4" expl="4.">
+   <proof prover="1"><result status="valid" time="0.05" steps="33"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.157" expl="157.">
+  <proof prover="1"><result status="valid" time="4.49" steps="4051"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.158" expl="158.">
+  <proof prover="4"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.159" expl="159.">
+  <proof prover="1"><result status="valid" time="0.05" steps="50"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.160" expl="160.">
+  <proof prover="0"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.161" expl="161.">
+  <proof prover="1"><result status="valid" time="0.50" steps="527"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.162" expl="162.">
+  <transf name="introduce_premises">
+   <goal name="have_winning_strat_local_criterion.162.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="have_winning_strat_local_criterion.162.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="have_winning_strat_local_criterion.162.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.55" steps="1272"/></proof>
+     </goal>
+     <goal name="have_winning_strat_local_criterion.162.1.1.2" expl="2.">
+     <proof prover="1"><result status="valid" time="2.56" steps="6617"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.163" expl="163.">
+  <proof prover="1"><result status="valid" time="0.16" steps="163"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.164" expl="164.">
+  <proof prover="1"><result status="valid" time="0.95" steps="793"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.165" expl="165.">
+  <proof prover="1"><result status="valid" time="0.65" steps="607"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.166" expl="166.">
+  <proof prover="1"><result status="valid" time="0.10" steps="163"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.167" expl="167.">
+  <proof prover="1"><result status="valid" time="0.17" steps="420"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.168" expl="168.">
+  <proof prover="1"><result status="valid" time="0.34" steps="581"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.169" expl="169.">
+  <proof prover="1"><result status="valid" time="0.04" steps="25"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.170" expl="170.">
+  <proof prover="1"><result status="valid" time="0.28" steps="595"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.171" expl="171.">
+  <proof prover="1"><result status="valid" time="0.26" steps="280"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.172" expl="172.">
+  <proof prover="1"><result status="valid" time="0.48" steps="728"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.173" expl="173.">
+  <proof prover="1"><result status="valid" time="0.25" steps="327"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.174" expl="174.">
+  <proof prover="1"><result status="valid" time="1.05" steps="1348"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.175" expl="175.">
+  <proof prover="1"><result status="valid" time="0.19" steps="341"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.176" expl="176.">
+  <proof prover="1"><result status="valid" time="0.07" steps="60"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.177" expl="177.">
+  <proof prover="1"><result status="valid" time="0.04" steps="30"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.178" expl="178.">
+  <proof prover="1"><result status="valid" time="0.20" steps="317"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.179" expl="179.">
+  <proof prover="1"><result status="valid" time="0.06" steps="28"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.180" expl="180.">
+  <proof prover="1"><result status="valid" time="0.10" steps="132"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.181" expl="181.">
+  <proof prover="1"><result status="valid" time="0.17" steps="303"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.182" expl="182.">
+  <proof prover="1"><result status="valid" time="0.06" steps="127"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.183" expl="183.">
+  <proof prover="1"><result status="valid" time="0.04" steps="73"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.184" expl="184.">
+  <proof prover="0"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.185" expl="185.">
+  <proof prover="1"><result status="valid" time="0.22" steps="326"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.186" expl="186.">
+  <proof prover="1"><result status="valid" time="0.31" steps="494"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.187" expl="187.">
+  <proof prover="1"><result status="valid" time="0.26" steps="305"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.188" expl="188.">
+  <proof prover="1"><result status="valid" time="0.07" steps="127"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.189" expl="189.">
+  <proof prover="1"><result status="valid" time="0.15" steps="397"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.190" expl="190.">
+  <proof prover="1"><result status="valid" time="0.20" steps="398"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.191" expl="191.">
+  <proof prover="1"><result status="valid" time="0.70" steps="862"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.192" expl="192.">
+  <proof prover="1"><result status="valid" time="0.70" steps="636"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.193" expl="193.">
+  <proof prover="1"><result status="valid" time="0.55" steps="673"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.194" expl="194.">
+  <proof prover="1"><result status="valid" time="0.68" steps="822"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.195" expl="195.">
+  <proof prover="1"><result status="valid" time="1.10" steps="1465"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.196" expl="196.">
+  <proof prover="1"><result status="valid" time="0.06" steps="29"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.197" expl="197.">
+  <proof prover="1"><result status="valid" time="0.21" steps="381"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.198" expl="198.">
+  <proof prover="1"><result status="valid" time="0.17" steps="216"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.199" expl="199.">
+  <proof prover="1"><result status="valid" time="0.13" steps="178"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.200" expl="200.">
+  <transf name="induction_pr">
+   <goal name="have_winning_strat_local_criterion.200.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_winning_strat_local_criterion.200.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_winning_strat_local_criterion.200.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.200.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_winning_strat_local_criterion.200.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_winning_strat_local_criterion.200.2.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.07" steps="150"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="have_winning_strat_local_criterion.200.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="have_winning_strat_local_criterion.200.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="have_winning_strat_local_criterion.200.3.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.12" steps="244"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.201" expl="201.">
+  <proof prover="1"><result status="valid" time="0.05" steps="48"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.202" expl="202.">
+  <proof prover="1"><result status="valid" time="0.04" steps="34"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.203" expl="203.">
+  <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.204" expl="204.">
+  <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.205" expl="205.">
+  <proof prover="1"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="have_winning_strat_local_criterion.206" expl="206.">
+  <proof prover="1"><result status="valid" time="0.03" steps="11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="h_proj_eq">
+ <transf name="split_goal_wp">
+  <goal name="h_proj_eq.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="h_proj_eq.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.03" steps="3"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="order_product">
+ <transf name="split_goal_wp">
+  <goal name="order_product.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="order_product.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.03" steps="25"/></proof>
+  </goal>
+  <goal name="order_product.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.04" steps="25"/></proof>
+  </goal>
+  <goal name="order_product.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="order_product.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="order_product.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="order_product.7" expl="7.">
+  <proof prover="1"><result status="valid" time="0.04" steps="106"/></proof>
+  </goal>
+  <goal name="order_product.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="order_product.9" expl="9.">
+  <proof prover="1"><result status="valid" time="0.05" steps="32"/></proof>
+  </goal>
+  <goal name="order_product.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="order_product.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.03" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="complete_product">
+ <transf name="split_goal_wp">
+  <goal name="complete_product.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
+  </goal>
+  <goal name="complete_product.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
+  </goal>
+  <goal name="complete_product.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.04" steps="23"/></proof>
+  </goal>
+  <goal name="complete_product.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.03" steps="11"/></proof>
+  </goal>
+  <goal name="complete_product.5" expl="5.">
+  <proof prover="4"><result status="valid" time="1.63"/></proof>
+  </goal>
+  <goal name="complete_product.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+  <goal name="complete_product.7" expl="7.">
+  <proof prover="1"><result status="valid" time="0.04" steps="23"/></proof>
+  </goal>
+  <goal name="complete_product.8" expl="8.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="complete_product.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="complete_product.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="complete_product.11" expl="11.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.06" steps="71"/></proof>
+  </goal>
+  <goal name="complete_product.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.07" steps="8"/></proof>
+  </goal>
+  <goal name="complete_product.13" expl="13.">
+  <proof prover="0"><result status="valid" time="0.48"/></proof>
+  </goal>
+  <goal name="complete_product.14" expl="14.">
+  <proof prover="1"><result status="valid" time="0.03" steps="19"/></proof>
+  </goal>
+  <goal name="complete_product.15" expl="15.">
+  <proof prover="1"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="complete_product.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.04" steps="44"/></proof>
+  </goal>
+  <goal name="complete_product.17" expl="17.">
+  <proof prover="1"><result status="valid" time="0.05" steps="51"/></proof>
+  </goal>
+  <goal name="complete_product.18" expl="18.">
+  <proof prover="0"><result status="valid" time="0.91"/></proof>
+  </goal>
+  <goal name="complete_product.19" expl="19.">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="complete_product.20" expl="20.">
+  <proof prover="0"><result status="valid" time="2.92"/></proof>
+  </goal>
+  <goal name="complete_product.21" expl="21.">
+  <proof prover="0"><result status="valid" time="2.93"/></proof>
+  </goal>
+  <goal name="complete_product.22" expl="22.">
+  <proof prover="1"><result status="valid" time="0.09" steps="43"/></proof>
+  </goal>
+  <goal name="complete_product.23" expl="23.">
+  <proof prover="1"><result status="valid" time="0.09" steps="43"/></proof>
+  </goal>
+  <goal name="complete_product.24" expl="24.">
+  <proof prover="0"><result status="valid" time="0.85"/></proof>
+  </goal>
+  <goal name="complete_product.25" expl="25.">
+  <proof prover="1"><result status="valid" time="0.08" steps="43"/></proof>
+  </goal>
+  <goal name="complete_product.26" expl="26.">
+  <proof prover="1"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sorder_order">
+ <transf name="split_goal_wp">
+  <goal name="sorder_order.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
+  </goal>
+  <goal name="sorder_order.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.06" steps="131"/></proof>
+  </goal>
+  <goal name="sorder_order.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.04" steps="25"/></proof>
+  </goal>
+  <goal name="sorder_order.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.04" steps="39"/></proof>
+  </goal>
+  <goal name="sorder_order.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.08" steps="204"/></proof>
+  </goal>
+  <goal name="sorder_order.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.07" steps="81"/></proof>
+  </goal>
+  <goal name="sorder_order.7" expl="7.">
+  <proof prover="1"><result status="valid" time="0.07" steps="130"/></proof>
+  </goal>
+  <goal name="sorder_order.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.05" steps="28"/></proof>
+  </goal>
+  <goal name="sorder_order.9" expl="9.">
+  <proof prover="1"><result status="valid" time="0.08" steps="85"/></proof>
+  </goal>
+  <goal name="sorder_order.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.05" steps="31"/></proof>
+  </goal>
+  <goal name="sorder_order.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.10" steps="248"/></proof>
+  </goal>
+  <goal name="sorder_order.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="sorder_order.13" expl="13.">
+  <proof prover="1"><result status="valid" time="0.06" steps="108"/></proof>
+  </goal>
+  <goal name="sorder_order.14" expl="14.">
+  <proof prover="1"><result status="valid" time="0.06" steps="22"/></proof>
+  </goal>
+  <goal name="sorder_order.15" expl="15.">
+  <proof prover="1"><result status="valid" time="0.05" steps="12"/></proof>
+  </goal>
+  <goal name="sorder_order.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sorder_completion">
+ <transf name="split_goal_wp">
+  <goal name="sorder_completion.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.05" steps="26"/></proof>
+  </goal>
+  <goal name="sorder_completion.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.04" steps="26"/></proof>
+  </goal>
+  <goal name="sorder_completion.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.05" steps="26"/></proof>
+  </goal>
+  <goal name="sorder_completion.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="sorder_completion.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="sorder_completion.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.06" steps="80"/></proof>
+  </goal>
+  <goal name="sorder_completion.7" expl="7.">
+  <proof prover="1"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="sorder_completion.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="sorder_completion.9" expl="9.">
+  <proof prover="1"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="sorder_completion.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="sorder_completion.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.05" steps="66"/></proof>
+  </goal>
+  <goal name="sorder_completion.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="sorder_completion.13" expl="13.">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="sorder_completion.14" expl="14.">
+  <proof prover="1"><result status="valid" time="0.05" steps="34"/></proof>
+  </goal>
+  <goal name="sorder_completion.15" expl="15.">
+  <proof prover="1"><result status="valid" time="0.05" steps="55"/></proof>
+  </goal>
+  <goal name="sorder_completion.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.08" steps="149"/></proof>
+  </goal>
+  <goal name="sorder_completion.17" expl="17.">
+  <proof prover="1"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="sorder_completion.18" expl="18.">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="sorder_completion.19" expl="19.">
+  <proof prover="1"><result status="valid" time="0.10" steps="134"/></proof>
+  </goal>
+  <goal name="sorder_completion.20" expl="20.">
+  <proof prover="1"><result status="valid" time="0.10" steps="142"/></proof>
+  </goal>
+  <goal name="sorder_completion.21" expl="21.">
+  <proof prover="1"><result status="valid" time="0.64" steps="516"/></proof>
+  </goal>
+  <goal name="sorder_completion.22" expl="22.">
+  <proof prover="1"><result status="valid" time="0.04" steps="0"/></proof>
+  </goal>
+  <goal name="sorder_completion.23" expl="23.">
+  <proof prover="1"><result status="valid" time="0.06" steps="35"/></proof>
+  </goal>
+  <goal name="sorder_completion.24" expl="24.">
+  <proof prover="1"><result status="valid" time="0.19" steps="187"/></proof>
+  </goal>
+  <goal name="sorder_completion.25" expl="25.">
+  <proof prover="1"><result status="valid" time="0.20" steps="202"/></proof>
+  </goal>
+  <goal name="sorder_completion.26" expl="26.">
+  <proof prover="1"><result status="valid" time="0.06" steps="42"/></proof>
+  </goal>
+  <goal name="sorder_completion.27" expl="27.">
+  <proof prover="1"><result status="valid" time="0.04" steps="33"/></proof>
+  </goal>
+  <goal name="sorder_completion.28" expl="28.">
+  <proof prover="1"><result status="valid" time="0.10" steps="206"/></proof>
+  </goal>
+  <goal name="sorder_completion.29" expl="29.">
+  <proof prover="1"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="sorder_completion.30" expl="30.">
+  <proof prover="1"><result status="valid" time="0.07" steps="118"/></proof>
+  </goal>
+  <goal name="sorder_completion.31" expl="31.">
+  <proof prover="1"><result status="valid" time="0.04" steps="18"/></proof>
+  </goal>
+  <goal name="sorder_completion.32" expl="32.">
+  <proof prover="1"><result status="valid" time="0.06" steps="118"/></proof>
+  </goal>
+  <goal name="sorder_completion.33" expl="33.">
+  <proof prover="1"><result status="valid" time="0.05" steps="76"/></proof>
+  </goal>
+  <goal name="sorder_completion.34" expl="34.">
+  <proof prover="1"><result status="valid" time="0.06" steps="122"/></proof>
+  </goal>
+  <goal name="sorder_completion.35" expl="35.">
+  <proof prover="1"><result status="valid" time="0.06" steps="80"/></proof>
+  </goal>
+  <goal name="sorder_completion.36" expl="36.">
+  <proof prover="1"><result status="valid" time="0.17" steps="250"/></proof>
+  </goal>
+  <goal name="sorder_completion.37" expl="37.">
+  <proof prover="1"><result status="valid" time="0.07" steps="87"/></proof>
+  </goal>
+  <goal name="sorder_completion.38" expl="38.">
+  <proof prover="1"><result status="valid" time="0.25" steps="328"/></proof>
+  </goal>
+  <goal name="sorder_completion.39" expl="39.">
+  <proof prover="1"><result status="valid" time="0.07" steps="72"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sorder_complete">
+ <proof prover="1"><result status="valid" time="0.04" steps="16"/></proof>
+ </goal>
+ <goal name="safe_add_property">
+ <proof prover="1"><result status="valid" time="0.08" steps="22"/></proof>
+ </goal>
+ <goal name="safe_add_chain_property">
+ <proof prover="1"><result status="valid" time="0.04" steps="32"/></proof>
+ </goal>
+ <goal name="evolve_inflationary">
+ <transf name="split_goal_wp">
+  <goal name="evolve_inflationary.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.07" steps="76"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.10" steps="108"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.05" steps="115"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.15" steps="66"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.06" steps="39"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.6" expl="6.">
+  <proof prover="4"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.7" expl="7.">
+  <proof prover="4"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.8" expl="8.">
+  <proof prover="4"><result status="valid" time="0.56"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.9" expl="9.">
+  <proof prover="0"><result status="valid" time="1.41"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.12" steps="44"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.07" steps="41"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.16" steps="136"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.13" expl="13.">
+  <proof prover="1"><result status="valid" time="0.21" steps="118"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.14" expl="14.">
+  <proof prover="1"><result status="valid" time="0.11" steps="116"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.15" expl="15.">
+  <proof prover="1"><result status="valid" time="0.68" steps="485"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.13" steps="169"/></proof>
+  </goal>
+  <goal name="evolve_inflationary.17" expl="17.">
+  <proof prover="1"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="coherence">
+ <transf name="split_goal_wp">
+  <goal name="coherence.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="coherence.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.13" steps="95"/></proof>
+  </goal>
+  <goal name="coherence.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.42" steps="296"/></proof>
+  </goal>
+  <goal name="coherence.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.22" steps="224"/></proof>
+  </goal>
+  <goal name="coherence.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.19" steps="41"/></proof>
+  </goal>
+  <goal name="coherence.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.13" steps="100"/></proof>
+  </goal>
+  <goal name="coherence.7" expl="7.">
+  <transf name="introduce_premises">
+   <goal name="coherence.7.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="coherence.7.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="coherence.7.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.11" steps="69"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.2" expl="2.">
+     <proof prover="1"><result status="valid" time="0.08" steps="44"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.3" expl="3.">
+     <proof prover="1"><result status="valid" time="0.09" steps="44"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.4" expl="4.">
+     <proof prover="1"><result status="valid" time="0.07" steps="20"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.5" expl="5.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="26"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.6" expl="6.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="26"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.7" expl="7.">
+     <proof prover="1"><result status="valid" time="0.14" steps="100"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.8" expl="8.">
+     <proof prover="1"><result status="valid" time="0.07" steps="100"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.9" expl="9.">
+     <proof prover="1"><result status="valid" time="0.08" steps="42"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.10" expl="10.">
+     <proof prover="1"><result status="valid" time="0.08" steps="42"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.11" expl="11.">
+     <proof prover="4"><result status="valid" time="0.65"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.12" expl="12.">
+     <proof prover="1"><result status="valid" time="0.27" steps="117"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.13" expl="13.">
+     <proof prover="1"><result status="valid" time="0.19" steps="142"/></proof>
+     </goal>
+     <goal name="coherence.7.1.1.14" expl="14.">
+     <proof prover="4"><result status="valid" time="0.82"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="coherence.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.18" steps="139"/></proof>
+  </goal>
+  <goal name="coherence.9" expl="9.">
+  <proof prover="1"><result status="valid" time="0.23" steps="152"/></proof>
+  </goal>
+  <goal name="coherence.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.19" steps="81"/></proof>
+  </goal>
+  <goal name="coherence.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.12" steps="77"/></proof>
+  </goal>
+  <goal name="coherence.12" expl="12.">
+  <proof prover="4"><result status="valid" time="0.94"/></proof>
+  </goal>
+  <goal name="coherence.13" expl="13.">
+  <proof prover="1"><result status="valid" time="0.24" steps="276"/></proof>
+  </goal>
+  <goal name="coherence.14" expl="14.">
+  <proof prover="4"><result status="valid" time="1.61"/></proof>
+  </goal>
+  <goal name="coherence.15" expl="15.">
+  <proof prover="4"><result status="valid" time="1.12"/></proof>
+  </goal>
+  <goal name="coherence.16" expl="16.">
+  <proof prover="1"><result status="valid" time="0.18" steps="22"/></proof>
+  </goal>
+  <goal name="coherence.17" expl="17.">
+  <proof prover="1"><result status="valid" time="0.12" steps="48"/></proof>
+  </goal>
+  <goal name="coherence.18" expl="18.">
+  <proof prover="1"><result status="valid" time="0.32" steps="355"/></proof>
+  </goal>
+  <goal name="coherence.19" expl="19.">
+  <proof prover="4"><result status="valid" time="0.99"/></proof>
+  </goal>
+  <goal name="coherence.20" expl="20.">
+  <proof prover="4"><result status="valid" time="1.21"/></proof>
+  </goal>
+  <goal name="coherence.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="125"/></proof>
+  </goal>
+  <goal name="coherence.22" expl="22.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="135"/></proof>
+  </goal>
+  <goal name="coherence.23" expl="23.">
+  <proof prover="1"><result status="valid" time="0.15" steps="145"/></proof>
+  </goal>
+  <goal name="coherence.24" expl="24.">
+  <proof prover="1"><result status="valid" time="0.13" steps="151"/></proof>
+  </goal>
+  <goal name="coherence.25" expl="25.">
+  <proof prover="1"><result status="valid" time="0.94" steps="626"/></proof>
+  </goal>
+  <goal name="coherence.26" expl="26.">
+  <proof prover="1"><result status="valid" time="1.47" steps="710"/></proof>
+  </goal>
+  <goal name="coherence.27" expl="27.">
+  <proof prover="4"><result status="valid" time="1.06"/></proof>
+  </goal>
+  <goal name="coherence.28" expl="28.">
+  <proof prover="4"><result status="valid" time="0.90"/></proof>
+  </goal>
+  <goal name="coherence.29" expl="29.">
+  <proof prover="1"><result status="valid" time="0.18" steps="35"/></proof>
+  </goal>
+  <goal name="coherence.30" expl="30.">
+  <proof prover="1"><result status="valid" time="0.24" steps="99"/></proof>
+  </goal>
+  <goal name="coherence.31" expl="31.">
+  <proof prover="4"><result status="valid" time="0.89"/></proof>
+  </goal>
+  <goal name="coherence.32" expl="32.">
+  <proof prover="1"><result status="valid" time="0.10" steps="21"/></proof>
+  </goal>
+  <goal name="coherence.33" expl="33.">
+  <proof prover="1"><result status="valid" time="0.16" steps="67"/></proof>
+  </goal>
+  <goal name="coherence.34" expl="34.">
+  <proof prover="1"><result status="valid" time="0.27" steps="134"/></proof>
+  </goal>
+  <goal name="coherence.35" expl="35.">
+  <proof prover="1"><result status="valid" time="0.12" steps="67"/></proof>
+  </goal>
+  <goal name="coherence.36" expl="36.">
+  <proof prover="1"><result status="valid" time="0.11" steps="39"/></proof>
+  </goal>
+  <goal name="coherence.37" expl="37.">
+  <proof prover="4"><result status="valid" time="0.71"/></proof>
+  </goal>
+  <goal name="coherence.38" expl="38.">
+  <proof prover="4"><result status="valid" time="0.87"/></proof>
+  </goal>
+  <goal name="coherence.39" expl="39.">
+  <proof prover="4"><result status="valid" time="0.77"/></proof>
+  </goal>
+  <goal name="coherence.40" expl="40.">
+  <proof prover="1"><result status="valid" time="0.32" steps="450"/></proof>
+  </goal>
+  <goal name="coherence.41" expl="41.">
+  <proof prover="1"><result status="valid" time="0.25" steps="185"/></proof>
+  </goal>
+  <goal name="coherence.42" expl="42.">
+  <proof prover="1"><result status="valid" time="0.07" steps="26"/></proof>
+  </goal>
+  <goal name="coherence.43" expl="43.">
+  <proof prover="4"><result status="valid" time="0.91"/></proof>
+  </goal>
+  <goal name="coherence.44" expl="44.">
+  <proof prover="1"><result status="valid" time="0.53" steps="254"/></proof>
+  </goal>
+  <goal name="coherence.45" expl="45.">
+  <proof prover="1"><result status="valid" time="0.10" steps="39"/></proof>
+  </goal>
+  <goal name="coherence.46" expl="46.">
+  <proof prover="1"><result status="valid" time="0.37" steps="241"/></proof>
+  </goal>
+  <goal name="coherence.47" expl="47.">
+  <proof prover="1"><result status="valid" time="0.15" steps="154"/></proof>
+  </goal>
+  <goal name="coherence.48" expl="48.">
+  <proof prover="1"><result status="valid" time="2.16" steps="1253"/></proof>
+  </goal>
+  <goal name="coherence.49" expl="49.">
+  <proof prover="1"><result status="valid" time="1.27" steps="618"/></proof>
+  </goal>
+  <goal name="coherence.50" expl="50.">
+  <proof prover="1"><result status="valid" time="0.33" steps="161"/></proof>
+  </goal>
+  <goal name="coherence.51" expl="51.">
+  <proof prover="1"><result status="valid" time="0.37" steps="114"/></proof>
+  </goal>
+  <goal name="coherence.52" expl="52.">
+  <proof prover="1"><result status="valid" time="0.76" steps="662"/></proof>
+  </goal>
+  <goal name="coherence.53" expl="53.">
+  <proof prover="1"><result status="valid" time="0.20" steps="45"/></proof>
+  </goal>
+  <goal name="coherence.54" expl="54.">
+  <proof prover="4"><result status="valid" time="1.14"/></proof>
+  </goal>
+  <goal name="coherence.55" expl="55.">
+  <proof prover="4"><result status="valid" time="1.00"/></proof>
+  </goal>
+  <goal name="coherence.56" expl="56.">
+  <proof prover="1"><result status="valid" time="0.30" steps="248"/></proof>
+  </goal>
+  <goal name="coherence.57" expl="57.">
+  <proof prover="1"><result status="valid" time="0.17" steps="123"/></proof>
+  </goal>
+  <goal name="coherence.58" expl="58.">
+  <proof prover="1"><result status="valid" time="0.15" steps="94"/></proof>
+  </goal>
+  <goal name="coherence.59" expl="59.">
+  <proof prover="1"><result status="valid" time="0.15" steps="90"/></proof>
+  </goal>
+  <goal name="coherence.60" expl="60.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.82"/></proof>
+  </goal>
+  <goal name="coherence.61" expl="61.">
+  <proof prover="4"><result status="valid" time="1.58"/></proof>
+  </goal>
+  <goal name="coherence.62" expl="62.">
+  <proof prover="1"><result status="valid" time="0.17" steps="32"/></proof>
+  </goal>
+  <goal name="coherence.63" expl="63.">
+  <proof prover="4"><result status="valid" time="1.48"/></proof>
+  </goal>
+  <goal name="coherence.64" expl="64.">
+  <proof prover="1"><result status="valid" time="0.11" steps="64"/></proof>
+  </goal>
+  <goal name="coherence.65" expl="65.">
+  <proof prover="4"><result status="valid" time="1.62"/></proof>
+  </goal>
+  <goal name="coherence.66" expl="66.">
+  <proof prover="1"><result status="valid" time="0.83" steps="457"/></proof>
+  </goal>
+  <goal name="coherence.67" expl="67.">
+  <proof prover="1"><result status="valid" time="0.13" steps="111"/></proof>
+  </goal>
+  <goal name="coherence.68" expl="68.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.13"/></proof>
+  </goal>
+  <goal name="coherence.69" expl="69.">
+  <proof prover="1"><result status="valid" time="0.18" steps="71"/></proof>
+  </goal>
+  <goal name="coherence.70" expl="70.">
+  <proof prover="4"><result status="valid" time="1.13"/></proof>
+  </goal>
+  <goal name="coherence.71" expl="71.">
+  <proof prover="4"><result status="valid" time="1.62"/></proof>
+  </goal>
+  <goal name="coherence.72" expl="72.">
+  <proof prover="1"><result status="valid" time="0.07" steps="31"/></proof>
+  </goal>
+  <goal name="coherence.73" expl="73.">
+  <proof prover="1"><result status="valid" time="0.14" steps="63"/></proof>
+  </goal>
+  <goal name="coherence.74" expl="74.">
+  <proof prover="1"><result status="valid" time="0.09" steps="37"/></proof>
+  </goal>
+  <goal name="coherence.75" expl="75.">
+  <proof prover="1"><result status="valid" time="0.20" steps="65"/></proof>
+  </goal>
+  <goal name="coherence.76" expl="76.">
+  <proof prover="1"><result status="valid" time="0.23" steps="195"/></proof>
+  </goal>
+  <goal name="coherence.77" expl="77.">
+  <proof prover="1"><result status="valid" time="0.17" steps="90"/></proof>
+  </goal>
+  <goal name="coherence.78" expl="78.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="8.40" steps="2445"/></proof>
+  </goal>
+  <goal name="coherence.79" expl="79.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="41"/></proof>
+  </goal>
+  <goal name="coherence.80" expl="80.">
+  <proof prover="1"><result status="valid" time="0.09" steps="41"/></proof>
+  </goal>
+  <goal name="coherence.81" expl="81.">
+  <proof prover="4"><result status="valid" time="2.08"/></proof>
+  </goal>
+  <goal name="coherence.82" expl="82.">
+  <proof prover="4"><result status="valid" time="1.31"/></proof>
+  </goal>
+  <goal name="coherence.83" expl="83.">
+  <proof prover="1"><result status="valid" time="1.54" steps="688"/></proof>
+  </goal>
+  <goal name="coherence.84" expl="84.">
+  <proof prover="1"><result status="valid" time="0.36" steps="167"/></proof>
+  </goal>
+  <goal name="coherence.85" expl="85.">
+  <proof prover="1"><result status="valid" time="0.22" steps="82"/></proof>
+  </goal>
+  <goal name="coherence.86" expl="86.">
+  <proof prover="4"><result status="valid" time="1.80"/></proof>
+  </goal>
+  <goal name="coherence.87" expl="87.">
+  <proof prover="1"><result status="valid" time="0.12" steps="44"/></proof>
+  </goal>
+  <goal name="coherence.88" expl="88.">
+  <proof prover="1"><result status="valid" time="0.16" steps="59"/></proof>
+  </goal>
+  <goal name="coherence.89" expl="89.">
+  <proof prover="1"><result status="valid" time="0.36" steps="265"/></proof>
+  </goal>
+  <goal name="coherence.90" expl="90.">
+  <proof prover="1"><result status="valid" time="0.09" steps="26"/></proof>
+  </goal>
+  <goal name="coherence.91" expl="91.">
+  <proof prover="1"><result status="valid" time="0.23" steps="129"/></proof>
+  </goal>
+  <goal name="coherence.92" expl="92.">
+  <proof prover="1"><result status="valid" time="0.14" steps="81"/></proof>
+  </goal>
+  <goal name="coherence.93" expl="93.">
+  <proof prover="1"><result status="valid" time="0.17" steps="46"/></proof>
+  </goal>
+  <goal name="coherence.94" expl="94.">
+  <proof prover="1"><result status="valid" time="0.11" steps="44"/></proof>
+  </goal>
+  <goal name="coherence.95" expl="95.">
+  <proof prover="4"><result status="valid" time="1.73"/></proof>
+  </goal>
+  <goal name="coherence.96" expl="96.">
+  <proof prover="1"><result status="valid" time="0.13" steps="86"/></proof>
+  </goal>
+  <goal name="coherence.97" expl="97.">
+  <proof prover="1"><result status="valid" time="0.38" steps="226"/></proof>
+  </goal>
+  <goal name="coherence.98" expl="98.">
+  <proof prover="1"><result status="valid" time="0.37" steps="177"/></proof>
+  </goal>
+  <goal name="coherence.99" expl="99.">
+  <proof prover="1"><result status="valid" time="1.18" steps="595"/></proof>
+  </goal>
+  <goal name="coherence.100" expl="100.">
+  <proof prover="4"><result status="valid" time="1.87"/></proof>
+  </goal>
+  <goal name="coherence.101" expl="101.">
+  <proof prover="1"><result status="valid" time="3.48" steps="1571"/></proof>
+  </goal>
+  <goal name="coherence.102" expl="102.">
+  <proof prover="1"><result status="valid" time="0.29" steps="174"/></proof>
+  </goal>
+  <goal name="coherence.103" expl="103.">
+  <proof prover="1"><result status="valid" time="0.21" steps="90"/></proof>
+  </goal>
+  <goal name="coherence.104" expl="104.">
+  <proof prover="1"><result status="valid" time="0.35" steps="189"/></proof>
+  </goal>
+  <goal name="coherence.105" expl="105.">
+  <proof prover="1"><result status="valid" time="0.22" steps="51"/></proof>
+  </goal>
+  <goal name="coherence.106" expl="106.">
+  <proof prover="1"><result status="valid" time="0.28" steps="159"/></proof>
+  </goal>
+  <goal name="coherence.107" expl="107.">
+  <proof prover="1"><result status="valid" time="0.97" steps="371"/></proof>
+  </goal>
+  <goal name="coherence.108" expl="108.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="7.09"/></proof>
+  </goal>
+  <goal name="coherence.109" expl="109.">
+  <proof prover="1"><result status="valid" time="0.54" steps="422"/></proof>
+  </goal>
+  <goal name="coherence.110" expl="110.">
+  <proof prover="1"><result status="valid" time="0.45" steps="375"/></proof>
+  </goal>
+  <goal name="coherence.111" expl="111.">
+  <proof prover="1"><result status="valid" time="0.31" steps="168"/></proof>
+  </goal>
+  <goal name="coherence.112" expl="112.">
+  <proof prover="1"><result status="valid" time="0.13" steps="88"/></proof>
+  </goal>
+  <goal name="coherence.113" expl="113.">
+  <proof prover="1"><result status="valid" time="3.60" steps="2055"/></proof>
+  </goal>
+  <goal name="coherence.114" expl="114.">
+  <proof prover="4"><result status="valid" time="1.68"/></proof>
+  </goal>
+  <goal name="coherence.115" expl="115.">
+  <proof prover="1"><result status="valid" time="0.12" steps="53"/></proof>
+  </goal>
+  <goal name="coherence.116" expl="116.">
+  <proof prover="1"><result status="valid" time="0.28" steps="181"/></proof>
+  </goal>
+  <goal name="coherence.117" expl="117.">
+  <proof prover="1"><result status="valid" time="2.12" steps="1177"/></proof>
+  </goal>
+  <goal name="coherence.118" expl="118.">
+  <proof prover="1"><result status="valid" time="0.17" steps="51"/></proof>
+  </goal>
+  <goal name="coherence.119" expl="119.">
+  <proof prover="4"><result status="valid" time="1.99"/></proof>
+  </goal>
+  <goal name="coherence.120" expl="120.">
+  <proof prover="1"><result status="valid" time="0.20" steps="30"/></proof>
+  </goal>
+  <goal name="coherence.121" expl="121.">
+  <proof prover="1"><result status="valid" time="0.22" steps="162"/></proof>
+  </goal>
+  <goal name="coherence.122" expl="122.">
+  <proof prover="4"><result status="valid" time="1.67"/></proof>
+  </goal>
+  <goal name="coherence.123" expl="123.">
+  <proof prover="1"><result status="valid" time="0.15" steps="65"/></proof>
+  </goal>
+  <goal name="coherence.124" expl="124.">
+  <proof prover="1"><result status="valid" time="0.40" steps="265"/></proof>
+  </goal>
+  <goal name="coherence.125" expl="125.">
+  <proof prover="1"><result status="valid" time="0.54" steps="362"/></proof>
+  </goal>
+  <goal name="coherence.126" expl="126.">
+  <proof prover="1"><result status="valid" time="0.33" steps="270"/></proof>
+  </goal>
+  <goal name="coherence.127" expl="127.">
+  <proof prover="1"><result status="valid" time="1.23" steps="497"/></proof>
+  </goal>
+  <goal name="coherence.128" expl="128.">
+  <proof prover="4"><result status="valid" time="1.56"/></proof>
+  </goal>
+  <goal name="coherence.129" expl="129.">
+  <proof prover="4"><result status="valid" time="1.73"/></proof>
+  </goal>
+  <goal name="coherence.130" expl="130.">
+  <proof prover="1"><result status="valid" time="0.09" steps="41"/></proof>
+  </goal>
+  <goal name="coherence.131" expl="131.">
+  <proof prover="1"><result status="valid" time="0.12" steps="81"/></proof>
+  </goal>
+  <goal name="coherence.132" expl="132.">
+  <proof prover="1"><result status="valid" time="0.13" steps="81"/></proof>
+  </goal>
+  <goal name="coherence.133" expl="133.">
+  <proof prover="1"><result status="valid" time="0.17" steps="79"/></proof>
+  </goal>
+  <goal name="coherence.134" expl="134.">
+  <proof prover="1"><result status="valid" time="0.14" steps="43"/></proof>
+  </goal>
+  <goal name="coherence.135" expl="135.">
+  <proof prover="1"><result status="valid" time="0.41" steps="335"/></proof>
+  </goal>
+  <goal name="coherence.136" expl="136.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="4.58"/></proof>
+  </goal>
+  <goal name="coherence.137" expl="137.">
+  <proof prover="1"><result status="valid" time="0.20" steps="46"/></proof>
+  </goal>
+  <goal name="coherence.138" expl="138.">
+  <proof prover="4"><result status="valid" time="1.82"/></proof>
+  </goal>
+  <goal name="coherence.139" expl="139.">
+  <proof prover="1"><result status="valid" time="0.17" steps="120"/></proof>
+  </goal>
+  <goal name="coherence.140" expl="140.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.54"/></proof>
+  </goal>
+  <goal name="coherence.141" expl="141.">
+  <proof prover="1"><result status="valid" time="0.51" steps="368"/></proof>
+  </goal>
+  <goal name="coherence.142" expl="142.">
+  <proof prover="1"><result status="valid" time="0.23" steps="162"/></proof>
+  </goal>
+  <goal name="coherence.143" expl="143.">
+  <proof prover="4"><result status="valid" time="1.24"/></proof>
+  </goal>
+  <goal name="coherence.144" expl="144.">
+  <transf name="introduce_premises">
+   <goal name="coherence.144.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="coherence.144.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="coherence.144.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.08" steps="18"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.2" expl="2.">
+     <proof prover="1"><result status="valid" time="0.07" steps="18"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.3" expl="3.">
+     <proof prover="1"><result status="valid" time="0.06" steps="18"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.4" expl="4.">
+     <proof prover="1"><result status="valid" time="0.25" steps="98"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.5" expl="5.">
+     <proof prover="1"><result status="valid" time="0.17" steps="81"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.6" expl="6.">
+     <proof prover="1"><result status="valid" time="0.13" steps="81"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.7" expl="7.">
+     <proof prover="4"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.8" expl="8.">
+     <proof prover="1"><result status="valid" time="0.10" steps="68"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.9" expl="9.">
+     <proof prover="1"><result status="valid" time="1.82" steps="882"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.10" expl="10.">
+     <proof prover="1"><result status="valid" time="0.34" steps="139"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.11" expl="11.">
+     <proof prover="1"><result status="valid" time="2.81" steps="1675"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.12" expl="12.">
+     <proof prover="1"><result status="valid" time="0.22" steps="47"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.13" expl="13.">
+     <proof prover="1"><result status="valid" time="0.58" steps="232"/></proof>
+     </goal>
+     <goal name="coherence.144.1.1.14" expl="14.">
+     <proof prover="1"><result status="valid" time="0.23" steps="153"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="coherence.145" expl="145.">
+  <proof prover="1"><result status="valid" time="0.37" steps="244"/></proof>
+  </goal>
+  <goal name="coherence.146" expl="146.">
+  <proof prover="1"><result status="valid" time="0.40" steps="240"/></proof>
+  </goal>
+  <goal name="coherence.147" expl="147.">
+  <transf name="introduce_premises">
+   <goal name="coherence.147.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="coherence.147.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="coherence.147.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.27" steps="139"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.2" expl="2.">
+     <proof prover="1"><result status="valid" time="0.10" steps="48"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.3" expl="3.">
+     <proof prover="1"><result status="valid" time="0.18" steps="43"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.4" expl="4.">
+     <proof prover="1"><result status="valid" time="0.09" steps="22"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.5" expl="5.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="23"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.6" expl="6.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="23"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.7" expl="7.">
+     <proof prover="1"><result status="valid" time="0.09" steps="40"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.8" expl="8.">
+     <proof prover="1"><result status="valid" time="0.11" steps="79"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.9" expl="9.">
+     <proof prover="1" timelimit="20" steplimit="-1"><result status="valid" time="4.96" steps="2751"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.10" expl="10.">
+     <proof prover="1"><result status="valid" time="0.35" steps="78"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.11" expl="11.">
+     <proof prover="1"><result status="valid" time="5.09" steps="2192"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.12" expl="12.">
+     <proof prover="1"><result status="valid" time="0.36" steps="154"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.13" expl="13.">
+     <proof prover="1"><result status="valid" time="0.75" steps="275"/></proof>
+     </goal>
+     <goal name="coherence.147.1.1.14" expl="14.">
+     <proof prover="1"><result status="valid" time="0.34" steps="140"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="coherence.148" expl="148.">
+  <transf name="introduce_premises">
+   <goal name="coherence.148.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="coherence.148.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="coherence.148.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.21" steps="22"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.2" expl="2.">
+     <proof prover="1"><result status="valid" time="0.23" steps="48"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.3" expl="3.">
+     <proof prover="1"><result status="valid" time="0.36" steps="194"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.4" expl="4.">
+     <proof prover="1"><result status="valid" time="0.19" steps="22"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.5" expl="5.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.44" steps="312"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.6" expl="6.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.50" steps="312"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.7" expl="7.">
+     <proof prover="1"><result status="valid" time="0.09" steps="40"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.8" expl="8.">
+     <proof prover="1"><result status="valid" time="0.12" steps="80"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.9" expl="9.">
+     <proof prover="1"><result status="valid" time="0.13" steps="40"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.10" expl="10.">
+     <proof prover="1"><result status="valid" time="0.23" steps="78"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.11" expl="11.">
+     <proof prover="4"><result status="valid" time="0.07"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.12" expl="12.">
+     <proof prover="1"><result status="valid" time="0.11" steps="53"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.13" expl="13.">
+     <proof prover="1"><result status="valid" time="0.32" steps="234"/></proof>
+     </goal>
+     <goal name="coherence.148.1.1.14" expl="14.">
+     <proof prover="1"><result status="valid" time="0.14" steps="152"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="coherence.149" expl="149.">
+  <proof prover="1"><result status="valid" time="3.26" steps="637"/></proof>
+  </goal>
+  <goal name="coherence.150" expl="150.">
+  <proof prover="1"><result status="valid" time="3.47" steps="683"/></proof>
+  </goal>
+  <goal name="coherence.151" expl="151.">
+  <proof prover="1"><result status="valid" time="0.07" steps="20"/></proof>
+  </goal>
+  <goal name="coherence.152" expl="152.">
+  <proof prover="1"><result status="valid" time="0.25" steps="139"/></proof>
+  </goal>
+  <goal name="coherence.153" expl="153.">
+  <proof prover="4"><result status="valid" time="1.76"/></proof>
+  </goal>
+  <goal name="coherence.154" expl="154.">
+  <proof prover="1"><result status="valid" time="0.24" steps="139"/></proof>
+  </goal>
+  <goal name="coherence.155" expl="155.">
+  <proof prover="4"><result status="valid" time="1.63"/></proof>
+  </goal>
+  <goal name="coherence.156" expl="156.">
+  <proof prover="1"><result status="valid" time="0.29" steps="163"/></proof>
+  </goal>
+  <goal name="coherence.157" expl="157.">
+  <proof prover="1"><result status="valid" time="0.08" steps="17"/></proof>
+  </goal>
+  <goal name="coherence.158" expl="158.">
+  <proof prover="1"><result status="valid" time="3.02" steps="658"/></proof>
+  </goal>
+  <goal name="coherence.159" expl="159.">
+  <proof prover="1"><result status="valid" time="3.46" steps="704"/></proof>
+  </goal>
+  <goal name="coherence.160" expl="160.">
+  <proof prover="1"><result status="valid" time="0.07" steps="21"/></proof>
+  </goal>
+  <goal name="coherence.161" expl="161.">
+  <proof prover="1"><result status="valid" time="0.31" steps="180"/></proof>
+  </goal>
+  <goal name="coherence.162" expl="162.">
+  <proof prover="4"><result status="valid" time="1.53"/></proof>
+  </goal>
+  <goal name="coherence.163" expl="163.">
+  <proof prover="1"><result status="valid" time="0.13" steps="180"/></proof>
+  </goal>
+  <goal name="coherence.164" expl="164.">
+  <proof prover="4"><result status="valid" time="1.20"/></proof>
+  </goal>
+  <goal name="coherence.165" expl="165.">
+  <proof prover="1"><result status="valid" time="0.28" steps="174"/></proof>
+  </goal>
+  <goal name="coherence.166" expl="166.">
+  <proof prover="1"><result status="valid" time="0.09" steps="18"/></proof>
+  </goal>
+  <goal name="coherence.167" expl="167.">
+  <proof prover="1"><result status="valid" time="0.82" steps="382"/></proof>
+  </goal>
+  <goal name="coherence.168" expl="168.">
+  <proof prover="1"><result status="valid" time="0.89" steps="422"/></proof>
+  </goal>
+  <goal name="coherence.169" expl="169.">
+  <proof prover="1"><result status="valid" time="0.23" steps="109"/></proof>
+  </goal>
+  <goal name="coherence.170" expl="170.">
+  <proof prover="1"><result status="valid" time="0.38" steps="320"/></proof>
+  </goal>
+  <goal name="coherence.171" expl="171.">
+  <proof prover="4"><result status="valid" time="1.17"/></proof>
+  </goal>
+  <goal name="coherence.172" expl="172.">
+  <proof prover="1"><result status="valid" time="0.42" steps="320"/></proof>
+  </goal>
+  <goal name="coherence.173" expl="173.">
+  <proof prover="4"><result status="valid" time="1.44"/></proof>
+  </goal>
+  <goal name="coherence.174" expl="174.">
+  <proof prover="1"><result status="valid" time="0.23" steps="200"/></proof>
+  </goal>
+  <goal name="coherence.175" expl="175.">
+  <proof prover="1"><result status="valid" time="0.13" steps="19"/></proof>
+  </goal>
+  <goal name="coherence.176" expl="176.">
+  <proof prover="1"><result status="valid" time="0.29" steps="224"/></proof>
+  </goal>
+  <goal name="coherence.177" expl="177.">
+  <proof prover="1"><result status="valid" time="0.43" steps="238"/></proof>
+  </goal>
+  <goal name="coherence.178" expl="178.">
+  <proof prover="1"><result status="valid" time="0.25" steps="86"/></proof>
+  </goal>
+  <goal name="coherence.179" expl="179.">
+  <proof prover="1"><result status="valid" time="0.84" steps="459"/></proof>
+  </goal>
+  <goal name="coherence.180" expl="180.">
+  <proof prover="1"><result status="valid" time="0.21" steps="92"/></proof>
+  </goal>
+  <goal name="coherence.181" expl="181.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.38"/></proof>
+  </goal>
+  <goal name="coherence.182" expl="182.">
+  <proof prover="1"><result status="valid" time="0.09" steps="34"/></proof>
+  </goal>
+  <goal name="coherence.183" expl="183.">
+  <proof prover="1"><result status="valid" time="0.09" steps="31"/></proof>
+  </goal>
+  <goal name="coherence.184" expl="184.">
+  <proof prover="1"><result status="valid" time="1.53" steps="645"/></proof>
+  </goal>
+  <goal name="coherence.185" expl="185.">
+  <proof prover="1"><result status="valid" time="1.84" steps="586"/></proof>
+  </goal>
+  <goal name="coherence.186" expl="186.">
+  <proof prover="1"><result status="valid" time="0.20" steps="168"/></proof>
+  </goal>
+  <goal name="coherence.187" expl="187.">
+  <proof prover="1"><result status="valid" time="1.01" steps="495"/></proof>
+  </goal>
+  <goal name="coherence.188" expl="188.">
+  <proof prover="1"><result status="valid" time="0.16" steps="156"/></proof>
+  </goal>
+  <goal name="coherence.189" expl="189.">
+  <proof prover="1"><result status="valid" time="0.51" steps="394"/></proof>
+  </goal>
+  <goal name="coherence.190" expl="190.">
+  <proof prover="1"><result status="valid" time="0.07" steps="16"/></proof>
+  </goal>
+  <goal name="coherence.191" expl="191.">
+  <proof prover="1"><result status="valid" time="4.11" steps="861"/></proof>
+  </goal>
+  <goal name="coherence.192" expl="192.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.63"/></proof>
+  </goal>
+  <goal name="coherence.193" expl="193.">
+  <proof prover="1"><result status="valid" time="3.25" steps="1352"/></proof>
+  </goal>
+  <goal name="coherence.194" expl="194.">
+  <proof prover="1"><result status="valid" time="0.14" steps="43"/></proof>
+  </goal>
+  <goal name="coherence.195" expl="195.">
+  <proof prover="1"><result status="valid" time="0.11" steps="34"/></proof>
+  </goal>
+  <goal name="coherence.196" expl="196.">
+  <proof prover="1"><result status="valid" time="5.46" steps="2182"/></proof>
+  </goal>
+  <goal name="coherence.197" expl="197.">
+  <proof prover="1"><result status="valid" time="0.30" steps="271"/></proof>
+  </goal>
+  <goal name="coherence.198" expl="198.">
+  <proof prover="1"><result status="valid" time="2.95" steps="1474"/></proof>
+  </goal>
+  <goal name="coherence.199" expl="199.">
+  <proof prover="1"><result status="valid" time="0.19" steps="37"/></proof>
+  </goal>
+  <goal name="coherence.200" expl="200.">
+  <proof prover="1"><result status="valid" time="0.20" steps="41"/></proof>
+  </goal>
+  <goal name="coherence.201" expl="201.">
+  <proof prover="1"><result status="valid" time="1.32" steps="608"/></proof>
+  </goal>
+  <goal name="coherence.202" expl="202.">
+  <proof prover="4"><result status="valid" time="1.81"/></proof>
+  </goal>
+  <goal name="coherence.203" expl="203.">
+  <proof prover="1"><result status="valid" time="0.58" steps="431"/></proof>
+  </goal>
+  <goal name="coherence.204" expl="204.">
+  <proof prover="1"><result status="valid" time="5.00" steps="2125"/></proof>
+  </goal>
+  <goal name="coherence.205" expl="205.">
+  <proof prover="1"><result status="valid" time="0.22" steps="73"/></proof>
+  </goal>
+  <goal name="coherence.206" expl="206.">
+  <proof prover="1"><result status="valid" time="0.09" steps="25"/></proof>
+  </goal>
+  <goal name="coherence.207" expl="207.">
+  <proof prover="1"><result status="valid" time="0.13" steps="95"/></proof>
+  </goal>
+  <goal name="coherence.208" expl="208.">
+  <proof prover="1"><result status="valid" time="0.07" steps="32"/></proof>
+  </goal>
+  <goal name="coherence.209" expl="209.">
+  <proof prover="1"><result status="valid" time="0.15" steps="27"/></proof>
+  </goal>
+  <goal name="coherence.210" expl="210.">
+  <proof prover="1"><result status="valid" time="4.60" steps="914"/></proof>
+  </goal>
+  <goal name="coherence.211" expl="211.">
+  <proof prover="1"><result status="valid" time="1.29" steps="512"/></proof>
+  </goal>
+  <goal name="coherence.212" expl="212.">
+  <proof prover="1"><result status="valid" time="0.17" steps="75"/></proof>
+  </goal>
+  <goal name="coherence.213" expl="213.">
+  <proof prover="1"><result status="valid" time="0.24" steps="242"/></proof>
+  </goal>
+  <goal name="coherence.214" expl="214.">
+  <proof prover="1"><result status="valid" time="0.27" steps="126"/></proof>
+  </goal>
+  <goal name="coherence.215" expl="215.">
+  <proof prover="1"><result status="valid" time="0.14" steps="104"/></proof>
+  </goal>
+  <goal name="coherence.216" expl="216.">
+  <proof prover="1"><result status="valid" time="0.25" steps="239"/></proof>
+  </goal>
+  <goal name="coherence.217" expl="217.">
+  <proof prover="1"><result status="valid" time="0.18" steps="190"/></proof>
+  </goal>
+  <goal name="coherence.218" expl="218.">
+  <proof prover="1"><result status="valid" time="0.40" steps="359"/></proof>
+  </goal>
+  <goal name="coherence.219" expl="219.">
+  <proof prover="4"><result status="valid" time="1.61"/></proof>
+  </goal>
+  <goal name="coherence.220" expl="220.">
+  <proof prover="1"><result status="valid" time="0.08" steps="42"/></proof>
+  </goal>
+  <goal name="coherence.221" expl="221.">
+  <proof prover="1"><result status="valid" time="0.12" steps="71"/></proof>
+  </goal>
+  <goal name="coherence.222" expl="222.">
+  <proof prover="4"><result status="valid" time="1.06"/></proof>
+  </goal>
+  <goal name="coherence.223" expl="223.">
+  <proof prover="4"><result status="valid" time="1.39"/></proof>
+  </goal>
+  <goal name="coherence.224" expl="224.">
+  <proof prover="1"><result status="valid" time="1.90" steps="699"/></proof>
+  </goal>
+  <goal name="coherence.225" expl="225.">
+  <proof prover="1"><result status="valid" time="1.99" steps="745"/></proof>
+  </goal>
+  <goal name="coherence.226" expl="226.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.32" steps="150"/></proof>
+  </goal>
+  <goal name="coherence.227" expl="227.">
+  <proof prover="1"><result status="valid" time="6.66" steps="1857"/></proof>
+  </goal>
+  <goal name="coherence.228" expl="228.">
+  <proof prover="1"><result status="valid" time="0.33" steps="169"/></proof>
+  </goal>
+  <goal name="coherence.229" expl="229.">
+  <proof prover="4"><result status="valid" time="1.78"/></proof>
+  </goal>
+  <goal name="coherence.230" expl="230.">
+  <proof prover="1"><result status="valid" time="0.14" steps="25"/></proof>
+  </goal>
+  <goal name="coherence.231" expl="231.">
+  <proof prover="4"><result status="valid" time="1.46"/></proof>
+  </goal>
+  <goal name="coherence.232" expl="232.">
+  <proof prover="4"><result status="valid" time="1.10"/></proof>
+  </goal>
+  <goal name="coherence.233" expl="233.">
+  <proof prover="1"><result status="valid" time="1.47" steps="591"/></proof>
+  </goal>
+  <goal name="coherence.234" expl="234.">
+  <proof prover="1"><result status="valid" time="1.26" steps="629"/></proof>
+  </goal>
+  <goal name="coherence.235" expl="235.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="127"/></proof>
+  </goal>
+  <goal name="coherence.236" expl="236.">
+  <proof prover="1"><result status="valid" time="5.23" steps="1160"/></proof>
+  </goal>
+  <goal name="coherence.237" expl="237.">
+  <proof prover="1"><result status="valid" time="0.24" steps="130"/></proof>
+  </goal>
+  <goal name="coherence.238" expl="238.">
+  <proof prover="4"><result status="valid" time="2.27"/></proof>
+  </goal>
+  <goal name="coherence.239" expl="239.">
+  <proof prover="1"><result status="valid" time="0.07" steps="25"/></proof>
+  </goal>
+  <goal name="coherence.240" expl="240.">
+  <proof prover="1"><result status="valid" time="0.27" steps="160"/></proof>
+  </goal>
+  <goal name="coherence.241" expl="241.">
+  <proof prover="1"><result status="valid" time="0.23" steps="119"/></proof>
+  </goal>
+  <goal name="coherence.242" expl="242.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="39"/></proof>
+  </goal>
+  <goal name="coherence.243" expl="243.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.44" steps="278"/></proof>
+  </goal>
+  <goal name="coherence.244" expl="244.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.43" steps="278"/></proof>
+  </goal>
+  <goal name="coherence.245" expl="245.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="107"/></proof>
+  </goal>
+  <goal name="coherence.246" expl="246.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.20" steps="907"/></proof>
+  </goal>
+  <goal name="coherence.247" expl="247.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="133"/></proof>
+  </goal>
+  <goal name="coherence.248" expl="248.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="31"/></proof>
+  </goal>
+  <goal name="coherence.249" expl="249.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.65" steps="477"/></proof>
+  </goal>
+  <goal name="coherence.250" expl="250.">
+  <proof prover="4"><result status="valid" time="1.37"/></proof>
+  </goal>
+  <goal name="coherence.251" expl="251.">
+  <proof prover="4"><result status="valid" time="2.02"/></proof>
+  </goal>
+  <goal name="coherence.252" expl="252.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.51" steps="882"/></proof>
+  </goal>
+  <goal name="coherence.253" expl="253.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.88" steps="694"/></proof>
+  </goal>
+  <goal name="coherence.254" expl="254.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.33" steps="163"/></proof>
+  </goal>
+  <goal name="coherence.255" expl="255.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="47"/></proof>
+  </goal>
+  <goal name="coherence.256" expl="256.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="105"/></proof>
+  </goal>
+  <goal name="coherence.257" expl="257.">
+  <proof prover="4"><result status="valid" time="1.35"/></proof>
+  </goal>
+  <goal name="coherence.258" expl="258.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="90"/></proof>
+  </goal>
+  <goal name="coherence.259" expl="259.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="275"/></proof>
+  </goal>
+  <goal name="coherence.260" expl="260.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="141"/></proof>
+  </goal>
+  <goal name="coherence.261" expl="261.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.43" steps="505"/></proof>
+  </goal>
+  <goal name="coherence.262" expl="262.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.69" steps="641"/></proof>
+  </goal>
+  <goal name="coherence.263" expl="263.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.19" steps="1167"/></proof>
+  </goal>
+  <goal name="coherence.264" expl="264.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.08" steps="634"/></proof>
+  </goal>
+  <goal name="coherence.265" expl="265.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="77"/></proof>
+  </goal>
+  <goal name="coherence.266" expl="266.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.16" steps="643"/></proof>
+  </goal>
+  <goal name="coherence.267" expl="267.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.34" steps="151"/></proof>
+  </goal>
+  <goal name="coherence.268" expl="268.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="34"/></proof>
+  </goal>
+  <goal name="coherence.269" expl="269.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.74" steps="457"/></proof>
+  </goal>
+  <goal name="coherence.270" expl="270.">
+  <proof prover="4"><result status="valid" time="2.12"/></proof>
+  </goal>
+  <goal name="coherence.271" expl="271.">
+  <proof prover="4"><result status="valid" time="2.59"/></proof>
+  </goal>
+  <goal name="coherence.272" expl="272.">
+  <proof prover="4"><result status="valid" time="2.59"/></proof>
+  </goal>
+  <goal name="coherence.273" expl="273.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.37" steps="833"/></proof>
+  </goal>
+  <goal name="coherence.274" expl="274.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.24" steps="184"/></proof>
+  </goal>
+  <goal name="coherence.275" expl="275.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="44"/></proof>
+  </goal>
+  <goal name="coherence.276" expl="276.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="coherence.277" expl="277.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="coherence.278" expl="278.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="coherence.279" expl="279.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="16"/></proof>
+  </goal>
+  <goal name="coherence.280" expl="280.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="16"/></proof>
+  </goal>
+  <goal name="coherence.281" expl="281.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="4.63"/></proof>
+  </goal>
+  <goal name="coherence.282" expl="282.">
+  <proof prover="1"><result status="valid" time="0.10" steps="26"/></proof>
+  </goal>
+  <goal name="coherence.283" expl="283.">
+  <proof prover="1"><result status="valid" time="0.08" steps="22"/></proof>
+  </goal>
+  <goal name="coherence.284" expl="284.">
+  <proof prover="4"><result status="valid" time="1.06"/></proof>
+  </goal>
+  <goal name="coherence.285" expl="285.">
+  <proof prover="1"><result status="valid" time="0.07" steps="26"/></proof>
+  </goal>
+  <goal name="coherence.286" expl="286.">
+  <proof prover="4"><result status="valid" time="4.90"/></proof>
+  </goal>
+  <goal name="coherence.287" expl="287.">
+  <proof prover="1"><result status="valid" time="0.07" steps="17"/></proof>
+  </goal>
+  <goal name="coherence.288" expl="288.">
+  <proof prover="1"><result status="valid" time="0.07" steps="17"/></proof>
+  </goal>
+  <goal name="coherence.289" expl="289.">
+  <proof prover="1"><result status="valid" time="2.64" steps="672"/></proof>
+  </goal>
+  <goal name="coherence.290" expl="290.">
+  <proof prover="4"><result status="valid" time="1.28"/></proof>
+  </goal>
+  <goal name="coherence.291" expl="291.">
+  <proof prover="1"><result status="valid" time="3.73" steps="682"/></proof>
+  </goal>
+  <goal name="coherence.292" expl="292.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="0.74"/></proof>
+  </goal>
+  <goal name="coherence.293" expl="293.">
+  <proof prover="1"><result status="valid" time="4.08" steps="727"/></proof>
+  </goal>
+  <goal name="coherence.294" expl="294.">
+  <proof prover="4"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="coherence.295" expl="295.">
+  <proof prover="1"><result status="valid" time="0.08" steps="20"/></proof>
+  </goal>
+  <goal name="coherence.296" expl="296.">
+  <proof prover="1"><result status="valid" time="1.30" steps="458"/></proof>
+  </goal>
+  <goal name="coherence.297" expl="297.">
+  <proof prover="1"><result status="valid" time="0.66" steps="317"/></proof>
+  </goal>
+  <goal name="coherence.298" expl="298.">
+  <proof prover="1"><result status="valid" time="0.26" steps="109"/></proof>
+  </goal>
+  <goal name="coherence.299" expl="299.">
+  <proof prover="1"><result status="valid" time="0.36" steps="230"/></proof>
+  </goal>
+  <goal name="coherence.300" expl="300.">
+  <proof prover="1"><result status="valid" time="0.23" steps="54"/></proof>
+  </goal>
+  <goal name="coherence.301" expl="301.">
+  <proof prover="1"><result status="valid" time="0.18" steps="218"/></proof>
+  </goal>
+  <goal name="coherence.302" expl="302.">
+  <proof prover="4"><result status="valid" time="1.47"/></proof>
+  </goal>
+  <goal name="coherence.303" expl="303.">
+  <proof prover="1"><result status="valid" time="0.08" steps="32"/></proof>
+  </goal>
+  <goal name="coherence.304" expl="304.">
+  <proof prover="1"><result status="valid" time="0.07" steps="25"/></proof>
+  </goal>
+  <goal name="coherence.305" expl="305.">
+  <proof prover="1"><result status="valid" time="2.50" steps="1296"/></proof>
+  </goal>
+  <goal name="coherence.306" expl="306.">
+  <proof prover="4"><result status="valid" time="1.85"/></proof>
+  </goal>
+  <goal name="coherence.307" expl="307.">
+  <proof prover="1"><result status="valid" time="0.19" steps="64"/></proof>
+  </goal>
+  <goal name="coherence.308" expl="308.">
+  <proof prover="1"><result status="valid" time="0.24" steps="209"/></proof>
+  </goal>
+  <goal name="coherence.309" expl="309.">
+  <proof prover="1"><result status="valid" time="0.15" steps="77"/></proof>
+  </goal>
+  <goal name="coherence.310" expl="310.">
+  <proof prover="1"><result status="valid" time="0.09" steps="22"/></proof>
+  </goal>
+  <goal name="coherence.311" expl="311.">
+  <proof prover="1"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="coherence.312" expl="312.">
+  <proof prover="1"><result status="valid" time="0.08" steps="22"/></proof>
+  </goal>
+  <goal name="coherence.313" expl="313.">
+  <proof prover="1"><result status="valid" time="0.18" steps="181"/></proof>
+  </goal>
+  <goal name="coherence.314" expl="314.">
+  <proof prover="1"><result status="valid" time="1.16" steps="843"/></proof>
+  </goal>
+  <goal name="coherence.315" expl="315.">
+  <proof prover="1"><result status="valid" time="0.08" steps="31"/></proof>
+  </goal>
+  <goal name="coherence.316" expl="316.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="4.09"/></proof>
+  </goal>
+  <goal name="coherence.317" expl="317.">
+  <proof prover="1"><result status="valid" time="0.10" steps="34"/></proof>
+  </goal>
+  <goal name="coherence.318" expl="318.">
+  <proof prover="1"><result status="valid" time="0.08" steps="27"/></proof>
+  </goal>
+  <goal name="coherence.319" expl="319.">
+  <proof prover="1"><result status="valid" time="0.17" steps="150"/></proof>
+  </goal>
+  <goal name="coherence.320" expl="320.">
+  <proof prover="1"><result status="valid" time="0.07" steps="31"/></proof>
+  </goal>
+  <goal name="coherence.321" expl="321.">
+  <proof prover="1"><result status="valid" time="0.08" steps="95"/></proof>
+  </goal>
+  <goal name="coherence.322" expl="322.">
+  <proof prover="1"><result status="valid" time="0.27" steps="154"/></proof>
+  </goal>
+  <goal name="coherence.323" expl="323.">
+  <proof prover="1"><result status="valid" time="0.84" steps="572"/></proof>
+  </goal>
+  <goal name="coherence.324" expl="324.">
+  <proof prover="1"><result status="valid" time="0.30" steps="140"/></proof>
+  </goal>
+  <goal name="coherence.325" expl="325.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.52"/></proof>
+  </goal>
+  <goal name="coherence.326" expl="326.">
+  <proof prover="1"><result status="valid" time="0.11" steps="39"/></proof>
+  </goal>
+  <goal name="coherence.327" expl="327.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="4.09"/></proof>
+  </goal>
+  <goal name="coherence.328" expl="328.">
+  <proof prover="1"><result status="valid" time="0.09" steps="22"/></proof>
+  </goal>
+  <goal name="coherence.329" expl="329.">
+  <proof prover="1"><result status="valid" time="2.66" steps="1550"/></proof>
+  </goal>
+  <goal name="coherence.330" expl="330.">
+  <proof prover="1"><result status="valid" time="0.36" steps="287"/></proof>
+  </goal>
+  <goal name="coherence.331" expl="331.">
+  <proof prover="4"><result status="valid" time="5.06"/></proof>
+  </goal>
+  <goal name="coherence.332" expl="332.">
+  <proof prover="1"><result status="valid" time="1.82" steps="1466"/></proof>
+  </goal>
+  <goal name="coherence.333" expl="333.">
+  <proof prover="1"><result status="valid" time="0.09" steps="38"/></proof>
+  </goal>
+  <goal name="coherence.334" expl="334.">
+  <proof prover="1"><result status="valid" time="0.21" steps="70"/></proof>
+  </goal>
+  <goal name="coherence.335" expl="335.">
+  <proof prover="1"><result status="valid" time="0.22" steps="119"/></proof>
+  </goal>
+  <goal name="coherence.336" expl="336.">
+  <proof prover="4"><result status="valid" time="1.68"/></proof>
+  </goal>
+  <goal name="coherence.337" expl="337.">
+  <proof prover="1"><result status="valid" time="3.00" steps="1991"/></proof>
+  </goal>
+  <goal name="coherence.338" expl="338.">
+  <proof prover="1"><result status="valid" time="1.05" steps="579"/></proof>
+  </goal>
+  <goal name="coherence.339" expl="339.">
+  <proof prover="1"><result status="valid" time="0.16" steps="68"/></proof>
+  </goal>
+  <goal name="coherence.340" expl="340.">
+  <proof prover="1"><result status="valid" time="0.10" steps="24"/></proof>
+  </goal>
+  <goal name="coherence.341" expl="341.">
+  <proof prover="1"><result status="valid" time="0.13" steps="42"/></proof>
+  </goal>
+  <goal name="coherence.342" expl="342.">
+  <transf name="introduce_premises">
+   <goal name="coherence.342.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="coherence.342.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="coherence.342.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.06" steps="9"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.2" expl="2.">
+     <proof prover="1"><result status="valid" time="0.05" steps="9"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.3" expl="3.">
+     <proof prover="1"><result status="valid" time="0.06" steps="9"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.4" expl="4.">
+     <proof prover="1"><result status="valid" time="0.07" steps="38"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.5" expl="5.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="89"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.6" expl="6.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="89"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.7" expl="7.">
+     <proof prover="1"><result status="valid" time="0.08" steps="17"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.8" expl="8.">
+     <proof prover="1"><result status="valid" time="0.13" steps="37"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.9" expl="9.">
+     <proof prover="1"><result status="valid" time="0.07" steps="17"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.10" expl="10.">
+     <proof prover="1"><result status="valid" time="0.15" steps="34"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.11" expl="11.">
+     <proof prover="1"><result status="valid" time="1.17" steps="746"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.12" expl="12.">
+     <proof prover="1"><result status="valid" time="0.22" steps="75"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.13" expl="13.">
+     <proof prover="1"><result status="valid" time="0.23" steps="101"/></proof>
+     </goal>
+     <goal name="coherence.342.1.1.14" expl="14.">
+     <proof prover="1"><result status="valid" time="0.20" steps="72"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="coherence.343" expl="343.">
+  <transf name="induction_pr">
+   <goal name="coherence.343.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="coherence.343.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="coherence.343.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.07" steps="3"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="coherence.343.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="coherence.343.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="coherence.343.2.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.09" steps="18"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="coherence.343.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="coherence.343.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="coherence.343.3.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.18" steps="85"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="coherence.344" expl="344.">
+  <proof prover="1"><result status="valid" time="0.09" steps="22"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="maximal_witness_unicity_prelude">
+ <transf name="split_goal_wp">
+  <goal name="maximal_witness_unicity_prelude.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.10" steps="16"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.07" steps="16"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.3" expl="3.">
+  <proof prover="1"><result status="valid" time="1.84" steps="461"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.4" expl="4.">
+  <proof prover="1"><result status="valid" time="0.66" steps="251"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.73" steps="277"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.69" steps="363"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.7" expl="7.">
+  <proof prover="4"><result status="valid" time="1.80"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.8" expl="8.">
+  <proof prover="4"><result status="valid" time="1.84"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.82" steps="491"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.38" steps="306"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.11" steps="63"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.12" expl="12.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="256"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.13" expl="13.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="43"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.14" expl="14.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="261"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.15" expl="15.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.66" steps="237"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.16" expl="16.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.52" steps="235"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.17" expl="17.">
+  <proof prover="4"><result status="valid" time="1.91"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.18" expl="18.">
+  <proof prover="4"><result status="valid" time="1.82"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.19" expl="19.">
+  <proof prover="4"><result status="valid" time="1.68"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.20" expl="20.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="52"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.29" steps="167"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.22" expl="22.">
+  <proof prover="1"><result status="valid" time="0.46" steps="337"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.23" expl="23.">
+  <proof prover="1"><result status="valid" time="3.94" steps="1581"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.24" expl="24.">
+  <proof prover="1"><result status="valid" time="0.31" steps="166"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.25" expl="25.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.46" steps="217"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.26" expl="26.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.09"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.27" expl="27.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.71" steps="498"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.28" expl="28.">
+  <proof prover="4"><result status="valid" time="1.58"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.29" expl="29.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="44"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.30" expl="30.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="28"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.31" expl="31.">
+  <proof prover="4"><result status="valid" time="1.87"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.32" expl="32.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="47"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.33" expl="33.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.55" steps="253"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.34" expl="34.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.99" steps="567"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.35" expl="35.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.51" steps="247"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.36" expl="36.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.80" steps="386"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.37" expl="37.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.60"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.38" expl="38.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="57"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.39" expl="39.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="176"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.40" expl="40.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.63" steps="375"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.41" expl="41.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.98" steps="1122"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.42" expl="42.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="177"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.43" expl="43.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.21" steps="606"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.44" expl="44.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="103"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.45" expl="45.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="48"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.46" expl="46.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47" steps="253"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.47" expl="47.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.66" steps="246"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.48" expl="48.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.13"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.49" expl="49.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.93" steps="368"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.50" expl="50.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.59"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.51" expl="51.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="51"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.52" expl="52.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.16" steps="1845"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.53" expl="53.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.13" steps="1427"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.54" expl="54.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.14"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.55" expl="55.">
+  <proof prover="1"><result status="valid" time="0.21" steps="43"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.56" expl="56.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.55" steps="340"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.57" expl="57.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.40" steps="157"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.58" expl="58.">
+  <proof prover="1"><result status="valid" time="0.11" steps="30"/></proof>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.59" expl="59.">
+  <transf name="induction_pr">
+   <goal name="maximal_witness_unicity_prelude.59.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="maximal_witness_unicity_prelude.59.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="maximal_witness_unicity_prelude.59.1.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="0.08" steps="14"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="maximal_witness_unicity_prelude.59.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="maximal_witness_unicity_prelude.59.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="maximal_witness_unicity_prelude.59.2.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="1.14" steps="762"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="maximal_witness_unicity_prelude.59.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="maximal_witness_unicity_prelude.59.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="maximal_witness_unicity_prelude.59.3.1.1" expl="1.">
+     <proof prover="1"><result status="valid" time="1.81" steps="1339"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="maximal_witness_unicity_prelude.60" expl="60.">
+  <proof prover="1"><result status="valid" time="0.31" steps="95"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="maximal_witness_unique">
+ <transf name="split_goal_wp">
+  <goal name="maximal_witness_unique.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.08" steps="23"/></proof>
+  </goal>
+  <goal name="maximal_witness_unique.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.15" steps="106"/></proof>
+  </goal>
+  <goal name="maximal_witness_unique.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.16" steps="106"/></proof>
+  </goal>
+  <goal name="maximal_witness_unique.4" expl="4.">
+  <proof prover="4"><result status="valid" time="0.38"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sim_angel_reach">
+ <transf name="split_goal_wp">
+  <goal name="sim_angel_reach.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="65"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.3" expl="3.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.22"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="43"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.5" expl="5.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="133"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.6" expl="6.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.67"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.7" expl="7.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.33"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.8" expl="8.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.94" steps="686"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.30" steps="156"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.89" steps="559"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.11" expl="11.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.69" steps="377"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.12" expl="12.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.94"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.13" expl="13.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.51" steps="447"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.14" expl="14.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="169"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.15" expl="15.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="75"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.16" expl="16.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="75"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.17" expl="17.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.80"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.18" expl="18.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.21" steps="579"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.19" expl="19.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="22"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.20" expl="20.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.99" steps="423"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="57"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.22" expl="22.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="26"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.23" expl="23.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="204"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.24" expl="24.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="23"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.25" expl="25.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="165"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.26" expl="26.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.90" steps="377"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.27" expl="27.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.42" steps="175"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.28" expl="28.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.27" steps="977"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.29" expl="29.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.91"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.30" expl="30.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.11"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.31" expl="31.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="15"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.32" expl="32.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="68"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.33" expl="33.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.43"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.34" expl="34.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.87"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.35" expl="35.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="40"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.36" expl="36.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="157"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.37" expl="37.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="21"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.38" expl="38.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.54" steps="385"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.39" expl="39.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.82"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.40" expl="40.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="26"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.41" expl="41.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.27"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.42" expl="42.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.02" steps="1119"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.43" expl="43.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.89" steps="865"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.44" expl="44.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="46"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.45" expl="45.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="47"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.46" expl="46.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="43"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.47" expl="47.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="42"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.48" expl="48.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="56"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.49" expl="49.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.87"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.50" expl="50.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="0"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.51" expl="51.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.39" steps="226"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.52" expl="52.">
+  <proof prover="0" timelimit="20" steplimit="-1"><result status="valid" time="5.74"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.53" expl="53.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="229"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.54" expl="54.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.39" steps="226"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.55" expl="55.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="19"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.56" expl="56.">
+  <transf name="introduce_premises">
+   <goal name="sim_angel_reach.56.1" expl="1.">
+   <transf name="inline_goal">
+    <goal name="sim_angel_reach.56.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="sim_angel_reach.56.1.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="1.80" steps="1399"/></proof>
+     </goal>
+     <goal name="sim_angel_reach.56.1.1.2" expl="2.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.72" steps="637"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sim_angel_reach.57" expl="57.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.33" steps="237"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.58" expl="58.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="34"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.59" expl="59.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="71"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.60" expl="60.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="19"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.61" expl="61.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47" steps="428"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.62" expl="62.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="16"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.63" expl="63.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.31" steps="675"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.64" expl="64.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.41" steps="329"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.65" expl="65.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="28"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.66" expl="66.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="236"/></proof>
+  </goal>
+  <goal name="sim_angel_reach.67" expl="67.">
+  <transf name="induction_pr">
+   <goal name="sim_angel_reach.67.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="sim_angel_reach.67.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="sim_angel_reach.67.1.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="138"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="sim_angel_reach.67.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="sim_angel_reach.67.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="sim_angel_reach.67.2.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="14"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="sim_angel_reach.67.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="sim_angel_reach.67.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="sim_angel_reach.67.3.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="184"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sim_angel_reach.68" expl="68.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="36"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="all_locally_winning">
+ <transf name="split_goal_wp">
+  <goal name="all_locally_winning.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="175"/></proof>
+  </goal>
+  <goal name="all_locally_winning.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="90"/></proof>
+  </goal>
+  <goal name="all_locally_winning.3" expl="3.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="93"/></proof>
+  </goal>
+  <goal name="all_locally_winning.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="60"/></proof>
+  </goal>
+  <goal name="all_locally_winning.5" expl="5.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="76"/></proof>
+  </goal>
+  <goal name="all_locally_winning.6" expl="6.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.13" steps="519"/></proof>
+  </goal>
+  <goal name="all_locally_winning.7" expl="7.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.17"/></proof>
+  </goal>
+  <goal name="all_locally_winning.8" expl="8.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47" steps="379"/></proof>
+  </goal>
+  <goal name="all_locally_winning.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.43" steps="858"/></proof>
+  </goal>
+  <goal name="all_locally_winning.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.29" steps="546"/></proof>
+  </goal>
+  <goal name="all_locally_winning.11" expl="11.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.33" steps="611"/></proof>
+  </goal>
+  <goal name="all_locally_winning.12" expl="12.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.05" steps="1094"/></proof>
+  </goal>
+  <goal name="all_locally_winning.13" expl="13.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.74" steps="373"/></proof>
+  </goal>
+  <goal name="all_locally_winning.14" expl="14.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="22"/></proof>
+  </goal>
+  <goal name="all_locally_winning.15" expl="15.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.79" steps="847"/></proof>
+  </goal>
+  <goal name="all_locally_winning.16" expl="16.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.58" steps="716"/></proof>
+  </goal>
+  <goal name="all_locally_winning.17" expl="17.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.99" steps="1158"/></proof>
+  </goal>
+  <goal name="all_locally_winning.18" expl="18.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="52"/></proof>
+  </goal>
+  <goal name="all_locally_winning.19" expl="19.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.32" steps="197"/></proof>
+  </goal>
+  <goal name="all_locally_winning.20" expl="20.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="13"/></proof>
+  </goal>
+  <goal name="all_locally_winning.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.46" steps="187"/></proof>
+  </goal>
+  <goal name="all_locally_winning.22" expl="22.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.52" steps="732"/></proof>
+  </goal>
+  <goal name="all_locally_winning.23" expl="23.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.29" steps="161"/></proof>
+  </goal>
+  <goal name="all_locally_winning.24" expl="24.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="86"/></proof>
+  </goal>
+  <goal name="all_locally_winning.25" expl="25.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="4.14" steps="1604"/></proof>
+  </goal>
+  <goal name="all_locally_winning.26" expl="26.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.75" steps="355"/></proof>
+  </goal>
+  <goal name="all_locally_winning.27" expl="27.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="25"/></proof>
+  </goal>
+  <goal name="all_locally_winning.28" expl="28.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.78" steps="1091"/></proof>
+  </goal>
+  <goal name="all_locally_winning.29" expl="29.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="81"/></proof>
+  </goal>
+  <goal name="all_locally_winning.30" expl="30.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="32"/></proof>
+  </goal>
+  <goal name="all_locally_winning.31" expl="31.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47" steps="192"/></proof>
+  </goal>
+  <goal name="all_locally_winning.32" expl="32.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.98" steps="630"/></proof>
+  </goal>
+  <goal name="all_locally_winning.33" expl="33.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.19"/></proof>
+  </goal>
+  <goal name="all_locally_winning.34" expl="34.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="15"/></proof>
+  </goal>
+  <goal name="all_locally_winning.35" expl="35.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.34" steps="235"/></proof>
+  </goal>
+  <goal name="all_locally_winning.36" expl="36.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.79" steps="407"/></proof>
+  </goal>
+  <goal name="all_locally_winning.37" expl="37.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="18"/></proof>
+  </goal>
+  <goal name="all_locally_winning.38" expl="38.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="75"/></proof>
+  </goal>
+  <goal name="all_locally_winning.39" expl="39.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="7"/></proof>
+  </goal>
+  <goal name="all_locally_winning.40" expl="40.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="83"/></proof>
+  </goal>
+  <goal name="all_locally_winning.41" expl="41.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="161"/></proof>
+  </goal>
+  <goal name="all_locally_winning.42" expl="42.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="101"/></proof>
+  </goal>
+  <goal name="all_locally_winning.43" expl="43.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="60"/></proof>
+  </goal>
+  <goal name="all_locally_winning.44" expl="44.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="128"/></proof>
+  </goal>
+  <goal name="all_locally_winning.45" expl="45.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="74"/></proof>
+  </goal>
+  <goal name="all_locally_winning.46" expl="46.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="63"/></proof>
+  </goal>
+  <goal name="all_locally_winning.47" expl="47.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.56" steps="476"/></proof>
+  </goal>
+  <goal name="all_locally_winning.48" expl="48.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="40"/></proof>
+  </goal>
+  <goal name="all_locally_winning.49" expl="49.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="77"/></proof>
+  </goal>
+  <goal name="all_locally_winning.50" expl="50.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="251"/></proof>
+  </goal>
+  <goal name="all_locally_winning.51" expl="51.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.67" steps="560"/></proof>
+  </goal>
+  <goal name="all_locally_winning.52" expl="52.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="107"/></proof>
+  </goal>
+  <goal name="all_locally_winning.53" expl="53.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.67" steps="476"/></proof>
+  </goal>
+  <goal name="all_locally_winning.54" expl="54.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="40"/></proof>
+  </goal>
+  <goal name="all_locally_winning.55" expl="55.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="77"/></proof>
+  </goal>
+  <goal name="all_locally_winning.56" expl="56.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="251"/></proof>
+  </goal>
+  <goal name="all_locally_winning.57" expl="57.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.58" steps="556"/></proof>
+  </goal>
+  <goal name="all_locally_winning.58" expl="58.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="107"/></proof>
+  </goal>
+  <goal name="all_locally_winning.59" expl="59.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="59"/></proof>
+  </goal>
+  <goal name="all_locally_winning.60" expl="60.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="52"/></proof>
+  </goal>
+  <goal name="all_locally_winning.61" expl="61.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="76"/></proof>
+  </goal>
+  <goal name="all_locally_winning.62" expl="62.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="23"/></proof>
+  </goal>
+  <goal name="all_locally_winning.63" expl="63.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.96"/></proof>
+  </goal>
+  <goal name="all_locally_winning.64" expl="64.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="47"/></proof>
+  </goal>
+  <goal name="all_locally_winning.65" expl="65.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.37" steps="125"/></proof>
+  </goal>
+  <goal name="all_locally_winning.66" expl="66.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.24" steps="83"/></proof>
+  </goal>
+  <goal name="all_locally_winning.67" expl="67.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.37" steps="262"/></proof>
+  </goal>
+  <goal name="all_locally_winning.68" expl="68.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.41" steps="265"/></proof>
+  </goal>
+  <goal name="all_locally_winning.69" expl="69.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="41"/></proof>
+  </goal>
+  <goal name="all_locally_winning.70" expl="70.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.69" steps="362"/></proof>
+  </goal>
+  <goal name="all_locally_winning.71" expl="71.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="95"/></proof>
+  </goal>
+  <goal name="all_locally_winning.72" expl="72.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.63" steps="1064"/></proof>
+  </goal>
+  <goal name="all_locally_winning.73" expl="73.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.00" steps="1286"/></proof>
+  </goal>
+  <goal name="all_locally_winning.74" expl="74.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="95"/></proof>
+  </goal>
+  <goal name="all_locally_winning.75" expl="75.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.31"/></proof>
+  </goal>
+  <goal name="all_locally_winning.76" expl="76.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.95"/></proof>
+  </goal>
+  <goal name="all_locally_winning.77" expl="77.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.54" steps="1222"/></proof>
+  </goal>
+  <goal name="all_locally_winning.78" expl="78.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="25"/></proof>
+  </goal>
+  <goal name="all_locally_winning.79" expl="79.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.30" steps="393"/></proof>
+  </goal>
+  <goal name="all_locally_winning.80" expl="80.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="35"/></proof>
+  </goal>
+  <goal name="all_locally_winning.81" expl="81.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="57"/></proof>
+  </goal>
+  <goal name="all_locally_winning.82" expl="82.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="244"/></proof>
+  </goal>
+  <goal name="all_locally_winning.83" expl="83.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.11" steps="571"/></proof>
+  </goal>
+  <goal name="all_locally_winning.84" expl="84.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="32"/></proof>
+  </goal>
+  <goal name="all_locally_winning.85" expl="85.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.44" steps="159"/></proof>
+  </goal>
+  <goal name="all_locally_winning.86" expl="86.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.23" steps="1285"/></proof>
+  </goal>
+  <goal name="all_locally_winning.87" expl="87.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.36"/></proof>
+  </goal>
+  <goal name="all_locally_winning.88" expl="88.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="34"/></proof>
+  </goal>
+  <goal name="all_locally_winning.89" expl="89.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="37"/></proof>
+  </goal>
+  <goal name="all_locally_winning.90" expl="90.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="39"/></proof>
+  </goal>
+  <goal name="all_locally_winning.91" expl="91.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="43"/></proof>
+  </goal>
+  <goal name="all_locally_winning.92" expl="92.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="43"/></proof>
+  </goal>
+  <goal name="all_locally_winning.93" expl="93.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="43"/></proof>
+  </goal>
+  <goal name="all_locally_winning.94" expl="94.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.24" steps="267"/></proof>
+  </goal>
+  <goal name="all_locally_winning.95" expl="95.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.25"/></proof>
+  </goal>
+  <goal name="all_locally_winning.96" expl="96.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="72"/></proof>
+  </goal>
+  <goal name="all_locally_winning.97" expl="97.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.35"/></proof>
+  </goal>
+  <goal name="all_locally_winning.98" expl="98.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="5"/></proof>
+  </goal>
+  <goal name="all_locally_winning.99" expl="99.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="146"/></proof>
+  </goal>
+  <goal name="all_locally_winning.100" expl="100.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="120"/></proof>
+  </goal>
+  <goal name="all_locally_winning.101" expl="101.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.92"/></proof>
+  </goal>
+  <goal name="all_locally_winning.102" expl="102.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="42"/></proof>
+  </goal>
+  <goal name="all_locally_winning.103" expl="103.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.24" steps="83"/></proof>
+  </goal>
+  <goal name="all_locally_winning.104" expl="104.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="4.37" steps="2128"/></proof>
+  </goal>
+  <goal name="all_locally_winning.105" expl="105.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="5"/></proof>
+  </goal>
+  <goal name="all_locally_winning.106" expl="106.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.01"/></proof>
+  </goal>
+  <goal name="all_locally_winning.107" expl="107.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="49"/></proof>
+  </goal>
+  <goal name="all_locally_winning.108" expl="108.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="104"/></proof>
+  </goal>
+  <goal name="all_locally_winning.109" expl="109.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.58"/></proof>
+  </goal>
+  <goal name="all_locally_winning.110" expl="110.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.51"/></proof>
+  </goal>
+  <goal name="all_locally_winning.111" expl="111.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.40" steps="213"/></proof>
+  </goal>
+  <goal name="all_locally_winning.112" expl="112.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.21" steps="70"/></proof>
+  </goal>
+  <goal name="all_locally_winning.113" expl="113.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="6.19"/></proof>
+  </goal>
+  <goal name="all_locally_winning.114" expl="114.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="56"/></proof>
+  </goal>
+  <goal name="all_locally_winning.115" expl="115.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="112"/></proof>
+  </goal>
+  <goal name="all_locally_winning.116" expl="116.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.21"/></proof>
+  </goal>
+  <goal name="all_locally_winning.117" expl="117.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="4.51"/></proof>
+  </goal>
+  <goal name="all_locally_winning.118" expl="118.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="97"/></proof>
+  </goal>
+  <goal name="all_locally_winning.119" expl="119.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="37"/></proof>
+  </goal>
+  <goal name="all_locally_winning.120" expl="120.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.65" steps="624"/></proof>
+  </goal>
+  <goal name="all_locally_winning.121" expl="121.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="37"/></proof>
+  </goal>
+  <goal name="all_locally_winning.122" expl="122.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="5"/></proof>
+  </goal>
+  <goal name="all_locally_winning.123" expl="123.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="93"/></proof>
+  </goal>
+  <goal name="all_locally_winning.124" expl="124.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.76" steps="313"/></proof>
+  </goal>
+  <goal name="all_locally_winning.125" expl="125.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.71" steps="314"/></proof>
+  </goal>
+  <goal name="all_locally_winning.126" expl="126.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="46"/></proof>
+  </goal>
+  <goal name="all_locally_winning.127" expl="127.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.09" steps="422"/></proof>
+  </goal>
+  <goal name="all_locally_winning.128" expl="128.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.25" steps="502"/></proof>
+  </goal>
+  <goal name="all_locally_winning.129" expl="129.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.26" steps="544"/></proof>
+  </goal>
+  <goal name="all_locally_winning.130" expl="130.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.87" steps="1602"/></proof>
+  </goal>
+  <goal name="all_locally_winning.131" expl="131.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.69" steps="1572"/></proof>
+  </goal>
+  <goal name="all_locally_winning.132" expl="132.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="38"/></proof>
+  </goal>
+  <goal name="all_locally_winning.133" expl="133.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.27" steps="791"/></proof>
+  </goal>
+  <goal name="all_locally_winning.134" expl="134.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.95"/></proof>
+  </goal>
+  <goal name="all_locally_winning.135" expl="135.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="181"/></proof>
+  </goal>
+  <goal name="all_locally_winning.136" expl="136.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="5"/></proof>
+  </goal>
+  <goal name="all_locally_winning.137" expl="137.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="99"/></proof>
+  </goal>
+  <goal name="all_locally_winning.138" expl="138.">
+  <transf name="induction_pr">
+   <goal name="all_locally_winning.138.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="all_locally_winning.138.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="all_locally_winning.138.1.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="3"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="all_locally_winning.138.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="all_locally_winning.138.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="all_locally_winning.138.2.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="65"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="all_locally_winning.138.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="all_locally_winning.138.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="all_locally_winning.138.3.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.33" steps="157"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_locally_winning.139" expl="139.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="39"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="descendant_compat">
+ <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="68"/></proof>
+ </goal>
+ <goal name="reconstruction">
+ <transf name="split_goal_wp">
+  <goal name="reconstruction.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.17" steps="592"/></proof>
+  </goal>
+  <goal name="reconstruction.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.50" steps="1304"/></proof>
+  </goal>
+  <goal name="reconstruction.3" expl="3.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.78" steps="499"/></proof>
+  </goal>
+  <goal name="reconstruction.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.97" steps="746"/></proof>
+  </goal>
+  <goal name="reconstruction.5" expl="5.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.36" steps="142"/></proof>
+  </goal>
+  <goal name="reconstruction.6" expl="6.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.33" steps="167"/></proof>
+  </goal>
+  <goal name="reconstruction.7" expl="7.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.29" steps="161"/></proof>
+  </goal>
+  <goal name="reconstruction.8" expl="8.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.32" steps="714"/></proof>
+  </goal>
+  <goal name="reconstruction.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="22"/></proof>
+  </goal>
+  <goal name="reconstruction.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.75" steps="505"/></proof>
+  </goal>
+  <goal name="reconstruction.11" expl="11.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="35"/></proof>
+  </goal>
+  <goal name="reconstruction.12" expl="12.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="26"/></proof>
+  </goal>
+  <goal name="reconstruction.13" expl="13.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.34" steps="186"/></proof>
+  </goal>
+  <goal name="reconstruction.14" expl="14.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="23"/></proof>
+  </goal>
+  <goal name="reconstruction.15" expl="15.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.30" steps="168"/></proof>
+  </goal>
+  <goal name="reconstruction.16" expl="16.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.73" steps="472"/></proof>
+  </goal>
+  <goal name="reconstruction.17" expl="17.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.34" steps="171"/></proof>
+  </goal>
+  <goal name="reconstruction.18" expl="18.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.85"/></proof>
+  </goal>
+  <goal name="reconstruction.19" expl="19.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.10" steps="834"/></proof>
+  </goal>
+  <goal name="reconstruction.20" expl="20.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.51" steps="910"/></proof>
+  </goal>
+  <goal name="reconstruction.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.50" steps="1633"/></proof>
+  </goal>
+  <goal name="reconstruction.22" expl="22.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="76"/></proof>
+  </goal>
+  <goal name="reconstruction.23" expl="23.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.49" steps="204"/></proof>
+  </goal>
+  <goal name="reconstruction.24" expl="24.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.43"/></proof>
+  </goal>
+  <goal name="reconstruction.25" expl="25.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.71" steps="521"/></proof>
+  </goal>
+  <goal name="reconstruction.26" expl="26.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.30" steps="975"/></proof>
+  </goal>
+  <goal name="reconstruction.27" expl="27.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="3.74"/></proof>
+  </goal>
+  <goal name="reconstruction.28" expl="28.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.00" steps="995"/></proof>
+  </goal>
+  <goal name="reconstruction.29" expl="29.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.24" steps="80"/></proof>
+  </goal>
+  <goal name="reconstruction.30" expl="30.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="13"/></proof>
+  </goal>
+  <goal name="reconstruction.31" expl="31.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.32" steps="197"/></proof>
+  </goal>
+  <goal name="reconstruction.32" expl="32.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.14"/></proof>
+  </goal>
+  <goal name="reconstruction.33" expl="33.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.26"/></proof>
+  </goal>
+  <goal name="reconstruction.34" expl="34.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="31"/></proof>
+  </goal>
+  <goal name="reconstruction.35" expl="35.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.29" steps="1051"/></proof>
+  </goal>
+  <goal name="reconstruction.36" expl="36.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="20"/></proof>
+  </goal>
+  <goal name="reconstruction.37" expl="37.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="62"/></proof>
+  </goal>
+  <goal name="reconstruction.38" expl="38.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.38" steps="253"/></proof>
+  </goal>
+  <goal name="reconstruction.39" expl="39.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.02"/></proof>
+  </goal>
+  <goal name="reconstruction.40" expl="40.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.62" steps="1431"/></proof>
+  </goal>
+  <goal name="reconstruction.41" expl="41.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="62"/></proof>
+  </goal>
+  <goal name="reconstruction.42" expl="42.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.28" steps="112"/></proof>
+  </goal>
+  <goal name="reconstruction.43" expl="43.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.53" steps="432"/></proof>
+  </goal>
+  <goal name="reconstruction.44" expl="44.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.27" steps="635"/></proof>
+  </goal>
+  <goal name="reconstruction.45" expl="45.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="4.29" steps="1653"/></proof>
+  </goal>
+  <goal name="reconstruction.46" expl="46.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.83" steps="1054"/></proof>
+  </goal>
+  <goal name="reconstruction.47" expl="47.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="70"/></proof>
+  </goal>
+  <goal name="reconstruction.48" expl="48.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="55"/></proof>
+  </goal>
+  <goal name="reconstruction.49" expl="49.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="18"/></proof>
+  </goal>
+  <goal name="reconstruction.50" expl="50.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="28"/></proof>
+  </goal>
+  <goal name="reconstruction.51" expl="51.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.89" steps="500"/></proof>
+  </goal>
+  <goal name="reconstruction.52" expl="52.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="82"/></proof>
+  </goal>
+  <goal name="reconstruction.53" expl="53.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="85"/></proof>
+  </goal>
+  <goal name="reconstruction.54" expl="54.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="90"/></proof>
+  </goal>
+  <goal name="reconstruction.55" expl="55.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.53" steps="343"/></proof>
+  </goal>
+  <goal name="reconstruction.56" expl="56.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="117"/></proof>
+  </goal>
+  <goal name="reconstruction.57" expl="57.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="83"/></proof>
+  </goal>
+  <goal name="reconstruction.58" expl="58.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="89"/></proof>
+  </goal>
+  <goal name="reconstruction.59" expl="59.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="23"/></proof>
+  </goal>
+  <goal name="reconstruction.60" expl="60.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47" steps="378"/></proof>
+  </goal>
+  <goal name="reconstruction.61" expl="61.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="67"/></proof>
+  </goal>
+  <goal name="reconstruction.62" expl="62.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="124"/></proof>
+  </goal>
+  <goal name="reconstruction.63" expl="63.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="96"/></proof>
+  </goal>
+  <goal name="reconstruction.64" expl="64.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="88"/></proof>
+  </goal>
+  <goal name="reconstruction.65" expl="65.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.88" steps="545"/></proof>
+  </goal>
+  <goal name="reconstruction.66" expl="66.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="23"/></proof>
+  </goal>
+  <goal name="reconstruction.67" expl="67.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="21"/></proof>
+  </goal>
+  <goal name="reconstruction.68" expl="68.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.52" steps="369"/></proof>
+  </goal>
+  <goal name="reconstruction.69" expl="69.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.29" steps="112"/></proof>
+  </goal>
+  <goal name="reconstruction.70" expl="70.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="41"/></proof>
+  </goal>
+  <goal name="reconstruction.71" expl="71.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="33"/></proof>
+  </goal>
+  <goal name="reconstruction.72" expl="72.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.94" steps="549"/></proof>
+  </goal>
+  <goal name="reconstruction.73" expl="73.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="92"/></proof>
+  </goal>
+  <goal name="reconstruction.74" expl="74.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.46" steps="375"/></proof>
+  </goal>
+  <goal name="reconstruction.75" expl="75.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="116"/></proof>
+  </goal>
+  <goal name="reconstruction.76" expl="76.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="43"/></proof>
+  </goal>
+  <goal name="reconstruction.77" expl="77.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="35"/></proof>
+  </goal>
+  <goal name="reconstruction.78" expl="78.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.02" steps="864"/></proof>
+  </goal>
+  <goal name="reconstruction.79" expl="79.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.19" steps="690"/></proof>
+  </goal>
+  <goal name="reconstruction.80" expl="80.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="41"/></proof>
+  </goal>
+  <goal name="reconstruction.81" expl="81.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.80" steps="455"/></proof>
+  </goal>
+  <goal name="reconstruction.82" expl="82.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.50" steps="828"/></proof>
+  </goal>
+  <goal name="reconstruction.83" expl="83.">
+  <transf name="induction_pr">
+   <goal name="reconstruction.83.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="reconstruction.83.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="reconstruction.83.1.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.28" steps="91"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="reconstruction.83.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="reconstruction.83.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="reconstruction.83.2.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.39" steps="163"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="reconstruction.83.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="reconstruction.83.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="reconstruction.83.3.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.93" steps="570"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="reconstruction.84" expl="84.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="98"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="absurdity">
+ <transf name="split_goal_wp">
+  <goal name="absurdity.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="177"/></proof>
+  </goal>
+  <goal name="absurdity.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="10"/></proof>
+  </goal>
+  <goal name="absurdity.3" expl="3.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.45" steps="258"/></proof>
+  </goal>
+  <goal name="absurdity.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.72" steps="239"/></proof>
+  </goal>
+  <goal name="absurdity.5" expl="5.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="90"/></proof>
+  </goal>
+  <goal name="absurdity.6" expl="6.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.14" steps="601"/></proof>
+  </goal>
+  <goal name="absurdity.7" expl="7.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.03"/></proof>
+  </goal>
+  <goal name="absurdity.8" expl="8.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="9"/></proof>
+  </goal>
+  <goal name="absurdity.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.34" steps="883"/></proof>
+  </goal>
+  <goal name="absurdity.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.49" steps="178"/></proof>
+  </goal>
+  <goal name="absurdity.11" expl="11.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="32"/></proof>
+  </goal>
+  <goal name="absurdity.12" expl="12.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.98" steps="350"/></proof>
+  </goal>
+  <goal name="absurdity.13" expl="13.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="24"/></proof>
+  </goal>
+  <goal name="absurdity.14" expl="14.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="29"/></proof>
+  </goal>
+  <goal name="absurdity.15" expl="15.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.51" steps="140"/></proof>
+  </goal>
+  <goal name="absurdity.16" expl="16.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="26"/></proof>
+  </goal>
+  <goal name="absurdity.17" expl="17.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="27"/></proof>
+  </goal>
+  <goal name="absurdity.18" expl="18.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="38"/></proof>
+  </goal>
+  <goal name="absurdity.19" expl="19.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="48"/></proof>
+  </goal>
+  <goal name="absurdity.20" expl="20.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.33" steps="139"/></proof>
+  </goal>
+  <goal name="absurdity.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="44"/></proof>
+  </goal>
+  <goal name="absurdity.22" expl="22.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.81" steps="482"/></proof>
+  </goal>
+  <goal name="absurdity.23" expl="23.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.29" steps="175"/></proof>
+  </goal>
+  <goal name="absurdity.24" expl="24.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.77" steps="850"/></proof>
+  </goal>
+  <goal name="absurdity.25" expl="25.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="28"/></proof>
+  </goal>
+  <goal name="absurdity.26" expl="26.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="0.40"/></proof>
+  </goal>
+  <goal name="absurdity.27" expl="27.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="14"/></proof>
+  </goal>
+  <goal name="absurdity.28" expl="28.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.54" steps="279"/></proof>
+  </goal>
+  <goal name="absurdity.29" expl="29.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.42" steps="233"/></proof>
+  </goal>
+  <goal name="absurdity.30" expl="30.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.19" steps="34"/></proof>
+  </goal>
+  <goal name="absurdity.31" expl="31.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="34"/></proof>
+  </goal>
+  <goal name="absurdity.32" expl="32.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.69"/></proof>
+  </goal>
+  <goal name="absurdity.33" expl="33.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.91" steps="335"/></proof>
+  </goal>
+  <goal name="absurdity.34" expl="34.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.73" steps="217"/></proof>
+  </goal>
+  <goal name="absurdity.35" expl="35.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="6.45"/></proof>
+  </goal>
+  <goal name="absurdity.36" expl="36.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="43"/></proof>
+  </goal>
+  <goal name="absurdity.37" expl="37.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="72"/></proof>
+  </goal>
+  <goal name="absurdity.38" expl="38.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.28" steps="43"/></proof>
+  </goal>
+  <goal name="absurdity.39" expl="39.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="3.13" steps="1256"/></proof>
+  </goal>
+  <goal name="absurdity.40" expl="40.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="1.94"/></proof>
+  </goal>
+  <goal name="absurdity.41" expl="41.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.57" steps="388"/></proof>
+  </goal>
+  <goal name="absurdity.42" expl="42.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.68" steps="492"/></proof>
+  </goal>
+  <goal name="absurdity.43" expl="43.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.90" steps="398"/></proof>
+  </goal>
+  <goal name="absurdity.44" expl="44.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="199"/></proof>
+  </goal>
+  <goal name="absurdity.45" expl="45.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="27"/></proof>
+  </goal>
+  <goal name="absurdity.46" expl="46.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="0"/></proof>
+  </goal>
+  <goal name="absurdity.47" expl="47.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.15" steps="36"/></proof>
+  </goal>
+  <goal name="absurdity.48" expl="48.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="47"/></proof>
+  </goal>
+  <goal name="absurdity.49" expl="49.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.25" steps="17"/></proof>
+  </goal>
+  <goal name="absurdity.50" expl="50.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.97" steps="846"/></proof>
+  </goal>
+  <goal name="absurdity.51" expl="51.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.63" steps="121"/></proof>
+  </goal>
+  <goal name="absurdity.52" expl="52.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="30"/></proof>
+  </goal>
+  <goal name="absurdity.53" expl="53.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="79"/></proof>
+  </goal>
+  <goal name="absurdity.54" expl="54.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.83" steps="318"/></proof>
+  </goal>
+  <goal name="absurdity.55" expl="55.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.39"/></proof>
+  </goal>
+  <goal name="absurdity.56" expl="56.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.32" steps="555"/></proof>
+  </goal>
+  <goal name="absurdity.57" expl="57.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.94" steps="748"/></proof>
+  </goal>
+  <goal name="absurdity.58" expl="58.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="19"/></proof>
+  </goal>
+  <goal name="absurdity.59" expl="59.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.49" steps="103"/></proof>
+  </goal>
+  <goal name="absurdity.60" expl="60.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="42"/></proof>
+  </goal>
+  <goal name="absurdity.61" expl="61.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.44" steps="172"/></proof>
+  </goal>
+  <goal name="absurdity.62" expl="62.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.65"/></proof>
+  </goal>
+  <goal name="absurdity.63" expl="63.">
+  <proof prover="0" steplimit="-1" obsolete="true"><result status="timeout" time="6.01"/></proof>
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.63" steps="212"/></proof>
+  </goal>
+  <goal name="absurdity.64" expl="64.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="2.71" steps="823"/></proof>
+  </goal>
+  <goal name="absurdity.65" expl="65.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.39"/></proof>
+  </goal>
+  <goal name="absurdity.66" expl="66.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.07" steps="442"/></proof>
+  </goal>
+  <goal name="absurdity.67" expl="67.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.45" steps="610"/></proof>
+  </goal>
+  <goal name="absurdity.68" expl="68.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.58" steps="576"/></proof>
+  </goal>
+  <goal name="absurdity.69" expl="69.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.55" steps="227"/></proof>
+  </goal>
+  <goal name="absurdity.70" expl="70.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="28"/></proof>
+  </goal>
+  <goal name="absurdity.71" expl="71.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="208"/></proof>
+  </goal>
+  <goal name="absurdity.72" expl="72.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.26" steps="450"/></proof>
+  </goal>
+  <goal name="absurdity.73" expl="73.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="75"/></proof>
+  </goal>
+  <goal name="absurdity.74" expl="74.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="3.81"/></proof>
+  </goal>
+  <goal name="absurdity.75" expl="75.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.43" steps="115"/></proof>
+  </goal>
+  <goal name="absurdity.76" expl="76.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.26" steps="85"/></proof>
+  </goal>
+  <goal name="absurdity.77" expl="77.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="33"/></proof>
+  </goal>
+  <goal name="absurdity.78" expl="78.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.24" steps="42"/></proof>
+  </goal>
+  <goal name="absurdity.79" expl="79.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="34"/></proof>
+  </goal>
+  <goal name="absurdity.80" expl="80.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.33" steps="188"/></proof>
+  </goal>
+  <goal name="absurdity.81" expl="81.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47" steps="262"/></proof>
+  </goal>
+  <goal name="absurdity.82" expl="82.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="absurdity.83" expl="83.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="0"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="recover_winner">
+ <transf name="split_goal_wp">
+  <goal name="recover_winner.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="45"/></proof>
+  </goal>
+  <goal name="recover_winner.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.28" steps="172"/></proof>
+  </goal>
+  <goal name="recover_winner.3" expl="3.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.31" steps="146"/></proof>
+  </goal>
+  <goal name="recover_winner.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="114"/></proof>
+  </goal>
+  <goal name="recover_winner.5" expl="5.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.72"/></proof>
+  </goal>
+  <goal name="recover_winner.6" expl="6.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="67"/></proof>
+  </goal>
+  <goal name="recover_winner.7" expl="7.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="45"/></proof>
+  </goal>
+  <goal name="recover_winner.8" expl="8.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.42"/></proof>
+  </goal>
+  <goal name="recover_winner.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.23" steps="205"/></proof>
+  </goal>
+  <goal name="recover_winner.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.22" steps="207"/></proof>
+  </goal>
+  <goal name="recover_winner.11" expl="11.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.00"/></proof>
+  </goal>
+  <goal name="recover_winner.12" expl="12.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="248"/></proof>
+  </goal>
+  <goal name="recover_winner.13" expl="13.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.44" steps="318"/></proof>
+  </goal>
+  <goal name="recover_winner.14" expl="14.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.16"/></proof>
+  </goal>
+  <goal name="recover_winner.15" expl="15.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.29" steps="246"/></proof>
+  </goal>
+  <goal name="recover_winner.16" expl="16.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="255"/></proof>
+  </goal>
+  <goal name="recover_winner.17" expl="17.">
+  <proof prover="4" steplimit="-1"><result status="valid" time="2.53"/></proof>
+  </goal>
+  <goal name="recover_winner.18" expl="18.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="26"/></proof>
+  </goal>
+  <goal name="recover_winner.19" expl="19.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.18" steps="13"/></proof>
+  </goal>
+  <goal name="recover_winner.20" expl="20.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="9"/></proof>
+  </goal>
+  <goal name="recover_winner.21" expl="21.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="16"/></proof>
+  </goal>
+  <goal name="recover_winner.22" expl="22.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="9"/></proof>
+  </goal>
+  <goal name="recover_winner.23" expl="23.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.13" steps="16"/></proof>
+  </goal>
+  <goal name="recover_winner.24" expl="24.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.36" steps="168"/></proof>
+  </goal>
+  <goal name="recover_winner.25" expl="25.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="30"/></proof>
+  </goal>
+  <goal name="recover_winner.26" expl="26.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.12" steps="8"/></proof>
+  </goal>
+  <goal name="recover_winner.27" expl="27.">
+  <transf name="induction_pr">
+   <goal name="recover_winner.27.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="recover_winner.27.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="recover_winner.27.1.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="57"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="recover_winner.27.2" expl="2.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="recover_winner.27.2.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="recover_winner.27.2.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.17" steps="74"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="recover_winner.27.3" expl="3.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="recover_winner.27.3.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="recover_winner.27.3.1.1" expl="1.">
+     <proof prover="1" steplimit="-1"><result status="valid" time="0.27" steps="165"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="recover_winner.28" expl="28.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.16" steps="77"/></proof>
+  </goal>
+  <goal name="recover_winner.29" expl="29.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.48"/></proof>
+  </goal>
+  <goal name="recover_winner.30" expl="30.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="17"/></proof>
+  </goal>
+  <goal name="recover_winner.31" expl="31.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="simulation_theorem">
+ <transf name="split_goal_wp">
+  <goal name="simulation_theorem.1" expl="1.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="19"/></proof>
+  </goal>
+  <goal name="simulation_theorem.2" expl="2.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="19"/></proof>
+  </goal>
+  <goal name="simulation_theorem.3" expl="3.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="19"/></proof>
+  </goal>
+  <goal name="simulation_theorem.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="20"/></proof>
+  </goal>
+  <goal name="simulation_theorem.5" expl="5.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.07" steps="17"/></proof>
+  </goal>
+  <goal name="simulation_theorem.6" expl="6.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.09" steps="17"/></proof>
+  </goal>
+  <goal name="simulation_theorem.7" expl="7.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.35" steps="144"/></proof>
+  </goal>
+  <goal name="simulation_theorem.8" expl="8.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.20" steps="65"/></proof>
+  </goal>
+  <goal name="simulation_theorem.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.14" steps="24"/></proof>
+  </goal>
+  <goal name="simulation_theorem.10" expl="10.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="36"/></proof>
+  </goal>
+  <goal name="simulation_theorem.11" expl="11.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.11" steps="19"/></proof>
+  </goal>
+  <goal name="simulation_theorem.12" expl="12.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="StratProps.have_uniform_winning_strat_alternate_def">
+ <proof prover="1"><result status="valid" time="0.08" steps="18"/></proof>
+ </goal>
+ <goal name="StratProps.have_winning_strat_local_criterion">
+ <proof prover="1"><result status="valid" time="0.07" steps="27"/></proof>
+ </goal>
+ <goal name="StratProps.simulation">
+ <proof prover="1" steplimit="-1"><result status="valid" time="0.08" steps="11"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
