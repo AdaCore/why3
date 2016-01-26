@@ -27,14 +27,14 @@ let clone_vs v = t_var (create_vsymbol (id_clone v.vs_name) v.vs_ty)
 
 (* explanations *)
 
-let _vc_label e f =
+let vc_label e f =
   let loc = if f.t_loc = None then e.e_loc else f.t_loc in
   let lab = Ident.Slab.union e.e_label f.t_label in
   t_label ?loc lab f
 
 let _expl_pre       = Ident.create_label "expl:precondition"
-let _expl_post      = Ident.create_label "expl:postcondition"
-let _expl_xpost     = Ident.create_label "expl:exceptional postcondition"
+let expl_post      = Ident.create_label "expl:postcondition"
+let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let _expl_assume    = Ident.create_label "expl:assumption"
 let _expl_assert    = Ident.create_label "expl:assertion"
 let _expl_check     = Ident.create_label "expl:check"
@@ -45,31 +45,43 @@ let _expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let _expl_loopvar   = Ident.create_label "expl:loop variant decrease"
 let _expl_variant   = Ident.create_label "expl:variant decrease"
 
-let lab_has_expl = let expl_regexp = Str.regexp "expl:\\(.*\\)" in
+let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
   Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
 
+let vc_expl l f =
+  let f = if Slab.mem Term.stop_split f.t_label
+    then f else t_label_add Term.stop_split f in
+  if lab_has_expl f.t_label then f else t_label_add l f
+
+(* propositional connectives with limited simplification *)
+
 (*
-let rec vc_expl l f =
-  if lab_has_expl f.t_label then f
-  else match f.t_node with
-    | _ when Slab.mem Split_goal.stop_split f.t_label -> t_label_add l f
-    | Tbinop (Tand,f1,f2) -> t_label_copy f (t_and (vc_expl l f1) (vc_expl l f2))
-    | Teps _ -> t_label_add l f (* post-condition, push down later *)
-    | _ -> f
+let can_simp t = not (Slab.mem stop_split t.t_label)
 
-(* propositional connectives *)
+let vc_and f1 f2 = match f1.t_node, f2.t_node with
+  | Ttrue, _ when can_simp f1 -> f2
+  | _, Ttrue when can_simp f2 -> t_label_remove asym_split f1
+  | _, _ -> t_and f1 f2
 
-let vc_and ~sym f1 f2 =
-  if sym then t_and(*_simp*) f1 f2 else t_and_asym(*_simp*) f1 f2
+let vc_and_asym f1 f2 = match f1.t_node, f2.t_node with
+  | Ttrue, _ when can_simp f1 -> f2
+  | _, Ttrue when can_simp f2 -> t_label_remove asym_split f1
+  | _, _ -> t_and_asym f1 f2
 
-let vc_and_l ~sym fl =
-  if sym then t_and_l(*simp_l*) fl else t_and_asym_l(*_simp_l*) fl
+let vc_or f1 f2 = match f1.t_node, f2.t_node with
+  | Tfalse, _ when can_simp f1 -> f2
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_split f1
+  | _, _ -> t_or f1 f2
+*)
 
-let vc_implies f1 f2 = t_implies(*_simp*) f1 f2
-
-let vc_let v t f = t_let_close_simp v t f
+let vc_implies_pre f1 f2 = match f1.t_node, f2.t_node with
+  | Ttrue, _ | _, Ttrue -> f2
+  | _, _ -> t_implies f1 f2
 
 let vc_forall vl f = t_forall_close_simp vl [] f
+
+(*
+let vc_let v t f = t_let_close_simp v t f
 
 type defn_fmla =
   | DFdefn of term
@@ -310,10 +322,51 @@ let _step_back wr1 rd2 wr2 mvs =
 
 (* classical WP *)
 
-let (*rec*) _slow _env _e _q _xq = assert false (* TODO *)
+let vs_result ity =
+  create_vsymbol (id_fresh "result") (ty_of_ity ity)
 
-and vc_fun _env _c _e = assert false (* TODO *)
-(*
+let ok_of_post l ity = function
+  | q::ql ->
+      let v, q = open_post q in let t = t_var v in
+      let mk_post q = vc_expl l (open_post_with t q) in
+      v, t_and_l (vc_expl l q :: List.map mk_post ql)
+  | [] ->
+      vs_result ity, t_true
+
+let rec slow env e res q xq = match e.e_node with
+  | Evar v ->
+      t_subst_single res (vc_label e (t_var v.pv_vs)) q
+  | Econst c ->
+      t_subst_single res (vc_label e (t_const c)) q
+
+
+
+
+  | Elet (LDvar (v, e1), e2) (* FIXME: do we need this? *)
+    when Slab.mem proxy_label v.pv_vs.vs_name.id_label ->
+    (* we push the label down, past the inserted "let" *)
+      let q = slow env (e_label_copy e e2) res q xq in
+      slow env e1 v.pv_vs q xq
+  | Elet (LDvar (v, e1), e2) ->
+      let q = slow env e2 res q xq in
+      vc_label e (slow env e1 v.pv_vs q xq)
+  | Eif (e1, e2, e3) ->
+      let v = vs_result e1.e_ity in
+      let test = t_equ (t_var v) t_bool_true in
+      (* TODO: how should we handle prop-behind-bool-typed exprs? *)
+      (* TODO: handle e_true and e_false, restore /\ and \/ *)
+(* FIXME: wrong if e2 or e3 have preconditions depending on test
+      let q = if eff_pure e2.e_effect && eff_pure e3.e_effect then
+        let u2 = vs_result e2.e_ity and u3 = vs_result e3.e_ity in
+        let r = t_subst_single res (t_if test (t_var u2) (t_var u3)) q in
+        slow env e2 u2 (slow env e3 u3 (t_subst_single res r q) xq) xq
+      else
+*)
+      let q = t_if test (slow env e2 res q xq) (slow env e3 res q xq) in
+      vc_label e (slow env e1 v q xq)
+  | _ -> assert false (* TODO *)
+
+and vc_fun env c e =
   let args = List.map (fun pv -> pv.pv_vs) c.cty_args in
 (* TODO: let rec with variants
   let env =
@@ -324,13 +377,13 @@ and vc_fun _env _c _e = assert false (* TODO *)
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
 *)
-  let q = old_mark lab (vc_expl expl_post c.cty_post) in
-  let conv p = old_mark lab (vc_expl expl_xpost p) in
-  let f = slow env e q (Mexn.map conv c.cty_xpost) in
-  (* TODO: oldies *)
-  let f = vc_implies c.cty_pre f in
-  vc_forall args (vc_implies (t_and_simp_l c.cty_pre) f)
-*)
+  let r,q = ok_of_post expl_post c.cty_result c.cty_post in
+  let mk_xq xs xq = ok_of_post expl_xpost xs.xs_ity xq in
+  let f = slow env e r q (Mexn.mapi mk_xq c.cty_xpost) in
+  let old o v f = t_subst_single o.pv_vs (t_var v.pv_vs) f in
+  let f = Mpv.fold old c.cty_oldies f in
+  let f = vc_implies_pre (t_and_l c.cty_pre) f in
+  vc_forall args f
 
 let mk_vc_decl id f =
   let {id_string = nm; id_label = label; id_loc = loc} = id in
