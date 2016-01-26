@@ -423,249 +423,6 @@ fun read_decl ctxt = variant
       (map (elem "eqn" (fn atts => fn [t] =>
          (get_name'' atts, expand_cases ctxt (read_prop ctxt t)))) xs))];
 
-fun rename_const ps = map_aterms
-  (fn t as Const (p as (_, T)) => (case AList.lookup (op =) ps p of
-          SOME s => Free (s, T)
-        | NONE => t)
-    | t => t);
-
-fun string_of_id (SOME (s, s')) = s ^ "." ^ s';
-
-fun lookup_list sel lookup xs =
-  let val ps = map (fn x => (x, lookup (sel x))) xs
-  in
-    if forall (is_none o snd) ps then NONE
-    else SOME (map
-      (fn (x, SOME y) => (x, y)
-        | (x, NONE) =>
-            error ("No association given for " ^ string_of_id (sel x)))
-      ps)
-  end;
-
-fun fact_binding s = Binding.qualify false "facts" (Binding.name s);
-
-fun mk_decl _ (Axiom ((s, id), ts)) thy =
-      (case lookup_thm thy id of
-         NONE =>
-           (thy |> Specification.axiomatization
-              [] [((fact_binding s, []), ts)] |> snd,
-            true)
-       | SOME thms =>
-           if length thms = length ts andalso
-             forall (Pattern.matches thy o apfst Thm.prop_of) (thms ~~ ts)
-           then (thy, false)
-           else error ("Failed to match axiom " ^ string_of_id id))
-  | mk_decl realize (Typedecl ((s, id), args, opt_rhs)) thy =
-      (case opt_rhs of
-         NONE =>
-           if realize then (thy, false) else
-           (case lookup_type' thy id of
-              NONE =>
-                (thy |> globalize (Typedecl.typedecl
-                   (Binding.name s, map (rpair dummyS) args, NoSyn) #> snd) |>
-                 add_type s,
-                 true)
-            | SOME s' => (add_type_raw NONE (s, s') thy, false))
-       | SOME T =>
-           (thy |> globalize (Typedecl.abbrev
-              (Binding.name s, args, NoSyn) T #> snd) |>
-            add_type s,
-            true))
-  | mk_decl realize (Param ((s, id), T)) thy =
-      if realize then (thy, false) else
-      (case lookup_const' thy id of
-         NONE =>
-           (thy |> Specification.axiomatization
-              [(Binding.name s, SOME T, NoSyn)] [] |> snd |>
-            add_const s,
-            true)
-       | SOME s' => (add_const_raw NONE (s, s') thy, false))
-  | mk_decl _ (Definition (id, eqn)) thy =
-      let val (s, _) = head_of_eqn eqn
-      in
-        case lookup_def thy id of
-          NONE =>
-            (thy |> globalize (Specification.definition
-               (NONE, (Attrib.empty_binding, eqn)) #> snd) |>
-             add_const s,
-             true)
-        | SOME [th] =>
-            let val p as (s', _) = head_of_eqn' (Thm.prop_of th)
-              handle TERM _ => error ("Bad equation for " ^ string_of_id id)
-            in
-              if Pattern.matches thy (rename_const [(p, s)] (Thm.prop_of th), eqn)
-              then (add_const_raw NONE (s, s') thy, false)
-              else error ("Failed to match definition " ^ string_of_id id)
-            end
-        | _ => error ("Single theorem expected for " ^ string_of_id id)
-      end
-  | mk_decl _ (Datatype dts) thy =
-      (case lookup_list (snd o #1) (lookup_type' thy) dts of
-         NONE =>
-           (thy |> BNF_LFP_Compat.add_datatype [BNF_LFP_Compat.Keep_Nesting]
-              (map (fn ((s, _), args, constrs) =>
-                 ((Binding.name s, map (rpair dummyS) args, NoSyn),
-                  map (fn ((s', _), Ts) =>
-                    (Binding.name s', Ts, NoSyn)) constrs)) dts) |> snd |>
-            fold (fn ((s, _), _, constrs) => add_type s #>
-              fold (add_const o fst o fst) constrs) dts,
-            true)
-       | SOME dts' =>
-           let val tcmap = map (fn (((s, _), _, _), s') =>
-             (Sign.full_name thy (Binding.name s), s')) dts'
-           in
-             (fold (fn (((s, id), args, constrs), s') =>
-                let
-                  val (args', constrs') = BNF_LFP_Compat.the_spec thy s';
-                  fun err () = error ("Failed to match type " ^ string_of_id id);
-                  val _ =
-                    length args = length args' andalso
-                    length constrs = length constrs' orelse err ();
-                  val tvmap = args ~~ map fst args';
-
-                  fun rename (Type (tc, Ts)) = Type
-                        (the_default tc (AList.lookup (op =) tcmap tc),
-                         map rename Ts)
-                    | rename (TFree (a, S)) = TFree
-                        (the_default a (AList.lookup (op =) tvmap a), S)
-                    | rename T = T
-                in
-                  add_type_raw NONE (s, s') #>
-                  fold2 (fn ((s, _), Ts) => fn (s', Us) =>
-                    if map rename Ts = Us
-                    then add_const_raw NONE (s, s')
-                    else err ()) constrs constrs'
-                end) dts' thy,
-              false)
-           end)
-  | mk_decl _ (Inductive (coind, preds)) thy =
-      (case lookup_list (snd o #1) (lookup_def thy) preds of
-         NONE =>
-           (thy |> Inductive.add_inductive_global
-              {quiet_mode = true, verbose = false,
-               alt_name = Binding.empty, coind = coind,
-               no_elim = false, no_ind = false, skip_mono = false}
-              (map (fn ((s, _), T, _) => ((Binding.name s, T), NoSyn)) preds) []
-              (maps (map (apfst (rpair [] o Binding.name o fst)) o #3) preds) [] |>
-            snd |> fold (add_const o fst o #1) preds,
-            true)
-       | SOME preds' =>
-           let val cmap = map (fn (((s, id), _, _), th :: _) =>
-             (th |> Thm.concl_of |> HOLogic.dest_Trueprop |> head_of |>
-              dest_Const handle TERM _ =>
-                error ("Bad introduction rule for " ^ string_of_id id),
-              s)) preds'
-           in
-             app (fn (((_, id), _, intrs), intrs') =>
-               if length intrs = length intrs' andalso
-                 ListPair.all (fn ((_, t), th) =>
-                     Pattern.matches thy (rename_const cmap (Thm.prop_of th), t))
-                   (intrs, intrs')
-               then ()
-               else error ("Failed to match predicate " ^ string_of_id id)) preds';
-             (fold (add_const_raw NONE o swap o apfst fst) cmap thy, false)
-           end)
-  | mk_decl _ (Function eqnss) thy =
-      let val eqnss' = map (head_of_eqn o hd o snd) eqnss
-      in
-        case lookup_list fst (lookup_def thy) eqnss of
-          NONE =>
-            (thy |> globalize (fn lthy => Function_Fun.add_fun
-               (map (fn (s, T) => (Binding.name s, SOME T, NoSyn)) eqnss')
-               (map (pair Attrib.empty_binding) (maps snd eqnss))
-               Function_Fun.fun_config lthy) |>
-             fold (add_const o fst) eqnss',
-             true)
-        | SOME eqnss'' =>
-            let val cmap = map2 (fn ((id, _), th :: _) => fn (s, _) =>
-              (th |> Thm.prop_of |> head_of_eqn' handle TERM _ =>
-                 error ("Bad equation for " ^ string_of_id id),
-               s)) eqnss'' eqnss'
-            in
-              app (fn ((id, eqns), eqns') =>
-                if length eqns = length eqns' andalso
-                  ListPair.all (fn (t, th) =>
-                      Pattern.matches thy (rename_const cmap (Thm.prop_of th), t))
-                    (eqns, eqns')
-                then ()
-                else error ("Failed to match function " ^ string_of_id id)) eqnss'';
-              (fold (add_const_raw NONE o swap o apfst fst) cmap thy, false)
-            end
-      end
-  | mk_decl _ _ thy = (thy, true);
-
-fun init_decls thyname consts types = Why3_Data.map
-  (fn {theories, env = NONE} =>
-        {theories = Symtab.update_new
-           (thyname,
-            {consts = Symtab.make consts,
-             types = Symtab.make types,
-             thms = Symtab.empty,
-             defs = Symtab.empty})
-           theories handle Symtab.DUP _ =>
-             error ("Theory " ^ thyname ^ " has already been loaded."),
-         env = SOME
-           {thyname = thyname,
-            decls = [],
-            vcs = Symtab.empty}}
-    | _ => err_unfinished ());
-
-fun put_decls decls = Why3_Data.map
-  (fn {theories, env = SOME {thyname, ...}} =>
-        {theories = theories,
-         env = SOME
-           {thyname = thyname,
-            decls = decls,
-            vcs = print_open_vcs I (fold
-              (fn Lemma ((s, _), ps, cs) => Symtab.update_new (s, (NONE, ps, cs))
-                | _ => I) decls Symtab.empty
-              handle Symtab.DUP k => error ("Verification condition " ^ k ^
-                " has already been declared."))}}
-    | _ => err_no_env ());
-
-fun close incomplete thy =
-  thy |>
-  Why3_Data.map (fn
-      {theories, env = SOME {thyname, vcs, ...}} =>
-        let
-          val (proved, unproved) = partition_vcs vcs;
-          val _ = Thm.join_proofs (maps (#1 o snd) proved)
-        in
-          (if null unproved
-           then writeln ("Finished Why3 theory " ^ thyname)
-           else (if incomplete then warning else error)
-             (Pretty.string_of (pp_open_vcs unproved));
-           {theories = theories, env = NONE})
-        end
-    | _ => err_no_env ()) |>
-  Sign.parent_path;
-
-fun process_decls consts types x path = elem "theory" (fn atts =>
-  (fn imports :: xs => elem "realized" (fn _ => fn rs => fn thy =>
-        let
-          val thyname = get_name atts;
-          val realize = get_bool "realize" atts;
-          val _ =
-            realize orelse
-            Path.is_basic path andalso
-            let val (path', ext) = Path.split_ext path
-            in
-              Path.implode path' = Context.theory_name thy andalso
-              ext = "xml"
-            end orelse
-            error "Name of Why3 file does not match name of theory";
-          val (ds, thy') = thy |>
-            Sign.add_path thyname |>
-            init_decls thyname consts types |>
-            pair [] |>
-            fold (fn x => fn (ds, thy) =>
-              let
-                val d = read_decl (Named_Target.theory_init thy) x;
-                val (thy', b) = mk_decl realize d thy
-              in ((b ? cons d) ds, thy') end) xs
-        in put_decls (rev ds) thy' end) imports
-    | _ => error "Bad theory specification")) x
-
 
 (**** pretty printing ****)
 
@@ -785,6 +542,262 @@ fun show_status thy sel =
            map_filter (pretty_decl sel ctxt) ds) decls'))
        end
    | _ => ());
+
+
+(**** processing declarations ****)
+
+fun rename_const ps = map_aterms
+  (fn t as Const (p as (_, T)) => (case AList.lookup (op =) ps p of
+          SOME s => Free (s, T)
+        | NONE => t)
+    | t => t);
+
+fun string_of_id (SOME (s, s')) = s ^ "." ^ s';
+
+fun lookup_list sel lookup xs =
+  let val ps = map (fn x => (x, lookup (sel x))) xs
+  in
+    if forall (is_none o snd) ps then NONE
+    else SOME (map
+      (fn (x, SOME y) => (x, y)
+        | (x, NONE) =>
+            error ("No association given for " ^ string_of_id (sel x)))
+      ps)
+  end;
+
+fun fact_binding s = Binding.qualify false "facts" (Binding.name s);
+
+fun err_decl thy s decl =
+  error (Pretty.string_of (Pretty.blk (0,
+    [Pretty.str s, Pretty.fbrk, Pretty.fbrk,
+     the (pretty_decl (K true, K "") (Proof_Context.init_global thy) decl)])));
+
+fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
+      (case lookup_thm thy id of
+         NONE =>
+           (thy |> Specification.axiomatization
+              [] [((fact_binding s, []), ts)] |> snd,
+            true)
+       | SOME thms =>
+           if length thms = length ts andalso
+             forall (Pattern.matches thy o apfst Thm.prop_of) (thms ~~ ts)
+           then (thy, false)
+           else err_decl thy ("Failed to match axiom " ^ string_of_id id) decl)
+  | mk_decl realize (Typedecl ((s, id), args, opt_rhs)) thy =
+      (case opt_rhs of
+         NONE =>
+           if realize then (thy, false) else
+           (case lookup_type' thy id of
+              NONE =>
+                (thy |> globalize (Typedecl.typedecl
+                   (Binding.name s, map (rpair dummyS) args, NoSyn) #> snd) |>
+                 add_type s,
+                 true)
+            | SOME s' => (add_type_raw NONE (s, s') thy, false))
+       | SOME T =>
+           (thy |> globalize (Typedecl.abbrev
+              (Binding.name s, args, NoSyn) T #> snd) |>
+            add_type s,
+            true))
+  | mk_decl realize (Param ((s, id), T)) thy =
+      if realize then (thy, false) else
+      (case lookup_const' thy id of
+         NONE =>
+           (thy |> Specification.axiomatization
+              [(Binding.name s, SOME T, NoSyn)] [] |> snd |>
+            add_const s,
+            true)
+       | SOME s' => (add_const_raw NONE (s, s') thy, false))
+  | mk_decl _ (decl as Definition (id, eqn)) thy =
+      let val (s, _) = head_of_eqn eqn
+      in
+        case lookup_def thy id of
+          NONE =>
+            (thy |> globalize (Specification.definition
+               (NONE, (Attrib.empty_binding, eqn)) #> snd) |>
+             add_const s,
+             true)
+        | SOME [th] =>
+            let val p as (s', _) = head_of_eqn' (Thm.prop_of th)
+              handle TERM _ => err_decl thy
+                ("Bad equation for " ^ string_of_id id) decl
+            in
+              if Pattern.matches thy (rename_const [(p, s)] (Thm.prop_of th), eqn)
+              then (add_const_raw NONE (s, s') thy, false)
+              else err_decl thy
+                ("Failed to match definition " ^ string_of_id id) decl
+            end
+        | _ => err_decl thy ("Single theorem expected for " ^ string_of_id id) decl
+      end
+  | mk_decl _ (decl as Datatype dts) thy =
+      (case lookup_list (snd o #1) (lookup_type' thy) dts of
+         NONE =>
+           (thy |> BNF_LFP_Compat.add_datatype [BNF_LFP_Compat.Keep_Nesting]
+              (map (fn ((s, _), args, constrs) =>
+                 ((Binding.name s, map (rpair dummyS) args, NoSyn),
+                  map (fn ((s', _), Ts) =>
+                    (Binding.name s', Ts, NoSyn)) constrs)) dts) |> snd |>
+            fold (fn ((s, _), _, constrs) => add_type s #>
+              fold (add_const o fst o fst) constrs) dts,
+            true)
+       | SOME dts' =>
+           let val tcmap = map (fn (((s, _), _, _), s') =>
+             (Sign.full_name thy (Binding.name s), s')) dts'
+           in
+             (fold (fn (((s, id), args, constrs), s') =>
+                let
+                  val (args', constrs') = BNF_LFP_Compat.the_spec thy s';
+                  fun err () = err_decl thy
+                    ("Failed to match type " ^ string_of_id id) decl;
+                  val _ =
+                    length args = length args' andalso
+                    length constrs = length constrs' orelse err ();
+                  val tvmap = args ~~ map fst args';
+
+                  fun rename (Type (tc, Ts)) = Type
+                        (the_default tc (AList.lookup (op =) tcmap tc),
+                         map rename Ts)
+                    | rename (TFree (a, S)) = TFree
+                        (the_default a (AList.lookup (op =) tvmap a), S)
+                    | rename T = T
+                in
+                  add_type_raw NONE (s, s') #>
+                  fold2 (fn ((s, _), Ts) => fn (s', Us) =>
+                    if map rename Ts = Us
+                    then add_const_raw NONE (s, s')
+                    else err ()) constrs constrs'
+                end) dts' thy,
+              false)
+           end)
+  | mk_decl _ (decl as Inductive (coind, preds)) thy =
+      (case lookup_list (snd o #1) (lookup_def thy) preds of
+         NONE =>
+           (thy |> Inductive.add_inductive_global
+              {quiet_mode = true, verbose = false,
+               alt_name = Binding.empty, coind = coind,
+               no_elim = false, no_ind = false, skip_mono = false}
+              (map (fn ((s, _), T, _) => ((Binding.name s, T), NoSyn)) preds) []
+              (maps (map (apfst (rpair [] o Binding.name o fst)) o #3) preds) [] |>
+            snd |> fold (add_const o fst o #1) preds,
+            true)
+       | SOME preds' =>
+           let val cmap = map (fn (((s, id), _, _), th :: _) =>
+             (th |> Thm.concl_of |> HOLogic.dest_Trueprop |> head_of |>
+              dest_Const handle TERM _ =>
+                err_decl thy ("Bad introduction rule for " ^ string_of_id id) decl,
+              s)) preds'
+           in
+             app (fn (((_, id), _, intrs), intrs') =>
+               if length intrs = length intrs' andalso
+                 ListPair.all (fn ((_, t), th) =>
+                     Pattern.matches thy (rename_const cmap (Thm.prop_of th), t))
+                   (intrs, intrs')
+               then ()
+               else err_decl thy
+                 ("Failed to match predicate " ^ string_of_id id) decl) preds';
+             (fold (add_const_raw NONE o swap o apfst fst) cmap thy, false)
+           end)
+  | mk_decl _ (decl as Function eqnss) thy =
+      let val eqnss' = map (head_of_eqn o hd o snd) eqnss
+      in
+        case lookup_list fst (lookup_def thy) eqnss of
+          NONE =>
+            (thy |> globalize (fn lthy => Function_Fun.add_fun
+               (map (fn (s, T) => (Binding.name s, SOME T, NoSyn)) eqnss')
+               (map (pair Attrib.empty_binding) (maps snd eqnss))
+               Function_Fun.fun_config lthy) |>
+             fold (add_const o fst) eqnss',
+             true)
+        | SOME eqnss'' =>
+            let val cmap = map2 (fn ((id, _), th :: _) => fn (s, _) =>
+              (th |> Thm.prop_of |> head_of_eqn' handle TERM _ =>
+                 err_decl thy ("Bad equation for " ^ string_of_id id) decl,
+               s)) eqnss'' eqnss'
+            in
+              app (fn ((id, eqns), eqns') =>
+                if length eqns = length eqns' andalso
+                  ListPair.all (fn (t, th) =>
+                      Pattern.matches thy (rename_const cmap (Thm.prop_of th), t))
+                    (eqns, eqns')
+                then ()
+                else err_decl thy
+                  ("Failed to match function " ^ string_of_id id) decl) eqnss'';
+              (fold (add_const_raw NONE o swap o apfst fst) cmap thy, false)
+            end
+      end
+  | mk_decl _ _ thy = (thy, true);
+
+fun init_decls thyname consts types = Why3_Data.map
+  (fn {theories, env = NONE} =>
+        {theories = Symtab.update_new
+           (thyname,
+            {consts = Symtab.make consts,
+             types = Symtab.make types,
+             thms = Symtab.empty,
+             defs = Symtab.empty})
+           theories handle Symtab.DUP _ =>
+             error ("Theory " ^ thyname ^ " has already been loaded."),
+         env = SOME
+           {thyname = thyname,
+            decls = [],
+            vcs = Symtab.empty}}
+    | _ => err_unfinished ());
+
+fun put_decls decls = Why3_Data.map
+  (fn {theories, env = SOME {thyname, ...}} =>
+        {theories = theories,
+         env = SOME
+           {thyname = thyname,
+            decls = decls,
+            vcs = print_open_vcs I (fold
+              (fn Lemma ((s, _), ps, cs) => Symtab.update_new (s, (NONE, ps, cs))
+                | _ => I) decls Symtab.empty
+              handle Symtab.DUP k => error ("Verification condition " ^ k ^
+                " has already been declared."))}}
+    | _ => err_no_env ());
+
+fun close incomplete thy =
+  thy |>
+  Why3_Data.map (fn
+      {theories, env = SOME {thyname, vcs, ...}} =>
+        let
+          val (proved, unproved) = partition_vcs vcs;
+          val _ = Thm.join_proofs (maps (#1 o snd) proved)
+        in
+          (if null unproved
+           then writeln ("Finished Why3 theory " ^ thyname)
+           else (if incomplete then warning else error)
+             (Pretty.string_of (pp_open_vcs unproved));
+           {theories = theories, env = NONE})
+        end
+    | _ => err_no_env ()) |>
+  Sign.parent_path;
+
+fun process_decls consts types x path = elem "theory" (fn atts =>
+  (fn imports :: xs => elem "realized" (fn _ => fn rs => fn thy =>
+        let
+          val thyname = get_name atts;
+          val realize = get_bool "realize" atts;
+          val _ =
+            realize orelse
+            Path.is_basic path andalso
+            let val (path', ext) = Path.split_ext path
+            in
+              Path.implode path' = Context.theory_name thy andalso
+              ext = "xml"
+            end orelse
+            error "Name of Why3 file does not match name of theory";
+          val (ds, thy') = thy |>
+            Sign.add_path thyname |>
+            init_decls thyname consts types |>
+            pair [] |>
+            fold (fn x => fn (ds, thy) =>
+              let
+                val d = read_decl (Named_Target.theory_init thy) x;
+                val (thy', b) = mk_decl realize d thy
+              in ((b ? cons d) ds, thy') end) xs
+        in put_decls (rev ds) thy' end) imports
+    | _ => error "Bad theory specification")) x
 
 
 (**** commands ****)
