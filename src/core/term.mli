@@ -224,8 +224,14 @@ val t_nat_const : int -> term
 val stop_split : label
 val asym_split : label
 
+val t_and_l : term list -> term
+val t_or_l : term list -> term
+
 val t_and_asym : term -> term -> term
 val t_or_asym : term -> term -> term
+
+val t_and_asym_l : term list -> term
+val t_or_asym_l : term list -> term
 
 val t_let_close : vsymbol -> term -> term -> term
 val t_eps_close : vsymbol -> term -> term

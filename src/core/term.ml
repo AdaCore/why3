@@ -866,11 +866,31 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
+let rec t_and_l = function
+  | [] -> t_true
+  | [f] -> f
+  | f::fl -> t_and f (t_and_l fl)
+
+let rec t_or_l = function
+  | [] -> t_false
+  | [f] -> f
+  | f::fl -> t_or f (t_or_l fl)
+
 let asym_split = create_label "asym_split"
 let stop_split = create_label "stop_split"
 
 let t_and_asym t1 t2 = t_and (t_label_add asym_split t1) t2
 let t_or_asym  t1 t2 = t_or  (t_label_add asym_split t1) t2
+
+let rec t_and_asym_l = function
+  | [] -> t_true
+  | [f] -> f
+  | f::fl -> t_and_asym f (t_and_asym_l fl)
+
+let rec t_or_asym_l = function
+  | [] -> t_false
+  | [f] -> f
+  | f::fl -> t_or_asym f (t_or_asym_l fl)
 
 (* closing constructors *)
 
