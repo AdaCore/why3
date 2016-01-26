@@ -150,6 +150,11 @@ theory set.Fset
   syntax function cardinal "<app><const name=\"Nat.semiring_1_class.of_nat\"><fun><type name=\"Nat.nat\"/><type name=\"Int.int\"/></fun></const><app><const name=\"FSet.fcard\"/>%1</app></app>"
 end
 
+theory number.Parity
+  syntax predicate even "<app><const name=\"Parity.semiring_parity_class.even\"/>%1</app>"
+  syntax predicate odd  "<app><const name=\"Parity.semiring_parity_class.odd\"/>%1</app>"
+end
+
 theory number.Divisibility
   syntax predicate divides "<app><const name=\"Rings.dvd_class.dvd\"/>%1%2</app>"
 end
@@ -164,11 +169,6 @@ end
 
 theory number.Coprime
   syntax predicate coprime "<app><const name=\"GCD.gcd_class.coprime\"/>%1%2</app>"
-end
-
-theory algebra.Field
-  syntax function inv "<app><const name=\"Fields.inverse_class.inverse\"/>%1</app>"
-  syntax function (/) "<app><const name=\"Fields.inverse_class.divide\"/>%1%2</app>"
 end
 
 theory real.Real
