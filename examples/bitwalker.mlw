@@ -32,11 +32,11 @@ module Bitwalker
 
   let lemma nth_ultpre0 (x:BV64.t) (len:BV32.t)
     requires { BV32.to_uint len < 64}
-    ensures { BV64.eq_sub x BV64.zero (BV32.to_uint len) (64 - BV32.to_uint len)
+    ensures { BV64.eq_sub x BV64.zeros (BV32.to_uint len) (64 - BV32.to_uint len)
           <-> BV64.to_uint x < BV64.to_uint (maxvalue len) }
   =
     assert { BV32.ult len (BV32.of_int 64) };
-    assert { BV64.eq_sub_bv x BV64.zero (C32_64.toBig len) (BV64.sub (BV64.of_int 64) (C32_64.toBig len))
+    assert { BV64.eq_sub_bv x BV64.zeros (C32_64.toBig len) (BV64.sub (BV64.of_int 64) (C32_64.toBig len))
          <-> BV64.ult x (maxvalue len) }
 
  (** return [value] with the bit of index [left] from the left set to [flag] *)
@@ -106,7 +106,7 @@ module Bitwalker
     let mask =
       BV32.lsl_bv (BV32.int_check 1) (BV32.sub_check (BV32.int_check 7) left)
     in
-    BV32.bw_and (C8_32.toBig byte) mask <> BV32.zero
+    BV32.bw_and (C8_32.toBig byte) mask <> BV32.zeros
     end
 
   (* return the bit of the [left]/8 element of [addr] at position mod [left] 8 starting from the left *)
@@ -124,7 +124,7 @@ module Bitwalker
     requires { BV32.to_uint start + BV32.to_uint len < BV32.two_power_size }
     requires { 8 * length addr < BV32.two_power_size }
     ensures  { BV32.to_uint start + BV32.to_uint len > (8 * length addr) ->
-      result = BV64.zero }
+      result = BV64.zeros }
     ensures  { BV32.to_uint start + BV32.to_uint len <= (8 * length addr) ->
       (forall i:int. 0 <= i < BV32.to_uint len ->
          BV64.nth result i
@@ -134,11 +134,11 @@ module Bitwalker
   =
     if (BV32.to_uint (BV32.add_check start len) > ( 8 *length addr ))
     then
-      BV64.zero
+      BV64.zeros
     else
 
-    let retval = ref BV64.zero in
-    let i = ref BV32.zero in
+    let retval = ref BV64.zeros in
+    let i = ref BV32.zeros in
     let lstart = BV32.sub_check (BV32.of_int 64) len in
 
     while BV32.ult !i len do variant{ !i with BV32.ugt }
@@ -172,7 +172,7 @@ module Bitwalker
                        (BV64.sub (BV64.of_int 63) (C32_64.toBig left))}
        let mask = BV64.lsl_bv (BV64.int_check 1)
                   (C32_64.toBig (BV32.sub_check (BV32.int_check 63) left)) in
-       BV64.bw_and value mask <> BV64.zero
+       BV64.bw_and value mask <> BV64.zeros
      end
 
 (*
@@ -251,7 +251,7 @@ module Bitwalker
     else
 
     let lstart = BV32.sub_check (BV32.of_int 64) len in
-    let i = ref BV32.zero in
+    let i = ref BV32.zeros in
 
     'Init:
     while BV32.ult !i len do variant { !i with BV32.ugt }

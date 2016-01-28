@@ -24,7 +24,7 @@ theory bv.BV_Gen
 
   remove prop size_pos
   remove prop nth_out_of_bound
-  remove prop Nth_zero
+  remove prop Nth_zeros
   remove prop Nth_ones
   remove prop two_power_size_val
   remove prop max_int_val
@@ -34,13 +34,13 @@ theory bv.BV_Gen
   remove prop Nth_bw_not
   remove prop Lsr_nth_low
   remove prop Lsr_nth_high
-  remove prop lsr_zero
+  remove prop lsr_zeros
   remove prop Asr_nth_low
   remove prop Asr_nth_high
-  remove prop asr_zero
+  remove prop asr_zeros
   remove prop Lsl_nth_low
   remove prop Lsl_nth_high
-  remove prop lsl_zero
+  remove prop lsl_zeros
   remove prop Nth_rotate_left
   remove prop Nth_rotate_right
 
@@ -48,7 +48,7 @@ theory bv.BV_Gen
   remove prop to_uint_bounds
   remove prop to_int_extensionality
 
-  remove prop Of_int_zero
+  remove prop Of_int_zeros
   remove prop Of_int_ones
 
   remove prop to_uint_add
@@ -78,7 +78,7 @@ end
 theory bv.BV64
   syntax type t "(_ BitVec 64)"
 
-  syntax function zero "#x0000000000000000"
+  syntax function zeros "#x0000000000000000"
   syntax function ones "#xFFFFFFFFFFFFFFFF"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
@@ -88,7 +88,7 @@ end
 theory bv.BV32
   syntax type t "(_ BitVec 32)"
 
-  syntax function zero "#x00000000"
+  syntax function zeros "#x00000000"
   syntax function ones "#xFFFFFFFF"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
@@ -98,7 +98,7 @@ end
 theory bv.BV16
   syntax type t "(_ BitVec 16)"
 
-  syntax function zero "#x0000"
+  syntax function zeros "#x0000"
   syntax function ones "#xFFFF"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
@@ -108,7 +108,7 @@ end
 theory bv.BV8
   syntax type t "(_ BitVec 8)"
 
-  syntax function zero "#x00"
+  syntax function zeros "#x00"
   syntax function ones "#xFF"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"

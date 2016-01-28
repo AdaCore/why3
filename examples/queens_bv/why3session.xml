@@ -106,7 +106,7 @@
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="8c27bb54fc3d9e15efa7c17b4978a559">
+<theory name="NQueensBits" sum="a825c274c9dc4b1ad2af530c895eda81">
  <goal name="WP_parameter t" expl="VC for t">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t.1" expl="1. assertion">
@@ -352,11 +352,6 @@
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="nth"/>
-   </ls_pos>
-   <ls_pos name="zero" id="4945"
-    ip_theory="BV32">
-    <ip_library name="bv"/>
-    <ip_qualid name="zero"/>
    </ls_pos>
    <ls_pos name="ones" id="4948"
     ip_theory="BV32">
@@ -1208,11 +1203,6 @@
     <ip_library name="bv"/>
     <ip_qualid name="nth_out_of_bound"/>
    </pr_pos>
-   <pr_pos name="Nth_zero" id="4946"
-    ip_theory="BV32">
-    <ip_library name="bv"/>
-    <ip_qualid name="Nth_zero"/>
-   </pr_pos>
    <pr_pos name="Nth_ones" id="4949"
     ip_theory="BV32">
     <ip_library name="bv"/>
@@ -1248,11 +1238,6 @@
     <ip_library name="bv"/>
     <ip_qualid name="Lsr_nth_high"/>
    </pr_pos>
-   <pr_pos name="lsr_zero" id="4988"
-    ip_theory="BV32">
-    <ip_library name="bv"/>
-    <ip_qualid name="lsr_zero"/>
-   </pr_pos>
    <pr_pos name="Asr_nth_low" id="4992"
     ip_theory="BV32">
     <ip_library name="bv"/>
@@ -1263,11 +1248,6 @@
     <ip_library name="bv"/>
     <ip_qualid name="Asr_nth_high"/>
    </pr_pos>
-   <pr_pos name="asr_zero" id="5002"
-    ip_theory="BV32">
-    <ip_library name="bv"/>
-    <ip_qualid name="asr_zero"/>
-   </pr_pos>
    <pr_pos name="Lsl_nth_high" id="5006"
     ip_theory="BV32">
     <ip_library name="bv"/>
@@ -1277,11 +1257,6 @@
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Lsl_nth_low"/>
-   </pr_pos>
-   <pr_pos name="lsl_zero" id="5016"
-    ip_theory="BV32">
-    <ip_library name="bv"/>
-    <ip_qualid name="lsl_zero"/>
    </pr_pos>
    <pr_pos name="Nth_rotate_right" id="5020"
     ip_theory="BV32">
@@ -1501,9 +1476,6 @@
    </meta>
    <meta name="remove_logic">
     <meta_arg_ls id="4940"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="4945"/>
    </meta>
    <meta name="remove_logic">
     <meta_arg_ls id="4948"/>
@@ -2013,9 +1985,6 @@
     <meta_arg_pr id="4941"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4946"/>
-   </meta>
-   <meta name="remove_prop">
     <meta_arg_pr id="4949"/>
    </meta>
    <meta name="remove_prop">
@@ -2037,25 +2006,16 @@
     <meta_arg_pr id="4983"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4988"/>
-   </meta>
-   <meta name="remove_prop">
     <meta_arg_pr id="4992"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="4997"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5002"/>
-   </meta>
-   <meta name="remove_prop">
     <meta_arg_pr id="5006"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="5011"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="5016"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="5020"/>
@@ -2211,7 +2171,7 @@
    <proof prover="3"><result status="valid" time="0.29"/></proof>
    </goal>
    <goal name="WP_parameter t.22.2" expl="2. assertion">
-   <proof prover="3"><result status="valid" time="6.28"/></proof>
+   <proof prover="3"><result status="valid" time="7.04"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2219,7 +2179,7 @@
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter t.24" expl="24. assertion">
-  <proof prover="3"><result status="valid" time="1.15"/></proof>
+  <proof prover="3"><result status="valid" time="1.47"/></proof>
   </goal>
   <goal name="WP_parameter t.25" expl="25. precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
@@ -2296,7 +2256,7 @@
    <proof prover="3"><result status="valid" time="0.15"/></proof>
    </goal>
    <goal name="WP_parameter t.48.2" expl="2. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="2.31"/></proof>
+   <proof prover="3"><result status="valid" time="2.76"/></proof>
    </goal>
    <goal name="WP_parameter t.48.3" expl="3. loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.29"/></proof>
@@ -2315,8 +2275,8 @@
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="WP_parameter t.49.3" expl="3. loop invariant preservation">
-   <proof prover="3" timelimit="60"><result status="valid" time="32.07"/></proof>
-   <proof prover="6" timelimit="60"><result status="valid" time="5.64"/></proof>
+   <proof prover="3" timelimit="60"><result status="valid" time="43.41"/></proof>
+   <proof prover="6" timelimit="60"><result status="valid" time="8.49"/></proof>
    </goal>
   </transf>
   </goal>
