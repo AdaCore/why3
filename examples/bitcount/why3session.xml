@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="30" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="30" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="30" steplimit="1" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="30" steplimit="1" memlimit="1000"/>
 <file name="../bitcount.mlw" expanded="true">
-<theory name="BitCount8bit_fact" sum="5751fad0b4d740cb2042ca2423c25c5e" expanded="true">
+<theory name="BitCount8bit_fact" sum="82f55971729b6150d50930dbb531ed9c" expanded="true">
  <goal name="nth_as_bv_is_int">
  <proof prover="0"><result status="valid" time="0.18" steps="95"/></proof>
  </goal>
@@ -25,10 +25,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter step1.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="3.36" steps="668"/></proof>
+  <proof prover="0"><result status="valid" time="2.88" steps="668"/></proof>
   </goal>
   <goal name="WP_parameter step1.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.80" steps="189"/></proof>
+  <proof prover="0"><result status="valid" time="0.50" steps="189"/></proof>
   </goal>
  </transf>
  </goal>
@@ -66,13 +66,13 @@
    <proof prover="0"><result status="valid" time="0.65" steps="152"/></proof>
    </goal>
    <goal name="WP_parameter step2.5.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.75" steps="144"/></proof>
+   <proof prover="0"><result status="valid" time="0.42" steps="144"/></proof>
    </goal>
    <goal name="WP_parameter step2.5.4" expl="4. assertion">
    <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="WP_parameter step2.5.5" expl="5. assertion">
-   <proof prover="5"><result status="valid" time="7.94"/></proof>
+   <proof prover="5"><result status="valid" time="5.20"/></proof>
    </goal>
   </transf>
   </goal>
@@ -80,7 +80,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter step2.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.50" steps="133"/></proof>
+  <proof prover="0"><result status="valid" time="0.32" steps="133"/></proof>
   </goal>
  </transf>
  </goal>
@@ -137,19 +137,23 @@
  </transf>
  </goal>
 </theory>
-<theory name="BitCounting32" sum="9f25f7ff7a6a81cbcd2f8a85a25ec49b" expanded="true">
- <goal name="WP_parameter proof0" expl="VC for proof0">
- <transf name="split_goal_wp">
+<theory name="BitCounting32" sum="10b4e91da18a7fca9af40b70ea189ff4" expanded="true">
+ <goal name="WP_parameter proof0" expl="VC for proof0" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter proof0.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.04" steps="81"/></proof>
   </goal>
   <goal name="WP_parameter proof0.2" expl="2. assertion">
   <proof prover="0"><result status="valid" time="0.03" steps="79"/></proof>
   </goal>
-  <goal name="WP_parameter proof0.3" expl="3. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter proof0.3.1" expl="1. VC for proof0">
-   <proof prover="2"><result status="valid" time="0.12"/></proof>
+  <goal name="WP_parameter proof0.3" expl="3. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter proof0.3.1" expl="1. VC for proof0" expanded="true">
+   <transf name="introduce_premises" expanded="true">
+    <goal name="WP_parameter proof0.3.1.1" expl="1. VC for proof0" expanded="true">
+    <proof prover="2" steplimit="-1"><result status="valid" time="0.17"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="WP_parameter proof0.3.2" expl="2. VC for proof0">
    <proof prover="0"><result status="valid" time="0.04" steps="110"/></proof>
@@ -160,7 +164,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter proof0.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.45" steps="305"/></proof>
+  <proof prover="0"><result status="valid" time="0.29" steps="305"/></proof>
   </goal>
  </transf>
  </goal>
@@ -226,7 +230,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="91"/></proof>
   </goal>
   <goal name="WP_parameter proof2.8" expl="8. assertion">
-  <proof prover="0"><result status="valid" time="0.91" steps="153"/></proof>
+  <proof prover="0"><result status="valid" time="0.58" steps="153"/></proof>
   </goal>
   <goal name="WP_parameter proof2.9" expl="9. assertion">
   <proof prover="0"><result status="valid" time="0.80" steps="151"/></proof>
@@ -279,7 +283,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="93"/></proof>
   </goal>
   <goal name="WP_parameter proof3.10" expl="10. assertion">
-  <proof prover="0"><result status="valid" time="1.02" steps="157"/></proof>
+  <proof prover="0"><result status="valid" time="0.57" steps="157"/></proof>
   </goal>
   <goal name="WP_parameter proof3.11" expl="11. assertion">
   <proof prover="0"><result status="valid" time="0.06" steps="93"/></proof>
@@ -378,11 +382,11 @@
  </transf>
  </goal>
 </theory>
-<theory name="Hamming" sum="dfdc0f1acb686591cb859b028bb81cbe" expanded="true">
+<theory name="Hamming" sum="d1fbefaa3e308a6b50a604fbf93f3876" expanded="true">
  <goal name="WP_parameter hammingD" expl="VC for hammingD">
  <transf name="split_goal_wp">
   <goal name="WP_parameter hammingD.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="1.42" steps="409"/></proof>
+  <proof prover="0"><result status="valid" time="1.00" steps="409"/></proof>
   </goal>
   <goal name="WP_parameter hammingD.2" expl="2. postcondition">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
@@ -393,19 +397,19 @@
  <proof prover="4"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="numof_ytpmE">
- <proof prover="2"><result status="valid" time="1.89"/></proof>
+ <proof prover="2"><result status="valid" time="1.04"/></proof>
  </goal>
  <goal name="WP_parameter separation" expl="VC for separation">
  <transf name="split_goal_wp">
   <goal name="WP_parameter separation.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="1.87" steps="473"/></proof>
+  <proof prover="0"><result status="valid" time="1.23" steps="473"/></proof>
   </goal>
   <goal name="WP_parameter separation.2" expl="2. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter separation.2.1" expl="1. postcondition">
-   <proof prover="0"><result status="valid" time="0.03" steps="73"/></proof>
+   <goal name="WP_parameter separation.2.1" expl="1. VC for separation">
+   <proof prover="0"><result status="valid" time="0.04" steps="73"/></proof>
    </goal>
-   <goal name="WP_parameter separation.2.2" expl="2. postcondition">
+   <goal name="WP_parameter separation.2.2" expl="2. VC for separation">
    <proof prover="0"><result status="valid" time="0.65" steps="313"/></proof>
    </goal>
   </transf>
@@ -413,17 +417,17 @@
  </transf>
  </goal>
  <goal name="WP_parameter numof_or" expl="VC for numof_or">
- <proof prover="2"><result status="valid" time="0.50"/></proof>
+ <proof prover="2"><result status="valid" time="0.32"/></proof>
  </goal>
  <goal name="WP_parameter triangleInequalityInt" expl="VC for triangleInequalityInt">
- <proof prover="1"><result status="valid" time="9.24"/></proof>
+ <proof prover="1"><result status="valid" time="7.31"/></proof>
  </goal>
  <goal name="triangleInequality">
- <proof prover="0"><result status="valid" time="0.05" steps="75"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="69"/></proof>
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="AsciiCode" sum="65a00d71812a6ba057f736c4159b37f1" expanded="true">
+<theory name="AsciiCode" sum="a0efd55626df3e4e4cb720eead890c7a" expanded="true">
  <goal name="WP_parameter bv_even" expl="VC for bv_even">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bv_even.1" expl="1. assertion">
@@ -433,10 +437,10 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter bv_even.3" expl="3. assertion">
-  <proof prover="1"><result status="valid" time="2.41"/></proof>
+  <proof prover="1"><result status="valid" time="3.21"/></proof>
   </goal>
   <goal name="WP_parameter bv_even.4" expl="4. assertion">
-  <proof prover="1"><result status="valid" time="1.75"/></proof>
+  <proof prover="1"><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="WP_parameter bv_even.5" expl="5. postcondition">
   <proof prover="0"><result status="valid" time="0.09" steps="115"/></proof>
@@ -448,7 +452,7 @@
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter numof_or" expl="VC for numof_or">
- <proof prover="2"><result status="valid" time="0.38"/></proof>
+ <proof prover="2"><result status="valid" time="0.22"/></proof>
  </goal>
  <goal name="WP_parameter count_or" expl="VC for count_or">
  <transf name="split_goal_wp">
@@ -462,7 +466,7 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter count_or.4" expl="4. assertion">
-  <proof prover="5" timelimit="5"><result status="valid" time="2.21"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="1.43"/></proof>
   </goal>
   <goal name="WP_parameter count_or.5" expl="5. postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="74"/></proof>
@@ -473,7 +477,7 @@
  <goal name="WP_parameter ascii" expl="VC for ascii">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ascii.1" expl="1. precondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="117"/></proof>
+  <proof prover="0"><result status="valid" time="0.30" steps="244"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter ascii.2" expl="2. assertion">
@@ -492,13 +496,13 @@
   <goal name="WP_parameter ascii.4" expl="4. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter ascii.4.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.08" steps="100"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="94"/></proof>
    </goal>
    <goal name="WP_parameter ascii.4.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.19" steps="123"/></proof>
+   <proof prover="0"><result status="valid" time="0.19" steps="119"/></proof>
    </goal>
    <goal name="WP_parameter ascii.4.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.55" steps="162"/></proof>
+   <proof prover="0"><result status="valid" time="0.55" steps="177"/></proof>
    </goal>
    <goal name="WP_parameter ascii.4.4" expl="4. assertion">
    <proof prover="4"><result status="valid" time="0.03"/></proof>
@@ -530,12 +534,12 @@
   <proof prover="4"><result status="valid" time="0.98"/></proof>
   </goal>
   <goal name="WP_parameter tmp.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="1.89" steps="575"/></proof>
+  <proof prover="0"><result status="valid" time="1.38" steps="575"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="asciiProp">
- <proof prover="0"><result status="valid" time="0.40" steps="235"/></proof>
+ <proof prover="0"><result status="valid" time="0.24" steps="235"/></proof>
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>

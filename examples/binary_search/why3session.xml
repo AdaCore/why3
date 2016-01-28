@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../binary_search.mlw" expanded="true">
 <theory name="BinarySearch" sum="7c8646b76f7105e1357a0dac5eef6893" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
@@ -20,7 +20,7 @@
  <proof prover="5" timelimit="10"><result status="valid" time="0.02" steps="44"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchInt32" sum="84d73d964ac2e52c2a4c56e898a3c5f5" expanded="true">
+<theory name="BinarySearchInt32" sum="be00e964eb6971d378bc5e7bb474a32c" expanded="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter binary_search.1" expl="1. integer overflow">
@@ -70,8 +70,8 @@
   </goal>
   <goal name="WP_parameter binary_search.16" expl="16. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="4.16"/></proof>
-  <proof prover="5"><result status="valid" time="1.68" steps="179"/></proof>
+  <proof prover="2"><result status="valid" time="3.48"/></proof>
+  <proof prover="5"><result status="valid" time="1.34" steps="179"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.17" expl="17. loop variant decrease">
   <proof prover="5"><result status="valid" time="0.02" steps="98"/></proof>
@@ -91,7 +91,7 @@
   <goal name="WP_parameter binary_search.22" expl="22. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="3.46"/></proof>
-  <proof prover="5"><result status="valid" time="1.99" steps="180"/></proof>
+  <proof prover="5"><result status="valid" time="1.35" steps="180"/></proof>
   </goal>
   <goal name="WP_parameter binary_search.23" expl="23. loop variant decrease">
   <proof prover="5"><result status="valid" time="0.02" steps="100"/></proof>

@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../bitwalker.mlw" expanded="true">
-<theory name="Bitwalker" sum="5f74f72afed1573d231ce92e0072a9e5" expanded="true">
+<theory name="Bitwalker" sum="9755ce6626677472899148634ff24705" expanded="true">
  <goal name="nth64">
  <proof prover="0"><result status="valid" time="0.10" steps="88"/></proof>
  </goal>
@@ -25,8 +25,8 @@
   <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter nth_ultpre0.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.52" steps="210"/></proof>
-  <proof prover="6"><result status="valid" time="0.30"/></proof>
+  <proof prover="0"><result status="valid" time="0.36" steps="198"/></proof>
+  <proof prover="6"><result status="valid" time="0.12"/></proof>
   </goal>
  </transf>
  </goal>
@@ -61,7 +61,7 @@
   </goal>
   <goal name="WP_parameter poke_64bit_bv.9" expl="9. postcondition">
   <proof prover="0"><result status="valid" time="0.34" steps="188"/></proof>
-  <proof prover="6"><result status="valid" time="0.22"/></proof>
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter poke_64bit_bv.10" expl="10. postcondition">
   <proof prover="0"><result status="valid" time="0.29" steps="163"/></proof>
@@ -81,13 +81,13 @@
   <proof prover="0"><result status="valid" time="0.04" steps="78"/></proof>
   </goal>
   <goal name="WP_parameter poke_64bit.4" expl="4. VC for poke_64bit">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="1"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter poke_64bit.5" expl="5. VC for poke_64bit">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="WP_parameter poke_64bit.6" expl="6. VC for poke_64bit">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="WP_parameter poke_64bit.7" expl="7. VC for poke_64bit">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
@@ -121,7 +121,7 @@
   <proof prover="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter peek_8bit_bv.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="1.56" steps="611"/></proof>
+  <proof prover="0"><result status="valid" time="1.56" steps="612"/></proof>
   </goal>
  </transf>
  </goal>
@@ -238,7 +238,7 @@
   </goal>
   <goal name="WP_parameter peek.19" expl="19. loop invariant preservation">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.25"/></proof>
+  <proof prover="6"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="WP_parameter peek.20" expl="20. loop variant decrease">
   <proof prover="0"><result status="valid" time="0.14" steps="104"/></proof>
@@ -276,7 +276,7 @@
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter peek_64bit.5" expl="5. VC for peek_64bit">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter peek_64bit.6" expl="6. postcondition">
   <proof prover="0"><result status="valid" time="0.07" steps="133"/></proof>
@@ -317,10 +317,10 @@
   <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter poke_8bit.9" expl="9. postcondition">
-  <proof prover="3"><result status="valid" time="1.68"/></proof>
+  <proof prover="3"><result status="valid" time="0.83"/></proof>
   </goal>
   <goal name="WP_parameter poke_8bit.10" expl="10. postcondition">
-  <proof prover="3"><result status="valid" time="0.88"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
  </transf>
  </goal>
@@ -357,7 +357,7 @@
   <goal name="WP_parameter poke_8bit_array.6" expl="6. precondition">
   <proof prover="0"><result status="valid" time="0.34" steps="196"/></proof>
   <proof prover="1"><result status="valid" time="0.08"/></proof>
-  <proof prover="3"><result status="valid" time="1.52"/></proof>
+  <proof prover="3"><result status="valid" time="1.26"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter poke_8bit_array.7" expl="7. index in array bounds">

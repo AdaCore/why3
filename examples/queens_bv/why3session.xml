@@ -2,12 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../queens_bv.mlw" expanded="true">
 <theory name="S" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
@@ -22,7 +22,7 @@
 </theory>
 <theory name="BitsSpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Bits" sum="0ff8cf2ea11fc9a9de3844539dd2b398">
+<theory name="Bits" sum="091da063ba5eb191742d660f826d4483">
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="0"><result status="valid" time="0.03" steps="79"/></proof>
  </goal>
@@ -67,24 +67,24 @@
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.2" expl="2. assertion">
-  <proof prover="0"><result status="valid" time="0.16" steps="171"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="140"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.3" expl="3. assertion">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.4" expl="4. assertion">
-  <proof prover="0"><result status="valid" time="0.35" steps="206"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="172"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.5" expl="5. assertion">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.6" expl="6. assertion">
-  <proof prover="0"><result status="valid" time="1.82" steps="516"/></proof>
+  <proof prover="0"><result status="valid" time="0.56" steps="363"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.7" expl="7. type invariant">
   <transf name="split_goal_wp">
    <goal name="WP_parameter rightmost_bit_trick.7.1" expl="1. type invariant">
-   <proof prover="0"><result status="valid" time="0.29" steps="208"/></proof>
+   <proof prover="0"><result status="valid" time="0.11" steps="167"/></proof>
    </goal>
    <goal name="WP_parameter rightmost_bit_trick.7.2" expl="2. type invariant">
    <proof prover="3"><result status="valid" time="0.12"/></proof>
@@ -93,7 +93,7 @@
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="WP_parameter rightmost_bit_trick.7.4" expl="4. type invariant">
-   <proof prover="0"><result status="valid" time="2.90" steps="1281"/></proof>
+   <proof prover="0"><result status="valid" time="0.52" steps="630"/></proof>
    </goal>
   </transf>
   </goal>
@@ -106,7 +106,7 @@
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="52654d3528256695406a132fccae498b">
+<theory name="NQueensBits" sum="8c27bb54fc3d9e15efa7c17b4978a559">
  <goal name="WP_parameter t" expl="VC for t">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t.1" expl="1. assertion">
@@ -343,167 +343,167 @@
     <ip_library name="bv"/>
     <ip_qualid name="pow2"/>
    </ls_pos>
-   <ls_pos name="size" id="4941"
+   <ls_pos name="size" id="4935"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="size"/>
    </ls_pos>
-   <ls_pos name="nth" id="4946"
+   <ls_pos name="nth" id="4940"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="nth"/>
    </ls_pos>
-   <ls_pos name="zero" id="4951"
+   <ls_pos name="zero" id="4945"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="zero"/>
    </ls_pos>
-   <ls_pos name="ones" id="4954"
+   <ls_pos name="ones" id="4948"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="ones"/>
    </ls_pos>
-   <ls_pos name="bw_and" id="4957"
+   <ls_pos name="bw_and" id="4951"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="bw_and"/>
    </ls_pos>
-   <ls_pos name="bw_or" id="4964"
+   <ls_pos name="bw_or" id="4958"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="bw_or"/>
    </ls_pos>
-   <ls_pos name="bw_xor" id="4971"
+   <ls_pos name="bw_xor" id="4965"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="bw_xor"/>
    </ls_pos>
-   <ls_pos name="bw_not" id="4978"
+   <ls_pos name="bw_not" id="4972"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="bw_not"/>
    </ls_pos>
-   <ls_pos name="lsr" id="4983"
+   <ls_pos name="lsr" id="4977"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="lsr"/>
    </ls_pos>
-   <ls_pos name="asr" id="4997"
+   <ls_pos name="asr" id="4991"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="asr"/>
    </ls_pos>
-   <ls_pos name="lsl" id="5011"
+   <ls_pos name="lsl" id="5005"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="lsl"/>
    </ls_pos>
-   <ls_pos name="rotate_right" id="5025"
+   <ls_pos name="rotate_right" id="5019"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="rotate_right"/>
    </ls_pos>
-   <ls_pos name="rotate_left" id="5031"
+   <ls_pos name="rotate_left" id="5025"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="rotate_left"/>
    </ls_pos>
-   <ls_pos name="to_int" id="5039"
+   <ls_pos name="to_int" id="5033"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_int"/>
    </ls_pos>
-   <ls_pos name="to_uint" id="5040"
+   <ls_pos name="to_uint" id="5034"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint"/>
    </ls_pos>
-   <ls_pos name="of_int" id="5041"
+   <ls_pos name="of_int" id="5035"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="of_int"/>
    </ls_pos>
-   <ls_pos name="size_bv" id="5062"
+   <ls_pos name="size_bv" id="5056"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="size_bv"/>
    </ls_pos>
-   <ls_pos name="ugt" id="5089"
+   <ls_pos name="ugt" id="5083"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="ugt"/>
    </ls_pos>
-   <ls_pos name="uge" id="5100"
+   <ls_pos name="uge" id="5094"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="uge"/>
    </ls_pos>
-   <ls_pos name="sge" id="5144"
+   <ls_pos name="sge" id="5138"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="sge"/>
    </ls_pos>
-   <ls_pos name="add" id="5153"
+   <ls_pos name="add" id="5147"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="add"/>
    </ls_pos>
-   <ls_pos name="sub" id="5164"
+   <ls_pos name="sub" id="5158"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="sub"/>
    </ls_pos>
-   <ls_pos name="neg" id="5175"
+   <ls_pos name="neg" id="5169"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="neg"/>
    </ls_pos>
-   <ls_pos name="mul" id="5179"
+   <ls_pos name="mul" id="5173"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="mul"/>
    </ls_pos>
-   <ls_pos name="udiv" id="5190"
+   <ls_pos name="udiv" id="5184"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="udiv"/>
    </ls_pos>
-   <ls_pos name="urem" id="5196"
+   <ls_pos name="urem" id="5190"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="urem"/>
    </ls_pos>
-   <ls_pos name="nth_bv" id="5202"
-    ip_theory="BV32">
-    <ip_library name="bv"/>
-    <ip_qualid name="nth_bv"/>
-   </ls_pos>
-   <ls_pos name="lsr_bv" id="5212"
+   <ls_pos name="lsr_bv" id="5196"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="lsr_bv"/>
    </ls_pos>
-   <ls_pos name="asr_bv" id="5223"
+   <ls_pos name="asr_bv" id="5207"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="asr_bv"/>
    </ls_pos>
-   <ls_pos name="lsl_bv" id="5229"
+   <ls_pos name="lsl_bv" id="5213"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="lsl_bv"/>
    </ls_pos>
-   <ls_pos name="eq_sub_bv" id="5257"
+   <ls_pos name="nth_bv" id="5236"
+    ip_theory="BV32">
+    <ip_library name="bv"/>
+    <ip_qualid name="nth_bv"/>
+   </ls_pos>
+   <ls_pos name="eq_sub_bv" id="5251"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="eq_sub_bv"/>
    </ls_pos>
-   <ls_pos name="eq_sub" id="5278"
+   <ls_pos name="eq_sub" id="5265"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="eq_sub"/>
    </ls_pos>
-   <ls_pos name="eq" id="5308"
+   <ls_pos name="eq" id="5295"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="eq"/>
@@ -1198,177 +1198,177 @@
     <ip_library name="bv"/>
     <ip_qualid name="pow2_64"/>
    </pr_pos>
-   <pr_pos name="size_pos" id="4944"
+   <pr_pos name="size_pos" id="4938"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="size_pos"/>
    </pr_pos>
-   <pr_pos name="nth_out_of_bound" id="4947"
+   <pr_pos name="nth_out_of_bound" id="4941"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="nth_out_of_bound"/>
    </pr_pos>
-   <pr_pos name="Nth_zero" id="4952"
+   <pr_pos name="Nth_zero" id="4946"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_zero"/>
    </pr_pos>
-   <pr_pos name="Nth_ones" id="4955"
+   <pr_pos name="Nth_ones" id="4949"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_ones"/>
    </pr_pos>
-   <pr_pos name="Nth_bw_and" id="4958"
+   <pr_pos name="Nth_bw_and" id="4952"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_bw_and"/>
    </pr_pos>
-   <pr_pos name="Nth_bw_or" id="4965"
+   <pr_pos name="Nth_bw_or" id="4959"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_bw_or"/>
    </pr_pos>
-   <pr_pos name="Nth_bw_xor" id="4972"
+   <pr_pos name="Nth_bw_xor" id="4966"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_bw_xor"/>
    </pr_pos>
-   <pr_pos name="Nth_bw_not" id="4979"
+   <pr_pos name="Nth_bw_not" id="4973"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_bw_not"/>
    </pr_pos>
-   <pr_pos name="Lsr_nth_low" id="4984"
+   <pr_pos name="Lsr_nth_low" id="4978"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Lsr_nth_low"/>
    </pr_pos>
-   <pr_pos name="Lsr_nth_high" id="4989"
+   <pr_pos name="Lsr_nth_high" id="4983"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Lsr_nth_high"/>
    </pr_pos>
-   <pr_pos name="lsr_zero" id="4994"
+   <pr_pos name="lsr_zero" id="4988"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="lsr_zero"/>
    </pr_pos>
-   <pr_pos name="Asr_nth_low" id="4998"
+   <pr_pos name="Asr_nth_low" id="4992"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Asr_nth_low"/>
    </pr_pos>
-   <pr_pos name="Asr_nth_high" id="5003"
+   <pr_pos name="Asr_nth_high" id="4997"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Asr_nth_high"/>
    </pr_pos>
-   <pr_pos name="asr_zero" id="5008"
+   <pr_pos name="asr_zero" id="5002"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="asr_zero"/>
    </pr_pos>
-   <pr_pos name="Lsl_nth_high" id="5012"
+   <pr_pos name="Lsl_nth_high" id="5006"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Lsl_nth_high"/>
    </pr_pos>
-   <pr_pos name="Lsl_nth_low" id="5017"
+   <pr_pos name="Lsl_nth_low" id="5011"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Lsl_nth_low"/>
    </pr_pos>
-   <pr_pos name="lsl_zero" id="5022"
+   <pr_pos name="lsl_zero" id="5016"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="lsl_zero"/>
    </pr_pos>
-   <pr_pos name="Nth_rotate_right" id="5026"
+   <pr_pos name="Nth_rotate_right" id="5020"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_rotate_right"/>
    </pr_pos>
-   <pr_pos name="Nth_rotate_left" id="5032"
+   <pr_pos name="Nth_rotate_left" id="5026"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_rotate_left"/>
    </pr_pos>
-   <pr_pos name="two_power_size_val" id="5037"
+   <pr_pos name="two_power_size_val" id="5031"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="two_power_size_val"/>
    </pr_pos>
-   <pr_pos name="max_int_val" id="5038"
+   <pr_pos name="max_int_val" id="5032"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="max_int_val"/>
    </pr_pos>
-   <pr_pos name="to_int_extensionality" id="5047"
+   <pr_pos name="to_int_extensionality" id="5041"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_int_extensionality"/>
    </pr_pos>
-   <pr_pos name="to_uint_bounds" id="5057"
+   <pr_pos name="to_uint_bounds" id="5051"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_bounds"/>
    </pr_pos>
-   <pr_pos name="to_uint_add" id="5154"
+   <pr_pos name="to_uint_add" id="5148"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_add"/>
    </pr_pos>
-   <pr_pos name="to_uint_add_bounded" id="5159"
+   <pr_pos name="to_uint_add_bounded" id="5153"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_add_bounded"/>
    </pr_pos>
-   <pr_pos name="to_uint_sub" id="5165"
+   <pr_pos name="to_uint_sub" id="5159"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_sub"/>
    </pr_pos>
-   <pr_pos name="to_uint_sub_bounded" id="5170"
+   <pr_pos name="to_uint_sub_bounded" id="5164"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_sub_bounded"/>
    </pr_pos>
-   <pr_pos name="to_uint_neg" id="5176"
+   <pr_pos name="to_uint_neg" id="5170"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_neg"/>
    </pr_pos>
-   <pr_pos name="to_uint_mul" id="5180"
+   <pr_pos name="to_uint_mul" id="5174"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_mul"/>
    </pr_pos>
-   <pr_pos name="to_uint_mul_bounded" id="5185"
+   <pr_pos name="to_uint_mul_bounded" id="5179"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_mul_bounded"/>
    </pr_pos>
-   <pr_pos name="to_uint_udiv" id="5191"
+   <pr_pos name="to_uint_udiv" id="5185"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_udiv"/>
    </pr_pos>
-   <pr_pos name="to_uint_urem" id="5197"
+   <pr_pos name="to_uint_urem" id="5191"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="to_uint_urem"/>
    </pr_pos>
-   <pr_pos name="Nth_bv_is_nth" id="5203"
+   <pr_pos name="Nth_bv_is_nth" id="5242"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Nth_bv_is_nth"/>
    </pr_pos>
-   <pr_pos name="eq_sub_equiv" id="5297"
+   <pr_pos name="eq_sub_equiv" id="5284"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="eq_sub_equiv"/>
    </pr_pos>
-   <pr_pos name="Extensionality" id="5317"
+   <pr_pos name="Extensionality" id="5304"
     ip_theory="BV32">
     <ip_library name="bv"/>
     <ip_qualid name="Extensionality"/>
@@ -1497,76 +1497,79 @@
     <meta_arg_ls id="4049"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4941"/>
+    <meta_arg_ls id="4935"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4946"/>
+    <meta_arg_ls id="4940"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4945"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4948"/>
    </meta>
    <meta name="remove_logic">
     <meta_arg_ls id="4951"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4954"/>
+    <meta_arg_ls id="4958"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4957"/>
+    <meta_arg_ls id="4965"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4964"/>
+    <meta_arg_ls id="4972"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4971"/>
+    <meta_arg_ls id="4977"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4978"/>
+    <meta_arg_ls id="4991"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4983"/>
+    <meta_arg_ls id="5005"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4997"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="5011"/>
+    <meta_arg_ls id="5019"/>
    </meta>
    <meta name="remove_logic">
     <meta_arg_ls id="5025"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5031"/>
+    <meta_arg_ls id="5033"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5039"/>
+    <meta_arg_ls id="5034"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5040"/>
+    <meta_arg_ls id="5035"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5041"/>
+    <meta_arg_ls id="5056"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5062"/>
+    <meta_arg_ls id="5083"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5089"/>
+    <meta_arg_ls id="5094"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5100"/>
+    <meta_arg_ls id="5138"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5144"/>
+    <meta_arg_ls id="5147"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5153"/>
+    <meta_arg_ls id="5158"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5164"/>
+    <meta_arg_ls id="5169"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5175"/>
+    <meta_arg_ls id="5173"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5179"/>
+    <meta_arg_ls id="5184"/>
    </meta>
    <meta name="remove_logic">
     <meta_arg_ls id="5190"/>
@@ -1575,25 +1578,22 @@
     <meta_arg_ls id="5196"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5202"/>
+    <meta_arg_ls id="5207"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5212"/>
+    <meta_arg_ls id="5213"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5223"/>
+    <meta_arg_ls id="5236"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5229"/>
+    <meta_arg_ls id="5251"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5257"/>
+    <meta_arg_ls id="5265"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5278"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="5308"/>
+    <meta_arg_ls id="5295"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="1958"/>
@@ -2007,91 +2007,94 @@
     <meta_arg_pr id="4128"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4944"/>
+    <meta_arg_pr id="4938"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4947"/>
+    <meta_arg_pr id="4941"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="4946"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="4949"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="4952"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4955"/>
+    <meta_arg_pr id="4959"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4958"/>
+    <meta_arg_pr id="4966"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4965"/>
+    <meta_arg_pr id="4973"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4972"/>
+    <meta_arg_pr id="4978"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4979"/>
+    <meta_arg_pr id="4983"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4984"/>
+    <meta_arg_pr id="4988"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4989"/>
+    <meta_arg_pr id="4992"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4994"/>
+    <meta_arg_pr id="4997"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="4998"/>
+    <meta_arg_pr id="5002"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5003"/>
+    <meta_arg_pr id="5006"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5008"/>
+    <meta_arg_pr id="5011"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5012"/>
+    <meta_arg_pr id="5016"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5017"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="5022"/>
+    <meta_arg_pr id="5020"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="5026"/>
    </meta>
    <meta name="remove_prop">
+    <meta_arg_pr id="5031"/>
+   </meta>
+   <meta name="remove_prop">
     <meta_arg_pr id="5032"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5037"/>
+    <meta_arg_pr id="5041"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5038"/>
+    <meta_arg_pr id="5051"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5047"/>
+    <meta_arg_pr id="5148"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5057"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="5154"/>
+    <meta_arg_pr id="5153"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="5159"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5165"/>
+    <meta_arg_pr id="5164"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="5170"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5176"/>
+    <meta_arg_pr id="5174"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5180"/>
+    <meta_arg_pr id="5179"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="5185"/>
@@ -2100,16 +2103,13 @@
     <meta_arg_pr id="5191"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5197"/>
+    <meta_arg_pr id="5242"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5203"/>
+    <meta_arg_pr id="5284"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5297"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="5317"/>
+    <meta_arg_pr id="5304"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="2"/>
@@ -2211,7 +2211,7 @@
    <proof prover="3"><result status="valid" time="0.29"/></proof>
    </goal>
    <goal name="WP_parameter t.22.2" expl="2. assertion">
-   <proof prover="3"><result status="valid" time="7.18"/></proof>
+   <proof prover="3"><result status="valid" time="6.28"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2219,7 +2219,7 @@
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter t.24" expl="24. assertion">
-  <proof prover="3"><result status="valid" time="1.53"/></proof>
+  <proof prover="3"><result status="valid" time="1.15"/></proof>
   </goal>
   <goal name="WP_parameter t.25" expl="25. precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
@@ -2296,7 +2296,7 @@
    <proof prover="3"><result status="valid" time="0.15"/></proof>
    </goal>
    <goal name="WP_parameter t.48.2" expl="2. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="2.87"/></proof>
+   <proof prover="3"><result status="valid" time="2.31"/></proof>
    </goal>
    <goal name="WP_parameter t.48.3" expl="3. loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.29"/></proof>
@@ -2315,8 +2315,8 @@
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="WP_parameter t.49.3" expl="3. loop invariant preservation">
-   <proof prover="3" timelimit="60"><result status="valid" time="45.01"/></proof>
-   <proof prover="6" timelimit="60"><result status="valid" time="7.44"/></proof>
+   <proof prover="3" timelimit="60"><result status="valid" time="32.07"/></proof>
+   <proof prover="6" timelimit="60"><result status="valid" time="5.64"/></proof>
    </goal>
   </transf>
   </goal>

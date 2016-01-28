@@ -131,9 +131,9 @@ module Utils_Spec
   let lemma triangleInequalityInt (a b c : t) : unit
     ensures {to_uint (hammingD a b) + to_uint (hammingD b c) >= to_uint (hammingD a c)}
   =
-    assert {numof (nth_diff a b) 0 32 + numof (nth_diff b c) 0 32 >=
-    numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >=
-    numof (nth_diff a c) 0 32}
+    assert {numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >= numof (nth_diff a c) 0 32
+             by
+            forall j:int. 0 <= j < 32 -> nth_diff a c j -> fun_or (nth_diff a b) (nth_diff b c) j}
 
   lemma triangleInequality: forall a b c.
     uge (add (hammingD a b) (hammingD b c)) (hammingD a c)
