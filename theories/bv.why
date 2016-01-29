@@ -116,9 +116,9 @@ theory BV_Gen
 
   axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size -> nth x n = False
 
-  constant zero : t
-  axiom Nth_zero:
-    forall n:int. nth zero n = False
+  constant zeros : t
+  axiom Nth_zeros:
+    forall n:int. nth zeros n = False
 
   constant ones : t
   axiom Nth_ones:
@@ -167,7 +167,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s >= size ->
       nth (lsr b s) n = False
 
-  lemma lsr_zero: forall x. lsr x 0 = x
+  lemma lsr_zeros: forall x. lsr x 0 = x
 
   function asr t int : t
 
@@ -179,7 +179,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s >= size ->
       nth (asr b s) n = nth b (size-1)
 
-  lemma asr_zero: forall x. asr x 0 = x
+  lemma asr_zeros: forall x. asr x 0 = x
 
   function lsl t int : t
 
@@ -191,7 +191,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= n < s ->
       nth (lsl b s) n = False
 
-  lemma lsl_zero: forall x. lsl x 0 = x
+  lemma lsl_zeros: forall x. lsl x 0 = x
 
   use import int.EuclideanDivision
 
@@ -243,8 +243,8 @@ theory BV_Gen
 
   constant size_bv : t = of_int size
 
-  axiom Of_int_zero:
-    zero = of_int 0
+  axiom Of_int_zeros:
+    zeros = of_int 0
 
   axiom Of_int_ones:
     ones = of_int max_int
@@ -360,7 +360,7 @@ theory BV_Gen
 
   axiom nth_bv_def:
     forall x i.
-      nth_bv x i = not (bw_and (lsr_bv x i) (of_int 1) = zero)
+      nth_bv x i = not (bw_and (lsr_bv x i) (of_int 1) = zeros)
 
   axiom Nth_bv_is_nth:
     forall x i.

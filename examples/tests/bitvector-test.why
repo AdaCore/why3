@@ -4,7 +4,7 @@ theory TestBv32
   use import bv.BV32
 
   lemma Test1:
-    let b = bw_and zero ones in nth b 1 = False
+    let b = bw_and zeros ones in nth b 1 = False
 
   lemma Test2:
     let b = lsr ones 16 in nth b 15 = True

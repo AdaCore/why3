@@ -72,7 +72,7 @@ Lemma nth_low : forall {l} (v : Vector.t bool l) m, (m < 0)%Z -> nth_aux v m = f
   apply IHv; omega.
 Qed.
 
-Lemma nth_zero_is_hd : forall {l} (b : Vector.t bool (S l)), nth_aux b 0 = Vector.hd b.
+Lemma nth_zeros_is_hd : forall {l} (b : Vector.t bool (S l)), nth_aux b 0 = Vector.hd b.
   apply Vector.rectS; easy.
 Qed.
 
@@ -206,16 +206,17 @@ unfold nth.
 rewrite nth_aux_out_of_bound; auto with zarith.
 Qed.
 
-Definition zero_aux {l} : Vector.t bool l.
+
+Definition zeros_aux {l} : Vector.t bool l.
   exact (Vector.const false l).
 Defined.
 
 (* Why3 goal *)
-Definition zero: t.
-  exact zero_aux.
+Definition zeros: t.
+  exact zeros_aux.
 Defined.
 
-Lemma Nth_zero_aux : forall {l} (n:Z), ((@nth_aux l zero_aux n) = false).
+Lemma Nth_zeros_aux : forall {l} (n:Z), ((@nth_aux l zeros_aux n) = false).
   induction l.
   easy.
   simpl.
@@ -223,8 +224,8 @@ Lemma Nth_zero_aux : forall {l} (n:Z), ((@nth_aux l zero_aux n) = false).
 Qed.
 
 (* Why3 goal *)
-Lemma Nth_zero : forall (n:Z), ((nth zero n) = false).
-intros n; apply Nth_zero_aux.
+Lemma Nth_zeros : forall (n:Z), ((nth zeros n) = false).
+intros n; apply Nth_zeros_aux.
 Qed.
 
 Definition ones_aux l : Vector.t bool l.
@@ -337,7 +338,7 @@ Lemma Lsr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma lsr_zero : forall (x:t), ((lsr x 0%Z) = x).
+Lemma lsr_zeros : forall (x:t), ((lsr x 0%Z) = x).
 auto.
 Qed.
 
@@ -379,7 +380,7 @@ Qed.
 Lemma singleton_is_singl : forall b : Vector.t bool 1, b = [ Vector.hd b ].
   intro; apply Extensionality_aux; unfold eq_aux; intros.
   change (Z.of_nat 1) with 1%Z in H; assert (n = 0%Z) as e by omega; rewrite e; simpl.
-  apply nth_zero_is_hd.
+  apply nth_zeros_is_hd.
 Qed.
 
 Lemma shiftrepeat_is_shiftin : forall {l} (v : Vector.t bool (S l)), Vector.shiftrepeat v = Vector.shiftin (Vector.last v) v.
@@ -475,7 +476,7 @@ Lemma Asr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma asr_zero : forall (x:t), ((asr x 0%Z) = x).
+Lemma asr_zeros : forall (x:t), ((asr x 0%Z) = x).
 auto.
 Qed.
 
@@ -538,7 +539,7 @@ Lemma Lsl_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= n)%Z /\ (n < s)%Z) ->
 Qed.
 
 (* Why3 goal *)
-Lemma lsl_zero : forall (x:t), ((lsl x 0%Z) = x).
+Lemma lsl_zeros : forall (x:t), ((lsl x 0%Z) = x).
 auto.
 Qed.
 
@@ -557,7 +558,7 @@ Fixpoint bvec_to_nat n (v : Bvector n) {struct v} : nat :=
     | Vector.cons true n v => 1 + 2 * bvec_to_nat n v
   end.
 
-Lemma bvec_to_nat_zero : forall {l}, bvec_to_nat l (Vector.const false l) = 0.
+Lemma bvec_to_nat_zeros : forall {l}, bvec_to_nat l (Vector.const false l) = 0.
   induction l; [easy|simpl; omega].
 Qed.
 
@@ -577,7 +578,7 @@ Fixpoint nat_to_bvec (length val : nat) {struct length} : Bvector length :=
       Bcons (Z.odd (Z.of_nat val)) length (nat_to_bvec length (Div2.div2 val))
   end.
 
-Lemma Nat_to_bvec_zero : forall {n}, Vector.const false n = nat_to_bvec n 0.
+Lemma Nat_to_bvec_zeros : forall {n}, Vector.const false n = nat_to_bvec n 0.
   induction n.
   easy.
   simpl.
@@ -791,7 +792,7 @@ Lemma bvec_to_nat_nat_to_bvec : forall {n} i, (Z.of_nat i <= Pow2int.pow2 (Z.of_
   simpl; intro; omega.
   destruct i; intros.
   simpl.
-  rewrite <- Nat_to_bvec_zero, bvec_to_nat_zero; trivial.
+  rewrite <- Nat_to_bvec_zeros, bvec_to_nat_zeros; trivial.
   unfold nat_to_bvec, Bcons, bvec_to_nat.
   case (case_odd (S i)); intro.
   assert (Even.even i).
@@ -983,7 +984,7 @@ Lemma Nth_rotate_aux_right : forall {l} (v : Vector.t bool (S l)) (n:nat) (i:nat
   simpl (rotate_right_aux v (S n)).
   rewrite nth_aux_shiftin_high.
   rewrite Z.add_comm, mod1_add by omega.
-  rewrite <-nth_zero_is_hd.
+  rewrite <-nth_zeros_is_hd.
   apply (IHn 0%nat); simpl; omega.
   rewrite <-IHn by (rewrite Nat2Z.inj_succ; omega).
   simpl (rotate_right_aux v (S n)).
@@ -1259,8 +1260,8 @@ Lemma to_uint_of_int : forall (i:Z), ((0%Z <= i)%Z /\
 Qed.
 
 (* Why3 goal *)
-Lemma Of_int_zero : (zero = (of_int 0%Z)).
-  apply Nat_to_bvec_zero.
+Lemma Of_int_zeros : (zeros = (of_int 0%Z)).
+apply Nat_to_bvec_zeros.
 Qed.
 
 (* Why3 goal *)
@@ -1496,24 +1497,24 @@ Definition nth_bv: t -> t -> bool.
   exact (fun v w => nth v (to_uint w)).
 Defined.
 
-Lemma and_zero : forall {l} (x:Vector.t bool l),
-                   Vector.map2 (fun a b => a && b) x zero_aux = zero_aux.
+Lemma and_zeros : forall {l} (x:Vector.t bool l),
+                   Vector.map2 (fun a b => a && b) x zeros_aux = zeros_aux.
   induction x; auto.
   simpl.
   rewrite andb_false_r.
-  fold (@zero_aux n).
+  fold (@zeros_aux n).
   rewrite IHx; reflexivity.
 Qed.
 
 Lemma nth_bv_def_aux : forall {l} (x:Vector.t bool (S l)) (i:Z),
-                         nth_aux x 0 = true <-> (Vector.map2 (fun a b => a && b) x (nat_to_bvec (S l) 1)) <> zero_aux.
+                         nth_aux x 0 = true <-> (Vector.map2 (fun a b => a && b) x (nat_to_bvec (S l) 1)) <> zeros_aux.
   intros.
   destruct x.
   simpl.
   split; [easy|auto].
-  rewrite nth_zero_is_hd; unfold Vector.hd.
+  rewrite nth_zeros_is_hd; unfold Vector.hd.
   simpl.
-  rewrite <-Nat_to_bvec_zero, and_zero.
+  rewrite <-Nat_to_bvec_zeros, and_zeros.
   rewrite andb_true_r.
   split; intro.
   rewrite H; easy.
@@ -1522,7 +1523,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
-  ~ ((bw_and (lsr_bv x i) (of_int 1%Z)) = zero).
+  ~ ((bw_and (lsr_bv x i) (of_int 1%Z)) = zeros).
   intros; unfold nth_bv.
   case (Z_lt_ge_dec (to_uint i) size); intro.
   rewrite <-(Zplus_0_l (to_uint i)).
@@ -1533,10 +1534,10 @@ Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
   apply to_uint_bounds.
   unfold nth.
   rewrite (nth_high x (to_uint i)); auto.
-  Lemma tmmp: forall x i, to_uint i >= size -> lsr_bv x i = zero_aux.
+  Lemma tmmp: forall x i, to_uint i >= size -> lsr_bv x i = zeros_aux.
     intros.
     apply Extensionality_aux; unfold eq_aux; intros.
-    unfold lsr_bv, zero_aux.
+    unfold lsr_bv, zeros_aux.
     rewrite nth_const by auto.
     apply Lsr_nth_high.
     unfold size in H; auto with zarith.
@@ -1549,7 +1550,7 @@ Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
   destruct H.
   apply Extensionality_aux; unfold eq_aux; intros.
   rewrite Nth_bw_and by auto.
-  unfold nth, zero, zero_aux.
+  unfold nth, zeros, zeros_aux.
   rewrite nth_const by auto.
   easy.
 Qed.
@@ -1570,10 +1571,11 @@ Lemma Nth_bv_is_nth2 : forall (x:t) (i:Z), ((0%Z <= i)%Z /\
 Qed.
 
 (* Why3 goal *)
-Definition eq_sub_bv (a:t) (b:t) (i:t) (n:t): Prop :=
-  let mask :=
-      (lsl_bv (sub (lsl_bv (of_int 1%Z) n) (of_int 1%Z)) i)
-  in ((bw_and b mask) = (bw_and a mask)).
+Definition eq_sub_bv: t -> t -> t -> t -> Prop.
+  exact (fun a b i n =>
+           let mask := (lsl_bv (sub (lsl_bv (of_int 1%Z) n) (of_int 1%Z)) i)
+           in ((bw_and b mask) = (bw_and a mask))).
+Defined.
 
 (* Why3 goal *)
 Lemma eq_sub_bv_def : forall (a:t) (b:t) (i:t) (n:t), let mask :=
@@ -1672,7 +1674,7 @@ Lemma mask_succ_tmp :
                              Z.of_nat (1 + 2 * (bvec_to_nat n (nat_to_bvec n 0))))
                             (Pow2int.pow2 (Z.of_nat (S n))))) =
           true :: Vector.map2 (fun x y : bool => x || y) v (nat_to_bvec n 0)).
-      rewrite <-Nat_to_bvec_zero, bvec_to_nat_zero.
+      rewrite <-Nat_to_bvec_zeros, bvec_to_nat_zeros.
       change (Z.of_nat (1 + 2 * 0)) with 1.
       set (mod1 (Z.of_nat (2 * bvec_to_nat n v) + 1)
            (Pow2int.pow2 (Z.of_nat (S n)))).
@@ -1773,7 +1775,7 @@ Lemma nth_bit_pred_high :
   assert (to_uint i = 0).
   pose (to_uint_bounds i).
   auto with zarith.
-  rewrite H1; apply nth_zero_is_hd.
+  rewrite H1; apply nth_zeros_is_hd.
 
   left.
   rewrite Lsl_nth_high; auto with zarith.
@@ -1804,8 +1806,8 @@ Lemma nth_bit_pred_low :
   split; [omega|apply Pow2int.pow2pos, Z.lt_le_incl, size_pos].
   split; [omega|apply Pow2int.pow2pos, Z.lt_le_incl, size_pos].
   apply in_range_1'.
-  rewrite H0, <-Of_int_zero.
-  apply Nth_zero.
+  rewrite H0, <-Of_int_zeros.
+  apply Nth_zeros.
 
   rewrite Nat2Z.inj_succ in H.
   rewrite <-Nth_bv_is_nth, mask_succ_2; simpl.
@@ -1848,7 +1850,7 @@ Lemma nth_bit_pred_low :
   unfold of_int, size, size_bv.
   rewrite one_nth.
   rewrite nth_cons_pred by auto with zarith.
-  apply Nth_zero_aux.
+  apply Nth_zeros_aux.
   apply nth_aux_out_of_bound.
   fold size; omega.
 Qed.
