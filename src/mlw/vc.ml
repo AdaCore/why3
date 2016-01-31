@@ -19,6 +19,9 @@ open Pdecl
 
 (* basic tools *)
 
+let debug = Debug.register_info_flag "vc"
+  ~desc:"Print@ details@ of@ verification@ conditions@ generation."
+
 let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
 let _ity_of_vs v = (restore_pv v).pv_ity
@@ -315,19 +318,45 @@ let rec havoc kn wr mreg t ity =
           t, if t_equal f t_true then NLnil else NLcons (f, NLnil)
       end
 
-let _havoc_fast kn {eff_writes = wr; eff_covers = cv} mpv =
-  if Sreg.is_empty cv then [] else
-  let mreg = name_regions kn cv mpv in
+let print_mpv mpv = if Debug.test_flag debug then
   Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
     (fun fmt (o,n) -> Format.fprintf fmt "(%a -> %a)"
-      Ity.print_pv o Pretty.print_vs n)) (Mpv.bindings mpv);
+      Ity.print_pv o Pretty.print_vs n)) (Mpv.bindings mpv)
+
+let print_mreg mreg = if Debug.test_flag debug then
   Format.printf "@[regs = %a@]@." (Pp.print_list Pp.space
     (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
-      Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg);
-  let update o n acc =
-    let t, fl = havoc kn wr mreg (t_var o.pv_vs) o.pv_ity in
+      Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg)
+
+let _havoc_fast {known_map = kn} {eff_writes = wr; eff_covers = cv} mpv =
+  if Sreg.is_empty cv || Mpv.is_empty mpv then [] else
+  let mreg = name_regions kn cv mpv in
+  let () = print_mpv mpv; print_mreg mreg in
+  let update {pv_vs = o; pv_ity = ity} n acc =
+    let t, fl = havoc kn wr mreg (t_var o) ity in
     nl_flatten (cons_t_simp (t_var n) t fl) acc in
   Mpv.fold update mpv []
+
+let havoc_slow {known_map = kn} {eff_writes = wr; eff_covers = cv} w =
+  if Sreg.is_empty cv then w else
+  let fvs = t_freevars Mvs.empty w in
+  let add v _ m = let pv = restore_pv v in
+    if ity_affected cv pv.pv_ity then
+    Mpv.add pv (new_of_vs v) m else m in
+  let mpv = Mvs.fold add fvs Mpv.empty in
+  if Mpv.is_empty mpv then w else
+  let mreg = name_regions kn cv mpv in
+  let () = print_mpv mpv; print_mreg mreg in
+  let add _ t fvs = t_freevars fvs t in
+  let fvs = Mreg.fold add mreg Mvs.empty in
+  let update {pv_vs = o; pv_ity = ity} n w =
+    let t, fl = havoc kn wr mreg (t_var o) ity in
+    if Mvs.mem n fvs then
+      nl_implies (cons_t_simp (t_var n) t fl) w
+    else vc_let n t (nl_implies fl w) in
+  let add o n sbs = Mvs.add o.pv_vs (t_var n) sbs in
+  let w = t_subst (Mpv.fold add mpv Mvs.empty) w in
+  vc_forall (Mvs.keys fvs) (Mpv.fold update mpv w)
 
 let _step_back wr1 rd2 wr2 mpv =
   if Mreg.is_empty wr1 then Mpv.empty else
@@ -367,38 +396,14 @@ let rec slow env e res q xq = match e.e_node with
 
   | Eexec {c_cty = {cty_args = []} as c} ->
       (* TODO: rewrite c.cty_post wrt c.cty_args <> [] *)
+      (* TODO: vc_forall_post *)
       let q = vc_forall [res] (vc_implies_post c.cty_post res q) in
       let xq = Mexn.set_inter xq c.cty_effect.eff_raises in
       let xq_implies _ (v,q) l = Some (v, vc_implies_post l v q) in
       let xq = Mexn.diff xq_implies xq c.cty_xpost in
       let xq_and _ (v,q) f = t_and f (vc_forall [v] q) in
       let q = Mexn.fold xq_and xq q in
-
-      let q = if Sreg.is_empty c.cty_effect.eff_covers then q else
-        let {eff_covers = cv; eff_writes = wr} = c.cty_effect in
-        let add v _ m = let pv = restore_pv v in
-          if not (ity_affected cv pv.pv_ity) then m
-          else Mpv.add (restore_pv v) (new_of_vs v) m in
-        let mpv = Mvs.fold add (t_freevars Mvs.empty q) Mpv.empty in
-        let add o n sbs = Mvs.add o.pv_vs (t_var n) sbs in
-        let q = t_subst (Mpv.fold add mpv Mvs.empty) q in
-        let mreg = name_regions env.known_map cv mpv in
-(*
-        Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
-          (fun fmt (o,n) -> Format.fprintf fmt "(%a -> %a)"
-            Ity.print_pv o Pretty.print_vs n)) (Mpv.bindings mpv);
-        Format.printf "@[regs = %a@]@." (Pp.print_list Pp.space
-          (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
-            Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg);
-*)
-        let update {pv_vs = v; pv_ity = ity} n q =
-          let t, fl = havoc env.known_map wr mreg (t_var v) ity in
-          (* FIXME: cannot use let-in: definitions may be circular *)
-          vc_let n t (nl_implies fl q) in
-        let q = Mpv.fold update mpv q in
-        let add _ t fvs = t_freevars fvs t in
-        vc_forall (Mvs.keys (Mreg.fold add mreg Mvs.empty)) q in
-
+      let q = havoc_slow env c.cty_effect q in
       let q = bind_oldies c q in (* TODO: cty_args <> [] *)
       let vl = List.map (fun v -> v.pv_vs) c.cty_args in
       let and_pre f q =
@@ -471,7 +476,7 @@ let vc _env kn d = match d.pd_node with
         Mpv.add v (create_vsymbol id vs.vs_ty) mpv in
       let mpv = List.fold_right add_read al Mpv.empty in
       let mpv = Spv.fold add_read eff.eff_reads mpv in
-      let f = t_and_simp_l (havoc kn eff mpv) in
+      let f = t_and_simp_l (havoc_fast kn eff mpv) in
       let fvs = Mvs.domain (t_freevars Mvs.empty f) in
       let f = t_forall_close (Svs.elements fvs) [] f in
       let pr = create_prsymbol (id_fresh (s.rs_name.id_string ^ "_havoc")) in
