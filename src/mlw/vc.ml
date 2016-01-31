@@ -21,9 +21,13 @@ open Pdecl
 
 let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
-let ity_of_vs v = (restore_pv v).pv_ity
+let _ity_of_vs v = (restore_pv v).pv_ity
 
-let clone_vs v = t_var (create_vsymbol (id_clone v.vs_name) v.vs_ty)
+let new_of_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
+
+let new_of_pv v = new_of_vs v.pv_vs
+
+let vs_result ity = create_vsymbol (id_fresh "result") (ty_of_ity ity)
 
 (* explanations *)
 
@@ -32,7 +36,7 @@ let vc_label e f =
   let lab = Ident.Slab.union e.e_label f.t_label in
   t_label ?loc lab f
 
-let _expl_pre       = Ident.create_label "expl:precondition"
+let expl_pre       = Ident.create_label "expl:precondition"
 let expl_post      = Ident.create_label "expl:postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let _expl_assume    = Ident.create_label "expl:assumption"
@@ -74,15 +78,21 @@ let vc_or f1 f2 = match f1.t_node, f2.t_node with
   | _, _ -> t_or f1 f2
 *)
 
-let vc_implies_pre f1 f2 = match f1.t_node, f2.t_node with
+let vc_implies f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _ | _, Ttrue -> f2
   | _, _ -> t_implies f1 f2
 
+let vc_implies_pre fl f = List.fold_right vc_implies fl f
+
+let vc_implies_post fl v f = let t = t_var v in
+  let implies q f = vc_implies (open_post_with t q) f in
+  List.fold_right implies fl f
+
 let vc_forall vl f = t_forall_close_simp vl [] f
 
-(*
 let vc_let v t f = t_let_close_simp v t f
 
+(*
 type defn_fmla =
   | DFdefn of term
   | DFfmla of term
@@ -203,6 +213,8 @@ let rec explore_paths kn aff mreg t ity =
   | Ityreg r when not (Sreg.mem r aff) -> mreg
   | Ityreg ({reg_its = s; reg_args = tl; reg_regs = rl} as r) ->
       let rec height t = match t.t_node with
+        (* prefer user variables to proxy variables *)
+        | Tvar v when Slab.mem proxy_label v.vs_name.id_label -> 65536
         | Tvar _ -> 0 | Tapp (_,[t]) -> height t + 1
         | _ -> assert false (* shouldn't happen *) in
       let min t o = if height t < height o then t else o in
@@ -218,11 +230,11 @@ and explore_its kn aff mreg t s tl rl =
     explore_paths kn aff mreg (t_app ls [t] ty) ity in
   List.fold_left follow mreg (find_its_defn kn s).itd_fields
 
-let name_regions kn wr mvs =
-  let collect v _ aff = ity_aff_regs wr aff (ity_of_vs v) in
-  let aff = Mvs.fold collect mvs Sreg.empty in
-  let fill v t mreg = explore_paths kn aff mreg t (ity_of_vs v) in
-  let mreg = Mvs.fold fill mvs Mreg.empty in
+let name_regions kn wr mpv =
+  let collect o _ aff = ity_aff_regs wr aff o.pv_ity in
+  let aff = Mpv.fold collect mpv Sreg.empty in
+  let fill o n mreg = explore_paths kn aff mreg (t_var n) o.pv_ity in
+  let mreg = Mpv.fold fill mpv Mreg.empty in
   let complete r nm _ = if nm <> None then nm else
     let ty = ty_app r.reg_its.its_ts (List.map ty_of_ity r.reg_args) in
     Some (t_var (create_vsymbol (id_clone r.reg_name) ty)) in
@@ -239,6 +251,11 @@ let rec nl_flatten nl acc = match nl with
   | NLflat l -> List.fold_right nl_flatten l acc
   | NLcons (elm, nl) -> elm :: nl_flatten nl acc
   | NLnil -> acc
+
+let rec nl_implies nl f = match nl with
+  | NLflat l -> List.fold_right nl_implies l f
+  | NLcons (elm, nl) -> vc_implies elm (nl_implies nl f)
+  | NLnil -> f
 
 let cons_t_simp nt t fl =
   if t_equal nt t then fl else NLcons (t_equ nt t, fl)
@@ -271,7 +288,14 @@ let rec havoc kn wr mreg t ity =
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
             havoc kn wr mreg (t_app_infer (ls_of_rs rs) [t]) ity in
           let tl, fl = List.split (List.map field itd.itd_fields) in
-          fs_app cs tl (ty_of_ity ity), NLflat fl
+          let t0 = match tl with
+            | {t_node = Tapp (_,[t])}::_ -> t | _ -> t_false in
+          let triv rs t = match t.t_node with
+            | Tapp (s,[t]) -> ls_equal s (ls_of_rs rs) && t_equal t t0
+            | _ -> false in
+          let t = if List.for_all2 triv itd.itd_fields tl
+            then t0 else fs_app cs tl (ty_of_ity ity) in
+          t, NLflat fl
       | cl ->
           let ty = ty_of_ity ity in
           let branch ({rs_cty = cty} as rs) =
@@ -291,39 +315,33 @@ let rec havoc kn wr mreg t ity =
           t, if t_equal f t_true then NLnil else NLcons (f, NLnil)
       end
 
-let havoc_fast kn {eff_writes = wr; eff_covers = cv} mvs =
+let _havoc_fast kn {eff_writes = wr; eff_covers = cv} mpv =
   if Sreg.is_empty cv then [] else
-  let mreg = name_regions kn cv mvs in
-(*
+  let mreg = name_regions kn cv mpv in
   Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
-    (fun fmt (v,t) -> Format.fprintf fmt "(%a -> %a)"
-      Pretty.print_vs v Pretty.print_term t)) (Mvs.bindings mvs);
+    (fun fmt (o,n) -> Format.fprintf fmt "(%a -> %a)"
+      Ity.print_pv o Pretty.print_vs n)) (Mpv.bindings mpv);
   Format.printf "@[regs = %a@]@." (Pp.print_list Pp.space
     (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
       Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg);
-*)
-  let update v nt acc =
-    let t, fl = havoc kn wr mreg (t_var v) (ity_of_vs v) in
-    nl_flatten (cons_t_simp nt t fl) acc in
-  Mvs.fold update mvs []
+  let update o n acc =
+    let t, fl = havoc kn wr mreg (t_var o.pv_vs) o.pv_ity in
+    nl_flatten (cons_t_simp (t_var n) t fl) acc in
+  Mpv.fold update mpv []
 
-let _step_back wr1 rd2 wr2 mvs =
-  if Mreg.is_empty wr1 then Mvs.empty else
-  let back v t =
-    let ity = ity_of_vs v in
-    if not (ity_affected wr1 ity) then None else
-    if not (ity_affected wr2 ity) then Some t else
-    Some (clone_vs v) in
-  let mvs = Mvs.mapi_filter back mvs in
-  let add {pv_vs = v; pv_ity = ity} acc =
-    if Mvs.mem v mvs || not (ity_affected wr1 ity)
-    then acc else Mvs.add v (clone_vs v) acc in
-  Spv.fold add rd2 mvs
+let _step_back wr1 rd2 wr2 mpv =
+  if Mreg.is_empty wr1 then Mpv.empty else
+  let back o n =
+    if not (ity_affected wr1 o.pv_ity) then None else
+    if not (ity_affected wr2 o.pv_ity) then Some n else
+    Some (new_of_pv o) in
+  let mpv = Mpv.mapi_filter back mpv in
+  let add v acc =
+    if Mpv.mem v mpv || not (ity_affected wr1 v.pv_ity)
+    then acc else Mpv.add v (new_of_pv v) acc in
+  Spv.fold add rd2 mpv
 
 (* classical WP *)
-
-let vs_result ity =
-  create_vsymbol (id_fresh "result") (ty_of_ity ity)
 
 let ok_of_post l ity = function
   | q::ql ->
@@ -333,14 +351,60 @@ let ok_of_post l ity = function
   | [] ->
       vs_result ity, t_true
 
+let bind_oldies c f = Mpv.fold (fun o v f ->
+  t_subst_single o.pv_vs (t_var v.pv_vs) f) c.cty_oldies f
+
 let rec slow env e res q xq = match e.e_node with
   | Evar v ->
       t_subst_single res (vc_label e (t_var v.pv_vs)) q
   | Econst c ->
       t_subst_single res (vc_label e (t_const c)) q
 
+  | Eexec ({c_node = Cfun _} as _c) ->
+      assert false (* TODO *)
+  | Eexec ({c_cty = {cty_args = _::_}} as _c) ->
+      assert false (* TODO *)
 
+  | Eexec {c_cty = {cty_args = []} as c} ->
+      (* TODO: rewrite c.cty_post wrt c.cty_args <> [] *)
+      let q = vc_forall [res] (vc_implies_post c.cty_post res q) in
+      let xq = Mexn.set_inter xq c.cty_effect.eff_raises in
+      let xq_implies _ (v,q) l = Some (v, vc_implies_post l v q) in
+      let xq = Mexn.diff xq_implies xq c.cty_xpost in
+      let xq_and _ (v,q) f = t_and f (vc_forall [v] q) in
+      let q = Mexn.fold xq_and xq q in
 
+      let q = if Sreg.is_empty c.cty_effect.eff_covers then q else
+        let {eff_covers = cv; eff_writes = wr} = c.cty_effect in
+        let add v _ m = let pv = restore_pv v in
+          if not (ity_affected cv pv.pv_ity) then m
+          else Mpv.add (restore_pv v) (new_of_vs v) m in
+        let mpv = Mvs.fold add (t_freevars Mvs.empty q) Mpv.empty in
+        let add o n sbs = Mvs.add o.pv_vs (t_var n) sbs in
+        let q = t_subst (Mpv.fold add mpv Mvs.empty) q in
+        let mreg = name_regions env.known_map cv mpv in
+(*
+        Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
+          (fun fmt (o,n) -> Format.fprintf fmt "(%a -> %a)"
+            Ity.print_pv o Pretty.print_vs n)) (Mpv.bindings mpv);
+        Format.printf "@[regs = %a@]@." (Pp.print_list Pp.space
+          (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
+            Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg);
+*)
+        let update {pv_vs = v; pv_ity = ity} n q =
+          let t, fl = havoc env.known_map wr mreg (t_var v) ity in
+          (* FIXME: cannot use let-in: definitions may be circular *)
+          vc_let n t (nl_implies fl q) in
+        let q = Mpv.fold update mpv q in
+        let add _ t fvs = t_freevars fvs t in
+        vc_forall (Mvs.keys (Mreg.fold add mreg Mvs.empty)) q in
+
+      let q = bind_oldies c q in (* TODO: cty_args <> [] *)
+      let vl = List.map (fun v -> v.pv_vs) c.cty_args in
+      let and_pre f q =
+        (* TODO: handle recursive calls *)
+        t_and (vc_expl expl_pre (vc_forall vl f)) q in
+      vc_label e (List.fold_right and_pre c.cty_pre q)
 
   | Elet (LDvar (v, e1), e2) (* FIXME: do we need this? *)
     when Slab.mem proxy_label v.pv_vs.vs_name.id_label ->
@@ -380,9 +444,7 @@ and vc_fun env c e =
   let r,q = ok_of_post expl_post c.cty_result c.cty_post in
   let mk_xq xs xq = ok_of_post expl_xpost xs.xs_ity xq in
   let f = slow env e r q (Mexn.mapi mk_xq c.cty_xpost) in
-  let old o v f = t_subst_single o.pv_vs (t_var v.pv_vs) f in
-  let f = Mpv.fold old c.cty_oldies f in
-  let f = vc_implies_pre (t_and_l c.cty_pre) f in
+  let f = vc_implies_pre c.cty_pre (bind_oldies c f) in
   vc_forall args f
 
 let mk_vc_decl id f =
@@ -403,15 +465,13 @@ let vc env kn d = match d.pd_node with
 (*
 let vc _env kn d = match d.pd_node with
   | PDlet (LDsym (s,{c_cty = {cty_args = al; cty_effect = eff}})) ->
-      let add_read v mvs =
-        if ity_r_stale eff.eff_resets eff.eff_covers v.pv_ity then mvs else
-        let nm = v.pv_vs.vs_name.id_string ^ "_new" in
-        let id = id_derive nm v.pv_vs.vs_name in
-        let nv = create_vsymbol id v.pv_vs.vs_ty in
-        Mvs.add v.pv_vs (t_var nv) mvs in
-      let mvs = List.fold_right add_read al Mvs.empty in
-      let mvs = Spv.fold add_read eff.eff_reads mvs in
-      let f = t_and_simp_l (havoc_fast kn eff mvs) in
+      let add_read ({pv_vs = vs; pv_ity = ity} as v) mpv =
+        if ity_r_stale eff.eff_resets eff.eff_covers ity then mpv else
+        let id = id_derive (vs.vs_name.id_string ^ "_new") vs.vs_name in
+        Mpv.add v (create_vsymbol id vs.vs_ty) mpv in
+      let mpv = List.fold_right add_read al Mpv.empty in
+      let mpv = Spv.fold add_read eff.eff_reads mpv in
+      let f = t_and_simp_l (havoc kn eff mpv) in
       let fvs = Mvs.domain (t_freevars Mvs.empty f) in
       let f = t_forall_close (Svs.elements fvs) [] f in
       let pr = create_prsymbol (id_fresh (s.rs_name.id_string ^ "_havoc")) in

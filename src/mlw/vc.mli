@@ -9,10 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Term
-open Ity
 open Pdecl
-
-val havoc_fast : known_map -> effect -> term Mvs.t -> term list
 
 val vc : Env.env -> known_map -> pdecl -> pdecl list
