@@ -2,12 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="-1" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="-1" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
 <file name="../zorn.mlw">
 <theory name="Zorn" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ZornProof" sum="3624ad2a03a1a1d233d072ee87a5a9fd">
+<theory name="ZornProof" sum="0e970e51c81a73c1c9027c6d998611a7">
  <goal name="choose_ub_builder">
  <proof prover="1"><result status="valid" time="0.36"/></proof>
  </goal>
@@ -20,16 +20,16 @@
   <proof prover="2"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
   <goal name="zorn_proof.3" expl="3.">
-  <proof prover="2"><result status="valid" time="0.03" steps="58"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="67"/></proof>
   </goal>
   <goal name="zorn_proof.4" expl="4.">
-  <proof prover="2"><result status="valid" time="0.03" steps="74"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="87"/></proof>
   </goal>
   <goal name="zorn_proof.5" expl="5.">
-  <proof prover="2"><result status="valid" time="0.03" steps="65"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="68"/></proof>
   </goal>
   <goal name="zorn_proof.6" expl="6.">
-  <proof prover="2"><result status="valid" time="0.08" steps="137"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="157"/></proof>
   </goal>
   <goal name="zorn_proof.7" expl="7.">
   <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
@@ -42,7 +42,7 @@
 </theory>
 <theory name="WellOrder" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="WellOrderProof" sum="2a391548b082fb4fe43166bf9b5206b0">
+<theory name="WellOrderProof" sum="81be3f5db7a9225b73e9d0bac8e2c489">
  <goal name="completion_well_ordered">
  <transf name="split_goal_wp">
   <goal name="completion_well_ordered.1" expl="1.">

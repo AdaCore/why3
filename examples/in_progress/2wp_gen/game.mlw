@@ -126,9 +126,6 @@ module Game
     forall start win. have_uniform_winning_strat g1 start win ->
       have_uniform_winning_strat g2 (rel_map r start) (rel_map r win)
 
-  predicate subgame (g1 g2:game 'a) =
-    simulate g1 (=) g2 /\ g1.progress = g2.progress
-
 end
 
 (* A few properties of strategies on such games.
@@ -1787,8 +1784,7 @@ module StratProofs
             so st.h_total y))
           so (maximum o1 st.h_proj a by forall u. st.h_proj u ->
             o1 u a by exists v. st.h_pair (u,v) so op (u,v) (a,b))
-          so (supremum o1 st.h_proj a by forall ch x.
-            maximum o1 ch x -> supremum o1 ch x)
+          so supremum o1 st.h_proj a
           so a = sup o1 st.h_proj
           so (sc.g1.transition a s0 -> dmna s0 = a /\ s0 (dmna s0)
             by match st.i_dmn s0 with

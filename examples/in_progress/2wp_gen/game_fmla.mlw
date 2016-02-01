@@ -1,0 +1,396 @@
+
+module Fmla
+  
+  use import game.Game
+  
+  (* Game inclusion relation. *)
+  predicate subgame (g1 g2:game 'a) =
+    simulate g1 (=) g2 /\ g1.progress = g2.progress
+  
+  (* Game formula defined in environment 'e, as a predicate over the game. *)
+  type fmla 'e 'a = 'e -> game 'a -> bool
+  
+  (* Correct game formulas are increasing with respect to subgame relation
+     (Kripke semantics). *)
+  predicate is_fmla (f:fmla 'e 'a) =
+    forall env g1 g2. subgame g1 g2 /\ f env g1 -> f env g2
+  
+  predicate e_closure (q:('e,'b) -> 'a -> bool) (env:'e) (x:'a) =
+    exists y. q (env,y) x
+  
+  function shift_context (f:fmla 'e 'a) : fmla ('e,'b) 'a =
+    \env. let (env,_) = env in f env
+  
+  (* {P|\Q} mean that from a state in P,
+     we can reach a state that satisfy Q. *)
+  function enforce (p q:'e -> 'a -> bool) : fmla 'e 'a =
+    \env g. have_uniform_winning_strat g (p env) (q env)
+  
+  (* Intuistionistic arrow. *)
+  function arrow (f1 f2:fmla 'e 'a) : fmla 'e 'a =
+    \env g. forall g2. subgame g g2 /\ f1 env g2 -> f2 env g2
+  
+  (* Lift environment predicate to the game formula level. *)
+  function lift (p:'e -> bool) : fmla 'e 'a = \env _. p env
+  
+  (* Standard quantifiers. *)
+  function universal (p:fmla ('e,'b) 'a) : fmla 'e 'a =
+    \env g. forall y. p (env,y) g
+  
+  function existential (p:fmla ('e,'b) 'a) : fmla 'e 'a =
+    \env g. exists y. p (env,y) g
+  
+  (* Express the game ordering. *)
+  function ordering (o:'a -> 'a -> bool) : fmla 'e 'a = \_ g. g.progress = o
+  
+  predicate holds (c f:fmla 'e 'a) =
+    forall env g. game_wf g /\ c env g -> f env g
+  
+  predicate stronger (p q:'e -> 'a -> bool) = forall e x. p e x -> q e x
+  
+end
+
+(* Rules for game formula derivations. *)
+module FmlaRules
+
+  use import Fmla
+
+  namespace import Dummy type d end
+
+  axiom enforce_monotonic : forall c,p1 p2,q1 q2:'e -> 'a -> bool.
+    stronger p2 p1 /\ holds c (enforce p1 q1) /\ stronger q1 q2 ->
+    holds c (enforce p2 q2)
+    /\ forall _:d. true
+
+  axiom enforce_fmla : forall p,q:('e,'b) -> 'a -> bool. is_fmla (enforce p q)
+    /\ forall _:d. true
+
+  axiom arrow_fmla : forall f1 f2:fmla 'e 'a. is_fmla (arrow f1 f2)
+    /\ forall _:d. true
+
+  axiom sequence : forall c p q,r:'e -> 'a -> bool.
+    holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
+    /\ forall _:d. true
+
+  axiom ghost_intro : forall c p,q:('e,'b) -> 'a -> bool.
+    holds (shift_context c) (enforce p q) ->
+    holds c (enforce (e_closure p) (e_closure q))
+    /\ forall _:d. true
+
+end
+
+(* Proof of rules. *)
+module FmlaRulesProof
+  
+  use import option.Option
+  use import order.Order
+  use import order.Chain
+  use import game.Game
+  use import game.StratProps
+  use import transfinite.ChainExtension
+  use import Fmla
+  
+  predicate ext (f g:'a -> 'b) = forall x. f x = g x
+  predicate hack (f g h:'a -> 'b) = f = g = h
+  let lemma ext (f g:'a -> 'b) : unit
+    requires { ext f g }
+    ensures { f = g }
+  = assert { hack f (\x. (\y. y) (f x)) g }
+
+  predicate pext (p q:'a -> bool) = forall x. p x <-> q x
+  lemma pext : forall p q:'a -> bool. pext p q -> p = q by ext p q
+  
+  lemma rel_map_equal : forall s:'a -> bool.
+    rel_map (=) s = s by pext (rel_map (=) s) s
+  
+  lemma enforce_fmla : forall p,q:('e,'b) -> 'a -> bool. is_fmla (enforce p q)
+  
+  lemma arrow_fmla : forall f1 f2:fmla 'e 'a. is_fmla (arrow f1 f2)
+  
+  predicate subset (p q:'a -> bool) = forall x. p x -> q x
+  
+  (* Useful lemma: monotonicity of having a winning strategy from some point. *)
+  lemma pre_monotonic : forall g x,q1 q2:'a -> bool.
+    game_wf g -> have_winning_strat g x q1 /\ subset q1 q2 ->
+      have_winning_strat g x q2
+    by exists ang. winning_strat g x q1 ang
+    so winning_strat g x q2 ang
+    by forall dmn. win_against g x q2 ang dmn
+    by win_against g x q1 ang dmn
+    so exists chy. reach_ch g.progress (strat_next g ang dmn) ((=) x) chy /\
+      win_at g q1 ang dmn chy
+    so win_at g q2 ang dmn chy
+  
+  predicate cut (g:game 'a) (q:'a -> bool) (x:'a) (y:'a) =
+    q y /\ g.progress x y
+  
+  (* Another useful lemma: if we can reach q from a point x,
+     then we can reach q /\ y >= x from x. *)
+  lemma reach_above : forall g x,q:'a -> bool.
+    game_wf g -> have_winning_strat g x q -> have_winning_strat g x (cut g q x)
+    by exists ang. winning_strat g x q ang
+    so winning_strat g x (cut g q x) ang
+    by forall dmn. win_against g x (cut g q x) ang dmn
+    by win_against g x q ang dmn
+    so exists chy. reach_ch g.progress (strat_next g ang dmn) ((=) x) chy /\
+      win_at g q ang dmn chy
+    so (forall z. chy z -> g.progress x z by subchain g.progress ((=) x) chy)
+    so win_at g (cut g q x) ang dmn chy
+  
+  (* Definitions for 'ghost' variable introduction:
+     Define a game with a (constant) extra state and show this
+     game bisimulate the original game,
+     e.g: - Use existence of strategy for all possible extra state
+            to get a strategy in the coupled game
+          - Use inverse relation to get a strategy in the initial game
+            that ignore the ghost variable. *)
+  predicate with_st (b:'b) (x:'a) (y:('a,'b)) = y = (x,b)
+  
+  (* Relations for step simulations: with_sto to embed strategies
+     from the original game as a strategy in the coupled one,
+     forget to get back to the original stateless game. *)
+  predicate with_sto (b:'b) (x:'a) (y:('a,option 'b)) =
+    let (a,b2) = y in a = x /\ match b2 with
+    | None -> true
+    | Some b2 -> b2 = b
+    end
+  
+  predicate forget (x:('a,'b)) (y:'a) = let (a,_) = x in y = a
+  
+  (* Transitions & orders in coupled games. *)
+  predicate tr_witness (g:game 'a) (x:('a,'b))
+                       (s:('a,'b) -> bool) (s':'a -> bool) =
+    let (a,b) = x in g.transition a s' /\ s = rel_map (with_st b) s'
+  
+  predicate with_progress (g:game 'a) (x y:('a,option 'b)) =
+    let (a,u) = x in
+    let (b,v) = y in
+    (match u, v with
+     | None, _ -> true
+     | _, None -> false
+     | Some u, Some v -> u = v
+     end) /\ g.progress a b
+  
+  predicate with_transition (g:game 'a) (x:('a,'b)) (s:('a,'b) -> bool) =
+    exists s'. tr_witness g x s s'
+  
+  function with_start (g:game 'a) : game ('a,option 'b) = {
+    progress = with_progress g;
+    transition = with_transition g;
+  }
+  
+  lemma with_start_wf : forall g:game 'a.
+    let gs:game ('a,option 'b) = with_start g in
+    game_wf g -> game_wf gs
+    by gs.progress = with_progress g
+    so gs.transition = with_transition g
+    so let os = gs.progress in
+      (order os
+      by (reflexive os by forall x:('a,option 'b). with_progress g x x)
+      /\ (antisymetric os by forall x y:('a,option 'b).
+        with_progress g x y /\ with_progress g y x -> x = y
+        by let (_,b) = x in let (_,d) = y in b = d
+        by match b, d with
+          | None, None -> true
+          | None, _ | _, None -> false
+          | Some b, Some d -> b = d
+          end)
+      /\ (transitive os by forall x y z:('a,option 'b).
+        with_progress g x y /\ with_progress g y z ->
+        with_progress g x z
+        by let ((_,b),(_,d),(_,f)) = (x,y,z) in match b, d, f with
+          | None,_, _ -> true
+          | _, None, _ | _, _, None -> false
+          | Some b, Some d, Some f -> b = d = f
+          end))
+    so (chain_complete os by forall ch.
+      chain os ch ->
+      (exists sp. supremum os ch sp)
+      by (exists x y. ch (x,Some y)
+        so let ch2 = \x. ch (x,Some y) in
+        (chain g.progress ch2 by forall a b. ch2 a /\ ch2 b ->
+          (g.progress a b by os (a,Some y) (b,Some y)) \/
+          (g.progress b a by os (b,Some y) (a,Some y)))
+        so exists sp0. supremum g.progress ch2 sp0
+        so let sp = (sp0,Some y) in
+          supremum os ch sp
+        by (upper_bound os ch sp
+          by forall z. ch z -> os z sp by let (a,b) = z in
+            match b with
+            | None -> os z (x,Some y) \/ (os (x,Some y) z so false)
+                so ch2 x so g.progress a x so g.progress x sp0
+                so g.progress a sp0
+            | Some u -> (u = y by os z (x,Some y) \/ os (x,Some y) z)
+                so ch2 a so g.progress a sp0
+            end)
+        /\ forall u. upper_bound os ch u -> os sp u
+          by let (a,b) = u in
+            match b with
+            | None -> false
+            | Some b -> b = y so upper_bound g.progress ch2 a
+                so g.progress sp0 a
+            end)
+      || (let ch2 = \x. ch (x,None) in
+        (chain g.progress ch2 by forall a b. ch2 a /\ ch2 b ->
+          (g.progress a b by os (a,None) (b,None)) \/
+          (g.progress b a by os (b,None) (a,None)))
+        so exists sp0. supremum g.progress ch2 sp0
+        so let sp = (sp0,None) in
+          supremum os ch sp
+        by (upper_bound os ch sp
+          by forall z. ch z -> os z sp by let (a,b) = z in
+            match b with
+            | None -> ch2 a so g.progress a sp0
+            | Some _ -> false
+            end)
+        /\ forall u. upper_bound os ch u -> os sp u))
+    so forall x s y. gs.transition x s /\ s y -> os x y
+    by exists s'. tr_witness g x s s'
+    so let (a,b) = x in
+      exists z. rel_map_witness (with_st b) s' y z
+    so g.progress a z so y = (z,b)
+  
+  lemma with_start_chain_compatibility : forall g:game 'a.
+    let gs:game ('a,option 'b) = with_start g in
+    game_wf g ->
+    let o = g.progress in let os = gs.progress in
+    (chain_compatible os forget o /\
+     forall b. chain_compatible o (with_sto b) os)
+    by ((forall ch s1 s2. (forall a b. ch (a,b) -> forget a b) /\
+        supremum (oprod os o) ch (s1,s2) -> forget s1 s2
+      by let (sa,sb) = s1 in
+        let ch2 = \y. exists x. ch (x,y) in
+      (supremum o ch2 s2
+        by upper_bound o ch2 s2
+        /\ forall u. upper_bound o ch2 u -> o s2 u
+        by upper_bound (oprod os o) ch (s1,u)
+        by forall v. ch v -> oprod os o v (s1,u)
+        by let (va,vb) = v in os va s1 /\ o vb u by ch2 vb)
+      /\ supremum o ch2 sa
+        by (upper_bound o ch2 sa by forall x. ch2 x ->
+          exists y. ch (y,x) so let (ya,_) = y in x = ya so o x sa)
+        /\ forall u. upper_bound o ch2 u -> o sa u
+          by upper_bound (oprod os o) ch ((u,sb),s2)
+          by forall v. ch v -> oprod os o v ((u,sb),s2)
+          by let ((va,vb),vc) = v in vc = va
+            so o vc s2 so os (va,vb) (sa,sb) so os (va,vb) (u,sb)
+            by ch2 vc)
+    && forall b ch s1 s2.
+        (forall a b2. ch (a,b2) -> with_sto b a b2) /\
+        supremum (oprod o os) ch (s1,s2) -> with_sto b s1 s2
+      by let (sa,sb) = s2 in
+        let chr = \x. let (a,b) = x in ch (b,a) in
+        (supremum (oprod os o) chr (s2,s1)
+          by (upper_bound (oprod os o) chr (s2,s1)
+            by forall x. chr x -> oprod os o x (s2,s1)
+            by let (a,b) = x in ch (b,a))
+          /\ forall u. upper_bound (oprod os o) chr u -> oprod os o (s2,s1) u
+            by let (ua,ub) = u in upper_bound (oprod o os) ch (ub,ua)
+            by forall v. ch v -> oprod o os v (ub,ua)
+            by let (va,vb) = v in chr (vb,va))
+        so (forall a b2. chr (a,b2) -> forget a b2 by with_sto b b2 a)
+        so forget s2 s1
+        so (exists x y. ch (x,(x,Some y))
+          so y = b
+          so os (x,Some y) s2
+          so match sb with
+          | None -> false
+          | Some u -> u = b
+          end)
+        || (match sb with
+          | None -> true
+          | Some _ -> false
+              by os (sa,sb) (sa,None)
+              by upper_bound (oprod o os) ch (s1,(sa,None))
+              by forall u. ch u -> let (_,(_,c)) = u in
+                match c with
+                | None -> true
+                | Some _ -> false
+                end
+          end))
+    by os = with_progress g
+  
+  lemma with_start_simulations : forall g:game 'a.
+    game_wf g ->
+    let gs:game ('a,option 'b) = with_start g in
+    ((simulate gs forget g
+      by step_simulate gs forget g
+      by forall x y s. gs.transition x s /\ forget x y ->
+        have_winning_strat g y (rel_map forget s)
+      by exists s'. tr_witness g x s s'
+      so let (_,xb) = x in
+        pext (rel_map forget s) s'
+      by forall u. s' u -> rel_map forget s u
+      by rel_map_witness forget s u (u,xb)
+      by rel_map_witness (with_st xb) s' (u,xb) u
+    ) /\ forall b. simulate g (with_sto b) gs
+      by step_simulate g (with_sto b) gs
+      by forall x y s. g.transition x s /\ with_sto b x y ->
+        have_winning_strat gs y (rel_map (with_sto b) s)
+      by let (_,yb) = y in
+        let s' = rel_map (with_st yb) s in
+        tr_witness g y s' s
+        so gs.transition y s' /\ forall z. s' z -> rel_map (with_sto b) s z
+        by exists z0. rel_map_witness (with_st yb) s z z0
+        so rel_map_witness (with_sto b) s z z0
+    ) by gs.transition = with_transition g
+  
+  lemma ghost_intro : forall c,p q:('e,'b) -> 'a -> bool.
+    let ep = e_closure p in
+    let eq = e_closure q in
+    holds (shift_context c) (enforce p q) -> holds c (enforce ep eq)
+    by forall env g. game_wf g /\ c env g -> enforce ep eq env g
+    by have_uniform_winning_strat g (ep env) (eq env)
+    by let gs = with_start g in
+      let liftb = \p e x. let (x,b) = x in
+        match b with None -> false | Some b -> p (e,b) x end
+      in
+      let pb = liftb p in let qb = liftb q in
+      (have_uniform_winning_strat gs (pb env) (qb env)
+      by forall x. pb env x -> have_winning_strat gs x (qb env)
+      by let (xa,xb) = x in
+        match xb with
+        | None -> false
+        | Some xb -> let rr = rel_map (with_sto xb) in
+            let peb = p (env,xb) in let qeb = q (env,xb) in
+            have_uniform_winning_strat gs (rr peb) (rr qeb)
+            so rel_map_witness (with_sto xb) peb x xa
+            so rr peb x
+            so have_winning_strat gs x (rr qeb)
+            so have_winning_strat gs x (cut gs (rr qeb) x)
+            so subset (cut gs (rr qeb) x) (qb env)
+            by forall z. cut gs (rr qeb) x z -> qb env z
+              by let (_,zb) = z in match zb with
+                | None -> false by gs.progress = with_progress g
+                | Some b -> true
+                end
+        end)
+      so let rr = rel_map forget in
+        have_uniform_winning_strat g (rr (pb env)) (rr (qb env))
+      so forall p. pext (rr (liftb p env)) (e_closure p env)
+      by (forall x. rr (liftb p env) x -> e_closure p env x
+        by exists y. rel_map_witness forget (liftb p env) x y
+        so let (ya,yb) = y in
+          match yb with None -> false | Some b -> p (env,b) x end
+      ) /\ forall x. e_closure p env x -> rr (liftb p env) x
+      by exists b. p (env,b) x
+      so rel_map_witness forget (liftb p env) x (x,Some b)
+  
+  lemma enforce_monotonic : forall c,p1 p2,q1 q2:'e -> 'a -> bool.
+    stronger p2 p1 /\ holds c (enforce p1 q1) /\ stronger q1 q2 ->
+    holds c (enforce p2 q2)
+    by forall env g. game_wf g /\ c env g ->
+      have_uniform_winning_strat g (p2 env) (q2 env)
+    by forall x. p2 env x -> have_winning_strat g x (q2 env)
+    by subset (q1 env) (q2 env)
+  
+  clone FmlaRules with type Dummy.d = unit,
+    goal enforce_monotonic,
+    goal enforce_fmla,
+    goal arrow_fmla,
+    goal sequence,
+    goal ghost_intro
+  
+end
+
+

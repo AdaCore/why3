@@ -39,8 +39,12 @@ module Order
   predicate supremum (o:'a -> 'a -> bool) (s:'a -> bool) (x:'a) =
     minimum o (upper_bound o s) x
 
+  lemma maximum_supremum : forall o s,x:'a. maximum o s x -> supremum o s x
+
   predicate infimum (o:'a -> 'a -> bool) (s:'a -> bool) (x:'a) =
     maximum o (lower_bound o s) x
+
+  lemma minimum_infimum : forall o s,x:'a. minimum o s x -> infimum o s x
 
   predicate maximal (o:'a -> 'a -> bool) (x:'a) = forall y. o x y -> o y x
 
