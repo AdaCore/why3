@@ -205,7 +205,7 @@ let rec print_term info defs fmt t = match t.t_node with
                    <num val=\"%s\"/>\
                  </app>",
                 "<app>\
-                   <const name=\"Fields.inverse_class.divide\"/>\
+                   <const name=\"Why3_Real.why3_divide\"/>\
                    <num val=\"%s\"><type name=\"Real.real\"/></num>\
                    <num val=\"%s\"/>\
                  </app>"));

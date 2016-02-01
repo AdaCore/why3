@@ -8,9 +8,9 @@ section {* Parity properties *}
 
 why3_open "number/Parity.xml"
 
-why3_vc even_def by (simp add: even_equiv_def)
+why3_vc even_def by arith
 
-why3_vc odd_def by (simp add: odd_equiv_def)
+why3_vc odd_def by arith
 
 why3_vc even_or_odd by auto
 
@@ -98,9 +98,9 @@ why3_vc divides_mod_computer
   by (simp add: cmod_def dvd_eq_mod_eq_0 zabs_def
     zmod_zminus1_eq_if zmod_zminus2_eq_if)
 
-why3_vc even_divides by (rule even_iff_2_dvd)
+why3_vc even_divides ..
 
-why3_vc odd_divides by (simp add: even_iff_2_dvd)
+why3_vc odd_divides ..
 
 why3_end
 
@@ -232,7 +232,7 @@ proof (induct n rule: less_induct)
   next
     case False
     with `1 < n` obtain k where "k dvd n" "k \<noteq> 1" "k \<noteq> n"
-      by (auto simp add: prime_nat_def)
+      by (auto simp add: Primes.prime_def)
     with `1 < n` have "k \<le> n" by (simp add: dvd_imp_le)
     with `k \<noteq> n` have "k < n" by simp
     moreover from `k dvd n` `1 < n` have "k \<noteq> 0" by (rule_tac notI) simp
@@ -263,7 +263,7 @@ proof
       with `2 \<le> p` obtain d
         where d: "prime d" "d * d \<le> p" "d dvd p"
         by (auto simp add: int_dvd_iff le_nat_iff int_mult)
-      from `prime d` have "2 \<le> d" by auto
+      from `prime d` have "2 \<le> d" by (simp add: prime_ge_2_nat)
       then have "2 \<le> int d" by simp
       with `2 \<le> int d` have "2 * 2 \<le> int d * int d"
         by (rule mult_mono) simp_all
@@ -275,16 +275,16 @@ qed
 why3_vc even_prime
 proof -
   from `prime (nat p)` have "0 \<le> p" by (simp add: prime_def)
-  from `prime (nat p)` have "2 \<le> nat p" by auto
+  from `prime (nat p)` have "2 \<le> nat p" by (simp add: prime_ge_2_nat)
   with `prime (nat p)` `even p` `0 \<le> p` show ?thesis
-    by (auto simp add: order_le_less prime_odd_nat pos_int_even_equiv_nat_even)
+    by (auto simp add: order_le_less prime_odd_nat even_nat_iff [symmetric])
 qed
 
 why3_vc odd_prime
 proof -
-  from `prime (nat p)` have "2 \<le> nat p" by auto
+  from `prime (nat p)` have "2 \<le> nat p" by (simp add: prime_ge_2_nat)
   with `prime (nat p)` `3 \<le> p` show ?thesis
-    by (auto simp add: order_le_less prime_odd_nat pos_int_even_equiv_nat_even)
+    by (auto simp add: order_le_less prime_odd_nat even_nat_iff [symmetric])
 qed
 
 why3_end
