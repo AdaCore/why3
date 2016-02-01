@@ -1,57 +1,57 @@
 
 module Fmla
-  
+
   use import game.Game
-  
+
   (* Game inclusion relation. *)
   predicate subgame (g1 g2:game 'a) =
     simulate g1 (=) g2 /\ g1.progress = g2.progress
-  
+
   (* Game formula defined in environment 'e, as a predicate over the game. *)
   type fmla 'e 'a = 'e -> game 'a -> bool
-  
+
   (* Correct game formulas are increasing with respect to subgame relation
      (Kripke semantics). *)
   predicate is_fmla (f:fmla 'e 'a) =
     forall env g1 g2. subgame g1 g2 /\ f env g1 -> f env g2
-  
+
   predicate e_closure (q:('e,'b) -> 'a -> bool) (env:'e) (x:'a) =
     exists y. q (env,y) x
-  
+
   function shift_context (f:fmla 'e 'a) : fmla ('e,'b) 'a =
     \env. let (env,_) = env in f env
-  
+
   (* {P|\Q} mean that from a state in P,
      we can reach a state that satisfy Q. *)
   function enforce (p q:'e -> 'a -> bool) : fmla 'e 'a =
     \env g. have_uniform_winning_strat g (p env) (q env)
-  
+
   (* Intuistionistic arrow. *)
   function arrow (f1 f2:fmla 'e 'a) : fmla 'e 'a =
     \env g. forall g2. subgame g g2 /\ f1 env g2 -> f2 env g2
-  
+
   (* Lift environment predicate to the game formula level. *)
   function lift (p:'e -> bool) : fmla 'e 'a = \env _. p env
-  
+
   (* Standard quantifiers. *)
   function universal (p:fmla ('e,'b) 'a) : fmla 'e 'a =
     \env g. forall y. p (env,y) g
-  
+
   function existential (p:fmla ('e,'b) 'a) : fmla 'e 'a =
     \env g. exists y. p (env,y) g
-  
+
   (* Express the game ordering. *)
   function ordering (o:'a -> 'a -> bool) : fmla 'e 'a = \_ g. g.progress = o
-  
+
   predicate holds (c f:fmla 'e 'a) =
     forall env g. game_wf g /\ c env g -> f env g
-  
+
   predicate stronger (p q:'e -> 'a -> bool) = forall e x. p e x -> q e x
-  
+
 end
 
 (* Rules for game formula derivations. *)
-module FmlaRules
+module FmlaRules "W:non_conservative_extension:N"
 
   use import Fmla
 
@@ -60,28 +60,23 @@ module FmlaRules
   axiom enforce_monotonic : forall c,p1 p2,q1 q2:'e -> 'a -> bool.
     stronger p2 p1 /\ holds c (enforce p1 q1) /\ stronger q1 q2 ->
     holds c (enforce p2 q2)
-    /\ forall _:d. true
 
   axiom enforce_fmla : forall p,q:('e,'b) -> 'a -> bool. is_fmla (enforce p q)
-    /\ forall _:d. true
 
   axiom arrow_fmla : forall f1 f2:fmla 'e 'a. is_fmla (arrow f1 f2)
-    /\ forall _:d. true
 
   axiom sequence : forall c p q,r:'e -> 'a -> bool.
     holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
-    /\ forall _:d. true
 
   axiom ghost_intro : forall c p,q:('e,'b) -> 'a -> bool.
     holds (shift_context c) (enforce p q) ->
     holds c (enforce (e_closure p) (e_closure q))
-    /\ forall _:d. true
 
 end
 
 (* Proof of rules. *)
 module FmlaRulesProof
-  
+
   use import option.Option
   use import order.Order
   use import order.Chain
@@ -89,7 +84,7 @@ module FmlaRulesProof
   use import game.StratProps
   use import transfinite.ChainExtension
   use import Fmla
-  
+
   predicate ext (f g:'a -> 'b) = forall x. f x = g x
   predicate hack (f g h:'a -> 'b) = f = g = h
   let lemma ext (f g:'a -> 'b) : unit
@@ -99,16 +94,16 @@ module FmlaRulesProof
 
   predicate pext (p q:'a -> bool) = forall x. p x <-> q x
   lemma pext : forall p q:'a -> bool. pext p q -> p = q by ext p q
-  
+
   lemma rel_map_equal : forall s:'a -> bool.
     rel_map (=) s = s by pext (rel_map (=) s) s
-  
+
   lemma enforce_fmla : forall p,q:('e,'b) -> 'a -> bool. is_fmla (enforce p q)
-  
+
   lemma arrow_fmla : forall f1 f2:fmla 'e 'a. is_fmla (arrow f1 f2)
-  
+
   predicate subset (p q:'a -> bool) = forall x. p x -> q x
-  
+
   (* Useful lemma: monotonicity of having a winning strategy from some point. *)
   lemma pre_monotonic : forall g x,q1 q2:'a -> bool.
     game_wf g -> have_winning_strat g x q1 /\ subset q1 q2 ->
@@ -120,10 +115,10 @@ module FmlaRulesProof
     so exists chy. reach_ch g.progress (strat_next g ang dmn) ((=) x) chy /\
       win_at g q1 ang dmn chy
     so win_at g q2 ang dmn chy
-  
+
   predicate cut (g:game 'a) (q:'a -> bool) (x:'a) (y:'a) =
     q y /\ g.progress x y
-  
+
   (* Another useful lemma: if we can reach q from a point x,
      then we can reach q /\ y >= x from x. *)
   lemma reach_above : forall g x,q:'a -> bool.
@@ -136,7 +131,7 @@ module FmlaRulesProof
       win_at g q ang dmn chy
     so (forall z. chy z -> g.progress x z by subchain g.progress ((=) x) chy)
     so win_at g (cut g q x) ang dmn chy
-  
+
   (* Definitions for 'ghost' variable introduction:
      Define a game with a (constant) extra state and show this
      game bisimulate the original game,
@@ -145,7 +140,7 @@ module FmlaRulesProof
           - Use inverse relation to get a strategy in the initial game
             that ignore the ghost variable. *)
   predicate with_st (b:'b) (x:'a) (y:('a,'b)) = y = (x,b)
-  
+
   (* Relations for step simulations: with_sto to embed strategies
      from the original game as a strategy in the coupled one,
      forget to get back to the original stateless game. *)
@@ -154,14 +149,14 @@ module FmlaRulesProof
     | None -> true
     | Some b2 -> b2 = b
     end
-  
+
   predicate forget (x:('a,'b)) (y:'a) = let (a,_) = x in y = a
-  
+
   (* Transitions & orders in coupled games. *)
   predicate tr_witness (g:game 'a) (x:('a,'b))
                        (s:('a,'b) -> bool) (s':'a -> bool) =
     let (a,b) = x in g.transition a s' /\ s = rel_map (with_st b) s'
-  
+
   predicate with_progress (g:game 'a) (x y:('a,option 'b)) =
     let (a,u) = x in
     let (b,v) = y in
@@ -170,15 +165,15 @@ module FmlaRulesProof
      | _, None -> false
      | Some u, Some v -> u = v
      end) /\ g.progress a b
-  
+
   predicate with_transition (g:game 'a) (x:('a,'b)) (s:('a,'b) -> bool) =
     exists s'. tr_witness g x s s'
-  
+
   function with_start (g:game 'a) : game ('a,option 'b) = {
     progress = with_progress g;
     transition = with_transition g;
   }
-  
+
   lemma with_start_wf : forall g:game 'a.
     let gs:game ('a,option 'b) = with_start g in
     game_wf g -> game_wf gs
@@ -249,7 +244,7 @@ module FmlaRulesProof
     so let (a,b) = x in
       exists z. rel_map_witness (with_st b) s' y z
     so g.progress a z so y = (z,b)
-  
+
   lemma with_start_chain_compatibility : forall g:game 'a.
     let gs:game ('a,option 'b) = with_start g in
     game_wf g ->
@@ -309,7 +304,7 @@ module FmlaRulesProof
                 end
           end))
     by os = with_progress g
-  
+
   lemma with_start_simulations : forall g:game 'a.
     game_wf g ->
     let gs:game ('a,option 'b) = with_start g in
@@ -334,7 +329,7 @@ module FmlaRulesProof
         by exists z0. rel_map_witness (with_st yb) s z z0
         so rel_map_witness (with_sto b) s z z0
     ) by gs.transition = with_transition g
-  
+
   lemma ghost_intro : forall c,p q:('e,'b) -> 'a -> bool.
     let ep = e_closure p in
     let eq = e_closure q in
@@ -362,7 +357,7 @@ module FmlaRulesProof
             by forall z. cut gs (rr qeb) x z -> qb env z
               by let (_,zb) = z in match zb with
                 | None -> false by gs.progress = with_progress g
-                | Some b -> true
+                | Some _ -> true
                 end
         end)
       so let rr = rel_map forget in
@@ -370,12 +365,12 @@ module FmlaRulesProof
       so forall p. pext (rr (liftb p env)) (e_closure p env)
       by (forall x. rr (liftb p env) x -> e_closure p env x
         by exists y. rel_map_witness forget (liftb p env) x y
-        so let (ya,yb) = y in
+        so let (_,yb) = y in
           match yb with None -> false | Some b -> p (env,b) x end
       ) /\ forall x. e_closure p env x -> rr (liftb p env) x
       by exists b. p (env,b) x
       so rel_map_witness forget (liftb p env) x (x,Some b)
-  
+
   lemma enforce_monotonic : forall c,p1 p2,q1 q2:'e -> 'a -> bool.
     stronger p2 p1 /\ holds c (enforce p1 q1) /\ stronger q1 q2 ->
     holds c (enforce p2 q2)
@@ -383,14 +378,12 @@ module FmlaRulesProof
       have_uniform_winning_strat g (p2 env) (q2 env)
     by forall x. p2 env x -> have_winning_strat g x (q2 env)
     by subset (q1 env) (q2 env)
-  
+
   clone FmlaRules with type Dummy.d = unit,
     goal enforce_monotonic,
     goal enforce_fmla,
     goal arrow_fmla,
     goal sequence,
     goal ghost_intro
-  
+
 end
-
-
