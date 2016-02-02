@@ -1,5 +1,9 @@
 
-(** A tiny register allocator for tree expressions. *)
+(** A tiny register allocator for tree expressions.
+
+    Authors: Martin Clochard (École Normale Supérieure)
+             Jean-Christophe Filliâtre (CNRS)
+ *)
 
 module Spec
 
@@ -77,12 +81,24 @@ module Spec
     | Cons i1 l1 -> exec_append l1 c2 (exec i1 s)
     end
 
-  function expr_post (e:expr) (r:register) : state -> state -> bool =
+  (** specification of the forthcoming compilation:
+      - value of expression e lies in register r in final state
+      - all registers smaller than are preserved
+      - memory and stack are preserved *)
+  function expr_post (e: expr) (r: register) : state -> state -> bool =
     \s s'. s'.mem = s.mem /\ s'.reg r = eval s.mem e /\ s'.st = s.st /\
       forall r'. r' < r -> s'.reg r' = s.reg r'
   meta rewrite_def function expr_post
 
 end
+
+(** Double WP technique
+
+    If you read French, see https://hal.inria.fr/hal-01094488
+
+    See also this other Why3 proof, from where this technique originates:
+    http://toccata.lri.fr/gallery/double_wp.en.html
+*)
 
 module DWP
 
@@ -92,7 +108,7 @@ module DWP
 
   meta compute_max_steps 0x10000
 
-  predicate (-->) (x y:'a) = "rewrite" x = y
+  predicate (-->) (x y: 'a) = "rewrite" x = y
   meta rewrite_def predicate (-->)
 
   type post = state -> state -> bool
@@ -100,45 +116,45 @@ module DWP
     hcode : code;
     ghost post : post;
   }
-  predicate hcode_ok (hc:hcode) = forall s. hc.post s (exec_list hc.hcode s)
+  predicate hcode_ok (hc: hcode) = forall s. hc.post s (exec_list hc.hcode s)
 
   type trans = (state -> bool) -> state -> bool
   type wcode = {
     ghost trans : trans;
     wcode : code;
   }
-  predicate wcode_ok (wc:wcode) = forall q s.
+  predicate wcode_ok (wc: wcode) = forall q s.
     wc.trans q s -> q (exec_list wc.wcode s)
 
-  function to_wp (pst:post) : trans = \q s1. forall s2. pst s1 s2 -> q s2
+  function to_wp (pst: post) : trans = \q s1. forall s2. pst s1 s2 -> q s2
   meta rewrite_def function to_wp
 
   function rcompose : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c = \f g x. g (f x)
   meta rewrite_def function rcompose
 
-  function exec_closure (i:instr) : state -> state = \s. exec i s
+  function exec_closure (i: instr) : state -> state = \s. exec i s
   function id : 'a -> 'a = \x.x
 
-  let ($_) (hc:hcode) : wcode
+  let ($_) (hc: hcode) : wcode
     requires { hcode_ok hc }
     ensures { wcode_ok result }
     ensures { result.trans --> to_wp hc.post }
   = { wcode = hc.hcode; trans = to_wp hc.post }
 
-  let wrap (wc:wcode) (ghost pst:post) : hcode
+  let wrap (wc: wcode) (ghost pst: post) : hcode
     requires { wcode_ok wc }
     requires { forall x. wc.trans (pst x) x }
     ensures { hcode_ok result }
     ensures { result.post --> pst }
   = { hcode = wc.wcode; post = pst }
 
-  let (--) (w1 w2:wcode) : wcode
+  let (--) (w1 w2: wcode) : wcode
     requires { wcode_ok w1 /\ wcode_ok w2 }
     ensures { wcode_ok result }
     ensures { result.trans --> rcompose w2.trans w1.trans }
   = { wcode = w1.wcode ++ w2.wcode; trans = rcompose w2.trans w1.trans }
 
-  let cons (i:instr) (w:wcode) : wcode
+  let cons (i: instr) (w: wcode) : wcode
     requires { wcode_ok w }
     ensures { wcode_ok result }
     ensures { result.trans --> rcompose w.trans (rcompose (exec i)) }
@@ -177,13 +193,13 @@ module InfinityOfRegisters
       end) (expr_post e r)
 
   (* To recover usual specification. *)
-  let ghost recover (e:expr) (r:register) (h:hcode) : unit
+  let ghost recover (e: expr) (r: register) (h: hcode) : unit
     requires { hcode_ok h /\ h.post --> expr_post e r }
-    ensures { forall s. let s' = exec_list h.hcode s in
-              s'.mem = s.mem /\
-              s'.reg r = eval s.mem e /\
-              s'.st = s.st /\
-              forall r'. r' < r -> s'.reg r' = s.reg r' }
+    ensures  { forall s. let s' = exec_list h.hcode s in
+               s'.mem = s.mem /\
+               s'.reg r = eval s.mem e /\
+               s'.st = s.st /\
+               forall r'. r' < r -> s'.reg r' = s.reg r' }
   = ()
 
 end

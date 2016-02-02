@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="5" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
-<file name="../register_allocation.mlw">
-<theory name="Spec" sum="84125847b61498f1784a3aedb308613e">
+<prover id="5" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
+<file name="../register_allocation.mlw" expanded="true">
+<theory name="Spec" sum="84125847b61498f1784a3aedb308613e" expanded="true">
  <goal name="WP_parameter exec_append" expl="VC for exec_append">
  <proof prover="5"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
@@ -46,7 +46,6 @@
  </transf>
  </goal>
  <goal name="WP_parameter nil" expl="VC for nil">
- <proof prover="5"><result status="unknown" time="0.01"/></proof>
  <transf name="split_goal_wp">
   <goal name="WP_parameter nil.1" expl="1. postcondition">
   <proof prover="5"><result status="valid" time="0.02" steps="3"/></proof>
