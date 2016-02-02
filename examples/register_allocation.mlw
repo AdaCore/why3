@@ -1,0 +1,155 @@
+
+(** A tiny register allocator for tree expressions. *)
+
+module Spec
+
+  use import HighOrd
+  use import int.Int
+
+  type addr
+
+  type expr =
+  | Evar addr
+  | Eneg expr
+  | Eadd expr expr
+
+  type memory = addr -> int
+
+  function eval (m: memory) (e: expr) : int =
+    match e with
+    | Evar x     -> m x
+    | Eneg e     -> - (eval m e)
+    | Eadd e1 e2 -> eval m e1 + eval m e2
+    end
+
+  type register = int
+
+  type instr =
+    | Iload addr register
+    | Ineg  register
+    | Iadd  register register
+    | Ipush register
+    | Ipop  register
+
+  type registers = register -> int
+
+  function update (reg: registers) (r: register) (v: int) : registers =
+    \r'. if r' = r then v else reg r'
+
+  use import list.List
+
+  type stack = list int
+
+  type state = {
+    mem: memory;
+    reg: registers;
+    st : stack;
+  }
+
+  function exec (i: instr) (s: state) : state =
+    match i with
+    | Iload x r   -> { s with reg = update s.reg r (s.mem x) }
+    | Ineg  r     -> { s with reg = update s.reg r (- s.reg r) }
+    | Iadd  r1 r2 -> { s with reg = update s.reg r2 (s.reg r1 + s.reg r2) }
+    | Ipush r     -> { s with st = Cons (s.reg r) s.st }
+    | Ipop  r     -> match s.st with
+                     | Nil       -> s (* fails *)
+                     | Cons v st -> { s with reg = update s.reg r v; st = st }
+                     end
+    end
+
+  type code = list instr
+
+  function exec_list (c: code) (s: state) : state =
+    match c with
+    | Nil      -> s
+    | Cons i l -> exec_list l (exec i s)
+    end
+
+  use import list.Append
+
+  let rec lemma exec_append (c1 c2: code) (s: state) : unit
+    ensures { exec_list (c1 ++ c2) s = exec_list c2 (exec_list c1 s) }
+    variant { c1 }
+  = match c1 with
+    | Nil        -> ()
+    | Cons i1 l1 -> exec_append l1 c2 (exec i1 s)
+    end
+
+end
+
+module InfinityOfRegisters
+
+  use import HighOrd
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import Spec
+
+  (** [compile e r] returns a list of instructions that stores the value
+      of [e] in register [r], without modifying any register [r' < r]. *)
+
+  let rec compile (e: expr) (r: register) : code
+    variant { e }
+    ensures { forall s. let s' = exec_list result s in
+              s'.mem = s.mem /\
+              s'.reg r = eval s.mem e /\
+              forall r'. r' < r -> s'.reg r' = s.reg r' }
+  =
+    match e with
+    | Evar x ->
+        Cons (Iload x r) Nil
+    | Eneg e ->
+        compile e r ++ Cons (Ineg r) Nil
+    | Eadd e1 e2 ->
+        compile e1 r ++ compile e2 (r + 1) ++ Cons (Iadd (r + 1) r) Nil
+    end
+
+end
+
+module FiniteNumberOfRegisters
+
+  use import HighOrd
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import Spec
+
+  (** we have k registers, namely 0,1,...,k-1 *)
+  constant k: int
+
+  (** we assume having at least two registers, otherwise we can't add *)
+  axiom at_least_two_registers: k >= 2
+
+  (** [compile e r] returns a list of instructions that stores the value
+      of [e] in register [r], without modifying any register [r' < r]. *)
+
+(** PROOF TO BE COMPLETED
+
+  let rec compile (e: expr) (r: register) : code
+    requires { 0 <= r < k }
+    variant  { e }
+    ensures  { forall s. let s' = exec_list result s in
+               s'.mem = s.mem /\
+               s'.st = s.st /\
+               s'.reg r = eval s.mem e /\
+               forall r'. r' < r -> s'.reg r' = s.reg r' }
+  =
+    match e with
+    | Evar x ->
+        Cons (Iload x r) Nil
+    | Eneg e ->
+        compile e r ++ Cons (Ineg r) Nil
+    | Eadd e1 e2 ->
+        if r < k-1 then
+          compile e1 r ++ compile e2 (r + 1) ++ Cons (Iadd (r + 1) r) Nil
+        else
+          Cons (Ipush (k - 2)) (
+          compile e1 (k - 2) ++ compile e2 (k - 1) ++
+          Cons (Iadd (k - 2) (k - 1)) (
+          Cons (Ipop (k - 2)) Nil))
+    end
+
+**)
+
+end
