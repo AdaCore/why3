@@ -245,26 +245,11 @@ let name_regions kn wr mpv =
 
 (* produce a rebuilding postcondition after a write effect *)
 
-type 'a nested_list =
-  | NLflat of 'a nested_list list
-  | NLcons of 'a * 'a nested_list
-  | NLnil
-
-let rec nl_flatten nl acc = match nl with
-  | NLflat l -> List.fold_right nl_flatten l acc
-  | NLcons (elm, nl) -> elm :: nl_flatten nl acc
-  | NLnil -> acc
-
-let rec nl_implies nl f = match nl with
-  | NLflat l -> List.fold_right nl_implies l f
-  | NLcons (elm, nl) -> vc_implies elm (nl_implies nl f)
-  | NLnil -> f
-
 let cons_t_simp nt t fl =
-  if t_equal nt t then fl else NLcons (t_equ nt t, fl)
+  if t_equal nt t then fl else t_equ nt t :: fl
 
-let rec havoc kn wr mreg t ity =
-  if not (ity_affected wr ity) then t, NLnil else
+let rec havoc kn wr mreg t ity fl =
+  if not (ity_affected wr ity) then t, fl else
   match ity.ity_node with
   | Ityvar _ -> assert false
   | Ityreg ({reg_its = s} as r) when s.its_nonfree || Mreg.mem r wr ->
@@ -272,14 +257,14 @@ let rec havoc kn wr mreg t ity =
       let isb = its_match_regs s r.reg_args r.reg_regs in
       let wfs = Mreg.find_def Mpv.empty r wr in
       let nt = Mreg.find r mreg in
-      let field rs =
-        if Mpv.mem (Opt.get rs.rs_field) wfs then NLnil else
+      let field rs fl =
+        if Mpv.mem (Opt.get rs.rs_field) wfs then fl else
         let ity = ity_full_inst isb rs.rs_cty.cty_result in
         let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
         let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
-        let t, fl = havoc kn wr mreg t ity in
+        let t, fl = havoc kn wr mreg t ity fl in
         cons_t_simp nt t fl in
-      nt, NLflat (List.map field itd.itd_fields)
+      nt, List.fold_right field itd.itd_fields fl
   | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
   | Ityapp (s,tl,rl) ->
       let itd = find_its_defn kn s in
@@ -287,10 +272,12 @@ let rec havoc kn wr mreg t ity =
       begin match itd.itd_constructors with
       | [{rs_logic = RLls cs}] (* record *)
         when List.length cs.ls_args = List.length itd.itd_fields ->
-          let field rs =
+          let field rs (tl, fl) =
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
-            havoc kn wr mreg (t_app_infer (ls_of_rs rs) [t]) ity in
-          let tl, fl = List.split (List.map field itd.itd_fields) in
+            let t = t_app_infer (ls_of_rs rs) [t] in
+            let t, fl = havoc kn wr mreg t ity fl in
+            t::tl, fl in
+          let tl, fl = List.fold_right field itd.itd_fields ([],fl) in
           let t0 = match tl with
             | {t_node = Tapp (_,[t])}::_ -> t | _ -> t_false in
           let triv rs t = match t.t_node with
@@ -298,7 +285,7 @@ let rec havoc kn wr mreg t ity =
             | _ -> false in
           let t = if List.for_all2 triv itd.itd_fields tl
             then t0 else fs_app cs tl (ty_of_ity ity) in
-          t, NLflat fl
+          t, fl
       | cl ->
           let ty = ty_of_ity ity in
           let branch ({rs_cty = cty} as rs) =
@@ -309,13 +296,14 @@ let rec havoc kn wr mreg t ity =
               create_vsymbol (id_clone id) (ty_of_ity ity) in
             let vl = List.map2 get_pjv cty.cty_args ityl in
             let p = pat_app cs (List.map pat_var vl) ty in
-            let get_hv v ity = havoc kn wr mreg (t_var v) ity in
-            let tl, fl = List.split (List.map2 get_hv vl ityl) in
-            let fl = List.fold_right nl_flatten fl [] in
-            (p, fs_app cs tl ty), (p, t_and_simp_l fl) in
+            let field v ity (tl, fl) =
+              let t, fl = havoc kn wr mreg (t_var v) ity fl in
+              t::tl, fl in
+            let tl, fl = List.fold_right2 field vl ityl ([],[]) in
+            (p, fs_app cs tl ty), (p, t_and_l fl) in
           let tbl, fbl = List.split (List.map branch cl) in
           let t = t_case_close t tbl and f = t_case_close_simp t fbl in
-          t, if t_equal f t_true then NLnil else NLcons (f, NLnil)
+          t, if t_equal f t_true then fl else f::fl
       end
 
 let print_mpv mpv = if Debug.test_flag debug then
@@ -332,9 +320,9 @@ let _havoc_fast {known_map = kn} {eff_writes = wr; eff_covers = cv} mpv =
   if Sreg.is_empty cv || Mpv.is_empty mpv then [] else
   let mreg = name_regions kn cv mpv in
   let () = print_mpv mpv; print_mreg mreg in
-  let update {pv_vs = o; pv_ity = ity} n acc =
-    let t, fl = havoc kn wr mreg (t_var o) ity in
-    nl_flatten (cons_t_simp (t_var n) t fl) acc in
+  let update {pv_vs = o; pv_ity = ity} n fl =
+    let t, fl = havoc kn wr mreg (t_var o) ity fl in
+    cons_t_simp (t_var n) t fl in
   Mpv.fold update mpv []
 
 let havoc_slow {known_map = kn} {eff_writes = wr; eff_covers = cv} w =
@@ -350,10 +338,10 @@ let havoc_slow {known_map = kn} {eff_writes = wr; eff_covers = cv} w =
   let add _ t fvs = t_freevars fvs t in
   let fvs = Mreg.fold add mreg Mvs.empty in
   let update {pv_vs = o; pv_ity = ity} n w =
-    let t, fl = havoc kn wr mreg (t_var o) ity in
+    let t, fl = havoc kn wr mreg (t_var o) ity [] in
     if Mvs.mem n fvs then
-      nl_implies (cons_t_simp (t_var n) t fl) w
-    else vc_let n t (nl_implies fl w) in
+      vc_implies_pre (cons_t_simp (t_var n) t fl) w
+    else vc_let n t (vc_implies_pre fl w) in
   let add o n sbs = Mvs.add o.pv_vs (t_var n) sbs in
   let w = t_subst (Mpv.fold add mpv Mvs.empty) w in
   vc_forall (Mvs.keys fvs) (Mpv.fold update mpv w)
