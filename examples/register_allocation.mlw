@@ -243,3 +243,72 @@ module FiniteNumberOfRegisters
       end) (expr_post e r)
 
 end
+
+module OptimalNumberOfRegisters
+
+  use import HighOrd
+  use import int.Int
+  use import int.MinMax
+  use import list.List
+  use import list.Append
+  use import Spec
+  use import DWP
+
+  (** we have k registers, namely 0,1,...,k-1 *)
+  constant k: int
+
+  (** we assume having at least two registers, otherwise we can't add *)
+  axiom at_least_two_registers: k >= 2
+
+  (** the minimal number of registers needed to evaluate e *)
+  function n (e: expr) : int =
+    match e with
+    | Evar _     -> 1
+    | Eneg e     -> n e
+    | Eadd e1 e2 -> let n1 = n e1 in let n2 = n e2 in
+                    if n1 = n2 then 1 + n1 else max n1 n2
+    end
+
+  (** Note: This is of course inefficient to recompute function [n] many
+      times. A realistic implementation would compute [n e] once for
+      each sub-expression [e], either with a first pass of tree decoration,
+      or with function [compile] returning the value of [n e] as well,
+      in a bottom-up way *)
+
+  function measure (e: expr) : int =
+    match e with
+    | Evar _     -> 0
+    | Eneg e     -> 1 + measure e
+    | Eadd e1 e2 -> 1 + if n e1 >= n e2 then measure e1 + measure e2
+                        else 1 + measure e1 + measure e2
+    end
+
+  lemma measure_nonneg: forall e. measure e >= 0
+
+  (** [compile e r] returns a list of instructions that stores the value
+      of [e] in register [r], without modifying any register [r' < r]. *)
+
+  let rec compile (e: expr) (r: register) : hcode
+    requires { 0 <= r < k }
+    variant  { measure e }
+    ensures  { hcode_ok result }
+    ensures  { result.post --> expr_post e r }
+  = wrap (
+      match e with
+      | Evar x -> cons (Iload x r) (nil ())
+      | Eneg e -> $ compile e r -- cons (Ineg r) (nil ())
+      | Eadd e1 e2 ->
+          if n e1 >= n e2 then (* we must compile e1 first *)
+            if r < k-1 then
+              $ compile e1 r -- $ compile e2 (r + 1) --
+              cons (Iadd (r + 1) r) (nil ())
+            else
+              cons (Ipush (k - 2)) (
+              $ compile e1 (k - 2) -- $ compile e2 (k - 1) --
+              cons (Iadd (k - 2) (k - 1)) (
+              cons (Ipop (k - 2)) (nil ())))
+          else
+            $ compile (Eadd e2 e1) r (* compile e2 first *)
+      end) (expr_post e r)
+
+end
