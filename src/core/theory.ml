@@ -717,6 +717,7 @@ let warn_clone_not_abstract loc th =
         begin match d.d_node with
         | Dtype { ts_def = None }
         | Dparam _ -> raise Exit
+        | Dprop(Paxiom, _,_) -> raise Exit
         | _ -> ()
         end
       | _ -> ()
