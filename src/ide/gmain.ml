@@ -2070,7 +2070,7 @@ let reload () =
     | e ->
         begin
           match e with
-          | Loc.Located(loc,e) ->
+          | Loc.Located(loc,_) ->
             scroll_to_loc ~color:error_tag ~yalign:0.5 loc;
             notebook#goto_page source_page (* go to "source" tab *)
           | _ -> ()
