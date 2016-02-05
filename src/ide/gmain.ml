@@ -2068,12 +2068,13 @@ let reload () =
     display_warnings ()
   with
     | e ->
-        let e = match e with
+        begin
+          match e with
           | Loc.Located(loc,e) ->
             scroll_to_loc ~color:error_tag ~yalign:0.5 loc;
-            e
-          | e -> e
-        in
+            notebook#goto_page source_page (* go to "source" tab *)
+          | _ -> ()
+        end;
         fprintf str_formatter
           "@[Error:@ %a@]" Exn_printer.exn_printer e;
         let msg = flush_str_formatter () in
