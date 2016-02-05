@@ -78,6 +78,10 @@ let get_transp_state env =
 
 let type_of_global = Global.type_of_global_unsafe
 
+let type_of = Typing.unsafe_type_of
+
+let pf_type_of = Tacmach.pf_unsafe_type_of
+
 let finite_ind v = v <> Decl_kinds.CoFinite
 
 let pr_str = Pp.str
@@ -86,7 +90,7 @@ let pr_spc = Pp.spc
 
 let pr_fnl = Pp.fnl
 
-let admit_as_an_axiom = Proofview.V82.of_tactic Tactics.admit_as_an_axiom
+let admit_as_an_axiom = Tacticals.tclIDTAC
 
 let map_to_list = CArray.map_to_list
 
@@ -640,6 +644,7 @@ and tr_global_ts dep env (r : global_reference) =
                 | Meta _ -> assert false
                 | Var _ -> assert false
                 | Rel _ -> assert false
+                | _ (* Proj *) -> assert false
               in
               let l = List.map (tr_type dep' tvm env) l in
               let id = preid_of_id (Nametab.basename_of_global r) in
@@ -1001,6 +1006,8 @@ and tr_term dep tvm bv env t =
 (*                   | x :: l -> applist (f, [x]), l | [] -> raise NotFO *)
 (*               in *)
 (*               abstract app l *)
+  | _ (* Proj *) ->
+      raise NotFO
 
 and quantifiers n a b dep tvm bv env =
   let id, env = coq_rename_var env n a in
@@ -1125,6 +1132,8 @@ and tr_formula dep tvm bv env f = match kind_of_term f with
         | Some _ ->
           raise NotFO
       end
+  | _ (* Proj *) ->
+      raise NotFO
 
 let is_global_var id =
   try ignore (Environ.lookup_named id (Global.env ())); true
@@ -1266,7 +1275,7 @@ let why3tac ?(timelimit=timelimit) s gl =
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
-  try
+  let res = try
     (* OCaml doesn't let us do it at the initialisation time *)
     if not !plugins_loaded then begin
       Whyconf.load_plugins main;
@@ -1281,17 +1290,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
     if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
     let call = Driver.prove_task ~command ~timelimit drv !task () in
-    let res = wait_on_call call () in
-    match res.pr_answer with
-      | Valid -> admit_as_an_axiom gl
-      | Invalid -> error "Invalid"
-      | Unknown s -> error ("Don't know: " ^ s)
-      | Call_provers.Failure s -> error ("Failure: " ^ s)
-      | Call_provers.Timeout -> error "Timeout"
-      | OutOfMemory -> error "Out Of Memory"
-      | StepsLimitExceeded -> error "Steps Limit reached"
-      | HighFailure ->
-          error ("Prover failure\n" ^ res.pr_output ^ "\n")
+    wait_on_call call ()
   with
     | NotFO ->
         if debug then Printexc.print_backtrace stderr; flush stderr;
@@ -1325,6 +1324,16 @@ let why3tac ?(timelimit=timelimit) s gl =
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
         raise e
+  in
+  match res.pr_answer with
+  | Valid -> admit_as_an_axiom gl
+  | Invalid -> error "Invalid"
+  | Unknown s -> error ("Don't know: " ^ s)
+  | Call_provers.Failure s -> error ("Failure: " ^ s)
+  | Call_provers.Timeout -> error "Timeout"
+  | OutOfMemory -> error "Out Of Memory"
+  | StepsLimitExceeded -> error "Steps Limit reached"
+  | HighFailure -> error ("Prover failure\n" ^ res.pr_output ^ "\n")
 
 IFDEF COQ85 THEN
 

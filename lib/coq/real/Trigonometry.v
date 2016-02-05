@@ -80,7 +80,7 @@ replace PI with (4 * (PI / 4))%R by field.
 rewrite <- atan_1.
 admit. (* to avoid a dependency on CoqInterval *)
 (* split ; interval with (i_prec 680). *)
-Qed.
+Admitted.
 
 (* Why3 goal *)
 Lemma Cos_pi : ((Reals.Rtrigo_def.cos Reals.Rtrigo1.PI) = (-1%R)%R).
