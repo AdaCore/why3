@@ -2,24 +2,24 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../transfinite.mlw">
 <theory name="IterateCommon" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Iterates" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="IterateProof" sum="7110fa6c95abf2834680e9aea777adf9">
+<theory name="IterateProof" sum="749a80e0893a304d15f90fcfd59ecdd2">
  <goal name="tr_reach_compare">
  <transf name="induction_pr">
   <goal name="tr_reach_compare.1" expl="1.">
-  <proof prover="2" steplimit="1"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="tr_reach_compare.2" expl="2.">
-  <proof prover="2" steplimit="1"><result status="valid" time="0.01" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
   <goal name="tr_reach_compare.3" expl="3.">
-  <proof prover="2" steplimit="1"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
  </transf>
  </goal>
@@ -326,18 +326,18 @@
 </theory>
 <theory name="ChainExtension" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ChainExtensionProof" sum="eb25cf3911502cbbab86e46f7256e871">
+<theory name="ChainExtensionProof" sum="fcf81d2518ca60cb2f06e6d92c1f1a0c">
  <goal name="WP_parameter ext" expl="VC for ext">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ext.1" expl="1. assertion">
   <transf name="inline_goal">
    <goal name="WP_parameter ext.1.1" expl="1. assertion">
-   <proof prover="2" steplimit="1"><result status="valid" time="0.01" steps="6"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter ext.2" expl="2. postcondition">
-  <proof prover="2" steplimit="1"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>

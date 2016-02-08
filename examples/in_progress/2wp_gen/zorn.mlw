@@ -1,9 +1,7 @@
 
 (* Zorn's lemma: any chain-bounded (not even complete)
    order has a maximal element. *)
-module Zorn
-
-  namespace import Dummy type d end
+module Zorn "W:non_conservative_extension:N"
 
   use import order.Order
   use import order.Chain
@@ -11,7 +9,6 @@ module Zorn
   (* Proof in ZornProof module. *)
   axiom zorn_lemma : forall o:'a -> 'a -> bool.
     preorder o /\ chain_bounded o -> exists y. maximal o y
-    /\ forall _:d. true
 
 end
 
@@ -48,21 +45,18 @@ module ZornProof
         so forall x. o witness x -> o x witness
           by not strict_upper_bound o fix x
 
-  clone Zorn with type Dummy.d = unit, goal zorn_lemma
+  clone Zorn with goal zorn_lemma
 
 end
 
 (* Consequence of Zorn's lemma: well-ordering theorem. *)
-module WellOrder
+module WellOrder "W:non_conservative_extension:N"
 
   use import order.Wf
-
-  namespace import Dummy type d end
 
   predicate well_order_witness (x y:'a)
 
   axiom well_order_exists : well_order (well_order_witness:'a -> 'a -> bool)
-    /\ forall _:d. true
 
 end
 
@@ -185,7 +179,7 @@ module WellOrderProof
   predicate witness (x y:'a) = choice well_order x y
   meta rewrite_def predicate witness
 
-  clone WellOrder with type Dummy.d = unit,
+  clone WellOrder with
     predicate well_order_witness = witness,
     goal well_order_exists
 

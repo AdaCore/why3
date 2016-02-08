@@ -2,12 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../zorn.mlw">
 <theory name="Zorn" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ZornProof" sum="0e970e51c81a73c1c9027c6d998611a7">
+<theory name="ZornProof" sum="ec60b3936ceac8b7c7e3c840622f551a">
  <goal name="choose_ub_builder">
  <proof prover="1"><result status="valid" time="0.36"/></proof>
  </goal>
@@ -42,7 +42,7 @@
 </theory>
 <theory name="WellOrder" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="WellOrderProof" sum="81be3f5db7a9225b73e9d0bac8e2c489">
+<theory name="WellOrderProof" sum="95b5475e469c614aa865e019736a6061">
  <goal name="completion_well_ordered">
  <transf name="split_goal_wp">
   <goal name="completion_well_ordered.1" expl="1.">
@@ -214,7 +214,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="well_order_proof.3" expl="3.">
-  <proof prover="2" steplimit="1"><result status="valid" time="0.05" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="17"/></proof>
   </goal>
   <goal name="well_order_proof.4" expl="4.">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
@@ -232,7 +232,7 @@
   <proof prover="2"><result status="valid" time="0.03" steps="59"/></proof>
   </goal>
   <goal name="well_order_proof.9" expl="9.">
-  <proof prover="2" steplimit="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
  </transf>
  </goal>

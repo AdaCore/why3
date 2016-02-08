@@ -1,76 +1,183 @@
 
 module Fmla
 
+  use import order.Order
+  use import order.Chain
+  use import transfinite.ChainExtension
   use import game.Game
 
   (* Game inclusion relation. *)
   predicate subgame (g1 g2:game 'a) =
     simulate g1 (=) g2 /\ g1.progress = g2.progress
 
-  (* Game formula defined in environment 'e, as a predicate over the game. *)
-  type fmla 'e 'a = 'e -> game 'a -> bool
+  (* Game formula: predicate over the game. *)
+  type fmla 'a =  game 'a -> bool
 
   (* Correct game formulas are increasing with respect to subgame relation
      (Kripke semantics). *)
-  predicate is_fmla (f:fmla 'e 'a) =
-    forall env g1 g2. subgame g1 g2 /\ f env g1 -> f env g2
+  predicate is_fmla (f:fmla 'a) = forall g1 g2. subgame g1 g2 /\ f g1 -> f g2
 
-  predicate e_closure (q:('e,'b) -> 'a -> bool) (env:'e) (x:'a) =
-    exists y. q (env,y) x
+  function cst (x:'b) : 'a -> 'b = \_. x
+  predicate e_closure (q:'b -> 'a -> bool) (x:'a) = exists y. q y x
+  predicate inter (p q:'a -> bool) (x:'a) = p x /\ q x
 
-  function shift_context (f:fmla 'e 'a) : fmla ('e,'b) 'a =
-    \env. let (env,_) = env in f env
-
-  (* {P|\Q} mean that from a state in P,
+  (* {P|Q} mean that from a state in P,
      we can reach a state that satisfy Q. *)
-  function enforce (p q:'e -> 'a -> bool) : fmla 'e 'a =
-    \env g. have_uniform_winning_strat g (p env) (q env)
+  function enforce (p q:'a -> bool) : fmla 'a =
+    \g. have_uniform_winning_strat g p q
+
+  (* Lifting of enforce to higher-order functions. *)
+  function u_enforce (p q:'b -> 'a -> bool) : 'b -> fmla 'a =
+    \b. enforce (p b) (q b)
 
   (* Intuistionistic arrow. *)
-  function arrow (f1 f2:fmla 'e 'a) : fmla 'e 'a =
-    \env g. forall g2. subgame g g2 /\ f1 env g2 -> f2 env g2
+  function arrow (f1 f2:fmla 'a) : fmla 'a =
+    \g. forall g2. subgame g g2 /\ f1 g2 -> f2 g2
 
-  (* Lift environment predicate to the game formula level. *)
-  function lift (p:'e -> bool) : fmla 'e 'a = \env _. p env
+  (* Natural predicate lifting. *)
+  function lift (b:bool) : fmla 'a = cst b
 
   (* Standard quantifiers. *)
-  function universal (p:fmla ('e,'b) 'a) : fmla 'e 'a =
-    \env g. forall y. p (env,y) g
+  function universal (p:'b -> fmla 'a) : fmla 'a = \g. forall y. p y g
+  function existential (p:'b -> fmla 'a) : fmla 'a = e_closure p
 
-  function existential (p:fmla ('e,'b) 'a) : fmla 'e 'a =
-    \env g. exists y. p (env,y) g
+  (* Conjonction. Could also be deduced from universal quantifier on booleans *)
+  function conj (p q:fmla 'a) : fmla 'a = inter p q
 
   (* Express the game ordering. *)
-  function ordering (o:'a -> 'a -> bool) : fmla 'e 'a = \_ g. g.progress = o
+  function ordering (o:'a -> 'a -> bool) : fmla 'a = \g. g.progress = o
 
-  predicate holds (c f:fmla 'e 'a) =
-    forall env g. game_wf g /\ c env g -> f env g
+  predicate holds (c f:fmla 'a) = forall g. game_wf g /\ c g -> f g
 
-  predicate stronger (p q:'e -> 'a -> bool) = forall e x. p e x -> q e x
+  (* For weakening rule of enforce. *)
+  predicate subset (p q:'a -> bool) = forall x. p x -> q x
+
+  (* For continuations. *)
+  constant bottom : 'a -> bool = \_. false
+
+  (* For transfinite loop rule. *)
+  predicate later (o:'b -> 'b -> bool) (i:'b -> 'a -> bool)
+                  (y:'b) (x:'a) =
+    exists y'. i y' x /\ o y y' /\ y' <> y
+
+  predicate proj1 (s:('a,'b) -> bool) (x:'a) = exists y. s (x,y)
+  predicate proj2 (s:('a,'b) -> bool) (y:'b) = exists x. s (x,y)
+
+  (* For transfinite call-stack rule. *)
+  type v_data 'a 'b = {
+    (* Underlying game ordering. *)
+    v_go : 'a -> 'a -> bool;
+    (* Extra order for the stack. *)
+    v_so : 'b -> 'b -> bool;
+    (* Initial stack. *)
+    v_s0 : ('a,'b) -> bool;
+    (* Precondition for calling on a given stack.
+       The location is the stack supremum on first component. *)
+    v_pr : (('a,'b) -> bool) -> bool;
+    (* Postcondition: some element in the stack satisfy the postcondition
+       at the given point. *)
+    v_pst : 'a -> ('a,'b) -> bool;
+  }
+  function v_prod (vd:v_data 'a 'b) : ('a,'b) -> ('a,'b) -> bool =
+    \x y. oprod vd.v_go vd.v_so x y
+  predicate v_data_valid (vd:v_data 'a 'b) =
+    order vd.v_so /\
+    chain vd.v_prod vd.v_s0 /\
+    forall stack.
+      chain vd.v_prod stack /\
+      subchain vd.v_prod vd.v_s0 stack /\
+      (forall x. not maximum vd.v_prod stack x) /\
+      (forall rstack.
+        subchain vd.v_prod vd.v_s0 rstack /\ subchain vd.v_prod rstack stack /\
+        rstack <> stack -> vd.v_pr rstack) ->
+      vd.v_pr stack
+  predicate v_pre (vd:v_data 'a 'b) (stack:('a,'b) -> bool) (x:'a) =
+    vd.v_pr stack /\ chain vd.v_prod stack /\
+    supremum vd.v_go (proj1 stack) x
+  predicate v_post (vd:v_data 'a 'b) (stack:('a,'b) -> bool) (x:'a) =
+    exists y. stack y /\ vd.v_pst x y
+  function v_enf (vd:v_data 'a 'b) : (('a,'b) -> bool) -> fmla 'a =
+    u_enforce (v_pre vd) (v_post vd)
+  function v_hrec (vd:v_data 'a 'b) (s:('a,'b) -> bool) : fmla 'a =
+    universal (\s'. arrow (lift (subchain vd.v_prod s s' /\ s <> s'))
+                          (v_enf vd s'))
+  function v_hfix (vd:v_data 'a 'b) : fmla 'a =
+    universal (\s. arrow (conj (lift (subchain vd.v_prod vd.v_s0 s))
+                               (v_hrec vd s))
+                         (v_enf vd s))
 
 end
 
 (* Rules for game formula derivations. *)
 module FmlaRules "W:non_conservative_extension:N"
 
-  use import Fmla
+  use import order.Order
+  use import order.Chain
+  use import game.Game
+  use export Fmla
 
-  namespace import Dummy type d end
+  (* Formula builders indeed build formulas. *)
+  axiom enforce_fmla : forall p,q:'a -> bool. is_fmla (enforce p q)
+  axiom arrow_fmla : forall f1 f2:fmla 'a. is_fmla (arrow f1 f2)
+  axiom universal_fmla : forall f:'b -> fmla 'a.
+    (forall x. is_fmla (f x)) -> is_fmla (universal f)
+  axiom existential_fmla : forall f:'b -> fmla 'a.
+    (forall x. is_fmla (f x)) -> is_fmla (existential f)
+  axiom conj_fmla : forall f1 f2:fmla 'a. is_fmla f1 /\ is_fmla f2 ->
+    is_fmla (conj f1 f2)
+  axiom lift_fmla : forall b. is_fmla (lift b:fmla 'a)
 
-  axiom enforce_monotonic : forall c,p1 p2,q1 q2:'e -> 'a -> bool.
-    stronger p2 p1 /\ holds c (enforce p1 q1) /\ stronger q1 q2 ->
+  (* TODO: Find some way to make lifted hypothesis and precondition interact.
+     Also, lifted hypothesis should be usable in weakening. *)
+
+  (* Weakening rule. *)
+  axiom enforce_monotonic : forall c,p1 p2,q1 q2:'a -> bool. is_fmla c ->
+    subset p2 p1 /\ holds c (enforce p1 q1) /\ subset q1 q2 ->
     holds c (enforce p2 q2)
 
-  axiom enforce_fmla : forall p,q:('e,'b) -> 'a -> bool. is_fmla (enforce p q)
-
-  axiom arrow_fmla : forall f1 f2:fmla 'e 'a. is_fmla (arrow f1 f2)
-
-  axiom sequence : forall c p q,r:'e -> 'a -> bool.
+  (* Sequence rule: if from P one can reach Q, and from Q one can reach R,
+     then from P one can reach R. *)
+  axiom sequence : forall c p q,r:'a -> bool. is_fmla c ->
     holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
 
-  axiom ghost_intro : forall c p,q:('e,'b) -> 'a -> bool.
-    holds (shift_context c) (enforce p q) ->
+  (* Ghost introduction rule: To prove that { exists x. P x | exists x. Q x },
+     one can introduce x explicitly as a parameter and prove { P x | Q x }
+     instead. *)
+  axiom ghost_intro : forall c p,q:'b -> 'a -> bool. is_fmla c ->
+    holds c (universal (u_enforce p q)) ->
     holds c (enforce (e_closure p) (e_closure q))
+
+  (* Continuation rule: to prove that {P|Q}, we may take as hypothesis that
+     {Q|False} *)
+  axiom kont_intro : forall c p,q:'a -> bool. is_fmla c ->
+    holds (conj c (enforce q bottom)) (enforce p q) -> holds c (enforce p q)
+
+  (* Transfinite loop rule:
+     If we have {I|'later' I} (later for a user-given ordering),
+     and I is stable over an analog of chain completion for that ordering,
+     then {I|False} *)
+  axiom trampoline : forall c go,i:'b -> 'a -> bool,o:'b -> 'b -> bool.
+    is_fmla c ->
+    holds c (universal (u_enforce i (later o i))) /\
+    holds c (ordering go) /\ order o /\
+    (forall ch inh x. chain (oprod go o) ch /\ supremum go (proj1 ch) x /\
+      ch inh /\ (forall x y. ch (x,y) -> i y x) ->
+      exists y. upper_bound o (proj2 ch) y /\ i y x) ->
+    holds c (universal (u_enforce i (cst bottom)))
+
+  (* Vertical fixpoint rule (or transfinite call-stack rule):
+     If, knowing that from any valid higher stack we can reach a point in
+     which the post is satisfied for some point of the stack,
+     then we can reach a point in which an element of the current stack
+     satisfy the post, plus some continuity condition on the precondition,
+     then we can have the same enforcement without the higher-stack
+     hypothesis (e.g a fixpoint) *)
+  axiom vertical_fix : forall c,vd:v_data 'a 'b.
+    is_fmla c ->
+    holds c (v_hfix vd) /\
+    holds c (ordering vd.v_go) /\
+    v_data_valid vd ->
+    holds c (v_enf vd vd.v_s0)
 
 end
 
@@ -78,10 +185,12 @@ end
 module FmlaRulesProof
 
   use import option.Option
+  use import choice.Choice
   use import order.Order
   use import order.Chain
   use import game.Game
   use import game.StratProps
+  use import transfinite.Iterates
   use import transfinite.ChainExtension
   use import Fmla
 
@@ -98,11 +207,15 @@ module FmlaRulesProof
   lemma rel_map_equal : forall s:'a -> bool.
     rel_map (=) s = s by pext (rel_map (=) s) s
 
-  lemma enforce_fmla : forall p,q:('e,'b) -> 'a -> bool. is_fmla (enforce p q)
-
-  lemma arrow_fmla : forall f1 f2:fmla 'e 'a. is_fmla (arrow f1 f2)
-
-  predicate subset (p q:'a -> bool) = forall x. p x -> q x
+  lemma enforce_fmla : forall p,q:'a -> bool. is_fmla (enforce p q)
+  lemma arrow_fmla : forall f1 f2:fmla 'a. is_fmla (arrow f1 f2)
+  lemma universal_fmla : forall f:'b -> fmla 'a.
+    (forall x. is_fmla (f x)) -> is_fmla (universal f)
+  lemma existential_fmla : forall f:'b -> fmla 'a.
+    (forall x. is_fmla (f x)) -> is_fmla (existential f)
+  lemma conj_fmla : forall f1 f2:fmla 'a. is_fmla f1 /\ is_fmla f2 ->
+    is_fmla (conj f1 f2)
+  lemma lift_fmla : forall b. is_fmla (lift b:fmla 'a)
 
   (* Useful lemma: monotonicity of having a winning strategy from some point. *)
   lemma pre_monotonic : forall g x,q1 q2:'a -> bool.
@@ -330,60 +443,310 @@ module FmlaRulesProof
         so rel_map_witness (with_sto b) s z z0
     ) by gs.transition = with_transition g
 
-  lemma ghost_intro : forall c,p q:('e,'b) -> 'a -> bool.
+  lemma ghost_intro : forall c,p q:'b -> 'a -> bool.
     let ep = e_closure p in
     let eq = e_closure q in
-    holds (shift_context c) (enforce p q) -> holds c (enforce ep eq)
-    by forall env g. game_wf g /\ c env g -> enforce ep eq env g
-    by have_uniform_winning_strat g (ep env) (eq env)
+    holds c (universal (u_enforce p q)) -> holds c (enforce ep eq)
+    by forall g. game_wf g /\ c g -> enforce ep eq g
+    by have_uniform_winning_strat g ep eq
     by let gs = with_start g in
-      let liftb = \p e x. let (x,b) = x in
-        match b with None -> false | Some b -> p (e,b) x end
+      let liftb = \p x. let (x,b) = x in
+        match b with None -> false | Some b -> p b x end
       in
       let pb = liftb p in let qb = liftb q in
-      (have_uniform_winning_strat gs (pb env) (qb env)
-      by forall x. pb env x -> have_winning_strat gs x (qb env)
+      (have_uniform_winning_strat gs pb qb
+      by forall x. pb x -> have_winning_strat gs x qb
       by let (xa,xb) = x in
         match xb with
         | None -> false
         | Some xb -> let rr = rel_map (with_sto xb) in
-            let peb = p (env,xb) in let qeb = q (env,xb) in
+            let peb = p xb in let qeb = q xb in
             have_uniform_winning_strat gs (rr peb) (rr qeb)
             so rel_map_witness (with_sto xb) peb x xa
             so rr peb x
             so have_winning_strat gs x (rr qeb)
             so have_winning_strat gs x (cut gs (rr qeb) x)
-            so subset (cut gs (rr qeb) x) (qb env)
-            by forall z. cut gs (rr qeb) x z -> qb env z
+            so subset (cut gs (rr qeb) x) qb
+            by forall z. cut gs (rr qeb) x z -> qb z
               by let (_,zb) = z in match zb with
                 | None -> false by gs.progress = with_progress g
                 | Some _ -> true
                 end
         end)
       so let rr = rel_map forget in
-        have_uniform_winning_strat g (rr (pb env)) (rr (qb env))
-      so forall p. pext (rr (liftb p env)) (e_closure p env)
-      by (forall x. rr (liftb p env) x -> e_closure p env x
-        by exists y. rel_map_witness forget (liftb p env) x y
+        have_uniform_winning_strat g (rr pb) (rr qb)
+      so forall p. pext (rr (liftb p)) (e_closure p)
+      by (forall x. rr (liftb p) x -> e_closure p x
+        by exists y. rel_map_witness forget (liftb p) x y
         so let (_,yb) = y in
-          match yb with None -> false | Some b -> p (env,b) x end
-      ) /\ forall x. e_closure p env x -> rr (liftb p env) x
-      by exists b. p (env,b) x
-      so rel_map_witness forget (liftb p env) x (x,Some b)
+          match yb with None -> false | Some b -> p b x end
+      ) /\ forall x. e_closure p x -> rr (liftb p) x
+      by exists b. p b x
+      so rel_map_witness forget (liftb p) x (x,Some b)
 
-  lemma enforce_monotonic : forall c,p1 p2,q1 q2:'e -> 'a -> bool.
-    stronger p2 p1 /\ holds c (enforce p1 q1) /\ stronger q1 q2 ->
+  lemma enforce_monotonic : forall c,p1 p2,q1 q2:'a -> bool.
+    subset p2 p1 /\ holds c (enforce p1 q1) /\ subset q1 q2 ->
     holds c (enforce p2 q2)
-    by forall env g. game_wf g /\ c env g ->
-      have_uniform_winning_strat g (p2 env) (q2 env)
-    by forall x. p2 env x -> have_winning_strat g x (q2 env)
-    by subset (q1 env) (q2 env)
+    by forall g. game_wf g /\ c g ->
+      have_uniform_winning_strat g p2 q2
+    by forall x. p2 x -> have_winning_strat g x q2
+    by subset q1 q2
 
-  clone FmlaRules with type Dummy.d = unit,
-    goal enforce_monotonic,
+  predicate game_inclusion (g1 g2:game 'a) = 
+    g1.progress = g2.progress /\
+    forall x s. g1.transition x s -> g2.transition x s
+
+  lemma trivial_compatibility : forall o:'a -> 'a -> bool.
+    order o -> chain_compatible o (=) o
+    by forall ch s1 s2. chain (oprod o o) ch /\
+      (forall x y. ch (x,y) -> x = y) /\
+      supremum (oprod o o) ch (s1,s2) -> s1 = s2
+    by upper_bound (oprod o o) ch (s2,s1)
+    so oprod o o (s1,s2) (s2,s1) so o s1 s2 so o s2 s1
+
+  lemma game_inclusion_subgame : forall g1 g2:game 'a.
+    game_wf g2 /\ game_inclusion g1 g2 ->
+    subgame g1 g2
+    by step_simulate g1 (=) g2
+
+  lemma kont_intro : forall c,p q:'a -> bool. is_fmla c ->
+    holds (conj c (enforce q bottom)) (enforce p q) ->
+    holds c (enforce p q)
+    by forall g. game_wf g /\ c g ->
+      have_uniform_winning_strat g p q
+    by forall x. p x -> have_winning_strat g x q
+    by let tr = \x s. g.transition x s \/ (q x /\ s = bottom) in
+      let g2 = { progress = g.progress; transition = tr } in
+      game_wf g2
+    so game_inclusion g g2
+    so (enforce q bottom g2 by forall x. q x -> have_winning_strat g2 x bottom)
+    so enforce p q g2
+    so have_winning_strat g2 x q
+    so exists ang. winning_strat g2 x q ang
+    so winning_strat g x q ang
+    by forall dmn. win_against g x q ang dmn
+    by win_against g2 x q ang dmn
+    so exists ch. reach_ch g.progress (strat_next g2 ang dmn) ((=) x) ch /\
+      win_at g2 q ang dmn ch
+    so win_at g q ang dmn ch
+    so ext (strat_next g2 ang dmn) (strat_next g ang dmn)
+    by forall ch. let x = choice (supremum g.progress ch) in
+      let a = ang x ch in
+      let d = dmn a in
+      g.transition x a /\ a d <-> g2.transition x a /\ a d
+
+  predicate add (ch:'a -> bool) (x:'a) (y:'a) = ch y \/ x = y
+
+  lemma order_product : forall o1 o2. order o1 /\ order o2 ->
+    let op = oprod o1 o2 in order op
+    by (reflexive op by forall x. op x x by let (y,_) = x in o1 y y)
+    /\ (transitive op by forall x y z:('a,'b). op x y /\ op y z ->
+      op x z by let ((a,_),(b,_),(c,_)) = (x,y,z) in o1 a b /\ o1 b c)
+    /\ (antisymetric op by forall x y. op x y /\ op y x ->
+      x = y by let ((a,_),(b,_)) = (x,y) in a = b)
+
+  lemma trampoline : forall c go,i:'b -> 'a -> bool,o:'b -> 'b -> bool.
+    holds c (universal (u_enforce i (later o i))) /\
+    holds c (ordering go) /\ order o /\
+    (forall ch inh x. chain (oprod go o) ch /\ supremum go (proj1 ch) x /\
+      ch inh /\ (forall x y. ch (x,y) -> i y x) ->
+      exists y. upper_bound o (proj2 ch) y /\ i y x) ->
+    holds c (universal (u_enforce i (cst bottom)))
+    by forall g. game_wf g /\ c g -> forall y.
+      have_uniform_winning_strat g (i y) bottom
+    by forall x. i y x -> have_winning_strat g x bottom
+    by let op = oprod go o in
+      go = g.progress
+    so order op
+    so let next = \ch ch'.
+        if not chain op ch \/
+           exists a b. ch (a,b) /\ not i b a then false else
+        let z = choice (maximum op ch) in
+        if maximum op ch z
+        then let (x,y) = z in exists x' y'. go x x' /\ o y y' /\ y <> y' /\
+          ch' = add ch (x',y') /\ i y' x'
+        else let x = choice (supremum go (proj1 ch)) in
+          exists u. upper_bound op ch (x,u) /\ i u x /\ ch' = add ch (x,u)
+      in
+      let tr = \ch s. s = next ch in
+      let g2 = { progress = subchain op; transition = tr } in
+      let strt = (=) (x,y) in
+      (game_wf g2
+        by forall ch s ch'. tr ch s /\ s ch' -> subchain op ch ch'
+        by (exists a b. upper_bound op ch (a,b) /\ ch' = add ch (a,b))
+        by chain op ch
+        so let z = choice (maximum op ch) in
+          maximum op ch z -> let (x,y) = z in
+          exists x' y'. ch' = add ch (x',y') /\
+            go x x' /\ o y y' so op z (x',y') so upper_bound op ch (x',y'))
+      so (have_winning_strat g2 strt bottom
+        by let ang2 = \x _. next x in
+          winning_strat g2 strt bottom ang2
+        by forall dmn. win_against g2 strt bottom ang2 dmn
+        by let nxt = strat_next g2 ang2 dmn in
+          let f = extends_ch g2.progress nxt in
+          let ch = fixpoint_above (subchain g2.progress) f ((=) strt) in
+          f ch = ch /\ reach_ch g2.progress nxt ((=) strt) ch
+        so ch (nxt ch)
+        so let x0 = choice (supremum g2.progress ch) in
+          supremum g2.progress ch x0
+        so ch x0
+        so let sa = ang2 x0 ch in
+          g2.transition x0 sa
+        so not (sa (dmn sa) so nxt ch = dmn sa
+          so sa = next x0
+          so let z = choice (maximum op x0) in
+            if maximum op x0 z
+            then let (x,y) = z in
+              exists x' y'. nxt ch = add x0 (x',y') /\ go x x' /\ o y y'
+                /\ y <> y'
+              so op z (x',y')
+              so upper_bound op x0 (x',y')
+              so subchain op x0 (nxt ch)
+              so subchain op (nxt ch) x0
+              so x0 = nxt ch
+            else let x = choice (supremum go (proj1 x0)) in
+              exists u. upper_bound op x0 (x,u) /\ nxt ch = add x0 (x,u)
+              so subchain op x0 (nxt ch)
+              so subchain op (nxt ch) x0
+              so x0 = nxt ch
+              so maximum op x0 (x,u))
+        so win_at g2 bottom ang2 dmn ch)
+      so let r = \ch x.
+          (forall a b. ch (a,b) -> i b a) /\
+          (exists u. ch u) /\
+          chain op ch /\
+          supremum go (proj1 ch) x in
+        have_uniform_winning_strat g2 ((=) strt) bottom
+      so (rel_map r ((=) strt) x by rel_map_witness r ((=) strt) x strt)
+      so ext (rel_map r bottom) bottom
+      so (simulate g2 r g
+        by step_simulate g2 r g
+        by (forall ch x1 s. g2.transition ch s /\ r ch x1 ->
+          have_winning_strat g x1 (rel_map r s)
+          by s = next ch
+          so let z = choice (maximum op ch) in
+            if maximum op ch z
+            then let (x,y) = z in
+              (x = x1 by maximum go (proj1 ch) x)
+              so (have_winning_strat g x1 (cut g (later o i y) x)
+                by have_winning_strat g x1 (later o i y)
+                by have_uniform_winning_strat g (i y) (later o i y))
+              so subset (cut g (later o i y) x) (rel_map r s)
+              by forall x'. cut g (later o i y) x x' ->
+                exists y'. o y y' /\ y <> y' /\ i y' x'
+              so let ch' = add ch (x',y') in
+                (forall a b. ch' (a,b) -> i b a) /\
+                (chain op ch'
+                  by (forall a b. ch' a /\ ch' b -> op a b \/ op b a
+                    by a = (x',y') || b = (x',y') || (ch a /\ ch b))
+                  by (forall z. ch' z -> op z (x',y')
+                    by z = (x',y') || (ch z so op z (x,y) /\ op (x,y) (x',y'))))
+                /\ supremum go (proj1 ch') x'
+                /\ ch' (x',y')
+              so rel_map_witness r s x' ch'
+            else let x' = choice (supremum go (proj1 ch)) in
+              x' = x1
+              so subset ((=) x1) (rel_map r s)
+              by rel_map r s x1
+              by exists u. upper_bound o (proj2 ch) u /\ i u x1
+              so (upper_bound op ch (x1,u) by forall z. ch z -> op z (x1,u)
+                by let (a,b) = z in go a x1 /\ o b u)
+              so let ch' = add ch (x1,u) in
+                (forall a b. ch' (a,b) -> i b a)
+                /\ chain op ch'
+                /\ supremum go (proj1 ch') x1
+              so rel_map_witness r s x1 ch'
+        )
+        /\ (chain_compatible g2.progress r g.progress
+          by let go2 = g2.progress in
+            forall ch inh s1 s2.
+              chain (oprod go2 go) ch /\ (forall a b. ch (a,b) -> r a b) /\
+              ch inh /\ supremum (oprod go2 go) ch (s1,s2) -> r s1 s2
+          by (supremum go2 (proj1 ch) s1
+            by upper_bound go2 (proj1 ch) s1 /\
+              forall u. upper_bound go2 (proj1 ch) u -> go2 s1 u
+                by upper_bound (oprod go2 go) ch (u,s2)
+                by forall v. ch v -> let (xv,yv) = v in
+                  oprod go2 go (xv,yv) (s1,s2) so proj1 ch xv)
+          so (supremum go (proj2 ch) s2
+            by upper_bound go (proj2 ch) s2 /\
+              forall u. upper_bound go (proj2 ch) u -> go s2 u
+                by upper_bound (oprod go2 go) ch (s1,u)
+                by forall v. ch v -> let (xv,yv) = v in
+                  oprod go2 go (xv,yv) (s1,s2) so proj2 ch yv)
+          so (s1 = subchain_completion (proj1 ch)
+            by chain go2 (proj1 ch)
+            by forall x y. proj1 ch x /\ proj1 ch y ->
+              go2 x y \/ go2 y x
+            by exists x' y'. ch (x,x') /\ ch (y,y')
+            so oprod go2 go (x,x') (y,y') \/ oprod go2 go (y,y') (x,x'))
+          so (forall a b. s1 (a,b) -> i b a
+            by exists s. proj1 ch s /\ s (a,b) so i b a)
+          so chain op s1
+          so ((exists u. proj1 s1 u)
+            by (exists u. s1 u so let (u,_) = u in proj1 s1 u)
+            by let (a,b) = inh in go2 a s1 /\ r a b
+            so exists u. a u)
+          so supremum go (proj1 s1) s2
+          by (upper_bound go (proj1 s1) s2
+            by forall u. proj1 s1 u -> go u s2
+            by exists v. s1 (u,v)
+            so exists s0. proj1 ch s0 /\ s0 (u,v)
+            so exists x0. ch (s0,x0)
+            so oprod go2 go (s0,x0) (s1,s2)
+            so go u x0 by supremum go (proj1 s0) x0 /\ proj1 s0 u
+          ) /\ (forall u. upper_bound go (proj1 s1) u -> go s2 u
+            by upper_bound go (proj2 ch) u
+            by forall a. proj2 ch a -> go a u
+            by exists b. ch (b,a)
+            so supremum go (proj1 b) a
+            so upper_bound go (proj1 b) u
+            by forall u0. proj1 b u0 -> go u0 u
+            by exists v0. b (u0,v0)
+            so proj1 s1 u0)
+        )
+      )
+      so have_uniform_winning_strat g (rel_map r ((=) strt)) (rel_map r bottom)
+
+  lemma sequence : forall c,p q r:'a -> bool. is_fmla c ->
+    holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
+    by forall g. game_wf g /\ c g -> enforce p r g
+    by let go = g.progress in
+      let c' = conj c (ordering go) in
+      holds c' (enforce p r)
+    by let c'' = conj c' (enforce r bottom) in
+      (holds c'' (enforce p r) by subset bottom r /\ subset p p)
+    by holds c'' (enforce p bottom)
+    by let i = \b. if b then q else p in
+      holds c'' (universal (u_enforce i (cst bottom))) /\
+      u_enforce i (cst bottom) false = enforce p bottom
+    by let o = \a b. a -> b in
+      holds c'' (universal (u_enforce i (later o i))) /\
+      holds c'' (ordering go) /\
+      (forall ch inh x. chain (oprod go o) ch /\ supremum go (proj1 ch) x /\
+        ch inh /\
+        (forall x y. ch (x,y) -> i y x) ->
+        exists y. upper_bound o (proj2 ch) y /\ i y x)
+    (*holds c (universal (u_enforce i (later o i))) /\
+      holds c (ordering go) /\ order o /\
+      (forall ch x. chain (oprod go o) ch /\ supremum go (proj1 ch) x /\
+        (forall x y. ch (x,y) -> i y x) ->
+        exists y. upper_bound o (proj2 ch) y /\ i y x) ->
+      holds c (universal (u_enforce i (cst bottom)))*)
+
+  clone FmlaRules with
     goal enforce_fmla,
     goal arrow_fmla,
+    goal universal_fmla,
+    goal existential_fmla,
+    goal conj_fmla,
+    goal lift_fmla,
+    goal enforce_monotonic,
     goal sequence,
-    goal ghost_intro
+    goal ghost_intro,
+    goal kont_intro,
+    goal trampoline,
+    goal vertical_fix
 
 end

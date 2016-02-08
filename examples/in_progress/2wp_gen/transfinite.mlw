@@ -24,7 +24,7 @@ module IterateCommon
 end
 
 (* Proof of iterate axioms in IterateProof module. *)
-module Iterates
+module Iterates "W:non_conservative_extension:N"
 
   use import order.Order
   use import order.Chain
@@ -32,14 +32,11 @@ module Iterates
   use import order.Wf
   use export IterateCommon
 
-  namespace import Dummy type d end
-
   (* tr_reach is a chain, and there are no
      tr_reach element between any z and its 'sucessor' f z. *)
   axiom tr_reach_separated : forall o f,x y z:'a.
     order o /\ inflationary o f /\ tr_reach o f x y /\ tr_reach o f x z ->
     separator o f z y
-    /\ forall _:d. true
 
   (* For chain-complete orders, there is a maximum tr_reach element,
      which is a fixpoint of the growth function
@@ -50,29 +47,24 @@ module Iterates
     order o /\ inflationary o f /\ chain_complete o ->
     f (fixpoint_above o f x) = fixpoint_above o f x /\
     maximum o (tr_reach o f x) (fixpoint_above o f x)
-    /\ forall _:d. true
 
   axiom tr_reach_fixpoint : forall o f,x y:'a.
     order o /\ inflationary o f /\ f y = y /\ tr_reach o f x y ->
     maximum o (tr_reach o f x) y
-    /\ forall _:d. true
 
   (* transifinite reachability relation is compatible with the base order. *)
   axiom tr_reach_compare : forall o f,x y:'a.
     preorder o /\ inflationary o f /\ tr_reach o f x y -> o x y
-    /\ forall _:d. true
 
   (* transfinite reachability relation is transitive. *)
   axiom tr_reach_transitive : forall o f,x y z:'a.
     preorder o /\ inflationary o f ->
     tr_reach o f x y /\ ("induction" tr_reach o f y z) -> tr_reach o f x z
-    /\ forall _:d. true
 
   (* the set of reachable states from a given one is well-founded
      for the base order relation. *)
   axiom tr_reach_wf : forall o f,x:'a.
     order o /\ inflationary o f -> wf (restricted_lower o f x)
-    /\ forall _:d. true
 
 end
 
@@ -161,7 +153,7 @@ module IterateProof
             acc (restricted_lower o f x) z
             by exists a. ch a /\ not o a z so separator o f a z so o z a)
 
-  clone Iterates with type Dummy.d = unit,
+  clone Iterates with
     function fixpoint_above = fixpoint_above,
     goal tr_reach_separated,
     goal tr_reach_maximum,
@@ -202,41 +194,34 @@ end
 (* Special shape of iterates: chain extension.
    This module contain the machinery to build chain iterates.
    Proofs in ChainExtensionProof. *)
-module ChainExtension
+module ChainExtension "W:non_conservative_extension:N"
 
   use import order.Order
   use import order.Chain
   use import order.Mono
   use export ChainExtensionCommon
-  namespace import Dummy type d end
 
   (* subchain ordering is a chain-complete order for transitive relations. *)
   axiom subchain_order : forall o:'a -> 'a -> bool.
     transitive o -> order (subchain o)
-    /\ forall _:d. true
 
   axiom subchain_complete : forall o:'a -> 'a -> bool,ch.
     chain (subchain o) ch -> supremum (subchain o) ch (subchain_completion ch)
-    /\ forall _:d. true
 
   axiom subchain_completion_chain : forall o:'a -> 'a -> bool,ch.
     chain (subchain o) ch /\ (forall x. ch x -> chain o x) ->
     chain o (subchain_completion ch)
-    /\ forall _:d. true
 
   axiom extends_inflationary : forall o:'a -> 'a -> bool,f.
     ub_builder o f -> inflationary (subchain o) (extends_ch o f)
-    /\ forall _:d. true
 
   axiom extends_preserve_chain : forall o:'a -> 'a -> bool,f ch.
     ub_builder o f /\ chain o ch /\ reflexive o ->
       chain o (extends_ch o f ch)
-    /\ forall _:d. true
 
   axiom reach_only_chains : forall o:'a -> 'a -> bool,f ch1 ch2.
     ub_builder o f /\ chain o ch1 /\ reach_ch o f ch1 ch2 /\
     reflexive o -> chain o ch2
-    /\ forall _:d. true
 
 end
 
@@ -278,7 +263,7 @@ module ChainExtensionProof
     by forall o1 f1 b1 x. o1 = o /\ f1 = f /\ b1 = ch1 ->
       ("induction" tr_reach (subchain o1) (extends_ch o1 f1) b1 x) -> chain o1 x
 
-  clone ChainExtension with type Dummy.d = unit,
+  clone ChainExtension with
     goal subchain_order,
     goal subchain_complete,
     goal subchain_completion_chain,

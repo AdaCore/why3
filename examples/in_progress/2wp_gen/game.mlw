@@ -106,15 +106,15 @@ module Game
     ('a,'b) -> ('a,'b) -> bool = \x y.
       let (a,c) = x in let (b,d) = y in o1 a b /\ o2 c d
 
-  (* Two order are chain-compatible by r if for every chain of related pairs,
-     the supremum is a related pair as well.
+  (* Two order are chain-compatible by r if for every non-empty chains of
+     related pairs, the supremum is a related pair as well.
      (as we are considering chain-complete orders, the supremum existence
      is immediate)
      This is a technical condition for the simulation theorem. *)
   predicate chain_compatible (o1:'a -> 'a -> bool) (r:'a -> 'b -> bool)
                              (o2:'b -> 'b -> bool) =
-    forall ch s1 s2.
-      chain (oprod o1 o2) ch /\ (forall a b. ch (a,b) -> r a b) /\
+    forall ch inh s1 s2.
+      chain (oprod o1 o2) ch /\ ch inh /\ (forall a b. ch (a,b) -> r a b) /\
       supremum (oprod o1 o2) ch (s1,s2) -> r s1 s2
 
   predicate step_simulate (g1:game 'a) (r:'a -> 'b -> bool) (g2:game 'b) =
@@ -130,11 +130,9 @@ end
 
 (* A few properties of strategies on such games.
    Proofs in StratProofs. *)
-module StratProps
+module StratProps "W:non_conservative_extension:N"
 
   use export Game
-
-  namespace import Dummy type d end
 
   (* Quantifier inversion between having a uniform strategy and
      having strategies for all. *)
@@ -142,7 +140,6 @@ module StratProps
     forall g,start win:'a -> bool. game_wf g ->
       (have_uniform_winning_strat g start win <->
         (forall x. start x -> have_winning_strat g x win))
-    /\ forall _:d. true
 
   (* Local criterion for winning strategy existence. *)
   axiom have_winning_strat_local_criterion :
@@ -150,12 +147,10 @@ module StratProps
       (have_winning_strat g x win <->
         win x \/
         exists s. g.transition x s /\ have_uniform_winning_strat g s win)
-    /\ forall _:d. true
 
   (* Simulation theorem: a step simulation extends to a real simulation. *)
   axiom simulation : forall g1,r:'a -> 'b -> bool,g2.
     game_wf g1 /\ game_wf g2 /\ step_simulate g1 r g2 -> simulate g1 r g2
-    /\ forall _:d. true
 
 end
 
@@ -846,6 +841,9 @@ module StratProofs
                 by s0 u /\ st.h_proj u
                 so o1 u a /\ o1 a u
             end)
+          so (let (a,b) = pr in sc.r a b
+            by exists u. st.h_pair u by u = (sc.basea,sc.baseb)
+            so sc.sd bs st so subchain op bs.h_pair st.h_pair)
           so forall a0 b0 st2. maximum op nst.h_pair (a0,b0) so (a0,b0) = pr ->
             let s0 = sc.anga a0 nst.h_proj in
             tr_reach sc.sd evl bs st2 /\ sc.sd st2 nst /\
@@ -1958,7 +1956,7 @@ module StratProofs
       exists st. tr_reach sc.sd evl bs st /\
         win_at sc.g2 winb angb dmn st.h_total
 
-  clone StratProps with type Dummy.d = unit,
+  clone StratProps with
     goal have_uniform_winning_strat_alternate_def,
     goal have_winning_strat_local_criterion,
     goal simulation
