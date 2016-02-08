@@ -11,7 +11,7 @@
 </theory>
 <theory name="FmlaRules" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="FmlaRulesProof" sum="71636b78d059f3ec060feb04a9e36094" expanded="true">
+<theory name="FmlaRulesProof" sum="96c44c81c0e7b8034c26434d581e59d9" expanded="true">
  <goal name="WP_parameter ext" expl="VC for ext">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ext.1" expl="1. assertion">
@@ -424,16 +424,16 @@
   <proof prover="0"><result status="valid" time="0.14" steps="113"/></proof>
   </goal>
   <goal name="with_start_chain_compatibility.39" expl="39.">
-  <proof prover="0"><result status="valid" time="0.43" steps="168"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="168"/></proof>
   </goal>
   <goal name="with_start_chain_compatibility.40" expl="40.">
   <proof prover="0"><result status="valid" time="0.72" steps="299"/></proof>
   </goal>
   <goal name="with_start_chain_compatibility.41" expl="41.">
-  <proof prover="0"><result status="valid" time="0.29" steps="150"/></proof>
+  <proof prover="0"><result status="valid" time="0.44" steps="150"/></proof>
   </goal>
   <goal name="with_start_chain_compatibility.42" expl="42.">
-  <proof prover="0"><result status="valid" time="0.07" steps="74"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="74"/></proof>
   </goal>
   <goal name="with_start_chain_compatibility.43" expl="43.">
   <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
@@ -504,10 +504,10 @@
  <goal name="ghost_intro">
  <transf name="split_goal_wp">
   <goal name="ghost_intro.1" expl="1.">
-  <proof prover="1"><result status="valid" time="0.65"/></proof>
+  <proof prover="1"><result status="valid" time="0.44"/></proof>
   </goal>
   <goal name="ghost_intro.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.05" steps="98"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="98"/></proof>
   </goal>
   <goal name="ghost_intro.3" expl="3.">
   <proof prover="0"><result status="valid" time="0.07" steps="144"/></proof>
@@ -596,7 +596,7 @@
  <goal name="trivial_compatibility">
  <transf name="split_goal_wp">
   <goal name="trivial_compatibility.1" expl="1.">
-  <proof prover="0"><result status="valid" time="1.48" steps="242"/></proof>
+  <proof prover="0"><result status="valid" time="1.94" steps="242"/></proof>
   </goal>
   <goal name="trivial_compatibility.2" expl="2.">
   <proof prover="0"><result status="valid" time="0.05" steps="26"/></proof>
@@ -626,7 +626,6 @@
  </transf>
  </goal>
  <goal name="kont_intro">
- <proof prover="0" obsolete="true"><result status="unknown" time="0.54"/></proof>
  <transf name="split_goal_wp">
   <goal name="kont_intro.1" expl="1.">
   <proof prover="0"><result status="valid" time="0.09" steps="20"/></proof>
@@ -709,13 +708,13 @@
  <goal name="order_product">
  <transf name="split_goal_wp">
   <goal name="order_product.1" expl="1.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="10"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="10"/></proof>
   </goal>
   <goal name="order_product.2" expl="2.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="27"/></proof>
   </goal>
   <goal name="order_product.3" expl="3.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="27"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.04" steps="27"/></proof>
   </goal>
   <goal name="order_product.4" expl="4.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="33"/></proof>
@@ -730,7 +729,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="108"/></proof>
   </goal>
   <goal name="order_product.8" expl="8.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.04" steps="12"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="12"/></proof>
   </goal>
   <goal name="order_product.9" expl="9.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="34"/></proof>
@@ -755,7 +754,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="51"/></proof>
   </goal>
   <goal name="trampoline.4" expl="4.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.12" steps="218"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.24" steps="218"/></proof>
   </goal>
   <goal name="trampoline.5" expl="5.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="61"/></proof>
@@ -779,10 +778,10 @@
   <proof prover="0"><result status="valid" time="0.32" steps="200"/></proof>
   </goal>
   <goal name="trampoline.12" expl="12.">
-  <proof prover="0"><result status="valid" time="0.40" steps="150"/></proof>
+  <proof prover="0"><result status="valid" time="0.26" steps="150"/></proof>
   </goal>
   <goal name="trampoline.13" expl="13.">
-  <proof prover="0"><result status="valid" time="3.10" steps="698"/></proof>
+  <proof prover="0"><result status="valid" time="2.57" steps="698"/></proof>
   </goal>
   <goal name="trampoline.14" expl="14.">
   <proof prover="0"><result status="valid" time="3.20" steps="662"/></proof>
@@ -791,52 +790,52 @@
   <proof prover="0"><result status="valid" time="0.19" steps="28"/></proof>
   </goal>
   <goal name="trampoline.16" expl="16.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="3.21" steps="711"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="4.12" steps="711"/></proof>
   </goal>
   <goal name="trampoline.17" expl="17.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.29" steps="64"/></proof>
   </goal>
   <goal name="trampoline.18" expl="18.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.13" steps="38"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.24" steps="38"/></proof>
   </goal>
   <goal name="trampoline.19" expl="19.">
-  <proof prover="0"><result status="valid" time="4.83" steps="862"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.52" steps="862"/></proof>
   </goal>
   <goal name="trampoline.20" expl="20.">
   <proof prover="0" steplimit="-1"><result status="valid" time="1.20" steps="209"/></proof>
   </goal>
   <goal name="trampoline.21" expl="21.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.94" steps="205"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.16" steps="205"/></proof>
   </goal>
   <goal name="trampoline.22" expl="22.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.37" steps="88"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.18" steps="88"/></proof>
   </goal>
   <goal name="trampoline.23" expl="23.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.40" steps="90"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.25" steps="90"/></proof>
   </goal>
   <goal name="trampoline.24" expl="24.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.10" steps="237"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.03" steps="237"/></proof>
   </goal>
   <goal name="trampoline.25" expl="25.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.39" steps="279"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.22" steps="279"/></proof>
   </goal>
   <goal name="trampoline.26" expl="26.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.25" steps="81"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.56" steps="81"/></proof>
   </goal>
   <goal name="trampoline.27" expl="27.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.09" steps="226"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.47" steps="226"/></proof>
   </goal>
   <goal name="trampoline.28" expl="28.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.75" steps="280"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.59" steps="280"/></proof>
   </goal>
   <goal name="trampoline.29" expl="29.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.33" steps="42"/></proof>
   </goal>
   <goal name="trampoline.30" expl="30.">
-  <proof prover="0"><result status="valid" time="0.25" steps="94"/></proof>
+  <proof prover="0"><result status="valid" time="0.47" steps="94"/></proof>
   </goal>
   <goal name="trampoline.31" expl="31.">
-  <proof prover="0"><result status="valid" time="0.16" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.33" steps="59"/></proof>
   </goal>
   <goal name="trampoline.32" expl="32.">
   <proof prover="0"><result status="valid" time="0.09" steps="21"/></proof>
@@ -860,7 +859,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="36"/></proof>
   </goal>
   <goal name="trampoline.39" expl="39.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.07" steps="470"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.77" steps="470"/></proof>
   </goal>
   <goal name="trampoline.40" expl="40.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.16" steps="101"/></proof>
@@ -869,10 +868,10 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.63" steps="454"/></proof>
   </goal>
   <goal name="trampoline.42" expl="42.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.86" steps="832"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.12" steps="832"/></proof>
   </goal>
   <goal name="trampoline.43" expl="43.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="140"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.21" steps="140"/></proof>
   </goal>
   <goal name="trampoline.44" expl="44.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.12" steps="147"/></proof>
@@ -893,7 +892,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="92"/></proof>
   </goal>
   <goal name="trampoline.50" expl="50.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="2.22" steps="1427"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.21" steps="1427"/></proof>
   </goal>
   <goal name="trampoline.51" expl="51.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="43"/></proof>
@@ -917,22 +916,22 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="46"/></proof>
   </goal>
   <goal name="trampoline.58" expl="58.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.70" steps="774"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.26" steps="774"/></proof>
   </goal>
   <goal name="trampoline.59" expl="59.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="103"/></proof>
   </goal>
   <goal name="trampoline.60" expl="60.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.24" steps="244"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.37" steps="244"/></proof>
   </goal>
   <goal name="trampoline.61" expl="61.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.41" steps="438"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.63" steps="438"/></proof>
   </goal>
   <goal name="trampoline.62" expl="62.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.11" steps="98"/></proof>
   </goal>
   <goal name="trampoline.63" expl="63.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.15" steps="90"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.12" steps="90"/></proof>
   </goal>
   <goal name="trampoline.64" expl="64.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="35"/></proof>
@@ -944,10 +943,10 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.25" steps="214"/></proof>
   </goal>
   <goal name="trampoline.67" expl="67.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="2.07" steps="1166"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.99" steps="1166"/></proof>
   </goal>
   <goal name="trampoline.68" expl="68.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="4.45" steps="1682"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.65" steps="1571"/></proof>
   </goal>
   <goal name="trampoline.69" expl="69.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="50"/></proof>
@@ -965,16 +964,16 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.42" steps="228"/></proof>
   </goal>
   <goal name="trampoline.74" expl="74.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.85" steps="407"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.53" steps="407"/></proof>
   </goal>
   <goal name="trampoline.75" expl="75.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.23" steps="107"/></proof>
   </goal>
   <goal name="trampoline.76" expl="76.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.94" steps="524"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.80" steps="524"/></proof>
   </goal>
   <goal name="trampoline.77" expl="77.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.11" steps="112"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.24" steps="112"/></proof>
   </goal>
   <goal name="trampoline.78" expl="78.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.12" steps="47"/></proof>
@@ -1010,13 +1009,13 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.26" steps="289"/></proof>
   </goal>
   <goal name="trampoline.89" expl="89.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="23"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="23"/></proof>
   </goal>
   <goal name="trampoline.90" expl="90.">
   <proof prover="0" steplimit="-1"><result status="valid" time="3.02" steps="918"/></proof>
   </goal>
   <goal name="trampoline.91" expl="91.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.31" steps="385"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.52" steps="385"/></proof>
   </goal>
   <goal name="trampoline.92" expl="92.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="37"/></proof>
@@ -1028,7 +1027,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.17" steps="201"/></proof>
   </goal>
   <goal name="trampoline.95" expl="95.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="55"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.11" steps="55"/></proof>
   </goal>
   <goal name="trampoline.96" expl="96.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="51"/></proof>
@@ -1049,7 +1048,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.16" steps="146"/></proof>
   </goal>
   <goal name="trampoline.102" expl="102.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.16" steps="163"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.21" steps="163"/></proof>
   </goal>
   <goal name="trampoline.103" expl="103.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.14" steps="59"/></proof>
@@ -1058,19 +1057,19 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.22" steps="163"/></proof>
   </goal>
   <goal name="trampoline.105" expl="105.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.23" steps="983"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.49" steps="983"/></proof>
   </goal>
   <goal name="trampoline.106" expl="106.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="40"/></proof>
   </goal>
   <goal name="trampoline.107" expl="107.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.13" steps="147"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.27" steps="147"/></proof>
   </goal>
   <goal name="trampoline.108" expl="108.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="59"/></proof>
   </goal>
   <goal name="trampoline.109" expl="109.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="1.49" steps="830"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="2.18" steps="830"/></proof>
   </goal>
   <goal name="trampoline.110" expl="110.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="67"/></proof>
@@ -1088,7 +1087,7 @@
   <proof prover="0" steplimit="-1"><result status="valid" time="0.22" steps="133"/></proof>
   </goal>
   <goal name="trampoline.115" expl="115.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.23" steps="142"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.21" steps="142"/></proof>
   </goal>
   <goal name="trampoline.116" expl="116.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="71"/></proof>
@@ -1116,42 +1115,164 @@
   </goal>
  </transf>
  </goal>
- <goal name="sequence" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="sequence.1" expl="1." expanded="true">
-  <proof prover="0" steplimit="-1"><result status="timeout" time="4.99"/></proof>
+ <goal name="reflexive">
+ <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="26"/></proof>
+ </goal>
+ <goal name="iorder_product">
+ <transf name="split_goal_wp">
+  <goal name="iorder_product.1" expl="1.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="iorder_product.2" expl="2.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="31"/></proof>
+  </goal>
+  <goal name="iorder_product.3" expl="3.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="31"/></proof>
+  </goal>
+  <goal name="iorder_product.4" expl="4.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="31"/></proof>
+  </goal>
+  <goal name="iorder_product.5" expl="5.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="iorder_product.6" expl="6.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+  <goal name="iorder_product.7" expl="7.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.15" steps="62"/></proof>
+  </goal>
+  <goal name="iorder_product.8" expl="8.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="iorder_product.9" expl="9.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="28"/></proof>
+  </goal>
+  <goal name="iorder_product.10" expl="10.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="iorder_product.11" expl="11.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sequence">
+ <transf name="split_goal_wp">
+  <goal name="sequence.1" expl="1.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="21"/></proof>
   </goal>
   <goal name="sequence.2" expl="2.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="54"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.05" steps="22"/></proof>
   </goal>
-  <goal name="sequence.3" expl="3." expanded="true">
-  <proof prover="0" steplimit="-1"><result status="timeout" time="5.00"/></proof>
+  <goal name="sequence.3" expl="3.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
   <goal name="sequence.4" expl="4.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.22" steps="323"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="54"/></proof>
   </goal>
   <goal name="sequence.5" expl="5.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.12" steps="22"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="46"/></proof>
   </goal>
   <goal name="sequence.6" expl="6.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.13" steps="63"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="30"/></proof>
   </goal>
   <goal name="sequence.7" expl="7.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="11"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.11" steps="58"/></proof>
   </goal>
   <goal name="sequence.8" expl="8.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="7"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="12"/></proof>
   </goal>
   <goal name="sequence.9" expl="9.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="18"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="59"/></proof>
   </goal>
   <goal name="sequence.10" expl="10.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.15" steps="77"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
   <goal name="sequence.11" expl="11.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="39"/></proof>
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.62" steps="388"/></proof>
   </goal>
   <goal name="sequence.12" expl="12.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.52" steps="389"/></proof>
+  </goal>
+  <goal name="sequence.13" expl="13.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.32" steps="231"/></proof>
+  </goal>
+  <goal name="sequence.14" expl="14.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.19" steps="115"/></proof>
+  </goal>
+  <goal name="sequence.15" expl="15.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.33" steps="167"/></proof>
+  </goal>
+  <goal name="sequence.16" expl="16.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="16"/></proof>
+  </goal>
+  <goal name="sequence.17" expl="17.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.34" steps="253"/></proof>
+  </goal>
+  <goal name="sequence.18" expl="18.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="24"/></proof>
+  </goal>
+  <goal name="sequence.19" expl="19.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="1.33" steps="1294"/></proof>
+  </goal>
+  <goal name="sequence.20" expl="20.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="sequence.21" expl="21.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="16"/></proof>
+  </goal>
+  <goal name="sequence.22" expl="22.">
+  <proof prover="0" steplimit="-1"><result status="timeout" time="5.01"/></proof>
+  <proof prover="1" steplimit="-1"><result status="valid" time="1.84"/></proof>
+  </goal>
+  <goal name="sequence.23" expl="23.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.11" steps="48"/></proof>
+  </goal>
+  <goal name="sequence.24" expl="24.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.16" steps="83"/></proof>
+  </goal>
+  <goal name="sequence.25" expl="25.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="51"/></proof>
+  </goal>
+  <goal name="sequence.26" expl="26.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="84"/></proof>
+  </goal>
+  <goal name="sequence.27" expl="27.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="0"/></proof>
+  </goal>
+  <goal name="sequence.28" expl="28.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="103"/></proof>
+  </goal>
+  <goal name="sequence.29" expl="29.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.23" steps="176"/></proof>
+  </goal>
+  <goal name="sequence.30" expl="30.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="114"/></proof>
+  </goal>
+  <goal name="sequence.31" expl="31.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.35" steps="369"/></proof>
+  </goal>
+  <goal name="sequence.32" expl="32.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="28"/></proof>
+  </goal>
+  <goal name="sequence.33" expl="33.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.07" steps="13"/></proof>
+  </goal>
+  <goal name="sequence.34" expl="34.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+  <goal name="sequence.35" expl="35.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="7"/></proof>
+  </goal>
+  <goal name="sequence.36" expl="36.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.09" steps="18"/></proof>
+  </goal>
+  <goal name="sequence.37" expl="37.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.15" steps="77"/></proof>
+  </goal>
+  <goal name="sequence.38" expl="38.">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.08" steps="39"/></proof>
+  </goal>
+  <goal name="sequence.39" expl="39.">
   <proof prover="0" steplimit="-1"><result status="valid" time="0.06" steps="7"/></proof>
   </goal>
  </transf>

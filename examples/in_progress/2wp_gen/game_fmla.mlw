@@ -188,6 +188,7 @@ module FmlaRulesProof
   use import choice.Choice
   use import order.Order
   use import order.Chain
+  use import int.Int
   use import game.Game
   use import game.StratProps
   use import transfinite.Iterates
@@ -709,6 +710,20 @@ module FmlaRulesProof
       )
       so have_uniform_winning_strat g (rel_map r ((=) strt)) (rel_map r bottom)
 
+  lemma reflexive : forall c,p:'a -> bool. holds c (enforce p p)
+
+  predicate iprod (o1:'a -> 'a -> bool) (o2:'b -> 'b -> bool) (x y:('a,'b)) =
+    let (a,b) = x in let (c,d) = y in
+    o1 a c /\ (a = c -> b = d)
+
+  lemma iorder_product : forall o1 o2. order o1 /\ order o2 ->
+    let ip = iprod o1 o2 in order ip
+    by (reflexive ip by forall x. ip x x by let (y,_) = x in o1 y y)
+    /\ (transitive ip by forall x y z:('a,'b). ip x y /\ ip y z ->
+      ip x z by let ((a,_),(b,_),(c,_)) = (x,y,z) in o1 a b /\ o1 b c)
+    /\ (antisymetric ip by forall x y. ip x y /\ ip y x ->
+      x = y by let ((a,_),(b,_)) = (x,y) in a = b)
+
   lemma sequence : forall c,p q r:'a -> bool. is_fmla c ->
     holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
     by forall g. game_wf g /\ c g -> enforce p r g
@@ -718,22 +733,44 @@ module FmlaRulesProof
     by let c'' = conj c' (enforce r bottom) in
       (holds c'' (enforce p r) by subset bottom r /\ subset p p)
     by holds c'' (enforce p bottom)
-    by let i = \b. if b then q else p in
-      holds c'' (universal (u_enforce i (cst bottom))) /\
-      u_enforce i (cst bottom) false = enforce p bottom
-    by let o = \a b. a -> b in
-      holds c'' (universal (u_enforce i (later o i))) /\
+    by let i = \u y. let (n,x) = u in x = y /\
+      if n = 0 then p x else
+      if n = 1 then q x else
+      if n = 2 then r x else false in
+      (holds c'' (universal (u_enforce i (cst bottom)))
+      so forall g. game_wf g /\ c'' g ->
+        have_uniform_winning_strat g p bottom
+      by forall x. p x -> have_winning_strat g x bottom
+      by u_enforce i (cst bottom) (0,x) g)
+    by let o = iprod (<=) go in
+      (holds c'' (universal (u_enforce i (later o i)))
+        by forall u. let lu = later o i u in holds c'' (enforce (i u) lu)
+        by "case_split"
+          let (n,_) = u in
+          if n = 0 then
+            subset q lu by forall x. q x -> i (n+1,x) x so lu x
+          else if n = 1 then
+            subset r lu by forall x. r x -> i (n+1,x) x so lu x
+          else subset bottom lu) /\
       holds c'' (ordering go) /\
+      order o /\
       (forall ch inh x. chain (oprod go o) ch /\ supremum go (proj1 ch) x /\
         ch inh /\
         (forall x y. ch (x,y) -> i y x) ->
-        exists y. upper_bound o (proj2 ch) y /\ i y x)
-    (*holds c (universal (u_enforce i (later o i))) /\
-      holds c (ordering go) /\ order o /\
-      (forall ch x. chain (oprod go o) ch /\ supremum go (proj1 ch) x /\
-        (forall x y. ch (x,y) -> i y x) ->
-        exists y. upper_bound o (proj2 ch) y /\ i y x) ->
-      holds c (universal (u_enforce i (cst bottom)))*)
+        (exists y. upper_bound o (proj2 ch) y /\ i y x)
+        by (exists z. maximum (oprod go o) ch z
+            so let (x,y) = z in upper_bound o (proj2 ch) y /\ i y x /\
+              maximum go (proj1 ch) x
+          ) || (false by
+            let under = \n. forall m x y. m >= n -> not ch (x,(m,y)) in
+            (forall n. under n -> under (n-1)
+             by forall x y. let z = (x,(n-1,y)) in
+               ch z -> false by upper_bound (oprod go o) ch z
+               by forall u. ch u -> let (_,(m,_)) = u in
+                 m <= n-1
+                 so (oprod go o u z)
+                 || (oprod go o z u so z = u so false))
+            so under 3 so under 0 so let (_,(_,_)) = inh in false))
 
   clone FmlaRules with
     goal enforce_fmla,
