@@ -24,15 +24,40 @@ let debug = Debug.register_info_flag "vc"
 
 let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
-let _ity_of_vs v = (restore_pv v).pv_ity
+let new_of_pv {pv_vs = v} = create_vsymbol (id_clone v.vs_name) v.vs_ty
 
-let new_of_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
+let res_of_ity ity = create_vsymbol (id_fresh "result") (ty_of_ity ity)
 
-let new_of_pv v = new_of_vs v.pv_vs
+let res_of_expr e =
+  create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_ity e.e_ity)
 
-let vs_result ity = create_vsymbol (id_fresh "result") (ty_of_ity ity)
+let sp_label = Ident.create_label "vc:fast_wp"
 
-(* explanations *)
+(* VCgen environment *)
+
+type vc_env = {
+  known_map : Pdecl.known_map;
+  ps_int_le : lsymbol;
+  ps_int_ge : lsymbol;
+  ps_int_lt : lsymbol;
+  ps_int_gt : lsymbol;
+  fs_int_pl : lsymbol;
+  fs_int_mn : lsymbol;
+}
+
+let mk_env {Theory.th_export = ns} kn = {
+  known_map = kn;
+  ps_int_le = Theory.ns_find_ls ns ["infix <="];
+  ps_int_ge = Theory.ns_find_ls ns ["infix >="];
+  ps_int_lt = Theory.ns_find_ls ns ["infix <"];
+  ps_int_gt = Theory.ns_find_ls ns ["infix >"];
+  fs_int_pl = Theory.ns_find_ls ns ["infix +"];
+  fs_int_mn = Theory.ns_find_ls ns ["infix -"];
+}
+
+let mk_env env kn = mk_env (Env.read_theory env ["int"] "Int") kn
+
+(* explanation labels *)
 
 let vc_label e f =
   let loc = if f.t_loc = None then e.e_loc else f.t_loc in
@@ -55,150 +80,16 @@ let _expl_variant   = Ident.create_label "expl:variant decrease"
 let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
   Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
 
-let vc_expl l f =
-  let f = if Slab.mem Term.stop_split f.t_label
-    then f else t_label_add Term.stop_split f in
-  if lab_has_expl f.t_label then f else t_label_add l f
-
-(* propositional connectives with limited simplification *)
-
-(*
-let can_simp t = not (Slab.mem stop_split t.t_label)
-
-let vc_and f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _ when can_simp f1 -> f2
-  | _, Ttrue when can_simp f2 -> t_label_remove asym_split f1
-  | _, _ -> t_and f1 f2
-
-let vc_and_asym f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _ when can_simp f1 -> f2
-  | _, Ttrue when can_simp f2 -> t_label_remove asym_split f1
-  | _, _ -> t_and_asym f1 f2
-
-let vc_or f1 f2 = match f1.t_node, f2.t_node with
-  | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> t_label_remove asym_split f1
-  | _, _ -> t_or f1 f2
-*)
-
-let vc_implies f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _ | _, Ttrue -> f2
-  | _, _ -> t_implies f1 f2
-
-let vc_implies_pre fl f = List.fold_right vc_implies fl f
-
-let vc_implies_post fl v f = let t = t_var v in
-  let implies q f = vc_implies (open_post_with t q) f in
-  List.fold_right implies fl f
-
-let vc_forall vl f = t_forall_close_simp vl [] f
-
-let vc_let v t f = t_let_close_simp v t f
-
-(*
-type defn_fmla =
-  | DFdefn of term
-  | DFfmla of term
-  | DFdffm of term * term
-
-let df_atom v f = match f.t_node with
-  | Tapp (ps, [{t_node = Tvar u}; t])
-    when ls_equal ps ps_equ && vs_equal u v && t_v_occurs v t = 0 ->
-         DFdefn t
-  | _ -> DFfmla f
-
-let df_and_left df1 f2 = match df1 with
-  | DFdefn t -> DFdffm (t, f2)
-  | DFfmla f1 -> DFfmla (t_and f1 f2)
-  | DFdffm (t,f1) -> DFdffm (t, t_and f1 f2)
-
-let df_and_right f1 df2 = match df2 with
-  | DFdefn t -> DFdffm (t, f1)
-  | DFfmla f2 -> DFfmla (t_and f1 f2)
-  | DFdffm (t,f2) -> DFdffm (t, t_and f1 f2)
-
-let df_implies df1 f2 = match df1 with
-  | DFdefn t -> DFdffm (t, f2)
-  | DFfmla f1 -> DFfmla (t_implies f1 f2)
-  | DFdffm (t,f1) -> DFdffm (t, t_implies f1 f2)
-
-let df_forall v df1 f2 = match df1 with
-  | DFdefn t -> t_let_close_simp v t f2
-  | DFfmla f1 -> t_forall_close_simp [v] [] (t_implies f1 f2)
-  | DFfmla (t,f1) -> t_let_close_simp v t (t_implies f1 f2)
-
-let df_label_copy e df = match df with
-  | DFdefn _ -> df
-  | DFfmla f -> DFfmla (t_label_copy e f)
-  | DFdffm (t,f) -> DFdffm (t, t_label_copy e f)
-
-let vc_forall_post v p f =
-  (* we optimize for the case when a postcondition
-     is of the form (... /\ result = t /\ ...) *)
-  let rec down p = match p.t_node with
-    | Tbinop (Tand,f1,f2) ->
-        df_label_copy p (match down f1 with
-          | DFfmla f1 -> df_and_right f1 (down f2)
-          | df1 -> df_and_left df1 f2)
-    | _ -> df_atom v p in
-  if ty_equal v.vs_ty ty_unit then
-    t_subst_single v t_void (t_implies p f)
-  else df_forall v (down p) f
-
-let t_and_subst v t1 t2 =
-  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
-     definition. Otherwise return [t1 /\ t2] *)
-  match is_equality_for v t1 with
-  | Some t -> t_subst_single v t t2
-  | None -> t_and t1 t2
-
-let t_implies_subst v t1 t2 =
-  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
-     definition. Otherwise return [t1 -> t2] *)
-  match is_equality_for v t1 with
-  | Some t -> t_subst_single v t t2
-  | None -> t_implies_simp t1 t2
-
-let open_unit_post q =
-  let v, q = open_post q in
-  t_subst_single v t_void q
-
-let create_unit_post =
-  let v = create_vsymbol (id_fresh "void") ty_unit in
-  fun q -> create_post v q
-
-let vs_result e =
-  create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_ity e.e_ity)
-*)
-
-(* VCgen environment *)
-
-type vc_env = {
-  known_map : Pdecl.known_map;
-  ps_int_le : Term.lsymbol;
-  ps_int_ge : Term.lsymbol;
-  ps_int_lt : Term.lsymbol;
-  ps_int_gt : Term.lsymbol;
-  fs_int_pl : Term.lsymbol;
-  fs_int_mn : Term.lsymbol;
-}
-
-let mk_env {Theory.th_export = ns} kn = {
-  known_map = kn;
-  ps_int_le = Theory.ns_find_ls ns ["infix <="];
-  ps_int_ge = Theory.ns_find_ls ns ["infix >="];
-  ps_int_lt = Theory.ns_find_ls ns ["infix <"];
-  ps_int_gt = Theory.ns_find_ls ns ["infix >"];
-  fs_int_pl = Theory.ns_find_ls ns ["infix +"];
-  fs_int_mn = Theory.ns_find_ls ns ["infix -"];
-}
-
-let mk_env env kn = mk_env (Env.read_theory env ["int"] "Int") kn
+let vc_expl lab f =
+  let f = if Slab.mem stop_split f.t_label
+    then f else t_label_add stop_split f in
+  if lab_has_expl f.t_label then f else t_label_add lab f
 
 (* a type is affected if a modified region is reachable from it *)
 
-let _reg_affected wr reg = Util.any reg_rch_fold (Mreg.contains wr) reg
 let ity_affected wr ity = Util.any ity_rch_fold (Mreg.contains wr) ity
+
+let pv_affected wr v = ity_affected wr v.pv_ity
 
 let rec reg_aff_regs wr s reg =
   let q = reg_exp_fold (reg_aff_regs wr) Sreg.empty reg in
@@ -242,6 +133,41 @@ let name_regions kn wr mpv =
     let ty = ty_app r.reg_its.its_ts (List.map ty_of_ity r.reg_args) in
     Some (t_var (create_vsymbol (id_clone r.reg_name) ty)) in
   Mreg.merge complete mreg aff
+
+(* propositional connectives with limited simplification *)
+
+let sp_implies sp wp = match sp.t_node, wp.t_node with
+  | Ttrue, _ | _, Ttrue -> wp
+  | _, _ -> t_implies sp wp
+
+let _sp_or sp1 sp2 = match sp1.t_node, sp2.t_node with
+  | Ttrue, _ | _, Tfalse -> sp1
+  | _, Ttrue | Tfalse, _ -> sp2
+  | _, _ -> t_or sp1 sp2
+
+let _sp_and sp1 sp2 = match sp1.t_node, sp2.t_node with
+  | Ttrue, _ | _, Tfalse -> sp2
+  | _, Ttrue | Tfalse, _ -> sp1
+  | _, _ -> t_and sp1 sp2
+
+let can_simp wp = not (Slab.mem stop_split wp.t_label)
+
+let wp_and wp1 wp2 = match wp1.t_node, wp2.t_node with
+  | (Ttrue, _ | _, Tfalse) when can_simp wp1 -> wp2
+  | (_, Ttrue | Tfalse, _) when can_simp wp2 -> wp1
+  | _, _ -> t_and wp1 wp2
+
+let _wp_if c wp1 wp2 = match c.t_node, wp1.t_node, wp2.t_node with
+  | Ttrue, _, _  when can_simp wp2 -> wp1
+  | Tfalse, _, _ when can_simp wp1 -> wp2
+  | Tnot c, Ttrue, _  when can_simp wp1 -> t_implies c wp2
+  | _, Ttrue, _  when can_simp wp1 -> t_implies (t_not c) wp2
+  | _, _, Ttrue  when can_simp wp2 -> t_implies c wp1
+  | _, _, _ -> t_if c wp1 wp2
+
+let wp_forall vl wp = t_forall_close_simp vl [] wp
+
+let wp_let v t wp = t_let_close_simp v t wp
 
 (* produce a rebuilding postcondition after a write effect *)
 
@@ -303,7 +229,7 @@ let rec havoc kn wr mreg t ity fl =
             (p, fs_app cs tl ty), (p, t_and_l fl) in
           let tbl, fbl = List.split (List.map branch cl) in
           let t = t_case_close t tbl and f = t_case_close_simp t fbl in
-          t, if t_equal f t_true then fl else f::fl
+          t, begin match f.t_node with Ttrue -> fl | _ -> f::fl end
       end
 
 let print_mpv mpv = if Debug.test_flag debug then
@@ -316,7 +242,7 @@ let print_mreg mreg = if Debug.test_flag debug then
     (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
       Ity.print_reg r Pretty.print_term t)) (Mreg.bindings mreg)
 
-let _havoc_fast {known_map = kn} {eff_writes = wr; eff_covers = cv} mpv =
+let _sp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} mpv =
   if Sreg.is_empty cv || Mpv.is_empty mpv then [] else
   let mreg = name_regions kn cv mpv in
   let () = print_mpv mpv; print_mreg mreg in
@@ -325,14 +251,24 @@ let _havoc_fast {known_map = kn} {eff_writes = wr; eff_covers = cv} mpv =
     cons_t_simp (t_var n) t fl in
   Mpv.fold update mpv []
 
-let havoc_slow {known_map = kn} {eff_writes = wr; eff_covers = cv} w =
-  if Sreg.is_empty cv then w else
-  let fvs = t_freevars Mvs.empty w in
-  let add v _ m = let pv = restore_pv v in
-    if ity_affected cv pv.pv_ity then
-    Mpv.add pv (new_of_vs v) m else m in
-  let mpv = Mvs.fold add fvs Mpv.empty in
-  if Mpv.is_empty mpv then w else
+let mpv_of_wp cv res wp =
+  if Sreg.is_empty cv then Mpv.empty else
+  let fvs = t_freevars Mvs.empty wp in
+  let add v _ m =
+    let v = restore_pv v in
+    if pv_affected cv v then
+    Mpv.add v (new_of_pv v) m else m in
+  Mvs.fold add (Mvs.remove res fvs) Mpv.empty
+
+let advance mpv f =
+  let add o n sbs = Mvs.add o.pv_vs (t_var n) sbs in
+  t_subst (Mpv.fold add mpv Mvs.empty) f
+
+let vs_dummy = create_vsymbol (id_fresh "dummy") ty_unit
+
+let wp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} wp =
+  let mpv = mpv_of_wp cv vs_dummy wp in
+  if Mpv.is_empty mpv then wp else
   let mreg = name_regions kn cv mpv in
   let () = print_mpv mpv; print_mreg mreg in
   let add _ t fvs = t_freevars fvs t in
@@ -340,38 +276,84 @@ let havoc_slow {known_map = kn} {eff_writes = wr; eff_covers = cv} w =
   let update {pv_vs = o; pv_ity = ity} n w =
     let t, fl = havoc kn wr mreg (t_var o) ity [] in
     if Mvs.mem n fvs then
-      vc_implies_pre (cons_t_simp (t_var n) t fl) w
-    else vc_let n t (vc_implies_pre fl w) in
-  let add o n sbs = Mvs.add o.pv_vs (t_var n) sbs in
-  let w = t_subst (Mpv.fold add mpv Mvs.empty) w in
-  vc_forall (Mvs.keys fvs) (Mpv.fold update mpv w)
+      sp_implies (t_and_l (cons_t_simp (t_var n) t fl)) w
+    else wp_let n t (sp_implies (t_and_l fl) w) in
+  let w = Mpv.fold update mpv (advance mpv wp) in
+  wp_forall (Mvs.keys fvs) w
 
 let _step_back wr1 rd2 wr2 mpv =
+  (* FIXME? result of e1? *)
   if Mreg.is_empty wr1 then Mpv.empty else
   let back o n =
-    if not (ity_affected wr1 o.pv_ity) then None else
-    if not (ity_affected wr2 o.pv_ity) then Some n else
+    if not (pv_affected wr1 o) then None else
+    if not (pv_affected wr2 o) then Some n else
     Some (new_of_pv o) in
   let mpv = Mpv.mapi_filter back mpv in
   let add v acc =
-    if Mpv.mem v mpv || not (ity_affected wr1 v.pv_ity)
+    if Mpv.mem v mpv || not (pv_affected wr1 v)
     then acc else Mpv.add v (new_of_pv v) acc in
   Spv.fold add rd2 mpv
 
+(* convert user specifications into wp and sp *)
+
+let t_var_or_void v =
+  if ty_equal v.vs_ty ty_unit then t_void else t_var v
+
+let wp_of_pre lab pl = t_and_l (List.map (vc_expl lab) pl)
+
+let wp_of_post lab ity = function
+  | q::ql ->
+      let v, q = open_post q in let t = t_var_or_void v in
+      let mk_post q = vc_expl lab (open_post_with t q) in
+      v, t_and_l (vc_expl lab q :: List.map mk_post ql)
+  | [] ->
+      res_of_ity ity, t_true
+
+let rec push_stop lab f = match f.t_node with
+  | Tbinop (Tand,g,h) when not (Slab.mem stop_split f.t_label) ->
+      t_label_copy f (t_and (push_stop lab g) (push_stop lab h))
+  | _ -> vc_expl lab f
+
+let sp_of_pre lab pl = t_and_l (List.map (push_stop lab) pl)
+
+let sp_of_post lab v ql = let t = t_var_or_void v in
+  let push q = push_stop lab (open_post_with t q) in
+  t_and_l (List.map push ql)
+
+(* combine a postcondition with a precondition *)
+
+let sp_close res mpv sp wp =
+  let is_fresh v _ = (* must bind every pure vsymbol in a wp *)
+    try ignore (restore_pv v); false with Not_found -> true in
+  let fvs = Mvs.filter is_fresh (t_freevars Mvs.empty sp) in
+  let fvs = Mpv.fold (fun _ v m -> Mvs.add v 1 m) mpv fvs in
+  let vl = res :: Mvs.keys (Mvs.remove res fvs) in
+  wp_forall vl (sp_implies sp (advance mpv wp))
+
+let wp_close res sp wp = wp_forall [res] (sp_implies sp wp)
+
 (* classical WP *)
 
-let ok_of_post l ity = function
-  | q::ql ->
-      let v, q = open_post q in let t = t_var v in
-      let mk_post q = vc_expl l (open_post_with t q) in
-      v, t_and_l (vc_expl l q :: List.map mk_post ql)
-  | [] ->
-      vs_result ity, t_true
+let bind_oldies c f =
+  let sbs = Mpv.fold (fun {pv_vs = o} {pv_vs = v} s ->
+    Mvs.add o (t_var v) s) c.cty_oldies Mvs.empty in
+  t_subst sbs f
 
-let bind_oldies c f = Mpv.fold (fun o v f ->
-  t_subst_single o.pv_vs (t_var v.pv_vs) f) c.cty_oldies f
-
-let rec slow env e res q xq = match e.e_node with
+let rec wp_expr env e res q xq = match e.e_node with
+  | _ when Slab.mem sp_label e.e_label ->
+      let cv = e.e_effect.eff_covers in
+      let mpv = mpv_of_wp cv res q in
+      let xq = Mexn.set_inter xq e.e_effect.eff_raises in
+      let xq = Mexn.map (fun (v,q) -> v, mpv_of_wp cv v q, q) xq in
+      let xmpv = Mexn.map (fun (v,mpv,_) -> v,mpv) xq in
+      let ok, ne, ex = sp_expr env e res mpv xmpv in
+      let xq_merge _ cq q = match cq, q with
+        | Some cq, Some (v,mpv,q) -> Some (sp_close v mpv cq q)
+        | None, Some (v,mpv,q) -> Some (sp_close v mpv t_true q)
+        | _, None -> None in
+      let xq = Mexn.merge xq_merge ex xq in
+      let q = sp_close res mpv ne q in
+      wp_and ok (Mexn.fold (fun _ g f -> t_and f g) xq q)
   | Evar v ->
       t_subst_single res (vc_label e (t_var v.pv_vs)) q
   | Econst c ->
@@ -384,46 +366,60 @@ let rec slow env e res q xq = match e.e_node with
 
   | Eexec {c_cty = {cty_args = []} as c} ->
       (* TODO: rewrite c.cty_post wrt c.cty_args <> [] *)
-      (* TODO: vc_forall_post *)
-      let q = vc_forall [res] (vc_implies_post c.cty_post res q) in
-      let xq = Mexn.set_inter xq c.cty_effect.eff_raises in
-      let xq_implies _ (v,q) l = Some (v, vc_implies_post l v q) in
-      let xq = Mexn.diff xq_implies xq c.cty_xpost in
-      let xq_and _ (v,q) f = t_and f (vc_forall [v] q) in
-      let q = Mexn.fold xq_and xq q in
-      let q = havoc_slow env c.cty_effect q in
-      let q = bind_oldies c q in (* TODO: cty_args <> [] *)
-      let vl = List.map (fun v -> v.pv_vs) c.cty_args in
-      let and_pre f q =
-        (* TODO: handle recursive calls *)
-        t_and (vc_expl expl_pre (vc_forall vl f)) q in
-      vc_label e (List.fold_right and_pre c.cty_pre q)
-
+      (* TODO: handle recursive calls *)
+      let cq = sp_of_post expl_post res c.cty_post in
+      let q = wp_close res cq q in
+      let xq_merge _ cq q = match cq, q with
+        | Some cq, Some (v,q) ->
+            Some (wp_close v (sp_of_post expl_xpost v cq) q)
+        | None, Some (v,q) -> Some (wp_forall [v] q)
+        | _, None -> None in
+      let xq = Mexn.set_inter xq e.e_effect.eff_raises in
+      let xq = Mexn.merge xq_merge c.cty_xpost xq in
+      let w = Mexn.fold (fun _ g f -> t_and f g) xq q in
+      let w = bind_oldies c (wp_havoc env c.cty_effect w) in
+      vc_label e (wp_and (wp_of_pre expl_pre c.cty_pre) w)
   | Elet (LDvar (v, e1), e2) (* FIXME: do we need this? *)
     when Slab.mem proxy_label v.pv_vs.vs_name.id_label ->
     (* we push the label down, past the inserted "let" *)
-      let q = slow env (e_label_copy e e2) res q xq in
-      slow env e1 v.pv_vs q xq
+      let q = wp_expr env (e_label_copy e e2) res q xq in
+      wp_expr env e1 v.pv_vs q xq
   | Elet (LDvar (v, e1), e2) ->
-      let q = slow env e2 res q xq in
-      vc_label e (slow env e1 v.pv_vs q xq)
+      let q = wp_expr env e2 res q xq in
+      vc_label e (wp_expr env e1 v.pv_vs q xq)
   | Eif (e1, e2, e3) ->
-      let v = vs_result e1.e_ity in
+      let v = res_of_expr e1 in
       let test = t_equ (t_var v) t_bool_true in
       (* TODO: how should we handle prop-behind-bool-typed exprs? *)
       (* TODO: handle e_true and e_false, restore /\ and \/ *)
 (* FIXME: wrong if e2 or e3 have preconditions depending on test
       let q = if eff_pure e2.e_effect && eff_pure e3.e_effect then
-        let u2 = vs_result e2.e_ity and u3 = vs_result e3.e_ity in
+        let u2 = res_of_expr e2 and u3 = res_of_expr e3 in
         let r = t_subst_single res (t_if test (t_var u2) (t_var u3)) q in
-        slow env e2 u2 (slow env e3 u3 (t_subst_single res r q) xq) xq
+        wp_expr env e2 u2 (wp_expr env e3 u3 (t_subst_single res r q) xq) xq
       else
 *)
-      let q = t_if test (slow env e2 res q xq) (slow env e3 res q xq) in
-      vc_label e (slow env e1 v q xq)
+      let q = t_if test (wp_expr env e2 res q xq) (wp_expr env e3 res q xq) in
+      vc_label e (wp_expr env e1 v q xq)
+  | Ecase (e1, [{pp_pat = {pat_node = Term.Pwild}}, e2]) ->
+      let q = wp_expr env e2 res q xq in
+      vc_label e (wp_expr env e1 (res_of_expr e1) q xq)
+  | Ecase (e1, [{pp_pat = {pat_node = Term.Papp (cs,[])}}, e2])
+    when ls_equal cs fs_void ->
+      let q = wp_expr env e2 res q xq in
+      vc_label e (wp_expr env e1 (res_of_expr e1) q xq)
+  | Ecase (e1, bl) ->
+      let res = res_of_expr e1 in
+      let branch ({pp_pat = pat}, e) =
+        t_close_branch pat (wp_expr env e res q xq) in
+      let q = t_case (t_var res) (List.map branch bl) in
+      vc_label e (wp_expr env e1 res q xq)
   | _ -> assert false (* TODO *)
 
+and sp_expr _env _e _res _mpv _xmpv = assert false (* TODO *)
+
 and vc_fun env c e =
+  let p = sp_of_pre expl_pre c.cty_pre in
   let args = List.map (fun pv -> pv.pv_vs) c.cty_args in
 (* TODO: let rec with variants
   let env =
@@ -434,11 +430,10 @@ and vc_fun env c e =
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
 *)
-  let r,q = ok_of_post expl_post c.cty_result c.cty_post in
-  let mk_xq xs xq = ok_of_post expl_xpost xs.xs_ity xq in
-  let f = slow env e r q (Mexn.mapi mk_xq c.cty_xpost) in
-  let f = vc_implies_pre c.cty_pre (bind_oldies c f) in
-  vc_forall args f
+  let mk_xq xs xq = wp_of_post expl_xpost xs.xs_ity xq in
+  let r,q = wp_of_post expl_post c.cty_result c.cty_post in
+  let w = wp_expr env e r q (Mexn.mapi mk_xq c.cty_xpost) in
+  wp_forall args (sp_implies p (bind_oldies c w))
 
 let mk_vc_decl id f =
   let {id_string = nm; id_label = label; id_loc = loc} = id in
@@ -464,7 +459,7 @@ let vc _env kn d = match d.pd_node with
         Mpv.add v (create_vsymbol id vs.vs_ty) mpv in
       let mpv = List.fold_right add_read al Mpv.empty in
       let mpv = Spv.fold add_read eff.eff_reads mpv in
-      let f = t_and_simp_l (havoc_fast kn eff mpv) in
+      let f = t_and_simp_l (sp_havoc kn eff mpv) in
       let fvs = Mvs.domain (t_freevars Mvs.empty f) in
       let f = t_forall_close (Svs.elements fvs) [] f in
       let pr = create_prsymbol (id_fresh (s.rs_name.id_string ^ "_havoc")) in

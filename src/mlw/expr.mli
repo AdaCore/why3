@@ -263,6 +263,7 @@ val rs_tuple : int -> rsymbol
 val e_tuple : expr list -> expr
 
 val rs_void : rsymbol
+val fs_void : lsymbol
 val e_void : expr
 val t_void : term
 

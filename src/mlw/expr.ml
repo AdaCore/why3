@@ -763,6 +763,7 @@ let e_tuple el =
   e_app (rs_tuple (List.length el)) el [] ity
 
 let rs_void = rs_tuple 0
+let fs_void = fs_tuple 0
 
 let e_void = e_app rs_void [] [] ity_unit
 
