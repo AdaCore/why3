@@ -354,7 +354,7 @@ let rec t_subst_fmla v t f = t_label_copy f (match f.t_node with
 
 let create_let_decl ld =
   let conv_post t q = match t.t_ty with
-      | Some _ -> open_post_with q t
+      | Some _ -> open_post_with t q
       | None -> let v,f = open_post q in
                 t_subst_fmla v t f in
   let conv_post t ql = List.map (conv_post t) ql in

@@ -422,11 +422,11 @@ let rec wp_expr env e res q xq = match e.e_node with
       let q3 = wp_expr env e3 res q xq in
       vc_label e (wp_expr env e1 v (t_if test q2 q3) xq)
   | Ecase (e1, bl) ->
-      let res = res_of_expr e1 in
+      let v = res_of_expr e1 in
       let branch ({pp_pat = pat}, e) =
         t_close_branch pat (wp_expr env e res q xq) in
-      let q = t_case (t_var res) (List.map branch bl) in
-      vc_label e (wp_expr env e1 res q xq)
+      let q = t_case (t_var v) (List.map branch bl) in
+      vc_label e (wp_expr env e1 v q xq)
   | _ -> assert false (* TODO *)
 
 and sp_expr env e res mpv xmpv = assert (is_fresh res); match e.e_node with
