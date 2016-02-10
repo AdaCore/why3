@@ -212,6 +212,11 @@ let get_syms node pure =
     | Eif (c,d,e) ->
         syms_expr (syms_expr (syms_eity syms c) d) e
     | Ecase (d,bl) ->
+        (* Dexpr handles this, but not Expr, so we set a failsafe *)
+        let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
+        let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
+        if not (Pattern.is_exhaustive [t_var v] pl) then
+          Loc.errorm ?loc:e.e_loc "Non-exhaustive pattern matching";
         let add_branch syms (p,e) =
           syms_pat (syms_expr syms e) p.pp_pat in
         List.fold_left add_branch (syms_eity syms d) bl

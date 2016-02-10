@@ -1128,6 +1128,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let bl = List.rev_map mk_branch bl in
       let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
       let v = create_vsymbol (id_fresh "x") (ty_of_ity e1.e_ity) in
+      (* TODO: this is the right place to show the missing patterns,
+         but we do not have access to the current known_map to do that *)
       let bl = if Pattern.is_exhaustive [t_var v] pl then bl else begin
         if List.length bl > 1 then Warning.emit ?loc:de0.de_loc
           "Non-exhaustive pattern matching, asserting `absurd'";
