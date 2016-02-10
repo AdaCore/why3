@@ -56,7 +56,9 @@ theory float.GenericFloat
    remove prop of_ubv64_to_real
 
    remove prop zero_of_int
+   remove prop oneF_of_int
    remove prop zeroF_to_real
+   remove prop oneF_to_real
    remove prop max_to_real
    remove prop is_finite
    remove prop is_finite_zero
@@ -66,9 +68,12 @@ theory float.GenericFloat
    (* remove prop to_bv2 *)
    remove prop of_int_is_finite
    remove prop of_int_to_real
+   remove prop to_int_rounding
+
    remove prop Bounded_real_no_overflow
    remove prop Round_monotonic
    remove prop Round_idempotent
+   remove prop Round_to_real
    remove prop Exact_rounding_for_integers
    remove prop eq
    remove prop lt
@@ -122,6 +127,17 @@ theory float.GenericFloat
    remove prop to_int_monotonic
    remove prop to_int_monotonic_int1
    remove prop to_int_monotonic_int2
+
+(*   remove prop Rounding_down
+   remove prop Rounding_up
+   remove prop Rounding_neg_tie
+   remove prop Rounding_pos_tie
+   remove prop Rounding_int
+   remove prop Rounding_near_int
+   remove prop Rounding_monotonic
+   remove prop Rounding_monotonic_int1
+   remove prop Rounding_monotonic_int2
+   remove prop Rounding_bound *)
 
    remove prop truncate_is_finite
    remove prop ceil_is_finite
