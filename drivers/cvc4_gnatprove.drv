@@ -1,5 +1,23 @@
 import "cvc4_14.drv"
 
+theory float.GenericFloat
+
+ prelude "; ---- floats ---- "
+
+ syntax type t "Real"
+
+ syntax function to_real "%1"
+
+ remove prop Round_to_real      (* would be inconsistent with the mapping of t and to_real *)
+
+end
+
+theory float.FloatConverter
+
+ syntax function to_float64 "%1"
+
+end
+
 (**********************************************************************
  ***                       gnat2why theories                        ***
  **********************************************************************)
