@@ -18,11 +18,6 @@ theory float.GenericFloat
    syntax function min "(fp.min %1 %2)"
    syntax function max "(fp.max %1 %2)"
 
-   syntax function to_ubv8  "((_ fp.to_ubv 8) RNA %1)"
-   syntax function to_ubv16 "((_ fp.to_ubv 16) RNA %1)"
-   syntax function to_ubv32 "((_ fp.to_ubv 32) RNA %1)"
-   syntax function to_ubv64 "((_ fp.to_ubv 64) RNA %1)"
-
    (* syntax function to_sbv8  "((_ fp.to_sbv 8) RNA %1)" *)
    (* syntax function to_sbv16 "((_ fp.to_sbv 16) RNA %1)" *)
    (* syntax function to_sbv32 "((_ fp.to_sbv 32) RNA %1)" *)
@@ -42,18 +37,6 @@ theory float.GenericFloat
    syntax predicate le  "(fp.leq %1 %2)"
    syntax predicate gt  "(fp.gt %1 %2)"
    syntax predicate ge  "(fp.geq %1 %2)"
-
-   remove prop of_ubv8_is_finite
-   remove prop of_ubv16_is_finite
-   remove prop of_ubv32_is_finite
-   remove prop of_ubv64_is_finite
-   remove prop of_ubv8_monotonic
-   remove prop of_ubv16_monotonic
-   remove prop of_ubv32_monotonic
-   remove prop of_ubv64_monotonic
-   remove prop of_ubv8_to_real
-   remove prop of_ubv16_to_real
-   remove prop of_ubv64_to_real
 
    remove prop zero_of_int
    remove prop oneF_of_int
@@ -149,18 +132,19 @@ end
 theory float.Float32
   syntax type t "Float32"
 
+  syntax type bv "(_ BitVec 32)"
+
   syntax function from_bv "((_ to_fp 8 24) %1)"
   syntax function zeroF "(_ +zero 8 24)"
+
+  syntax function oneF "((_ to_fp 8 24) #x3F800000)"
+  syntax function max_value "((_ to_fp 8 24) #x7F7FFFFF)"
+  syntax function two "((_ to_fp 8 24) #x40000000)"
+  syntax function half "((_ to_fp 8 24) #x3F000000)"
 
   (* remove prop zeroF_bv *)
   (* remove prop max_bv *)
   remove prop round_bound
-  remove prop of_ubv32_to_real
-
-  syntax function of_ubv8  "((_ to_fp_unsigned 8 24) RNE %1)"
-  syntax function of_ubv16 "((_ to_fp_unsigned 8 24) RNE %1)"
-  syntax function of_ubv32 "((_ to_fp_unsigned 8 24) RNE %1)"
-  syntax function of_ubv64 "((_ to_fp_unsigned 8 24) RNE %1)"
 
   (* syntax function of_sbv8  "((_ to_fp 8 24) RNE %1)" *)
   (* syntax function of_sbv16 "((_ to_fp 8 24) RNE %1)" *)
@@ -175,19 +159,19 @@ end
 
 theory float.Float64
   syntax type t "Float64"
+  syntax type bv "(_ BitVec 64)"
 
   syntax function from_bv   "((_ to_fp 11 53) %1)"
   syntax function zeroF "(_ +zero 11 53)"
 
-  syntax function of_ubv8  "((_ to_fp_unsigned 11 53) RNE %1)"
-  syntax function of_ubv16 "((_ to_fp_unsigned 11 53) RNE %1)"
-  syntax function of_ubv32 "((_ to_fp_unsigned 11 53) RNE %1)"
-  syntax function of_ubv64 "((_ to_fp_unsigned 11 53) RNE %1)"
+  syntax function oneF "((_ to_fp 8 24) #x3FF0000000000000)"
+  syntax function max_value "((_ to_fp 8 24) #x7FEFFFFFFFFFFFFF)"
+  syntax function two "((_ to_fp 8 24) #x4000000000000000)"
+  syntax function half "((_ to_fp 8 24) #x3FE0000000000000)"
 
   (* remove prop zeroF_bv *)
   (* remove prop max_bv *)
   remove prop round_bound
-  remove prop of_ubv32_to_real
 
   (* syntax function of_sbv8  "((_ to_fp 11 53) RNE %1)" *)
   (* syntax function of_sbv16 "((_ to_fp 11 53) RNE %1)" *)
@@ -207,4 +191,45 @@ theory float.FloatConverter
    remove prop round_double_single
    remove prop to_float64_exact
    remove prop to_float32_conv
+end
+
+theory float.Float_BV_Converter
+   syntax function to_ubv8  "((_ fp.to_ubv 8) RNA %1)"
+   syntax function to_ubv16 "((_ fp.to_ubv 16) RNA %1)"
+   syntax function to_ubv32 "((_ fp.to_ubv 32) RNA %1)"
+   syntax function to_ubv64 "((_ fp.to_ubv 64) RNA %1)"
+
+   remove prop of_ubv8_is_finite
+   remove prop of_ubv16_is_finite
+   remove prop of_ubv32_is_finite
+   remove prop of_ubv64_is_finite
+   remove prop of_ubv8_monotonic
+   remove prop of_ubv16_monotonic
+   remove prop of_ubv32_monotonic
+   remove prop of_ubv64_monotonic
+   remove prop of_ubv8_to_real
+   remove prop of_ubv16_to_real
+   remove prop of_ubv64_to_real
+end
+
+theory float.Float64_BV_Converter
+
+  syntax function of_ubv8  "((_ to_fp_unsigned 8 24) RNE %1)"
+  syntax function of_ubv16 "((_ to_fp_unsigned 8 24) RNE %1)"
+  syntax function of_ubv32 "((_ to_fp_unsigned 8 24) RNE %1)"
+  syntax function of_ubv64 "((_ to_fp_unsigned 8 24) RNE %1)"
+
+  remove prop of_ubv32_to_real
+
+end
+
+theory float.Float64_BV_Converter
+
+  syntax function of_ubv8  "((_ to_fp_unsigned 11 53) RNE %1)"
+  syntax function of_ubv16 "((_ to_fp_unsigned 11 53) RNE %1)"
+  syntax function of_ubv32 "((_ to_fp_unsigned 11 53) RNE %1)"
+  syntax function of_ubv64 "((_ to_fp_unsigned 11 53) RNE %1)"
+
+  remove prop of_ubv32_to_real
+
 end

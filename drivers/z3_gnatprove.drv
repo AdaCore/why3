@@ -50,6 +50,19 @@ theory "ada__model".Finite_Float_Literal
   remove prop l_is_finite
 end
 
+theory "ada__model".Finite_Float32_Literal
+  syntax function from_bv "((_ to_fp 8 24) ((_ int2bv 32) %1))"
+end
+
+theory "ada__model".Finite_Float64_Literal
+  syntax function from_bv "((_ to_fp 11 53) ((_ int2bv 64) %1))"
+end
+
+theory float.GenericFloat
+  remove prop to_bv
+  remove prop to_bv2
+end
+
 (* bitvector modules, is not in smt-libv2.drv since cvc4 and z3 don't
    have the same name for the function to_uint *)
 theory bv.BV64

@@ -43,30 +43,6 @@ theory GenericFloat
   function from_bv bv : t
   function to_bv   t  : bv      (* uninterpreted function *)
 
-  (* with unsigned int as bitvector *)
-  (* factorise to not have systematically all bv theories used  *)
-  use bv.BV8
-  use bv.BV16
-  use bv.BV32
-  use bv.BV64
-
-  function of_ubv8  BV8.t  : t
-  function of_ubv16 BV16.t : t
-  function of_ubv32 BV32.t : t
-  function of_ubv64 BV64.t : t
-
-  (* /!\ axioms for those *)
-
-  (* the to_[us]bv* functions are used to convert to a modular or integer
-     type in ada, and as such the rounding follows the rounding rules in
-     Ada, i.e. RNA. Note the reverse ( of_[us]bv* ) will follow RNE
-     rounding however. *)
-
-  function to_ubv8  t : BV8.t
-  function to_ubv16 t : BV16.t
-  function to_ubv32 t : BV32.t
-  function to_ubv64 t : BV64.t
-
   (* with signed int as bitvectors *)
   (* function of_sbv8  BV8.t  : t *)
   (* function of_sbv16 BV16.t : t *)
@@ -250,31 +226,6 @@ theory GenericFloat
 
   (* sqrt : same as others but without no_overflow *)
 
-  (** of unsigned bv axioms  *)
-
-  axiom of_ubv8_is_finite : forall x. is_finite (of_ubv8  x)
-  axiom of_ubv16_is_finite: forall x. is_finite (of_ubv16 x)
-  axiom of_ubv32_is_finite: forall x. is_finite (of_ubv32 x)
-  axiom of_ubv64_is_finite: forall x. is_finite (of_ubv64 x)
-
-  axiom of_ubv8_monotonic :
-    forall x y. BV8.ule  x y -> le (of_ubv8 x)  (of_ubv8 y)
-  axiom of_ubv16_monotonic:
-    forall x y. BV16.ule x y -> le (of_ubv16 x) (of_ubv16 y)
-  axiom of_ubv32_monotonic:
-    forall x y. BV32.ule x y -> le (of_ubv32 x) (of_ubv32 y)
-  axiom of_ubv64_monotonic:
-    forall x y. BV64.ule x y -> le (of_ubv64 x) (of_ubv64 y)
-
-  axiom of_ubv8_to_real : forall x.
-    to_real (of_ubv8 x)  = FromInt.from_int (BV8.to_uint x)
-  axiom of_ubv16_to_real: forall x.
-    to_real (of_ubv16 x) = FromInt.from_int (BV16.to_uint x)
-  (* of_ubv32_to_real is defined at cloning *)
-  axiom of_ubv64_to_real: forall x.
-    to_real (of_ubv64 x) = round (FromInt.from_int (BV64.to_uint x))
-
-  (* _____________ *)
 
   (* magic axioms  *)
 
@@ -457,30 +408,88 @@ theory GenericFloat
 
 end
 
-theory Float32
+theory Float_BV_Converter
+  (* with unsigned int as bitvector *)
+  (* factorise to not have systematically all bv theories used  *)
+  type t
+
+  use bv.BV8
+  use bv.BV16
   use bv.BV32
+  use bv.BV64
+
+  function of_ubv8  BV8.t  : t
+  function of_ubv16 BV16.t : t
+  function of_ubv32 BV32.t : t
+  function of_ubv64 BV64.t : t
+
+  (* /!\ axioms for those *)
+
+  (* the to_[us]bv* functions are used to convert to a modular or integer
+     type in ada, and as such the rounding follows the rounding rules in
+     Ada, i.e. RNA. Note the reverse ( of_[us]bv* ) will follow RNE
+     rounding however. *)
+
+  function to_ubv8  t : BV8.t
+  function to_ubv16 t : BV16.t
+  function to_ubv32 t : BV32.t
+  function to_ubv64 t : BV64.t
+
+  use import real.RealInfix
+  use real.FromInt
+
+  predicate is_finite t
+  predicate le t t
+  function to_real t : real
+  function round real : real
+
+  (** of unsigned bv axioms  *)
+
+  axiom of_ubv8_is_finite : forall x. is_finite (of_ubv8  x)
+  axiom of_ubv16_is_finite: forall x. is_finite (of_ubv16 x)
+  axiom of_ubv32_is_finite: forall x. is_finite (of_ubv32 x)
+  axiom of_ubv64_is_finite: forall x. is_finite (of_ubv64 x)
+
+  axiom of_ubv8_monotonic :
+    forall x y. BV8.ule  x y -> le (of_ubv8 x)  (of_ubv8 y)
+  axiom of_ubv16_monotonic:
+    forall x y. BV16.ule x y -> le (of_ubv16 x) (of_ubv16 y)
+  axiom of_ubv32_monotonic:
+    forall x y. BV32.ule x y -> le (of_ubv32 x) (of_ubv32 y)
+  axiom of_ubv64_monotonic:
+    forall x y. BV64.ule x y -> le (of_ubv64 x) (of_ubv64 y)
+
+  axiom of_ubv8_to_real : forall x.
+    to_real (of_ubv8 x)  = FromInt.from_int (BV8.to_uint x)
+  axiom of_ubv16_to_real: forall x.
+    to_real (of_ubv16 x) = FromInt.from_int (BV16.to_uint x)
+  (* of_ubv32_to_real is defined at cloning *)
+  axiom of_ubv64_to_real: forall x.
+    to_real (of_ubv64 x) = round (FromInt.from_int (BV64.to_uint x))
+end
+
+theory Float32
+  (* use bv.BV32 *)
 
   type t
 
-  function from_bv BV32.t : t
+  (* function from_bv BV32.t : t *)
 
   constant max_representable_integer : int = 16777216
   constant max_real : real = 0x1.FFFFFEp127
 
   clone export GenericFloat with
     type t           = t,
-    type bv          = BV32.t,
+    (* type bv          = BV32.t, *)
     constant max_real = max_real,
-    constant max_representable_integer = max_representable_integer,
-    function from_bv = from_bv
+    constant max_representable_integer = max_representable_integer(* , *)
+    (* function from_bv = from_bv *)
 
-  axiom oneF_bv : oneF      = from_bv (BV32.of_uint 0x3F80_0000)
-  axiom max_bv  : max_value = from_bv (BV32.of_uint 0x7F7F_FFFF)
-  axiom of_ubv32_to_real : forall x.
-    to_real (of_ubv32 x) = round (FromInt.from_int (BV32.to_uint x))
+  (* axiom oneF_bv : oneF      = from_bv (BV32.of_uint 0x3F80_0000) *)
+  (* axiom max_bv  : max_value = from_bv (BV32.of_uint 0x7F7F_FFFF) *)
 
-  axiom two_bv : two  = from_bv (BV32.of_uint 0x4000_0000)
-  axiom half_bv: half = from_bv (BV32.of_uint 0x3F00_0000)
+  (* axiom two_bv : two  = from_bv (BV32.of_uint 0x4000_0000) *)
+  (* axiom half_bv: half = from_bv (BV32.of_uint 0x3F00_0000) *)
 
   use import real.Real
   lemma round_bound :
@@ -493,25 +502,23 @@ theory Float64
 
   type t
 
-  function from_bv BV64.t : t
+  (* function from_bv BV64.t : t *)
 
   constant max_representable_integer : int = 9007199254740992
   constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
 
   clone export GenericFloat with
     type t           = t,
-    type bv          = BV64.t,
+    (* type bv          = BV64.t, *)
     constant max_real = max_real,
-    constant max_representable_integer = max_representable_integer,
-    function from_bv = from_bv
+    constant max_representable_integer = max_representable_integer(* , *)
+    (* function from_bv = from_bv *)
 
-  axiom oneF_bv : oneF      = from_bv (BV64.of_uint 0x3FF0_0000_0000_0000)
-  axiom max_bv  : max_value = from_bv (BV64.of_uint 0x7FEF_FFFF_FFFF_FFFF)
-  axiom of_ubv32_to_real : forall x.
-    to_real (of_ubv32 x) = FromInt.from_int (BV32.to_uint x)
+  (* axiom oneF_bv : oneF      = from_bv (BV64.of_uint 0x3FF0_0000_0000_0000) *)
+  (* axiom max_bv  : max_value = from_bv (BV64.of_uint 0x7FEF_FFFF_FFFF_FFFF) *)
 
-  axiom two_bv : two  = from_bv (BV64.of_uint 0x4000_0000_0000_0000)
-  axiom half_bv: half = from_bv (BV64.of_uint 0x3FE0_0000_0000_0000)
+  (* axiom two_bv : two  = from_bv (BV64.of_uint 0x4000_0000_0000_0000) *)
+  (* axiom half_bv: half = from_bv (BV64.of_uint 0x3FE0_0000_0000_0000) *)
 
   use import real.Real
   axiom round_bound :
@@ -541,4 +548,32 @@ theory FloatConverter
       Float32.is_finite (to_float32 x)
    /\ Float32.to_real (to_float32 x) = Float32.round (Float64.to_real x)
 
+end
+
+theory Float32_BV_Converter
+  use import Float32
+
+  clone export Float_BV_Converter with
+    type t = t,
+    predicate is_finite = is_finite,
+    predicate le = le,
+    function to_real = to_real,
+    function round = round
+
+  axiom of_ubv32_to_real : forall x.
+    to_real (of_ubv32 x) = round (FromInt.from_int (BV32.to_uint x))
+end
+
+theory Float64_BV_Converter
+  use import Float64
+
+  clone export Float_BV_Converter with
+    type t = t,
+    predicate is_finite = is_finite,
+    predicate le = le,
+    function to_real = to_real,
+    function round = round
+
+  axiom of_ubv32_to_real : forall x.
+    to_real (of_ubv32 x) = FromInt.from_int (BV32.to_uint x)
 end
