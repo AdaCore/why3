@@ -1227,9 +1227,10 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
   let mask = mask_reduce mask in
   (* the arguments are pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
-  (* drop unused or empty exceptional postconditions *)
-  let xpost = Mexn.set_inter xpost effect.eff_raises in
-  let xpost = Mexn.filter (fun _ l -> l <> []) xpost in
+  (* add empty and drop unused exceptional postconditions *)
+  let xpost = Mexn.merge (fun _ x q -> match x, q with
+    | Some (), Some _  -> q | Some (), None -> Some []
+    | None, _ -> None) effect.eff_raises xpost in
   (* complete the reads and freeze the external context.
      oldies must be fresh: collisions with args and external
      reads are forbidden, to simplify instantiation later. *)
@@ -1246,13 +1247,7 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
   let xreads = Spv.diff effect.eff_reads sarg in
   let freeze = Spv.fold freeze_pv xreads isb_empty in
   check_tvs effect.eff_reads result pre post xpost;
-  (* remove exceptions whose postcondition is False.
-     For a given function definition, we ensure both
-     cty.eff_raises and cty.xpost are in e.eff_raises,
-     where every postcondition missing in cty.xpost
-     is handled in a VC-specific way (e.g. as true),
-     and every exception missing in cty.eff_raises
-     has a false postcondition in cty.xpost. *)
+  (* remove exceptions whose postcondition is False *)
   let is_false q = match open_post q with
     | _, {t_node = Tfalse} -> true | _ -> false in
   let filter _ () = function

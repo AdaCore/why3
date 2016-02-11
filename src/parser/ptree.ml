@@ -93,7 +93,7 @@ type variant = (term * qualid option) list
 
 type pre = term
 type post = Loc.position * (pattern * term) list
-type xpost = Loc.position * (qualid * pattern * term) list
+type xpost = Loc.position * (qualid * (pattern * term) option) list
 
 type spec = {
   sp_pre     : pre list;

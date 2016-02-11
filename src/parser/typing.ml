@@ -475,12 +475,15 @@ let dpost muc ql lvm old ity =
   List.map dpost ql
 
 let dxpost muc ql lvm old =
-  let add_exn (q,pat,f) m =
+  let add_exn (q,pf) m =
     let xs = find_xsymbol muc q in
-    Mexn.change (function
-      | Some l -> Some ((pat,f) :: l)
-      | None   -> Some ((pat,f) :: [])) xs m in
+    Mexn.change (fun l -> match pf, l with
+      | Some pf, Some l -> Some (pf :: l)
+      | Some pf, None   -> Some (pf :: [])
+      | None,    None   -> Some []
+      | None,    Some _ -> l) xs m in
   let mk_xpost loc xs pfl =
+    if pfl = [] then [] else
     dpost muc [loc,pfl] lvm old xs.xs_ity in
   let exn_map (loc,xpfl) =
     let m = List.fold_right add_exn xpfl Mexn.empty in

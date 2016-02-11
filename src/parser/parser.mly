@@ -827,13 +827,12 @@ ensures:
 
 raises:
 | uqualid ARROW term
-    { $1, mk_pat (Ptuple []) $startpos($1) $endpos($1), $3 }
+    { $1, Some (mk_pat (Ptuple []) $startpos($1) $endpos($1), $3) }
 | uqualid pat_arg ARROW term
-    { $1, $2, $4 }
+    { $1, Some ($2, $4) }
 
 xsymbol:
-| uqualid
-    { $1, mk_pat Pwild $startpos $endpos, mk_term Ttrue $startpos $endpos }
+| uqualid { $1, None }
 
 invariant:
 | INVARIANT LEFTBRC term RIGHTBRC { $3 }
