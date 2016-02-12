@@ -25,15 +25,17 @@ let debug = Debug.register_info_flag "vc"
 let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
 let new_of_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
-
 let new_of_pv v = new_of_vs v.pv_vs
 
-let res_of_ity ity = create_vsymbol (id_fresh "result") (ty_of_ity ity)
+(* TODO? take a string as an argument? many of these are proxies *)
+let res_of_ty ty = create_vsymbol (id_fresh "result") ty
+let res_of_ity ity = res_of_ty (ty_of_ity ity)
 
 let res_of_expr e =
   create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_ity e.e_ity)
 
-let sp_label = Ident.create_label "vc:fast_wp"
+let sp_label = Ident.create_label "vc:sp"
+let wp_label = Ident.create_label "vc:wp"
 
 (* VCgen environment *)
 
@@ -64,6 +66,8 @@ let mk_env env kn = mk_env (Env.read_theory env ["int"] "Int") kn
 let vc_label e f =
   let loc = if f.t_loc = None then e.e_loc else f.t_loc in
   let lab = Ident.Slab.union e.e_label f.t_label in
+  let lab = Ident.Slab.remove sp_label lab in
+  let lab = Ident.Slab.remove wp_label lab in
   t_label ?loc lab f
 
 let expl_pre       = Ident.create_label "expl:precondition"
@@ -164,9 +168,9 @@ let wp_and wp1 wp2 = match wp1.t_node, wp2.t_node with
 let wp_if c wp1 wp2 = match c.t_node, wp1.t_node, wp2.t_node with
   | Ttrue, _, _  when can_simp wp2 -> wp1
   | Tfalse, _, _ when can_simp wp1 -> wp2
-  | Tnot c, Ttrue, _  when can_simp wp1 -> t_implies c wp2
-  | _, Ttrue, _  when can_simp wp1 -> t_implies (t_not c) wp2
-  | _, _, Ttrue  when can_simp wp2 -> t_implies c wp1
+  | Tnot c, Ttrue, _  when can_simp wp1 -> sp_implies c wp2
+  | _, Ttrue, _  when can_simp wp1 -> sp_implies (t_not c) wp2
+  | _, _, Ttrue  when can_simp wp2 -> sp_implies c wp1
   | _, _, _ -> t_if c wp1 wp2
 
 let wp_case t bl =
@@ -387,8 +391,6 @@ let bind_oldies c f =
 
 let rec wp_expr env e res q xq = match e.e_node with
   | _ when Slab.mem sp_label e.e_label ->
-      let lab = Slab.remove sp_label e.e_label in
-      let e = e_label ?loc:e.e_loc lab e in
       let cv = e.e_effect.eff_covers in
       let reopen res q =
         let q = create_post res q in
@@ -457,6 +459,20 @@ let rec wp_expr env e res q xq = match e.e_node with
         t_close_branch pat (wp_expr env e res q xq) in
       let q = wp_case (t_var v) (List.map branch bl) in
       vc_label e (wp_expr env e0 v q xq)
+  | Etry (e0, bl) ->
+      let branch xs (vl,e) =
+        let wp = wp_expr env e res q xq in
+        match vl with
+        | [] -> res_of_ty ty_unit, wp
+        | [v] -> v.pv_vs, wp
+        | vl ->
+            let v = res_of_ity xs.xs_ity in
+            let cs = fs_tuple (List.length vl) in
+            let var v = pat_var v.pv_vs in
+            let p = pat_app cs (List.map var vl) v.vs_ty in
+            v, t_case_close (t_var v) [p, wp] in
+      let xq = Mexn.set_union (Mexn.mapi branch bl) xq in
+      vc_label e (wp_expr env e0 res q xq)
   | Eraise (xs, e0) ->
       let v, q = try Mexn.find xs xq with Not_found ->
         res_of_expr e0, t_true in
@@ -529,6 +545,31 @@ and sp_expr env e res mpv xmpv = assert (is_fresh res); match e.e_node with
       let mpv = step_back e0.e_effect.eff_covers
                     eff.eff_reads eff.eff_covers mpv in
       out_label e (sp_seq env e0 v mpv xmpv (ok,ne,ex))
+(*
+  | Etry (e0, bl) ->
+      let eff = Mexn.fold (fun _ (vl,e) acc ->
+        let eff = eff_bind (Spv.of_list vl) e.e_effect in
+        eff_union_par acc eff) xl eff_empty in
+      let aff = mpv_affected eff mpv in
+      let xaff = xmpv_affected eff xmpv in
+      let outm = Mexn.map (fun (vl,e) ->
+        let out = sp_expr env e res aff xaff in
+        let out = out_complete e.e_effect out aff xaff in
+        out_map (t_close_branch p) out) bl in
+
+
+      let branch (vl,e) =
+        let wp = wp_expr env e res q xq in
+        match vl with
+        | [] -> res_of_ity ity_unit, wp
+        | [v] -> v, wp
+        | vl ->
+            let cs = fs_tuple (List.length vl) in
+            let p = pat_app cs (List.map pat_var vl) in
+            res_of_ty p.pat_ty, t_case_close [p, wp] in
+      let xq = Mexn.set_union (Mexn.map branch bl) xq in
+      vp_label e (wp_expr env e0 res q xq)
+*)
   | Eraise (xs, e0) ->
       let v, mpv = try Mexn.find xs xmpv with Not_found ->
         res_of_expr e0, Mpv.empty in
