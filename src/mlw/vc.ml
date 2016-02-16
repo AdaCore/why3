@@ -597,7 +597,7 @@ and sp_expr env e res xres mpv = match e.e_node with
       let join sp (_,(_,ne,_)) = sp_and sp ne in
       let ne = sp_inter_mexn (adjust ne) join ex outm in
       let join sp (_,(_,_,ex)) = Mexn.map (sp_and sp) ex in
-      let ex = Mexn.fold (Util.const union_mexn)
+      let ex = Mexn.fold (fun _ x1 x2 -> union_mexn x2 x1)
         (inter_mexn join ex outm)
         (Mexn.map adjust (Mexn.set_diff ex outm)) in
       out_label e (ok, ne, ex)
