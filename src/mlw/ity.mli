@@ -291,7 +291,7 @@ val t_freepvs : Spv.t -> term -> Spv.t
 (** raises [Not_found] if the term contains a free variable
     which is not a [pv_vs] *)
 
-val pvs_of_vss : Spv.t -> Svs.t -> Spv.t
+val pvs_of_vss : Spv.t -> 'a Mvs.t -> Spv.t
 
 (** {2 Exception symbols} *)
 
