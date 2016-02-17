@@ -34,6 +34,8 @@ let res_of_ity ity = res_of_ty (ty_of_ity ity)
 let res_of_expr e =
   create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_ity e.e_ity)
 
+let vc_freepvs s v q = pvs_of_vss s (Mvs.remove v (t_freevars Mvs.empty q))
+
 let sp_label = Ident.create_label "vc:sp"
 let wp_label = Ident.create_label "vc:wp"
 
@@ -181,8 +183,13 @@ let rec push_stop lab f = match f.t_node with
 
 let sp_of_pre lab pl = t_and_l (List.map (push_stop lab) pl)
 
-let sp_of_post lab v ql = let t = t_var_or_void v in
-  let push q = push_stop lab (open_post_with t q) in
+let sp_of_post lab v ql =
+  let t = t_var_or_void v in
+  (* remove the post-condition of () *)
+  let push q = match open_post_with t q with
+    | {t_node = Tapp (ps, [_; {t_ty = Some ty}])}
+      when ls_equal ps ps_equ && ty_equal ty ty_unit -> t_true
+    | f -> push_stop lab f in
   t_and_l (List.map push ql)
 
 (* a type is affected if a modified region is reachable from it *)
@@ -398,7 +405,7 @@ let wp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} wp =
 
 let sp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} res sp dst =
   if Sreg.is_empty cv then sp else
-  let rd = t_freepvs Spv.empty (create_post res sp) in
+  let rd = vc_freepvs Spv.empty res sp in
   let dst = dst_step_back_raw cv rd Mreg.empty dst in
   if Mpv.is_empty dst then sp else
   let regs = name_regions kn cv dst in
@@ -441,16 +448,22 @@ let rec wp_expr env e res q xq = match e.e_node with
       let cv = e.e_effect.eff_covers in
       let xq = Mexn.set_inter xq e.e_effect.eff_raises in
       let dst = if Sreg.is_empty cv then Mpv.empty else
-        let pvs_of_wp s v q = pvs_of_vss s
-          (Mvs.remove v (t_freevars Mvs.empty q)) in
-        let pvs_of_xwp _ (v,q) s = pvs_of_wp s v q in
+        let pvs_of_xwp _ (v,q) s = vc_freepvs s v q in
         let pvs = Mexn.fold pvs_of_xwp xq Spv.empty in
-        dst_of_pvs cv (pvs_of_wp pvs res q) in
+        dst_of_pvs cv (vc_freepvs pvs res q) in
+      (* compute sp_expr e independently of q *)
       let ok, ne, ex = sp_expr env e res (Mexn.map fst xq) dst in
       let adv = advancement dst in
       let q = sp_wp_close res ne adv q in
-      let join cq (v,xq) = sp_wp_close v cq adv xq in
+      let join cq (v,q) = sp_wp_close v cq adv q in
       wp_and ok (wp_inter_mexn q join ex xq)
+(*    (* compute sp_expr e with q inlined into ok, so that
+         the result expression can be substituted into q *)
+      let out = q, t_true, Mexn.empty in
+      let ok,_,ex = sp_seq env e res (Mexn.map fst xq) out eff_empty dst in
+      let adv = if Mexn.is_empty ex then Mvs.empty else advancement dst in
+      wp_inter_mexn ok (fun sp (v,q) -> sp_wp_close v sp adv q) ex xq
+*)
   | Evar v ->
       t_subst_single res (vc_label e (t_var v.pv_vs)) q
   | Econst c ->
@@ -623,8 +636,8 @@ and sp_expr env e res xres dst = match e.e_node with
   | _ -> assert false (* TODO *)
 
 and sp_pred_let env e0 res xres out e1 eff dst =
-  let eff = eff_bind_single (restore_pv res) eff in
-  let eff = eff_union_seq e1.e_effect eff in
+  let eff1 = eff_bind_single (restore_pv res) e1.e_effect in
+  let eff = eff_union_seq eff1 eff in
   sp_seq env e0 res xres out eff dst
 
 and sp_pred_seq env e0 res xres out e1 eff dst =
