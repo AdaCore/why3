@@ -70,7 +70,10 @@ let register_goal goal =
          Gnat_util.abort_with_message ~internal:true
          "Task has no tracability label."
    | _, Some c ->
-       Gnat_objectives.add_to_objective c goal
+       if c.Gnat_expl.already_proved then
+         Gnat_objectives.set_not_interesting goal
+       else
+         Gnat_objectives.add_to_objective c goal
 
 let rec handle_vc_result goal result prover_result manual_info =
    (* This function is called when the prover has returned from a VC.

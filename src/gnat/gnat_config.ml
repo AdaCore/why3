@@ -120,7 +120,7 @@ let parse_line_spec s =
          let col = int_of_string col in
          let check = Gnat_expl.reason_from_string check in
          let loc = Gnat_loc.mk_loc fn line col None in
-         Limit_Check (Gnat_expl.mk_check check 0 loc)
+         Limit_Check (Gnat_expl.mk_check check 0 loc false)
      | _ ->
       Gnat_util.abort_with_message ~internal:true
       (
