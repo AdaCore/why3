@@ -876,6 +876,21 @@ ifeq (@enable_coq_support@,yes)
 
 ifeq (@enable_coq_libs@,yes)
 
+
+COQVERSIONSPECIFIC=bv/BV_Gen.v
+
+COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
+COQVERSIONSPECIFICSOURCES=$(addsuffix .@coq_compat_version@, $(COQVERSIONSPECIFICTARGETS))
+
+$(COQVERSIONSPECIFICTARGETS): $(COQVERSIONSPECIFICSOURCES)
+	for i in $(COQVERSIONSPECIFIC); do \
+		cp lib/coq/$$i.@coq_compat_version@ lib/coq/$$i ; \
+	done
+
+clean::
+	rm -f $(COQVERSIONSPECIFICTARGETS)
+
+
 COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power NumOf
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
