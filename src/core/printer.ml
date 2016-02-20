@@ -199,7 +199,7 @@ let print_prelude_of_theories th_used fmt pm =
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,_) } -> th::acc
+    | { td_node = Use th | Clone (th,_) } -> th::acc
     | _ -> acc) [] task
   in
   print_prelude_of_theories th_used fmt pm
