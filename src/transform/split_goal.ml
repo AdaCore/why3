@@ -90,7 +90,6 @@ let split_case_2 kn forig spl pos acc t bl =
 
 let stop f = Slab.mem Term.stop_split f.t_label
 let asym f = Slab.mem Term.asym_split f.t_label
-let keep f = Slab.mem Term.keep_on_simp f.t_label
 
 let unstop f =
   t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
@@ -104,7 +103,7 @@ type split = {
 
 let rec split_pos ro acc f = match f.t_node with
   | _ when ro.stop_label && stop f -> unstop f :: acc
-  | Ttrue -> if keep f then f::acc else acc
+  | Ttrue -> acc
   | Tfalse -> f::acc
   | Tapp _ -> f::acc
   | Tbinop (Tand,f1,f2) when ro.respect_as && asym f1 ->
@@ -150,7 +149,7 @@ let rec split_pos ro acc f = match f.t_node with
 and split_neg ro acc f = match f.t_node with
   | _ when ro.stop_label && stop f -> unstop f :: acc
   | Ttrue -> f::acc
-  | Tfalse -> if keep f then f::acc else acc
+  | Tfalse -> acc
   | Tapp _ -> f::acc
   | Tbinop (Tand,_,_) when ro.right_only -> f::acc
   | Tbinop (Tand,f1,f2) ->
@@ -299,7 +298,7 @@ let split_intro known_map pr f =
   let rec split_intro dl acc f =
     let rsp = split_intro dl in
     match f.t_node with
-    | Ttrue when not (keep f) -> acc
+    | Ttrue -> acc
     | Tbinop (Tand,f1,f2) when asym f1 ->
         rsp (rsp acc (t_implies f1 f2)) f1
     | Tbinop (Tand,f1,f2) ->

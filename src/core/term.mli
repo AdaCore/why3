@@ -247,8 +247,6 @@ val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
-val keep_on_simp : label
-
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
 val t_case_simp : term -> term_branch list -> term
