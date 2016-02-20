@@ -27,6 +27,9 @@ let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
 let clone_pv v = clone_vs v.pv_vs
 
+let old_of_pv {pv_vs = v; pv_ity = ity} =
+  create_pvsymbol ~ghost:true (id_clone v.vs_name) (ity_purify ity)
+
 (* TODO? take a string as an argument? many of these are proxies *)
 let res_of_ty ty = create_vsymbol (id_fresh "result") ty
 let res_of_ity ity = res_of_ty (ty_of_ity ity)
@@ -43,6 +46,7 @@ let wp_label = Ident.create_label "vc:wp"
 
 type vc_env = {
   known_map : Pdecl.known_map;
+  letrec_ps : (variant list * lsymbol option list) Mls.t;
   ps_int_le : lsymbol;
   ps_int_ge : lsymbol;
   ps_int_lt : lsymbol;
@@ -53,6 +57,7 @@ type vc_env = {
 
 let mk_env {Theory.th_export = ns} kn = {
   known_map = kn;
+  letrec_ps = Mls.empty;
   ps_int_le = Theory.ns_find_ls ns ["infix <="];
   ps_int_ge = Theory.ns_find_ls ns ["infix >="];
   ps_int_lt = Theory.ns_find_ls ns ["infix <"];
@@ -83,7 +88,7 @@ let _expl_type_inv  = Ident.create_label "expl:type invariant"
 let _expl_loop_init = Ident.create_label "expl:loop invariant init"
 let _expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let _expl_loopvar   = Ident.create_label "expl:loop variant decrease"
-let _expl_variant   = Ident.create_label "expl:variant decrease"
+let expl_variant   = Ident.create_label "expl:variant decrease"
 
 let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
   Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
@@ -161,12 +166,62 @@ let res_of_xbranch xs vl map out = match vl with
       let p = pat_app cs pl v.vs_ty and t = t_var v in
       v, map (fun f -> t_case_close t [p, f]) out
 
+(* variant decrease pre-conditions *)
+
+let decrease_alg env loc old_t t =
+  let oty = t_type old_t and nty = t_type t in
+  let quit () = Loc.errorm ?loc "no default order for %a" Pretty.print_term t in
+  let ts = match oty with {ty_node = Tyapp (ts,_)} -> ts | _ -> quit () in
+  let itd = find_its_defn env.known_map (restore_its ts) in
+  let get_cs rs = match rs.rs_logic with RLls cs -> cs | _ -> quit () in
+  let csl = List.map get_cs itd.itd_constructors in
+  if csl = [] then quit ();
+  let sbs = ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) oty in
+  let add_arg fty acc =
+    let fty = ty_inst sbs fty in
+    if ty_equal fty nty then
+      let vs = create_vsymbol (id_fresh "f") nty in
+      pat_var vs, t_or_simp (t_equ (t_var vs) t) acc
+    else pat_wild fty, acc in
+  let add_cs cs =
+    let pl, f = Lists.map_fold_right add_arg cs.ls_args t_false in
+    t_close_branch (pat_app cs pl oty) f in
+  t_case old_t (List.map add_cs csl)
+
+let decrease_def env loc old_t t =
+  if ty_equal (t_type old_t) ty_int && ty_equal (t_type t) ty_int
+  then t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
+             (ps_app env.ps_int_lt [t; old_t])
+  else decrease_alg env loc old_t t
+
+let decrease env loc olds news =
+  let rec decr olds news = match olds, news with
+    | (old_t, Some old_r)::olds, (t, Some r)::news
+      when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
+        let dt = ps_app r [t; old_t] in
+        t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
+    | (old_t, None)::olds, (t, None)::news
+      when oty_equal old_t.t_ty t.t_ty ->
+        let dt = decrease_def env loc old_t t in
+        t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
+    | (old_t, None)::_, (t, None)::_ ->
+        decrease_def env loc old_t t
+    | _ -> t_false in
+  t_label ?loc Slab.empty (decr olds news)
+
 (* convert user specifications into wp and sp *)
 
 let t_var_or_void v =
   if ty_equal v.vs_ty ty_unit then t_void else t_var v
 
-let wp_of_pre lab pl = t_and_l (List.map (vc_expl lab) pl)
+let wp_of_pre ({letrec_ps = lps} as env) loc lab = function
+  | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
+      let olds, rels = Mls.find ls lps in
+      let news = List.combine tl rels in
+      let p = decrease env loc olds news in
+      let p = vc_expl expl_variant p in
+      t_and_l (p :: List.map (vc_expl lab) pl)
+  | pl -> t_and_l (List.map (vc_expl lab) pl)
 
 let wp_of_post lab ity = function
   | q::ql ->
@@ -480,7 +535,7 @@ let rec wp_expr env e res q xq = match e.e_node with
       let join cq (v,q) = wp_close expl_xpost v cq q in
       let w = wp_inter_mexn q join (cty_xpost_real c) xq in
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
-      vc_label e (wp_and (wp_of_pre expl_pre c.cty_pre) w)
+      vc_label e (wp_and (wp_of_pre env e.e_loc expl_pre c.cty_pre) w)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -550,7 +605,7 @@ and sp_expr env e res xres dst = match e.e_node with
       let ne = sp_of_post expl_post res c.cty_post in
       let join v ql = sp_of_post expl_xpost v ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
-      out_label e (wp_of_pre expl_pre c.cty_pre, ne, ex)
+      out_label e (wp_of_pre env e.e_loc expl_pre c.cty_pre, ne, ex)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -675,22 +730,32 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let ex = union_mexn (Mexn.map adjust ex1) (Mexn.map shift ex2) in
       ok, shift ne2, ex
 
-and vc_fun env c e =
+and vc_fun env ?(olds=Mvs.empty) c e =
   let p = sp_of_pre expl_pre c.cty_pre in
   let args = List.map (fun v -> v.pv_vs) c.cty_args in
-(* TODO: let rec with variants
-  let env =
-    if c.c_letrec = 0 || c.c_variant = [] then env else
-    let lab = t_var lab in
-    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
-    let tl = List.map t_at_lab c.c_variant in
-    let lrv = Mint.add c.c_letrec tl env.letrec_var in
-    { env with letrec_var = lrv } in
-*)
   let mk_xq xs xq = wp_of_post expl_xpost xs.xs_ity xq in
   let r,q = wp_of_post expl_post c.cty_result c.cty_post in
   let w = wp_expr env e r q (Mexn.mapi mk_xq c.cty_xpost) in
-  wp_forall args (sp_implies p (bind_oldies c w))
+  wp_forall args (sp_implies p (t_subst olds (bind_oldies c w)))
+
+and vc_rec ({letrec_ps = lps} as env) rdl =
+  let vc_rd {rec_fun = c; rec_varl = varl} =
+    let e = match c.c_node with Cfun e -> e | _ -> assert false in
+    if varl = [] then vc_fun env c.c_cty e else
+    let fpv = Mpv.mapi_filter (fun v _ -> (* oldify mutable vars *)
+      if ity_immutable v.pv_ity then None else Some (old_of_pv v))
+      (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty varl) in
+    let olds = Mpv.fold (fun v o s ->
+      Mvs.add o.pv_vs (t_var v.pv_vs) s) fpv Mvs.empty in
+    let news = Mpv.fold (fun v o s ->
+      Mvs.add v.pv_vs (t_var o.pv_vs) s) fpv Mvs.empty in
+    let varl = if Mvs.is_empty news then varl else
+      List.map (fun (t,r) -> t_subst news t, r) varl in
+    let add lps rd = let decr = ls_decr_of_rec_defn rd in
+      Mls.add (Opt.get decr) (varl, List.map snd rd.rec_varl) lps in
+    let env = { env with letrec_ps = List.fold_left add lps rdl } in
+    vc_fun env ~olds c.c_cty e in
+  List.map vc_rd rdl
 
 let mk_vc_decl id f =
   let {id_string = nm; id_label = label; id_loc = loc} = id in
@@ -705,4 +770,8 @@ let vc env kn d = match d.pd_node with
       let env = mk_env env kn in
       let f = vc_fun env cty e in
       [mk_vc_decl s.rs_name f]
+  | PDlet (LDrec rdl) ->
+      let env = mk_env env kn in
+      let fl = vc_rec env rdl in
+      List.map2 (fun rd f -> mk_vc_decl rd.rec_sym.rs_name f) rdl fl
   | _ -> []
