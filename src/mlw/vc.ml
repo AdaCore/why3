@@ -80,10 +80,10 @@ let vc_label e f =
 let expl_pre       = Ident.create_label "expl:precondition"
 let expl_post      = Ident.create_label "expl:postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
-let _expl_assume    = Ident.create_label "expl:assumption"
-let _expl_assert    = Ident.create_label "expl:assertion"
-let _expl_check     = Ident.create_label "expl:check"
-let _expl_absurd    = Ident.create_label "expl:unreachable point"
+let expl_assume    = Ident.create_label "expl:assumption"
+let expl_assert    = Ident.create_label "expl:assertion"
+let expl_check     = Ident.create_label "expl:check"
+let expl_absurd    = Ident.create_label "expl:unreachable point"
 let _expl_type_inv  = Ident.create_label "expl:type invariant"
 let _expl_loop_init = Ident.create_label "expl:loop invariant init"
 let _expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
@@ -122,6 +122,11 @@ let wp_and wp1 wp2 = match wp1.t_node, wp2.t_node with
   | (Ttrue, _ | _, Tfalse) when can_simp wp1 -> wp2
   | (_, Ttrue | Tfalse, _) when can_simp wp2 -> wp1
   | _, _ -> t_and wp1 wp2
+
+let wp_and_asym wp1 wp2 = match wp1.t_node, wp2.t_node with
+  | (Ttrue, _ | _, Tfalse) when can_simp wp1 -> wp2
+  | (_, Ttrue | Tfalse, _) when can_simp wp2 -> wp1
+  | _, _ -> t_and_asym wp1 wp2
 
 let wp_if c wp1 wp2 = match c.t_node, wp1.t_node, wp2.t_node with
   | Ttrue, _, _  when can_simp wp2 -> wp1
@@ -299,12 +304,6 @@ let adjustment dst dst' =
 
 (* combine postconditions with preconditions *)
 
-let wp_close lab v ql wp =
-  wp_forall [v] (sp_implies (sp_of_post lab v ql) wp)
-
-let is_fresh v =
-  try ignore (restore_pv v); false with Not_found -> true
-
 let extract_defn v sp =
   let rec extract h = match h.t_node with
     | Tapp (ps, [{t_node = Tvar u}; t])
@@ -315,6 +314,15 @@ let extract_defn v sp =
         t, t_label_copy h (sp_and f g)
     | _ -> raise Exit in
   try Some (extract sp) with Exit -> None
+
+let wp_close lab v ql wp =
+  let sp = sp_of_post lab v ql in
+  match extract_defn v sp with
+  | Some (t, sp) -> wp_let v t (sp_implies sp wp)
+  | None ->      wp_forall [v] (sp_implies sp wp)
+
+let is_fresh v =
+  try ignore (restore_pv v); false with Not_found -> true
 
 let sp_wp_close v sp adv wp =
   let wp  = t_subst adv wp in
@@ -549,6 +557,10 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Ecase (e0, [pp, e1]) when anon_pat pp ->
       let q = wp_expr env e1 res q xq in
       vc_label e (wp_expr env e0 (res_of_expr e0) q xq)
+  | Elet (LDsym _, _) ->
+      assert false (* TODO *)
+  | Elet (LDrec _, _) ->
+      assert false (* TODO *)
 
   | Eif (e0, e1, e2) ->
       let v = res_of_expr e0 in
@@ -581,7 +593,31 @@ let rec wp_expr env e res q xq = match e.e_node with
       let v, q = try Mexn.find xs xq with Not_found ->
         res_of_expr e0, t_true in
       vc_label e (wp_expr env e0 v q xq)
-  | _ -> assert false (* TODO *)
+  | Eassert (Assert, f) ->
+      let q = t_subst_single res t_void q in
+      wp_and_asym (vc_label e (vc_expl expl_assert f)) q
+  | Eassert (Assume, f) ->
+      let q = t_subst_single res t_void q in
+      sp_implies (vc_label e (vc_expl expl_assume f)) q
+  | Eassert (Check, f) ->
+      let q = t_subst_single res t_void q in
+      wp_and (vc_label e (vc_expl expl_check f)) q
+  | Eghost e0 ->
+      vc_label e (wp_expr env e0 res q xq)
+  | Epure t ->
+      let t = vc_label e t in
+      begin match t.t_ty with
+        | Some ty when ty_equal ty ty_unit -> t_subst_single res t_void q
+        | Some _ -> wp_let res t q
+        | None ->
+            let f = t_iff_simp (t_equ (t_var res) t_bool_true) t in
+            wp_forall [res] (sp_implies f q)
+      end
+  | Eabsurd ->
+      vc_label e (vc_expl expl_absurd t_false)
+  | Eassign _ -> assert false (* TODO *)
+  | Ewhile _ -> assert false (* TODO *)
+  | Efor _ -> assert false (* TODO *)
 
 and sp_expr env e res xres dst = match e.e_node with
   | Evar v ->
@@ -621,7 +657,10 @@ and sp_expr env e res xres dst = match e.e_node with
       let v = res_of_expr e0 in
       let out = sp_expr env e1 res xres dst in
       out_label e (sp_pred_seq env e0 v xres out e1 eff_empty dst)
-
+  | Elet (LDsym _, _) ->
+      assert false (* TODO *)
+  | Elet (LDrec _, _) ->
+      assert false (* TODO *)
 
   | Eif (e0, e1, e2) ->
       let eff = eff_union_par e1.e_effect e2.e_effect in
@@ -688,7 +727,28 @@ and sp_expr env e res xres dst = match e.e_node with
       let ok, ne, ex = sp_expr env e0 v xres dst in
       let ex = union_mexn ex (Mexn.singleton xs ne) in
       out_label e (ok, t_false, ex)
-  | _ -> assert false (* TODO *)
+  | Eassert (Assert, f) ->
+      let ok = vc_label e (vc_expl expl_assert f) in
+      ok, ok, Mexn.empty
+  | Eassert (Assume, f) ->
+      t_true, vc_label e (vc_expl expl_assume f), Mexn.empty
+  | Eassert (Check, f) ->
+      vc_label e (vc_expl expl_check f), t_true, Mexn.empty
+  | Eghost e0 ->
+      out_label e (sp_expr env e0 res xres dst)
+  | Epure t ->
+      let t = vc_label e t in
+      let ne = match t.t_ty with
+        | Some ty when ty_equal ty ty_unit -> t_true
+        | Some _ -> t_equ (t_var res) t
+        | None -> t_iff_simp (t_equ (t_var res) t_bool_true) t in
+      t_true, ne, Mexn.empty
+  | Eabsurd ->
+      let ok = vc_label e (vc_expl expl_absurd t_false) in
+      ok, ok, Mexn.empty
+  | Eassign _ -> assert false (* TODO *)
+  | Ewhile _ -> assert false (* TODO *)
+  | Efor _ -> assert false (* TODO *)
 
 and sp_pred_let env e0 res xres out e1 eff dst =
   let eff1 = eff_bind_single (restore_pv res) e1.e_effect in
