@@ -85,9 +85,9 @@ let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
 let expl_absurd    = Ident.create_label "expl:unreachable point"
 let _expl_type_inv  = Ident.create_label "expl:type invariant"
-let _expl_loop_init = Ident.create_label "expl:loop invariant init"
-let _expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
-let _expl_loopvar   = Ident.create_label "expl:loop variant decrease"
+let expl_loop_init = Ident.create_label "expl:loop invariant init"
+let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
+let expl_loop_vari = Ident.create_label "expl:loop variant decrease"
 let expl_variant   = Ident.create_label "expl:variant decrease"
 
 let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
@@ -199,7 +199,7 @@ let decrease_def env loc old_t t =
              (ps_app env.ps_int_lt [t; old_t])
   else decrease_alg env loc old_t t
 
-let decrease env loc olds news =
+let decrease env loc lab olds news =
   let rec decr olds news = match olds, news with
     | (old_t, Some old_r)::olds, (t, Some r)::news
       when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
@@ -212,7 +212,19 @@ let decrease env loc olds news =
     | (old_t, None)::_, (t, None)::_ ->
         decrease_def env loc old_t t
     | _ -> t_false in
-  t_label ?loc Slab.empty (decr olds news)
+  vc_expl lab (t_label ?loc Slab.empty (decr olds news))
+
+let oldify_variant varl =
+  if varl = [] then Mvs.empty, varl else
+  let fpv = Mpv.mapi_filter (fun v _ -> (* oldify mutable vars *)
+    if ity_immutable v.pv_ity then None else Some (old_of_pv v))
+    (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty varl) in
+  if Mpv.is_empty fpv then Mvs.empty, varl else
+  let o2n = Mpv.fold (fun v o s ->
+    Mvs.add o.pv_vs (t_var v.pv_vs) s) fpv Mvs.empty in
+  let n2o = Mpv.fold (fun v o s ->
+    Mvs.add v.pv_vs (t_var o.pv_vs) s) fpv Mvs.empty in
+  o2n, List.map (fun (t,r) -> t_subst n2o t, r) varl
 
 (* convert user specifications into wp and sp *)
 
@@ -223,8 +235,7 @@ let wp_of_pre ({letrec_ps = lps} as env) loc lab = function
   | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
       let olds, rels = Mls.find ls lps in
       let news = List.combine tl rels in
-      let p = decrease env loc olds news in
-      let p = vc_expl expl_variant p in
+      let p = decrease env loc expl_variant olds news in
       t_and_l (p :: List.map (vc_expl lab) pl)
   | pl -> t_and_l (List.map (vc_expl lab) pl)
 
@@ -497,6 +508,10 @@ let out_complete eff (ok, ne, ex) xres dst =
     | None, Some _ -> Some t_false | _, None -> None in
   ok, sp_complete eff ne dst, Mexn.merge join ex xres
 
+let sp_adjust eff dst dst' =
+  let adj = adjustment dst dst' in
+  fun sp -> sp_complete eff (t_subst adj sp) dst'
+
 (* classical WP / fast WP *)
 
 let anon_pat pp = Svs.is_empty pp.pp_pat.pat_vars
@@ -615,9 +630,26 @@ let rec wp_expr env e res q xq = match e.e_node with
       end
   | Eabsurd ->
       vc_label e (vc_expl expl_absurd t_false)
-  | Eassign _ -> assert false (* TODO *)
-  | Ewhile _ -> assert false (* TODO *)
-  | Efor _ -> assert false (* TODO *)
+  | Eassign _ ->
+      let _q = t_subst_single res t_void q in
+      assert false (* TODO *)
+  | Ewhile (e0, invl, varl, e1) ->
+      let v = res_of_expr e0 in
+      let q = t_subst_single res t_void q in
+      let init = wp_of_pre env e.e_loc expl_loop_init invl in
+      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+      let o2n, keep = if varl = [] then Mvs.empty, keep else
+        let o2n, olds = oldify_variant varl in
+        let d = decrease env e.e_loc expl_loop_vari olds varl in
+        o2n, wp_and keep d in
+      let w_in = wp_expr env e1 (res_of_expr e1) keep xq in
+      let w = wp_if (t_equ (t_var v) t_bool_true) w_in q in
+      let w = sp_implies init (wp_expr env e0 v w xq) in
+      let w = wp_havoc env e.e_effect (t_subst o2n w) in
+      vc_label e (wp_and init w)
+  | Efor _ ->
+      let _q = t_subst_single res t_void q in
+      assert false (* TODO *)
 
 and sp_expr env e res xres dst = match e.e_node with
   | Evar v ->
@@ -710,11 +742,10 @@ and sp_expr env e res xres dst = match e.e_node with
       let xres = Mexn.set_union (Mexn.map fst outm) xres in
       let dst = dst_step_back e0.e_effect eff dst in
       let ok, ne, ex = sp_expr env e0 res xres dst in
-      let adv = if Mexn.is_empty outm then Mvs.empty else advancement dst in
+      let adv = advancement dst in
       let join sp (v,(ok,_,_)) = sp_wp_close v sp adv ok in
       let ok = wp_inter_mexn ok join ex outm in
-      let adj = adjustment dst dst' in
-      let adjust sp = sp_complete e0.e_effect (t_subst adj sp) dst' in
+      let adjust = sp_adjust e0.e_effect dst dst' in
       let join sp (v,(_,ne,_)) = sp_sp_close v sp adv ne in
       let ne = sp_inter_mexn (adjust ne) join ex outm in
       let join sp (v,(_,_,ex)) = Mexn.map (sp_sp_close v sp adv) ex in
@@ -747,7 +778,29 @@ and sp_expr env e res xres dst = match e.e_node with
       let ok = vc_label e (vc_expl expl_absurd t_false) in
       ok, ok, Mexn.empty
   | Eassign _ -> assert false (* TODO *)
-  | Ewhile _ -> assert false (* TODO *)
+  | Ewhile (e0, invl, varl, e1) ->
+      let v = res_of_expr e0 and z = res_of_expr e1 in
+      let init = wp_of_pre env e.e_loc expl_loop_init invl in
+      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+      let o2n, keep = if varl = [] then Mvs.empty, keep else
+        let o2n, olds = oldify_variant varl in
+        let d = decrease env e.e_loc expl_loop_vari olds varl in
+        o2n, wp_and keep d in
+      let out = keep, t_false, Mexn.empty in
+      let dst = dst_affected e.e_effect dst in
+      let eff = eff_read (t_freepvs Spv.empty keep) in
+      let ok, _, ex = sp_seq env e1 z xres out eff dst in
+      let test = t_equ (t_var v) t_bool_true in
+      let out = sp_implies test ok, t_not test, Mexn.map (sp_and test) ex in
+      let ok, ne, ex = sp_pred_seq env e0 v xres out e1 eff dst in
+      let dst0 = dst_step_back e0.e_effect e1.e_effect dst in
+      let ne = sp_adjust e0.e_effect dst0 dst ne in
+      let dst = dst_step_back e.e_effect e.e_effect dst in
+      let hav = sp_havoc env e.e_effect z init dst in
+      let adv = advancement dst in
+      let close sp = sp_sp_close z hav adv sp in
+      let ok = sp_wp_close z hav adv (t_subst o2n ok) in
+      out_label e (wp_and init ok, close ne, Mexn.map close ex)
   | Efor _ -> assert false (* TODO *)
 
 and sp_pred_let env e0 res xres out e1 eff dst =
@@ -784,11 +837,9 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let adv = advancement dst in
       let ok = wp_and ok1 (sp_wp_close res ne1 adv ok2) in
       let shift sp = sp_sp_close res ne1 adv sp in
-      let adj =
-        if Mexn.is_empty ex1 then Mvs.empty else adjustment dst dst' in
-      let adjust sp = sp_complete e.e_effect (t_subst adj sp) dst' in
-      let ex = union_mexn (Mexn.map adjust ex1) (Mexn.map shift ex2) in
-      ok, shift ne2, ex
+      let ex1 = if Mexn.is_empty ex1 then ex1 else
+        Mexn.map (sp_adjust e.e_effect dst dst') ex1 in
+      ok, shift ne2, union_mexn ex1 (Mexn.map shift ex2)
 
 and vc_fun env vc_wp c e =
   let p = sp_of_pre expl_pre c.cty_pre in
@@ -804,19 +855,11 @@ and vc_rec ({letrec_ps = lps} as env) vc_wp rdl =
   let vc_rd {rec_fun = c; rec_varl = varl} =
     let e = match c.c_node with Cfun e -> e | _ -> assert false in
     if varl = [] then vc_fun env vc_wp c.c_cty e else
-    let fpv = Mpv.mapi_filter (fun v _ -> (* oldify mutable vars *)
-      if ity_immutable v.pv_ity then None else Some (old_of_pv v))
-      (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty varl) in
-    let olds = Mpv.fold (fun v o s ->
-      Mvs.add o.pv_vs (t_var v.pv_vs) s) fpv Mvs.empty in
-    let news = Mpv.fold (fun v o s ->
-      Mvs.add v.pv_vs (t_var o.pv_vs) s) fpv Mvs.empty in
-    let varl = if Mvs.is_empty news then varl else
-      List.map (fun (t,r) -> t_subst news t, r) varl in
+    let o2n, varl = oldify_variant varl in
     let add lps rd = let decr = ls_decr_of_rec_defn rd in
       Mls.add (Opt.get decr) (varl, List.map snd rd.rec_varl) lps in
     let env = { env with letrec_ps = List.fold_left add lps rdl } in
-    t_subst olds (vc_fun env vc_wp c.c_cty e) in
+    t_subst o2n (vc_fun env vc_wp c.c_cty e) in
   List.map vc_rd rdl
 
 let mk_vc_decl id f =
