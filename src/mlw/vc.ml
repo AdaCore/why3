@@ -84,11 +84,11 @@ let expl_assume    = Ident.create_label "expl:assumption"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
 let expl_absurd    = Ident.create_label "expl:unreachable point"
-let _expl_type_inv  = Ident.create_label "expl:type invariant"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let expl_loop_vari = Ident.create_label "expl:loop variant decrease"
 let expl_variant   = Ident.create_label "expl:variant decrease"
+let _expl_type_inv  = Ident.create_label "expl:type invariant"
 
 let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
   Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
@@ -521,6 +521,15 @@ let bind_oldies c f =
     Mvs.add o (t_var v) s) c.cty_oldies Mvs.empty in
   t_subst sbs f
 
+let get_for_ops env d =
+  let t_one = t_nat_const 1 in
+  let gt, le, pl = match d with
+    | To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
+    | DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn in
+  (fun i j -> ps_app gt [t_var i; t_var j]),
+  (fun i j -> ps_app le [t_var i; t_var j]),
+  (fun i   -> fs_app pl [t_var i; t_one] ty_int)
+
 let rec wp_expr env e res q xq = match e.e_node with
   | _ when Slab.mem sp_label e.e_label ->
       let cv = e.e_effect.eff_covers in
@@ -642,14 +651,31 @@ let rec wp_expr env e res q xq = match e.e_node with
         let o2n, olds = oldify_variant varl in
         let d = decrease env e.e_loc expl_loop_vari olds varl in
         o2n, wp_and keep d in
-      let w_in = wp_expr env e1 (res_of_expr e1) keep xq in
-      let w = wp_if (t_equ (t_var v) t_bool_true) w_in q in
+      let w = wp_expr env e1 (res_of_expr e1) keep xq in
+      let w = wp_if (t_equ (t_var v) t_bool_true) w q in
       let w = sp_implies init (wp_expr env e0 v w xq) in
       let w = wp_havoc env e.e_effect (t_subst o2n w) in
       vc_label e (wp_and init w)
-  | Efor _ ->
-      let _q = t_subst_single res t_void q in
-      assert false (* TODO *)
+  | Efor ({pv_vs = x}, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
+      (* wp(for x = a to b do inv { I(x) } e1, Q, R) =
+             a > b  -> Q
+         and a <= b ->     I(a)
+                       and forall S. forall x. a <= x <= b ->
+                                               I(x) -> wp(e1, I(x+1), R)
+                                     and I(b+1) -> Q *)
+      let q = t_subst_single res t_void q in
+      let prev = wp_of_pre env e.e_loc expl_loop_init invl in
+      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+      let t_gt, t_le, t_incr = get_for_ops env d in
+      let init = t_subst_single x (t_var a)  prev in
+      let keep = t_subst_single x (t_incr x) keep in
+      let last = t_subst_single x (t_incr b) prev in
+      let p = sp_and (t_le a x) (t_le x b) in
+      let w = wp_expr env e1 (res_of_expr e1) keep xq in
+      let w = wp_forall [x] (sp_implies p (sp_implies prev w)) in
+      let w = wp_havoc env e.e_effect (wp_and w (sp_implies last q)) in
+      let w = sp_implies (t_le a b) (wp_and init w) in
+      vc_label e (wp_and (sp_implies (t_gt a b) q) w)
 
 and sp_expr env e res xres dst = match e.e_node with
   | Evar v ->
@@ -779,7 +805,7 @@ and sp_expr env e res xres dst = match e.e_node with
       ok, ok, Mexn.empty
   | Eassign _ -> assert false (* TODO *)
   | Ewhile (e0, invl, varl, e1) ->
-      let v = res_of_expr e0 and z = res_of_expr e1 in
+      let v = res_of_expr e0 in
       let init = wp_of_pre env e.e_loc expl_loop_init invl in
       let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
       let o2n, keep = if varl = [] then Mvs.empty, keep else
@@ -789,19 +815,48 @@ and sp_expr env e res xres dst = match e.e_node with
       let out = keep, t_false, Mexn.empty in
       let dst = dst_affected e.e_effect dst in
       let eff = eff_read (t_freepvs Spv.empty keep) in
-      let ok, _, ex = sp_seq env e1 z xres out eff dst in
+      let ok, _, ex = sp_seq env e1 res xres out eff dst in
       let test = t_equ (t_var v) t_bool_true in
       let out = sp_implies test ok, t_not test, Mexn.map (sp_and test) ex in
       let ok, ne, ex = sp_pred_seq env e0 v xres out e1 eff dst in
       let dst0 = dst_step_back e0.e_effect e1.e_effect dst in
       let ne = sp_adjust e0.e_effect dst0 dst ne in
       let dst = dst_step_back e.e_effect e.e_effect dst in
-      let hav = sp_havoc env e.e_effect z init dst in
+      let hav = sp_havoc env e.e_effect res init dst in
       let adv = advancement dst in
-      let close sp = sp_sp_close z hav adv sp in
-      let ok = sp_wp_close z hav adv (t_subst o2n ok) in
+      let close sp = sp_sp_close res hav adv sp in
+      let ok = sp_wp_close res hav adv (t_subst o2n ok) in
       out_label e (wp_and init ok, close ne, Mexn.map close ex)
-  | Efor _ -> assert false (* TODO *)
+  | Efor ({pv_vs = x}, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
+      (* wp(for x = a to b do inv { I(x) } e1, Q, R) =
+             a > b  -> Q
+         and a <= b ->     I(a)
+                       and forall S. forall x. a <= x <= b ->
+                                               I(x) -> wp(e1, I(x+1), R)
+                                     and I(b+1) -> Q *)
+      let prev = wp_of_pre env e.e_loc expl_loop_init invl in
+      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+      let t_gt, t_le, t_incr = get_for_ops env d in
+      let init = t_subst_single x (t_var a)  prev in
+      let keep = t_subst_single x (t_incr x) keep in
+      let last = t_subst_single x (t_incr b) prev in
+      let p = sp_and (t_le a x) (t_le x b) in
+      let out = keep, t_false, Mexn.empty in
+      let dst = dst_affected e.e_effect dst in
+      let eff = eff_read (t_freepvs Spv.empty keep) in
+      let ok, _, ex = sp_seq env e1 res xres out eff dst in
+      let ok = wp_forall [x] (sp_implies p (sp_implies prev ok)) in
+      let ex = Mexn.map (fun sp -> sp_and p (sp_and prev sp)) ex in
+      let ne0 = sp_complete eff_empty (t_gt a b) dst in
+      let ne1 = sp_havoc env e.e_effect res last dst in
+      let ne = sp_or ne0 (sp_and (t_le a b) ne1) in
+      let dst = dst_step_back e.e_effect e.e_effect dst in
+      let hav = sp_havoc env e.e_effect res t_true dst in
+      let adv = advancement dst in
+      let ok = sp_wp_close res hav adv ok in
+      let ok = sp_implies (t_le a b) (wp_and init ok) in
+      let close sp = sp_sp_close res hav adv sp in
+      out_label e (ok, ne, Mexn.map close ex)
 
 and sp_pred_let env e0 res xres out e1 eff dst =
   let eff1 = eff_bind_single (restore_pv res) e1.e_effect in
