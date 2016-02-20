@@ -790,18 +790,20 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let ex = union_mexn (Mexn.map adjust ex1) (Mexn.map shift ex2) in
       ok, shift ne2, ex
 
-and vc_fun env ?(olds=Mvs.empty) c e =
+and vc_fun env vc_wp c e =
   let p = sp_of_pre expl_pre c.cty_pre in
   let args = List.map (fun v -> v.pv_vs) c.cty_args in
   let mk_xq xs xq = wp_of_post expl_xpost xs.xs_ity xq in
   let r,q = wp_of_post expl_post c.cty_result c.cty_post in
+  let e = if vc_wp || Slab.mem wp_label e.e_label
+          then e else e_label_add sp_label e in
   let w = wp_expr env e r q (Mexn.mapi mk_xq c.cty_xpost) in
-  wp_forall args (sp_implies p (t_subst olds (bind_oldies c w)))
+  wp_forall args (sp_implies p (bind_oldies c w))
 
-and vc_rec ({letrec_ps = lps} as env) rdl =
+and vc_rec ({letrec_ps = lps} as env) vc_wp rdl =
   let vc_rd {rec_fun = c; rec_varl = varl} =
     let e = match c.c_node with Cfun e -> e | _ -> assert false in
-    if varl = [] then vc_fun env c.c_cty e else
+    if varl = [] then vc_fun env vc_wp c.c_cty e else
     let fpv = Mpv.mapi_filter (fun v _ -> (* oldify mutable vars *)
       if ity_immutable v.pv_ity then None else Some (old_of_pv v))
       (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty varl) in
@@ -814,7 +816,7 @@ and vc_rec ({letrec_ps = lps} as env) rdl =
     let add lps rd = let decr = ls_decr_of_rec_defn rd in
       Mls.add (Opt.get decr) (varl, List.map snd rd.rec_varl) lps in
     let env = { env with letrec_ps = List.fold_left add lps rdl } in
-    vc_fun env ~olds c.c_cty e in
+    t_subst olds (vc_fun env vc_wp c.c_cty e) in
   List.map vc_rd rdl
 
 let mk_vc_decl id f =
@@ -828,10 +830,10 @@ let mk_vc_decl id f =
 let vc env kn d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn in
-      let f = vc_fun env cty e in
+      let f = vc_fun env true cty e in
       [mk_vc_decl s.rs_name f]
   | PDlet (LDrec rdl) ->
       let env = mk_env env kn in
-      let fl = vc_rec env rdl in
+      let fl = vc_rec env true rdl in
       List.map2 (fun rd f -> mk_vc_decl rd.rec_sym.rs_name f) rdl fl
   | _ -> []
