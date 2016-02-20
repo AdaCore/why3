@@ -22,6 +22,9 @@ open Pdecl
 let debug = Debug.register_info_flag "vc"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
 
+let debug_sp = Debug.register_info_flag "vc_sp"
+  ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
+
 let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
 let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
@@ -896,7 +899,7 @@ and sp_seq env e res xres out eff dst = match e.e_node with
         Mexn.map (sp_adjust e.e_effect dst dst') ex1 in
       ok, shift ne2, union_mexn ex1 (Mexn.map shift ex2)
 
-and vc_fun env vc_wp c e =
+and vc_fun env ?(o2n=Mvs.empty) vc_wp c e =
   let p = sp_of_pre expl_pre c.cty_pre in
   let args = List.map (fun v -> v.pv_vs) c.cty_args in
   let mk_xq xs xq = wp_of_post expl_xpost xs.xs_ity xq in
@@ -904,7 +907,7 @@ and vc_fun env vc_wp c e =
   let e = if vc_wp || Slab.mem wp_label e.e_label
           then e else e_label_add sp_label e in
   let w = wp_expr env e r q (Mexn.mapi mk_xq c.cty_xpost) in
-  wp_forall args (sp_implies p (bind_oldies c w))
+  wp_forall args (sp_implies p (t_subst o2n (bind_oldies c w)))
 
 and vc_rec ({letrec_ps = lps} as env) vc_wp rdl =
   let vc_rd {rec_fun = c; rec_varl = varl} =
@@ -914,7 +917,7 @@ and vc_rec ({letrec_ps = lps} as env) vc_wp rdl =
     let add lps rd = let decr = ls_decr_of_rec_defn rd in
       Mls.add (Opt.get decr) (varl, List.map snd rd.rec_varl) lps in
     let env = { env with letrec_ps = List.fold_left add lps rdl } in
-    t_subst o2n (vc_fun env vc_wp c.c_cty e) in
+    vc_fun env ~o2n vc_wp c.c_cty e in
   List.map vc_rd rdl
 
 let mk_vc_decl id f =
@@ -928,10 +931,10 @@ let mk_vc_decl id f =
 let vc env kn d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn in
-      let f = vc_fun env true cty e in
+      let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       [mk_vc_decl s.rs_name f]
   | PDlet (LDrec rdl) ->
       let env = mk_env env kn in
-      let fl = vc_rec env true rdl in
+      let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
       List.map2 (fun rd f -> mk_vc_decl rd.rec_sym.rs_name f) rdl fl
   | _ -> []
