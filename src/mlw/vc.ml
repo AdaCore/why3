@@ -763,11 +763,10 @@ and sp_expr env e res xres dst = match e.e_node with
         eff_union_par acc eff) xl eff_empty in
       let xres' = Mexn.set_inter xres eff.eff_raises in
       let dst' = dst_affected eff dst in
-      let branch xs (vl,e) =
+      let outm = Mexn.mapi (fun xs (vl,e) ->
         let out = sp_expr env e res xres' dst' in
         let out = out_complete e.e_effect out xres' dst' in
-        res_of_xbranch xs vl out_map out in
-      let outm = Mexn.mapi branch xl in
+        res_of_xbranch xs vl out_map out) xl in
       let xres = Mexn.set_union (Mexn.map fst outm) xres in
       let dst = dst_step_back e0.e_effect eff dst in
       let ok, ne, ex = sp_expr env e0 res xres dst in
@@ -809,27 +808,36 @@ and sp_expr env e res xres dst = match e.e_node with
   | Eassign _ -> assert false (* TODO *)
   | Ewhile (e0, invl, varl, e1) ->
       let v = res_of_expr e0 in
+      let test = t_equ (t_var v) t_bool_true in
       let init = wp_of_pre env e.e_loc expl_loop_init invl in
       let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
       let o2n, keep = if varl = [] then Mvs.empty, keep else
         let o2n, olds = oldify_variant varl in
         let d = decrease env e.e_loc expl_loop_vari olds varl in
         o2n, wp_and keep d in
+      (* ok: init /\ !! init -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> keep)))
+         ne:         !! init /\         (ne0 /\ !test)
+         ex:         !! init /\ (ex0 \/ (ne0 /\  test /\ ex1)) *)
       let out = keep, t_false, Mexn.empty in
       let dst = dst_affected e.e_effect dst in
       let eff = eff_read (t_freepvs Spv.empty keep) in
       let ok, _, ex = sp_seq env e1 res xres out eff dst in
-      let test = t_equ (t_var v) t_bool_true in
       let out = sp_implies test ok, t_not test, Mexn.map (sp_and test) ex in
-      let ok, ne, ex = sp_pred_seq env e0 v xres out e1 eff dst in
-      let dst0 = dst_step_back e0.e_effect e1.e_effect dst in
-      let ne = sp_adjust e0.e_effect dst0 dst ne in
+      let eff1 = eff_union_seq e1.e_effect eff in
+      let dst1 = dst_step_back e0.e_effect eff1 dst in
+      let ok, ne, ex = sp_seq env e0 v xres out eff_empty dst1 in
+      (* we pretend that ne(e0) happened right before dst *)
+      let ne = t_subst (adjustment dst1 dst) ne in
+      let dst0 = dst_step_back e.e_effect e0.e_effect dst in
+      let hav0 = sp_havoc env e.e_effect res init dst0 in
+      let ne = sp_sp_close res hav0 (advancement dst0) ne in
+      (* ok(e0) and ex(e0) do not need to be adjusted *)
       let dst = dst_step_back e.e_effect e.e_effect dst in
       let hav = sp_havoc env e.e_effect res init dst in
       let adv = advancement dst in
       let close sp = sp_sp_close res hav adv sp in
       let ok = sp_wp_close res hav adv (t_subst o2n ok) in
-      out_label e (wp_and init ok, close ne, Mexn.map close ex)
+      out_label e (wp_and init ok, ne, Mexn.map close ex)
   | Efor ({pv_vs = x}, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
       (* wp(for x = a to b do inv { I(x) } e1, Q, R) =
              a > b  -> Q
