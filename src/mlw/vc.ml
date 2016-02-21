@@ -524,14 +524,28 @@ let bind_oldies c f =
     Mvs.add o (t_var v) s) c.cty_oldies Mvs.empty in
   t_subst sbs f
 
-let get_for_ops env d =
-  let t_one = t_nat_const 1 in
+let spec_while env e invl varl =
+  let init = wp_of_pre env e.e_loc expl_loop_init invl in
+  let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+  if varl = [] then init, Mvs.empty, keep else
+  let o2n, olds = oldify_variant varl in
+  let d = decrease env e.e_loc expl_loop_vari olds varl in
+  init, o2n, wp_and keep d
+
+let spec_for env e v ({pv_vs = a}, d, {pv_vs = b}) invl =
+  let one = t_nat_const 1 in
+  let i = t_var v and a = t_var a and b = t_var b in
+  let prev = wp_of_pre env e.e_loc expl_loop_init invl in
+  let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
   let gt, le, pl = match d with
     | To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
     | DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn in
-  (fun i j -> ps_app gt [t_var i; t_var j]),
-  (fun i j -> ps_app le [t_var i; t_var j]),
-  (fun i   -> fs_app pl [t_var i; t_one] ty_int)
+  let a_gt_b = ps_app gt [a;b] and a_le_b = ps_app le [a;b] in
+  let bounds = t_and (ps_app le [a;i]) (ps_app le [i;b]) in
+  let init = sp_implies a_le_b (t_subst_single v a prev) in
+  let keep = t_subst_single v (fs_app pl [i;one] ty_int) keep in
+  let last = t_subst_single v (fs_app pl [b;one] ty_int) prev in
+  a_gt_b, init, sp_and bounds prev, keep, sp_and a_le_b last
 
 let rec wp_expr env e res q xq = match e.e_node with
   | _ when Slab.mem sp_label e.e_label ->
@@ -646,39 +660,28 @@ let rec wp_expr env e res q xq = match e.e_node with
       let _q = t_subst_single res t_void q in
       assert false (* TODO *)
   | Ewhile (e0, invl, varl, e1) ->
+      (* wp(while e0 inv I var V do e1 done, Q, R) =
+         I and forall S. I ->
+                 wp(e0, (if result then wp(e1, I /\ decr(V), R) else Q), R) *)
       let v = res_of_expr e0 in
       let q = t_subst_single res t_void q in
-      let init = wp_of_pre env e.e_loc expl_loop_init invl in
-      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
-      let o2n, keep = if varl = [] then Mvs.empty, keep else
-        let o2n, olds = oldify_variant varl in
-        let d = decrease env e.e_loc expl_loop_vari olds varl in
-        o2n, wp_and keep d in
-      let w = wp_expr env e1 (res_of_expr e1) keep xq in
+      let init, o2n, keep = spec_while env e invl varl in
+      let w = wp_expr env e1 res keep xq in
       let w = wp_if (t_equ (t_var v) t_bool_true) w q in
       let w = sp_implies init (wp_expr env e0 v w xq) in
       let w = wp_havoc env e.e_effect (t_subst o2n w) in
       vc_label e (wp_and init w)
-  | Efor ({pv_vs = x}, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
-      (* wp(for x = a to b do inv { I(x) } e1, Q, R) =
+  | Efor ({pv_vs = v}, bounds, invl, e1) ->
+      (* wp(for v = a to b inv I(v) do e1 done, Q, R) =
              a > b  -> Q
-         and a <= b ->     I(a)
-                       and forall S. forall x. a <= x <= b ->
-                                               I(x) -> wp(e1, I(x+1), R)
-                                     and I(b+1) -> Q *)
+         and a <= b -> I(a)
+         and forall S. forall v. a <= v <= b /\ I(v) -> wp(e1, I(v+1), R)
+                   and a <= b /\ I(b+1) -> Q *)
       let q = t_subst_single res t_void q in
-      let prev = wp_of_pre env e.e_loc expl_loop_init invl in
-      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
-      let t_gt, t_le, t_incr = get_for_ops env d in
-      let init = t_subst_single x (t_var a)  prev in
-      let keep = t_subst_single x (t_incr x) keep in
-      let last = t_subst_single x (t_incr b) prev in
-      let p = sp_and (t_le a x) (t_le x b) in
-      let w = wp_expr env e1 (res_of_expr e1) keep xq in
-      let w = wp_forall [x] (sp_implies p (sp_implies prev w)) in
+      let a_gt_b, init, prev, keep, last = spec_for env e v bounds invl in
+      let w = wp_forall [v] (sp_implies prev (wp_expr env e1 res keep xq)) in
       let w = wp_havoc env e.e_effect (wp_and w (sp_implies last q)) in
-      let w = sp_implies (t_le a b) (wp_and init w) in
-      vc_label e (wp_and (sp_implies (t_gt a b) q) w)
+      vc_label e (wp_and (sp_implies a_gt_b q) (wp_and init w))
 
 and sp_expr env e res xres dst = match e.e_node with
   | Evar v ->
@@ -807,67 +810,71 @@ and sp_expr env e res xres dst = match e.e_node with
       ok, ok, Mexn.empty
   | Eassign _ -> assert false (* TODO *)
   | Ewhile (e0, invl, varl, e1) ->
+      (* ok: I /\ !! I -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> I /\ V)))
+         ne:      !! I /\         (ne0 /\ !test)
+         ex:      !! I /\ (ex0 \/ (ne0 /\  test /\ ex1)) *)
       let v = res_of_expr e0 in
       let test = t_equ (t_var v) t_bool_true in
-      let init = wp_of_pre env e.e_loc expl_loop_init invl in
-      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
-      let o2n, keep = if varl = [] then Mvs.empty, keep else
-        let o2n, olds = oldify_variant varl in
-        let d = decrease env e.e_loc expl_loop_vari olds varl in
-        o2n, wp_and keep d in
-      (* ok: init /\ !! init -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> keep)))
-         ne:         !! init /\         (ne0 /\ !test)
-         ex:         !! init /\ (ex0 \/ (ne0 /\  test /\ ex1)) *)
+      let init, o2n, keep = spec_while env e invl varl in
       let out = keep, t_false, Mexn.empty in
       let dst = dst_affected e.e_effect dst in
       let eff = eff_read (t_freepvs Spv.empty keep) in
+      let dst1 = dst_step_back e1.e_effect eff dst in
+      let ne = sp_complete eff_empty (t_not test) dst1 in
       let ok, _, ex = sp_seq env e1 res xres out eff dst in
-      let out = sp_implies test ok, t_not test, Mexn.map (sp_and test) ex in
-      let eff1 = eff_union_seq e1.e_effect eff in
-      let dst1 = dst_step_back e0.e_effect eff1 dst in
-      let ok, ne, ex = sp_seq env e0 v xres out eff_empty dst1 in
-      (* we pretend that ne(e0) happened right before dst *)
-      let ne = t_subst (adjustment dst1 dst) ne in
-      let dst0 = dst_step_back e.e_effect e0.e_effect dst in
-      let hav0 = sp_havoc env e.e_effect res init dst0 in
-      let ne = sp_sp_close res hav0 (advancement dst0) ne in
-      (* ok(e0) and ex(e0) do not need to be adjusted *)
-      let dst = dst_step_back e.e_effect e.e_effect dst in
-      let hav = sp_havoc env e.e_effect res init dst in
-      let adv = advancement dst in
-      let close sp = sp_sp_close res hav adv sp in
+      let out = sp_implies test ok, ne, Mexn.map (sp_and test) ex in
+      let ok, ne, ex = sp_pred_seq env e0 v xres out e1 eff dst in
+      let src = dst_step_back e.e_effect e.e_effect dst in
+      let hav = sp_havoc env e.e_effect res init src in
+      let adv = advancement src in
+      let ne = sp_sp_close res hav adv ne in
+      let ex = Mexn.map (sp_sp_close res hav adv) ex in
       let ok = sp_wp_close res hav adv (t_subst o2n ok) in
-      out_label e (wp_and init ok, ne, Mexn.map close ex)
-  | Efor ({pv_vs = x}, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
-      (* wp(for x = a to b do inv { I(x) } e1, Q, R) =
-             a > b  -> Q
-         and a <= b ->     I(a)
-                       and forall S. forall x. a <= x <= b ->
-                                               I(x) -> wp(e1, I(x+1), R)
-                                     and I(b+1) -> Q *)
-      let prev = wp_of_pre env e.e_loc expl_loop_init invl in
-      let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
-      let t_gt, t_le, t_incr = get_for_ops env d in
-      let init = t_subst_single x (t_var a)  prev in
-      let keep = t_subst_single x (t_incr x) keep in
-      let last = t_subst_single x (t_incr b) prev in
-      let p = sp_and (t_le a x) (t_le x b) in
+      (* right now, ne looks like this:
+           [S] havoc [S1] I /\ ne0 [S2] !test /\ dst S = S2.
+         The last part was introduced by sp_complete to make
+         postcondition !test consistent with the effect of e1.
+         To remove the noise, every equality (x = x') in ne,
+         where x in Rn dst, and x' is fresh and not in Rn dst,
+         is removed and converted into substitution [x' -> x]. *)
+      let finals = Mpv.fold (Util.const Svs.add) dst Svs.empty in
+      let locals = Mvs.set_diff (t_freevars Mvs.empty ne) finals in
+      let locals = Mvs.filter (fun v _ -> is_fresh v) locals in
+      let rec clean sbs h = match h.t_node with
+        | _ when Slab.mem stop_split h.t_label -> sbs, h
+        | Tapp (ps, [{t_node = Tvar u} as t; {t_node = Tvar v}])
+          when ls_equal ps ps_equ && Svs.mem u finals &&
+               Mvs.mem v locals && not (Mvs.mem v sbs) ->
+            Mvs.add v t sbs, t_true
+        | Tbinop (Tand, f, g) ->
+            let sbs, p = clean sbs f in let sbs, q = clean sbs g in
+            sbs, if p == f && q == g then h else t_label_copy h (sp_and p q)
+        | Tlet (t, bf) ->
+            let v, f = t_open_bound bf in let sbs, p = clean sbs f in
+            sbs, if p == f then h else t_label_copy h (wp_let v t p)
+        | _ -> sbs, h in
+      let sbs, ne = clean Mvs.empty ne in
+      out_label e (wp_and init ok, t_subst sbs ne, ex)
+  | Efor ({pv_vs = v}, bounds, invl, e1) ->
+      (* ok:    a <= b -> I(a)
+            and forall v. !! a <= v <= b /\ I(v) -> ok1 /\ (ne1 -> I(v+1))
+         ne:                    (a > b /\ S' = S) \/ (!! a <= b /\ I(b+1))
+         ex:   [exists v] !! a <= v <= b /\ I(v) /\ ex1 *)
+      let a_gt_b, init, prev, keep, last = spec_for env e v bounds invl in
       let out = keep, t_false, Mexn.empty in
       let dst = dst_affected e.e_effect dst in
       let eff = eff_read (t_freepvs Spv.empty keep) in
       let ok, _, ex = sp_seq env e1 res xres out eff dst in
-      let ok = wp_forall [x] (sp_implies p (sp_implies prev ok)) in
-      let ex = Mexn.map (fun sp -> sp_and p (sp_and prev sp)) ex in
-      let ne0 = sp_complete eff_empty (t_gt a b) dst in
+      let ne0 = sp_complete eff_empty a_gt_b dst in
       let ne1 = sp_havoc env e.e_effect res last dst in
-      let ne = sp_or ne0 (sp_and (t_le a b) ne1) in
-      let dst = dst_step_back e.e_effect e.e_effect dst in
-      let hav = sp_havoc env e.e_effect res t_true dst in
-      let adv = advancement dst in
-      let ok = sp_wp_close res hav adv ok in
-      let ok = sp_implies (t_le a b) (wp_and init ok) in
-      let close sp = sp_sp_close res hav adv sp in
-      out_label e (ok, ne, Mexn.map close ex)
+      let src = dst_step_back e.e_effect e.e_effect dst in
+      let hav = sp_havoc env e.e_effect res prev src in
+      let adv = advancement src in
+      let sbs = if Mexn.is_empty ex then Mvs.empty
+                else Mvs.singleton v (t_var (clone_vs v)) in
+      let ok = wp_forall [v] (sp_wp_close res hav adv ok) in
+      let close sp = t_subst sbs (sp_sp_close res hav adv sp) in
+      out_label e (wp_and init ok, sp_or ne0 ne1, Mexn.map close ex)
 
 and sp_pred_let env e0 res xres out e1 eff dst =
   let eff1 = eff_bind_single (restore_pv res) e1.e_effect in
@@ -902,10 +909,10 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let ok1, ne1, ex1 = sp_expr env e res xres dst in
       let adv = advancement dst in
       let ok = wp_and ok1 (sp_wp_close res ne1 adv ok2) in
-      let shift sp = sp_sp_close res ne1 adv sp in
+      let close sp = sp_sp_close res ne1 adv sp in
       let ex1 = if Mexn.is_empty ex1 then ex1 else
         Mexn.map (sp_adjust e.e_effect dst dst') ex1 in
-      ok, shift ne2, union_mexn ex1 (Mexn.map shift ex2)
+      ok, close ne2, union_mexn ex1 (Mexn.map close ex2)
 
 and vc_fun env ?(o2n=Mvs.empty) vc_wp c e =
   let p = sp_of_pre expl_pre c.cty_pre in
