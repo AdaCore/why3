@@ -38,7 +38,7 @@ module SchorrWaite
 
   (** the type of pointers and the null pointer *)
   type loc
-  constant null: loc
+  val constant null: loc
 
   val (=) (a b: loc) : bool
     ensures { result = (a = b) }
@@ -49,6 +49,9 @@ module SchorrWaite
   val c: ref (map loc bool)
   val left: ref (map loc loc)
   val right: ref (map loc loc)
+
+  (* FIXME: should we export this from map.Map? *)
+  let ([]) (m: map 'a 'b) (x: 'a) : 'b = m x
 
   val get_left (p: loc) : loc
     requires { p <> null }
