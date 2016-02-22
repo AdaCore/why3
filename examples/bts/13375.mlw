@@ -10,7 +10,7 @@ theory Signed
   predicate in_range (x : int) =
    (first <= x <= last)
 
-  function to_int (n : signed_type) : int
+  val function to_int (n : signed_type) : int
 
   function from_int (n : int) : signed_type
 

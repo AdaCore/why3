@@ -1,11 +1,11 @@
 
 theory T
 
-  namespace A
+  scope A
   goal g:true
   end
 
-  namespace B
+  scope B
   goal g:false
   end
 
@@ -18,11 +18,11 @@ module A
 
   predicate q
 
-  namespace B
+  scope B
     let f () : unit ensures { p } = ()
   end
 
-  namespace C
+  scope C
     let f () : unit ensures { q <-> p } = ()
   end
 

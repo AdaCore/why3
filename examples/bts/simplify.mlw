@@ -6,7 +6,7 @@ module M
 
   val x : ref int
 
-  let f () : int 
+  let f () : int
     ensures  { result = !x }
   = !x
 
