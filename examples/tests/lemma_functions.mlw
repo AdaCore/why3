@@ -50,7 +50,7 @@ module M
   function length (l:list 'a) : int =
     match l with
     | Nil -> 0
-    | Cons x r -> 1 + length r
+    | Cons _ r -> 1 + length r
     end
 
 
@@ -60,7 +60,7 @@ module M
   =
     match l with
     | Nil -> ()
-    | Cons x r -> lemma_length_non_neg r
+    | Cons _ r -> lemma_length_non_neg r
     end
 
 

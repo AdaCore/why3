@@ -112,13 +112,13 @@ theory BV_Gen
 
   (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
       the least significant bit *)
-  function nth t int : bool
+  val function nth t int : bool
 
-  constant zero : t
+  val constant zero : t
   axiom Nth_zero:
     forall n:int. 0 <= n < size_int -> nth zero n = False
 
-  constant ones : t
+  val constant ones : t
   axiom Nth_ones:
     forall n. 0 <= n < size_int -> nth ones n = True
 
@@ -129,27 +129,27 @@ theory BV_Gen
 
   (** Bitwise operators *)
 
-  function bw_and (v1 v2 : t) : t
+  val function bw_and (v1 v2 : t) : t
   axiom Nth_bw_and:
     forall v1 v2:t, n:int. 0 <= n < size_int ->
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
 
-  function bw_or (v1 v2 : t) : t
+  val function bw_or (v1 v2 : t) : t
   axiom Nth_bw_or:
     forall v1 v2:t, n:int. 0 <= n < size_int ->
       nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
 
-  function bw_xor (v1 v2 : t) : t
+  val function bw_xor (v1 v2 : t) : t
   axiom Nth_bw_xor:
     forall v1 v2:t, n:int. 0 <= n < size_int ->
       nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
 
-  function bw_not (v : t) : t
+  val function bw_not (v : t) : t
   axiom Nth_bw_not:
     forall v:t, n:int. 0 <= n < size_int ->
       nth (bw_not v) n = notb (nth v n)
 
-  function lsr t int : t
+  val function lsr t int : t
 
   axiom Lsr_nth_low:
     forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s < size_int ->
@@ -159,7 +159,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
       nth (lsr b s) n = False
 
-  function asr t int : t
+  val function asr t int : t
 
   axiom Asr_nth_low:
     forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n+s < size_int ->
@@ -169,7 +169,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
       nth (asr b s) n = nth b (size_int-1)
 
-  function lsl t int : t
+  val function lsl t int : t
 
   axiom Lsl_nth_high:
     forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n-s < size_int -> nth (lsl b s) n = nth b (n-s)
@@ -182,9 +182,9 @@ theory BV_Gen
 
   constant max_int : int
 
-  function to_int t : int
-  function to_uint t : int
-  function of_int int : t
+  val function to_int t : int
+  val function to_uint t : int
+  val function of_int int : t
 
   constant size : t = of_int size_int
 
@@ -204,31 +204,31 @@ theory BV_Gen
   axiom to_uint_of_int :
     forall i. uint_in_range i -> to_uint (of_int i) = i
 
-  predicate ult (x y : t) =
+  let predicate ult (x y : t) =
     Int.(<) (to_uint x) (to_uint y)
 
-  predicate ule (x y : t) =
+  let predicate ule (x y : t) =
     Int.(<=) (to_uint x) (to_uint y)
 
-  predicate ugt (x y : t) =
+  let predicate ugt (x y : t) =
     Int.(>) (to_uint x) (to_uint y)
 
-  predicate uge (x y : t) =
+  let predicate uge (x y : t) =
     Int.(>=) (to_uint x) (to_uint y)
 
-  predicate slt (v1 v2 : t) =
+  let predicate slt (v1 v2 : t) =
     Int.(<) (to_int v1) (to_int v2)
 
-  predicate sle (v1 v2 : t) =
+  let predicate sle (v1 v2 : t) =
     Int.(<=) (to_int v1) (to_int v2)
 
-  predicate sgt (v1 v2 : t) =
+  let predicate sgt (v1 v2 : t) =
     Int.(>) (to_int v1) (to_int v2)
 
-  predicate sge (v1 v2 : t) =
+  let predicate sge (v1 v2 : t) =
     Int.(>=) (to_int v1) (to_int v2)
 
-  function nth_bv t t: bool
+  val function nth_bv t t: bool
 
   axiom Nth_bv_is_nth:
     forall x i: t.
@@ -242,33 +242,33 @@ theory BV_Gen
 
   (** Arithmetic operators *)
 
-  function add (v1 v2 : t) : t
+  val function add (v1 v2 : t) : t
   axiom to_uint_add:
     forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
 
-  function sub (v1 v2 : t) : t
+  val function sub (v1 v2 : t) : t
   axiom to_uint_sub:
     forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
 
-  function neg (v1 : t) : t
+  val function neg (v1 : t) : t
   axiom to_uint_neg:
     forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
 
-  function mul (v1 v2 : t) : t
+  val function mul (v1 v2 : t) : t
   axiom to_uint_mul:
     forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
 
-  function udiv (v1 v2 : t) : t
+  val function udiv (v1 v2 : t) : t
   axiom to_uint_udiv:
     forall v1 v2. to_uint (udiv v1 v2) = div (to_uint v1) (to_uint v2)
 
-  function urem (v1 v2 : t) : t
+  val function urem (v1 v2 : t) : t
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
 
-  function rotate_right (v n : t) : t
+  val function rotate_right (v n : t) : t
 
-  function rotate_left (v n : t) : t
+  val function rotate_left (v n : t) : t
 
   axiom Nth_rotate_left :
     forall v n i. ult i size -> ult n (sub ones size) ->
@@ -279,7 +279,7 @@ theory BV_Gen
       nth_bv (rotate_right v n) i = nth_bv v (urem (add i n) size)
 
   (** logical shift right *)
-  function lsr_bv t t : t
+  val function lsr_bv t t : t
 
   axiom lsr_bv_is_lsr:
     forall x n.
@@ -290,14 +290,14 @@ theory BV_Gen
       to_uint (lsr_bv v n) = div (to_uint v) (pow2 ( to_uint n ))
 
   (** arithmetic shift right *)
-  function asr_bv t t : t
+  val function asr_bv t t : t
 
   axiom asr_bv_is_asr:
     forall x n.
       asr_bv x n = asr x (to_uint n)
 
   (** logical shift left *)
-  function lsl_bv t t : t
+  val function lsl_bv t t : t
 
   axiom lsl_bv_is_lsl:
     forall x n.
