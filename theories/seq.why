@@ -220,7 +220,9 @@ end
 theory SortedInt (** sorted sequences of integers *)
 
   use import int.Int
-  clone export Sorted with type t = int, predicate le = (<=)
+  clone export Sorted with type t = int, predicate le = (<=),
+    goal TotalOrder.Refl, goal TotalOrder.Trans,
+    goal TotalOrder.Antisymm, goal TotalOrder.Total
 
 end
 

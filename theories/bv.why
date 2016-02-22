@@ -319,7 +319,9 @@ theory BV64
 
   clone export BV_Gen with
     constant size_int = size_int,
-    constant max_int = max_int
+    constant max_int = max_int,
+    goal size_int_pos,
+    goal two_power_size_val
 end
 
 theory BV32
@@ -328,7 +330,9 @@ theory BV32
 
   clone export BV_Gen with
     constant size_int = size_int,
-    constant max_int = max_int
+    constant max_int = max_int,
+    goal size_int_pos,
+    goal two_power_size_val
 end
 
 theory BV16
@@ -337,7 +341,9 @@ theory BV16
 
   clone export BV_Gen with
     constant size_int = size_int,
-    constant max_int = max_int
+    constant max_int = max_int,
+    goal size_int_pos,
+    goal two_power_size_val
 end
 
 theory BV8
@@ -346,7 +352,9 @@ theory BV8
 
   clone export BV_Gen with
     constant size_int = size_int,
-    constant max_int = max_int
+    constant max_int = max_int,
+    goal size_int_pos,
+    goal two_power_size_val
 end
 
 (** {2 Generic Converter} *)

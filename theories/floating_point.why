@@ -245,7 +245,8 @@ theory Single
   clone export GenFloatSpecStrict with
     type t = single,
     constant max = max_single,
-    constant max_representable_integer = max_int
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow
 
 end
 
@@ -257,7 +258,8 @@ theory Double
   clone export GenFloatSpecStrict with
     type t = double,
     constant max = max_double,
-    constant max_representable_integer = max_int
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow
 
 end
 
@@ -509,7 +511,7 @@ theory GenFloatSpecFull
         -> is_infinite r)
     /\(is_gen_zero x /\ is_gen_zero y -> is_NaN r)
     /\ product_sign r x y
-    /\ exact r = exact x /exact y 
+    /\ exact r = exact x /exact y
     /\ model r = model x /model y
 
   predicate of_real_exact_post (x:real) (r:t) =
@@ -567,7 +569,8 @@ theory SingleFull
   clone export GenFloatSpecFull with
     type t = single,
     constant max = max_single,
-    constant max_representable_integer = max_int
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow
 
 end
 
@@ -582,7 +585,8 @@ theory DoubleFull
   clone export GenFloatSpecFull with
     type t = double,
     constant max = max_double,
-    constant max_representable_integer = max_int
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow
 
 end
 
@@ -680,7 +684,8 @@ theory SingleMultiRounding
     constant max_representable_integer = max_int,
     constant min_normalized = min_normalized_single,
     constant eps_normalized = eps_normalized_single,
-    constant eta_normalized = eta_normalized_single
+    constant eta_normalized = eta_normalized_single,
+    lemma Bounded_real_no_overflow
 
 end
 
@@ -700,6 +705,7 @@ theory DoubleMultiRounding
     constant max_representable_integer = max_int,
     constant min_normalized = min_normalized_double,
     constant eps_normalized = eps_normalized_double,
-    constant eta_normalized = eta_normalized_double
+    constant eta_normalized = eta_normalized_double,
+    lemma Bounded_real_no_overflow
 
 end
