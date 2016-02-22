@@ -639,8 +639,8 @@ let clone_type_decl inst cl tdl =
           if Sits.mem s alg then begin
             if not (Mts.mem s.its_ts cl.ts_table) then
             let id = id_clone s.its_ts.ts_name in
-            let s = create_rec_itysymbol id s.its_ts.ts_args in
-            cl.ts_table <- Mts.add s.its_ts s cl.ts_table
+            let s' = create_rec_itysymbol id s.its_ts.ts_args in
+            cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
           end else Opt.iter (visit alg s) (Mits.find_opt s def);
           List.iter down tl
       | Ityvar _ -> () in
