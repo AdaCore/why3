@@ -1,10 +1,10 @@
 
 module Choice
 
-  use import HighOrd
+  use import fn.Fun
   use import option.Option
 
-  constant default : 'a
+  constant witness : 'a
   function choice ('a -> bool) : 'a
   axiom choice_def : forall p,x:'a. p x -> p (choice p)
 

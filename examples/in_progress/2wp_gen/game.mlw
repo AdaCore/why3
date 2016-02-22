@@ -1,136 +1,510 @@
 
-(* Asymetric angel vs demon perfect information games on chain-complete orders.
-   Angel and demon reflect respectively existential and universal behavior.
-   Mostly intended for angel possibility results. *)
+(* Asymetric angel vs demon perfect information games on
+   chain-complete orders.
+   Angel and demon reflect respectively existential and universal
+   behavior.
+   Definition mostly intended for angel possibility results,
+   hence the asymetry. *)
 module Game
 
-  use import order.Order
+  use import ho_set.Set
   use import order.Chain
-  use import choice.Choice
+  use import order.LimUniq
+  use import ho_rel.Prod
+  use import ho_rel.RelSet
   use import transfinite.ChainExtension
 
   type game 'a = {
-    (* chain-complete progress relation. The game flow respect that
-       progression relation, and chain completion is used to get limit
+    (* chain-complete progress relation. The game flow respect
+       that relation, and chain completion is used to get limit
        behaviors. *)
     progress : 'a -> 'a -> bool;
-    (* Transition relation: The angel choose a set of possibility
-       for the next state, then the demon choose among that set of
-       possibilities. *)
-    transition : 'a -> ('a -> bool) -> bool;
+    (* Transition relation: the angel choose a set of possibility
+       for the next state, then the demon choose among that
+       set of possibilities. Another view is that
+       'a are angel sets and (set 'a) are demon sets. *)
+    transition : 'a -> set (set 'a);
   }
 
-  (* Angel strategy: from a given state and game history (as a chain),
-     choose a set of state. *)
-  type angel 'a = 'a -> ('a -> bool) -> ('a -> bool)
-  (* Demon strategy: from a given set of state, choose an element.
-     note: this is asymetrical with respect to the angel, since the demon
-     cannot use history to take decision. However, this is completely
-     unimportant here as the demon strategy depends on the angel strategy
-     and on the starting state. In this way, the demon may know exactly the
-     history of the game dependending only of the set of states he has to
-     choose in. *)
-  type demon 'a = ('a -> bool) -> 'a
+  (* Angel strategy: from a given state and game history
+     (a well-founded chain), choose a set of states. *)
+  type angel 'a = 'a -> set 'a -> set 'a
+  (* Demon strategy: from a given set of states, choose an element.
+     This is asymetrical with respect to the angel, since the
+     demon cannot use history to take decision. However, this is
+     completely unimportant here are the demon strategy may depends
+     on the angel strategy and on the starting state. In this way,
+     the demon may rebuild the complete history based only on
+     the set of states he has to choose in. *)
+  type demon 'a = set 'a -> 'a
 
-  (* Game well-formed: ordering is chain-complete and transitions respect
-     progression. *)
+  (* Game well-formed: as stated above, order is chain-complete
+     and transition respect progression (loosely: there may be
+     loops) *)
   predicate game_wf (g:game 'a) =
     order g.progress /\ chain_complete g.progress /\
     forall x s y. g.transition x s /\ s y -> g.progress x y
 
-  (* Describe a step in the game, as the next element in function of history.
-     In case the history has no maximum, there is no current state and we
-     choose the chain supremum (the limit) as the new current state.
-     Otherwise, we use the angel then the demon to compute the next state.
-     In case one of them fails to perform a valid choice, it is considered
-     losing. *)
-  function strat_next (g:game 'a) (ang:angel 'a) (dmn:demon 'a)
-    (ch:'a -> bool) : 'a =
-    let x = choice (supremum g.progress ch) in
+  (* Describe a step in the game, as the next element in function
+     of history. In case the history has no maximum, there is no
+     current state and we go to the limit. Otherwise, we use the
+     angel/demon strategies to compute the next state.
+     In case one of them fails to perform a valid choice, it is
+     considered losing and the run stops. *)
+  function step (g:game 'a) (ang:angel 'a) (dmn:demon 'a) (ch:set 'a) : 'a =
+    let x = sup g.progress ch in
     let a = ang x ch in
     let d = dmn a in
     if ch x /\ g.transition x a /\ a d
     then d
     else x
 
-  (* Correctness of the parts used to build
-     the chain extension process. *)
-  lemma strat_next_is_ub_builder : forall g:game 'a,ang dmn.
-    game_wf g -> ub_builder g.progress (strat_next g ang dmn)
-    by forall ch. let o = g.progress in let f = strat_next g ang dmn in
+  (* Two lemma justifying the correctness of the
+     construction of history by transfinite chain extension. *)
+  lemma step_is_ub_builder : forall g:game 'a,ang dmn.
+    game_wf g -> ub_builder g.progress (step g ang dmn)
+    by forall ch. let o = g.progress in let f = step g ang dmn in
       chain o ch -> upper_bound o ch (f ch)
-      by let x = choice (supremum o ch) in
-        forall y. ch y -> o y (f ch) by upper_bound o ch x /\ o x (f ch)
+      by let x = sup o ch in
+      forall y. ch y -> o y (f ch) by supremum o ch x /\ o x (f ch)
 
-  lemma start_by_chain : forall g,x:'a. game_wf g -> chain g.progress ((=) x)
+  lemma start_by_chain : forall g,x:'a. game_wf g ->
+    chain g.progress ((=) x)
 
-  (* The angel win at some point x if:
+  (* The angel win at some point if:
      - Either he reached the target set
-     - Either the demon did something illegal *)
-  predicate win_at (g:game 'a) (win:'a -> bool) (ang:angel 'a) (dmn:demon 'a)
-    (chx:'a -> bool) =
-    exists x. maximum g.progress chx x /\
-      (win x \/ let a = ang x chx in g.transition x a /\ not a (dmn a))
+     - Either the demon did an illegal move *)
+  predicate win_at (g:game 'a) (win:set 'a) (ang:angel 'a) (dmn:demon 'a)
+    (ch:set 'a) =
+    exists x. maximum g.progress ch x /\
+      (win x \/ let a = ang x ch in g.transition x a /\ not a (dmn a))
 
-  (* Angel strategy winning against the demon strategy for starting point
-     x and target set win. *)
-  predicate win_against (g:game 'a) (x:'a) (win:'a -> bool)
+  (* Angel win against demon for given target set and from x
+     if the transfinite run reach a winning configuration. *)
+  predicate win_against (g:game 'a) (x:'a) (win:set 'a)
                         (ang:angel 'a) (dmn:demon 'a) =
-    exists chy. reach_ch g.progress (strat_next g ang dmn) ((=) x) chy /\
-      win_at g win ang dmn chy
+    exists ch. reach_ch g.progress (step g ang dmn) ((=) x) ch /\
+      win_at g win ang dmn ch
 
-  (* A strategy is a strategy winning against any demon. *)
-  predicate winning_strat (g:game 'a) (x:'a) (win:'a -> bool) (ang:angel 'a) =
+  (* A strategy is winning if winning against any demon. *)
+  predicate winning_strat (g:game 'a) (x:'a) (win:set 'a) (ang:angel 'a) =
     forall dmn. win_against g x win ang dmn
 
-  predicate uniform_winning_strat (g:game 'a) (start win:'a -> bool)
+  predicate uniform_winning_strat (g:game 'a) (start win:set 'a)
                                   (ang:angel 'a) =
     forall x. start x -> winning_strat g x win ang
 
-  predicate have_winning_strat (g:game 'a) (x:'a) (win:'a -> bool) =
+  predicate have_winning_strat (g:game 'a) (x:'a) (win:set 'a) =
     exists ang. winning_strat g x win ang
 
-  (* Note: uniform_have_winning_strat is actually the same thing,
-     will be a lemma. *)
-  predicate have_uniform_winning_strat (g:game 'a) (start win:'a -> bool) =
-    exists ang. uniform_winning_strat g start win ang so g = g
+  (* Note: having a uniform winning strat and having winning strats
+     for all starts are actually the same thing,
+     this will be a lemma. *)
+  predicate have_uniform_winning_strat (g:game 'a) (start win:set 'a) =
+    exists ang. uniform_winning_strat g start win ang
 
-  function rel_map_witness (r:'a -> 'b -> bool)
-                           (s:'a -> bool) (y:'b) : 'a -> bool =
-    \x. r x y /\ s x
-
-  function rel_map (r:'a -> 'b -> bool) (s:'a -> bool) : 'b -> bool =
-    \y. exists x. rel_map_witness r s y x
-
-  function oprod (o1:'a -> 'a -> bool) (o2:'b -> 'b -> bool) :
-    ('a,'b) -> ('a,'b) -> bool = \x y.
-      let (a,c) = x in let (b,d) = y in o1 a b /\ o2 c d
-
-  (* Two order are chain-compatible by r if for every non-empty chains of
-     related pairs, the supremum is a related pair as well.
-     (as we are considering chain-complete orders, the supremum existence
-     is immediate)
-     This is a technical condition for the simulation theorem. *)
-  predicate chain_compatible (o1:'a -> 'a -> bool) (r:'a -> 'b -> bool)
-                             (o2:'b -> 'b -> bool) =
+  (* Two order are chain-compatible by r if for every non-empty
+     chains of related pair, the supremum must be a related pair as
+     well. Technical condition for the simulation theorem. *)
+  predicate chain_compatible (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b) =
     forall ch inh s1 s2.
-      chain (oprod o1 o2) ch /\ ch inh /\ (forall a b. ch (a,b) -> r a b) /\
-      supremum (oprod o1 o2) ch (s1,s2) -> r s1 s2
+      chain (rprod o1 o2) ch /\ ch inh /\ (forall a b. ch (a,b) -> r a b) /\
+      supremum (rprod o1 o2) ch (s1,s2) -> r s1 s2
 
-  predicate step_simulate (g1:game 'a) (r:'a -> 'b -> bool) (g2:game 'b) =
+  (* A relation induce a step simulation if every step of game 1
+     can be mapped to a winning strategy in game 2,
+     and the chain compatibility condition holds for preserving
+     the relation at limits. *)
+  predicate step_simulate (g1:game 'a) (r:rel 'a 'b) (g2:game 'b) =
     chain_compatible g1.progress r g2.progress /\
     (forall x y s. g1.transition x s /\ r x y ->
-      have_winning_strat g2 y (rel_map r s))
+      have_winning_strat g2 y (related r s))
 
-  predicate simulate (g1:game 'a) (r:'a -> 'b -> bool) (g2:game 'b) =
+  predicate simulate (g1:game 'a) (r:rel 'a 'b) (g2:game 'b) =
     forall start win. have_uniform_winning_strat g1 start win ->
-      have_uniform_winning_strat g2 (rel_map r start) (rel_map r win)
+      have_uniform_winning_strat g2 (related r start) (related r win)
 
 end
 
-(* A few properties of strategies on such games.
-   Proofs in StratProofs. *)
-module StratProps "W:non_conservative_extension:N"
+(* Define the extra notion (useful in proofs) of demon reachability.
+   Mainly show that it is closed under the steps and limits operations.
+   Also allows to define an alternative losing criterion for the
+   angel. *)
+module DmnReachCommon
+  use import Game
+  use import ho_set.Set
+  use import order.Chain
+  use import transfinite.ChainExtension
+  (* A chain can be reached by the demon simply if there exists a demon
+     that reach it. *)
+  predicate dmn_reach (g:game 'a) (ang:angel 'a) (x:'a) (ch:set 'a) =
+    exists dmn. reach_ch g.progress (step g ang dmn) ((=) x) ch
+  (* The angel definitely lose at some point iff it did not win,
+     and (fails or send the game into a loop) *)
+  predicate lose_at (g:game 'a) (ang:angel 'a) (win ch:set 'a) =
+    (forall u. ch u -> not win u) /\
+    exists x. maximum g.progress ch x /\
+      let a = ang x ch in not g.transition x a \/ a x
+end
+
+module DmnReach "W:non_conservative_extension:N" (* => DmnReachProofs *)
+
+  use import Game
+  use import ho_set.Set
+  use import order.Chain
+  use import transfinite.ChainExtension
+
+  use export DmnReachCommon
+
+  (* If a chain can be reached by a demon,
+     then there is a demon that reach any next chain as well,
+     as long as no loop occurs. *)
+  axiom dmn_reach_next : forall g ang ch,b x y:'a.
+    game_wf g /\ dmn_reach g ang b ch /\ maximum g.progress ch x /\
+    g.transition x (ang x ch) /\ ang x ch y /\ not ang x ch x ->
+    dmn_reach g ang b (add ch y)
+
+  (* If we have a chain of histories that can all be reached
+     by some demons, then there is a demon that reach the limit. *)
+  axiom dmn_reach_lim : forall g ang chh ch,b:'a.
+    game_wf g /\ chain (subchain g.progress) chh /\
+    supremum (subchain g.progress) chh ch /\
+    chh ((=) b) /\
+    (forall x. chh x -> dmn_reach g ang b x) ->
+    dmn_reach g ang b ch
+
+  (* A strategy is winning iff there are no losing
+     demon-reachable chains. *)
+  axiom non_winning_strat_criterion : forall g:game 'a,x win ang ch.
+    game_wf g /\ dmn_reach g ang x ch /\ lose_at g ang win ch ->
+      not winning_strat g x win ang
+
+  (* Moreover, if the strategy is non-winning,
+     then we can build another losing chain together
+     with a demon that has the extra property of making
+     the last step loop (e.g an evident witness of failure) *)
+  axiom build_losing_demon : forall g:game 'a,x win ang.
+    game_wf g /\ not winning_strat g x win ang ->
+    exists dmn ch. reach_ch g.progress (step g ang dmn) ((=) x) ch /\
+      (forall x. maximum g.progress ch x /\ g.transition x (ang x ch) ->
+        dmn (ang x ch) = x) /\
+      lose_at g ang win ch
+
+end
+
+module DmnReachProofs
+
+  use import choice.Choice
+  use import Game
+  use import DmnReachCommon
+  use import fn.Fun
+  use import ho_set.Set
+  use import order.Chain
+  use import order.WfChain
+  use import order.LimUniq
+  use import transfinite.Iterates
+  use import transfinite.ChainExtension
+
+  predicate dmn_witness (g:game 'a) (ang:angel 'a) (x:'a)
+                        (ch:set 'a) (dmn:demon 'a) =
+    reach_ch g.progress (step g ang dmn) ((=) x) ch
+
+  predicate same_choices (g:game 'a) (ang:angel 'a)
+                         (ch:set 'a) (dmn1 dmn2:demon 'a) =
+    forall ch0 x. subchain g.progress ch0 ch /\ maximum g.progress ch0 x /\
+      ch <> ch0 ->
+      dmn1 (ang x ch0) = dmn2 (ang x ch0)
+
+  (* All strict non-limit subchains of a chain reachable by
+     some demon are reachable with the same demon and the
+     associated step is well-formed. *)
+  lemma subchain_well_formed : forall g ang b ch0 x ch,dmn:demon 'a.
+    game_wf g /\ dmn_witness g ang b ch dmn /\
+    subchain g.progress ch0 ch /\ maximum g.progress ch0 x /\
+    ch <> ch0 ->
+    let a = ang x ch0 in
+    let d = dmn a in
+    (dmn_witness g ang b ch0 dmn /\
+     g.transition x a /\ ang x ch0 d /\ ch d)
+    by let o = g.progress in
+      let sb = subchain o in
+      let st = step g ang dmn in
+      let xt = extends_ch o st in
+      (dmn_witness g ang b ch0 dmn
+        by (sb ((=) b) ch0 by if ch0 b then true else
+          false by sext ch0 none by forall x. ch0 x ->
+            false by sb ((=) b) ch so ch b so o x b so ch x so o b x))
+      so let ch1 = xt ch0 in
+      if ch1 = ch0
+      then false by maximum sb (tr_reach sb xt ((=) b)) ch0
+      else ch1 = add ch0 (st ch0)
+        so not ch0 (st ch0) || (false by sext ch0 ch1)
+        so (if sb ch1 ch then true else
+            false by separator sb xt ch0 ch so sb ch ch0 so order sb)
+        so st ch0 = d so ch1 d so ch d
+
+  (* If we have a demon that reach some chain, then any demon
+     that carry the exact same choice on its strict subchain
+     will also reach that chain. *)
+  lemma dmn_witness_criterion : forall g ang b ch,dmn1 dmn2:demon 'a.
+    game_wf g /\ dmn_witness g ang b ch dmn1 ->
+    (dmn_witness g ang b ch dmn2 <->
+     same_choices g ang ch dmn1 dmn2)
+    by let o = g.progress in
+      let sb = subchain o in
+      let st1 = step g ang dmn1 in
+      let st2 = step g ang dmn2 in
+      let xt1 = extends_ch o st1 in
+      let xt2 = extends_ch o st2 in
+      if same_choices g ang ch dmn1 dmn2 \/ dmn_witness g ang b ch dmn2
+      then (forall o1 f1 b1 ch0. o1 = sb /\ f1 = xt1 /\ b1 = ((=) b) ->
+        ("induction" tr_reach o1 f1 b1 ch0) ->
+        sb ch0 ch -> "stop_split" dmn_witness g ang b ch0 dmn2 /\
+          same_choices g ang ch0 dmn1 dmn2)
+        by order sb
+        so dmn_witness g ang b ((=) b) dmn2 /\
+          (same_choices g ang ((=) b) dmn1 dmn2
+          by forall ch0 x. sb ch0 ((=) b) /\ maximum o ch0 x /\
+            ch0 <> ((=) b) -> false
+            by if ch0 b then sext ch0 ((=) b) else sext ch0 none)
+        /\ (forall ch0. dmn_witness g ang b ch0 dmn1 /\
+          dmn_witness g ang b ch0 dmn2 /\
+          same_choices g ang ch0 dmn1 dmn2 /\ sb (xt1 ch0) ch ->
+          (dmn_witness g ang b (xt1 ch0) dmn2 /\
+          same_choices g ang (xt1 ch0) dmn1 dmn2)
+          by ("case_split" if xt1 ch0 = ch0 then true else
+            let x = sup o ch0 in
+            if not ch0 x
+            then (sext (xt1 ch0) (xt2 ch0) by st1 ch0 = st2 ch0)
+              /\ forall ch1 x1. sb ch1 (xt1 ch0) /\
+                 maximum o ch1 x1 /\ ch1 <> (xt1 ch0) ->
+               dmn1 (ang x1 ch1) = dmn2 (ang x1 ch1)
+               by ch1 <> ch0
+               so (sb ch1 ch0 || false
+                 by dmn_witness g ang b (xt1 ch0) dmn1
+                 so dmn_witness g ang b ch1 dmn1
+                 so separator sb xt1 ch0 ch1)
+            else let a = ang x ch0 in
+            if dmn1 a = dmn2 a
+            then (sext (xt1 ch0) (xt2 ch0) by st1 ch0 = st2 ch0)
+              so forall ch1 x1. sb ch1 (xt1 ch0) /\
+                 maximum o ch1 x1 /\ ch1 <> xt1 ch0 ->
+                dmn1 (ang x1 ch1) = dmn2 (ang x1 ch1)
+              by if sb ch1 ch0 /\ ch1 <> ch0 then true else
+                if ch1 <> ch0
+                then false by separator sb xt1 ch0 ch1
+                  by dmn_witness g ang b (xt1 ch0) dmn1
+                  so dmn_witness g ang b ch1 dmn1
+                else x1 = x
+            else false
+              by (not same_choices g ang ch dmn1 dmn2
+                by sb ch0 ch /\ ch0 <> ch /\ maximum o ch0 x)
+              so st1 ch0 = dmn1 a
+              so st2 ch0 = (if a (dmn2 a) then dmn2 a else x)
+              so not (dmn1 a = x so sext ch0 (xt1 ch0))
+              so st1 ch0 <> st2 ch0
+              so if not dmn_witness g ang b ch dmn2 then true else
+                false by if xt2 ch0 = ch0
+                  then false by maximum sb (tr_reach sb xt2 ((=) b)) ch0
+                    so sb ch ch0 so sb ch0 ch
+                  else false by dmn_witness g ang b (xt2 ch0) dmn2
+                    so separator sb xt2 ch0 ch
+                    so sb (xt2 ch0) ch
+                    so xt2 ch0 (st2 ch0) /\ xt1 ch0 (st1 ch0)
+                    so ch (st2 ch0) /\ ch (st1 ch0)
+                    so not (ch0 (st1 ch0) so sext ch0 (xt1 ch0))
+                    so not (ch0 (st2 ch0) so sext ch0 (xt2 ch0))
+                    so not xt2 ch0 (st1 ch0)
+                    so not xt1 ch0 (st2 ch0)
+                    so o (st1 ch0) (st2 ch0) /\ o (st1 ch0) (st2 ch0)
+                    so antisymetric o
+        ) by chain o ch0 so xt1 ch0 = add ch0 (st1 ch0)
+          so xt2 ch0 = add ch0 (st2 ch0))
+        /\ (forall chh y. supremum sb chh y /\ chain sb chh /\ chh ((=) b) /\
+          (forall x. chh x /\ sb x ch ->
+            dmn_witness g ang b x dmn2 /\ same_choices g ang x dmn1 dmn2) ->
+          sb y ch ->
+          (dmn_witness g ang b y dmn2 /\
+           same_choices g ang y dmn1 dmn2)
+          by order sb
+          so (forall x. chh x -> dmn_witness g ang b x dmn2  by sb x ch)
+          so dmn_witness g ang b y dmn2
+          so forall ch0 x0. sb ch0 y /\ maximum o ch0 x0 /\ ch0 <> y ->
+            dmn1 (ang x0 ch0) = dmn2 (ang x0 ch0)
+          by (exists ch1. chh ch1 /\ sb ch0 ch1 /\ ch0 <> ch1
+              so same_choices g ang ch1 dmn1 dmn2 by sb ch1 ch)
+          || (false by sb y ch0 by upper_bound sb chh ch0
+            by forall ch1. chh ch1 -> sb ch1 ch0
+            by dmn_witness g ang b ch0 dmn2
+            /\ dmn_witness g ang b ch1 dmn2
+            so separator sb xt2 ch0 ch1
+          ))
+      else true
+
+  (* General variation of dmn_reach_next,
+     also explain what occurs in the looping case. *)
+  lemma dmn_reach_next_gen : forall g ang ch,b x y:'a.
+    game_wf g /\ dmn_reach g ang b ch /\ maximum g.progress ch x /\
+    g.transition x (ang x ch) /\ ang x ch y /\ (ang x ch x -> y = x) ->
+    let o = g.progress in
+    (exists dmn. reach_ch o (step g ang dmn) ((=) b) ch /\
+      dmn (ang x ch) = y
+     by exists dmn0. reach_ch o (step g ang dmn0) ((=) b) ch /\
+       dmn = update dmn0 (ang x ch) y
+     so reach_ch o (step g ang dmn) ((=) b) ch
+     by same_choices g ang ch dmn0 dmn
+     by forall ch0 z. subchain o ch0 ch /\ maximum o ch0 z /\ ch0 <> ch ->
+       dmn0 (ang z ch0) = dmn (ang z ch0)
+     by "case_split" if ang z ch0 <> ang x ch then true else
+       let y2 = dmn0 (ang z ch0) in y2 = y
+     by ch y2 so o y2 x so ang x ch y2 so o x y2)
+    && (dmn_reach g ang b (add ch y)
+      by forall dmn. reach_ch o (step g ang dmn) ((=) b) ch /\
+        dmn (ang x ch) = y ->
+        sup o ch = x
+      so extends_ch o (step g ang dmn) ch = add ch y
+      so reach_ch o (step g ang dmn) ((=) b) (add ch y))
+
+  (* Build limit demon by noticing
+     that all witness demons make the same choice on their
+     common prefix, hence we can take any such choice. *)
+  lemma dmn_reach_lim : forall g ang chh ch,b:'a.
+    game_wf g /\ chain (subchain g.progress) chh /\
+    supremum (subchain g.progress) chh ch /\
+    chh ((=) b) /\
+    (forall x. chh x -> dmn_reach g ang b x) ->
+    dmn_reach g ang b ch
+    by let o = g.progress in
+      let sb = subchain o in
+      let dmn_x = \x. choice (dmn_witness g ang b x) in
+      (forall x. chh x -> dmn_witness g ang b x (dmn_x x)
+        by exists dmn. dmn_witness g ang b x dmn)
+    so ch = subchain_completion chh
+    so order sb
+    so let p0 = \ch0 s. sb ch0 s /\ ch0 <> s /\ chh s in
+      let sub_wit = \ch0. choice (p0 ch0) in
+      (forall ch0. sb ch0 ch /\ ch0 <> ch ->
+        let s = sub_wit ch0 in sb ch0 s /\ ch0 <> s /\ chh s
+        by (exists s. subset ch0 s /\ ch0 <> s /\ chh s so sb ch0 s
+          so p0 ch0 s)
+        || (false by sb ch ch0 by upper_bound sb chh ch0
+            by forall s. chh s -> sb s ch so sb s ch0
+              by if subset s ch0 then true else
+              false by exists x. s x /\ not ch0 x
+                so exists y. ch0 y /\ not s y
+                so ch x /\ ch y
+                so o x y /\ o y x))
+    so let ch_by = \s ch0. exists x.
+        sb ch0 ch /\ maximum o ch0 x /\ ch0 <> ch /\
+        ang x ch0 = s in
+      let dmn_l = \s. let ch0 = choice (ch_by s) in
+        let db = dmn_x (sub_wit ch0) in
+        db s in
+      (forall ch1. chh ch1 -> dmn_witness g ang b ch1 dmn_l
+        by let dmn = dmn_x ch1 in
+          same_choices g ang ch1 dmn dmn_l
+        by forall ch0 x. sb ch0 ch1 /\ maximum o ch0 x /\
+          ch1 <> ch0 ->
+          dmn (ang x ch0) = dmn_l (ang x ch0)
+        by let s = ang x ch0 in
+          let ch_ = choice (ch_by s) in
+          ch_by s ch0
+        so ch_by s ch_
+        so exists x_. maximum o ch_ x_
+        so let ch2 = sub_wit ch_ in
+          sb ch_ ch2 /\ ch_ <> ch2 /\ chh ch2
+        so let dmn2 = dmn_x ch2 in
+          dmn_witness g ang b ch2 dmn2 /\ dmn_witness g ang b ch1 dmn
+        so "case_split" if sb ch2 ch1
+          then dmn_witness g ang b ch2 dmn
+            so same_choices g ang ch2 dmn2 dmn
+          else sb ch1 ch2
+            so dmn_witness g ang b ch1 dmn2
+            so same_choices g ang ch1 dmn dmn2
+        )
+    so dmn_witness g ang b ch dmn_l
+
+  (* lose_at ==> non-winning:
+       The losing set is a dead stop for some demon,
+       so the maximum reachable place.
+       Hence if we can win, we do so by a subchain of this
+       maximum. Hence we cannot win by reaching the target set,
+       so the angel must stop the run. Hence the losing and winning
+       position are the same, which is contradictory.
+     non-winning ==> lose_at: take a demon that prevent winning,
+     the fixpoint is the losing set. As we took the fixpoint,
+     stepping also loop or abort. *)
+  lemma non_wins_criterion : forall g:game 'a,b win ang ch.
+    game_wf g ->
+    let o = g.progress in
+    let sb = subchain o in
+      dmn_reach g ang b ch /\ lose_at g ang win ch ->
+      not winning_strat g b win ang
+      by exists x0. let a0 = ang x0 ch in
+        maximum o ch x0 /\ (not g.transition x0 a0 \/ a0 x0)
+      so (if g.transition x0 a0 /\ a0 x0
+        then exists dmn. reach_ch o (step g ang dmn) ((=) b) ch /\
+          dmn a0 = x0
+        else true)
+      so exists dmn. dmn_witness g ang b ch dmn /\
+        (g.transition x0 a0 -> dmn a0 = x0)
+      so let st = step g ang dmn in
+        let xt = extends_ch o st in
+        st ch = x0 so sext (xt ch) ch
+      so maximum sb (tr_reach sb xt ((=) b)) ch
+      so not win_against g b win ang dmn
+      by forall ch0. reach_ch o st ((=) b) ch0 ->
+        if not win_at g win ang dmn ch0 then true else
+        false by exists x0. maximum o ch0 x0 /\
+        (win x0 \/ let a = ang x0 ch0 in g.transition x0 a /\ not a (dmn a))
+     so sb ch0 ch so subset ch0 ch
+     so not win x0
+     so st ch0 = x0 so sext (xt ch0) ch0
+     so maximum sb (tr_reach sb xt ((=) b)) ch0
+
+  lemma build_losing_demon : forall g:game 'a,b win ang.
+    game_wf g /\ not winning_strat g b win ang ->
+    (exists dmn ch. reach_ch g.progress (step g ang dmn) ((=) b) ch /\
+      (forall x. maximum g.progress ch x /\ g.transition x (ang x ch) ->
+        dmn (ang x ch) = x) /\
+      lose_at g ang win ch)
+    by exists dmn. not win_against g b win ang dmn
+    so let o = g.progress in
+      let sb = subchain o in
+      let st = step g ang dmn in
+      let xt = extends_ch o st in
+      let ch = fixpoint_above sb xt ((=) b) in
+      reach_ch o st ((=) b) ch /\ xt ch = ch
+      so chain o ch
+      so ch (st ch)
+      so let x = sup o ch in supremum o ch x
+      so not (not ch x so st ch = x)
+      so maximum o ch x
+      so (x = st ch by upper_bound o ch (st ch)
+        so o x (st ch) so o (st ch) x)
+      so let a = ang x ch in
+        (if g.transition x a
+        then a (dmn a) so dmn a = st ch
+        else true)
+      so lose_at g ang win ch
+      by forall u. ch u -> if not win u then true else
+        false by let ch0 = \x. ch x /\ o x u in
+        subchain o ch0 ch so subchain o ((=) b) ch
+        so ch0 b
+        so subchain o ((=) b) ch0
+        so reach_ch o st ((=) b) ch0
+        so maximum o ch0 u
+        so win_at g win ang dmn ch0
+
+  clone DmnReach with goal dmn_reach_next,
+    goal dmn_reach_lim,
+    goal non_winning_strat_criterion,
+    goal build_losing_demon
+
+end
+
+(* A few properties of strategies on such games. *)
+module StratProps "W:non_conservative_extension:N" (* => StratProofs *)
 
   use export Game
 
@@ -157,63 +531,49 @@ end
 module StratProofs
 
   use import Game
-  use import option.Option
   use import choice.Choice
-  use import order.Order
   use import order.Chain
-  use import order.Mono
+  use import order.LimUniq
+  use import fn.Fun
+  use import ho_set.Set
   use import transfinite.Iterates
   use import transfinite.ChainExtension
 
-  predicate ext (f g:'a -> 'b) = forall x. f x = g x
-  predicate hack (f g h:'a -> 'b) = f = g = h
-  let lemma ext (f g:'a -> 'b) : unit
-    requires { ext f g }
-    ensures { f = g }
-  = assert { hack f (\x. (\y. y) (f x)) g }
-
-  predicate pext (p q:'a -> bool) = forall x. p x <-> q x
-  lemma pext : forall p q:'a -> bool. pext p q -> p = q by ext p q
-
-  lemma have_uniform_winning_strat_alternate_def :
+  lemma have_uniform_winning_start_alternate_def :
     forall g,start win:'a -> bool. game_wf g ->
       (forall x. start x -> have_winning_strat g x win) <->
       have_uniform_winning_strat g start win
       by let o = g.progress in
         let ang_of = \min. choice (winning_strat g min win) in
-        let ang = \x ch. ang_of (choice (minimum o ch)) x ch in
+        let ang = \x ch. ang_of (min o ch) x ch in
         uniform_winning_strat g start win ang
       by forall x. start x -> winning_strat g x win ang
       by forall dmn. win_against g x win ang dmn
-      by let nxt = strat_next g ang dmn in
-        let nxt_x = strat_next g (ang_of x) dmn in
-        (exists chx. reach_ch o nxt ((=) x) chx && win_at g win ang dmn chx
-          by win_at g win (ang_of x) dmn chx /\ reach_ch o nxt_x ((=) x) chx
-          so (forall ch. reach_ch o nxt ((=) x) ch ->
-            (forall y. ang y ch = ang_of x y ch by subchain o ((=) x) ch
-              so minimum o ch x so x = choice (minimum o ch))
-            so let a = extends_ch o nxt ch in let b = extends_ch o nxt_x ch in
-              a = b by pext a b by nxt ch = nxt_x ch)
-          so (forall o1 f1 b1 ch.
-            o1 = subchain o /\ f1 = extends_ch o nxt_x /\ b1 = (=) x ->
-            ("induction" tr_reach o1 f1 b1 ch) ->
-            reach_ch o nxt ((=) x) ch))
-      by win_against g x win (ang_of x) dmn
-
-  function update (f:'a -> 'b) (y:'a) (z:'b) : 'a -> 'b =
-    \x. if x = y then z else f x
-
-  function add (s:'a -> bool) (x:'a) : 'a -> bool = update s x true
-  function rem (s:'a -> bool) (x:'a) : 'a -> bool = update s x false
+      by let st = step g ang dmn in
+        let st_x = step g (ang_of x) dmn in
+        (exists chx. reach_ch o st ((=) x) chx && win_at g win ang dmn chx
+        by win_at g win (ang_of x) dmn chx /\ reach_ch o st_x ((=) x) chx
+        so (forall ch. reach_ch o st ((=) x) ch ->
+          (forall y. ang y ch = ang_of x y ch by subchain o ((=) x) ch
+            so minimum o ch x so x = min o ch)
+          so let a = extends_ch o st ch in
+            let b = extends_ch o st_x ch in
+            a = b by sext a b by st ch = st_x ch)
+        so (forall o1 f1 b1 ch.
+          o1 = subchain o /\ f1 = extends_ch o st_x /\ b1 = ((=) x) ->
+          ("induction" tr_reach o1 f1 b1 ch) ->
+          reach_ch o st ((=) x) ch))
+        by win_against g x win (ang_of x) dmn
 
 
+  (* Lemma about subchain preservation when adding/removing elements.
+     Needed for local criterion which does that a lot. *)
   lemma remove_subchains : forall o,x:'a,a b. order o ->
     subchain o (add a x) (add b x) /\ not a x /\ not b x -> subchain o a b
     by forall y. a y -> b y by add a x y so add b x y
 
   lemma add_subchains : forall o,x:'a,a b. order o ->
-    subchain o a b /\ (forall y. b y -> o x y) ->
-    subchain o (add a x) (add b x)
+    subchain o a b /\ lower_bound o b x -> subchain o (add a x) (add b x)
 
   lemma have_winning_strat_local_criterion :
     forall g,x:'a,win. game_wf g ->
@@ -227,125 +587,156 @@ module StratProofs
         by let ex = (=) x in
           exists ang. winning_strat g x win ang /\ s = ang x ex
         so (g.transition x s
-          by let nxt = strat_next g ang default in
-            let f = extends_ch o nxt in
-            win_against g x win ang default
-          so exists ch. reach_ch o nxt ex ch /\ win_at g win ang default ch
+          by let st = step g ang witness in
+            let xt = extends_ch o st in
+            win_against g x win ang witness
+          so exists ch. reach_ch o st ex ch /\ win_at g win ang witness ch
           so g.transition x s || (ch <> ex
-            so (f ex <> ex by not maximum sb (tr_reach sb f ex) ex)
-            so (sb (f ex) ex by nxt ex = x by supremum o ex x) so false))
+            so (xt ex <> ex by not maximum sb (tr_reach sb xt ex) ex)
+            so (st ex = x by maximum o ex x)
+            so sext (xt ex) ex so false))
         so forall y. s y -> have_winning_strat g y win by (x <> y ->
           let ang2 = \u chu. ang u (add chu x) in
           winning_strat g y win ang2
           by forall dmn2. win_against g y win ang2 dmn2
           by let dmn = update dmn2 s y in
-            (let nxt = strat_next g ang dmn in
-            let nxt2 = strat_next g ang2 dmn2 in
-            let f = extends_ch o nxt in
-            let f2 = extends_ch o nxt2 in
+            (let st = step g ang dmn in
+            let st2 = step g ang2 dmn2 in
+            let xt = extends_ch o st in
+            let xt2 = extends_ch o st2 in
             let ey = ((=) y) in
-            exists ch2. reach_ch o nxt2 ey ch2 /\ win_at g win ang2 dmn2 ch2
+            exists ch2. reach_ch o st2 ey ch2 /\ win_at g win ang2 dmn2 ch2
             by if win y then ch2 = ey so maximum o ey y else
-              exists ch. reach_ch o nxt ex ch /\ win_at g win ang dmn ch /\
-              ch2 = rem ch x
-            so (forall ch0. reach_ch o nxt ex ch0 ->
-              let c = add (rem ch0 x) x in c = ch0 by pext c ch0 by sb ex ch0)
+              exists ch. reach_ch o st ex ch /\ win_at g win ang dmn ch /\
+              ch2 = remove ch x
+            so (forall ch0. reach_ch o st ex ch0 ->
+              let c = add (remove ch0 x) x in
+              c = ch0 by sext c ch0 by ch0 x by sb ex ch0)
+            so (order o /\ transitive o /\ order sb /\ inflationary sb xt)
             (* Map chains for first strategy to chain\{x} with second one. *)
-            so ((forall o0 f0 b0 ch0. o0 = sb /\ f0 = f /\ b0 = ex ->
+            so ((forall o0 f0 b0 ch0. o0 = sb /\ f0 = xt /\ b0 = ex ->
               ("induction" tr_reach o0 f0 b0 ch0) ->
-              ch0 <> ex -> reach_ch o nxt2 ey (rem ch0 x))
+              ch0 <> ex -> reach_ch o st2 ey (remove ch0 x))
               by let exy = add ex y in
                 (* case Reach_succ *)
-                (forall ch0. reach_ch o nxt ex ch0 /\ (ch0 <> ex ->
-                  reach_ch o nxt2 ey (rem ch0 x)) ->
-                  reach_ch o nxt2 ey (rem (f ch0) x)
-                  by "case_split" (ch0 = ex so pext (rem (f ch0) x) ey) || (
-                    pext (rem (f ch0) x) (f2 (rem ch0 x))
-                    by (forall y. rem (f ch0) x y <-> f2 (rem ch0 x) y)
-                    by chain o ch0 so chain o (rem ch0 x)
-                    so (nxt2 (rem ch0 x) = nxt ch0
-                      by let u = choice (supremum o ch0) in
-                        supremum o ch0 u
-                      so (supremum o (rem ch0 x) u
-                        by upper_bound o (rem ch0 x) u /\ forall v.
-                        upper_bound o (rem ch0 x) v -> o u v
-                        by upper_bound o ch0 v by rem ch0 x y by sb exy ch0)
-                      so u = choice (supremum o (rem ch0 x))
-                      so let a = ang u ch0 in a = ang2 u (rem ch0 x)
-                      so (g.transition u a -> dmn a = dmn2 a by (a = s ->
-                        o u y so sb exy ch0
-                        so (forall v. ch0 v /\ not exy v -> false
-                          by exy y so o y v so o v u so y = v)
-                        so pext exy ch0 so o y u so u = y so nxt exy = y
-                        so pext (f exy) exy so maximum sb (tr_reach sb f ex) exy
-                        so sb ch exy so exists u. maximum o ch u /\ (win u \/
-                          let a = ang u ch in g.transition u a /\ not a (dmn a))
-                        so exy u so o u y
-                        so (u = x so pext ch ex) \/ (u = y so pext ch exy)
-                        so false
-                      ))) so nxt ch0 <> x
-                    by upper_bound o ch0 (nxt ch0) so sb exy ch0
-                    so o y (nxt ch0) so o x y so not o (nxt ch0) x))
+                (forall ch0. reach_ch o st ex ch0 /\ (ch0 <> ex ->
+                  reach_ch o st2 ey (remove ch0 x)) ->
+                  reach_ch o st2 ey (remove (xt ch0) x)
+                  by "case_split"
+                    if ch0 = ex
+                    then sext (remove (xt ch0) x) ey
+                      by xt ch0 = exy by st ch0 = y
+                      by maximum o ex x so supremum o ex x
+                    else let rx = remove ch0 x in
+                      sext (remove (xt ch0) x) (xt2 rx)
+                      by (forall u. remove (xt ch0) x u <->
+                        xt2 (remove ch0 x) u)
+                      by chain o ch0 so chain o rx
+                      so xt ch0 = add ch0 (st ch0) /\
+                        xt2 rx = add rx (st2 rx)
+                      so (st2 rx = st ch0
+                        by let u = sup o ch0 in
+                          supremum o ch0 u
+                        so (supremum o rx u
+                          by upper_bound o rx u /\ forall v.
+                          upper_bound o rx v -> o u v
+                          by upper_bound o ch0 v
+                          by forall t. ch0 t -> o t v
+                          by t <> x || (o x y /\ o y v
+                            by rx y by sb exy ch0))
+                        so u = sup o rx
+                        so (ch0 y by subset exy ch0)
+                        so o y u
+                        so ((ch0 u <-> rx u) by u <> x)
+                        so let a = ang u ch0 in a = ang2 u rx
+                        so (g.transition u a -> dmn a = dmn2 a by (a = s ->
+                          o u y so sb exy ch0
+                          so (forall v. ch0 v /\ not exy v -> false
+                            by exy y so o y v so o v u so o v y so y = v)
+                          so sext exy ch0 so u = y so st exy = y
+                          so (forall u. xt exy u <-> exy u)
+                          so sext (xt exy) exy
+                          so maximum sb (tr_reach sb xt ex) exy
+                          so sb ch exy
+                          so exists u. maximum o ch u /\ (win u \/
+                          let a = ang u ch in
+                          g.transition u a /\ not a (dmn a))
+                          so exy u so o u y
+                          so (u = x so sext ch ex so false) \/
+                             (u = y so sext ch exy so false)
+                        ))) so st ch0 <> x
+                      by upper_bound o ch0 (st ch0) so sb exy ch0
+                      so subset exy ch0 so o y (st ch0) so o x y so not o y x
+                      so not o (st ch0) x)
               /\ (* case Reach_chain. *)
                 (forall chh ch0. chain sb chh /\ supremum sb chh ch0 /\
                   chh ex /\ ch0 <> ex /\ (forall u. chh u ->
-                    reach_ch o nxt ex u /\
-                    (u <> ex -> reach_ch o nxt2 ey (rem u x))) ->
-                  reach_ch o nxt2 ey (rem ch0 x)
+                    reach_ch o st ex u /\
+                    (u <> ex -> reach_ch o st2 ey (remove u x))) ->
+                  reach_ch o st2 ey (remove ch0 x)
                   by let chh2 = \ch. ch = ey \/
                     (not ch x /\ ch y /\ chh (add ch x)) in chh2 ey
-                  so (forall u. chh2 u -> reach_ch o nxt2 ey u
+                  so (forall u. chh2 u -> reach_ch o st2 ey u
                     by u = ey || (
-                    chh (add u x) so pext (rem (add u x) x) u so add u x <> ex))
+                    chh (add u x) so sext (remove (add u x) x) u
+                    so add u x <> ex))
                   so sb exy ch0
                   so (forall u. chh2 u -> sb ey u)
                   so (chain sb chh2 by forall a b. chh2 a /\ chh2 b ->
                     (sb a b \/ sb b a)
                     by a = ey || b = ey || (
                       sb (add a x) (add b x) \/ sb (add b x) (add a x)))
-                  so supremum sb chh2 (rem ch0 x)
+                  so supremum sb chh2 (remove ch0 x)
                   by (forall bd. upper_bound sb chh2 bd ->
-                    sb (rem ch0 x) bd
+                    sb (remove ch0 x) bd
                     by o x y so not o y x so sb ey bd
                     so (upper_bound sb chh (add bd x)
                       by forall u. chh u -> sb u (add bd x)
-                      by (if u = ex then subchain o (rem u x) bd else
-                      sb exy u so u y so chh2 (rem u x) so sb (rem u x) bd)
-                      so (forall z. (bd z so o y z) -> o x z))
+                      by (if u = ex then subchain o (remove u x) bd else
+                      sb exy u so subset exy u so u y so chh2 (remove u x)
+                      so sb (remove u x) bd)
+                      so lower_bound o bd x
+                      by (forall z. bd z -> o x z by o y z
+                        by y = z || ey y /\ not ey z))
                     so sb ch0 (add bd x)
-                    so ch0 = add (rem ch0 x) x
-                    so not rem ch0 x x /\ not bd x)
-                  /\ (upper_bound sb chh2 (rem ch0 x)
-                    by forall u. chh2 u -> sb u (rem ch0 x)
-                    by add (rem ch0 x) x = ch0 so
-                      if u = ey then pext (add ey x) exy else sb (add u x) ch0
+                    so ch0 = add (remove ch0 x) x
+                    so (not bd x by ey y /\ not ey x)
+                    so not remove ch0 x x)
+                  /\ (upper_bound sb chh2 (remove ch0 x)
+                    by forall u. chh2 u -> sb u (remove ch0 x)
+                    by add (remove ch0 x) x = ch0 so
+                      not remove ch0 x x so not u x so
+                      sb (add u x) ch0
+                    by if u = ey then sext (add ey x) exy
+                      else true
                   )
                 )
               (* Remark useful for induction: if we reach something <> ex,
                  it must include exy as subchain. *)
-              by (pext (f ex) exy by nxt ex = y by supremum o ex x)
-              so forall ch0. reach_ch o nxt ex ch0 /\ ch0 <> ex ->
-                sb exy ch0 || (false by sb ch0 ex by reach_ch o nxt ex exy
-                 so separator sb f ex ch0))
+              by (sext (xt ex) exy by st ex = y by maximum o ex x)
+              so forall ch0. reach_ch o st ex ch0 /\ ch0 <> ex ->
+                sb exy ch0 || (false by sb ch0 ex by reach_ch o st ex ex
+                 so reach_ch o st ex exy
+                 so separator sb xt ex ch0))
             so win_at g win ang2 dmn2 ch2
             by exists mx. maximum o ch mx /\
               (win mx \/ let a = ang mx ch in
                 g.transition mx a /\ not a (dmn a))
               so maximum o ch2 mx
               by mx <> x || (sb ex ch so (forall y. ch y -> ex y by o x y)
-                             so pext ch ex so false))
+                             so sext ch ex so false))
           by win_against g x win ang dmn
         )) /\
         (* Inverse implications. *)
         (win x -> have_winning_strat g x win
-          by forall dmn. win_against g x win default dmn
-          by win_at g win default dmn ((=) x)
-          by maximum o ((=) x) x)
-        /\ forall s. g.transition x s /\ have_uniform_winning_strat g s win ->
+          by forall dmn. win_against g x win witness dmn
+          by win_at g win witness dmn ((=) x)
+          by maximum o ((=) x) x) /\ forall s. g.transition x s
+            /\ have_uniform_winning_strat g s win ->
           have_winning_strat g x win
           by exists ang. uniform_winning_strat g s win ang
           so if s x then winning_strat g x win ang else
-          let ang2 = \u chu. if u = x then s else ang u (rem chu x) in
+          let ang2 = \u chu. if u = x then s else ang u (remove chu x) in
           winning_strat g x win ang2
           by forall dmn. win_against g x win ang2 dmn
           by let y = dmn s in
@@ -354,248 +745,256 @@ module StratProofs
             if not s y
             then win_at g win ang2 dmn ex by maximum o ex x
             else
-              let nxt = strat_next g ang dmn in
-              let nxt2 = strat_next g ang2 dmn in
-              let f = extends_ch o nxt in
-              let f2 = extends_ch o nxt2 in
-              (exists ch. win_at g win ang dmn ch /\ reach_ch o nxt ey ch
+              let st = step g ang dmn in
+              let st2 = step g ang2 dmn in
+              let xt = extends_ch o st in
+              let xt2 = extends_ch o st2 in
+              (order o /\ transitive o /\ order sb /\ inflationary sb xt /\
+               inflationary sb xt2 /\ o x y /\ x <> y)
+              so (exists ch. win_at g win ang dmn ch /\ reach_ch o st ey ch
                 so (win_at g win ang2 dmn (add ch x)
-                  by sb ey ch so not ch x so pext (rem (add ch x) x) ch
+                  by sb ey ch so not ch x so sext (remove (add ch x) x) ch
                   so forall t. maximum o ch t -> maximum o (add ch x) t
                   by forall u. add ch x u -> o u t
                   by if u = x then o x y /\ o y t else ch u
                 )
-                so reach_ch o nxt2 ex (add ch x)
+                so reach_ch o st2 ex (add ch x)
                 (* Maps chains for y-start strategy to chains+{x} in
                    second one. *)
-                by (forall o1 f1 b1 ch0. o1 = sb /\ f1 = f /\ b1 = ey ->
+                by (forall o1 f1 b1 ch0. o1 = sb /\ f1 = xt /\ b1 = ey ->
                   ("induction" tr_reach o1 f1 b1 ch0) ->
-                  reach_ch o nxt2 ex (add ch0 x))
+                  reach_ch o st2 ex (add ch0 x))
                 by let exy = add ey x in
                   (* case Reach_base. *)
-                  (reach_ch o nxt2 ex exy by pext (f2 ex) exy by nxt2 ex = y
-                   by x = choice (supremum o ex) by supremum o ex x)
+                  (reach_ch o st2 ex exy by sext (xt2 ex) exy by st2 ex = y
+                   by x = sup o ex by supremum o ex x)
                   /\ (* case Reach_succ. *)
-                    (forall ch0. reach_ch o nxt ey ch0 /\
-                      reach_ch o nxt2 ex (add ch0 x) /\ sb ey ch0 ->
-                      reach_ch o nxt2 ex (add (f ch0) x)
+                    (forall ch0. reach_ch o st ey ch0 /\
+                      reach_ch o st2 ex (add ch0 x) /\ sb ey ch0 ->
+                      reach_ch o st2 ex (add (xt ch0) x)
                       by (not (ch0 x so not ey x so o y x))
-                      so pext (rem (add ch0 x) x) ch0
+                      so (ch0 y by subset ey ch0)
+                      so sext (remove (add ch0 x) x) ch0
                       so chain o ch0
-                      so let u = choice (supremum o ch0) in supremum o ch0 u
+                      so let u = sup o ch0 in supremum o ch0 u
                       so u <> x || (o y x so false)
                       so (supremum o (add ch0 x) u
+                        by sext (upper_bound o (add ch0 x))
+                                (upper_bound o ch0)
                         by forall v.
                           ("stop_split" (upper_bound o (add ch0 x) v by
                            forall z. add ch0 x z -> o z v
                            by x <> z || (o x y so o y v))) <->
                           upper_bound o ch0 v)
-                      so u = choice (supremum o (add ch0 x))
+                      so u = sup o (add ch0 x)
                       so ang2 u (add ch0 x) = ang u ch0
-                      so nxt2 (add ch0 x) = nxt ch0
-                      so chain o (add ch0 x)
-                      so pext (add (f ch0) x) (f2 (add ch0 x))
+                      so (ch0 u <-> add ch0 x u)
+                      so st2 (add ch0 x) = st ch0
+                      so chain o (add ch0 x) /\ chain o ch0
+                      so xt ch0 = add ch0 (st ch0) /\
+                        xt2 (add ch0 x) = add (add ch0 x) (st ch0)
+                      so sext (add (xt ch0) x) (xt2 (add ch0 x))
                       )
                   /\ (* case Reach_chain. *)
                     (forall chh ch0. chain sb chh /\ supremum sb chh ch0 /\
-                      chh ey /\ (forall u. chh u -> reach_ch o nxt ey u /\
-                        reach_ch o nxt2 ex (add u x)) ->
-                      reach_ch o nxt2 ex (add ch0 x) by
-                      let chh2 = \ch. ch = ex \/ (ch x /\ chh (rem ch x)) in
+                      chh ey /\ (forall u. chh u -> reach_ch o st ey u /\
+                        reach_ch o st2 ex (add u x)) ->
+                      reach_ch o st2 ex (add ch0 x) by
+                      let chh2 = \ch. ch = ex \/
+                        (ch x /\ chh (remove ch x)) in
                       (supremum sb chh2 (add ch0 x)
                        by (upper_bound sb chh2 (add ch0 x)
                          by forall v. chh2 v -> subchain o v (add ch0 x)
                          by (forall z. ch0 z -> o x z by sb ey ch0 so o y z)
-                           so v = ex || let rv = rem v x in
-                           sb rv ch0 so pext (add rv x) v
+                           so v = ex || let rv = remove v x in
+                           sb rv ch0 so sext (add rv x) v
                        ) /\ forall ch1. upper_bound sb chh2 ch1 ->
                          sb (add ch0 x) ch1
-                         by let r1 = rem ch1 x in
-                           sb ex ch1 so pext (add r1 x) ch1
-                         so (forall z. r1 z -> o x z)
-                         so sb ch0 r1
+                         by let r1 = remove ch1 x in
+                           sb ex ch1 so subset ex ch1
+                         so ch1 x so sext (add r1 x) ch1
+                         so lower_bound o r1 x so sb ch0 r1
                          by upper_bound sb chh r1
                          by forall u. chh u -> sb u r1
-                           by not (u x so sb ey u so o y x)
-                           so pext (rem (add u x) x) u
+                           by not (u x so sb ey u so not ey x /\ ey y
+                                   so o y x)
+                           so not r1 x
+                           so sext (remove (add u x) x) u
                            so chh2 (add u x)
                            so sb (add u x) ch1)
                       so (chain sb chh2
                         by (forall u. chh2 u -> sb ex u
                           by u = ex || forall z. u z -> o x z
-                          by chh (rem u x) so sb ey (rem u x) so z = x || o y z)
-                        so forall a b. chh2 a /\ chh2 b -> sb a b \/ sb b a by
-                          a = ex || b = ex || (
-                            (sb (rem a x) (rem b x) \/ sb (rem b x) (rem a x))
-                            so pext (add (rem a x) x) a
-                            so pext (add (rem b x) x) b
-                            so forall z. (rem a x z so sb ey (rem a x)) \/
-                                         (rem b x z so sb ey (rem b x)) ->
-                                         o x z by o y z))
-                      so (forall u. chh2 u -> reach_ch o nxt2 ex u
-                        by u = ex || pext (add (rem u x) x) u)
+                          by chh (remove u x)
+                          so sb ey (remove u x) so z = x || o y z)
+                        so forall a b. chh2 a /\ chh2 b -> sb a b \/ sb b a
+                          by a = ex || b = ex || (
+                            let rax = remove a x in let rbx = remove b x in
+                            (sb rax rbx so sb a b) \/
+                            (sb rbx rax so sb b a)
+                            by sext (add rax x) a
+                            so sext (add rbx x) b
+                            so lower_bound o rbx x /\ lower_bound o rax x
+                            by forall z. (rax z so sb ey rax) \/
+                                         (rbx z so sb ey rbx) ->
+                                         o x z by o y z
+                               by y = z || (ey y /\ not ey z)))
+                      so (forall u. chh2 u -> reach_ch o st2 ex u
+                        by u = ex || sext (add (remove u x) x) u)
                     )
               ) by win_against g y win ang dmn
 
-  (* Simulation theorem: first define a notion of 'paired state' decribing
-     parallel evolution in both games, following expansed strategy for
-     first game against demon in second game. *)
+  use import ho_rel.Prod
+  use import ho_rel.RelSet
+  use import DmnReach
+  use import order.Product
+  use import order.ProductChain
+  use import fn.Image
+
+  (* (very lengthy) proof of simulation theorem:
+     first define a notion of 'paired state'
+     describing parallel evolution in both games, following
+     expansed strategy for first game against demon in second game.
+     The idea is that we will be able to build a strategy in second game
+     by rebuilding the paired state associated to current history
+     and then playing as this paired state. Then, the properties
+     of paired state evolution will guarantee that if we lose,
+     we also lose in first game by projecting the history on first game.
+     Which is absurd. *)
   type state 'a 'b = {
     h_pair : ('a,'b) -> bool;
     h_total : 'b -> bool;
     h_local : 'b -> bool;
-    (* Reconstructed demon in first game. *)
-    i_dmn : ('a -> bool) -> option 'a;
   }
 
-  function h_proj (s:state 'a 'b) : 'a -> bool = \x. exists y. s.h_pair (x,y)
-
-  lemma h_proj_eq : forall s1 s2:state 'a 'b. s1.h_pair = s2.h_pair ->
-    s1.h_proj = s2.h_proj by pext s1.h_proj s2.h_proj
-
-  function max (o:'a -> 'a -> bool) (s:'a -> bool) : 'a = choice (maximum o s)
-  function sup (o:'a -> 'a -> bool) (s:'a -> bool) : 'a = choice (supremum o s)
-
-  function fst (pr:('a,'b)) : 'a = let (x,_) = pr in x
-  function snd (pr:('a,'b)) : 'b = let (_,y) = pr in y
+  function h_proj (s:state 'a 'b) : 'a -> bool = image fst s.h_pair
 
   predicate with_prefix (hp:('a,'b) -> bool)
-    (dm:('a -> bool) -> option 'a) (st:state 'a 'b) =
-    st.h_pair = hp /\ st.i_dmn = dm
+                        (st:state 'a 'b) = st.h_pair = hp
 
   predicate with_prefix_in (s:state 'a 'b -> bool) (hp:('a,'b) -> bool)
-    (dm:('a -> bool) -> option 'a) (st:state 'a 'b) =
-    with_prefix hp dm st /\ s st
+                        (st:state 'a 'b) =
+    with_prefix hp st /\ s st
 
-  function map (f:'a -> 'b) (s:'a -> bool) : 'b -> bool =
-    \y. exists x. s x /\ y = f x
-
-  (* Chain-complete ordering on paired states. *)
-  predicate sorder (o1:'a -> 'a -> bool) (o2:'b -> 'b -> bool)
-                   (s1 s2:state 'a 'b) =
-    subchain (oprod o1 o2) s1.h_pair s2.h_pair /\
+  (* Very first step: chain-complete ordering on paired states. *)
+  predicate sorder (o1:erel 'a) (o2:erel 'b) (s1 s2:state 'a 'b) =
+    subchain (rprod o1 o2) s1.h_pair s2.h_pair /\
     subchain o2 s1.h_total s2.h_total /\
-    (forall x. s1.i_dmn x <> None -> s2.i_dmn x = s1.i_dmn x) /\
-    (with_prefix s2.h_pair s2.i_dmn s1 ->
-      subchain o2 s1.h_local s2.h_local)
-
-  predicate dmn_map (ch:state 'a 'b -> bool) (s:'a -> bool) (x:'a) =
-    exists y. ch y /\ y.i_dmn s = Some x
-
-  function dmn_limit (ch:state 'a 'b -> bool) : ('a -> bool) -> option 'a = \s.
-    if exists y. dmn_map ch s y
-    then Some (choice (dmn_map ch s))
-    else None
+    (with_prefix s2.h_pair s1 -> subchain o2 s1.h_local s2.h_local)
 
   function sorder_completion (ch:state 'a 'b -> bool) : state 'a 'b =
-    let hp = subchain_completion (map h_pair ch) in
-    let ht = subchain_completion (map h_total ch) in
-    let dm = dmn_limit ch in
-    let hl = subchain_completion (map h_local (with_prefix_in ch hp dm)) in
+    let hp = subchain_completion (image h_pair ch) in
+    let ht = subchain_completion (image h_total ch) in
+    let hl = subchain_completion (image h_local (with_prefix_in ch hp)) in
     { h_pair = hp;
       h_total = ht;
-      h_local = hl;
-      i_dmn = dm }
-
-  lemma order_product : forall o1 o2. order o1 /\ order o2 ->
-    let op = oprod o1 o2 in order op
-    by (reflexive op by forall x. op x x by let (y,_) = x in o1 y y)
-    /\ (transitive op by forall x y z:('a,'b). op x y /\ op y z ->
-      op x z by let ((a,_),(b,_),(c,_)) = (x,y,z) in o1 a b /\ o1 b c)
-    /\ (antisymetric op by forall x y. op x y /\ op y x ->
-      x = y by let ((a,_),(b,_)) = (x,y) in a = b)
-
-  lemma complete_product :
-    forall o1 o2. chain_complete o1 /\ chain_complete o2 ->
-    let op = oprod o1 o2 in chain_complete op
-    by forall ch. chain op ch -> (exists u. supremum op ch u
-      by exists a:'a,b:'b. supremum o1 (map fst ch) a /\
-        supremum o2 (map snd ch) b /\ u = (a,b)
-      so (upper_bound op ch u by forall v. ch v -> op v u
-        by (o1 (fst v) a by map fst ch (fst v)) /\
-           (o2 (snd v) b) by map snd ch (snd v))
-      so forall v. upper_bound op ch v -> op u v
-      by (o1 a (fst v) by upper_bound o1 (map fst ch) (fst v))
-      /\ (o2 b (snd v) by upper_bound o2 (map snd ch) (snd v)))
-    by (chain o1 (map fst ch) by forall a b. map fst ch a /\ map fst ch b ->
-      o1 a b \/ o1 b a
-      by exists u. a = fst u /\ ch u so exists v. b = fst v /\ ch v
-      so op u v \/ op v u)
-    /\ (chain o2 (map snd ch) by forall a b. map snd ch a /\ map snd ch b ->
-      o2 a b \/ o2 b a
-      by exists u. a = snd u /\ ch u so exists v. b = snd v /\ ch v
-      so let (_,a2) = u in let (_,b2) = v in a = a2 /\ b = b2 /\
-        (op u v \/ op v u))
+      h_local = hl }
 
   lemma sorder_order : forall o1 o2. order o1 /\ order o2 ->
     let sd = sorder o1 o2 in order sd
     by (reflexive sd)
     /\ (transitive sd by forall x y z:state 'a 'b. sd x y /\ sd y z ->
-      sd x z by subchain (oprod o1 o2) x.h_pair z.h_pair /\
+      sd x z by subchain (rprod o1 o2) x.h_pair z.h_pair /\
         subchain o2 x.h_total y.h_total /\
-        (forall u. x.i_dmn u <> None -> z.i_dmn u = x.i_dmn u) /\
-        ((x.h_pair = z.h_pair so x.h_pair = y.h_pair) /\
-         (x.i_dmn = z.i_dmn so ext x.i_dmn y.i_dmn) ->
-         subchain o2 x.h_local z.h_local))
+        ((x.h_pair = z.h_pair so x.h_pair = y.h_pair) ->
+        subchain o2 x.h_local z.h_local))
     /\ (antisymetric sd by forall x y. sd x y /\ sd y x ->
-      x = y by x.h_pair = y.h_pair /\ x.h_total = y.h_total /\
-        ext x.i_dmn y.i_dmn so x.h_local = y.h_local)
+      x = y by x.h_pair = y.h_pair /\ x.h_total = y.h_total so
+        x.h_local = y.h_local)
 
-  lemma sorder_completion : forall o1 o2,ch:state 'a 'b -> bool.
+  lemma h_proj_mono : forall o1 o2,s1 s2:state 'a 'b.
+    order o1 /\ order o2 ->
+    sorder o1 o2 s1 s2 -> subchain o1 s1.h_proj s2.h_proj
+    by (forall x. s1.h_proj x -> s2.h_proj x)
+    /\ (forall x y. s1.h_proj x /\ s2.h_proj y /\ not s1.h_proj y -> o1 x y
+      by exists x2. s1.h_pair (x,x2)
+      so exists y2. s2.h_pair (y,y2)
+      so not s1.h_pair (y,y2)
+      so rprod o1 o2 (x,x2) (y,y2))
+
+  lemma bounds_projections : forall o1 o2 ch,st:state 'a 'b.
+    let sd = sorder o1 o2 in
+    order o1 /\ order o2 /\ upper_bound sd ch st ->
+    let sb = subchain o2 in
+    let pref = with_prefix_in ch st.h_pair in
+    (let sb = subchain (rprod o1 o2) in
+      upper_bound sb (image h_pair ch) st.h_pair
+      by forall u. image h_pair ch u -> sb u st.h_pair
+      by exists v. ch v /\ v.h_pair = u so sd v st)
+    /\ (upper_bound sb (image h_total ch) st.h_total
+      by forall u. image h_total ch u -> sb u st.h_total
+      by exists v. ch v /\ v.h_total = u so sd v st)
+    /\ (upper_bound sb (image h_local pref) st.h_local
+      by forall u. image h_local pref u -> sb u st.h_local
+      by exists v. pref v /\ v.h_local = u so sd v st)
+
+  lemma chain_projection : forall o1 o2,ch:state 'a 'b -> bool.
+    order o1 /\ order o2 ->
+    let sd = sorder o1 o2 in chain sd ch ->
+    let op = rprod o1 o2 in
+    let hp = subchain_completion (image h_pair ch) in
+    let pref = with_prefix_in ch hp in
+    (chain (subchain op) (image h_pair ch) by
+      forall a b. image h_pair ch a /\ image h_pair ch b ->
+        subchain op a b \/ subchain op b a
+      by exists sa. sa.h_pair = a /\ ch sa
+      so exists sb. sb.h_pair = b /\ ch sb
+      so sd sa sb \/ sd sb sa)
+    && (chain (subchain o1) (image h_proj ch)
+      by forall a b. image h_proj ch a /\ image h_proj ch b ->
+        subchain o1 a b \/ subchain o1 b a
+      by exists sa. sa.h_proj = a /\ ch sa
+      so exists sb. sb.h_proj = b /\ ch sb
+      so sd sa sb \/ sd sb sa)
+    && (chain (subchain o2) (image h_total ch)
+      by forall a b. image h_total ch a /\ image h_total ch b ->
+        subchain o2 a b \/ subchain o2 b a
+      by exists sa. sa.h_total = a /\ ch sa
+      so exists sb. sb.h_total = b /\ ch sb
+      so sd sa sb \/ sd sb sa)
+    && (chain (subchain o2) (image h_local pref)
+      by forall a b. image h_local pref a /\ image h_local pref b ->
+        subchain o2 a b \/ subchain o2 b a
+      by exists sa. sa.h_local = a /\ pref sa
+      so exists sb. sb.h_local = b /\ pref sb
+      so sd sa sb \/ sd sb sa)
+
+  lemma sorder_completion : forall o1 o2, ch:state 'a 'b -> bool.
     order o1 /\ order o2 ->
     let sd = sorder o1 o2 in chain sd ch ->
     let cpl = sorder_completion ch in
-    supremum sd ch cpl by
-    let hp = subchain_completion (map h_pair ch) in
-    let ht = subchain_completion (map h_total ch) in
-    let dm = dmn_limit ch in
-    let pref = with_prefix_in ch hp dm in
-    let local = map h_local pref in
+    supremum sd ch cpl
+    by
+    let hp = subchain_completion (image h_pair ch) in
+    let ht = subchain_completion (image h_total ch) in
+    let pref = with_prefix_in ch hp in
+    let local = image h_local pref in
     let hl = subchain_completion local in
-    let op = oprod o1 o2 in
-    let sb = subchain o2 in
-    ((let sb = subchain op in
-      supremum sb (map h_pair ch) hp by chain sb (map h_pair ch)
-      by forall a b. map h_pair ch a /\ map h_pair ch b -> sb a b \/ sb b a
-      by exists u. ch u /\ a = u.h_pair so exists v. ch v /\ b = v.h_pair
-      so sd u v \/ sd v u)
-    /\ (supremum sb (map h_total ch) ht by chain sb (map h_total ch)
-      by forall a b. map h_total ch a /\ map h_total ch b -> sb a b \/ sb b a
-      by exists u. ch u /\ a = u.h_total so exists v. ch v /\ b = v.h_total
-      so sd u v \/ sd v u)
-    /\ (supremum sb local hl by chain sb local
-      by forall a b. local a /\ local b -> sb a b \/ sb b a
-      by exists u. pref u /\ a = u.h_local so exists v. pref v /\ b = v.h_local
-      so sd u v \/ sd v u))
+    let (op,sb) = (rprod o1 o2,subchain o2) in
+    supremum (subchain op) (image h_pair ch) hp
+    /\ supremum sb (image h_total ch) ht
+    /\ supremum sb local hl
     so (upper_bound sd ch cpl by forall u. ch u -> sd u cpl
       by subchain op u.h_pair hp
       so sb u.h_total ht
-      so (with_prefix hp dm u -> sb u.h_local hl)
-      so forall s. u.i_dmn s <> None -> dm s = u.i_dmn s
-      by "case_split" match u.i_dmn s with
-      | None -> false
-      | Some x -> dmn_map ch s x so match dm s with
-          | None -> false
-          | Some y -> dmn_map ch s y so x = y
-              by exists v. ch v /\ v.i_dmn s = dm s
-              so sd u v \/ sd v u
-          end
-      end)
-    so (forall u. upper_bound sd ch u -> sd cpl u
-      by (let sb = subchain op in
-        sb hp u.h_pair by upper_bound sb (map h_pair ch) u.h_pair)
-      so (sb ht u.h_total by upper_bound sb (map h_total ch) u.h_total)
-      so (with_prefix hp dm u -> sb hl u.h_local
-        by upper_bound sb local u.h_local))
+      so (with_prefix hp u -> sb u.h_local hl
+        by local u.h_local))
+    so forall u. upper_bound sd ch u -> sd cpl u
+      by (let sb = subchain op in sb hp u.h_pair
+        by upper_bound sb (image h_pair ch) u.h_pair)
+      so (sb ht u.h_total by upper_bound sb (image h_total ch) u.h_total)
+      so (with_prefix hp u -> sb hl u.h_local
+        by upper_bound sb local u.h_local)
 
   lemma sorder_complete :
     forall o1:'a -> 'a -> bool,o2:'b -> 'b -> bool.
     order o1 /\ order o2 -> chain_complete (sorder o1 o2)
 
-  (* 'section' parameters. *)
+  (* The following lemmas have a lot of redundant parameters,
+     so we factor them into a 'section' *)
   type section 'a 'b = {
-    g1:game 'a;
-    r : 'a -> 'b -> bool;
+    g1 : game 'a;
+    r : rel 'a 'b;
     g2:game 'b;
     basea : 'a;
     baseb : 'b;
@@ -611,61 +1010,61 @@ module StratProofs
   function iangel (sc:section 'a 'b) (y:'b) (s:'b -> bool) : angel 'b =
     choice (winning_strat sc.g2 y s)
 
-  function safe_add (o:'a -> 'a -> bool) (ch:'a -> bool) (x:'a) : 'a -> bool =
-    if upper_bound o ch x then add ch x else ch
+  lemma add_subchain : forall o ch,x:'a. upper_bound o ch x ->
+    subchain o ch (add ch x)
 
-  lemma safe_add_property : forall o ch,x:'a. subchain o ch (safe_add o ch x)
+  lemma add_chain : forall o ch,x:'a.
+    order o /\ chain o ch /\ upper_bound o ch x ->
+    chain o (add ch x)
 
-  lemma safe_add_chain_property : forall o ch,x:'a. order o /\ chain o ch ->
-    chain o (safe_add o ch x)
+  predicate related_w (r:rel 'a 'b) (s:set 'a) (y:'b) (x:'a) = s x /\ r x y
 
   function sd (sc:section 'a 'b) : state 'a 'b -> state 'a 'b -> bool =
     sorder sc.g1.progress sc.g2.progress
 
-  constant min_dmn : 'a -> option 'b = \_. None
-
-  (* Initial state. *)
+  (* Initial paired state. *)
   function basic (sc:section 'a 'b) : state 'a 'b =
     { h_pair = ((=) (sc.basea,sc.baseb));
       h_total = ((=) sc.baseb);
-      i_dmn = min_dmn;
       h_local = ((=) sc.baseb) }
 
   (* Paired evolution of state: simulate steps in 'a game by picking
      a winning imitation strategy on 'b game,
-     and carry out a step in 'a game once this strategy terminates
+     and carrying out a step in 'a game once this strategy terminates
      (hence changing the imitation strategy) *)
   function evolve (sc:section 'a 'b) (dmn:demon 'b)
                   (st:state 'a 'b) : state 'a 'b =
     let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-    if not (chain (oprod o1 o2) st.h_pair /\ chain o2 st.h_local) then st else
-    let pr = sup (oprod o1 o2) st.h_pair in
+    if not (chain (rprod o1 o2) st.h_pair /\ chain o2 st.h_local)
+    then st else
+    let pr = sup (rprod o1 o2) st.h_pair in
     let b = snd pr in
-    if not maximum (oprod o1 o2) st.h_pair pr
-    then { h_pair = add st.h_pair pr;
-           h_total = safe_add o2 st.h_total b;
-           i_dmn = st.i_dmn;
-           h_local = ((=) b) }
+    if not maximum (rprod o1 o2) st.h_pair pr
+    then if supremum o2 st.h_total b
+      then { h_pair = add st.h_pair pr;
+             h_total = add st.h_total b;
+             h_local = ((=) b) }
+      else st
     else
       let a = fst pr in
       let s0 = sc.anga a st.h_proj in
       (* loop detection in first game.
          If that occurs, must stops immediately.
          Also stops immediately if this is not a valid transition. *)
-      if st.i_dmn s0 <> None \/ not sc.g1.transition a s0 then st else
-      let target = rel_map sc.r s0 in
+      if s0 a \/ not sc.g1.transition a s0 then st else
+      let target = related sc.r s0 in
       let bl = sup o2 st.h_local in
-      if target bl
-      then let al = choice (rel_map_witness sc.r s0 bl) in
-        { h_pair = safe_add (oprod o1 o2) st.h_pair (al,bl);
-          h_total = safe_add o2 st.h_total bl;
-          i_dmn = update st.i_dmn s0 (Some al);
-          h_local = ((=) bl); }
-      else let nxt = strat_next sc.g2 (iangel sc b target) dmn in
-        { h_pair = st.h_pair;
-          h_total = safe_add o2 st.h_total (nxt st.h_local);
-          i_dmn = st.i_dmn;
-          h_local = extends_ch o2 nxt st.h_local }
+      if upper_bound o2 st.h_total bl /\ o2 b bl
+      then if target bl
+        then let al = choice (related_w sc.r s0 bl) in
+          { h_pair = add st.h_pair (al,bl);
+            h_total = add st.h_total bl;
+            h_local = ((=) bl); }
+        else let stp = step sc.g2 (iangel sc b target) dmn in
+          { h_pair = st.h_pair;
+            h_total = add st.h_total (stp st.h_local);
+            h_local = extends_ch o2 stp st.h_local }
+      else st
 
   lemma evolve_inflationary : forall sc:section 'a 'b,dmn:demon 'b.
     section_hypothesis sc -> inflationary sc.sd (evolve sc dmn)
@@ -673,24 +1072,41 @@ module StratProofs
       sc.sd st nx
     by "case_split"
       let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-      chain (oprod o1 o2) st.h_pair /\ chain o2 st.h_local ->
-      let pr = sup (oprod o1 o2) st.h_pair in
-      if not maximum (oprod o1 o2) st.h_pair pr
-      then supremum (oprod o1 o2) st.h_pair pr
-        so subchain (oprod o1 o2) st.h_pair nx.h_pair
-        so not with_prefix st.h_pair st.i_dmn nx
+      chain (rprod o1 o2) st.h_pair /\ chain o2 st.h_local ->
+      let pr = sup (rprod o1 o2) st.h_pair in
+      let b = snd pr in
+      if not maximum (rprod o1 o2) st.h_pair pr
+      then (supremum o2 st.h_total b ->
+        chain_complete (rprod o1 o2)
+        so supremum (rprod o1 o2) st.h_pair pr
+        so subchain (rprod o1 o2) st.h_pair nx.h_pair
+        so subchain o2 st.h_total nx.h_total
+        so not with_prefix st.h_pair nx)
       else
         let a = fst pr in
         let s0 = sc.anga a st.h_proj in
-        st.i_dmn s0 = None /\ sc.g1.transition a s0 ->
-        let target = rel_map sc.r s0 in
-        let b = sup o2 st.h_local in
-        supremum o2 st.h_local b
-        so "case_split" if target b
-        then forall x. st.i_dmn x <> None -> nx.i_dmn x = st.i_dmn x
-        else st.h_pair = nx.h_pair /\
-          st.i_dmn = nx.i_dmn /\ subchain o2 st.h_local nx.h_local
-          so subchain o2 st.h_total nx.h_total
+        not s0 a /\ sc.g1.transition a s0 ->
+        let target = related sc.r s0 in
+        let bl = sup o2 st.h_local in
+        supremum o2 st.h_local bl
+        so "case_split" upper_bound o2 st.h_total bl /\ o2 b bl ->
+          if target bl
+          then let al = choice (related_w sc.r s0 bl) in
+            exists al1. s0 al1 /\ sc.r al1 bl
+            so related_w sc.r s0 bl al1
+            so related_w sc.r s0 bl al
+            so rprod o1 o2 (a,b) (al,bl) /\ a <> al
+            so (upper_bound (rprod o1 o2) st.h_pair (al,bl)
+              by transitive (rprod o1 o2))
+            so subchain (rprod o1 o2) st.h_pair nx.h_pair
+            so subchain o2 st.h_total nx.h_total
+            so (not with_prefix st.h_pair nx
+              by not st.h_pair (al,bl))
+          else let stp = step sc.g2 (iangel sc b target) dmn in
+            st.h_pair = nx.h_pair /\ subchain o2 st.h_local nx.h_local
+            so o2 bl (stp st.h_local)
+            so upper_bound o2 st.h_total (stp st.h_local)
+            so subchain o2 st.h_total nx.h_total
 
   predicate maximal_witness (sc:section 'a 'b) (ch:'b -> bool)
                             (st:state 'a 'b) (dmn:demon 'b) =
@@ -705,565 +1121,458 @@ module StratProofs
   (* Expansed strategy on second game: pick any state that is the
      maximum reached for some evolution with the given history,
      then play as expected for that state.
-     That works because (we will prove it) there is at most one such state. *)
+     That works because (we will prove it) there is at most one such state.
+   *)
   function sim_angel (sc:section 'a 'b) (x:'b) (ch:'b -> bool) : 'b -> bool =
     let st = choice (any_max_witness sc ch) in
-    let pr = sup (oprod sc.g1.progress sc.g2.progress) st.h_pair in
+    let pr = sup (rprod sc.g1.progress sc.g2.progress) st.h_pair in
     let s0 = sc.anga (fst pr) st.h_proj in
-    let target = rel_map sc.r s0 in
+    let target = related sc.r s0 in
     iangel sc (snd pr) target x st.h_local
 
-  (* Some invariants on paired state: historics are chains,
-     local history and total history share supremums in case
-     paired history admit a maximum.
-     inverted demon is undefined on unreached states,
-     all pairs are related.
-     Also, we have some technical conditions for paired supremum steps to
-     coincide with supremum steps in total history:
-     - Total history is always 'bigger' than second projection of first history
-     - Second projection of first history is 'bigger' than total history
-       of any reachable state with strictly lower paired history.
-     - If paired history has no maximum, it is 'bigger' than total history
-       as well.
-     There is also a technical loop condition on the inverted demon:
-     if it is already defined for the current 1st-game transition, then it
-     must corresponds to a loop.
-     Finally, we must enforce an anti-stuttering condition: any lower reachable
-     inverted demon for the same paired history (in case it has a maximum)
-     will be identical modulo update at current step. *)
+  (* Some invariants on paired state:
+     - historics are chains,
+     - local history and total history admit the same limits
+       (sups/maxs) in case paired history admit a maximum.
+     - All pairs in paired history are related
+     - The paired history is in dmn-reach for first game
+     Plus three technical condition so that in the paired limit
+     case, supremums of total history and paired history coincide:
+     - total history dominate paired history
+     - paired history is bigger than total history of any
+       reachable state with strictly lower paired history
+     - If paired history is a limit, it is bigger than total
+       history *)
   predicate coherent (sc:section 'a 'b) (dmn:demon 'b) (st:state 'a 'b) =
     let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-    chain (oprod o1 o2) st.h_pair /\
+    chain (rprod o1 o2) st.h_pair /\
     chain o2 st.h_total /\
     chain o2 st.h_local /\
-    (forall pr. maximum (oprod o1 o2) st.h_pair pr ->
+    (forall a b. st.h_pair (a,b) -> sc.r a b) /\
+    dmn_reach sc.g1 sc.anga sc.basea st.h_proj /\
+    (forall pr. maximum (rprod o1 o2) st.h_pair pr ->
       let loc = sup o2 st.h_local in
       let tot = sup o2 st.h_total in
-      loc = tot /\ (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot)) /\
-    (forall s. match st.i_dmn s with
-       | None -> true
-       | Some u -> s u /\ st.h_proj u
-       end) /\
-    (forall a b. st.h_pair (a,b) -> sc.r a b) /\
+      loc = tot /\
+      (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot)) /\
     (* domination conditions between total/paired history. *)
     (forall a b. st.h_pair (a,b) -> st.h_total b) /\
     (forall st2. tr_reach sc.sd (evolve sc dmn) (basic sc) st2 /\
        sc.sd st2 st /\ st2.h_pair <> st.h_pair -> forall a. st2.h_total a ->
          exists b c. st.h_pair (b,c) /\ o2 a c) /\
-    ((forall pr. not maximum (oprod o1 o2) st.h_pair pr) ->
-      forall a. st.h_total a -> exists b c. st.h_pair (b,c) /\ o2 a c) /\
-    (* If inverted demon is already defined for current step, then it loops. *)
-    (forall a. maximum o1 st.h_proj a ->
-      let s0 = sc.anga a st.h_proj in
-      sc.g1.transition a s0 ->
-      match st.i_dmn s0 with
-      | None -> true
-      | Some u -> u = a
-      end) /\
-    (* Also, any demon before for that history that coincided at
-       sc.anga a st.h_proj with the current demon was already the
-       current one. *)
-    forall a b st2. maximum (oprod o1 o2) st.h_pair (a,b) ->
-      let s0 = sc.anga a st.h_proj in
-      tr_reach sc.sd (evolve sc dmn) (basic sc) st2 /\
-      sc.sd st2 st /\ st2.h_pair = st.h_pair /\ st2.i_dmn s0 = st.i_dmn s0 ->
-      st2.i_dmn = st.i_dmn
+    (forall a b. supremum (rprod o1 o2) st.h_pair (a,b) /\
+      not st.h_pair (a,b) -> supremum o2 st.h_total b)
 
+  (* Lengthy proof that coherence olds for any reachable state. *)
   lemma coherence : forall sc:section 'a 'b,dmn st. section_hypothesis sc ->
     tr_reach sc.sd (evolve sc dmn) (basic sc) st ->
     coherent sc dmn st
-    by (forall o1 f1 b1 st. o1 = sc.sd /\ f1 = evolve sc dmn /\ b1 = basic sc ->
-      ("induction" tr_reach o1 f1 b1 st) -> coherent sc dmn st)
+    by (forall o1 f1 b1 st. o1 = sc.sd /\ f1 = evolve sc dmn /\
+      b1 = basic sc -> ("induction" tr_reach o1 f1 b1 st) ->
+      coherent sc dmn st)
     by let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-       let op = oprod o1 o2 in let evl = evolve sc dmn in
-       let sb = subchain o2 in let sbp = subchain op in
-       let bs = basic sc in
-       (* Case Reach_base *)
-       (coherent sc dmn bs
-         by (forall a b. bs.h_pair (a,b) -> exists y. bs.h_total y /\ o2 b y
-             by y = b)
-         /\ forall st2. tr_reach sc.sd evl bs st2 /\ sc.sd st2 bs /\
-            st2.h_pair <> st.h_pair -> sc.sd bs st2)
-    /\ (forall st. tr_reach sc.sd evl bs st /\
-      coherent sc dmn st -> coherent sc dmn (evl st)
-      by "case_split"
-        let nst = evl st in
-        let pr = sup op st.h_pair in
-        let b = snd pr in
-        supremum op st.h_pair pr so "case_split"
-        if not maximum op st.h_pair pr
-        then (* Paired completion case. *)
-             nst.h_pair = add st.h_pair pr
-          /\ nst.h_total = safe_add o2 st.h_total b
-          /\ nst.h_local = (=) b
-          /\ nst.i_dmn = st.i_dmn
-          so (upper_bound o2 st.h_total b by
-            forall x. st.h_total x -> o2 x b
-            by exists a2 b2. st.h_pair (a2,b2) /\ o2 x b2
-            so o2 b2 b)
-          so nst.h_total = add st.h_total b
-          so chain op nst.h_pair
-          so chain o2 nst.h_total so chain o2 nst.h_local
-          so maximum o2 nst.h_local b so maximum o2 nst.h_total b
-          so maximum op nst.h_pair pr
-          so (forall pr2. maximum op nst.h_pair pr2 ->
-            sup o2 nst.h_local = b = sup o2 nst.h_total
-            by pr2 = pr
-            so supremum o2 nst.h_local b
-            so supremum o2 nst.h_total b)
-          so (forall s. match nst.i_dmn s with
-             | None -> true
-             | Some u -> s u /\ nst.h_proj u
-                 by st.h_proj u
-             end)
-          so (forall a0 b0. nst.h_pair (a0,b0) ->
-            (exists y. nst.h_total y /\ o2 b0 y)
-            by if (a0,b0) = pr
-              then nst.h_total b /\ o2 b0 b
-              else st.h_pair (a0,b0)
-              so st.h_total b0 so nst.h_total b0)
-          so (forall st2. tr_reach sc.sd evl bs st2 /\
-           sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
-           forall a. st2.h_total a ->
-             (exists b c. nst.h_pair (b,c) /\ o2 a c)
-             by separator sc.sd evl st st2
-             so sc.sd st2 st
-             so (st2.h_pair <> st.h_pair ->
-               forall pr2. maximum op st.h_pair pr2 -> false
-               by supremum op st.h_pair pr2
-               so pr = pr2))
-          so (forall a. maximum o1 nst.h_proj a ->
-            let s0 = sc.anga a nst.h_proj in
-            sc.g1.transition a s0 ->
-            match nst.i_dmn s0 with
-            | None -> true
-            | Some u -> u = a
-                by s0 u /\ st.h_proj u
-                so o1 u a /\ o1 a u
-            end)
-          so (let (a,b) = pr in sc.r a b
-            by exists u. st.h_pair u by u = (sc.basea,sc.baseb)
-            so sc.sd bs st so subchain op bs.h_pair st.h_pair)
-          so forall a0 b0 st2. maximum op nst.h_pair (a0,b0) so (a0,b0) = pr ->
-            let s0 = sc.anga a0 nst.h_proj in
-            tr_reach sc.sd evl bs st2 /\ sc.sd st2 nst /\
-            st2.h_pair = nst.h_pair /\ st2.i_dmn s0 = nst.i_dmn s0 ->
-            st2.i_dmn = nst.i_dmn
-            by separator sc.sd evl st st2
-            so not sbp st2.h_pair st.h_pair
-            so not sc.sd st2 st
-            so sc.sd nst st2
-        else let a = fst pr in
-          let s0 = sc.anga a st.h_proj in
-          st.i_dmn s0 = None /\ sc.g1.transition a s0 ->
-          let target = rel_map sc.r s0 in
-          let bl = sup o2 st.h_local in
-          (supremum o2 st.h_local bl so supremum o2 st.h_total bl)
-          so "case_split" if target bl
-          then (* Case when we end the simulation of a given step. *)
-            let al = choice (rel_map_witness sc.r s0 bl) in
-            nst.h_pair = safe_add op st.h_pair (al,bl) /\
-            nst.h_total = safe_add o2 st.h_total bl /\
-            nst.i_dmn = update st.i_dmn s0 (Some al) /\
-            nst.h_local = (=) bl
-            so (upper_bound op st.h_pair (al,bl) by forall u.
-              st.h_pair u -> op u (al,bl)
-              by let (a0,b0) = u in op (a0,b0) pr
-              so o1 a0 a so s0 al so o1 a al
-              so o2 b0 b so o2 b bl
-              by st.h_total b)
-            so nst.h_pair = add st.h_pair (al,bl)
-            so upper_bound o2 st.h_total bl
-            so nst.h_total = add st.h_total bl
-            so maximum o2 nst.h_total bl so maximum o2 nst.h_local bl
-            so (sup o2 nst.h_total = bl = sup o2 nst.h_local by
-              supremum o2 nst.h_total bl /\ supremum o2 nst.h_local bl
-              by forall ch x. maximum o2 ch x -> supremum o2 ch x)
-            so (forall s. match nst.i_dmn s with
-             | None -> true
-             | Some u -> s u /\ nst.h_proj u
-                 by if s = s0
-                   then s0 al /\ nst.h_proj al
-                   else st.i_dmn s = Some u so s u /\ st.h_proj u
-             end)
-            so (forall a0 b0. nst.h_pair (a0,b0) ->
-                nst.h_total b0
-                by if (a0,b0) = (al,bl)
-                  then nst.h_total bl
-                  else st.h_pair (a0,b0) so st.h_total b0 so nst.h_total b0)
-            so (forall st2. tr_reach sc.sd evl bs st2 /\
+      let op = rprod o1 o2 in let evl = evolve sc dmn in
+      let sb = subchain o2 in let sbp = subchain op in
+      let bs = basic sc in
+      (sext bs.h_proj ((=) sc.basea)
+        by forall x. bs.h_proj x -> x = sc.basea
+        by exists y. bs.h_pair y /\ fst y = x)
+    so (* Case Reach_base *)
+      (coherent sc dmn bs
+      by (dmn_reach sc.g1 sc.anga sc.basea bs.h_proj
+        by reach_ch o1 (step sc.g1 sc.anga witness) bs.h_proj bs.h_proj)
+      /\ (forall pr. supremum op bs.h_pair pr -> bs.h_pair pr
+        by let p0 = (sc.basea,sc.baseb) in
+          maximum op bs.h_pair p0
+        by forall x. bs.h_pair x -> op x p0 by x = p0)
+      /\ forall st2. tr_reach sc.sd evl bs st2 /\ sc.sd st2 bs /\
+            st2.h_pair <> bs.h_pair -> false
+            by (sc.sd bs st2 so antisymetric sc.sd)
+    )
+    /\ (* Case Reach_succ *)
+      (forall st. tr_reach sc.sd evl bs st /\
+        coherent sc dmn st -> let nst = evl st in
+        coherent sc dmn nst
+        by "case_split"
+          let pr = sup op st.h_pair in
+          let (a,b) = pr in
+          (chain (rprod o1 o2) st.h_pair
+          so chain o2 st.h_local
+          so chain o2 st.h_total
+          so supremum op st.h_pair pr) so "case_split"
+          if not maximum op st.h_pair pr
+          then if supremum o2 st.h_total b
+            then nst.h_pair = add st.h_pair pr
+              /\ nst.h_total = add st.h_total b
+              /\ nst.h_local = ((=) b)
+              so chain op nst.h_pair
+              so chain o2 nst.h_total so chain o2 nst.h_local
+              so maximum o2 nst.h_local b so maximum o2 nst.h_total b
+              so maximum op nst.h_pair pr
+              so (forall pr2. maximum op nst.h_pair pr2 ->
+                sup o2 nst.h_local = b = sup o2 nst.h_total)
+              so (let (a,b) = pr in sc.r a b
+                by chain_compatible o1 sc.r o2
+                /\ exists u. st.h_pair u by u = (sc.basea,sc.baseb)
+                  so sc.sd bs st so subchain op bs.h_pair st.h_pair
+                  so subset bs.h_pair st.h_pair)
+              so (forall st2. tr_reach sc.sd evl bs st2 /\
                 sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
                 forall a. st2.h_total a ->
                   (exists b c. nst.h_pair (b,c) /\ o2 a c)
-                  by nst.h_total a so o2 a bl)
-            so (forall a0. maximum o1 nst.h_proj a0 ->
-              let s1 = sc.anga a0 nst.h_proj in
-              sc.g1.transition a0 s1 ->
-              match nst.i_dmn s1 with
-              | None -> true
-              | Some u -> u = a0
-                  by (forall u. nst.h_proj u ->
-                    o1 u al by exists v. nst.h_pair (u,v)
-                    so op (u,v) (al,bl))
-                  so maximum o1 nst.h_proj al so a0 = al
-                  so match st.i_dmn s1 with
-                  | None -> s0 = s1
-                  | Some u -> s1 u /\ st.h_proj u so o1 al u so o1 u al
-                  end
-              end)
-            so forall a0 b0 st2.
-              maximum op nst.h_pair (a0,b0)
-              so (a0,b0) = (al,bl) by maximum op nst.h_pair (al,bl) ->
-              let s0 = sc.anga a0 nst.h_proj in
-              tr_reach sc.sd evl bs st2 /\ sc.sd st2 nst /\
-              st2.h_pair = nst.h_pair /\ st2.i_dmn s0 = nst.i_dmn s0 ->
-              st2.i_dmn = nst.i_dmn
-              by nst = st2
-              by separator sc.sd evl st st2
-              so not (sc.sd st2 st so st2.i_dmn s0 = st.i_dmn s0
-                so st.h_pair (al,bl)
-                so maximum op st.h_pair (al,bl)
-                so al = a so ext nst.h_proj st.h_proj)
-              so sc.sd nst st2
-          else (* Case when we carry out simulation normally. *)
-            let nxt = strat_next sc.g2 (iangel sc b target) dmn in
-            let bnx = nxt st.h_local in
-            nst.h_pair = st.h_pair /\
-            nst.h_total = safe_add o2 st.h_total bnx /\
-            nst.h_local = extends_ch o2 nxt st.h_local /\
-            nst.i_dmn = st.i_dmn
-            so upper_bound o2 st.h_local bnx
-            so upper_bound o2 st.h_total bnx
-            so nst.h_total = add st.h_total bnx
-            so ext nst.h_local (add st.h_local bnx)
-            so maximum o2 nst.h_total bnx
-            so maximum o2 nst.h_local bnx
-            so (sup o2 nst.h_total = sup o2 nst.h_local
-              by supremum o2 nst.h_total bnx /\ supremum o2 nst.h_local bnx)
-            so forall s. match nst.i_dmn s with
-              | None -> true
-              | Some u -> s u /\ nst.h_proj u by st.h_proj u
-              end
-            so (forall a0 b0. nst.h_pair (a0,b0) ->
-                nst.h_total b0 by st.h_total b0)
-            so (forall st2. tr_reach sc.sd evl bs st2 /\
-                sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
-                forall a. st2.h_total a ->
-                  (exists b c. nst.h_pair (b,c) /\ o2 a c)
-                  by sc.sd st2 st
                   by separator sc.sd evl st st2
-                  so not sc.sd nst st2)
-            so ext nst.h_proj st.h_proj
-            so (forall a. maximum o1 nst.h_proj a ->
-              let s0 = sc.anga a nst.h_proj in
-              sc.g1.transition a s0 ->
-              match nst.i_dmn s0 with
-              | None -> true
-              | Some u -> u = a
-              end)
-            so forall a b st2.
-              maximum op nst.h_pair (a,b) so (a,b) = pr ->
-              let s0 = sc.anga a nst.h_proj in
-              tr_reach sc.sd evl bs st2 /\
-              sc.sd st2 nst /\ st2.h_pair = nst.h_pair /\
-              st2.i_dmn s0 = nst.i_dmn s0 ->
-              st2.i_dmn = nst.i_dmn
-              by separator sc.sd evl st st2
-          )
-      (* Case Reach_chain *)
-    /\ forall ch st. chain sc.sd ch /\ ch bs /\ supremum sc.sd ch st /\
-          (forall u. ch u -> tr_reach sc.sd evl bs u /\ coherent sc dmn u) ->
-      coherent sc dmn st
-      by let pref = with_prefix_in ch st.h_pair st.i_dmn in
-        st = sorder_completion ch
-      (* Historics are indeed chains. *)
-      so (chain op st.h_pair by
-        forall x y. st.h_pair x /\ st.h_pair y -> op x y \/ op y x
-        by exists st2. ch st2 /\ st2.h_pair x
-        so exists st3. ch st3 /\ st3.h_pair y
-        so (sc.sd st2 st3 so sbp st2.h_pair st3.h_pair
-            so chain op st3.h_pair) \/
-           (sc.sd st3 st2 so sbp st3.h_pair st2.h_pair
-            so chain op st2.h_pair))
-      so (chain o2 st.h_total by
-        forall x y. st.h_total x /\ st.h_total y -> o2 x y \/ o2 y x
-        by exists st2. ch st2 /\ st2.h_total x
-        so exists st3. ch st3 /\ st3.h_total y
-        so (sc.sd st2 st3 so sb st2.h_total st3.h_total
-            so chain o2 st3.h_total) \/
-           (sc.sd st3 st2 so sb st3.h_total st2.h_total
-            so chain o2 st2.h_total))
-      so (chain o2 st.h_local by
-        forall x y. st.h_local x /\ st.h_local y -> o2 x y \/ o2 y x
-        by exists st2. st2.h_local x /\ pref st2
-        so exists st3. st3.h_local y /\ pref st3
-        so (sc.sd st2 st3 so sb st2.h_local st3.h_local
-            so chain o2 st3.h_local) \/
-           (sc.sd st3 st2 so sb st3.h_local st2.h_local
-            so chain o2 st2.h_local))
-      (* Very technical: supremum/maximum
-         coincidence when there is a paired maximum.
-         Fall down from the fact that the set of element with given prefix
-         is not empty. *)
-      so (forall x. maximum op st.h_pair x ->
-        let loc = sup o2 st.h_local in let tot = sup o2 st.h_total in
-        loc = tot /\
-          (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot)
-        by let (a,_) = x in
-          (* First note that the tandem paired history/current demon
-             will be eventually reached inside the chain. *)
-          ((exists st3. pref st3)
-          by let s0 = sc.anga a st.h_proj in
-          (* Notice that the demon is indeed reached inside the chain
-             once the paired history
-             and the value at current step are reached. *)
-          (exists st2. ch st2 /\ st2.h_pair x /\ st2.i_dmn s0 = st.i_dmn s0
-            so (pext st2.h_pair st.h_pair by forall z. st.h_pair z ->
-              not st2.h_pair z -> false
-              by sbp st2.h_pair st.h_pair so op x z so x = z)
-            so (ext st2.i_dmn st.i_dmn by forall s.
-              st2.i_dmn s = st.i_dmn s by "case_split"
-              match dmn_limit ch s with
-              | None -> true
-              | Some u -> (exists y. dmn_map ch s y) so dmn_map ch s u
-                  so exists st3. ch st3 /\ st3.i_dmn s = Some u
-                  so (sc.sd st2 st3 so st3.i_dmn s0 = st.i_dmn s0
-                      so sbp st2.h_pair st3.h_pair
-                      so sbp st3.h_pair st.h_pair
-                      so coherent sc dmn st3
-                      so tr_reach sc.sd evl bs st2
-                      so ext st3.h_proj st.h_proj
-                      so st2.i_dmn = st3.i_dmn) \/
-                     (sc.sd st3 st2 so st2.i_dmn s = Some u)
-              end)
-            so pref st2)
-          (* Demon value at current step/paired history are reached in the
-             chain. *)
-          by match dmn_limit ch s0 with
-          | None -> exists a. map h_pair ch a /\ a x
-              so exists st2. ch st2 /\ st2.h_pair = a
-              so st2.i_dmn s0 = None
-          | Some u -> exists a. map h_pair ch a /\ a x
-            so exists st2. ch st2 /\ st2.h_pair = a
-            so dmn_map ch s0 u
-            so exists st3. ch st3 /\ st3.i_dmn s0 = Some u
-            so (sc.sd st2 st3 so st3.h_pair x) \/
-               (sc.sd st3 st2 so st2.i_dmn s0 = Some u)
-          end)
-        so exists st3. pref st3
-        so (loc = tot
-          by pext (supremum o2 st.h_local) (supremum o2 st.h_total)
-          by pext (upper_bound o2 st.h_local) (upper_bound o2 st.h_total)
-          (* supremum equals <-> upper bounds are equivalent. *)
-          by (forall u. upper_bound o2 st.h_local u ->
-            upper_bound o2 st.h_total u
-            by forall v. st.h_total v -> o2 v u
-            by (exists st2. pref st2 /\ st2.h_total v
-              so chain o2 st2.h_total so chain o2 st2.h_local
-              so supremum o2 st2.h_total (sup o2 st2.h_total)
-              so supremum o2 st2.h_local (sup o2 st2.h_local)
-              so o2 v (sup o2 st2.h_total)
-              so upper_bound o2 st2.h_local u
-              so o2 (sup o2 st2.h_local) u)
-            by exists st2. ch st2 /\ st2.h_total v
-            so (sc.sd st2 st3 so sb st2.h_total st3.h_total so st3.h_total v)
-              \/ (sc.sd st3 st2 so sc.sd st2 st so
-                  sb st2.h_total st.h_total so sb st3.h_total st2.h_total so
-                  ext st2.i_dmn st.i_dmn so with_prefix st.h_pair st.i_dmn st2
-                  so pref st2))
-          /\ forall u. upper_bound o2 st.h_total u ->
-            upper_bound o2 st.h_local u
-            by forall v. st.h_local v -> o2 v u
-            by exists st2. pref st2 /\ st2.h_local v
-            so chain o2 st2.h_total so chain o2 st2.h_local
-            so supremum o2 st2.h_total (sup o2 st2.h_total)
-            so supremum o2 st2.h_local (sup o2 st2.h_local)
-            so o2 v (sup o2 st2.h_local)
-            so upper_bound o2 st2.h_total u
-            so o2 (sup o2 st2.h_total) u)
-        so (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot)
-        by (maximum o2 st.h_local loc -> maximum o2 st.h_total tot
-          by exists m. map h_local pref m /\ m loc
-          so exists st2. pref st2 /\ st2.h_local = m
-          so (upper_bound o2 st2.h_local loc by sb st2.h_local st.h_local)
-          so maximum o2 st2.h_local loc
-          so supremum o2 st2.h_local loc
-          so loc = sup o2 st2.h_local
-          so maximum o2 st2.h_total tot
-          so supremum o2 st.h_total tot
-          so st.h_total tot by sb st2.h_total st.h_total)
-        /\ (maximum o2 st.h_total tot -> maximum o2 st.h_local tot
-          by (exists st2. pref st2 /\ st2.h_total tot
-            so (upper_bound o2 st2.h_total tot by sb st2.h_total st.h_total)
-            so maximum o2 st2.h_total tot
-            so supremum o2 st2.h_total tot
-            so tot = sup o2 st2.h_total
-            so maximum o2 st2.h_local loc
-            so supremum o2 st.h_local loc
-            so st.h_local loc by sb st2.h_local st.h_local)
-          by exists m. map h_total ch m /\ m tot
-          so exists st2. ch st2 /\ st2.h_total = m
-          so separator sc.sd evl st2 st3
-          so (sc.sd st2 st3 so st3.h_total tot by sb st2.h_total st3.h_total)
-          \/ (sc.sd st3 st2 so sbp st3.h_pair st2.h_pair
-            so sbp st2.h_pair st.h_pair so ext st2.i_dmn st.i_dmn so pref st2)))
-      (* Inverted demon undefinedness *)
-      so (forall s. match st.i_dmn s with
-        | None -> true
-        | Some u -> s u /\ st.h_proj u by
-            (dmn_map ch s u
-            so exists st2. ch st2 /\ st2.i_dmn s = Some u
-            so coherent sc dmn st2
-            so s u /\ st2.h_proj u so st.h_proj u)
-        end)
-      (* Related pairs. *)
-      so (forall a b. st.h_pair (a,b) -> sc.r a b
-        by exists st2. ch st2 /\ st2.h_pair (a,b))
-      (* Domination conditions. *)
-      so (forall a b. st.h_pair (a,b) -> st.h_total b
-        by exists st2. ch st2 /\ st2.h_pair (a,b)
-        so st2.h_total b so st.h_total b)
-      so (forall st2. tr_reach sc.sd evl bs st2 /\
+                  so sc.sd st2 st
+                  so (st.h_total a by subchain o2 st2.h_total st.h_total
+                    so subset st2.h_total st.h_total)
+                  so o2 a b)
+              so (dmn_reach sc.g1 sc.anga sc.basea nst.h_proj
+                by if nst.h_proj = st.h_proj
+                then true
+                else let ba = (=) sc.basea in
+                  exists dmn.
+                    let stp = step sc.g1 sc.anga dmn in
+                    reach_ch o1 stp ba st.h_proj
+                  so reach_ch o1 stp ba nst.h_proj
+                  by (sext nst.h_proj (add st.h_proj a)
+                    by (forall x. nst.h_proj x ->
+                      add st.h_proj a x
+                      by image fst nst.h_pair x
+                      so exists y. nst.h_pair y /\ fst y = x
+                      so if y = (a,b) then true
+                        else st.h_pair y so image fst st.h_pair x
+                          so st.h_proj x)
+                    /\ (forall x. add st.h_proj a x -> nst.h_proj x
+                      by image fst nst.h_pair x
+                      by if x = a
+                      then nst.h_pair (a,b)
+                      else image fst st.h_pair x
+                        so exists y. st.h_pair y /\ fst y = x
+                        so nst.h_pair y))
+                  so not (st.h_proj a so sext nst.h_proj st.h_proj)
+                  so supremum o1 st.h_proj a
+                  so stp st.h_proj = a
+                  so extends_ch o1 stp st.h_proj = add st.h_proj a
+                    = nst.h_proj)
+            else false
+          else
+            let s0 = sc.anga a st.h_proj in
+            if s0 a \/ not sc.g1.transition a s0
+            then nst = st
+            else let target = related sc.r s0 in
+              let bl = sup o2 st.h_local in
+            (supremum o2 st.h_local bl so supremum o2 st.h_total bl)
+            so "case_split"
+            if upper_bound o2 st.h_total bl /\ o2 b bl
+            then if target bl
+              then let al = choice (related_w sc.r s0 bl) in
+                 exists al1. sc.r al1 bl /\ s0 al1
+                so related_w sc.r s0 bl al1
+                so related_w sc.r s0 bl al
+                so sc.r al bl /\ s0 al
+                so nst.h_pair = add st.h_pair (al,bl)
+                so nst.h_total = add st.h_total bl
+                so nst.h_local = ((=) bl)
+                so (upper_bound op st.h_pair (al,bl) by forall u.
+                  st.h_pair u -> op u (al,bl)
+                  by let (a0,b0) = u in op (a0,b0) pr
+                  so o1 a0 a so s0 al so o1 a al
+                  so o2 b0 b so o2 b bl by st.h_total b)
+                so chain op nst.h_pair
+                so maximum op nst.h_pair (al,bl)
+                so maximum o2 nst.h_total bl so maximum o2 nst.h_local bl
+                so sup o2 nst.h_total = bl = sup o2 nst.h_local
+                so (forall pr. supremum op nst.h_pair pr /\
+                  not maximum op nst.h_pair pr -> false
+                  by pr = (al,bl))
+                so (forall st2. tr_reach sc.sd evl bs st2 /\
+                  sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
+                  forall a. st2.h_total a ->
+                    (exists b c. nst.h_pair (b,c) /\ o2 a c)
+                    by subchain o2 st2.h_total nst.h_total
+                    so subset st2.h_total nst.h_total
+                    so nst.h_total a so o2 a bl)
+                so (dmn_reach sc.g1 sc.anga sc.basea nst.h_proj
+                  by (sext nst.h_proj (add st.h_proj al)
+                    by (forall x. nst.h_proj x ->
+                      add st.h_proj al x
+                      by image fst nst.h_pair x
+                      so exists y. nst.h_pair y /\ fst y = x
+                      so if y = (al,bl) then true
+                        else st.h_pair y so image fst st.h_pair x
+                          so st.h_proj x)
+                    /\ (forall x. add st.h_proj al x -> nst.h_proj x
+                      by image fst nst.h_pair x
+                      by if x = al
+                      then nst.h_pair (al,bl)
+                      else image fst st.h_pair x
+                        so exists y. st.h_pair y /\ fst y = x
+                        so nst.h_pair y))
+                  so (maximum o1 st.h_proj a
+                    by (st.h_proj a by st.h_pair (a,b))
+                    /\ upper_bound o1 st.h_proj a
+                    by forall u. st.h_proj u ->
+                      o1 u a
+                      by image fst st.h_pair u
+                      so exists v. st.h_pair v /\ fst v = u
+                      so let (_,v) = v in op (u,v) (a,b))
+                  so dmn_reach sc.g1 sc.anga sc.basea st.h_proj
+                  so game_wf sc.g1
+                )
+              else let stp = step sc.g2 (iangel sc b target) dmn in
+                let nx = stp st.h_local in
+                (nst.h_pair = st.h_pair /\
+                nst.h_total = add st.h_total nx /\
+                nst.h_local = extends_ch o2 stp st.h_local
+                            = add st.h_local nx
+                  by a = fst pr /\ b = snd pr)
+                so chain o2 nst.h_local
+                so (upper_bound o2 st.h_total nx by o2 bl nx)
+                so chain o2 nst.h_total
+                so maximum o2 nst.h_total nx
+                so (maximum o2 nst.h_local nx
+                  by upper_bound o2 st.h_local nx)
+                so sup o2 nst.h_total = nx = sup o2 nst.h_local
+                so (forall st2. tr_reach sc.sd evl bs st2 /\
+                  sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
+                   forall a. st2.h_total a ->
+                    (exists b c. nst.h_pair (b,c) /\ o2 a c)
+                    by sc.sd st2 st
+                    by separator sc.sd evl st st2
+                    so not (sc.sd nst st2 so order sc.sd))
+            else nst = st
+    )
+    /\ (* Case Reach_chain *)
+       forall chh st. chain sc.sd chh /\ chh bs /\ supremum sc.sd chh st /\
+         (forall u. chh u -> tr_reach sc.sd evl bs u /\ coherent sc dmn u) ->
+       coherent sc dmn st
+       by let pref = with_prefix_in chh st.h_pair in
+         st = sorder_completion chh
+       (* Chains+demon-reach. *)
+       so (chain op st.h_pair
+         by chain sbp (image h_pair chh)
+         so st.h_pair = subchain_completion (image h_pair chh)
+         so supremum sbp (image h_pair chh) st.h_pair
+         so (forall x. image h_pair chh x -> chain (rprod o1 o2) x))
+       so (chain o2 st.h_total
+         by chain sb (image h_total chh)
+         so supremum sb (image h_total chh) st.h_total
+         so (forall x. image h_total chh x -> chain o2 x))
+       so (chain o2 st.h_local
+         by chain (subchain o2) (image h_local pref)
+         so supremum (subchain o2) (image h_local pref) st.h_local
+         so (forall x. image h_local pref x -> chain o2 x
+           by exists y. chh y /\ y.h_local = x))
+       so (dmn_reach sc.g1 sc.anga sc.basea st.h_proj
+         by chain (subchain o1) (image h_proj chh)
+         so (let s = image h_proj chh in
+           supremum (subchain o1) s st.h_proj
+           by sext st.h_proj (subchain_completion s)
+           by (forall x. st.h_proj x -> subchain_completion s x
+           by image fst st.h_pair x
+           so exists y. st.h_pair y /\ fst y = x
+           so exists hp. image h_pair chh hp /\ hp y
+           so exists u. chh u /\ u.h_pair = hp
+           so s u.h_proj /\ u.h_proj x
+           ) /\ forall x. subchain_completion s x -> st.h_proj x
+           by exists prj. s prj /\ prj x
+           so exists st2. chh st2 /\ st2.h_proj = prj
+           so image fst st2.h_pair x
+           so exists y. st2.h_pair y /\ fst y = x
+           so image h_pair chh st2.h_pair so st.h_pair y)
+         so (forall x. image h_proj chh x ->
+           dmn_reach sc.g1 sc.anga sc.basea x
+           by exists y. chh y /\ y.h_proj = x so coherent sc dmn y)
+         so image h_proj chh ((=) sc.basea))
+       so dmn_reach sc.g1 sc.anga sc.basea st.h_proj
+       (* The limit correlation falls by bi-domination. *)
+       so (forall pr. maximum op st.h_pair pr ->
+         let loc = sup o2 st.h_local in let tot = sup o2 st.h_total in
+         loc = tot /\
+           (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot)
+         by ((exists st3. pref st3)
+           by exists hp. image h_pair chh hp /\ hp pr
+           so exists st2. chh st2 /\ st2.h_pair = hp
+           so sc.sd st2 st so sbp hp st.h_pair
+           so (forall x. st.h_pair x -> not (not hp x so op pr x so op x pr))
+           so sext hp st.h_pair so pref st2)
+         so exists st3. pref st3
+         so (forall u. st.h_total u ->
+           (exists st2. pref st2 /\ st2.h_total u)
+           by exists s0. image h_total chh s0 /\ s0 u
+           so exists st2. chh st2 /\ st2.h_total = s0
+           so (sc.sd st2 st3 so sb st2.h_total st3.h_total so st3.h_total u)
+           \/ (sc.sd st3 st2 so sc.sd st2 st so
+             sbp st2.h_pair st.h_pair so sbp st3.h_pair st2.h_pair
+             so pref st2))
+         so supremum o2 st.h_total tot /\ supremum o2 st.h_local loc
+         so (loc = tot
+           by sext (upper_bound o2 st.h_local) (upper_bound o2 st.h_total)
+           by (forall u v. upper_bound o2 st.h_local u /\ st.h_total v ->
+             o2 v u
+             by exists st2. pref st2 /\ st2.h_total v
+             so coherent sc dmn st2
+             so supremum o2 st2.h_total (sup o2 st2.h_total)
+             so supremum o2 st2.h_local (sup o2 st2.h_local)
+             so sup o2 st2.h_total = sup o2 st2.h_local
+             so o2 v (sup o2 st2.h_total)
+             so sc.sd st2 st so subset st2.h_local st.h_local
+             so upper_bound o2 st2.h_local u
+             so o2 (sup o2 st2.h_local) u)
+           /\ (forall u v. upper_bound o2 st.h_total u /\ st.h_local v ->
+             o2 v u
+             by exists s0. image h_local pref s0 /\ s0 v
+             so exists st2. pref st2 /\ st2.h_local = s0
+             so coherent sc dmn st2
+             so supremum o2 st2.h_total (sup o2 st2.h_total)
+             so supremum o2 st2.h_local (sup o2 st2.h_local)
+             so sup o2 st2.h_total = sup o2 st2.h_local
+             so o2 v (sup o2 st2.h_local)
+             so sc.sd st2 st so subset st2.h_total st.h_total
+             so upper_bound o2 st2.h_total u
+             so o2 (sup o2 st2.h_total) u))
+         so (maximum o2 st.h_total tot -> maximum o2 st.h_local tot
+           by exists st2. pref st2 /\ st2.h_total tot
+           so sc.sd st2 st so subset st2.h_total st.h_total
+           so subset st2.h_local st.h_local
+           so coherent sc dmn st2
+           so maximum o2 st2.h_total tot
+           so (maximum o2 st2.h_local tot by st2.h_pair = st.h_pair)
+           so st.h_local tot)
+         /\ (maximum o2 st.h_local loc -> maximum o2 st.h_total loc
+           by exists s0. image h_local pref s0 /\ s0 loc
+           so exists st2. pref st2 /\ st2.h_local = s0
+           so sc.sd st2 st so subset st2.h_total st.h_total
+           so subset st2.h_local st.h_local
+           so coherent sc dmn st2
+           so maximum o2 st2.h_local loc
+           so (maximum o2 st2.h_total loc by st2.h_pair = st.h_pair)
+           so st.h_total loc))
+       (* Related pairs + total above paired. *)
+       so (forall a b. st.h_pair (a,b) -> sc.r a b /\ st.h_total b
+         by exists s0. image h_pair chh s0 /\ s0 (a,b)
+         so exists st2. chh st2 /\ st2.h_pair = s0
+         so st2.h_total b so st.h_total b
+         by sc.sd st2 st so subset st2.h_total st.h_total)
+       (* paired above previous totals. *)
+       so (forall st2. tr_reach sc.sd evl bs st2 /\
          sc.sd st2 st /\ st2.h_pair <> st.h_pair ->
          forall a. st2.h_total a -> (exists b c. st.h_pair (b,c) /\ o2 a c)
          by not ext st2.h_pair st.h_pair
+         so subset st2.h_pair st.h_pair
          so exists x. st.h_pair x /\ not st2.h_pair x
-         so exists hp. map h_pair ch hp /\ hp x
-         so exists st3. ch st3 /\ st3.h_pair = hp
+         so st.h_pair = subchain_completion (image h_pair chh)
+         so exists hp. image h_pair chh hp /\ hp x
+         so exists st3. chh st3 /\ st3.h_pair = hp
          so separator sc.sd evl st2 st3 so not sbp st3.h_pair st2.h_pair
-         so not sc.sd st3 st2 so sc.sd st2 st3
-         so coherent sc dmn st3 so st3.h_pair <> st2.h_pair
+         so not sc.sd st3 st2 so transitive sc.sd so sc.sd st2 st3
+         so coherent sc dmn st3 so st2.h_pair <> st3.h_pair
          so exists b c. st3.h_pair (b,c) /\ o2 a c
-         so st.h_pair (b,c))
-      so ((forall pr. not maximum op st.h_pair pr) ->
-        forall a. st.h_total a -> (exists b c. st.h_pair (b,c) /\ o2 a c)
-        by exists m. map h_total ch m /\ m a
-        so exists st2. ch st2 /\ st2.h_total = m
-        so if st2.h_pair = st.h_pair
-           then coherent sc dmn st2 /\ st2.h_total a
-           else tr_reach sc.sd evl bs st2 /\ sc.sd st2 st)
-      (* Technical conditions on inverted demon. *)
-      so (forall a. maximum o1 st.h_proj a ->
-          let s0 = sc.anga a st.h_proj in
-          sc.g1.transition a s0 ->
-          match st.i_dmn s0 with
-          | None -> true
-          | Some u -> u = a by st.i_dmn = dmn_limit ch
-            so dmn_map ch s0 u
-            so exists st2. ch st2 /\ st2.i_dmn s0 = Some u
-            so coherent sc dmn st2
-            so s0 u /\ st2.h_proj u
-            so o1 a u /\ o1 u a
-          end)
-      so forall a b st2. maximum op st.h_pair (a,b) ->
-          let s0 = sc.anga a st.h_proj in
-          tr_reach sc.sd evl bs st2 /\
-          sc.sd st2 st /\ st2.h_pair = st.h_pair /\
-          st2.i_dmn s0 = st.i_dmn s0 ->
-          st2.i_dmn = st.i_dmn
-          by ext st2.i_dmn st.i_dmn
-          by forall s. st2.i_dmn s = st.i_dmn s
-          by "case_split" match dmn_limit ch s with
-            | None -> true
-            | Some u -> (exists y. dmn_map ch s y) so dmn_map ch s u
-                so exists st3. ch st3 /\ st3.i_dmn s = Some u
-                so separator sc.sd evl st3 st2
-                so (sc.sd st2 st3 so sbp st3.h_pair st.h_pair
-                    so sbp st2.h_pair st3.h_pair
-                    so st3.i_dmn s0 = st2.i_dmn s0
-                    so st3.h_pair = st.h_pair
-                    so coherent sc dmn st3
-                    so st3.h_proj = st.h_proj
-                    so st2.i_dmn = st3.i_dmn) \/
-                   (sc.sd (evl st3) st2 so sc.sd st3 st2
-                    so st2.i_dmn s = st3.i_dmn s)
-            end
+         so subset st3.h_pair st.h_pair
+       )
+       (* If limit paired history get a supremum which is not a max,
+          then it is a supremum of total history. *)
+       so (forall a b. supremum op st.h_pair (a,b) /\ not st.h_pair (a,b) ->
+         supremum o2 st.h_total b
+         by (forall u. upper_bound o2 st.h_total u -> o2 b u
+           by op (a,b) (a,u)
+           by upper_bound op st.h_pair (a,u)
+           by forall x. st.h_pair x -> op x (a,u)
+           by let (c,d) = x in op x (a,b) so o1 c a
+           so st.h_total d so o2 d u)
+         /\ (upper_bound o2 st.h_total b
+           by forall u. st.h_total u -> o2 u b
+           by exists ht. image h_total chh ht /\ ht u
+           so exists st2. chh st2 /\ st2.h_total = ht
+           so if st2.h_pair = st.h_pair
+             then supremum o2 st2.h_total b
+             else tr_reach sc.sd evl bs st2 /\ sc.sd st2 st
+               so exists v w. st.h_pair (v,w) /\ o2 u w
+               so transitive o2
+               so o2 w b by op (v,w) (a,b))
+       )
 
-  (* Unicity of maximal witness. *)
+
+  (* Unicity of maximal witness for a given total history.
+     First prove that if we have two maximal witness,
+     one is under the other. Then the identity will fall by antisymetry. *)
   lemma maximal_witness_unicity_prelude :
     forall sc:section 'a 'b,st1 dmn1 st2 dmn2 ch.
-      section_hypothesis sc ->
-      maximal_witness sc ch st1 dmn1 /\ maximal_witness sc ch st2 dmn2 ->
-      let bs = basic sc in
-      let ev1 = evolve sc dmn1 in
-      let ev2 = evolve sc dmn2 in
-      sc.sd st1 st2
-      by (forall o1 f1 b1 st3. o1 = sc.sd /\ f1 = ev1 /\ b1 = bs ->
-        ("induction" tr_reach o1 f1 b1 st3) -> sc.sd st3 st1 ->
-        tr_reach sc.sd ev2 bs st3)
-      by forall st3. tr_reach sc.sd ev1 bs st3 /\ sc.sd (ev1 st3) st1 /\
-        tr_reach sc.sd ev2 bs st3 ->
-        ev1 st3 = ev2 st3 \/ ev1 st3 = st3
-        by coherent sc dmn1 st3 /\ coherent sc dmn2 st3
-        so let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-          let op = oprod o1 o2 in
-          let pr = sup op st3.h_pair in
-          supremum op st3.h_pair pr
-        so let b = snd pr in
-        if not maximum op st3.h_pair pr
+    section_hypothesis sc ->
+    maximal_witness sc ch st1 dmn1 /\ maximal_witness sc ch st2 dmn2 ->
+    let bs = basic sc in
+    let ev1 = evolve sc dmn1 in let ev2 = evolve sc dmn2 in
+    sc.sd st1 st2
+    by (forall o1 f1 b1 st3. o1 = sc.sd /\ f1 = ev1 /\ b1 = bs ->
+      ("induction" tr_reach o1 f1 b1 st3) -> sc.sd st3 st1 ->
+      tr_reach sc.sd ev2 bs st3)
+    by (* Case reach_succ. *)
+      forall st3. tr_reach sc.sd ev1 bs st3 /\ sc.sd (ev1 st3) st1 /\
+        tr_reach sc.sd ev2 bs st3 -> ev1 st3 = ev2 st3 \/ ev1 st3 = st3
+      by coherent sc dmn1 st3 /\ coherent sc dmn2 st3
+      (* Unroll evolve, most cases yield immediately one of the above
+         equalities *)
+      so let o1 = sc.g1.progress in let o2 = sc.g2.progress in
+        let op = rprod o1 o2 in
+        let pr = sup op st3.h_pair in
+        supremum op st3.h_pair pr
+      so let (a,b) = pr in
+        a = fst pr /\ b = snd pr
+      so if not maximum op st3.h_pair pr
+      then ev1 st3 = ev2 st3
+      else
+        let s0 = sc.anga a st3.h_proj in
+        if s0 a \/ not sc.g1.transition a s0 then ev1 st3 = ev2 st3 else
+        let target = related sc.r s0 in
+        let bl = sup o2 st3.h_local in
+        if not upper_bound o2 st3.h_total bl \/ not o2 b bl \/ target bl
         then ev1 st3 = ev2 st3
-        else let a = fst pr in
-          let s0 = sc.anga a st3.h_proj in
-          if st3.i_dmn s0 <> None \/ not sc.g1.transition a s0
-          then ev1 st3 = ev2 st3 else
-          let target = rel_map sc.r s0 in
-          let bl = sup o2 st3.h_local in
-          if target bl then ev1 st3 = ev2 st3 else
-          let nxt1 = strat_next sc.g2 (iangel sc b target) dmn1 in
-          let nxt2 = strat_next sc.g2 (iangel sc b target) dmn2 in
-          let nx1 = nxt1 st3.h_local in
-          let nx2 = nxt2 st3.h_local in
-          (if st3.h_total nx1
+        else
+          (* Only kind of step that may depends on demon. *)
+          let stp1 = step sc.g2 (iangel sc b target) dmn1 in
+          let stp2 = step sc.g2 (iangel sc b target) dmn2 in
+          let sp1 = stp1 st3.h_local in
+          let sp2 = stp2 st3.h_local in
+          (ev1 st3).h_total = add st3.h_total sp1
+          /\ (ev2 st3).h_total = add st3.h_total sp2
+          /\ (ev1 st3).h_local = extends_ch o2 stp1 st3.h_local
+                               = add st3.h_local sp1
+          /\ (ev2 st3).h_local = extends_ch o2 stp2 st3.h_local
+                               = add st3.h_local sp2
+          so supremum o2 st3.h_local bl
+          /\ supremum o2 st3.h_total (sup o2 st3.h_total)
+          so bl = sup o2 st3.h_total
+          so antisymetric o2
+          so (* Either the step was already there, in case ev1 stutter,
+                either it is a new step, then it must be the same with
+                ev2 because they project identically on ch. *)
+          if st3.h_total sp1
           then ev1 st3 = st3
-            by upper_bound o2 st3.h_local nx1
-            so o2 (sup o2 st3.h_local) nx1
-            so o2 nx1 (sup o2 st3.h_total)
-            so nx1 = sup o2 st3.h_total
-            so maximum o2 st3.h_total nx1
-            so maximum o2 st3.h_local nx1
-            so pext st3.h_local (ev1 st3).h_local
-            so pext st3.h_total (ev1 st3).h_total
-          else (nx1 = nx2
-            by ((ev1 st3).h_total nx1
-              by upper_bound o2 st3.h_total nx1
-              by upper_bound o2 st3.h_local nx1 so o2 (sup o2 st3.h_local) nx1)
-            so subchain o2 (ev1 st3).h_total st1.h_total
-            so st1.h_total nx1
-            so not (sc.sd st2 st3 so subchain o2 st2.h_total st3.h_total
-              so not st2.h_total nx1)
-            so if st3.h_total nx2
+            by upper_bound o2 st3.h_local sp1
+            so (sp1 = bl by o2 bl sp1 /\ o2 sp1 bl)
+            so sext st3.h_local (ev1 st3).h_local
+            /\ sext st3.h_total (ev1 st3).h_total
+          else sp1 = sp2
+            by subchain o2 (ev1 st3).h_total st1.h_total
+            so (st1.h_total sp1 by subset (ev1 st3).h_total st1.h_total)
+            so not(sc.sd st2 st3 so subchain o2 st2.h_total st3.h_total
+              so subset st2.h_total st3.h_total
+              so not st2.h_total sp1)
+            so (* sp2 cannot be a member of st3's total history.
+                  Otherwise, ch (which is known via sp1 to
+                  be strictly bigger) would not be reachable. *)
+            if st3.h_total sp2
             then false
               by (ev2 st3 = st3
-                by upper_bound o2 st3.h_local nx2
-                so o2 (sup o2 st3.h_local) nx2
-                so o2 nx2 (sup o2 st3.h_local)
-                so nx2 = sup o2 st3.h_total
-                so maximum o2 st3.h_total nx2
-                so maximum o2 st3.h_local nx2
-                so pext st3.h_local (ev2 st3).h_local
-                so pext st3.h_total (ev2 st3).h_total)
+                by upper_bound o2 st3.h_local sp2
+                so (sp2 = bl by o2 bl sp2 /\ o2 sp2 bl)
+                so sext st3.h_local (ev2 st3).h_local
+                /\ sext st3.h_total (ev2 st3).h_total)
               so maximum sc.sd (tr_reach sc.sd ev2 bs) st3
             else separator sc.sd ev2 st3 st2
-              so sc.sd (ev2 st3) st2
-              so ((ev2 st3).h_total nx2
-                by upper_bound o2 st3.h_total nx2
-                by upper_bound o2 st3.h_local nx2
-                so o2 (sup o2 st3.h_local) nx2)
               so subchain o2 (ev2 st3).h_total st2.h_total
-              so st2.h_total nx2
-              so o2 nx1 nx2
-              so o2 nx2 nx1)
-            so pext (ev1 st3).h_total (ev2 st3).h_total
-            so pext (ev1 st3).h_local (ev2 st3).h_local
-            so ev1 st3 = ev2 st3)
-          by (exists y. supremum o2 st3.h_local y
-           so exists y. supremum o2 st3.h_total y
-           so supremum o2 st3.h_local (sup o2 st3.h_local)
-           so supremum o2 st3.h_total (sup o2 st3.h_total)
-           so (ev1 st3).h_local = extends_ch o2 nxt1 st3.h_local
-           so (ev1 st3).h_total = safe_add o2 st3.h_total nx1
-           so (ev2 st3).h_local = extends_ch o2 nxt2 st3.h_local
-           so (ev2 st3).h_total = safe_add o2 st3.h_total nx2)
+              so (st2.h_total sp2 by subset (ev2 st3).h_total st2.h_total)
+              so not(sp1 <> sp2 so o2 sp1 sp2 /\ o2 sp2 sp1)
+
 
   lemma maximal_witness_unique :
     forall sc:section 'a 'b,st1 st2 ch.
@@ -1271,165 +1580,130 @@ module StratProofs
       any_max_witness sc ch st1 /\ any_max_witness sc ch st2 -> st1 = st2
       by exists dmn1 dmn2.
         maximal_witness sc ch st1 dmn1 /\ maximal_witness sc ch st2 dmn2
-        so sc.sd st1 st2 /\ sc.sd st2 st1
+      so sc.sd st1 st2 /\ sc.sd st2 st1
 
-  (* We now prove a crucial lemma: any total history reachable
-     from a given paired state can be reached using the simulation
-     angel strategy alone. *)
+
+  (* Thanks to maximal witness unicity, we can prove a key lemma:
+     any total history reachable by a given paired state can be reached
+     using the sim-angel alone. *)
   lemma sim_angel_reach :
     forall sc:section 'a 'b,st dmn.
       let evl = evolve sc dmn in
       let bs = basic sc in
-      let o1 = sc.g1.progress in
-      let o2 = sc.g2.progress in
-      let op = oprod o1 o2 in
+      let o1 = sc.g1.progress in let o2 = sc.g2.progress in
+      let op = rprod o1 o2 in
       let ang = sim_angel sc in
-      let nxt = strat_next sc.g2 ang dmn in
-      section_hypothesis sc ->
-      tr_reach sc.sd evl bs st ->
-      reach_ch o2 nxt ((=) sc.baseb) st.h_total
+      let stp = step sc.g2 ang dmn in
+      section_hypothesis sc /\ tr_reach sc.sd evl bs st ->
+      reach_ch o2 stp ((=) sc.baseb) st.h_total
       by (forall o1 f1 b1 st. o1 = sc.sd /\ f1 = evl /\ b1 = bs ->
-        ("induction" tr_reach o1 f1 b1 st) ->
-        reach_ch o2 nxt ((=) sc.baseb) st.h_total)
-      by (* case Reach_succ *)
+        ("induction" tr_reach o1 f1 b1 st ->
+        reach_ch o2 stp ((=) sc.baseb) st.h_total))
+      by (* Case Reach_succ: For most cases, unrolling def of evolve
+            is enough. Evolve corresponds either to 0 or 1 step in
+            total history. *)
         (forall st. tr_reach sc.sd evl bs st /\
-          reach_ch o2 nxt ((=) sc.baseb) st.h_total ->
+          reach_ch o2 stp ((=) sc.baseb) st.h_total ->
           let nst = evl st in
-          reach_ch o2 nxt ((=) sc.baseb) nst.h_total
-          by nst.h_total = extends_ch o2 nxt st.h_total \/
-             nst.h_total = st.h_total
-          by let pr = sup op st.h_pair in
-            coherent sc dmn st
-          so supremum op st.h_pair pr
-          so let (a,b) = pr in
-          (forall bl. supremum o2 st.h_total bl /\
-            nst.h_total = safe_add o2 st.h_total bl ->
-            nst.h_total = extends_ch o2 nxt st.h_total \/
+          reach_ch o2 stp ((=) sc.baseb) nst.h_total
+          by if nst.h_total = extends_ch o2 stp st.h_total \/
             nst.h_total = st.h_total
-            by nst.h_total = add st.h_total bl
-            so if st.h_total bl
-              then pext nst.h_total st.h_total
-              else pext nst.h_total (extends_ch o2 nxt st.h_total)
-              by nxt st.h_total = bl
-              by bl = sup o2 st.h_total)
-          so if not maximum op st.h_pair pr
-          then nst.h_total = safe_add o2 st.h_total b
-            so supremum o2 st.h_total b
-            by (forall pr. not maximum op st.h_pair pr)
-            so (upper_bound o2 st.h_total b
-              by forall a. st.h_total a -> o2 a b
-              by exists c d. st.h_pair (c,d) /\ o2 a d
-              so op (c,d) pr so o2 d b)
-            /\ (forall u. upper_bound o2 st.h_total u -> o2 b u
-              by (upper_bound op st.h_pair (a,u)
-                by forall pr. st.h_pair pr -> op pr (a,u)
-                  by let (a2,b2) = pr in op (a2,b2) (a,b)
-                  so o1 a2 a
-                  so st.h_total b2
-                  so o2 b2 u)
-              so op (a,b) (a,u)
-            )
-          else let s0 = sc.anga a st.h_proj in
-            if st.i_dmn s0 <> None \/ not sc.g1.transition a s0
-            then nst.h_total = st.h_total
-            else let target = rel_map sc.r s0 in
-            let bl = sup o2 st.h_local in
-            supremum o2 st.h_total bl
-            so if nst.h_total = safe_add o2 st.h_total bl
-            then true
-            else not target bl
-              so let iang = iangel sc b target in
-              let nxt' = strat_next sc.g2 iang dmn in
-              nst.h_local = extends_ch o2 nxt' st.h_local
-              so nst.h_total = safe_add o2 st.h_total (nxt' st.h_local)
-              (* This equality is the crux of the proof: we must
-                 use the fact that the current state is the maximal
-                 witness for the current total history, then
-                 the angel decision are identical. *)
-              so (nxt st.h_total = nxt' st.h_local
-                by let n' = nxt' st.h_local in
-                n' <> bl
-                so bl = sup o2 st.h_total
-                so supremum o2 st.h_local bl
-                so st.h_local bl
-                so maximum o2 st.h_local bl
-                so maximum o2 st.h_total bl
-                so (maximal_witness sc st.h_total st dmn
-                  by tr_reach sc.sd evl bs st /\
-                  forall st2. tr_reach sc.sd evl bs st2 /\
-                    st2.h_total = st.h_total ->
-                    sc.sd st2 st
-                  by separator sc.sd evl st st2
-                  so not (sc.sd nst st2
-                    so upper_bound o2 st.h_total bl
-                    so o2 bl n'
-                    so nst.h_total n'
-                    so subchain o2 nst.h_total st2.h_total
-                    so st2.h_total n'
-                    so o2 n' bl))
-                so any_max_witness sc st.h_total st
-                so st = choice (any_max_witness sc st.h_total)
-                so pr = sup op st.h_pair
-                so ang bl st.h_total = iang bl st.h_local
+          then true
+          else false
+            by coherent sc dmn st
+            so let pr = sup op st.h_pair in
+              supremum op st.h_pair pr
+            so let a = fst pr in let b = snd pr in
+              (forall bl. supremum o2 st.h_total bl /\
+                         nst.h_total = add st.h_total bl -> false
+              by if st.h_total bl
+                then sext nst.h_total st.h_total
+                else sext nst.h_total (extends_ch o2 stp st.h_total)
+                  by stp st.h_total = bl by bl = sup o2 st.h_total)
+            so if not maximum op st.h_pair pr
+              then nst.h_total = add st.h_total b
+                so supremum o2 st.h_total b
+              else let s0 = sc.anga a st.h_proj in
+                not s0 a /\ sc.g1.transition a s0
+                so let target = related sc.r s0 in
+                let bl = sup o2 st.h_local in
+                supremum o2 st.h_total bl /\ supremum o2 st.h_local bl
+                so upper_bound o2 st.h_total bl /\ o2 b bl /\ not target bl
+                so let iang = iangel sc b target in
+                let stp' = step sc.g2 iang dmn in
+                nst.h_total = add st.h_total (stp' st.h_local)
+                (* Tricky part: the following equality holds
+                   because the current state is a/the maximal witness
+                   for the current total history. *)
+                so (stp' st.h_local = stp st.h_total
+                  by let n' = stp' st.h_local in
+                  n' <> bl
+                  so st.h_local bl
+                  so maximum o2 st.h_total bl
+                  so (maximal_witness sc st.h_total st dmn
+                    by forall st2. tr_reach sc.sd evl bs st2 /\
+                      st2.h_total = st.h_total -> sc.sd st2 st
+                    by separator sc.sd evl st st2
+                    so not (sc.sd nst st2
+                      so subset nst.h_total st2.h_total
+                      so o2 n' bl
+                      so (o2 bl n' by upper_bound o2 st.h_total n'
+                        by upper_bound o2 st.h_local n')
+                    ))
+                  so any_max_witness sc st.h_total st
+                  so let st2 = choice (any_max_witness sc st.h_total) in
+                    any_max_witness sc st.h_total st2
+                  so st = st2
+                  so pr = sup op st.h_pair
+                  so ang bl st.h_total = iang bl st.h_local
                 )
-              so upper_bound o2 st.h_local (nxt' st.h_local)
-              so upper_bound o2 st.h_total (nxt' st.h_local)
-              so chain o2 st.h_total
-              so pext nst.h_total (extends_ch o2 nxt st.h_total))
-      /\ (* case Reach_chain *)
+                so upper_bound o2 st.h_total (stp st.h_total)
+      )
+      /\ (* Case Reach_chain. *)
         forall ch st. chain sc.sd ch /\ supremum sc.sd ch st /\
           ch bs /\
-          (forall u. ch u -> reach_ch o2 nxt ((=) sc.baseb) u.h_total) ->
-          reach_ch o2 nxt ((=) sc.baseb) st.h_total
-        by let chh = map h_total ch in
-          let sb = subchain o2 in
-          (chain sb chh by forall u v. chh u /\ chh v -> sb u v \/ sb v u
-            by exists a. ch a /\ a.h_total = u
-            so exists b. ch b /\ b.h_total = v
-            so sc.sd a b \/ sc.sd b a)
-          so (forall u. chh u -> reach_ch o2 nxt ((=) sc.baseb) u)
-          so supremum sb chh st.h_total
-          so (=) sc.baseb = bs.h_total
+          (forall u. ch u -> reach_ch o2 stp ((=) sc.baseb) u.h_total) ->
+          reach_ch o2 stp ((=) sc.baseb) st.h_total
+        by let ch2 = image h_total ch in
+          chain (subchain o2) ch2
+          so (forall u. ch2 u -> reach_ch o2 stp ((=) sc.baseb) u)
+          so (supremum (subchain o2) ch2 st.h_total
+            by st = sorder_completion ch)
+          so ch2 ((=) sc.baseb)
 
-  (* Nearly there. We now defined a strategy on the second game
-     and proved it followed exactly the structure of the paired
-     evolution. To complete the proof,
-     we only need to prove that a paired evolution eventually win.
-     We will do this in three steps:
-     1) Show the additional invariant that the local history is always winning
-        or irrelevant. This will ensures that the paired evolution cannot reach
-        its fixpoint via the local steps.
-     2) Show that the projected history is in the 'a-reach of
-        any demon compatible with the inverted one
-        (playing against the 'a-angel).
-        This allows to rebuild runs in the 'a game.
-     3) By absurd, consider the maximal reachable state and suppose it
-        does not contains any winning state (and also that it does not win
-        right there). Then, the maximum state falls out of the
-        conditions that the demon forced a loop or that the 'a-angel failed.
-        Hence the 'a-angel does not win right at this projected history,
-        and its history does not contains any winning state.
-        From the fixpoints conditions, the projected history is also
-        maximal for the 'a-angel, hence contradiction (the 'a-angel
-        is known to win).
-        From this,
-        3a) either the maximum state is outright winning (and we're done)
-        3b) either there is a winning state in the history.
-           Then, we can induce that there exists a precise state at which
-           it is reached, hence a winning point.
-     *)
-  predicate locally_winning (sc:section 'a 'b) (dmn:demon 'b) (st:state 'a 'b) =
+  (* Nearly there. We now defined a strategy on the second game,
+     and proved that anything reachable in paired evolution was
+     also reachable via this strategy (which internally rebuild that
+     paired state). We also proved (withing coherence) that
+     the history projection on first game was withing demon-reach against
+     the supposedly winning strategy in first game.
+     To complete the proof, we then only need to prove
+     that the paired evolution eventually reach a winning state.
+     We will do this in two steps:
+     1) Show the additional invariant that the local history is either
+        winning or irrelevant. This will ensures that the paired
+        evolution cannot get stuck at local steps.
+     2) By absurd, consider the maximal reachable state and suppose
+        it does not contains any winning state (which basically mean
+        that we suppose lose_at on second game). Then, we see that it
+        implies that the angel lose for the current restriction to
+        first history. Obviously, this is absurd.
+     Note: the complete proof makes
+       massive use of the DmnReach module here. *)
+
+  predicate locally_winning (sc:section 'a 'b) (dmn:demon 'b)
+                            (st:state 'a 'b) =
     let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-    let op = oprod o1 o2 in
+    let op = rprod o1 o2 in
     let pr = sup op st.h_pair in
     let b = snd pr in
     not maximum op st.h_pair pr \/
     let a = fst pr in
     let s0 = sc.anga a st.h_proj in
-    st.i_dmn s0 <> None \/ not sc.g1.transition a s0 \/
-    let target = rel_map sc.r s0 in
-    (forall x. st.h_local x /\ rel_map sc.r s0 x -> maximum o2 st.h_local x) /\
-    reach_ch o2 (strat_next sc.g2 (iangel sc b target) dmn) ((=) b) st.h_local
+    s0 a \/ not sc.g1.transition a s0 \/
+    let target = related sc.r s0 in
+    (forall x. st.h_local x /\ target x -> maximum o2 st.h_local x) /\
+    reach_ch o2 (step sc.g2 (iangel sc b target) dmn) ((=) b) st.h_local
 
   lemma all_locally_winning : forall sc:section 'a 'b,st dmn.
     section_hypothesis sc ->
@@ -1439,308 +1713,287 @@ module StratProofs
     by (forall o1 f1 b1 st. o1 = sc.sd /\ f1 = evl /\ b1 = bs ->
       ("induction" tr_reach o1 f1 b1 st) -> locally_winning sc dmn st)
     by let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-      let op = oprod o1 o2 in
+      let op = rprod o1 o2 in
       (* Case Reach_base *)
-      (locally_winning sc dmn bs by forall x. bs.h_local x ->
-        maximum o2 bs.h_local x)
+      (locally_winning sc dmn bs by
+        (sup op bs.h_pair = (sc.basea,sc.baseb)
+         by maximum op bs.h_pair (sc.basea,sc.baseb)
+         by reflexive op)
+        /\ forall x. bs.h_local x -> maximum o2 bs.h_local x)
     /\ (* Case Reach_succ *)
       (forall st. coherent sc dmn st /\ locally_winning sc dmn st ->
         let nst = evl st in locally_winning sc dmn nst
         by "case_split" let pr = sup op st.h_pair in
-          let (a,b) = pr in
-          if not maximum op st.h_pair pr
-          then let s0 = sc.anga a nst.h_proj in
-            let target = rel_map sc.r s0 in
-            (forall x. nst.h_local x -> maximum o2 nst.h_local x) /\
-            reach_ch o2 (strat_next sc.g2 (iangel sc b target) dmn)
-                     ((=) b) nst.h_local /\
-            pr = sup op nst.h_pair
-            by nst.h_local = (=) b /\ nst.h_pair = add st.h_pair pr
-            so supremum op st.h_pair pr
-            so supremum op nst.h_pair pr
-          else let a = fst pr in
-            let s0 = sc.anga a st.h_proj in
-            if st.i_dmn s0 <> None \/ not sc.g1.transition a s0
-            then st = nst
-            else let target = rel_map sc.r s0 in
-              let bl = sup o2 st.h_local in
-              if target bl
-              then let al = choice (rel_map_witness sc.r s0 bl) in
-                let s02 = sc.anga al nst.h_proj in
-                let target2 = rel_map sc.r s02 in
-                (forall x. nst.h_local x -> maximum o2 nst.h_local x) /\
-                reach_ch o2 (strat_next sc.g2 (iangel sc bl target2) dmn)
-                  ((=) bl) nst.h_local /\
-                (al,bl) = sup op nst.h_pair
-                by nst.h_local = (=) bl /\
-                  (supremum op nst.h_pair (al,bl)
-                  by (upper_bound op st.h_pair (al,bl)
-                    so nst.h_pair = safe_add (oprod o1 o2) st.h_pair (al,bl)
-                    so ext nst.h_pair (add st.h_pair (al,bl)))
-                  by supremum op st.h_pair pr
-                  so op pr (al,bl)
-                  by o1 a al /\ (o2 b bl
-                  by supremum o2 st.h_total bl
-                  so st.h_total b so o2 b bl))
-              else let nxt = strat_next sc.g2 (iangel sc b target) dmn in
-                nst.h_pair = st.h_pair /\
-                nst.h_local = extends_ch o2 nxt st.h_local
-                so ext nst.h_proj st.h_proj
-                so forall y. nst.h_local y /\ target y ->
-                  maximum o2 nst.h_local y
-                by if st.h_local y
-                  then false
-                    by maximum o2 st.h_local y
-                    so supremum o2 st.h_local y
-                    so y = bl
-                  else y = nxt st.h_local
-                    so upper_bound o2 st.h_local y
-                    so maximum o2 nst.h_local y)
+          let a = fst pr in let b = snd pr in
+          supremum op st.h_pair pr
+          so "case_split" if not (chain op st.h_pair /\ chain o2 st.h_local)
+          then true
+          else if not maximum op st.h_pair pr
+          then (nst.h_local = (=) b) /\ nst.h_pair = add st.h_pair pr
+            so (forall x. nst.h_local x -> maximum o2 nst.h_local x)
+            /\ pr = sup op nst.h_pair
+            by maximum op nst.h_pair pr
+            by supremum op st.h_pair pr
+          else let s0 = sc.anga a st.h_proj in
+            if s0 a \/ not sc.g1.transition a s0 then true else
+            let target = related sc.r s0 in
+            let bl = sup o2 st.h_local in
+            if not (upper_bound o2 st.h_total bl /\ o2 b bl) then true else
+            if target bl
+            then let al = choice (related_w sc.r s0 bl) in
+              (s0 al by (exists al1. sc.r al1 bl /\ s0 al1
+                  so related_w sc.r s0 bl al1)
+                so related_w sc.r s0 bl al)
+              so nst.h_pair = add st.h_pair (al,bl) /\ nst.h_local = ((=) bl)
+              so (maximum op nst.h_pair (al,bl)
+                by upper_bound op st.h_pair (al,bl) by forall u.
+                  st.h_pair u -> op u (al,bl)
+                  by let (a0,b0) = u in op (a0,b0) pr
+                  so o1 a0 a so o1 a al
+                  so o2 b0 b so o2 b bl by st.h_total b)
+              so sup op nst.h_pair = (al,bl)
+              so (forall x. nst.h_local x -> maximum o2 nst.h_local x
+                by reflexive o2)
+            else let stp = step sc.g2 (iangel sc b target) dmn in
+              nst.h_pair = st.h_pair /\
+              nst.h_local = extends_ch o2 stp st.h_local
+              so forall y. nst.h_local y /\ target y ->
+                maximum o2 nst.h_local y
+              by if st.h_local y
+                then false
+                  by maximum o2 st.h_local y
+                  so supremum o2 st.h_local y
+                else y = stp st.h_local so upper_bound o2 (st.h_local) y
+                  so upper_bound o2 (nst.h_local) y
+      )
     /\ (* Case Reach_chain *)
       forall ch st. chain sc.sd ch /\ supremum sc.sd ch st /\ ch bs /\
-        (forall u. ch u -> tr_reach sc.sd evl bs u /\
-                            locally_winning sc dmn u) ->
+        (forall u. ch u ->
+          tr_reach sc.sd evl bs u /\ locally_winning sc dmn u) ->
         locally_winning sc dmn st
         by let pr = sup op st.h_pair in
-          not maximum op st.h_pair pr ||
-          let (a,b) = pr in
-          let s0 = sc.anga a st.h_proj in
-          st.i_dmn s0 <> None || not sc.g1.transition a s0 ||
-          let target = rel_map sc.r s0 in
-          (forall x. st.h_local x /\ rel_map sc.r s0 x ->
-              maximum o2 st.h_local x
-            by forall y. st.h_local y -> o2 y x
-            by st = sorder_completion ch
-            so let pref = with_prefix_in ch st.h_pair st.i_dmn in
-              exists m. map h_local pref m /\ m y
-            so exists sty. pref sty /\ sty.h_local = m
-            so exists m. map h_local pref m /\ m x
-            so exists stx. pref stx /\ stx.h_local = m
-            so (sc.sd stx sty so subchain o2 stx.h_local sty.h_local
-                so sty.h_local x so locally_winning sc dmn sty
-                so ext sty.h_proj st.h_proj
-                so maximum o2 sty.h_local x so o2 y x) \/
-               (sc.sd sty stx so subchain o2 sty.h_local stx.h_local
-                so stx.h_local y so locally_winning sc dmn stx
-                so ext stx.h_proj st.h_proj
-                so maximum o2 stx.h_local x so o2 y x)) /\
-          (reach_ch o2 (strat_next sc.g2 (iangel sc b target) dmn) ((=) b)
-            st.h_local
-            by true
-            so tr_reach sc.sd evl bs st
-            so coherent sc dmn st
-            so st = sorder_completion ch
-            so let pref = with_prefix_in ch st.h_pair st.i_dmn in
-              let chh = add (map h_local pref) ((=) b) in
-              let nxt = strat_next sc.g2 (iangel sc b target) dmn in
-              (forall v. chh v ->
-                reach_ch o2 nxt ((=) b) v
-                by if v = (=) b then true else
-                map h_local pref v
-                so exists stv. pref stv /\ stv.h_local = v
-                so locally_winning sc dmn stv
-                so stv.h_pair = st.h_pair
-                so stv.i_dmn = st.i_dmn
-                so stv.h_proj = st.h_proj
-                so reach_ch o2 nxt ((=) b) stv.h_local)
-              so (chain (subchain o2) chh by forall u v. chh u /\ chh v ->
-                u = (=) b || v = (=) b || (
-                  exists stu. pref stu /\ stu.h_local = u
-                  so exists stv. pref stv /\ stv.h_local = v
-                  so (sc.sd stu stv so subchain o2 u v) \/
-                     (sc.sd stv stu so subchain o2 v u)))
-              so chh ((=) b)
-              so chain (subchain o2) (map h_local pref)
-              so (supremum (subchain o2) (map h_local pref) st.h_local)
-              so (supremum (subchain o2) chh st.h_local
-                by (upper_bound (subchain o2) chh st.h_local by forall u.
-                  chh u -> subchain o2 u st.h_local
-                  by if map h_local pref u then true else
-                    u = (=) b
-                    so (exists st0. pref st0
-                    so locally_winning sc dmn st0
-                    so st0.h_pair = st.h_pair
-                    so st0.i_dmn = st.i_dmn
-                    so st0.h_proj = st.h_proj
-                    so reach_ch o2 nxt ((=) b) st0.h_local
-                    so subchain o2 ((=) b) st0.h_local
-                    so map h_local pref st0.h_local
-                    so subchain o2 st0.h_local st.h_local
-                    (* FIXME: Duplicata (copy-paste) of a similar existence
-                       proof for coherence propagation. Fuse somehow ? *)
-                    ) by (
-                      (exists st0. pref st0)
-                      by (exists st2. ch st2 /\ st2.h_pair pr /\
-                        st2.i_dmn s0 = st.i_dmn s0
-                        so (pext st2.h_pair st.h_pair
-                          by subchain op st2.h_pair st.h_pair
-                          so (forall z. st.h_pair z -> not st2.h_pair z ->
-                            false by op pr z so pr = z))
-                        so (ext st2.i_dmn st.i_dmn by forall s.
-                          st2.i_dmn s = st.i_dmn s by "case_split"
-                          match dmn_limit ch s with
-                          | None -> true
-                          | Some u -> (exists y. dmn_map ch s y) so dmn_map ch s u
-                              so exists st3. ch st3 /\ st3.i_dmn s = Some u
-                              so (sc.sd st2 st3
-                                  so sc.sd st3 st
-                                  so (st3.i_dmn s0 = st.i_dmn s0 by
-                                    match st2.i_dmn s0, st3.i_dmn s0 with
-                                    | None , None -> true
-                                    | None, Some _ -> st.i_dmn s0 = st3.i_dmn s0
-                                    | Some _, _ -> st3.i_dmn s0 = st2.i_dmn s0
-                                    end)
-                                  so subchain op st2.h_pair st3.h_pair
-                                  so subchain op st3.h_pair st.h_pair
-                                  so coherent sc dmn st3
-                                  so tr_reach sc.sd evl bs st2
-                                  so st3.h_pair = st.h_pair
-                                  so st3.h_proj = st.h_proj
-                                  so st2.i_dmn = st3.i_dmn) \/
-                                 (sc.sd st3 st2 so st2.i_dmn s = Some u)
-                          end)
-                        so pref st2)
-                      by match dmn_limit ch s0 with
-                      | None -> exists a. map h_pair ch a /\ a pr
-                          so exists st2. ch st2 /\ st2.h_pair = a
-                          so st2.i_dmn s0 = None
-                          by sc.sd st2 st
-                      | Some u -> exists a. map h_pair ch a /\ a pr
-                        so exists st2. ch st2 /\ st2.h_pair = a
-                        so dmn_map ch s0 u
-                        so exists st3. ch st3 /\ st3.i_dmn s0 = Some u
-                        so (sc.sd st2 st3 so st3.h_pair pr) \/
-                           (sc.sd st3 st2 so st2.i_dmn s0 = Some u)
-                      end) (* end of duplicata *)
-                )
-                /\ (forall u. upper_bound (subchain o2) chh u ->
-                  subchain o2 st.h_local u
-                  by upper_bound (subchain o2) (map h_local pref) u))
-              so reach_ch o2 nxt ((=) b) st.h_local)
+        if not maximum op st.h_pair pr then true else
+        let (a,b) = pr in
+        let s0 = sc.anga a st.h_proj in
+        if s0 a \/ not sc.g1.transition a s0 then true else
+        let target = related sc.r s0 in
+        let pref = with_prefix_in ch st.h_pair in
+        let imp = image h_local pref in
+        st = sorder_completion ch
+        so (forall x. st.h_local x /\ target x -> maximum o2 st.h_local x
+          by forall y. st.h_local y -> o2 y x
+          by exists hl. imp hl /\ hl y
+          so exists sty. pref sty /\ sty.h_local = hl
+          so exists hl. imp hl /\ hl x
+          so exists stx. pref stx /\ stx.h_local = hl
+          so (exists stxy. pref stxy /\ stxy.h_local x /\ stxy.h_local y
+            so stxy.h_pair = st.h_pair
+            so locally_winning sc dmn stxy
+            so maximum o2 stxy.h_local x)
+          by (sc.sd stx sty so sty.h_local x by subset stx.h_local sty.h_local)
+          \/ (sc.sd sty stx so stx.h_local y by subset sty.h_local stx.h_local))
+        /\ (let stp = step sc.g2 (iangel sc b target) dmn in
+          reach_ch o2 stp ((=) b) st.h_local
+          by tr_reach sc.sd evl bs st
+          so coherent sc dmn st
+          so let chh = add imp ((=) b) in
+            (forall v. chh v -> reach_ch o2 stp ((=) b) v
+              by if v = (=) b then true else
+              image h_local pref v
+              so exists stv. pref stv /\ stv.h_local = v
+              so locally_winning sc dmn stv
+              so stv.h_pair = st.h_pair)
+          so (forall u. chh u -> subchain o2 ((=) b) u
+            by reach_ch o2 stp ((=) b) u)
+          so (chain (subchain o2) chh by forall u v. chh u /\ chh v ->
+            u = (=) b || v = (=) b || (imp u /\ imp v
+              so chain (subchain o2) imp))
+          so let sb = subchain o2 in
+            supremum sb imp st.h_local
+          so supremum sb chh st.h_local
+            by (upper_bound sb chh st.h_local
+              by forall u. chh u -> sb u st.h_local
+              by "case_split" if imp u then true else
+                u = (=) b
+                so (exists st0. pref st0
+                  so locally_winning sc dmn st0
+                  so st0.h_pair = st.h_pair
+                  so order sb
+                  so reach_ch o2 stp ((=) b) st0.h_local
+                  so sb ((=) b) st0.h_local
+                  so imp st0.h_local
+                  so sb st0.h_local st.h_local)
+                by (exists st0. pref st0)
+                by subchain_completion (image h_pair ch) pr
+                so exists hp. image h_pair ch hp /\ hp pr
+                so exists st2. ch st2 /\ st2.h_pair = hp
+                so (sext st2.h_pair st.h_pair
+                  by supremum (subchain op) (image h_pair ch) st.h_pair
+                  so subchain op st2.h_pair st.h_pair
+                  so forall x. st.h_pair x -> not (not st2.h_pair x
+                    so op pr x so op x pr so antisymetric op) )
+                so pref st2
+            ) /\ lower_bound (subchain o2)
+                           (upper_bound (subchain o2) chh) st.h_local
+            by forall u. upper_bound (subchain o2) chh u ->
+              subchain o2 st.h_local u
+              by upper_bound (subchain o2) imp u
+              /\ supremum (subchain o2) imp st.h_local)
 
-  predicate compat (partial:'a -> option 'b) (total:'a -> 'b) =
-    forall x. match partial x with
-      | None -> true
-      | Some y -> total x = y
-      end
-
-  predicate reconstructed (sc:section 'a 'b) (st:state 'a 'b) (dmn:demon 'a) =
-    let o1 = sc.g1.progress in
-    reach_ch o1 (strat_next sc.g1 sc.anga dmn) ((=) sc.basea) st.h_proj
-
-  lemma descendant_compat : forall sc:section 'a 'b,st1 st2 dmna.
-    section_hypothesis sc ->
-    sc.sd st1 st2 /\ compat st2.i_dmn dmna -> compat st1.i_dmn dmna
-
-  lemma reconstruction : forall sc:section 'a 'b,st dmn dmna.
-    section_hypothesis sc ->
-    let evl = evolve sc dmn in
-    let bs = basic sc in
-    tr_reach sc.sd evl bs st /\ compat st.i_dmn dmna -> reconstructed sc st dmna
-    by (forall o1 f1 b1 st. o1 = sc.sd /\ f1 = evl /\ b1 = bs ->
-      "induction" tr_reach o1 f1 b1 st ->
-      forall dmna. compat st.i_dmn dmna -> reconstructed sc st dmna)
+  lemma simulation_theorem : forall g10,r0:'a -> 'b -> bool,g20.
+    game_wf g10 /\ game_wf g20 /\ step_simulate g10 r0 g20 ->
+    simulate g10 r0 g20
+    by forall start win0. have_uniform_winning_strat g10 start win0 ->
+      have_uniform_winning_strat g20 (related r0 start) (related r0 win0)
+    by let rwin = related r0 win0 in
+      forall y. related r0 start y ->
+      have_winning_strat g20 y rwin
+    by exists x. r0 x y /\ start x
+    so exists ang. uniform_winning_strat g10 start win0 ang
+    so winning_strat g10 x win0 ang
+    so let sc = {
+        g1 = g10;
+        r = r0;
+        g2 = g20;
+        basea = x;
+        baseb = y;
+        win = win0;
+        anga = ang;
+      } in
+      section_hypothesis sc
+    so let angb = sim_angel sc in
+      let o2 = g20.progress in
+      let sb = subchain o2 in
+      (* By absurd: suppose not winning, hence we have a demon
+         that reach a looping chain. *)
+      if winning_strat g20 y rwin angb then true else
+      exists dmn ch. let stp = step g20 angb dmn in
+      let xt = extends_ch o2 stp in
+      reach_ch o2 stp ((=) y) ch /\
+      (forall x. maximum o2 ch x /\ g20.transition x (angb x ch) ->
+        dmn (angb x ch) = x) /\
+      lose_at g20 angb rwin ch
+    so (xt ch = ch by ext (xt ch) ch by ch (stp ch)
+      by exists x. let a = angb x ch in
+        maximum o2 ch x /\ (not g20.transition x a \/ a x)
+        so x = sup o2 ch so stp ch = x
+        by not g20.transition x a || (dmn a = x so stp ch = x))
+      (* So let us check how the paired evolution fixpoint behave. *)
+    so let bs = basic sc in
+      let evl = evolve sc dmn in
+      let stl = fixpoint_above sc.sd evl bs in
+      tr_reach sc.sd evl bs stl /\ evl stl = stl
+    so evolve sc dmn stl = stl
+    so coherent sc dmn stl
+    so locally_winning sc dmn stl
+    so reach_ch o2 stp ((=) y) stl.h_total
+    so maximum sb (tr_reach sb xt ((=) y)) ch
+    so subchain o2 stl.h_total ch
+    (* Preliminary: check that there are no past winner for h_proj. *)
+    so (forall x. stl.h_proj x -> not (win0 x
+      so image fst stl.h_pair x
+      so exists y. stl.h_pair y /\ fst y = x
+        so let (_,y) = y in
+          sc.r x y
+        so rwin y
+        so stl.h_total y so ch y))
+    so false
     by let o1 = sc.g1.progress in
       let o2 = sc.g2.progress in
-      let op = oprod o1 o2 in
-    pext bs.h_proj ((=) sc.basea)
-    so (* Case Reach_succ *)
-      (forall st. coherent sc dmn st /\ (forall dmna. compat st.i_dmn dmna ->
-        reconstructed sc st dmna) ->
-        let nst = evl st in
-        forall dmna. compat nst.i_dmn dmna ->
-          reconstructed sc nst dmna
-        by reconstructed sc st dmna
-        so let pr = sup op st.h_pair in
-        let (a,b) = pr in
-        let nxt = strat_next sc.g1 sc.anga dmna in
-        (supremum o1 st.h_proj a
-         by supremum op st.h_pair pr
-         so (upper_bound o1 st.h_proj a by forall a2. st.h_proj a2 -> o1 a2 a
-           by exists b2. st.h_pair (a2,b2) so op (a2,b2) pr
-         ) /\ (forall u. upper_bound o1 st.h_proj u -> o1 a u
-           by (upper_bound op st.h_pair (u,b) by forall pi. st.h_pair pi ->
-             op pi (u,b) by let (a2,b2) = pi in op pi (a,b)
-             so o2 b2 b /\ st.h_proj a2 so o1 a2 u
-           ) so op (a,b) (u,b)))
-        so a = sup o1 st.h_proj
-        so if not maximum op st.h_pair pr
-        then nst.h_pair = add st.h_pair pr
-          so (pext nst.h_proj (add st.h_proj a)
-            by forall x. add st.h_proj a x ->
-              nst.h_proj x by "case_split" x = a \/ st.h_proj x)
-          so (if st.h_proj a
-            then pext nst.h_proj st.h_proj
-            else a = nxt st.h_proj
-              so pext nst.h_proj (extends_ch o1 nxt st.h_proj))
-              so reconstructed sc nst dmna
-        else let s0 = sc.anga a st.h_proj in
-          if st.i_dmn s0 <> None \/ not sc.g1.transition a s0
-          then st.h_proj = nst.h_proj
-            so reconstructed sc nst dmna
-          else let target = rel_map sc.r s0 in
-            let bl = sup o2 st.h_local in
-            supremum o2 st.h_total bl
-            so if target bl
-            then let al = choice (rel_map_witness sc.r s0 bl) in
-              s0 al
-              so nst.i_dmn s0 = Some al
-              so dmna s0 = al
-              so nst.h_pair = safe_add op st.h_pair (al,bl)
-              so (upper_bound op st.h_pair (al,bl)
-                by upper_bound op st.h_pair (a,b)
-                so op (a,b) (al,bl)
-                by o2 b bl by st.h_total b)
-              so nst.h_pair = add st.h_pair (al,bl)
-              so (pext nst.h_proj (add st.h_proj al)
-                by forall u. add st.h_proj al u ->
-                  nst.h_proj u by u = al || st.h_proj u)
-              so al = nxt st.h_proj
-              so pext nst.h_proj (extends_ch o1 nxt st.h_proj)
-              so reconstructed sc nst dmna
-            else st.h_pair = nst.h_pair
-              so st.h_proj = nst.h_proj
-              so reconstructed sc nst dmna)
-    /\ (* Case Reach_chain *)
-      (forall ch st. chain sc.sd ch /\ supremum sc.sd ch st /\ ch bs /\
-        (forall u dmna. ch u /\ compat u.i_dmn dmna ->
-          reconstructed sc u dmna) ->
-        forall dmna. compat st.i_dmn dmna ->
-          reconstructed sc st dmna
-        by (forall u. ch u -> reconstructed sc u dmna)
-        so st = sorder_completion ch
-        so let chh = map h_proj ch in
-          (forall stu stv. subchain op stu.h_pair stv.h_pair ->
-            subchain o1 stu.h_proj stv.h_proj
-            by forall a b. stu.h_proj a /\ stv.h_proj b /\ not stu.h_proj b ->
-              o1 a b
-            by exists a0. stu.h_pair (a,a0)
-            so exists b0. stv.h_pair (b,b0)
-            so op (a,a0) (b,b0))
-          so (chain (subchain o1) chh
-            by forall u v. chh u /\ chh v -> subchain o1 u v \/ subchain o1 v u
-            by exists stu. ch stu /\ stu.h_proj = u
-            so exists stv. ch stv /\ stv.h_proj = v
-            so sc.sd stu stv \/ sc.sd stv stu)
-          so chh ((=) sc.basea)
-          so supremum (subchain o1) chh st.h_proj
-          by (upper_bound (subchain o1) chh st.h_proj
-            by forall u. chh u -> subchain o1 u st.h_proj
-            by exists stu. ch stu /\ stu.h_proj = u
-            so subchain op stu.h_pair st.h_pair)
-          /\ (forall u. upper_bound (subchain o1) chh u ->
-            subchain o1 st.h_proj u
-            by (forall a. st.h_proj a -> u a
-              by exists a1. st.h_pair (a,a1)
-              so exists m. map h_pair ch m /\ m (a,a1)
-              so exists u0. ch u0 /\ u0.h_pair = m
-              so chh u0.h_proj so u0.h_proj a)
-            so (forall a b. st.h_proj a /\ u b /\ not st.h_proj b -> o1 a b
-              by exists a1. st.h_pair (a,a1)
-              so exists m. map h_pair ch m /\ m (a,a1)
-              so exists u0. ch u0 /\ u0.h_pair = m
-              so chh u0.h_proj so u0.h_proj a
-              so not u0.h_proj b)))
+      let op = rprod o1 o2 in
+      let pr = sup op stl.h_pair in
+      let a = fst pr in let b = snd pr in
+      (* Safe-guards holds. *)
+      chain op stl.h_pair /\ chain o2 stl.h_local
+      so (* Fixpoint can't be at a 'add supremum' step,
+            otherwise it would not be a fixpoint. *)
+      if not maximum op stl.h_pair pr
+      then chain_complete op
+        so supremum op stl.h_pair pr so supremum o2 stl.h_total b
+        so stl.h_pair = add stl.h_pair pr so false
+      else let s0 = sc.anga a stl.h_proj in
+        if s0 a \/ not g10.transition a s0
+        then (* That implies that the current h_proj is losing.
+                Impossible as well. *)
+          maximum o1 stl.h_proj a
+          so lose_at g10 ang win0 stl.h_proj so false
+        else let target = related sc.r s0 in
+          let bl = sup o2 stl.h_local in
+          (* Other safe-guards holds. *)
+          (supremum o2 stl.h_local bl /\ supremum o2 stl.h_total bl
+            by chain_complete o2
+            so (exists bl0. supremum o2 stl.h_local bl0)
+            /\ (exists bl1. supremum o2 stl.h_total bl1))
+          so upper_bound o2 stl.h_total bl
+          so (o2 b bl by op (a,b) (a,bl) by upper_bound op stl.h_pair (a,bl)
+            by forall u. stl.h_pair u -> op u (a,bl)
+            by let (v,w) = u in op (v,w) (a,b)
+              so o1 v a so stl.h_total w so o2 w bl)
+          so if target bl
+          then (* If we reach the local target,
+            we would increase the paired history => impossible. *)
+            let al = choice (related_w sc.r s0 bl) in
+            exists al1. sc.r al1 bl /\ s0 al1
+            so related_w sc.r s0 bl al1 so related_w sc.r s0 bl al
+            so not (stl.h_pair (al,bl) so op (al,bl) (a,b) so o1 al a
+              so o1 a al so antisymetric o1)
+            so stl.h_pair = add stl.h_pair (al,bl)
+            so false
+          else (* Otherwise, as the current step is locally winning,
+                  we can add one more step to the local history
+                  => impossible, would not be a fixpoint. *)
+            let lang = iangel sc b target in
+            let stp = step sc.g2 lang dmn in
+            stl.h_local = extends_ch o2 stp stl.h_local /\
+            stl.h_total = add stl.h_total (stp stl.h_local)
+            so stl.h_local (stp stl.h_local)
+            so stl.h_local bl
+            so maximum o2 stl.h_local bl
+            so let an = lang bl stl.h_local in
+              let d = dmn an in
+              if not sc.g2.transition bl an ||
+                 (an d so d = bl by stp stl.h_local = d
+                       so o2 d bl so o2 bl d so antisymetric o2)
+              then (lose_at g20 lang target stl.h_local
+                  by forall u. stl.h_local u -> not (target u
+                    so maximum o2 stl.h_local u so u = bl))
+                so sc.r a b
+                so have_winning_strat sc.g2 b target
+                so exists ang_. winning_strat sc.g2 b target ang_
+                so winning_strat sc.g2 b target lang
+                so reach_ch o2 stp ((=) b) stl.h_local
+                so dmn_reach sc.g2 lang b stl.h_local
+                so false
+              else (* There is one case in which we can't add a step:
+                      the case where the demon fail.
+                      Then, the run is maximal => it also corresponds
+                      to the losing run, which is absurd. *)
+                (angb bl stl.h_total = an
+                  by (maximal_witness sc stl.h_total stl dmn
+                    by maximum sc.sd (tr_reach sc.sd evl bs) stl)
+                  so any_max_witness sc stl.h_total stl
+                  so let st0 = choice (any_max_witness sc stl.h_total) in
+                    any_max_witness sc stl.h_total st0
+                  so st0 = stl)
+                so stl.h_total bl
+                so let stp2 = step sc.g2 angb dmn in
+                  let xt2 = extends_ch o2 stp2 in
+                  reach_ch o2 stp2 ((=) sc.baseb) stl.h_total
+                so stp2 stl.h_total = bl
+                so xt2 stl.h_total = stl.h_total
+                so maximum sb (tr_reach sb xt2 ((=) sc.baseb)) stl.h_total
+                so stl.h_total = max sb (tr_reach sb xt2 ((=) sc.baseb)) = ch
+                so d = bl
+                so false
+    (* Conclusion: absurd. *)
+
+  clone StratProps with goal have_uniform_winning_strat_alternate_def,
+    goal have_winning_strat_local_criterion,
+    goal simulation
+
+end
+
+(*
 
   lemma absurdity : forall sc:section 'a 'b,dmn.
     section_hypothesis sc ->
@@ -1859,106 +2112,4 @@ module StratProofs
               so exists ang. winning_strat sc.g2 b target ang)
             so false
 
-  lemma recover_winner : forall sc:section 'a 'b,dmn.
-    section_hypothesis sc ->
-    let evl = evolve sc dmn in
-    let bs = basic sc in
-    let angb = sim_angel sc in
-    let winb = rel_map sc.r sc.win in
-    (exists st. tr_reach sc.sd evl bs st /\
-      win_at sc.g2 winb angb dmn st.h_total)
-    by ((forall o1 f1 b1 st. o1 = sc.sd /\ f1 = evl /\ b1 = bs ->
-      ("induction" tr_reach o1 f1 b1 st) ->
-        (exists st. tr_reach sc.sd evl bs st /\
-         win_at sc.g2 winb angb dmn st.h_total) \/
-        (forall x. st.h_total x -> not winb x))
-      by let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-        let op = oprod o1 o2 in
-        (* case Reach_base *)
-        (maximum o2 bs.h_total sc.baseb
-        so (winb sc.baseb so win_at sc.g2 winb angb dmn bs.h_total) ||
-           (forall x. bs.h_total x -> not winb x))
-      /\ (* case Reach_succ *)
-        (forall st. tr_reach sc.sd evl bs st /\
-          (forall x. st.h_total x -> not winb x) ->
-          let nst = evl st in
-          win_at sc.g2 winb angb dmn nst.h_total \/
-          (forall x. nst.h_total x -> not winb x)
-          by "case_split"
-            let pr = sup op st.h_pair in
-            let b = snd pr in
-            if not maximum op st.h_pair pr
-            then nst.h_total = safe_add o2 st.h_total b
-              so if nst.h_total b /\ winb b
-              then win_at sc.g2 winb angb dmn nst.h_total
-                by maximum o2 nst.h_total b
-              else forall x. nst.h_total x -> not winb x
-            else let a = fst pr in
-              let s0 = sc.anga a st.h_proj in
-              if st.i_dmn s0 <> None \/ not sc.g1.transition a s0
-              then forall x. nst.h_total x -> not winb x
-              else let target = rel_map sc.r s0 in
-                let bl = sup o2 st.h_local in
-                if target bl
-                then (if nst.h_total bl /\ winb bl
-                  then win_at sc.g2 winb angb dmn nst.h_total
-                    by maximum o2 nst.h_total bl
-                  else forall x. nst.h_total x -> not winb x
-                  ) by nst.h_total = safe_add o2 st.h_total bl
-                else let nxt = strat_next sc.g2 (iangel sc b target) dmn in
-                  let bnx = nxt st.h_local in
-                  (if nst.h_total bnx /\ winb bnx
-                   then win_at sc.g2 winb angb dmn nst.h_total
-                     by maximum o2 nst.h_total bnx
-                   else forall x. nst.h_total x -> not winb x
-                  ) by nst.h_total = safe_add o2 st.h_total bnx)
-      /\ (* case Reach_chain *)
-        (forall ch st. chain sc.sd ch /\ supremum sc.sd ch st /\
-          (forall u x. ch u /\ u.h_total x -> not winb x) ->
-          forall x. st.h_total x -> not winb x
-          by st = sorder_completion ch
-          so exists stu. stu.h_total x /\ ch stu
-          so not winb x)
-    ) so let st = fixpoint_above sc.sd evl bs in
-      tr_reach sc.sd evl bs st
-      so (exists st. tr_reach sc.sd evl bs st /\
-        win_at sc.g2 winb angb dmn st.h_total) \/
-      ((forall x. st.h_total x -> not winb x) so
-       win_at sc.g2 winb angb dmn st.h_total)
-
-  lemma simulation_theorem : forall g10,r0:'a -> 'b -> bool,g20.
-    game_wf g10 /\ game_wf g20 /\ step_simulate g10 r0 g20 ->
-    simulate g10 r0 g20
-    by forall start win0. have_uniform_winning_strat g10 start win0 ->
-      have_uniform_winning_strat g20 (rel_map r0 start) (rel_map r0 win0)
-    by forall y. rel_map r0 start y ->
-      have_winning_strat g20 y (rel_map r0 win0)
-    by exists x. rel_map_witness r0 start y x
-    so start x /\ r0 x y
-    so exists ang. uniform_winning_strat g10 start win0 ang
-    so winning_strat g10 x win0 ang
-    so let sc = {
-        g1 = g10;
-        r = r0;
-        g2 = g20;
-        basea = x;
-        baseb = y;
-        win = win0;
-        anga = ang;
-      } in
-      section_hypothesis sc
-    so let angb = sim_angel sc in
-      winning_strat g20 y (rel_map r0 win0) angb
-    by forall dmn. win_against g20 y (rel_map r0 win0) angb dmn
-    by let evl = evolve sc dmn in
-      let bs = basic sc in
-      let winb = rel_map sc.r sc.win in
-      exists st. tr_reach sc.sd evl bs st /\
-        win_at sc.g2 winb angb dmn st.h_total
-
-  clone StratProps with
-    goal have_uniform_winning_strat_alternate_def,
-    goal have_winning_strat_local_criterion,
-    goal simulation
-
-end
+end*)
