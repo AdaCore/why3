@@ -1,3 +1,23 @@
+
+typing
+------
+
+  - expression { e with f2 = e2 } is syntactic sugar for
+    { f1 = e.f1; f2 = e2; f3 = e.f3 }
+    We would get better error messages if we would produce instead
+    { f2 = e2; f1 = e.f1; f3 = e.f3 }
+    that is, with user-given fields first, then fields from e
+    See for instance bench/programs/bad-typing/with1.mlw
+
+  - the error message for
+      val foo (_x : int) : int
+      val f (x:int) : unit writes { foo.contents }
+    is "unbound symbol 'foo'", which is not correct
+    (is should rather be that "foo" has the wrong type)
+
+  - bench/programs/bad-to-keep/at1.mlw
+    should at least produce a warning (meaningless 'old')
+
 docs
 ----
 

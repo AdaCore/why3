@@ -1,0 +1,4 @@
+theory A
+  type list 'a = Nil | Cons 'a (list 'a)
+  let f (l:list int) : int = match l with Cons x x -> 0 | Nil -> 1 end
+end

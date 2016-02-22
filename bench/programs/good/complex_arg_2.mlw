@@ -1,4 +1,3 @@
-module M
 
 exception Exception int
 
@@ -10,10 +9,3 @@ val m (a:int) (b:int) : unit raises { Exception }
 
 let test () raises { Exception } = (m ( assert { true } ; 0) 0)
 
-end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/complex_arg_2"
-End:
-*)

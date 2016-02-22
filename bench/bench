@@ -165,12 +165,12 @@ invalid_goals bench/invalid
 echo ""
 
 echo "=== Checking theories ==="
-goods theories
+goods theories --type-only # FIXME remove --type-only
 echo ""
 
 echo "=== Checking modules ==="
-goods modules
-goods modules/mach
+goods modules --type-only # FIXME remove --type-only
+goods modules/mach --type-only # FIXME remove --type-only
 echo ""
 
 echo "=== Checking drivers ==="
@@ -186,7 +186,7 @@ echo ""
 
 echo "=== Checking good files ==="
 goods bench/typing/good
-goods bench/programs/good
+goods bench/programs/good --type-only # FIXME remove --type-only
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers

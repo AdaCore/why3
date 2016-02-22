@@ -8,20 +8,11 @@ val x : ref int
 val f () : unit writes {x} ensures { !x = 1 - old !x }
 
 let p () =
-'Init:
-  begin
-    let _t = () in ();
-    (f ());
-    (f ());
-    assert { !x = at !x 'Init };
-    ()
-  end
+  label Init in
+  let _t = () in ();
+  (f ());
+  (f ());
+  assert { !x = !x at Init };
+  ()
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/wpcalls"
-End:
-*)
-

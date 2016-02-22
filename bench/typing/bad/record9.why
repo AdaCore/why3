@@ -1,7 +1,7 @@
 theory Records
-  type t = { a:int; b:int }
+  type t  = { a:int; b:int }
   type t2 = { c:int; d:int }
-  goal g1 : 
+  goal g1 :
     let t = { a = 1; b = 2 } in
     let t = { t with d = 3 } in
     true

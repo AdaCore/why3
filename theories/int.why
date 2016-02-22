@@ -285,8 +285,8 @@ theory NumOf
   let rec function numof (p: int -> bool) (a b: int) : int
     variant { b - a }
   = if b <= a then 0 else
-    if p (b - 1) then 1 + numof p a (b - 1) else
-                          numof p a (b - 1)
+    if p (b - 1) then 1 + numof p a (b - 1)
+                 else     numof p a (b - 1)
 
   lemma Numof_bounds :
     forall p : int -> bool, a b : int. a < b -> 0 <= numof p a b <= b - a
