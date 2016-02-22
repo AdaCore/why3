@@ -1339,7 +1339,8 @@ let cty_tuple args =
   let post = create_post vs (t_equ (t_var vs) (t_tuple tl)) in
   let mask = mask_reduce (MaskTuple (List.map mask_of_pv args)) in
   let res = ity_tuple (List.map (fun v -> v.pv_ity) args) in
-  let eff = eff_ghostify (mask = MaskGhost) eff_empty in
+  let eff = eff_read (Spv.of_list args) in
+  let eff = eff_ghostify (mask = MaskGhost) eff in
   let frz = List.fold_right freeze_pv args isb_empty in
   cty_unsafe [] [] [post] Mexn.empty Mpv.empty eff res mask frz
 
