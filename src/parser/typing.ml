@@ -567,7 +567,9 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let qualid_app loc q el =
     let e = try match find_prog_symbol muc q with
       | PV pv -> DEpv pv | RS rs -> DErs rs with
-      | _ -> DEls (find_lsymbol muc.muc_theory q) in
+      | _ -> ignore (find_lsymbol muc.muc_theory q);
+             Loc.errorm ~loc "Symbol %a is a pure logical symbol, \
+                              it cannot be used in a program" print_qualid q in
     expr_app loc e el
   in
   let qualid_app loc q el = match q with
