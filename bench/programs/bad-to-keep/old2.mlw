@@ -1,0 +1,9 @@
+module M
+  use import int.Int
+  use import ref.Ref
+  let test1 (x: ref int)
+    ensures  { !x >= old !x }
+    requires { !x >= 0}
+  = x := !x - 1;
+    assert { !x >= old !x }
+end
