@@ -354,7 +354,7 @@ Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo".
+Ltac ae := why3 "Alt-Ergo,0.99.1,"; admit.
 Require Import Classical.
 
 (* Why3 goal *)
@@ -379,7 +379,7 @@ Theorem WP_parameter_relax : forall (m:(map.Map.map vertex t)) (u:vertex)
   | (Finite x) => match (map.Map.get m
       v) with
       | Infinite => True
-      | (Finite y) => ((x + (weight u v))%Z < y)%Z
+      | (Finite x1) => ((x + (weight u v))%Z < x1)%Z
       end
   end -> forall (m1:(map.Map.map vertex t)), (m1 = (map.Map.set m v
   match (map.Map.get m
@@ -400,5 +400,5 @@ destruct H as (lu, (hu1, hu2)).
 exists (app lu (cons u nil)); ae.
 subst m1. rewrite Map.Select_neq; auto.
 ae.
-Qed.
+Admitted.
 

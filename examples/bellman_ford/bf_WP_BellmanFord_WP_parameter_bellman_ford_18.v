@@ -354,7 +354,7 @@ Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 30.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 30; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
@@ -421,5 +421,5 @@ assert (i <= Length.length l')%Z by ae.
 assert (Length.length l = Length.length l' + 1)%Z.
 subst l. apply Append.Append_length.
 ae.
-Qed.
+Admitted.
 
