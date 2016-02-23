@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.5" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="4000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="10" steplimit="1" memlimit="4000"/>
 <prover id="11" name="Vampire" version="0.6" timelimit="5" steplimit="1" memlimit="4000"/>
 <prover id="12" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="1" memlimit="4000"/>
@@ -532,7 +532,7 @@
  <proof prover="15"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="permut_permutation">
- <proof prover="0" timelimit="6" memlimit="1000" edited="verifythis_fm2012_lcp_SuffixArray_permut_permutation_1.v"><result status="valid" time="2.26"/></proof>
+ <proof prover="1" timelimit="6" memlimit="1000" edited="verifythis_fm2012_lcp_SuffixArray_permut_permutation_1.v"><result status="valid" time="1.12"/></proof>
  </goal>
  <goal name="WP_parameter create" expl="VC for create">
  <transf name="split_goal_wp">
@@ -621,7 +621,7 @@
   </goal>
   <goal name="WP_parameter create.12" expl="12. type invariant">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.10"/></proof>
-  <proof prover="11"><result status="valid" time="4.28"/></proof>
+  <proof prover="11"><result status="valid" time="3.51"/></proof>
   <proof prover="12" memlimit="1000"><result status="valid" time="0.08" steps="76"/></proof>
   <proof prover="14" memlimit="1000"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -643,7 +643,7 @@
   </goal>
   <goal name="WP_parameter lcp.3" expl="3. precondition">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="11"><result status="valid" time="3.62"/></proof>
+  <proof prover="11"><result status="valid" time="3.00"/></proof>
   <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
   <proof prover="13" memlimit="1000"><result status="valid" time="0.06"/></proof>
   <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
@@ -752,7 +752,7 @@
   </goal>
   <goal name="WP_parameter lrs.11" expl="11. precondition">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="3.56"/></proof>
+  <proof prover="11"><result status="valid" time="2.93"/></proof>
   <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="23"/></proof>
   <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
@@ -774,11 +774,11 @@
   </goal>
   <goal name="WP_parameter lrs.14" expl="14. loop invariant preservation">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.16"/></proof>
-  <proof prover="11"><result status="valid" time="3.78"/></proof>
+  <proof prover="11"><result status="valid" time="3.25"/></proof>
   <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="45"/></proof>
   <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
   <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="15"><result status="valid" time="0.50"/></proof>
+  <proof prover="15"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter lrs.15" expl="15. loop invariant preservation">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.17"/></proof>
@@ -820,17 +820,17 @@
   <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.21" expl="21. loop invariant preservation">
-  <proof prover="3" memlimit="1000"><result status="valid" time="2.92"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="2.15"/></proof>
   <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter lrs.22" expl="22. assertion">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.15"/></proof>
   <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="54"/></proof>
   <proof prover="14" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="15"><result status="valid" time="1.81"/></proof>
+  <proof prover="15"><result status="valid" time="1.10"/></proof>
   </goal>
   <goal name="WP_parameter lrs.23" expl="23. assertion">
-  <proof prover="0" memlimit="1000" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_10.v"><result status="valid" time="0.98"/></proof>
+  <proof prover="1" memlimit="1000" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_10.v"><result status="valid" time="1.61"/></proof>
   </goal>
   <goal name="WP_parameter lrs.24" expl="24. postcondition">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
@@ -856,7 +856,7 @@
   <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.27" expl="27. postcondition">
-  <proof prover="0" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v"><result status="valid" time="0.81"/></proof>
+  <proof prover="1" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v"><result status="valid" time="1.31"/></proof>
   </goal>
  </transf>
  </goal>
