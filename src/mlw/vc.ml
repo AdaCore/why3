@@ -603,19 +603,20 @@ let rec wp_expr env e res q xq = match e.e_node with
         let pvs_of_xwp _ (v,q) s = vc_freepvs s v q in
         let pvs = Mexn.fold pvs_of_xwp xq Spv.empty in
         dst_of_pvs cv (vc_freepvs pvs res q) in
+(*
       (* compute sp_expr e independently of q *)
       let ok, ne, ex = sp_expr env e res (Mexn.map fst xq) dst in
       let adv = advancement dst in
       let q = sp_wp_close res ne adv q in
       let join cq (v,q) = sp_wp_close v cq adv q in
       wp_and ok (wp_inter_mexn q join ex xq)
-(*    (* compute sp_expr e with q inlined into ok, so that
+*)
+      (* compute sp_expr e with q inlined into ok, so that
          the result expression can be substituted into q *)
       let out = q, t_true, Mexn.empty in
       let ok,_,ex = sp_seq env e res (Mexn.map fst xq) out eff_empty dst in
       let adv = if Mexn.is_empty ex then Mvs.empty else advancement dst in
       wp_inter_mexn ok (fun sp (v,q) -> sp_wp_close v sp adv q) ex xq
-*)
   | Evar v ->
       t_subst_single res (vc_label e (t_var v.pv_vs)) q
   | Econst c ->
