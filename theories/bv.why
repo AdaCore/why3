@@ -402,11 +402,10 @@ theory BV64
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  (* meta "remove_prop" prop size_pos *)
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
@@ -418,11 +417,10 @@ theory BV32
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  (* meta "remove_prop" prop size_pos *)
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
@@ -434,11 +432,10 @@ theory BV16
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  (* meta "remove_prop" prop size_pos *)
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
@@ -450,11 +447,10 @@ theory BV8
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  (* meta "remove_prop" prop size_pos *)
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
