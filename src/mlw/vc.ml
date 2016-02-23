@@ -638,18 +638,19 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Econst c ->
       t_subst_single res (vc_label e (t_const c)) q
 
-  | Eexec {c_node = Cfun _; c_cty = _c} ->
-      assert false (* TODO *)
   | Eexec {c_cty = {cty_args = _::_} as _c} ->
       assert false (* TODO *)
 
-  | Eexec {c_cty = {cty_args = []} as c} ->
+  | Eexec {c_node = nd; c_cty = {cty_args = []} as c} ->
       let q = wp_close expl_post res c.cty_post q in
       let join cq (v,q) = wp_close expl_xpost v cq q in
       let w = wp_inter_mexn q join (cty_xpost_real c) xq in
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
       let p = wp_of_pre env e.e_loc expl_pre c.cty_pre in
-      vc_label e (wp_and p w)
+      let vc = match nd with
+        | Cfun e0 -> vc_fun env true c e0
+        | Capp _ | Cpur _ | Cany -> t_true in
+      vc_label e (wp_and vc (wp_and p w))
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -777,12 +778,10 @@ and sp_expr env e res xres dst = match e.e_node with
       let t = vc_label e (t_const c) in
       t_true, t_equ (t_var res) t, Mexn.empty
 
-  | Eexec {c_node = Cfun _; c_cty = _c} ->
-      assert false (* TODO *)
   | Eexec {c_cty = {cty_args = _::_} as _c} ->
       assert false (* TODO *)
 
-  | Eexec {c_cty = {cty_args = []} as c} ->
+  | Eexec {c_node = nd; c_cty = {cty_args = []} as c} ->
       let sp_of_post lab v ql =
         let cq = sp_of_post lab v ql in
         let sp = sp_havoc env e.e_effect v cq dst in
@@ -791,7 +790,10 @@ and sp_expr env e res xres dst = match e.e_node with
       let join v ql = sp_of_post expl_xpost v ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
       let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
-      out_label e (ok, ne, ex)
+      let vc = match nd with
+        | Cfun e0 -> vc_fun env false c e0
+        | Capp _ | Cpur _ | Cany -> t_true in
+      out_label e (wp_and vc ok, ne, ex)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
