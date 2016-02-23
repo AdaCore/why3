@@ -149,15 +149,19 @@ Axiom pow2_62 : ((pow2 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
-Axiom Div_double : forall (x:Z) (y:Z), (((0%Z < y)%Z /\ (y <= x)%Z) /\
-  (x < (2%Z * y)%Z)%Z) -> ((int.EuclideanDivision.div x y) = 1%Z).
+Axiom Div_mult_inst : forall (x:Z) (z:Z), (0%Z < x)%Z ->
+  ((int.EuclideanDivision.div ((x * 1%Z)%Z + z)%Z
+  x) = (1%Z + (int.EuclideanDivision.div z x))%Z).
+
+Axiom Div_double : forall (x:Z) (y:Z), ((0%Z < y)%Z /\ ((y <= x)%Z /\
+  (x < (2%Z * y)%Z)%Z)) -> ((int.EuclideanDivision.div x y) = 1%Z).
 
 Axiom Div_pow : forall (x:Z) (i:Z), (0%Z < i)%Z ->
   ((((pow2 (i - 1%Z)%Z) <= x)%Z /\ (x < (pow2 i))%Z) ->
   ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = 1%Z)).
 
-Axiom Div_double_neg : forall (x:Z) (y:Z), (((((-2%Z)%Z * y)%Z <= x)%Z /\
-  (x < (-y)%Z)%Z) /\ ((-y)%Z < 0%Z)%Z) -> ((int.EuclideanDivision.div x
+Axiom Div_double_neg : forall (x:Z) (y:Z), ((((-2%Z)%Z * y)%Z <= x)%Z /\
+  ((x < (-y)%Z)%Z /\ ((-y)%Z < 0%Z)%Z)) -> ((int.EuclideanDivision.div x
   y) = (-2%Z)%Z).
 
 Axiom Div_pow2 : forall (x:Z) (i:Z), (0%Z < i)%Z ->
@@ -198,21 +202,24 @@ Axiom extensionality : forall (v1:bv) (v2:bv), (eq v1 v2) -> (v1 = v2).
 Parameter bw_and: bv -> bv -> bv.
 
 Axiom Nth_bw_and : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_and v1 v2) n) = (andb (nth v1 n) (nth v2 n))).
+  (n < size)%Z) -> ((nth (bw_and v1 v2) n) = (Init.Datatypes.andb (nth v1
+  n) (nth v2 n))).
 
 Parameter bw_or: bv -> bv -> bv.
 
 Axiom Nth_bw_or : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_or v1 v2) n) = (orb (nth v1 n) (nth v2 n))).
+  (n < size)%Z) -> ((nth (bw_or v1 v2) n) = (Init.Datatypes.orb (nth v1
+  n) (nth v2 n))).
 
 Parameter bw_xor: bv -> bv -> bv.
 
 Axiom Nth_bw_xor : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_xor v1 v2) n) = (xorb (nth v1 n) (nth v2 n))).
+  (n < size)%Z) -> ((nth (bw_xor v1 v2) n) = (Init.Datatypes.xorb (nth v1
+  n) (nth v2 n))).
 
 Axiom Nth_bw_xor_v1true : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
   (n < size)%Z) /\ ((nth v1 n) = true)) -> ((nth (bw_xor v1 v2)
-  n) = (negb (nth v2 n))).
+  n) = (Init.Datatypes.negb (nth v2 n))).
 
 Axiom Nth_bw_xor_v1false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
   (n < size)%Z) /\ ((nth v1 n) = false)) -> ((nth (bw_xor v1 v2) n) = (nth v2
@@ -220,7 +227,7 @@ Axiom Nth_bw_xor_v1false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
 
 Axiom Nth_bw_xor_v2true : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
   (n < size)%Z) /\ ((nth v2 n) = true)) -> ((nth (bw_xor v1 v2)
-  n) = (negb (nth v1 n))).
+  n) = (Init.Datatypes.negb (nth v1 n))).
 
 Axiom Nth_bw_xor_v2false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
   (n < size)%Z) /\ ((nth v2 n) = false)) -> ((nth (bw_xor v1 v2) n) = (nth v1
@@ -229,7 +236,7 @@ Axiom Nth_bw_xor_v2false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
 Parameter bw_not: bv -> bv.
 
 Axiom Nth_bw_not : forall (v:bv) (n:Z), ((0%Z <= n)%Z /\ (n < size)%Z) ->
-  ((nth (bw_not v) n) = (negb (nth v n))).
+  ((nth (bw_not v) n) = (Init.Datatypes.negb (nth v n))).
 
 Parameter lsr: bv -> Z -> bv.
 
@@ -263,19 +270,19 @@ Axiom lsl_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
 
 Parameter to_nat_sub: bv -> Z -> Z -> Z.
 
-Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
-  (i <= j)%Z) /\ (j < size)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
+Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
+  ((i <= j)%Z /\ (j < size)%Z)) -> (((nth b j) = false) -> ((to_nat_sub b j
   i) = (to_nat_sub b (j - 1%Z)%Z i))).
 
-Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
-  (i <= j)%Z) /\ (j < size)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
+Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
+  ((i <= j)%Z /\ (j < size)%Z)) -> (((nth b j) = true) -> ((to_nat_sub b j
   i) = ((pow2 (j - i)%Z) + (to_nat_sub b (j - 1%Z)%Z i))%Z)).
 
 Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j < i)%Z ->
   ((to_nat_sub b j i) = 0%Z).
 
-Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j < size)%Z /\
-  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
+  ((i <= j)%Z /\ (0%Z <= i)%Z)) -> ((forall (k:Z), ((k <= j)%Z /\
   (i < k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j 0%Z) = (to_nat_sub b
   i 0%Z))).
 
@@ -283,13 +290,13 @@ Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
   (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
   k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
-Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j < size)%Z /\
-  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
+  ((i <= j)%Z /\ (0%Z <= i)%Z)) -> ((forall (k:Z), ((k <= j)%Z /\
   (i <= k)%Z) -> ((nth b k) = true)) -> ((to_nat_sub b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 5.
+Ltac ae := why3 "alt-ergo" timelimit 15; admit.
 Open Scope Z_scope.
 
 (* Why3 goal *)
@@ -297,6 +304,7 @@ Theorem to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
   ((j < size)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
   (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
   i) = (to_nat_sub b2 j i))).
+(* Why3 intros b1 b2 j i (h1,h2) h3. *)
 (* intros b1 b2 j i (h1,h2) h3. *)
 intros b1 b2 j i (Hij,Hipos).
 assert (h:(j < i \/ i <= j)) by omega; destruct h.
@@ -313,7 +321,6 @@ destruct h.
 rewrite to_nat_sub_zero; auto with zarith.
 ae.
 rewrite to_nat_sub_one; auto with zarith.
-why3 "alt-ergo" timelimit 15.
-Qed.
-
+ae.
+Admitted.
 

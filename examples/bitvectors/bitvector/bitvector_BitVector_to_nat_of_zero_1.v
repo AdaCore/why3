@@ -287,7 +287,10 @@ Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
   i 0%Z))).
 
 Require Import Why3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
+Ltac cvc := why3 "CVC3,2.4.1," timelimit 5; admit.
 Open Scope Z_scope.
+
 
 (* Why3 goal *)
 Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
@@ -297,10 +300,10 @@ Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
 (* intros b i j (h1,h2) h3. *)
 intros b i j (Hj & Hi).
 assert (h:(i>j)\/(i<=j)) by omega; destruct h.
-why3 "Alt-Ergo,0.99.1," timelimit 2.
+ae.
 generalize Hj.
 pattern j.
 apply Zlt_lower_bound_ind with (z:=i); auto.
-why3 "CVC3,2.4.1,".
-Qed.
+cvc.
+Admitted.
 

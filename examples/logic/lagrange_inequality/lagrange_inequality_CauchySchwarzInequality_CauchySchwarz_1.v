@@ -33,7 +33,7 @@ Axiom sqr_le_sqrt : forall (x:R) (y:R), ((Reals.RIneq.Rsqr x) <= y)%R ->
   (x <= (Reals.R_sqrt.sqrt y))%R.
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem CauchySchwarz : forall (x1:R) (x2:R) (y1:R) (y2:R), ((dot x1 x2 y1
@@ -46,5 +46,5 @@ apply sqr_le_sqrt.
 ae.
 ae.
 ae.
-Qed.
+Admitted.
 

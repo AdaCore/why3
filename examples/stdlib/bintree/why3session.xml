@@ -2,8 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="1" memlimit="1000"/>
 <file name="../../../theories/bintree.why" expanded="true">
 <theory name="Tree" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -11,14 +10,14 @@
  <goal name="size_nonneg" expanded="true">
  <transf name="induction_ty_lex" expanded="true">
   <goal name="size_nonneg.1" expl="1." expanded="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="size_empty" expanded="true">
  <transf name="induction_ty_lex" expanded="true">
   <goal name="size_empty.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
@@ -27,7 +26,7 @@
  <goal name="occ_nonneg" expanded="true">
  <transf name="induction_ty_lex" expanded="true">
   <goal name="occ_nonneg.1" expl="1." expanded="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
  </transf>
  </goal>
@@ -36,7 +35,7 @@
  <goal name="height_nonneg" expanded="true">
  <transf name="induction_ty_lex" expanded="true">
   <goal name="height_nonneg.1" expl="1.">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
@@ -49,7 +48,7 @@
  <goal name="inorder_length" expanded="true">
  <transf name="induction_ty_lex" expanded="true">
   <goal name="inorder_length.1" expl="1." expanded="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
  </transf>
  </goal>
