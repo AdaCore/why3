@@ -391,17 +391,70 @@ let name_regions kn wr dst =
     Some (t_var (create_vsymbol (id_clone r.reg_name) ty)) in
   Mreg.merge complete regs aff
 
+(* multi-staged assignment changes the names of regions *)
+
+let writes_of_assign asl =
+  let add wr (r,f,v) =
+    let f = Opt.get f.rs_field in
+    let r = match r.pv_ity.ity_node with
+      | Ityreg r -> r | _ -> assert false in
+    Mreg.change (function
+      | None   -> Some (Mpv.singleton f v)
+      | Some s -> Some (Mpv.add f v s)) r wr in
+  List.fold_left add Mreg.empty asl
+
+let rename_regions regs cv wr =
+  (* we compute the same region bijection as eff_assign,
+     except we do not need any consistency checking now *)
+  let reg_rexp {reg_its = s; reg_args = tl; reg_regs = rl} wfs =
+    let ity_rexp xl t = ity_exp_fold (fun l r -> r :: l) xl t in
+    let sbs = its_match_regs s tl rl in
+    let mfield xl f = match Mpv.find_opt f wfs with
+      | Some v -> ity_rexp xl v.pv_ity
+      | None -> ity_rexp xl (ity_full_inst sbs f.pv_ity) in
+    List.fold_left mfield [] s.its_mfields in
+  let rec stitch t2f rf rt wfs =
+    let t2f = Mreg.add rt rf t2f in
+    let link t2f rf rt = stitch t2f rf rt (Mreg.find_def Mpv.empty rt wr) in
+    List.fold_left2 link t2f (reg_rexp rf Mpv.empty) (reg_rexp rt wfs) in
+  let add_write r wfs t2f = (* reset regions do not partake in renaming *)
+    if not (Sreg.mem r cv) then t2f else stitch t2f r r wfs in
+  let t2f = Mreg.fold add_write wr Mreg.empty in
+  Mreg.map (fun rf -> Mreg.find rf regs) t2f
+
 (* produce a rebuilding postcondition after a write effect *)
 
 let cons_t_simp nt t fl =
   if t_equal nt t then fl else t_equ nt t :: fl
 
-let rec havoc kn reg_havoc wr regs t ity fl =
+type rhs_of_write = PV of pvsymbol | VD | NF
+
+let rhs_of_effect f wfs = if Mpv.mem f wfs then VD else NF
+
+let rhs_of_assign f wfs = try PV (Mpv.find f wfs) with Not_found -> NF
+
+let rec havoc kn get_rhs wr regs t ity fl =
   if not (ity_affected wr ity) then t, fl else
   match ity.ity_node with
   | Ityvar _ -> assert false
   | Ityreg ({reg_its = s} as r) when s.its_nonfree || Mreg.mem r wr ->
-      reg_havoc kn wr regs t r fl
+      let itd = find_its_defn kn s in
+      let isb = its_match_regs s r.reg_args r.reg_regs in
+      let wfs = Mreg.find_def Mpv.empty r wr in
+      let nt = Mreg.find r regs in
+      let field rs fl = match get_rhs (Opt.get rs.rs_field) wfs with
+        | VD -> fl
+        | PV {pv_vs = v; pv_ity = ity} ->
+            let nt = fs_app (ls_of_rs rs) [nt] v.vs_ty in
+            let t, fl = havoc kn get_rhs wr regs (t_var v) ity fl in
+            cons_t_simp nt t fl
+        | NF ->
+            let ity = ity_full_inst isb rs.rs_cty.cty_result in
+            let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
+            let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
+            let t, fl = havoc kn get_rhs wr regs t ity fl in
+            cons_t_simp nt t fl in
+      nt, List.fold_right field itd.itd_fields fl
   | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
   | Ityapp (s,tl,rl) ->
       let itd = find_its_defn kn s in
@@ -412,7 +465,7 @@ let rec havoc kn reg_havoc wr regs t ity fl =
           let field rs (tl, fl) =
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
             let t = t_app_infer (ls_of_rs rs) [t] in
-            let t, fl = havoc kn reg_havoc wr regs t ity fl in
+            let t, fl = havoc kn get_rhs wr regs t ity fl in
             t::tl, fl in
           let tl, fl = List.fold_right field itd.itd_fields ([],fl) in
           let t0 = match tl with
@@ -434,7 +487,7 @@ let rec havoc kn reg_havoc wr regs t ity fl =
             let vl = List.map2 get_pjv cty.cty_args ityl in
             let p = pat_app cs (List.map pat_var vl) ty in
             let field v ity (tl, fl) =
-              let t, fl = havoc kn reg_havoc wr regs (t_var v) ity fl in
+              let t, fl = havoc kn get_rhs wr regs (t_var v) ity fl in
               t::tl, fl in
             let tl, fl = List.fold_right2 field vl ityl ([],[]) in
             (p, fs_app cs tl ty), (p, t_and_l fl) in
@@ -442,51 +495,6 @@ let rec havoc kn reg_havoc wr regs t ity fl =
           let t = t_case_close t tbl and f = t_case_close_simp t fbl in
           t, begin match f.t_node with Ttrue -> fl | _ -> f::fl end
       end
-
-let rec havoc_effect kn wr regs t ({reg_its = s} as r) fl =
-  let itd = find_its_defn kn s in
-  let isb = its_match_regs s r.reg_args r.reg_regs in
-  let wfs = Mreg.find_def Spv.empty r wr in
-  let nt = Mreg.find r regs in
-  let field rs fl =
-    if Spv.mem (Opt.get rs.rs_field) wfs then fl else
-    let ity = ity_full_inst isb rs.rs_cty.cty_result in
-    let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
-    let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
-    let t, fl = havoc kn havoc_effect wr regs t ity fl in
-    cons_t_simp nt t fl in
-  nt, List.fold_right field itd.itd_fields fl
-
-let rec havoc_assign kn wr regs t ({reg_its = s} as r) fl =
-  let itd = find_its_defn kn s in
-  let isb = its_match_regs s r.reg_args r.reg_regs in
-  let wfs = Mreg.find_def Mrs.empty r wr in
-  let nt = Mreg.find r regs in
-  let field rs fl =
-    let ity = ity_full_inst isb rs.rs_cty.cty_result in
-    let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
-    let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
-    let t, fl = match Mrs.find_opt rs wfs with
-      | Some v ->
-          let lrl = ity_rch_fold (fun l r -> r::l) [] ity in
-          let rrl = ity_rch_fold (fun l r -> r::l) [] v.pv_ity in
-          (* we start from a surviving variable, so lrl <-> rrl *)
-          let update rg l r = Mreg.add r (Mreg.find l regs) rg in
-          let regs = List.fold_left2 update Mreg.empty lrl rrl in
-          havoc kn havoc_assign wr regs (t_var v.pv_vs) v.pv_ity fl
-      | None ->
-          havoc kn havoc_assign wr regs t ity fl in
-    cons_t_simp nt t fl in
-  nt, List.fold_right field itd.itd_fields fl
-
-let writes_of_assign asl =
-  let add wr (r,f,v) =
-    let r = match r.pv_ity.ity_node with
-      | Ityreg r -> r | _ -> assert false in
-    Mreg.change (function
-      | None   -> Some (Mrs.singleton f v)
-      | Some s -> Some (Mrs.add f v s)) r wr in
-  List.fold_left add Mreg.empty asl
 
 let print_dst dst = if Debug.test_flag debug then
   Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
@@ -498,15 +506,12 @@ let print_regs regs = if Debug.test_flag debug then
     (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
       Ity.print_reg r Pretty.print_term t)) (Mreg.bindings regs)
 
-let wp_havoc_raw {known_map = kn} reg_havoc wr cv wp =
-  let dst = dst_of_wp cv wp in
-  if Mpv.is_empty dst then wp else
-  let regs = name_regions kn cv dst in
+let wp_havoc_raw kn get_rhs wr wp dst regs =
   let () = print_dst dst; print_regs regs in
   let add _ t fvs = t_freevars fvs t in
   let fvs = Mreg.fold add regs Mvs.empty in
   let update {pv_vs = o; pv_ity = ity} n wp =
-    let t, fl = havoc kn reg_havoc wr regs (t_var o) ity [] in
+    let t, fl = havoc kn get_rhs wr regs (t_var o) ity [] in
     if Mvs.mem n fvs then
       sp_implies (t_and_l (cons_t_simp (t_var n) t fl)) wp
     else wp_let n t (sp_implies (t_and_l fl) wp) in
@@ -514,24 +519,27 @@ let wp_havoc_raw {known_map = kn} reg_havoc wr cv wp =
   let wp = Mpv.fold update dst wp in
   wp_forall (Mvs.keys fvs) wp
 
-let wp_havoc env {eff_writes = wr; eff_covers = cv} wp =
-  wp_havoc_raw env havoc_effect wr cv wp
+let wp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} wp =
+  let dst = dst_of_wp cv wp in
+  if Mpv.is_empty dst then wp else
+  let regs = name_regions kn cv dst in
+  wp_havoc_raw kn rhs_of_effect wr wp dst regs
 
-let sp_havoc_raw {known_map = kn} reg_havoc wr cv res sp dst =
+let sp_havoc_raw kn get_rhs wr sp dst regs =
+  let () = print_dst dst; print_regs regs in
+  let update {pv_vs = o; pv_ity = ity} n sp =
+    let t, fl = havoc kn get_rhs wr regs (t_var o) ity [] in
+    sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
+  let sp = t_subst (advancement dst) sp in
+  sp_and sp (Mpv.fold update dst t_true)
+
+let sp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} res sp dst =
   if Sreg.is_empty cv then sp else
   let rd = vc_freepvs Spv.empty res sp in
   let dst = dst_step_back_raw cv rd Mreg.empty dst in
   if Mpv.is_empty dst then sp else
   let regs = name_regions kn cv dst in
-  let () = print_dst dst; print_regs regs in
-  let update {pv_vs = o; pv_ity = ity} n sp =
-    let t, fl = havoc kn reg_havoc wr regs (t_var o) ity [] in
-    sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
-  let sp = t_subst (advancement dst) sp in
-  sp_and sp (Mpv.fold update dst t_true)
-
-let sp_havoc env {eff_writes = wr; eff_covers = cv} res sp dst =
-  sp_havoc_raw env havoc_effect wr cv res sp dst
+  sp_havoc_raw kn rhs_of_effect wr sp dst regs
 
 let sp_complete {eff_covers = cv} sp dst =
   let check o n sp =
@@ -698,8 +706,12 @@ let rec wp_expr env e res q xq = match e.e_node with
       vc_label e (vc_expl expl_absurd t_false)
   | Eassign asl ->
       let q = t_subst_single res t_void q in
-      let wr = writes_of_assign asl in
-      vc_label e (wp_havoc_raw env havoc_assign wr e.e_effect.eff_covers q)
+      let cv = e.e_effect.eff_covers in
+      let dst = dst_of_wp cv q in
+      if Mpv.is_empty dst then vc_label e q else
+      let wr = writes_of_assign asl and kn = env.known_map in
+      let regs = rename_regions (name_regions kn cv dst) cv wr in
+      vc_label e (wp_havoc_raw kn rhs_of_assign wr q dst regs)
   | Ewhile (e0, invl, varl, e1) ->
       (* wp(while e0 inv I var V do e1 done, Q, R) =
          I and forall S. I ->
@@ -850,8 +862,12 @@ and sp_expr env e res xres dst = match e.e_node with
       let ok = vc_label e (vc_expl expl_absurd t_false) in
       ok, ok, Mexn.empty
   | Eassign asl ->
-      let sp = sp_havoc_raw env havoc_assign
-        (writes_of_assign asl) e.e_effect.eff_covers res t_true dst in
+      let cv = e.e_effect.eff_covers in
+      let dst = dst_affected e.e_effect dst in
+      if Mpv.is_empty dst then t_true, t_true, Mexn.empty else
+      let wr = writes_of_assign asl and kn = env.known_map in
+      let regs = rename_regions (name_regions kn cv dst) cv wr in
+      let sp = sp_havoc_raw kn rhs_of_assign wr t_true dst regs in
       t_true, vc_label e sp, Mexn.empty
   | Ewhile (e0, invl, varl, e1) ->
       (* ok: I /\ !! I -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> I /\ V)))
