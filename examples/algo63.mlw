@@ -88,6 +88,6 @@ module Algo63
         (forall r:int. m <= r <= !j -> a[r] <= x) /\
         (forall r:int. !j < r < !i -> a[r] = x) /\
         (forall r:int. !i <= r <= n -> a[r] >= x) }
-    partition_ a m n i j (ref 0)
+    partition_ a m n i j (ghost ref 0)
 
 end

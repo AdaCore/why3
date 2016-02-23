@@ -595,6 +595,13 @@ let spec_for env e v ({pv_vs = a}, d, {pv_vs = b}) invl =
   let last = t_subst_single v (fs_app pl [b;one] ty_int) prev in
   a_gt_b, init, sp_and bounds prev, keep, sp_and a_le_b last
 
+let eff_refresh e =
+  (* when we havok the VC of a locally defined function,
+     we must take into account every write in the following
+     expression and ignore the resets, because the function
+     may be executed before the resets. *)
+  eff_write e.e_effect.eff_reads e.e_effect.eff_writes
+
 let rec wp_expr env e res q xq = match e.e_node with
   | _ when Slab.mem sp_label e.e_label ->
       let cv = e.e_effect.eff_covers in
@@ -622,18 +629,18 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Econst c ->
       t_subst_single res (vc_label e (t_const c)) q
 
-  | Eexec ({c_node = Cfun _} as _c) ->
+  | Eexec {c_node = Cfun _; c_cty = _c} ->
       assert false (* TODO *)
-  | Eexec ({c_cty = {cty_args = _::_}} as _c) ->
+  | Eexec {c_cty = {cty_args = _::_} as _c} ->
       assert false (* TODO *)
 
   | Eexec {c_cty = {cty_args = []} as c} ->
-      (* TODO: handle recursive calls *)
       let q = wp_close expl_post res c.cty_post q in
       let join cq (v,q) = wp_close expl_xpost v cq q in
       let w = wp_inter_mexn q join (cty_xpost_real c) xq in
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
-      vc_label e (wp_and (wp_of_pre env e.e_loc expl_pre c.cty_pre) w)
+      let p = wp_of_pre env e.e_loc expl_pre c.cty_pre in
+      vc_label e (wp_and p w)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -647,8 +654,24 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Ecase (e0, [pp, e1]) when anon_pat pp ->
       let q = wp_expr env e1 res q xq in
       vc_label e (wp_expr env e0 (res_of_expr e0) q xq)
+
+  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Cfun e0; c_cty = c}), e1) ->
+      let q = wp_expr env e1 res q xq in
+      let w = vc_fun env true c e0 in
+      let w = wp_havoc env (eff_refresh e1) w in
+      vc_label e (wp_and w q)
+  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Capp _|Cpur _|Cany}), e1) ->
+      vc_label e (wp_expr env e1 res q xq)
   | Elet (LDsym _, _) ->
       assert false (* TODO *)
+
+  | Elet (LDrec rdl, e1)
+    when List.for_all (fun rd -> rd.rec_sym.rs_logic = RLnone) rdl ->
+      let q = wp_expr env e1 res q xq in
+      let wl = vc_rec env true rdl in
+      let w = List.fold_right wp_and wl t_true in
+      let w = wp_havoc env (eff_refresh e1) w in
+      vc_label e (wp_and w q)
   | Elet (LDrec _, _) ->
       assert false (* TODO *)
 
@@ -745,13 +768,12 @@ and sp_expr env e res xres dst = match e.e_node with
       let t = vc_label e (t_const c) in
       t_true, t_equ (t_var res) t, Mexn.empty
 
-  | Eexec ({c_node = Cfun _} as _c) ->
+  | Eexec {c_node = Cfun _; c_cty = _c} ->
       assert false (* TODO *)
-  | Eexec ({c_cty = {cty_args = _::_}} as _c) ->
+  | Eexec {c_cty = {cty_args = _::_} as _c} ->
       assert false (* TODO *)
 
   | Eexec {c_cty = {cty_args = []} as c} ->
-      (* TODO: handle recursive calls *)
       let sp_of_post lab v ql =
         let cq = sp_of_post lab v ql in
         let sp = sp_havoc env e.e_effect v cq dst in
@@ -759,7 +781,8 @@ and sp_expr env e res xres dst = match e.e_node with
       let ne = sp_of_post expl_post res c.cty_post in
       let join v ql = sp_of_post expl_xpost v ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
-      out_label e (wp_of_pre env e.e_loc expl_pre c.cty_pre, ne, ex)
+      let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
+      out_label e (ok, ne, ex)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -775,8 +798,24 @@ and sp_expr env e res xres dst = match e.e_node with
       let v = res_of_expr e0 in
       let out = sp_expr env e1 res xres dst in
       out_label e (sp_pred_seq env e0 v xres out e1 eff_empty dst)
+
+  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Cfun e0; c_cty = c}), e1) ->
+      let ok, ne, ex = sp_expr env e1 res xres dst in
+      let w = vc_fun env false c e0 in
+      let w = wp_havoc env (eff_refresh e1) w in
+      out_label e (wp_and w ok, ne, ex)
+  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Capp _|Cpur _|Cany}), e1) ->
+      out_label e (sp_expr env e1 res xres dst)
   | Elet (LDsym _, _) ->
       assert false (* TODO *)
+
+  | Elet (LDrec rdl, e1)
+    when List.for_all (fun rd -> rd.rec_sym.rs_logic = RLnone) rdl ->
+      let ok, ne, ex = sp_expr env e1 res xres dst in
+      let wl = vc_rec env false rdl in
+      let w = List.fold_right wp_and wl t_true in
+      let w = wp_havoc env (eff_refresh e1) w in
+      out_label e (wp_and w ok, ne, ex)
   | Elet (LDrec _, _) ->
       assert false (* TODO *)
 
