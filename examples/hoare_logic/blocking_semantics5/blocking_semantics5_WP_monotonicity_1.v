@@ -477,7 +477,7 @@ Axiom abstract_effects_writes : forall (sigma:(map.Map.map mident value))
   (eval_fmla sigma pi (wp body f))).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem monotonicity : forall (s:stmt), forall (x:mident) (x1:term),
@@ -500,5 +500,5 @@ apply H; auto.
 apply fresh_from_fmla.
 apply fresh_from_fmla.
 *)
-Qed.
+Admitted.
 

@@ -491,7 +491,7 @@ Axiom wp_preserved_by_reduction : forall (sigma:(map.Map.map mident value))
   (eval_fmla sigma' pi' (wp s' q)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 2.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 2; admit.
 
 
 (* Why3 goal *)
@@ -523,5 +523,5 @@ apply one_step_seq_skip.
 inversion H2; subst; auto.
 destruct H0 with (1:=H1) (q:= (wp x1 q)) as (sigma2 & pi2 & s3 & h3); auto.
 exists sigma2. exists pi2. exists (Sseq s3 x1). ae.
-Qed.
+Admitted.
 
