@@ -433,6 +433,9 @@ let rhs_of_effect f wfs = if Mpv.mem f wfs then VD else NF
 
 let rhs_of_assign f wfs = try PV (Mpv.find f wfs) with Not_found -> NF
 
+let sensitive itd {pv_vs = f} =
+  List.exists (fun i -> t_v_occurs f i > 0) itd.itd_invariant
+
 let rec havoc kn get_rhs wr regs t ity fl =
   if not (ity_affected wr ity) then t, fl else
   match ity.ity_node with
@@ -442,14 +445,20 @@ let rec havoc kn get_rhs wr regs t ity fl =
       let isb = its_match_regs s r.reg_args r.reg_regs in
       let wfs = Mreg.find_def Mpv.empty r wr in
       let nt = Mreg.find r regs in
-      let field rs fl = match get_rhs (Opt.get rs.rs_field) wfs with
+      let field rs fl =
+        let fd = Opt.get rs.rs_field in
+        match get_rhs fd wfs with
         | VD -> fl
         | PV {pv_vs = v; pv_ity = ity} ->
+            if sensitive itd fd then
+              assert false; (* TODO: strong invariants *)
             let nt = fs_app (ls_of_rs rs) [nt] v.vs_ty in
             let t, fl = havoc kn get_rhs wr regs (t_var v) ity fl in
             cons_t_simp nt t fl
         | NF ->
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
+            if ity_affected wr ity && sensitive itd fd then
+              assert false; (* TODO: strong invariants *)
             let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
             let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
             let t, fl = havoc kn get_rhs wr regs t ity fl in
