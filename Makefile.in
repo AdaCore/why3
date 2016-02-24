@@ -294,8 +294,6 @@ endif
 	mkdir -p $(TOOLDIR)
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
-	mkdir -p $(DATADIR)/why3/images/boomy
-	mkdir -p $(DATADIR)/why3/images/fatcow
 	mkdir -p $(DATADIR)/why3/vim
 	mkdir -p $(DATADIR)/why3/lang
 	mkdir -p $(DATADIR)/why3/theories
@@ -308,10 +306,13 @@ endif
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	cp -f LICENSE $(DATADIR)/why3/
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
-	cp -f share/images/icons.rc $(DATADIR)/why3/images
+	for i in share/images/*.rc; do \
+	     d=`basename $$i .rc`; \
+	     cp -f $$i $(DATADIR)/why3/images; \
+	     mkdir $(DATADIR)/why3/images/$$d; \
+	     cp -f share/images/$$d/* $(DATADIR)/why3/images/$$d; \
+	done
 	cp -f share/images/*.png $(DATADIR)/why3/images
-	cp -f share/images/boomy/* $(DATADIR)/why3/images/boomy
-	cp -f share/images/fatcow/* $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f share/Makefile.config $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
