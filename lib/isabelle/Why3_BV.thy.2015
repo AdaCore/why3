@@ -279,8 +279,6 @@ why3_open "bv/BV8.xml"
   types
     t=word8
 
-why3_vc size_pos by simp
-
 why3_vc nth_out_of_bound
   using assms
   by (auto simp add: bv_nth_def test_bit_bin)
@@ -422,10 +420,6 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
     uint_word_ariths mult_ac uint_pow pull_mods)
-
-why3_vc two_power_size_val by simp
-
-why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
@@ -475,8 +469,6 @@ why3_open "bv/BV16.xml"
   types
     t=word16
 
-why3_vc size_pos by simp
-
 why3_vc nth_out_of_bound
   using assms
   by (auto simp add: bv_nth_def test_bit_bin)
@@ -618,10 +610,6 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
     uint_word_ariths mult_ac uint_pow pull_mods)
-
-why3_vc two_power_size_val by simp
-
-why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
@@ -671,8 +659,6 @@ why3_open "bv/BV32.xml"
   types
     t=word32
 
-why3_vc size_pos by simp
-
 why3_vc nth_out_of_bound
   using assms
   by (auto simp add: bv_nth_def test_bit_bin)
@@ -814,10 +800,6 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
     uint_word_ariths mult_ac uint_pow pull_mods)
-
-why3_vc two_power_size_val by simp
-
-why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
@@ -867,8 +849,6 @@ why3_open "bv/BV64.xml"
   types
     t=word64
 
-why3_vc size_pos by simp
-
 why3_vc nth_out_of_bound
   using assms
   by (auto simp add: bv_nth_def test_bit_bin)
@@ -1010,10 +990,6 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
     uint_word_ariths mult_ac uint_pow pull_mods)
-
-why3_vc two_power_size_val by simp
-
-why3_vc max_int_val by simp
 
 why3_vc Extensionality
   using assms
