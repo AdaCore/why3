@@ -59,6 +59,7 @@ module DFS
     requires { well_colored !marked !busy }
     requires { only_descendants_are_marked !marked }
     requires { path root c }
+    diverges
     ensures  { well_colored !marked !busy }
     ensures  { forall x: loc. (old !marked)[x] = True -> !marked[x] = True }
     ensures  { c <> null -> !marked[c] = True }
@@ -86,6 +87,7 @@ module DFS
   let traverse () : unit
     requires { forall x: loc. x <> null ->
                !marked[x] = False && !busy[x] = False }
+    diverges
     ensures  { only_descendants_are_marked !marked }
     ensures  { all_descendants_are_marked !marked }
     ensures  { forall x: loc. x <> null -> !busy[x] = False }

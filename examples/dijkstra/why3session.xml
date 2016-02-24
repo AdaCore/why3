@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.5" timelimit="30" steplimit="1" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl6" timelimit="30" steplimit="1" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="6" steplimit="1" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="1" memlimit="1000"/>
@@ -40,11 +40,11 @@
  <proof prover="8"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="Path_shortest_path">
- <proof prover="1" timelimit="5" edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"><result status="valid" time="0.91"/></proof>
+ <proof prover="0" timelimit="5" edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"><result status="valid" time="1.32"/></proof>
  </goal>
  <goal name="Main_lemma">
  <proof prover="3" timelimit="5"><result status="valid" time="0.08"/></proof>
- <proof prover="9"><result status="valid" time="0.69" steps="937"/></proof>
+ <proof prover="9"><result status="valid" time="0.38" steps="937"/></proof>
  </goal>
  <goal name="Completeness_lemma">
  <transf name="induction_pr">
@@ -134,13 +134,13 @@
     <proof prover="8"><result status="valid" time="0.04" steps="86"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.12.1.2" expl="2. VC for shortest_path_code">
-    <proof prover="2" timelimit="10"><result status="valid" time="1.36"/></proof>
+    <proof prover="2" timelimit="10"><result status="valid" time="0.96"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.12.1.3" expl="3. VC for shortest_path_code">
     <proof prover="8"><result status="valid" time="0.03" steps="25"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.12.1.4" expl="4. VC for shortest_path_code">
-    <proof prover="2" timelimit="10"><result status="valid" time="4.51"/></proof>
+    <proof prover="2" timelimit="10"><result status="valid" time="2.50"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.12.1.5" expl="5. VC for shortest_path_code">
     <proof prover="8"><result status="valid" time="0.16" steps="337"/></proof>
@@ -149,7 +149,7 @@
     <proof prover="8"><result status="valid" time="0.12" steps="156"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.12.1.7" expl="7. VC for shortest_path_code">
-    <proof prover="1" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"><result status="valid" time="9.20"/></proof>
+    <proof prover="0" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"><result status="valid" time="3.30"/></proof>
     </goal>
    </transf>
    </goal>
@@ -163,10 +163,10 @@
     <transf name="split_goal_wp">
      <goal name="WP_parameter shortest_path_code.13.1.1.1" expl="1. loop invariant preservation">
      <proof prover="2"><result status="valid" time="0.08"/></proof>
-     <proof prover="5"><result status="valid" time="3.95"/></proof>
+     <proof prover="5"><result status="valid" time="2.18"/></proof>
      </goal>
      <goal name="WP_parameter shortest_path_code.13.1.1.2" expl="2. loop invariant preservation">
-     <proof prover="2"><result status="valid" time="1.48"/></proof>
+     <proof prover="2"><result status="valid" time="0.78"/></proof>
      </goal>
     </transf>
     </goal>
@@ -184,7 +184,7 @@
   <proof prover="5"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.17" expl="17. loop invariant preservation">
-  <proof prover="1" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"><result status="valid" time="5.03"/></proof>
+  <proof prover="0" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"><result status="valid" time="5.85"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.18" expl="18. loop variant decrease">
   <proof prover="8"><result status="valid" time="0.07" steps="73"/></proof>
