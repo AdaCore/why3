@@ -234,13 +234,19 @@ let oldify_variant varl =
 let t_var_or_void v =
   if ty_equal v.vs_ty ty_unit then t_void else t_var v
 
+let wp_of_inv lab pl = t_and_l (List.map (vc_expl lab) pl)
+
 let wp_of_pre ({letrec_ps = lps} as env) loc lab = function
   | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
       let olds, rels = Mls.find ls lps in
       let news = List.combine tl rels in
       let p = decrease env loc expl_variant olds news in
-      t_and_l (p :: List.map (vc_expl lab) pl)
-  | pl -> t_and_l (List.map (vc_expl lab) pl)
+      wp_and p (wp_of_inv lab pl)
+  | pl -> wp_of_inv lab pl
+
+let wp_of_pre env loc lab al pl =
+  let p = wp_of_pre env loc lab pl in
+  wp_forall (List.map (fun v -> v.pv_vs) al) p
 
 let wp_of_post lab ity = function
   | q::ql ->
@@ -257,10 +263,10 @@ let rec push_stop lab f = match f.t_node with
 
 let sp_of_pre lab pl = t_and_l (List.map (push_stop lab) pl)
 
-let sp_of_post lab v ql =
+let sp_of_post lab v al ql =
   let t = t_var_or_void v in
   (* remove the post-condition of () *)
-  let push q = match open_post_with t q with
+  let push q = match open_post_with_args t al q with
     | {t_node = Tapp (ps, [_; {t_ty = Some ty}])}
       when ls_equal ps ps_equ && ty_equal ty ty_unit -> t_true
     | f -> push_stop lab f in
@@ -322,8 +328,8 @@ let extract_defn v sp =
     | _ -> raise Exit in
   try Some (extract sp) with Exit -> None
 
-let wp_close lab v ql wp =
-  let sp = sp_of_post lab v ql in
+let wp_close lab v al ql wp =
+  let sp = sp_of_post lab v al ql in
   match extract_defn v sp with
   | Some (t, sp) -> wp_let v t (sp_implies sp wp)
   | None ->      wp_forall [v] (sp_implies sp wp)
@@ -582,18 +588,18 @@ let bind_oldies c f =
   t_subst sbs f
 
 let spec_while env e invl varl =
-  let init = wp_of_pre env e.e_loc expl_loop_init invl in
-  let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+  let init = wp_of_inv expl_loop_init invl in
+  let keep = wp_of_inv expl_loop_keep invl in
   if varl = [] then init, Mvs.empty, keep else
   let o2n, olds = oldify_variant varl in
   let d = decrease env e.e_loc expl_loop_vari olds varl in
   init, o2n, wp_and keep d
 
-let spec_for env e v ({pv_vs = a}, d, {pv_vs = b}) invl =
-  let one = t_nat_const 1 in
-  let i = t_var v and a = t_var a and b = t_var b in
-  let prev = wp_of_pre env e.e_loc expl_loop_init invl in
-  let keep = wp_of_pre env e.e_loc expl_loop_keep invl in
+let spec_for env _e v ({pv_vs = a}, d, {pv_vs = b}) invl =
+  let a = t_var a and b = t_var b in
+  let i = t_var v and one = t_nat_const 1 in
+  let prev = wp_of_inv expl_loop_init invl in
+  let keep = wp_of_inv expl_loop_keep invl in
   let gt, le, pl = match d with
     | To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
     | DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn in
@@ -638,15 +644,12 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Econst c ->
       t_subst_single res (vc_label e (t_const c)) q
 
-  | Eexec {c_cty = {cty_args = _::_} as _c} ->
-      assert false (* TODO *)
-
-  | Eexec {c_node = nd; c_cty = {cty_args = []} as c} ->
-      let q = wp_close expl_post res c.cty_post q in
-      let join cq (v,q) = wp_close expl_xpost v cq q in
+  | Eexec {c_node = nd; c_cty = {cty_args = al} as c} ->
+      let q = wp_close expl_post res al c.cty_post q in
+      let join cq (v,q) = wp_close expl_xpost v [] cq q in
       let w = wp_inter_mexn q join (cty_xpost_real c) xq in
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
-      let p = wp_of_pre env e.e_loc expl_pre c.cty_pre in
+      let p = wp_of_pre env e.e_loc expl_pre al c.cty_pre in
       let vc = match nd with
         | Cfun e0 -> vc_fun env true c e0
         | Capp _ | Cpur _ | Cany -> t_true in
@@ -778,18 +781,15 @@ and sp_expr env e res xres dst = match e.e_node with
       let t = vc_label e (t_const c) in
       t_true, t_equ (t_var res) t, Mexn.empty
 
-  | Eexec {c_cty = {cty_args = _::_} as _c} ->
-      assert false (* TODO *)
-
-  | Eexec {c_node = nd; c_cty = {cty_args = []} as c} ->
-      let sp_of_post lab v ql =
-        let cq = sp_of_post lab v ql in
+  | Eexec {c_node = nd; c_cty = {cty_args = al} as c} ->
+      let sp_of_post lab v al ql =
+        let cq = sp_of_post lab v al ql in
         let sp = sp_havoc env e.e_effect v cq dst in
         bind_oldies c sp in
-      let ne = sp_of_post expl_post res c.cty_post in
-      let join v ql = sp_of_post expl_xpost v ql in
+      let ne = sp_of_post expl_post res al c.cty_post in
+      let join v ql = sp_of_post expl_xpost v [] ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
-      let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
+      let ok = wp_of_pre env e.e_loc expl_pre al c.cty_pre in
       let vc = match nd with
         | Cfun e0 -> vc_fun env false c e0
         | Capp _ | Cpur _ | Cany -> t_true in

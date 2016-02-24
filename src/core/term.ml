@@ -1578,6 +1578,7 @@ let t_quant_simp q ((vl,_,_,f) as qf) =
     else t_quant_close q vl (List.filter (List.for_all (t_v_all check)) tl) f
 
 let t_quant_close_simp q vl tl f =
+  if vl = [] then f else
   let fvs = t_vars f in
   let check v = Mvs.mem v fvs in
   if List.for_all check vl then
