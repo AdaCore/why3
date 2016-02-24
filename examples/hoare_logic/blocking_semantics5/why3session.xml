@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.5" timelimit="5" steplimit="1" memlimit="4000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="30" steplimit="1" memlimit="4000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
@@ -35,7 +35,7 @@
  <proof prover="12"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="steps_non_neg">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_SemOp_steps_non_neg_1.v"><result status="valid" time="0.80"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_SemOp_steps_non_neg_1.v"><result status="valid" time="0.55"/></proof>
  </goal>
 </theory>
 <theory name="TestSemantics" sum="5386d426772b7907db51e574cfc3e48a">
@@ -57,7 +57,7 @@
  <proof prover="9" memlimit="1000"><result status="valid" time="0.05" steps="107"/></proof>
  </goal>
  <goal name="If42">
- <proof prover="0" timelimit="6" memlimit="1000" edited="blocking_semantics5_TestSemantics_If42_1.v"><result status="valid" time="1.61"/></proof>
+ <proof prover="1" timelimit="6" memlimit="1000" edited="blocking_semantics5_TestSemantics_If42_1.v"><result status="valid" time="1.21"/></proof>
  </goal>
 </theory>
 <theory name="Typing" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -90,14 +90,14 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.08" steps="143"/></proof>
    </goal>
    <goal name="eval_type_term.1.4" expl="4.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"><result status="valid" time="2.42"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"><result status="valid" time="2.42"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="type_preservation">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_type_preservation_1.v"><result status="valid" time="2.36"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_type_preservation_1.v"><result status="valid" time="2.36"/></proof>
  </goal>
 </theory>
 <theory name="FreshVariables" sum="490368b5a16b190f6c29edfc9b0d5a6b">
@@ -164,14 +164,14 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.03" steps="79"/></proof>
    </goal>
    <goal name="eval_msubst.1.9" expl="9.">
-   <proof prover="3" memlimit="1000"><result status="valid" time="3.56"/></proof>
-   <proof prover="9" timelimit="30" memlimit="1000"><result status="valid" time="0.23" steps="586"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="5.03"/></proof>
+   <proof prover="9" timelimit="30" memlimit="1000"><result status="valid" time="0.38" steps="586"/></proof>
    </goal>
    <goal name="eval_msubst.1.10" expl="10.">
    <proof prover="9" memlimit="1000"><result status="valid" time="0.30" steps="655"/></proof>
    </goal>
    <goal name="eval_msubst.1.11" expl="11.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_msubst_2.v"><result status="valid" time="1.52"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_msubst_2.v"><result status="valid" time="1.52"/></proof>
    </goal>
    <goal name="eval_msubst.1.12" expl="12.">
    <proof prover="9" memlimit="1000"><result status="valid" time="0.30" steps="561"/></proof>
@@ -189,7 +189,7 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.04" steps="12"/></proof>
    </goal>
    <goal name="eval_swap_term.1.2" expl="2.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_term_1.v"><result status="valid" time="1.64"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_term_1.v"><result status="valid" time="1.64"/></proof>
    </goal>
    <goal name="eval_swap_term.1.3" expl="3.">
    <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
@@ -216,11 +216,11 @@
    <proof prover="9" timelimit="30"><result status="valid" time="0.03" steps="47"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.3" expl="3.">
-   <proof prover="3"><result status="valid" time="0.30"/></proof>
+   <proof prover="3"><result status="valid" time="0.46"/></proof>
    <proof prover="9" timelimit="30"><result status="valid" time="0.10" steps="81"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.4" expl="4.">
-   <proof prover="3"><result status="valid" time="0.32"/></proof>
+   <proof prover="3"><result status="valid" time="0.47"/></proof>
    <proof prover="9" timelimit="30"><result status="valid" time="0.11" steps="81"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.5" expl="5.">
@@ -236,7 +236,7 @@
    <proof prover="9" timelimit="30"><result status="valid" time="0.04" steps="51"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.8" expl="8.">
-   <proof prover="3"><result status="valid" time="0.31"/></proof>
+   <proof prover="3"><result status="valid" time="0.48"/></proof>
    <proof prover="9" timelimit="30"><result status="valid" time="0.04" steps="51"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.9" expl="9.">
@@ -246,17 +246,17 @@
    <proof prover="9" timelimit="30"><result status="valid" time="0.15" steps="112"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.11" expl="11.">
-   <proof prover="9" timelimit="30"><result status="valid" time="0.68" steps="736"/></proof>
+   <proof prover="9" timelimit="30"><result status="valid" time="1.15" steps="736"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.12" expl="12.">
-   <proof prover="9" timelimit="30"><result status="valid" time="0.67" steps="736"/></proof>
+   <proof prover="9" timelimit="30"><result status="valid" time="0.88" steps="736"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="eval_swap">
- <proof prover="0" edited="blocking_semantics5_FreshVariables_eval_swap_3.v"><result status="valid" time="0.84"/></proof>
+ <proof prover="1" edited="blocking_semantics5_FreshVariables_eval_swap_3.v"><result status="valid" time="0.84"/></proof>
  </goal>
  <goal name="eval_term_change_free">
  <transf name="induction_ty_lex">
@@ -323,11 +323,11 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.26" steps="539"/></proof>
    </goal>
    <goal name="eval_change_free.1.10" expl="10.">
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.33"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.47"/></proof>
    <proof prover="9" memlimit="1000"><result status="valid" time="0.07" steps="89"/></proof>
    </goal>
    <goal name="eval_change_free.1.11" expl="11.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_4.v"><result status="valid" time="2.23"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_4.v"><result status="valid" time="2.23"/></proof>
    </goal>
    <goal name="eval_change_free.1.12" expl="12.">
    <proof prover="9" memlimit="1000"><result status="valid" time="0.18" steps="280"/></proof>
@@ -339,32 +339,32 @@
 </theory>
 <theory name="HoareLogic" sum="06bb2600c8d8760878e05c429245d541">
  <goal name="many_steps_seq">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_HoareLogic_many_steps_seq_1.v"><result status="valid" time="1.75"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_many_steps_seq_1.v"><result status="valid" time="1.47"/></proof>
  </goal>
  <goal name="consequence_rule">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.24"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.42"/></proof>
  </goal>
  <goal name="skip_rule">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_HoareLogic_skip_rule_1.v"><result status="valid" time="1.14"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_skip_rule_1.v"><result status="valid" time="1.14"/></proof>
  </goal>
  <goal name="assign_rule">
- <proof prover="0" timelimit="12" memlimit="1000" edited="blocking_semantics5_HoareLogic_assign_rule_1.v"><result status="valid" time="1.86"/></proof>
+ <proof prover="1" timelimit="12" memlimit="1000" edited="blocking_semantics5_HoareLogic_assign_rule_1.v"><result status="valid" time="1.86"/></proof>
  </goal>
  <goal name="seq_rule">
  <proof prover="7"><result status="valid" time="0.09"/></proof>
  <proof prover="12"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="if_rule">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_HoareLogic_if_rule_1.v"><result status="valid" time="1.72"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_if_rule_1.v"><result status="valid" time="1.72"/></proof>
  </goal>
  <goal name="assert_rule">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_1.v"><result status="valid" time="0.92"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_1.v"><result status="valid" time="1.42"/></proof>
  </goal>
  <goal name="assert_rule_ext">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="0.92"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="0.92"/></proof>
  </goal>
  <goal name="while_rule">
- <proof prover="0" memlimit="1000" edited="blocking_semantics5_HoareLogic_while_rule_1.v"><result status="valid" time="1.15"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_while_rule_1.v"><result status="valid" time="1.15"/></proof>
  </goal>
 </theory>
 <theory name="WP" sum="c3b1d24b21f6d88ab3dc3fc87a7ea92a">
@@ -379,7 +379,7 @@
    <proof prover="12"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="monotonicity.1.2" expl="2.">
-   <proof prover="0" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_1.v"><result status="valid" time="1.45"/></proof>
+   <proof prover="1" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_1.v"><result status="valid" time="1.45"/></proof>
    </goal>
    <goal name="monotonicity.1.3" expl="3.">
    <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.14"/></proof>
@@ -392,7 +392,7 @@
    <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="monotonicity.1.6" expl="6.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_3.v"><result status="valid" time="0.96"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_3.v"><result status="valid" time="0.73"/></proof>
    </goal>
   </transf>
   </goal>
@@ -407,28 +407,28 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.06" steps="30"/></proof>
    </goal>
    <goal name="distrib_conj.1.2" expl="2.">
-   <proof prover="9" memlimit="1000"><result status="valid" time="0.55" steps="1402"/></proof>
+   <proof prover="9" memlimit="1000"><result status="valid" time="0.93" steps="1402"/></proof>
    </goal>
    <goal name="distrib_conj.1.3" expl="3.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_2.v"><result status="valid" time="1.63"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_2.v"><result status="valid" time="1.63"/></proof>
    </goal>
    <goal name="distrib_conj.1.4" expl="4.">
    <proof prover="9" memlimit="1000"><result status="valid" time="0.34" steps="965"/></proof>
-   <proof prover="10"><result status="valid" time="0.08"/></proof>
+   <proof prover="10"><result status="valid" time="0.20"/></proof>
    </goal>
    <goal name="distrib_conj.1.5" expl="5.">
-   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.23"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.43"/></proof>
    <proof prover="9" memlimit="1000"><result status="valid" time="0.14" steps="333"/></proof>
    </goal>
    <goal name="distrib_conj.1.6" expl="6.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_3.v"><result status="valid" time="1.62"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_3.v"><result status="valid" time="1.18"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="wp_preserved_by_reduction">
- <proof prover="0" edited="blocking_semantics5_WP_wp_preserved_by_reduction_4.v"><result status="valid" time="3.22"/></proof>
+ <proof prover="1" edited="blocking_semantics5_WP_wp_preserved_by_reduction_4.v"><result status="valid" time="3.22"/></proof>
  </goal>
  <goal name="progress">
  <transf name="induction_ty_lex">
@@ -441,27 +441,27 @@
    <proof prover="12"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="progress.1.2" expl="2.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_progress_1.v"><result status="valid" time="0.95"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_1.v"><result status="valid" time="0.95"/></proof>
    </goal>
    <goal name="progress.1.3" expl="3.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_progress_2.v"><result status="valid" time="1.63"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_2.v"><result status="valid" time="1.91"/></proof>
    </goal>
    <goal name="progress.1.4" expl="4.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_progress_3.v"><result status="valid" time="1.04"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_3.v"><result status="valid" time="1.04"/></proof>
    </goal>
    <goal name="progress.1.5" expl="5.">
    <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.45"/></proof>
    <proof prover="11"><result status="valid" time="0.20"/></proof>
    </goal>
    <goal name="progress.1.6" expl="6.">
-   <proof prover="0" memlimit="1000" edited="blocking_semantics5_WP_progress_5.v"><result status="valid" time="0.98"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_5.v"><result status="valid" time="0.60"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="wp_soundness">
- <proof prover="0" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_wp_soundness_1.v"><result status="valid" time="1.01"/></proof>
+ <proof prover="1" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_wp_soundness_1.v"><result status="valid" time="0.70"/></proof>
  </goal>
 </theory>
 </file>

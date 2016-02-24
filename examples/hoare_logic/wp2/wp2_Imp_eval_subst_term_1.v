@@ -3,56 +3,57 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require bool.Bool.
 Require map.Map.
 
 (* Why3 assumption *)
-Inductive datatype  :=
-  | Tint : datatype 
-  | Tbool : datatype .
+Inductive datatype :=
+  | Tint : datatype
+  | Tbool : datatype.
 Axiom datatype_WhyType : WhyType datatype.
 Existing Instance datatype_WhyType.
 
 (* Why3 assumption *)
-Inductive operator  :=
-  | Oplus : operator 
-  | Ominus : operator 
-  | Omult : operator 
-  | Ole : operator .
+Inductive operator :=
+  | Oplus : operator
+  | Ominus : operator
+  | Omult : operator
+  | Ole : operator.
 Axiom operator_WhyType : WhyType operator.
 Existing Instance operator_WhyType.
 
 (* Why3 assumption *)
-Definition ident  := Z.
+Definition ident := Z.
 
 (* Why3 assumption *)
-Inductive term  :=
-  | Tconst : Z -> term 
-  | Tvar : Z -> term 
-  | Tderef : Z -> term 
-  | Tbin : term -> operator -> term -> term .
+Inductive term :=
+  | Tconst : Z -> term
+  | Tvar : Z -> term
+  | Tderef : Z -> term
+  | Tbin : term -> operator -> term -> term.
 Axiom term_WhyType : WhyType term.
 Existing Instance term_WhyType.
 
 (* Why3 assumption *)
-Inductive fmla  :=
-  | Fterm : term -> fmla 
-  | Fand : fmla -> fmla -> fmla 
-  | Fnot : fmla -> fmla 
-  | Fimplies : fmla -> fmla -> fmla 
-  | Flet : Z -> term -> fmla -> fmla 
-  | Fforall : Z -> datatype -> fmla -> fmla .
+Inductive fmla :=
+  | Fterm : term -> fmla
+  | Fand : fmla -> fmla -> fmla
+  | Fnot : fmla -> fmla
+  | Fimplies : fmla -> fmla -> fmla
+  | Flet : Z -> term -> fmla -> fmla
+  | Fforall : Z -> datatype -> fmla -> fmla.
 Axiom fmla_WhyType : WhyType fmla.
 Existing Instance fmla_WhyType.
 
 (* Why3 assumption *)
-Inductive value  :=
-  | Vint : Z -> value 
-  | Vbool : bool -> value .
+Inductive value :=
+  | Vint : Z -> value
+  | Vbool : bool -> value.
 Axiom value_WhyType : WhyType value.
 Existing Instance value_WhyType.
 
 (* Why3 assumption *)
-Definition env  := (map.Map.map Z value).
+Definition env := (map.Map.map Z value).
 
 Parameter eval_bin: value -> operator -> value -> value.
 
@@ -70,7 +71,7 @@ Axiom eval_bin_def : forall (x:value) (op:operator) (y:value), match (x,
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_term(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
+Fixpoint eval_term (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   (t:term) {struct t}: value :=
   match t with
   | (Tconst n) => (Vint n)
@@ -81,7 +82,7 @@ Fixpoint eval_term(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_fmla(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
+Fixpoint eval_fmla (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm t) => ((eval_term sigma pi t) = (Vbool true))
@@ -109,7 +110,7 @@ Axiom subst_term_def : forall (e:term) (r:Z) (v:Z),
   end.
 
 (* Why3 assumption *)
-Fixpoint fresh_in_term(id:Z) (t:term) {struct t}: Prop :=
+Fixpoint fresh_in_term (id:Z) (t:term) {struct t}: Prop :=
   match t with
   | (Tconst _) => True
   | (Tvar v) => ~ (id = v)
@@ -122,6 +123,7 @@ Theorem eval_subst_term : forall (sigma:(map.Map.map Z value))
   (pi:(map.Map.map Z value)) (e:term) (x:Z) (v:Z), (fresh_in_term v e) ->
   ((eval_term sigma pi (subst_term e x v)) = (eval_term (map.Map.set sigma x
   (map.Map.get pi v)) pi e)).
+(* Why3 intros sigma pi e x v h1. *)
 induction e; intros r v H.
 
 rewrite (subst_term_def (Tconst z) r v); auto.
@@ -141,5 +143,4 @@ elim H; intros.
 rewrite IHe1; auto.
 rewrite IHe2; auto.
 Qed.
-
 

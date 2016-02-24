@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.5" timelimit="10" steplimit="1" memlimit="0"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.4pl6" timelimit="10" steplimit="1" memlimit="0"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="5" name="Spass" version="3.7" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="8" name="Vampire" version="0.6" timelimit="10" steplimit="1" memlimit="1000"/>
@@ -27,10 +27,10 @@
  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
  <goal name="lt_node_lt">
- <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"><result status="valid" time="0.76"/></proof>
+ <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"><result status="valid" time="0.76"/></proof>
  </goal>
  <goal name="gt_node_gt">
- <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"><result status="valid" time="0.76"/></proof>
+ <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"><result status="valid" time="0.76"/></proof>
  </goal>
  <goal name="lt_left">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.06"/></proof>
@@ -639,21 +639,21 @@
   </transf>
   </goal>
   <goal name="WP_parameter lbalance.3" expl="3. postcondition">
-  <proof prover="0" memlimit="1000"><result status="valid" time="2.05" steps="2334"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="2.64" steps="2334"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.4" expl="4. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.08" steps="176"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.5" expl="5. postcondition">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.84" steps="1403"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="1.14" steps="1403"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.6" expl="6. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.07" steps="134"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.7" expl="7. postcondition">
-  <proof prover="0" memlimit="1000"><result status="valid" time="1.43" steps="1863"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="2.04" steps="1863"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.8" expl="8. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.09" steps="176"/></proof>
@@ -1210,21 +1210,21 @@
   </metas>
   </goal>
   <goal name="WP_parameter rbalance.3" expl="3. postcondition">
-  <proof prover="0" memlimit="1000"><result status="valid" time="1.59" steps="1960"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="2.21" steps="1960"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.4" expl="4. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.06" steps="176"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.5" expl="5. postcondition">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.75" steps="1148"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="1.03" steps="1148"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.6" expl="6. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.06" steps="134"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.7" expl="7. postcondition">
-  <proof prover="0" memlimit="1000"><result status="valid" time="1.73" steps="2174"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="2.34" steps="2174"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.8" expl="8. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.09" steps="176"/></proof>
@@ -1503,7 +1503,7 @@
    <goal name="WP_parameter add.2.2" expl="2. VC for add">
    <transf name="inline_goal">
     <goal name="WP_parameter add.2.2.1" expl="1. VC for add">
-    <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.80"/></proof>
+    <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.57"/></proof>
     </goal>
    </transf>
    </goal>
