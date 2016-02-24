@@ -384,11 +384,12 @@ let create_let_decl ld =
               t_exists_close [v] [] (t_and_simp_l fl)
           | [] -> t_true in
         abst, defn, cty_axiom (id_clone s.rs_name) cty f axms
-    | RLls ls ->
+    | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let t = t_app ls (List.map t_var vl) ls.ls_value in
         let f = t_and_simp_l (conv_post t cty.cty_post) in
-        let axms = cty_axiom (id_clone ls.ls_name) cty f axms in
+        let nm = id.id_string ^ "_spec" in
+        let axms = cty_axiom (id_derive nm id) cty f axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
@@ -396,6 +397,8 @@ let create_let_decl ld =
                when possible? If yes, remove the redundant axioms. *)
             create_param_decl ls :: abst, defn, axms
         | Cfun e ->
+            (* TODO/FIXME: should we do any of this when the user
+               supplied explicit post-conditions to the definition? *)
             let res = if c.c_cty.cty_pre <> [] then None else
               term_of_expr ~prop:(ls.ls_value = None) e in
             begin match res with
@@ -403,8 +406,8 @@ let create_let_decl ld =
             | None ->
                 let axms = match post_of_expr t e with
                   | Some f ->
-                      let nm = ls.ls_name.id_string ^ "_def" in
-                      cty_axiom (id_derive nm ls.ls_name) cty f axms
+                      let nm = id.id_string ^ "_def" in
+                      cty_axiom (id_derive nm id) cty f axms
                   | None -> axms in
                 create_param_decl ls :: abst, defn, axms
             end
