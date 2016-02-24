@@ -1146,13 +1146,40 @@ type post = term  (* postcondition: eps result . post_fmla *)
 
 let create_post vs f = t_eps_close vs f
 
-let open_post f = match f.t_node with
+let open_post q = match q.t_node with
   | Teps bf -> t_open_bound bf
   | _ -> invalid_arg "Ity.open_post"
 
-let open_post_with t f = match f.t_node with
+let open_post_with t q = match q.t_node with
   | Teps bf -> t_open_bound_with t bf
   | _ -> invalid_arg "Ity.open_post_with"
+
+let open_post_with_args t al q =
+  if al = [] then open_post_with t q else
+  let v, h = open_post q in
+  let al = List.map (fun v -> v.pv_vs) al in
+  let res = t_func_app_l t (List.map t_var al) in
+  let rec down h s el vl = match el, vl with
+    | {t_node = Tvar u}::el, v::vl when vs_equal u v ->
+        down h s el vl
+    | el, [] ->
+        let tyl = List.map (fun v -> v.vs_ty) al in
+        let ty = Opt.map (Util.const v.vs_ty) s.ls_value in
+        t_equ t (t_app_partial s (List.rev el) tyl ty)
+    | _ -> t_subst_single v res h in
+  let rec conv h = t_label_copy h (match h.t_node with
+    | Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp(s, tl)} as t])
+      when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t = 0 ->
+        down h s (List.rev tl) (List.rev al)
+    | Tbinop (Tiff, {t_node =
+        Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp (fs, [])}])},
+        ({t_node = Tapp (s, tl)} as f))
+      when ls_equal ps ps_equ && vs_equal v u &&
+           ls_equal fs fs_bool_true && t_v_occurs v f = 0 ->
+        down h s (List.rev tl) (List.rev al)
+    | Tbinop (Tand, f, g) -> t_and (conv f) (conv g)
+    | _ -> t_subst_single v res h) in
+  t_forall_close_simp al [] (conv h)
 
 type cty = {
   cty_args   : pvsymbol list;

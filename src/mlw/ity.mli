@@ -388,6 +388,7 @@ type post = term  (** postcondition: eps result . post_fmla *)
 
 val open_post : post -> vsymbol * term
 val open_post_with : term -> post -> term
+val open_post_with_args : term -> pvsymbol list -> post -> term
 
 val create_post : vsymbol -> term -> post
 
