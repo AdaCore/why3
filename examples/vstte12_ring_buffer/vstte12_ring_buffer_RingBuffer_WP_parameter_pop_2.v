@@ -80,10 +80,10 @@ Definition size {a:Type} {a_WT:WhyType a} (b:(buffer a)): Z :=
   (length (data b)).
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
 
 (* Why3 goal *)
-Theorem WP_parameter_head : forall {a:Type} {a_WT:WhyType a}, forall (b:Z)
+Theorem WP_parameter_pop : forall {a:Type} {a_WT:WhyType a}, forall (b:Z)
   (b1:Z) (b2:Z) (b3:(map.Map.map Z a)) (b4:(list a)), (((((0%Z <= b)%Z /\
   (b < b2)%Z) /\ (((0%Z <= b1)%Z /\ (b1 <= b2)%Z) /\
   ((b1 = (list.Length.length b4)) /\ forall (i:Z), ((0%Z <= i)%Z /\
@@ -91,20 +91,25 @@ Theorem WP_parameter_head : forall {a:Type} {a_WT:WhyType a}, forall (b:Z)
   b4) = (Init.Datatypes.Some (map.Map.get b3 (b + i)%Z)))) /\
   ((0%Z <= ((b + i)%Z - b2)%Z)%Z -> ((list.Nth.nth i
   b4) = (Init.Datatypes.Some (map.Map.get b3 ((b + i)%Z - b2)%Z)))))))) /\
-  (0%Z <= b2)%Z) /\ (0%Z < b1)%Z) -> (((0%Z <= b)%Z /\ (b < b2)%Z) ->
-  match b4 with
-  | Init.Datatypes.nil => False
-  | (Init.Datatypes.cons x _) => ((map.Map.get b3 b) = x)
-  end).
-(* Why3 intros a a_WT b b1 b2 b3 b4 ((((h1,h2),((h3,h4),(h5,h6))),h7),h8)
-        (h9,h10). *)
-intros a _a b rho rho1 rho2 rho3.
-intros (((h2a,(h2b,(h2c,h2d))),h2e),h1) _.
-destruct rho3.
-simpl in *.
-omega.
-intuition.
-generalize (h2d 0%Z). clear h2d.
+  (0%Z <= b2)%Z) /\ (0%Z < b1)%Z) -> forall (x:a) (x1:(list a)),
+  (b4 = (Init.Datatypes.cons x x1)) -> forall (rho:(list a)), (rho = x1) ->
+  (((0%Z <= b)%Z /\ (b < b2)%Z) -> forall (rho1:Z), (rho1 = (b1 - 1%Z)%Z) ->
+  forall (rho2:Z), (rho2 = (b + 1%Z)%Z) -> ((~ (rho2 = b2)) ->
+  ((((0%Z <= rho2)%Z /\ (rho2 < b2)%Z) /\ (((0%Z <= rho1)%Z /\
+  (rho1 <= b2)%Z) /\ ((rho1 = (list.Length.length rho)) /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < rho1)%Z) -> ((((rho2 + i)%Z < b2)%Z ->
+  ((list.Nth.nth i rho) = (Init.Datatypes.Some (map.Map.get b3
+  (rho2 + i)%Z)))) /\ ((0%Z <= ((rho2 + i)%Z - b2)%Z)%Z -> ((list.Nth.nth i
+  rho) = (Init.Datatypes.Some (map.Map.get b3
+  ((rho2 + i)%Z - b2)%Z)))))))) -> forall (x2:a) (x3:(list a)),
+  (b4 = (Init.Datatypes.cons x2 x3)) -> ((map.Map.get b3 b) = x2)))).
+(* Why3 intros a a_WT b b1 b2 b3 b4 ((((h1,h2),((h3,h4),(h5,h6))),h7),h8) x
+        x1 h9 rho h10 (h11,h12) rho1 h13 rho2 h14 h15
+        ((h16,h17),((h18,h19),(h20,h21))) x2 x3 h22. *)
+intros a a_WT b b1 b2 b3 b4 ((((h1,h2),((h3,h4),(h5,h6))),h7),h8) x x1 h9 rho
+h10 (h11,h12) rho1 h13 rho2 h14 h15 ((h16,h17),((h18,h19),(h20,h21))) x2 x3
+h22.
+generalize (h6 0)%Z.
 ae.
 Admitted.
 
