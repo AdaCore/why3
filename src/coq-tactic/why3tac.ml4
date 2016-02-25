@@ -73,7 +73,10 @@ let declare_summary name freeze unfreeze init =
 
 let body_of_constant env c =
   if Reductionops.is_transparent env (ConstKey c) then
-    Declareops.body_of_constant Opaqueproof.empty_opaquetab (Global.lookup_constant c)
+    let cb = Environ.lookup_constant c env in
+    match cb.const_body with
+    | Def _ -> Declareops.body_of_constant Opaqueproof.empty_opaquetab cb
+    | _ -> None
   else None
 
 let get_transp_state env =
