@@ -99,6 +99,16 @@ let map_to_list = CArray.map_to_list
 
 let force x = x
 
+let coq_reference t1 t2 =
+  let th = lazy (coq_reference t1 t2) in
+  fun x -> lazy (Lazy.force th x)
+
+let find_reference t1 t2 =
+  let th = lazy (find_reference t1 t2) in
+  fun x -> lazy (Lazy.force th x)
+
+let is_global c t = is_global (Lazy.force c) t
+
 DECLARE PLUGIN "why3tac"
 
 END
