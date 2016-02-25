@@ -824,7 +824,7 @@ let check_spec dsp ecty e =
                                             weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sexn.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
-  let check_rwd = dsp.ds_checkrw in
+  let check_rw = dsp.ds_checkrw in
   let uwrl, ue = effect_of_dspec dsp in
   let ucty = create_cty ecty.cty_args ecty.cty_pre ecty.cty_post
     ecty.cty_xpost ecty.cty_oldies ue ecty.cty_result in
@@ -843,18 +843,18 @@ let check_spec dsp ecty e =
   if ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc:e.e_loc
     "this@ expression@ does@ not@ diverge";
   (* check that every computed effect is listed *)
-  if check_rwd && not (Spv.subset erds urds) then Spv.iter (fun v ->
+  if check_rw && not (Spv.subset erds urds) then Spv.iter (fun v ->
     Loc.errorm ?loc:e.e_loc
       "this@ expression@ depends@ on@ variable@ %a@ left@ out@ in@ \
       the@ specification" Pretty.print_vs v.pv_vs) (Spv.diff erds urds);
-  if check_rwd && bad_write eeff ueff then
+  if check_rw && bad_write eeff ueff then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sexn.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sexn.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
       print_xs xs) (Sexn.diff eeff.eff_raises ueff.eff_raises);
-  if check_rwd && eeff.eff_oneway && not ueff.eff_oneway then
+  if eeff.eff_oneway && not ueff.eff_oneway then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> eff.eff_oneway) e)
       "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
         stated@ in@ the@ specification"

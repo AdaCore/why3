@@ -13,6 +13,7 @@ exception E
 
 let rec f (x:int) : int
   raises { E }
+  diverges
 = if x = 42 then raise E else
   try
     let n = f (x-1) in
