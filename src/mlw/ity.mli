@@ -388,7 +388,6 @@ type post = term  (** postcondition: eps result . post_fmla *)
 
 val open_post : post -> vsymbol * term
 val open_post_with : term -> post -> term
-val open_post_with_args : term -> pvsymbol list -> post -> term
 
 val create_post : vsymbol -> term -> post
 
@@ -428,6 +427,11 @@ val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
 val cty_tuple : pvsymbol list -> cty
 (** [cty_tuple pvl] returns a nullary tuple-valued cty with
     an appropriate [cty_mask]. *)
+
+val cty_exec : cty -> cty
+(** [cty_exec cty] converts a cty of a partial application into
+    a cty of a fully applied application, returning a mapping.
+    The original cty must be effectless. *)
 
 val cty_ghost : cty -> bool
 (** [cty_ghost cty] returns [cty.cty_effect.eff_ghost] *)

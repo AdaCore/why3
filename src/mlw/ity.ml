@@ -1154,33 +1154,6 @@ let open_post_with t q = match q.t_node with
   | Teps bf -> t_open_bound_with t bf
   | _ -> invalid_arg "Ity.open_post_with"
 
-let open_post_with_args t al q =
-  if al = [] then open_post_with t q else
-  let v, h = open_post q in
-  let al = List.map (fun v -> v.pv_vs) al in
-  let res = t_func_app_l t (List.map t_var al) in
-  let rec down h s el vl = match el, vl with
-    | {t_node = Tvar u}::el, v::vl when vs_equal u v ->
-        down h s el vl
-    | el, [] ->
-        let tyl = List.map (fun v -> v.vs_ty) al in
-        let ty = Opt.map (Util.const v.vs_ty) s.ls_value in
-        t_equ t (t_app_partial s (List.rev el) tyl ty)
-    | _ -> t_subst_single v res h in
-  let rec conv h = t_label_copy h (match h.t_node with
-    | Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp(s, tl)} as t])
-      when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t = 0 ->
-        down h s (List.rev tl) (List.rev al)
-    | Tbinop (Tiff, {t_node =
-        Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp (fs, [])}])},
-        ({t_node = Tapp (s, tl)} as f))
-      when ls_equal ps ps_equ && vs_equal v u &&
-           ls_equal fs fs_bool_true && t_v_occurs v f = 0 ->
-        down h s (List.rev tl) (List.rev al)
-    | Tbinop (Tand, f, g) -> t_and (conv f) (conv g)
-    | _ -> t_subst_single v res h) in
-  t_forall_close_simp al [] (conv h)
-
 type cty = {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
@@ -1370,6 +1343,63 @@ let cty_tuple args =
   let eff = eff_ghostify (mask = MaskGhost) eff in
   let frz = List.fold_right freeze_pv args isb_empty in
   cty_unsafe [] [] [post] Mexn.empty Mpv.empty eff res mask frz
+
+let cty_exec ({cty_effect = eff} as c) =
+  (* we do not purify the signature, so the regions will be frozen
+     in the resulting pvsymbol. Thus, we have to forbid all effects,
+     including allocation. TODO/FIXME: we should probably forbid
+     the rest of the signature to contain regions at all. *)
+  if eff.eff_oneway then Loc.errorm
+    "This function may not terminate, it cannot be used as pure";
+  if not (eff_pure eff && Sreg.is_empty eff.eff_resets) then Loc.errorm
+    "This function has side effects, it cannot be used as pure";
+  if not (Mreg.is_empty c.cty_freeze.isb_reg) then Loc.errorm
+    "This function is stateful, it cannot be used as pure";
+  let ity = List.fold_right (fun a ity ->
+    ity_func a.pv_ity ity) c.cty_args c.cty_result in
+  let gh = List.exists (fun a -> a.pv_ghost) c.cty_args in
+  let eff = eff_ghostify (gh || mask_ghost c.cty_mask) eff in
+  (* translate the specification *)
+  let al = List.map (fun a -> a.pv_vs) c.cty_args in
+  let pre = List.map (fun f -> t_forall_close_simp al [] f) c.cty_pre in
+  let res = create_vsymbol (id_fresh "result") (ty_of_ity ity) in
+  let res_al = t_func_app_l (t_var res) (List.map t_var al) in
+  let oldies = Mpv.fold (fun {pv_vs = o} {pv_vs = v} s ->
+    Mvs.add o (t_var v) s) c.cty_oldies Mvs.empty in
+  let conv_post q =
+    let v, h = open_post q in
+    let rec down h s el vl = match el, vl with
+      | {t_node = Tvar u}::el, v::vl when vs_equal u v ->
+          down h s el vl
+      | el, [] ->
+          let tyl = List.map (fun v -> v.vs_ty) al in
+          let ty = Opt.map (Util.const v.vs_ty) s.ls_value in
+          t_equ (t_var res) (t_app_partial s (List.rev el) tyl ty)
+      | _ -> t_subst_single v res_al h in
+    let rec conv h = t_label_copy h (match h.t_node with
+      | Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp(s, tl)} as t])
+        when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t = 0 ->
+          down h s (List.rev tl) (List.rev al)
+      | Tbinop (Tiff, {t_node =
+          Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp (fs, [])}])},
+          ({t_node = Tapp (s, tl)} as f))
+        when ls_equal ps ps_equ && vs_equal v u &&
+             ls_equal fs fs_bool_true && t_v_occurs v f = 0 ->
+          down h s (List.rev tl) (List.rev al)
+      | Tbinop (Tand, f, g) -> t_and (conv f) (conv g)
+      | _ -> t_subst_single v res_al h) in
+    let h = t_forall_close_simp al [] (conv (t_subst oldies h)) in
+    create_post res h in
+  let post = List.map conv_post c.cty_post in
+  (* we do not modify cty_freeze to respect the invariants of the cty type.
+     It is sound to assume that the resulting cty can be executed multiple
+     times, producing mappings with different type variables and regions.
+     Still, Expr never uses it like this: it is merely attached to Eexec
+     to provide the converted specification for VC generation. Pvsymbols
+     that carry the resulting value, however, cannot be generalized. *)
+  cty_unsafe [] pre post Mexn.empty Mpv.empty eff ity MaskVisible c.cty_freeze
+
+let cty_exec c = if c.cty_args = [] then c else cty_exec c
 
 let cty_read_pre pvs c =
   (* the external reads are already frozen and

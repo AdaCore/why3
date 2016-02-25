@@ -190,7 +190,8 @@ let get_syms node pure =
     | Evar _ | Econst _ | Eabsurd -> syms
     | Eassert (_,t) | Epure t -> syms_term syms t
     | Eghost e -> syms_expr syms e
-    | Eexec c -> syms_cexp syms c
+    | Eexec (c,_) when c.c_cty.cty_args = [] -> syms_cexp syms c
+    | Eexec (c,cty) -> syms_cty (syms_cexp syms c) cty
     | Eassign al ->
         let syms_as syms (v,s,u) =
           syms_pv (syms_pv (Sid.add s.rs_name syms) u) v in

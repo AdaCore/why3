@@ -117,7 +117,7 @@ type expr = private {
 and expr_node = private
   | Evar    of pvsymbol
   | Econst  of Number.constant
-  | Eexec   of cexp
+  | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr

@@ -303,7 +303,7 @@ type expr = {
 and expr_node =
   | Evar    of pvsymbol
   | Econst  of Number.constant
-  | Eexec   of cexp
+  | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
@@ -373,8 +373,8 @@ let find_effect pr loc e =
     if not (pr e.e_effect) then loc else
     let loc = if e.e_loc = None then loc else e.e_loc in
     let loc = match e.e_node with
-      | Eexec {c_node = Cfun d} -> find loc d
-      | _ ->                e_fold find loc e in
+      | Eexec ({c_node = Cfun d},_) -> find loc d
+      | _ ->                    e_fold find loc e in
     raise (FoundExpr (loc,e)) in
   try find loc e, e with FoundExpr (loc,e) -> loc, e
 
@@ -476,11 +476,11 @@ let rs_true  = rs_of_ls fs_bool_true
 let rs_false = rs_of_ls fs_bool_false
 
 let is_e_true e = match e.e_node with
-  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_true
+  | Eexec ({c_node = Capp (s,[])},_) -> rs_equal s rs_true
   | _ -> false
 
 let is_e_false e = match e.e_node with
-  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_false
+  | Eexec ({c_node = Capp (s,[])},_) -> rs_equal s rs_false
   | _ -> false
 
 let t_void = t_tuple []
@@ -503,8 +503,8 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
   | Econst n -> t_const n
   | Epure t -> t
   | Eghost e -> raw_of_expr e
-  | Eexec {c_cty = {cty_post = []}} -> raise Exit
-  | Eexec {c_cty = {cty_args = al; cty_post = q::_}} ->
+  | Eexec (_,{cty_post = []}) -> raise Exit
+  | Eexec (_,{cty_args = al; cty_post = q::_}) ->
       let v, q = open_post q in
       let rec find h = match h.t_node with
         | Tapp (ps, [{t_node = Tvar u}; t])
@@ -585,8 +585,8 @@ let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Eabsurd -> copy_labels e t_false
-  | Eexec {c_cty = c} ->
-      let conv q = open_post_with_args res c.cty_args q in
+  | Eexec (_,c) ->
+      let conv q = open_post_with res q in
       copy_labels e (t_and_l (List.map conv c.cty_post))
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
       copy_labels e (t_subst_single v.pv_vs t_void (post_of_expr res e))
@@ -676,21 +676,12 @@ let e_let ld e =
 
 (* callable expressions *)
 
-let e_exec ({c_cty = cty} as c) = match cty.cty_args with
-  | _::_ as al ->
-      (* unlike for RLpv or RLls, we do not purify the signature,
-         so the regions are now frozen and we have to forbid all
-         effects, including allocation *)
-      check_effects cty; check_state cty;
-      if not (Sreg.is_empty cty.cty_effect.eff_resets) then Loc.errorm
-        "This function has side effects, it cannot be used as pure";
-      let func a ity = ity_func a.pv_ity ity in
-      let ity = List.fold_right func al cty.cty_result in
-      let ghost = List.exists (fun a -> a.pv_ghost) al in
-      let eff = eff_ghostify ghost cty.cty_effect in
-      mk_expr (Eexec c) ity MaskVisible eff
-  | [] ->
-      mk_expr (Eexec c) cty.cty_result cty.cty_mask cty.cty_effect
+let e_exec c =
+  let cty = match c with
+    | {c_node = Cfun e; c_cty = {cty_post = []} as cty} ->
+        cty_exec (cty_add_post cty (local_post_of_expr e))
+    | _ -> cty_exec c.c_cty in
+  mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask cty.cty_effect
 
 let c_any c = mk_cexp Cany c
 
@@ -775,7 +766,7 @@ let fs_void = fs_tuple 0
 let e_void = e_app rs_void [] [] ity_unit
 
 let is_e_void e = match e.e_node with
-  | Eexec {c_node = Capp (s,[])} -> rs_equal s rs_void
+  | Eexec ({c_node = Capp (s,[])},_) -> rs_equal s rs_void
   | _ -> false
 
 let rs_func_app = rs_of_ls fs_func_app
@@ -931,7 +922,7 @@ let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
 let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Evar _ | Econst _ | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
   | Eghost e -> e_ghostify true (e_rs_subst sm e)
-  | Eexec c -> e_exec (c_rs_subst sm c)
+  | Eexec (c,_) -> e_exec (c_rs_subst sm c)
   | Elet (LDvar (v,d),e) ->
       let d = e_rs_subst sm d in
       ity_equal_check d.e_ity v.pv_ity;
@@ -1245,7 +1236,7 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
   | Econst c -> print_const fmt c
-  | Eexec c -> print_cexp true pri fmt c
+  | Eexec (c,_) -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->
       fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
