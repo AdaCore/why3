@@ -54,8 +54,17 @@ theory GenericFloat
 
   (*** Conversion to/from other sorts ***)
 
-  (* with int *)
+  (* with mathematical int *)
+  (* note that these conversions do not feature in SMTLIB *)
+
+  (* intended semantics for of_int are the same as (_ to_fp eb sb) RNE with *)
+  (* a suitably sized bitvector, large enough to hold x                     *)
   function of_int (x : int) : t
+  (* intended semantics for to_int are the same as (_ fp.to_sbv) RNE with *)
+  (* a suitably sized bitvector, large enough to hold the return value    *)
+  (* when x not finite (infinite or NaN) then to_int should act like an   *)
+  (* uninterpreted function, in particular asserting it returns something *)
+  (* large is not valid in the case of infinity                           *)
   function to_int (x : t) : int
 
   axiom zero_of_int : zeroF = of_int 0
@@ -107,6 +116,7 @@ theory GenericFloat
   use real.FromInt
 
   (* is this correct &| accurate ? *)
+  (* FS: seems OK for float32 at least *)
   axiom of_int_is_finite: forall x:int. no_overflow (FromInt.from_int x) ->
         is_finite (of_int x)
 
