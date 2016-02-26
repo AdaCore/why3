@@ -41,11 +41,11 @@ theory float.Float32
 
   syntax function from_binary "((_ to_fp 8 24) ((_ int2bv 32) %1))"
 
-  syntax function zeroF "(_ +zero 8 24)"
-  syntax function oneF "((_ to_fp 8 24) #x3F800000)"
+  syntax function zeroF     "(_ +zero 8 24)"
+  syntax function oneF      "((_ to_fp 8 24) #x3F800000)"
   syntax function max_value "((_ to_fp 8 24) #x7F7FFFFF)"
-  syntax function two "((_ to_fp 8 24) #x40000000)"
-  syntax function half "((_ to_fp 8 24) #x3F000000)"
+  syntax function two       "((_ to_fp 8 24) #x40000000)"
+  syntax function half      "((_ to_fp 8 24) #x3F000000)"
 
   syntax function of_int   "((_ to_fp 8 24) RNE (to_real %1))"
   (* syntax function round "(fp.to_real ((_ to_fp 8 24) RNE %1))" *)
@@ -58,11 +58,11 @@ theory float.Float64
 
   syntax function from_binary "((_ to_fp 11 53) ((_ int2bv 64) %1))"
 
-  syntax function zeroF "(_ +zero 11 53)"
-  syntax function oneF "((_ to_fp 8 24) #x3FF0000000000000)"
-  syntax function max_value "((_ to_fp 8 24) #x7FEFFFFFFFFFFFFF)"
-  syntax function two "((_ to_fp 8 24) #x4000000000000000)"
-  syntax function half "((_ to_fp 8 24) #x3FE0000000000000)"
+  syntax function zeroF     "(_ +zero 11 53)"
+  syntax function oneF      "((_ to_fp 11 53) #x3FF0000000000000)"
+  syntax function max_value "((_ to_fp 11 53) #x7FEFFFFFFFFFFFFF)"
+  syntax function two       "((_ to_fp 11 53) #x4000000000000000)"
+  syntax function half      "((_ to_fp 11 53) #x3FE0000000000000)"
 
   syntax function of_int   "((_ to_fp 11 53) RNE (to_real %1))"
   (* syntax function round "(fp.to_real ((_ to_fp 11 53) RNE %1))" *)
