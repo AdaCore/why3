@@ -32,24 +32,23 @@ theory GenericFloat
   function mul       t t : t
   function div       t t : t
 
-  (* function fma     t t t : t *)
+  function fma     t t t : t (* xy + z *)
 
   function sqrt      t   : t
   function rem       t t : t
 
-  (* The three functions below have nothing to do with IEEE-754, but they *)
-  (* are here because we need them in Ada/SPARK.                          *)
+  (* In Ada/SPARK we need sign-preserving floor/ceil in the case of 0,    *)
+  (* but luckily this is the case for IEEE floats so we can use the below *)
+  (* directly.                                                            *)
 
-  function ceil      t   : t (* ada : when 0, has the sign of 0 /!\ test
-                                smtlib *)
-  function floor     t   : t (* same as above *)
-  function truncate  t   : t (* The function yields the value ceil x
-                                when x is negative, and floor x otherwise *)
+  function ceil      t   : t (* IEEE roundToIntegralTowardsPositive *)
+  function floor     t   : t (* IEEE roundToIntegralTowardsNegative *)
+  function truncate  t   : t (* IEEE roundToIntegralTowardsZero     *)
+  function nearbyInt t   : t (* IEEE roundToIntegralTiesToAway      *)
 
-  function nearbyInt t   : t (* this is fp.roundToIntegral *)
-
-  (* constructor, perform an unchecked convertion from the binary
-     representation of a float *)
+  (* constructor, perform an unchecked convertion from the binary *)
+  (* representation of a float. this is a workaround and should   *)
+  (* only be used for literals!                                   *)
   function from_binary int : t
 
   (*** Conversion to/from other sorts ***)
