@@ -1,5 +1,14 @@
 (** {1 Formalization of Floating-Point Arithmetic}
-  Full float theory (with infinities and NaN) only RNE rounding mode. Special values are not axiomatized. *)
+
+  Full float theory (with infinities and NaN) only RNE rounding mode.
+  Special values are not axiomatized.
+
+  A note on intended semantics: we use the same idea as the SMTLIB floating
+  point theory, that defers any inconsistencies to the "parent" document.
+  Hence, in doubt, the correct axiomatisation is one that implements "An
+  Automatable Formal Semantics for IEEE-754 Floating-Point Arithmetic",
+  which in turn defers any inconsistencies to IEE-754.
+*)
 
 theory GenericFloat
 
@@ -7,11 +16,11 @@ theory GenericFloat
 
   (** Constants *)
 
-  constant zeroF     : t      (* +0.0 *)
-  constant oneF      : t      (* not used here, but used in _gnatprove_standard *)
+  constant zeroF     : t   (* +0.0 *)
+  constant oneF      : t   (* not used here, but used in _gnatprove_standard *)
   constant two       : t
   constant half      : t
-  constant max_value : t      (* largest finite float *)
+  constant max_value : t   (* largest finite float *)
 
   (**  arithmetic functions *)
 
@@ -23,18 +32,24 @@ theory GenericFloat
   function mul       t t : t
   function div       t t : t
 
-  (* what about fma ? *)
-  (* add axioms for those *)
+  (* function fma     t t t : t *)
+
   function sqrt      t   : t
   function rem       t t : t
 
-  function ceil      t   : t (* ada : when 0, has the sign of 0 /!\ test smtlib *)
+  (* The three functions below have nothing to do with IEEE-754, but they *)
+  (* are here because we need them in Ada/SPARK.                          *)
+
+  function ceil      t   : t (* ada : when 0, has the sign of 0 /!\ test
+                                smtlib *)
   function floor     t   : t (* same as above *)
   function truncate  t   : t (* The function yields the value ceil x
                                 when x is negative, and floor x otherwise *)
-  function nearbyInt  t   : t (* rename to nearbyInt C norm *)
 
-  (* constructor, perform an unchecked convertion from the binary representation of a float *)
+  function nearbyInt t   : t (* this is fp.roundToIntegral *)
+
+  (* constructor, perform an unchecked convertion from the binary
+     representation of a float *)
   function from_binary int : t
 
   (*** Conversion to/from other sorts ***)
@@ -78,7 +93,7 @@ theory GenericFloat
 
   predicate is_finite (x:t)
 
-  axiom is_finite: forall x (* [in_range (to_real x)] *). is_finite x -> in_range (to_real x)
+  axiom is_finite: forall x:t (* [in_range (to_real x)] *). is_finite x -> in_range (to_real x)
 
   axiom zero_is_finite : is_finite zeroF
   axiom one_is_finite  : is_finite oneF
@@ -228,16 +243,20 @@ theory GenericFloat
   (*     gt (mul a c) b -> ge a (div b c) *)
 
   (* Min & Max *)
+  (* Note that we have to follow IEEE-754 and SMTLIB here. Two things to *)
+  (* note in particular:                                                 *)
+  (*    1) m?n(-0, 0) is either 0 or -0, there is a choice               *)
+  (*    2) if either argument is NaN then the other argument is returned *)
+  function min (x y : t) : t
+  function max (x y : t) : t
 
-  function min (x y : t) : t = if le x y then x else y
-  function max (x y : t) : t = if le y x then x else y
-  (* Note that max(-0,0) = min(-0,0) = -0; as in spark*)
+  lemma Min_r : forall x y:t. le y x -> eq (min x y) y
+  lemma Max_l : forall x y:t. le x y -> eq (max x y) y
 
-  lemma Min_r : forall x y:t. le y x -> min x y = y
-  lemma Max_l : forall x y:t. le x y -> max x y = y
-
-  lemma Min_comm : forall x y:t. min x y = min y x
-  lemma Max_comm : forall x y:t. max x y = max y x
+  (* FS: wrong for 0 and -0. Using eq instead makes them wrong for NaN and *)
+  (*     NaN                                                               *)
+  (* lemma Min_comm : forall x y:t. min x y = min y x *)
+  (* lemma Max_comm : forall x y:t. max x y = max y x *)
 
   lemma Min_assoc : forall x y z:t. min (min x y) z = min x (min y z)
   lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
