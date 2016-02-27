@@ -504,7 +504,7 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
   | Epure t -> t
   | Eghost e -> raw_of_expr e
   | Eexec (_,{cty_post = []}) -> raise Exit
-  | Eexec (_,{cty_args = al; cty_post = q::_}) ->
+  | Eexec (_,{cty_post = q::_}) ->
       let v, q = open_post q in
       let rec find h = match h.t_node with
         | Tapp (ps, [{t_node = Tvar u}; t])
@@ -515,23 +515,7 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
                ls_equal fs fs_bool_true && t_v_occurs v f = 0 -> f
         | Tbinop (Tand, f, _) -> find f
         | _ -> raise Exit in
-      let t = find q in
-      if al = [] then t else
-      let al = List.map (fun v -> v.pv_vs) al in
-      begin match t.t_node with
-        | Tapp (s, tl) ->
-            let rec down el vl = match el, vl with
-              | {t_node = Tvar u}::el, v::vl when vs_equal u v ->
-                  down el vl
-              | el, [] ->
-                  let tyl = List.map (fun v -> v.vs_ty) al in
-                  t_app_partial s (List.rev el) tyl t.t_ty
-              | _ ->
-                  t_lambda al [] t in
-            down (List.rev tl) (List.rev al)
-        | _ ->
-            t_lambda al [] t
-      end
+      find q
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
       t_subst_single v.pv_vs t_void (raw_of_expr e)
   | Elet (LDvar (v,d),e) ->
