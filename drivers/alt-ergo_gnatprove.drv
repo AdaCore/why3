@@ -1,0 +1,25 @@
+import "alt_ergo.drv"
+
+(* theory float.GenericFloat *)
+
+(*   syntax type t "real" *)
+
+(*   syntax function to_real "%1" *)
+
+(*   remove prop Round_to_real *)
+(* end *)
+
+(* theory float.FloatConverter *)
+(*  syntax function to_float64 "%1" *)
+(* end *)
+
+theory ada__model.Finite_Float_Literal
+  remove prop l_bin
+end
+
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)
