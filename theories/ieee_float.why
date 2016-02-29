@@ -7,7 +7,7 @@
   point theory, that defers any inconsistencies to the "parent" document.
   Hence, in doubt, the correct axiomatisation is one that implements "An
   Automatable Formal Semantics for IEEE-754 Floating-Point Arithmetic",
-  which in turn defers any inconsistencies to IEE-754.
+  which in turn defers any inconsistencies to IEEE-754.
 
   This theory is split into two parts: the first part talks about IEEE
   operations and this is what you should use as a user, the second part is
@@ -38,17 +38,18 @@ theory GenericFloat
   (* constructor, perform an unchecked convertion from the binary *)
   (* representation of a float. this is a workaround and should   *)
   (* only be used for literals!                                   *)
-  function from_binary int : t
+  function from_binary int  : t
+  function (!)         real : t (* constructor from real literals *)
 
   (* {3 Operators} *)
 
   function abs       t   : t
-  function neg       t   : t
+  function (.-_)     t   : t
 
-  function add       t t : t
-  function sub       t t : t
-  function mul       t t : t
-  function div       t t : t
+  function (.+)      t t : t
+  function (.-)      t t : t
+  function (.*)      t t : t
+  function (./)      t t : t
 
   function fma     t t t : t (* xy + z *)
 
@@ -58,10 +59,10 @@ theory GenericFloat
   (* In Ada/SPARK we need sign-preserving floor/ceil in the case of 0,    *)
   (* but luckily this is the case for IEEE floats so we can use the below *)
   (* directly.                                                            *)
-  function ceil      t   : t (* IEEE roundToIntegralTowardsPositive *)
-  function floor     t   : t (* IEEE roundToIntegralTowardsNegative *)
-  function truncate  t   : t (* IEEE roundToIntegralTowardsZero     *)
-  function nearbyInt t   : t (* IEEE roundToIntegralTiesToAway      *)
+  function roundToIntegralTowardsPositive t : t
+  function roundToIntegralTowardsNegative t : t
+  function roundToIntegralTowardsZero     t : t
+  function roundToIntegralTiesToAway      t : t
 
   (* Min & Max *)
   (* Note that we have to follow IEEE-754 and SMTLIB here. Two things to *)
@@ -73,18 +74,18 @@ theory GenericFloat
 
   (** {3 Comparisons} *)
 
-  predicate le t t
-  predicate lt t t
-  predicate ge t t
-  predicate gt t t
+  predicate (.<=) t t
+  predicate (.<)  t t
+  predicate (.>=) t t
+  predicate (.>)  t t
 
-  predicate eq t t
+  predicate (.=)  t t
 
   (* {3 Classification of numbers} *)
 
   predicate is_normal    t
   predicate is_subnormal t
-  predicate is_zero      (x:t) = eq x zeroF
+  predicate is_zero      (x:t) = x .= zeroF
   predicate is_infinite  t
   predicate is_nan       t
   predicate is_positive  t
@@ -164,10 +165,10 @@ theory GenericFloat
 
   axiom max_to_real   : max_real = to_real max_value
 
-  use import real.Real
+  use import real.RealInfix
   use real.Abs
 
-  predicate in_range (x:real) = - max_real <= x <= max_real
+  predicate in_range (x:real) = -. max_real <=. x <=. max_real
 
   (* is_finite will guard all axioms, we're not specifying anything
      for special values. It remains uninterpreted for the
@@ -200,7 +201,7 @@ theory GenericFloat
   (* to_int and nearbyInt *)
   axiom to_int_nearbyInt: forall x:t.
     is_finite x ->
-      FromInt.from_int (to_int x) = to_real (nearbyInt x)
+      FromInt.from_int (to_int x) = to_real (roundToIntegralTiesToAway x)
 
   (* Axioms on round *)
 
@@ -208,7 +209,7 @@ theory GenericFloat
     forall x:real. in_range x -> no_overflow x
 
   axiom Round_monotonic :
-    forall x y:real. x <= y -> round x <= round y
+    forall x y:real. x <=. y -> round x <=. round y
 
   axiom Round_idempotent :
     forall x:real[round(round x)]. round (round x) = round x
@@ -222,12 +223,11 @@ theory GenericFloat
 
   (* round and integers *)
 
-  use int.Int
+  use import int.Int
 
   axiom Exact_rounding_for_integers:
     forall i:int.
-      Int.(<=) (Int.(-_) max_representable_integer) i /\
-      Int.(<=) i max_representable_integer ->
+      (- max_representable_integer) <= i <= max_representable_integer ->
         round (FromInt.from_int i) = FromInt.from_int i
 
   (** {3 Comparisons} *)
@@ -237,56 +237,58 @@ theory GenericFloat
   (* axiomatize eq w.r.t. = ? *)
   (* e.g. is_finite x /\ is_finite y /\ not_is_zero x -> eq x y <-> x = y *)
   axiom eq: forall x y.
-    is_finite x /\ is_finite y /\ not (x = zeroF \/ y = zeroF) -> eq x y <-> x = y
+    is_finite x /\ is_finite y /\ not (x = zeroF \/ y = zeroF) -> x .= y <-> x = y
+
+  axiom eq_zero: zeroF .= (.- zeroF) /\ (.- zeroF) .= zeroF
 
   axiom eq_to_real: forall x y.
-    is_finite x /\ is_finite y -> eq x y <-> to_real x = to_real y
+    is_finite x /\ is_finite y -> x .= y <-> to_real x = to_real y
 
   axiom lt: forall x y.
-    is_finite x /\ is_finite y -> lt x y <-> to_real x < to_real y
+    is_finite x /\ is_finite y -> x .< y <-> to_real x <. to_real y
 
   axiom le: forall x y.
-    is_finite x /\ is_finite y -> le x y <-> to_real x <= to_real y
+    is_finite x /\ is_finite y -> x .<= y <-> to_real x <=. to_real y
 
   axiom gt: forall x y.
-    is_finite x /\ is_finite y -> gt x y <-> to_real x > to_real y
+    is_finite x /\ is_finite y -> x .> y <-> to_real x >. to_real y
 
   axiom ge: forall x y.
-    is_finite x /\ is_finite y -> ge x y <-> to_real x >= to_real y
+    is_finite x /\ is_finite y -> x .>= y <-> to_real x >=. to_real y
 
-  axiom positive_to_real: forall x[is_positive x|to_real x >= 0.0].
-    is_finite x -> is_positive x -> to_real x >= 0.0
+  axiom positive_to_real: forall x[is_positive x|to_real x >=. 0.0].
+    is_finite x -> is_positive x -> to_real x >=. 0.0
   axiom to_real_positive: forall x[is_positive x].
-    is_finite x -> to_real x > 0.0 -> is_positive x
+    is_finite x -> to_real x >. 0.0 -> is_positive x
 
-  axiom negative_to_real: forall x [is_negative x|to_real x <= 0.0].
-    is_finite x -> is_negative x -> to_real x <= 0.0
+  axiom negative_to_real: forall x [is_negative x|to_real x <=. 0.0].
+    is_finite x -> is_negative x -> to_real x <=. 0.0
   axiom to_real_negative: forall x [is_negative x].
-    is_finite x -> to_real x < 0.0 -> is_negative x
+    is_finite x -> to_real x <. 0.0 -> is_negative x
 
   axiom negative_xor_positive: forall x. not (is_positive x /\ is_negative x)
   axiom negative_or_positive: forall x. is_finite x -> is_positive x \/ is_negative x
 
   (** {3 binary operations} *)
 
-  axiom add: forall x y:t [add x y].
-   is_finite x -> is_finite y -> no_overflow (to_real x + to_real y) ->
-    is_finite (add x y) /\ to_real (add x y) = round (to_real x + to_real y)
+  axiom add: forall x y:t [x .+ y].
+   is_finite x -> is_finite y -> no_overflow (to_real x +. to_real y) ->
+    is_finite (x .+ y) /\ to_real (x .+ y) = round (to_real x +. to_real y)
 
   axiom sub: forall x y:t.
-  is_finite x -> is_finite y -> no_overflow (to_real x - to_real y) ->
-    is_finite (sub x y) /\ to_real (sub x y) = round (to_real x - to_real y)
+  is_finite x -> is_finite y -> no_overflow (to_real x -. to_real y) ->
+    is_finite (x .- y) /\ to_real (x .- y) = round (to_real x -. to_real y)
 
   axiom mul: forall x y:t.
-  is_finite x -> is_finite y -> no_overflow (to_real x * to_real y) ->
-    is_finite (mul x y) /\ to_real (mul x y) = round (to_real x * to_real y)
+  is_finite x -> is_finite y -> no_overflow (to_real x *. to_real y) ->
+    is_finite (x .* y) /\ to_real (x .* y) = round (to_real x *. to_real y)
 
   axiom div: forall x y:t.
-  is_finite x -> is_finite y -> no_overflow (to_real x / to_real y) /\ not is_zero y ->
-    is_finite (div x y) /\ to_real (div x y) = round (to_real x / to_real y)
+  is_finite x -> is_finite y -> no_overflow (to_real x /. to_real y) /\ not is_zero y ->
+    is_finite (x ./ y) /\ to_real (x ./ y) = round (to_real x /. to_real y)
 
   axiom neg: forall x:t.
-    is_finite x -> is_finite (neg x) /\ to_real (neg x) = - to_real x
+    is_finite x -> is_finite (.- x) /\ to_real (.- x) = -. to_real x
 
   axiom abs: forall x:t.
     is_finite x -> is_finite (abs x) /\  to_real (abs x) = Abs.abs (to_real x)
@@ -310,8 +312,10 @@ theory GenericFloat
      no_overflow (to_real a * to_real c) -> not is_zero c -> *)
   (*     gt (mul a c) b -> ge a (div b c) *)
 
-  lemma Min_r : forall x y:t. le y x -> eq (min x y) y
-  lemma Max_l : forall x y:t. le x y -> eq (max x y) y
+  lemma Min_r : forall x y:t. y .<= x -> (min x y) .= y
+  lemma Min_l : forall x y:t. x .<= y -> (min x y) .= x
+  lemma Max_r : forall x y:t. y .<= x -> (max x y) .= x
+  lemma Max_l : forall x y:t. x .<= y -> (max x y) .= y
 
   (* FS: wrong for 0 and -0. Using eq instead makes them wrong for NaN and *)
   (*     NaN                                                               *)
@@ -324,96 +328,100 @@ theory GenericFloat
   (* _____________ *)
 
 
-  axiom eq_to_int: forall x y. is_finite x -> is_finite y -> eq x y ->
+  axiom eq_to_int: forall x y. is_finite x -> is_finite y -> x .= y ->
     to_int x = to_int y
 
   use import real.RealInfix
   use real.Truncate
 
   axiom truncate_neg: forall x:t.
-    is_finite x -> is_negative x -> truncate x = ceil x
+    is_finite x -> is_negative x -> roundToIntegralTowardsZero x = roundToIntegralTowardsPositive x
 
   axiom truncate_pos: forall x:t.
-    is_finite x -> is_positive x -> truncate x = floor x
+    is_finite x -> is_positive x -> roundToIntegralTowardsZero x = roundToIntegralTowardsNegative x
 
   axiom to_int_of_int: forall i:int.
-    Int.(<=) (Int.(-_) max_representable_integer) i /\
-    Int.(<=) i max_representable_integer ->
+    (- max_representable_integer) <= i <= max_representable_integer ->
       to_int (of_int i) = i
 
   predicate is_int (x:t)
 
-  axiom of_int_is_int: forall x. is_int (of_int x)
+  (* temporary range check on int set to 2^64; TODO find the actual
+     max int that don't give INF with of_int for both clones *)
+  axiom of_int_is_int: forall x.
+    (- 0x10000000000000000) <= x <= 0x10000000000000000
+      -> is_int (of_int x)
+
+  axiom is_int_is_finite: forall x. is_int x -> is_finite x
 
   (* ceil axioms *)
-  axiom ceil_is_int: forall x:t. is_int (ceil x)
+  axiom ceil_is_int: forall x:t. is_finite x -> is_int (roundToIntegralTowardsPositive x)
 
   (* zero's sign is kept so '=' instead of eq is OK *)
-  axiom ceil_of_int: forall i:int. ceil (of_int i) = of_int i
+  (* try is_int i -> ceil i = i *)
+  axiom ceil_of_int: forall i:int. roundToIntegralTowardsPositive (of_int i) = of_int i
 
-  axiom ceil_le: forall x:t. le x (ceil x)
+  axiom ceil_le: forall x:t. x .<= (roundToIntegralTowardsPositive x)
 
-  axiom ceil_lest: forall x y:t. le x y /\ is_int y -> le (ceil x) y
+  axiom ceil_lest: forall x y:t. x .<= y /\ is_int y -> (roundToIntegralTowardsPositive x) .<= y
 
   axiom ceil_to_int: forall x:t.
-    le (neg (of_int max_representable_integer)) x /\
-    lt x (of_int max_representable_integer) ->
-      (* or ? to_int (ceil x) = Truncate.ceil (to_real x) *)
-      to_real (ceil x) = FromInt.from_int (Truncate.ceil (to_real x))
+    (.- (of_int max_representable_integer)) .<= x .<= (of_int max_representable_integer) ->
+      (* or ? to_int (roundToIntegralTowardsPositive x) = Truncate.roundToIntegralTowardsPositive (to_real x) *)
+      to_real (roundToIntegralTowardsPositive x) = FromInt.from_int (Truncate.ceil (to_real x))
 
   (* floor axioms *)
-  axiom floor_is_int: forall x:t. is_int (floor x)
+  axiom floor_is_int: forall x:t. is_finite x -> is_int (roundToIntegralTowardsNegative x)
 
-  axiom floor_of_int: forall i:int. floor (of_int i) = of_int i
+  axiom floor_of_int: forall i:int. roundToIntegralTowardsNegative (of_int i) .= of_int i
 
-  axiom floor_le: forall x:t. le (floor x) x
+  axiom floor_le: forall x:t. (roundToIntegralTowardsNegative x) .<= x
 
-  axiom floor_lest: forall x y:t. le y x /\ is_int y -> le y (floor x)
+  axiom floor_lest: forall x y:t. y .<= x /\ is_int y -> y .<= (roundToIntegralTowardsNegative x)
 
   axiom floor_to_int: forall x:t.
-    lt (neg (of_int max_representable_integer)) x /\
-    le x (of_int max_representable_integer) ->
-      (*or ? to_int (floor x) = Truncate.floor (to_real x) *)
-      to_real (floor x) = FromInt.from_int (Truncate.floor (to_real x))
+    (.- (of_int max_representable_integer)) .< x .<= (of_int max_representable_integer) ->
+      (*or ? to_int (roundToIntegralTowardsNegative x) = Truncate.roundToIntegralTowardsNegative (to_real x) *)
+      to_real (roundToIntegralTowardsNegative x) = FromInt.from_int (Truncate.floor (to_real x))
 
   (* rounding *)
 
   axiom to_int_down:
-    (* forall x:t. lt x (div (add (ceil x) (floor x)) two) -> to_int x = to_int (floor x) *)
-    forall x:t. lt (sub x (floor x)) (sub (ceil x) x) -> to_int x = to_int (floor x)
+    (* forall x:t. lt x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) -> to_int x = to_int (roundToIntegralTowardsNegative x) *)
+    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .< ((roundToIntegralTowardsPositive x) .- x) -> to_int x = to_int (roundToIntegralTowardsNegative x)
 
   axiom to_int_up:
-    (* forall x:t. gt x (div (add (ceil x) (floor x)) two) -> to_int x = to_int (ceil x) *)
-    forall x:t. gt (sub x (floor x)) (sub (ceil x) x) -> to_int x = to_int (ceil x)
+    (* forall x:t. gt x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) -> to_int x = to_int (roundToIntegralTowardsPositive x) *)
+    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .> ((roundToIntegralTowardsPositive x) .- x) -> to_int x = to_int (roundToIntegralTowardsPositive x)
 
   axiom to_int_down_tie:        (* check if to_int is rounding or RNE *)
-    (* forall x:t. eq x (div (add (ceil x) (floor x)) two) /\ is_negative x -> *)
-    forall x:t. eq (sub x (floor x)) (sub (ceil x) x) -> is_negative x ->
-      to_int x = to_int (floor x)
+    (* forall x:t. eq x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) /\ is_negative x -> *)
+    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .= ((roundToIntegralTowardsPositive x) .- x) -> is_negative x ->
+      to_int x = to_int (roundToIntegralTowardsNegative x)
 
   axiom to_int_up_tie:
-    (* forall x:t. eq x (div (add (ceil x) (floor x)) two) -> is_positive x -> *)
-    forall x:t. eq (sub (ceil x) x) (sub x (floor x)) -> is_positive x ->
-      to_int x = to_int (ceil x)
+    (* forall x:t. eq x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) -> is_positive x -> *)
+    forall x:t. ((roundToIntegralTowardsPositive x) .- x) .= (x .- (roundToIntegralTowardsNegative x)) -> is_positive x ->
+      to_int x = to_int (roundToIntegralTowardsPositive x)
 
   axiom to_int_near_int:
-    forall i x:t. is_int i -> lt (neg half) x /\ lt x half ->
-      to_int (add i x) = to_int i
+    forall i x:t. is_int i -> (.- half) .< x .< half ->
+      to_int (i .+ x) = to_int i
 
   axiom to_int_monotonic: forall x y:t.
-    is_finite y -> is_finite x -> le x y -> Int.(<=) (to_int x) (to_int y)
+    is_finite y -> is_finite x -> x .<= y -> (to_int x) <= (to_int y)
 
   (* are those two really ok ? *)
   axiom to_int_monotonic_int1:
-    forall x:t, i:int. is_finite x -> le x (of_int i) -> Int.(<=) (to_int x) i
+    forall x:t, i:int. is_finite x -> x .<= (of_int i) -> (to_int x) <= i
 
   axiom to_int_monotonic_int2:
-    forall x:t, i:int. is_finite x -> le (of_int i) x -> Int.(<=) i (to_int x)
+    forall x:t, i:int. is_finite x -> (of_int i) .<= x -> i <= (to_int x)
 
-  axiom truncate_is_finite  : forall x:t. is_finite x -> is_finite (truncate x)
-  axiom ceil_is_finite      : forall x:t. is_finite x -> is_finite (ceil x)
-  axiom floor_is_finite     : forall x:t. is_finite x -> is_finite (floor x)
-  axiom nearbyInt_is_finite : forall x:t. is_finite x -> is_finite (nearbyInt x)
+  axiom truncate_is_finite  : forall x:t. is_finite x -> is_finite (roundToIntegralTowardsZero x)
+  axiom ceil_is_finite      : forall x:t. is_finite x -> is_finite (roundToIntegralTowardsPositive x)
+  axiom floor_is_finite     : forall x:t. is_finite x -> is_finite (roundToIntegralTowardsNegative x)
+  axiom nearbyInt_is_finite : forall x:t. is_finite x -> is_finite (roundToIntegralTiesToAway x)
 end
 
 theory Float_BV_Converter
@@ -564,7 +572,7 @@ theory Float32_BV_Converter
   clone export Float_BV_Converter with
     type t = t,
     predicate is_finite = is_finite,
-    predicate le = le,
+    predicate le = (.<=),
     function to_real = to_real,
     function round = round
 
@@ -578,7 +586,7 @@ theory Float64_BV_Converter
   clone export Float_BV_Converter with
     type t = t,
     predicate is_finite = is_finite,
-    predicate le = le,
+    predicate le = (.<=),
     function to_real = to_real,
     function round = round
 
