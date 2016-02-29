@@ -68,11 +68,6 @@ import "smt-libv2-floats.gen"
  ***                       gnat2why theories                        ***
  **********************************************************************)
 
-theory "ada__model".Finite_Float_Literal
-  remove prop l_real
-  remove prop l_is_finite
-end
-
 theory _gnatprove_standard_th.Integer
    syntax function bool_eq "(= %1 %2)"
    syntax function bool_ne "(not (= %1 %2))"
@@ -89,11 +84,34 @@ theory _gnatprove_standard_th.Integer
    remove prop bool_ge_axiom
 end
 
+theory _gnatprove_standard_th.Floating_Func
+   syntax predicate lt "(fp.lt %1 %2)"
+   syntax predicate le "(fp.leq %1 %2)"
+   syntax predicate gt "(fp.gt %1 %2)"
+   syntax predicate ge "(fp.geq %1 %2)"
+   syntax predicate eq "(fp.eq %1 %2)"
+   syntax predicate neq "(not (fp.eq %1 %2))"
+   syntax function bool_lt "(fp.lt %1 %2)"
+   syntax function bool_le "(fp.leq %1 %2)"
+   syntax function bool_gt "(fp.gt %1 %2)"
+   syntax function bool_ge "(fp.geq %1 %2)"
+   syntax function bool_eq "(fp.eq %1 %2)"
+   syntax function bool_neq "(not (fp.eq %1 %2))"
+end
+
 theory _gnatprove_standard_th.Boolean_Func
    syntax function bool_eq "(= %1 %2)"
 end
 
+theory ada__model.Finite_Float_Literal
+  remove prop l_bin
+end
+
 theory ada__model_th.Discrete_Base_Theory
+  syntax function bool_eq "(= %1 %2)"
+end
+
+theory ada__model_th.Floating_Point_Theory
   syntax function bool_eq "(= %1 %2)"
 end
 
