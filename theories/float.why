@@ -8,21 +8,39 @@
   Hence, in doubt, the correct axiomatisation is one that implements "An
   Automatable Formal Semantics for IEEE-754 Floating-Point Arithmetic",
   which in turn defers any inconsistencies to IEE-754.
+
+  This theory is split into two parts: the first part talks about IEEE
+  operations and this is what you should use as a user, the second part is
+  internal only and is an axiomatisation for the provers that do not
+  natively support floating point. You should not use any symbols you find
+  there in your verification conditions as solvers with native floating
+  point support will leave them uninterpreted.
 *)
 
 theory GenericFloat
 
+  (*********************************************************************)
+  (* {2 PART I - PUBLIC INTERFACE}                                     *)
+  (*********************************************************************)
+
+  (* {3 Sorts} *)
+
   type t
 
-  (** Constants *)
+  (* {3 Constructors and Constants} *)
 
   constant zeroF     : t   (* +0.0 *)
   constant oneF      : t   (* not used here, but used in _gnatprove_standard *)
-  constant two       : t
-  constant half      : t
-  constant max_value : t   (* largest finite float *)
+  constant two       : t   (* 2.0 *)
+  constant half      : t   (* 0.5 *)
+  constant max_value : t   (* largest positive finite float *)
 
-  (**  arithmetic functions *)
+  (* constructor, perform an unchecked convertion from the binary *)
+  (* representation of a float. this is a workaround and should   *)
+  (* only be used for literals!                                   *)
+  function from_binary int : t
+
+  (* {3 Operators} *)
 
   function abs       t   : t
   function neg       t   : t
@@ -40,18 +58,70 @@ theory GenericFloat
   (* In Ada/SPARK we need sign-preserving floor/ceil in the case of 0,    *)
   (* but luckily this is the case for IEEE floats so we can use the below *)
   (* directly.                                                            *)
-
   function ceil      t   : t (* IEEE roundToIntegralTowardsPositive *)
   function floor     t   : t (* IEEE roundToIntegralTowardsNegative *)
   function truncate  t   : t (* IEEE roundToIntegralTowardsZero     *)
   function nearbyInt t   : t (* IEEE roundToIntegralTiesToAway      *)
 
-  (* constructor, perform an unchecked convertion from the binary *)
-  (* representation of a float. this is a workaround and should   *)
-  (* only be used for literals!                                   *)
-  function from_binary int : t
+  (* Min & Max *)
+  (* Note that we have to follow IEEE-754 and SMTLIB here. Two things to *)
+  (* note in particular:                                                 *)
+  (*    1) m?n(-0, 0) is either 0 or -0, there is a choice               *)
+  (*    2) if either argument is NaN then the other argument is returned *)
+  function min       t t : t
+  function max       t t : t
 
-  (*** Conversion to/from other sorts ***)
+  (** {3 Comparisons} *)
+
+  predicate le t t
+  predicate lt t t
+  predicate ge t t
+  predicate gt t t
+
+  predicate eq t t
+
+  (* {3 Classification of numbers} *)
+
+  predicate is_normal    t
+  predicate is_subnormal t
+  predicate is_zero      (x:t) = eq x zeroF
+  predicate is_infinite  t
+  predicate is_nan       t
+  predicate is_positive  t
+  predicate is_negative  t
+
+  (* helper predicate for zero, normal and subnormals. not defined so that *)
+  (* the axiomatisation below can use it without talking about subnormals  *)
+  predicate is_finite    t
+
+  (* {3 Conversions from other sorts} *)
+
+  (* from bitvec binary interchange                           *)
+  (*   partly done with from_binary (for literals only)       *)
+  (* from another fp                 - see FloatConverter     *)
+  (* from real                                                *)
+  (* from unsigned integer bitvector - see Float_BV_Converter *)
+  (* from signed integer bitvector                            *)
+
+  (* {3 Conversions to other sorts} *)
+
+  (* to unsigned integer bitvector   - see Float_BV_Converter *)
+  (* to signed integer bitvector                              *)
+  (* to real *)
+  function to_real   t    : real
+
+  (*********************************************************************)
+  (* {2 PART II - PRIVATE AXIOMATISATION}                              *)
+  (*********************************************************************)
+
+  (* {3 Constructors and Constants} *)
+  axiom zeroF_to_real     : to_real zeroF = 0.0
+  axiom zeroF_is_positive : is_positive zeroF
+  axiom oneF_to_real      : to_real oneF  = 1.0
+  axiom two_to_real       : to_real two   = 2.0
+  axiom half_to_real      : to_real half  = 0.5
+
+  (* {3 Conversions from other sorts} *)
 
   (* with mathematical int *)
   (* note that these conversions do not feature in SMTLIB *)
@@ -59,6 +129,9 @@ theory GenericFloat
   (* intended semantics for of_int are the same as (_ to_fp eb sb) RNE with *)
   (* a suitably sized bitvector, large enough to hold x                     *)
   function of_int (x : int) : t
+
+  (* {3 Conversions to other sorts} *)
+
   (* intended semantics for to_int are the same as (_ fp.to_sbv) RNE with *)
   (* a suitably sized bitvector, large enough to hold the return value    *)
   (* when x not finite (infinite or NaN) then to_int should act like an   *)
@@ -70,16 +143,8 @@ theory GenericFloat
   axiom oneF_of_int : oneF  = of_int 1
   axiom two_of_int  : two   = of_int 2
 
-  (* with real *)
-  function to_real   t    : real
+  (* {3 Arithmetic} *)
 
-  (** mapping float constant to real value *)
-  axiom zeroF_to_real : to_real zeroF = 0.0
-  axiom oneF_to_real  : to_real oneF  = 1.0
-  axiom two_to_real   : to_real two   = 2.0
-  axiom half_to_real  : to_real half  = 0.5
-
-  (*** arithmetic axiomatisations ***)
   function round real : real    (* specific to axiomatisation, to be
                                    ignored by prover with native support *)
 
@@ -98,8 +163,6 @@ theory GenericFloat
      propagate it. The only way to have is_finite x is if x is by
      propagation or by construction (right now only from using a
      constant or a prover with native support). *)
-
-  predicate is_finite (x:t)
 
   axiom is_finite: forall x:t (* [in_range (to_real x)] *). is_finite x -> in_range (to_real x)
 
@@ -159,8 +222,6 @@ theory GenericFloat
 
   (** Comparison predicates *)
 
-  predicate eq t t
-
   (* axiomatize eq w.r.t. = ? *)
   (* e.g. is_finite x /\ is_finite y /\ not_is_zero x -> eq x y <-> x = y *)
   axiom eq: forall x y.
@@ -169,31 +230,17 @@ theory GenericFloat
   axiom eq_to_real: forall x y.
     is_finite x /\ is_finite y -> eq x y <-> to_real x = to_real y
 
-  predicate lt t t
-
   axiom lt: forall x y.
     is_finite x /\ is_finite y -> lt x y <-> to_real x < to_real y
-
-  predicate le t t
 
   axiom le: forall x y.
     is_finite x /\ is_finite y -> le x y <-> to_real x <= to_real y
 
-  predicate gt t t
-
   axiom gt: forall x y.
     is_finite x /\ is_finite y -> gt x y <-> to_real x > to_real y
 
-  predicate ge t t
-
   axiom ge: forall x y.
     is_finite x /\ is_finite y -> ge x y <-> to_real x >= to_real y
-
-  predicate is_zero (x:t) = eq x zeroF
-
-  predicate is_positive t
-
-  predicate is_negative t
 
   axiom positive_to_real: forall x[is_positive x|to_real x >= 0.0].
     is_finite x -> is_positive x -> to_real x >= 0.0
@@ -250,14 +297,6 @@ theory GenericFloat
   (* is_finite a -> is_finite b -> is_finite c ->
      no_overflow (to_real a * to_real c) -> not is_zero c -> *)
   (*     gt (mul a c) b -> ge a (div b c) *)
-
-  (* Min & Max *)
-  (* Note that we have to follow IEEE-754 and SMTLIB here. Two things to *)
-  (* note in particular:                                                 *)
-  (*    1) m?n(-0, 0) is either 0 or -0, there is a choice               *)
-  (*    2) if either argument is NaN then the other argument is returned *)
-  function min (x y : t) : t
-  function max (x y : t) : t
 
   lemma Min_r : forall x y:t. le y x -> eq (min x y) y
   lemma Max_l : forall x y:t. le x y -> eq (max x y) y

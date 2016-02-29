@@ -1,4 +1,6 @@
 theory float.GenericFloat
+   (* Part I *)
+
    syntax function abs  "(fp.abs %1)"
    syntax function neg  "(fp.neg %1)"
 
@@ -20,25 +22,34 @@ theory float.GenericFloat
    syntax function min "(fp.min %1 %2)"
    syntax function max "(fp.max %1 %2)"
 
-   syntax function to_int   "(to_int (fp.to_real %1))"
-   syntax function to_real  "(fp.to_real %1)"
+   syntax predicate le  "(fp.leq %1 %2)"
+   syntax predicate lt  "(fp.lt %1 %2)"
+   syntax predicate ge  "(fp.geq %1 %2)"
+   syntax predicate gt  "(fp.gt %1 %2)"
 
-   syntax predicate is_zero   "(fp.isZero %1)"
-   syntax predicate is_positive "(fp.isPositive %1)"
-   syntax predicate is_negative "(fp.isNegative %1)"
+   syntax predicate eq  "(fp.eq %1 %2)"
+
+   syntax predicate is_normal    "(fp.isNormal    %1)"
+   syntax predicate is_subnormal "(fp.isSubnormal %1)"
+   syntax predicate is_zero      "(fp.isZero      %1)"
+   syntax predicate is_infinite  "(fp.isInfinite  %1)"
+   syntax predicate is_nan       "(fp.isNaN       %1)"
+   syntax predicate is_positive  "(fp.isPositive  %1)"
+   syntax predicate is_negative  "(fp.isNegative  %1)"
 
    syntax predicate is_finite "(not (or (fp.isInfinite %1) (fp.isNaN %1)))"
 
-   syntax predicate eq  "(fp.eq %1 %2)"
-   syntax predicate lt  "(fp.lt %1 %2)"
-   syntax predicate le  "(fp.leq %1 %2)"
-   syntax predicate gt  "(fp.gt %1 %2)"
-   syntax predicate ge  "(fp.geq %1 %2)"
+   syntax function to_real  "(fp.to_real %1)"
+
+   (* Part II *)
+
+   (* syntax function to_int   "(to_int (fp.to_real %1))" *)
 
    remove allprops
 end
 
 theory float.Float32
+  (* Part I *)
   syntax type t "Float32"
 
   syntax function from_binary "((_ to_fp 8 24) ((_ int2bv 32) %1))"
@@ -49,13 +60,14 @@ theory float.Float32
   syntax function two       "((_ to_fp 8 24) #x40000000)"
   syntax function half      "((_ to_fp 8 24) #x3F000000)"
 
+  (* Part II *)
   syntax function of_int   "((_ to_fp 8 24) RNE (to_real %1))"
-  (* syntax function round "(fp.to_real ((_ to_fp 8 24) RNE %1))" *)
 
   remove allprops
 end
 
 theory float.Float64
+  (* Part I *)
   syntax type t "Float64"
 
   syntax function from_binary "((_ to_fp 11 53) ((_ int2bv 64) %1))"
@@ -66,13 +78,14 @@ theory float.Float64
   syntax function two       "((_ to_fp 11 53) #x4000000000000000)"
   syntax function half      "((_ to_fp 11 53) #x3FE0000000000000)"
 
+  (* Part II *)
   syntax function of_int   "((_ to_fp 11 53) RNE (to_real %1))"
-  (* syntax function round "(fp.to_real ((_ to_fp 11 53) RNE %1))" *)
 
   remove allprops
 end
 
 theory float.FloatConverter
+  (* Part I *)
    syntax function to_float32 "((_ to_fp 8 24) RNE %1)"
    syntax function to_float64 "((_ to_fp 11 53) RNE %1)"
 
@@ -80,6 +93,7 @@ theory float.FloatConverter
 end
 
 theory float.Float_BV_Converter
+  (* Part I *)
    syntax function to_ubv8  "((_ fp.to_ubv 8) RNA %1)"
    syntax function to_ubv16 "((_ fp.to_ubv 16) RNA %1)"
    syntax function to_ubv32 "((_ fp.to_ubv 32) RNA %1)"
@@ -89,6 +103,7 @@ theory float.Float_BV_Converter
 end
 
 theory float.Float64_BV_Converter
+  (* Part I *)
   syntax function of_ubv8  "((_ to_fp_unsigned 8 24) RNE %1)"
   syntax function of_ubv16 "((_ to_fp_unsigned 8 24) RNE %1)"
   syntax function of_ubv32 "((_ to_fp_unsigned 8 24) RNE %1)"
@@ -98,6 +113,7 @@ theory float.Float64_BV_Converter
 end
 
 theory float.Float64_BV_Converter
+  (* Part I *)
   syntax function of_ubv8  "((_ to_fp_unsigned 11 53) RNE %1)"
   syntax function of_ubv16 "((_ to_fp_unsigned 11 53) RNE %1)"
   syntax function of_ubv32 "((_ to_fp_unsigned 11 53) RNE %1)"
