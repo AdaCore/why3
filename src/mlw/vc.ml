@@ -74,6 +74,7 @@ let mk_env env kn = mk_env (Env.read_theory env ["int"] "Int") kn
 (* explanation labels *)
 
 let vc_label e f =
+  if e.e_loc = None && Slab.is_empty e.e_label then f else
   let loc = if f.t_loc = None then e.e_loc else f.t_loc in
   let lab = Ident.Slab.union e.e_label f.t_label in
   let lab = Ident.Slab.remove sp_label lab in

@@ -493,7 +493,43 @@ let copy_labels e t =
   let loc = if t.t_loc = None then e.e_loc else t.t_loc in
   t_label ?loc (Slab.union e.e_label t.t_label) t
 
-let rec raw_of_expr e = copy_labels e (match e.e_node with
+let term_of_fmla f = match f.t_node with
+  | _ when f.t_ty <> None -> f
+  | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
+    when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
+  | _ -> t_label ?loc:f.t_loc Slab.empty (t_if_simp f t_bool_true t_bool_false)
+
+let fmla_of_term t = match t.t_node with
+  | _ when t.t_ty = None -> t
+  | Tif (f, {t_node = Tapp (fs1,[])}, {t_node = Tapp (fs2,[])})
+    when ls_equal fs1 fs_bool_true && ls_equal fs2 fs_bool_false -> f
+  | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_label_copy t t_true
+  | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_label_copy t t_false
+  | _ -> t_label ?loc:t.t_loc Slab.empty (t_equ_simp t t_bool_true)
+
+let rec raw_of_post prop v h = match h.t_node with
+  | Tapp (ps, [{t_node = Tvar u}; t])
+    when ls_equal ps ps_equ && vs_equal u v && t_v_occurs v t = 0 ->
+      (if prop then fmla_of_term t else t), t_true
+  | Tbinop (Tiff, {t_node =
+      Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp (fs,[])}])}, f)
+    when ls_equal ps ps_equ && vs_equal v u &&
+         ls_equal fs fs_bool_true && t_v_occurs v f = 0 ->
+      (if prop then f else term_of_fmla f), t_true
+  | Tbinop (Tand, f, g) ->
+      let t, f = raw_of_post prop v f in
+      t, t_label_copy h (t_and_simp f g)
+  | _ -> raise Exit
+
+let pure_of_post prop v h = match raw_of_post prop v h with
+  | {t_ty = Some _} as t, h when prop -> fmla_of_term t, h
+  | {t_ty = None} as f, h when not prop -> term_of_fmla f, h
+  | z -> z
+
+let term_of_post ~prop v h =
+  try Some (pure_of_post prop v h) with Exit -> None
+
+let rec raw_of_expr prop e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_void
     (* we do not check e.e_effect here, since we check the
         effects later for the overall expression. The only
@@ -502,33 +538,24 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
   | Evar v -> t_var v.pv_vs
   | Econst n -> t_const n
   | Epure t -> t
-  | Eghost e -> raw_of_expr e
+  | Eghost e -> pure_of_expr prop e
   | Eexec (_,{cty_post = []}) -> raise Exit
   | Eexec (_,{cty_post = q::_}) ->
-      let v, q = open_post q in
-      let rec find h = match h.t_node with
-        | Tapp (ps, [{t_node = Tvar u}; t])
-          when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t = 0 -> t
-        | Tbinop (Tiff, {t_node =
-            Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp (fs,[])}])}, f)
-          when ls_equal ps ps_equ && vs_equal v u &&
-               ls_equal fs fs_bool_true && t_v_occurs v f = 0 -> f
-        | Tbinop (Tand, f, _) -> find f
-        | _ -> raise Exit in
-      find q
+      let v, h = open_post q in
+      fst (pure_of_post prop v h)
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
-      t_subst_single v.pv_vs t_void (raw_of_expr e)
+      t_subst_single v.pv_vs t_void (pure_of_expr prop e)
   | Elet (LDvar (v,d),e) ->
-      t_let_close_simp v.pv_vs (pure_of_expr false d) (raw_of_expr e)
+      t_let_close_simp v.pv_vs (pure_of_expr false d) (pure_of_expr prop e)
   | Elet (LDsym (s,_),e) ->
       (* TODO/FIXME: should we create a lambda-term for RLpv here instead
           of failing? Why would anyone want to define a local let-function,
           if it already has a pure logical meaning? *)
       if is_rlpv s then raise Exit;
-      raw_of_expr e
+      pure_of_expr prop e
   | Elet (LDrec rdl,e) ->
       if List.exists (fun rd -> is_rlpv rd.rec_sym) rdl then raise Exit;
-      raw_of_expr e
+      pure_of_expr prop e
   | Eif (e0,e1,e2) when is_e_false e1 && is_e_true e2 ->
       t_not (pure_of_expr true e0)
   | Eif (e0,e1,e2) when is_e_false e2 ->
@@ -536,21 +563,18 @@ let rec raw_of_expr e = copy_labels e (match e.e_node with
   | Eif (e0,e1,e2) when is_e_true e1 ->
       t_or (pure_of_expr true e0) (pure_of_expr true e2)
   | Eif (e0,e1,e2) ->
-      let prop = ity_equal e.e_ity ity_bool in
+      let prop = prop || ity_equal e.e_ity ity_bool in
       t_if (pure_of_expr true e0) (pure_of_expr prop e1) (pure_of_expr prop e2)
   | Ecase (d,bl) ->
-      let prop = ity_equal e.e_ity ity_bool in
+      let prop = prop || ity_equal e.e_ity ity_bool in
       let conv (p,e) = t_close_branch p.pp_pat (pure_of_expr prop e) in
       t_case (pure_of_expr false d) (List.map conv bl)
-  | Etry _ | Eraise _ | Eabsurd -> raise Exit)
+  | Etry _ | Eraise _ | Eabsurd -> raise Exit
 
-and pure_of_expr prop e =
-  let loca f = t_label ?loc:e.e_loc Slab.empty f in
-  let t = raw_of_expr e in
-  match t.t_ty with
-  | None when not prop -> loca (t_if_simp t t_bool_true t_bool_false)
-  | Some _ when prop -> loca (t_equ_simp t t_bool_true)
-  | _ -> t
+and pure_of_expr prop e = match copy_labels e (raw_of_expr prop e) with
+  | {t_ty = Some _} as t when prop -> fmla_of_term t
+  | {t_ty = None} as f when not prop -> term_of_fmla f
+  | t -> t
 
 let term_of_expr ~prop e =
   if not (eff_pure e.e_effect) then None else
@@ -568,7 +592,10 @@ let post_of_term res t =
 let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
-  | Eabsurd -> copy_labels e t_false
+  | Evar v -> post_of_term res (t_var v.pv_vs)
+  | Econst n -> post_of_term res (t_const n)
+  | Epure t -> post_of_term res t
+  | Eghost e -> post_of_expr res e
   | Eexec (_,c) ->
       let conv q = open_post_with res q in
       copy_labels e (t_and_l (List.map conv c.cty_post))
@@ -585,18 +612,24 @@ let rec post_of_expr res e = match e.e_node with
       copy_labels e (post_of_expr res e)
   | Eif (_,e1,e2) when is_e_true e1 || is_e_false e2 ||
                       (is_e_false e1 && is_e_true e2) ->
-      post_of_term res (raw_of_expr e)
+      post_of_term res (pure_of_expr true e)
   | Eif (e0,e1,e2) ->
       t_if (pure_of_expr true e0) (post_of_expr res e1) (post_of_expr res e2)
   | Ecase (d,bl) ->
       let conv (p,e) = t_close_branch p.pp_pat (post_of_expr res e) in
       t_case (pure_of_expr false d) (List.map conv bl)
   | Etry _ | Eraise _ -> raise Exit
-  | _ -> post_of_term res (raw_of_expr e)
+  | Eabsurd -> copy_labels e t_false
 
 let local_post_of_expr e =
   if ity_equal e.e_ity ity_unit || not (eff_pure e.e_effect) then [] else
   let res = create_vsymbol (id_fresh "result") (ty_of_ity e.e_ity) in
+  try let t = pure_of_expr (ity_equal e.e_ity ity_bool) e in
+      let t = match t.t_node with
+        | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
+          when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
+        | _ -> t in
+      [create_post res (post_of_term (t_var res) t)] with Exit ->
   try [create_post res (post_of_expr (t_var res) e)] with Exit -> []
 
 let post_of_expr res e =
