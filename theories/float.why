@@ -154,8 +154,11 @@ theory GenericFloat
 
   (* {3 Arithmetic} *)
 
-  function round real : real    (* specific to axiomatisation, to be
-                                   ignored by prover with native support *)
+  (* The intended meaning for round is the RNE rounding for floating point *)
+  (* as described on p17 of IEEE-754. For results where the corresponding  *)
+  (* floating point result would be infinity or NaN this function should   *)
+  (* be uninterpreted.                                                     *)
+  function round real : real
 
   constant max_real   : real    (* defined when cloning *)
 
