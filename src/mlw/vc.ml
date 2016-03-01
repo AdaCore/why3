@@ -19,11 +19,14 @@ open Pdecl
 
 (* basic tools *)
 
-let debug = Debug.register_info_flag "vc"
+let debug = Debug.register_info_flag "vc_debug"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
 
-let debug_sp = Debug.register_info_flag "vc_sp"
+let debug_sp = Debug.register_flag "vc_sp"
   ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
+
+let no_eval = Debug.register_flag "vc_no_eval"
+  ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
 let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
@@ -314,20 +317,9 @@ let adjustment dst dst' =
 
 (* combine postconditions with preconditions *)
 
-let extract_defn v sp =
-  let rec extract h = match h.t_node with
-    | Tapp (ps, [{t_node = Tvar u}; t])
-      when ls_equal ps ps_equ && vs_equal u v && t_v_occurs v t = 0 ->
-        t, t_true
-    | Tbinop (Tand,f,g) ->
-        let t, f = extract f in
-        t, t_label_copy h (sp_and f g)
-    | _ -> raise Exit in
-  try Some (extract sp) with Exit -> None
-
 let wp_close lab v ql wp =
   let sp = sp_of_post lab v ql in
-  match extract_defn v sp with
+  match term_of_post ~prop:false v sp with
   | Some (t, sp) -> wp_let v t (sp_implies sp wp)
   | None ->      wp_forall [v] (sp_implies sp wp)
 
@@ -340,13 +332,13 @@ let sp_wp_close v sp adv wp =
   let fvs = Mvs.filter (fun v _ -> is_fresh v) fvs in
   let fvs = Mvs.fold (fun _ t s -> t_freevars s t) adv fvs in
   let vl  = List.rev (Mvs.keys (Mvs.remove v fvs)) in
-  match extract_defn v sp with
+  match term_of_post ~prop:false v sp with
   | Some (t, sp) -> wp_forall vl (wp_let v t (sp_implies sp wp))
   | None         -> wp_forall (v :: vl)      (sp_implies sp wp)
 
 let sp_sp_close v sp adv sp' =
   let sp' = t_subst adv sp' in
-  match extract_defn v sp with
+  match term_of_post ~prop:false v sp with
   | Some (t, sp) ->                    wp_let v t (sp_and sp sp')
   | None when is_fresh v ->                        sp_and sp sp'
   | None -> t_subst_single v (t_var (clone_vs v)) (sp_and sp sp')
@@ -1043,21 +1035,23 @@ and vc_rec ({letrec_ps = lps} as env) vc_wp rdl =
     vc_fun env ~o2n vc_wp c.c_cty e in
   List.map vc_rd rdl
 
-let mk_vc_decl id f =
+let mk_vc_decl kn id f =
   let {id_string = nm; id_label = label; id_loc = loc} = id in
   let label = if lab_has_expl label then label else
     Slab.add (Ident.create_label ("expl:VC for " ^ nm)) label in
   let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
+  let f = if Debug.test_flag no_eval then f else
+    Eval_match.eval_match kn f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
 let vc env kn d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
-      [mk_vc_decl s.rs_name f]
+      [mk_vc_decl kn s.rs_name f]
   | PDlet (LDrec rdl) ->
       let env = mk_env env kn in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
-      List.map2 (fun rd f -> mk_vc_decl rd.rec_sym.rs_name f) rdl fl
+      List.map2 (fun rd f -> mk_vc_decl kn rd.rec_sym.rs_name f) rdl fl
   | _ -> []
