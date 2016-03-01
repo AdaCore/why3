@@ -128,6 +128,10 @@ theory GenericFloat
 
   (* intended semantics for of_int are the same as (_ to_fp eb sb) RNE with *)
   (* a suitably sized bitvector, large enough to hold x                     *)
+  (* note values >= than the below should result in infinities              *)
+  (*    float32 : 0x1ffffff * 2^103                                         *)
+  (*    float64 : 0x3fffffffffffff * 2^970                                  *)
+  (* also note that this function never yields a subnormal, or a nan, or -0 *)
   function of_int (x : int) : t
 
   (* {3 Conversions to other sorts} *)
