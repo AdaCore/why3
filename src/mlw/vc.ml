@@ -677,18 +677,13 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Elet (LDrec _, _) ->
       assert false (* TODO *)
 
+  | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
+      let v, ok, ne = sp_pure_if env e0.e_loc e1 e2 res in
+      let q = sp_wp_close res ne Mvs.empty q in
+      vc_label e (wp_expr env e0 v (wp_and ok q) xq)
   | Eif (e0, e1, e2) ->
       let v = res_of_expr e0 in
       let test = t_equ (t_var v) t_bool_true in
-      (* TODO: how should we handle prop-behind-bool-typed exprs? *)
-      (* TODO: handle e_true and e_false, restore /\ and \/ *)
-(* FIXME: wrong if e1 or e2 have preconditions depending on test
-      let q = if eff_pure e1.e_effect && eff_pure e2.e_effect then
-        let u1 = res_of_expr e1 and u2 = res_of_expr e2 in
-        let r = t_subst_single res (t_if test (t_var u1) (t_var u2)) q in
-        wp_expr env e1 u1 (wp_expr env e2 u2 (t_subst_single res r q) xq) xq
-      else
-*)
       let q1 = wp_expr env e1 res q xq in
       let q2 = wp_expr env e2 res q xq in
       vc_label e (wp_expr env e0 v (wp_if test q1 q2) xq)
@@ -819,6 +814,10 @@ and sp_expr env e res xres dst = match e.e_node with
   | Elet (LDrec _, _) ->
       assert false (* TODO *)
 
+  | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
+      let v, ok, ne = sp_pure_if env e0.e_loc e1 e2 res in
+      let eff = eff_union_par e1.e_effect e2.e_effect in
+      out_label e (sp_seq env e0 v xres (ok,ne,Mexn.empty) eff dst)
   | Eif (e0, e1, e2) ->
       let eff = eff_union_par e1.e_effect e2.e_effect in
       let xres' = Mexn.set_inter xres eff.eff_raises in
@@ -1002,6 +1001,15 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       out_label e (sp_pred_seq env e0 v xres out e1 eff dst)
   | Eghost e1 ->
       sp_seq env (e_label_copy e e1) res xres out eff dst
+  | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
+      let ok2, ne2, ex2 = out in
+      let v, ok1, ne1 = sp_pure_if env e0.e_loc e1 e2 res in
+      let ok = wp_and ok1 (sp_wp_close res ne1 Mvs.empty ok2) in
+      let close sp = sp_sp_close res ne1 Mvs.empty sp in
+      let ne = close ne2 and ex = Mexn.map close ex2 in
+      let eff = eff_union_seq
+        (eff_union_par e1.e_effect e2.e_effect) eff in
+      out_label e (sp_seq env e0 v xres (ok,ne,ex) eff dst)
   | _ ->
       let ok2, ne2, ex2 = out in
       let dst' = dst_affected eff dst in
@@ -1013,6 +1021,23 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let ex1 = if Mexn.is_empty ex1 then ex1 else
         Mexn.map (sp_adjust e.e_effect dst dst') ex1 in
       ok, close ne2, union_mexn ex1 (Mexn.map close ex2)
+
+and sp_pure_if env loc e1 e2 res =
+  let ok1, ne1, _ = sp_expr env e1 res Mexn.empty Mpv.empty in
+  let ok2, ne2, _ = sp_expr env e2 res Mexn.empty Mpv.empty in
+  (* we need a pvsymbol to prevent sp_wp_close from binding *)
+  let v = create_pvsymbol (id_fresh ?loc "result") ity_bool in
+  let test = t_equ (t_var v.pv_vs) t_bool_true in
+  let ne = match term_of_post ~prop:false res ne1 with
+    | Some (t1, f1) -> (* creative indentation ahead *)
+          (match term_of_post ~prop:false res ne2 with
+    | Some (t2, f2) ->
+        let t = t_if_simp test t1 t2 in
+        let f = t_if_simp test f1 f2 in
+        sp_and (t_equ (t_var res) t) f
+    | None -> t_if_simp test ne1 ne2)
+    | None -> t_if_simp test ne1 ne2 in
+  v.pv_vs, wp_if test ok1 ok2, ne
 
 and vc_fun env ?(o2n=Mvs.empty) vc_wp c e =
   let p = sp_of_pre expl_pre c.cty_pre in

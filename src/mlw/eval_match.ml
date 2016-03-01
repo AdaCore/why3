@@ -105,6 +105,8 @@ let rec add_quant kn (vl,tl,f) ({vs_ty = ty} as v) =
 let let_map fn env t1 tb =
   let x,t2,close = t_open_bound_cb tb in
   let t2 = fn (Mvs.add x t1 env) t2 in
+  (* TODO/FIXME? convert (let x = if f then True else False in h)
+     into (forall x. (x = True <-> f) -> h) ? *)
   t_let_simp t1 (close x t2)
 
 let branch_map fn env t1 bl =
