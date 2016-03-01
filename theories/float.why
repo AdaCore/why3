@@ -136,11 +136,16 @@ theory GenericFloat
 
   (* {3 Conversions to other sorts} *)
 
-  (* intended semantics for to_int are the same as (_ fp.to_sbv) RNE with *)
-  (* a suitably sized bitvector, large enough to hold the return value    *)
-  (* when x not finite (infinite or NaN) then to_int should act like an   *)
-  (* uninterpreted function, in particular asserting it returns something *)
-  (* large is not valid in the case of infinity                           *)
+  (* Intended semantics for to_int are the same as (_ fp.to_sbv) RNE with  *)
+  (* a suitably sized bitvector. Safe minimum sizes are given below:       *)
+  (*    float32 : 129                                                      *)
+  (*    float64 : 1025                                                     *)
+  (* In particular this function should be uninterpreted for infinities    *)
+  (* and NaN. Take care that no conclusion can be made on the result based *)
+  (* on the size of the bitvector chosen in those cases, i.e. this should  *)
+  (* not hold:                                                             *)
+  (*    to_int +INF < 2 ** 2048     // nope                                *)
+  (*    to_int +INF > 0             // nope                                *)
   function to_int (x : t) : int
 
   axiom zero_of_int : zeroF = of_int 0
