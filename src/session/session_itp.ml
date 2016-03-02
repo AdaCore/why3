@@ -73,6 +73,36 @@ type file = {
   session_file_name             : string;
 }
 
+type tree =
+  Tree of
+    (int * string * int * (int * string * int * tree list) list)
+
+let rec get_goal s id : tree =
+  let t = Hint.find s.proofNode_table id in
+  let parent = match t.proofn_parent with
+    | Theory _ -> -1
+    | Trans n -> n
+  in
+  let trl = List.map (get_trans s) t.proofn_transformations in
+  Tree (id,t.proofn_name.Ident.id_string,parent,trl)
+
+and get_trans s id =
+  let tr = Hint.find s.trans_table id in
+  (id,tr.transf_name,tr.transf_parent,List.map (get_goal s) tr.transf_subtasks)
+
+let get_tree s =
+  Hstr.fold
+    (fun fn f acc ->
+     let c =
+       List.map
+         (fun th ->
+          let goals = List.map (get_goal s) th.theory_goals in
+          (th.theory_name.Ident.id_string,goals))
+         f.file_theories
+     in
+     (fn,c) :: acc)
+    s.session_files []
+
 let gen_transID (s : session) =
   let id = s.next_transID in
   s.next_transID <- id + 1;
@@ -108,6 +138,29 @@ let empty_session ?shape_version (file : string) =
     session_prover_ids = Hprover.create 7;
     session_file_name = file;
   }
+
+let add_file_section (s:session) (fn:string) ?format (ths:Theory.theory list): unit =
+  let theories = []
+(*
+    List.rev_map
+      (fun (_,thname,th) ->
+       let tasks =
+         List.rev_map
+           (fun t -> t)
+           (Task.split_theory th None None)
+       in
+       { theory_name     = thname;
+         theory_checksum = None;
+         theory_goals    = tasks }) ths
+ *)
+  in
+  let f = { file_name = fn;
+            file_format = format;
+            file_theories = List.rev theories }
+  in
+  Hstr.add s.session_files fn f
+
+exception BadID
 
 let graft_proof_attempt (s : session) (id : proofNodeID) (pa : proof_attempt) =
   let pn = get_proofNode s id in
