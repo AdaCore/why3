@@ -34,6 +34,7 @@ type proof_attempt_node = {
 }
 
 type proof_node = {
+  proofn_name                    : Ident.ident;
   proofn_task                    : Task.task;
   proofn_parent                  : proof_parent;
   proofn_attempts                : proof_attempt_node Hprover.t;
@@ -118,18 +119,30 @@ let remove_proof_attempt (s : session) (id : proofNodeID)
   let pn = get_proofNode s id in
   Hprover.remove pn.proofn_attempts prover
 
-(* [mk_proof_node s t p id] register in the session [s] a proof node
+(* [mk_proof_node s n t p id] register in the session [s] a proof node
    of proofNodeID [id] of parent [p] of task [t] *)
-let mk_proof_node (s : session) (t : Task.task) (parent : proof_parent)
-    (node_id : proofNodeID) =
-  let pn = { proofn_task = t; proofn_parent = parent;
+let mk_proof_node (s : session) (n : Ident.ident) (t : Task.task)
+    (parent : proof_parent) (node_id : proofNodeID) =
+  let pn = { proofn_name = n;
+             proofn_task = t;
+             proofn_parent = parent;
              proofn_attempts = Hprover.create 7;
              proofn_transformations = []} in
   Hint.add s.proofNode_table node_id pn
 
-let mk_transf_proof_node (s : session) (tid : int) (t : Task.task) =
+let mk_proof_node_no_task (s : session) (n : Ident.ident)
+    (parent : proof_parent) (node_id : proofNodeID) =
+  mk_proof_node s n None parent node_id
+
+let mk_proof_node_task (s : session) (t : Task.task)
+    (parent : proof_parent) (node_id : proofNodeID) =
+  let name,_,_ = Termcode.goal_expl_task ~root:false t in
+  mk_proof_node s name t parent node_id
+
+let mk_transf_proof_node (s : session) (tid : int)
+    (t : Task.task) =
   let id = gen_proofNodeID s in
-  mk_proof_node s t (Trans tid) id;
+  mk_proof_node_task s t (Trans tid) id;
   id
 
 let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
@@ -322,7 +335,9 @@ let read_file_session_and_shapes dir xml_filename =
    [g] of nodeID [id] into the session [s] *)
 let rec load_goal session old_provers parent g id =
   match g.Xml.name with
-  | "goal" -> mk_proof_node session None parent id;
+  | "goal" ->
+    let gname = load_ident g in
+    mk_proof_node_no_task session gname parent id;
     List.iter (load_proof_or_transf session old_provers id) g.Xml.elements;
   | "label" -> ()
   | s ->
