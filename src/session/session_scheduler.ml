@@ -862,7 +862,7 @@ let edit_proof ~cntexample eS sched ~default_editor a =
   else
     let callback a res =
       match res with
-      | Done {Call_provers.pr_answer = Call_provers.Unknown ("", None)} ->
+      | Done {Call_provers.pr_answer = Call_provers.Unknown ("", _)} ->
         set_proof_state ~notify ~obsolete:true ~archived:false
           JustEdited a
       | _ ->
@@ -874,7 +874,7 @@ let edit_proof ~cntexample eS sched ~default_editor a =
 let edit_proof_v3 ~cntexample eS sched ~default_editor ~callback a =
   let callback a res =
     match res with
-    | Done {Call_provers.pr_answer = Call_provers.Unknown ("", None)} ->
+    | Done {Call_provers.pr_answer = Call_provers.Unknown ("", _)} ->
       callback a
     | _ -> ()
   in
@@ -940,7 +940,7 @@ let convert_unknown_prover =
       Todo._done todo ()
     else
       match Array.get strat pc with
-        | Icall_prover(p,timelimit,steplimit,memlimit) ->
+        | Icall_prover(p,timelimit,memlimit) ->
           let callback _pa res =
             match res with
               | Scheduled | Running ->
@@ -957,7 +957,7 @@ let convert_unknown_prover =
                 (* should not happen *)
                 assert false
           in
-          prover_on_goal es sched ~callback ~timelimit ~steplimit ~memlimit p g
+          prover_on_goal es sched ~callback ~timelimit ~steplimit:(-1) ~memlimit p g
         | Itransform(trname,pcsuccess) ->
           let callback ntr =
             match ntr with

@@ -5,7 +5,7 @@ Language
   * Add new logical connectives "by" and "so" as keywords
 
 Tools
-  * add a command-line option --extra-expl-prefix to specify
+  o add a command-line option --extra-expl-prefix to specify
     additional possible prefixes for VC explanations.  (Available for
     why3 commands "prove" and "ide".)
 
@@ -18,7 +18,7 @@ Transformations
     introduce_premises
 
 Library
-  * improved bitvectors theories
+  * improved bitvector theories
 
 API
   * Renamed functions in Split_goal
@@ -30,13 +30,33 @@ Encodings
     format is direct
 
 Provers
-  o discarded support for Alt-Ergo versions older than 0.95.2
+  * discarded support for Alt-Ergo versions older than 0.95.2
+  o support for Alt-Ergo 1.01 (released Feb 16, 2016) and
+    non-free versions 1.10 and 1.20
   o support for Coq 8.4pl6 (released Apr 9, 2015)
+  o support for Coq 8.5 (released Jan 21, 2016)
   o support for Gappa 1.2.0 (released May 19, 2015)
-  o support for Isabelle 2015 (released May 25, 2015)
-  o support for Z3 4.4.0 (released Apr 29, 2015)
+  * discarded support for Isabelle 2014
+  o support for Isabelle 2015 (released May 25, 2015) and
+    Isabelle 2016 (released Feb 17, 2016)
+  o support for Z3 4.4.0 (released Apr 29, 2015) and
+    4.4.1 (released Oct 5, 2015)
   o support for Zenon 0.8.0 (released Oct 21, 2014)
   o support for Zenon_modulo 0.4.1 (released Jul 2, 2015)
+
+Distribution
+  * non-free files are distributed in an extra tar file: "boomy" icon set,
+    javascript helpers for "why3 session html --style jstree"
+
+Version 0.86.3, February 8, 2016
+================================
+
+bug fixes
+  o assorted bug fixes
+
+provers
+  o fix compilation issues with Coq 8.5
+    (the tactic for 8.5 now behaves like idtac on successfully proved goals)
 
 Version 0.86.2, October 13, 2015
 ================================

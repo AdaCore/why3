@@ -93,7 +93,7 @@ let ident_printer =
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (* From Z3 *)
-      "map"; "bv"; "subset"; "union"
+      "map"; "bv"; "subset"; "union"; "default"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
@@ -604,8 +604,10 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
       print_info_model cntexample fmt model_list info;
-      (* (get-info :reason-unknown) *)
-      fprintf fmt "@[(get-info :reason-unknown)@]@\n";
+      if cntexample then begin
+	(* (get-info :reason-unknown) *)
+	fprintf fmt "@[(get-info :reason-unknown)@]@\n";
+      end;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;

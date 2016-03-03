@@ -32,14 +32,14 @@ theory BV_Check
   lemma to_uint_of_int :
     forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
 
-  lemma Of_int_zero: zero = of_int 0
+  lemma Of_int_zero: zeros = of_int 0
 
   lemma Of_int_ones: ones = of_int max_int
 
   goal nth_out_of_bound:
     forall x n. size <= n <= max_int -> nth x n = False
 
-  goal Nth_zero: forall n:int. 0 <= n < size -> nth zero n = False
+  goal Nth_zero: forall n:int. 0 <= n < size -> nth zeros n = False
 
   goal Nth_ones:
     (forall n. ult n size_bv -> nth_bv ones n = True) &&

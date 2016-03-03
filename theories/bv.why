@@ -116,9 +116,9 @@ theory BV_Gen
 
   axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size -> nth x n = False
 
-  constant zero : t
-  axiom Nth_zero:
-    forall n:int. nth zero n = False
+  constant zeros : t
+  axiom Nth_zeros:
+    forall n:int. nth zeros n = False
 
   constant ones : t
   axiom Nth_ones:
@@ -167,7 +167,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s >= size ->
       nth (lsr b s) n = False
 
-  lemma lsr_zero: forall x. lsr x 0 = x
+  lemma lsr_zeros: forall x. lsr x 0 = x
 
   function asr t int : t
 
@@ -179,7 +179,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s >= size ->
       nth (asr b s) n = nth b (size-1)
 
-  lemma asr_zero: forall x. asr x 0 = x
+  lemma asr_zeros: forall x. asr x 0 = x
 
   function lsl t int : t
 
@@ -191,7 +191,7 @@ theory BV_Gen
     forall b:t,n s:int. 0 <= n < s ->
       nth (lsl b s) n = False
 
-  lemma lsl_zero: forall x. lsl x 0 = x
+  lemma lsl_zeros: forall x. lsl x 0 = x
 
   use import int.EuclideanDivision
 
@@ -243,8 +243,8 @@ theory BV_Gen
 
   constant size_bv : t = of_int size
 
-  axiom Of_int_zero:
-    zero = of_int 0
+  axiom Of_int_zeros:
+    zeros = of_int 0
 
   axiom Of_int_ones:
     ones = of_int max_int
@@ -313,16 +313,7 @@ theory BV_Gen
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
 
-  (** Bitvector alternative for nth and shifts *)
-  function nth_bv t t: bool
-
-  axiom Nth_bv_is_nth:
-    forall x i.
-      nth x (to_uint i) = nth_bv x i
-
-  axiom Nth_bv_is_nth2:
-    forall x i. 0 <= i < two_power_size ->
-      nth_bv x (of_int i) = nth x i
+  (** Bitvector alternatives for shifts, rotations and nth *)
 
   (** logical shift right *)
   function lsr_bv t t : t
@@ -353,6 +344,7 @@ theory BV_Gen
     forall v n : t.
          to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
 
+  (** rotations *)
   function rotate_right_bv (v n : t) : t
 
   function rotate_left_bv (v n : t) : t
@@ -363,12 +355,28 @@ theory BV_Gen
   axiom rotate_right_bv_is_rotate_right :
     forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
 
+  (** nth_bv *)
+  function nth_bv t t: bool
+
+  axiom nth_bv_def:
+    forall x i.
+      nth_bv x i = not (bw_and (lsr_bv x i) (of_int 1) = zeros)
+
+  axiom Nth_bv_is_nth:
+    forall x i.
+      nth x (to_uint i) = nth_bv x i
+
+  axiom Nth_bv_is_nth2:
+    forall x i. 0 <= i < two_power_size ->
+      nth_bv x (of_int i) = nth x i
 
   (* equality axioms *)
 
-  predicate eq_sub_bv (a b:t) (i n:t) =
-  let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
-    bw_and b mask = bw_and a mask
+  predicate eq_sub_bv t t t t
+
+  axiom eq_sub_bv_def: forall a b i n.
+    let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
+      eq_sub_bv a b i n = (bw_and b mask = bw_and a mask)
 
   predicate eq_sub (a b:t) (i n:int) =
     forall j. i <= j < i + n -> nth a j = nth b j
@@ -394,13 +402,10 @@ theory BV64
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
@@ -412,13 +417,10 @@ theory BV32
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
@@ -430,13 +432,10 @@ theory BV16
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 
@@ -448,13 +447,10 @@ theory BV8
   clone export BV_Gen with
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int
-
-  meta "remove_prop" prop two_power_size_val
-  meta "remove_prop" prop max_int_val
-  meta "remove_prop" prop to_uint_add
-  meta "remove_prop" prop to_uint_sub
-  meta "remove_prop" prop to_uint_mul
+    constant max_int = max_int,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
 
 end
 

@@ -21,7 +21,7 @@ Require floating_point.Single.
 (* Why3 assumption *)
 Definition unit := unit.
 
-Require Import Interval_tactic.
+Require Import Interval.Interval_tactic.
 
 
 (* Why3 goal *)

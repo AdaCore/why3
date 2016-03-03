@@ -439,6 +439,8 @@ let check_used_var t vs =
     ()
 
 let check_exists_implies f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
+    when Slab.mem Term.asym_label f.t_label -> ()
   | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()

@@ -275,7 +275,7 @@ Axiom eval_msubst : forall (f:fmla) (sigma:(map.Map.map mident value))
   (map.Map.set sigma x (get_stack v pi)) pi f)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem eval_swap_term : forall (t:term), forall (x:ident), (t = (Tvar x)) ->
@@ -296,5 +296,5 @@ ae.
 simpl.
 destruct a.
 destruct (ident_decide id1 id2); ae.
-Qed.
+Admitted.
 

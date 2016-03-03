@@ -1,0 +1,1051 @@
+
+module SubgameCommon
+
+  use import game.Game
+  use import ho_set.Set
+
+  (* Notion of game inclusion: the larger game simulate the smaller one,
+     using the same ordering support. *)
+  predicate subgame (g1 g2:game 'a) =
+    simulate g1 (=) g2 /\ g1.progress = g2.progress
+
+  (* Trivial game inclusion: the smaller game transitions are included
+     in the larger one. *)
+  predicate trivial_subgame (g1 g2:game 'a) =
+    g1.progress = g2.progress /\
+    forall x. subset (g1.transition x) (g2.transition x)
+
+end
+
+module Subgame "W:non_conservative_extension:N" (* => SubgameProof *)
+
+  use import game.Game
+  use export SubgameCommon
+
+  axiom trivial_subgame_indeed : forall g1 g2:game 'a.
+    game_wf g1 /\ game_wf g2 /\ trivial_subgame g1 g2 -> subgame g1 g2
+
+end
+
+module SubgameProof
+
+  use import game.Game
+  use import SubgameCommon
+  use import ho_set.Set
+  use import ho_rel.RelSet
+  use import ho_rel.Prod
+  use import game.StratProps
+  use import order.LimUniq
+  use import order.Product
+  use import order.Chain
+  use import fn.Fun
+  use import fn.Image
+
+  lemma rel_map_equal : forall s:set 'a.
+    related (=) s = s by sext (related (=) s) s
+
+  lemma ax : forall g1 g2:game 'a.
+    game_wf g1 /\ game_wf g2 /\ trivial_subgame g1 g2 ->
+    subgame g1 g2 by step_simulate g1 (=) g2
+    by let o1 = g1.progress in let o2 = g2.progress in
+      (chain_compatible o1 (=) o2
+      by forall ch inh s1 s2.
+        chain (rprod o1 o2) ch /\ ch inh /\ (forall a b. ch (a,b) -> a = b)
+        /\ supremum (rprod o1 o2) ch (s1,s2) -> s1 = s2
+        by supremum o1 (image fst ch) s1
+        so supremum o2 (image snd ch) s2
+        so sext (image fst ch) (image snd ch)
+        by forall x. (image fst ch x <-> image snd ch x)
+        by (image fst ch x <-> ch (x,x)) /\ (image snd ch x <-> ch (x,x))
+      )
+    /\ (forall x s. g1.transition x s ->
+        have_winning_strat g2 x (related (=) s)
+        by g2.transition x s)
+
+  clone Subgame with lemma trivial_subgame_indeed
+
+end
+
+module Fmla
+
+  use import order.Chain
+  use import transfinite.ChainExtension
+  use import ho_set.Set
+  use import ho_rel.Rel
+  use import fn.Fun
+  use import game.Game
+  use import Subgame
+
+  (* Game formulae: predicates over games. *)
+  type fmla 'a = game 'a -> bool
+
+  (* Valid game formulae: formula increasing with respect to the subgame
+     relationship (Kripke semantics for intuitionistic logic) *)
+  predicate is_fmla (f:fmla 'a) = forall g1 g2. subgame g1 g2 /\ f g1 -> f g2
+
+  (* `P enforce Q` mean that from a state in P, we have a winning
+     strategy to reach a state in Q. *)
+
+  function enforce (p q:set 'a) : fmla 'a =
+    \g. have_uniform_winning_strat g p q
+
+  (* Higher-order lifting of enforce: \u. enforce (p u) (q u) *)
+  function u_enforce (p q:rel 'b 'a) : 'b -> fmla 'a =
+    \b. enforce (p b) (q b)
+
+  (* Intuitionistic arrow. *)
+  function arrow (f1 f2:fmla 'a) : fmla 'a =
+    \g. forall g2. subgame g g2 /\ game_wf g2 /\ f1 g2 -> f2 g2
+
+  (* Universal quantifiers (restricted and general) *)
+  function b_universal (s:'b -> bool) (p:'b -> fmla 'a) : fmla 'a =
+    \g. forall y. s y -> p y g
+  function universal (p:'b -> fmla 'a) : fmla 'a = b_universal all p
+
+  (* Conjonction. Could also be deduced from
+     `universal (\b. if b then p else q)` *)
+  function conj (p q:fmla 'a) : fmla 'a = inter p q
+
+  (* Express the game ordering. Note that one ordering formula
+     necessarily holds,
+     e.g trivially: |- exists ordering,
+     and (c |- ordering o) ==> (c |- [order o /\ chain_complete o]) *)
+  function ordering (o:'a -> 'a -> bool) : fmla 'a = \g. g.progress = o
+
+  (* Sequent. *)
+  predicate holds (c f:fmla 'a) = forall g. game_wf g /\ c g -> f g
+
+  (* Express that an invariant holds on later state. For transfinite
+     loop rule. *)
+  predicate later (o:erel 'b) (i:rel 'b 'a) (x:'b) (y:'a) =
+    exists x'. i x' y /\ o x x' /\ x' <> x
+
+  (* Variation of later for transfinite limit steps in transfinite loop rule. *)
+  predicate later_limit (o:erel 'b) (i:rel 'b 'a) (ch:set 'b) (y:'a) =
+    exists x. i x y /\ upper_bound o ch x
+
+  (* TODO: recreate values for transfinite call-stack rule,
+     commented for now. *)
+  (*  type v_data 'a 'b = {
+    (* Underlying game ordering. *)
+    v_go : 'a -> 'a -> bool;
+    (* Extra order for the stack. *)
+    v_so : 'b -> 'b -> bool;
+    (* Initial stack. *)
+    v_s0 : ('a,'b) -> bool;
+    (* Precondition for calling on a given stack.
+       The location is the stack supremum on first component. *)
+    v_pr : (('a,'b) -> bool) -> bool;
+    (* Postcondition: some element in the stack satisfy the postcondition
+       at the given point. *)
+    v_pst : 'a -> ('a,'b) -> bool;
+  }
+  function v_prod (vd:v_data 'a 'b) : ('a,'b) -> ('a,'b) -> bool =
+    \x y. oprod vd.v_go vd.v_so x y
+  predicate v_data_valid (vd:v_data 'a 'b) =
+    order vd.v_so /\
+    chain vd.v_prod vd.v_s0 /\
+    forall stack.
+      chain vd.v_prod stack /\
+      subchain vd.v_prod vd.v_s0 stack /\
+      (forall x. not maximum vd.v_prod stack x) /\
+      (forall rstack.
+        subchain vd.v_prod vd.v_s0 rstack /\ subchain vd.v_prod rstack stack /\
+        rstack <> stack -> vd.v_pr rstack) ->
+      vd.v_pr stack
+  predicate v_pre (vd:v_data 'a 'b) (stack:('a,'b) -> bool) (x:'a) =
+    vd.v_pr stack /\ chain vd.v_prod stack /\
+    supremum vd.v_go (proj1 stack) x
+  predicate v_post (vd:v_data 'a 'b) (stack:('a,'b) -> bool) (x:'a) =
+    exists y. stack y /\ vd.v_pst x y
+  function v_enf (vd:v_data 'a 'b) : (('a,'b) -> bool) -> fmla 'a =
+    u_enforce (v_pre vd) (v_post vd)
+  function v_hrec (vd:v_data 'a 'b) (s:('a,'b) -> bool) : fmla 'a =
+    universal (\s'. arrow (lift (subchain vd.v_prod s s' /\ s <> s'))
+                          (v_enf vd s'))
+  function v_hfix (vd:v_data 'a 'b) : fmla 'a =
+    universal (\s. arrow (conj (lift (subchain vd.v_prod vd.v_s0 s))
+                               (v_hrec vd s))
+                         (v_enf vd s))*)
+end
+
+module FmlaRules "W:non_conservative_extension:N" (* => FmlaRulesProof *)
+
+  use import ho_rel.Rel
+  use import ho_set.Set
+  use import fn.Fun
+  use import fn.Image
+  use import order.Chain
+  use import game.Game
+  use export Fmla
+
+  (* Formula builders indeed build formulas. *)
+  axiom enforce_fmla : forall p q:set 'a. is_fmla (enforce p q)
+  axiom arrow_fmla : forall f1 f2:fmla 'a. is_fmla (arrow f1 f2)
+  axiom b_universal_fmla : forall s:'b -> bool,f:'b -> fmla 'a.
+    (forall x. s x -> is_fmla (f x)) -> is_fmla (b_universal s f)
+  (*axiom universal_fmla : forall f:'b -> fmla 'a.
+    (forall x. is_fmla (f x)) -> is_fmla (universal f)
+  axiom existential_fmla : forall f:'b -> fmla 'a.
+    (forall x. is_fmla (f x)) -> is_fmla (existential f)*)
+  axiom conj_fmla : forall f1 f2:fmla 'a. is_fmla f1 /\ is_fmla f2 ->
+    is_fmla (conj f1 f2)
+
+  (* Weakening rule. *)
+  axiom enforce_monotonic : forall c,p1 p2 q1 q2:set 'a. is_fmla c ->
+    subset p2 p1 /\ holds c (enforce p1 q1) /\ subset q1 q2 ->
+    holds c (enforce p2 q2)
+
+  axiom enforce_does_progress : forall c o x,q:set 'a. is_fmla c ->
+    holds c (enforce ((=) x) q) /\ holds c (ordering o) ->
+    holds c (enforce ((=) x) (inter q (o x)))
+
+  axiom sequence : forall c,p q r:set 'a. is_fmla c ->
+    holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
+
+  (* Continuation rule: to prove that P enforce Q, we may take as
+     hypothesis that Q enforce False. *)
+  axiom kont_intro : forall c,p q:set 'a. is_fmla c ->
+    holds (conj c (enforce q none)) (enforce p q) -> holds c (enforce p q)
+
+  (* External precondition rule: to prove that P enforce Q,
+     it is enough to prove that forall x. (=) x enforce Q.
+     (the other way around is obvious by weakening) *)
+  axiom external_pre : forall c,p q:set 'a. is_fmla c ->
+    (forall y. p y -> holds c (enforce ((=) y) q)) -> holds c (enforce p q)
+
+  (* Transfinite loop rule:
+     If we can prove that an invariant Inv is preservable by non-trivial
+     steps according to a user-given ordering (<)
+     (e.g Inv enforce later < Inv), and any Inv-chain have an upper-bound
+     (which is the supremum for the in-game part), then we can
+     prove that Inv enforce False.
+     (we can derive rules with real postcondition from this one + Kont). *)
+  axiom trampoline : forall c go,i:rel 'b 'a,o:erel 'b.
+    is_fmla c ->
+    holds c (universal (u_enforce i (later o i))) /\
+    holds c (ordering go) /\ order o /\
+    (forall ch f inh y. chain o ch /\ supremum go (image f ch) y /\
+      monotone_on ch o f go /\ ch inh /\
+      (forall x. not maximum o ch x) /\ (forall x. ch x -> i x (f x)) ->
+      holds c (enforce ((=) y) (later_limit o i ch))) ->
+    holds c (universal (u_enforce i (const none)))
+
+  (* Standard abstraction rule of intuitionistic logic. *)
+  axiom abstraction : forall c f1 f2:fmla 'a.
+    is_fmla c /\ is_fmla f1 /\ is_fmla f2 ->
+    holds c (arrow f1 f2) <-> holds (conj c f1) f2
+
+  (* TODO: rewrite vertical fixpoint
+    (* Vertical fixpoint rule (or transfinite call-stack rule):
+     If, knowing that from any valid higher stack we can reach a point in
+     which the post is satisfied for some point of the stack,
+     then we can reach a point in which an element of the current stack
+     satisfy the post, plus some continuity condition on the precondition,
+     then we can have the same enforcement without the higher-stack
+     hypothesis (e.g a fixpoint) *)
+  axiom vertical_fix : forall c,vd:v_data 'a 'b.
+    is_fmla c ->
+    holds c (v_hfix vd) /\
+    holds c (ordering vd.v_go) /\
+    v_data_valid vd ->
+    holds c (v_enf vd vd.v_s0)*)
+
+end
+
+module FmlaRulesProof
+
+  use import option.Option
+  use import ho_set.Set
+  use import ho_rel.RelSet
+  use import ho_rel.Prod
+  use import fn.Fun
+  use import fn.Image
+  use import choice.Choice
+  use import order.LimUniq
+  use import order.Chain
+  use import order.ProductChain
+  use import int.Int
+  use import game.Game
+  use import game.StratProps
+  use import transfinite.Iterates
+  use import transfinite.ChainExtension
+  use import Subgame
+  use import Fmla
+
+  lemma rel_map_equal : forall s:set 'a.
+    related (=) s = s by sext (related (=) s) s
+
+  (* prepare for enforce_monotonic: postcondition side. *)
+  lemma pre_monotonic : forall g x,q1 q2:set 'a.
+    game_wf g -> have_winning_strat g x q1 /\ subset q1 q2 ->
+      have_winning_strat g x q2
+    by exists ang. winning_strat g x q1 ang
+    so winning_strat g x q2 ang
+    by forall dmn. win_against g x q2 ang dmn
+    by win_against g x q1 ang dmn
+    so exists ch. reach_ch g.progress (step g ang dmn) ((=) x) ch /\
+      win_at g q1 ang dmn ch
+    so win_at g q2 ang dmn ch
+
+  (* Prepare for enforce_does_progress. *)
+  lemma reach_above : forall g x,q:set 'a.
+    game_wf g -> have_winning_strat g x q ->
+      let o = g.progress in
+      have_winning_strat g x (inter q (o x))
+      by exists ang. winning_strat g x q ang
+      so winning_strat g x (inter q (o x)) ang
+      by forall dmn. win_against g x (inter q (o x)) ang dmn
+      by win_against g x q ang dmn
+      so exists ch. reach_ch g.progress (step g ang dmn) ((=) x) ch /\
+        win_at g q ang dmn ch
+      so (forall z. ch z -> o x z by subchain g.progress ((=) x) ch)
+      so win_at g (inter q (o x)) ang dmn ch
+
+  (* Monotonicity & progression through enforce. *)
+  lemma enforce_monotonic : forall c,p1 p2 q1 q2:set 'a.
+    subset p2 p1 /\ holds c (enforce p1 q1) /\ subset q1 q2 ->
+      holds c (enforce p2 q2)
+      by forall g. game_wf g /\ c g ->
+        have_uniform_winning_strat g p2 q2
+      by forall x. p2 x -> have_winning_strat g x q2
+
+  lemma enforce_does_progress : forall c o x,q:set 'a.
+    holds c (enforce ((=) x) q) /\ holds c (ordering o) ->
+      holds c (enforce ((=) x) (inter q (o x)))
+      by forall g. game_wf g /\ c g ->
+        have_uniform_winning_strat g ((=) x) (inter q (o x))
+      by have_winning_strat g x (inter q (o x))
+
+  (* Continuation introduction: The principle of the proof
+     is to use a game with extra empty transitions on q-states.
+     Then, this game satisfy Q enforce False. Then, it satisfy P enforce Q.
+     But any run of P enforce Q in this modified game
+     can be mapped as is to a P enforce Q run in the initial game,
+     so we're done. *)
+  lemma kont_intro : forall c,p q:'a -> bool. is_fmla c ->
+    holds (conj c (enforce q none)) (enforce p q) ->
+    holds c (enforce p q)
+    by forall g. game_wf g /\ c g ->
+      have_uniform_winning_strat g p q
+    by forall x. p x -> have_winning_strat g x q
+    by let tr = \x s. g.transition x s \/ (q x /\ s = none) in
+      let g2 = { progress = g.progress; transition = tr } in
+      game_wf g2
+    so trivial_subgame g g2
+    so (enforce q none g2
+      by forall x. q x -> have_winning_strat g2 x none by g2.transition x none)
+    so enforce p q g2
+    so have_winning_strat g2 x q
+    so exists ang. winning_strat g2 x q ang
+    so winning_strat g x q ang
+    by forall dmn. win_against g x q ang dmn
+    by win_against g2 x q ang dmn
+    so exists ch. reach_ch g.progress (step g2 ang dmn) ((=) x) ch /\
+      win_at g2 q ang dmn ch
+    so win_at g q ang dmn ch
+    so ext (step g2 ang dmn) (step g ang dmn)
+    by forall ch. let x = sup g.progress ch in
+      let a = ang x ch in
+      let d = dmn a in
+      g.transition x a /\ a d <-> g2.transition x a /\ a d
+
+  lemma external_pre : forall c,p q:set 'a.
+    (forall y. p y -> holds c (enforce ((=) y) q)) ->
+    holds c (enforce p q)
+    by forall g. game_wf g /\ c g -> have_uniform_winning_strat g p q
+    by forall y. p y -> have_winning_strat g y q
+    by enforce ((=) y) q g
+
+  use import game.DmnReach
+
+  (* Transfinite loop rule, version 1.
+     (it is weak in the sense that it imposes
+      few properties on the I-chain and requires a very strong property,
+      namely the supremum to satisfy the invariant)
+     Under the hood, the transfinite loop rule is an immediate application
+     of the simulation theorem based on fully demonic games.
+     Consider the fully demonic game of I-state with progression relation
+     being the product order. Then, we requires exactly the hypothesis
+     needed to have a simulation from this game to the current game. *)
+
+  lemma crude_trampoline : forall c go,i:rel 'b 'a,o:erel 'b.
+    holds c (universal (u_enforce i (later o i))) /\
+    holds c (ordering go) /\ order o /\ chain_complete o /\
+    chain_compatible o i go ->
+    holds c (universal (u_enforce i (const none)))
+    by forall g. game_wf g /\ c g -> forall x.
+      have_uniform_winning_strat g (i x) none
+    by forall y. i x y -> have_winning_strat g y none
+    by let op = rprod o go in
+      order op
+    so let nx = \x y. let (a,b) = x in let (c,d) = y in
+        go b d /\ a <> c /\ o a c /\ i c d in
+      let tr = \x. (=) (nx x) in
+      let g2 = { progress = op; transition = tr } in
+      let strt = (=) (x,y) in
+      game_wf g2
+      so (have_uniform_winning_strat g2 strt none
+        by have_winning_strat g2 (x,y) none
+        by let ang = \x _. nx x in
+          not (not winning_strat g2 (x,y) none ang
+               so exists ch. lose_at g2 ang none ch))
+      so let r = \x y. let (a,b) = x in b = y /\ i a b in
+        (simulate g2 r g
+        by step_simulate g2 r g
+        by (forall x s y. tr x s /\ r x y ->
+          have_winning_strat g y (related r s)
+          by let (xx,_) = x in
+          (have_winning_strat g y (inter (later o i xx) (go y))
+            by have_winning_strat g y (later o i xx)
+            by have_uniform_winning_strat g (i xx) (later o i xx))
+          so subset (inter (later o i xx) (go y)) (related r s)
+          by forall z. later o i xx z /\ go y z ->
+            related r s z by exists xz. i xz z /\ o xx xz /\ xx <> xz
+            so s (xz,z) /\ r (xz,z) z)
+        /\ (chain_compatible op r go
+          by forall chp inhp xp yp. chain (rprod op go) chp /\ chp inhp /\
+            (forall x y. chp (x,y) -> r x y) /\
+            supremum (rprod op go) chp (xp,yp) ->
+            let ch = image fst chp in
+            supremum op ch xp
+            so (forall x y. ch (x,y) -> i x y
+              by exists z. chp z /\ fst z = (x,y))
+            so let (a,b) = xp in let (u,_) = inhp in ch u so i a b
+            so b = yp
+              by let ch1 = image snd ch in let ch2 = image snd chp in
+                supremum go ch1 b /\ supremum go (image snd chp) yp
+              so sext ch1 ch2
+              by (forall x. ch1 x -> ch2 x by exists y. ch y /\ snd y = x
+                so exists z. chp z /\ fst z = y so
+                let ((_,b),_) = z in ch2 (snd z) so snd z = b)
+              /\ (forall x. ch2 x -> ch1 x by exists y. chp y /\ snd y = x
+                so ch (fst y) so ch1 (snd (fst y)) so
+                let ((_,_),c) = y in snd (fst y) = c)
+        ))
+      so (related r strt y)
+      so (sext (related r none) none)
+      so have_uniform_winning_strat g (related r strt) none
+
+  (* Variation of the order product (injective product)
+     Enforce that the second element
+     occurs only once per first element in pair chains.
+     Will be used to discard the possibility that the extra
+     state does not grow between iterations.  *)
+  predicate iprod (o1:erel 'a) (o2:erel 'b) (x y:('a,'b)) =
+    let (a,b) = x in let (c,d) = y in
+    o1 a c /\ o2 b d /\ (a = c -> b = d)
+
+  lemma iprod_order : forall o1:erel 'a,o2:erel 'b.
+    order o1 /\ preorder o2 -> order (iprod o1 o2)
+    by let ip = iprod o1 o2 in
+      reflexive ip
+    /\ (transitive ip by forall x y z. ip x y /\ ip y z -> ip x z
+      by let (a,_) = x in let (_,_) = y in let (b,_) = z in o1 a b)
+    /\ (antisymetric ip by forall x y. ip x y /\ ip y x -> x = y
+      by let (a,_) = x in let (b,_) = y in a = b)
+
+  (* Transfinite loop, second version.
+     This version relax a lot the limit requirements by using
+     version 1 with specific invariants and ordering
+     (subchain ordering with injective product) *)
+  lemma better_trampoline : forall c go o,i:rel 'b 'a. is_fmla c ->
+    holds c (universal (u_enforce i (later o i))) /\
+    holds c (ordering go) /\ order o /\
+    (forall ch inh y. chain (iprod o go) ch /\ supremum go (image snd ch) y /\
+      (forall x. not maximum o (image fst ch) x) /\ ch inh /\
+      (forall x y. ch (x,y) -> i x y) ->
+      holds c (enforce ((=) y) (later_limit o i (image fst ch)))) ->
+    holds c (universal (u_enforce i (const none)))
+    by let ip = iprod o go in
+      (* Order: subchain order, hence trivially chain-complete. *)
+      let o_ch = subchain ip in
+      (* invariant: the ghost state is a non-empty ip-chain
+         satisfying i globally and whose state supremum is
+         the physical state. *)
+      let i_ch = \ch x.
+        chain ip ch /\
+        supremum go (image snd ch) x /\
+        (exists u. ch u) /\
+        (forall y z. ch (y,z) -> i y z)
+      in
+      let op = rprod o_ch go in
+      forall g. game_wf g /\ c g -> forall x. enforce (i x) none g
+      by order ip
+      so order o_ch /\ chain_complete o_ch
+      (* Can carry out steps for i_ch.
+         Case disjunction between regular and limit steps. *)
+      so (holds c (universal (u_enforce i_ch (later o_ch i_ch)))
+        by forall ch. holds c (enforce (i_ch ch) (later o_ch i_ch ch))
+        by (exists ys. i_ch ch ys
+          so let ch1 = image fst ch in let ch2 = image snd ch in
+            (forall xn yn.
+              upper_bound go ch2 yn /\ upper_bound o ch1 xn /\
+              i xn yn /\ not ch1 xn ->
+              later o_ch i_ch ch yn
+              by let ch' = add ch (xn,yn) in
+                ch' (xn,yn)
+              so (upper_bound ip ch (xn,yn) by forall u. ch u -> ip u (xn,yn)
+                by let (xu,yu) = u in ch2 yu so go yu ys so go yu yn
+                  so ch1 xu so o xu xn so xu <> xn)
+              so o_ch ch ch' /\ (ch' <> ch by not ch (xn,yn))
+              so i_ch ch' yn
+              by (exists u. ch' u by ch u)
+              so let ch'2 = image snd ch' in
+                maximum go ch'2 yn
+                by ch'2 yn /\ forall u. ch'2 u -> go u yn by u = yn \/ ch2 u)
+          so (exists xs. maximum o ch1 xs
+            so (maximum ip ch (xs,ys)
+              by exists p. ch p /\ fst p = xs
+              so let (xs,yp) = p in
+                (maximum ip ch p
+                by forall u. ch u -> let (xu,yu) = u in
+                if ip u p then true else ip p u so ch1 xu so xu = xs so yu = yp)
+              so (go yp ys by ch2 yp)
+              so go ys yp by upper_bound go ch2 yp
+              by forall u. ch2 u -> go u yp
+              by exists v. ch v /\ snd v = u so ip v p)
+            so (holds c (enforce ((=) ys) (inter (later o i xs) (go ys)))
+              by holds c (enforce (i xs) (later o i xs))
+              /\ subset ((=) ys) (i xs))
+            so subset (i_ch ch) ((=) ys)
+            so subset (inter (later o i xs) (go ys)) (later o_ch i_ch ch)
+              by forall yn. later o i xs yn /\ go ys yn ->
+                later o_ch i_ch ch yn
+              by exists xn. i xn yn /\ o xs xn /\ xs <> xn
+              so upper_bound go ch2 yn
+              so not (ch1 xn)
+              so upper_bound o ch1 xn)
+          || (holds c (enforce ((=) ys) (inter (later_limit o i ch1) (go ys)))
+            so subset (i_ch ch) ((=) ys)
+            so subset (inter (later_limit o i ch1) (go ys))
+                      (later o_ch i_ch ch)
+              by forall yn. later_limit o i ch1 yn /\ go ys yn ->
+                later o_ch i_ch ch yn
+                by exists xn. i xn yn /\ upper_bound o ch1 xn
+                so not (ch1 xn so maximum o ch1 xn))
+        ) || sext (i_ch ch) none)
+      (* Chain compatibility. *)
+      so (forall chh inhh chs y. chain op chh /\ supremum op chh (chs,y)
+        /\ chh inhh /\ (forall x y. chh (x,y) -> i_ch x y) ->
+        i_ch chs y
+        by let ch1 = image fst chh in let ch2 = image snd chh in
+          supremum o_ch ch1 chs /\ chain o_ch ch1 /\
+          supremum go ch2 y /\ chain go ch2
+        so chs = subchain_completion ch1
+        so (chain ip chs by forall x. ch1 x -> chain ip x)
+        so let (ch0,_) = inhh in
+          (exists u. chs u by exists v. ch0 v /\ u = v so ch1 ch0)
+        so (let ch3 = image snd chs in
+          supremum go ch3 y
+          by (forall u. ch3 u -> go u y
+            by exists v. chs v /\ snd v = u
+            so exists s0. ch1 s0 /\ s0 v
+            so exists w. chh w /\ fst w = s0
+            so let (_,a) = w in (go a y by op w (chs,y))
+            so supremum go (image snd s0) a /\ image snd s0 u)
+          /\ forall u. upper_bound go ch3 u -> go y u
+            by forall a. ch2 a -> go a u
+            by exists b. chh b /\ snd b = a
+            so let (b,_) = b in
+              supremum go (image snd b) a
+            so upper_bound go (image snd b) u
+            by forall u0. image snd b u0 -> go u0 u
+            by exists v0. b v0 /\ snd v0 = u0
+            so ch3 u0 by ch1 b)
+        so (forall y z. chs (y,z) -> i y z
+          by exists ch. ch1 ch /\ ch (y,z) so exists a. chh a /\ fst a = ch)
+      )
+      so holds c (universal (u_enforce i_ch (const none)))
+      so forall y. i x y -> have_winning_strat g y none
+      by let ch = ((=) (x,y)) in
+        (have_uniform_winning_strat g (i_ch ch) none
+         by u_enforce i_ch (const none) ch g)
+      /\ (i_ch ch y
+        by chain ip ch
+        /\ (let ch2 = image snd ch in
+          supremum go ch2 y by sext ch2 ((=) y) by ch2 y)
+        /\ (ch (x,y)))
+
+  (* Transfinite loop rule, exported version. Simply show that the
+     monotone-function-based criterion imply the one based on
+     injective product. *)
+  lemma trampoline : forall c go,i:rel 'b 'a,o.
+    is_fmla c ->
+    holds c (universal (u_enforce i (later o i))) /\
+    holds c (ordering go) /\ order o /\
+    (forall ch f inh y. chain o ch /\ supremum go (image f ch) y /\
+      monotone_on ch o f go /\ ch inh /\
+      (forall x. not maximum o ch x) /\ (forall x. ch x -> i x (f x)) ->
+      holds c (enforce ((=) y) (later_limit o i ch))) ->
+    holds c (universal (u_enforce i (const none)))
+    by forall ch inh y. chain (iprod o go) ch /\
+      supremum go (image snd ch) y /\
+      (forall x. not maximum o (image fst ch) x) /\ ch inh /\
+      (forall x y. ch (x,y) -> i x y) ->
+      holds c (enforce ((=) y) (later_limit o i (image fst ch)))
+      by let ch2 = image fst ch in
+        let wit = \x z. ch (x,z) in
+        let f = \x. choice (wit x) in
+        (chain o ch2 by forall x y. ch2 x /\ ch2 y -> o x y \/ o y x
+          by exists a. ch a /\ fst a = x so exists b. ch b /\ fst b = y
+          so let ((_,_),(_,_)) = (a,b) in iprod o go a b \/ iprod o go b a)
+        /\ (monotone_on ch2 o f go
+          by forall x y. ch2 x /\ ch2 y /\ o x y ->
+            let a = (x,f x) in let b = (y,f y) in
+            ch a /\ ch b so iprod o go a b \/ (x = y by iprod o go b a))
+        /\ (forall x. ch2 x -> i x (f x))
+        /\ (sext (image f ch2) (image snd ch)
+          by (forall y. image f ch2 y -> image snd ch y
+            by exists z. ch2 z /\ y = f z so ch (z,y))
+          /\ (forall y. image snd ch y -> image f ch2 y
+            by exists z. ch z /\ snd z = y
+            so let (x,_) = z in ch2 x))
+        /\ ch2 (fst inh)
+        by forall x y. let a = (x,y) in ch a -> y = f x
+          by let b = (x,f x) in iprod o go a b \/ iprod o go b a by ch b
+
+  (* Sequence via transfinite loop rule with only 3 steps+kont intro.
+     Needs a few properties of fmla builders to be checked first. *)
+  lemma enforce_fmla : forall p q:set 'a. is_fmla (enforce p q)
+  lemma conj_fmla : forall f1 f2:fmla 'a. is_fmla f1 /\ is_fmla f2 ->
+    is_fmla (conj f1 f2)
+
+  lemma sequence : forall c,p q r:set 'a. is_fmla c ->
+    holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
+    by forall g. game_wf g /\ c g -> enforce p r g
+    by let go = g.progress in
+      let c' = conj c (ordering go) in
+      holds c' (enforce p r)
+    by let c'' = conj c' (enforce r none) in
+      (holds c'' (enforce p r) by subset none r)
+    by holds c'' (enforce p none)
+    by let i = \n.
+      if n = 0 then p else if n = 1 then q else if n = 2 then r else none in
+    (holds c'' (universal (u_enforce i (const none)))
+     so holds c'' (u_enforce i (const none) 0))
+    by (holds c'' (universal (u_enforce i (later (<=) i)))
+      by forall n. holds c'' (enforce (i n) (later (<=) i n))
+      by "case_split" (n < 0 || n >= 2 ||
+        (holds c'' (enforce (i n) (i (n+1))) /\
+         subset (i (n+1)) (later (<=) i n)))
+    )
+    /\ holds c'' (ordering go)
+    /\ is_fmla c''
+    /\ (forall ch f inh. chain (<=) ch /\ ch inh /\
+      monotone_on ch (<=) f go /\
+      (forall x. ch x -> i x (f x)) -> (exists x. maximum (<=) ch x)
+      by (forall x. ch x -> 0 <= x <= 2)
+      so (ch 2 so maximum (<=) ch 2)
+      || (ch 1 so maximum (<=) ch 1)
+      || (ch 0 so maximum (<=) ch 0))
+
+  (* Abstraction rule (basically come from subgame being a preorder) *)
+  lemma open_abstraction : forall c f1 f2:fmla 'a.
+    holds c (arrow f1 f2) -> holds (conj c f1) f2
+
+  lemma close_abstraction : forall c f1 f2:fmla 'a. is_fmla c ->
+    holds (conj c f1) f2 -> holds c (arrow f1 f2)
+
+  (* TODO: recursion theorem. *)
+
+  (* Re-thinking recursion theorem: the context dependency completely
+     kills the stack-of-strategy proof. However, it also opens
+     a vast spectrum of usages for this combinator, notably cps.
+     And actually, cps seems to be the right way to carry out the proof.
+     Indeed, since we carry a dependent context, we can in particular
+     fit a continuation inside.
+     In that setup (and simplifying out the extra state for readability),
+     the theorem rewrite as:
+     If:
+     C |- forall x. (forall y > x. phi y => ((=) y) enforce False) =>
+       phi x => ((=) x) enforce False
+     Forall X non-empty chain, C |- (forall y in X. phi y) -> phi (sup X)
+     C |- phi x_0
+     Then:
+     C |- ((=) x_0) enforce False
+     The proof of this theorem is rather special.
+     First, we reduce to C being cone(G) for some G such that C(G).
+     Then, we use the transfinite loop rule with the extra state
+     being... a stack of game (really !)
+     At the bottom of the stack sits G.
+     But G does not allows ((=) x0) enforce False directly.
+     The only way to do that is to use the recursion hypothesis,
+     but for this we need (forall y > x. phi y -> ((=) y) enforce False).
+     Then, we could add to G extra to-empty transitions for y such that
+     phi holds in G... but that a priori does NOT yield a game where
+     (forall y > x. phi y -> ((=) y) enforce False) holds, because there
+     could be MORE values for which phi holds now (thankfully, there
+     cannot be less because phi is subgame-monotonic)
+     ===> We can define a transfinite process of saturation that
+     add to-empty transitions as needed, and eventually reach a fixpoint
+     G_{fix}. For this  game, we know that ((=) x_0) enforce False
+     holds. However,
+     it might be that the last transition we takes (for exiting) does not
+     exists in G ! Then, there exists G_{\alpha} in the saturation process
+     that was responsible for the introduction of that y->False transition
+     (not present in G_{\alpha} but is in G_{\alpha^+}). For this
+     game, we need to prove y->False. But we can achieve this by using
+     the fixpoint hypothesis for that y. Then we saturate again, adding
+     a layer to the stack (which is now {<x_0|G>,<y|G_{\alpha}>}).
+     However, there are now two kinds of transition in G_{\alpha} that are
+     wrong... in fact that's not a problem as we can just cut out to
+     the right layer.
+     So let's sum up:
+     - State is a well-founded injective chain of pairs <state|game>,
+       with <x_0|G> being the bottom of the chain,
+       and where each successor pair (<x|G_x>,<y|G_y>) verify
+       that G_y is obtained by x-saturation of G_x
+     - Each pair <x|G> in the stack has G |- phi(x)
+     - Each limit pair (limit if forall x < l. exists z: x < z < l,
+       e.g not successor) is the supremum of its lower pairs.
+     Which gives the state invariants. Now, we also need to define
+     an ordering between such stacks:
+     S_0 <= S_1 if, with P being the largest common prefix of (S_0,S_1)
+     (S_0 = P ++ X, S_1 = P ++ Y, X and Y differ from the bottom.
+      P exists since S_0/S_1 are well-founded),
+      we have that:
+      - Y is empty => X is empty as well
+      - Forall <y|_> in Y, y is above any element of X
+      - If Y and X have minimum elements <y|G_y> and <x|G_x> with x = y,
+        and P have maximum element <z|G_z>, then G_y is strictly lower than
+        G_x in the z-saturation of G_z. Note that by the above definition,
+        if P <> S_0, then P necessarily have a maximum.
+        (this implies P <> S_1 as well. If P had no maximum,
+        then the limit would be the minimum of S_0 and S_1, and P would
+        not be the lcp) *)
+
+  (* Some definitions/simple lemmas to prove the cps recursion theorem.
+     The cps recursion theorem is (with simplified extra state):
+     If
+     C is cone(G) for a given game
+     C |- forall x. (forall y > x. ctx y => (=) y enforce False) =>
+                    phi x => (=) x enforce False)
+     (forall X non-empty chain, C |- (forall x in X. phi x) => phi (sup x))
+     C |- phi x_0
+     Then
+     C |- (=) x_0 enforce False *)
+
+  (* There is a (trivial) formula corresponding to the cone
+     generated by a game (more importantly, this is indeed a formula. *)
+  lemma cone_fmla : forall g:game 'a. is_fmla (subgame g)
+
+  (* Regroup parameters. *)
+  type section 'a 'b = {
+    (* Base game *)
+    gm : game 'a;
+     (* Progression order *)
+    bo : erel 'b;
+    (* Dependent context for ((=) x) enforce False *)
+    ctx : 'b -> 'a -> fmla 'a;
+    (* Base points. *)
+    bs_a : 'a;
+    bs_b : 'b;
+  }
+
+  (* The basic arrow we intend to prove by recursion. *)
+  function rcps_impl (sc:section 'a 'b) (x:'b) (y:'a) : fmla 'a =
+    arrow (sc.ctx x y) (enforce ((=) y) none)
+
+  (* Recursive hypothesis. *)
+  function rcps_hyp (sc:section 'a 'b) (x:'b) : fmla 'a =
+    b_universal (lower sc.bo x) (\x. universal (rcps_impl sc x))
+
+  (* chain-complete ordering on game transitions. *)
+  type trans 'a = 'a -> set (set 'a)
+  predicate tro (t1 t2:trans 'a) = forall x. subset (t1 x) (t2 x)
+
+  function tro_complete (s:set (trans 'a)) : trans 'a =
+    \x z. exists u. s u /\ u x z
+  lemma tro_fully_complete :
+    let o = (tro:erel (trans 'a)) in
+    (order o by antisymetric o by forall x y. o x y /\ o y x ->
+      ext x y by (forall u. sext (x u) (y u)))
+    && (forall s. let cpl = tro_complete s in
+      supremum o s cpl
+      by upper_bound o s cpl
+      /\ forall u. upper_bound o s u -> o cpl u
+      by forall x y. cpl x y -> u x y
+      by exists v. s v /\ v x y so o v u)
+    && chain_complete o
+    && (forall s x. supremum o s x -> x = tro_complete s)
+
+  (* Saturation process: If we have a game that satisfy
+     [ctx x] for a recursive layer x, we need to be able to
+     create a game that satisfy the recursive hypothesis
+     [forall y > x. (ctx y) => (from y) enforce False]
+     We do so by adding necessary transitions step-by-step,
+     e.g taking all y > x such that [ctx y] holds in the game and
+     additing respective y -> {} transitions.
+     After a step, the modified game might not satisfy
+     forall y > x. (phi y => (=) y enforce False) because there might
+     be extra points for which phi y holds. However, the fixpoint
+     obtained by iterating this process will. *)
+
+  (* State for cps recursion theorem. *)
+  type state 'a 'b = {
+    stack : set 'b; (* Stack of 'recursive calls' *)
+    state : 'b -> 'a; (* State associated to each recursive layer. *)
+    trans : 'b -> trans 'a;
+      (* Transitions of the game associated to each recursive layer. *)
+  }
+
+  predicate extends (sc:section 'a 'b) (x0:'b)
+                    (tr:trans 'a) (y:'a) (s:set 'a) =
+    tr y s \/
+    let go = sc.gm.progress in
+    let g = { progress = go; transition = tr } in
+    exists x. sc.ctx x y g /\ lower sc.bo x0 x /\ s = none
+
+  lemma extends_infl : forall sc:section 'a 'b,y0.
+    inflationary tro (extends sc y0)
+
+  predicate reach (sc:section 'a 'b) (x0:'b) (tr1 tr2:trans 'a) =
+    tr_reach tro (extends sc x0) tr1 tr2
+
+  function saturate (sc:section 'a 'b) (x0:'b) (tr:trans 'a) : trans 'a =
+    fixpoint_above tro (extends sc x0) tr
+
+  (* Note that in particular,
+     the generated games inherit well-formedness. *)
+  lemma reach_add_only_nones : forall sc:section 'a 'b,x0 tr1 tr2 x s.
+    reach sc x0 tr1 tr2 /\ tr2 x s /\ not tr1 x s -> s = none
+    by (forall o1 f1 b1 tr. o1 = tro /\ f1 = extends sc x0 /\ b1 = tr1 ->
+      ("induction" tr_reach o1 f1 b1 tr) -> tr x s -> s = none)
+
+  (* Fully saturated game satisfy the recursive hypothesis.... OR NOT ?
+     Ouch. We get a slight problem here: there are no reason that
+     supergames satisfying phi will also satisfy the given enforcements.
+     FIXME: ENORMOUS PROBLEM. Indeed, the complete saturation
+     has NO reason to satisfy the recursive hypothesis, and that's
+     beause the recursive hypothesis is an intuitionistic arrow, e.g
+     forall y > x. forall g2 >= g. ctx y g2 -> kont ((=) y) g2
+     However, the saturated game satisfy the CLASSICAL arrow, as in
+     forall y > x. ctx y g -> kont ((=) y) g2
+     Hence a natural question: is it a problem to use a classical
+     arrow in the recursive hypothesis ? Is it a real requirement
+     (e.g because there would be counter-example otherwise) ?
+     Let's try to see what the classical arrow prevent us to do.
+     - It does not prevent us from doing any kind of classical reasoning
+     - It does not prevent us from applying the derivation rules,
+       as they can be packed up as theorems of the empty context, and
+       the intuitionistic arrows implies the classical ones
+     - It DOES prevents us from proving intuitionistic arrows,
+       as hypothesis cannot be introduced anymore.
+       Hence in particular it prevents us from
+       introducing extra continuations/fixpoint hypothesis.
+       Of course, here we do not have any need for
+       introducing continuations as the only continuation we would
+       introduce would have precondition False anyway, and we
+       can transform out the regular enforcements into continuations
+       transformers beforehand....
+       However, something we seems to be really unable to do is...
+       nothing ? wait, there's a real problem there...
+       OR MAYBE THE PROBLEM IS WITH THE DEFINITION OF HOLDS ?
+       Indeed, if we define holds c f to mean:
+       forall g wf s.t c g, forall g2 above g, f g2
+       then we can again introduce ? nope.
+       However, maybe we could have a layered definition of what holds
+       mean... argh.
+       Mainly, the problem is that the fixpoint introduction build
+       up a frontier at the recursive proof point.
+       *)
+
+  (*lemma saturated : forall sc:section 'a 'b,x0 tr.
+    let go = sc.gm.progress in
+    let g = { progress = go; transition = saturate sc x0 tr } in
+    rcps_hyp sc x0 g
+    by forall y. lower sc.bo x0 y -> universal (rcps_impl sc y) g
+    by forall z. rcps_impl sc y z g
+    by arrow (sc.ctx y z) (enforce ((=) z) none) g
+    by forall g2. subgame g g2 /\ sc.ctx y z g2 -> enforce ((=) z) none g2*)
+
+  predicate rcps_inv (sc:section 'a 'b) (st:state 'a 'b) (x:'a) =
+    let go = sc.gm.progress in
+    wf_chain sc.bo st.stack /\
+    monotone_on st.stack sc.bo st.state go /\
+    monotone_on st.stack sc.bo st.trans tro /\
+    supremum go (image st.state st.stack) x
+
+(*  (* Some definitions/simple lemmas to prove recursion theorem. *)
+
+  (* Postcondition for crude recursion theorem:
+     for a given chain, the postcondition is given by reaching some q
+     inside the chain itself (e.g closing any level below) *)
+  predicate crec_post (sc:section 'a 'b) (ch:set ('b,'a)) (r:'a) =
+    exists y z. sc.ps y r /\ ch (y,z)
+
+  (* Enforcement associated to crude recursion theorem:
+     starting from chain supremum, we enforce the postcondition at
+     some layer *)
+  function crec_enf (sc:section 'a 'b) (ch:set ('b,'a)) : fmla 'a =
+    enforce (supremum sc.go (image snd ch)) (crec_post sc ch)
+
+  (* Implication taking into account the recursion dependent context *)
+  function crec_impl (sc:section 'a 'b) (ch:set ('b,'a)) : fmla 'a =
+    arrow (sc.ctx ch) (crec_enf sc ch)
+
+  (* hypothesis for 'recursive calls'. *)
+  predicate higher (o:erel 'c) (ch:set 'c) (ch':set 'c) =
+    exists y. ch' = add ch y /\ not ch y /\ upper_bound o ch y
+
+  function crec_hyp (sc:section 'a 'b) (ch:set ('b,'a)) : fmla 'a =
+    b_universal (higher (iprod sc.bo sc.go) ch) (crec_impl sc)
+
+  function crec_fmla (sc:section 'a 'b) (ch:set ('b,'a)) : fmla 'a =
+    arrow (crec_hyp sc ch) (crec_impl sc ch)
+
+  predicate non_empty (s:set 'c) = exists x. s x
+
+  (* Internal tool for recursion theorem proof: extension of the
+     cone base to a game with transitions corresponding to higher recursive
+     calls.
+     FIXME: enormous problem here ! Indeed, the game build that way
+     has no reason to satisfy forall higher Y,
+     phi Y => (recursive enforcement), and this for one evident reason:
+     there may be MORE Y that satisfy phi in this new game !
+     Actually, there is one way to save the day:
+     To prove (very, very far from evident. It amounts to repeat
+     the underneath construction a transfinite number of times...
+     which (ironically) mean we will certainly prove it using the
+     transfinite loop combinator above on the 'game of games'...)
+     that there exists a minimum game above g that satisfy phi0 => rec_enf,
+     and all its extra transition have the shape rec_enf for some rec_enf.
+     If we can achieve that, then we can take that game as 'recursive game'.
+     However, this mean we will not only take a stack of strategies,
+     but also a STACK OF GAMES ! *)
+  predicate rec_tr (sc:section 'a 'b) (g:game 'a) (ch:set ('b,'a))
+                   (x:'a) (s:set 'a) =
+    g.transition x s \/ (exists y.
+      upper_bound (iprod sc.bo sc.go) ch (y,x) /\ not ch (y,x) /\
+      sc.ctx (add ch (y,x)) g /\
+      s = inter (sc.ps y) (sc.go x))
+
+  function rec_game (sc:section 'a 'b) (g:game 'a) (ch:set ('b,'a)) : game 'a =
+    { transition = rec_tr sc g ch;
+      progress = sc.go }
+
+  lemma rec_game_wf : forall sc:section 'a 'b,g:game 'a,ch.
+    g.progress = sc.go /\ game_wf g -> let rg = rec_game sc g ch in
+      game_wf rg
+
+  (* Internal state to prove recursion theorem from the transfinite loop
+     rule. *)
+  type state 'a 'b = {
+    (* Stack of nested 'calls' *)
+    stack : set 'b;
+    (* starting point for given level. *)
+    start : 'b -> 'a;
+    (* History of given level. *)
+    history : 'b -> set 'a;
+  }
+
+  (* Invariant on state to prove recursion theorem from transfinite
+     loop rule. *)
+  predicate rec_inv (sc:section 'a 'b) (g:game 'a) (s:state 'a 'b) (x:'a) =
+    s.stack sc.bs_b /\
+    start sc.bs_b = sc.bs_a /\
+    (forall x. s.stack x -> dmn_reach
+
+  (* Crude recursion theorem:
+     The 'fixpoint properties' considered have the shape:
+       phi s => (\r. sup-of-chain s r) enforce (\r. exists x in s. q r x)
+     This allows to handle quasi uniformly regular and limit layers
+     (thus simplifying the proof),
+     but is rather hard to use in practice as the recursive hypothesis may
+     close any level below. Moreover, for technical reason
+     the context is required to be a cone, which may feel
+     rather restrictive.
+     The proof use the transfinite loop rule with a rather convoluted state:
+     a stack of nested historics played in extension of the base game
+     by the transition implied by the recursive hypothesis. *)
+  lemma crude_recursion_theorem :
+    forall g:game 'a,sc:section 'a 'b.
+    let c = subgame g in
+    let base = (=) (sc.bs_a,sc.bs_b) in
+    let ip = iprod sc.bo sc.go in
+    let sip = subchain ip in
+    game_wf g /\ g.progress = sc.go ->
+    (* Fixpoint hypothesis (relatively natural for recursive calls) *)
+    (forall s. non_empty s -> holds c (crec_fmla sc s))
+    (* Limit condition: ctx stable by subchain completion. *)
+    /\ (forall chh inh sp. chain sip chh /\ chh inh /\ supremum sip chh sp /\
+      (forall ch. chh ch -> holds c (sc.ctx ch)) -> holds c (sc.ctx sp))
+    (* Initial conditions *)
+    /\ holds c (sc.ctx base) none
+    /\ holds c (enforce (c_rec_post base)
+    -> holds c (crec_enf sc base)*)
+
+  (* TODO: Less crude recursion theorem: drop the hypothesis that
+     the context is a cone. Note that unlike above,
+     the limit condition must be strengthened as an intuitionistic
+     implication. *)
+
+  (* TODO: Better recursion theorem: drop chains completely from the fixpoint
+     properties, giving much more natural properties looking like:
+     phi x => (=) x enforce (Q x)
+     Internally, use the crude recursion theorem instantiated with
+     a continuation stack. *)
+
+  (* TODO: Exported recursion theorem. As for the trampoline rule,
+     drop the injective product from the theorem statement. *)
+
+  (* Scheming vertical fixpoint theorem.
+   * The theorem we would like has the shape:
+   * (above `P enforce Q` => P enforce Q) + (limit condition)
+   * => (P enforce Q),
+   * with the limit condition being: we can enforce any of the postcondition
+   * in the chain (again supposing the above hypothesis)
+   * But that's not strong enough !
+   * Hence we would rather need:
+   * (above (phi0 => `P enforce Q`) => (phi0 => `P enforce Q`)
+     + (limit condition) => phi0 => `P enforce Q` (!!!)
+   * Which is quite CRAZY...
+   * Q°: how to derive this from the transfinite loop rule ?
+   * One things that can be done is reducing to a somewhat simpler
+   * rule, by uniformizing the conditions.
+   * This gives something like:
+     H1: Forall non-empty chain. above chain (chain'. phi0 chain' /\ P chain' =>
+         {is-sup-of-chain'|Q'}) => phi0 chain /\ P chain => {is-sup-of-chain|Q'})
+     H2: P and phi0 are closed by non-empty subchain limits.
+     Conclusion: Forall non-empty chain. {is-sup-of-chain|Q'}
+     With Q' being: exists x in initial chain. Q x current-location
+   * Then, we can instantiate this lemma by:
+     - (P-chain): forall element in the chain, P element
+     - Q-chain: bottom
+     - (phi0-chain): phi0 + forall element in the chain,
+       there is a Q-continuation for that element.
+       The propagation property holds by:
+       - In the limit case, by using the limit enforcement+the corresponding
+         continuation
+       - In the regular case, idem.
+       However, there is a problematic thing in both cases: we need
+       to show that the ABOVE hypothesis holds in this context.
+       (e.g above (phi0 => `P enforce Q`)).
+       But in fact, that's rather easy: If under larger phi0-chain,
+       we can enforce {is-sup-chain|False},
+       then we can take the particular chain that has one more element than
+       the current one. phi0 will hold immediately because we already
+       have phi0-chain for the current one, and phi0 for the extra element
+       is precisely the new hypothesis. Also, we will have nearly all necessary
+       continuation.... excepted the one for the new element.
+       But to get it, we can use weakening+kont-intro to push the continuation
+       pre as the is-sup-chain post, getting exactly the desired triplet !
+    Finally, we get the desired `phi0 => P enforce Q`
+       by instiantating the theorem after a kont_intro phasis. *)
+
+  clone FmlaRules with goal enforce_fmla,
+    goal arrow_fmla,
+    goal b_universal_fmla,
+    goal conj_fmla,
+    goal enforce_monotonic,
+    goal enforce_does_progress,
+    goal sequence,
+    goal external_pre,
+    goal kont_intro,
+    goal trampoline,
+    goal abstraction
+    (* TODO: goal vertical_fix *)
+
+end
+

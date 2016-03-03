@@ -1,0 +1,11 @@
+module M
+
+  type t = { ghost a : bool; b : int; c : int }
+
+  let bad (z : t) : int
+    ensures { result = if z.a then z.b else z.c }
+  = match z with
+    | { a = True; b = x } | { a = False; c = x } -> x
+    end
+
+end

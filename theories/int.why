@@ -380,6 +380,11 @@ theory Sum
     forall f: int -> int, a b c: int. a <= b <= c ->
     sum a c f = sum a b f + sum b c f
 
+  lemma sum_zero:
+    forall f: int -> int, a b: int.
+    (forall i. a <= i < b -> f i = 0) ->
+    sum a b f = 0
+
 end
 
 (** {2 Factorial function} *)

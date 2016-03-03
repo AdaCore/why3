@@ -445,7 +445,11 @@ let warn_dubious_axiom uc k _ syms =
 *)
     with Exit -> ()
 
-let lab_w_non_conservative_extension_no = Ident.create_label "W:non_conservative_extension:N"
+let lab_w_non_conservative_extension_no =
+  Ident.create_label "W:non_conservative_extension:N"
+
+let should_be_conservative id =
+  not (Slab.mem lab_w_non_conservative_extension_no id.id_label)
 
 let add_decl ?(warn=true) uc d =
   check_decl_opacity d; (* we don't care about tasks *)
@@ -457,8 +461,8 @@ let add_decl ?(warn=true) uc d =
     | Dlogic dl -> List.fold_left add_logic uc dl
     | Dind (_, dl) -> List.fold_left add_ind uc dl
     | Dprop ((k,pr,_) as p) ->
-      if warn &&
-        not (Slab.mem lab_w_non_conservative_extension_no pr.pr_name.id_label)
+      if warn && should_be_conservative uc.uc_name &&
+           should_be_conservative pr.pr_name
       then warn_dubious_axiom uc k pr.pr_name d.d_syms;
       add_prop uc p
 
@@ -715,6 +719,7 @@ let warn_clone_not_abstract loc th =
         begin match d.d_node with
         | Dtype { ts_def = None }
         | Dparam _ -> raise Exit
+        | Dprop(Paxiom, _,_) -> raise Exit
         | _ -> ()
         end
       | _ -> ()

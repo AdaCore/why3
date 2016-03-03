@@ -241,6 +241,9 @@ Axiom long_path_decomposition_pigeon3 : forall (l:(list vertex)) (v:vertex),
   exists l3:(list vertex),
   (l = (Init.Datatypes.app l1 (Init.Datatypes.cons n (Init.Datatypes.app l2 (Init.Datatypes.cons n l3)))))).
 
+Require Import Why3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
+
 (* Why3 goal *)
 Theorem long_path_decomposition : forall (l:(list vertex)) (v:vertex), (path
   s l v) -> (((cardinal vertices) <= (list.Length.length l))%Z ->
@@ -252,11 +255,8 @@ Theorem long_path_decomposition : forall (l:(list vertex)) (v:vertex), (path
 (* Why3 intros l v h1 h2. *)
 intuition.
 
-Require Why3.
-Ltac ae := why3 "alt-ergo".
-
 apply long_path_decomposition_pigeon3.
 apply long_path_decomposition_pigeon2 ; ae.
 
-Qed.
+Admitted.
 

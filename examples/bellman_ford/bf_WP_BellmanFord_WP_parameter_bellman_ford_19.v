@@ -7,14 +7,11 @@ Require list.Length.
 Require int.Int.
 Require list.Mem.
 Require map.Map.
+Require map.Const.
 Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
@@ -115,6 +112,10 @@ Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
 
 Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
+
+Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
+  (infix_eqeq s1 s2)).
 
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
@@ -353,7 +354,7 @@ Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo".
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
@@ -366,6 +367,7 @@ Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
   forall (v:vertex), (mem v vertices) -> forall (x:Z), ((map.Map.get m
   v) = (Finite x)) -> forall (l:(list vertex)), (path s l v) ->
   (x <= (path_weight l v))%Z)))).
+(* Why3 intros o h1 m h2 h3 es h4 es1 (h5,h6) o1 h7 h8 h9 v h10 x h11 l h12. *)
 intros o _ m _ hinv1 _ _ _ _ _ _ _ hinv2 v hv z Heqt0 l hl.
 assert (case: (z <= path_weight l v \/ path_weight l v < z)%Z) by omega.
 destruct case; auto.
@@ -374,5 +376,5 @@ generalize (hinv1 v hv); clear hinv1 hinv2.
 rewrite Heqt0; ae.
 exists l; intuition.
 ae.
-Qed.
+Admitted.
 

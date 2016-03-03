@@ -1530,6 +1530,7 @@ let split_strategy =
 let inline_strategy =
   [| Strategy.Itransform(inline_transformation,1) |]
 
+(*
 let test_strategy () =
   let config = gconfig.Gconfig.config in
   let altergo =
@@ -1541,12 +1542,13 @@ let test_strategy () =
     Whyconf.filter_one_prover config fp
   in
   [|
-    Strategy.Icall_prover(altergo.Whyconf.prover,1,-1,1000);
-    Strategy.Icall_prover(cvc4.Whyconf.prover,1,0,1000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,1,1000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,1,1000);
     Strategy.Itransform(split_transformation,0); (* goto 0 on success *)
-    Strategy.Icall_prover(altergo.Whyconf.prover,10,-1,4000);
-    Strategy.Icall_prover(cvc4.Whyconf.prover,10,-1,4000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,10,4000);
   |]
+ *)
 
 (*
 let strategies () :
@@ -2066,12 +2068,13 @@ let reload () =
     display_warnings ()
   with
     | e ->
-        let e = match e with
-          | Loc.Located(loc,e) ->
+        begin
+          match e with
+          | Loc.Located(loc,_) ->
             scroll_to_loc ~color:error_tag ~yalign:0.5 loc;
-            e
-          | e -> e
-        in
+            notebook#goto_page source_page (* go to "source" tab *)
+          | _ -> ()
+        end;
         fprintf str_formatter
           "@[Error:@ %a@]" Exn_printer.exn_printer e;
         let msg = flush_str_formatter () in

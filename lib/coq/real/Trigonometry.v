@@ -83,7 +83,7 @@ admit. (* to avoid a dependency on CoqInterval *)
 Require Import Interval_tactic.
 split ; interval with (i_prec 55). 
 *)
-Qed.
+Admitted.
 
 (* Why3 goal *)
 Lemma Cos_pi : ((Reals.Rtrigo_def.cos Reals.Rtrigo1.PI) = (-1%R)%R).

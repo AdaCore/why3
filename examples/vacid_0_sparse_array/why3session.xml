@@ -2,84 +2,83 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="17" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.4pl6" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="3.2" timelimit="17" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
-<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="17" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="3" name="Z3" version="3.2" timelimit="17" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
 <file name="../vacid_0_sparse_array.mlw" expanded="true">
 <theory name="SparseArray" sum="f180fa00de7bc39519572aca507e77f8" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
- <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="11"/></proof>
  </goal>
  <goal name="WP_parameter test" expl="VC for test">
- <proof prover="5"><result status="valid" time="0.18" steps="64"/></proof>
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.18" steps="64"/></proof>
  </goal>
  <goal name="WP_parameter get" expl="VC for get">
- <proof prover="5"><result status="valid" time="0.07" steps="22"/></proof>
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.07" steps="22"/></proof>
  </goal>
- <goal name="permutation" expanded="true">
- <proof prover="2" edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v"><result status="valid" time="1.51"/></proof>
+ <goal name="permutation">
+ <proof prover="2" edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v"><result status="valid" time="1.40"/></proof>
  </goal>
- <goal name="WP_parameter set" expl="VC for set" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter set" expl="VC for set">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter set.1" expl="1. index in array bounds">
-  <proof prover="5" timelimit="17"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="5" timelimit="17" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter set.2" expl="2. type invariant">
-  <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter set.3" expl="3. type invariant">
-  <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter set.4" expl="4. precondition">
-  <proof prover="5"><result status="valid" time="0.03" steps="11"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter set.5" expl="5. assertion">
   <proof prover="1" timelimit="5"><result status="valid" time="0.09"/></proof>
   <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="unknown" time="0.03"/></proof>
+  <proof prover="5" memlimit="1000"><result status="unknown" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter set.6" expl="6. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter set.7" expl="7. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.03" steps="16"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter set.8" expl="8. type invariant">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter set.9" expl="9. type invariant">
-  <proof prover="5"><result status="valid" time="0.04" steps="19"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter set.10" expl="10. type invariant">
-  <proof prover="5"><result status="valid" time="0.04" steps="19"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter set.11" expl="11. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter set.11.1" expl="1. VC for set">
-   <proof prover="5" timelimit="17"><result status="valid" time="0.10" steps="41"/></proof>
+   <proof prover="5" timelimit="17" memlimit="1000"><result status="valid" time="0.10" steps="41"/></proof>
    </goal>
    <goal name="WP_parameter set.11.2" expl="2. VC for set">
-   <proof prover="1"><result status="valid" time="0.51"/></proof>
+   <proof prover="1"><result status="valid" time="0.52"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>
-   <proof prover="5" timelimit="17"><result status="unknown" time="1.29"/></proof>
+   <proof prover="5" timelimit="17" memlimit="1000"><result status="unknown" time="1.12"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter set.12" expl="12. postcondition">
-  <proof prover="5"><result status="valid" time="0.17" steps="56"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.17" steps="56"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Harness" sum="a4766a15c155e10c8525ab932ec189a0" expanded="true">
  <goal name="WP_parameter harness" expl="VC for harness">
- <proof prover="5"><result status="valid" time="0.42" steps="249"/></proof>
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.39" steps="249"/></proof>
  </goal>
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="4"><result status="valid" time="0.06" steps="43"/></proof>
+ <proof prover="5"><result status="valid" time="0.06" steps="43"/></proof>
  </goal>
 </theory>
 </file>

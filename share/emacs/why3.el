@@ -145,7 +145,8 @@
                    (let ((file (file-name-nondirectory buffer-file-name)))
                      (format "why3 ide %s" file))))))
 
-
+(add-hook 'why3-mode-hook
+          (lambda () (modify-syntax-entry ?_ "w")))
 
 ;; setting the mode
 (defun why3-mode ()

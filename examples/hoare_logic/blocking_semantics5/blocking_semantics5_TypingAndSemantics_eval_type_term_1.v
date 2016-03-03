@@ -328,7 +328,7 @@ Axiom type_inversion : forall (v:value),
 
 Require Import Why3.
 
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem eval_type_term : forall (t:term), forall (x:term) (x1:operator)
@@ -353,5 +353,5 @@ destruct H9 as (h1 & h2 & h3).
 generalize (type_inversion (eval_term sigma pi x)).
 generalize (type_inversion (eval_term sigma pi x2)).
 destruct h3; ae.
-Qed.
+Admitted.
 

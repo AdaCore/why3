@@ -2,10 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.2" timelimit="10" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="1" memlimit="0"/>
+<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="10" steplimit="1" memlimit="1000"/>
 <file name="../muller.mlw" expanded="true">
 <theory name="Muller" sum="f9c0e7f73098dd225f02eaeb679d901e" expanded="true">
  <goal name="WP_parameter compact" expl="VC for compact" expanded="true">
@@ -21,7 +20,7 @@
   <proof prover="5" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.3" expl="3. index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compact.4" expl="4. index in array bounds">
   <proof prover="4"><result status="valid" time="0.02" steps="12"/></proof>
@@ -75,7 +74,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter compact.18" expl="18. index in array bounds">
-  <proof prover="4" timelimit="30"><result status="valid" time="15.46" steps="6306"/></proof>
+  <proof prover="4" timelimit="30"><result status="valid" time="28.70" steps="6306"/></proof>
   <proof prover="5" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compact.19" expl="19. loop invariant preservation">

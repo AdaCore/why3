@@ -795,13 +795,18 @@ let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
 
 
 let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
+  let steplimit =
+    if mostfrequent_steplimit < 0 then None else Some mostfrequent_steplimit
+  in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
-               version=\"%a\"%a@ timelimit=\"%d\"@ steplimit=\"%d\"@ memlimit=\"%d\"/>@]"
+               version=\"%a\"%a@ timelimit=\"%d\"%a@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
     p.C.prover_altern
-    mostfrequent_timelimit mostfrequent_steplimit mostfrequent_memlimit
+    mostfrequent_timelimit
+    (opt pp_print_int "steplimit") steplimit
+    mostfrequent_memlimit
 
 let save fname shfname _config session =
   let ch = open_out fname in

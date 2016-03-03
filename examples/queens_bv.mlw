@@ -152,13 +152,13 @@ module Bits "the 1-bits of an integer, as a set of integers"
   let empty () : t
     ensures { is_empty result.mdl }
   =
-    { bv = zero; mdl = empty }
+    { bv = zeros; mdl = empty }
 
   let is_empty (x:t) : bool
     ensures { result  <-> is_empty x.mdl }
   =
-    assert {is_empty x.mdl -> BV32.eq x.bv zero};
-    x.bv = zero
+    assert {is_empty x.mdl -> BV32.eq x.bv zeros};
+    x.bv = zeros
 
   let remove_singleton (a b: t) : t
     requires { b.mdl = singleton (min_elt b.mdl) }
@@ -195,14 +195,14 @@ module Bits "the 1-bits of an integer, as a set of integers"
     { bv = bw_and a.bv (bw_not b.bv);
       mdl = diff a.mdl b.mdl }
 
-  predicate bits_interval_is_zero_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
-    eq_sub_bv a zero i n
+  predicate bits_interval_is_zeros_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
+    eq_sub_bv a zeros i n
 
   predicate bits_interval_is_one_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
     eq_sub_bv a ones i n
 
-  predicate bits_interval_is_zero (a:BV32.t) (i : int) (n : int) =
-    eq_sub a zero i n
+  predicate bits_interval_is_zeros (a:BV32.t) (i : int) (n : int) =
+    eq_sub a zeros i n
 
   predicate bits_interval_is_one (a:BV32.t) (i : int) (n : int) =
     eq_sub a ones i n
@@ -213,13 +213,13 @@ module Bits "the 1-bits of an integer, as a set of integers"
   =
     let ghost n = min_elt a.mdl in
     let ghost n_bv = of_int n in
-    assert {bits_interval_is_zero_bv a.bv zero n_bv};
+    assert {bits_interval_is_zeros_bv a.bv zeros n_bv};
     assert {nth_bv a.bv n_bv};
     assert {nth_bv (neg a.bv) n_bv};
     let res = bw_and a.bv (neg a.bv) in
     assert {forall i. 0 <= i < n -> not (nth res i)};
-    assert {bits_interval_is_zero_bv res (add n_bv (of_int 1)) (sub (of_int 31) n_bv )};
-    assert {bits_interval_is_zero res (n + 1) (31 - n)};
+    assert {bits_interval_is_zeros_bv res (add n_bv (of_int 1)) (sub (of_int 31) n_bv )};
+    assert {bits_interval_is_zeros res (n + 1) (31 - n)};
     { bv = res;
       mdl = singleton n }
 

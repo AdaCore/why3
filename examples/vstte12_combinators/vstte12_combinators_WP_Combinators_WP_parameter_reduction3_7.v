@@ -8,10 +8,6 @@ Require int.Div2.
 (* Why3 assumption *)
 Definition unit := unit.
 
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
 (* Why3 assumption *)
 Inductive term :=
   | S : term
@@ -130,7 +126,7 @@ Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
   (((ks n1) = (ks n2)) -> (n1 = n2))).
 
 Require Import Why3. 
-Ltac ae := why3 "alt-ergo" timelimit 10.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 10; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,
@@ -145,10 +141,12 @@ Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,
   (0%Z <= n)%Z -> (((x1 = (ks (2%Z * n)%Z)) -> (v3 = K)) /\
   ((x1 = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> (v3 = (App K K))))) -> exists n:Z,
   (0%Z <= n)%Z /\ ((App (App x5 v3) (App x3 v3)) = (ks n))))).
+(* Why3 intros t (n,(h1,h2)) x x1 h3 (n1,(h4,h5)) result (h6,h7) x2 x3 h8 x4
+        x5 h9 h10 (n2,(h11,h12)) v3 (h13,h14). *)
 intros t (n,(h1,h2)) x x1 h3 (n1,(h4,h5)) result (h6,h7) x2 x3 h8 x4
         x5 h9 h10 (n2,(h11,h12)) v3 (h13,h14).
 subst.
-destruct (Div2.div2 n1).
+destruct (int.Div2.div2 n1).
 intuition; ae.
-Qed.
+Admitted.
 

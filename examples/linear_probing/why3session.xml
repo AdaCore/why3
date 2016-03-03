@@ -2,20 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="15" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="6" memlimit="4000"/>
-<prover id="4" name="Z3" version="4.3.2" timelimit="6" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="15" steplimit="1" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="6" steplimit="1" memlimit="4000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="6" steplimit="1" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="1" memlimit="1000"/>
 <file name="../linear_probing.mlw" expanded="true">
 <theory name="HashedTypeWithDummy" sum="85d6c734e87cf28635f5245b68475522">
  <goal name="WP_parameter neq" expl="VC for neq">
- <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
+ <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
 </theory>
 <theory name="LinearProbing" sum="1cbb56a699a651dee5d971c187b7dba9" expanded="true">
  <goal name="bucket_bounds">
- <proof prover="5"><result status="valid" time="0.02" steps="16"/></proof>
+ <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
  </goal>
  <goal name="NumOfDummy.WP_parameter numof_eq" expl="VC for numof_eq">
  <transf name="split_goal_wp">
@@ -158,7 +157,7 @@
    <proof prover="6"><result status="valid" time="0.04" steps="25"/></proof>
    </goal>
    <goal name="WP_parameter find.9.2" expl="2. VC for find">
-   <proof prover="4"><result status="valid" time="0.32"/></proof>
+   <proof prover="4"><result status="valid" time="0.50"/></proof>
    </goal>
   </transf>
   </goal>
@@ -362,10 +361,10 @@
      </goal>
      <goal name="WP_parameter resize.25.1.1.7" expl="7. VC for resize">
      <proof prover="2" memlimit="1000"><result status="valid" time="0.10"/></proof>
-     <proof prover="6"><result status="valid" time="0.54" steps="204"/></proof>
+     <proof prover="6"><result status="valid" time="0.77" steps="204"/></proof>
      </goal>
      <goal name="WP_parameter resize.25.1.1.8" expl="8. VC for resize">
-     <proof prover="2" memlimit="1000"><result status="valid" time="0.35"/></proof>
+     <proof prover="2" memlimit="1000"><result status="valid" time="0.54"/></proof>
      </goal>
     </transf>
     </goal>
@@ -419,11 +418,11 @@
     <proof prover="6" timelimit="1"><result status="valid" time="0.04" steps="17"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.2" expl="2. VC for add">
-    <proof prover="2" memlimit="1000"><result status="valid" time="1.20"/></proof>
+    <proof prover="2" memlimit="1000"><result status="valid" time="1.69"/></proof>
     <proof prover="4"><result status="valid" time="0.65"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.3" expl="3. VC for add">
-    <proof prover="4"><result status="valid" time="0.80"/></proof>
+    <proof prover="4"><result status="valid" time="0.99"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.4" expl="4. VC for add">
     <proof prover="4"><result status="valid" time="0.28"/></proof>
@@ -432,10 +431,10 @@
     <proof prover="4"><result status="valid" time="0.21"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.6" expl="6. VC for add">
-    <proof prover="4"><result status="valid" time="0.56"/></proof>
+    <proof prover="4"><result status="valid" time="0.76"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.7" expl="7. VC for add">
-    <proof prover="2" timelimit="10"><result status="valid" time="0.98"/></proof>
+    <proof prover="2" timelimit="10"><result status="valid" time="1.27"/></proof>
     </goal>
     <goal name="WP_parameter add.10.1.8" expl="8. VC for add">
     <proof prover="4"><result status="valid" time="0.94"/></proof>
@@ -471,554 +470,554 @@
   </goal>
   <goal name="WP_parameter copy.2" expl="2. type invariant">
   <metas>
-   <ts_pos name="option" arity="1" id="2588"
+   <ts_pos name="option" arity="1" id="2600"
     ip_theory="Option">
     <ip_library name="option"/>
     <ip_qualid name="option"/>
    </ts_pos>
-   <ts_pos name="list" arity="1" id="2592"
+   <ts_pos name="list" arity="1" id="2604"
     ip_theory="List">
     <ip_library name="list"/>
     <ip_qualid name="list"/>
    </ts_pos>
-   <ts_pos name="ref" arity="1" id="4645"
+   <ts_pos name="ref" arity="1" id="4657"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
    </ts_pos>
-   <ts_pos name="t" arity="0" id="6085"
+   <ts_pos name="t" arity="0" id="6097"
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
-   <ls_pos name="zero" id="429"
+   <ls_pos name="zero" id="433"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="zero"/>
    </ls_pos>
-   <ls_pos name="one" id="430"
+   <ls_pos name="one" id="434"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="one"/>
    </ls_pos>
-   <ls_pos name="infix &lt;" id="431"
+   <ls_pos name="infix &lt;" id="435"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="infix &lt;"/>
    </ls_pos>
-   <ls_pos name="infix +" id="1600"
+   <ls_pos name="infix +" id="1604"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="infix +"/>
    </ls_pos>
-   <ls_pos name="prefix -" id="1601"
+   <ls_pos name="prefix -" id="1605"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="prefix -"/>
    </ls_pos>
-   <ls_pos name="infix *" id="1602"
+   <ls_pos name="infix *" id="1606"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="infix *"/>
    </ls_pos>
-   <ls_pos name="abs" id="1715"
+   <ls_pos name="abs" id="1719"
     ip_theory="Abs">
     <ip_library name="int"/>
     <ip_qualid name="abs"/>
    </ls_pos>
-   <ls_pos name="div" id="1920"
+   <ls_pos name="div" id="1924"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="div"/>
    </ls_pos>
-   <ls_pos name="mod" id="1923"
+   <ls_pos name="mod" id="1927"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="mod"/>
    </ls_pos>
-   <ls_pos name="keym" id="2540"
+   <ls_pos name="keym" id="2553"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="keym"/>
    </ls_pos>
-   <ls_pos name="hash" id="2569"
+   <ls_pos name="hash" id="2582"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash"/>
    </ls_pos>
-   <ls_pos name="dummy" id="2578"
+   <ls_pos name="dummy" id="2591"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="dummy"/>
    </ls_pos>
-   <ls_pos name="mem" id="2616"
+   <ls_pos name="mem" id="2628"
     ip_theory="Mem">
     <ip_library name="list"/>
     <ip_qualid name="mem"/>
    </ls_pos>
-   <ls_pos name="get" id="3266"
+   <ls_pos name="get" id="3278"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="get"/>
    </ls_pos>
-   <ls_pos name="set" id="3269"
+   <ls_pos name="set" id="3281"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix []" id="3276"
+   <ls_pos name="mixfix []" id="3288"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="mixfix []"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="3289"
+   <ls_pos name="mixfix [&lt;-]" id="3301"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="prefix !" id="4651"
+   <ls_pos name="prefix !" id="4663"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="prefix !"/>
    </ls_pos>
-   <ls_pos name="set" id="4818"
+   <ls_pos name="set" id="4830"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="4860"
+   <ls_pos name="mixfix [&lt;-]" id="4872"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="numofd" id="5866"
+   <ls_pos name="numofd" id="5878"
     ip_theory="LinearProbing">
     <ip_qualid name="numofd"/>
    </ls_pos>
-   <ls_pos name="next" id="6706"
+   <ls_pos name="next" id="6718"
     ip_theory="LinearProbing">
     <ip_qualid name="next"/>
    </ls_pos>
-   <pr_pos name="Assoc" id="1603"
+   <pr_pos name="Assoc" id="1607"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Assoc"/>
    </pr_pos>
-   <pr_pos name="Unit_def_l" id="1610"
+   <pr_pos name="Unit_def_l" id="1614"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Unit_def_l"/>
    </pr_pos>
-   <pr_pos name="Unit_def_r" id="1613"
+   <pr_pos name="Unit_def_r" id="1617"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Unit_def_r"/>
    </pr_pos>
-   <pr_pos name="Inv_def_l" id="1616"
+   <pr_pos name="Inv_def_l" id="1620"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Inv_def_l"/>
    </pr_pos>
-   <pr_pos name="Inv_def_r" id="1619"
+   <pr_pos name="Inv_def_r" id="1623"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Inv_def_r"/>
    </pr_pos>
-   <pr_pos name="Comm" id="1622"
+   <pr_pos name="Comm" id="1626"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Comm"/>
     <ip_qualid name="Comm"/>
    </pr_pos>
-   <pr_pos name="Assoc" id="1627"
+   <pr_pos name="Assoc" id="1631"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Assoc"/>
     <ip_qualid name="Assoc"/>
    </pr_pos>
-   <pr_pos name="Mul_distr_l" id="1634"
+   <pr_pos name="Mul_distr_l" id="1638"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Mul_distr_l"/>
    </pr_pos>
-   <pr_pos name="Mul_distr_r" id="1641"
+   <pr_pos name="Mul_distr_r" id="1645"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Mul_distr_r"/>
    </pr_pos>
-   <pr_pos name="Comm" id="1659"
+   <pr_pos name="Comm" id="1663"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Comm"/>
     <ip_qualid name="Comm"/>
    </pr_pos>
-   <pr_pos name="Unitary" id="1664"
+   <pr_pos name="Unitary" id="1668"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Unitary"/>
    </pr_pos>
-   <pr_pos name="NonTrivialRing" id="1667"
+   <pr_pos name="NonTrivialRing" id="1671"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="NonTrivialRing"/>
    </pr_pos>
-   <pr_pos name="Refl" id="1679"
+   <pr_pos name="Refl" id="1683"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Refl"/>
    </pr_pos>
-   <pr_pos name="Trans" id="1682"
+   <pr_pos name="Trans" id="1686"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Trans"/>
    </pr_pos>
-   <pr_pos name="Antisymm" id="1689"
+   <pr_pos name="Antisymm" id="1693"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Antisymm"/>
    </pr_pos>
-   <pr_pos name="Total" id="1694"
+   <pr_pos name="Total" id="1698"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Total"/>
    </pr_pos>
-   <pr_pos name="ZeroLessOne" id="1699"
+   <pr_pos name="ZeroLessOne" id="1703"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="ZeroLessOne"/>
    </pr_pos>
-   <pr_pos name="CompatOrderAdd" id="1700"
+   <pr_pos name="CompatOrderAdd" id="1704"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CompatOrderAdd"/>
    </pr_pos>
-   <pr_pos name="CompatOrderMult" id="1707"
+   <pr_pos name="CompatOrderMult" id="1711"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CompatOrderMult"/>
    </pr_pos>
-   <pr_pos name="Abs_le" id="1720"
+   <pr_pos name="Abs_le" id="1724"
     ip_theory="Abs">
     <ip_library name="int"/>
     <ip_qualid name="Abs_le"/>
    </pr_pos>
-   <pr_pos name="Abs_pos" id="1725"
+   <pr_pos name="Abs_pos" id="1729"
     ip_theory="Abs">
     <ip_library name="int"/>
     <ip_qualid name="Abs_pos"/>
    </pr_pos>
-   <pr_pos name="Div_mod" id="1926"
+   <pr_pos name="Div_mod" id="1930"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_mod"/>
    </pr_pos>
-   <pr_pos name="Div_bound" id="1931"
+   <pr_pos name="Div_bound" id="1935"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_bound"/>
    </pr_pos>
-   <pr_pos name="Mod_bound" id="1936"
+   <pr_pos name="Mod_bound" id="1940"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_bound"/>
    </pr_pos>
-   <pr_pos name="Div_sign_pos" id="1941"
+   <pr_pos name="Div_sign_pos" id="1945"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_sign_pos"/>
    </pr_pos>
-   <pr_pos name="Div_sign_neg" id="1946"
+   <pr_pos name="Div_sign_neg" id="1950"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_sign_neg"/>
    </pr_pos>
-   <pr_pos name="Mod_sign_pos" id="1951"
+   <pr_pos name="Mod_sign_pos" id="1955"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_sign_pos"/>
    </pr_pos>
-   <pr_pos name="Mod_sign_neg" id="1956"
+   <pr_pos name="Mod_sign_neg" id="1960"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_sign_neg"/>
    </pr_pos>
-   <pr_pos name="Rounds_toward_zero" id="1961"
+   <pr_pos name="Rounds_toward_zero" id="1965"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Rounds_toward_zero"/>
    </pr_pos>
-   <pr_pos name="Div_1" id="1966"
+   <pr_pos name="Div_1" id="1970"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_1"/>
    </pr_pos>
-   <pr_pos name="Mod_1" id="1969"
+   <pr_pos name="Mod_1" id="1973"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_1"/>
    </pr_pos>
-   <pr_pos name="Div_inf" id="1972"
+   <pr_pos name="Div_inf" id="1976"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_inf"/>
    </pr_pos>
-   <pr_pos name="Mod_inf" id="1977"
+   <pr_pos name="Mod_inf" id="1981"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_inf"/>
    </pr_pos>
-   <pr_pos name="Div_mult" id="1982"
+   <pr_pos name="Div_mult" id="1986"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_mult"/>
    </pr_pos>
-   <pr_pos name="Mod_mult" id="1989"
+   <pr_pos name="Mod_mult" id="1993"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_mult"/>
    </pr_pos>
-   <pr_pos name="hash_nonneg" id="2570"
+   <pr_pos name="hash_nonneg" id="2583"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash_nonneg"/>
    </pr_pos>
-   <pr_pos name="hash_eq" id="2573"
+   <pr_pos name="hash_eq" id="2586"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash_eq"/>
    </pr_pos>
-   <pr_pos name="Select_eq" id="3302"
+   <pr_pos name="Select_eq" id="3314"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_eq"/>
    </pr_pos>
-   <pr_pos name="Select_neq" id="3311"
+   <pr_pos name="Select_neq" id="3323"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_neq"/>
    </pr_pos>
-   <pr_pos name="bucket_bounds" id="5527"
+   <pr_pos name="bucket_bounds" id="5539"
     ip_theory="LinearProbing">
     <ip_qualid name="bucket_bounds"/>
    </pr_pos>
-   <pr_pos name="numof_eq" id="5756"
+   <pr_pos name="numof_eq" id="5768"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="numof_eq"/>
    </pr_pos>
-   <pr_pos name="dummy_const" id="5862"
+   <pr_pos name="dummy_const" id="5874"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="429"/>
+    <meta_arg_ls id="433"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="430"/>
+    <meta_arg_ls id="434"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="431"/>
+    <meta_arg_ls id="435"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1600"/>
+    <meta_arg_ls id="1604"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1601"/>
+    <meta_arg_ls id="1605"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1602"/>
+    <meta_arg_ls id="1606"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1715"/>
+    <meta_arg_ls id="1719"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1920"/>
+    <meta_arg_ls id="1924"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1923"/>
+    <meta_arg_ls id="1927"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2540"/>
+    <meta_arg_ls id="2553"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2569"/>
+    <meta_arg_ls id="2582"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2578"/>
+    <meta_arg_ls id="2591"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2616"/>
+    <meta_arg_ls id="2628"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3266"/>
+    <meta_arg_ls id="3278"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3269"/>
+    <meta_arg_ls id="3281"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3276"/>
+    <meta_arg_ls id="3288"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3289"/>
+    <meta_arg_ls id="3301"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4651"/>
+    <meta_arg_ls id="4663"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4818"/>
+    <meta_arg_ls id="4830"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4860"/>
+    <meta_arg_ls id="4872"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5866"/>
+    <meta_arg_ls id="5878"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="6706"/>
+    <meta_arg_ls id="6718"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1603"/>
+    <meta_arg_pr id="1607"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1610"/>
+    <meta_arg_pr id="1614"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1613"/>
+    <meta_arg_pr id="1617"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1616"/>
+    <meta_arg_pr id="1620"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1619"/>
+    <meta_arg_pr id="1623"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1622"/>
+    <meta_arg_pr id="1626"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1627"/>
+    <meta_arg_pr id="1631"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1634"/>
+    <meta_arg_pr id="1638"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1641"/>
+    <meta_arg_pr id="1645"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1659"/>
+    <meta_arg_pr id="1663"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1664"/>
+    <meta_arg_pr id="1668"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1667"/>
+    <meta_arg_pr id="1671"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1679"/>
+    <meta_arg_pr id="1683"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1682"/>
+    <meta_arg_pr id="1686"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1689"/>
+    <meta_arg_pr id="1693"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1694"/>
+    <meta_arg_pr id="1698"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1699"/>
+    <meta_arg_pr id="1703"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1700"/>
+    <meta_arg_pr id="1704"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1707"/>
+    <meta_arg_pr id="1711"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1720"/>
+    <meta_arg_pr id="1724"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1725"/>
+    <meta_arg_pr id="1729"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1926"/>
+    <meta_arg_pr id="1930"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1931"/>
+    <meta_arg_pr id="1935"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1936"/>
+    <meta_arg_pr id="1940"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1941"/>
+    <meta_arg_pr id="1945"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1946"/>
+    <meta_arg_pr id="1950"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1951"/>
+    <meta_arg_pr id="1955"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1956"/>
+    <meta_arg_pr id="1960"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1961"/>
+    <meta_arg_pr id="1965"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1966"/>
+    <meta_arg_pr id="1970"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1969"/>
+    <meta_arg_pr id="1973"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1972"/>
+    <meta_arg_pr id="1976"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1977"/>
+    <meta_arg_pr id="1981"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1982"/>
+    <meta_arg_pr id="1986"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1989"/>
+    <meta_arg_pr id="1993"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2570"/>
+    <meta_arg_pr id="2583"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2573"/>
+    <meta_arg_pr id="2586"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3302"/>
+    <meta_arg_pr id="3314"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3311"/>
+    <meta_arg_pr id="3323"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5527"/>
+    <meta_arg_pr id="5539"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5756"/>
+    <meta_arg_pr id="5768"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5862"/>
+    <meta_arg_pr id="5874"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2588"/>
+    <meta_arg_ts id="2600"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2592"/>
+    <meta_arg_ts id="2604"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="4645"/>
+    <meta_arg_ts id="4657"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="6085"/>
+    <meta_arg_ts id="6097"/>
    </meta>
    <goal name="WP_parameter copy.2" expl="2. type invariant">
    <proof prover="4" timelimit="5"><result status="valid" time="0.19"/></proof>
@@ -1061,10 +1060,10 @@
   </goal>
   <goal name="WP_parameter find_dummy.10" expl="10. precondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter find_dummy.10.1" expl="1. precondition">
+   <goal name="WP_parameter find_dummy.10.1" expl="1. VC for find_dummy">
    <proof prover="6"><result status="valid" time="0.40" steps="265"/></proof>
    </goal>
-   <goal name="WP_parameter find_dummy.10.2" expl="2. precondition">
+   <goal name="WP_parameter find_dummy.10.2" expl="2. VC for find_dummy">
    <proof prover="0" timelimit="5"><result status="valid" time="0.05"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="0.03"/></proof>
    </goal>
@@ -1249,7 +1248,7 @@
   </goal>
   <goal name="WP_parameter delete.36" expl="36. precondition">
   <proof prover="0"><result status="valid" time="0.20"/></proof>
-  <proof prover="2" timelimit="15" memlimit="1000"><result status="valid" time="0.52"/></proof>
+  <proof prover="2" timelimit="15" memlimit="1000"><result status="valid" time="0.79"/></proof>
   </goal>
   <goal name="WP_parameter delete.37" expl="37. precondition">
   <proof prover="6"><result status="valid" time="0.03" steps="34"/></proof>
@@ -1257,7 +1256,7 @@
   <goal name="WP_parameter delete.38" expl="38. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.38.1" expl="1. precondition">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.54"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.74"/></proof>
    </goal>
    <goal name="WP_parameter delete.38.2" expl="2. precondition">
    <proof prover="2" memlimit="1000"><result status="valid" time="0.57"/></proof>
@@ -1276,10 +1275,10 @@
    <proof prover="0"><result status="valid" time="0.18"/></proof>
    </goal>
    <goal name="WP_parameter delete.39.4" expl="4. precondition">
-   <proof prover="0" timelimit="5"><result status="valid" time="1.79"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="2.44"/></proof>
    </goal>
    <goal name="WP_parameter delete.39.5" expl="5. precondition">
-   <proof prover="0"><result status="valid" time="1.65"/></proof>
+   <proof prover="0"><result status="valid" time="2.28"/></proof>
    <proof prover="4" timelimit="15"><result status="valid" time="1.14"/></proof>
    </goal>
   </transf>
@@ -1313,7 +1312,7 @@
     <proof prover="6"><result status="valid" time="0.06" steps="25"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.7" expl="7. VC for delete">
-    <proof prover="6"><result status="valid" time="0.32" steps="315"/></proof>
+    <proof prover="6"><result status="valid" time="0.18" steps="315"/></proof>
     </goal>
     <goal name="WP_parameter delete.42.1.8" expl="8. VC for delete">
     <proof prover="4"><result status="valid" time="0.14"/></proof>
@@ -1339,7 +1338,7 @@
   <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter remove.5" expl="5. assertion">
-  <proof prover="0" timelimit="30"><result status="valid" time="20.83"/></proof>
+  <proof prover="0" timelimit="30"><result status="valid" time="31.91"/></proof>
   <proof prover="4" timelimit="30"><result status="valid" time="16.68"/></proof>
   </goal>
   <goal name="WP_parameter remove.6" expl="6. type invariant">
@@ -1356,10 +1355,10 @@
   </goal>
   <goal name="WP_parameter remove.10" expl="10. precondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter remove.10.1" expl="1. precondition">
-   <proof prover="4"><result status="valid" time="0.13"/></proof>
+   <goal name="WP_parameter remove.10.1" expl="1. VC for remove">
+   <proof prover="4"><result status="valid" time="0.26"/></proof>
    </goal>
-   <goal name="WP_parameter remove.10.2" expl="2. precondition">
+   <goal name="WP_parameter remove.10.2" expl="2. VC for remove">
    <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.07"/></proof>
    </goal>
   </transf>
@@ -1371,10 +1370,10 @@
   <proof prover="6"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.13" expl="13. precondition">
-  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.14" expl="14. precondition">
-  <proof prover="6"><result status="valid" time="0.04" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.15" expl="15. precondition">
   <proof prover="6"><result status="valid" time="0.03" steps="22"/></proof>
@@ -1395,12 +1394,12 @@
   <proof prover="6"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter remove.21" expl="21. precondition">
-  <proof prover="2" memlimit="1000"><result status="valid" time="0.99"/></proof>
-  <proof prover="4"><result status="valid" time="0.46"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="1.62"/></proof>
+  <proof prover="4"><result status="valid" time="0.70"/></proof>
   </goal>
   <goal name="WP_parameter remove.22" expl="22. precondition">
-  <proof prover="4"><result status="valid" time="0.74"/></proof>
-  <proof prover="6"><result status="valid" time="2.37" steps="1017"/></proof>
+  <proof prover="4"><result status="valid" time="1.11"/></proof>
+  <proof prover="6"><result status="valid" time="4.01" steps="1017"/></proof>
   </goal>
   <goal name="WP_parameter remove.23" expl="23. type invariant">
   <proof prover="4"><result status="valid" time="0.12"/></proof>
@@ -1424,7 +1423,7 @@
   <proof prover="6"><result status="valid" time="0.03" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter remove.28" expl="28. postcondition">
-  <proof prover="4"><result status="valid" time="1.95"/></proof>
+  <proof prover="4"><result status="valid" time="3.34"/></proof>
   </goal>
  </transf>
  </goal>

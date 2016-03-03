@@ -3,39 +3,40 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 (* Why3 assumption *)
-Inductive ref (a:Type) {a_WT:WhyType a} :=
+Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a] [a_WT]].
+Implicit Arguments mk_ref [[a]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
 
-Axiom set : forall (a:Type) {a_WT:WhyType a}, Type.
+Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Existing Instance set_WhyType.
 
 Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
   a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
 
 Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
 
 (* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set a)): Prop :=
-  forall (x:a), (mem x s1) -> (mem x s2).
+Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
+  a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
 
 Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (subset s s).
@@ -47,14 +48,14 @@ Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
 Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set a)): Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
   forall (x:a), ~ (mem x s).
 
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set
+Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
   a))).
 
 Axiom mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
-  (empty :(set a))).
+  (empty : (set a))).
 
 Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
@@ -65,6 +66,12 @@ Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
 Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
   (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
+
+Axiom add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), (mem x s) -> ((add x (remove x s)) = s).
+
+Axiom remove_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), ((remove x (add x s)) = (remove x s)).
 
 Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
   a)), (subset (remove x s) s).
@@ -114,33 +121,12 @@ Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
 Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
 
+Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
+  (infix_eqeq s1 s2)).
+
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
-
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set1: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set1 m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set1 m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
 
 Axiom vertex : Type.
 Parameter vertex_WhyType : WhyType vertex.
@@ -157,32 +143,35 @@ Parameter weight: vertex -> vertex -> Z.
 Axiom Weight_nonneg : forall (x:vertex) (y:vertex), (0%Z <= (weight x y))%Z.
 
 (* Why3 assumption *)
-Definition min(m:vertex) (q:(set vertex)) (d:(map vertex Z)): Prop := (mem m
-  q) /\ forall (x:vertex), (mem x q) -> ((get d m) <= (get d x))%Z.
+Definition min (m:vertex) (q:(set vertex)) (d:(map.Map.map vertex
+  Z)): Prop := (mem m q) /\ forall (x:vertex), (mem x q) -> ((map.Map.get d
+  m) <= (map.Map.get d x))%Z.
 
 (* Why3 assumption *)
-Inductive path : vertex -> vertex -> Z -> Prop :=
+Inductive path: vertex -> vertex -> Z -> Prop :=
   | Path_nil : forall (x:vertex), (path x x 0%Z)
-  | Path_cons : forall (x:vertex) (y:vertex) (z:vertex), forall (d:Z),
-      (path x y d) -> ((mem z (g_succ y)) -> (path x z (d + (weight y z))%Z)).
+  | Path_cons : forall (x:vertex) (y:vertex) (z:vertex), forall (d:Z), (path
+      x y d) -> ((mem z (g_succ y)) -> (path x z (d + (weight y z))%Z)).
 
 Axiom Length_nonneg : forall (x:vertex) (y:vertex), forall (d:Z), (path x y
   d) -> (0%Z <= d)%Z.
 
 (* Why3 assumption *)
-Definition shortest_path(x:vertex) (y:vertex) (d:Z): Prop := (path x y d) /\
+Definition shortest_path (x:vertex) (y:vertex) (d:Z): Prop := (path x y d) /\
   forall (d':Z), (path x y d') -> (d <= d')%Z.
 
-Axiom Path_inversion : forall (src:vertex) (v1:vertex), forall (d:Z),
-  (path src v1 d) -> (((v1 = src) /\ (d = 0%Z)) \/ exists v':vertex,
-  (path src v' (d - (weight v' v1))%Z) /\ (mem v1 (g_succ v'))).
+Axiom Path_inversion : forall (src:vertex) (v1:vertex), forall (d:Z), (path
+  src v1 d) -> (((v1 = src) /\ (d = 0%Z)) \/ exists v':vertex, (path src v'
+  (d - (weight v' v1))%Z) /\ (mem v1 (g_succ v'))).
 
-Require Import Why3. Ltac ae := why3 "alt-ergo".
+Require Import Why3. 
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
 Require Import Classical.
 
 (* Why3 goal *)
 Theorem Path_shortest_path : forall (src:vertex) (v1:vertex), forall (d:Z),
   (path src v1 d) -> exists d':Z, (shortest_path src v1 d') /\ (d' <= d)%Z.
+(* Why3 intros src v1 d h1. *)
 intros src v1 d path.
 assert (0 <= d)%Z by ae.
 generalize path; clear path. generalize H.
@@ -192,6 +181,5 @@ destruct (classic (exists d', (d' < d)%Z /\ path src v1 d')).
 destruct H as (d', (h1, h2)).
 generalize (IH d'); ae.
 exists d; ae.
-Qed.
-
+Admitted.
 
