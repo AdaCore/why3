@@ -15,8 +15,6 @@ Small text-based interactive prover using new Why3 session format, to be run in 
 
 ******************)
 
-(*
-
 #load "unix.cma";;
 #load "nums.cma";;
 #load "dynlink.cma";;
@@ -30,10 +28,7 @@ Small text-based interactive prover using new Why3 session format, to be run in 
 #directory "../../lib/why3";;
 #load_rec "why3.cma";;
 
- *)
-
 open Format
-
 
 (* opening the Why3 library *)
 open Why3
@@ -67,15 +62,40 @@ let provers =
     provers
     []
 
+open Session_itp;;
+open Format;;
 
-let (s,b) = Session_itp.load_session "../bitwalker/why3session.xml"
+let (s,b) = Session_itp.load_session "../bitwalker/why3session.xml";;
+
+let th = Session_itp.get_theories s;;
+
+let (_,_,id) = match th with
+    (n, (thn, _::_::x::_)::_)::_ -> (n,thn,x);;
+
+let t = Session_itp.get_tree s id;;
+
+printf "%a@." (print_tree s) t;;
+
+(* let n = Session_itp.get_node s 19;;
+
+let s' = Session_itp.graft_transf s n "blabla" [] [];;
+
+let t = Session_itp.get_tree s;;
+
+let _ = Session_itp.remove_transformation s s';;
+
+let _ = remove_transformation s (get_trans s 15);;
 
 let t = Session_itp.get_tree s;;
 
 let my_session = Session_itp.empty_session "test.xml";;
 
+let s' = Session_itp.graft_transf s n "blabla" [] [];;
+
+   let t = Session_itp.get_tree s;; *)
+
 (* excerpt from src/session/session.ml *)
-let read_file env ?format fn =
+ let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
   let ltheories =
     Stdlib.Mstr.fold
@@ -88,31 +108,42 @@ let read_file env ?format fn =
            | None   -> (Loc.dummy_position,th_name,th)::acc)
       theories []
   in
-  List.sort
-    (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
-    ltheories,theories
+  let th =  List.sort
+      (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
+      ltheories
+  in
+  List.map (fun (_,_,a) -> a) th;;
+
+let my_session = empty_session ();;
 
 (* adds a file in the new session *)
 let file : unit (* Session_itp.file *) =
   let fname = "../logic/hello_proof.why" in
   try
-    let ordered_theories,theories = read_file env fname in
-    Session_itp.add_file my_session fname ordered_theories;
+    let theories = read_file env fname in
+    add_file_section my_session fname theories None;
   with e ->
     eprintf "@[Error while reading file@ '%s':@ %a@.@]" fname
       Exn_printer.exn_printer e;
-    exit 1
-
-
-
-
+    exit 1;;
 
 (* explore the theories in that file *)
-let theories = file.Session.file_theories
+let theories = get_theories my_session;;
 let () = eprintf "%d theories found@." (List.length theories)
 
-(* add proof attempts for each goals in the theories *)
+let (_,_,id) = match theories with
+    (n, (thn, x::_)::_)::_ -> (n,thn,x);;
 
+let t = Session_itp.get_tree my_session id;;
+
+print_session my_session;;
+
+let l = graft_transf my_session id "toto" [] [];;
+
+printf "%a@." (print_tree my_session) t;;
+
+(* add proof attempts for each goals in the theories *)
+(*
 let add_proofs_attempts g =
   List.iter
     (fun (p,d) ->
@@ -136,3 +167,4 @@ let () =
 
 (* save the session on disk *)
 let () = Session.save_session config env_session.Session.session
+*)
