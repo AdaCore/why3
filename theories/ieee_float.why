@@ -44,12 +44,12 @@ theory GenericFloat
   (* {3 Operators} *)
 
   function abs       t   : t
-  function (.-_)     t   : t
+  function (.-_)     t   : t (* fp.neg *)
 
-  function (.+)      t t : t
-  function (.-)      t t : t
-  function (.*)      t t : t
-  function (./)      t t : t
+  function (.+)      t t : t (* fp.add *)
+  function (.-)      t t : t (* fp.sub *)
+  function (.*)      t t : t (* fp.mul *)
+  function (./)      t t : t (* fp.div *)
 
   function fma     t t t : t (* xy + z *)
 
@@ -74,12 +74,12 @@ theory GenericFloat
 
   (** {3 Comparisons} *)
 
-  predicate (.<=) t t
-  predicate (.<)  t t
-  predicate (.>=) t t
-  predicate (.>)  t t
+  predicate (.<=) t t (* fp.leq *)
+  predicate (.<)  t t (* fp.lt  *)
+  predicate (.>=) t t (* fp.geq *)
+  predicate (.>)  t t (* fp.gt  *)
 
-  predicate (.=)  t t
+  predicate (.=)  t t (* fp.eq, NOT SMTLIB = *)
 
   (* {3 Classification of numbers} *)
 
@@ -101,6 +101,7 @@ theory GenericFloat
   (*   partly done with from_binary (for literals only)       *)
   (* from another fp                 - see FloatConverter     *)
   (* from real                                                *)
+  (*   partly done with (!) (for literals only)               *)
   (* from unsigned integer bitvector - see Float_BV_Converter *)
   (* from signed integer bitvector                            *)
 
@@ -159,6 +160,9 @@ theory GenericFloat
   (* as described on p17 of IEEE-754. For results where the corresponding  *)
   (* floating point result would be infinity or NaN this function should   *)
   (* be uninterpreted.                                                     *)
+  (*                                                                       *)
+  (* Note that this means round (+INF) > 0 is not true.                    *)
+  (* Note also this means round (2*INF) > round (INF) is not true either.  *)
   function round real : real
 
   constant max_real   : real    (* defined when cloning *)
