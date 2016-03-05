@@ -433,6 +433,10 @@ val cty_exec : cty -> cty
     a cty of a fully applied application, returning a mapping.
     The original cty must be effectless. *)
 
+val cty_exec_post : cty -> post list
+(** [cty_exec_post cty] returns a post-condition appropriate
+    for use with local let-functions in VC generation. *)
+
 val cty_ghost : cty -> bool
 (** [cty_ghost cty] returns [cty.cty_effect.eff_ghost] *)
 

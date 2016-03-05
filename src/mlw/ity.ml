@@ -1344,24 +1344,10 @@ let cty_tuple args =
   let frz = List.fold_right freeze_pv args isb_empty in
   cty_unsafe [] [] [post] Mexn.empty Mpv.empty eff res mask frz
 
-let cty_exec ({cty_effect = eff} as c) =
-  (* we do not purify the signature, so the regions will be frozen
-     in the resulting pvsymbol. Thus, we have to forbid all effects,
-     including allocation. TODO/FIXME: we should probably forbid
-     the rest of the signature to contain regions at all. *)
-  if eff.eff_oneway then Loc.errorm
-    "This function may not terminate, it cannot be used as pure";
-  if not (eff_pure eff && Sreg.is_empty eff.eff_resets) then Loc.errorm
-    "This function has side effects, it cannot be used as pure";
-  if not (Mreg.is_empty c.cty_freeze.isb_reg) then Loc.errorm
-    "This function is stateful, it cannot be used as pure";
+let cty_exec_post_raw c =
   let ity = List.fold_right (fun a ity ->
     ity_func a.pv_ity ity) c.cty_args c.cty_result in
-  let gh = List.exists (fun a -> a.pv_ghost) c.cty_args in
-  let eff = eff_ghostify (gh || mask_ghost c.cty_mask) eff in
-  (* translate the specification *)
   let al = List.map (fun a -> a.pv_vs) c.cty_args in
-  let pre = List.map (fun f -> t_forall_close_simp al [] f) c.cty_pre in
   let res = create_vsymbol (id_fresh "result") (ty_of_ity ity) in
   let res_al = t_func_app_l (t_var res) (List.map t_var al) in
   let oldies = Mpv.fold (fun {pv_vs = o} {pv_vs = v} s ->
@@ -1388,9 +1374,31 @@ let cty_exec ({cty_effect = eff} as c) =
           down h s (List.rev tl) (List.rev al)
       | Tbinop (Tand, f, g) -> t_and (conv f) (conv g)
       | _ -> t_subst_single v res_al h) in
-    let h = t_forall_close_simp al [] (conv (t_subst oldies h)) in
-    create_post res h in
-  let post = List.map conv_post c.cty_post in
+    conv (t_subst oldies h) in
+  al, ity, res, List.map conv_post c.cty_post
+
+let cty_exec_post c =
+  let _, _, res, ql = cty_exec_post_raw c in
+  List.map (create_post res) ql
+
+let cty_exec ({cty_effect = eff} as c) =
+  (* we do not purify the signature, so the regions will be frozen
+     in the resulting pvsymbol. Thus, we have to forbid all effects,
+     including allocation. TODO/FIXME: we should probably forbid
+     the rest of the signature to contain regions at all. *)
+  if eff.eff_oneway then Loc.errorm
+    "This function may not terminate, it cannot be used as pure";
+  if not (eff_pure eff && Sreg.is_empty eff.eff_resets) then Loc.errorm
+    "This function has side effects, it cannot be used as pure";
+  if not (Mreg.is_empty c.cty_freeze.isb_reg) then Loc.errorm
+    "This function is stateful, it cannot be used as pure";
+  let gh = List.exists (fun a -> a.pv_ghost) c.cty_args in
+  let eff = eff_ghostify (gh || mask_ghost c.cty_mask) eff in
+  (* translate the specification *)
+  let al, ity, res, ql = cty_exec_post_raw c in
+  let pre = List.map (t_forall_close_simp al []) c.cty_pre in
+  let conv q = create_post res (t_forall_close_simp al [] q) in
+  let post = List.map conv ql in
   (* we do not modify cty_freeze to respect the invariants of the cty type.
      It is sound to assume that the resulting cty can be executed multiple
      times, producing mappings with different type variables and regions.

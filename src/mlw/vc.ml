@@ -100,10 +100,10 @@ let _expl_type_inv  = Ident.create_label "expl:type invariant"
 let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
   Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
 
-let vc_expl lab f =
-  let f = if Slab.mem stop_split f.t_label
-    then f else t_label_add stop_split f in
-  if lab_has_expl f.t_label then f else t_label_add lab f
+let vc_expl loc l ({t_label = lab} as f) =
+  let lab = if lab_has_expl lab then lab else Slab.add l lab in
+  let loc = if loc = None then f.t_loc else loc in
+  t_label ?loc (Slab.add stop_split lab) f
 
 (* propositional connectives with limited simplification *)
 
@@ -219,7 +219,7 @@ let decrease env loc lab olds news =
     | (old_t, None)::_, (t, None)::_ ->
         decrease_def env loc old_t t
     | _ -> t_false in
-  vc_expl lab (t_label ?loc Slab.empty (decr olds news))
+  vc_expl loc lab (decr olds news)
 
 let oldify_variant varl =
   if varl = [] then Mvs.empty, varl else
@@ -238,38 +238,38 @@ let oldify_variant varl =
 let t_var_or_void v =
   if ty_equal v.vs_ty ty_unit then t_void else t_var v
 
-let wp_of_inv lab pl = t_and_l (List.map (vc_expl lab) pl)
+let wp_of_inv loc lab pl = t_and_l (List.map (vc_expl loc lab) pl)
 
 let wp_of_pre ({letrec_ps = lps} as env) loc lab = function
   | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
       let olds, rels = Mls.find ls lps in
       let news = List.combine tl rels in
       let p = decrease env loc expl_variant olds news in
-      wp_and p (wp_of_inv lab pl)
-  | pl -> wp_of_inv lab pl
+      wp_and p (wp_of_inv loc lab pl)
+  | pl -> wp_of_inv loc lab pl
 
 let wp_of_post lab ity = function
   | q::ql ->
       let v, q = open_post q in let t = t_var_or_void v in
-      let mk_post q = vc_expl lab (open_post_with t q) in
-      v, t_and_l (vc_expl lab q :: List.map mk_post ql)
+      let mk_post q = vc_expl None lab (open_post_with t q) in
+      v, t_and_l (vc_expl None lab q :: List.map mk_post ql)
   | [] ->
       res_of_ity ity, t_true
 
-let rec push_stop lab f = match f.t_node with
+let rec push_stop loc lab f = match f.t_node with
   | Tbinop (Tand,g,h) when not (Slab.mem stop_split f.t_label) ->
-      t_label_copy f (t_and (push_stop lab g) (push_stop lab h))
-  | _ -> vc_expl lab f
+      t_label_copy f (t_and (push_stop loc lab g) (push_stop loc lab h))
+  | _ -> vc_expl loc lab f
 
-let sp_of_pre lab pl = t_and_l (List.map (push_stop lab) pl)
+let sp_of_pre lab pl = t_and_l (List.map (push_stop None lab) pl)
 
-let sp_of_post lab v ql =
+let sp_of_post loc lab v ql =
   let t = t_var_or_void v in
   (* remove the post-condition of () *)
   let push q = match open_post_with t q with
     | {t_node = Tapp (ps, [_; {t_ty = Some ty}])}
       when ls_equal ps ps_equ && ty_equal ty ty_unit -> t_true
-    | f -> push_stop lab f in
+    | f -> push_stop loc lab f in
   t_and_l (List.map push ql)
 
 (* a type is affected if a modified region is reachable from it *)
@@ -317,8 +317,8 @@ let adjustment dst dst' =
 
 (* combine postconditions with preconditions *)
 
-let wp_close lab v ql wp =
-  let sp = sp_of_post lab v ql in
+let wp_close loc lab v ql wp =
+  let sp = sp_of_post loc lab v ql in
   match term_of_post ~prop:false v sp with
   | Some (t, sp) -> wp_let v t (sp_implies sp wp)
   | None ->      wp_forall [v] (sp_implies sp wp)
@@ -577,8 +577,8 @@ let bind_oldies c f =
   t_subst sbs f
 
 let spec_while env e invl varl =
-  let init = wp_of_inv expl_loop_init invl in
-  let keep = wp_of_inv expl_loop_keep invl in
+  let init = wp_of_inv None expl_loop_init invl in
+  let keep = wp_of_inv None expl_loop_keep invl in
   if varl = [] then init, Mvs.empty, keep else
   let o2n, olds = oldify_variant varl in
   let d = decrease env e.e_loc expl_loop_vari olds varl in
@@ -587,8 +587,8 @@ let spec_while env e invl varl =
 let spec_for env _e v ({pv_vs = a}, d, {pv_vs = b}) invl =
   let a = t_var a and b = t_var b in
   let i = t_var v and one = t_nat_const 1 in
-  let prev = wp_of_inv expl_loop_init invl in
-  let keep = wp_of_inv expl_loop_keep invl in
+  let prev = wp_of_inv None expl_loop_init invl in
+  let keep = wp_of_inv None expl_loop_keep invl in
   let gt, le, pl = match d with
     | To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
     | DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn in
@@ -598,13 +598,6 @@ let spec_for env _e v ({pv_vs = a}, d, {pv_vs = b}) invl =
   let keep = t_subst_single v (fs_app pl [i;one] ty_int) keep in
   let last = t_subst_single v (fs_app pl [b;one] ty_int) prev in
   a_gt_b, init, sp_and bounds prev, keep, sp_and a_le_b last
-
-let eff_refresh e =
-  (* when we havok the VC of a locally defined function,
-     we must take into account every write in the following
-     expression and ignore the resets, because the function
-     may be executed before the resets. *)
-  eff_write e.e_effect.eff_reads e.e_effect.eff_writes
 
 let rec wp_expr env e res q xq = match e.e_node with
   | _ when Slab.mem sp_label e.e_label ->
@@ -634,15 +627,12 @@ let rec wp_expr env e res q xq = match e.e_node with
       t_subst_single res (vc_label e (t_const c)) q
 
   | Eexec (ce, c) ->
-      let q = wp_close expl_post res c.cty_post q in
-      let join cq (v,q) = wp_close expl_xpost v cq q in
+      let p = wp_of_pre env e.e_loc expl_pre c.cty_pre in
+      let q = wp_close e.e_loc expl_post res c.cty_post q in
+      let join cq (v,q) = wp_close e.e_loc expl_xpost v cq q in
       let w = wp_inter_mexn q join (cty_xpost_real c) xq in
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
-      let p = wp_of_pre env e.e_loc expl_pre c.cty_pre in
-      let vc = match ce.c_node with
-        | Cfun e -> vc_fun env true ce.c_cty e
-        | Capp _ | Cpur _ | Cany -> t_true in
-      vc_label e (wp_and vc (wp_and p w))
+      vc_label e (wp_and (vc_cexp env true ce) (wp_and p w))
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -657,26 +647,10 @@ let rec wp_expr env e res q xq = match e.e_node with
       let q = wp_expr env e1 res q xq in
       vc_label e (wp_expr env e0 (res_of_expr e0) q xq)
 
-  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Cfun e0; c_cty = c}), e1) ->
+  | Elet ((LDsym _| LDrec _) as ld, e1) ->
       let q = wp_expr env e1 res q xq in
-      let w = vc_fun env true c e0 in
-      let w = wp_havoc env (eff_refresh e1) w in
-      vc_label e (wp_and w q)
-  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Capp _|Cpur _|Cany}), e1) ->
-      vc_label e (wp_expr env e1 res q xq)
-  | Elet (LDsym _, _) ->
-      assert false (* TODO *)
-
-  | Elet (LDrec rdl, e1)
-    when List.for_all (fun rd -> rd.rec_sym.rs_logic = RLnone) rdl ->
-      let q = wp_expr env e1 res q xq in
-      let wl = vc_rec env true rdl in
-      let w = List.fold_right wp_and wl t_true in
-      let w = wp_havoc env (eff_refresh e1) w in
-      vc_label e (wp_and w q)
-  | Elet (LDrec _, _) ->
-      assert false (* TODO *)
-
+      let close_wp, _ = vc_let_sym env true ld e1 in
+      vc_label e (close_wp q)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
       let v, ok, ne = sp_pure_if env e0.e_loc e1 e2 res in
       let q = sp_wp_close res ne Mvs.empty q in
@@ -705,13 +679,13 @@ let rec wp_expr env e res q xq = match e.e_node with
       vc_label e (wp_expr env e0 v q xq)
   | Eassert (Assert, f) ->
       let q = t_subst_single res t_void q in
-      wp_and_asym (vc_label e (vc_expl expl_assert f)) q
+      wp_and_asym (vc_label e (vc_expl None expl_assert f)) q
   | Eassert (Assume, f) ->
       let q = t_subst_single res t_void q in
-      sp_implies (vc_label e (vc_expl expl_assume f)) q
+      sp_implies (vc_label e (vc_expl None expl_assume f)) q
   | Eassert (Check, f) ->
       let q = t_subst_single res t_void q in
-      wp_and (vc_label e (vc_expl expl_check f)) q
+      wp_and (vc_label e (vc_expl None expl_check f)) q
   | Eghost e0 ->
       vc_label e (wp_expr env e0 res q xq)
   | Epure t ->
@@ -719,12 +693,10 @@ let rec wp_expr env e res q xq = match e.e_node with
       begin match t.t_ty with
         | Some ty when ty_equal ty ty_unit -> t_subst_single res t_void q
         | Some _ -> wp_let res t q
-        | None ->
-            let f = t_iff_simp (t_equ (t_var res) t_bool_true) t in
-            wp_forall [res] (sp_implies f q)
+        | None -> wp_let res (t_if_simp t t_bool_true t_bool_false) q
       end
   | Eabsurd ->
-      vc_label e (vc_expl expl_absurd t_false)
+      vc_label e (vc_expl e.e_loc expl_absurd t_false)
   | Eassign asl ->
       let q = t_subst_single res t_void q in
       let cv = e.e_effect.eff_covers in
@@ -767,17 +739,14 @@ and sp_expr env e res xres dst = match e.e_node with
 
   | Eexec (ce, c) ->
       let sp_of_post lab v ql =
-        let cq = sp_of_post lab v ql in
+        let cq = sp_of_post e.e_loc lab v ql in
         let sp = sp_havoc env e.e_effect v cq dst in
         bind_oldies c sp in
       let ne = sp_of_post expl_post res c.cty_post in
       let join v ql = sp_of_post expl_xpost v ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
       let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
-      let vc = match ce.c_node with
-        | Cfun e -> vc_fun env false ce.c_cty e
-        | Capp _ | Cpur _ | Cany -> t_true in
-      out_label e (wp_and vc ok, ne, ex)
+      out_label e (wp_and (vc_cexp env false ce) ok, ne, ex)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
@@ -794,26 +763,10 @@ and sp_expr env e res xres dst = match e.e_node with
       let out = sp_expr env e1 res xres dst in
       out_label e (sp_pred_seq env e0 v xres out e1 eff_empty dst)
 
-  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Cfun e0; c_cty = c}), e1) ->
+  | Elet ((LDsym _| LDrec _) as ld, e1) ->
       let ok, ne, ex = sp_expr env e1 res xres dst in
-      let w = vc_fun env false c e0 in
-      let w = wp_havoc env (eff_refresh e1) w in
-      out_label e (wp_and w ok, ne, ex)
-  | Elet (LDsym ({rs_logic = RLnone}, {c_node = Capp _|Cpur _|Cany}), e1) ->
-      out_label e (sp_expr env e1 res xres dst)
-  | Elet (LDsym _, _) ->
-      assert false (* TODO *)
-
-  | Elet (LDrec rdl, e1)
-    when List.for_all (fun rd -> rd.rec_sym.rs_logic = RLnone) rdl ->
-      let ok, ne, ex = sp_expr env e1 res xres dst in
-      let wl = vc_rec env false rdl in
-      let w = List.fold_right wp_and wl t_true in
-      let w = wp_havoc env (eff_refresh e1) w in
-      out_label e (wp_and w ok, ne, ex)
-  | Elet (LDrec _, _) ->
-      assert false (* TODO *)
-
+      let close_wp, close_sp = vc_let_sym env false ld e1 in
+      out_label e (close_wp ok, close_sp ne, Mexn.map close_sp ex)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
       let v, ok, ne = sp_pure_if env e0.e_loc e1 e2 res in
       let eff = eff_union_par e1.e_effect e2.e_effect in
@@ -882,12 +835,12 @@ and sp_expr env e res xres dst = match e.e_node with
       let ex = union_mexn ex (Mexn.singleton xs ne) in
       out_label e (ok, t_false, ex)
   | Eassert (Assert, f) ->
-      let ok = vc_label e (vc_expl expl_assert f) in
+      let ok = vc_label e (vc_expl None expl_assert f) in
       ok, ok, Mexn.empty
   | Eassert (Assume, f) ->
-      t_true, vc_label e (vc_expl expl_assume f), Mexn.empty
+      t_true, vc_label e (vc_expl None expl_assume f), Mexn.empty
   | Eassert (Check, f) ->
-      vc_label e (vc_expl expl_check f), t_true, Mexn.empty
+      vc_label e (vc_expl None expl_check f), t_true, Mexn.empty
   | Eghost e0 ->
       out_label e (sp_expr env e0 res xres dst)
   | Epure t ->
@@ -895,10 +848,10 @@ and sp_expr env e res xres dst = match e.e_node with
       let ne = match t.t_ty with
         | Some ty when ty_equal ty ty_unit -> t_true
         | Some _ -> t_equ (t_var res) t
-        | None -> t_iff_simp (t_equ (t_var res) t_bool_true) t in
+        | None -> t_equ (t_var res) (t_if_simp t t_bool_true t_bool_false) in
       t_true, ne, Mexn.empty
   | Eabsurd ->
-      let ok = vc_label e (vc_expl expl_absurd t_false) in
+      let ok = vc_label e (vc_expl e.e_loc expl_absurd t_false) in
       ok, ok, Mexn.empty
   | Eassign asl ->
       let cv = e.e_effect.eff_covers in
@@ -985,6 +938,8 @@ and sp_pred_seq env e0 res xres out e1 eff dst =
   sp_seq env e0 res xres out eff dst
 
 and sp_seq env e res xres out eff dst = match e.e_node with
+  | Eghost e1 ->
+      sp_seq env (e_label_copy e e1) res xres out eff dst
   | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
     when Slab.mem proxy_label v.vs_name.id_label ->
     (* we push the label down, past the inserted "let" *)
@@ -999,8 +954,10 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let v = res_of_expr e0 in
       let out = sp_seq env e1 res xres out eff dst in
       out_label e (sp_pred_seq env e0 v xres out e1 eff dst)
-  | Eghost e1 ->
-      sp_seq env (e_label_copy e e1) res xres out eff dst
+  | Elet ((LDsym _| LDrec _) as ld, e1) ->
+      let ok, ne, ex = sp_seq env e1 res xres out eff dst in
+      let close_wp, close_sp = vc_let_sym env false ld e1 in
+      out_label e (close_wp ok, close_sp ne, Mexn.map close_sp ex)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
       let ok2, ne2, ex2 = out in
       let v, ok1, ne1 = sp_pure_if env e0.e_loc e1 e2 res in
@@ -1039,6 +996,85 @@ and sp_pure_if env loc e1 e2 res =
     | None -> t_if_simp test ne1 ne2 in
   v.pv_vs, wp_if test ok1 ok2, ne
 
+and vc_let_sym env vc_wp ld {e_effect = eff} =
+  (* when we havoc the VC of a locally defined function,
+     we must take into account every write in the following
+     expression and ignore the resets, because the function
+     may be executed before the resets. *)
+  let eff = eff_write eff.eff_reads eff.eff_writes in
+  (* compute the pre-condition *)
+  let ok = match ld with
+    | LDvar _ -> assert false (* not applicable *)
+    | LDsym (_, {c_node = Capp _| Cpur _| Cany}) ->
+        t_true
+    | LDsym (_, {c_node = Cfun e; c_cty = cty}) ->
+        wp_havoc env eff (vc_fun env vc_wp cty e)
+    | LDrec rdl ->
+        let wl = vc_rec env vc_wp rdl in
+        wp_havoc env eff (List.fold_right wp_and wl t_true) in
+  (* compute the post-condition, as in [Pdecl.create_let_decl] *)
+  let cty_axiom cty f axms =
+    if t_equal f t_true then axms else
+    let p = sp_of_pre expl_pre cty.cty_pre in
+    let args = List.map (fun v -> v.pv_vs) cty.cty_args in
+    let f = wp_forall args (sp_implies p (bind_oldies cty f)) in
+    wp_havoc env eff f :: axms in
+  let add_rs sm s c (abst,axms) = match s.rs_logic with
+    | RLls _ -> assert false
+    | RLnone -> abst, axms
+    | RLlemma ->
+        let cty = c.c_cty in
+        let r,q = wp_of_post expl_post cty.cty_result cty.cty_post in
+        let f = if ty_equal r.vs_ty ty_unit
+          then t_subst_single r t_void q
+          else t_exists_close_simp [r] [] q in
+        abst, cty_axiom cty f axms
+    | RLpv v ->
+        let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
+        let cty = match c.c_node with
+          | Cany | Capp _ | Cpur _ -> c.c_cty
+          | Cfun e ->
+              let res = res_of_expr e in
+              let prop = ity_equal e.e_ity ity_bool in
+              let ql = match term_of_expr ~prop e with
+                | Some f ->
+                    let f = match f.t_node with
+                      | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
+                        when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
+                      | _ -> f in
+                    let q = match f.t_ty with
+                      | None -> t_iff (t_equ (t_var res) t_bool_true) f
+                      | Some _ -> t_equ (t_var res) f in
+                    [create_post res q]
+                | None when c.c_cty.cty_post = [] ->
+                    begin match post_of_expr (t_var res) e with
+                    | Some f -> [create_post res f]
+                    | None -> [] end
+                | None -> [] in
+              cty_add_post c.c_cty ql in
+        let ql = cty_exec_post cty in
+        let q = sp_of_post None expl_post v.pv_vs ql in
+        v.pv_vs :: abst, cty_axiom cty q axms in
+  let vl, ax = match ld with
+    | LDvar _ -> assert false (* not applicable *)
+    | LDsym (s,c) -> add_rs Mrs.empty s c ([],[])
+    | LDrec rdl ->
+        let add_rd sm d = Mrs.add d.rec_rsym d.rec_sym sm in
+        let sm = List.fold_left add_rd Mrs.empty rdl in
+        let add_rd d dl = add_rs sm d.rec_sym d.rec_fun dl in
+        List.fold_right add_rd rdl ([],[]) in
+  let close_wp wp =
+    wp_and ok (wp_forall vl (List.fold_right sp_implies ax wp)) in
+  let close_sp = if vc_wp then (fun _ -> assert false) else
+    let sbs = List.fold_left (fun sbs v ->
+      Mvs.add v (t_var (clone_vs v)) sbs) Mvs.empty vl in
+    fun sp -> t_subst sbs (List.fold_right sp_and ax sp) in
+  close_wp, close_sp
+
+and vc_cexp env ?(o2n=Mvs.empty) vc_wp c = match c.c_node with
+  | Cfun e -> vc_fun ~o2n env vc_wp c.c_cty e
+  | Capp _ | Cpur _ | Cany -> t_true
+
 and vc_fun env ?(o2n=Mvs.empty) vc_wp c e =
   let p = sp_of_pre expl_pre c.cty_pre in
   let args = List.map (fun v -> v.pv_vs) c.cty_args in
@@ -1051,13 +1087,12 @@ and vc_fun env ?(o2n=Mvs.empty) vc_wp c e =
 
 and vc_rec ({letrec_ps = lps} as env) vc_wp rdl =
   let vc_rd {rec_fun = c; rec_varl = varl} =
-    let e = match c.c_node with Cfun e -> e | _ -> assert false in
-    if varl = [] then vc_fun env vc_wp c.c_cty e else
+    if varl = [] then vc_cexp env vc_wp c else
     let o2n, varl = oldify_variant varl in
     let add lps rd = let decr = ls_decr_of_rec_defn rd in
       Mls.add (Opt.get decr) (varl, List.map snd rd.rec_varl) lps in
     let env = { env with letrec_ps = List.fold_left add lps rdl } in
-    vc_fun env ~o2n vc_wp c.c_cty e in
+    vc_cexp env ~o2n vc_wp c in
   List.map vc_rd rdl
 
 let mk_vc_decl kn id f =
