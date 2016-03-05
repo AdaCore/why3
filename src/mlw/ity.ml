@@ -1378,6 +1378,7 @@ let cty_exec_post_raw c =
   al, ity, res, List.map conv_post c.cty_post
 
 let cty_exec_post c =
+  if c.cty_args = [] then c.cty_post else
   let _, _, res, ql = cty_exec_post_raw c in
   List.map (create_post res) ql
 
