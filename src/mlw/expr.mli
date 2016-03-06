@@ -157,6 +157,7 @@ and rec_defn = private {
 (** {2 Expressions} *)
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
+val e_label_push : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 

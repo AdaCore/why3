@@ -351,6 +351,18 @@ let e_label_copy { e_label = lab; e_loc = loc } e =
   let loc = if e.e_loc = None then loc else e.e_loc in
   { e with e_label = lab; e_loc = loc }
 
+let proxy_label = create_label "whyml_proxy_symbol"
+let proxy_labels = Slab.singleton proxy_label
+
+let rec e_label_push ?loc l e = match e.e_node with
+  | (Elet (LDvar ({pv_vs = {vs_name = id}},_) as ld, e1)
+  |  Elet (LDsym ({rs_name = id},_) as ld, e1))
+    when Slab.mem proxy_label id.id_label ->
+      let e1 = e_label_push ?loc l e1 in
+      { e with e_node = Elet (ld, e1); e_loc = loc }
+  | _ ->
+      { e with e_label = l; e_loc = loc }
+
 let e_ghost e = e.e_effect.eff_ghost
 let c_ghost c = c.c_cty.cty_effect.eff_ghost
 
@@ -727,9 +739,6 @@ let c_pur s vl ityl ity =
   let eff = eff_ghostify true eff_empty in
   let cty = create_cty v_args [] [q] Mexn.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
-
-let proxy_label = create_label "whyml_proxy_symbol"
-let proxy_labels = Slab.singleton proxy_label
 
 let mk_proxy e hd = match e.e_node with
   | Evar v when Slab.is_empty e.e_label -> hd, v

@@ -634,11 +634,6 @@ let rec wp_expr env e res q xq = match e.e_node with
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
       vc_label e (wp_and (vc_cexp env true ce) (wp_and p w))
 
-  | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
-    when Slab.mem proxy_label v.vs_name.id_label ->
-    (* we push the label down, past the inserted "let" *)
-      let q = wp_expr env (e_label_copy e e1) res q xq in
-      wp_expr env e0 v q xq
   | Elet (LDvar ({pv_vs = v}, e0), e1)
   | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
       let q = wp_expr env e1 res q xq in
@@ -748,12 +743,6 @@ and sp_expr env e res xres dst = match e.e_node with
       let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
       out_label e (wp_and (vc_cexp env false ce) ok, ne, ex)
 
-  | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
-    when Slab.mem proxy_label v.vs_name.id_label ->
-    (* we push the label down, past the inserted "let" *)
-      let e1 = e_label_copy e e1 in
-      let out = sp_expr env e1 res xres dst in
-      sp_pred_let env e0 v xres out e1 eff_empty dst
   | Elet (LDvar ({pv_vs = v}, e0), e1)
   | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
       let out = sp_expr env e1 res xres dst in
@@ -940,12 +929,6 @@ and sp_pred_seq env e0 res xres out e1 eff dst =
 and sp_seq env e res xres out eff dst = match e.e_node with
   | Eghost e1 ->
       sp_seq env (e_label_copy e e1) res xres out eff dst
-  | Elet (LDvar ({pv_vs = v}, e0), e1) (* FIXME: what for? *)
-    when Slab.mem proxy_label v.vs_name.id_label ->
-    (* we push the label down, past the inserted "let" *)
-      let e1 = e_label_copy e e1 in
-      let out = sp_seq env e1 res xres out eff dst in
-      sp_pred_let env e0 v xres out e1 eff dst
   | Elet (LDvar ({pv_vs = v}, e0), e1)
   | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
       let out = sp_seq env e1 res xres out eff dst in
@@ -1063,9 +1046,11 @@ and vc_let_sym env vc_wp ld {e_effect = eff} =
         let sm = List.fold_left add_rd Mrs.empty rdl in
         let add_rd d dl = add_rs sm d.rec_sym d.rec_fun dl in
         List.fold_right add_rd rdl ([],[]) in
+  (* TODO: switch to sp_*_close when it handles multiple results *)
   let close_wp wp =
     wp_and ok (wp_forall vl (List.fold_right sp_implies ax wp)) in
   let close_sp = if vc_wp then (fun _ -> assert false) else
+    (* replace pv with fresh vs so that sp_wp_close binds them *)
     let sbs = List.fold_left (fun sbs v ->
       Mvs.add v (t_var (clone_vs v)) sbs) Mvs.empty vl in
     fun sp -> t_subst sbs (List.fold_right sp_and ax sp) in

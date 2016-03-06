@@ -1022,7 +1022,7 @@ let rec expr uloc env ({de_loc = loc} as de) =
   let e = Loc.try3 ?loc try_expr uloc env de in
   let loc = Opt.get_def loc uloc in
   if loc = None && Slab.is_empty labs
-  then e else e_label ?loc labs e
+  then e else e_label_push ?loc labs e
 
 and cexp uloc env ghost ({de_loc = loc} as de) vl =
   let uloc, labs, de = strip uloc Slab.empty de in
