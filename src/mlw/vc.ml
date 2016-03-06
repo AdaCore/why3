@@ -28,7 +28,8 @@ let debug_sp = Debug.register_flag "vc_sp"
 let no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
-let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
+let ls_of_rs s =
+  match s.rs_logic with RLls ls -> ls | _ -> assert false
 
 let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
 let clone_pv v = clone_vs v.pv_vs
@@ -36,14 +37,22 @@ let clone_pv v = clone_vs v.pv_vs
 let old_of_pv {pv_vs = v; pv_ity = ity} =
   create_pvsymbol ~ghost:true (id_clone v.vs_name) (ity_purify ity)
 
-(* TODO? take a string as an argument? many of these are proxies *)
-let res_of_ty ty = create_vsymbol (id_fresh "result") ty
-let res_of_ity ity = res_of_ty (ty_of_ity ity)
+let res_of_ity ity =
+  create_vsymbol (id_fresh "result") (ty_of_ity ity)
 
-let res_of_expr e =
-  create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_ity e.e_ity)
+let proxy_of_expr =
+  let label = Slab.singleton proxy_label in fun e ->
+  (* often we need a proxy variable to be a pvsymbol
+     to prevent it from being bound by sp_wp_close *)
+  let id = id_fresh ?loc:e.e_loc ~label "o" in
+  (create_pvsymbol ~ghost:true id e.e_ity).pv_vs
 
-let vc_freepvs s v q = pvs_of_vss s (Mvs.remove v (t_freevars Mvs.empty q))
+let test_of_expr e =
+  let v = proxy_of_expr e in
+  v, t_equ (t_var v) t_bool_true
+
+let vc_freepvs s v q =
+  pvs_of_vss s (Mvs.remove v (t_freevars Mvs.empty q))
 
 let sp_label = Ident.create_label "vc:sp"
 let wp_label = Ident.create_label "vc:wp"
@@ -169,7 +178,7 @@ let cty_xpost_real c = (* drop raises {X -> false} *)
   Mexn.set_inter c.cty_xpost c.cty_effect.eff_raises
 
 let res_of_xbranch xs vl map out = match vl with
-  | [] -> res_of_ty ty_unit, out
+  | [] -> res_of_ity ity_unit, out
   | [v] -> v.pv_vs, out
   | vl ->
       let v = res_of_ity xs.xs_ity in
@@ -545,11 +554,16 @@ let sp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} res sp dst =
   let regs = name_regions kn cv dst in
   sp_havoc_raw kn rhs_of_effect wr sp dst regs
 
-let sp_complete {eff_covers = cv} sp dst =
-  let check o n sp =
+let dst_complete sp dst =
+  let add o n sp =
+    sp_and sp (t_equ (t_var n) (t_var o.pv_vs)) in
+  Mpv.fold add dst sp
+
+let eff_complete {eff_covers = cv} sp dst =
+  let add o n sp =
     if pv_affected cv o then sp else
     sp_and sp (t_equ (t_var n) (t_var o.pv_vs)) in
-  Mpv.fold check dst sp
+  Mpv.fold add dst sp
 
 (* fast-related tools *)
 
@@ -559,13 +573,14 @@ let out_label e out = out_map (vc_label e) out
 
 let out_complete eff (ok, ne, ex) xres dst =
   let join _ sp xres = match sp, xres with
-    | Some sp, Some _ -> Some (sp_complete eff sp dst)
+    | Some sp, Some _ -> Some (eff_complete eff sp dst)
     | None, Some _ -> Some t_false | _, None -> None in
-  ok, sp_complete eff ne dst, Mexn.merge join ex xres
+  ok, eff_complete eff ne dst, Mexn.merge join ex xres
 
-let sp_adjust eff dst dst' =
-  let adj = adjustment dst dst' in
-  fun sp -> sp_complete eff (t_subst adj sp) dst'
+let sp_adjust dst zdst =
+  let adj = adjustment dst zdst in
+  let dst = Mpv.set_diff zdst dst in
+  fun sp -> dst_complete (t_subst adj sp) dst
 
 (* classical WP / fast WP *)
 
@@ -640,24 +655,23 @@ let rec wp_expr env e res q xq = match e.e_node with
       vc_label e (wp_expr env e0 v q xq)
   | Ecase (e0, [pp, e1]) when anon_pat pp ->
       let q = wp_expr env e1 res q xq in
-      vc_label e (wp_expr env e0 (res_of_expr e0) q xq)
+      vc_label e (wp_expr env e0 (proxy_of_expr e0) q xq)
 
   | Elet ((LDsym _| LDrec _) as ld, e1) ->
       let q = wp_expr env e1 res q xq in
       let close_wp, _ = vc_let_sym env true ld e1 in
       vc_label e (close_wp q)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
-      let v, ok, ne = sp_pure_if env e0.e_loc e1 e2 res in
+      let v, ok, ne = sp_pure_if env e0 e1 e2 res in
       let q = sp_wp_close res ne Mvs.empty q in
       vc_label e (wp_expr env e0 v (wp_and ok q) xq)
   | Eif (e0, e1, e2) ->
-      let v = res_of_expr e0 in
-      let test = t_equ (t_var v) t_bool_true in
+      let v, test = test_of_expr e0 in
       let q1 = wp_expr env e1 res q xq in
       let q2 = wp_expr env e2 res q xq in
       vc_label e (wp_expr env e0 v (wp_if test q1 q2) xq)
   | Ecase (e0, bl) ->
-      let v = res_of_expr e0 in
+      let v = proxy_of_expr e0 in
       let branch ({pp_pat = pat}, e) =
         t_close_branch pat (wp_expr env e res q xq) in
       let q = wp_case (t_var v) (List.map branch bl) in
@@ -669,8 +683,8 @@ let rec wp_expr env e res q xq = match e.e_node with
       let xq = Mexn.set_union (Mexn.mapi branch bl) xq in
       vc_label e (wp_expr env e0 res q xq)
   | Eraise (xs, e0) ->
-      let v, q = try Mexn.find xs xq with Not_found ->
-        res_of_expr e0, t_true in
+      let v, q = try Mexn.find xs xq with
+        | Not_found -> proxy_of_expr e0, t_true in
       vc_label e (wp_expr env e0 v q xq)
   | Eassert (Assert, f) ->
       let q = t_subst_single res t_void q in
@@ -682,7 +696,7 @@ let rec wp_expr env e res q xq = match e.e_node with
       let q = t_subst_single res t_void q in
       wp_and (vc_label e (vc_expl None expl_check f)) q
   | Eghost e0 ->
-      vc_label e (wp_expr env e0 res q xq)
+      wp_expr env (e_label_copy e e0) res q xq
   | Epure t ->
       let t = vc_label e t in
       begin match t.t_ty with
@@ -704,11 +718,10 @@ let rec wp_expr env e res q xq = match e.e_node with
       (* wp(while e0 inv I var V do e1 done, Q, R) =
          I and forall S. I ->
                  wp(e0, (if result then wp(e1, I /\ decr(V), R) else Q), R) *)
-      let v = res_of_expr e0 in
+      let v, test = test_of_expr e0 in
       let q = t_subst_single res t_void q in
       let init, o2n, keep = spec_while env e invl varl in
-      let w = wp_expr env e1 res keep xq in
-      let w = wp_if (t_equ (t_var v) t_bool_true) w q in
+      let w = wp_if test (wp_expr env e1 res keep xq) q in
       let w = sp_implies init (wp_expr env e0 v w xq) in
       let w = wp_havoc env e.e_effect (t_subst o2n w) in
       vc_label e (wp_and init w)
@@ -733,6 +746,8 @@ and sp_expr env e res xres dst = match e.e_node with
       t_true, t_equ (t_var res) t, Mexn.empty
 
   | Eexec (ce, c) ->
+      let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
+      let ok = wp_and (vc_cexp env false ce) ok in
       let sp_of_post lab v ql =
         let cq = sp_of_post e.e_loc lab v ql in
         let sp = sp_havoc env e.e_effect v cq dst in
@@ -740,15 +755,14 @@ and sp_expr env e res xres dst = match e.e_node with
       let ne = sp_of_post expl_post res c.cty_post in
       let join v ql = sp_of_post expl_xpost v ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
-      let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
-      out_label e (wp_and (vc_cexp env false ce) ok, ne, ex)
+      out_label e (ok, ne, ex)
 
   | Elet (LDvar ({pv_vs = v}, e0), e1)
   | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
       let out = sp_expr env e1 res xres dst in
       out_label e (sp_pred_let env e0 v xres out e1 eff_empty dst)
   | Ecase (e0, [pp, e1]) when anon_pat pp ->
-      let v = res_of_expr e0 in
+      let v = proxy_of_expr e0 in
       let out = sp_expr env e1 res xres dst in
       out_label e (sp_pred_seq env e0 v xres out e1 eff_empty dst)
 
@@ -757,69 +771,68 @@ and sp_expr env e res xres dst = match e.e_node with
       let close_wp, close_sp = vc_let_sym env false ld e1 in
       out_label e (close_wp ok, close_sp ne, Mexn.map close_sp ex)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
-      let v, ok, ne = sp_pure_if env e0.e_loc e1 e2 res in
-      let eff = eff_union_par e1.e_effect e2.e_effect in
-      out_label e (sp_seq env e0 v xres (ok,ne,Mexn.empty) eff dst)
+      let v, ok, ne = sp_pure_if env e0 e1 e2 res in
+      let eff12 = eff_union_par e1.e_effect e2.e_effect in
+      out_label e (sp_seq env e0 v xres (ok,ne,Mexn.empty) eff12 dst)
   | Eif (e0, e1, e2) ->
-      let eff = eff_union_par e1.e_effect e2.e_effect in
-      let xres' = Mexn.set_inter xres eff.eff_raises in
-      let dst' = dst_affected eff dst in
-      let out1 = sp_expr env e1 res xres' dst' in
-      let out2 = sp_expr env e2 res xres' dst' in
-      let ok1, ne1, ex1 = out_complete e1.e_effect out1 xres' dst' in
-      let ok2, ne2, ex2 = out_complete e2.e_effect out2 xres' dst' in
-      let v = res_of_expr e0 in
-      let test = t_equ (t_var v) t_bool_true in
+      let eff12 = eff_union_par e1.e_effect e2.e_effect in
+      let xres12 = Mexn.set_inter xres eff12.eff_raises in
+      let dst12 = dst_affected eff12 dst in
+      let out1 = sp_expr env e1 res xres12 dst12 in
+      let out2 = sp_expr env e2 res xres12 dst12 in
+      let ok1, ne1, ex1 = out_complete e1.e_effect out1 xres12 dst12 in
+      let ok2, ne2, ex2 = out_complete e2.e_effect out2 xres12 dst12 in
+      let v, test = test_of_expr e0 in
       let ok = wp_if test ok1 ok2 in
       let ne = t_if_simp test ne1 ne2 in
       let ex = inter_mexn (t_if_simp test) ex1 ex2 in
-      out_label e (sp_seq env e0 v xres (ok,ne,ex) eff dst)
+      out_label e (sp_seq env e0 v xres (ok,ne,ex) eff12 dst)
   | Ecase (e0, bl) ->
-      let eff = List.fold_left (fun acc (p,e) ->
+      let eff12 = List.fold_left (fun acc (p,e1) ->
         let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
-        let eff = eff_bind pvs e.e_effect in
+        let eff = eff_bind pvs e1.e_effect in
         eff_union_par acc eff) eff_empty bl in
-      let xres' = Mexn.set_inter xres eff.eff_raises in
-      let dst' = dst_affected eff dst in
-      let outl = List.map (fun ({pp_pat = p}, e) ->
-        let out = sp_expr env e res xres' dst' in
-        let out = out_complete e.e_effect out xres' dst' in
+      let xres12 = Mexn.set_inter xres eff12.eff_raises in
+      let dst12 = dst_affected eff12 dst in
+      let out12 = List.map (fun ({pp_pat = p}, e1) ->
+        let out = sp_expr env e1 res xres12 dst12 in
+        let out = out_complete e1.e_effect out xres12 dst12 in
         out_map (t_close_branch p) out) bl in
-      let v = res_of_expr e0 in
-      let t = t_var v in
-      let ok = wp_case t (List.map (fun (ok,_,_) -> ok) outl) in
-      let ne = t_case_simp t (List.map (fun (_,ne,_) -> ne) outl) in
-      let xbl = Mexn.map (fun _ -> []) xres' in
+      let v = proxy_of_expr e0 in let t = t_var v in
+      let ok = wp_case t (List.map (fun (ok,_,_) -> ok) out12) in
+      let ne = t_case_simp t (List.map (fun (_,ne,_) -> ne) out12) in
+      let xbl = Mexn.map (fun _ -> []) xres12 in
       let xbl = List.fold_right (fun (_,_,ex) xbl ->
-        inter_mexn (fun x l -> x::l) ex xbl) outl xbl in
+        inter_mexn (fun x l -> x::l) ex xbl) out12 xbl in
       let ex = Mexn.map (t_case_simp t) xbl in
-      out_label e (sp_seq env e0 v xres (ok,ne,ex) eff dst)
+      out_label e (sp_seq env e0 v xres (ok,ne,ex) eff12 dst)
   | Etry (e0, xl) ->
-      let eff = Mexn.fold (fun _ (vl,e) acc ->
-        let eff = eff_bind (Spv.of_list vl) e.e_effect in
+      let eff12 = Mexn.fold (fun _ (vl,e1) acc ->
+        let eff = eff_bind (Spv.of_list vl) e1.e_effect in
         eff_union_par acc eff) xl eff_empty in
-      let xres' = Mexn.set_inter xres eff.eff_raises in
-      let dst' = dst_affected eff dst in
-      let outm = Mexn.mapi (fun xs (vl,e) ->
-        let out = sp_expr env e res xres' dst' in
-        let out = out_complete e.e_effect out xres' dst' in
+      let xres12 = Mexn.set_inter xres eff12.eff_raises in
+      let dst12 = dst_affected eff12 dst in
+      let out12 = Mexn.mapi (fun xs (vl,e1) ->
+        let out = sp_expr env e1 res xres12 dst12 in
+        let out = out_complete e1.e_effect out xres12 dst12 in
         res_of_xbranch xs vl out_map out) xl in
-      let xres = Mexn.set_union (Mexn.map fst outm) xres in
-      let dst = dst_step_back e0.e_effect eff dst in
-      let ok, ne, ex = sp_expr env e0 res xres dst in
-      let adv = advancement dst in
+      let xres = Mexn.set_union (Mexn.map fst out12) xres in
+      let dst0 = dst_step_back e0.e_effect eff12 dst in
+      let ok, ne, ex = sp_expr env e0 res xres dst0 in
+      let adv = advancement dst0 in
       let join sp (v,(ok,_,_)) = sp_wp_close v sp adv ok in
-      let ok = wp_inter_mexn ok join ex outm in
-      let adjust = sp_adjust e0.e_effect dst dst' in
+      let ok = wp_inter_mexn ok join ex out12 in
+      let adjust = sp_adjust dst0 dst12 in
       let join sp (v,(_,ne,_)) = sp_sp_close v sp adv ne in
-      let ne = sp_inter_mexn (adjust ne) join ex outm in
+      let ne = sp_inter_mexn (adjust ne) join ex out12 in
       let join sp (v,(_,_,ex)) = Mexn.map (sp_sp_close v sp adv) ex in
       let ex = Mexn.fold (fun _ x1 x2 -> union_mexn x2 x1)
-        (inter_mexn join ex outm)
-        (Mexn.map adjust (Mexn.set_diff ex outm)) in
+        (inter_mexn join ex out12)
+        (Mexn.map adjust (Mexn.set_diff ex out12)) in
       out_label e (ok, ne, ex)
   | Eraise (xs, e0) ->
-      let v = try Mexn.find xs xres with Not_found -> res_of_expr e0 in
+      let v = try Mexn.find xs xres with
+        | Not_found -> proxy_of_expr e0 in
       let ok, ne, ex = sp_expr env e0 v xres dst in
       let ex = union_mexn ex (Mexn.singleton xs ne) in
       out_label e (ok, t_false, ex)
@@ -827,11 +840,13 @@ and sp_expr env e res xres dst = match e.e_node with
       let ok = vc_label e (vc_expl None expl_assert f) in
       ok, ok, Mexn.empty
   | Eassert (Assume, f) ->
-      t_true, vc_label e (vc_expl None expl_assume f), Mexn.empty
+      let ne = vc_label e (vc_expl None expl_assume f) in
+      t_true, ne, Mexn.empty
   | Eassert (Check, f) ->
-      vc_label e (vc_expl None expl_check f), t_true, Mexn.empty
+      let ok = vc_label e (vc_expl None expl_check f) in
+      ok, t_true, Mexn.empty
   | Eghost e0 ->
-      out_label e (sp_expr env e0 res xres dst)
+      sp_expr env (e_label_copy e e0) res xres dst
   | Epure t ->
       let t = vc_label e t in
       let ne = match t.t_ty with
@@ -854,14 +869,13 @@ and sp_expr env e res xres dst = match e.e_node with
       (* ok: I /\ !! I -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> I /\ V)))
          ne:      !! I /\         (ne0 /\ !test)
          ex:      !! I /\ (ex0 \/ (ne0 /\  test /\ ex1)) *)
-      let v = res_of_expr e0 in
-      let test = t_equ (t_var v) t_bool_true in
+      let v, test = test_of_expr e0 in
       let init, o2n, keep = spec_while env e invl varl in
       let out = keep, t_false, Mexn.empty in
       let dst = dst_affected e.e_effect dst in
       let eff = eff_read (t_freepvs Spv.empty keep) in
       let dst1 = dst_step_back e1.e_effect eff dst in
-      let ne = sp_complete eff_empty (t_not test) dst1 in
+      let ne = dst_complete (t_not test) dst1 in
       let ok, _, ex = sp_seq env e1 res xres out eff dst in
       let out = sp_implies test ok, ne, Mexn.map (sp_and test) ex in
       let ok, ne, ex = sp_pred_seq env e0 v xres out e1 eff dst in
@@ -873,7 +887,7 @@ and sp_expr env e res xres dst = match e.e_node with
       let ok = sp_wp_close res hav adv (t_subst o2n ok) in
       (* right now, ne looks like this:
            [S] havoc [S1] I /\ ne0 [S2] !test /\ dst S = S2.
-         The last part was introduced by sp_complete to make
+         The last part was introduced by dst_complete to make
          postcondition !test consistent with the effect of e1.
          To remove the noise, every equality (x = x') in ne,
          where x in Rn dst, and x' is fresh and not in Rn dst,
@@ -906,7 +920,7 @@ and sp_expr env e res xres dst = match e.e_node with
       let dst = dst_affected e.e_effect dst in
       let eff = eff_read (t_freepvs Spv.empty keep) in
       let ok, _, ex = sp_seq env e1 res xres out eff dst in
-      let ne0 = sp_complete eff_empty a_gt_b dst in
+      let ne0 = dst_complete a_gt_b dst in
       let ne1 = sp_havoc env e.e_effect res last dst in
       let src = dst_step_back e.e_effect e.e_effect dst in
       let hav = sp_havoc env e.e_effect res prev src in
@@ -934,7 +948,7 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let out = sp_seq env e1 res xres out eff dst in
       out_label e (sp_pred_let env e0 v xres out e1 eff dst)
   | Ecase (e0, [pp, e1]) when anon_pat pp ->
-      let v = res_of_expr e0 in
+      let v = proxy_of_expr e0 in
       let out = sp_seq env e1 res xres out eff dst in
       out_label e (sp_pred_seq env e0 v xres out e1 eff dst)
   | Elet ((LDsym _| LDrec _) as ld, e1) ->
@@ -943,7 +957,7 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       out_label e (close_wp ok, close_sp ne, Mexn.map close_sp ex)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
       let ok2, ne2, ex2 = out in
-      let v, ok1, ne1 = sp_pure_if env e0.e_loc e1 e2 res in
+      let v, ok1, ne1 = sp_pure_if env e0 e1 e2 res in
       let ok = wp_and ok1 (sp_wp_close res ne1 Mvs.empty ok2) in
       let close sp = sp_sp_close res ne1 Mvs.empty sp in
       let ne = close ne2 and ex = Mexn.map close ex2 in
@@ -959,15 +973,13 @@ and sp_seq env e res xres out eff dst = match e.e_node with
       let ok = wp_and ok1 (sp_wp_close res ne1 adv ok2) in
       let close sp = sp_sp_close res ne1 adv sp in
       let ex1 = if Mexn.is_empty ex1 then ex1 else
-        Mexn.map (sp_adjust e.e_effect dst dst') ex1 in
+        Mexn.map (sp_adjust dst dst') ex1 in
       ok, close ne2, union_mexn ex1 (Mexn.map close ex2)
 
-and sp_pure_if env loc e1 e2 res =
+and sp_pure_if env e0 e1 e2 res =
   let ok1, ne1, _ = sp_expr env e1 res Mexn.empty Mpv.empty in
   let ok2, ne2, _ = sp_expr env e2 res Mexn.empty Mpv.empty in
-  (* we need a pvsymbol to prevent sp_wp_close from binding *)
-  let v = create_pvsymbol (id_fresh ?loc "result") ity_bool in
-  let test = t_equ (t_var v.pv_vs) t_bool_true in
+  let v, test = test_of_expr e0 in
   let ne = match term_of_post ~prop:false res ne1 with
     | Some (t1, f1) -> (* creative indentation ahead *)
           (match term_of_post ~prop:false res ne2 with
@@ -977,7 +989,7 @@ and sp_pure_if env loc e1 e2 res =
         sp_and (t_equ (t_var res) t) f
     | None -> t_if_simp test ne1 ne2)
     | None -> t_if_simp test ne1 ne2 in
-  v.pv_vs, wp_if test ok1 ok2, ne
+  v, wp_if test ok1 ok2, ne
 
 and vc_let_sym env vc_wp ld {e_effect = eff} =
   (* when we havoc the VC of a locally defined function,
@@ -1017,7 +1029,7 @@ and vc_let_sym env vc_wp ld {e_effect = eff} =
         let cty = match c.c_node with
           | Cany | Capp _ | Cpur _ -> c.c_cty
           | Cfun e ->
-              let res = res_of_expr e in
+              let res = proxy_of_expr e in
               let prop = ity_equal e.e_ity ity_bool in
               let ql = match term_of_expr ~prop e with
                 | Some f ->
