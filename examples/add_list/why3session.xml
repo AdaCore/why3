@@ -2,31 +2,74 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <file name="../add_list.mlw" expanded="true">
 <theory name="SumList" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="AddListRec" sum="d67dc47228a231353998af4e0d24050a" expanded="true">
- <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+<theory name="AddListRec" sum="f1b4c4e0923c97bb07f0497e41cca3dd" expanded="true">
+ <goal name="VC sum" expl="VC for sum">
+ <transf name="split_goal_wp">
+  <goal name="VC sum.1" expl="1. postcondition">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC sum.2" expl="2. variant decrease">
+  <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC sum.3" expl="3. postcondition">
+  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC sum.4" expl="4. postcondition">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="WP_parameter main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <goal name="VC main" expl="VC for main">
+ <transf name="split_goal_wp">
+  <goal name="VC main.1" expl="1. assertion">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC main.2" expl="2. assertion">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
-<theory name="AddListImp" sum="a7627a17b1b407f559c2a43c04728e9a" expanded="true">
- <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+<theory name="AddListImp" sum="e8c88c18c52faab3c58cf2482eb150fd" expanded="true">
+ <goal name="VC sum" expl="VC for sum">
+ <transf name="split_goal_wp">
+  <goal name="VC sum.1" expl="1. loop invariant init">
+  <proof prover="3"><result status="valid" time="0.01" steps="2"/></proof>
+  </goal>
+  <goal name="VC sum.2" expl="2. postcondition">
+  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC sum.3" expl="3. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC sum.4" expl="4. loop variant decrease">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC sum.5" expl="5. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC sum.6" expl="6. loop variant decrease">
+  <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC sum.7" expl="7. unreachable point">
+  <proof prover="3"><result status="valid" time="0.01" steps="2"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="WP_parameter main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <goal name="VC main" expl="VC for main">
+ <transf name="split_goal_wp">
+  <goal name="VC main.1" expl="1. assertion">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC main.2" expl="2. assertion">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>
