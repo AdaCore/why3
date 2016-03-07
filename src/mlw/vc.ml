@@ -649,7 +649,6 @@ let rec wp_expr env e res q xq = match e.e_node with
       t_subst_single res (vc_label e (t_var v.pv_vs)) q
   | Econst c ->
       t_subst_single res (vc_label e (t_const c)) q
-
   | Eexec (ce, c) ->
       let p = wp_of_pre env e.e_loc expl_pre c.cty_pre in
       let q = wp_close e.e_loc expl_post res c.cty_post q in
@@ -657,7 +656,6 @@ let rec wp_expr env e res q xq = match e.e_node with
       let w = wp_inter_mexn q join (cty_xpost_real c) xq in
       let w = bind_oldies c (wp_havoc env c.cty_effect w) in
       vc_label e (wp_and (vc_cexp env true ce) (wp_and p w))
-
   | Elet (LDvar ({pv_vs = v}, e0), e1)
   | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
       let q = wp_expr env e1 res q xq in
@@ -665,13 +663,12 @@ let rec wp_expr env e res q xq = match e.e_node with
   | Ecase (e0, [pp, e1]) when anon_pat pp ->
       let q = wp_expr env e1 res q xq in
       vc_label e (wp_expr env e0 (proxy_of_expr e0) q xq)
-
   | Elet ((LDsym _| LDrec _) as ld, e1) ->
       let q = wp_expr env e1 res q xq in
-      let close_wp, _ = vc_let_sym env true ld e1 in
-      vc_label e (close_wp q)
+      vc_label e (fst (vc_let_sym env true ld q e1))
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
-      let v, ok, ne = sp_pure_if env e0 e1 e2 res in
+      let v, test = test_of_expr e0 in
+      let ok, ne = sp_pure_if env test e1 e2 res in
       let q = sp_wp_close res ne Mvs.empty q in
       vc_label e (wp_expr env e0 v (wp_and ok q) xq)
   | Eif (e0, e1, e2) ->
@@ -752,7 +749,6 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
   | Econst c ->
       let t = vc_label e (t_const c) in
       out_seq_pure t_true (t_equ (t_var res) t) res zout
-
   | Eexec (ce, c) ->
       let dst = dst_step_back e.e_effect zeff zdst in
       let ok = wp_of_pre env e.e_loc expl_pre c.cty_pre in
@@ -765,7 +761,6 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
       let join v ql = sp_of_post expl_xpost v ql in
       let ex = inter_mexn join xres (cty_xpost_real c) in
       out_seq (out_label e (ok, ne, ex)) dst res zout zeff zdst
-
   | Elet (LDvar ({pv_vs = v}, e0), e1)
   | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
       let out = sp_expr env e1 res xres zout zeff zdst in
@@ -775,13 +770,13 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
       let v = proxy_of_expr e0 in
       let out = sp_expr env e1 res xres zout zeff zdst in
       out_label e (sp_expr_seq env e0 v xres out eff zeff zdst)
-
   | Elet ((LDsym _| LDrec _) as ld, e1) ->
       let ok, ne, ex = sp_expr env e1 res xres zout zeff zdst in
-      let close_wp, close_sp = vc_let_sym env false ld e1 in
-      out_label e (close_wp ok, close_sp ne, Mexn.map close_sp ex)
+      let ok, close = vc_let_sym env false ld ok e1 in
+      out_label e (ok, close ne, Mexn.map close ex)
   | Eif (e0, e1, e2) when eff_pure e1.e_effect && eff_pure e2.e_effect ->
-      let v, ok, ne = sp_pure_if env e0 e1 e2 res in
+      let v, test = test_of_expr e0 in
+      let ok, ne = sp_pure_if env test e1 e2 res in
       let out = out_seq_pure ok ne res zout in
       let eff12 = eff_union_par e1.e_effect e2.e_effect in
       out_label e (sp_expr_seq env e0 v xres out eff12 zeff zdst)
@@ -955,10 +950,9 @@ and sp_expr_seq env e res xres out eff zeff zdst =
 and sp_expr_nil env e res xres dst =
   sp_expr env e res xres None eff_empty dst
 
-and sp_pure_if env e0 e1 e2 res =
+and sp_pure_if env test e1 e2 res =
   let ok1, ne1, _ = sp_expr_nil env e1 res Mexn.empty Mpv.empty in
   let ok2, ne2, _ = sp_expr_nil env e2 res Mexn.empty Mpv.empty in
-  let v, test = test_of_expr e0 in
   let ne = match term_of_post ~prop:false res ne1 with
     | Some (t1, f1) -> (* creative indentation ahead *)
           (match term_of_post ~prop:false res ne2 with
@@ -968,9 +962,9 @@ and sp_pure_if env e0 e1 e2 res =
         sp_and (t_equ (t_var res) t) f
     | None -> t_if_simp test ne1 ne2)
     | None -> t_if_simp test ne1 ne2 in
-  v, wp_if test ok1 ok2, ne
+  wp_if test ok1 ok2, ne
 
-and vc_let_sym env vc_wp ld {e_effect = eff} =
+and vc_let_sym env vc_wp ld wp {e_effect = eff} =
   (* when we havoc the VC of a locally defined function,
      we must take into account every write in the following
      expression and ignore the resets, because the function
@@ -1038,14 +1032,13 @@ and vc_let_sym env vc_wp ld {e_effect = eff} =
         let add_rd d dl = add_rs sm d.rec_sym d.rec_fun dl in
         List.fold_right add_rd rdl ([],[]) in
   (* TODO: switch to sp_*_close when it handles multiple results *)
-  let close_wp wp =
-    wp_and ok (wp_forall vl (List.fold_right sp_implies ax wp)) in
-  let close_sp = if vc_wp then (fun _ -> assert false) else
+  let close = if vc_wp then (fun _ -> assert false) else
     (* replace pv with fresh vs so that sp_wp_close binds them *)
     let sbs = List.fold_left (fun sbs v ->
       Mvs.add v (t_var (clone_vs v)) sbs) Mvs.empty vl in
     fun sp -> t_subst sbs (List.fold_right sp_and ax sp) in
-  close_wp, close_sp
+  let wp = wp_forall vl (List.fold_right sp_implies ax wp) in
+  wp_and ok wp, close
 
 and vc_cexp env ?(o2n=Mvs.empty) vc_wp c = match c.c_node with
   | Cfun e -> vc_fun ~o2n env vc_wp c.c_cty e
