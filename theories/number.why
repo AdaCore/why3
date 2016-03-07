@@ -25,6 +25,11 @@ theory Parity
   lemma even_2k: forall k: int. even (2 * k)
   lemma odd_2k1: forall k: int. odd (2 * k + 1)
 
+  use import int.ComputerDivision
+
+  lemma even_mod2 :
+    forall n:int. even n <-> div n 2 = 0
+
 end
 
 (** {2 Divisibility} *)

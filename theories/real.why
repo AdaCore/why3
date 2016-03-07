@@ -13,15 +13,28 @@ theory Real
   constant zero : real = 0.0
   constant one  : real = 1.0
 
-  predicate (< ) real real
-  predicate (> ) (x y : real) = y < x
-  predicate (<=) (x y : real) = x < y \/ x = y
-  predicate (>=) (x y : real) = y <= x
+  val (=) (x y : real) : bool ensures { result <-> x = y }
+
+  val function  (-_) real : real
+  val function  (+)  real real : real
+  val function  (*)  real real : real
+  val predicate (<)  real real : bool
+
+  let (-)  (x y : real) = x + -y
+  let predicate (>)  (x y : real) = y < x
+  let predicate (<=) (x y : real) = x < y || x = y
+  let predicate (>=) (x y : real) = y <= x
 
   clone export algebra.OrderedField with type t = real,
-    constant zero = zero, constant one = one, predicate (<=) = (<=),
+    constant zero = zero, constant one = one,
+    function (-_) = (-_), function (+) = (+),
+    function (*) = (*), predicate (<=) = (<=),
     lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
     lemma NonTrivialRing, lemma ZeroLessOne
+
+  val (/) (x y:real) : real
+    requires { y <> 0.0 }
+    ensures  { result = x / y }
 
 (***
   lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
@@ -40,17 +53,21 @@ theory RealInfix
 
   use import Real
 
-  function (+.) (x:real) (y:real) : real = x + y
-  function (-.) (x:real) (y:real) : real = x - y
-  function ( *.) (x:real) (y:real) : real = x * y
+  let function (+.) (x:real) (y:real) : real = x + y
+  let function (-.) (x:real) (y:real) : real = x - y
+  let function ( *.) (x:real) (y:real) : real = x * y
   function (/.) (x:real) (y:real) : real = x / y
-  function (-._) (x:real) : real = - x
+  let function (-._) (x:real) : real = - x
   function inv (x:real) : real = Real.inv x
 
-  predicate (<=.) (x:real) (y:real) = x <= y
-  predicate (>=.) (x:real) (y:real) = x >= y
-  predicate ( <.) (x:real) (y:real) = x < y
-  predicate ( >.) (x:real) (y:real) = x > y
+  let predicate (<=.) (x:real) (y:real) = x <= y
+  let predicate (>=.) (x:real) (y:real) = x >= y
+  let predicate ( <.) (x:real) (y:real) = x < y
+  let predicate ( >.) (x:real) (y:real) = x > y
+
+  val (/.) (x y:real) : real
+    requires { y <> 0.0 }
+    ensures  { result = x /. y }
 
 end
 
