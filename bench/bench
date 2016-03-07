@@ -169,8 +169,8 @@ goods theories --type-only # FIXME remove --type-only
 echo ""
 
 echo "=== Checking modules ==="
-goods modules --type-only # FIXME remove --type-only
-goods modules/mach --type-only # FIXME remove --type-only
+goods modules
+goods modules/mach
 echo ""
 
 echo "=== Checking drivers ==="
@@ -186,13 +186,13 @@ echo ""
 
 echo "=== Checking good files ==="
 goods bench/typing/good
-goods bench/programs/good --type-only # FIXME remove --type-only
+goods bench/programs/good
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
 goods examples/check-builtin
-goods examples
 goods examples/logic
+goods examples
 goods examples/foveoos11-cm
 goods examples/hoare_logic
 goods examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps"
