@@ -10,13 +10,16 @@ module Bag
     forall x: 'a. b1 x = b2 x
 
   constant empty : bag 'a =
-    \ _. 0
+    fun _ -> 0
+
+  val empty () : bag 'a
+    ensures { result = empty }
 
   function add (e: 'a) (b: bag 'a) : bag 'a =
-    \ x. if x = e then b x + 1 else b x
+    fun x -> if x = e then b x + 1 else b x
 
   function remove (e: 'a) (b: bag 'a) : bag 'a =
-    \ x. if x = e then b x - 1 else b x
+    fun x -> if x = e then b x - 1 else b x
 
 end
 
@@ -25,7 +28,7 @@ module BagSpec
   use import int.Int
   use import Bag
 
-  type t 'a model {
+  type t 'a = private {
     mutable size: int;
     mutable contents: bag 'a;
   }
@@ -51,30 +54,34 @@ module ResizableArraySpec
   use import int.Int
   use import map.Map
 
-  type rarray 'a model { mutable length: int; mutable data: map int 'a }
+  type rarray 'a = private { mutable length: int; mutable data: map int 'a }
 
   function ([]) (r: rarray 'a) (i: int) : 'a = Map.get r.data i
-  function ([<-]) (r: rarray ~'a) (i: int) (v: 'a) : rarray 'a =
-    { r with data = Map.set r.data i v }
 
-  val length (r: rarray ~'a) : int
+  val function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a
+    ensures { result.length = r.length }
+    ensures { result.data = Map.set r.data i v }
+
+ (***
+ val length (r: rarray 'a) : int
     ensures { result = r.length }
+*)
 
-  val make (len: int) (dummy: ~'a) : rarray 'a
+  val make (len: int) (dummy: 'a) : rarray 'a
     requires { 0 <= len }
     ensures  { result.length = len }
     ensures  { result.data = Map.const dummy }
 
-  val ([]) (r: rarray ~'a) (i: int) : 'a
+  val ([]) (r: rarray 'a) (i: int) : 'a
     requires { 0 <= i < r.length }
     ensures  { result = r[i] }
 
-  val ([]<-) (r: rarray ~'a) (i: int) (v: 'a) : unit
+  val ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
     requires { 0 <= i < r.length }
     writes   { r.data }
     ensures  { r = (old r)[i <- v] }
 
-  val resize (r: rarray ~'a) (len: int) : unit
+  val resize (r: rarray 'a) (len: int) : unit
     requires { 0 <= len }
     writes   { r.length, r.data }
     ensures  { r.length = len }
@@ -93,24 +100,24 @@ module BagImpl
   use null.Null
 
   function numof (r: rarray (Null.t 'a)) (x: 'a) (l u: int) : int =
-    NumOf.numof (\i. (Map.get r.R.data i).Null.v = Null.Value x) l u
+    NumOf.numof (fun i -> (Map.get r.R.data i).Null.v = Null.Value x) l u
 
   type t 'a = {
     mutable       size:     int;
                   data:     rarray (Null.t 'a);
     mutable ghost contents: bag 'a;
   }
-  invariant { 0 <= self.size = self.data.length }
-  invariant { forall i: int. 0 <= i < self.size ->
-                not (Null.is_null self.data[i]) }
-  invariant { forall x: 'a. self.contents x = numof self.data x 0 self.size }
+  invariant { 0 <= size = data.length }
+  invariant { forall i: int. 0 <= i < size ->
+                not (Null.is_null data[i]) }
+  invariant { forall x: 'a. contents x = numof data x 0 size }
 
   let create () : t 'a
     ensures { result.size = 0 }
     ensures { result.contents == Bag.empty }
   =
     let null = Null.create_null () : Null.t 'a in
-    { size = 0; data = make 0 null; contents = Bag.empty }
+    { size = 0; data = make 0 null; contents = Bag.empty () }
 
   let clear (t: t 'a) : unit
     ensures { t.size = 0 }
@@ -118,7 +125,7 @@ module BagImpl
   =
     resize t.data 0;
     t.size <- 0;
-    t.contents <- Bag.empty
+    t.contents <- Bag.empty ()
 
   let add (t: t 'a) (x: 'a) : unit
     ensures { t.size = old t.size + 1 }
