@@ -108,7 +108,7 @@
 %BEGIN LATEX
 \begin{LARGE}
 %END LATEX
-  Version \whyversion{}, May 2015
+  Version \whyversion{}, Month? 2016
 %BEGIN LATEX
 \end{LARGE}
 %END LATEX
@@ -141,7 +141,7 @@ $^2$ Inria Saclay -- \^Ile-de-France, Palaiseau, F-91120
 \bigskip
 %END LATEX
 
-  \textcopyright 2010-2015 University Paris-Sud, CNRS, Inria
+  \textcopyright 2010-2016 University Paris-Sud, CNRS, Inria
 
 \urldef{\urlutcat}{\url}{http://frama-c.com/u3cat/}
 \urldef{\urlhilite}{\url}{http://www.open-do.org/projects/hi-lite/}
@@ -262,6 +262,19 @@ Thi-Minh-Tuyen Nguyen, Asma Tafat, Piotr Trojanek.
 \appendix
 
 \chapter{Release Notes}
+
+\section{Release Notes for version 0.90: syntax changes w.r.t. 0.87}
+
+\begin{center}
+  \begin{tabular}{|c|c|}
+\hline
+    0.87 & 0.90 \\
+\hline
+\texttt{'L:} & \texttt{label L in} \\
+\texttt{at !x 'L} & \texttt{!x at L} \\
+\hline
+  \end{tabular}
+\end{center}
 
 \section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
