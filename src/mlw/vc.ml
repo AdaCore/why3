@@ -454,15 +454,19 @@ let rec havoc kn get_rhs wr regs t ity fl =
         match get_rhs fd wfs with
         | VD -> fl
         | PV {pv_vs = v; pv_ity = ity} ->
-            if sensitive itd fd then
-              assert false; (* TODO: strong invariants *)
+            if sensitive itd fd then begin
+              Warning.emit "invariant-breaking updates are not yet supported";
+              fl (* TODO: strong invariants *)
+            end else
             let nt = fs_app (ls_of_rs rs) [nt] v.vs_ty in
             let t, fl = havoc kn get_rhs wr regs (t_var v) ity fl in
             cons_t_simp nt t fl
         | NF ->
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
-            if ity_affected wr ity && sensitive itd fd then
-              assert false; (* TODO: strong invariants *)
+            if ity_affected wr ity && sensitive itd fd then begin
+              Warning.emit "invariant-breaking updates are not yet supported";
+              fl (* TODO: strong invariants *)
+            end else
             let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
             let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
             let t, fl = havoc kn get_rhs wr regs t ity fl in
