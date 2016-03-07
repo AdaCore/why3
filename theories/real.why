@@ -58,9 +58,7 @@ theory RealInfix
   let function ( *.) (x:real) (y:real) : real = x * y
   function (/.) (x:real) (y:real) : real = x / y
   let function (-._) (x:real) : real = - x
-(***
-  let function inv (x:real) : real = Real.inv x
-*)
+  function inv (x:real) : real = Real.inv x
 
   let predicate (<=.) (x:real) (y:real) = x <= y
   let predicate (>=.) (x:real) (y:real) = x >= y
