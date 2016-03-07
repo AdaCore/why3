@@ -26,7 +26,8 @@ module Algo63
     ensures  { permut_sub (old a) a m (n+1) }
     let v = a[i] in
     a[i] <- a[j];
-    a[j] <- v
+    a[j] <- v;
+    assert { exchange (old a) a i j }
 
   val random (m n: int) : int ensures { m <= result <= n }
 

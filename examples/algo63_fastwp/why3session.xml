@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<file name="../algo63.mlw" expanded="true">
+<theory name="Algo63" sum="194369664eddb4417ee380157f3a70d4" expanded="true">
+ <goal name="VC exchange" expl="VC for exchange">
+ <transf name="split_goal_wp">
+  <goal name="VC exchange.1" expl="1. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC exchange.2" expl="2. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="VC exchange.3" expl="3. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="VC exchange.4" expl="4. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC exchange.5" expl="5. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
+  </goal>
+  <goal name="VC exchange.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC exchange.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC partition_" expl="VC for partition_">
+ <transf name="split_goal_wp">
+  <goal name="VC partition_.1" expl="1. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="VC partition_.2" expl="2. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="VC partition_.3" expl="3. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="VC partition_.4" expl="4. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC partition_.5" expl="5. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC partition_.6" expl="6. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+  <goal name="VC partition_.7" expl="7. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="VC partition_.8" expl="8. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="VC partition_.9" expl="9. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="VC partition_.10" expl="10. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC partition_.11" expl="11. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="VC partition_.12" expl="12. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="VC partition_.13" expl="13. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="VC partition_.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="VC partition_.15" expl="15. variant decrease">
+  <proof prover="0"><result status="valid" time="0.04" steps="87"/></proof>
+  </goal>
+  <goal name="VC partition_.16" expl="16. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="VC partition_.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="128"/></proof>
+  </goal>
+  <goal name="VC partition_.18" expl="18. precondition">
+  <proof prover="0"><result status="valid" time="1.93" steps="780"/></proof>
+  </goal>
+  <goal name="VC partition_.19" expl="19. precondition">
+  <proof prover="2"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="VC partition_.20" expl="20. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="129"/></proof>
+  </goal>
+  <goal name="VC partition_.21" expl="21. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="55"/></proof>
+  </goal>
+  <goal name="VC partition_.22" expl="22. postcondition">
+  <proof prover="0"><result status="valid" time="0.31" steps="588"/></proof>
+  </goal>
+  <goal name="VC partition_.23" expl="23. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="57"/></proof>
+  </goal>
+  <goal name="VC partition_.24" expl="24. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="51"/></proof>
+  </goal>
+  <goal name="VC partition_.25" expl="25. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="52"/></proof>
+  </goal>
+  <goal name="VC partition_.26" expl="26. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="142"/></proof>
+  </goal>
+  <goal name="VC partition_.27" expl="27. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="142"/></proof>
+  </goal>
+  <goal name="VC partition_.28" expl="28. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="VC partition_.29" expl="29. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="VC partition_.30" expl="30. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC partition_.31" expl="31. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC partition_.32" expl="32. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="0"/></proof>
+  </goal>
+  <goal name="VC partition_.33" expl="33. assertion">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC partition_.34" expl="34. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC partition_.35" expl="35. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="VC partition_.36" expl="36. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="39"/></proof>
+  </goal>
+  <goal name="VC partition_.37" expl="37. postcondition">
+  <proof prover="0"><result status="valid" time="0.22" steps="673"/></proof>
+  </goal>
+  <goal name="VC partition_.38" expl="38. postcondition">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="VC partition_.39" expl="39. postcondition">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="2"><result status="valid" time="1.85"/></proof>
+  </goal>
+  <goal name="VC partition_.40" expl="40. postcondition">
+  <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.79"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC partition" expl="VC for partition" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="VC partition.1" expl="1. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="VC partition.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="VC partition.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="VC partition.4" expl="4. postcondition" expanded="true">
+  <proof prover="0" timelimit="30"><result status="valid" time="18.04" steps="455"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
