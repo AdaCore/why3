@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<file name="../binary_search.mlw" expanded="true">
+<theory name="BinarySearch" sum="2f41cacfb96e90ff7c4f9a1031a4da0c" expanded="true">
+ <goal name="VC binary_search" expl="VC for binary_search">
+ <transf name="split_goal_wp">
+  <goal name="VC binary_search.1" expl="1. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+  </goal>
+  <goal name="VC binary_search.2" expl="2. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+  </goal>
+  <goal name="VC binary_search.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC binary_search.4" expl="4. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="VC binary_search.5" expl="5. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC binary_search.6" expl="6. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="VC binary_search.7" expl="7. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="VC binary_search.8" expl="8. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.08" steps="50"/></proof>
+  </goal>
+  <goal name="VC binary_search.9" expl="9. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="VC binary_search.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="VC binary_search.11" expl="11. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="BinarySearchAnyMidPoint" sum="1c7344cbdd4fa3ee18d3bebf0c89856b" expanded="true">
+ <goal name="VC binary_search" expl="VC for binary_search">
+ <transf name="split_goal_wp">
+  <goal name="VC binary_search.1" expl="1. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+  </goal>
+  <goal name="VC binary_search.2" expl="2. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="VC binary_search.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="VC binary_search.4" expl="4. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC binary_search.5" expl="5. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC binary_search.6" expl="6. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
+  </goal>
+  <goal name="VC binary_search.7" expl="7. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="VC binary_search.8" expl="8. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC binary_search.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC binary_search.10" expl="10. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="BinarySearchInt32" sum="badc1b8bf6577b29c30d0160c2ba5ef3" expanded="true">
+ <goal name="VC binary_search" expl="VC for binary_search">
+ <transf name="split_goal_wp">
+  <goal name="VC binary_search.1" expl="1. integer overflow">
+  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
+  </goal>
+  <goal name="VC binary_search.2" expl="2. integer overflow">
+  <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
+  </goal>
+  <goal name="VC binary_search.3" expl="3. integer overflow">
+  <proof prover="0"><result status="valid" time="0.02" steps="78"/></proof>
+  </goal>
+  <goal name="VC binary_search.4" expl="4. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.04" steps="70"/></proof>
+  </goal>
+  <goal name="VC binary_search.5" expl="5. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.03" steps="73"/></proof>
+  </goal>
+  <goal name="VC binary_search.6" expl="6. integer overflow">
+  <proof prover="0"><result status="valid" time="0.03" steps="74"/></proof>
+  </goal>
+  <goal name="VC binary_search.7" expl="7. integer overflow">
+  <proof prover="0"><result status="valid" time="0.06" steps="125"/></proof>
+  </goal>
+  <goal name="VC binary_search.8" expl="8. division by zero">
+  <proof prover="0"><result status="valid" time="0.03" steps="75"/></proof>
+  </goal>
+  <goal name="VC binary_search.9" expl="9. integer overflow">
+  <proof prover="0"><result status="valid" time="0.21" steps="151"/></proof>
+  </goal>
+  <goal name="VC binary_search.10" expl="10. integer overflow">
+  <proof prover="0"><result status="valid" time="0.76" steps="425"/></proof>
+  </goal>
+  <goal name="VC binary_search.11" expl="11. assertion">
+  <proof prover="0"><result status="valid" time="0.11" steps="110"/></proof>
+  </goal>
+  <goal name="VC binary_search.12" expl="12. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="79"/></proof>
+  </goal>
+  <goal name="VC binary_search.13" expl="13. integer overflow">
+  <proof prover="0"><result status="valid" time="0.03" steps="81"/></proof>
+  </goal>
+  <goal name="VC binary_search.14" expl="14. integer overflow">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_search.15" expl="15. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
+  </goal>
+  <goal name="VC binary_search.16" expl="16. integer overflow">
+  <proof prover="0"><result status="valid" time="0.03" steps="82"/></proof>
+  </goal>
+  <goal name="VC binary_search.17" expl="17. integer overflow">
+  <proof prover="0"><result status="valid" time="0.78" steps="205"/></proof>
+  </goal>
+  <goal name="VC binary_search.18" expl="18. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.21" steps="289"/></proof>
+  </goal>
+  <goal name="VC binary_search.19" expl="19. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC binary_search.20" expl="20. loop variant decrease">
+  <proof prover="0"><result status="valid" time="1.03" steps="1277"/></proof>
+  </goal>
+  <goal name="VC binary_search.21" expl="21. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="117"/></proof>
+  </goal>
+  <goal name="VC binary_search.22" expl="22. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
