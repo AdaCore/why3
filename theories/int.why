@@ -91,8 +91,8 @@ theory EuclideanDivision
   use import Int
   use import Abs
 
-  val function div (x y: int) : int
-  val function mod (x y: int) : int
+  function div (x y: int) : int
+  function mod (x y: int) : int
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
@@ -162,8 +162,8 @@ theory ComputerDivision
   use import Int
   use import Abs
 
-  val function div (x y: int) : int
-  val function mod (x y: int) : int
+  function div (x y: int) : int
+  function mod (x y: int) : int
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
@@ -204,6 +204,14 @@ theory ComputerDivision
   lemma Mod_mult: forall x y z:int [mod (x * y + z) x].
           x > 0 /\ y >= 0 /\ z >= 0 ->
           mod (x * y + z) x = mod z x
+
+  val div (x y:int) : int
+    requires { y <> 0 }
+    ensures { result = div x y }
+
+  val mod (x y:int) : int
+    requires { y <> 0 }
+    ensures { result = mod x y }
 
 end
 
