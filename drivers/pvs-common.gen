@@ -26,8 +26,12 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
+theory HighOrd
+  syntax type (->) "[%1 -> %2]"
+  syntax function (@) "%1(%2)"
+end
+
 theory map.Map
-  syntax type  map "[%1 -> %2]"
 
   syntax function get "%1(%2)"
   syntax function ([]) "%1(%2)"
@@ -38,11 +42,6 @@ theory map.Map
   remove prop Select_eq
   remove prop Select_neq
 
-end
-
-theory map.Const
-  syntax function const "(LAMBDA (x:%v0): %1)"
-  remove prop Const
 end
 
 theory Bool

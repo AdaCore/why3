@@ -196,7 +196,7 @@ theory Reverse
   use import Seq
 
   function reverse (s: seq 'a) : seq 'a =
-    create (length s) (\ i. s[length s - 1 - i])
+    create (length s) (fun i -> s[length s - 1 - i])
 
 end
 
