@@ -1,0 +1,466 @@
+
+module Decl
+  
+  use import logic_syntax.Defs
+  use import list.List
+  use import option.Option
+  use import support.HOList
+  use import support.PartialMap
+  
+  (* Abstract infinite type for proposition symbols. *)
+  type prsymbol
+  function prsymbol_from_index (n:int) : prsymbol
+  axiom prsymbol_from_index_injective : forall n m.
+    prsymbol_from_index n = prsymbol_from_index m -> n = m
+  meta infinite_type type prsymbol
+  
+  (* Constructor: logical symbol for the constructor itself, and
+     optional names for projections. *)
+  type constructor = (lsymbol,pmap int lsymbol)
+  
+  (* datatype declaration: type symbol, constructors. *)
+  type data_decl = (ty_symbol,list constructor)
+  
+  (* Logical symbol declaration: name and definition. *)
+  type logic_decl = (lsymbol,term int)
+  
+  (* (co)inductive declaration: Ind is for least fixpoint, CoInd for
+     greatest one. *)
+  type ind_sign = Ind | CoInd
+  
+  (* Inductive declaration: predicate name, signature, list of named
+     clauses. *)
+  type clause = (prsymbol,term closed)
+  type ind_decl = (lsymbol,list clause)
+  
+  (* Kind of proposition.
+     lemma = prove & use, axiom = use, goal = prove, skip = do nothing. *)
+  type prop_kind =
+    | Plemma
+    | Paxiom
+    | Pgoal
+    | Pskip
+  
+  (* Declaration. *)
+  type decl =
+    (* Abstract type symbol. *)
+    | DType ty_symbol
+    (* Algebraic datatype. *)
+    | DData (list data_decl)
+    (* Abstract logic symbol. *)
+    | DParam lsymbol
+    (* Mutually recursive logic definition. *)
+    | DLogic (list logic_decl)
+    (* (co)inductive predicate definition. *)
+    | DInd ind_sign (list ind_decl)
+    (* Proposition. *)
+    | DProp prop_kind prsymbol (term closed)
+  
+  (* Names defined by declarations. *)
+  predicate data_decl_tys (tys:ty_symbol) (d:data_decl) =
+    let (tys2,_) = d in tys = tys2
+  
+  predicate decl_tys (d:decl) (tys:ty_symbol) = match d with
+    | DType tys2 -> tys = tys2
+    | DData dl -> exist (data_decl_tys tys) dl
+    | _ -> false
+    end
+  
+  predicate constructor_ls (ls0:lsymbol) (c:constructor) =
+    let (ls,pm) = c in ls = ls0 \/ exists n. pm n = Some ls0
+  
+  predicate constructor_constr (ls0:lsymbol) (c:constructor) =
+    let (ls,_) = c in ls = ls0
+  
+  predicate data_decl_ls (ls0:lsymbol) (d:data_decl) = let (_,cn) = d in
+    exist (constructor_ls ls0) cn
+  
+  predicate data_decl_constr (ls0:lsymbol) (d:data_decl) = let (_,cn) = d in
+    exist (constructor_constr ls0) cn
+  
+  predicate decl_constr (d:decl) (ls0:lsymbol) = match d with
+    | DData dl -> exist (data_decl_constr ls0) dl
+    | _ -> false
+    end
+  
+  predicate is_fst (ls0:'a) (p:('a,'b)) =
+    let (ls1,_) = p in ls0 = ls1
+  
+  predicate decl_ls (d:decl) (ls0:lsymbol) = match d with
+    | DParam ls -> ls = ls0
+    | DData dl -> exist (data_decl_ls ls0) dl
+    | DLogic ld -> exist (is_fst ls0) ld
+    | DInd _ idl -> exist (is_fst ls0) idl
+    | _ -> false
+    end
+  
+  predicate ind_decl_prs (prs0:prsymbol) (id:(lsymbol,list clause)) =
+    let (_,cls) = id in exist (is_fst prs0) cls
+  
+  predicate decl_prs (d:decl) (prs0:prsymbol) = match d with
+    | DProp _ prs _ -> prs0 = prs
+    | DInd _ idl -> exist (ind_decl_prs prs0) idl
+    | _ -> false
+    end
+  
+  predicate logic_decl_no_conflict (ld:list logic_decl) = match ld with
+    | Nil -> true
+    | Cons (ls,_) q -> not exist (is_fst ls) q /\ logic_decl_no_conflict q
+    end
+  (*
+  (* No conflict between declared names. *)
+  predicate decl_no_conflict (d:decl) = match d with
+    | DData dl -> 
+    | DLogic ld -> logic_decl_no_conflict ld
+    | DInd _ idl -> ind_decl_no_conflict idl
+    end*)
+  
+  
+  (* Domain of declared symbols for terms. *)
+  type syms_dom = {
+    d_tys : ty_symbol -> bool;
+    d_ls : lsymbol -> bool;
+    d_constr : lsymbol -> bool;
+  }
+  
+  
+  
+end
+
+(*
+(* Need a modelisation of tasks.
+   Base idea: task = Well-founded stack of
+   environments obtained by successive declaration
+   extension.
+   So in the modelisation part, we need:
+   - Declarations & their semantics.
+   - Declaration environments & semantics again.
+ *)
+
+module Decl
+  
+  use import logic_syntax.Defs
+  use import logic_syntax.VarsIn
+  use import support.HO
+  use import support.PartialMap
+  use import support.Choice
+  use import logic_typing.Env
+  use import option.Option
+  use import int.Int
+  use import list.List
+  use import list.Length
+  
+  (* Abstract infinite type for proposition symbols. *)
+  type prsymbol
+  function prsymbol_from_index (n:int) : prsymbol
+  axiom prsymbol_from_index_injective : forall n m.
+    prsymbol_from_index n = prsymbol_from_index m -> n = m
+  meta infinite_type type prsymbol
+  
+  (* Constructor: logical symbol for constructor,
+     and optional names for projections. *)
+  type constructor = (lsymbol,pmap int lsymbol)
+  
+  (* Datatype declaration: type symbol, constructors. *)
+  type data_decl = (ty_symbol,list constructor)
+  
+  (* Logical declaration: logical symbol name,type arity,signature,
+     definition. *)
+  type logic_decl = (lsymbol,term int)
+  
+  (* Inductive declaration sign: inductive (least fixpoint) or coinductive
+     (greatest fixpoint). *)
+  type ind_sign = Ind | Coind
+  
+  (* Inductive declaration: predicate name, signature, list of
+     named clauses. *)
+  type ind_decl = (lsymbol,list (prsymbol,term closed))
+  
+  type prop_kind =
+    | Plemma
+    | Paxiom
+    | Pgoal
+    | Pskip
+  
+  type decl =
+    | Dtype ty_symbol
+    | Ddata (list data_decl)
+    | Dparam lsymbol
+    | Dlogic (list logic_decl)
+    | Dind ind_sign (list ind_decl)
+    | Dprop prop_kind prsymbol (term closed)
+  
+  predicate data_decl_ty_symbols (dl:list data_decl) (tys:ty_symbol) =
+    match dl with
+    | Nil -> false
+    | Cons (tys2,_) q -> tys = tys2 \/ data_decl_ty_symbols q tys
+    end
+  
+  predicate decl_ty_symbols (d:decl) (tys:ty_symbol) = match d with
+    | Dtype tys2 -> tys = tys2
+    | Ddata dl -> data_decl_ty_symbols dl tys
+    | _ -> false
+    end
+  
+  predicate constructor_lsymbols (cl:list constructor) (ls:lsymbol) =
+    match cl with
+    | Nil -> false
+    | Cons (cn,pm) q -> ls = cn \/ constructor_lsymbols q ls \/
+        exists n. pm n = Some ls
+    end
+  
+  predicate constructor_names (cl:list constructor) (ls:lsymbol) =
+    match cl with
+    | Nil -> false
+    | Cons (cn,_) q -> ls = cn \/ constructor_names q ls
+    end
+  
+  predicate data_decl_lsymbols (dl:list data_decl) (ls:lsymbol) =
+    match dl with
+    | Nil -> false
+    | Cons (_,cl) q -> constructor_lsymbols cl ls \/
+      data_decl_lsymbols q ls
+    end
+  
+  predicate logic_decl_lsymbols (dl:list logic_decl) (ls:lsymbol) =
+    match dl with
+    | Nil -> false
+    | Cons (ln,_) q -> ls = ln \/ logic_decl_lsymbols q ls
+    end
+  
+  predicate ind_decl_lsymbols (dl:list ind_decl) (ls:lsymbol) =
+    match dl with
+    | Nil -> false 
+    | Cons (indn,_) q -> indn = ls \/ ind_decl_lsymbols q ls
+    end
+  
+  predicate decl_lsymbols (d:decl) (ls:lsymbol) = match d with
+    | Ddata dl -> data_decl_lsymbols dl ls
+    | Dparam ls2 -> ls = ls2
+    | Dlogic dl -> logic_decl_lsymbols dl ls
+    | Dind _ dl -> ind_decl_lsymbols dl ls
+    | _ -> false
+    end
+  
+  predicate clauses_prsymbols (icl:list (prsymbol,term closed)) (prs:prsymbol) =
+    match icl with
+    | Nil -> false
+    | Cons (pr,_) q -> pr = prs \/ clauses_prsymbols q prs
+    end
+  
+  predicate ind_decl_prsymbols (dl:list ind_decl) (prs:prsymbol) =
+    match dl with
+    | Nil -> false
+    | Cons (_,icl) q ->
+      clauses_prsymbols icl prs \/ ind_decl_prsymbols q prs
+    end
+  
+  predicate decl_prsymbols (d:decl) (prs:prsymbol) = match d with
+    | Dind _ dl -> ind_decl_prsymbols dl prs
+    | Dprop _ prs2 _ -> prs = prs2
+    | _ -> false
+    end
+  
+  predicate constructor_no_conflict (cl:list constructor) = match cl with
+    | Nil -> true
+    | Cons (cn,pm) q ->
+      (forall n u. pm n = Some u -> u <> cn /\ not constructor_lsymbols q u) /\
+      not constructor_lsymbols q cn /\
+      constructor_no_conflict q /\
+      (forall n m u. pm n = Some u /\ pm m = Some u -> n = m)
+    end
+  
+  predicate data_decl_no_conflict (dl:list data_decl) = match dl with
+    | Nil -> true
+    | Cons (tys,cl) q -> data_decl_no_conflict q /\
+      constructor_no_conflict cl /\
+      not data_decl_ty_symbols q tys /\
+      (forall ls. not constructor_lsymbols cl ls \/
+                  not data_decl_lsymbols q ls)
+    end
+  
+  predicate logic_decl_no_conflict (dl:list logic_decl) = match dl with
+    | Nil -> true
+    | Cons (ls,_) q -> logic_decl_no_conflict q /\
+      not logic_decl_lsymbols q ls
+    end
+  
+  predicate clauses_no_conflict (cls:list (prsymbol,term closed)) =
+    match cls with
+    | Nil -> true
+    | Cons (prs,_) q -> clauses_no_conflict q /\ not clauses_prsymbols q prs
+    end
+  
+  predicate ind_decl_no_conflict (dl:list ind_decl) = match dl with
+    | Nil -> true
+    | Cons (ls,cls) q -> ind_decl_no_conflict q /\
+      clauses_no_conflict cls /\
+      not ind_decl_lsymbols q ls
+    end
+  
+  predicate decl_no_conflict (d:decl) = match d with
+    | Ddata dl -> data_decl_no_conflict dl
+    | Dlogic dl -> logic_decl_no_conflict dl
+    | Dind _ dl -> ind_decl_no_conflict dl
+    | _ -> true
+    end
+  
+  predicate constructor_symbols_in (s:lsymbol -> bool)
+    (cl:list constructor) = match cl with
+    | Nil -> true
+    | Cons (ls,pm) q -> constructor_symbols_in s q /\
+      s ls /\ forall n. match pm n with None -> true | Some u -> s u end
+    end
+  
+  predicate data_decl_symbols_in (s1:ty_symbol -> bool) (s2:lsymbol -> bool)
+    (dl:list data_decl) = match dl with
+    | Nil -> true
+    | Cons (tys,cl) q -> data_decl_symbols_in s1 s2 q /\
+      s1 tys /\ constructor_symbols_in s2 cl
+    end
+  
+  predicate logic_decl_symbols_in (s1:ty_symbol -> bool) (s2:lsymbol -> bool)
+    (dl:list logic_decl) = match dl with
+    | Nil -> true
+    | Cons (ls,df) q -> logic_decl_symbols_in s1 s2 q /\
+      s2 ls /\ t_vars_in all all s1 s2 df
+    end
+  
+  predicate clauses_symbols_in (s1:ty_symbol -> bool) (s2:lsymbol -> bool)
+    (s3:prsymbol -> bool) (cls:list (prsymbol,term closed)) = match cls with
+    | Nil -> true
+    | Cons (prs,phi) q -> s3 prs /\ t_vars_in none all s1 s2 phi
+    end
+  
+  predicate ind_decl_symbols_in (s1:ty_symbol -> bool)
+    (s2:lsymbol -> bool) (s3:prsymbol -> bool)
+    (dl:list ind_decl) = match dl with
+    | Nil -> true
+    | Cons (pn,cls) q -> s2 pn /\ clauses_symbols_in s1 s2 s3 cls /\
+      ind_decl_symbols_in s1 s2 s3 q
+    end
+  
+  predicate decl_symbols_in (s1:ty_symbol -> bool)
+    (s2:lsymbol -> bool) (s3:prsymbol -> bool) (d:decl) =
+    match d with
+    | Dtype tys -> s1 tys
+    | Ddata dl -> data_decl_symbols_in s1 s2 dl
+    | Dparam ls -> s2 ls
+    | Dlogic dl -> logic_decl_symbols_in s1 s2 dl
+    | Dind _ dl -> ind_decl_symbols_in s1 s2 s3 dl
+    | Dprop _ prs t -> s3 prs /\ t_vars_in none all s1 s2 t
+    end
+  
+  predicate logic_decl_wf (sig:signature) (dl:list logic_decl) = match dl with
+    | Nil -> true
+    | Cons (ls,t) q -> (* TODO: build environment corresponding to the type input,
+       check definition well-formed in that environment*) true /\
+       logic_decl_wf sig q
+    end
+  
+  predicate constructor_wf (sig:signature) (tys:ty_symbol)
+    (cl:list constructor) = match cl with
+    | Nil -> true
+    | Cons (cn,pm) q -> constructor_wf sig q /\
+      sig.ls_belong cn /\ sig.tys_constr tys cn /\
+      let tyl = sig.ls_args cn in
+      let tyr = sig.ls_ret cn in
+      (* All projections symbols can have their variables renamed to yield
+         the inverse of ??? *)
+      forall n. n >= 0 -> match pm n with
+        | None -> true
+        | Some u -> sig.ls_belong u /\ 0 <= n < length tyl /\
+          exists f. tyl_map f identity (sig.ls_args u) = Cons tyr Nil /\
+            nth n tyl = Some (ty_map f identity (sig.ls_ret u)) 
+        end
+    end
+  
+  predicate data_decl_wf (sig:signature) (dl:list data_decl) = match dl with
+    | Nil -> true
+    | Cons (tys,cl) q -> sig.tys_alg tys /\
+      sig.tys_constr_complete tys /\
+      constructors_wf sig tys cl /\
+      forall cn. sig.tys_constr tys cn -> constructor_names cl cn
+    end
+  
+  predicate decl_wf (sig:signature) (d:decl) = match d with
+    | Dtype tys -> sig.tys_belong tys
+    | Ddata dl -> data_decl_wf sig dl /\ dl <> Nil
+    | Dparam ls -> sig.ls_belong ls
+    | Dlogic dl -> logic_decl_wf sig dl /\ dl <> Nil
+    | Dind _ dl -> ind_decl_wf sig dl /\ dl <> Nil
+    | Dprop _ _ tc -> term_wf sig ty_env_empty tc
+    end
+  
+  (*function logic_decl_signatures
+    (dl:list logic_decl) : lsymbol -> option (int,list ty,ty) =
+    match dl with
+    | Nil -> const None
+    | Cons (ls,tya,tyl,ty,_) q -> let base = logic_decl_signatures q in
+      base[ls <- Some (tya,tyl,ty)]
+    end
+  
+  function ind_decl_signatures
+    (dl:list ind_decl) : lsymbol -> option (int,list ty,ty) =
+    match dl with
+    | Nil -> const None
+    | Cons (ls,tya,tyl,_) q -> let base = ind_decl_signatures q in
+      base[ls <- Some (tya,tyl,ty_prop)]
+    end
+  
+  predicate seq_index (len:int) (tyn:int -> option 'a) (x:'a) (n:int) =
+    0 <= n < len /\ tyn n = Some x
+  
+  function proj_signatures (tya:int) (tyr:ty) (len:int) (tyn:int -> ty)
+    (pm:int -> option lsymbol) : lsymbol -> option (int,list ty,ty) =
+    \ls. if exists n. seq_index len pm ls n
+         then let n = choice (seq_index len pm ls) in
+           Some (tya,Cons tyr Nil,tyn n)
+         else None
+  
+  function constructor_signatures (tya:int) (tyr:ty)
+    (cl:list constructor) : lsymbol -> option (int,list ty,ty) =
+    match cl with
+    | Nil -> const None
+    | Cons (ls,tyl,pm) q -> let base = constructor_signatures tya tyr q in
+      let e1 = base[ls <- Some (tya,tyl,tyr)] in
+      let ps = proj_signatures tya tyr (length tyl) (list_nth tyl default) pm in
+      extend e1 ps
+    end
+  
+  function data_decl_signatures
+    (dl:list data_decl) : lsymbol -> option (int,list ty,ty) =
+    match dl with
+    | Nil -> const None
+    | Cons (tys,tya,cl) q -> let base = data_decl_signatures q in
+      let tyr = TyApp tys (constr_ty_list 0 tya) in
+      let ext = constructor_signatures tya tyr cl in
+      extend base ext
+    end
+  
+  function decl_signatures (d:decl) : lsymbol -> option (int,list ty,ty) =
+    match d with
+    | Dlogic dl -> logic_decl_signatures dl
+    | Ddata dl -> data_decl_signatures dl
+    | Dind _ idl -> ind_decl_signatures idl
+    | Dparam ls tya tyl ty -> (const None)[ls <- Some (tya,tyl,ty)]
+    | _ -> const None
+    end
+  
+  function data_decl_arities (dl:list data_decl) : ty_symbol -> option int =
+    match dl with
+    | Nil -> const None
+    | Cons (tys,tya,_) q -> (data_decl_arities q)[tys <- Some tya]
+    end
+  
+  function decl_arities (d:decl) : ty_symbol -> option int =
+    match d with
+    | Ddata dl -> data_decl_arities dl
+    | Dtype tys n -> (const None)[tys -> Some n]
+    | _ -> const None
+    end*)
+  
+  
+  
+end*)
+

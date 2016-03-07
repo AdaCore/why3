@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Environments} *)
+
 open Stdlib
 
 (** Local type aliases *)
@@ -33,7 +35,7 @@ val create_env : filename list -> env
 val get_loadpath : env -> filename list
 (** returns the loadpath of a given environment *)
 
-(** Input languages *)
+(** {2 Input languages} *)
 
 type 'a language
 
@@ -102,7 +104,7 @@ val list_formats :
     be translated to [lang]. Use [list_formats base_language] to obtain
     the list of all registered formats. *)
 
-(** Language-specific parsers *)
+(** {2 Language-specific parsers} *)
 
 exception InvalidFormat of fformat
 exception UnknownFormat of fformat

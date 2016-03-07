@@ -56,18 +56,20 @@ function eval_expr (s:state) (e:expr) : int =
        eval_bin (eval_expr s e1) op (eval_expr s e2)
   end
 
+  use map.Const
+
   goal Test13 :
-    let s = IdMap.const 0 in
+    let s = Const.const 0 in
     eval_expr s (Econst 13) = 13
 
   goal Test42 :
     let x = mk_ident 0 in
-    let s = IdMap.set (IdMap.const 0) x 42 in
+    let s = IdMap.set (Const.const 0) x 42 in
     eval_expr s (Evar x) = 42
 
   goal Test55 :
     let x = mk_ident 0 in
-    let s = IdMap.set (IdMap.const 0) x 42 in
+    let s = IdMap.set (Const.const 0) x 42 in
     eval_expr s (Ebin (Evar x) Oplus (Econst 13)) = 55
 
 
@@ -111,14 +113,14 @@ inductive one_step state stmt state stmt =
 
   goal Ass42 :
     let x = mk_ident 0 in
-    let s = IdMap.const 0 in
+    let s = Const.const 0 in
     forall s':state.
       one_step s (Sassign x (Econst 42)) s' Sskip ->
         IdMap.get s' x = 42
 
   goal If42 :
     let x = mk_ident 0 in
-    let s = IdMap.const 0 in
+    let s = Const.const 0 in
     forall s1 s2:state, i:stmt.
       one_step s
         (Sif (Evar x)
@@ -250,5 +252,3 @@ Local Variables:
 compile-command: "why3ide imp_n.why"
 End:
 *)
-
-

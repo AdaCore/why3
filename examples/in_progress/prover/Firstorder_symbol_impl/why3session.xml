@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<file name="../Firstorder_symbol_impl.mlw">
+<theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Logic" sum="8942ac6e2361c16c38459a751e0dbd63">
+ <goal name="WP_parameter nlsize_positive_lemma_symbol" expl="VC for nlsize_positive_lemma_symbol">
+ <proof prover="7"><result status="valid" time="0.03" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter shiftb_compose_lemma_symbol" expl="VC for shiftb_compose_lemma_symbol">
+ <proof prover="7"><result status="valid" time="0.08" steps="146"/></proof>
+ </goal>
+ <goal name="WP_parameter nlmodel_subst_commutation_lemma_symbol" expl="VC for nlmodel_subst_commutation_lemma_symbol">
+ <proof prover="7"><result status="valid" time="0.02" steps="25"/></proof>
+ </goal>
+ <goal name="WP_parameter nlmodel_rename_commutation_lemma_symbol" expl="VC for nlmodel_rename_commutation_lemma_symbol">
+ <proof prover="7"><result status="valid" time="0.04" steps="39"/></proof>
+ </goal>
+ <goal name="WP_parameter bound_depth_of_symbol_in_symbol_nonnegative" expl="VC for bound_depth_of_symbol_in_symbol_nonnegative">
+ <proof prover="7"><result status="valid" time="0.04" steps="34"/></proof>
+ </goal>
+ <goal name="WP_parameter model_equal_symbol" expl="VC for model_equal_symbol">
+ <proof prover="7"><result status="valid" time="0.04" steps="65"/></proof>
+ </goal>
+</theory>
+<theory name="Impl" sum="68dce20711cd1fde227ae722087cc947">
+ <goal name="WP_parameter bind_var_symbol_in_symbol" expl="VC for bind_var_symbol_in_symbol">
+ <proof prover="7"><result status="valid" time="0.10" steps="210"/></proof>
+ </goal>
+ <goal name="WP_parameter unbind_var_symbol_in_symbol" expl="VC for unbind_var_symbol_in_symbol">
+ <proof prover="7"><result status="valid" time="0.16" steps="280"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_base_symbol_in_symbol" expl="VC for subst_base_symbol_in_symbol">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_base_symbol_in_symbol.1" expl="1. precondition">
+  <proof prover="7"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.2" expl="2. precondition">
+  <proof prover="7"><result status="valid" time="0.04" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.3" expl="3. postcondition">
+  <proof prover="7"><result status="valid" time="0.04" steps="56"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.4" expl="4. postcondition">
+  <proof prover="7"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.5" expl="5. postcondition">
+  <proof prover="7"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.6" expl="6. postcondition">
+  <proof prover="7"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.7" expl="7. postcondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.8" expl="8. postcondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.9" expl="9. postcondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_symbol.10" expl="10. postcondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter construct_symbol" expl="VC for construct_symbol">
+ <proof prover="7"><result status="valid" time="0.06" steps="73"/></proof>
+ </goal>
+ <goal name="WP_parameter destruct_symbol" expl="VC for destruct_symbol">
+ <proof prover="7"><result status="valid" time="0.04" steps="56"/></proof>
+ </goal>
+ <goal name="WP_parameter nlsubst_symbol_in_symbol" expl="VC for nlsubst_symbol_in_symbol">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.1" expl="1. precondition">
+  <transf name="inline_goal">
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.1.1" expl="1. precondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter nlsubst_symbol_in_symbol.1.1.1" expl="1. precondition">
+    <proof prover="7"><result status="valid" time="0.12" steps="21"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.2" expl="2. precondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.3" expl="3. precondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.4" expl="4. postcondition">
+  <proof prover="7"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.5" expl="5. precondition">
+  <proof prover="7"><result status="valid" time="0.04" steps="51"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.6" expl="6. precondition">
+  <proof prover="7"><result status="valid" time="0.06" steps="59"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.7" expl="7. precondition">
+  <proof prover="7"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.8" expl="8. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.8.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="1.61"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.8.2" expl="2. assertion">
+   <proof prover="7"><result status="valid" time="0.08" steps="103"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.8.3" expl="3. assertion">
+   <proof prover="1"><result status="valid" time="0.78"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.8.4" expl="4. assertion">
+   <proof prover="7"><result status="valid" time="0.03" steps="17"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.8.5" expl="5. assertion">
+   <proof prover="7"><result status="valid" time="0.08" steps="101"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_symbol.9" expl="9. postcondition">
+  <transf name="inline_goal">
+   <goal name="WP_parameter nlsubst_symbol_in_symbol.9.1" expl="1. postcondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter nlsubst_symbol_in_symbol.9.1.1" expl="1. VC for nlsubst_symbol_in_symbol">
+    <proof prover="7"><result status="valid" time="0.27" steps="613"/></proof>
+    </goal>
+    <goal name="WP_parameter nlsubst_symbol_in_symbol.9.1.2" expl="2. VC for nlsubst_symbol_in_symbol">
+    <proof prover="7"><result status="valid" time="0.05" steps="77"/></proof>
+    </goal>
+    <goal name="WP_parameter nlsubst_symbol_in_symbol.9.1.3" expl="3. VC for nlsubst_symbol_in_symbol">
+    <proof prover="7"><result status="valid" time="0.11" steps="140"/></proof>
+    </goal>
+    <goal name="WP_parameter nlsubst_symbol_in_symbol.9.1.4" expl="4. VC for nlsubst_symbol_in_symbol">
+    <proof prover="7"><result status="valid" time="0.86" steps="502"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

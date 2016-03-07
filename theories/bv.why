@@ -105,90 +105,122 @@ theory BV_Gen
   use export bool.Bool
   use import int.Int
 
-  constant size_int : int
-  axiom size_int_pos : size_int > 0
+  constant size : int
+  axiom size_pos : size > 0
 
   type t
 
-  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+  (** [nth b n] is the n-th bit of b. Bit 0 is
       the least significant bit *)
   val function nth t int : bool
 
-  val constant zero : t
-  axiom Nth_zero:
-    forall n:int. 0 <= n < size_int -> nth zero n = False
+  axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size -> nth x n = False
+
+  val constant zeros : t
+  axiom Nth_zeros:
+    forall n:int. nth zeros n = False
 
   val constant ones : t
   axiom Nth_ones:
-    forall n. 0 <= n < size_int -> nth ones n = True
-
-  predicate eq (v1 v2 : t) =
-    forall n. 0 <= n < size_int -> nth v1 n = nth v2 n
-
-  axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+    forall n. 0 <= n < size -> nth ones n = True
 
   (** Bitwise operators *)
 
+  (* /!\ NOTE : both bw_and and bw_or don't need guard on n because of
+  nth out of bound axiom *)
   val function bw_and (v1 v2 : t) : t
   axiom Nth_bw_and:
-    forall v1 v2:t, n:int. 0 <= n < size_int ->
+    forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
 
   val function bw_or (v1 v2 : t) : t
   axiom Nth_bw_or:
-    forall v1 v2:t, n:int. 0 <= n < size_int ->
+    forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
 
   val function bw_xor (v1 v2 : t) : t
   axiom Nth_bw_xor:
-    forall v1 v2:t, n:int. 0 <= n < size_int ->
+    forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
 
   val function bw_not (v : t) : t
   axiom Nth_bw_not:
-    forall v:t, n:int. 0 <= n < size_int ->
+    forall v:t, n:int. 0 <= n < size ->
       nth (bw_not v) n = notb (nth v n)
+
+  (** Shift operators *)
+
+  (** Warning: shift operators of an amount greater than or equal to
+      the size are specified here, in concordance with SMTLIB. This is
+      not necessarily the case in hardware, where the amount of the
+      shift might be taken modulo the size, eg. [lsr x 64] might be
+      equal to [x], whereas in this theory it is 0.
+  *)
 
   val function lsr t int : t
 
   axiom Lsr_nth_low:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s < size_int ->
+    forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s < size ->
       nth (lsr b s) n = nth b (n+s)
 
   axiom Lsr_nth_high:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
+    forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s >= size ->
       nth (lsr b s) n = False
+
+  lemma lsr_zeros: forall x. lsr x 0 = x
 
   val function asr t int : t
 
   axiom Asr_nth_low:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n+s < size_int ->
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s < size ->
       nth (asr b s) n = nth b (n+s)
 
   axiom Asr_nth_high:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n+s >= size_int ->
-      nth (asr b s) n = nth b (size_int-1)
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s >= size ->
+      nth (asr b s) n = nth b (size-1)
+
+  lemma asr_zeros: forall x. asr x 0 = x
 
   val function lsl t int : t
 
   axiom Lsl_nth_high:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> 0 <= n-s < size_int -> nth (lsl b s) n = nth b (n-s)
+    forall b:t,n s:int. 0 <= s <= n < size ->
+      nth (lsl b s) n = nth b (n-s)
 
   axiom Lsl_nth_low:
-    forall b:t,n s:int. 0 <= s < size_int -> 0 <= n < size_int -> n-s < 0 -> nth (lsl b s) n = False
+    forall b:t,n s:int. 0 <= n < s ->
+      nth (lsl b s) n = False
 
-  use import Pow2int
+  lemma lsl_zeros: forall x. lsl x 0 = x
+
   use import int.EuclideanDivision
 
+  function rotate_right t int : t
+
+  axiom Nth_rotate_right :
+    forall v n i. 0 <= i < size -> 0 <= n ->
+      nth (rotate_right v n) i = nth v (mod (i + n) size)
+
+  function rotate_left t int : t
+
+  axiom Nth_rotate_left :
+    forall v n i. 0 <= i < size -> 0 <= n ->
+      nth (rotate_left v n) i = nth v (mod (i - n) size)
+
+
+(* Conversions from/to integers *)
+
+  use import Pow2int
+
+  constant two_power_size : int
   constant max_int : int
+
+  axiom two_power_size_val : two_power_size = pow2 size
+  axiom max_int_val : max_int = two_power_size - 1
 
   val function to_int t : int
   val function to_uint t : int
   val function of_int int : t
-
-  constant size : t = of_int size_int
-
-  constant two_power_size : int = Int.(+) max_int 1
 
   axiom to_uint_extensionality :
     forall v,v':t. to_uint v = to_uint v' -> v = v'
@@ -196,13 +228,28 @@ theory BV_Gen
   axiom to_int_extensionality:
     forall v,v':t. to_int v = to_int v' -> v = v'
 
+(*  *)
   predicate uint_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
+(*  *)
 
   axiom to_uint_bounds :
+(*
     forall v:t. uint_in_range (to_uint v)
+*)
+    forall v:t. 0 <= to_uint v < two_power_size
 
   axiom to_uint_of_int :
-    forall i. uint_in_range i -> to_uint (of_int i) = i
+    forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
+
+  constant size_bv : t = of_int size
+
+  axiom Of_int_zeros:
+    zeros = of_int 0
+
+  axiom Of_int_ones:
+    ones = of_int max_int
+
+  (* comparison operators *)
 
   let predicate ult (x y : t) =
     Int.(<) (to_uint x) (to_uint y)
@@ -228,27 +275,23 @@ theory BV_Gen
   let predicate sge (v1 v2 : t) =
     Int.(>=) (to_int v1) (to_int v2)
 
-  val function nth_bv t t: bool
-
-  axiom Nth_bv_is_nth:
-    forall x i: t.
-      nth_bv x i = nth x (to_uint i)
-
-  axiom Of_int_zero:
-    zero = of_int 0
-
-  axiom Of_int_ones:
-    ones = of_int max_int
-
   (** Arithmetic operators *)
 
   val function add (v1 v2 : t) : t
   axiom to_uint_add:
     forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
+  lemma to_uint_add_bounded:
+    forall v1 v2.
+      to_uint v1 + to_uint v2 < two_power_size ->
+      to_uint (add v1 v2) = to_uint v1 + to_uint v2
 
   val function sub (v1 v2 : t) : t
   axiom to_uint_sub:
     forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
+  lemma to_uint_sub_bounded:
+    forall v1 v2.
+      0 <= to_uint v1 - to_uint v2 < two_power_size ->
+      to_uint (sub v1 v2) = to_uint v1 - to_uint v2
 
   val function neg (v1 : t) : t
   axiom to_uint_neg:
@@ -257,6 +300,10 @@ theory BV_Gen
   val function mul (v1 v2 : t) : t
   axiom to_uint_mul:
     forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
+  lemma to_uint_mul_bounded:
+    forall v1 v2.
+      to_uint v1 * to_uint v2 < two_power_size ->
+      to_uint (mul v1 v2) = to_uint v1 * to_uint v2
 
   val function udiv (v1 v2 : t) : t
   axiom to_uint_udiv:
@@ -266,17 +313,7 @@ theory BV_Gen
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
 
-  val function rotate_right (v n : t) : t
-
-  val function rotate_left (v n : t) : t
-
-  axiom Nth_rotate_left :
-    forall v n i. ult i size -> ult n (sub ones size) ->
-      nth_bv v i = nth_bv (rotate_left v n) (urem (add i n) size)
-
-  axiom Nth_rotate_right :
-    forall v n i. ult i size -> ult n (sub ones size) ->
-      nth_bv (rotate_right v n) i = nth_bv v (urem (add i n) size)
+  (** Bitvector alternatives for shifts, rotations and nth *)
 
   (** logical shift right *)
   val function lsr_bv t t : t
@@ -307,54 +344,114 @@ theory BV_Gen
     forall v n : t.
          to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
 
-  axiom two_power_size_val :
-    two_power_size = pow2 size_int
+  (** rotations *)
+  val function rotate_right_bv (v n : t) : t
+
+  val function rotate_left_bv (v n : t) : t
+
+  axiom rotate_left_bv_is_rotate_left :
+    forall v n. rotate_left_bv v n = rotate_left v (to_uint n)
+
+  axiom rotate_right_bv_is_rotate_right :
+    forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
+
+  (** nth_bv *)
+  val function nth_bv t t: bool
+
+  axiom nth_bv_def:
+    forall x i.
+      nth_bv x i = not (bw_and (lsr_bv x i) (of_int 1) = zeros)
+
+  axiom Nth_bv_is_nth:
+    forall x i.
+      nth x (to_uint i) = nth_bv x i
+
+  axiom Nth_bv_is_nth2:
+    forall x i. 0 <= i < two_power_size ->
+      nth_bv x (of_int i) = nth x i
+
+  (* equality axioms *)
+
+  predicate eq_sub_bv t t t t
+
+  axiom eq_sub_bv_def: forall a b i n.
+    let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
+      eq_sub_bv a b i n = (bw_and b mask = bw_and a mask)
+
+  predicate eq_sub (a b:t) (i n:int) =
+    forall j. i <= j < i + n -> nth a j = nth b j
+
+  axiom eq_sub_equiv: forall a b i n:t.
+      eq_sub    a b (to_uint i) (to_uint n)
+  <-> eq_sub_bv a b i n
+
+  predicate eq (v1 v2 : t) =
+    eq_sub v1 v2 0 size
+
+  axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+
 end
 
-(** {2 Bit Vectors of common sizes, 8/16/32/64} *)
+(** {2 Bit Vectors of common size_bvs, 8/16/32/64} *)
 
 theory BV64
-  constant size_int : int = 64
-  constant max_int : int = 0xFFFF_FFFF_FFFF_FFFF
+  constant size           : int = 64
+  constant two_power_size : int = 0x1_0000_0000_0000_0000
+  constant max_int        : int = 0xFFFF_FFFF_FFFF_FFFF
 
   clone export BV_Gen with
-    constant size_int = size_int,
+    constant size = size,
+    constant two_power_size = two_power_size,
     constant max_int = max_int,
-    goal size_int_pos,
-    goal two_power_size_val
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
+
 end
 
 theory BV32
-  constant size_int : int = 32
-  constant max_int : int = 0xFFFF_FFFF
+  constant size           : int = 32
+  constant two_power_size : int = 0x1_0000_0000
+  constant max_int        : int = 0xFFFF_FFFF
 
   clone export BV_Gen with
-    constant size_int = size_int,
+    constant size = size,
+    constant two_power_size = two_power_size,
     constant max_int = max_int,
-    goal size_int_pos,
-    goal two_power_size_val
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
+
 end
 
 theory BV16
-  constant size_int : int = 16
+  constant size : int = 16
+  constant two_power_size : int = 0x1_0000
   constant max_int : int = 0xFFFF
 
   clone export BV_Gen with
-    constant size_int = size_int,
+    constant size = size,
+    constant two_power_size = two_power_size,
     constant max_int = max_int,
-    goal size_int_pos,
-    goal two_power_size_val
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
+
 end
 
 theory BV8
-  constant size_int : int = 8
-  constant max_int : int = 0xFF
+  constant size           : int = 8
+  constant two_power_size : int = 0x1_00
+  constant max_int        : int = 0xFF
 
   clone export BV_Gen with
-    constant size_int = size_int,
+    constant size = size,
+    constant two_power_size = two_power_size,
     constant max_int = max_int,
-    goal size_int_pos,
-    goal two_power_size_val
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val
+
 end
 
 (** {2 Generic Converter} *)
@@ -364,8 +461,6 @@ theory BVConverter_Gen
   type bigBV
   type smallBV
 
-  constant pow2_smallSize : int
-
   predicate in_small_range bigBV
 
   function to_uint_small smallBV : int
@@ -373,9 +468,18 @@ theory BVConverter_Gen
 
   function toBig smallBV : bigBV
   function toSmall bigBV : smallBV
+
+  axiom toSmall_to_uint :
+    forall x:bigBV. in_small_range x ->
+      to_uint_big x = to_uint_small (toSmall x)
+
+  axiom toBig_to_uint :
+    forall x:smallBV.
+      to_uint_small x = to_uint_big (toBig x)
+
 end
 
-(** {2 Converters of common sizes} *)
+(** {2 Converters of common size_bvs} *)
 
 theory BVConverter_32_64
   use BV32
@@ -387,7 +491,6 @@ theory BVConverter_32_64
     type bigBV = BV64.t,
     type smallBV = BV32.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV32.two_power_size,
     function to_uint_small = BV32.to_uint,
     function to_uint_big = BV64.to_uint
 end
@@ -402,7 +505,6 @@ theory BVConverter_16_64
     type bigBV = BV64.t,
     type smallBV = BV16.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV16.two_power_size,
     function to_uint_small = BV16.to_uint,
     function to_uint_big = BV64.to_uint
 end
@@ -417,7 +519,6 @@ theory BVConverter_8_64
     type bigBV = BV64.t,
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize =  BV8.two_power_size,
     function to_uint_small = BV8.to_uint,
     function to_uint_big = BV64.to_uint
 end
@@ -432,7 +533,6 @@ theory BVConverter_16_32
     type bigBV = BV32.t,
     type smallBV = BV16.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV16.two_power_size,
     function to_uint_small = BV16.to_uint,
     function to_uint_big = BV32.to_uint
 end
@@ -447,7 +547,6 @@ theory BVConverter_8_32
     type bigBV = BV32.t,
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV8.two_power_size,
     function to_uint_small = BV8.to_uint,
     function to_uint_big = BV32.to_uint
 end
@@ -462,7 +561,6 @@ theory BVConverter_8_16
     type bigBV = BV16.t,
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    constant pow2_smallSize = BV8.two_power_size,
     function to_uint_small = BV8.to_uint,
     function to_uint_big = BV16.to_uint
 end

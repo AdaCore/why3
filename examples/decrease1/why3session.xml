@@ -3,71 +3,71 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.4pl4" timelimit="10" memlimit="0"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.4pl6" timelimit="10" memlimit="0"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="5" name="CVC3" version="2.2" timelimit="10" memlimit="0"/>
 <prover id="6" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
 <file name="../decrease1.mlw" expanded="true">
-<theory name="Decrease1" sum="96029203b47dc412a4717a33c2ab812d" expanded="true">
+<theory name="Decrease1" sum="7c49cfeea622335075ec3d6212620b2b" expanded="true">
  <goal name="decrease1_induction" expanded="true">
- <proof prover="1" edited="decrease1_Decrease1_decrease1_induction_2.v"><result status="valid" time="1.10"/></proof>
+ <proof prover="3" edited="decrease1_Decrease1_decrease1_induction_2.v"><result status="valid" time="1.10"/></proof>
  </goal>
  <goal name="WP_parameter search" expl="VC for search" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter search.1" expl="1. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter search.2" expl="2. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter search.3" expl="3. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter search.4" expl="4. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter search.5" expl="5. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter search.6" expl="6. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search.7" expl="7. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter search.8" expl="8. loop invariant preservation" expanded="true">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
@@ -76,39 +76,39 @@
   </goal>
   <goal name="WP_parameter search.9" expl="9. loop variant decrease" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter search.10" expl="10. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter search.11" expl="11. loop invariant preservation" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter search.12" expl="12. loop variant decrease" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter search.13" expl="13. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
@@ -116,75 +116,75 @@
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter search_rec.1" expl="1. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.2" expl="2. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.3" expl="3. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.4" expl="4. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.5" expl="5. variant decrease">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.6" expl="6. precondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.7" expl="7. postcondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="7"><result status="valid" time="0.21"/></proof>
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.8" expl="8. variant decrease">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="8"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.9" expl="9. precondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.10" expl="10. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.11" expl="11. postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>

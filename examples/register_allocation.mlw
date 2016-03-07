@@ -1,0 +1,314 @@
+
+(** A tiny register allocator for tree expressions.
+
+    Authors: Martin Clochard (École Normale Supérieure)
+             Jean-Christophe Filliâtre (CNRS)
+ *)
+
+module Spec
+
+  use import HighOrd
+  use import int.Int
+
+  type addr
+
+  type expr =
+  | Evar addr
+  | Eneg expr
+  | Eadd expr expr
+
+  type memory = addr -> int
+
+  function eval (m: memory) (e: expr) : int =
+    match e with
+    | Evar x     -> m x
+    | Eneg e     -> - (eval m e)
+    | Eadd e1 e2 -> eval m e1 + eval m e2
+    end
+
+  type register = int
+
+  type instr =
+    | Iload addr register
+    | Ineg  register
+    | Iadd  register register
+    | Ipush register
+    | Ipop  register
+
+  type registers = register -> int
+
+  function update (reg: registers) (r: register) (v: int) : registers =
+    \r'. if r' = r then v else reg r'
+
+  use import list.List
+
+  type stack = list int
+
+  type state = {
+    mem: memory;
+    reg: registers;
+    st : stack;
+  }
+
+  function exec (i: instr) (s: state) : state =
+    match i with
+    | Iload x r   -> { s with reg = update s.reg r (s.mem x) }
+    | Ineg  r     -> { s with reg = update s.reg r (- s.reg r) }
+    | Iadd  r1 r2 -> { s with reg = update s.reg r2 (s.reg r1 + s.reg r2) }
+    | Ipush r     -> { s with st = Cons (s.reg r) s.st }
+    | Ipop  r     -> match s.st with
+                     | Nil       -> s (* fails *)
+                     | Cons v st -> { s with reg = update s.reg r v; st = st }
+                     end
+    end
+  meta rewrite_def function exec
+
+  type code = list instr
+
+  function exec_list (c: code) (s: state) : state =
+    match c with
+    | Nil      -> s
+    | Cons i l -> exec_list l (exec i s)
+    end
+
+  use import list.Append
+
+  let rec lemma exec_append (c1 c2: code) (s: state) : unit
+    ensures { exec_list (c1 ++ c2) s = exec_list c2 (exec_list c1 s) }
+    variant { c1 }
+  = match c1 with
+    | Nil        -> ()
+    | Cons i1 l1 -> exec_append l1 c2 (exec i1 s)
+    end
+
+  (** specification of the forthcoming compilation:
+      - value of expression e lies in register r in final state
+      - all registers smaller than are preserved
+      - memory and stack are preserved *)
+  function expr_post (e: expr) (r: register) : state -> state -> bool =
+    \s s'. s'.mem = s.mem /\ s'.reg r = eval s.mem e /\ s'.st = s.st /\
+      forall r'. r' < r -> s'.reg r' = s.reg r'
+  meta rewrite_def function expr_post
+
+end
+
+(** Double WP technique
+
+    If you read French, see https://hal.inria.fr/hal-01094488
+
+    See also this other Why3 proof, from where this technique originates:
+    http://toccata.lri.fr/gallery/double_wp.en.html
+*)
+
+module DWP
+
+  use import list.List
+  use import list.Append
+  use import Spec
+
+  meta compute_max_steps 0x10000
+
+  predicate (-->) (x y: 'a) = "rewrite" x = y
+  meta rewrite_def predicate (-->)
+
+  type post = state -> state -> bool
+  type hcode = {
+    hcode : code;
+    ghost post : post;
+  }
+  predicate hcode_ok (hc: hcode) = forall s. hc.post s (exec_list hc.hcode s)
+
+  type trans = (state -> bool) -> state -> bool
+  type wcode = {
+    ghost trans : trans;
+    wcode : code;
+  }
+  predicate wcode_ok (wc: wcode) = forall q s.
+    wc.trans q s -> q (exec_list wc.wcode s)
+
+  function to_wp (pst: post) : trans = \q s1. forall s2. pst s1 s2 -> q s2
+  meta rewrite_def function to_wp
+
+  function rcompose : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c = \f g x. g (f x)
+  meta rewrite_def function rcompose
+
+  function exec_closure (i: instr) : state -> state = \s. exec i s
+  function id : 'a -> 'a = \x.x
+
+  let ($_) (hc: hcode) : wcode
+    requires { hcode_ok hc }
+    ensures { wcode_ok result }
+    ensures { result.trans --> to_wp hc.post }
+  = { wcode = hc.hcode; trans = to_wp hc.post }
+
+  let wrap (wc: wcode) (ghost pst: post) : hcode
+    requires { wcode_ok wc }
+    requires { forall x. wc.trans (pst x) x }
+    ensures { hcode_ok result }
+    ensures { result.post --> pst }
+  = { hcode = wc.wcode; post = pst }
+
+  let (--) (w1 w2: wcode) : wcode
+    requires { wcode_ok w1 /\ wcode_ok w2 }
+    ensures { wcode_ok result }
+    ensures { result.trans --> rcompose w2.trans w1.trans }
+  = { wcode = w1.wcode ++ w2.wcode; trans = rcompose w2.trans w1.trans }
+
+  let cons (i: instr) (w: wcode) : wcode
+    requires { wcode_ok w }
+    ensures { wcode_ok result }
+    ensures { result.trans --> rcompose w.trans (rcompose (exec i)) }
+  = { wcode = Cons i w.wcode;
+      trans = rcompose w.trans (rcompose (exec_closure i)) }
+
+  let nil () : wcode
+    ensures { wcode_ok result }
+    ensures { result.trans --> \q.q }
+  = { wcode = Nil; trans = id }
+
+end
+
+module InfinityOfRegisters
+
+  use import HighOrd
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import Spec
+  use import DWP
+
+  (** [compile e r] returns a list of instructions that stores the value
+      of [e] in register [r], without modifying any register [r' < r]. *)
+
+  let rec compile (e: expr) (r: register) : hcode
+    variant { e }
+    ensures { hcode_ok result }
+    ensures { result.post --> expr_post e r }
+  = wrap (
+      match e with
+      | Evar x -> cons (Iload x r) (nil ())
+      | Eneg e -> $ compile e r -- cons (Ineg r) (nil ())
+      | Eadd e1 e2 ->
+          $ compile e1 r -- $ compile e2 (r + 1) -- cons (Iadd (r+1) r) (nil ())
+      end) (expr_post e r)
+
+  (* To recover usual specification. *)
+  let ghost recover (e: expr) (r: register) (h: hcode) : unit
+    requires { hcode_ok h /\ h.post --> expr_post e r }
+    ensures  { forall s. let s' = exec_list h.hcode s in
+               s'.mem = s.mem /\
+               s'.reg r = eval s.mem e /\
+               s'.st = s.st /\
+               forall r'. r' < r -> s'.reg r' = s.reg r' }
+  = ()
+
+end
+
+module FiniteNumberOfRegisters
+
+  use import HighOrd
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import Spec
+  use import DWP
+
+  (** we have k registers, namely 0,1,...,k-1 *)
+  constant k: int
+
+  (** we assume having at least two registers, otherwise we can't add *)
+  axiom at_least_two_registers: k >= 2
+
+  (** [compile e r] returns a list of instructions that stores the value
+      of [e] in register [r], without modifying any register [r' < r]. *)
+
+  let rec compile (e: expr) (r: register) : hcode
+    requires { 0 <= r < k }
+    variant  { e }
+    ensures  { hcode_ok result }
+    ensures  { result.post --> expr_post e r }
+  = wrap (
+      match e with
+      | Evar x -> cons (Iload x r) (nil ())
+      | Eneg e -> $ compile e r -- cons (Ineg r) (nil ())
+      | Eadd e1 e2 ->
+          if r < k-1 then
+            $ compile e1 r -- $ compile e2 (r + 1) --
+            cons (Iadd (r + 1) r) (nil ())
+          else
+            cons (Ipush (k - 2)) (
+            $ compile e1 (k - 2) -- $ compile e2 (k - 1) --
+            cons (Iadd (k - 2) (k - 1)) (
+            cons (Ipop (k - 2)) (nil ())))
+      end) (expr_post e r)
+
+end
+
+module OptimalNumberOfRegisters
+
+  use import HighOrd
+  use import int.Int
+  use import int.MinMax
+  use import list.List
+  use import list.Append
+  use import Spec
+  use import DWP
+
+  (** we have k registers, namely 0,1,...,k-1 *)
+  constant k: int
+
+  (** we assume having at least two registers, otherwise we can't add *)
+  axiom at_least_two_registers: k >= 2
+
+  (** the minimal number of registers needed to evaluate e *)
+  function n (e: expr) : int =
+    match e with
+    | Evar _     -> 1
+    | Eneg e     -> n e
+    | Eadd e1 e2 -> let n1 = n e1 in let n2 = n e2 in
+                    if n1 = n2 then 1 + n1 else max n1 n2
+    end
+
+  (** Note: This is of course inefficient to recompute function [n] many
+      times. A realistic implementation would compute [n e] once for
+      each sub-expression [e], either with a first pass of tree decoration,
+      or with function [compile] returning the value of [n e] as well,
+      in a bottom-up way *)
+
+  function measure (e: expr) : int =
+    match e with
+    | Evar _     -> 0
+    | Eneg e     -> 1 + measure e
+    | Eadd e1 e2 -> 1 + if n e1 >= n e2 then measure e1 + measure e2
+                        else 1 + measure e1 + measure e2
+    end
+
+  lemma measure_nonneg: forall e. measure e >= 0
+
+  (** [compile e r] returns a list of instructions that stores the value
+      of [e] in register [r], without modifying any register [r' < r]. *)
+
+  let rec compile (e: expr) (r: register) : hcode
+    requires { 0 <= r < k }
+    variant  { measure e }
+    ensures  { hcode_ok result }
+    ensures  { result.post --> expr_post e r }
+  = wrap (
+      match e with
+      | Evar x -> cons (Iload x r) (nil ())
+      | Eneg e -> $ compile e r -- cons (Ineg r) (nil ())
+      | Eadd e1 e2 ->
+          if n e1 >= n e2 then (* we must compile e1 first *)
+            if r < k-1 then
+              $ compile e1 r -- $ compile e2 (r + 1) --
+              cons (Iadd (r + 1) r) (nil ())
+            else
+              cons (Ipush (k - 2)) (
+              $ compile e1 (k - 2) -- $ compile e2 (k - 1) --
+              cons (Iadd (k - 2) (k - 1)) (
+              cons (Ipop (k - 2)) (nil ())))
+          else
+            $ compile (Eadd e2 e1) r (* compile e2 first *)
+      end) (expr_post e r)
+
+end

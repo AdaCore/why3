@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<file name="../ProverTest.mlw" expanded="true">
+<theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Impl" sum="aae70bc668e1fd46c9bdc15813975a9a" expanded="true">
+ <goal name="WP_parameter imply" expl="VC for imply">
+ <proof prover="0"><result status="valid" time="0.15" steps="48"/></proof>
+ </goal>
+ <goal name="WP_parameter equiv" expl="VC for equiv">
+ <proof prover="0"><result status="valid" time="0.17" steps="59"/></proof>
+ </goal>
+ <goal name="WP_parameter drinker" expl="VC for drinker">
+ <proof prover="0"><result status="valid" time="1.64" steps="54"/></proof>
+ </goal>
+ <goal name="WP_parameter group" expl="VC for group">
+ <proof prover="1"><result status="valid" time="0.69"/></proof>
+ </goal>
+ <goal name="WP_parameter bidon1" expl="VC for bidon1">
+ <proof prover="0"><result status="valid" time="0.22" steps="38"/></proof>
+ </goal>
+ <goal name="WP_parameter bidon2" expl="VC for bidon2">
+ <proof prover="0"><result status="valid" time="0.45" steps="52"/></proof>
+ </goal>
+ <goal name="WP_parameter bidon3" expl="VC for bidon3">
+ <proof prover="1"><result status="valid" time="0.67"/></proof>
+ <proof prover="2"><result status="valid" time="0.18"/></proof>
+ </goal>
+ <goal name="WP_parameter bidon4" expl="VC for bidon4">
+ <proof prover="1"><result status="valid" time="0.55"/></proof>
+ <proof prover="2"><result status="valid" time="0.24"/></proof>
+ </goal>
+ <goal name="WP_parameter pierce" expl="VC for pierce">
+ <proof prover="0"><result status="valid" time="0.48" steps="50"/></proof>
+ </goal>
+ <goal name="WP_parameter generate" expl="VC for generate">
+ <proof prover="0"><result status="valid" time="0.25" steps="51"/></proof>
+ </goal>
+ <goal name="WP_parameter zenon5" expl="VC for zenon5">
+ <proof prover="1"><result status="valid" time="0.51"/></proof>
+ <proof prover="2"><result status="valid" time="0.16"/></proof>
+ </goal>
+ <goal name="WP_parameter zenon6" expl="VC for zenon6">
+ <proof prover="1"><result status="valid" time="0.76"/></proof>
+ <proof prover="2"><result status="valid" time="0.17"/></proof>
+ </goal>
+ <goal name="WP_parameter zenon10" expl="VC for zenon10">
+ <proof prover="1"><result status="valid" time="0.71"/></proof>
+ </goal>
+ <goal name="WP_parameter test" expl="VC for test">
+ <proof prover="0"><result status="valid" time="0.30" steps="10"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

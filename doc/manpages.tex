@@ -185,7 +185,7 @@ The \texttt{prove} command executes the following steps:
 %\texttt{why3} calls the provers sequentially, use \texttt{why3bench} if *)
 %you want to call the provers concurrently.  *)
 
-\noindent
+\subsection{Prover Results}
 The provers can give the following output:
 \begin{description}
 \item[Valid] The goal is proved in the given context.
@@ -211,6 +211,17 @@ The provers can give the following output:
 %multiple times with reduced context. The minimal set of declarations is
 %then written in the prover syntax into a file located in the directory
 %given to the \verb|-o/--output| option.
+
+\subsection{Additional Options}
+\label{sec:proveoptions}
+
+\begin{description}
+\item[\texttt{-{}-get-ce}] activates the generation of a potential counter-example when a proof does not succeed (experimental).
+\item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}] specifies
+  \textsl{s} as an additional prefix for labels that denotes VC
+  explanations. The option can be used several times to specify
+  several prefixes.
+\end{description}
 
 \section{The \texttt{ide} Command}
 \label{sec:ideref}
@@ -437,6 +448,27 @@ are grouped together under several tabs.
   decision previously taken for missing provers, as described in
   Section~\ref{sec:uninstalledprovers}. You can remove any recorded
   decision by clicking on it.
+\end{description}
+
+% \subsection{Displaying Counterexamples}
+%
+% how to use counterexamples - explain labels, projections, the option --get-ce of why3prove and the setting in why3ide
+%
+% problem with set logic and counterexamples
+%
+% which provers
+%
+% where it is displayed
+%
+% how to interpret the display
+%
+% example
+
+\subsection{Additional Command-Line Options}
+
+The \texttt{ide} command also accepts the following options described for the command \texttt{prove} in Section~\ref{sec:proveoptions}.
+\begin{description}
+\item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}]
 \end{description}
 
 

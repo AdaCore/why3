@@ -305,9 +305,9 @@ apply generic_format_B2R.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
 zify ; generalize Hprec' Hemax' ; omega.
-apply bpow_gt_0.
 apply abs_B2R_lt_emax.
-unfold pred.
+rewrite pred_eq_pos.
+unfold pred_pos.
 rewrite ln_beta_bpow.
 ring_simplify (emax+1-1)%Z.
 rewrite Req_bool_true by easy.
@@ -322,6 +322,7 @@ simpl; ring.
 apply Zlt_le_weak.
 exact Hprec'.
 generalize Hprec' Hemax' ; omega.
+apply bpow_ge_0.
 Qed.
 
 (* Why3 goal *)

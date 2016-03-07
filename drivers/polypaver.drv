@@ -1,0 +1,93 @@
+(* Why3 driver for PolyPaver *)
+(* http://michalkonecny.github.io/polypaver/_site/ *)
+
+printer "metitarski"
+filename "%f-%t-%g.tptp"
+
+valid 0
+invalid 111
+timeout "Gave up on deciding conjecture: TIMED OUT"
+time "why3cpulimit time : %s s"
+unknown 1 "toto"
+
+(* to be improved *)
+
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "inline_all"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_epsilon"
+transformation "eliminate_if"
+transformation "eliminate_let"
+
+transformation "simplify_formula"
+transformation "simplify_unknown_lsymbols"
+transformation "simplify_trivial_quantification"
+transformation "introduce_premises"
+transformation "instantiate_predicate"
+transformation "abstract_unknown_lsymbols"
+
+transformation "discriminate"
+transformation "encoding_tptp"
+
+theory BuiltIn
+  meta "encoding : base" type real
+  syntax predicate (=)  "(%1 = %2)"
+  meta "eliminate_algebraic" "no_index"
+end
+
+import "discrimination.gen"
+
+theory real.Real
+
+  syntax function zero "0.0"
+  syntax function one  "1.0"
+
+  syntax function (+)   "(%1 + %2)"
+  syntax function (-)   "(%1 - %2)"
+  syntax function (-_)  "(-%1)"
+  syntax function ( * ) "(%1 * %2)"
+  syntax function (/)   "(%1 / %2)"
+  syntax function inv   "(1/ %1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 < %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 > %2)"
+
+  meta "inline : no" predicate (<=)
+  meta "inline : no" predicate (>=)
+  meta "inline : no" predicate (>)
+
+  remove allprops
+end
+
+theory real.Abs
+  syntax function abs "abs(%1)"
+  remove allprops
+end
+
+theory real.Square
+  syntax function sqr  "(%1)^2"
+  syntax function sqrt "sqrt(%1)"
+  remove allprops
+end
+
+theory real.MinMax
+  syntax function min "min(%1,%2)"
+  syntax function max "max(%1,%2)"
+  remove allprops
+end
+
+theory real.ExpLog
+  syntax function exp "exp(%1)"
+  syntax function log "ln(%1)"
+  remove allprops
+end
+
+theory real.PowerReal
+  syntax function pow "pow(%1,%2)"
+  remove allprops
+end

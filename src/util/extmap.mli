@@ -256,6 +256,10 @@ module type S =
     (** [add_new e x v m] binds [x] to [v] in [m] if [x] is not bound,
         and raises [e] otherwise. *)
 
+    val replace : exn -> key -> 'a -> 'a t -> 'a t
+    (** [replace e x v m] binds [x] to [v] in [m] if [x] is already bound,
+        and raises [e] otherwise. *)
+
     val keys: 'a t -> key list
     (** Return the list of all keys of the given map.
         The returned list is sorted in increasing order with respect

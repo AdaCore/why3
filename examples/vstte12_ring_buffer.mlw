@@ -161,9 +161,9 @@ module RingBufferSeq
     self.len = S.length self.sequence /\
     forall i: int. 0 <= i < self.len ->
       (self.first + i < size ->
-         S.([]) self.sequence i = self.data[self.first + i]) /\
+         S.get self.sequence i = self.data[self.first + i]) /\
       (0 <= self.first + i - size ->
-         S.([]) self.sequence i = self.data[self.first + i - size])
+         S.get self.sequence i = self.data[self.first + i - size])
   }
 
   (* total capacity of the buffer *)
@@ -204,14 +204,14 @@ module RingBufferSeq
 
   let head (b: buffer 'a) : 'a
     requires { length b > 0 }
-    ensures  { result = S.([]) b.sequence 0 }
+    ensures  { result = S.get b.sequence 0 }
   = b.data[b.first]
 
   let pop (b: buffer 'a) : 'a
     requires { length b > 0 }
     writes   { b.first, b.len, b.sequence }
     ensures  { length b = (old (length b)) - 1 }
-    ensures  { result = S.([]) (old b.sequence) 0 }
+    ensures  { result = S.get (old b.sequence) 0 }
     ensures  { b.sequence = (old b.sequence)[1 ..] }
   = ghost b.sequence <- b.sequence[1 ..];
     let r = b.data[b.first] in

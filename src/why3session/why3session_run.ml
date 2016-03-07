@@ -181,7 +181,7 @@ let is_valid pr =
 
 let to_edit_queue = Queue.create ()
 
-let is_successful env = (** means all goals proved*)
+let is_successful env = (* means all goals proved*)
   try
     let rec iter = function
         | File f -> file_iter iter f
@@ -305,13 +305,13 @@ let run_one sched env config filters interactive_provers fname =
       let checkyn = ask_yn_nonblock ~callback:(fun b ->
         if b then
           let callback_edit pa =
-            M.run_external_proof_v3
-              env_session sched pa 
+            M.run_external_proof_v3 ~use_steps:false
+              env_session sched pa
 	      callback in
           M.edit_proof_v3 env_session sched
 	    ~cntexample:false
-            ~default_editor:"" (** TODO? *)
-            ~callback:callback_edit a 
+            ~default_editor:"" (* TODO? *)
+            ~callback:callback_edit a
         else
           Todo.stop todo;
         if not (Queue.is_empty to_edit_queue) then
@@ -320,7 +320,7 @@ let run_one sched env config filters interactive_provers fname =
       ) in
       O.timeout ~ms:100 checkyn
     in
-    M.run_external_proof_v3 env_session sched pr callback
+    M.run_external_proof_v3 ~use_steps:false env_session sched pr callback
   ) stack;
   Todo.stop todo
 

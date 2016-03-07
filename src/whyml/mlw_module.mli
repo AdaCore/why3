@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Program modules} *)
+
 open Stdlib
 open Ident
 open Ty
@@ -19,8 +21,6 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
-
-(** *)
 
 type type_symbol =
   | PT of itysymbol

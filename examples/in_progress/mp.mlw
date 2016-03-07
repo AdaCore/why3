@@ -70,6 +70,7 @@ module N
         else 0
 
   use map.MapEq
+  use map.Const
 
   let rec lemma value_sub_frame (x y:map int limb) (n m:int)
     requires { MapEq.map_eq_sub x y n m }
@@ -111,7 +112,7 @@ module N
     value_sub_concat (Map.set x i v) n i m
 
   let rec lemma value_zero (x:map int limb) (n m:int)
-    requires { MapEq.map_eq_sub x (Map.const Limb.zero_unsigned) n m }
+    requires { MapEq.map_eq_sub x (Const.const Limb.zero_unsigned) n m }
     variant  { m - n }
     ensures  { value_sub x n m = 0 }
   = if n < m then value_zero x (n+1) m else ()
@@ -143,7 +144,7 @@ module N
     requires { p2i l > p2i x.digits.length }
     writes  { x }
     ensures { x.digits.length = l }
-    ensures { MapEq.map_eq_sub x.digits.elts (Map.const Limb.zero_unsigned)
+    ensures { MapEq.map_eq_sub x.digits.elts (Const.const Limb.zero_unsigned)
                 (p2i (old x).digits.length) (p2i l) }
     ensures { value x = value (old x) }
   = 'Init:
@@ -151,11 +152,11 @@ module N
     let zero = Int31.of_int 0 in
     let lx = x.digits.length in
     let r = Array31.make l limb_zero in
-    assert { MapEq.map_eq_sub r.elts (Map.const limb_zero) (p2i lx) (p2i l) };
+    assert { MapEq.map_eq_sub r.elts (Const.const limb_zero) (p2i lx) (p2i l) };
     Array31.blit x.digits zero r zero lx;
     assert { MapEq.map_eq_sub x.digits.elts r.elts 0 (p2i lx) };
     assert { value_sub x.digits.elts 0 (p2i lx) = value (at x 'Init) };
-    assert { MapEq.map_eq_sub r.elts (Map.const limb_zero) (p2i lx) (p2i l) };
+    assert { MapEq.map_eq_sub r.elts (Const.const limb_zero) (p2i lx) (p2i l) };
     assert { value_sub r.elts (p2i lx) (p2i l) = 0 };
     assert { value_sub r.elts 0 (p2i l) = value_sub r.elts 0 (p2i lx)
            + value_sub r.elts (p2i lx) (p2i l) * power radix (p2i lx) };
@@ -506,7 +507,7 @@ module N
     let ly = y.digits.length in
     if Int31.(>) lx (Int31.(-) (of_int 0x3FFFFFFF) ly) then raise TooManyDigits;
     let zd = Array31.make (Int31.(+) lx ly) limb_zero in
-    assert { MapEq.map_eq_sub zd.elts (Map.const limb_zero) 0 (p2i lx + p2i ly) };
+    assert { MapEq.map_eq_sub zd.elts (Const.const limb_zero) 0 (p2i lx + p2i ly) };
     assert { value_sub zd.elts 0 (p2i lx + p2i ly) = 0 };
     let _c = mul_limbs zd x.digits y.digits zero zero lx zero ly in
     assert { l2i _c = 0 };

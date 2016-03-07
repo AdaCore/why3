@@ -1,0 +1,297 @@
+module Types
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  type nl_symbol 'b0 = | NLFVar_symbol 'b0
+    | NLBruijn_symbol int
+
+
+  type nlimpl_symbol =
+    { nlrepr_symbol_field : nl_symbol int ;
+      nlfree_var_symbol_set_abstraction_symbol_field : int ;
+      ghost model_symbol_field : symbol int ;
+    }
+
+  type cons_symbol = | NLCVar_symbol int
+
+
+end
+
+module Logic
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  use import Types
+  function nat_nlsize_symbol (t:nl_symbol 'b0) : nat =
+    match t with | NLFVar_symbol v0 -> one_nat
+      | NLBruijn_symbol v0 -> one_nat
+    end
+
+  with nlsize_symbol (t:nl_symbol 'b0) : int =
+    match t with | NLFVar_symbol v0 -> 1 | NLBruijn_symbol v0 -> 1 end
+
+  let rec lemma nlsize_positive_lemma_symbol (t:nl_symbol 'b0) : unit
+    ensures { nlsize_symbol t > 0 }
+    variant { nat_to_int (nat_nlsize_symbol t) } =
+    match t with | NLFVar_symbol v0 -> () | NLBruijn_symbol v0 -> () end
+
+  (* Abstraction definition axiom :
+      function shiftb_symbol (bnd:func int (symbol 'b0)) :
+        func int (symbol (option 'b0)) =
+        (\ i:int.
+           if i = 0 then Var_symbol None else rename_symbol (bnd (i-1)) some)*)
+  function shiftb_symbol (bnd:func int (symbol 'b0)) :
+    func int (symbol (option 'b0))
+  axiom shiftb_symbol_definition :
+    forall bnd:func int (symbol 'b0), i:int.
+      eval (shiftb_symbol bnd) i =
+        if i = 0 then Var_symbol None else rename_symbol (bnd (i-1)) some
+
+  let lemma shiftb_compose_lemma_symbol (bnd:func int (symbol 'b0))
+    (s0:func 'b0 (symbol 'c0)) : unit
+    ensures { subst_compose_symbol (shiftb_symbol bnd) (olifts_symbol s0) =
+      shiftb_symbol (subst_compose_symbol bnd s0) }
+    =
+    assert {
+      forall i:int. (i = 0 \/ i <> 0) ->
+        subst_symbol (shiftb_symbol bnd i) (olifts_symbol s0) =
+        eval (shiftb_symbol (subst_compose_symbol bnd s0)) i
+      } ;
+    assert {
+      extensionalEqual
+        (subst_compose_symbol (shiftb_symbol bnd) (olifts_symbol s0))
+        (shiftb_symbol (subst_compose_symbol bnd s0))
+      }
+
+  function nlmodel_symbol (t:nl_symbol 'b0) (fr0:func 'b0 (symbol 'c0))
+    (bnd0:func int (symbol 'c0)) : symbol 'c0 =
+    match t with | NLFVar_symbol v0 -> fr0 v0 | NLBruijn_symbol v0 -> bnd0 v0
+    end
+
+  let rec lemma nlmodel_subst_commutation_lemma_symbol (t:nl_symbol 'b0)
+    (fr0:func 'b0 (symbol 'c0)) (bnd0:func int (symbol 'c0))
+    (s0:func 'c0 (symbol 'd0)) : unit
+    ensures {
+      nlmodel_symbol t (subst_compose_symbol fr0 s0)
+        (subst_compose_symbol bnd0 s0)
+      = subst_symbol (nlmodel_symbol t fr0 bnd0) s0 }
+    variant { nlsize_symbol t } =
+    match t with | NLFVar_symbol v0 -> () | NLBruijn_symbol v0 -> () end
+
+  let lemma nlmodel_rename_commutation_lemma_symbol (t:nl_symbol 'b0)
+    (fr0:func 'b0 (symbol 'c0)) (bnd0:func int (symbol 'c0))
+    (s0:func 'c0 'd0) : unit
+    ensures {
+      nlmodel_symbol t (rename_subst_symbol fr0 s0)
+        (rename_subst_symbol bnd0 s0)
+      = rename_symbol (nlmodel_symbol t fr0 bnd0) s0 }
+    =
+    nlmodel_subst_commutation_lemma_symbol t fr0 bnd0
+      (subst_of_rename_symbol s0)
+
+  predicate correct_indexes_symbol (t:nl_symbol 'b0) =
+    match t with | NLFVar_symbol v0 -> true | NLBruijn_symbol v0 -> v0 >= 0
+    end
+
+  function bound_depth_of_symbol_in_symbol (t:nl_symbol 'b0) : int =
+    match t with | NLFVar_symbol v0 -> 0 | NLBruijn_symbol v0 -> 1 + v0 end
+
+  let rec lemma bound_depth_of_symbol_in_symbol_nonnegative
+    (t:nl_symbol 'b0) : unit requires { correct_indexes_symbol t }
+    ensures { bound_depth_of_symbol_in_symbol t >= 0 }
+    variant { nlsize_symbol t } =
+    match t with | NLFVar_symbol v0 -> () | NLBruijn_symbol v0 -> () end
+
+  let rec lemma model_equal_symbol (t:nl_symbol 'b0)
+    (fr10:func 'b0 (symbol 'c0)) (fr20:func 'b0 (symbol 'c0))
+    (bnd10:func int (symbol 'c0)) (bnd20:func int (symbol 'c0)) : unit
+    requires {
+      forall i:int. 0 <= i < bound_depth_of_symbol_in_symbol t ->  bnd10 i =
+        bnd20 i
+      }
+    requires { fr10 = fr20 } requires { correct_indexes_symbol t }
+    ensures { nlmodel_symbol t fr10 bnd10 = nlmodel_symbol t fr20 bnd20 }
+    variant { nlsize_symbol t } =
+    match t with | NLFVar_symbol v0 -> () | NLBruijn_symbol v0 -> () end
+
+  predicate nlimpl_symbol_ok (t:nlimpl_symbol) =
+    nlmodel_symbol t.nlrepr_symbol_field subst_id_symbol
+      (const (Var_symbol ((-1)))) = t.model_symbol_field
+    /\ correct_indexes_symbol t.nlrepr_symbol_field /\
+    bound_depth_of_symbol_in_symbol t.nlrepr_symbol_field = 0 /\
+    (forall x:int. is_symbol_free_var_in_symbol x t.model_symbol_field -> (x)
+       < (t.nlfree_var_symbol_set_abstraction_symbol_field))
+
+  predicate cons_ok_symbol (c:cons_symbol) =
+    match c with | NLCVar_symbol v0 -> true end
+
+  predicate cons_rel_symbol (c:cons_symbol) (t:nlimpl_symbol) =
+    match c with | NLCVar_symbol v0 -> t.model_symbol_field = Var_symbol v0
+    end
+
+  predicate cons_open_rel_symbol (c:cons_symbol) (t:nlimpl_symbol) =
+    match c with | NLCVar_symbol v0 -> t.model_symbol_field = Var_symbol v0
+    end
+
+
+end
+
+module Impl
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  use import Types
+  use import Logic
+  let rec bind_var_symbol_in_symbol (t:nl_symbol int) (x:int) (i:int)
+    (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0)) :
+    nl_symbol int
+    requires { correct_indexes_symbol t }
+    requires { bound_depth_of_symbol_in_symbol t <= i }
+    variant { nlsize_symbol t }
+    ensures { bound_depth_of_symbol_in_symbol result <= i + 1 }
+    ensures { correct_indexes_symbol result }
+    ensures { nlmodel_symbol result fr0 bnd0 =
+      nlmodel_symbol t (update fr0 x (bnd0 i)) bnd0 }
+    =
+    match t with
+      | NLFVar_symbol v0 ->
+        if v0 = x then NLBruijn_symbol i else NLFVar_symbol v0
+      | NLBruijn_symbol v0 -> NLBruijn_symbol v0
+    end
+
+  let rec unbind_var_symbol_in_symbol (t:nl_symbol int) (i:int)
+    (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
+    (ghost bnd10:func int (symbol 'b0)) (ghost bnd20:func int (symbol 'b0)) :
+    nl_symbol int
+    requires { i >= 0 }
+    requires { correct_indexes_symbol t }
+    requires { bound_depth_of_symbol_in_symbol t <= i + 1 }
+    requires { correct_indexes_symbol x }
+    requires { bound_depth_of_symbol_in_symbol x = 0 }
+    variant { nlsize_symbol t }
+    ensures { correct_indexes_symbol result }
+    ensures { bound_depth_of_symbol_in_symbol result <= i }
+    ensures { nlmodel_symbol result fr0 bnd10 =
+      nlmodel_symbol t fr0 (update bnd10 i (nlmodel_symbol x fr0 bnd20)) }
+    =
+    match t with | NLFVar_symbol v0 -> NLFVar_symbol v0
+      | NLBruijn_symbol v0 ->
+        if v0 = i then (model_equal_symbol x fr0 fr0 bnd10 bnd20 ; x)
+          else NLBruijn_symbol v0
+    end
+
+  let subst_base_symbol_in_symbol (t:nl_symbol int) (x:int)
+    (u:nl_symbol int) (ghost fr0:func int (symbol 'b0))
+    (ghost bnd10:func int (symbol 'b0)) (ghost bnd20:func int (symbol 'b0)) :
+    nl_symbol int
+    requires { correct_indexes_symbol t }
+    requires { correct_indexes_symbol u }
+    requires { bound_depth_of_symbol_in_symbol u = 0 }
+    ensures { correct_indexes_symbol result }
+    ensures { bound_depth_of_symbol_in_symbol result =
+       bound_depth_of_symbol_in_symbol t }
+    ensures { nlmodel_symbol result fr0 bnd10 =
+      nlmodel_symbol t (update fr0 x (nlmodel_symbol u fr0 bnd20)) bnd10 }
+    =
+    match t with
+      | NLFVar_symbol v0 ->
+        if v0 = x then (model_equal_symbol u fr0 fr0 bnd10 bnd20 ; u)
+          else NLFVar_symbol v0
+      | NLBruijn_symbol v0 -> NLBruijn_symbol v0
+    end
+
+  let construct_symbol (c:cons_symbol) : nlimpl_symbol
+    requires { cons_ok_symbol c } ensures { nlimpl_symbol_ok result }
+    ensures { cons_rel_symbol c result }
+    (*ensures { cons_open_rel_symbol c result }*) =
+    match c with
+      | NLCVar_symbol v0 ->
+        { nlrepr_symbol_field = NLFVar_symbol v0 ;
+          nlfree_var_symbol_set_abstraction_symbol_field = (1 + (v0)) ;
+          model_symbol_field = ghost (Var_symbol v0) ;
+        }
+    end
+
+  let destruct_symbol (t:nlimpl_symbol) : cons_symbol
+    requires { nlimpl_symbol_ok t } ensures { cons_ok_symbol result }
+    ensures { cons_rel_symbol result t }
+    ensures { cons_open_rel_symbol result t } =
+    let fv0 = t.nlfree_var_symbol_set_abstraction_symbol_field in
+    match t.nlrepr_symbol_field with | NLFVar_symbol v0 -> NLCVar_symbol v0
+      | NLBruijn_symbol v0 -> absurd
+    end
+
+  let nlsubst_symbol_in_symbol (t:nlimpl_symbol) (x:int) (u:nlimpl_symbol) :
+    nlimpl_symbol requires { nlimpl_symbol_ok t }
+    requires { nlimpl_symbol_ok u } ensures { nlimpl_symbol_ok result }
+    ensures { result.model_symbol_field =
+      subst_symbol t.model_symbol_field
+        (update (subst_id_symbol: func (int) (symbol (int))) x
+           u.model_symbol_field)
+      }
+    =
+    model_equal_symbol t.nlrepr_symbol_field
+      (subst_compose_symbol subst_id_symbol
+         ((update (subst_id_symbol: func (int) (symbol (int))) x
+             u.model_symbol_field)))
+      ((update (subst_id_symbol: func (int) (symbol (int))) x
+          u.model_symbol_field))
+      (subst_compose_symbol (const (Var_symbol (-1)))
+         ((update (subst_id_symbol: func (int) (symbol (int))) x
+             u.model_symbol_field)))
+      ((const (Var_symbol (-1))));
+    let res =
+      {
+        nlrepr_symbol_field =
+          subst_base_symbol_in_symbol t.nlrepr_symbol_field x
+            u.nlrepr_symbol_field (subst_id_symbol)
+            ((const (Var_symbol (-1)))) ((const (Var_symbol (-1)))) ;
+        nlfree_var_symbol_set_abstraction_symbol_field =
+          (let aux (a:int) (b:int) : int
+             ensures { result >= a /\ result >= b } = if a < b then b else a
+             in
+             aux (t.nlfree_var_symbol_set_abstraction_symbol_field)
+               (u.nlfree_var_symbol_set_abstraction_symbol_field)) ;
+        model_symbol_field = ghost
+          subst_symbol t.model_symbol_field
+            (update (subst_id_symbol: func (int) (symbol (int))) x
+               u.model_symbol_field) ;
+      }
+    in
+    assert {
+      forall x2:int. is_symbol_free_var_in_symbol x2 res.model_symbol_field
+        ->
+        (true /\
+           (forall y:int.
+              (is_symbol_free_var_in_symbol y t.model_symbol_field /\
+                 is_symbol_free_var_in_symbol x2
+                   (eval
+                      ((update (subst_id_symbol: func (int) (symbol (int))) x
+                          u.model_symbol_field))
+                      y))
+              ->
+              ((x = y -> (x2) <
+                  (res.nlfree_var_symbol_set_abstraction_symbol_field))
+                 /\
+                 (x <> y -> x2 = y && (x2) <
+                    (res.nlfree_var_symbol_set_abstraction_symbol_field)))
+                 && (x2) <
+                 (res.nlfree_var_symbol_set_abstraction_symbol_field)))
+        && (x2) < (res.nlfree_var_symbol_set_abstraction_symbol_field)
+      } ;
+    res
+
+
+end

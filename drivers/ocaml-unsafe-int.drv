@@ -1,15 +1,14 @@
 
 (** OCaml driver with Why3 type int being mapped to OCaml type int.
 
-    This is of course unsafe, yet useful to run your code is you
-    have an independant argument regarding the absence of arithmetic
+    This is of course unsafe, yet useful to run your code when you
+    have an independent argument for the absence of arithmetic
     overflows. *)
 
-printer "ocaml"
+printer "ocaml-unsafe-int"
 
 theory BuiltIn
   syntax type int "int"
-  (* meta "ocaml arithmetic" "unsafe int" *)
   syntax predicate  (=)   "(%1 = %2)"
 end
 
@@ -48,31 +47,25 @@ theory int.MinMax
   syntax function max "(Pervasives.max %1 %2)"
 end
 
-(* FIXME
-theory int.Lex2
-  syntax predicate lt_nat "(Why3__BigInt.lt_nat %1 %2)"
-  syntax predicate lex    "(Why3__BigInt.lex %1 %2)"
-end
-
-theory int.EuclideanDivision
-  syntax function div "(Why3__BigInt.euclidean_div %1 %2)"
-  syntax function mod "(Why3__BigInt.euclidean_mod %1 %2)"
-end
+(* TODO
+   - int.EuclideanDivision
+   - number.Gcd
+*)
 
 theory int.Power
-  syntax function power "(Why3__BigInt.power %1 %2)"
+  prelude "let rec power x n = if n = 0 then 1 else x * power x (n-1)"
+  syntax function power "(power %1 %2)"
 end
 
 theory int.Fact
-  syntax function fact "(Why3__IntAux.fact %1)"
+  prelude "let rec fact n = if n <= 1 then 1 else n * fact (n-1)"
+  syntax function fact "(fact %1)"
 end
 
 theory int.Fibonacci
-  syntax function fib "(Why3__IntAux.fib %1)"
+  prelude "let rec fib n = if n <= 1 then n else fib (n-2) + fib (n-1)"
+  syntax function fib "(fib %1)"
 end
-
-TODO number.Gcd
-*)
 
 (* WhyML *)
 
@@ -127,6 +120,23 @@ module array.Array
   syntax val blit          "Array.blit"
 end
 
+module matrix.Matrix
+  syntax type matrix "(%1 array array)"
+
+  syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
+
+  syntax function rows     "(Array.length %1)"
+  syntax function columns  "(Array.length %1.(0))"
+  syntax val rows          "Array.length"
+  syntax val columns       "(fun m -> Array.length m.(0))"
+  syntax val get           "(fun m i j -> m.(i).(j))"
+  syntax val set           "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val defensive_get "(fun m i j -> m.(i).(j))"
+  syntax val defensive_set "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val make          "Array.make_matrix"
+  syntax val copy          "(Array.map Array.copy)"
+end
+
 module mach.int.Int31
   syntax val       of_int   "(fun x -> x)"
   syntax converter of_int   "%1"
@@ -147,6 +157,37 @@ module mach.int.Int31
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
 end
+module mach.int.Int63
+  syntax val       of_int   "(fun x -> x)"
+  syntax converter of_int   "%1"
+
+  syntax function to_int "(%1)"
+
+  syntax type     int63     "int"
+  syntax val      ( + )     "( + )"
+  syntax val      ( - )     "( - )"
+  syntax val      (-_)      "( ~- )"
+  syntax val      ( * )     "( * )"
+  syntax val      ( / )     "( / )"
+  syntax val      ( % )     "(mod)"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+module mach.int.Refint63
+  syntax val incr "Pervasives.incr"
+  syntax val decr "Pervasives.decr"
+  syntax val (+=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r + v))"
+  syntax val (-=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r - v))"
+  syntax val ( *= ) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r * v))"
+end
+module mach.int.MinMax63
+  syntax val min "Pervasives.min"
+  syntax val max "Pervasives.max"
+end
 
 (* TODO
    other mach.int.XXX modules *)
@@ -165,25 +206,34 @@ module mach.array.Array31
   syntax val  blit   "Array.blit"
   syntax val  self_blit "Array.blit"
 end
+module mach.array.Array63
+  syntax type array63 "(%1 array)"
 
-(* TODO
-module string.Char
-  syntax type char "Pervasives.char"
-  syntax val chr "Why3__BigInt.chr"
-  syntax val code "Why3__BigInt.code"
-  syntax function uppercase "Char.uppercase"
-  syntax function lowercase "Char.lowercase"
+  syntax val  make   "Array.make"
+  syntax val  ([])   "Array.get"
+  syntax val  ([]<-) "Array.set"
+  syntax val  length "Array.length"
+  syntax val  append "Array.append"
+  syntax val  sub    "Array.sub"
+  syntax val  copy   "Array.copy"
+  syntax val  fill   "Array.fill"
+  syntax val  blit   "Array.blit"
+  syntax val  self_blit "Array.blit"
+end
+module mach.matrix.Matrix63
+  syntax type matrix "(%1 array array)"
+
+  syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
+
+  syntax function rows     "(Array.length %1)"
+  syntax function columns  "(Array.length %1.(0))"
+  syntax val rows          "Array.length"
+  syntax val columns       "(fun m -> Array.length m.(0))"
+  syntax val get           "(fun m i j -> m.(i).(j))"
+  syntax val set           "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val defensive_get "(fun m i j -> m.(i).(j))"
+  syntax val defensive_set "(fun m i j v -> m.(i).(j) <- v)"
+  syntax val make          "Array.make_matrix"
+  syntax val copy          "(Array.map Array.copy)"
 end
 
-module io.StdIO
-  syntax val print_char "Pervasives.print_char"
-  syntax val print_int "Why3__BigInt.print"
-  syntax val print_newline "Pervasives.print_newline"
-end
-
-module random.Random
-
-  syntax val random_int    "Why3__BigInt.random_int"
-
-end
-*)

@@ -15,15 +15,25 @@ open Term
 (*          explanations       *)
 (*******************************)
 
-let expl_regexp = Str.regexp "expl:\\(.*\\)"
+let expl_prefixes = ref ["expl:"]
+
+let arg_extra_expl_prefix =
+  ("--extra-expl-prefix",
+   Arg.String (fun s -> expl_prefixes := s :: !expl_prefixes),
+   "<s> register s as an additional prefix for VC explanations")
 
 let collect_expls lab =
   Ident.Slab.fold
     (fun lab acc ->
        let lab = lab.Ident.lab_string in
-       if Str.string_match expl_regexp lab 0
-       then Str.matched_group 1 lab :: acc
-       else acc)
+       let rec aux l =
+         match l with
+           | [] -> acc
+           | p :: r ->
+              try
+                let s = Strings.remove_prefix p lab in s :: acc
+              with Not_found -> aux r
+       in aux !expl_prefixes)
     lab
     []
 
@@ -32,21 +42,26 @@ let concat_expls = function
   | [l] -> Some l
   | l :: ls -> Some (l ^ " (" ^ String.concat ". " ls ^ ")")
 
-let rec get_expls_fmla acc f =
-  if f.t_ty <> None then acc
-  else if Ident.Slab.mem Term.stop_split f.Term.t_label then acc
-  else
-    let res = collect_expls f.Term.t_label in
-    if res = [] then match f.t_node with
-      | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
-      | Term.Tbinop (Term.Timplies, _, f) -> get_expls_fmla acc f
-      | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
-        Term.t_fold get_expls_fmla acc f
-      | _ -> raise Exit
-    else if acc = [] then res
-    else raise Exit
+let search_labels callback =
+  let rec aux acc f =
+    if f.t_ty <> None then acc
+    else if Ident.Slab.mem Term.stop_split f.Term.t_label then acc
+    else
+      let res = callback f.Term.t_label in
+      if res = [] then match f.t_node with
+        | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
+        | Term.Tbinop (Term.Timplies, _, f) -> aux acc f
+        | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
+          Term.t_fold aux acc f
+        | _ -> raise Exit
+      else if acc = [] then res
+      else raise Exit
+  in
+  aux []
 
-let get_expls_fmla f = try get_expls_fmla [] f with Exit -> []
+let get_expls_fmla =
+  let search = search_labels collect_expls in
+  fun f -> try search f with Exit -> []
 
 let goal_expl_task ~root task =
   let gid = (Task.task_goal task).Decl.pr_name in

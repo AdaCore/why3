@@ -1,0 +1,29 @@
+module M
+
+  use import int.Int
+  use import ref.Ref
+
+  function sqr (x:int) : int = x * x
+
+  lemma sqr_sum :
+    forall x y : int. sqr(x+y) = sqr x + 2*x*y + sqr y
+
+  let isqrt (x:int) : int
+    requires { x >= 0 }
+    ensures { result >= 0 }
+    ensures { sqr result <= x < sqr (result + 1) }
+  = let count = ref 0 in
+    let sum = ref 1 in
+    while !sum <= x do
+      invariant { !count >= 0 }
+      invariant { x >= sqr !count }
+      invariant { !sum = sqr (!count+1) }
+      variant   { x - !count }
+      count := !count + 1;
+      sum := !sum + 2 * !count + 1
+    done;
+    !count
+
+  let main () ensures { result = 4 } = isqrt 17
+
+end

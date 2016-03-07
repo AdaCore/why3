@@ -2,16 +2,8 @@
 
 module M
 
-  type t = O | S t
+  use import map.Map
 
-  let f () =
-     let ghost g (x:t) : t =
-        match x with O -> O | S y -> y end
-(*
-     with ghost h (x:t) : t = 
-        match x with O -> O | S y -> y end
-*)
-     in
-     ()
+  let f (x:map int int) : int = x[0]
 
 end

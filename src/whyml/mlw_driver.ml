@@ -93,28 +93,36 @@ let load_driver env file extra_files =
   let find_ps th q =
     let ls = find_ls th q in
     if ls.ls_value <> None then raise (PSymExpected ls) else ls in
-  let add_syntax id s = syntax_map := Mid.add id s !syntax_map in
-  let add_converter id s = converter_map := Mid.add id s !converter_map in
+  let add_syntax id s b =
+    syntax_map := Mid.add id (s,if b then 1 else 0) !syntax_map in
+  let add_converter id s b =
+    converter_map := Mid.add id (s,if b then 1 else 0) !converter_map in
   let add_local th = function
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
-    | Rsyntaxts (q,s) ->
+    | Rsyntaxts (q,s,b) ->
         let ts = find_ts th q in
         check_syntax_type ts s;
-        add_syntax ts.ts_name s
-    | Rsyntaxfs (q,s) ->
+        add_syntax ts.ts_name s b
+    | Rsyntaxfs (q,s,b) ->
         let fs = find_fs th q in
         check_syntax_logic fs s;
-        add_syntax fs.ls_name s
-    | Rsyntaxps (q,s) ->
+        add_syntax fs.ls_name s b
+    | Rsyntaxps (q,s,b) ->
         let ps = find_ps th q in
         check_syntax_logic ps s;
-        add_syntax ps.ls_name s
+        add_syntax ps.ls_name s b
     | Rconverter _ ->
         Loc.errorm "Syntax converter cannot be used in pure theories"
     | Rremovepr (q) ->
-        ignore (find_pr th q)
+      ignore (find_pr th q)
+    | Rremoveall ->
+      let it key _ = match (Mid.find key th.th_known).Decl.d_node with
+        | Decl.Dprop (_,symb,_) -> ignore symb
+        | _ -> ()
+      in
+      Mid.iter it th.th_local
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
@@ -155,13 +163,13 @@ let load_driver env file extra_files =
   let add_local_module loc m = function
     | MRexception (q,s) ->
         let xs = find_xs m q in
-        add_syntax xs.xs_name s
+        add_syntax xs.xs_name s false
     | MRval (q,s) ->
         let id = find_val m q in
-        add_syntax id s
-    | MRtheory (Rconverter (q,s)) ->
+        add_syntax id s false
+    | MRtheory (Rconverter (q,s,b)) ->
         let id = find_val m q in
-        add_converter id s
+        add_converter id s b
     | MRtheory trule ->
         add_local m.mod_theory (loc,trule)
   in

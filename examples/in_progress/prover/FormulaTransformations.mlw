@@ -1,0 +1,1467 @@
+
+module Types
+
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_term_impl.Types
+  use import list.List
+  use import Functions.Func
+  use import Firstorder_semantics.Sem
+
+  (* ghost field: explicitly to get rid of the existential. *)
+
+  type skolemization_return 'st = {
+    skolemized : nlimpl_fo_formula ;
+    skolem_bound : int ;
+    free_var_list : list int ;
+    ghost model_transformer : func (model int 'st) (model int 'st) ;
+  }
+
+  type skolemization_list_return 'st = {
+    skolemized_l : nlimpl_fo_formula_list ;
+    skolem_bound_l : int ;
+    ghost model_transformer_l : func (model int 'st) (model int 'st) ;
+  }
+
+  type skolemization_env_return 'st = {
+    skolemized_fv_list : nlimpl_fo_term_list ;
+    ghost skolem_env : func (list 'st) (func int 'st) ;
+  }
+
+end
+
+module Logic
+
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_formula_list_spec.Spec
+  use import Functions.Func
+  use import option.Option
+  use import OptionFuncs.Funcs
+
+  predicate is_atom (phi:fo_formula 'ls 'b) = match phi with
+    | PApp _ _ -> true
+    | Not (PApp _ _) -> true
+    | _ -> false
+  end
+
+  (* Negational normal form. *)
+
+  predicate is_nnf (phi:fo_formula 'ls 'b) = match phi with
+    | Not (PApp _ _) -> true
+    | Not _ -> false
+    | PApp _ _ -> true
+    | And a b -> is_nnf a /\ is_nnf b
+    | Or a b -> is_nnf a /\ is_nnf b
+    | Forall a -> is_nnf a
+    | Exists a -> is_nnf a
+    | FTrue -> true
+    | FFalse -> true
+  end
+
+  predicate is_nnf_list (phis:fo_formula_list 'ls 'b) = match phis with
+    | FOFNil -> true
+    | FOFCons x q -> is_nnf x /\ is_nnf_list q
+  end
+
+  let rec lemma is_nnf_subst (phi:fo_formula 'ls 'b) (f:func 'b (fo_term 'ls 'c)) : unit
+    requires { is_nnf phi }
+    ensures { is_nnf (subst_fo_formula phi subst_id_symbol f) }
+    variant { size_fo_formula phi }
+  =
+    match phi with
+      | Not (PApp p l) -> assert {
+          subst_fo_formula phi subst_id_symbol f =
+            Not (subst_fo_formula (PApp p l) subst_id_symbol f) =
+            Not (PApp (subst_symbol p subst_id_symbol)
+                      (subst_fo_term_list l subst_id_symbol f)) }
+      | Not _ -> absurd
+      | PApp _ _ -> ()
+      | And a b -> is_nnf_subst a f ; is_nnf_subst b f
+      | Or a b -> is_nnf_subst a f ; is_nnf_subst b f
+      | Forall a -> is_nnf_subst a (olifts_fo_term f) ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Forall (subst_fo_formula a subst_id_symbol (olifts_fo_term f)) }
+      | Exists a -> is_nnf_subst a (olifts_fo_term f) ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Exists (subst_fo_formula a subst_id_symbol (olifts_fo_term f)) }
+      | FTrue -> ()
+      | FFalse -> ()
+    end
+
+  let lemma is_nnf_renaming (phi:fo_formula 'ls 'b) (f:func 'b 'c) : unit
+    requires { is_nnf phi }
+    ensures { is_nnf (rename_fo_formula phi identity f) }
+  =
+    is_nnf_subst phi (rcompose f subst_id_fo_term)
+
+  (* Simplified formula. *)
+
+  predicate is_simpl (phi:fo_formula 'ls 'b) = match phi with
+    | Not u -> is_simpl u
+    | PApp _ _ -> true
+    | And a b -> is_simpl a /\ is_simpl b
+    | Or a b -> is_simpl a /\ is_simpl b
+    | Forall a -> is_simpl a
+    | Exists a -> is_simpl a
+    | FTrue -> false
+    | FFalse -> false
+  end
+
+  predicate is_simpl_list (phis:fo_formula_list 'ls 'b) = match phis with
+    | FOFNil -> true
+    | FOFCons x q -> is_simpl x /\ is_simpl_list q
+  end
+
+  let rec lemma is_simpl_subst (phi:fo_formula 'ls 'b) (f:func 'b (fo_term 'ls 'c)) : unit
+    requires { is_simpl phi }
+    ensures { is_simpl (subst_fo_formula phi subst_id_symbol f) }
+    variant { size_fo_formula phi }
+  =
+    match phi with
+      | Not u -> is_simpl_subst u f ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Not (subst_fo_formula u subst_id_symbol f) }
+      | PApp _ _ -> ()
+      | And a b -> is_simpl_subst a f ; is_simpl_subst b f
+      | Or a b -> is_simpl_subst a f ; is_simpl_subst b f
+      | Forall a -> is_simpl_subst a (olifts_fo_term f) ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Forall (subst_fo_formula a subst_id_symbol (olifts_fo_term f)) }
+      | Exists a -> is_simpl_subst a (olifts_fo_term f) ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Exists (subst_fo_formula a subst_id_symbol (olifts_fo_term f)) }
+      | FTrue -> absurd
+      | FFalse -> absurd
+    end
+
+  let lemma is_simpl_renaming (phi:fo_formula 'ls 'b) (f:func 'b 'c) : unit
+    requires { is_simpl phi }
+    ensures { is_simpl (rename_fo_formula phi identity f) }
+  =
+    is_simpl_subst phi (rcompose f subst_id_fo_term)
+
+  (* Simplified formula, + true/false allowed at top. *)
+
+  predicate is_simpl_extended (phi:fo_formula 'ls 'b) =
+    is_simpl phi \/ phi = FTrue \/ phi = FFalse
+
+  lemma is_simpl_extended_renaming :
+    forall phi:fo_formula 'ls 'b,f:func 'b 'c.
+      is_simpl_extended phi -> is_simpl_extended (rename_fo_formula phi identity f)
+
+  predicate no_existential (phi:fo_formula 'ls 'b) = match phi with
+      | Not u -> no_existential u
+      | PApp _ _ -> true
+      | And a b -> no_existential a /\ no_existential b
+      | Or a b -> no_existential a /\ no_existential b
+      | Forall a -> no_existential a
+      | Exists _ -> false
+      | FTrue -> true
+      | FFalse -> true
+    end
+
+  predicate no_existential_list (phis:fo_formula_list 'ls 'b) = match phis with
+    | FOFNil -> true
+    | FOFCons x q -> no_existential x /\ no_existential_list q
+  end
+
+  let rec lemma no_existential_subst (phi:fo_formula 'ls 'b) (f:func 'b (fo_term 'ls 'c)) : unit
+    requires { no_existential phi }
+    ensures { no_existential (subst_fo_formula phi subst_id_symbol f) }
+    variant { size_fo_formula phi }
+  =
+    match phi with
+      | Not u -> no_existential_subst u f ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Not (subst_fo_formula u subst_id_symbol f) }
+      | PApp _ _ -> ()
+      | And a b -> no_existential_subst a f ; no_existential_subst b f
+      | Or a b -> no_existential_subst a f ; no_existential_subst b f
+      | Forall a -> no_existential_subst a (olifts_fo_term f) ;
+        assert { subst_fo_formula phi subst_id_symbol f =
+          Forall (subst_fo_formula a subst_id_symbol (olifts_fo_term f)) }
+      | Exists _ -> absurd
+      | FTrue -> ()
+      | FFalse -> ()
+    end
+
+  let lemma no_existential_renaming (phi:fo_formula 'ls 'b) (f:func 'b 'c) : unit
+    requires { no_existential phi }
+    ensures { no_existential (rename_fo_formula phi identity f) }
+  =
+    no_existential_subst phi (rcompose f subst_id_fo_term)
+
+  (* Skolemization environment. *)
+
+  use import Choice.Choice
+  use import list.List
+
+  (* Hack to force possibility of instantiation of extend_env
+     definition axiom ! *)
+  function extend_env_selection (g:func (list 'st) (func 'b 'st))
+    (x:'b) (y:'b) (z:'st) (q:list 'st) : 'st = if x = y then z else g q x
+  (* Abstraction-definition axiom :
+     function extend_env (g:func (list 'st) (func 'b 'st) (y:'b) :
+       func (list 'st) (func  'b 'st) =
+       (\ l:list 'st. (\ x:option 'b. match l with
+         | Cons z q -> extend_env_selection g x y z q
+         | Nil -> default ) ) *)
+  function extend_env (g:func (list 'st) (func 'b 'st)) (y:'b) :
+    func (list 'st) (func 'b 'st)
+  axiom extend_env_def : forall g:func (list 'st) (func 'b 'st),y:'b,
+    l:list 'st,x:'b. extend_env g y l x =
+    match l with
+      | Cons z q -> extend_env_selection g x y z q
+      | Nil -> default
+    end
+
+end
+
+module Impl
+
+  use import Types
+  use import Logic
+  use import Functions.Func
+  use import set.Set as S
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_list_impl.Impl
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_term_impl.Impl
+  use import Firstorder_term_impl.Logic
+  use import Firstorder_term_impl.Types
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_symbol_impl.Impl
+  use import Firstorder_symbol_impl.Logic
+  use import Firstorder_symbol_impl.Types
+  use import list.List
+  use import option.Option
+  use import OptionFuncs.Funcs
+  use import Firstorder_semantics.Sem
+  use import bool.Bool
+  use import list.Mem
+  use import int.Int
+
+  exception Unsat
+
+  let smart_and (phi1 phi2:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi1 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi1.model_fo_formula_field -> S.mem x fvp }
+    requires { nlimpl_fo_formula_ok phi2 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi2.model_fo_formula_field -> S.mem x fvp }
+    requires { is_simpl_extended phi1.model_fo_formula_field }
+    requires { is_simpl_extended phi2.model_fo_formula_field }
+    ensures { is_simpl_extended result.model_fo_formula_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_semantic result.model_fo_formula_field m rho <->
+      formula_semantic phi1.model_fo_formula_field m rho /\
+      formula_semantic phi2.model_fo_formula_field m rho }
+    ensures { is_nnf phi1.model_fo_formula_field /\
+      is_nnf phi2.model_fo_formula_field ->
+        is_nnf result.model_fo_formula_field }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula x
+      result.model_fo_formula_field -> S.mem x fvp }
+  =
+    let phi1m = phi1.model_fo_formula_field in
+    let phi2m = phi2.model_fo_formula_field in
+    match destruct_fo_formula phi1 with
+      | NLC_FFalse -> phi1
+      | NLC_FTrue -> phi2
+      | _ -> assert { phi1m <> FTrue } ; assert { phi1m <> FFalse } ;
+        match destruct_fo_formula phi2 with
+          | NLC_FFalse -> phi2
+          | NLC_FTrue -> phi1
+          | _ -> assert { phi2m <> FTrue } ; assert { phi2m <> FFalse } ;
+            assert { is_simpl phi1m /\ is_simpl phi2m } ;
+            let phi0 = construct_fo_formula (NLC_And phi1 phi2) in
+            assert { phi0.model_fo_formula_field = And phi1m phi2m } ;
+            phi0
+        end
+    end
+
+  let smart_or (phi1 phi2:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi1 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi1.model_fo_formula_field -> S.mem x fvp }
+    requires { nlimpl_fo_formula_ok phi2 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi2.model_fo_formula_field -> S.mem x fvp }
+    requires { is_simpl_extended phi1.model_fo_formula_field }
+    requires { is_simpl_extended phi2.model_fo_formula_field }
+    ensures { is_simpl_extended result.model_fo_formula_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_semantic result.model_fo_formula_field m rho <->
+      formula_semantic phi1.model_fo_formula_field m rho \/
+      formula_semantic phi2.model_fo_formula_field m rho }
+    ensures { is_nnf phi1.model_fo_formula_field /\
+      is_nnf phi2.model_fo_formula_field ->
+        is_nnf result.model_fo_formula_field }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula x
+      result.model_fo_formula_field -> S.mem x fvp }
+  =
+    let phi1m = phi1.model_fo_formula_field in
+    let phi2m = phi2.model_fo_formula_field in
+    match destruct_fo_formula phi1 with
+      | NLC_FTrue -> phi1
+      | NLC_FFalse -> phi2
+      | _ -> assert { phi1m <> FTrue } ; assert { phi1m <> FFalse } ;
+        match destruct_fo_formula phi2 with
+          | NLC_FTrue -> phi2
+          | NLC_FFalse -> phi1
+          | _ -> assert { phi2m <> FTrue } ; assert { phi2m <> FFalse } ;
+            assert { is_simpl phi1m /\ is_simpl phi2m } ;
+            let phi0 = construct_fo_formula (NLC_Or phi1 phi2) in
+            assert { phi0.model_fo_formula_field = Or phi1m phi2m } ;
+            phi0
+        end
+    end
+
+  let smart_forall (x:int) (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi }
+    requires { forall y:int. is_fo_term_free_var_in_fo_formula y
+      phi.model_fo_formula_field -> S.mem y fvp \/ y = x }
+    requires { is_simpl_extended phi.model_fo_formula_field }
+    ensures { is_simpl_extended result.model_fo_formula_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_semantic result.model_fo_formula_field m rho <->
+      (forall xm:'st.
+        let r = rcompose (some[x <- None]) (ocase rho xm) in
+        formula_semantic phi.model_fo_formula_field m r) }
+    ensures { is_nnf phi.model_fo_formula_field ->
+        is_nnf result.model_fo_formula_field }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall y:int. is_fo_term_free_var_in_fo_formula y
+      result.model_fo_formula_field -> S.mem y fvp }
+  =
+    let phim = phi.model_fo_formula_field in
+    match destruct_fo_formula phi with
+      | NLC_FFalse -> assert { phim = FFalse &&
+        forall m:model int 'st,rho:func int 'st.
+          not(formula_semantic phim m rho) } ;
+        phi
+      | NLC_FTrue -> phi
+      | _ -> assert { phim <> FTrue /\ phim <> FFalse && is_simpl phim } ;
+        let phi0 = construct_fo_formula (NLC_Forall x phi) in
+        let phi0m = phi0.model_fo_formula_field in
+        let phi1m = rename_fo_formula phim identity (some[x <- None]) in
+        assert { phi0m = Forall phi1m } ;
+        assert { forall xf:int.
+          (forall y:int. is_fo_term_free_var_in_fo_formula y phim /\
+            eval (some[x<-None]) y = Some xf -> y <> x &&
+            Some xf = Some y && xf = y) && is_fo_term_free_var_in_fo_formula xf phi0m ->
+          is_fo_term_free_var_in_fo_formula (Some xf) phi1m &&
+          (exists y:int. is_fo_term_free_var_in_fo_formula y phim /\
+            eval (some[x <- None]) y = Some xf) && is_fo_term_free_var_in_fo_formula xf phim
+            && xf <> x && S.mem xf fvp } ;
+        phi0
+    end
+
+  let smart_exists (x:int) (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi }
+    requires { forall y:int. is_fo_term_free_var_in_fo_formula y phi.model_fo_formula_field
+      -> S.mem y fvp \/ y = x }
+    requires { is_simpl_extended phi.model_fo_formula_field }
+    ensures { is_simpl_extended result.model_fo_formula_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_semantic result.model_fo_formula_field m rho <->
+      (exists xm:'st.
+        let r = rcompose (some[x <- None]) (ocase rho xm) in
+        formula_semantic phi.model_fo_formula_field m r) }
+    ensures { is_nnf phi.model_fo_formula_field ->
+        is_nnf result.model_fo_formula_field }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall y:int. is_fo_term_free_var_in_fo_formula y result.model_fo_formula_field
+      -> S.mem y fvp }
+  =
+    let phim = phi.model_fo_formula_field in
+    match destruct_fo_formula phi with
+      | NLC_FFalse -> phi
+      | NLC_FTrue -> assert { phim = FTrue /\
+        forall m:model int 'st,rho:func int 'st.
+          formula_semantic phim m rho } ;
+        phi
+      | _ -> assert { phim <> FTrue /\ phim <> FFalse && is_simpl phim } ;
+        let phi0 = construct_fo_formula (NLC_Exists x phi) in
+        let phi0m = phi0.model_fo_formula_field in
+        let phi1m = rename_fo_formula phim identity (some[x <- None]) in
+        assert { phi0m = Exists phi1m } ;
+        assert { forall xf:int.
+          (forall y:int. is_fo_term_free_var_in_fo_formula y phim /\
+            eval (some[x<-None]) y = Some xf -> y <> x &&
+            Some xf = Some y && xf = y) && (is_fo_term_free_var_in_fo_formula xf phi0m ->
+          is_fo_term_free_var_in_fo_formula (Some xf) phi1m &&
+          (exists y:int. is_fo_term_free_var_in_fo_formula y phim /\
+            eval (some[x <- None]) y = Some xf) && is_fo_term_free_var_in_fo_formula xf phim
+            && xf <> x && S.mem xf fvp) && (is_fo_term_free_var_in_fo_formula xf phi0m ->
+            S.mem xf fvp) } ;
+        phi0
+    end
+
+  (* Put in negational normal form and
+     simplify formula (e.g. true/false removal/propagation to toplevel) *)
+
+  let rec nnf_simpl (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi }
+    requires { forall x:int.
+      is_fo_term_free_var_in_fo_formula x phi.model_fo_formula_field -> S.mem x fvp }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall x:int.
+      is_fo_term_free_var_in_fo_formula x result.model_fo_formula_field -> S.mem x fvp }
+    ensures { forall m:model int 'st, rho:func int 'st.
+      formula_semantic phi.model_fo_formula_field m rho <->
+      formula_semantic result.model_fo_formula_field m rho }
+    ensures { is_nnf result.model_fo_formula_field }
+    ensures { is_simpl_extended result.model_fo_formula_field }
+    variant { size_fo_formula phi.model_fo_formula_field }
+  =
+    let phim = phi.model_fo_formula_field in
+    match destruct_fo_formula phi with
+      | NLC_PApp p l -> phi
+      | NLC_Not phi' -> assert { forall x:int.
+        is_fo_term_free_var_in_fo_formula x phi'.model_fo_formula_field ->
+        is_fo_term_free_var_in_fo_formula x phim && S.mem x fvp } ;
+        nnf_neg_simpl phi' fvp
+      | NLC_And phi1 phi2 -> let phi'1 = nnf_simpl phi1 fvp in
+        let phi'2 = nnf_simpl phi2 fvp in
+        smart_and phi'1 phi'2 fvp
+      | NLC_Or phi1 phi2 -> let phi'1 = nnf_simpl phi1 fvp in
+        let phi'2 = nnf_simpl phi2 fvp in
+        smart_or phi'1 phi'2 fvp
+      | NLC_FTrue -> phi
+      | NLC_FFalse -> phi
+      | NLC_Forall x phi0 ->
+        let phi0m = phi0.model_fo_formula_field in
+        let phi1m = rename_fo_formula phi0m identity (some[x<-None]) in
+        assert { phim = Forall phi1m } ;
+        assert { phi0m = rename_fo_formula phi1m identity (ocase identity x) };
+        let fvp' = S.add x fvp in
+        assert { forall xf:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+           ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
+             | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m ->
+           (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+             ocase identity x y = xf) && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
+        let phi' = nnf_simpl phi0 fvp' in
+        let phi'' = smart_forall x phi' fvp in
+        phi''
+      | NLC_Exists x phi0 ->
+        let phi0m = phi0.model_fo_formula_field in
+        let phi1m = rename_fo_formula phi0m identity (some[x<-None]) in
+        assert { phim = Exists phi1m } ;
+        assert { phi0m = rename_fo_formula phi1m identity (ocase identity x) };
+        let fvp' = S.add x fvp in
+        assert { forall xf:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+           ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
+             | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m ->
+           (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+             ocase identity x y = xf) && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
+
+        let phi' = nnf_simpl phi0 fvp' in
+        let phi'' = smart_exists x phi' fvp in
+        phi''
+    end
+
+  with nnf_neg_simpl (phi:nlimpl_fo_formula) (ghost fvp:set int) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi.model_fo_formula_field -> S.mem x fvp }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula x
+      result.model_fo_formula_field -> S.mem x fvp }
+    ensures { forall m:model int 'st, rho:func int 'st.
+      formula_semantic phi.model_fo_formula_field m rho <->
+      not(formula_semantic result.model_fo_formula_field m rho) }
+    ensures { is_nnf result.model_fo_formula_field }
+    ensures { is_simpl_extended result.model_fo_formula_field }
+    variant { size_fo_formula phi.model_fo_formula_field }
+  =
+    let phim = phi.model_fo_formula_field in
+    match destruct_fo_formula phi with
+      | NLC_PApp p l -> construct_fo_formula (NLC_Not phi)
+      | NLC_Not phi' -> nnf_simpl phi' fvp
+      | NLC_And phi1 phi2 -> let phi'1 = nnf_neg_simpl phi1 fvp in
+        let phi'2 = nnf_neg_simpl phi2 fvp in
+        smart_or phi'1 phi'2 fvp
+      | NLC_Or phi1 phi2 -> let phi'1 = nnf_neg_simpl phi1 fvp in
+        let phi'2 = nnf_neg_simpl phi2 fvp in
+        smart_and phi'1 phi'2 fvp
+      | NLC_FTrue -> construct_fo_formula NLC_FFalse
+      | NLC_FFalse -> construct_fo_formula NLC_FTrue
+      | NLC_Forall x phi0 ->
+        let phi0m = phi0.model_fo_formula_field in
+        let phi1m = rename_fo_formula phi0m identity (some[x<-None]) in
+        assert { phim = Forall phi1m } ;
+        assert { phi0m = rename_fo_formula phi1m identity (ocase identity x) };
+        let fvp' = S.add x fvp in
+        assert { forall xf:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+           ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
+             | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m ->
+           (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+             ocase identity x y = xf) && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
+        let phi' = nnf_neg_simpl phi0 fvp' in
+        let phi'' = smart_exists x phi' fvp in
+        phi''
+      | NLC_Exists x phi0 ->
+        let phi0m = phi0.model_fo_formula_field in
+        let phi1m = rename_fo_formula phi0m identity (some[x<-None]) in
+        assert { phim = Exists phi1m } ;
+        assert { phi0m = rename_fo_formula phi1m identity (ocase identity x) };
+        let fvp' = S.add x fvp in
+        assert { forall xf:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+           ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
+             | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m ->
+           (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+             ocase identity x y = xf) && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
+
+        let phi' = nnf_neg_simpl phi0 fvp' in
+        let phi'' = smart_forall x phi' fvp in
+        phi''
+    end
+
+  (* gnum : take care of eliminated starting points. *)
+  let rec nnf_simpl_list (phis:nlimpl_fo_formula_list) (gnum:int)
+    (ghost fvp:set int) :  (nlimpl_fo_formula_list,int)
+    requires { nlimpl_fo_formula_list_ok phis }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phis.model_fo_formula_list_field -> S.mem x fvp }
+    returns { (rs,_) -> nlimpl_fo_formula_list_ok rs }
+    returns { (rs,_) -> forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      rs.model_fo_formula_list_field -> S.mem x fvp }
+    returns { (rs,_) -> forall m:model int 'st,rho:func int 'st.
+      formula_list_conj_semantic phis.model_fo_formula_list_field m rho <->
+        formula_list_conj_semantic rs.model_fo_formula_list_field m rho }
+    returns { (rs,_) -> is_nnf_list rs.model_fo_formula_list_field }
+    returns { (rs,_) -> is_simpl_list rs.model_fo_formula_list_field }
+    raises { Unsat -> forall m:model int 'st,rho:func int 'st.
+      not(formula_list_conj_semantic phis.model_fo_formula_list_field m rho) }
+    variant { size_fo_formula_list phis.model_fo_formula_list_field }
+  =
+    let phism = phis.model_fo_formula_list_field in
+    match destruct_fo_formula_list phis with
+      | NLC_FOFNil -> (phis,gnum)
+      | NLC_FOFCons phi q ->
+        let phim = phi.model_fo_formula_field in
+        let qm = q.model_fo_formula_list_field in
+        assert { phism = FOFCons phim qm } ;
+        let (q',gnum') = nnf_simpl_list q (gnum-1) fvp in
+        let phi' = nnf_simpl phi fvp in
+        let phi'm = phi'.model_fo_formula_field in
+        let q'm = q'.model_fo_formula_list_field in
+        match destruct_fo_formula phi' with
+          | NLC_FTrue -> (q',if gnum > 0 then gnum' else gnum'+1)
+          | NLC_FFalse -> raise Unsat
+          | _ -> assert { is_simpl phi'.model_fo_formula_field } ;
+            let res = construct_fo_formula_list (NLC_FOFCons phi' q') in
+            let resm = res.model_fo_formula_list_field in
+            assert { resm = FOFCons phi'm q'm } ;
+            (res,gnum'+1)
+        end
+    end
+
+  use import ISet.Logic
+  use import ISet.Impl
+  use import Choice.Choice
+
+  let rec term_free_vars (t:nlimpl_fo_term) (ghost fvp:set int) : list int
+    requires { nlimpl_fo_term_ok t }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term x t.model_fo_term_field ->
+      S.mem x fvp }
+    ensures { forall x:int.
+      is_fo_term_free_var_in_fo_term x t.model_fo_term_field ->
+       mem x result }
+    ensures { forall x:int. mem x result -> S.mem x fvp }
+    ensures { iset_ok result }
+    variant { size_fo_term t.model_fo_term_field }
+  =
+    match destruct_fo_term t with
+      | NLCVar_fo_term x -> Cons x Nil
+      | NLC_App _ l -> term_list_free_vars l fvp
+    end
+
+  with term_list_free_vars (l:nlimpl_fo_term_list) (ghost fvp:set int): list int
+    requires { nlimpl_fo_term_list_ok l }
+    requires { forall x:int.
+      is_fo_term_free_var_in_fo_term_list x l.model_fo_term_list_field ->
+        S.mem x fvp }
+    ensures { forall x:int.
+      is_fo_term_free_var_in_fo_term_list x l.model_fo_term_list_field ->
+        mem x result }
+    ensures { forall x:int. mem x result -> S.mem x fvp }
+    ensures { iset_ok result }
+    variant { size_fo_term_list l.model_fo_term_list_field }
+  =
+    match destruct_fo_term_list l with
+      | NLC_FONil -> Nil
+      | NLC_FOCons t q -> merge (term_free_vars t fvp) (term_list_free_vars q fvp)
+    end
+
+  let rec skolem_parameters (l:list int) (acc:skolemization_env_return 'st)
+    (ghost fvp:set int) : skolemization_env_return 'st
+    requires { iset_ok l }
+    requires { forall x:int. mem x l -> S.mem x fvp }
+    requires { nlimpl_fo_term_list_ok acc.skolemized_fv_list }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      acc.skolemized_fv_list.model_fo_term_list_field -> S.mem x fvp }
+    requires { forall x:int. not(mem x l /\
+      is_fo_term_free_var_in_fo_term_list x
+        acc.skolemized_fv_list.model_fo_term_list_field) }
+    requires { forall x:int,m:model int 'st,rho:func int 'st.
+      is_fo_term_free_var_in_fo_term_list x
+        acc.skolemized_fv_list.model_fo_term_list_field ->
+      eval acc.skolem_env (term_list_semantic
+        acc.skolemized_fv_list.model_fo_term_list_field m rho) x =
+        rho x }
+    requires { forall f:int. not(is_symbol_free_var_in_fo_term_list f
+      acc.skolemized_fv_list.model_fo_term_list_field) }
+    ensures { nlimpl_fo_term_list_ok result.skolemized_fv_list }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      result.skolemized_fv_list.model_fo_term_list_field -> S.mem x fvp }
+    ensures { forall x:int,m:model int 'st,rho:func int 'st.
+      mem x l \/ is_fo_term_free_var_in_fo_term_list x
+        acc.skolemized_fv_list.model_fo_term_list_field ->
+      eval result.skolem_env (term_list_semantic
+        result.skolemized_fv_list.model_fo_term_list_field m rho) x =
+        rho x }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      result.skolemized_fv_list.model_fo_term_list_field ->
+      mem x l \/ is_fo_term_free_var_in_fo_term_list x
+        acc.skolemized_fv_list.model_fo_term_list_field }
+    ensures { forall f:int. not(is_symbol_free_var_in_fo_term_list f
+      result.skolemized_fv_list.model_fo_term_list_field) }
+    variant { l }
+  =
+    match l with
+      | Nil -> acc
+      | Cons x q -> let accl = acc.skolemized_fv_list in
+        let skenv = acc.skolem_env in
+        let varx = construct_fo_term (NLCVar_fo_term x) in
+        let accl' = construct_fo_term_list (NLC_FOCons varx accl) in
+        let (acclm,accl'm) = (accl.model_fo_term_list_field ,accl'.model_fo_term_list_field) in
+        assert { accl'm = FOCons (Var_fo_term x) acclm } ;
+        let skenv' = extend_env skenv x in
+        let acc' = {
+          skolemized_fv_list = accl' ;
+          skolem_env = skenv'
+        } in
+        skolem_parameters q acc' fvp
+    end
+
+  (* Not sufficient yet. *)
+
+  let rec skolemize (phi:nlimpl_fo_formula) (skb:int) (b:bool)
+    (ghost fvp:set int) : skolemization_return 'st
+    requires { nlimpl_fo_formula_ok phi }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi.model_fo_formula_field -> S.mem x fvp }
+    requires { is_simpl phi.model_fo_formula_field }
+    requires { is_nnf phi.model_fo_formula_field }
+    requires { forall ls:int.
+      is_symbol_free_var_in_fo_formula ls phi.model_fo_formula_field -> ls < skb }
+    ensures { nlimpl_fo_formula_ok result.skolemized }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula x
+      result.skolemized.model_fo_formula_field -> S.mem x fvp }
+    ensures { result.skolem_bound >= skb }
+    ensures { forall ls:int.
+      is_symbol_free_var_in_fo_formula ls result.skolemized.model_fo_formula_field ->
+        ls < result.skolem_bound }
+    ensures { is_nnf result.skolemized.model_fo_formula_field }
+    ensures { is_simpl result.skolemized.model_fo_formula_field }
+    ensures { no_existential result.skolemized.model_fo_formula_field }
+    ensures { forall m:model int 'st, rho:func int 'st.
+      formula_semantic phi.model_fo_formula_field m rho ->
+      formula_semantic result.skolemized.model_fo_formula_field
+        (eval result.model_transformer m) rho }
+    (* Completeness concern.
+    ensures { forall m:model int 'st, rho:func int 'st.
+      formula_semantic result.skolemized.model_fo_formula_field m rho ->
+      formula_semantic phi.model_fo_formula_field m rho
+     *)
+    ensures { forall m:model int 'st, ls:int.
+      ls < skb -> eval m.interp_fun ls =
+        eval (eval result.model_transformer m).interp_fun ls }
+    ensures { forall m:model int 'st.
+      m.interp_pred = (eval result.model_transformer m).interp_pred }
+    ensures { forall x:int. b = True ->
+      is_fo_term_free_var_in_fo_formula x result.skolemized.model_fo_formula_field ->
+        mem x result.free_var_list }
+    ensures { iset_ok result.free_var_list }
+    ensures { forall x:int. b = True -> mem x result.free_var_list -> S.mem x fvp }
+    variant { size_fo_formula phi.model_fo_formula_field }
+  =
+    let phim = phi.model_fo_formula_field in
+    match destruct_fo_formula phi with
+      | NLC_PApp _ l -> { skolemized = phi ;
+        skolem_bound = skb ;
+        model_transformer = identity ;
+        free_var_list = if b
+          then term_list_free_vars l fvp
+          else Nil }
+      | NLC_Not phi' -> let phi'm = phi'.model_fo_formula_field in
+        assert { phim = Not phi'm } ;
+        assert { match phi'm with
+        | PApp _ _ -> true | _ -> false end } ;
+        { skolemized = phi ;
+          skolem_bound = skb ;
+          model_transformer = identity ;
+          free_var_list = if b
+            then match destruct_fo_formula phi' with
+                | NLC_PApp _ l -> term_list_free_vars l fvp
+                | _ -> absurd
+              end
+            else Nil }
+      | NLC_And phi1 phi2 ->
+        let phi1m = phi1.model_fo_formula_field in
+        let phi2m = phi2.model_fo_formula_field in
+        assert { phim = And phi1m phi2m } ;
+        assert { forall ls:int. is_symbol_free_var_in_fo_formula ls phi1m ->
+          is_symbol_free_var_in_fo_formula ls phim } ;
+        assert { forall ls:int. is_symbol_free_var_in_fo_formula ls phi2m ->
+          is_symbol_free_var_in_fo_formula ls phim } ;
+        let res1 = skolemize phi1 skb b fvp in
+        let res2 = skolemize phi2 res1.skolem_bound b fvp in
+        let res1m = res1.skolemized.model_fo_formula_field in
+        let res2m = res2.skolemized.model_fo_formula_field in
+        let skr = construct_fo_formula (NLC_And res1.skolemized res2.skolemized) in
+        let skrm = skr.model_fo_formula_field in
+        let (res1f,res2f) = (res1.model_transformer,res2.model_transformer) in
+        let transf = rcompose res1f res2f in
+        let fvlist = merge res1.free_var_list res2.free_var_list in
+        assert { skrm = And res1m res2m } ;
+        assert { forall m:model int 'st.
+          m.interp_pred = (res1f m).interp_pred =
+          (transf m).interp_pred } ;
+        assert { forall m:model int 'st, ls:int.
+          ls < skb ->
+            eval m.interp_fun ls = eval (res1f m).interp_fun ls
+              = eval (transf m).interp_fun ls } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic res1m m rho <->
+            formula_semantic res1m (res2f m) rho } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic phi2m m rho <->
+            formula_semantic phi2m (res1f m) rho } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          transf m = res2f (res1f m) &&
+          (formula_semantic phi1m m rho ->
+            formula_semantic res1m (res1f m) rho &&
+            formula_semantic res1m (transf m) rho) /\
+          (formula_semantic phi2m m rho ->
+            formula_semantic phi2m (res1f m) rho &&
+            formula_semantic res2m (transf m) rho) } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x skrm ->
+          (is_fo_term_free_var_in_fo_formula x res1m \/
+           is_fo_term_free_var_in_fo_formula x res2m) &&
+          S.mem x fvp } ;
+        { skolemized = skr ;
+          skolem_bound = res2.skolem_bound ;
+          model_transformer = transf ;
+          free_var_list = fvlist }
+      | NLC_Or phi1 phi2 ->
+        let phi1m = phi1.model_fo_formula_field in
+        let phi2m = phi2.model_fo_formula_field in
+        assert { phim = Or phi1m phi2m } ;
+        assert { forall ls:int. is_symbol_free_var_in_fo_formula ls phi1m ->
+          is_symbol_free_var_in_fo_formula ls phim } ;
+        assert { forall ls:int. is_symbol_free_var_in_fo_formula ls phi2m ->
+          is_symbol_free_var_in_fo_formula ls phim } ;
+        let res1 = skolemize phi1 skb b fvp in
+        let res2 = skolemize phi2 res1.skolem_bound b fvp in
+        let res1m = res1.skolemized.model_fo_formula_field in
+        let res2m = res2.skolemized.model_fo_formula_field in
+        let skr = construct_fo_formula (NLC_Or res1.skolemized res2.skolemized) in
+        let skrm = skr.model_fo_formula_field in
+        let (res1f,res2f) = (res1.model_transformer,res2.model_transformer) in
+        let transf = rcompose res1f res2f in
+        let fvlist = merge res1.free_var_list res2.free_var_list in
+        assert { skrm = Or res1m res2m } ;
+        assert { forall m:model int 'st.
+          m.interp_pred = (res1f m).interp_pred =
+          (transf m).interp_pred } ;
+        assert { forall m:model int 'st, ls:int.
+          ls < skb ->
+            eval m.interp_fun ls = eval (res1f m).interp_fun ls
+              = eval (transf m).interp_fun ls } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic res1m m rho <->
+            formula_semantic res1m (res2f m) rho } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic phi2m m rho <->
+            formula_semantic phi2m (res1f m) rho } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          transf m = res2f (res1f m) &&
+          (formula_semantic phi1m m rho ->
+            formula_semantic res1m (res1f m) rho &&
+            formula_semantic res1m (transf m) rho) /\
+          (formula_semantic phi2m m rho ->
+            formula_semantic phi2m (res1f m) rho &&
+            formula_semantic res2m (transf m) rho) } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x skrm ->
+          (is_fo_term_free_var_in_fo_formula x res1m
+            \/ is_fo_term_free_var_in_fo_formula x res2m) &&
+          S.mem x fvp } ;
+        { skolemized = skr ;
+          skolem_bound = res2.skolem_bound ;
+          model_transformer = transf ;
+          free_var_list = fvlist }
+      | NLC_FTrue -> absurd
+      | NLC_FFalse -> absurd
+      | NLC_Forall x phi0 ->
+        let phi0m = phi0.model_fo_formula_field in
+        let ghost r0 = some[x <- None] in
+        let phi1m = rename_fo_formula phi0m identity r0 in
+        assert { phim = Forall phi1m } ;
+        assert { phi0m = rename_fo_formula phi1m identity (ocase identity x) } ;
+        assert { forall ls:int.
+          (is_symbol_free_var_in_fo_formula ls phi1m <->
+          is_symbol_free_var_in_fo_formula ls phi0m) &&
+          (is_symbol_free_var_in_fo_formula ls phim <->
+          is_symbol_free_var_in_fo_formula ls phi0m) } ;
+        let fvp' = S.add x fvp in
+        assert { forall xf:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+           ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
+             | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m ->
+           (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+             ocase identity x y = xf) && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
+        let res = skolemize phi0 skb b fvp' in
+        let resm = res.skolemized.model_fo_formula_field in
+        let res1m = rename_fo_formula resm identity r0 in
+        let skr = construct_fo_formula (NLC_Forall x res.skolemized) in
+        let skrm = skr.model_fo_formula_field in
+        let fvl = remove x res.free_var_list in
+        let transf = res.model_transformer in
+        assert { skrm = Forall res1m } ;
+        assert { forall ls:int.
+          (is_symbol_free_var_in_fo_formula ls res1m <->
+           (exists ls':int.
+             is_symbol_free_var_in_fo_formula ls' resm /\ identity ls' = ls)) &&
+          (is_symbol_free_var_in_fo_formula ls res1m <->
+           is_symbol_free_var_in_fo_formula ls resm) } ;
+        assert { forall m:model int 'st, rho:func int 'st, xm:'st.
+            formula_semantic phi1m m (ocase rho xm) ->
+              formula_semantic phi0m m (rcompose r0 (ocase rho xm)) &&
+              formula_semantic resm (transf m) (rcompose r0 (ocase rho xm)) &&
+              formula_semantic res1m (transf m) (ocase rho xm)
+          } ;
+        assert { forall y:int.
+          is_fo_term_free_var_in_fo_formula (Some y) res1m ->
+            (forall z:int.
+              is_fo_term_free_var_in_fo_formula z resm /\ r0 z = Some y ->
+                z <> x && z = y ) &&
+            (is_fo_term_free_var_in_fo_formula y resm /\ y <> x)
+            && ((b = True -> mem y fvl) /\ (S.mem y fvp' && S.mem y fvp))
+          } ;
+        { skolemized = skr ;
+          skolem_bound = res.skolem_bound ;
+          model_transformer = transf ;
+          free_var_list = fvl }
+      | NLC_Exists x phi0 ->
+        let phi0m = phi0.model_fo_formula_field in
+        let ghost r0 = some[x <- None] in
+        let phi1m = rename_fo_formula phi0m identity r0 in
+        assert { phim = Exists phi1m } ;
+        assert { forall ls:int.
+          (is_symbol_free_var_in_fo_formula ls phi1m <->
+          is_symbol_free_var_in_fo_formula ls phi0m) &&
+          (is_symbol_free_var_in_fo_formula ls phim <->
+          is_symbol_free_var_in_fo_formula ls phi0m) } ;
+        let fvp' = S.add x fvp in
+        assert { phi0m = rename_fo_formula phi1m identity (ocase identity x) } ;
+        assert { forall xf:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+           ocase identity x y = xf -> match y with None -> x = xf && S.mem xf fvp'
+             | Some y -> y = xf && is_fo_term_free_var_in_fo_formula y phim &&
+               S.mem xf fvp && S.mem xf fvp' end && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m ->
+           (exists y:option int. is_fo_term_free_var_in_fo_formula y phi1m /\
+             ocase identity x y = xf) && S.mem xf fvp') &&
+          (is_fo_term_free_var_in_fo_formula xf phi0m -> S.mem xf fvp') };
+        let res = skolemize phi0 skb True fvp' in
+        let resm = res.skolemized.model_fo_formula_field in
+        let res1m = rename_fo_formula resm identity r0 in
+        let fvl = res.free_var_list in
+        let fvl = remove x fvl in
+        let skb' = res.skolem_bound in
+        let fonil = construct_fo_term_list NLC_FONil in
+        assert { fonil.model_fo_term_list_field = FONil } ;
+        let skenv = skolem_parameters fvl { skolemized_fv_list = fonil ; skolem_env = default } fvp in
+        let skparams = skenv.skolemized_fv_list in
+        let skenv = skenv.skolem_env in
+        let skparamsm = skparams.model_fo_term_list_field in
+        assert { forall y:int.
+          is_fo_term_free_var_in_fo_formula (Some y) res1m ->
+            (forall z:int.
+              is_fo_term_free_var_in_fo_formula z resm /\ r0 z = Some y ->
+              z <> x && z = y ) &&
+            (is_fo_term_free_var_in_fo_formula y resm /\ y <> x) && mem y fvl } ;
+        let transf = skolem_model_transformer res1m skb' skparamsm skenv in
+        let symb = construct_symbol (NLCVar_symbol skb') in
+        assert { symb.model_symbol_field = Var_symbol skb' } ;
+        let skolemf = construct_fo_term (NLC_App symb skparams) in
+        let skolemfm = skolemf.model_fo_term_field in
+        assert { skolemfm = App (Var_symbol skb') skparamsm } ;
+        let phir = nlsubst_fo_term_in_fo_formula res.skolemized x skolemf in
+        let phirm = phir.model_fo_formula_field in
+        let resf = res.model_transformer in
+        let transf2 = rcompose resf transf in
+        (* sat (Exists phi1m) -> sat (Exists res1m). *)
+        assert { forall m:model int 'st, rho:func int 'st, xm:'st.
+            formula_semantic phi1m m (ocase rho xm) ->
+              formula_semantic phi0m m (rcompose r0 (ocase rho xm)) &&
+              formula_semantic resm (resf m) (rcompose r0 (ocase rho xm)) &&
+              formula_semantic res1m (resf m) (ocase rho xm)
+          } ;
+        assert { forall m:model int 'st, rho:func int 'st.
+          formula_semantic phim m rho ->
+          formula_semantic (Exists res1m) (resf m) rho } ;
+        (* sat (Exists res1m) -> sat phir. *)
+        let ghost sub1 = subst_id_fo_term[x <- skolemfm] in
+        let ghost r1 = ocase identity x in
+        let ghost sub2 = ocase subst_id_fo_term skolemfm in
+        assert { phirm = subst_fo_formula resm subst_id_symbol sub1 } ;
+        assert { forall y:option int.
+          is_fo_term_free_var_in_fo_formula y res1m ->
+            (y <> Some x) && rcompose r1 sub1 y = sub2 y } ;
+        assert { subst_fo_formula res1m subst_id_symbol sub2 =
+          subst_fo_formula res1m subst_id_symbol (rcompose r1 sub1) } ;
+        assert { extensionalEqual (rcompose r0 r1) identity } ;
+        assert { phirm = subst_fo_formula res1m subst_id_symbol sub2 } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic (Exists res1m) m rho ->
+            formula_semantic phirm (transf m) rho } ;
+        assert { forall y:int.
+          is_fo_term_free_var_in_fo_formula y phirm ->
+            (forall z:int.
+              is_fo_term_free_var_in_fo_formula z resm /\
+              is_fo_term_free_var_in_fo_term y (sub1 z) ->
+              (if z <> x then z = y && mem y fvl
+               else is_fo_term_free_var_in_fo_term y skolemfm &&
+                 mem y fvl)) && mem y fvl } ;
+        (* Vexingly painful ! *)
+        assert { forall ls:int.
+          is_symbol_free_var_in_fo_formula ls phirm ->
+          is_symbol_free_var_in_fo_formula ls (subst_fo_formula resm subst_id_symbol sub1) &&
+            ((forall z:int.
+              is_symbol_free_var_in_fo_formula z resm /\
+              is_symbol_free_var_in_symbol ls (subst_id_symbol z) ->
+              z = ls && z < skb' + 1 ) /\
+            (forall z:int.
+              is_fo_term_free_var_in_fo_formula z resm /\
+              is_symbol_free_var_in_fo_term ls (sub1 z) ->
+              (if z <> x then sub1 z = Var_fo_term z
+               else is_symbol_free_var_in_fo_term ls skolemfm &&
+                 ls = skb' && ls < skb' + 1) && ls < skb' + 1) /\
+             ((exists z:int.
+               is_symbol_free_var_in_fo_formula z resm /\
+               is_symbol_free_var_in_symbol ls (subst_id_symbol z)) \/
+             (exists z:int.
+               is_fo_term_free_var_in_fo_formula z resm /\
+               is_symbol_free_var_in_fo_term ls (sub1 z))))
+             && ls < skb' + 1 } ;
+
+        (* Two point of views : either why3 do not deconstruct
+           records enough, either too much. *)
+        assert { forall m:model int 'st.
+          let mf = (resf m).interp_fun in
+          let mp = (resf m).interp_pred in
+          m.interp_pred = mp =
+          (transf ({ interp_fun = mf ; interp_pred = mp })).interp_pred
+          = (transf2 m).interp_pred &&
+          m.interp_pred = (transf2 m).interp_pred } ;
+        assert { forall m:model int 'st, ls:int.
+          ls < skb ->
+            let mf = (resf m).interp_fun in
+            let mp = (resf m).interp_pred in
+            eval m.interp_fun ls = eval mf ls
+              = eval (transf { interp_fun = mf ; interp_pred = mp }).interp_fun ls
+              = eval (transf2 m).interp_fun ls &&
+            eval m.interp_fun ls = eval (transf2 m).interp_fun ls } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          let mf = (resf m).interp_fun in
+          let mp = (resf m).interp_pred in
+          formula_semantic phim m rho ->
+            formula_semantic (Exists res1m) ({ interp_fun = mf ; interp_pred = mp }) rho &&
+            formula_semantic phirm (transf ({ interp_fun = mf ; interp_pred = mp})) rho &&
+            formula_semantic phirm (transf2 m) rho } ;
+        { skolemized = phir ;
+          skolem_bound = skb' + 1 ;
+          model_transformer = transf2 ;
+          free_var_list = fvl }
+    end
+
+  let rec skolemize_list (phil:nlimpl_fo_formula_list) (skb:int)
+    (ghost fvp:set int) : skolemization_list_return 'st
+    requires { nlimpl_fo_formula_list_ok phil }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phil.model_fo_formula_list_field -> S.mem x fvp }
+    requires { is_simpl_list phil.model_fo_formula_list_field }
+    requires { is_nnf_list phil.model_fo_formula_list_field }
+    requires { forall ls:int.
+      is_symbol_free_var_in_fo_formula_list ls phil.model_fo_formula_list_field -> ls < skb }
+    ensures { nlimpl_fo_formula_list_ok result.skolemized_l }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      result.skolemized_l.model_fo_formula_list_field -> S.mem x fvp }
+    ensures { result.skolem_bound_l >= skb }
+    ensures { forall ls:int.
+      is_symbol_free_var_in_fo_formula_list ls result.skolemized_l.model_fo_formula_list_field ->
+        ls < result.skolem_bound_l }
+    ensures { is_nnf_list result.skolemized_l.model_fo_formula_list_field }
+    ensures { is_simpl_list result.skolemized_l.model_fo_formula_list_field }
+    ensures { no_existential_list result.skolemized_l.model_fo_formula_list_field }
+    ensures { forall m:model int 'st, rho:func int 'st.
+      formula_list_conj_semantic phil.model_fo_formula_list_field m rho ->
+      formula_list_conj_semantic result.skolemized_l.model_fo_formula_list_field
+        (eval result.model_transformer_l m) rho }
+    (* Completeness concern.
+    ensures { forall m:model int 'st, rho:func int 'st.
+      formula_semantic result.skolemized.model_fo_formula_field m rho ->
+      formula_semantic phi.model_fo_formula_field m rho
+     *)
+    ensures { forall m:model int 'st, ls:int.
+      ls < skb -> eval m.interp_fun ls =
+        eval (eval result.model_transformer_l m).interp_fun ls }
+    ensures { forall m:model int 'st.
+      m.interp_pred = (eval result.model_transformer_l m).interp_pred }
+    variant { size_fo_formula_list phil.model_fo_formula_list_field }
+  =
+    let philm = phil.model_fo_formula_list_field in
+    match destruct_fo_formula_list phil with
+      | NLC_FOFNil -> { skolemized_l = phil ;
+        skolem_bound_l = skb ;
+        model_transformer_l = identity }
+      | NLC_FOFCons phi phiq -> let phim = phi.model_fo_formula_field in
+        let phiqm = phiq.model_fo_formula_list_field in
+        assert { philm = FOFCons phim phiqm } ;
+        assert { forall ls:int. is_symbol_free_var_in_fo_formula ls phim ->
+          is_symbol_free_var_in_fo_formula_list ls philm } ;
+        assert { forall ls:int. is_symbol_free_var_in_fo_formula_list ls phiqm ->
+          is_symbol_free_var_in_fo_formula_list ls philm } ;
+        let res = skolemize phi skb False fvp in
+        let resq = skolemize_list phiq res.skolem_bound fvp in
+        let resm = res.skolemized.model_fo_formula_field in
+        let resqm = resq.skolemized_l.model_fo_formula_list_field in
+        let skr = construct_fo_formula_list (NLC_FOFCons res.skolemized resq.skolemized_l) in
+        let skrm = skr.model_fo_formula_list_field in
+        let (resf,resqf) = (res.model_transformer,resq.model_transformer_l) in
+        let transf = rcompose resf resqf in
+        assert { skrm = FOFCons resm resqm } ;
+        assert { forall m:model int 'st.
+          m.interp_pred = (resf m).interp_pred =
+          (transf m).interp_pred } ;
+        assert { forall m:model int 'st, ls:int.
+          ls < skb ->
+            eval m.interp_fun ls = eval (resf m).interp_fun ls
+              = eval (transf m).interp_fun ls } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic resm m rho <->
+            formula_semantic resm (resqf m) rho } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_list_conj_semantic phiqm m rho <->
+            formula_list_conj_semantic phiqm (resf m) rho } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          transf m = resqf (resf m) &&
+          (formula_semantic phim m rho ->
+            formula_semantic resm (resf m) rho &&
+            formula_semantic resm (transf m) rho) /\
+          (formula_list_conj_semantic phiqm m rho ->
+            formula_list_conj_semantic phiqm (resf m) rho &&
+            formula_list_conj_semantic resqm (transf m) rho) } ;
+        { skolemized_l = skr ;
+          skolem_bound_l = resq.skolem_bound_l ;
+          model_transformer_l = transf }
+    end
+
+  (* No need for it in the logic... *)
+
+  type preprocessing_return 'st = {
+    preprocessed : nlimpl_fo_formula_list ;
+    final_goals_number : int ;
+    ghost model_transf : func (model int 'st) (model int 'st) ;
+  }
+
+  type fvr = {
+    ghost sr : set int ;
+    lr : list int ;
+  }
+
+  let rec term_free_vars_noghost (t:nlimpl_fo_term) : fvr
+    requires { nlimpl_fo_term_ok t }
+    ensures { forall x:int.
+      is_fo_term_free_var_in_fo_term x t.model_fo_term_field ->
+       mem x result.lr }
+    ensures { iset_ok result.lr }
+    ensures { forall x:int. S.mem x result.sr <-> mem x result.lr }
+    variant { size_fo_term t.model_fo_term_field }
+  =
+    match destruct_fo_term t with
+      | NLCVar_fo_term x -> { sr = S.singleton x ; lr = Cons x Nil }
+      | NLC_App _ l -> term_list_free_vars_noghost l
+    end
+
+  with term_list_free_vars_noghost (l:nlimpl_fo_term_list) : fvr
+    requires { nlimpl_fo_term_list_ok l }
+    ensures { forall x:int.
+      is_fo_term_free_var_in_fo_term_list x l.model_fo_term_list_field ->
+        mem x result.lr }
+    ensures { forall x:int. S.mem x result.sr <-> mem x result.lr }
+    ensures { iset_ok result.lr }
+    variant { size_fo_term_list l.model_fo_term_list_field }
+  =
+    match destruct_fo_term_list l with
+      | NLC_FONil -> { lr = Nil ; sr = S.empty }
+      | NLC_FOCons t q -> let r1 = term_free_vars_noghost t in
+        let r2 = term_list_free_vars_noghost q in
+        { lr = merge r1.lr r2.lr ; sr = S.union r1.sr r2.sr }
+    end
+
+  let rec collect_free_var_formula (phi:nlimpl_fo_formula) : fvr
+    requires { nlimpl_fo_formula_ok phi }
+    ensures { iset_ok result.lr }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi.model_fo_formula_field -> mem x result.lr }
+    ensures { forall x:int. mem x result.lr <-> S.mem x result.sr }
+    variant { size_fo_formula phi.model_fo_formula_field }
+  =
+    let phim = phi.model_fo_formula_field in
+    match destruct_fo_formula phi with
+      | NLC_PApp p l -> let pm = p.model_symbol_field in
+        let lm = l.model_fo_term_list_field in
+        assert { phim = PApp pm lm } ;
+        term_list_free_vars_noghost l
+      | NLC_Not phi0 -> let phi0m = phi0.model_fo_formula_field in
+        assert { phim = Not phi0m } ;
+        collect_free_var_formula phi0
+      | NLC_And phi1 phi2 -> let phi1m = phi1.model_fo_formula_field in
+        let phi2m = phi2.model_fo_formula_field in
+        assert { phim = And phi1m phi2m } ;
+        let r1 = collect_free_var_formula phi1 in
+        let r2 = collect_free_var_formula phi2 in
+        { lr = merge r1.lr r2.lr ; sr = S.union r1.sr r2.sr }
+      | NLC_Or phi1 phi2 -> let phi1m = phi1.model_fo_formula_field in
+        let phi2m = phi2.model_fo_formula_field in
+        assert { phim = Or phi1m phi2m } ;
+        let r1 = collect_free_var_formula phi1 in
+        let r2 = collect_free_var_formula phi2 in
+        { lr = merge r1.lr r2.lr ; sr = S.union r1.sr r2.sr }
+      | NLC_FTrue -> { lr = Nil ; sr = S.empty }
+      | NLC_FFalse -> { lr = Nil ; sr = S.empty }
+      | NLC_Forall x phi0 -> let phi0m = phi0.model_fo_formula_field in
+        let ghost r0 = some[x <- None] in
+        let phi1m = rename_fo_formula phi0m identity r0 in
+        assert { phim = Forall phi1m } ;
+        let r = collect_free_var_formula phi0 in
+        let res = { lr = remove x r.lr ; sr = S.remove x r.sr } in
+        assert { forall xf:int.
+          (forall y:int. is_fo_term_free_var_in_fo_formula y phi0m /\
+            eval (some[x<-None]) y = Some xf -> y <> x &&
+            Some xf = Some y && xf = y) && is_fo_term_free_var_in_fo_formula xf phim ->
+          is_fo_term_free_var_in_fo_formula (Some xf) phi1m &&
+          (exists y:int. is_fo_term_free_var_in_fo_formula y phi0m /\
+            eval (some[x <- None]) y = Some xf) && is_fo_term_free_var_in_fo_formula xf phi0m
+            && xf <> x && mem xf res.lr } ;
+        res
+      | NLC_Exists x phi0 -> let phi0m = phi0.model_fo_formula_field in
+        let ghost r0 = some[x <- None] in
+        let phi1m = rename_fo_formula phi0m identity r0 in
+        assert { phim = Exists phi1m } ;
+        let r = collect_free_var_formula phi0 in
+        let res = { lr = remove x r.lr ; sr = S.remove x r.sr } in
+        assert { forall xf:int.
+          (forall y:int. is_fo_term_free_var_in_fo_formula y phi0m /\
+            eval (some[x<-None]) y = Some xf -> y <> x &&
+            Some xf = Some y && xf = y) && is_fo_term_free_var_in_fo_formula xf phim ->
+          is_fo_term_free_var_in_fo_formula (Some xf) phi1m &&
+          (exists y:int. is_fo_term_free_var_in_fo_formula y phi0m /\
+            eval (some[x <- None]) y = Some xf) && is_fo_term_free_var_in_fo_formula xf phi0m
+            && xf <> x && mem xf res.lr } ;
+        res
+    end
+
+  let rec collect_free_var_formula_list (phil:nlimpl_fo_formula_list) : fvr
+    requires { nlimpl_fo_formula_list_ok phil }
+    ensures { iset_ok result.lr }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phil.model_fo_formula_list_field -> mem x result.lr }
+    ensures { forall x:int. mem x result.lr <-> S.mem x result.sr }
+    variant { size_fo_formula_list phil.model_fo_formula_list_field }
+  =
+    match destruct_fo_formula_list phil with
+      | NLC_FOFNil -> { lr = Nil ; sr = S.empty }
+      | NLC_FOFCons phi0 q -> let fvr1 = collect_free_var_formula phi0 in
+        let fvr2 = collect_free_var_formula_list q in
+        { lr = merge fvr1.lr fvr2.lr ;
+          sr = S.union fvr1.sr fvr2.sr }
+    end
+
+
+  let rec exists_quantify (l:list int) (phi:nlimpl_fo_formula) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok phi }
+    requires { is_simpl phi.model_fo_formula_field }
+    requires { is_nnf phi.model_fo_formula_field }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi.model_fo_formula_field -> mem x l }
+    ensures { nlimpl_fo_formula_ok result }
+    ensures { forall x:int. not(is_fo_term_free_var_in_fo_formula x
+      result.model_fo_formula_field) }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_semantic phi.model_fo_formula_field m rho ->
+      formula_semantic result.model_fo_formula_field m rho }
+    ensures { is_simpl result.model_fo_formula_field }
+    ensures { is_nnf result.model_fo_formula_field }
+    variant { l }
+  = let phim = phi.model_fo_formula_field in
+    match l with
+      | Nil -> phi
+      | Cons x q -> let phi' = construct_fo_formula (NLC_Exists x phi) in
+        let phi'm = phi'.model_fo_formula_field in
+        let phi1m = rename_fo_formula phim identity (some[x <- None]) in
+        assert { phi'm = Exists phi1m } ;
+        assert { forall xf:int.
+          (forall y:int. is_fo_term_free_var_in_fo_formula y phim /\
+            eval (some[x<-None]) y = Some xf -> y <> x &&
+            Some xf = Some y && xf = y) && is_fo_term_free_var_in_fo_formula xf phi'm ->
+          is_fo_term_free_var_in_fo_formula (Some xf) phi1m &&
+          (exists y:int. is_fo_term_free_var_in_fo_formula y phim /\
+            eval (some[x <- None]) y = Some xf) && is_fo_term_free_var_in_fo_formula xf phim
+            && xf <> x && mem xf q } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_semantic phim m rho ->
+          let rhos = ocase rho (rho x) in
+          let sub = rcompose (some[x <- None]) subst_id_fo_term in
+          let rhos' = semantic_subst sub m rhos in
+          extensionalEqual rhos' rho &&
+          phi1m = subst_fo_formula phim subst_id_symbol (rcompose (some[x <- None]) subst_id_fo_term) &&
+          formula_semantic phi1m m rhos &&
+          (exists xm:'st. formula_semantic phi1m m (ocase rho xm)) &&
+          formula_semantic phi'm m rho } ;
+        exists_quantify q phi'
+    end
+
+  type comb_ret = {
+    form : nlimpl_fo_formula ;
+    llen : int ;
+  }
+
+  let rec combine_with (l:nlimpl_fo_formula_list) (phi0:nlimpl_fo_formula)
+    (ghost fvp:set int) : comb_ret
+    requires { nlimpl_fo_formula_list_ok l }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x phi0.model_fo_formula_field
+      -> S.mem x fvp }
+    requires { nlimpl_fo_formula_ok phi0 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      l.model_fo_formula_list_field -> S.mem x fvp }
+    requires { is_simpl_list l.model_fo_formula_list_field }
+    requires { is_nnf_list l.model_fo_formula_list_field }
+    requires { is_simpl phi0.model_fo_formula_field }
+    requires { is_nnf phi0.model_fo_formula_field }
+    variant { size_fo_formula_list l.model_fo_formula_list_field }
+    ensures { nlimpl_fo_formula_ok result.form }
+    ensures { is_simpl result.form.model_fo_formula_field }
+    ensures { is_nnf result.form.model_fo_formula_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_semantic result.form.model_fo_formula_field m rho <->
+      (formula_list_conj_semantic l.model_fo_formula_list_field m rho /\
+       formula_semantic phi0.model_fo_formula_field m rho) }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula x
+      result.form.model_fo_formula_field -> S.mem x fvp }
+  =
+    let lm = l.model_fo_formula_list_field in
+    let phi0m = phi0.model_fo_formula_field in
+    match destruct_fo_formula_list l with
+      | NLC_FOFNil -> { form = phi0 ; llen = 1 }
+      | NLC_FOFCons x q -> let xm = x.model_fo_formula_field in
+        let qm = q.model_fo_formula_list_field in
+        assert { lm = FOFCons xm qm } ;
+        let cr = combine_with q x fvp in
+        let phi' = cr.form in
+        let phi'm = phi'.model_fo_formula_field in
+        let phir = construct_fo_formula (NLC_And phi0 phi') in
+        let phirm = phir.model_fo_formula_field in
+        assert { phirm = And phi0m phi'm } ;
+        { form = phir ; llen = cr.llen + 1 }
+    end
+
+  type split_ret = {
+    forms : nlimpl_fo_formula_list ;
+    total_goals : int ;
+  }
+
+  let rec split (phi:nlimpl_fo_formula) (l:nlimpl_fo_formula_list) (lnum:int) (gnum:int) : split_ret
+    requires { nlimpl_fo_formula_ok phi }
+    requires { forall x:int. not(is_fo_term_free_var_in_fo_formula x
+      phi.model_fo_formula_field) }
+    requires { is_simpl phi.model_fo_formula_field }
+    requires { is_nnf phi.model_fo_formula_field }
+    requires { no_existential phi.model_fo_formula_field }
+    requires { nlimpl_fo_formula_list_ok l }
+    requires { forall x:int. not(is_fo_term_free_var_in_fo_formula_list x
+      l.model_fo_formula_list_field) }
+    requires { is_simpl_list l.model_fo_formula_list_field }
+    requires { is_nnf_list l.model_fo_formula_list_field }
+    requires { no_existential_list l.model_fo_formula_list_field }
+    variant { size_fo_formula phi.model_fo_formula_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_list_conj_semantic result.forms.model_fo_formula_list_field m rho
+      <-> (formula_semantic phi.model_fo_formula_field m rho /\
+      formula_list_conj_semantic l.model_fo_formula_list_field m rho) }
+    ensures { nlimpl_fo_formula_list_ok result.forms }
+    ensures { forall x:int. not(is_fo_term_free_var_in_fo_formula_list x
+      result.forms.model_fo_formula_list_field) }
+    ensures { is_simpl_list result.forms.model_fo_formula_list_field }
+    ensures { is_nnf_list result.forms.model_fo_formula_list_field }
+    ensures { no_existential_list result.forms.model_fo_formula_list_field }
+  =
+    match destruct_fo_formula phi with
+      | NLC_And phi1 phi2 ->
+        (* gnum <> 0 : either need full count (<0),
+           either phi is a "goal". if lnum = 1,
+           then gnumcall must be updated accordingly.
+           if lnum <> 1 (not last of initial list),
+           then either gnum = 1 (last goal,do not want next count),
+           either it is expected. *)
+        let phim = phi.model_fo_formula_field in
+        let phi1m = phi1.model_fo_formula_field in
+        let phi2m = phi2.model_fo_formula_field in
+        assert { phim = And phi1m phi2m } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi1m ->
+          is_fo_term_free_var_in_fo_formula x phim } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi2m ->
+          is_fo_term_free_var_in_fo_formula x phim } ;
+        let gnumcall = if lnum = 1
+          then if gnum <> 0
+            then (-1)
+            else gnum - 1
+          else gnum - 1 in
+        let r0 = split phi2 l (lnum-1) gnumcall in
+        let l0 = r0.forms in
+        (* need full count for r1. *)
+        let r1 = split phi1 l0 0 (-1) in
+        let l1 = r1.forms in
+        { forms = l1 ;
+          total_goals = if gnum <> 0
+            then r0.total_goals + r1.total_goals
+            else 0 }
+      | _ -> let lr = construct_fo_formula_list (NLC_FOFCons phi l) in
+        { forms = lr ;
+          total_goals = if gnum <> 0
+            then 1
+            else 0 }
+    end
+
+  (* Prover preprocessing function:
+     From a set of formulas,
+     return an equi-satisfiable
+     (as completeness is not considered here,
+      it is only proved that satisfiability is preserved)
+     set of formulas without occurence of true/false,
+     in negational normal form, without existential quantifiers.
+     Potentially raises an exception when the input set of formulas
+     was (trivially) unsatisfiable. *)
+
+  exception Sat
+
+  let preprocessing (phil:nlimpl_fo_formula_list) (gnum:int) : preprocessing_return 'st
+    requires { nlimpl_fo_formula_list_ok phil }
+    ensures { nlimpl_fo_formula_list_ok result.preprocessed }
+    ensures { forall x:int. not(is_fo_term_free_var_in_fo_formula_list x
+      result.preprocessed.model_fo_formula_list_field) }
+    ensures { is_nnf_list result.preprocessed.model_fo_formula_list_field }
+    ensures { is_simpl_list result.preprocessed.model_fo_formula_list_field }
+    ensures { no_existential_list result.preprocessed.model_fo_formula_list_field }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_list_conj_semantic phil.model_fo_formula_list_field m rho ->
+      formula_list_conj_semantic result.preprocessed.model_fo_formula_list_field
+        (eval result.model_transf m) rho }
+    raises { Unsat ->
+      forall m:model int 'st,rho:func int 'st.
+        not(formula_list_conj_semantic phil.model_fo_formula_list_field m rho) }
+    raises { Sat -> forall m:model int 'st,rho:func int 'st.
+        formula_list_conj_semantic phil.model_fo_formula_list_field m rho }
+  =
+    let s = collect_free_var_formula_list phil in
+    let fvp = s.sr in
+    let (phisimpl,gnum) = nnf_simpl_list phil gnum fvp in
+    match destruct_fo_formula_list phisimpl with
+      | NLC_FOFNil -> raise Sat
+      | NLC_FOFCons phi0 q -> let cb = combine_with q phi0 fvp in
+        let len = cb.llen in
+        let phicb = cb.form in
+        let phiex = exists_quantify s.lr phicb in
+        let skr = (skolemize phiex phiex.nlfree_var_symbol_set_abstraction_fo_formula_field False S.empty:skolemization_return 'st) in
+        let phisk = skr.skolemized in
+        let tr = skr.model_transformer in
+        let fonil = construct_fo_formula_list NLC_FOFNil in
+        let spl = split phisk fonil len gnum in
+        assert { forall m:model int 'st,rho:func int 'st.
+          formula_list_conj_semantic phil.model_fo_formula_list_field m rho ->
+          formula_list_conj_semantic phisimpl.model_fo_formula_list_field m rho &&
+          (formula_semantic phi0.model_fo_formula_field m rho /\
+           formula_list_conj_semantic q.model_fo_formula_list_field m rho) &&
+          formula_semantic phicb.model_fo_formula_field m rho &&
+          formula_semantic phisk.model_fo_formula_field (tr m) rho &&
+          formula_list_conj_semantic fonil.model_fo_formula_list_field (tr m) rho &&
+          formula_list_conj_semantic spl.forms.model_fo_formula_list_field (tr m) rho } ;
+        { preprocessed = spl.forms ;
+          final_goals_number = spl.total_goals ;
+          model_transf = tr }
+    end
+
+
+  (*
+  let preprocessing (phil:nlimpl_fo_formula_list) : preprocessing_return 'st
+    requires { nlimpl_fo_formula_list_ok phil }
+    ensures { nlimpl_fo_formula_list_ok result.preprocessed }
+    ensures { forall x:int. not(is_fo_term_free_var_in_fo_formula_list x
+      result.preprocessed.model_fo_formula_list_field) }
+    ensures { is_nnf_list result.preprocessed.model_fo_formula_list_field }
+    ensures { is_simpl_list result.preprocessed.model_fo_formula_list_field }
+    ensures { no_existential_list result.preprocessed.model_fo_formula_list_field }
+    ensures { forall m:model int 'st, rho:func int 'st.
+       formula_list_conj_semantic phil.model_fo_formula_list_field m rho ->
+       formula_list_conj_semantic result.preprocessed.model_fo_formula_list_field
+         (eval result.model_transf m) rho }
+    raises { Unsat ->
+      forall m:model int 'st,rho:func int 'st.
+        not(formula_list_conj_semantic phil.model_fo_formula_list_field m rho) }
+  =
+    let s = collect_free_var_formula_list in
+    let fvp = s.sr in
+    let phil' = nnf_simpl_list phil fvp in
+    TODO
+
+    let skr =
+      (skolemize_list phil' phil'.nlfree_var_symbol_set_abstraction_fo_formula_list_field fvp:
+        skolemization_list_return 'st) in
+    { preprocessed = skr.skolemized_l ;
+      model_transf = skr.model_transformer_l }*)
+
+end

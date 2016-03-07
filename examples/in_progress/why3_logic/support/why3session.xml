@@ -3,11 +3,31 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="5" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <file name="../support.mlw" expanded="true">
-<theory name="HO" sum="cacf043d990e8fc0b8032e0b3427633c">
+<theory name="Dummy" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="NoDiscriminate" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HO" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOExt" sum="00ec7f3170026a2e8ddbfd50c6512414">
+ <goal name="WP_parameter extensionality" expl="VC for extensionality">
+ <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ </goal>
+</theory>
+<theory name="HOCompose" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOConst" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOIte" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOFull" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOProof" sum="134362cf4ad8eea352a553f5932c56a0">
  <goal name="WP_parameter extensionality" expl="VC for extensionality">
  <transf name="split_goal_wp">
   <goal name="WP_parameter extensionality.1" expl="1. assertion">
@@ -22,79 +42,511 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter compose_associative" expl="VC for compose_associative">
- <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
- </goal>
  <goal name="WP_parameter id_neutral" expl="VC for id_neutral">
- <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
  </goal>
- <goal name="WP_parameter compose_const_right" expl="VC for compose_const_right">
- <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="WP_parameter compose_associative" expl="VC for compose_associative">
+ <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
  <goal name="WP_parameter compose_const_left" expl="VC for compose_const_left">
- <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter compose_const_right" expl="VC for compose_const_right">
+ <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
  <goal name="WP_parameter ho_ite_compose_left" expl="VC for ho_ite_compose_left">
- <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+ </goal>
+ <goal name="WP_parameter ho_ite_compose_right" expl="VC for ho_ite_compose_right">
+ <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+ </goal>
+ <goal name="HOExt.extensionality">
+ <proof prover="0" edited="support-HOProof-extensionality_1.why"><result status="valid" time="0.01" steps="2"/></proof>
+ </goal>
+ <goal name="HOCompose.compose_associative">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="HOCompose.id_neutral">
+ <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ </goal>
+ <goal name="HOConst.compose_const_right">
+ <proof prover="0" edited="support-HOProof-compose_const_right_1.why"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="HOConst.compose_const_left">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="HOIte.ho_ite_compose_left">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="HOIte.ho_ite_compose_right">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="PartialMap" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+<theory name="PartialMap" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Bind" sum="84c5d9efd8b9cef1a2a2d90187a06512">
+<theory name="Bind" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="BindFull" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="BindProof" sum="7ff2f35f2aa8c86aac8f35c92010887a">
  <goal name="WP_parameter bfold_identity" expl="VC for bfold_identity">
- <proof prover="0"><result status="valid" time="0.04" steps="34"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="34"/></proof>
  </goal>
  <goal name="WP_parameter bfold_compose" expl="VC for bfold_compose">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bfold_compose.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter bfold_compose.1.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
    </goal>
    <goal name="WP_parameter bfold_compose.1.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
    </goal>
    <goal name="WP_parameter bfold_compose.1.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter bfold_compose.1.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+   </goal>
+   <goal name="WP_parameter bfold_compose.1.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter bfold_compose.2" expl="2. postcondition">
-  <proof prover="3"><result status="valid" time="0.14"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter bfold_constructor" expl="VC for bfold_constructor">
- <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
  </goal>
- <goal name="bmap_compose">
- <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <goal name="WP_parameter bfold_all" expl="VC for bfold_all">
+ <proof prover="0"><result status="valid" time="0.06" steps="92"/></proof>
  </goal>
- <goal name="bmap_id">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="BindFull.bfold_identity">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="close_fold">
- <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="BindFull.bfold_compose">
+ <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="BindFull.bfold_constructor">
+ <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+ </goal>
+ <goal name="BindFull.bfold_all">
+ <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="BindFull.bfold_map_compose">
+ <proof prover="0"><result status="valid" time="0.02" steps="42"/></proof>
+ </goal>
+ <goal name="BindFull.bmap_compose">
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="BindFull.bmap_identity">
+ <proof prover="1" edited="support-BindProof-bmap_identity_1.smt2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Choice" sum="68e1b9014aa75a68b118b93980778ee0">
+<theory name="HOList" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOListFull" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="HOListProof" sum="487f5bd4abd62903c516de7cd268e205">
+ <goal name="WP_parameter map_nth" expl="VC for map_nth">
+ <proof prover="0"><result status="valid" time="0.03" steps="222"/></proof>
+ </goal>
+ <goal name="WP_parameter map_nth2" expl="VC for map_nth2">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter map_nth2.1" expl="1. postcondition">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter map_nth2.2" expl="2. postcondition">
+  <proof prover="4"><result status="valid" time="0.43"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter map_length" expl="VC for map_length">
+ <proof prover="0"><result status="valid" time="0.02" steps="44"/></proof>
+ </goal>
+ <goal name="WP_parameter for_all_nth" expl="VC for for_all_nth">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter for_all_nth.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter for_all_nth.2" expl="2. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter for_all_nth.2.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.05" steps="26"/></proof>
+   </goal>
+   <goal name="WP_parameter for_all_nth.2.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
+   </goal>
+   <goal name="WP_parameter for_all_nth.2.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
+   </goal>
+   <goal name="WP_parameter for_all_nth.2.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+   </goal>
+   <goal name="WP_parameter for_all_nth.2.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter for_all_nth.3" expl="3. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter for_all_nth.3.1" expl="1. postcondition">
+   <proof prover="0"><result status="valid" time="0.02" steps="123"/></proof>
+   </goal>
+   <goal name="WP_parameter for_all_nth.3.2" expl="2. postcondition">
+   <proof prover="0"><result status="valid" time="0.04" steps="128"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter for_all_nth.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter exist_nth" expl="VC for exist_nth">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter exist_nth.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter exist_nth.2" expl="2. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter exist_nth.3" expl="3. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter exist_nth.3.1" expl="1. postcondition">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter exist_nth.3.2" expl="2. postcondition">
+   <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter exist_nth.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="HOListFull.map_nth">
+ <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="HOListFull.map_nth2">
+ <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
+ </goal>
+ <goal name="HOListFull.map_length">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="HOListFull.for_all_nth">
+ <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+ </goal>
+ <goal name="HOListFull.exist_nth">
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+ </goal>
+</theory>
+<theory name="Choice" sum="1acca6cb9f360ed6ae64f559049d2b97">
  <goal name="WP_parameter choose" expl="VC for choose">
  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
+ <goal name="WP_parameter choose_if" expl="VC for choose_if">
+ <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
+ </goal>
 </theory>
-<theory name="Finite" sum="05eaf7bb441bba99b938a60650e78e78" expanded="true">
- <goal name="WP_parameter cardinal_remove" expl="VC for cardinal_remove">
+<theory name="Finite" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="FiniteFull" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="FiniteProof" sum="065db1b74d05ca55302d0a548649d5a4">
+ <goal name="equirange_def">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter cardinal_remove.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  <goal name="equirange_def.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter cardinal_remove.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="equirange_def.2" expl="2.">
+  <transf name="inline_goal">
+   <goal name="equirange_def.2.1" expl="1.">
+   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="equirange_def.3" expl="3.">
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
+ </goal>
+ <goal name="WP_parameter equirange_add" expl="VC for equirange_add">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter equirange_add.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.07" steps="228"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_add.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter equirange_remove" expl="VC for equirange_remove">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter equirange_remove.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_remove.2" expl="2. VC for equirange_remove">
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_remove.3" expl="3. assertion">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_remove.4" expl="4. assertion">
+  <proof prover="0"><result status="valid" time="0.12" steps="362"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_remove.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter equirange_unique" expl="VC for equirange_unique">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter equirange_unique.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_unique.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_unique.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter equirange_unique.4" expl="4. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter equirange_unique.4.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+   <goal name="WP_parameter equirange_unique.4.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="41"/></proof>
+   </goal>
+   <goal name="WP_parameter equirange_unique.4.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter equirange_unique.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="equirange_cardinal">
+ <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+ </goal>
+ <goal name="WP_parameter cardinal_empty" expl="VC for cardinal_empty">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter cardinal_empty.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_empty.2" expl="2. postcondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_empty.3" expl="3. postcondition">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter finite_add" expl="VC for finite_add">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter finite_add.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_add.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_add.3" expl="3. postcondition">
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter finite_remove" expl="VC for finite_remove">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter finite_remove.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_remove.2" expl="2. postcondition">
+  <proof prover="3"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_remove.3" expl="3. assertion">
+  <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_remove.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter cardinal_remove" expl="VC for cardinal_remove">
+ <proof prover="0"><result status="valid" time="0.03" steps="51"/></proof>
+ </goal>
+ <goal name="WP_parameter cardinal_add" expl="VC for cardinal_add">
+ <proof prover="0"><result status="valid" time="0.03" steps="56"/></proof>
+ </goal>
+ <goal name="WP_parameter cardinal_subset" expl="VC for cardinal_subset">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter cardinal_subset.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_subset.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_subset.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_subset.4" expl="4. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter cardinal_subset.4.1" expl="1. VC for cardinal_subset">
+   <proof prover="4"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="WP_parameter cardinal_subset.4.2" expl="2. VC for cardinal_subset">
+   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter cardinal_subset.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter cardinal_zero" expl="VC for cardinal_zero">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter cardinal_zero.1" expl="1. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter cardinal_zero.1.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter cardinal_zero.1.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter cardinal_zero.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_zero.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter cardinal_eq_subset" expl="VC for cardinal_eq_subset">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter cardinal_eq_subset.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.03" steps="100"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_eq_subset.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="163"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_eq_subset.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="143"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_eq_subset.4" expl="4. precondition">
+  <transf name="introduce_premises">
+   <goal name="WP_parameter cardinal_eq_subset.4.1" expl="1. precondition">
+   <transf name="inline_goal">
+    <goal name="WP_parameter cardinal_eq_subset.4.1.1" expl="1. precondition">
+    <proof prover="4"><result status="valid" time="0.29"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter cardinal_eq_subset.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_eq_subset.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter cardinal_eq_subset.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter finite_union" expl="VC for finite_union">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter finite_union.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_union.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_union.3" expl="3. assertion">
+  <proof prover="0"><result status="valid" time="0.04" steps="198"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_union.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_union.5" expl="5. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_union.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter finite_range" expl="VC for finite_range">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter finite_range.1" expl="1. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_range.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_range.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_range.4" expl="4. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_range.5" expl="5. postcondition">
+  <proof prover="3"><result status="valid" time="0.51"/></proof>
+  </goal>
+  <goal name="WP_parameter finite_range.6" expl="6. postcondition">
+  <proof prover="4"><result status="valid" time="0.18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="FiniteFull.finite_empty">
+ <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="FiniteFull.finite_add">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="FiniteFull.finite_remove">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="FiniteFull.finite_union">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="FiniteFull.finite_subset">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_empty">
+ <proof prover="0"><result status="valid" time="0.03" steps="2"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_positive">
+ <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_add">
+ <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_remove">
+ <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_subset">
+ <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_eq_subset">
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+ </goal>
+ <goal name="FiniteFull.finite_range">
+ <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="FiniteFull.cardinal_range">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
 </theory>
 </file>

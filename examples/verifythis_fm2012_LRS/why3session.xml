@@ -2,1356 +2,868 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="6" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.2" timelimit="10" memlimit="1000"/>
-<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="10" memlimit="4000"/>
-<prover id="4" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
-<prover id="5" name="Z3" version="2.19" timelimit="10" memlimit="1000"/>
-<prover id="6" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
-<prover id="7" name="Z3" version="4.3.1" timelimit="10" memlimit="4000"/>
-<prover id="8" name="Z3" version="3.2" timelimit="10" memlimit="4000"/>
-<prover id="9" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
-<prover id="10" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
-<prover id="11" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="10" steplimit="1" memlimit="4000"/>
+<prover id="11" name="Vampire" version="0.6" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="12" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="1" memlimit="4000"/>
+<prover id="13" name="Z3" version="4.3.2" timelimit="10" steplimit="1" memlimit="4000"/>
+<prover id="14" name="CVC4" version="1.4" timelimit="10" steplimit="1" memlimit="4000"/>
+<prover id="15" name="Eprover" version="1.8-001" timelimit="5" steplimit="1" memlimit="4000"/>
 <file name="../verifythis_fm2012_LRS.mlw" expanded="true">
-<theory name="LCP" sum="17abfd805fb6378151469e361d399188" expanded="true">
+<theory name="LCP" sum="821c4c7b4eefc7603fd949478dc68000">
  <goal name="not_common_prefix_if_last_char_are_different">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
- <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
- <proof prover="9"><result status="valid" time="0.01"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+ <proof prover="13" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="longest_common_prefix_succ">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
- <proof prover="5"><result status="valid" time="8.44"/></proof>
- <proof prover="9"><result status="valid" time="0.02"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="23"/></proof>
+ <proof prover="13" memlimit="1000"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="WP_parameter lcp" expl="VC for lcp">
  <transf name="split_goal_wp">
   <goal name="WP_parameter lcp.1" expl="1. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter lcp.2" expl="2. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter lcp.3" expl="3. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter lcp.4" expl="4. loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter lcp.5" expl="5. loop variant decrease">
-  <proof prover="2"><result status="valid" time="1.34"/></proof>
   <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="1.16"/></proof>
+  <proof prover="12" timelimit="5"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="13" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="14" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.54"/></proof>
   </goal>
   <goal name="WP_parameter lcp.6" expl="6. postcondition">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" timelimit="20" memlimit="1000"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter lcp.7" expl="7. postcondition">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.79"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="1.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter lcp.8" expl="8. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.80"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="1.02"/></proof>
+  <proof prover="11"><result status="valid" time="1.24"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="15"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.11"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="LCP_test" sum="637ecbd230ca27cd7c13506bf31c71e0">
+<theory name="LCP_test" sum="c72f281745bb5c07623e7c7b5db2aa2f">
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="9"><result status="valid" time="0.02"/></proof>
+ <proof prover="12" timelimit="5"><result status="valid" time="0.02" steps="14"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" sum="fa17d54208c9852314a1f90992e94a4b" expanded="true">
+<theory name="SuffixSort" sum="f964e891d2b66f843c1077481bdba58f">
  <goal name="WP_parameter compare" expl="VC for compare">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compare.1" expl="1. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.2" expl="2. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.4" expl="4. precondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.5" expl="5. precondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.00"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.7" expl="7. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="1.47"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="WP_parameter compare.8" expl="8. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.05"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compare.9" expl="9. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.00"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.10" expl="10. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compare.11" expl="11. postcondition">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter compare.12" expl="12. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compare.13" expl="13. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compare.14" expl="14. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.15" expl="15. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="25"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compare.16" expl="16. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compare.17" expl="17. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.18" expl="18. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.19" expl="19. postcondition">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compare.20" expl="20. postcondition">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01"/></proof>
   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compare.21" expl="21. postcondition">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter compare.22" expl="22. unreachable point">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="lcp_same_index">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="6"><result status="valid" time="0.01"/></proof>
- <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
- <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
- <proof prover="9"><result status="valid" time="0.02"/></proof>
- <proof prover="10"><result status="valid" time="0.03"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+ <proof prover="13" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="le_trans">
- <proof prover="4"><result status="valid" time="0.11"/></proof>
- <proof prover="9"><result status="valid" time="0.14"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.10" steps="235"/></proof>
  </goal>
  <goal name="WP_parameter sort" expl="VC for sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sort.1" expl="1. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.2" expl="2. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.17"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.30"/></proof>
+  <proof prover="11"><result status="valid" time="0.34"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter sort.3" expl="3. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.16"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.29"/></proof>
+  <proof prover="11"><result status="valid" time="0.34"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="WP_parameter sort.4" expl="4. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.5" expl="5. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.6" expl="6. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.7" expl="7. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.07"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.8" expl="8. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.04"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter sort.9" expl="9. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.10" expl="10. loop invariant init">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter sort.11" expl="11. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.13"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="0.25"/></proof>
+  <proof prover="11"><result status="valid" time="0.12"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="WP_parameter sort.12" expl="12. type invariant">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.13" expl="13. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="1.05"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="1.41"/></proof>
+  <proof prover="11"><result status="valid" time="1.04"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.14" expl="14. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.15" expl="15. precondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="1.98"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.35"/></proof>
+  <proof prover="11"><result status="valid" time="0.22"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.16" expl="16. precondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.17"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.35"/></proof>
+  <proof prover="11"><result status="valid" time="0.21"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter sort.17" expl="17. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.18" expl="18. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.19" expl="19. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.20" expl="20. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. assertion">
-  <proof prover="4"><result status="valid" time="0.18"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.04" steps="64"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.16"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.20"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.09"/></proof>
+  <proof prover="11"><result status="valid" time="0.22"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.23" expl="23. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.05"/></proof>
-  <proof prover="9"><result status="valid" time="1.84"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.51"/></proof>
+  <transf name="inline_goal">
+   <goal name="WP_parameter sort.23.1" expl="1. loop invariant preservation">
+   <proof prover="12" memlimit="1000"><result status="valid" time="0.42" steps="150"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="WP_parameter sort.24" expl="24. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="3.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="4.80"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.13"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="2.00" steps="401"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.14"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="10"><result status="valid" time="0.08"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.39"/></proof>
   </goal>
   <goal name="WP_parameter sort.26" expl="26. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.32"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  <proof prover="13" timelimit="5" memlimit="1000"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter sort.27" expl="27. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter sort.28" expl="28. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.17"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.12"/></proof>
+  <proof prover="11"><result status="valid" time="0.15"/></proof>
+  <proof prover="12" timelimit="5"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="14" timelimit="5"><result status="valid" time="0.04"/></proof>
+  <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.29" expl="29. assertion">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.12"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="35"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter sort.30" expl="30. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.31" expl="31. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.09"/></proof>
-  <proof prover="4"><result status="valid" time="0.32"/></proof>
-  <proof prover="9"><result status="valid" time="0.32"/></proof>
-  <proof prover="10"><result status="valid" time="0.11"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.16" steps="181"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.21"/></proof>
   </goal>
   <goal name="WP_parameter sort.32" expl="32. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.07"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.12"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.33" expl="33. assertion">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.34" expl="34. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.35" expl="35. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="17"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter sort.36" expl="36. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.37" expl="37. type invariant">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.38" expl="38. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.13"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="WP_parameter sort.39" expl="39. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.07"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="SuffixSort_test" sum="a563fdedb3c475791c006b76fe7a6f43">
+<theory name="SuffixSort_test" sum="c77cd41b547ef4ee80898bd3563f97bc">
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="9" memlimit="1000"><result status="valid" time="2.69"/></proof>
+ <proof prover="12" timelimit="5" memlimit="1000"><result status="valid" time="0.16" steps="92"/></proof>
  </goal>
 </theory>
-<theory name="SuffixArray" sum="2b10a5a850a09fd67c4e0b0a59af0bb3" expanded="true">
+<theory name="SuffixArray" sum="1f2bf5d2a409c764d4273d56797dfab7">
  <goal name="WP_parameter select" expl="VC for select">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.03"/></proof>
- <proof prover="6"><result status="valid" time="0.01"/></proof>
- <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
- <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
- <proof prover="9"><result status="valid" time="0.02"/></proof>
- <proof prover="10"><result status="valid" time="0.02"/></proof>
  <proof prover="11"><result status="valid" time="0.01"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="15"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="permut_permutation">
- <proof prover="0" edited="verifythis_fm2012_lcp_SuffixArray_permut_permutation_1.v"><result status="valid" time="1.64"/></proof>
+ <proof prover="1" timelimit="6" memlimit="1000" edited="verifythis_fm2012_lcp_SuffixArray_permut_permutation_1.v"><result status="valid" time="1.12"/></proof>
  </goal>
  <goal name="WP_parameter create" expl="VC for create">
  <transf name="split_goal_wp">
   <goal name="WP_parameter create.1" expl="1. array creation size">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="1"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter create.2" expl="2. precondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter create.3" expl="3. precondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.16"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.20"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter create.4" expl="4. type invariant">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter create.5" expl="5. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.04"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter create.6" expl="6. type invariant">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter create.7" expl="7. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="1.13"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="0.64"/></proof>
+  <proof prover="11"><result status="valid" time="0.52"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.71"/></proof>
   </goal>
   <goal name="WP_parameter create.8" expl="8. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter create.9" expl="9. type invariant">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="4"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="15"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter create.10" expl="10. precondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter create.11" expl="11. precondition">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.18"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="0.31"/></proof>
+  <proof prover="11"><result status="valid" time="0.24"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter create.12" expl="12. type invariant">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.10"/></proof>
-  <proof prover="4"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.07"/></proof>
-  <proof prover="9"><result status="valid" time="0.08"/></proof>
-  <proof prover="10"><result status="valid" time="0.08"/></proof>
-  <proof prover="11"><result status="valid" time="4.48"/></proof>
+  <proof prover="11"><result status="valid" time="3.51"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.08" steps="76"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter lcp" expl="VC for lcp">
  <transf name="split_goal_wp">
   <goal name="WP_parameter lcp.1" expl="1. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lcp.2" expl="2. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lcp.3" expl="3. precondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="3.74"/></proof>
+  <proof prover="11"><result status="valid" time="3.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter lcp.4" expl="4. precondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.06"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter lcp.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.03"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="62"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="SuffixArray_test" sum="c15cb46e53e49c8d188e00f52a682fc7">
+<theory name="SuffixArray_test" sum="c7996d38b6990ca0fc1fead0b9f0d11a">
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="12" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="26"/></proof>
  </goal>
 </theory>
-<theory name="LRS" sum="7f7badbc93e5301c5329359e0f089198" expanded="true">
+<theory name="LRS" sum="d0971bf26d5eb7030604f7cf76581ea9">
  <goal name="lcp_sym">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
- <proof prover="9"><result status="valid" time="0.02"/></proof>
- <proof prover="10"><result status="valid" time="0.04"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="40"/></proof>
+ <proof prover="14" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="le_le_common_prefix">
- <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="9"><result status="valid" time="0.12"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.10" steps="136"/></proof>
  </goal>
  <goal name="le_le_longest_common_prefix">
- <proof prover="1"><result status="valid" time="0.11"/></proof>
- <proof prover="2"><result status="valid" time="0.16"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
- <proof prover="4"><result status="valid" time="0.36"/></proof>
- <proof prover="6"><result status="valid" time="0.10"/></proof>
- <proof prover="9"><result status="valid" time="0.36"/></proof>
- <proof prover="10"><result status="valid" time="0.08"/></proof>
+ <proof prover="12" memlimit="1000"><result status="valid" time="0.19" steps="223"/></proof>
+ <proof prover="14" memlimit="1000"><result status="valid" time="0.11"/></proof>
+ <proof prover="15"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter lrs" expl="VC for lrs">
  <transf name="split_goal_wp">
   <goal name="WP_parameter lrs.1" expl="1. assertion">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lrs.2" expl="2. assertion">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lrs.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter lrs.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.07"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="9"><result status="valid" time="0.03"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="32"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter lrs.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lrs.7" expl="7. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.8" expl="8. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.9" expl="9. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.03"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter lrs.10" expl="10. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lrs.11" expl="11. precondition">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="1.60"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="4.10"/></proof>
+  <proof prover="11"><result status="valid" time="2.93"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="15"><result status="valid" time="0.49"/></proof>
   </goal>
   <goal name="WP_parameter lrs.12" expl="12. precondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="27"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter lrs.13" expl="13. precondition">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="5.10"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter lrs.14" expl="14. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.86"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.16"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.03"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="4.30"/></proof>
+  <proof prover="11"><result status="valid" time="3.25"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="45"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="15"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter lrs.15" expl="15. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.94"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.05"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="9"><result status="valid" time="0.04"/></proof>
-  <proof prover="10"><result status="valid" time="0.05"/></proof>
-  <proof prover="11"><result status="valid" time="4.42"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.17"/></proof>
+  <proof prover="11"><result status="valid" time="3.87"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="49"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter lrs.16" expl="16. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.26"/></proof>
-  <proof prover="4"><result status="valid" time="0.16"/></proof>
-  <proof prover="6"><result status="valid" time="0.07"/></proof>
-  <proof prover="9"><result status="valid" time="0.18"/></proof>
-  <proof prover="10"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.18"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.16" steps="173"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lrs.17" expl="17. loop invariant preservation">
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.52"/></proof>
-  <proof prover="6"><result status="valid" time="0.25"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="3.69"/></proof>
   </goal>
   <goal name="WP_parameter lrs.18" expl="18. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.00" steps="27"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter lrs.19" expl="19. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter lrs.20" expl="20. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.05"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="27"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.21" expl="21. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.59"/></proof>
-  <proof prover="6"><result status="valid" time="0.23"/></proof>
-  <proof prover="10"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="2.15"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter lrs.22" expl="22. assertion">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="2"><result status="valid" time="0.90"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.16"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.13"/></proof>
-  <proof prover="9"><result status="valid" time="0.07"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" memlimit="1000"><result status="valid" time="0.15"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.03" steps="54"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="15"><result status="valid" time="1.10"/></proof>
   </goal>
   <goal name="WP_parameter lrs.23" expl="23. assertion">
-  <proof prover="0" timelimit="10" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_10.v"><result status="valid" time="32.13"/></proof>
+  <proof prover="1" memlimit="1000" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_10.v"><result status="valid" time="1.61"/></proof>
   </goal>
   <goal name="WP_parameter lrs.24" expl="24. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.10"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter lrs.25" expl="25. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.10"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.06"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="13" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter lrs.26" expl="26. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.05"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
   <proof prover="11"><result status="valid" time="0.05"/></proof>
+  <proof prover="12" memlimit="1000"><result status="valid" time="0.02" steps="21"/></proof>
+  <proof prover="14" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter lrs.27" expl="27. postcondition">
-  <proof prover="0" timelimit="5" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v"><result status="valid" time="31.24"/></proof>
+  <proof prover="1" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v"><result status="valid" time="1.31"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="LRS_test" sum="bf58931ccc664c64a3f12088e018598c">
+<theory name="LRS_test" sum="9adc6d6f969cf94cc3e7a6184dda9b9b">
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="9" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="12" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
 </theory>
 </file>

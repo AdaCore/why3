@@ -92,7 +92,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
     | RegexpStepLimitExceeded s ->
       add_to_list regexps (Str.regexp s, StepLimitExceeded)
-    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
+    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown (t, None))
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
@@ -103,7 +103,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
     | ExitCodeStepLimitExceeded s ->
       add_to_list exitcodes (s, StepLimitExceeded)
-    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
+    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown (t, None))
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
     | Printer s -> set_or_raise loc printer s "printer"
@@ -142,20 +142,26 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
-    | Rsyntaxts (q,s) ->
-        let td = syntax_type (find_ts th q) s in
+    | Rsyntaxts (q,s,b) ->
+        let td = syntax_type (find_ts th q) s b in
         add_meta th td meta
-    | Rsyntaxfs (q,s) ->
-        let td = syntax_logic (find_fs th q) s in
+    | Rsyntaxfs (q,s,b) ->
+        let td = syntax_logic (find_fs th q) s b in
         add_meta th td meta
-    | Rsyntaxps (q,s) ->
-        let td = syntax_logic (find_ps th q) s in
+    | Rsyntaxps (q,s,b) ->
+        let td = syntax_logic (find_ps th q) s b in
         add_meta th td meta
     | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
         add_meta th td meta
-    | Rconverter (q,s) ->
-        let cs = syntax_converter (find_ls th q) s in
+    | Rremoveall ->
+      let it key _ = match (Mid.find key th.th_known).d_node with
+        | Dprop (_,symb,_) -> add_meta th (remove_prop symb) meta
+        | _ -> ()
+      in
+      Mid.iter it th.th_local
+    | Rconverter (q,s,b) ->
+        let cs = syntax_converter (find_ls th q) s b in
         add_meta th cs meta
     | Rmeta (s,al) ->
         let rec ty_of_pty = function

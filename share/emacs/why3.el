@@ -29,7 +29,7 @@
    '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
 ;   '("{}\\|{[^|]\\([^}]*\\)}" . font-lock-type-face)
    `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "returns" "raises" "reads" "writes" "assert" "assume" "check")) . font-lock-type-face)
-   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "try" "with" "theory" "uses" "module" "converter" "fun" "at" "old" "true" "false" "forall" "exists" "label")) . font-lock-keyword-face)
+   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "try" "with" "theory" "uses" "module" "converter" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")
 
@@ -145,7 +145,8 @@
                    (let ((file (file-name-nondirectory buffer-file-name)))
                      (format "why3 ide %s" file))))))
 
-
+(add-hook 'why3-mode-hook
+          (lambda () (modify-syntax-entry ?_ "w")))
 
 ;; setting the mode
 (defun why3-mode ()

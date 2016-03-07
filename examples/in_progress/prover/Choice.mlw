@@ -1,0 +1,18 @@
+
+module Choice
+  
+  use import HighOrd
+  
+  (* no why3 type is empty. *)
+  
+  constant default : 'a
+  
+  (* Axiom of choice : we can explicitely pick an element whom
+     existence is proven. *)
+  
+  function choice (p:pred 'a) : 'a
+  axiom choice_behaviour : forall p:pred 'a,x:'a.
+    p x -> p (choice p)
+  
+end
+

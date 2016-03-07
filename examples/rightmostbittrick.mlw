@@ -1,0 +1,35 @@
+module Rmbt
+  use import int.Int
+  use import ref.Ref
+  use import bv.BV64
+
+  let ghost rightmost_position_set (a : t) : t
+    requires { a <> zeros }
+    ensures  { ult result (of_int 64) }
+    ensures  { eq_sub_bv a zeros zeros result }
+    ensures  { nth_bv a result }
+  =
+    let i = ref zeros in
+    while ult !i (of_int 64) && not (nth_bv a !i) do
+      variant {64 - to_uint !i}
+      invariant {eq_sub_bv a zeros zeros !i}
+      i := add !i (of_int 1)
+    done;
+    !i
+
+  let rightmost_bit_trick (x: t) (ghost p : ref int) : t
+    requires { x <> zeros }
+    writes   { p }
+    ensures  { 0 <= !p < 64 }
+    ensures  { eq_sub x zeros 0 !p }
+    ensures  { nth x !p }
+    ensures  { eq_sub result zeros 0 !p }
+    ensures  { eq_sub result zeros (!p+1) (63 - !p) }
+    ensures  { nth result !p }
+  =
+    let ghost p_bv = rightmost_position_set x in
+    ghost p := to_uint p_bv;
+    assert { nth_bv (neg x) p_bv };
+    bw_and x (neg x)
+
+end

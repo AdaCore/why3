@@ -2,70 +2,69 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="3" memlimit="0"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="3" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="3" memlimit="1000"/>
-<prover id="3" name="Z3" version="2.19" timelimit="3" memlimit="0"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="3" steplimit="1" memlimit="0"/>
+<prover id="2" name="Coq" version="8.4pl6" timelimit="3" steplimit="1" memlimit="0"/>
+<prover id="5" name="Z3" version="3.2" timelimit="3" steplimit="1" memlimit="0"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="3" steplimit="1" memlimit="1000"/>
+<prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../imp_n.why" expanded="true">
-<theory name="Imp" sum="35767608e19f9a9a41f9ab3d3b8770c0" expanded="true">
+<theory name="Imp" sum="49dea7a154c8410b9f73a20cca68e63a" expanded="true">
  <goal name="ident_eq_dec">
- <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.00" steps="0"/></proof>
  </goal>
  <goal name="check_skip">
- <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="Test13">
- <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
  <goal name="Test42">
- <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
  <goal name="Test55">
- <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.02" steps="25"/></proof>
  </goal>
  <goal name="Ass42">
- <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.09" steps="90"/></proof>
  </goal>
  <goal name="If42">
- <proof prover="2" timelimit="5"><result status="valid" time="0.36"/></proof>
- <proof prover="4"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.06"/></proof>
+ <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
+ <proof prover="6" timelimit="5"><result status="valid" time="0.29" steps="496"/></proof>
+ <proof prover="7"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="progress">
- <proof prover="0" edited="imp_n_Imp_progress_1.v"><result status="valid" time="1.08"/></proof>
+ <proof prover="2" edited="imp_n_Imp_progress_1.v"><result status="valid" time="0.86"/></proof>
  </goal>
  <goal name="steps_non_neg">
- <proof prover="0" edited="imp_n_Imp_steps_non_neg_1.v"><result status="valid" time="1.12"/></proof>
+ <proof prover="2" edited="imp_n_Imp_steps_non_neg_1.v"><result status="valid" time="0.89"/></proof>
  </goal>
  <goal name="many_steps_seq">
- <proof prover="0" edited="imp_n_Imp_many_steps_seq_1.v"><result status="valid" time="1.22"/></proof>
+ <proof prover="2" edited="imp_n_Imp_many_steps_seq_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="eval_subst_expr">
- <proof prover="0" edited="imp_n_Imp_eval_subst_expr_1.v"><result status="valid" time="1.11"/></proof>
+ <proof prover="2" edited="imp_n_Imp_eval_subst_expr_1.v"><result status="valid" time="1.11"/></proof>
  </goal>
  <goal name="eval_subst">
- <proof prover="0" edited="imp_n_Imp_eval_subst_1.v"><result status="valid" time="1.24"/></proof>
+ <proof prover="2" edited="imp_n_Imp_eval_subst_1.v"><result status="valid" time="0.93"/></proof>
  </goal>
  <goal name="skip_rule">
- <proof prover="2" memlimit="0"><result status="valid" time="0.58"/></proof>
+ <proof prover="6" memlimit="0"><result status="valid" time="0.04" steps="113"/></proof>
  </goal>
  <goal name="assign_rule">
- <proof prover="0" edited="imp_n_Imp_assign_rule_1.v"><result status="valid" time="1.19"/></proof>
+ <proof prover="2" edited="imp_n_Imp_assign_rule_1.v"><result status="valid" time="0.96"/></proof>
  </goal>
  <goal name="seq_rule">
- <proof prover="0" edited="imp_n_Imp_seq_rule_1.v"><result status="valid" time="1.12"/></proof>
+ <proof prover="2" edited="imp_n_Imp_seq_rule_1.v"><result status="valid" time="0.90"/></proof>
  </goal>
  <goal name="if_rule">
- <proof prover="0" edited="imp_n_Imp_if_rule_1.v"><result status="valid" time="1.14"/></proof>
+ <proof prover="2" edited="imp_n_Imp_if_rule_1.v"><result status="valid" time="0.89"/></proof>
  </goal>
  <goal name="while_rule">
- <proof prover="0" edited="imp_n_Imp_while_rule_1.v"><result status="valid" time="1.27"/></proof>
+ <proof prover="2" edited="imp_n_Imp_while_rule_1.v"><result status="valid" time="1.02"/></proof>
  </goal>
  <goal name="consequence_rule">
  <proof prover="1"><result status="valid" time="0.05"/></proof>
- <proof prover="3"><result status="timeout" time="2.98"/></proof>
+ <proof prover="5"><result status="timeout" time="2.98"/></proof>
  </goal>
 </theory>
 </file>

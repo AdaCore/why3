@@ -1,6 +1,8 @@
 
 module VM_instr_spec
 
+  meta compute_max_steps 0x10000
+
   use import int.Int
   use import list.List
   use import list.Length
@@ -148,11 +150,12 @@ module VM_instr_spec
         if cond n1 n2 then VMS (p+ofs+1) s m else VMS (p+1) s m
       | _ -> ms
       end
+  meta rewrite_def function icjump_fun
 
   let create_cjump (code_cd:code) (ghost cond:cond) (ghost ofs:ofs) : hl 'a
-    requires { forall c p1 n1 n2. codeseq_at c p1 code_cd ->
-      let p2 = (if cond n1 n2 then p1 + 1 + ofs else p1 + 1) in
-      forall s m. transition c (VMS p1 (push n2 (push n1 s)) m) (VMS p2 s m) }
+    requires { forall c p1 n1 n2 s m. codeseq_at c p1 code_cd ->
+      let p2 = (if cond n1 n2 then p1 + ofs + 1 else p1 + 1) in
+      transition c (VMS p1 (push n2 (push n1 s)) m) (VMS p2 s m) }
     ensures { result.pre = ibinop_pre /\ result.post = icjump_post cond ofs }
     ensures { result.code.length = code_cd.length /\ hl_correctness result }
   = let c = $ ifunf ibinop_pre code_cd (icjump_fun cond ofs) in
@@ -206,6 +209,7 @@ module VM_instr_spec
       | VMS p (Cons n s) m -> VMS (p+1) s m[x <- n]
       | _ -> ms
       end
+  meta rewrite_def function isetvar_fun
 
   let isetvarf (x: id) : hl 'a
     ensures { result.pre  = isetvar_pre /\ result.post = isetvar_post x  }

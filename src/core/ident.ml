@@ -42,6 +42,63 @@ let lab_equal : label -> label -> bool = (==)
 let lab_hash lab = lab.lab_tag
 let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
 
+(* functions for working with counterexample model labels *)
+
+let model_proj_label = create_label "model_projected"
+let model_label = create_label "model"
+
+let remove_model_labels ~labels =
+  Slab.filter (fun l -> (l <> model_label) && (l <> model_proj_label) ) labels
+
+let is_model_trace_label label =
+  Strings.has_prefix "model_trace:" label.lab_string
+
+let get_model_trace_label ~labels =
+  Slab.choose (Slab.filter is_model_trace_label labels)
+
+let transform_model_trace_label labels trans_fun =
+  try
+    let trace_label = get_model_trace_label ~labels in
+    let labels_without_trace = Slab.remove trace_label labels in
+    let new_trace_label = create_label (trans_fun trace_label.lab_string) in
+    Slab.add new_trace_label labels_without_trace
+  with Not_found -> labels
+
+let append_to_model_element_name ~labels ~to_append =
+  let trans lab_str =
+    let splitted = Strings.bounded_split '@' lab_str 2 in
+    match splitted with
+    | [before; after] -> before ^ to_append ^ "@" ^ after
+    | _ -> lab_str^to_append in
+  transform_model_trace_label labels trans
+
+let append_to_model_trace_label ~labels ~to_append =
+    let trans lab_str = lab_str ^ to_append in
+    transform_model_trace_label labels trans
+
+let get_model_element_name ~labels =
+  let trace_label = get_model_trace_label ~labels in
+  let splitted1 = Strings.bounded_split ':' trace_label.lab_string 2 in
+  match splitted1 with
+  | [_; content] ->
+    begin
+      let splitted2 = Strings.bounded_split '@' content 2 in
+      match splitted2 with
+      | [el_name; _] -> el_name
+      | [el_name] -> el_name
+      | _ -> raise Not_found
+    end;
+  | [_] -> ""
+  | _ -> assert false
+
+let get_model_trace_string ~labels =
+  let tl = get_model_trace_label ~labels in
+  let splitted = Strings.bounded_split ':' tl.lab_string 2 in
+  match splitted with
+  | [_; t_str] -> t_str
+  | _ -> ""
+
+
 (** Identifiers *)
 
 type ident = {
@@ -91,6 +148,9 @@ let id_fresh ?(label = Slab.empty) ?loc nm =
 
 let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
+
+let id_lab label id =
+  create_ident id.id_string label id.id_loc
 
 let id_clone ?(label = Slab.empty) id =
   let ll = Slab.union label id.id_label in

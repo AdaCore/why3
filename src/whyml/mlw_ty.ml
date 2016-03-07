@@ -506,10 +506,10 @@ let its_clone sm =
     | Ityapp (its,tl,rl) ->
         let tl = List.map conv_ity tl in
         let rl = List.map conv_reg rl in
-        ity_app_unsafe (conv_its its) tl rl
+        ity_app (conv_its its) tl rl
     | Itypur (ts,tl) ->
         let tl = List.map conv_ity tl in
-        ity_pur_unsafe (conv_ts ts) tl
+        ity_pur (conv_ts ts) tl
     | Ityvar _ -> ity
   and conv_its its =
     try Hits.find itsh its with Not_found ->

@@ -1,0 +1,148 @@
+
+(** Computing the height of a tree in CPS style
+    (author: Jean-Christophe Filliâtre) *)
+
+module HeightCPS
+
+  use import int.Int
+  use import int.MinMax
+  use import bintree.Tree
+  use import bintree.Height
+  use HighOrd
+
+  function height_cps (t: tree 'a) (k: int -> 'b) : 'b =
+    match t with
+    | Empty -> k 0
+    | Node l _ r ->
+        height_cps l (\ hl.
+        height_cps r (\ hr.
+        k (1 + max hl hr)))
+    end
+
+  function height1 (t: tree 'a) : int = height_cps t (\ h. h)
+
+  lemma height_cps_correct:
+    forall t: tree 'a, k: int -> 'b. height_cps t k = k (height t)
+
+  lemma height1_correct:
+    forall t: tree 'a. height1 t = height t
+
+end
+
+(** with a while loop, manually obtained by compiling out recursion *)
+
+module Iteration
+
+  use import int.Int
+  use import int.MinMax
+  use import list.List
+  use import bintree.Tree
+  use import bintree.Size
+  use import bintree.Height
+  use import ref.Ref
+
+  type cont 'a = Id | Kleft (tree 'a) (cont 'a) | Kright int (cont 'a)
+
+  type what 'a = Argument (tree 'a) | Result int
+
+  predicate is_id (k: cont 'a) =
+    match k with Id -> true | _ -> false end
+
+  predicate is_result (w: what 'a) =
+    match w with Result _ -> true | _ -> false end
+
+  function evalk (k: cont 'a) (r: int) : int =
+    match k with
+    | Id         -> r
+    | Kleft  l k -> evalk k (1 + max (height l) r)
+    | Kright x k -> evalk k (1 + max x r)
+    end
+
+  function evalw (w: what 'a) : int =
+    match w with
+    | Argument t -> height t
+    | Result   x -> x
+    end
+
+  function sizek (k: cont 'a) : int =
+    match k with
+    | Id         -> 0
+    | Kleft  t k -> 3 + 4 * size t + sizek k
+    | Kright _ k -> 1 + sizek k
+    end
+
+  lemma sizek_nonneg: forall k: cont 'a. sizek k >= 0
+
+  function sizew (w: what 'a) : int =
+    match w with
+    | Argument t -> 1 + 4 * size t
+    | Result   _ -> 0
+    end
+
+  lemma helper1: forall t: tree 'a. 4 * size t >= 0
+  lemma sizew_nonneg: forall w: what 'a. sizew w >= 0
+
+  let height1 (t: tree 'a) : int
+    ensures { result = height t }
+  =
+    let w = ref (Argument t) in
+    let k = ref Id in
+    while not (is_id !k && is_result !w) do
+      invariant { evalk !k (evalw !w) = height t }
+      variant   { sizek !k + sizew !w }
+      match !w, !k with
+      | Argument Empty,        _ -> w := Result 0
+      | Argument (Node l _ r), _ -> w := Argument l; k := Kleft r !k
+      | Result _, Id             -> absurd
+      | Result v, Kleft r k0     -> w := Argument r; k := Kright v k0
+      | Result v, Kright hl k0   -> w := Result (1 + max hl v); k := k0
+      end
+    done;
+    match !w with Result r -> r | _ -> absurd end
+
+end
+
+(** Computing the height of a tree with an explicit stack
+    (code: Andrei Paskevich / proof: Jean-Christophe Filliâtre) *)
+
+module HeightStack
+
+  use import int.Int
+  use import int.MinMax
+  use import list.List
+  use import bintree.Tree
+  use import bintree.Size
+  use import bintree.Height
+
+  type stack 'a = list (int, tree 'a)
+
+  function heights (s: stack 'a) : int =
+    match s with
+    | Nil            -> 0
+    | Cons (h, t) s' -> max (h + height t) (heights s')
+    end
+
+  function sizes (s: stack 'a) : int =
+    match s with
+    | Nil            -> 0
+    | Cons (_, t) s' -> size t + sizes s'
+    end
+
+  lemma sizes_nonneg: forall s: stack 'a. sizes s >= 0
+
+  let rec height_stack (m: int) (s: stack 'a) : int
+    requires { m >= 0 }
+    variant  { sizes s, s }
+    ensures  { result = max m (heights s) }
+  = match s with
+    | Nil                     -> m
+    | Cons (h, Empty) s'      -> height_stack (max m h) s'
+    | Cons (h, Node l _ r) s' -> height_stack m (Cons (h+1,l) (Cons (h+1,r) s'))
+   end
+
+  let height1 (t: tree 'a) : int
+    ensures { result = height t }
+  = height_stack 0 (Cons (0, t) Nil)
+
+end
+

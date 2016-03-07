@@ -21,9 +21,14 @@ open Term
 open Decl
 
 let rec intros pr f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
+      when Slab.mem Term.asym_split f2.t_label ->
+        [create_prop_decl Pgoal pr f]
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
-      let l = Split_goal.split_pos_intro f1 in
+      (* f is going to be removed, preserve its labels and location in f2  *)
+      let f2 = t_label_copy f f2 in
+      let l = Split_goal.split_intro_right f1 in
       List.fold_right
         (fun f acc ->
            let id = create_prsymbol (id_fresh "H") in
@@ -32,14 +37,15 @@ let rec intros pr f = match f.t_node with
         l
         (intros pr f2)
   | Tquant (Tforall,fq) ->
-      let vsl,_trl,f = t_open_quant fq in
+      let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
-      let f = t_subst subst f in
+      (* preserve labels and location of f  *)
+      let f = t_label_copy f (t_subst subst f_t) in
       dl @ intros pr f
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
@@ -57,12 +63,15 @@ let intros pr f =
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   Mtv.values decls @ intros pr (t_ty_subst subst Mvs.empty f)
 
-let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
+let introduce_premises = Trans.goal intros
+
+let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+let split_intro =
+  Trans.compose_l Split_goal.split_goal_wp (Trans.singleton introduce_premises)
+
+let () = Trans.register_transform_l "split_intro" split_intro
+  ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
+    the@ implication@ antecedents@ to@ premises."

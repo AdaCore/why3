@@ -1,0 +1,83 @@
+
+module Sig
+  
+  use import int.Int
+  use import logic_syntax.Defs
+  use import logic_syntax.VarsIn
+  use import logic_typing.Sig as S
+  use import support.HO
+  use import support.Finite
+  
+  (* Global extensible signature.
+     With respect to typing signatures,
+     a new field has been added: the field giving the
+     number of constructors for a type symbol.
+     The reason is that Why3 cache a ls_constr field inside logic symbols
+     that corresponds to the total number of constructors,
+     so it must be known from the signature modelisation.
+   *)
+  type signature model {
+    mutable sig_m : S.signature;
+    mutable tsc_n : ty_symbol -> int;
+  } invariant { sig_wf self.sig_m /\
+      forall tys. self.sig_m.tys_belong tys ->
+        let s = self.sig_m.tys_constr tys in
+        let n0 = self.tsc_n tys in
+        finite s /\ n0 >= cardinal s /\
+        (n0 = cardinal s -> self.sig_m.tys_constr_complete tys) }
+  type signature_s model {
+    sig_m_s : S.signature;
+    tsc_n_s : ty_symbol -> int;
+  } invariant { sig_wf self.sig_m_s /\
+    forall tys. self.sig_m_s.tys_belong tys ->
+      let s = self.sig_m_s.tys_constr tys in
+      let n0 = self.tsc_n_s tys in
+      finite s /\ n0 >= cardinal s /\
+      (n0 = cardinal s -> self.sig_m_s.tys_constr_complete tys) }
+  
+  (* global signature declaration. *)
+  val ghost global_sig : signature
+  val ghost global_sig_snapshot () : signature_s
+    ensures { result.sig_m_s = global_sig.sig_m }
+    ensures { result.tsc_n_s = global_sig.tsc_n }
+  val ghost global_sig_growth (s:signature_s) : unit
+    ensures { let so = s.sig_m_s in let sc = global_sig.sig_m in
+      sig_inclusion so sc /\
+      equalizer (tys_alg so) s.tsc_n_s global_sig.tsc_n }
+  
+  (* Allowed symbols domain, e.g symbol contexts. *)
+  type sym_ctx
+  function d_tys sym_ctx : ty_symbol -> bool
+  function d_ls sym_ctx : lsymbol -> bool
+  function d_constr sym_ctx : lsymbol -> bool
+  axiom sym_ctx_inv : forall sc ls. sc.d_constr ls -> sc.d_ls ls
+  
+  predicate sub_sym_ctx (s1 s2:sym_ctx) =
+    subset s1.d_tys s2.d_tys /\
+    subset s1.d_ls s2.d_ls /\
+    subset s1.d_constr s2.d_constr
+  
+  predicate sym_prj_wf (sig:S.signature) (dtys:ty_symbol -> bool)
+    (dls:lsymbol -> bool) (dconstr:lsymbol -> bool) =
+    subset dtys sig.tys_belong /\
+    subset dls sig.ls_belong /\
+    subset dconstr sig.ls_constr /\
+    (forall ls. dls ls -> ty_vars_in all dtys (sig.ls_ret ls) /\
+      tyl_vars_in all dtys (sig.ls_args ls))
+  
+  predicate sym_ctx_wf (sig:S.signature) (s:sym_ctx) =
+    sym_prj_wf sig s.d_tys s.d_ls s.d_constr
+  
+  val ghost sym_bounds (sym_c:sym_ctx) : unit
+    ensures { sym_ctx_wf global_sig.sig_m sym_c }
+  
+  val ghost make_sym_ctx (dtys:ty_symbol -> bool)
+                         (dls:lsymbol -> bool)
+                         (dconstr:lsymbol -> bool) : sym_ctx
+    requires { sym_prj_wf global_sig.sig_m dtys dls dconstr }
+    ensures { result.d_tys = dtys }
+    ensures { result.d_ls = dls }
+    ensures { result.d_constr = dconstr }
+  
+end
+

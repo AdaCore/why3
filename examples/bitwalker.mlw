@@ -1,0 +1,323 @@
+module Bitwalker
+  use import int.Int
+  use import int.EuclideanDivision
+  use import array.Array
+  use import ref.Ref
+  (* use bv.BV32 *)
+  (* use bv.BV8 *)
+  (* use bv.BV64 *)
+  use mach.bv.BVCheck8  as BV8
+  use mach.bv.BVCheck32 as BV32
+  use mach.bv.BVCheck64 as BV64
+  use bv.BVConverter_32_64 as C32_64
+  use bv.BVConverter_8_32 as C8_32
+
+(* file missing in repository
+  use import mach.bv.BV
+*)
+
+  function nth8_stream (stream : array BV8.t) (pos : int) : bool =
+    BV8.nth stream[div pos 8] (7 - mod pos 8)
+
+  lemma nth64:
+    forall value:BV64.t, i:int. 0 <= i < 64 ->
+      BV64.nth value i = BV64.nth_bv value (C32_64.toBig (BV32.of_int i))
+
+  lemma nth8:
+    forall value:BV8.t, i:int. 0 <= i < 8 ->
+      BV8.nth value i = BV8.nth_bv value (C8_32.toSmall (BV32.of_int i))
+
+  (*  *)
+  function maxvalue (len : BV32.t) : BV64.t = BV64.lsl_bv (BV64.of_int 1) (C32_64.toBig len)
+
+  let lemma nth_ultpre0 (x:BV64.t) (len:BV32.t)
+    requires { BV32.to_uint len < 64}
+    ensures { BV64.eq_sub x BV64.zeros (BV32.to_uint len) (64 - BV32.to_uint len)
+          <-> BV64.to_uint x < BV64.to_uint (maxvalue len) }
+  =
+    assert { BV32.ult len (BV32.of_int 64) };
+    assert { BV64.eq_sub_bv x BV64.zeros (C32_64.toBig len) (BV64.sub (BV64.of_int 64) (C32_64.toBig len))
+         <-> BV64.ult x (maxvalue len) }
+
+ (** return [value] with the bit of index [left] from the left set to [flag] *)
+  let poke_64bit_bv (value : BV64.t) (left : BV32.t) (flag : bool) : BV64.t
+    requires { BV32.to_uint left < 64 }
+    ensures  { forall i. 0 <= i < 64 /\ i <> 63 - BV32.to_uint left ->
+                 BV64.nth result i = BV64.nth value i }
+    ensures  { flag = BV64.nth result (63 - BV32.to_uint left) }
+  =
+    assert { BV32.ult left (BV32.of_int 64) };
+    abstract
+    ensures { forall i:BV32.t. i <> BV32.sub (BV32.of_int 63) left ->
+               BV64.nth_bv result (C32_64.toBig i) =
+                 BV64.nth_bv value (C32_64.toBig i) }
+    ensures { flag = BV64.nth_bv result
+                       (C32_64.toBig (BV32.sub (BV32.of_int 63) left)) }
+      let mask =
+        BV64.lsl_bv (BV64.int_check 1)
+          (C32_64.toBig (BV32.sub_check (BV32.int_check 63) left))
+      in
+      match flag with
+      | True -> BV64.bw_or value mask
+      | False -> BV64.bw_and value (BV64.bw_not mask)
+      end
+    end
+
+ (** return [value] with the bit of index [left] from the left set to [flag] *)
+(* version where [left] is an int and not a bitvector, which
+  is closer to the result of the SPARK translation from signed
+  integers *)
+  let poke_64bit (value : BV64.t) (left : int) (flag : bool) : BV64.t
+    requires { 0 <= left < 64 }
+    ensures  { forall i. 0 <= i < 64 /\ i <> 63 - left ->
+                 BV64.nth result i = BV64.nth value i }
+    ensures  { flag = BV64.nth result (63 - left) }
+  =
+    let ghost left_bv = BV64.of_int left in
+    assert { BV64.ult left_bv (BV64.of_int 64) };
+    assert { (BV64.sub (BV64.of_int 63) left_bv) = BV64.of_int (63 - left) };
+    abstract
+    ensures { forall i:BV64.t. BV64.ule i (BV64.of_int 63) ->
+               i <> BV64.sub (BV64.of_int 63) left_bv ->
+               BV64.nth_bv result i = BV64.nth_bv value i }
+    ensures { flag = BV64.nth_bv result (BV64.sub (BV64.of_int 63) left_bv) }
+      let mask =
+        BV64.lsl_bv (BV64.int_check 1) (BV64.of_int (63 - left))
+      in
+      match flag with
+      | True -> BV64.bw_or value mask
+      | False -> BV64.bw_and value (BV64.bw_not mask)
+      end
+    end
+
+
+  (* return the bit of [byte] at position [left] starting from the
+  left *)
+
+  let peek_8bit_bv (byte : BV8.t) (left : BV32.t) : bool
+    requires { 0 <= BV32.to_uint left < 8 }
+    ensures  { result = BV8.nth byte (7 - BV32.to_uint left) }
+  =
+    assert {BV32.ult left (BV32.of_int 8)};
+    abstract
+      ensures {
+        result = BV8.nth_bv
+                   byte (BV8.sub (BV8.of_int 7) (C8_32.toSmall left))}
+    let mask =
+      BV32.lsl_bv (BV32.int_check 1) (BV32.sub_check (BV32.int_check 7) left)
+    in
+    BV32.bw_and (C8_32.toBig byte) mask <> BV32.zeros
+    end
+
+  (* return the bit of the [left]/8 element of [addr] at position mod [left] 8 starting from the left *)
+  let peek_8bit_array (addr : array BV8.t) (left : BV32.t) : bool
+    requires { 8 * (length addr) < BV32.two_power_size }
+    requires { BV32.to_uint left < 8 * length addr }
+    ensures  { result = nth8_stream addr (BV32.to_uint left) }
+  =
+    peek_8bit_bv (addr[ BV32.to_uint (BV32.udiv_check left (BV32.int_check 8)) ]) (BV32.urem_check left (BV32.int_check 8))
+
+  (* return a bitvector of 64 bits with its [len] bits of the right
+    set to the bits between [start] and [start] + [len] of [addr] *)
+  let peek (start : BV32.t) (len : BV32.t) (addr : array BV8.t) : BV64.t
+    requires { BV32.to_uint len <= 64 }
+    requires { BV32.to_uint start + BV32.to_uint len < BV32.two_power_size }
+    requires { 8 * length addr < BV32.two_power_size }
+    ensures  { BV32.to_uint start + BV32.to_uint len > (8 * length addr) ->
+      result = BV64.zeros }
+    ensures  { BV32.to_uint start + BV32.to_uint len <= (8 * length addr) ->
+      (forall i:int. 0 <= i < BV32.to_uint len ->
+         BV64.nth result i
+         = nth8_stream addr (BV32.to_uint start + BV32.to_uint len - i - 1))
+      /\
+      (forall i:int. BV32.to_uint len <= i < 64 -> BV64.nth result i = False) }
+  =
+    if (BV32.to_uint (BV32.add_check start len) > ( 8 *length addr ))
+    then
+      BV64.zeros
+    else
+
+    let retval = ref BV64.zeros in
+    let i = ref BV32.zeros in
+    let lstart = BV32.sub_check (BV32.of_int 64) len in
+
+    while BV32.ult !i len do variant{ !i with BV32.ugt }
+    invariant {0 <= BV32.to_uint !i <= BV32.to_uint len}
+    invariant {forall j:int. BV32.to_uint len - BV32.to_uint !i <= j < BV32.to_uint len ->
+                 BV64.nth !retval j
+               = nth8_stream addr (BV32.to_uint start + BV32.to_uint len - j - 1)}
+    invariant {forall j:int. 0 <= j < BV32.to_uint len - BV32.to_uint !i ->
+                 BV64.nth !retval j
+               = False}
+    invariant {forall j:int. BV32.to_uint len <= j < 64 ->
+                 BV64.nth !retval j
+               = False}
+
+      let flag = peek_8bit_array addr (BV32.add_check start !i) in
+      retval := poke_64bit_bv !retval (BV32.add_check lstart !i) flag;
+
+      i := BV32.add_check !i (BV32.int_check 1);
+
+    done;
+
+    !retval
+
+  let peek_64bit (value : BV64.t) (left : BV32.t) : bool
+    requires {BV32.to_uint left < 64}
+    ensures {result = BV64.nth value (63 - BV32.to_uint left)}
+  =
+     assert {BV32.ult left (BV32.of_int 64)};
+     abstract
+     ensures {result = BV64.nth_bv value
+                       (BV64.sub (BV64.of_int 63) (C32_64.toBig left))}
+       let mask = BV64.lsl_bv (BV64.int_check 1)
+                  (C32_64.toBig (BV32.sub_check (BV32.int_check 63) left)) in
+       BV64.bw_and value mask <> BV64.zeros
+     end
+
+(*
+  static inline uint8_t PokeBit8(uint8_t byte, uint32_t left, int flag)
+  {
+    uint8_t mask = ((uint8_t) 1) << (7u - left);
+
+    return (flag == 0) ? (byte & ~mask) : (byte | mask);
+  }
+*)
+
+  (* return [byte] with the bit at index [left] from the left set to [flag] *)
+  let poke_8bit (byte : BV8.t) (left : BV32.t) (flag : bool) : BV8.t
+    requires { BV32.to_uint left < 8 }
+    ensures  { forall i:int. 0 <= i < 8 -> i <> 7 - BV32.to_uint left ->
+               BV8.nth result i = BV8.nth byte i }
+    ensures  { BV8.nth result (7 - BV32.to_uint left) = flag }
+  =
+    assert { BV32.ult left (BV32.of_int 8) };
+    abstract
+    ensures { forall i:BV32.t. BV32.ult i (BV32.of_int 8) ->
+               i <> BV32.sub (BV32.of_int 7) left ->
+               BV8.nth_bv result (C8_32.toSmall i)
+             = BV8.nth_bv byte (C8_32.toSmall i) }
+    ensures { BV8.nth_bv result (BV8.sub (BV8.of_int 7) (C8_32.toSmall left))
+            = flag }
+      let mask = BV8.lsl_bv (BV8.int_check 1) (BV8.sub_check (BV8.int_check 7) (C8_32.toSmall left)) in
+      match flag with
+      | True -> BV8.bw_or byte mask
+      | False -> BV8.bw_and byte (BV8.bw_not mask)
+      end
+    end
+
+  let poke_8bit_array (addr : array BV8.t) (left : BV32.t) (flag : bool)
+    writes {addr}
+    requires { 8 * (length addr) < BV32.two_power_size }
+    requires { BV32.to_uint left < 8 * length addr }
+    ensures  { forall i:int. 0 <= i < 8 * length addr -> i <> BV32.to_uint left ->
+               nth8_stream addr i = nth8_stream (old addr) i}
+    ensures  { nth8_stream addr (BV32.to_uint left) = flag }
+  =
+    let i = BV32.udiv_check left (BV32.int_check 8) in
+    let k = BV32.urem_check left (BV32.int_check 8) in
+    addr[BV32.to_uint i] <- poke_8bit addr[BV32.to_uint i] k flag
+
+  let poke (start : BV32.t) (len : BV32.t) (addr : array BV8.t) (value : BV64.t)
+    writes  { addr }
+    requires{ BV32.to_uint len < 64 } (* could be lower or equal if maxvalue and the condition to return -2 is corrected *)
+    requires{ BV32.to_uint start + BV32.to_uint len < BV32.two_power_size }
+    requires{ 8 * length addr < BV32.two_power_size }
+    ensures { -2 <= result <= 0 }
+    ensures { result = -1 <-> BV32.to_uint start + BV32.to_uint len > 8 * length addr }
+    ensures { result = -2 <-> BV64.to_uint (maxvalue len) <= BV64.to_uint value /\ BV32.to_uint start + BV32.to_uint len <= 8 * length addr }
+    ensures { result =  0 <-> BV64.to_uint (maxvalue len) > BV64.to_uint value /\ BV32.to_uint start + BV32.to_uint len <= 8 * length addr }
+    ensures { result =  0 ->
+              (forall i:int. 0 <= i < BV32.to_uint start ->
+                nth8_stream (old addr) i
+              = nth8_stream addr i)
+           /\
+              (forall i:int. BV32.to_uint start <= i < BV32.to_uint start + BV32.to_uint len ->
+                nth8_stream addr i
+              = BV64.nth value (BV32.to_uint len - i - 1 + BV32.to_uint start))
+           /\
+              (forall i:int. BV32.to_uint start + BV32.to_uint len <= i < 8 * length addr ->
+                nth8_stream addr i
+              = nth8_stream (old addr) i) }
+  =
+    if BV32.to_uint (BV32.add_check start len) > 8 * length addr
+    then
+      -1                        (*error: invalid_bit_sequence*)
+    else
+
+    if BV64.uge value (maxvalue len) (* should be len <> 64 && _..._ *)
+    then
+      -2                        (*error: value_too_big*)
+    else
+
+    let lstart = BV32.sub_check (BV32.of_int 64) len in
+    let i = ref BV32.zeros in
+
+    'Init:
+    while BV32.ult !i len do variant { !i with BV32.ugt }
+    invariant {0 <= BV32.to_uint !i <= BV32.to_uint len}
+    invariant {forall j:int. 0 <= j < BV32.to_uint start ->
+                 nth8_stream (at addr 'Init) j
+               = nth8_stream addr j}
+    invariant {forall j:int. BV32.to_uint start <= j < BV32.to_uint start + BV32.to_uint !i ->
+                 nth8_stream addr j
+               = BV64.nth value (BV32.to_uint len - j - 1 + BV32.to_uint start) }
+    invariant {forall j:int. BV32.to_uint start + BV32.to_uint !i <= j < 8 * length addr ->
+                 nth8_stream addr j
+               = nth8_stream (at addr 'Init) j }
+
+      let flag = peek_64bit value (BV32.add_check lstart !i) in
+
+      poke_8bit_array addr (BV32.add_check start !i) flag;
+
+      assert {nth8_stream addr (BV32.to_uint start + BV32.to_uint !i)
+            = BV64.nth value ((BV32.to_uint len - BV32.to_uint !i - 1))};
+      assert { forall k. BV32.to_uint start <= k < BV32.to_uint start + BV32.to_uint !i ->
+               k <> BV32.to_uint start + BV32.to_uint !i &&
+               0 <= k < 8 * length addr &&
+                   nth8_stream addr k
+                 = BV64.nth value (BV32.to_uint start + BV32.to_uint len - k - 1)};
+
+      i := BV32.add_check !i (BV32.int_check 1);
+    done;
+
+    0
+
+  let peekthenpoke (start len : BV32.t) (addr : array BV8.t)
+    requires {8 * length addr < BV32.two_power_size}
+    requires {0 <= BV32.to_uint len < 64}
+    requires {BV32.to_uint start + BV32.to_uint len <= 8 * length addr}
+    ensures {result = 0}
+    ensures {forall i. 0 <= i < 8 * length addr ->
+               nth8_stream addr i = nth8_stream (old addr) i}
+  =
+    'Init:
+    let value = peek start len addr in
+    let res = poke start len addr value in
+
+    assert {res = 0};
+
+    assert {forall i. BV32.to_uint start <= i < BV32.to_uint start + BV32.to_uint len ->
+         nth8_stream addr i
+       = nth8_stream (at addr 'Init) i};
+
+    res
+
+  let pokethenpeek (start len : BV32.t) (addr : array BV8.t) (value : BV64.t)
+    writes   {addr}
+    requires {8 * length addr < BV32.two_power_size}
+    requires {0 <= BV32.to_uint len < 64}
+    requires {BV32.to_uint start + BV32.to_uint len <= 8 * length addr}
+    requires {BV64.to_uint value < BV64.to_uint (maxvalue len)}
+    ensures  {result = value}
+  =
+    assert { forall i:int. BV32.to_uint len <= i < 64 -> BV64.nth value i = False };
+    let poke_result = poke start len addr value in
+    assert {poke_result = 0};
+    let peek_result = peek start len addr in
+
+    assert {BV64.eq peek_result value};
+
+    peek_result
+
+end

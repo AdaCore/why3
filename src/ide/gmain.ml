@@ -33,26 +33,27 @@ let () = reset_gc ()
 
 let debug = Debug.lookup_flag "ide_info"
 
+let debug_show_text_cntexmp = Debug.register_info_flag "show_text_cntexmp"
+  ~desc:"Print@ textual@ counterexample@ before@ printing@ counterexample@ interleaved@ with@ cource@ code."
+
 (************************)
 (* parsing command line *)
 (************************)
 
 let files = Queue.create ()
 let opt_parser = ref None
-let opt_cntexmp = ref false
 
 let spec = Arg.align [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "--get-ce", Arg.Set opt_cntexmp,
-      " gets the counter-example model";
 (*
   "-f",
    Arg.String (fun s -> input_files := s :: !input_files),
    "<file> add file to the project (ignored if it is already there)";
 *)
+  Termcode.arg_extra_expl_prefix
 ]
 
 let usage_str = sprintf
@@ -505,7 +506,7 @@ let set_proof_state a =
           a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
-  (* TODO find a better way to signal arhived row *)
+  (* TODO find a better way to signal archived row *)
   let t = if a.S.proof_archived then t ^ " (archived)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
 
@@ -581,6 +582,11 @@ let goal_task_text g =
   else
     task_text (S.goal_task g)
 
+let file_contents f =
+  try
+    Sysutil.file_contents f
+  with Invalid_argument s -> s
+
 let update_tabs a =
   let task_text =
     match a with
@@ -598,7 +604,7 @@ let update_tabs a =
         let env = env_session () in
         match S.get_edited_as_abs env.S.session a with
         | None -> ""
-        | Some f -> Sysutil.file_contents f
+        | Some f -> file_contents f
       end
     | _ -> ""
   in
@@ -645,13 +651,20 @@ let update_tabs a =
       begin
         match a.S.proof_state with
 	  | S.Done r ->
-	    if r.Call_provers.pr_model <> Model_parser.empty_model then begin
-	      Model_parser.model_to_string r.Call_provers.pr_model ^ "\n" ^
-		Model_parser.model_to_string_json r.Call_provers.pr_model ^ "\n\n" ^
-		(Model_parser.interleave_with_source 
+	    if not (Model_parser.is_model_empty r.Call_provers.pr_model) then begin
+	      let cntexample_text =
+		if Debug.test_flag debug_show_text_cntexmp then
+		  "Counterexample:\n" ^
+		    (Model_parser.model_to_string r.Call_provers.pr_model) ^
+		    "\n\nSource code interleaved with counterexample:"
+		else
+		  "" in
+	      let cntexample_text = cntexample_text ^
+		(Model_parser.interleave_with_source
 		   r.Call_provers.pr_model
-		   !current_file
-		   (Sysutil.file_contents !current_file))
+		   ~filename:!current_file
+		   ~source_code:(file_contents !current_file)) in
+	      cntexample_text
 	    end else
 	      ""
 	  | _ -> ""
@@ -672,6 +685,7 @@ let update_tabs a =
   edited_view#scroll_to_mark `INSERT;
   output_view#source_buffer#set_text output_text;
   counterexample_view#source_buffer#set_text counterexample_text;
+  counterexample_view#scroll_to_mark `INSERT;
 
 
 
@@ -812,7 +826,7 @@ let () = w#show ()
 (** TODO remove that should done only in session *)
 let project_dir =
   let fname = Queue.pop files in
-  (** The remaining files in [files] are going to be open *)
+  (* The remaining files in [files] are going to be open *)
   if Sys.file_exists fname then
     begin
       if Sys.is_directory fname then
@@ -830,11 +844,11 @@ let project_dir =
           in
           Debug.dprintf debug
             "[GUI] using '%s' as directory for the project@." d;
-          Queue.push fname files; (** we need to open [fname] *)
+          Queue.push fname files; (* we need to open [fname] *)
           d
         end
         else begin
-          (** The first argument is not a directory and it's not the
+          (* The first argument is not a directory and it's not the
               only file *)
           Format.eprintf
             "[Error] @[When@ more@ than@ one@ file@ is@ given@ on@ the@ \
@@ -994,6 +1008,7 @@ let () = Queue.iter (open_file ~start:true) files
 let prover_on_selected_goals pr =
   let timelimit = gconfig.session_time_limit in
   let memlimit = gconfig.session_mem_limit in
+  let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
   List.iter
     (fun row ->
       try
@@ -1001,7 +1016,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~cntexample:!opt_cntexmp ~timelimit ~memlimit
+         ~cntexample ~timelimit ~steplimit:(-1) ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1076,13 +1091,14 @@ let bisect_proof_attempt pa =
   let timelimit = ref (-1) in
   let set_timelimit res =
     timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
+  let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
   let rec callback lp pa c = function
     | S.Running | S.Scheduled -> ()
     | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
     | S.Unedited | S.JustEdited -> assert false
     | S.InternalFailure exn ->
-      (** Perhaps the test can be considered false in this case? *)
+      (* Perhaps the test can be considered false in this case? *)
       dprintf debug "Bisecting interrupted by an error %a.@."
         Exn_printer.exn_printer exn
     | S.Done res ->
@@ -1107,28 +1123,28 @@ let bisect_proof_attempt pa =
         let npa = S.copy_external_proof ~notify ~keygen ~obsolete:true
           ~goal ~env_session:eS pa in
         MA.init_any (S.Metas metas);
-        M.run_external_proof eS sched ~cntexample:!opt_cntexmp npa
+        M.run_external_proof eS sched ~cntexample npa
         with e ->
           dprintf debug "Bisecting error:@\n%a@."
             Exn_printer.exn_printer e end
       | Eliminate_definition.BSstep (t,c) ->
         assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
-	  ~cntexample:!opt_cntexmp
+	  ~cntexample
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
 	  ~steplimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
-          (** It is dangerous, isn't it? to be in place for bisecting? *)
+          (* It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
           ~command:(C.get_complete_command lp.S.prover_config (-1))
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
-    (** Run once the complete goal in order to verify its validity and
-        update the proof attempt *)
+    (* Run once the complete goal in order to verify its validity and
+       update the proof attempt *)
   let first_callback pa = function
-    (** this pa can be different than the first pa *)
+    (* this pa can be different than the first pa *)
     | S.Running | S.Scheduled -> ()
     | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
@@ -1153,7 +1169,7 @@ let bisect_proof_attempt pa =
             dprintf debug "Prover can't be loaded.@."
           | Some lp ->
             M.schedule_proof_attempt
-	      ~cntexample:!opt_cntexmp
+	      ~cntexample
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
 	      ~steplimit:(-1)
@@ -1164,7 +1180,7 @@ let bisect_proof_attempt pa =
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
     C.print_prover pa.S.proof_prover;
-  M.run_external_proof eS sched ~cntexample:!opt_cntexmp ~callback:first_callback pa
+  M.run_external_proof eS sched ~cntexample ~callback:first_callback pa
 
 let apply_bisect_on_selection () =
   List.iter
@@ -1514,6 +1530,7 @@ let split_strategy =
 let inline_strategy =
   [| Strategy.Itransform(inline_transformation,1) |]
 
+(*
 let test_strategy () =
   let config = gconfig.Gconfig.config in
   let altergo =
@@ -1531,6 +1548,7 @@ let test_strategy () =
     Strategy.Icall_prover(altergo.Whyconf.prover,10,4000);
     Strategy.Icall_prover(cvc4.Whyconf.prover,10,4000);
   |]
+ *)
 
 (*
 let strategies () :
@@ -1623,7 +1641,11 @@ let string_of_desc desc =
   in Pp.string_of print_trans_desc desc
 
 let () =
-  let add_submenu_transform name get_trans () =
+  let transformations =
+    List.sort (fun (x,_) (y,_) -> String.compare x y)
+      (List.rev_append (Trans.list_transforms_l ()) (Trans.list_transforms ()))
+  in
+  let add_submenu_transform name filter () =
     let submenu = tools_factory#add_submenu name in
     let submenu = new GMenu.factory submenu ~accel_group in
     let iter ((name,_) as desc) =
@@ -1632,31 +1654,21 @@ let () =
         ~label:(sanitize_markup name) ~callback () in
       ii#misc#set_tooltip_text (string_of_desc desc)
     in
-    let trans = get_trans () in
-    let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
+    let trans = List.filter filter transformations in
     List.iter iter trans
   in
-  let add_splitting =
-    add_submenu_transform
-      "splitting transformations" Trans.list_transforms_l
-  in
-  let add_non_splitting text filt =
-    add_submenu_transform text
-      (fun () -> let l = Trans.list_transforms () in List.filter filt l)
-  in
   add_gui_item
-    (add_non_splitting "non-splitting transformations (a-e)"
+    (add_submenu_transform "transformations (a-e)"
        (fun (x,_) -> x < "eliminate"));
   add_gui_item
-    (add_non_splitting "eliminate"
+    (add_submenu_transform "transformations (eliminate)"
        (fun (x,_) -> x >= "eliminate" && x < "eliminatf"));
   add_gui_item
-    (add_non_splitting "non-splitting transformations (e-i)"
-       (fun (x,_) -> x >= "eliminatf" && x < "j"));
+    (add_submenu_transform "transformations (e-r)"
+       (fun (x,_) -> x >= "eliminatf" && x < "s"));
   add_gui_item
-    (add_non_splitting "non-splitting transformations (j-z)"
-       (fun (x,_) -> x >= "j"));
-  add_gui_item add_splitting;
+    (add_submenu_transform "transformations (s-z)"
+       (fun (x,_) -> x >= "s"));
   add_tool_separator ();
   add_tool_item "Bisect in selection" apply_bisect_on_selection
 
@@ -1967,7 +1979,7 @@ let scroll_to_file f =
         then why_lang else any_lang f
       in
       source_view#source_buffer#set_language lang;
-      source_view#source_buffer#set_text (Sysutil.file_contents f);
+      source_view#source_buffer#set_text (file_contents f);
       set_current_file f;
     end
 
@@ -2042,10 +2054,10 @@ let reload () =
   try
     erase_color_loc source_view;
     current_file := "";
-    (** create a new environnement
-        (in order to reload the files which are "use") *)
+    (* create a new environnement
+       (in order to reload the files which are "use") *)
     gconfig.env <- Env.create_env (Env.get_loadpath gconfig.env);
-    (** reload the session *)
+    (* reload the session *)
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =
       (* use_shapes is true since session is in memory *)
@@ -2056,12 +2068,13 @@ let reload () =
     display_warnings ()
   with
     | e ->
-        let e = match e with
-          | Loc.Located(loc,e) ->
+        begin
+          match e with
+          | Loc.Located(loc,_) ->
             scroll_to_loc ~color:error_tag ~yalign:0.5 loc;
-            e
-          | e -> e
-        in
+            notebook#goto_page source_page (* go to "source" tab *)
+          | _ -> ()
+        end;
         fprintf str_formatter
           "@[Error:@ %a@]" Exn_printer.exn_printer e;
         let msg = flush_str_formatter () in
@@ -2131,6 +2144,7 @@ let edit_selected_row r =
         ()
     | S.Proof_attempt a ->
         let e = env_session () in
+	let cntexample = Whyconf.cntexample (Whyconf.get_main gconfig.config) in
 (*
         let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
                     prover_altern = "" } in
@@ -2141,7 +2155,7 @@ let edit_selected_row r =
           "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
           0 time p.editor;
 *)
-        M.edit_proof ~cntexample:!opt_cntexmp e sched ~default_editor:gconfig.default_editor a
+        M.edit_proof ~cntexample e sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
     | S.Metas _ -> ()
 

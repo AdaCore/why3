@@ -937,7 +937,7 @@ let check_user_effect ?ps e spec args dsp =
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect" in
   if dsp.ds_checkrw then begin
-    let reads = Spv.remove Mlw_wp.pv_old e.e_syms.syms_pv in
+    let reads = Spv.remove Mlw_decl.pv_old e.e_syms.syms_pv in
     let reads = Spv.diff reads (spec_pvset Spv.empty spec) in
     Spv.iter check_read (Spv.diff reads args);
     Sreg.iter check_write eeff.eff_writes;
@@ -1095,6 +1095,7 @@ let spec_invariant env pvs vty spec =
 (** Abstract values *)
 
 let warn_unused s loc =
+  if not (Debug.test_flag Dterm.debug_ignore_unused_var) then
   if s = "" || s.[0] <> '_' then
   Warning.emit ?loc "unused variable %s" s
 
@@ -1336,7 +1337,17 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       check_user_effect e spec [] dsp;
       let speci = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
       (* we do not require invariants on free variables *)
-      e_abstract e { speci with c_pre = spec.c_pre }
+      let spec = { speci with c_pre = spec.c_pre } in
+      (* no user post => we try to purify *)
+      let spec = if dsp.ds_post <> [] then spec else match e_purify e with
+        | Some t ->
+          let vs, f = Mlw_ty.open_post spec.c_post in
+          let f = t_and_simp (t_equ_simp (t_var vs) t) f in
+          let f = t_label_add Split_goal.stop_split f in
+          let post = Mlw_ty.create_post vs f in
+          { spec with c_post = post }
+        | None -> spec in
+      e_abstract e spec
   | DEmark (id,de) ->
       let ld = create_let_defn id Mlw_wp.e_now in
       let env = add_let_sym env ld.let_sym in

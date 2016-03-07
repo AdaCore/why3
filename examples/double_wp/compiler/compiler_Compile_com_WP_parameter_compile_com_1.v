@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
@@ -14,10 +15,6 @@ Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 Axiom map : forall (a:Type) (b:Type), Type.
 Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
@@ -37,12 +34,6 @@ Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
 Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
   {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
   forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1: (map a b)) a1) = b1).
 
 (* Why3 assumption *)
 Inductive id :=
@@ -318,17 +309,6 @@ Definition vm_terminates (c:(list instr)) (mi:(map id Z)) (mf:(map id
   (Init.Datatypes.cons Ihalt Init.Datatypes.nil)) /\ (transition_star c
   (VMS 0%Z Init.Datatypes.nil mi) (VMS p Init.Datatypes.nil mf)).
 
-Axiom func : forall (a:Type) (b:Type), Type.
-Parameter func_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (func a b).
-Existing Instance func_WhyType.
-
-(* Why3 assumption *)
-Definition pred (a:Type) := (a -> bool).
-
-Parameter infix_at: forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, (a -> b) -> a -> b.
-
 (* Why3 assumption *)
 Definition fst {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} (p:(a*
   b)%type): a := match p with
@@ -342,7 +322,7 @@ Definition snd {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} (p:(a*
   end.
 
 (* Why3 assumption *)
-Definition pred1 := (machine_state -> bool).
+Definition pred := (machine_state -> bool).
 
 (* Why3 assumption *)
 Definition rel := (machine_state -> (machine_state -> bool)).
@@ -806,8 +786,8 @@ Axiom loop_variant_def : forall {a:Type} {a_WT:WhyType a}, forall (c:com)
   end.
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.2,".
-Ltac cvc := why3 "CVC4,1.4,".
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
+Ltac cvc := why3 "CVC4,1.4," timelimit 5; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_compile_com : forall {a:Type} {a_WT:WhyType a},
@@ -929,5 +909,5 @@ assert (m0 = mj).
 eapply ceval_deterministic.
 2: exact T1.
 ae. ae.
-Qed.
+Admitted.
 

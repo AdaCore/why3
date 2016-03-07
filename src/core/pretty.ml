@@ -198,8 +198,8 @@ let print_binop ~asym fmt = function
   | Tiff -> fprintf fmt "<->"
 
 let prio_binop = function
-  | Tand -> 3
-  | Tor -> 2
+  | Tand -> 4
+  | Tor -> 3
   | Timplies -> 1
   | Tiff -> 1
 
@@ -223,32 +223,32 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
   | _, [] ->
       print_ls fmt ls
   | Some s, [t1] when tight_op s ->
-      fprintf fmt (protect_on (pri > 7) "%s%a")
-        s (print_lterm 7) t1
+      fprintf fmt (protect_on (pri > 8) "%s%a")
+        s (print_lterm 8) t1
   | Some s, [t1] ->
-      fprintf fmt (protect_on (pri > 4) "%s %a")
-        s (print_lterm 5) t1
+      fprintf fmt (protect_on (pri > 5) "%s %a")
+        s (print_lterm 6) t1
   | Some s, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
-        (print_lterm 5) t1 s (print_lterm 5) t2
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a %s@ %a@]")
+        (print_lterm 6) t1 s (print_lterm 6) t2
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a]")
-        (print_lterm 6) t1 print_term t2
+      fprintf fmt (protect_on (pri > 7) "%a[%a]")
+        (print_lterm 7) t1 print_term t2
   | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
-        (print_lterm 6) t1 (print_lterm 5) t2 (print_lterm 5) t3
+      fprintf fmt (protect_on (pri > 7) "%a[%a <- %a]")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix [_..]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..]")
-        (print_lterm 6) t1 print_term t2
+      fprintf fmt (protect_on (pri > 7) "%a[%a..]")
+        (print_lterm 7) t1 print_term t2
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix [.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[..%a]")
-        (print_lterm 6) t1 print_term t2
+      fprintf fmt (protect_on (pri > 7) "%a[..%a]")
+        (print_lterm 7) t1 print_term t2
   | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [_.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
-        (print_lterm 6) t1 (print_lterm 5) t2 (print_lterm 5) t3
+      fprintf fmt (protect_on (pri > 7) "%a[%a..%a]")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
   | _, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print_ls ls (print_list space (print_lterm 6)) tl
+      fprintf fmt (protect_on (pri > 6) "@[<hov 1>%a@ %a@]")
+        print_ls ls (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
@@ -268,7 +268,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0) "let %a%a = @[%a@] in@ %a")
-        print_vs v print_id_labels v.vs_name (print_lterm 4) t1 print_term t2;
+        print_vs v print_id_labels v.vs_name (print_lterm 5) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
@@ -294,13 +294,21 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt "true"
   | Tfalse ->
       fprintf fmt "false"
+  | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
+    when Slab.mem Term.asym_split f2.t_label ->
+      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a so@ %a@]")
+        (print_lterm 3) f1 (print_lterm 2) f2
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
+    when Slab.mem Term.asym_split f2.t_label ->
+      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a by@ %a@]")
+        (print_lterm 3) f1 (print_lterm 2) f2
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_split f1.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
-      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
+      fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
@@ -619,4 +627,3 @@ let () = Exn_printer.register
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
   | _ -> raise exn
   end
-

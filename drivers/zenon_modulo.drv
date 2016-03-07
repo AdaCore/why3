@@ -1,0 +1,292 @@
+(* Why driver for first-order tptp provers *)
+
+printer "tptp-tff1"
+filename "%f-%t-%g.p"
+
+valid   "PROOF-FOUND"
+timeout "Zenon error: could not find a proof within the time limit"
+outofmemory "Zenon error: could not find a proof within the memory size limit"
+unknown "NO-PROOF" "no proof found"
+time "why3cpulimit time : %s s"
+
+(* to be improved *)
+
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_epsilon"
+transformation "eliminate_if"
+transformation "eliminate_let"
+
+theory BuiltIn
+  syntax predicate (=)  "(%1 = %2)"
+  syntax type int  "$int"
+  syntax type real "$real"
+  meta "eliminate_algebraic" "no_index"
+end
+
+
+theory int.Int
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "$sum(%1,%2)"
+  syntax function (-)  "$difference(%1,%2)"
+  syntax function (*)  "$product(%1,%2)"
+  syntax function (-_) "$uminus(%1)"
+
+  syntax predicate (<=) "$lesseq(%1,%2)"
+  syntax predicate (<)  "$less(%1,%2)"
+  syntax predicate (>=) "$greatereq(%1,%2)"
+  syntax predicate (>)  "$greater(%1,%2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+end
+
+theory real.Real
+  syntax function zero "0.0"
+  syntax function one  "1.0"
+
+  syntax function (+)  "$sum(%1,%2)"
+  syntax function (-)  "$difference(%1,%2)"
+  syntax function (*)  "$product(%1,%2)"
+  syntax function (-_) "$uminus(%1)"
+
+  syntax function (/)  "$quotient(%1,%2)"
+  syntax function inv  "$quotient(1.0,%1)"
+
+  syntax predicate (<=) "$lesseq(%1,%2)"
+  syntax predicate (<)  "$less(%1,%2)"
+  syntax predicate (>=) "$greatereq(%1,%2)"
+  syntax predicate (>)  "$greater(%1,%2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+end
+
+theory int.EuclideanDivision
+  syntax function div "$quotient_e(%1,%2)"
+  syntax function mod "$remainder_e(%1,%2)"
+
+  remove prop Div_mod
+  remove prop Div_bound
+  remove prop Mod_bound
+  remove prop Mod_1
+  remove prop Div_1
+  remove prop Div_inf
+  remove prop Div_inf_neg
+  remove prop Mod_0
+  remove prop Div_1_left
+  remove prop Div_minus1_left
+  remove prop Mod_1_left
+  remove prop Mod_minus1_left
+end
+
+theory tptp.Univ
+  syntax type iType "$i"
+end
+
+theory tptp.IntTrunc
+  syntax function floor    "$floor(%1)"
+  syntax function ceiling  "$ceiling(%1)"
+  syntax function truncate "$truncate(%1)"
+  syntax function round    "$round(%1)"
+
+  syntax function to_int   "$to_int(%1)"
+
+  syntax predicate is_int  "$is_int(%1)"
+  syntax predicate is_rat  "$is_rat(%1)"
+end
+
+theory tptp.IntDivT
+  syntax function div_t "$quotient_t(%1,%2)"
+  syntax function mod_t "$remainder_t(%1,%2)"
+end
+
+theory tptp.IntDivF
+  syntax function div_f "$quotient_f(%1,%2)"
+  syntax function mod_f "$remainder_f(%1,%2)"
+end
+
+theory tptp.Rat
+  syntax type rat "$rat"
+
+  syntax function zero "0/1"
+  syntax function one  "1/1"
+
+  syntax function (+)  "$sum(%1,%2)"
+  syntax function (-)  "$difference(%1,%2)"
+  syntax function (*)  "$product(%1,%2)"
+  syntax function (-_) "$uminus(%1)"
+
+  syntax function (/)  "$quotient(%1,%2)"
+  syntax function inv  "$quotient(1/1,%1)"
+
+  syntax predicate (<=) "$lesseq(%1,%2)"
+  syntax predicate (<)  "$less(%1,%2)"
+  syntax predicate (>=) "$greatereq(%1,%2)"
+  syntax predicate (>)  "$greater(%1,%2)"
+
+  syntax function to_rat   "$to_rat(%1)"
+
+  syntax predicate is_int  "$is_int(%1)"
+  syntax predicate is_rat  "$is_rat(%1)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+end
+
+theory tptp.RatTrunc
+  syntax function floor    "$floor(%1)"
+  syntax function ceiling  "$ceiling(%1)"
+  syntax function truncate "$truncate(%1)"
+  syntax function round    "$round(%1)"
+
+  syntax function to_int   "$to_int(%1)"
+end
+
+theory tptp.RatDivE
+  syntax function div "$quotient_e(%1,%2)"
+  syntax function mod "$remainder_e(%1,%2)"
+end
+
+theory tptp.RatDivT
+  syntax function div_t "$quotient_t(%1,%2)"
+  syntax function mod_t "$remainder_t(%1,%2)"
+end
+
+theory tptp.RatDivF
+  syntax function div_f "$quotient_f(%1,%2)"
+  syntax function mod_f "$remainder_f(%1,%2)"
+end
+
+theory tptp.Real
+  syntax function to_real "$to_real(%1)"
+end
+
+theory real.FromInt
+  syntax function from_int "$to_real(%1)"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+end
+
+theory real.Truncate
+  syntax function floor    "$to_int(%1)"
+  syntax function ceil     "$to_int($ceiling(%1))"
+  syntax function truncate "$to_int($truncate(%1))"
+
+  remove prop Truncate_int
+  remove prop Truncate_down_pos
+  remove prop Truncate_up_neg
+  remove prop Real_of_truncate
+  remove prop Truncate_monotonic
+  remove prop Truncate_monotonic_int1
+  remove prop Truncate_monotonic_int2
+  remove prop Floor_int
+  remove prop Ceil_int
+  remove prop Floor_down
+  remove prop Ceil_up
+  remove prop Floor_monotonic
+  remove prop Ceil_monotonic
+end
+
+theory tptp.RealTrunc
+  syntax function floor    "$floor(%1)"
+  syntax function ceiling  "$ceiling(%1)"
+  syntax function truncate "$truncate(%1)"
+  syntax function round    "$round(%1)"
+
+  syntax function to_int   "$to_int(%1)"
+
+  syntax predicate is_int  "$is_int(%1)"
+  syntax predicate is_rat  "$is_rat(%1)"
+end
+
+theory tptp.RealDivE
+  syntax function div "$quotient_e(%1,%2)"
+  syntax function mod "$remainder_e(%1,%2)"
+end
+
+theory tptp.RealDivT
+  syntax function div_t "$quotient_t(%1,%2)"
+  syntax function mod_t "$remainder_t(%1,%2)"
+end
+
+theory tptp.RealDivF
+  syntax function div_f "$quotient_f(%1,%2)"
+  syntax function mod_f "$remainder_f(%1,%2)"
+end
+
+theory tptp.IntToRat
+  syntax function to_rat   "$to_rat(%1)"
+end
+
+theory tptp.IntToReal
+  syntax function to_real "$to_real(%1)"
+end
+
+theory tptp.RealToRat
+  syntax function to_rat   "$to_rat(%1)"
+end
+
+theory tptp.RatToReal
+  syntax function to_real "$to_real(%1)"
+end

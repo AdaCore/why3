@@ -35,18 +35,19 @@ let meta_begin_compute_context =
            transformation@ 'compute_in_context'."
 *)
 
+let rule_label = Ident.create_label "rewrite"
+
 let collect_rule_decl prs e d =
   match d.Decl.d_node with
-    | Decl.Dtype _ | Decl.Ddata _ | Decl.Dparam _ | Decl.Dind  _
-    | Decl.Dlogic _ -> e
-    | Decl.Dprop(_, pr, t) ->
-      if Decl.Spr.mem pr prs then
+    | Decl.Dprop((Plemma|Paxiom), pr, t) ->
+      if Decl.Spr.mem pr prs || Ident.Slab.mem rule_label t.t_label then
         try add_rule t e
         with NotARewriteRule msg ->
           Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"
             Pretty.print_pr pr msg;
           e
       else e
+    | _ -> e
 
 let collect_rules p env km prs t =
   Task.task_fold

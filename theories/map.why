@@ -36,9 +36,13 @@ theory Map
     forall b : 'b [m[a1 <- b][a2]].
     a1 <> a2 -> m[a1 <- b][a2] = m[a2]
 
-  function const (v: 'b) : map 'a 'b = fun _ -> v
+end
 
-  lemma Const : forall v: 'b, a: 'a. (const v)[a] = v
+theory Const
+
+  use import Map
+
+  function const (v: 'b) : map 'a 'b = fun _ -> v
 
 end
 
@@ -258,4 +262,3 @@ theory MapParam
 
 end
 *)
-

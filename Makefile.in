@@ -170,6 +170,7 @@ LIB_PARSER = ptree glob typing parser lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		detect_polymorphism \
+		reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
@@ -178,9 +179,9 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		encoding_sort simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
 		eliminate_epsilon intro_projections_counterexmp \
-		prepare_for_counterexmp \
+		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		instantiate_predicate smoke_detector \
-		reduction_engine compute induction_pr prop_curry
+		induction_pr prop_curry
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
@@ -288,8 +289,6 @@ endif
 	mkdir -p $(TOOLDIR)
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
-	mkdir -p $(DATADIR)/why3/images/boomy
-	mkdir -p $(DATADIR)/why3/images/fatcow
 	mkdir -p $(DATADIR)/why3/vim
 	mkdir -p $(DATADIR)/why3/lang
 	mkdir -p $(DATADIR)/why3/theories
@@ -302,10 +301,13 @@ endif
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	cp -f LICENSE $(DATADIR)/why3/
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
-	cp -f share/images/icons.rc $(DATADIR)/why3/images
+	for i in share/images/*.rc; do \
+	     d=`basename $$i .rc`; \
+	     cp -f $$i $(DATADIR)/why3/images; \
+	     mkdir $(DATADIR)/why3/images/$$d; \
+	     cp -f share/images/$$d/* $(DATADIR)/why3/images/$$d; \
+	done
 	cp -f share/images/*.png $(DATADIR)/why3/images
-	cp -f share/images/boomy/* $(DATADIR)/why3/images/boomy
-	cp -f share/images/fatcow/* $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f share/Makefile.config $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
@@ -635,6 +637,7 @@ gallery::
 GALLERYSUBS=avl
 
 gallery-subs::
+	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for d in $(GALLERYSUBS) ; do \
 	  echo "exporting examples/$$d"; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
@@ -651,7 +654,8 @@ gallery-subs::
 	x=$*/why3session.xml; \
 	d=`dirname $$x`; \
 	f=`basename $$d`; \
-	why3 session html $$x; \
+	why3 session html $$d; \
+	rm $$d/*.bak; \
 	echo "exporting $$f"; \
 	mkdir -p $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
@@ -871,6 +875,21 @@ ifeq (@enable_coq_support@,yes)
 
 ifeq (@enable_coq_libs@,yes)
 
+
+COQVERSIONSPECIFIC=bv/BV_Gen.v
+
+COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
+COQVERSIONSPECIFICSOURCES=$(addsuffix .@coq_compat_version@, $(COQVERSIONSPECIFICTARGETS))
+
+$(COQVERSIONSPECIFICTARGETS): $(COQVERSIONSPECIFICSOURCES)
+	for i in $(COQVERSIONSPECIFIC); do \
+		cp lib/coq/$$i.@coq_compat_version@ lib/coq/$$i ; \
+	done
+
+clean::
+	rm -f $(COQVERSIONSPECIFICTARGETS)
+
+
 COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power NumOf
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
@@ -887,7 +906,7 @@ COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 COQLIBS_SET_FILES = Set
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
-COQLIBS_MAP_FILES = Map Occ MapPermut MapInjection
+COQLIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
 COQLIBS_MAP = $(addprefix lib/coq/map/, $(COQLIBS_MAP_FILES))
 
 COQLIBS_LIST_FILES = List Length Mem Nth NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt NthNoOpt RevAppend Combine Distinct NumOcc Permut
@@ -967,7 +986,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1139,7 +1158,7 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
-ISABELLEVERSIONSPECIFIC=why3.ML Tools/why3 Why3_Number.thy
+ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
@@ -1154,13 +1173,13 @@ $(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
 clean::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
 
-ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
+ISABELLELIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
 ISABELLELIBS_BOOL_FILES = Bool
 ISABELLELIBS_BOOL = $(addsuffix .xml, $(addprefix lib/isabelle/bool/, $(ISABELLELIBS_BOOL_FILES)))
 
-ISABELLELIBS_REAL_FILES = # not yet realized : Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
+ISABELLELIBS_REAL_FILES = Real RealInfix Abs MinMax FromInt Truncate Square ExpLog Trigonometry PowerInt # not yet realized : PowerReal Hyperbolic Polar
 ISABELLELIBS_REAL = $(addsuffix .xml, $(addprefix lib/isabelle/real/, $(ISABELLELIBS_REAL_FILES)))
 
 ISABELLELIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
@@ -1169,11 +1188,14 @@ ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix lib/isabelle/number/, $(ISAB
 ISABELLELIBS_SET_FILES = Set Fset
 ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix lib/isabelle/set/, $(ISABELLELIBS_SET_FILES)))
 
-ISABELLELIBS_MAP_FILES = Map Occ MapPermut MapInjection
+ISABELLELIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
 ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/map/, $(ISABELLELIBS_MAP_FILES)))
 
 ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt RevAppend Combine Distinct NumOcc Permut
 ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix lib/isabelle/list/, $(ISABELLELIBS_LIST_FILES)))
+
+ISABELLELIBS_BV_FILES = Pow2int BV8 BV16 BV32 BV64 BVConverter_32_64 BVConverter_16_64 BVConverter_8_64 BVConverter_16_32 BVConverter_8_32 BVConverter_8_16
+ISABELLELIBS_BV = $(addsuffix .xml, $(addprefix lib/isabelle/bv/, $(ISABELLELIBS_BV_FILES)))
 
 drivers/isabelle-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
@@ -1195,6 +1217,8 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_OPTION_FILES); do \
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_BV_FILES); do \
+	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	) > $@
 
 ifeq (@enable_local@,yes)
@@ -1203,7 +1227,7 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS) $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
 ifneq (@enable_local@,yes)
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 endif
@@ -1224,7 +1248,7 @@ install_no_local:: lib/isabelle/last_build
 
 install_local:: lib/isabelle/last_build
 
-update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
 
 $(ISABELLELIBS_INT): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/int.why
@@ -1266,6 +1290,11 @@ $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realization
 	mkdir -p lib/isabelle/option
 	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
+$(ISABELLELIBS_BV): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+  $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/bv.why
+	mkdir -p lib/isabelle/bv
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o lib/isabelle/bv/
+
 # do not update isabelle realizations systematically
 # opt byte: update-isabelle
 
@@ -1291,7 +1320,8 @@ clean::
 # Ocaml realizations
 #######################
 
-OCAMLLIBS_FILES = why3__BigInt_compat why3__BigInt why3__IntAux why3__Array
+OCAMLLIBS_FILES = why3__BigInt_compat why3__BigInt why3__IntAux why3__Array \
+	          why3__Matrix
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1436,6 +1466,80 @@ install_no_local::
 
 # TODO
 #install_local:: bin/why3doc
+
+#########
+# trywhy3
+#########
+
+ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
+
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
+        -syntax camlp4o -I src/trywhy3 \
+	-I $(ALTERGODIR)/src/util \
+	-I $(ALTERGODIR)/src/structures \
+	-I $(ALTERGODIR)/src/parsing \
+	-I $(ALTERGODIR)/src/preprocess \
+	-I $(ALTERGODIR)/src/theories \
+	-I $(ALTERGODIR)/src/instances \
+	-I $(ALTERGODIR)/src/sat \
+	-I $(ALTERGODIR)/src/main
+
+ALTERGOMODS=util/numsNumbers util/numbers \
+	util/version util/myUnix util/config util/options \
+	util/hashcons util/hstring util/lists util/loc \
+	util/profiling_default util/profiling \
+	util/util \
+	structures/parsed structures/symbols \
+	structures/ty structures/errors \
+	structures/term structures/literal structures/formula \
+	structures/explanation structures/exception \
+	parsing/why_parser parsing/why_lexer \
+	preprocess/existantial preprocess/triggers \
+	preprocess/why_typing preprocess/cnf \
+	theories/polynome theories/ac \
+	theories/intervals theories/inequalities \
+	theories/intervalCalculus \
+	theories/arith theories/records theories/bitv \
+	theories/arrays theories/sum theories/uf theories/use \
+	theories/combine theories/ccx theories/theory \
+	instances/matching \
+	sat/sat_solvers \
+	main/frontend
+
+TRYWHY3CMO=lib/why3/why3.cma $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+
+trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
+
+%.fr.html: %.prehtml
+	yamlpp -l fr $< -o $@
+
+%.en.html: %.prehtml
+	yamlpp -l en $< -o $@
+
+src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
+	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
+		--file=try_alt_ergo.drv:/ \
+		--file=drinkers.why:/ \
+		--file=simplearith.why:/ \
+		--file=bin_mult.mlw:/ \
+		--file=fact.mlw:/ \
+		--file=isqrt.mlw:/ \
+		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
+		+weak.js +nat.js $^
+
+src/trywhy3/trywhy3.byte: $(TRYWHY3CMO) src/trywhy3/trywhy3.cmo
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+src/trywhy3/%.cmo: src/trywhy3/%.ml
+	$(JSOCAMLC) $(BFLAGS) -c $<
+
+src/trywhy3/%.cmi: src/trywhy3/%.mli
+	$(JSOCAMLC) $(BFLAGS) -c $<
+
+clean::
+	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte
+
+CLEANDIRS += src/trywhy3
 
 ########
 # bench
@@ -1624,10 +1728,8 @@ MODULESTODOC = \
 	util/weakhtbl util/stdlib util/rc util/debug \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
-	driver/whyconf driver/driver \
-	session/session session/session_tools session/session_scheduler \
-#	transform/introduction \
-#	ide/db
+	driver/whyconf driver/call_provers driver/driver \
+	session/session session/session_tools session/session_scheduler
 
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
@@ -1822,67 +1924,22 @@ wc:
 #########
 
 NAME = why3-@VERSION@
-
 # see .gitattributes for the list of files that are not distributed
-EXTRA_DIST = configure doc/manual.pdf
+MORE_DIST = configure doc/manual.pdf
+EXTRANAME = why3-extra-@VERSION@
+EXTRA_DIST = share/images/boomy.rc share/images/boomy share/javascript
 
-dist: $(EXTRA_DIST)
+dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
+	rm -rf distrib/$(EXTRANAME)/ distrib/$(EXTRANAME).tar.gz
 	mkdir -p distrib/
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
-	for f in $(EXTRA_DIST); do cp $$f distrib/$(NAME)/$$f; done
+	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+	mkdir distrib/$(EXTRANAME)
+	cp -r $(EXTRA_DIST) distrib/$(EXTRANAME)
+	cd distrib; tar cf $(EXTRANAME).tar $(EXTRANAME); gzip -f --best $(EXTRANAME).tar
 
-
-# distrib export: source export-doc export-www export-examples export-examples-c linux
-#
-# export-www:
-# 	echo "<#def version>$(VERSION)</#def>" > /users/demons/filliatr/www/why/version.prehtml
-# 	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
-# 	$(MAKE) -C /users/demons/filliatr/www/why install
-#
-#
-# tarball:
-# 	mkdir -p export
-# 	cd export; rm -rf $(NAME) $(NAME).tar.gz
-# 	$(MAKE) export/$(NAME).tar.gz
-#
-# EXFILES = lib/coq*/*.v examples/*/*.v examples/*/*.mlw
-#
-# export-examples:
-# 	cp --parents $(EXFILES) $(WWW)
-# 	$(MAKE) -C $(WWW)/examples clean depend
-# 	echo "*** faire make all dans $(WWW)/examples ***"
-#
-# export-examples-c:
-# 	mkdir -p $(WWW)/caduceus/examples
-# 	cd examples-c; cp --parents */*.c */*.h $(WWW)/caduceus/examples
-# 	mkdir -p $(WWW)/caduceus/examples/bench
-# 	cp bench/c/good/*.c $(WWW)/caduceus/examples/bench
-# 	rm -f $(WWW)/caduceus/examples/bench/test.c
-#
-# export-doc: $(DOC)
-# 	cp doc/manual.ps doc/manual.html $(WWW)/manual
-# 	cp doc/logic_syntax.bnf $(WWW)/manual
-# 	(cd $(WWW)/manual; hacha manual.html)
-# 	cp doc/caduceus.ps doc/caduceus.html $(WWW)/caduceus/manual
-# 	(cd $(WWW)/caduceus/manual; hacha caduceus.html)
-# 	cp doc/krakatoa.pdf doc/krakatoa.html $(WWWKRAKATOA)/manual
-# 	(cd $(WWWKRAKATOA)/manual; hacha krakatoa.html)
-#
-# OSTYPE  ?= linux
-#
-# BINARYNAME = $(NAME)-$(OSTYPE)
-#
-# linux: binary
-#
-# ALLBINARYFILES = $(FILES) $(BINARYFILES)
-#
-# binary: $(ALLBINARYFILES)
-# 	mkdir -p export/$(BINARYNAME)
-# 	cp --parents $(ALLBINARYFILES) export/$(BINARYNAME)
-# 	(cd export; tar czf $(BINARYNAME).tar.gz $(BINARYNAME))
-# 	cp export/$(BINARYNAME).tar.gz $(FTP)
 
 ###############
 # file headers

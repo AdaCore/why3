@@ -12,7 +12,7 @@ theory Utils
 
   constant one : t = of_int 1
   constant two : t = of_int 2
-  constant lastbit : t = sub size one
+  constant lastbit : t = sub size_bv one
 
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
@@ -51,11 +51,11 @@ module Utils_Spec
   (** {6 count correctness } *)
 
   (** Let's start by checking that there are no 1-bits in the
-      bitvector "zero": *)
+      bitvector "zeros": *)
 
-  lemma countZero: count zero = zero
+  lemma countZero: count zeros = zeros
 
-  lemma numOfZero: NumOf.numof (\i. nth zero i) 0 32 = 0
+  lemma numOfZero: NumOf.numof (\i. nth zeros i) 0 32 = 0
 
   (** Now, for b a bitvector with n 1-bits, we check that if its
       first bit is 0 then shifting b by one on the right doesn't
@@ -63,8 +63,8 @@ module Utils_Spec
       there are n-1 1-bits in the shifting of b by one on the right. *)
 
   lemma countStep: forall b.
-    (not (nth_bv b zero) <-> count (lsr_bv b one) = count b) /\
-    (nth_bv b zero <-> count (lsr_bv b one) = sub (count b) one)
+    (not (nth_bv b zeros) <-> count (lsr_bv b one) = count b) /\
+    (nth_bv b zeros <-> count (lsr_bv b one) = sub (count b) one)
 
   let rec lemma numof_shift (p q : int -> bool) (a b k: int) : unit
     requires {forall i. q i = p (i + k)}
@@ -78,12 +78,12 @@ module Utils_Spec
   variant {bv with ult}
   ensures {to_uint (count bv) = NumOf.numof (nth bv) 0 32}
   =
-    if bv = zero then ()
+    if bv = zeros then ()
     else
     begin
       countSpec_Aux (lsr_bv bv one);
       assert {
-                 let x = (if nth_bv bv zero then 1 else 0) in
+                 let x = (if nth_bv bv zeros then 1 else 0) in
                   let f = nth bv in
                   let g = nth (lsr_bv bv one) in
                   let h = \i. nth bv (i+1) in
@@ -117,7 +117,7 @@ module Utils_Spec
 
   lemma symmetric: forall a b. hammingD a b = hammingD b a
 
-  lemma separation: forall a b. hammingD a b = zero <-> a = b
+  lemma separation: forall a b. hammingD a b = zeros <-> a = b
 
   function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
 
@@ -131,9 +131,9 @@ module Utils_Spec
   let lemma triangleInequalityInt (a b c : t) : unit
     ensures {to_uint (hammingD a b) + to_uint (hammingD b c) >= to_uint (hammingD a c)}
   =
-    assert {numof (nth_diff a b) 0 32 + numof (nth_diff b c) 0 32 >=
-    numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >=
-    numof (nth_diff a c) 0 32}
+    assert {numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >= numof (nth_diff a c) 0 32
+             by
+            forall j:int. 0 <= j < 32 -> nth_diff a c j -> fun_or (nth_diff a b) (nth_diff b c) j}
 
   lemma triangleInequality: forall a b c.
     uge (add (hammingD a b) (hammingD b c)) (hammingD a c)
@@ -160,7 +160,7 @@ module Hackers_delight
   (** A ascii character is valid if its number of bits is even.
       (Remember that a binary number is odd if and only if its first
       bit is 1) *)
-  predicate validAscii (b : t) = (nth_bv (count b) zero) = False
+  predicate validAscii (b : t) = (nth_bv (count b) zeros) = False
 
   (** The ascii checksum aim is to make any character valid in the
       sens that we just defined. One way to implement it is to count
@@ -181,7 +181,7 @@ module Hackers_delight
       will be invalid, hence the validity of the encoding. *)
   lemma asciiProp: forall a b.
       ((validAscii a /\ not validAscii b) \/ (validAscii b /\ not
-      validAscii a)) <-> nth_bv (hammingD a b) zero
+      validAscii a)) <-> nth_bv (hammingD a b) zeros
 
   (** {2 Gray code}
     Gray codes are bit-wise representations of integers with the
@@ -238,15 +238,15 @@ module Hackers_delight
       integer *)
 
   lemma nthBinary: forall b i.
-    ult i size ->
-      nth_bv (fromGray b) i <-> nth_bv (count (lsr_bv b i)) zero
+    ult i size_bv ->
+      nth_bv (fromGray b) i <-> nth_bv (count (lsr_bv b i)) zeros
 
   (** The last property that we check is that if an integer is even
       its encoding has an even number of 1-bits, and if it is odd, its
       encoding has an odd number of 1-bits. *)
 
   lemma evenOdd : forall b.
-    nth_bv b zero <-> nth_bv (count (toGray b)) zero
+    nth_bv b zeros <-> nth_bv (count (toGray b)) zeros
 
   (** {2 Various (in)equalities between bitvectors. } *)
 
@@ -279,7 +279,7 @@ module Hackers_delight
     bw_not( sub x y ) = add (bw_not x) y
 
   lemma DMtest: forall x.
-    zero = bw_not( bw_or x (neg( add x (of_int 1))))
+    zeros = bw_not( bw_or x (neg( add x (of_int 1))))
 
   (** {6 Addition Combined with Logical Operations (p.16)} *)
 
@@ -342,17 +342,17 @@ module Hackers_delight
   (** {6 Shifts and rotates} *)
   (** shift right and arithmetic shift right (p.20)*)
 
-  lemma SR1: forall x n. ult n size ->
+  lemma SR1: forall x n. ult n size_bv ->
     bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
   = asr_bv x n
 
   (** rotate vs shift (p.37)*)
 
   lemma RS_left: forall x.
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left x one
+    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left_bv x one
 
   lemma RS_right: forall x.
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right x one
+    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right_bv x one
 
   (** {6 bound propagation (p.73)} *)
 
@@ -364,8 +364,8 @@ module Hackers_delight
     ( ule a x /\ ule x b /\ ule c y /\ ule y d ) ->                 (*  a <= x <= b   and   c <= y <= d  *)
     addDontOverflow b d ->
       ule (max a c) (bw_or x y) /\ ule (bw_or x y) (add b d) /\     (* max a c  <=   x | y   <=   b + d  *)
-      ule zero (bw_and x y) /\ ule (bw_and x y) (min b d) /\        (*    0     <=   x & y   <=  min b d *)
-      ule zero (bw_xor x y) /\ ule (bw_xor x y) (add b d) /\        (*    0     <=  x xor y  <=   b + d  *)
+      ule zeros (bw_and x y) /\ ule (bw_and x y) (min b d) /\       (*    0     <=   x & y   <=  min b d *)
+      ule zeros (bw_xor x y) /\ ule (bw_xor x y) (add b d) /\       (*    0     <=  x xor y  <=   b + d  *)
       ule (bw_not b) (bw_not x) /\ ule (bw_not x) (bw_not a)        (*  not b   <=   not x   <=   not a  *)
 
 end

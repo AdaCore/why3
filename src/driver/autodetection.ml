@@ -28,7 +28,7 @@ A block with more than one exec fields is now the same thing than if you
 split the block into blocks containing one fields.
 
 New message field that allows to print a message when a prover is
-detected. If a message is not present, we print ", Ok." if the version
+detected. If a message is not present, we print ", OK." if the version
 is good (version_good) and not old, and " (it is an old version)." if
 the version is old (version_old).
 
@@ -88,7 +88,7 @@ let load_prover kind (id,section) =
     prover_id = id;
     prover_name = get_string section "name";
     prover_altern = get_string section ~default:"" "alternative";
-    compile_time_support = 
+    compile_time_support =
       get_bool section ~default:false "compile_time_support";
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
@@ -148,16 +148,16 @@ end)
 
 type env =
   {
-    (** memoization of (exec_name,version_switch)
+    (* memoization of (exec_name,version_switch)
         -> Some output | None doesn't exists *)
     prover_output : string option Hstr2.t;
-    (** existing executable table:
+    (* existing executable table:
         exec_name -> | Some (priority, id, prover_config)
                                   unknown version (neither good or bad)
                      | None               there is a good version *)
     prover_unknown_version :
       (int * string * config_prover) option Hstr.t;
-    (** string -> priority * prover  *)
+    (* string -> priority * prover  *)
     prover_shortcuts : (int * prover) Hstr.t;
     mutable possible_prover_shortcuts : (filter_prover * string) list;
   }
@@ -285,13 +285,13 @@ let find_prover_altern provers prover_id =
       if Mprover.mem prover_id_n provers
       then aux (n+1)
       else prover_id_n in
-    (** start with 2 in order to have toto_alt, toto_alt2,
-        toto_alt3,... and not toto_alt, toto_alt1 which can be
-        confusing *)
+    (* start with 2 in order to have toto_alt, toto_alt2,
+       toto_alt3,... and not toto_alt, toto_alt1 which can be
+       confusing *)
     aux 2
 
 let add_prover_with_uniq_id prover provers =
-  (** find an unique prover triplet *)
+  (* find an unique prover triplet *)
   let prover_id = find_prover_altern provers prover.Wc.prover in
   let prover = {prover with Wc.prover = prover_id} in
   Mprover.add prover_id prover provers
@@ -330,20 +330,20 @@ let detect_exec env main data acc exec_name =
         ""
       end
   in
-  (** bad mean here not good, it's not the same thing than a version
-      of a prover with known problems *)
+  (* bad mean here not good, it's not the same thing than a version
+     of a prover with known problems *)
   let bad = List.exists (check_version ver) data.versions_bad in
   if bad then (known_version env exec_name; acc)
   else
     (* check if this prover needs compile-time support *)
     let missing_compile_time_support =
       if data.compile_time_support then
-        try 
+        try
           let compile_time_ver =
-            List.assoc data.prover_name Config.compile_time_support 
-          in 
+            List.assoc data.prover_name Config.compile_time_support
+          in
           if compile_time_ver <> ver then begin
-            eprintf 
+            eprintf
               "Found prover %s version %s, but Why3 was compiled with support for version %s@."
             data.prover_name ver compile_time_ver;
             true
@@ -351,7 +351,7 @@ let detect_exec env main data acc exec_name =
           else
             false
         with Not_found ->
-          eprintf 
+          eprintf
             "Found prover %s version %s, but Why3 wasn't compiled with support for it@."
             data.prover_name ver;
           true
@@ -364,8 +364,8 @@ let detect_exec env main data acc exec_name =
     let old  = List.exists (check_version ver) data.versions_old in
     match data.prover_command with
     | None ->
-      (** Empty prover *)
-      if good || old then begin (** Known version with error *)
+      (* Empty prover *)
+      if good || old then begin (* Known version with error *)
         known_version env exec_name;
         eprintf "Found prover %s version %s%s@."
           data.prover_name ver
@@ -374,10 +374,10 @@ let detect_exec env main data acc exec_name =
              data.message);
         acc
       end
-      else (** it's not a known bad version *) acc
+      else (* it's not a known bad version *) acc
 
     | Some prover_command ->
-    (** create the prover config *)
+    (* create the prover config *)
     let c = make_command exec_name prover_command in
     let c_steps = (match data.prover_command_steps with
       | None -> None
@@ -401,8 +401,14 @@ let detect_exec env main data acc exec_name =
     if good || old then begin
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
-        (Opt.get_def (if old then
-            " (old version, please consider upgrading)." else ", Ok.")
+        (Opt.get_def
+	   (if old then
+	      " (old version, please consider upgrading)."
+	    else
+	      if data.prover_altern <> "" then
+		" (alternative: " ^ data.prover_altern ^ ")"
+	      else
+		", OK.")
            data.message);
       known_version env exec_name;
       add_prover_shortcuts env prover;
@@ -425,10 +431,10 @@ let detect_unknown env detected =
       Warning.emit "Warning: prover %s version %s is not known to be \
                      supported.@."
         prover.Wc.prover_name prover.prover_version;
-      (** Pb: Even if it match the first prover section (normally
-          highest priority) since it is unknown it has the lower
-          priority for its id as shortcut. Perhaps we don't want
-          that. *)
+      (* Pb: Even if it match the first prover section (normally
+         highest priority) since it is unknown it has the lower
+         priority for its id as shortcut. Perhaps we don't want
+         that. *)
       add_id_prover_shortcut env prover_id prover priority;
       add_prover_with_uniq_id prover_config acc)
     env.prover_unknown_version detected
@@ -500,7 +506,7 @@ let add_prover_binary config id path =
     Loc.errorm "File %s does not correspond to the prover id %s" path id;
   let provers = get_provers config in
   let fold _ p provers =
-    (** find a prover altern not used *)
+    (* find a prover altern not used *)
     (* Is a prover with this name and version already in config? *)
     let prover_id =
       if not (Mprover.mem p.prover provers) then p.prover else

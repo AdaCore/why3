@@ -94,7 +94,7 @@ let rec t_insert hd t = match t.t_node with
       t_case tl (List.map br bl)
   | _ -> TermTF.t_selecti t_equ_simp t_iff_simp hd t
 
-let add_ld which (ls,ld) (abst,defn,axl) =
+let add_ld which meta_rewrite_def (ls,ld) (abst,defn,axl,metas) =
   if which ls then
     let vl,e = open_ls_defn ld in
     let nm = ls.ls_name.id_string ^ "_def" in
@@ -103,24 +103,31 @@ let add_ld which (ls,ld) (abst,defn,axl) =
     let ax = t_forall_close vl [] (t_insert hd e) in
     let ax = create_prop_decl Paxiom pr ax in
     let ld = create_param_decl ls in
-    ld :: abst, defn, ax :: axl
+    let metas =
+      if Sls.mem ls meta_rewrite_def then
+        Theory.create_meta Compute.meta_rewrite [Theory.MApr pr] :: metas
+      else metas
+    in
+    ld :: abst, defn, ax :: axl, metas
   else
-    abst, (ls,ld) :: defn, axl
+    abst, (ls,ld) :: defn, axl, metas
 
-let elim_decl which l =
-  let abst,defn,axl = List.fold_right (add_ld which) l ([],[],[]) in
+let elim_decl which meta_rewrite_def l =
+  let abst,defn,axl,metas =
+    List.fold_right (add_ld which meta_rewrite_def) l ([],[],[],[])
+  in
   let defn = if defn = [] then [] else [create_logic_decl defn] in
-  abst @ defn @ axl
+  List.rev_append (List.rev_map Theory.create_decl (abst @ defn @ axl)) metas
 
-let elim which d = match d.d_node with
-  | Dlogic l -> elim_decl which l
-  | _ -> [d]
+let elim which meta_rewrite_def d = match d.d_node with
+  | Dlogic l -> elim_decl which meta_rewrite_def l
+  | _ -> [Theory.create_decl d]
 
 let elim_recursion d = match d.d_node with
   | Dlogic ([s,_] as l)
-    when Sid.mem s.ls_name d.d_syms -> elim_decl Util.ttrue l
-  | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue l
-  | _ -> [d]
+    when Sid.mem s.ls_name d.d_syms -> elim_decl Util.ttrue Sls.empty l
+  | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue Sls.empty l
+  | _ -> [Theory.create_decl d]
 
 let is_struct dl = (* FIXME? Shouldn't 0 be allowed too? *)
   List.for_all (fun (_,ld) -> List.length (ls_defn_decrease ld) = 1) dl
@@ -129,15 +136,17 @@ let is_struct dl = (* FIXME? Shouldn't 0 be allowed too? *)
 let elim_non_struct_recursion d = match d.d_node with
   | Dlogic ((s,_) :: _ as dl)
     when Sid.mem s.ls_name d.d_syms && not (is_struct dl) ->
-      elim_decl Util.ttrue dl
+      elim_decl Util.ttrue Sls.empty dl
   | _ ->
-      [d]
+      [Theory.create_decl d]
 
 let elim_mutual d = match d.d_node with
-  | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue l
-  | _ -> [d]
+  | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue Sls.empty l
+  | _ -> [Theory.create_decl d]
 
-let eliminate_definition_gen which = Trans.decl (elim which) None
+let eliminate_definition_gen which =
+  Trans.on_tagged_ls Compute.meta_rewrite_def (fun rew ->
+      Trans.tdecl (elim which rew) None)
 
 let eliminate_definition_func  =
   eliminate_definition_gen (fun ls -> ls.ls_value <> None)
@@ -146,9 +155,9 @@ let eliminate_definition_pred  =
 let eliminate_definition       =
   eliminate_definition_gen Util.ttrue
 
-let eliminate_recursion        = Trans.decl elim_recursion None
-let eliminate_non_struct_recursion = Trans.decl elim_non_struct_recursion None
-let eliminate_mutual_recursion = Trans.decl elim_mutual None
+let eliminate_recursion        = Trans.tdecl elim_recursion None
+let eliminate_non_struct_recursion = Trans.tdecl elim_non_struct_recursion None
+let eliminate_mutual_recursion = Trans.tdecl elim_mutual None
 
 let () =
   Trans.register_transform "eliminate_definition_func"

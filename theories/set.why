@@ -99,6 +99,7 @@ end
 theory Set
 
   use import map.Map
+  use import map.Const
 
   type set 'a = map 'a bool
 
@@ -141,24 +142,13 @@ end
 
 (** {2 Set Comprehension} *)
 
-theory SetComprehension
+theory SetMap
 
   use export Set
 
-  (** { x | p x } *)
-  function comprehension (p: 'a -> bool) : set 'a
-
-  axiom comprehension_def:
-    forall p: 'a -> bool.
-    forall x: 'a. mem x (comprehension p) <-> p x
-
-  (** { x | x in U and p(x) } *)
-  function filter (p: 'a -> bool) (u: set 'a) : set 'a =
-    comprehension (fun (x: 'a) -> p x /\ mem x u)
-
   (** { f x | x in U } *)
   function map (f: 'a  -> 'b) (u: set 'a) : set 'b =
-    comprehension (fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x)
+    fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x
 
   lemma map_def:
     forall f: 'a -> 'b, u: set 'a.
@@ -190,6 +180,10 @@ theory Fset
 
   axiom cardinal_subset:
     forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
+
+  lemma subset_eq:
+    forall s1 s2 : set 'a.
+    subset s1 s2 -> cardinal s1 = cardinal s2 -> s1 == s2
 
   lemma cardinal1:
     forall s: set 'a. cardinal s = 1 ->
@@ -324,43 +318,37 @@ theory Min
 end
 
 (** sum on finite set *)
-theory FsetSum "Sum of the elements of a container limited to a finite set of keys"
+theory FsetSum "Sum of a function over a finite set"
 
   use import int.Int
   use import Fset as S
 
-  type key
-  type container
-
-  function f container key : int
-  (** [f c k] is the element associated to k in the container [c] *)
-
-  function sum container (set key) : int
-  (** [sum c s] is the sum Sum_{S.mem k s} f c k *)
+  function sum (set 'a) ('a -> int) : int
+  (** [sum s f] is the sum Sum_{S.mem x s} f x *)
 
   axiom Sum_def_empty :
-    forall c : container. sum c S.empty = 0
+    forall f. sum (S.empty: set 'a) f = 0
 
   axiom Sum_add:
-    forall c : container, s : set key, k: key.
-    not (mem k s) -> sum c (S.add k s) = sum c s + f c k
+    forall s: set 'a. forall f x.
+    not (mem x s) -> sum (S.add x s) f = sum s f + f x
 
   lemma Sum_remove:
-    forall c : container, s : set key, k: key.
-    mem k s -> sum c (S.remove k s) = sum c s - f c k
+    forall s: set 'a. forall f x.
+    mem x s -> sum (S.remove x s) f = sum s f - f x
 
-  lemma Sum_def_choose :
-    forall c: container, s:set key.
+  lemma Sum_def_choose:
+    forall s: set 'a. forall f.
      not (S.is_empty s) ->
-      let k = S.choose s in
-      sum c s = f c k + sum c (S.remove k s)
+     let x = S.choose s in
+     sum s f = f x + sum (S.remove x s) f
 
-  lemma Sum_transitivity :
-    forall c : container, s1 s2 : set key.
-     sum c (S.union s1 s2) = sum c s1 + sum c s2 - sum c (S.inter s1 s2)
+  lemma Sum_transitivity:
+    forall s1 s2: set 'a. forall f.
+     sum (S.union s1 s2) f = sum s1 f + sum s2 f - sum (S.inter s1 s2) f
 
-  lemma Sum_eq :
-    forall c1 c2 : container, s : set key.
-    (forall k : key. S.mem k s -> f c1 k = f c2 k) -> sum c1 s = sum c2 s
+  lemma Sum_eq:
+    forall s: set 'a. forall f g.
+    (forall x. S.mem x s -> f x = g x) -> sum s f = sum s g
 
 end

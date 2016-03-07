@@ -18,6 +18,7 @@ why3.conf
 *.vo
 *.vd
 *.glob
+.*.aux
 *.elc
 *.summary
 \#*\#
@@ -143,6 +144,9 @@ why3.conf
 /src/coq-tactic/why3tac.ml
 /src/coq-tactic/.why3-vo-*
 
+# Coq
+/lib/coq/bv/BV_Gen.v
+
 # PVS
 .pvscontext
 orphaned-proofs.prf
@@ -155,11 +159,12 @@ pvsbin/
 /lib/isabelle/number/
 /lib/isabelle/list/
 /lib/isabelle/map/
+/lib/isabelle/real/
 /lib/isabelle/set/
-/lib/isabelle/Tools/why3
-/lib/isabelle/Why3_Number.thy
+/lib/isabelle/Why3_BV.thy
 /lib/isabelle/why3.ML
 /lib/isabelle/last_build
+/lib/isabelle/bv
 
 # /src/driver/
 /src/driver/driver_lexer.ml
@@ -218,6 +223,10 @@ pvsbin/
 /examples/in_progress/binary_search2/
 /examples/in_progress/binary_search_c/
 /examples/in_progress/vacid_0_red_black_trees_harness/
+/examples/in_progress/prover/bench/*/*.out
+/examples/in_progress/prover/bench/*/*.txt
+/examples/in_progress/prover/bench1
+/examples/in_progress/prover/bench2
 /examples/why3bench.html
 /examples/why3regtests.err
 /examples/why3regtests.out
@@ -256,7 +265,9 @@ pvsbin/
 /examples/in_progress/bigInt/*__*.ml
 /examples/in_progress/mp/jsmain.js
 /examples/in_progress/mp/*__*.ml
-
+/examples/in_progress/prover/build/*__*.ml
+/examples/in_progress/prover/.depend
+/examples/in_progress/prover/build/prover
 
 # modules
 /modules/string/
@@ -266,6 +277,15 @@ pvsbin/
 /modules/mach/array/
 /modules/mach/int/
 
+# Try Why3
+/src/trywhy3/trywhy3.js
+/src/trywhy3/trywhy3.byte
+/src/trywhy3/index.en.html
+/src/trywhy3/index.fr.html
+/src/trywhy3/index.html
+/src/trywhy3/ace-builds
+/src/trywhy3/*.png
+/src/trywhy3/alt-ergo-1.00-private-2015-01-29
 
 # jessie3
 /src/jessie/config.log

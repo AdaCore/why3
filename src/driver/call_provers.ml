@@ -16,6 +16,29 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+type reason_unknown =
+  | Resourceout
+  | Other
+
+type prover_answer =
+  | Valid
+  | Invalid
+  | Timeout
+  | OutOfMemory
+  | StepLimitExceeded
+  | Unknown of (string * reason_unknown option)
+  | Failure of string
+  | HighFailure
+
+type prover_result = {
+  pr_answer : prover_answer;
+  pr_status : Unix.process_status;
+  pr_output : string;
+  pr_time   : float;
+  pr_steps  : int;		(* -1 if unknown *)
+  pr_model  : model;
+}
+
 (** time regexp "%h:%m:%s" *)
 type timeunit =
   | Hour
@@ -83,26 +106,15 @@ let rec grep_steps out = function
       with _ -> grep_steps out l
     end
 
-(** *)
-
-type prover_answer =
-  | Valid
-  | Invalid
-  | Timeout
-  | OutOfMemory
-  | StepLimitExceeded
-  | Unknown of string
-  | Failure of string
-  | HighFailure
-
-type prover_result = {
-  pr_answer : prover_answer;
-  pr_status : Unix.process_status;
-  pr_output : string;
-  pr_time   : float;
-  pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : model;
-}
+let grep_reason_unknown out =
+  try
+    let re = Str.regexp "^(:reason-unknown \\([^)]*\\)" in
+    ignore (Str.search_forward re out 0);
+    match  (Str.matched_group 1 out) with
+    | "resourceout" -> Resourceout
+    | _ -> Other
+  with Not_found ->
+    Other
 
 type prover_result_parser = {
   prp_regexps     : (Str.regexp * prover_answer) list;
@@ -112,15 +124,20 @@ type prover_result_parser = {
   prp_model_parser : Model_parser.model_parser;
 }
 
+let print_unknown_reason fmt r =
+  match r with
+  | Some Resourceout -> fprintf fmt " because of resource limit reached "
+  | _ -> ()
+
 let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown "" -> fprintf fmt "Unknown"
+  | Unknown ("", r) -> fprintf fmt "Unknown%a" print_unknown_reason r
   | Failure "" -> fprintf fmt "Failure"
-  | Unknown s -> fprintf fmt "Unknown (%s)" s
+  | Unknown (s, r) -> fprintf fmt "Unknown %a(%s)" print_unknown_reason r s
   | Failure s -> fprintf fmt "Failure (%s)" s
   | HighFailure -> fprintf fmt "HighFailure"
 
@@ -135,7 +152,7 @@ let print_steps fmt s =
 let print_prover_result fmt
   {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s; pr_model=m} =
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
-  if m <> Model_parser.empty_model then begin
+  if not (Model_parser.is_model_empty m) then begin
     fprintf fmt "\nCounter-example model:";
     Model_parser.print_model fmt m
   end;
@@ -151,7 +168,7 @@ let rec grep out l = match l with
         ignore (Str.search_forward re out 0);
         match pa with
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
-        | Unknown s -> Unknown (Str.replace_matched s out)
+        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false
       with Not_found -> grep out l end
@@ -168,8 +185,9 @@ type pre_prover_call = unit -> prover_call
 let save f = f ^ ".save"
 
 let debug_print_model model =
-  Debug.dprintf debug "Call_provers: %s@." (Model_parser.model_to_string model)
-  
+  let model_str = Model_parser.model_to_string model in
+  Debug.dprintf debug "Call_provers: %s@." model_str
+
 
 let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
   let ans = match ret with
@@ -187,6 +205,10 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
+  let reason_unknown = grep_reason_unknown out in
+  let ans = match ans with
+    | Unknown (s, _) -> Unknown (s, Some reason_unknown)
+    | _ -> ans in
   let ans = match ans with
     | Unknown _ | HighFailure when on_timelimit && timelimit > 0
       && time >= (0.9 *. float timelimit) -> Timeout

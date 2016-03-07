@@ -2,197 +2,194 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="1000"/>
-<prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.4pl6" timelimit="10" steplimit="1" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="7" name="Z3" version="3.2" timelimit="10" steplimit="1" memlimit="1000"/>
 <file name="../insertion_sort.mlw" expanded="true">
-<theory name="InsertionSort" sum="7d35e65724fd176c697c950869e3990e" expanded="true">
+<theory name="InsertionSort" sum="b40a544e879367d9464fbd54d244a5d6" expanded="true">
  <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter insertion_sort.1" expl="1. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3" memlimit="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="7" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.2" expl="2. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.3" expl="3. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.4" expl="4. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.6" expl="6. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.7" expl="7. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.8" expl="8. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.9" expl="9. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.10" expl="10. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.11" expl="11. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.12" expl="12. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.13" expl="13. assertion">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.14" expl="14. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.15" expl="15. loop invariant preservation">
-  <proof prover="0" edited="insertion_sort_WP_InsertionSort_WP_parameter_insertion_sort_1.v"><result status="valid" time="1.17"/></proof>
+  <proof prover="2" edited="insertion_sort_WP_InsertionSort_WP_parameter_insertion_sort_1.v"><result status="valid" time="0.91"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.16" expl="16. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.29"/></proof>
+  <proof prover="6"><result status="valid" time="0.07" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.17" expl="17. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.18" expl="18. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.19" expl="19. assertion">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.20" expl="20. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.21" expl="21. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.31"/></proof>
+  <proof prover="6"><result status="valid" time="0.17" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.22" expl="22. assertion">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.23" expl="23. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.24" expl="24. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.25" expl="25. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  <proof prover="6"><result status="valid" time="0.07" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.26" expl="26. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.27" expl="27. postcondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3" memlimit="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="7" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter test1" expl="VC for test1">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
  <goal name="WP_parameter test2" expl="VC for test2">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.02" steps="24"/></proof>
  </goal>
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.02" steps="21"/></proof>
  </goal>
 </theory>
-<theory name="InsertionSortGen" sum="74c5aa8a06e3901f9aeba96b4eeceb9d" expanded="true">
+<theory name="InsertionSortGen" sum="7d5f81b9d899749fdac81efe5b534a37" expanded="true">
  <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter insertion_sort.1" expl="1. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.2" expl="2. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.3" expl="3. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.4" expl="4. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.6" expl="6. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.7" expl="7. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.8" expl="8. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.9" expl="9. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.10" expl="10. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.11" expl="11. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.12" expl="12. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.13" expl="13. assertion">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.14" expl="14. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.15" expl="15. loop invariant preservation">
-  <proof prover="0" edited="insertion_sort_InsertionSortGen_WP_parameter_insertion_sort_1.v"><result status="valid" time="32.32"/></proof>
+  <proof prover="2" edited="insertion_sort_InsertionSortGen_WP_parameter_insertion_sort_1.v"><result status="valid" time="1.39"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.16" expl="16. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3" timelimit="5"><result status="valid" time="0.62"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="0.41"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.17" expl="17. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.18" expl="18. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.19" expl="19. assertion">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.20" expl="20. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.21" expl="21. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.22" expl="22. assertion">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.23" expl="23. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.24" expl="24. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.25" expl="25. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.26" expl="26. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter insertion_sort.27" expl="27. postcondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>

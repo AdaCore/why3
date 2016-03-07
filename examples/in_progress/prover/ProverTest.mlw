@@ -1,0 +1,356 @@
+
+module Types
+
+end
+
+module Impl
+
+  use import ProverMain.Impl
+  use import Firstorder_symbol_impl.Types
+  use import Firstorder_term_impl.Types
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_symbol_impl.Logic
+  use import Firstorder_term_impl.Logic
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_symbol_impl.Impl
+  use import Firstorder_term_impl.Impl
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_impl.Impl
+  use import int.Int
+
+  let imply (a b:nlimpl_fo_formula) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok a }
+    requires { nlimpl_fo_formula_ok b }
+    ensures { nlimpl_fo_formula_ok result }
+  =
+    construct_fo_formula (NLC_Or
+      (construct_fo_formula (NLC_Not a)) b)
+
+  let equiv (a b:nlimpl_fo_formula) : nlimpl_fo_formula
+    requires { nlimpl_fo_formula_ok a }
+    requires { nlimpl_fo_formula_ok b }
+    ensures { nlimpl_fo_formula_ok result }
+  =
+    construct_fo_formula (NLC_And (imply a b) (imply b a))
+
+  let drinker () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let c0 = construct_symbol (NLCVar_symbol 0) in
+    let v0 = construct_fo_term (NLCVar_fo_term 0) in
+    let l0 = construct_fo_term_list (NLC_FOCons v0 fotnil) in
+    let phip = construct_fo_formula (NLC_PApp c0 l0) in (* c0 x *)
+    let phi0 = construct_fo_formula (NLC_Forall 0 phip) in (* forall x,c0 x *)
+    let phi1 = construct_fo_formula (NLC_Not phip) in (* Not (c0 x) *)
+    let phi2 = construct_fo_formula (NLC_Or phi1 phi0) in (* c0 x -> forall x,c0 x *)
+    let phi3 = construct_fo_formula (NLC_Exists 0 phi2) in
+    (* exists x, (c0 x -> forall x,c0 x) *)
+    let phi4 = construct_fo_formula (NLC_Not phi3) in
+    construct_fo_formula_list (NLC_FOFCons phi4 fonil)
+
+  let group () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fonil = construct_fo_formula_list NLC_FOFNil in (* [] *)
+    let fotnil = construct_fo_term_list NLC_FONil in (* [] *)
+    let c0 = construct_symbol (NLCVar_symbol 0) in (* c0 *)
+    let c1 = construct_symbol (NLCVar_symbol 1) in (* e *)
+    let neutral = construct_fo_term (NLC_App c1 fotnil) in
+    let aux (v1 v2 v3:nlimpl_fo_term) : nlimpl_fo_formula
+      requires { nlimpl_fo_term_ok v1 }
+      requires { nlimpl_fo_term_ok v2 }
+      requires { nlimpl_fo_term_ok v3 }
+      ensures { nlimpl_fo_formula_ok result }
+    =
+      let l = construct_fo_term_list (NLC_FOCons v3 fotnil) in
+      let l = construct_fo_term_list (NLC_FOCons v2 l) in
+      let l = construct_fo_term_list (NLC_FOCons v1 l) in
+      construct_fo_formula (NLC_PApp c0 l)
+    in
+    let v0 = construct_fo_term (NLCVar_fo_term 0) in (* x *)
+    let v1 = construct_fo_term (NLCVar_fo_term 1) in (* y *)
+    let v2 = construct_fo_term (NLCVar_fo_term 2) in (* z *)
+    let v3 = construct_fo_term (NLCVar_fo_term 3) in (* t *)
+    let v4 = construct_fo_term (NLCVar_fo_term 4) in (* u *)
+    let v5 = construct_fo_term (NLCVar_fo_term 5) in (* v *)
+
+    (* forall x y, exists z. c0(x,y,z) *)
+    let phimul = aux v0 v1 v2 in (* c0(x,y,z) *)
+    let phimul = construct_fo_formula (NLC_Exists 2 phimul) in (* exists z,c0(x,y,z) *)
+    let phimul = construct_fo_formula (NLC_Forall 1 phimul) in (* forall y,exists z. c0(x,y,z) *)
+    let phimul = construct_fo_formula (NLC_Forall 0 phimul) in (* forall x y,exists z.c0(x,y,z) *)
+
+    (* forall x y z t u v.
+      (* xy = t /\ yz = v -> (tz = u <-> xv = u) *)
+      c0(x,y,t) /\ c0(y,z,v) -> (c0(t,z,u) <-> c0(x,v,u)) *)
+    let phi0ass = aux v0 v1 v3 in (* c0(x,y,t) *)
+    let phi1ass = aux v1 v2 v5 in (* c0(y,z,v) *)
+    let phi0ass = construct_fo_formula (NLC_And phi0ass phi1ass) in (* c0(x,y,t) /\ c0(y,z,v) *)
+    let phi1ass = aux v3 v2 v4 in (* c0(t,z,u) *)
+    let phi2ass = aux v0 v5 v4 in (* c0(x,v,u) *)
+    let phicass = equiv phi1ass phi2ass in
+    (*let phi0ass = construct_fo_formula (NLC_And phi0ass phi1ass) in*)
+    (*let phi1ass = aux v0 v5 v4 in (* c0(x,v,u) *)*)
+    let phiass = imply phi0ass phicass in
+      (* c0(x,y,t) /\ c0(y,z,v) -> (c0(t,z,u) <-> c0(x,v,u)) *)
+      (* Universal quantification... *)
+    let phiass = construct_fo_formula (NLC_Forall 5 phiass) in
+    let phiass = construct_fo_formula (NLC_Forall 4 phiass) in
+    let phiass = construct_fo_formula (NLC_Forall 3 phiass) in
+    let phiass = construct_fo_formula (NLC_Forall 2 phiass) in
+    let phiass = construct_fo_formula (NLC_Forall 1 phiass) in
+    let phiass = construct_fo_formula (NLC_Forall 0 phiass) in
+
+
+    (* forall x. c0(e,x,x) /\ c0(x,e,x) *)
+    let phin0 = aux neutral v0 v0 in
+    let phin1 = aux v0 neutral v0 in
+    let phin = construct_fo_formula (NLC_And phin0 phin1) in
+    let phin = construct_fo_formula (NLC_Forall 0 phin) in
+
+    (* forall x. c0(x,x,e) *)
+    let phi2 = aux v0 v0 neutral in
+    let phi2 = construct_fo_formula (NLC_Forall 0 phi2) in
+
+    (* forall x y z. c0(x,y,z) -> c0(y,x,z) *)
+    let phigh = aux v0 v1 v2 in
+    let phig = aux v1 v0 v2 in
+    let phig = imply phigh phig in
+    let phig = construct_fo_formula (NLC_Forall 2 phig) in
+    let phig = construct_fo_formula (NLC_Forall 1 phig) in
+    let phig = construct_fo_formula (NLC_Forall 0 phig) in
+    let phig = construct_fo_formula (NLC_Not phig) in
+
+    let l = construct_fo_formula_list (NLC_FOFCons phimul fonil) in
+    let l = construct_fo_formula_list (NLC_FOFCons phiass l) in
+    let l = construct_fo_formula_list (NLC_FOFCons phin l) in
+    let l = construct_fo_formula_list (NLC_FOFCons phi2 l) in
+    let l = construct_fo_formula_list (NLC_FOFCons phig l) in
+    l
+
+  let bidon1 () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let a = construct_symbol (NLCVar_symbol 0) in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let a = construct_fo_formula (NLC_PApp a fotnil) in
+    let r = construct_fo_formula (NLC_Not (imply a a)) in
+    construct_fo_formula_list (NLC_FOFCons r fonil)
+
+  let bidon2 () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let a = construct_symbol (NLCVar_symbol 0) in
+    let b = construct_symbol (NLCVar_symbol 1) in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let a = construct_fo_formula (NLC_PApp a fotnil) in
+    let b = construct_fo_formula (NLC_PApp b fotnil) in
+    let o = construct_fo_formula (NLC_Or a b) in
+    let a = construct_fo_formula (NLC_And a b) in
+    let r = construct_fo_formula (NLC_Not (imply a o)) in
+    construct_fo_formula_list (NLC_FOFCons r fonil)
+
+  let bidon3 () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let a = construct_symbol (NLCVar_symbol 0) in
+    let a = construct_fo_formula (NLC_PApp a fotnil) in
+    let b = construct_symbol (NLCVar_symbol 1) in
+    let b = construct_fo_formula (NLC_PApp b fotnil) in
+    let c = construct_symbol (NLCVar_symbol 2) in
+    let c = construct_fo_formula (NLC_PApp c fotnil) in
+    let r = imply (imply a (imply b c)) (imply (imply a b) (imply a c)) in
+    let r = construct_fo_formula (NLC_Not r) in
+    construct_fo_formula_list (NLC_FOFCons r fonil)
+
+  let bidon4 () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let a = construct_symbol (NLCVar_symbol 0) in
+    let a = construct_fo_formula (NLC_PApp a fotnil) in
+    let b = construct_symbol (NLCVar_symbol 1) in
+    let b = construct_fo_formula (NLC_PApp b fotnil) in
+    let c = construct_symbol (NLCVar_symbol 2) in
+    let c = construct_fo_formula (NLC_PApp c fotnil) in
+    let r = imply (imply a (imply b c)) (imply b (imply a c)) in
+    let r = construct_fo_formula (NLC_Not r) in
+    construct_fo_formula_list (NLC_FOFCons r fonil)
+
+  let pierce () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let a = construct_symbol (NLCVar_symbol 0) in
+    let b = construct_symbol (NLCVar_symbol 1) in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let a = construct_fo_formula (NLC_PApp a fotnil) in
+    let b = construct_fo_formula (NLC_PApp b fotnil) in
+    let r = imply (imply (imply a b) a) a in
+    let r = construct_fo_formula (NLC_Not r) in
+    construct_fo_formula_list (NLC_FOFCons r fonil)
+
+  let generate (n:int) : nlimpl_fo_formula_list
+    requires { n >= 0 }
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let rec aux1 (m:int) : nlimpl_fo_formula
+      ensures { nlimpl_fo_formula_ok result }
+      requires { m >= 0 }
+      variant { m + n + 1 }
+    =
+      let symb = construct_symbol (NLCVar_symbol m) in
+      let symb = construct_fo_formula (NLC_PApp symb fotnil) in
+      if m = 0
+      then equiv symb (aux0 n)
+      else equiv symb (aux1 (m-1))
+
+    with aux0 (m:int) : nlimpl_fo_formula
+      ensures { nlimpl_fo_formula_ok result }
+      requires { m >= 0 }
+      variant { m }
+    =
+      let symb = construct_symbol (NLCVar_symbol m) in
+      let symb = construct_fo_formula (NLC_PApp symb fotnil) in
+      if m = 0
+      then symb
+      else equiv symb (aux0 (m-1))
+    in
+    let r = construct_fo_formula (NLC_Not (aux1 n)) in
+    construct_fo_formula_list (NLC_FOFCons r fonil)
+
+  let zenon5 () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let a = construct_symbol (NLCVar_symbol 0) in
+    let b = construct_symbol (NLCVar_symbol 1) in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let a = construct_fo_formula (NLC_PApp a fotnil) in
+    let v = construct_fo_term (NLCVar_fo_term 0) in
+    let v = construct_fo_term_list (NLC_FOCons v fotnil) in
+    let bv = construct_fo_formula (NLC_PApp b v) in
+    let e1 = construct_fo_formula (NLC_Exists 0 (imply a bv)) in
+    let e2 = construct_fo_formula (NLC_Exists 0 (imply bv a)) in
+    let g = construct_fo_formula (NLC_Exists 0 (equiv a bv)) in
+    let ng = construct_fo_formula (NLC_Not g) in
+    let l = construct_fo_formula_list (NLC_FOFCons e1 fonil) in
+    let l = construct_fo_formula_list (NLC_FOFCons e2 l) in
+    let l = construct_fo_formula_list (NLC_FOFCons ng l) in
+    l
+
+  (* Quite good ! *)
+
+  let zenon6 () : nlimpl_fo_formula_list
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let p = construct_symbol (NLCVar_symbol 0) in
+    let q = construct_symbol (NLCVar_symbol 1) in
+    let r = construct_symbol (NLCVar_symbol 2) in
+    let s = construct_symbol (NLCVar_symbol 3) in
+    let x = construct_fo_term (NLCVar_fo_term 0) in
+    let x = construct_fo_term_list (NLC_FOCons x fotnil) in
+    let px = construct_fo_formula (NLC_PApp p x) in
+    let qx = construct_fo_formula (NLC_PApp q x) in
+    let rx = construct_fo_formula (NLC_PApp r x) in
+    let sx = construct_fo_formula (NLC_PApp s x) in
+    let h1 = construct_fo_formula (NLC_And sx qx) in
+    let h1 = construct_fo_formula (NLC_Exists 0 h1) in
+    let h1 = construct_fo_formula (NLC_Not h1) in
+    let h2 = construct_fo_formula (NLC_Exists 0 px) in
+    let h2 = construct_fo_formula (NLC_Not h2) in
+    let h2_ = construct_fo_formula (NLC_Exists 0 qx) in
+    let h2 = imply h2 h2_ in
+    let h3 = construct_fo_formula (NLC_Or qx rx) in
+    let h3 = imply h3 sx in
+    let h3 = construct_fo_formula (NLC_Forall 0 h3) in
+    let h4 = construct_fo_formula (NLC_Or qx rx) in
+    let h4 = imply px h4 in
+    let h4 = construct_fo_formula (NLC_Forall 0 h4) in
+    let g = construct_fo_formula (NLC_And px rx) in
+    let g = construct_fo_formula (NLC_Exists 0 g) in
+    let g = construct_fo_formula (NLC_Not g) in
+    let l = construct_fo_formula_list (NLC_FOFCons h1 fonil) in
+    let l = construct_fo_formula_list (NLC_FOFCons h2 l) in
+    let l = construct_fo_formula_list (NLC_FOFCons h3 l) in
+    let l = construct_fo_formula_list (NLC_FOFCons h4 l) in
+    let l = construct_fo_formula_list (NLC_FOFCons g l) in
+    l
+
+  let zenon10 (n:int) : nlimpl_fo_formula_list
+    requires { n >= 0 }
+    ensures { nlimpl_fo_formula_list_ok result }
+  =
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let fonil = construct_fo_formula_list NLC_FOFNil in
+    let r = construct_symbol (NLCVar_symbol 0) in
+    let f = construct_symbol (NLCVar_symbol 1) in
+    let x = construct_fo_term (NLCVar_fo_term 0) in
+    let x = construct_fo_term_list (NLC_FOCons x fotnil) in
+    let rec aux (n0:int) : nlimpl_fo_term_list
+      ensures { nlimpl_fo_term_list_ok result }
+      requires { n0 >= 0 }
+      variant { n0 }
+    =
+      if n0 = 0
+      then x
+      else let t = aux (n0-1) in
+        let fx = construct_fo_term (NLC_App f t) in
+        construct_fo_term_list (NLC_FOCons fx fotnil) in
+    let rx = construct_fo_formula (NLC_PApp r x) in
+    let rfx = construct_fo_formula (NLC_PApp r (aux 1)) in
+    let rfnx = construct_fo_formula (NLC_PApp r (aux n)) in
+    let h = construct_fo_formula (NLC_Or rx rfx) in
+    let h = construct_fo_formula (NLC_Forall 0 h) in
+    let g = construct_fo_formula (NLC_And rx rfnx) in
+    let g = construct_fo_formula (NLC_Exists 0 g) in
+    let g = construct_fo_formula (NLC_Not g) in
+    let l = construct_fo_formula_list (NLC_FOFCons h fonil) in
+    let l = construct_fo_formula_list (NLC_FOFCons g l) in
+    l
+
+  use import FormulaTransformations.Impl as F
+
+  let test () : unit
+    diverges
+    raises { F.Sat -> true }
+    =
+    (*let fonil = construct_fo_formula_list NLC_FOFNil in
+    let fotnil = construct_fo_term_list NLC_FONil in
+    let false_ = construct_fo_formula NLC_FFalse in
+    let c0 = construct_symbol (NLCVar_symbol 0) in
+    let c1 = construct_symbol (NLCVar_symbol 1) in
+    let c2 = construct_symbol (NLCVar_symbol 2) in
+    let c3 = construct_symbol (NLCVar_symbol 3) in
+    let c4 = construct_symbol (NLCVar_symbol 4) in
+    let v0 = construct_fo_term (NLCVar_fo_term 0) in
+    let v1 = construct_fo_term (NLCVar_fo_term 1) in
+    let v2 = construct_fo_term (NLCVar_fo_term 2) in
+    let v3 = construct_fo_term (NLCVar_fo_term 3) in
+    let v4 = construct_fo_term (NLCVar_fo_term 4) in
+    let tl1 = construct_fo_term_list (NLC_FOCons v0 fotnil) in
+    let tl2 = construct_fo_term_list (NLC_FOCons v1 fotnil) in
+    let phip1 = construct_fo_formula (NLC_PApp c0 tl1) in
+    let phip2 = construct_fo_formula (NLC_PApp c0 tl2) in
+    let phi0 = construct_fo_formula (NLC_Forall 0 phip1) in
+    let phi1 = construct_fo_formula (NLC_Exists 1 phip2) in
+    let nphi1 = construct_fo_formula (NLC_Not phi1) in
+    let fl1 = construct_fo_formula_list (NLC_FOFCons nphi1 fonil) in
+    let fl2 = construct_fo_formula_list (NLC_FOFCons phi0 fl1) in*)
+    let _ = main (zenon10 2) 1 in
+    ()
+
+end

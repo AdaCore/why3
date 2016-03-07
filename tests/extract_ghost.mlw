@@ -1,0 +1,13 @@
+
+
+module M
+
+  use import int.Int
+
+  let f (x:int) (ghost y:int) : int
+    ensures { x = y }
+  = x
+
+  let g (z:int) = f z 0
+
+end

@@ -124,7 +124,8 @@ let pl_clone sm =
 type ppattern = {
   ppat_pattern : pattern;
   ppat_ity     : ity;
-  ppat_ghost   : bool;
+  ppat_ghost   : bool;  (* matches a ghost value *)
+  ppat_fail    : bool;  (* refutable under ghost *)
 }
 
 type pre_ppattern =
@@ -137,7 +138,7 @@ type pre_ppattern =
 
 let make_ppattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
-  let gghost = ref false in
+  let fail = ref false in
   let find id ghost ity =
     try
       let pv = Hstr.find hv id.pre_name in
@@ -155,7 +156,7 @@ let make_ppattern pp ?(ghost=false) ity =
         if pls.pl_hidden then raise (HiddenPLS pls);
         if pls.pl_ls.ls_constr = 0 then
           raise (Term.ConstructorExpected pls.pl_ls);
-        if ghost && pls.pl_ls.ls_constr > 1 then gghost := true;
+        if ghost && pls.pl_ls.ls_constr > 1 then fail := true;
         let ityv = pls.pl_value.fd_ity in
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
@@ -169,7 +170,7 @@ let make_ppattern pp ?(ghost=false) ity =
     | PPlapp (ls,ppl) ->
         if ls.ls_constr = 0 then
           raise (Term.ConstructorExpected ls);
-        if ghost && ls.ls_constr > 1 then gghost := true;
+        if ghost && ls.ls_constr > 1 then fail := true;
         let ityv = ity_of_ty_opt ls.ls_value in
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
@@ -185,9 +186,9 @@ let make_ppattern pp ?(ghost=false) ity =
         pat_as (make ghost ity pp) (find id ghost ity).pv_vs;
   in
   let pat = make ghost ity pp in
-  let gh = ghost || !gghost in
   Hstr.fold Mstr.add hv Mstr.empty,
-  { ppat_pattern = pat; ppat_ity = ity; ppat_ghost = gh }
+  { ppat_pattern = pat; ppat_ity = ity;
+    ppat_ghost = ghost; ppat_fail = !fail }
 
 (** program symbols *)
 
@@ -634,18 +635,16 @@ let e_case e0 bl =
   let bity = match bl with
     | (_,e)::_ -> ity_of_expr e
     | [] -> raise Term.EmptyCase in
-  let multi_br = List.length bl > 1 in
   let rec branch ghost eff syms = function
     | (pp,e)::bl ->
-        if e0.e_ghost && not pp.ppat_ghost then
-          Loc.errorm "Non-ghost pattern in a ghost position";
+        if e0.e_ghost <> pp.ppat_ghost then
+          Loc.errorm "Invalid pattern ghost status";
         ity_equal_check (ity_of_expr e0) pp.ppat_ity;
         ity_equal_check (ity_of_expr e) bity;
         let eff = eff_union eff e.e_effect in
         let del_vs vs _ syms = del_pv_syms (restore_pv vs) syms in
         let bsyms = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_syms in
-        (* one-branch match is not ghost even if its pattern is ghost *)
-        let ghost = ghost || (multi_br && pp.ppat_ghost) || e.e_ghost in
+        let ghost = ghost || pp.ppat_fail || e.e_ghost in
         branch ghost eff (syms_union syms bsyms) bl
     | [] ->
         (* the cumulated effect of all branches, w/out e0 *)
@@ -655,7 +654,8 @@ let e_case e0 bl =
         let syms = add_e_syms e0 syms in
         mk_expr (Ecase (e0,bl)) (VTvalue bity) ghost eff syms
   in
-  branch false eff_empty syms_empty bl
+  (* one-branch match is not ghost even if the matched value is *)
+  branch (e0.e_ghost && List.length bl > 1) eff_empty syms_empty bl
 
 (* ghost *)
 
@@ -952,19 +952,17 @@ and subst_fd psm fdl =
    until the effects are stabilized. TODO: prove correctness *)
 let create_rec_defn = let letrec = ref 1 in fun defl ->
   if defl = [] then invalid_arg "Mlw_expr.create_rec_defn";
-  (* check that the all variants use the same order *)
+  (* Check that all variants use compatible orders for their
+     first component. *)
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
-    let vl, variant1 = match List.rev vl, List.rev variant1 with
-      | (_, None)::vl, (_, None)::variant1 -> vl, variant1
-      | _, _ -> vl, variant1 in
-    let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
-        Opt.equal ty_equal t1.t_ty t2.t_ty &&
-        Opt.equal ls_equal r1 r2) vl variant1
-      with Invalid_argument _ -> false in
-    if not res then Loc.errorm
-      "All functions in a recursive definition \
-        must use the same well-founded order for variant"
+    match variant1, vl with
+    | [], []
+    | (_,None)::_, (_,None)::_ -> ()
+    | (t1, Some r1)::_, (t2, Some r2)::_
+      when oty_equal t1.t_ty t2.t_ty && ls_equal r1 r2 -> ()
+    | _ -> Loc.errorm "All functions in a recursive definition \
+        must use the same well-founded order for the first variant component"
   in
   List.iter check_variant (List.tl defl);
   (* create the first list of fun_defns *)

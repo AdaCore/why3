@@ -7,14 +7,11 @@ Require list.Length.
 Require int.Int.
 Require list.Mem.
 Require map.Map.
+Require map.Const.
 Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
@@ -115,6 +112,10 @@ Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
 
 Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
+
+Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
+  (infix_eqeq s1 s2)).
 
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
@@ -353,8 +354,9 @@ Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac Z3 := why3 "z3".
-Ltac ae := why3 "alt-ergo".
+Ltac Z3 := why3 "Z3,4.4.0,"; admit.
+Ltac ae := why3 "Alt-Ergo,0.99.1,"; admit.
+Ltac cvc3 := why3 "CVC3,2.4.1,"; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
@@ -405,11 +407,15 @@ Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
   ((map.Map.get m1 v) = (Finite x)) -> forall (l:(list vertex)), (path s l
   v) -> (((list.Length.length l) < (i + 1%Z)%Z)%Z -> (x <= (path_weight l
   v))%Z))))).
+(* Why3 intros o h1 m i (h2,h3) h4 es h5 es1 m1 (h6,h7) o1 h8 h9 h10 v h11 x
+        h12 l h13 h14. *)
 intros o h1 m i (h2,h3) h4 es h5 es1 m1 (h6,h7) o1 h8 h9 h10 v h11 x
         h12 l hpath hlength.
 destruct (path_right_inversion s v l hpath) as [(hg1,hg2) | (y, (l', (hg1, (hg2, hg3))))].
 (* Nil *)
-subst. simpl. why3 "cvc3".
+cvc3.
+subst. simpl. cvc3.
+(*
 (* Cons *)
 rewrite hg3; rewrite path_weight_right_extension.
 generalize (h10 v h11); clear h10.
@@ -420,5 +426,6 @@ assert (Length.length l = Length.length l' + 1)%Z.
 subst l. rewrite Append.Append_length.
 auto.
 ae.
-Qed.
+*)
+Admitted.
 

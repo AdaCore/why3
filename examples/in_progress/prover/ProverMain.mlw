@@ -1,0 +1,96 @@
+
+module Types
+
+end
+
+module Impl
+
+  use import Firstorder_semantics.Sem
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_formula_list_impl.Impl
+  use import Firstorder_tableau_spec.Spec
+  use import Firstorder_tableau_impl.Types
+  use import Firstorder_tableau_impl.Logic
+  use import Firstorder_tableau_impl.Impl
+  use import FormulaTransformations.Types
+  use import FormulaTransformations.Logic
+  use import FormulaTransformations.Impl
+  use import Unification.Types
+  use import Unification.Logic
+  use import Functions.Func
+  use import option.Option
+  use import OptionFuncs.Funcs
+  use import bool.Bool
+  use import int.Int
+  use import Prover.Types
+  use import Prover.Logic
+  use import Prover.Impl
+  use import list.List
+  use import set.Set as S
+  use import BacktrackArray.Impl as BA
+
+  val ghost sdata_inv_hack (u:unit) : pred sdata
+    ensures { result = sdata_inv }
+
+  let main (base:nlimpl_fo_formula_list) (gnum:int) : int
+    requires { nlimpl_fo_formula_list_ok base }
+    diverges
+    ensures { forall m:model int 'st,rho:func int 'st.
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rho) }
+    raises { Sat -> forall m:model int 'st,rho:func int 'st.
+      formula_list_conj_semantic base.model_fo_formula_list_field m rho }
+  =
+    let root = construct_tableau NLC_Root in
+    try let phip = preprocessing base gnum in
+      let phip0 = (phip:preprocessing_return 'st).preprocessed in
+      let phip0m = phip0.model_fo_formula_list_field in
+      assert { root.model_tableau_field  = Root } ;
+      let gnum = phip.final_goals_number in
+      let gnum = if gnum <= 0 then (-1) else gnum in
+      let rec aux (n:int) : (int, prover_return)
+        diverges
+        returns { (_,{ contradictory_assignment = s }) ->
+        forall m:model int 'st,rho:func int 'st.
+          let rhos = semantic_subst s m rho in
+          not(formula_list_conj_semantic phip0.model_fo_formula_list_field m rhos) }
+      =
+        (* Do work to define them outside the loop, but harder
+           to prove while not more performant. *)
+        let unifb = BA.create (sdata_inv_hack ()) in
+        let unif = {
+          unifier_base_model = subst_id_fo_term ;
+          unifier = subst_id_fo_term } in
+        assert { extensionalEqual (smodel (BA.current_timestamp unifb))
+          (subst_id_fo_term) &&
+          (smodel (BA.current_timestamp unifb)) = subst_id_fo_term } ;
+        assert { forall x:int. unassigned (BA.current_timestamp unifb) x } ;
+        try (n,extend_branch phip0 root unifb unif 0 n gnum)
+        with Failure -> aux (n+1)
+        end
+      in
+      let n,r = aux 0 in
+      let s = r.contradictory_assignment in
+      let basem = base.model_fo_formula_list_field in
+      let tr = phip.model_transf in
+      assert { forall m:model int 'st,rho:func int 'st.
+        let m' = { interp_fun = (tr m).interp_fun ;
+          interp_pred = (tr m).interp_pred } in
+        let rhos = semantic_subst s m' rho in
+        m' = (tr m) &&
+        not(formula_list_conj_semantic phip0m m' rhos) &&
+        (forall x:int. is_fo_term_free_var_in_fo_formula_list x phip0m ->
+          rho x = rhos x) &&
+        not(formula_list_conj_semantic phip0m m' rho) &&
+        not(formula_list_conj_semantic basem m rho) };
+      n
+    with Unsat -> 0
+    end
+
+end

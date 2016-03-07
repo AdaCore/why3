@@ -159,7 +159,7 @@ and dpattern_node =
   | DPcast of dpattern * ty
 
 type dbinop =
-  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff | DTby | DTso
 
 type dquant =
   | DTforall | DTexists | DTlambda
@@ -427,12 +427,19 @@ let quant_vars ~strict env vl =
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
+
+let debug_ignore_unused_var = Debug.register_info_flag "ignore_unused_vars"
+  ~desc:"Suppress@ warnings@ on@ unused@ variables"
+
 let check_used_var t vs =
+  if not (Debug.test_flag debug_ignore_unused_var) then
   let s = vs.vs_name.id_string in
   if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
 
 let check_exists_implies f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
+    when Slab.mem Term.asym_split f.t_label -> ()
   | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
@@ -538,6 +545,16 @@ and try_term strict keep_loc uloc env prop dty node =
       t_implies (get env true df1) (get env true df2)
   | DTbinop (DTiff,df1,df2) ->
       t_iff (get env true df1) (get env true df2)
+  | DTbinop (DTby,df1,df2) ->
+      let t2 = get env true df2 in
+      let tt = t_label t2.t_loc Slab.empty t_true in
+      let t2 = t_label t2.t_loc Slab.empty (t_or_asym t2 tt) in
+      t_implies t2 (get env true df1)
+  | DTbinop (DTso,df1,df2) ->
+      let t2 = get env true df2 in
+      let tt = t_label t2.t_loc Slab.empty t_true in
+      let t2 = t_label t2.t_loc Slab.empty (t_or_asym t2 tt) in
+      t_and (get env true df1) t2
   | DTnot df ->
       t_not (get env true df)
   | DTtrue ->

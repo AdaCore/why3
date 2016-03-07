@@ -1,0 +1,877 @@
+
+module Vs
+  
+  use import support.HO
+  use import ident.String
+  use import ident.Ident
+  use import ident.Label
+  use import list.List
+  use import option.Option
+  use import ty.Tv
+  use import ty.Ty
+  
+  (* TODO (long-term, see ident): add a table to recover variable types
+     from name (would actually be necessary to define one of the context
+     invariant about program variable). *)
+  
+  (* Toplevel declaration: ident class of term variables. *)
+  constant vs_id_class_name : ident_name
+  axiom vs_id_class_name_distinct :
+    vs_id_class_name <> tv_id_class_name /\
+    vs_id_class_name <> ts_id_class_name
+  val ghost vs_id_class () : id_class
+    ensures { result.id_class_name = vs_id_class_name }
+  
+  (* Type variable symbols. *)
+  type vsymbol
+  function vs_name vsymbol : ident
+  function vs_ty vsymbol : ty
+  function vs_idn (vs:vsymbol) : ident_name = vs.vs_name.id_name
+  axiom vs_inv : forall x. exists y z.
+    x.vs_name.id_class = Cons y z /\ y.id_class_name = vs_id_class_name
+  
+  val vs_name (vs:vsymbol) : ident
+    ensures { result = vs.vs_name }
+  
+  val vs_ty (vs:vsymbol) : ty
+    ensures { result = vs.vs_ty }
+  
+  val vs_equal (vs1 vs2:vsymbol) : bool
+    ensures { vs1.vs_idn = vs2.vs_idn -> result }
+    ensures { result -> vs1 = vs2 }
+  
+  val create_vs_symbol (ghost idc:list id_class) (p:preid) : vsymbol
+    writes { ids }
+    ensures { result.vs_name.id_string = p.pre_name }
+    ensures { result.vs_name.id_label = p.pre_label.Mlab.domain }
+    ensures { result.vs_name.id_loc = p.pre_loc }
+    ensures { exists y. result.vs_name.id_class = Cons y idc /\
+                        y.id_class_name = vs_id_class_name }
+    ensures { not (old ids).ids result.vs_idn }
+    ensures { subset (old ids).ids ids.ids }
+    ensures { ids.ids result.vs_idn }
+  
+  clone extmap.FMap as Mvs with
+    type key = tvsymbol,
+    type key_l = ident_name,
+    function k_m = tv_idn
+  
+end
+
+module Ls
+  
+  use import int.Int
+  use import list.List
+  use import option.Option
+  use import ident.Ident
+  use import logic_syntax.Defs as D
+  use import logic_syntax.FreeVars
+  use logic_typing.Sig as E
+  use import context.Ctx
+  use import support.HO
+  use import support.HOList
+  use import signature.Sig
+  use import ty.Tv
+  use import ty.Ty
+  
+  (* Split the logical view of logic symbols in two parts:
+     constant and non-constant symbols. *)
+  predicate ls_constant D.lsymbol
+  
+  (* Global growing correspondance between logic symbols and
+     their identifiers names. *)
+  type ls_ctx model {
+    mutable ctls : context ident_name D.lsymbol;
+  }
+  type ls_ctx_snapshot model {
+    ctls_s : context ident_name D.lsymbol;
+  }
+  val ghost ls_ctx : ls_ctx
+  val ghost ls_ctx_snapshot () : ls_ctx_snapshot
+    ensures { result.ctls_s = ls_ctx.ctls }
+  val ghost ls_ctx_growth (s:ls_ctx_snapshot) : unit
+    ensures { sub_context s.ctls_s ls_ctx.ctls }
+  
+  type lsymbol
+  function ls_name lsymbol : ident
+  function ls_m lsymbol : D.lsymbol
+  function ls_constr lsymbol : int
+  function ls_ctv lsymbol : context ident_name int
+  function ls_ty_arity lsymbol : int
+  function ls_args lsymbol : list D.ty
+  function ls_ret lsymbol : D.ty
+  axiom ls_inv : forall ls. not ls.ls_m.ls_constant /\
+    ls.ls_ctv.c_ldom = range 0 ls.ls_ty_arity /\
+    (* Additional requirement with respect to general signature:
+       any bound type variable must be relevant to the symbol scheme.
+       This enforces subsitution unicity for application. *)
+    forall n. 0 <= n < ls.ls_ty_arity ->
+      ty_tyv_free_var ls.ls_ret n \/ tyl_tyv_free_var ls.ls_args n
+  
+  function ls_idn (ls:lsymbol) : ident_name = ls.ls_name.id_name
+  
+  (* TODO (long-term): add type arguments/return projections to constants. *)
+  type const
+  function cst_m const : D.lsymbol
+  axiom const_inv : forall c. c.cst_m.ls_constant
+  
+  val ls_name (ls:lsymbol) : ident
+    ensures { result = ls.ls_name }
+  
+  val ghost ls_cty (sym_c:sym_ctx) (ls:lsymbol) : ty_ctx
+    requires { sym_c.d_ls ls.ls_m }
+    ensures { result.cty_sym = sym_c }
+    ensures { result.cty_tv = ls.ls_ctv }
+  
+  val ls_args (ghost cty:ty_ctx) (ls:lsymbol) : list ty
+    requires { cty.cty_sym.d_ls ls.ls_m }
+    requires { cty.cty_tv = ls.ls_ctv }
+    ensures { map (cty.cty_m) result = ls.ls_args }
+  
+  val ls_value (ghost cty:ty_ctx) (ls:lsymbol) : option ty
+    requires { cty.cty_sym.d_ls ls.ls_m }
+    requires { cty.cty_tv = ls.ls_ctv }
+    ensures { match result with
+      | None -> ls.ls_ret = E.ty_prop
+      | Some u -> ls.ls_ret = cty.cty_m u
+      end }
+  
+  val ls_constr (ls:lsymbol) : int
+    ensures { result >= 0 }
+    ensures { result = ls.ls_constr }
+    ensures { result <> 0 -> let sig = global_sig.sig_m in
+      sig.E.ls_constr ls.ls_m /\ match sig.E.ls_ret ls.ls_m with
+        | D.TyVar _ -> false
+        | D.TyApp tys _ -> tys <> E.tys_prop /\
+          result = global_sig.tsc_n tys
+        end }
+  
+  val ghost ls_inv (ls:lsymbol) : unit
+    ensures { not ls_constant ls.ls_m /\ let sig = global_sig.sig_m in
+      sig.E.ls_belong ls.ls_m /\ ls.ls_ty_arity = sig.E.ls_ty_arity ls.ls_m /\
+      ls.ls_ret = sig.E.ls_ret ls.ls_m /\ ls.ls_args = sig.E.ls_args ls.ls_m /\
+      ls.ls_ctv.c_ldom = range 0 ls.ls_ty_arity /\
+      (forall n. 0 <= n < ls.ls_ty_arity ->
+        ty_tyv_free_var ls.ls_ret n \/ tyl_tyv_free_var ls.ls_args n) /\
+      ls.ls_constr >= 0 /\ (ls.ls_constr <> 0 <-> sig.E.ls_constr ls.ls_m) /\
+      ls.ls_constr <> 0 -> match sig.E.ls_ret ls.ls_m with
+      | D.TyVar _ -> false
+      | D.TyApp tys _ -> tys <> E.tys_prop /\
+        ls.ls_constr = global_sig.tsc_n tys
+      end /\
+      let ctls = ls_ctx.ctls in
+      ctls.c_ldom ls.ls_m /\ ctls.c_pdom ls.ls_idn /\
+      ctls.c_ltp ls.ls_m = ls.ls_idn /\ ctls.c_ptl ls.ls_idn = ls.ls_m }
+  
+  val ghost const_inv (cst:const) : unit
+    ensures { ls_constant cst.cst_m /\ let sig = global_sig.sig_m in
+      sig.E.ls_belong cst.cst_m /\ sig.E.ls_ty_arity cst.cst_m = 0 /\
+      sig.E.ls_args cst.cst_m = Nil /\ not sig.E.ls_constr cst.cst_m }
+  
+  val ls_equal (a b:lsymbol) : bool
+    ensures { result -> a = b }
+    ensures { a.ls_m = b.ls_m -> result }
+    ensures { a.ls_idn = b.ls_idn -> result }
+  
+  val create_lsymbol (ghost cty:ty_ctx) (ghost ty_ar:int)
+    (constr:int) (p:preid) (tyl:list ty) (vl:option ty) : lsymbol
+    writes { global_sig , ids , ls_ctx }
+    requires { cty.cty_tv.c_ldom = range 0 ty_ar }
+    requires { for_all cty.cty_d tyl /\ match vl with
+      | None -> true
+      | Some ty -> cty.cty_d ty
+      end }
+    requires { constr = 0 -> forall n. 0 <= n < ty_ar ->
+      tyl_tyv_free_var (map (cty.cty_m) tyl) n \/ match vl with
+      | None -> false
+      | Some u -> ty_tyv_free_var (cty.cty_m u) n
+      end }
+    requires { constr >= 0 }
+    requires { constr <> 0 -> match vl with
+      | None -> false
+      | Some ty -> match cty.cty_m ty with
+        | D.TyVar _ -> false
+        | D.TyApp tys tyl -> E.tys_alg global_sig.sig_m tys ->
+          constr = global_sig.tsc_n tys /\
+          not global_sig.sig_m.E.tys_constr_complete tys /\
+          E.distinct_tyv tyl /\ ty_ar = global_sig.sig_m.E.tys_arity tys
+        end
+      end }
+    ensures { not (old ids).ids result.ls_idn }
+    ensures { not (old global_sig).sig_m.E.ls_belong result.ls_m }
+    ensures { result.ls_ty_arity = ty_ar }
+    ensures { result.ls_constr = constr }
+    ensures { result.ls_args = map (cty.cty_m) tyl }
+    ensures { match vl with
+      | None -> result.ls_ret = E.ty_prop
+      | Some u -> result.ls_ret = cty.cty_m u
+      end }
+    ensures { result.ls_ctv = cty.cty_tv }
+    ensures { constr = 0 ->
+      global_sig.sig_m.E.ls_constr = (old global_sig).sig_m.E.ls_constr }
+    ensures { constr > 0 -> global_sig.sig_m.E.ls_constr =
+      update (old global_sig).sig_m.E.ls_constr result.ls_m true }
+  
+  val ls_ty_freevars (ls:lsymbol) : Mtv.s
+    ensures { result.Mtv.domain = ls.ls_ctv.c_pdom }
+  
+end
+
+module Term
+  
+  use import list.List
+  use import list.Length
+  use import list.Nth
+  use import option.Option
+  use import support.HO
+  use import support.Bind
+  use import support.HOList
+  use import logic_syntax.Defs
+  use import logic_syntax.Maps
+  use import logic_syntax.VarsIn
+  use import logic_syntax.FreeVars
+  use import logic_typing.Pattern
+  use import logic_typing.Term
+  use import logic_semantic.Sem
+  use import ident.Ident
+  use import signature.Sig
+  use import context.Ctx
+  use import ty.Ty
+  use import Vs
+  use import Ls
+  
+  (* Patterns and terms. Interpretation depends on environment. *)
+  type pattern
+  function pat_ty pattern : ty
+  type term
+  function t_ty term : ty
+  (* Terms below one level of binding. *)
+  type term_bound
+  function tb_ty term_bound : ty
+  function tb_bty term_bound : ty
+  type term_quant
+  function tq_qty term_quant : list ty
+  type term_branch
+  function tbr_ty term_branch : ty
+  function tbr_bty term_branch : ty
+  
+  (* Polymorphic environment for terms (the type to which variables are
+     interpreted may change). *)
+  type t_ctx 'vs
+  function ct_vs (t_ctx 'vs) : context ident_name 'vs
+  function ct_ty (t_ctx 'vs) : ty_ctx
+  function ct_vty (t_ctx 'vs) : 'vs -> D.ty
+  function ct_d (t_ctx 'vs) : term -> bool
+  function ct_m (t_ctx 'vs) : term -> D.term 'vs
+  axiom t_ctx_inv : forall c,x:'vs. c.ct_vs.c_ldom x ->
+    ty_vars_in c.ct_ty.cty_tv.c_ldom c.ct_ty.cty_sym.d_tys (c.ct_vty x)  
+  
+  function ct_tv (ct:t_ctx 'vs) : context ident_name int = ct.ct_ty.cty_tv
+  function ct_sym (ct:t_ctx 'vs) : sym_ctx = ct.ct_ty.cty_sym
+  
+  (* Environment for terms are also environments for bounds terms. *)
+  function ctb_d (t_ctx 'vs) : term_bound -> bool
+  function ctb_m (t_ctx 'vs) : term_bound -> D.term (bind 'vs unit)
+  function ctq_d (t_ctx 'vs) : term_quant -> bool
+  function ctq_m (t_ctx 'vs) : term_quant -> D.term (bind 'vs int)
+  function ctbr_d (t_ctx 'vs) : term_branch -> bool
+  function ctbr_m (t_ctx 'vs) : term_branch -> D.branch 'vs
+  
+  (* Environment for patterns: special case of term environment. *)
+  type pat_ctx = t_ctx pat_var
+  function ctp_d pat_ctx : pattern -> bool
+  function ctp_m pat_ctx : pattern -> D.pattern
+  
+  (* Useful alias in practice *)
+  function ct_mty (ct:t_ctx 'vs) : term -> D.ty = \t. ct.ct_ty.cty_m t.t_ty
+  function ctp_mty (ctp:pat_ctx) : pattern -> D.ty =
+    \p. ctp.ct_ty.cty_m p.pat_ty
+  
+  (* Type of variable symbols in contexts. *)
+  val ghost ct_vs_tys (ct:t_ctx 'vs) (vs:vsymbol) : unit
+    requires { ct.ct_vs.c_pdom vs.vs_idn }
+    ensures { ct.ct_ty.cty_d vs.vs_ty }
+    ensures { ct.ct_vty (ct.ct_vs.c_ptl vs.vs_idn) = ct.ct_ty.cty_m vs.vs_ty }
+  (* Contexts bounds. *)
+  val ghost ct_ubounds (ct:t_ctx 'vs) : unit
+    ensures { subset ct.ct_vs.c_pdom ids.ids }
+    ensures { context_inv ct.ct_vs }
+  val ghost ct_lbounds (ct:t_ctx 'vs) : unit
+    ensures { forall t. ct.ct_d t ->
+      t_vars_in ct.ct_vs.c_ldom ct.ct_tv.c_ldom
+                ct.ct_sym.d_tys ct.ct_sym.d_ls (ct.ct_m t) }
+  (* Make context. *)
+  val ghost make_ct (ct:context ident_name 'vs)
+                    (vty:'vs -> D.ty) (cty:ty_ctx) : t_ctx 'vs
+    requires { subset ct.c_pdom ids.ids }
+    requires { forall x:'vs. ct.c_ldom x ->
+      ty_vars_in cty.cty_tv.c_ldom cty.cty_sym.d_tys (vty x) }
+    ensures { result.ct_vs = ct }
+    ensures { result.ct_ty = cty }
+    ensures { result.ct_vty = vty }
+  (* Transfer model function via injection (term and bound term only). *)
+  val ghost map_all_ct (ct1:t_ctx 'vs1) (fvs:'vs1 -> 'vs2)
+                       (ftv:int -> int) (ct2:t_ctx 'vs2) : unit
+    requires { context_inj ct1.ct_vs fvs ct2.ct_vs }
+    requires { context_inj ct1.ct_tv ftv ct2.ct_tv }
+    requires { sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+    requires { forall x. ct1.ct_vs.c_ldom x ->
+      ct2.ct_vty (fvs x) = ty_map ftv id (ct1.ct_vty x) }
+    ensures { forall t. ct1.ct_d t ->
+      ct2.ct_d t /\ ct2.ct_m t = t_map fvs ftv id id (ct1.ct_m t) }
+    ensures { forall tb. ct1.ctb_d tb -> ct2.ctb_d tb /\
+      ct2.ctb_m tb = t_map (bmap fvs) ftv id id (ct1.ctb_m tb) }
+    ensures { forall tq. ct1.ctq_d tq -> ct2.ctq_d tq /\
+      ct2.ctq_m tq = t_map (bmap fvs) ftv id id (ct1.ctq_m tq) }
+    ensures { forall tbr. ct1.ctbr_d tbr -> ct2.ctbr_d tbr /\
+      ct2.ctbr_m tbr = br_map fvs ftv id id (ct1.ctbr_m tbr) }
+  (* Restricted version that does not map on types. *)
+  val ghost map_ct (ct1:t_ctx 'vs1) (f:'vs1 -> 'vs2) (ct2:t_ctx 'vs2) : unit
+    requires { context_inj ct1.ct_vs f ct2.ct_vs }
+    requires { sub_context ct1.ct_tv ct2.ct_tv }
+    requires { sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+    requires { forall x. ct1.ct_vs.c_ldom x -> ct2.ct_vty (f x) = ct1.ct_vty x }
+    ensures { forall t. ct1.ct_d t ->
+      ct2.ct_d t /\ ct2.ct_m t = t_map f id id id (ct1.ct_m t) }
+    ensures { forall tb. ct1.ctb_d tb -> ct2.ctb_d tb /\
+      ct2.ctb_m tb = t_map (bmap f) id id id (ct1.ctb_m tb) }
+    ensures { forall tq. ct1.ctq_d tq -> ct2.ctq_d tq /\
+      ct2.ctq_m tq = t_map (bmap f) id id id (ct1.ctq_m tq) }
+    ensures { forall tbr. ct1.ctbr_d tbr -> ct2.ctbr_d tbr /\
+      ct2.ctbr_m tbr = br_map f id id id (ct1.ctbr_m tbr) }
+  (* Idem via inclusion (hence no mapping). *)
+  val ghost sub_ct (ct1 ct2:t_ctx 'vs) : unit
+    requires { sub_context ct1.ct_vs ct2.ct_vs }
+    requires { sub_context ct1.ct_tv ct2.ct_tv }
+    requires { sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+    ensures { forall t. ct1.ct_d t -> ct2.ct_d t /\ ct2.ct_m t = ct1.ct_m t }
+    ensures { forall tb. ct1.ctb_d tb -> ct2.ctb_d tb /\
+      ct2.ctb_m tb = ct1.ctb_m tb }
+    ensures { forall tq. ct1.ctq_d tq -> ct2.ctq_d tq /\
+      ct2.ctq_m tq = ct1.ctq_m tq }
+    ensures { forall tbr. ct1.ctbr_d tbr -> ct2.ctbr_d tbr /\
+      ct2.ctbr_m tbr = ct1.ctbr_m tbr }
+  (* Variants of above functions for patterns. *)
+  val ghost ctp_lbounds (ctp:pat_ctx) : unit
+    ensures { forall p. ctp.ctp_d p ->
+      pat_vars_in ctp.ct_vs.c_ldom ctp.ct_tv.c_ldom
+                  ctp.ct_sym.d_tys ctp.ct_sym.d_ls (ctp.ctp_m p) }
+  val ghost map_all_ctp (ct1:pat_ctx) (fvs:pat_var -> pat_var)
+                       (ftv:int -> int) (ct2:pat_ctx) : unit
+    requires { context_inj ct1.ct_vs fvs ct2.ct_vs }
+    requires { context_inj ct1.ct_tv ftv ct2.ct_tv }
+    requires { sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+    requires { forall x. ct1.ct_vs.c_ldom x ->
+      ct2.ct_vty (fvs x) = ty_map ftv id (ct1.ct_vty x) }
+    ensures { forall p. ct1.ctp_d p ->
+      ct2.ctp_d p /\ ct2.ctp_m p = pat_map fvs ftv id id (ct1.ctp_m p) }
+  val ghost map_ctp (ct1:pat_ctx) (f:pat_var -> pat_var) (ct2:pat_ctx) : unit
+    requires { context_inj ct1.ct_vs f ct2.ct_vs }
+    requires { sub_context ct1.ct_tv ct2.ct_tv }
+    requires { sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+    requires { forall x. ct1.ct_vs.c_ldom x -> ct2.ct_vty (f x) = ct1.ct_vty x }
+    ensures { forall p. ct1.ctp_d p ->
+      ct2.ctp_d p /\ ct2.ctp_m p = pat_map f id id id (ct1.ctp_m p) }
+  val ghost sub_ctp (ct1 ct2:pat_ctx) : unit
+    requires { sub_context ct1.ct_vs ct2.ct_vs }
+    requires { sub_context ct1.ct_tv ct2.ct_tv }
+    requires { sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+    ensures { forall p. ct1.ctp_d p ->
+      ct2.ctp_d p /\ ct2.ctp_m p = ct1.ctp_m p }
+  (* TODO (see ty.mlw): context shrinking as well... *)
+  
+  (* Binding predicate: notion of fusion between environments. *)
+  predicate fused (ct1:t_ctx 'old) (ct2:t_ctx 'new)
+                  (ct3:t_ctx (bind 'old 'new)) =
+    ct3.ct_ty = ct2.ct_ty = ct1.ct_ty /\
+    ct3.ct_vs.c_ldom = bfold ct1.ct_vs.c_ldom ct2.ct_vs.c_ldom /\
+    ct3.ct_vs.c_ltp = bfold ct1.ct_vs.c_ltp ct2.ct_vs.c_ltp /\
+    ct3.ct_vty = bfold ct1.ct_vty ct2.ct_vty
+  
+  (* Consequences of fused on the program variable side. *)
+  predicate fused_alt (ct1:t_ctx 'old) (ct2:t_ctx 'new)
+                      (ct3:t_ctx (bind 'old 'new)) =
+    (forall x. ct3.ct_vs.c_pdom x <-> 
+               (ct1.ct_vs.c_pdom x \/ ct2.ct_vs.c_pdom x)) /\
+    (forall x. ct1.ct_vs.c_pdom x ->
+               ct3.ct_vs.c_ptl x = Old (ct1.ct_vs.c_ptl x)) /\
+    (forall x. ct2.ct_vs.c_pdom x ->
+               ct3.ct_vs.c_ptl x = Fresh (ct2.ct_vs.c_ptl x))
+  
+  let lemma fused_alt (ct1:t_ctx 'old) (ct2:t_ctx 'new)
+                          (ct3:t_ctx (bind 'old 'new)) : unit
+    ensures { fused ct1 ct2 ct3 -> fused_alt ct1 ct2 ct3 }
+  = let v1 = ct1.ct_vs in let v2 = ct2.ct_vs in let v3 = ct3.ct_vs in
+    assert { context_inv v1 /\ context_inv v2 /\ context_inv v3 };
+    assert { fused ct1 ct2 ct3 ->
+      (forall x. v3.c_pdom x -> not (v1.c_pdom x \/ v2.c_pdom x) ->
+        x = v3.c_ltp (v3.c_ptl x) && v3.c_ldom (v3.c_ptl x) &&
+          match v3.c_ptl x with
+          | Old u -> x = v1.c_ltp u && v1.c_ldom u && false
+          | Fresh u -> x = v2.c_ltp u && v2.c_ldom u && false
+          end && false) /\
+      (forall x. v1.c_pdom x -> not (v3.c_pdom x) -> let u = v1.c_ptl x in
+        x = v1.c_ltp u && v3.c_ldom (Old u) && v3.c_ltp (Old u) = x && false) /\
+      (forall x. v2.c_pdom x -> not (v3.c_pdom x) -> let u = v2.c_ptl x in
+        x = v2.c_ltp u && v3.c_ldom (Fresh u) && v3.c_ltp (Fresh u) = x
+        && false) /\
+      (forall x. v1.c_pdom x -> let u = v1.c_ptl x in v3.c_ptl x <> Old u ->
+        v3.c_ldom (Old u) && v3.c_ltp (Old u) = x && false) /\
+      (forall x. v2.c_pdom x -> let u = v2.c_ptl x in v3.c_ptl x <> Fresh u ->
+        v3.c_ldom (Fresh u) && v3.c_ltp (Fresh u) = x && false)
+    }
+  
+  let lemma fused_inj (ct1:t_ctx 'old) (ct2:t_ctx 'new)
+                      (ct3:t_ctx (bind 'old 'new)) : unit
+    ensures { fused ct1 ct2 ct3 ->
+      context_inj ct1.ct_vs Old ct3.ct_vs /\
+      sub_context ct1.ct_tv ct2.ct_tv /\
+      sub_sym_ctx ct1.ct_sym ct2.ct_sym }
+  = ()
+  
+  (* Pattern operations. *)
+  
+  type pattern_node =
+    | Pwild
+    | Pvar vsymbol
+    | Papp lsymbol (ghost list D.ty) (list pattern)
+    | Por pattern pattern
+    | Pas pattern vsymbol
+  
+  val ghost pat_typing (ctp:pat_ctx) (p:pattern) : unit
+    requires { ctp.ctp_d p }
+    ensures { pat_wf global_sig.sig_m (ctp.ctp_m p) (ctp.ctp_mty p) }
+    ensures { forall x. let sig0 = global_sig.sig_m in
+      match pat_ty_collector sig0 (ctp.ctp_m p) (ctp.ctp_mty p) x with
+      | None -> true
+      | Some u -> ctp.ct_vs.c_ldom x /\ ctp.ct_vty x = u
+      end }
+  
+  val pat_ty (ghost ctp:pat_ctx) (p:pattern) : ty
+    requires { ctp.ctp_d p }
+    ensures { ctp.ct_ty.cty_d result }
+    ensures { ctp.ctp_mty p = ctp.ct_ty.cty_m result }
+    ensures { ctp.ctp_mty p <> ty_prop }
+  
+  val pat_wild (ghost ctp:pat_ctx) (ty:ty) : pattern
+    requires { ctp.ct_ty.cty_d ty }
+    ensures { ctp.ctp_d result }
+    ensures { ctp.ctp_m result = D.PWild }
+    ensures { ctp.ctp_mty result = ctp.ct_ty.cty_m ty }
+  
+  val pat_var (ghost ctp:pat_ctx) (vs:vsymbol) : pattern
+    requires { ctp.ct_vs.c_pdom vs.vs_idn }
+    ensures { ctp.ctp_d result }
+    ensures { ctp.ctp_m result = D.PVar (ctp.ct_vs.c_ptl vs.vs_idn) }
+    ensures { ctp.ctp_mty result = ctp.ct_ty.cty_m vs.vs_ty }
+    (* Guaranteed by context invariant. *)
+    ensures { ctp.ct_ty.cty_d vs.vs_ty /\
+      ctp.ct_ty.cty_m vs.vs_ty = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn) }
+  
+  val pat_app (ghost ctp:pat_ctx) (ls:lsymbol) (ghost tyl:list D.ty)
+              (pl:list pattern) (ty:ty) : pattern
+    requires { for_all ctp.ctp_d pl /\ ctp.ct_sym.d_constr ls.ls_m }
+    requires { ctp.ct_ty.cty_d ty }
+    requires { map ctp.ctp_mty pl = ty_subst_args tyl ls.ls_args }
+    requires { ctp.ct_ty.cty_m ty = ty_subst_ret tyl ls.ls_ret }
+    requires {
+      patl_wf global_sig.sig_m (map ctp.ctp_m pl) (map ctp.ctp_mty pl) }
+    ensures { ctp.ctp_d result }
+    ensures { ctp.ctp_m result = D.PApp ls.ls_m tyl (map ctp.ctp_m pl) }
+    ensures { ctp.ctp_mty result = ctp.ct_ty.cty_m ty }
+  
+  val pat_or (ghost ctp:pat_ctx) (p1 p2:pattern) : pattern
+    requires { ctp.ctp_d p1 /\ ctp.ctp_d p2 }
+    requires { ctp.ctp_mty p1 = ctp.ctp_mty p2 }
+    requires { forall x. pat_pv_free_var (ctp.ctp_m p1) x <->
+                         pat_pv_free_var (ctp.ctp_m p2) x }
+    ensures { ctp.ctp_d result }
+    ensures { ctp.ctp_m result = D.POr (ctp.ctp_m p1) (ctp.ctp_m p2) }
+    ensures { ctp.ctp_mty result = ctp.ctp_mty p1 }
+  
+  val pat_as (ghost ctp:pat_ctx) (p:pattern) (vs:vsymbol) : pattern
+    requires { ctp.ctp_d p /\ ctp.ct_vs.c_pdom vs.vs_idn }
+    requires { ctp.ctp_mty p = ctp.ct_ty.cty_m vs.vs_ty }
+    requires { not pat_pv_free_var (ctp.ctp_m p) (ctp.ct_vs.c_ptl vs.vs_idn) }
+    ensures { ctp.ctp_d result }
+    ensures {
+      ctp.ctp_m result = D.PAs (ctp.ctp_m p) (ctp.ct_vs.c_ptl vs.vs_idn) }
+    ensures { ctp.ctp_mty result = ctp.ctp_mty p }
+    ensures { ctp.ct_ty.cty_d vs.vs_ty /\
+      ctp.ct_ty.cty_m vs.vs_ty = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn) }
+  
+  val pat_node (ghost ctp:pat_ctx) (p:pattern) : pattern_node
+    requires { ctp.ctp_d p }
+    returns {
+      | Pwild -> ctp.ctp_m p = D.PWild
+      | Pvar vs -> ctp.ct_vs.c_pdom vs.vs_idn /\
+        ctp.ctp_m p = D.PVar (ctp.ct_vs.c_ptl vs.vs_idn) /\
+        ctp.ct_ty.cty_d vs.vs_ty /\
+        ctp.ctp_mty p = ctp.ct_ty.cty_m vs.vs_ty
+                      = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn)
+      | Papp ls tyl pl -> ctp.ct_sym.d_constr ls.ls_m /\
+        for_all ctp.ctp_d pl /\
+        map (ctp.ctp_mty) pl = ty_subst_args tyl ls.ls_args /\
+        ctp.ctp_mty p = ty_subst_ret tyl ls.ls_ret /\
+        ctp.ctp_m p = D.PApp ls.ls_m tyl (map ctp.ctp_m pl) /\
+        patl_wf global_sig.sig_m (map ctp.ctp_m pl) (map (ctp.ctp_mty) pl)
+      | Por p1 p2 -> ctp.ctp_d p1 /\ ctp.ctp_d p2 /\
+        ctp.ctp_m p = D.POr (ctp.ctp_m p1) (ctp.ctp_m p2) /\
+        ctp.ctp_mty p = ctp.ctp_mty p1 = ctp.ctp_mty p2 /\
+        (forall x.
+          pat_pv_free_var (ctp.ctp_m p1) x <-> pat_pv_free_var (ctp.ctp_m p2) x)
+      | Pas p0 vs -> ctp.ctp_d p0 /\ ctp.ct_vs.c_pdom vs.vs_idn /\
+        ctp.ctp_m p = D.PAs (ctp.ctp_m p0) (ctp.ct_vs.c_ptl vs.vs_idn) /\
+        ctp.ct_ty.cty_d vs.vs_ty /\
+        ctp.ctp_mty p = ctp.ctp_mty p0 =
+          ctp.ct_ty.cty_m vs.vs_ty = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn)
+    }
+  
+  val pat_vars (ghost ctp:pat_ctx) (p:pattern) : Mvs.s
+    requires { ctp.ctp_d p }
+    ensures { forall x. result.Mvs.domain x <->
+                        (ctp.ct_vs.c_pdom x /\
+                        pat_pv_free_var (ctp.ctp_m p) (ctp.ct_vs.c_ptl x)) }
+  
+  (* Term operations. *)
+  
+  type quant = Tforall | Texists
+  
+  type binop = Tand | Tor | Timplies | Tiff
+  
+  type term_node =
+    | Tvar vsymbol
+    | Tconst const
+    | Tapp lsymbol (ghost list D.ty) (list term)
+    | Tif term term term
+    | Tlet term term_bound
+    | Tcase term (list term_branch)
+    | Teps term_bound
+    | Tquant quant term_quant
+    | Tbinop binop term term
+    | Tnot term
+    | Ttrue
+    | Tfalse
+  
+  
+  type trigger = list (list term)
+  
+  predicate br_ty_are (ct:t_ctx 'vs) (bty:D.ty) (oty:D.ty) (tbr:term_branch) =
+    ct.ct_ty.cty_m tbr.tbr_bty = bty /\
+    ct.ct_ty.cty_m tbr.tbr_ty = oty
+  
+  (* Binding predicates. *)
+  predicate bound_env (x:vsymbol) (c:t_ctx unit) =
+    c.ct_vs.c_ldom = all /\
+    (forall y. c.ct_vs.c_pdom y <-> y = x.vs_idn) /\
+    c.ct_vs.c_ltp () = x.vs_idn /\ c.ct_vs.c_ptl x.vs_idn = () /\
+    c.ct_vty () = c.ct_ty.cty_m x.vs_ty
+  
+  predicate branch_env (pat:pattern) (c:t_ctx pat_var) =
+    c.ctp_d pat /\
+    c.ct_vs.c_ldom = pat_pv_free_var (c.ctp_m pat)
+  
+  predicate quant_env (vsl:list vsymbol) (c:t_ctx int) =
+    c.ct_vs.c_ldom = range 0 (length vsl) /\
+    forall n. match nth n vsl with
+      | None -> true
+      | Some u -> u.vs_idn = c.ct_vs.c_ltp n
+      end
+  
+  (* Encode triggers inside the term structure as a semantically
+     irrelevant formula *)
+  function trigg (ct:t_ctx 'vs) (tl:list term) : D.term 'vs =
+    match tl with
+    | Nil -> TFalse
+    | Cons x q -> TAnd (TLet (ct.ct_m x) TTrue) (trigg ct q)
+    end
+  
+  function trigger (ct:t_ctx 'vs) (trig:trigger) : D.term 'vs =
+    match trig with
+    | Nil -> TTrue
+    | Cons x q -> TOr (trigg ct x) (trigger ct q)
+    end
+  
+  let rec lemma trigger_irrelevant (m:model 'u) (tyv:ty_val 'u)
+                                   (tv:valuation 'vs 'u)
+                                   (ct:t_ctx 'vs) (trig:trigger) : unit
+    ensures { f_sem m tyv tv (trigger ct trig) }
+    variant { trig }
+  = match trig with Cons _ q -> trigger_irrelevant m tyv tv ct q | _ -> () end
+  
+  val ghost t_typing (ct:t_ctx 'vs) (t:term) : unit
+    requires { ct.ct_d t }
+    ensures { let e0 = { tv_belong = ct.ct_vs.c_ldom ; tv_ty = ct.ct_vty } in
+      t_wf global_sig.sig_m e0 (ct.ct_m t) (ct.ct_mty t) }
+  
+  val t_ty (ghost ct:t_ctx 'vs) (t:term) : option ty
+    requires { ct.ct_d t }
+    returns { None -> ct.ct_mty t = ty_prop
+      | Some u -> ct.ct_ty.cty_d u
+               /\ ct.ct_mty t = ct.ct_ty.cty_m u
+               /\ ct.ct_mty t <> ty_prop }
+  
+  val t_close_bound (ghost ct:t_ctx (bind 'vs unit))
+                    (ghost co:t_ctx 'vs) (ghost cb:t_ctx unit)
+                    (vs:vsymbol) (t:term) : term_bound
+    requires { ct.ct_d t }
+    requires { fused co cb ct }
+    requires { bound_env vs cb }
+    ensures { co.ctb_d result }
+    ensures { co.ctb_m result = ct.ct_m t }
+    ensures { co.ct_ty.cty_m result.tb_ty = ct.ct_mty t }
+    ensures { ct.ct_ty.cty_d vs.vs_ty }
+    ensures { co.ct_ty.cty_m result.tb_bty = ct.ct_ty.cty_m vs.vs_ty
+                                       = ct.ct_vty (ct.ct_vs.c_ptl vs.vs_idn) }
+  
+  val t_close_branch (ghost ct:t_ctx (bind 'vs pat_var))
+                     (ghost co:t_ctx 'vs) (ghost cb:t_ctx pat_var)
+                     (pat:pattern) (t:term) : term_branch
+    requires { ct.ct_d t }
+    requires { fused co cb ct }
+    requires { branch_env pat cb }
+    ensures { co.ctbr_d result }
+    ensures { co.ctbr_m result = (cb.ctp_m pat, ct.ct_m t) }
+    ensures { co.ct_ty.cty_m result.tbr_ty = ct.ct_mty t }
+    ensures { co.ct_ty.cty_m result.tbr_bty = co.ct_ty.cty_m pat.pat_ty }
+  
+  val t_close_quant (ghost ct:t_ctx (bind 'vs int))
+                    (ghost co:t_ctx 'vs) (ghost cb:t_ctx int)
+                    (vsl:list vsymbol) (tr:trigger) (t:term) : term_quant
+    requires { vsl <> Nil }
+    requires { for_all (for_all ct.ct_d) tr /\ ct.ct_d t }
+    requires { ct.ct_ty.cty_m t.t_ty = ty_prop }
+    requires { fused co cb ct }
+    requires { quant_env vsl cb }
+    ensures { co.ctq_d result }
+    ensures { co.ctq_m result = D.TImplies (trigger ct tr) (ct.ct_m t) }
+    ensures { result.tq_qty = map vs_ty vsl }
+  
+  type term_bound_open 'vs = {
+    ghost tbo_cn : t_ctx (bind 'vs unit);
+    ghost tbo_cb : t_ctx unit;
+    tbo_vs : vsymbol;
+    tbo_t : term;
+  }
+  
+  val t_open_bound (ghost ct:t_ctx 'vs) (tb:term_bound) : term_bound_open 'vs
+    requires { ct.ctb_d tb }
+    returns { r -> let cn = r.tbo_cn in let t = r.tbo_t in
+      let vs = r.tbo_vs in let cb = r.tbo_cb in
+      cn.ct_d t /\ fused ct cb cn /\ bound_env vs cb /\
+      cn.ct_m t = ct.ctb_m tb /\ cn.ct_mty t = ct.ct_ty.cty_m tb.tb_ty /\
+      cn.ct_ty.cty_d vs.vs_ty /\
+      cn.ct_ty.cty_m vs.vs_ty = cn.ct_vty (cn.ct_vs.c_ptl vs.vs_idn)
+                              = ct.ct_ty.cty_m tb.tb_bty }
+  
+  type term_branch_open 'vs = {
+    ghost tbro_cn : t_ctx (bind 'vs pat_var);
+    ghost tbro_cb : t_ctx pat_var;
+    tbro_pat : pattern;
+    tbro_t : term;
+  }
+  
+  val term_open_branch (ghost ct:t_ctx 'vs)
+                       (tbr:term_branch) : term_branch_open 'vs
+    requires { ct.ctbr_d tbr }
+    returns { r -> let cn = r.tbro_cn in let t = r.tbro_t in
+      let pat = r.tbro_pat in let cb = r.tbro_cb in
+      cn.ct_d t /\ cb.ctp_d pat /\
+      fused ct cb cn /\ branch_env pat cb /\
+      ct.ctbr_m tbr = (cb.ctp_m pat,cn.ct_m t) /\
+      ct.ct_ty.cty_m tbr.tbr_ty = cn.ct_mty t /\
+      ct.ct_ty.cty_m tbr.tbr_bty = cn.ct_ty.cty_m pat.pat_ty }
+  
+  type term_quant_open 'vs = {
+    ghost tqo_cn : t_ctx (bind 'vs int);
+    ghost tqo_cb : t_ctx int;
+    tqo_vsl : list vsymbol;
+    tqo_trig : trigger;
+    tqo_t : term;
+  }
+  
+  val t_open_quant (ghost ct:t_ctx 'vs) (tq:term_quant) : term_quant_open 'vs
+    requires { ct.ctq_d tq }
+    returns { r -> let cn = r.tqo_cn in let t = r.tqo_t in
+      let vsl = r.tqo_vsl in let tr = r.tqo_trig in let cb = r.tqo_cb in
+      cn.ct_d t /\ for_all (for_all cn.ct_d) tr /\
+      fused ct cb cn /\ quant_env vsl cb /\
+      ct.ctq_m tq = D.TImplies (trigger cn tr) (cn.ct_m t) /\
+      tq.tq_qty = map vs_ty vsl /\
+      vsl <> Nil /\ cn.ct_ty.cty_m t.t_ty = ty_prop }
+  
+  val t_node (ghost ct:t_ctx 'vs) (t:term) : term_node
+    requires { ct.ct_d t }
+    returns { Tvar vs -> ct.ct_m t = D.TVar (ct.ct_vs.c_ptl vs.vs_idn) /\
+        ct.ct_vs.c_pdom vs.vs_idn /\
+        ct.ct_ty.cty_d vs.vs_ty /\
+        ct.ct_mty t = ct.ct_ty.cty_m vs.vs_ty
+                  = ct.ct_vty (ct.ct_vs.c_ptl vs.vs_idn)
+      | Tconst cst -> ct.ct_m t = D.TApp cst.cst_m Nil Nil /\
+        ct.ct_mty t = ty_ret global_sig.sig_m cst.cst_m Nil
+      | Tapp f tyl tl -> for_all ct.ct_d tl /\ ct.ct_sym.d_ls f.ls_m /\
+        ct.ct_m t = D.TApp f.ls_m tyl (map ct.ct_m tl) /\
+        ct.ct_mty t = ty_subst_ret tyl f.ls_ret /\
+        map ct.ct_mty tl = ty_subst_args tyl f.ls_args
+      | Tif b th el -> ct.ct_d b /\ ct.ct_d th /\ ct.ct_d el /\
+        ct.ct_m t = D.TIf (ct.ct_m b) (ct.ct_m th) (ct.ct_m el) /\
+        ct.ct_mty b = ty_prop /\ ct.ct_mty th = ct.ct_mty el = ct.ct_mty t
+      | Tlet u v -> ct.ct_d u /\ ct.ctb_d v /\
+        ct.ct_m t = D.TLet (ct.ct_m u) (ct.ctb_m v) /\
+        ct.ct_ty.cty_m v.tb_bty = ct.ct_mty u /\
+        ct.ct_ty.cty_m v.tb_ty = ct.ct_mty t
+      | Tcase u brl -> ct.ct_d u /\ for_all ct.ctbr_d brl /\
+        for_all (br_ty_are ct (ct.ct_mty u) (ct.ct_mty t)) brl /\
+        ct.ct_m t = D.TCase (ct.ct_m u) (map ct.ctbr_m brl)
+      | Teps u -> ct.ctb_d u /\ ct.ct_m t = D.TEps (ct.ct_mty t) (ct.ctb_m u) /\
+        ct.ct_ty.cty_m u.tb_bty = ct.ct_mty t /\
+        ct.ct_ty.cty_m u.tb_ty = ty_prop
+      | Tquant q tq -> ct.ctq_d tq /\ ct.ct_mty t = ty_prop /\
+        tq.tq_qty <> Nil /\ let tyl = map ct.ct_ty.cty_m tq.tq_qty in
+        match q with
+        | Tforall -> ct.ct_m t = D.TForall tyl (ct.ctq_m tq)
+        | Texists -> ct.ct_m t = D.TExists tyl (ct.ctq_m tq)
+        end
+      | Tbinop bp a b -> ct.ct_d a /\ ct.ct_d b /\
+        ct.ct_mty a = ct.ct_mty b = ct.ct_mty t = ty_prop /\
+        let tm = ct.ct_m t in let am = ct.ct_m a in let bm = ct.ct_m b in
+        match bp with
+        | Tand -> tm = D.TAnd am bm
+        | Tor -> tm = D.TOr am bm
+        | Timplies -> tm = D.TImplies am bm
+        | Tiff -> tm = D.TIff am bm
+        end
+      | Tnot u -> ct.ct_d u /\ ct.ct_mty t = ct.ct_mty u = ty_prop /\
+        ct.ct_m t = D.TNot (ct.ct_m u)
+      | Ttrue -> ct.ct_m t = D.TTrue /\ ct.ct_mty t = ty_prop
+      | Tfalse -> ct.ct_m t = D.TFalse /\ ct.ct_mty t = ty_prop
+    }
+  
+  val t_var (ghost ct:t_ctx 'vs) (vs:vsymbol) : term
+    requires { ct.ct_vs.c_pdom vs.vs_idn }
+    ensures { ct.ct_d result }
+    ensures { ct.ct_m result = D.TVar (ct.ct_vs.c_ptl vs.vs_idn) }
+    ensures { ct.ct_ty.cty_d vs.vs_ty }
+    ensures { ct.ct_mty result = ct.ct_ty.cty_m vs.vs_ty
+                               = ct.ct_vty (ct.ct_vs.c_ptl vs.vs_idn) }
+  
+  val t_const (ghost ct:t_ctx 'vs) (cst:const) : term
+    ensures { ct.ct_d result /\ ct.ct_m result = D.TApp cst.cst_m Nil Nil }
+    ensures { ct.ct_mty result = ty_ret global_sig.sig_m cst.cst_m Nil }
+  
+  val t_app (ghost ct:t_ctx 'vs) (ls:lsymbol) (ghost tyl:list D.ty)
+            (tl:list term) (tyo:option ty) : term
+    requires { for_all ct.ct_d tl /\ ct.ct_sym.d_ls ls.ls_m }
+    requires { map ct.ct_mty tl = ty_subst_args tyl ls.ls_args }
+    requires { match tyo with
+      | None -> ty_subst_ret tyl ls.ls_ret = ty_prop
+      | Some u -> ty_subst_ret tyl ls.ls_ret = ct.ct_ty.cty_m u
+      end }
+    ensures { ct.ct_d result }
+    ensures { ct.ct_m result = D.TApp ls.ls_m tyl (map ct.ct_m tl) }
+    ensures { ct.ct_mty result = ty_subst_ret tyl ls.ls_ret }
+  
+  val t_if (ghost ct:t_ctx 'vs) (b:term) (th:term) (el:term) : term
+    requires { ct.ct_d b /\ ct.ct_d th /\ ct.ct_d el }
+    requires { ct.ct_mty th = ct.ct_mty el /\ ct.ct_mty b = ty_prop }
+    ensures { ct.ct_d result }
+    ensures { ct.ct_m result = D.TIf (ct.ct_m b) (ct.ct_m th) (ct.ct_m el) }
+    ensures { ct.ct_mty result = ct.ct_mty th }
+  
+  val t_let (ghost ct:t_ctx 'vs) (u:term) (v:term_bound) : term
+    requires { ct.ct_d u /\ ct.ctb_d v }
+    requires { ct.ct_ty.cty_m v.tb_bty = ct.ct_mty u }
+    ensures { ct.ct_d result }
+    ensures { ct.ct_m result = D.TLet (ct.ct_m u) (ct.ctb_m v) }
+    ensures { ct.ct_mty result = ct.ct_ty.cty_m v.tb_ty }
+  
+  val t_case (ghost ct:t_ctx 'vs) (ghost oty:D.ty)
+             (u:term) (brl:list term_branch) : term
+    requires { ct.ct_d u /\ for_all ct.ctbr_d brl }
+    requires { for_all (br_ty_are ct (ct.ct_mty u) oty) brl }
+    ensures { ct.ct_d result }
+    ensures { ct.ct_m result = D.TCase (ct.ct_m u) (map ct.ctbr_m brl) }
+    ensures { ct.ct_mty result = oty }
+  
+  val t_eps (ghost ct:t_ctx 'vs) (u:term_bound) : term
+    requires { ct.ctb_d u /\ ct.ct_ty.cty_m u.tb_ty = ty_prop }
+    ensures { ct.ct_d result }
+    ensures { ct.ct_m result = D.TEps (ct.ct_mty result) (ct.ctb_m u) }
+    ensures { ct.ct_mty result = ct.ct_ty.cty_m u.tb_bty }
+  
+  val t_quant (ghost ct:t_ctx 'vs) (q:quant) (tq:term_quant) : term
+    requires { ct.ctq_d tq }
+    ensures { ct.ct_d result }
+    ensures { let tyl = map ct.ct_ty.cty_m tq.tq_qty in
+      match q with
+      | Tforall -> ct.ct_m result = D.TForall tyl (ct.ctq_m tq)
+      | Texists -> ct.ct_m result = D.TExists tyl (ct.ctq_m tq)
+      end }
+    ensures { ct.ct_mty result = ty_prop }
+  
+  val t_forall (ghost ct:t_ctx 'vs) (tq:term_quant) : term
+    requires { ct.ctq_d tq }
+    ensures { ct.ct_d result }
+    ensures { let tyl = map ct.ct_ty.cty_m tq.tq_qty in
+      ct.ct_m result = D.TForall tyl (ct.ctq_m tq) }
+    ensures { ct.ct_mty result = ty_prop }
+  
+  val t_exists (ghost ct:t_ctx 'vs) (tq:term_quant) : term
+    requires { ct.ctq_d tq }
+    ensures { ct.ct_d result }
+    ensures { let tyl = map ct.ct_ty.cty_m tq.tq_qty in
+      ct.ct_m result = D.TExists tyl (ct.ctq_m tq) }
+    ensures { ct.ct_mty result = ty_prop }
+  
+  val t_binary (ghost ct:t_ctx 'vs) (bp:binop) (a b:term) : term
+    requires { ct.ct_d a /\ ct.ct_d b }
+    requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures {
+      let am = ct.ct_m a in let bm = ct.ct_m b in let rm = ct.ct_m result in
+      match bp with
+      | Tand -> rm = D.TAnd am bm
+      | Tor -> rm = D.TOr am bm
+      | Timplies -> rm = D.TImplies am bm
+      | Tiff -> rm = D.TIff am bm
+      end }
+  
+  val t_and (ghost ct:t_ctx 'vs) (a b:term) : term
+    requires { ct.ct_d a /\ ct.ct_d b }
+    requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TAnd (ct.ct_m a) (ct.ct_m b) }
+  
+  val t_or (ghost ct:t_ctx 'vs) (a b:term) : term
+    requires { ct.ct_d a /\ ct.ct_d b }
+    requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TOr (ct.ct_m a) (ct.ct_m b) }
+  
+  val t_implies (ghost ct:t_ctx 'vs) (a b:term) : term
+    requires { ct.ct_d a /\ ct.ct_d b }
+    requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TImplies (ct.ct_m a) (ct.ct_m b) }
+  
+  val t_iff (ghost ct:t_ctx 'vs) (a b:term) : term
+    requires { ct.ct_d a /\ ct.ct_d b }
+    requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TIff (ct.ct_m a) (ct.ct_m b) }
+  
+  val t_not (ghost ct:t_ctx 'vs) (a:term) : term
+    requires { ct.ct_d a /\ ct.ct_mty a = ty_prop }
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TNot (ct.ct_m a) }
+  
+  val t_true (ghost ct:t_ctx 'vs) : term
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TTrue }
+  
+  val t_false (ghost ct:t_ctx 'vs) : term
+    ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
+    ensures { ct.ct_m result = D.TFalse }
+  
+end
+

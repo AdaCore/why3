@@ -120,7 +120,6 @@ theory real.Real
   remove prop ZeroLessOne
 
   meta "encoding : kept" type real
-
 end
 
 theory Bool
@@ -129,6 +128,7 @@ theory Bool
    syntax function False "false"
    meta "encoding : kept" type bool
 end
+
 theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
@@ -151,6 +151,8 @@ theory map.Map
   syntax function ([])   "(%1 %2)"
   syntax function set    "(update %1 (%2) %3)"
   syntax function ([<-]) "(update %1 (%2) %3)"
+end
 
+theory map.Const
   meta "encoding : lskept" function const
 end

@@ -1,0 +1,65 @@
+
+module Funcs
+
+  use import option.Option
+  use import Functions.Func
+
+  (* Abstraction definition axiom :
+       constant some : func 'a (option 'a) = (\ x:'a. Some x) *)
+  constant some : func 'a (option 'a)
+  axiom some_def : forall x:'a. some x = Some x
+
+  (* Abstraction definition axiom :
+       constant ocase (f:func 'a 'b) (d:'b) : func (option 'a) 'b =
+         (\ x:'a. match x with None -> d | Some x -> f x end) *)
+  function ocase (f:func 'a 'b) (d:'b) : func (option 'a) 'b
+  axiom ocase_def : forall f:func 'a 'b,d:'b,x:option 'a.
+    ocase f d x = match x with None -> d | Some x -> f x end
+
+  lemma ocase_some : forall f:func 'a 'b,d:'b,x:'a.
+    ocase f d (Some x) = f x
+  lemma ocase_none : forall f:func 'a 'b,d:'b.
+    ocase f d None = d
+  let lemma compose_ocase_some (f:func 'a 'b) (d:'b) : unit
+    ensures { rcompose some (ocase f d) = f }
+  =
+    assert { extensionalEqual (rcompose some (ocase f d)) f }
+
+  function omap (f:func 'a 'b) (x:option 'a) : option 'b = match x with
+    | None -> None
+    | Some x -> Some (f x)
+  end
+  function olift (f:func 'a 'b) : func (option 'a) (option 'b) = ocase (compose some f) None
+  lemma olift_def : forall f:func 'a 'b,x:option 'a. olift f x = omap f x
+
+  lemma olift_none : forall f:func 'a 'b. olift f None = None
+  lemma olift_some : forall f:func 'a 'b,x:'a. olift f (Some x) = Some (f x)
+  lemma olift_none_inversion : forall f:func 'a 'b,x:option 'a. olift f x = None <-> x = None
+  let lemma olift_some_inversion (f:func 'a 'b) (x:option 'a) (y:'b) : unit
+    ensures { olift f x = Some y <->
+      match x with None -> false | Some x' -> f x' = y end }
+  =
+    match x with
+      | None -> ()
+      | Some _x' -> ()
+    end
+
+  let lemma olift_identity (u:unit) : unit
+    ensures { olift (identity:func 'a 'a) = identity }
+  =
+    assert { extensionalEqual (olift (identity:func 'a 'a)) identity }
+
+  let lemma olift_composition (g:func 'b 'c) (f:func 'a 'b) : unit
+    ensures { compose (olift g) (olift f) = olift (compose g f) }
+  =
+    assert { extensionalEqual (compose (olift g) (olift f)) (olift (compose g f)) }
+
+  lemma olift_some_commutation : forall f:func 'a 'b.
+    compose some f = compose (olift f) some
+
+  let lemma olift_update (f:func 'a 'b) (x:'a) (y:'b) : unit
+    ensures { olift (f[x<-y]) = (olift f)[Some x <- Some y] }
+  =
+    assert { extensionalEqual (olift (f[x <- y])) ((olift f)[Some x <- Some y]) }
+
+end

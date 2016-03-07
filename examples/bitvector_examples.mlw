@@ -94,7 +94,7 @@ theory Hackers_delight
     bw_not( sub x y ) = add (bw_not x) y
 
   goal DMtest: forall x.
-    zero = bw_not( bw_or x (neg( add x (of_int 1))))
+    zeros = bw_not( bw_or x (neg( add x (of_int 1))))
 
   (* inequality  *)
 
@@ -112,29 +112,29 @@ theory Hackers_delight
 
   (* shift right and arithmetic shift right *)
 
-  goal SR1: forall x n. ( ule zero n /\ ule n (of_int 31)) ->
+  goal SR1: forall x n. ( ule zeros n /\ ule n (of_int 31)) ->
     bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
   = asr_bv x n
 
   (* rotate en shift *)
 
   goal RS_left: forall x.
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left x (of_int 1)
+    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left_bv x (of_int 1)
 
   goal RS_right: forall x.
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right x (of_int 1)
+    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right_bv x (of_int 1)
 
   (* bound propagation *)
 
   goal BP1: forall a b c d x y.
     ( ule a x /\ ule x b /\ ule c y /\ ule y d ) ->
     ( ule b (add b d) /\ ule d (add b d) ) -> (* no overflow in addition *)
-      ule (bw_or x y) (add b d) /\ ule zero (bw_and x y)
+      ule (bw_or x y) (add b d) /\ ule zeros (bw_and x y)
 
   goal BP2: forall a b c d x y.
     ( ule a x /\ ule x b /\ ule c y /\ ule y d ) ->
     ( ule b (add b d) /\ ule d (add b d) ) -> (* no overflow in addition *)
-      ule zero (bw_xor x y) /\ ule (bw_xor x y) (add b d)
+      ule zeros (bw_xor x y) /\ ule (bw_xor x y) (add b d)
 
   goal BP3: forall a b c d x y.
     ( ule a x /\ ule x b /\ ule c y /\ ule y d ) ->
@@ -181,7 +181,7 @@ module Hackers_delight_mod
     bw_not( sub x y )
 
   let dmtest (x : t) =
-    ensures{ result = zero }
+    ensures{ result = zeros }
     bw_not( bw_or x (neg( add x (of_int 1))))
 
   (* inequality  *)
@@ -207,18 +207,18 @@ module Hackers_delight_mod
   (* shift right and arithmetic shift right *)
 
   let sr1 (x : t) (n : t) =
-    requires{ ule zero n /\ ule n (of_int 31) }
+    requires{ ule zeros n /\ ule n (of_int 31) }
     ensures{ result = asr_bv x n }
     bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
 
   (* rotate en shift *)
 
   let rs_left (x : t) =
-  ensures{ result = rotate_left x (of_int 1) }
+  ensures{ result = rotate_left_bv x (of_int 1) }
     bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31))
 
   let rs_right (x : t) =
-  ensures{ result = rotate_right x (of_int 1) }
+  ensures{ result = rotate_right_bv x (of_int 1) }
     bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31))
 
   (* bound propagation *)
@@ -234,14 +234,14 @@ module Hackers_delight_mod
   requires{ ule a x /\ ule x b }
   requires{ ule c y /\ ule y d }
   requires{ ule b (add b d) /\ ule d (add b d) } (* no overflow in addition *)
-  ensures{ ule zero result }
+  ensures{ ule zeros result }
     bw_and x y
 
   let bp2 (a b c d x y : t) =
   requires{ ule a x /\ ule x b }
   requires{ ule c y /\ ule y d }
   requires{ ule b (add b d) /\ ule d (add b d) } (* no overflow in addition *)
-  ensures{ ule zero result }
+  ensures{ ule zeros result }
   ensures{ ule result (add b d) }
     bw_xor x y
 
@@ -264,7 +264,7 @@ module Test_imperial_violet
   (* to_int and bounds *)
 
   lemma bv32_bounds_bv:
-    forall b. ule zero b /\ ule b ones
+    forall b. ule zeros b /\ ule b ones
 
   lemma to_int_ule:
     forall b c. ule b c -> to_uint b <= to_uint c
@@ -288,7 +288,7 @@ module Test_imperial_violet
                 ult b[i] (of_int 0x8000_0000) }
     ensures{ forall i. 0 <= i < length result ->
                to_uint result[i] = to_uint a[i] + to_uint b[i] }
-    let sum = make (length a) zero in
+    let sum = make (length a) zeros in
     for i = 0 to length a - 1 do
       invariant{ forall j. 0 <= j < i -> sum[j] = add a[j] b[j] }
       invariant{ forall j. 0 <= j < i -> to_uint sum[j] = to_uint a[j] + to_uint b[j] }
@@ -304,7 +304,7 @@ module Test_from_bitvector_example
   use import bv.BV32
 
   goal Test1:
-    let b = bw_and zero ones in nth_bv b (of_int 1) = False
+    let b = bw_and zeros ones in nth_bv b (of_int 1) = False
 
   goal Test2:
     let b = lsr_bv ones (of_int 16) in nth_bv b (of_int 15) = True

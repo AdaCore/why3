@@ -49,6 +49,7 @@ module Static
   use import Graph
   use set.Fset as S
   use map.Map as M
+  use map.Const
 
   function defined_sort (m:msort) : S.set vertex
   axiom defined_sort_def:
@@ -110,7 +111,7 @@ module Static
       =
     'Init:
       let next = ref 0 in
-      let values = ref (M.const (-1)) in
+      let values = ref (Const.const (-1)) in
       let p = ref (vertices g) in
       while not (S.is_empty !p) do
         invariant { inv g !values !next }
@@ -155,6 +156,7 @@ module Online_Basic
   use import Online_graph
   use set.Fset as S
   use map.Map as M
+  use map.Const
 
   type marked = (S.set vertex)
 
@@ -172,7 +174,7 @@ module Online_Basic
      ensures  { result.graph = g }
      ensures  { inv result }
    =
-    {graph = g; values = M.const 0}
+    {graph = g; values = Const.const 0}
 
   let rec dfs (g:t) (v:vertex)
               (seen:marked) (min_depth:int) : unit

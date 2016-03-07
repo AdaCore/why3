@@ -32,5 +32,3 @@ type instruction =
   | Igoto of int (** goto state *)
 
 type t = instruction array
-
-

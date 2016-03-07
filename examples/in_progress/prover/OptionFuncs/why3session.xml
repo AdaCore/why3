@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<file name="../OptionFuncs.mlw">
+<theory name="Funcs" sum="ad1de2222a12642f93f29217a94a1509">
+ <goal name="ocase_some">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+ </goal>
+ <goal name="ocase_none">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="WP_parameter compose_ocase_some" expl="VC for compose_ocase_some">
+ <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+ </goal>
+ <goal name="olift_def">
+ <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+ </goal>
+ <goal name="olift_none">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="olift_some">
+ <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+ </goal>
+ <goal name="olift_none_inversion">
+ <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+ </goal>
+ <goal name="WP_parameter olift_some_inversion" expl="VC for olift_some_inversion">
+ <proof prover="0"><result status="valid" time="0.02" steps="59"/></proof>
+ </goal>
+ <goal name="WP_parameter olift_identity" expl="VC for olift_identity">
+ <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
+ </goal>
+ <goal name="WP_parameter olift_composition" expl="VC for olift_composition">
+ <proof prover="0"><result status="valid" time="0.04" steps="107"/></proof>
+ </goal>
+ <goal name="olift_some_commutation">
+ <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter olift_update" expl="VC for olift_update">
+ <proof prover="0"><result status="valid" time="0.21" steps="330"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

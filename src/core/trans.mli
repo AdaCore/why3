@@ -47,7 +47,6 @@ val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 val fold_map   : (task_hd -> 'a * 'b -> ('a * 'b)     ) -> 'a -> 'b -> 'b trans
 val fold_map_l : (task_hd -> 'a * 'b -> ('a * 'b) list) -> 'a -> 'b -> 'b tlist
 
-(** [decl f acc [d1;..;dn]] returns acc@f d1@..@f dn *)
 val decl   : (decl -> decl list     ) -> task -> task trans
 val decl_l : (decl -> decl list list) -> task -> task tlist
 
@@ -95,14 +94,16 @@ val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
     does not have a requested association. Raises [IllegalFlagTrans] if
     the type of [m] is not [[MTstring]]. *)
 
+val on_flag_t : meta -> ('a,'b) flag_trans -> ('a -> 'b trans) -> 'a -> 'b trans
+
 (** Debug Transformations *)
 
 val print_meta : Debug.flag -> meta -> task trans
 (** [print_meta f m] is an identity transformation that
     prints every meta [m] in the task if flag [d] is set *)
 
-(* Creates new transformation that prints the goal of the task to be 
-transfromed, do the original transformation and than prints the goal 
+(* Creates new transformation that prints the goal of the task to be
+transfromed, do the original transformation and than prints the goal
 of the transformed task.  *)
 val create_debugging_trans: string -> task trans ->  task trans
 

@@ -61,7 +61,7 @@ let env_spec = common_options
 *)
 
 let read_env_spec () =
-  (** Configuration *)
+  (* Configuration *)
   let config = Whyconf.read_config !opt_config in
   let config = List.fold_left Whyconf.merge_config config !opt_extra in
   let main = Whyconf.get_main config in
@@ -94,7 +94,7 @@ let read_opt_prover s =
   try
     let l = Strings.rev_split ',' s in
     match l with
-    (** A prover specified uniquely *)
+    (* A prover specified uniquely *)
     | [altern;version;name]
       when List.for_all (fun s -> s = "" || s.[0] <> '^') l ->
       Prover {Whyconf.prover_name = name;
@@ -148,7 +148,7 @@ the proof containing this prover are selected";
    Arg.Unit (fun () -> opt_status := Call_provers.Invalid::!opt_status),
    " filter the invalid goals";
    "--filter-unknown",
-   Arg.String (fun s -> opt_status := Call_provers.Unknown s::!opt_status),
+   Arg.String (fun s -> opt_status := Call_provers.Unknown (s, None)::!opt_status),
    " filter when the prover reports it can't determine if the task is valid";
    "--filter-failure",
    Arg.String (fun s -> opt_status := Call_provers.Failure s::!opt_status),
@@ -197,29 +197,29 @@ let read_filter_spec whyconf : filters * bool =
   },!should_exit
 
 let iter_proof_attempt_by_filter iter filters f session =
-  (** provers *)
+  (* provers *)
   let iter_provers a =
     if C.Sprover.mem a.S.proof_prover filters.provers then f a in
   let f = if C.Sprover.is_empty filters.provers then f else iter_provers in
-  (** three value *)
+  (* three value *)
   let three_value f v p =
     let iter_obsolete a =
       match v, p a with
         | FT_No, false -> f a
         | FT_Yes, true -> f a
-        | _ -> () (** FT_All treated after *) in
+        | _ -> () (* FT_All treated after *) in
     if v = FT_All then f else iter_obsolete in
-  (** obsolete *)
+  (* obsolete *)
   let f = three_value f filters.obsolete (fun a -> a.S.proof_obsolete) in
-  (** archived *)
+  (* archived *)
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
-  (** verified_goal *)
+  (* verified_goal *)
   let f = three_value f filters.verified_goal
     (fun a -> Opt.inhabited a.S.proof_parent.S.goal_verified) in
-  (** verified *)
+  (* verified *)
   let f = three_value f filters.verified
     (fun p -> Opt.inhabited (S.proof_verified p)) in
-  (** status *)
+  (* status *)
   let f = if filters.status = [] then f else
       (fun a -> match a.S.proof_state with
       | S.Done pr when List.mem pr.Call_provers.pr_answer filters.status -> f a
@@ -258,7 +258,7 @@ let ask_yn_nonblock ~callback =
     | [],_,_ -> true
     | _ ->
       if Unix.read Unix.stdin s 1 0 = 0 then
-        begin (** EndOfFile*) callback false; false end
+        begin (* EndOfFile *) callback false; false end
       else begin
         if s.[0] <> '\n'
         then (Buffer.add_char b s.[0]; true)

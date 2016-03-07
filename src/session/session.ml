@@ -89,7 +89,7 @@ module Mmeta_args = Extmap.Make(struct
 
   let compare_meta_arg x y =
     match x,y with
-  (** These hash are in fact tag *)
+    (* These hash are in fact tag *)
     | MAty  x, MAty  y -> compare (ty_hash x) (ty_hash y)
     | MAts  x, MAts  y -> compare (ts_hash x) (ts_hash y)
     | MAls  x, MAls  y -> compare (ls_hash x) (ls_hash y)
@@ -158,6 +158,7 @@ and 'a proof_attempt =
     proof_parent : 'a goal;
     mutable proof_state : proof_attempt_status;
     mutable proof_timelimit : int;
+    mutable proof_steplimit : int;
     mutable proof_memlimit : int;
     mutable proof_obsolete : bool;
     mutable proof_archived : bool;
@@ -404,9 +405,9 @@ module PTreeT = struct
     | Session s ->
       let l = ref [] in
       session_iter (fun a -> l := (Any a)::!l) s;
-      (** Previously "" was `Filename.basename s.session_dir` but
-          the tree depend on the filename given in input and not the content
-          which is not easy for diffing
+      (* Previously "" was `Filename.basename s.session_dir` but
+         the tree depend on the filename given in input and not the content
+         which is not easy for diffing
       *)
       "",!l
 
@@ -490,10 +491,10 @@ let get_used_provers_with_stats session =
     (fun pa ->
       (* record mostly used pa.proof_timelimit pa.proof_memlimit *)
       let prover = pa.proof_prover in
-      let timelimits,memlimits =
+      let timelimits,steplimits,memlimits =
         try PHprover.find prover_table prover
         with Not_found ->
-          let x = (Hashtbl.create 5,Hashtbl.create 5) in
+          let x = (Hashtbl.create 5,Hashtbl.create 5,Hashtbl.create 5) in
           PHprover.add prover_table prover x;
           x
       in
@@ -501,11 +502,16 @@ let get_used_provers_with_stats session =
         try Hashtbl.find timelimits pa.proof_timelimit
         with Not_found -> 0
       in
+      let sf =
+	try Hashtbl.find steplimits pa.proof_steplimit
+	with Not_found -> 0
+      in
       let mf =
         try Hashtbl.find memlimits pa.proof_timelimit
         with Not_found -> 0
       in
       Hashtbl.replace timelimits pa.proof_timelimit (tf+1);
+      Hashtbl.replace steplimits pa.proof_steplimit (sf+1);
       Hashtbl.replace memlimits pa.proof_memlimit (mf+1))
     session;
   prover_table
@@ -578,11 +584,12 @@ let save_int_def name def fmt n =
 
 let opt_string = opt save_string
 
-let save_proof_attempt fmt ((id,tl,ml),a) =
+let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
-    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a>"
+    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a%a>"
     id
     (save_int_def "timelimit" tl) a.proof_timelimit
+    (save_int_def "steplimit" sl) a.proof_steplimit
     (save_int_def "memlimit" ml) a.proof_memlimit
     (opt_string "edited") a.proof_edited_as
     (save_bool_def "obsolete" false) a.proof_obsolete
@@ -603,7 +610,7 @@ module Compr = Compress.Compress_z
 
 type save_ctxt = {
   prover_ids : int PHprover.t;
-  provers : (int * int * int) Mprover.t;
+  provers : (int * int * int * int) Mprover.t;
   ch_shapes : Compr.out_channel;
 }
 
@@ -633,7 +640,7 @@ let rec save_goal ctxt fmt g =
   let l = PHprover.fold
     (fun _ a acc -> (Mprover.find a.proof_prover ctxt.provers, a) :: acc)
     g.goal_external_proofs [] in
-  let l = List.sort (fun ((i1,_,_),_) ((i2,_,_),_) -> compare i1 i2) l in
+  let l = List.sort (fun ((i1,_,_,_),_) ((i2,_,_,_),_) -> compare i1 i2) l in
   List.iter (save_proof_attempt fmt) l;
   let l = PHstr.fold (fun _ t acc -> t :: acc) g.goal_transformations [] in
   let l = List.sort (fun t1 t2 -> compare t1.transf_name t2.transf_name) l in
@@ -664,7 +671,7 @@ and save_metas ctxt fmt _ m =
       save_string ts.ts_name.id_string (List.length ts.ts_args)
       (ts_hash ts) save_pos pos in
   let save_ls_pos fmt ls pos =
-    (** TODO: add the signature? *)
+    (* TODO: add the signature? *)
     fprintf fmt "@\n@[<hov 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</ls_pos>"
       save_string ls.ls_name.id_string
       (ls_hash ls) save_pos pos
@@ -746,11 +753,17 @@ let save_file ctxt fmt _ f =
   List.iter (save_theory ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
-let get_prover_to_save prover_ids p (timelimits,memlimits) provers =
+let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
   let mostfrequent_timelimit,_ =
     Hashtbl.fold
       (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
       timelimits
+      (0,0)
+  in
+  let mostfrequent_steplimit,_ =
+    Hashtbl.fold
+      (fun s f ((_,f') as s') -> if f > f' then (s,f) else s')
+      steplimits
       (0,0)
   in
   let mostfrequent_memlimit,_ =
@@ -778,17 +791,22 @@ let get_prover_to_save prover_ids p (timelimits,memlimits) provers =
         PHprover.add prover_ids p !id;
         !id
   in
-  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers
+  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) provers
 
 
-let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_memlimit) =
+let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
+  let steplimit =
+    if mostfrequent_steplimit < 0 then None else Some mostfrequent_steplimit
+  in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
-               version=\"%a\"%a@ timelimit=\"%d\"@ memlimit=\"%d\"/>@]"
+               version=\"%a\"%a@ timelimit=\"%d\"%a@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
     p.C.prover_altern
-    mostfrequent_timelimit mostfrequent_memlimit
+    mostfrequent_timelimit
+    (opt pp_print_int "steplimit") steplimit
+    mostfrequent_memlimit
 
 let save fname shfname _config session =
   let ch = open_out fname in
@@ -811,8 +829,8 @@ let save fname shfname _config session =
   in
   let provers_to_save =
     Mprover.fold
-      (fun p (id,mostfrequent_timelimit,mostfrequent_memlimit) acc ->
-        Mint.add id (p,mostfrequent_timelimit,mostfrequent_memlimit) acc)
+      (fun p (id,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) acc ->
+        Mint.add id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) acc)
       provers Mint.empty
   in
   Mint.iter (save_prover fmt) provers_to_save;
@@ -936,7 +954,7 @@ type 'a keygen = ?parent:'a -> unit -> 'a
 let add_external_proof
     ?(notify=notify)
     ~(keygen:'a keygen) ~obsolete
-    ~archived ~timelimit ~memlimit ~edit (g:'a goal) p result =
+    ~archived ~timelimit ~steplimit ~memlimit ~edit (g:'a goal) p result =
   assert (edit <> Some "");
   let key = keygen ~parent:g.goal_key () in
   let a = { proof_prover = p;
@@ -946,6 +964,7 @@ let add_external_proof
             proof_archived = archived;
             proof_state = result;
             proof_timelimit = timelimit;
+	    proof_steplimit = steplimit;
             proof_memlimit = memlimit;
             proof_edited_as = edit;
           }
@@ -1137,7 +1156,7 @@ let int_attribute field r =
   try
     int_of_string (List.assoc field r.Xml.attributes)
   with Not_found | Invalid_argument _ ->
-    (** TODO: use real error *)
+    (* TODO: use real error *)
     eprintf "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name;
     assert false
@@ -1168,7 +1187,7 @@ let load_result r =
           match status with
             | "valid" -> Call_provers.Valid
             | "invalid" -> Call_provers.Invalid
-            | "unknown" -> Call_provers.Unknown ""
+            | "unknown" -> Call_provers.Unknown ("", None)
             | "timeout" -> Call_provers.Timeout
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
@@ -1194,7 +1213,7 @@ let load_result r =
           Call_provers.pr_output = "";
           Call_provers.pr_status = Unix.WEXITED 0;
 	  Call_provers.pr_steps = steps;
-	  Call_provers.pr_model = Model_parser.empty_model
+	  Call_provers.pr_model = Model_parser.default_model;
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited
@@ -1231,7 +1250,7 @@ let load_ident elt =
   Ident.id_register preid
 
 type 'key load_ctxt = {
-  old_provers : (Whyconf.prover * int * int) Mint.t ;
+  old_provers : (Whyconf.prover * int * int * int) Mint.t ;
   keygen : 'key keygen;
 }
 
@@ -1265,7 +1284,7 @@ and load_proof_or_transf ctxt mg a =
         let prover = string_attribute "prover" a in
         try
           let prover = int_of_string prover in
-          let (p,timelimit,memlimit) =Mint.find prover ctxt.old_provers in
+          let (p,timelimit,steplimit,memlimit) =Mint.find prover ctxt.old_provers in
           let res = match a.Xml.elements with
             | [r] -> load_result r
             | [] -> Interrupted
@@ -1278,6 +1297,7 @@ and load_proof_or_transf ctxt mg a =
           let obsolete = bool_attribute "obsolete" a false in
           let archived = bool_attribute "archived" a false in
           let timelimit = int_attribute_def "timelimit" a timelimit in
+	  let steplimit = int_attribute_def "steplimit" a steplimit in
           let memlimit = int_attribute_def "memlimit" a memlimit in
         (*
           if timelimit < 0 then begin
@@ -1289,7 +1309,7 @@ and load_proof_or_transf ctxt mg a =
         *)
           let (_ : 'a proof_attempt) =
             add_external_proof ~keygen:ctxt.keygen ~archived ~obsolete
-              ~timelimit ~memlimit ~edit mg p res
+              ~timelimit ~steplimit ~memlimit ~edit mg p res
           in
           ()
         with Failure _ | Not_found ->
@@ -1307,7 +1327,7 @@ and load_proof_or_transf ctxt mg a =
              [] a.Xml.elements);
         (* already done by raw_add_transformation:
            Hashtbl.add mg.transformations trname mtr *)
-        (** The attribute "proved" is required but not read *)
+        (* The attribute "proved" is required but not read *)
         mtr.transf_verified <- transf_verified mtr
     | "metas" -> load_metas ctxt mg a;
     | "label" -> ()
@@ -1349,7 +1369,7 @@ and load_metas ctxt mg a =
             let idpos_ts = Mts.add ts pos idpos.idpos_ts in
             { idpos with idpos_ts = idpos_ts }
           | "ls_pos" ->
-            (** TODO signature? *)
+            (* TODO signature? *)
             let ls = Term.create_lsymbol (Ident.id_fresh name) [] None in
             Hint.add hls intid ls;
             let idpos_ls = Mls.add ls pos idpos.idpos_ls in
@@ -1427,7 +1447,7 @@ and load_metas ctxt mg a =
     List.hd (load_goal ctxt (Parent_metas metas) [] goal);
   (* already done by raw_add_transformation:
      Hashtbl.add mg.transformations trname mtr *)
-  (** The attribute "proved" is required but not read *)
+  (* The attribute "proved" is required but not read *)
   metas.metas_verified <- metas_verified metas
 
 
@@ -1467,7 +1487,7 @@ let load_file ~keygen session old_provers f =
         mf.file_verified <- file_verified mf;
         old_provers
     | "prover" ->
-      (** The id is just for the session file *)
+      (* The id is just for the session file *)
         let id = string_attribute "id" f in
         begin
           try
@@ -1476,11 +1496,12 @@ let load_file ~keygen session old_provers f =
             let version = string_attribute "version" f in
             let altern = string_attribute_def "alternative" f "" in
             let timelimit = int_attribute_def "timelimit" f 5 in
+	    let steplimit = int_attribute_def "steplimit" f 1 in
             let memlimit = int_attribute_def "memlimit" f 1000 in
             let p = {C.prover_name = name;
                      prover_version = version;
                      prover_altern = altern} in
-            Mint.add id (p,timelimit,memlimit) old_provers
+            Mint.add id (p,timelimit,steplimit,memlimit) old_provers
           with Failure _ ->
             Warning.emit "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
             old_provers
@@ -1495,12 +1516,12 @@ let load_session ~keygen session xml =
       let shape_version = int_attribute_def "shape_version" xml 1 in
       session.session_shape_version <- shape_version;
       Debug.dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
-      (** just to keep the old_provers somewhere *)
+      (* just to keep the old_provers somewhere *)
       let old_provers =
         List.fold_left (load_file ~keygen session) Mint.empty xml.Xml.elements
       in
       Mint.iter
-        (fun id (p,_,_) ->
+        (fun id (p,_,_,_) ->
           Debug.dprintf debug "prover %d: %a@." id Whyconf.print_prover p;
           PHprover.replace session.session_prover_ids p id)
         old_provers;
@@ -1619,7 +1640,7 @@ let read_session_with_keys ~keygen dir =
   let xml_filename = Filename.concat dir db_filename in
   let session = empty_session dir in
   let use_shapes =
-  (** If the xml is present we read it, otherwise we consider it empty *)
+  (* If the xml is present we read it, otherwise we consider it empty *)
     if Sys.file_exists xml_filename then
       try
         Tc.reset_dict ();
@@ -1681,7 +1702,7 @@ let read_file env ?format fn =
   let ltheories =
     Mstr.fold
       (fun name th acc ->
-        (** Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
+        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
         let th_name =
           Ident.id_register (Ident.id_derive name th.Theory.th_name) in
          match th.Theory.th_name.Ident.id_loc with
@@ -1850,7 +1871,7 @@ let add_registered_metas ~keygen env added0 g =
     let add_meta task (s,l) =
       let m = Theory.lookup_meta s in
       Task.add_meta task m l in
-    (** add before the goal *)
+    (* add before the goal *)
     let task = List.fold_left add_meta task0 added0 in
     let task = add_tdecl task goal in
     let idpos = pos_of_metas added0 in
@@ -1909,7 +1930,7 @@ let ft_of_pa a =
     But since it will be perhaps removed...
  *)
 let copy_external_proof
-    ?notify ~keygen ?obsolete ?archived ?timelimit ?memlimit ?edit
+    ?notify ~keygen ?obsolete ?archived ?timelimit ?steplimit ?memlimit ?edit
     ?goal ?prover ?attempt_status ?env_session ?session a =
   let session = match env_session with
     | Some eS -> Some eS.session
@@ -1917,22 +1938,23 @@ let copy_external_proof
   let obsolete = Opt.get_def a.proof_obsolete obsolete in
   let archived = Opt.get_def a.proof_archived archived in
   let timelimit = Opt.get_def a.proof_timelimit timelimit in
+  let steplimit = Opt.get_def a.proof_steplimit steplimit in
   let memlimit = Opt.get_def a.proof_memlimit memlimit in
   let pas = Opt.get_def a.proof_state attempt_status in
   let ngoal = Opt.get_def a.proof_parent goal in
   let nprover = match prover with
     | None -> a.proof_prover
     | Some prover -> prover in
-  (** copy or generate the edit file if needed *)
+  (* copy or generate the edit file if needed *)
   let edit =
     match edit, a.proof_edited_as, session with
       | Some edit, _, _ -> edit
       | _, None, _ -> None
-      | _, _, None -> (** In the other case a session is needed *)
+      | _, _, None -> (* In the other case a session is needed *)
         None
       | _, Some file, Some session ->
         assert (file != "");
-        (** Copy the edited file *)
+        (* Copy the edited file *)
         let dir = session.session_dir in
         let file = Filename.concat dir file in
         if not (Sys.file_exists file) then None else
@@ -1943,7 +1965,7 @@ let copy_external_proof
             let dst_file = Sysutil.relativize_filename dir dst_file in
             Some dst_file
           | (_, _, None,_)| (_, _, _, None) ->
-            (** In the other cases an env_session and a task are needed *)
+            (* In the other cases an env_session and a task are needed *)
             None
           | _, _, Some task, Some env_session ->
             match load_prover env_session nprover with
@@ -1964,7 +1986,7 @@ let copy_external_proof
             Some (dst_file)
   in
   add_external_proof ?notify ~keygen
-    ~obsolete ~archived ~timelimit ~memlimit ~edit ngoal nprover pas
+    ~obsolete ~archived ~timelimit ~steplimit ~memlimit ~edit ngoal nprover pas
 
 exception UnloadableProver of Whyconf.prover
 
@@ -2021,10 +2043,10 @@ let print_attempt_status fmt = function
   | InternalFailure _ -> pp_print_string fmt "Failure"
 
 let print_external_proof fmt p =
-  fprintf fmt "%a - %a (%i, %i)%s%s%s"
+  fprintf fmt "%a - %a (%i, %i, %i)%s%s%s"
     Whyconf.print_prover p.proof_prover
     print_attempt_status p.proof_state
-    p.proof_timelimit p.proof_memlimit
+    p.proof_timelimit p.proof_steplimit p.proof_memlimit
     (if p.proof_obsolete then " obsolete" else "")
     (if p.proof_archived then " archived" else "")
     (if p.proof_edited_as <> None then " edited" else "")
@@ -2060,6 +2082,7 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
        ~obsolete
        ~archived:from_proof.proof_archived
        ~timelimit:from_proof.proof_timelimit
+       ~steplimit:from_proof.proof_steplimit
        ~memlimit:from_proof.proof_memlimit
        ~edit:from_proof.proof_edited_as
        to_goal
@@ -2078,11 +2101,11 @@ exception Pr_not_found of prsymbol
 
 
 let merge_metas_in_task ~theories env task from_metas =
-  (** Find in the new task the new symbol (ts,ls,pr) *)
-  (** We order the position bottom up and find the ident as we go
-      through the task *)
+  (* Find in the new task the new symbol (ts,ls,pr) *)
+  (* We order the position bottom up and find the ident as we go
+     through the task *)
 
-  (** hashtbl that will contain the conversion *)
+  (* hashtbl that will contain the conversion *)
   let hts = Hts.create 4 in
   let hls = Hls.create 4 in
   let hpr = Hpr.create 10 in
@@ -2137,7 +2160,7 @@ let merge_metas_in_task ~theories env task from_metas =
       meta_name
       (Pp.print_list Pp.space Pretty.print_meta_arg) meta_args in
 
-  (** Now convert the metas to the new symbol *)
+  (* Now convert the metas to the new symbol *)
   let add_meta ((metas,task) as acc) meta_name meta_args =
     let conv_ts ts = Hts.find_exn hts (Ts_not_found ts) ts in
     let conv_ls ls = Hls.find_exn hls (Ls_not_found ls) ls in
@@ -2221,9 +2244,9 @@ type 'key update_context =
 
 let rec recover_sub_tasks ~theories env_session task g =
   g.goal_task <- Some task;
-  (** Check that the sum and shape don't change (the order is kept)
-      It seems an acceptable limitation. Non-deterministic transformation seems
-      ugly.
+  (* Check that the sum and shape don't change (the order is kept)
+     It seems an acceptable limitation. Non-deterministic transformation seems
+     ugly.
   *)
   let version = env_session.session.session_shape_version in
   let sum = Termcode.task_checksum ~version task in
@@ -2241,8 +2264,8 @@ let rec recover_sub_tasks ~theories env_session task g =
   Mmetas_args.iter (fun _ t ->
       let task,_metas,_to_idpos,_obsolete =
         merge_metas_in_task ~theories env_session task t in
-      (** It is better to keep the original metas and idpos *)
-      (** If it is obsolete the next task will see it *)
+      (* It is better to keep the original metas and idpos *)
+      (* If it is obsolete the next task will see it *)
       recover_sub_tasks ~theories env_session task t.metas_goal
     ) g.goal_metas
 
@@ -2595,14 +2618,14 @@ and add_metas_to_goal ~keygen env to_goal from_metas =
       from_metas.metas_added from_metas.metas_idpos
   in
   let goal,task0 = Task.task_separate_goal (goal_task to_goal) in
-  (** add before the goal *)
+  (* add before the goal *)
   let task =
     try
       Mstr.fold_left
         (fun task name s ->
           let m = Theory.lookup_meta name in
           Smeta_args.fold_left
-            (fun task l -> Task.add_meta task m l) (** TODO: try with *)
+            (fun task l -> Task.add_meta task m l) (* TODO: try with *)
             task s)
         task0 from_metas.metas_added
     with exn ->

@@ -9,13 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {1 Program Declarations} *)
+
 open Ident
 open Term
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
-(** *)
 
 (** {2 Type declaration} *)
 
@@ -39,6 +40,13 @@ and pdecl_node = private
   | PDlet  of let_defn
   | PDrec  of fun_defn list
   | PDexn  of xsymbol
+
+(** {2 Marks} *)
+
+val ts_mark : Ty.tysymbol
+val ty_mark : Ty.ty
+val ity_mark : ity
+val pv_old : pvsymbol
 
 (** {2 Declaration constructors} *)
 

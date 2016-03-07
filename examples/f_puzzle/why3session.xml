@@ -2,7 +2,6 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="4000"/>
@@ -10,19 +9,20 @@
 <prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
 <prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
+<prover id="8" name="Eprover" version="1.8-001" timelimit="5" memlimit="4000"/>
 <file name="../f_puzzle.why" expanded="true">
 <theory name="Puzzle" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
 <theory name="Step1" sum="c6982815f07de3d63e8073ac62ff3ef6" expanded="true">
  <goal name="I1.base" expanded="true">
- <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="6" memlimit="1000"><result status="valid" time="0.01" steps="3"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="I1.induction_step" expanded="true">
  <proof prover="4" memlimit="1000"><result status="valid" time="0.37"/></proof>
@@ -31,28 +31,28 @@
 </theory>
 <theory name="Solution" sum="91b74543979bf87712b2c979d9d3726a" expanded="true">
  <goal name="L3" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.06"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
+ <proof prover="8"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="L4" expanded="true">
- <proof prover="0" memlimit="1000"><result status="valid" time="3.20"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="3.22"/></proof>
- <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="8" memlimit="1000"><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="I2.base" expanded="true">
- <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="6" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <proof prover="6" memlimit="1000"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="I2.induction_step" expanded="true">
- <proof prover="6" memlimit="1000"><result status="valid" time="0.84"/></proof>
+ <proof prover="6" memlimit="1000"><result status="valid" time="0.84" steps="59"/></proof>
  <metas
   expanded="true">
   <ts_pos name="real" arity="0" id="2"
@@ -67,183 +67,183 @@
    <ip_library name="BuiltIn"/>
    <ip_qualid name="infix ="/>
   </ls_pos>
-  <ls_pos name="zero" id="132"
+  <ls_pos name="zero" id="136"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="zero"/>
   </ls_pos>
-  <ls_pos name="one" id="133"
+  <ls_pos name="one" id="137"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="one"/>
   </ls_pos>
-  <ls_pos name="infix &lt;" id="134"
+  <ls_pos name="infix &lt;" id="138"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="infix &lt;"/>
   </ls_pos>
-  <ls_pos name="infix &gt;" id="137"
+  <ls_pos name="infix &gt;" id="141"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="infix &gt;"/>
   </ls_pos>
-  <ls_pos name="infix +" id="1303"
+  <ls_pos name="infix +" id="1307"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="infix +"/>
   </ls_pos>
-  <ls_pos name="prefix -" id="1304"
+  <ls_pos name="prefix -" id="1308"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="prefix -"/>
   </ls_pos>
-  <ls_pos name="infix *" id="1305"
+  <ls_pos name="infix *" id="1309"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="infix *"/>
   </ls_pos>
-  <ls_pos name="infix -" id="1353"
+  <ls_pos name="infix -" id="1357"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="infix -"/>
   </ls_pos>
-  <ls_pos name="infix &gt;=" id="1373"
+  <ls_pos name="infix &gt;=" id="1377"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="infix &gt;="/>
   </ls_pos>
-  <ls_pos name="f" id="2080" ip_theory="Puzzle">
+  <ls_pos name="f" id="2161" ip_theory="Puzzle">
    <ip_qualid name="f"/>
   </ls_pos>
-  <ls_pos name="p" id="2089" ip_theory="Step1">
+  <ls_pos name="p" id="2170" ip_theory="Step1">
    <ip_qualid name="p"/>
   </ls_pos>
-  <pr_pos name="Assoc" id="1306"
+  <pr_pos name="Assoc" id="1310"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CommutativeGroup"/>
    <ip_qualid name="Assoc"/>
   </pr_pos>
-  <pr_pos name="Unit_def_l" id="1313"
+  <pr_pos name="Unit_def_l" id="1317"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CommutativeGroup"/>
    <ip_qualid name="Unit_def_l"/>
   </pr_pos>
-  <pr_pos name="Unit_def_r" id="1316"
+  <pr_pos name="Unit_def_r" id="1320"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CommutativeGroup"/>
    <ip_qualid name="Unit_def_r"/>
   </pr_pos>
-  <pr_pos name="Inv_def_l" id="1319"
+  <pr_pos name="Inv_def_l" id="1323"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CommutativeGroup"/>
    <ip_qualid name="Inv_def_l"/>
   </pr_pos>
-  <pr_pos name="Inv_def_r" id="1322"
+  <pr_pos name="Inv_def_r" id="1326"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CommutativeGroup"/>
    <ip_qualid name="Inv_def_r"/>
   </pr_pos>
-  <pr_pos name="Comm" id="1325"
+  <pr_pos name="Comm" id="1329"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CommutativeGroup"/>
    <ip_qualid name="Comm"/>
    <ip_qualid name="Comm"/>
   </pr_pos>
-  <pr_pos name="Assoc" id="1330"
+  <pr_pos name="Assoc" id="1334"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Assoc"/>
    <ip_qualid name="Assoc"/>
   </pr_pos>
-  <pr_pos name="Mul_distr_l" id="1337"
+  <pr_pos name="Mul_distr_l" id="1341"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Mul_distr_l"/>
   </pr_pos>
-  <pr_pos name="Mul_distr_r" id="1344"
+  <pr_pos name="Mul_distr_r" id="1348"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Mul_distr_r"/>
   </pr_pos>
-  <pr_pos name="Comm" id="1362"
+  <pr_pos name="Comm" id="1366"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Comm"/>
    <ip_qualid name="Comm"/>
   </pr_pos>
-  <pr_pos name="Unitary" id="1367"
+  <pr_pos name="Unitary" id="1371"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Unitary"/>
   </pr_pos>
-  <pr_pos name="NonTrivialRing" id="1370"
+  <pr_pos name="NonTrivialRing" id="1374"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="NonTrivialRing"/>
   </pr_pos>
-  <pr_pos name="Refl" id="1382"
+  <pr_pos name="Refl" id="1386"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Refl"/>
   </pr_pos>
-  <pr_pos name="Trans" id="1385"
+  <pr_pos name="Trans" id="1389"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Trans"/>
   </pr_pos>
-  <pr_pos name="Antisymm" id="1392"
+  <pr_pos name="Antisymm" id="1396"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Antisymm"/>
   </pr_pos>
-  <pr_pos name="Total" id="1397"
+  <pr_pos name="Total" id="1401"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="Total"/>
   </pr_pos>
-  <pr_pos name="ZeroLessOne" id="1402"
+  <pr_pos name="ZeroLessOne" id="1406"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="ZeroLessOne"/>
   </pr_pos>
-  <pr_pos name="CompatOrderAdd" id="1403"
+  <pr_pos name="CompatOrderAdd" id="1407"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CompatOrderAdd"/>
   </pr_pos>
-  <pr_pos name="CompatOrderMult" id="1410"
+  <pr_pos name="CompatOrderMult" id="1414"
    ip_theory="Int">
    <ip_library name="int"/>
    <ip_qualid name="CompatOrderMult"/>
   </pr_pos>
-  <pr_pos name="H1" id="2082" ip_theory="Puzzle">
+  <pr_pos name="H1" id="2163" ip_theory="Puzzle">
    <ip_qualid name="H1"/>
   </pr_pos>
-  <pr_pos name="base" id="2097"
+  <pr_pos name="base" id="2178"
    ip_theory="Step1">
    <ip_qualid name="I1"/>
    <ip_qualid name="base"/>
   </pr_pos>
-  <pr_pos name="induction_step" id="2098"
+  <pr_pos name="induction_step" id="2179"
    ip_theory="Step1">
    <ip_qualid name="I1"/>
    <ip_qualid name="induction_step"/>
   </pr_pos>
-  <pr_pos name="SimpleInduction" id="2100"
+  <pr_pos name="SimpleInduction" id="2181"
    ip_theory="Step1">
    <ip_qualid name="I1"/>
    <ip_qualid name="SimpleInduction"/>
   </pr_pos>
-  <pr_pos name="L4" id="2106" ip_theory="Solution">
+  <pr_pos name="L4" id="2187" ip_theory="Solution">
    <ip_qualid name="L4"/>
   </pr_pos>
-  <pr_pos name="base" id="2120"
+  <pr_pos name="base" id="2201"
    ip_theory="Solution">
    <ip_qualid name="I2"/>
    <ip_qualid name="base"/>
@@ -252,112 +252,112 @@
    <meta_arg_ls id="10"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="132"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="133"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="134"/>
+   <meta_arg_ls id="136"/>
   </meta>
   <meta name="remove_logic">
    <meta_arg_ls id="137"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="1303"/>
+   <meta_arg_ls id="138"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="1304"/>
+   <meta_arg_ls id="141"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="1305"/>
+   <meta_arg_ls id="1307"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="1353"/>
+   <meta_arg_ls id="1308"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="1373"/>
+   <meta_arg_ls id="1309"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="2080"/>
+   <meta_arg_ls id="1357"/>
   </meta>
   <meta name="remove_logic">
-   <meta_arg_ls id="2089"/>
+   <meta_arg_ls id="1377"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="2161"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="2170"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1306"/>
+   <meta_arg_pr id="1310"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1313"/>
+   <meta_arg_pr id="1317"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1316"/>
+   <meta_arg_pr id="1320"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1319"/>
+   <meta_arg_pr id="1323"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1322"/>
+   <meta_arg_pr id="1326"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1325"/>
+   <meta_arg_pr id="1329"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1330"/>
+   <meta_arg_pr id="1334"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1337"/>
+   <meta_arg_pr id="1341"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1344"/>
+   <meta_arg_pr id="1348"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1362"/>
+   <meta_arg_pr id="1366"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1367"/>
+   <meta_arg_pr id="1371"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1370"/>
+   <meta_arg_pr id="1374"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1382"/>
+   <meta_arg_pr id="1386"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1385"/>
+   <meta_arg_pr id="1389"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1392"/>
+   <meta_arg_pr id="1396"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1397"/>
+   <meta_arg_pr id="1401"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1402"/>
+   <meta_arg_pr id="1406"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1403"/>
+   <meta_arg_pr id="1407"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="1410"/>
+   <meta_arg_pr id="1414"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="2082"/>
+   <meta_arg_pr id="2163"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="2097"/>
+   <meta_arg_pr id="2178"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="2098"/>
+   <meta_arg_pr id="2179"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="2100"/>
+   <meta_arg_pr id="2181"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="2106"/>
+   <meta_arg_pr id="2187"/>
   </meta>
   <meta name="remove_prop">
-   <meta_arg_pr id="2120"/>
+   <meta_arg_pr id="2201"/>
   </meta>
   <meta name="remove_type">
    <meta_arg_ts id="2"/>
@@ -367,26 +367,26 @@
    <goal name="induction_step.1" expl="1." expanded="true">
    <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.16"/></proof>
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="6" memlimit="1000"><result status="valid" time="0.04" steps="26"/></proof>
    </goal>
   </transf>
   </goal>
  </metas>
  </goal>
  <goal name="L5" expanded="true">
- <proof prover="0"><result status="valid" time="0.05"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.04"/></proof>
+ <proof prover="8"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="L6" expanded="true">
- <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="G" expanded="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.35"/></proof>
  <proof prover="5"><result status="valid" time="0.14"/></proof>
- <proof prover="6"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
 </theory>
 </file>

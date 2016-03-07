@@ -2,130 +2,162 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="10" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="10" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.3" timelimit="10" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.2" timelimit="10" memlimit="1000"/>
-<file name="../linked_list_rev.mlw">
-<theory name="Disjoint" sum="9c582db93bf8e816b74d113c3748231e">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="10" steplimit="1" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.4.0" timelimit="36" memlimit="1000"/>
+<file name="../linked_list_rev.mlw" expanded="true">
+<theory name="Disjoint" sum="d9538770c8f60c61e92f6baffbf62d5d">
  <goal name="WP_parameter mem_decomp" expl="VC for mem_decomp">
- <proof prover="2"><result status="valid" time="0.02" steps="54"/></proof>
+ <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="48"/></proof>
  </goal>
 </theory>
-<theory name="InPlaceRev" sum="6f1515477f42e0629a5741cced45aef5">
+<theory name="InPlaceRev" sum="79182a5e3856c7f8aff3c51d7a23476f">
  <goal name="WP_parameter list_seg_frame_ext" expl="VC for list_seg_frame_ext">
- <proof prover="2"><result status="valid" time="0.16" steps="278"/></proof>
+ <proof prover="3" timelimit="5"><result status="valid" time="0.16" steps="236"/></proof>
  </goal>
  <goal name="WP_parameter list_seg_functional" expl="VC for list_seg_functional">
- <proof prover="2"><result status="valid" time="0.10" steps="326"/></proof>
+ <proof prover="3" timelimit="5"><result status="valid" time="0.10" steps="278"/></proof>
  </goal>
  <goal name="WP_parameter list_seg_sublistl" expl="VC for list_seg_sublistl">
- <proof prover="0" timelimit="5"><result status="valid" time="0.29"/></proof>
+ <proof prover="0"><result status="valid" time="0.28"/></proof>
  </goal>
  <goal name="WP_parameter list_seg_no_repet" expl="VC for list_seg_no_repet">
- <proof prover="2"><result status="valid" time="0.72" steps="241"/></proof>
+ <proof prover="3" timelimit="5"><result status="valid" time="0.05" steps="179"/></proof>
  </goal>
  <goal name="WP_parameter list_seg_append" expl="VC for list_seg_append">
- <proof prover="2"><result status="valid" time="0.48" steps="712"/></proof>
+ <proof prover="3" timelimit="5"><result status="valid" time="0.23" steps="615"/></proof>
  </goal>
  <goal name="WP_parameter app" expl="VC for app">
  <transf name="split_goal_wp">
   <goal name="WP_parameter app.1" expl="1. postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="40"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter app.2" expl="2. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter app.3" expl="3. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter app.4" expl="4. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter app.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter app.6" expl="6. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter app.7" expl="7. precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter app.8" expl="8. unreachable point">
-  <proof prover="2"><result status="valid" time="0.06" steps="89"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="76"/></proof>
   </goal>
   <goal name="WP_parameter app.9" expl="9. precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter app.10" expl="10. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter app.11" expl="11. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter app.12" expl="12. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.08" steps="121"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.08" steps="137"/></proof>
   </goal>
   <goal name="WP_parameter app.13" expl="13. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.22" steps="152"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="180"/></proof>
   </goal>
   <goal name="WP_parameter app.14" expl="14. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="2.05" steps="614"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.32" steps="670"/></proof>
   </goal>
   <goal name="WP_parameter app.15" expl="15. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.03" steps="44"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.03" steps="46"/></proof>
   </goal>
   <goal name="WP_parameter app.16" expl="16. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter app.17" expl="17. assertion">
-  <proof prover="2"><result status="valid" time="0.16" steps="101"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter app.18" expl="18. assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter app.19" expl="19. assertion">
-  <proof prover="2"><result status="valid" time="0.65" steps="235"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.32" steps="283"/></proof>
   </goal>
   <goal name="WP_parameter app.20" expl="20. postcondition">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.23"/></proof>
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter in_place_reverse" expl="VC for in_place_reverse">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter in_place_reverse.1" expl="1. loop invariant init">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="1"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.2" expl="2. loop invariant init">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.3" expl="3. loop invariant init">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.4" expl="4. loop invariant init">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.5" expl="5. assertion">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.09" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.6" expl="6. unreachable point">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.05" steps="140"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.7" expl="7. loop invariant preservation">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.30" steps="526"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.8" expl="8. loop invariant preservation">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.11" steps="215"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.9" expl="9. loop invariant preservation">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.56" steps="405"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.10" expl="10. loop invariant preservation">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.11" expl="11. loop variant decrease">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="58"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.12" expl="12. postcondition">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="139"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceRevSeq" sum="068ee82c25a0ff944ca4fedde3b37f6b">
+<theory name="InPlaceRevSeq" sum="98a75103e20b687045d666de85976237" expanded="true">
+ <goal name="non_empty_seq">
+ <proof prover="3"><result status="valid" time="0.02" steps="22"/></proof>
+ </goal>
  <goal name="WP_parameter mem_decomp" expl="VC for mem_decomp">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter mem_decomp.1" expl="1. unreachable point">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="5"/></proof>
+  <goal name="WP_parameter mem_decomp.1" expl="1. postcondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter mem_decomp.2" expl="2. postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="42"/></proof>
+  <goal name="WP_parameter mem_decomp.2" expl="2. assertion">
+  <proof prover="3" timelimit="36" steplimit="-1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter mem_decomp.3" expl="3. variant decrease">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter mem_decomp.4" expl="4. precondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter mem_decomp.4.1" expl="1. precondition">
-   <proof prover="5"><result status="valid" time="3.64"/></proof>
-   </goal>
-  </transf>
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter mem_decomp.5" expl="5. postcondition">
-  <proof prover="5"><result status="valid" time="1.09"/></proof>
+  <proof prover="3" timelimit="36" steplimit="-1"><result status="valid" time="0.12" steps="165"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="list_seg_frame_ext">
  <proof prover="3"><result status="valid" time="0.02" steps="28"/></proof>
- </goal>
- <goal name="non_empty_seq">
- <proof prover="3"><result status="valid" time="0.02" steps="22"/></proof>
  </goal>
  <goal name="WP_parameter list_seg_functional" expl="VC for list_seg_functional">
  <transf name="split_goal_wp">
@@ -133,13 +165,15 @@
   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_functional.2" expl="2. variant decrease">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="6" timelimit="5" steplimit="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_functional.3" expl="3. precondition">
-  <proof prover="4"><result status="valid" time="0.33"/></proof>
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.15" steps="258"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_functional.4" expl="4. precondition">
-  <proof prover="4"><result status="valid" time="0.22"/></proof>
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.16" steps="262"/></proof>
+  <proof prover="6" timelimit="5" steplimit="1"><result status="valid" time="1.95"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_functional.5" expl="5. postcondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
@@ -152,24 +186,55 @@
  <goal name="WP_parameter list_seg_tail" expl="VC for list_seg_tail">
  <transf name="split_goal_wp">
   <goal name="WP_parameter list_seg_tail.1" expl="1. variant decrease">
-  <proof prover="3" timelimit="80"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_tail.2" expl="2. precondition">
-  <proof prover="3" timelimit="80"><result status="valid" time="0.12" steps="192"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="192"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_tail.3" expl="3. precondition">
-  <proof prover="3" timelimit="80"><result status="valid" time="0.03" steps="17"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_tail.4" expl="4. postcondition">
-  <proof prover="3" timelimit="80"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_tail.5" expl="5. postcondition">
-  <proof prover="3" timelimit="80"><result status="valid" time="0.04" steps="24"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="24"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter list_seg_append" expl="VC for list_seg_append">
- <proof prover="5"><result status="valid" time="5.06"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter list_seg_append.1" expl="1. variant decrease">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="22"/></proof>
+  <proof prover="5" timelimit="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter list_seg_append.2" expl="2. precondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="5" timelimit="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter list_seg_append.3" expl="3. precondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="3"/></proof>
+  <proof prover="5" timelimit="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter list_seg_append.4" expl="4. postcondition">
+  <transf name="inline_goal">
+   <goal name="WP_parameter list_seg_append.4.1" expl="1. postcondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter list_seg_append.4.1.1" expl="1. postcondition">
+    <proof prover="5" timelimit="36" steplimit="-1"><result status="valid" time="4.58"/></proof>
+    </goal>
+    <goal name="WP_parameter list_seg_append.4.1.2" expl="2. postcondition">
+    <proof prover="5" timelimit="36" steplimit="-1"><result status="valid" time="2.86"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter list_seg_append.5" expl="5. postcondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.09" steps="147"/></proof>
+  <proof prover="5" timelimit="6"><result status="valid" time="0.94"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="seq_tail_append">
  <proof prover="3"><result status="valid" time="0.05" steps="52"/></proof>
@@ -180,7 +245,7 @@
   <proof prover="3"><result status="valid" time="0.03" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_prefix.2" expl="2. precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_prefix.3" expl="3. variant decrease">
   <proof prover="3"><result status="valid" time="0.06" steps="22"/></proof>
@@ -189,10 +254,21 @@
   <proof prover="3"><result status="valid" time="0.05" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_prefix.5" expl="5. postcondition">
-  <proof prover="5"><result status="valid" time="3.45"/></proof>
+  <transf name="inline_goal">
+   <goal name="WP_parameter list_seg_prefix.5.1" expl="1. postcondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter list_seg_prefix.5.1.1" expl="1. postcondition">
+    <proof prover="6"><result status="valid" time="0.33"/></proof>
+    </goal>
+    <goal name="WP_parameter list_seg_prefix.5.1.2" expl="2. postcondition">
+    <proof prover="6"><result status="valid" time="0.45"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="WP_parameter list_seg_prefix.6" expl="6. postcondition">
-  <proof prover="3"><result status="valid" time="2.09" steps="1137"/></proof>
+  <proof prover="3"><result status="valid" time="0.98" steps="744"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
@@ -209,16 +285,17 @@
   <proof prover="3"><result status="valid" time="0.03" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_sublistl.4" expl="4. variant decrease">
-  <proof prover="3" timelimit="25"><result status="valid" time="0.02" steps="69"/></proof>
+  <proof prover="3"><result status="valid" time="0.14" steps="69"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_sublistl.5" expl="5. precondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.03" steps="88"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_sublistl.6" expl="6. postcondition">
-  <proof prover="3" timelimit="25"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_sublistl.7" expl="7. postcondition">
-  <proof prover="3" timelimit="25"><result status="valid" time="0.44" steps="529"/></proof>
+  <proof prover="3"><result status="valid" time="0.36" steps="571"/></proof>
   </goal>
  </transf>
  </goal>
@@ -236,7 +313,7 @@
   <goal name="WP_parameter list_seg_no_repet.2" expl="2. precondition">
   <transf name="introduce_premises">
    <goal name="WP_parameter list_seg_no_repet.2.1" expl="1. precondition">
-   <proof prover="0"><result status="valid" time="0.10"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="0.12"/></proof>
    </goal>
   </transf>
   </goal>
@@ -247,19 +324,19 @@
   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.5" expl="5. assertion">
-  <proof prover="3"><result status="valid" time="0.11" steps="74"/></proof>
+  <proof prover="3"><result status="valid" time="0.11" steps="78"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.6" expl="6. postcondition">
   <proof prover="3"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.7" expl="7. assertion">
-  <proof prover="3" timelimit="70"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.8" expl="8. variant decrease">
-  <proof prover="3" timelimit="70"><result status="valid" time="0.04" steps="25"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.9" expl="9. precondition">
-  <proof prover="3" timelimit="70"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.10" expl="10. assertion">
   <transf name="inline_trivial">
@@ -273,7 +350,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.11" expl="11. postcondition">
-  <proof prover="3" timelimit="70"><result status="valid" time="0.03" steps="12"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter list_seg_no_repet.12" expl="12. postcondition">
   <proof prover="3"><result status="valid" time="0.03" steps="5"/></proof>
@@ -285,50 +362,56 @@
   <goal name="WP_parameter app.1" expl="1. postcondition">
   <proof prover="3"><result status="valid" time="0.04" steps="106"/></proof>
   </goal>
-  <goal name="WP_parameter app.2" expl="2. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.03" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter app.3" expl="3. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.03" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter app.4" expl="4. loop invariant init">
+  <goal name="WP_parameter app.2" expl="2. precondition">
   <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
+  <goal name="WP_parameter app.3" expl="3. loop invariant init">
+  <proof prover="3"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter app.4" expl="4. loop invariant init">
+  <proof prover="3"><result status="valid" time="0.03" steps="15"/></proof>
+  </goal>
   <goal name="WP_parameter app.5" expl="5. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="3" timelimit="36" steplimit="-1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter app.6" expl="6. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter app.7" expl="7. precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="9"/></proof>
+  <goal name="WP_parameter app.7" expl="7. loop invariant init">
+  <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter app.8" expl="8. assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
+  <goal name="WP_parameter app.8" expl="8. precondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter app.9" expl="9. precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
+  <goal name="WP_parameter app.9" expl="9. assertion">
+  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter app.10" expl="10. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
+  <goal name="WP_parameter app.10" expl="10. assertion">
+  <proof prover="3" timelimit="36" steplimit="-1"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter app.11" expl="11. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.10"/></proof>
+  <goal name="WP_parameter app.11" expl="11. precondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter app.12" expl="12. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter app.13" expl="13. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="3.12"/></proof>
+  </goal>
+  <goal name="WP_parameter app.14" expl="14. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter app.15" expl="15. loop invariant preservation">
   <transf name="introduce_premises">
-   <goal name="WP_parameter app.13.1" expl="1. loop invariant preservation">
+   <goal name="WP_parameter app.15.1" expl="1. loop invariant preservation">
    <transf name="inline_goal">
-    <goal name="WP_parameter app.13.1.1" expl="1. loop invariant preservation">
+    <goal name="WP_parameter app.15.1.1" expl="1. loop invariant preservation">
     <transf name="split_goal_wp">
-     <goal name="WP_parameter app.13.1.1.1" expl="1. VC for app">
-     <proof prover="3"><result status="valid" time="0.14" steps="123"/></proof>
+     <goal name="WP_parameter app.15.1.1.1" expl="1. VC for app">
+     <proof prover="3"><result status="valid" time="0.09" steps="135"/></proof>
      </goal>
-     <goal name="WP_parameter app.13.1.1.2" expl="2. VC for app">
-     <proof prover="5"><result status="valid" time="1.15"/></proof>
+     <goal name="WP_parameter app.15.1.1.2" expl="2. VC for app">
+     <proof prover="5"><result status="valid" time="2.66"/></proof>
      </goal>
     </transf>
     </goal>
@@ -336,30 +419,84 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter app.14" expl="14. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="3.11"/></proof>
+  <goal name="WP_parameter app.16" expl="16. loop invariant preservation">
+  <proof prover="0" timelimit="36" steplimit="-1"><result status="valid" time="6.21"/></proof>
   </goal>
-  <goal name="WP_parameter app.15" expl="15. loop variant decrease">
-  <proof prover="3"><result status="valid" time="1.08" steps="346"/></proof>
+  <goal name="WP_parameter app.17" expl="17. loop variant decrease">
+  <proof prover="3"><result status="valid" time="0.85" steps="388"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter app.16" expl="16. precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="WP_parameter app.18" expl="18. precondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter app.17" expl="17. assertion">
-  <proof prover="3"><result status="valid" time="0.23" steps="109"/></proof>
+  <goal name="WP_parameter app.19" expl="19. assertion">
+  <proof prover="3"><result status="valid" time="0.21" steps="107"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter app.18" expl="18. assertion">
-  <proof prover="3"><result status="valid" time="2.34" steps="613"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter app.20" expl="20. assertion">
+  <proof prover="3"><result status="valid" time="8.12" steps="2082"/></proof>
+  <proof prover="5"><result status="valid" time="0.67"/></proof>
   </goal>
-  <goal name="WP_parameter app.19" expl="19. assertion">
+  <goal name="WP_parameter app.21" expl="21. assertion">
   <proof prover="5"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter app.20" expl="20. postcondition">
-  <proof prover="5"><result status="valid" time="0.51"/></proof>
+  <goal name="WP_parameter app.22" expl="22. postcondition">
+  <proof prover="6" timelimit="6"><result status="valid" time="4.58"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter in_place_reverse" expl="VC for in_place_reverse">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter in_place_reverse.1" expl="1. loop invariant init">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="1"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.2" expl="2. loop invariant init">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.3" expl="3. loop invariant init">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.4" expl="4. loop invariant init">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.5" expl="5. precondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.6" expl="6. precondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.7" expl="7. assertion">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.08" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.8" expl="8. loop invariant preservation">
+  <proof prover="3" steplimit="-1"><result status="valid" time="4.50" steps="2689"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.9" expl="9. loop invariant preservation">
+  <proof prover="6" timelimit="6"><result status="valid" time="11.12"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.10" expl="10. loop invariant preservation">
+  <proof prover="5" timelimit="16" steplimit="-1"><result status="valid" time="0.51"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.11" expl="11. loop invariant preservation">
+  <transf name="inline_goal">
+   <goal name="WP_parameter in_place_reverse.11.1" expl="1. loop invariant preservation">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter in_place_reverse.11.1.1" expl="1. VC for in_place_reverse">
+    <proof prover="3" timelimit="36" steplimit="-1"><result status="valid" time="0.07" steps="81"/></proof>
+    </goal>
+    <goal name="WP_parameter in_place_reverse.11.1.2" expl="2. VC for in_place_reverse">
+    <proof prover="3" timelimit="36" steplimit="-1"><result status="valid" time="12.39" steps="2292"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.12" expl="12. loop variant decrease">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.41" steps="264"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.13" expl="13. postcondition">
+  <proof prover="3" steplimit="-1"><result status="valid" time="0.43" steps="1067"/></proof>
   </goal>
  </transf>
  </goal>

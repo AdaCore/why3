@@ -1,0 +1,50 @@
+
+module Ctx
+  
+  (* Variable contexts. *)
+  
+  use import support.HO
+  
+  type context 'p 'l
+  function c_ldom (context 'p 'l) : 'l -> bool
+  function c_pdom (context 'p 'l) : 'p -> bool
+  function c_ltp (context 'p 'l) : 'l -> 'p
+  function c_ptl (context 'p 'l) : 'p -> 'l
+  
+  predicate context_pred (ld:'l -> bool) (pd:'p -> bool)
+    (ltp:'l -> 'p) (ptl:'p -> 'l) =
+    maps_to ld ltp pd /\ maps_to pd ptl ld /\
+    (forall x. ld x -> ptl (ltp x) = x) /\ (forall x. pd x -> ltp (ptl x) = x)
+  predicate context_inv (c:context 'p 'l) =
+    context_pred c.c_ldom c.c_pdom c.c_ltp c.c_ptl
+  axiom context_inv : forall c:context 'p 'l. context_inv c
+  
+  function make_context (ld:'l -> bool) (pd:'p -> bool)
+                        (ltp:'l -> 'p) (ptl:'p -> 'l) : context 'p 'l
+  axiom make_context_ok : forall ld pd,ltp:'l -> 'p,ptl.
+    context_pred ld pd ltp ptl -> let u = make_context ld pd ltp ptl in
+      u.c_ldom = ld /\ u.c_pdom = pd /\ u.c_ltp = ltp /\ u.c_ptl = ptl
+  
+  let ghost make_context (ld:'l -> bool) (pd:'p -> bool)
+                         (ltp:'l -> 'p) (ptl:'p -> 'l) : context 'p 'l
+    requires { context_pred ld pd ltp ptl }
+    ensures { let r = result in r = make_context ld pd ltp ptl /\
+      r.c_ldom = ld /\ r.c_pdom = pd /\ r.c_ltp = ltp /\ r.c_ptl = ptl }
+  = make_context ld pd ltp ptl
+  
+  predicate context_inj (c1:context 'p 'l1) (f:'l1 -> 'l2) (c2:context 'p 'l2) =
+    forall x. c1.c_pdom x -> c2.c_pdom x /\ c2.c_ptl x = f (c1.c_ptl x)
+  
+  let lemma context_inj_maps_to
+    (c1:context 'p 'l1) (f:'l1 -> 'l2) (c2:context 'p 'l2) : unit
+    ensures { context_inj c1 f c2 -> maps_to c1.c_ldom f c2.c_ldom }
+  = ()
+  
+  predicate sub_context (c1 c2:context 'p 'l) = context_inj c1 id c2
+  
+  let lemma sub_context_subset (c1 c2:context 'p 'l) : unit
+    ensures { sub_context c1 c2 -> subset c1.c_ldom c2.c_ldom }
+  = ()
+  
+end
+

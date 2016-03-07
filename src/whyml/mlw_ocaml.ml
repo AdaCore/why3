@@ -26,20 +26,8 @@
   - singleton types
     record/constructor fields of type unit
 
-  - preludes
-
-  - command line
-
-  - drivers:
-
-    we'd like to use both ocaml64.drv from the lib and a local
-    driver (specific to the files being extracted) but currently
-
-    - only one driver is allowed on the extraction command line
-
-    - import "ocaml64" in the local driver fails, because it's looking
-      for a file ocaml64 in the local directory (and not for ocaml64.drv
-      in the library)
+  - ghost code
+    remove it as much as possible (in types and function arguments)
 
 *)
 
@@ -173,6 +161,7 @@ type info = {
   th_known_map: Decl.known_map;
   mo_known_map: Mlw_decl.known_map;
   fname: string option;
+  unsafe_int: bool;
 }
 
 module Translate = struct
@@ -264,7 +253,7 @@ module Translate = struct
     if has_syntax info ts.ts_name || is_record d then []
     else projections info d
 
-  let filter_ghost ls def al =
+  let filter_ghost_fields ls def al =
     let flt fd arg = if fd.Mlw_expr.fd_ghost then def else arg in
     try List.map2 flt (Mlw_expr.restore_pl ls).Mlw_expr.pl_args al
     with Not_found -> al
@@ -285,7 +274,7 @@ module Translate = struct
         | Some s -> ML.Psyntax (s, List.map (pat info) pl)
         | None ->
           let pat_void = Term.pat_app Mlw_expr.fs_void [] Mlw_ty.ty_unit in
-          let pl = filter_ghost cs pat_void pl in
+          let pl = filter_ghost_fields cs pat_void pl in
           let pjl = get_record info cs in
           if pjl = [] then
             ML.Papp (cs.ls_name, List.map (pat info) pl)
@@ -331,7 +320,7 @@ module Translate = struct
     let id = ls.ls_name in
     match tl with
       | tl when isconstr ->
-          let tl = filter_ghost ls Mlw_expr.t_void tl in
+          let tl = filter_ghost_fields ls Mlw_expr.t_void tl in
           let pjl = get_record info ls in
           if pjl = [] then
             ML.Econstr (id, List.map (term info) tl)
@@ -358,9 +347,10 @@ module Translate = struct
         assert false
     | Tapp (fs, tl) when is_fs_tuple fs ->
         ML.etuple (List.map (term info) tl)
-    | Tapp (fs, [t1; t2])
-      when ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
-        ML.Esyntax ("(Why3__BigInt.eq %1 %2)", [term info t1; term info t2])
+    | Tapp (fs, [t1; t2]) when not info.unsafe_int
+        && ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
+        ML.Esyntax ("(Why3extract.Why3__BigInt.eq %1 %2)",
+                    [term info t1; term info t2])
     | Tapp (fs, tl) ->
         begin match query_syntax info.info_syn fs.ls_name with
         | Some s -> ML.Esyntax (s, List.map (term info) tl)
@@ -457,8 +447,6 @@ module Translate = struct
         | None -> ML.Tapp (ts.ts_name, List.map (ity info) tl)
         end
 
-  let ity_mark = ity_pur Mlw_wp.ts_mark []
-
   let is_underscore pv =
     pv.pv_vs.vs_name.id_string = "_" && ity_equal pv.pv_ity ity_unit
 
@@ -484,6 +472,13 @@ module Translate = struct
     | [fd] -> fd.fun_lambda.l_spec.c_letrec <> 0
     | _ -> true
 
+  let filter_ghost_params =
+    let dummy = create_pvsymbol (Ident.id_fresh "") ity_unit in
+    fun args ->
+    match List.filter (fun v -> not v.Mlw_ty.pv_ghost) args with
+    | [] -> [dummy]
+    | l -> l
+
   let rec expr info e =
     assert (not e.e_ghost);
     match e.e_node with
@@ -500,10 +495,17 @@ module Translate = struct
               { e_node = Eapp ({ e_node = Earrow a }, pv', _) })
         when pv_equal pv' pv
              && Mid.mem a.ps_name info.converters && is_int_constant e1 ->
-          let s = Mid.find a.ps_name info.converters in
+          let s = fst (Mid.find a.ps_name info.converters) in
           let n = Number.compute_int (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])
+      | Eapp (e, v, _) when v.pv_ghost ->
+         (* ghost parameters are ignored *)
+         begin
+           match e.e_node with
+           | Eapp _ -> expr info e
+           | _ -> ML.Eapp (expr info e, [ML.enop])
+         end
       | Eapp (e, v, _) ->
           ML.Eapp (expr info e, [ML.Eident (pv_name v)])
       | Elet ({ let_expr = e1 }, e2) when e1.e_ghost ->
@@ -560,7 +562,8 @@ module Translate = struct
 
   and recdef info { fun_ps = ps; fun_lambda = lam } =
     assert (not ps.ps_ghost);
-    ps.ps_name, List.map (pvty info) lam.l_args, expr info lam.l_expr
+    let args = filter_ghost_params lam.l_args in
+    ps.ps_name, List.map (pvty info) args, expr info lam.l_expr
 
   and ebranch info ({ppat_pattern=p}, e) =
     pat info p, expr info e
@@ -624,8 +627,9 @@ module Translate = struct
     if has_syntax info ts.its_ts.ts_name || is_record d then []
     else pprojections info d
 
-  let pdecl info pd = match pd.pd_node with
-    | PDval (LetV pv) when pv_equal pv Mlw_wp.pv_old ->
+  let pdecl info pd =
+    match pd.pd_node with
+    | PDval (LetV pv) when pv_equal pv Mlw_decl.pv_old ->
         []
     | PDval _ ->
         []
@@ -638,7 +642,9 @@ module Translate = struct
               [ML.Dtype [id, type_args ts.ts_args, ML.Dalias (ity info ty)]]
         end
     | PDlet { let_sym = lv ; let_expr = e } ->
-        [ML.Dlet (false, [lv_name lv, [], expr info e])]
+       Debug.dprintf debug "extract 'let' declaration %s@."
+                     (lv_name lv).id_string;
+       [ML.Dlet (false, [lv_name lv, [], expr info e])]
     | PDdata tl ->
         begin match List.flatten (List.map (pdata_decl info) tl) with
           | [] -> []
@@ -651,6 +657,10 @@ module Translate = struct
             (ps1.ps_ghost || has_syntax info ps1.ps_name)
             (ps2.ps_ghost || has_syntax info ps2.ps_name) in
         let fdl = List.sort cmp fdl in
+        List.iter
+          (fun {fun_ps=ps} ->
+           Debug.dprintf debug "extract 'let rec' declaration %s@."
+                         ps.ps_name.id_string) fdl;
         [ML.Dlet (is_letrec fdl, List.map (recdef info) fdl)]
     | PDexn xs ->
         let id = xs.xs_name in
@@ -659,8 +669,24 @@ module Translate = struct
         else
           [ML.Dexn (id, Some (ity info xs.xs_ity))]
 
+  let warn_non_ghost_non_exec ps =
+    if not ps.ps_ghost then
+      Warning.emit ?loc:ps.ps_name.id_loc
+        "Cannot extract code from non-ghost function %s: body is not executable"
+        ps.ps_name.id_string
+
   let pdecl info d =
-    if Mlw_exec.is_exec_pdecl info.exec d then pdecl info d else []
+    if Mlw_exec.is_exec_pdecl info.exec d then pdecl info d else
+      begin
+        begin match d.pd_node with
+        | PDlet { let_sym = LetA ps } -> warn_non_ghost_non_exec ps
+        | PDrec fdl ->
+           List.iter
+             (fun {fun_ps=ps} -> warn_non_ghost_non_exec ps) fdl
+        | _ -> ()
+        end;
+        []
+      end
 
   let module_ info m =
     List.flatten (List.map (pdecl info) m.mod_decls)
@@ -790,7 +816,7 @@ module Print = struct
     | tvl -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
   let print_ty_arg info fmt ty = fprintf fmt "%a" (print_ty ~paren:true info) ty
-  let print_vs_arg info fmt vs = fprintf fmt "(%a)" (print_vsty info) vs
+  let print_vs_arg info fmt vs = fprintf fmt "@[(%a)@]" (print_vsty info) vs
 
   let print_type_decl info fst fmt (ts, args, def) =
     let print_constr fmt (cs, args) = match args with
@@ -861,15 +887,16 @@ module Print = struct
   let print_const ~paren fmt c =
     let n = Number.compute_int c in
     if BigInt.eq n BigInt.zero then
-      fprintf fmt "Why3__BigInt.zero"
+      fprintf fmt "Why3extract.Why3__BigInt.zero"
     else if BigInt.eq n BigInt.one then
-      fprintf fmt "Why3__BigInt.one"
+      fprintf fmt "Why3extract.Why3__BigInt.one"
     else if BigInt.le min_int31 n && BigInt.le n max_int31 then
       let m = BigInt.to_int n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
+      fprintf fmt (protect_on paren "Why3extract.Why3__BigInt.of_int %d") m
     else
       let s = BigInt.to_string n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
+      fprintf fmt
+        (protect_on paren "Why3extract.Why3__BigInt.of_string \"%s\"") s
 
   let print_binop fmt = function
     | Band -> fprintf fmt "&&"
@@ -885,6 +912,8 @@ module Print = struct
         print_lident info fmt v
     | Ebool b ->
         fprintf fmt "%b" b
+    | Econst c when info.unsafe_int ->
+        fprintf fmt "%s" (BigInt.to_string (Number.compute_int c))
     | Econst c ->
         print_const ~paren fmt c
     | Etuple el ->
@@ -899,10 +928,11 @@ module Print = struct
           (protect_on paren "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@]")
           (print_expr info) e1 (print_expr ~paren:true info) e2
     | Eif (e1, e2, e3) ->
-        fprintf fmt (protect_on paren "if @[%a@] then %a@ else %a")
+        fprintf fmt (protect_on paren
+        "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]")
           (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Elet (v, e1, e2) ->
-        fprintf fmt (protect_on paren "let %a = @[%a@] in@ %a")
+        fprintf fmt (protect_on paren "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a")
           (print_lident info) v (print_expr info) e1 (print_expr info) e2;
         forget_id v
     | Ematch (e1, [p, b1]) ->
@@ -950,9 +980,15 @@ module Print = struct
     | Ewhile (e1, e2) ->
         fprintf fmt "@[<hv>while %a do@;<1 2>@[%a@]@ done@]"
           (print_expr info) e1 (print_expr info) e2
+    | Efor (x, vfrom, dir, vto, e1) when info.unsafe_int ->
+        fprintf fmt
+          "@[<hov 2>for %a = %a %s %a do@\n%a@\ndone@]"
+          (print_lident info) x  (print_lident info) vfrom
+          (if dir = To then "to" else "downto") (print_lident info) vto
+          (print_expr info) e1
     | Efor (x, vfrom, dir, vto, e1) ->
         fprintf fmt
-          "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
+      "@[<hov 2>(Why3extract.Why3__IntAux.for_loop_%s %a %a@ (fun %a ->@ %a))@]"
           (if dir = To then "to" else "downto")
           (print_lident info) vfrom (print_lident info) vto
           (print_lident info) x (print_expr info) e1
@@ -1015,25 +1051,25 @@ module Print = struct
 
   let print_decl info fmt = function
     | Dtype dl ->
-        print_list_next newline (print_type_decl info) fmt dl;
-        fprintf fmt "@\n@\n"
+       print_list_next newline (print_type_decl info) fmt dl;
+       fprintf fmt "@\n@\n"
     | Dlet (isrec, dl) ->
-        let print_one fst fmt (ls, vl, e) =
-          fprintf fmt "@[<hv 2>%s %a @[%a@] =@ %a@]"
-            (if fst then if isrec then "let rec" else "let" else "and")
-            (print_lident info) ls
-            (print_list space (print_vs_arg info)) vl
-            (print_expr info) e;
-          forget_vars vl;
-          forget_tvs ()
-        in
-        print_list_next newline print_one fmt dl;
-        fprintf fmt "@\n@\n"
+       let print_one fst fmt (ls, vl, e) =
+         fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
+                 (if fst then if isrec then "let rec" else "let" else "and")
+                 (print_lident info) ls
+                 (print_list space (print_vs_arg info)) vl
+                 (print_expr info) e;
+         forget_vars vl;
+         forget_tvs ()
+       in
+       print_list_next newline print_one fmt dl;
+       fprintf fmt "@\n@\n"
     | Dexn (xs, None) ->
-        fprintf fmt "exception %a@\n@\n" (print_uident info) xs
+       fprintf fmt "exception %a@\n@\n" (print_uident info) xs
     | Dexn (xs, Some ty) ->
-        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-          (print_uident info) xs (print_ty info) ty
+       fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
+               (print_uident info) xs (print_ty info) ty
 
 end
 
@@ -1042,10 +1078,16 @@ end
 let extract_filename ?fname th =
   (modulename ?fname th.th_path th.th_name.Ident.id_string) ^ ".ml"
 
-(*
-let arith_meta = register_meta "ocaml arithmetic" [MTstring]
-  ~desc:"Specify@ OCaml@ arithmetic:@ 32, 64, or unsafe"
-*)
+let unsafe_int drv =
+  drv.Mlw_driver.drv_printer = Some "ocaml-unsafe-int"
+
+let print_preludes used fmt pm =
+  (* we do not print the same prelude twice *)
+  let ht = Hstr.create 5 in
+  let add l s = if Hstr.mem ht s then l else (Hstr.add ht s (); s :: l) in
+  let l = Sid.fold
+    (fun id l -> List.fold_left add l (Mid.find_def [] id pm)) used [] in
+  print_prelude fmt l
 
 let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
@@ -1057,13 +1099,15 @@ let extract_theory drv ?old ?fname fmt th =
     current_module = None;
     th_known_map = th.th_known;
     mo_known_map = Mid.empty;
-    fname = Opt.map clean_fname fname; } in
+    fname = Opt.map clean_fname fname;
+    unsafe_int = unsafe_int drv; } in
   let decls = Translate.theory info th in
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     Print.print_theory_name th;
-  fprintf fmt
-    "open Why3extract@\n@\n";
+  print_prelude fmt drv.Mlw_driver.drv_prelude;
+  print_preludes th.th_used fmt drv.Mlw_driver.drv_thprelude;
+  fprintf fmt "@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   fprintf fmt "@."
 
@@ -1080,14 +1124,17 @@ let extract_module drv ?old ?fname fmt m =
     current_module = Some m;
     th_known_map = th.th_known;
     mo_known_map = m.mod_known;
-    fname = Opt.map clean_fname fname; } in
+    fname = Opt.map clean_fname fname;
+    unsafe_int = unsafe_int drv; } in
   let decls = Translate.theory info th in
   let mdecls = Translate.module_ info m in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
-  fprintf fmt
-    "open Why3extract@\n@\n";
+  print_prelude fmt drv.Mlw_driver.drv_prelude;
+  let used = Sid.union m.mod_used m.mod_theory.th_used in
+  print_preludes used fmt drv.Mlw_driver.drv_thprelude;
+  fprintf fmt "@\n";
   print_list nothing (Print.print_decl info) fmt decls;
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."

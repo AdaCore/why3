@@ -130,6 +130,7 @@ end
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
   meta "encoding : lskept" function ite
+  meta "encoding:ignore_polymorphism_ls" function ite
 end
 
 (* not uniformly interpreted by provers
@@ -146,14 +147,27 @@ theory HighOrd
 
   syntax function (@)  "(select %1 %2)"
   meta "encoding : lskept" function (@)
+
+  meta "encoding:ignore_polymorphism_ts" type (->)
 end
 
 theory map.Map
+  syntax function get "(select %1 %2)"
+  syntax function set "(store %1 %2 %3)"
   meta "encoding : lskept" function get
   meta "encoding : lskept" function set
-  meta "encoding : lskept" function const
+  meta "encoding:ignore_polymorphism_ls" function get
+  meta "encoding:ignore_polymorphism_ls" function ([])
+  meta "encoding:ignore_polymorphism_ls" function set
+  meta "encoding:ignore_polymorphism_ls" function ([<-])
 
-  syntax function get   "(select %1 %2)"
-  syntax function set   "(store %1 %2 %3)"
+  meta "encoding:ignore_polymorphism_pr" prop Select_eq
+  meta "encoding:ignore_polymorphism_pr" prop Select_neq
+  remove prop Select_eq
+  remove prop Select_neq
+end
+
+theory map.Const
+  meta "encoding : lskept" function const
 (*  syntax function const "(const[%t0] %1)" *)
 end

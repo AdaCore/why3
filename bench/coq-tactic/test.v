@@ -1,6 +1,10 @@
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 5.
-Ltac z3 := why3 "z3" timelimit 5.
+
+Inductive Why3Unhabited : Prop := .
+Axiom letUsTrustWhy3 : Why3Unhabited.
+
+Ltac ae := why3 "alt-ergo" timelimit 5 ; case letUsTrustWhy3.
+Ltac z3 := why3 "z3" timelimit 5; case letUsTrustWhy3.
 
 Require Export ZArith.
 Open Scope Z_scope.
@@ -52,9 +56,8 @@ with p : nat -> Prop :=
   | cc : p O.
 
 Goal p O.
-(* not a first order goal
-ae.
-*)
+(* not a first order goal *)
+try ae.
 exact cc.
 Qed.
 
@@ -64,9 +67,8 @@ with bar : nat -> Prop :=
   d : forall f:nat->nat, bar (f O).
 
 Goal fooo O.
-(* Don't know
-ae.
-*)
+(* Don't know *)
+try ae.
 exact (c (d (fun x => O))).
 Qed.
 
@@ -84,9 +86,8 @@ Qed.
 Parameter f : (nat -> nat) -> nat.
 
 Goal f (plus O) = f (plus O).
-(* not a first order goal
-ae.
-*)
+(* not a first order goal *)
+try ae.
 trivial.
 Qed.
 
@@ -324,14 +325,5 @@ Require Import Rfunctions.
 Require Import Rbasic_fun.
 
 Goal forall (x:R), (0 <= x * x)%R.
-(* don't know
-ae
-*)
-(* timeout
-z3.
-*)
-(* timeout
-why3 "cvc3" timelimit 3.
-*)
-intros.
-Admitted.
+ae.
+Qed.

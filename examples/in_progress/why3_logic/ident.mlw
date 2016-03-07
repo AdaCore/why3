@@ -1,0 +1,152 @@
+
+(* Very, very abstract views of strings & Why3 locations:
+   they are. *)
+module String
+  type string
+end
+
+module Loc
+  type position
+end
+
+module Label
+  
+  use import String
+  use import Loc
+  
+  type label model { lab_string : string }
+  
+  val lab_equal (l1 l2:label) : bool
+    ensures { result -> l1 = l2 }
+    ensures { l1.lab_string = l2.lab_string -> result }
+  
+  val create_label (s:string) : label
+    ensures { result.lab_string = s }
+  
+  val lab_string (l:label) : string
+    ensures { result = l.lab_string }
+  
+  clone extmap.FMap as Mlab with
+    type key = label,
+    type key_l = string,
+    function k_m = lab_string
+  
+end
+
+module Ident
+  
+  use import int.Int
+  use import String
+  use import Loc
+  use import Label
+  use import option.Option
+  use import list.List
+  use import support.HO
+  
+  (* Abstract name type. *)
+  type ident_name
+  
+  (* Not present in Why3: ghost information allowing to know the
+     identifier class.
+     Justification: Why3 library make use of the fact that the same identifier
+     may be used for only one class of variable: variable symbol,
+     type symbol, function/predicate symbol, proposition symbol, and
+     maybe others. This fact is used to build maps that are the reunion of
+     disjoint maps over those categories. *)
+  type id_class model { id_class_name : ident_name }
+  (* Type of set of all classes build yet, and of snapshots
+     of such classes. Correctness of such specification can be
+     justified via the use of history invariants (this trick is a mere coding
+     of it)
+     Important note about this trick: any mean of countourning the fact
+     that program values of type id_class are build using this interface
+     would break its safety. In practice, this impose limitation about
+     calls to logic function in (ghost) code, (axiomatized default/choice break
+     this property when applied to non-pure logic type such as id_class).
+     In this setup, the safe logic functions calls in (ghost) code are:
+     - any call that instantiate polymorphic variables using
+       pure logic types only (does not interfere with the program world).
+     - any call to a logic function defined on top of safe logic functions
+       (can be lifted to the program world).
+     - projections & constructors (present in the program world).
+   *)
+  type id_class_set model { mutable id_classes : id_class -> bool }
+  type id_class_snapshot model { id_classes_s : id_class -> bool }
+  val ghost idcls : id_class_set
+  val ghost id_class_snapshot () : id_class_snapshot
+    ensures { result.id_classes_s = idcls.id_classes }
+  val ghost id_classes_growth (id0:id_class_snapshot) : unit
+    ensures { subset id0.id_classes_s idcls.id_classes }
+  val ghost id_class_inv (idc:id_class) : unit
+    ensures { idcls.id_classes idc }
+  val ghost fresh_id_class () : id_class
+    writes { idcls }
+    ensures { not (old idcls).id_classes result }
+    ensures { subset (old idcls).id_classes idcls.id_classes }
+    ensures { idcls.id_classes result }
+  
+  (* Projection. *)
+  function idn_string ident_name : string
+  type ident model {
+    id_name : ident_name;
+    id_label : string -> bool;
+    id_loc : option position;
+    (* Not present in Why3 (because ghost): classes to which the identifier
+       belong, ordered. This allow to build hierarchies of disjoint name
+       generators on top of identifiers, while being able to easily recover the
+       disjointness property. *)
+    id_class : list id_class;
+  }
+  
+  function id_string (i:ident) : string = i.id_name.idn_string
+  
+  val id_string (i:ident) : string
+    ensures { result = i.id_string }
+  
+  val id_label (i:ident) : Mlab.s
+    ensures { result.Mlab.domain = i.id_label }
+  
+  val id_loc (i:ident) : option position
+    ensures { result = i.id_loc }
+  
+  type preid = {
+    pre_name : string;
+    pre_label : Mlab.s;
+    pre_loc : option position;
+  }
+  
+  (* TODO (long term): add a mechanism to get back identifier
+     fields (mainly labels) from their names. *)
+  
+  (* Similar mechanism for identifier generation. *)
+  type id_set model { mutable ids : ident_name -> bool }
+  type id_set_snapshot model { ids_s : ident_name -> bool }
+  val ghost ids : id_set
+  val ghost id_set_snapshot () : id_set_snapshot
+    ensures { result.ids_s = ids.ids }
+  val ghost id_set_growth (id0:id_set_snapshot) : unit
+    ensures { subset id0.ids_s ids.ids }
+  val ghost id_inv (i:ident) : unit
+    ensures { ids.ids i.id_name }
+  
+  val id_equal (i1 i2:ident) : bool
+    ensures { result -> i1 = i2 }
+    ensures { i1.id_name = i2.id_name -> result }
+  
+  val id_register (ghost idc:list id_class) (p:preid) : ident
+    writes { ids }
+    ensures { result.id_string = p.pre_name }
+    ensures { result.id_label = p.pre_label.Mlab.domain }
+    ensures { result.id_loc = p.pre_loc }
+    ensures { result.id_class = idc }
+    ensures { not (old ids).ids result.id_name }
+    ensures { subset (old ids).ids ids.ids }
+    ensures { ids.ids result.id_name }
+  
+  clone extmap.FMap as Mid with
+    type key = ident,
+    type key_l = ident_name,
+    function k_m = id_name
+  
+end
+

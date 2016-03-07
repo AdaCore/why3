@@ -15,10 +15,10 @@ import "ocaml-gen.drv"
 end*)
 
 module mach.int.Int32
-  syntax val of_int "Why3__BigInt.to_int32"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int32"
   syntax converter of_int "%1l"
 
-  syntax function to_int "(Why3__BigInt.of_int32 %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int32 %1)"
 
   syntax type     int32     "Int32.t"
   syntax val      (+)       "Int32.add"
@@ -39,10 +39,10 @@ module mach.int.Int32
 end
 
 module mach.int.UInt32
-  syntax val of_int "Why3__BigInt.to_int64"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int64"
   syntax converter of_int "%1L"
 
-  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int64 %1)"
   syntax constant zero_unsigned "0L"
 
   syntax type     uint32    "Int64.t"
@@ -78,10 +78,10 @@ module mach.int.UInt32
 end
 
 module mach.int.Int63
-  syntax val of_int "Why3__BigInt.to_int64"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int64"
   syntax converter of_int "%1L"
 
-  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int64 %1)"
 
   syntax type     int63     "Int64.t"
   syntax val      (+)       "Int64.add"
@@ -99,10 +99,10 @@ module mach.int.Int63
 end
 
 module mach.int.Int64
-  syntax val of_int "Why3__BigInt.to_int64"
+  syntax val of_int "Why3extract.Why3__BigInt.to_int64"
   syntax converter of_int "%1L"
 
-  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int64 %1)"
 
   syntax type     int64     "Int64.t"
   syntax val      (+)       "Int64.add"

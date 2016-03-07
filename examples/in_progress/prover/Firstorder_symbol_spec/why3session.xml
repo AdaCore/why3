@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<file name="../Firstorder_symbol_spec.mlw" expanded="true">
+<theory name="Spec" sum="54ebee0ba44c4d15184f0e0c09def333" expanded="true">
+ <goal name="WP_parameter size_positive_lemma_symbol" expl="VC for size_positive_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter renaming_composition_lemma_symbol" expl="VC for renaming_composition_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter renaming_identity_lemma_symbol" expl="VC for renaming_identity_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter associativity_subst_rename_rename_lemma_symbol" expl="VC for associativity_subst_rename_rename_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
+ </goal>
+ <goal name="WP_parameter associativity_rename_subst_rename_lemma_symbol" expl="VC for associativity_rename_subst_rename_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="18"/></proof>
+ </goal>
+ <goal name="WP_parameter right_rename_subst_by_identity_lemma_symbol" expl="VC for right_rename_subst_by_identity_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.40"/></proof>
+ <proof prover="1"><result status="valid" time="0.06"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="19"/></proof>
+ </goal>
+ <goal name="WP_parameter olifts_composition_lemma_rename_subst_symbol" expl="VC for olifts_composition_lemma_rename_subst_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.06" steps="257"/></proof>
+ </goal>
+ <goal name="WP_parameter olifts_composition_lemma_subst_rename_symbol" expl="VC for olifts_composition_lemma_subst_rename_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.14" steps="210"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_then_subst_composition_lemma_symbol" expl="VC for rename_then_subst_composition_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.10"/></proof>
+ <proof prover="1"><result status="valid" time="0.08"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_then_rename_composition_lemma_symbol" expl="VC for subst_then_rename_composition_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.10"/></proof>
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter associativity_rename_subst_subst_lemma_symbol" expl="VC for associativity_rename_subst_subst_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="18"/></proof>
+ </goal>
+ <goal name="WP_parameter associativity_subst_rename_subst_lemma_symbol" expl="VC for associativity_subst_rename_subst_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="19"/></proof>
+ </goal>
+ <goal name="WP_parameter associativity_subst_subst_rename_lemma_symbol" expl="VC for associativity_subst_subst_rename_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
+ </goal>
+ <goal name="WP_parameter olifts_composition_lemma_subst_subst_symbol" expl="VC for olifts_composition_lemma_subst_subst_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.06" steps="236"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_composition_lemma_symbol" expl="VC for subst_composition_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.18"/></proof>
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter associativity_subst_subst_subst_lemma_symbol" expl="VC for associativity_subst_subst_subst_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
+ </goal>
+ <goal name="WP_parameter olifts_identity_symbol" expl="VC for olifts_identity_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.16" steps="328"/></proof>
+ </goal>
+ <goal name="WP_parameter left_rename_subst_identity_lemma_symbol" expl="VC for left_rename_subst_identity_lemma_symbol" expanded="true">
+ <proof prover="5"><result status="valid" time="0.03" steps="30"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_identity_lemma_symbol" expl="VC for subst_identity_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter left_subst_subst_identity_lemma_symbol" expl="VC for left_subst_subst_identity_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.88"/></proof>
+ <proof prover="1"><result status="valid" time="0.14"/></proof>
+ <proof prover="5"><result status="valid" time="0.03" steps="22"/></proof>
+ </goal>
+ <goal name="WP_parameter right_subst_subst_by_identity_lemma_symbol" expl="VC for right_subst_subst_by_identity_lemma_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.93"/></proof>
+ <proof prover="1"><result status="valid" time="0.14"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="18"/></proof>
+ </goal>
+ <goal name="WP_parameter renaming_preserve_size_symbol" expl="VC for renaming_preserve_size_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_symbol" expl="VC for rename_free_var_constructive_inversion_symbol_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_inversion_symbol_symbol" expl="VC for rename_free_var_inversion_symbol_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter rename_free_var_propagation_symbol_symbol" expl="VC for rename_free_var_propagation_symbol_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_symbol" expl="VC for subst_free_var_constructive_inversion_symbol_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.07"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_free_var_inversion_symbol_symbol" expl="VC for subst_free_var_inversion_symbol_symbol" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter subst_free_var_inversion_symbol_symbol.1" expl="1. variant decrease" expanded="true">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_inversion_symbol_symbol.2" expl="2. precondition" expanded="true">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_free_var_inversion_symbol_symbol.3" expl="3. postcondition" expanded="true">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_symbol" expl="VC for subst_free_var_propagation_symbol_symbol_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_equivalence_of_subst_symbol" expl="VC for free_var_equivalence_of_subst_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_equivalence_of_rename_symbol" expl="VC for free_var_equivalence_of_rename_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.11"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_derive_equivalence_of_subst_symbol" expl="VC for free_var_derive_equivalence_of_subst_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter free_var_derive_equivalence_of_rename_symbol" expl="VC for free_var_derive_equivalence_of_rename_symbol" expanded="true">
+ <proof prover="0"><result status="valid" time="0.55"/></proof>
+ <proof prover="5"><result status="valid" time="0.03" steps="40"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

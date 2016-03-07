@@ -30,7 +30,7 @@ Definition norm (x1:R) (x2:R): R := (Reals.R_sqrt.sqrt (norm2 x1 x2)).
 Axiom norm_pos : forall (x1:R) (x2:R), (0%R <= (norm x1 x2))%R.
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
 Import R_sqrt.
 
 Open Scope R_scope.
@@ -52,5 +52,5 @@ ae.
 ae.
 ae.
 ae.
-Qed.
+Admitted.
 

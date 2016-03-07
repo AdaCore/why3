@@ -1,0 +1,80 @@
+module PGCD
+  use import int.Int
+  use import ref.Refint
+  use import int.EuclideanDivision
+
+  predicate divides (m: int) (n: int) =
+    exists k: int. n = k * m
+
+  predicate common_div (m:int) (n:int) (cd:int) =
+    divides cd m /\ divides cd n
+
+  predicate is_gcd (m: int) (n: int) (gcd: int) =
+    common_div m n gcd /\ (forall d: int. common_div m n d -> divides d gcd)
+  
+  lemma is_gcd_self: (* Proof by iProver or Spass *)
+    forall n: int. is_gcd n n n
+
+  lemma common_div_a_b:
+    forall a b k:int. common_div (a-b) b k -> common_div a b k
+  (* Isabelle proof
+proof -
+  from assms have "\<exists>pa pb::int. (a-b) = pa * k \<and> b = pb * k" using common_div_def and divides_def by simp
+  then obtain pa pb where "(a-b) = pa * k" and "b = pb * k" by auto
+  hence "a-b+b = pa * k + pb * k" by simp
+  hence "a = (pa + pb) * k" using Mul_distr_r by simp
+  hence "divides k a" using divides_def by simp
+  thus "common_div a b k" using assms and common_div_def by simp
+qed
+  *)
+
+  lemma common_div_b_a: (* Proof by Alt-Ergo *)
+    forall a b k:int. common_div a (b-a) k -> common_div a b k
+ 
+  lemma common_div_commutes: (* Proof by Alt-Ergo *)
+    forall a b k:int. common_div a b k -> common_div b a k
+
+  lemma gcd_commutes: (* Proof by Alt-Ergo *)
+    forall a b k:int. is_gcd a b k -> is_gcd b a k
+
+  lemma gcd_a_b:
+    forall a b k:int. is_gcd (a-b) b k -> is_gcd a b k
+  (* Isabelle proof
+proof -
+  from assms have "common_div (a-b) b k" using is_gcd_def by simp
+  then have 1: "common_div a b k" using common_div_a_b by simp
+  (* show that any other common divisor of a and b divides k *)
+  { fix p
+    assume h: "common_div a b p"
+    hence "\<exists>ka kb::int. (a = ka * p) \<and> (b = kb * p)" using common_div_def and divides_def by simp
+    then obtain ka kb where "a = ka * p" and "b = kb * p" by auto
+    hence "a - b = (ka - kb) * p" using int_distrib by simp
+    hence "divides p (a-b)"  using divides_def by simp
+    hence "common_div (a-b) b p" using h and common_div_def by simp
+    hence "divides p k" using assms and is_gcd_def by simp
+  }
+  hence "\<forall>p::int. common_div a b p \<longrightarrow> divides p k" by simp
+  thus "is_gcd a b k" using 1 and is_gcd_def by simp
+qed
+  *)
+
+  lemma gcd_b_a: (* Proof by Alt-Ergo *)
+    forall a b k:int. is_gcd a (b-a) k -> is_gcd a b k
+ 
+  (* Correctness and termination by Alt-Ergo *)
+  let pgcd (p: int) (q: int)
+    requires { p > 0 /\ q > 0 }
+    ensures { is_gcd p q result }
+  =
+    let a = ref p in
+    let b = ref q in
+    while (!a <> !b) do
+      invariant { !a > 0 /\ !b > 0 /\ forall k: int. is_gcd !a !b k -> is_gcd p q k }
+      variant { !a + !b }
+      if !a > !b then
+      	a := !a - !b
+      else
+        b := !b - !a
+    done;
+    !a
+end

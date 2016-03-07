@@ -1,0 +1,1827 @@
+module Types
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_symbol_impl.Types
+  use import Firstorder_symbol_impl.Logic
+  use import Firstorder_symbol_impl.Impl
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_term_impl.Types
+  use import Firstorder_term_impl.Logic
+  use import Firstorder_term_impl.Impl
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_formula_list_impl.Impl
+  use import Firstorder_tableau_spec.Spec
+  type nl_tableau 'b0 'b1 =
+    | NL_Root
+    | NL_Node (nl_tableau 'b0 'b1) (nl_fo_formula 'b0 'b1)
+      (nl_fo_formula_list 'b0 'b1)
+
+
+  type nlimpl_tableau =
+    { nlrepr_tableau_field : nl_tableau int int ;
+      nlfree_var_symbol_set_abstraction_tableau_field : int ;
+      nlfree_var_fo_term_set_abstraction_tableau_field : int ;
+      ghost model_tableau_field : tableau int int ;
+    }
+
+  type cons_tableau = | NLC_Root
+    | NLC_Node (nlimpl_tableau) (nlimpl_fo_formula) (nlimpl_fo_formula_list)
+
+
+end
+
+module Logic
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_symbol_impl.Types
+  use import Firstorder_symbol_impl.Logic
+  use import Firstorder_symbol_impl.Impl
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_term_impl.Types
+  use import Firstorder_term_impl.Logic
+  use import Firstorder_term_impl.Impl
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_formula_list_impl.Impl
+  use import Firstorder_tableau_spec.Spec
+  use import Types
+  function nat_nlsize_tableau (t:nl_tableau 'b0 'b1) : nat =
+    match t with | NL_Root -> let s = one_nat in s
+      | NL_Node v0 v1 v2 ->
+        let s = one_nat in
+          let s = add_nat (nat_nlsize_fo_formula_list v2) s in
+          let s = add_nat (nat_nlsize_fo_formula v1) s in
+          let s = add_nat (nat_nlsize_tableau v0) s in s
+    end
+
+  with nlsize_tableau (t:nl_tableau 'b0 'b1) : int =
+    match t with | NL_Root -> let s = 1 in s
+      | NL_Node v0 v1 v2 ->
+        let s = 1 in let s = nlsize_fo_formula_list v2 + s in
+          let s = nlsize_fo_formula v1 + s in let s = nlsize_tableau v0 +
+          s in s
+    end
+
+  let rec lemma nlsize_positive_lemma_tableau (t:nl_tableau 'b0 'b1) : unit
+    ensures { nlsize_tableau t > 0 }
+    variant { nat_to_int (nat_nlsize_tableau t) } =
+    match t with | NL_Root -> ()
+      | NL_Node v0 v1 v2 ->
+        nlsize_positive_lemma_tableau v0 ;
+          nlsize_positive_lemma_fo_formula v1 ;
+          nlsize_positive_lemma_fo_formula_list v2 ; ()
+    end
+
+  function nlmodel_tableau (t:nl_tableau 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
+    (bnd0:func int (symbol 'c0)) (fr1:func 'b1 (fo_term 'c0 'c1))
+    (bnd1:func int (fo_term 'c0 'c1)) : tableau 'c0 'c1 =
+    match t with | NL_Root -> Root
+      | NL_Node v0 v1 v2 ->
+        Node
+          (nlmodel_tableau v0 ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd0 identity))
+            ((rename_subst_fo_term fr1 identity identity))
+            ((rename_subst_fo_term bnd1 identity identity)))
+          (nlmodel_fo_formula v1 ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd0 identity))
+            ((rename_subst_fo_term fr1 identity identity))
+            ((rename_subst_fo_term bnd1 identity identity)))
+          (nlmodel_fo_formula_list v2 ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd0 identity))
+            ((rename_subst_fo_term fr1 identity identity))
+            ((rename_subst_fo_term bnd1 identity identity)))
+    end
+
+  let rec lemma nlmodel_subst_commutation_lemma_tableau
+    (t:nl_tableau 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
+    (bnd0:func int (symbol 'c0)) (s0:func 'c0 (symbol 'd0))
+    (fr1:func 'b1 (fo_term 'c0 'c1)) (bnd1:func int (fo_term 'c0 'c1))
+    (s1:func 'c1 (fo_term 'd0 'd1)) : unit
+    ensures {
+      nlmodel_tableau t (subst_compose_symbol fr0 s0)
+        (subst_compose_symbol bnd0 s0) (subst_compose_fo_term fr1 s0 s1)
+        (subst_compose_fo_term bnd1 s0 s1)
+      = subst_tableau (nlmodel_tableau t fr0 bnd0 fr1 bnd1) s0 s1 }
+    variant { nlsize_tableau t } =
+    match t with | NL_Root -> ()
+      | NL_Node v0 v1 v2 ->
+        nlmodel_subst_commutation_lemma_tableau v0
+          ((rename_subst_symbol fr0 identity))
+          ((rename_subst_symbol bnd0 identity))
+          ((rename_subst_symbol s0 identity))
+          ((rename_subst_fo_term fr1 identity identity))
+          ((rename_subst_fo_term bnd1 identity identity))
+          ((rename_subst_fo_term s1 identity identity)) ;
+          assert {
+            subst_compose_symbol (rename_subst_symbol fr0 identity)
+              ((rename_subst_symbol s0 identity))
+            = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
+          assert {
+            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+              ((rename_subst_symbol s0 identity))
+            = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
+            } ;
+          assert {
+            subst_compose_fo_term
+              (rename_subst_fo_term fr1 identity identity)
+              ((rename_subst_symbol s0 identity))
+              ((rename_subst_fo_term s1 identity identity))
+            =
+            (rename_subst_fo_term (subst_compose_fo_term fr1 s0 s1) identity
+              identity)
+            } ;
+          assert {
+            subst_compose_fo_term
+              (rename_subst_fo_term bnd1 identity identity)
+              ((rename_subst_symbol s0 identity))
+              ((rename_subst_fo_term s1 identity identity))
+            =
+            (rename_subst_fo_term (subst_compose_fo_term bnd1  s0 s1)
+              identity identity)
+            } ;
+          nlmodel_subst_commutation_lemma_fo_formula v1
+          ((rename_subst_symbol fr0 identity))
+          ((rename_subst_symbol bnd0 identity))
+          ((rename_subst_symbol s0 identity))
+          ((rename_subst_fo_term fr1 identity identity))
+          ((rename_subst_fo_term bnd1 identity identity))
+          ((rename_subst_fo_term s1 identity identity)) ;
+          assert {
+            subst_compose_symbol (rename_subst_symbol fr0 identity)
+              ((rename_subst_symbol s0 identity))
+            = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
+          assert {
+            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+              ((rename_subst_symbol s0 identity))
+            = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
+            } ;
+          assert {
+            subst_compose_fo_term
+              (rename_subst_fo_term fr1 identity identity)
+              ((rename_subst_symbol s0 identity))
+              ((rename_subst_fo_term s1 identity identity))
+            =
+            (rename_subst_fo_term (subst_compose_fo_term fr1 s0 s1) identity
+              identity)
+            } ;
+          assert {
+            subst_compose_fo_term
+              (rename_subst_fo_term bnd1 identity identity)
+              ((rename_subst_symbol s0 identity))
+              ((rename_subst_fo_term s1 identity identity))
+            =
+            (rename_subst_fo_term (subst_compose_fo_term bnd1  s0 s1)
+              identity identity)
+            } ;
+          nlmodel_subst_commutation_lemma_fo_formula_list v2
+          ((rename_subst_symbol fr0 identity))
+          ((rename_subst_symbol bnd0 identity))
+          ((rename_subst_symbol s0 identity))
+          ((rename_subst_fo_term fr1 identity identity))
+          ((rename_subst_fo_term bnd1 identity identity))
+          ((rename_subst_fo_term s1 identity identity)) ;
+          assert {
+            subst_compose_symbol (rename_subst_symbol fr0 identity)
+              ((rename_subst_symbol s0 identity))
+            = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
+          assert {
+            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+              ((rename_subst_symbol s0 identity))
+            = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
+            } ;
+          assert {
+            subst_compose_fo_term
+              (rename_subst_fo_term fr1 identity identity)
+              ((rename_subst_symbol s0 identity))
+              ((rename_subst_fo_term s1 identity identity))
+            =
+            (rename_subst_fo_term (subst_compose_fo_term fr1 s0 s1) identity
+              identity)
+            } ;
+          assert {
+            subst_compose_fo_term
+              (rename_subst_fo_term bnd1 identity identity)
+              ((rename_subst_symbol s0 identity))
+              ((rename_subst_fo_term s1 identity identity))
+            =
+            (rename_subst_fo_term (subst_compose_fo_term bnd1  s0 s1)
+              identity identity)
+            } ;
+          ()
+    end
+
+  let lemma nlmodel_rename_commutation_lemma_tableau (t:nl_tableau 'b0 'b1)
+    (fr0:func 'b0 (symbol 'c0)) (bnd0:func int (symbol 'c0))
+    (s0:func 'c0 'd0) (fr1:func 'b1 (fo_term 'c0 'c1))
+    (bnd1:func int (fo_term 'c0 'c1)) (s1:func 'c1 'd1) : unit
+    ensures {
+      nlmodel_tableau t (rename_subst_symbol fr0 s0)
+        (rename_subst_symbol bnd0 s0) (rename_subst_fo_term fr1 s0 s1)
+        (rename_subst_fo_term bnd1 s0 s1)
+      = rename_tableau (nlmodel_tableau t fr0 bnd0 fr1 bnd1) s0 s1 }
+    =
+    nlmodel_subst_commutation_lemma_tableau t fr0 bnd0
+      (subst_of_rename_symbol s0) fr1 bnd1 (subst_of_rename_fo_term s1)
+
+  predicate correct_indexes_tableau (t:nl_tableau 'b0 'b1) =
+    match t with | NL_Root -> true
+      | NL_Node v0 v1 v2 ->
+        correct_indexes_tableau v0 /\ correct_indexes_fo_formula v1 /\
+          correct_indexes_fo_formula_list v2
+    end
+
+  function bound_depth_of_symbol_in_tableau (t:nl_tableau 'b0 'b1) : int =
+    match t with | NL_Root -> 0
+      | NL_Node v0 v1 v2 ->
+        let b = bound_depth_of_symbol_in_tableau v0 in let a = b in
+          let b = bound_depth_of_symbol_in_fo_formula v1 in
+          let a = if a > b then a else b in
+          let b = bound_depth_of_symbol_in_fo_formula_list v2 in
+          let a = if a > b then a else b in a
+    end
+
+  with bound_depth_of_fo_term_in_tableau (t:nl_tableau 'b0 'b1) : int =
+    match t with | NL_Root -> 0
+      | NL_Node v0 v1 v2 ->
+        let b = bound_depth_of_fo_term_in_tableau v0 in let a = b in
+          let b = bound_depth_of_fo_term_in_fo_formula v1 in
+          let a = if a > b then a else b in
+          let b = bound_depth_of_fo_term_in_fo_formula_list v2 in
+          let a = if a > b then a else b in a
+    end
+
+  let rec lemma bound_depth_of_symbol_in_tableau_nonnegative
+    (t:nl_tableau 'b0 'b1) : unit requires { correct_indexes_tableau t }
+    ensures { bound_depth_of_symbol_in_tableau t >= 0 }
+    variant { nlsize_tableau t } =
+    match t with | NL_Root -> ()
+      | NL_Node v0 v1 v2 ->
+        bound_depth_of_symbol_in_tableau_nonnegative v0 ;
+          bound_depth_of_symbol_in_fo_formula_nonnegative v1 ;
+          bound_depth_of_symbol_in_fo_formula_list_nonnegative v2 ; ()
+    end
+
+  with lemma bound_depth_of_fo_term_in_tableau_nonnegative
+    (t:nl_tableau 'b0 'b1) : unit requires { correct_indexes_tableau t }
+    ensures { bound_depth_of_fo_term_in_tableau t >= 0 }
+    variant { nlsize_tableau t } =
+    match t with | NL_Root -> ()
+      | NL_Node v0 v1 v2 ->
+        bound_depth_of_fo_term_in_tableau_nonnegative v0 ;
+          bound_depth_of_fo_term_in_fo_formula_nonnegative v1 ;
+          bound_depth_of_fo_term_in_fo_formula_list_nonnegative v2 ; ()
+    end
+
+  let rec lemma model_equal_tableau (t:nl_tableau 'b0 'b1)
+    (fr10:func 'b0 (symbol 'c0)) (fr20:func 'b0 (symbol 'c0))
+    (bnd10:func int (symbol 'c0)) (bnd20:func int (symbol 'c0))
+    (fr11:func 'b1 (fo_term 'c0 'c1)) (fr21:func 'b1 (fo_term 'c0 'c1))
+    (bnd11:func int (fo_term 'c0 'c1)) (bnd21:func int (fo_term 'c0 'c1)) :
+    unit
+    requires {
+      forall i:int. 0 <= i < bound_depth_of_symbol_in_tableau t ->  bnd10 i =
+        bnd20 i
+      }
+    requires { fr10 = fr20 }
+    requires {
+      forall i:int. 0 <= i < bound_depth_of_fo_term_in_tableau t ->  bnd11 i
+        = bnd21 i
+      }
+    requires { fr11 = fr21 } requires { correct_indexes_tableau t }
+    ensures { nlmodel_tableau t fr10 bnd10 fr11 bnd11 =
+      nlmodel_tableau t fr20 bnd20 fr21 bnd21 }
+    variant { nlsize_tableau t } =
+    match t with | NL_Root -> ()
+      | NL_Node v0 v1 v2 ->
+        model_equal_tableau v0 ((rename_subst_symbol fr10 identity))
+          ((rename_subst_symbol fr20 identity))
+          ((rename_subst_symbol bnd10 identity))
+          ((rename_subst_symbol bnd20 identity))
+          ((rename_subst_fo_term fr11 identity identity))
+          ((rename_subst_fo_term fr21 identity identity))
+          ((rename_subst_fo_term bnd11 identity identity))
+          ((rename_subst_fo_term bnd21 identity identity)) ;
+          model_equal_fo_formula v1 ((rename_subst_symbol fr10 identity))
+            ((rename_subst_symbol fr20 identity))
+            ((rename_subst_symbol bnd10 identity))
+            ((rename_subst_symbol bnd20 identity))
+            ((rename_subst_fo_term fr11 identity identity))
+            ((rename_subst_fo_term fr21 identity identity))
+            ((rename_subst_fo_term bnd11 identity identity))
+            ((rename_subst_fo_term bnd21 identity identity)) ;
+          model_equal_fo_formula_list v2
+            ((rename_subst_symbol fr10 identity))
+            ((rename_subst_symbol fr20 identity))
+            ((rename_subst_symbol bnd10 identity))
+            ((rename_subst_symbol bnd20 identity))
+            ((rename_subst_fo_term fr11 identity identity))
+            ((rename_subst_fo_term fr21 identity identity))
+            ((rename_subst_fo_term bnd11 identity identity))
+            ((rename_subst_fo_term bnd21 identity identity)) ;
+          ()
+    end
+
+  predicate nlimpl_tableau_ok (t:nlimpl_tableau) =
+    nlmodel_tableau t.nlrepr_tableau_field subst_id_symbol
+      (const (Var_symbol ((-1)))) subst_id_fo_term
+      (const (Var_fo_term ((-1)))) = t.model_tableau_field
+    /\ correct_indexes_tableau t.nlrepr_tableau_field /\
+    bound_depth_of_symbol_in_tableau t.nlrepr_tableau_field = 0 /\
+    bound_depth_of_fo_term_in_tableau t.nlrepr_tableau_field = 0 /\
+    (forall x:int. is_symbol_free_var_in_tableau x t.model_tableau_field ->
+       (x) < (t.nlfree_var_symbol_set_abstraction_tableau_field))
+    /\
+    (forall x:int. is_fo_term_free_var_in_tableau x t.model_tableau_field ->
+       (x) < (t.nlfree_var_fo_term_set_abstraction_tableau_field))
+
+  predicate cons_ok_tableau (c:cons_tableau) =
+    match c with | NLC_Root -> true
+      | NLC_Node v0 v1 v2 -> nlimpl_tableau_ok v0 /\ nlimpl_fo_formula_ok v1
+        /\ nlimpl_fo_formula_list_ok v2
+    end
+
+  predicate cons_rel_tableau (c:cons_tableau) (t:nlimpl_tableau) =
+    match c with | NLC_Root -> t.model_tableau_field = Root
+      | NLC_Node v0 v1 v2 -> t.model_tableau_field =
+        Node (rename_tableau v0.model_tableau_field identity identity)
+          (rename_fo_formula v1.model_fo_formula_field identity identity)
+          (rename_fo_formula_list v2.model_fo_formula_list_field identity
+             identity)
+    end
+
+  predicate cons_open_rel_tableau (c:cons_tableau) (t:nlimpl_tableau) =
+    match c with
+      | NLC_Root ->
+        match t.model_tableau_field with | Root -> true
+          | Node w0 w1 w2 -> false
+        end
+      | NLC_Node v0 v1 v2 ->
+        match t.model_tableau_field with | Root -> false
+          | Node w0 w1 w2 ->
+            v0.model_tableau_field = (rename_tableau w0 identity identity) /\
+              v1.model_fo_formula_field =
+                (rename_fo_formula w1 identity identity)
+              /\
+              v2.model_fo_formula_list_field =
+                (rename_fo_formula_list w2 identity identity)
+        end
+    end
+
+
+end
+
+module Impl
+  use import option.Option
+  use import int.Int
+  use import Nat.Nat
+  use import Functions.Func
+  use import OptionFuncs.Funcs
+  use import Sum.Sum
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_symbol_impl.Types
+  use import Firstorder_symbol_impl.Logic
+  use import Firstorder_symbol_impl.Impl
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_term_impl.Types
+  use import Firstorder_term_impl.Logic
+  use import Firstorder_term_impl.Impl
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_formula_list_impl.Impl
+  use import Firstorder_tableau_spec.Spec
+  use import Types
+  use import Logic
+  let rec bind_var_symbol_in_tableau (t:nl_tableau int int) (x:int) (i:int)
+    (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0))
+    (ghost fr1:func int (fo_term 'b0 'b1))
+    (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    requires { correct_indexes_tableau t }
+    requires { bound_depth_of_symbol_in_tableau t <= i }
+    variant { nlsize_tableau t }
+    ensures { bound_depth_of_symbol_in_tableau result <= i + 1 }
+    ensures { correct_indexes_tableau result }
+    ensures { bound_depth_of_fo_term_in_tableau t =
+      bound_depth_of_fo_term_in_tableau result }
+    ensures { nlmodel_tableau result fr0 bnd0 fr1 bnd1 =
+      nlmodel_tableau t (update fr0 x (bnd0 i)) bnd0 fr1 bnd1 }
+    =
+    match t with | NL_Root -> NL_Root
+      | NL_Node v0 v1 v2 ->
+        assert { (rename_symbol (bnd0 i) identity) =
+          (eval ((rename_subst_symbol bnd0 identity)) (i+0)) };
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol (update fr0 x (bnd0 i)) identity))
+              ((update ((rename_subst_symbol fr0 identity)) x
+                  (rename_symbol (bnd0 i) identity)))
+            };
+          assert { (rename_subst_symbol (update fr0 x (bnd0 i)) identity) =
+            (update ((rename_subst_symbol fr0 identity)) x
+               (eval ((rename_subst_symbol bnd0 identity)) (i+0)))
+            };
+          assert { (rename_symbol (bnd0 i) identity) =
+            (eval ((rename_subst_symbol bnd0 identity)) (i+0)) };
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol (update fr0 x (bnd0 i)) identity))
+              ((update ((rename_subst_symbol fr0 identity)) x
+                  (rename_symbol (bnd0 i) identity)))
+            };
+          assert { (rename_subst_symbol (update fr0 x (bnd0 i)) identity) =
+            (update ((rename_subst_symbol fr0 identity)) x
+               (eval ((rename_subst_symbol bnd0 identity)) (i+0)))
+            };
+          assert { (rename_symbol (bnd0 i) identity) =
+            (eval ((rename_subst_symbol bnd0 identity)) (i+0)) };
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol (update fr0 x (bnd0 i)) identity))
+              ((update ((rename_subst_symbol fr0 identity)) x
+                  (rename_symbol (bnd0 i) identity)))
+            };
+          assert { (rename_subst_symbol (update fr0 x (bnd0 i)) identity) =
+            (update ((rename_subst_symbol fr0 identity)) x
+               (eval ((rename_subst_symbol bnd0 identity)) (i+0)))
+            };
+          NL_Node
+            (bind_var_symbol_in_tableau v0 x (i+0)
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd0 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd1 identity identity)))
+            (bind_var_symbol_in_fo_formula v1 x (i+0)
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd0 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd1 identity identity)))
+            (bind_var_symbol_in_fo_formula_list v2 x (i+0)
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd0 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd1 identity identity)))
+    end
+
+  with bind_var_fo_term_in_tableau (t:nl_tableau int int) (x:int) (i:int)
+    (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0))
+    (ghost fr1:func int (fo_term 'b0 'b1))
+    (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    requires { correct_indexes_tableau t }
+    requires { bound_depth_of_fo_term_in_tableau t <= i }
+    variant { nlsize_tableau t }
+    ensures { bound_depth_of_fo_term_in_tableau result <= i + 1 }
+    ensures { correct_indexes_tableau result }
+    ensures { bound_depth_of_symbol_in_tableau t =
+      bound_depth_of_symbol_in_tableau result }
+    ensures { nlmodel_tableau result fr0 bnd0 fr1 bnd1 =
+      nlmodel_tableau t fr0 bnd0 (update fr1 x (bnd1 i)) bnd1 }
+    =
+    match t with | NL_Root -> NL_Root
+      | NL_Node v0 v1 v2 ->
+        assert { (rename_fo_term (bnd1 i) identity identity) =
+          (eval ((rename_subst_fo_term bnd1 identity identity)) (i+0)) };
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term (update fr1 x (bnd1 i)) identity
+                 identity))
+              ((update ((rename_subst_fo_term fr1 identity identity)) x
+                  (rename_fo_term (bnd1 i) identity identity)))
+            };
+          assert {
+            (rename_subst_fo_term (update fr1 x (bnd1 i)) identity identity)
+            =
+            (update ((rename_subst_fo_term fr1 identity identity)) x
+               (eval ((rename_subst_fo_term bnd1 identity identity)) (i+0)))
+            };
+          assert { (rename_fo_term (bnd1 i) identity identity) =
+            (eval ((rename_subst_fo_term bnd1 identity identity)) (i+0)) };
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term (update fr1 x (bnd1 i)) identity
+                 identity))
+              ((update ((rename_subst_fo_term fr1 identity identity)) x
+                  (rename_fo_term (bnd1 i) identity identity)))
+            };
+          assert {
+            (rename_subst_fo_term (update fr1 x (bnd1 i)) identity identity)
+            =
+            (update ((rename_subst_fo_term fr1 identity identity)) x
+               (eval ((rename_subst_fo_term bnd1 identity identity)) (i+0)))
+            };
+          assert { (rename_fo_term (bnd1 i) identity identity) =
+            (eval ((rename_subst_fo_term bnd1 identity identity)) (i+0)) };
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term (update fr1 x (bnd1 i)) identity
+                 identity))
+              ((update ((rename_subst_fo_term fr1 identity identity)) x
+                  (rename_fo_term (bnd1 i) identity identity)))
+            };
+          assert {
+            (rename_subst_fo_term (update fr1 x (bnd1 i)) identity identity)
+            =
+            (update ((rename_subst_fo_term fr1 identity identity)) x
+               (eval ((rename_subst_fo_term bnd1 identity identity)) (i+0)))
+            };
+          NL_Node
+            (bind_var_fo_term_in_tableau v0 x (i+0)
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd0 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd1 identity identity)))
+            (bind_var_fo_term_in_fo_formula v1 x (i+0)
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd0 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd1 identity identity)))
+            (bind_var_fo_term_in_fo_formula_list v2 x (i+0)
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd0 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd1 identity identity)))
+    end
+
+  let rec unbind_var_symbol_in_tableau (t:nl_tableau int int) (i:int)
+    (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
+    (ghost bnd10:func int (symbol 'b0))
+    (ghost fr1:func int (fo_term 'b0 'b1))
+    (ghost bnd11:func int (fo_term 'b0 'b1))
+    (ghost bnd20:func int (symbol 'b0)) : nl_tableau int int
+    requires { i >= 0 } requires { correct_indexes_tableau t }
+    requires { bound_depth_of_symbol_in_tableau t <= i + 1 }
+    requires { correct_indexes_symbol x }
+    requires { bound_depth_of_symbol_in_symbol x = 0 }
+    variant { nlsize_tableau t }
+    ensures { correct_indexes_tableau result }
+    ensures { bound_depth_of_symbol_in_tableau result <= i }
+    ensures { bound_depth_of_fo_term_in_tableau result =
+      bound_depth_of_fo_term_in_tableau t }
+    ensures { nlmodel_tableau result fr0 bnd10 fr1 bnd11 =
+      nlmodel_tableau t fr0 (update bnd10 i (nlmodel_symbol x fr0 bnd20)) fr1
+        bnd11
+      }
+    =
+    match t with | NL_Root -> NL_Root
+      | NL_Node v0 v1 v2 ->
+        assert { rename_symbol (nlmodel_symbol x fr0 bnd20) identity =
+          nlmodel_symbol x ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd20 identity))
+          } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol
+                 (update bnd10 i (nlmodel_symbol x fr0 bnd20)) identity))
+              (update ((rename_subst_symbol bnd10 identity)) (i+0)
+                 (rename_symbol (nlmodel_symbol x fr0 bnd20) identity))
+            } ;
+          assert {
+            (rename_subst_symbol
+              (update bnd10 i (nlmodel_symbol x fr0 bnd20)) identity)
+            =
+            update ((rename_subst_symbol bnd10 identity)) (i+0)
+              (nlmodel_symbol x ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity)))
+            } ;
+          assert { rename_symbol (nlmodel_symbol x fr0 bnd20) identity =
+            nlmodel_symbol x ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol
+                 (update bnd10 i (nlmodel_symbol x fr0 bnd20)) identity))
+              (update ((rename_subst_symbol bnd10 identity)) (i+0)
+                 (rename_symbol (nlmodel_symbol x fr0 bnd20) identity))
+            } ;
+          assert {
+            (rename_subst_symbol
+              (update bnd10 i (nlmodel_symbol x fr0 bnd20)) identity)
+            =
+            update ((rename_subst_symbol bnd10 identity)) (i+0)
+              (nlmodel_symbol x ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity)))
+            } ;
+          assert { rename_symbol (nlmodel_symbol x fr0 bnd20) identity =
+            nlmodel_symbol x ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol
+                 (update bnd10 i (nlmodel_symbol x fr0 bnd20)) identity))
+              (update ((rename_subst_symbol bnd10 identity)) (i+0)
+                 (rename_symbol (nlmodel_symbol x fr0 bnd20) identity))
+            } ;
+          assert {
+            (rename_subst_symbol
+              (update bnd10 i (nlmodel_symbol x fr0 bnd20)) identity)
+            =
+            update ((rename_subst_symbol bnd10 identity)) (i+0)
+              (nlmodel_symbol x ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity)))
+            } ;
+          NL_Node
+            (unbind_var_symbol_in_tableau v0 (i+0) x
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity)))
+            (unbind_var_symbol_in_fo_formula v1 (i+0) x
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity)))
+            (unbind_var_symbol_in_fo_formula_list v2 (i+0) x
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity)))
+    end
+
+  with unbind_var_fo_term_in_tableau (t:nl_tableau int int) (i:int)
+    (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
+    (ghost bnd10:func int (symbol 'b0))
+    (ghost fr1:func int (fo_term 'b0 'b1))
+    (ghost bnd11:func int (fo_term 'b0 'b1))
+    (ghost bnd20:func int (symbol 'b0))
+    (ghost bnd21:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    requires { i >= 0 } requires { correct_indexes_tableau t }
+    requires { bound_depth_of_fo_term_in_tableau t <= i + 1 }
+    requires { correct_indexes_fo_term x }
+    requires { bound_depth_of_symbol_in_fo_term x = 0 }
+    requires { bound_depth_of_fo_term_in_fo_term x = 0 }
+    variant { nlsize_tableau t }
+    ensures { correct_indexes_tableau result }
+    ensures { bound_depth_of_fo_term_in_tableau result <= i }
+    ensures { bound_depth_of_symbol_in_tableau result =
+      bound_depth_of_symbol_in_tableau t }
+    ensures { nlmodel_tableau result fr0 bnd10 fr1 bnd11 =
+      nlmodel_tableau t fr0 bnd10 fr1
+        (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+      }
+    =
+    match t with | NL_Root -> NL_Root
+      | NL_Node v0 v1 v2 ->
+        assert {
+          rename_fo_term (nlmodel_fo_term x fr0 bnd20 fr1 bnd21) identity
+            identity
+          =
+          nlmodel_fo_term x ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd20 identity))
+            ((rename_subst_fo_term fr1 identity identity))
+            ((rename_subst_fo_term bnd21 identity identity))
+          } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term
+                 (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+                 identity identity))
+              (update ((rename_subst_fo_term bnd11 identity identity)) (i+0)
+                 (rename_fo_term (nlmodel_fo_term x fr0 bnd20 fr1 bnd21)
+                    identity identity))
+            } ;
+          assert {
+            (rename_subst_fo_term
+              (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+              identity identity)
+            =
+            update ((rename_subst_fo_term bnd11 identity identity)) (i+0)
+              (nlmodel_fo_term x ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity))
+                 ((rename_subst_fo_term fr1 identity identity))
+                 ((rename_subst_fo_term bnd21 identity identity)))
+            } ;
+          assert {
+            rename_fo_term (nlmodel_fo_term x fr0 bnd20 fr1 bnd21) identity
+              identity
+            =
+            nlmodel_fo_term x ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+              ((rename_subst_fo_term fr1 identity identity))
+              ((rename_subst_fo_term bnd21 identity identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term
+                 (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+                 identity identity))
+              (update ((rename_subst_fo_term bnd11 identity identity)) (i+0)
+                 (rename_fo_term (nlmodel_fo_term x fr0 bnd20 fr1 bnd21)
+                    identity identity))
+            } ;
+          assert {
+            (rename_subst_fo_term
+              (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+              identity identity)
+            =
+            update ((rename_subst_fo_term bnd11 identity identity)) (i+0)
+              (nlmodel_fo_term x ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity))
+                 ((rename_subst_fo_term fr1 identity identity))
+                 ((rename_subst_fo_term bnd21 identity identity)))
+            } ;
+          assert {
+            rename_fo_term (nlmodel_fo_term x fr0 bnd20 fr1 bnd21) identity
+              identity
+            =
+            nlmodel_fo_term x ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+              ((rename_subst_fo_term fr1 identity identity))
+              ((rename_subst_fo_term bnd21 identity identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term
+                 (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+                 identity identity))
+              (update ((rename_subst_fo_term bnd11 identity identity)) (i+0)
+                 (rename_fo_term (nlmodel_fo_term x fr0 bnd20 fr1 bnd21)
+                    identity identity))
+            } ;
+          assert {
+            (rename_subst_fo_term
+              (update bnd11 i (nlmodel_fo_term x fr0 bnd20 fr1 bnd21))
+              identity identity)
+            =
+            update ((rename_subst_fo_term bnd11 identity identity)) (i+0)
+              (nlmodel_fo_term x ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity))
+                 ((rename_subst_fo_term fr1 identity identity))
+                 ((rename_subst_fo_term bnd21 identity identity)))
+            } ;
+          NL_Node
+            (unbind_var_fo_term_in_tableau v0 (i+0) x
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity))
+               ((rename_subst_fo_term bnd21 identity identity)))
+            (unbind_var_fo_term_in_fo_formula v1 (i+0) x
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity))
+               ((rename_subst_fo_term bnd21 identity identity)))
+            (unbind_var_fo_term_in_fo_formula_list v2 (i+0) x
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity))
+               ((rename_subst_fo_term bnd21 identity identity)))
+    end
+
+  let rec subst_base_symbol_in_tableau (t:nl_tableau int int) (x:int)
+    (u:nl_symbol int) (ghost fr0:func int (symbol 'b0))
+    (ghost bnd10:func int (symbol 'b0))
+    (ghost fr1:func int (fo_term 'b0 'b1))
+    (ghost bnd11:func int (fo_term 'b0 'b1))
+    (ghost bnd20:func int (symbol 'b0)) : nl_tableau int int
+    requires { correct_indexes_tableau t }
+    requires { correct_indexes_symbol u }
+    requires { bound_depth_of_symbol_in_symbol u = 0 }
+    variant { nlsize_tableau t }
+    ensures { correct_indexes_tableau result }
+    ensures { bound_depth_of_symbol_in_tableau result =
+       bound_depth_of_symbol_in_tableau t }
+    ensures { bound_depth_of_fo_term_in_tableau result =
+      bound_depth_of_fo_term_in_tableau t }
+    ensures { nlmodel_tableau result fr0 bnd10 fr1 bnd11 =
+      nlmodel_tableau t (update fr0 x (nlmodel_symbol u fr0 bnd20)) bnd10 fr1
+        bnd11
+      }
+    =
+    match t with | NL_Root -> NL_Root
+      | NL_Node v0 v1 v2 ->
+        assert { rename_symbol (nlmodel_symbol u fr0 bnd20) identity =
+          nlmodel_symbol u ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd20 identity))
+          } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol
+                 (update fr0 x (nlmodel_symbol u fr0 bnd20)) identity))
+              (update ((rename_subst_symbol fr0 identity)) x
+                 (rename_symbol (nlmodel_symbol u fr0 bnd20) identity))
+            } ;
+          assert {
+            (rename_subst_symbol (update fr0 x (nlmodel_symbol u fr0 bnd20))
+              identity)
+            =
+            update ((rename_subst_symbol fr0 identity)) x
+              (nlmodel_symbol u ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity)))
+            } ;
+          assert { rename_symbol (nlmodel_symbol u fr0 bnd20) identity =
+            nlmodel_symbol u ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol
+                 (update fr0 x (nlmodel_symbol u fr0 bnd20)) identity))
+              (update ((rename_subst_symbol fr0 identity)) x
+                 (rename_symbol (nlmodel_symbol u fr0 bnd20) identity))
+            } ;
+          assert {
+            (rename_subst_symbol (update fr0 x (nlmodel_symbol u fr0 bnd20))
+              identity)
+            =
+            update ((rename_subst_symbol fr0 identity)) x
+              (nlmodel_symbol u ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity)))
+            } ;
+          assert { rename_symbol (nlmodel_symbol u fr0 bnd20) identity =
+            nlmodel_symbol u ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_symbol
+                 (update fr0 x (nlmodel_symbol u fr0 bnd20)) identity))
+              (update ((rename_subst_symbol fr0 identity)) x
+                 (rename_symbol (nlmodel_symbol u fr0 bnd20) identity))
+            } ;
+          assert {
+            (rename_subst_symbol (update fr0 x (nlmodel_symbol u fr0 bnd20))
+              identity)
+            =
+            update ((rename_subst_symbol fr0 identity)) x
+              (nlmodel_symbol u ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity)))
+            } ;
+          NL_Node
+            (subst_base_symbol_in_tableau v0 x u
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity)))
+            (subst_base_symbol_in_fo_formula v1 x u
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity)))
+            (subst_base_symbol_in_fo_formula_list v2 x u
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity)))
+    end
+
+  with subst_base_fo_term_in_tableau (t:nl_tableau int int) (x:int)
+    (u:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
+    (ghost bnd10:func int (symbol 'b0))
+    (ghost fr1:func int (fo_term 'b0 'b1))
+    (ghost bnd11:func int (fo_term 'b0 'b1))
+    (ghost bnd20:func int (symbol 'b0))
+    (ghost bnd21:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    requires { correct_indexes_tableau t }
+    requires { correct_indexes_fo_term u }
+    requires { bound_depth_of_symbol_in_fo_term u = 0 }
+    requires { bound_depth_of_fo_term_in_fo_term u = 0 }
+    variant { nlsize_tableau t }
+    ensures { correct_indexes_tableau result }
+    ensures { bound_depth_of_symbol_in_tableau result =
+       bound_depth_of_symbol_in_tableau t }
+    ensures { bound_depth_of_fo_term_in_tableau result =
+      bound_depth_of_fo_term_in_tableau t }
+    ensures { nlmodel_tableau result fr0 bnd10 fr1 bnd11 =
+      nlmodel_tableau t fr0 bnd10
+        (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)) bnd11
+      }
+    =
+    match t with | NL_Root -> NL_Root
+      | NL_Node v0 v1 v2 ->
+        assert {
+          rename_fo_term (nlmodel_fo_term u fr0 bnd20 fr1 bnd21) identity
+            identity
+          =
+          nlmodel_fo_term u ((rename_subst_symbol fr0 identity))
+            ((rename_subst_symbol bnd20 identity))
+            ((rename_subst_fo_term fr1 identity identity))
+            ((rename_subst_fo_term bnd21 identity identity))
+          } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term
+                 (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21))
+                 identity identity))
+              (update ((rename_subst_fo_term fr1 identity identity)) x
+                 (rename_fo_term (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)
+                    identity identity))
+            } ;
+          assert {
+            (rename_subst_fo_term
+              (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)) identity
+              identity)
+            =
+            update ((rename_subst_fo_term fr1 identity identity)) x
+              (nlmodel_fo_term u ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity))
+                 ((rename_subst_fo_term fr1 identity identity))
+                 ((rename_subst_fo_term bnd21 identity identity)))
+            } ;
+          assert {
+            rename_fo_term (nlmodel_fo_term u fr0 bnd20 fr1 bnd21) identity
+              identity
+            =
+            nlmodel_fo_term u ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+              ((rename_subst_fo_term fr1 identity identity))
+              ((rename_subst_fo_term bnd21 identity identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term
+                 (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21))
+                 identity identity))
+              (update ((rename_subst_fo_term fr1 identity identity)) x
+                 (rename_fo_term (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)
+                    identity identity))
+            } ;
+          assert {
+            (rename_subst_fo_term
+              (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)) identity
+              identity)
+            =
+            update ((rename_subst_fo_term fr1 identity identity)) x
+              (nlmodel_fo_term u ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity))
+                 ((rename_subst_fo_term fr1 identity identity))
+                 ((rename_subst_fo_term bnd21 identity identity)))
+            } ;
+          assert {
+            rename_fo_term (nlmodel_fo_term u fr0 bnd20 fr1 bnd21) identity
+              identity
+            =
+            nlmodel_fo_term u ((rename_subst_symbol fr0 identity))
+              ((rename_subst_symbol bnd20 identity))
+              ((rename_subst_fo_term fr1 identity identity))
+              ((rename_subst_fo_term bnd21 identity identity))
+            } ;
+          assert {
+            extensionalEqual
+              ((rename_subst_fo_term
+                 (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21))
+                 identity identity))
+              (update ((rename_subst_fo_term fr1 identity identity)) x
+                 (rename_fo_term (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)
+                    identity identity))
+            } ;
+          assert {
+            (rename_subst_fo_term
+              (update fr1 x (nlmodel_fo_term u fr0 bnd20 fr1 bnd21)) identity
+              identity)
+            =
+            update ((rename_subst_fo_term fr1 identity identity)) x
+              (nlmodel_fo_term u ((rename_subst_symbol fr0 identity))
+                 ((rename_subst_symbol bnd20 identity))
+                 ((rename_subst_fo_term fr1 identity identity))
+                 ((rename_subst_fo_term bnd21 identity identity)))
+            } ;
+          NL_Node
+            (subst_base_fo_term_in_tableau v0 x u
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity))
+               ((rename_subst_fo_term bnd21 identity identity)))
+            (subst_base_fo_term_in_fo_formula v1 x u
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity))
+               ((rename_subst_fo_term bnd21 identity identity)))
+            (subst_base_fo_term_in_fo_formula_list v2 x u
+               ((rename_subst_symbol fr0 identity))
+               ((rename_subst_symbol bnd10 identity))
+               ((rename_subst_fo_term fr1 identity identity))
+               ((rename_subst_fo_term bnd11 identity identity))
+               ((rename_subst_symbol bnd20 identity))
+               ((rename_subst_fo_term bnd21 identity identity)))
+    end
+
+  let construct_tableau (c:cons_tableau) : nlimpl_tableau
+    requires { cons_ok_tableau c } ensures { nlimpl_tableau_ok result }
+    ensures { cons_rel_tableau c result }
+    (*ensures { cons_open_rel_tableau c result }*) =
+    match c with
+      | NLC_Root ->
+        let res =
+          { nlrepr_tableau_field = (NL_Root) ;
+            nlfree_var_symbol_set_abstraction_tableau_field = 0 ;
+            nlfree_var_fo_term_set_abstraction_tableau_field = 0 ;
+            model_tableau_field = ghost (Root) ;
+          }
+        in
+        assert {
+          forall x:int.
+            is_symbol_free_var_in_tableau x res.model_tableau_field ->
+            (false) && (x) <
+            (res.nlfree_var_symbol_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_fo_term_free_var_in_tableau x res.model_tableau_field ->
+            (false) && (x) <
+            (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+          } ;
+        res
+      | NLC_Node v0 v1 v2 -> assert { nlimpl_tableau_ok v0 } ;
+        assert { nlimpl_fo_formula_ok v1 } ;
+        assert { nlimpl_fo_formula_list_ok v2 } ;
+        let res =
+          {
+            nlrepr_tableau_field =
+              (NL_Node (let v0 = v0.nlrepr_tableau_field in v0)
+                 (let v1 = v1.nlrepr_fo_formula_field in v1)
+                 (let v2 = v2.nlrepr_fo_formula_list_field in v2)) ;
+            nlfree_var_symbol_set_abstraction_tableau_field =
+              (let aux (a:int) (b:int) : int
+                 ensures { result >= a /\ result >= b } =
+                 if a < b then b else a in
+                 aux
+                   ((let aux (a:int) (b:int) : int
+                       ensures { result >= a /\ result >= b } =
+                       if a < b then b else a in
+                       aux
+                         (v0.nlfree_var_symbol_set_abstraction_tableau_field)
+                         (v1.nlfree_var_symbol_set_abstraction_fo_formula_field)))
+                   (v2.nlfree_var_symbol_set_abstraction_fo_formula_list_field)) ;
+            nlfree_var_fo_term_set_abstraction_tableau_field =
+              (let aux (a:int) (b:int) : int
+                 ensures { result >= a /\ result >= b } =
+                 if a < b then b else a in
+                 aux
+                   ((let aux (a:int) (b:int) : int
+                       ensures { result >= a /\ result >= b } =
+                       if a < b then b else a in
+                       aux
+                         (v0.nlfree_var_fo_term_set_abstraction_tableau_field)
+                         (v1.nlfree_var_fo_term_set_abstraction_fo_formula_field)))
+                   (v2.nlfree_var_fo_term_set_abstraction_fo_formula_list_field)) ;
+            model_tableau_field = ghost
+              (Node (rename_tableau v0.model_tableau_field identity identity)
+                 (rename_fo_formula v1.model_fo_formula_field identity
+                    identity)
+                 (rename_fo_formula_list v2.model_fo_formula_list_field
+                    identity identity)) ;
+          }
+        in
+        assert {
+          forall x:int.
+            is_symbol_free_var_in_tableau x
+              (rename_tableau v0.model_tableau_field identity identity)
+            ->
+            (forall y:int.
+               (is_symbol_free_var_in_tableau y v0.model_tableau_field /\
+               eval (identity) y = x) -> x = eval (identity) y && x = y &&
+               is_symbol_free_var_in_tableau x v0.model_tableau_field)
+            && is_symbol_free_var_in_tableau x v0.model_tableau_field && (x)
+            < (v0.nlfree_var_symbol_set_abstraction_tableau_field) && (x) <
+            (res.nlfree_var_symbol_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_fo_term_free_var_in_tableau x
+              (rename_tableau v0.model_tableau_field identity identity)
+            ->
+            (forall y:int.
+               (is_fo_term_free_var_in_tableau y v0.model_tableau_field /\
+               eval (identity) y = x) -> x = eval (identity) y && x = y &&
+               is_fo_term_free_var_in_tableau x v0.model_tableau_field)
+            && is_fo_term_free_var_in_tableau x v0.model_tableau_field && (x)
+            < (v0.nlfree_var_fo_term_set_abstraction_tableau_field) && (x) <
+            (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_symbol_free_var_in_fo_formula x
+              (rename_fo_formula v1.model_fo_formula_field identity identity)
+            ->
+            (forall y:int.
+               (is_symbol_free_var_in_fo_formula y v1.model_fo_formula_field
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               x = y &&
+               is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field)
+            && is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field
+            && (x) < (v1.nlfree_var_symbol_set_abstraction_fo_formula_field)
+            && (x) < (res.nlfree_var_symbol_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_fo_term_free_var_in_fo_formula x
+              (rename_fo_formula v1.model_fo_formula_field identity identity)
+            ->
+            (forall y:int.
+               (is_fo_term_free_var_in_fo_formula y v1.model_fo_formula_field
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               x = y &&
+               is_fo_term_free_var_in_fo_formula x v1.model_fo_formula_field)
+            && is_fo_term_free_var_in_fo_formula x v1.model_fo_formula_field
+            && (x) < (v1.nlfree_var_fo_term_set_abstraction_fo_formula_field)
+            && (x) < (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_symbol_free_var_in_fo_formula_list x
+              (rename_fo_formula_list v2.model_fo_formula_list_field identity
+                 identity)
+            ->
+            (forall y:int.
+               (is_symbol_free_var_in_fo_formula_list y
+                  v2.model_fo_formula_list_field
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               x = y &&
+               is_symbol_free_var_in_fo_formula_list x
+                 v2.model_fo_formula_list_field)
+            &&
+            is_symbol_free_var_in_fo_formula_list x
+              v2.model_fo_formula_list_field
+            && (x) <
+            (v2.nlfree_var_symbol_set_abstraction_fo_formula_list_field) &&
+            (x) < (res.nlfree_var_symbol_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_fo_term_free_var_in_fo_formula_list x
+              (rename_fo_formula_list v2.model_fo_formula_list_field identity
+                 identity)
+            ->
+            (forall y:int.
+               (is_fo_term_free_var_in_fo_formula_list y
+                  v2.model_fo_formula_list_field
+               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               x = y &&
+               is_fo_term_free_var_in_fo_formula_list x
+                 v2.model_fo_formula_list_field)
+            &&
+            is_fo_term_free_var_in_fo_formula_list x
+              v2.model_fo_formula_list_field
+            && (x) <
+            (v2.nlfree_var_fo_term_set_abstraction_fo_formula_list_field) &&
+            (x) < (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_symbol_free_var_in_tableau x res.model_tableau_field ->
+            (is_symbol_free_var_in_tableau x
+               (rename_tableau v0.model_tableau_field identity identity) \/
+               is_symbol_free_var_in_fo_formula x
+                 (rename_fo_formula v1.model_fo_formula_field identity
+                    identity)
+               \/
+               is_symbol_free_var_in_fo_formula_list x
+                 (rename_fo_formula_list v2.model_fo_formula_list_field
+                    identity identity))
+            && (x) < (res.nlfree_var_symbol_set_abstraction_tableau_field)
+          } ;
+        assert {
+          forall x:int.
+            is_fo_term_free_var_in_tableau x res.model_tableau_field ->
+            (is_fo_term_free_var_in_tableau x
+               (rename_tableau v0.model_tableau_field identity identity) \/
+               is_fo_term_free_var_in_fo_formula x
+                 (rename_fo_formula v1.model_fo_formula_field identity
+                    identity)
+               \/
+               is_fo_term_free_var_in_fo_formula_list x
+                 (rename_fo_formula_list v2.model_fo_formula_list_field
+                    identity identity))
+            && (x) < (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+          } ;
+        assert {
+          extensionalEqual (rename_subst_symbol subst_id_symbol identity)
+            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+                identity))
+          } ;
+        assert { rename_subst_symbol subst_id_symbol identity =
+          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+             identity)
+          } ;
+        assert {
+          extensionalEqual
+            (rename_subst_fo_term subst_id_fo_term identity identity)
+            ((rename_subst_fo_term
+                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                identity))
+          } ;
+        assert { rename_subst_fo_term subst_id_fo_term identity identity =
+          (rename_subst_fo_term
+             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             identity)
+          } ;
+        model_equal_tableau v0.nlrepr_tableau_field
+          (rename_subst_symbol subst_id_symbol identity)
+          (rename_subst_symbol subst_id_symbol identity)
+          ((rename_subst_symbol (const (Var_symbol (-1))) identity))
+          (rename_subst_symbol (const (Var_symbol (-1))) identity)
+          (rename_subst_fo_term subst_id_fo_term identity identity)
+          (rename_subst_fo_term subst_id_fo_term identity identity)
+          ((rename_subst_fo_term (const (Var_fo_term (-1))) identity
+             identity))
+          (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
+        (*assert {
+            extensionalEqual (rcompose (identity) (identity))
+              ((identity : func (int) (int)))
+            } ;
+        assert { rcompose (identity) (identity) =
+          (identity : func (int) (int)) } ;*)
+        (*assert {
+            extensionalEqual (rcompose (identity) (identity))
+              ((identity : func (int) (int)))
+            } ;
+        assert { rcompose (identity) (identity) =
+          (identity : func (int) (int)) } ;*)
+        assert {
+          extensionalEqual (rename_subst_symbol subst_id_symbol identity)
+            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+                identity))
+          } ;
+        assert { rename_subst_symbol subst_id_symbol identity =
+          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+             identity)
+          } ;
+        assert {
+          extensionalEqual
+            (rename_subst_fo_term subst_id_fo_term identity identity)
+            ((rename_subst_fo_term
+                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                identity))
+          } ;
+        assert { rename_subst_fo_term subst_id_fo_term identity identity =
+          (rename_subst_fo_term
+             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             identity)
+          } ;
+        model_equal_fo_formula v1.nlrepr_fo_formula_field
+          (rename_subst_symbol subst_id_symbol identity)
+          (rename_subst_symbol subst_id_symbol identity)
+          ((rename_subst_symbol (const (Var_symbol (-1))) identity))
+          (rename_subst_symbol (const (Var_symbol (-1))) identity)
+          (rename_subst_fo_term subst_id_fo_term identity identity)
+          (rename_subst_fo_term subst_id_fo_term identity identity)
+          ((rename_subst_fo_term (const (Var_fo_term (-1))) identity
+             identity))
+          (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
+        (*assert {
+            extensionalEqual (rcompose (identity) (identity))
+              ((identity : func (int) (int)))
+            } ;
+        assert { rcompose (identity) (identity) =
+          (identity : func (int) (int)) } ;*)
+        (*assert {
+            extensionalEqual (rcompose (identity) (identity))
+              ((identity : func (int) (int)))
+            } ;
+        assert { rcompose (identity) (identity) =
+          (identity : func (int) (int)) } ;*)
+        assert {
+          extensionalEqual (rename_subst_symbol subst_id_symbol identity)
+            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+                identity))
+          } ;
+        assert { rename_subst_symbol subst_id_symbol identity =
+          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+             identity)
+          } ;
+        assert {
+          extensionalEqual
+            (rename_subst_fo_term subst_id_fo_term identity identity)
+            ((rename_subst_fo_term
+                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                identity))
+          } ;
+        assert { rename_subst_fo_term subst_id_fo_term identity identity =
+          (rename_subst_fo_term
+             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             identity)
+          } ;
+        model_equal_fo_formula_list v2.nlrepr_fo_formula_list_field
+          (rename_subst_symbol subst_id_symbol identity)
+          (rename_subst_symbol subst_id_symbol identity)
+          ((rename_subst_symbol (const (Var_symbol (-1))) identity))
+          (rename_subst_symbol (const (Var_symbol (-1))) identity)
+          (rename_subst_fo_term subst_id_fo_term identity identity)
+          (rename_subst_fo_term subst_id_fo_term identity identity)
+          ((rename_subst_fo_term (const (Var_fo_term (-1))) identity
+             identity))
+          (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
+        (*assert {
+            extensionalEqual (rcompose (identity) (identity))
+              ((identity : func (int) (int)))
+            } ;
+        assert { rcompose (identity) (identity) =
+          (identity : func (int) (int)) } ;*)
+        (*assert {
+            extensionalEqual (rcompose (identity) (identity))
+              ((identity : func (int) (int)))
+            } ;
+        assert { rcompose (identity) (identity) =
+          (identity : func (int) (int)) } ;*)
+        res
+    end
+
+  let destruct_tableau (t:nlimpl_tableau) : cons_tableau
+    requires { nlimpl_tableau_ok t } ensures { cons_ok_tableau result }
+    ensures { cons_rel_tableau result t }
+    ensures { cons_open_rel_tableau result t } =
+    let fv0 = t.nlfree_var_symbol_set_abstraction_tableau_field in
+    let fv1 = t.nlfree_var_fo_term_set_abstraction_tableau_field in
+    match t.nlrepr_tableau_field with
+      | NL_Root ->
+        assert { t.model_tableau_field = Root } ;
+          let () =
+            match t.model_tableau_field with | Root -> ()
+              | Node x0 x1 x2 -> absurd
+            end
+          in let res = NLC_Root in res
+      | NL_Node v0 v1 v2 ->
+        assert { t.model_tableau_field =
+          Node
+            (nlmodel_tableau v0
+               (rename_subst_symbol subst_id_symbol identity)
+               (rename_subst_symbol
+                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+               (rename_subst_fo_term subst_id_fo_term identity identity)
+               (rename_subst_fo_term
+                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 identity identity))
+            (nlmodel_fo_formula v1
+               (rename_subst_symbol subst_id_symbol identity)
+               (rename_subst_symbol
+                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+               (rename_subst_fo_term subst_id_fo_term identity identity)
+               (rename_subst_fo_term
+                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 identity identity))
+            (nlmodel_fo_formula_list v2
+               (rename_subst_symbol subst_id_symbol identity)
+               (rename_subst_symbol
+                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+               (rename_subst_fo_term subst_id_fo_term identity identity)
+               (rename_subst_fo_term
+                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 identity identity))
+          } ;
+          let (mv0 , mv1 , mv2) =
+            match t.model_tableau_field with | Root -> absurd
+              | Node x0 x1 x2 -> (x0 , x1 , x2)
+            end
+          in
+          assert { mv0 =
+            nlmodel_tableau v0
+              ((rename_subst_symbol subst_id_symbol identity))
+              ((rename_subst_symbol
+                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+              ((rename_subst_fo_term subst_id_fo_term identity identity))
+              ((rename_subst_fo_term
+                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 identity identity))
+            } ;
+          assert { mv1 =
+            nlmodel_fo_formula v1
+              ((rename_subst_symbol subst_id_symbol identity))
+              ((rename_subst_symbol
+                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+              ((rename_subst_fo_term subst_id_fo_term identity identity))
+              ((rename_subst_fo_term
+                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 identity identity))
+            } ;
+          assert { mv2 =
+            nlmodel_fo_formula_list v2
+              ((rename_subst_symbol subst_id_symbol identity))
+              ((rename_subst_symbol
+                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+              ((rename_subst_fo_term subst_id_fo_term identity identity))
+              ((rename_subst_fo_term
+                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 identity identity))
+            } ;
+          assert { bound_depth_of_symbol_in_tableau v0 <= 0 } ;
+          assert {
+            forall x:int. is_symbol_free_var_in_tableau x mv0 ->
+              is_symbol_free_var_in_tableau x t.model_tableau_field && (x) <
+              (t.nlfree_var_symbol_set_abstraction_tableau_field)
+            } ;
+          assert { bound_depth_of_fo_term_in_tableau v0 <= 0 } ;
+          assert {
+            forall x:int. is_fo_term_free_var_in_tableau x mv0 ->
+              is_fo_term_free_var_in_tableau x t.model_tableau_field && (x) <
+              (t.nlfree_var_fo_term_set_abstraction_tableau_field)
+            } ;
+          assert { bound_depth_of_symbol_in_fo_formula v1 <= 0 } ;
+          assert {
+            forall x:int. is_symbol_free_var_in_fo_formula x mv1 ->
+              is_symbol_free_var_in_tableau x t.model_tableau_field && (x) <
+              (t.nlfree_var_symbol_set_abstraction_tableau_field)
+            } ;
+          assert { bound_depth_of_fo_term_in_fo_formula v1 <= 0 } ;
+          assert {
+            forall x:int. is_fo_term_free_var_in_fo_formula x mv1 ->
+              is_fo_term_free_var_in_tableau x t.model_tableau_field && (x) <
+              (t.nlfree_var_fo_term_set_abstraction_tableau_field)
+            } ;
+          assert { bound_depth_of_symbol_in_fo_formula_list v2 <= 0 } ;
+          assert {
+            forall x:int. is_symbol_free_var_in_fo_formula_list x mv2 ->
+              is_symbol_free_var_in_tableau x t.model_tableau_field && (x) <
+              (t.nlfree_var_symbol_set_abstraction_tableau_field)
+            } ;
+          assert { bound_depth_of_fo_term_in_fo_formula_list v2 <= 0 } ;
+          assert {
+            forall x:int. is_fo_term_free_var_in_fo_formula_list x mv2 ->
+              is_fo_term_free_var_in_tableau x t.model_tableau_field && (x) <
+              (t.nlfree_var_fo_term_set_abstraction_tableau_field)
+            } ;
+          model_equal_tableau v0 subst_id_symbol
+            (rename_subst_symbol
+               ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
+            const (Var_symbol (-1)) : func int (symbol int)))
+            (rename_subst_symbol
+               ((rename_subst_symbol
+                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+               (identity))
+            subst_id_fo_term
+            (rename_subst_fo_term
+               ((rename_subst_fo_term subst_id_fo_term identity identity))
+               (identity) (identity)) ((const (Var_fo_term (-1)) :
+                                          func int (fo_term int int)))
+            (rename_subst_fo_term
+               ((rename_subst_fo_term
+                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  identity identity))
+               (identity) (identity)) ;
+          model_equal_fo_formula v1 subst_id_symbol
+            (rename_subst_symbol
+               ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
+            const (Var_symbol (-1)) : func int (symbol int)))
+            (rename_subst_symbol
+               ((rename_subst_symbol
+                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+               (identity))
+            subst_id_fo_term
+            (rename_subst_fo_term
+               ((rename_subst_fo_term subst_id_fo_term identity identity))
+               (identity) (identity)) ((const (Var_fo_term (-1)) :
+                                          func int (fo_term int int)))
+            (rename_subst_fo_term
+               ((rename_subst_fo_term
+                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  identity identity))
+               (identity) (identity)) ;
+          model_equal_fo_formula_list v2 subst_id_symbol
+            (rename_subst_symbol
+               ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
+            const (Var_symbol (-1)) : func int (symbol int)))
+            (rename_subst_symbol
+               ((rename_subst_symbol
+                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+               (identity))
+            subst_id_fo_term
+            (rename_subst_fo_term
+               ((rename_subst_fo_term subst_id_fo_term identity identity))
+               (identity) (identity)) ((const (Var_fo_term (-1)) :
+                                          func int (fo_term int int)))
+            (rename_subst_fo_term
+               ((rename_subst_fo_term
+                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  identity identity))
+               (identity) (identity)) ;
+          let mrv0 = rename_tableau mv0 identity identity in
+          let mrv1 = rename_fo_formula mv1 identity identity in
+          let mrv2 = rename_fo_formula_list mv2 identity identity in
+          let resv0 =
+            { nlrepr_tableau_field = v0 ;
+              nlfree_var_symbol_set_abstraction_tableau_field = fv0 ;
+              nlfree_var_fo_term_set_abstraction_tableau_field = fv1 ;
+              model_tableau_field = ghost mrv0 ;
+            }
+          in
+          let resv1 =
+            { nlrepr_fo_formula_field = v1 ;
+              nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
+              nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
+              model_fo_formula_field = ghost mrv1 ;
+            }
+          in
+          let resv2 =
+            { nlrepr_fo_formula_list_field = v2 ;
+              nlfree_var_symbol_set_abstraction_fo_formula_list_field = fv0 ;
+              nlfree_var_fo_term_set_abstraction_fo_formula_list_field =
+                fv1 ;
+              model_fo_formula_list_field = ghost mrv2 ;
+            }
+          in let res = NLC_Node resv0 resv1 resv2 in
+          free_var_equivalence_of_rename_tableau mv0 (identity)
+            (rcompose (identity) (identity)) (identity)
+            (rcompose (identity) (identity)) ;
+          free_var_equivalence_of_rename_fo_formula mv1 (identity)
+            (rcompose (identity) (identity)) (identity)
+            (rcompose (identity) (identity)) ;
+          free_var_equivalence_of_rename_fo_formula_list mv2 (identity)
+            (rcompose (identity) (identity)) (identity)
+            (rcompose (identity) (identity)) ;
+          assert {
+            forall x:int. is_symbol_free_var_in_tableau x mrv0 ->
+              (forall y:int.
+                 (is_symbol_free_var_in_tableau y mv0 /\ eval (identity) y =
+                    x)
+                 -> x = y &&
+                 is_symbol_free_var_in_tableau x t.model_tableau_field && (x)
+                 < (fv0))
+              && (x) < (fv0)
+            } ;
+          assert {
+            forall x:int. is_fo_term_free_var_in_tableau x mrv0 ->
+              (forall y:int.
+                 (is_fo_term_free_var_in_tableau y mv0 /\ eval (identity) y =
+                    x)
+                 -> x = y &&
+                 is_fo_term_free_var_in_tableau x t.model_tableau_field &&
+                 (x) < (fv1))
+              && (x) < (fv1)
+            } ;
+          assert {
+            forall x:int. is_symbol_free_var_in_fo_formula x mrv1 ->
+              (forall y:int.
+                 (is_symbol_free_var_in_fo_formula y mv1 /\ eval (identity) y
+                    = x)
+                 -> x = y &&
+                 is_symbol_free_var_in_tableau x t.model_tableau_field && (x)
+                 < (fv0))
+              && (x) < (fv0)
+            } ;
+          assert {
+            forall x:int. is_fo_term_free_var_in_fo_formula x mrv1 ->
+              (forall y:int.
+                 (is_fo_term_free_var_in_fo_formula y mv1 /\
+                    eval (identity) y = x)
+                 -> x = y &&
+                 is_fo_term_free_var_in_tableau x t.model_tableau_field &&
+                 (x) < (fv1))
+              && (x) < (fv1)
+            } ;
+          assert {
+            forall x:int. is_symbol_free_var_in_fo_formula_list x mrv2 ->
+              (forall y:int.
+                 (is_symbol_free_var_in_fo_formula_list y mv2 /\
+                    eval (identity) y = x)
+                 -> x = y &&
+                 is_symbol_free_var_in_tableau x t.model_tableau_field && (x)
+                 < (fv0))
+              && (x) < (fv0)
+            } ;
+          assert {
+            forall x:int. is_fo_term_free_var_in_fo_formula_list x mrv2 ->
+              (forall y:int.
+                 (is_fo_term_free_var_in_fo_formula_list y mv2 /\
+                    eval (identity) y = x)
+                 -> x = y &&
+                 is_fo_term_free_var_in_tableau x t.model_tableau_field &&
+                 (x) < (fv1))
+              && (x) < (fv1)
+            } ;
+          res
+    end
+
+  let nlsubst_symbol_in_tableau (t:nlimpl_tableau) (x:int)
+    (u:nlimpl_symbol) : nlimpl_tableau requires { nlimpl_tableau_ok t }
+    requires { nlimpl_symbol_ok u } ensures { nlimpl_tableau_ok result }
+    ensures { result.model_tableau_field =
+      subst_tableau t.model_tableau_field
+        (update (subst_id_symbol: func (int) (symbol (int))) x
+           u.model_symbol_field)
+        (subst_id_fo_term: func (int) (fo_term (int) (int)))
+      }
+    =
+    model_equal_tableau t.nlrepr_tableau_field
+      (subst_compose_symbol subst_id_symbol
+         ((update (subst_id_symbol: func (int) (symbol (int))) x
+             u.model_symbol_field)))
+      ((update (subst_id_symbol: func (int) (symbol (int))) x
+          u.model_symbol_field))
+      (subst_compose_symbol (const (Var_symbol (-1)))
+         ((update (subst_id_symbol: func (int) (symbol (int))) x
+             u.model_symbol_field)))
+      ((const (Var_symbol (-1))))
+      (subst_compose_fo_term subst_id_fo_term
+         ((update (subst_id_symbol: func (int) (symbol (int))) x
+             u.model_symbol_field))
+         ((subst_id_fo_term: func (int) (fo_term (int) (int)))))
+      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+      (subst_compose_fo_term (const (Var_fo_term (-1)))
+         ((update (subst_id_symbol: func (int) (symbol (int))) x
+             u.model_symbol_field))
+         ((subst_id_fo_term: func (int) (fo_term (int) (int)))))
+      ((const (Var_fo_term (-1))));
+    let res =
+      {
+        nlrepr_tableau_field =
+          subst_base_symbol_in_tableau t.nlrepr_tableau_field x
+            u.nlrepr_symbol_field (subst_id_symbol)
+            ((const (Var_symbol (-1)))) (subst_id_fo_term)
+            ((const (Var_fo_term (-1)))) ((const (Var_symbol (-1)))) ;
+        nlfree_var_symbol_set_abstraction_tableau_field =
+          (let aux (a:int) (b:int) : int
+             ensures { result >= a /\ result >= b } = if a < b then b else a
+             in
+             aux (t.nlfree_var_symbol_set_abstraction_tableau_field)
+               (u.nlfree_var_symbol_set_abstraction_symbol_field)) ;
+        nlfree_var_fo_term_set_abstraction_tableau_field =
+          t.nlfree_var_fo_term_set_abstraction_tableau_field ;
+        model_tableau_field = ghost
+          subst_tableau t.model_tableau_field
+            (update (subst_id_symbol: func (int) (symbol (int))) x
+               u.model_symbol_field)
+            (subst_id_fo_term: func (int) (fo_term (int) (int))) ;
+      }
+    in
+    assert {
+      forall x2:int. is_symbol_free_var_in_tableau x2 res.model_tableau_field
+        ->
+        (true /\
+           (forall y:int.
+              (is_symbol_free_var_in_tableau y t.model_tableau_field /\
+                 is_symbol_free_var_in_symbol x2
+                   (eval
+                      ((update (subst_id_symbol: func (int) (symbol (int))) x
+                          u.model_symbol_field))
+                      y))
+              ->
+              ((x = y -> (x2) <
+                  (res.nlfree_var_symbol_set_abstraction_tableau_field))
+                 /\
+                 (x <> y -> x2 = y && (x2) <
+                    (res.nlfree_var_symbol_set_abstraction_tableau_field)))
+                 && (x2) <
+                 (res.nlfree_var_symbol_set_abstraction_tableau_field))
+           /\
+           (forall y:int.
+              (is_fo_term_free_var_in_tableau y t.model_tableau_field /\
+                 is_symbol_free_var_in_fo_term x2
+                   (eval
+                      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+                      y))
+              -> false))
+        && (x2) < (res.nlfree_var_symbol_set_abstraction_tableau_field)
+      } ;
+    assert {
+      forall x2:int.
+        is_fo_term_free_var_in_tableau x2 res.model_tableau_field ->
+        (true /\
+           (forall y:int.
+              (is_fo_term_free_var_in_tableau y t.model_tableau_field /\
+                 is_fo_term_free_var_in_fo_term x2
+                   (eval
+                      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+                      y))
+              -> x2 = y && (x2) <
+              (res.nlfree_var_fo_term_set_abstraction_tableau_field)))
+        && (x2) < (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+      } ;
+    res
+
+  let nlsubst_fo_term_in_tableau (t:nlimpl_tableau) (x:int)
+    (u:nlimpl_fo_term) : nlimpl_tableau requires { nlimpl_tableau_ok t }
+    requires { nlimpl_fo_term_ok u } ensures { nlimpl_tableau_ok result }
+    ensures { result.model_tableau_field =
+      subst_tableau t.model_tableau_field
+        (subst_id_symbol: func (int) (symbol (int)))
+        (update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+           u.model_fo_term_field)
+      }
+    =
+    model_equal_tableau t.nlrepr_tableau_field
+      (subst_compose_symbol subst_id_symbol
+         ((subst_id_symbol: func (int) (symbol (int)))))
+      ((subst_id_symbol: func (int) (symbol (int))))
+      (subst_compose_symbol (const (Var_symbol (-1)))
+         ((subst_id_symbol: func (int) (symbol (int)))))
+      ((const (Var_symbol (-1))))
+      (subst_compose_fo_term subst_id_fo_term
+         ((subst_id_symbol: func (int) (symbol (int))))
+         ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+             u.model_fo_term_field)))
+      ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+          u.model_fo_term_field))
+      (subst_compose_fo_term (const (Var_fo_term (-1)))
+         ((subst_id_symbol: func (int) (symbol (int))))
+         ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+             u.model_fo_term_field)))
+      ((const (Var_fo_term (-1))));
+    let res =
+      {
+        nlrepr_tableau_field =
+          subst_base_fo_term_in_tableau t.nlrepr_tableau_field x
+            u.nlrepr_fo_term_field (subst_id_symbol)
+            ((const (Var_symbol (-1)))) (subst_id_fo_term)
+            ((const (Var_fo_term (-1)))) ((const (Var_symbol (-1))))
+            ((const (Var_fo_term (-1)))) ;
+        nlfree_var_symbol_set_abstraction_tableau_field =
+          (let aux (a:int) (b:int) : int
+             ensures { result >= a /\ result >= b } = if a < b then b else a
+             in
+             aux (t.nlfree_var_symbol_set_abstraction_tableau_field)
+               (u.nlfree_var_symbol_set_abstraction_fo_term_field)) ;
+        nlfree_var_fo_term_set_abstraction_tableau_field =
+          (let aux (a:int) (b:int) : int
+             ensures { result >= a /\ result >= b } = if a < b then b else a
+             in
+             aux (t.nlfree_var_fo_term_set_abstraction_tableau_field)
+               (u.nlfree_var_fo_term_set_abstraction_fo_term_field)) ;
+        model_tableau_field = ghost
+          subst_tableau t.model_tableau_field
+            (subst_id_symbol: func (int) (symbol (int)))
+            (update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+               u.model_fo_term_field) ;
+      }
+    in
+    assert {
+      forall x2:int. is_symbol_free_var_in_tableau x2 res.model_tableau_field
+        ->
+        (true /\
+           (forall y:int.
+              (is_symbol_free_var_in_tableau y t.model_tableau_field /\
+                 is_symbol_free_var_in_symbol x2
+                   (eval ((subst_id_symbol: func (int) (symbol (int)))) y))
+              -> x2 = y && (x2) <
+              (res.nlfree_var_symbol_set_abstraction_tableau_field))
+           /\
+           (forall y:int.
+              (is_fo_term_free_var_in_tableau y t.model_tableau_field /\
+                 is_symbol_free_var_in_fo_term x2
+                   (eval
+                      ((update
+                          (subst_id_fo_term: func (int) (fo_term (int) (int)))
+                          x u.model_fo_term_field))
+                      y))
+              ->
+              ((x = y -> (x2) <
+                  (res.nlfree_var_symbol_set_abstraction_tableau_field))
+                 /\ (x <> y -> false)) && (x2) <
+                 (res.nlfree_var_symbol_set_abstraction_tableau_field)))
+        && (x2) < (res.nlfree_var_symbol_set_abstraction_tableau_field)
+      } ;
+    assert {
+      forall x2:int.
+        is_fo_term_free_var_in_tableau x2 res.model_tableau_field ->
+        (true /\
+           (forall y:int.
+              (is_fo_term_free_var_in_tableau y t.model_tableau_field /\
+                 is_fo_term_free_var_in_fo_term x2
+                   (eval
+                      ((update
+                          (subst_id_fo_term: func (int) (fo_term (int) (int)))
+                          x u.model_fo_term_field))
+                      y))
+              ->
+              ((x = y -> (x2) <
+                  (res.nlfree_var_fo_term_set_abstraction_tableau_field))
+                 /\
+                 (x <> y -> x2 = y && (x2) <
+                    (res.nlfree_var_fo_term_set_abstraction_tableau_field)))
+                 && (x2) <
+                 (res.nlfree_var_fo_term_set_abstraction_tableau_field)))
+        && (x2) < (res.nlfree_var_fo_term_set_abstraction_tableau_field)
+      } ;
+    res
+
+
+end

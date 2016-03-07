@@ -9,3 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+
+val meta_rewrite : Theory.meta
+
+val meta_rewrite_def : Theory.meta

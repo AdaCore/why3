@@ -62,4 +62,3 @@ let anyd fold pr1 pr2 x =
 (* constant boolean function *)
 let ttrue _ = true
 let ffalse _ = false
-

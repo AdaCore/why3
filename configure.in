@@ -552,13 +552,13 @@ if test "$enable_coq_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
      [ echo "Require Import Flocq.Flocq_version BinNat." \
-            "Goal (20200 <= Flocq_version)%N. easy. Qed." > conftest.v
+            "Goal (20500 <= Flocq_version)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
        AC_MSG_WARN(Cannot find Flocq.)
-       reason_coq_fp_libs=" (Flocq >= 2.2 not found)" ])
+       reason_coq_fp_libs=" (Flocq >= 2.5 not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
 
@@ -618,21 +618,21 @@ else
         ISABELLEDETECTEDVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
 
         case $ISABELLEDETECTEDVERSION in
-          2014*)
-	        enable_isabelle_support=yes
-                ISABELLEVERSION=2014
-                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
-                ;;
           2015*)
 	        enable_isabelle_support=yes
                 ISABELLEVERSION=2015
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
+          2016*)
+	        enable_isabelle_support=yes
+                ISABELLEVERSION=2016
+                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
+                ;;
           *)
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2014 or 2015; Isabelle discarded)
-                reason_isabelle_support=" (need version >= 2014)"
+	        AC_MSG_WARN(You need Isabelle 2015 or later; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2015)"
                 ;;
         esac
     fi

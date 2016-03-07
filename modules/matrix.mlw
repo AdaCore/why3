@@ -11,77 +11,54 @@ module Matrix
                columns: int
   } invariant { 0 <= rows /\ 0 <= columns }
 
-  type index = (int, int)
+  val ghost function get_unsafe (a: matrix 'a) (r c: int) : 'a
+    ensures { result = M.get (M.get a.elts r) c }
 
-  val ghost function get_unsafe (a: matrix 'a) (i: index) : 'a
-    ensures { result = let r,c = i in M.get (M.get a.elts r) c }
-
-  val ghost function set_unsafe (a: matrix 'a) (i: index) (v: 'a) : matrix 'a
+  val ghost function set_unsafe (a: matrix 'a) (r c: int) (v: 'a) : matrix 'a
     ensures {
       result.rows = a.rows /\ result.columns = a.columns /\
-      result.elts = let r,c = i in M.set a.elts r (M.set (M.get a.elts r) c v) }
+      result.elts = M.set a.elts r (M.set (M.get a.elts r) c v) }
 
-  predicate valid_index (a: matrix 'a) (i: index) =
-    let r,c = i in 0 <= r < a.rows /\ 0 <= c < a.columns
+  predicate valid_index (a: matrix 'a) (r c: int) =
+    0 <= r < a.rows /\ 0 <= c < a.columns
 
-  val get (a: matrix 'a) (i: index) : 'a
-    requires { valid_index a i }
-    ensures  { result = get_unsafe a i }
+  val get (a: matrix 'a) (r c: int) : 'a
+    requires { "expl:index in array bounds" valid_index a r c }
+    ensures  { result = get_unsafe a r c }
 
-  val set (a: matrix 'a) (i: index) (v: 'a) : unit writes {a}
-    requires { let r,c = i in 0 <= r < a.rows /\ 0 <= c < a.columns }
-    ensures  { let r,c = i in
-      a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v) }
+  val set (a: matrix 'a) (r c: int) (v: 'a) : unit
+    requires { "expl:index in array bounds" valid_index a r c }
+    writes   { a }
+    ensures  { a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v)}
 
   (** unsafe get/set operations with no precondition *)
   exception OutOfBounds
 
-  let defensive_get (a: matrix 'a) (i: index)
-    ensures { valid_index a i /\ result = get_unsafe a i }
-    raises  { OutOfBounds -> not (valid_index a i) }
-  = let r,c = i in
-    if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
-    get a i
+  let defensive_get (a: matrix 'a) (r c: int) : 'a
+    ensures { "expl:index in array bounds" valid_index a r c }
+    ensures { result = get_unsafe a r c }
+    raises  { OutOfBounds -> not (valid_index a r c) }
+  = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
+    get a r c
 
-  let defensive_set (a: matrix 'a) (i: index) (v: 'a)
-    ensures { valid_index a i /\ a = set_unsafe (old a) i v }
-    raises  { OutOfBounds -> not (valid_index a i) /\ a = old a }
-  = let r,c = i in
-    if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
-    set a i v
+  let defensive_set (a: matrix 'a) (r c: int) (v: 'a) : unit
+    ensures { "expl:index in array bounds" valid_index a r c }
+    ensures { a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v)}
+    raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }
+  = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
+    set a r c v
 
-  val function make (r c: int) (v: 'a) : matrix 'a
+  val make (r c: int) (v: 'a) : matrix 'a
     requires { r >= 0 /\ c >= 0 }
-    ensures  { result.elts = M.const (M.const v) /\
-               result.rows = r /\ result.columns = c }
+    ensures  { result.rows = r }
+    ensures  { result.columns = c }
+    ensures  {
+      forall i j. 0 <= i < r /\ 0 <= j < c -> get_unsafe result i j = v }
 
   val copy (a: matrix 'a) : matrix 'a
     ensures  { result.rows = a.rows /\ result.columns = a.columns }
     ensures  { forall r:int. 0 <= r < result.rows ->
                forall c:int. 0 <= c < result.columns ->
-                 get_unsafe result (r,c) = get_unsafe a (r,c) }
-
-end
-
-(* {2 Square bracket syntax in both logic and programs} *)
-
-module Syntax
-
-  use import int.Int
-  use export Matrix
-
-  function ([]) (a: matrix 'a) (i: index) : 'a = get_unsafe a i
-
-  function ([<-]) (a: matrix 'a) (i: index) (v: 'a) : matrix 'a =
-    set_unsafe a i v
-
-  val ([]) (a: matrix 'a) (i: index) : 'a
-    requires { valid_index a i }
-    ensures  { result = get_unsafe a i }
-
-  val ([]<-) (a: matrix 'a) (i: index) (v: 'a) : unit writes {a}
-    requires { let r,c = i in 0 <= r < a.rows /\ 0 <= c < a.columns }
-    ensures  { let r,c = i in
-      a.elts = M.set (old a.elts) r (M.set (M.get (old a.elts) r) c v) }
+               get_unsafe result r c = get_unsafe a r c }
 
 end

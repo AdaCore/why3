@@ -1,0 +1,1645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="2" name="CVC3" version="2.4.1" timelimit="60" memlimit="1000"/>
+<prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="10" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="11" name="Spass" version="3.7" timelimit="60" memlimit="1000"/>
+<prover id="12" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<file name="../Firstorder_term_impl.mlw" expanded="true">
+<theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Logic" sum="1fcb05d0eebbaebf65b3b9091cfcd406">
+ <goal name="WP_parameter nlsize_positive_lemma_fo_term_list" expl="VC for nlsize_positive_lemma_fo_term_list">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.08" steps="80"/></proof>
+ </goal>
+ <goal name="WP_parameter nlsize_positive_lemma_fo_term" expl="VC for nlsize_positive_lemma_fo_term">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="51"/></proof>
+ </goal>
+ <goal name="WP_parameter shiftb_compose_lemma_fo_term" expl="VC for shiftb_compose_lemma_fo_term">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.13" steps="168"/></proof>
+ </goal>
+ <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list" expl="VC for nlmodel_subst_commutation_lemma_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.1" expl="1. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.2" expl="2. variant decrease">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.3" expl="3. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.4" expl="4. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.5" expl="5. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.6" expl="6. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.7" expl="7. variant decrease">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.8" expl="8. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.10" expl="10. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.11" expl="11. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term_list.12" expl="12. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term" expl="VC for nlmodel_subst_commutation_lemma_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.3" expl="3. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.4" expl="4. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.5" expl="5. variant decrease">
+  <proof prover="9"><result status="valid" time="0.07" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.6" expl="6. assertion">
+  <proof prover="9"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.7" expl="7. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.8" expl="8. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_term.10" expl="10. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter nlmodel_rename_commutation_lemma_fo_term_list" expl="VC for nlmodel_rename_commutation_lemma_fo_term_list">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="29"/></proof>
+ </goal>
+ <goal name="WP_parameter nlmodel_rename_commutation_lemma_fo_term" expl="VC for nlmodel_rename_commutation_lemma_fo_term">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="29"/></proof>
+ </goal>
+ <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative" expl="VC for bound_depth_of_symbol_in_fo_term_list_nonnegative">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative.2" expl="2. variant decrease">
+  <proof prover="9"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative.3" expl="3. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative.4" expl="4. variant decrease">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative.5" expl="5. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_list_nonnegative.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter bound_depth_of_fo_term_in_fo_term_list_nonnegative" expl="VC for bound_depth_of_fo_term_in_fo_term_list_nonnegative">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.07" steps="90"/></proof>
+ </goal>
+ <goal name="WP_parameter bound_depth_of_symbol_in_fo_term_nonnegative" expl="VC for bound_depth_of_symbol_in_fo_term_nonnegative">
+ <proof prover="9"><result status="valid" time="0.10" steps="93"/></proof>
+ </goal>
+ <goal name="WP_parameter bound_depth_of_fo_term_in_fo_term_nonnegative" expl="VC for bound_depth_of_fo_term_in_fo_term_nonnegative">
+ <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="60"/></proof>
+ </goal>
+ <goal name="WP_parameter model_equal_fo_term_list" expl="VC for model_equal_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter model_equal_fo_term_list.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.2" expl="2. variant decrease">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.3" expl="3. precondition">
+  <proof prover="9"><result status="valid" time="0.11" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.4" expl="4. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.5" expl="5. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="53"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.6" expl="6. precondition">
+  <proof prover="9"><result status="valid" time="0.05" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.7" expl="7. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.8" expl="8. variant decrease">
+  <proof prover="9"><result status="valid" time="0.07" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.9" expl="9. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="59"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.10" expl="10. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.11" expl="11. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="57"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.12" expl="12. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.13" expl="13. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term_list.14" expl="14. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter model_equal_fo_term" expl="VC for model_equal_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter model_equal_fo_term.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.3" expl="3. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.4" expl="4. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.5" expl="5. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.6" expl="6. variant decrease">
+  <proof prover="9"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.7" expl="7. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.8" expl="8. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.9" expl="9. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="66"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.10" expl="10. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.11" expl="11. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter model_equal_fo_term.12" expl="12. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="36"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Impl" sum="8fbfe04f53fa102c08e83f42f16fca72">
+ <goal name="WP_parameter bind_var_symbol_in_fo_term_list" expl="VC for bind_var_symbol_in_fo_term_list">
+ <proof prover="9"><result status="valid" time="1.16" steps="603"/></proof>
+ </goal>
+ <goal name="WP_parameter bind_var_fo_term_in_fo_term_list" expl="VC for bind_var_fo_term_in_fo_term_list">
+ <proof prover="10"><result status="valid" time="0.81"/></proof>
+ </goal>
+ <goal name="WP_parameter bind_var_symbol_in_fo_term" expl="VC for bind_var_symbol_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.4" expl="4. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.5" expl="5. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.7" expl="7. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.8" expl="8. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.11" expl="11. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.12" expl="12. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.13" expl="13. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.14" expl="14. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.15" expl="15. variant decrease">
+  <proof prover="9"><result status="valid" time="0.08" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.16" expl="16. precondition">
+  <proof prover="9"><result status="valid" time="0.11" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.16" steps="67"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.18" expl="18. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="103"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.19" expl="19. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.20" expl="20. postcondition">
+  <proof prover="9"><result status="valid" time="0.12" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.21" expl="21. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="131"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.22" expl="22. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_symbol_in_fo_term.23" expl="23. postcondition">
+  <proof prover="9"><result status="valid" time="0.18" steps="51"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter bind_var_fo_term_in_fo_term" expl="VC for bind_var_fo_term_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.1" expl="1. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.2" expl="2. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.4" expl="4. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.07" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.5" expl="5. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.6" expl="6. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.7" expl="7. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.8" expl="8. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.9" expl="9. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.10" expl="10. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.07" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.11" expl="11. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.12" expl="12. variant decrease">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.13" expl="13. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.14" expl="14. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.15" expl="15. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.16" expl="16. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="63"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.17" expl="17. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter bind_var_fo_term_in_fo_term.18" expl="18. postcondition">
+  <proof prover="10"><result status="valid" time="0.51"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter unbind_var_symbol_in_fo_term_list" expl="VC for unbind_var_symbol_in_fo_term_list">
+ <proof prover="10"><result status="valid" time="0.87"/></proof>
+ </goal>
+ <goal name="WP_parameter unbind_var_fo_term_in_fo_term_list" expl="VC for unbind_var_fo_term_in_fo_term_list">
+ <proof prover="10"><result status="valid" time="0.71"/></proof>
+ </goal>
+ <goal name="WP_parameter unbind_var_symbol_in_fo_term" expl="VC for unbind_var_symbol_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.4" expl="4. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.5" expl="5. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.7" expl="7. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.8" expl="8. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="57"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.11" expl="11. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.12" expl="12. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.13" expl="13. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.14" expl="14. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.15" expl="15. variant decrease">
+  <proof prover="9"><result status="valid" time="0.07" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.16" expl="16. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.18" expl="18. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.19" expl="19. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.20" expl="20. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.21" expl="21. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.22" expl="22. precondition">
+  <proof prover="9"><result status="valid" time="0.25" steps="155"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.23" expl="23. precondition">
+  <proof prover="9"><result status="valid" time="0.12" steps="78"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.24" expl="24. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="71"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.25" expl="25. precondition">
+  <proof prover="9"><result status="valid" time="0.15" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.26" expl="26. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="141"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.27" expl="27. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="39"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.28" expl="28. postcondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_symbol_in_fo_term.29" expl="29. postcondition">
+  <proof prover="9"><result status="valid" time="0.18" steps="57"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter unbind_var_fo_term_in_fo_term" expl="VC for unbind_var_fo_term_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.1" expl="1. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.2" expl="2. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.4" expl="4. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.5" expl="5. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.6" expl="6. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.7" expl="7. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.8" expl="8. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.9" expl="9. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.10" expl="10. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.11" expl="11. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.12" expl="12. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.13" expl="13. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.14" expl="14. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.15" expl="15. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.16" expl="16. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.17" expl="17. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.18" expl="18. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.19" expl="19. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.20" expl="20. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.21" expl="21. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.22" expl="22. variant decrease">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.23" expl="23. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.24" expl="24. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="40"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.25" expl="25. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.26" expl="26. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.27" expl="27. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.28" expl="28. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.29" expl="29. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="68"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.30" expl="30. postcondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.31" expl="31. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter unbind_var_fo_term_in_fo_term.32" expl="32. postcondition">
+  <proof prover="10"><result status="valid" time="0.26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_base_symbol_in_fo_term_list" expl="VC for subst_base_symbol_in_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.4" expl="4. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.5" expl="5. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.6" expl="6. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="51"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.7" expl="7. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.8" expl="8. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.11" expl="11. variant decrease">
+  <proof prover="9"><result status="valid" time="0.08" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.12" expl="12. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.13" expl="13. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.14" expl="14. precondition">
+  <proof prover="9"><result status="valid" time="0.12" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.15" expl="15. variant decrease">
+  <proof prover="9"><result status="valid" time="0.13" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.16" expl="16. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="66"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="53"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.18" expl="18. precondition">
+  <proof prover="9"><result status="valid" time="0.11" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.19" expl="19. postcondition">
+  <proof prover="9"><result status="valid" time="0.12" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.20" expl="20. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="39"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.21" expl="21. postcondition">
+  <proof prover="10"><result status="valid" time="0.47"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term_list.22" expl="22. postcondition">
+  <proof prover="10"><result status="valid" time="0.54"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_base_fo_term_in_fo_term_list" expl="VC for subst_base_fo_term_in_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.4" expl="4. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.5" expl="5. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.6" expl="6. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.7" expl="7. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.8" expl="8. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.11" expl="11. variant decrease">
+  <proof prover="9"><result status="valid" time="0.12" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.12" expl="12. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.13" expl="13. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.14" expl="14. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.15" expl="15. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.16" expl="16. variant decrease">
+  <proof prover="9"><result status="valid" time="0.09" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.18" expl="18. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.19" expl="19. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.20" expl="20. precondition">
+  <proof prover="9"><result status="valid" time="0.11" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.21" expl="21. postcondition">
+  <proof prover="9"><result status="valid" time="0.12" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.22" expl="22. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="38"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.23" expl="23. postcondition">
+  <proof prover="10"><result status="valid" time="0.25"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term_list.24" expl="24. postcondition">
+  <proof prover="10"><result status="valid" time="0.28"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_base_symbol_in_fo_term" expl="VC for subst_base_symbol_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.1" expl="1. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.2" expl="2. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.3" expl="3. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.4" expl="4. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.5" expl="5. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.7" expl="7. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.8" expl="8. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.10" steps="52"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.11" expl="11. assertion">
+  <proof prover="9"><result status="valid" time="0.10" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.12" expl="12. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.13" expl="13. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.14" expl="14. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.15" expl="15. variant decrease">
+  <proof prover="9"><result status="valid" time="0.11" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.16" expl="16. precondition">
+  <proof prover="9"><result status="valid" time="0.11" steps="47"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.18" expl="18. precondition">
+  <proof prover="9"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.19" expl="19. precondition">
+  <proof prover="9"><result status="valid" time="0.25" steps="149"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.20" expl="20. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="60"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.21" expl="21. precondition">
+  <proof prover="9"><result status="valid" time="0.16" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.22" expl="22. postcondition">
+  <proof prover="9"><result status="valid" time="0.16" steps="168"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.23" expl="23. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="56"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.24" expl="24. postcondition">
+  <proof prover="9"><result status="valid" time="0.12" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_symbol_in_fo_term.25" expl="25. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="50"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter subst_base_fo_term_in_fo_term" expl="VC for subst_base_fo_term_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.1" expl="1. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.2" expl="2. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.3" expl="3. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.4" expl="4. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.5" expl="5. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.11" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.7" expl="7. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.8" expl="8. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.9" expl="9. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.10" expl="10. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.11" expl="11. postcondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.12" expl="12. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.13" expl="13. postcondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.14" expl="14. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.15" expl="15. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.16" expl="16. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.17" expl="17. assertion">
+  <proof prover="9"><result status="valid" time="0.10" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.18" expl="18. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.19" expl="19. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.20" expl="20. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.21" expl="21. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.22" expl="22. variant decrease">
+  <proof prover="9"><result status="valid" time="0.10" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.23" expl="23. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.24" expl="24. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.25" expl="25. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.26" expl="26. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.27" expl="27. postcondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="64"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.28" expl="28. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.29" expl="29. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter subst_base_fo_term_in_fo_term.30" expl="30. postcondition">
+  <proof prover="10"><result status="valid" time="0.26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter construct_fo_term_list" expl="VC for construct_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter construct_fo_term_list.1" expl="1. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.2" expl="2. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.3" expl="3. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.4" expl="4. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.5" expl="5. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="145"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.6" expl="6. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="80"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.7" expl="7. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.8" expl="8. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.14" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.10" expl="10. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.16" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.11" expl="11. assertion">
+  <proof prover="9"><result status="valid" time="0.14" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.12" expl="12. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.10" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.13" expl="13. assertion">
+  <proof prover="9"><result status="valid" time="0.10" steps="85"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.14" expl="14. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.10" steps="85"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.15" expl="15. assertion">
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.16" expl="16. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.17" expl="17. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.18" expl="18. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.19" expl="19. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.20" expl="20. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.21" expl="21. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.22" expl="22. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.23" expl="23. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.24" expl="24. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.25" expl="25. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.26" expl="26. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.27" expl="27. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.28" expl="28. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.29" expl="29. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.20" steps="212"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term_list.30" expl="30. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="119"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter construct_fo_term" expl="VC for construct_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter construct_fo_term.1" expl="1. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.07" steps="78"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.2" expl="2. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="102"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.3" expl="3. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="125"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.4" expl="4. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="111"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.5" expl="5. postcondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.6" expl="6. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter construct_fo_term.6.1" expl="1. assertion">
+   <proof prover="9"><result status="valid" time="0.06" steps="13"/></proof>
+   </goal>
+   <goal name="WP_parameter construct_fo_term.6.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.09" steps="63"/></proof>
+   </goal>
+   <goal name="WP_parameter construct_fo_term.6.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+   </goal>
+   <goal name="WP_parameter construct_fo_term.6.4" expl="4. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="62"/></proof>
+   </goal>
+   <goal name="WP_parameter construct_fo_term.6.5" expl="5. assertion">
+   <proof prover="11" timelimit="5"><result status="valid" time="0.50"/></proof>
+   </goal>
+   <goal name="WP_parameter construct_fo_term.6.6" expl="6. assertion">
+   <proof prover="9"><result status="valid" time="0.07" steps="13"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.7" expl="7. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="53"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.8" expl="8. assertion">
+  <proof prover="9"><result status="valid" time="0.14" steps="52"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.36" steps="365"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.13" steps="77"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.11" expl="11. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.12" expl="12. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.13" expl="13. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.14" expl="14. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="68"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.15" expl="15. assertion">
+  <proof prover="9"><result status="valid" time="0.12" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.16" expl="16. assertion">
+  <proof prover="9"><result status="valid" time="0.06" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.18" expl="18. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.19" expl="19. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.20" expl="20. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.21" expl="21. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.22" expl="22. postcondition">
+  <proof prover="9"><result status="valid" time="0.24" steps="279"/></proof>
+  </goal>
+  <goal name="WP_parameter construct_fo_term.23" expl="23. postcondition">
+  <proof prover="9"><result status="valid" time="0.24" steps="275"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter destruct_fo_term_list" expl="VC for destruct_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter destruct_fo_term_list.1" expl="1. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.2" expl="2. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.3" expl="3. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.4" expl="4. unreachable point">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.5" expl="5. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.6" expl="6. unreachable point">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.7" expl="7. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.08" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.8" expl="8. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.9" expl="9. assertion">
+  <proof prover="9"><result status="valid" time="0.11" steps="59"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.10" expl="10. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.11" expl="11. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="60"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.12" expl="12. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.13" expl="13. assertion">
+  <proof prover="9"><result status="valid" time="0.10" steps="56"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.14" expl="14. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.15" expl="15. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="57"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.16" expl="16. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.17" expl="17. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.18" expl="18. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="56"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.19" expl="19. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.20" expl="20. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="39"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.21" expl="21. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="58"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.22" expl="22. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.23" expl="23. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.24" expl="24. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.25" expl="25. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.26" expl="26. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="73"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.27" expl="27. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.28" expl="28. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.29" expl="29. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.30" expl="30. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.31" expl="31. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.10" steps="71"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.32" expl="32. assertion">
+  <proof prover="9"><result status="valid" time="0.13" steps="71"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.33" expl="33. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.08" steps="73"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.34" expl="34. assertion">
+  <proof prover="9"><result status="valid" time="0.14" steps="73"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.35" expl="35. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.33" steps="805"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.36" expl="36. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.09" steps="51"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term_list.37" expl="37. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.12" steps="183"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter destruct_fo_term" expl="VC for destruct_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter destruct_fo_term.1" expl="1. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.2" expl="2. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.3" expl="3. unreachable point">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.4" expl="4. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.5" expl="5. unreachable point">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.6" expl="6. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.7" expl="7. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.8" expl="8. assertion">
+  <proof prover="9"><result status="valid" time="0.10" steps="62"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.9" expl="9. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.10" expl="10. assertion">
+  <proof prover="9"><result status="valid" time="0.09" steps="59"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.11" expl="11. assertion">
+  <proof prover="9"><result status="valid" time="0.08" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.12" expl="12. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.13" expl="13. assertion">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.08" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.14" expl="14. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.15" expl="15. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="56"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.16" expl="16. precondition">
+  <proof prover="9"><result status="valid" time="0.21" steps="143"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.17" expl="17. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.18" expl="18. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.19" expl="19. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.20" expl="20. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="39"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.21" expl="21. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="85"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.22" expl="22. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.23" expl="23. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.24" expl="24. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.25" expl="25. assertion">
+  <proof prover="9"><result status="valid" time="0.11" steps="74"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.26" expl="26. assertion">
+  <proof prover="9"><result status="valid" time="0.18" steps="111"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.27" expl="27. assertion">
+  <proof prover="9"><result status="valid" time="0.15" steps="67"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.28" expl="28. postcondition">
+  <transf name="inline_goal">
+   <goal name="WP_parameter destruct_fo_term.28.1" expl="1. postcondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter destruct_fo_term.28.1.1" expl="1. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.11" steps="224"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.2" expl="2. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.07" steps="61"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.3" expl="3. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.17" steps="51"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.4" expl="4. VC for destruct_fo_term">
+    <proof prover="12" timelimit="120"><result status="valid" time="0.31"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.5" expl="5. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.13" steps="39"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.6" expl="6. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.10" steps="20"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.7" expl="7. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.11" steps="22"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.8" expl="8. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.9" expl="9. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.11" steps="270"/></proof>
+    </goal>
+    <goal name="WP_parameter destruct_fo_term.28.1.10" expl="10. VC for destruct_fo_term">
+    <proof prover="9"><result status="valid" time="0.11" steps="270"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.29" expl="29. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.20" steps="138"/></proof>
+  </goal>
+  <goal name="WP_parameter destruct_fo_term.30" expl="30. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.11" steps="177"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter nlsubst_symbol_in_fo_term_list" expl="VC for nlsubst_symbol_in_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.1" expl="1. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.2" expl="2. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.3" expl="3. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.4" expl="4. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.5" expl="5. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.7" expl="7. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.8" expl="8. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.9" expl="9. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10" expl="10. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.1" expl="1. assertion">
+   <proof prover="2"><result status="valid" time="8.78"/></proof>
+   <proof prover="11"><result status="valid" time="8.24"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.32" steps="185"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.13" steps="85"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.4" expl="4. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="22"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.5" expl="5. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="31"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.10.6" expl="6. assertion">
+   <proof prover="2"><result status="valid" time="2.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11" expl="11. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11.1" expl="1. assertion">
+   <proof prover="12"><result status="valid" time="0.71"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.11" steps="74"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.11.3" expl="3. assertion">
+   <proof prover="10"><result status="valid" time="0.67"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.12" expl="12. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term_list.12.1" expl="1. postcondition">
+   <proof prover="9"><result status="valid" time="0.20" steps="168"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list" expl="VC for nlsubst_fo_term_in_fo_term_list">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.1" expl="1. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.2" expl="2. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.3" expl="3. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.13" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.4" expl="4. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.5" expl="5. precondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.6" expl="6. postcondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.7" expl="7. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.7.1" expl="1. VC for nlsubst_fo_term_in_fo_term_list">
+   <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.7.2" expl="2. VC for nlsubst_fo_term_in_fo_term_list">
+   <proof prover="10"><result status="valid" time="0.25"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.8" expl="8. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.9" expl="9. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.10" expl="10. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.11" expl="11. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12" expl="12. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.1" expl="1. assertion">
+   <proof prover="9"><result status="valid" time="0.09" steps="46"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="67"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.71" steps="371"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.4" expl="4. assertion">
+   <proof prover="12"><result status="valid" time="1.07"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.5" expl="5. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.12.6" expl="6. assertion">
+   <proof prover="2"><result status="valid" time="0.87"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13" expl="13. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.1" expl="1. assertion">
+   <proof prover="9"><result status="valid" time="0.86" steps="369"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.2" expl="2. assertion">
+   <proof prover="12"><result status="valid" time="1.16"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="63"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.4" expl="4. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.13.5" expl="5. assertion">
+   <proof prover="9"><result status="valid" time="0.82" steps="355"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.14" expl="14. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term_list.14.1" expl="1. postcondition">
+   <proof prover="9"><result status="valid" time="0.17" steps="103"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter nlsubst_symbol_in_fo_term" expl="VC for nlsubst_symbol_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.1" expl="1. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.2" expl="2. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.3" expl="3. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.4" expl="4. precondition">
+  <proof prover="9"><result status="valid" time="0.10" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.5" expl="5. precondition">
+  <proof prover="9"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.6" expl="6. postcondition">
+  <proof prover="9"><result status="valid" time="0.06" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.7" expl="7. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.8" expl="8. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.9" expl="9. precondition">
+  <proof prover="9"><result status="valid" time="0.08" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.10" expl="10. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.1" expl="1. assertion">
+   <proof prover="2"><result status="valid" time="8.63"/></proof>
+   <proof prover="11"><result status="valid" time="6.37"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.19" steps="185"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.14" steps="85"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.4" expl="4. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="22"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.5" expl="5. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="31"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.10.6" expl="6. assertion">
+   <proof prover="2"><result status="valid" time="2.27"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.11" expl="11. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.11.1" expl="1. assertion">
+   <proof prover="12"><result status="valid" time="1.02"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.11.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.12" steps="74"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.11.3" expl="3. assertion">
+   <proof prover="10"><result status="valid" time="0.88"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_symbol_in_fo_term.12" expl="12. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_symbol_in_fo_term.12.1" expl="1. postcondition">
+   <proof prover="9"><result status="valid" time="0.22" steps="168"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter nlsubst_fo_term_in_fo_term" expl="VC for nlsubst_fo_term_in_fo_term">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.1" expl="1. precondition">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.23"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.2" expl="2. precondition">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.17"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.3" expl="3. precondition">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.29"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.17" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.4" expl="4. precondition">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.18"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.5" expl="5. precondition">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.18"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.6" expl="6. postcondition">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.20"/></proof>
+  <proof prover="9" timelimit="1"><result status="valid" time="0.06" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.7" expl="7. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.7.1" expl="1. VC for nlsubst_fo_term_in_fo_term">
+   <proof prover="9"><result status="valid" time="0.10" steps="22"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.7.2" expl="2. VC for nlsubst_fo_term_in_fo_term">
+   <proof prover="10"><result status="valid" time="0.26"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.8" expl="8. precondition">
+  <proof prover="9"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.9" expl="9. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.10" expl="10. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.11" expl="11. precondition">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.05" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12" expl="12. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.1" expl="1. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="46"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.2" expl="2. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="67"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.64" steps="371"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.4" expl="4. assertion">
+   <proof prover="12"><result status="valid" time="0.37"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.5" expl="5. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.12.6" expl="6. assertion">
+   <proof prover="2"><result status="valid" time="0.80"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13" expl="13. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.1" expl="1. assertion">
+   <proof prover="9"><result status="valid" time="0.85" steps="369"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.2" expl="2. assertion">
+   <proof prover="12"><result status="valid" time="0.78"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.3" expl="3. assertion">
+   <proof prover="9"><result status="valid" time="0.10" steps="63"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.4" expl="4. assertion">
+   <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
+   </goal>
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.13.5" expl="5. assertion">
+   <proof prover="9"><result status="valid" time="0.54" steps="355"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter nlsubst_fo_term_in_fo_term.14" expl="14. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter nlsubst_fo_term_in_fo_term.14.1" expl="1. postcondition">
+   <proof prover="9"><result status="valid" time="0.18" steps="103"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

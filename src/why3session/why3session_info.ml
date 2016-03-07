@@ -395,7 +395,7 @@ let print_hist stats =
     (fun p h acc ->
       let pf,ch = Filename.open_temp_file "why3session" ".data" in
       if acc = 1 then
-        fprintf main_fmt "plot [1:%d] [0.01:%.2f] "
+        fprintf main_fmt "plot [0:%d] [0.1:%.2f] "
           (stats.nb_proved_sub_goals + stats.nb_proved_root_goals)
           max_sum_times
       else
@@ -404,16 +404,17 @@ let print_hist stats =
         " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n"
         pf (string_of_prover p);
       let fmt = formatter_of_out_channel ch in
-      (** The time is also accumulated in order to obtain the total cpu time
+      (* The time is also accumulated in order to obtain the total cpu time
           taken to reach the given number of proved goal *)
+      (* fprintf fmt "0.1 0@\n"; *)
       let (_ : float * int) =
         Mfloat.fold
           (fun t c (acct,accc) ->
             let accc = c + accc in
-            let acct = t +. acct in
+            let acct = (float c) *. t +. acct in
             fprintf fmt "%.2f %d@\n" acct accc;
             (acct,accc))
-          h (0.0,0)
+          h (0.1,0)
       in
       fprintf fmt "@.";
       close_out ch;

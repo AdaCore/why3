@@ -1,0 +1,35 @@
+
+theory DivTest
+
+  use import real.Real
+
+  constant div_m1_2 : real = (-1.0) / 2.0
+  constant div_1_m2 : real = 1.0 / (-2.0)
+  constant div_m1_m2 : real = (-1.0) / (-2.0)
+
+  goal ok1 : div_m1_2 = -0.5
+  goal ok3 : div_1_m2 = -0.5
+  goal ok5 : div_m1_m2 = 0.5
+
+  goal smoke1 : div_m1_2 = 0.0
+  goal smoke3 : div_1_m2 = 1.0
+  goal smoke5 : div_m1_m2 = 0.0
+
+  goal div_bound0: forall x y. 0.0 < x <= y -> 0.0 < x/y <= 1.0
+
+  lemma div_le:
+     forall x y z. 0.0 < y -> x <= z * y -> x/y <= z
+
+  lemma div_lt:
+     forall x y z. 0.0 < y -> x < z * y -> x/y < z
+
+  lemma le_div:
+     forall x y z. 0.0 < y -> z * y <= x -> z <= x/y
+
+  lemma lt_div:
+     forall x y z. 0.0 < y -> z * y < x -> z < x/y
+
+  goal div_bound1: forall x y. 0.0 < x <= y -> 0.0 < x/y <= 1.0
+
+
+end

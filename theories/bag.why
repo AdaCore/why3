@@ -39,11 +39,12 @@ theory Bag
   axiom occ_singleton: forall x y: 'a.
     (x = y /\ (nb_occ y (singleton x)) = 1) \/
     (x <> y /\ (nb_occ y (singleton x)) = 0)
+    (* FIXME? nb_occ y (singleton x) = if x = y then 1 else 0 *)
 
   lemma occ_singleton_eq:
-    forall x y: 'a. x = y -> (nb_occ y (singleton x)) = 1
+    forall x y: 'a. x = y -> nb_occ y (singleton x) = 1
   lemma occ_singleton_neq:
-    forall x y: 'a. x <> y -> (nb_occ y (singleton x)) = 0
+    forall x y: 'a. x <> y -> nb_occ y (singleton x) = 0
 
   function union (bag 'a) (bag 'a) : bag 'a
 
@@ -60,7 +61,7 @@ theory Bag
   lemma Union_assoc:
     forall a b c: bag 'a. union a (union b c) = union (union a b) c
 
-  lemma bag_simpl:
+  lemma bag_simpl_right:
     forall a b c: bag 'a. union a b = union c b -> a = c
 
   lemma bag_simpl_left:
@@ -72,7 +73,7 @@ theory Bag
 
   lemma occ_add_eq:
     forall b: bag 'a, x y: 'a.
-    x = y -> nb_occ x (add x b) = nb_occ x b + 1
+    x = y -> nb_occ y (add x b) = nb_occ y b + 1
 
   lemma occ_add_neq: forall b: bag 'a, x y: 'a.
     x <> y -> nb_occ y (add x b) = nb_occ y b
@@ -81,6 +82,7 @@ theory Bag
 
   function card (bag 'a): int
 
+  axiom Card_nonneg: forall x: bag 'a. card x >= 0
   axiom Card_empty: card (empty_bag: bag 'a) = 0
   axiom Card_zero_empty: forall x: bag 'a. card x = 0 -> x = empty_bag
 
@@ -107,5 +109,12 @@ theory Bag
 
   lemma Add_diff: forall b: bag 'a, x:'a.
     mem x b -> add x (diff b (singleton x)) = b
+
+  (** arbitrary element *)
+
+  function choose (b: bag 'a) : 'a
+
+  axiom choose_mem: forall b: bag 'a.
+    empty_bag <> b -> mem (choose b) b
 
 end

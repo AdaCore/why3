@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<file name="../Firstorder_semantics.mlw">
+<theory name="Sem" sum="f84677bb47d971613b71c230b6af7fe0">
+ <goal name="model_rename_id">
+ <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+ </goal>
+ <goal name="WP_parameter term_semantic_subst_commutation" expl="VC for term_semantic_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.12" steps="131"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_semantic_subst_commutation" expl="VC for term_list_semantic_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.15" steps="97"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_semantic_rename_commutation" expl="VC for term_list_semantic_rename_commutation">
+ <proof prover="0"><result status="valid" time="0.11" steps="95"/></proof>
+ </goal>
+ <goal name="WP_parameter term_semantic_rename_commutation" expl="VC for term_semantic_rename_commutation">
+ <proof prover="0"><result status="valid" time="0.08" steps="93"/></proof>
+ </goal>
+ <goal name="WP_parameter semantic_lifting_commutation" expl="VC for semantic_lifting_commutation">
+ <proof prover="0"><result status="valid" time="0.19" steps="246"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_semantic_subst_commutation" expl="VC for formula_semantic_subst_commutation">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter formula_semantic_subst_commutation.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.2" expl="2. assertion">
+  <proof prover="2"><result status="valid" time="0.49"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="132"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.4" expl="4. variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.5" expl="5. assertion">
+  <proof prover="2"><result status="valid" time="0.51"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.6" expl="6. postcondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="137"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.7" expl="7. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.8" expl="8. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="128"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.10" expl="10. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.11" expl="11. variant decrease">
+  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.12" expl="12. postcondition">
+  <proof prover="0"><result status="valid" time="0.18" steps="141"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.13" expl="13. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.14" expl="14. assertion">
+  <proof prover="2"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.15" expl="15. postcondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.16" expl="16. postcondition">
+  <proof prover="0"><result status="valid" time="0.13" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.17" expl="17. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.18" expl="18. assertion">
+  <proof prover="0"><result status="valid" time="0.08" steps="47"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.19" expl="19. assertion">
+  <proof prover="0"><result status="valid" time="0.09" steps="85"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.20" expl="20. postcondition">
+  <proof prover="2"><result status="valid" time="1.93"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_subst_commutation.21" expl="21. postcondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter formula_semantic_rename_commutation" expl="VC for formula_semantic_rename_commutation">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter formula_semantic_rename_commutation.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_rename_commutation.2" expl="2. assertion">
+  <proof prover="0"><result status="valid" time="1.34" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_rename_commutation.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter formula_semantic_term_subst_commutation" expl="VC for formula_semantic_term_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.12" steps="22"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_semantic_term_rename_commutation" expl="VC for formula_semantic_term_rename_commutation">
+ <proof prover="0"><result status="valid" time="0.14" steps="16"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_conj_semantic_subst_commutation" expl="VC for formula_list_conj_semantic_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.22" steps="235"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_disj_semantic_subst_commutation" expl="VC for formula_list_disj_semantic_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.21" steps="236"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_conj_semantic_term_subst_commutation" expl="VC for formula_list_conj_semantic_term_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.15" steps="25"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_disj_semantic_term_subst_commutation" expl="VC for formula_list_disj_semantic_term_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.14" steps="25"/></proof>
+ </goal>
+ <goal name="WP_parameter tableau_semantic_subst_commutation" expl="VC for tableau_semantic_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.77" steps="1333"/></proof>
+ </goal>
+ <goal name="WP_parameter tableau_semantic_term_subst_commutation" expl="VC for tableau_semantic_term_subst_commutation">
+ <proof prover="0"><result status="valid" time="0.14" steps="25"/></proof>
+ </goal>
+ <goal name="WP_parameter term_semantic_depend_only_free_var" expl="VC for term_semantic_depend_only_free_var">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter term_semantic_depend_only_free_var.1" expl="1. postcondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter term_semantic_depend_only_free_var.2" expl="2. variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter term_semantic_depend_only_free_var.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter term_semantic_depend_only_free_var.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter term_semantic_depend_only_free_var.5" expl="5. assertion">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter term_semantic_depend_only_free_var.6" expl="6. postcondition">
+  <proof prover="2"><result status="valid" time="0.63"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter term_list_semantic_depend_only_free_var" expl="VC for term_list_semantic_depend_only_free_var">
+ <proof prover="0"><result status="valid" time="0.33" steps="328"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_semantic_depend_only_free_var" expl="VC for formula_semantic_depend_only_free_var">
+ <proof prover="0"><result status="timeout" time="5.00"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.3" expl="3. assertion">
+  <proof prover="0"><result status="valid" time="0.59" steps="1017"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="91"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.5" expl="5. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.7" expl="7. assertion">
+  <proof prover="0"><result status="valid" time="1.05" steps="1893"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.8" expl="8. postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="91"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.9" expl="9. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.10" expl="10. precondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.11" expl="11. variant decrease">
+  <proof prover="0"><result status="valid" time="0.11" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.13" expl="13. postcondition">
+  <proof prover="0"><result status="valid" time="0.24" steps="312"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.14" expl="14. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.15" expl="15. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.16" expl="16. variant decrease">
+  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.18" expl="18. postcondition">
+  <proof prover="0"><result status="valid" time="0.39" steps="520"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.19" expl="19. variant decrease">
+  <proof prover="0"><result status="valid" time="0.12" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.20" expl="20. precondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.21" expl="21. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="62"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.22" expl="22. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.23" expl="23. postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.24" expl="24. assertion">
+  <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.25" expl="25. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter formula_semantic_depend_only_free_var.25.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="1.69"/></proof>
+   </goal>
+   <goal name="WP_parameter formula_semantic_depend_only_free_var.25.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="9"/></proof>
+   </goal>
+   <goal name="WP_parameter formula_semantic_depend_only_free_var.25.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
+   </goal>
+   <goal name="WP_parameter formula_semantic_depend_only_free_var.25.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+   </goal>
+   <goal name="WP_parameter formula_semantic_depend_only_free_var.25.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="9"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.26" expl="26. postcondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="72"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.27" expl="27. precondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter formula_semantic_depend_only_free_var.28" expl="28. postcondition">
+  <proof prover="0"><result status="valid" time="0.11" steps="17"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter formula_list_conj_semantic_depend_only_free_var" expl="VC for formula_list_conj_semantic_depend_only_free_var">
+ <proof prover="0"><result status="valid" time="1.18" steps="762"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_disj_semantic_depend_only_free_var" expl="VC for formula_list_disj_semantic_depend_only_free_var">
+ <proof prover="0"><result status="valid" time="2.63" steps="1716"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_conj_semantic_other_def" expl="VC for formula_list_conj_semantic_other_def">
+ <proof prover="0"><result status="valid" time="0.20" steps="124"/></proof>
+ </goal>
+ <goal name="WP_parameter formula_list_disj_semantic_other_def" expl="VC for formula_list_disj_semantic_other_def">
+ <proof prover="0"><result status="valid" time="0.21" steps="128"/></proof>
+ </goal>
+ <goal name="WP_parameter skolem_model_transformer" expl="VC for skolem_model_transformer">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter skolem_model_transformer.1" expl="1. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter skolem_model_transformer.1.1" expl="1. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="6"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.2" expl="2. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.3" expl="3. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="21"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="35"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.09" steps="27"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.6" expl="6. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="27"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.7" expl="7. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="94"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.8" expl="8. assertion">
+   <proof prover="0"><result status="valid" time="0.11" steps="96"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.9" expl="9. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="44"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.10" expl="10. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="12"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.11" expl="11. assertion">
+   <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.12" expl="12. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="130"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.13" expl="13. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="68"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.14" expl="14. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="50"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.15" expl="15. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="71"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.16" expl="16. assertion">
+   <proof prover="0"><result status="valid" time="0.08" steps="52"/></proof>
+   </goal>
+   <goal name="WP_parameter skolem_model_transformer.1.17" expl="17. assertion">
+   <proof prover="1"><result status="valid" time="1.80"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter skolem_model_transformer.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="1.45"/></proof>
+  <proof prover="2"><result status="valid" time="2.14"/></proof>
+  </goal>
+  <goal name="WP_parameter skolem_model_transformer.3" expl="3. postcondition">
+  <proof prover="2"><result status="valid" time="2.84"/></proof>
+  <proof prover="3"><result status="valid" time="0.81"/></proof>
+  </goal>
+  <goal name="WP_parameter skolem_model_transformer.4" expl="4. postcondition">
+  <proof prover="3"><result status="valid" time="0.21"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -40,7 +40,7 @@ and dpattern_node =
   | DPcast of dpattern * ty
 
 type dbinop =
-  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff | DTby | DTso
 
 type dquant =
   | DTforall | DTexists | DTlambda
@@ -102,6 +102,8 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 val dterm : ?loc:Loc.position -> dterm_node -> dterm
 
 (** Final stage *)
+
+val debug_ignore_unused_var : Debug.flag
 
 val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 

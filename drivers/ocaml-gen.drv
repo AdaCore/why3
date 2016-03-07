@@ -5,7 +5,7 @@
 printer "ocaml"
 
 theory BuiltIn
-  syntax type int "Why3__BigInt.t"
+  syntax type int "Why3extract.Why3__BigInt.t"
   syntax predicate  (=)   "(%1 = %2)"
 end
 
@@ -14,6 +14,7 @@ import "ocaml-no-arith.drv"
 (* int *)
 
 theory int.Int
+  prelude "open Why3extract"
   syntax constant zero "Why3__BigInt.zero"
   syntax constant one  "Why3__BigInt.one"
 
@@ -29,38 +30,46 @@ theory int.Int
 end
 
 theory int.Abs
+  prelude "open Why3extract"
   syntax function abs "(Why3__BigInt.abs %1)"
 end
 
 theory int.MinMax
+  prelude "open Why3extract"
   syntax function min "(Why3__BigInt.min %1 %2)"
   syntax function max "(Why3__BigInt.max %1 %2)"
 end
 
 theory int.Lex2
+  prelude "open Why3extract"
   syntax predicate lt_nat "(Why3__BigInt.lt_nat %1 %2)"
   syntax predicate lex    "(Why3__BigInt.lex %1 %2)"
 end
 
 theory int.EuclideanDivision
+  prelude "open Why3extract"
   syntax function div "(Why3__BigInt.euclidean_div %1 %2)"
   syntax function mod "(Why3__BigInt.euclidean_mod %1 %2)"
 end
 
 theory int.ComputerDivision
+  prelude "open Why3extract"
   syntax function div "(Why3__BigInt.computer_div %1 %2)"
   syntax function mod "(Why3__BigInt.computer_mod %1 %2)"
 end
 
 theory int.Power
+  prelude "open Why3extract"
   syntax function power "(Why3__BigInt.power %1 %2)"
 end
 
 theory int.Fact
+  prelude "open Why3extract"
   syntax function fact "(Why3__IntAux.fact %1)"
 end
 
 theory int.Fibonacci
+  prelude "open Why3extract"
   syntax function fib "(Why3__IntAux.fib %1)"
 end
 
@@ -69,6 +78,7 @@ end
 (* WhyML *)
 
 module stack.Stack
+  prelude "open Why3extract"
   syntax type      t        "(%1 Stack.t)"
   syntax val       create   "Stack.create"
   syntax val       push     "Stack.push"
@@ -84,6 +94,7 @@ module stack.Stack
 end
 
 module queue.Queue
+  prelude "open Why3extract"
   syntax type      t         "(%1 Queue.t)"
   syntax val       create    "Queue.create"
   syntax val       push      "Queue.push"
@@ -100,6 +111,7 @@ module queue.Queue
 end
 
 module array.Array
+  prelude "open Why3extract"
   syntax type array "(%1 Why3__Array.t)"
 
   syntax function ([]) "(Why3__Array.get %1 %2)"
@@ -119,17 +131,36 @@ module array.Array
   syntax val blit          "Why3__Array.blit"
 end
 
+module matrix.Matrix
+  prelude "open Why3extract"
+  syntax type matrix "(%1 Why3__Matrix.t)"
+
+  syntax function get "(Why3__Matrix.get %1 %2)"
+
+  syntax exception OutOfBounds "Why3__Matrix.OutOfBounds"
+
+  syntax val get           "Why3__Matrix.get"
+  syntax val set           "Why3__Matrix.set"
+  syntax val rows          "Why3__Matrix.rows"
+  syntax val columns       "Why3__Matrix.columns"
+  syntax val defensive_get "Why3__Matrix.defensive_get"
+  syntax val defensive_set "Why3__Matrix.defensive_set"
+  syntax val make          "Why3__Matrix.make"
+  syntax val copy          "Why3__Matrix.copy"
+end
+
 module mach.int.Int
+  prelude "open Why3extract"
   syntax val ( / ) "Why3__BigInt.computer_div"
   syntax val ( % ) "Why3__BigInt.computer_mod"
 end
 
 module mach.int.Int31
   (* even on a 64-bit machine, it is safe to use type int for 31-bit integers *)
-  syntax val       of_int   "Why3__BigInt.to_int"
+  syntax val       of_int   "Why3extract.Why3__BigInt.to_int"
   syntax converter of_int   "%1"
 
-  syntax function to_int "(Why3__BigInt.of_int %1)"
+  syntax function to_int "(Why3extract.Why3__BigInt.of_int %1)"
 
   syntax type     int31     "int"
   syntax val      ( + )     "( + )"
@@ -148,6 +179,7 @@ end
 
 module mach.int.UInt64
   (* no OCaml library for unsigned 64-bit integers => we use BigInt *)
+  prelude "open Why3extract"
   syntax val       of_int   "(fun x -> x)"
   syntax converter of_int   "(Why3__BigInt.of_string \"%1\")"
 
@@ -185,6 +217,7 @@ end
 
 
 module string.Char
+  prelude "open Why3extract"
   syntax type char "Pervasives.char"
   syntax val chr "Why3__BigInt.chr"
   syntax val code "Why3__BigInt.code"
@@ -194,13 +227,13 @@ end
 
 
 module io.StdIO
+  prelude "open Why3extract"
   syntax val print_char "Pervasives.print_char"
   syntax val print_int "Why3__BigInt.print"
   syntax val print_newline "Pervasives.print_newline"
 end
 
 module random.Random
-
+  prelude "open Why3extract"
   syntax val random_int    "Why3__BigInt.random_int"
-
 end

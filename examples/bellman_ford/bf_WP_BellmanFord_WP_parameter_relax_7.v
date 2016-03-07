@@ -7,14 +7,11 @@ Require list.Length.
 Require int.Int.
 Require list.Mem.
 Require map.Map.
+Require map.Const.
 Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
@@ -115,6 +112,10 @@ Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
 
 Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
+
+Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
+  (infix_eqeq s1 s2)).
 
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
@@ -353,7 +354,7 @@ Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo".
+Ltac ae := why3 "Alt-Ergo,0.99.1,"; admit.
 Require Import Classical.
 
 (* Why3 goal *)
@@ -378,7 +379,7 @@ Theorem WP_parameter_relax : forall (m:(map.Map.map vertex t)) (u:vertex)
   | (Finite x) => match (map.Map.get m
       v) with
       | Infinite => True
-      | (Finite y) => ((x + (weight u v))%Z < y)%Z
+      | (Finite x1) => ((x + (weight u v))%Z < x1)%Z
       end
   end -> forall (m1:(map.Map.map vertex t)), (m1 = (map.Map.set m v
   match (map.Map.get m
@@ -399,5 +400,5 @@ destruct H as (lu, (hu1, hu2)).
 exists (app lu (cons u nil)); ae.
 subst m1. rewrite Map.Select_neq; auto.
 ae.
-Qed.
+Admitted.
 

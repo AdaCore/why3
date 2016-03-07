@@ -13,12 +13,6 @@ module OneTime
   val zero (): t
     ensures { result.valid }
     ensures { result.v = 0 }
-  (* FIXME: should be a constant?
-
-     val function zero : t
-       ensures { result.valid }
-       ensures { result.v = 0 }
-   *)
 
   val succ (x: t) : t
     requires { x.valid }

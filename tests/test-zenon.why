@@ -1,0 +1,27 @@
+
+theory T
+
+  use import set.Set
+
+  meta "rewrite" prop mem_empty
+
+  meta "rewrite" prop add_def1
+
+  meta "rewrite" prop union_def1
+
+  meta "rewrite_def" predicate subset
+
+  meta "rewrite_def" function singleton
+
+  type t
+  constant a:t
+  constant b:t
+  constant c:t
+
+  goal g1: mem a (add b (add a (add c empty)))
+
+  goal g2: mem a (add b (add a (singleton c)))
+
+  goal g3: subset empty (singleton c)
+
+end

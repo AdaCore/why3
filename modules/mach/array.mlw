@@ -51,9 +51,10 @@ module Array32
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  val function make (n: int32) (v: 'a) : array 'a
+  val make (n: int32) (v: 'a) : array 'a
     requires { "expl:array creation size" to_int n >= 0 }
-    ensures  { result.elts = M.const v /\ result.length = n }
+    ensures  { forall i:int. 0 <= i < to_int n -> result[i] = v }
+    ensures  { result.length = n }
 
   val append (a1: array 'a) (a2: array 'a) : array 'a
     ensures { to_int result.length = to_int a1.length + to_int a2.length }
@@ -156,9 +157,10 @@ module Array31
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  val function make (n: int31) (v: 'a) : array 'a
+  val make (n: int31) (v: 'a) : array 'a
     requires { "expl:array creation size" to_int n >= 0 }
-    ensures  { result.elts = M.const v /\ result.length = n }
+    ensures  { forall i:int. 0 <= i < to_int n -> result[i] = v }
+    ensures  { result.length = n }
 
   val append (a1: array 'a) (a2: array 'a) : array 'a
     ensures { to_int result.length = to_int a1.length + to_int a2.length }
@@ -261,9 +263,10 @@ module Array63
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  val function make (n: int63) (v: 'a) : array 'a
+  val make (n: int63) (v: 'a) : array 'a
     requires { "expl:array creation size" to_int n >= 0 }
-    ensures  { result.elts = M.const v /\ result.length = n }
+    ensures  { forall i:int. 0 <= i < to_int n -> result[i] = v }
+    ensures  { result.length = n }
 
   val append (a1: array 'a) (a2: array 'a) : array 'a
     ensures { to_int result.length = to_int a1.length + to_int a2.length }

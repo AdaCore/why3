@@ -83,7 +83,7 @@ policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
-version = "8.4pl4"
+version = "8.4pl2"
 
 [uninstalled_prover policy1]
 alternative = ""
@@ -92,7 +92,7 @@ policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
-version = "8.4pl5"
+version = "8.4pl4"
 
 [uninstalled_prover policy2]
 alternative = ""
@@ -101,7 +101,25 @@ policy = "upgrade"
 target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
-version = "8.4pl2"
+version = "8.4pl5"
+
+[uninstalled_prover policy3]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "$COQVER"
+version = "8.4pl6"
+
+[uninstalled_prover policy4]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "$COQVER"
+version = "8.5"
 
 EOF
 fi

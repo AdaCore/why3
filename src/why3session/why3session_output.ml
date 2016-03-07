@@ -66,14 +66,14 @@ let run_one env config filters dir fname =
             Opt.get (goal_task_option pr.proof_parent) in
           match load_prover env_session pr.proof_prover with
           | None ->
-            (** In fact That is a bad reason we can always output know? *)
+            (* In fact That is a bad reason we can always output know? *)
             eprintf "Can't@ output@ task@ for@ prover@ %a@ not@ installed@."
               Whyconf.print_prover pr.proof_prover
           | Some lp ->
             let dest = Driver.file_of_task lp.prover_driver fname tname task in
-            (** Uniquify the filename before the extension if it exists*)
+            (* Uniquify the filename before the extension if it exists*)
             let i = try String.rindex dest '.' with _ -> String.length dest in
-            (** Before extension *)
+            (* Before extension *)
             let name = (String.sub dest 0 i) in
             let name = Ident.string_unique fname_printer name in
             let ext = String.sub dest i (String.length dest - i) in
@@ -89,7 +89,7 @@ let run () =
   let env,config,should_exit1 = read_env_spec () in
   let filters,should_exit2 = read_filter_spec config in
   if should_exit1 || should_exit2 then exit 1;
-  (** sanitize --to-prover and --to-known-prover for Copy* *)
+  (* sanitize --to-prover and --to-known-prover for Copy* *)
   match !opt_output_dir with
   | None ->
     eprintf "The@ option@ --output-dir/-o@ must@ be@ set@.";

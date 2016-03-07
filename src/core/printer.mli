@@ -28,7 +28,11 @@ type 'a pp = Format.formatter -> 'a -> unit
 in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
+  vc_term_loc   : Loc.position option;
+  (* The position of the term that triggers the VC *)
   queried_terms : Term.term list;
+  (* The list of terms that were queried for the counter-example
+     by the printer *)
 }
 
 type printer_args = {
@@ -62,17 +66,17 @@ val meta_remove_logic : meta
 val meta_remove_type : meta
 val meta_realized_theory : meta
 
-val syntax_type : tysymbol -> string -> tdecl
-val syntax_logic : lsymbol -> string -> tdecl
-val syntax_converter : lsymbol -> string -> tdecl
+val syntax_type : tysymbol -> string -> bool -> tdecl
+val syntax_logic : lsymbol -> string -> bool -> tdecl
+val syntax_converter : lsymbol -> string -> bool -> tdecl
 val remove_prop : prsymbol -> tdecl
 
 val check_syntax_type: tysymbol -> string -> unit
 val check_syntax_logic: lsymbol -> string -> unit
 
-type syntax_map = string Mid.t
+type syntax_map = (string*int) Mid.t
 (* [syntax_map] maps the idents of removed props to "" *)
-type converter_map = string Mls.t
+type converter_map = (string*int) Mls.t
 
 val get_syntax_map : task -> syntax_map
 val add_syntax_map : tdecl -> syntax_map -> syntax_map

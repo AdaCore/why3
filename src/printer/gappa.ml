@@ -24,7 +24,7 @@ let syntactic_transform transf =
   Trans.on_meta meta_syntax_logic (fun metas ->
     let symbols = List.fold_left (fun acc meta_arg ->
       match meta_arg with
-      | [MAls ls; MAstr _] -> Sls.add ls acc
+      | [MAls ls; MAstr _; MAint _] -> Sls.add ls acc
       | _ -> assert false) Sls.empty metas in
     transf (fun ls -> Sls.mem ls symbols))
 

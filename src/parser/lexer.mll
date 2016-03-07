@@ -26,6 +26,7 @@
       [
         "as", AS;
         "axiom", AXIOM;
+        "by", BY;
         "clone", CLONE;
         "coinductive", COINDUCTIVE;
         "constant", CONSTANT;
@@ -49,6 +50,7 @@
         "not", NOT;
         "predicate", PREDICATE;
         "scope", SCOPE;
+        "so", SO;
         "then", THEN;
         "theory", THEORY;
         "true", TRUE;
@@ -105,7 +107,7 @@ let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
 let op_char_1 = ['=' '<' '>' '~']
 let op_char_2 = ['+' '-']
-let op_char_3 = ['*' '/' '%' '\\']
+let op_char_3 = ['*' '/' '\\' '%']
 let op_char_4 = ['!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
 let op_char_34 = op_char_3 | op_char_4
 let op_char_234 = op_char_2 | op_char_34

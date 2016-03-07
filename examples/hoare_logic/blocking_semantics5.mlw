@@ -202,8 +202,9 @@ end
 theory TestSemantics
 
 use import SemOp
+use map.Const
 
-function my_sigma : env = IdMap.const (Vint 0)
+function my_sigma : env = Const.const (Vint 0)
 constant x : ident
 constant y : mident
 

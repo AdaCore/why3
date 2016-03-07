@@ -1,0 +1,1665 @@
+
+module Types
+
+  use import Functions.Func
+  use import Firstorder_term_spec.Spec
+
+  (* The prover return a contradictory assignment.
+     To be perfectly correct, its initial
+     input (even before preprocessing) should not
+     contain any free variable of kind term. *)
+
+  type prover_return = {
+    ghost contradictory_assignment : func int (fo_term int int) ;
+  }
+
+end
+
+module Logic
+
+  use import FormulaTransformations.Types
+  use import FormulaTransformations.Logic
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_tableau_spec.Spec
+  use import Functions.Func
+  use import bool.Bool
+  use import Firstorder_semantics.Sem
+
+  predicate is_atom_list (phil:fo_formula_list 'ls 'b) = match phil with
+    | FOFNil -> true
+    | FOFCons x q -> is_atom x /\ is_atom_list q
+  end
+
+  let lemma is_atom_subst (phi:fo_formula 'ls 'b)
+    (sigma:func 'b (fo_term 'ls 'c)) : unit
+    requires { is_atom phi }
+    ensures { is_atom (subst_fo_formula phi subst_id_symbol sigma) }
+  =
+    match phi with
+      | PApp _ _ -> ()
+      | Not (PApp _ _ ) -> ()
+      | _ -> absurd
+    end
+
+  let rec lemma is_atom_list_subst (phil:fo_formula_list 'ls 'b)
+    (sigma:func 'b (fo_term 'ls 'c)) : unit
+    requires { is_atom_list phil }
+    ensures { is_atom_list (subst_fo_formula_list phil subst_id_symbol sigma) }
+    variant { size_fo_formula_list phil }
+  =
+    match phil with
+      | FOFNil -> ()
+      | FOFCons x q -> is_atom_list_subst q sigma
+    end
+
+  predicate is_procedure_tableau (t:tableau 'ls 'b) = match t with
+    | Root -> true
+    | Node tnext phi0 phib -> is_procedure_tableau tnext /\
+      is_atom phi0 /\ is_atom_list phib
+  end
+
+  let rec lemma is_procedure_tableau_subst (t:tableau 'ls 'b)
+    (sigma:func 'b (fo_term 'ls 'c)) : unit
+    requires { is_procedure_tableau t }
+    ensures { is_procedure_tableau (subst_tableau t subst_id_symbol sigma) }
+    variant { size_tableau t }
+  =
+    match t with
+      | Root -> ()
+      | Node tnext phi0 phib -> is_procedure_tableau_subst tnext sigma
+    end
+
+  (*let rec lemma tableau_semantic_increasing (t:tableau 'ls 'b)
+    (b1 b2:bool) (m:model 'ls 'st) (rho:func 'b 'st) : unit
+    requires { implb b1 b2 = True }
+    ensures { tableau_semantic_with t b1 m rho ->
+      tableau_semantic_with t b2 m rho }
+    variant { size_tableau t }
+  =
+    match t with
+      | Root -> ()
+      | Node tnext phi0 phib ->
+        tableau_semantic_increasing tnext (tableau_node b1 phib phi0 m rho)
+          (tableau_node b2 phib phi0 m rho) m rho
+    end*)
+
+end
+
+module Impl
+
+  use import Firstorder_semantics.Sem
+  use import Firstorder_symbol_spec.Spec
+  use import Firstorder_symbol_impl.Types
+  use import Firstorder_symbol_impl.Logic
+  use import Firstorder_symbol_impl.Impl
+  use import Firstorder_term_spec.Spec
+  use import Firstorder_term_impl.Types
+  use import Firstorder_term_impl.Logic
+  use import Firstorder_term_impl.Impl
+  use import Firstorder_formula_spec.Spec
+  use import Firstorder_formula_impl.Types
+  use import Firstorder_formula_impl.Logic
+  use import Firstorder_formula_impl.Impl
+  use import Firstorder_formula_list_spec.Spec
+  use import Firstorder_formula_list_impl.Types
+  use import Firstorder_formula_list_impl.Logic
+  use import Firstorder_formula_list_impl.Impl
+  use import Firstorder_tableau_spec.Spec
+  use import Firstorder_tableau_impl.Types
+  use import Firstorder_tableau_impl.Logic
+  use import Firstorder_tableau_impl.Impl
+  use import FormulaTransformations.Types
+  use import FormulaTransformations.Logic
+  use import FormulaTransformations.Impl
+  use import Unification.Types
+  use import Unification.Logic
+  use import Unification.Impl
+  use import BacktrackArray.Logic
+  use import BacktrackArray.Impl
+  use import Functions.Func
+  use import option.Option
+  use import OptionFuncs.Funcs
+  use import bool.Bool
+  use import int.Int
+  use import Types
+  use import Logic
+  use import ref.Ref
+  use import list.List
+
+  exception Failure
+
+  let rec merge (phi1 phi2:nlimpl_fo_formula_list) : nlimpl_fo_formula_list
+    requires { nlimpl_fo_formula_list_ok phi1 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phi1.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok phi2 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phi2.model_fo_formula_list_field -> x >= 0 }
+    requires { is_atom_list phi1.model_fo_formula_list_field }
+    requires { is_atom_list phi2.model_fo_formula_list_field }
+    ensures { nlimpl_fo_formula_list_ok result }
+    ensures { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      result.model_fo_formula_list_field -> x >= 0 }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      formula_list_disj_semantic result.model_fo_formula_list_field m rho <->
+        formula_list_disj_semantic phi1.model_fo_formula_list_field m rho \/
+        formula_list_disj_semantic phi2.model_fo_formula_list_field m rho }
+    ensures { is_atom_list result.model_fo_formula_list_field }
+    variant { size_fo_formula_list phi1.model_fo_formula_list_field }
+  =
+    let phi1m = phi1.model_fo_formula_list_field in
+    let phi2m = phi2.model_fo_formula_list_field in
+    match destruct_fo_formula_list phi1 with
+      | NLC_FOFNil -> phi2
+      | NLC_FOFCons phi0 q ->
+        let phi0m = phi0.model_fo_formula_field in
+        let qm = q.model_fo_formula_list_field in
+        assert { phi1m = FOFCons phi0m qm } ;
+        let phi3 = construct_fo_formula_list (NLC_FOFCons phi0 phi2) in
+        let phi3m = phi3.model_fo_formula_list_field in
+        assert { phi3m = FOFCons phi0m phi2m } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_fo_formula_list x phi1m && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phi3m ->
+          (is_fo_term_free_var_in_fo_formula x phi0m \/
+           is_fo_term_free_var_in_fo_formula_list x phi2m) && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x qm ->
+          is_fo_term_free_var_in_fo_formula_list x phi1m && x >= 0 } ;
+        merge q phi3
+    end
+
+  (* extend the current tableau branch by the given formula list.
+     equivalent to contraction of empty branches
+     until a non-empty branch is found. *)
+  let rec contract_tableau (tab:nlimpl_tableau)
+    (branch:nlimpl_fo_formula_list) (ndepth:ref int) : option nlimpl_tableau
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok branch }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      branch.model_fo_formula_list_field -> x >= 0 }
+    requires { is_procedure_tableau tab.model_tableau_field }
+    requires { is_atom_list branch.model_fo_formula_list_field }
+    returns { None -> forall m:model int 'st,rho:func int 'st.
+        let b = if formula_list_disj_semantic branch.model_fo_formula_list_field m rho
+          then True
+          else False in
+        not(tableau_semantic_with tab.model_tableau_field b m rho)
+      | Some x -> (forall m:model int 'st,rho:func int 'st.
+        let b = if formula_list_disj_semantic branch.model_fo_formula_list_field m rho
+          then True
+          else False in
+        tableau_semantic_with tab.model_tableau_field b m rho ->
+          tableau_semantic_with x.model_tableau_field True m rho) /\
+        is_procedure_tableau x.model_tableau_field /\
+        nlimpl_tableau_ok x /\
+        (forall y:int. is_fo_term_free_var_in_tableau y x.model_tableau_field
+          -> y >= 0) }
+    variant { size_tableau tab.model_tableau_field }
+  =
+    let tabm = tab.model_tableau_field in
+    let brm = branch.model_fo_formula_list_field in
+    match destruct_fo_formula_list branch with
+      | NLC_FOFNil -> assert { brm = FOFNil } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+              not(formula_list_disj_semantic brm m rho) } ;
+        match destruct_tableau tab with
+          | NLC_Root -> assert { tabm = Root } ; None
+          | NLC_Node tnext phi0 phib ->
+            let tnm = tnext.model_tableau_field in
+            let phi0m = phi0.model_fo_formula_field in
+            let phibm = phib.model_fo_formula_list_field in
+            assert { tabm = Node tnm phi0m phibm } ;
+            assert { forall x:int. is_fo_term_free_var_in_tableau x tnm ->
+              is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+            assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phibm ->
+              is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+            assert { forall m:model int 'st,rho:func int 'st.
+              tableau_semantic_with tab.model_tableau_field False m rho ->
+              let b = if formula_list_disj_semantic phibm m rho
+                then True
+                else False in
+              tableau_semantic_with tnm b m rho } ;
+            ndepth := !ndepth + 1 ;
+            contract_tableau tnext phib ndepth
+        end
+      | NLC_FOFCons phi0 qb -> let phi0m = phi0.model_fo_formula_field in
+        let qbm = qb.model_fo_formula_list_field in
+        assert { brm = FOFCons phi0m qbm } ;
+        let ftab = construct_tableau (NLC_Node tab phi0 qb) in
+        let ftabm = ftab.model_tableau_field in
+        assert { ftabm = Node tabm phi0m qbm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_fo_formula_list x brm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x qbm ->
+          is_fo_term_free_var_in_fo_formula_list x brm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_tableau x ftabm ->
+          (is_fo_term_free_var_in_tableau x tabm
+            \/ is_fo_term_free_var_in_fo_formula x phi0m
+            \/ is_fo_term_free_var_in_fo_formula_list x qbm) && x >= 0 } ;
+        Some ftab
+    end
+
+  let rec branch_conflict_atom (p1:int) (t1:nlimpl_fo_term_list) (tab:nlimpl_tableau)
+    (rhob:subst) (ghost rho:unifier_subst) : unit
+    requires { nlimpl_fo_term_list_ok t1 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      t1.model_fo_term_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok rhob rho }
+    requires { is_procedure_tableau tab.model_tableau_field }
+    ensures { precede (old rhob) rhob }
+    ensures { unifier_subst_ok rhob rho }
+    raises { Failure -> precede (old rhob) rhob /\ correct rhob }
+    variant { size_tableau tab.model_tableau_field }
+  =
+    let tabm = tab.model_tableau_field in
+    match destruct_tableau tab with
+      | NLC_Root -> ()
+      | NLC_Node tnext phi1 phib ->
+        let tnextm = tnext.model_tableau_field in
+        let phi1m = phi1.model_fo_formula_field in
+        let phibm = phib.model_fo_formula_list_field in
+        assert { tabm = Node tnextm phi1m phibm } ;
+        assert { is_atom phi1m } ;
+        assert { forall x:int. is_fo_term_free_var_in_tableau x tnextm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        match destruct_fo_formula phi1 with
+          | NLC_PApp p2 t2 -> let p2m = p2.model_symbol_field in
+            let t2m = t2.model_fo_term_list_field in
+            assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t2m ->
+              is_fo_term_free_var_in_fo_formula x phi1m &&
+              is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+            let p3 = match destruct_symbol p2 with
+              | NLCVar_symbol p3 -> p3 end in
+            if p1 = p3
+            then begin
+              try conflict t1 t2 rhob rho with UnificationFailure ->
+              raise Failure end ;
+              branch_conflict_atom p1 t1 tnext rhob rho
+            end
+            else branch_conflict_atom p1 t1 tnext rhob rho
+          | NLC_Not _ -> branch_conflict_atom p1 t1 tnext rhob rho
+          | _ -> absurd
+        end
+    end
+
+  let rec branch_conflict_neg_atom (p1:int) (t1:nlimpl_fo_term_list) (tab:nlimpl_tableau)
+    (rhob:subst) (ghost rho:unifier_subst) : unit
+    requires { nlimpl_fo_term_list_ok t1 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      t1.model_fo_term_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok rhob rho }
+    requires { is_procedure_tableau tab.model_tableau_field }
+    ensures { precede (old rhob) rhob }
+    ensures { unifier_subst_ok rhob rho }
+    raises { Failure -> precede (old rhob) rhob /\ correct rhob }
+    variant { size_tableau tab.model_tableau_field }
+  =
+    let tabm = tab.model_tableau_field in
+    match destruct_tableau tab with
+      | NLC_Root -> ()
+      | NLC_Node tnext phi1 phib ->
+        let tnextm = tnext.model_tableau_field in
+        let phi1m = phi1.model_fo_formula_field in
+        let phibm = phib.model_fo_formula_list_field in
+        assert { tabm = Node tnextm phi1m phibm } ;
+        assert { is_atom phi1m } ;
+        assert { forall x:int. is_fo_term_free_var_in_tableau x tnextm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        match destruct_fo_formula phi1 with
+          | NLC_Not phi2 -> let phi2m = phi2.model_fo_formula_field in
+            assert { phi1m = Not phi2m } ;
+            match destruct_fo_formula phi2 with
+              | NLC_PApp p2 t2 -> let p2m = p2.model_symbol_field in
+                let t2m = t2.model_fo_term_list_field in
+                assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t2m ->
+                  is_fo_term_free_var_in_fo_formula x phi1m &&
+                  is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+                let p3 = match destruct_symbol p2 with
+                  | NLCVar_symbol p3 -> p3 end in
+                if p1 = p3
+                then begin
+                  try conflict t1 t2 rhob rho with UnificationFailure ->
+                  raise Failure end ;
+                  branch_conflict_atom p1 t1 tnext rhob rho
+                end
+                else branch_conflict_atom p1 t1 tnext rhob rho
+              | _ -> absurd
+            end
+          | NLC_PApp _ _ -> branch_conflict_atom p1 t1 tnext rhob rho
+          | _ -> absurd
+        end
+    end
+
+  let rec clause_conflicts (phil:nlimpl_fo_formula_list) (tab:nlimpl_tableau)
+    (rhob:subst) (ghost rho:unifier_subst) : unit
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phil.model_fo_formula_list_field -> x >= 0 }
+    requires { is_atom_list phil.model_fo_formula_list_field }
+    requires { nlimpl_fo_formula_list_ok phil }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { is_procedure_tableau tab.model_tableau_field }
+    requires { nlimpl_tableau_ok tab }
+    requires { unifier_subst_ok rhob rho }
+    ensures { precede (old rhob) rhob }
+    ensures { unifier_subst_ok rhob rho }
+    raises { Failure -> precede (old rhob) rhob /\ correct rhob }
+    variant { size_fo_formula_list phil.model_fo_formula_list_field }
+  =
+    let philm = phil.model_fo_formula_list_field in
+    match destruct_fo_formula_list phil with
+      | NLC_FOFNil -> ()
+      | NLC_FOFCons phi0 phiq -> let phi0m = phi0.model_fo_formula_field in
+        let phiqm = phiq.model_fo_formula_list_field in
+        assert { philm = FOFCons phi0m phiqm } ;
+        assert { is_atom phi0m } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phiqm ->
+          is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+        match destruct_fo_formula phi0 with
+          | NLC_PApp p1 t1 -> let p1m = p1.model_symbol_field in
+            let t1m = t1.model_fo_term_list_field in
+            assert { phi0m = PApp p1m t1m } ;
+            let p1' = match destruct_symbol p1 with
+              | NLCVar_symbol p1' -> p1'
+            end in
+            assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t1m ->
+              is_fo_term_free_var_in_fo_formula x phi0m &&
+              is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+            branch_conflict_atom p1' t1 tab rhob rho ;
+            clause_conflicts phiq tab rhob rho
+          | NLC_Not phi1 -> let phi1m = phi1.model_fo_formula_field in
+            assert { phi0m = Not phi1m } ;
+            match destruct_fo_formula phi1 with
+              | NLC_PApp p1 t1 -> let p1' = match destruct_symbol p1 with
+                  | NLCVar_symbol p1' -> p1'
+                end in
+                let t1m = t1.model_fo_term_list_field in
+                let p1m = p1.model_symbol_field in
+                assert { phi1m = PApp p1m t1m } ;
+                assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t1m ->
+                  is_fo_term_free_var_in_fo_formula x phi1m &&
+                  is_fo_term_free_var_in_fo_formula x phi0m &&
+                  is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+                branch_conflict_neg_atom p1' t1 tab rhob rho ;
+                clause_conflicts phiq tab rhob rho
+              | _ -> absurd
+            end
+          | _ -> absurd
+        end
+    end
+
+  (* base:set of initial (preprocessed) formula.
+     tab:context still to be proved.
+     Return: nothing, if successful, base is unsatisfiable.
+     May fail without justification.
+   *)
+
+  let rec decompose (base:nlimpl_fo_formula_list)
+      (tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (phi0:nlimpl_fo_formula)
+      (clause:nlimpl_fo_formula_list)
+      (remaining:nlimpl_fo_formula_list)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_formula_ok phi0 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi0.model_fo_formula_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok clause }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      clause.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok remaining }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      remaining.model_fo_formula_list_field -> x >= 0 }
+
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_simpl phi0.model_fo_formula_field }
+    requires { no_existential phi0.model_fo_formula_field }
+    requires { is_nnf phi0.model_fo_formula_field }
+
+    requires { is_atom_list clause.model_fo_formula_list_field }
+
+    requires { is_simpl_list remaining.model_fo_formula_list_field }
+    requires { is_nnf_list remaining.model_fo_formula_list_field }
+    requires { no_existential_list remaining.model_fo_formula_list_field }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos }
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        formula_semantic phi0.model_fo_formula_field m rhos \/
+        formula_list_disj_semantic clause.model_fo_formula_list_field m rhos \/
+        formula_list_disj_semantic remaining.model_fo_formula_list_field m rhos }
+    diverges
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let phi0m = phi0.model_fo_formula_field in
+    let rmgm = remaining.model_fo_formula_list_field in
+    let basem = base.model_fo_formula_list_field in
+    let clausem = clause.model_fo_formula_list_field in
+    let tabm = tab.model_tableau_field in
+    match destruct_fo_formula phi0 with
+      | NLC_Or a b ->
+        let am = a.model_fo_formula_field in
+        let bm = b.model_fo_formula_field in
+        assert { phi0m = Or am bm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x am ->
+          is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x bm ->
+          is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+        let rmg = construct_fo_formula_list (NLC_FOFCons b remaining) in
+        let rmg'm = rmg.model_fo_formula_list_field in
+        assert { rmg'm = FOFCons bm rmgm } ;
+        decompose base tab unifb unif fresh a clause rmg depth goalnum
+      | NLC_And a b -> let am = a.model_fo_formula_field in
+        let bm = b.model_fo_formula_field in
+        assert { phi0m = And am bm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x am ->
+          is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x bm ->
+          is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+        'B:
+        let tp = stamp unifb in
+        try decompose base tab unifb unif fresh a clause remaining depth goalnum
+        with Failure -> 'F: backtrack tp unifb ;
+          assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
+          decompose base tab unifb unif fresh b clause remaining depth goalnum end
+      | NLC_Exists _ _ -> absurd
+      | NLC_FTrue -> absurd
+      | NLC_FFalse -> absurd
+      | NLC_Forall x phi1 ->
+        let phi1m = phi1.model_fo_formula_field in
+        let vfresh = construct_fo_term (NLCVar_fo_term fresh) in
+        let phi2 = nlsubst_fo_term_in_fo_formula phi1 x vfresh in
+        let phi2m = phi2.model_fo_formula_field in
+        let ghost r0 = some[x <- None] in
+        let ghost r1 = ocase identity x in
+        let ghost r2 = ocase identity fresh in
+        let ghost r3 = identity[x <- fresh] in
+        let ghost sid = (subst_id_fo_term:func int (fo_term int int)) in
+        let ghost s3 = sid[x <- Var_fo_term fresh] in
+        let ghost s3' = rcompose r3 sid in
+        let ghost s2 = rcompose r2 sid in
+        assert { extensionalEqual s3' s3 } ;
+        let phi3m = rename_fo_formula phi1m identity r0 in
+        assert { phi0m = Forall phi3m &&
+          phi1m = rename_fo_formula phi3m identity r1 } ;
+        assert { phi2m = subst_fo_formula phi1m (rcompose identity subst_id_symbol) s3'
+          = rename_fo_formula phi1m identity r3 } ;
+        assert { extensionalEqual r3 (rcompose r0 r2) } ;
+        assert { phi2m = rename_fo_formula phi3m identity r2 =
+          subst_fo_formula phi3m subst_id_symbol s2 } ;
+        assert { forall m:model int 'st, rho:func int 'st.
+          let rhos = semantic_subst unif.unifier m rho in
+          let s0 = semantic_subst s2 m rhos in
+          let s1 = ocase rhos (term_semantic (Var_fo_term fresh) m rhos) in
+          s0 None = s1 None &&
+          (forall x:int. s2 (Some x) = Var_fo_term x &&
+            s0 (Some x) = term_semantic (Var_fo_term x) m rhos = s1 (Some x)) &&
+          extensionalEqual s0 s1 &&
+          (formula_semantic phi0m m rhos ->
+            formula_semantic phi2m m rhos)
+        } ;
+        assert { forall x:int.
+          (forall y:option int. is_fo_term_free_var_in_fo_formula y phi3m /\
+            r2 y = x -> match y with None -> x = fresh && x >= 0
+              | Some y -> x = y &&
+                is_fo_term_free_var_in_fo_formula (Some x) phi3m &&
+                is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 end &&
+              x >= 0) &&
+          (is_fo_term_free_var_in_fo_formula x phi2m ->
+          (exists y:option int. is_fo_term_free_var_in_fo_formula y phi3m /\
+            r2 y = x) && x >= 0) &&
+          (is_fo_term_free_var_in_fo_formula x phi2m -> x >= 0)
+        } ;
+        decompose base tab unifb unif (fresh + 1) phi2 clause remaining depth goalnum
+      | NLC_PApp p l ->  assert { is_atom phi0m } ;
+        decompose_literal base tab unifb unif fresh phi0 clause remaining depth goalnum
+      | NLC_Not phi1 -> assert { is_atom phi0m } ;
+        decompose_literal base tab unifb unif fresh phi0 clause remaining depth goalnum
+    end
+
+  with decompose_literal (base:nlimpl_fo_formula_list)
+      (tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (phi0:nlimpl_fo_formula)
+      (clause:nlimpl_fo_formula_list)
+      (remaining:nlimpl_fo_formula_list)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_formula_ok phi0 }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula x
+      phi0.model_fo_formula_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok clause }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      clause.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok remaining }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      remaining.model_fo_formula_list_field -> x >= 0 }
+
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_atom phi0.model_fo_formula_field }
+
+    requires { is_atom_list clause.model_fo_formula_list_field }
+
+    requires { is_simpl_list remaining.model_fo_formula_list_field }
+    requires { is_nnf_list remaining.model_fo_formula_list_field }
+    requires { no_existential_list remaining.model_fo_formula_list_field }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos }
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        formula_semantic phi0.model_fo_formula_field m rhos \/
+        formula_list_disj_semantic clause.model_fo_formula_list_field m rhos \/
+        formula_list_disj_semantic remaining.model_fo_formula_list_field m rhos }
+
+    diverges
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let phi0m = phi0.model_fo_formula_field in
+    let rmgm = remaining.model_fo_formula_list_field in
+    let basem = base.model_fo_formula_list_field in
+    let clausem = clause.model_fo_formula_list_field in
+    let tabm = tab.model_tableau_field in
+    match destruct_fo_formula_list remaining with
+      | NLC_FOFNil -> assert { rmgm = FOFNil } ;
+        match destruct_tableau tab with
+          | NLC_Root -> (* Topmost decomposition,
+                do not look for contradiction here. *)
+            let tab' = construct_tableau (NLC_Node tab phi0 clause) in
+            let tab'm = tab'.model_tableau_field in
+            assert { tab'm = Node tabm phi0m clausem } ;
+            if depth = 0 then raise Failure else
+            select_lemma base base tab' unifb unif fresh (depth-1) goalnum (-1)
+          | NLC_Node tnext phi1 phib ->
+            let clse = construct_fo_formula_list (NLC_FOFCons phi0 clause) in
+            let clsem = clse.model_fo_formula_list_field in
+            let phi1m = phi1.model_fo_formula_field in
+            let tnextm = tnext.model_tableau_field in
+            let phibm = phib.model_fo_formula_list_field in
+            assert { clsem = FOFCons phi0m clausem } ;
+            assert { is_atom_list clsem } ;
+            assert { tabm = Node tnextm phi1m phibm } ;
+            assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phibm ->
+              is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+            assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi1m ->
+              is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+            assert { forall x:int. is_fo_term_free_var_in_tableau x tnextm ->
+              is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+            let fonil = construct_fo_formula_list NLC_FOFNil in
+            assert { fonil.model_fo_formula_list_field = FOFNil } ;
+            assert { is_atom phi1m } ;
+            match destruct_fo_formula phi1 with
+              | NLC_PApp ptab ttab ->
+                let ptabm = ptab.model_symbol_field in
+                let ttabm = ttab.model_fo_term_list_field in
+                assert { phi1m = PApp ptabm ttabm } ;
+                assert { forall x:int. is_fo_term_free_var_in_fo_term_list x ttabm ->
+                  is_fo_term_free_var_in_fo_formula x phi1m && x >= 0 } ;
+                let ptab2 = match destruct_symbol ptab with
+                  | NLCVar_symbol ptab2 -> assert { ptabm = Var_symbol ptab2 } ;
+                    ptab2
+                end in
+                contradiction_atom base tab unifb unif fresh ptab2 ttab phibm tnextm clsem clse fonil depth goalnum
+              | NLC_Not phi2 -> let phi2m = phi2.model_fo_formula_field in
+                assert { phi1m = Not phi2m } ;
+                assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi2m
+                  -> is_fo_term_free_var_in_fo_formula x phi1m && x >= 0 } ;
+                match destruct_fo_formula phi2 with
+                  | NLC_PApp ptab ttab ->
+                    let ptabm = ptab.model_symbol_field in
+                    let ttabm = ttab.model_fo_term_list_field in
+                    assert { phi2m = PApp ptabm ttabm } ;
+                    assert { forall x:int. is_fo_term_free_var_in_fo_term_list x ttabm ->
+                      is_fo_term_free_var_in_fo_formula x phi2m && x >= 0 } ;
+                    let ptab2 = match destruct_symbol ptab with
+                      | NLCVar_symbol ptab2 -> assert { ptabm = Var_symbol ptab2 } ;
+                        ptab2
+                    end in
+                    contradiction_neg_atom base tab unifb unif fresh ptab2 ttab phibm tnextm clsem clse fonil depth goalnum
+                  | _ -> absurd
+                end
+              | _ -> absurd
+            end
+        end
+      | NLC_FOFCons phi1 qr ->
+        let phi1m = phi1.model_fo_formula_field in
+        let qrm = qr.model_fo_formula_list_field in
+        assert { rmgm = FOFCons phi1m qrm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi1m ->
+          is_fo_term_free_var_in_fo_formula_list x rmgm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x qrm ->
+          is_fo_term_free_var_in_fo_formula_list x rmgm && x >= 0 } ;
+        let clse = construct_fo_formula_list (NLC_FOFCons phi0 clause) in
+        let clsem = clse.model_fo_formula_list_field in
+        assert { clsem = FOFCons phi0m clausem } ;
+        decompose base tab unifb unif fresh phi1 clse qr depth goalnum
+    end
+
+  (* find a contradiction with the current leaf of the tableau,
+     if it is a non-negated literal. *)
+  with contradiction_atom (base:nlimpl_fo_formula_list)
+      (tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (p:int)
+      (t:nlimpl_fo_term_list)
+      (ghost phit:fo_formula_list int int)
+      (ghost tnext:tableau int int)
+      (ghost clsem:fo_formula_list int int)
+      (phil:nlimpl_fo_formula_list)
+      (phiacc:nlimpl_fo_formula_list)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok phil }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phil.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok phiacc }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phiacc.model_fo_formula_list_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_term_list_ok t }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      t.model_fo_term_list_field -> x >= 0 }
+
+    requires { tab.model_tableau_field =
+      Node tnext (PApp (Var_symbol p) t.model_fo_term_list_field) phit }
+
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_atom_list phil.model_fo_formula_list_field }
+    requires { is_atom_list phiacc.model_fo_formula_list_field }
+
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos }
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        formula_list_disj_semantic clsem m rhos }
+
+    requires { forall m:model int 'st, rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_disj_semantic clsem m rhos <->
+        formula_list_disj_semantic phil.model_fo_formula_list_field m rhos \/
+        formula_list_disj_semantic phiacc.model_fo_formula_list_field m rhos }
+    diverges
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let basem = base.model_fo_formula_list_field in
+    let tabm = tab.model_tableau_field in
+    let tm = t.model_fo_term_list_field in
+    let philm = phil.model_fo_formula_list_field in
+    let phiaccm = phiacc.model_fo_formula_list_field in
+    let phibasem = PApp (Var_symbol p) tm in
+    match destruct_fo_formula_list phil with
+      | NLC_FOFNil -> raise Failure (* no contradiction found. *)
+      | NLC_FOFCons phi0 q -> (* Maybe phi0 is a contradiction. *)
+        let phi0m = phi0.model_fo_formula_field in
+        let qm = q.model_fo_formula_list_field in
+        assert { philm = FOFCons phi0m qm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x qm ->
+          is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+        assert { is_atom phi0m } ;
+        (* prepare backtracking data. *)
+        let phiacc2 = construct_fo_formula_list (NLC_FOFCons phi0 phiacc) in
+        let phiacc2m = phiacc2.model_fo_formula_list_field in
+        assert { phiacc2m = FOFCons phi0m phiaccm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phiacc2m ->
+          (is_fo_term_free_var_in_fo_formula x phi0m \/
+          is_fo_term_free_var_in_fo_formula_list x phiaccm) && x >= 0 } ;
+        match destruct_fo_formula phi0 with
+          | NLC_Not phi1 -> let phi1m = phi1.model_fo_formula_field in
+            assert { phi0m = Not phi1m } ;
+            assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi1m ->
+              is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+            match destruct_fo_formula phi1 with
+              | NLC_PApp p2 t2 -> match destruct_symbol p2 with
+                  | NLCVar_symbol p3 -> let t2m = t2.model_fo_term_list_field in
+                    assert { phi1m = PApp (Var_symbol p3) t2m } ;
+                    assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t2m ->
+                      is_fo_term_free_var_in_fo_formula x phi1m && x >= 0 } ;
+                    if p = p3
+                    then (* let-try. *)
+                      'B: let tp = stamp unifb in
+                      let l0 = ref Nil in
+                      match try let u = unify_term_list t t2 l0 unifb unif in Some u
+                      with UnificationFailure -> None end with
+                        (* Contradiction found. *)
+                        | Some u -> let unif2 = u.final_unifier in
+                          (* should walk back in the tableau
+                            until a non-empty branch is found. *)
+                          let phifinal = merge phiacc q in
+                          let b = try clause_conflicts phifinal tab unifb unif2 ;
+                            False with Failure -> True end in
+                          match b with
+                            | True -> 'T: backtrack tp unifb ;
+                            assert { backtrack_to (at unifb 'B) (at unifb 'T) unifb } ;
+                          contradiction_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                            | False -> assert { precede (at unifb 'B) unifb } ;
+                            let phifm = phifinal.model_fo_formula_list_field in
+                          assert { forall m:model int 'st,rho:func int 'st.
+                            let rhos = semantic_subst unif2.unifier m rho in
+                            let rhos0 = semantic_subst u.unifier_factor m rho in
+                            (forall x:int.
+                              eval unif2.unifier x = subst_fo_term (eval unif.unifier x)
+                                (rcompose identity subst_id_symbol) u.unifier_factor &&
+                              rhos x = term_semantic (eval unif2.unifier x) m rho
+                                = term_semantic (eval unif.unifier x) (model_rename identity m) rhos0
+                                = semantic_subst unif.unifier m rhos0 x) &&
+                            extensionalEqual rhos
+                              (semantic_subst unif.unifier m rhos0) &&
+                            subst_fo_formula phi1m subst_id_symbol unif2.unifier =
+                            subst_fo_formula phibasem subst_id_symbol unif2.unifier &&
+                            (formula_semantic phi1m m rhos <->
+                              formula_semantic phibasem m rhos) &&
+                            not(formula_semantic phi0m m rhos /\
+                              formula_semantic phibasem m rhos) &&
+                            (formula_list_conj_semantic basem m rhos ->
+                              tableau_semantic_with tabm True m rhos &&
+                              (formula_list_disj_semantic clsem m rhos) &&
+                              (formula_list_disj_semantic phifm m rhos \/
+                               formula_semantic phi0m m rhos) &&
+                              let b = if formula_list_disj_semantic phifm m rhos
+                                then True
+                                else False in
+                              tableau_semantic_with tabm b m rhos) } ;
+                          let nd = ref depth in
+                          let ct = contract_tableau tab phifinal nd in
+                          let depth = !nd in
+                          match ct with
+                            | None -> assert { forall m:model int 'st,rho:func int 'st.
+                              let rhos = semantic_subst unif2.unifier m rho in
+                              let b = if formula_list_disj_semantic phifm m rhos
+                                then True
+                                else False in
+                              not(tableau_semantic_with tabm b m rhos) &&
+                              not(formula_list_conj_semantic basem m rhos) } ;
+                              { contradictory_assignment = unif2.unifier }
+                            (* continue proof search. If fail,
+                             backtrack to find another contradiction. *)
+                            | Some tab2 ->
+                              let tab2m = tab2.model_tableau_field in
+                              assert { forall m:model int 'st,rho:func int 'st.
+                                let rhos = semantic_subst unif2.unifier m rho in
+                                formula_list_conj_semantic basem m rhos ->
+                                  let b = if formula_list_disj_semantic phifm m rhos
+                                    then True
+                                    else False in
+                                  tableau_semantic_with tabm b m rhos &&
+                                  tableau_semantic_with tab2m True m rhos
+                                 } ;
+                              match !l0 with
+                                | Nil -> extend_branch base tab2 unifb unif2 fresh depth goalnum
+                                | _ -> try extend_branch base tab2 unifb unif2 fresh depth goalnum
+                                with Failure ->
+                                  'F: backtrack tp unifb ;
+                                  assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
+                                  try conflict t t2 unifb unif
+                                  with UnificationFailure -> raise Failure end ;
+                                  contradiction_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                                end
+                              end
+                          end end
+                        | None -> 'N: backtrack tp unifb ;
+                          assert { backtrack_to (at unifb 'B) (at unifb 'N) unifb } ;
+                          contradiction_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                      end
+                    else (* do not conflict. *)
+                      contradiction_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                end
+              | _ -> absurd (* phi0 is literal. *)
+            end
+          | NLC_PApp _ _ -> (* do not conflict. *)
+            contradiction_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+          | _ -> absurd (* phi0 is literal. *)
+        end
+    end
+
+  (* find a contradiction with the current leaf of the tableau,
+     if it is a negated literal. *)
+  with contradiction_neg_atom (base:nlimpl_fo_formula_list)
+      (tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (p:int)
+      (t:nlimpl_fo_term_list)
+      (ghost phit:fo_formula_list int int)
+      (ghost tnext:tableau int int)
+      (ghost clsem:fo_formula_list int int)
+      (phil:nlimpl_fo_formula_list)
+      (phiacc:nlimpl_fo_formula_list)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok phil }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phil.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok phiacc }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      phiacc.model_fo_formula_list_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_term_list_ok t }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      t.model_fo_term_list_field -> x >= 0 }
+
+    requires { tab.model_tableau_field =
+      Node tnext (Not (PApp (Var_symbol p) t.model_fo_term_list_field)) phit }
+
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_atom_list phil.model_fo_formula_list_field }
+    requires { is_atom_list phiacc.model_fo_formula_list_field }
+
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos }
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        formula_list_disj_semantic clsem m rhos }
+
+    requires { forall m:model int 'st, rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_disj_semantic clsem m rhos <->
+        formula_list_disj_semantic phil.model_fo_formula_list_field m rhos \/
+        formula_list_disj_semantic phiacc.model_fo_formula_list_field m rhos }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let basem = base.model_fo_formula_list_field in
+    let tabm = tab.model_tableau_field in
+    let tm = t.model_fo_term_list_field in
+    let philm = phil.model_fo_formula_list_field in
+    let phiaccm = phiacc.model_fo_formula_list_field in
+    let phi1m = PApp (Var_symbol p) tm in
+    let phibasem = Not phi1m in
+    match destruct_fo_formula_list phil with
+      | NLC_FOFNil -> raise Failure (* no contradiction found. *)
+      | NLC_FOFCons phi0 q -> (* Maybe phi0 is a contradiction. *)
+        let phi0m = phi0.model_fo_formula_field in
+        let qm = q.model_fo_formula_list_field in
+        assert { philm = FOFCons phi0m qm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x qm ->
+          is_fo_term_free_var_in_fo_formula_list x philm && x >= 0 } ;
+        assert { is_atom phi0m } ;
+        (* prepare backtracking data. *)
+        let phiacc2 = construct_fo_formula_list (NLC_FOFCons phi0 phiacc) in
+        let phiacc2m = phiacc2.model_fo_formula_list_field in
+        assert { phiacc2m = FOFCons phi0m phiaccm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phiacc2m ->
+          (is_fo_term_free_var_in_fo_formula x phi0m \/
+          is_fo_term_free_var_in_fo_formula_list x phiaccm) && x >= 0 } ;
+        match destruct_fo_formula phi0 with
+          | NLC_PApp p2 t2 -> match destruct_symbol p2 with
+              | NLCVar_symbol p3 -> let t2m = t2.model_fo_term_list_field in
+                assert { phi0m = PApp (Var_symbol p3) t2m } ;
+                assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t2m ->
+                  is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+                if p = p3
+                then (* let-try. *)
+                  'B: let tp = stamp unifb in
+                  let l0 = ref Nil in
+                  match try let u = unify_term_list t t2 l0 unifb unif in Some u
+                  with UnificationFailure -> None end with
+                    (* Contradiction found. *)
+                    | Some u -> let unif2 = u.final_unifier in
+                      (* should walk back in the tableau
+                        until a non-empty branch is found. *)
+                      let phifinal = merge phiacc q in
+                      let b = try clause_conflicts phifinal tab unifb unif2 ;
+                        False with Failure -> True end in
+                      match b with
+                      | True -> 'T: backtrack tp unifb ;
+                        assert { backtrack_to (at unifb 'B) (at unifb 'T) unifb } ;
+                        contradiction_neg_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                      | False -> assert { precede (at unifb 'B) unifb } ;
+                      let phifm = phifinal.model_fo_formula_list_field in
+                      assert { forall m:model int 'st,rho:func int 'st.
+                        let rhos = semantic_subst unif2.unifier m rho in
+                        let rhos0 = semantic_subst u.unifier_factor m rho in
+                        (forall x:int.
+                          eval unif2.unifier x = subst_fo_term (eval unif.unifier x)
+                            (rcompose identity subst_id_symbol) u.unifier_factor &&
+                          rhos x = term_semantic (eval unif2.unifier x) m rho
+                            = term_semantic (eval unif.unifier x) (model_rename identity m) rhos0
+                            = semantic_subst unif.unifier m rhos0 x) &&
+                        extensionalEqual rhos
+                         (semantic_subst unif.unifier m rhos0) &&
+                        subst_fo_formula phi1m subst_id_symbol unif2.unifier =
+                        (*PApp (subst_symbol (Var_symbol p) subst_id_symbol)
+                          (subst_fo_term_list tm subst_id_symbol unif2.unifier) =
+                        PApp (subst_symbol (Var_symbol p) subst_id_symbol)
+                          (subst_fo_term_list t2m subst_id_symbol unif2.unifier) =*)
+                        subst_fo_formula phi0m subst_id_symbol unif2.unifier &&
+                        (formula_semantic phi0m m rhos <->
+                          formula_semantic phi1m m rhos) &&
+                        not(formula_semantic phi0m m rhos /\
+                          formula_semantic phibasem m rhos) &&
+                        (formula_list_conj_semantic basem m rhos ->
+                          tableau_semantic_with tabm True m rhos &&
+                          (formula_list_disj_semantic clsem m rhos) &&
+                          (formula_list_disj_semantic phifm m rhos \/
+                           formula_semantic phi0m m rhos) &&
+                          let b = if formula_list_disj_semantic phifm m rhos
+                            then True
+                            else False in
+                          tableau_semantic_with tabm b m rhos) } ;
+                        let nd = ref depth in
+                        let ct = contract_tableau tab phifinal nd in
+                        let depth = !nd in
+                      match ct with
+                        | None -> assert { forall m:model int 'st,rho:func int 'st.
+                          let rhos = semantic_subst unif2.unifier m rho in
+                          let b = if formula_list_disj_semantic phifm m rhos
+                            then True
+                            else False in
+                          not(tableau_semantic_with tabm b m rhos) &&
+                          not(formula_list_conj_semantic basem m rhos) } ;
+                          { contradictory_assignment = unif2.unifier }
+                        (* continue proof search. If fail,
+                           backtrack to find another contradiction. *)
+                        | Some tab2 ->
+                          let tab2m = tab2.model_tableau_field in
+                          assert { forall m:model int 'st,rho:func int 'st.
+                            let rhos = semantic_subst unif2.unifier m rho in
+                            formula_list_conj_semantic basem m rhos ->
+                              let b = if formula_list_disj_semantic phifm m rhos
+                                then True
+                                else False in
+                              tableau_semantic_with tabm b m rhos &&
+                              tableau_semantic_with tab2m True m rhos
+                            } ;
+                          match !l0 with
+                            | Nil -> extend_branch base tab2 unifb unif2 fresh depth goalnum
+                            | _ -> try extend_branch base tab2 unifb unif2 fresh depth goalnum
+                              with Failure ->
+                                'F: backtrack tp unifb ;
+                                assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
+                                try conflict t t2 unifb unif
+                                with UnificationFailure -> raise Failure end ;
+                                contradiction_neg_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                              end
+                          end
+                      end end
+                    | None -> 'N: backtrack tp unifb ;
+                      assert { backtrack_to (at unifb 'B) (at unifb 'N) unifb } ;
+                      contradiction_neg_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+                  end
+                else (* do not conflict. *)
+                  contradiction_neg_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+            end
+          | NLC_Not _ -> (* do not conflict. *)
+            contradiction_neg_atom base tab unifb unif fresh p t phit tnext clsem q phiacc2 depth goalnum
+          | _ -> absurd (* phi0 is literal. *)
+        end
+    end
+
+  (* Technically speaking, the entry point of the main loop.
+     Should be called with a preprocessed set of formula
+     independent of the interpretation (no free variable),
+     and a empty unifier (identity substitution). *)
+
+  with extend_branch (base:nlimpl_fo_formula_list)
+      (tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+
+    requires { is_procedure_tableau tab.model_tableau_field }
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos }
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let tabm = tab.model_tableau_field in
+    let basem = base.model_fo_formula_list_field in
+    match destruct_tableau tab with
+      | NLC_Root -> if depth = 0
+        then raise Failure
+        else let depth = depth - 1 in
+          select_lemma base base tab unifb unif fresh depth goalnum goalnum
+      | NLC_Node tnext phi0 phib -> let tnextm = tnext.model_tableau_field in
+        let phi0m = phi0.model_fo_formula_field in
+        let phibm = phib.model_fo_formula_list_field in
+        assert { tabm = Node tnextm phi0m phibm } ;
+        assert { forall x:int. is_fo_term_free_var_in_tableau x tnextm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phibm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { is_atom phi0m } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          let rhos = semantic_subst unif.unifier m rho in
+          formula_list_conj_semantic basem m rhos ->
+            let b1 = if tableau_node True phibm phi0m m rhos
+              then True
+              else False in
+            tableau_semantic_with tnextm b1 m rhos &&
+            (tableau_semantic_with tnextm True m rhos \/
+             tableau_semantic_with tnextm False m rhos) } ;
+        match destruct_fo_formula phi0 with
+          | NLC_PApp ps t -> let psm = ps.model_symbol_field in
+            let tm = t.model_fo_term_list_field in
+            assert { phi0m = PApp psm tm } ;
+            assert { forall x:int. is_fo_term_free_var_in_fo_term_list x tm ->
+              is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+            let p = match destruct_symbol ps with
+              | NLCVar_symbol p -> assert { psm = Var_symbol p } ; p
+            end in
+            contradiction_find_atom base tab tnext tnext unifb unif fresh p t phib depth goalnum
+          | NLC_Not phi1 -> let phi1m = phi1.model_fo_formula_field in
+            assert { phi0m = Not phi1m } ;
+            match destruct_fo_formula phi1 with
+              | NLC_PApp ps t ->
+                let psm = ps.model_symbol_field in
+                let tm = t.model_fo_term_list_field in
+                assert { phi1m = PApp psm tm } ;
+                assert { forall x:int. is_fo_term_free_var_in_fo_term_list x tm ->
+                  is_fo_term_free_var_in_fo_formula x phi1m &&
+                  is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+                let p = match destruct_symbol ps with
+                  | NLCVar_symbol p -> assert { psm = Var_symbol p } ; p
+                end in
+                contradiction_find_neg_atom base tab tnext tnext unifb unif fresh p t phib depth goalnum
+              | _ -> absurd
+            end
+          | _ -> absurd
+        end
+    end
+
+  (* Look for a contradiction inside the current branch. *)
+  with contradiction_find_atom (base:nlimpl_fo_formula_list)
+      (tab0 tab1 tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (p:int)
+      (t:nlimpl_fo_term_list)
+      (philist:nlimpl_fo_formula_list)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab0 }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab0.model_tableau_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab1 }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab1.model_tableau_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_term_list_ok t }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      t.model_fo_term_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok philist }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      philist.model_fo_formula_list_field -> x >= 0 }
+
+    requires { is_procedure_tableau tab0.model_tableau_field }
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_atom_list philist.model_fo_formula_list_field }
+
+    requires { tab0.model_tableau_field =
+      Node tab1.model_tableau_field
+           (PApp (Var_symbol p) t.model_fo_term_list_field)
+           philist.model_fo_formula_list_field }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab0.model_tableau_field True m rhos }
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos \/
+        tableau_semantic_with tab.model_tableau_field False m rhos }
+    requires { forall m:model int 'st,rho:func int 'st,b:bool.
+      let rhos = semantic_subst unif.unifier m rho in
+      (tableau_semantic_with tab.model_tableau_field True m rhos <->
+        tableau_semantic_with tab.model_tableau_field False m rhos) ->
+      (tableau_semantic_with tab0.model_tableau_field True m rhos <->
+       tableau_semantic_with tab0.model_tableau_field False m rhos) }
+
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let tab0m = tab0.model_tableau_field in
+    let tab1m = tab1.model_tableau_field in
+    let tabm = tab.model_tableau_field in
+    let tm = t.model_fo_term_list_field in
+    let philm = philist.model_fo_formula_list_field in
+    let basem = base.model_fo_formula_list_field in
+    let phibasem = PApp (Var_symbol p) tm in
+    match destruct_tableau tab with
+      | NLC_Root -> (* No branch contradiction found, try to instantiate
+        a lemma. *)
+        if depth = 0
+        then raise Failure
+        else select_lemma base base tab0 unifb unif fresh (depth-1) goalnum (-1)
+      | NLC_Node tnext phi0 phib ->
+        let tnextm = tnext.model_tableau_field in
+        let phi0m = phi0.model_fo_formula_field in
+        let phibm = phib.model_fo_formula_list_field in
+        assert { tabm = Node tnextm phi0m phibm } ;
+        assert { forall x:int. is_fo_term_free_var_in_tableau x tnextm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phibm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { is_atom phi0m } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          (tableau_semantic_with tnextm True m rho <->
+            tableau_semantic_with tnextm False m rho) ->
+          (tableau_semantic_with tabm True m rho <->
+            tableau_semantic_with tabm False m rho) } ;
+        assert { forall m:model int 'st,rho:func int 'st,b:bool.
+          tableau_semantic_with tabm b m rho ->
+            let b1 = if tableau_node b phibm phi0m m rho
+              then True
+              else False in
+            tableau_semantic_with tnextm b1 m rho &&
+            (tableau_semantic_with tnextm True m rho \/
+             tableau_semantic_with tnextm False m rho) } ;
+        match destruct_fo_formula phi0 with
+          | NLC_PApp _ _ -> contradiction_find_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+          | NLC_Not phi1 -> let phi1m = phi1.model_fo_formula_field in
+            assert { phi0m = Not phi1m } ;
+            match destruct_fo_formula phi1 with
+              | NLC_PApp p2 t2 ->
+                let p2m = p2.model_symbol_field in
+                let t2m = t2.model_fo_term_list_field in
+                assert { phi1m = PApp p2m t2m } ;
+                assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t2m ->
+                  is_fo_term_free_var_in_fo_formula x phi1m &&
+                  is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+                let p3 = match destruct_symbol p2 with
+                    | NLCVar_symbol p3 -> p3
+                  end in
+                assert { p2m = Var_symbol p3 } ;
+                (* Unification attempt. *)
+                if p = p3
+                then (* let-try. *) 'B: let tp = stamp unifb in
+                  let l0 = ref Nil in
+                  match try let u = unify_term_list t t2 l0 unifb unif in Some u
+                  with UnificationFailure -> None end with
+                    | Some u -> (* Unifiable. *)
+                      let unif2 = u.final_unifier in
+                      assert { forall m:model int 'st,rho:func int 'st.
+                        let rhos = semantic_subst unif2.unifier m rho in
+                        let rhos0 = semantic_subst u.unifier_factor m rho in
+                        (forall x:int.
+                          eval unif2.unifier x = subst_fo_term (eval unif.unifier x)
+                            (rcompose identity subst_id_symbol) u.unifier_factor &&
+                          rhos x = term_semantic (eval unif2.unifier x) m rho
+                            = term_semantic (eval unif.unifier x) (model_rename identity m) rhos0
+                            = semantic_subst unif.unifier m rhos0 x) &&
+                        extensionalEqual rhos
+                          (semantic_subst unif.unifier m rhos0) &&
+                        subst_fo_formula phi1m subst_id_symbol unif2.unifier =
+                        subst_fo_formula phibasem subst_id_symbol unif2.unifier &&
+                        (formula_semantic phi1m m rhos <->
+                          formula_semantic phibasem m rhos) &&
+                        not(formula_semantic phi0m m rhos /\
+                          formula_semantic phibasem m rhos) &&
+                        (formula_list_conj_semantic basem m rhos ->
+                          tableau_semantic_with tab0m True m rhos &&
+                          (if formula_semantic phibasem m rhos
+                          then (tableau_semantic_with tabm True m rhos <->
+                              tableau_semantic_with tabm False m rhos) &&
+                            tableau_semantic_with tabm False m rhos &&
+                            tableau_semantic_with tab0m False m rhos
+                          else tableau_semantic_with tab0m False m rhos) &&
+                            tableau_semantic_with tab0m False m rhos &&
+                          let b = if formula_list_disj_semantic philm m rhos
+                            then True
+                            else False in
+                          tableau_semantic_with tab1m b m rhos) } ;
+                      let nd = ref depth in
+                      let ct = contract_tableau tab1 philist nd in
+                      let depth = !nd in
+                      match ct with
+                        | Some tab2 ->
+                          let tab2m = tab2.model_tableau_field in
+                          assert { forall m:model int 'st,rho:func int 'st.
+                            let rhos = semantic_subst unif2.unifier m rho in
+                            formula_list_conj_semantic basem m rhos ->
+                              let b = if formula_list_disj_semantic philm m rhos
+                                then True
+                                else False in
+                              tableau_semantic_with tab1m b m rhos &&
+                              tableau_semantic_with tab2m True m rhos
+                             } ;
+                          match !l0 with
+                            | Nil -> extend_branch base tab2 unifb unif2 fresh depth goalnum
+                            | _ -> try extend_branch base tab2 unifb unif2 fresh depth goalnum
+                          with Failure -> 'F:
+                            backtrack tp unifb ;
+                            assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
+                            try conflict t t2 unifb unif
+                            with UnificationFailure -> raise Failure end ;
+                            contradiction_find_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+                          end end
+                        | None -> assert { forall m:model int 'st,rho:func int 'st.
+                          let rhos = semantic_subst unif2.unifier m rho in
+                          let b = if formula_list_disj_semantic philm m rhos
+                            then True
+                            else False in
+                          not(tableau_semantic_with tab1m b m rhos) &&
+                          not(formula_list_conj_semantic basem m rhos) } ;
+                          { contradictory_assignment = unif2.unifier }
+                      end
+                    | None -> 'N: backtrack tp unifb ;
+                      assert { backtrack_to (at unifb 'B) (at unifb 'N) unifb } ;
+                      contradiction_find_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+                  end
+                else contradiction_find_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+              | _ -> absurd (* atomic. *)
+            end
+          | _ -> absurd (* atomic. *)
+        end
+    end
+
+
+  (* Look for a contradiction inside the current branch,
+     negated version. *)
+  with contradiction_find_neg_atom (base:nlimpl_fo_formula_list)
+      (tab0 tab1 tab:nlimpl_tableau)
+      (unifb:subst)
+      (ghost unif:unifier_subst)
+      (fresh:int)
+      (p:int)
+      (t:nlimpl_fo_term_list)
+      (philist:nlimpl_fo_formula_list)
+      (depth:int)
+      (goalnum:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab0 }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab0.model_tableau_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab1 }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab1.model_tableau_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_term_list_ok t }
+    requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
+      t.model_fo_term_list_field -> x >= 0 }
+    requires { nlimpl_fo_formula_list_ok philist }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      philist.model_fo_formula_list_field -> x >= 0 }
+
+    requires { is_procedure_tableau tab0.model_tableau_field }
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_atom_list philist.model_fo_formula_list_field }
+
+    requires { tab0.model_tableau_field =
+      Node tab1.model_tableau_field
+           (Not (PApp (Var_symbol p) t.model_fo_term_list_field))
+           philist.model_fo_formula_list_field }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab0.model_tableau_field True m rhos }
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos \/
+        tableau_semantic_with tab.model_tableau_field False m rhos }
+    requires { forall m:model int 'st,rho:func int 'st,b:bool.
+      let rhos = semantic_subst unif.unifier m rho in
+      (tableau_semantic_with tab.model_tableau_field True m rhos <->
+        tableau_semantic_with tab.model_tableau_field False m rhos) ->
+      (tableau_semantic_with tab0.model_tableau_field True m rhos <->
+       tableau_semantic_with tab0.model_tableau_field False m rhos) }
+
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    let tab0m = tab0.model_tableau_field in
+    let tab1m = tab1.model_tableau_field in
+    let tabm = tab.model_tableau_field in
+    let tm = t.model_fo_term_list_field in
+    let philm = philist.model_fo_formula_list_field in
+    let basem = base.model_fo_formula_list_field in
+    let phi1m = PApp (Var_symbol p) tm in
+    let phibasem = Not phi1m in
+    match destruct_tableau tab with
+      | NLC_Root -> if depth = 0
+        then raise Failure
+        else select_lemma base base tab0 unifb unif fresh (depth-1) goalnum (-1)
+      | NLC_Node tnext phi0 phib ->
+        let tnextm = tnext.model_tableau_field in
+        let phi0m = phi0.model_fo_formula_field in
+        let phibm = phib.model_fo_formula_list_field in
+        assert { tabm = Node tnextm phi0m phibm } ;
+        assert { forall x:int. is_fo_term_free_var_in_tableau x tnextm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x phi0m ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x phibm ->
+          is_fo_term_free_var_in_tableau x tabm && x >= 0 } ;
+        assert { is_atom phi0m } ;
+        assert { forall m:model int 'st,rho:func int 'st.
+          (tableau_semantic_with tnextm True m rho <->
+            tableau_semantic_with tnextm False m rho) ->
+          (tableau_semantic_with tabm True m rho <->
+            tableau_semantic_with tabm False m rho) } ;
+        assert { forall m:model int 'st,rho:func int 'st,b:bool.
+          tableau_semantic_with tabm b m rho ->
+            let b1 = if tableau_node b phibm phi0m m rho
+              then True
+              else False in
+            tableau_semantic_with tnextm b1 m rho &&
+            (tableau_semantic_with tnextm True m rho \/
+             tableau_semantic_with tnextm False m rho) } ;
+        match destruct_fo_formula phi0 with
+          | NLC_Not _ -> contradiction_find_neg_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+          | NLC_PApp p2 t2 ->
+            let p2m = p2.model_symbol_field in
+            let t2m = t2.model_fo_term_list_field in
+            assert { phi0m = PApp p2m t2m } ;
+            assert { forall x:int. is_fo_term_free_var_in_fo_term_list x t2m ->
+              is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
+            let p3 = match destruct_symbol p2 with
+                | NLCVar_symbol p3 -> p3
+              end in
+            assert { p2m = Var_symbol p3 } ;
+            (* Unification attempt. *)
+            if p = p3
+            then (* let-try. *) 'B: let tp = stamp unifb in
+              let l0 = ref Nil in
+              match try let u = unify_term_list t t2 l0 unifb unif in Some u
+              with UnificationFailure -> None end with
+                | Some u -> (* Unifiable. *)
+                  let unif2 = u.final_unifier in
+                  assert { forall m:model int 'st,rho:func int 'st.
+                    let rhos = semantic_subst unif2.unifier m rho in
+                    let rhos0 = semantic_subst u.unifier_factor m rho in
+                    (forall x:int.
+                      eval unif2.unifier x = subst_fo_term (eval unif.unifier x)
+                        (rcompose identity subst_id_symbol) u.unifier_factor &&
+                      rhos x = term_semantic (eval unif2.unifier x) m rho
+                        = term_semantic (eval unif.unifier x) (model_rename identity m) rhos0
+                        = semantic_subst unif.unifier m rhos0 x) &&
+                    extensionalEqual rhos
+                      (semantic_subst unif.unifier m rhos0) &&
+                    subst_fo_formula phi1m subst_id_symbol unif2.unifier =
+                    subst_fo_formula phi0m subst_id_symbol unif2.unifier &&
+                    (formula_semantic phi0m m rhos <->
+                      formula_semantic phi1m m rhos) &&
+                    not(formula_semantic phi0m m rhos /\
+                      formula_semantic phibasem m rhos) &&
+                    (formula_list_conj_semantic basem m rhos ->
+                      tableau_semantic_with tab0m True m rhos &&
+                      (if formula_semantic phibasem m rhos
+                      then (tableau_semantic_with tabm True m rhos <->
+                          tableau_semantic_with tabm False m rhos) &&
+                        tableau_semantic_with tabm False m rhos &&
+                        tableau_semantic_with tab0m False m rhos
+                      else tableau_semantic_with tab0m False m rhos) &&
+                        tableau_semantic_with tab0m False m rhos &&
+                      let b = if formula_list_disj_semantic philm m rhos
+                        then True
+                        else False in
+                      tableau_semantic_with tab1m b m rhos) } ;
+                  let nd = ref depth in
+                  let ct = contract_tableau tab1 philist nd in
+                  let depth = !nd in
+                  match ct with
+                    | Some tab2 ->
+                      let tab2m = tab2.model_tableau_field in
+                      assert { forall m:model int 'st,rho:func int 'st.
+                        let rhos = semantic_subst unif2.unifier m rho in
+                        formula_list_conj_semantic basem m rhos ->
+                        let b = if formula_list_disj_semantic philm m rhos
+                          then True
+                          else False in
+                          tableau_semantic_with tab1m b m rhos &&
+                          tableau_semantic_with tab2m True m rhos
+                         } ;
+                      match !l0 with
+                        | Nil -> extend_branch base tab2 unifb unif2 fresh depth goalnum
+                          (* no need to backtrack ! *)
+                        | _ -> try
+                          extend_branch base tab2 unifb unif2 fresh depth goalnum
+                          with Failure -> 'F:
+                            backtrack tp unifb ;
+                            assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
+                            try conflict t t2 unifb unif
+                            with UnificationFailure -> raise Failure end;
+                            contradiction_find_neg_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+                          end end
+                    | None -> assert { forall m:model int 'st,rho:func int 'st.
+                      let rhos = semantic_subst unif2.unifier m rho in
+                      let b = if formula_list_disj_semantic philm m rhos
+                        then True
+                        else False in
+                      not(tableau_semantic_with tab1m b m rhos) &&
+                      not(formula_list_conj_semantic basem m rhos) } ;
+                      { contradictory_assignment = unif2.unifier }
+                  end
+                | None -> 'N: backtrack tp unifb ;
+                  assert { backtrack_to (at unifb 'B) (at unifb 'N) unifb } ;
+                  contradiction_find_neg_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+              end
+            else contradiction_find_neg_atom base tab0 tab1 tnext unifb unif fresh p t philist depth goalnum
+          | _ -> absurd (* atomic. *)
+        end
+    end
+
+  (* Iterate through every lemma of the base formula set. *)
+
+  with select_lemma (base:nlimpl_fo_formula_list) (basecursor:nlimpl_fo_formula_list)
+    (tab:nlimpl_tableau)
+    (unifb:subst)
+    (ghost unif:unifier_subst)
+    (fresh:int)
+    (depth:int)
+    (goalnum:int)
+    (number:int) : prover_return
+    requires { fresh >= 0 }
+    requires { nlimpl_fo_formula_list_ok base }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      base.model_fo_formula_list_field -> x >= 0 }
+    requires { nlimpl_tableau_ok tab }
+    requires { forall x:int. is_fo_term_free_var_in_tableau x
+      tab.model_tableau_field -> x >= 0 }
+    requires { unifier_subst_ok unifb unif }
+    requires { nlimpl_fo_formula_list_ok basecursor }
+    requires { forall x:int. is_fo_term_free_var_in_fo_formula_list x
+      basecursor.model_fo_formula_list_field -> x >= 0 }
+
+    requires { is_procedure_tableau tab.model_tableau_field }
+
+    requires { is_simpl_list base.model_fo_formula_list_field }
+    requires { is_nnf_list base.model_fo_formula_list_field }
+    requires { no_existential_list base.model_fo_formula_list_field }
+
+    requires { is_simpl_list basecursor.model_fo_formula_list_field }
+    requires { is_nnf_list basecursor.model_fo_formula_list_field }
+    requires { no_existential_list basecursor.model_fo_formula_list_field }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      formula_list_conj_semantic base.model_fo_formula_list_field m rho ->
+        formula_list_conj_semantic basecursor.model_fo_formula_list_field m rho }
+
+    requires { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst unif.unifier m rho in
+      formula_list_conj_semantic base.model_fo_formula_list_field m rhos ->
+        tableau_semantic_with tab.model_tableau_field True m rhos }
+
+    ensures { forall m:model int 'st,rho:func int 'st.
+      let rhos = semantic_subst result.contradictory_assignment m rho in
+      not(formula_list_conj_semantic base.model_fo_formula_list_field m rhos) }
+    ensures { precede (old unifb) unifb /\ correct unifb }
+    diverges
+    raises { Failure -> precede (old unifb) unifb /\ correct unifb }
+  =
+    if number = 0
+    then raise Failure ;
+    let bcm = basecursor.model_fo_formula_list_field in
+    match destruct_fo_formula_list basecursor with
+      | NLC_FOFNil -> raise Failure
+      | NLC_FOFCons x q -> let qm = q.model_fo_formula_list_field in
+        let xm = x.model_fo_formula_field in
+        assert { bcm = FOFCons xm qm } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula x xm ->
+          is_fo_term_free_var_in_fo_formula_list x bcm && x >= 0 } ;
+        assert { forall x:int. is_fo_term_free_var_in_fo_formula_list x qm ->
+          is_fo_term_free_var_in_fo_formula_list x bcm && x >= 0 } ;
+        let fonil = construct_fo_formula_list NLC_FOFNil in
+        assert { fonil.model_fo_formula_list_field = FOFNil } ;
+        'B: let tp = stamp unifb in
+        try decompose base tab unifb unif fresh x fonil fonil depth goalnum
+        with Failure -> 'F: backtrack tp unifb ;
+          assert { backtrack_to (at unifb 'B) (at unifb 'F) unifb } ;
+          select_lemma base q tab unifb unif fresh depth goalnum (number-1) end
+    end
+
+end

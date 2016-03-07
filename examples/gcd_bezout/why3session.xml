@@ -2,29 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
 <file name="../gcd_bezout.mlw" expanded="true">
-<theory name="GcdBezout" sum="ee56a3971a32c0af67845daaf6066a93" expanded="true">
+<theory name="GcdBezout" sum="910432b1fed52122625d8689525e888a" expanded="true">
  <goal name="WP_parameter gcd" expl="VC for gcd" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter gcd.1" expl="1. loop invariant init" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter gcd.2" expl="2. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter gcd.3" expl="3. loop invariant init" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter gcd.4" expl="4. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.79"/></proof>
+  <proof prover="2"><result status="valid" time="1.39" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter gcd.5" expl="5. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.34" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter gcd.6" expl="6. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.17" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter gcd.7" expl="7. loop invariant preservation" expanded="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -33,10 +33,10 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter gcd.9" expl="9. postcondition">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.17" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter gcd.10" expl="10. postcondition">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="25"/></proof>
   </goal>
  </transf>
  </goal>

@@ -140,38 +140,22 @@ end
 
 theory real.Trigonometry
   prelude "%%% this is a prelude for Metitarski trigonometry"
+  remove allprops
 
   prelude "include('Axioms/pi.ax')."
 
-  remove prop Pi_interval
-  remove prop Cos_pi
-  remove prop Sin_pi
-
-  remove prop Cos_pi2
-  remove prop Sin_pi2
-
-  remove prop Cos_plus_pi
-  remove prop Sin_plus_pi
-
-  remove prop Cos_plus_pi2
-  remove prop Sin_plus_pi2
+  syntax function atan "arctan(%1)"
+  syntax function tan  "tan(%1)"
 
   prelude "include('Axioms/tan.ax')."
   prelude "include('Axioms/arctan-lower.ax')."
   prelude "include('Axioms/arctan-upper.ax')."
 
-  syntax function atan "arctan(%1)"
-  syntax function tan  "tan(%1)"
-
-  prelude "include('Axioms/cos.ax')."
-  prelude "include('Axioms/sin.ax')."
-
   syntax function cos  "cos(%1)"
   syntax function sin  "sin(%1)"
 
-  (* These follow from Metitarski's base axioms. *)
-  remove prop Cos_0
-  remove prop Sin_0
+  prelude "include('Axioms/cos.ax')."
+  prelude "include('Axioms/sin.ax')."
 
   (* The following files "greatly increase the search space" and thus
      cause failures. Do not include them! *)
@@ -180,8 +164,6 @@ theory real.Trigonometry
   prelude "include('Axioms/sin-constant.ax')."
   *)
 
-  remove prop Cos_le_one
-  remove prop Sin_le_one
 end
 
 theory real.MinMax

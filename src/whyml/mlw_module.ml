@@ -400,10 +400,7 @@ let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
 
 let mod_prelude =
   let pd_exit = create_exn_decl xs_exit in
-  let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
   let uc = empty_module None (id_fresh "Prelude") ["why3";"Prelude"] in
-  let uc = use_export_theory uc Mlw_wp.mark_theory in
-  let uc = add_pdecl ~wp:false uc pd_old in
   let uc = add_pdecl ~wp:false uc pd_exit in
   close_module uc
 
@@ -536,7 +533,7 @@ let clone_export uc m minst inst =
       | VTarrow a -> VTarrow (conv_aty mv a)
       | VTvalue v -> VTvalue (conv_ity v) in
     vty_arrow args ~spec vty in
-  let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
+  let mvs = ref (Mvs.singleton pv_old.pv_vs pv_old.pv_vs) in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known nth) uc.muc_known d;

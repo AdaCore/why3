@@ -11,7 +11,7 @@ let get_counterexmp task =
   let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
   not (Theory.Stdecl.is_empty ce_meta.tds_set)
 
-let prepare_for_counterexmp2 task = 
+let prepare_for_counterexmp2 env task =
   if not (get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)
     Debug.dprintf debug "Not get ce@.";
@@ -20,16 +20,19 @@ let prepare_for_counterexmp2 task =
   else begin
     (* Counter-example will be queried, prepare the task *)
     Debug.dprintf debug "Get ce@.";
-    let comp_trans = Trans.compose 
-      (Trans.goal Introduction.intros) 
-      Intro_projections_counterexmp.intro_projections_counterexmp
+    let comp_trans = Trans.compose
+      (Trans.goal Introduction.intros)
+      (Trans.compose
+	 Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp
+	 (Intro_projections_counterexmp.intro_projections_counterexmp env)
+      )
     in
     (Trans.apply comp_trans) task
   end
 
-let prepare_for_counterexmp = Trans.store prepare_for_counterexmp2
+let prepare_for_counterexmp env = Trans.store (prepare_for_counterexmp2 env)
 
-let () = Trans.register_transform "prepare_for_counterexmp" prepare_for_counterexmp
+let () = Trans.register_env_transform "prepare_for_counterexmp" prepare_for_counterexmp
   ~desc:"Transformation@ that@ prepares@ the@ task@ for@ quering@ for@ \
     the@ counter-example@ model.@ This@ transformation@ does@ so@ only@ \
 when@ the@ solver@ will@ be@ asked@ for@ the@ counter-example."

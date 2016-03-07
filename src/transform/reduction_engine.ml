@@ -126,17 +126,17 @@ let simpl_divmod _ls t1 t2 _ty =
 let simpl_minmax _ls v1 v2 _ty =
   match v1,v2 with
   | Term t1, Term t2 ->
-    if t_equal t1 t2 then v1 else 
+    if t_equal t1 t2 then v1 else
       raise Undetermined
   (*
     t_app_value ls [v1;v2] ty
   *)
-  | _ -> 
+  | _ ->
     raise Undetermined
 (*
   t_app_value ls [v1;v2] ty
 *)
-      
+
 let eval_int_rel op _ls l _ty =
   match l with
   | [t1 ; t2] ->
@@ -162,7 +162,7 @@ let eval_int_uop op _ls l _ty =
         raise Undetermined
     (*       t_app_value ls l ty *)
     end
-  | _ -> assert false 
+  | _ -> assert false
 
 
 let built_in_theories =
@@ -418,13 +418,21 @@ let rec reduce engine c =
       | Term { t_node = Tfalse } ->
         { value_stack = st ;
           cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
-      | Term t1 ->
-        { value_stack =
-            Term
-              (t_label_copy orig
-                 (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
-          cont_stack = rem ;
-        }
+      | Term t1 -> begin
+          match t1.t_node , t2.t_node , t3.t_node with
+          | Tapp (ls,[b0;{ t_node = Tapp (ls1,_) }]) , Tapp(ls2,_) , Tapp(ls3,_)
+            when ls_equal ls ps_equ && ls_equal ls1 fs_bool_true &&
+              ls_equal ls2 fs_bool_true && ls_equal ls3 fs_bool_false ->
+            { value_stack = Term (t_label_copy orig b0) :: st;
+              cont_stack = rem }
+          | _ ->
+            { value_stack =
+                Term
+                  (t_label_copy orig
+                     (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
+              cont_stack = rem ;
+            }
+        end
       | Int _ -> assert false (* would be ill-typed *)
     end
   | [], (Klet _, _) :: _ -> assert false
@@ -511,6 +519,7 @@ and reduce_match st u ~orig tbl sigma cont =
 
 
 and reduce_eval st t ~orig sigma rem =
+  let orig = t_label_copy orig t in
   match t.t_node with
   | Tvar v ->
     begin
@@ -525,13 +534,13 @@ and reduce_eval st t ~orig sigma rem =
           Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
           assert false
         *)
-        { value_stack = Term (t_label_copy orig t) :: st ;
+        { value_stack = Term orig :: st ;
           cont_stack = rem;
         }
     end
   | Tif(t1,t2,t3) ->
     { value_stack = st;
-      cont_stack = (Keval(t1,sigma),t1) :: (Kif(t2,t3,sigma),t) :: rem;
+      cont_stack = (Keval(t1,sigma),t1) :: (Kif(t2,t3,sigma),orig) :: rem;
     }
   | Tlet(t1,tb) ->
     let v,t2 = t_open_bound tb in
@@ -566,7 +575,7 @@ and reduce_eval st t ~orig sigma rem =
       cont_stack = List.rev_append args ((Kapp(ls,t.t_ty),orig) :: rem);
     }
   | Ttrue | Tfalse | Tconst _ ->
-    { value_stack = Term (t_label_copy orig t) :: st;
+    { value_stack = Term orig :: st;
       cont_stack = rem;
     }
 
@@ -584,7 +593,7 @@ and reduce_app engine st ls ~orig ty rem_cont =
   else
     if ls_equal ls fs_func_app then
       match st with
-      | t2 :: t1 :: rem_st -> 
+      | t2 :: t1 :: rem_st ->
         begin
           try
             reduce_func_app ~orig ty rem_st t1 t2 rem_cont
@@ -668,19 +677,11 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
               let lhs = t_label_copy teq (t_app ps_equ [lhs;tr] None) in
               t_label_copy t (t_binary Tiff lhs body) in
             let elim body vh t2 =
-              match rem_cont with
-              | (Keval (tr,_),_) :: (Kapp (ls,_),_) :: rem_cont
-                when t_equal tr t_bool_true && ls_equal ls ps_equ ->
-                { value_stack = rem_st;
-                  cont_stack =
-                    (Keval(body,Mvs.add vh t2 Mvs.empty),
-                     t_label_copy orig body) :: rem_cont }
-              | _ ->
-                let body = t_if body t_bool_true t_bool_false in
-                { value_stack = rem_st;
-                  cont_stack =
-                  (Keval(body,Mvs.add vh t2 Mvs.empty),
-                  t_label_copy orig body) :: rem_cont } in
+              let body = t_if body t_bool_true t_bool_false in
+              { value_stack = rem_st;
+                cont_stack =
+                (Keval(body,Mvs.add vh t2 Mvs.empty),
+                t_label_copy orig body) :: rem_cont } in
             process lhs body equ elim
           | _ -> raise Undetermined
         end
@@ -881,6 +882,11 @@ and reduce_term_equ ~orig st t1 t2 cont =
       { value_stack = Term (t_label_copy orig t_false) :: st;
         cont_stack = cont;
       }
+  | Tif (b,{ t_node = Tapp(ls1,_) },{ t_node = Tapp(ls2,_) }) , Tapp(ls3,_)
+    when ls_equal ls3 fs_bool_true && ls_equal ls1 fs_bool_true &&
+         ls_equal ls2 fs_bool_false ->
+    { value_stack = Term (t_label_copy orig b) :: st;
+      cont_stack = cont }
   | _ -> raise Undetermined
 
 
@@ -981,6 +987,9 @@ let extract_rule _km t =
       | Decl.Dparam _ | Decl.Dind _ -> ()
   in
 *)
+  (* TODO : verifier que les variables de droite, aussi bien term que type,
+     apparaissent a gauche *)
+
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->

@@ -1,0 +1,10 @@
+(* Why3 driver for noBV alternatives on bit-vector theories *)
+
+theory bv.BV_Gen
+  remove prop nth_bv_def
+  remove prop eq_sub_bv_def
+
+  remove prop to_uint_add
+  remove prop to_uint_sub
+  remove prop to_uint_mul
+end
