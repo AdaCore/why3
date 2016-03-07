@@ -80,10 +80,12 @@ module BinaryGcd
   =
     if v > u then binary_gcd v u else
     if v = 0 then u else
-    if even u then if even v then 2 * binary_gcd (u / 2) (v / 2)
-                             else binary_gcd (u / 2) v
-              else if even v then binary_gcd u (v / 2)
-                             else binary_gcd ((u - v) / 2) v
+    if mod u 2 = 0 then
+      if mod u 2 = 0 then 2 * binary_gcd (u / 2) (v / 2)
+                     else binary_gcd (u / 2) v
+      else
+      if mod u 2 = 0 then binary_gcd u (v / 2)
+                     else binary_gcd ((u - v) / 2) v
 
 end
 
