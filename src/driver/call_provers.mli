@@ -91,6 +91,22 @@ type prover_result_parser = {
   (* The parser for a model returned by the solver. *)
   prp_model_parser : Model_parser.model_parser;
 }
+(*
+    if the first field matches the prover output,
+    the second field is the answer. Regexp groups present in
+    the first field are substituted in the second field (\0,\1,...).
+    The regexps are tested in the order of the list.
+
+    @param timeregexps : a list of regular expressions with special
+    markers '%h','%m','%s','%i' (for milliseconds), constructed with
+    [timeregexp] function, and used to extract the time usage from
+    the prover's output. If the list is empty, wallclock is used.
+    The regexps are tested in the order of the list.
+
+    @param exitcodes : if the first field is the exit code, then
+    the second field is the answer. Exit codes are tested in the order
+    of the list and before the regexps.
+*)
 
 (** {2 Functions for calling external provers} *)
 type prover_call
@@ -130,43 +146,30 @@ val mk_limit : int -> int -> int -> resource_limit
    *)
 
 val call_on_file :
-  command     : string ->
-  limit       : resource_limit ->
-  res_parser  : prover_result_parser ->
+  command         : string ->
+  limit           : resource_limit ->
+  res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
-  ?cleanup    : bool ->
-  ?inplace    : bool ->
-  ?redirect   : bool ->
+  ?cleanup        : bool ->
+  ?inplace        : bool ->
+  ?interactive    : bool ->
+  ?redirect       : bool ->
   string -> pre_prover_call
 
 val call_on_buffer :
-  command     : string ->
-  limit       : resource_limit ->
-  res_parser  : prover_result_parser ->
-  filename    : string ->
+  command         : string ->
+  limit           : resource_limit ->
+  filename        : string ->
   printer_mapping : Printer.printer_mapping ->
-  ?inplace    : bool ->
+  ?inplace        : bool ->
+  ?interactive    : bool ->
   Buffer.t -> pre_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
-    @param timelimit : set the available time limit (def. 0 : unlimited)
-    @param memlimit : set the available memory limit (def. 0 : unlimited)
-    @param steplimit : set the available step limit (def. -1 : unlimited)
+    @param limit : set the available time limit (def. 0 : unlimited), memory
+    limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)
 
-    @param regexps : if the first field matches the prover output,
-    the second field is the answer. Regexp groups present in
-    the first field are substituted in the second field (\0,\1,...).
-    The regexps are tested in the order of the list.
-
-    @param timeregexps : a list of regular expressions with special
-    markers '%h','%m','%s','%i' (for milliseconds), constructed with
-    [timeregexp] function, and used to extract the time usage from
-    the prover's output. If the list is empty, wallclock is used.
-    The regexps are tested in the order of the list.
-
-    @param exitcodes : if the first field is the exit code, then
-    the second field is the answer. Exit codes are tested in the order
-    of the list and before the regexps.
+    @param res_parser : prover result parser
 
     @param filename : the suffix of the proof task's file, if the prover
     doesn't accept stdin. *)

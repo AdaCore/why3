@@ -252,10 +252,10 @@ let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
 let call_on_buffer ~command ~limit
-                   ?inplace ~filename ~printer_mapping drv buffer =
+                   ?inplace ?interactive ~filename ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
     ~command ~limit ~res_parser:drv.drv_res_parser
-    ~filename ~printer_mapping ?inplace buffer
+    ~filename ~printer_mapping ?inplace ?interactive buffer
 
 
 (** print'n'prove *)
@@ -323,8 +323,7 @@ let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
   print_task ?old drv fmt task
 
-let prove_task_prepared
-    ~command ~limit ?old ?inplace drv task =
+let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -343,13 +342,14 @@ let prove_task_prepared
   in
   let res =
     call_on_buffer ~command ~limit
-                   ?inplace ~filename ~printer_mapping drv buf in
+                   ?inplace ?interactive ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ~limit ?(cntexample=false) ?old ?inplace drv task =
+let prove_task ~command ~limit ?(cntexample=false) ?old
+               ?inplace ?interactive drv task =
   let task = prepare_task ~cntexample drv task in
-  prove_task_prepared ~command ~limit ?old ?inplace drv task
+  prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task
 
 (* exception report *)
 

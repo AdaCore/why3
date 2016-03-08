@@ -249,10 +249,14 @@ let parse_prover_run res_parser time out ret on_timelimit limit ~printer_mapping
     pr_model  = model;
   }
 
-let actualcommand command limit file =
+let actualcommand command ~use_why3cpulimit limit interactive file =
   let timelimit = get_time limit in
   let memlimit  = get_mem limit in
   let steplimit = get_steps limit in
+  let utime = string_of_int (2 * timelimit + 1) in
+  let ttime = string_of_int (succ timelimit) in
+  let stime = string_of_int timelimit in
+  let smem = string_of_int memlimit in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
@@ -261,9 +265,9 @@ let actualcommand command limit file =
     | "%" -> "%"
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; string_of_int timelimit
-    | "T" -> string_of_int (succ timelimit)
-    | "U" -> string_of_int (2 * timelimit + 1)
-    | "m" -> string_of_int memlimit
+    | "T" -> ttime
+    | "U" -> utime
+    | "m" -> smem
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
        to prepare the command line in a separate function? *)
@@ -275,16 +279,30 @@ let actualcommand command limit file =
   let args =
     List.map (Str.global_substitute cmd_regexp replace) arglist
   in
+  let args =
+    if use_why3cpulimit && not interactive then
+      let cpulimit_bin = Filename.concat Config.libdir "why3-cpulimit" in
+      let cpulimit_time =
+        (* for steps limit use 2 * t + 1 time *)
+        if limit.limit_steps <> None then utime
+        (* if prover implements time limit, use t + 1 *)
+        else if !on_timelimit then ttime
+        (* otherwise use t *)
+        else stime in
+       cpulimit_bin :: cpulimit_time :: smem :: "-s" :: args
+    else
+      args in
   args, !use_stdin, !on_timelimit
 
 let call_on_file ~command
                  ~limit
                  ~res_parser
 		 ~printer_mapping
-                 ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
+                 ?(cleanup=false) ?(inplace=false) ?(interactive=false)
+                 ?(redirect=true) fin =
 
   let command, use_stdin, on_timelimit =
-    try actualcommand command limit fin
+    try actualcommand command ~use_why3cpulimit:true limit interactive fin
     with e ->
       if cleanup then Sys.remove fin;
       if inplace then Sys.rename (save fin) fin;
@@ -335,7 +353,7 @@ let call_on_file ~command
 
 let call_on_buffer ~command ~limit ~res_parser ~filename
 		   ~printer_mapping
-                   ?(inplace=false) buffer =
+                   ?(inplace=false) ?interactive buffer =
 
   let fin,cin =
     if inplace then begin
@@ -345,7 +363,8 @@ let call_on_buffer ~command ~limit ~res_parser ~filename
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~limit
-               ~res_parser ~printer_mapping ~cleanup:true ~inplace fin
+               ~res_parser ~printer_mapping ~cleanup:true
+               ~inplace ?interactive fin
 
 let query_call pc =
   let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
