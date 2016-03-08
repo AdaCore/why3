@@ -251,10 +251,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?steplimit
+let call_on_buffer ~command ~limit
                    ?inplace ~filename ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ?steplimit ~res_parser:drv.drv_res_parser
+    ~command ~limit ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace buffer
 
 
@@ -324,7 +324,7 @@ let print_theory ?old drv fmt th =
   print_task ?old drv fmt task
 
 let prove_task_prepared
-    ~command ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
+    ~command ~limit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -342,15 +342,14 @@ let prove_task_prepared
         get_filename drv fn "T" pr.pr_name.id_string
   in
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?steplimit
+    call_on_buffer ~command ~limit
                    ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ?(cntexample=false) ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
+let prove_task ~command ~limit ?(cntexample=false) ?old ?inplace drv task =
   let task = prepare_task ~cntexample drv task in
-  prove_task_prepared ~command ?timelimit ?memlimit
-                      ?steplimit ?old ?inplace drv task
+  prove_task_prepared ~command ~limit ?old ?inplace drv task
 
 (* exception report *)
 

@@ -120,7 +120,7 @@ type config_prover = {
   extra_drivers: string list;
 }
 
-val get_complete_command : config_prover -> int -> string
+val get_complete_command : config_prover -> with_steps:bool -> string
 (** add the extra_options to the command *)
 
 val get_provers : config -> config_prover Mprover.t

@@ -489,7 +489,8 @@ let set_proof_state a =
     | S.Done { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
        let s =
         if gconfig.show_time_limit then
-          Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
+          Format.sprintf "%.2f [%d.0]" time
+          (Call_provers.get_time a.S.proof_limit)
         else
           Format.sprintf "%.2f" time
        in
@@ -503,7 +504,8 @@ let set_proof_state a =
     | S.Interrupted -> "(interrupted)"
     | S.Scheduled | S.Running ->
         Format.sprintf "[limit=%d sec., %d M]"
-          a.S.proof_timelimit a.S.proof_memlimit
+          (Call_provers.get_time a.S.proof_limit)
+          (Call_provers.get_mem a.S.proof_limit)
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   (* TODO find a better way to signal archived row *)
@@ -1016,7 +1018,10 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~cntexample ~timelimit ~steplimit:(-1) ~memlimit
+         ~cntexample
+         ~limit:{Call_provers.limit_time = Some timelimit;
+                              limit_mem = Some memlimit;
+                              limit_steps = None}
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1131,13 +1136,13 @@ let bisect_proof_attempt pa =
         assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
 	  ~cntexample
-          ~timelimit:!timelimit
-          ~memlimit:pa.S.proof_memlimit
-	  ~steplimit:(-1)
+          ~limit:{Call_provers.limit_time = Some !timelimit;
+                 limit_mem = pa.S.proof_limit.Call_provers.limit_mem;
+                 limit_steps = None}
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (* It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
-          ~command:(C.get_complete_command lp.S.prover_config (-1))
+          ~command:(C.get_complete_command lp.S.prover_config ~with_steps:false)
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
@@ -1170,12 +1175,13 @@ let bisect_proof_attempt pa =
           | Some lp ->
             M.schedule_proof_attempt
 	      ~cntexample
-              ~timelimit:!timelimit
-              ~memlimit:pa.S.proof_memlimit
-	      ~steplimit:(-1)
+              ~limit:{pa.S.proof_limit with
+                        Call_provers.limit_steps = None;
+                        limit_time = Some !timelimit}
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
-              ~command:(C.get_complete_command lp.S.prover_config (-1))
+              ~command:(C.get_complete_command lp.S.prover_config
+                            ~with_steps:false)
               ~driver:lp.S.prover_driver
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
