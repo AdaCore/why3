@@ -281,7 +281,7 @@ and print_tnode pri fmt t = match t.t_node with
           print_vsty v print_term f;
         forget_var v
       end else begin
-        fprintf fmt (protect_on (pri > 0) "@[<hov 1>\\ %a%a.@ %a@]")
+        fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun %a%a ->@ %a@]")
           (print_list comma print_vsty) vl print_tl tl print_term e;
         List.iter forget_var vl
       end

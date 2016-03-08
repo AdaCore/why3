@@ -219,14 +219,14 @@ let map metas_rewrite_pr env d =
       let substs = ty_quant env f in
       let substs_len = Ssubst.cardinal substs in
       let conv_f tvar (task,metas) =
-        (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
+        (* Format.eprintf "f0: %a@. env: %a@." Pretty.print_fmla *)
         (*   (t_ty_subst tvar Mvs.empty f) *)
         (*   print_env env; *)
         let f = t_ty_subst tvar Mvs.empty f in
         let f = t_app_map (find_logic env) f in
-        (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)
+        (* Format.eprintf "f: %a@. env: %a@." Pretty.print_fmla f *)
         (*   print_env menv; *)
-        (* Format.eprintf "undef ls : %a, ts : %a@." *)
+        (* Format.eprintf "undef ls: %a, ts: %a@." *)
         (*   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) *)
         (*   menv.undef_lsymbol *)
         (*   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) *)

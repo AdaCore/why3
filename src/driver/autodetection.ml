@@ -233,7 +233,7 @@ let ask_prover_version exec_name version_switch =
   let out = Filename.temp_file "out" "" in
   let cmd = sprintf "%s %s" exec_name version_switch in
   let c = sprintf "(%s) > %s 2>&1" cmd out in
-  Debug.dprintf debug "Run : %s@." c;
+  Debug.dprintf debug "Run: %s@." c;
   let ret = Sys.command c in
   if ret <> 0 then
     begin

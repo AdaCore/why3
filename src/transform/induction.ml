@@ -99,8 +99,8 @@ let print_vset vset =
     Format.printf "] "
   in
   Format.printf "************** t_candidates_lex *****************\n";
-  Format.printf "Candidates found : %d @." (Svsl.cardinal vset);
-  Format.printf "Candidates : [ ";
+  Format.printf "Candidates found: %d @." (Svsl.cardinal vset);
+  Format.printf "Candidates: [ ";
   Svsl.iter (fun vl -> aux vl) vset;
   Format.printf "]\n@.";
   Pretty.forget_all ()
@@ -112,7 +112,7 @@ let print_heuristic_lex vl =
   Format.printf "Induction variables (in lexicographic order): [ ";
   List.iter (Format.printf "%a " Pretty.print_vs) vl;
   Format.printf "]@.";
-  Format.printf "Lex. order map : [ ";
+  Format.printf "Lex. order map: [ ";
   Mvs.iter (fun v i -> Format.printf "%a -> %d; " Pretty.print_vs v i) ivm;
   Format.printf "]\n@.";
   Pretty.forget_all ()

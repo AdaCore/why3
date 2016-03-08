@@ -196,7 +196,7 @@ let rec print_term info fmt t =
   | Tcase _ -> unsupportedTerm t
       "gappa: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "gappa : you must eliminate epsilon"
+      "gappa: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 
@@ -304,12 +304,12 @@ let print_decl (* ?old *) info fmt d =
   | Dtype _ -> ()
 (*
 unsupportedDecl d
-      "gappa : type declarations are not supported"
+      "gappa: type declarations are not supported"
 *)
   | Dlogic _ -> ()
 (*
 unsupportedDecl d
-      "gappa : logic declarations are not supported"
+      "gappa: logic declarations are not supported"
 *)
   | Dind _ -> unsupportedDecl d
       "gappa: inductive definitions are not supported"

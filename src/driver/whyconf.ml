@@ -240,7 +240,7 @@ let load_plugins m =
   let load x =
     try Plugin.load x
     with exn ->
-      Format.eprintf "%s can't be loaded : %a@." x
+      Format.eprintf "%s can't be loaded: %a@." x
         Exn_printer.exn_printer exn in
   List.iter load m.plugins
 
@@ -822,7 +822,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | WrongMagicNumber ->
       Format.fprintf fmt "outdated config file; rerun 'why3 config'"
   | NonUniqueId ->
-    Format.fprintf fmt "InternalError : two provers share the same id"
+    Format.fprintf fmt "InternalError: two provers share the same id"
   | ProverNotFound (config,fp) ->
     fprintf fmt "No prover in %s corresponds to \"%a\"@."
       (get_conf_file config) print_filter_prover fp
@@ -833,11 +833,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
       provers
   | ParseFilterProver s ->
     fprintf fmt
-      "Syntax error prover identification '%s' : \
+      "Syntax error prover identification '%s': \
        name[,version[,alternative]|,,alternative]" s
   | DuplicateShortcut s ->
     fprintf fmt
-      "Shortcut %s appears two times in the configuration file" s
+      "Shortcut %s appears twice in the configuration file" s
   | _ -> raise e)
 
 

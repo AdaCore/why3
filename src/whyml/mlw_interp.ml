@@ -1120,7 +1120,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eif(e1,e2,e3) ->
     begin
 (*
-      eprintf "[interp] condition of the if : @?";
+      eprintf "[interp] condition of the if: @?";
 *)
       match eval_expr env s e1 with
         | Normal t, s' ->
@@ -1396,7 +1396,7 @@ let eval_global_symbol env m fmt d =
           fprintf fmt "@[<hov 2>   result:@ %a@\nglobals:@ %a@]@."
             print_logic_result res print_vsenv final_env
 (*
-          fprintf fmt "@[<hov 2>  result:@ %a@\nstate :@ %a@]@."
+          fprintf fmt "@[<hov 2>  result:@ %a@\nstate:@ %a@]@."
             (print_result m.Mlw_module.mod_known
                m.Mlw_module.mod_theory.Theory.th_known st) res
             print_state st

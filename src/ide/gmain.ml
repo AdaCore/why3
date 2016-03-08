@@ -1308,7 +1308,7 @@ let (_ : GMenu.image_menu_item) =
 (*
       Mprover.iter
         (fun p pi ->
-          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
+          Debug.dprintf debug "editor for %a: %s@." Whyconf.print_prover p
             pi.editor)
         (Whyconf.get_provers gconfig.config);
 *)

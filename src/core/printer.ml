@@ -168,7 +168,7 @@ exception BadSyntaxArity of int * int
 let int_of_string s =
   try int_of_string s
   with _ ->
-    Format.eprintf "bad argument for int_of_string : %s@." s;
+    Format.eprintf "bad argument for int_of_string: %s@." s;
     assert false
 
 let check_syntax s len =

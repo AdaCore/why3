@@ -141,7 +141,7 @@ let debug_print_term message t =
 
 (** type *)
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
+  | Tyvar _ -> unsupported "smtv2: you must encode type polymorphism"
   | Tyapp (ts, l) ->
      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
@@ -627,7 +627,7 @@ let print_decl vc_loc cntexample args info fmt d = match d.d_node with
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "smtv2 : inductive definition are not supported"
+      "smtv2: inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc cntexample args info fmt k pr f

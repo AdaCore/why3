@@ -42,7 +42,7 @@ module Todo = struct
 
 (** dead code
   let print todo =
-    dprintf debug "[Sched] todo : %i@." todo.todo
+    dprintf debug "[Sched] todo: %i@." todo.todo
 *)
 end
 
@@ -277,7 +277,7 @@ let cancel_scheduled_proofs t =
 
 let schedule_proof_attempt ~cntexample ~timelimit ~memlimit ~steplimit ?old ~inplace
     ~command ~driver ~callback t goal =
-  Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
+  Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal: %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   callback Scheduled;

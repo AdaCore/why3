@@ -152,13 +152,13 @@ let rec print_term info fmt t = match t.t_node with
              (print_type info) (t_type t)
     end
   | Tlet _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate let in term"
+      "alt-ergo: you must eliminate let in term"
   | Tif _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate if_then_else"
+      "alt-ergo: you must eliminate if_then_else"
   | Tcase _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate match"
+      "alt-ergo: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate epsilon"
+      "alt-ergo: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_tapp info fmt = function
@@ -268,7 +268,7 @@ let print_data_decl info fmt = function
       fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" print_type_decl ts
         (print_list semi print_field) pjl
   | _, _ -> unsupported
-      "alt-ergo : algebraic datatype are not supported"
+      "alt-ergo: algebraic datatype are not supported"
 
 let print_data_decl info fmt ((ts, _csl) as p) =
   if Mid.mem ts.ts_name info.info_syn then () else

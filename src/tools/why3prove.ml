@@ -285,7 +285,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
     | None, Some command ->
         let call = Driver.prove_task ~command ~cntexample:!opt_cntexmp ~timelimit ~memlimit drv task in
         let res = Call_provers.wait_on_call (call ()) () in
-        printf "%s %s %s : %a@." fname tname
+        printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->

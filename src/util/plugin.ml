@@ -17,7 +17,7 @@ let debug = Debug.register_info_flag "load_plugin"
 exception Plugin_Not_Found of plugin * string list
 
 let loadfile f =
-  Debug.dprintf debug "Plugin loaded : %s@." f;
+  Debug.dprintf debug "Plugin loaded: %s@." f;
   Dynlink.loadfile_private f
 
 
@@ -64,5 +64,5 @@ let () =
         Format.fprintf fmt "The plugin %s can't be found in the directories %a"
           pl (Pp.print_list Pp.space Pp.string) sl
       | Dynlink.Error (error) ->
-        Format.fprintf fmt "Dynlink error : %s" (Dynlink.error_message error)
+        Format.fprintf fmt "Dynlink error: %s" (Dynlink.error_message error)
       | _ -> raise exn)

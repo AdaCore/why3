@@ -1012,7 +1012,7 @@ let editors_page c (notebook:GPack.notebook) =
                   try Meditor.find s map
                   with Not_found -> assert false
             in
-	    (* Debug.dprintf debug "prover %a : selected editor '%s'@." *)
+	    (* Debug.dprintf debug "prover %a: selected editor '%s'@." *)
             (*   print_prover p data; *)
             let provers = Whyconf.get_provers c.config in
             c.config <-
@@ -1052,7 +1052,7 @@ let preferences (c : t) =
   in
   let (_ : GtkSignal.id) =
     color_sel#connect ColorSelection.S.color_changed ~callback:
-      (fun c -> Format.eprintf "Gconfig.color_sel : %s@."
+      (fun c -> Format.eprintf "Gconfig.color_sel: %s@."
          c)
   in
 *)

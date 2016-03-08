@@ -1334,7 +1334,7 @@ let why3tac ?(timelimit=timelimit) s gl =
         errorlabstrm "Whyconf.ProverAmbiguity" msg
     | Whyconf.ParseFilterProver s ->
       let msg = pr_str "Syntax error prover identification '" ++
-        pr_str s ++ pr_str "' :  name[,version[,alternative]|,,alternative]" in
+        pr_str s ++ pr_str "':  name[,version[,alternative]|,,alternative]" in
       errorlabstrm "Whyconf.ParseFilterProver" msg
 (*
     | e ->

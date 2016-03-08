@@ -563,7 +563,7 @@ module type S =
             | None -> ()
             | Some last ->
               if Ord.compare last v >= 0
-              then invalid_arg "Map.translate : given function incorrect"
+              then invalid_arg "Map.translate: invalid function parameter"
           end;
           let r,last = aux (Some v) r in
           Node(l,v,d,r,h),last in
