@@ -8,33 +8,14 @@ theory Map
 
   type map 'a 'b = 'a -> 'b
 
-  (* FIXME: add meta "material_type_arg" type func, 1 for (->) *)
-  (* FIXME: remove Select_eq, Select_neq, and Const ? *)
-  (* FIXME: we cannot remove the defining axiom for set in a driver. *)
-
-(*
-  (** if ['b] is an infinite type, then [map 'a 'b] is infinite *)
-  meta "material_type_arg" type func, 1
-*)
-
   function get (f: map 'a 'b) (x: 'a) : 'b = f x
 
   function set (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b =
     fun y -> if y = x then v else f y
 
   (** syntactic sugar *)
-  function ([])   (f: map 'a 'b) (x: 'a) : 'b = get f x
+  function ([])   (f: map 'a 'b) (x: 'a) : 'b = f x
   function ([<-]) (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b = set f x v
-
-  lemma Select_eq :
-    forall m : map 'a 'b. forall a1 a2 : 'a.
-    forall b : 'b [m[a1 <- b][a2]].
-    a1 = a2 -> m[a1 <- b][a2] = b
-
-  lemma Select_neq :
-    forall m : map 'a 'b. forall a1 a2 : 'a.
-    forall b : 'b [m[a1 <- b][a2]].
-    a1 <> a2 -> m[a1 <- b][a2] = m[a2]
 
 end
 

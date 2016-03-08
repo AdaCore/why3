@@ -32,16 +32,11 @@ theory HighOrd
 end
 
 theory map.Map
-
-  syntax function get "%1(%2)"
+  syntax function get  "%1(%2)"
   syntax function ([]) "%1(%2)"
 
   syntax function set    "(%1 WITH [(%2) |-> %3])"
   syntax function ([<-]) "(%1 WITH [(%2) |-> %3])"
-
-  remove prop Select_eq
-  remove prop Select_neq
-
 end
 
 theory Bool
