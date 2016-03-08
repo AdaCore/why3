@@ -135,33 +135,33 @@ theory real.FromInt
 end
 
 theory Bool
-   syntax type     bool  "BITVECTOR(1)"
-   syntax function True  "0bin1"
-   syntax function False "0bin0"
-   meta "encoding:kept" type bool
+  syntax type     bool  "BITVECTOR(1)"
+  syntax function True  "0bin1"
+  syntax function False "0bin0"
+
+  meta "encoding:kept" type bool
 end
 
 theory bool.Bool
-   syntax function andb  "(%1 & %2)"
-   syntax function orb   "(%1 | %2)"
-   syntax function xorb  "(BVXOR(%1,%2))"
-   syntax function notb  "(~ %1)"
+  syntax function andb  "(%1 & %2)"
+  syntax function orb   "(%1 | %2)"
+  syntax function xorb  "(BVXOR(%1,%2))"
+  syntax function notb  "(~ %1)"
 end
 
 theory HighOrd
   syntax type (->) "(ARRAY %1 OF %2)"
-  meta "material_type_arg" type (->), 1
-
   syntax function (@) "(%1[%2])"
+
   meta "encoding:lskept" function (@)
 end
 
 theory map.Map
-  meta "encoding:lskept" function get
-  meta "encoding:lskept" function set
-
   syntax function get "(%1[%2])"
   syntax function set "(%1 WITH [%2] := %3)"
+
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
 end
 
 import "discrimination.gen"

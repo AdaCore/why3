@@ -123,34 +123,34 @@ theory real.Real
 end
 
 theory Bool
-   syntax type     bool  "bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding:kept" type bool
+  syntax type     bool  "bool"
+  syntax function True  "true"
+  syntax function False "false"
+
+  meta "encoding:kept" type bool
 end
 
 theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function notb  "(not %1)"
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function notb  "(not %1)"
 end
 
 theory HighOrd
   syntax type (->) "(-> %1 %2)"
-  meta "material_type_arg" type (->), 1
+  syntax function (@) "(%1 %2)"
 
-  syntax function (@)  "(%1 %2)"
   meta "encoding:lskept" function (@)
 end
 
 theory map.Map
-  meta "encoding:lskept" function get
-  meta "encoding:lskept" function set
-
   syntax function get    "(%1 %2)"
   syntax function ([])   "(%1 %2)"
   syntax function set    "(update %1 (%2) %3)"
   syntax function ([<-]) "(update %1 (%2) %3)"
+
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
 end
 
 theory map.Const

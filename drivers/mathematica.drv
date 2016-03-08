@@ -245,24 +245,17 @@ end
 
 
 theory Bool
-   syntax type     bool  "Bool"
-   syntax function True  "True"
-   syntax function False "False"
-   meta "encoding:kept" type bool
+  syntax type     bool  "Bool"
+  syntax function True  "True"
+  syntax function False "False"
+
+  meta "encoding:kept" type bool
 end
 
 theory bool.Bool
-   syntax function andb  "(%1 && %2)"
-   syntax function orb   "(%1 || %2)"
-   syntax function xorb  "Xor[%1, %2]"
-   syntax function notb  "(! %1)"
-   syntax function implb "Implies[%1, %2]"
+  syntax function andb  "(%1 && %2)"
+  syntax function orb   "(%1 || %2)"
+  syntax function xorb  "Xor[%1, %2]"
+  syntax function notb  "(! %1)"
+  syntax function implb "Implies[%1, %2]"
 end
-
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
