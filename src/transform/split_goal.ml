@@ -29,7 +29,7 @@ let asym f = Slab.mem Term.asym_split f.t_label
 let case_split = Ident.create_label "case_split"
 let case f = Slab.mem case_split f.t_label
 
-let compiled = Ident.create_label "split_goal: compiled match"
+let compiled = Ident.create_label "split_goal:compiled match"
 
 let unstop f =
   t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f

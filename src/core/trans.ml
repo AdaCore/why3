@@ -279,7 +279,6 @@ let create_debugging_trans trans_name (tran : Task.task trans) =
     print_task_goal t2;
     Debug.dprintf debug "@.@.";
     t2;
-    
   end in
   store new_trans
 
@@ -368,18 +367,18 @@ let on_flag_find m ft s = try Hstr.find ft s with
 let on_flag_gen m ft def_name def arg =
   on_meta_excl m (fun alo ->
     let t, tr_name = match alo with
-      | None -> def, Printf.sprintf "%s %s" m.meta_name def_name
+      | None -> def, Printf.sprintf "%s%s" m.meta_name def_name
       | Some [MAstr s] ->
-          on_flag_find m ft s, Printf.sprintf "%s : %s" m.meta_name s
+          on_flag_find m ft s, Printf.sprintf "%s:%s" m.meta_name s
       | _ -> raise (IllegalFlagTrans m)
     in
     named tr_name (t arg))
 
-let on_flag m ft def arg =
-  let tdef x = on_flag_find m ft def x in
-  on_flag_gen m ft (Printf.sprintf ": %s" def) tdef arg
+let on_flag m ft def_name arg =
+  let def x = on_flag_find m ft def_name x in
+  on_flag_gen m ft (Printf.sprintf ":%s" def_name) def arg
 
-let on_flag_t m ft def arg = on_flag_gen m ft "(default)" def arg
+let on_flag_t m ft def arg = on_flag_gen m ft " (default)" def arg
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownTrans s ->

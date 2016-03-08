@@ -70,7 +70,7 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
 end
 
@@ -79,7 +79,7 @@ theory Bool
    syntax type     bool  "Bool"
    syntax function True  "true"
    syntax function False "false"
-   meta "encoding : kept" type bool
+   meta "encoding:kept" type bool
 end
 
 theory bool.Bool
@@ -92,7 +92,7 @@ end
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
-  meta "encoding : lskept" function ite
+  meta "encoding:lskept" function ite
 end
 *)
 

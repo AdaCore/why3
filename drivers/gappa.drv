@@ -55,9 +55,9 @@ theory int.Int
   meta "gappa arith" predicate (<), "not ", ">=", "<="
   meta "gappa arith" predicate (>), "not ", "<=", ">="
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove prop NonTrivialRing
   remove prop ZeroLessOne
@@ -101,9 +101,9 @@ theory real.Real
   meta "gappa arith" predicate (<), "not ", ">=", "<="
   meta "gappa arith" predicate (>), "not ", "<=", ">="
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove prop NonTrivialRing
   remove prop ZeroLessOne
@@ -152,14 +152,14 @@ end
 theory floating_point.Single
 
   syntax function round "float<ieee_32,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 
 theory floating_point.Double
 
   syntax function round "float<ieee_64,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 
@@ -167,7 +167,7 @@ end
 theory floating_point.SingleMultiRounding
 
   syntax function round "float<ieee_32,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 *)
@@ -175,7 +175,7 @@ end
 theory floating_point.DoubleMultiRounding
 
   syntax function round "float<ieee_64,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 

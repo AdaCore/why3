@@ -81,9 +81,9 @@ module M
   function projf_r_g "model_trace:.g" (x : r) : bool
   =
   x.g
-  meta "inline : no" function projf_r_f
+  meta "inline:no" function projf_r_f
   meta "model_projection" function projf_r_f
-  meta "inline : no" function projf_r_g
+  meta "inline:no" function projf_r_g
   meta "model_projection" function projf_r_g
 
   let record_match_eval_test1 (x "model" "model_trace:x" : r) : int
@@ -133,10 +133,10 @@ module M
   =
   rec_map.g_bool
 
-  meta "inline : no" function projf_r_map_f_map
+  meta "inline:no" function projf_r_map_f_map
   meta "model_projection" function projf_r_map_f_map
 
-  meta "inline : no" function projf_r_map_g
+  meta "inline:no" function projf_r_map_g
   meta "model_projection" function projf_r_map_g
 
   (* Tests *)
@@ -164,7 +164,7 @@ module M
   function projfi "model_trace:.projfi" (l : int) : int
   = l
 
-  meta "inline : no" function projfi
+  meta "inline:no" function projfi
   meta "model_projection" function projfi
 
   function projf1 "model_trace:.projf1" (l : int) : bool
@@ -175,9 +175,9 @@ module M
   =
   l <= 0
 
-  meta "inline : no" function projf1
+  meta "inline:no" function projf1
   meta "model_projection" function projf1
-  meta "inline : no" function projf2
+  meta "inline:no" function projf2
   meta "model_projection" function projf2
 
   (*******************************************************
@@ -211,7 +211,7 @@ module M
   | Cons (Integer n) _ -> n
   | _ -> 0
   end
-  meta "inline : no" function projfl
+  meta "inline:no" function projfl
   meta "model_projection" function projfl
 
   (* list int_type will be projected using projfl to int,

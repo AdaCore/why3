@@ -430,10 +430,10 @@ let eliminate_match =
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
-    \"keep_types\" : @[keep algebraic type definitions@]@\n\
-    \"keep_enums\" : @[keep monomorphic enumeration types@]@\n\
-    \"keep_recs\"  : @[keep non-recursive records@]@\n\
-    \"no_index\"   : @[do not generate indexing functions@]@]"
+    - keep_types: @[keep algebraic type definitions@]@\n\
+    - keep_enums: @[keep monomorphic enumeration types@]@\n\
+    - keep_recs:  @[keep non-recursive records@]@\n\
+    - no_index:   @[do not generate indexing functions@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->

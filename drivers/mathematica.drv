@@ -36,7 +36,7 @@ theory BuiltIn
   syntax type real  "Reals"
   syntax predicate (=)  "(%1 == %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 (* int *)
@@ -58,9 +58,9 @@ theory int.Int
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove prop MulComm.Comm
   remove prop MulAssoc.Assoc
@@ -82,7 +82,7 @@ theory int.Int
   remove prop CompatOrderMult
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory int.Abs
@@ -102,7 +102,7 @@ theory int.EuclideanDivision
   remove prop Mod_1
   remove prop Div_1
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 (* real *)
@@ -126,9 +126,9 @@ theory real.Real
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove prop MulComm.Comm
   remove prop MulAssoc.Assoc
@@ -158,7 +158,7 @@ theory real.Real
   remove prop assoc_div_div
   remove prop CompatOrderMult
 
-  (*meta "encoding : kept" type real*)
+  (*meta "encoding:kept" type real*)
 end
 
 theory real.Abs
@@ -248,7 +248,7 @@ theory Bool
    syntax type     bool  "Bool"
    syntax function True  "True"
    syntax function False "False"
-   meta "encoding : kept" type bool
+   meta "encoding:kept" type bool
 end
 
 theory bool.Bool

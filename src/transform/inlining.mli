@@ -31,7 +31,7 @@ val t :
     - [ls] is a function symbol and [notdeft] returns true on its definition;
     - [ls] is a predicate symbol and [notdeff] returns true on its definition;
     - [notls ls] returns [true];
-    - [use_meta] is set and [ls] is tagged by "inline : no"
+    - [use_meta] is set and [ls] is tagged by "inline:no"
 
     Notice that [use_meta], [notdeft], [notdeff], [notls] restrict only which
     symbols are inlined not when.

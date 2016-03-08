@@ -17,22 +17,22 @@ open Decl
 open Theory
 open Task
 
-let meta_inst = register_meta "encoding : inst" [MTty]
+let meta_inst = register_meta "encoding:inst" [MTty]
   ~desc:"Specify@ which@ types@ should@ instantiate@ symbols@ marked@ by@ \
-         'encoding : lskept'."
+         'encoding:lskept'."
 
-let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
+let meta_lskept = register_meta "encoding:lskept" [MTlsymbol]
   ~desc:"Specify@ which@ function/predicate@ symbols@ should@ be@ kept.@ \
          When@ the@ symbol@ is@ polymorphic,@ generate@ every@ possible@ \
-         type@ instances@ with@ types@ marked@ by@ 'encoding : inst'."
+         type@ instances@ with@ types@ marked@ by@ 'encoding:inst'."
 
-let meta_lsinst = register_meta "encoding : lsinst" [MTlsymbol;MTlsymbol]
+let meta_lsinst = register_meta "encoding:lsinst" [MTlsymbol;MTlsymbol]
   ~desc:"Specify@ which@ type@ instances@ of@ symbols@ should@ be@ kept.@ \
          The first@ symbol@ specifies@ the@ polymorphic@ symbol,@ \
          the@ second@ provides@ a@ monomorphic@ type@ signature@ to@ keep."
 
 let meta_select_inst = register_meta_excl "select_inst" [MTstring]
-  ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding : inst':@;  \
+  ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding:inst':@;  \
     @[\
       - none: @[don't@ mark@ any@ type@ automatically@]@\n\
       - goal: @[mark@ every@ closed@ type@ in@ the@ goal@]@\n\
@@ -40,7 +40,7 @@ let meta_select_inst = register_meta_excl "select_inst" [MTstring]
     @]"
 
 let meta_select_lskept = register_meta_excl "select_lskept" [MTstring]
-  ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding : lskept':@;  \
+  ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding:lskept':@;  \
     @[\
       - none: @[don't@ mark@ any@ symbol@ automatically@]@\n\
       - goal: @[mark@ every@ polymorphic@ symbol@ in@ the@ goal@]@\n\
@@ -48,7 +48,7 @@ let meta_select_lskept = register_meta_excl "select_lskept" [MTstring]
     @]"
 
 let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
-  ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding : lsinst':@;  \
+  ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding:lsinst':@;  \
     @[\
       - none: @[don't@ mark@ any@ symbol@ automatically@]@\n\
       - goal: @[mark@ every@ monomorphic@ instance@ in@ the@ goal@]@\n\

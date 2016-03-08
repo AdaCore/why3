@@ -45,8 +45,8 @@ theory BuiltIn
   syntax type int  "$int"
   syntax type real "$real"
 
-  meta "encoding : kept" type int
-  meta "encoding : kept" type real
+  meta "encoding:kept" type int
+  meta "encoding:kept" type real
   meta "eliminate_algebraic" "no_index"
 end
 
@@ -143,7 +143,7 @@ end
 theory tptp.Univ
   syntax type iType "$i"
 
-  meta "encoding : kept" type iType
+  meta "encoding:kept" type iType
 end
 
 theory tptp.IntTrunc
@@ -211,7 +211,7 @@ theory tptp.Rat
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type rat
+  meta "encoding:kept" type rat
 end
 
 theory tptp.RatTrunc

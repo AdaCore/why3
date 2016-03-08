@@ -33,7 +33,7 @@ theory BuiltIn
   syntax type real  "real"
   syntax predicate (=)  "(= %1 %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 
   (* could we do this? *)
   (* meta "eliminate_algebraic" "keep_enums" *)
@@ -119,14 +119,14 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 end
 
 theory Bool
    syntax type     bool  "bool"
    syntax function True  "true"
    syntax function False "false"
-   meta "encoding : kept" type bool
+   meta "encoding:kept" type bool
 end
 
 theory bool.Bool
@@ -140,12 +140,12 @@ theory HighOrd
   meta "material_type_arg" type (->), 1
 
   syntax function (@)  "(%1 %2)"
-  meta "encoding : lskept" function (@)
+  meta "encoding:lskept" function (@)
 end
 
 theory map.Map
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
 
   syntax function get    "(%1 %2)"
   syntax function ([])   "(%1 %2)"
@@ -154,5 +154,5 @@ theory map.Map
 end
 
 theory map.Const
-  meta "encoding : lskept" function const
+  meta "encoding:lskept" function const
 end

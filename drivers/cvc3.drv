@@ -34,7 +34,7 @@ theory BuiltIn
   syntax type real  "REAL"
   syntax predicate (=)  "(%1 = %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory int.Int
@@ -117,7 +117,7 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
 end
 
@@ -138,7 +138,7 @@ theory Bool
    syntax type     bool  "BITVECTOR(1)"
    syntax function True  "0bin1"
    syntax function False "0bin0"
-   meta "encoding : kept" type bool
+   meta "encoding:kept" type bool
 end
 
 theory bool.Bool
@@ -153,12 +153,12 @@ theory HighOrd
   meta "material_type_arg" type (->), 1
 
   syntax function (@) "(%1[%2])"
-  meta "encoding : lskept" function (@)
+  meta "encoding:lskept" function (@)
 end
 
 theory map.Map
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
 
   syntax function get "(%1[%2])"
   syntax function set "(%1 WITH [%2] := %3)"

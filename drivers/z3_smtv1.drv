@@ -29,7 +29,7 @@ theory BuiltIn
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory int.Int
@@ -110,7 +110,7 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
 end
 
@@ -120,7 +120,7 @@ theory Bool
    syntax type bool   "bool"
    syntax function True  "true"
    syntax function False "false"
-   meta "encoding_decorate : kept" type bool
+   meta "encoding_decorate:kept" type bool
 end
 theory bool.Bool
    syntax function andb  "(and %1 %2)"
