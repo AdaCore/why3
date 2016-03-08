@@ -298,7 +298,6 @@ let bool_module =
 
 let highord_module =
   let uc = empty_module dummy_env (id_fresh "HighOrd") ["why3";"HighOrd"] in
-  let uc = use_export uc bool_module in
   let uc = add_pdecl_no_logic uc pd_func in
   let uc = add_pdecl_no_logic uc pd_func_app in
   let m = close_module uc in
@@ -334,13 +333,11 @@ let add_use uc d = Sid.fold (fun id uc ->
 let add_pdecl ~vc uc d =
   let uc = add_use uc d in
   let dl = if vc then Vc.vc uc.muc_env uc.muc_known d else [] in
-  (* verification conditions might contain built-in symbols which
-     do not occur in the original declaration, so we call add_use.
-     However, we expect int.Int or any other library theory to
-     be in the context: importing them automatically seems to be
-     too invasive for the namespace. *)
-  let uc = List.fold_left (fun uc d -> add_pdecl (add_use uc d) d) uc dl in
-  add_pdecl uc d
+  (* verification conditions must not add additional dependencies
+     on built-in theories like TupleN or HighOrd. Also, we expect
+     int.Int or any other library theory to be in the context:
+     importing them automatically seems to be too invasive. *)
+  add_pdecl (List.fold_left add_pdecl uc dl) d
 
 (** {2 Cloning} *)
 

@@ -480,7 +480,7 @@ let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
   | _ -> assert false
 
 let pd_func, pd_func_app = match highord_theory.th_decls with
-  | [{td_node = Use _bo}; {td_node = Decl df}; {td_node = Decl da}] ->
+  | [{td_node = Decl df}; {td_node = Decl da}] ->
       mk_decl (PDtype [mk_itd its_func [] [] []]) [df],
       mk_decl (PDlet ld_func_app) [da]
   | _ -> assert false

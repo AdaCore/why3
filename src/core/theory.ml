@@ -822,7 +822,6 @@ let bool_theory =
 
 let highord_theory =
   let uc = empty_theory (id_fresh "HighOrd") ["why3";"HighOrd"] in
-  let uc = use_export uc bool_theory in
   let uc = add_ty_decl uc ts_func in
   let uc = add_param_decl uc fs_func_app in
   close_theory uc
@@ -880,7 +879,7 @@ let () = Exn_printer.register
   | ClashSymbol s ->
       Format.fprintf fmt "Symbol %s is already defined in the current scope" s
   | UnknownMeta s ->
-      Format.fprintf fmt "Unknown metaproperty %s" s
+      Format.fprintf fmt "Unknown meta-property %s" s
   | KnownMeta m ->
       Format.fprintf fmt "Metaproperty %s is already registered with \
         a conflicting signature" m.meta_name
