@@ -11,7 +11,7 @@ module DfaExample
 
   use import option.Option
 
-  type stream model { mutable state: list char }
+  type stream = abstract { mutable state: list char }
 
   val input: stream
 
