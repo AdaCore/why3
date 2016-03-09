@@ -210,7 +210,7 @@ let cntexample m = m.cntexample
 exception StepsCommandNotSpecified of string
 
 let get_complete_command pc ~with_steps =
-  let comm = if with_steps then pc.command
+  let comm = if not with_steps then pc.command
     else
       match pc.command_steps with
       | None -> raise (StepsCommandNotSpecified
