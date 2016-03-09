@@ -104,10 +104,9 @@ theory array.Array
 
   syntax type array "(array %1)"
 
-  syntax function get_unsafe "(get %1 %2)"
+  syntax function ([]) "(get %1 %2)"
   syntax function length "(size %1 : int)"
   syntax function elts "(get %1)"
-  syntax function set_unsafe "(set %1 %2 %3)"
 (* does not exist anymore
   syntax function make "(make %1 %2)"
 *)
@@ -118,11 +117,9 @@ theory matrix.Matrix
 
   syntax type matrix "(matrix %1)"
 
-  syntax function get_unsafe "(matrix_get %1 %2 %3)"
   syntax function rows "(nrows %1 : int)"
   syntax function columns "(ncols %1 : int)"
   syntax function elts "(matrix_get_curry %1)"
-  syntax function set_unsafe "(matrix_set %1 %2 %3)"
 (* does not exist anymore
   syntax function make "(matrix_make %1 %2)"
 *)

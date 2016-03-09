@@ -17,15 +17,7 @@ module Array
                 length : int
   } invariant { 0 <= length }
 
-  val ghost function get_unsafe (a: array 'a) (i: int) : 'a
-    ensures { result = M.get a.elts i }
-
-  val ghost function set_unsafe (a: array 'a) (i: int) (v: 'a) : array 'a
-    ensures { result.elts = M.set a.elts i v /\ result.length = a.length }
-
-  (** syntactic sugar *)
-  function ([]) (a: array 'a) (i: int) : 'a = get_unsafe a i
-  function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set_unsafe a i v
+  function ([]) (a: array 'a) (i: int) : 'a = M.get a.elts i
 
   val ([]) (a: array 'a) (i: int) : 'a
     requires { "expl:index in array bounds" 0 <= i < length a }
@@ -33,7 +25,7 @@ module Array
 
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { "expl:index in array bounds" 0 <= i < length a }
-    ensures  { a.elts = M.set (old a.elts) i v }
+    ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
   exception OutOfBounds
@@ -45,7 +37,7 @@ module Array
     a[i]
 
   let defensive_set (a: array 'a) (i: int) (v: 'a)
-    ensures { 0 <= i < length a /\ a = old a[i <- v] }
+    ensures { 0 <= i < length a /\ a.elts = (old a.elts)[i <- v] }
     raises  { OutOfBounds -> i < 0 \/ i >= length a /\ a = old a }
   = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v

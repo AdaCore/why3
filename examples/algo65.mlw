@@ -20,7 +20,7 @@ module Algo65
 
   (* algorithm 63 *)
 
-  val partition (a:array int) (m n: int) (i j: ref int) (ghost x: ref int) :
+  val partition (a: array int) (m n: int) (i j: ref int) (ghost x: ref int) :
     unit
     requires { 0 <= m < n < length a }
     writes   { a, i, j }
@@ -32,7 +32,7 @@ module Algo65
 
   (* Algorithm 65 (fixed version) *)
 
-  let rec find (a:array int) (m n:int) (k:int) : unit
+  let rec find (a: array int) (m n: int) (k: int) : unit
     requires { 0 <= m <= k <= n < length a }
     variant  { n - m }
     ensures  { permut_sub (old a) a m (n+1) }
