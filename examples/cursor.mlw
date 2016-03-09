@@ -60,14 +60,13 @@ module TestCursor
   let sum (t: t) (c: cursor) : int
     requires { coherent t c }
     requires { c.i = 0 }
-    ensures  { result = sum 0 (length c.seq) (get c.seq) }
+    ensures  { result = sum (get c.seq) 0 (length c.seq) }
   =
     let s = ref 0 in
-    'I:
     while has_next t c do
       invariant { coherent t c }
       invariant { 0 <= c.i <= length c.seq }
-      invariant { !s = sum 0 c.i (get c.seq) }
+      invariant { !s = sum (get c.seq) 0 c.i }
       variant   { length c.seq - c.i }
       let x = next t c in
       s += x
@@ -107,7 +106,7 @@ module IntListCursor (* : IterableList *)
     requires { coherent t c }
     ensures  { result <-> c.to_do <> Nil }
   =
-    c.to_do <> Nil
+    not is_nil c.to_do
 
   let next (t: t) (c: cursor) : elt
     requires { c.to_do <> Nil }

@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="1" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="1" memlimit="4000"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="1" memlimit="4000"/>
 <file name="../braun_trees.mlw" expanded="true">
-<theory name="BraunHeaps" sum="20f7ebde985c3ab8d295dc1512266772" expanded="true">
+<theory name="BraunHeaps" sum="9334f80cdd6602327443c5aae6cefa84" expanded="true">
  <goal name="VC le_root" expl="VC for le_root">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="0"/></proof>
  </goal>
- <goal name="VC root_is_min" expl="VC for root_is_min">
+ <goal name="VC root_is_min" expl="VC for root_is_min" expanded="true">
  <proof prover="0"><result status="valid" time="0.17"/></proof>
  </goal>
  <goal name="VC empty" expl="VC for empty">

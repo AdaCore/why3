@@ -50,12 +50,9 @@ module BraunHeaps
      requires { heap t && 0 < size t }
      ensures  { is_minimum (minimum t) t }
      variant  { t }
-  = match t with
-    | Empty -> absurd
-    | Node l _ r ->
-        if not is_empty l then root_is_min l;
-        if not is_empty r then root_is_min r
-    end
+  = let Node l _ r = t in
+    if not is_empty l then root_is_min l;
+    if not is_empty r then root_is_min r
 
   predicate inv (t: tree elt) = match t with
   | Empty      -> true

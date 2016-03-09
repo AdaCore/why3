@@ -7,6 +7,11 @@ theory List
 
   type list 'a = Nil | Cons 'a (list 'a)
 
+  let predicate is_nil (l:list 'a)
+    ensures { result <-> l = Nil }
+  =
+    match l with Nil -> true | Cons _ _ -> false end
+
 end
 
 (** {2 Length of a list} *)

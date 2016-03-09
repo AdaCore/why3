@@ -5,8 +5,9 @@ theory Tree
 
   type tree 'a = Empty | Node (tree 'a) 'a (tree 'a)
 
-  let function is_empty (t:tree 'a) : bool =
-    match t with Empty -> true | Node _ _ _ -> false end
+  let predicate is_empty (t:tree 'a)
+    ensures { result <-> t = Empty }
+  = match t with Empty -> true | Node _ _ _ -> false end
 
 end
 
@@ -51,10 +52,8 @@ theory Height "height of a tree"
   use import int.MinMax
 
   let rec function height (t: tree 'a) : int = match t with
-    | Empty ->
-        0
-    | Node l _ r ->
-        1 + max (height l) (height r)
+    | Empty      -> 0
+    | Node l _ r -> 1 + max (height l) (height r)
   end
 
   lemma height_nonneg:
@@ -68,7 +67,7 @@ theory Inorder "inorder traversal"
   use import list.List
   use import list.Append
 
-  function inorder (t: tree 'a) : list 'a = match t with
+  let rec function inorder (t: tree 'a) : list 'a = match t with
     | Empty -> Nil
     | Node l x r -> inorder l ++ Cons x (inorder r)
   end
@@ -81,7 +80,7 @@ theory Preorder "preorder traversal"
   use import list.List
   use import list.Append
 
-  function preorder (t: tree 'a) : list 'a = match t with
+  let rec function preorder (t: tree 'a) : list 'a = match t with
     | Empty -> Nil
     | Node l x r -> Cons x (preorder l ++ preorder r)
   end
@@ -109,31 +108,32 @@ theory Zipper "Huet's zipper"
     | Left  (zipper 'a) 'a (tree 'a)
     | Right (tree 'a)   'a (zipper 'a)
 
-  function zip (t: tree 'a) (z: zipper 'a) : tree 'a = match z with
+  let rec function zip (t: tree 'a) (z: zipper 'a) : tree 'a =
+    match z with
     | Top -> t
     | Left z x r -> zip (Node t x r) z
     | Right l x z -> zip (Node l x t) z
-  end
+    end
 
   (* navigating in a tree using a zipper *)
 
   type pointed 'a = (tree 'a, zipper 'a)
 
-  function start (t: tree 'a) : pointed 'a = (t, Top)
+  let function start (t: tree 'a) : pointed 'a = (t, Top)
 
-  function up (p: pointed 'a) : pointed 'a = match p with
+  let function up (p: pointed 'a) : pointed 'a = match p with
     | _, Top -> p (* do nothing *)
     | l, Left z x r | r, Right l x z -> (Node l x r, z)
   end
 
-  function top (p: pointed 'a) : tree 'a = let t, z = p in zip t z
+  let function top (p: pointed 'a) : tree 'a = let t, z = p in zip t z
 
-  function down_left (p: pointed 'a) : pointed 'a = match p with
+  let function down_left (p: pointed 'a) : pointed 'a = match p with
     | Empty, _ -> p (* do nothing *)
     | Node l x r, z -> (l, Left z x r)
   end
 
-  function down_right (p: pointed 'a) : pointed 'a = match p with
+  let function down_right (p: pointed 'a) : pointed 'a = match p with
     | Empty, _ -> p (* do nothing *)
     | Node l x r, z -> (r, Right l x z)
   end
