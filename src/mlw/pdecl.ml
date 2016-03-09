@@ -353,6 +353,8 @@ let rec t_subst_fmla v t f = t_label_copy f (match f.t_node with
   | Tvar u when vs_equal u v -> t_if t t_bool_true t_bool_false
   | _ -> t_map (t_subst_fmla v t) f)
 
+let lab_w_nce_no = Slab.singleton Theory.lab_w_non_conservative_extension_no
+
 let create_let_decl ld =
   let conv_post t ql =
     let conv q = match t.t_ty with
@@ -360,6 +362,7 @@ let create_let_decl ld =
       | None -> let v,f = open_post q in
                 t_subst_fmla v t f in
     List.map conv ql in
+  let label = lab_w_nce_no in
   let cty_axiom id cty f axms =
     if t_equal f t_true then axms else
     (* we do not care about aliases for pure symbols *)
@@ -383,13 +386,13 @@ let create_let_decl ld =
               let fl = f :: conv_post (t_var v) ql in
               t_exists_close [v] [] (t_and_simp_l fl)
           | [] -> t_true in
-        abst, defn, cty_axiom (id_clone s.rs_name) cty f axms
+        abst, defn, cty_axiom (id_clone ~label s.rs_name) cty f axms
     | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
         let f = t_and_simp_l (conv_post hd cty.cty_post) in
         let nm = id.id_string ^ "_spec" in
-        let axms = cty_axiom (id_derive nm id) cty f axms in
+        let axms = cty_axiom (id_derive ~label nm id) cty f axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
@@ -406,13 +409,13 @@ let create_let_decl ld =
                 abst, (ls, vl, f) :: defn, axms
             | Some f ->
                 let f = t_insert hd f and nm = id.id_string ^ "_def" in
-                let axms = cty_axiom (id_derive nm id) cty f axms in
+                let axms = cty_axiom (id_derive ~label nm id) cty f axms in
                 create_param_decl ls :: abst, defn, axms
             | None when cty.cty_post = [] ->
                 let axms = match post_of_expr hd e with
                   | Some f ->
                       let nm = id.id_string ^ "_def" in
-                      cty_axiom (id_derive nm id) cty f axms
+                      cty_axiom (id_derive ~label nm id) cty f axms
                   | None -> axms in
                 create_param_decl ls :: abst, defn, axms
             | None ->
@@ -446,7 +449,7 @@ let create_let_decl ld =
     let abst = List.map (fun (s,_) -> create_param_decl s) dl in
     let mk_ax ({ls_name = id} as s, vl, t) =
       let nm = id.id_string ^ "_def" in
-      let pr = create_prsymbol (id_derive nm id) in
+      let pr = create_prsymbol (id_derive ~label nm id) in
       let hd = t_app s (List.map t_var vl) t.t_ty in
       let ax = t_forall_close vl [] (t_insert hd t) in
       create_prop_decl Paxiom pr ax in

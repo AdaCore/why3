@@ -275,7 +275,7 @@ let add_pdecl_no_logic uc d =
 
 let add_pdecl uc d =
   let uc = add_pdecl_no_logic uc d in
-  let th = List.fold_left (add_decl ~warn:true) uc.muc_theory d.pd_pure in
+  let th = List.fold_left add_decl uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }
 
 (** {2 Builtin symbols} *)

@@ -420,7 +420,7 @@ let lab_w_non_conservative_extension_no =
 let should_be_conservative id =
   not (Slab.mem lab_w_non_conservative_extension_no id.id_label)
 
-let add_decl ?(warn=true) uc d =
+let add_decl uc d =
   let uc = add_tdecl uc (create_decl d) in
   match d.d_node with
     | Dtype ts  -> add_symbol add_ts ts.ts_name ts uc
@@ -429,8 +429,8 @@ let add_decl ?(warn=true) uc d =
     | Dlogic dl -> List.fold_left add_logic uc dl
     | Dind (_, dl) -> List.fold_left add_ind uc dl
     | Dprop ((k,pr,_) as p) ->
-      if warn && should_be_conservative uc.uc_name &&
-           should_be_conservative pr.pr_name
+      if should_be_conservative uc.uc_name &&
+         should_be_conservative pr.pr_name
       then warn_dubious_axiom uc k pr.pr_name d.d_syms;
       add_prop uc p
 
@@ -441,8 +441,7 @@ let add_data_decl uc dl = add_decl uc (create_data_decl dl)
 let add_param_decl uc ls = add_decl uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl uc (create_logic_decl dl)
 let add_ind_decl uc s dl = add_decl uc (create_ind_decl s dl)
-let add_prop_decl ?warn uc k p f =
-  add_decl ?warn uc (create_prop_decl k p f)
+let add_prop_decl uc k p f = add_decl uc (create_prop_decl k p f)
 
 (** Use *)
 

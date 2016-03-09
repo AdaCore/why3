@@ -149,15 +149,16 @@ val restore_path : ident -> string list * string * string list
 
 val create_decl : decl -> tdecl
 
-val add_decl : ?warn:bool -> theory_uc -> decl -> theory_uc
+val add_decl : theory_uc -> decl -> theory_uc
 
 val add_ty_decl : theory_uc -> tysymbol -> theory_uc
 val add_data_decl : theory_uc -> data_decl list -> theory_uc
 val add_param_decl : theory_uc -> lsymbol -> theory_uc
 val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_sign -> ind_decl list -> theory_uc
-val add_prop_decl :
-  ?warn:bool -> theory_uc -> prop_kind -> prsymbol -> term -> theory_uc
+val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> term -> theory_uc
+
+val lab_w_non_conservative_extension_no : Ident.label
 
 (** {2 Use} *)
 
