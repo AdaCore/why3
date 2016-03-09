@@ -5,6 +5,9 @@ theory Tree
 
   type tree 'a = Empty | Node (tree 'a) 'a (tree 'a)
 
+  let function is_empty (t:tree 'a) : bool =
+    match t with Empty -> true | Node _ _ _ -> false end
+
 end
 
 theory Size "number of nodes"
@@ -12,7 +15,7 @@ theory Size "number of nodes"
   use import Tree
   use import int.Int
 
-  function size (t: tree 'a) : int = match t with
+  let rec function size (t: tree 'a) : int = match t with
     | Empty -> 0
     | Node l _ r -> 1 + size l + size r
   end
@@ -47,7 +50,7 @@ theory Height "height of a tree"
   use import int.Int
   use import int.MinMax
 
-  function height (t: tree 'a) : int = match t with
+  let rec function height (t: tree 'a) : int = match t with
     | Empty ->
         0
     | Node l _ r ->
