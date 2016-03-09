@@ -2,12 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../add_list.mlw" expanded="true">
 <theory name="SumList" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="AddListRec" sum="f1b4c4e0923c97bb07f0497e41cca3dd" expanded="true">
+<theory name="AddListRec" sum="a7bc617783ac097fd03baf5114e10fca" expanded="true">
  <goal name="VC sum" expl="VC for sum">
  <transf name="split_goal_wp">
   <goal name="VC sum.1" expl="1. postcondition">
@@ -35,7 +35,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="AddListImp" sum="e8c88c18c52faab3c58cf2482eb150fd" expanded="true">
+<theory name="AddListImp" sum="b59d5583deafd1e0a51ec8df39195de2" expanded="true">
  <goal name="VC sum" expl="VC for sum">
  <transf name="split_goal_wp">
   <goal name="VC sum.1" expl="1. loop invariant init">

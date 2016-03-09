@@ -2,38 +2,43 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="1" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../all_distinct.mlw" expanded="true">
-<theory name="AllDistinct" sum="a41b03c7310badbe67937c261148930c" expanded="true">
+<theory name="AllDistinct" sum="d0fdc968e71fba542b0c675b6cab2360" expanded="true">
  <goal name="VC all_distinct" expl="VC for all_distinct" expanded="true">
- <proof prover="0"><result status="valid" time="0.09" steps="244"/></proof>
  <transf name="split_goal_wp" expanded="true">
   <goal name="VC all_distinct.1" expl="1. array creation size">
   <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC all_distinct.2" expl="2. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC all_distinct.2" expl="2. postcondition">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="VC all_distinct.3" expl="3. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC all_distinct.4" expl="4. loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC all_distinct.4" expl="4. index in array bounds">
+  <goal name="VC all_distinct.5" expl="5. index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC all_distinct.5" expl="5. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
-  </goal>
   <goal name="VC all_distinct.6" expl="6. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC all_distinct.7" expl="7. loop invariant preservation">
+  <goal name="VC all_distinct.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC all_distinct.8" expl="8. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.00" steps="19"/></proof>
+  </goal>
+  <goal name="VC all_distinct.9" expl="9. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
-  <goal name="VC all_distinct.8" expl="8. loop invariant preservation">
+  <goal name="VC all_distinct.10" expl="10. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="55"/></proof>
   </goal>
-  <goal name="VC all_distinct.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="42"/></proof>
+  <goal name="VC all_distinct.11" expl="11. postcondition">
+  <proof prover="0" steplimit="-1"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
