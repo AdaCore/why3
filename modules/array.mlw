@@ -13,11 +13,11 @@ module Array
   use import map.Map as M
 
   type array 'a = private {
-    mutable ghost elts : map int 'a;
+    mutable ghost elts : int -> 'a;
                 length : int
   } invariant { 0 <= length }
 
-  function ([]) (a: array 'a) (i: int) : 'a = M.get a.elts i
+  function ([]) (a: array 'a) (i: int) : 'a = a.elts i
 
   val ([]) (a: array 'a) (i: int) : 'a
     requires { "expl:index in array bounds" 0 <= i < length a }
@@ -275,17 +275,9 @@ module ToList
   use import Array
   use import list.List
 
-  function to_list (a: array 'a) (l u: int) : list 'a
-
-  axiom to_list_empty:
-    forall a: array 'a, l u: int. u <= l ->
-    to_list a l u = Nil
-
-  axiom to_list_cons:
-    forall a: array 'a, l u: int. l < u ->
-    to_list a l u = Cons a[l] (to_list a (l+1) u)
-
-  val to_list (a: array 'a) (l u: int) : list 'a
-    ensures { result = to_list a l u }
+  let rec function to_list (a: array 'a) (l u: int) : list 'a
+    requires { l >= 0 /\ u <= a.length }
+    variant  { u - l }
+  = if u <= l then Nil else Cons a[l] (to_list a (l+1) u)
 
 end
