@@ -312,13 +312,12 @@ module Bitwalker
     requires {BV64.to_uint value < BV64.to_uint (maxvalue len)}
     ensures  {result = value}
   =
-    assert { forall i:int. BV32.to_uint len <= i < 64 -> BV64.nth value i = False };
+    assert { forall i:int. BV32.to_uint len <= i < 64 ->
+               BV64.nth value i = False };
     let poke_result = poke start len addr value in
-    assert {poke_result = 0};
+    assert { poke_result = 0 };
     let peek_result = peek start len addr in
-
-    assert {BV64.eq peek_result value};
-
+    assert { BV64.(==) peek_result value };
     peek_result
 
 end

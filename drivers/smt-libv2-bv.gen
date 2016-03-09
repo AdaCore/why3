@@ -18,7 +18,7 @@ theory bv.BV_Gen
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax predicate eq "(= %1 %2)"
+  syntax predicate (==) "(= %1 %2)"
 
   (* Warning: we should NOT remove all the axioms using "allprops" *)
 

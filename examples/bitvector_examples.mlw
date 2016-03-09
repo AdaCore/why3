@@ -29,7 +29,7 @@ module Test_proofinuse
   type bitvec64 = BV64.t
 
   let mask ( x : t ) =
-    ensures{ BV8.eq result (BV8.of_int 1) }
+    ensures{ result  = BV8.of_int 1 }
     (* ensures{ not ( BV8.eq result (BV8.of_int 1) ) } *)
     let res = C8_32.toSmall(
                 bw_and

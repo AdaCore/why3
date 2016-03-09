@@ -385,13 +385,13 @@ theory BV_Gen
       eq_sub    a b (to_uint i) (to_uint n)
   <-> eq_sub_bv a b i n
 
-  predicate eq (v1 v2 : t) =
+  predicate (==) (v1 v2 : t) =
     eq_sub v1 v2 0 size
 
-  axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+  axiom Extensionality: forall x y : t [x == y]. x == y -> x = y
 
   val eq (v1 v2 : t) : bool
-    ensures { if result then v1 = v2 else v1 <> v2 }
+    ensures { result <-> v1 = v2 }
 
 end
 

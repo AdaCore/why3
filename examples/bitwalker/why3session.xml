@@ -4,115 +4,127 @@
 <why3session shape_version="4">
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.01" timelimit="1" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.4.1" timelimit="1" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.4.1" timelimit="1" steplimit="1" memlimit="1000"/>
 <file name="../bitwalker.mlw" expanded="true">
-<theory name="Bitwalker" sum="9a18d050e61cbb667843c97e4d5a0417" expanded="true">
+<theory name="Bitwalker" sum="8341287dd9f0d54533feef757773c6c9" expanded="true">
  <goal name="nth64">
  <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="2"><result status="valid" time="0.06" steps="87"/></proof>
  </goal>
  <goal name="nth8">
- <proof prover="2"><result status="valid" time="0.14" steps="223"/></proof>
+ <proof prover="2" steplimit="1"><result status="valid" time="0.14" steps="223"/></proof>
  </goal>
  <goal name="VC maxvalue" expl="VC for maxvalue">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.03" steps="71"/></proof>
  </goal>
  <goal name="VC nth_ultpre0" expl="VC for nth_ultpre0">
  <transf name="split_goal_wp">
   <goal name="VC nth_ultpre0.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.02" steps="77"/></proof>
   </goal>
   <goal name="VC nth_ultpre0.2" expl="2. assertion">
-  <proof prover="1"><result status="valid" time="0.17"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC nth_ultpre0.3" expl="3. postcondition">
-  <proof prover="2"><result status="valid" time="0.14" steps="137"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.14" steps="137"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC poke_64bit_bv" expl="VC for poke_64bit_bv">
  <transf name="split_goal_wp">
   <goal name="VC poke_64bit_bv.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.03" steps="77"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="77"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="73"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="78"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="76"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.27"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.7" expl="7. postcondition">
-  <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.8" expl="8. postcondition">
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.9" expl="9. postcondition">
-  <proof prover="2"><result status="valid" time="0.12" steps="199"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.12" steps="199"/></proof>
   </goal>
   <goal name="VC poke_64bit_bv.10" expl="10. postcondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="127"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.09" steps="127"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC poke_64bit" expl="VC for poke_64bit">
  <transf name="split_goal_wp">
   <goal name="VC poke_64bit.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.03" steps="81"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="81"/></proof>
   </goal>
   <goal name="VC poke_64bit.2" expl="2. assertion">
-  <proof prover="2"><result status="valid" time="0.10" steps="123"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.10" steps="123"/></proof>
   </goal>
   <goal name="VC poke_64bit.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="75"/></proof>
   </goal>
   <goal name="VC poke_64bit.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="0.52"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.52"/></proof>
   </goal>
   <goal name="VC poke_64bit.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.19"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC poke_64bit.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.35"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.35"/></proof>
   </goal>
   <goal name="VC poke_64bit.7" expl="7. postcondition">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC poke_64bit.8" expl="8. postcondition">
   <proof prover="1"><result status="valid" time="0.54"/></proof>
+  <proof prover="2"><result status="valid" time="0.28" steps="247"/></proof>
   </goal>
   <goal name="VC poke_64bit.9" expl="9. postcondition">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.16" steps="103"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC peek_8bit_bv" expl="VC for peek_8bit_bv">
  <transf name="split_goal_wp">
   <goal name="VC peek_8bit_bv.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="78"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
   <goal name="VC peek_8bit_bv.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="74"/></proof>
   </goal>
   <goal name="VC peek_8bit_bv.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="76"/></proof>
   </goal>
   <goal name="VC peek_8bit_bv.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="77"/></proof>
   </goal>
   <goal name="VC peek_8bit_bv.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC peek_8bit_bv.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.85"/></proof>
+  <proof prover="2"><result status="valid" time="0.57" steps="585"/></proof>
   </goal>
  </transf>
  </goal>
@@ -120,150 +132,168 @@
  <transf name="split_goal_wp">
   <goal name="VC peek_8bit_array.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="73"/></proof>
   </goal>
   <goal name="VC peek_8bit_array.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="85"/></proof>
   </goal>
   <goal name="VC peek_8bit_array.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
   <goal name="VC peek_8bit_array.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="96"/></proof>
   </goal>
   <goal name="VC peek_8bit_array.5" expl="5. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.05" steps="97"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.05" steps="97"/></proof>
   </goal>
   <goal name="VC peek_8bit_array.6" expl="6. precondition">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="135"/></proof>
   </goal>
   <goal name="VC peek_8bit_array.7" expl="7. postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="115"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.08" steps="115"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC peek" expl="VC for peek">
  <transf name="split_goal_wp">
   <goal name="VC peek.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="75"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="75"/></proof>
   </goal>
   <goal name="VC peek.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
   <goal name="VC peek.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="77"/></proof>
   </goal>
   <goal name="VC peek.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="95"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.08" steps="95"/></proof>
   </goal>
   <goal name="VC peek.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.10" steps="101"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.10" steps="101"/></proof>
   </goal>
   <goal name="VC peek.6" expl="6. loop invariant init">
   <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="110"/></proof>
   </goal>
   <goal name="VC peek.7" expl="7. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="81"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.02" steps="81"/></proof>
   </goal>
   <goal name="VC peek.8" expl="8. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.03" steps="81"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="81"/></proof>
   </goal>
   <goal name="VC peek.9" expl="9. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="83"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="83"/></proof>
   </goal>
   <goal name="VC peek.10" expl="10. precondition">
   <proof prover="1"><result status="valid" time="0.17"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="83"/></proof>
   </goal>
   <goal name="VC peek.11" expl="11. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="84"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="84"/></proof>
   </goal>
   <goal name="VC peek.12" expl="12. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="87"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="87"/></proof>
   </goal>
   <goal name="VC peek.13" expl="13. precondition">
-  <proof prover="2"><result status="valid" time="0.13" steps="118"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.13" steps="118"/></proof>
   </goal>
   <goal name="VC peek.14" expl="14. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="86"/></proof>
   </goal>
   <goal name="VC peek.15" expl="15. precondition">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
   </goal>
   <goal name="VC peek.16" expl="16. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="92"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="92"/></proof>
   </goal>
   <goal name="VC peek.17" expl="17. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC peek.18" expl="18. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.67" steps="217"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.67" steps="217"/></proof>
   </goal>
   <goal name="VC peek.19" expl="19. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.51" steps="172"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.51" steps="172"/></proof>
   </goal>
   <goal name="VC peek.20" expl="20. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.04" steps="92"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.04" steps="92"/></proof>
   </goal>
   <goal name="VC peek.21" expl="21. postcondition">
   <proof prover="1"><result status="valid" time="0.18"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="81"/></proof>
   </goal>
   <goal name="VC peek.22" expl="22. postcondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="109"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.09" steps="109"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC peek_64bit" expl="VC for peek_64bit">
  <transf name="split_goal_wp">
   <goal name="VC peek_64bit.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.02" steps="77"/></proof>
   </goal>
   <goal name="VC peek_64bit.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
   <goal name="VC peek_64bit.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
   <goal name="VC peek_64bit.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="76"/></proof>
   </goal>
   <goal name="VC peek_64bit.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.25"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="VC peek_64bit.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="102"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.08" steps="102"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC poke_8bit" expl="VC for poke_8bit">
  <transf name="split_goal_wp">
   <goal name="VC poke_8bit.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.02" steps="77"/></proof>
   </goal>
   <goal name="VC poke_8bit.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="73"/></proof>
   </goal>
   <goal name="VC poke_8bit.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="131"/></proof>
   </goal>
   <goal name="VC poke_8bit.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="76"/></proof>
   </goal>
   <goal name="VC poke_8bit.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC poke_8bit.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC poke_8bit.7" expl="7. postcondition">
-  <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC poke_8bit.8" expl="8. postcondition">
-  <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC poke_8bit.9" expl="9. postcondition">
-  <proof prover="2"><result status="valid" time="0.27" steps="363"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.53" steps="363"/></proof>
   </goal>
   <goal name="VC poke_8bit.10" expl="10. postcondition">
-  <proof prover="1"><result status="valid" time="0.76"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.76"/></proof>
   </goal>
  </transf>
  </goal>
@@ -271,111 +301,128 @@
  <transf name="split_goal_wp">
   <goal name="VC poke_8bit_array.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="73"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="85"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="77"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="95"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.5" expl="5. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.06" steps="97"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.06" steps="97"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.6" expl="6. precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="137"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.7" expl="7. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.05" steps="101"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.05" steps="101"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.8" expl="8. postcondition">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.9" expl="9. postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="123"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.08" steps="121"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC poke" expl="VC for poke">
  <transf name="split_goal_wp">
   <goal name="VC poke.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="75"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="75"/></proof>
   </goal>
   <goal name="VC poke.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
   <goal name="VC poke.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
   <goal name="VC poke.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
   <goal name="VC poke.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
   <goal name="VC poke.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="77"/></proof>
   </goal>
   <goal name="VC poke.7" expl="7. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
   <goal name="VC poke.8" expl="8. postcondition">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="79"/></proof>
   </goal>
   <goal name="VC poke.9" expl="9. postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="79"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.02" steps="79"/></proof>
   </goal>
   <goal name="VC poke.10" expl="10. postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="79"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="79"/></proof>
   </goal>
   <goal name="VC poke.11" expl="11. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
   <goal name="VC poke.12" expl="12. precondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="103"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.09" steps="103"/></proof>
   </goal>
   <goal name="VC poke.13" expl="13. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.11" steps="109"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.11" steps="109"/></proof>
   </goal>
   <goal name="VC poke.14" expl="14. loop invariant init">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
   <goal name="VC poke.15" expl="15. loop invariant init">
   <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="2"><result status="valid" time="0.15" steps="112"/></proof>
   </goal>
   <goal name="VC poke.16" expl="16. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="71"/></proof>
   </goal>
   <goal name="VC poke.17" expl="17. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="88"/></proof>
   </goal>
   <goal name="VC poke.18" expl="18. precondition">
-  <proof prover="2"><result status="valid" time="0.14" steps="119"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.14" steps="119"/></proof>
   </goal>
   <goal name="VC poke.19" expl="19. precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="88"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.04" steps="88"/></proof>
   </goal>
   <goal name="VC poke.20" expl="20. precondition">
   <proof prover="1"><result status="valid" time="0.19"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="87"/></proof>
   </goal>
   <goal name="VC poke.21" expl="21. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="88"/></proof>
   </goal>
   <goal name="VC poke.22" expl="22. assertion">
-  <proof prover="2"><result status="valid" time="0.43" steps="220"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.43" steps="220"/></proof>
   </goal>
   <goal name="VC poke.23" expl="23. assertion">
   <transf name="split_goal_wp">
    <goal name="VC poke.23.1" expl="1. assertion">
-   <proof prover="2"><result status="valid" time="0.03" steps="90"/></proof>
+   <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="90"/></proof>
    </goal>
    <goal name="VC poke.23.2" expl="2. assertion">
-   <proof prover="2"><result status="valid" time="0.04" steps="97"/></proof>
+   <proof prover="2" steplimit="1"><result status="valid" time="0.04" steps="97"/></proof>
    </goal>
    <goal name="VC poke.23.3" expl="3. assertion">
-   <proof prover="2"><result status="valid" time="0.03" steps="91"/></proof>
+   <proof prover="2" steplimit="1"><result status="valid" time="0.03" steps="91"/></proof>
    </goal>
    <goal name="VC poke.23.4" expl="4. assertion">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -384,39 +431,43 @@
   </goal>
   <goal name="VC poke.24" expl="24. precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="88"/></proof>
   </goal>
   <goal name="VC poke.25" expl="25. precondition">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="90"/></proof>
   </goal>
   <goal name="VC poke.26" expl="26. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.07" steps="94"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.07" steps="94"/></proof>
   </goal>
   <goal name="VC poke.27" expl="27. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.56" steps="225"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.79" steps="225"/></proof>
   </goal>
   <goal name="VC poke.28" expl="28. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.90" steps="298"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="1.20" steps="298"/></proof>
   </goal>
   <goal name="VC poke.29" expl="29. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.65" steps="236"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.65" steps="236"/></proof>
   </goal>
   <goal name="VC poke.30" expl="30. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.06" steps="94"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.06" steps="94"/></proof>
   </goal>
   <goal name="VC poke.31" expl="31. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="83"/></proof>
   </goal>
   <goal name="VC poke.32" expl="32. postcondition">
   <proof prover="1"><result status="valid" time="0.09"/></proof>
-  </goal>
-  <goal name="VC poke.33" expl="33. postcondition">
   <proof prover="2"><result status="valid" time="0.05" steps="85"/></proof>
   </goal>
+  <goal name="VC poke.33" expl="33. postcondition">
+  <proof prover="2" steplimit="1"><result status="valid" time="0.05" steps="85"/></proof>
+  </goal>
   <goal name="VC poke.34" expl="34. postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="84"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.05" steps="84"/></proof>
   </goal>
   <goal name="VC poke.35" expl="35. postcondition">
-  <proof prover="2"><result status="valid" time="0.17" steps="149"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.17" steps="149"/></proof>
   </goal>
  </transf>
  </goal>
@@ -424,33 +475,40 @@
  <transf name="split_goal_wp">
   <goal name="VC peekthenpoke.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="VC peekthenpoke.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="VC peekthenpoke.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="VC peekthenpoke.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="75"/></proof>
   </goal>
   <goal name="VC peekthenpoke.5" expl="5. precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="VC peekthenpoke.6" expl="6. precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
   <goal name="VC peekthenpoke.7" expl="7. assertion">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC peekthenpoke.8" expl="8. assertion">
-  <proof prover="2"><result status="valid" time="0.47" steps="303"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.47" steps="303"/></proof>
   </goal>
   <goal name="VC peekthenpoke.9" expl="9. postcondition">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="82"/></proof>
   </goal>
   <goal name="VC peekthenpoke.10" expl="10. postcondition">
-  <proof prover="2"><result status="valid" time="0.14" steps="105"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.14" steps="105"/></proof>
   </goal>
  </transf>
  </goal>
@@ -461,30 +519,37 @@
   </goal>
   <goal name="VC pokethenpeek.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="76"/></proof>
   </goal>
   <goal name="VC pokethenpeek.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="76"/></proof>
   </goal>
   <goal name="VC pokethenpeek.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="76"/></proof>
   </goal>
   <goal name="VC pokethenpeek.5" expl="5. assertion">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="81"/></proof>
   </goal>
   <goal name="VC pokethenpeek.6" expl="6. precondition">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="82"/></proof>
   </goal>
   <goal name="VC pokethenpeek.7" expl="7. precondition">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="82"/></proof>
   </goal>
   <goal name="VC pokethenpeek.8" expl="8. precondition">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
   <goal name="VC pokethenpeek.9" expl="9. assertion">
-  <proof prover="2"><result status="valid" time="0.41" steps="261"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.26" steps="261"/></proof>
   </goal>
   <goal name="VC pokethenpeek.10" expl="10. postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="95"/></proof>
+  <proof prover="2" steplimit="1"><result status="valid" time="0.08" steps="95"/></proof>
   </goal>
  </transf>
  </goal>

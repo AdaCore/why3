@@ -25,7 +25,6 @@ module BVCheck_Gen
   function asr    t int : t
   function asr_bv t t   : t
 
-  predicate eq t t
   predicate ule t t
   predicate ult t t
   predicate uge t t
@@ -79,64 +78,26 @@ module BVCheck_Gen
     ensures  { result = urem a b }
 
   val eq_check (a b:t) : bool
-    ensures { match result with
-              | True -> to_uint a = to_uint b
-              | False -> to_uint a <> to_uint b
-              end }
-    ensures { match result with
-              | True -> eq a b
-              | False -> not (eq a b)
-              end }
+    ensures { result <-> a = b }
 
   val ne_check (a b:t) : bool
-    ensures { match result with
-              | True -> to_uint a <> to_uint b
-              | False -> to_uint a = to_uint b
-              end }
-    ensures { match result with
-              | True -> not (eq a b)
-              | False -> eq a b
-              end }
+    ensures { result <-> a <> b }
 
   val le_check (a b:t) : bool
-    ensures { match result with
-              | True -> to_uint a <= to_uint b
-              | False -> to_uint a > to_uint b
-              end }
-    ensures { match result with
-              | True -> ule a b
-              | False -> not (ule a b)
-              end }
+    ensures { result <-> to_uint a <= to_uint b }
+    ensures { result <-> ule a b }
 
   val lt_check (a b:t) : bool
-    ensures { match result with
-              | True -> to_uint a < to_uint b
-              | False -> to_uint a >= to_uint b
-              end }
-    ensures { match result with
-              | True -> ult a b
-              | False -> not (ult a b)
-              end }
+    ensures { result <-> to_uint a < to_uint b }
+    ensures { result <-> ult a b }
 
   val ge_check (a b:t) : bool
-    ensures { match result with
-              | True -> to_uint a >= to_uint b
-              | False -> to_uint a < to_uint b
-              end }
-    ensures { match result with
-              | True -> uge a b
-              | False -> not (uge a b)
-              end }
+    ensures { result <-> to_uint a >= to_uint b }
+    ensures { result <-> uge a b }
 
   val gt_check (a b:t) : bool
-    ensures { match result with
-              | True -> to_uint a > to_uint b
-              | False -> to_uint a <= to_uint b
-              end }
-    ensures { match result with
-              | True -> ugt a b
-              | False -> not (ugt a b)
-              end }
+    ensures { result <-> to_uint a > to_uint b }
+    ensures { result <-> ugt a b }
 
 end
 
@@ -161,7 +122,6 @@ module BVCheck8
     function lsr_bv = lsr_bv,
     function asr = asr,
     function asr_bv = asr_bv,
-    predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
@@ -189,7 +149,6 @@ module BVCheck16
     function lsr_bv = lsr_bv,
     function asr = asr,
     function asr_bv = asr_bv,
-    predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
@@ -217,7 +176,6 @@ module BVCheck32
     function lsr_bv = lsr_bv,
     function asr = asr,
     function asr_bv = asr_bv,
-    predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
@@ -245,7 +203,6 @@ module BVCheck64
     function lsr_bv = lsr_bv,
     function asr = asr,
     function asr_bv = asr_bv,
-    predicate eq = eq,
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
