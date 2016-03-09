@@ -14,7 +14,6 @@ module Assoc
   use import list.Mem
   use import list.Append
   use import option.Option
-  use import HighOrd
 
   (** Existence of an element identified by key [k] in list [l]. *)
   predicate appear (k:key) (l:list (t 'a)) =
@@ -181,4 +180,3 @@ module AssocSorted
   = ()
 
 end
-

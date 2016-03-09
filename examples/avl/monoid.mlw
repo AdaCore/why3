@@ -25,7 +25,6 @@ module MonoidSum
 
   use import list.List
   use import list.Append
-  use import HighOrd
   clone import Monoid as M
 
   (** Axiomatized definition of the monoidal aggregation of elements
@@ -48,7 +47,6 @@ end
 (** {2 Definition of aggregation} *)
 module MonoidSumDef
   use import list.List
-  use import HighOrd
 
   namespace M
     type t
@@ -76,4 +74,3 @@ module ComputableMonoid
   val op (a b:t) : t ensures { result = op a b }
 
 end
-

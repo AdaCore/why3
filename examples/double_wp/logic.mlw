@@ -9,8 +9,6 @@ module Compiler_logic
   use import list.Append
   use import vm.Vm
   use import state.State
-  use import HighOrd
-
 
   function fst (p: ('a,'b)) : 'a = let (x,_) = p in x
   meta rewrite_def function fst
@@ -166,4 +164,3 @@ module Compiler_logic
     res
 
 end
-

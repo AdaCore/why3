@@ -8,7 +8,6 @@ module HeightCPS
   use import int.MinMax
   use import bintree.Tree
   use import bintree.Height
-  use HighOrd
 
   function height_cps (t: tree 'a) (k: int -> 'b) : 'b =
     match t with
@@ -145,4 +144,3 @@ module HeightStack
   = height_stack 0 (Cons (0, t) Nil)
 
 end
-

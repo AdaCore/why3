@@ -58,8 +58,6 @@ constant p2 : term =
            (Lambda y (Var y)))
       (Lambda x (Var x))
 
-use HighOrd as H
-
 predicate ground_rec (t:term) (bound: H.pred identifier) =
   match t with
   | Var v -> bound v
@@ -123,7 +121,7 @@ let rec lemma weak_nf_complete (t:term)
 = match t with
   | Var _ -> ()
   | Lambda _ _ -> ()
-  | App t1 t2 -> 
+  | App t1 t2 ->
     weak_nf_complete t1; weak_nf_complete t2
   end
 
@@ -132,7 +130,7 @@ let rec lemma weak_nf_complete (t:term)
 inductive weak_n_reduce int term term =
   | Zero : forall t. weak_n_reduce 0 t t
   | Succ : forall t1 t2 t3 n.
-     weak_reduce t1 t2 -> weak_n_reduce n t2 t3 -> 
+     weak_reduce t1 t2 -> weak_n_reduce n t2 t3 ->
      weak_n_reduce (n+1) t1 t3
 
 predicate weak_normalize (t1 t2:term) =
@@ -218,9 +216,9 @@ let rec lemma recompose_values (c:context) (t1 t2:expr) (e:environment) : unit
 </pre></blockquote>}
 *)
 
-let rec eval (t:term) (e:environment) (c:context) : value 
+let rec eval (t:term) (e:environment) (c:context) : value
   diverges
-  returns { Closure x t1 e1 -> 
+  returns { Closure x t1 e1 ->
     weak_normalize (recompose c t e) (Lambda x t1) }
 = match t with
   | Var x -> cont c (lookup x e)
@@ -228,7 +226,7 @@ let rec eval (t:term) (e:environment) (c:context) : value
   | App t0 t1 -> eval t0 e (Left c t1 e)
   end
 
-with cont (c:context) (v:value) : value 
+with cont (c:context) (v:value) : value
   diverges
 = match c with
   | Empty -> v
@@ -244,13 +242,9 @@ let compute p : value
     e = Nil /\ weak_normalize p (Lambda x t) }
 = eval p Nil Empty
 
-let test () 
-  diverges 
+let test ()
+  diverges
 = (compute p0,compute p1,compute p2)
 
 
 end
-
-
-
-

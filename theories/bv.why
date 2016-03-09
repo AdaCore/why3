@@ -390,9 +390,12 @@ theory BV_Gen
 
   axiom Extensionality: forall x y : t [eq x y]. eq x y -> x = y
 
+  val eq (v1 v2 : t) : bool
+    ensures { if result then v1 = v2 else v1 <> v2 }
+
 end
 
-(** {2 Bit Vectors of common size_bvs, 8/16/32/64} *)
+(** {2 Bit Vectors of common sizes, 8/16/32/64} *)
 
 theory BV64
   constant size           : int = 64
@@ -466,8 +469,8 @@ theory BVConverter_Gen
   function to_uint_small smallBV : int
   function to_uint_big bigBV : int
 
-  function toBig smallBV : bigBV
-  function toSmall bigBV : smallBV
+  val function toBig smallBV : bigBV
+  val function toSmall bigBV : smallBV
 
   axiom toSmall_to_uint :
     forall x:bigBV. in_small_range x ->

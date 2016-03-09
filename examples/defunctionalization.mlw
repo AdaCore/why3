@@ -143,8 +143,6 @@ use import Expr
 
 *)
 
-use HighOrd
-
 function eval_1 (e:expr) (k: int->'a) : 'a =
   match e with
     | Cte n -> k n
@@ -479,8 +477,6 @@ function interpret_0 (p:prog) : value = eval_0 p
 </pre></blockquote>}
 *)
 
-
-use HighOrd
 
 function eval_1 (e:expr) (k:value -> 'a) : 'a =
   match e with

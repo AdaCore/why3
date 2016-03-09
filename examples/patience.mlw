@@ -51,7 +51,6 @@ module PigeonHole
 *)
 
   use import int.Int
-  use HighOrd
 
   predicate range (f: int -> int) (n: int) (m:int) =
     forall i: int. 0 <= i < n -> 0 <= f i < m

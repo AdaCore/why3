@@ -263,7 +263,24 @@ Thi-Minh-Tuyen Nguyen, Asma Tafat, Piotr Trojanek.
 
 \chapter{Release Notes}
 
-\section{Release Notes for version 0.90: syntax changes w.r.t. 0.87}
+\section{Release Notes for version 0.90}
+
+TO DISCUSS:
+
+Pourquoi les lemma functions generent un warning ``does not contain any
+abstract symbol'' ?
+
+comment mettre a jour l'example bag ? Parametrer par une egalit'e sur
+les elements ?
+
+
+Attention, ne pas introduire 1 variable par champ complique le boulot des prouveurs
+
+``inline'' ne doit pas inliner Map.set
+
+egalite sur les type algebriques ? engendrees automatiquement ?
+
+\subsection{Syntax Changes}
 
 \begin{center}
   \begin{tabular}{|c|c|}
@@ -272,11 +289,26 @@ Thi-Minh-Tuyen Nguyen, Asma Tafat, Piotr Trojanek.
 \hline
 \texttt{'L:} & \texttt{label L in} \\
 \texttt{at !x 'L} & \texttt{!x at L} \\
-\verb|\|\texttt{ x. t} & \texttt{fun x -> t} \\
-\texttt{type t model ...} & \texttt{type t = private ... } \\
+\verb|\|\texttt{ x. e} & \texttt{fun x -> e} \\
+\verb|\|\texttt{use HighOrd} & nothing, not needed anymore \\
+\verb|\|\texttt{HighOrd.pred ty} & \texttt{ty -> bool} \\
+\texttt{type t model ...} & \texttt{type t = abstract ... } \\
 \hline
   \end{tabular}
 \end{center}
+
+\subsection{Model types, abstract types}
+
+explain \texttt{private} and ghost fields, \texttt{abstract mutable},
+\texttt{private mutable}
+
+\subsection{Polymorphic Equality}
+
+No polymorphic equality in programs. Consequence : no List.mem in
+programs, need for List.mem, List.filter, parameterized with a
+predicate.
+
+No default equality on algebraic datatypes
 
 \section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 

@@ -49,7 +49,7 @@ theory IntPathWeight
   use import list.List
   use import list.Append
 
-  function weight vertex vertex : int
+  val function weight vertex vertex : int
 
   function path_weight (l: list vertex) (dst: vertex) : int = match l with
     | Nil -> 0

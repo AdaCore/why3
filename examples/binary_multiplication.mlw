@@ -1,8 +1,8 @@
 
 module BinaryMultiplication
 
-  use import mach.int.Int
-  use import number.Parity
+  use import int.Int
+  use import int.ComputerDivision
   use import ref.Ref
 
   let binary_mult (a b: int)
@@ -15,11 +15,10 @@ module BinaryMultiplication
       invariant { 0 <= !y }
       invariant { !z + !x * !y = a * b }
       variant   { !y }
-      if odd !y then z := !z + !x;
+      if mod !y 2 <> 0 then z := !z + !x;
       x := 2 * !x;
-      y := !y / 2
+      y := div !y 2
     done;
     !z
 
 end
-

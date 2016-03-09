@@ -8,7 +8,6 @@ module VM_instr_spec
   use import list.Length
   use import vm.Vm
   use import state.State
-  use import HighOrd
   use import logic.Compiler_logic
 
   function ifun_post (f:machine_state -> machine_state) : post 'a =
@@ -218,4 +217,3 @@ module VM_instr_spec
     hoare isetvar_pre c (isetvar_post x)
 
 end
-

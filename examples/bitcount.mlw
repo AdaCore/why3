@@ -253,7 +253,6 @@ module Hamming
   use import int.NumOf
   use import mach.bv.BVCheck32
   use import BitCounting32
-  use import HighOrd as HO
 
   predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
 
@@ -276,7 +275,7 @@ module Hamming
   =
     assert { hammingD_logic a b = 0 -> eq_sub a b 0 32 }
 
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  function fun_or (f g : 'a -> bool) : 'a -> bool = fun x -> f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     variant {b - a}
@@ -337,9 +336,7 @@ module AsciiCode
 
   (* use Numofbit *)
 
-  use HighOrd as HO
-
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  function fun_or (f g : 'a -> bool) : 'a -> bool = fun x -> f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     requires { forall i. a <= i < b -> not (p i) \/ not (q i) }
@@ -369,7 +366,7 @@ module AsciiCode
     ensures  { eq_sub_bv result b zeros lastbit }
     ensures  { validAscii result }
     let c = count b in
-    let maskbit = lsl_check c lastbit in
+    let maskbit = lsl_check c (of_int 31) in
     assert { bw_and b maskbit = zeros };
     assert { even (to_uint c) ->
                not (nth_bv c zeros)

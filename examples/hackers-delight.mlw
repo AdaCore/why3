@@ -102,8 +102,6 @@ module Utils_Spec
 
   (** {6 hammingD correctness } *)
 
-  use HighOrd as HO
-
   predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
 
   (** The correctness property can be express as the following: *)

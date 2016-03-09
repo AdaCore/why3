@@ -28,6 +28,26 @@ theory Length
 
 end
 
+(** {2 Quantifiers on lists} *)
+
+module Quant
+
+  use import List
+
+  let rec function for_all (p: 'a -> bool) (l:list 'a) : bool =
+    match l with
+    | Nil -> true
+    | Cons x r -> p x && for_all p r
+    end
+
+  let rec function for_some (p: 'a -> bool) (l:list 'a) : bool =
+    match l with
+    | Nil -> true
+    | Cons x r -> p x || for_some p r
+    end
+
+end
+
 (** {2 Membership in a list} *)
 
 theory Mem
@@ -517,6 +537,8 @@ theory Sum
 
 end
 
+(* TODO: redesign these modules using higher-order instead
+
 (** {2 Induction on lists} *)
 
 theory Induction
@@ -585,6 +607,7 @@ theory FoldRight
     end
 
 end
+*)
 
 (** {2 Importation of all list theories in one} *)
 
