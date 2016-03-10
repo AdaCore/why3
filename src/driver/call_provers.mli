@@ -159,6 +159,7 @@ val call_on_file :
 val call_on_buffer :
   command         : string ->
   limit           : resource_limit ->
+  res_parser      : prover_result_parser ->
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
