@@ -8,13 +8,13 @@ theory Map
 
   type map 'a 'b = 'a -> 'b
 
-  function get (f: map 'a 'b) (x: 'a) : 'b = f x
+  let function get (f: map 'a 'b) (x: 'a) : 'b = f x
 
   function set (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b =
     fun y -> if y = x then v else f y
 
   (** syntactic sugar *)
-  function ([])   (f: map 'a 'b) (x: 'a) : 'b = f x
+  let function ([]) (f: map 'a 'b) (x: 'a) : 'b = f x
   function ([<-]) (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b = set f x v
 
 end
@@ -23,7 +23,7 @@ theory Const
 
   use import Map
 
-  function const (v: 'b) : map 'a 'b = fun _ -> v
+  let function const (v: 'b) : map 'a 'b = fun _ -> v
 
 end
 
