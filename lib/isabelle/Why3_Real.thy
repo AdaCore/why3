@@ -181,9 +181,9 @@ subsection {* Rounding towards zero *}
 
 why3_vc Real_of_truncate
   using floor_correct [of x] ceiling_correct [of x]
-  by (simp_all add: truncate_def)
+  by (simp_all add: truncate_def del: of_int_floor_le le_of_int_ceiling)
 
-why3_vc Truncate_int by (simp add:truncate_def)
+why3_vc Truncate_int by (simp add: truncate_def)
 
 why3_vc Truncate_up_neg
   using assms ceiling_correct [of x]
@@ -298,6 +298,9 @@ section {* Power of a real to a real exponent *}
 (* TODO: no power to a real exponent in Isabelle? *)
 
 section {* Trigonometric Functions *}
+
+abbreviation (input)
+  "why3_divide \<equiv> divide"
 
 why3_open "real/Trigonometry.xml"
   constants

@@ -363,13 +363,19 @@ let iconname_reload = ref ""
 let iconname_remove = ref ""
 let iconname_cleaning = ref ""
 
-let iconsets () =
+let iconsets () : (string * Why3.Rc.family) =
   let main = get_main () in
   let dir = Filename.concat (datadir main) "images" in
-  let n = Filename.concat dir "icons.rc"
-  in
-  let d = Rc.from_file n in
-  (dir, Rc.get_family d "iconset")
+  let files = Sys.readdir dir in
+  let f = ref [] in
+  Array.iter
+    (fun fn ->
+       if Filename.check_suffix fn ".rc" then
+         let n = Filename.concat dir fn in
+         let d = Rc.from_file n in
+         f := List.rev_append (Rc.get_family d "iconset") !f)
+    files;
+  (dir, !f)
 
 let load_icon_names () =
   let ide = config () in

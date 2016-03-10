@@ -27,7 +27,7 @@
   *)
 
 type instruction =
-  | Icall_prover of Whyconf.prover * int * int * int (** timelimit, steplimi, memlimit *)
+  | Icall_prover of Whyconf.prover * int * int (** timelimit, memlimit *)
   | Itransform of string * int (** successor state on success *)
   | Igoto of int (** goto state *)
 

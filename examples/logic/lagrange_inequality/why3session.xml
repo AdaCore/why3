@@ -2,70 +2,53 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="3" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.4pl6" timelimit="5" memlimit="4000"/>
-<prover id="4" name="MetiTarski" version="2.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="6" name="MetiTarski" version="2.4" timelimit="5" memlimit="1000"/>
-<prover id="8" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="9" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="10" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="11" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
-<prover id="12" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="3" steplimit="1" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="6" name="MetiTarski" version="2.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="11" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../lagrange_inequality.why" expanded="true">
 <theory name="LagrangeInequality" sum="5e115a67d12d3b9e0cb091836baf8f27" expanded="true">
  <goal name="norm2_pos">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Lagrange">
  <proof prover="6"><result status="valid" time="0.01"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
 <theory name="CauchySchwarzInequality" sum="6fcd96c715b7475a71d99c0f82d79af4" expanded="true">
  <goal name="CauchySchwarz_aux">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.01"/></proof>
- <proof prover="12"><result status="valid" time="2.49"/></proof>
  </goal>
  <goal name="norm_pos">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
- <proof prover="12"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="sqr_le_sqrt">
- <proof prover="3" edited="lagrange_inequality_CauchySchwarzInequality_sqr_le_sqrt_1.v"><result status="valid" time="1.53"/></proof>
- <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="3" edited="lagrange_inequality_CauchySchwarzInequality_sqr_le_sqrt_1.v"><result status="valid" time="1.57"/></proof>
  <proof prover="6"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="CauchySchwarz">
- <proof prover="3" edited="lagrange_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="1.36"/></proof>
+ <proof prover="3" edited="lagrange_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="1.27"/></proof>
  </goal>
 </theory>
 <theory name="TriangleInequality" sum="c1ce71fbadfa600580a354699d029b51" expanded="true">
  <goal name="triangle_aux">
- <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="9"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="sqr_sqrt_le">
  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.05"/></proof>
  <proof prover="6"><result status="valid" time="0.06"/></proof>
- <proof prover="10"><result status="valid" time="0.05" steps="11"/></proof>
  </goal>
  <goal name="triangle">
- <proof prover="3" memlimit="1000" edited="lagrange_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="0.91"/></proof>
+ <proof prover="3" memlimit="1000" edited="lagrange_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="0.92"/></proof>
  </goal>
 </theory>
 </file>

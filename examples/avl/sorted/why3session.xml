@@ -2,33 +2,33 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../sorted.mlw">
 <theory name="Increasing" sum="33bff6ba91e99a4e930bd71eb88f6a0e">
  <goal name="smaller_lower_bound">
- <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
  </goal>
  <goal name="bigger_upper_bound">
- <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter increasing_precede" expl="VC for increasing_precede">
  <transf name="split_goal_wp">
   <goal name="WP_parameter increasing_precede.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter increasing_precede.2" expl="2. variant decrease">
-  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter increasing_precede.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.53" steps="425"/></proof>
+  <proof prover="1"><result status="valid" time="0.53" steps="381"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter increasing_midpoint" expl="VC for increasing_midpoint">
- <proof prover="0"><result status="valid" time="0.26" steps="168"/></proof>
+ <proof prover="1"><result status="valid" time="0.26" steps="128"/></proof>
  </goal>
  <goal name="WP_parameter increasing_snoc" expl="VC for increasing_snoc">
- <proof prover="0"><result status="valid" time="0.03" steps="47"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="25"/></proof>
  </goal>
 </theory>
 </file>

@@ -92,9 +92,9 @@ let add_proofs_attempts g =
           ~keygen:dummy_keygen
           ~obsolete:true
           ~archived:false
-          ~timelimit:5
-	  ~steplimit:(-1)
-          ~memlimit:1000
+          ~limit:{Call_provers.limit_time = Some 5;
+                               limit_steps = None;
+                               limit_mem = Some 1000 }
           ~edit:None
           g p.Whyconf.prover Session.Scheduled
       in ())

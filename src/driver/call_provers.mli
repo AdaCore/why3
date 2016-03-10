@@ -91,46 +91,8 @@ type prover_result_parser = {
   (* The parser for a model returned by the solver. *)
   prp_model_parser : Model_parser.model_parser;
 }
-
-(** {2 Functions for calling external provers} *)
-type prover_call
-(** Type that represents a single prover run *)
-
-type pre_prover_call = unit -> prover_call
-(** Thread-safe closure that launches the prover *)
-
-type post_prover_call = unit -> prover_result
-(** Thread-unsafe closure that interprets the prover's results *)
-
-val call_on_file :
-  command     : string ->
-  ?timelimit  : int ->
-  ?memlimit   : int ->
-  ?steplimit  : int ->
-  res_parser  : prover_result_parser ->
-  printer_mapping : Printer.printer_mapping ->
-  ?cleanup    : bool ->
-  ?inplace    : bool ->
-  ?redirect   : bool ->
-  string -> pre_prover_call
-
-val call_on_buffer :
-  command     : string ->
-  ?timelimit  : int ->
-  ?memlimit   : int ->
-  ?steplimit  : int ->
-  res_parser  : prover_result_parser ->
-  filename    : string ->
-  printer_mapping : Printer.printer_mapping ->
-  ?inplace    : bool ->
-  Buffer.t -> pre_prover_call
-(** Call a prover on the task printed in the {!type: Buffer.t} given.
-
-    @param timelimit : set the available time limit (def. 0 : unlimited)
-    @param memlimit : set the available memory limit (def. 0 : unlimited)
-    @param steplimit : set the available step limit (def. -1 : unlimited)
-
-    @param regexps : if the first field matches the prover output,
+(*
+    if the first field matches the prover output,
     the second field is the answer. Regexp groups present in
     the first field are substituted in the second field (\0,\1,...).
     The regexps are tested in the order of the list.
@@ -144,6 +106,71 @@ val call_on_buffer :
     @param exitcodes : if the first field is the exit code, then
     the second field is the answer. Exit codes are tested in the order
     of the list and before the regexps.
+*)
+
+(** {2 Functions for calling external provers} *)
+type prover_call
+(** Type that represents a single prover run *)
+
+type pre_prover_call = unit -> prover_call
+(** Thread-safe closure that launches the prover *)
+
+type post_prover_call = unit -> prover_result
+(** Thread-unsafe closure that interprets the prover's results *)
+
+type resource_limit =
+  {
+    limit_time  : int option;
+    limit_mem   : int option;
+    limit_steps : int option;
+  }
+(* represents the three ways a prover run can be limited: in time, memory
+   and/or steps *)
+
+val empty_limit : resource_limit
+(* the limit object which imposes no limits *)
+
+val limit_max : resource_limit -> resource_limit -> resource_limit
+(* return the limit object whose components represent the maximum of the
+   corresponding components of the arguments *)
+
+val get_time : resource_limit -> int
+(* return time, return default value 0 if not set *)
+val get_mem : resource_limit -> int
+(* return time, return default value 0 if not set *)
+val get_steps : resource_limit -> int
+(* return time, return default value (-1) if not set *)
+
+val mk_limit : int -> int -> int -> resource_limit
+(* build a limit object, transforming the default values into None on the fly
+   *)
+
+val call_on_file :
+  command         : string ->
+  limit           : resource_limit ->
+  res_parser      : prover_result_parser ->
+  printer_mapping : Printer.printer_mapping ->
+  ?cleanup        : bool ->
+  ?inplace        : bool ->
+  ?interactive    : bool ->
+  ?redirect       : bool ->
+  string -> pre_prover_call
+
+val call_on_buffer :
+  command         : string ->
+  limit           : resource_limit ->
+  res_parser      : prover_result_parser ->
+  filename        : string ->
+  printer_mapping : Printer.printer_mapping ->
+  ?inplace        : bool ->
+  ?interactive    : bool ->
+  Buffer.t -> pre_prover_call
+(** Call a prover on the task printed in the {!type: Buffer.t} given.
+
+    @param limit : set the available time limit (def. 0 : unlimited), memory
+    limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)
+
+    @param res_parser : prover result parser
 
     @param filename : the suffix of the proof task's file, if the prover
     doesn't accept stdin. *)
@@ -169,11 +196,10 @@ type server_id = int
 val prove_file_server :
           res_parser : prover_result_parser ->
           command : string ->
-          timelimit : int ->
-          memlimit : int ->
-          steplimit : int ->
+          limit : resource_limit ->
           printer_mapping : Printer.printer_mapping ->
           ?inplace : bool ->
+          ?interactive : bool ->
           string -> server_id
 
 val wait_for_server_result : unit -> (server_id * prover_result) list

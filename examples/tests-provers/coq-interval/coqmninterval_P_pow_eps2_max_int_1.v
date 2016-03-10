@@ -8,7 +8,7 @@ Require real.RealInfix.
 Require int.Int.
 Require real.PowerInt.
 
-Require Import Interval_tactic.
+Require Import Interval.Interval_tactic.
 
 (* Why3 goal *)
 Theorem pow_eps2_max_int : ((Reals.Rfunctions.powerRZ (1%R + ((7 / 1125899906842624)%R + (3 / 9007199254740992)%R)%R)%R 2147483647%Z) <= 2%R)%R.

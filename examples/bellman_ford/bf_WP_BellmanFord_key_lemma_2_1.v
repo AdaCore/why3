@@ -350,8 +350,8 @@ Definition inv2 (m:(map.Map.map vertex t)) (via:(set (vertex*
   (le (map.Map.get m v) (add1 (map.Map.get m u) (Finite (weight u v)))).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 60.
-Ltac Z3 := why3 "z3" timelimit 10.
+Ltac ae := why3 "alt-ergo" timelimit 60; admit.
+Ltac Z3 := why3 "z3" timelimit 10; admit.
 
 Require Import list.Length.
 
@@ -400,5 +400,5 @@ unfold le, add1; destruct (Map.get m v) as [] _eqn.
 ae.
 absurd (Map.get m v = Infinite); auto.
 ae.
-Qed.
+Admitted.
 

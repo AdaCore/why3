@@ -5,6 +5,13 @@ module M
 
   type int_type = Integer int
 
+  goal G : forall x "model" : int_type. match x with Integer y -> y > 0 end
+
+  let test_post (x "model" "model_trace:x" : int) (y "model" "model_trace:y" : ref int): unit
+    ensures { "model_vc_post" old !y >= x }
+      =
+      y := x - 1 + !y
+
   (**********************************************************
    ** Getting counterexamples for terms of primitive types **
    **********************************************************)
@@ -19,11 +26,11 @@ module M
   x23 := !x23 + 1
 
   let test_loop ( x "model" "model_trace:x" : ref int ): unit
-  ensures { !x < old !x }
+  ensures { "model_vc_post" !x < old !x }
   =
-  incr x;
-  while "model" "model_trace:cond" !x > 0 do
-  invariant { !x >= 0 }
+  'L: incr x;
+  'M: while !x > 0 do
+  invariant { "model_vc" !x > at !x 'L + at !x 'M }
   variant { !x }
     x := !x - 1
   done

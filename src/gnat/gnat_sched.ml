@@ -32,20 +32,18 @@ let run_goal entry =
   let prover = entry.prover in
   let base_prover = prover.Gnat_config.prover in
   let driver = prover.Gnat_config.driver in
-  let old, inplace, timeout =
+  let old, inplace, limit =
     match (base_prover.Whyconf.interactive,
            Session.PHprover.find_opt g.Session.goal_external_proofs
                                      base_prover.Whyconf.prover) with
     | true, Some { Session.proof_edited_as = Some fn } ->
-       Some fn, Some true, 0
-    | _ -> None, None, Gnat_config.timeout in
-  let steplimit = Gnat_config.steps ~prover:base_prover.Whyconf.prover.Whyconf.prover_name in
+       Some fn, Some true, Call_provers.empty_limit
+    | _ -> None, None, Gnat_config.limit ~prover:base_prover.Whyconf.prover.Whyconf.prover_name in
   Driver.prove_task_server
-    (Whyconf.get_complete_command base_prover steplimit)
+    (Whyconf.get_complete_command base_prover
+    ~with_steps:(limit.Call_provers.limit_steps <> None))
     ~cntexample:entry.cntexample
-    ~timelimit:timeout
-    ~memlimit:0
-    ~steplimit
+    ~limit
     ?old:old ?inplace:inplace
     driver
     (Session.goal_task g)
@@ -97,9 +95,7 @@ let handle_finished_call callback entry res =
          ~keygen:Keygen.keygen
          ~obsolete:false
          ~archived:false
-         ~timelimit:Gnat_config.timeout
-	 ~steplimit:(Gnat_config.steps ~prover:prover.Whyconf.prover_name)
-         ~memlimit:0
+	 ~limit:(Gnat_config.limit ~prover:prover.Whyconf.prover_name)
          ~edit
          g
          prover

@@ -38,12 +38,11 @@ val file_of_theory : driver -> string -> Theory.theory -> string
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
 val call_on_buffer :
-  command    : string ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  ?steplimit : int ->
-  ?inplace   : bool ->
-  filename   : string ->
+  command      : string ->
+  limit        : Call_provers.resource_limit ->
+  ?inplace     : bool ->
+  ?interactive : bool ->
+  filename     : string ->
   printer_mapping : Printer.printer_mapping ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
 
@@ -59,13 +58,12 @@ val print_theory :
   (** produce a realization of the given theory using the given driver *)
 
 val prove_task :
-  command    : string ->
-  ?cntexample : bool ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  ?steplimit : int ->
-  ?old       : string ->
-  ?inplace   : bool ->
+  command      : string ->
+  limit        : Call_provers.resource_limit ->
+  ?cntexample  : bool ->
+  ?old         : string ->
+  ?inplace     : bool ->
+  ?interactive : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
 
 (** Split the previous function in two simpler functions *)
@@ -75,18 +73,18 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
-val prove_task_server : string -> cntexample:bool -> timelimit:int -> memlimit:int ->
-                        steplimit:int ->
+val prove_task_server : string ->
+                        limit : Call_provers.resource_limit ->
+                        cntexample:bool ->
                         ?old:string -> ?inplace:bool -> driver -> Task.task ->
                         Call_provers.server_id
 
 val prove_task_prepared :
-  command    : string ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  ?steplimit : int ->
-  ?old       : string ->
-  ?inplace   : bool ->
+  command      : string ->
+  limit        : Call_provers.resource_limit ->
+  ?old         : string ->
+  ?inplace     : bool ->
+  ?interactive : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
 
 

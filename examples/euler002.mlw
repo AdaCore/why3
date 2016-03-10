@@ -41,14 +41,17 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
 
 end
 
-theory FibOnlyEven
+module FibOnlyEven
 
   use import int.Int
   use import int.ComputerDivision
   use import int.Fibonacci
 
-  lemma fib_even_3n : forall n:int. n >= 0 ->
-    mod (fib n) 2 = 0 <-> mod n 3 = 0
+  let rec lemma fib_even_3n (n:int)
+    requires { n >= 0 }
+    variant { n }
+    ensures { mod (fib n) 2 = 0 <-> mod n 3 = 0 }
+  = if n > 2 then fib_even_3n (n-3)
 
   function fib_even (n: int) : int = fib (3 * n)
 

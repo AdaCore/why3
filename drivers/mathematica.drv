@@ -10,8 +10,8 @@ valid "\\bTrue\\b"
 unknown "\\bFalse\\b" "\\bFalse\\b"
 time "why3cpulimit time : %s s"
 
-(*transformation "inline_trivial"*)
-(*transformation "inline_all"*)
+transformation "inline_trivial"
+transformation "inline_all"
 
 transformation "eliminate_builtin"
 (*transformation "eliminate_definition"*)
@@ -79,6 +79,7 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop CompatOrderMult
   remove prop ZeroLessOne
 
   meta "encoding : kept" type int
@@ -148,6 +149,14 @@ theory real.Real
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
+
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+  remove prop CompatOrderMult
 
   (*meta "encoding : kept" type real*)
 end
@@ -232,6 +241,22 @@ theory real.FromInt
   remove prop Mul
   remove prop Neg
 
+end
+
+
+theory Bool
+   syntax type     bool  "Bool"
+   syntax function True  "True"
+   syntax function False "False"
+   meta "encoding : kept" type bool
+end
+
+theory bool.Bool
+   syntax function andb  "(%1 && %2)"
+   syntax function orb   "(%1 || %2)"
+   syntax function xorb  "Xor[%1, %2]"
+   syntax function notb  "(! %1)"
+   syntax function implb "Implies[%1, %2]"
 end
 
 

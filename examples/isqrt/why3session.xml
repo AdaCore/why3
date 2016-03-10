@@ -2,166 +2,112 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
-<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="6" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
-<prover id="7" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="8" name="Z3" version="4.3.2" timelimit="5" memlimit="0"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="7" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="4000"/>
 <file name="../isqrt.mlw" expanded="true">
-<theory name="Square" sum="cc4289accaabbdc40efcd836055c6241" expanded="true">
+<theory name="Square" sum="9d10f7a99e3dc8b97241d913352efc97">
+ <goal name="sqr_non_neg">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
  <goal name="sqr_increasing">
- <proof prover="6" memlimit="1000"><result status="valid" time="0.17"/></proof>
- <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="sqr_sum">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="Simple" sum="e86e6a3432e7d148b0201a205c4c5e85" expanded="true">
+<theory name="Simple" sum="b9231cbba4db342a3e2006fe92f14e06">
  <goal name="WP_parameter isqrt" expl="VC for isqrt">
- <proof prover="6" timelimit="2"><result status="valid" time="0.02"/></proof>
- <proof prover="8" timelimit="2"><result status="valid" time="0.01"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter isqrt.1" expl="1. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter isqrt.2" expl="2. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter isqrt.3" expl="3. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter isqrt.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="WP_parameter main" expl="VC for main">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
- <proof prover="8" timelimit="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="NewtonMethod" sum="5594ef5fe359fe5a9a25d101ccd870d4" expanded="true">
+<theory name="NewtonMethod" sum="963cc5da969d37ed9834dacc348651ec">
  <goal name="WP_parameter sqrt" expl="VC for sqrt">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sqrt.1" expl="1. postcondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="6"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.2" expl="2. postcondition">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.02" steps="7"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.3" expl="3. loop invariant init">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.4" expl="4. loop invariant init">
-  <proof prover="5"><result status="valid" time="0.01" steps="3"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.5" expl="5. loop invariant init">
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.6" expl="6. loop invariant init">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter sqrt.6.1" expl="1. loop invariant init">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.7" expl="7. loop invariant init">
-  <proof prover="5"><result status="valid" time="0.13" steps="22"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.8" expl="8. assertion">
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.32"/></proof>
-  <proof prover="7"><result status="valid" time="0.06"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.9" expl="9. assertion">
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.33"/></proof>
-  <proof prover="7"><result status="valid" time="0.04"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.10" expl="10. assertion">
-  <proof prover="5"><result status="valid" time="0.21" steps="20"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="7"><result status="valid" time="0.03"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.11" expl="11. assertion">
-  <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="7"><result status="valid" time="0.06"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.12" expl="12. assertion">
+  <proof prover="0"><result status="valid" time="0.06" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.13" expl="13. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.09" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.14" expl="14. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.15" expl="15. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.16" expl="16. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.17" expl="17. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.18" expl="18. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.19" expl="19. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter sqrt.12.1" expl="1. VC for sqrt">
-   <proof prover="5"><result status="valid" time="0.01" steps="83"/></proof>
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="7"><result status="valid" time="0.03"/></proof>
-   <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   <goal name="WP_parameter sqrt.19.1" expl="1. VC for sqrt">
+   <proof prover="7" steplimit="-1"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter sqrt.12.2" expl="2. VC for sqrt">
-   <proof prover="5"><result status="valid" time="0.03" steps="15"/></proof>
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="7"><result status="valid" time="0.05"/></proof>
-   <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="WP_parameter sqrt.12.3" expl="3. VC for sqrt">
-   <proof prover="5"><result status="valid" time="0.01" steps="15"/></proof>
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   <proof prover="7"><result status="valid" time="0.06"/></proof>
-   <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter sqrt.12.4" expl="4. VC for sqrt">
-   <proof prover="5"><result status="valid" time="0.03" steps="45"/></proof>
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="7"><result status="valid" time="0.04"/></proof>
-   <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="WP_parameter sqrt.12.5" expl="5. VC for sqrt">
-   <proof prover="6" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter sqrt.19.2" expl="2. VC for sqrt">
+   <proof prover="0" steplimit="-1"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter sqrt.13" expl="13. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.05" steps="22"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.08"/></proof>
-  <proof prover="7"><result status="valid" time="0.05"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.09"/></proof>
-  </goal>
-  <goal name="WP_parameter sqrt.14" expl="14. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter sqrt.20" expl="20. postcondition">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter sqrt.15" expl="15. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter sqrt.16" expl="16. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="7"><result status="valid" time="0.07"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter sqrt.17" expl="17. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  <proof prover="7"><result status="valid" time="0.07"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter sqrt.18" expl="18. loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.00" steps="20"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter sqrt.19" expl="19. postcondition">
-  <proof prover="4"><result status="valid" time="0.23"/></proof>
   </goal>
  </transf>
  </goal>

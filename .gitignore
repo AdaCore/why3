@@ -20,6 +20,7 @@ why3.conf
 *.vo
 *.vd
 *.glob
+.*.aux
 *.elc
 *.summary
 \#*\#
@@ -151,6 +152,9 @@ why3.conf
 /src/coq-tactic/why3tac.ml
 /src/coq-tactic/.why3-vo-*
 
+# Coq
+/lib/coq/bv/BV_Gen.v
+
 # PVS
 .pvscontext
 orphaned-proofs.prf
@@ -165,8 +169,7 @@ pvsbin/
 /lib/isabelle/map/
 /lib/isabelle/real/
 /lib/isabelle/set/
-/lib/isabelle/Tools/why3
-/lib/isabelle/Why3_Number.thy
+/lib/isabelle/Why3_BV.thy
 /lib/isabelle/why3.ML
 /lib/isabelle/last_build
 /lib/isabelle/bv

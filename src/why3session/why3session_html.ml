@@ -134,10 +134,10 @@ let print_results fmt provers proofs =
                   fprintf fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
                   fprintf fmt "FF8000\">Timeout (%ds)"
-                    pr.S.proof_timelimit
+                    (Call_provers.get_time pr.S.proof_limit)
 		| Call_provers.OutOfMemory ->
                   fprintf fmt "FF8000\">Out Of Memory (%dM)"
-                    pr.S.proof_memlimit
+                    (Call_provers.get_time pr.S.proof_limit)
 		| Call_provers.StepLimitExceeded ->
                   fprintf fmt "FF8000\">Step limit exceeded"
 		| Call_provers.Unknown _ ->

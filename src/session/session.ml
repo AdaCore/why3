@@ -157,9 +157,7 @@ and 'a proof_attempt =
     mutable proof_prover : Whyconf.prover;
     proof_parent : 'a goal;
     mutable proof_state : proof_attempt_status;
-    mutable proof_timelimit : int;
-    mutable proof_steplimit : int;
-    mutable proof_memlimit : int;
+    mutable proof_limit : Call_provers.resource_limit;
     mutable proof_obsolete : bool;
     mutable proof_archived : bool;
     mutable proof_edited_as : string option;
@@ -498,21 +496,15 @@ let get_used_provers_with_stats session =
           PHprover.add prover_table prover x;
           x
       in
-      let tf =
-        try Hashtbl.find timelimits pa.proof_timelimit
-        with Not_found -> 0
-      in
-      let sf =
-	try Hashtbl.find steplimits pa.proof_steplimit
-	with Not_found -> 0
-      in
-      let mf =
-        try Hashtbl.find memlimits pa.proof_timelimit
-        with Not_found -> 0
-      in
-      Hashtbl.replace timelimits pa.proof_timelimit (tf+1);
-      Hashtbl.replace steplimits pa.proof_steplimit (sf+1);
-      Hashtbl.replace memlimits pa.proof_memlimit (mf+1))
+      let lim_time = Call_provers.get_time pa.proof_limit in
+      let lim_mem = Call_provers.get_mem pa.proof_limit in
+      let lim_steps = Call_provers.get_steps pa.proof_limit in
+      let tf = try Hashtbl.find timelimits lim_time with Not_found -> 0 in
+      let sf = try Hashtbl.find steplimits lim_steps with Not_found -> 0 in
+      let mf = try Hashtbl.find memlimits lim_mem with Not_found -> 0 in
+      Hashtbl.replace timelimits lim_time (tf+1);
+      Hashtbl.replace steplimits lim_mem (sf+1);
+      Hashtbl.replace memlimits lim_steps (mf+1))
     session;
   prover_table
 
@@ -588,9 +580,9 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
     "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a%a>"
     id
-    (save_int_def "timelimit" tl) a.proof_timelimit
-    (save_int_def "steplimit" sl) a.proof_steplimit
-    (save_int_def "memlimit" ml) a.proof_memlimit
+    (save_int_def "timelimit" tl) (Call_provers.get_time a.proof_limit)
+    (save_int_def "steplimit" sl) (Call_provers.get_steps a.proof_limit)
+    (save_int_def "memlimit" ml) (Call_provers.get_mem a.proof_limit)
     (opt_string "edited") a.proof_edited_as
     (save_bool_def "obsolete" false) a.proof_obsolete
     (save_bool_def "archived" false) a.proof_archived;
@@ -795,13 +787,18 @@ let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
 
 
 let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
+  let steplimit =
+    if mostfrequent_steplimit < 0 then None else Some mostfrequent_steplimit
+  in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
-               version=\"%a\"%a@ timelimit=\"%d\"@ steplimit=\"%d\"@ memlimit=\"%d\"/>@]"
+               version=\"%a\"%a@ timelimit=\"%d\"%a@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
     p.C.prover_altern
-    mostfrequent_timelimit mostfrequent_steplimit mostfrequent_memlimit
+    mostfrequent_timelimit
+    (opt pp_print_int "steplimit") steplimit
+    mostfrequent_memlimit
 
 let save fname shfname _config session =
   let ch = open_out fname in
@@ -949,7 +946,7 @@ type 'a keygen = ?parent:'a -> unit -> 'a
 let add_external_proof
     ?(notify=notify)
     ~(keygen:'a keygen) ~obsolete
-    ~archived ~timelimit ~steplimit ~memlimit ~edit (g:'a goal) p result =
+    ~archived ~limit ~edit (g:'a goal) p result =
   assert (edit <> Some "");
   let key = keygen ~parent:g.goal_key () in
   let a = { proof_prover = p;
@@ -958,9 +955,7 @@ let add_external_proof
             proof_obsolete = obsolete;
             proof_archived = archived;
             proof_state = result;
-            proof_timelimit = timelimit;
-	    proof_steplimit = steplimit;
-            proof_memlimit = memlimit;
+            proof_limit = limit;
             proof_edited_as = edit;
           }
   in
@@ -990,8 +985,12 @@ let change_prover a p =
 
 let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 
-let set_timelimit timelimit a = a.proof_timelimit <- timelimit
-let set_memlimit memlimit a = a.proof_memlimit <- memlimit
+let set_timelimit timelimit a =
+  a.proof_limit <-
+    { a.proof_limit with Call_provers.limit_time = Some timelimit}
+let set_memlimit memlimit a =
+  a.proof_limit <-
+    { a.proof_limit with Call_provers.limit_mem = Some memlimit}
 
 let set_obsolete ?(notify=notify) a =
   a.proof_obsolete <- true;
@@ -1294,6 +1293,7 @@ and load_proof_or_transf ctxt mg a =
           let timelimit = int_attribute_def "timelimit" a timelimit in
 	  let steplimit = int_attribute_def "steplimit" a steplimit in
           let memlimit = int_attribute_def "memlimit" a memlimit in
+          let limit = Call_provers.mk_limit timelimit memlimit steplimit in
         (*
           if timelimit < 0 then begin
           eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
@@ -1304,7 +1304,7 @@ and load_proof_or_transf ctxt mg a =
         *)
           let (_ : 'a proof_attempt) =
             add_external_proof ~keygen:ctxt.keygen ~archived ~obsolete
-              ~timelimit ~steplimit ~memlimit ~edit mg p res
+              ~limit ~edit mg p res
           in
           ()
         with Failure _ | Not_found ->
@@ -1926,16 +1926,14 @@ let ft_of_pa a =
     But since it will be perhaps removed...
  *)
 let copy_external_proof
-    ?notify ~keygen ?obsolete ?archived ?timelimit ?steplimit ?memlimit ?edit
+    ?notify ~keygen ?obsolete ?archived ?limit ?edit
     ?goal ?prover ?attempt_status ?env_session ?session a =
   let session = match env_session with
     | Some eS -> Some eS.session
     | _ -> session in
   let obsolete = Opt.get_def a.proof_obsolete obsolete in
   let archived = Opt.get_def a.proof_archived archived in
-  let timelimit = Opt.get_def a.proof_timelimit timelimit in
-  let steplimit = Opt.get_def a.proof_steplimit steplimit in
-  let memlimit = Opt.get_def a.proof_memlimit memlimit in
+  let limit = Opt.get_def a.proof_limit limit in
   let pas = Opt.get_def a.proof_state attempt_status in
   let ngoal = Opt.get_def a.proof_parent goal in
   let nprover = match prover with
@@ -1982,7 +1980,7 @@ let copy_external_proof
             Some (dst_file)
   in
   add_external_proof ?notify ~keygen
-    ~obsolete ~archived ~timelimit ~steplimit ~memlimit ~edit ngoal nprover pas
+    ~obsolete ~archived ~limit ~edit ngoal nprover pas
 
 exception UnloadableProver of Whyconf.prover
 
@@ -2042,7 +2040,9 @@ let print_external_proof fmt p =
   fprintf fmt "%a - %a (%i, %i, %i)%s%s%s"
     Whyconf.print_prover p.proof_prover
     print_attempt_status p.proof_state
-    p.proof_timelimit p.proof_steplimit p.proof_memlimit
+    (Call_provers.get_time p.proof_limit)
+    (Call_provers.get_steps p.proof_limit)
+    (Call_provers.get_mem p.proof_limit)
     (if p.proof_obsolete then " obsolete" else "")
     (if p.proof_archived then " archived" else "")
     (if p.proof_edited_as <> None then " edited" else "")
@@ -2077,9 +2077,7 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
     (add_external_proof ~keygen
        ~obsolete
        ~archived:from_proof.proof_archived
-       ~timelimit:from_proof.proof_timelimit
-       ~steplimit:from_proof.proof_steplimit
-       ~memlimit:from_proof.proof_memlimit
+       ~limit:from_proof.proof_limit
        ~edit:from_proof.proof_edited_as
        to_goal
        from_proof.proof_prover

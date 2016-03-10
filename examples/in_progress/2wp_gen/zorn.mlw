@@ -1,0 +1,186 @@
+
+(* Zorn's lemma: any chain-bounded (not even complete)
+   order has a maximal element. *)
+module Zorn "W:non_conservative_extension:N"
+
+  use import order.Order
+  use import order.Chain
+
+  (* Proof in ZornProof module. *)
+  axiom zorn_lemma : forall o:'a -> 'a -> bool.
+    preorder o /\ chain_bounded o -> exists y. maximal o y
+
+end
+
+module ZornProof
+
+  use import choice.Choice
+  use import order.Order
+  use import order.Chain
+  use import order.Mono
+  use import transfinite.Iterates
+  use import transfinite.ChainExtension
+
+  predicate strict_upper_bound (o:'a -> 'a -> bool) (s:'a -> bool) (x:'a) =
+    upper_bound o s x /\ not s x
+
+  function choose_ub (o:'a -> 'a -> bool) (s:'a -> bool) : 'a =
+    let u = choice (strict_upper_bound o s) in
+    if upper_bound o s u then u else choice (upper_bound o s)
+
+  lemma choose_ub_builder : forall o:'a -> 'a -> bool.
+    chain_bounded o -> ub_builder o (choose_ub o)
+
+  constant none : 'a -> bool = \_.false
+
+  lemma zorn_proof : forall o:'a -> 'a -> bool.
+    preorder o /\ chain_bounded o ->
+      let ext = extends_ch o (choose_ub o) in
+      let sub = subchain o in
+      let fix = fixpoint_above sub ext none in
+      let witness = choose_ub o fix in
+      exists y. maximal o y by y = witness
+        so maximum (subchain o) (tr_reach sub ext none) fix
+        so chain o fix so fix witness
+        so forall x. o witness x -> o x witness
+          by not strict_upper_bound o fix x
+
+  clone Zorn with goal zorn_lemma
+
+end
+
+(* Consequence of Zorn's lemma: well-ordering theorem. *)
+module WellOrder "W:non_conservative_extension:N"
+
+  use import order.Wf
+
+  predicate well_order_witness (x y:'a)
+
+  axiom well_order_exists : well_order (well_order_witness:'a -> 'a -> bool)
+
+end
+
+module WellOrderProof
+
+  use import order.Order
+  use import order.Chain
+  use import order.Wf
+  use import choice.Choice
+  use import Zorn
+
+  type t 'a = {
+    domain : 'a -> bool;
+    ordering : 'a -> 'a -> bool;
+  }
+
+  predicate subset (a b:'a -> bool) = forall x. a x -> b x
+
+  predicate well_ordered (a:t 'a) =
+    reflexive a.ordering /\
+    transitive a.ordering /\
+    (forall x y. a.domain x /\ a.domain y /\
+                 a.ordering x y /\ a.ordering y x -> x = y) /\
+    total a.ordering /\
+    (forall x. a.domain x -> acc (lower a.ordering) x)
+
+  predicate inject (a b:t 'a) =
+    not well_ordered a \/
+      (well_ordered b /\ subset a.domain b.domain /\
+       (forall x y. a.domain x /\ a.domain y ->
+         a.ordering x y <-> b.ordering x y) /\
+       (forall x y. a.domain x /\ not a.domain y /\ b.domain y ->
+         b.ordering x y))
+
+  predicate complete_domain (ch:t 'a -> bool) (x:'a) =
+    exists y. ch y /\ well_ordered y /\ y.domain x
+
+  predicate cord_witness (ch:t 'a -> bool) (x y:'a) (z:t 'a) =
+    ch z /\ well_ordered z /\ z.domain x /\ z.domain y /\ z.ordering x y
+
+  predicate complete_ordering (ch:t 'a -> bool) (x y:'a) =
+    not complete_domain ch y \/ exists z. cord_witness ch x y z
+
+  function complete (ch:t 'a -> bool) : t 'a =
+    { domain = complete_domain ch; ordering = complete_ordering ch }
+
+  (* completion of a chain of sets for well-order injection
+     is a well-ordered upper bound.*)
+  lemma completion_well_ordered : forall ch:t 'a -> bool. chain inject ch ->
+    let x = complete ch in
+    well_ordered x /\ upper_bound inject ch x
+    by (reflexive x.ordering
+        by forall a. x.ordering a a
+          by not x.domain a ||
+            exists t. ch t /\ well_ordered t /\ t.domain a
+              so cord_witness ch a a t) &&
+      (forall a b. x.domain a /\ x.domain b /\
+        x.ordering a b /\ x.ordering b a -> a = b
+          by exists tab. cord_witness ch a b tab
+            so exists tba. cord_witness ch b a tba
+            so inject tab tba \/ inject tba tab) &&
+      (transitive x.ordering
+        by forall a b c. x.ordering a b /\ x.ordering b c -> x.ordering a c
+          by not x.domain c ||
+            exists tbc. cord_witness ch b c tbc
+            so exists tab. cord_witness ch a b tab
+            so (inject tab tbc so cord_witness ch a c tbc)
+              \/ (inject tbc tab so cord_witness ch a c tab)) &&
+      (total x.ordering
+        by forall a b. x.ordering a b \/ x.ordering b a
+          by not x.domain a || not x.domain b ||
+            exists ta. ch ta /\ well_ordered ta /\ ta.domain a
+            so exists tb. ch tb /\ well_ordered tb /\ tb.domain b
+            so exists t. (inject ta tb /\ t = tb) \/ (inject tb ta /\ t = ta)
+            so cord_witness ch a b t \/ cord_witness ch b a t) &&
+      (forall t a b. ch t /\ well_ordered t /\
+        t.domain a /\ not t.domain b /\ x.domain b ->
+        x.ordering a b
+        by exists tb. ch tb /\ well_ordered tb /\ tb.domain b
+        so inject t tb so cord_witness ch a b tb) &&
+      ("stop_split" forall t a b. ch t /\ well_ordered t /\
+        t.domain a /\ t.domain b ->
+        ((t.ordering a b by exists tab. cord_witness ch a b tab
+          so inject t tab \/ inject tab t)
+         <-> (x.ordering a b by cord_witness ch a b t))) &&
+      forall y. x.domain y -> acc (lower x.ordering) y
+        by exists t. ch t /\ well_ordered t /\ t.domain y
+        so (forall v a. v = t /\ v.domain a ->
+          ("induction" acc (lower v.ordering) a) -> acc (lower x.ordering) a)
+        by forall a b. t.domain a /\ lower x.ordering b a ->
+          t.domain b /\ lower t.ordering b a
+
+  function add (x:t 'a) (y:'a) : t 'a =
+    let dom = \u. x.domain u \/ u = y in
+    { domain = dom;
+      ordering = \u v. not dom v \/ (x.domain u /\ x.domain v /\ x.ordering u v)
+        \/ (dom u /\ v = y) }
+
+  lemma step : forall x,y:'a. well_ordered x /\ not x.domain y ->
+    let z = add x y in
+    inject x z /\ not inject z x
+    by well_ordered z
+    by forall x' a. x' = x /\ x'.domain a ->
+      ("induction" acc (lower x'.ordering) a) && acc (lower z.ordering) a
+
+  lemma well_order_proof :
+    let inj = inject in
+    (exists o:'a -> 'a -> bool. well_order o
+      by
+        exists x. (o = x.ordering /\ maximal inj x)
+        (* Trick: to show x is well-ordered, take the completion of {x}:
+           it is known to be well-ordered, and must be x by maximality. *)
+        so let s = (=) x in chain inj s
+        so upper_bound inj s (complete s)
+        so well_ordered x
+        so (forall y. x.domain y)
+        so well_order x.ordering)
+    by preorder inj /\ chain_bounded inj
+
+  predicate witness (x y:'a) = choice well_order x y
+  meta rewrite_def predicate witness
+
+  clone WellOrder with
+    predicate well_order_witness = witness,
+    goal well_order_exists
+
+end

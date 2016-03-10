@@ -2,62 +2,62 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../algo64.mlw" expanded="true">
 <theory name="Algo64" sum="8ab02ef07be464ccc7c31dda9dd33adb" expanded="true">
  <goal name="WP_parameter quicksort" expl="VC for quicksort" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter quicksort.1" expl="1. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.2" expl="2. variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.4" expl="4. assertion">
-  <proof prover="0"><result status="valid" time="0.14" steps="172"/></proof>
+  <proof prover="1"><result status="valid" time="0.14" steps="131"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.5" expl="5. variant decrease">
-  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.7" expl="7. assertion">
-  <proof prover="0"><result status="valid" time="2.07" steps="738"/></proof>
+  <proof prover="1"><result status="valid" time="2.95" steps="657"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.53" steps="555"/></proof>
+  <proof prover="1"><result status="valid" time="0.53" steps="315"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="122"/></proof>
+  <proof prover="1"><result status="valid" time="0.16" steps="95"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter quicksort.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter qs" expl="VC for qs">
  <transf name="split_goal_wp">
   <goal name="WP_parameter qs.1" expl="1. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter qs.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter qs.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter qs.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter qs.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>

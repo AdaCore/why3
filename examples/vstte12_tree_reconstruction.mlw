@@ -9,7 +9,7 @@
    lists from Why3's standard library.
 *)
 
-theory Tree
+module Tree
 
   use export int.Int
   use export list.List
@@ -29,9 +29,22 @@ theory Tree
     forall t: tree, d: int.
     match depths d t with Cons x _ -> x >= d | Nil -> false end
 
-  lemma depths_unique:
-    forall t1 t2: tree, d: int, s1 s2: list int.
-    depths d t1 ++ s1 = depths d t2 ++ s2 -> t1 = t2 && s1 = s2
+  let rec lemma depths_unique (t1 t2: tree) (d: int) (s1 s2: list int)
+    requires { depths d t1 ++ s1 = depths d t2 ++ s2 }
+    variant { t1 }
+    ensures { t1 = t2 && s1 = s2 }
+  = let d' = d+1 in
+    match t1,t2 with
+    | Leaf,Leaf -> ()
+    | Node t11 t12, Node t21 t22 ->
+      depths_unique t11 t21 d' (depths d' t12 ++ s1) (depths d' t22 ++ s2);
+      depths_unique t12 t22 d' s1 s2
+    | Leaf, (Node t _) | (Node t _), Leaf ->
+      match depths d' t with
+      | Nil -> absurd
+      | Cons x _ -> assert { x >= d' }
+      end
+    end
 
   lemma depths_prefix:
     forall t: tree, d1 d2: int, s1 s2: list int.
@@ -41,9 +54,16 @@ theory Tree
     forall t: tree, d1 d2: int.
     depths d1 t = depths d2 t -> d1 = d2
 
-  lemma depths_subtree:
-    forall t1 "induction" t2: tree, d1 d2: int, s1: list int.
-    depths d1 t1 ++ s1 = depths d2 t2 -> d1 >= d2
+  let rec lemma depths_subtree (t1 t2: tree) (d1 d2:int) (s1:list int)
+    requires { depths d1 t1 ++ s1 = depths d2 t2 }
+    variant { t1 }
+    ensures { d1 >= d2 }
+  = assert { depths d2 t2 = depths d2 t2 ++ Nil };
+    match t1 with
+    | Leaf -> ()
+    | Node t3 t4 ->
+        depths_subtree t3 t2 (d1+1) d2 (depths (d1+1) t4 ++ s1)
+    end
 
   lemma depths_unique2:
     forall t1 t2: tree, d1 d2: int.

@@ -2,11 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="30" memlimit="0"/>
-<prover id="5" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="6" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="30" steplimit="1" memlimit="0"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="30" steplimit="1" memlimit="1000"/>
 <file name="../mjrty.mlw" expanded="true">
 <theory name="Mjrty" sum="997a4729c8c41742be81a59084f9c422" expanded="true">
  <goal name="WP_parameter mjrty" expl="VC for mjrty" expanded="true">
@@ -33,11 +32,11 @@
   <proof prover="4" memlimit="1000"><result status="valid" time="0.05" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.8" expl="8. loop invariant preservation">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.56"/></proof>
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="1.40"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.9" expl="9. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  <proof prover="0"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.10" expl="10. index in array bounds">
   <proof prover="4" timelimit="10"><result status="valid" time="0.00" steps="10"/></proof>
@@ -58,13 +57,13 @@
   <proof prover="0" timelimit="30"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.16" expl="16. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.16"/></proof>
+  <proof prover="0"><result status="valid" time="0.35"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.17" expl="17. exceptional postcondition">
   <proof prover="4" timelimit="10"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.18" expl="18. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.19" expl="19. exceptional postcondition">
   <proof prover="4" timelimit="10"><result status="valid" time="0.03" steps="10"/></proof>
@@ -76,7 +75,7 @@
   <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.22" expl="22. postcondition">
-  <proof prover="2"><result status="valid" time="0.36"/></proof>
+  <proof prover="2"><result status="valid" time="0.77"/></proof>
   </goal>
   <goal name="WP_parameter mjrty.23" expl="23. loop invariant preservation">
   <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.07" steps="58"/></proof>

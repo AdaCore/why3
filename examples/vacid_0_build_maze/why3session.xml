@@ -2,12 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="30" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="30" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="30" steplimit="1" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="30" steplimit="1" memlimit="1000"/>
 <file name="../vacid_0_build_maze.mlw" expanded="true">
 <theory name="UnionFind_pure" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
@@ -21,60 +20,60 @@
  <goal name="Ineq1">
  <transf name="split_goal_wp">
   <goal name="Ineq1.1" expl="1.">
-  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="Ineq1.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.21"/></proof>
+  <proof prover="0"><result status="valid" time="0.38"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter add_edge_and_union" expl="VC for add_edge_and_union">
  <transf name="split_goal_wp">
   <goal name="WP_parameter add_edge_and_union.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter add_edge_and_union.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter add_edge_and_union.3" expl="3. postcondition">
-  <proof prover="2"><result status="valid" time="16.72" steps="7390"/></proof>
+  <proof prover="6"><result status="valid" time="0.53" steps="615"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter build_maze" expl="VC for build_maze" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter build_maze.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.2" expl="2. assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.3" expl="3. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.5" expl="5. precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.6" expl="6. precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.7" expl="7. assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.8" expl="8. assertion">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.9" expl="9. precondition">
-  <proof prover="2"><result status="valid" time="0.30" steps="48"/></proof>
+  <proof prover="6"><result status="valid" time="0.30" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.10" expl="10. precondition">
-  <proof prover="2"><result status="valid" time="0.29" steps="78"/></proof>
+  <proof prover="6"><result status="valid" time="0.29" steps="44"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.11" expl="11. precondition">
-  <proof prover="4"><result status="valid" time="2.14" steps="811"/></proof>
+  <proof prover="4"><result status="valid" time="0.42" steps="381"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.12" expl="12. loop invariant preservation">
@@ -82,14 +81,14 @@
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.13" expl="13. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="2.53"/></proof>
-  <proof prover="4"><result status="valid" time="1.08" steps="519"/></proof>
+  <proof prover="3"><result status="valid" time="5.13"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="175"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.14" expl="14. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.15" expl="15. postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="59"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="21"/></proof>
   </goal>
  </transf>
  </goal>
