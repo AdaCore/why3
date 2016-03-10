@@ -39,7 +39,31 @@ type prover_result = {
   pr_model  : model;
 }
 
-(** time regexp "%h:%m:%s" *)
+type resource_limit =
+  {
+    limit_time  : int option;
+    limit_mem   : int option;
+    limit_steps : int option;
+  }
+
+let empty_limit =
+  { limit_time = None ; limit_mem = None; limit_steps = None }
+
+let get_time x = Opt.get_def 0 x.limit_time
+let get_mem x = Opt.get_def 0 x.limit_mem
+let get_steps x = Opt.get_def (-1) x.limit_steps
+
+let mk_limit t m s =
+  { limit_time = if t = 0 then None else Some t;
+    limit_mem  = if m = 0 then None else Some m;
+    limit_steps = if s = -1 then None else Some s
+  }
+
+let limit_max a b =
+  mk_limit (max (get_time a) (get_time b))
+           (max (get_mem a) (get_mem b))
+           (max (get_steps a) (get_steps b))
+
 type timeunit =
   | Hour
   | Min
@@ -189,7 +213,7 @@ let debug_print_model model =
   Debug.dprintf debug "Call_provers: %s@." model_str
 
 
-let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
+let parse_prover_run res_parser time out ret on_timelimit limit ~printer_mapping =
   let ans = match ret with
     | Unix.WSTOPPED n ->
         Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
@@ -209,9 +233,9 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
   let ans = match ans with
     | Unknown (s, _) -> Unknown (s, Some reason_unknown)
     | _ -> ans in
-  let ans = match ans with
-    | Unknown _ | HighFailure when on_timelimit && timelimit > 0
-      && time >= (0.9 *. float timelimit) -> Timeout
+  let ans = match ans, limit with
+    | (Unknown _ | HighFailure), { limit_time = Some tlimit }
+      when on_timelimit && time >= (0.9 *. float tlimit) -> Timeout
     | _ -> ans
   in
   let model = res_parser.prp_model_parser out printer_mapping in
@@ -225,15 +249,17 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
     pr_model  = model;
   }
 
-let actualcommand command timelimit memlimit steplimit file =
+let actualcommand command limit file =
+  let timelimit = get_time limit in
+  let memlimit  = get_mem limit in
+  let steplimit = get_steps limit in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
-  (* FIXME: use_stdin is never modified below ?? *)
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> file
+    | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "T" -> string_of_int (succ timelimit)
     | "U" -> string_of_int (2 * timelimit + 1)
@@ -247,17 +273,19 @@ let actualcommand command timelimit memlimit steplimit file =
     | "S" -> string_of_int steplimit
     | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, %d or %S"
   in
-  (* FIXME: are we sure that tuples are evaluated from left to right ? *)
-  List.map (Str.global_substitute cmd_regexp replace) arglist,
-  !use_stdin, !on_timelimit
+  let args =
+    List.map (Str.global_substitute cmd_regexp replace) arglist
+  in
+  args, !use_stdin, !on_timelimit
 
-let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(steplimit=(-1))
+let call_on_file ~command
+                 ~limit
                  ~res_parser
 		 ~printer_mapping
                  ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
   let command, use_stdin, on_timelimit =
-    try actualcommand command timelimit memlimit steplimit fin
+    try actualcommand command limit fin
     with e ->
       if cleanup then Sys.remove fin;
       if inplace then Sys.rename (save fin) fin;
@@ -299,12 +327,12 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(steplimit=(-1))
           if inplace then Sys.rename (save fin) fin;
           if redirect then Sys.remove fout;
         end;
-        parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping
+        parse_prover_run res_parser time out ret on_timelimit limit
+          ~printer_mapping
     in
     { call = call; pid = pid }
 
-let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(steplimit=(-1))
-                   ~res_parser ~filename
+let call_on_buffer ~command ~limit ~res_parser ~filename
 		   ~printer_mapping
                    ?(inplace=false) buffer =
 
@@ -315,7 +343,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(steplimit=(-1))
     end else
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~timelimit ~memlimit ~steplimit
+  call_on_file ~command ~limit
                ~res_parser ~printer_mapping ~cleanup:true ~inplace fin
 
 let query_call pc =
@@ -343,25 +371,26 @@ let gen_id =
 type save_data =
   { vc_file      : string;
     is_temporary : bool;
-    timeout      : int;
+    limit        : resource_limit;
     res_parser   : prover_result_parser;
     printer_mapping : Printer.printer_mapping;
   }
 
-let regexs = Hashtbl.create 17
+let regexs : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
-let prove_file_server ~res_parser ~command ~timelimit
-                      ~memlimit ~steplimit ~printer_mapping ?(inplace=false) file =
+let prove_file_server ~res_parser ~command ~limit
+                      ~printer_mapping ?(inplace=false) file =
   let id = gen_id () in
-  let cmd, _, _ =
-    actualcommand command timelimit memlimit steplimit file in
+  let cmd, _, _ = actualcommand command limit file in
   let saved_data =
     { vc_file      = file;
       is_temporary = not inplace;
-      timeout      = timelimit;
+      limit        = limit;
       res_parser   = res_parser;
       printer_mapping = printer_mapping } in
   Hashtbl.add regexs id saved_data;
+  let timelimit = get_time limit in
+  let memlimit = get_mem limit in
   Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
   id
 
@@ -393,7 +422,7 @@ let handle_answer answer =
   let ans =
     parse_prover_run save.res_parser
                      answer.Prove_client.time
-                     out ret answer.Prove_client.timeout save.timeout
+                     out ret answer.Prove_client.timeout save.limit
                      ~printer_mapping
   in
   id, ans

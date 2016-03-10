@@ -1306,7 +1306,11 @@ let why3tac ?(timelimit=timelimit) s gl =
     let command = String.concat " " (cp.command :: cp.extra_options) in
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
     if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
-    let call = Driver.prove_task ~command ~timelimit drv !task () in
+    let limit =
+      { Call_provers.limit_time = Some timelimit;
+                     limit_mem = None;
+                     limit_steps = None } in
+    let call = Driver.prove_task ~command ~limit drv !task () in
     wait_on_call call ()
   with
     | NotFO ->

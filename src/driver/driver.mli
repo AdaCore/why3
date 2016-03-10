@@ -39,9 +39,7 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 
 val call_on_buffer :
   command    : string ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  ?steplimit : int ->
+  limit      : Call_provers.resource_limit ->
   ?inplace   : bool ->
   filename   : string ->
   printer_mapping : Printer.printer_mapping ->
@@ -60,10 +58,8 @@ val print_theory :
 
 val prove_task :
   command    : string ->
+  limit      : Call_provers.resource_limit ->
   ?cntexample : bool ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  ?steplimit : int ->
   ?old       : string ->
   ?inplace   : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
@@ -75,16 +71,15 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
-val prove_task_server : string -> cntexample:bool -> timelimit:int -> memlimit:int ->
-                        steplimit:int ->
+val prove_task_server : string ->
+                        limit : Call_provers.resource_limit ->
+                        cntexample:bool ->
                         ?old:string -> ?inplace:bool -> driver -> Task.task ->
                         Call_provers.server_id
 
 val prove_task_prepared :
   command    : string ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  ?steplimit : int ->
+  limit      : Call_provers.resource_limit ->
   ?old       : string ->
   ?inplace   : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call

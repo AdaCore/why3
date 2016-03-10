@@ -39,11 +39,13 @@ val manual_prover : prover option
 
 (* Configuration settings given or determined by the command line *)
 
-val timeout : int
-(* value of the -t/--timeout option, default value 10 *)
+val timeout : int option
 
-val steps : prover : string -> int
-(* value of the --steps option adjusted for given prover, default value is -1 *)
+val steps : prover : string -> int option
+(* value of the --steps option adjusted for given prover, if no steps are
+ * given, return None *)
+
+val limit : prover : string -> Call_provers.resource_limit
 
 type proof_mode =
     Then_Split

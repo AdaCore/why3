@@ -329,8 +329,8 @@ let has_been_tried_by g prover =
                   options *)
                if not pa.Session.proof_obsolete &&
                pa.Session.proof_prover = prover &&
-               pa.Session.proof_timelimit = Gnat_config.timeout &&
-	       pa.Session.proof_steplimit = (Gnat_config.steps ~prover:prover.Whyconf.prover_name) then
+               pa.Session.proof_limit =
+                Gnat_config.limit ~prover:prover.Whyconf.prover_name then
                   raise Exit
          | _ -> ()) g;
       false
@@ -783,7 +783,8 @@ let clean_automatic_proofs =
           | Session.Proof_attempt pa ->
               if not pa.Session.proof_obsolete &&
                 pa.Session.proof_prover = prover &&
-                pa.Session.proof_timelimit = Gnat_config.timeout then
+                pa.Session.proof_limit = Gnat_config.limit
+                     ~prover:prover.Whyconf.prover_name then
                   Session.remove_external_proof pa;
           | _ -> ()) g) Gnat_config.provers
     end)

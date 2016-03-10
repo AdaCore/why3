@@ -33,7 +33,7 @@ let is_builtin_prover =
     let s = String.lowercase s in
     Sstr.mem s builtin_provers_set)
 
-let default_timeout = 1
+let default_timeout = Some 1
 
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
@@ -472,9 +472,9 @@ let filename =
 
 let timeout =
    match !opt_timeout with
-   | Some x -> x
+   | Some _ -> !opt_timeout
    | None ->
-         if !opt_steps <> None then 0
+         if !opt_steps <> None then None
          else default_timeout
 
 let min a b =
@@ -484,18 +484,20 @@ let min a b =
     b
 
 let steps ~prover =
-  if manual_prover <> None then -1
+  if manual_prover <> None then None
   else
     match !opt_steps with
-    | None -> -1
+    | None -> None
     | Some c ->
       let prover = String.sub prover 0 (min 4 (String.length prover)) in
-      if prover = "CVC4" then
-        50000 + c*250
-      else if prover = "Z3" then
-        100000 + c*1500
-      else
-        c
+      if prover = "CVC4" then Some (50000 + c*250)
+      else if prover = "Z3" then Some (100000 + c*1500)
+      else !opt_steps
+
+let limit ~prover =
+  { Call_provers.limit_time = timeout;
+    limit_steps = steps ~prover;
+    limit_mem = None }
 
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy

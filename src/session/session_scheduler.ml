@@ -79,7 +79,8 @@ module Make(O : OBSERVER) = struct
 (*************************)
 
 type action =
-  | Action_proof_attempt of bool * int * int * int * string option * bool * string *
+  | Action_proof_attempt of
+      bool * Call_provers.resource_limit * string option * bool * string *
       Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
 
@@ -209,13 +210,13 @@ let idle_handler t =
     if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
       begin
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(cntexample,timelimit,memlimit,steplimit,
+        | Action_proof_attempt(cntexample,limit,
               old,inplace,command,driver,callback,goal) ->
             begin
               try
                 let pre_call =
                   Driver.prove_task ?old ~cntexample ~inplace ~command
-                    ~timelimit ~steplimit ~memlimit driver goal
+                    ~limit driver goal
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
@@ -257,7 +258,7 @@ let cancel_scheduled_proofs t =
   try
     while true do
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(_cntexample,_timelimit,_memlimit,_steplimit,
+        | Action_proof_attempt(_cntexample,_limit,
               _old,_inplace,_command,_driver,callback,_goal) ->
             callback Interrupted
         | Action_delayed _ as a->
@@ -275,14 +276,14 @@ let cancel_scheduled_proofs t =
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
-let schedule_proof_attempt ~cntexample ~timelimit ~memlimit ~steplimit ?old ~inplace
+let schedule_proof_attempt ~cntexample ~limit ?old ~inplace
     ~command ~driver ~callback t goal =
   Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   callback Scheduled;
   Queue.push
-    (Action_proof_attempt(cntexample,timelimit,memlimit,steplimit,
+    (Action_proof_attempt(cntexample,limit,
       old,inplace,command,driver,callback,goal))
     t.actions_queue;
   run_idle_handler t
@@ -296,8 +297,12 @@ let schedule_edition t command filename callback =
       Call_provers.prp_stepregexps = [];
       Call_provers.prp_model_parser = fun _ _ -> Model_parser.default_model
     } in
+  let nolimit =
+    { Call_provers.limit_time = None; limit_mem = None; limit_steps = None } in
   let precall =
-    Call_provers.call_on_file ~command ~res_parser ~redirect:false filename ~printer_mapping:Printer.get_default_printer_mapping in
+    Call_provers.call_on_file ~command ~limit:nolimit ~res_parser
+      ~redirect:false filename
+      ~printer_mapping:Printer.get_default_printer_mapping in
   callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
   run_timeout_handler t
@@ -400,6 +405,8 @@ let find_prover eS a =
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
 let adapt_limits ~use_steps a =
+  let timelimit = (Call_provers.get_time a.proof_limit) in
+  let memlimit = (Call_provers.get_mem a.proof_limit) in
   match a.proof_state with
   | Done { Call_provers.pr_answer = r;
            Call_provers.pr_time = t;
@@ -409,14 +416,14 @@ let adapt_limits ~use_steps a =
        the previous time limit *)
     let increased_time =
       let t = truncate (1.0 +. 2.0 *. t) in
-      max a.proof_timelimit (min t (2 * a.proof_timelimit))
+      max timelimit (min t (2 * timelimit))
     in
     (* increased mem limit is just 1.5 times the previous mem limit *)
-    let increased_mem = 3 * a.proof_memlimit / 2 in
+    let increased_mem = 3 * memlimit / 2 in
     begin
       match r with
-      | Call_provers.OutOfMemory -> increased_time, a.proof_memlimit, -1
-      | Call_provers.Timeout -> a.proof_timelimit, increased_mem, -1
+      | Call_provers.OutOfMemory -> increased_time, memlimit, -1
+      | Call_provers.Timeout -> timelimit, increased_mem, -1
       | Call_provers.Valid ->
         let steplimit =
           if use_steps && not a.proof_obsolete then s else -1
@@ -428,11 +435,13 @@ let adapt_limits ~use_steps a =
       | Call_provers.Failure _
       | Call_provers.HighFailure ->
         (* correct ? failures are supposed to appear quickly anyway... *)
-        a.proof_timelimit, a.proof_memlimit, -1
+        timelimit, memlimit, -1
     end
-  | _ -> a.proof_timelimit, a.proof_memlimit, -1
+  | _ -> timelimit, memlimit, -1
 
-
+let adapt_limits ~use_steps a =
+  let t, m, s = adapt_limits ~use_steps a in
+  Call_provers.mk_limit t m s
 
 type run_external_status =
 | Starting
@@ -453,30 +462,30 @@ let fuzzy_proof_time nres ores =
     Done { res' with Call_provers.pr_time = told }
   | _, _ -> nres
 
-let dummy_limits = (0,0,0)
-
 (** run_external_proof_v3 doesn't modify existing proof attempt, it can just
     create new one by find_prover *)
 let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
   match find_prover eS a with
   | None ->
-    callback a a.proof_prover dummy_limits None Starting;
+    callback a a.proof_prover Call_provers.empty_limit None Starting;
     (* nothing to do *)
-    callback a a.proof_prover dummy_limits None MissingProver
+    callback a a.proof_prover Call_provers.empty_limit None MissingProver
   | Some(ap,npc,a) ->
-    callback a ap dummy_limits None Starting;
+    callback a ap Call_provers.empty_limit None Starting;
     if a.proof_edited_as = None &&
        npc.prover_config.Whyconf.interactive
     then begin
-      callback a ap dummy_limits None (MissingFile "unedited")
+      callback a ap Call_provers.empty_limit None (MissingFile "unedited")
     end else begin
       let previous_result = a.proof_state in
-      let timelimit, memlimit, steplimit = adapt_limits ~use_steps a in
+      let limit = adapt_limits ~use_steps a in
       let inplace = npc.prover_config.Whyconf.in_place in
-      let command = Whyconf.get_complete_command npc.prover_config steplimit in
+      let command =
+        Whyconf.get_complete_command npc.prover_config
+          ~with_steps:(limit.Call_provers.limit_steps <> None) in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
-        callback a ap (timelimit,memlimit,steplimit)
+        callback a ap limit
           (match previous_result with Done res -> Some res | _ -> None)
           (StatusChange result) in
       try
@@ -487,14 +496,14 @@ let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
             if Sys.file_exists f then Some f
             else raise (NoFile f) in
         schedule_proof_attempt
-          ~cntexample ~timelimit ~memlimit ~steplimit
+          ~cntexample ~limit
           ?old ~inplace ~command
           ~driver:npc.prover_driver
           ~callback:cb
           eT
           (goal_task_or_recover eS a.proof_parent)
       with NoFile f ->
-        callback a ap dummy_limits None (MissingFile f)
+        callback a ap Call_provers.empty_limit None (MissingFile f)
     end
 
 (** run_external_proof_v2 modify the session according to the current state *)
@@ -545,16 +554,16 @@ let run_external_proof eS eT ?(cntexample=false) ?callback a =
   in
   run_external_proof_v2 ~use_steps:false eS eT a ~cntexample callback
 
-let prover_on_goal eS eT ?callback ?(cntexample=false) ~timelimit ~steplimit ~memlimit p g =
+let prover_on_goal eS eT ?callback ?(cntexample=false) ~limit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
-      set_timelimit timelimit a;
-      set_memlimit memlimit a;
+      set_timelimit (Call_provers.get_time limit) a;
+      set_memlimit (Call_provers.get_mem limit) a;
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
-        ~archived:false ~timelimit ~steplimit ~memlimit
+        ~archived:false ~limit
         ~edit:None g p Interrupted in
       O.init ep.proof_key (Proof_attempt ep);
       ep
@@ -562,39 +571,39 @@ let prover_on_goal eS eT ?callback ?(cntexample=false) ~timelimit ~steplimit ~me
   run_external_proof eS eT ~cntexample ?callback a
 
 let prover_on_goal_or_children eS eT
-    ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit p g =
+    ~context_unproved_goals_only ~cntexample ~limit p g =
   goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
-    (prover_on_goal eS eT ~cntexample ~timelimit ~steplimit ~memlimit p) g
+    (prover_on_goal eS eT ~cntexample ~limit p) g
 
-let run_prover eS eT ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr a =
+let run_prover eS eT ~context_unproved_goals_only ~cntexample ~limit pr a =
   match a with
   | Goal g ->
     prover_on_goal_or_children eS eT
-      ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr g
+      ~context_unproved_goals_only ~cntexample ~limit pr g
   | Theory th ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr)
+             ~context_unproved_goals_only ~cntexample ~limit pr)
           th.theory_goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
                (prover_on_goal_or_children eS eT
-                  ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr)
+                  ~context_unproved_goals_only ~cntexample ~limit pr)
                th.theory_goals)
           file.file_theories
     | Proof_attempt a ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr a.proof_parent
+          ~context_unproved_goals_only ~cntexample ~limit pr a.proof_parent
     | Transf tr ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr)
+             ~context_unproved_goals_only ~cntexample ~limit pr)
           tr.transf_goals
     | Metas m ->
       prover_on_goal_or_children eS eT
-        ~context_unproved_goals_only ~cntexample ~timelimit ~steplimit ~memlimit pr m.metas_goal
+        ~context_unproved_goals_only ~cntexample ~limit pr m.metas_goal
 
 
 
@@ -741,17 +750,14 @@ let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
 (* play all                        *)
 (***********************************)
 
-let rec play_on_goal_and_children eS eT ~timelimit ~steplimit ~memlimit todo l g =
-  let timelimit, steplimit, memlimit, auto_proved =
-    PHprover.fold (fun _ pa (timelimit, steplimit, memlimit, _ as acc) ->
+let rec play_on_goal_and_children eS eT ~limit todo l g =
+  let limit, auto_proved =
+    PHprover.fold (fun _ pa (limit, _ as acc) ->
       match pa.proof_edited_as, pa.proof_state with
         | None, Done { Call_provers.pr_answer = Call_provers.Valid } ->
-            max timelimit pa.proof_timelimit,
-	    max steplimit pa.proof_steplimit,
-            max memlimit pa.proof_memlimit,
-            true
+            Call_provers.limit_max limit pa.proof_limit, true
         | _ -> acc)
-      g.goal_external_proofs (timelimit, steplimit, memlimit, false) in
+      g.goal_external_proofs (limit, false) in
   let callback _key status =
     if not (running status) then Todo._done todo () in
   if auto_proved then begin
@@ -761,21 +767,21 @@ let rec play_on_goal_and_children eS eT ~timelimit ~steplimit ~memlimit todo l g
       (* eprintf "todo increased to %d@." todo.Todo.todo; *)
       (* eprintf "prover %a on goal %s@." *)
       (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
-        prover_on_goal eS eT ~callback ~timelimit ~steplimit ~memlimit p g)
+        prover_on_goal eS eT ~callback ~limit p g)
       l
   end;
   iter_goal
     (fun _ -> ())
     (iter_transf
-       (play_on_goal_and_children eS eT ~timelimit ~steplimit ~memlimit todo l)
+       (play_on_goal_and_children eS eT ~limit todo l)
     )
     (iter_metas
-       (play_on_goal_and_children eS eT ~timelimit ~steplimit ~memlimit todo l)
+       (play_on_goal_and_children eS eT ~limit todo l)
     )
     g
 
 
-let play_all eS eT ~callback ~timelimit ~steplimit ~memlimit l =
+let play_all eS eT ~callback ~limit l =
   let todo = Todo.create () (fun () _ -> ()) callback in
   Todo.start todo;
   PHstr.iter
@@ -783,7 +789,7 @@ let play_all eS eT ~callback ~timelimit ~steplimit ~memlimit l =
       List.iter
         (fun th ->
           List.iter
-            (play_on_goal_and_children eS eT ~timelimit ~steplimit ~memlimit todo l)
+            (play_on_goal_and_children eS eT ~limit todo l)
             th.theory_goals)
         file.file_theories)
     eS.session.session_files;
@@ -957,7 +963,8 @@ let convert_unknown_prover =
                 (* should not happen *)
                 assert false
           in
-          prover_on_goal es sched ~callback ~timelimit ~steplimit:(-1) ~memlimit p g
+          let limit = Call_provers.mk_limit timelimit memlimit (-1) in
+          prover_on_goal es sched ~callback ~limit p g
         | Itransform(trname,pcsuccess) ->
           let callback ntr =
             match ntr with

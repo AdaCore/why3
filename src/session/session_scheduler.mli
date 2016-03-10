@@ -133,7 +133,7 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
     cntexample : bool ->
-    timelimit:int -> steplimit:int -> memlimit:int ->
+    limit : Call_provers.resource_limit ->
     Whyconf.prover -> O.key any -> unit
     (** [run_prover es sched p a] runs prover [p] on all goals under [a]
         the proof attempts are only scheduled for running, and they
@@ -170,7 +170,7 @@ module Make(O: OBSERVER) : sig
     O.key Session.env_session -> t -> O.key Session.proof_attempt ->
     ?cntexample : bool ->
     (O.key Session.proof_attempt -> Whyconf.prover ->
-     int * int * int -> Call_provers.prover_result option -> run_external_status -> unit) ->
+     Call_provers.resource_limit -> Call_provers.prover_result option -> run_external_status -> unit) ->
      unit
   (** [run_external_proof_v3 env_session sched pa ?cntexample callback] the
       callback is applied with [callback pa p limits old_result
@@ -188,7 +188,7 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     ?cntexample : bool ->
-    timelimit:int -> steplimit:int -> memlimit:int ->
+    limit : Call_provers.resource_limit ->
     Whyconf.prover -> O.key goal -> unit
   (** [prover_on_goal es sched ?cntexample ?timelimit p g] same as
       {!redo_external_proof} but creates or reuses existing proof_attempt
@@ -287,18 +287,19 @@ module Make(O: OBSERVER) : sig
     use_steps:bool -> (** Replay use recorded number of proof steps *)
     ?filter:(O.key proof_attempt -> bool) ->
     O.key env_session -> t ->
-    callback:((Ident.ident * Whyconf.prover * (int * int * int) * report) list -> unit) ->
+    callback:
+      ((Ident.ident * Whyconf.prover * Call_provers.resource_limit * report) list
+            -> unit) ->
     unit
   (** [check_all session callback] reruns all the proofs of the
         session, and reports for all proofs the current result and the
         new one (does not change the session state). When finished,
         calls the callback with the reports which are 4-uples [(goal
-        name, prover, limits, report)] where [limits] is a triple
-        [(timelimit, memlimit, steplimit)] *)
+        name, prover, limits, report)] *)
 
   val play_all :
     O.key env_session -> t -> callback:(unit-> unit) ->
-    timelimit:int -> steplimit:int -> memlimit:int -> Whyconf.prover list -> unit
+    limit:Call_provers.resource_limit -> Whyconf.prover list -> unit
     (** [play_all es sched l] runs every prover of list [l] on all
         goals and sub-goals of the session, with the given time limit.
         [callback] is called when all tasks are finished.
@@ -307,9 +308,7 @@ module Make(O: OBSERVER) : sig
 
   val schedule_proof_attempt:
     cntexample:bool ->
-    timelimit:int ->
-    memlimit:int ->
-    steplimit:int ->
+    limit:Call_provers.resource_limit ->
     ?old:string ->
     inplace:bool ->
     command:string ->
