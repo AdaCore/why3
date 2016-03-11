@@ -283,18 +283,19 @@ module FibonacciLogarithmic
 
   use import int.Int
   use import int.Fibonacci
-  use import int.EuclideanDivision
+  use import int.ComputerDivision
   use import Mat22
 
-  constant m1110 : t = { a11 = 1; a12 = 1;
-                         a21 = 1; a22 = 0 }
+  val constant m1110 : t
+    ensures { result = { a11 = 1; a12 = 1;
+                         a21 = 1; a22 = 0 } }
 
   (* computes ((1 1) (1 0))^n in O(log(n)) time
 
      since it is a matrix of the shape ((a+b b) (b a)),
      we only return the pair (a, b) *)
 
-  let rec logfib n variant { n }
+  let rec logfib (n:int) variant { n }
     requires { n >= 0 }
     ensures  { let a, b = result in
       power m1110 n = { a11 = a+b; a12 = b; a21 = b; a22 = a } }
@@ -317,9 +318,11 @@ module FibonacciLogarithmic
     thus, we can compute F(n) in O(log(n)) using funtion logfib above
   *)
 
-  lemma fib_m :
-    forall n: int. n >= 0 ->
-    let p = power m1110 n in fib (n+1) = p.a11 /\ fib n = p.a21
+  let rec lemma fib_m (n: int)
+    requires { n >= 0 }
+    variant { n }
+    ensures { let p = power m1110 n in fib (n+1) = p.a11 /\ fib n = p.a21 }
+  = if n = 0 then () else fib_m (n-1)
 
   let fibo n requires { n >= 0 } ensures { result = fib n } =
     let _, b = logfib n in b
