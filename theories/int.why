@@ -143,6 +143,15 @@ theory EuclideanDivision
           x > 0 ->
           mod (x * y + z) x = mod z x
 
+  val div (x y:int) : int
+    requires { y <> 0 }
+    ensures { result = div x y }
+
+  val mod (x y:int) : int
+    requires { y <> 0 }
+    ensures { result = mod x y }
+
+
 end
 
 (** {2 Division by 2}
