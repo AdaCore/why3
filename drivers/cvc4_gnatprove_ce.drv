@@ -1,5 +1,25 @@
 import "cvc4_15.drv"
 
+theory ieee_float.GenericFloat
+
+ prelude "; ---- floats ---- "
+
+ (* This will be definitly wrong with ranges and range_axiom ! *)
+
+ syntax type t "Real"
+
+ syntax function to_real "%1"
+
+ remove prop Round_to_real (* would be inconsistent with the mapping of t and to_real *)
+
+end
+
+theory ieee_float.FloatConverter
+
+ syntax function to_float64 "%1"
+
+end
+
 (**********************************************************************
  ***                       gnat2why theories                        ***
  **********************************************************************)
