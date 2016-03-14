@@ -114,8 +114,7 @@ module SchorrWaite
     requires { Seq.length stack > 0 }
     ensures  { result = stack[1 .. ] }
     ensures  { forall n. not_in_stack n stack -> not_in_stack n result }
-  =
-    stack[1 .. ]
+  = stack[1 .. ]
 
   (** two lemmas about stacks *)
 
