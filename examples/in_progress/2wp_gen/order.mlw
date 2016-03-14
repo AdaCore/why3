@@ -92,12 +92,13 @@ module Chain
   predicate chain_complete (o:erel 'a) =
     forall s. chain o s -> exists y. supremum o s y
 
+  (* quasi-chain-complete = all non-empty chains admit supremum. *)
+  predicate q_chain_complete (o:erel 'a) =
+    forall s inh. chain o s /\ s inh -> exists y. supremum o s y
+
   predicate subchain (o:erel 'a) (s1 s2:set 'a) =
     subset s1 s2 /\
     forall x y. s1 x /\ s2 y /\ not s1 y -> o x y
-
-  function subchain_completion (c:set (set 'a)) : set 'a =
-    \x. exists s. c s /\ s x
 
   predicate wf_chain (o:erel 'a) (s:set 'a) =
     forall s2. subset s2 s /\ (exists x. s2 x) ->
@@ -162,13 +163,14 @@ end
 module SubChain "W:non_conservative_extension:N" (* => SubChainProof *)
 
   use export Chain
+  use import ho_set.SetBigOps
 
   axiom subchain_complete_order : forall o:erel 'a.
     transitive o -> order (subchain o) /\ chain_complete (subchain o)
 
   axiom subchain_completion : forall o:erel 'a,ch.
     chain (subchain o) ch ->
-    supremum (subchain o) ch (subchain_completion ch)
+    supremum (subchain o) ch (bigunion ch)
 
   axiom chain_subchain_completion : forall o:erel 'a,ch x.
     chain (subchain o) ch /\ (forall x. ch x -> chain o x) /\
@@ -183,6 +185,7 @@ end
 module SubChainProof
 
   use import ho_set.SubsetOrder
+  use import ho_set.SetBigOps
   use import Chain
 
   lemma subchain_antisymetric : forall o:erel 'a.
@@ -192,7 +195,7 @@ module SubChainProof
     transitive o -> order (subchain o)
 
   lemma subchain_completion : forall o:erel 'a,ch.
-    let u = subchain_completion ch in
+    let u = bigunion ch in
     let sb = subchain o in
     chain sb ch ->
     supremum sb ch u
@@ -211,7 +214,7 @@ module SubChainProof
     chain (subchain o) ch /\
     (forall x. ch x -> chain o x) /\ supremum (subchain o) ch x ->
     chain o x
-    by x = subchain_completion ch
+    by x = bigunion ch
     so forall u v. x u /\ x v -> o u v \/ o v u
     by exists wu. ch wu /\ wu u
     so exists wv. ch wv /\ wv v
@@ -222,7 +225,7 @@ module SubChainProof
     chain (subchain o) ch /\
     (forall x. ch x -> wf_chain o x) /\ supremum (subchain o) ch x ->
     wf_chain o x
-    by x = subchain_completion ch
+    by x = bigunion ch
     so forall s2 y. s2 y /\ subset s2 x ->
       (exists z. minimum o s2 z)
     by exists wy. ch wy /\ wy y
@@ -344,6 +347,15 @@ module ProductChain
     chain_complete (rprod o1 o2)
     by forall ch. chain (rprod o1 o2) ch ->
       exists x. supremum o1 (image fst ch) x
+    so exists y. supremum o2 (image snd ch) y
+    so supremum (rprod o1 o2) ch (x,y)
+
+  lemma prod_q_chain_complete : forall o1:erel 'a,o2:erel 'b.
+    order o1 /\ order o2 /\ q_chain_complete o1 /\ q_chain_complete o2 ->
+    q_chain_complete (rprod o1 o2)
+    by forall ch inh. chain (rprod o1 o2) ch /\ ch inh ->
+      let (a,b) = inh in image fst ch a /\ image snd ch b
+    so exists x. supremum o1 (image fst ch) x
     so exists y. supremum o2 (image snd ch) y
     so supremum (rprod o1 o2) ch (x,y)
 

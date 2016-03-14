@@ -37,7 +37,7 @@ module Iterates "W:non_conservative_extension:N" (* => IterateProof *)
   function fixpoint_above (o:'a -> 'a -> bool) (f:'a -> 'a) 'a : 'a
 
   axiom tr_reach_maximum : forall o f,x:'a.
-    order o /\ inflationary o f /\ chain_complete o ->
+    order o /\ inflationary o f /\ q_chain_complete o ->
     f (fixpoint_above o f x) = fixpoint_above o f x /\
     maximum o (tr_reach o f x) (fixpoint_above o f x)
 
@@ -109,11 +109,12 @@ module IterateProof
     sup o (tr_reach o f u)
 
   lemma fixpoint_max_proof : forall o f,u:'a.
-    order o /\ chain_complete o /\ inflationary o f ->
+    order o /\ q_chain_complete o /\ inflationary o f ->
     (forall x y. tr_reach o f u x /\ tr_reach o f u y ->
         separator o f x y && (o x y \/ o y x)) &&
       chain o (tr_reach o f u) && let y = fixpoint_above o f u in
-      maximum o (tr_reach o f u) y && (f y = y by o (f y) y /\ o y (f y))
+      (maximum o (tr_reach o f u) y by tr_reach o f u u)
+      && (f y = y by o (f y) y /\ o y (f y))
 
   lemma fixpoint_is_max_proof : forall o f,x y:'a.
     order o /\ inflationary o f /\ tr_reach o f x y /\ f y = y ->
