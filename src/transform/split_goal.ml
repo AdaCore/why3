@@ -47,27 +47,11 @@ module M = struct
   (* inject formula into monoid. *)
   let (!+) a = Comb (Base a)
 
-  let rec filter c = match c with
-    | Base _ -> None
-    | Op (a,b) ->
-        match filter a, filter b with
-        | None, u | u, None -> u
-        | Some a, Some b -> Some (Op (a,b))
-
   (* monoid law. *)
   let (++) a b =
     match a, b with
-    | _, Unit -> a
-    | Unit, _ -> b
-    | Zero ta, Comb b -> begin match filter b with
-        | None -> a
-        | Some b -> Comb (Op (Base ta,b))
-        end
-    | Comb a, Zero tb -> begin match filter a with
-        | None -> b
-        | Some a -> Comb (Op (a,Base tb))
-        end
-    | Zero _, Zero _ -> a
+    | _, Unit | Zero _, _ -> a
+    | Unit, _ | _, Zero _ -> b
     | Comb ca, Comb cb -> Comb (Op (ca, cb))
 
   (* (base -> base) morphism application. *)
