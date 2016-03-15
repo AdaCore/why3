@@ -422,22 +422,22 @@ let adapt_limits ~use_steps a =
     let increased_mem = 3 * memlimit / 2 in
     begin
       match r with
-      | Call_provers.OutOfMemory -> increased_time, memlimit, -1
-      | Call_provers.Timeout -> timelimit, increased_mem, -1
+      | Call_provers.OutOfMemory -> increased_time, memlimit, 0
+      | Call_provers.Timeout -> timelimit, increased_mem, 0
       | Call_provers.Valid ->
         let steplimit =
-          if use_steps && not a.proof_obsolete then s else -1
+          if use_steps && not a.proof_obsolete then s else 0
         in
         increased_time, increased_mem, steplimit
       | Call_provers.Unknown _
       | Call_provers.StepLimitExceeded
-      | Call_provers.Invalid -> increased_time, increased_mem, -1
+      | Call_provers.Invalid -> increased_time, increased_mem, 0
       | Call_provers.Failure _
       | Call_provers.HighFailure ->
         (* correct ? failures are supposed to appear quickly anyway... *)
-        timelimit, memlimit, -1
+        timelimit, memlimit, 0
     end
-  | _ -> timelimit, memlimit, -1
+  | _ -> timelimit, memlimit, 0
 
 let adapt_limits ~use_steps a =
   let t, m, s = adapt_limits ~use_steps a in
