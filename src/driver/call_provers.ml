@@ -51,12 +51,12 @@ let empty_limit =
 
 let get_time x = Opt.get_def 0 x.limit_time
 let get_mem x = Opt.get_def 0 x.limit_mem
-let get_steps x = Opt.get_def (-1) x.limit_steps
+let get_steps x = Opt.get_def 0 x.limit_steps
 
 let mk_limit t m s =
   { limit_time = if t = 0 then None else Some t;
     limit_mem  = if m = 0 then None else Some m;
-    limit_steps = if s = -1 then None else Some s
+    limit_steps = if s = 0 then None else Some s
   }
 
 let limit_max a b =

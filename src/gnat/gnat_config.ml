@@ -100,7 +100,7 @@ let set_timeout t =
    opt_timeout := Some t
 
 let set_steps t =
-   opt_steps := Some t
+  if t > 0 then opt_steps := Some t
 
 let set_socket_name s =
   opt_socket_name := s
