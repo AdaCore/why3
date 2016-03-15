@@ -503,8 +503,8 @@ let get_used_provers_with_stats session =
       let sf = try Hashtbl.find steplimits lim_steps with Not_found -> 0 in
       let mf = try Hashtbl.find memlimits lim_mem with Not_found -> 0 in
       Hashtbl.replace timelimits lim_time (tf+1);
-      Hashtbl.replace steplimits lim_mem (sf+1);
-      Hashtbl.replace memlimits lim_steps (mf+1))
+      Hashtbl.replace steplimits lim_steps (sf+1);
+      Hashtbl.replace memlimits lim_mem (mf+1))
     session;
   prover_table
 

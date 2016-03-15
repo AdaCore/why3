@@ -62,7 +62,7 @@ module SubgameProof
         have_winning_strat g2 x (related (=) s)
         by g2.transition x s)
 
-  clone Subgame with lemma trivial_subgame_indeed
+  clone Subgame with goal trivial_subgame_indeed
 
 end
 
@@ -73,6 +73,7 @@ module Fmla
   use import ho_set.Set
   use import ho_rel.Rel
   use import fn.Fun
+  use import fn.Image
   use import game.Game
   use import Subgame
 
@@ -121,49 +122,32 @@ module Fmla
   predicate later_limit (o:erel 'b) (i:rel 'b 'a) (ch:set 'b) (y:'a) =
     exists x. i x y /\ upper_bound o ch x
 
-  (* TODO: recreate values for transfinite call-stack rule,
-     commented for now. *)
-  (*  type v_data 'a 'b = {
-    (* Underlying game ordering. *)
-    v_go : 'a -> 'a -> bool;
-    (* Extra order for the stack. *)
-    v_so : 'b -> 'b -> bool;
-    (* Initial stack. *)
-    v_s0 : ('a,'b) -> bool;
-    (* Precondition for calling on a given stack.
-       The location is the stack supremum on first component. *)
-    v_pr : (('a,'b) -> bool) -> bool;
-    (* Postcondition: some element in the stack satisfy the postcondition
-       at the given point. *)
-    v_pst : 'a -> ('a,'b) -> bool;
-  }
-  function v_prod (vd:v_data 'a 'b) : ('a,'b) -> ('a,'b) -> bool =
-    \x y. oprod vd.v_go vd.v_so x y
-  predicate v_data_valid (vd:v_data 'a 'b) =
-    order vd.v_so /\
-    chain vd.v_prod vd.v_s0 /\
-    forall stack.
-      chain vd.v_prod stack /\
-      subchain vd.v_prod vd.v_s0 stack /\
-      (forall x. not maximum vd.v_prod stack x) /\
-      (forall rstack.
-        subchain vd.v_prod vd.v_s0 rstack /\ subchain vd.v_prod rstack stack /\
-        rstack <> stack -> vd.v_pr rstack) ->
-      vd.v_pr stack
-  predicate v_pre (vd:v_data 'a 'b) (stack:('a,'b) -> bool) (x:'a) =
-    vd.v_pr stack /\ chain vd.v_prod stack /\
-    supremum vd.v_go (proj1 stack) x
-  predicate v_post (vd:v_data 'a 'b) (stack:('a,'b) -> bool) (x:'a) =
-    exists y. stack y /\ vd.v_pst x y
-  function v_enf (vd:v_data 'a 'b) : (('a,'b) -> bool) -> fmla 'a =
-    u_enforce (v_pre vd) (v_post vd)
-  function v_hrec (vd:v_data 'a 'b) (s:('a,'b) -> bool) : fmla 'a =
-    universal (\s'. arrow (lift (subchain vd.v_prod s s' /\ s <> s'))
-                          (v_enf vd s'))
-  function v_hfix (vd:v_data 'a 'b) : fmla 'a =
-    universal (\s. arrow (conj (lift (subchain vd.v_prod vd.v_s0 s))
-                               (v_hrec vd s))
-                         (v_enf vd s))*)
+  (* Condition for transfinite loop limit case. *)
+  predicate step_limit (c:fmla 'a) (o:erel 'b) (go:erel 'a) (i:rel 'b 'a) =
+    forall ch f inh. chain o ch /\ monotone_on ch o f go /\ ch inh /\
+      (forall x. not maximum o ch x) /\ (forall x. ch x -> i x (f x)) ->
+      holds c (enforce (supremum go (image f ch)) (later_limit o i ch))
+
+  (* Express that the precondition is taken with respect to higher
+     state. For transfinite recursion rule. *)
+  predicate higher (o:erel 'b) (p:rel 'b 'a) (x:'b) (y:'b) (z:'a) =
+    o x y /\ x <> y /\ p y z
+
+  (* Variation of higher in limit case. *)
+  predicate higher_limit (o:erel 'b) (p:rel 'b 'a) (ch:set 'b) (y:'b) (z:'a) =
+    upper_bound o ch y /\ p y z
+
+  (* Postcondition for recursion limit case. *)
+  predicate post_limit (q:rel 'b 'a) (ch:set 'b) (y:'a) =
+    exists x. ch x /\ q x y
+
+  (* Fixpoint condition for recursion limit case. *)
+  predicate fix_limit (c:fmla 'a) (o:erel 'b) (go:erel 'a) (p q:rel 'b 'a) =
+    forall ch inh f. ch inh /\ monotone_on ch o f go /\ chain o ch /\
+      (forall x. not maximum o ch x) /\ (forall x. ch x -> p x (f x)) ->
+      holds c (arrow (universal (u_enforce (higher_limit o p ch) q))
+                     (enforce (supremum go (image f ch)) (post_limit q ch)))
+
 end
 
 module FmlaRules "W:non_conservative_extension:N" (* => FmlaRulesProof *)
@@ -218,30 +202,22 @@ module FmlaRules "W:non_conservative_extension:N" (* => FmlaRulesProof *)
      (we can derive rules with real postcondition from this one + Kont). *)
   axiom trampoline : forall c go,i:rel 'b 'a,o:erel 'b.
     holds c (universal (u_enforce i (later o i))) /\
-    holds c (ordering go) /\ order o /\
-    (forall ch f inh y. chain o ch /\ supremum go (image f ch) y /\
-      monotone_on ch o f go /\ ch inh /\
-      (forall x. not maximum o ch x) /\ (forall x. ch x -> i x (f x)) ->
-      holds c (enforce ((=) y) (later_limit o i ch))) ->
+    holds c (ordering go) /\ order o /\ step_limit c o go i ->
     holds c (universal (u_enforce i (const none)))
 
   axiom abstraction : forall c f1 f2:fmla 'a.
     is_fmla c -> holds c (arrow f1 f2) <-> holds (conj c f1) f2
 
-  (* TODO: rewrite vertical fixpoint
-    (* Vertical fixpoint rule (or transfinite call-stack rule):
-     If, knowing that from any valid higher stack we can reach a point in
-     which the post is satisfied for some point of the stack,
-     then we can reach a point in which an element of the current stack
-     satisfy the post, plus some continuity condition on the precondition,
-     then we can have the same enforcement without the higher-stack
-     hypothesis (e.g a fixpoint) *)
-  axiom vertical_fix : forall c,vd:v_data 'a 'b.
-    is_fmla c ->
-    holds c (v_hfix vd) /\
-    holds c (ordering vd.v_go) /\
-    v_data_valid vd ->
-    holds c (v_enf vd vd.v_s0)*)
+  axiom modus_ponens : forall c f1 f2:fmla 'a.
+    holds c (arrow f1 f2) /\ holds c f1 -> holds c f2
+
+  axiom recursion : forall c o go,p q:rel 'b 'a.
+    holds c (ordering go) /\ order o /\
+    (forall x.
+      holds c (arrow (universal (u_enforce (higher o p x) q))
+                     (enforce (p x) (q x)))) /\
+    fix_limit c o go p q ->
+    holds c (universal (u_enforce p q))
 
 end
 
@@ -249,6 +225,7 @@ module FmlaRulesProof
 
   use import option.Option
   use import ho_set.Set
+  use import ho_set.SetBigOps
   use import ho_rel.RelSet
   use import ho_rel.Prod
   use import fn.Fun
@@ -376,8 +353,8 @@ module FmlaRulesProof
       let tr = \x. (=) (nx x) in
       let g2 = { progress = op; transition = tr } in
       let strt = (=) (x,y) in
-      game_wf g2
-      so (have_uniform_winning_strat g2 strt none
+      (game_wf g2 by forall x s y. tr x s /\ s y -> op x y by nx x y)
+      so ("stop_split" have_uniform_winning_strat g2 strt none
         by have_winning_strat g2 (x,y) none
         by let ang = \x _. nx x in
           not (not winning_strat g2 (x,y) none ang
@@ -385,7 +362,7 @@ module FmlaRulesProof
       so let r = \x y. let (a,b) = x in b = y /\ i a b in
         (simulate g2 r g
         by step_simulate g2 r g
-        by (forall x s y. tr x s /\ r x y ->
+        by ("stop_split" forall x s y. tr x s /\ r x y ->
           have_winning_strat g y (related r s)
           by let (xx,_) = x in
           (have_winning_strat g y (inter (later o i xx) (go y))
@@ -395,12 +372,14 @@ module FmlaRulesProof
           by forall z. later o i xx z /\ go y z ->
             related r s z by exists xz. i xz z /\ o xx xz /\ xx <> xz
             so s (xz,z) /\ r (xz,z) z)
-        /\ (chain_compatible op r go
+        /\ ("stop_split" chain_compatible op r go
           by forall chp inhp xp yp. chain (rprod op go) chp /\ chp inhp /\
             (forall x y. chp (x,y) -> r x y) /\
             supremum (rprod op go) chp (xp,yp) ->
             let ch = image fst chp in
-            supremum op ch xp
+            let (inh,_) = inhp in
+            ch inh
+            so supremum op ch xp
             so (forall x y. ch (x,y) -> i x y
               by exists z. chp z /\ fst z = (x,y))
             so let (a,b) = xp in let (u,_) = inhp in ch u so i a b
@@ -467,11 +446,11 @@ module FmlaRulesProof
       so order o_ch /\ chain_complete o_ch
       (* Can carry out steps for i_ch.
          Case disjunction between regular and limit steps. *)
-      so (holds c (universal (u_enforce i_ch (later o_ch i_ch)))
+      so ("stop_split" holds c (universal (u_enforce i_ch (later o_ch i_ch)))
         by forall ch. holds c (enforce (i_ch ch) (later o_ch i_ch ch))
         by (exists ys. i_ch ch ys
           so let ch1 = image fst ch in let ch2 = image snd ch in
-            (forall xn yn.
+            ("stop_split" forall xn yn.
               upper_bound go ch2 yn /\ upper_bound o ch1 xn /\
               i xn yn /\ not ch1 xn ->
               later o_ch i_ch ch yn
@@ -487,7 +466,7 @@ module FmlaRulesProof
                 maximum go ch'2 yn
                 by ch'2 yn /\ forall u. ch'2 u -> go u yn by u = yn \/ ch2 u)
           so (exists xs. maximum o ch1 xs
-            so (maximum ip ch (xs,ys)
+            so ("stop_split" maximum ip ch (xs,ys)
               by exists p. ch p /\ fst p = xs
               so let (xs,yp) = p in
                 (maximum ip ch p
@@ -518,25 +497,26 @@ module FmlaRulesProof
                 so not (ch1 xn so maximum o ch1 xn))
         ) || sext (i_ch ch) none)
       (* Chain compatibility. *)
-      so (forall chh inhh chs y. chain op chh /\ supremum op chh (chs,y)
+      so ("stop_split"
+        forall chh inhh chs y. chain op chh /\ supremum op chh (chs,y)
         /\ chh inhh /\ (forall x y. chh (x,y) -> i_ch x y) ->
         i_ch chs y
         by let ch1 = image fst chh in let ch2 = image snd chh in
           supremum o_ch ch1 chs /\ chain o_ch ch1 /\
           supremum go ch2 y /\ chain go ch2
-        so chs = subchain_completion ch1
+        so chs = bigunion ch1
         so (chain ip chs by forall x. ch1 x -> chain ip x)
         so let (ch0,_) = inhh in
           (exists u. chs u by exists v. ch0 v /\ u = v so ch1 ch0)
         so (let ch3 = image snd chs in
           supremum go ch3 y
-          by (forall u. ch3 u -> go u y
+          by ("stop_split" forall u. ch3 u -> go u y
             by exists v. chs v /\ snd v = u
             so exists s0. ch1 s0 /\ s0 v
             so exists w. chh w /\ fst w = s0
             so let (_,a) = w in (go a y by op w (chs,y))
             so supremum go (image snd s0) a /\ image snd s0 u)
-          /\ forall u. upper_bound go ch3 u -> go y u
+          /\ "stop_split" forall u. upper_bound go ch3 u -> go y u
             by forall a. ch2 a -> go a u
             by exists b. chh b /\ snd b = a
             so let (b,_) = b in
@@ -564,11 +544,7 @@ module FmlaRulesProof
      injective product. *)
   lemma trampoline : forall c go,i:rel 'b 'a,o.
     holds c (universal (u_enforce i (later o i))) /\
-    holds c (ordering go) /\ order o /\
-    (forall ch f inh y. chain o ch /\ supremum go (image f ch) y /\
-      monotone_on ch o f go /\ ch inh /\
-      (forall x. not maximum o ch x) /\ (forall x. ch x -> i x (f x)) ->
-      holds c (enforce ((=) y) (later_limit o i ch))) ->
+    holds c (ordering go) /\ order o /\ step_limit c o go i ->
     holds c (universal (u_enforce i (const none)))
     by forall ch inh y. chain (iprod o go) ch /\
       supremum go (image snd ch) y /\
@@ -578,6 +554,10 @@ module FmlaRulesProof
       by let ch2 = image fst ch in
         let wit = \x z. ch (x,z) in
         let f = \x. choice (wit x) in
+        holds c (enforce (supremum go (image f ch2))
+                         (later_limit o i (image fst ch)))
+        /\ subset ((=) y) (supremum go (image f ch2))
+        by
         (chain o ch2 by forall x y. ch2 x /\ ch2 y -> o x y \/ o y x
           by exists a. ch a /\ fst a = x so exists b. ch b /\ fst b = y
           so let ((_,_),(_,_)) = (a,b) in iprod o go a b \/ iprod o go b a)
@@ -621,8 +601,7 @@ module FmlaRulesProof
         (holds c'' (enforce (i n) (i (n+1))) /\
          subset (i (n+1)) (later (<=) i n)))
     )
-    /\ holds c'' (ordering go)
-    /\ (forall ch f inh. chain (<=) ch /\ ch inh /\
+    /\ (step_limit c'' (<=) go i by forall ch f inh. chain (<=) ch /\ ch inh /\
       monotone_on ch (<=) f go /\
       (forall x. ch x -> i x (f x)) -> (exists x. maximum (<=) ch x)
       by (forall x. ch x -> 0 <= x <= 2)
@@ -630,8 +609,8 @@ module FmlaRulesProof
       || (ch 1 so maximum (<=) ch 1)
       || (ch 0 so maximum (<=) ch 0))
 
-  (* From that point on, the goal is to prove the
-     'crude recursion theorem'.
+  (* From that point on, the goal is to prove the recursion theorem,
+     starting by the 'crude recursion theorem'.
      If we have:
      - An ordered set B
      - A non-empty-chain-stable precondition on (B,Game-support) chains
@@ -640,8 +619,7 @@ module FmlaRulesProof
        Gamma |- forall X. (forall Y strict super-chain of X =>
                           P Y enforce exists y in Y. Q Y) =>
                           P X enforce exists x in X. Q x
-     - Gamma |- Q X_0 enforce False
-     Then, Gamma |- P X_0 enforce False
+     Then, Gamma |- P X_0 enforce Q X_0
      Initially, we even restrict Gamma to a singleton. *)
 
   (* Regroup parameters *)
@@ -761,12 +739,12 @@ module FmlaRulesProof
   lemma clex_order : forall o1 o2 r:erel 'a. clex_valid o1 o2 r ->
     let o = clex o1 o2 r in
     order o
-    by (antisymetric o
+    by ("stop_split" antisymetric o
       by forall a b. o a b /\ o b a /\ a <> b -> false
       by not subchain o1 a b
       so not subchain o1 b a
       so antisymetric o2)
-    /\ (transitive o
+    /\ ("stop_split" transitive o
       by forall a b c. o a b /\ o b c -> o a c
       by if a = b || b = c then true else
         if subchain o1 a b
@@ -794,29 +772,29 @@ module FmlaRulesProof
           else if o1 xb yb
           then clex_witness o1 o2 r a c xp xa xb
             by yp xb so subset yp b so subset yp c so b xb so c xb
-            so (forall y. c y /\ o1 y xa -> xp y
+            so ("stop_split" forall y. c y /\ o1 y xa -> xp y
               by if o1 y xb
                 then xp y by yp y
                 else false by chain o1 c so o1 xb y so o1 xb xa)
             so subchain o1 xp c
             by subchain o1 xp yp
-            by (forall x. xp x -> yp x
+            by ("stop_split" forall x. xp x -> yp x
               by b x so o1 x xb so o1 x yb so x <> yb)
-            so (forall x y. xp x /\ yp y /\ not xp y -> o1 x y
+            so ("stop_split" forall x y. xp x /\ yp y /\ not xp y -> o1 x y
               by o1 x xb so if o1 xb y then true else false
               by chain o1 b so b y so o1 y xb so y <> xb)
           else (o1 yb xb by chain o1 b)
             so clex_witness o1 o2 r a c yp yb yc
             by xp yb so subset xp b so subset xp a so a yb so b yb
-            so (forall y. a y /\ o1 y yc -> yp y
+            so ("stop_split" forall y. a y /\ o1 y yc -> yp y
               by if o1 y yb
                 then yp y by xp y
                 else false by chain o1 a so o1 yb y so o1 yb yc)
             so subchain o1 yp a
             by subchain o1 yp xp
-            by (forall x. yp x -> xp x
+            by ("stop_split" forall x. yp x -> xp x
               by b x so o1 x yb so o1 x xb so x <> xb)
-            so (forall x y. yp x /\ xp y /\ not yp y -> o1 x y
+            so ("stop_split" forall x y. yp x /\ xp y /\ not yp y -> o1 x y
               by o1 x yb so if o1 yb y then true else false
               by chain o1 b so b y so o1 y yb so y <> yb)
     )
@@ -967,18 +945,20 @@ module FmlaRulesProof
     so is_stack sc stk
     so is_frame sc f
     so transitive (lframe sc) /\ transitive go /\ antisymetric go
-    so (* Lengthy internal lemma for step case of trampoline rule:
+    so (* Internal lemma for step case of trampoline rule:
           if we execute any frame in the stack (and cut the stack at
           the associated level), then we go to a later stack.
           This lemma covers both natural step case and return chaining case. *)
-      (forall f0 y z. stk f0 /\ maximum go f0.hstr y /\ f0.angl y f0.hstr z /\
+      ("stop_split"
+        forall f0 y z. stk f0 /\ maximum go f0.hstr y /\ f0.angl y f0.hstr z /\
         go x z /\ not rc_post sc f0.keys y ->
         later o i stk z
         by let nf = { f0 with hstr = add f0.hstr z } in
           let nstk = \f2. (stk f2 /\ lframe sc f2 f0 /\ f2 <> f0) \/ f2 = nf in
           let mg = mgame sc f0.keys in
           (* Preservation of frame invariant. *)
-          (is_frame sc nf /\ maximum go nf.hstr z /\ nf.hstr <> f0.hstr
+          ("stop_split"
+            is_frame sc nf /\ maximum go nf.hstr z /\ nf.hstr <> f0.hstr
             by let s = f0.angl y f0.hstr in
               not (not mg.transition y s \/ s y
                 so lose_at mg f0.angl (rc_post sc f0.keys) f0.hstr)
@@ -988,11 +968,11 @@ module FmlaRulesProof
               maximum go nf.hstr x
               by not (x <> z so f0.hstr x so maximum go f0.hstr x))
           )
-          so (maximum (lframe sc) nstk nf
+          so ("stop_split" maximum (lframe sc) nstk nf
             by forall f1. nstk f1 -> lframe sc f1 nf
             by f1 = nf || (stk f1 so lframe sc f1 f0))
           (* Preservation of stack invariant. *)
-          so (is_stack sc nstk
+          so ("stop_split" is_stack sc nstk
             by (wf_chain (lframe sc) nstk
               by let pstk = remove nstk nf in
                  subset pstk stk
@@ -1014,7 +994,7 @@ module FmlaRulesProof
           so nstk <> stk
           so rframe sc f0 nf
           (* Progression. *)
-          so (lstack sc stk nstk
+          so ("stop_split" lstack sc stk nstk
             by let p = \f2. stk f2 /\ lframe sc f2 f0 /\ f2 <> f0 in
               clex_witness (lframe sc) (rframe sc) (later_frame sc)
                            stk nstk p f0 nf
@@ -1047,7 +1027,7 @@ module FmlaRulesProof
       not (not mg.transition x s
         so lose_at mg f.angl (rc_post sc f.keys) f.hstr)
       so if g.transition x s
-      then (* Normal execution, just runs top frame. *)
+      then (* Normal execution, just runs top frame via internal lemma. *)
         have_uniform_winning_strat g s (later o i stk)
         by forall y. s y -> later o i stk y
       else (* The transition does not exists in the original game,
@@ -1078,11 +1058,11 @@ module FmlaRulesProof
         so lframe sc f nf
         (* Put it at the top of the stack. *)
         so let nstk = add stk nf in
-          (maximum (lframe sc) nstk nf
+          ("stop_split" maximum (lframe sc) nstk nf
             by forall f0. nstk f0 -> lframe sc f0 nf
               by f0 = nf ||
                 (stk f0 so lframe sc f0 f))
-        so (is_stack sc nstk
+        so ("stop_split" is_stack sc nstk
             by forall f0 y. nstk f0 /\ rc_post sc f0.keys y /\ go f0.strt y ->
               (exists fr x. chain_to sc nstk fr f0 x y)
               by if f0 <> nf
@@ -1104,20 +1084,32 @@ module FmlaRulesProof
         so c x /\ c y so o x y so o y x so x = y))
     || (subchain o a b)
 
-  (* We can also carry out limit steps of trampoline as expected. *)
+  (* We can also carry out limit steps of trampoline as expected.
+     The (lengthy) proof is based on the following dichotomy:
+     - Either there is a largest eventually stable prefix. Then,
+       we can recover an ordered sequence of frames at the same
+       level that corresponds to the same state in the game as the
+       complete sequence of stacks. We get a valid limit state by taking
+       the limit of those frames.
+     - Either there is no such prefix. Then, the supremum of eventually
+       stable prefixes is a non-empty maxless stack and an upper bound of
+       of all prefixes. We get a valid limit state by adding an extra
+       frame on top of that maxless stack. *)
   lemma rc_as_trampoline_limit : forall sc:section 'a 'b. rc_section sc ->
     let o = lstack sc in
     let i = rc_inv sc in
     let go = sc.gm.progress in
     let c = (=) sc.gm in
-    forall chh loc inh x. chain o chh /\ supremum go (image loc chh) x /\
-      monotone_on chh o loc go /\ chh inh /\
+    step_limit c o go i
+    by forall chh loc inh. chain o chh /\ monotone_on chh o loc go /\ chh inh /\
       (forall x. not maximum o chh x) /\ (forall x. chh x -> i x (loc x)) ->
-      holds c (enforce ((=) x) (later_limit o i chh))
+      holds c (enforce (supremum go (image loc chh)) (later_limit o i chh))
     by forall g. c g ->
-      have_uniform_winning_strat g ((=) x) (later_limit o i chh)
+      have_uniform_winning_strat g (supremum go (image loc chh))
+                                   (later_limit o i chh)
     by g = sc.gm
-    so have_winning_strat g x (later_limit o i chh)
+    so forall x. supremum go (image loc chh) x ->
+      have_winning_strat g x (later_limit o i chh)
     by later_limit o i chh x
     by (* Introduce the notion of eventually stable prefixes. *)
       let lf = lframe sc in
@@ -1126,7 +1118,7 @@ module FmlaRulesProof
         forall s1. chh s1 /\ lstack sc s0 s1 -> sbf p s1 in
       transitive sbf /\ transitive lf /\ antisymetric lf /\ transitive go
       (* Eventually stable prefixes form a chain. *)
-      so (chain sbf evp
+      so ("stop_split" chain sbf evp
         by forall p1 p2. evp p1 /\ evp p2 ->
           (sbf p1 p2 \/ sbf p2 p1)
         by exists s0. chh s0 /\
@@ -1137,7 +1129,7 @@ module FmlaRulesProof
         by (lstack sc s0 s1 /\ s3 = s1) \/ (lstack sc s1 s0 /\ s3 = s0)
       )
       (* Eventually stable prefixes are stacks. *)
-      so (forall p. evp p -> is_stack sc p
+      so ("stop_split" forall p. evp p -> is_stack sc p
         by exists s0. chh s0 /\
           (forall s2. chh s2 /\ lstack sc s0 s2 -> sbf p s2)
         so subchain lf p s0
@@ -1150,9 +1142,9 @@ module FmlaRulesProof
       )
       so transitive o /\ transitive go
       (* In particular, they have a supremum which is also a stack. *)
-      so let limp = subchain_completion evp in
+      so let limp = bigunion evp in
         supremum sbf evp limp
-      so (is_stack sc limp
+      so ("stop_split" is_stack sc limp
         by forall f y. limp f /\ rc_post sc f.keys y /\ go f.strt y ->
           (exists fr x. chain_to sc limp fr f x y)
           by exists p. evp p /\ p f
@@ -1173,7 +1165,7 @@ module FmlaRulesProof
         (* Such a right-above-limp element must exists, otherwise
            limp=stkr would be maximal. *)
           not (not (exists x. mins x)
-          so (forall s2. chh s2 /\ lstack sc stkr s2 -> s2 = limp
+          so ("stop_split" forall s2. chh s2 /\ lstack sc stkr s2 -> s2 = limp
             by sext s2 limp by sbf limp s2
             so forall x. s2 x -> not (not limp x so diff s2 limp x
               so subset (diff s2 limp) s2
@@ -1186,7 +1178,7 @@ module FmlaRulesProof
             so lstack sc stkr s2))
         (* Local lemma: if two stacks after stkr have a maximal common
            prefix, then limp is included in that prefix. *)
-        so (forall s2 s3 pi x.
+        so ("stop_split" forall s2 s3 pi x.
           lstack sc stkr s2 /\ lstack sc stkr s3 /\ chh s2 /\ chh s3 /\
           max_cprefix_by lf pi s2 s3 x -> sbf limp pi
           by if subchain lf limp pi then true else false
@@ -1196,7 +1188,7 @@ module FmlaRulesProof
         )
         (* Local lemma: if two stacks have a maximal common prefix,
            then the cut implies a minimum. *)
-        so (forall s2 s3 pi x.
+        so ("stop_split" forall s2 s3 pi x.
           max_cprefix_by lf pi s2 s3 x /\ chh s3 ->
           minimum lf (diff s3 pi) x
           by subset pi s3
@@ -1207,7 +1199,7 @@ module FmlaRulesProof
            could not have been the maximum stable prefix. *)
         so let rf = rframe sc in
           transitive rf /\ antisymetric rf
-        so (forall x. maximum rf mins x -> false
+        so ("stop_split" forall x. maximum rf mins x -> false
           by let prf = add limp x in
             exists s0.
               chh s0 /\ lstack sc stkr s0 /\ minimum lf (diff s0 limp) x
@@ -1241,7 +1233,7 @@ module FmlaRulesProof
           so sbf prf limp so limp x)
         (* The right-above-lim elements indeed form a chain.
            The relation is induced by the chain structure of chh. *)
-        so (forall x y. mins x /\ mins y -> rf x y \/ rf y x
+        so ("stop_split" forall x y. mins x /\ mins y -> rf x y \/ rf y x
           by (forall x sx y sy. chh sx /\ chh sy /\
             lstack sc stkr sx /\ lstack sc sx sy /\
             minimum lf (diff sx limp) x /\ minimum lf (diff sy limp) y ->
@@ -1269,7 +1261,7 @@ module FmlaRulesProof
         so exists stk0. chh stk0 /\ minimum lf (diff stk0 limp) fr0 /\
           lstack sc stkr stk0
         (* All min frames are valid frames. *)
-        so (forall fr. mins fr -> is_frame sc fr
+        so ("stop_split" forall fr. mins fr -> is_frame sc fr
           by exists stk. chh stk /\ minimum lf (diff stk limp) fr
           so is_stack sc stk by i stk (loc stk))
         (* Introduce the chain of frame historics to prove the
@@ -1278,28 +1270,29 @@ module FmlaRulesProof
           let e0 = (=) fr0.strt in
           let ehstrs = add hstrs e0 in
           let mg = mgame sc fr0.keys in
-          (forall x. ehstrs x ->
-            (dmn_reach mg fr0.angl fr0.strt x so subchain go e0 x)
+          ("stop_split" forall x. ehstrs x ->
+            (dmn_reach mg fr0.angl fr0.strt x && subchain go e0 x)
             by if x = e0
               then reach_ch go (step mg fr0.angl witness) e0 e0
               else exists frx. mins frx /\ frx.hstr = x
                 so (rf fr0 frx \/ rf frx fr0))
         so subchain go e0 fr0.hstr
-        so (chain (subchain go) ehstrs by forall x y. ehstrs x /\ ehstrs y ->
+        so ("stop_split"
+          chain (subchain go) ehstrs by forall x y. ehstrs x /\ ehstrs y ->
           subchain go x y \/ subchain go y x
           by if x = e0 \/ y = e0 then true
           else exists fr1. mins fr1 /\ fr1.hstr = x
             so exists fr2. mins fr2 /\ fr2.hstr = y
             so rf fr1 fr2 \/ rf fr2 fr1)
-        so let sp = subchain_completion ehstrs in
+        so let sp = bigunion ehstrs in
           supremum (subchain go) ehstrs sp
         so dmn_reach mg fr0.angl fr0.strt sp
         (* Prove that the current state (x)
            is indeed the supremum of the limit history.
            To achieve this, use the fact that cuts carry out
            global progression via later_frame. *)
-        so (supremum go sp x
-          by (upper_bound go sp x
+        so ("stop_split" supremum go sp x
+          by ("stop_split" upper_bound go sp x
             by forall y. sp y -> go y x
             by (exists fr. fr.hstr y /\ mins fr
               so exists stk. chh stk /\ minimum lf (diff stk limp) fr
@@ -1324,7 +1317,7 @@ module FmlaRulesProof
                which is located after y.
                However, finding those stacks formally is rather
                inelegant. *)
-            by (forall y. image loc chh y -> go y ub
+            by ( "stop_split" forall y. image loc chh y -> go y ub
               by (exists stk fr. chh stk /\ lstack sc stkr stk /\
                 go y (loc stk) /\ minimum lf (diff stk limp) fr
                 so go (loc stk) ub
@@ -1388,7 +1381,7 @@ module FmlaRulesProof
         )
         (* Complete sp with x as to have a maximum in history. *)
         so let csp = add sp x in
-          (dmn_reach mg fr0.angl fr0.strt csp
+          ("stop_split" dmn_reach mg fr0.angl fr0.strt csp
             by if sp x then sext csp sp else
               exists dmn. let st = step mg fr0.angl dmn in
                 reach_ch go st ((=) fr0.strt) csp
@@ -1399,7 +1392,8 @@ module FmlaRulesProof
         so maximum go csp x
         (* Prove that the obtained limit historic does satisfy
            the postcondition-maximum criterion for frame validity. *)
-        so (forall z. csp z /\ rc_post sc fr0.keys z -> maximum go csp z
+        so ("stop_split"
+          forall z. csp z /\ rc_post sc fr0.keys z -> maximum go csp z
           by if z = x then true else false
           by maximum go sp z
           by (forall y. sp y -> go y z
@@ -1428,7 +1422,7 @@ module FmlaRulesProof
         (* Limit frame is above any mins frame.
            In particular, since mins has no maximum it is
            strictly above any mins frame. *)
-        so (forall fr. mins fr -> rf fr frl
+        so ("stop_split" forall fr. mins fr -> rf fr frl
           by rf fr fr0 \/ rf fr0 fr so ehstrs fr.hstr
           so subchain go fr.hstr sp so subchain go sp csp
           so subchain go fr.hstr csp
@@ -1442,7 +1436,7 @@ module FmlaRulesProof
           (maximum lf stkl frl by forall u. stkl u -> lf u frl
             by if u = frl then true else
             limp u so lf u fr0 /\ u <> fr0)
-        so (is_stack sc stkl
+        so ("stop_split" is_stack sc stkl
           by forall fr y. stkl fr /\ rc_post sc fr.keys y /\ go fr.strt y ->
             (exists fr2 x. chain_to sc stkl fr2 fr x y)
           by (is_stack sc stk0 by i stk0 (loc stk0))
@@ -1459,7 +1453,7 @@ module FmlaRulesProof
         so (i stkl x by is_stack_top sc stkl frl x)
         (* There is one last thing to prove in order to establish
            later_limit: that stkl is indeed an upper bound of ch. *)
-        so (upper_bound o chh stkl by (forall stk. chh stk ->
+        so ("stop_split" upper_bound o chh stkl by (forall stk. chh stk ->
             lstack sc stk stkl
             by (lstack sc stk stkr -> lstack sc stkr stkl)
           )
@@ -1507,7 +1501,7 @@ module FmlaRulesProof
         (forall p. evp p -> exists s0. chh s0 &&
           (sbf p s0 by forall s2. chh s2 /\ lstack sc s0 s2 -> sbf p s2))
         (* limp is upper bound. *)
-        so (upper_bound o chh limp
+        so ("stop_split" upper_bound o chh limp
           by forall stk. chh stk -> o stk limp
           by exists stk2. chh stk2 /\ lstack sc stk stk2 /\ not sbf limp stk2
           so o stk2 limp
@@ -1532,7 +1526,7 @@ module FmlaRulesProof
                               stk2 p1 pi f1 f2
         )
         (* limp does not have a maximum. *)
-        so (forall fr. limp fr -> not (maximum lf limp fr
+        so ("stop_split" forall fr. limp fr -> not (maximum lf limp fr
           so exists p. evp p /\ p fr
           so sext p limp by forall x. limp x -> not (not p x
             so subchain lf p limp so lf fr x so lf x fr so x = fr)))
@@ -1542,7 +1536,7 @@ module FmlaRulesProof
         so exists inh_fr. limp inh_fr
         (* The supremum of the so-build stack is exactly x. *)
         so (supremum go (image strt limp) x
-          by (forall ub. upper_bound go (image strt limp) ub ->
+          by ("stop_split" forall ub. upper_bound go (image strt limp) ub ->
             go x ub
             by upper_bound go (image loc chh) ub
             by forall a. image loc chh a -> go a ub
@@ -1570,7 +1564,7 @@ module FmlaRulesProof
               so (go b fr4.strt by upper_bound go fr3.hstr fr4.strt)
               so image strt limp fr4.strt
               so go fr4.strt ub
-          ) /\ (forall y. image strt limp y -> go y x
+          ) /\ ("stop_split" forall y. image strt limp y -> go y x
             by exists fr. limp fr /\ fr.strt = y
             so exists p. evp p /\ p fr
             so exists stk. chh stk /\ sbf p stk
@@ -1592,14 +1586,14 @@ module FmlaRulesProof
         so let op = rprod sc.bo go in
           let sbp = subchain op in
           let allk = image keys limp in
-          (chain sbp allk by forall k1 k2. allk k1 /\ allk k2 ->
+          ("stop_split" chain sbp allk by forall k1 k2. allk k1 /\ allk k2 ->
             (sbp k1 k2 \/ sbp k2 k1)
             by exists f1. limp f1 /\ f1.keys = k1
             so exists f2. limp f2 /\ f2.keys = k2
             so (lf f1 f2 \/ lf f2 f1))
-        so let ksup = subchain_completion allk in
+        so let ksup = bigunion allk in
           supremum sbp allk ksup
-        so (supremum go (image snd ksup) x
+        so ("stop_split" supremum go (image snd ksup) x
           by (upper_bound go (image snd ksup) x by forall y. image snd ksup y ->
             go y x
             by exists z. ksup z /\ snd z = y
@@ -1638,7 +1632,7 @@ module FmlaRulesProof
           (is_frame sc nf by reach_ch go (step mg' ang witness) ((=) x) ((=) x))
         so (* Put it at the top of the stack. *)
           let lstk = add limp nf in
-          (maximum lf lstk nf by forall fr. lstk fr -> lf fr nf
+          ("stop_split" maximum lf lstk nf by forall fr. lstk fr -> lf fr nf
             by fr = nf || (limp fr so allk fr.keys
               so sbp fr.keys ksup
               so chain lf limp
@@ -1654,7 +1648,7 @@ module FmlaRulesProof
               so upper_bound go fr.hstr fr2.strt
               so (go fr2.strt x by image strt limp fr2.strt)
           ))
-        so (is_stack sc lstk
+        so ("stop_split" is_stack sc lstk
           by forall f y. lstk f /\ rc_post sc f.keys y /\ go f.strt y ->
             (exists fr x. chain_to sc lstk fr f x y)
           by (exists f2. limp f2 /\ lf f2 f /\
@@ -1700,7 +1694,7 @@ module FmlaRulesProof
       by forall x. rc_pre sc ch0 x -> holds c2 (enforce ((=) x) none)
       by let pst = \inp x. sc.ps inp x /\ not ch0 inp in
         let sc2 = { sc with gm = g2; ps = pst } in
-        (rc_section sc2
+        ("stop_split" rc_section sc2
           by forall ch. arrow (rc_hyp sc2 ch) (rc_enf sc2 ch) g2
           by forall g3. subgame g2 g3 /\ game_wf g3 /\ rc_hyp sc2 ch g3 ->
             rc_enf sc2 ch g3
@@ -1710,6 +1704,7 @@ module FmlaRulesProof
               by forall ch'. lower sbp ch ch' -> rc_enf sc ch' g3
               by holds c3 (rc_enf sc2 ch')
               so subset (rc_post sc2 ch') (rc_post sc ch')
+              so subset (rc_pre sc ch') (rc_pre sc2 ch')
               so holds c3 (rc_enf sc ch'))
           so (rc_enf sc ch g3 by subgame sc.gm g3)
           so holds c3 (rc_enf sc ch)
@@ -1750,13 +1745,250 @@ module FmlaRulesProof
       so holds c2 (enforce (i stk) none)
       so i stk x
 
-  (* TODO: apply the crude recursion theorem to derive
-     a variation that does not use chains. *)
+  lemma b_universal_fmla : forall s:set 'b,f:'b -> fmla 'a.
+    (forall x. s x -> is_fmla (f x)) -> is_fmla (b_universal s f)
 
+  lemma modus_ponens : forall c f1 f2:fmla 'a.
+    holds c (arrow f1 f2) /\ holds c f1 -> holds c f2
 
+  predicate ifix_limit (c:fmla 'a) (o:erel 'b) (go:erel 'a) (p q:rel 'b 'a) =
+    (forall ch inh. ch inh /\ chain (iprod o go) ch /\
+      (forall x. not maximum o (image fst ch) x) /\
+      (forall x y. ch (x,y) -> p x y) ->
+      let ch1 = image fst ch in let ch2 = image snd ch in
+      holds c (arrow (universal (u_enforce (higher_limit o p ch1) q))
+                     (enforce (supremum go ch2) (post_limit q ch1))))
 
+  (* Derive a variant of recursion theorem that does not use chains
+     except for limit. *)
+  lemma better_recursion : forall c o go,p q:rel 'b 'a.
+    holds c (ordering go) /\ order o /\
+    (forall x.
+      holds c (arrow (universal (u_enforce (higher o p x) q))
+                     (enforce (p x) (q x)))) /\
+    ifix_limit c o go p q ->
+    holds c (universal (u_enforce p q))
+    by forall g. c g /\ game_wf g -> universal (u_enforce p q) g
+    by let cg = subgame g in
+      cg g /\ is_fmla cg
+    so
+      let ip = iprod o go in
+      let op = rprod ip go in
+      let sbp = subchain op in
+      let pre = \ch.
+        chain op ch /\
+        (exists x. ch x) /\
+        (forall x y z. ch ((x,y),z) -> p x y /\ y = z) in
+      let pst = \z y. let ((x,_),_) = z in q x y in
+      let sc = {
+        gm = g;
+        bo = ip;
+        pr = pre;
+        ps = pst;
+      } in
+    (rc_section sc
+      by ("stop_split"
+        forall chh inh chs. chain sbp chh /\ chh inh /\
+          supremum sbp chh chs /\ (forall ch. chh ch -> sc.pr ch) -> sc.pr chs
+        by chs = bigunion chh
+        so (forall x y z. chs ((x,y),z) -> p x y /\ y = z
+          by exists ch0. chh ch0 /\ ch0 ((x,y),z))
+        so (exists x. inh x so chs x)
+        so chain op chs
+      ) /\ ("stop_split" forall ch. arrow (rc_hyp sc ch) (rc_enf sc ch) sc.gm
+        by holds cg (arrow (rc_hyp sc ch) (rc_enf sc ch))
+        by let c2 = conj cg (rc_hyp sc ch) in
+          (is_fmla c2 by is_fmla (rc_hyp sc ch)
+            by forall ch. is_fmla (rc_enf sc ch))
+        so holds c2 (rc_enf sc ch)
+        by forall y. rc_pre sc ch y ->
+          holds c2 (enforce ((=) y) (rc_post sc ch))
+        by (* Technical: in the crude variant, the higher
+              enforcement requires that the next state is after the
+              one for the lower one, while the variant we prove has
+              no such constraint. To re-enable it, we introduce a
+              'continuation' for element not beyond y in the context,
+              using enforce_does_progress and kont_intro lemma. *)
+          let q0 = \x. rc_post sc ch x \/ not go y x in
+          let q1 = inter q0 (go y) in
+          (holds c2 (enforce ((=) y) q1) /\ subset q1 (rc_post sc ch))
+        by holds c2 (enforce ((=) y) q0)
+        by holds c2 (arrow (enforce q0 none) (enforce ((=) y) q0))
+        by let c3 = conj c2 (enforce q0 none) in
+          holds c3 (enforce ((=) y) q0)
+        by let chi = image fst ch in
+          let chc = image fst chi in
+          let chg = image snd chi in
+          (* Lemma: for all x strictly above chc,
+             'enforce (p x) (q x)' holds in c3. Will be used in
+             both future cases. *)
+          ("stop_split" forall x. upper_bound o chc x /\ not chc x ->
+            holds c3 (enforce (p x) (q x))
+            by forall z. p x z -> holds c3 (enforce ((=) z) (q x))
+            by (* Discard not(y < z) by continuation. *)
+            if not go y z
+            then subset ((=) z) q0
+              so holds c3 (enforce q0 none)
+            else let nw = ((x,z),z) in
+              let nch = add ch nw in
+              ("stop_split" holds c3 (enforce ((=) z) (rc_post sc nch))
+                by ("stop_split" upper_bound op ch nw
+                  by forall u. ch u -> op u nw
+                  by let ((a,b),c) = u in b = c
+                  so (go c z by go c y by image snd ch c)
+                  so (o a x /\ a <> x by chc a by chi (a,b))
+                )
+                so (lower sbp ch nch
+                  by not (ch nw so chi (x,z) so chc x)
+                  so not (sbp nch ch so subset nch ch so sext ch nch)
+                  so sbp ch nch)
+                so holds c3 (b_universal (lower sbp ch) (rc_enf sc))
+                so holds c3 (rc_enf sc nch)
+                so subset ((=) z) (rc_pre sc nch)
+                by rc_pre sc nch z
+                by (maximum op nch nw by reflexive op)
+                so chain op nch
+                so (forall a b c. nch ((a,b),c) ->
+                  p a b /\ b = c by ch ((a,b),c) || (a = x /\ b = z /\ c = z))
+                so sc.pr nch
+                so supremum go (image snd nch) z
+              ) /\ ("stop_split" holds c3 (enforce (rc_post sc nch) (q x))
+                by forall z. rc_post sc nch z ->
+                  holds c3 (enforce ((=) z) (q x))
+                by exists v. nch v /\ pst v z
+                so if ch v
+                  then subset ((=) z) q0
+                    so holds c3 (enforce q0 none)
+                  else v = nw so q x z
+              )
+          )
+          (* Invoke different hypothesis depending on whether
+              ch has a maximum. *)
+          so if (exists u. maximum op ch u)
+          then exists u. maximum op ch u
+            so let ((x0,y0),z0) = u in
+              z0 = y /\ y0 = z0
+            so subset ((=) y) (p x0)
+            so subset (q x0) (rc_post sc ch)
+            so "stop_split" holds c3 (enforce (p x0) (q x0))
+            by let unv = universal (u_enforce (higher o p x0) q) in
+              holds c3 (arrow unv (enforce (p x0) (q x0)))
+            so holds c3 unv
+            by forall x. holds c3 (enforce (higher o p x0 x) (q x))
+            by forall z. higher o p x0 x z ->
+              holds c3 (enforce ((=) z) (q x))
+            by subset ((=) z) (p x)
+            so holds c3 (enforce (p x) (q x))
+            by (* Prove that we are above. *)
+              "stop_split" upper_bound o chc x /\ not chc x
+            by maximum o chc x0
+            by maximum ip chi (x0,y)
+            so (forall x. chc x -> o x x0
+              by exists p. chi p /\ fst p = x
+              so let (_,b) = p in ip (x,b) (x0,y))
+          else
+            (* Prove that chi satisfy the hypothesis
+               expected for the limit enforcement. *)
+            ("stop_split" forall x. not (maximum o chc x
+              so exists p0. chi p0 /\ fst p0 = x
+              so exists p1. ch p1 /\ fst p1 = p0
+              so let ((_,y),z) = p1 in y = z
+              so maximum op ch p1
+              by forall u. ch u -> if op u p1 then true else false
+              by let ((a,b) as v,c) = u in
+                p a b /\ b = c
+              so order op so op p1 u so ip p0 v so o x a so a <> x
+              so chi v so chc a so o a x))
+            so exists inh. ch inh
+            so let ((x_,_) as p_,_) = inh in (chc x_ by chi p_)
+            so chain ip chi
+            so (forall x y. chi (x,y) -> p x y
+              by exists p0. ch p0 /\ fst p0 = (x,y))
+            so let unv = universal (u_enforce (higher_limit o p chc) q) in
+              let enf = enforce (supremum go chg) (post_limit q chc) in
+              holds c (arrow unv enf)
+            so holds c3 (arrow unv enf)
+            so ("stop_split" subset ((=) y) (supremum go chg)
+              by sext chg (image snd ch)
+              by (forall x. chg x -> image snd ch x
+                by exists p. chi p /\ snd p = x
+                so exists p2. ch p2 /\ fst p2 = p
+                so snd p2 = x by let ((_,a),b) = p2 in a = b
+              ) /\ (forall x. image snd ch x -> chg x
+                by exists p. ch p /\ snd p = x
+                so let ((_,a) as p2 ,b) = p in a = b
+                so (chi p2 by fst p = p2) so snd p2 = a))
+            so ("stop_split" subset (post_limit q chc) q0
+              by forall z. post_limit q chc z -> q0 z
+              by rc_post sc ch z
+              by exists x. chc x /\ q x z
+              so exists p. chi p /\ fst p = x
+              so exists p2. ch p2 /\ fst p2 = p
+              so (pst p2 z by let ((a,_),_) = p2 in q a z))
+            so "stop_split" holds c3 enf
+            by holds c3 unv
+            by forall x. holds c3 (enforce (higher_limit o p chc x) (q x))
+            by forall z. higher_limit o p chc x z ->
+              holds c3 (enforce ((=) z) (q x))
+            by subset ((=) z) (p x)
+            so holds c3 (enforce (p x) (q x))
+            by upper_bound o chc x
+            so not (chc x so maximum o chc x)
+      )
+    )
+    so forall x. u_enforce p q x g by enforce (p x) (q x) g
+    by holds cg (enforce (p x) (q x))
+    by forall y. p x y -> holds cg (enforce ((=) y) (q x))
+    by let ch0 = (=) ((x,y),y) in
+      rc_enf sc ch0 g
+    so holds cg (enforce (rc_pre sc ch0) (rc_post sc ch0))
+    so (subset ((=) y) (rc_pre sc ch0)
+      by (supremum go (image snd ch0) y
+        by order go /\ image snd ch0 = (=) y
+        by sext (image snd ch0) ((=) y)
+        by snd ((x,y),y) = y
+      )
+      so chain op ch0
+      so ch0 ((x,y),y)
+      so forall a b c. ch0 ((a,b),c) -> p a b /\ b = c
+    )
+    so subset (rc_post sc ch0) (q x)
 
-
+  (* Now we can prove the exported variant of recursion theorem. *)
+  lemma recursion : forall c o go,p q:rel 'b 'a.
+    holds c (ordering go) /\ order o /\
+    (forall x.
+      holds c (arrow (universal (u_enforce (higher o p x) q))
+                     (enforce (p x) (q x)))) /\
+    fix_limit c o go p q ->
+    holds c (universal (u_enforce p q))
+    by ifix_limit c o go p q
+    by forall ch inh. ch inh /\ chain (iprod o go) ch /\
+      (forall x. not maximum o (image fst ch) x) /\
+      (forall x y. ch (x,y) -> p x y) ->
+      let ch1 = image fst ch in let ch2 = image snd ch in
+      holds c (arrow (universal (u_enforce (higher_limit o p ch1) q))
+                     (enforce (supremum go ch2) (post_limit q ch1)))
+    by let wit = \x z. ch (x,z) in
+      let f = \x. choice (wit x) in
+    (ch2 = image f ch1 by sext ch2 (image f ch1)
+      by (forall y. ch2 y -> image f ch1 y
+        by exists z. ch z /\ snd z = y
+        so let (x,_) = z in ch (x,f x)
+        so y = f x by (iprod o go z (x,f x) \/ iprod o go (x,f x) z)
+      ) /\ (forall y. image f ch1 y -> ch2 y
+        by exists x. ch1 x /\ f x = y
+        so exists z. ch z /\ fst z = x
+        so let (_,_) = z in snd (x,y) = y
+      ))
+    so (forall x. ch1 x -> p x (f x))
+    so (chain o ch1 by forall x y. ch1 x /\ ch1 y -> o x y \/ o y x
+      by exists a. ch a /\ fst a = x so exists b. ch b /\ fst b = y
+      so let ((_,_),(_,_)) = (a,b) in iprod o go a b \/ iprod o go b a)
+    so (monotone_on ch1 o f go by forall x y. ch1 x /\ ch1 y /\ o x y ->
+      let a = (x,f x) in let b = (y,f y) in
+      ch a /\ ch b so iprod o go a b \/ (x = y by iprod o go b a))
+    so let (a,_) = inh in ch1 a
 
   clone FmlaRules with goal enforce_fmla,
     goal b_universal_fmla,
@@ -1769,8 +2001,8 @@ module FmlaRulesProof
     goal external_pre,
     goal kont_intro,
     goal trampoline,
-    goal abstraction
-    (* TODO: goal vertical_fix *)
+    goal abstraction,
+    goal modus_ponens,
+    goal recursion
 
 end
-
