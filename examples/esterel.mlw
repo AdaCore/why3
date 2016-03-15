@@ -1,0 +1,82 @@
+
+
+(** {1 Challenge about the Esterel Compiler}
+
+This is a challenge given by Gérard Berry, extracted from
+Esterel compiler.
+
+1. Each instruction returns an integer code between [1] and
+   [N]. Parallel execution returns the maximum of codes of its
+   branches.
+
+2. Return codes are implemented as bitvectors.
+
+3. During static analysis, each instruction [P] may return a set of
+   codes [C(P)] instead of one code only. Hence [P||Q] must return
+   [{max(p,q) | p in C(p), q in C(q)], to be computed on bitvectors.
+
+4. A method given by Georges Gonthier is to write the result under the
+   form [{ x in P U Q | x >= max (min(P), min(Q) }] that can be
+   encoded as bitvector operation [(P|Q)&(P|-P)&(Q|-Q)].
+
+*)
+
+module Esterel
+
+  use import int.Int
+  use import int.MinMax
+  use import set.Fsetint
+  use import bv.BV64
+
+  type s = {
+          bv : BV64.t;  (* a 64-bit bitvector *)
+    ghost mdl: set int; (* its interpretation as a set *)
+  }
+  invariant {
+    forall i: int. (0 <= i < size /\ nth self.bv i) <-> mem i self.mdl
+  }
+
+
+  let union (a b: s) : s  (* operator [a|b] *)
+    ensures  { result.mdl = union b.mdl a.mdl }
+  = { bv = bw_or a.bv b.bv;
+      mdl = union b.mdl a.mdl }
+
+  let intersection (a b : s) : s (* operator [a&b] *)
+    ensures { result.mdl = inter a.mdl b.mdl }
+  = { bv = bw_and a.bv b.bv;
+      mdl = inter a.mdl b.mdl }
+
+
+  let aboveMin (a : s) : s (* operator [a|-a] *)
+    requires { not is_empty a.mdl }
+    ensures { result.mdl = interval (min_elt a.mdl) size }
+  = let ghost p = min_elt a.mdl in
+    let ghost p_bv = of_int p in
+    assert { eq_sub_bv a.bv zeros zeros p_bv };
+    let res = bw_or a.bv (neg a.bv) in
+    assert { eq_sub_bv res zeros zeros p_bv };
+    assert { eq_sub_bv res ones p_bv (sub size_bv p_bv) };
+    { bv = res;
+      mdl = interval p size }
+
+
+  let maxUnion (a b : s) : s  (* operator [(a|b)&(a|-a)&(b|-b)] *)
+    requires { not is_empty a.mdl /\ not is_empty b.mdl }
+    ensures { forall x. mem x result.mdl <->
+                (mem x (union a.mdl b.mdl) /\
+                 x >= max (min_elt a.mdl) (min_elt b.mdl)) }
+    ensures { forall x. mem x result.mdl <->
+                exists y z. mem y a.mdl /\ mem z b.mdl /\ x = max y z }
+  = let res =
+      intersection (union a b) (intersection (aboveMin a) (aboveMin b))
+    in
+    assert {
+      forall x. mem x res.mdl ->
+        let (y,z) =
+          if mem x a.mdl then (x,min_elt b.mdl) else (min_elt a.mdl,x)
+        in
+          mem y a.mdl /\ mem z b.mdl /\ x = max y z };
+    res
+
+end
