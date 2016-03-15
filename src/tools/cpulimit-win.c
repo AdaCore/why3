@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     showtime = !strncmp("-s",argv[3],3);
     hidetime = !strncmp("-h",argv[3],3);
   }
-  
+
   if (error || !(showtime || hidetime)) {
     fprintf(stderr, "usage: %s <time limit in seconds> <virtual memory limit in MiB>\n"
                     "          <show/hide cpu time: -s|-h> <command> <args>...\n\n"
@@ -122,12 +122,12 @@ int main(int argc, char *argv[]) {
     strcat(p, "\"");
     if (i < argc - 1) strcat(p, " ");
   }
-  
+
   if (time_limit_seconds!=0||memory_limit_MiB!=0)
     {/* Set the time limit */
     ULONGLONG timeout;
     ZeroMemory(&limits, sizeof(limits));
-    limits.BasicLimitInformation.LimitFlags = 
+    limits.BasicLimitInformation.LimitFlags =
       ((time_limit_seconds==0)?0:JOB_OBJECT_LIMIT_PROCESS_TIME)
       |((memory_limit_MiB==0)?0:JOB_OBJECT_LIMIT_PROCESS_MEMORY);
 
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
   int w;
     switch (w=WaitForSingleObject(pi.hProcess, INFINITE))
     {
-    case WAIT_FAILED: 
+    case WAIT_FAILED:
       printf("Wait failed"); break;
     case WAIT_TIMEOUT:
       printf("Wait timeout"); break;
@@ -188,11 +188,11 @@ int main(int argc, char *argv[]) {
     ull_system.HighPart = ft_system.dwHighDateTime;
     ull_user.LowPart = ft_user.dwLowDateTime;
     ull_user.HighPart = ft_user.dwHighDateTime;
-    cpu_time = 
+    cpu_time =
       ((ull_system.QuadPart + ull_user.QuadPart + 0.0) / 10000000.);
     wall_time = (ull_stop.QuadPart - ull_start.QuadPart + 0.0) / 10000000.;
-    fprintf(stdout, 
-	    "why3cpulimit cpu time: %fs wall time: %fs\n", cpu_time, wall_time);
+    fprintf(stdout,
+	    "why3cpulimit time : %f s\nwhy3cpulimit real time : %f s\n", cpu_time, wall_time);
     fflush(stdout);
   }
   CloseHandle(pi.hProcess);
