@@ -82,15 +82,17 @@ int main(int argc, char *argv[]) {
     if (pid > 0) {
       int status;
       pid_t p;
-      struct sigaction sa;
 
-      /* set a wallclock time limit as last resort */
-      sa.sa_handler = &wallclock_timelimit_reached;
-      sigemptyset(&sa.sa_mask);
-      sa.sa_flags = 0;
-      sigaction(SIGALRM, &sa, NULL);
-      wallclock_timelimit = 2*timelimit + 60;
-      alarm(wallclock_timelimit);
+      if (timelimit) {
+        /* set a wallclock time limit as last resort */
+        struct sigaction sa;
+        sa.sa_handler = &wallclock_timelimit_reached;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = 0;
+        sigaction(SIGALRM, &sa, NULL);
+        wallclock_timelimit = 2*timelimit + 60;
+        alarm(wallclock_timelimit);
+      }
 
       /* wait for the subprocess */
       p = waitpid(pid, &status, 0);
