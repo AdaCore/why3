@@ -50,11 +50,11 @@ module LinearProbing
     l <= j < r || r < l <= j || j < r < l
 
   (** number of dummy values in array [a] between [l] and [u] *)
-  namespace NumOfDummy
+  scope NumOfDummy
     use int.NumOf
 
     function numof (a: array key) (l u: int) : int =
-      NumOf.numof (\ i. eq a[i] dummy) l u
+      NumOf.numof (fun i -> eq a[i] dummy) l u
 
     let rec lemma numof_eq (a1 a2: array key) (l u: int) : unit
       requires { 0 <= l <= u <= length a1 = length a2 }
@@ -190,11 +190,11 @@ module LinearProbing
                     forall j2: int. 0 <= j2 < n2 -> neq a[j2] x }
       let x = h.data[i] in
       if neq x dummy then begin
-        'L:
+        label L in
         let j = find a x in
         assert { eq a[j] dummy };
         a[j] <- x;
-        assert { numofd a 0 (j+1) = numofd (at a 'L) 0 (j+1) - 1 };
+        assert { numofd a 0 (j+1) = numofd (a at L) 0 (j+1) - 1 };
         l := Map.set !l (keym x) j
       end
     done;
@@ -212,11 +212,11 @@ module LinearProbing
     end;
     let i = find h.data x in
     if eq h.data[i] dummy then begin
-      'L:
+      label L in
       h.size <- h.size + 1;
       h.data[i] <- x;
       assert { numofd h.data 0 (i+1) =
-               numofd (at h.data 'L) 0 (i+1) - 1 }
+               numofd (h.data at L) 0 (i+1) - 1 }
     end;
     ghost h.view <- Map.set h.view (keym x) True;
     ghost h.loc <- Map.set h.loc (keym x) i;
@@ -309,10 +309,10 @@ module LinearProbing
     let n = Array.length h.data in
     let j = find h.data x in
     if neq h.data[j] dummy then begin
-      'L:
+      label L in
       h.data[j] <- dummy;
       assert { numofd h.data 0 (j+1) =
-               numofd (at h.data 'L) 0 (j+1) + 1 };
+               numofd (h.data at L) 0 (j+1) + 1 };
       ghost h.view <- Map.set h.view (keym x) False;
       let l = ref h.loc in
       let f0 = find_dummy h.data j (next n j) in

@@ -40,28 +40,28 @@ module FIND
   let find (a: array int) =
     requires { length a = _N+1 }
     ensures  { found a /\ permut_all a (old a) }
-'Init:
   let m = ref 1 in let n = ref _N in
   while !m < !n do
     invariant { m_invariant !m a /\ n_invariant !n a /\
-      permut_all a (at a 'Init) /\ 1 <= !m /\ !n <= _N }
+      permut_all a (old a) /\ 1 <= !m /\ !n <= _N }
     variant { !n - !m }
     let r = a[f] in let i = ref !m in let j = ref !n in
     while !i <= !j do
       invariant { i_invariant !m !n !i r a /\ j_invariant !m !n !j r a /\
         m_invariant !m a /\ n_invariant !n a /\ 0 <= !j /\ !i <= _N + 1 /\
-        termination !i !j !m !n r a /\ permut_all a (at a 'Init) }
+        termination !i !j !m !n r a /\ permut_all a (old a) }
       variant { _N + 2 + !j - !i }
-  'L: while a[!i] < r do
+      label L in
+      while a[!i] < r do
         invariant { i_invariant !m !n !i r a /\
-          at !i 'L <= !i <= !n /\ termination !i !j !m !n r a }
+          !i at L <= !i <= !n /\ termination !i !j !m !n r a }
         variant { _N + 1 - !i }
         i := !i + 1
       done;
 
       while r < a[!j] do
         invariant { j_invariant !m !n !j r a /\
-          !j <= at !j 'L /\ !m <= !j /\ termination !i !j !m !n r a }
+          !j <= !j at L /\ !m <= !j /\ termination !i !j !m !n r a }
         variant { !j }
         j := !j - 1
       done;
@@ -70,7 +70,7 @@ module FIND
 
       if !i <= !j then begin
         let w = a[!i] in begin a[!i] <- a[!j]; a[!j] <- w end;
-        assert { exchange a (at a 'L) !i !j };
+        assert { exchange a (a at L) !i !j };
         assert { a[!i] <= r }; assert { r <= a[!j] };
         i := !i + 1;
         j := !j - 1

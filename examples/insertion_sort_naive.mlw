@@ -19,25 +19,24 @@ module InsertionSortNaive
     ensures { sorted a }
     ensures { permut_all (old a) a }
   =
-   'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut_all (at a 'Init) a   }
+     invariant { permut_all (old a) a   }
      invariant { sorted_sub a 0 i  }
      let j = ref i in
      while !j > 0 && a[!j-1] > a[!j]  do
        invariant { 0 <= !j <= i }
-       invariant { permut_all (at a 'Init) a   }
+       invariant { permut_all (old a) a   }
        invariant { sorted_sub a 0 !j }
        invariant { sorted_sub a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       a[k1] <= a[k2] }
        variant { !j }
-       'L:
+       label L in
        let b = !j - 1 in
        let t = a[!j] in
        a[!j] <- a[b];
        a[b] <- t;
-       assert { exchange (at a 'L) a (!j-1) !j };
+       assert { exchange (a at L) a (!j-1) !j };
        decr j
      done
    done
@@ -72,25 +71,24 @@ module InsertionSortNaiveGen
     ensures { sorted a }
     ensures { permut_all (old a) a }
   =
-   'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut_all (at a 'Init) a   }
+     invariant { permut_all (old a) a   }
      invariant { sorted_sub a 0 i  }
      let j = ref i in
      while !j > 0 && not (le a[!j-1] a[!j])  do
        invariant { 0 <= !j <= i }
-       invariant { permut_all (at a 'Init) a   }
+       invariant { permut_all (old a) a   }
        invariant { sorted_sub a 0 !j }
        invariant { sorted_sub a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       le a[k1] a[k2] }
        variant { !j }
-       'L:
+       label L in
        let b = !j - 1 in
        let t = a[!j] in
        a[!j] <- a[b];
        a[b] <- t;
-       assert { exchange (at a 'L) a (!j-1) !j };
+       assert { exchange (a at L) a (!j-1) !j };
        decr j
      done
    done
@@ -132,25 +130,24 @@ module InsertionSortParam
     ensures { sorted p a }
     ensures { permut_all (old a) a }
   =
-   'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut_all (at a 'Init) a   }
+     invariant { permut_all (old a) a   }
      invariant { sorted_sub p a.elts 0 i  }
      let j = ref i in
      while !j > 0 && not (le p a[!j-1] a[!j])  do
        invariant { 0 <= !j <= i }
-       invariant { permut_all (at a 'Init) a   }
+       invariant { permut_all (old a) a   }
        invariant { sorted_sub p a.elts 0 !j }
        invariant { sorted_sub p a.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       le p a[k1] a[k2] }
        variant { !j }
-       'L:
+       label L in
        let b = !j - 1 in
        let t = a[!j] in
        a[!j] <- a[b];
        a[b] <- t;
-       assert { exchange (at a 'L) a (!j-1) !j };
+       assert { exchange (a at L) a (!j-1) !j };
        assert { sorted_sub p a.elts (!j-1) (i+1) };
        decr j
      done
@@ -194,25 +191,24 @@ module InsertionSortParamBad
     ensures { sorted p a }
     ensures { permut_all (old a) a }
   =
-   'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut_all (at a 'Init) a   }
+     invariant { permut_all (old a) a   }
      invariant { sorted_sub p a 0 i  }
      let j = ref i in
      while !j > 0 && not (le p a[!j-1] a[!j])  do
        invariant { 0 <= !j <= i }
-       invariant { permut_all (at a 'Init) a   }
+       invariant { permut_all (old a) a   }
        invariant { sorted_sub p a 0 !j }
        invariant { sorted_sub p a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       le p a[k1] a[k2] }
        variant { !j }
-       'L:
+       label L in
        let b = !j - 1 in
        let t = a[!j] in
        a[!j] <- a[b];
        a[b] <- t;
-       assert { exchange (at a 'L) a (!j-1) !j };
+       assert { exchange (a at L) a (!j-1) !j };
        decr j
      done
    done

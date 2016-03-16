@@ -55,7 +55,7 @@ module Utils_Spec
 
   lemma countZero: count zeros = zeros
 
-  lemma numOfZero: NumOf.numof (\i. nth zeros i) 0 32 = 0
+  lemma numOfZero: NumOf.numof (fun i -> nth zeros i) 0 32 = 0
 
   (** Now, for b a bitvector with n 1-bits, we check that if its
       first bit is 0 then shifting b by one on the right doesn't
@@ -86,7 +86,7 @@ module Utils_Spec
                  let x = (if nth_bv bv zeros then 1 else 0) in
                   let f = nth bv in
                   let g = nth (lsr_bv bv one) in
-                  let h = \i. nth bv (i+1) in
+                  let h = fun i -> nth bv (i+1) in
                   (forall i. 0 <= i < 31 -> g i = h i) &&
                   NumOf.numof f 0 32 - x = NumOf.numof f (0+1) 32 &&
                   NumOf.numof f (0+1) (31+1) = NumOf.numof h 0 31 &&
@@ -117,7 +117,7 @@ module Utils_Spec
 
   lemma separation: forall a b. hammingD a b = zeros <-> a = b
 
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  function fun_or (f g : 'a -> bool) : 'a -> bool = fun x -> f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     variant {b - a}

@@ -147,15 +147,14 @@ module N
     ensures { MapEq.map_eq_sub x.digits.elts (Const.const Limb.zero_unsigned)
                 (p2i (old x).digits.length) (p2i l) }
     ensures { value x = value (old x) }
-  = 'Init:
-    let limb_zero = Limb.of_int 0 in
+  = let limb_zero = Limb.of_int 0 in
     let zero = Int31.of_int 0 in
     let lx = x.digits.length in
     let r = Array31.make l limb_zero in
     assert { MapEq.map_eq_sub r.elts (Const.const limb_zero) (p2i lx) (p2i l) };
     Array31.blit x.digits zero r zero lx;
     assert { MapEq.map_eq_sub x.digits.elts r.elts 0 (p2i lx) };
-    assert { value_sub x.digits.elts 0 (p2i lx) = value (at x 'Init) };
+    assert { value_sub x.digits.elts 0 (p2i lx) = value (old x) };
     assert { MapEq.map_eq_sub r.elts (Const.const limb_zero) (p2i lx) (p2i l) };
     assert { value_sub r.elts (p2i lx) (p2i l) = 0 };
     assert { value_sub r.elts 0 (p2i l) = value_sub r.elts 0 (p2i lx)
@@ -287,24 +286,23 @@ module N
     ensures { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length -> x[j] = (old x)[j] }
     ensures { value_array x + power radix (p2i x2) * l2i result
       = value_array (old x) + power radix (p2i x1) * l2i y }
-  = 'Init:
-    let limb_zero = Limb.of_int 0 in
+  = let limb_zero = Limb.of_int 0 in
     let one = Int31.of_int 1 in
     let i = ref x1 in
     let c = ref y in
     while Int31.(<) !i x2 && Limb.ne !c limb_zero do
       invariant { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length ->
-                  x[j] = (at x 'Init)[j] }
+                  x[j] = (old x)[j] }
       invariant { p2i x1 <= p2i !i <= p2i x2 }
       invariant {
         value_array x + power radix (p2i !i) * l2i !c =
-        value_array (at x 'Init) + power radix (p2i x1) * l2i y }
+        value_array (old x) + power radix (p2i x1) * l2i y }
       variant { p2i x2 - p2i !i }
       let (r,c') = Limb.add_with_carry x[!i] !c limb_zero in
-      'L:
+      label L in
       x[!i] <- r;
-      assert { value_array x = value_array (at x 'L)
-        + power radix (p2i !i) * (l2i r - l2i (at x 'L)[p2i !i]) };
+      assert { value_array x = value_array (x at L)
+        + power radix (p2i !i) * (l2i r - l2i (x at L)[p2i !i]) };
       c := c';
       i := Int31.(+) !i one;
     done;
@@ -320,28 +318,27 @@ module N
       value_array x + power radix (p2i x2) * l2i result
       = value_array (old x) +
         power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i y2) }
-  = 'Init:
-    let limb_zero = Limb.of_int 0 in
+  = let limb_zero = Limb.of_int 0 in
     let one = Int31.of_int 1 in
     let i = ref y1 in
     let c = ref limb_zero in
     while Int31.(<) !i y2 do
       invariant { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length ->
-                  x[j] = (at x 'Init)[j] }
+                  x[j] = (old x)[j] }
       invariant { p2i y1 <= p2i !i <= p2i y2 }
       invariant {
         let j = p2i x1 + (p2i !i - p2i y1) in
         value_array x + power radix j * l2i !c
-      = value_array (at x 'Init) +
+      = value_array (old x) +
         power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) }
       invariant { 0 <= l2i !c <= 1 }
       variant { p2i y2 - p2i !i }
       let j = Int31.(+) x1 (Int31.(-) !i y1) in
       let (r,c') = Limb.add_with_carry x[j] y[!i] !c in
-      'L:
+      label L in
       x[j] <- r;
-      assert { value_array x = value_array (at x 'L)
-        + power radix (p2i j) * (l2i r - l2i (at x 'L)[p2i j]) };
+      assert { value_array x = value_array (x at L)
+        + power radix (p2i j) * (l2i r - l2i (x at L)[p2i j]) };
       assert { value_sub y.elts (p2i y1) (p2i !i + 1) =
          value_sub y.elts (p2i y1) (p2i !i)
          + power radix (p2i !i - p2i y1) * l2i y[p2i !i] };
@@ -360,24 +357,23 @@ module N
     writes   { x.digits, x.digits.elts }
     ensures  { value x = value (old x) + value_array y }
     raises   { TooManyDigits -> true }
-  = 'Init:
-    let zero = Int31.of_int 0 in
+  = let zero = Int31.of_int 0 in
     let one = Int31.of_int 1 in
     let limb_zero = Limb.of_int 0 in
     let lx = x.digits.length in
     let c = add_limbs x.digits y zero lx zero y.length in
     assert {
       value x + power radix (p2i lx) * l2i c =
-      value (at x 'Init) + value_array y };
+      value (old x) + value_array y };
     if Limb.eq c limb_zero then () else
     begin
     (* we enlarge x *)
     if Int31.eq lx (of_int 0x3FFFFFFF) then raise TooManyDigits;
-    'L:
+    label L in
     enlarge x (Int31.(+) lx one);
     assert { l2i x.digits[p2i lx] = 0 };
     x.digits[lx] <- c;
-    assert { value x = value_array (at x.digits 'L) + power radix (p2i lx) * l2i c };
+    assert { value x = value_array (x.digits at L) + power radix (p2i lx) * l2i c };
     end
 
   let add_in_place (x y:t) : unit
@@ -409,10 +405,10 @@ module N
     let c = add_limbs r y zero lx zero y.length in
     assert {
       value_array r + power radix (p2i lx) * l2i c = value_array x + value_array y };
-    'L:
+    label L in
     assert { l2i r[p2i lx] = 0 };
     r[lx] <- c;
-    assert { value_array r = value_array (at r 'L) + power radix (p2i lx) * l2i c };
+    assert { value_array r = value_array (r at L) + power radix (p2i lx) * l2i c };
     r
 
   let add (x y:t) : t
@@ -436,28 +432,27 @@ module N
     ensures { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) <= j < p2i z.length -> z[j] = (old z)[j] }
     ensures { value_array z + power radix (p2i z1 + (p2i x2 - p2i x1)) * l2i result
       = value_array (old z) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * l2i y) }
-  = 'Init:
-    let limb_zero = Limb.of_int 0 in
+  = let limb_zero = Limb.of_int 0 in
     let one = Int31.of_int 1 in
     let i = ref x1 in
     let c = ref limb_zero in
     while Int31.(<) !i x2 do
       invariant { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) <= j < p2i z.length ->
-                  z[j] = (at z 'Init)[j] }
+                  z[j] = (old z)[j] }
       invariant { p2i x1 <= p2i !i <= p2i x2 }
       invariant {
         value_array z + power radix (p2i z1 + (p2i !i - p2i x1)) * l2i !c =
-        value_array (at z 'Init) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i !i) * l2i y) }
+        value_array (old z) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i !i) * l2i y) }
       variant { p2i x2 - p2i !i }
       let (rl,rh) = Limb.mul_double x[!i] y in
       let j = Int31.(+) z1 (Int31.(-) !i x1) in
       let (v,c') = Limb.add3 z[j] rl !c in
       assert { 0 <= l2i z[p2i j] + l2i !c + l2i x[p2i !i] * l2i y <= radix * radix - 1 };
       assert { l2i v + radix * (l2i rh + l2i c') = l2i z[p2i j] + l2i !c + l2i x[p2i !i] * l2i y };
-      'L:
+      label L in
       z[j] <- v;
-      assert { value_array z = value_array (at z 'L)
-        + power radix (p2i z1 + (p2i !i - p2i x1)) * (l2i v - l2i (at z 'L)[p2i z1 + (p2i !i - p2i x1)]) };
+      assert { value_array z = value_array (z at L)
+        + power radix (p2i z1 + (p2i !i - p2i x1)) * (l2i v - l2i (z at L)[p2i z1 + (p2i !i - p2i x1)]) };
       c := Limb.(+) rh c';
       i := Int31.(+) !i one;
     done;
@@ -474,18 +469,17 @@ module N
       x[j] = (old x)[j] }
     ensures { value_array z + power radix (p2i z1 + (p2i x2 - p2i x1) + (p2i y2 - p2i y1)) * l2i result
       = value_array (old z) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * value_sub y.elts (p2i y1) (p2i y2)) }
-  = 'Init:
-    let limb_zero = Limb.of_int 0 in
+  = let limb_zero = Limb.of_int 0 in
     let one = Int31.of_int 1 in
     let c = ref limb_zero in
     let i = ref y1 in
     while Int31.(<) !i y2 do
       invariant { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) + (p2i y2 - p2i y1) <= j < p2i z.length ->
-                  z[j] = (at z 'Init)[j] }
+                  z[j] = (old z)[j] }
       invariant { p2i y1 <= p2i !i <= p2i y2 }
       invariant {
         value_array z + power radix (p2i z1 + (p2i x2 - p2i x1) + (p2i !i - p2i y1)) * l2i !c =
-        value_array (at z 'Init) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * value_sub y.elts (p2i y1) (p2i !i)) }
+        value_array (old z) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * value_sub y.elts (p2i y1) (p2i !i)) }
       invariant { 0 <= l2i !c <= 1 }
       variant { p2i y2 - p2i !i }
       let j = Int31.(+) z1 (Int31.(-) !i y1) in

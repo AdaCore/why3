@@ -78,7 +78,7 @@ module PigeonHole
   exception Found
 
   function shift (f: int -> int) (i:int) : int -> int =
-    \k:int. if k < i then f k else f (k+1)
+    fun k -> if k < i then f k else f (k+1)
 
   let rec lemma pigeon_hole (n m:int) (f: int -> int)
     requires { range f n m }
@@ -487,7 +487,6 @@ module PatienceAbstract
        invariant { forall j,k. i < j < k < ns ->
          s.values[!seq[j]] < s.values[!seq[k]]
        }
-       'L:
        seq := !seq[i <- !idx];
        idx := s.preds[!idx];
     done;
@@ -503,7 +502,7 @@ module PatienceAbstract
     assert {  (* non-injectivity *)
       forall sigma: seq int.
         increasing_subsequence sigma input /\ sigma.seqlen > s.num_stacks ->
-        let f = \i:int.
+        let f = fun i ->
           let si = sigma.seqval[i] in
           let (stack_i,_) = s.positions[si] in
           stack_i
@@ -841,7 +840,6 @@ module PatienceFull
        invariant { forall j,k. i < j < k < ns ->
          state.values[!seq[j]] < state.values[!seq[k]]
        }
-       'L:
        seq := !seq[i <- !idx];
        idx := state.preds[!idx];
     done;
@@ -856,7 +854,7 @@ module PatienceFull
     assert {  (* non-injectivity *)
       forall sigma: seq int.
         increasing_subsequence sigma input /\ sigma.seqlen > state.num_stacks ->
-        let f = \i:int.
+        let f = fun i ->
           let si = sigma.seqval[i] in
           let (stack_i,_) = state.positions[si] in
           stack_i

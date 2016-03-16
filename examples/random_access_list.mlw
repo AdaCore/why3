@@ -190,8 +190,8 @@ module RandomAccessListWithSeq
 
   function flatten (s: seq ('a, 'a)) : seq 'a =
     create (2 * length s)
-           (\ i: int. let (x0, x1) = s[div i 2] in
-                      if mod i 2 = 0 then x0 else x1)
+           (fun i -> let (x0, x1) = s[div i 2] in
+                     if mod i 2 = 0 then x0 else x1)
 
   function elements (l: ral 'a) : seq 'a =
     match l with
@@ -251,7 +251,7 @@ module RandomAccessListWithSeq
     set s i (f s[i])
 
   function aux (i: int) (f: 'a -> 'a) : ('a, 'a) -> ('a, 'a) =
-    \ z. let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
+    fun z -> let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
 
   let rec fupdate (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }
@@ -265,7 +265,7 @@ module RandomAccessListWithSeq
     | Zero l1  -> Zero (fupdate (aux i f) (div i 2) l1)
     end
 
-  function f (y: 'a) : 'a -> 'a = \ _. y
+  function f (y: 'a) : 'a -> 'a = fun _ -> y
 
   let update (i: int) (y: 'a) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }

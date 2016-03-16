@@ -193,13 +193,13 @@ module HeapSort
       t := add a[i] !t;
       assert { M.occ a[i] a.elts i n = 1 + M.occ a[i] a.elts (i+1) n }
     done;
-    'I:
+    label I in
     for i = 0 to n - 1 do
       invariant { sorted_sub a 0 i }
       invariant { heap !t && size !t = n - i }
       invariant { forall j. 0 <= j < i -> forall e. mem e !t -> le a[j] e }
       invariant { forall e.
-                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (at a.elts 'I) 0 n }
+                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (a.elts at I) 0 n }
       a[i] <- get_min !t;
       t := remove_min !t
     done

@@ -171,8 +171,7 @@ module InPlaceRev
   let in_place_reverse (l:loc) (ghost lM:list loc) : loc
     requires { list_seg l !next lM null }
     ensures  { list_seg result !next (reverse lM) null }
-  = 'Init:
-    let p = ref l in
+  = let p = ref l in
     let ghost pM = ref lM in
     let r = ref null in
     let ghost rM = ref (Nil : list loc) in
@@ -375,8 +374,7 @@ module InPlaceRevSeq
   let in_place_reverse (l:loc) (ghost lM: seq loc) : loc
     requires { list_seg !next l lM null }
     ensures  { list_seg !next result (reverse lM) null }
-  = 'Init:
-    let p = ref l in
+  = let p = ref l in
     let ghost pM = ref lM in
     let r = ref null in
     let ghost rM = ref (empty: seq loc) in

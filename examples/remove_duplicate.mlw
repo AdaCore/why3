@@ -49,15 +49,14 @@ module RemoveDuplicateQuadratic
     let r = ref 0 in
     let ghost from = make n 0 in
     let ghost to_  = make n 0 in
-    'L:
     for i = 0 to n - 1 do
       invariant { 0 <= !r <= i }
       invariant { nodup a !r }
       invariant { forall j: int. 0 <= j < !r ->
-                  0 <= to_[j] < i /\ a[j] = (at a 'L)[to_[j]] }
+                  0 <= to_[j] < i /\ a[j] = (old a)[to_[j]] }
       invariant { forall j: int. 0 <= j < i ->
-                  0 <= from[j] < !r /\ (at a 'L)[j] = a[from[j]] }
-      invariant { forall j: int. i <= j < n -> a[j] = (at a 'L)[j] }
+                  0 <= from[j] < !r /\ (old a)[j] = a[from[j]] }
+      invariant { forall j: int. i <= j < n -> a[j] = (old a)[j] }
       let ghost w = ref 0 in
       if not (test_appears w a[i] a !r) then begin
         a[!r] <- a[i];

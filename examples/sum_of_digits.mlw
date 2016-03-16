@@ -34,7 +34,7 @@ module Euler290
     0 <= mod n 10 < c /\ sum_digits n = sum_digits (137 * n + a) + b
 
   function numof (a b c: int) (l u: int) : int =
-    NumOf.numof (\ n. p a b c n) l u
+    NumOf.numof (fun n -> p a b c n) l u
 
   function solution(a b m: int) : int = numof a b 10 0 (power 10 m)
 
@@ -82,14 +82,14 @@ module Euler290
       let ghost p = power 10 m in
       for c = 0 to 9 do (* count the n st n mod 10 = c *)
         invariant { !sum = numof a b c 0 p }
-        'L:
+        label L in
         let x = 137 * c + a in
         let q = div x 10 in
         let r = mod x 10 in
         let b' = (r+b-c) in
         sum := !sum + f (m-1) q b';
         assert { q = E.div x 10 && r = E.mod x 10 &&
-          !sum - !(at sum 'L) = num_of_modc a b c 0 p }
+          !sum - !(sum at L) = num_of_modc a b c 0 p }
       done;
       !sum
     end

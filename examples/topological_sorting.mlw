@@ -83,19 +83,18 @@ module Static
     ensures { forall x:vertex. S.mem x seen -> M.get (old !values) x = M.get !values x }
     raises  { Cycle_found -> true }
    =
-  'Init:
    if S.mem v seen then raise Cycle_found;
    if not (0 <= M.get !values v) then
-  'Init_loop:
+   label Init_loop in
     begin
      let p = ref (preds g v) in
      let seen = S.add v seen in
      while not (S.is_empty !p) do
       invariant { inv g !values !next }
       invariant { S.subset (S.diff (preds g v) !p) (defined_sort !values) }
-      invariant { S.subset (at (defined_sort !values) 'Init) (defined_sort !values) }
+      invariant { S.subset (old (defined_sort !values)) (defined_sort !values) }
       invariant { S.subset !p (preds g v) }
-      invariant { forall x:vertex. S.mem x seen -> M.get (at !values 'Init_loop) x = M.get !values x }
+      invariant { forall x:vertex. S.mem x seen -> M.get (!values at Init_loop) x = M.get !values x }
       variant {S.cardinal !p}
       let u = S.choose !p in
       dfs g u seen values next;
@@ -108,8 +107,7 @@ module Static
     let topo_order (g:graph): msort
       raises  { Cycle_found -> true }
       ensures { sort g result }
-      =
-    'Init:
+    =
       let next = ref 0 in
       let values = ref (Const.const (-1)) in
       let p = ref (vertices g) in
@@ -117,7 +115,7 @@ module Static
         invariant { inv g !values !next }
         invariant { S.subset !p (vertices g) }
         invariant { S.subset (S.diff (vertices g) !p) (defined_sort !values) }
-        invariant { S.subset (at (defined_sort !values) 'Init) (defined_sort !values) }
+        invariant { S.subset (old (defined_sort !values)) (defined_sort !values) }
         variant {S.cardinal !p}
         let u = S.choose !p in
         dfs g u (S.empty) values next;
@@ -188,10 +186,8 @@ module Online_Basic
     ensures { forall x:vertex. S.mem x seen -> M.get (old g.values) x = M.get g.values x }
     ensures { forall x:vertex. M.get (old g.values) x <= M.get g.values x }
    =
-  'Init:
    if S.mem v seen then raise Cycle_found;
    if M.get g.values v < min_depth then
-  'Init_loop:
     begin
      let p = ref (succs g.graph v) in
      let seen = S.add v seen in
@@ -199,8 +195,8 @@ module Online_Basic
       invariant { inv g }
       invariant { forall s:vertex. S.mem s (succs g.graph v) -> not (S.mem s !p) -> min_depth < M.get g.values s }
       invariant { S.subset !p (succs g.graph v) }
-      invariant { forall x:vertex. S.mem x seen -> M.get (at g.values 'Init_loop) x = M.get g.values x }
-      invariant { forall x:vertex. M.get (at g.values 'Init_loop) x <= M.get g.values x }
+      invariant { forall x:vertex. S.mem x seen -> M.get (g.values at Init_loop) x = M.get g.values x }
+      invariant { forall x:vertex. M.get (g.values at Init_loop) x <= M.get g.values x }
       variant {S.cardinal !p}
       let u = S.choose !p in
       dfs g u seen (min_depth + 1);

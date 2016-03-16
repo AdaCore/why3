@@ -334,11 +334,10 @@ module M2
     ensures  { reverse (model (old !next) (old !p)) = model !next !result }
   = let old_p = !p in
     let q = ref null in
-'Init:
     while !p <> null do
       invariant { is_list !next !p /\ is_list !next !q }
       invariant { sep_list_list !next !p !q }
-      invariant { reverse (model (at !next 'Init) (old_p)) =
+      invariant { reverse (model (old !next) (old_p)) =
         reverse (model !next !p) ++ model !next !q }
       variant { model !next !p }
       let tmp = !next[!p] in

@@ -24,8 +24,7 @@ let heapSort (a : array int)
   ensures  { sorted a /\
     elements a.elts 0 (length a) =
       elements (old a.elts) 0 (length a) }
-= 'Init:
-  let len = length a in
+= let len = length a in
   let h = create len in
 
    for i = 0 to len-1 do
@@ -40,7 +39,7 @@ let heapSort (a : array int)
    invariant
      { 0 <= i <= len /\
        card (model !h) = len - i /\
-       elements (at a.elts 'Init) 0 len =
+       elements (old a.elts) 0 len =
          union (model !h) (elements a.elts 0 i) /\
        sorted_sub a 0 i /\
        forall j:int. 0 <= j < i -> a[j] <= min_bag (model !h)

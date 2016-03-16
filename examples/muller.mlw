@@ -13,7 +13,7 @@ module Muller
   use int.NumOf as N
 
   function numof (a: array int) (l u: int) : int =
-    N.numof (\ i. a[i] <> 0) l u
+    N.numof (fun i -> a[i] <> 0) l u
 
   let compact (a: array int) =
     let count = ref 0 in

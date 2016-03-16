@@ -13,12 +13,12 @@ module HeightCPS
     match t with
     | Empty -> k 0
     | Node l _ r ->
-        height_cps l (\ hl.
-        height_cps r (\ hr.
+        height_cps l (fun hl ->
+        height_cps r (fun hr ->
         k (1 + max hl hr)))
     end
 
-  function height1 (t: tree 'a) : int = height_cps t (\ h. h)
+  function height1 (t: tree 'a) : int = height_cps t (fun h -> h)
 
   lemma height_cps_correct:
     forall t: tree 'a, k: int -> 'b. height_cps t k = k (height t)

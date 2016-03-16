@@ -320,18 +320,17 @@ module Balance
     ensures  { string_of_array q i (max+1) ==
                  S.app (string_of_array (old q) i (max+1)) (string r) }
     variant  { max - i }
-  = 'L:
-    let r' = concat q[i] r in
+  = let r' = concat q[i] r in
     if R.length r' < fib (i+1) then begin
       q[i] <- r';
-      assert {    string_of_array q         (i+1) (max+1)
-               == string_of_array (at q 'L) (i+1) (max+1) }
+      assert {    string_of_array q       (i+1) (max+1)
+               == string_of_array (old q) (i+1) (max+1) }
     end else begin
       q[i] <- Emp;
-      assert {    string_of_array q         i     (max+1)
-               == string_of_array (at q 'L) (i+1) (max+1) };
-      assert {   S.app (string_of_array q         i (max+1)) (string r')
-              == S.app (string_of_array (at q 'L) i (max+1)) (string r) };
+      assert {    string_of_array q       i     (max+1)
+               == string_of_array (old q) (i+1) (max+1) };
+      assert {   S.app (string_of_array q       i (max+1)) (string r')
+              == S.app (string_of_array (old q) i (max+1)) (string r) };
       insert q (i+1) r';
       assert { string_of_array q i (max+1) == string_of_array q (i+1) (max+1) }
     end
