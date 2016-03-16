@@ -150,7 +150,7 @@ module RAL
   use import list.Nth
 
   type t 'a = { r: ral 'a; ghost l: list 'a }
-    invariant { self.l = elements self.r }
+    invariant { l = elements r }
 
   let empty () : t 'a
     ensures { result.l = Nil }

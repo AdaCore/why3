@@ -93,7 +93,7 @@ module BitsSpec
   type t = {
     ghost mdl: set int;
   }
-  invariant { forall i. mem i self.mdl -> 0 <= i < size }
+  invariant { forall i. mem i mdl -> 0 <= i < size }
 
   val empty () : t
     ensures { is_empty result.mdl }
@@ -146,7 +146,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ghost mdl: set int;
   }
   invariant {
-    forall i: int. (0 <= i < size /\ nth self.bv i) <-> mem i self.mdl
+    forall i: int. (0 <= i < size /\ nth bv i) <-> mem i mdl
   }
 
   let empty () : t

@@ -41,10 +41,10 @@ module HashtblImpl
                 mutable data: array (list (key, 'a)); (* buckets *)
           ghost mutable view: map key (option 'a); (* pure model *) }
 
-    invariant { 0 < length self.data }
+    invariant { 0 < length data }
     invariant {
-      forall i: int. 0 <= i < length self.data -> good_hash self.data i }
-    invariant { forall k: key, v: 'a. good_data k v self.view self.data }
+      forall i: int. 0 <= i < length data -> good_hash data i }
+    invariant { forall k: key, v: 'a. good_data k v view data }
 
   let create (n: int) : t 'a
     requires { 1 <= n }

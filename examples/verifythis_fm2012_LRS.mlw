@@ -339,9 +339,9 @@ type suffixArray = {
     values : array int;
     suffixes : array int;
 }
-invariant { self.values.length = self.suffixes.length /\
-  permutation self.suffixes.elts self.suffixes.length /\
-  SuffixSort.sorted self.values self.suffixes }
+invariant { values.length = suffixes.length /\
+  permutation suffixes.elts suffixes.length /\
+  SuffixSort.sorted values suffixes }
 
 let select (s:suffixArray) (i:int) : int
   requires { 0 <= i < s.values.length }

@@ -109,10 +109,10 @@ module LinearProbing
        ghost mutable loc : map keym int;  (* index where it is stored *)
     }
     (* at least one empty slot *)
-    invariant { 0 <= self.size < length self.data }
-    invariant { let n = Array.length self.data in
-                self.size + numofd self.data 0 n = n }
-    invariant { valid self.data self.view self.loc }
+    invariant { 0 <= size < length data }
+    invariant { let n = Array.length data in
+                size + numofd data 0 n = n }
+    invariant { valid data view loc }
 
   let create (n: int) : t
     requires { 0 < n }
