@@ -77,7 +77,7 @@ module Iterator
 
   let hasNext (i: iterator)
     ensures { result = True <-> hasNext i }
-  = i.it <> Done
+  = match i.it with Done -> False | _ -> True end
 
   let next (i: iterator)
     requires { hasNext i }
@@ -142,7 +142,7 @@ module ITree
   use export BSTree
   use export Iterator
 
-  type itree = { mutable tree: tree } invariant { bst self.tree }
+  type itree = { mutable tree: tree } invariant { bst tree }
 
   let create () = { tree = Empty }
 

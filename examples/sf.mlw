@@ -111,7 +111,7 @@ module MoreHoareLogic
   let list_sum (l: ref (list int)) (y: ref int)
     ensures { !y = sum (old !l) }
   = y := 0;
-    while !l <> Nil do
+    while not (is_nil !l) do
       invariant { length !l <= length (old !l) /\
                   !y + sum !l = sum (old !l) }
       variant { !l }
@@ -126,7 +126,7 @@ module MoreHoareLogic
   let list_member (x : ref (list 'a)) (y: 'a) (z: ref int)
     ensures { !z=1 <-> mem y (old !x) }
   = z := 0;
-    while !x <> Nil do
+    while not (is_nil !x) do
       invariant { length !x <= length (old !x) /\
                   (mem y !x -> mem y (old !x)) /\
                   (!z=1 /\ mem y (old !x) \/

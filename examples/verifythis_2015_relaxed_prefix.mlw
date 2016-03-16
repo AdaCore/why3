@@ -85,6 +85,7 @@ module RelaxedPrefix
   use import array.Array
 
   type char
+  val eq (x y : char) : bool ensures { result = True <-> x = y }
 
   (** [a1[ofs1..ofs1+len]] and [a2[ofs2..ofs2+len]] are valid sub-arrays
       and they are equal *)
@@ -130,7 +131,7 @@ module RelaxedPrefix
                eq_array pat (!ignored + 1) a !ignored (i - !ignored - 1) /\
                not (eq_array pat 0 a 0 i) /\
                (!ignored < m -> pat[!ignored] <> a[!ignored]) }
-        if i - !shift >= m || pat[i] <> a[i - !shift] then begin
+        if i - !shift >= m || not (eq pat[i] a[i - !shift]) then begin
           if !shift = 1 then begin
             assert { forall j. eq_array pat 0 a 0 j ->
               eq_array pat (j+1) a j (n-j-1) ->

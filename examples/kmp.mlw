@@ -14,6 +14,7 @@ module KnuthMorrisPratt
   use import array.Array
 
   type char
+  val eq (x y : char) : bool ensures { result = True <-> x = y }
 
   predicate matches (a1: array char) (i1: int)
                     (a2: array char) (i2: int) (n: int) =
@@ -104,7 +105,7 @@ module KnuthMorrisPratt
           !j+1 < z < !i+1 -> not matches p (!i + 1 - z) p 0 z }
         invariant { forall k:int. 0 < k <= !i -> is_next p k next[k] }
         variant { m - !i, !j }
-        if p[!i] = p[!j] then begin
+        if eq p[!i] p[!j] then begin
           i := !i + 1; j := !j + 1; next[!i] <- !j
         end else
           if !j = 0 then begin i := !i + 1; next[!i] <- 0 end else j := next[!j]
@@ -135,7 +136,7 @@ module KnuthMorrisPratt
       invariant { matches a (!i - !j) p 0 !j }
       invariant { forall k:int. 0 <= k < !i - !j -> not (matches a k p 0 m) }
       variant { n - !i, !j }
-      if a[!i] = p[!j] then begin
+      if eq a[!i] p[!j] then begin
         i := !i+1; j := !j+1
       end else
         if !j = 0 then i := !i+1 else j := next[!j]
