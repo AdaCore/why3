@@ -8,13 +8,13 @@ module Test_proofinuse
   (* Shift is div example -------------------  *)
 
   let shift_is_div ( x : t ) ( y : t ) : t =
-    requires{ 0 <= to_uint y < 32 }
-    let res = lsr_bv x ( of_int 1 ) in
-    assert{ res = ( udiv x (of_int 2) ) };
-    assert{ to_uint res = div (to_uint x) 2 };
-    let res = lsr_bv res ( of_int 2 ) in
-    assert{ res = ( udiv x (of_int 8) ) };
-    assert{ to_uint res = div (to_uint x) 8 };
+    requires{ 0 <= t'int y < 32 }
+    let res = lsr_bv x one in
+    assert{ res = ( udiv x (2:t) ) };
+    assert{ t'int res = div (t'int x) 2 };
+    let res = lsr_bv res (2:t) in
+    assert{ res = ( udiv x (8:t) ) };
+    assert{ t'int res = div (t'int x) 8 };
     res
 
  (* Mask example --------------------- *)
@@ -29,14 +29,14 @@ module Test_proofinuse
   type bitvec64 = BV64.t
 
   let mask ( x : t ) =
-    ensures{ BV8.eq result (BV8.of_int 1) }
+    ensures{ BV8.eq result BV8.one }
     (* ensures{ not ( BV8.eq result (BV8.of_int 1) ) } *)
     let res = C8_32.toSmall(
                 bw_and
-                  ( bw_or
-                    ( bw_and x (of_int 0xFFFF_FF00) )
-                    (of_int 1) )
-                  ( of_int 0x0000_00FF ) )
+                  (bw_or
+                    (bw_and x (0xFFFF_FF00:t))
+                    one)
+                  (0x0000_00FF:t))
     in res
 
   (* test invariant from frama-c ---------------- *)
@@ -45,7 +45,7 @@ module Test_proofinuse
 
   let testVariant( n : t ) =
     let i = ref n in
-    let two = of_int 2 in
+    let two = 2:t in
 
     while uge !i two do
     variant{ !i with ult }
@@ -54,7 +54,7 @@ module Test_proofinuse
 
   (* testssss *)
 
-  predicate in_range (n : t) = (ule (of_int 0) n) /\ (ule n (of_int 0x0000_00FF))
+  predicate in_range (n : t) = (ule (0:t) n) /\ (ule n (0x0000_00FF:t))
 
   predicate add_over (x y : t) = (uge (add x y) x) /\ (uge (add x y) y)
 
@@ -76,13 +76,13 @@ theory Hackers_delight
     bw_not( bw_or x y ) = bw_and (bw_not x) (bw_not y)
 
   goal DM3: forall x.
-    bw_not( add x (of_int 1) ) = sub (bw_not x) (of_int 1)
+    bw_not (add x one) = sub (bw_not x) one
 
   goal DM4: forall x.
-    bw_not( sub x (of_int 1) ) = add (bw_not x) (of_int 1)
+    bw_not (sub x one) = add (bw_not x) one
 
   goal DM5: forall x.
-    bw_not( neg x ) = sub x (of_int 1)
+    bw_not (neg x) = sub x one
 
   goal DM6: forall x y.
     bw_not( bw_xor x y ) = bw_xor (bw_not x) y (* = eq x y *)
@@ -94,7 +94,7 @@ theory Hackers_delight
     bw_not( sub x y ) = add (bw_not x) y
 
   goal DMtest: forall x.
-    zeros = bw_not( bw_or x (neg( add x (of_int 1))))
+    zeros = bw_not( bw_or x (neg( add x one)))
 
   (* inequality  *)
 
@@ -112,17 +112,17 @@ theory Hackers_delight
 
   (* shift right and arithmetic shift right *)
 
-  goal SR1: forall x n. ( ule zeros n /\ ule n (of_int 31)) ->
-    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
+  goal SR1: forall x n. ( ule zeros n /\ ule n (31:t)) ->
+    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (31:t) )) (sub (31:t) n))
   = asr_bv x n
 
   (* rotate en shift *)
 
   goal RS_left: forall x.
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left_bv x (of_int 1)
+    bw_or (lsl_bv x one) (lsr_bv x (31:t)) = rotate_left_bv x one
 
   goal RS_right: forall x.
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right_bv x (of_int 1)
+    bw_or (lsr_bv x one) (lsl_bv x (31:t)) = rotate_right_bv x one
 
   (* bound propagation *)
 
@@ -157,15 +157,15 @@ module Hackers_delight_mod
     bw_not( bw_or x y )
 
   let dm3 (x : t) =
-    ensures{ result = sub (bw_not x) (of_int 1) }
-    bw_not( add x (of_int 1) )
+    ensures{ result = sub (bw_not x) one }
+    bw_not( add x one )
 
   let dm4 (x : t) =
-    ensures{ result = add (bw_not x) (of_int 1) }
-    bw_not( sub x (of_int 1) )
+    ensures{ result = add (bw_not x) one }
+    bw_not( sub x one )
 
   let dm5 (x : t) =
-    ensures{ result = sub x (of_int 1) }
+    ensures{ result = sub x one }
     bw_not( neg x )
 
   let dm6 (x : t) (y : t) =
@@ -182,7 +182,7 @@ module Hackers_delight_mod
 
   let dmtest (x : t) =
     ensures{ result = zeros }
-    bw_not( bw_or x (neg( add x (of_int 1))))
+    bw_not( bw_or x (neg( add x one)))
 
   (* inequality  *)
 
@@ -207,19 +207,19 @@ module Hackers_delight_mod
   (* shift right and arithmetic shift right *)
 
   let sr1 (x : t) (n : t) =
-    requires{ ule zeros n /\ ule n (of_int 31) }
+    requires{ ule zeros n /\ ule n (31:t) }
     ensures{ result = asr_bv x n }
-    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
+    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (31:t) )) (sub (31:t) n))
 
   (* rotate en shift *)
 
   let rs_left (x : t) =
-  ensures{ result = rotate_left_bv x (of_int 1) }
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31))
+  ensures{ result = rotate_left_bv x one }
+    bw_or (lsl_bv x one) (lsr_bv x (31:t))
 
   let rs_right (x : t) =
-  ensures{ result = rotate_right_bv x (of_int 1) }
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31))
+  ensures{ result = rotate_right_bv x one }
+    bw_or (lsr_bv x one) (lsl_bv x (31:t))
 
   (* bound propagation *)
 
@@ -267,31 +267,31 @@ module Test_imperial_violet
     forall b. ule zeros b /\ ule b ones
 
   lemma to_int_ule:
-    forall b c. ule b c -> to_uint b <= to_uint c
+    forall b c. ule b c -> t'int b <= t'int c
 
   lemma to_int_ult:
-    forall b c. ult b c -> to_uint b < to_uint c
+    forall b c. ult b c -> t'int b < t'int c
 
   lemma bv32_bounds_0:
-    forall b. 0 <= to_uint b
+    forall b. 0 <= t'int b
 
   lemma bv32_bounds:
-    forall b. 0 <= to_uint b < 0x1_0000_0000
+    forall b. 0 <= t'int b < 0x1_0000_0000
 
   (* bounded add of array of t *)
 
   let add (a : array t ) (b : array t) =
     requires{ length a = length b }
     requires{ forall i. 0 <= i < length a ->
-                ult a[i] (of_int 0x8000_0000) }
+                ult a[i] (0x8000_0000:t) }
     requires{ forall i. 0 <= i < length b ->
-                ult b[i] (of_int 0x8000_0000) }
+                ult b[i] (0x8000_0000:t) }
     ensures{ forall i. 0 <= i < length result ->
-               to_uint result[i] = to_uint a[i] + to_uint b[i] }
+               t'int result[i] = t'int a[i] + t'int b[i] }
     let sum = make (length a) zeros in
     for i = 0 to length a - 1 do
       invariant{ forall j. 0 <= j < i -> sum[j] = add a[j] b[j] }
-      invariant{ forall j. 0 <= j < i -> to_uint sum[j] = to_uint a[j] + to_uint b[j] }
+      invariant{ forall j. 0 <= j < i -> t'int sum[j] = t'int a[j] + t'int b[j] }
       sum[i] <- add a[i] b[i]
     done;
     sum
@@ -304,123 +304,123 @@ module Test_from_bitvector_example
   use import bv.BV32
 
   goal Test1:
-    let b = bw_and zeros ones in nth_bv b (of_int 1) = False
+    let b = bw_and zeros ones in nth_bv b one = False
 
   goal Test2:
-    let b = lsr_bv ones (of_int 16) in nth_bv b (of_int 15) = True
+    let b = lsr_bv ones (16:t) in nth_bv b (15:t) = True
 
   goal Test3:
-    let b = lsr_bv ones (of_int 16) in nth_bv b (of_int 16) = False
+    let b = lsr_bv ones (16:t) in nth_bv b (16:t) = False
 
   goal Test4:
-    let b = asr_bv ones (of_int 16) in nth_bv b (of_int 15) = True
+    let b = asr_bv ones (16:t) in nth_bv b (15:t) = True
 
   goal Test5:
-    let b = asr_bv ones (of_int 16) in nth_bv b (of_int 16) = True
+    let b = asr_bv ones (16:t) in nth_bv b (16:t) = True
 
   goal Test6:
-    let b = asr_bv (lsr_bv ones (of_int 1)) (of_int 16) in nth_bv b (of_int 16) = False
+    let b = asr_bv (lsr_bv ones one) (16:t) in nth_bv b (16:t) = False
 
   let lsr31 () =
-    ensures{ result = of_int 1 }
-    lsr_bv ones (of_int 31)
+    ensures{ result = one }
+    lsr_bv ones (31:t)
 
   let lsr30 () =
-    ensures{ result = of_int 3 }
-    lsr_bv ones (of_int 30)
+    ensures{ result = (3:t) }
+    lsr_bv ones (30:t)
 
   let lsr29 () =
-    ensures{ to_uint result = 7 }
-    lsr_bv ones (of_int 29)
+    ensures{ t'int result = 7 }
+    lsr_bv ones (29:t)
 
   let lsr28 () =
-    ensures{ to_uint result = 15 }
-    lsr_bv ones (of_int 28)
+    ensures{ t'int result = 15 }
+    lsr_bv ones (28:t)
 
   let lsr27 () =
-    ensures{ to_uint result = 31 }
-    lsr_bv ones (of_int 27)
+    ensures{ t'int result = 31 }
+    lsr_bv ones (27:t)
 
   let lsr26 () =
-    ensures{ to_uint result = 63 }
-    lsr_bv ones (of_int 26)
+    ensures{ t'int result = 63 }
+    lsr_bv ones (26:t)
 
   let lsr20 () =
-    ensures{ to_uint result = 4095 }
-    lsr_bv ones (of_int 20)
+    ensures{ t'int result = 4095 }
+    lsr_bv ones (20:t)
 
   let lsr13 () =
-    ensures{ to_uint result = 524287 }
-    lsr_bv ones (of_int 13)
+    ensures{ t'int result = 524287 }
+    lsr_bv ones (13:t)
 
   let lsr8 () =
-    ensures{ to_uint result = 16777215 }
-    lsr_bv ones (of_int 8)
+    ensures{ t'int result = 16777215 }
+    lsr_bv ones (8:t)
 
   goal to_int_0x00000001:
-    to_uint (lsr_bv ones (of_int 31)) = 1
+    t'int (lsr_bv ones (31:t)) = 1
 
   goal to_int_0x00000003:
-    to_uint (lsr_bv ones (of_int 30)) = 3
+    t'int (lsr_bv ones (30:t)) = 3
 
   goal to_int_0x00000007:
-    to_uint (lsr_bv ones (of_int 29)) = 7
+    t'int (lsr_bv ones (29:t)) = 7
 
   goal to_int_0x0000000F:
-    to_uint (lsr_bv ones (of_int 28)) = 15
+    t'int (lsr_bv ones (28:t)) = 15
 
   goal to_int_0x0000001F:
-    to_uint (lsr_bv ones (of_int 27)) = 31
+    t'int (lsr_bv ones (27:t)) = 31
 
   goal to_int_0x0000003F:
-    to_uint (lsr_bv ones (of_int 26)) = 63
+    t'int (lsr_bv ones (26:t)) = 63
 
   goal to_int_0x0000007F:
-    to_uint (lsr_bv ones (of_int 25)) = 127
+    t'int (lsr_bv ones (25:t)) = 127
 
   goal to_int_0x000000FF:
-    to_uint (lsr_bv ones (of_int 24)) = 255
+    t'int (lsr_bv ones (24:t)) = 255
 
   goal to_int_0x000001FF:
-    to_uint (lsr_bv ones (of_int 23)) = 511
+    t'int (lsr_bv ones (23:t)) = 511
 
   goal to_int_0x000003FF:
-    to_uint (lsr_bv ones (of_int 22)) = 1023
+    t'int (lsr_bv ones (22:t)) = 1023
 
   goal to_int_0x000007FF:
-    to_uint (lsr_bv ones (of_int 21)) = 2047
+    t'int (lsr_bv ones (21:t)) = 2047
 
   goal to_int_0x00000FFF:
-    to_uint (lsr_bv ones (of_int 20)) = 4095
+    t'int (lsr_bv ones (20:t)) = 4095
 
   goal to_int_0x00001FFF:
-    to_uint (lsr_bv ones (of_int 19)) = 8191
+    t'int (lsr_bv ones (19:t)) = 8191
 
   goal to_int_0x00003FFF:
-    to_uint (lsr_bv ones (of_int 18)) = 16383
+    t'int (lsr_bv ones (18:t)) = 16383
 
   goal to_int_0x00007FFF:
-    to_uint (lsr_bv ones (of_int 17)) = 32767
+    t'int (lsr_bv ones (17:t)) = 32767
 
   goal to_int_0x0000FFFF:
-    to_uint (lsr_bv ones (of_int 16)) = 65535
+    t'int (lsr_bv ones (16:t)) = 65535
 
   goal to_int_0x0001FFFF:
-    to_uint (lsr_bv ones (of_int 15)) = 131071
+    t'int (lsr_bv ones (15:t)) = 131071
 
   goal to_int_0x0003FFFF:
-    to_uint (lsr_bv ones (of_int 14)) = 262143
+    t'int (lsr_bv ones (14:t)) = 262143
 
   goal to_int_0x0007FFFF:
-    to_uint (lsr_bv ones (of_int 13)) = 524287
+    t'int (lsr_bv ones (13:t)) = 524287
 
   goal to_int_0x000FFFFF:
-    to_uint (lsr_bv ones (of_int 12)) = 1048575
+    t'int (lsr_bv ones (12:t)) = 1048575
 
   goal to_int_0x00FFFFFF:
-    to_uint (lsr_bv ones (of_int 8)) = 16777215
+    t'int (lsr_bv ones (8:t)) = 16777215
 
   goal to_int_0xFFFFFFFF:
-    to_uint ones = 4294967295
+    t'int ones = 4294967295
 
 end

@@ -12,7 +12,6 @@
 open Format
 open Pp
 open Stdlib
-open Number
 open Ident
 open Ty
 open Term
@@ -133,16 +132,6 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
 
 let print_ty fmt ty = print_ty_node 0 fmt ty
 
-let print_const fmt = function
-  | ConstInt (IConstDec s) -> fprintf fmt "%s" s
-  | ConstInt (IConstHex s) -> fprintf fmt "0x%s" s
-  | ConstInt (IConstOct s) -> fprintf fmt "0o%s" s
-  | ConstInt (IConstBin s) -> fprintf fmt "0b%s" s
-  | ConstReal (RConstDec (i,f,None)) -> fprintf fmt "%s.%s" i f
-  | ConstReal (RConstDec (i,f,Some e)) -> fprintf fmt "%s.%se%s" i f e
-  | ConstReal (RConstHex (i,f,Some e)) -> fprintf fmt "0x%s.%sp%s" i f e
-  | ConstReal (RConstHex (i,f,None)) -> fprintf fmt "0x%s.%s" i f
-
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
   let rec lookup v ty = match ty.ty_node with
@@ -244,7 +233,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      print_const fmt c
+      Number.print_constant fmt c
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->
@@ -328,8 +317,10 @@ let print_constr fmt (cs,pjl) =
 
 let print_ty_decl fmt ts =
   let print_def fmt = function
-    | None -> ()
-    | Some ty -> fprintf fmt " =@ %a" print_ty ty
+    | NoDef -> ()
+    | Alias ty -> fprintf fmt " =@ %a" print_ty ty
+    | Range _  -> fprintf fmt " =@ <range ...>" (* TODO *)
+    | Float _  -> fprintf fmt " =@ <float ...>" (* TODO *)
   in
   fprintf fmt "@[<hov 2>type %a%a%a%a@]"
     print_ts ts print_id_labels ts.ts_name
@@ -532,6 +523,12 @@ let () = Exn_printer.register
       fprintf fmt "Unbound type variable: %a" print_tv tv
   | Ty.UnexpectedProp ->
       fprintf fmt "Unexpected propositional type"
+  | Ty.EmptyRange ->
+      fprintf fmt "Empty integer range"
+  | Ty.BadFloatSpec ->
+      fprintf fmt "Invalid floating point format"
+  | Ty.IllegalTypeParameters ->
+      fprintf fmt "This type cannot have type parameters"
   | Term.BadArity ({ls_args = []} as ls, _) ->
       fprintf fmt "%s %a expects no arguments"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
@@ -557,6 +554,8 @@ let () = Exn_printer.register
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
+  | Term.InvalidLiteralType ty ->
+      fprintf fmt "Type %a cannot be used for a numeric literal" print_ty ty
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls

@@ -22,15 +22,15 @@ theory BV_Check
   lemma max_int_val : max_int = two_power_size - 1
 
   lemma to_uint_extensionality :
-    forall v,v':t. to_uint v = to_uint v' -> v = v'
+    forall v,v':t. t'int v = t'int v' -> v = v'
 
   lemma to_int_extensionality:
     forall v,v':t. to_int v = to_int v' -> v = v'
 
-  lemma to_uint_bounds : forall v:t. 0 <= to_uint v < two_power_size
+  lemma to_uint_bounds : forall v:t. 0 <= t'int v < two_power_size
 
   lemma to_uint_of_int :
-    forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
+    forall i. 0 <= i < two_power_size -> t'int (of_int i) = i
 
   lemma Of_int_zero: zeros = of_int 0
 
@@ -106,13 +106,13 @@ theory BV_Check
 
   (* comparison operators *)
 
-  goal ult_spec: forall x y. ult x y <-> Int.(<) (to_uint x) (to_uint y)
+  goal ult_spec: forall x y. ult x y <-> Int.(<) (t'int x) (t'int y)
 
-  goal ule_spec: forall x y. ule x y <-> Int.(<=) (to_uint x) (to_uint y)
+  goal ule_spec: forall x y. ule x y <-> Int.(<=) (t'int x) (t'int y)
 
-  goal ugt_spec: forall x y. ugt x y <-> Int.(>) (to_uint x) (to_uint y)
+  goal ugt_spec: forall x y. ugt x y <-> Int.(>) (t'int x) (t'int y)
 
-  goal uge_spec: forall x y. uge x y <-> Int.(>=) (to_uint x) (to_uint y)
+  goal uge_spec: forall x y. uge x y <-> Int.(>=) (t'int x) (t'int y)
 
   goal slt_spec: forall x y. slt x y  <-> Int.(<) (to_int x) (to_int y)
 
@@ -125,47 +125,47 @@ theory BV_Check
   (** Arithmetic operators *)
 
   goal to_uint_add:
-    forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
+    forall v1 v2. t'int (add v1 v2) =  mod (Int.(+) (t'int v1) (t'int v2)) two_power_size
   goal to_uint_add_bounded:
     forall v1 v2.
-      to_uint v1 + to_uint v2 < two_power_size ->
-      to_uint (add v1 v2) = to_uint v1 + to_uint v2
+      t'int v1 + t'int v2 < two_power_size ->
+      t'int (add v1 v2) = t'int v1 + t'int v2
 
   goal to_uint_sub:
-    forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
+    forall v1 v2. t'int (sub v1 v2) = mod (Int.(-) (t'int v1) (t'int v2)) two_power_size
   goal to_uint_sub_bounded:
     forall v1 v2.
-      0 <= to_uint v1 - to_uint v2 < two_power_size ->
-      to_uint (sub v1 v2) = to_uint v1 - to_uint v2
+      0 <= t'int v1 - t'int v2 < two_power_size ->
+      t'int (sub v1 v2) = t'int v1 - t'int v2
 
   goal to_uint_neg:
-    forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
+    forall v. t'int (neg v) = mod (Int.(-_) (t'int v)) two_power_size
 
   goal to_uint_mul:
-    forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
+    forall v1 v2. t'int (mul v1 v2) = mod (Int.( * ) (t'int v1) (t'int v2)) two_power_size
   goal to_uint_mul_bounded:
     forall v1 v2.
-      to_uint v1 * to_uint v2 < two_power_size ->
-      to_uint (mul v1 v2) = to_uint v1 * to_uint v2
+      t'int v1 * t'int v2 < two_power_size ->
+      t'int (mul v1 v2) = t'int v1 * t'int v2
 
   goal to_uint_udiv:
-    forall v1 v2. to_uint (udiv v1 v2) = div (to_uint v1) (to_uint v2)
+    forall v1 v2. t'int (udiv v1 v2) = div (t'int v1) (t'int v2)
 
   goal to_uint_urem:
-    forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
+    forall v1 v2. t'int (urem v1 v2) = mod (t'int v1) (t'int v2)
 
   goal to_uint_lsr:
     forall v n : t.
-      to_uint (lsr_bv v n) = div (to_uint v) (pow2 ( to_uint n ))
+      t'int (lsr_bv v n) = div (t'int v) (pow2 ( t'int n ))
 
   goal to_uint_lsl:
     forall v n : t.
-         to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
+         t'int (lsl_bv v n) = mod (Int.( * ) (t'int v) (pow2 (t'int n))) two_power_size
 
   (* equality goals *)
 
   goal eq_sub_equiv: forall a b i n:t.
-      eq_sub    a b (to_uint i) (to_uint n)
+      eq_sub    a b (t'int i) (t'int n)
   <-> eq_sub_bv a b i n
 
   goal Extensionality: forall x y : t [eq x y]. eq x y -> x = y
@@ -177,9 +177,9 @@ theory BVConverter_Check
   use import bv.BVConverter_32_64
 
   goal toSmall_to_uint :
-    forall x. in_range x -> BV64.to_uint x = BV32.to_uint (toSmall x)
+    forall x. in_range x -> BV64.t'int x = BV32.t'int (toSmall x)
 
   goal toBig_to_uint :
-    forall x. BV32.to_uint x = BV64.to_uint (toBig x)
+    forall x. BV32.t'int x = BV64.t'int (toBig x)
 
 end

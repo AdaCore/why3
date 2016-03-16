@@ -61,7 +61,7 @@ let deco_term kept tvar =
   deco
 
 let deco_decl kept d = match d.d_node with
-  | Dtype { ts_def = Some _ } -> []
+  | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> [d; lsdecl_of_ts ts]
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic types are not supported, run eliminate_algebraic"
@@ -87,10 +87,10 @@ let deco kept = Trans.decl (deco_decl kept) deco_init
 
 (** Monomorphisation *)
 
-let ts_base = create_tysymbol (id_fresh "uni") [] None
+let ts_base = create_tysymbol (id_fresh "uni") [] NoDef
 let ty_base = ty_app ts_base []
 
-let ts_deco = create_tysymbol (id_fresh "deco") [] None
+let ts_deco = create_tysymbol (id_fresh "deco") [] NoDef
 let ty_deco = ty_app ts_deco []
 
 let ls_deco = create_fsymbol (id_fresh "sort") [ty_type;ty_base] ty_deco

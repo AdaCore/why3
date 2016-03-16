@@ -307,7 +307,7 @@ let print_enum_decl info fmt ts csl =
     (print_list alt2 print_cs) csl
 
 let print_ty_decl info fmt ts =
-  if ts.ts_def <> None then () else
+  if is_alias_type_def ts.ts_def then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   (fprintf fmt "%a@\n@\n" (print_type_decl info) ts; forget_tvs info)
 

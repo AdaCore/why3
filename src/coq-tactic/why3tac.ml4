@@ -527,6 +527,7 @@ let rec tr_positive p = match kind_of_term p with
 let const_of_big_int b =
   Term.t_const
     (Number.ConstInt (Number.int_const_dec (Big_int.string_of_big_int b)))
+    ty_int
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant dep t = match kind_of_term t with
@@ -539,8 +540,10 @@ let rec tr_arith_constant dep t = match kind_of_term t with
       Term.fs_app fs [t] Ty.ty_int
   | Const _ when is_global coq_R0 t ->
       Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
+        ty_real
   | Const _ when is_global coq_R1 t ->
       Term.t_const (Number.ConstReal (Number.real_const_dec "1" "0" None))
+        ty_real
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)
 (*       let tb = tr_arith_constant b in *)
@@ -620,7 +623,7 @@ and tr_global_ts dep env evd (r : global_reference) =
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id id in
-          let ts = Ty.create_tysymbol id vars None in
+          let ts = Ty.create_tysymbol id vars NoDef in
           let decl = Decl.create_ty_decl ts in
           add_table global_ts r (Some ts);
           add_new_decl dep !dep' decl;
@@ -636,11 +639,11 @@ and tr_global_ts dep env evd (r : global_reference) =
             | Some b ->
                 let b = force b in
                 let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
-                let def = Some (tr_type dep' tvm env evd t) in
+                let def = Alias (tr_type dep' tvm env evd t) in
                 Ty.create_tysymbol id vars def
                   (* FIXME: is it correct to use None when NotFO? *)
             | None ->
-                Ty.create_tysymbol id vars None
+                Ty.create_tysymbol id vars NoDef
           in
           let decl = Decl.create_ty_decl ts in
           add_table global_ts r (Some ts);
@@ -655,7 +658,7 @@ and tr_global_ts dep env evd (r : global_reference) =
             let (_,vars), _, t = decomp_type_quantifiers env ty in
             if not (is_Set t) && not (is_Type t) then raise NotFO;
             let id = preid_of_id (Nametab.basename_of_global r) in
-            let ts = Ty.create_tysymbol id vars None in
+            let ts = Ty.create_tysymbol id vars NoDef in
             add_table global_ts r (Some ts)
           in
           Array.iteri make_one_ts mib.mind_packets;

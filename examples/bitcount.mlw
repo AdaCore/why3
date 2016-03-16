@@ -7,7 +7,7 @@ module BitCount8bit_fact
 
   function nth_as_bv (a i : t) : t =
     if nth_bv a i
-    then (of_int 1)
+    then (1 : t)
     else zeros
 
   function nth_as_int (a : t) (i : int) : int =
@@ -16,81 +16,81 @@ module BitCount8bit_fact
     else 0
 
   lemma nth_as_bv_is_int : forall a i.
-    to_uint (nth_as_bv a i) = nth_as_int a (to_uint i)
+    t'int (nth_as_bv a i) = nth_as_int a (t'int i)
 
     use import int.EuclideanDivision
 
   let ghost step1 (n x1 : t) (i : int) : unit
     requires { 0 <= i < 4 }
-    requires { x1 = sub n (bw_and (lsr_bv n (of_int 1)) (of_int 0x55)) }
-    ensures { to_uint (bw_and (lsr x1 (2*i)) (of_int 0x03))
+    requires { x1 = sub n (bw_and (lsr_bv n (1 : t)) (0x55 : t)) }
+    ensures { t'int (bw_and (lsr x1 (2*i)) (0x03 : t))
             = numof (nth n) (2*i) (2*i + 2) }
-    ensures { ule (bw_and (lsr x1 (2*i)) (of_int 0x03)) (of_int 2) }
+    ensures { ule (bw_and (lsr x1 (2*i)) (0x03 : t)) (2 : t) }
   =
     assert { let i' = of_int i in
-             let twoi = mul (of_int 2) i' in
-                 bw_and (lsr_bv x1 twoi) (of_int 0x03)
-               = add (nth_as_bv n twoi) (nth_as_bv n (add twoi (of_int 1)))
+             let twoi = mul (2 : t) i' in
+                 bw_and (lsr_bv x1 twoi) (0x03 : t)
+               = add (nth_as_bv n twoi) (nth_as_bv n (add twoi (1 : t)))
              &&
-                 to_uint (bw_and (lsr_bv x1 twoi) (of_int 0x03))
-               = numof (nth n) (to_uint twoi) (to_uint twoi + 2) }
+                 t'int (bw_and (lsr_bv x1 twoi) (0x03 : t))
+               = numof (nth n) (t'int twoi) (t'int twoi + 2) }
 
   let ghost step2 (n x1 x2 : t) (i : int) : unit
     requires { 0 <= i < 2 }
-    requires { x1 = sub n (bw_and (lsr_bv n (of_int 1)) (of_int 0x55)) }
+    requires { x1 = sub n (bw_and (lsr_bv n (1 : t)) (0x55 : t)) }
     requires { x2 = add
-               (bw_and x1 (of_int 0x33))
-               (bw_and (lsr_bv x1 (of_int 2)) (of_int (0x33))) }
-    ensures  { to_uint (bw_and (lsr x2 (4*i)) (of_int 0x0F))
+               (bw_and x1 (0x33 : t))
+               (bw_and (lsr_bv x1 (2 : t)) (0x33 : t)) }
+    ensures  { t'int (bw_and (lsr x2 (4*i)) (0x0F : t))
              = numof (nth n) (4*i) (4*i+4) }
-    ensures  { ule (bw_and (lsr_bv x2 (of_int (4*i))) (of_int 0x0F))
-                   (of_int 4) }
+    ensures  { ule (bw_and (lsr_bv x2 (of_int (4*i))) (0x0F : t))
+                   (4 : t) }
   =
      step1 n x1 (2*i);
      step1 n x1 (2*i+1);
 
      assert { let i' = of_int i in
-                  ult i' (of_int 2)
+                  ult i' (2 : t)
                 &&
-                  of_int (4*i) = mul (of_int 4) i'
+                  of_int (4*i) = mul (4 : t) i'
                 &&
-                  to_uint (bw_and (lsr x2 (4*i)) (of_int 0x0F))
-                = to_uint (bw_and (lsr_bv x2 (mul (of_int 4) i')) (of_int 0x0F))
-                = to_uint (add (bw_and (lsr_bv x1 (mul (of_int 4) i')) (of_int 0x03))
-                           (bw_and (lsr_bv x1 (add (mul (of_int 4) i') (of_int 2))) (of_int (0x03))))
-                = to_uint (add (bw_and (lsr x1 (4*i)) (of_int 0x03))
-                               (bw_and (lsr x1 ((4*i)+2)) (of_int (0x03))))}
+                  t'int (bw_and (lsr x2 (4*i)) (0x0F : t))
+                = t'int (bw_and (lsr_bv x2 (mul (4 : t) i')) (0x0F : t))
+                = t'int (add (bw_and (lsr_bv x1 (mul (4 : t) i')) (0x03 : t))
+                           (bw_and (lsr_bv x1 (add (mul (4 : t) i') (2 : t))) (0x03 : t)))
+                = t'int (add (bw_and (lsr x1 (4*i)) (0x03 : t))
+                               (bw_and (lsr x1 ((4*i)+2)) (0x03 : t)))}
 
   let ghost prove (n x1 x2 x3 : t) : unit
-    requires { x1 = sub n (bw_and (lsr_bv n (of_int 1)) (of_int 0x55)) }
+    requires { x1 = sub n (bw_and (lsr_bv n (1 : t)) (0x55 : t)) }
     requires { x2 = add
-               (bw_and x1 (of_int 0x33))
-               (bw_and (lsr_bv x1 (of_int 2)) (of_int (0x33))) }
-    requires { x3 = bw_and (add x2 (lsr_bv x2 (of_int 4))) (of_int 0x0F) }
-    ensures { to_uint x3 = numof (nth n) 0 8 }
+               (bw_and x1 (0x33 : t))
+               (bw_and (lsr_bv x1 (2 : t)) (0x33 : t)) }
+    requires { x3 = bw_and (add x2 (lsr_bv x2 (4 : t))) (0x0F : t) }
+    ensures { t'int x3 = numof (nth n) 0 8 }
   =
     step2 n x1 x2 0;
     step2 n x1 x2 1;
 
-    assert {  to_uint (bw_and x2 (of_int 0x0F)) +
-              to_uint (bw_and (lsr_bv x2 (of_int 4)) (of_int 0x0F))
-            = to_uint (bw_and (lsr x2 0) (of_int 0x0F)) +
-              to_uint (bw_and (lsr x2 4) (of_int 0x0F)) }
+    assert {  t'int (bw_and x2 (0x0F : t)) +
+              t'int (bw_and (lsr_bv x2 (4 : t)) (0x0F : t))
+            = t'int (bw_and (lsr x2 0) (0x0F : t)) +
+              t'int (bw_and (lsr x2 4) (0x0F : t)) }
 
   let count (n : t) : t
-    ensures { to_uint result = numof (nth n) 0 8 }
+    ensures { t'int result = numof (nth n) 0 8 }
   =
     let x = ref n in
 
-    x := sub !x (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55));
+    x := sub !x (bw_and (lsr_bv !x (1 : t)) (0x55 : t));
     let ghost x1 = !x in
 
     x := add
-               (bw_and !x (of_int 0x33))
-               (bw_and (lsr_bv !x (of_int 2)) (of_int (0x33)));
+               (bw_and !x (0x33 : t))
+               (bw_and (lsr_bv !x (2 : t)) (0x33 : t));
     let ghost x2 = !x in
 
-    x := bw_and (add !x (lsr_bv !x (of_int 4))) (of_int 0x0F);
+    x := bw_and (add !x (lsr_bv !x (4 : t))) (0x0F : t);
 
     prove n x1 x2 !x;
 
@@ -106,75 +106,75 @@ module BitCounting32
   use import ref.Ref
 
   predicate step0 (n x1 : t) =
-    x1 = sub n (bw_and (lsr_bv n (of_int 1)) (of_int 0x55555555))
+    x1 = sub n (bw_and (lsr_bv n (1 : t)) (0x55555555 : t))
 
   let ghost proof0 (n x1 : t) (i : int) : unit
     requires { 0 <= i < 16 }
     requires { step0 n x1 }
-    ensures { to_uint (bw_and (lsr x1 (2*i)) (of_int 0x03))
+    ensures { t'int (bw_and (lsr x1 (2*i)) (0x03 : t))
               = numof (nth n) (2*i) (2*i + 2) }
   =
     let i' = of_int i in
-    let twoi = mul (of_int 2) i' in
-    assert { to_uint twoi = 2 * i };
-    assert { to_uint (add twoi (of_int 1)) = to_uint twoi + 1 };
-    assert { to_uint (bw_and (lsr_bv x1 twoi) (of_int 0x03))
+    let twoi = mul (2 : t) i' in
+    assert { t'int twoi = 2 * i };
+    assert { t'int (add twoi (1 : t)) = t'int twoi + 1 };
+    assert { t'int (bw_and (lsr_bv x1 twoi) (0x03 : t))
              = (if nth_bv n twoi then 1 else 0) +
-               (if nth_bv n (add twoi (of_int 1)) then 1 else 0)
-             = (if nth n (to_uint twoi) then 1 else 0) +
-               (if nth n (to_uint twoi + 1) then 1 else 0)
-             = numof (nth n) (to_uint twoi) (to_uint twoi + 2) }
+               (if nth_bv n (add twoi (1 : t)) then 1 else 0)
+             = (if nth n (t'int twoi) then 1 else 0) +
+               (if nth n (t'int twoi + 1) then 1 else 0)
+             = numof (nth n) (t'int twoi) (t'int twoi + 2) }
 
   predicate step1 (x1 x2 : t) =
-    x2 = add (bw_and x1 (of_int 0x33333333))
-             (bw_and (lsr_bv x1 (of_int 2)) (of_int (0x33333333)))
+    x2 = add (bw_and x1 (0x33333333 : t))
+             (bw_and (lsr_bv x1 (2 : t)) (0x33333333 : t))
 
   let ghost proof1 (n x1 x2 : t) (i : int) : unit
     requires { 0 <= i < 8 }
     requires { step0 n x1  }
     requires { step1 x1 x2 }
-    ensures  { to_uint (bw_and (lsr x2 (4*i)) (of_int 0x07))
+    ensures  { t'int (bw_and (lsr x2 (4*i)) (0x07 : t))
                = numof (nth n) (4*i) (4*i+4) }
   =
      proof0 n x1 (2*i);
      proof0 n x1 (2*i+1);
      let i' = of_int i in
-     assert { ult i' (of_int 8) };
-     assert { to_uint (mul (of_int 4) i') = 4*i };
-     assert { bw_and (lsr x2 (4*i)) (of_int 0x07)
-              = bw_and (lsr_bv x2 (mul (of_int 4) i')) (of_int 0x07)
-              = add (bw_and (lsr_bv x1 (mul (of_int 4) i')) (of_int 0x03))
-                      (bw_and (lsr_bv x1 (add (mul (of_int 4) i') (of_int 2)))
-                              (of_int (0x03)))
-              = add (bw_and (lsr x1 (4*i)) (of_int 0x03))
-                      (bw_and (lsr x1 ((4*i)+2)) (of_int (0x03))) }
+     assert { ult i' (8 : t) };
+     assert { t'int (mul (4 : t) i') = 4*i };
+     assert { bw_and (lsr x2 (4*i)) (0x07 : t)
+              = bw_and (lsr_bv x2 (mul (4 : t) i')) (0x07 : t)
+              = add (bw_and (lsr_bv x1 (mul (4 : t) i')) (0x03 : t))
+                      (bw_and (lsr_bv x1 (add (mul (4 : t) i') (2 : t)))
+                              (0x03 : t))
+              = add (bw_and (lsr x1 (4*i)) (0x03 : t))
+                      (bw_and (lsr x1 ((4*i)+2)) (0x03 : t)) }
 
   predicate step2 (x2:t) (x3:t) =
-    x3 = bw_and (add x2 (lsr_bv x2 (of_int 4))) (of_int 0x0F0F0F0F)
+    x3 = bw_and (add x2 (lsr_bv x2 (4 : t))) (0x0F0F0F0F : t)
 
   let ghost proof2 (n x1 x2 x3 : t) (i : int) : unit
     requires { 0 <= i < 4 }
     requires { step0 n x1 }
     requires { step1 x1 x2 }
     requires { step2 x2 x3 }
-    ensures  { to_uint (bw_and (lsr x3 (8*i)) (of_int 0x0F))
+    ensures  { t'int (bw_and (lsr x3 (8*i)) (0x0F : t))
              = numof (nth n) (8*i) (8*i+8) }
   =
     proof1 n x1 x2 (2*i);
     proof1 n x1 x2 (2*i+1);
     let i' = of_int i in
-    assert { ult i' (of_int 4) };
-    assert { to_uint (mul (of_int 8) i') = 8*i };
-    assert { to_uint (add (mul (of_int 8) i') (of_int 4)) = 8*i+4 };
-    assert { bw_and (lsr x3 (8*i)) (of_int 0x0F)
-             = bw_and (lsr_bv x3 (mul (of_int 8) i')) (of_int 0x0F)
-             = add (bw_and (lsr_bv x2 (mul (of_int 8) i')) (of_int 0x07))
-                   (bw_and (lsr_bv x2 (add (mul (of_int 8) i') (of_int 4))) (of_int (0x07)))
-             = add (bw_and (lsr x2 (8*i)) (of_int 0x07))
-                   (bw_and (lsr x2 ((8*i)+4)) (of_int (0x07))) }
+    assert { ult i' (4 : t) };
+    assert { t'int (mul (8 : t) i') = 8*i };
+    assert { t'int (add (mul (8 : t) i') (4 : t)) = 8*i+4 };
+    assert { bw_and (lsr x3 (8*i)) (0x0F : t)
+             = bw_and (lsr_bv x3 (mul (8 : t) i')) (0x0F : t)
+             = add (bw_and (lsr_bv x2 (mul (8 : t) i')) (0x07 : t))
+                   (bw_and (lsr_bv x2 (add (mul (8 : t) i') (4 : t))) (0x07 : t))
+             = add (bw_and (lsr x2 (8*i)) (0x07 : t))
+                   (bw_and (lsr x2 ((8*i)+4)) (0x07 : t)) }
 
   predicate step3 (x3:t) (x4:t) =
-    x4 = add x3 (lsr_bv x3 (of_int 8))
+    x4 = add x3 (lsr_bv x3 (8 : t))
 
   let ghost proof3 (n x1 x2 x3 x4 : t) (i : int) : unit
     requires { 0 <= i < 2 }
@@ -182,24 +182,24 @@ module BitCounting32
     requires { step1 x1 x2 }
     requires { step2 x2 x3 }
     requires { step3 x3 x4 }
-    ensures  { to_uint (bw_and (lsr x4 (16*i)) (of_int 0x1F))
+    ensures  { t'int (bw_and (lsr x4 (16*i)) (0x1F : t))
                = numof (nth n) (16*i) (16*i+16) }
   =
     proof2 n x1 x2 x3 (2*i);
     proof2 n x1 x2 x3 (2*i+1);
     let i' = of_int i in
-    assert { ult i' (of_int 2) };
-    assert { to_uint (mul (of_int 16) i') = 16*i };
-    assert { to_uint (add (mul (of_int 16) i') (of_int 8)) = 16*i+8 };
-    assert { bw_and (lsr x4 (16*i)) (of_int 0x1F)
-             = bw_and (lsr_bv x4 (mul (of_int 16) i')) (of_int 0x1F)
-             = add (bw_and (lsr_bv x3 (mul (of_int 16) i')) (of_int 0x0F))
-                   (bw_and (lsr_bv x3 (add (mul (of_int 16) i') (of_int 8))) (of_int (0x0F)))
-             = add (bw_and (lsr x3 (16*i)) (of_int 0x0F))
-                   (bw_and (lsr x3 ((16*i)+8)) (of_int (0x0F))) }
+    assert { ult i' (2 : t) };
+    assert { t'int (mul (16 : t) i') = 16*i };
+    assert { t'int (add (mul (16 : t) i') (8 : t)) = 16*i+8 };
+    assert { bw_and (lsr x4 (16*i)) (0x1F : t)
+             = bw_and (lsr_bv x4 (mul (16 : t) i')) (0x1F : t)
+             = add (bw_and (lsr_bv x3 (mul (16 : t) i')) (0x0F : t))
+                   (bw_and (lsr_bv x3 (add (mul (16 : t) i') (8 : t))) (0x0F : t))
+             = add (bw_and (lsr x3 (16*i)) (0x0F : t))
+                   (bw_and (lsr x3 ((16*i)+8)) (0x0F : t)) }
 
   predicate step4 (x4:t) (x5:t) =
-    x5 = add x4 (lsr_bv x4 (of_int 16))
+    x5 = add x4 (lsr_bv x4 (16 : t))
 
   let ghost prove (n x1 x2 x3 x4 x5 : t) : unit
     requires { step0 n x1 }
@@ -207,43 +207,43 @@ module BitCounting32
     requires { step2 x2 x3 }
     requires { step3 x3 x4 }
     requires { step4 x4 x5 }
-    ensures { to_uint (bw_and x5 (of_int 0x3F)) = numof (nth n) 0 32 }
+    ensures { t'int (bw_and x5 (0x3F : t)) = numof (nth n) 0 32 }
   =
     proof3 n x1 x2 x3 x4 0;
     proof3 n x1 x2 x3 x4 1;
 (* moved to the stdlib
     assert { x4 = lsr x4 0 };
 *)
-    assert { bw_and x5 (of_int 0x3F)
-             = add (bw_and x4 (of_int 0x1F)) (bw_and (lsr_bv x4 (of_int 16)) (of_int 0x1F))
-             = add (bw_and (lsr x4 0) (of_int 0x1F)) (bw_and (lsr x4 16) (of_int 0x1F)) }
+    assert { bw_and x5 (0x3F : t)
+             = add (bw_and x4 (0x1F : t)) (bw_and (lsr_bv x4 (16 : t)) (0x1F : t))
+             = add (bw_and (lsr x4 0) (0x1F : t)) (bw_and (lsr x4 16) (0x1F : t)) }
 
   function count_logic (n:t) : int = numof (nth n) 0 32
 
   let count (n : t) : t
-    ensures { to_uint result = count_logic n }
+    ensures { t'int result = count_logic n }
   =
     let x = ref n in
     (* x = x - ( (x >> 1) & 0x55555555) *)
-    x := sub !x (bw_and (lsr_bv !x (of_int 1)) (of_int 0x55555555));
+    x := sub !x (bw_and (lsr_bv !x (1 : t)) (0x55555555 : t));
     let ghost x1 = !x in
     (* x = (x & 0x33333333) + ((x >> 2) & 0x33333333) *)
-    x := add (bw_and !x (of_int 0x33333333))
-             (bw_and (lsr_bv !x (of_int 2)) (of_int (0x33333333)));
+    x := add (bw_and !x (0x33333333 : t))
+             (bw_and (lsr_bv !x (2 : t)) (0x33333333 : t));
     let ghost x2 = !x in
     (* x = (x + (x >> 4)) & 0x0F0F0F0F *)
-    x := bw_and (add !x (lsr_bv !x (of_int 4))) (of_int 0x0F0F0F0F);
+    x := bw_and (add !x (lsr_bv !x (4 : t))) (0x0F0F0F0F : t);
     let ghost x3 = !x in
     (* x = x + (x >> 8) *)
-    x := add !x (lsr_bv !x (of_int 8));
+    x := add !x (lsr_bv !x (8 : t));
     let ghost x4 = !x in
     (* x = x + (x >> 16) *)
-    x := add !x (lsr_bv !x (of_int 16));
+    x := add !x (lsr_bv !x (16 : t));
 
     prove n x1 x2 x3 x4 !x;
 
     (* return (x & 0x0000003F) *)
-    bw_and !x (of_int 0x0000003F)
+    bw_and !x (0x0000003F : t)
 
 end
 
@@ -260,7 +260,7 @@ module Hamming
   function hammingD_logic (a b : t) : int = NumOf.numof (nth_diff a b) 0 32
 
   let hammingD (a b : t) : t
-    ensures { to_uint result = hammingD_logic a b }
+    ensures { t'int result = hammingD_logic a b }
   =
     assert { forall i. 0 <= i < 32 -> nth (bw_xor a b) i <-> (nth_diff a b i) };
     count (bw_xor a b)
@@ -305,7 +305,7 @@ module AsciiCode
   use import mach.bv.BVCheck32
   use import BitCounting32
 
-  constant one : t = of_int 1
+  constant one : t = 1 : t
   constant lastbit : t = sub size_bv one
 
   (* let lastbit () = (sub_check size_bv one) : t *)
@@ -326,14 +326,14 @@ module AsciiCode
   predicate validAscii (b : t) = even (count_logic b)
 
   let lemma bv_even (b:t)
-    ensures { even (to_uint b) <-> not (nth b 0) }
+    ensures { even (t'int b) <-> not (nth b 0) }
   =
-    assert { not (nth_bv b zeros) <-> b = mul (of_int 2) (lsr_bv b one) };
-    assert { (exists k. b = mul (of_int 2) k) -> not (nth_bv b zeros) };
-    assert { (exists k. to_uint b = 2 * k) -> (exists k. b = mul (of_int 2) k) };
-    assert { not (nth b 0) <-> to_uint b = 2 * to_uint (lsr b 1) }
+    assert { not (nth_bv b zeros) <-> b = mul (2 : t) (lsr_bv b one) };
+    assert { (exists k. b = mul (2 : t) k) -> not (nth_bv b zeros) };
+    assert { (exists k. t'int b = 2 * k) -> (exists k. b = mul (2 : t) k) };
+    assert { not (nth b 0) <-> t'int b = 2 * t'int (lsr b 1) }
 
-  lemma bv_odd : forall b : t. odd (to_uint b) <-> nth b 0
+  lemma bv_odd : forall b : t. odd (t'int b) <-> nth b 0
 
   (* use Numofbit *)
 
@@ -371,10 +371,10 @@ module AsciiCode
     let c = count b in
     let maskbit = lsl_check c lastbit in
     assert { bw_and b maskbit = zeros };
-    assert { even (to_uint c) ->
+    assert { even (t'int c) ->
                not (nth_bv c zeros)
             && count_logic maskbit    = 0 };
-    assert { odd  (to_uint c) ->
+    assert { odd  (t'int c) ->
                nth_bv c zeros
             && nth maskbit 31
             && (forall i. 0 <= i < 31 -> not (nth maskbit i))
@@ -418,7 +418,7 @@ module GrayCode
   use import BitCounting32
   use Hamming
 
-  constant one : t = of_int 1
+  constant one : t = 1 : t
   constant lastbit : t = sub size_bv one
 
   (** {2 Gray code}
@@ -436,11 +436,11 @@ module GrayCode
     bw_xor bv (lsr_bv bv one)
 
   function fromGray (gr : t) : t =
-    let b = bw_xor gr (lsr_bv gr (of_int 1)) in
-    let b = bw_xor b (lsr_bv b (of_int 2)) in
-    let b = bw_xor b (lsr_bv b (of_int 4)) in
-    let b = bw_xor b (lsr_bv b (of_int 8)) in
-      bw_xor b (lsr_bv b (of_int 16))
+    let b = bw_xor gr (lsr_bv gr (1 : t)) in
+    let b = bw_xor b (lsr_bv b (2 : t)) in
+    let b = bw_xor b (lsr_bv b (4 : t)) in
+    let b = bw_xor b (lsr_bv b (8 : t)) in
+      bw_xor b (lsr_bv b (16 : t))
 
   (** Which define an isomorphism. *)
 
@@ -458,7 +458,7 @@ module GrayCode
     assert { b <> ones -> toGray (add b one) = bw_xor (toGray b) (bw_and (bw_not b) (add b one)) };
     assert { b <> ones -> exists k. (bw_and (bw_not b) (add b one)) = lsl one k };
     assert { b <> ones -> count_logic (bw_and (bw_not b) (add b one)) = 1 };
-    assert { b = ones -> (toGray b) = of_int 0x80000000 /\ (toGray (add b one)) = zeros }
+    assert { b = ones -> (toGray b) = 0x80000000 : t /\ (toGray (add b one)) = zeros }
 
   (** Now, a couple of property between the Gray code and the binary
       representation.

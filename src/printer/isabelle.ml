@@ -389,9 +389,10 @@ let print_ind_decls info s fmt tl =
 
 let print_type_decl info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn || is_ts_tuple ts) then
+  let def = match ts.ts_def with Alias ty -> Some ty | _ -> None in
     (elem "typedecl" (print_ts info)
        (pair print_tparams (print_option (print_ty info)))
-       fmt (ts, (ts.ts_args, ts.ts_def));
+       fmt (ts, (ts.ts_args, def));
      forget_tvs ())
 
 let print_param_decl info fmt ls =
