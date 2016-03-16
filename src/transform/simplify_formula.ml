@@ -102,7 +102,7 @@ let rec fmla_quant sign f = function
         vs::vsl, f
       with Subst_found t ->
         let f = t_subst_single vs t f in
-        vsl, fmla_simpl f
+        vsl, f
 
 let rec fmla_remove_quant f =
   match f.t_node with
