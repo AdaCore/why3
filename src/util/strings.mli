@@ -47,4 +47,4 @@ val has_prefix : string -> string -> bool
 
 val remove_prefix : string -> string -> string
 (** [remove_prefix pref s] removes the prefix [pref] from [s]. Raises
-    [Not_found if [s] does not start with [pref] *)
+    [Not_found] if [s] does not start with [pref] *)
