@@ -633,7 +633,7 @@ numeral:
 prog_decl:
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
-| LET ghost kind labels(lident_rich) EQUAL seq_expr    { Dlet ($4, $2, $3, $6) }
+| LET ghost kind labels(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
 | LET REC with_list1(rec_defn)                         { Drec $3 }
 | EXCEPTION labels(uident)            { Dexn ($2, PTtuple [], Ity.MaskVisible) }
 | EXCEPTION labels(uident) return     { Dexn ($2, fst $3, snd $3) }
@@ -662,6 +662,10 @@ fun_defn:
 val_defn:
 | params ret_opt spec
     { Eany ($1, Expr.RKnone, fst $2, snd $2, $3) }
+
+const_defn:
+| cast EQUAL seq_expr   { { $3 with expr_desc = Ecast ($3, $1) } }
+| EQUAL seq_expr        { $2 }
 
 (* Program expressions *)
 
