@@ -64,9 +64,6 @@ let pad_right c s i =
   then String.sub s 0 i
   else s
 
-let slice s start end_ =
-  String.sub s start (end_ - start)
-
 let has_prefix pref s =
   let l = String.length pref in
   if String.length s < l then false else

@@ -42,11 +42,6 @@ val ends_with : string -> string -> bool
 val pad_right : char -> string -> int -> string
 (** chop or pad the given string on the right up to the given length *)
 
-val slice : string -> int -> int -> string
-(* [slice s start end] returns the substring of s that starts at [start] and
-   ends at [end-1]. Uses [String.sub] under the hood, so Invalid_argument will
-   be raised if start/end do not correspond to a valid substring. *)
-
 val has_prefix : string -> string -> bool
 (** [has_prefix pref s] returns true if s [s] starts with prefix [pref] *)
 
