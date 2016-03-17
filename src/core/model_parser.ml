@@ -16,6 +16,12 @@ open Ident
 open Printer
 
 (*
+let debug = Debug.register_info_flag "model_parser"
+  ~desc:"Print@ debugging@ messages@ about@ parsing@ \
+         the@ counter-example@ model."
+*)
+
+(*
 ***************************************************************
 **  Counter-example model values
 ****************************************************************
