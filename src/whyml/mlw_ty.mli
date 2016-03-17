@@ -23,8 +23,6 @@ module rec T : sig
     vars_tv  : Stv.t;
     vars_reg : Sreg.t;
   }
-  (* the set of variables, e.g. of an individual type. An individual program
-     type can contain type and region variables *)
 
   type itysymbol = private {
     its_ts   : tysymbol;      (** "pure snapshot" type symbol *)
@@ -44,11 +42,9 @@ module rec T : sig
   }
 
   and ity_node = private
-    | Ityvar of tvsymbol                           (* simply a type variable *)
-    | Itypur of tysymbol * ity list                (* a pure type *)
+    | Ityvar of tvsymbol
+    | Itypur of tysymbol * ity list
     | Ityapp of itysymbol * ity list * region list
-                           (* a regular type application, with type and region
-                              arguments *)
 
   and region = private {
     reg_name : ident;
@@ -281,8 +277,7 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
-  (* return the program variable [pvs] such that pvs.pv_vs is equal to the
-     argument. raises Not_found if the argument is not a pv_vs *)
+(** raises [Not_found] if the argument is not a [pv_vs] *)
 
 val t_pvset : Spv.t -> term -> Spv.t
 (** raises [Not_found] if the term contains non-pv variables *)
