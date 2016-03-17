@@ -44,10 +44,10 @@ module Iteration
 
   type what 'a = Argument (tree 'a) | Result int
 
-  predicate is_id (k: cont 'a) =
+  let predicate is_id (k: cont 'a) =
     match k with Id -> true | _ -> false end
 
-  predicate is_result (w: what 'a) =
+  let predicate is_result (w: what 'a) =
     match w with Result _ -> true | _ -> false end
 
   function evalk (k: cont 'a) (r: int) : int =

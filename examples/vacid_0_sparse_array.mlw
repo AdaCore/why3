@@ -112,10 +112,10 @@ module Harness
   use import SparseArray
 
   type elt
-  constant default : elt
+  val constant default : elt
 
-  constant c1 : elt
-  constant c2 : elt
+  val constant c1 : elt
+  val constant c2 : elt
 
   let harness () =
     let a = create 10 default in
@@ -132,20 +132,23 @@ module Harness
     let get_b_0 = get b 0 in assert { get_b_0 = default };
     ()
 
+  val predicate (!=) (x y : elt)
+    ensures { result <-> x <> y }
+
   exception BenchFailure
 
   let bench () raises { BenchFailure -> true } =
     let a = create 10 default in
     let b = create 20 default in
-    if get a 5 <> default then raise BenchFailure;
-    if get b 7 <> default then raise BenchFailure;
+    if get a 5 != default then raise BenchFailure;
+    if get b 7 != default then raise BenchFailure;
     set a 5 c1;
     set b 7 c2;
-    if get a 5 <> c1 then raise BenchFailure;
-    if get b 7 <> c2 then raise BenchFailure;
-    if get a 7 <> default then raise BenchFailure;
-    if get b 5 <> default then raise BenchFailure;
-    if get a 0 <> default then raise BenchFailure;
-    if get b 0 <> default then raise BenchFailure
+    if get a 5 != c1 then raise BenchFailure;
+    if get b 7 != c2 then raise BenchFailure;
+    if get a 7 != default then raise BenchFailure;
+    if get b 5 != default then raise BenchFailure;
+    if get a 0 != default then raise BenchFailure;
+    if get b 0 != default then raise BenchFailure
 
 end
