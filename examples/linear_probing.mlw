@@ -12,16 +12,18 @@ module HashedTypeWithDummy
   type key
   type keym (** the logic model of a key *)
   function keym key: keym
-  predicate eq (x y: key) = keym x = keym y
-  val eq (x y: key) : bool ensures { result <-> eq x y }
-  predicate neq (x y: key) = keym x <> keym y
-  let neq (x y: key) : bool ensures { result <-> neq x y } = not (eq x y)
 
-  function hash key : int
+  val predicate eq (x y: key)
+    ensures { result <-> keym x = keym y }
+  let predicate neq (x y: key)
+    ensures { result <-> keym x <> keym y }
+  = not (eq x y)
+
+  val function hash key : int
   axiom hash_nonneg: forall k: key. 0 <= hash k
   axiom hash_eq: forall x y: key. eq x y -> hash x = hash y
 
-  constant dummy: key
+  val constant dummy: key
   constant dummym: keym = keym dummy
 
 end
@@ -39,11 +41,10 @@ module LinearProbing
   use import ref.Ref
   use import array.Array
 
-  function bucket (k: key) (n: int) : int = mod (hash k) n
-
-  lemma bucket_bounds:
-    forall n: int. 0 < n ->
-    forall k: key. 0 <= bucket k n < n
+  let function bucket (k: key) (n: int) : int
+    requires { 0 < n }
+    ensures { 0 <= result < n }
+  = mod (hash k) n
 
   (** j lies between l and r, cyclically *)
   predicate between (l j r: int) =
@@ -130,7 +131,7 @@ module LinearProbing
     Array.fill h.data 0 (Array.length h.data) dummy;
     h.view <- Const.const false
 
-  function next (n i: int) : int =
+  let function next (n i: int) : int =
     let i = i+1 in if i = n then 0 else i
 
   let find (a: array key) (x: key) : int
