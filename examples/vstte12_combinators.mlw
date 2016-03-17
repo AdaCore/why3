@@ -9,6 +9,15 @@ module Combinators
 
   type term = S | K | App term term
 
+  let rec predicate eq (x y : term)
+    ensures { result <-> x = y }
+  = match x, y with
+    | S, S -> True
+    | K, K -> True
+    | App x1 x2, App y1 y2 -> eq x1 y1 && eq x2 y2
+    | _, _ -> False
+    end
+
   (* specification of the CBV reduction *)
 
   predicate is_value (t: term) = match t with
@@ -85,15 +94,15 @@ module Combinators
 
   exception BenchFailure
 
-  constant i : term = App (App S K) K
+  let constant i = App (App S K) K
 
   let test_SKK ()
     diverges (* would be hard to prove terminating *)
     raises { BenchFailure -> true }
   = let t1 = reduction (App i i) in
-    if t1 <> i then raise BenchFailure;
+    if not (eq t1 i) then raise BenchFailure;
     let t2 = reduction (App (App (App (App K K) K) K) K) in
-    if t2 <> K then raise BenchFailure;
+    if not (eq t2 K) then raise BenchFailure;
     (t1, t2)
 
   (* an irreducible term is a value *)

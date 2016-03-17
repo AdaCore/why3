@@ -12,8 +12,8 @@ module FIND
   use import array.Array
   use import array.ArrayPermut
 
-  constant _N: int (* actually N in Hoare's notation *)
-  constant f: int
+  val constant _N: int (* actually N in Hoare's notation *)
+  val constant f: int
 
   axiom f_N_range: 1 <= f <= _N
 

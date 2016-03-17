@@ -78,7 +78,7 @@ module Utils_Spec
   variant {bv with ult}
   ensures {to_uint (count bv) = NumOf.numof (nth bv) 0 32}
   =
-    if bv = zeros then ()
+    if Utils.(=) bv zeros then ()
     else
     begin
       countSpec_Aux (lsr_bv bv one);
