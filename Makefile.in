@@ -160,7 +160,7 @@ LIB_UTIL = config bigInt util opt lists strings \
 LIB_CORE = ident ty term pattern decl theory \
 	   task pretty dterm env trans printer model_parser
 
-LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
+LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection \
              parse_smtv2_model_parser parse_smtv2_model_lexer parse_smtv2_model
 
@@ -236,10 +236,6 @@ src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
 
-src/driver/vc_client.o: src/driver/vc_client.c
-	ocamlopt -c $^
-	mv $(CURDIR)/vc_client.o $@
-
 # hide deprecated warnings for strings
 
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
@@ -250,11 +246,11 @@ src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 byte: lib/why3/why3.cma
 opt:  lib/why3/why3.cmxa
 
-lib/why3/why3.cma: lib/why3/why3.cmo src/driver/vc_client.o
+lib/why3/why3.cma: lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-lib/why3/why3.cmxa: lib/why3/why3.cmx src/driver/vc_client.o
+lib/why3/why3.cmxa: lib/why3/why3.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
@@ -559,7 +555,6 @@ clean_old_install::
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
@@ -614,51 +609,6 @@ clean::
 
 %.type: %.mlw bin/why3ide.opt
 	bin/why3.opt --type-only $*.mlw
-
-##############
-# Why3server #
-##############
-
-SERVER_MODULES:= logging arraylist options queue readbuf request writebuf server_main
-SERVER_C:= $(addprefix src/tools/, $(addsuffix .c, $(SERVER_MODULES)))
-SERVER_H:= $(addprefix src/tools/, $(addsuffix .h, $(SERVER_MODULES)))
-SERVER_O:= $(addprefix src/tools/, $(addsuffix .o, $(SERVER_MODULES)))
-
-opt: bin/why3server$(EXE)
-
-bin/why3server$(EXE): $(SERVER_O)
-	gcc -o $@ $^
-
-%.o: %.c %.h
-	gcc -c -Wall -g -o $@ $<
-%.o: %.c
-	gcc -c -Wall -g -o $@ $<
-
-src/tools/main.o:: src/tools/server-unix.c src/tools/server-win.c
-
-install_no_local::
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
-
-clean::
-	 rm -f $(SERVER_O)
-
-install_spark2014:
-	mkdir -p $(BINDIR)
-	mkdir -p $(DATADIR)/why3
-	mkdir -p $(DATADIR)/why3/theories
-	mkdir -p $(DATADIR)/why3/drivers
-	mkdir -p $(DATADIR)/why3/modules
-	mkdir -p $(DATADIR)/why3/libs
-	cp -f theories/*.why $(DATADIR)/why3/theories
-	cp -f modules/*.mlw $(DATADIR)/why3/modules
-	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
-	cp -f share/why3session.dtd $(DATADIR)/why3
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
-	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
-	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize$(EXE)
-	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
-	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
-	cp -rf lib/coq $(DATADIR)/why3/libs
 
 ##########
 # gallery
