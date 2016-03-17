@@ -243,6 +243,11 @@ endif
 src/driver/vc_client.o: src/driver/vc_client.c
 	ocamlopt -c $^
 	mv $(CURDIR)/vc_client.o $@
+<<<<<<< HEAD
+=======
+
+# hide deprecated warnings for strings
+>>>>>>> lri-master
 
 # hide deprecated warnings for strings
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
@@ -253,7 +258,7 @@ src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 byte: lib/why3/why3.cma
 opt:  lib/why3/why3.cmxa
 
-lib/why3/why3.cma: lib/why3/why3.cmo
+lib/why3/why3.cma: lib/why3/why3.cmo src/driver/vc_client.o
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
@@ -562,6 +567,7 @@ clean_old_install::
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	cp -f bin/why3server$(EXE) $(BINDIR)/why3$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
@@ -617,6 +623,7 @@ clean::
 %.type: %.mlw bin/why3ide.opt
 	bin/why3.opt --type-only $*.mlw
 
+<<<<<<< HEAD
 ########
 # GNATWhy3
 ########
