@@ -687,14 +687,15 @@ let clone_invl cl sm invl =
 let clone_varl cl sm varl = List.map (fun (t,r) ->
   clone_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
 
-let clone_cty cl sm cty =
+let clone_cty cl sm ?(drop_decr=false) cty =
   let res = clone_ity cl cty.cty_result in
   let args = List.map (clone_pv cl) cty.cty_args in
   let sm_args = List.fold_left2 sm_save_pv sm cty.cty_args args in
   let add_old o n (sm, olds) = let o' = clone_pv cl o in
     sm_save_pv sm o o', Mpv.add o' (sm_find_pv sm_args n) olds in
   let sm_olds, olds = Mpv.fold add_old cty.cty_oldies (sm_args, Mpv.empty) in
-  let pre = clone_invl cl sm_args cty.cty_pre in
+  let pre = if drop_decr then List.tl cty.cty_pre else cty.cty_pre in
+  let pre = clone_invl cl sm_args pre in
   let post = clone_invl cl sm_olds cty.cty_post in
   let xpost = Mexn.fold (fun xs fl q ->
     let xs = cl_find_xs cl xs in
@@ -822,15 +823,13 @@ and clone_let_defn cl sm ld = match ld with
         ~ghost:(rs_ghost s) ~kind:(rs_kind s) c' in
       sm_save_rs cl sm s s', ld
   | LDrec rdl ->
-      let conv_rs mrs {rec_rsym = rs} =
-        let rs' = create_rsymbol (id_clone rs.rs_name)
-          ~ghost:(rs_ghost rs) (clone_cty cl sm rs.rs_cty) in
+      let conv_rs mrs {rec_rsym = {rs_name = id} as rs; rec_varl = varl} =
+        let cty = clone_cty cl sm ~drop_decr:(varl <> []) rs.rs_cty in
+        let rs' = create_rsymbol (id_clone id) ~ghost:(rs_ghost rs) cty in
         Mrs.add rs rs' mrs, rs' in
       let mrs, rsyml = Lists.map_fold_left conv_rs sm.sm_rs rdl in
       let rsm = { sm with sm_rs = mrs } in
       let conv_rd ({rec_fun = c} as rd) ({rs_cty = cty} as rs) =
-        let pre = if rd.rec_varl = [] then cty.cty_pre
-          else List.tl cty.cty_pre (* remove DECR *) in
         let rsm = sm_save_args rsm c.c_cty cty in
         let varl = clone_varl cl rsm rd.rec_varl in
         let rsm = sm_save_olds rsm c.c_cty cty in
@@ -838,7 +837,7 @@ and clone_let_defn cl sm ld = match ld with
           | Cfun e -> clone_expr cl rsm e
           | _ -> assert false (* can't be *) in
         let c = c_fun ~mask:c.c_cty.cty_mask cty.cty_args
-          pre cty.cty_post cty.cty_xpost cty.cty_oldies e in
+          cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e in
         rs, c, varl, rs_kind rd.rec_sym in
       let ld, rdl' = let_rec (List.map2 conv_rd rdl rsyml) in
       let sm = List.fold_left2 (fun sm d d' ->
