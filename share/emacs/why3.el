@@ -175,4 +175,3 @@
   (run-hooks 'why3-mode-hook))
 
 (provide 'why3)
-
