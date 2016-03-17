@@ -336,12 +336,20 @@ DONE * sauvegarde de la configuration : à quel endroit dans l'IDE ?
   Fedora package
 
 * produce the Why3 part of Toccata gallery
-  (TODO: add the procedure here)
-  add also a tar.gz and a ZIP file of it: this is done by doing
-  "make gallery-files" in the sources of the Toccata web pages
+  - have GALLERYDIR set to the sub-directory gallery/ of the git sources
+    of the Toccata web site, e.g.
+    export GALLERYDIR=/users/vals/filliatr/toccata/web/gallery
+  - in Why3 sources, do "make gallery"; it exports to GALLERYDIR all
+    Why3 programs for which there is a session
+  - now move to the Toccata web site sources, and
+    - update web/gallery/examples.rc to include new examples
+    - "git add" the files for these new examples (those currently untracked
+      in git) or simply remove them if they should not go on-line
+    - do "make" in web/gallery/
+    - do "make install-gallery" in web/
 
-* Once the OPAM package is pulled in the main OPAM repository: a
-  nnounce the distrib
+* Once the OPAM package is pulled in the main OPAM repository:
+  announce the distrib
   What to put in the announcement: see New Features above
 
 
