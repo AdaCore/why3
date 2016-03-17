@@ -243,11 +243,6 @@ endif
 src/driver/vc_client.o: src/driver/vc_client.c
 	ocamlopt -c $^
 	mv $(CURDIR)/vc_client.o $@
-<<<<<<< HEAD
-=======
-
-# hide deprecated warnings for strings
->>>>>>> lri-master
 
 # hide deprecated warnings for strings
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
@@ -623,7 +618,6 @@ clean::
 %.type: %.mlw bin/why3ide.opt
 	bin/why3.opt --type-only $*.mlw
 
-<<<<<<< HEAD
 ########
 # GNATWhy3
 ########
