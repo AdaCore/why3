@@ -79,7 +79,7 @@ module Check
   let is_dyck (w: word) : bool
     ensures { result <-> dyck w }
   =
-    try match is_dyck_rec (ghost ref Nil) w with
+    try match is_dyck_rec (ref Nil) w with
       | Nil -> true
       | _ -> false
     end with Failure -> false end

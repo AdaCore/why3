@@ -1002,7 +1002,7 @@ let warn_unused s loc =
 let check_used_pv e pv = if not (Spv.mem pv e.e_effect.eff_reads) then
   warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
 
-let e_let_check ld e = match ld with
+let e_let_check e ld = match ld with
   | LDvar (v,_) -> check_used_pv e v; e_let ld e
   | _           -> e_let ld e
 
@@ -1017,6 +1017,10 @@ let get_rs env n = Mstr.find_exn (Dterm.UnboundVar n) n env.rsm
 
 let proxy_labels = Slab.singleton proxy_label
 
+type let_prexix =
+  | LD of let_defn
+  | EA of expr
+
 let rec expr uloc env ({de_loc = loc} as de) =
   let uloc, labs, de = strip uloc Slab.empty de in
   let e = Loc.try3 ?loc try_expr uloc env de in
@@ -1024,43 +1028,66 @@ let rec expr uloc env ({de_loc = loc} as de) =
   if loc = None && Slab.is_empty labs
   then e else e_label_push ?loc labs e
 
-and cexp uloc env ghost ({de_loc = loc} as de) vl =
+and cexp uloc env ghost ({de_loc = loc} as de) lpl =
   let uloc, labs, de = strip uloc Slab.empty de in
   if not (Slab.is_empty labs) then Warning.emit ?loc
     "Ignoring labels over a higher-order expression";
-  Loc.try5 ?loc try_cexp uloc env ghost de vl
+  Loc.try5 ?loc try_cexp uloc env ghost de lpl
 
-and try_cexp uloc env ghost ({de_dvty = argl,res} as de0) vl =
+and try_cexp uloc env ghost ({de_dvty = argl,res} as de0) lpl =
   let rec drop vl al = match vl, al with
     | _::vl, _::al -> drop vl al | _ -> al in
-  let apply app s =
+  let rec all_ghost al lpl = match al, lpl with
+    | gh :: al, EA {e_mask = m} :: lpl ->
+        (not gh && mask_ghost m) || all_ghost al lpl
+    | _::_, LD _ :: lpl -> all_ghost al lpl
+    | _, _ -> false in
+  let rec proxy_args ghost_args al lpl = match al, lpl with
+    | _ :: al, EA ({e_node = Evar v} as e) :: lpl
+      when Slab.is_empty e.e_label ->
+        let hd, vl = proxy_args ghost_args al lpl in
+        hd, v::vl
+    | gh :: al, EA e :: lpl ->
+        let hd, vl = proxy_args ghost_args al lpl in
+        let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
+        let ld, v = let_var ~ghost:(ghost_args || gh) id e in
+        ld::hd, v::vl
+    | al, LD ld :: lpl ->
+        let hd, vl = proxy_args ghost_args al lpl in
+        ld::hd, vl
+    | [], _::_ ->
+        assert false (* would be ill-typed *)
+    | _, [] ->
+        [], [] in
+  let apply app ghost_args s al lpl =
+    let ldl, vl = proxy_args ghost_args al lpl in
     let argl = List.map ity_of_dity (drop vl argl) in
     let c = app s vl argl (ity_of_dity res) in
-    ghost || c_ghost c, [], c in
-  let add_ld   ld (gh,l,c) = gh, ld :: l, c in
-  let add_ldl ldl (gh,l,c) = gh, ldl @ l, c in
+    ghost || c_ghost c, ldl, c in
+  let c_app s lpl =
+    let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
+    let ghost_args = ghost || rs_ghost s || all_ghost al lpl in
+    apply c_app ghost_args s al lpl in
+  let c_pur s lpl =
+    apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
   let proxy c =
-    if vl = [] then ghost || c_ghost c,[],c else
-    let loc = Opt.get_def de0.de_loc uloc in
-    let id = id_fresh ?loc ~label:proxy_labels "h" in
-    let ld, s = let_sym id ~ghost c in
-    add_ld ld (apply c_app s) in
+    try
+      let ld_of_lp = function LD ld -> ld | EA _ -> raise Exit in
+      ghost || c_ghost c, List.map ld_of_lp lpl, c
+    with Exit ->
+      let loc = Opt.get_def de0.de_loc uloc in
+      let id = id_fresh ?loc ~label:proxy_labels "h" in
+      let ld, s = let_sym id ~ghost c in
+      c_app s (LD ld :: lpl) in
   match de0.de_node with
-  | DEvar (n,_) -> apply c_app (get_rs env n)
-  | DErs s -> apply c_app s
-  | DEls s -> apply c_pur s
+  | DEvar (n,_) -> c_app (get_rs env n) lpl
+  | DErs s -> c_app s lpl
+  | DEls s -> c_pur s lpl
   | DEapp (de1,de2) ->
       let e2 = expr uloc env de2 in
-      begin match e2.e_node with
-        | Evar v when Slab.is_empty e2.e_label ->
-            cexp uloc env ghost de1 (v::vl)
-        | _ ->
-            let id = id_fresh ?loc:e2.e_loc ~label:proxy_labels "o" in
-            let ld, v = let_var id (e_ghostify ghost e2) in
-            add_ld ld (cexp uloc env ghost de1 (v::vl))
-      end
+      cexp uloc env ghost de1 (EA e2 :: lpl)
   | DEghost de ->
-      cexp uloc env true de vl
+      cexp uloc env true de lpl
   | DEfun (bl,msk,dsp,de) ->
       let dvl _ _ = [] in
       let c, dsp, _ = lambda uloc env (binders bl) msk dsp dvl de in
@@ -1070,13 +1097,14 @@ and try_cexp uloc env ghost ({de_dvty = argl,res} as de0) vl =
       proxy (c_any (cty_of_spec env bl msk dsp dity))
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
       let ld, env = var_defn uloc env ghost dldf in
-      add_ld ld (cexp uloc env ghost de vl)
+      cexp uloc env ghost de (LD ld :: lpl)
   | DElet (dldf,de) ->
       let ldl0, env = sym_defn uloc env ghost dldf in
-      add_ldl ldl0 (cexp uloc env ghost de vl)
+      let lpl0 = List.rev_map (fun ld -> LD ld) ldl0 in
+      cexp uloc env ghost de (List.rev_append lpl0 lpl)
   | DErec (drdf,de) ->
       let ld, env = rec_defn uloc env ghost drdf in
-      add_ld ld (cexp uloc env ghost de vl)
+      cexp uloc env ghost de (LD ld :: lpl)
   | DEmark _ ->
       Loc.errorm "Marks are not allowed over higher-order expressions"
   | DEpv _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
@@ -1099,14 +1127,14 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEvar _ | DErs _ | DEls _ | DEapp _ | DEfun _ | DEany _ ->
       let cgh,ldl,c = try_cexp uloc env false de0 [] in
       let e = e_ghostify cgh (e_exec c) in
-      List.fold_right e_let_check ldl e
+      List.fold_left e_let_check e ldl
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
       let ld, env = var_defn uloc env false dldf in
       let e2 = expr uloc env de in
       e_let ld e2
   | DElet (dldf,de) ->
       let ldl, env = sym_defn uloc env false dldf in
-      List.fold_right e_let_check ldl (expr uloc env de)
+      List.fold_left e_let_check (expr uloc env de) ldl
   | DErec (drdf,de) ->
       let ld, env = rec_defn uloc env false drdf in
       e_let ld (expr uloc env de)
@@ -1240,7 +1268,7 @@ and var_defn uloc env ghost (id,gh,kind,de) =
 and sym_defn uloc env ghost (id,gh,kind,de) =
   let ghost, ldl, c = cexp uloc env ghost de [] in
   let ld, s = let_sym id ~ghost:(gh || ghost) ~kind c in
-  ldl @ [ld], add_rsymbol env s
+  ld::ldl, add_rsymbol env s
 
 and rec_defn uloc env ghost {fds = dfdl} =
   let step1 env (id, gh, kind, bl, mask, dsp, dvl, ({de_dvty = dvty} as de)) =

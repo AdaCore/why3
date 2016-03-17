@@ -740,22 +740,32 @@ let c_pur s vl ityl ity =
   let cty = create_cty v_args [] [q] Mexn.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
-let mk_proxy e hd = match e.e_node with
+let mk_proxy ghost e hd = match e.e_node with
   | Evar v when Slab.is_empty e.e_label -> hd, v
   | _ ->
       let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
-      let ld, v = let_var id e in ld::hd, v
+      let ld, v = let_var ~ghost id e in ld::hd, v
 
-let add_proxy e (hd,vl) = let hd, v = mk_proxy e hd in hd, v::vl
+let add_proxy ghost e (hd,vl) =
+  let hd, v = mk_proxy ghost e hd in hd, v::vl
 
 let let_head hd e = List.fold_left (fun e ld -> e_let ld e) e hd
 
 let e_app s el ityl ity =
-  let hd, vl = List.fold_right add_proxy el ([],[]) in
+  let trues l = List.map Util.ttrue l in
+  let rec down al el = match al, el with
+    | {pv_ghost = gh}::al, {e_mask = m}::el ->
+        if not gh && mask_ghost m then raise Exit;
+        gh :: down al el
+    | _, el -> trues el in
+  let ghl = if rs_ghost s then trues el else
+    try down s.rs_cty.cty_args el with Exit -> trues el in
+  let hd, vl = List.fold_right2 add_proxy ghl el ([],[]) in
   let_head hd (e_exec (c_app s vl ityl ity))
 
 let e_pur s el ityl ity =
-  let hd, vl = List.fold_right add_proxy el ([],[]) in
+  let ghl = List.map Util.ttrue el in
+  let hd, vl = List.fold_right2 add_proxy ghl el ([],[]) in
   let_head hd (e_exec (c_pur s vl ityl ity))
 
 (* assignment *)
@@ -766,8 +776,9 @@ let e_assign_raw al =
 
 let e_assign al =
   let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
-    let hv, v = mk_proxy v hv in
-    let hr, r = mk_proxy r hr in
+    let ghost = e_ghost r || rs_ghost f || e_ghost v in
+    let hv, v = mk_proxy ghost v hv in
+    let hr, r = mk_proxy ghost r hr in
     hr, hv, (r,f,v)::al) al ([],[],[]) in
   (* first pants, THEN your shoes *)
   let_head hv (let_head hr (e_assign_raw al))
@@ -845,8 +856,8 @@ let e_for_raw v ((f,_,t) as bounds) inv e =
   mk_expr (Efor (v,bounds,inv,e)) e.e_ity MaskVisible eff
 
 let e_for v f dir t inv e =
-  let hd, t = mk_proxy t [] in
-  let hd, f = mk_proxy f hd in
+  let hd, t = mk_proxy false t [] in
+  let hd, f = mk_proxy false f hd in
   let_head hd (e_for_raw v (f,dir,t) inv e)
 
 let e_while d inv vl e =
