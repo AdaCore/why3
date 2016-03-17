@@ -742,7 +742,7 @@ let clone_ppat cl sm pp mask =
     | Term.Papp (s,pl) ->
         PPapp (restore_rs (cl_find_ls cl s), List.map conv_pat pl) in
   let pre = conv_pat pp.pp_pat in
-  let vm, pp' = create_prog_pattern pre pp.pp_ity mask in
+  let vm, pp' = create_prog_pattern pre (clone_ity cl pp.pp_ity) mask in
   let save v sm = sm_save_vs sm v (Mstr.find v.vs_name.id_string vm) in
   Svs.fold save pp.pp_pat.pat_vars sm, pp'
 
