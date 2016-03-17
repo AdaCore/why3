@@ -407,7 +407,8 @@ let writes_of_assign asl =
       | Some s -> Some (Mpv.add f v s)) r wr in
   List.fold_left add Mreg.empty asl
 
-let rename_regions regs cv wr =
+let assign_regions kn cv wr dst =
+  let regs = name_regions kn cv dst in
   (* we compute the same region bijection as eff_assign,
      except we do not need any consistency checking now *)
   let reg_rexp {reg_its = s; reg_args = tl; reg_regs = rl} wfs =
@@ -438,6 +439,7 @@ let rhs_of_effect f wfs = if Mpv.mem f wfs then VD else NF
 let rhs_of_assign f wfs = try PV (Mpv.find f wfs) with Not_found -> NF
 
 let sensitive itd {pv_vs = f} =
+  not itd.itd_its.its_private &&
   List.exists (fun i -> t_v_occurs f i > 0) itd.itd_invariant
 
 let rec havoc kn get_rhs wr regs t ity fl =
@@ -542,6 +544,13 @@ let wp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} wp =
   let regs = name_regions kn cv dst in
   wp_havoc_raw kn rhs_of_effect wr wp dst regs
 
+let wp_assign {known_map = kn} {eff_covers = cv} asl wp =
+  let dst = dst_of_wp cv wp in
+  if Mpv.is_empty dst then wp else
+  let wr = writes_of_assign asl in
+  let regs = assign_regions kn cv wr dst in
+  wp_havoc_raw kn rhs_of_assign wr wp dst regs
+
 let sp_havoc_raw kn get_rhs wr sp dst regs =
   let () = print_dst dst; print_regs regs in
   let update {pv_vs = o; pv_ity = ity} n sp =
@@ -557,6 +566,12 @@ let sp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} res sp dst =
   if Mpv.is_empty dst then sp else
   let regs = name_regions kn cv dst in
   sp_havoc_raw kn rhs_of_effect wr sp dst regs
+
+let sp_assign {known_map = kn} {eff_covers = cv} asl dst =
+  if Mpv.is_empty dst then t_true else
+  let wr = writes_of_assign asl in
+  let regs = assign_regions kn cv wr dst in
+  sp_havoc_raw kn rhs_of_assign wr t_true dst regs
 
 let dst_complete sp dst =
   let add o n sp =
@@ -718,11 +733,7 @@ let rec wp_expr env e res q xq = match e.e_node with
       vc_label e (vc_expl e.e_loc expl_absurd t_false)
   | Eassign asl ->
       let q = t_subst_single res t_void q in
-      let cv = e.e_effect.eff_covers in
-      let dst = dst_of_wp cv q in
-      let wr = writes_of_assign asl and kn = env.known_map in
-      let regs = rename_regions (name_regions kn cv dst) cv wr in
-      vc_label e (wp_havoc_raw kn rhs_of_assign wr q dst regs)
+      vc_label e (wp_assign env e.e_effect asl q)
   | Ewhile (e0, invl, varl, e1) ->
       (* wp(while e0 inv I var V do e1 done, Q, R) =
          I and forall S. I ->
@@ -874,11 +885,8 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
       let ok = vc_label e (vc_expl e.e_loc expl_absurd t_false) in
       ok, ok, Mexn.empty
   | Eassign asl ->
-      let cv = e.e_effect.eff_covers in
       let dst = dst_step_back e.e_effect zeff zdst in
-      let wr = writes_of_assign asl and kn = env.known_map in
-      let regs = rename_regions (name_regions kn cv dst) cv wr in
-      let sp = sp_havoc_raw kn rhs_of_assign wr t_true dst regs in
+      let sp = sp_assign env e.e_effect asl dst in
       out_seq_raw (t_true, vc_label e sp, Mexn.empty) dst res zout
   | Ewhile (e0, invl, varl, e1) ->
       (* ok: I /\ !! I -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> I /\ V)))
