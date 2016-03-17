@@ -1245,9 +1245,10 @@ and sym_defn uloc env ghost (id,gh,kind,de) =
 and rec_defn uloc env ghost {fds = dfdl} =
   let step1 env (id, gh, kind, bl, mask, dsp, dvl, ({de_dvty = dvty} as de)) =
     let pvl = binders bl in
+    let ghost = gh || ghost || kind = RKlemma in
     let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
     let cty = create_cty ~mask pvl [] [] Mexn.empty Mpv.empty eff_empty ity in
-    let rs = create_rsymbol id ~ghost:(gh || ghost) ~kind:RKnone cty in
+    let rs = create_rsymbol id ~ghost ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, mask, dsp, dvl, de) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
   let step2 (rs, kind, mask, dsp, dvl, de) (fdl,dspl) =
@@ -1300,6 +1301,7 @@ let rec mask_of_fun de = match de.de_node with
 let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
   let uloc = if keep_loc then None else Some None in
   let {pre_name = nm; pre_loc = loc} = id in
+  let ghost = ghost || kind = RKlemma in
   match kind, de.de_dvty with
   | _, (_::_, _) ->
       let cgh, ldl, c = cexp uloc env_empty false de [] in
