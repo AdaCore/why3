@@ -210,11 +210,10 @@ module FiniteNumberOfRegisters
   use import Spec
   use import DWP
 
-  (** we have k registers, namely 0,1,...,k-1 *)
-  constant k: int
-
-  (** we assume having at least two registers, otherwise we can't add *)
-  axiom at_least_two_registers: k >= 2
+  (** we have k registers, namely 0,1,...,k-1,
+      and there are at least two of them, otherwise we can't add *)
+  val constant k: int
+    ensures { 2 <= result }
 
   (** [compile e r] returns a list of instructions that stores the value
       of [e] in register [r], without modifying any register [r' < r]. *)
@@ -250,14 +249,13 @@ module OptimalNumberOfRegisters
   use import Spec
   use import DWP
 
-  (** we have k registers, namely 0,1,...,k-1 *)
-  constant k: int
-
-  (** we assume having at least two registers, otherwise we can't add *)
-  axiom at_least_two_registers: k >= 2
+  (** we have k registers, namely 0,1,...,k-1,
+      and there are at least two of them, otherwise we can't add *)
+  val constant k: int
+    ensures { 2 <= result }
 
   (** the minimal number of registers needed to evaluate e *)
-  function n (e: expr) : int =
+  let rec function n (e: expr) : int =
     match e with
     | Evar _     -> 1
     | Eneg e     -> n e
