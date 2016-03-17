@@ -613,7 +613,7 @@ let freevars_of_invariant ftv flds invl =
 
 (*  private immutable:
       all arguments are immutable, exposed, visible, frozen
-      all reachable regions are immutable, otherwise we lose unicity
+      all reachable regions are immutable, otherwise we lose unicity [!]
       rexp, rvis, rfrz are computed from the known fields
         => known regions cannot appear in the added fields
            in a refining type (no field aliases)
@@ -630,13 +630,16 @@ let freevars_of_invariant ftv flds invl =
 
     nonfree immutable:
       all reachable arguments are immutable, otherwise we lose unicity
-      all reachable regions are immutable, otherwise we lose unicity
+      all reachable regions are immutable, otherwise we lose unicity [!]
       aexp, avis, afrz are computed from the known fields
       rexp, rvis, rfrz are computed from the known fields
 
     nonfree mutable, free mutable, free immutable:
       aimm, aexp, avis, afrz are computed from the known fields
       rimm, rexp, rvis, rfrz are computed from the known fields
+
+  [!] if this rule makes a reachable region immutable, we declare
+      the type mutable to preserve mutability.
 *)
 
 let create_plain_record_itysymbol ~priv ~mut id args flds invl =
@@ -659,8 +662,13 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let f_imm_regs f _ a = if Mvs.mem f.pv_vs iflds then
     ity_rch_regs a f.pv_ity else ity_imm_regs a f.pv_ity in
   let tl = List.map Util.ttrue args in
-  let mut = mut || mfld <> [] in
+  let rimm = if priv (* [!] compute rimm ignoring mut *)
+        then check_regs (Mpv.fold f_imm_regs flds Sreg.empty)
+        else check_regs (collect_all ity_imm_regs Sreg.empty) in
+  let rrch = check_regs (collect_all ity_rch_regs Sreg.empty) in
   let inv = priv || invl <> [] in
+  let mut = mut  || mfld <> [] || (* [!] save mutable regions *)
+      (inv && List.exists2 (fun r i -> r && not i) rrch rimm) in
   let aimm = if priv then tl
         else if inv && not mut
         then check_args (collect_all ity_rch_vars Stv.empty)
@@ -671,11 +679,6 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
         else check_args (collect_vis ity_vis_vars Stv.empty) in
   let afrz = if priv then tl
         else check_args (collect_frz ity_exp_vars Stv.empty) in
-  let rimm = if priv && mut
-        then check_regs (Mpv.fold f_imm_regs flds Sreg.empty)
-        else if inv && not mut
-        then check_regs (collect_all ity_rch_regs Sreg.empty)
-        else check_regs (collect_all ity_imm_regs Sreg.empty) in
   let rexp = check_regs (collect_all ity_exp_regs Sreg.empty) in
   let rvis = check_regs (collect_vis ity_vis_regs Sreg.empty) in
   let rfrz = check_regs (collect_frz ity_exp_regs Sreg.empty) in
