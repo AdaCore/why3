@@ -372,3 +372,76 @@ let wait_on_call pc =
 let post_wait_call pc ret = pc.call ret
 
 let prover_call_pid pc = pc.pid
+
+let set_socket_name =
+  Prove_client.set_socket_name
+
+type server_id = int
+
+let gen_id =
+  let x = ref 0 in
+  fun () ->
+    incr x;
+    !x
+
+type save_data =
+  { vc_file      : string;
+    is_temporary : bool;
+    limit        : resource_limit;
+    res_parser   : prover_result_parser;
+    printer_mapping : Printer.printer_mapping;
+  }
+
+let regexs : (int, save_data) Hashtbl.t = Hashtbl.create 17
+
+let prove_file_server ~res_parser ~command ~limit
+                      ~printer_mapping ?(inplace=false) ?(interactive=false) file =
+  let id = gen_id () in
+  let cmd, _, _ = actualcommand command ~use_why3cpulimit:false limit interactive file in
+  let saved_data =
+    { vc_file      = file;
+      is_temporary = not inplace;
+      limit        = limit;
+      res_parser   = res_parser;
+      printer_mapping = printer_mapping } in
+  Hashtbl.add regexs id saved_data;
+  let timelimit = get_time limit in
+  let memlimit = get_mem limit in
+  Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
+  id
+
+let read_and_delete_file fn =
+  let cin = open_in fn in
+  let buf = Buffer.create 1024 in
+  try
+    while true do
+      Buffer.add_string buf (input_line cin);
+      Buffer.add_char buf '\n'
+    done;
+    assert false
+  with End_of_file ->
+  begin
+    close_in cin;
+    Sys.remove fn;
+    Buffer.contents buf
+  end
+
+let handle_answer answer =
+  let id = answer.Prove_client.id in
+  let save = Hashtbl.find regexs id in
+  Hashtbl.remove regexs id;
+  if save.is_temporary then
+    Sys.remove save.vc_file;
+  let out = read_and_delete_file answer.Prove_client.out_file in
+  let ret = Unix.WEXITED answer.Prove_client.exit_code in
+  let printer_mapping = save.printer_mapping in
+  let ans =
+    parse_prover_run save.res_parser
+                     answer.Prove_client.time
+                     out ret answer.Prove_client.timeout save.limit
+                     ~printer_mapping
+  in
+  id, ans
+
+let wait_for_server_result () =
+  List.map handle_answer (Prove_client.read_answers ())

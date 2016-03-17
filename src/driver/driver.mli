@@ -70,6 +70,12 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
+val prove_task_server : string ->
+                        limit : Call_provers.resource_limit ->
+                        cntexample:bool ->
+                        ?old:string -> ?inplace:bool -> driver -> Task.task ->
+                        Call_provers.server_id
+
 val prove_task_prepared :
   command      : string ->
   limit        : Call_provers.resource_limit ->
