@@ -391,7 +391,7 @@ module Solver
       let v = g[Int31.(+) s offsets[!off]] in
       if Int31.(<=) n1 v && Int31.(<=) v n9 then
          begin
-           if b[v] = True then
+           if b[v] then
               begin
                 assert { exists o:int.
            0 <= o < t !off /\ t (Map.get g.elts (t s + t offsets[o])) = t v };
@@ -564,7 +564,7 @@ this is true but with 2 different possible reasons:
     let n81 = of_int 81 in
     if Int31.eq i n81 then raise SolutionFound;
     (* assert { is_index i }; *)
-    if g[i] <> n0 then
+    if not (Int31.eq g[i] n0) then
       try
         (* assert { 1 <= t g[i] <= 9 }; *)
         check_valid_chunk g i s.column_start s.column_offsets;

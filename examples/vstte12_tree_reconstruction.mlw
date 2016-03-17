@@ -289,10 +289,11 @@ module ZipperBased
      [(x1, Leaf); (x2, Leaf); ...; (xn, Leaf)].
      Function [map_leaf] below does this. *)
 
-  function map_leaf (l: list int) : list (int, tree) = match l with
-  | Nil -> Nil
-  | Cons d r -> Cons (d, Leaf) (map_leaf r)
-  end
+  let rec function map_leaf (l: list int) : list (int, tree) =
+    match l with
+    | Nil -> Nil
+    | Cons d r -> Cons (d, Leaf) (map_leaf r)
+    end
 
   (* two lemmas on [map_leaf] *)
 

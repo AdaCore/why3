@@ -52,7 +52,7 @@ module SearchingALinkedList
               (result = length l /\ no_zero l) }
   = let i = ref 0 in
     let s = ref l in
-    while !s <> Nil && head !s <> 0 do
+    while not (is_nil !s) && head !s <> 0 do
       invariant {
         0 <= !i /\ !i + length !s = length l /\
         (forall j:int. 0 <= j -> nth j !s = nth (!i + j) l) /\
