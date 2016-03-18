@@ -447,22 +447,31 @@ P(t)
   corresponding set of subgoals. In absence of case analysis labels,
   the number of subgoals generated is linear in the size of the initial goal.
 
-  \paragraph{Behavior on asymetric connectives and \texttt{by}/\texttt{so}}
+  \paragraph{Behavior on asymmetric connectives and
+    \texttt{by}/\texttt{so}}
 
-  The transformation treat specially asymetric and \texttt{by}/\texttt{so}
-  connectives. Asymetric conjunction \verb|A && B| in goal position
-  is handled as syntactic sugar for \verb|A /\ (A -> B)|.
-  The conclusion of the first subgoal can then be used to prove the second one.
+  The transformation treat specially asymmetric and
+  \texttt{by}/\texttt{so} connectives. Asymmetric conjunction
+  \verb|A && B| in goal position is handled as syntactic sugar for
+  \verb|A /\ (A -> B)|.  The conclusion of the first subgoal can then
+  be used to prove the second one.
 
-  Asymetric disjunction \verb+A || B+ in hypothesis position is handled as
+  Asymmetric disjunction \verb+A || B+ in hypothesis position is handled as
   syntactic sugar for \verb|A \/ ((not A) /\ B)|.
   In particular, a case analysis on such hypothesis would give the negation of
   the first hypothesis in the second case.
 
-  The \texttt{by} connective is treated as a proof indication. In hypothesis position, \verb|A by B| is treated as if it were syntactic sugar for its regular interpretation \verb|A|. In goal position, it is treated as if \verb|B| was an intermediate step for proving \verb|A|. \verb|A by B| is then replaced by |B| and the transformation also generates a side-condition subgoal \verb|B -> A| representing the logical cut.
+  The \texttt{by} connective is treated as a proof indication. In
+  hypothesis position, \verb|A by B| is treated as if it were
+  syntactic sugar for its regular interpretation \verb|A|. In goal
+  position, it is treated as if \verb|B| was an intermediate step for
+  proving \verb|A|. \verb|A by B| is then replaced by \verb|B| and the
+  transformation also generates a side-condition subgoal \verb|B -> A|
+  representing the logical cut.
 
-  Although splitting stops at disjunctive points like
-  symetric disjunction and left-hand sides of implications, the occurences of the \texttt{by} connective are not restricted. For instance:
+  Although splitting stops at disjunctive points like symmetric
+  disjunction and left-hand sides of implications, the occurrences of
+  the \texttt{by} connective are not restricted. For instance:
   \begin{itemize}
   \item Splitting
 \begin{whycode}
@@ -494,7 +503,7 @@ goal G1 : B || D
 goal G2 : B -> A        (* side-condition *)
 goal G3 : B || (D -> C) (* side-condition *)
 \end{whycode}
-Note that due to the asymetric disjunction, the disjunction is kept in the
+Note that due to the asymmetric disjunction, the disjunction is kept in the
 second side-condition subgoal.
 \item Splitting
 \begin{whycode}
@@ -508,9 +517,9 @@ goal G2 : forall x. x = 42 -> P x (* side-condition *)
 Note that in the side-condition subgoal, the context is universally closed.
 \end{itemize}
 
-The \texttt{so} connective plays a similar role in hypothesis position, as it serves as a consequence indication. In goal position, \verb|A so B| is treated as if it were syntatic sugar for its regular interpretation \verb|A|. In hypothesis position, it is treated as if both \verb|A| and \verb|B| were true because \verb|B| is a consequence of \verb|A|. \verb|A so B| is replaced by \verb|A /\ B| and the transformation also generates a side-condition subgoal \verb|A -> B| corresponding to the consequence relation between formula.
+The \texttt{so} connective plays a similar role in hypothesis position, as it serves as a consequence indication. In goal position, \verb|A so B| is treated as if it were syntactic sugar for its regular interpretation \verb|A|. In hypothesis position, it is treated as if both \verb|A| and \verb|B| were true because \verb|B| is a consequence of \verb|A|. \verb|A so B| is replaced by \verb|A /\ B| and the transformation also generates a side-condition subgoal \verb|A -> B| corresponding to the consequence relation between formula.
 
-  As for the \texttt{by} connective, occurences of \texttt{so} are unrestricted.
+  As for the \texttt{by} connective, occurrences of \texttt{so} are unrestricted.
   For instance:
   \begin{itemize}
   \item Splitting
@@ -535,21 +544,26 @@ goal G3 : forall x. P x -> Q x -> T x        (* side-condition *)
 goal G4 : forall x. P x -> Q x -> T x -> R x (* side-condition *)
 goal G5 : (exists x. P x /\ Q x /\ R x) -> A (* side-condition *)
 \end{whycode}
-In natural language, this corresponds to the following proof schema for \verb|A|:
-There exists a \verb|x| for which \verb|P| holds. Then, for that witness \verb|Q| and \verb|R| also holds. The last one holds because \verb|T| holds as well. And from those three conditions on \verb|x|, we can deduce \verb|A|.
+In natural language, this corresponds to the following proof schema
+for \verb|A|: There exists a \verb|x| for which \verb|P| holds. Then,
+for that witness \verb|Q| and \verb|R| also holds. The last one holds
+because \verb|T| holds as well. And from those three conditions on
+\verb|x|, we can deduce \verb|A|.
 \end{itemize}
 
 \paragraph{Labels controlling the transformation}
 
-The transformations in the split family can be finely controlled by using
-labels on formula.
+The transformations in the split family can be controlled by using
+labels on formulas.
 
-The label \verb|"stop_split"| can be used to block the splitting of a formula.
-The label is removed after blocking, so applying the transformation a second
-time will split the formula. This is can be used to decompose the splitting process in blocks. Also, if a formula with this label is found in non-goal position,
-its \texttt{by}/\texttt{so} proof indication will be erased by the
-transformation. In a sense, formula tagged by \verb|"stop_split"| are handled
-as if they were local lemmas.
+The label \verb|"stop_split"| can be used to block the splitting of a
+formula.  The label is removed after blocking, so applying the
+transformation a second time will split the formula. This is can be
+used to decompose the splitting process in several steps. Also, if a
+formula with this label is found in non-goal position, its
+\texttt{by}/\texttt{so} proof indication will be erased by the
+transformation. In a sense, formulas tagged by \verb|"stop_split"| are
+handled as if they were local lemmas.
 
 The label \verb|"case_split"| can be used to force case analysis on hypotheses.
 For instance, applying \texttt{split\_goal} on
@@ -595,4 +609,3 @@ and is likely to change in future versions.
 %%% TeX-PDF-mode: t
 %%% TeX-master: "manual"
 %%% End:
-
