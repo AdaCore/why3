@@ -8,7 +8,10 @@ module M
   (** Memory model and definition of is_list *)
   type pointer
   type next = map pointer pointer
-  constant null : pointer
+
+  val constant null : pointer
+  val predicate is_null (x : pointer)
+    ensures { result <-> x <> null }
 
   val value : ref (map pointer int)
   val next : ref (next)
@@ -117,7 +120,7 @@ module M
     diverges
     ensures { is_list !next !result }
   = let q = ref null in
-    while !p <> null do
+    while not (is_null !p) do
       invariant { is_list !next !p /\ is_list !next !q }
       invariant { sep_list_list !next !p !q }
       let tmp = !next[!p] in
@@ -163,7 +166,7 @@ module M
   = let old_next = !next in
     let old_p = !p in
     let q = ref null in
-    while !p <> null do
+    while not (is_null !p) do
       invariant { is_list !next !p /\ is_list !next !q }
       invariant { sep_list_list !next !p !q }
       invariant { reverse (model (old_next) (old_p)) =
@@ -287,7 +290,7 @@ module M2
     diverges
     ensures  { is_list !next !result }
     let q = ref null in
-    while !p <> null do
+    while not (is_null !p) do
       invariant { is_list !next !p /\ is_list !next !q }
       invariant { sep_list_list !next !p !q }
       let tmp = !next[!p] in
@@ -334,7 +337,7 @@ module M2
     ensures  { reverse (model (old !next) (old !p)) = model !next !result }
   = let old_p = !p in
     let q = ref null in
-    while !p <> null do
+    while not (is_null !p) do
       invariant { is_list !next !p /\ is_list !next !q }
       invariant { sep_list_list !next !p !q }
       invariant { reverse (model (old !next) (old_p)) =

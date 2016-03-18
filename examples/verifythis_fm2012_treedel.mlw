@@ -46,6 +46,9 @@ module Memory
 
   type loc
   constant null: loc
+  val predicate is_null (x:loc)
+    ensures { result <-> x = null }
+
   type node = { left: loc; right: loc; data: int; }
   type memory = map loc node
 
@@ -134,7 +137,7 @@ module Treedel
                | Cons p l -> m = !mem[p].data /\ inorder !ot = l end }
     =
     let p = ref (get_left t) in
-    if !p = null then begin
+    if is_null !p then begin
       let m = get_data t in
       let tt = get_right t in
       ghost match it with Empty -> absurd
@@ -146,7 +149,7 @@ module Treedel
       let ghost zipper = ref Top in
       let ghost ppr = ref (tree_right it) in
       let ghost subtree = ref (tree_left it) in
-      while !tt <> null do
+      while not (is_null !tt) do
         invariant { !pp <> null /\ !mem[!pp].left = !p }
         invariant { !p <> null /\ !mem[!p].left = !tt }
         invariant { let pt = Node !subtree !pp !ppr in

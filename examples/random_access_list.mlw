@@ -265,7 +265,7 @@ module RandomAccessListWithSeq
     | Zero l1  -> Zero (fupdate (aux i f) (div i 2) l1)
     end
 
-  function f (y: 'a) : 'a -> 'a = fun _ -> y
+  let function f (y: 'a) : 'a -> 'a = fun _ -> y
 
   let update (i: int) (y: 'a) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }

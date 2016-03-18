@@ -101,8 +101,8 @@ use import ConvexSet
 use import set.Fset
 use import ref.Ref
 
-predicate lower (p q:pt) =
-  p.y <. q.y \/ (p.y = q.y /\ p.x <=. q.x)
+val predicate lower (p q:pt)
+  ensures { result <-> p.y <. q.y \/ (p.y = q.y /\ p.x <=. q.x) }
 
 let lowest_pt (s:set pt) : (pt, set pt)
   requires { not (is_empty s) }
