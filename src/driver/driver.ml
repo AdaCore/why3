@@ -257,7 +257,6 @@ let call_on_buffer ~command ~limit
     ~command ~limit ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace ?interactive buffer
 
-
 (** print'n'prove *)
 
 exception NoPrinter
@@ -323,14 +322,8 @@ let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
   print_task ?old drv fmt task
 
-let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
-  let buf = Buffer.create 1024 in
-  let fmt = formatter_of_buffer buf in
-  let old_channel = Opt.map open_in old in
-  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
-  pp_print_flush fmt ();
-  Opt.iter close_in old_channel;
-  let filename = match old, inplace with
+let file_name_of_task ?old ?inplace drv task =
+  match old, inplace with
     | Some fn, Some true -> fn
     | _ ->
         let pr = Task.task_goal task in
@@ -339,7 +332,15 @@ let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         get_filename drv fn "T" pr.pr_name.id_string
-  in
+
+let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
+  let buf = Buffer.create 1024 in
+  let fmt = formatter_of_buffer buf in
+  let old_channel = Opt.map open_in old in
+  let filename = file_name_of_task ?old ?inplace drv task in
+  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
+  pp_print_flush fmt ();
+  Opt.iter close_in old_channel;
   let res =
     call_on_buffer ~command ~limit
                    ?inplace ?interactive ~filename ~printer_mapping drv buf in
@@ -350,6 +351,21 @@ let prove_task ~command ~limit ?(cntexample=false) ?old
                ?inplace ?interactive drv task =
   let task = prepare_task ~cntexample drv task in
   prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task
+
+let prove_task_server command ~limit ~cntexample ?old ?inplace drv task =
+  let task = prepare_task ~cntexample drv task in
+  let fn = file_name_of_task ?old ?inplace drv task in
+  let res_parser = drv.drv_res_parser in
+  let printer_mapping = get_default_printer_mapping in
+  match inplace with
+  | Some true ->
+     prove_file_server ~command ~res_parser ~limit ~printer_mapping ?inplace fn
+  | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
+	 let fmt = Format.formatter_of_out_channel outc in
+	 let printer_mapping = print_task_prepared ?old:None drv fmt task in
+         close_out outc;
+
+         prove_file_server ~command ~res_parser ~limit ~printer_mapping fn
 
 (* exception report *)
 
