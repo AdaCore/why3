@@ -28,6 +28,9 @@ let debug_sp = Debug.register_flag "vc_sp"
 let no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
+let case_split = Ident.create_label "case_split"
+let add_case t = t_label_add case_split (t_label_add stop_split t)
+
 let ls_of_rs s =
   match s.rs_logic with RLls ls -> ls | _ -> assert false
 
@@ -123,12 +126,28 @@ let sp_implies sp wp = match sp.t_node, wp.t_node with
 let sp_or sp1 sp2 = match sp1.t_node, sp2.t_node with
   | Ttrue, _ | _, Tfalse -> sp1
   | _, Ttrue | Tfalse, _ -> sp2
-  | _, _ -> t_or sp1 sp2
+  | _, _ -> add_case (t_or sp1 sp2)
 
 let sp_and sp1 sp2 = match sp1.t_node, sp2.t_node with
   | Ttrue, _ | _, Tfalse -> sp2
   | _, Ttrue | Tfalse, _ -> sp1
   | _, _ -> t_and sp1 sp2
+
+let sp_if c sp1 sp2 = match c.t_node, sp1.t_node, sp2.t_node with
+  | Ttrue, _, _  -> sp1
+  | Tfalse, _, _ -> sp2
+  | Tnot c, Ttrue, _ -> sp_implies c sp2
+  | Tnot c, Tfalse, _ -> sp_and c sp2
+  | _, Ttrue, _ -> sp_implies (t_not c) sp2
+  | _, Tfalse, _ -> sp_and (t_not c) sp2
+  | _, _, Ttrue -> sp_implies c sp1
+  | _, _, Tfalse -> sp_and c sp1
+  | _, _, _ -> add_case (t_if c sp1 sp2)
+
+let sp_case t bl =
+  let isfalse b = match t_open_branch b with
+    | _, { t_node = Tfalse } -> true | _ -> false in
+  if List.for_all isfalse bl then t_false else add_case (t_case t bl)
 
 let can_simp wp = match wp.t_node with
   | Ttrue -> not (Slab.mem stop_split wp.t_label)
@@ -805,8 +824,8 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
       let ok2, ne2, ex2 = out_complete e2.e_effect out2 xres12 dst12 in
       let v, test = test_of_expr e0 in
       let ok = wp_if test ok1 ok2 in
-      let ne = t_if_simp test ne1 ne2 in
-      let ex = inter_mexn (t_if_simp test) ex1 ex2 in
+      let ne = sp_if test ne1 ne2 in
+      let ex = inter_mexn (sp_if test) ex1 ex2 in
       let out = out_seq (ok, ne, ex) dst12 res zout zeff zdst in
       out_label e (sp_expr_seq env e0 v xres out eff12 zeff zdst)
   | Ecase (e0, bl) ->
@@ -822,11 +841,11 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
         out_map (t_close_branch p) out) bl in
       let v = proxy_of_expr e0 in let t = t_var v in
       let ok = wp_case t (List.map (fun (ok,_,_) -> ok) out12) in
-      let ne = t_case_simp t (List.map (fun (_,ne,_) -> ne) out12) in
+      let ne = sp_case t (List.map (fun (_,ne,_) -> ne) out12) in
       let xbl = Mexn.map (fun _ -> []) xres12 in
       let xbl = List.fold_right (fun (_,_,ex) xbl ->
         inter_mexn (fun x l -> x::l) ex xbl) out12 xbl in
-      let ex = Mexn.map (t_case_simp t) xbl in
+      let ex = Mexn.map (sp_case t) xbl in
       let out = out_seq (ok, ne, ex) dst12 res zout zeff zdst in
       out_label e (sp_expr_seq env e0 v xres out eff12 zeff zdst)
   | Etry (e0, xl) ->
@@ -970,10 +989,10 @@ and sp_pure_if env test e1 e2 res =
           (match term_of_post ~prop:false res ne2 with
     | Some (t2, f2) ->
         let t = t_if_simp test t1 t2 in
-        let f = t_if_simp test f1 f2 in
+        let f = sp_if test f1 f2 in
         sp_and (t_equ (t_var res) t) f
-    | None -> t_if_simp test ne1 ne2)
-    | None -> t_if_simp test ne1 ne2 in
+    | None -> sp_if test ne1 ne2)
+    | None -> sp_if test ne1 ne2 in
   wp_if test ok1 ok2, ne
 
 and vc_let_sym env vc_wp ld wp {e_effect = eff} =
