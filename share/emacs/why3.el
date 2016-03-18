@@ -136,7 +136,7 @@
             (indent-line-to cur-indent)
           (indent-line-to 0)))))))
 
-; compile will propose "why3 ide file" is no Makefile is present
+; compile will propose "why3 ide file" if no Makefile is present
 
 (add-hook 'why3-mode-hook
           (lambda ()
