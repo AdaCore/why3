@@ -134,6 +134,14 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
 
 let print_ty fmt ty = print_ty_node 0 fmt ty
 
+let print_vsty fmt v =
+  fprintf fmt "%a%a:@,%a" print_vs v
+    print_id_labels v.vs_name print_ty v.vs_ty
+
+let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
+let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
+
 let print_const fmt = function
   | ConstInt (IConstDec s) -> fprintf fmt "%s" s
   | ConstInt (IConstHex s) -> fprintf fmt "0x%s" s
@@ -180,10 +188,6 @@ let rec print_pat_node pri fmt p = match p.pat_node with
         print_cs cs (print_list space (print_pat_node 2)) pl
 
 let print_pat = print_pat_node 0
-
-let print_vsty fmt v =
-  fprintf fmt "%a%a:@,%a" print_vs v
-    print_id_labels v.vs_name print_ty v.vs_ty
 
 let print_quant fmt = function
   | Tforall -> fprintf fmt "forall"
@@ -281,8 +285,8 @@ and print_tnode pri fmt t = match t.t_node with
           print_vsty v print_term f;
         forget_var v
       end else begin
-        fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun %a%a ->@ %a@]")
-          (print_list comma print_vsty) vl print_tl tl print_term e;
+        fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun%a%a ->@ %a@]")
+          (print_list nothing print_vs_arg) vl print_tl tl print_term e;
         List.iter forget_var vl
       end
   | Tquant (q,fq) ->
@@ -320,10 +324,6 @@ and print_tl fmt tl =
     (print_list alt (print_list comma print_term)) tl
 
 (** Declarations *)
-
-let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
-let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 let print_constr fmt (cs,pjl) =
   let add_pj pj ty pjl = (pj,ty)::pjl in
