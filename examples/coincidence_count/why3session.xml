@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="3" name="Alt-Ergo" version="1.01" timelimit="1" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="1" memlimit="1000"/>
 <file name="../coincidence_count.mlw" expanded="true">
-<theory name="CoincidenceCount" sum="0132b9a7880f94ef4837b56d77339196" expanded="true">
+<theory name="CoincidenceCount" sum="7a2287b91f2b0a651faa05f57cda3b8b" expanded="true">
  <goal name="drop_left" expanded="true">
  <proof prover="3"><result status="valid" time="0.21" steps="779"/></proof>
  </goal>
@@ -73,7 +73,7 @@
      <goal name="VC coincidence_count.16.1.1.2" expl="2. assertion">
      <transf name="introduce_premises">
       <goal name="VC coincidence_count.16.1.1.2.1" expl="1. assertion">
-      <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.18" steps="2995"/></proof>
+      <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.50" steps="2968"/></proof>
       </goal>
      </transf>
      </goal>
@@ -84,7 +84,7 @@
   </transf>
   </goal>
   <goal name="VC coincidence_count.17" expl="17. assertion">
-  <proof prover="3"><result status="valid" time="0.61" steps="815"/></proof>
+  <proof prover="3"><result status="valid" time="0.61" steps="825"/></proof>
   </goal>
   <goal name="VC coincidence_count.18" expl="18. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>

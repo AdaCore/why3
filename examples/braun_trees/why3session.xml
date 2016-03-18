@@ -4,12 +4,12 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="1" memlimit="4000"/>
-<file name="../braun_trees.mlw" expanded="true">
-<theory name="BraunHeaps" sum="9334f80cdd6602327443c5aae6cefa84" expanded="true">
+<file name="../braun_trees.mlw">
+<theory name="BraunHeaps" sum="876d02933ffd18547ca9986469a3c53f">
  <goal name="VC le_root" expl="VC for le_root">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="0"/></proof>
  </goal>
- <goal name="VC root_is_min" expl="VC for root_is_min" expanded="true">
+ <goal name="VC root_is_min" expl="VC for root_is_min">
  <proof prover="0"><result status="valid" time="0.17"/></proof>
  </goal>
  <goal name="VC empty" expl="VC for empty">
@@ -57,11 +57,7 @@
   <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="140"/></proof>
   </goal>
   <goal name="VC replace_min.11" expl="11. postcondition">
-  <transf name="introduce_premises">
-   <goal name="VC replace_min.11.1" expl="1. postcondition">
-   <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="2.17" steps="3887"/></proof>
-   </goal>
-  </transf>
+  <proof prover="1" timelimit="5" steplimit="-1" memlimit="1000"><result status="valid" time="1.85" steps="3886"/></proof>
   </goal>
   <goal name="VC replace_min.12" expl="12. postcondition">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.08" steps="395"/></proof>
@@ -75,7 +71,7 @@
   <goal name="VC replace_min.15" expl="15. postcondition">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="VC replace_min.16" expl="16. VC for replace_min">
+  <goal name="VC replace_min.16" expl="16. unreachable point">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
@@ -110,13 +106,13 @@
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC merge.10" expl="10. precondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="48"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="46"/></proof>
   </goal>
   <goal name="VC merge.11" expl="11. precondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="48"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="46"/></proof>
   </goal>
   <goal name="VC merge.12" expl="12. precondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="88"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="86"/></proof>
   </goal>
   <goal name="VC merge.13" expl="13. precondition">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="11"/></proof>
@@ -125,7 +121,7 @@
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC merge.15" expl="15. precondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="VC merge.16" expl="16. precondition">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00" steps="15"/></proof>
@@ -139,20 +135,20 @@
   <goal name="VC merge.19" expl="19. postcondition">
   <transf name="introduce_premises">
    <goal name="VC merge.19.1" expl="1. postcondition">
-   <proof prover="1" timelimit="30"><result status="valid" time="5.00" steps="6583"/></proof>
+   <proof prover="1" timelimit="30"><result status="valid" time="5.00" steps="6584"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC merge.20" expl="20. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="108"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03" steps="107"/></proof>
   </goal>
   <goal name="VC merge.21" expl="21. postcondition">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.21" steps="519"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.21" steps="515"/></proof>
   </goal>
   <goal name="VC merge.22" expl="22. postcondition">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="VC merge.23" expl="23. VC for merge">
+  <goal name="VC merge.23" expl="23. unreachable point">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
  </transf>
@@ -161,7 +157,7 @@
  <proof prover="1" memlimit="1000"><result status="valid" time="0.05" steps="136"/></proof>
  </goal>
  <goal name="VC diff" expl="VC for diff">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.73" steps="252"/></proof>
+ <proof prover="1" memlimit="1000"><result status="valid" time="0.48" steps="252"/></proof>
  </goal>
  <goal name="VC fast_size" expl="VC for fast_size">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="67"/></proof>
@@ -170,7 +166,7 @@
  <proof prover="1" memlimit="1000"><result status="valid" time="0.16" steps="501"/></proof>
  </goal>
  <goal name="VC inv_height" expl="VC for inv_height">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.42" steps="755"/></proof>
+ <proof prover="1" memlimit="1000"><result status="valid" time="0.42" steps="766"/></proof>
  </goal>
 </theory>
 </file>
