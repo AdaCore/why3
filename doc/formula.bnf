@@ -6,6 +6,8 @@
        | formula "&&"  formula ; asymmetric conj.
        | formula "\/"  formula ; disjunction
        | formula "||"  formula ; asymmetric disj.
+       | formula "by" formula ; proof indication
+       | formula "so" formula ; consequence indication
        | "not" formula         ; negation
        | lqualid 	       ; symbol
        | prefix-op term        ;
