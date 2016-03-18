@@ -2,9 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.4.0" timelimit="15" memlimit="1000"/>
-<file name="../register_allocation.mlw" expanded="true">
+<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
+<file name="../register_allocation.mlw">
 <theory name="Spec" sum="ba1e3a728704cdb775f61eda94820d9d">
  <goal name="VC exec_append" expl="VC for exec_append">
  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
@@ -120,12 +119,12 @@
  <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
  </goal>
 </theory>
-<theory name="FiniteNumberOfRegisters" sum="42a29d23713b3b0262afc5ae14383e33" expanded="true">
+<theory name="FiniteNumberOfRegisters" sum="59f339fa28e657cc21745c25665df93a">
  <goal name="VC k" expl="VC for k">
  <proof prover="2"><result status="valid" time="0.01" steps="0"/></proof>
  </goal>
- <goal name="VC compile" expl="VC for compile" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC compile" expl="VC for compile">
+ <transf name="split_goal_wp">
   <goal name="VC compile.1" expl="1. precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -239,29 +238,45 @@
   <goal name="VC compile.35" expl="35. precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC compile.36" expl="36. precondition" expanded="true">
-  <proof prover="2"><result status="timeout" time="5.00"/></proof>
-  <transf name="split_goal_full" expanded="true">
-   <goal name="VC compile.36.1" expl="1. precondition" expanded="true">
-   <proof prover="2" timelimit="30"><result status="timeout" time="29.93"/></proof>
-   <transf name="compute_specified" expanded="true">
-    <goal name="VC compile.36.1.1" expl="1. precondition" expanded="true">
-    <proof prover="2" timelimit="15"><result status="unknown" time="0.11"/></proof>
+  <goal name="VC compile.36" expl="36. precondition">
+  <transf name="split_goal_full">
+   <goal name="VC compile.36.1" expl="1. precondition">
+   <transf name="prop_curry">
+    <goal name="VC compile.36.1.1" expl="1. precondition">
+    <transf name="compute_specified">
+     <goal name="VC compile.36.1.1.1" expl="1. precondition">
+     <transf name="simplify_trivial_quantification_in_goal">
+      <goal name="VC compile.36.1.1.1.1" expl="1. VC for compile">
+      <transf name="introduce_premises">
+       <goal name="VC compile.36.1.1.1.1.1" expl="1. VC for compile">
+       <transf name="compute_specified">
+        <goal name="VC compile.36.1.1.1.1.1.1" expl="1. VC for compile">
+        <proof prover="2" timelimit="15" steplimit="-1"><result status="valid" time="0.02" steps="41"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="VC compile.36.2" expl="2. precondition" expanded="true">
-   <proof prover="2" timelimit="30"><result status="timeout" time="29.94"/></proof>
-   <transf name="prop_curry" expanded="true">
-    <goal name="VC compile.36.2.1" expl="1. precondition" expanded="true">
-    <transf name="compute_specified" expanded="true">
-     <goal name="VC compile.36.2.1.1" expl="1. precondition" expanded="true">
-     <transf name="simplify_trivial_quantification" expanded="true">
-      <goal name="VC compile.36.2.1.1.1" expl="1. VC for compile" expanded="true">
-      <proof prover="2" timelimit="15"><result status="timeout" time="14.98"/></proof>
-      <transf name="inline_goal" expanded="true">
-       <goal name="VC compile.36.2.1.1.1.1" expl="1. VC for compile" expanded="true">
-       <proof prover="2" timelimit="15"><result status="timeout" time="14.97"/></proof>
+   <goal name="VC compile.36.2" expl="2. precondition">
+   <transf name="prop_curry">
+    <goal name="VC compile.36.2.1" expl="1. precondition">
+    <transf name="compute_specified">
+     <goal name="VC compile.36.2.1.1" expl="1. precondition">
+     <transf name="simplify_trivial_quantification_in_goal">
+      <goal name="VC compile.36.2.1.1.1" expl="1. VC for compile">
+      <transf name="introduce_premises">
+       <goal name="VC compile.36.2.1.1.1.1" expl="1. VC for compile">
+       <transf name="compute_specified">
+        <goal name="VC compile.36.2.1.1.1.1.1" expl="1. VC for compile">
+        <proof prover="2" timelimit="15" steplimit="-1"><result status="valid" time="0.04" steps="74"/></proof>
+        </goal>
+       </transf>
        </goal>
       </transf>
       </goal>
@@ -282,7 +297,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="OptimalNumberOfRegisters" sum="e6b1a3bd99c07322da36f95a9b686d52" expanded="true">
+<theory name="OptimalNumberOfRegisters" sum="7a24fe5c482c472ff2997b093fc9ca7d">
  <goal name="VC k" expl="VC for k">
  <proof prover="2"><result status="valid" time="0.01" steps="0"/></proof>
  </goal>
@@ -296,8 +311,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC compile" expl="VC for compile" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC compile" expl="VC for compile">
+ <transf name="split_goal_wp">
   <goal name="VC compile.1" expl="1. precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
@@ -420,27 +435,76 @@
   <goal name="VC compile.38" expl="38. precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC compile.39" expl="39. precondition" expanded="true">
-  <proof prover="2"><result status="timeout" time="4.99"/></proof>
-  <transf name="split_goal_full" expanded="true">
-   <goal name="VC compile.39.1" expl="1. precondition" expanded="true">
-   <transf name="compute_specified" expanded="true">
-    <goal name="VC compile.39.1.1" expl="1. precondition" expanded="true">
-    <proof prover="2" timelimit="30"><result status="timeout" time="29.93"/></proof>
-    <proof prover="3"><result status="outofmemory" time="6.47"/></proof>
+  <goal name="VC compile.39" expl="39. precondition">
+  <transf name="split_goal_full">
+   <goal name="VC compile.39.1" expl="1. precondition">
+   <transf name="prop_curry">
+    <goal name="VC compile.39.1.1" expl="1. precondition">
+    <transf name="compute_specified">
+     <goal name="VC compile.39.1.1.1" expl="1. precondition">
+     <transf name="simplify_trivial_quantification_in_goal">
+      <goal name="VC compile.39.1.1.1.1" expl="1. VC for compile">
+      <transf name="introduce_premises">
+       <goal name="VC compile.39.1.1.1.1.1" expl="1. VC for compile">
+       <transf name="compute_specified">
+        <goal name="VC compile.39.1.1.1.1.1.1" expl="1. VC for compile">
+        <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="60"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="VC compile.39.2" expl="2. precondition" expanded="true">
-   <transf name="compute_specified" expanded="true">
-    <goal name="VC compile.39.2.1" expl="1. precondition" expanded="true">
-    <proof prover="2" timelimit="30"><result status="timeout" time="29.94"/></proof>
-    <proof prover="3"><result status="outofmemory" time="6.62"/></proof>
+   <goal name="VC compile.39.2" expl="2. precondition">
+   <transf name="prop_curry">
+    <goal name="VC compile.39.2.1" expl="1. precondition">
+    <transf name="compute_specified">
+     <goal name="VC compile.39.2.1.1" expl="1. precondition">
+     <transf name="simplify_trivial_quantification_in_goal">
+      <goal name="VC compile.39.2.1.1.1" expl="1. VC for compile">
+      <transf name="introduce_premises">
+       <goal name="VC compile.39.2.1.1.1.1" expl="1. VC for compile">
+       <transf name="compute_specified">
+        <goal name="VC compile.39.2.1.1.1.1.1" expl="1. VC for compile">
+        <proof prover="2" steplimit="-1"><result status="valid" time="0.06" steps="123"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
    <goal name="VC compile.39.3" expl="3. precondition">
-   <proof prover="2" timelimit="15"><result status="valid" time="0.01" steps="32"/></proof>
+   <transf name="prop_curry">
+    <goal name="VC compile.39.3.1" expl="1. precondition">
+    <transf name="compute_specified">
+     <goal name="VC compile.39.3.1.1" expl="1. precondition">
+     <transf name="simplify_trivial_quantification_in_goal">
+      <goal name="VC compile.39.3.1.1.1" expl="1. VC for compile">
+      <transf name="introduce_premises">
+       <goal name="VC compile.39.3.1.1.1.1" expl="1. VC for compile">
+       <transf name="compute_specified">
+        <goal name="VC compile.39.3.1.1.1.1.1" expl="1. VC for compile">
+        <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="14"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
