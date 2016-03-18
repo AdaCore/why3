@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Isabelle" version="2015" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="0" name="Isabelle" version="2015" timelimit="5" steplimit="1" memlimit="0"/>
 <prover id="1" name="CVC4" version="1.2" timelimit="60" steplimit="1" memlimit="1000"/>
 <prover id="2" name="Zenon" version="0.8.0" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="0"/>
@@ -16,7 +16,7 @@
 <prover id="11" name="Simplify" version="1.5.4" timelimit="3" steplimit="1" memlimit="1000"/>
 <prover id="12" name="Yices" version="1.0.38" timelimit="5" steplimit="1" memlimit="0"/>
 <prover id="13" name="Zenon" version="0.7.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="14" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="4000"/>
+<prover id="14" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="4000"/>
 <prover id="15" name="Metis" version="2.3" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="16" name="Z3" version="3.2" timelimit="5" steplimit="1" memlimit="0"/>
 <prover id="17" name="Alt-Ergo" version="0.95.2" timelimit="60" steplimit="1" memlimit="1000"/>
@@ -30,10 +30,10 @@
 <prover id="25" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="26" name="Zenon Modulo" version="0.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="27" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="28" name="Z3" version="4.4.1" timelimit="5" memlimit="4000"/>
+<prover id="28" name="Z3" version="4.4.1" timelimit="5" steplimit="1" memlimit="4000"/>
 <file name="../genealogy.why" expanded="true">
-<theory name="Genealogy" sum="35e1439432a79e05534b2c5cf39ad9dc" expanded="true">
- <goal name="Child_is_son_or_daughter" expanded="true">
+<theory name="Genealogy" sum="35e1439432a79e05534b2c5cf39ad9dc">
+ <goal name="Child_is_son_or_daughter">
  <proof prover="0" edited="genealogy_Genealogy_Child_is_son_or_daughter_1.xml"><result status="valid" time="6.55"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -60,8 +60,8 @@
  <proof prover="27" edited="genealogy_Genealogy_Child_is_son_or_daughter_1.v"><result status="valid" time="0.80"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Sibling_sym" expanded="true">
- <proof prover="0" edited="genealogy_Genealogy_Sibling_sym_1.xml"><result status="valid" time="6.09"/></proof>
+ <goal name="Sibling_sym">
+ <proof prover="0" edited="genealogy_Genealogy_Sibling_sym_1.xml"><result status="valid" time="7.12"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -87,8 +87,8 @@
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Sibling_is_brother_or_sister" expanded="true">
- <proof prover="0" edited="genealogy_Genealogy_Sibling_is_brother_or_sister_1.xml"><result status="valid" time="6.19"/></proof>
+ <goal name="Sibling_is_brother_or_sister">
+ <proof prover="0" edited="genealogy_Genealogy_Sibling_is_brother_or_sister_1.xml"><result status="valid" time="7.32"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -112,8 +112,8 @@
  <proof prover="26"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Grandparent_is_grandfather_or_grandmother" expanded="true">
- <proof prover="0" edited="genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1.xml"><result status="valid" time="6.50"/></proof>
+ <goal name="Grandparent_is_grandfather_or_grandmother">
+ <proof prover="0" edited="genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1.xml"><result status="valid" time="7.48"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -138,7 +138,7 @@
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Grandfather_male" expanded="true">
+ <goal name="Grandfather_male">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -164,7 +164,7 @@
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Grandmother_female" expanded="true">
+ <goal name="Grandmother_female">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -190,7 +190,7 @@
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Only_two_grandfathers" expanded="true">
+ <goal name="Only_two_grandfathers">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
