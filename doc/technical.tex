@@ -423,41 +423,183 @@ P(t)
   is the same as above but it applies only in the goal.
 \index{simplify-trivial-quantification-in-goal@\verb+simplify_trivial_quantification_in_goal+}
 
-\item[split\_premise]
-  splits conjunctive premises.
+\item[split\_premise] replaces axioms in conjunctive form
+  by an equivalent collection of axioms.
+  In absence of case analysis labels (see \texttt{split\_goal} for details),
+  the number of axiom generated per initial axiom is
+  linear in the size of that initial axiom.
 \index{split-premise@\verb+split_premise+}
+
+\item[split\_premise\_full]: This transformation is similar to \texttt{split\_premise}, but also converts the axioms to conjunctive normal form. The number of axioms generated per initial axiom may be exponential in the size of the initial axiom.
+\index{split-premise-full@\verb+split_premise_full+}
 
 \end{description}
 
-\subsection{Other Splitting Transformations}
+\subsection{Other Splitting Transformations}~\label{tech:trans:split}
 
 \begin{description}
 
-\item[full\_split\_all]
-  performs both \texttt{split\_premise} and \texttt{full\_split\_goal}.
-\index{full-split-all@\verb+full_split_all+}
-
-\item[full\_split\_goal] puts the goal in a conjunctive form,
-  returns the corresponding set of subgoals. The number of subgoals
-  generated may be exponential in the size of the initial goal.
-\index{full-split-goal@\verb+full_split_goal+}
-
 \item[simplify\_formula\_and\_task] is the same as \texttt{simplify\_formula}
   but it also removes the goal if it is equivalent to true.
-\index{full-split-all@\verb+full_split_all+}
+\index{simplify-formula-and-task@\verb+simplify_formula_and_task+}
+
+\item[split\_goal]: if the goal is a conjunction of goals, returns the
+  corresponding set of subgoals. In absence of case analysis labels,
+  the number of subgoals generated is linear in the size of the initial goal.
+
+  \paragraph{Behavior on asymmetric connectives and
+    \texttt{by}/\texttt{so}}
+
+  The transformation treat specially asymmetric and
+  \texttt{by}/\texttt{so} connectives. Asymmetric conjunction
+  \verb|A && B| in goal position is handled as syntactic sugar for
+  \verb|A /\ (A -> B)|.  The conclusion of the first subgoal can then
+  be used to prove the second one.
+
+  Asymmetric disjunction \verb+A || B+ in hypothesis position is handled as
+  syntactic sugar for \verb|A \/ ((not A) /\ B)|.
+  In particular, a case analysis on such hypothesis would give the negation of
+  the first hypothesis in the second case.
+
+  The \texttt{by} connective is treated as a proof indication. In
+  hypothesis position, \verb|A by B| is treated as if it were
+  syntactic sugar for its regular interpretation \verb|A|. In goal
+  position, it is treated as if \verb|B| was an intermediate step for
+  proving \verb|A|. \verb|A by B| is then replaced by \verb|B| and the
+  transformation also generates a side-condition subgoal \verb|B -> A|
+  representing the logical cut.
+
+  Although splitting stops at disjunctive points like symmetric
+  disjunction and left-hand sides of implications, the occurrences of
+  the \texttt{by} connective are not restricted. For instance:
+  \begin{itemize}
+  \item Splitting
+\begin{whycode}
+goal G : (A by B) && C
+\end{whycode}
+generates the subgoals
+\begin{whycode}
+goal G1 : B
+goal G2 : A -> C
+goal G3 : B -> A (* side-condition *)
+\end{whycode}
+\item Splitting
+\begin{whycode}
+goal G : (A by B) \/ (C by D)
+\end{whycode}
+generates
+\begin{whycode}
+goal G1 : B \/ D
+goal G2 : B -> A (* side-condition *)
+goal G3 : D -> C (* side-condition *)
+\end{whycode}
+\item Splitting
+\begin{whycode}
+goal G : (A by B) || (C by D)
+\end{whycode}
+generates
+\begin{whycode}
+goal G1 : B || D
+goal G2 : B -> A        (* side-condition *)
+goal G3 : B || (D -> C) (* side-condition *)
+\end{whycode}
+Note that due to the asymmetric disjunction, the disjunction is kept in the
+second side-condition subgoal.
+\item Splitting
+\begin{whycode}
+goal G : exists x. P x by x = 42
+\end{whycode}
+generates
+\begin{whycode}
+goal G1 : exists x. x = 42
+goal G2 : forall x. x = 42 -> P x (* side-condition *)
+\end{whycode}
+Note that in the side-condition subgoal, the context is universally closed.
+\end{itemize}
+
+The \texttt{so} connective plays a similar role in hypothesis position, as it serves as a consequence indication. In goal position, \verb|A so B| is treated as if it were syntactic sugar for its regular interpretation \verb|A|. In hypothesis position, it is treated as if both \verb|A| and \verb|B| were true because \verb|B| is a consequence of \verb|A|. \verb|A so B| is replaced by \verb|A /\ B| and the transformation also generates a side-condition subgoal \verb|A -> B| corresponding to the consequence relation between formula.
+
+  As for the \texttt{by} connective, occurrences of \texttt{so} are unrestricted.
+  For instance:
+  \begin{itemize}
+  \item Splitting
+\begin{whycode}
+goal G : (((A so B) \/ C) -> D) && E
+\end{whycode}
+generates
+\begin{whycode}
+goal G1 : ((A /\ B) \/ C) -> D
+goal G2 : (A \/ C -> D) -> E
+goal G3 : A -> B               (* side-condition *)
+\end{whycode}
+\item Splitting
+\begin{whycode}
+goal G : A by exists x. P x so Q x so R x by T x
+(* reads: A by (exists x. P x so (Q x so (R x by T x))) *)
+\end{whycode}
+\begin{whycode}
+goal G1 : exists x. P x
+goal G2 : forall x. P x -> Q x               (* side-condition *)
+goal G3 : forall x. P x -> Q x -> T x        (* side-condition *)
+goal G4 : forall x. P x -> Q x -> T x -> R x (* side-condition *)
+goal G5 : (exists x. P x /\ Q x /\ R x) -> A (* side-condition *)
+\end{whycode}
+In natural language, this corresponds to the following proof schema
+for \verb|A|: There exists a \verb|x| for which \verb|P| holds. Then,
+for that witness \verb|Q| and \verb|R| also holds. The last one holds
+because \verb|T| holds as well. And from those three conditions on
+\verb|x|, we can deduce \verb|A|.
+\end{itemize}
+
+\paragraph{Labels controlling the transformation}
+
+The transformations in the split family can be controlled by using
+labels on formulas.
+
+The label \verb|"stop_split"| can be used to block the splitting of a
+formula.  The label is removed after blocking, so applying the
+transformation a second time will split the formula. This is can be
+used to decompose the splitting process in several steps. Also, if a
+formula with this label is found in non-goal position, its
+\texttt{by}/\texttt{so} proof indication will be erased by the
+transformation. In a sense, formulas tagged by \verb|"stop_split"| are
+handled as if they were local lemmas.
+
+The label \verb|"case_split"| can be used to force case analysis on hypotheses.
+For instance, applying \texttt{split\_goal} on
+\begin{whycode}
+goal G : ("case_split" A \/ B) -> C
+\end{whycode}
+generates the subgoals
+\begin{whycode}
+goal G1 : A -> C
+goal G2 : B -> C
+\end{whycode}
+Without the label, the transformation do nothing because undesired case analysis
+may easily lead to an exponential blow-up.
+
+Note that the precise behavior of splitting transformation in presence of
+the \verb|"case_split"| is not yet specified
+and is likely to change in future versions.
+
+\index{split-goal@\verb+split_goal+}
 
 \item[split\_all]
   performs both \texttt{split\_premise} and \texttt{split\_goal}.
 \index{split-all@\verb+split_all+}
 
-\item[split\_goal] if the goal is a conjunction of goals, returns the
-  corresponding set of subgoals. The number of subgoals generated is linear in
-  the size of the initial goal.
-\index{split-goal@\verb+split_goal+}
-
-\item[split\_intro]
-  moves the antecedents into the premises when a goal is an implication.
+\item[split\_intro]: Composition of \texttt{split\_goal} and \texttt{introduce\_premises}.
 \index{split-intro@\verb+split_intro+}
+
+\item[split\_goal\_full]: This transformation has a behavior similar
+  to \texttt{split\_goal}, but also converts the goal to conjunctive normal form.
+  The number of subgoals generated may be exponential in the size of the initial goal.
+\index{split-goal-full@\verb+split_goal_full+}
+
+\item[split\_all\_full]
+  performs both \texttt{split\_premise} and \texttt{split\_goal\_full}.
+\index{split-all-full@\verb+split_all_full+}
+
 
 \end{description}
 
@@ -467,4 +609,3 @@ P(t)
 %%% TeX-PDF-mode: t
 %%% TeX-master: "manual"
 %%% End:
-
