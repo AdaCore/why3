@@ -69,14 +69,14 @@ module M
   val x : array int
 
   (* the number of digits of X *)
-  constant n : int
+  val constant n : int
+    ensures { 0 <= result }
 
   (* the target digit sum *)
-  constant y : int
+  val constant y : int
+    ensures { 0 < result }
 
-  axiom Hypotheses: n >= 0 /\ y > 0
-
-  constant m : int = 1 + max n (div y 9)
+  let constant m : int = 1 + max n (div y 9)
 
 exception Success
 
@@ -111,7 +111,7 @@ let search_safety ()
     s := !s - x[d]
   done
 
-(* 2. Correctness, part 1: when Sucess is raised, x contains an integer
+(* 2. Correctness, part 1: when Success is raised, x contains an integer
       with digit sum y *)
 
   (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
