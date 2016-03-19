@@ -899,12 +899,18 @@ type env = {
   rsm : rsymbol Mstr.t;
   pvm : pvsymbol Mstr.t;
   old : (pvsymbol Mstr.t * (let_defn * pvsymbol) Hpv.t) Mstr.t;
+  ghs : bool; (* we are under DEghost or in a ghost function *)
+  lgh : bool; (* we are under let ghost v = ... *)
+  cgh : bool; (* we are under DEghost in a cexp *)
 }
 
 let env_empty = {
   rsm = Mstr.empty;
   pvm = Mstr.empty;
   old = Mstr.empty;
+  ghs = false;
+  lgh = false;
+  cgh = false;
 }
 
 exception UnboundLabel of string
@@ -1023,18 +1029,18 @@ type let_prexix =
 
 let rec expr uloc env ({de_loc = loc} as de) =
   let uloc, labs, de = strip uloc Slab.empty de in
-  let e = Loc.try3 ?loc try_expr uloc env de in
+  let e = Loc.try3 ?loc try_expr uloc {env with cgh = false} de in
   let loc = Opt.get_def loc uloc in
   if loc = None && Slab.is_empty labs
   then e else e_label_push ?loc labs e
 
-and cexp uloc env ghost ({de_loc = loc} as de) lpl =
+and cexp uloc env ({de_loc = loc} as de) lpl =
   let uloc, labs, de = strip uloc Slab.empty de in
   if not (Slab.is_empty labs) then Warning.emit ?loc
     "Ignoring labels over a higher-order expression";
-  Loc.try5 ?loc try_cexp uloc env ghost de lpl
+  Loc.try4 ?loc try_cexp uloc env de lpl
 
-and try_cexp uloc env ghost ({de_dvty = argl,res} as de0) lpl =
+and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   let rec drop vl al = match vl, al with
     | _::vl, _::al -> drop vl al | _ -> al in
   let rec all_ghost al lpl = match al, lpl with
@@ -1063,31 +1069,35 @@ and try_cexp uloc env ghost ({de_dvty = argl,res} as de0) lpl =
     let ldl, vl = proxy_args ghost_args al lpl in
     let argl = List.map ity_of_dity (drop vl argl) in
     let c = app s vl argl (ity_of_dity res) in
-    ghost || c_ghost c, ldl, c in
+    env.cgh, ldl, c in
   let c_app s lpl =
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
-    let ghost_args = ghost || rs_ghost s || all_ghost al lpl in
+    let ghost_args = env.ghs || rs_ghost s || all_ghost al lpl in
     apply c_app ghost_args s al lpl in
   let c_pur s lpl =
+    if not (env.ghs || env.lgh) then Warning.emit ?loc:de0.de_loc
+      "Pure symbol %a used outside explicit ghost context" Pretty.print_ls s;
     apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
   let proxy c =
     try
       let ld_of_lp = function LD ld -> ld | EA _ -> raise Exit in
-      ghost || c_ghost c, List.map ld_of_lp lpl, c
+      env.cgh, List.map ld_of_lp lpl, c
     with Exit ->
       let loc = Opt.get_def de0.de_loc uloc in
       let id = id_fresh ?loc ~label:proxy_labels "h" in
-      let ld, s = let_sym id ~ghost c in
+      let ld, s = let_sym id ~ghost:env.ghs c in
       c_app s (LD ld :: lpl) in
   match de0.de_node with
   | DEvar (n,_) -> c_app (get_rs env n) lpl
   | DErs s -> c_app s lpl
   | DEls s -> c_pur s lpl
   | DEapp (de1,de2) ->
-      let e2 = expr uloc env de2 in
-      cexp uloc env ghost de1 (EA e2 :: lpl)
+      let e2 = e_ghostify env.cgh (expr uloc env de2) in
+      cexp uloc env de1 (EA e2 :: lpl)
   | DEghost de ->
-      cexp uloc env true de lpl
+      (* if we were not in the ghost context until now, then
+         we must ghostify the let-definitions down from here *)
+      cexp uloc {env with ghs = true; cgh = env.cgh || not env.ghs} de lpl
   | DEfun (bl,msk,dsp,de) ->
       let dvl _ _ = [] in
       let c, dsp, _ = lambda uloc env (binders bl) msk dsp dvl de in
@@ -1096,15 +1106,15 @@ and try_cexp uloc env ghost ({de_dvty = argl,res} as de0) lpl =
   | DEany (bl,msk,dsp,dity) ->
       proxy (c_any (cty_of_spec env bl msk dsp dity))
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
-      let ld, env = var_defn uloc env ghost dldf in
-      cexp uloc env ghost de (LD ld :: lpl)
+      let ld, env = var_defn uloc env dldf in
+      cexp uloc env de (LD ld :: lpl)
   | DElet (dldf,de) ->
-      let ldl0, env = sym_defn uloc env ghost dldf in
+      let ldl0, env = sym_defn uloc env dldf in
       let lpl0 = List.rev_map (fun ld -> LD ld) ldl0 in
-      cexp uloc env ghost de (List.rev_append lpl0 lpl)
+      cexp uloc env de (List.rev_append lpl0 lpl)
   | DErec (drdf,de) ->
-      let ld, env = rec_defn uloc env ghost drdf in
-      cexp uloc env ghost de (LD ld :: lpl)
+      let ld, env = rec_defn uloc env drdf in
+      cexp uloc env de (LD ld :: lpl)
   | DEmark _ ->
       Loc.errorm "Marks are not allowed over higher-order expressions"
   | DEpv _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
@@ -1125,18 +1135,18 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e2 = expr uloc env de2 in
       e_app rs_func_app [e1; e2] [] (ity_of_dity res)
   | DEvar _ | DErs _ | DEls _ | DEapp _ | DEfun _ | DEany _ ->
-      let cgh,ldl,c = try_cexp uloc env false de0 [] in
+      let cgh,ldl,c = try_cexp uloc env de0 [] in
       let e = e_ghostify cgh (e_exec c) in
       List.fold_left e_let_check e ldl
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
-      let ld, env = var_defn uloc env false dldf in
+      let ld, env = var_defn uloc env dldf in
       let e2 = expr uloc env de in
       e_let ld e2
   | DElet (dldf,de) ->
-      let ldl, env = sym_defn uloc env false dldf in
+      let ldl, env = sym_defn uloc env dldf in
       List.fold_left e_let_check (expr uloc env de) ldl
   | DErec (drdf,de) ->
-      let ld, env = rec_defn uloc env false drdf in
+      let ld, env = rec_defn uloc env drdf in
       e_let ld (expr uloc env de)
   | DEnot de ->
       e_not (expr uloc env de)
@@ -1238,7 +1248,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEraise (xs,de) ->
       e_raise xs (expr uloc env de) (ity_of_dity res)
   | DEghost de ->
-      e_ghostify true (expr uloc env de)
+      e_ghostify true (expr uloc {env with ghs = true} de)
   | DEassert (ak,f) ->
       e_assert ak (create_assert (get_later env f))
   | DEpure t ->
@@ -1256,30 +1266,33 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
-and var_defn uloc env ghost (id,gh,kind,de) =
+and var_defn uloc env (id,gh,kind,de) =
+  let env = {env with lgh = env.lgh || gh} in
   let e = match kind with
     | RKlemma -> Loc.errorm ?loc:id.pre_loc
         "Lemma-functions must have parameters"
     | RKfunc | RKpred | RKlocal | RKnone ->
-        e_ghostify ghost (expr uloc env de) in
-  let ld, v = let_var id ~ghost:gh e in
+        e_ghostify env.cgh (expr uloc env de) in
+  let ld, v = let_var id ~ghost:(gh || env.ghs) e in
   ld, add_pvsymbol env v
 
-and sym_defn uloc env ghost (id,gh,kind,de) =
-  let ghost, ldl, c = cexp uloc env ghost de [] in
-  let ld, s = let_sym id ~ghost:(gh || ghost) ~kind c in
+and sym_defn uloc env (id,gh,kind,de) =
+  let ghs = env.ghs || gh || kind = RKlemma in
+  let cgh, ldl, c = cexp uloc {env with ghs = ghs} de [] in
+  let ld, s = let_sym id ~ghost:(gh || cgh) ~kind c in
   ld::ldl, add_rsymbol env s
 
-and rec_defn uloc env ghost {fds = dfdl} =
+and rec_defn uloc env {fds = dfdl} =
   let step1 env (id, gh, kind, bl, mask, dsp, dvl, ({de_dvty = dvty} as de)) =
     let pvl = binders bl in
-    let ghost = gh || ghost || kind = RKlemma in
+    let ghost = env.ghs || gh || kind = RKlemma in
     let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
     let cty = create_cty ~mask pvl [] [] Mexn.empty Mpv.empty eff_empty ity in
     let rs = create_rsymbol id ~ghost ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, mask, dsp, dvl, de) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
   let step2 (rs, kind, mask, dsp, dvl, de) (fdl,dspl) =
+    let env = {env with ghs = env.ghs || rs_ghost rs} in
     let {rs_name = {id_string = nm; id_loc = loc}; rs_cty = c} = rs in
     let lam, dsp, dvl = lambda uloc env c.cty_args mask dsp dvl de in
     if c_ghost lam && not (rs_ghost rs) then Loc.errorm ?loc
@@ -1318,7 +1331,7 @@ and lambda uloc env pvl mask dsp dvl de =
 
 let rec_defn ?(keep_loc=true) drdf =
   let uloc = if keep_loc then None else Some None in
-  fst (rec_defn uloc env_empty false drdf)
+  fst (rec_defn uloc env_empty drdf)
 
 let rec mask_of_fun de = match de.de_node with
   | DEfun (_,msk,_,_) -> msk
@@ -1332,10 +1345,11 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
   let ghost = ghost || kind = RKlemma in
   match kind, de.de_dvty with
   | _, (_::_, _) ->
-      let cgh, ldl, c = cexp uloc env_empty false de [] in
+      let env = {env_empty with ghs = ghost} in
+      let cgh, ldl, c = cexp uloc env de [] in
       if ldl <> [] then Loc.errorm ?loc:de.de_loc
         "Illegal top-level function definition";
-      if cgh && not ghost then Loc.errorm ?loc
+      if (cgh || c_ghost c) && not ghost then Loc.errorm ?loc
         "Function %s must be explicitly marked ghost" nm;
       let spl = mask_spill c.c_cty.cty_mask (mask_of_fun de) in
       if spl && not ghost then Loc.errorm ?loc
@@ -1343,7 +1357,7 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
       fst (let_sym id ~ghost ~kind c)
   | (RKfunc | RKpred), ([], _) ->
       (* FIXME: let ghost constant c = <effectful> *)
-      let e = expr uloc env_empty de in
+      let e = expr uloc {env_empty with lgh = ghost} de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Function %s must be explicitly marked ghost" nm;
       let c = c_fun [] [] [] Mexn.empty Mpv.empty e in
@@ -1358,7 +1372,7 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
          into an axiom. *)
       fst (let_sym id ~ghost ~kind c)
   | RKnone, ([], _) ->
-      let e = expr uloc env_empty de in
+      let e = expr uloc {env_empty with lgh = ghost} de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Variable %s must be explicitly marked ghost" nm;
       fst (let_var id ~ghost e)
