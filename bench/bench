@@ -11,7 +11,7 @@ suffix=$1
 
 goods () {
     pgm="bin/why3prove$suffix"
-    for f in $1/[e-z]*.[wm][hl][yw] ; do
+    for f in $1/*.[wm][hl][yw] ; do
 	echo -n "  $f... "
 	# running Why
 	if ! $pgm $2 $f > /dev/null 2>&1; then
