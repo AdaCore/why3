@@ -33,6 +33,7 @@ type pty =
   | PTtuple of pty list
   | PTarrow of pty * pty
   | PTparen of pty
+  | PTpure  of pty
 
 (*s Patterns *)
 

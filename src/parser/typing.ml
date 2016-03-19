@@ -123,7 +123,7 @@ let ty_of_pty tuc pty =
         ty_app s.its_ts (List.map get_ty tyl)
     | PTarrow (ty1, ty2) ->
         ty_func (get_ty ty1) (get_ty ty2)
-    | PTparen ty ->
+    | PTpure ty | PTparen ty ->
         get_ty ty
   in
   get_ty pty
@@ -140,6 +140,8 @@ let ity_of_pty muc pty =
         ity_tuple (List.map get_ity tyl)
     | PTarrow (ty1, ty2) ->
         ity_func (get_ity ty1) (get_ity ty2)
+    | PTpure ty ->
+        ity_purify (get_ity ty)
     | PTparen ty ->
         get_ity ty
   in
@@ -897,6 +899,7 @@ let add_types muc tdl =
           Loc.try3 ~loc:(qloc q) ity_app s (List.map down tyl) []
       | PTtuple tyl -> ity_tuple (List.map down tyl)
       | PTarrow (ty1,ty2) -> ity_func (down ty1) (down ty2)
+      | PTpure ty -> ity_purify (down ty)
       | PTparen ty -> down ty in
     down pty in
 

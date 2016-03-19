@@ -332,12 +332,14 @@ abstract:
 | ABSTRACT          { Abstract }
 
 type_field:
+| labels(lident) cast
+  { { f_ident = $1; f_mutable = false; f_ghost = false;
+      f_pty = $2; f_loc = floc $startpos $endpos } }
 | field_modifiers labels(lident) cast
   { { f_ident = $2; f_mutable = fst $1; f_ghost = snd $1;
       f_pty = $3; f_loc = floc $startpos $endpos } }
 
 field_modifiers:
-| (* epsilon *) { false, false }
 | MUTABLE       { true,  false }
 | GHOST         { false, true  }
 | GHOST MUTABLE { true,  true  }
@@ -395,6 +397,7 @@ ty_arg:
 | LEFTPAR comma_list2(ty) RIGHTPAR  { PTtuple $2 }
 | LEFTPAR RIGHTPAR                  { PTtuple [] }
 | LEFTPAR ty RIGHTPAR               { PTparen $2 }
+| LEFTBRC ty RIGHTBRC               { PTpure $2 }
 
 cast:
 | COLON ty  { $2 }
