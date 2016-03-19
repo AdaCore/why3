@@ -14,12 +14,10 @@ goods () {
     for f in $1/*.[wm][hl][yw] ; do
 	echo -n "  $f... "
 	# running Why
-	if ! $pgm $2 $f > /dev/null 2>&1; then
+	if ! $pgm $2 $f > /dev/null; then
 	    echo "FAILED!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
             echo "invocation: $pgm $2 $f"
-            echo "result:"
-	    $pgm $2 $f
 	    exit 1
 	fi
 	echo "ok"
@@ -46,7 +44,7 @@ drivers () {
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
 	echo -n "  $f... "
 	# running Why
-	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null 2>&1; then
+	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null; then
 	    echo "why FAILED"
             echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f -
 	    exit 1
@@ -88,7 +86,7 @@ invalid_goals () {
 execute () {
     pgm="bin/why3execute$suffix"
     echo -n "$1 $2... "
-    if $pgm $1 $2 > /dev/null 2>&1; then
+    if $pgm $1 $2 > /dev/null; then
         echo "ok"
     else
         echo "execution test failed!"
@@ -106,15 +104,15 @@ extract_and_run () {
     echo -n "$dir... "
     rm -f $dir/$prg
     echo -n "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null 2>&1; then
+    if BENCH=yes make -C $dir clean > /dev/null; then
         echo -n "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null 2>&1; then
+        if BENCH=yes make -C $dir extract > /dev/null; then
             echo -n "compile... "
-            if BENCH=yes make -C $dir > /dev/null 2>&1; then
+            if BENCH=yes make -C $dir > /dev/null; then
                 echo -n "execute... "
-                if $dir/main.opt "$@" > /dev/null 2>&1; then
+                if $dir/main.opt "$@" > /dev/null; then
                     echo -n "doc... "
-                    if BENCH=yes make -C $dir doc > /dev/null 2>&1; then
+                    if BENCH=yes make -C $dir doc > /dev/null; then
                         echo "ok"
                     else
                         echo "documentation failed!"
@@ -151,7 +149,7 @@ extract_and_run () {
 list_stuff () {
     pgm="bin/why3$suffix"
     echo -n "$1 "
-    if $pgm $1 > /dev/null 2>&1; then
+    if $pgm $1 > /dev/null; then
         echo "ok"
     else
         echo "$pgm $1 FAIL"

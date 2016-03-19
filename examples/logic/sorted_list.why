@@ -45,7 +45,9 @@ end
 theory SortedIntList
   use import int.Int
   use import List
-  clone import SortedList with type O.t = int, predicate O.(<=) = (<=)
+  clone import SortedList with
+    type O.t = int, predicate O.(<=) = (<=),
+    lemma O.le_refl, lemma O.le_asym, lemma O.le_trans
 
   goal sorted123: sorted (Cons 1 (Cons 2 (Cons 3 Nil)))
 end
