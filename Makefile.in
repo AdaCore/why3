@@ -240,6 +240,9 @@ src/driver/vc_client.o: src/driver/vc_client.c
 	gcc -O -mms-bitfields -Wall -Wno-unused -c -I$(OCAMLLIB) -fPIC $^
 	mv $(CURDIR)/vc_client.o $@
 
+src/driver/vc_client.so: src/driver/vc_client.c
+	gcc -shared -O -mms-bitfields -Wall -Wno-unused -I$(OCAMLLIB) -fPIC $^ -o $@
+
 # hide deprecated warnings for strings
 
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
@@ -250,11 +253,11 @@ src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 byte: lib/why3/why3.cma
 opt:  lib/why3/why3.cmxa
 
-lib/why3/why3.cma: lib/why3/why3.cmo src/driver/vc_client.o
+lib/why3/why3.cma: src/driver/vc_client.so lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
+	    $(OCAMLC)  -a $(BFLAGS) -o $@ $^
 
-lib/why3/why3.cmxa: lib/why3/why3.cmx src/driver/vc_client.o
+lib/why3/why3.cmxa: src/driver/vc_client.o lib/why3/why3.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
@@ -878,7 +881,7 @@ lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
+lib/coq-tactic/why3tac.cma: src/driver/vc_client.o lib/why3/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
