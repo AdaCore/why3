@@ -1113,6 +1113,7 @@ let eff_inst sbs e =
      not a snapshot. Also, every region containing a modified or reset
      region, must also be instantiated into a region and not a snapshot.
      The latter is not necessary for soundness, but simplifies VCgen. *)
+  let impact = Sreg.union (Mreg.domain e.eff_writes) e.eff_resets in
   let inst src = Mreg.fold (fun p v acc -> Mreg.fold (fun q t acc ->
     match t.ity_node with
     | Ityapp _ when reg_r_reachable p q -> raise (IllegalSnapshot t)
@@ -1122,9 +1123,7 @@ let eff_inst sbs e =
   let resets = inst e.eff_resets in
   let taints = inst e.eff_taints in
   let covers = inst e.eff_covers in
-  let impact = Mreg.merge (fun r fld void -> match fld, void with
-    | Some _, Some _ -> raise (IllegalAlias r)
-    | _ -> Some ()) writes resets in
+  let impact = inst impact in
   (* all type variables and unaffected regions must be instantiated
      outside [impact]. Every region in the instantiated execution
      is either brought in by the type substitution or instantiates
