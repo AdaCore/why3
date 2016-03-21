@@ -187,8 +187,8 @@ type context =
 let rec function recompose (c:context) (t:term) (e:environment) : term =
   match c with
   | Empty -> t
-  | Left c t1 e1 -> App (recompose c t e) t1
-  | Right (Closure x t1 e1) c -> App (Lambda x t1) (recompose c t e)
+  | Left c t1 _e1 -> App (recompose c t e) t1
+  | Right (Closure x t1 _e1) c -> App (Lambda x t1) (recompose c t e)
   end
 
 (*
@@ -218,7 +218,7 @@ let rec lemma recompose_values (c:context) (t1 t2:expr) (e:environment) : unit
 
 let rec eval (t:term) (e:environment) (c:context) : value
   diverges
-  returns { Closure x t1 e1 ->
+  returns { Closure x t1 _e1 ->
     weak_normalize (recompose c t e) (Lambda x t1) }
 = match t with
   | Var x -> cont c (lookup x e)

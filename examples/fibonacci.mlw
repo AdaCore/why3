@@ -275,7 +275,9 @@ theory Mat22 "2x2 integer matrices"
   (* clone algebra.Assoc with type t = t, function op = mult, lemma Assoc *)
 
   clone export
-    int.Exponentiation with type t = t, function one = id, function (*) = mult
+    int.Exponentiation with
+      type t = t, function one = id, function (*) = mult,
+      goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
 
 end
 

@@ -250,7 +250,7 @@ module RandomAccessListWithSeq
   function setf (s: seq 'a) (i: int) (f: 'a -> 'a) : seq 'a =
     set s i (f s[i])
 
-  function aux (i: int) (f: 'a -> 'a) : ('a, 'a) -> ('a, 'a) =
+  let function aux (i: int) (f: 'a -> 'a) : ('a, 'a) -> ('a, 'a) =
     fun z -> let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
 
   let rec fupdate (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a

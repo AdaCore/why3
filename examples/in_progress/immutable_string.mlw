@@ -10,7 +10,7 @@ module String
 
   function ([]) (s: string) (i: int) : char = s.chars i
 
-  constant empty : string = { length = 0; chars = fun (i: int) -> dummy_char }
+  constant empty : string = { length = 0; chars = fun (_: int) -> dummy_char }
 
   val get (s: string) (i:int) : char
     requires { 0 <= i < s.length }

@@ -152,7 +152,7 @@ module RingBufferSeq
     mutable first: int;
     mutable len  : int;
             data : array 'a;
-    ghost mutable sequence: S.seq 'a;
+    ghost mutable sequence: S.seq {'a};
   }
   invariant {
     let size = Array.length data in

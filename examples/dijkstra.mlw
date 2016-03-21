@@ -26,9 +26,8 @@ module DijkstraShortestPath
   axiom G_succ_sound :
     forall x: vertex. S.subset (g_succ x) v
 
-  function weight vertex vertex : int (* edge weight, if there is an edge *)
-
-  axiom Weight_nonneg: forall x y: vertex. weight x y >= 0
+  val function weight vertex vertex : int (* edge weight, if there is an edge *)
+    ensures { result >= 0 }
 
   (** Data structures for the algorithm. *)
 
