@@ -248,7 +248,7 @@ opt:  lib/why3/why3.cmxa
 
 lib/why3/why3.cma: lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
+	    $(OCAMLC)  -a $(BFLAGS) -o $@ $^
 
 lib/why3/why3.cmxa: lib/why3/why3.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -874,7 +874,7 @@ lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
+lib/coq-tactic/why3tac.cma: src/driver/vc_client.o lib/why3/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
