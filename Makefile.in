@@ -236,10 +236,6 @@ src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
 
-src/driver/vc_client.o: src/driver/vc_client.c
-	gcc -O -mms-bitfields -Wall -Wno-unused -c -I$(OCAMLLIB) -fPIC $^
-	mv $(CURDIR)/vc_client.o $@
-
 # hide deprecated warnings for strings
 
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
@@ -250,11 +246,11 @@ src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 byte: lib/why3/why3.cma
 opt:  lib/why3/why3.cmxa
 
-lib/why3/why3.cma: lib/why3/why3.cmo src/driver/vc_client.o
+lib/why3/why3.cma: lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-lib/why3/why3.cmxa: lib/why3/why3.cmx src/driver/vc_client.o
+lib/why3/why3.cmxa: lib/why3/why3.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 

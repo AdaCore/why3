@@ -1,7 +1,39 @@
-external client_connect : string -> unit      = "c_client_connect"
-external client_disconnect : unit -> unit     = "c_client_disconnect"
-external send_request_string : string -> unit = "c_send_request_string"
-external read_from_client : unit -> string    = "c_read_from_client"
+let socket : Unix.file_descr option ref = ref None
+
+let client_connect socket_name =
+  if Sys.os_type = "Win32" then begin
+    let name = "\\\\.\\pipe\\" ^ socket_name in
+    socket := Some (Unix.openfile name [Unix.O_RDWR] 0)
+  end else begin
+    let sock = Unix.socket Unix.PF_UNIX  Unix.SOCK_STREAM 0 in
+    Unix.connect sock (Unix.ADDR_UNIX socket_name);
+    socket := Some sock
+  end
+
+let client_disconnect () =
+  match !socket with
+  | None -> ()
+  | Some s -> Unix.close s
+
+let send_request_string msg =
+  match !socket with
+  | None -> assert false
+  | Some sock ->
+      let to_write = String.length msg in
+      let rec write pointer =
+        if pointer < to_write then
+          let written = Unix.write sock msg pointer (to_write - pointer) in
+          write (pointer + written)
+      in write 0
+
+let read_from_client =
+  let buf = String.make 1024 ' ' in
+  fun () ->
+    match !socket with
+    | None -> assert false
+    | Some sock ->
+        let read = Unix.read sock buf 0 1024 in
+        String.sub buf 0 read
 
 type answer =
   {
