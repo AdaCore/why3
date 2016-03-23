@@ -313,15 +313,15 @@ module ToSeq
     to_seq a l u = S.empty
 
   axiom to_seq_cons:
-    forall a: array 'a, l u: int. l < u ->
+    forall a: array 'a, l u: int. 0 <= l < u <= length a ->
     to_seq a l u = S.cons a[l] (to_seq a (l+1) u)
 
   lemma to_seq_nth:
-    forall a: array 'a, l i u: int. l <= i < u ->
+    forall a: array 'a, l i u: int. 0 <= l <= i < u <= length a ->
     S.get (to_seq a l u) (i - l) = a[i]
 
   lemma to_seq_length:
-    forall a: array 'a, l u: int. l <= u ->
+    forall a: array 'a, l u: int. 0 <= l <= u <= length a ->
     S.length (to_seq a l u) = u - l
 
   val to_seq (a: array 'a) (l u: int) : S.seq 'a
