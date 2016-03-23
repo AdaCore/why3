@@ -29,7 +29,7 @@ let no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
 let case_split = Ident.create_label "case_split"
-let add_case t = t_label_add case_split (t_label_add stop_split t)
+let add_case t = t_label_add case_split t
 
 let ls_of_rs s =
   match s.rs_logic with RLls ls -> ls | _ -> assert false
