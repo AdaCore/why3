@@ -68,7 +68,7 @@ module HashTable
   use import int.Int
   use import map.Map
 
-  type t 'a 'b model { mutable contents: map 'a (option 'b) }
+  type t 'a 'b = private { ghost mutable contents: map 'a (option 'b) }
 
   function ([]) (h: t 'a 'b) (k: 'a) : option 'b = Map.get h.contents k
 
@@ -95,12 +95,10 @@ module MaxMatrixMemo
   use import map.Map
   use map.Const
   use import ref.Ref
-
-  constant n : int
-  axiom n_nonneg: 0 <= n
-
   use import Bitset
-  axiom integer_size: n <= size
+
+  val constant n : int
+    ensures { 0 <= result <= size }
 
   constant m : map int (map int int)
   axiom m_pos: forall i j: int. 0 <= i < n -> 0 <= j < n -> 0 <= m[i][j]
