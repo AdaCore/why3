@@ -175,7 +175,8 @@ let rec split_core sp f =
   let rc = split_core sp in
   let (~-) = t_label_copy f in
   let ro = sp.right_only in
-  let alias fo1 unop f1 = if fo1 == f1 then f else - unop f1 in
+  let alias fo1 unop f1 =
+    if fo1 == f1 then f else - unop f1 in
   let alias2 fo1 fo2 binop f1 f2 =
     if fo1 == f1 && fo2 == f2 then f else - binop f1 f2 in
   let rec trivial n = function
@@ -293,7 +294,7 @@ let rec split_core sp f =
       let dfi = if sfi.fwd == sfi.bwd then sfi.fwd else drop_byso fif in
       let rebuild fif2 fthen2 felse2 =
         if fif == fif2 && fthen == fthen2 && felse == felse2 then f else
-        t_if fif2 fthen2 felse2
+        - t_if fif2 fthen2 felse2
       in
       let fwd = rebuild dfi sft.fwd sfe.fwd in
       let bwd = rebuild dfi sft.bwd sfe.bwd in
@@ -322,7 +323,7 @@ let rec split_core sp f =
   | Tcase (t,bl) ->
       let k join =
         let case_close bl2 =
-          if Lists.equal (==) bl bl2 then f else t_case t bl2 in
+          if Lists.equal (==) bl bl2 then f else - t_case t bl2 in
         let sbl = List.map (fun b ->
           let p, f, close = t_open_branch_cb b in
           p, close, split_core sp f) bl in
@@ -343,7 +344,7 @@ let rec split_core sp f =
                 let dp_top = c_top :: bf_top and dp_bot = c_bot :: bf_bot in
                 let pos, neg, side, af_top, af_bot = zip_all dp_top dp_bot q in
                 let fzip bf af mid =
-                  t_case t (List.rev_append bf (close p mid::af)) in
+                  - t_case t (List.rev_append bf (close p mid::af)) in
                 let zip bf mid af =
                   map (fun t -> !+(fzip bf af t)) (fzip bf af) mid in
                 zip bf_top sf.pos af_top ++ pos,
@@ -359,7 +360,11 @@ let rec split_core sp f =
       | Some kn ->
           if Slab.mem compiled f.t_label
           then
-            let lab = Slab.remove compiled f.t_label in
+            (* keep the labels for single-case match *)
+            let lab = match bl with
+              | [_] -> Slab.remove case_split
+                    (Slab.remove compiled f.t_label)
+              | _ -> Slab.empty in
             let join sbl =
               let vs = create_vsymbol (id_fresh "q") (t_type t) in
               let tv = t_var vs in
@@ -388,7 +393,7 @@ let rec split_core sp f =
             let mk_case t bl = t_label_add compiled (t_case_close t bl) in
             let mk_b b = let p, f = t_open_branch b in [p], f in
             let bl = List.map mk_b bl in
-            let f = Pattern.compile_bare ~mk_case ~mk_let [t] bl in
+            let f = - Pattern.compile_bare ~mk_case ~mk_let [t] bl in
             split_core sp f
       end
   | Tquant (qn,fq) ->
@@ -396,7 +401,7 @@ let rec split_core sp f =
       let close = alias f1 (t_quant_close qn vsl trl) in
       let sf = rc f1 in
       let bwd = close sf.bwd and fwd = close sf.fwd in
-      let pos, neg , cpos, cneg = match qn with
+      let pos, neg, cpos, cneg = match qn with
         | Tforall ->
             map (fun t -> Zero t) close sf.pos, !+fwd,
             sf.cpos, false
