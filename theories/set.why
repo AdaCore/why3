@@ -161,10 +161,11 @@ end
 theory Fset
 
   use import int.Int
-  clone export SetGen
 
-  val empty () : set 'a
-    ensures { is_empty result }
+  type set 'a
+  val constant empty : set 'a
+
+  clone export SetGen with type set = set, function empty = empty
 
   function cardinal (set 'a) : int
 

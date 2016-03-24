@@ -151,7 +151,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
 
   let empty () : t
     ensures { is_empty result.mdl }
-  = { bv = zeros; mdl = empty () }
+  = { bv = zeros; mdl = empty }
 
   let is_empty (x:t) : bool
     ensures { result  <-> is_empty x.mdl }
