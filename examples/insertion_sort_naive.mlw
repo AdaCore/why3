@@ -53,7 +53,11 @@ module InsertionSortNaiveGen
   use import array.Array
   use import array.ArrayPermut
 
-  clone import map.MapSorted as M
+  type elt
+
+  val predicate le elt elt
+
+  clone import map.MapSorted as M with type elt = elt, predicate le = le
 
   axiom le_refl: forall x:elt. le x x
 
@@ -111,7 +115,7 @@ module InsertionSortParam
 
   type elt
 
-  predicate le param elt elt
+  val predicate le param elt elt
 
   axiom le_refl: forall p:param, x:elt. le p x x
 
@@ -172,7 +176,7 @@ module InsertionSortParamBad
 
   type elt
 
-  predicate le param elt elt
+  val predicate le param elt elt
 
   axiom le_refl: forall p:param, x:elt. le p x x
 

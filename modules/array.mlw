@@ -92,6 +92,10 @@ module Array
     ensures  { forall i:int.
       ofs2 <= i < ofs2 + len -> a[i] = old a[ofs1 + i - ofs2] }
 
+  val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
+    ensures { result.length = a.length }
+    ensures { result.elts = a.elts[i <- v] }
+
   (*** TODO?
      - concat : 'a array list -> 'a array
      - to_list

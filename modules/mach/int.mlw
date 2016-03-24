@@ -80,6 +80,9 @@ module Bounded_int
 
   axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
 
+  val (=) (a:t) (b:t) : bool
+    ensures  { result <-> to_int a = to_int b }
+
   val (<=) (a:t) (b:t) : bool
     ensures  { result <-> to_int a <= to_int b }
 

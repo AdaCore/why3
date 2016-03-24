@@ -70,7 +70,11 @@ module InsertionSortGen
   use import array.ArrayPermut
   use import array.ArrayEq
 
-  clone import map.MapSorted as M
+  type elt
+
+  val predicate le elt elt
+
+  clone import map.MapSorted as M with type elt = elt, predicate le = le
 
   axiom le_refl: forall x:elt. le x x
 

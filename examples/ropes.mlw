@@ -245,8 +245,8 @@ module Balance
   use import ref.Ref
 
   (** we assume that any rope length is smaller than fib (max+1) *)
-  constant max : int (* e.g. = 100 *)
-  axiom max_at_least_2: 2 <= max
+  val constant max : int (* e.g. = 100 *)
+    ensures { 2 <= result }
 
   function string_of_array (q: Array.array rope) (l u: int) : string
     (** q[u-1] + q[u-2] + ... + q[l] *)
