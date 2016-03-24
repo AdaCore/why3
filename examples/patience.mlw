@@ -236,21 +236,21 @@ module PatienceAbstract
   use import map.Const
 
   type state = {
-    mutable num_elts : int;
+    ghost mutable num_stacks : int;
+    (** number of stacks built so far *)
+    ghost mutable num_elts : int;
     (** number of cards already seen *)
-    mutable values : map int card;
+    ghost mutable values : map int card;
     (** cards values seen, indexed in the order they have been seen,
         from [0] to [num_elts-1] *)
-    mutable num_stacks : int;
-    (** number of stacks built so far *)
-    mutable stack_sizes : map int int;
+    ghost mutable stack_sizes : map int int;
     (** sizes of these stacks, numbered from [0] to [num_stacks - 1] *)
-    mutable stacks : map int (map int int);
+    ghost mutable stacks : map int (map int int);
     (** indexes of the cards in respective stacks *)
-    mutable positions : map int (int,int);
+    ghost mutable positions : map int (int,int);
     (** table that given a card index, provides its position, i.e. in
         which stack it is and at which height *)
-    mutable preds : map int int;
+    ghost mutable preds : map int int;
     (** predecessors of cards, i.e. for each card index [i], [preds[i]]
         provides an index of a card in the stack on the immediate left,
         whose value is smaller. Defaults to [-1] if the card is on the
@@ -320,14 +320,14 @@ module PatienceAbstract
   exception Return int
 
   (** [play_card c i s] pushes the card [c] on state [s] *)
-  let play_card (c:card) (s:state) : unit
+  let ghost play_card (c:card) (s:state) : unit
     requires { inv s }
     writes   { s }
     ensures  { inv s }
     ensures  { s.num_elts = (old s).num_elts + 1 }
     ensures  { s.values = (old s).values[(old s).num_elts <- c] }
   =
-    let pred = ref (-1) in
+    let ghost pred = ref (-1) in
     try
     for i = 0 to s.num_stacks - 1 do
       invariant { if i=0 then !pred = -1 else
@@ -441,7 +441,7 @@ module PatienceAbstract
 
 
 
-  let play_game (input: list int) : state
+  let ghost play_game (input: list int) : state
     ensures { exists s: seq int.  s.seqlen = result.num_stacks /\
         increasing_subsequence s input
       }
@@ -535,7 +535,7 @@ module PatienceAbstract
     };
     s
 
-  let test () =
+  let ghost test () =
     (* the list given in the problem description
        9, 7, 10, 9, 5, 4, and 10 *)
     play_game

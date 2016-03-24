@@ -151,14 +151,12 @@ module Bits "the 1-bits of an integer, as a set of integers"
 
   let empty () : t
     ensures { is_empty result.mdl }
-  =
-    { bv = zeros; mdl = empty }
+  = { bv = zeros; mdl = empty () }
 
   let is_empty (x:t) : bool
     ensures { result  <-> is_empty x.mdl }
-  =
-    assert {is_empty x.mdl -> BV32.eq x.bv zeros};
-    x.bv = zeros
+  = assert {is_empty x.mdl -> x.bv = zeros by x.bv == zeros};
+    BV32.eq x.bv zeros
 
   let remove_singleton (a b: t) : t
     requires { b.mdl = singleton (min_elt b.mdl) }
@@ -166,7 +164,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures  { result.mdl = remove (min_elt b.mdl) a.mdl }
   =
     { bv = bw_and a.bv (bw_not b.bv);
-      mdl = remove (min_elt b.mdl) a.mdl }
+      mdl = ghost remove (min_elt b.mdl) a.mdl }
     (* { bv = sub a.bv b.bv; mdl = remove (min_elt b.mdl) a.mdl } *)
 
   let add_singleton (a b: t) : t
@@ -176,24 +174,26 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures  { result.mdl = S.add (min_elt b.mdl) a.mdl }
   =
     { bv = bw_or a.bv b.bv;
-      mdl = S.add (min_elt b.mdl) a.mdl }
+      mdl = ghost S.add (min_elt b.mdl) a.mdl }
     (* { bv = add a.bv b.bv; mdl = add (min_elt b.mdl) a.mdl } *)
 
   let mul2 (a: t) : t
     ensures { result.mdl = remove size (succ a.mdl) }
   =
-    { bv = lsl_bv a.bv (of_int 1); mdl = remove size (succ a.mdl) }
+    { bv = lsl_bv a.bv (of_int 1);
+      mdl = ghost remove size (succ a.mdl) }
 
   let div2 (a: t) : t
     ensures { result.mdl = pred a.mdl }
   =
-    { bv = lsr_bv a.bv (of_int 1); mdl = pred a.mdl }
+    { bv = lsr_bv a.bv (of_int 1);
+      mdl = ghost pred a.mdl }
 
   let diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
   =
     { bv = bw_and a.bv (bw_not b.bv);
-      mdl = diff a.mdl b.mdl }
+      mdl = ghost diff a.mdl b.mdl }
 
   predicate bits_interval_is_zeros_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
     eq_sub_bv a zeros i n
@@ -228,7 +228,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures  { result.mdl = interval 0 (to_uint n) }
   =
     { bv = bw_not (lsl_bv ones n);
-      mdl = interval 0 (to_uint n) }
+      mdl = ghost interval 0 (to_uint n) }
 
 end
 

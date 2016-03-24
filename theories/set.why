@@ -163,6 +163,9 @@ theory Fset
   use import int.Int
   clone export SetGen
 
+  val empty () : set 'a
+    ensures { is_empty result }
+
   function cardinal (set 'a) : int
 
   axiom cardinal_nonneg: forall s: set 'a. cardinal s >= 0

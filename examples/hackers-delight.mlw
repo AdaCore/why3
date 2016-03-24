@@ -12,7 +12,7 @@ theory Utils
 
   let constant one : t = of_int 1
   let constant two : t = of_int 2
-  let constant lastbit : t = sub size_bv one
+  let constant lastbit : t = of_int 31
 
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
