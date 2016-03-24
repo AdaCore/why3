@@ -1,3 +1,5 @@
+val standalone : bool ref
+
 val set_socket_name : string -> unit
 
 val connect : unit -> unit
@@ -18,6 +20,6 @@ type answer =
     out_file  : string;
   }
 
-val read_answers : unit -> answer list
+val read_answers : blocking:bool -> answer list
 
 val disconnect : unit -> unit

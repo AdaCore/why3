@@ -197,15 +197,6 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-type post_prover_call = unit -> prover_result
-
-type prover_call = {
-  call : Unix.process_status -> post_prover_call;
-  pid  : int
-}
-
-type pre_prover_call = unit -> prover_call
-
 let save f = f ^ ".save"
 
 let debug_print_model model =
@@ -290,89 +281,6 @@ let actualcommand command ~use_why3cpulimit limit interactive file =
       args in
   args, !use_stdin, !on_timelimit
 
-let call_on_file ~command
-                 ~limit
-                 ~res_parser
-		 ~printer_mapping
-                 ?(cleanup=false) ?(inplace=false) ?(interactive=false)
-                 ?(redirect=true) fin =
-
-  let command, use_stdin, on_timelimit =
-    try actualcommand command ~use_why3cpulimit:true limit interactive fin
-    with e ->
-      if cleanup then Sys.remove fin;
-      if inplace then Sys.rename (save fin) fin;
-      raise e in
-  let exec = List.hd command in
-  Debug.dprintf debug "@[<hov 2>Call_provers: command is: %a@]@."
-    (Pp.print_list Pp.space pp_print_string) command;
-  let argarray = Array.of_list command in
-
-  fun () ->
-    let fd_in = if use_stdin then
-      Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
-    let fout,cout,fd_out,fd_err =
-      if redirect then
-        let fout,cout =
-          Filename.open_temp_file (Filename.basename fin) ".out" in
-        let fd_out = Unix.descr_of_out_channel cout in
-        fout, cout, fd_out, fd_out
-      else
-        "", stdout, Unix.stdout, Unix.stderr in
-    let time = Unix.gettimeofday () in
-    let pid = Unix.create_process exec argarray fd_in fd_out fd_err in
-    if use_stdin then Unix.close fd_in;
-    if redirect then close_out cout;
-
-    let call = fun ret ->
-      let time = Unix.gettimeofday () -. time in
-      let out =
-        if redirect then
-          let cout = open_in fout in
-          let out = Sysutil.channel_contents cout in
-          close_in cout;
-          out
-        else "" in
-
-      fun () ->
-        if Debug.test_noflag debug then begin
-          let swallow f x =
-            try f x with Sys_error s -> eprintf "Call_provers: %s@." s in
-          if cleanup then swallow Sys.remove fin;
-          if inplace then swallow (Sys.rename (save fin)) fin;
-          if redirect then swallow Sys.remove fout
-        end;
-        parse_prover_run res_parser time out ret on_timelimit limit
-          ~printer_mapping
-    in
-    { call = call; pid = pid }
-
-let call_on_buffer ~command ~limit ~res_parser ~filename
-		   ~printer_mapping
-                   ?(inplace=false) ?interactive buffer =
-
-  let fin,cin =
-    if inplace then begin
-      Sys.rename filename (save filename);
-      filename, open_out filename
-    end else
-      Filename.open_temp_file "why_" ("_" ^ filename) in
-  Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~limit
-               ~res_parser ~printer_mapping ~cleanup:true
-               ~inplace ?interactive fin
-
-let query_call pc =
-  let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
-  if pid = 0 then None else Some (pc.call ret)
-
-let wait_on_call pc =
-  let _, ret = Unix.waitpid [] pc.pid in pc.call ret
-
-let post_wait_call pc ret = pc.call ret
-
-let prover_call_pid pc = pc.pid
-
 let set_socket_name =
   Prove_client.set_socket_name
 
@@ -395,9 +303,11 @@ type save_data =
 let regexs : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
 let prove_file_server ~res_parser ~command ~limit
-                      ~printer_mapping ?(inplace=false) ?(interactive=false) file =
+                      ~printer_mapping ?(inplace=false) ?(interactive=false)
+                      file =
   let id = gen_id () in
-  let cmd, _, _ = actualcommand command ~use_why3cpulimit:false limit interactive file in
+  let cmd, _, _ =
+    actualcommand command ~use_why3cpulimit:false limit interactive file in
   let saved_data =
     { vc_file      = file;
       is_temporary = not inplace;
@@ -443,5 +353,49 @@ let handle_answer answer =
   in
   id, ans
 
-let wait_for_server_result () =
-  List.map handle_answer (Prove_client.read_answers ())
+let wait_for_server_result ~blocking =
+  List.map handle_answer (Prove_client.read_answers ~blocking)
+
+type post_prover_call = unit -> prover_result
+
+type prover_call = server_id
+
+type pre_prover_call = unit -> prover_call
+
+let result_buffer : (server_id, prover_result) Hashtbl.t = Hashtbl.create 17
+
+let call_on_file ~command ~limit ~res_parser ~printer_mapping
+                 ?(cleanup=false) ?(inplace=false) ?(interactive=false)
+                 ?(redirect=true) fin =
+  fun () ->
+      prove_file_server ~res_parser ~command ~limit ~printer_mapping
+                        ~inplace ~interactive fin
+
+let get_new_results ~blocking =
+  List.iter (fun (id, r) -> Hashtbl.add result_buffer id r)
+    (wait_for_server_result ~blocking)
+
+let query_call id =
+  try
+    get_new_results ~blocking:false;
+    Some (let r = Hashtbl.find result_buffer id in (fun () -> r))
+  with Not_found -> None
+
+let rec wait_on_call id =
+  try let r = Hashtbl.find result_buffer id in (fun () -> r)
+  with Not_found ->
+    get_new_results ~blocking:true;
+    wait_on_call id
+
+let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
+                   ?(inplace=false) ?(interactive=false) buffer =
+  let fin,cin =
+    if inplace then begin
+      Sys.rename filename (save filename);
+      filename, open_out filename
+    end else
+      Filename.open_temp_file "why_" ("_" ^ filename) in
+  Buffer.output_buffer cin buffer; close_out cin;
+  call_on_file ~command ~limit ~res_parser ~printer_mapping
+               ~cleanup:true ~inplace ~interactive fin
+

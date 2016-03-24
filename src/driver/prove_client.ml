@@ -1,3 +1,4 @@
+let standalone : bool ref = ref true
 let socket : Unix.file_descr option ref = ref None
 
 let client_connect socket_name =
@@ -7,6 +8,7 @@ let client_connect socket_name =
   end else begin
     let sock = Unix.socket Unix.PF_UNIX  Unix.SOCK_STREAM 0 in
     Unix.connect sock (Unix.ADDR_UNIX socket_name);
+    Unix.set_nonblock sock;
     socket := Some sock
   end
 
@@ -28,12 +30,18 @@ let send_request_string msg =
 
 let read_from_client =
   let buf = String.make 1024 ' ' in
-  fun () ->
+  fun blocking ->
     match !socket with
     | None -> assert false
     | Some sock ->
-        let read = Unix.read sock buf 0 1024 in
-        String.sub buf 0 read
+        if blocking then
+          let _ = Unix.select [sock] [] [] (-1.0) in
+          let read = Unix.read sock buf 0 1024 in
+          String.sub buf 0 read
+        else try
+          let read = Unix.read sock buf 0 1024 in
+          String.sub buf 0 read
+        with Unix.Unix_error ((Unix.EAGAIN | Unix.EWOULDBLOCK), _, _) -> ""
 
 type answer =
   {
@@ -44,7 +52,7 @@ type answer =
     out_file  : string;
   }
 
-let socket_name : string ref = ref ""
+let socket_name : string ref = ref "why3server.sock"
 
 let set_socket_name s =
   socket_name := s
@@ -58,7 +66,28 @@ let connect () =
 let disconnect () =
   client_disconnect ()
 
+let run_server () =
+  let id =
+    Unix.create_process "why3server"
+    [|"why3server"; "--socket"; !socket_name|]
+    Unix.stdin Unix.stdout Unix.stderr
+  in
+  at_exit (fun () ->
+    Unix.kill id 9;
+    if Sys.os_type <> "Win32" then Sys.remove !socket_name
+  )
+
+let force_connect () =
+  match !socket with
+  | None when !standalone ->
+      run_server ();
+      (* sleep is needed before connecting, or the server will not be ready yet *)
+      ignore (Unix.select [] [] [] 0.1);
+      connect()
+  | _ -> ()
+
 let send_request ~id ~timelimit ~memlimit ~cmd =
+  force_connect ();
   let buf = Buffer.create 128 in
   Buffer.add_string buf (string_of_int id);
   Buffer.add_char buf ';';
@@ -73,8 +102,8 @@ let send_request ~id ~timelimit ~memlimit ~cmd =
   let s = Buffer.contents buf in
   send_request_string s
 
-let rec read_lines () =
-  let s = read_from_client () in
+let rec read_lines blocking =
+  let s = read_from_client blocking in
   if String.contains s '\n' then begin
     let s = Buffer.contents buf ^ s in
     Buffer.clear buf;
@@ -91,7 +120,7 @@ let rec read_lines () =
       end
   end else begin
     Buffer.add_string buf s;
-    read_lines ()
+    read_lines blocking
   end
 
 let bool_of_timeout_string s =
@@ -114,5 +143,5 @@ let read_answer s =
   |_  ->
         assert false
 
-let read_answers () =
-  List.map read_answer (List.filter (fun x -> x <> "") (read_lines ()))
+let read_answers ~blocking =
+  List.map read_answer (List.filter (fun x -> x <> "") (read_lines blocking))

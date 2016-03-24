@@ -6,11 +6,13 @@
 
 int parallel = 1;
 char* basename = NULL;
+bool logging = false;
 
 void parse_options(int argc, char **argv) {
   static struct option long_options[] = {
     /* These options set a flag. */
     {"socket", required_argument, 0, 's'},
+    {"logging", no_argument, 0, 'l'},
     {0, 0, 0, 0}
   };
   while (1) {
@@ -41,6 +43,9 @@ void parse_options(int argc, char **argv) {
          }
          break;
 
+       case 'l':
+         logging = true;
+         break;
        case 's':
          basename = optarg;
          break;

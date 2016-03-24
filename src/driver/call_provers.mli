@@ -182,13 +182,6 @@ val query_call : prover_call -> post_prover_call option
 val wait_on_call : prover_call -> post_prover_call
 (** Thread-safe blocking function that waits until the prover finishes. *)
 
-val post_wait_call : prover_call -> Unix.process_status -> post_prover_call
-(** Thread-safe non-blocking function that should be called when the
-    prover's exit status was obtained from a prior call of Unix.waitpid *)
-
-val prover_call_pid : prover_call -> int
-(** Return the pid of the prover *)
-
 val set_socket_name : string -> unit
 
 type server_id = int
@@ -202,4 +195,4 @@ val prove_file_server :
           ?interactive : bool ->
           string -> server_id
 
-val wait_for_server_result : unit -> (server_id * prover_result) list
+val wait_for_server_result : blocking:bool -> (server_id * prover_result) list
