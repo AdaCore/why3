@@ -162,12 +162,80 @@ theory Fset
 
   use import int.Int
 
+  (* TODO: monomorphize to fix issue with equality *)
+
   type set 'a
-  val constant empty : set 'a
 
-  clone export SetGen with type set, function empty
+  (** if ['a] is an infinite type, then [set 'a] is infinite *)
+  meta "material_type_arg" type set, 0
 
-  function cardinal (set 'a) : int
+  (** membership *)
+  val predicate mem 'a (set 'a)
+
+  (** equality *)
+  val predicate (==) (s1 s2: set 'a)
+    ensures { result <-> (forall x: 'a. mem x s1 <-> mem x s2) }
+
+  axiom extensionality:
+    forall s1 s2: set 'a. s1 == s2 -> s1 = s2
+
+  (** inclusion *)
+  val predicate subset (s1 s2: set 'a)
+    ensures { result <-> (forall x : 'a. mem x s1 -> mem x s2) }
+
+  lemma subset_refl:
+    forall s: set 'a. subset s s
+
+  lemma subset_trans:
+    forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
+
+  (** empty set *)
+  val predicate is_empty (s: set 'a)
+    ensures { result <-> forall x: 'a. not (mem x s) }
+
+  val constant empty: set 'a
+    ensures { is_empty result }
+
+  (** addition *)
+  val function add (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y = x \/ mem y s }
+
+  let function singleton (x: 'a): set 'a = add x empty
+
+  (** removal *)
+  val function remove (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y <> x /\ mem y s }
+
+  lemma add_remove:
+    forall x: 'a, s: set 'a. mem x s -> add x (remove x s) = s
+
+  lemma remove_add:
+    forall x: 'a, s: set 'a. remove x (add x s) = remove x s
+
+  lemma subset_remove:
+    forall x: 'a, s: set 'a. subset (remove x s) s
+
+  (** union *)
+  val function union (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 \/ mem x s2 }
+
+  (** intersection *)
+  val function inter (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ mem x s2 }
+
+  (** difference *)
+  val function diff (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ not (mem x s2) }
+
+  lemma subset_diff:
+    forall s1 s2: set 'a. subset (diff s1 s2) s1
+
+  (** arbitrary element *)
+  val function choose (s: set 'a): 'a
+    ensures { not (is_empty s) -> mem result s }
+
+  (** cardinal *)
+  val function cardinal (set 'a): int
 
   axiom cardinal_nonneg: forall s: set 'a. cardinal s >= 0
 
@@ -175,18 +243,18 @@ theory Fset
     forall s: set 'a. cardinal s = 0 <-> is_empty s
 
   axiom cardinal_add:
-    forall x : 'a. forall s : set 'a.
+    forall x: 'a. forall s: set 'a.
     not (mem x s) -> cardinal (add x s) = 1 + cardinal s
 
   axiom cardinal_remove:
-    forall x : 'a. forall s : set 'a.
+    forall x: 'a. forall s: set 'a.
     mem x s -> cardinal s = 1 + cardinal (remove x s)
 
   axiom cardinal_subset:
-    forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
+    forall s1 s2: set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
 
   lemma subset_eq:
-    forall s1 s2 : set 'a.
+    forall s1 s2: set 'a.
     subset s1 s2 -> cardinal s1 = cardinal s2 -> s1 == s2
 
   lemma cardinal1:
