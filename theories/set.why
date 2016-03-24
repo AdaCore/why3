@@ -129,14 +129,14 @@ theory Set
   axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
 *)
 
-  clone export SetGen with type set = set,
-    predicate mem = mem, lemma extensionality,
-    constant empty = empty, lemma empty_def,
-    function add = add, lemma add_def,
-    function remove = remove, lemma remove_def,
-    function union = union, lemma union_def,
-    function inter = inter, lemma inter_def,
-    function diff = diff, lemma diff_def
+  clone export SetGen with type set,
+    predicate mem, lemma extensionality,
+    constant empty, lemma empty_def,
+    function add, lemma add_def,
+    function remove, lemma remove_def,
+    function union, lemma union_def,
+    function inter, lemma inter_def,
+    function diff, lemma diff_def
 
 end
 
@@ -165,7 +165,7 @@ theory Fset
   type set 'a
   val constant empty : set 'a
 
-  clone export SetGen with type set = set, function empty = empty
+  clone export SetGen with type set, function empty
 
   function cardinal (set 'a) : int
 

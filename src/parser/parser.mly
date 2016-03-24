@@ -260,10 +260,15 @@ clone_subst:
 
 single_clone_subst:
 | TYPE qualid ty_var* EQUAL ty  { CStsym  ($2,$3,$5) }
+| TYPE qualid                   { CStsym  ($2, [], PTtyapp ($2, [])) }
 | CONSTANT  qualid EQUAL qualid { CSfsym  ($2,$4) }
+| CONSTANT  qualid              { CSfsym  ($2,$2) }
 | FUNCTION  qualid EQUAL qualid { CSfsym  ($2,$4) }
+| FUNCTION  qualid              { CSfsym  ($2,$2) }
 | PREDICATE qualid EQUAL qualid { CSpsym  ($2,$4) }
+| PREDICATE qualid              { CSpsym  ($2,$2) }
 | VAL       qualid EQUAL qualid { CSvsym  ($2,$4) }
+| VAL       qualid              { CSvsym  ($2,$2) }
 | AXIOM     qualid              { CSaxiom ($2) }
 | LEMMA     qualid              { CSlemma ($2) }
 | GOAL      qualid              { CSgoal  ($2) }
