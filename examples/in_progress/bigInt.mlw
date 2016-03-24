@@ -452,9 +452,9 @@ module Z
 
   use import int.Int
   use import int.Power
-  constant base : int = 32768
-  constant max_digit : int = 16384
-  constant min_digit : int = -16384
+  let constant base : int = 32768
+  let constant max_digit : int = 16384
+  let constant min_digit : int = -16384
 
   type t = { mutable digits: array int31 }
 

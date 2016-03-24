@@ -30,9 +30,9 @@ module Assoc
 
   (** Functional update with equivalence classes. *)
   function equiv_update (f:key -> 'b) (k:key) (b:'b) : key -> 'b =
-    \k2. if Eq.rel k k2 then b else f k2
+    fun k2 -> if Eq.rel k k2 then b else f k2
 
-  function const_none : 'a -> option 'b = \_.None
+  function const_none : 'a -> option 'b = fun _ -> None
 
   (** Association list viewed as a partial mapping *)
   function model (l:list (t 'a)) : key -> option (t 'a) =
