@@ -45,9 +45,9 @@ module Memory
   use export ref.Ref
 
   type loc
-  constant null: loc
-  val predicate is_null (x:loc)
-    ensures { result <-> x = null }
+  val constant null: loc
+  val predicate eq_loc (x y:loc)
+    ensures { result <-> x = y }
 
   type node = { left: loc; right: loc; data: int; }
   type memory = map loc node
@@ -68,6 +68,16 @@ module Memory
     requires { p <> null }
     ensures  { result = !mem[p].data }
     !mem[p].data
+
+  val set_left (p: loc) (v:loc) : unit
+    requires { p <> null }
+    writes { mem }
+    ensures  { !mem[p] = { (old !mem)[p] with left = v } }
+    ensures  { forall q. q <> p -> !mem[q] = (old !mem)[q] }
+(* FIXME: This expression makes a ghost modification in the non-ghost variable mem
+
+  = mem := set !mem p { !mem[p] with left = v }
+*)
 
 end
 
@@ -137,7 +147,7 @@ module Treedel
                | Cons p l -> m = !mem[p].data /\ inorder !ot = l end }
     =
     let p = ref (get_left t) in
-    if is_null !p then begin
+    if eq_loc !p null then begin
       let m = get_data t in
       let tt = get_right t in
       ghost match it with Empty -> absurd
@@ -149,7 +159,7 @@ module Treedel
       let ghost zipper = ref Top in
       let ghost ppr = ref (tree_right it) in
       let ghost subtree = ref (tree_left it) in
-      while not (is_null !tt) do
+      while not (eq_loc !tt null) do
         invariant { !pp <> null /\ !mem[!pp].left = !p }
         invariant { !p <> null /\ !mem[!p].left = !tt }
         invariant { let pt = Node !subtree !pp !ppr in
@@ -167,7 +177,7 @@ module Treedel
       assert { !pp <> !p };
       let m = get_data !p in
       tt := get_right !p;
-      mem := set !mem !pp { !mem[!pp] with left = !tt };
+      set_left !pp !tt;
       let ghost pl = tree_left !subtree in assert { pl = Empty };
       ghost ot := zip (tree_right !subtree) (Left !zipper !pp !ppr);
       (t, m)
