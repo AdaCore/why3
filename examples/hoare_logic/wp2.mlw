@@ -362,7 +362,7 @@ module WP
 
 use import Imp
 
-use set.Set
+use set.Fset as Set
 
 predicate assigns (sigma:env) (a:Set.set ident) (sigma':env) =
   forall i:ident. not (Set.mem i a) ->
