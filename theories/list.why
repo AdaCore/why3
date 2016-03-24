@@ -47,9 +47,12 @@ module Quant
 
   let rec function for_some (p: 'a -> bool) (l:list 'a) : bool =
     match l with
-    | Nil -> true
+    | Nil -> false
     | Cons x r -> p x || for_some p r
     end
+
+  let function mem (eq:'a -> 'a -> bool) (x:'a) (l:list 'a) : bool =
+    for_some (eq x) l
 
 end
 
