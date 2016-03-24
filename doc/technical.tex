@@ -604,6 +604,94 @@ and is likely to change in future versions.
 \end{description}
 
 
+\section{Proof Strategies}
+\label{sec:strategies}
+
+As seen in Section~\ref{sec:ideref}, the IDE provides a few buttons
+that trigger the run of simple proof strategies on the selected goals.
+Proof strategies can be defined using a basic assembly-style language,
+and put into the Why3 configuration file. The commands of this basic
+language are:
+\begin{itemize}
+\item \texttt{c $p$ $t$ $m$} calls the prover $p$ with a time limit
+  $t$ and memory limit $m$. On success, the strategy ends, it
+  continues to next line otherwise
+\item \texttt{t $n$ $lab$} applies the transformation $n$. On success,
+  the strategy continues to label $lab$, and is applied to each
+  generated sub-goals.  It continues to next line otherwise.
+\item \texttt{g $lab$} inconditionally jumps to label $lab$
+\item \texttt{$lab$:} declares the label $lab$. The default label
+  \texttt{exit} allows to stop the program.
+\end{itemize}
+
+To examplify this basic programming language, we give below the
+default strategies that are attached to the default buttons of the
+IDE, assuming that the provers Alt-Ergo 1.01, CVC4 1.4 and Z3 4.4.1
+were detected by the \verb|why3 config --detect| command
+\begin{description}
+\item[Split] is bound to the 1-line strategy
+\begin{verbatim}
+t split_goal_wp exit
+\end{verbatim}
+
+\item[Auto level 1] is bound to
+\begin{verbatim}
+start:
+c Z3,4.4.1, 1 1000
+c Alt-Ergo,1.01, 1 1000
+c CVC4,1.4, 1 1000
+t split_goal_wp start
+c Z3,4.4.1, 10 4000
+c Alt-Ergo,1.01, 10 4000
+c CVC4,1.4, 10 4000
+\end{verbatim}
+  The three provers are first tried for a time limit of 1 second and
+  memory limit of 1~Gb, each in turn. If none of them succeed, a
+  split is attempted. If the split works then the same strategy is
+  retried on each sub-goals. If the split does not succeed, the provers
+  are tried again with a larger limits.
+
+\item[Auto level 2] is bound to
+\begin{verbatim}
+start:
+c Z3,4.4.1, 1 1000
+c Eprover,1.8-001, 1 1000
+c Spass,3.7, 1 1000
+c Alt-Ergo,1.01, 1 1000
+c CVC4,1.4, 1 1000
+t split_goal_wp start
+c Z3,4.4.1, 5 2000
+c Eprover,1.8-001, 5 2000
+c Spass,3.7, 5 2000
+c Alt-Ergo,1.01, 5 2000
+c CVC4,1.4, 5 2000
+t introduce_premises afterintro
+afterintro:
+t inline_goal afterinline
+g trylongertime
+afterinline:
+t split_goal_wp start
+trylongertime:
+c Z3,4.4.1, 30 4000
+c Eprover,1.8-001, 30 4000
+c Spass,3.7, 30 4000
+c Alt-Ergo,1.01, 30 4000
+c CVC4,1.4, 30 4000
+
+\end{verbatim}
+  Notice that now 5 provers are used.  The provers are first tried for
+  a time limit of 1 second and memory limit of 1~Gb, each in turn. If
+  none of them succeed, a split is attempted. If the split works then
+  the same strategy is retried on each sub-goals. If the split does
+  not succeed, the prover are tried again with limits of 5 s and 2
+  Gb. If all fail, we attempt the transformation of introduction of
+  premises in the context, followed by an inlining of the definiiions
+  in the goals. We then attempt a split again, if the split succeeds,
+  we restart from the beginning, if it fails then provers are tried
+  again with 30s and 4 Gb.
+
+\end{description}
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-PDF-mode: t

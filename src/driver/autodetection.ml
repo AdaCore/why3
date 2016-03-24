@@ -328,8 +328,8 @@ let generate_auto_strategies config =
   eprintf "Generating strategies:@.";
   Hprover.iter
     (fun p (lev,b) ->
-      if b then eprintf "  Prover %a will be used in Auto level >= %d@."
-           Whyconf.print_prover p lev) prover_auto_levels;
+     if b then eprintf "  Prover %a will be used in Auto level >= %d@."
+                       Whyconf.print_prover p lev) prover_auto_levels;
   (* Split *)
   let code = "t split_goal_wp exit" in
   let split = {
@@ -338,15 +338,23 @@ let generate_auto_strategies config =
       strategy_shortcut = "s";
       strategy_code = code }
   in
+  (* Inline *)
+  let code = "t introduce_premises next next: t inline_goal exit" in
+  let inline = {
+      strategy_name = "Inline";
+      strategy_desc = "Inline@ definitions@ in@ the@ conclusion@ of@ the@ goal";
+      strategy_shortcut = "i";
+      strategy_code = code }
+  in
   (* Auto level 1 *)
   let provers_level1 =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev = 1 then
-           let name =
-             p.Whyconf.prover_name ^ "," ^
-               p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
-           in name :: acc
+         let name =
+           p.Whyconf.prover_name ^ "," ^
+             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
+         in name :: acc
        else acc) prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
@@ -365,10 +373,10 @@ let generate_auto_strategies config =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev >= 1 && lev <= 2 then
-           let name =
-             p.Whyconf.prover_name ^ "," ^
-               p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
-           in name :: acc
+         let name =
+           p.Whyconf.prover_name ^ "," ^
+             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
+         in name :: acc
        else acc) prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
@@ -376,15 +384,12 @@ let generate_auto_strategies config =
   fprintf str_formatter "t split_goal_wp start@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level2;
   fprintf str_formatter "t introduce_premises afterintro@\n";
-  fprintf str_formatter "g inline@\n";
   fprintf str_formatter "afterintro:@\n";
-  fprintf str_formatter "t split_goal_wp start@\n";
-  fprintf str_formatter "inline:@\n";
   fprintf str_formatter "t inline_goal afterinline@\n";
-  fprintf str_formatter "g longtime@\n";
+  fprintf str_formatter "g trylongertime@\n";
   fprintf str_formatter "afterinline:@\n";
   fprintf str_formatter "t split_goal_wp start@\n";
-  fprintf str_formatter "longtime:@\n";
+  fprintf str_formatter "trylongertime:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level2;
   let code = flush_str_formatter () in
   let auto2 = {
@@ -393,7 +398,9 @@ let generate_auto_strategies config =
       strategy_shortcut = "2";
       strategy_code = code }
   in
-  add_strategy (add_strategy (add_strategy config split) auto1) auto2
+  add_strategy
+    (add_strategy
+       (add_strategy (add_strategy config inline) split) auto1) auto2
 
 let detect_exec env main data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
