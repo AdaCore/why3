@@ -487,12 +487,19 @@ void send_msg_to_client(pclient client,
    try_write(client);
 }
 
+void shutdown_server() {
+  shutdown_with_msg("last client disconnected");
+}
+
 void close_client(pclient client, int key) {
-   list_remove(clients, key);
-   CloseHandle(client->handle);
-   free_readbuf(client->readbuf);
-   free_writebuf(client->writebuf);
-   free(client);
+  list_remove(clients, key);
+  CloseHandle(client->handle);
+  free_readbuf(client->readbuf);
+  free_writebuf(client->writebuf);
+  free(client);
+  if (single_client && list_is_empty(clients)) {
+    shutdown_server();
+  }
 }
 
 void schedule_new_jobs() {

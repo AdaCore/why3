@@ -555,7 +555,6 @@ clean_old_install::
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
@@ -620,9 +619,9 @@ SERVER_C:= $(addprefix src/tools/, $(addsuffix .c, $(SERVER_MODULES)))
 SERVER_H:= $(addprefix src/tools/, $(addsuffix .h, $(SERVER_MODULES)))
 SERVER_O:= $(addprefix src/tools/, $(addsuffix .o, $(SERVER_MODULES)))
 
-opt: bin/why3server$(EXE)
+opt: lib/why3server$(EXE)
 
-bin/why3server$(EXE): $(SERVER_O)
+lib/why3server$(EXE): $(SERVER_O)
 	gcc -o $@ $^
 
 %.o: %.c %.h
@@ -633,7 +632,7 @@ bin/why3server$(EXE): $(SERVER_O)
 src/tools/main.o:: src/tools/server-unix.c src/tools/server-win.c
 
 install_no_local::
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
+	cp -f lib/why3server$(EXE) $(LIBDIR)/why3/why3server$(EXE)
 
 clean::
 	 rm -f $(SERVER_O)
@@ -649,7 +648,7 @@ install_spark2014:
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
 	cp -f share/why3session.dtd $(DATADIR)/why3
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
+	cp -f lib/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
 	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)

@@ -68,21 +68,17 @@ let disconnect () =
   client_disconnect ()
 
 let run_server () =
-  let id =
-    Unix.create_process "why3server"
-    [|"why3server"; "--socket"; !socket_name|]
-    Unix.stdin Unix.stdout Unix.stderr
-  in
-  at_exit (fun () ->
-    Unix.kill id 9;
-    if Sys.os_type <> "Win32" then Sys.remove !socket_name
-  )
+  let exec = Filename.concat Config.libdir "why3server" in
+  Unix.create_process exec
+    [|exec; "--socket"; !socket_name; "--single-client"|]
+  Unix.stdin Unix.stdout Unix.stderr
 
 let force_connect () =
   match !socket with
   | None when !standalone ->
       run_server ();
-      (* sleep is needed before connecting, or the server will not be ready yet *)
+      (* sleep is needed before connecting, or the server will not be ready
+         yet *)
       ignore (Unix.select [] [] [] 0.1);
       connect()
   | _ -> ()

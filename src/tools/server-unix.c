@@ -210,7 +210,7 @@ void server_init_listening(char* basename, int parallel) {
   memcpy(addr.sun_path, basename, strlen(basename) + 1);
   server_sock = socket(AF_UNIX, SOCK_STREAM, 0);
   res = unlink(basename);
-  // we delete the file if present, said otherwise we accept ENOENT as error
+  // we delete the file if present
   if (res == -1 && errno != ENOENT) {
     shutdown_with_msg("error deleting socket");
   }
@@ -451,6 +451,11 @@ void handle_msg(pclient client, int key) {
   }
 }
 
+void shutdown_server() {
+  unlink(basename);
+  shutdown_with_msg("last client disconnected");
+}
+
 void close_client(pclient client) {
   list_remove(clients, client->fd);
   poll_list_remove(client->fd);
@@ -458,6 +463,9 @@ void close_client(pclient client) {
   free_writebuf(client->writebuf);
   close(client->fd);
   free(client);
+  if (single_client && list_is_empty(clients)) {
+    shutdown_server();
+  }
 }
 
 
