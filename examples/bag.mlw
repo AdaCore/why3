@@ -1,6 +1,7 @@
 
 module Bag
 
+  use BuiltIn
   use import int.Int
 
   type bag 'a = 'a -> int
@@ -11,11 +12,11 @@ module Bag
   let constant empty : bag 'a =
     fun _ -> 0
 
-  function add (e: 'a) (b: bag 'a) : bag 'a =
-    fun x -> if x = e then b x + 1 else b x
+  let ghost function add (e: 'a) (b: bag 'a): bag 'a =
+    fun x -> if BuiltIn.(=) x e then b x + 1 else b x
 
-  function remove (e: 'a) (b: bag 'a) : bag 'a =
-    fun x -> if x = e then b x - 1 else b x
+  let ghost function remove (e: 'a) (b: bag 'a): bag 'a =
+    fun x -> if BuiltIn.(=) x e then b x - 1 else b x
 
 end
 
@@ -102,7 +103,7 @@ module BagImpl
   type t 'a = {
     mutable       size:     int;
                   data:     rarray (Null.t 'a);
-    mutable ghost contents: bag {'a};
+    mutable ghost contents: bag 'a;
   }
   invariant { 0 <= size = data.length }
   invariant { forall i: int. 0 <= i < size ->
@@ -122,7 +123,7 @@ module BagImpl
   =
     resize t.data 0;
     t.size <- 0;
-    t.contents <- (Bag.empty : bag {'a})
+    t.contents <- Bag.empty
 
   let add (t: t 'a) (x: 'a) : unit
     ensures { t.size = old t.size + 1 }
