@@ -8,7 +8,6 @@ let client_connect socket_name =
   end else begin
     let sock = Unix.socket Unix.PF_UNIX  Unix.SOCK_STREAM 0 in
     Unix.connect sock (Unix.ADDR_UNIX socket_name);
-    Unix.set_nonblock sock;
     socket := Some sock
   end
 
@@ -34,14 +33,16 @@ let read_from_client =
     match !socket with
     | None -> assert false
     | Some sock ->
-        if blocking then
-          let _ = Unix.select [sock] [] [] (-1.0) in
+        (* we only call read() if we are allowed to block or if the socket is
+           ready *)
+        let do_read =
+          blocking ||
+          (let l,_,_ = Unix.select [sock] [] [] 0.0 in l <> [])
+        in
+        if do_read then
           let read = Unix.read sock buf 0 1024 in
           String.sub buf 0 read
-        else try
-          let read = Unix.read sock buf 0 1024 in
-          String.sub buf 0 read
-        with Unix.Unix_error ((Unix.EAGAIN | Unix.EWOULDBLOCK), _, _) -> ""
+        else ""
 
 type answer =
   {
