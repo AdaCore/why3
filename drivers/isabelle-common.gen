@@ -139,11 +139,6 @@ theory map.Map
   syntax function ([<-]) "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
 end
 
-theory set.SetGen
-  syntax predicate (==) "<app><const name=\"HOL.eq\"/>%1%2</app>"
-  syntax predicate subset "<app><const name=\"Orderings.ord_class.less_eq\"/>%1%2</app>"
-end
-
 theory set.Fset
   syntax function cardinal "<app><const name=\"Nat.semiring_1_class.of_nat\"><fun><type name=\"Nat.nat\"/><type name=\"Int.int\"/></fun></const><app><const name=\"FSet.fcard\"/>%1</app></app>"
 end

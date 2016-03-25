@@ -1,22 +1,25 @@
 
 (** {1 Set theories} *)
 
-(** {2 General Sets} *)
+(** {2 Potentially infinite sets} *)
 
-theory SetGen
+theory Set
 
-  type set 'a
+  use import map.Map
+  use import map.Const
+
+  type set 'a = map 'a bool
 
   (** if ['a] is an infinite type, then [set 'a] is infinite *)
   meta "material_type_arg" type set, 0
 
   (** membership *)
-  predicate mem 'a (set 'a)
+  predicate mem (x: 'a) (s: set 'a) = s[x]
 
   (** equality *)
-  predicate (==) (s1 s2: set 'a) = forall x : 'a. mem x s1 <-> mem x s2
+  predicate (==) (s1 s2: set 'a) = forall x: 'a. mem x s1 <-> mem x s2
 
-  axiom extensionality:
+  lemma extensionality:
     forall s1 s2: set 'a. s1 == s2 -> s1 = s2
 
   (** inclusion *)
@@ -29,114 +32,63 @@ theory SetGen
     forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
 
   (** empty set *)
-  constant empty : set 'a
-
   predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
 
-  axiom empty_def: is_empty (empty : set 'a)
+  let constant empty: set 'a = const false
 
-  lemma mem_empty: forall x:'a. mem x empty <-> false
+  lemma mem_empty: is_empty (empty: set 'a)
+
+
+  (** whole set *)
+  let constant all: set 'a = const true
 
   (** addition *)
-  function add 'a (set 'a) : set 'a
+  let ghost function add (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y = x \/ mem y s }
+  = s[x <- true]
 
-  axiom add_def:
-    forall x y: 'a. forall s: set 'a.
-    mem x (add y s) <-> x = y \/ mem x s
-
-  function singleton (x: 'a) : set 'a = add x empty
+  let ghost function singleton (x: 'a): set 'a = add x empty
 
   (** removal *)
-  function remove 'a (set 'a) : set 'a
-
-  axiom remove_def:
-    forall x y : 'a, s : set 'a.
-    mem x (remove y s) <-> x <> y /\ mem x s
+  let ghost function remove (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y <> x /\ mem y s }
+  = s[x <- false]
 
   lemma add_remove:
-    forall x: 'a, s : set 'a. mem x s -> add x (remove x s) = s
+    forall x: 'a, s: set 'a. mem x s -> add x (remove x s) = s
 
   lemma remove_add:
-    forall x: 'a, s : set 'a. remove x (add x s) = remove x s
+    forall x: 'a, s: set 'a. remove x (add x s) = remove x s
 
   lemma subset_remove:
     forall x: 'a, s: set 'a. subset (remove x s) s
 
   (** union *)
-  function union (set 'a) (set 'a) : set 'a
-
-  axiom union_def:
-    forall s1 s2: set 'a, x: 'a.
-    mem x (union s1 s2) <-> mem x s1 \/ mem x s2
+  let ghost function union (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 \/ mem x s2 }
+  = fun x -> s1[x] || s2[x]
 
   (** intersection *)
-  function inter (set 'a) (set 'a) : set 'a
-
-  axiom inter_def:
-    forall s1 s2: set 'a, x: 'a.
-    mem x (inter s1 s2) <-> mem x s1 /\ mem x s2
+  let ghost function inter (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ mem x s2 }
+  = fun x -> s1[x] && s2[x]
 
   (** difference *)
-  function diff (set 'a) (set 'a) : set 'a
-
-  axiom diff_def:
-    forall s1 s2: set 'a, x: 'a.
-    mem x (diff s1 s2) <-> mem x s1 /\ not (mem x s2)
+  let ghost function diff (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ not (mem x s2) }
+  = fun x -> s1[x] && not s2[x]
 
   lemma subset_diff:
     forall s1 s2: set 'a. subset (diff s1 s2) s1
 
+  (** complement *)
+  let ghost function complement (s: set 'a): set 'a
+  = fun x -> not s[x]
+
   (** arbitrary element *)
-  function choose (s:set 'a) : 'a
-
-  axiom choose_def:
-    forall s: set 'a. not (is_empty s) -> mem (choose s) s
-
-end
-
-(** {2 Potentially infinite sets} *)
-
-theory Set
-
-  use import map.Map
-  use import map.Const
-
-  type set 'a = map 'a bool
-
-  predicate mem (x:'a) (s:set 'a) = s[x]
-
-  constant empty : set 'a = const false
-
-  constant all : set 'a = const true
-
-  function add (x:'a) (s:set 'a) : set 'a = s[x <- true]
-
-  function remove (x:'a) (s:set 'a) : set 'a =  s[x <- false]
-
-  function union (s1 s2: set 'a) : set 'a =
-    fun x -> s1[x] \/ s2[x]
-
-  function inter (s1 s2: set 'a) : set 'a =
-    fun x -> s1[x] /\ s2[x]
-
-  function diff (s1 s2: set 'a) : set 'a =
-    fun x -> s1[x] /\ not s2[x]
-
-  function complement (s: set 'a) : set 'a =
-    fun x -> not s[x]
-
-(* dubious axiom: extensionality should be postulated on maps instead
-  axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
-*)
-
-  clone export SetGen with type set,
-    predicate mem, lemma extensionality,
-    constant empty, lemma empty_def,
-    function add, lemma add_def,
-    function remove, lemma remove_def,
-    function union, lemma union_def,
-    function inter, lemma inter_def,
-    function diff, lemma diff_def
+  let ghost function choose(s: set 'a): 'a
+    ensures { not (is_empty s) -> mem result s }
+  = any 'a ensures { not (is_empty s) -> mem result s }
 
 end
 

@@ -294,24 +294,24 @@ theory set.Set
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      empty_def
+  remove prop      mem_empty
 
   syntax function add "add(%1, %2)"
-  remove prop     add_def
+  remove prop     add_spec
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_def
+  remove prop     remove_spec
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_def
+  remove prop     union_spec
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_def
+  remove prop     inter_spec
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_def
+  remove prop     diff_spec
   remove prop     subset_diff
 
   (* TODO: choose *)
