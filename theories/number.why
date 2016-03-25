@@ -37,8 +37,11 @@ end
 theory Divisibility
 
   use export int.Int
+  use import int.ComputerDivision
 
-  predicate divides (d:int) (n:int) = exists q:int. n = q * d
+  let predicate divides (d:int) (n:int)
+    ensures { result <-> exists q:int. n = q * d }
+  = if d = 0 then n = 0 else mod n d = 0
 
   lemma divides_refl: forall n:int. divides n n
   lemma divides_1_n : forall n:int. divides 1 n
