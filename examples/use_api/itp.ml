@@ -46,6 +46,8 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
+open Format
+
 (* loading the drivers *)
 let provers =
   Whyconf.Mprover.fold
@@ -62,85 +64,77 @@ let provers =
     provers
     []
 
-open Session_itp;;
-open Format;;
+(* One prover named Alt-Ergo in the config file *)
+let alt_ergo : Whyconf.config_prover =
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  (** all provers that have the name "Alt-Ergo" *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
+    eprintf "Prover Alt-Ergo not installed or not configured@.";
+    exit 0
+  end else
+    snd (Whyconf.Mprover.max_binding provers)
 
-let (s,b) = Session_itp.load_session "../bitwalker/why3session.xml";;
 
-let th = Session_itp.get_theories s;;
+(** Testing Session_itp *)
 
-let (_,_,id) = match th with
-    (n, (thn, _::_::x::_)::_)::_ -> (n,thn,x);;
+let (s,b) = Session_itp.load_session "../bitwalker/why3session.xml"
 
-let t = Session_itp.get_tree s id;;
+let id =
+  match Session_itp.get_theories s with
+    | (n, (thn, _::_::x::_)::_)::_ -> x
+    | _ -> assert false
 
-printf "%a@." (print_tree s) t;;
+let () =
+  printf "%a@." (Session_itp.print_tree s) (Session_itp.get_tree s id)
 
-(* let n = Session_itp.get_node s 19;;
+let pid = Session_itp.graft_proof_attempt s id alt_ergo.Whyconf.prover ~timelimit:42
 
-let s' = Session_itp.graft_transf s n "blabla" [] [];;
+let () =
+  printf "%a@." (Session_itp.print_tree s) (Session_itp.get_tree s id)
 
-let t = Session_itp.get_tree s;;
 
-let _ = Session_itp.remove_transformation s s';;
+(** Testing Controller_itp *)
 
-let _ = remove_transformation s (get_trans s 15);;
-
-let t = Session_itp.get_tree s;;
-
-let my_session = Session_itp.empty_session "test.xml";;
-
-let s' = Session_itp.graft_transf s n "blabla" [] [];;
-
-   let t = Session_itp.get_tree s;; *)
-
-(* excerpt from src/session/session.ml *)
- let read_file env ?format fn =
-  let theories = Env.read_file Env.base_language env ?format fn in
-  let ltheories =
-    Stdlib.Mstr.fold
-      (fun name th acc ->
-        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
-        let th_name =
-          Ident.id_register (Ident.id_derive name th.Theory.th_name) in
-         match th.Theory.th_name.Ident.id_loc with
-           | Some l -> (l,th_name,th)::acc
-           | None   -> (Loc.dummy_position,th_name,th)::acc)
-      theories []
-  in
-  let th =  List.sort
-      (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
-      ltheories
-  in
-  List.map (fun (_,_,a) -> a) th;;
-
-let my_session = empty_session ();;
+let my_session = Session_itp.empty_session ()
 
 (* adds a file in the new session *)
-let file : unit (* Session_itp.file *) =
+let () =
   let fname = "../logic/hello_proof.why" in
   try
-    let theories = read_file env fname in
-    add_file_section my_session fname theories None;
+    Controller_itp.add_file_to_session env my_session fname
   with e ->
     eprintf "@[Error while reading file@ '%s':@ %a@.@]" fname
       Exn_printer.exn_printer e;
-    exit 1;;
+    exit 1
 
 (* explore the theories in that file *)
-let theories = get_theories my_session;;
+let theories = Session_itp.get_theories my_session
+
 let () = eprintf "%d theories found@." (List.length theories)
 
-let (_,_,id) = match theories with
-    (n, (thn, x::_)::_)::_ -> (n,thn,x);;
+let id = match theories with
+  | (n, (thn, x::_)::_)::_ -> x
+  | _ -> assert false
 
-let t = Session_itp.get_tree my_session id;;
+let () = Session_itp.print_session my_session
 
-print_session my_session;;
+let _id = Session_itp.graft_transf my_session id "toto" []
 
-let l = graft_transf my_session id "toto" [] [];;
+let () =
+  printf "%a@." (Session_itp.print_tree my_session)
+         (Session_itp.get_tree my_session id)
 
-printf "%a@." (print_tree my_session) t;;
+let () =
+  let callback st =
+    printf "callback called with Status = %a@." Controller_itp.print_status st
+  in
+  Controller_itp.schedule_proof_attempt my_session id alt_ergo.Whyconf.prover
+                                        ~timelimit:5 ~callback
+
+let () =
+  printf "%a@." (Session_itp.print_tree my_session)
+         (Session_itp.get_tree my_session id)
 
 (* add proof attempts for each goals in the theories *)
 (*

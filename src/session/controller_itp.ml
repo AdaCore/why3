@@ -10,7 +10,20 @@ type proof_attempt_status =
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
-type transformation_status = TSscheduled of transID | TSdone of transID | TSfailed
+open Format
+
+let print_status fmt st =
+  match st with
+  | Unedited -> fprintf fmt "Unedited"
+  | JustEdited -> fprintf fmt "JustEdited"
+  | Interrupted -> fprintf fmt "Interrupted"
+  | Scheduled -> fprintf fmt "Scheduled"
+  | Running -> fprintf fmt "Running"
+  | Done r -> fprintf fmt "Done(%a)" Call_provers.print_prover_result r
+  | InternalFailure e -> fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
+
+type transformation_status =
+  | TSscheduled of transID | TSdone of transID | TSfailed
 
 let schedule_proof_attempt s id pr ~timelimit ~callback =
   graft_proof_attempt s id pr ~timelimit;
@@ -42,3 +55,6 @@ let read_file env ?format fn =
 let add_file_to_session env s ?format fname =
   let theories = read_file env ?format fname in
   add_file_section s fname theories None
+
+let reload_session_files (_s : session)  =
+  failwith "Controller_itp.reload_session_files not yet implemented"

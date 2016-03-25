@@ -74,12 +74,16 @@ type file = {
 
 type tree =
     Tree of
-      (proofNodeID * string * (transID * string * tree list) list)
+      (proofNodeID * string
+       * proof_attempt list * (transID * string * tree list) list)
 
 let rec get_tree s id : tree =
   let t = Hint.find s.proofNode_table id in
+  let pal =
+    Hprover.fold (fun p pa acc -> pa.proofa_attempt::acc) t.proofn_attempts []
+  in
   let trl = List.map (get_trans s) t.proofn_transformations in
-  Tree (id, t.proofn_name.Ident.id_string, trl)
+  Tree (id, t.proofn_name.Ident.id_string, pal, trl)
 
 and get_trans s id =
   let tr = Hint.find s.trans_table id in
@@ -132,14 +136,23 @@ let get_sub_tasks (s : session) (id : transID) =
 open Format
 open Ident
 
-let rec print_tree s fmt (Tree (id, name, l)) =
+let print_proof_attempt fmt pa =
+  fprintf fmt "%a tl=%d %a"
+          Whyconf.print_prover pa.prover
+          pa.timelimit
+          (Pp.print_option Call_provers.print_prover_result) pa.proof_state
+
+let rec print_tree s fmt (Tree (id, name, pal ,trl)) =
   let pn = get_proofNode s id in
   let parent = match pn.proofn_parent with
     | Theory t -> t.theory_name.id_string
     | Trans id -> (get_transfNode s id).transf_name
   in
-  fprintf fmt "@[<hv 2> Goal %s;@ parent %s;@ [%a]@]" name parent
-    (Pp.print_list Pp.semi (print_trans s)) l
+  fprintf fmt
+    "@[<hv 2> Goal %s;@ parent %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
+    name parent
+    (Pp.print_list Pp.semi print_proof_attempt) pal
+    (Pp.print_list Pp.semi (print_trans s)) trl
 
 and print_trans s fmt (id, name, l) =
   let tn = get_transfNode s id in
@@ -592,24 +605,6 @@ let load_session (file : string) =
   session, use_shapes
 
 (* add a why file from a session *)
-(** Read file and sort theories by location *)
-let read_file env ?format fn =
-  let theories = Env.read_file Env.base_language env ?format fn in
-  let ltheories =
-    Mstr.fold
-      (fun name th acc ->
-        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
-        let th_name =
-          Ident.id_register (Ident.id_derive name th.Theory.th_name) in
-         match th.Theory.th_name.Ident.id_loc with
-           | Some l -> (l,th_name,th)::acc
-           | None   -> (Loc.dummy_position,th_name,th)::acc)
-      theories []
-  in
-  List.sort
-    (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
-    ltheories,theories
-
 let add_file_section (s:session) (fn:string) (theories:Theory.theory list) format : unit =
   let add_theory acc (th : Theory.theory) =
     let add_goal parent goal id =

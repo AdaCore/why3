@@ -16,7 +16,9 @@ type trans_arg
 
 type tree =
     Tree of
-      (proofNodeID * string * (transID * string * tree list) list)
+      (proofNodeID * string
+       * proof_attempt list (* proof attempts in this node *)
+       * (transID * string * tree list) list) (* transformation in this node *)
 
 val get_theories : session -> (string * (string * proofNodeID list) list) list
 (** [get_theories s] returns a list of pairs [name,l] where [name] is a

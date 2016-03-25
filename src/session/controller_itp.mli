@@ -21,6 +21,8 @@ type proof_attempt_status =
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
+val print_status : Format.formatter -> proof_attempt_status -> unit
+
 val schedule_proof_attempt :
   session ->
   proofNodeID ->
@@ -46,7 +48,8 @@ val schedule_transformations :
    the transformation status changes. Typically at Scheluded, then
    Done tid.*)
 
-val add_file_to_session : Env.env -> session -> string -> unit
+val add_file_to_session :
+  Env.env -> session -> ?format:Env.fformat -> string -> unit
 (** [add_file_to_session env s ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session [s] *)
 
