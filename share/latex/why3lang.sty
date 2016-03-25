@@ -4,13 +4,16 @@
 
 \lstdefinelanguage{why3}
 {
-basicstyle=\ttfamily,
-morekeywords=[1]{predicate,constant,function,goal,type,use,%
-import,theory,end,in,%
-mutable,invariant,model,requires,ensures,raises,returns,reads,writes,diverges,%
-variant,let,val,while,for,loop,abstract,private,any,assert,assume,check,%
-fun,rec,clone,if,then,else,result,old,ghost,by,so%
-axiom,lemma,export,forall,exists,match,with,try,not,inductive,coinductive},%
+basicstyle=\ttfamily,%
+morekeywords=[1]{abstract,absurd,any,assert,assume,axiom,by,%
+check,clone,coinductive,constant,diverges,do,done,downto,%
+else,end,ensures,exception,exists,export,for,forall,fun,%
+function,ghost,goal,if,import,in,inductive,invariant,lemma,%
+let,loop,match,meta,model,module,mutable,namespace,not,old,%
+predicate,private,raise,raises,reads,rec,requires,result,%
+returns,so,then,theory,to,try,type,use,val,variant,while,%
+with,writes},%
+string=[b]",%
 %keywordstyle=[1]{\color{red}},%
 morekeywords=[2]{true,false},%
 %keywordstyle=[2]{\color{blue}},%
@@ -20,27 +23,27 @@ columns=[l]fullflexible,%
 sensitive=true,%
 morecomment=[s]{(*}{*)},%
 escapeinside={*?}{?*},%
-keepspaces=true,
+keepspaces=true,%
 literate=%
-%{'a}{$\alpha$}{1}%
-%{'b}{$\beta$}{1}%
-{<}{$<$}{1}%
-{>}{$>$}{1}%
-{<=}{$\le$}{1}%
-{>=}{$\ge$}{1}%
-{<>}{$\ne$}{1}%
-{/\\}{$\land$}{1}%
-{\\/}{ $\lor$ }{3}%
-{\ or(}{ $\lor$(}{3}%
+% {'a}{$\alpha$}{1}%
+% {'b}{$\beta$}{1}%
+% {<}{$<$}{1}%
+% {>}{$>$}{1}%
+% {<=}{$\le$}{1}%
+% {>=}{$\ge$}{1}%
+% {<>}{$\ne$}{1}%
+% {/\\}{$\land$}{1}%
+% {\\/}{ $\lor$ }{3}%
+% {\ or(}{ $\lor$(}{3}%
 % {not\ }{$\lnot$ }{1}%
 % {not(}{$\lnot$(}{1}%
-{+->}{\texttt{+->}}{2}%
+% {+->}{\texttt{+->}}{2}%
 % {+->}{$\mapsto$}{2}%
-{-->}{\texttt{-\relax->}}{2}%
-%{-->}{$\longrightarrow$}{2}%
-{->}{$\rightarrow$}{2}%
-{<-}{$\leftarrow$}{2}%
-{<->}{$\leftrightarrow$}{2}%
+% {-->}{\texttt{-\relax->}}{2}%
+% {-->}{$\longrightarrow$}{2}%
+% {->}{$\rightarrow$}{2}%
+% {<-}{$\leftarrow$}{2}%
+% {<->}{$\leftrightarrow$}{2}%
 %
 %
 }
@@ -48,4 +51,3 @@ literate=%
 \lstnewenvironment{why3}{\lstset{language=why3}}{}
 
 \newcommand{\whyf}[1]{\lstinline[language=why3]{#1}}
-
