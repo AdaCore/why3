@@ -714,6 +714,11 @@ let rec wp_expr env e res q xq = match e.e_node with
       let q1 = wp_expr env e1 res q xq in
       let q2 = wp_expr env e2 res q xq in
       vc_label e (wp_expr env e0 v (wp_if test q1 q2) xq)
+  | Ecase (e0, bl) when List.for_all (fun (_,e) -> eff_pure e.e_effect) bl ->
+      let v = proxy_of_expr e0 in
+      let ok, ne = sp_pure_case env v bl res in
+      let q = sp_wp_close res ne Mvs.empty q in
+      vc_label e (wp_expr env e0 v (wp_and ok q) xq)
   | Ecase (e0, bl) ->
       let v = proxy_of_expr e0 in
       let branch ({pp_pat = pat}, e) =
@@ -827,6 +832,15 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
       let ne = sp_if test ne1 ne2 in
       let ex = inter_mexn (sp_if test) ex1 ex2 in
       let out = out_seq (ok, ne, ex) dst12 res zout zeff zdst in
+      out_label e (sp_expr_seq env e0 v xres out eff12 zeff zdst)
+  | Ecase (e0, bl) when List.for_all (fun (_,e) -> eff_pure e.e_effect) bl ->
+      let v = proxy_of_expr e0 in
+      let ok, ne = sp_pure_case env v bl res in
+      let out = out_seq_pure ok ne res zout in
+      let eff12 = List.fold_left (fun acc (p,e1) ->
+        let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
+        let eff = eff_bind pvs e1.e_effect in
+        eff_union_par acc eff) eff_empty bl in
       out_label e (sp_expr_seq env e0 v xres out eff12 zeff zdst)
   | Ecase (e0, bl) ->
       let eff12 = List.fold_left (fun acc (p,e1) ->
@@ -994,6 +1008,23 @@ and sp_pure_if env test e1 e2 res =
     | None -> sp_if test ne1 ne2)
     | None -> sp_if test ne1 ne2 in
   wp_if test ok1 ok2, ne
+
+and sp_pure_case env v bl res =
+  let t = t_var v in
+  let bl = List.map (fun (p,e) ->
+    let ok, ne, _ = sp_expr_nil env e res Mexn.empty Mpv.empty in
+    p.pp_pat, ok, ne) bl in
+  let ne = try
+    let ne = List.map (fun (p,_,ne) ->
+      match term_of_post ~prop:false res ne with
+      | Some (t,f) -> p, t, f
+      | None -> raise Exit) bl in
+    sp_and (t_equ (t_var res)
+       (t_case t (List.map (fun (p,t,_) -> t_close_branch p t) ne)))
+      (sp_case t (List.map (fun (p,_,f) -> t_close_branch p f) ne))
+  with Exit ->
+    sp_case t (List.map (fun (p,_,ne) -> t_close_branch p ne) bl) in
+  wp_case t (List.map (fun (p,ok,_) -> t_close_branch p ok) bl), ne
 
 and vc_let_sym env vc_wp ld wp {e_effect = eff} =
   (* when we havoc the VC of a locally defined function,
