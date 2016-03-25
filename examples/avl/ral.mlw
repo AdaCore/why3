@@ -21,7 +21,7 @@ module RAL
 
   (** Use the integer monoid in order to measure sequence of elements
       by their length. *)
-  namespace M
+  scope M
     type m = int
     type t = int
     constant zero : int = 0
@@ -37,7 +37,7 @@ module RAL
   end
 
   (** The stored elements are measured by 1. *)
-  namespace D
+  scope D
     type t 'a = 'a
     (* Morally equivalent to
        [function measure 'b : int = 1], but left axiomatized for

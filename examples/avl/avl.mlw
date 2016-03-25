@@ -40,10 +40,10 @@ theory SelectionTypes
     rebuild p = p.left ++ option_to_list p.middle ++ p.right
 
   (** Shortcuts for extending a split on the left/right. *)
-  function left_extend (l:list 'a) (d:'a) (e:split 'a) : split 'a =
+  let ghost function left_extend (l:list 'a) (d:'a) (e:split 'a) : split 'a =
     { e with left = l ++ Cons d e.left }
 
-  function right_extend (e:split 'a) (d:'a) (r:list 'a) : split 'a =
+  let ghost function right_extend (e:split 'a) (d:'a) (r:list 'a) : split 'a =
     { e with right = e.right ++ Cons d r }
 
 end
@@ -98,8 +98,8 @@ module AVL
      the cost of balancing and the cost of finding:
      the bigger the balancing constant is, the lesser is the need for
      balancing the tree, but the deeper the trees may be. *)
-  constant balancing : int
-  axiom balancing_positive : balancing > 0
+  val constant balancing : int
+    ensures { result > 0 }
 
   (** tree representation.
       Height and monoidal summary are cached at every node. *)
@@ -121,11 +121,11 @@ module AVL
     hgt : int;
   }
 
-  function node_model (l:list 'a) (d:'a) (r:list 'a) : list 'a =
+  let ghost function node_model (l:list 'a) (d:'a) (r:list 'a) : list 'a =
     l ++ Cons d r
 
   (** Sequence of elements obtained by infix-order traversal. *)
-  function list_model (t:tree 'a) : list (D.t 'a) =
+  let rec ghost function list_model (t:tree 'a) : list (D.t 'a) =
     match t with
     | Empty -> Nil
     | Node l d r _ _ -> node_model (list_model l) d (list_model r)

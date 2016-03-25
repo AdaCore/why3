@@ -24,10 +24,10 @@ module MapBase
   axiom balancing_positive : balancing > 0
 
   (** Stored elements are identified by totally ordered keys *)
-  namespace D type t 'a end namespace K type t end
+  scope D type t 'a end scope K type t end
   clone export key_type.ProgramKeyType with type t = D.t, type key = K.t
   clone preorder.Computable as CO with type t = K.t
-  namespace D
+  scope D
     function measure 'a : unit = ()
     let measure (x:'c) : unit
       ensures { result = () }
@@ -49,7 +49,7 @@ module MapBase
 
   (** As we do not need any extra information in order to perform search
       for this particular instance, we instantiate the monoid by unit. *)
-  namespace M
+  scope M
     type t = unit
     constant zero : unit = ()
     function op (x y:unit) : unit = ()
@@ -498,11 +498,11 @@ module Map
   axiom balancing_positive : balancing > 0
 
   (** Parameter: key type with computable total preorder. *)
-  namespace K type t end
+  scope K type t end
   clone preorder.Computable as CO with type t = K.t
 
   (** Elements are key-value pairs. *)
-  namespace D
+  scope D
 
     type t 'a = (K.t,'a)
     function key (t:t 'a) : K.t = let (a,_) = t in a
@@ -725,11 +725,11 @@ module Set
   axiom balancing_positive : balancing > 0
 
   (** Parameter: comparable elements. *)
-  namespace K type t end
+  scope K type t end
   clone preorder.Computable as CO with type t = K.t
 
   (** Elements are themselves the keys. *)
-  namespace D
+  scope D
 
     type t 'a = K.t
     function key (t:'a) : 'a = t
@@ -939,7 +939,7 @@ module IMapAndSet
 
   use import int.Int
 
-  namespace K type t = int end
+  scope K type t = int end
 
   constant balancing : int = 1
 

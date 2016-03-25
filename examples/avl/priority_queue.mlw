@@ -22,8 +22,8 @@ module PQueue
 
   (** The Elements of the priority queue are indexed by totally ordered keys.
       Moreover, this order can be effectively decided. *)
-  namespace D type t 'a end
-  namespace K type t end
+  scope D type t 'a end
+  scope K type t end
   clone export key_type.ProgramKeyType with type t = D.t, type key = K.t
   constant default_element : D.t 'a
   clone preorder.Computable as CO with type t = K.t
@@ -39,7 +39,7 @@ module PQueue
   (** Use the minimum monoid to measure sequence of elements by their
       minimum value. We extend it with a minimum element in order to measure
       empty sequences. *)
-  namespace M
+  scope M
     type t = option K.t
     constant zero : t = None
     function op (x y:t) : t = match x with
@@ -83,7 +83,7 @@ module PQueue
 
   end
   (** Elements are measured by their keys. *)
-  namespace D
+  scope D
     (* Morally equivalent to
        [function measure (d:D.t 'a) : M.t = Some d.key],
        but left axiomatized for technical reasons. *)
