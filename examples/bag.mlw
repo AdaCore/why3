@@ -8,11 +8,8 @@ module Bag
   predicate (==) (b1 b2: bag 'a) =
     forall x: 'a. b1 x = b2 x
 
-  constant empty : bag 'a =
+  let constant empty : bag 'a =
     fun _ -> 0
-
-  val empty () : bag 'a
-    ensures { result = empty }
 
   function add (e: 'a) (b: bag 'a) : bag 'a =
     fun x -> if x = e then b x + 1 else b x
@@ -105,7 +102,7 @@ module BagImpl
   type t 'a = {
     mutable       size:     int;
                   data:     rarray (Null.t 'a);
-    mutable ghost contents: bag 'a;
+    mutable ghost contents: bag {'a};
   }
   invariant { 0 <= size = data.length }
   invariant { forall i: int. 0 <= i < size ->
@@ -117,7 +114,7 @@ module BagImpl
     ensures { result.contents == Bag.empty }
   =
     let null = Null.create_null () : Null.t 'a in
-    { size = 0; data = make 0 null; contents = Bag.empty () }
+    { size = 0; data = make 0 null; contents = Bag.empty }
 
   let clear (t: t 'a) : unit
     ensures { t.size = 0 }
@@ -125,7 +122,7 @@ module BagImpl
   =
     resize t.data 0;
     t.size <- 0;
-    t.contents <- Bag.empty ()
+    t.contents <- (Bag.empty : bag {'a})
 
   let add (t: t 'a) (x: 'a) : unit
     ensures { t.size = old t.size + 1 }
@@ -149,16 +146,15 @@ module BagImpl
     ensures  { forall x: 'a. Null.Value x = old t.data[i].Null.v ->
                t.contents == Bag.remove x (old t.contents) }
   =
-    'L:
     let n = t.size - 1 in
     let ghost x = Null.get t.data[i] in
     if i < n then t.data[i] <- t.data[n];
     resize t.data n;
     t.size <- n;
     t.contents <- Bag.remove x t.contents;
-    assert { forall v: 'a. numof t.data v 0 i = numof (at t.data 'L) v 0 i };
+    assert { forall v: 'a. numof t.data v 0 i = numof (old t.data) v 0 i };
     assert { forall v: 'a.
-             numof t.data v i n = numof (at t.data 'L) v (i+1) (n+1) };
+             numof t.data v i n = numof (old t.data) v (i+1) (n+1) };
     assert { forall v: 'a.
              numof t.data v 0 n = numof t.data v 0 i + numof t.data v i n }
 
