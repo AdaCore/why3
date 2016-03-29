@@ -122,8 +122,12 @@ module MoreHoareLogic
   use import list.Mem
   use import list.Append
 
+  type elt
+  val predicate eq (x y: elt)
+    ensures { result <-> x = y }
+
   (* note: we avoid the use of an existential quantifier in the invariant *)
-  let list_member (x : ref (list 'a)) (y: 'a) (z: ref int)
+  let list_member (x : ref (list elt)) (y: elt) (z: ref int)
     ensures { !z=1 <-> mem y (old !x) }
   = z := 0;
     while not (is_nil !x) do
@@ -132,7 +136,7 @@ module MoreHoareLogic
                   (!z=1 /\ mem y (old !x) \/
                    !z=0 /\ (mem y (old !x) -> mem y !x)) }
       variant { !x }
-      if y = head !x then z := 1;
+      if eq y (head !x) then z := 1;
       x := tail !x
     done
 
