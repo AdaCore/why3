@@ -66,4 +66,7 @@ module ImpmapNoDom
     writes { m }
     ensures { m.contents = m.contents[k <- v] }
 
+  val ghost function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
 end
