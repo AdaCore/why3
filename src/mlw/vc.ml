@@ -771,15 +771,15 @@ let rec wp_expr env e res q xq = match e.e_node with
       vc_label e (wp_and init w)
   | Efor ({pv_vs = v}, bounds, invl, e1) ->
       (* wp(for v = a to b inv I(v) do e1 done, Q, R) =
-             a > b  -> Q
-         and a <= b -> I(a)
+             a <= b -> I(a)
          and forall S. forall v. a <= v <= b /\ I(v) -> wp(e1, I(v+1), R)
-                   and a <= b /\ I(b+1) -> Q *)
+                   and a <= b /\ I(b+1) -> Q
+         and a > b  -> Q *)
       let q = t_subst_single res t_void q in
       let a_gt_b, init, prev, keep, last = spec_for env e v bounds invl in
       let w = wp_forall [v] (sp_implies prev (wp_expr env e1 res keep xq)) in
       let w = wp_havoc env e.e_effect (wp_and w (sp_implies last q)) in
-      vc_label e (wp_and (sp_implies a_gt_b q) (wp_and init w))
+      vc_label e (wp_and init (wp_and w (sp_implies a_gt_b q)))
 
 and sp_expr env e res xres zout zeff zdst = match e.e_node with
   | Evar v ->
@@ -970,7 +970,7 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
   | Efor ({pv_vs = v}, bounds, invl, e1) ->
       (* ok:    a <= b -> I(a)
             and forall v. !! a <= v <= b /\ I(v) -> ok1 /\ (ne1 -> I(v+1))
-         ne:                    (a > b /\ S' = S) \/ (!! a <= b /\ I(b+1))
+         ne:             (!! a <= b /\ I(b+1)) \/ (a > b /\ S' = S)
          ex:   [exists v] !! a <= v <= b /\ I(v) /\ ex1 *)
       let a_gt_b, init, prev, keep, last = spec_for env e v bounds invl in
       let out = keep, t_false, Mexn.empty in
@@ -986,7 +986,7 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
                 else Mvs.singleton v (t_var (clone_vs v)) in
       let ok = wp_forall [v] (sp_wp_close res hav adv ok) in
       let close sp = t_subst sbs (sp_sp_close res hav adv sp) in
-      let out = wp_and init ok, sp_or ne0 ne1, Mexn.map close ex in
+      let out = wp_and init ok, sp_or ne1 ne0, Mexn.map close ex in
       out_seq (out_label e out) dst res zout zeff zdst
 
 and sp_expr_seq env e res xres out eff zeff zdst =
