@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../coincidence_count_list.mlw" expanded="true">
+<theory name="CoincidenceCount" sum="4d4c890e56bb604a55ec2e21b7ac9a92" expanded="true">
+ <goal name="Transitive.Trans" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="WP_parameter coincidence_count" expl="VC for coincidence_count" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter coincidence_count.1" expl="1. variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="1.98" steps="2625"/></proof>
+  <proof prover="3"><result status="timeout" time="5.99"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.5" expl="5. variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.8" expl="8. postcondition" expanded="true">
+  <proof prover="0"><result status="valid" time="2.36" steps="4210"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.9" expl="9. variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.10" expl="10. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.12" expl="12. postcondition" expanded="true">
+  <proof prover="0"><result status="valid" time="3.56" steps="6215"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.13" expl="13. postcondition">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter coincidence_count.14" expl="14. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
