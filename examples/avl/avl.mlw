@@ -132,7 +132,8 @@ module AVL
     end
 
   (** Height of the tree. *)
-  function real_height (t:tree 'a) : int = match t with
+  let rec function real_height (t:tree 'a): int =
+    match t with
     | Empty -> 0
     | Node l _ r _ _ -> let hl = real_height l in let hr = real_height r in
       1 + if hl < hr then hr else hl
