@@ -45,5 +45,25 @@ module Impmap
   val remove (k: key) (m: t 'a) : unit
     writes   { m }
     ensures  { m.contents = old m.contents[k <- None] }
+end
+
+module ImpmapNoDom
+
+  use import map.Map
+  use import map.Const
+
+  type key
+
+  type t 'a = abstract { mutable contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val ([]<-) (m: t 'a) (k: key) (v: 'a): unit
+    writes { m }
+    ensures { m.contents = m.contents[k <- v] }
 
 end
