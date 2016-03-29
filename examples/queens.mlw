@@ -9,15 +9,11 @@ theory S "finite sets of with succ and pred operations"
 
   use export set.Fsetint
 
-  function succ (set int) : set int
+  val function succ (s: set int): set int
+    ensures { forall i: int. mem i result <-> i >= 1 /\ mem (i - 1) s }
 
-  axiom succ_def:
-    forall s: set int, i: int. mem i (succ s) <-> i >= 1 /\ mem (i-1) s
-
-  function pred (set int) : set int
-
-  axiom pred_def:
-    forall s: set int, i: int. mem i (pred s) <-> i >= 0 /\ mem (i+1) s
+  val function pred (s: set int): set int
+    ensures { forall i: int. mem i result <-> i >= 0 /\ mem (i + 1) s }
 
 end
 

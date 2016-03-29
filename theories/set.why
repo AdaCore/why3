@@ -292,25 +292,18 @@ theory Fsetint
   use export int.Int
   use export Fset
 
-  function min_elt (set int) : int
+  val function min_elt (s: set int): int
+    requires { not (is_empty s) }
+    ensures { mem result s }
+    ensures { forall x: int. mem x s -> result <= x }
 
-  axiom min_elt_def1:
-    forall s: set int. not (is_empty s) -> mem (min_elt s) s
+  val function max_elt (s: set int): int
+    requires { not (is_empty s) }
+    ensures { mem result s }
+    ensures { forall x: int. mem x s -> x <= result }
 
-  axiom min_elt_def2:
-    forall s: set int. forall x: int. mem x s -> min_elt s <= x
-
-  function max_elt (set int) : int
-
-  axiom max_elt_def1:
-    forall s: set int. not (is_empty s) -> mem (max_elt s) s
-
-  axiom max_elt_def2:
-    forall s: set int. forall x: int. mem x s -> x <= max_elt s
-
-  function interval int int : set int
-
-  axiom interval_def: forall x l r: int. mem x (interval l r) <-> l <= x < r
+  val function interval (l r: int): set int
+    ensures { forall x: int. mem x result <-> l <= x < r }
 
   lemma cardinal_interval:
     forall l r: int. cardinal (interval l r) = if l <= r then r - l else 0

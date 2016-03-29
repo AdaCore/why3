@@ -29,25 +29,20 @@ theory Bitset "sets of small integers"
 
   (* membership
      [mem i s] can be implemented as [s land (1 lsl i) <> 0] *)
-  predicate mem int set
+  val predicate mem int set
 
   (* removal
      [remove i s] can be implemented as [s - (1 lsl i)] *)
-  function remove int set : set
-
-  axiom remove_def1:
-    forall x y: int, s: set.
-    mem x (remove y s) <-> x <> y /\ mem x s
+  val function remove (x: int) (s: set): set
+    ensures { forall y: int. mem y result <-> y <> x /\ mem y s }
 
   (* the set {0,1,...,n-1}
      [below n] can be implemented as [1 lsl n - 1] *)
-  function below int : set
+  val function below (n: int): set
+    requires { 0 <= n <= size }
+    ensures { forall x: int. mem x result <-> 0 <= x < n }
 
-  axiom below_def:
-    forall x n: int. 0 <= n <= size ->
-    mem x (below n) <-> 0 <= x < n
-
-  function cardinal set : int
+  val function cardinal set: int
 
   axiom cardinal_empty:
     forall s: set. cardinal s = 0 <-> (forall x: int. not (mem x s))
@@ -100,8 +95,8 @@ module MaxMatrixMemo
   val constant n : int
     ensures { 0 <= result <= size }
 
-  constant m : map int (map int int)
-  axiom m_pos: forall i j: int. 0 <= i < n -> 0 <= j < n -> 0 <= m[i][j]
+  val constant m : map int (map int int)
+    ensures { forall i j: int. 0 <= i < n -> 0 <= j < n -> 0 <= result[i][j] }
 
   predicate solution (s: map int int) (i: int) =
     (forall k: int. i <= k < n -> 0 <= s[k] < n) /\
