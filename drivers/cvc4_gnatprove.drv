@@ -11,6 +11,7 @@ theory ieee_float.GenericFloat
  syntax function to_real "%1"
 
  remove prop Round_to_real      (* would be inconsistent with the mapping of t and to_real *)
+ remove prop eq_zero            (* would give a proof +zero=-zero *)
 
 end
 
