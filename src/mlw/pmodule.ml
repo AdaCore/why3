@@ -908,10 +908,10 @@ let clone_export uc m inst =
           | MApr pr -> MApr (cl_find_pr cl pr)
           | a -> a) al)
         with Not_found -> uc end
-    | Uscope (n,import,ul) ->
+    | Uscope (n,_import,ul) ->
         let uc = open_scope uc n in
         let uc = List.fold_left add_unit uc ul in
-        close_scope ~import uc in
+        close_scope ~import:false uc in
   let uc = List.fold_left add_unit uc m.mod_units in
   let mi = {
     mi_mod = m;
