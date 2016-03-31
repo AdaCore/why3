@@ -36,7 +36,8 @@ open Gnat_objectives
                 "trace_file" : string,
                 "vc_file"    : string,
                 "editor_cmd" : string,
-                "stats"      : stats_rec
+                "stats"      : stats_rec,
+                "cntexmp"    : ??? needs documentation
                 }
 
      stats_rec = { [prover_name : stats_entry] }
