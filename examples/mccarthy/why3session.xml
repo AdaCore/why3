@@ -2,9 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../mccarthy.mlw" expanded="true">
-<theory name="McCarthy91" sum="dfd70d690529e1a36626f39ca1116ffb" expanded="true">
+<theory name="McCarthy91" sum="38080f0fd49f8f0d571a189eec9df3af" expanded="true">
  <goal name="VC f91" expl="VC for f91" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="VC f91.1" expl="1. variant decrease">
@@ -14,7 +15,10 @@
   <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
   <goal name="VC f91.3" expl="3. postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC f91.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
  </transf>
  </goal>
@@ -24,13 +28,13 @@
   <proof prover="4"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
   <goal name="VC f91_nonrec.2" expl="2. loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.03" steps="46"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="61"/></proof>
   </goal>
   <goal name="VC f91_nonrec.3" expl="3. loop variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC f91_nonrec.4" expl="4. loop invariant preservation">
-  <proof prover="4"><result status="valid" time="1.32" steps="222"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
   <goal name="VC f91_nonrec.5" expl="5. loop variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
