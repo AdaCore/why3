@@ -207,7 +207,7 @@ module LinearProbing
     writes   { h.size, h.data, h.data.elts, h.view, h.loc }
     ensures  { h.view = Map.set (old h.view) (keym x) True }
    =
-    abstract
+    begin
       ensures { h.size + 1 < Array.length h.data }
       if 2 * (h.size + 1) >= Array.length h.data then resize h
     end;

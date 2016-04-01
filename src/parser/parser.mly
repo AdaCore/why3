@@ -763,8 +763,6 @@ expr_:
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
     { Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, $6) }
-| ABSTRACT spec seq_expr END
-    { Efun ([], None, Ity.MaskVisible, $2, $3) }
 | ANY return spec
     { Eany ([], Expr.RKnone, Some (fst $2), snd $2, $3) }
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
@@ -813,7 +811,11 @@ expr_dot_:
 | expr_sub                  { $1 }
 
 expr_sub:
-| expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
+| BEGIN single_spec spec seq_expr END
+    { Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $4) }
+| BEGIN single_spec spec END
+    { let e = mk_expr (Etuple []) $startpos $endpos in
+      Efun ([], None, Ity.MaskVisible, spec_union $2 $3, e) }
 | BEGIN seq_expr END                                { $2.expr_desc }
 | LEFTPAR seq_expr RIGHTPAR                         { $2.expr_desc }
 | BEGIN END                                         { Etuple [] }
@@ -821,6 +823,7 @@ expr_sub:
 | LEFTPAR comma_list2(expr) RIGHTPAR                { Etuple $2 }
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
+| expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | expr_arg LEFTSQ expr RIGHTSQ
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ expr LARROW expr RIGHTSQ

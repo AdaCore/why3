@@ -48,7 +48,7 @@ module Bitwalker
     ensures  { flag = BV64.nth result (63 - BV32.to_uint left) }
   =
     assert { BV32.ult left (BV32.of_int 64) };
-    abstract
+    begin
     ensures { forall i:BV32.t. i <> BV32.sub (BV32.of_int 63) left ->
                BV64.nth_bv result (C32_64.toBig i) =
                  BV64.nth_bv value (C32_64.toBig i) }
@@ -77,7 +77,7 @@ module Bitwalker
     let ghost left_bv = BV64.of_int left in
     assert { BV64.ult left_bv (BV64.of_int 64) };
     assert { (BV64.sub (BV64.of_int 63) left_bv) = BV64.of_int (63 - left) };
-    abstract
+    begin
     ensures { forall i:BV64.t. BV64.ule i (BV64.of_int 63) ->
                i <> BV64.sub (BV64.of_int 63) left_bv ->
                BV64.nth_bv result i = BV64.nth_bv value i }
@@ -100,7 +100,7 @@ module Bitwalker
     ensures  { result = BV8.nth byte (7 - BV32.to_uint left) }
   =
     assert {BV32.ult left (BV32.of_int 8)};
-    abstract
+    begin
       ensures {
         result = BV8.nth_bv
                    byte (BV8.sub (BV8.of_int 7) (C8_32.toSmall left))}
@@ -168,7 +168,7 @@ module Bitwalker
     ensures {result = BV64.nth value (63 - BV32.to_uint left)}
   =
      assert {BV32.ult left (BV32.of_int 64)};
-     abstract
+     begin
      ensures {result = BV64.nth_bv value
                        (BV64.sub (BV64.of_int 63) (C32_64.toBig left))}
        let mask = BV64.lsl_bv (BV64.int_check 1)
@@ -193,7 +193,7 @@ module Bitwalker
     ensures  { BV8.nth result (7 - BV32.to_uint left) = flag }
   =
     assert { BV32.ult left (BV32.of_int 8) };
-    abstract
+    begin
     ensures { forall i:BV32.t. BV32.ult i (BV32.of_int 8) ->
                i <> BV32.sub (BV32.of_int 7) left ->
                BV8.nth_bv result (C8_32.toSmall i)

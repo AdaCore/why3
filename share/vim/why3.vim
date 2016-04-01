@@ -28,7 +28,7 @@ syn match    whyBraceErr   "}"
 syn match    whyBrackErr   "\]"
 syn match    whyParenErr   ")"
 
-syn match    whyCommentErr "\(^\|[^(]\)\*)"
+syn match    whyCommentErr "\*)"
 
 syn match    whyCountErr   "\<downto\>"
 syn match    whyCountErr   "\<to\>"
@@ -52,13 +52,14 @@ syn region   whyEncl transparent matchgroup=whyKeyword start="{" matchgroup=whyK
 syn region   whyEncl transparent matchgroup=whyKeyword start="\[" matchgroup=whyKeyword end="\]" contains=ALLBUT,@whyContained,whyBrackErr
 
 " Comments
-syn region   whyComment start="(\*\([^)]\|$\)" end="\(^\|[^(]\)\*)" contains=whyComment,whyTodo
+syn region   whyComment start="(\*" end="\*)" contains=whyComment,whyTodo
+syn match    whyOperator "(\*)"
+
 syn keyword  whyTodo contained TODO FIXME XXX NOTE
 
 " Blocks
 " FIXME? match and try should detect the absence of "with" ?
 syn region   whyEnd matchgroup=whyKeyword start="\<begin\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
-syn region   whyEnd matchgroup=whyKeyword start="\<abstract\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<match\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<loop\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<try\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
@@ -68,18 +69,15 @@ syn region   whyNone matchgroup=whyKeyword start="\<if\>" matchgroup=whyKeyword 
 
 " Theories and modules
 
-syn region   whyTheory matchgroup=whyKeyword start="\<theory\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment skipwhite skipempty nextgroup=whyTheoryContents
+syn region   whyTheory matchgroup=whyKeyword start="\<theory\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment skipwhite skipempty nextgroup=whyModuleContents
 syn region   whyModule matchgroup=whyKeyword start="\<module\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment skipwhite skipempty nextgroup=whyModuleContents
-syn region   whyScope matchgroup=whyKeyword start="\<scope\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyImport skipwhite skipempty nextgroup=whyScopeContents
+syn region   whyScope matchgroup=whyKeyword start="\<scope\>" matchgroup=whyModSpec end="\<\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyImport skipwhite skipempty nextgroup=whyModuleContents
 
-syn region   whyTheoryContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
-syn region   whyModuleContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
-syn region   whyScopeContents start="^" start="."me=e-1 matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
+syn region   whyModuleContents start="" matchgroup=whyModSpec end="\<end\>" contained contains=ALLBUT,@whyContained,whyEndErr,whyTheory,whyModule
 
-syn region   whyNone matchgroup=whyKeyword start="\<\(use\|clone\)\>" matchgroup=whyModSpec end="\<\(\w\+\.\)*\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyString,whyImport,whyExport,whyModuleKeyword
+syn region   whyNone matchgroup=whyKeyword start="\<\(use\|clone\)\>" matchgroup=whyModSpec end="\<\(\w\+\.\)*\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment,whyString,whyImport,whyExport
 syn keyword  whyExport contained export
 syn keyword  whyImport contained import
-syn keyword  whyModuleKeyword contained module
 
 syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
 
@@ -91,7 +89,7 @@ syn keyword  whyKeyword  let meta
 syn keyword  whyKeyword  not predicate so
 syn keyword  whyKeyword  then type with
 
-syn keyword  whyKeyword  any
+syn keyword  whyKeyword  abstract any
 syn keyword  whyKeyword  exception fun ghost label
 syn keyword  whyKeyword  model mutable private
 syn keyword  whyKeyword  raise rec val while
@@ -140,7 +138,7 @@ syn sync maxlines=500
 syn sync match whyDoSync      grouphere  whyDo      "\<do\>"
 syn sync match whyDoSync      groupthere whyDo      "\<done\>"
 
-syn sync match whyEndSync     grouphere  whyEnd     "\<\(begin\|abstract\|match\|loop\|try\)\>"
+syn sync match whyEndSync     grouphere  whyEnd     "\<\(begin\|match\|loop\|try\)\>"
 syn sync match whyEndSync     groupthere whyEnd     "\<end\>"
 
 syn sync match whyTheorySync  grouphere  whyTheory  "\<theory\>"

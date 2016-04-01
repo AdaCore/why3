@@ -706,7 +706,7 @@ module Map
       (forall k2:K.t. CO.lt k k2 -> rg.m.func k2 = t.m.func k2) /\
       (forall k2:K.t. CO.le k2 k -> rg.m.func k2 = None) }
   = let (lf,o,rg) = MB.split k t in
-    let o = abstract ensures { match o with None -> result = None
+    let o = begin ensures { match o with None -> result = None
         | Some (_,v) -> result = Some v end }
         match o with None -> None | Some (_,v) -> Some v end end in
     (lf,o,rg)
@@ -896,7 +896,7 @@ module Set
       (forall k2. CO.le k k2 -> not lf.m.set k2) /\
       (forall k2. CO.le k2 k -> not rg.m.set k2) }
   = let (lf,o,rg) = MB.split k t in
-    let o = abstract ensures { result <-> o <> None }
+    let o = begin ensures { result <-> o <> None }
       match o with None -> false | _ -> true end end in
     (lf,o,rg)
 
