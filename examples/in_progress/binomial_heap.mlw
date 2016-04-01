@@ -19,6 +19,7 @@ module BinomialHeap
   type tree = {
     elem: elt;
     children: list tree;
+    rank: int;
   }
 
   (* [e] is no greater than the roots of the trees in [l] *)
@@ -41,14 +42,14 @@ module BinomialHeap
   lemma heaps_reverse:
     forall h. heaps h -> heaps (reverse h)
 
-  function rank (t: tree) : int =
-    length t.children
+  (* function rank (t: tree) : int = *)
+  (*   length t.children *)
 
   function link (t1 t2: tree) : tree =
     if le t1.elem t2.elem then
-      { t1 with children = Cons t2 t1.children }
+      { elem = t1.elem; rank = t1.rank + 1; children = Cons t2 t1.children }
     else
-      { t2 with children = Cons t1 t2.children }
+      { elem = t2.elem; rank = t2.rank + 1; children = Cons t1 t2.children }
 
   function occ (x: elt) (l: list tree) : int =
     match l with
@@ -86,7 +87,8 @@ module BinomialHeap
     end
 
   predicate binomial_tree (t: tree) =
-    has_order (rank t) t.children
+    t.rank = length t.children &&
+    has_order t.rank t.children
 
   (* a binomial heap is a list of trees *)
   type heap = list tree
@@ -96,7 +98,7 @@ module BinomialHeap
   predicate inv (m: int) (h: heap) =
     match h with
     | Nil -> true
-    | Cons t r -> let k = rank t in m <= k && binomial_tree t && inv (k + 1) r
+    | Cons t r -> let k = t.rank in m <= k && binomial_tree t && inv (k + 1) r
     end
 
   lemma inv_reverse:
@@ -166,7 +168,7 @@ module BinomialHeap
     ensures  { occ x result = occ x h + 1 }
     ensures  { forall e. e <> x -> occ e result = occ e h }
     =
-    add_tree { elem = x; children = Nil } h
+    add_tree { elem = x; rank = 0; children = Nil } h
 
   let rec merge (ghost k: int) (h1 h2: heap)
     requires { heaps h1 }
