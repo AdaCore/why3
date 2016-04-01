@@ -34,7 +34,7 @@ theory TwoPlayerGame
      [-winning_value].
   *)
   constant winning_value : int
-  constant infinity : int
+  val constant infinity : int
   val function position_value position : int
 
   axiom position_value_bound :
@@ -114,6 +114,7 @@ module AlphaBeta
       if - beta < m < - alpha then result = - m
       else if m <= - beta then result >= beta
       else result <= alpha }
+    variant { depth, 0 }
     let pos' = G.do_move pos move in
     let s = negabeta (-beta) (-alpha) pos' (depth-1)
     in -s
@@ -124,6 +125,7 @@ module AlphaBeta
       if alpha < G.minmax pos depth < beta then result = G.minmax pos depth else
       if G.minmax pos depth <= alpha then result <= alpha else
       result >= beta }
+    variant { depth, 1 }
     if depth = 0 then G.position_value pos else
     let l = G.legal_moves pos in
     match l with
@@ -145,6 +147,7 @@ module AlphaBeta
       if alpha < m < beta then result = m
       else if m <= alpha then result <= alpha else
       result >= beta }
+    variant { depth, 1, l }
     match l with
       |	Nil -> best
       | Cons c l ->
