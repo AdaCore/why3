@@ -23,8 +23,8 @@ predicate parentChild (i: int) (j: int) =
     0 <= i < j -> (j = left i) || (j = right i)
 
 
-use import map.Map as A
-type map = A.map int int
+clone import appmap.Appmap as A with type key = int
+type map = A.t int
 type logic_heap = (map, int)
 
 predicate is_heap_array (a: map) (idx: int) (sz: int) =
