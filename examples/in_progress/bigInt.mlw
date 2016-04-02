@@ -319,7 +319,7 @@ module N
     assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
        value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
     assert { value_array arr = value_array x + value_array y };
-    abstract
+    begin
      ensures { -1 <= to_int !non_null_idx <= to_int !i }
      ensures { to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
      ensures {
