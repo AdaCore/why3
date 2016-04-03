@@ -2,7 +2,7 @@
 (** Binomial heaps (Jean Vuillemin, 1978).
 
     Purely applicative implementation, following Okasaki's implementation
-    in Purely Functional Data Structures (Section 3.2).
+    in his book "Purely Functional Data Structures" (Section 3.2).
 
     Author: Jean-Christophe Filliâtre (CNRS)
 *)
@@ -40,8 +40,13 @@ module BinomialHeap
     | Cons { children = c } r -> 1 + size c + size r
     end
 
-  lemma size_nonnneg:
-    forall l. size l >= 0
+  let lemma size_nonnneg (l: list tree)
+    ensures { size l >= 0 }
+  = let rec auxl (l: list tree) ensures { size l >= 0 } variant { l }
+    = match l with Nil -> () | Cons t r -> auxt t; auxl r end
+    with auxt (t: tree) ensures { size t.children >= 0 } variant { t }
+    = match t with { children = c } -> auxl c end in
+    auxl l
 
   (** Heaps. *)
 
