@@ -220,8 +220,7 @@ module LinearProbing
                numofd (h.data at L) 0 (i+1) - 1 }
     end;
     ghost h.view <- Map.set h.view (keym x) True;
-    ghost h.loc <- Map.set h.loc (keym x) i;
-    ()
+    ghost h.loc <- Map.set h.loc (keym x) i
 
   let copy (h: t) : t
     ensures { result.view = h.view }
