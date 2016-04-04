@@ -52,6 +52,18 @@ theory "ada__model".Finite_Float_Literal
   remove prop l_is_finite
 end
 
+theory "_gnatprove_standard".Float32_next_prev
+  remove prop max_value
+
+  syntax function max_value "(fp #b0 #b11111110 #b11111111111111111111111)"
+end
+
+theory "_gnatprove_standard".Float64_next_prev
+  remove prop max_value
+
+  syntax function max_value "(fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)"
+end
+
 (* bitvector theories are not in smt-libv2.drv since cvc4 and z3 don't
    have the same name for the function to_uint *)
 theory bv.BV_Gen

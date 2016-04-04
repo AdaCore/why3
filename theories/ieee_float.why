@@ -19,9 +19,23 @@
 
 theory GenericFloat
 
+  use import int.Int
+  use real.Abs
+  use real.FromInt
+  use real.Truncate
+  use import real.RealInfix
+
   (*********************************************************************)
   (* {2 PART I - PUBLIC INTERFACE}                                     *)
   (*********************************************************************)
+
+  (* the number of bits in the exponent.  *)
+  constant eb : int
+  (* the number of bits in the significand, including the hidden bit. *)
+  constant sb : int
+
+  axiom eb_gt_1: 1 < eb
+  axiom sb_gt_1: 1 < sb
 
   (* {3 Sorts} *)
 
@@ -30,10 +44,13 @@ theory GenericFloat
   (* {3 Constructors and Constants} *)
 
   constant zeroF     : t   (* +0.0 *)
-  constant oneF      : t   (* not used here, but used in _gnatprove_standard *)
-  constant two       : t   (* 2.0 *)
   constant half      : t   (* 0.5 *)
-  constant max_value : t   (* largest positive finite float *)
+  (* exp_bia = 2^(sb - 1) - 1 *)
+  (* max_finite_exp = 2^sb - 2 - exp_bia = exp_bia *)
+  (* max_signifacnd = (2^eb + 2^eb - 1) * 2^(1-eb) *)
+  (* max_value = (2^eb + 2^eb - 1) * 2^(1-eb) * 2 ^ max_finite_exp *)
+  (* [m;x] = ( 1 + m * 2^(1-eb) ) * 2^( x - exp_bia ) *)
+  (* max_value = [2^(eb-1); 2^sb - 2] *)
 
   (* constructor, perform an unchecked convertion from the binary *)
   (* representation of a float. this is a workaround and should   *)
@@ -119,8 +136,6 @@ theory GenericFloat
   (* {3 Constructors and Constants} *)
   axiom zeroF_to_real     : to_real zeroF = 0.0
   axiom zeroF_is_positive : is_positive zeroF
-  axiom oneF_to_real      : to_real oneF  = 1.0
-  axiom two_to_real       : to_real two   = 2.0
   axiom half_to_real      : to_real half  = 0.5
 
   (* {3 Conversions from other sorts} *)
@@ -151,8 +166,6 @@ theory GenericFloat
   function to_int (x : t) : int
 
   axiom zero_of_int : zeroF = of_int 0
-  axiom oneF_of_int : oneF  = of_int 1
-  axiom two_of_int  : two   = of_int 2
 
   (* {3 Arithmetic} *)
 
@@ -165,12 +178,7 @@ theory GenericFloat
   (* Note also this means round (2*INF) > round (INF) is not true either.  *)
   function round real : real
 
-  constant max_real   : real    (* defined when cloning *)
-
-  axiom max_to_real   : max_real = to_real max_value
-
-  use import real.RealInfix
-  use real.Abs
+  constant max_real : real (* defined when cloning *)
 
   predicate in_range (x:real) = -. max_real <=. x <=. max_real
 
@@ -184,15 +192,10 @@ theory GenericFloat
   axiom is_finite: forall x:t (* [in_range (to_real x)] *). is_finite x -> in_range (to_real x)
 
   axiom zero_is_finite : is_finite zeroF
-  axiom one_is_finite  : is_finite oneF
-  axiom two_is_finite  : is_finite two
   axiom half_is_finite : is_finite half
-  axiom max_is_finite  : is_finite max_value
 
   (* used as a condition to propagate is_finite *)
   predicate no_overflow (x:real) = in_range (round x)
-
-  use real.FromInt
 
   (* is this correct &| accurate ? *)
   (* FS: seems OK for float32 at least *)
@@ -226,8 +229,6 @@ theory GenericFloat
   constant max_representable_integer : int (* defined when cloning RENAME -> max_safe_integer ? *)
 
   (* round and integers *)
-
-  use import int.Int
 
   axiom Exact_rounding_for_integers:
     forall i:int.
@@ -331,12 +332,21 @@ theory GenericFloat
 
   (* _____________ *)
 
+  predicate is_int (x:t)
+
+  (* temporary range check on int set to 2^64; TODO find the actual
+     max int that don't give INF with of_int for both clones *)
+  axiom of_int_is_int: forall x.
+    (- 0x10000000000000000) <= x <= 0x10000000000000000
+      -> is_int (of_int x)
+
+  axiom is_int_is_finite: forall x. is_int x -> is_finite x
 
   axiom eq_to_int: forall x y. is_finite x -> is_finite y -> x .= y ->
     to_int x = to_int y
 
-  use import real.RealInfix
-  use real.Truncate
+  axiom truncate_int: forall x:t. is_int x ->
+        roundToIntegralTowardsZero x .= x
 
   axiom truncate_neg: forall x:t.
     is_finite x -> is_negative x -> roundToIntegralTowardsZero x = roundToIntegralTowardsPositive x
@@ -348,22 +358,13 @@ theory GenericFloat
     (- max_representable_integer) <= i <= max_representable_integer ->
       to_int (of_int i) = i
 
-  predicate is_int (x:t)
-
-  (* temporary range check on int set to 2^64; TODO find the actual
-     max int that don't give INF with of_int for both clones *)
-  axiom of_int_is_int: forall x.
-    (- 0x10000000000000000) <= x <= 0x10000000000000000
-      -> is_int (of_int x)
-
-  axiom is_int_is_finite: forall x. is_int x -> is_finite x
-
   (* ceil axioms *)
   axiom ceil_is_int: forall x:t. is_finite x -> is_int (roundToIntegralTowardsPositive x)
 
   (* zero's sign is kept so '=' instead of eq is OK *)
   (* try is_int i -> ceil i = i *)
-  axiom ceil_of_int: forall i:int. roundToIntegralTowardsPositive (of_int i) = of_int i
+  axiom ceil_of_int: forall i:t. is_int i ->
+    roundToIntegralTowardsPositive i = i
 
   axiom ceil_le: forall x:t. x .<= (roundToIntegralTowardsPositive x)
 
@@ -374,10 +375,11 @@ theory GenericFloat
       (* or ? to_int (roundToIntegralTowardsPositive x) = Truncate.roundToIntegralTowardsPositive (to_real x) *)
       to_real (roundToIntegralTowardsPositive x) = FromInt.from_int (Truncate.ceil (to_real x))
 
- (* floor axioms *)
+  (* floor axioms *)
   axiom floor_is_int: forall x:t. is_finite x -> is_int (roundToIntegralTowardsNegative x)
 
-  axiom floor_of_int: forall i:int. roundToIntegralTowardsNegative (of_int i) .= of_int i
+  axiom floor_of_int: forall i:t.
+    is_int i -> roundToIntegralTowardsNegative i .= i
 
   axiom floor_le: forall x:t. (roundToIntegralTowardsNegative x) .<= x
 
@@ -390,21 +392,22 @@ theory GenericFloat
 
   (* rounding *)
 
+  axiom round_is_int: forall x. is_finite x ->
+    is_int (roundToIntegralTiesToAway x)
+
+  axiom round_of_int: forall i:t. is_int i -> roundToIntegralTiesToAway i .= i
+
   axiom to_int_down:
-    (* forall x:t. lt x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) -> to_int x = to_int (roundToIntegralTowardsNegative x) *)
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .< ((roundToIntegralTowardsPositive x) .- x) -> to_int x = to_int (roundToIntegralTowardsNegative x)
 
   axiom to_int_up:
-    (* forall x:t. gt x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) -> to_int x = to_int (roundToIntegralTowardsPositive x) *)
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .> ((roundToIntegralTowardsPositive x) .- x) -> to_int x = to_int (roundToIntegralTowardsPositive x)
 
   axiom to_int_down_tie:        (* check if to_int is rounding or RNE *)
-    (* forall x:t. eq x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) /\ is_negative x -> *)
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .= ((roundToIntegralTowardsPositive x) .- x) -> is_negative x ->
       to_int x = to_int (roundToIntegralTowardsNegative x)
 
   axiom to_int_up_tie:
-    (* forall x:t. eq x (div (add (roundToIntegralTowardsPositive x) (roundToIntegralTowardsNegative x)) two) -> is_positive x -> *)
     forall x:t. ((roundToIntegralTowardsPositive x) .- x) .= (x .- (roundToIntegralTowardsNegative x)) -> is_positive x ->
       to_int x = to_int (roundToIntegralTowardsPositive x)
 
@@ -428,7 +431,69 @@ theory GenericFloat
   axiom nearbyInt_is_finite : forall x:t. is_finite x -> is_finite (roundToIntegralTiesToAway x)
 end
 
+theory Float_BV_Converter
+  use bv.BV8
+  use bv.BV16
+  use bv.BV32
+  use bv.BV64
+
+  (* with unsigned int as bitvector *)
+  (* factorise to not have systematically all bv theories used  *)
+  type t
+
+  function of_ubv8  BV8.t  : t
+  function of_ubv16 BV16.t : t
+  function of_ubv32 BV32.t : t
+  function of_ubv64 BV64.t : t
+
+  (* /!\ axioms for those *)
+
+  (* the to_[us]bv* functions are used to convert to a modular or integer
+     type in ada, and as such the rounding follows the rounding rules in
+     Ada, i.e. RNA. Note the reverse ( of_[us]bv* ) will follow RNE
+     rounding however. *)
+
+  function to_ubv8  t : BV8.t
+  function to_ubv16 t : BV16.t
+  function to_ubv32 t : BV32.t
+  function to_ubv64 t : BV64.t
+
+  use import real.RealInfix
+  use real.FromInt
+
+  predicate is_finite t
+  predicate le t t
+  function to_real t : real
+  function round real : real
+
+  (** of unsigned bv axioms  *)
+
+  axiom of_ubv8_is_finite : forall x. is_finite (of_ubv8  x)
+  axiom of_ubv16_is_finite: forall x. is_finite (of_ubv16 x)
+  axiom of_ubv32_is_finite: forall x. is_finite (of_ubv32 x)
+  axiom of_ubv64_is_finite: forall x. is_finite (of_ubv64 x)
+
+  axiom of_ubv8_monotonic :
+    forall x y. BV8.ule  x y -> le (of_ubv8 x)  (of_ubv8 y)
+  axiom of_ubv16_monotonic:
+    forall x y. BV16.ule x y -> le (of_ubv16 x) (of_ubv16 y)
+  axiom of_ubv32_monotonic:
+    forall x y. BV32.ule x y -> le (of_ubv32 x) (of_ubv32 y)
+  axiom of_ubv64_monotonic:
+    forall x y. BV64.ule x y -> le (of_ubv64 x) (of_ubv64 y)
+
+  axiom of_ubv8_to_real : forall x.
+    to_real (of_ubv8 x)  = FromInt.from_int (BV8.to_uint x)
+  axiom of_ubv16_to_real: forall x.
+    to_real (of_ubv16 x) = FromInt.from_int (BV16.to_uint x)
+  (* of_ubv32_to_real is defined at cloning *)
+  axiom of_ubv64_to_real: forall x.
+    to_real (of_ubv64 x) = round (FromInt.from_int (BV64.to_uint x))
+end
+
 theory Float32
+  use int.Int
+  use import real.Real
   (* use bv.BV32 *)
 
   type t
@@ -438,19 +503,13 @@ theory Float32
   constant max_representable_integer : int = 16777216
   constant max_real : real = 0x1.FFFFFEp127
 
-  use int.Int
   clone export GenericFloat with
     type t = t,
     constant max_real = max_real,
     constant max_representable_integer = max_representable_integer
 
-  (* axiom oneF_bv : oneF      = from_bv (BV32.of_uint 0x3F80_0000) *)
-  (* axiom max_bv  : max_value = from_bv (BV32.of_uint 0x7F7F_FFFF) *)
-
-  (* axiom two_bv : two  = from_bv (BV32.of_uint 0x4000_0000) *)
   (* axiom half_bv: half = from_bv (BV32.of_uint 0x3F00_0000) *)
 
-  use import real.Real
   lemma round_bound :
     forall x : real [round x].
       x - 0x1p-24 * Abs.abs(x) - 0x1p-150 <= round x <= x + 0x1p-24 * Abs.abs(x) + 0x1p-150
@@ -458,6 +517,9 @@ end
 
 theory Float64
   use bv.BV64
+  use int.Int
+  use real.FromInt
+  use import real.Real
 
   type t
 
@@ -466,21 +528,13 @@ theory Float64
   constant max_representable_integer : int = 9007199254740992
   constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
 
-  use int.Int
-  use real.FromInt
-
   clone export GenericFloat with
-    type t           = t,
+    type t = t,
     constant max_real = max_real,
     constant max_representable_integer = max_representable_integer
 
-  (* axiom oneF_bv : oneF      = from_bv (BV64.of_uint 0x3FF0_0000_0000_0000) *)
-  (* axiom max_bv  : max_value = from_bv (BV64.of_uint 0x7FEF_FFFF_FFFF_FFFF) *)
-
-  (* axiom two_bv : two  = from_bv (BV64.of_uint 0x4000_0000_0000_0000) *)
   (* axiom half_bv: half = from_bv (BV64.of_uint 0x3FE0_0000_0000_0000) *)
 
-  use import real.Real
   axiom round_bound :
     forall x : real [round x].
       x - 0x1p-53 * Abs.abs(x) - 0x1p-1075 <= round x <= x + 0x1p-53 * Abs.abs(x) + 0x1p-1075
@@ -510,73 +564,13 @@ theory FloatConverter
 
 end
 
-theory Float_BV_Converter
-  (* with unsigned int as bitvector *)
-  (* factorise to not have systematically all bv theories used  *)
-  type t
-
-  use bv.BV8
-  use bv.BV16
-  use bv.BV32
-  use bv.BV64
-
-  function of_ubv8  BV8.t  : t
-  function of_ubv16 BV16.t : t
-  function of_ubv32 BV32.t : t
-  function of_ubv64 BV64.t : t
-
-  (* /!\ axioms for those *)
-
-  (* the to_[us]bv* functions are used to convert to a modular or integer
-     type in ada, and as such the rounding follows the rounding rules in
-     Ada, i.e. RNA. Note the reverse ( of_[us]bv* ) will follow RNE
-     rounding however. *)
-
-  function to_ubv8  t : BV8.t
-  function to_ubv16 t : BV16.t
-  function to_ubv32 t : BV32.t
-  function to_ubv64 t : BV64.t
-
-  use import real.RealInfix
-  use real.FromInt
-
-  predicate is_finite t
-  predicate (.<=) t t
-  function to_real t : real
-  function round real : real
-
-  (** of unsigned bv axioms  *)
-
-  axiom of_ubv8_is_finite : forall x. is_finite (of_ubv8  x)
-  axiom of_ubv16_is_finite: forall x. is_finite (of_ubv16 x)
-  axiom of_ubv32_is_finite: forall x. is_finite (of_ubv32 x)
-  axiom of_ubv64_is_finite: forall x. is_finite (of_ubv64 x)
-
-  axiom of_ubv8_monotonic :
-    forall x y. BV8.ule  x y -> (of_ubv8 x) .<= (of_ubv8 y)
-  axiom of_ubv16_monotonic:
-    forall x y. BV16.ule x y -> (of_ubv16 x) .<= (of_ubv16 y)
-  axiom of_ubv32_monotonic:
-    forall x y. BV32.ule x y -> (of_ubv32 x) .<= (of_ubv32 y)
-  axiom of_ubv64_monotonic:
-    forall x y. BV64.ule x y -> (of_ubv64 x) .<= (of_ubv64 y)
-
-  axiom of_ubv8_to_real : forall x.
-    to_real (of_ubv8 x)  = FromInt.from_int (BV8.to_uint x)
-  axiom of_ubv16_to_real: forall x.
-    to_real (of_ubv16 x) = FromInt.from_int (BV16.to_uint x)
-  (* of_ubv32_to_real is defined at cloning *)
-  axiom of_ubv64_to_real: forall x.
-    to_real (of_ubv64 x) = round (FromInt.from_int (BV64.to_uint x))
-end
-
 theory Float32_BV_Converter
   use import Float32
 
   clone export Float_BV_Converter with
     type t = t,
     predicate is_finite = is_finite,
-    predicate (.<=) = (.<=),
+    predicate le = (.<=),
     function to_real = to_real,
     function round = round
 
@@ -590,7 +584,7 @@ theory Float64_BV_Converter
   clone export Float_BV_Converter with
     type t = t,
     predicate is_finite = is_finite,
-    predicate (.<=) = (.<=),
+    predicate le = (.<=),
     function to_real = to_real,
     function round = round
 
