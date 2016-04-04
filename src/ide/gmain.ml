@@ -1680,6 +1680,7 @@ let () =
 
 let () =
   let iter (name,desc,strat,k) =
+    let desc = Scanf.format_from_string desc "" in
     let b = GButton.button ~packing:strategies_box#add
       ~label:(sanitize_markup name) ()
     in
@@ -2304,6 +2305,7 @@ let () =
   let submenu = tools_factory#add_submenu "Strategies" in
   let submenu = new GMenu.factory submenu ~accel_group in
   let iter (name,desc,strat,k) =
+    let desc = Scanf.format_from_string desc "" in
     let callback () = apply_strategy_on_selection strat in
     let ii = submenu#add_image_item
       ~label:(sanitize_markup name) ~callback ()

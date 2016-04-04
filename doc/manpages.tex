@@ -307,17 +307,36 @@ proof obligations, the corresponding proof attempts are marked obsolete.
   actions are performed even if the goal is already proved. The second
   choice allows to compare provers on the same goal.
 
+\item[Strategies] section provides a set of actions that are
+  performed on the selected goal(s):
+  \begin{description}
+  \item[Split] splits the current goal into subgoals if it is a
+    conjunction of two or more goals. It corresponds to the
+    \verb|split_goal_wp| transformation.
+  \item[Inline] inlines the definitions in the conclusion of the goal.
+    It corresponds to the \verb|introduce_premises| transformation
+    follwoed by \verb|inline_goal|.
+  \item[Auto level 1] is a strategy that first applies a few provers
+    on the goal with a short time limit, then splits the goal and
+    tries again on the subgoals
+  \item[Auto level 2] is a strategy more elaborate than level 1, that
+    attempts to apply a few transformations that are typically
+    useful. It also tries the provers with a larger time limit.
+  \end{description}
+  A more detailed description of strategies is given in
+  Section~\ref{sec:strategies}, as well as a description on how to
+  design strategies of your own.
+
 \item[Provers] provide a button for each detected prover. Clicking on such a
   button starts the corresponding prover on the selected goal(s).
 
-\item[Split] splits the current goal into subgoals if it is a
-  conjunction of two or more goals. It corresponds to the
-  \verb|split_goal_wp| transformation.
+% \item[Inline] replaces the head predicate symbol of the goal with its
+%   definition. It corresponds to the
+%   \verb|inline_goal| transformation.
 
-\item[Inline] replaces the head predicate symbol of the goal with its
-  definition. It corresponds to the
-  \verb|inline_goal| transformation.
-
+\item[Tools] section provides a set of specific action that are
+  typically performed on the selected goal(s). :
+  \begin{description}
 \item[Edit] starts an editor on the selected task.
 
   For automatic provers, this allows to see the file sent to the
@@ -340,6 +359,7 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 
 \item[Interrupt] cancels all the proof attempts currently scheduled
   but not yet started.
+\end{description}
 
 \end{description}
 
@@ -350,7 +370,7 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 \begin{description}
 \item[Add File] adds a file in the GUI.
 %\item[Detect provers] runs provers auto-detection
-\item[Preferences] opens a window for modifying preferred
+]\item[Preferences] opens a window for modifying preferred
   configuration parameters, see details below.
 \item[Reload] reloads the input files from disk, and update the session state accordingly.
 \item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
