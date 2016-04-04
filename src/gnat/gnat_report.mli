@@ -40,13 +40,6 @@ open Gnat_objectives
                 "cntexmp"    : ??? needs documentation
                 }
 
-     stats_rec = { [prover_name : stats_entry] }
-
-     stats_entry = { "count"     : int,
-                     "max_steps" : int,
-                     "max_time"  : float }
-
-
    The field "id" contains the id of the VC. The field "reason" identifies the
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
    the VC has been proved or not. The field "extra_info" specifies more
@@ -57,9 +50,19 @@ open Gnat_objectives
    present, "vc_file" contains the name of a VC file to be used for manual
    proof, and "editor_cmd" the command to spawn for an external editor for this
    VC.
+
    The optional field "stats" contains a mapping from each prover name to a
    stat record, which indicates the number of VCs proved by this prover, with
-   max time and steps.
+   max time and steps. Note that stats_rec is a record with a variable number
+   of fields, indicated with the [] syntax. It's not a list, nor does it
+   contain a list.
+
+     stats_rec = { [prover_name : stats_entry] }
+
+     stats_entry = { "count"     : int,
+                     "max_steps" : int,
+                     "max_time"  : float }
+
    *)
 
 val register :
