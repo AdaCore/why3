@@ -37,7 +37,7 @@ open Gnat_objectives
                 "vc_file"    : string,
                 "editor_cmd" : string,
                 "stats"      : stats_rec,
-                "cntexmp"    : ??? needs documentation
+                "cntexmp"    : cntexmp_rec
                 }
 
    The field "id" contains the id of the VC. The field "reason" identifies the
@@ -62,6 +62,18 @@ open Gnat_objectives
      stats_entry = { "count"     : int,
                      "max_steps" : int,
                      "max_time"  : float }
+
+  The counter example information is stored in the cntexmp field. At the top
+  level, this is a mapping from file names to linesentry record.
+
+      cntexmp_rec = { [filename : linesentry] }
+
+  A linesentry is a mapping from lines to line information. A linenumber is
+  always a string. Usually the strings are integer values saved as strings, but
+  the special value "vc_line" is also used.
+
+      linesentry = { [ linenumber : lineentry }
+
 
    *)
 
