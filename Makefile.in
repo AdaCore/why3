@@ -248,7 +248,7 @@ opt:  lib/why3/why3.cmxa
 
 lib/why3/why3.cma: lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC)  -a $(BFLAGS) -o $@ $^
+	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 lib/why3/why3.cmxa: lib/why3/why3.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -614,46 +614,38 @@ clean::
 # Why3server #
 ##############
 
-SERVER_MODULES:= logging arraylist options queue readbuf request writebuf server_main
-SERVER_C:= $(addprefix src/tools/, $(addsuffix .c, $(SERVER_MODULES)))
-SERVER_H:= $(addprefix src/tools/, $(addsuffix .h, $(SERVER_MODULES)))
-SERVER_O:= $(addprefix src/tools/, $(addsuffix .o, $(SERVER_MODULES)))
+SERVER_MODULES := logging arraylist options queue readbuf request \
+		  writebuf server-unix server-win
 
-opt: lib/why3server$(EXE)
+CPULIM_MODULES := cpulimit-unix cpulimit-win
+
+SERVER_O := $(addprefix src/server/, $(addsuffix .o, $(SERVER_MODULES)))
+
+CPULIM_O := $(addprefix src/server/, $(addsuffix .o, $(CPULIM_MODULES)))
+
+TOOLS = lib/why3server$(EXE) lib/why3cpulimit$(EXE)
+
+byte opt: $(TOOLS)
 
 lib/why3server$(EXE): $(SERVER_O)
-	gcc -o $@ $^
+	$(CC) -Wall -o $@ $^
+
+lib/why3cpulimit$(EXE): $(CPULIM_O)
+	$(CC) -Wall -o $@ $^
 
 %.o: %.c %.h
-	gcc -c -Wall -g -o $@ $<
-%.o: %.c
-	gcc -c -Wall -g -o $@ $<
+	$(CC) -c -Wall -g -o $@ $<
 
-src/tools/main.o:: src/tools/server-unix.c src/tools/server-win.c
+%.o: %.c
+	$(CC) -c -Wall -g -o $@ $<
 
 install_no_local::
 	cp -f lib/why3server$(EXE) $(LIBDIR)/why3/why3server$(EXE)
+	cp -f lib/why3cpulimit$(EXE) $(LIBDIR)/why3/why3cpulimit$(EXE)
+	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 clean::
-	 rm -f $(SERVER_O)
-
-install_spark2014:
-	mkdir -p $(BINDIR)
-	mkdir -p $(DATADIR)/why3
-	mkdir -p $(DATADIR)/why3/theories
-	mkdir -p $(DATADIR)/why3/drivers
-	mkdir -p $(DATADIR)/why3/modules
-	mkdir -p $(DATADIR)/why3/libs
-	cp -f theories/*.why $(DATADIR)/why3/theories
-	cp -f modules/*.mlw $(DATADIR)/why3/modules
-	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
-	cp -f share/why3session.dtd $(DATADIR)/why3
-	cp -f lib/why3server$(EXE) $(BINDIR)/why3server$(EXE)
-	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
-	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize$(EXE)
-	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
-	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
-	cp -rf lib/coq $(DATADIR)/why3/libs
+	rm -f $(SERVER_O) $(CPULIM_O) $(TOOLS)
 
 ##########
 # gallery
@@ -873,7 +865,7 @@ lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-lib/coq-tactic/why3tac.cma: src/driver/vc_client.o lib/why3/why3.cma $(COQPCMO)
+lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
@@ -1441,24 +1433,6 @@ clean::
 	$(MAKE) -C src/jessie clean
 
 endif
-
-#######
-# tools
-#######
-
-TOOLS = lib/why3-cpulimit$(EXE)
-
-byte opt: $(TOOLS)
-
-lib/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
-	$(CC) -Wall -o $@ $^
-
-clean::
-	rm -f lib/why3-cpulimit$(EXE)
-
-install_no_local::
-	cp -f lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
-	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 #########
 # why3doc

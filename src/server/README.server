@@ -48,9 +48,3 @@
 // events are incoming clients, read/write operations on sockets, and
 // terminating child processes. Lists of child processes and connected clients
 // are maintained.
-
-#ifdef _WIN32
-# include "server-win.c"
-#else
-# include "server-unix.c"
-#endif

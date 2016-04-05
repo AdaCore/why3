@@ -5,6 +5,8 @@
 // windows: you need to start them first, and get notified when they are
 // terminated.
 
+#ifdef _WIN32
+
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -648,3 +650,5 @@ int main(int argc, char **argv) {
       }
    }
 }
+
+#endif /* _WIN32 */

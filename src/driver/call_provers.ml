@@ -267,7 +267,7 @@ let actualcommand command ~use_why3cpulimit limit interactive file =
   in
   let args =
     if use_why3cpulimit && not interactive then
-      let cpulimit_bin = Filename.concat Config.libdir "why3-cpulimit" in
+      let cpulimit_bin = Filename.concat Config.libdir "why3cpulimit" in
       let cpulimit_time =
         (* for steps limit use 2 * t + 1 time *)
         if limit.limit_steps <> None then string_of_int (2 * timelimit + 1)

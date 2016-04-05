@@ -17,6 +17,8 @@
 
 /* $Id: cpulimit-win.c,v 1.3 2009-12-09 08:28:00 nrousset Exp $ */
 
+#ifdef _WIN32
+
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -202,6 +204,8 @@ int main(int argc, char *argv[]) {
   if (w == WAIT_TIMEOUT) return 152;
   return ex;
 }
+
+#endif /* _WIN32 */
 
 // How to compile under Cygwin (needs make, gcc and win32api):
 //                 gcc -Wall -o cpulimit cpulimit.c

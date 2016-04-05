@@ -76,9 +76,9 @@ let run_server () =
 let force_connect () =
   match !socket with
   | None when !standalone ->
-      run_server ();
-      (* sleep is needed before connecting, or the server will not be ready
-         yet *)
+      let _pid = run_server () in
+      (* sleep is needed before connecting,
+         or the server will not be ready yet *)
       ignore (Unix.select [] [] [] 0.1);
       connect()
   | _ -> ()

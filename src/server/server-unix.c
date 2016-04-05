@@ -5,6 +5,8 @@
 // Contrary to the situation on windows, e.g. a read event means that the next
 // call to read() will not block.
 
+#ifndef _WIN32
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -544,3 +546,5 @@ int main(int argc, char **argv) {
     }
   }
 }
+
+#endif /* _WIN32 */
