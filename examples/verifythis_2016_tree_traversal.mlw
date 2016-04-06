@@ -231,6 +231,13 @@ module TreeShape
     | GoBack
     | Finish
 
+  function next_phase (ph:phase) : phase =
+    match ph with
+    | GoLeft -> GoRight
+    | GoRight -> GoBack
+    | GoBack -> GoLeft
+    | Finish -> Finish
+    end
   (** [rotated memo1 memo2 ph c] describe how [c] is rotated in
       [memo2] with respect to its initial position in [memo1] for
       current phase [ph]. In final phase, it is not rotated but
@@ -307,10 +314,10 @@ module Recursive
     ensures { was_marked t (old memo).mark memo.mark }
   = let x = ref (anyloc ()) in (* ==> Tree x, y *)
     let y = ref (anyloc ()) in
+    x := root; (* ==> x = root *)
     let entered = ref false in
     (* ^ Used to encode the do { .. } while() loop as a while() {..}.
        Iterations will set the flag. *)
-    x := root; (* ==> x = root *)
     let ghost z = ref (null ()) in (* Store previously explored node. *)
     (* Loop body. [mem0] is memory state at start of recursive call,
        [ph] is phase. *)
@@ -332,17 +339,12 @@ module Recursive
         if (old memo).accessor[Left][!z] = null
            = (old memo).accessor[Right][!z]
         then memo.accessor = (old memo).accessor
-        else match ph with
-        | GoLeft -> rotated mem0 memo.accessor GoRight !z
-        | GoRight -> rotated mem0 memo.accessor GoBack !z
-        | GoBack -> rotated mem0 memo.accessor GoLeft !z
-        | Finish -> false
-        end }
+        else rotated mem0 memo.accessor (next_phase ph) !z }
       (* In [Finish] phase, the code throws [Stop] without changing
          anything. *)
       raises { Stop -> ph = Finish /\ memo = old memo }
-    = if !entered && is_null !x then raise Stop; (* ==> do { BODY *)
-      entered := true;                           (*  } while (x != null) *)
+    = if !entered && is_null !x then raise Stop; (* ==> do { BODY         *)
+      entered := true;                           (*  } while (x != null); *)
       (ghost z := !x);
       set_mark !x true; (* ==> x.mark = true; *)
       if is_null (get_acc Left !x) && is_null (get_acc Right !x)
@@ -403,5 +405,276 @@ module Recursive
 
 end
 
-(* TODO: derecursification. *)
+(** In this module we provide a proof of the initial algorithm by
+    derecursiving the previous one *)
+module Iterative
 
+  use import int.Int
+  use import map.Map
+  use import map.Const
+  use import bintree.Tree
+  use import bintree.Size
+  use import option.Option
+  use import ref.Ref
+  use import Memory
+  use import TreeShape
+
+  (** Snapshot of all relevant memory values in the program *)
+  type snap = {
+    pointers : pmem;
+    cursor : loc;
+    parent : loc;
+    marks : map loc bool;
+  }
+
+  (** Stack frame in the recursive version. Fields are
+      assigned as the code pointer increase. *)
+  type frame = {
+    (* Memory & ghost argument at call site (pc>=0). *)
+    memo0 : snap;
+    tree : treel;
+    (* right & left trees/pointers (pc>=1) *)
+    tleft : treel;
+    pleft : loc;
+    tright : treel;
+    pright : loc;
+    (* Memory after first bloc call (pc>=2) *)
+    memo1 : snap;
+    (* Memory after first recursive call (pc >= 4) *)
+    memo2 : snap;
+    (* Memory after second bloc call (pc >= 5) *)
+    memo3 : snap;
+    (* Memory after second recursive call (pc >= 6) *)
+    memo4 : snap;
+  }
+
+  (** Find out current memory state with respect to code pointer. *)
+  function frame_memo (f:frame) (pc:int) : snap =
+    if pc <= 0 then f.memo0
+    else if pc <= 1 then f.memo1
+    else if pc <= 2 then f.memo2
+    else if pc <= 3 then f.memo3
+    else f.memo4
+
+  (** Postcondition relation for [bloc] calls. *)
+  predicate bloc_rel (mem0:pmem) (ph:phase) (s1 s2:snap) =
+    s2.parent = s1.cursor /\ s2.cursor = s2.pointers[Parent][s2.parent] /\
+    s2.marks[s2.parent] /\
+    (forall l. l <> s2.parent -> s2.marks[l] = s1.marks[l]) /\
+    if s1.pointers[Left][s1.cursor] = null = s1.pointers[Right][s1.cursor]
+    then s2.pointers = s1.pointers
+    else rotated mem0 s2.pointers (next_phase ph) s2.parent
+
+  (** postcondition relation for recursive ([aux]) calls. *)
+  predicate rec_rel (t:treel) (s1 s2:snap) =
+    unchanged s1.pointers s2.pointers /\
+    s2.cursor = s1.parent /\ s2.parent = s1.cursor /\
+    was_marked t s1.marks s2.marks
+
+  (** Call stack *)
+  type stack =
+    | Bottom
+    | Running stack int frame
+    | Done
+
+  (** Describe a valid call stack. Mostly precise which relation
+      between states holds. Note that in the previous version,
+      Why3 did that part for us via the weakest precondition calculus. *)
+  predicate is_stack (t:treel) (stop scur:snap)
+                     (s:stack) (calls:option treel) =
+    match s with
+    | Bottom -> stop = scur /\ calls = Some t
+    | Running s pc f ->
+        0 <= pc <= 4 /\
+        (* Correctness of caller stack. *)
+        let m0 = f.memo0 in
+        is_stack t stop m0 s (Some f.tree) /\
+        (* Precondition for recursive call. *)
+        m0.cursor <> null /\ is_tree m0.pointers f.tree m0.cursor m0.parent /\
+        (* Initially obtained pointers & subtrees. *)
+        f.tree = Node f.tleft m0.cursor f.tright /\
+        f.pleft = m0.pointers[Left][m0.cursor] /\
+        f.pright = m0.pointers[Right][m0.cursor] /\
+        (* First bloc run, if completed normally. *)
+        (pc >= 1 -> bloc_rel m0.pointers GoLeft m0 f.memo1 /\
+                    f.pleft <> null /\ f.pright <> null) /\
+        (* First recursive call. *)
+        (pc >= 2 -> rec_rel f.tleft f.memo1 f.memo2) /\
+        (* Second bloc run. *)
+        (pc >= 3 -> bloc_rel m0.pointers GoRight f.memo2 f.memo3) /\
+        (* Second recursive call. *)
+        (pc >= 4 -> rec_rel f.tright f.memo3 f.memo4) /\
+        (* Current memory state. *)
+        frame_memo f pc = scur /\
+        match calls with
+        | None -> pc <> 1 /\ pc <> 3
+        | Some u ->
+            if pc = 1 then u = f.tleft else pc = 3 /\ u = f.tright
+        end
+    | Done -> rec_rel t stop scur /\ calls = None
+    end
+
+  (** Termination argument. In fully general cases, we would need
+     a lexicographic ordering but here an integer size suffice. *)
+  constant large_enough : int = 100
+  function stack_size (st:stack) : int = match st with
+    | Bottom -> 1
+    | Done -> 0
+    | Running s pc f ->
+        stack_size s + (large_enough - pc) + if pc = 0
+        then large_enough * (size f.tleft + size f.tright)
+        else if pc <= 2
+        then large_enough * size f.tright
+        else 0
+    end
+
+  let rec lemma stack_size_pos (st:stack) : unit
+    requires { exists t stop scur calls. is_stack t stop scur st calls }
+    ensures { stack_size st >= 0 }
+    variant { st }
+  = match st with Running s _ _ -> stack_size_pos s | _ -> () end
+
+  (** Create a stack frame for a recursive call *)
+  let ghost opening (t ct:treel) (stop scur:snap) (ghost st:ref stack)
+    requires { is_stack t stop scur !st (Some ct) }
+    requires { is_tree scur.pointers ct scur.cursor scur.parent }
+    requires { scur.cursor <> null }
+    writes { st }
+    ensures { is_stack t stop scur !st None }
+    ensures { stack_size !st <= stack_size !(old st) +
+                                large_enough * size ct }
+  = match ct with
+    | Empty -> absurd
+    | Node lf _ rg ->
+      let f = {
+        memo0 = scur; tree = ct; tleft = lf; tright = rg;
+        pleft = scur.pointers[Left][scur.cursor];
+        pright = scur.pointers[Right][scur.cursor];
+        memo1 = scur; memo2 = scur; memo3 = scur; memo4 = scur;
+      } in
+      st := Running !st 0 f
+    end
+
+  (** Remove a stack frame at end of recursive call simulation *)
+  let ghost closing (t ct:treel) (stop sprev scur:snap)
+                    (ghost st:ref stack) : unit
+    requires { is_stack t stop sprev !st (Some ct) }
+    requires { rec_rel ct sprev scur }
+    writes { st }
+    ensures { is_stack t stop scur !st None }
+    ensures { stack_size !st < stack_size !(old st) }
+  = match !st with
+    | Bottom -> st := Done
+    | Done -> absurd
+    | Running s pc f ->
+      let f = if pc = 1 then { f with memo2 = scur }
+      else { f with memo4 = scur } in
+      st := Running s (pc+1) f
+    end
+
+  (** Advance code pointer when a bloc is run. Takes care to
+      open/close new frame as needed. *)
+  let ghost continuing (t:treel) (stop sprev scur:snap)
+                       (ghost st:ref stack)
+    requires { is_stack t stop sprev !st None }
+    requires { match !st with
+      | Bottom | Done -> false
+      | Running _ pc f ->
+          let ph =
+            if pc = 0 then GoLeft else if pc = 2 then GoRight else GoBack in
+          bloc_rel f.memo0.pointers ph sprev scur
+      end }
+    writes { st }
+    ensures { is_stack t stop scur !st None }
+    ensures { stack_size !st < stack_size !(old st) }
+  = match !st with
+    | Bottom | Done -> absurd
+    | Running s pc f ->
+      not_below f.memo0.pointers f.tleft f.tright
+                f.memo0.cursor f.memo0.parent;
+      if pc = 0 then
+        if is_null f.pleft && is_null f.pright
+        then begin
+          st := s;
+          assert { f.tleft = Empty /\ f.tright = Empty };
+          closing t f.tree stop f.memo0 scur st
+        end else begin
+          let f = { f with memo1 = scur } in
+          st := Running s (pc+1) f;
+          ext_set (footprint f.tleft) f.memo0.pointers scur.pointers
+                  f.tleft f.pleft f.memo0.cursor;
+          opening t f.tleft stop scur st;
+        end
+      else if pc = 2 then begin
+        let f = { f with memo3 = scur } in
+        st := Running s (pc+1) f;
+        ext_set (footprint f.tright) f.memo0.pointers scur.pointers
+                f.tright f.pright f.memo0.cursor;
+        opening t f.tright stop scur st;
+      end else if pc = 4 then begin
+        st := s;
+        assert { unchanged scur.pointers f.memo0.pointers };
+        closing t f.tree stop f.memo0 scur st
+      end
+    end
+
+  (** The main algorithm. *)
+  let markTree (ghost t:treel) (root:loc) : unit
+    (* Requires a well-formed non-empty tree *)
+    requires { is_tree memo.accessor t root null /\ root <> null }
+    writes { memo, non_det }
+    (* Tree shape is unchanged *)
+    ensures { is_tree memo.accessor t root null }
+    ensures { unchanged (old memo).accessor memo.accessor }
+    (* All nodes are marked. *)
+    ensures { was_marked t (old memo).mark memo.mark }
+  = let x = ref (anyloc ()) in (* ==> Tree x, y *)
+    let y = ref (anyloc ()) in
+    let ghost z = ref (null ()) in
+    let ghost snapshot () : snap
+      ensures { result.pointers = memo.accessor }
+      ensures { result.cursor = !x }
+      ensures { result.parent = !z }
+      ensures { result.marks = memo.mark }
+    = { pointers = get_all_accs ();
+        cursor = !x; parent = !z;
+        marks = get_all_marks () } in
+    x := root; (* ==> x = root; *)
+    let ghost stop = snapshot () in
+    let ghost scur = ref stop in
+    let ghost st = ref Bottom in
+    ghost opening t t stop stop st;
+    let entered = ref false in (* encode do-while loop. *)
+    while not(abstract ensures { result <-> !x = null }
+        !entered && is_null !x end)
+    do (* ==> do { BODY } while(x != null); *)
+      invariant { !x = null -> !entered }
+      invariant { !scur.pointers = memo.accessor }
+      invariant { !scur.cursor = !x }
+      invariant { !scur.parent = !z }
+      invariant { !scur.marks = memo.mark }
+      invariant { is_stack t stop !scur !st None }
+      variant { stack_size !st }
+      entered := true;
+      (ghost z := !x);
+      set_mark !x true; (* ==> x.mark = true; *)
+      if is_null (get_acc Left !x) && is_null (get_acc Right !x)
+        (* ==> if (x.left == null && x.right == null) { *)
+      then begin
+        y := get_acc Parent !x; (* ==> y = x.parent; *)
+      end
+      else begin (* ==> } else { *)
+        y := get_acc Left !x; (* ==> y = x.left; *)
+        set_acc Left !x (get_acc Right !x); (* ==> x.left = x.right; *)
+        set_acc Right !x (get_acc Parent !x); (* ==> x.right = x.parent; *)
+        set_acc Parent !x !y; (* ==> x.parent = y; *)
+      end; (* ==> } *)
+      x := !y; (* ==> x = y; *)
+      let ghost sprev = !scur in
+      ghost scur := snapshot ();
+      ghost continuing t stop sprev !scur st;
+    done; (* ==> end 'do while' *)
+    ghost (match !st with Done -> () | _ -> absurd end);
+    ghost ext_cur stop.pointers t root (null ())
+
+end

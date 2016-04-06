@@ -4,6 +4,7 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2016_tree_traversal.mlw" expanded="true">
 <theory name="Memory" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -21,9 +22,8 @@
  <proof prover="0"><result status="valid" time="0.08" steps="376"/></proof>
  </goal>
 </theory>
-<theory name="Recursive" sum="af053c68b886727943bb49343cb4db19" expanded="true">
+<theory name="Recursive" sum="d97050d2b88a4229b21e2db091739c5d" expanded="true">
  <goal name="WP_parameter markTree" expl="VC for markTree">
- <proof prover="0"><result status="unknown" time="0.35"/></proof>
  <transf name="split_goal_wp">
   <goal name="WP_parameter markTree.1" expl="1. exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
@@ -86,7 +86,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter markTree.21" expl="21. postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter markTree.22" expl="22. precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
@@ -119,7 +119,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter markTree.32" expl="32. postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="70"/></proof>
   </goal>
   <goal name="WP_parameter markTree.33" expl="33. precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
@@ -179,7 +179,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter markTree.52" expl="52. postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="60"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="71"/></proof>
   </goal>
   <goal name="WP_parameter markTree.53" expl="53. precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
@@ -212,7 +212,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter markTree.63" expl="63. postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="58"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="69"/></proof>
   </goal>
   <goal name="WP_parameter markTree.64" expl="64. precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
@@ -327,6 +327,347 @@
   </goal>
   <goal name="WP_parameter markTree.101" expl="101. postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Iterative" sum="69139e97b83b0216d7c7d00561c6672a" expanded="true">
+ <goal name="WP_parameter stack_size_pos" expl="VC for stack_size_pos">
+ <proof prover="0"><result status="valid" time="0.10" steps="92"/></proof>
+ </goal>
+ <goal name="WP_parameter opening" expl="VC for opening">
+ <proof prover="0"><result status="valid" time="0.04" steps="56"/></proof>
+ </goal>
+ <goal name="WP_parameter closing" expl="VC for closing">
+ <proof prover="0"><result status="valid" time="1.15" steps="1065"/></proof>
+ </goal>
+ <goal name="WP_parameter continuing" expl="VC for continuing">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter continuing.1" expl="1. unreachable point">
+  <proof prover="0"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.2" expl="2. unreachable point">
+  <proof prover="0"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.10" steps="87"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.4" expl="4. assertion">
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="52"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="1.00" steps="755"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.8" expl="8. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="41"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.9" expl="9. precondition">
+  <proof prover="0"><result status="valid" time="0.15" steps="72"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.10" expl="10. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="51"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.32" steps="331"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="74"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="74"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.15" expl="15. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.16" expl="16. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="119"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.34" steps="152"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.18" expl="18. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.19" expl="19. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="49"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.20" expl="20. precondition">
+  <proof prover="0"><result status="valid" time="0.67" steps="565"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.21" expl="21. precondition">
+  <proof prover="0"><result status="valid" time="0.84" steps="246"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.22" expl="22. precondition">
+  <proof prover="0"><result status="valid" time="0.80" steps="233"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.23" expl="23. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.24" expl="24. postcondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="100"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.25" expl="25. precondition">
+  <proof prover="0"><result status="valid" time="0.96" steps="375"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.26" expl="26. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.27" expl="27. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="53"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.28" expl="28. precondition">
+  <proof prover="0"><result status="valid" time="2.34" steps="1010"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.29" expl="29. precondition">
+  <proof prover="0"><result status="valid" time="1.88" steps="486"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.30" expl="30. precondition">
+  <proof prover="0"><result status="valid" time="2.06" steps="449"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.31" expl="31. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.32" expl="32. postcondition">
+  <proof prover="0"><result status="valid" time="0.27" steps="119"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.33" expl="33. assertion">
+  <proof prover="0" timelimit="20"><result status="valid" time="5.65" steps="1839"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.34" expl="34. precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="54"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.35" expl="35. precondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter continuing.35.1" expl="1. VC for continuing">
+   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+   <goal name="WP_parameter continuing.35.2" expl="2. VC for continuing">
+   <proof prover="0"><result status="valid" time="0.21" steps="135"/></proof>
+   </goal>
+   <goal name="WP_parameter continuing.35.3" expl="3. VC for continuing">
+   <proof prover="0"><result status="valid" time="0.37" steps="191"/></proof>
+   </goal>
+   <goal name="WP_parameter continuing.35.4" expl="4. VC for continuing">
+   <transf name="introduce_premises">
+    <goal name="WP_parameter continuing.35.4.1" expl="1. VC for continuing">
+    <transf name="inline_goal">
+     <goal name="WP_parameter continuing.35.4.1.1" expl="1. VC for continuing">
+     <transf name="split_goal_wp">
+      <goal name="WP_parameter continuing.35.4.1.1.1" expl="1. VC for continuing">
+      <proof prover="0"><result status="valid" time="0.55" steps="241"/></proof>
+      </goal>
+      <goal name="WP_parameter continuing.35.4.1.1.2" expl="2. VC for continuing">
+      <proof prover="0"><result status="valid" time="1.69" steps="718"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter continuing.36" expl="36. postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.37" expl="37. postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.38" expl="38. postcondition">
+  <proof prover="0"><result status="valid" time="1.06" steps="649"/></proof>
+  </goal>
+  <goal name="WP_parameter continuing.39" expl="39. postcondition">
+  <proof prover="0"><result status="valid" time="0.19" steps="115"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter markTree" expl="VC for markTree">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter markTree.1" expl="1. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.4" expl="4. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.5" expl="5. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.6" expl="6. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.7" expl="7. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.8" expl="8. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.9" expl="9. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.10" expl="10. VC for markTree">
+  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.15" expl="15. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.16" expl="16. precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="148"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.17" expl="17. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.18" expl="18. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.19" expl="19. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.20" expl="20. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.21" expl="21. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.22" expl="22. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.23" expl="23. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="115"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.24" expl="24. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.25" expl="25. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.26" expl="26. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.27" expl="27. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.28" expl="28. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.29" expl="29. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.30" expl="30. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.31" expl="31. precondition">
+  <proof prover="0"><result status="valid" time="1.92" steps="762"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.32" expl="32. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04" steps="49"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.33" expl="33. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.34" expl="34. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.35" expl="35. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.36" expl="36. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.37" expl="37. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.38" expl="38. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="120"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.39" expl="39. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.40" expl="40. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.41" expl="41. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.42" expl="42. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.43" expl="43. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.44" expl="44. precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.45" expl="45. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.46" expl="46. precondition">
+  <proof prover="0"><result status="valid" time="3.85" steps="1708"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.47" expl="47. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.48" expl="48. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.49" expl="49. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.50" expl="50. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.51" expl="51. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.52" expl="52. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.53" expl="53. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.07" steps="118"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.54" expl="54. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="53"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.55" expl="55. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.56" expl="56. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.57" expl="57. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.58" expl="58. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter markTree.59" expl="59. unreachable point">
+  <proof prover="0"><result status="valid" time="0.11" steps="170"/></proof>
   </goal>
  </transf>
  </goal>
