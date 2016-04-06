@@ -66,13 +66,23 @@ open Gnat_objectives
   The counter example information is stored in the cntexmp field. At the top
   level, this is a mapping from file names to linesentry record.
 
-      cntexmp_rec = { [filename : linesentry] }
+     cntexmp_rec = { [filename : linesentry] }
 
-  A linesentry is a mapping from lines to line information. A linenumber is
-  always a string. Usually the strings are integer values saved as strings, but
-  the special value "vc_line" is also used.
+  A linesentry is a mapping from linenumbers to line information. A linenumber
+  is always a string. Usually the strings are integer values saved as strings,
+  but the special value "vc_line" is also used.
 
-      linesentry = { [ linenumber : lineentry }
+     linesentry = { [ linenumber : list lineentry }
+
+     lineentry = { "kind"  : string,
+                   "name"  : string,
+                   "value" : string }
+
+  Possible values for "kind" are
+   - "variable"
+   - "error_message"
+   - "old"
+   - "result"
 
 
    *)
