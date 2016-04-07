@@ -398,22 +398,32 @@ theory GenericFloat
   axiom round_of_int: forall i:t. is_int i -> roundToIntegralTiesToAway i .= i
 
   axiom to_int_down:
-    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .< ((roundToIntegralTowardsPositive x) .- x) -> to_int x = to_int (roundToIntegralTowardsNegative x)
+    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .< ((roundToIntegralTowardsPositive x) .- x) ->
+      (* to_int x = to_int (roundToIntegralTowardsNegative x) *)
+      roundToIntegralTiesToAway x = roundToIntegralTowardsNegative x
 
   axiom to_int_up:
-    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .> ((roundToIntegralTowardsPositive x) .- x) -> to_int x = to_int (roundToIntegralTowardsPositive x)
+    forall x:t. (x .- (roundToIntegralTowardsNegative x)) .> ((roundToIntegralTowardsPositive x) .- x) ->
+      (* to_int x = to_int (roundToIntegralTowardsPositive x) *)
+      roundToIntegralTiesToAway x = roundToIntegralTowardsPositive x
 
   axiom to_int_down_tie:        (* check if to_int is rounding or RNE *)
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .= ((roundToIntegralTowardsPositive x) .- x) -> is_negative x ->
-      to_int x = to_int (roundToIntegralTowardsNegative x)
+      (* to_int x = to_int (roundToIntegralTowardsNegative x) *)
+      roundToIntegralTiesToAway x = roundToIntegralTowardsNegative x
 
   axiom to_int_up_tie:
     forall x:t. ((roundToIntegralTowardsPositive x) .- x) .= (x .- (roundToIntegralTowardsNegative x)) -> is_positive x ->
-      to_int x = to_int (roundToIntegralTowardsPositive x)
+      (* to_int x = to_int (roundToIntegralTowardsPositive x) *)
+      roundToIntegralTiesToAway x = roundToIntegralTowardsPositive x
 
   axiom to_int_near_int:
     forall i x:t. is_int i -> (.- half) .< x .< half ->
-      to_int (i .+ x) = to_int i
+      (* to_int (i .+ x) = to_int i *)
+      roundToIntegralTiesToAway (i .+ x) = i
+
+  axiom to_int_tiestoaway: forall x:t.
+    to_int x = to_int (roundToIntegralTiesToAway x)
 
   axiom to_int_monotonic: forall x y:t.
     is_finite y -> is_finite x -> x .<= y -> (to_int x) <= (to_int y)
