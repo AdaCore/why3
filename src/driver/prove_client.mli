@@ -1,6 +1,7 @@
 val standalone : bool ref
 
 val set_socket_name : string -> unit
+val set_max_running_provers : int -> unit
 
 val connect : unit -> unit
 

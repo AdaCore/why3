@@ -111,11 +111,13 @@ type t =
     }
 
 let set_maximum_running_proofs max sched =
+  Prove_client.set_max_running_provers max;
   (* TODO dequeue actions if maximum_running_proofs increase *)
   sched.maximum_running_proofs <- max
 
 let init max =
   Debug.dprintf debug "[Sched] init scheduler max=%i@." max;
+  Prove_client.set_max_running_provers max;
   { actions_queue = Queue.create ();
     maximum_running_proofs = max;
     running_proofs = [];

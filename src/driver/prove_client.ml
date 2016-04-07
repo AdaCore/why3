@@ -1,5 +1,9 @@
 let standalone : bool ref = ref true
 let socket : Unix.file_descr option ref = ref None
+let max_running_provers : int ref = ref 1
+
+let set_max_running_provers x =
+  max_running_provers := x
 
 let client_connect socket_name =
   if Sys.os_type = "Win32" then begin
@@ -70,7 +74,9 @@ let disconnect () =
 let run_server () =
   let exec = Filename.concat Config.libdir "why3server" in
   Unix.create_process exec
-    [|exec; "--socket"; !socket_name; "--single-client"|]
+    [|exec; "--socket"; !socket_name;
+      "--single-client";
+      "-j"; string_of_int !max_running_provers |]
   Unix.stdin Unix.stdout Unix.stderr
 
 let force_connect () =
