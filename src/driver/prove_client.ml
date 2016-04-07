@@ -73,11 +73,12 @@ let disconnect () =
 
 let run_server () =
   let exec = Filename.concat Config.libdir "why3server" in
-  Unix.create_process exec
+  ignore
+  (Unix.create_process exec
     [|exec; "--socket"; !socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers |]
-  Unix.stdin Unix.stdout Unix.stderr
+    Unix.stdin Unix.stdout Unix.stderr)
 
 let force_connect () =
   match !socket with
@@ -107,7 +108,8 @@ let send_request ~id ~timelimit ~memlimit ~cmd =
 
 let rec read_lines blocking =
   let s = read_from_client blocking in
-  if String.contains s '\n' then begin
+  if s = "" then []
+  else if String.contains s '\n' then begin
     let s = Buffer.contents buf ^ s in
     Buffer.clear buf;
     let l = Strings.rev_split '\n' s in
