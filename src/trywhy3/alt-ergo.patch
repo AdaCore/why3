@@ -1,6 +1,10 @@
-diff -c -r alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml
-*** alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2015-10-19 10:44:47.532877782 +0200
---- /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2015-10-11 17:04:29.987623110 +0200
+Only in alt-ergo-1.00-private-2015-01-29/: autom4te.cache
+Only in alt-ergo-1.00-private-2015-01-29/: config.status
+Only in alt-ergo-1.00-private-2015-01-29/: .depend
+Only in alt-ergo-1.00-private-2015-01-29/: Makefile.configurable
+diff -c -r /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml
+*** /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2016-04-07 16:01:57.449020746 +0200
+--- alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2016-04-08 10:26:05.485174395 +0200
 ***************
 *** 23,28 ****
 --- 23,30 ----
@@ -26,9 +30,9 @@ diff -c -r alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml /home/cmarche
           end;
         { env with tbox = tbox; unit_tbox = utbox; inst = inst }
   
-diff -c -r alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli
-*** alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2015-10-19 10:44:47.540877782 +0200
---- /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2015-10-11 17:05:07.655624228 +0200
+diff -c -r /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli
+*** /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2016-04-07 16:01:57.449020746 +0200
+--- alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2016-04-08 10:26:05.485174395 +0200
 ***************
 *** 20,25 ****
 --- 20,27 ----
@@ -39,4 +43,29 @@ diff -c -r alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli /home/cmarch
 + 
   module type S = sig
     type t
+  
+diff -c -r /tmp/alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml
+*** /tmp/alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml	2016-04-07 16:01:57.453020790 +0200
+--- alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml	2016-04-08 10:41:51.037337014 +0200
+***************
+*** 20,28 ****
+  (*   This file is distributed under the terms of the CeCILL-C licence         *)
+  (******************************************************************************)
+  
+! module MyZarith = ZarithNumbers
+  module MyNums = NumsNumbers
+  
+! include MyZarith
+  
+  
+--- 20,29 ----
+  (*   This file is distributed under the terms of the CeCILL-C licence         *)
+  (******************************************************************************)
+  
+! (* module MyZarith = ZarithNumbers *)
+  module MyNums = NumsNumbers
+  
+! include MyNums
+! 
+  
   
