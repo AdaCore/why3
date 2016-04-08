@@ -1,0 +1,42 @@
+diff -c -r alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml
+*** alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2015-10-19 10:44:47.532877782 +0200
+--- /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2015-10-11 17:04:29.987623110 +0200
+***************
+*** 23,28 ****
+--- 23,30 ----
+  open Options
+  open Format
+  
++ exception StepsLimitReached
++ 
+  module type S = sig
+    type t
+  
+***************
+*** 492,499 ****
+--- 494,504 ----
+        if steps_bound () <> -1
+          && Int64.compare !steps (Int64.of_int (steps_bound ())) > 0 then
+          begin
++           raise StepsLimitReached;
++ (*
+  	  printf "Steps limit reached: %Ld@." !steps;
+  	  exit 1
++  *)
+          end;
+        { env with tbox = tbox; unit_tbox = utbox; inst = inst }
+  
+diff -c -r alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli
+*** alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2015-10-19 10:44:47.540877782 +0200
+--- /home/cmarche/why3/src/trywhy3/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2015-10-11 17:05:07.655624228 +0200
+***************
+*** 20,25 ****
+--- 20,27 ----
+  (*   This file is distributed under the terms of the CeCILL-C licence         *)
+  (******************************************************************************)
+  
++ exception StepsLimitReached
++ 
+  module type S = sig
+    type t
+  

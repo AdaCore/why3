@@ -1,0 +1,24 @@
+To compile and run TryWhy3 you need:
+
+* 'ace'
+
+  in directory src/trywhy3 do
+
+  git clone https://github.com/ajaxorg/ace-builds.git
+
+* Alt-Ergo
+
+**  get sources of Alt-Ergo and put them in directory src/trywhy3
+
+**  change the following line of Makefile.in the name of this directory
+
+  ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
+
+**  apply the patch alt-ergo.patch
+
+  cd <alt-ergo dir>
+  patch -p2 < ../alt-ergo.patch
+
+* compile with make trywhy3
+
+* install : TODO
