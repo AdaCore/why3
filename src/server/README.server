@@ -17,10 +17,17 @@ Command line options
 
 A client request is a single line which looks like this:
 
-  id;timeout;memlimit;cmd;arg1;arg2;...;argn
+  commandkind;payload
 
-All items are separated by semicolons, and must not contain semicolons
-themselves (but may contain spaces). Their meaning is the following:
+Where commandkind is a simple string and payload is a semicolon-separated
+list. There are currently only two possible commands. The first command looks
+like this:
+
+  run;id;timeout;memlimit;cmd;arg1;arg2;...;argn
+
+So the commandstring is "run". All items are separated by semicolons, and must
+not contain semicolons themselves (but may contain spaces). Their meaning is
+the following:
   id       - a (ideally) unique identifier which identifies the request
   timeout  - the allowed CPU time in seconds for this command;
              this must be number, 0 for unlimited
@@ -29,7 +36,10 @@ themselves (but may contain spaces). Their meaning is the following:
   cmd      - the name of the executable to run
   arg(i)   - the commandline arguments of the command to run
 
-A server answer looks like this:
+The server does not acknowledge the receipt of this message. However, it will
+run the executable with its arguments and time/memory limit. When the
+executable has terminated, the server sends a message like this to the client
+who sent the 'run' request:
 
   id;exitcode;time;timeout;file
 
@@ -41,6 +51,15 @@ Their meaning is the following:
              timeout
   file     - the path to a file which contains the stdout and stderr of the
              executed program
+
+The second commmand is like this:
+
+  parallel;num
+
+So the commandstring is "parallel". 'num' is a number greater or equal to 1.
+When this command is received, the server will allow to run up to 'num'
+processes in parallel from now on. Later 'parallel' commands can increase or
+decrease this number. There is no server answer to this command.
 
 There are two separate implementations on linux and windows, but both are
 very similar in structure and share some code (but should share much more).

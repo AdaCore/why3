@@ -443,7 +443,7 @@ void accept_client(int key) {
    pclient client = (pclient) malloc(sizeof(t_client));
    client->handle = server_socket->handle;
    client->readbuf = init_readbuf(BUFSIZE);
-   client->writebuf = init_writebuf(parallel);
+   client->writebuf = init_writebuf(16);
    init_connect_data(&(client->read), READOP);
    init_connect_data(&(client->write), WRITEOP);
    free(server_socket);
@@ -564,8 +564,8 @@ void init() {
    strcat(socket_name, basename);
 
    queue = init_queue(100);
-   clients = init_list(parallel);
-   processes = init_list(parallel);
+   clients = init_list(16);
+   processes = init_list(16);
 
    init_logging();
    create_server_socket();

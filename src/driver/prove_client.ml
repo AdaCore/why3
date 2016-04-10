@@ -2,9 +2,6 @@ let standalone : bool ref = ref true
 let socket : Unix.file_descr option ref = ref None
 let max_running_provers : int ref = ref 1
 
-let set_max_running_provers x =
-  max_running_provers := x
-
 let client_connect socket_name =
   if Sys.os_type = "Win32" then begin
     let name = "\\\\.\\pipe\\" ^ socket_name in
@@ -90,9 +87,15 @@ let force_connect () =
       connect()
   | _ -> ()
 
+let set_max_running_provers x =
+  max_running_provers := x;
+  if !socket <> None then
+    send_request_string ("parallel;" ^ string_of_int x)
+
 let send_request ~id ~timelimit ~memlimit ~cmd =
   force_connect ();
   let buf = Buffer.create 128 in
+  Buffer.add_string buf "run;";
   Buffer.add_string buf (string_of_int id);
   Buffer.add_char buf ';';
   Buffer.add_string buf (string_of_int timelimit);

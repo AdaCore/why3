@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "request.h"
+#include "options.h"
 
 //count the semicolons in <buf>, up to <len>
 int count_semicolons(char* buf, int len);
@@ -43,14 +44,35 @@ int copy_up_to_semicolon(char* buf, int begin, int len, char** result) {
 }
 
 prequest parse_request(char* str_req, int len, int key) {
-  int numargs;
+  int numargs, semic, parallel_arg;
   int i = 0;
   int pos = 0;
   prequest req;
   char* tmp;
 
-  numargs = count_semicolons(str_req, len) - 3;
+  semic = count_semicolons(str_req, len);
+  if (semic == 0) {
+    return NULL;
+  }
+  //  might be a 'parallel' command
+  if (semic == 1) {
+    pos = copy_up_to_semicolon (str_req, pos, len, &tmp);
+    if (strncmp(tmp, "parallel", pos) == 0) {
+        pos = copy_up_to_semicolon (str_req, pos, len, &tmp);
+        parallel_arg = atoi(tmp);
+        if (parallel_arg >= 1) {
+          parallel = parallel_arg;
+        }
+    }
+    return NULL;
+  }
+
+  numargs = semic - 4;
   if (numargs < 0) {
+    return NULL;
+  }
+  pos = copy_up_to_semicolon(str_req, pos, len, &tmp);
+  if (strncmp(tmp, "run", pos) != 0) {
     return NULL;
   }
   req = (prequest) malloc(sizeof(request));
