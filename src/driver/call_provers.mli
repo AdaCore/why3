@@ -191,6 +191,7 @@ val prove_file_server :
           command : string ->
           limit : resource_limit ->
           printer_mapping : Printer.printer_mapping ->
+          ?redirect : bool ->
           ?inplace : bool ->
           ?interactive : bool ->
           string -> server_id

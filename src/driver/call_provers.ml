@@ -295,6 +295,7 @@ let gen_id =
 type save_data =
   { vc_file      : string;
     is_temporary : bool;
+    redirect     : bool;
     limit        : resource_limit;
     res_parser   : prover_result_parser;
     printer_mapping : Printer.printer_mapping;
@@ -303,7 +304,8 @@ type save_data =
 let regexs : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
 let prove_file_server ~res_parser ~command ~limit
-                      ~printer_mapping ?(inplace=false) ?(interactive=false)
+                      ~printer_mapping ?(redirect=true)
+                      ?(inplace=false) ?(interactive=false)
                       file =
   let id = gen_id () in
   let cmd, _, _ =
@@ -312,6 +314,7 @@ let prove_file_server ~res_parser ~command ~limit
     { vc_file      = file;
       is_temporary = not inplace;
       limit        = limit;
+      redirect     = redirect;
       res_parser   = res_parser;
       printer_mapping = printer_mapping } in
   Hashtbl.add regexs id saved_data;
@@ -343,6 +346,7 @@ let handle_answer answer =
   if save.is_temporary then
     Sys.remove save.vc_file;
   let out = read_and_delete_file answer.Prove_client.out_file in
+  let out = if save.redirect then out else "" in
   let ret = Unix.WEXITED answer.Prove_client.exit_code in
   let printer_mapping = save.printer_mapping in
   let ans =
@@ -369,7 +373,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
                  ?(redirect=true) fin =
   fun () ->
       prove_file_server ~res_parser ~command ~limit ~printer_mapping
-                        ~inplace ~interactive fin
+                        ~redirect ~inplace ~interactive fin
 
 let get_new_results ~blocking =
   List.iter (fun (id, r) -> Hashtbl.add result_buffer id r)
