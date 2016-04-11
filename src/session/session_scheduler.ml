@@ -292,19 +292,7 @@ let schedule_proof_attempt ~cntexample ~limit ?old ~inplace
 
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
-  let res_parser =
-    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown ("", None))];
-      Call_provers.prp_regexps = [];
-      Call_provers.prp_timeregexps = [];
-      Call_provers.prp_stepregexps = [];
-      Call_provers.prp_model_parser = fun _ _ -> Model_parser.default_model
-    } in
-  let nolimit =
-    { Call_provers.limit_time = None; limit_mem = None; limit_steps = None } in
-  let precall =
-    Call_provers.call_on_file ~command ~limit:nolimit ~res_parser
-      ~redirect:false filename
-      ~printer_mapping:Printer.get_default_printer_mapping in
+  let precall = Call_provers.call_editor ~command filename in
   callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
   run_timeout_handler t

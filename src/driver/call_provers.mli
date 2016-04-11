@@ -145,15 +145,14 @@ val mk_limit : int -> int -> int -> resource_limit
 (* build a limit object, transforming the default values into None on the fly
    *)
 
+val call_editor : command : string -> string -> pre_prover_call
+
 val call_on_file :
   command         : string ->
   limit           : resource_limit ->
   res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
-  ?cleanup        : bool ->
   ?inplace        : bool ->
-  ?interactive    : bool ->
-  ?redirect       : bool ->
   string -> pre_prover_call
 
 val call_on_buffer :
@@ -163,7 +162,6 @@ val call_on_buffer :
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  ?interactive    : bool ->
   Buffer.t -> pre_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
@@ -191,9 +189,7 @@ val prove_file_server :
           command : string ->
           limit : resource_limit ->
           printer_mapping : Printer.printer_mapping ->
-          ?redirect : bool ->
           ?inplace : bool ->
-          ?interactive : bool ->
           string -> server_id
 
 val wait_for_server_result : blocking:bool -> (server_id * prover_result) list
