@@ -1504,10 +1504,10 @@ ALTERGOMODS=util/numsNumbers util/numbers \
 	instances/matching \
 	sat/sat_solvers \
 	main/frontend
+ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+TRYWHY3CMO=lib/why3/why3.cma 
 
-TRYWHY3CMO=lib/why3/why3.cma $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
-
-trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
+trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
 
 %.fr.html: %.prehtml
 	yamlpp -l fr $< -o $@
@@ -1516,18 +1516,37 @@ trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.h
 	yamlpp -l en $< -o $@
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
-		--file=try_alt_ergo.drv:/ \
+	js_of_ocaml --extern-fs -I . -I src/trywhy3 \
 		--file=drinkers.why:/ \
 		--file=simplearith.why:/ \
 		--file=bin_mult.mlw:/ \
 		--file=fact.mlw:/ \
 		--file=isqrt.mlw:/ \
-		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
 		+weak.js +nat.js $^
 
-src/trywhy3/trywhy3.byte: $(TRYWHY3CMO) src/trywhy3/trywhy3.cmo
+src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+
+src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
+	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
+		--file=try_alt_ergo.drv:/ \
+		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
+	+weak.js +nat.js $^
+
+src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+
+src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
+	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $^
+
+src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
+src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
+src/trywhy3/trywhy3.cmo: src/trywhy3/worker_proto.cmo
 
 src/trywhy3/%.cmo: src/trywhy3/%.ml
 	$(JSOCAMLC) $(BFLAGS) -c $<
@@ -1536,7 +1555,11 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 	$(JSOCAMLC) $(BFLAGS) -c $<
 
 clean::
-	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte
+	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
+	 src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte src/trywhy3/why3_worker.cm* \
+         src/trywhy3/alt_ergo_worker.js src/trywhy3/alt_ergo_worker.byte src/trywhy3/alt_ergo_worker.cm* \
+         src/trywhy3/worker_proto.cm*	\
+	 src/trywhy3/index.en.html src/trywhy3/index.fr.html
 
 CLEANDIRS += src/trywhy3
 
