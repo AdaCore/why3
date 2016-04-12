@@ -4,9 +4,8 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.20.prv" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="36" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="36" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -27,7 +26,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Lemmas" sum="e854d03b7c4acc5d88dd8c36e7048e5c">
+<theory name="Lemmas" sum="e854d03b7c4acc5d88dd8c36e7048e5c" expanded="true">
  <goal name="mem_app">
  <transf name="induction_ty_lex">
   <goal name="mem_app.1" expl="1.">
@@ -83,24 +82,24 @@
   </goal>
  </transf>
  </goal>
- <goal name="any_stack_frame">
- <transf name="induction_ty_lex">
-  <goal name="any_stack_frame.1" expl="1.">
-  <transf name="split_goal_wp">
+ <goal name="any_stack_frame" expanded="true">
+ <transf name="induction_ty_lex" expanded="true">
+  <goal name="any_stack_frame.1" expl="1." expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="any_stack_frame.1.1" expl="1.">
    <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="any_stack_frame.1.2" expl="2.">
-   <transf name="introduce_premises">
-    <goal name="any_stack_frame.1.2.1" expl="1.">
-    <transf name="compute_in_goal">
-     <goal name="any_stack_frame.1.2.1.1" expl="1.">
-     <transf name="split_goal_wp">
+   <goal name="any_stack_frame.1.2" expl="2." expanded="true">
+   <transf name="introduce_premises" expanded="true">
+    <goal name="any_stack_frame.1.2.1" expl="1." expanded="true">
+    <transf name="compute_in_goal" expanded="true">
+     <goal name="any_stack_frame.1.2.1.1" expl="1." expanded="true">
+     <transf name="split_goal_wp" expanded="true">
       <goal name="any_stack_frame.1.2.1.1.1" expl="1.">
-      <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.02" steps="104"/></proof>
+      <proof prover="1" timelimit="36"><result status="valid" time="0.02" steps="104"/></proof>
       </goal>
-      <goal name="any_stack_frame.1.2.1.1.2" expl="2.">
-      <proof prover="3"><result status="valid" time="0.05"/></proof>
+      <goal name="any_stack_frame.1.2.1.1.2" expl="2." expanded="true">
+      <proof prover="2"><result status="valid" time="0.06"/></proof>
       </goal>
      </transf>
      </goal>
@@ -268,7 +267,6 @@
   <goal name="sub_weaken2.2" expl="2.">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="67"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="sub_weaken2.3" expl="3.">
@@ -446,7 +444,6 @@
      <goal name="sub_valid_coloring.3.1.1.1" expl="1.">
      <transf name="split_goal_wp">
       <goal name="sub_valid_coloring.3.1.1.1.1" expl="1.">
-      <proof prover="1"><result status="timeout" time="5.98"/></proof>
       <proof prover="9" edited="koda_ruskey_KodaRuskey_Spec_sub_valid_coloring_1.v"><result status="valid" time="5.64"/></proof>
       </goal>
       <goal name="sub_valid_coloring.3.1.1.1.2" expl="2.">
@@ -513,7 +510,7 @@
   <proof prover="1" timelimit="11"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter sub_valid_coloring_white.10" expl="10. postcondition">
-  <proof prover="9" edited="koda_ruskey_KodaRuskey_Spec_WP_parameter_sub_valid_coloring_white_1.v"><result status="valid" time="3.15"/></proof>
+  <proof prover="9" edited="koda_ruskey_KodaRuskey_Spec_WP_parameter_sub_valid_coloring_white_1.v"><result status="valid" time="4.52"/></proof>
   </goal>
  </transf>
  </goal>
@@ -542,10 +539,10 @@
      <proof prover="1" timelimit="5"><result status="valid" time="0.15" steps="173"/></proof>
      </goal>
      <goal name="WP_parameter stored_trans1.1.1.1.4" expl="4. postcondition">
-     <proof prover="1"><result status="valid" time="0.19" steps="211"/></proof>
+     <proof prover="1"><result status="valid" time="0.32" steps="211"/></proof>
      </goal>
      <goal name="WP_parameter stored_trans1.1.1.1.5" expl="5. postcondition">
-     <proof prover="1" timelimit="5"><result status="valid" time="0.86" steps="596"/></proof>
+     <proof prover="1" timelimit="5"><result status="valid" time="1.08" steps="596"/></proof>
      </goal>
     </transf>
     </goal>
@@ -587,242 +584,6 @@
  </transf>
  </goal>
 </theory>
-<theory name="CountCorrect" sum="9efcdad61b44779d37192b37c7ef5543">
- <goal name="solution_eq">
- <proof prover="0" timelimit="6"><result status="timeout" time="6.02"/></proof>
- <proof prover="1"><result status="unknown" time="0.07"/></proof>
- </goal>
- <goal name="WP_parameter product" expl="VC for product">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter product.1" expl="1. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter product.2" expl="2. variant decrease">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter product.3" expl="3. variant decrease">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter product.4" expl="4. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.05" steps="133"/></proof>
-  </goal>
-  <goal name="WP_parameter product.5" expl="5. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.23" steps="417"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="solution_product">
- <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
- </goal>
- <goal name="WP_parameter product_all" expl="VC for product_all">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter product_all.1" expl="1. postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.2" expl="2. postcondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.4" expl="4. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.5" expl="5. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.6" expl="6. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.7" expl="7. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.8" expl="8. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.9" expl="9. loop invariant preservation">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.06"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.10" expl="10. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.11" expl="11. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.12" expl="12. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="97"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.13" expl="13. precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.14" expl="14. precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.15" expl="15. precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.16" expl="16. assertion">
-  <proof prover="0" timelimit="6"><result status="timeout" time="6.04"/></proof>
-  <proof prover="1"><result status="timeout" time="5.99"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.17" expl="17. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="33"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.18" expl="18. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.25" steps="235"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.19" expl="19. loop invariant preservation">
-  <proof prover="0" timelimit="6"><result status="timeout" time="6.04"/></proof>
-  <proof prover="1"><result status="timeout" time="5.99"/></proof>
-  <proof prover="5" timelimit="6"><result status="timeout" time="5.98"/></proof>
-  <transf name="inline_goal">
-   <goal name="WP_parameter product_all.19.1" expl="1. loop invariant preservation">
-   <transf name="split_goal_wp">
-    <goal name="WP_parameter product_all.19.1.1" expl="1. loop invariant preservation">
-    <proof prover="0" timelimit="6"><result status="timeout" time="6.04"/></proof>
-    <proof prover="1"><result status="timeout" time="5.99"/></proof>
-    </goal>
-    <goal name="WP_parameter product_all.19.1.2" expl="2. loop invariant preservation">
-    <proof prover="0" timelimit="6"><result status="timeout" time="6.05"/></proof>
-    <proof prover="1"><result status="timeout" time="5.99"/></proof>
-    </goal>
-    <goal name="WP_parameter product_all.19.1.3" expl="3. loop invariant preservation">
-    <proof prover="0" timelimit="6"><result status="timeout" time="6.08"/></proof>
-    <proof prover="1"><result status="timeout" time="5.99"/></proof>
-    </goal>
-    <goal name="WP_parameter product_all.19.1.4" expl="4. loop invariant preservation">
-    <proof prover="0" timelimit="6"><result status="timeout" time="6.05"/></proof>
-    <proof prover="1"><result status="timeout" time="5.99"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter product_all.20" expl="20. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.21" expl="21. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.22" expl="22. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.23" expl="23. postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.24" expl="24. postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="24"/></proof>
-  </goal>
-  <goal name="WP_parameter product_all.25" expl="25. postcondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="solution_white_or_black">
- <proof prover="0" timelimit="6"><result status="timeout" time="6.05"/></proof>
- <proof prover="1"><result status="unknown" time="2.60"/></proof>
- <transf name="split_goal_wp">
-  <goal name="solution_white_or_black.1" expl="1.">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.03" steps="67"/></proof>
-  </goal>
-  <goal name="solution_white_or_black.2" expl="2.">
-  <proof prover="0" timelimit="6"><result status="timeout" time="6.02"/></proof>
-  <proof prover="1"><result status="unknown" time="2.38"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter enum" expl="VC for enum">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter enum.1" expl="1. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.2" expl="2. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="36"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.3" expl="3. postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter enum.3.1" expl="1. postcondition">
-   <proof prover="2"><result status="valid" time="0.06"/></proof>
-   </goal>
-   <goal name="WP_parameter enum.3.2" expl="2. postcondition">
-   <proof prover="0" timelimit="6"><result status="valid" time="0.07"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter enum.4" expl="4. variant decrease">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.5" expl="5. precondition">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.6" expl="6. variant decrease">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.7" expl="7. precondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter enum.7.1" expl="1. precondition">
-   <transf name="split_goal_wp">
-    <goal name="WP_parameter enum.7.1.1" expl="1. VC for enum">
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="WP_parameter enum.7.1.2" expl="2. VC for enum">
-    <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="32"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter enum.8" expl="8. precondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.9" expl="9. precondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.10" expl="10. precondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.11" expl="11. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.12" expl="12. postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter enum.12.1" expl="1. postcondition">
-   <transf name="split_goal_wp">
-    <goal name="WP_parameter enum.12.1.1" expl="1. VC for enum">
-    <proof prover="1"><result status="valid" time="0.38" steps="391"/></proof>
-    </goal>
-    <goal name="WP_parameter enum.12.1.2" expl="2. VC for enum">
-    <proof prover="0" timelimit="6"><result status="timeout" time="6.05"/></proof>
-    <proof prover="1"><result status="timeout" time="5.98"/></proof>
-    <proof prover="2"><result status="timeout" time="5.97"/></proof>
-    <proof prover="5" timelimit="6"><result status="timeout" time="5.98"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter enum.13" expl="13. postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter enum.13.1" expl="1. postcondition">
-   <proof prover="0" timelimit="6"><result status="timeout" time="6.03"/></proof>
-   <proof prover="1"><result status="timeout" time="5.99"/></proof>
-   <proof prover="2"><result status="timeout" time="5.98"/></proof>
-   <proof prover="5" timelimit="6"><result status="timeout" time="5.98"/></proof>
-   </goal>
-   <goal name="WP_parameter enum.13.2" expl="2. postcondition">
-   <proof prover="0" timelimit="6"><result status="valid" time="0.08"/></proof>
-   <proof prover="1" obsolete="true"><result status="timeout" time="5.99"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.98"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
-</theory>
 <theory name="KodaRuskey" sum="e1f74a7b1053dbbb409b16e4c43cefe2">
  <goal name="WP_parameter enum" expl="VC for enum">
  <transf name="split_goal_wp">
@@ -842,7 +603,7 @@
   <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter enum.6" expl="6. variant decrease">
-  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  <proof prover="1" timelimit="36"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter enum.7" expl="7. precondition">
   <proof prover="1" steplimit="1"><result status="valid" time="0.01" steps="17"/></proof>
@@ -857,7 +618,7 @@
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter enum.11" expl="11. precondition">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter enum.12" expl="12. precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
@@ -902,10 +663,10 @@
   <proof prover="0"><result status="valid" time="0.73"/></proof>
   </goal>
   <goal name="WP_parameter enum.18" expl="18. assertion">
-  <proof prover="4"><result status="valid" time="0.04" steps="94"/></proof>
+  <proof prover="1" timelimit="36"><result status="valid" time="0.04" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter enum.19" expl="19. index in array bounds">
-  <proof prover="3"><result status="valid" time="0.16"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter enum.20" expl="20. variant decrease">
   <proof prover="1" timelimit="5"><result status="valid" time="0.13" steps="68"/></proof>
@@ -946,7 +707,7 @@
   <proof prover="0"><result status="valid" time="3.80"/></proof>
   </goal>
   <goal name="WP_parameter enum.30" expl="30. assertion">
-  <proof prover="0"><result status="valid" time="4.01"/></proof>
+  <proof prover="0"><result status="valid" time="3.38"/></proof>
   </goal>
   <goal name="WP_parameter enum.31" expl="31. assertion">
   <proof prover="0" timelimit="25"><result status="valid" time="0.04"/></proof>
@@ -985,7 +746,7 @@
   <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter enum.43" expl="43. precondition">
-  <proof prover="3"><result status="valid" time="1.23"/></proof>
+  <proof prover="0"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="WP_parameter enum.44" expl="44. precondition">
   <proof prover="0"><result status="valid" time="0.31"/></proof>
@@ -1032,7 +793,7 @@
      <proof prover="0"><result status="valid" time="0.33"/></proof>
      </goal>
      <goal name="WP_parameter enum.49.1.1.2" expl="2. VC for enum">
-     <proof prover="0" timelimit="25"><result status="valid" time="6.17"/></proof>
+     <proof prover="0" timelimit="25"><result status="valid" time="4.99"/></proof>
      </goal>
      <goal name="WP_parameter enum.49.1.1.3" expl="3. VC for enum">
      <proof prover="0"><result status="valid" time="0.18"/></proof>
@@ -1071,10 +832,10 @@
   <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter enum.59" expl="59. assertion">
-  <proof prover="4"><result status="valid" time="2.41" steps="1669"/></proof>
+  <proof prover="1" timelimit="36"><result status="valid" time="6.98" steps="1370"/></proof>
   </goal>
   <goal name="WP_parameter enum.60" expl="60. index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter enum.61" expl="61. assertion">
   <proof prover="1" timelimit="5"><result status="valid" time="0.14" steps="145"/></proof>
