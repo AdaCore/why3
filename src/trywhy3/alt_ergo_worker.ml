@@ -49,7 +49,7 @@ let () =
   Options.set_steps_bound 100;
   Worker.set_onmessage (fun msg ->
 			match unmarshal msg with
-			  Task (id, text) ->
+			  Goal (id, text) ->
 			  let result = run_alt_ergo_on_task text in
 			  Worker.post_message (marshal (id,result))
 			| OptionSteps i -> Options.set_steps_bound i)

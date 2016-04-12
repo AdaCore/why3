@@ -18,6 +18,18 @@ let get_opt o = Js.Opt.get o (fun () -> assert false)
 (* the view *)
 module Console =
   struct
+    let highlightRegion s l1 c1 l2 c2 =
+      ignore (Js.Unsafe.meth_call Js.Unsafe.global
+                                  "highlightRegion"
+                                  Js.Unsafe.( [| inject (Js.string s);
+                                                inject l1;
+                                                inject c1;
+                                                inject l2;
+                                                inject c2 |] ) )
+
+    let clearHighlight ()=
+      ignore (Js.Unsafe.meth_call Js.Unsafe.global
+                                  "clearHighlight" [| |])
     let get_buffer () =
       let global = Js.Unsafe.global in
       let editor = Js.Unsafe.get global (Js.string "editor") in
@@ -43,28 +55,46 @@ module Console =
 
     let print_alt_ergo_output id res =
       (* see alt_ergo_worker.ml and the Tasks case in print_why3_output *)
-      let doc = Dom_html.document in
-      match Js.Opt.to_option (doc ## getElementById (Js.string id)) with
-        None -> log ("No element with id " ^ id)
-      | Some li ->
-         let span_icon = node_to_html ( li ## firstChild ) in
-         let span_msg = node_to_html ( li ## lastChild ) in
-         match res with
-           Valid ->
-           span_icon ## className <- (Js.string "fontawesome-ok-sign");
-           (span_icon ## style) ## color <- (Js.string "green");
-
-         | Unknown msg ->
-            span_icon ## className <- (Js.string "fontawesome-question-sign");
-            (span_icon ## style) ## color <- (Js.string "orange");
-            span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
-         | Invalid msg ->
-            span_icon ## className <- (Js.string "fontawesome-remove-sign");
-            (span_icon ## style) ## color <- (Js.string "red");
-            span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
+      let span_msg = Dom_html.getElementById (id ^ "_msg") in
+      match res with
+        Valid -> ()
+      | Unknown msg -> span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
+      | Invalid msg -> span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
 
     let appendChild o c =
       ignore (o ## appendChild ( (c :> Dom.node Js.t)))
+
+    let attach_to_parent id parent_id expl _loc =
+      let doc = Dom_html.document in
+      let ul =
+        try
+          Dom_html.getElementById parent_id
+        with
+          Not_found ->
+          let ul = Dom_html.createUl doc in
+          ul ## id <- Js.string parent_id;
+          appendChild (get_console()) ul;
+          ul
+      in
+      try
+        ignore (Dom_html.getElementById id);
+        log ("li element " ^ id ^ " already exists !")
+      with
+        Not_found ->
+        let li = Dom_html.createLi doc in
+        li ## id <- Js.string id;
+        appendChild ul li;
+        let span_icon = Dom_html.createSpan doc in
+        appendChild li span_icon;
+        span_icon ## id <- Js.string (id ^ "_icon");
+        appendChild li (doc ## createTextNode (Js.string (" " ^ expl ^ " ")));
+        let span_msg = Dom_html.createSpan doc in
+        span_msg ## id <- Js.string (id ^ "_msg");
+        appendChild li span_msg;
+        let tul = Dom_html.createUl doc in
+        tul ## id <- Js.string (id ^ "_ul");
+        appendChild li tul
+
 
     let print_why3_output o =
       let doc = Dom_html.document in
@@ -86,63 +116,26 @@ module Console =
                     li ## innerHTML <- (Js.string s);
                     appendChild ul li;) sl
 
-
-      | Tasks ((th_id, th_name),
-               (task_id, task_name),
-               (vc_id, vc_expl, vc_code)) ->
-
-         let ul =
-           try
-             Dom_html.getElementById "theory-list"
-           with
-             Not_found ->
-             let ul = Dom_html.createUl doc in
-             ul ## id <- Js.string "theory-list";
-             appendChild (get_console()) ul;
-             ul
-         in
-         let th_ul =
-           try
-             node_to_html ((Dom_html.getElementById th_id) ## lastChild)
-           with
-             Not_found ->
-             let li = Dom_html.createLi doc in
-             li ## id <- Js.string th_id;
-             appendChild ul li;
-             appendChild li (doc ## createTextNode (Js.string th_name));
-             let tul = Dom_html.createUl doc in
-             appendChild li tul;
-             tul
-         in
-         let task_ul =
-           try
-             node_to_html ((Dom_html.getElementById  task_id) ## lastChild)
-           with
-             Not_found ->
-             let li = Dom_html.createLi doc in
-             li ## id <- Js.string task_id;
-             appendChild th_ul li;
-             appendChild li (doc ## createTextNode (Js.string task_name));
-             let tul = Dom_html.createUl doc in
-             appendChild li tul;
-             tul
-         in
-         let li = Dom_html.createLi doc in
-         li ## id <- Js.string vc_id;
-         appendChild task_ul li;
-         let span = Dom_html.createSpan doc in
-         span ## className <- Js.string "fontawesome-cogs pending";
-         (span ## style) ## color <- (Js.string "blue");
-
-         appendChild li (span);
-         appendChild li (doc ## createTextNode (Js.string (" " ^ vc_expl ^ " ")));
-         appendChild li (Dom_html.createSpan doc)
+      | Theory (th_id, th_name) -> attach_to_parent th_id "theory-list" th_name []
+      | Task (id, parent_id, expl, _code, loc) ->
+         attach_to_parent id parent_id expl loc
+      | UpdateStatus(st, id) ->
+         try
+           let span_icon = Dom_html.getElementById (id ^ "_icon") in
+           let cls =
+             match st with
+               `New -> "fontawesome-cogs task-pending"
+             | `Valid -> "fontawesome-ok-sign task-valid"
+             | `Unknown -> "fontawesome-question-sign task-unknown"
+           in
+           span_icon ## className <- Js.string cls
+         with
+           Not_found -> ()
 
     let set_abort_icon () =
-      let list = Dom_html.document ## getElementsByClassName (Js.string "pending") in
+      let list = Dom_html.document ## getElementsByClassName (Js.string "task-pending") in
       List.iter (fun span ->
-                 span ## className <- (Js.string "fontawesome-minus-sign");
-                 (span ## style) ## color <- (Js.string "black"))
+                 span ## className <- (Js.string "fontawesome-minus-sign task-abort"))
                 (Dom.list_of_nodeList list)
 
   end
@@ -169,13 +162,19 @@ type 'a status = Free of 'a | Busy of 'a | Absent
 let num_workers = 4
 let alt_ergo_steps = ref 100
 let alt_ergo_workers = ref (Array.make num_workers Absent)
+let why3_worker = ref None
+let get_why3_worker () =
+  match !why3_worker with
+    Some w -> w
+  | None -> log ("Why3 Worker not initialized !"); assert false
 
 let rec init_alt_ergo_worker i =
   let worker = Worker.create "alt_ergo_worker.js" in
   worker ## onmessage <-
     (Dom.handler (fun ev ->
-                  let (id, result) = unmarshal (ev ## data) in
+                  let (id, result) as res = unmarshal (ev ## data) in
                   Console.print_alt_ergo_output id result;
+                  (get_why3_worker()) ## postMessage (marshal (status_of_result res));
                   !alt_ergo_workers.(i) <- Free(worker);
                   process_task ();
                   Js._false));
@@ -225,12 +224,12 @@ let init_why3_worker () =
                   Console.print_why3_output msg;
                   let () =
                     match msg with
-                      Tasks (_,_,(id,_,code)) -> push_task (Task (id,code))
+                      Task (id,_,_,code,_) -> push_task (Goal (id,code))
                     | _ -> ()
                   in Js._false));
   worker
 
-let why3_worker = ref (init_why3_worker ())
+let () = why3_worker := Some (init_why3_worker ())
 
 let why3_parse () =
   Console.clear ();
@@ -241,7 +240,7 @@ let why3_parse () =
   let code = Console.get_buffer () in
   let msg = marshal (ParseBuffer code) in
   log_time "After marshalling in main thread";
-  !why3_worker ## postMessage (msg)
+  (get_why3_worker()) ## postMessage (msg)
 
 let why3_execute () =
   Console.clear ();
@@ -249,17 +248,18 @@ let why3_execute () =
   log_time "Before marshalling in main thread";
   reset_workers ();
   let code = Console.get_buffer () in
-  !why3_worker ## postMessage (marshal (ExecuteBuffer code))
+   (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
 
 
 let () =
   add_button "prove" why3_parse ;
   add_button "run" why3_execute ;
   add_button "stop" (fun () ->
-                     !why3_worker ## terminate ();
-                     why3_worker := init_why3_worker ();
+                     (get_why3_worker()) ## terminate ();
+                     why3_worker := Some (init_why3_worker ());
                      reset_workers ();
                      Console.set_abort_icon());
+
   let input_threads = get_opt Dom_html.(CoerceTo.input
 					  (getElementById "input-num-threads"))
   in
@@ -274,6 +274,7 @@ let () =
        Console.set_abort_icon();
        Js._false
       );
+
   let input_steps = get_opt Dom_html.(CoerceTo.input
 					  (getElementById "input-num-steps"))
   in
@@ -324,6 +325,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. src/trywhy3/trywhy3.js"
+compile-command: "unset LANG; make -C ../.. trywhy3"
 End:
 *)

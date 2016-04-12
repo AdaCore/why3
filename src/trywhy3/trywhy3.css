@@ -6,13 +6,32 @@
 }
 
 
+/* tasks icons */
+.task-pending {
+    color: blue;
+}
+.task-valid {
+    color:green;
+}
+.task-unknown {
+    color:orange;
+}
+.task-abort {
+    color:black;
+}
+
+
 /* ACE Editor */
 .error {
     position:absolute;
     background:rgba(200,100,100,0.5);
     z-index:40;
 }
-
+.hl-task {
+    position:absolute;
+    background:rgba(200,200,100,0.5);
+    z-index:40;
+}
 /* Interface */
 body {
     padding:0;
@@ -211,7 +230,7 @@ body {
 #console ul#theory-list {
     list-style-type: none;
     list-style-position: inside;
-    padding: 0.5em;
+    padding-left: 0.5em;
 }
 #console ul#theory-list li {
     font-weight:bold;
@@ -221,21 +240,19 @@ body {
     font-weight:normal;
 }
 
-#console ul ul {
-    list-style-type: square;
-    list-style-position: inside;
-
-    padding: 0.5em;
-}
-
-#console ul ul ul {
+#console ul#theory-list ul {
     list-style-type: none;
     list-style-position: inside;
-
-    padding: 0.5em;
-    /*margin: 0.5em; */
 }
 
+#console ul#theory-list ul > li {
+    padding-left:1em;
+}
+#console ul#theory-list ul ul {
+    list-style-type: none;
+    list-style-position: inside;
+    padding-left: 0.5em;
+}
 
 /* Confirmation dialog */
 .btn {

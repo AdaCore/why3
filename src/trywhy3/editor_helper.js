@@ -13,6 +13,12 @@ function highlightError (x1, y1, x2, y2)
     marker = editor.session.addMarker(selectedRange, "error", "text");
 }
 
+function highlightRegion (cls, x1, y1, x2, y2)
+{
+    selectedRange = new Range (x1,y1,x2,y2);
+    marker = editor.session.addMarker(selectedRange, cls, "text");
+}
+
 
 function clearHighlight ()
 {

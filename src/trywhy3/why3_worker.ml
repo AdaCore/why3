@@ -52,6 +52,7 @@ let alt_ergo_driver : Driver.driver =
 let () = log_time ("Initialising why3 worker: end ")
 
 
+let task_table = Hashtbl.create 17
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
@@ -65,7 +66,63 @@ let gen_id =
   fun () -> incr c; "id" ^ (string_of_int !c)
 
 let send msg =
-  Worker.post_message (marshal msg)
+  ignore (Worker.post_message (marshal msg))
+
+
+let get_loc l =
+  match l with
+    Some (l) ->
+    let _, l, c1, c2 = Loc.get l in
+    Some (l, c1, l, c2)
+  | _ -> None
+
+
+let send_task parent_id task =
+  let id = gen_id () in
+  let () = Hashtbl.add task_table id (`Task (task), parent_id, `New, []) in
+  let vid, expl, _ = Termcode.goal_expl_task ~root:false task in
+  let expl = match expl with
+    | Some s -> s
+    | None -> vid.Ident.id_string
+  in
+  let msg = Task (id, parent_id, expl, task_to_string task, [ (* TODO *) ]) in
+  send msg;
+  send (UpdateStatus(`New, id));
+  id
+let get_task = function `Task t -> t
+                      | `Theory _ -> log ("called get_task on a theory !"); assert false
+
+let why3_split id =
+  try
+    let task, parent_id,_,subtasks =  Hashtbl.find task_table id in
+    match subtasks with
+      [] ->
+      let subtasks = Trans.apply split_trans (get_task task) in
+      send (UpdateStatus(`New, id));
+      let sub_ids = List.fold_left (fun acc t -> (send_task id t)::acc) [] subtasks in
+      Hashtbl.replace task_table id (task,parent_id, `New, sub_ids)
+    | _ -> ()
+  with
+    Not_found -> log ("No task with id " ^ id)
+
+let set_status st id =
+  try
+    let task, parent_id, _, subs = Hashtbl.find task_table id in
+    Hashtbl.replace task_table id (task, parent_id, st, subs);
+    let _,_,_, depends = Hashtbl.find task_table parent_id  in
+    send (UpdateStatus (st, id));
+    if
+      List.for_all (fun cid -> try
+                            match Hashtbl.find task_table cid with
+                              (_, _, `Valid, _) -> true
+                            | _ -> false
+                          with Not_found -> false) depends
+    then
+      send (UpdateStatus (`Valid, parent_id))
+  with
+    Not_found -> log ("No task with id " ^ id)
+
+
 
 let why3_parse_theories theories =
   let theories =
@@ -80,30 +137,11 @@ let why3_parse_theories theories =
   List.iter
     (fun (_, (th_name, th)) ->
      let th_id = gen_id () in
+     let () = send (Theory(th_id, th_name)) in
+     send (UpdateStatus(`New, th_id));
      let tasks = Task.split_theory th None None in
-     List.iter
-       (fun task ->
-	let (id,expl,_) = Termcode.goal_expl_task ~root:true task in
-        let task_name = match expl with
-          | Some s -> s
-          | None -> id.Ident.id_string
-        in
-	let task_id = gen_id () in
-	List.iter
-	  (fun vc ->
-	   let vc_id = gen_id () in
-	   let id, expl, _ = Termcode.goal_expl_task ~root:false vc in
-	   let expl = match expl with
-             | Some s -> s
-             | None -> id.Ident.id_string
-           in
-	   let msg = Tasks ((th_id, th_name),
-			    (task_id, task_name),
-			    (vc_id, expl, task_to_string vc))
-	   in
-	   send msg)
-	  (Trans.apply split_trans task)
-       ) (List.rev tasks)
+     let task_ids = List.fold_left (fun acc t ->  (send_task th_id t):: acc) [] tasks in
+     Hashtbl.add task_table th_id (`Theory(th), "theory-list", `New, task_ids)
     ) theories
 
 let execute_symbol m fmt ps =
@@ -209,7 +247,7 @@ let why3_run f lang code =
 
 
 let () =
-  
+
   Worker.set_onmessage
     (fun ev ->
 
@@ -217,10 +255,14 @@ let () =
      let ev = unmarshal ev in
      log_time ("After unmarshal ");
      match ev with
+     | Transform (`Split, id) ->
+        why3_split id
      | ParseBuffer code ->
-       why3_run why3_parse_theories Env.base_language code
+        Hashtbl.clear task_table;
+        why3_run why3_parse_theories Env.base_language code
      | ExecuteBuffer code ->
 	why3_run why3_execute Mlw_module.mlw_language code
+     | SetStatus (st, id) -> set_status st id
     )
 (*
 Local Variables:
