@@ -483,6 +483,14 @@ let min a b =
   else
     b
 
+type steps_convert = { add : int; mult : int }
+
+let convert_data =
+  let h = Hashtbl.create 17 in
+  Hashtbl.add h "CVC4" { add = 50000; mult = 250 };
+  Hashtbl.add h "Z3" { add = 100000; mult = 1500 };
+  h
+
 let steps ~prover =
   if manual_prover <> None then None
   else
@@ -490,9 +498,19 @@ let steps ~prover =
     | None -> None
     | Some c ->
       let prover = String.sub prover 0 (min 4 (String.length prover)) in
-      if prover = "CVC4" then Some (50000 + c*250)
-      else if prover = "Z3" then Some (100000 + c*1500)
-      else !opt_steps
+      try
+        let conv = Hashtbl.find convert_data prover in
+        Some (conv.add + conv.mult * c)
+      with Not_found -> !opt_steps
+
+let back_convert_steps ~prover c =
+  try
+    let conv = Hashtbl.find convert_data prover in
+    (* we are adding 1 to the count because the division will round downwards,
+       but we want to have the property that checks are proved with the
+       reported steps *)
+    (max 0 (c - conv.add)) / conv.mult + 1
+  with Not_found -> c
 
 let limit ~prover =
   { Call_provers.limit_time = timeout;

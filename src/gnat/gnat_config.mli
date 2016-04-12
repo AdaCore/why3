@@ -45,6 +45,9 @@ val steps : prover : string -> int option
 (* value of the --steps option adjusted for given prover, if no steps are
  * given, return None *)
 
+val back_convert_steps : prover : string -> int -> int
+(* given the raw steps a prover has taken, reconvert them to SPARK steps *)
+
 val limit : prover : string -> Call_provers.resource_limit
 
 type proof_mode =
