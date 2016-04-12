@@ -347,7 +347,7 @@ let result_buffer : (server_id, prover_result) Hashtbl.t = Hashtbl.create 17
 let call_on_file ~command ~limit ~res_parser ~printer_mapping
                  ?(inplace=false) fin () =
   let id = gen_id () in
-  let cmd, _, on_timelimit =
+  let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace command limit fin in
   let limit = adapt_limits limit on_timelimit in
   let save =
@@ -359,7 +359,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
   Hashtbl.add saved_data id save;
   let timelimit = get_time limit in
   let memlimit = get_mem limit in
-  Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
+  Prove_client.send_request ~use_stdin ~id ~timelimit ~memlimit ~cmd;
   ServerCall id
 
 let get_new_results ~blocking =

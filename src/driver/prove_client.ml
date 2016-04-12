@@ -92,10 +92,11 @@ let set_max_running_provers x =
   if !socket <> None then
     send_request_string ("parallel;" ^ string_of_int x)
 
-let send_request ~id ~timelimit ~memlimit ~cmd =
+let send_request ~use_stdin ~id ~timelimit ~memlimit ~cmd =
   force_connect ();
   let buf = Buffer.create 128 in
-  Buffer.add_string buf "run;";
+  let servercommand = if use_stdin then "runstdin;" else "run;" in
+  Buffer.add_string buf servercommand;
   Buffer.add_string buf (string_of_int id);
   Buffer.add_char buf ';';
   Buffer.add_string buf (string_of_int timelimit);

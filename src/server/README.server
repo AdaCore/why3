@@ -20,7 +20,7 @@ A client request is a single line which looks like this:
   commandkind;payload
 
 Where commandkind is a simple string and payload is a semicolon-separated
-list. There are currently only two possible commands. The first command looks
+list. There are currently three possible commands. The first command looks
 like this:
 
   run;id;timeout;memlimit;cmd;arg1;arg2;...;argn
@@ -52,7 +52,16 @@ Their meaning is the following:
   file     - the path to a file which contains the stdout and stderr of the
              executed program
 
-The second commmand is like this:
+The second command is very similar:
+
+  runstdin;id;timeout;memlimit;cmd;arg1;arg2;...;argn;filename
+
+The meaning of this command is identical to the "run" command, with the
+difference that an extra filename is given as the last argument to the
+command. This filename is not passed to the command as a commandline argument,
+instead it is "piped" into the stdin of the command.
+
+The third commmand is like this:
 
   parallel;num
 

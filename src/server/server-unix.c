@@ -241,12 +241,19 @@ void queue_write(pclient client, char* msgbuf) {
 pid_t create_process(char* cmd,
                      int argc,
                      char** argv,
+                     bool usestdin,
                      int outfile,
                      int timelimit,
                      int memlimit) {
   struct rlimit res;
   int i;
   char** unix_argv;
+  int count = argc;
+  // in the case of usestdin, the last argument is in fact not passed to
+  // execvp, it contains the filename instead
+  if (usestdin) {
+    count--;
+  }
   unix_argv = (char**)malloc(sizeof(char*) * (argc + 2));
   unix_argv[0] = cmd;
   unix_argv[argc + 1] = NULL;
@@ -292,6 +299,9 @@ pid_t create_process(char* cmd,
   //adapt stdout/stderr
   dup2(outfile, 1);
   dup2(outfile, 2);
+  if (usestdin) {
+    freopen(argv[argc-1], "r", stdin);
+  }
 
   /* execute the command */
   execvp(cmd,unix_argv);
@@ -405,6 +415,7 @@ void run_request (prequest r) {
   id = create_process(r->cmd,
                       r->numargs,
                       r->args,
+                      r->usestdin,
                       out_descr,
                       r->timeout,
                       r->memlimit);

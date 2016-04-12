@@ -224,12 +224,19 @@ void run_request (prequest r) {
    char* outfile;
    pproc proc;
    int key;
+   int argcount = r->numargs;
    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits;
    JOBOBJECT_ASSOCIATE_COMPLETION_PORT portassoc;
    STARTUPINFO si;
-   HANDLE ghJob, outfilehandle;
+   HANDLE ghJob, outfilehandle, infilehandle;
    PROCESS_INFORMATION pi;
    pclient client;
+
+  // in the case of usestdin, the last argument is in fact not passed to
+  // CreateProcess, it contains the filename instead
+   if (r->usestdin) {
+     argcount--;
+   }
 
    client = (pclient) list_lookup(clients, r->key);
    if (client==NULL) {
@@ -246,6 +253,17 @@ void run_request (prequest r) {
    // set the stdout for the childprocess
    si.hStdOutput = outfilehandle;
    si.hStdError = outfilehandle;
+   if (r->usestdin) {
+     infilehandle =
+       CreateFile(r->args[argcount],
+                 GENERIC_READ,
+                 FILE_SHARE_READ,
+                 NULL,
+                 OPEN_ALWAYS,
+                 FILE_ATTRIBUTE_NORMAL,
+                 NULL);
+     si->hSdtInput = infilehandle;
+   }
    // if we don't set that flag, the stdout we just set won't even be looked at
    si.dwFlags = STARTF_USESTDHANDLES;
    /* Compute command line string. When a parameter contains a " or a space we
@@ -260,7 +278,7 @@ void run_request (prequest r) {
    /* Now take care of the arguments */
    {
      int k;
-     for (k = 0; k < r->numargs; k++)
+     for (k = 0; k < argcount; k++)
        {
          char *ca = r->args[k]; /* current arg */
          int ca_index; /* index of the current character in ca */

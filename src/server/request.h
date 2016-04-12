@@ -1,11 +1,14 @@
 #ifndef REQUEST_H
 #define REQUEST_H
 
+#include <stdbool.h>
+
 typedef struct {
   int key;
   char* id;
   int timeout;
   int memlimit;
+  bool usestdin;
   char* cmd;   // the command to execute
   int numargs; // the length of the following array
   char** args; // the arguments of the process to run (not including the command)

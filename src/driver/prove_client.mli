@@ -6,6 +6,7 @@ val set_max_running_provers : int -> unit
 val connect : unit -> unit
 
 val send_request :
+ use_stdin:bool ->
  id:int ->
  timelimit:int ->
  memlimit:int ->

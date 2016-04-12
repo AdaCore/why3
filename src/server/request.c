@@ -49,6 +49,7 @@ prequest parse_request(char* str_req, int len, int key) {
   int pos = 0;
   prequest req;
   char* tmp;
+  bool runstdin = false;
 
   semic = count_semicolons(str_req, len);
   if (semic == 0) {
@@ -73,11 +74,16 @@ prequest parse_request(char* str_req, int len, int key) {
   }
   pos = copy_up_to_semicolon(str_req, pos, len, &tmp);
   if (strncmp(tmp, "run", pos) != 0) {
-    return NULL;
+    if (strncmp(tmp, "runstdin", pos) == 0) {
+      runstdin = true;
+    } else {
+      return NULL;
+    }
   }
   req = (prequest) malloc(sizeof(request));
   req->key = key;
   req->numargs = numargs;
+  req->usestdin = runstdin;
   pos = copy_up_to_semicolon(str_req, pos, len, &(req->id));
   pos = copy_up_to_semicolon(str_req, pos, len, &tmp);
   req->timeout = atoi(tmp);
