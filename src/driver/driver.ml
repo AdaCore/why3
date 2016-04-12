@@ -352,21 +352,6 @@ let prove_task ~command ~limit ?(cntexample=false) ?old
   let task = prepare_task ~cntexample drv task in
   prove_task_prepared ~command ~limit ?old ?inplace drv task
 
-let prove_task_server command ~limit ~cntexample ?old ?inplace drv task =
-  let task = prepare_task ~cntexample drv task in
-  let fn = file_name_of_task ?old ?inplace drv task in
-  let res_parser = drv.drv_res_parser in
-  let printer_mapping = get_default_printer_mapping in
-  match inplace with
-  | Some true ->
-     prove_file_server ~command ~res_parser ~limit ~printer_mapping ?inplace fn
-  | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
-	 let fmt = Format.formatter_of_out_channel outc in
-	 let printer_mapping = print_task_prepared ?old:None drv fmt task in
-         close_out outc;
-
-         prove_file_server ~command ~res_parser ~limit ~printer_mapping fn
-
 (* exception report *)
 
 let string_of_qualid thl idl =
