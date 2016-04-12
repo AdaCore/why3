@@ -167,8 +167,8 @@ let task_queue  = Queue.create ()
 let first_task = ref true
 type 'a status = Free of 'a | Busy of 'a | Absent
 let num_workers = 4
-
-let alt_ergo_workers = Array.make num_workers Absent
+let alt_ergo_steps = ref 100
+let alt_ergo_workers = ref (Array.make num_workers Absent)
 
 let rec init_alt_ergo_worker i =
   let worker = Worker.create "alt_ergo_worker.js" in
@@ -176,7 +176,7 @@ let rec init_alt_ergo_worker i =
     (Dom.handler (fun ev ->
                   let (id, result) = unmarshal (ev ## data) in
                   Console.print_alt_ergo_output id result;
-                  alt_ergo_workers.(i) <- Free(worker);
+                  !alt_ergo_workers.(i) <- Free(worker);
                   process_task ();
                   Js._false));
   Free (worker)
@@ -184,7 +184,7 @@ let rec init_alt_ergo_worker i =
 and process_task () =
   let rec find_free_worker_slot i =
     if i < num_workers then
-      match alt_ergo_workers.(i) with
+      match !alt_ergo_workers.(i) with
         Free _ as w -> i, w
       | _ -> find_free_worker_slot (i+1)
     else -1, Absent
@@ -193,7 +193,8 @@ and process_task () =
   match w with
     Free w when not (Queue.is_empty task_queue) ->
     let task = Queue.take task_queue in
-    alt_ergo_workers.(idx) <- Busy (w);
+    !alt_ergo_workers.(idx) <- Busy (w);
+    w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
     w ## postMessage (marshal task)
   | _ -> ()
 
@@ -203,10 +204,10 @@ let reset_workers () =
      match w with
        Busy (w)  ->
                    w ## terminate ();
-                   alt_ergo_workers.(i) <- init_alt_ergo_worker i
-     | Absent -> alt_ergo_workers.(i) <- init_alt_ergo_worker i
+                   !alt_ergo_workers.(i) <- init_alt_ergo_worker i
+     | Absent -> !alt_ergo_workers.(i) <- init_alt_ergo_worker i
      | Free _ -> ()
-    ) alt_ergo_workers
+    ) !alt_ergo_workers
 
 let push_task task =
   Queue.add  task task_queue;
@@ -224,19 +225,16 @@ let init_why3_worker () =
                   Console.print_why3_output msg;
                   let () =
                     match msg with
-                      Tasks (_,_,(id,_,code)) -> push_task (id,code)
+                      Tasks (_,_,(id,_,code)) -> push_task (Task (id,code))
                     | _ -> ()
                   in Js._false));
-  (* seems necessary to warm-up the worker and start loading
-     the script premptively *)
-  worker ## postMessage(marshal Init);
   worker
 
 let why3_worker = ref (init_why3_worker ())
 
 let why3_parse () =
   Console.clear ();
-  Console.print_msg "Sending buffer to Alt-ergo … ";
+  Console.print_msg "Sending buffer to Alt-Ergo … ";
   log_time "Before marshalling in main thread";
   reset_workers ();
   first_task := true;
@@ -261,7 +259,34 @@ let () =
                      !why3_worker ## terminate ();
                      why3_worker := init_why3_worker ();
                      reset_workers ();
-                     Console.set_abort_icon())
+                     Console.set_abort_icon());
+  let input_threads = get_opt Dom_html.(CoerceTo.input
+					  (getElementById "input-num-threads"))
+  in
+  input_threads ## oninput <-
+    Dom.handler
+      (fun ev ->
+       let len = int_of_string (Js.to_string (input_threads ## value)) in
+       Array.iter (function Busy (w) | Free (w) -> w ## terminate () | _ -> ())
+		  !alt_ergo_workers;
+       log (string_of_int len);
+       alt_ergo_workers := Array.make len Absent;
+       Console.set_abort_icon();
+       Js._false
+      );
+  let input_steps = get_opt Dom_html.(CoerceTo.input
+					  (getElementById "input-num-steps"))
+  in
+  input_steps ## oninput <-
+    Dom.handler
+      (fun ev ->
+       let steps = int_of_string (Js.to_string (input_steps ## value)) in
+       log(string_of_int steps);
+       alt_ergo_steps := steps;
+       reset_workers ();
+       Console.set_abort_icon();
+       Js._false
+      )
 
 
 (* Predefined examples *)

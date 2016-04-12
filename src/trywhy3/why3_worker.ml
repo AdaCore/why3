@@ -217,7 +217,6 @@ let () =
      let ev = unmarshal ev in
      log_time ("After unmarshal ");
      match ev with
-       Init -> ()
      | ParseBuffer code ->
        why3_run why3_parse_theories Env.base_language code
      | ExecuteBuffer code ->

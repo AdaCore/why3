@@ -147,24 +147,12 @@ function widescreenView()
 {
     var e = document.getElementById("editor");
     var c = document.getElementById("console");
-    e.style.width = "50%";
+    e.style.width = "60%";
     e.style.height = "100%";
     c.style.width = "40%";
     c.style.height = "100%";
     editor.focus();
 }
 
-function prove()
-{
-    document.getElementById("console").innerHTML = "<p>Execution feature is not yet implemented</p>";
-    console.focus();
-    editor.focus();
-}
-
-function prove()
-{
-    document.getElementById("console").innerHTML = "<p>Call to Why3 is not yet implemented</p>";
-    editor.focus();
-}
 
 editor.focus();

@@ -1,0 +1,116 @@
+
+<!-- This document was automatically generated with yamlpp
+     (see http://www.lri.fr/~filliatr/yamlpp.en.html),
+     with the following command:
+yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      style="font-family:Verdana,Arial,Sans-Serif">
+  <head>
+    <title>
+      Try Why3
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="trywhy3.css" />
+    <!-- color customisation -->
+    <style>
+
+    </style>
+  </head>
+  <body>
+    <!--invisible elements for the open file dialog -->
+    <input type="file"  id="file-selector" />
+    <div id="background-shadow">
+      <div id="confirm-dialog" >
+	The content of the current buffer will be lost
+
+        <br/>
+	<div style="width:70%; display:inline-block;">
+	  <button class="btn"
+		  onclick="confirmReplace();">
+            Confirm
+
+          </button>
+	  <button class="btn"
+		  onclick="cancelReplace();">
+            Cancel
+
+          </button>
+	</div>
+      </div>
+    </div>
+
+    <div class="menu-bar">
+      <ul>
+	<li><span>File</span>
+	  <ul>
+	    <li onclick="openFile();">
+                Open</li>
+	    <li onclick="saveFile();">
+              Save as
+	    </li>
+	  </ul>
+	</li>
+	<li><span>Edit</span>
+	  <ul>
+	    <li onclick="editor.undo();">Undo</li>
+	    <li onclick="editor.redo();">Redo</li>
+	    <li onclick="clearBuffer();">Clear buffer</li>
+	  </ul>
+	</li>
+	<li><span>Examples</span>
+	  <ul>
+	    <li id="drinkers">Drinker's paradox</li>
+	    <li id="bin_mult">Binary Multiplication</li>
+	    <li id="fact">Factorial</li>
+	    <li id="isqrt">Integral square root</li>
+	  </ul>
+	</li>
+	<li><span>Why3</span>
+	  <ul>
+	    <li id="run">Execute Buffer</li>
+	    <li id="prove">Prove with Alt-Ergo</li>
+	    <li id="stop">Stop Alt-ergo</li>
+	  </ul>
+	</li>
+	<li><span>Preferences</span>
+	  <ul>
+	    <li onclick="document.getElementById('radio-wide').click();">
+	      <input id="radio-wide" type="radio" name="view"
+		     value="wide" checked="checked" onchange="widescreenView();"
+		     />
+              Split Vertically
+	    </li>
+	    <li onclick="document.getElementById('radio-std').click();">
+	      <input id="radio-std" type="radio" name="view" value="std"
+		     onchange="standardView();"
+		     />
+              Split Horizontally
+	    </li>
+	    <li>
+ 	      <input id="input-num-threads" type="number" style="width:3em;" min="1" max="8"
+		     value="4"></input></input> Number of threads for Alt-Ergo
+	    </li>
+	    <li>
+ 	      <input id="input-num-steps" type="number" style="width:3em;" min="1" max="1000"
+		     value="100"></input></input> Number of steps for Alt-Ergo
+	    </li>
+	  </ul>
+	</li>
+	<li style="float:right;"><span>Help</span></li>
+      </ul>
+    </div>
+    <div id="editor-panel">
+      <div id="editor" title="Editor" tabindex="-1" ></div>
+      <div title="Console" id="console">
+      </div>
+    </div>
+    <script defer="true" src="ace-builds/src-noconflict/ace.js"
+            type="text/javascript" charset="utf-8"></script>
+    <script defer="true" type="text/javascript"
+            src="editor_helper.js"></script>
+    <script defer="true" type="text/javascript"
+            src="trywhy3.js"></script>
+  </body>
+
+</html>
