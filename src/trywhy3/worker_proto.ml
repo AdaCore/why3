@@ -3,7 +3,7 @@ type loc = int * int * int * int
 type status = [`New | `Valid | `Unknown ]
 type why3_command =  ParseBuffer of string
               | ExecuteBuffer of string
-              | Transform of [ `Split ] * id
+              | Transform of [ `Prove | `Split | `Clean ] * id
               | SetStatus of status * id
 
 type why3_output = Error of string (* msg *)
@@ -11,7 +11,7 @@ type why3_output = Error of string (* msg *)
                  | Theory of id * string (* Theory (id, name) *)
                  | Task of (id * id * string * string * loc list) (* id, parent id, expl, code, location list *)
                  | Result of string list
-                 | UpdateStatus of status * id 
+                 | UpdateStatus of status * id
 
 type prover_command = OptionSteps of int | Goal of id * string
 type prover_output = Valid | Unknown of string | Invalid of string

@@ -64,6 +64,18 @@ module Console =
     let appendChild o c =
       ignore (o ## appendChild ( (c :> Dom.node Js.t)))
 
+    let mk_li_content id expl =
+      Js.string (Format.sprintf
+		   "<span id='%s_container'><span id='%s_icon'></span> %s <span id='%s_msg'></span></span><ul id='%s_ul'></ul>"
+		   id id expl id id)
+
+    let clean_task id =
+      try
+	let ul = Dom_html.getElementById (id ^ "_ul") in
+	ul ## innerHTML <- Js.string ""
+      with
+	Not_found -> ()
+
     let attach_to_parent id parent_id expl _loc =
       let doc = Dom_html.document in
       let ul =
@@ -84,17 +96,14 @@ module Console =
         let li = Dom_html.createLi doc in
         li ## id <- Js.string id;
         appendChild ul li;
-        let span_icon = Dom_html.createSpan doc in
-        appendChild li span_icon;
-        span_icon ## id <- Js.string (id ^ "_icon");
-        appendChild li (doc ## createTextNode (Js.string (" " ^ expl ^ " ")));
-        let span_msg = Dom_html.createSpan doc in
-        span_msg ## id <- Js.string (id ^ "_msg");
-        appendChild li span_msg;
-        let tul = Dom_html.createUl doc in
-        tul ## id <- Js.string (id ^ "_ul");
-        appendChild li tul
+	li ## innerHTML <- mk_li_content id expl
 
+
+    let task_selection = Hashtbl.create 17
+    let task_deselect () =
+      Hashtbl.iter (fun _ span -> span ## classList ## remove (Js.string "task-selected"))
+                   task_selection;
+      Hashtbl.clear task_selection
 
     let print_why3_output o =
       let doc = Dom_html.document in
@@ -116,9 +125,37 @@ module Console =
                     li ## innerHTML <- (Js.string s);
                     appendChild ul li;) sl
 
-      | Theory (th_id, th_name) -> attach_to_parent th_id "theory-list" th_name []
+      | Theory (th_id, th_name) ->
+	 attach_to_parent th_id "theory-list" th_name []
+
       | Task (id, parent_id, expl, _code, loc) ->
-         attach_to_parent id parent_id expl loc
+	 begin
+	   try
+	     ignore (Dom_html.getElementById id)
+	   with Not_found ->
+		attach_to_parent id (parent_id ^ "_ul") expl loc;
+		let span = Dom_html.getElementById (id ^ "_container") in
+		span ## onclick <-
+		  Dom.handler
+		    (fun ev ->
+		     let ctrl = Js.to_bool (ev ## ctrlKey) in
+		     if Hashtbl.mem task_selection id then
+                       if ctrl then
+			 begin
+			   Hashtbl.remove task_selection id;
+			   (span ## classList) ## remove (Js.string "task-selected");
+			 end
+                       else
+			 task_deselect ()
+		     else begin
+			 if not ctrl then task_deselect ();
+			 Hashtbl.add task_selection id span;
+			 (span ## classList) ## add (Js.string "task-selected")
+                       end;
+		     Js._false)
+	 end
+
+
       | UpdateStatus(st, id) ->
          try
            let span_icon = Dom_html.getElementById (id ^ "_icon") in
@@ -224,7 +261,9 @@ let init_why3_worker () =
                   Console.print_why3_output msg;
                   let () =
                     match msg with
-                      Task (id,_,_,code,_) -> push_task (Goal (id,code))
+                      Task (id,_,_,code,_) ->
+		      log ("Got task " ^ id);
+		      push_task (Goal (id,code))
                     | _ -> ()
                   in Js._false));
   worker
@@ -250,15 +289,39 @@ let why3_execute () =
   let code = Console.get_buffer () in
    (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
 
+let array_for_all a f =
+  let rec loop i n =
+    if i < n then (f a.(i)) && loop (i+1) n
+    else true
+  in
+  loop 0 (Array.length a)
+
+let alt_ergo_not_running () =
+  array_for_all !alt_ergo_workers (function Busy _ -> false | _ -> true)
+
+let why3_transform tr f () =
+  if alt_ergo_not_running () then
+    begin
+      Hashtbl.iter
+        (fun id _ ->
+	 f id;
+	 (get_why3_worker()) ## postMessage (marshal (Transform(tr, id))))
+	Console.task_selection;
+      Console.task_deselect ()
+    end
+
 
 let () =
-  add_button "prove" why3_parse ;
+  add_button "prove_all" why3_parse ;
   add_button "run" why3_execute ;
   add_button "stop" (fun () ->
                      (get_why3_worker()) ## terminate ();
                      why3_worker := Some (init_why3_worker ());
                      reset_workers ();
                      Console.set_abort_icon());
+  add_button "prove" (why3_transform `Prove (fun _ -> ()));
+  add_button "split_prove" (why3_transform `Split (fun _ -> ()));
+  add_button "clean" (why3_transform `Clean Console.clean_task);
 
   let input_threads = get_opt Dom_html.(CoerceTo.input
 					  (getElementById "input-num-threads"))
@@ -302,7 +365,9 @@ let add_file_example (buttonname, file) =
       let loaded = Filename.basename file in
       Js.Unsafe.set global (Js.string "loadedFilename") (Js.string loaded);
       ignore (Js.Unsafe.meth_call global "replaceWithLoaded" [| |]);
+      Console.clear ();
       ignore (Js.Unsafe.meth_call editor "focus" [| |]);
+
       Js._false)
   in
   let button =

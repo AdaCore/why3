@@ -60,7 +60,8 @@ function realReplaceBuffer()
 	currentFilename = loadedFilename;
          //document.getElementById("filename_panel").innerHTML = loadedFilename;
 	loadedFilename = "";
-	loadedBuffer = "";
+    loadedBuffer = "";
+    document.getElementById("console").innerHTML = "";
 }
 
 function confirmReplace ()
