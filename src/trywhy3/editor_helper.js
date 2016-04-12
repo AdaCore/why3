@@ -134,23 +134,19 @@ var saveFile = (function ()
 
 function standardView()
 {
-    var e = document.getElementById("editor");
-    var c = document.getElementById("console");
-    e.style.width = "100%";
-    e.style.height = "60vh";
-    c.style.width = "100%";
-    c.style.height = "37vh";
+    var e = document.getElementById("editor-panel");
+    e.classList.remove("wide-view");
+    e.classList.add("standard-view");
     editor.focus();
 }
 
 function widescreenView()
 {
-    var e = document.getElementById("editor");
-    var c = document.getElementById("console");
-    e.style.width = "60%";
-    e.style.height = "100%";
-    c.style.width = "40%";
-    c.style.height = "100%";
+    var e = document.getElementById("editor-panel");
+    e.classList.remove("standard-view");
+    e.classList.add("wide-view");
+
+
     editor.focus();
 }
 

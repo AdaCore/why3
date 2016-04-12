@@ -18,28 +18,55 @@ body {
     padding:0;
     margin:0;
     font-family: sans-serif;
+    font-size:12pt;
 }
 
 #editor-panel {
-    height: 97vh;
-    box-sizing:border-box;
-    padding: 0;
-    margin: 0;
+    position:absolute;
+    top:18pt;
+    bottom:0pt;
+    display:block;
+    box-sizing: border-box;
+    padding:0;
+    margin:0;
+    width:100%;
+}
+
+
+#editor-panel.wide-view #editor {
+    position:absolute;
+    top:0;
+    left:0;
+    width:48rem;
+    height:100%;
+}
+#editor-panel.wide-view #console {
+    position:absolute;
+    left:48rem;
+    right:0;
+    height:100%;
+}
+#editor-panel.standard-view #editor {
+    position:relative;
+    width:100%;
+    height:50%;
+}
+#editor-panel.standard-view #console {
+    position:relative;
+    width:100%;
+    height:49%;
 }
 
 #editor {
-    position:relative;
     font-size: large;
     box-sizing: border-box;
     display:inline-block;
-    height:100%;
-    margin:0 0 0 0;
-    padding:0 0 0 0;
+    margin: 0 ;
+    padding:0;
     z-index:0;
     vertical-align:top;
     border-right: 1pt  #ddd solid;
     border-bottom: 1pt #ddd solid;
-    width:59%;
 }
 
 #console {
@@ -47,21 +74,22 @@ body {
     overflow: auto;
     position:relative;
     display:inline-block;
-    width:40%;
-    height:100%;
-    margin:0 0 0 0;
-    padding:0 0 0 0;
+    margin:0 ;
+    padding:0.5em ;
     vertical-align:top;
 }
 
 /* CSS MENU BAR */
 
 .menu-bar {
+    position:absolute;
+    top:0pt;
     margin:0;
     z-index:10;
-    font-size:2vh;
-    height:3vh;
+    font-size:14pt;
+    height:18pt;
     padding:0;
+    width:100%;
 }
 
 .menu-bar:after {
@@ -76,8 +104,8 @@ body {
     list-style: none;
     position: relative;
     background-image: linear-gradient(to bottom, #eee, #ccc);
-    height:3vh;
     z-index:10;
+    height:18pt;
     box-sizing:border-box;
     }
 
@@ -94,6 +122,9 @@ body {
 
 /* Styling the links */
 .menu-bar > ul > li > span {
+    text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+
     display:block;
     padding:0pt 1em;
     color:#444;
@@ -112,6 +143,7 @@ body {
     background-image: linear-gradient(to bottom, #eee, #bbb);
     border-color: #aaa;
     box-sizing:border-box;
+    cursor:default;
 
 }
 .menu-bar > ul > li > ul {
@@ -131,6 +163,7 @@ body {
     background-color:#ddd;
     box-shadow:0pt 0pt 5pt  #444;
     opacity:1;
+    cursor:default;
 }
 .menu-bar > ul > li > ul > li {
     float:left;
@@ -174,25 +207,16 @@ body {
     z-index:-1;
 }
 
-#editor-panel {
-    position:relative;
-    display:block;
-    box-sizing: border-box;
-    padding:0;
-    margin:0;
-    height:97vh;
-}
-
 
 #console ul#theory-list {
     list-style-type: none;
     list-style-position: inside;
     padding: 0.5em;
-    /*margin: 0.5em; */
 }
 #console ul#theory-list li {
     font-weight:bold;
 }
+
 #console ul#theory-list li * {
     font-weight:normal;
 }
@@ -202,7 +226,6 @@ body {
     list-style-position: inside;
 
     padding: 0.5em;
-    /*margin: 0.5em;*/
 }
 
 #console ul ul ul {

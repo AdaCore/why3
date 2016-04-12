@@ -100,9 +100,10 @@ yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
 	<li style="float:right;"><span>Help</span></li>
       </ul>
     </div>
-    <div id="editor-panel">
-      <div id="editor" title="Editor" tabindex="-1" ></div>
-      <div title="Console" id="console">
+    <div id="editor-panel" class="wide-view">
+      <div id="editor" title="Editor" tabindex="-1" ></div><!--
+      Don't leave white-spaces between editor and console div's
+     --><div title="Console" id="console">
       </div>
     </div>
     <script defer="true" src="ace-builds/src-noconflict/ace.js"
