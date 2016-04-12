@@ -1,0 +1,71 @@
+Only in alt-ergo-1.00-private-2015-01-29/: autom4te.cache
+Only in alt-ergo-1.00-private-2015-01-29/: config.status
+Only in alt-ergo-1.00-private-2015-01-29/: .depend
+Only in alt-ergo-1.00-private-2015-01-29/: Makefile.configurable
+diff -c -r /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml
+*** /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2016-04-07 16:01:57.449020746 +0200
+--- alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.ml	2016-04-08 10:26:05.485174395 +0200
+***************
+*** 23,28 ****
+--- 23,30 ----
+  open Options
+  open Format
+  
++ exception StepsLimitReached
++ 
+  module type S = sig
+    type t
+  
+***************
+*** 492,499 ****
+--- 494,504 ----
+        if steps_bound () <> -1
+          && Int64.compare !steps (Int64.of_int (steps_bound ())) > 0 then
+          begin
++           raise StepsLimitReached;
++ (*
+  	  printf "Steps limit reached: %Ld@." !steps;
+  	  exit 1
++  *)
+          end;
+        { env with tbox = tbox; unit_tbox = utbox; inst = inst }
+  
+diff -c -r /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli
+*** /tmp/alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2016-04-07 16:01:57.449020746 +0200
+--- alt-ergo-1.00-private-2015-01-29/src/sat/sat_solvers.mli	2016-04-08 10:26:05.485174395 +0200
+***************
+*** 20,25 ****
+--- 20,27 ----
+  (*   This file is distributed under the terms of the CeCILL-C licence         *)
+  (******************************************************************************)
+  
++ exception StepsLimitReached
++ 
+  module type S = sig
+    type t
+  
+diff -c -r /tmp/alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml
+*** /tmp/alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml	2016-04-07 16:01:57.453020790 +0200
+--- alt-ergo-1.00-private-2015-01-29/src/util/numbers.ml	2016-04-08 10:41:51.037337014 +0200
+***************
+*** 20,28 ****
+  (*   This file is distributed under the terms of the CeCILL-C licence         *)
+  (******************************************************************************)
+  
+! module MyZarith = ZarithNumbers
+  module MyNums = NumsNumbers
+  
+! include MyZarith
+  
+  
+--- 20,29 ----
+  (*   This file is distributed under the terms of the CeCILL-C licence         *)
+  (******************************************************************************)
+  
+! (* module MyZarith = ZarithNumbers *)
+  module MyNums = NumsNumbers
+  
+! include MyNums
+! 
+  
+  
