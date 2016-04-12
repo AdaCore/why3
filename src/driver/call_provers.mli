@@ -181,15 +181,3 @@ val wait_on_call : prover_call -> post_prover_call
 (** Thread-safe blocking function that waits until the prover finishes. *)
 
 val set_socket_name : string -> unit
-
-type server_id = int
-
-val prove_file_server :
-          res_parser : prover_result_parser ->
-          command : string ->
-          limit : resource_limit ->
-          printer_mapping : Printer.printer_mapping ->
-          ?inplace : bool ->
-          string -> server_id
-
-val wait_for_server_result : blocking:bool -> (server_id * prover_result) list

@@ -305,25 +305,6 @@ type save_data =
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
-let prove_file_server ~res_parser ~command ~limit
-                      ~printer_mapping ?(inplace=false)
-                      file =
-  let id = gen_id () in
-  let cmd, _, on_timelimit =
-    actualcommand ~cleanup:true ~inplace command limit file in
-  let limit = adapt_limits limit on_timelimit in
-  let save =
-    { vc_file      = file;
-      inplace      = inplace;
-      limit        = limit;
-      res_parser   = res_parser;
-      printer_mapping = printer_mapping } in
-  Hashtbl.add saved_data id save;
-  let timelimit = get_time limit in
-  let memlimit = get_mem limit in
-  Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
-  id
-
 let read_and_delete_file fn =
   let cin = open_in fn in
   let out = Sysutil.channel_contents cin in
@@ -365,8 +346,20 @@ let result_buffer : (server_id, prover_result) Hashtbl.t = Hashtbl.create 17
 
 let call_on_file ~command ~limit ~res_parser ~printer_mapping
                  ?(inplace=false) fin () =
-  let id = prove_file_server ~res_parser ~command ~limit ~printer_mapping
-                             ~inplace fin in
+  let id = gen_id () in
+  let cmd, _, on_timelimit =
+    actualcommand ~cleanup:true ~inplace command limit fin in
+  let limit = adapt_limits limit on_timelimit in
+  let save =
+    { vc_file      = fin;
+      inplace      = inplace;
+      limit        = limit;
+      res_parser   = res_parser;
+      printer_mapping = printer_mapping } in
+  Hashtbl.add saved_data id save;
+  let timelimit = get_time limit in
+  let memlimit = get_mem limit in
+  Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
   ServerCall id
 
 let get_new_results ~blocking =
