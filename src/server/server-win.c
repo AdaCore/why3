@@ -262,7 +262,7 @@ void run_request (prequest r) {
                  OPEN_ALWAYS,
                  FILE_ATTRIBUTE_NORMAL,
                  NULL);
-     si->hSdtInput = infilehandle;
+     si.hStdInput = infilehandle;
    }
    // if we don't set that flag, the stdout we just set won't even be looked at
    si.dwFlags = STARTF_USESTDHANDLES;
