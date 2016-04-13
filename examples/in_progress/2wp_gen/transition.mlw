@@ -1,104 +1,198 @@
-(* Encoding of transition system (with countable limits)
-   into fully angelic/demonic games to represent the usual
-   notions of admissibility and correctness. *)
+
+(* Log encoding of transition systems (with countable limits)
+   into fully existential/universal games to represent the
+   usual notions of admissibility and correctness. *)
 module Trans
 
   use import int.Int
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import fn.Image
-  use import order.Ordered
-  use import game.Game as G
-
-  (* Transition system with ordered limit states. *)
-  type system 'a 'o = {
-    (* Transition relation *)
-    transition : 'a -> 'a -> bool;
-    (* Projection to the ordered part. *)
-    projection : 'a -> 'o;
-    (* Progression relation on the ordered part. *)
-    progress : 'o -> 'o -> bool;
-  }
-
-  (* A transition system (as defined above) is well-formed if
-     the transitions respect the order, and the order admit supremum
-     of countable chains. *)
-  predicate countable_complete (o:erel 'a) =
-    forall f:int -> 'a. monotone (<=) f o ->
-      exists lim. supremum o (image f all) lim
-
-  predicate system_wf (sys:system 'a 'b) =
-    transitive sys.transition /\
-    order sys.progress /\
-    countable_complete sys.progress /\
-    (forall x y. sys.transition x y ->
-      sys.progress (sys.projection x) (sys.projection y))
-
-  (* Encoding into games: add a time counter, and shave off
-     non-ordered part at limit. *)
-  type state 'a 'o =
-    | Natural 'a int
-    | Limit 'o
-
-  predicate gprogress (sys:system 'a 'o) (x y:state 'a 'o) =
-    match x, y with
-    | Natural xa xtc, Natural ya ytc -> x = y \/
-      (xtc < ytc /\ sys.progress (sys.projection xa) (sys.projection ya))
-    | Natural x _, Limit y -> sys.progress (sys.projection x) y
-    | Limit x, Limit y -> sys.progress x y
-    | _ -> false
-    end
-
-  predicate successor (sys:system 'a 'o) (x:'a) (xtc:int) (y:state 'a 'o) =
-    match y with
-    | Limit _ -> false
-    | Natural y ytc -> sys.transition x y /\ xtc < ytc
-    end
-
-  predicate existential_transition (sys:system 'a 'o)
-                (x:state 'a 'o) (s:set (state 'a 'o)) =
-    match x with
-    | Limit _ -> false
-    | Natural x xtc -> image (=) (successor sys x xtc) s
-    end
-
-  predicate universal_transition (sys:system 'a 'o)
-              (x:state 'a 'o) (s:set (state 'a 'o)) =
-    match x with
-    | Limit _ -> false
-    | Natural xs xtc ->
-      (* Having no possible successor mean being stuck.
-         It should not imply that the existential player has won. *)
-      let succ = successor sys xs xtc in
-      s = if succ = none then (=) x else succ
-    end
-
-  function egame (sys:system 'a 'o) : game (state 'a 'o) =
-    { G.progress = gprogress sys; G.transition = existential_transition sys }
-  function ugame (sys:system 'a 'o) : game (state 'a 'o) =
-    { G.progress = gprogress sys; G.transition = universal_transition sys }
-
-end
-
-module TransWf "W:non_conservative_extension:N" (* => TransProof. *)
-
-  use import int.Int
+  use import option.Option
   use import ho_set.Set
   use import ho_rel.Rel
   use import fn.Image
   use import order.Ordered
   use import order.Chain
+  use import order.LimUniq
+  use import fn.Fun
   use import game.Game as G
+
+  type system 'a 'o = {
+    (* Transition relation *)
+    transition : 'a -> 'a -> bool;
+    (* Projection to the ordered part *)
+    projection : 'a -> 'o;
+    (* Progression relation on the ordered part *)
+    progress : 'o -> 'o -> bool;
+  }
+
+  predicate countable_complete (o:erel 'a) =
+    forall f. monotone (<=) f o -> exists z. supremum o (image f all) z
+
+  predicate system_wf (sys:system 'a 'o) =
+    order sys.progress /\
+    countable_complete sys.progress /\
+    forall x y. sys.transition x y ->
+      sys.progress (sys.projection x) (sys.projection y)
+
+  (* Encoding into game: potentially unbounded log *)
+  type state 'a = {
+    time : option int;
+    log : int -> 'a;
+  }
+
+  (* Local state vision, more natural
+     (technical: using local states directly does not work out well.
+      it is incompatible with countable limits, and requires a number
+      of 'log-building' lemmas for bridge that the log representation
+      gives for free) *)
+  type lstate 'a 'o =
+    | Natural int 'a
+    | Limit 'o
+
+  (* Projection log state => local state. Continuous. *)
+  function local_repr (sys:system 'a 'o) (s:state 'a) : lstate 'a 'o =
+    match s.time with
+    | None ->
+        let cp = compose sys.projection s.log in
+        let ch = image cp all in
+        Limit (sup sys.progress ch)
+    | Some u -> Natural u (s.log u)
+    end
+
+  predicate o_le (x y:option int) =
+    match x, y with
+    | None, _ -> y = None
+    | _, None -> true
+    | Some u, Some v -> u <= v
+    end
+
+  predicate urange (x:option int) (y:int) =
+    match x with
+    | None -> true
+    | Some u -> y <= u
+    end
+
+  predicate normalized (xtc:int) (xlg:int -> 'a) =
+    forall z. z >= xtc -> xlg z = xlg xtc
+
+  (* States we are really interested in have monotonic and normalized logs. *)
+  predicate valid (sys:system 'a 'o) (s:state 'a) =
+    monotone (<=) (compose sys.projection s.log) sys.progress /\
+    match s.time with None -> true | Some u -> normalized u s.log end
+
+  (* Progression on logs: countable analog to subchain ordering *)
+  predicate gprogress (sys:system 'a 'o) (x y:state 'a) =
+    x = y \/
+    (valid sys x /\ valid sys y /\
+      o_le x.time y.time /\
+      equalizer (urange x.time) y.log x.log /\
+      forall z t. urange x.time z /\ urange y.time t /\ not urange x.time t ->
+        let zp = sys.projection (x.log z) in
+        let tp = sys.projection (y.log z) in
+        sys.progress zp tp)
+
+  (* Progression on local states *)
+  predicate lprogress (sys:system 'a 'o) (x y:lstate 'a 'o) =
+    match x, y with
+    | Natural xtc xa, Natural ytc ya -> x = y \/
+        (xtc < ytc /\ sys.progress (sys.projection xa) (sys.projection ya))
+    | Natural _ x, Limit y -> sys.progress (sys.projection x) y
+    | Limit x, Limit y -> sys.progress x y
+    | _ -> false
+    end
+
+  predicate successor (sys:system 'a 'o) (xtc:int) (xlg:int -> 'a) (y:state 'a) =
+    valid sys y /\ normalized xtc xlg /\
+    match y.time with
+    | None -> false
+    | Some u ->
+        u = xtc + 1 /\ sys.transition (xlg xtc) (y.log u) /\
+        equalizer ((>=) xtc) y.log xlg
+    end
+
+  predicate existential_transition (sys:system 'a 'o)
+                      (x:state 'a) (s:set (state 'a)) =
+    match x.time with
+    | None -> false
+    | Some xtc -> image (=) (successor sys xtc x.log) s
+    end
+
+  predicate universal_transition (sys:system 'a 'o)
+                    (x:state 'a) (s:set (state 'a)) =
+    match x.time with
+    | None -> false
+    | Some xtc ->
+        let succ = successor sys xtc x.log in
+        s = if succ = none then (=) x else succ
+    end
+
+  function egame (sys:system 'a 'o) : game (state 'a) =
+    { G.progress = gprogress sys; G.transition = existential_transition sys }
+  function ugame (sys:system 'a 'o) : game (state 'a) =
+    { G.progress = gprogress sys; G.transition = universal_transition sys }
+
+  (* Definition for bridge lemmas.
+     They use log state formalism (this is not the place to introduce
+     the definitions associated to general 'vision' mechanism). *)
+
+  predicate st_pre (sys:system 'a 'o) (p:set 'a) (x:state 'a) =
+    valid sys x /\
+    match local_repr sys x with
+    | Natural _ x -> p x
+    | Limit _ -> false
+    end
+
+  predicate st_post (sys:system 'a 'o) (qn:set 'a) (ql:set 'o) (x:state 'a) =
+    valid sys x /\
+    match local_repr sys x with
+    | Natural _ x -> qn x
+    | Limit o -> ql o
+    end
+
+  constant pos : int -> bool = \x. x >= 0
+
+  predicate fin_reach (sys:system 'a 'o) (q:set 'a) (lg:int -> 'a) (n:int) =
+    n >= 0 /\ q (lg n) /\ forall m. 0 <= m < n -> sys.transition (lg m) (lg (m+1))
+  predicate fin_correct (sys:system 'a 'o) (q:set 'a) (lg:int -> 'a) (n:int) =
+    n >= 0 /\ (q (lg n) \/ not sys.transition (lg n) (lg (n+1))) /\
+    forall m. 0 <= m < n -> sys.transition (lg m) (lg (m+1))
+  predicate lim_reach (sys:system 'a 'o) (q:set 'o) (lg:int -> 'a) =
+    let cp = compose sys.projection lg in
+    (exists sp. supremum sys.progress (image cp pos) sp /\ q sp) /\
+    (forall n. 0 <= n -> sys.transition (lg n) (lg (n+1)))
+  predicate reach (sys:system 'a 'o) (qn:set 'a) (ql:set 'o) (lg:int -> 'a) =
+    lim_reach sys ql lg \/ exists n. fin_reach sys qn lg n
+  predicate correct (sys:system 'a 'o) (qn:set 'a) (ql:set 'o) (lg:int -> 'a) =
+    lim_reach sys ql lg \/ exists n. fin_correct sys qn lg n
+
+end
+
+module TransWf "W:non_conservative_extension:N" (* => TransProof *)
+
+  use import ho_rel.Rel
+  use import order.Chain
+  use import game.Game
+  use import fn.Image
   use import Trans
 
-  axiom q_chain_complete_is_countable_complete :
-    forall o:erel 'a. q_chain_complete o -> countable_complete o
+  axiom q_chain_complete_countable_complete : forall o:erel 'a.
+    q_chain_complete o -> countable_complete o
 
   axiom gprogress_order : forall sys:system 'a 'o.
     system_wf sys -> order (gprogress sys)
 
+  axiom lprogress_order : forall sys:system 'a 'o.
+    system_wf sys -> order (lprogress sys)
+
+  axiom local_repr_mono : forall sys:system 'a 'o.
+    system_wf sys -> monotone (gprogress sys) (local_repr sys) (lprogress sys)
+
   axiom gprogress_complete : forall sys:system 'a 'o.
     system_wf sys -> q_chain_complete (gprogress sys)
+
+  axiom local_repr_cont : forall sys:system 'a 'o,ch inh sp.
+    system_wf sys /\ chain (gprogress sys) ch /\ ch inh /\
+    supremum (gprogress sys) ch sp ->
+    supremum (lprogress sys) (image (local_repr sys) ch) (local_repr sys sp)
 
   axiom egame_wf : forall sys:system 'a 'o.
     system_wf sys -> game_wf (egame sys)
@@ -108,286 +202,600 @@ module TransWf "W:non_conservative_extension:N" (* => TransProof. *)
 
 end
 
-(* TODO: transfer lemmas in another module. *)
+module Bridge "W:non_conservative_extension:N" (* => TransProof *)
+
+  use import game_fmla.Fmla
+  use import Trans
+
+  axiom egame_enforce : forall sys:system 'a 'o,p qn ql.
+    system_wf sys ->
+      (enforce (st_pre sys p) (st_post sys qn ql) (egame sys) <->
+        forall x. p x -> exists lg. x = lg 0 /\ reach sys qn ql lg)
+  axiom ugame_enforce : forall sys:system 'a 'o,p qn ql.
+    system_wf sys ->
+      (enforce (st_pre sys p) (st_post sys qn ql) (ugame sys) <->
+        forall lg. p (lg 0) -> correct sys qn ql lg)
+
+end
 
 module TransProof
 
   use import int.Int
-  use import choice.Choice
   use import option.Option
+  use import choice.Choice
   use import ho_set.Set
   use import ho_rel.Rel
-  use import fn.Image
-  use import order.Ordered
   use import order.Chain
-  use import order.LimUniq
+  use import fn.Fun
+  use import fn.Image
   use import game.Game as G
   use import Trans
 
-  lemma q_chain_complete_is_countable_complete :
-    forall o:erel 'a. order o /\ q_chain_complete o -> countable_complete o
-    by forall f. monotone (<=) f o ->
-      let ch = image f all in
-      (exists lim. supremum o ch lim)
-    by ch (f 0)
-    so chain o ch
-    by (forall x y. ch x /\ ch y -> o x y \/ o y x
-      by exists a. f a = x so exists b. f b = y
-      so (o x y by a <= b) \/ (o y x by b <= a)
-    )
+  lemma q_chain_complete_countable_complete : forall o:erel 'a.
+    q_chain_complete o -> countable_complete o
+    by forall f. monotone (<=) f o -> chain o (image f all) /\ image f all (f 0)
 
   lemma gprogress_order : forall sys:system 'a 'o.
     system_wf sys -> order (gprogress sys)
     by let og = gprogress sys in
-      let o = sys.progress in
-    (antisymetric og by forall a b. og a b /\ og b a -> a = b
-      by match a, b with
-        | Natural _ _, Natural _ _ -> true
-        | Limit a, Limit b -> o a b /\ o b a
-        | _ -> false
-        end)
-    /\ (transitive og by forall a b c. og a b /\ og b c -> og a c
-      by if a = b \/ b = c then true else
-        match a, b, c with
-        | _, Limit _, Natural _ _
-        | Limit _, Natural _ _, _
-        | Limit _, _, Natural _ _ -> false
-        | Limit a, _, Limit c -> o a c
-        | Natural a _, _, Natural c _ -> o (sys.projection a) (sys.projection c)
-        | Natural a _, _, Limit c -> o (sys.projection a) c
-        end
+    (antisymetric og by forall x y. og x y /\ og y x -> if x = y then true else
+      false by match x.time, y.time with
+      | None, None -> ext x.log y.log
+      | Some u, Some v ->
+        u = v so ext x.log y.log by normalized u x.log /\ normalized u y.log
+      | _, _ -> false
+      end
+    ) /\ (transitive og by forall x y z. og x y /\ og y z -> og x z
+      by if x = y \/ y = z then true else
+        subset (urange x.time) (urange y.time) /\
+        subset (urange y.time) (urange z.time) /\
+        o_le x.time z.time
+      by "case_split" match x.time, y.time, z.time with
+      | None, Some _, _
+      | _, None, Some _ -> false
+      | _ -> true
+      end
     )
 
-  (* Machinery to transform a maxless chain on states into a
-     monotonic function on integers with same supremum. Moreover, the so-build
-     function image is exactly the restriction to elements above the seed. *)
-  inductive nth_build (system 'a 'o) (set (state 'a 'o)) (state 'a 'o)
-                                     int (state 'a 'o) =
-    | build_low : forall sys ch n,inh:state 'a 'o.
-      n <= 0 -> nth_build sys ch inh n inh
-    | build_succ : forall sys ch inh n,x y:state 'a 'o.
-      let s = inter ch (lower (gprogress sys) x) in
-      nth_build sys ch inh n x /\ minimum (gprogress sys) s y /\ n >= 0 ->
-      nth_build sys ch inh (n+1) y
-
-  lemma nth_build_unique : forall sys ch inh n,x:state 'a 'o.
-    system_wf sys ->
-    ("induction" nth_build sys ch inh n x) ->
-      forall y. nth_build sys ch inh n y -> x = y
-
-  function proxy (sys:system 'a 'o) (ch:set (state 'a 'o))
-                                           (x:state 'a 'o) : state 'a 'o =
-    choice (inter ch (lower (gprogress sys) x))
-
-  function range (sys:system 'a 'o) (ch:set (state 'a 'o))
-                                    (x y:state 'a 'o) : set (state 'a 'o) =
-    \z. let og = gprogress sys in ch z /\ lower og x z /\ lower og z y
-
-  let rec ghost chain_restriction_wf (sys:system 'a 'o)
-           (ch:set (state 'a 'o)) (x y:state 'a 'o) : state 'a 'o
-    requires { forall x. ch x -> match x with Limit _ -> false | _ -> true end }
-    requires { ch y /\ lower (gprogress sys) x y }
-    requires { chain (gprogress sys) ch }
-    ensures { minimum (gprogress sys)
-                      (inter ch (lower (gprogress sys) x)) result }
-    variant { match y with Limit _ -> 1 | Natural _ _ -> 0 end,
-              match x, y with
-              | Natural _ cx, Natural _ cy -> cy - cx
-              | _ -> 0
-              end }
-  = match x with
-    | Limit _ -> absurd
-    | Natural _ xc -> match choose_if (range sys ch x y) with
-    | None ->
-        assert { let og = gprogress sys in
-          let s = inter ch (lower og x) in
-          not (not minimum og s y so exists u. s u /\ not og y u
-            so og u y so lower og u y so range sys ch x y u) };
-        y
-    | Some (Limit _) -> absurd
-    | Some (Natural _ uc as u) -> match y with
-        | Limit _ -> ()
-        | Natural _ yc -> assert { xc < uc < yc }
-        end;
-        chain_restriction_wf sys ch x u
-    end end
-
-  (* Caracterise maxless, limitless inhabited chains of states. *)
-  predicate mxl_inh (sys:system 'a 'o) (ch:set (state 'a 'o))
-                                            (inh:state 'a 'o) =
-    let og = gprogress sys in
-    system_wf sys /\ ch inh /\ chain og ch /\ not (exists x. maximum og ch x) /\
-    (forall x. ch x -> match x with Natural _ _ -> true | Limit _ -> false end)
-
-  let rec ghost make_nth_build (sys:system 'a 'o) ch inh n
-    requires { mxl_inh sys ch inh }
-    ensures { nth_build sys ch inh n result }
-    ensures { ch result }
-    variant { n }
-  = if n <= 0 then inh else begin
-      let x = make_nth_build sys ch inh (n-1) in
-      assert {
-        let og = gprogress sys in
-        let s = inter ch (lower og x) in
-        not ((forall y. not s y) so maximum og ch x
-          by forall z. ch z so not s z -> og z x)
-        so exists y. s y
-      };
-      chain_restriction_wf sys ch x (proxy sys ch x)
-    end
-
-  function nth_ch (sys:system 'a 'o) (ch:set (state 'a 'o))
-                       (inh:state 'a 'o) (n:int) : state 'a 'o =
-    choice (nth_build sys ch inh n)
-
-  let lemma nth_build_exists (sys:system 'a 'o) ch inh n
-    requires { mxl_inh sys ch inh }
-    ensures { nth_build sys ch inh n (nth_ch sys ch inh n) }
-    ensures { ch (nth_ch sys ch inh n) }
-  = let _ = make_nth_build sys ch inh n in ()
-
-  let ghost nth_ch_succ_mono (sys:system 'a 'o) ch inh n
-    requires { 0 <= n /\ mxl_inh sys ch inh }
-    ensures {
-      lower (gprogress sys) (nth_ch sys ch inh n) (nth_ch sys ch inh (n+1)) }
-  = nth_build_exists sys ch inh n;
-    nth_build_exists sys ch inh (n+1)
-
-  let rec lemma nth_ch_mono (sys:system 'a 'o) (ch:set (state 'a 'o))
-               (inh:state 'a 'o) (n m:int)
-    requires { 0 <= n < m }
-    requires { mxl_inh sys ch inh }
-    ensures {
-      lower (gprogress sys) (nth_ch sys ch inh n) (nth_ch sys ch inh m) }
-    variant { m }
-  = nth_ch_succ_mono sys ch inh (m-1);
-    assert { transitive (lower (gprogress sys)) by order (gprogress sys) };
-    if m > n + 1
-    then nth_ch_mono sys ch inh n (m-1)
-
-  constant pos : set int = (<=) 0
-
-  lemma nth_ch_monotonic : forall sys:system 'a 'o,ch inh.
-    let og = gprogress sys in
-    let f = nth_ch sys ch inh in
-    mxl_inh sys ch inh -> monotone_on pos (<) f (lower og)
-
-  lemma nth_ch_monotonic_2 : forall sys:system 'a 'o,ch inh.
-    let og = gprogress sys in
-    let f = nth_ch sys ch inh in
-    mxl_inh sys ch inh -> monotone (<=) f og
-    by forall n m. n <= m -> og (f n) (f m)
-    by if n = m then true else
-      if n >= 0 then lower og (f n) (f m) by pos n /\ pos m else
-      f n = inh so if m <= 0 then f m = inh else
-      lower og (f 0) (f m) so f 0 = inh
-
-  let rec ghost nth_ch_preimage (sys:system 'a 'o) (ch:set (state 'a 'o))
-                                (inh:state 'a 'o) (x:state 'a 'o) (n:int) : int
-    requires { mxl_inh sys ch inh }
-    requires { gprogress sys (nth_ch sys ch inh n) x /\ ch x }
-    requires { n >= 0 }
-    ensures { nth_ch sys ch inh result = x }
-    variant { match x, nth_ch sys ch inh n with
-              | Natural _ tc, Natural _ nc -> tc - nc
-              | _ -> 0
-              end }
-  = let nf = nth_ch sys ch inh n in
-    let nsf = nth_ch sys ch inh (n+1) in
-    match x, nf, nsf with
-    | Natural _ _, Natural _ _, Natural _ _ -> if nf = x then n else begin
-          nth_build_exists sys ch inh n;
-          nth_build_exists sys ch inh (n+1);
-          nth_ch_succ_mono sys ch inh n;
-          assert { let og = gprogress sys in
-            let f = nth_ch sys ch inh in
-            let s = inter ch (lower og (f n)) in
-            og (f (n+1)) x by minimum og s (f (n+1)) so s x
-          };
-          nth_ch_preimage sys ch inh x (n+1)
-        end
-    | _ -> absurd
-    end
-
-  let lemma nth_ch_image (sys:system 'a 'o) ch inh x
-    requires { mxl_inh sys ch inh }
-    requires { ch x /\ gprogress sys inh x }
-    ensures { image (nth_ch sys ch inh) pos x }
-  = nth_build_exists sys ch inh 0;
-    let _ = nth_ch_preimage sys ch inh x 0 in ()
-
-  function nth_pj (sys:system 'a 'o) (ch:set (state 'a 'o))
-                  (inh:state 'a 'o) (n:int) : 'o =
-    match nth_ch sys ch inh n with
-    | Natural x _ -> sys.projection x
-    | _ -> witness
-    end
-
-  lemma nth_pj_monotonic : forall sys:system 'a 'o,ch inh.
-    mxl_inh sys ch inh ->
-    let f = nth_pj sys ch inh in
-    let o = sys.progress in
-    monotone (<=) f o
-    by let g = nth_ch sys ch inh in
-      forall n m. n <= m -> o (f n) (f m)
-    by gprogress sys (g n) (g m) /\ ch (g n) /\ ch (g m)
-    so match g n, g m with
-    | Natural _ _, Natural _ _ -> true
-    | _ -> false
-    end
-
-  lemma same_supremum : forall sys:system 'a 'o,ch inh sp.
-    let og = gprogress sys in
-    let o = sys.progress in
-    let f = nth_pj sys ch inh in
-    mxl_inh sys ch inh /\ supremum og ch sp ->
-    match sp with
-    | Natural _ _ -> false
-    | Limit lp -> supremum o (image f all) lp
-        by (upper_bound o (image f all) lp
-        )
-        /\ (forall u. upper_bound o (image f all) u -> o lp u
-          by og sp (Limit u) by upper_bound og ch (Limit u)
-        )
-    end
-
-  (*lemma gprogress_complete : forall sys:system 'a 'o.
-    system_wf sys -> q_chain_complete (gprogress sys)
-    by let og = gprogress sys in
+  lemma lprogress_order : forall sys:system 'a 'o.
+    system_wf sys -> order (lprogress sys)
+    by let ol = lprogress sys in
       let o = sys.progress in
-      forall ch inh. chain og ch /\ ch inh ->
-      (exists lim. supremum og ch lim)
-    by if exists lim. maximum og ch lim then true else
-      let f0 = \n. choice (nth_build sys ch inh n) in
-      (forall n. nth_build sys ch inh n (f0 n) && ch (f0 n)
-        by nth_build_prop sys ch inh n)
-    so (monotone (<=) f0 og by forall n m. n <= m -> og (f0 n) (f0 m)
-      by "stop_split" forall sys1 ch1 inh1 m1 x1.
-        sys1 = sys /\ ch1 = ch /\ m1 >= n ->
-        "induction" nth_build sys1 ch1 inh1 m1 x1 ->
-        x1 = f0 m1 && og (f0 n) x1)
-    so (forall x. ch x -> exists n. og x (f0 n))
-    so (forall n. match f0 n with Limit _ -> false | _ -> true end)
-    so let f = \n. match f0 n with
-      | Limit _ -> witness
-      | Natural x _ -> sys.projection x
+      (antisymetric ol by forall a b. ol a b /\ ol b a -> a = b
+        by match a, b with
+          | Natural _ _, Natural _ _ -> true
+          | Limit a, Limit b -> o a b /\ o b a
+          | _ -> false
+          end)
+    /\ (transitive ol by forall a b c. ol a b /\ ol b c -> ol a c
+      by if a = b \/ b = c then true else match a, b, c with
+      | _, Limit _, Natural _ _
+      | Limit _, Natural _ _, _ -> false
+      | Limit a, _, Limit c -> o a c
+      | Natural _ a, _, Natural _ c -> o (sys.projection a) (sys.projection c)
+      | Natural _ a, _, Limit c -> o (sys.projection a) c
+      end
+    )
+
+  lemma local_repr_mono : forall sys:system 'a 'o.
+    let og = gprogress sys in let lr = local_repr sys in
+    let ol = lprogress sys in
+    system_wf sys -> monotone og lr ol
+    by forall x y. og x y -> ol (lr x) (lr y)
+    by "case_split" if x = y then true else
+      let cp = compose sys.projection y.log in
+      monotone (<=) cp sys.progress
+    so "case_split" match x.time, y.time with
+      | None, Some _ -> false
+      | None, None -> false by ext x.log y.log
+      | Some xtc, None -> let ch = image cp all in
+            exists sp. supremum sys.progress ch sp
+          so lr y = Limit sp
+          so y.log xtc = x.log xtc
+          so sys.progress (sys.projection (y.log xtc)) sp
+      | Some xtc, Some ytc ->
+          sys.progress (cp xtc) (cp ytc) /\ x.log xtc = y.log xtc
+      end
+
+  predicate maxless (o:erel 'a) (s:set 'a) =
+    forall x. s x -> not maximum o s x
+
+  (* A chain member with time being None must be a maximum. *)
+  lemma none_time_max : forall sys:system 'a 'o,s x.
+    let og = gprogress sys in
+    chain og s /\ s x /\ x.time = None -> maximum og s x
+    by forall z. s z -> if og z x then true else
+      false by og x z so z.time = None so ext x.log z.log
+
+  function after (sys:system 'a 'o) (s:set (state 'a))
+                 (x:state 'a) : state 'a -> bool =
+    \y. s y /\ gprogress sys x y /\ x <> y
+
+  predicate go_beyond (s:set (state 'a)) (n:int) =
+    exists x. s x /\ urange x.time n
+
+  (* In a maxless chain, it is possible to find elements with
+     arbitrarily high timers. *)
+  let lemma beyond (sys:system 'a 'o) (s:set (state 'a)) (n:int) (inh:state 'a)
+    requires { let og = gprogress sys in maxless og s /\ chain og s }
+    requires { s inh }
+    ensures { go_beyond s n }
+  = let rec aux (x:state 'a) : state 'a
+      requires { s x }
+      ensures { s result /\ urange result.time n }
+      variant { match x.time with None -> 0 | Some u -> n - u end }
+    = match x.time with
+      | None -> absurd
+      | Some xtc ->
+          if xtc >= n then x else match choose_if (after sys s x) with
+          | None ->
+              assert { let og = gprogress sys in maximum og s x
+                by forall z. s z -> og z x ||
+                                    (after sys s x z by og x z so x <> z) };
+              absurd
+          | Some z ->
+              assert { match z.time with
+                  | None -> false
+                  | Some ztc -> not (ztc = xtc so ext z.log x.log
+                      by normalized xtc x.log /\ normalized xtc z.log)
+                  end };
+              aux z
+          end
       end in
-      monotone (<=) f o
-    so exists lim. supremum o (image f all) lim
-    so let lims = Limit lim in supremum og ch lims*)
+    let _ = aux inh in ()
+
+  (* Maxless chains does not have bounds with finite timers. *)
+  lemma no_finite_bound : forall sys:system 'a 'o,s inh x.
+    let og = gprogress sys in
+    system_wf sys /\ chain og s /\ maxless og s /\ s inh /\
+    upper_bound og s x -> x.time = None
+    by match x.time with None -> true | Some n -> false
+      by go_beyond s (n+1) so exists y. s y /\ urange y.time (n+1)
+      so og y x
+    end
+
+  (* Completion by log saturation. *)
+  lemma gprogress_complete : forall sys:system 'a 'o.
+    let og = gprogress sys in
+    system_wf sys -> q_chain_complete og
+    by forall ch inh. ch inh /\ chain og ch ->
+      (exists z. supremum og ch z)
+    by if not maxless og ch
+      then true
+      else
+        let itm = \n x. ch x /\ urange x.time n in
+        let tlg = \n. let x = choice (itm n) in x.log n in
+        let sp = { time = None; log = tlg } in
+        supremum og ch sp
+        by (forall y. ch y -> equalizer (urange y.time) sp.log y.log
+          by forall n. urange y.time n -> sp.log n = y.log n
+          by (let z = choice (itm n) in itm n z
+            so og z y \/ og y z)
+          by (exists z. itm n z) by go_beyond ch n
+        )
+        so (valid sys sp
+          by let cp = compose sys.projection sp.log in
+            forall n m. n <= m -> sys.progress (cp n) (cp m)
+          by go_beyond ch m so exists y. ch y /\ urange y.time m
+          so urange y.time n so valid sys y
+          so let cp2 = compose sys.projection y.log in
+            cp2 n = cp n /\ cp2 m = cp m
+        )
+        so upper_bound og ch sp
+        so forall u. upper_bound og ch u -> og sp u by u = sp
+          by u.time = None
+          so ext u.log sp.log by forall n. sp.log n = u.log n
+          by go_beyond ch n so exists y. ch y /\ urange y.time n
+          so og y u /\ og y sp
+
+  lemma successor_after : forall sys:system 'a 'o,xtc xlg y.
+    let x = { time = Some xtc; log = xlg } in
+    let og = gprogress sys in
+    successor sys xtc xlg y -> og x y
+    by match y.time with None -> false | Some ytc ->
+      ytc = xtc + 1
+      so o_le x.time y.time
+      so sext (urange x.time) ((>=) xtc)
+      so equalizer (urange x.time) y.log x.log
+      so valid sys x
+      so forall z t. urange x.time z /\ urange y.time t /\ not urange x.time t ->
+        let zp = sys.projection (x.log z) in
+        let tp = sys.projection (y.log z) in
+        sys.progress zp tp
+    end
+
+  lemma local_repr_cont : forall sys:system 'a 'o,ch inh sp.
+    let og = gprogress sys in let lr = local_repr sys in
+    let ol = lprogress sys in let lp = lr sp in
+    let imh = image lr ch in let o = sys.progress in
+    system_wf sys /\ chain og ch /\ ch inh /\ supremum og ch sp ->
+    supremum ol imh lp
+    by upper_bound ol imh lp
+    /\ forall u. upper_bound ol imh u -> ol lp u
+    by if not maxless og ch
+    then exists x. maximum og ch x
+      so x = sp so maximum ol imh lp
+    else sp.time = None
+      so let cp = compose sys.projection sp.log in
+        let ch2 = image cp all in
+        (monotone (<=) cp o by og inh sp)
+      so exists sp2. supremum o ch2 sp2
+      so lp = Limit sp2
+      so match u with
+      | Natural xtc _ -> false
+          by go_beyond ch (xtc+1) so exists x. ch x /\ urange x.time (xtc+1)
+          so imh (lr x) so ol (lr x) u
+          so match x.time with None -> false | Some y -> false by y > xtc end
+      | Limit v -> sys.progress sp2 v
+          by upper_bound o ch2 v
+          by forall w. ch2 w -> o w v by exists n. cp n = w
+          so go_beyond ch n so exists x. ch x /\ urange x.time n
+          so match x.time with
+          | None -> false
+          | Some xtc -> og x sp so o w (cp xtc) so imh (lr x) so ol (lr x) u
+              so urange x.time xtc so sp.log xtc = x.log xtc so o (cp xtc) v
+          end
+      end
 
   lemma egame_wf : forall sys:system 'a 'o.
     system_wf sys -> game_wf (egame sys)
+    by let og = gprogress sys in
+      forall x s y. existential_transition sys x s /\ s y -> og x y
+    by match x.time with None -> false | Some _ -> true end
 
   lemma ugame_wf : forall sys:system 'a 'o.
     system_wf sys -> game_wf (ugame sys)
+    by let og = gprogress sys in
+      forall x s y. universal_transition sys x s /\ s y -> og x y
+    by match x.time with None -> false | Some _ -> true end
 
-  clone TransWf with goal q_chain_complete_is_countable_complete,
+  use import ho_set.SetBigOps
+  use import order.SubChain
+  use import order.LimUniq
+  use import fn.Fun
+  use import game_fmla.Fmla
+  use import transfinite.Iterates
+  use import transfinite.ChainExtension
+
+  predicate osucc (sys:system 'a 'o) (x y:state 'a) = match x.time with
+    | None -> false
+    | Some xtc -> successor sys xtc x.log y
+    end
+
+  predicate related (sys:system 'a 'o) (g:game (state 'a)) =
+    g.G.progress = gprogress sys /\ game_wf g /\
+    forall x s y. g.G.transition x s /\ s y ->
+      x = y \/ osucc sys x y
+
+  predicate transit (sys:system 'a 'o) (s:set (state 'a)) =
+    forall n x. s x /\ n >= 0 /\ urange x.time (n+1) ->
+      sys.transition (x.log n) (x.log (n+1))
+
+  lemma invariance : forall sys:system 'a 'o,g ang dmn ch x.
+    let og = gprogress sys in
+    let st = step g ang dmn in
+    let sx = { time = Some 0; log = const x } in
+    system_wf sys /\ related sys g /\ reach_ch og st ((=) sx) ch ->
+    transit sys ch
+    by let sbg = subchain og in let xt = extends_ch og st in
+      (forall o1 f1 b1 ch. o1 = sbg /\ f1 = xt /\ b1 = (=) sx ->
+      "induction" tr_reach o1 f1 b1 ch -> transit sys ch)
+    by (forall ch. reach_ch og st ((=) sx) ch /\ transit sys ch ->
+      let nch = extends_ch og st ch in
+      transit sys nch by let nst = st ch in
+      forall n. n >= 0 /\ urange nst.time (n+1) ->
+        sys.transition (nst.log n) (nst.log (n+1))
+      by let sp0 = sup og ch in
+        let a = ang sp0 ch in
+        let d = dmn a in
+        "case_split" if ch sp0 /\ g.G.transition sp0 a /\ a d
+        then (if sp0 = d then true else
+            match sp0.time with
+            | None -> false
+            | Some stc -> match d.time with
+                | None -> false
+                | Some dtc -> dtc = stc + 1
+                    so (d.log n = sp0.log n by urange sp0.time n)
+                    so "case_split" if n < stc
+                    then (d.log (n+1) = sp0.log (n+1) by urange sp0.time (n+1))
+                    else n = stc so sys.transition  (d.log n) (d.log (n+1))
+                end by successor sys stc sp0.log d
+            end by osucc sys sp0 d) by nst = d so og sp0 d
+        else (ch sx by subset ((=) sx) ch by sbg ((=) sx) ch)
+          so (supremum og ch nst by chain og ch so exists sp. supremum og ch sp)
+          so "case_split" if ch sp0 then true else
+            maxless og ch
+          so go_beyond ch (n+1)
+          so exists s0. ch s0 /\ urange s0.time (n+1)
+          so og s0 nst so urange s0.time n
+          so s0.log n = nst.log n /\ s0.log (n+1) = nst.log (n+1)
+    ) /\ (forall chh sp. chain (subchain og) chh /\ chh ((=) sx) /\
+      (forall ch. chh ch -> transit sys ch) /\
+      supremum (subchain og) chh sp -> transit sys sp
+      by sp = bigunion chh
+    ) by order og so order sbg
+
+  lemma games_related : forall sys:system 'a 'o.
+    system_wf sys ->
+    let eg = egame sys in let ug = ugame sys in
+    related sys eg /\ related sys ug
+
+  lemma chop_supremum : forall o:erel 'a,f:int -> 'a,sp.
+    monotone (<=) f o /\ order o ->
+    (supremum o (image f all) sp <-> supremum o (image f pos) sp)
+    by forall u.
+      (upper_bound o (image f all) u <-> upper_bound o (image f pos) u)
+    by forall v. upper_bound o (image f pos) u /\ image f all v ->
+      o v u by exists n. v = f n
+      so if n >= 0 then true else o v (f 0) /\ o (f 0) u by image f pos (f 0)
+
+  lemma egame_enforce_1 : forall sys:system 'a 'o,p qn ql x.
+    let eg = egame sys in
+    let pr = st_pre sys p in
+    let ps = st_post sys qn ql in
+    system_wf sys /\ enforce pr ps eg /\ p x ->
+    (exists lg. x = lg 0 /\ reach sys qn ql lg)
+    by exists ang. uniform_winning_strat eg pr ps ang
+    so let sx = { time = Some 0; log = const x } in
+      pr sx
+    so winning_strat eg sx ps ang
+    so let dmn = choice in
+      win_against eg sx ps ang dmn
+    so let st = step eg ang dmn in
+      let og = eg.G.progress in
+      exists ch. reach_ch og st ((=) sx) ch /\
+        win_at eg ps ang dmn ch
+    so exists sy. (maximum og ch sy
+      so (ch sx by subset ((=) sx) ch by subchain og ((=) sx) ch
+               by order (subchain og) by order og)
+      so og sx sy
+    )
+    &&
+    ((false by let a = ang sy ch in eg.G.transition sy a /\ not a (dmn a)
+      so match sy.time with
+        | None -> false
+        | Some ytc -> image (=) (successor sys ytc sy.log) a
+            so exists z. a = (=) z so a z
+        end
+    ) \/ (ps sy so transit sys ch
+      so (sy.log 0 = sx.log 0 = x by urange sx.time 0
+          so equalizer (urange sx.time) sy.log sx.log)
+      so ch sy
+      so match sy.time with
+      | Some n -> fin_reach sys qn sy.log n
+          by local_repr sys sy = Natural n (sy.log n)
+          so n >= 0
+          by og sx sy so o_le sx.time sy.time
+      | None -> lim_reach sys ql sy.log
+          by let cp = compose sys.projection sy.log in
+            let o = sys.progress in
+            let sp = sup o (image cp all) in
+            supremum o (image cp all) sp
+          so local_repr sys sy = Limit sp so ql sp
+          so supremum o (image cp pos) sp
+          by monotone (<=) cp o
+      end
+    ))
+
+  predicate log_coh (lg:int -> 'a) (m:int) (s:state 'a) =
+    forall n. 0 <= n /\ urange s.time (n+m) -> s.log (n+m) = lg n
+
+  predicate all_log_coh (lg:int -> 'a) (s:set (state 'a)) =
+    forall x. s x -> log_coh lg 0 x
+
+  function u_dmn (lg:int -> 'a) (s:set (state 'a)) : state 'a =
+    let x = choice (inter s (log_coh lg 0)) in
+    if log_coh lg 0 x
+    then x
+    else { time = Some (-1); log = lg }
+
+  lemma log_coh_propagate : forall sys:system 'a 'o,lg ang ch x.
+    let og = gprogress sys in
+    let ug = ugame sys in
+    let dmn = u_dmn lg in
+    let st = step ug ang dmn in
+    let sx = { time = Some 0; log = const x } in
+    system_wf sys /\ lg 0 = x /\ reach_ch og st ((=) sx) ch ->
+    all_log_coh lg ch
+    by let sbg = subchain og in let xt = extends_ch og st in
+      (forall o1 f1 b1 ch. o1 = sbg /\ f1 = xt /\ b1 = (=) sx ->
+        "induction" tr_reach o1 f1 b1 ch -> all_log_coh lg ch)
+    by (forall ch. reach_ch og st ((=) sx) ch /\ all_log_coh lg ch ->
+      all_log_coh lg (xt ch) by let nst = st ch in log_coh lg 0 nst
+      by let sp0 = sup og ch in
+        let a = ang sp0 ch in
+        let d = dmn a in
+        if ch sp0 /\ ug.G.transition sp0 a /\ a d
+        then log_coh lg 0 d by let x = choice (inter a (log_coh lg 0)) in
+            log_coh lg 0 x || log_coh lg 0 d
+        else (ch sx by subset ((=) sx) ch by sbg ((=) sx) ch by order sbg)
+          so (supremum og ch nst by chain og ch so exists sp. supremum og ch sp)
+          so if ch sp0 then true else maxless og ch
+          so forall n. 0 <= n -> nst.log n = lg n
+          by go_beyond ch (n+1)
+          so exists s0. ch s0 /\ urange s0.time (n+1)
+          so og s0 nst so urange s0.time n
+          so lg n = s0.log (n+0) = nst.log n
+    ) /\ (forall chh sp. chain sbg chh /\ supremum sbg chh sp /\
+        (forall ch. chh ch -> all_log_coh lg ch) ->
+        all_log_coh lg sp by sp = bigunion chh)
+
+  lemma ugame_enforce_1 : forall sys:system 'a 'o,p qn ql lg.
+    let ug = ugame sys in
+    let pr = st_pre sys p in
+    let ps = st_post sys qn ql in
+    let x = lg 0 in
+    system_wf sys /\ enforce pr ps ug /\ p x ->
+    correct sys qn ql lg
+    by exists ang. uniform_winning_strat ug pr ps ang
+    so let sx = { time = Some 0; log = const x } in
+      pr sx
+    so winning_strat ug sx ps ang
+    so let dmn = u_dmn lg in
+      win_against ug sx ps ang dmn
+    so let st = step ug ang dmn in
+      let og = ug.G.progress in
+      let o = sys.progress in
+      exists ch. reach_ch og st ((=) sx) ch /\
+        win_at ug ps ang dmn ch
+    so transit sys ch
+    so exists sy.
+      (maximum og ch sy
+         so ch sy so (log_coh lg 0 sy by all_log_coh lg ch)
+         so (og sx sy by ch sx by subset ((=) sx) ch
+               by subchain og ((=) sx) ch by order (subchain og)))
+      && (((exists n. fin_correct sys qn lg n)
+        (* Case where the demon fails. *)
+        by let a = ang sy ch in ug.G.transition sy a /\ not a (dmn a)
+          so match sy.time with
+          | None -> false
+          | Some ytc ->
+              (ytc >= 0 /\ urange sy.time ytc
+                by o_le sx.time sy.time \/ sx = sy)
+              so let x = choice (inter a (log_coh lg 0)) in
+              if a = (=) sy
+              then false by inter a (log_coh lg 0) sy
+                  so inter a (log_coh lg 0) x so dmn a = x = sy
+              else a = successor sys ytc sy.log
+                so let nx = lg (ytc+1) in
+                  if sys.transition (lg ytc) nx
+                  then false
+                      by let lg2 = \n. if n <= ytc then sy.log n else nx in
+                        let sz = { time = Some (ytc+1); log = lg2 } in
+                      inter a (log_coh lg 0) sz by log_coh lg 0 sz
+                      so successor sys ytc sy.log sz
+                      by sy.log (ytc+0) = lg ytc
+                      so (valid sys sy by gprogress sys sx sy)
+                      so (valid sys sz
+                        by let cp = compose sys.projection sy.log in
+                        let cp2 = compose sys.projection lg2 in
+                        forall n m. n <= m -> o (cp2 n) (cp2 m)
+                        by "case_split"
+                        if m <= ytc then cp2 m = cp m /\ cp2 n = cp n
+                        else if n > ytc \/ n = m then lg2 n = lg2 m else
+                        o (cp n) (cp ytc)
+                        so cp2 ytc = cp ytc = sys.projection (lg ytc)
+                        so cp2 m = cp2 (ytc+1) = sys.projection nx
+                        so o (cp2 ytc) (cp2 (ytc+1))
+                        so cp n = cp2 n /\ transitive o
+                      )
+                  else fin_correct sys qn lg ytc
+                      by forall n. 0 <= n < ytc ->
+                        urange sy.time (n+1) /\
+                        sy.log (n+0) = lg n /\ sy.log (n+1+0) = lg (n+1)
+          end
+    ) \/ (ps sy (* Case where the angel succeed *)
+      so match sy.time with
+      | Some ytc -> fin_correct sys qn lg ytc
+          by (ytc >= 0 /\ urange sy.time ytc
+                by o_le sx.time sy.time \/ sx = sy)
+          so sy.log (ytc+0) = lg ytc
+          so local_repr sys sy = Natural ytc (lg ytc)
+          /\ forall n. 0 <= n < ytc ->
+            urange sy.time (n+1) /\
+            sy.log (n+0) = lg n /\ sy.log (n+1+0) = lg (n+1)
+      | None ->
+          let cp = compose sys.projection sy.log in
+          let cp2 = compose sys.projection lg in
+          let ch = image cp all in
+          let sp = sup o ch in
+          lim_reach sys ql lg
+          by local_repr sys sy = Limit sp
+          so (forall n. 0 <= n -> urange sy.time (n+1) /\
+            sy.log (n+0) = lg n /\ sy.log (n+1+0) = lg (n+1))
+          so supremum o (image cp2 pos) sp
+          by supremum o (image cp all) sp
+          so monotone (<=) cp o /\ sext (image cp2 pos) (image cp pos)
+          by (forall f g:int -> 'o,u. equalizer pos f g /\ image f pos u ->
+            image g pos u by exists n. pos n /\ u = f n so u = g n)
+          so (equalizer pos cp cp2 so equalizer pos cp2 cp)
+          by forall n. pos n -> sy.log (n+0) = lg n
+      end
+    ))
+
+  use import game_fmla.Subgame
+  use import game_fmla.FmlaRules
+
+  lemma egame_enforce_2 : forall sys:system 'a 'o,p qn ql.
+    let pr = st_pre sys p in
+    let ps = st_post sys qn ql in
+    let eg = egame sys in
+    system_wf sys /\ (forall x. p x -> exists lg.
+      reach sys qn ql lg /\ x = lg 0) ->
+    enforce pr ps eg
+    by let c = subgame eg in
+      is_fmla c
+    so holds c (enforce pr ps) /\ c eg
+    by forall sx. pr sx -> holds c (enforce ((=) sx) ps)
+    by match sx.time with
+    | None -> false
+    | Some xtc ->
+        let x = sx.log xtc in
+        let o = sys.progress in
+        let og = gprogress sys in
+        local_repr sys sx = Natural xtc x
+        so exists lg. reach sys qn ql lg /\ x = lg 0
+        so holds c (arrow (enforce ps none) (enforce ((=) sx) ps))
+        by let c' = conj c (enforce ps none) in
+          holds c' (enforce ((=) sx) ps)
+        by let i = \t s.
+            s = t /\ log_coh lg xtc s /\ valid sys s /\
+            forall n. 0 <= n /\ urange s.time (n+xtc+1) -> not qn (lg n) in
+          subset none ps
+        so (subset ((=) sx) (i sx)
+          by forall n. 0 <= n /\ urange sx.time (n+xtc+1) -> false)
+        so holds c' (enforce (i sx) (const none sx))
+        by holds c' (universal (u_enforce i (const none)))
+        by holds c' (ordering og) /\ order og
+        so (holds c' (universal (u_enforce i (later og i)))
+        )
+        so (step_limit c' og og i
+          by forall ch inh f. ch inh /\ monotone_on ch og f og /\
+            chain og ch /\ (forall x. not maximum og ch x) /\
+            (forall x. ch x -> i x (f x)) ->
+            holds c' (enforce (supremum og (image f ch)) (later_limit og i ch))
+          by forall sp. supremum og (image f ch) sp ->
+            holds c' (enforce ((=) sp) (later_limit og i ch))
+          by subset none (later_limit og i ch)
+          so holds c' (enforce ((=) sp) none)
+          by holds c' (enforce ps none) /\ subset ((=) sp) ps
+          by ps sp
+          by (sext (image f ch) ch by forall x. ch x -> f x = x by i x (f x))
+          so maxless og ch
+          so sp.time = None
+          so (forall n. n >= 0 -> lg n = sp.log (n+xtc)
+            by go_beyond ch (n+xtc)
+            so exists x0. ch x0 /\ urange x0.time (n+xtc)
+            so (sp.log (n+xtc) = x0.log (n+xtc) by og x0 sp)
+            so i x0 (f x0)
+          )
+          so (valid sys sp by og inh sp /\ sp <> inh)
+          so let cp = compose sys.projection sp.log in
+            let ch2 = image cp all in
+            let sp2 = sup o ch2 in
+            local_repr sys sp = Limit sp2
+          so ql sp2
+          by (forall n. 0 <= n -> not qn (lg n)
+            by go_beyond ch (n+xtc+1)
+            so exists x0. ch x0 /\ urange x0.time (n+xtc+1)
+            so i x0 (f x0))
+          so lim_reach sys ql lg
+        )
+    end
+
+  clone TransWf with
+    goal q_chain_complete_countable_complete,
     goal gprogress_order,
+    goal lprogress_order,
+    goal local_repr_mono,
     goal gprogress_complete,
+    goal local_repr_cont,
     goal egame_wf,
     goal ugame_wf
 
-end
+  clone Bridge with
+    goal egame_enforce,
+    goal ugame_enforce
 
+end
 
