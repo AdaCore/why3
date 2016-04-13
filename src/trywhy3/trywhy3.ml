@@ -57,7 +57,7 @@ module Console =
       (* see alt_ergo_worker.ml and the Tasks case in print_why3_output *)
       let span_msg = Dom_html.getElementById (id ^ "_msg") in
       match res with
-        Valid -> ()
+        Valid -> span_msg ## innerHTML <- Js.string ""
       | Unknown msg -> span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
       | Invalid msg -> span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
 
