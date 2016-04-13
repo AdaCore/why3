@@ -18,6 +18,8 @@ open Why3
 open Format
 open Worker_proto
 
+
+
 let () = log_time ("Initialising why3 worker: start ")
 
 
@@ -51,126 +53,164 @@ let alt_ergo_driver : Driver.driver =
 
 let () = log_time ("Initialising why3 worker: end ")
 
-(* *** *)
-type task_info = { task : [ `Theory of Theory.theory | `Task of Task.task ];
-		   parent_id : id;
-		   mutable status : status;
-		   mutable subtasks : id list;
-		   loc : loc list;
-		   expl : string; }
-
-let task_table : (id, task_info) Hashtbl.t = Hashtbl.create 17
-
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
 
-let task_to_string t =
-  ignore (flush_str_formatter ());
-  Driver.print_task alt_ergo_driver str_formatter t;
-  flush_str_formatter ()
+module W =
+  struct
+    let send msg =
+      ignore (Worker.post_message (marshal msg))
 
-let gen_id =
-  let c = ref 0 in
-  fun () -> incr c; "id" ^ (string_of_int !c)
+    let set_onmessage f =
+      Worker.set_onmessage (fun data -> f (unmarshal data))
+  end
 
-let send msg =
-  ignore (Worker.post_message (marshal msg))
+(* Task Management *)
+module Why3Task = Task (* prevent shadowing *)
 
-let get_loc l =
-  match l with
-    Some (l) ->
-    let _, l, c1, c2 = Loc.get l in
-    Some (l, c1, l, c2)
-  | _ -> None
+module Task =
+  struct
+    type task_info =
+      { task : [ `Theory of Theory.theory | `Task of Task.task ];
+	parent_id : id;
+	mutable status : status;
+	mutable subtasks : id list;
+	loc : loc list;
+	expl : string;
+      }
 
+    let task_table : (id, task_info) Hashtbl.t = Hashtbl.create 17
 
-let register_task parent_id task =
-  let id = gen_id () in
-  let vid, expl, _ = Termcode.goal_expl_task ~root:false task in
-  let expl = match expl with
-    | Some s -> s
-    | None -> vid.Ident.id_string
-  in
-  let task_info = { task = `Task(task);
-		    parent_id = parent_id;
-		    status = `New;
-		    subtasks = [];
-		    loc = [ (* todo *) ];
-		    expl = expl }
-  in
-  Hashtbl.add task_table id task_info;
-  id
-
-let get_task = function `Task t -> t
-                      | `Theory _ -> log ("called get_task on a theory !"); assert false
+    let clear_table () = Hashtbl.clear task_table
+    let get_task_info id = Hashtbl.find task_table id
+    let get_parent_id id = (get_task_info id).parent_id
 
 
+    let task_to_string t =
+      ignore (flush_str_formatter ());
+      Driver.print_task alt_ergo_driver str_formatter t;
+      flush_str_formatter ()
 
-let rec set_status id st =
-  try
-    let info = Hashtbl.find task_table id in
-    if info.status <> st then begin
-	info.status <- st;
-	send (UpdateStatus (st, id));
-	let par_info = Hashtbl.find task_table info.parent_id in
-	let has_new, has_unknown =
-	  List.fold_left
-	    (fun (an, au) id ->
-	     let info = Hashtbl.find task_table id in
-	     (an || info.status = `New), (au || info.status = `Unknown))
-	    (false, false) par_info.subtasks
-	in
-	let par_status = if has_new then `New else if
-			   has_unknown then `Unknown
-			 else `Valid
-	in
-	if par_info.status <> par_status then
-	  set_status info.parent_id par_status 
-      end
-  with
-    Not_found -> ()
+    let gen_id =
+      let c = ref 0 in
+      fun () -> incr c; "id" ^ (string_of_int !c)
 
+    let register_task parent_id task =
+      let id = gen_id () in
+      let vid, expl, _ = Termcode.goal_expl_task ~root:false task in
+      let expl = match expl with
+        | Some s -> s
+        | None -> vid.Ident.id_string
+      in
+      let task_info =
+        { task = `Task(task);
+	  parent_id = parent_id;
+	  status = `New;
+	  subtasks = [];
+	  loc = [ (* todo *) ];
+	  expl = expl }
+      in
+      Hashtbl.add task_table id task_info;
+      id
+
+    let register_theory th_name th =
+      let th_id = gen_id () in
+      let tasks = Why3Task.split_theory th None None in
+      let task_ids = List.fold_left (fun acc t ->
+				     let tid = register_task th_id t in
+				     tid:: acc) [] tasks in
+      Hashtbl.add task_table th_id  { task = `Theory(th);
+				      parent_id = "theory-list";
+				      status = `New;
+				      subtasks = task_ids;
+				      loc = [ (* todo *) ];
+				      expl = th_name };
+      th_id
+
+    let get_task = function `Task t -> t
+                          | `Theory _ -> log ("called get_task on a theory !"); assert false
+
+    let set_status id st =
+      let rec loop id st acc =
+        match
+          try
+            Some (get_task_info id)
+          with Not_found -> None
+        with
+          None -> acc
+        | Some info ->
+           if info.status <> st then begin
+	       info.status <- st;
+               let acc = (UpdateStatus (st, id)) :: acc in
+	       let par_info = get_task_info info.parent_id in
+	       let has_new, has_unknown =
+	         List.fold_left
+	           (fun (an, au) id ->
+	            let info = Hashtbl.find task_table id in
+	            (an || info.status = `New), (au || info.status = `Unknown))
+	           (false, false) par_info.subtasks
+	       in
+	       let par_status = if has_new then `New else if
+			          has_unknown then `Unknown
+			        else `Valid
+	       in
+	       if par_info.status <> par_status then
+	         loop info.parent_id par_status acc
+               else acc
+             end
+           else acc
+      in
+      loop id st []
+
+    let rec clean_task id =
+      try
+        let info = get_task_info id in
+        List.iter clean_task info.subtasks;
+        Hashtbl.remove task_table id
+      with
+        Not_found -> ()
+
+  end
+
+
+
+(* External API *)
 
 
 let rec why3_prove id =
-  let t = Hashtbl.find task_table id in
+  let open Task in
+  let t = get_task_info id in
   match t.subtasks with
     [] ->  t.status <- `Unknown;
-	   let task = get_task t.task in
-	   let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc) in
-	   send msg;
-	   set_status id `New
+	  let task = get_task t.task in
+	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc) in
+	  W.send msg;
+	  let l = set_status id `New in
+          List.iter W.send l
   | l -> List.iter why3_prove l
 
 
 let why3_split id =
-  try
-    let t = Hashtbl.find task_table id in
-    match t.subtasks with
-      [] ->
-      let subtasks = Trans.apply split_trans (get_task t.task) in
-      t.subtasks <- List.fold_left (fun acc t ->
-				    let tid = register_task id t in
-				    why3_prove tid;
-				    tid :: acc) [] subtasks
-    | _ -> ()
-  with
-    Not_found -> log ("No task with id " ^ id)
+  let open Task in
+  let t = get_task_info id in
+  match t.subtasks with
+    [] ->
+    let subtasks = Trans.apply split_trans (get_task t.task) in
+    t.subtasks <- List.fold_left (fun acc t ->
+				 let tid = register_task id t in
+				 why3_prove tid;
+				 tid :: acc) [] subtasks
+  | _ -> ()
 
 
-let rec clean_task id =
-  try
-    let info = Hashtbl.find task_table id in
-    List.iter clean_task info.subtasks;
-    Hashtbl.remove task_table id
-  with
-    Not_found -> ()
 
 let why3_clean id =
+  let open Task in
   try
-    let t = Hashtbl.find task_table id in
+    let t = get_task_info id in
     List.iter clean_task t.subtasks;
     t.subtasks <- [];
-    set_status id `Unknown;
+    let l = set_status id `Unknown in
+    List.iter W.send l
   with
     Not_found -> ()
 
@@ -186,20 +226,11 @@ let why3_parse_theories theories =
   let theories = List.sort  (fun (l1,_) (l2,_) -> Loc.compare l1 l2) theories in
   List.iter
     (fun (_, (th_name, th)) ->
-     let th_id = gen_id () in
-     let () = send (Theory(th_id, th_name)) in
-     send (UpdateStatus(`New, th_id));
-     let tasks = Task.split_theory th None None in
-     let task_ids = List.fold_left (fun acc t ->
-				    let tid = register_task th_id t in
-				    why3_prove tid;
-				    tid:: acc) [] tasks in
-     Hashtbl.add task_table th_id  { task = `Theory(th);
-				     parent_id = "theory-list";
-				     status = `New;
-				     subtasks = task_ids;
-				     loc = [ (* todo *) ];
-				     expl = th_name }
+     let th_id = Task.register_theory th_name th in
+
+     W.send (Theory(th_id, th_name));
+     W.send (UpdateStatus(`New, th_id));
+     List.iter why3_prove (Task.get_task_info th_id).Task.subtasks
     ) theories
 
 let execute_symbol m fmt ps =
@@ -271,7 +302,7 @@ let why3_execute (modules,_theories) =
        in
        (Result (List.rev_map snd s) )
   in
-  send result
+  W.send result
 
 let temp_file_name = "/input.mlw"
 
@@ -294,37 +325,32 @@ let why3_run f lang code =
   with
   | Loc.Located(loc,e') ->
      let _, l, b, e = Loc.get loc in
-     send (ErrorLoc ((l-1,b, l-1, e),
+     W.send (ErrorLoc ((l-1,b, l-1, e),
 		     Pp.sprintf
 		       "error line %d, columns %d-%d: %a" l b e
 		       Exn_printer.exn_printer e'))
   | e ->
-     send (Error (Pp.sprintf
-		    "unexpected exception: %a (%s)" Exn_printer.exn_printer e
-		    (Printexc.to_string e)))
+     W.send (Error (Pp.sprintf
+		      "unexpected exception: %a (%s)" Exn_printer.exn_printer e
+		      (Printexc.to_string e)))
 
 
 let () =
 
-  Worker.set_onmessage
-    (fun ev ->
-
-     log_time ("Entering why3 worker ");
-     let ev = unmarshal ev in
-     log_time ("After unmarshal ");
-     match ev with
-     | Transform (`Split, id) -> why3_split id
-     | Transform (`Prove, id) -> why3_prove id
-     | Transform (`Clean, id) -> why3_clean id
-     | ParseBuffer code ->
-        Hashtbl.clear task_table;
-        why3_run why3_parse_theories Env.base_language code
-     | ExecuteBuffer code ->
-	why3_run why3_execute Mlw_module.mlw_language code
-     | SetStatus (st, id) -> set_status id st
+  W.set_onmessage
+    (function
+      | Transform (`Split, id) -> why3_split id
+       | Transform (`Prove, id) -> why3_prove id
+       | Transform (`Clean, id) -> why3_clean id
+       | ParseBuffer code ->
+          Task.clear_table ();
+          why3_run why3_parse_theories Env.base_language code
+       | ExecuteBuffer code ->
+	  why3_run why3_execute Mlw_module.mlw_language code
+       | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
     )
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. src/trywhy3/trywhy3.js"
+compile-command: "unset LANG; make -C ../.. trywhy3"
 End:
 *)
