@@ -2,45 +2,7 @@
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/chrome");
 editor.getSession().setMode("ace/mode/why3");
-var Range = ace.require("ace/range").Range;
-var selectedRange = null;
-var marker = null;
 editor.$blockScrolling = Infinity;
-
-function highlightError (x1, y1, x2, y2)
-{
-    selectedRange = new Range (x1,y1,x2,y2);
-    marker = editor.session.addMarker(selectedRange, "error", "text");
-}
-
-function highlightRegion (cls, x1, y1, x2, y2)
-{
-    selectedRange = new Range (x1,y1,x2,y2);
-    marker = editor.session.addMarker(selectedRange, cls, "text");
-}
-
-
-function clearHighlight ()
-{
-    if (marker) {
-	editor.session.removeMarker(marker);
-	marker = null;
-    };
-}
-
-editor.on("change", clearHighlight);
-
-function moveToError ()
-{
-    if (selectedRange) {
-	editor.selection.setSelectionRange(selectedRange);
-	editor.moveCursorToPosition(selectedRange.start);
-	selectedRange = null;
-    }
-}
-
-editor.on("focus", moveToError);
-
 
 function openFile ()
 {
@@ -132,7 +94,7 @@ var saveFile = (function ()
     a.style.zIndex = "-10";
     return function () {
 	a.href = "data:application/octet-stream;base64," + btoa(editor.getValue()+"\n");
-	a.download = /\S/.test(currentFilename) ? currentFilename : "Test.cd";
+	a.download = /\S/.test(currentFilename) ? currentFilename : "Test.mlw";
 	a.click();
 	editor.focus();
     };

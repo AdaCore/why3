@@ -16,24 +16,77 @@ let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 
 (* the view *)
+module Editor =
+  struct
+    type range
+    type marker
+    let editor =
+      let open Js.Unsafe in
+      get global (Js.string "editor")
+
+    let get_buffer_js () : Js.js_string Js.t =
+      let open Js.Unsafe in
+      meth_call editor "getValue" [| |]
+
+    let get_buffer () =
+      Js.to_string (get_buffer_js ())
+
+    let mk_range l1 c1 l2 c2 =
+      let open Js.Unsafe in
+      let range : (int -> int -> int -> int -> range Js.t) Js.constr =
+        get global (Js.string "Range")
+      in
+      jsnew range (l1, c1, l2, c2)
+
+    let set_selection_range r =
+      let open Js.Unsafe in
+      let selection = meth_call editor "getSelection" [| |] in
+      ignore (meth_call selection "setSelectionRange" [| inject r |])
+
+    let add_marker cls r : marker =
+      let open Js.Unsafe in
+      let session = meth_call editor "getSession" [| |] in
+      meth_call session "addMarker"
+                                 [| inject r;
+                                    inject (Js.string cls);
+                                    inject (Js.string "text") |]
+
+    let remove_marker m =
+      let open Js.Unsafe in
+      let session = meth_call editor "getSession" [| |] in
+      ignore (meth_call session "removeMarker" [| inject  m|])
+
+    let get_char buffer i = int_of_float (buffer ## charCodeAt(i))
+    let why3_loc_to_range buffer loc =
+      let goto_line lstop =
+        let rec loop lcur i =
+          if lcur == lstop then i
+          else
+            let c = get_char buffer i in
+            loop (if c == 0 then lcur+1 else lcur) (i+1)
+        in
+        loop 1 0
+      in
+      let rec convert_range l c i n =
+        if n == 0 then (l, c) else
+          if (get_char buffer i) == 10
+          then convert_range (l+1) 0 (i+1) (n-1)
+          else convert_range l (c+1) (i+1) (n-1)
+      in
+      let l1, b, e = loc in
+      let c1 = b in
+      let i = goto_line l1 in
+      let l2, c2 = convert_range l1 b (i+b) (e-b) in
+      mk_range (l1-1) c1 (l2-1) c2
+
+    let set_on_event e f =
+      let open Js.Unsafe in
+      ignore (meth_call editor "on" [| inject (Js.string e);
+                                       inject f|])
+  end
+
 module Console =
   struct
-    let highlightRegion s l1 c1 l2 c2 =
-      ignore (Js.Unsafe.meth_call Js.Unsafe.global
-                                  "highlightRegion"
-                                  Js.Unsafe.( [| inject (Js.string s);
-                                                inject l1;
-                                                inject c1;
-                                                inject l2;
-                                                inject c2 |] ) )
-
-    let clearHighlight ()=
-      ignore (Js.Unsafe.meth_call Js.Unsafe.global
-                                  "clearHighlight" [| |])
-    let get_buffer () =
-      let global = Js.Unsafe.global in
-      let editor = Js.Unsafe.get global (Js.string "editor") in
-      Js.to_string (Js.Unsafe.meth_call editor "getValue" [| |])
 
     let get_console () =
         get_opt (Dom_html.document ## getElementById (Js.string "console"))
@@ -100,11 +153,42 @@ module Console =
 
 
     let task_selection = Hashtbl.create 17
-    let task_deselect () =
-      Hashtbl.iter (fun _ span -> span ## classList ## remove (Js.string "task-selected"))
-                   task_selection;
-      Hashtbl.clear task_selection
+    let is_selected id = Hashtbl.mem task_selection id
+    let select_task id span loc =
+      (span ## classList) ## add (Js.string "task-selected");
+      let markers = List.map (Editor.add_marker "hl-task") loc in
+      Hashtbl.add task_selection id (span, loc, markers)
 
+    let deselect_task id =
+      try
+        let span, loc, markers = Hashtbl.find task_selection id in
+        (span ## classList) ## remove (Js.string "task-selected");
+        List.iter Editor.remove_marker markers;
+        Hashtbl.remove task_selection id
+      with
+        Not_found -> ()
+
+    let clear_task_selection () =
+      let l = Hashtbl.fold (fun id _ acc -> id :: acc) task_selection [] in
+      List.iter deselect_task l
+
+    let error_marker = ref None
+    let () =
+      Editor.set_on_event
+        "change"
+        (Js.wrap_callback (fun () -> clear_task_selection ();
+                                  match !error_marker with
+                                    None -> ()
+                                  | Some (m, _) -> Editor.remove_marker m))
+
+    let () =
+      Editor.set_on_event
+        "focus"
+        (Js.wrap_callback (fun () ->
+                           clear_task_selection ();
+                           match !error_marker with
+                             None -> ()
+                           | Some (_, r) -> Editor.set_selection_range r))
     let print_why3_output o =
       let doc = Dom_html.document in
       (* see why3_worker.ml *)
@@ -112,10 +196,10 @@ module Console =
         Error s -> print_error s
 
       | ErrorLoc ((l1, b, l2, e), s) ->
-         ignore (Js.Unsafe.meth_call Js.Unsafe.global
-                                     "highlightError"
-                                     (Array.map Js.Unsafe.inject [| l1; b; l2; e |]));
+         let r = Editor.mk_range l1 b l2 e in
+         error_marker := Some (Editor.add_marker "error" r, r);
          print_error s
+
       | Result sl ->
          clear ();
          let ul = Dom_html.createUl doc in
@@ -135,22 +219,18 @@ module Console =
 	   with Not_found ->
 		attach_to_parent id (parent_id ^ "_ul") expl loc;
 		let span = Dom_html.getElementById (id ^ "_container") in
+                let buffer = Editor.get_buffer_js () in
+                let loc = List.map (Editor.why3_loc_to_range buffer) loc in
 		span ## onclick <-
 		  Dom.handler
 		    (fun ev ->
 		     let ctrl = Js.to_bool (ev ## ctrlKey) in
-		     if Hashtbl.mem task_selection id then
-                       if ctrl then
-			 begin
-			   Hashtbl.remove task_selection id;
-			   (span ## classList) ## remove (Js.string "task-selected");
-			 end
-                       else
-			 task_deselect ()
+		     if is_selected id then
+                       if ctrl then deselect_task id else
+			 clear_task_selection ()
 		     else begin
-			 if not ctrl then task_deselect ();
-			 Hashtbl.add task_selection id span;
-			 (span ## classList) ## add (Js.string "task-selected")
+			 if not ctrl then clear_task_selection ();
+                         select_task id span loc
                        end;
 		     Js._false)
 	 end
@@ -276,7 +356,7 @@ let why3_parse () =
   log_time "Before marshalling in main thread";
   reset_workers ();
   first_task := true;
-  let code = Console.get_buffer () in
+  let code = Editor.get_buffer () in
   let msg = marshal (ParseBuffer code) in
   log_time "After marshalling in main thread";
   (get_why3_worker()) ## postMessage (msg)
@@ -286,7 +366,7 @@ let why3_execute () =
   Console.print_msg "Compiling buffer … ";
   log_time "Before marshalling in main thread";
   reset_workers ();
-  let code = Console.get_buffer () in
+  let code = Editor.get_buffer () in
    (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
 
 let array_for_all a f =
@@ -307,7 +387,7 @@ let why3_transform tr f () =
 	 f id;
 	 (get_why3_worker()) ## postMessage (marshal (Transform(tr, id))))
 	Console.task_selection;
-      Console.task_deselect ()
+      Console.clear_task_selection ()
     end
 
 

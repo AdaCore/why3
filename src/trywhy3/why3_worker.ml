@@ -54,7 +54,7 @@ let alt_ergo_driver : Driver.driver =
 let () = log_time ("Initialising why3 worker: end ")
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
-
+(* CF gmain.ml ligne 568 et suivante *)
 module W =
   struct
     let send msg =
@@ -74,7 +74,7 @@ module Task =
 	parent_id : id;
 	mutable status : status;
 	mutable subtasks : id list;
-	loc : loc list;
+	loc : why3_loc list;
 	expl : string;
       }
 
@@ -87,9 +87,45 @@ module Task =
         Some (get_info id)
       with
         Not_found -> None
-                      
+
     let get_parent_id id = (get_info id).parent_id
 
+    let mk_loc (_, a,b,c) = (a,b,c)
+    let collect_locs t =
+      (* from why 3 ide *)
+      let locs = ref [] in
+      let rec get_locs f =
+        Opt.iter (fun loc -> locs := (mk_loc (Loc.get loc)) :: !locs) f.Term.t_loc;
+        Term.t_fold (fun () t -> get_locs t ) () f
+      in
+      let rec get_t_locs f =
+        match f.Term.t_node with
+        | Term.Tbinop (Term.Timplies,f1,f2) ->
+           get_locs f1;
+           get_t_locs f2
+        | Term.Tlet (t,fb) ->
+           let _,f1 = Term.t_open_bound fb in
+           get_locs t;
+           get_t_locs f1
+        | Term.Tquant (Term.Tforall,fq) ->
+           let _,_,f1 = Term.t_open_quant fq in
+           get_t_locs f1
+        | _ ->
+           get_locs f
+      in
+      (*
+      let rec merge_locs = function
+          [] | [ _ ] as l -> l
+          | ((l1, b1, e1) as h1) :: ((l2, b2, e2) as h2) :: ll ->
+             if l1 != l2 then h1 :: (merge_locs (h2 :: ll))
+             else
+       *)
+      match t with
+      | Some { Task.task_decl =
+                 { Theory.td_node =
+                     Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
+         get_t_locs f; !locs
+      |  _ -> []
 
     let task_to_string t =
       ignore (flush_str_formatter ());
@@ -107,12 +143,16 @@ module Task =
         | Some s -> s
         | None -> vid.Ident.id_string
       in
+      let id_loc = match vid.Ident.id_loc with
+          None -> []
+        | Some l -> [ mk_loc (Loc.get l) ]
+      in
       let task_info =
         { task = `Task(task);
 	  parent_id = parent_id;
 	  status = `New;
 	  subtasks = [];
-	  loc = [ (* todo *) ];
+	  loc = id_loc @  (collect_locs task);
 	  expl = expl }
       in
       Hashtbl.add task_table id task_info;
@@ -128,7 +168,7 @@ module Task =
 				      parent_id = "theory-list";
 				      status = `New;
 				      subtasks = task_ids;
-				      loc = [ (* todo *) ];
+				      loc = [];
 				      expl = th_name };
       th_id
 
