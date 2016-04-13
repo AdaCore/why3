@@ -174,10 +174,9 @@ val call_on_buffer :
     doesn't accept stdin. *)
 
 val query_call : prover_call -> post_prover_call option
-(** Thread-safe non-blocking function that checks if the prover
-    has finished. *)
+(** non-blocking function that checks if the prover has finished. *)
 
 val wait_on_call : prover_call -> post_prover_call
-(** Thread-safe blocking function that waits until the prover finishes. *)
+(** blocking function that waits until the prover finishes. *)
 
 val set_socket_name : string -> unit
