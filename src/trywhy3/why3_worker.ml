@@ -81,8 +81,14 @@ module Task =
     let task_table : (id, task_info) Hashtbl.t = Hashtbl.create 17
 
     let clear_table () = Hashtbl.clear task_table
-    let get_task_info id = Hashtbl.find task_table id
-    let get_parent_id id = (get_task_info id).parent_id
+    let get_info id = Hashtbl.find task_table id
+    let get_info_opt id =
+      try
+        Some (get_info id)
+      with
+        Not_found -> None
+                      
+    let get_parent_id id = (get_info id).parent_id
 
 
     let task_to_string t =
@@ -133,37 +139,39 @@ module Task =
       let rec loop id st acc =
         match
           try
-            Some (get_task_info id)
+            Some (get_info id)
           with Not_found -> None
         with
-          None -> acc
-        | Some info ->
-           if info.status <> st then begin
-	       info.status <- st;
-               let acc = (UpdateStatus (st, id)) :: acc in
-	       let par_info = get_task_info info.parent_id in
-	       let has_new, has_unknown =
-	         List.fold_left
-	           (fun (an, au) id ->
-	            let info = Hashtbl.find task_table id in
-	            (an || info.status = `New), (au || info.status = `Unknown))
-	           (false, false) par_info.subtasks
-	       in
-	       let par_status = if has_new then `New else if
-			          has_unknown then `Unknown
-			        else `Valid
-	       in
-	       if par_info.status <> par_status then
-	         loop info.parent_id par_status acc
-               else acc
-             end
-           else acc
+        | Some info when info.status <> st ->
+	   info.status <- st;
+           let acc = (UpdateStatus (st, id)) :: acc in
+           begin
+             match get_info_opt info.parent_id with
+               None -> acc
+             | Some par_info ->
+	        let has_new, has_unknown =
+	          List.fold_left
+	            (fun (an, au) id ->
+	             let info = Hashtbl.find task_table id in
+	             (an || info.status = `New), (au || info.status = `Unknown))
+	            (false, false) par_info.subtasks
+	        in
+	        let par_status = if has_new then `New else if
+			           has_unknown then `Unknown
+			         else `Valid
+	        in
+	        if par_info.status <> par_status then
+	          loop info.parent_id par_status acc
+                else acc
+           end
+        | _ -> acc
+
       in
       loop id st []
 
     let rec clean_task id =
       try
-        let info = get_task_info id in
+        let info = get_info id in
         List.iter clean_task info.subtasks;
         Hashtbl.remove task_table id
       with
@@ -178,7 +186,7 @@ module Task =
 
 let rec why3_prove id =
   let open Task in
-  let t = get_task_info id in
+  let t = get_info id in
   match t.subtasks with
     [] ->  t.status <- `Unknown;
 	  let task = get_task t.task in
@@ -191,7 +199,7 @@ let rec why3_prove id =
 
 let why3_split id =
   let open Task in
-  let t = get_task_info id in
+  let t = get_info id in
   match t.subtasks with
     [] ->
     let subtasks = Trans.apply split_trans (get_task t.task) in
@@ -206,7 +214,7 @@ let why3_split id =
 let why3_clean id =
   let open Task in
   try
-    let t = get_task_info id in
+    let t = get_info id in
     List.iter clean_task t.subtasks;
     t.subtasks <- [];
     let l = set_status id `Unknown in
@@ -230,7 +238,7 @@ let why3_parse_theories theories =
 
      W.send (Theory(th_id, th_name));
      W.send (UpdateStatus(`New, th_id));
-     List.iter why3_prove (Task.get_task_info th_id).Task.subtasks
+     List.iter why3_prove (Task.get_info th_id).Task.subtasks
     ) theories
 
 let execute_symbol m fmt ps =
