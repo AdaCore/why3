@@ -271,10 +271,8 @@ let adapt_limits limit on_timelimit =
     (* otherwise use t *)
     else limit.limit_time }
 
-let set_socket_name =
-  Prove_client.set_socket_name
-
 type server_id = int
+
 let gen_id =
   let x = ref 0 in
   fun () ->

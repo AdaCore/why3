@@ -169,5 +169,3 @@ val query_call : prover_call -> post_prover_call option
 
 val wait_on_call : prover_call -> post_prover_call
 (** blocking function that waits until the prover finishes. *)
-
-val set_socket_name : string -> unit

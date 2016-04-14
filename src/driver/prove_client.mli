@@ -1,16 +1,15 @@
-val standalone : bool ref
-
 val set_socket_name : string -> unit
 val set_max_running_provers : int -> unit
 
 val connect : unit -> unit
+val disconnect : unit -> unit
 
 val send_request :
- use_stdin:string option ->
- id:int ->
- timelimit:int ->
- memlimit:int ->
- cmd:string list->
+  id:int ->
+  timelimit:int ->
+  memlimit:int ->
+  use_stdin:string option ->
+  cmd:string list ->
   unit
 
 type answer =
@@ -23,5 +22,3 @@ type answer =
   }
 
 val read_answers : blocking:bool -> answer list
-
-val disconnect : unit -> unit
