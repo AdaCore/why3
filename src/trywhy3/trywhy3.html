@@ -1,9 +1,3 @@
-
-<!-- This document was automatically generated with yamlpp
-     (see http://www.lri.fr/~filliatr/yamlpp.en.html),
-     with the following command:
-yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
-
 <html xmlns="http://www.w3.org/1999/xhtml"
       style="font-family:Verdana,Arial,Sans-Serif">
   <head>
@@ -59,24 +53,6 @@ yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
 	    <li onclick="clearBuffer();">Clear buffer</li>
 	  </ul>
 	</li>
-	<li><span>Examples</span>
-	  <ul>
-	    <li id="drinkers">Drinker's paradox</li>
-	    <li id="bin_mult">Binary Multiplication</li>
-	    <li id="fact">Factorial</li>
-	    <li id="isqrt">Integral square root</li>
-	  </ul>
-	</li>
-	<li><span>Why3</span>
-	  <ul>
-	    <li id="run">Execute Buffer</li>
-	    <li id="prove_all">Prove All with Alt-Ergo</li>
-	    <li id="prove">Prove Goal</li>
-	    <li id="split_prove">Split Goal and Prove</li>
-	    <li id="clean">Clean Goal</li>
-	    <li id="stop">Stop Alt-ergo</li>
-	  </ul>
-	</li>
 	<li><span>Preferences</span>
 	  <ul>
 	    <li onclick="document.getElementById('radio-wide').click();">
@@ -103,6 +79,36 @@ yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
 	</li>
 	<li style="float:right;"><span>Help</span></li>
       </ul>
+    </div>
+    <div id="tool-bar">
+      <button id="button-execute" title="Execute buffer">
+	<span class="fa-arrow-circle-right"></span>
+      </button>
+      <button id="button-compile" title="Compile buffer">
+	<span class="fa-cogs"></span>
+      </button>
+      <button id="button-prove-all" title="Prove all tasks">
+	<span style="font-size:50%"
+	class="fa-check-square"></span><span style="font-size:50%"
+					     class="fa-check-square"></span>
+	<span style="font-size:50%"
+	class="fa-check-square"></span><span style="font-size:50%"
+					     class="fa-check-square"></span>
+      </button>
+      <button id="button-prove" title="Prove selected task">
+	<span class="fa-check-square"></span>
+      </button>
+      <button id="button-split" title="Split and prove task">
+	<span class="fa-share-alt"></span>
+      </button>
+      <button id="button-clean" title="Clean task">
+	<span class="fa-unlink"></span>
+      </button>
+      <button id="button-stop" title="Interrupt">
+	<span class="fa-ban"></span>
+      </button>
+      <span style="margin-left:5em;" class="fa-book"></span>
+      <select  id="select-example" ></select>
     </div>
     <div id="editor-panel" class="wide-view">
       <div id="editor" title="Editor" tabindex="-1" ></div><!--

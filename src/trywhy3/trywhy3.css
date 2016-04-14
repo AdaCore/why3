@@ -1,7 +1,7 @@
-@import url(fontawesome/fontawesome.css);
+@import url(fontawesome/css/font-awesome.min.css);
 
 /* fontawesome */
-[class*="fontawesome-"]:before {
+[class*="fa-"]:before {
     font-family: 'FontAwesome', sans-serif;
 }
 
@@ -57,7 +57,7 @@ body {
 
 #editor-panel {
     position:absolute;
-    top:18pt;
+    top:48pt;
     bottom:0pt;
     display:block;
     box-sizing: border-box;
@@ -97,7 +97,7 @@ body {
     height:100%;
     width:100%;
     font-size: large;
-    
+
 }
 
 .tab-header.alert {
@@ -154,7 +154,28 @@ body {
 }
 
 /* CSS MENU BAR */
-
+#tool-bar {
+    background-color:#ddd;
+    position: absolute;
+    top: 18pt;
+    margin:0;
+    height:30pt;
+    width:100%;
+    padding:0;
+    line-height:30pt;
+}
+#tool-bar button {
+    color: #333;
+    margin-top:1pt;
+    margin-left:5pt;
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    border-radius:3pt;
+    border: solid 1pt #aaa;
+    font-size:14pt;
+    width: 28pt;
+    height:28pt;
+    vertical-align:top;
+}
 .menu-bar {
     position:absolute;
     top:0pt;

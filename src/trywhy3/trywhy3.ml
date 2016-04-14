@@ -291,9 +291,9 @@ module Console =
            let span_icon = Dom_html.getElementById (id ^ "_icon") in
            let cls =
              match st with
-               `New -> "fontawesome-cogs task-pending"
-             | `Valid -> "fontawesome-ok-sign task-valid"
-             | `Unknown -> "fontawesome-question-sign task-unknown"
+               `New -> "fa fa-fw fa-cog fa-spin fa-fw task-pending"
+             | `Valid -> "fa fa-fw fa-check-circle task-valid"
+             | `Unknown -> "fa fa-fw fa-question-circle task-unknown"
            in
            span_icon ## className <- Js.string cls
          with
@@ -302,7 +302,7 @@ module Console =
     let set_abort_icon () =
       let list = Dom_html.document ## getElementsByClassName (Js.string "task-pending") in
       List.iter (fun span ->
-                 span ## className <- (Js.string "fontawesome-minus-sign task-abort"))
+                 span ## className <- (Js.string "fa fa-fw fa-minus-circle task-abort"))
                 (Dom.list_of_nodeList list)
 
   end
@@ -442,16 +442,17 @@ let why3_transform tr f () =
 
 
 let () =
-  add_button "prove_all" why3_parse ;
-  add_button "run" why3_execute ;
-  add_button "stop" (fun () ->
-                     (get_why3_worker()) ## terminate ();
-                     why3_worker := Some (init_why3_worker ());
-                     reset_workers ();
-                     Console.set_abort_icon());
-  add_button "prove" (why3_transform `Prove (fun _ -> ()));
-  add_button "split_prove" (why3_transform `Split (fun _ -> ()));
-  add_button "clean" (why3_transform `Clean Console.clean_task);
+  add_button "button-execute" why3_execute ;
+  add_button "button-compile" why3_parse ; (* todo : change *)
+  add_button "button-prove-all" why3_parse ;
+  add_button "button-prove" (why3_transform `Prove (fun _ -> ()));
+  add_button "button-split" (why3_transform `Split (fun _ -> ()));
+  add_button "button-clean" (why3_transform `Clean Console.clean_task);
+  add_button "button-stop" (fun () ->
+			    (get_why3_worker()) ## terminate ();
+			    why3_worker := Some (init_why3_worker ());
+			    reset_workers ();
+			    Console.set_abort_icon());
 
   let input_threads = get_opt Dom_html.(CoerceTo.input
 					  (getElementById "input-num-threads"))
