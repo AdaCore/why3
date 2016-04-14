@@ -194,7 +194,6 @@ let debug_print_model model =
   let model_str = Model_parser.model_to_string model in
   Debug.dprintf debug "Call_provers: %s@." model_str
 
-
 let parse_prover_run res_parser time out ret limit ~printer_mapping =
   let ans = match ret with
     | Unix.WSTOPPED n ->
@@ -217,7 +216,7 @@ let parse_prover_run res_parser time out ret limit ~printer_mapping =
     | _ -> ans in
   let ans = match ans, limit with
     | (Unknown _ | HighFailure), { limit_time = tlimit }
-      when time >= (0.9 *. float tlimit) -> Timeout
+      when tlimit > 0 && time >= (0.9 *. float tlimit) -> Timeout
     | _ -> ans in
   let model = res_parser.prp_model_parser out printer_mapping in
   Debug.dprintf debug "Call_provers: model:@.";
