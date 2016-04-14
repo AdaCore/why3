@@ -28,7 +28,7 @@ let model_vc_label = Ident.create_label "model_vc"
   (* Identifies the term that triggers the VC. *)
 let model_vc_post_label = Ident.create_label "model_vc_post"
 (* Identifies the postcondition that triggers the VC. *)
-let model_trace_regexp = Str.regexp "model_trace:"
+let model_trace_prefix = "model_trace:"
   (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
 
 (* Information about the term that triggers VC.  *)
@@ -41,17 +41,12 @@ type vc_term_info = {
   (* true if VC was generated for precondition or postcondition *)
 }
 
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
+let get_label labels prefix =
+  let check l = Strings.has_prefix prefix l.lab_string in
+  Slab.choose (Slab.filter check labels)
 
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
-
-let is_model_vc_label l = if l = model_vc_label || l = model_vc_post_label then true
-  else false
+let is_model_vc_label l =
+  lab_equal l model_vc_label || lab_equal l model_vc_post_label
 
 let check_enter_vc_term t info =
   (* Check whether the term that triggers VC is entered.
@@ -71,6 +66,7 @@ let check_exit_vc_term t info =
     info.vc_inside <- false;
   end
 
+(* TODO: add "remove_suffix" to Strings and use it here instead of regexps *)
 let add_old lab_str =
   try
     let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
@@ -89,7 +85,7 @@ let model_trace_for_postcondition ~labels =
      exist model_trace label in labels, labels otherwise.
   *)
   try
-    let trace_label = get_label labels model_trace_regexp in
+    let trace_label = get_label labels model_trace_prefix in
     let lab_str = add_old trace_label.lab_string in
     if lab_str = trace_label.lab_string then
       labels

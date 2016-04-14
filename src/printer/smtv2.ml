@@ -205,18 +205,14 @@ let collect_model_ls info ls =
       add_model_element
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
 
-let model_trace_regexp = Str.regexp "model_trace:"
+let model_trace_prefix = "model_trace:"
   (* The term labeled with "model_trace:name" will be in counter-example with name "name" *)
 
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
+let get_label labels prefix =
+  let check l = Strings.has_prefix prefix l.lab_string in
+  Slab.choose (Slab.filter check labels)
 
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
-
+(* TODO: add "remove_suffix" to Strings and use it here instead of regexps *)
 let add_old lab_str =
   try
     let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
@@ -234,7 +230,7 @@ let model_trace_for_postcondition ~labels info =
      model_trace label in a form function_name@result
   *)
   try
-    let trace_label = get_label labels model_trace_regexp in
+    let trace_label = get_label labels model_trace_prefix in
     let lab_str = add_old trace_label.lab_string in
     if lab_str = trace_label.lab_string then
       labels
@@ -271,7 +267,7 @@ let check_enter_vc_term t info =
     try
       (* Label "model_func" => the VC is postcondition or precondition *)
       (* Extract the function name from "model_func" label *)
-      let fun_label = get_label t.t_label (Str.regexp "model_func") in
+      let fun_label = get_label t.t_label "model_func:" in
       vc_term_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
     with Not_found ->
       (* No label "model_func" => the VC is not postcondition or precondition *)

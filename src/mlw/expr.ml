@@ -1106,17 +1106,13 @@ let forget_let_defn = function
   | LDsym (s,_) -> forget_rs s
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
-let extract_op s =
-  let s = s.id_string in
-  let len = String.length s in
-  if len < 7 then None else
-  let inf = String.sub s 0 6 in
-  if inf = "infix "  then Some (String.sub s 6 (len - 6)) else
-  let prf = String.sub s 0 7 in
-  if prf = "prefix " then Some (String.sub s 7 (len - 7)) else
+let extract_op {id_string = s} =
+  try Some (Strings.remove_prefix "infix " s) with Not_found ->
+  try Some (Strings.remove_prefix "prefix " s) with Not_found ->
   None
 
-let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
+let tight_op s =
+  s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
 let print_rs fmt ({rs_name = {id_string = nm}} as s) =
   if nm = "mixfix []" then pp_print_string fmt "([])" else
@@ -1127,8 +1123,8 @@ let print_rs fmt ({rs_name = {id_string = nm}} as s) =
   if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
   match extract_op s.rs_name, s.rs_logic with
   | Some s, _ ->
-      let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
-      let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
+      let s = if Strings.has_prefix "*" s then " " ^ s else s in
+      let s = if Strings.ends_with s "*" then s ^ " " else s in
       fprintf fmt "(%s)" s
   | _, RLnone | _, RLlemma ->
       pp_print_string fmt (id_unique sprinter s.rs_name)

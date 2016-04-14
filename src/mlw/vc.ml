@@ -109,8 +109,8 @@ let expl_loop_vari = Ident.create_label "expl:loop variant decrease"
 let expl_variant   = Ident.create_label "expl:variant decrease"
 let _expl_type_inv  = Ident.create_label "expl:type invariant"
 
-let lab_has_expl = let expl_regexp = Str.regexp "expl:" in
-  Slab.exists (fun l -> Str.string_match expl_regexp l.lab_string 0)
+let lab_has_expl lab =
+  Slab.exists (fun l -> Strings.has_prefix "expl:" l.lab_string) lab
 
 let vc_expl loc l ({t_label = lab} as f) =
   let lab = if lab_has_expl lab then lab else Slab.add l lab in

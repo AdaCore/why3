@@ -77,19 +77,16 @@ let forget_var vs = forget_id iprinter vs.vs_name
 
 let extract_op ls =
   let s = ls.ls_name.id_string in
-  let len = String.length s in
-  if len < 7 then None else
-  let inf = String.sub s 0 6 in
-  if inf = "infix "  then Some (String.sub s 6 (len - 6)) else
-  let prf = String.sub s 0 7 in
-  if prf = "prefix " then Some (String.sub s 7 (len - 7)) else
+  try Some (Strings.remove_prefix "infix " s) with Not_found ->
+  try Some (Strings.remove_prefix "prefix " s) with Not_found ->
   None
 
-let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
+let tight_op s =
+  s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
 let escape_op s =
-  let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
-  let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
+  let s = if Strings.has_prefix "*" s then " " ^ s else s in
+  let s = if Strings.ends_with s "*" then s ^ " " else s in
   s
 
 (* theory names always start with an upper case letter *)
