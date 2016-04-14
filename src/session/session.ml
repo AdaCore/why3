@@ -496,9 +496,9 @@ let get_used_provers_with_stats session =
           PHprover.add prover_table prover x;
           x
       in
-      let lim_time = Call_provers.get_time pa.proof_limit in
-      let lim_mem = Call_provers.get_mem pa.proof_limit in
-      let lim_steps = Call_provers.get_steps pa.proof_limit in
+      let lim_time = pa.proof_limit.Call_provers.limit_time in
+      let lim_mem = pa.proof_limit.Call_provers.limit_mem in
+      let lim_steps = pa.proof_limit.Call_provers.limit_steps in
       let tf = try Hashtbl.find timelimits lim_time with Not_found -> 0 in
       let sf = try Hashtbl.find steplimits lim_steps with Not_found -> 0 in
       let mf = try Hashtbl.find memlimits lim_mem with Not_found -> 0 in
@@ -580,9 +580,9 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
     "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a%a>"
     id
-    (save_int_def "timelimit" tl) (Call_provers.get_time a.proof_limit)
-    (save_int_def "steplimit" sl) (Call_provers.get_steps a.proof_limit)
-    (save_int_def "memlimit" ml) (Call_provers.get_mem a.proof_limit)
+    (save_int_def "timelimit" tl) (a.proof_limit.Call_provers.limit_time)
+    (save_int_def "steplimit" sl) (a.proof_limit.Call_provers.limit_steps)
+    (save_int_def "memlimit" ml) (a.proof_limit.Call_provers.limit_mem)
     (opt_string "edited") a.proof_edited_as
     (save_bool_def "obsolete" false) a.proof_obsolete
     (save_bool_def "archived" false) a.proof_archived;
@@ -987,10 +987,10 @@ let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 
 let set_timelimit timelimit a =
   a.proof_limit <-
-    { a.proof_limit with Call_provers.limit_time = Some timelimit}
+    { a.proof_limit with Call_provers.limit_time = timelimit}
 let set_memlimit memlimit a =
   a.proof_limit <-
-    { a.proof_limit with Call_provers.limit_mem = Some memlimit}
+    { a.proof_limit with Call_provers.limit_mem = memlimit}
 
 let set_obsolete ?(notify=notify) a =
   a.proof_obsolete <- true;
@@ -1293,7 +1293,9 @@ and load_proof_or_transf ctxt mg a =
           let timelimit = int_attribute_def "timelimit" a timelimit in
 	  let steplimit = int_attribute_def "steplimit" a steplimit in
           let memlimit = int_attribute_def "memlimit" a memlimit in
-          let limit = Call_provers.mk_limit timelimit memlimit steplimit in
+          let limit = { Call_provers.limit_time = timelimit;
+                        Call_provers.limit_mem = memlimit;
+                        Call_provers.limit_steps = steplimit } in
         (*
           if timelimit < 0 then begin
           eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
@@ -2039,9 +2041,9 @@ let print_external_proof fmt p =
   fprintf fmt "%a - %a (%i, %i, %i)%s%s%s"
     Whyconf.print_prover p.proof_prover
     print_attempt_status p.proof_state
-    (Call_provers.get_time p.proof_limit)
-    (Call_provers.get_steps p.proof_limit)
-    (Call_provers.get_mem p.proof_limit)
+    (p.proof_limit.Call_provers.limit_time)
+    (p.proof_limit.Call_provers.limit_steps)
+    (p.proof_limit.Call_provers.limit_mem)
     (if p.proof_obsolete then " obsolete" else "")
     (if p.proof_archived then " archived" else "")
     (if p.proof_edited_as <> None then " edited" else "")

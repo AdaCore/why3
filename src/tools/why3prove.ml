@@ -278,9 +278,9 @@ let output_theory drv fname _tname th task dir =
 
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
-    { Call_provers.limit_time = Some timelimit;
-                   limit_mem = Some memlimit;
-                   limit_steps = None } in
+    { Call_provers.empty_limit with
+      Call_provers.limit_time = timelimit;
+                   limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =

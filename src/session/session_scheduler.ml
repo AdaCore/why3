@@ -395,8 +395,8 @@ let find_prover eS a =
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
 let adapt_limits ~use_steps a =
-  let timelimit = (Call_provers.get_time a.proof_limit) in
-  let memlimit = (Call_provers.get_mem a.proof_limit) in
+  let timelimit = (a.proof_limit.Call_provers.limit_time) in
+  let memlimit = (a.proof_limit.Call_provers.limit_mem) in
   match a.proof_state with
   | Done { Call_provers.pr_answer = r;
            Call_provers.pr_time = t;
@@ -431,7 +431,7 @@ let adapt_limits ~use_steps a =
 
 let adapt_limits ~use_steps a =
   let t, m, s = adapt_limits ~use_steps a in
-  Call_provers.mk_limit t m s
+  { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
 
 type run_external_status =
 | Starting
@@ -472,7 +472,8 @@ let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
       let inplace = npc.prover_config.Whyconf.in_place in
       let command =
         Whyconf.get_complete_command npc.prover_config
-          ~with_steps:(limit.Call_provers.limit_steps <> None) in
+          ~with_steps:(limit.Call_provers.limit_steps <>
+                       Call_provers.empty_limit.Call_provers.limit_steps) in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
         callback a ap limit
@@ -548,8 +549,8 @@ let prover_on_goal eS eT ?callback ?(cntexample=false) ~limit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
-      set_timelimit (Call_provers.get_time limit) a;
-      set_memlimit (Call_provers.get_mem limit) a;
+      set_timelimit (limit.Call_provers.limit_time) a;
+      set_memlimit (limit.Call_provers.limit_mem) a;
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
@@ -953,7 +954,9 @@ let convert_unknown_prover =
                 (* should not happen *)
                 assert false
           in
-          let limit = Call_provers.mk_limit timelimit memlimit (-1) in
+          let limit = { Call_provers.empty_limit with
+                        Call_provers.limit_time = timelimit;
+                        limit_mem  = memlimit} in
           prover_on_goal es sched ~callback ~limit p g
         | Itransform(trname,pcsuccess) ->
           let callback ntr =

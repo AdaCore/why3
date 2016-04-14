@@ -41,28 +41,19 @@ type prover_result = {
 
 type resource_limit =
   {
-    limit_time  : int option;
-    limit_mem   : int option;
-    limit_steps : int option;
+    limit_time  : int;
+    limit_mem   : int;
+    limit_steps : int;
   }
 
-let empty_limit =
-  { limit_time = None ; limit_mem = None; limit_steps = None }
+let empty_limit = { limit_time = 0 ; limit_mem = 0; limit_steps = 0 }
 
-let get_time x = Opt.get_def 0 x.limit_time
-let get_mem x = Opt.get_def 0 x.limit_mem
-let get_steps x = Opt.get_def 0 x.limit_steps
-
-let mk_limit t m s =
-  { limit_time = if t = 0 then None else Some t;
-    limit_mem  = if m = 0 then None else Some m;
-    limit_steps = if s = 0 then None else Some s
-  }
-
-let limit_max a b =
-  mk_limit (max (get_time a) (get_time b))
-           (max (get_mem a) (get_mem b))
-           (max (get_steps a) (get_steps b))
+let limit_max =
+  let single_limit_max a b = if a = 0 || b = 0 then 0 else max a b in
+  fun a b ->
+    { limit_time = single_limit_max a.limit_time b.limit_time;
+      limit_steps = single_limit_max a.limit_steps b.limit_steps;
+      limit_mem = single_limit_max a.limit_mem b.limit_mem; }
 
 type timeunit =
   | Hour
@@ -225,7 +216,7 @@ let parse_prover_run res_parser time out ret limit ~printer_mapping =
     | Unknown (s, _) -> Unknown (s, Some reason_unknown)
     | _ -> ans in
   let ans = match ans, limit with
-    | (Unknown _ | HighFailure), { limit_time = Some tlimit }
+    | (Unknown _ | HighFailure), { limit_time = tlimit }
       when time >= (0.9 *. float tlimit) -> Timeout
     | _ -> ans in
   let model = res_parser.prp_model_parser out printer_mapping in
@@ -240,11 +231,8 @@ let parse_prover_run res_parser time out ret limit ~printer_mapping =
   }
 
 let actualcommand command limit file =
-  let timelimit = get_time limit in
-  let memlimit  = get_mem limit in
-  let steplimit = get_steps limit in
-  let stime = string_of_int timelimit in
-  let smem = string_of_int memlimit in
+  let stime = string_of_int limit.limit_time in
+  let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
@@ -259,7 +247,7 @@ let actualcommand command limit file =
        to prepare the command line in a separate function? *)
     | "l" -> Config.libdir
     | "d" -> Config.datadir
-    | "S" -> string_of_int steplimit
+    | "S" -> string_of_int limit.limit_steps
     | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, %d or %S"
   in
   let args =
@@ -275,15 +263,14 @@ let actualcommand ~cleanup ~inplace command limit file =
     raise e
 
 let adapt_limits limit on_timelimit =
-  let new_time_limit =
-    let timelimit = get_time limit in
+  { limit with limit_time =
     (* for steps limit use 2 * t + 1 time *)
-    if limit.limit_steps <> None then (2 * timelimit + 1)
+    if limit.limit_steps <> empty_limit.limit_steps
+    then (2 * limit.limit_time + 1)
     (* if prover implements time limit, use t + 1 *)
-    else if on_timelimit then succ timelimit
+    else if on_timelimit then succ limit.limit_time
     (* otherwise use t *)
-    else timelimit in
-  { limit with limit_time = Some new_time_limit }
+    else limit.limit_time }
 
 let set_socket_name =
   Prove_client.set_socket_name
@@ -357,10 +344,11 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
       res_parser   = res_parser;
       printer_mapping = printer_mapping } in
   Hashtbl.add saved_data id save;
-  let timelimit = get_time limit in
-  let memlimit = get_mem limit in
   let use_stdin = if use_stdin then Some fin else None in
-  Prove_client.send_request ~use_stdin ~id ~timelimit ~memlimit ~cmd;
+  Prove_client.send_request ~use_stdin ~id
+                            ~timelimit:limit.limit_time
+                            ~memlimit:limit.limit_mem
+                            ~cmd;
   ServerCall id
 
 let get_new_results ~blocking =

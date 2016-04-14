@@ -105,9 +105,7 @@ let () = printf "@[On task 1, alt-ergo answers %a@."
 let result2 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task ~command:alt_ergo.Whyconf.command
-    ~limit:{Call_provers.limit_time = Some 10;
-                         limit_mem = None ;
-                         limit_steps = None}
+    ~limit:{Call_provers.empty_limit with Call_provers.limit_time = 10}
     alt_ergo_driver task2 ()) ()
 
 let () = printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."

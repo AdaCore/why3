@@ -120,30 +120,21 @@ type post_prover_call = unit -> prover_result
 
 type resource_limit =
   {
-    limit_time  : int option;
-    limit_mem   : int option;
-    limit_steps : int option;
+    limit_time  : int;
+    limit_mem   : int;
+    limit_steps : int;
   }
 (* represents the three ways a prover run can be limited: in time, memory
    and/or steps *)
 
 val empty_limit : resource_limit
-(* the limit object which imposes no limits *)
+(* the limit object which imposes no limits. Use this object to impose no
+   limits, but also to know if some concrete time, steps or memlimit actually
+   means "no limit" *)
 
 val limit_max : resource_limit -> resource_limit -> resource_limit
 (* return the limit object whose components represent the maximum of the
    corresponding components of the arguments *)
-
-val get_time : resource_limit -> int
-(* return time, return default value 0 if not set *)
-val get_mem : resource_limit -> int
-(* return time, return default value 0 if not set *)
-val get_steps : resource_limit -> int
-(* return time, return default value 0 if not set *)
-
-val mk_limit : int -> int -> int -> resource_limit
-(* build a limit object, transforming the default values into None on the fly
-   *)
 
 val call_editor : command : string -> string -> pre_prover_call
 
