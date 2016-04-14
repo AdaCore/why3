@@ -11,6 +11,7 @@
 
 (* simple helpers *)
 open Worker_proto
+module XHR = XmlHttpRequest
 
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
@@ -32,9 +33,9 @@ module Editor =
       let open Js.Unsafe in
       meth_call editor "getValue" [| |]
 
-    let set_value ?(editor=editor) str =
+    let set_value ?(editor=editor) (str : Js.js_string Js.t) =
       let open Js.Unsafe in
-      ignore (meth_call editor "setValue" [| inject (Js.string str); inject ~-1 |])
+      ignore (meth_call editor "setValue" [| inject (str); inject ~-1 |])
 
 
     let get_buffer () =
@@ -139,9 +140,6 @@ module Console =
     let get_console () =
         get_opt (Dom_html.document ## getElementById (Js.string "console"))
 
-    let clear () =
-      (get_console ()) ## innerHTML <- Js.string "";
-      Editor.set_value ~editor:Editor.task_editor ""
 
     let print cls msg =
         (get_console ()) ## innerHTML <-
@@ -207,7 +205,7 @@ module Console =
       (span ## classList) ## add (Js.string "task-selected");
       let markers = List.map (fun (cls, range) -> Editor.add_marker cls range) loc in
       Hashtbl.add task_selection id (span, loc, markers);
-      Editor.set_value ~editor:Editor.task_editor pretty
+      Editor.set_value ~editor:Editor.task_editor (Js.string pretty)
 
     let deselect_task id =
       try
@@ -222,11 +220,18 @@ module Console =
       let l = Hashtbl.fold (fun id _ acc -> id :: acc) task_selection [] in
       List.iter deselect_task l
 
+
+
+    let clear () =
+      clear_task_selection ();
+      (get_console ()) ## innerHTML <- Js.string "";
+      Editor.set_value ~editor:Editor.task_editor (Js.string "")
+
     let error_marker = ref None
     let () =
       Editor.set_on_event
         "change"
-        (Js.wrap_callback (fun () -> clear_task_selection ();
+        (Js.wrap_callback (fun () -> clear ();
                                   match !error_marker with
                                     None -> ()
                                   | Some (m, _) -> Editor.remove_marker m))
@@ -239,6 +244,8 @@ module Console =
                            match !error_marker with
                              None -> ()
                            | Some (_, r) -> Editor.set_selection_range r))
+
+
     let print_why3_output o =
       let doc = Dom_html.document in
       (* see why3_worker.ml *)
@@ -286,6 +293,7 @@ module Console =
 	 end
 
 
+
       | UpdateStatus(st, id) ->
          try
            let span_icon = Dom_html.getElementById (id ^ "_icon") in
@@ -304,6 +312,61 @@ module Console =
       List.iter (fun span ->
                  span ## className <- (Js.string "fa fa-fw fa-minus-circle task-abort"))
                 (Dom.list_of_nodeList list)
+
+
+
+
+
+    let select_example =
+      match Dom_html.tagged (Dom_html.getElementById "select-example") with
+	Dom_html.Select s -> s
+      | _ -> assert false
+
+
+    let set_loading_label b =
+      let label = Dom_html.getElementById "example-label" in
+      select_example ## disabled <- (Js.bool b);
+      if b then
+	label ## className <- Js.string "fa fa-spin fa-refresh"
+      else
+	label ## className <- Js.string "fa-book"
+
+    let () =
+      let sessionStorage : Dom_html.storage Js.t =
+	let open Js.Unsafe in
+	get global (Js.string "sessionStorage")
+      in
+      select_example ## onchange <-
+	Dom.handler (fun _ ->
+		     let url = select_example ## value in
+		     begin
+		       match Js.Opt.to_option (sessionStorage ## getItem (url)) with
+			 Some s -> Editor.set_value s
+		       | None ->
+			  let xhr = XHR.create () in
+			   xhr ## onreadystatechange <-
+			     Js.wrap_callback
+			       (fun () ->
+				if xhr ## status = 200 &&
+				     xhr ## readyState == XHR.DONE
+				then
+				  let mlw = xhr ## responseText in
+				  sessionStorage ## setItem (url, mlw);
+				  Editor.set_value mlw;
+				  set_loading_label false
+			       );
+			   xhr ## _open (Js.string "GET", url, Js._true);
+			   xhr ## send (Js.null);
+			   set_loading_label true
+		     end;
+		     Js._false
+		    )
+
+    let add_example text url =
+      let option = Dom_html.createOption Dom_html.document in
+      option ## value <- url;
+      option ## innerHTML <- text;
+      appendChild select_example option
 
   end
 
@@ -341,7 +404,13 @@ let rec init_alt_ergo_worker i =
     (Dom.handler (fun ev ->
                   let (id, result) as res = unmarshal (ev ## data) in
                   Console.print_alt_ergo_output id result;
-                  (get_why3_worker()) ## postMessage (marshal (status_of_result res));
+		  let status_update = status_of_result res in
+		  let () = match status_update with
+		      SetStatus(v, id) ->
+		      Console.print_why3_output (UpdateStatus(v, id))
+		    | _ -> ()
+		  in
+                  (get_why3_worker()) ## postMessage (marshal status_update);
                   !alt_ergo_workers.(i) <- Free(worker);
                   process_task ();
                   Js._false));
@@ -440,11 +509,15 @@ let why3_transform tr f () =
       Console.clear_task_selection ()
     end
 
+let why3_prove_all () =
+  if alt_ergo_not_running () then
+    (get_why3_worker()) ## postMessage (marshal ProveAll)
+
 
 let () =
   add_button "button-execute" why3_execute ;
   add_button "button-compile" why3_parse ; (* todo : change *)
-  add_button "button-prove-all" why3_parse ;
+  add_button "button-prove-all" why3_prove_all;
   add_button "button-prove" (why3_transform `Prove (fun _ -> ()));
   add_button "button-split" (why3_transform `Split (fun _ -> ()));
   add_button "button-clean" (why3_transform `Clean Console.clean_task);
@@ -452,7 +525,7 @@ let () =
 			    (get_why3_worker()) ## terminate ();
 			    why3_worker := Some (init_why3_worker ());
 			    reset_workers ();
-			    Console.set_abort_icon());
+			    Console.clear());
 
   let input_threads = get_opt Dom_html.(CoerceTo.input
 					  (getElementById "input-num-threads"))
@@ -483,41 +556,25 @@ let () =
        Js._false
       )
 
-
-(* Predefined examples *)
-
-let add_file_example (buttonname, file) =
-  let handler = Dom.handler
-    (fun _ev ->
-      let text = Sys_js.file_content file in
-      let global = Js.Unsafe.global in
-      let editor = Js.Unsafe.get global (Js.string "editor") in
-      Js.Unsafe.set global (Js.string "loadedBuffer") (Js.string text);
-      let loaded = Filename.basename file in
-      Js.Unsafe.set global (Js.string "loadedFilename") (Js.string loaded);
-      ignore (Js.Unsafe.meth_call global "replaceWithLoaded" [| |]);
-      Console.clear ();
-      ignore (Js.Unsafe.meth_call editor "focus" [| |]);
-
-      Js._false)
-  in
-  let button =
-    get_opt (Dom_html.document ## getElementById (Js.string buttonname))
-  in
-  button ## onclick <- handler
-
 let () =
-  let files =
-    [
-      "drinkers", "/drinkers.why";
-(*  add_file_example "simplearith" "/simplearith.why";*)
-      "bin_mult", "/bin_mult.mlw";
-      "fact", "/fact.mlw";
-      "isqrt", "/isqrt.mlw"
-    ]
-  in
-  List.iter add_file_example files;
-
+  let xhr = XHR.create () in
+  xhr ## onreadystatechange <-
+    Js.wrap_callback
+      (fun () ->
+       if xhr ## readyState == XHR.DONE then
+	 if xhr ## status = 200 then
+	   let examples = xhr ## responseText ## split (Js.string "\n") in
+	   let examples = Js.to_array (Js.str_array examples) in
+	   for i = 0 to ((Array.length examples) / 2) - 1 do
+	     Console.add_example examples.(2*i) ((Js.string "examples/") ## concat (examples.(2*i+1)))
+	   done;
+	   Console.set_loading_label false
+	 else
+	   Console.set_loading_label false
+      );
+  xhr ## _open (Js.string "GET", Js.string "examples/index.txt", Js._true);
+  xhr ## send (Js.null);
+  Console.set_loading_label true
 
 (*
 Local Variables:

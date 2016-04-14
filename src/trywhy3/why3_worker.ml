@@ -156,7 +156,7 @@ module Task =
 	  subtasks = [];
 	  loc = id_loc @  (collect_locs task);
 	  expl = expl;
-          pretty = task_text (Trans.apply intro_trans task); 
+          pretty = task_text (Trans.apply intro_trans task);
         }
       in
       Hashtbl.add task_table id task_info;
@@ -268,24 +268,35 @@ let why3_clean id =
   with
     Not_found -> ()
 
-let why3_parse_theories theories =
-  let theories =
-    Stdlib.Mstr.fold
-      (fun thname th acc ->
-       let loc =
-         Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
-       in
-       (loc, (thname, th)) :: acc) theories []
-  in
-  let theories = List.sort  (fun (l1,_) (l2,_) -> Loc.compare l1 l2) theories in
-  List.iter
-    (fun (_, (th_name, th)) ->
-     let th_id = Task.register_theory th_name th in
+let why3_prove_all () =
+  Hashtbl.iter
+    (fun _ info ->
+     match info.Task.task with
+       `Theory _ -> List.iter why3_prove info.Task.subtasks
+     | _ -> ()) Task.task_table
 
-     W.send (Theory(th_id, th_name));
-     W.send (UpdateStatus(`New, th_id));
-     List.iter why3_prove (Task.get_info th_id).Task.subtasks
-    ) theories
+
+let why3_parse_theories theories =
+  if Stdlib.Mstr.is_empty theories then
+    W.send (Result []) (* hack to return no result *)
+  else
+    let theories =
+      Stdlib.Mstr.fold
+	(fun thname th acc ->
+	 let loc =
+           Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+	 in
+	 (loc, (thname, th)) :: acc) theories []
+    in
+    let theories = List.sort  (fun (l1,_) (l2,_) -> Loc.compare l1 l2) theories in
+    List.iter
+      (fun (_, (th_name, th)) ->
+       let th_id = Task.register_theory th_name th in
+       W.send (Theory(th_id, th_name));
+       let subs = (Task.get_info th_id).Task.subtasks in
+       W.send (UpdateStatus( (if subs == [] then `Valid else `New) , th_id));
+       List.iter why3_prove subs
+      ) theories
 
 let execute_symbol m fmt ps =
   match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
@@ -364,17 +375,11 @@ let () = Sys_js.register_file ~name:temp_file_name ~content:""
 
 let why3_run f lang code =
   try
-    log_time "Why3 worker : start writing file";
     let ch = open_out temp_file_name in
     output_string ch code;
     close_out ch;
-    log_time "Why3 worker : stop writing file";
-
-    (* TODO: add a function Env.read_string or Env.read_from_lexbuf ? *)
-    log_time "Why3 worker : start parsing file";
 
     let theories = Env.read_file lang env temp_file_name in
-    log_time "Why3 worker : stop parsing file";
     f theories
   with
   | Loc.Located(loc,e') ->
@@ -396,10 +401,12 @@ let () =
       | Transform (`Split, id) -> why3_split id
        | Transform (`Prove, id) -> why3_prove id
        | Transform (`Clean, id) -> why3_clean id
+       | ProveAll -> why3_prove_all ()
        | ParseBuffer code ->
           Task.clear_table ();
           why3_run why3_parse_theories Env.base_language code
        | ExecuteBuffer code ->
+	  Task.clear_table ();
 	  why3_run why3_execute Mlw_module.mlw_language code
        | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
     )

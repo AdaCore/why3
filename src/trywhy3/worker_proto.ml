@@ -2,10 +2,12 @@ type id = string
 type loc = int * int * int * int
 type why3_loc = string * (int * int * int) (* kind, line, column, length *)
 type status = [`New | `Valid | `Unknown ]
+
 type why3_command =  ParseBuffer of string
-              | ExecuteBuffer of string
-              | Transform of [ `Prove | `Split | `Clean ] * id
-              | SetStatus of status * id
+		   | ExecuteBuffer of string
+		   | ProveAll
+		   | Transform of [ `Prove | `Split | `Clean ] * id
+		   | SetStatus of status * id
 
 type why3_output = Error of string (* msg *)
                  | ErrorLoc of (loc * string) (* loc * msg *)
