@@ -205,11 +205,6 @@ theory GenericFloat
   axiom of_int_to_real: forall x:int. no_overflow (FromInt.from_int x) ->
         to_real (of_int x) = round (FromInt.from_int x)
 
-  (* to_int and nearbyInt *)
-  axiom to_int_nearbyInt: forall x:t.
-    is_finite x ->
-      FromInt.from_int (to_int x) = to_real (roundToIntegralTiesToAway x)
-
   (* Axioms on round *)
 
   axiom Bounded_real_no_overflow :
@@ -332,6 +327,9 @@ theory GenericFloat
 
   (* _____________ *)
 
+  use real.Truncate
+
+  (* is_int predicate  *)
   predicate is_int (x:t)
 
   (* temporary range check on int set to 2^64; TODO find the actual
@@ -342,11 +340,38 @@ theory GenericFloat
 
   axiom is_int_is_finite: forall x. is_int x -> is_finite x
 
-  axiom eq_to_int: forall x y. is_finite x -> is_finite y -> x .= y ->
-    to_int x = to_int y
+  axiom int_to_real: forall x.
+    is_int x -> to_real x = FromInt.from_int (to_int x)
+
+  (** rounded are ints *)
+
+  axiom truncate_is_int: forall x:t. is_finite x ->
+    is_int (roundToIntegralTowardsZero x)
+
+  axiom ceil_is_int: forall x:t. is_finite x ->
+    is_int (roundToIntegralTowardsPositive x)
+
+  axiom floor_is_int: forall x:t. is_finite x ->
+    is_int (roundToIntegralTowardsNegative x)
+
+  axiom round_is_int: forall x. is_finite x ->
+    is_int (roundToIntegralTiesToAway x)
+
+  (** rounding ints *)
 
   axiom truncate_int: forall x:t. is_int x ->
-        roundToIntegralTowardsZero x .= x
+    roundToIntegralTowardsZero x .= x
+
+  axiom ceil_int: forall i:t. is_int i ->
+    roundToIntegralTowardsPositive i .= i
+
+  axiom floor_int: forall i:t. is_int i ->
+    roundToIntegralTowardsNegative i .= i
+
+  axiom round_int: forall i:t. is_int i ->
+    roundToIntegralTiesToAway i .= i
+
+  (** truncate *)
 
   axiom truncate_neg: forall x:t.
     is_finite x -> is_negative x -> roundToIntegralTowardsZero x = roundToIntegralTowardsPositive x
@@ -354,86 +379,80 @@ theory GenericFloat
   axiom truncate_pos: forall x:t.
     is_finite x -> is_positive x -> roundToIntegralTowardsZero x = roundToIntegralTowardsNegative x
 
-  axiom to_int_of_int: forall i:int.
-    (- max_representable_integer) <= i <= max_representable_integer ->
-      to_int (of_int i) = i
-
-  (* ceil axioms *)
-  axiom ceil_is_int: forall x:t. is_finite x -> is_int (roundToIntegralTowardsPositive x)
-
-  (* zero's sign is kept so '=' instead of eq is OK *)
-  (* try is_int i -> ceil i = i *)
-  axiom ceil_of_int: forall i:t. is_int i ->
-    roundToIntegralTowardsPositive i = i
+  (** ceil *)
 
   axiom ceil_le: forall x:t. x .<= (roundToIntegralTowardsPositive x)
 
   axiom ceil_lest: forall x y:t. x .<= y /\ is_int y -> (roundToIntegralTowardsPositive x) .<= y
 
-  axiom ceil_to_int: forall x:t.
+  axiom ceil_to_real: forall x:t.
     (.- (of_int max_representable_integer)) .<= x .<= (of_int max_representable_integer) ->
-      (* or ? to_int (roundToIntegralTowardsPositive x) = Truncate.roundToIntegralTowardsPositive (to_real x) *)
       to_real (roundToIntegralTowardsPositive x) = FromInt.from_int (Truncate.ceil (to_real x))
 
-  (* floor axioms *)
-  axiom floor_is_int: forall x:t. is_finite x -> is_int (roundToIntegralTowardsNegative x)
+  axiom ceil_to_int: forall x:t.
+    (.- (of_int max_representable_integer)) .<= x .<= (of_int max_representable_integer) ->
+      to_int (roundToIntegralTowardsPositive x) = Truncate.ceil (to_real x)
 
-  axiom floor_of_int: forall i:t.
-    is_int i -> roundToIntegralTowardsNegative i .= i
+  (** floor *)
 
   axiom floor_le: forall x:t. (roundToIntegralTowardsNegative x) .<= x
 
   axiom floor_lest: forall x y:t. y .<= x /\ is_int y -> y .<= (roundToIntegralTowardsNegative x)
 
-  axiom floor_to_int: forall x:t.
-    (.- (of_int max_representable_integer)) .< x .<= (of_int max_representable_integer) ->
-      (*or ? to_int (roundToIntegralTowardsNegative x) = Truncate.roundToIntegralTowardsNegative (to_real x) *)
+  axiom floor_to_real: forall x:t.
+    (.- (of_int max_representable_integer)) .<= x .<= (of_int max_representable_integer) ->
       to_real (roundToIntegralTowardsNegative x) = FromInt.from_int (Truncate.floor (to_real x))
 
-  (* rounding *)
+  axiom floor_to_int: forall x:t.
+    (.- (of_int max_representable_integer)) .<= x .<= (of_int max_representable_integer) ->
+      to_int (roundToIntegralTowardsNegative x) = Truncate.floor (to_real x)
 
-  axiom round_is_int: forall x. is_finite x ->
-    is_int (roundToIntegralTiesToAway x)
+  (* Rna *)
 
-  axiom round_of_int: forall i:t. is_int i -> roundToIntegralTiesToAway i .= i
-
-  axiom to_int_down:
+  axiom RNA_down:
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .< ((roundToIntegralTowardsPositive x) .- x) ->
-      (* to_int x = to_int (roundToIntegralTowardsNegative x) *)
       roundToIntegralTiesToAway x = roundToIntegralTowardsNegative x
 
-  axiom to_int_up:
+  axiom RNA_up:
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .> ((roundToIntegralTowardsPositive x) .- x) ->
-      (* to_int x = to_int (roundToIntegralTowardsPositive x) *)
       roundToIntegralTiesToAway x = roundToIntegralTowardsPositive x
 
-  axiom to_int_down_tie:        (* check if to_int is rounding or RNE *)
+  axiom RNA_down_tie:
     forall x:t. (x .- (roundToIntegralTowardsNegative x)) .= ((roundToIntegralTowardsPositive x) .- x) -> is_negative x ->
-      (* to_int x = to_int (roundToIntegralTowardsNegative x) *)
       roundToIntegralTiesToAway x = roundToIntegralTowardsNegative x
 
-  axiom to_int_up_tie:
+  axiom RNA_up_tie:
     forall x:t. ((roundToIntegralTowardsPositive x) .- x) .= (x .- (roundToIntegralTowardsNegative x)) -> is_positive x ->
-      (* to_int x = to_int (roundToIntegralTowardsPositive x) *)
       roundToIntegralTiesToAway x = roundToIntegralTowardsPositive x
 
-  axiom to_int_near_int:
+  axiom RNA_near_int:
     forall i x:t. is_int i -> (.- half) .< x .< half ->
-      (* to_int (i .+ x) = to_int i *)
       roundToIntegralTiesToAway (i .+ x) = i
 
-  axiom to_int_tiestoaway: forall x:t.
+  (* axiom rna_to_real: forall x:t. *)
+  (*   is_finite x -> *)
+  (*     to_real (roundToIntegralTiesToAway x) = FromInt.from_int (to_int x) *)
+
+  (* to_int *)
+
+  axiom to_int_rna: forall x:t.
     to_int x = to_int (roundToIntegralTiesToAway x)
 
   axiom to_int_monotonic: forall x y:t.
     is_finite y -> is_finite x -> x .<= y -> (to_int x) <= (to_int y)
 
-  (* are those two really ok ? *)
   axiom to_int_monotonic_int1:
     forall x:t, i:int. is_finite x -> x .<= (of_int i) -> (to_int x) <= i
 
   axiom to_int_monotonic_int2:
     forall x:t, i:int. is_finite x -> (of_int i) .<= x -> i <= (to_int x)
+
+  axiom to_int_of_int: forall i:int.
+    (- max_representable_integer) <= i <= max_representable_integer ->
+      to_int (of_int i) = i
+
+  axiom eq_to_int: forall x y. is_finite x -> is_finite y -> x .= y ->
+    to_int x = to_int y
 
   axiom truncate_is_finite  : forall x:t. is_finite x -> is_finite (roundToIntegralTowardsZero x)
   axiom ceil_is_finite      : forall x:t. is_finite x -> is_finite (roundToIntegralTowardsPositive x)
