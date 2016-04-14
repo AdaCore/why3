@@ -539,9 +539,9 @@ let opt pr lab fmt = function
 
 let save_result fmt r =
   let steps = if  r.Call_provers.pr_steps >= 0 then
-		Some  r.Call_provers.pr_steps
-	      else
-		None
+                Some  r.Call_provers.pr_steps
+              else
+                None
   in
   fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"%a/>"
     (match r.Call_provers.pr_answer with
@@ -1206,8 +1206,8 @@ let load_result r =
           Call_provers.pr_time = time;
           Call_provers.pr_output = "";
           Call_provers.pr_status = Unix.WEXITED 0;
-	  Call_provers.pr_steps = steps;
-	  Call_provers.pr_model = Model_parser.default_model;
+          Call_provers.pr_steps = steps;
+          Call_provers.pr_model = Model_parser.default_model;
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited
@@ -1291,7 +1291,7 @@ and load_proof_or_transf ctxt mg a =
           let obsolete = bool_attribute "obsolete" a false in
           let archived = bool_attribute "archived" a false in
           let timelimit = int_attribute_def "timelimit" a timelimit in
-	  let steplimit = int_attribute_def "steplimit" a steplimit in
+          let steplimit = int_attribute_def "steplimit" a steplimit in
           let memlimit = int_attribute_def "memlimit" a memlimit in
           let limit = { Call_provers.limit_time = timelimit;
                         Call_provers.limit_mem = memlimit;
@@ -1493,7 +1493,7 @@ let load_file ~keygen session old_provers f =
             let version = string_attribute "version" f in
             let altern = string_attribute_def "alternative" f "" in
             let timelimit = int_attribute_def "timelimit" f 5 in
-	    let steplimit = int_attribute_def "steplimit" f 1 in
+            let steplimit = int_attribute_def "steplimit" f 0 in
             let memlimit = int_attribute_def "memlimit" f 1000 in
             let p = {C.prover_name = name;
                      prover_version = version;
