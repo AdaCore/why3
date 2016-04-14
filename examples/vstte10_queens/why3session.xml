@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="1" memlimit="4000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="1" memlimit="0"/>
-<prover id="2" name="Z3" version="4.3.2" timelimit="6" steplimit="1" memlimit="1000"/>
-<prover id="3" name="Z3" version="3.2" timelimit="8" steplimit="1" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="1" memlimit="0"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="6" memlimit="4000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="6" memlimit="1000"/>
+<prover id="3" name="Z3" version="3.2" timelimit="8" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="0"/>
 <file name="../vstte10_queens.mlw" expanded="true">
 <theory name="NQueens" sum="bd54a466f42b418faffacb9470dabda3" expanded="true">
  <goal name="eq_board_set">
@@ -40,7 +40,7 @@
  <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter count_bt_queens" expl="VC for count_bt_queens">
- <proof prover="0" timelimit="5" steplimit="-1"><result status="valid" time="0.27"/></proof>
+ <proof prover="0" timelimit="5"><result status="valid" time="0.27"/></proof>
  </goal>
  <goal name="WP_parameter count_queens" expl="VC for count_queens">
  <proof prover="6" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>

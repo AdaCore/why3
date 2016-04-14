@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="7" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="4000"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="4000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" memlimit="4000"/>
+<prover id="7" name="CVC4" version="1.4" timelimit="5" memlimit="4000"/>
 <file name="../isqrt.mlw" expanded="true">
 <theory name="Square" sum="9d10f7a99e3dc8b97241d913352efc97">
  <goal name="sqr_non_neg">
@@ -98,10 +98,10 @@
   <goal name="WP_parameter sqrt.19" expl="19. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter sqrt.19.1" expl="1. VC for sqrt">
-   <proof prover="7" steplimit="-1"><result status="valid" time="0.01"/></proof>
+   <proof prover="7"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="WP_parameter sqrt.19.2" expl="2. VC for sqrt">
-   <proof prover="0" steplimit="-1"><result status="valid" time="0.01" steps="11"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
   </transf>
   </goal>

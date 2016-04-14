@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
 <file name="../association_list.mlw">
 <theory name="Assoc" sum="12adb5d5e7c156493bafb1bd121c4586">
  <goal name="appear_append">
@@ -163,12 +163,12 @@
   <proof prover="4"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter model_cut.9" expl="9. postcondition">
-  <proof prover="4" steplimit="0"><result status="valid" time="0.11" steps="312"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="312"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter model_split" expl="VC for model_split">
- <proof prover="4" steplimit="0"><result status="valid" time="0.15" steps="686"/></proof>
+ <proof prover="4"><result status="valid" time="0.15" steps="686"/></proof>
  </goal>
 </theory>
 </file>

@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="1" memlimit="4000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="10" steplimit="1" memlimit="1000"/>
-<prover id="3" name="Z3" version="3.2" timelimit="10" steplimit="1" memlimit="4000"/>
-<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="7" name="Z3" version="4.3.2" timelimit="10" steplimit="1" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="4000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Z3" version="3.2" timelimit="10" memlimit="4000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="4000"/>
+<prover id="7" name="Z3" version="4.3.2" timelimit="10" memlimit="1000"/>
 <file name="../verifythis_PrefixSumRec.mlw" expanded="true">
 <theory name="PrefixSumRec" sum="ee494c5f3d4aa78c6f6a6f28a36bfbe6" expanded="true">
  <goal name="Div_mod_2">
@@ -55,8 +55,8 @@
   <proof prover="1" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter phase1_frame.8" expl="8. postcondition">
-  <proof prover="0" timelimit="30" steplimit="-1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3" timelimit="30" steplimit="-1"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" timelimit="30"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
@@ -95,8 +95,8 @@
   <proof prover="1" timelimit="30"><result status="valid" time="0.27"/></proof>
   </goal>
   <goal name="WP_parameter phase1_frame2.8" expl="8. postcondition">
-  <proof prover="0" timelimit="30" steplimit="-1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3" timelimit="30" steplimit="-1"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" timelimit="30"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>

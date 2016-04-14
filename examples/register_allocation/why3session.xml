@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="1" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
 <file name="../register_allocation.mlw">
 <theory name="Spec" sum="84125847b61498f1784a3aedb308613e">
  <goal name="WP_parameter exec_append" expl="VC for exec_append">
@@ -424,7 +424,7 @@
  <goal name="measure_nonneg">
  <transf name="induction_ty_lex">
   <goal name="measure_nonneg.1" expl="1.">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
  </transf>
  </goal>
@@ -578,7 +578,7 @@
       <goal name="WP_parameter compile.40.1.1.1.1" expl="1. VC for compile">
       <transf name="introduce_premises">
        <goal name="WP_parameter compile.40.1.1.1.1.1" expl="1. VC for compile">
-       <proof prover="0" steplimit="-1"><result status="valid" time="0.10" steps="99"/></proof>
+       <proof prover="0"><result status="valid" time="0.10" steps="99"/></proof>
        </goal>
       </transf>
       </goal>

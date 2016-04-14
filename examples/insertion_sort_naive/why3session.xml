@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="4000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
+<prover id="6" name="CVC4" version="1.4" timelimit="5" memlimit="4000"/>
+<prover id="7" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <file name="../insertion_sort_naive.mlw" expanded="true">
 <theory name="InsertionSortNaive" sum="e5e29e5ec84b82cb79a31084ea5e3dc7">
  <goal name="WP_parameter sort" expl="VC for sort">
@@ -414,7 +414,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.09" steps="83"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. loop invariant preservation">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.17" steps="147"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="147"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. loop invariant preservation">
   <transf name="inline_goal">
@@ -430,7 +430,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. loop invariant preservation">
-  <proof prover="0" steplimit="-1"><result status="valid" time="0.03" steps="57"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter sort.26" expl="26. loop invariant preservation">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>

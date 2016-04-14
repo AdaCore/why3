@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="10" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<prover id="12" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="4000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="10" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="4000"/>
+<prover id="12" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
 <file name="../euler002.mlw" expanded="true">
 <theory name="FibSumEven" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -14,16 +14,16 @@
  <goal name="WP_parameter fib_even_3n" expl="VC for fib_even_3n">
  <transf name="split_goal_wp">
   <goal name="WP_parameter fib_even_3n.1" expl="1. variant decrease">
-  <proof prover="10" steplimit="-1"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="10"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter fib_even_3n.2" expl="2. precondition">
-  <proof prover="10" steplimit="-1"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="10"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter fib_even_3n.3" expl="3. postcondition">
-  <proof prover="1" steplimit="-1"><result status="valid" time="0.19"/></proof>
+  <proof prover="1"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="WP_parameter fib_even_3n.4" expl="4. postcondition">
-  <proof prover="10" steplimit="-1"><result status="valid" time="0.20" steps="41"/></proof>
+  <proof prover="10"><result status="valid" time="0.20" steps="41"/></proof>
   </goal>
  </transf>
  </goal>

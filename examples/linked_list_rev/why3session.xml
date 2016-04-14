@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.1" timelimit="5" memlimit="1000"/>
 <file name="../linked_list_rev.mlw" expanded="true">
 <theory name="Disjoint" sum="d9538770c8f60c61e92f6baffbf62d5d">
  <goal name="WP_parameter mem_decomp" expl="VC for mem_decomp">
@@ -304,7 +304,7 @@
   <goal name="WP_parameter list_seg_no_repet.2" expl="2. precondition">
   <transf name="introduce_premises">
    <goal name="WP_parameter list_seg_no_repet.2.1" expl="1. precondition">
-   <proof prover="0" steplimit="1"><result status="valid" time="0.12"/></proof>
+   <proof prover="0"><result status="valid" time="0.12"/></proof>
    </goal>
   </transf>
   </goal>
@@ -411,7 +411,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter app.16" expl="16. loop invariant preservation">
-  <proof prover="0" steplimit="-1"><result status="valid" time="6.21"/></proof>
+  <proof prover="0"><result status="valid" time="6.21"/></proof>
   </goal>
   <goal name="WP_parameter app.17" expl="17. loop variant decrease">
   <proof prover="1"><result status="valid" time="0.05" steps="131"/></proof>
