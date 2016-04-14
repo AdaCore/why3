@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="4000"/>
-<prover id="1" name="Z3" version="4.4.1" timelimit="5" memlimit="4000"/>
-<prover id="7" name="CVC4" version="1.4" timelimit="5" memlimit="4000"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="7" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../isqrt.mlw" expanded="true">
 <theory name="Square" sum="9d10f7a99e3dc8b97241d913352efc97">
  <goal name="sqr_non_neg">
@@ -54,7 +54,7 @@
   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.5" expl="5. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.46"/></proof>
+  <proof prover="1"><result status="valid" time="1.21"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.6" expl="6. loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>

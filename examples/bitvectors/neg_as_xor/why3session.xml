@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="3.2" timelimit="10" memlimit="1000"/>
-<prover id="9" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../neg_as_xor.why" expanded="true">
 <theory name="TestNegAsXOR" sum="4b3f5b71a28db1ecea74d9fd0780e47d" expanded="true">
  <goal name="Nth_j">
@@ -13,12 +13,12 @@
  </goal>
  <goal name="sign_of_j">
  <proof prover="1"><result status="valid" time="0.15" steps="108"/></proof>
- <proof prover="3"><result status="valid" time="0.86"/></proof>
+ <proof prover="3"><result status="valid" time="0.65"/></proof>
  </goal>
  <goal name="mantissa_of_j">
  <proof prover="1"><result status="valid" time="0.16" steps="123"/></proof>
  <proof prover="3"><result status="valid" time="0.61"/></proof>
- <proof prover="5"><result status="valid" time="2.65"/></proof>
+ <proof prover="5"><result status="valid" time="3.37"/></proof>
  <proof prover="9"><result status="valid" time="0.78"/></proof>
  </goal>
  <goal name="exp_of_j">
@@ -50,12 +50,12 @@
  <goal name="Exp_of_xor_j">
  <proof prover="1"><result status="valid" time="1.20" steps="498"/></proof>
  <proof prover="3"><result status="valid" time="0.65"/></proof>
- <proof prover="5"><result status="valid" time="2.18"/></proof>
+ <proof prover="5"><result status="valid" time="2.61"/></proof>
  <proof prover="9"><result status="valid" time="0.66"/></proof>
  </goal>
  <goal name="Mantissa_of_xor_j">
  <proof prover="3"><result status="valid" time="0.66"/></proof>
- <proof prover="5"><result status="valid" time="2.22"/></proof>
+ <proof prover="5"><result status="valid" time="2.66"/></proof>
  <proof prover="9"><result status="valid" time="0.75"/></proof>
  </goal>
  <goal name="MainResultZero">

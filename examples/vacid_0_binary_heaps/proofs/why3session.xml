@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.4pl6" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../heapsort.mlw">
 <theory name="HeapSort" sum="9c2fa0e6c0d92d2a002dd9f0c0f63f95">
  <goal name="Min_of_sorted">
- <proof prover="1" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.27"/></proof>
+ <proof prover="1" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="WP_parameter heapSort" expl="VC for heapSort">
  <transf name="split_goal_wp">

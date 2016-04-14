@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2016_tree_traversal.mlw" expanded="true">
 <theory name="Memory" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -339,7 +339,7 @@
  <proof prover="0"><result status="valid" time="0.04" steps="56"/></proof>
  </goal>
  <goal name="WP_parameter closing" expl="VC for closing">
- <proof prover="0"><result status="valid" time="1.15" steps="1065"/></proof>
+ <proof prover="0"><result status="valid" time="0.84" steps="1065"/></proof>
  </goal>
  <goal name="WP_parameter continuing" expl="VC for continuing">
  <transf name="split_goal_wp">
@@ -359,7 +359,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter continuing.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="1.00" steps="755"/></proof>
+  <proof prover="0"><result status="valid" time="0.64" steps="755"/></proof>
   </goal>
   <goal name="WP_parameter continuing.7" expl="7. postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
@@ -392,7 +392,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="119"/></proof>
   </goal>
   <goal name="WP_parameter continuing.17" expl="17. precondition">
-  <proof prover="0"><result status="valid" time="0.34" steps="152"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="152"/></proof>
   </goal>
   <goal name="WP_parameter continuing.18" expl="18. precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="17"/></proof>
@@ -401,13 +401,13 @@
   <proof prover="0"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="WP_parameter continuing.20" expl="20. precondition">
-  <proof prover="0"><result status="valid" time="0.67" steps="565"/></proof>
+  <proof prover="0"><result status="valid" time="0.43" steps="565"/></proof>
   </goal>
   <goal name="WP_parameter continuing.21" expl="21. precondition">
-  <proof prover="0"><result status="valid" time="0.84" steps="246"/></proof>
+  <proof prover="0"><result status="valid" time="0.46" steps="246"/></proof>
   </goal>
   <goal name="WP_parameter continuing.22" expl="22. precondition">
-  <proof prover="0"><result status="valid" time="0.80" steps="233"/></proof>
+  <proof prover="0"><result status="valid" time="0.40" steps="233"/></proof>
   </goal>
   <goal name="WP_parameter continuing.23" expl="23. postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
@@ -416,7 +416,7 @@
   <proof prover="0"><result status="valid" time="0.17" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter continuing.25" expl="25. precondition">
-  <proof prover="0"><result status="valid" time="0.96" steps="375"/></proof>
+  <proof prover="0"><result status="valid" time="0.68" steps="375"/></proof>
   </goal>
   <goal name="WP_parameter continuing.26" expl="26. precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
@@ -425,22 +425,22 @@
   <proof prover="0"><result status="valid" time="0.07" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter continuing.28" expl="28. precondition">
-  <proof prover="0"><result status="valid" time="2.34" steps="1010"/></proof>
+  <proof prover="0"><result status="valid" time="1.40" steps="1010"/></proof>
   </goal>
   <goal name="WP_parameter continuing.29" expl="29. precondition">
-  <proof prover="0"><result status="valid" time="1.88" steps="486"/></proof>
+  <proof prover="0"><result status="valid" time="1.11" steps="486"/></proof>
   </goal>
   <goal name="WP_parameter continuing.30" expl="30. precondition">
-  <proof prover="0"><result status="valid" time="2.06" steps="449"/></proof>
+  <proof prover="0"><result status="valid" time="1.00" steps="449"/></proof>
   </goal>
   <goal name="WP_parameter continuing.31" expl="31. postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter continuing.32" expl="32. postcondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="119"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="119"/></proof>
   </goal>
   <goal name="WP_parameter continuing.33" expl="33. assertion">
-  <proof prover="0" timelimit="20"><result status="valid" time="5.65" steps="1839"/></proof>
+  <proof prover="0" timelimit="20"><result status="valid" time="4.81" steps="1839"/></proof>
   </goal>
   <goal name="WP_parameter continuing.34" expl="34. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="54"/></proof>
@@ -454,7 +454,7 @@
    <proof prover="0"><result status="valid" time="0.21" steps="135"/></proof>
    </goal>
    <goal name="WP_parameter continuing.35.3" expl="3. VC for continuing">
-   <proof prover="0"><result status="valid" time="0.37" steps="191"/></proof>
+   <proof prover="0"><result status="valid" time="0.22" steps="191"/></proof>
    </goal>
    <goal name="WP_parameter continuing.35.4" expl="4. VC for continuing">
    <transf name="introduce_premises">
@@ -463,10 +463,10 @@
      <goal name="WP_parameter continuing.35.4.1.1" expl="1. VC for continuing">
      <transf name="split_goal_wp">
       <goal name="WP_parameter continuing.35.4.1.1.1" expl="1. VC for continuing">
-      <proof prover="0"><result status="valid" time="0.55" steps="241"/></proof>
+      <proof prover="0"><result status="valid" time="0.31" steps="241"/></proof>
       </goal>
       <goal name="WP_parameter continuing.35.4.1.1.2" expl="2. VC for continuing">
-      <proof prover="0"><result status="valid" time="1.69" steps="718"/></proof>
+      <proof prover="0"><result status="valid" time="0.99" steps="718"/></proof>
       </goal>
      </transf>
      </goal>
@@ -483,7 +483,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter continuing.38" expl="38. postcondition">
-  <proof prover="0"><result status="valid" time="1.06" steps="649"/></proof>
+  <proof prover="0"><result status="valid" time="0.84" steps="649"/></proof>
   </goal>
   <goal name="WP_parameter continuing.39" expl="39. postcondition">
   <proof prover="0"><result status="valid" time="0.19" steps="115"/></proof>
@@ -583,7 +583,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter markTree.31" expl="31. precondition">
-  <proof prover="0"><result status="valid" time="1.92" steps="762"/></proof>
+  <proof prover="0"><result status="valid" time="1.42" steps="762"/></proof>
   </goal>
   <goal name="WP_parameter markTree.32" expl="32. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04" steps="49"/></proof>
@@ -628,7 +628,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter markTree.46" expl="46. precondition">
-  <proof prover="0"><result status="valid" time="3.85" steps="1708"/></proof>
+  <proof prover="0"><result status="valid" time="3.07" steps="1708"/></proof>
   </goal>
   <goal name="WP_parameter markTree.47" expl="47. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>

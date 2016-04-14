@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.10.prv" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.10.prv" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bitwalker.mlw" expanded="true">
 <theory name="Bitwalker" sum="6755724df7c462879051ab2676cc5753" expanded="true">
  <goal name="nth64">
@@ -649,7 +649,7 @@
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter pokethenpeek.9" expl="9. assertion">
-  <proof prover="0"><result status="valid" time="1.52" steps="455"/></proof>
+  <proof prover="0"><result status="valid" time="1.00" steps="341"/></proof>
   </goal>
   <goal name="WP_parameter pokethenpeek.10" expl="10. postcondition">
   <proof prover="0"><result status="valid" time="0.18" steps="94"/></proof>

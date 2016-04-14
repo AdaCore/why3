@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="2" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="2" steplimit="0" memlimit="0"/>
 <file name="../avl.mlw">
 <theory name="SelectionTypes" sum="8ee3f641805a143e052f3881ea88fc8c">
  <goal name="rebuild_aternative_def">
@@ -89,13 +89,13 @@
   <proof prover="1"><result status="valid" time="0.33" steps="504"/></proof>
   </goal>
   <goal name="WP_parameter balance.15" expl="15. precondition">
-  <proof prover="1"><result status="valid" time="0.93" steps="883"/></proof>
+  <proof prover="1"><result status="valid" time="0.54" steps="883"/></proof>
   </goal>
   <goal name="WP_parameter balance.16" expl="16. postcondition">
-  <proof prover="1"><result status="valid" time="0.31" steps="313"/></proof>
+  <proof prover="1"><result status="valid" time="0.16" steps="313"/></proof>
   </goal>
   <goal name="WP_parameter balance.17" expl="17. postcondition">
-  <proof prover="1"><result status="valid" time="0.98" steps="986"/></proof>
+  <proof prover="1"><result status="valid" time="0.70" steps="986"/></proof>
   </goal>
   <goal name="WP_parameter balance.18" expl="18. precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
@@ -134,10 +134,10 @@
   <proof prover="1"><result status="valid" time="0.35" steps="495"/></proof>
   </goal>
   <goal name="WP_parameter balance.30" expl="30. precondition">
-  <proof prover="1"><result status="valid" time="0.80" steps="877"/></proof>
+  <proof prover="1"><result status="valid" time="0.53" steps="877"/></proof>
   </goal>
   <goal name="WP_parameter balance.31" expl="31. postcondition">
-  <proof prover="1"><result status="valid" time="0.35" steps="336"/></proof>
+  <proof prover="1"><result status="valid" time="0.18" steps="336"/></proof>
   </goal>
   <goal name="WP_parameter balance.32" expl="32. postcondition">
   <proof prover="1"><result status="valid" time="0.86" steps="979"/></proof>
@@ -234,10 +234,10 @@
   <proof prover="1"><result status="valid" time="0.03" steps="54"/></proof>
   </goal>
   <goal name="WP_parameter insert.13" expl="13. postcondition">
-  <proof prover="1"><result status="valid" time="2.67" steps="1031"/></proof>
+  <proof prover="1"><result status="valid" time="1.90" steps="1031"/></proof>
   </goal>
   <goal name="WP_parameter insert.14" expl="14. postcondition">
-  <proof prover="1"><result status="valid" time="0.51" steps="333"/></proof>
+  <proof prover="1"><result status="valid" time="0.34" steps="333"/></proof>
   </goal>
   <goal name="WP_parameter insert.15" expl="15. variant decrease">
   <proof prover="1"><result status="valid" time="0.10" steps="135"/></proof>
@@ -252,10 +252,10 @@
   <proof prover="1"><result status="valid" time="0.03" steps="54"/></proof>
   </goal>
   <goal name="WP_parameter insert.19" expl="19. postcondition">
-  <proof prover="1"><result status="valid" time="2.56" steps="983"/></proof>
+  <proof prover="1"><result status="valid" time="1.90" steps="983"/></proof>
   </goal>
   <goal name="WP_parameter insert.20" expl="20. postcondition">
-  <proof prover="1"><result status="valid" time="0.81" steps="339"/></proof>
+  <proof prover="1"><result status="valid" time="0.40" steps="339"/></proof>
   </goal>
   <goal name="WP_parameter insert.21" expl="21. precondition">
   <proof prover="1"><result status="valid" time="0.08" steps="85"/></proof>
@@ -310,10 +310,10 @@
   <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter remove.13" expl="13. postcondition">
-  <proof prover="1"><result status="valid" time="0.93" steps="545"/></proof>
+  <proof prover="1"><result status="valid" time="0.69" steps="545"/></proof>
   </goal>
   <goal name="WP_parameter remove.14" expl="14. postcondition">
-  <proof prover="1"><result status="valid" time="0.51" steps="331"/></proof>
+  <proof prover="1"><result status="valid" time="0.32" steps="331"/></proof>
   </goal>
   <goal name="WP_parameter remove.15" expl="15. variant decrease">
   <proof prover="1"><result status="valid" time="0.11" steps="135"/></proof>
@@ -331,7 +331,7 @@
   <proof prover="1"><result status="valid" time="1.72" steps="807"/></proof>
   </goal>
   <goal name="WP_parameter remove.20" expl="20. postcondition">
-  <proof prover="1"><result status="valid" time="0.56" steps="329"/></proof>
+  <proof prover="1"><result status="valid" time="0.37" steps="329"/></proof>
   </goal>
   <goal name="WP_parameter remove.21" expl="21. precondition">
   <proof prover="1"><result status="valid" time="0.08" steps="85"/></proof>
@@ -398,10 +398,10 @@
   <proof prover="1"><result status="valid" time="0.19" steps="164"/></proof>
   </goal>
   <goal name="WP_parameter extract.16" expl="16. postcondition">
-  <proof prover="1"><result status="valid" time="0.90" steps="714"/></proof>
+  <proof prover="1"><result status="valid" time="0.54" steps="714"/></proof>
   </goal>
   <goal name="WP_parameter extract.17" expl="17. postcondition">
-  <proof prover="1"><result status="valid" time="0.87" steps="525"/></proof>
+  <proof prover="1"><result status="valid" time="0.54" steps="525"/></proof>
   </goal>
   <goal name="WP_parameter extract.18" expl="18. precondition">
   <proof prover="1"><result status="valid" time="0.05" steps="85"/></proof>

@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="4000"/>
-<prover id="3" name="Z3" version="4.4.1" timelimit="5" memlimit="4000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../gcd_bezout.mlw" expanded="true">
 <theory name="GcdBezout" sum="64a68ff39d46e88e6208437a2eae11a6" expanded="true">
  <goal name="WP_parameter gcd" expl="VC for gcd" expanded="true">
@@ -22,13 +22,13 @@
   <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter gcd.5" expl="5. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.51" steps="41"/></proof>
+  <proof prover="1"><result status="valid" time="0.28" steps="41"/></proof>
   </goal>
   <goal name="WP_parameter gcd.6" expl="6. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.40" steps="16"/></proof>
+  <proof prover="1"><result status="valid" time="0.14" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter gcd.7" expl="7. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.31" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.14" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter gcd.8" expl="8. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02"/></proof>

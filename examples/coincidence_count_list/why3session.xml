@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="6" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.8-001" timelimit="6" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../coincidence_count_list.mlw" expanded="true">
 <theory name="CoincidenceCount" sum="e1c38f7c433de1db1bf331338e6cd93a">
  <goal name="Transitive.Trans">
@@ -22,7 +22,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="1.18" steps="2625"/></proof>
+  <proof prover="0"><result status="valid" time="0.82" steps="2661"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.5" expl="5. variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
@@ -34,7 +34,7 @@
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="1.73" steps="3685"/></proof>
+  <proof prover="0"><result status="valid" time="1.01" steps="3244"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.9" expl="9. variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
@@ -46,7 +46,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.12" expl="12. postcondition">
-  <proof prover="0"><result status="valid" time="1.76" steps="3635"/></proof>
+  <proof prover="0"><result status="valid" time="2.71" steps="6776"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.13" expl="13. postcondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -63,7 +63,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="WP_parameter coincidence_count" expl="VC for coincidence_count">
- <proof prover="0"><result status="valid" time="4.92" steps="12209"/></proof>
+ <proof prover="0"><result status="valid" time="3.63" steps="12168"/></proof>
  <transf name="split_goal_wp">
   <goal name="WP_parameter coincidence_count.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
@@ -75,7 +75,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="1.00" steps="2400"/></proof>
+  <proof prover="0"><result status="valid" time="0.57" steps="2400"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.5" expl="5. variant decrease">
   <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
@@ -87,7 +87,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.68" steps="1750"/></proof>
+  <proof prover="0"><result status="valid" time="0.36" steps="1750"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.9" expl="9. variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
@@ -99,7 +99,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.12" expl="12. postcondition">
-  <proof prover="0"><result status="valid" time="0.52" steps="1837"/></proof>
+  <proof prover="0"><result status="valid" time="0.52" steps="1823"/></proof>
   </goal>
   <goal name="WP_parameter coincidence_count.13" expl="13. postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>

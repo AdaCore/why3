@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.10.prv" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="5" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.10.prv" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../queens_bv.mlw" expanded="true">
 <theory name="S" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
@@ -31,7 +31,7 @@
  <proof prover="0"><result status="valid" time="0.11" steps="110"/></proof>
  </goal>
  <goal name="WP_parameter remove_singleton" expl="VC for remove_singleton">
- <proof prover="0"><result status="valid" time="0.90" steps="753"/></proof>
+ <proof prover="0"><result status="valid" time="0.90" steps="761"/></proof>
  </goal>
  <goal name="WP_parameter add_singleton" expl="VC for add_singleton">
  <proof prover="6"><result status="valid" time="0.08"/></proof>
@@ -95,7 +95,7 @@
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="WP_parameter rightmost_bit_trick.7.4" expl="4. type invariant">
-   <proof prover="0"><result status="valid" time="0.52" steps="626"/></proof>
+   <proof prover="0"><result status="valid" time="0.52" steps="630"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2162,7 +2162,7 @@
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="WP_parameter t.20" expl="20. assertion">
-  <proof prover="3"><result status="valid" time="0.74"/></proof>
+  <proof prover="3"><result status="valid" time="0.54"/></proof>
   </goal>
   <goal name="WP_parameter t.21" expl="21. precondition">
   <proof prover="3"><result status="valid" time="0.14"/></proof>
@@ -2173,7 +2173,7 @@
    <proof prover="3"><result status="valid" time="0.29"/></proof>
    </goal>
    <goal name="WP_parameter t.22.2" expl="2. assertion">
-   <proof prover="3"><result status="valid" time="7.04"/></proof>
+   <proof prover="3"><result status="valid" time="5.88"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2278,7 +2278,7 @@
    </goal>
    <goal name="WP_parameter t.49.3" expl="3. loop invariant preservation">
    <proof prover="3" timelimit="60"><result status="valid" time="32.39"/></proof>
-   <proof prover="6" timelimit="60"><result status="valid" time="6.70"/></proof>
+   <proof prover="6" timelimit="60"><result status="valid" time="5.74"/></proof>
    </goal>
   </transf>
   </goal>

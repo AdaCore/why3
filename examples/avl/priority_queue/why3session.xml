@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.4.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
-<prover id="6" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../priority_queue.mlw">
 <theory name="PQueue" sum="a8f2dd09a268c50fc0a71d952b1c9e0e">
  <goal name="S.O.Trans">
@@ -74,7 +74,7 @@
    <proof prover="1"><result status="valid" time="0.13"/></proof>
    </goal>
    <goal name="WP_parameter monoid_sum_is_min.2.2" expl="2. VC for monoid_sum_is_min">
-   <proof prover="1"><result status="valid" time="1.36"/></proof>
+   <proof prover="1"><result status="valid" time="1.06"/></proof>
    </goal>
    <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. VC for monoid_sum_is_min">
    <proof prover="6"><result status="valid" time="0.20"/></proof>
@@ -131,7 +131,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter selected_part.3" expl="3. postcondition">
-  <proof prover="3"><result status="valid" time="2.56" steps="1561"/></proof>
+  <proof prover="3"><result status="valid" time="1.92" steps="1561"/></proof>
   </goal>
   <goal name="WP_parameter selected_part.4" expl="4. postcondition">
   <transf name="split_goal_wp">
@@ -179,7 +179,7 @@
       <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
       </goal>
       <goal name="WP_parameter selected_part.5.2.1.1.2" expl="2. VC for selected_part">
-      <proof prover="1"><result status="valid" time="1.65"/></proof>
+      <proof prover="1"><result status="valid" time="0.80"/></proof>
       </goal>
       <goal name="WP_parameter selected_part.5.2.1.1.3" expl="3. VC for selected_part">
       <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
@@ -251,7 +251,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter first_minimum_caracterisation.11" expl="11. precondition">
-  <proof prover="3"><result status="valid" time="0.35" steps="360"/></proof>
+  <proof prover="3"><result status="valid" time="0.18" steps="360"/></proof>
   </goal>
   <goal name="WP_parameter first_minimum_caracterisation.12" expl="12. postcondition">
   <transf name="split_goal_wp">
