@@ -95,7 +95,7 @@ let set_max_running_provers x =
 let send_request ~use_stdin ~id ~timelimit ~memlimit ~cmd =
   force_connect ();
   let buf = Buffer.create 128 in
-  let servercommand = if use_stdin then "runstdin;" else "run;" in
+  let servercommand = if use_stdin <> None then "runstdin;" else "run;" in
   Buffer.add_string buf servercommand;
   Buffer.add_string buf (string_of_int id);
   Buffer.add_char buf ';';
@@ -106,6 +106,12 @@ let send_request ~use_stdin ~id ~timelimit ~memlimit ~cmd =
       Buffer.add_char buf ';';
       Buffer.add_string buf x)
     cmd;
+  begin match use_stdin with
+  | None -> ()
+  | Some s ->
+      Buffer.add_char buf ';';
+      Buffer.add_string buf s
+  end;
   Buffer.add_char buf '\n';
   let s = Buffer.contents buf in
   send_request_string s

@@ -359,6 +359,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
   Hashtbl.add saved_data id save;
   let timelimit = get_time limit in
   let memlimit = get_mem limit in
+  let use_stdin = if use_stdin then Some fin else None in
   Prove_client.send_request ~use_stdin ~id ~timelimit ~memlimit ~cmd;
   ServerCall id
 

@@ -257,7 +257,7 @@ pid_t create_process(char* cmd,
   unix_argv = (char**)malloc(sizeof(char*) * (argc + 2));
   unix_argv[0] = cmd;
   unix_argv[argc + 1] = NULL;
-  for (i = 0; i < argc; i++) {
+  for (i = 0; i < count; i++) {
     unix_argv[i + 1] = argv[i];
   }
 
