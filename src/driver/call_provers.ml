@@ -335,7 +335,6 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace command limit fin in
-  let limit = adapt_limits limit on_timelimit in
   let save =
     { vc_file      = fin;
       inplace      = inplace;
@@ -343,6 +342,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
       res_parser   = res_parser;
       printer_mapping = printer_mapping } in
   Hashtbl.add saved_data id save;
+  let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
   Prove_client.send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
