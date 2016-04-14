@@ -86,7 +86,7 @@ let tight_op s =
 
 let escape_op s =
   let s = if Strings.has_prefix "*" s then " " ^ s else s in
-  let s = if Strings.ends_with s "*" then s ^ " " else s in
+  let s = if Strings.has_suffix "*" s then s ^ " " else s in
   s
 
 (* theory names always start with an upper case letter *)

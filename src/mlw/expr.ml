@@ -1124,7 +1124,7 @@ let print_rs fmt ({rs_name = {id_string = nm}} as s) =
   match extract_op s.rs_name, s.rs_logic with
   | Some s, _ ->
       let s = if Strings.has_prefix "*" s then " " ^ s else s in
-      let s = if Strings.ends_with s "*" then s ^ " " else s in
+      let s = if Strings.has_suffix "*" s then s ^ " " else s in
       fprintf fmt "(%s)" s
   | _, RLnone | _, RLlemma ->
       pp_print_string fmt (id_unique sprinter s.rs_name)
