@@ -296,12 +296,15 @@ pid_t create_process(char* cmd,
     setrlimit(RLIMIT_CORE,&res);
   }
 
+  if (usestdin) {
+    int infile = open(argv[count], O_RDONLY);
+    if (infile == -1) { perror("Cannot open the input file"); exit(1); }
+    dup2(infile, 0);
+  }
+
   //adapt stdout/stderr
   dup2(outfile, 1);
   dup2(outfile, 2);
-  if (usestdin) {
-    freopen(argv[argc-1], "r", stdin);
-  }
 
   /* execute the command */
   execvp(cmd,unix_argv);
