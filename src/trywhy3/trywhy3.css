@@ -26,14 +26,27 @@
 /* ACE Editor */
 .error {
     position:absolute;
-    background:rgba(200,100,100,0.5);
-    z-index:40;
+    background:rgba(231,113,116,1);
+    z-index:70;
 }
-.hl-task {
+
+.loc-neg-premise {
     position:absolute;
-    background:rgba(200,200,100,1);
+    background:rgba(255,128,64,1);
+    z-index:60;
+}
+
+.loc-goal {
+    position:absolute;
+    background:rgba(64,191,255,1);
+    z-index:50;
+}
+.loc-premise {
+    position:absolute;
+    background:rgba(100,233,134,1);
     z-index:40;
 }
+
 /* Interface */
 body {
     padding:0;
@@ -53,6 +66,56 @@ body {
     width:100%;
 }
 
+.tab-header {
+    display:inline-block;
+    border-radius: 0.25em 0.25em 0 0;
+    vertical-align:middle;
+    text-align:center;
+    padding:0.25em 0.75em;
+    margin-top:0.25em;
+    margin-left:0.25em;
+    margin-right:0.25em;
+    background: #ddd;
+    height:1.5em;
+    line-height:1.5em;
+    font-size:14pt;
+    z-index:0;
+} /*total height 0.25 * 2 + 0.25 +1.5 = 2.25 em; */
+
+.tab-body {
+    display:block;
+    position:absolute;
+    background: #ddd;
+    bottom:0;
+    top:2.25em;
+    left:0;
+    right:0;
+    z-index: 0;
+}
+
+#task-editor {
+    height:100%;
+    width:100%;
+    font-size: large;
+    
+}
+
+.tab-header.alert {
+    color:red;
+    font-weight:bold;
+}
+.tab-header.active {
+    z-index:10;
+    background:#eee;
+}
+.tab-body.active
+ {
+    z-index:10;
+    bottom:0;
+    top:2.25em;
+    width:100%;
+    background:#eee;
+}
 
 #editor-panel.wide-view #editor {
     position:absolute;
@@ -61,18 +124,18 @@ body {
     width:48rem;
     height:100%;
 }
-#editor-panel.wide-view #console {
+#editor-panel.wide-view #tab-panel {
     position:absolute;
     left:48rem;
     right:0;
     height:100%;
 }
-#editor-panel.standard-view #editor {
+#editor-panel.standard-view #editor  {
     position:relative;
     width:100%;
     height:50%;
 }
-#editor-panel.standard-view #console {
+#editor-panel.standard-view #tab-panel {
     position:relative;
     width:100%;
     height:49%;
@@ -84,20 +147,10 @@ body {
     display:inline-block;
     margin: 0 ;
     padding:0;
-    z-index:0;
+    z-index:5;
     vertical-align:top;
     border-right: 1pt  #ddd solid;
     border-bottom: 1pt #ddd solid;
-}
-
-#console {
-    box-sizing: border-box;
-    overflow: auto;
-    position:relative;
-    display:inline-block;
-    margin:0 ;
-    padding:0.5em ;
-    vertical-align:top;
 }
 
 /* CSS MENU BAR */
@@ -106,13 +159,15 @@ body {
     position:absolute;
     top:0pt;
     margin:0;
-    z-index:10;
+    z-index:100;
     font-size:14pt;
     height:18pt;
     padding:0;
     width:100%;
 }
-
+.menu-bar * {
+    z-index:100;
+}
 .menu-bar:after {
     content:"";
     display:table;
@@ -125,7 +180,6 @@ body {
     list-style: none;
     position: relative;
     background-image: linear-gradient(to bottom, #eee, #ccc);
-    z-index:10;
     height:18pt;
     box-sizing:border-box;
     }
@@ -278,8 +332,8 @@ body {
     top:0;
     left:-1.5em;
     width:1.25em;
-    border-bottom: 2pt solid #ddd;
-    border-left: 2pt solid #ddd;
+    border-bottom: 2pt solid #aaa;
+    border-left: 2pt solid #aaa;
 }
 
 

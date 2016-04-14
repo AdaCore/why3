@@ -1,8 +1,15 @@
 /* Global objects */
 var editor = ace.edit("editor");
+var task_editor = ace.edit("task-editor");
+var Range = ace.require('ace/range').Range;
 editor.setTheme("ace/theme/chrome");
 editor.getSession().setMode("ace/mode/why3");
 editor.$blockScrolling = Infinity;
+
+task_editor.setTheme("ace/theme/chrome");
+task_editor.getSession().setMode("ace/mode/why3");
+task_editor.$blockScrolling = Infinity;
+task_editor.setReadOnly(true);
 
 function openFile ()
 {

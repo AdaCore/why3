@@ -54,6 +54,8 @@ let alt_ergo_driver : Driver.driver =
 let () = log_time ("Initialising why3 worker: end ")
 
 let split_trans = Trans.lookup_transform_l "split_goal_wp" env
+let intro_trans = Trans.lookup_transform "introduce_premises" env
+
 (* CF gmain.ml ligne 568 et suivante *)
 module W =
   struct
@@ -76,6 +78,7 @@ module Task =
 	mutable subtasks : id list;
 	loc : why3_loc list;
 	expl : string;
+        pretty : string;
       }
 
     let task_table : (id, task_info) Hashtbl.t = Hashtbl.create 17
@@ -91,35 +94,31 @@ module Task =
     let get_parent_id id = (get_info id).parent_id
 
     let mk_loc (_, a,b,c) = (a,b,c)
+    let premise_kind = function
+      | { Term. t_node = Term.Tnot _; t_loc = None } -> "loc-neg-premise"
+    | _ -> "loc-premise"
     let collect_locs t =
       (* from why 3 ide *)
       let locs = ref [] in
-      let rec get_locs f =
-        Opt.iter (fun loc -> locs := (mk_loc (Loc.get loc)) :: !locs) f.Term.t_loc;
-        Term.t_fold (fun () t -> get_locs t ) () f
+      let rec get_locs kind f =
+        Opt.iter (fun loc -> locs := (kind, mk_loc (Loc.get loc)) :: !locs) f.Term.t_loc;
+        Term.t_fold (fun () t -> get_locs kind t ) () f
       in
       let rec get_t_locs f =
         match f.Term.t_node with
         | Term.Tbinop (Term.Timplies,f1,f2) ->
-           get_locs f1;
+           get_locs (premise_kind f1) f1;
            get_t_locs f2
         | Term.Tlet (t,fb) ->
            let _,f1 = Term.t_open_bound fb in
-           get_locs t;
+           get_locs (premise_kind t) t;
            get_t_locs f1
         | Term.Tquant (Term.Tforall,fq) ->
            let _,_,f1 = Term.t_open_quant fq in
            get_t_locs f1
         | _ ->
-           get_locs f
+           get_locs "loc-goal" f
       in
-      (*
-      let rec merge_locs = function
-          [] | [ _ ] as l -> l
-          | ((l1, b1, e1) as h1) :: ((l2, b2, e2) as h2) :: ll ->
-             if l1 != l2 then h1 :: (merge_locs (h2 :: ll))
-             else
-       *)
       match t with
       | Some { Task.task_decl =
                  { Theory.td_node =
@@ -136,6 +135,9 @@ module Task =
       let c = ref 0 in
       fun () -> incr c; "id" ^ (string_of_int !c)
 
+    let task_text t =
+      Pp.string_of Pretty.print_task t
+
     let register_task parent_id task =
       let id = gen_id () in
       let vid, expl, _ = Termcode.goal_expl_task ~root:false task in
@@ -145,7 +147,7 @@ module Task =
       in
       let id_loc = match vid.Ident.id_loc with
           None -> []
-        | Some l -> [ mk_loc (Loc.get l) ]
+        | Some l -> [ ("loc-goal",mk_loc (Loc.get l)) ]
       in
       let task_info =
         { task = `Task(task);
@@ -153,7 +155,9 @@ module Task =
 	  status = `New;
 	  subtasks = [];
 	  loc = id_loc @  (collect_locs task);
-	  expl = expl }
+	  expl = expl;
+          pretty = task_text (Trans.apply intro_trans task); 
+        }
       in
       Hashtbl.add task_table id task_info;
       id
@@ -169,7 +173,9 @@ module Task =
 				      status = `New;
 				      subtasks = task_ids;
 				      loc = [];
-				      expl = th_name };
+				      expl = th_name;
+                                      pretty = "";
+                                    };
       th_id
 
     let get_task = function `Task t -> t
@@ -230,7 +236,7 @@ let rec why3_prove id =
   match t.subtasks with
     [] ->  t.status <- `Unknown;
 	  let task = get_task t.task in
-	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc) in
+	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty) in
 	  W.send msg;
 	  let l = set_status id `New in
           List.iter W.send l

@@ -1,6 +1,6 @@
 type id = string
 type loc = int * int * int * int
-type why3_loc = int * int * int (* line, column, length *)
+type why3_loc = string * (int * int * int) (* kind, line, column, length *)
 type status = [`New | `Valid | `Unknown ]
 type why3_command =  ParseBuffer of string
               | ExecuteBuffer of string
@@ -10,7 +10,8 @@ type why3_command =  ParseBuffer of string
 type why3_output = Error of string (* msg *)
                  | ErrorLoc of (loc * string) (* loc * msg *)
                  | Theory of id * string (* Theory (id, name) *)
-                 | Task of (id * id * string * string * why3_loc list) (* id, parent id, expl, code, location list *)
+                 | Task of (id * id * string * string * why3_loc list * string)
+                 (* id, parent id, expl, code, location list, pretty *)
                  | Result of string list
                  | UpdateStatus of status * id
 

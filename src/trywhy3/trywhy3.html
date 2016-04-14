@@ -12,6 +12,7 @@ yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="trywhy3.css" />
+    <link rel="stylesheet" type="text/css" href="trywhy3_custom.css" />
     <!-- color customisation -->
     <style>
 
@@ -106,7 +107,14 @@ yamlpp -l en src/trywhy3/index.prehtml -o src/trywhy3/index.en.html  -->
     <div id="editor-panel" class="wide-view">
       <div id="editor" title="Editor" tabindex="-1" ></div><!--
       Don't leave white-spaces between editor and console div's
-     --><div title="Console" id="console">
+      --><div id="tab-panel">
+        <!-- First list all the tab headers in spans, with an id equal
+             to the id of the corresponding tab below, with the suffix     -tab
+             then list all the tab content in divs -->
+        <span id="console-tab" class="tab-header active">Task list</span>
+        <span id="task-view-tab" class="tab-header" >Task</span>
+        <div id="console" class="tab-body active"> </div>
+        <div id="task-view" class="tab-body"><div id="task-editor"></div></div>
       </div>
     </div>
     <script defer="true" src="ace-builds/src-noconflict/ace.js"

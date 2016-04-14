@@ -20,16 +20,25 @@ module Editor =
   struct
     type range
     type marker
+
     let editor =
       let open Js.Unsafe in
       get global (Js.string "editor")
+    let task_editor =
+      let open Js.Unsafe in
+      get global (Js.string "task_editor")
 
-    let get_buffer_js () : Js.js_string Js.t =
+    let get_value ?(editor=editor) () : Js.js_string Js.t =
       let open Js.Unsafe in
       meth_call editor "getValue" [| |]
 
+    let set_value ?(editor=editor) str =
+      let open Js.Unsafe in
+      ignore (meth_call editor "setValue" [| inject (Js.string str); inject ~-1 |])
+
+
     let get_buffer () =
-      Js.to_string (get_buffer_js ())
+      Js.to_string (get_value ())
 
     let mk_range l1 c1 l2 c2 =
       let open Js.Unsafe in
@@ -88,11 +97,51 @@ module Editor =
 module Console =
   struct
 
+
+    let tabs =
+      let headers = Dom_html.document ## getElementsByClassName (Js.string "tab-header") in
+      List.fold_left (fun acc t ->
+                      let tab_id = t ## id in
+                      let i = tab_id ## lastIndexOf (Js.string "-tab") in
+                      let len = tab_id ## length in
+                      if i == len - 4 then
+                        try
+                          let tab = Dom_html.getElementById (Js.to_string (tab_id ## substring(0,i))) in
+                          (t, tab) :: acc
+                        with
+                          Not_found -> acc
+                      else acc
+                     )
+                     [] (Dom.list_of_nodeList headers)
+    let () =
+      List.iter (fun (th, tb) ->
+                 let cb = fun idh idb _ ->
+                   List.iter (fun (h,b) ->
+                              if Js.to_string (h ## id) = idh &&
+                                   Js.to_string (b ## id) = idb
+                              then begin
+                                  h ## classList ## add (Js.string "active");
+                                  b ## classList ## add (Js.string "active");
+                                end
+                              else begin
+                                  h ## classList ## remove (Js.string "active");
+                                  b ## classList ## remove (Js.string "active");
+                                end;
+                             ) tabs;
+                   th ## classList ## remove (Js.string "alert");
+                   Js._false
+
+                 in
+                 th ## onclick <- Dom.handler (cb (Js.to_string th ## id) (Js.to_string tb ## id)))
+                tabs
+
+
     let get_console () =
         get_opt (Dom_html.document ## getElementById (Js.string "console"))
 
     let clear () =
-      (get_console ()) ## innerHTML <- (Js.string "")
+      (get_console ()) ## innerHTML <- Js.string "";
+      Editor.set_value ~editor:Editor.task_editor ""
 
     let print cls msg =
         (get_console ()) ## innerHTML <-
@@ -154,10 +203,11 @@ module Console =
 
     let task_selection = Hashtbl.create 17
     let is_selected id = Hashtbl.mem task_selection id
-    let select_task id span loc =
+    let select_task id span loc pretty =
       (span ## classList) ## add (Js.string "task-selected");
-      let markers = List.map (Editor.add_marker "hl-task") loc in
-      Hashtbl.add task_selection id (span, loc, markers)
+      let markers = List.map (fun (cls, range) -> Editor.add_marker cls range) loc in
+      Hashtbl.add task_selection id (span, loc, markers);
+      Editor.set_value ~editor:Editor.task_editor pretty
 
     let deselect_task id =
       try
@@ -212,15 +262,15 @@ module Console =
       | Theory (th_id, th_name) ->
 	 attach_to_parent th_id "theory-list" th_name []
 
-      | Task (id, parent_id, expl, _code, loc) ->
+      | Task (id, parent_id, expl, _code, locs, pretty) ->
 	 begin
 	   try
 	     ignore (Dom_html.getElementById id)
 	   with Not_found ->
-		attach_to_parent id (parent_id ^ "_ul") expl loc;
+		attach_to_parent id (parent_id ^ "_ul") expl locs;
 		let span = Dom_html.getElementById (id ^ "_container") in
-                let buffer = Editor.get_buffer_js () in
-                let loc = List.map (Editor.why3_loc_to_range buffer) loc in
+                let buffer = Editor.get_value () in
+                let locs = List.map (fun (k, loc) -> k, Editor.why3_loc_to_range buffer loc) locs in
 		span ## onclick <-
 		  Dom.handler
 		    (fun ev ->
@@ -230,7 +280,7 @@ module Console =
 			 clear_task_selection ()
 		     else begin
 			 if not ctrl then clear_task_selection ();
-                         select_task id span loc
+                         select_task id span locs pretty
                        end;
 		     Js._false)
 	 end
@@ -341,7 +391,7 @@ let init_why3_worker () =
                   Console.print_why3_output msg;
                   let () =
                     match msg with
-                      Task (id,_,_,code,_) ->
+                      Task (id,_,_,code,_,_) ->
 		      log ("Got task " ^ id);
 		      push_task (Goal (id,code))
                     | _ -> ()

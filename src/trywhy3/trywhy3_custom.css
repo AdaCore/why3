@@ -1,0 +1,55 @@
+/* You can modify the values below to alter the default look of trywhy3 */
+
+/*** TASKS ***/
+
+/* Color of the icon used to show a task is being proved */
+.task-pending {
+    color: blue;
+}
+
+/* Color of the icon used to show a task is proved */
+.task-valid {
+    color:green;
+}
+
+/* Color of the icon used to show the status of a task is unproven */
+.task-unknown {
+    color:orange;
+}
+
+/* Color of the icon used to show the status of a task has been aborted */
+.task-abort {
+    color:black;
+}
+
+/* Style used to for selected tasks */
+.task-selected {
+    background:rgba(250,220,90,0.7);
+}
+
+/*** EDITOR ***/
+
+/*** Warning: for highlighting properties, do not
+    modify the position or z-index property.
+    You should not use alpha-transparency (either opacity < 1 or rgba colors)
+    since some highlight region overlaps. 
+
+/* Color used to highlight errors in the editor */
+.error {
+    background:rgb(231,113,116);
+}
+
+/* Color used to highlight negative premises of a task in the editor */
+.loc-neg-premise {
+    background:rgb(255,128,64);
+}
+
+/* Color used to highlight goals of a task in the editor */
+.loc-goal {
+    background:rgb(64,191,255);
+}
+
+/* Color used to highlight premises of a task in the editor */
+.loc-premise {
+    background:rgb(100,233,134);
+}
