@@ -254,9 +254,9 @@ pid_t create_process(char* cmd,
   if (usestdin) {
     count--;
   }
-  unix_argv = (char**)malloc(sizeof(char*) * (argc + 2));
+  unix_argv = (char**)malloc(sizeof(char*) * (count + 2));
   unix_argv[0] = cmd;
-  unix_argv[argc + 1] = NULL;
+  unix_argv[count + 1] = NULL;
   for (i = 0; i < count; i++) {
     unix_argv[i + 1] = argv[i];
   }
