@@ -394,7 +394,7 @@ let find_prover eS a =
 (* to avoid corner cases when prover results are obtained very closely
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
-let adapt_limits ~use_steps a =
+let adapt_limits ~interactive ~use_steps a =
   let timelimit = (a.proof_limit.Call_provers.limit_time) in
   let memlimit = (a.proof_limit.Call_provers.limit_mem) in
   match a.proof_state with
@@ -404,12 +404,11 @@ let adapt_limits ~use_steps a =
     (* increased time limit is 1 + twice the previous running time,
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
-    let increased_time =
-      let t = truncate (1.0 +. 2.0 *. t) in
-      max timelimit (min t (2 * timelimit))
-    in
+    let t = truncate (1.0 +. 2.0 *. t) in
+    let increased_time = if interactive then t
+      else max timelimit (min t (2 * timelimit)) in
     (* increased mem limit is just 1.5 times the previous mem limit *)
-    let increased_mem = 3 * memlimit / 2 in
+    let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
     begin
       match r with
       | Call_provers.OutOfMemory -> increased_time, memlimit, 0
@@ -427,10 +426,11 @@ let adapt_limits ~use_steps a =
         (* correct ? failures are supposed to appear quickly anyway... *)
         timelimit, memlimit, 0
     end
+  | _ when interactive -> 0, 0, 0
   | _ -> timelimit, memlimit, 0
 
-let adapt_limits ~use_steps a =
-  let t, m, s = adapt_limits ~use_steps a in
+let adapt_limits ~interactive ~use_steps a =
+  let t, m, s = adapt_limits ~interactive ~use_steps a in
   { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
 
 type run_external_status =
@@ -462,13 +462,12 @@ let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
     callback a a.proof_prover Call_provers.empty_limit None MissingProver
   | Some(ap,npc,a) ->
     callback a ap Call_provers.empty_limit None Starting;
-    if a.proof_edited_as = None &&
-       npc.prover_config.Whyconf.interactive
-    then begin
+    let itp = npc.prover_config.Whyconf.interactive in
+    if itp && a.proof_edited_as = None then begin
       callback a ap Call_provers.empty_limit None (MissingFile "unedited")
     end else begin
       let previous_result = a.proof_state in
-      let limit = adapt_limits ~use_steps a in
+      let limit = adapt_limits ~interactive:itp ~use_steps a in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command =
         Whyconf.get_complete_command npc.prover_config

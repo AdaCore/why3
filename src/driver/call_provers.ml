@@ -248,7 +248,7 @@ let actualcommand command limit file =
     | "l" -> Config.libdir
     | "d" -> Config.datadir
     | "S" -> string_of_int limit.limit_steps
-    | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, %d or %S"
+    | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
   in
   let args =
     List.map (Str.global_substitute cmd_regexp replace) arglist
