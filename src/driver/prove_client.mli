@@ -1,8 +1,13 @@
-val set_socket_name : string -> unit
-val set_max_running_provers : int -> unit
+exception NotConnected
+exception AlreadyConnected
+exception InvalidAnswer of string
 
-val connect : unit -> unit
+val connect_external : string -> unit
+val connect_internal : unit -> unit
+
 val disconnect : unit -> unit
+
+val is_connected : unit -> bool
 
 val send_request :
   id:int ->
@@ -12,13 +17,14 @@ val send_request :
   cmd:string list ->
   unit
 
-type answer =
-  {
-    id        : int;
-    exit_code : int;
-    time      : float;
-    timeout   : bool;
-    out_file  : string;
-  }
+type answer = {
+  id        : int;
+  time      : float;
+  timeout   : bool;
+  out_file  : string;
+  exit_code : int;
+}
 
 val read_answers : blocking:bool -> answer list
+
+val set_max_running_provers : int -> unit

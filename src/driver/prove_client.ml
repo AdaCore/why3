@@ -1,6 +1,13 @@
 let socket : Unix.file_descr option ref = ref None
 
+exception NotConnected
+exception AlreadyConnected
+exception InvalidAnswer of string
+
+let is_connected () = !socket <> None
+
 let client_connect socket_name =
+  if !socket <> None then raise AlreadyConnected;
   if Sys.os_type = "Win32" then begin
     let name = "\\\\.\\pipe\\" ^ socket_name in
     socket := Some (Unix.openfile name [Unix.O_RDWR] 0)
@@ -12,14 +19,14 @@ let client_connect socket_name =
 
 let client_disconnect () =
   match !socket with
-  | None -> ()
-  | Some s ->
+  | None -> raise NotConnected
+  | Some sock ->
       socket := None;
-      Unix.close s
+      Unix.close sock
 
 let send_request_string msg =
   match !socket with
-  | None -> assert false
+  | None -> raise NotConnected
   | Some sock ->
       let to_write = String.length msg in
       let rec write pointer =
@@ -32,10 +39,10 @@ let read_from_client =
   let buf = String.make 1024 ' ' in
   fun blocking ->
     match !socket with
-    | None -> assert false
+    | None -> raise NotConnected
     | Some sock ->
-        (* we only call read() if we are allowed to block or if the socket is
-           ready *)
+        (* we only call read() if we are allowed to block
+           or if the socket is ready *)
         let do_read =
           blocking ||
           (let l,_,_ = Unix.select [sock] [] [] 0.0 in l <> [])
@@ -45,95 +52,85 @@ let read_from_client =
           String.sub buf 0 read
         else ""
 
-type answer =
-  {
-    id        : int;
-    exit_code : int;
-    time      : float;
-    timeout   : bool;
-    out_file  : string;
-  }
-
-let socket_name : string option ref = ref None
-
-let set_socket_name s =
-  socket_name := Some s
-
+(* TODO/FIXME: should we be able to change this setting when
+   using an external server? *)
+(* TODO/FIXME: this number should be stored server-side and
+   consulted via a protocol request, if ever needed. The only
+   reason for this reference to be here is to store the config
+   setting before the first connection request is issued. *)
 let max_running_provers : int ref = ref 1
 
 let set_max_running_provers x =
   if x <= 0 then invalid_arg "Prove_client.set_max_running_provers";
   max_running_provers := x;
-  if !socket <> None then
-    send_request_string ("parallel;" ^ string_of_int x)
+  if is_connected () then
+    send_request_string ("parallel;" ^ string_of_int x ^ "\n")
 
-let run_server socket_name =
+let send_buf : Buffer.t = Buffer.create 512
+let recv_buf : Buffer.t = Buffer.create 1024
+
+(* FIXME? should we send !max_running_provers once connected? *)
+let connect_external socket_name =
+  if is_connected () then raise AlreadyConnected;
+  Buffer.clear recv_buf;
+  client_connect socket_name
+
+let connect_internal () =
+  if is_connected () then raise AlreadyConnected;
+  Buffer.clear recv_buf;
+  let cwd = Unix.getcwd () in
+  Unix.chdir (Filename.get_temp_dir_name ());
+  let socket_name = Filename.concat (Unix.getcwd ())
+    ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
   let exec = Filename.concat Config.libdir "why3server" in
-  Unix.create_process exec
+  let _pid = Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
-      "-j"; string_of_int !max_running_provers |]
-    Unix.stdin Unix.stdout Unix.stderr
+      "-j"; string_of_int !max_running_provers|]
+    Unix.stdin Unix.stdout Unix.stderr in
+  Unix.chdir cwd;
+  (* sleep before connecting, or the server will not be ready yet *)
+  (* FIXME? replace this with something more robust *)
+  ignore (Unix.select [] [] [] 0.1);
+  client_connect socket_name
 
-let buf : Buffer.t = Buffer.create 1024
+(* TODO/FIXME: how should we handle disconnect if there are still
+   tasks in queue? What are the use cases for disconnect? *)
+let disconnect = client_disconnect
 
-let connect () =
-  Buffer.clear buf;
-  match !socket_name with
-  | Some sname ->
-      (* FIXME? should we send !max_running_provers once connected?
-         This branch is normally only used for external servers *)
-      client_connect sname
-  | None ->
-      let cwd = Unix.getcwd () in
-      Unix.chdir (Filename.get_temp_dir_name ());
-      let sname = Filename.concat (Unix.getcwd ())
-        ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
-      let _server_pid = run_server sname in
-      Unix.chdir cwd;
-      (* sleep is needed before connecting,
-         or the server will not be ready yet *)
-      ignore (Unix.select [] [] [] 0.1);
-      set_socket_name sname;
-      client_connect sname
-
-let connect () =
-  (* must disconnect first *)
-  if !socket = None then connect ()
-
-let disconnect () =
-  client_disconnect ()
-
+(* TODO/FIXME: is this the right place to connect-on-demand? *)
 let send_request ~id ~timelimit ~memlimit ~use_stdin ~cmd =
-  connect ();
-  let buf = Buffer.create 128 in
-  let servercommand = if use_stdin <> None then "runstdin;" else "run;" in
-  Buffer.add_string buf servercommand;
-  Buffer.add_string buf (string_of_int id);
-  Buffer.add_char buf ';';
-  Buffer.add_string buf (string_of_int timelimit);
-  Buffer.add_char buf ';';
-  Buffer.add_string buf (string_of_int memlimit);
+  if not (is_connected ()) then connect_internal ();
+  Buffer.clear send_buf;
+  let servercommand =
+    if use_stdin <> None then "runstdin;" else "run;" in
+  Buffer.add_string send_buf servercommand;
+  Buffer.add_string send_buf (string_of_int id);
+  Buffer.add_char send_buf ';';
+  Buffer.add_string send_buf (string_of_int timelimit);
+  Buffer.add_char send_buf ';';
+  Buffer.add_string send_buf (string_of_int memlimit);
   List.iter (fun x ->
-      Buffer.add_char buf ';';
-      Buffer.add_string buf x)
+      Buffer.add_char send_buf ';';
+      Buffer.add_string send_buf x)
     cmd;
   begin match use_stdin with
   | None -> ()
   | Some s ->
-      Buffer.add_char buf ';';
-      Buffer.add_string buf s
+      Buffer.add_char send_buf ';';
+      Buffer.add_string send_buf s
   end;
-  Buffer.add_char buf '\n';
-  let s = Buffer.contents buf in
+  Buffer.add_char send_buf '\n';
+  let s = Buffer.contents send_buf in
   send_request_string s
 
 let rec read_lines blocking =
   let s = read_from_client blocking in
-  if s = "" then []
-  else if String.contains s '\n' then begin
-    let s = Buffer.contents buf ^ s in
-    Buffer.clear buf;
+  (* TODO: should we detect and handle EOF here? *)
+  if s = "" then [] else
+  if String.contains s '\n' then begin
+    let s = Buffer.contents recv_buf ^ s in
+    Buffer.clear recv_buf;
     let l = Strings.rev_split '\n' s in
     match l with
     | [] -> assert false
@@ -142,33 +139,43 @@ let rec read_lines blocking =
       if x = "" then List.rev xs else
       if x.[String.length x - 1] = '\n' then List.rev l
       else begin
-        Buffer.add_string buf x;
+        Buffer.add_string recv_buf x;
         List.rev xs
       end
   end else begin
-    Buffer.add_string buf s;
+    Buffer.add_string recv_buf s;
     read_lines blocking
   end
 
-let bool_of_timeout_string s =
-  if s = "1" then true else false
+type answer = {
+  id        : int;
+  time      : float;
+  timeout   : bool;
+  out_file  : string;
+  exit_code : int;
+}
 
-let read_answer s =
-  let l = Strings.split ';' s in
-  match l with
+let read_answer s = match Strings.split ';' s with
   | id :: exit_s :: time_s :: timeout_s :: ( (_ :: _) as rest) ->
       (* same trick we use in other parsing code. The file name may contain
-         ';'. Luckily, the file name comes last, so we still split on ';', and
-         put the pieces back together afterwards *)
-      let out_file = Strings.join ";" rest in
+         ';'. Luckily, the file name comes last, so we still split on ';',
+         and put the pieces back together afterwards *)
       { id = int_of_string id;
-        out_file = out_file;
+        out_file = Strings.join ";" rest;
         time = float_of_string time_s;
         exit_code = int_of_string exit_s;
-        timeout = bool_of_timeout_string timeout_s;
-      }
-  |_  ->
-        assert false
+        timeout = (timeout_s = "1"); }
+  | _ ->
+      raise (InvalidAnswer s)
 
 let read_answers ~blocking =
   List.map read_answer (List.filter (fun x -> x <> "") (read_lines blocking))
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | NotConnected ->
+      Format.fprintf fmt "Not connected to the proof server"
+  | AlreadyConnected ->
+      Format.fprintf fmt "Already connected to the proof server"
+  | InvalidAnswer s ->
+      Format.fprintf fmt "Invalid server answer: %s" s
+  | _ -> raise exn)
