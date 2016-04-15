@@ -334,8 +334,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     printer_mapping = printer_mapping } in
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
-  let use_stdin = if not use_stdin then None else
-    Some (Sysutil.absolutize_filename (Sys.getcwd ()) fin) in
+  let use_stdin = if use_stdin then Some fin else None in
   Prove_client.send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
@@ -371,6 +370,7 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
                    ?(inplace=false) buffer =
   let fin,cin =
     if inplace then begin
+      let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
       Sys.rename filename (backup_file filename);
       filename, open_out filename
     end else
