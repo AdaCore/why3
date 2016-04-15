@@ -488,7 +488,7 @@ type steps_convert = { add : int; mult : int }
 let convert_data =
   let h = Hashtbl.create 17 in
   Hashtbl.add h "CVC4" { add = 50000; mult = 250 };
-  Hashtbl.add h "Z3" { add = 100000; mult = 1500 };
+  Hashtbl.add h "Z3" { add = 100000; mult = 15000 };
   h
 
 let steps ~prover =
