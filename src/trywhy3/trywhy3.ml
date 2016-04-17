@@ -545,19 +545,27 @@ module Panel =
 
 
   end
-module Settings =
+module Dialogs =
   struct
-    let setting_panel = getElement AsHtml.div "why3-setting-panel"
-    let button_close = getElement AsHtml.button "why3-close-setting-button"
+    let dialog_panel = getElement AsHtml.div "why3-dialog-panel"
+    let setting_dialog = getElement AsHtml.div "why3-setting-dialog"
+    let about_dialog = getElement AsHtml.div "why3-about-dialog"
+    let button_close = getElement AsHtml.button "why3-close-dialog-button"
     let input_num_threads = getElement AsHtml.input "why3-input-num-threads"
     let input_num_steps = getElement AsHtml.input "why3-input-num-steps"
     let radio_wide = getElement AsHtml.input "why3-radio-wide"
     let radio_column = getElement AsHtml.input "why3-radio-column"
 
-    let show () =
-      setting_panel ## style ## display <- Js.string "flex"
+    let all_dialogs = [ setting_dialog ]
+    let show diag () =
+      log ("HERE");
+      dialog_panel ## style ## display <- Js.string "flex";
+      diag ## style ## display <- Js.string "inline-block"
+
     let close () =
-      setting_panel ## style ## display <- Js.string "none"
+      List.iter (fun d -> d ## style ## display <- Js.string "none") all_dialogs;
+      dialog_panel ## style ## display <- Js.string "none"
+
     let set_onchange o f =
       o ## onchange <- Dom.handler (fun _ -> f o; Js._false)
 
@@ -713,7 +721,8 @@ let () =
   ToolBar.(add_action button_execute Controller.why3_execute);
   ToolBar.(add_action button_compile Controller.why3_parse);
   ToolBar.(add_action button_stop Controller.stop);
-  ToolBar.(add_action button_settings Settings.show);
+  ToolBar.(add_action button_settings Dialogs.(show setting_dialog));
+  ToolBar.(add_action button_about Dialogs.(show about_dialog));
   ContextMenu.(add_action split_menu_entry
 			  Controller.(why3_transform `Split ignore));
   ContextMenu.(add_action prove_menu_entry
@@ -724,7 +733,7 @@ let () =
 			  Controller.(why3_transform (`Prove(1000)) ignore));
   ContextMenu.(add_action clean_menu_entry
 			  Controller.(why3_transform (`Clean) TaskList.clean_task));
-  Settings.(set_onchange input_num_threads
+  Dialogs.(set_onchange input_num_threads
 			 (fun o ->
 			  let open Controller in
 			  let len = int_of_string (Js.to_string (o ## value)) in
@@ -734,15 +743,15 @@ let () =
 			    !alt_ergo_workers;
 			  alt_ergo_workers := Array.make len Absent));
 
-  Settings.(set_onchange input_num_steps
+  Dialogs.(set_onchange input_num_steps
 			 (fun o ->
 			  let open Controller in
 			  let steps = int_of_string (Js.to_string (o ## value)) in
 			  alt_ergo_steps := steps;
 			  reset_workers ()));
-  ToolBar.add_action Settings.button_close Settings.close;
-  Settings.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
-  Settings.(set_onchange radio_column (fun _ -> Panel.set_wide false))
+  ToolBar.add_action Dialogs.button_close Dialogs.close;
+  Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
+  Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))
 
 (*  add_button "button-prove" (why3_transform `Prove (fun _ -> ()));
   add_button "button-split" (why3_transform `Split (fun _ -> ()));

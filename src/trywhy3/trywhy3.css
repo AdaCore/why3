@@ -75,7 +75,9 @@ body {
 }
 
 /* SPECIFIC PART */
-
+#why3-select-example {
+    width:20em;
+}
 #why3-top-button-bar {
     height:2em;
     font-size:14pt;
@@ -221,8 +223,8 @@ body {
     padding: 0.5em 1em 0.5em 1em;
 }
 
-/******* SETTINGS ****/
-#why3-setting-panel {
+/******* DIALOGS ****/
+#why3-dialog-panel {
     position:absolute;
     z-index:100;
     display:none;
@@ -233,7 +235,7 @@ body {
     justify-content:center;
     align-items:center;
 }
-#why3-setting-bg {
+#why3-dialog-bg {
     position:absolute;
     opacity:0.75;
     top:0;
@@ -242,17 +244,21 @@ body {
     height:100%;
     z-index:101;
 }
-#why3-setting-box {
-    display:inline-block;
+.why3-dialog {
     z-index:102;
     flex-grow:0;
     box-shadow:0pt 0pt 5pt #333;
     padding: 1em;
 }
-#why3-setting-box ul {
+
+#why3-dialog-panel .why3-dialog div.why3-widget {
+    display:none;
+}
+
+#why3-setting-dialog ul {
     list-style-type:none;
 }
-#why3-setting-box li {
+#why3-setting-dialog li {
     padding:0.5em;
 }
 /********** THEMABLE PART, SEE trywhy3_custom.css *************/

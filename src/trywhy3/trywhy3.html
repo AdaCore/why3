@@ -110,35 +110,62 @@
       </ul>
     </div>
     <!-- settings -->
-    <div id="why3-setting-panel" class="why3-container">
-      <div id="why3-setting-bg" class="why3-widget"> </div>
-      <div id="why3-setting-box" class="why3-widget">
-	<span>Preferences</span>
-	<ul>
-          <li>
-            <input id="why3-radio-wide" type="radio" name="why3-view"
-		   checked="checked" value="wide" />
-            <label for="why3-radio-wide">Split Vertically</label>
-	  </li>
-	  <li>
-	    <input id="why3-radio-column" type="radio"
-	    name="why3-view" value="column" />
-	    <label for="why3-radio-column">Split Horizontally</label>
-          </li>
-          <li>
-            <input id="why3-input-num-threads" type="number" style="width:4em;" min="1" max="8"
-                   value="4"></input></input> Number of threads for Alt-Ergo
-          </li>
-          <li>
-            <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="1000"
-                   value="100"></input></input> Number of steps for Alt-Ergo
-          </li>
-	</ul>
-	<button id="why3-close-setting-button"
+    <div id="why3-dialog-panel" class="why3-container">
+      <div id="why3-dialog-bg" class="why3-widget"> </div>
+      <div class="why3-widget why3-dialog">
+	<div id="why3-setting-dialog" class="why3-widget">
+	  <span>Preferences</span>
+	  <ul>
+            <li>
+              <input id="why3-radio-wide" type="radio" name="why3-view"
+		     checked="checked" value="wide" />
+              <label for="why3-radio-wide">Split Vertically</label>
+	    </li>
+	    <li>
+	      <input id="why3-radio-column" type="radio"
+		     name="why3-view" value="column" />
+	      <label for="why3-radio-column">Split Horizontally</label>
+            </li>
+            <li>
+              <input id="why3-input-num-threads" type="number" style="width:4em;" min="1" max="8"
+                     value="4"></input></input> Number of threads for Alt-Ergo
+            </li>
+            <li>
+              <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="1000"
+                     value="100"></input></input> Number of steps for Alt-Ergo
+            </li>
+	  </ul>
+	</div>
+	<div id="why3-about-dialog" class="why3-widget">
+	  <span>About TryWhy3</span>
+	  <p>TryWhy3 is a Javascript based version of the <a href="http://why3.lri.fr/">Why3
+	    Verification Platform</a></p>
+	  <p>© 2010-2016,   INRIA - CNRS - Paris-Sud University<br/>
+	    This software is distributed under the terms of the GNU Lesser
+	    General Public License version 2.1, with the special exception
+	    on linking described in file LICENSE.
+	  </p>
+	  <p>TryWhy3 relies on the following excellent open source
+	    software and resources :
+	  </p>
+	  <ul>
+	    <li>A Javascript version of
+	    the <a href="https://alt-ergo.ocamlpro.com/">Alt-Ergo SMT
+		Solver</a>.</li>
+	    <li>The <a href="http://ocsigen.org/js_of_ocaml/">js_of_ocaml</a>
+	      Ocaml to Javascript compiler, part of
+	    the <a href="http://ocsigen.org/">Ocsigen</a>
+	      project.</li>
+
+	    <li>The <a href="https://fortawesome.github.io/Font-Awesome/">Font
+		Awsome</a> font and CSS toolkit.</li>
+	    <li>The <a href="https://ace.c9.io/">ACE</a> Web editor.</li>
+	  </ul>
+	</div>
+	<button id="why3-close-dialog-button"
 		style="float:right;"
 		class="why3-button"
-		title="Close">Close</button>
-
+		title="Close"><span class="fa-times"></span></button>
       </div>
     </div>
   </body>
