@@ -400,20 +400,27 @@ let why3_run f lang code =
 
 
 let () =
-
+  let free = ref true in
   W.set_onmessage
-    (function
-      | Transform (`Split, id) -> why3_split id
-       | Transform (`Prove(steps), id) -> why3_prove ~steps id
-       | Transform (`Clean, id) -> why3_clean id
-       | ProveAll -> why3_prove_all ()
-       | ParseBuffer code ->
-          Task.clear_table ();
-          why3_run why3_parse_theories Env.base_language code
-       | ExecuteBuffer code ->
-	  Task.clear_table ();
-	  why3_run why3_execute Mlw_module.mlw_language code
-       | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
+    (fun msg ->
+     if !free then begin
+	 free := false;
+	 let () =
+	   match msg with
+	   | Transform (`Split, id) -> why3_split id
+	   | Transform (`Prove(steps), id) -> why3_prove ~steps id
+	   | Transform (`Clean, id) -> why3_clean id
+	   | ProveAll -> why3_prove_all ()
+	   | ParseBuffer code ->
+              Task.clear_table ();
+              why3_run why3_parse_theories Env.base_language code
+	   | ExecuteBuffer code ->
+	      Task.clear_table ();
+	      why3_run why3_execute Mlw_module.mlw_language code
+	   | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
+	 in
+	 free := true;
+       end
     )
 (*
 Local Variables:

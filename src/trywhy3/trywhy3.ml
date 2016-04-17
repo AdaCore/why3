@@ -180,6 +180,7 @@ module ContextMenu =
   struct
     let task_menu = getElement AsHtml.div "why3-task-menu"
     let split_menu_entry = getElement AsHtml.li "why3-split-menu-entry"
+    let prove_menu_entry = getElement AsHtml.li "why3-prove-menu-entry"
     let prove100_menu_entry = getElement AsHtml.li "why3-prove100-menu-entry"
     let prove1000_menu_entry = getElement AsHtml.li "why3-prove1000-menu-entry"
     let clean_menu_entry = getElement AsHtml.li "why3-clean-menu-entry"
@@ -445,8 +446,6 @@ module ToolBar =
     let button_help = getElement AsHtml.button "why3-button-help"
     let button_about = getElement AsHtml.button "why3-button-about"
 
-
-
     let disable (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
      b ## disabled <- Js._true
 
@@ -461,6 +460,15 @@ module ToolBar =
 				   f ();
 				   Editor.(focus editor);
 				   Js._false)
+
+    let disable_compile () =
+      disable button_execute;
+      disable button_compile
+
+    let enable_compile () =
+      enable button_execute;
+      enable button_compile
+
 
     let save () =
       let data : Js.js_string Js.t =
@@ -502,7 +510,7 @@ module Panel =
     let resize_bar = getElement AsHtml.div "why3-resize-bar"
     let reset () =
       let edit_style = editor_container ## style in
-      JSU.(set edit_style (Js.string "flexGrow") (Js.string "1"));
+      JSU.(set edit_style (Js.string "flexGrow") (Js.string "2"));
       JSU.(set edit_style (Js.string "flexBasis") (Js.string ""))
     let set_wide b =
       main_panel ## classList ## remove (Js.string "why3-wide-view");
@@ -557,16 +565,29 @@ module Settings =
 module Controller =
   struct
     let task_queue  = Queue.create ()
+    let array_for_all a f =
+      let rec loop i n =
+	if i < n then (f a.(i)) && loop (i+1) n
+	else true
+      in
+      loop 0 (Array.length a)
+
     let first_task = ref true
     type 'a status = Free of 'a | Busy of 'a | Absent
     let num_workers = 4
     let alt_ergo_steps = ref 100
     let alt_ergo_workers = ref (Array.make num_workers Absent)
+    let why3_busy = ref false
     let why3_worker = ref None
     let get_why3_worker () =
       match !why3_worker with
 	Some w -> w
       | None -> log ("Why3 Worker not initialized !"); assert false
+
+
+    let alt_ergo_not_running () =
+      array_for_all !alt_ergo_workers (function Busy _ -> false | _ -> true)
+
 
     let rec init_alt_ergo_worker i =
       let worker = Worker.create "alt_ergo_worker.js" in
@@ -601,7 +622,8 @@ module Controller =
 	!alt_ergo_workers.(idx) <- Busy (w);
 	w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
 	w ## postMessage (marshal task)
-      | _ -> ()
+      | _ -> if Queue.is_empty task_queue && alt_ergo_not_running ()
+	     then ToolBar.enable_compile ()
 
     let reset_workers () =
       Array.iteri
@@ -625,23 +647,25 @@ module Controller =
                       let msg = unmarshal (ev ## data) in
                       if !first_task then begin
 			  first_task := false;
-                      TaskList.clear ()
+			  TaskList.clear ()
 			end;
                       TaskList.print_why3_output msg;
                       let () =
 			match msg with
 			  Task (id,_,_,code,_, _, steps) ->
-			  log ("Got task " ^ id);
 			  push_task (Goal (id,code, steps))
+			| Result _ ->
+			   ToolBar.enable_compile ()
 			| _ -> ()
-                  in Js._false));
+                      in Js._false));
       worker
 
     let () = why3_worker := Some (init_why3_worker ())
 
     let why3_parse () =
+      ToolBar.disable_compile ();
       TaskList.clear ();
-      TaskList.print_msg "Generating tasks … ";
+      TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Generating tasks … ";
       reset_workers ();
       first_task := true;
       let code = Js.to_string (Editor.get_value ()) in
@@ -649,22 +673,14 @@ module Controller =
       (get_why3_worker()) ## postMessage (msg)
 
     let why3_execute () =
+      ToolBar.disable_compile ();
       TaskList.clear ();
-      TaskList.print_msg "Compiling buffer … ";
-      log_time "Before marshalling in main thread";
+      TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Compiling buffer … ";
       reset_workers ();
       let code = Js.to_string (Editor.get_value ()) in
       (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
 
-    let array_for_all a f =
-      let rec loop i n =
-	if i < n then (f a.(i)) && loop (i+1) n
-	else true
-      in
-      loop 0 (Array.length a)
 
-    let alt_ergo_not_running () =
-      array_for_all !alt_ergo_workers (function Busy _ -> false | _ -> true)
 
     let why3_transform tr f () =
       if alt_ergo_not_running () then
@@ -685,8 +701,11 @@ module Controller =
       (get_why3_worker()) ## terminate ();
       why3_worker := Some (init_why3_worker ());
       reset_workers ();
-      TaskList.clear()
-  end
+      TaskList.clear ();
+      ToolBar.enable_compile ()
+
+end
+
 (* Initialisation *)
 let () =
   ToolBar.(add_action button_open (fun _ ->  open_ ## click()));
@@ -697,6 +716,8 @@ let () =
   ToolBar.(add_action button_settings Settings.show);
   ContextMenu.(add_action split_menu_entry
 			  Controller.(why3_transform `Split ignore));
+  ContextMenu.(add_action prove_menu_entry
+			  Controller.(why3_transform (`Prove(-1)) ignore));
   ContextMenu.(add_action prove100_menu_entry
 			  Controller.(why3_transform (`Prove(100)) ignore));
   ContextMenu.(add_action prove1000_menu_entry
