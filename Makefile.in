@@ -1507,13 +1507,7 @@ ALTERGOMODS=util/numsNumbers util/numbers \
 ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 TRYWHY3CMO=lib/why3/why3.cma 
 
-trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
-
-%.fr.html: %.prehtml
-	yamlpp -l fr $< -o $@
-
-%.en.html: %.prehtml
-	yamlpp -l en $< -o $@
+trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	js_of_ocaml +weak.js +nat.js $^
@@ -1552,8 +1546,7 @@ clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
 	 src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte src/trywhy3/why3_worker.cm* \
          src/trywhy3/alt_ergo_worker.js src/trywhy3/alt_ergo_worker.byte src/trywhy3/alt_ergo_worker.cm* \
-         src/trywhy3/worker_proto.cm*	\
-	 src/trywhy3/index.en.html src/trywhy3/index.fr.html
+         src/trywhy3/worker_proto.cm*
 
 CLEANDIRS += src/trywhy3
 
