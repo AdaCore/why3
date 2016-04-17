@@ -1505,7 +1505,18 @@ ALTERGOMODS=util/numsNumbers util/numbers \
 	sat/sat_solvers \
 	main/frontend
 ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
-TRYWHY3CMO=lib/why3/why3.cma 
+TRYWHY3CMO=lib/why3/why3.cma
+TRYWHY3FILES=trywhy3.js why3_worker.js alt_ergo_worker.js trywhy3.html trywhy3.css \
+	README examples/ \
+	trywhy3_custom.css gen_index.sh fontawesome/css/font-awesome.min.css \
+	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
+	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
+	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
+	 ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/theme-chrome.js
+
+trywhy3_package: trywhy3
+	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3FILES))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
@@ -1546,7 +1557,7 @@ clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
 	 src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte src/trywhy3/why3_worker.cm* \
          src/trywhy3/alt_ergo_worker.js src/trywhy3/alt_ergo_worker.byte src/trywhy3/alt_ergo_worker.cm* \
-         src/trywhy3/worker_proto.cm*
+         src/trywhy3/worker_proto.cm* trywhy3.tar.gz
 
 CLEANDIRS += src/trywhy3
 

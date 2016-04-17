@@ -556,7 +556,7 @@ module Dialogs =
     let radio_wide = getElement AsHtml.input "why3-radio-wide"
     let radio_column = getElement AsHtml.input "why3-radio-column"
 
-    let all_dialogs = [ setting_dialog ]
+    let all_dialogs = [ setting_dialog; about_dialog ]
     let show diag () =
       log ("HERE");
       dialog_panel ## style ## display <- Js.string "flex";
@@ -752,42 +752,6 @@ let () =
   ToolBar.add_action Dialogs.button_close Dialogs.close;
   Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
   Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))
-
-(*  add_button "button-prove" (why3_transform `Prove (fun _ -> ()));
-  add_button "button-split" (why3_transform `Split (fun _ -> ()));
-  add_button "button-clean" (why3_transform `Clean TaskList.clean_task);
- *)
-
-  (*
-  let input_threads = get_opt Dom_html.(CoerceTo.input
-					  (getElementById "input-num-threads"))
-  in
-  input_threads ## oninput <-
-    Dom.handler
-      (fun ev ->
-       let len = int_of_string (Js.to_string (input_threads ## value)) in
-       Array.iter (function Busy (w) | Free (w) -> w ## terminate () | _ -> ())
-		  !alt_ergo_workers;
-       log (string_of_int len);
-       alt_ergo_workers := Array.make len Absent;
-       TaskList.set_abort_icon();
-       Js._false
-      );
-
-  let input_steps = get_opt Dom_html.(CoerceTo.input
-					  (getElementById "input-num-steps"))
-  in
-  input_steps ## oninput <-
-    Dom.handler
-      (fun ev ->
-       let steps = int_of_string (Js.to_string (input_steps ## value)) in
-       log(string_of_int steps);
-       alt_ergo_steps := steps;
-       reset_workers ();
-       TaskList.set_abort_icon();
-       Js._false
-      )
-   *)
 
 let () =
   let xhr = XHR.create () in

@@ -15,7 +15,7 @@ Instructions to build TryWhy3
      mkdir fontawesome
 
      copy in that directory the directory fonts and css of the Font-Awesome distribution.
-     
+
 
   ** install Alt-Ergo
 
@@ -46,4 +46,28 @@ Instructions to build TryWhy3
       make trywhy3
 
 
-* install : TODO
+* install
+  you can build a package with
+
+  make trywhy3_package
+
+  this creates a tarball containing a directory trywhy3/ which you can put on a webserver.
+
+* customization
+
+  ** To change the theme used by the ace editor widget, add the
+     relevant theme-*.js file to the ace-builds/src-min-noconflict/
+     directory and update the variable definition at the top of the
+     trywhy3.html file
+
+  ** To change the look and feel of the rest of the application, edit
+     the file trywhy3_custom.css.
+
+  ** To add some predefined examples, put some .mlw or .why files in the
+     examples/ subdirectory and generate an index as follows (assuming you
+     are in your trywhy3 directory) :
+
+     cp some_file.mlw examples/
+     cd examples/
+     ../gen_index.sh *.mlw > index.txt
+
