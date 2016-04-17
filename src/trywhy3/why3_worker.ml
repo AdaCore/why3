@@ -95,8 +95,8 @@ module Task =
 
     let mk_loc (_, a,b,c) = (a,b,c)
     let premise_kind = function
-      | { Term. t_node = Term.Tnot _; t_loc = None } -> "loc-neg-premise"
-    | _ -> "loc-premise"
+      | { Term. t_node = Term.Tnot _; t_loc = None } -> "why3-loc-neg-premise"
+    | _ -> "why3-loc-premise"
     let collect_locs t =
       (* from why 3 ide *)
       let locs = ref [] in
@@ -117,7 +117,7 @@ module Task =
            let _,_,f1 = Term.t_open_quant fq in
            get_t_locs f1
         | _ ->
-           get_locs "loc-goal" f
+           get_locs "why3-loc-goal" f
       in
       match t with
       | Some { Task.task_decl =
@@ -147,7 +147,7 @@ module Task =
       in
       let id_loc = match vid.Ident.id_loc with
           None -> []
-        | Some l -> [ ("loc-goal",mk_loc (Loc.get l)) ]
+        | Some l -> [ ("why3-loc-goal",mk_loc (Loc.get l)) ]
       in
       let task_info =
         { task = `Task(task);
@@ -230,17 +230,17 @@ module Task =
 (* External API *)
 
 
-let rec why3_prove id =
+let rec why3_prove ?(steps= ~-1) id =
   let open Task in
   let t = get_info id in
   match t.subtasks with
     [] ->  t.status <- `Unknown;
 	  let task = get_task t.task in
-	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty) in
+	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty, steps) in
 	  W.send msg;
 	  let l = set_status id `New in
           List.iter W.send l
-  | l -> List.iter why3_prove l
+  | l -> List.iter (why3_prove ~steps) l
 
 
 let why3_split id =
@@ -248,11 +248,16 @@ let why3_split id =
   let t = get_info id in
   match t.subtasks with
     [] ->
-    let subtasks = Trans.apply split_trans (get_task t.task) in
-    t.subtasks <- List.fold_left (fun acc t ->
-				 let tid = register_task id t in
-				 why3_prove tid;
-				 tid :: acc) [] subtasks
+    begin
+      match Trans.apply split_trans (get_task t.task), t.task with
+	[], _ -> ()
+      | [ child ], `Task(orig) when Why3.Task.task_equal child orig -> ()
+      | subtasks, _ ->
+	 t.subtasks <- List.fold_left (fun acc t ->
+				       let tid = register_task id t in
+				       why3_prove tid;
+				       tid :: acc) [] subtasks
+    end
   | _ -> ()
 
 
@@ -272,7 +277,7 @@ let why3_prove_all () =
   Hashtbl.iter
     (fun _ info ->
      match info.Task.task with
-       `Theory _ -> List.iter why3_prove info.Task.subtasks
+       `Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
      | _ -> ()) Task.task_table
 
 
@@ -295,7 +300,7 @@ let why3_parse_theories theories =
        W.send (Theory(th_id, th_name));
        let subs = (Task.get_info th_id).Task.subtasks in
        W.send (UpdateStatus( (if subs == [] then `Valid else `New) , th_id));
-       List.iter why3_prove subs
+       List.iter (fun i -> why3_prove i) subs
       ) theories
 
 let execute_symbol m fmt ps =
@@ -399,7 +404,7 @@ let () =
   W.set_onmessage
     (function
       | Transform (`Split, id) -> why3_split id
-       | Transform (`Prove, id) -> why3_prove id
+       | Transform (`Prove(steps), id) -> why3_prove ~steps id
        | Transform (`Clean, id) -> why3_clean id
        | ProveAll -> why3_prove_all ()
        | ParseBuffer code ->

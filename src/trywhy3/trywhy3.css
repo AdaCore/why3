@@ -5,212 +5,28 @@
     font-family: 'FontAwesome', sans-serif;
 }
 
-/* tasks icons */
-.task-pending {
-    color: blue;
-}
-.task-valid {
-    color:green;
-}
-.task-unknown {
-    color:orange;
-}
-.task-abort {
-    color:black;
-}
-.task-selected {
-    background:rgba(250,220,90,0.7);
-}
-
-/* ACE Editor */
-.error {
-    position:absolute;
-    background:rgba(231,113,116,1);
-    z-index:70;
-}
-
-.loc-neg-premise {
-    position:absolute;
-    background:rgba(255,128,64,1);
-    z-index:60;
-}
-
-.loc-goal {
-    position:absolute;
-    background:rgba(64,191,255,1);
-    z-index:50;
-}
-.loc-premise {
-    position:absolute;
-    background:rgba(100,233,134,1);
-    z-index:40;
-}
-
-/* Interface */
+/****** GLOBAL LAYOUT *********/
 body {
     padding:0;
     margin:0;
     font-family: sans-serif;
-    font-size:12pt;
 }
 
-#editor-panel {
-    position:absolute;
-    top:48pt;
-    bottom:0pt;
-    display:block;
-    box-sizing: border-box;
-    padding:0;
-    margin:0;
-    width:100%;
-}
-
-.tab-header {
-    display:inline-block;
-    border-radius: 0.25em 0.25em 0 0;
-    vertical-align:middle;
-    text-align:center;
-    padding:0.25em 0.75em;
-    margin-top:0.25em;
-    margin-left:0.25em;
-    margin-right:0.25em;
-    background: #ddd;
-    height:1.5em;
-    line-height:1.5em;
-    font-size:14pt;
-    color: #444;
-    z-index:0;
-} /*total height 0.25 * 2 + 0.25 +1.5 = 2.25 em; */
-
-.tab-body {
-    display:block;
-    position:absolute;
-    background: #ddd;
-    bottom:0;
-    top:2.25em;
-    left:0;
-    right:0;
-    z-index: 0;
-}
-
-#console {
-    overflow: auto;
-}
-#task-editor {
-    height:100%;
-    width:100%;
-    font-size: large;
-
-}
-
-.tab-header.alert {
-    color:red;
-    font-weight:bold;
-}
-.tab-header.active {
-    z-index:10;
-    background:#eee;
-}
-.tab-body.active
- {
-    z-index:10;
-    bottom:0;
-    top:2.25em;
-    width:100%;
-    background:#eee;
-}
-
-#editor-panel.wide-view #editor {
+#why3-main-container {
+    /* Fills the whole window */
+    display: flex; /* tells the children with flex:i
+                      to fill-up the remaining space.
+                      non flex children will be sized
+                      according to content;
+                  */
+    flex-direction:column;
     position:absolute;
     top:0;
     left:0;
-    width:48rem;
-    height:100%;
-}
-#editor-panel.wide-view #tab-panel {
-    position:absolute;
-    left:48rem;
     right:0;
-    height:100%;
+    bottom:0;
 }
-#editor-panel.standard-view #editor  {
-    position:relative;
-    width:100%;
-    height:50%;
-}
-#editor-panel.standard-view #tab-panel {
-    position:relative;
-    width:100%;
-    height:49%;
-}
-
-#editor {
-    font-size: large;
-    box-sizing: border-box;
-    display:inline-block;
-    margin: 0 ;
-    padding:0;
-    z-index:5;
-    vertical-align:top;
-    border-right: 1pt  #ddd solid;
-    border-bottom: 1pt #ddd solid;
-}
-
-/* CSS MENU BAR */
-#tool-bar {
-    background-color:#ddd;
-    position: absolute;
-    top: 18pt;
-    margin:0;
-    height:30pt;
-    width:100%;
-    padding:0;
-    line-height:30pt;
-}
-#tool-bar button {
-    color: #333;
-    margin-top:2pt;
-    margin-left:5pt;
-    background-image: linear-gradient(to bottom, #eee, #ccc);
-    border-radius:3pt;
-    border: solid 1pt #aaa;
-    font-size:12pt;
-    width: 24pt;
-    height:24pt;
-    vertical-align:top;
-}
-.menu-bar {
-    position:absolute;
-    top:0pt;
-    margin:0;
-    z-index:100;
-    font-size:14pt;
-    height:18pt;
-    padding:0;
-    width:100%;
-}
-.menu-bar * {
-    z-index:100;
-}
-.menu-bar:after {
-    content:"";
-    display:table;
-    clear:both;
-}
-
-.menu-bar ul {
-    padding:0;
-    margin:0;
-    list-style: none;
-    position: relative;
-    background-image: linear-gradient(to bottom, #eee, #ccc);
-    height:18pt;
-    box-sizing:border-box;
-    }
-
-/* Positioning the navigation items inline */
-.menu-bar *,
-#console ul#theory-list * {
+.why3-widget, .why3-container {
     /* Make the test non selectable */
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none;   /* Chrome/Safari/Opera */
@@ -221,166 +37,301 @@ body {
                                   not supported by any browser */
 }
 
-.menu-bar ul li {
-    margin: 0;
-    padding: 0;
-    display: inline-block;
-    float: left;
-    height: 100%;
-    box-sizing:border-box;
+#why3-top-button-bar {
+    width:100%;
 }
 
-/* Styling the links */
-.menu-bar > ul > li > span {
-    text-size-adjust: none;
-    -webkit-text-size-adjust: none;
+#why3-main-panel {
+    width:100%;
+    padding:0;
+    margin:0;
+    flex: 1;
+}
 
-    display:block;
-    padding:0pt 1em;
-    color:#444;
-    text-decoration:none;
-    border-radius: 5pt 5pt 0pt 0pt;
-    border-style:solid;
-    border-width:1pt;
-    border-color:transparent;
-    height:100%;
+/**** BUTTON BAR *****/
+/* GENERIC PART */
+
+.why3-button-bar {
     box-sizing:border-box;
+    padding:0;
     margin:0;
 }
 
-/* Background color change on Hover */
-.menu-bar > ul > li > span:hover {
-    background-image: linear-gradient(to bottom, #eee, #bbb);
-    border-color: #aaa;
+.why3-button-bar > .why3-button-group {
+    position:relative;
+    margin:0;
     box-sizing:border-box;
-    cursor:default;
-
-}
-.menu-bar > ul > li > ul {
-/*    display:none;*/
-    height:0;
-    overflow:hidden;
-    box-sizing:border-box;
-    opacity: 0;
-    transition: opacity .3s ease-in-out;
-    -webkit-transition: opacity .3s ease-in-out;
-    -moz-transition: opacity .3s ease-in-out;
-    -o-transition: opacity .3s ease-in-out;
-    -ms-transition: opacity .3s ease-in-out;
-}
-.menu-bar > ul > li:hover > ul {
-    height:auto;
-    background-color:#ddd;
-    box-shadow:0pt 0pt 5pt  #444;
-    opacity:1;
-    cursor:default;
-}
-.menu-bar > ul > li > ul > li {
-    float:left;
-    display: inline-block;
-    clear:left;
-    width: 100%;
-    position: relative;
-
-}
-.menu-bar > ul > li > ul > li  {
-    display:block;
-    padding:1pt 2pt 1pt 2pt;
-    color:#444;
-    text-decoration:none;
-    border-radius: 1pt;
-    border-style:solid;
-    border-width:1pt;
-    border-color:transparent;
-    box-sizing:border-box;
-    height: 100%;
-}
-.menu-bar > ul > li > ul > li:before {
     display:inline-block;
-    content:"";
-    width:0pt;
-    height: 100%;
-    vertical-align:middle;
-}
-.menu-bar > ul > li > ul > li:hover {
-    border-color:#cce;
-    background-image: linear-gradient(to bottom, #abe, #68b);
+    vertical-align:top;
+    padding:0;
 }
 
-/* Hidden file selector */
-#file-selector {
+.why3-button-bar .why3-separator {
+    display:inline-block;
+}
+.why3-flushright {
+    position:relative;
+    float:right;
+}
+
+/* SPECIFIC PART */
+
+#why3-top-button-bar {
+    height:2em;
+    font-size:14pt;
+    line-height:1.8em;
+}
+#why3-top-button-bar .why3-button {
+    font-size:14pt;
+    width:1.8em;
+    display:inline-block;
+    height:1.6em;
+}
+
+/**** END BUTTON BAR ****/
+
+/**** Main view ****/
+
+#why3-main-panel {
+    display:flex;
+    align-items:stretch;
+}
+
+#why3-main-panel.why3-wide-view {
+    flex-direction:raw;
+}
+#why3-main-panel.why3-column-view {
+    flex-direction:column;
+}
+
+#why3-main-panel > * {
+    flex-grow: 1;
+    width:auto;
+    height:auto;
+}
+#why3-resize-bar {
+    flex-basis:3pt;
+    flex-grow:0;
+}
+
+#why3-main-panel.why3-wide-view #why3-resize-bar:hover {
+    cursor: ew-resize;
+}
+#why3-main-panel.why3-column-view #why3-resize-bar:hover {
+    cursor: ns-resize;
+}
+
+/*** MAIN EDITOR ***/
+#why3-editor-container {
+    position:relative;
+}
+#why3-tab-container {
+    position:relative;
+    margin:0;
+    padding:0;
+}
+
+#why3-editor {
     position:absolute;
-    left:0;
     top:0;
-    width:0;
-    height:0;
-    z-index:-1;
+    left:0;
+    bottom:0;
+    right:0;
+    padding:0;
+    margin:0;
 }
 
-#console ul#theory-list {
+/*** TABS ***/
+
+#why3-tab-panel {
+    
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    padding:0;
+    margin:0;
+    
+
+}
+
+.why3-tab-label {
+    display:inline-block;
     position:relative;
-    list-style-type: none;
-    list-style-position: inside;
-    padding-left: 0.5em;
-}
-#console ul#theory-list li {
-    font-weight:bold;
-    position:relative;
-}
-
-#console ul#theory-list li {
-    font-weight:normal;
-    padding-top:0.5em;
-    padding-bottom:0.5em;
-}
-
-#console ul#theory-list ul {
-    list-style-type: none;
-    list-style-position: inside;
-}
-
-
-#console ul#theory-list ul ul {
-    list-style-type: none;
-    list-style-position: inside;
-
-}
-
-*/
-/* Confirmation dialog */
-.btn {
-    width:100%;
-    z-index:1;
-    margin:0 0 4pt 0;
+    top:1pt;
+    border-radius: 3pt 3pt 0 0;
+    border-width: 1pt 1pt 0 1pt;
+    border-style: solid;
+    height:2em;
     box-sizing:border-box;
+    line-height:2em;
+    margin: 0.5em 0.5em 0 0.5em;
+    padding: 0 0.5em;
+    z-index:2;
 }
 
-#confirm-dialog {
-    z-index:20;
-    display:none;
+.why3-tab {
     position:absolute;
-    margin: 0 auto;
-    padding: 2pt 0;
-    width:50%;
-    left:25%;
-    right:25%;
-    top:20%;
-    border-radius:5pt;
-    background: #eee;
-    text-align:center;
+    top:2.5em;
+    bottom:1pt;
+    left:0;
+    right:0;
+    margin:0;
+    padding:0;
+    z-index: 1;
+    padding-top:0.5em;
+    box-sizing:border-box;
+    border-top-style:solid;
+    border-top-width:1pt;
+}
+.why3-tab-label.why3-inactive,
+.why3-tab-label.why3-inactive + .why3-tab {
+    z-index:0;
 }
 
-#background-shadow {
-    display:none;
-    background-color: rgba(0,0,0,0.8);
-    position:absolute;
+#why3-task-viewer {
     width:100%;
     height:100%;
-    top: 0;
-    left:0;
-    z-index:15;
+}
+#why3-task-list {
+    overflow:auto;
+    width:100%;
+    height:100%;
+}
+/******* CONTEXT MENU *********/
+.why3-contextmenu {
+    display:none;
+    position:absolute;
+    border-style:solid;
+    border-width:1pt;
+    box-shadow:0pt 0pt 5pt #333;
 }
 
-#confirm-dialog .btn {
-    width:40%;
+.why3-contextmenu {
+    z-index:100;
+}
+.why3-contextmenu ul {
+    list-style-type:none;
+    padding:0;
+    margin:0;
+}
+.why3-contextmenu li {
+    padding: 0.5em 1em 0.5em 1em;
+}
+
+/******* SETTINGS ****/
+#why3-setting-panel {
+    position:absolute;
+    z-index:100;
+    display:none;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    justify-content:center;
+    align-items:center;
+}
+#why3-setting-bg {
+    position:absolute;
+    opacity:0.75;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:101;
+}
+#why3-setting-box {
+    display:inline-block;
+    z-index:102;
+    flex-grow:0;
+    box-shadow:0pt 0pt 5pt #333;
+    padding: 1em;
+}
+#why3-setting-box ul {
+    list-style-type:none;
+}
+#why3-setting-box li {
+    padding:0.5em;
+}
+/********** THEMABLE PART, SEE trywhy3_custom.css *************/
+
+#why3-editor {
+    font-size:large;
+}
+#why3-task-viewer {
+    font-size:large;
+}
+#why3-task-list ul {
+    list-style-type:none;
+}
+#why3-task-list li {
+    padding-left:1em;
+    padding-top:1em;
+}
+/* tasks icons */
+.why3-task-pending {
+    color: blue;
+}
+.why3-task-valid {
+    color:green;
+}
+.why3-task-unknown {
+    color:orange;
+}
+.why3-task-selected {
+    background:rgba(250,220,90,0.7);
+}
+
+/* ACE Editor */
+.why3-error {
+    position:absolute;
+    background:rgba(231,113,116,1);
+    z-index:70;
+}
+.why3-msg {
+}
+
+.why3-loc-neg-premise {
+    position:absolute;
+    background:rgba(255,128,64,1);
+    z-index:60;
+}
+
+.why3-loc-goal {
+    position:absolute;
+    background:rgba(64,191,255,1);
+    z-index:50;
+}
+.why3-loc-premise {
+    position:absolute;
+    background:rgba(100,233,134,1);
+    z-index:40;
+}
+
+.why3-widget {
+    background: #eee;
+    color: #666;
+    border-color: #888;
+}
+.why3-widget.why3-inactive {
+    background:#eee;
+    border-color:#eee;
+    color:#aaa;
+}
+
+.why3-button {
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    border-radius:3pt;
+    border: solid 1pt #aaa;
+}
+.why3-button,
+.why3-icon  {
+    color:#333;
+}
+
+.why3-contextmenu li:hover,
+.why3-contextmenu li:hover .why3-icon
+{
+    color: #eee;
+    background: #222;
 }

@@ -1,137 +1,143 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-      style="font-family:Verdana,Arial,Sans-Serif">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title>
-      Try Why3
-    </title>
+    <title>Try Why3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="trywhy3.css" />
-    <link rel="stylesheet" type="text/css" href="trywhy3_custom.css" />
-    <!-- color customisation -->
-    <style>
-
-    </style>
-  </head>
-  <body>
-    <!--invisible elements for the open file dialog -->
-    <input type="file"  id="file-selector" />
-    <div id="background-shadow">
-      <div id="confirm-dialog" >
-	The content of the current buffer will be lost
-
-        <br/>
-	<div style="width:70%; display:inline-block;">
-	  <button class="btn"
-		  onclick="confirmReplace();">
-            Confirm
-
-          </button>
-	  <button class="btn"
-		  onclick="cancelReplace();">
-            Cancel
-
-          </button>
-	</div>
-      </div>
-    </div>
-
-    <div class="menu-bar">
-      <ul>
-	<li><span>File</span>
-	  <ul>
-	    <li onclick="openFile();">
-                Open</li>
-	    <li onclick="saveFile();">
-              Save as
-	    </li>
-	  </ul>
-	</li>
-	<li><span>Edit</span>
-	  <ul>
-	    <li onclick="editor.undo();">Undo</li>
-	    <li onclick="editor.redo();">Redo</li>
-	    <li onclick="clearBuffer();">Clear buffer</li>
-	  </ul>
-	</li>
-	<li><span>Preferences</span>
-	  <ul>
-	    <li onclick="document.getElementById('radio-wide').click();">
-	      <input id="radio-wide" type="radio" name="view"
-		     value="wide" checked="checked" onchange="widescreenView();"
-		     />
-              Split Vertically
-	    </li>
-	    <li onclick="document.getElementById('radio-std').click();">
-	      <input id="radio-std" type="radio" name="view" value="std"
-		     onchange="standardView();"
-		     />
-              Split Horizontally
-	    </li>
-	    <li>
- 	      <input id="input-num-threads" type="number" style="width:4em;" min="1" max="8"
-		     value="4"></input></input> Number of threads for Alt-Ergo
-	    </li>
-	    <li>
- 	      <input id="input-num-steps" type="number" style="width:4em;" min="1" max="1000"
-		     value="100"></input></input> Number of steps for Alt-Ergo
-	    </li>
-	  </ul>
-	</li>
-	<li style="float:right;"><span>Help</span></li>
-      </ul>
-    </div>
-    <div id="tool-bar">
-      <button id="button-execute" title="Execute buffer">
-	<span class="fa-arrow-circle-right"></span>
-      </button>
-      <button id="button-compile" title="Compile buffer">
-	<span class="fa-cogs"></span>
-      </button>
-      <button id="button-prove-all" title="Prove all tasks">
-	<span style="font-size:50%"
-	class="fa-check-square"></span><span style="font-size:50%"
-					     class="fa-check-square"></span>
-	<span style="font-size:50%"
-	class="fa-check-square"></span><span style="font-size:50%"
-					     class="fa-check-square"></span>
-      </button>
-      <button id="button-prove" title="Prove selected task">
-	<span class="fa-check-square"></span>
-      </button>
-      <button id="button-split" title="Split and prove task">
-	<span class="fa-share-alt"></span>
-      </button>
-      <button id="button-clean" title="Clean task">
-	<span class="fa-unlink"></span>
-      </button>
-      <button id="button-stop" title="Interrupt">
-	<span class="fa-ban"></span>
-      </button>
-      <span id="example-label" style="margin-left:5em;" class="fa fa-spin fa-refresh"></span>
-      <select  id="select-example"
-	       title="Choose a predefined example">
-	<option disabled="disabled"></option>
-      </select>
-    </div>
-    <div id="editor-panel" class="wide-view">
-      <div id="editor" title="Editor" tabindex="-1" ></div><!--
-      Don't leave white-spaces between editor and console div's
-      --><div id="tab-panel">
-        <!-- First list all the tab headers in spans, with an id equal
-             to the id of the corresponding tab below, with the suffix     -tab
-             then list all the tab content in divs -->
-        <span id="console-tab" class="tab-header active">Task list</span>
-        <span id="task-view-tab" class="tab-header" >Task</span>
-        <div id="console" class="tab-body active"> </div>
-        <div id="task-view" class="tab-body"><div id="task-editor"></div></div>
-      </div>
-    </div>
-    <script defer="true" src="ace-builds/src-noconflict/ace.js"
+    <link rel="stylesheet" type="text/css" href="trywhy3_custom.css"/>
+    <script defer="true" src="ace-builds/src-min-noconflict/ace.js"
             type="text/javascript" charset="utf-8"></script>
-    <script defer="true" type="text/javascript"
-            src="editor_helper.js"></script>
+
+    <script type="text/javascript">
+      var editor_theme = "ace/theme/chrome";
+      var editor_mode = "ace/mode/why3";
+    </script>
     <script defer="true" type="text/javascript"
             src="trywhy3.js"></script>
+  </head>
+  <body>
+    <div id="why3-main-container" class="why3-container">
+      <div id="why3-top-button-bar" class="why3-widget why3-button-bar">
+	<div class="why3-separator" style="width:0.1em;"></div>
+	<div class="why3-button-group">
+	  <button id="why3-button-open"  class="why3-button" title="Open file">
+	    <span class="fa-folder-open"></span>
+	  </button>
+	  <button id="why3-button-save"  class="why3-button" title="Save file">
+	    <span class="fa-cloud-download"></span>
+	  </button>
+	</div>
+
+	<div class="why3-separator" style="width:2em;"></div>
+
+	<div class="why3-button-group">
+	  <span id="why3-example-label" class="fa fa-spin fa-refresh why3-icon"></span>
+	  <select  id="why3-select-example"
+		   title="Choose a predefined example">
+	    <option disabled="disabled" selected="selected"></option>
+	  </select>
+	</div>
+
+	<div class="why3-separator" style="width:4em;"></div>
+
+	<div class="why3-button-group">
+	  <button id="why3-button-execute" class="why3-button" title="Execute buffer">
+	    <span class="fa-arrow-circle-right"></span>
+	  </button>
+	  <button id="why3-button-compile" class="why3-button" title="Compile buffer">
+	    <span class="fa-cogs"></span>
+	  </button>
+	  <button id="why3-button-stop" class="why3-button" title="Interrupt">
+	    <span class="fa-ban"></span>
+	  </button>
+	</div>
+
+	<div class="why3-button-group why3-flushright">
+	  <button id="why3-button-settings" class="why3-button"
+		  title="Settings…">
+	    <span class="fa-wrench"></span>
+	  </button>
+	  <button id="why3-button-help" class="why3-button"
+		  title="Help">
+	    <span class="fa-question-circle"></span>
+	  </button>
+	  <button id="why3-button-about" class="why3-button"
+		  title="About">
+	    <span class="fa-info-circle"></span>
+	  </button>
+	</div>
+      </div>
+
+      <div id="why3-main-panel" class="why3-wide-view">
+	<div id="why3-editor-container" class="why3-container">
+	  <div id="why3-editor" tabindex="-1" ></div>
+	</div>
+	<div id="why3-resize-bar" class="why3-widget" ></div>
+	<div id="why3-tab-container" class="why3-container">
+	  <div id="why3-tab-panel" >
+	    <span class="why3-tab-label why3-widget" >Task list</span>
+	    <div class="why3-widget why3-tab">
+	      <div id="why3-task-list" class="why3-widget"></div>
+	    </div>
+	    <span class="why3-tab-label why3-widget why3-inactive" >Task view</span>
+	    <div class="why3-widget why3-tab"><div  id="why3-task-viewer"></div></div>
+	  </div>
+	</div>
+
+      </div>
+    </div>
+    <!-- open and save -->
+    <a id="why3-save-as" href=""
+       style="z-index:-10;position:absolute;top:0;left:0;height:0;width:0;"></a>
+    <input id="why3-open" type="file"
+	   style="z-index:-10;position:absolute;top:0;left:0;height:0;width:0;"></input>
+    <!-- context menu -->
+    <div class="why3-contextmenu why3-widget" id="why3-task-menu">
+      <ul>
+	<li id="why3-split-menu-entry"><span class="fa-share-alt
+						    why3-icon"></span> Split and prove </li>
+	<li id="why3-prove100-menu-entry"><span class="fa-check-square
+						    why3-icon"></span>
+						    Prove (100
+	  steps) </li>
+	<li id="why3-prove1000-menu-entry"><span class="fa-check-square
+							why3-icon"></span>
+	  Prove (1000 steps) </li>
+	<li id="why3-clean-menu-entry"><span class="fa-unlink why3-icon"></span>
+	  Clean </li>
+      </ul>
+    </div>
+    <!-- settings -->
+    <div id="why3-setting-panel" class="why3-container">
+      <div id="why3-setting-bg" class="why3-widget"> </div>
+      <div id="why3-setting-box" class="why3-widget">
+	<span>Preferences</span>
+	<ul>
+          <li>
+            <input id="why3-radio-wide" type="radio" name="why3-view"
+		   checked="checked" value="wide" />
+            <label for="why3-radio-wide">Split Vertically</label>
+	  </li>
+	  <li>
+	    <input id="why3-radio-column" type="radio"
+	    name="why3-view" value="column" />
+	    <label for="why3-radio-column">Split Horizontally</label>
+          </li>
+          <li>
+            <input id="why3-input-num-threads" type="number" style="width:4em;" min="1" max="8"
+                   value="4"></input></input> Number of threads for Alt-Ergo
+          </li>
+          <li>
+            <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="1000"
+                   value="100"></input></input> Number of steps for Alt-Ergo
+          </li>
+	</ul>
+	<button id="why3-close-setting-button"
+		style="float:right;"
+		class="why3-button"
+		title="Close">Close</button>
+
+      </div>
+    </div>
   </body>
 
 </html>
