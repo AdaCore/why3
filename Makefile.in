@@ -1516,13 +1516,7 @@ trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_
 	yamlpp -l en $< -o $@
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml --extern-fs -I . -I src/trywhy3 \
-		--file=drinkers.why:/ \
-		--file=simplearith.why:/ \
-		--file=bin_mult.mlw:/ \
-		--file=fact.mlw:/ \
-		--file=isqrt.mlw:/ \
-		+weak.js +nat.js $^
+	js_of_ocaml +weak.js +nat.js $^
 
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^

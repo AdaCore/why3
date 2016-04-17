@@ -34,7 +34,7 @@ module FactFor
   = let r = ref 1 in
     for y = 1 to x do
       invariant { !r = fact (y-1) }
-      r := !r * !y
+      r := !r * y
     done;
     !r
 
