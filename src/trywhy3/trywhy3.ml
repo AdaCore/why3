@@ -90,6 +90,20 @@ module Editor =
     let get_session ed =
       JSU.(meth_call ed "getSession" [| |])
 
+    let mk_annotation row col text kind =
+      JSU.(obj [| "row", inject row; "column", inject col;
+		  "text", inject text; "type", inject kind |])
+
+    let set_annotations l =
+      let a =
+	Array.map (fun (r,c,t,k) -> mk_annotation r c t k) (Array.of_list l)
+      in
+      let a = Js.array a in
+      JSU.(meth_call (get_session editor) "setAnnotations" [| inject a |])
+
+    let clear_annotations () =
+      ignore (JSU.(meth_call (get_session editor) "clearAnnotations" [| |]))
+
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
@@ -289,6 +303,7 @@ module TaskList =
       Editor.set_on_event
         "change"
         (Js.wrap_callback (fun () -> clear ();
+				     Editor.clear_annotations ();
                                      match !error_marker with
                                        None -> ()
                                      | Some (m, _) -> Editor.remove_marker m))
@@ -312,7 +327,8 @@ module TaskList =
       | ErrorLoc ((l1, b, l2, e), s) ->
          let r = Editor.mk_range l1 b l2 e in
          error_marker := Some (Editor.add_marker "why3-error" r, r);
-         print_error s
+         print_error s;
+	 Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
 
       | Result sl ->
          clear ();
@@ -662,8 +678,7 @@ module Controller =
 			match msg with
 			  Task (id,_,_,code,_, _, steps) ->
 			  push_task (Goal (id,code, steps))
-			| Result _ ->
-			   ToolBar.enable_compile ()
+			| Result _ | Error _ | ErrorLoc _ -> ToolBar.enable_compile ()
 			| _ -> ()
                       in Js._false));
       worker

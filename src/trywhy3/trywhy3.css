@@ -291,6 +291,28 @@ body {
 }
 
 /* ACE Editor */
+
+.ace_gutter-cell.ace_error {
+    background-image:none !important;
+}
+.ace_gutter-cell.ace_error:before {
+    content:"\f057";
+    font-family: 'FontAwesome', sans-serif;
+    position:absolute;
+    left:0.1em;
+    color:rgba(231,113,116,1);
+}
+.ace_gutter-cell.ace_warning {
+    background-image:none !important;
+}
+.ace_gutter-cell.ace_warning:before {
+    content:"\f06a";
+    font-family: 'FontAwesome', sans-serif;
+    position:absolute;
+    left:0.1em;
+    color:rgba(233,150,122,1);
+}
+
 .why3-error {
     position:absolute;
     background:rgba(231,113,116,1);
