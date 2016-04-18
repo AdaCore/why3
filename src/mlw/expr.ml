@@ -519,7 +519,7 @@ let fmla_of_term t = match t.t_node with
   | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_label_copy t t_false
   | _ -> t_label ?loc:t.t_loc Slab.empty (t_equ_simp t t_bool_true)
 
-let rec raw_of_post prop v h = match h.t_node with
+let rec pure_of_post prop v h = match h.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t])
     when ls_equal ps ps_equ && vs_equal u v && t_v_occurs v t = 0 ->
       (if prop then fmla_of_term t else t), t_true
@@ -529,14 +529,9 @@ let rec raw_of_post prop v h = match h.t_node with
          ls_equal fs fs_bool_true && t_v_occurs v f = 0 ->
       (if prop then f else term_of_fmla f), t_true
   | Tbinop (Tand, f, g) ->
-      let t, f = raw_of_post prop v f in
+      let t, f = pure_of_post prop v f in
       t, t_label_copy h (t_and_simp f g)
   | _ -> raise Exit
-
-let pure_of_post prop v h = match raw_of_post prop v h with
-  | {t_ty = Some _} as t, h when prop -> fmla_of_term t, h
-  | {t_ty = None} as f, h when not prop -> term_of_fmla f, h
-  | z -> z
 
 let term_of_post ~prop v h =
   try Some (pure_of_post prop v h) with Exit -> None
