@@ -462,11 +462,14 @@ module ToolBar =
     let button_help = getElement AsHtml.button "why3-button-help"
     let button_about = getElement AsHtml.button "why3-button-about"
 
-    let disable (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
-     b ## disabled <- Js._true
+    let disable b  =
+      b ## disabled <- Js._true;
+      b ## classList ## add (Js.string "why3-inactive")
 
-    let enable (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
-     b ## disabled <- Js._false
+    let enable b =
+      b ## disabled <- Js._false;
+      b ## classList ## remove (Js.string "why3-inactive")
+
 
     let toggle (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
       if Js.to_bool (b##disabled) then enable b else disable b
