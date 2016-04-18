@@ -554,17 +554,39 @@ module ToolBar =
       enable button_compile
 
 
-    let save () =
-      let data : Js.js_string Js.t =
-	let buffer = JSU.(fun_call (get_global "btoa") [| inject (Editor.get_value ()) |]) in
-	(Js.string "data:application/octet-stream;bas64,") ## concat (buffer)
+
+
+    let mk_save =
+      let _Blob  = get_global "Blob" in
+      fun () ->
+      let blob =
+        jsnew _Blob (Js.array [| (Editor.get_value ()) |],
+                     JSU.(obj [| "type", inject (Js.string "application/octet-stream") |]))
       in
-      real_save ## href <- data;
       let name =
 	if !Editor.name ## length == 0 then Js.string "test.mlw" else !Editor.name
       in
+      blob, name
+
+    let save_default  =
+      let _URL = JSU.(get Dom_html.window (Js.string "URL")) in
+      fun () ->
+      let blob, name = mk_save () in
+      let url = JSU.(meth_call _URL "createObjectURL" [| inject blob |]) in
+      real_save ## href <- url;
       JSU.(set real_save (Js.string "download") name);
-      ignore (JSU.(meth_call real_save "click" [| |]))
+      ignore JSU.(meth_call real_save "click" [| |]);
+      ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |])
+
+
+    let save =
+      match Js.Optdef.to_option JSU.(get (Dom_html.window ## navigator) (Js.string "msSaveBlob"))
+      with
+        None -> save_default
+      | Some _f ->
+         fun () ->
+         let blob, name = mk_save () in
+         ignore JSU.(meth_call (Dom_html.window ## navigator) "msSaveBlob" [| inject blob; inject name |])
 
     let open_ = getElement AsHtml.input "why3-open"
     let () =
@@ -856,7 +878,7 @@ let () =
   ToolBar.(add_action button_redo Editor.redo);
   KeyBinding.add_global ~ctrl:Js._true 89 Editor.redo;
 
-  
+
   ToolBar.(add_action button_execute Controller.why3_execute);
   ToolBar.(add_action button_compile Controller.why3_parse);
   ToolBar.(add_action button_stop Controller.stop);
