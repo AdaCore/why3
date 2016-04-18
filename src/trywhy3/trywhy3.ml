@@ -575,8 +575,9 @@ module ToolBar =
       let url = JSU.(meth_call _URL "createObjectURL" [| inject blob |]) in
       real_save ## href <- url;
       JSU.(set real_save (Js.string "download") name);
-      ignore JSU.(meth_call real_save "click" [| |]);
-      ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |])
+      ignore JSU.(meth_call real_save "click" [| |])
+    (* does not work with firefox *)
+    (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *) 
 
 
     let save =

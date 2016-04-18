@@ -1,17 +1,19 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
   <head>
     <title>Try Why3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="trywhy3.css" />
     <link rel="stylesheet" type="text/css" href="trywhy3_custom.css"/>
-    <script defer="true" src="ace-builds/src-min-noconflict/ace.js"
+
+    <script defer="defer" src="ace-builds/src-min-noconflict/ace.js"
             type="text/javascript" charset="utf-8"></script>
 
     <script type="text/javascript">
       var editor_theme = "ace/theme/chrome";
       var editor_mode = "ace/mode/why3";
     </script>
-    <script defer="true" type="text/javascript"
+    <script defer="defer" type="text/javascript"
             src="trywhy3.js"></script>
   </head>
   <body>
@@ -48,7 +50,7 @@
 	  <span id="why3-example-label" class="fa fa-spin fa-refresh why3-icon"></span>
 	  <select  id="why3-select-example"
 		   title="Choose a predefined example">
-	    <option disabled="disabled" selected="selected"></option>
+	    <option disabled="disabled" selected="selected">&nbsp;</option>
 	  </select>
 	</div>
 
@@ -102,10 +104,8 @@
       </div>
     </div>
     <!-- open and save -->
-    <a id="why3-save-as" href=""
-       style="z-index:-10;position:absolute;top:0;left:0;height:0;width:0;"></a>
-    <input id="why3-open" type="file"
-	   style="z-index:-10;position:absolute;top:0;left:0;height:0;width:0;"></input>
+    <a id="why3-save-as" href="" class="why3-hidden"></a>
+    <input id="why3-open" type="file" class="why3-hidden" />
     <!-- context menu -->
     <div class="why3-contextmenu why3-widget" id="why3-task-menu">
       <ul>
@@ -144,11 +144,11 @@
             </li>
             <li>
               <input id="why3-input-num-threads" type="number" style="width:4em;" min="1" max="8"
-                     value="4"></input> Number of threads for Alt-Ergo
+                     value="4" /> Number of threads for Alt-Ergo
             </li>
             <li>
               <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="1000"
-                     value="100"></input> Number of steps for Alt-Ergo
+                     value="100" /> Number of steps for Alt-Ergo
             </li>
 	  </ul>
 	</div>
