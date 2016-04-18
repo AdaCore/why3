@@ -12,7 +12,7 @@ do
 	    EXT=".why"
 	    ;;
 	*)
-	    echo "Warning: unknown extension for file $i";
+	    echo "Warning: unknown extension for file $i" >&2;
 	    continue
 	    ;;
     esac
