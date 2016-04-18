@@ -282,26 +282,23 @@ let why3_prove_all () =
 
 
 let why3_parse_theories theories =
-  if Stdlib.Mstr.is_empty theories then
-    W.send (Result []) (* hack to return no result *)
-  else
-    let theories =
-      Stdlib.Mstr.fold
-	(fun thname th acc ->
-	 let loc =
-           Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
-	 in
-	 (loc, (thname, th)) :: acc) theories []
-    in
-    let theories = List.sort  (fun (l1,_) (l2,_) -> Loc.compare l1 l2) theories in
-    List.iter
-      (fun (_, (th_name, th)) ->
-       let th_id = Task.register_theory th_name th in
-       W.send (Theory(th_id, th_name));
-       let subs = (Task.get_info th_id).Task.subtasks in
-       W.send (UpdateStatus( (if subs == [] then `Valid else `New) , th_id));
-       List.iter (fun i -> why3_prove i) subs
-      ) theories
+  let theories =
+    Stdlib.Mstr.fold
+      (fun thname th acc ->
+       let loc =
+         Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
+       in
+       (loc, (thname, th)) :: acc) theories []
+  in
+  let theories = List.sort  (fun (l1,_) (l2,_) -> Loc.compare l1 l2) theories in
+  List.iter
+    (fun (_, (th_name, th)) ->
+     let th_id = Task.register_theory th_name th in
+     W.send (Theory(th_id, th_name));
+     let subs = (Task.get_info th_id).Task.subtasks in
+     W.send (UpdateStatus( (if subs == [] then `Valid else `New) , th_id));
+     List.iter (fun i -> why3_prove i) subs
+    ) theories
 
 let execute_symbol m fmt ps =
   match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
@@ -400,27 +397,23 @@ let why3_run f lang code =
 
 
 let () =
-  let free = ref true in
   W.set_onmessage
     (fun msg ->
-     if !free then begin
-	 free := false;
-	 let () =
-	   match msg with
-	   | Transform (`Split, id) -> why3_split id
-	   | Transform (`Prove(steps), id) -> why3_prove ~steps id
-	   | Transform (`Clean, id) -> why3_clean id
-	   | ProveAll -> why3_prove_all ()
-	   | ParseBuffer code ->
-              Task.clear_table ();
-              why3_run why3_parse_theories Env.base_language code
-	   | ExecuteBuffer code ->
-	      Task.clear_table ();
-	      why3_run why3_execute Mlw_module.mlw_language code
-	   | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
-	 in
-	 free := true;
-       end
+     let () =
+       match msg with
+       | Transform (`Split, id) -> why3_split id
+       | Transform (`Prove(steps), id) -> why3_prove ~steps id
+       | Transform (`Clean, id) -> why3_clean id
+       | ProveAll -> why3_prove_all ()
+       | ParseBuffer code ->
+          Task.clear_table ();
+          why3_run why3_parse_theories Env.base_language code
+       | ExecuteBuffer code ->
+	  Task.clear_table ();
+	  why3_run why3_execute Mlw_module.mlw_language code
+       | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
+     in
+     W.send Idle
     )
 (*
 Local Variables:

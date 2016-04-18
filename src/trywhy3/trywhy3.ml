@@ -103,11 +103,17 @@ module Editor =
 
     let clear_annotations () =
       ignore (JSU.(meth_call (get_session editor) "clearAnnotations" [| |]))
+    let _Infinity = get_global "Infinity"
+
+    let scroll_to_end e =
+      let len : int  = JSU.(meth_call (get_session e) "getLength" [| |]) in
+      let last_line = len - 1 in
+      ignore JSU.(meth_call e "gotoLine" [| inject last_line; inject _Infinity; inject Js._false |])
 
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
-      let _Infinity = get_global "Infinity" in
+
       List.iter (fun e ->
 		 ignore (JSU.(meth_call e "setTheme" [| inject editor_theme |]));
 		 ignore (JSU.(meth_call (get_session e) "setMode" [| inject editor_mode |]));
@@ -198,13 +204,20 @@ module ContextMenu =
     let prove100_menu_entry = getElement AsHtml.li "why3-prove100-menu-entry"
     let prove1000_menu_entry = getElement AsHtml.li "why3-prove1000-menu-entry"
     let clean_menu_entry = getElement AsHtml.li "why3-clean-menu-entry"
+    let enabled = ref true
+
+    let enable () = enabled := true
+    let disable () = enabled := false
 
     let show_at x y =
-      task_menu ## style ## display <- Js.string "block";
-      task_menu ## style ## left <- Js.string ((string_of_int x) ^ "px");
-      task_menu ## style ## top <- Js.string ((string_of_int y) ^ "px")
+      if !enabled then begin
+          task_menu ## style ## display <- Js.string "block";
+          task_menu ## style ## left <- Js.string ((string_of_int x) ^ "px");
+          task_menu ## style ## top <- Js.string ((string_of_int y) ^ "px")
+        end
     let hide () =
-      task_menu ## style ## display <- Js.string "none"
+      if !enabled then
+        task_menu ## style ## display <- Js.string "none"
     let add_action b f =
       b ## onclick <- Dom.handler (fun _ ->
 				   hide ();
@@ -277,7 +290,8 @@ module TaskList =
       (span ## classList) ## add (Js.string "why3-task-selected");
       let markers = List.map (fun (cls, range) -> Editor.add_marker cls range) loc in
       Hashtbl.add task_selection id (span, loc, markers);
-      Editor.set_value ~editor:Editor.task_viewer (Js.string pretty)
+      Editor.set_value ~editor:Editor.task_viewer (Js.string pretty);
+      Editor.scroll_to_end Editor.task_viewer
 
     let deselect_task id =
       try
@@ -322,7 +336,8 @@ module TaskList =
       let doc = Dom_html.document in
       (* see why3_worker.ml *)
       match o with
-        Error s -> print_error s
+      | Idle -> ()
+      | Error s -> print_error s
 
       | ErrorLoc ((l1, b, l2, e), s) ->
          let r = Editor.mk_range l1 b l2 e in
@@ -448,7 +463,13 @@ module ExampleList =
       option ## innerHTML <- text;
       appendChild select_example option
 
+    let enable () =
+      select_example ## disabled <- Js._false
+
+    let disable () =
+      select_example ## disabled <- Js._true
   end
+
 module ToolBar =
   struct
     let button_open = getElement AsHtml.button "why3-button-open"
@@ -474,17 +495,27 @@ module ToolBar =
     let toggle (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
       if Js.to_bool (b##disabled) then enable b else disable b
 
+
     let add_action b f =
-      b ## onclick <- Dom.handler (fun _ ->
-				   f ();
-				   Editor.(focus editor);
-				   Js._false)
+      let cb = fun _ ->
+	f ();
+	Editor.(focus editor);
+	Js._false
+      in
+      b ## onclick <- Dom.handler cb
+
 
     let disable_compile () =
+      ContextMenu.disable ();
+      ExampleList.disable ();
+      disable button_open;
       disable button_execute;
       disable button_compile
 
     let enable_compile () =
+      ContextMenu.enable ();
+      ExampleList.enable ();
+      enable button_open;
       enable button_execute;
       enable button_compile
 
@@ -506,7 +537,6 @@ module ToolBar =
       open_ ## onchange <-
 	Dom.handler
 	  (fun _e ->
-	   log "Here";
 	   match Js.Optdef.to_option (open_ ## files) with
 	     None -> Js._false
 	   | Some (f) -> match Js.Opt.to_option (f ## item (0)) with
@@ -520,6 +550,8 @@ module ToolBar =
 					  Lwt.return_unit));
 			    Js._true)
 
+    let open_ () = open_ ## click ()
+
   end
 
 module Panel =
@@ -531,7 +563,9 @@ module Panel =
       let edit_style = editor_container ## style in
       JSU.(set edit_style (Js.string "flexGrow") (Js.string "2"));
       JSU.(set edit_style (Js.string "flexBasis") (Js.string ""))
+
     let set_wide b =
+      reset ();
       main_panel ## classList ## remove (Js.string "why3-wide-view");
       main_panel ## classList ## remove (Js.string "why3-column-view");
       if b then
@@ -561,8 +595,6 @@ module Panel =
 			     Js._false
 		       end
 		     else Js._true)
-
-
   end
 module Dialogs =
   struct
@@ -577,9 +609,9 @@ module Dialogs =
 
     let all_dialogs = [ setting_dialog; about_dialog ]
     let show diag () =
-      log ("HERE");
       dialog_panel ## style ## display <- Js.string "flex";
-      diag ## style ## display <- Js.string "inline-block"
+      diag ## style ## display <- Js.string "inline-block";
+      ignore JSU.(meth_call diag "focus" [| |])
 
     let close () =
       List.iter (fun d -> d ## style ## display <- Js.string "none") all_dialogs;
@@ -587,8 +619,40 @@ module Dialogs =
 
     let set_onchange o f =
       o ## onchange <- Dom.handler (fun _ -> f o; Js._false)
+  end
+
+module KeyBinding =
+  struct
+
+    let callbacks = Array.init 255 (fun _ -> Array.make 16 None)
+    let bool_to_int b =
+      if Js.to_bool b then 1 else 0
+    let pack a b c d =
+      ((bool_to_int a) lsl 3) lor
+        ((bool_to_int b) lsl 2) lor
+          ((bool_to_int c) lsl 1) lor
+            (bool_to_int d)
+
+    let () =
+      Dom_html.document ## onkeydown <-
+        Dom.handler
+          (fun ev ->
+           let i = min (Array.length callbacks) (max 0 ev ## keyCode) in
+           let t = callbacks.(i) in
+           match t.(pack (ev ## ctrlKey) (ev ## shiftKey) (ev ## metaKey) (ev ## altKey)) with
+             None -> Js._true
+           | Some f ->
+              ignore JSU.(meth_call ev "preventDefault" [| |]);
+              f ();
+              Js._false)
+
+    let add_global ?(ctrl=Js._false) ?(shift=Js._false) ?(alt=Js._false) ?(meta=Js._false) keycode f =
+      let i = min (Array.length callbacks) (max 0 keycode) in
+      let t = callbacks.(i) in
+      t.(pack ctrl shift meta alt) <- Some f
 
   end
+
 module Controller =
   struct
     let task_queue  = Queue.create ()
@@ -606,6 +670,7 @@ module Controller =
     let alt_ergo_workers = ref (Array.make num_workers Absent)
     let why3_busy = ref false
     let why3_worker = ref None
+
     let get_why3_worker () =
       match !why3_worker with
 	Some w -> w
@@ -614,6 +679,10 @@ module Controller =
 
     let alt_ergo_not_running () =
       array_for_all !alt_ergo_workers (function Busy _ -> false | _ -> true)
+
+    let is_idle () =
+      alt_ergo_not_running () && Queue.is_empty task_queue && not (!why3_busy)
+
 
 
     let rec init_alt_ergo_worker i =
@@ -649,8 +718,7 @@ module Controller =
 	!alt_ergo_workers.(idx) <- Busy (w);
 	w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
 	w ## postMessage (marshal task)
-      | _ -> if Queue.is_empty task_queue && alt_ergo_not_running ()
-	     then ToolBar.enable_compile ()
+      | _ -> if is_idle () then ToolBar.enable_compile ()
 
     let reset_workers () =
       Array.iteri
@@ -681,7 +749,7 @@ module Controller =
 			match msg with
 			  Task (id,_,_,code,_, _, steps) ->
 			  push_task (Goal (id,code, steps))
-			| Result _ | Error _ | ErrorLoc _ -> ToolBar.enable_compile ()
+			| Idle -> why3_busy := false; if is_idle () then ToolBar.enable_compile ()
 			| _ -> ()
                       in Js._false));
       worker
@@ -690,6 +758,7 @@ module Controller =
 
     let why3_parse () =
       ToolBar.disable_compile ();
+      why3_busy := true;
       TaskList.clear ();
       TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Generating tasks … ";
       reset_workers ();
@@ -700,6 +769,7 @@ module Controller =
 
     let why3_execute () =
       ToolBar.disable_compile ();
+      why3_busy := true;
       TaskList.clear ();
       TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Compiling buffer … ";
       reset_workers ();
@@ -709,8 +779,10 @@ module Controller =
 
 
     let why3_transform tr f () =
-      if alt_ergo_not_running () then
+      if (*alt_ergo_not_running ()*) is_idle () then
 	begin
+          why3_busy := true;
+          ToolBar.disable_compile ();
 	  Hashtbl.iter
             (fun id _ ->
 	     f id;
@@ -720,13 +792,17 @@ module Controller =
 	end
 
     let why3_prove_all () =
-      if alt_ergo_not_running () then
-	(get_why3_worker()) ## postMessage (marshal ProveAll)
+      if is_idle () then begin
+          why3_busy := true;
+	  (get_why3_worker()) ## postMessage (marshal ProveAll)
+        end
 
     let stop () =
-      (get_why3_worker()) ## terminate ();
-      why3_worker := Some (init_why3_worker ());
-      reset_workers ();
+      if not (is_idle ()) then begin
+          (get_why3_worker()) ## terminate ();
+          why3_worker := Some (init_why3_worker ());
+          reset_workers ()
+        end;
       TaskList.clear ();
       ToolBar.enable_compile ()
 
@@ -734,8 +810,12 @@ end
 
 (* Initialisation *)
 let () =
-  ToolBar.(add_action button_open (fun _ ->  open_ ## click()));
+  ToolBar.(add_action button_open open_);
+  KeyBinding.add_global ~ctrl:Js._true 79 ToolBar.open_;
+
   ToolBar.(add_action button_save save);
+  KeyBinding.add_global ~ctrl:Js._true 83 ToolBar.save;
+
   ToolBar.(add_action button_execute Controller.why3_execute);
   ToolBar.(add_action button_compile Controller.why3_parse);
   ToolBar.(add_action button_stop Controller.stop);
@@ -767,7 +847,10 @@ let () =
 			  let steps = int_of_string (Js.to_string (o ## value)) in
 			  alt_ergo_steps := steps;
 			  reset_workers ()));
+
   ToolBar.add_action Dialogs.button_close Dialogs.close;
+  KeyBinding.add_global Keycode.esc  Dialogs.close;
+
   Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
   Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))
 

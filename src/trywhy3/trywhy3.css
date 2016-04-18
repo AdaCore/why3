@@ -114,10 +114,15 @@ body {
 #why3-resize-bar {
     flex-basis:3pt;
     flex-grow:0;
+
 }
 
 #why3-main-panel.why3-wide-view #why3-resize-bar:hover {
     cursor: ew-resize;
+    opacity:0.5;
+    border-style:solid;
+    border-width: 2pt;
+    box-sizing:border-box;
 }
 #why3-main-panel.why3-column-view #why3-resize-bar:hover {
     cursor: ns-resize;
