@@ -27,6 +27,7 @@ type why3_output = Error of string (* msg *)
                  (* id, parent id, expl, code, location list, pretty, steps*)
                  | Result of string list
                  | UpdateStatus of status * id
+                 | Warning of ((int*int) * string) list
                  | Idle
 
 type prover_command = OptionSteps of int | Goal of id * string * int

@@ -94,9 +94,20 @@ module Task =
     let get_parent_id id = (get_info id).parent_id
 
     let mk_loc (_, a,b,c) = (a,b,c)
+
+
+    let warnings = ref []
+    let clear_warnings () = warnings := []
+    let () =
+      Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 0)) msg ->
+                        let _, a,b,c = Loc.get loc in
+                        warnings := ((a-1,b), msg) :: !warnings)
+
+
     let premise_kind = function
       | { Term. t_node = Term.Tnot _; t_loc = None } -> "why3-loc-neg-premise"
-    | _ -> "why3-loc-premise"
+      | _ -> "why3-loc-premise"
+
     let collect_locs t =
       (* from why 3 ide *)
       let locs = ref [] in
@@ -382,6 +393,7 @@ let why3_run f lang code =
     close_out ch;
 
     let theories = Env.read_file lang env temp_file_name in
+    W.send (Warning !Task.warnings);
     f theories
   with
   | Loc.Located(loc,e') ->
@@ -406,9 +418,11 @@ let () =
        | Transform (`Clean, id) -> why3_clean id
        | ProveAll -> why3_prove_all ()
        | ParseBuffer code ->
+          Task.clear_warnings ();
           Task.clear_table ();
           why3_run why3_parse_theories Env.base_language code
        | ExecuteBuffer code ->
+          Task.clear_warnings ();
 	  Task.clear_table ();
 	  why3_run why3_execute Mlw_module.mlw_language code
        | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)

@@ -35,6 +35,7 @@ body {
   -ms-user-select: none;       /* IE/Edge */
   user-select: none;           /* non-prefixed version, currently
                                   not supported by any browser */
+  cursor:default;
 }
 
 #why3-top-button-bar {
@@ -148,6 +149,19 @@ body {
     right:0;
     padding:0;
     margin:0;
+}
+#why3-editor-bg {
+    display:none;
+    position:absolute;
+    opacity:0.75;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:100;
+}
+#why3-editor-bg:hover {
+    cursor:progress;
 }
 
 /*** TABS ***/

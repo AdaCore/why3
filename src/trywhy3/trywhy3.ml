@@ -121,7 +121,10 @@ module Editor =
 		) [ editor; task_viewer ];
       JSU.(meth_call task_viewer "setReadOnly" [| inject Js._true|])
 
-
+    let undo () =
+      ignore JSU.(meth_call editor "undo" [| |])
+    let redo () =
+      ignore JSU.(meth_call editor "redo" [| |])
     let get_value ?(editor=editor) () : Js.js_string Js.t =
       JSU.meth_call editor "getValue" [| |]
 
@@ -173,6 +176,20 @@ module Editor =
       let set_on_event e f =
 	ignore JSU.(meth_call editor "on" [| inject (Js.string e);
 					   inject f|])
+
+
+      let editor_bg = getElement AsHtml.div "why3-editor-bg"
+
+      let disable () =
+        ignore JSU.(meth_call editor "setReadOnly" [| inject Js._true|]);
+        editor_bg ## style ## display <- Js.string "block"
+
+
+      let enable () =
+        ignore JSU.(meth_call editor "setReadOnly" [| inject Js._false|]);
+        editor_bg ## style ## display <- Js.string "none"
+
+
   end
 
 module Tabs =
@@ -336,7 +353,14 @@ module TaskList =
       let doc = Dom_html.document in
       (* see why3_worker.ml *)
       match o with
-      | Idle -> ()
+      | Idle | Warning [] -> ()
+      | Warning lst ->
+         let annot =
+           List.map (fun ((l1, c1), msg) ->
+                     (l1,c1, Js.string msg, Js.string "warning")) lst
+         in
+         Editor.set_annotations annot
+
       | Error s -> print_error s
 
       | ErrorLoc ((l1, b, l2, e), s) ->
@@ -475,6 +499,10 @@ module ToolBar =
     let button_open = getElement AsHtml.button "why3-button-open"
     let real_save = getElement AsHtml.a "why3-save-as"
     let button_save = getElement AsHtml.button "why3-button-save"
+
+    let button_undo = getElement AsHtml.button "why3-button-undo"
+    let button_redo = getElement AsHtml.button "why3-button-redo"
+
     let button_execute = getElement AsHtml.button "why3-button-execute"
     let button_compile = getElement AsHtml.button "why3-button-compile"
     let button_stop = getElement AsHtml.button "why3-button-stop"
@@ -506,16 +534,22 @@ module ToolBar =
 
 
     let disable_compile () =
+      Editor.disable ();
       ContextMenu.disable ();
       ExampleList.disable ();
       disable button_open;
+      disable button_undo;
+      disable button_redo;
       disable button_execute;
       disable button_compile
 
     let enable_compile () =
+      Editor.enable ();
       ContextMenu.enable ();
       ExampleList.enable ();
       enable button_open;
+      enable button_undo;
+      enable button_redo;
       enable button_execute;
       enable button_compile
 
@@ -816,10 +850,21 @@ let () =
   ToolBar.(add_action button_save save);
   KeyBinding.add_global ~ctrl:Js._true 83 ToolBar.save;
 
+  ToolBar.(add_action button_undo Editor.undo);
+  KeyBinding.add_global ~ctrl:Js._true 90 Editor.undo;
+
+  ToolBar.(add_action button_redo Editor.redo);
+  KeyBinding.add_global ~ctrl:Js._true 89 Editor.redo;
+
+  
   ToolBar.(add_action button_execute Controller.why3_execute);
   ToolBar.(add_action button_compile Controller.why3_parse);
   ToolBar.(add_action button_stop Controller.stop);
   ToolBar.(add_action button_settings Dialogs.(show setting_dialog));
+  ToolBar.(add_action button_help (fun () ->
+                                   Dom_html.window ## open_ (Js.string "trywhy3_help.html",
+                                                             Js.string "_blank",
+                                                             Js.null)));
   ToolBar.(add_action button_about Dialogs.(show about_dialog));
   ContextMenu.(add_action split_menu_entry
 			  Controller.(why3_transform `Split ignore));

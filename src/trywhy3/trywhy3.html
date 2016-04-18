@@ -17,13 +17,28 @@
   <body>
     <div id="why3-main-container" class="why3-container">
       <div id="why3-top-button-bar" class="why3-widget why3-button-bar">
+
 	<div class="why3-separator" style="width:0.1em;"></div>
-	<div class="why3-button-group">
-	  <button id="why3-button-open"  class="why3-button" title="Open file">
+ 	<div class="why3-button-group">
+	  <button id="why3-button-open"  class="why3-button"
+                  title="Open file (ctrl-o)">
 	    <span class="fa-folder-open"></span>
 	  </button>
-	  <button id="why3-button-save"  class="why3-button" title="Save file">
+	  <button id="why3-button-save"  class="why3-button"
+                  title="Save file (ctrl-s)">
 	    <span class="fa-cloud-download"></span>
+	  </button>
+ 	</div>
+
+	<div class="why3-separator" style="width:2em;"></div>
+ 	<div class="why3-button-group">
+	  <button id="why3-button-undo"  class="why3-button"
+                  title="Undo edit (ctrl-z)">
+	    <span class="fa-undo"></span>
+	  </button>
+	  <button id="why3-button-redo"  class="why3-button"
+                  title="Repeat edit (ctrl-y)">
+	    <span class="fa-repeat"></span>
 	  </button>
  	</div>
 
@@ -69,6 +84,7 @@
 
       <div id="why3-main-panel" class="why3-wide-view">
 	<div id="why3-editor-container" class="why3-container">
+          <div id="why3-editor-bg" class="why3-widget"> </div>
 	  <div id="why3-editor" tabindex="-1" ></div>
 	</div>
 	<div id="why3-resize-bar" class="why3-widget" ></div>
@@ -147,7 +163,7 @@
 	    file <a href="https://scm.gforge.inria.fr/anonscm/gitweb?p=why3/why3.git;a=blob_plain;f=LICENSE">LICENSE</a>.
 	  </p>
 	  <p>TryWhy3 relies on the following excellent open source
-	    softwares and resources :
+	    softwares and resources:
 	  </p>
 	  <ul>
 	    <li>A Javascript version of
