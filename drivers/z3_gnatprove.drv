@@ -64,6 +64,20 @@ theory "_gnatprove_standard".Float64_next_prev
   syntax function max_value "(fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)"
 end
 
+theory ieee_float.GenericFloat
+   syntax function to_int "(ite (bvslt ((_ fp.to_sbv 64) RNE %1) #x8000000000000000) (bv2int ((_ fp.to_sbv 64) RNE %1)) (- 18446744073709551616 (bv2int ((_ fp.to_sbv 64) RNE %1))))"
+end
+
+theory ieee_float.Float64
+  syntax function of_int "((_ to_fp 11 53) RNE (ite (< %1 0) ((_ int2bv 64) (+ 18446744073709551616 %1)) ((_ int2bv 64) %1)))"
+  (* syntax function of_int "((_ to_fp 11 53) RNE (ite (< %1 0) (bvadd (bvnot ((_ int2bv 64) (- %1))) (_ bv1 64)) ((_ int2bv 64) %1)))" *)
+end
+
+theory ieee_float.Float32
+  syntax function of_int "((_ to_fp 8 24) RNE (ite (< %1 0) ((_ int2bv 64) (+ 18446744073709551616 %1)) ((_ int2bv 64) %1)))"
+  (* syntax function of_int "((_ to_fp 8 24) RNE (ite (< %1 0) (bvadd (bvnot ((_ int2bv 64) (- %1))) (_ bv1 64)) ((_ int2bv 64) %1)))" *)
+end
+
 (* bitvector theories are not in smt-libv2.drv since cvc4 and z3 don't
    have the same name for the function to_uint *)
 theory bv.BV_Gen

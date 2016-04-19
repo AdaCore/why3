@@ -44,6 +44,7 @@ theory ieee_float.GenericFloat
    (* Part II *)
 
 (*   syntax function to_int   "(to_int (fp.to_real %1))" *)
+   (* syntax function to_int "(ite (bvslt ((_ fp.to_sbv 64) RNE %1) #x8000000000000000) (bv2int ((_ fp.to_sbv 64) RNE %1)) (- 18446744073709551616 (bv2int ((_ fp.to_sbv 64) RNE %1))))" *)
 
    remove allprops
 end
@@ -60,7 +61,8 @@ theory ieee_float.Float32
   syntax function half      "((_ to_fp 8 24) #x3F000000)"
 
   (* Part II *)
-  syntax function of_int   "((_ to_fp 8 24) RNE (to_real %1))"
+  (* syntax function of_int   "((_ to_fp 8 24) RNE (to_real %1))" *)
+  (* syntax function of_int "((_ to_fp 8 24) RNE (ite (< %1 0) ((_ int2bv 64) (+ #x8000000000000000 (- %1))) ((_ int2bv 64) %1)))" *)
 
   remove allprops
 end
@@ -77,7 +79,8 @@ theory ieee_float.Float64
   syntax function half      "((_ to_fp 11 53) #x3FE0000000000000)"
 
   (* Part II *)
-  syntax function of_int   "((_ to_fp 11 53) RNE (to_real %1))"
+  (* syntax function of_int   "((_ to_fp 11 53) RNE (to_real %1))" *)
+  (* syntax function of_int "((_ to_fp 11 53) RNE (ite (< %1 0)  ((_ int2bv 64) (+ #x8000000000000000 (- %1))) ((_ int2bv 64) %1)))" *)
 
   remove allprops
 end
