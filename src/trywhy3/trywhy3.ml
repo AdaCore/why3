@@ -13,9 +13,91 @@
 open Worker_proto
 
 module JSU = Js.Unsafe
-module XHR = XmlHttpRequest
-
 let get_opt o = Js.Opt.get o (fun () -> assert false)
+
+let check_def s o =
+  Js.Optdef.get o (fun () -> log ("Object " ^ s ^ " is undefined or null");
+			     assert false)
+let get_global ident =
+  let res : 'a Js.optdef = JSU.(get global) (Js.string ident) in
+  check_def ident res
+
+
+module XHR =
+  struct
+    include XmlHttpRequest
+
+
+    let update_file ?(date=0.) cb url =
+      let xhr = create () in
+      xhr ## onreadystatechange <-
+        Js.wrap_callback
+          (fun () ->
+           if xhr ## readyState == DONE then
+	     if xhr ## status = 200 then
+               let date_str = Js.Opt.get (xhr ## getResponseHeader (Js.string "Last-Modified"))
+                                         (fun () -> Js.string "01/01/2100") (* far into the future *)
+               in
+               log (Printf.sprintf "File %s has date %s" (Js.to_string url) (Js.to_string date_str));
+               let document_date = Js.date ## parse (date_str) in
+               if document_date < date then
+                 cb `UpToDate
+               else
+                 let () = xhr ## onreadystatechange <-
+                            Js.wrap_callback
+                              (fun () ->
+                               if xhr ## readyState == DONE then
+	                         if xhr ## status = 200 then
+                                   cb (`New xhr ## responseText)
+                                 else
+                                   cb `NotFound)
+                 in
+                 let () = xhr ## _open (Js.string "GET", url, Js._true) in
+                 xhr ## send (Js.null)
+             else
+               cb `NotFound
+          );
+      xhr ## _open (Js.string "HEAD", url, Js._true);
+      xhr ## send (Js.null)
+
+  end
+
+module Session =
+  struct
+    let localStorage : Dom_html.storage Js.t =
+      get_global "localStorage"
+
+    let library_kind = Js.string "library"
+    let file_kind = Js.string "file"
+
+    let key_remote url = library_kind ## concat (Js.string ":") ## concat (url)
+    let key_file url =  file_kind ## concat (Js.string ":") ## concat (url)
+    type info = < url : Js.js_string Js.t Js.prop;
+                date_orig : float Js.prop;
+                content_orig : Js.js_string Js.t Js.prop;
+                date_last : float Js.prop;
+                content_last : Js.js_string Js.t Js.prop;
+                kind : Js.js_string Js.t Js.prop;
+                > Js.t
+    let mk_info url kind date content : info =
+      JSU.(obj [|  "url", inject url;
+                   "date_orig", inject date;
+                   "content_orig", inject content;
+                   "date_last", inject date;
+                   "content_last", inject content;
+                   "kind", inject kind |])
+
+    let save_info key (info : info) =
+      localStorage ## setItem (key, Js._JSON ## stringify (info))
+
+    let load_info key : info option =
+      Js.Opt.case (localStorage ## getItem (key))
+                  (fun () -> None)
+                  (fun s -> Some (Js._JSON ## parse(s)))
+
+
+  end
+
 
 module AsHtml =
   struct
@@ -55,13 +137,6 @@ let addMouseEventListener prevent o e f =
 
 
 
-let check_def s o =
-  Js.Optdef.get o (fun () -> log ("Object " ^ s ^ " is undefined or null");
-			     assert false)
-let get_global ident =
-  let res : 'a Js.optdef = JSU.(get global) (Js.string ident) in
-  check_def ident res
-
 
 module Editor =
   struct
@@ -91,6 +166,7 @@ module Editor =
 
     let get_session ed =
       JSU.(meth_call ed "getSession" [| |])
+
 
     let mk_annotation row col text kind =
       JSU.(obj [| "row", inject row; "column", inject col;
@@ -343,16 +419,12 @@ module TaskList =
 				     Editor.clear_annotations ();
                                      match !error_marker with
                                        None -> ()
-                                     | Some (m, _) -> Editor.remove_marker m))
+                                     | Some (m, _) -> Editor.remove_marker m;error_marker := None))
 
     let () =
       Editor.set_on_event
         "focus"
-        (Js.wrap_callback (fun () ->
-                           clear_task_selection ();
-                           match !error_marker with
-                             None -> ()
-                           | Some (_, r) -> Editor.set_selection_range r))
+        (Js.wrap_callback  clear_task_selection )
 
 
     let print_why3_output o =
@@ -468,22 +540,14 @@ module ExampleList =
 		       match Js.Opt.to_option (sessionStorage ## getItem (url)) with
 			 Some s -> Editor.set_value s; Editor.name := name
 		       | None ->
-			  let xhr = XHR.create () in
-			  xhr ## onreadystatechange <-
-			    Js.wrap_callback
-			      (fun () ->
-			       if xhr ## status = 200 &&
-				    xhr ## readyState == XHR.DONE
-			       then
-				 let mlw = xhr ## responseText in
-				 sessionStorage ## setItem (url, mlw);
-				 Editor.name := name;
-				 Editor.set_value mlw;
-				 set_loading_label false
-			      );
-			  xhr ## _open (Js.string "GET", url, Js._true);
-			  xhr ## send (Js.null);
-			  set_loading_label true
+                          XHR.update_file
+                            (function `New mlw ->
+				      sessionStorage ## setItem (url, mlw);
+				      Editor.name := name;
+				      Editor.set_value mlw;
+				      set_loading_label false
+                                    | _ -> ()
+			    ) url
 		     end;
 		     Js._false
 		    )
@@ -862,14 +926,17 @@ module Controller =
 	  (get_why3_worker()) ## postMessage (marshal ProveAll)
         end
 
-    let stop () =
-      if not (is_idle ()) then begin
-          (get_why3_worker()) ## terminate ();
-          why3_worker := Some (init_why3_worker ());
-          reset_workers ();
-	  TaskList.clear ();
-        end;
+    let force_stop () =
+      log ("Called force_stop");
+      (get_why3_worker()) ## terminate ();
+      why3_worker := Some (init_why3_worker ());
+      reset_workers ();
+      TaskList.clear ();
       ToolBar.enable_compile ()
+
+    let stop () =
+      if not (is_idle ()) then force_stop ();
+
 
 end
 
@@ -911,18 +978,15 @@ let () =
 			 (fun o ->
 			  let open Controller in
 			  let len = int_of_string (Js.to_string (o ## value)) in
-			  reset_workers ();
-			  Array.iter
-			    (function Busy (w) | Free (w) -> w ## terminate () | _ -> ())
-			    !alt_ergo_workers;
+                          force_stop ();
 			  alt_ergo_workers := Array.make len Absent));
 
   Dialogs.(set_onchange input_num_steps
 			 (fun o ->
-			  let open Controller in
 			  let steps = int_of_string (Js.to_string (o ## value)) in
-			  alt_ergo_steps := steps;
-			  reset_workers ()));
+                          Controller.alt_ergo_steps := steps;
+			  Controller.force_stop ()
+	                 ));
 
   ToolBar.add_action Dialogs.button_close Dialogs.close;
   KeyBinding.add_global Keycode.esc  Dialogs.close;
@@ -930,30 +994,25 @@ let () =
   Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
   Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))
 
+
 let () =
-  let xhr = XHR.create () in
-  xhr ## onreadystatechange <-
-    Js.wrap_callback
-      (fun () ->
-       if xhr ## readyState == XHR.DONE && xhr ## status = 200 then
-	 if xhr ## status = 200 then
-	   let examples = xhr ## responseText ## split (Js.string "\n") in
-	   let examples = Js.to_array (Js.str_array examples) in
-	   for i = 0 to ((Array.length examples) / 2) - 1 do
-	     ExampleList.add_example
-	       examples.(2*i)
-	       ((Js.string "examples/") ## concat (examples.(2*i+1)))
-	   done;
-	   ExampleList.set_loading_label false
-	 else
-	   ExampleList.set_loading_label false
-      );
-  xhr ## _open (Js.string "GET", Js.string "examples/index.txt", Js._true);
-  xhr ## send (Js.null);
+  XHR.update_file (function `New content ->
+	                    let examples = content ## split (Js.string "\n") in
+	                    let examples = Js.to_array (Js.str_array examples) in
+	                    for i = 0 to ((Array.length examples) / 2) - 1 do
+	                      ExampleList.add_example
+	                        examples.(2*i)
+	                        ((Js.string "examples/") ## concat (examples.(2*i+1)))
+	                    done;
+	                    ExampleList.set_loading_label false
+                          | _ ->
+	                     ExampleList.set_loading_label false
+                  ) (Js.string "examples/index.txt");
   ExampleList.set_loading_label true
 
 
-
+let () =
+  Dom_html.window ## onunload <- Dom.handler (fun _ -> Js._false)
 
 (*
 Local Variables:
