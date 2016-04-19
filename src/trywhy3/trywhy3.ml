@@ -22,6 +22,7 @@ let get_global ident =
   let res : 'a Js.optdef = JSU.(get global) (Js.string ident) in
   check_def ident res
 
+let int_of_js_string s = int_of_string (Js.to_string s)
 
 module XHR =
   struct
@@ -61,43 +62,6 @@ module XHR =
       xhr ## send (Js.null)
 
   end
-
-module Session =
-  struct
-    let localStorage : Dom_html.storage Js.t =
-      get_global "localStorage"
-
-    let library_kind = Js.string "library"
-    let file_kind = Js.string "file"
-
-    let key_remote url = library_kind ## concat (Js.string ":") ## concat (url)
-    let key_file url =  file_kind ## concat (Js.string ":") ## concat (url)
-    type info = < url : Js.js_string Js.t Js.prop;
-                date_orig : float Js.prop;
-                content_orig : Js.js_string Js.t Js.prop;
-                date_last : float Js.prop;
-                content_last : Js.js_string Js.t Js.prop;
-                kind : Js.js_string Js.t Js.prop;
-                > Js.t
-    let mk_info url kind date content : info =
-      JSU.(obj [|  "url", inject url;
-                   "date_orig", inject date;
-                   "content_orig", inject content;
-                   "date_last", inject date;
-                   "content_last", inject content;
-                   "kind", inject kind |])
-
-    let save_info key (info : info) =
-      localStorage ## setItem (key, Js._JSON ## stringify (info))
-
-    let load_info key : info option =
-      Js.Opt.case (localStorage ## getItem (key))
-                  (fun () -> None)
-                  (fun s -> Some (Js._JSON ## parse(s)))
-
-
-  end
-
 
 module AsHtml =
   struct
@@ -143,6 +107,7 @@ module Editor =
     type range
     type marker
     let name = ref (Js.string "")
+    let saved = ref false
     let ace = get_global "ace"
 
     let _Range : (int -> int -> int -> int -> range Js.t) Js.constr =
@@ -271,6 +236,13 @@ module Editor =
         editor_bg ## style ## display <- Js.string "none"
 
 
+      let confirm_unsaved () =
+        if not !saved then
+          Js.to_bool
+            (Dom_html.window ## confirm (Js.string "You have unsaved changes in your editor, proceed anyway ?"))
+        else
+          true
+
   end
 
 module Tabs =
@@ -329,6 +301,68 @@ module ContextMenu =
 	(fun _ -> hide())
 
 
+  end
+module ExampleList =
+  struct
+
+    let select_example = getElement AsHtml.select "why3-select-example"
+    let example_label = getElement AsHtml.span "why3-example-label"
+    let set_loading_label b =
+      select_example ## disabled <- (Js.bool b);
+      if b then
+	example_label ## className <- Js.string "fa fa-spin fa-refresh why3-icon"
+      else
+	example_label ## className <- Js.string "fa-book why3-icon"
+
+    let selected_index = ref 0
+    let unselect () =
+      selected_index := 0;
+      select_example ## selectedIndex <- 0
+
+    let () =
+      let sessionStorage : Dom_html.storage Js.t =
+	get_global "sessionStorage"
+      in
+      let filename url =
+	let arr = url ## split (Js.string "/") in
+	let arr = Js.to_array (Js.str_array arr) in
+	arr.(Array.length arr - 1)
+      in
+      select_example ## onchange <-
+	Dom.handler (fun _ ->
+                     if Editor.confirm_unsaved () then begin
+                         selected_index := select_example ## selectedIndex;
+		         let url = select_example ## value in
+		         let name = filename url in
+		         begin
+		           match Js.Opt.to_option (sessionStorage ## getItem (url)) with
+			     Some s -> Editor.set_value s; Editor.name := name
+		           | None ->
+                              XHR.update_file
+                                (function `New mlw ->
+				          sessionStorage ## setItem (url, mlw);
+				          Editor.name := name;
+				          Editor.set_value mlw;
+				          set_loading_label false
+                                        | _ -> ()
+			        ) url
+                         end
+                       end
+                     else
+                       select_example ## selectedIndex <- !selected_index;
+		     Js._false
+		    )
+    let add_example text url =
+      let option = Dom_html.createOption Dom_html.document in
+      option ## value <- url;
+      option ## innerHTML <- text;
+      appendChild select_example option
+
+    let enable () =
+      select_example ## disabled <- Js._false
+
+    let disable () =
+      select_example ## disabled <- Js._true
   end
 
 module TaskList =
@@ -416,10 +450,12 @@ module TaskList =
       Editor.set_on_event
         "change"
         (Js.wrap_callback (fun () -> clear ();
-				     Editor.clear_annotations ();
-                                     match !error_marker with
-                                       None -> ()
-                                     | Some (m, _) -> Editor.remove_marker m;error_marker := None))
+                                  Editor.saved := false;
+                                  ExampleList.unselect ();
+				  Editor.clear_annotations ();
+                                  match !error_marker with
+                                    None -> ()
+                                  | Some (m, _) -> Editor.remove_marker m;error_marker := None))
 
     let () =
       Editor.set_on_event
@@ -511,58 +547,6 @@ module TaskList =
 
   end
 
-module ExampleList =
-  struct
-
-    let select_example = getElement AsHtml.select "why3-select-example"
-    let example_label = getElement AsHtml.span "why3-example-label"
-    let set_loading_label b =
-      select_example ## disabled <- (Js.bool b);
-      if b then
-	example_label ## className <- Js.string "fa fa-spin fa-refresh why3-icon"
-      else
-	example_label ## className <- Js.string "fa-book why3-icon"
-
-    let () =
-      let sessionStorage : Dom_html.storage Js.t =
-	get_global "sessionStorage"
-      in
-      let filename url =
-	let arr = url ## split (Js.string "/") in
-	let arr = Js.to_array (Js.str_array arr) in
-	arr.(Array.length arr - 1)
-      in
-      select_example ## onchange <-
-	Dom.handler (fun _ ->
-		     let url = select_example ## value in
-		     let name = filename url in
-		     begin
-		       match Js.Opt.to_option (sessionStorage ## getItem (url)) with
-			 Some s -> Editor.set_value s; Editor.name := name
-		       | None ->
-                          XHR.update_file
-                            (function `New mlw ->
-				      sessionStorage ## setItem (url, mlw);
-				      Editor.name := name;
-				      Editor.set_value mlw;
-				      set_loading_label false
-                                    | _ -> ()
-			    ) url
-		     end;
-		     Js._false
-		    )
-    let add_example text url =
-      let option = Dom_html.createOption Dom_html.document in
-      option ## value <- url;
-      option ## innerHTML <- text;
-      appendChild select_example option
-
-    let enable () =
-      select_example ## disabled <- Js._false
-
-    let disable () =
-      select_example ## disabled <- Js._true
-  end
 
 module ToolBar =
   struct
@@ -664,20 +648,21 @@ module ToolBar =
       open_ ## onchange <-
 	Dom.handler
 	  (fun _e ->
+           ExampleList.unselect ();
 	   match Js.Optdef.to_option (open_ ## files) with
 	     None -> Js._false
 	   | Some (f) -> match Js.Opt.to_option (f ## item (0)) with
-			   None -> Js._false
-			 | Some f ->
-			    ignore (
-				Lwt.bind (File.readAsText f)
-					 (fun str ->
-					  Editor.name := File.filename f;
-					  Editor.set_value str;
-					  Lwt.return_unit));
-			    Js._true)
-
-    let open_ () = open_ ## click ()
+			  None -> Js._false
+			| Some f ->
+			   ignore (
+			       Lwt.bind (File.readAsText f)
+					(fun str ->
+					 Editor.name := File.filename f;
+					 Editor.set_value str;
+					 Lwt.return_unit));
+			       Js._true
+          )
+    let open_ () = if Editor.confirm_unsaved () then open_ ## click ()
 
   end
 
@@ -782,6 +767,54 @@ module KeyBinding =
 
   end
 
+
+module Session =
+  struct
+
+    let localStorage : Dom_html.storage Js.t =
+      get_global "localStorage"
+
+    let save_num_threads i =
+      localStorage ## setItem (Js.string "why3-num-threads", Js.string (string_of_int i))
+
+    let save_num_steps i =
+      localStorage ## setItem (Js.string "why3-num-steps", Js.string (string_of_int i))
+
+
+    let save_view_mode m =
+      localStorage ## setItem (Js.string "why3-view-mode", m)
+
+    let save_buffer name content =
+      localStorage ## setItem (Js.string "why3-buffer-name", name);
+      localStorage ## setItem (Js.string "why3-buffer-content", content)
+
+    let load_num_threads () =
+      int_of_js_string (Js.Opt.get (localStorage ## getItem (Js.string "why3-num-threads"))
+                                (fun () -> Js.string "4"))
+
+    let load_num_steps () =
+      int_of_js_string (Js.Opt.get (localStorage ## getItem (Js.string "why3-num-steps"))
+                                (fun () -> Js.string "100"))
+
+    let load_view_mode () =
+      Js.Opt.get (localStorage ## getItem (Js.string "why3-view-mode"))
+                 (fun () -> Js.string "wide")
+
+    let load_buffer () =
+      let name = Js.Opt.get  (localStorage ## getItem (Js.string "why3-buffer-name"))
+                             (fun () -> Js.string "")
+      in
+      let buffer = Js.Opt.get  (localStorage ## getItem (Js.string "why3-buffer-content"))
+                               (fun () -> Js.string "")
+      in
+      (name, buffer)
+
+
+
+
+  end
+
+
 module Controller =
   struct
     let task_queue  = Queue.create ()
@@ -794,8 +827,8 @@ module Controller =
 
     let first_task = ref true
     type 'a status = Free of 'a | Busy of 'a | Absent
-    let num_workers = 4
-    let alt_ergo_steps = ref 100
+    let num_workers = Session.load_num_threads ()
+    let alt_ergo_steps = ref (Session.load_num_steps ())
     let alt_ergo_workers = ref (Array.make num_workers Absent)
     let why3_busy = ref false
     let why3_worker = ref None
@@ -977,13 +1010,13 @@ let () =
   Dialogs.(set_onchange input_num_threads
 			 (fun o ->
 			  let open Controller in
-			  let len = int_of_string (Js.to_string (o ## value)) in
+			  let len = int_of_js_string (o ## value) in
                           force_stop ();
 			  alt_ergo_workers := Array.make len Absent));
 
   Dialogs.(set_onchange input_num_steps
 			 (fun o ->
-			  let steps = int_of_string (Js.to_string (o ## value)) in
+			  let steps = int_of_js_string (o ## value) in
                           Controller.alt_ergo_steps := steps;
 			  Controller.force_stop ()
 	                 ));
@@ -1012,7 +1045,23 @@ let () =
 
 
 let () =
-  Dom_html.window ## onunload <- Dom.handler (fun _ -> Js._false)
+  Dom_html.window ## onunload <- Dom.handler (fun _ -> Js._false);
+  (* restore the session *)
+  let name, buffer = Session.load_buffer () in
+  Editor.name := name;
+  Editor.set_value buffer;
+  Panel.set_wide (Session.load_view_mode () = (Js.string "wide"));
+  ExampleList.unselect();
+  Dom_html.window ## onbeforeunload <-
+    Dom.handler (Obj.magic (fun _ ->
+                   Session.save_buffer !Editor.name (Editor.get_value ());
+                   Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
+                   Session.save_num_steps !Controller.alt_ergo_steps;
+                   Session.save_view_mode (if Panel.is_wide () then Js.string "wide"
+                                           else Js.string "column");
+                   
+                   (Js.string "Do you wish to quit TryWhy3 (your current session will be saved to your browser local storage) ?"))
+                )
 
 (*
 Local Variables:
