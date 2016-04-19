@@ -23,7 +23,9 @@ module AsHtml =
     let span e = element e
   end
 
-(* Each group of UI element is encpasulated in a module *)
+
+let select e cls =
+  Dom.list_of_nodeList (e ## querySelectorAll (Js.string cls))
 
 let getElement_exn cast id =
   Js.Opt.get (cast (Dom_html.getElementById id)) (fun () -> raise Not_found)
@@ -46,10 +48,10 @@ let addMouseEventListener prevent o e f =
 	      f e;
 	      Js._false)
   in
-  ignore (JSU.(meth_call o "addEventListener"
-			 [| inject (Js.string e);
-			    inject cb;
-			    inject Js._false |]))
+  ignore JSU.(meth_call o "addEventListener"
+			[| inject (Js.string e);
+			   inject cb;
+			   inject Js._false |])
 
 
 
@@ -103,6 +105,7 @@ module Editor =
 
     let clear_annotations () =
       ignore (JSU.(meth_call (get_session editor) "clearAnnotations" [| |]))
+
     let _Infinity = get_global "Infinity"
 
     let scroll_to_end e =
@@ -123,8 +126,10 @@ module Editor =
 
     let undo () =
       ignore JSU.(meth_call editor "undo" [| |])
+
     let redo () =
       ignore JSU.(meth_call editor "redo" [| |])
+
     let get_value ?(editor=editor) () : Js.js_string Js.t =
       JSU.meth_call editor "getValue" [| |]
 
@@ -194,23 +199,25 @@ module Editor =
 
 module Tabs =
   struct
+
     let () =
-      let labels =
-	Dom.list_of_nodeList (
-	    Dom_html.document ## getElementsByClassName (Js.string "why3-tab-label")
-	  )
-      in
+      let tab_groups = select Dom_html.document ".why3-tab-group" in
       List.iter
-	(fun t ->
-	 t ## onclick <-
-	   Dom.handler
-	     (fun _ ->
-	      List.iter
-		(fun l -> ignore (l ## classList ## toggle (Js.string "why3-inactive")))
-		labels;
-	      Js._false)
-	)
-	labels
+	(fun tab_group ->
+	 let labels = select tab_group ".why3-tab-label" in
+	 List.iter (
+	     (fun tab ->
+	      tab ## onclick <-
+		Dom.handler
+		  (fun _ev ->
+		   List.iter
+		     (fun t ->
+		      ignore (t ## classList ## toggle (Js.string "why3-inactive")))
+		     labels;
+		   Js._false))
+	       ) labels)
+	tab_groups
+
   end
 
 module ContextMenu =
@@ -235,15 +242,14 @@ module ContextMenu =
     let hide () =
       if !enabled then
         task_menu ## style ## display <- Js.string "none"
+
     let add_action b f =
       b ## onclick <- Dom.handler (fun _ ->
 				   hide ();
 				   f ();
 				   Editor.(focus editor);
 				   Js._false)
-    let () =
-      addMouseEventListener
-	false task_menu "mouseleave"
+    let () = addMouseEventListener false task_menu "mouseleave"
 	(fun _ -> hide())
 
 
@@ -577,7 +583,7 @@ module ToolBar =
       JSU.(set real_save (Js.string "download") name);
       ignore JSU.(meth_call real_save "click" [| |])
     (* does not work with firefox *)
-    (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *) 
+    (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *)
 
 
     let save =
@@ -632,6 +638,7 @@ module Panel =
 
     let is_wide () =
       Js.to_bool (main_panel ## classList ## contains (Js.string "why3-wide-view"))
+
     let () =
       let mouse_down = ref false in
       resize_bar ## onmousedown <- Dom.handler (fun _ -> mouse_down := true; Js._false);
@@ -653,6 +660,7 @@ module Panel =
 		       end
 		     else Js._true)
   end
+
 module Dialogs =
   struct
     let dialog_panel = getElement AsHtml.div "why3-dialog-panel"
@@ -836,7 +844,7 @@ module Controller =
 
 
     let why3_transform tr f () =
-      if (*alt_ergo_not_running ()*) is_idle () then
+      if is_idle () then
 	begin
           why3_busy := true;
           ToolBar.disable_compile ();
@@ -858,9 +866,9 @@ module Controller =
       if not (is_idle ()) then begin
           (get_why3_worker()) ## terminate ();
           why3_worker := Some (init_why3_worker ());
-          reset_workers ()
+          reset_workers ();
+	  TaskList.clear ();
         end;
-      TaskList.clear ();
       ToolBar.enable_compile ()
 
 end
@@ -927,12 +935,14 @@ let () =
   xhr ## onreadystatechange <-
     Js.wrap_callback
       (fun () ->
-       if xhr ## readyState == XHR.DONE then
+       if xhr ## readyState == XHR.DONE && xhr ## status = 200 then
 	 if xhr ## status = 200 then
 	   let examples = xhr ## responseText ## split (Js.string "\n") in
 	   let examples = Js.to_array (Js.str_array examples) in
 	   for i = 0 to ((Array.length examples) / 2) - 1 do
-	     ExampleList.add_example examples.(2*i) ((Js.string "examples/") ## concat (examples.(2*i+1)))
+	     ExampleList.add_example
+	       examples.(2*i)
+	       ((Js.string "examples/") ## concat (examples.(2*i+1)))
 	   done;
 	   ExampleList.set_loading_label false
 	 else
@@ -941,6 +951,9 @@ let () =
   xhr ## _open (Js.string "GET", Js.string "examples/index.txt", Js._true);
   xhr ## send (Js.null);
   ExampleList.set_loading_label true
+
+
+
 
 (*
 Local Variables:
