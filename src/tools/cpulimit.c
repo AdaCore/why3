@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -82,15 +82,17 @@ int main(int argc, char *argv[]) {
     if (pid > 0) {
       int status;
       pid_t p;
-      struct sigaction sa;
 
-      /* set a wallclock time limit as last resort */
-      sa.sa_handler = &wallclock_timelimit_reached;
-      sigemptyset(&sa.sa_mask);
-      sa.sa_flags = 0;
-      sigaction(SIGALRM, &sa, NULL);
-      wallclock_timelimit = 2*timelimit + 60;
-      alarm(wallclock_timelimit);
+      if (timelimit) {
+        /* set a wallclock time limit as last resort */
+        struct sigaction sa;
+        sa.sa_handler = &wallclock_timelimit_reached;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = 0;
+        sigaction(SIGALRM, &sa, NULL);
+        wallclock_timelimit = 2*timelimit + 60;
+        alarm(wallclock_timelimit);
+      }
 
       /* wait for the subprocess */
       p = waitpid(pid, &status, 0);

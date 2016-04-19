@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -63,9 +63,6 @@ let pad_right c s i =
   else if sl > i
   then String.sub s 0 i
   else s
-
-let slice s start end_ =
-  String.sub s start (end_ - start)
 
 let has_prefix pref s =
   let l = String.length pref in

@@ -864,8 +864,8 @@ Section~\ref{chap:starting}, respectively with style 1 and 2.
 \subsection{Command \texttt{html}}
 
 This command produces a summary of the proof session in HTML syntax.
-There are three styles of output: `table', `simpletree', and
-`jstree'. The default is `table'.
+There are two styles of output: `table' and `simpletree'. The default is
+`table'.
 
 The file generated is named \texttt{why3session.html} and is written
 in the session directory by default (see option \texttt{-o} to
@@ -908,16 +908,10 @@ The style `simpletree' displays the contents of the session under the
 form of tree, similar to the tree view in the IDE. It uses only basic
 HTML tags such as \verb|<ul>| and \verb|<li>|.
 
-The style `jstree' displays a dynamic tree view of the session, where
-you can click on various parts to expand or shrink some parts of the
-tree. Clicking on an edited proof script also shows the contents of
-this script. Technically, it uses the `jstree' plugin of the javascript
-library `jquery'.
-
 Specific options for this command are as follows.
 \begin{description}
 \item[\texttt{-{}-style \textsl{<style>}}] sets the style to use, among
-  \texttt{simpletree}, \texttt{jstree}, and \texttt{table}; defaults to
+  \texttt{simpletree} and \texttt{table}; defaults to
   \texttt{table}.
 
 \item[\texttt{-o \textsl{<dir>}}] sets the directory where to output

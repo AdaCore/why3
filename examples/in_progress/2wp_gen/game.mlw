@@ -1,6 +1,6 @@
 
 (* Asymetric angel vs demon perfect information games on
-   chain-complete orders.
+   quasi-chain-complete orders.
    Angel and demon reflect respectively existential and universal
    behavior.
    Definition mostly intended for angel possibility results,
@@ -38,11 +38,11 @@ module Game
      the set of states he has to choose in. *)
   type demon 'a = set 'a -> 'a
 
-  (* Game well-formed: as stated above, order is chain-complete
+  (* Game well-formed: as stated above, order is quasi chain-complete
      and transition respect progression (loosely: there may be
      loops) *)
   predicate game_wf (g:game 'a) =
-    order g.progress /\ chain_complete g.progress /\
+    order g.progress /\ q_chain_complete g.progress /\
     forall x s y. g.transition x s /\ s y -> g.progress x y
 
   (* Describe a step in the game, as the next element in function
@@ -199,6 +199,7 @@ module DmnReachProofs
   use import DmnReachCommon
   use import fn.Fun
   use import ho_set.Set
+  use import ho_set.SetBigOps
   use import order.Chain
   use import order.WfChain
   use import order.LimUniq
@@ -263,11 +264,11 @@ module DmnReachProofs
           same_choices g ang ch0 dmn1 dmn2)
         by order sb
         so dmn_witness g ang b ((=) b) dmn2 /\
-          (same_choices g ang ((=) b) dmn1 dmn2
-          by forall ch0 x. sb ch0 ((=) b) /\ maximum o ch0 x /\
-            ch0 <> ((=) b) -> false
-            by if ch0 b then sext ch0 ((=) b) else sext ch0 none)
-        /\ (forall ch0. dmn_witness g ang b ch0 dmn1 /\
+          ("stop_split" same_choices g ang ((=) b) dmn1 dmn2
+            by forall ch0 x. sb ch0 ((=) b) /\ maximum o ch0 x /\
+              ch0 <> ((=) b) -> false
+              by if ch0 b then sext ch0 ((=) b) else sext ch0 none)
+        /\ ("stop_split" forall ch0. dmn_witness g ang b ch0 dmn1 /\
           dmn_witness g ang b ch0 dmn2 /\
           same_choices g ang ch0 dmn1 dmn2 /\ sb (xt1 ch0) ch ->
           (dmn_witness g ang b (xt1 ch0) dmn2 /\
@@ -275,7 +276,8 @@ module DmnReachProofs
           by ("case_split" if xt1 ch0 = ch0 then true else
             let x = sup o ch0 in
             if not ch0 x
-            then (sext (xt1 ch0) (xt2 ch0) by st1 ch0 = st2 ch0)
+            then "stop_split"
+              (sext (xt1 ch0) (xt2 ch0) by st1 ch0 = st2 ch0)
               /\ forall ch1 x1. sb ch1 (xt1 ch0) /\
                  maximum o ch1 x1 /\ ch1 <> (xt1 ch0) ->
                dmn1 (ang x1 ch1) = dmn2 (ang x1 ch1)
@@ -284,9 +286,11 @@ module DmnReachProofs
                  by dmn_witness g ang b (xt1 ch0) dmn1
                  so dmn_witness g ang b ch1 dmn1
                  so separator sb xt1 ch0 ch1)
-            else let a = ang x ch0 in
+            else
+            let a = ang x ch0 in
             if dmn1 a = dmn2 a
-            then (sext (xt1 ch0) (xt2 ch0) by st1 ch0 = st2 ch0)
+            then "stop_split"
+              (sext (xt1 ch0) (xt2 ch0) by st1 ch0 = st2 ch0)
               so forall ch1 x1. sb ch1 (xt1 ch0) /\
                  maximum o ch1 x1 /\ ch1 <> xt1 ch0 ->
                 dmn1 (ang x1 ch1) = dmn2 (ang x1 ch1)
@@ -296,7 +300,8 @@ module DmnReachProofs
                   by dmn_witness g ang b (xt1 ch0) dmn1
                   so dmn_witness g ang b ch1 dmn1
                 else x1 = x
-            else false
+            else "stop_split"
+              false
               by (not same_choices g ang ch dmn1 dmn2
                 by sb ch0 ch /\ ch0 <> ch /\ maximum o ch0 x)
               so st1 ch0 = dmn1 a
@@ -304,7 +309,7 @@ module DmnReachProofs
               so not (dmn1 a = x so sext ch0 (xt1 ch0))
               so st1 ch0 <> st2 ch0
               so if not dmn_witness g ang b ch dmn2 then true else
-                false by if xt2 ch0 = ch0
+                "stop_split" false by if xt2 ch0 = ch0
                   then false by maximum sb (tr_reach sb xt2 ((=) b)) ch0
                     so sb ch ch0 so sb ch0 ch
                   else false by dmn_witness g ang b (xt2 ch0) dmn2
@@ -320,7 +325,8 @@ module DmnReachProofs
                     so antisymetric o
         ) by chain o ch0 so xt1 ch0 = add ch0 (st1 ch0)
           so xt2 ch0 = add ch0 (st2 ch0))
-        /\ (forall chh y. supremum sb chh y /\ chain sb chh /\ chh ((=) b) /\
+        /\ ("stop_split"
+          forall chh y. supremum sb chh y /\ chain sb chh /\ chh ((=) b) /\
           (forall x. chh x /\ sb x ch ->
             dmn_witness g ang b x dmn2 /\ same_choices g ang x dmn1 dmn2) ->
           sb y ch ->
@@ -379,11 +385,11 @@ module DmnReachProofs
       let dmn_x = \x. choice (dmn_witness g ang b x) in
       (forall x. chh x -> dmn_witness g ang b x (dmn_x x)
         by exists dmn. dmn_witness g ang b x dmn)
-    so ch = subchain_completion chh
+    so ch = bigunion chh
     so order sb
     so let p0 = \ch0 s. sb ch0 s /\ ch0 <> s /\ chh s in
       let sub_wit = \ch0. choice (p0 ch0) in
-      (forall ch0. sb ch0 ch /\ ch0 <> ch ->
+      ("stop_split" forall ch0. sb ch0 ch /\ ch0 <> ch ->
         let s = sub_wit ch0 in sb ch0 s /\ ch0 <> s /\ chh s
         by (exists s. subset ch0 s /\ ch0 <> s /\ chh s so sb ch0 s
           so p0 ch0 s)
@@ -400,7 +406,7 @@ module DmnReachProofs
       let dmn_l = \s. let ch0 = choice (ch_by s) in
         let db = dmn_x (sub_wit ch0) in
         db s in
-      (forall ch1. chh ch1 -> dmn_witness g ang b ch1 dmn_l
+      ("stop_split" forall ch1. chh ch1 -> dmn_witness g ang b ch1 dmn_l
         by let dmn = dmn_x ch1 in
           same_choices g ang ch1 dmn dmn_l
         by forall ch0 x. sb ch0 ch1 /\ maximum o ch0 x /\
@@ -536,6 +542,7 @@ module StratProofs
   use import order.LimUniq
   use import fn.Fun
   use import ho_set.Set
+  use import ho_set.SetBigOps
   use import transfinite.Iterates
   use import transfinite.ChainExtension
 
@@ -582,7 +589,7 @@ module StratProofs
       (have_winning_strat g x win <-> win x \/
         exists s. g.transition x s /\ have_uniform_winning_strat g s win)
       (* First implication. *)
-      by (have_winning_strat g x win -> not win x ->
+      by ("stop_split" have_winning_strat g x win -> not win x ->
         exists s. g.transition x s /\ have_uniform_winning_strat g s win
         by let ex = (=) x in
           exists ang. winning_strat g x win ang /\ s = ang x ex
@@ -600,16 +607,16 @@ module StratProofs
           winning_strat g y win ang2
           by forall dmn2. win_against g y win ang2 dmn2
           by let dmn = update dmn2 s y in
-            (let st = step g ang dmn in
+            ("stop_split" let st = step g ang dmn in
             let st2 = step g ang2 dmn2 in
             let xt = extends_ch o st in
             let xt2 = extends_ch o st2 in
-            let ey = ((=) y) in
+            let ey = (=) y in
             exists ch2. reach_ch o st2 ey ch2 /\ win_at g win ang2 dmn2 ch2
             by if win y then ch2 = ey so maximum o ey y else
               exists ch. reach_ch o st ex ch /\ win_at g win ang dmn ch /\
               ch2 = remove ch x
-            so (forall ch0. reach_ch o st ex ch0 ->
+            so ("stop_split" forall ch0. reach_ch o st ex ch0 ->
               let c = add (remove ch0 x) x in
               c = ch0 by sext c ch0 by ch0 x by sb ex ch0)
             so (order o /\ transitive o /\ order sb /\ inflationary sb xt)
@@ -619,7 +626,8 @@ module StratProofs
               ch0 <> ex -> reach_ch o st2 ey (remove ch0 x))
               by let exy = add ex y in
                 (* case Reach_succ *)
-                (forall ch0. reach_ch o st ex ch0 /\ (ch0 <> ex ->
+                ("stop_split"
+                  forall ch0. reach_ch o st ex ch0 /\ (ch0 <> ex ->
                   reach_ch o st2 ey (remove ch0 x)) ->
                   reach_ch o st2 ey (remove (xt ch0) x)
                   by "case_split"
@@ -634,8 +642,9 @@ module StratProofs
                       by chain o ch0 so chain o rx
                       so xt ch0 = add ch0 (st ch0) /\
                         xt2 rx = add rx (st2 rx)
-                      so (st2 rx = st ch0
-                        by let u = sup o ch0 in
+                      so ("stop_split" st2 rx = st ch0
+                        by (ch0 y by subset exy ch0)
+                        so let u = sup o ch0 in
                           supremum o ch0 u
                         so (supremum o rx u
                           by upper_bound o rx u /\ forall v.
@@ -645,11 +654,11 @@ module StratProofs
                           by t <> x || (o x y /\ o y v
                             by rx y by sb exy ch0))
                         so u = sup o rx
-                        so (ch0 y by subset exy ch0)
                         so o y u
                         so ((ch0 u <-> rx u) by u <> x)
                         so let a = ang u ch0 in a = ang2 u rx
-                        so (g.transition u a -> dmn a = dmn2 a by (a = s ->
+                        so ("stop_split"
+                          g.transition u a -> dmn a = dmn2 a by (a = s ->
                           o u y so sb exy ch0
                           so (forall v. ch0 v /\ not exy v -> false
                             by exy y so o y v so o v u so o v y so y = v)
@@ -669,7 +678,8 @@ module StratProofs
                       so subset exy ch0 so o y (st ch0) so o x y so not o y x
                       so not o (st ch0) x)
               /\ (* case Reach_chain. *)
-                (forall chh ch0. chain sb chh /\ supremum sb chh ch0 /\
+                ("stop_split"
+                 forall chh ch0. chain sb chh /\ supremum sb chh ch0 /\
                   chh ex /\ ch0 <> ex /\ (forall u. chh u ->
                     reach_ch o st ex u /\
                     (u <> ex -> reach_ch o st2 ey (remove u x))) ->
@@ -687,7 +697,7 @@ module StratProofs
                     by a = ey || b = ey || (
                       sb (add a x) (add b x) \/ sb (add b x) (add a x)))
                   so supremum sb chh2 (remove ch0 x)
-                  by (forall bd. upper_bound sb chh2 bd ->
+                  by ("stop_split" forall bd. upper_bound sb chh2 bd ->
                     sb (remove ch0 x) bd
                     by o x y so not o y x so sb ey bd
                     so (upper_bound sb chh (add bd x)
@@ -702,7 +712,7 @@ module StratProofs
                     so ch0 = add (remove ch0 x) x
                     so (not bd x by ey y /\ not ey x)
                     so not remove ch0 x x)
-                  /\ (upper_bound sb chh2 (remove ch0 x)
+                  /\ ("stop_split" upper_bound sb chh2 (remove ch0 x)
                     by forall u. chh2 u -> sb u (remove ch0 x)
                     by add (remove ch0 x) x = ch0 so
                       not remove ch0 x x so not u x so
@@ -728,10 +738,10 @@ module StratProofs
           by win_against g x win ang dmn
         )) /\
         (* Inverse implications. *)
-        (win x -> have_winning_strat g x win
+        ("stop_split" win x -> have_winning_strat g x win
           by forall dmn. win_against g x win witness dmn
           by win_at g win witness dmn ((=) x)
-          by maximum o ((=) x) x) /\ forall s. g.transition x s
+          by maximum o ((=) x) x) /\ "stop_split" forall s. g.transition x s
             /\ have_uniform_winning_strat g s win ->
           have_winning_strat g x win
           by exists ang. uniform_winning_strat g s win ang
@@ -744,8 +754,7 @@ module StratProofs
             let ey = ((=) y) in
             if not s y
             then win_at g win ang2 dmn ex by maximum o ex x
-            else
-              let st = step g ang dmn in
+            else let st = step g ang dmn in
               let st2 = step g ang2 dmn in
               let xt = extends_ch o st in
               let xt2 = extends_ch o st2 in
@@ -766,10 +775,12 @@ module StratProofs
                   reach_ch o st2 ex (add ch0 x))
                 by let exy = add ey x in
                   (* case Reach_base. *)
-                  (reach_ch o st2 ex exy by sext (xt2 ex) exy by st2 ex = y
+                  ("stop_split"
+                    reach_ch o st2 ex exy by sext (xt2 ex) exy by st2 ex = y
                    by x = sup o ex by supremum o ex x)
                   /\ (* case Reach_succ. *)
-                    (forall ch0. reach_ch o st ey ch0 /\
+                    ("stop_split"
+                    forall ch0. reach_ch o st ey ch0 /\
                       reach_ch o st2 ex (add ch0 x) /\ sb ey ch0 ->
                       reach_ch o st2 ex (add (xt ch0) x)
                       by (not (ch0 x so not ey x so o y x))
@@ -796,19 +807,21 @@ module StratProofs
                       so sext (add (xt ch0) x) (xt2 (add ch0 x))
                       )
                   /\ (* case Reach_chain. *)
-                    (forall chh ch0. chain sb chh /\ supremum sb chh ch0 /\
+                    ("stop_split"
+                      forall chh ch0. chain sb chh /\ supremum sb chh ch0 /\
                       chh ey /\ (forall u. chh u -> reach_ch o st ey u /\
                         reach_ch o st2 ex (add u x)) ->
                       reach_ch o st2 ex (add ch0 x) by
                       let chh2 = \ch. ch = ex \/
                         (ch x /\ chh (remove ch x)) in
                       (supremum sb chh2 (add ch0 x)
-                       by (upper_bound sb chh2 (add ch0 x)
+                       by ("stop_split" upper_bound sb chh2 (add ch0 x)
                          by forall v. chh2 v -> subchain o v (add ch0 x)
                          by (forall z. ch0 z -> o x z by sb ey ch0 so o y z)
                            so v = ex || let rv = remove v x in
                            sb rv ch0 so sext (add rv x) v
-                       ) /\ forall ch1. upper_bound sb chh2 ch1 ->
+                       ) /\ "stop_split"
+                       forall ch1. upper_bound sb chh2 ch1 ->
                          sb (add ch0 x) ch1
                          by let r1 = remove ch1 x in
                            sb ex ch1 so subset ex ch1
@@ -822,7 +835,7 @@ module StratProofs
                            so sext (remove (add u x) x) u
                            so chh2 (add u x)
                            so sb (add u x) ch1)
-                      so (chain sb chh2
+                      so ("stop_split" chain sb chh2
                         by (forall u. chh2 u -> sb ex u
                           by u = ex || forall z. u z -> o x z
                           by chh (remove u x)
@@ -883,9 +896,9 @@ module StratProofs
     (with_prefix s2.h_pair s1 -> subchain o2 s1.h_local s2.h_local)
 
   function sorder_completion (ch:state 'a 'b -> bool) : state 'a 'b =
-    let hp = subchain_completion (image h_pair ch) in
-    let ht = subchain_completion (image h_total ch) in
-    let hl = subchain_completion (image h_local (with_prefix_in ch hp)) in
+    let hp = bigunion (image h_pair ch) in
+    let ht = bigunion (image h_total ch) in
+    let hl = bigunion (image h_local (with_prefix_in ch hp)) in
     { h_pair = hp;
       h_total = ht;
       h_local = hl }
@@ -932,7 +945,7 @@ module StratProofs
     order o1 /\ order o2 ->
     let sd = sorder o1 o2 in chain sd ch ->
     let op = rprod o1 o2 in
-    let hp = subchain_completion (image h_pair ch) in
+    let hp = bigunion (image h_pair ch) in
     let pref = with_prefix_in ch hp in
     (chain (subchain op) (image h_pair ch) by
       forall a b. image h_pair ch a /\ image h_pair ch b ->
@@ -965,11 +978,11 @@ module StratProofs
     let cpl = sorder_completion ch in
     supremum sd ch cpl
     by
-    let hp = subchain_completion (image h_pair ch) in
-    let ht = subchain_completion (image h_total ch) in
+    let hp = bigunion (image h_pair ch) in
+    let ht = bigunion (image h_total ch) in
     let pref = with_prefix_in ch hp in
     let local = image h_local pref in
-    let hl = subchain_completion local in
+    let hl = bigunion local in
     let (op,sb) = (rprod o1 o2,subchain o2) in
     supremum (subchain op) (image h_pair ch) hp
     /\ supremum sb (image h_total ch) ht
@@ -1028,6 +1041,16 @@ module StratProofs
       h_total = ((=) sc.baseb);
       h_local = ((=) sc.baseb) }
 
+  (* Very simple invariants on state: historics are
+     chains, and mostly non-empty. *)
+  predicate correct (sc:section 'a 'b) (st:state 'a 'b) =
+    let o1 = sc.g1.progress in let o2 = sc.g2.progress in
+    chain (rprod o1 o2) st.h_pair /\ chain o2 st.h_local /\
+    chain o2 st.h_total /\
+    st.h_pair (sc.basea,sc.baseb) /\
+    st.h_total sc.baseb /\
+    (forall a b. maximum (rprod o1 o2) st.h_pair (a,b) -> st.h_local b)
+
   (* Paired evolution of state: simulate steps in 'a game by picking
      a winning imitation strategy on 'b game,
      and carrying out a step in 'a game once this strategy terminates
@@ -1035,7 +1058,7 @@ module StratProofs
   function evolve (sc:section 'a 'b) (dmn:demon 'b)
                   (st:state 'a 'b) : state 'a 'b =
     let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-    if not (chain (rprod o1 o2) st.h_pair /\ chain o2 st.h_local)
+    if not (correct sc st)
     then st else
     let pr = sup (rprod o1 o2) st.h_pair in
     let b = snd pr in
@@ -1072,12 +1095,12 @@ module StratProofs
       sc.sd st nx
     by "case_split"
       let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-      chain (rprod o1 o2) st.h_pair /\ chain o2 st.h_local ->
+      correct sc st ->
       let pr = sup (rprod o1 o2) st.h_pair in
       let b = snd pr in
       if not maximum (rprod o1 o2) st.h_pair pr
       then (supremum o2 st.h_total b ->
-        chain_complete (rprod o1 o2)
+        q_chain_complete (rprod o1 o2)
         so supremum (rprod o1 o2) st.h_pair pr
         so subchain (rprod o1 o2) st.h_pair nx.h_pair
         so subchain o2 st.h_total nx.h_total
@@ -1145,9 +1168,7 @@ module StratProofs
        history *)
   predicate coherent (sc:section 'a 'b) (dmn:demon 'b) (st:state 'a 'b) =
     let o1 = sc.g1.progress in let o2 = sc.g2.progress in
-    chain (rprod o1 o2) st.h_pair /\
-    chain o2 st.h_total /\
-    chain o2 st.h_local /\
+    correct sc st /\
     (forall a b. st.h_pair (a,b) -> sc.r a b) /\
     dmn_reach sc.g1 sc.anga sc.basea st.h_proj /\
     (forall pr. maximum (rprod o1 o2) st.h_pair pr ->
@@ -1178,7 +1199,7 @@ module StratProofs
         by forall x. bs.h_proj x -> x = sc.basea
         by exists y. bs.h_pair y /\ fst y = x)
     so (* Case Reach_base *)
-      (coherent sc dmn bs
+      ("stop_split" coherent sc dmn bs
       by (dmn_reach sc.g1 sc.anga sc.basea bs.h_proj
         by reach_ch o1 (step sc.g1 sc.anga witness) bs.h_proj bs.h_proj)
       /\ (forall pr. supremum op bs.h_pair pr -> bs.h_pair pr
@@ -1190,7 +1211,7 @@ module StratProofs
             by (sc.sd bs st2 so antisymetric sc.sd)
     )
     /\ (* Case Reach_succ *)
-      (forall st. tr_reach sc.sd evl bs st /\
+      ("stop_split" forall st. tr_reach sc.sd evl bs st /\
         coherent sc dmn st -> let nst = evl st in
         coherent sc dmn nst
         by "case_split"
@@ -1211,12 +1232,12 @@ module StratProofs
               so maximum op nst.h_pair pr
               so (forall pr2. maximum op nst.h_pair pr2 ->
                 sup o2 nst.h_local = b = sup o2 nst.h_total)
-              so (let (a,b) = pr in sc.r a b
+              so ("stop_split" let (a,b) = pr in sc.r a b
                 by chain_compatible o1 sc.r o2
                 /\ exists u. st.h_pair u by u = (sc.basea,sc.baseb)
                   so sc.sd bs st so subchain op bs.h_pair st.h_pair
                   so subset bs.h_pair st.h_pair)
-              so (forall st2. tr_reach sc.sd evl bs st2 /\
+              so ("stop_split" forall st2. tr_reach sc.sd evl bs st2 /\
                 sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
                 forall a. st2.h_total a ->
                   (exists b c. nst.h_pair (b,c) /\ o2 a c)
@@ -1225,7 +1246,7 @@ module StratProofs
                   so (st.h_total a by subchain o2 st2.h_total st.h_total
                     so subset st2.h_total st.h_total)
                   so o2 a b)
-              so (dmn_reach sc.g1 sc.anga sc.basea nst.h_proj
+              so ("stop_split" dmn_reach sc.g1 sc.anga sc.basea nst.h_proj
                 by if nst.h_proj = st.h_proj
                 then true
                 else let ba = (=) sc.basea in
@@ -1272,7 +1293,8 @@ module StratProofs
                 so nst.h_pair = add st.h_pair (al,bl)
                 so nst.h_total = add st.h_total bl
                 so nst.h_local = ((=) bl)
-                so (upper_bound op st.h_pair (al,bl) by forall u.
+                so ("stop_split"
+                  upper_bound op st.h_pair (al,bl) by forall u.
                   st.h_pair u -> op u (al,bl)
                   by let (a0,b0) = u in op (a0,b0) pr
                   so o1 a0 a so s0 al so o1 a al
@@ -1281,33 +1303,34 @@ module StratProofs
                 so maximum op nst.h_pair (al,bl)
                 so maximum o2 nst.h_total bl so maximum o2 nst.h_local bl
                 so sup o2 nst.h_total = bl = sup o2 nst.h_local
-                so (forall pr. supremum op nst.h_pair pr /\
+                so ("stop_split" forall pr. supremum op nst.h_pair pr /\
                   not maximum op nst.h_pair pr -> false
                   by pr = (al,bl))
-                so (forall st2. tr_reach sc.sd evl bs st2 /\
+                so ("stop_split" forall st2. tr_reach sc.sd evl bs st2 /\
                   sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
                   forall a. st2.h_total a ->
                     (exists b c. nst.h_pair (b,c) /\ o2 a c)
                     by subchain o2 st2.h_total nst.h_total
                     so subset st2.h_total nst.h_total
                     so nst.h_total a so o2 a bl)
-                so (dmn_reach sc.g1 sc.anga sc.basea nst.h_proj
+                so ("stop_split" dmn_reach sc.g1 sc.anga sc.basea nst.h_proj
                   by (sext nst.h_proj (add st.h_proj al)
-                    by (forall x. nst.h_proj x ->
+                    by ("stop_split" forall x. nst.h_proj x ->
                       add st.h_proj al x
                       by image fst nst.h_pair x
                       so exists y. nst.h_pair y /\ fst y = x
                       so if y = (al,bl) then true
                         else st.h_pair y so image fst st.h_pair x
                           so st.h_proj x)
-                    /\ (forall x. add st.h_proj al x -> nst.h_proj x
+                    /\ ("stop_split"
+                      forall x. add st.h_proj al x -> nst.h_proj x
                       by image fst nst.h_pair x
                       by if x = al
                       then nst.h_pair (al,bl)
                       else image fst st.h_pair x
                         so exists y. st.h_pair y /\ fst y = x
                         so nst.h_pair y))
-                  so (maximum o1 st.h_proj a
+                  so ("stop_split" maximum o1 st.h_proj a
                     by (st.h_proj a by st.h_pair (a,b))
                     /\ upper_bound o1 st.h_proj a
                     by forall u. st.h_proj u ->
@@ -1332,7 +1355,7 @@ module StratProofs
                 so (maximum o2 nst.h_local nx
                   by upper_bound o2 st.h_local nx)
                 so sup o2 nst.h_total = nx = sup o2 nst.h_local
-                so (forall st2. tr_reach sc.sd evl bs st2 /\
+                so ("stop_split" forall st2. tr_reach sc.sd evl bs st2 /\
                   sc.sd st2 nst /\ st2.h_pair <> nst.h_pair ->
                    forall a. st2.h_total a ->
                     (exists b c. nst.h_pair (b,c) /\ o2 a c)
@@ -1342,61 +1365,65 @@ module StratProofs
             else nst = st
     )
     /\ (* Case Reach_chain *)
+       "stop_split"
        forall chh st. chain sc.sd chh /\ chh bs /\ supremum sc.sd chh st /\
          (forall u. chh u -> tr_reach sc.sd evl bs u /\ coherent sc dmn u) ->
        coherent sc dmn st
        by let pref = with_prefix_in chh st.h_pair in
          st = sorder_completion chh
        (* Chains+demon-reach. *)
-       so (chain op st.h_pair
+       so ("stop_split" chain op st.h_pair
          by chain sbp (image h_pair chh)
-         so st.h_pair = subchain_completion (image h_pair chh)
+         so st.h_pair = bigunion (image h_pair chh)
          so supremum sbp (image h_pair chh) st.h_pair
          so (forall x. image h_pair chh x -> chain (rprod o1 o2) x))
-       so (chain o2 st.h_total
+       so ("stop_split" chain o2 st.h_total
          by chain sb (image h_total chh)
          so supremum sb (image h_total chh) st.h_total
          so (forall x. image h_total chh x -> chain o2 x))
-       so (chain o2 st.h_local
+       so ("stop_split" chain o2 st.h_local
          by chain (subchain o2) (image h_local pref)
          so supremum (subchain o2) (image h_local pref) st.h_local
          so (forall x. image h_local pref x -> chain o2 x
            by exists y. chh y /\ y.h_local = x))
-       so (dmn_reach sc.g1 sc.anga sc.basea st.h_proj
+       so ("stop_split" dmn_reach sc.g1 sc.anga sc.basea st.h_proj
          by chain (subchain o1) (image h_proj chh)
          so (let s = image h_proj chh in
            supremum (subchain o1) s st.h_proj
-           by sext st.h_proj (subchain_completion s)
-           by (forall x. st.h_proj x -> subchain_completion s x
-           by image fst st.h_pair x
-           so exists y. st.h_pair y /\ fst y = x
-           so exists hp. image h_pair chh hp /\ hp y
-           so exists u. chh u /\ u.h_pair = hp
-           so s u.h_proj /\ u.h_proj x
-           ) /\ forall x. subchain_completion s x -> st.h_proj x
-           by exists prj. s prj /\ prj x
-           so exists st2. chh st2 /\ st2.h_proj = prj
-           so image fst st2.h_pair x
-           so exists y. st2.h_pair y /\ fst y = x
-           so image h_pair chh st2.h_pair so st.h_pair y)
+           by sext st.h_proj (bigunion s)
+           by ("stop_split" forall x. st.h_proj x -> bigunion s x
+             by image fst st.h_pair x
+             so exists y. st.h_pair y /\ fst y = x
+             so exists hp. image h_pair chh hp /\ hp y
+             so exists u. chh u /\ u.h_pair = hp
+             so s u.h_proj /\ u.h_proj x
+           ) /\ "stop_split" forall x. bigunion s x -> st.h_proj x
+             by exists prj. s prj /\ prj x
+             so exists st2. chh st2 /\ st2.h_proj = prj
+             so image fst st2.h_pair x
+             so exists y. st2.h_pair y /\ fst y = x
+             so image h_pair chh st2.h_pair so st.h_pair y)
          so (forall x. image h_proj chh x ->
            dmn_reach sc.g1 sc.anga sc.basea x
            by exists y. chh y /\ y.h_proj = x so coherent sc dmn y)
          so image h_proj chh ((=) sc.basea))
        so dmn_reach sc.g1 sc.anga sc.basea st.h_proj
+       so (st.h_total sc.baseb
+         by bs.h_total sc.baseb /\ image h_total chh bs.h_total)
        (* The limit correlation falls by bi-domination. *)
-       so (forall pr. maximum op st.h_pair pr ->
+       so ("stop_split" forall pr. maximum op st.h_pair pr ->
          let loc = sup o2 st.h_local in let tot = sup o2 st.h_total in
          loc = tot /\
-           (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot)
-         by ((exists st3. pref st3)
+           (maximum o2 st.h_local loc <-> maximum o2 st.h_total tot) /\
+           (let (_,b) = pr in st.h_local b)
+         by ("stop_split" (exists st3. pref st3)
            by exists hp. image h_pair chh hp /\ hp pr
            so exists st2. chh st2 /\ st2.h_pair = hp
            so sc.sd st2 st so sbp hp st.h_pair
            so (forall x. st.h_pair x -> not (not hp x so op pr x so op x pr))
            so sext hp st.h_pair so pref st2)
          so exists st3. pref st3
-         so (forall u. st.h_total u ->
+         so ("stop_split" forall u. st.h_total u ->
            (exists st2. pref st2 /\ st2.h_total u)
            by exists s0. image h_total chh s0 /\ s0 u
            so exists st2. chh st2 /\ st2.h_total = s0
@@ -1404,33 +1431,49 @@ module StratProofs
            \/ (sc.sd st3 st2 so sc.sd st2 st so
              sbp st2.h_pair st.h_pair so sbp st3.h_pair st2.h_pair
              so pref st2))
-         so supremum o2 st.h_total tot /\ supremum o2 st.h_local loc
+         so ("stop_split" let (_,b) = pr in st.h_local b
+           by exists h0. image h_pair chh h0 /\ h0 pr
+           so exists st0. chh st0 /\ st0.h_pair = h0
+           so (subchain op h0 st.h_pair by sc.sd st0 st)
+           so (sext h0 st.h_pair by forall x. st.h_pair x ->
+             not (not h0 x so op pr x so op x pr so x = pr))
+           so with_prefix h0 st0
+           so image h_local (with_prefix_in chh h0) st0.h_local
+           so st0.h_local b by coherent sc dmn st0)
+         so supremum o2 st.h_total tot
+         so supremum o2 st.h_local loc
          so (loc = tot
            by sext (upper_bound o2 st.h_local) (upper_bound o2 st.h_total)
-           by (forall u v. upper_bound o2 st.h_local u /\ st.h_total v ->
+           by ("stop_split" forall u v.
+             upper_bound o2 st.h_local u /\ st.h_total v ->
              o2 v u
              by exists st2. pref st2 /\ st2.h_total v
              so coherent sc dmn st2
              so supremum o2 st2.h_total (sup o2 st2.h_total)
-             so supremum o2 st2.h_local (sup o2 st2.h_local)
+             so (supremum o2 st2.h_local (sup o2 st2.h_local)
+               by let (_,b) = pr in st2.h_local b)
              so sup o2 st2.h_total = sup o2 st2.h_local
              so o2 v (sup o2 st2.h_total)
              so sc.sd st2 st so subset st2.h_local st.h_local
              so upper_bound o2 st2.h_local u
              so o2 (sup o2 st2.h_local) u)
-           /\ (forall u v. upper_bound o2 st.h_total u /\ st.h_local v ->
+           /\ ("stop_split" forall u v.
+             upper_bound o2 st.h_total u /\ st.h_local v ->
              o2 v u
              by exists s0. image h_local pref s0 /\ s0 v
              so exists st2. pref st2 /\ st2.h_local = s0
              so coherent sc dmn st2
-             so supremum o2 st2.h_total (sup o2 st2.h_total)
-             so supremum o2 st2.h_local (sup o2 st2.h_local)
+             so (supremum o2 st2.h_total (sup o2 st2.h_total)
+               by st2.h_total sc.baseb)
+             so (supremum o2 st2.h_local (sup o2 st2.h_local)
+               by let (_,b) = pr in st2.h_local b)
              so sup o2 st2.h_total = sup o2 st2.h_local
              so o2 v (sup o2 st2.h_local)
              so sc.sd st2 st so subset st2.h_total st.h_total
              so upper_bound o2 st2.h_total u
              so o2 (sup o2 st2.h_total) u))
-         so (maximum o2 st.h_total tot -> maximum o2 st.h_local tot
+         so ("stop_split"
+           maximum o2 st.h_total tot -> maximum o2 st.h_local tot
            by exists st2. pref st2 /\ st2.h_total tot
            so sc.sd st2 st so subset st2.h_total st.h_total
            so subset st2.h_local st.h_local
@@ -1438,7 +1481,8 @@ module StratProofs
            so maximum o2 st2.h_total tot
            so (maximum o2 st2.h_local tot by st2.h_pair = st.h_pair)
            so st.h_local tot)
-         /\ (maximum o2 st.h_local loc -> maximum o2 st.h_total loc
+         /\ ("stop_split"
+           maximum o2 st.h_local loc -> maximum o2 st.h_total loc
            by exists s0. image h_local pref s0 /\ s0 loc
            so exists st2. pref st2 /\ st2.h_local = s0
            so sc.sd st2 st so subset st2.h_total st.h_total
@@ -1448,19 +1492,21 @@ module StratProofs
            so (maximum o2 st2.h_total loc by st2.h_pair = st.h_pair)
            so st.h_total loc))
        (* Related pairs + total above paired. *)
-       so (forall a b. st.h_pair (a,b) -> sc.r a b /\ st.h_total b
+       so ("stop_split"
+         forall a b. st.h_pair (a,b) -> sc.r a b /\ st.h_total b
          by exists s0. image h_pair chh s0 /\ s0 (a,b)
          so exists st2. chh st2 /\ st2.h_pair = s0
          so st2.h_total b so st.h_total b
          by sc.sd st2 st so subset st2.h_total st.h_total)
        (* paired above previous totals. *)
-       so (forall st2. tr_reach sc.sd evl bs st2 /\
+       so ("stop_split"
+         forall st2. tr_reach sc.sd evl bs st2 /\
          sc.sd st2 st /\ st2.h_pair <> st.h_pair ->
          forall a. st2.h_total a -> (exists b c. st.h_pair (b,c) /\ o2 a c)
          by not ext st2.h_pair st.h_pair
          so subset st2.h_pair st.h_pair
          so exists x. st.h_pair x /\ not st2.h_pair x
-         so st.h_pair = subchain_completion (image h_pair chh)
+         so st.h_pair = bigunion (image h_pair chh)
          so exists hp. image h_pair chh hp /\ hp x
          so exists st3. chh st3 /\ st3.h_pair = hp
          so separator sc.sd evl st2 st3 so not sbp st3.h_pair st2.h_pair
@@ -1471,15 +1517,16 @@ module StratProofs
        )
        (* If limit paired history get a supremum which is not a max,
           then it is a supremum of total history. *)
-       so (forall a b. supremum op st.h_pair (a,b) /\ not st.h_pair (a,b) ->
+       so ("stop_split" forall a b.
+         supremum op st.h_pair (a,b) /\ not st.h_pair (a,b) ->
          supremum o2 st.h_total b
-         by (forall u. upper_bound o2 st.h_total u -> o2 b u
+         by ("stop_split" forall u. upper_bound o2 st.h_total u -> o2 b u
            by op (a,b) (a,u)
            by upper_bound op st.h_pair (a,u)
            by forall x. st.h_pair x -> op x (a,u)
            by let (c,d) = x in op x (a,b) so o1 c a
            so st.h_total d so o2 d u)
-         /\ (upper_bound o2 st.h_total b
+         /\ ("stop_split" upper_bound o2 st.h_total b
            by forall u. st.h_total u -> o2 u b
            by exists ht. image h_total chh ht /\ ht u
            so exists st2. chh st2 /\ st2.h_total = ht
@@ -1490,6 +1537,8 @@ module StratProofs
                so transitive o2
                so o2 w b by op (v,w) (a,b))
        )
+       so (let pr0 = (sc.basea,sc.baseb) in st.h_pair pr0
+         by bs.h_pair pr0 /\ image h_pair chh bs.h_pair)
 
 
   (* Unicity of maximal witness for a given total history.
@@ -1514,7 +1563,8 @@ module StratProofs
       so let o1 = sc.g1.progress in let o2 = sc.g2.progress in
         let op = rprod o1 o2 in
         let pr = sup op st3.h_pair in
-        supremum op st3.h_pair pr
+        (supremum op st3.h_pair pr by st3.h_pair (sc.basea,sc.baseb)
+          /\ q_chain_complete op)
       so let (a,b) = pr in
         a = fst pr /\ b = snd pr
       so if not maximum op st3.h_pair pr
@@ -1538,8 +1588,11 @@ module StratProofs
                                = add st3.h_local sp1
           /\ (ev2 st3).h_local = extends_ch o2 stp2 st3.h_local
                                = add st3.h_local sp2
-          so supremum o2 st3.h_local bl
-          /\ supremum o2 st3.h_total (sup o2 st3.h_total)
+          so (supremum o2 st3.h_local bl
+            /\ supremum o2 st3.h_total (sup o2 st3.h_total)
+            by q_chain_complete o2
+            /\ st3.h_total sc.baseb
+            /\ st3.h_local b)
           so bl = sup o2 st3.h_total
           so antisymetric o2
           so (* Either the step was already there, in case ev1 stutter,
@@ -1602,7 +1655,7 @@ module StratProofs
       by (* Case Reach_succ: For most cases, unrolling def of evolve
             is enough. Evolve corresponds either to 0 or 1 step in
             total history. *)
-        (forall st. tr_reach sc.sd evl bs st /\
+        ("stop_split" forall st. tr_reach sc.sd evl bs st /\
           reach_ch o2 stp ((=) sc.baseb) st.h_total ->
           let nst = evl st in
           reach_ch o2 stp ((=) sc.baseb) nst.h_total
@@ -1627,7 +1680,11 @@ module StratProofs
                 not s0 a /\ sc.g1.transition a s0
                 so let target = related sc.r s0 in
                 let bl = sup o2 st.h_local in
-                supremum o2 st.h_total bl /\ supremum o2 st.h_local bl
+                (supremum o2 st.h_total bl /\ supremum o2 st.h_local bl
+                  by q_chain_complete o2
+                  /\ st.h_total sc.baseb
+                  /\ st.h_local b
+                )
                 so upper_bound o2 st.h_total bl /\ o2 b bl /\ not target bl
                 so let iang = iangel sc b target in
                 let stp' = step sc.g2 iang dmn in
@@ -1635,7 +1692,7 @@ module StratProofs
                 (* Tricky part: the following equality holds
                    because the current state is a/the maximal witness
                    for the current total history. *)
-                so (stp' st.h_local = stp st.h_total
+                so ("stop_split" stp' st.h_local = stp st.h_total
                   by let n' = stp' st.h_local in
                   n' <> bl
                   so st.h_local bl
@@ -1659,7 +1716,7 @@ module StratProofs
                 )
                 so upper_bound o2 st.h_total (stp st.h_total)
       )
-      /\ (* Case Reach_chain. *)
+      /\ "stop_split" (* Case Reach_chain. *)
         forall ch st. chain sc.sd ch /\ supremum sc.sd ch st /\
           ch bs /\
           (forall u. ch u -> reach_ch o2 stp ((=) sc.baseb) u.h_total) ->
@@ -1715,13 +1772,14 @@ module StratProofs
     by let o1 = sc.g1.progress in let o2 = sc.g2.progress in
       let op = rprod o1 o2 in
       (* Case Reach_base *)
-      (locally_winning sc dmn bs by
+      ("stop_split" locally_winning sc dmn bs by
         (sup op bs.h_pair = (sc.basea,sc.baseb)
          by maximum op bs.h_pair (sc.basea,sc.baseb)
          by reflexive op)
         /\ forall x. bs.h_local x -> maximum o2 bs.h_local x)
     /\ (* Case Reach_succ *)
-      (forall st. coherent sc dmn st /\ locally_winning sc dmn st ->
+      ("stop_split"
+        forall st. coherent sc dmn st /\ locally_winning sc dmn st ->
         let nst = evl st in locally_winning sc dmn nst
         by "case_split" let pr = sup op st.h_pair in
           let a = fst pr in let b = snd pr in
@@ -1745,7 +1803,7 @@ module StratProofs
                   so related_w sc.r s0 bl al1)
                 so related_w sc.r s0 bl al)
               so nst.h_pair = add st.h_pair (al,bl) /\ nst.h_local = ((=) bl)
-              so (maximum op nst.h_pair (al,bl)
+              so ("stop_split" maximum op nst.h_pair (al,bl)
                 by upper_bound op st.h_pair (al,bl) by forall u.
                   st.h_pair u -> op u (al,bl)
                   by let (a0,b0) = u in op (a0,b0) pr
@@ -1757,7 +1815,7 @@ module StratProofs
             else let stp = step sc.g2 (iangel sc b target) dmn in
               nst.h_pair = st.h_pair /\
               nst.h_local = extends_ch o2 stp st.h_local
-              so forall y. nst.h_local y /\ target y ->
+              so "stop_split" forall y. nst.h_local y /\ target y ->
                 maximum o2 nst.h_local y
               by if st.h_local y
                 then false
@@ -1766,7 +1824,7 @@ module StratProofs
                 else y = stp st.h_local so upper_bound o2 (st.h_local) y
                   so upper_bound o2 (nst.h_local) y
       )
-    /\ (* Case Reach_chain *)
+    /\ "stop_split" (* Case Reach_chain *)
       forall ch st. chain sc.sd ch /\ supremum sc.sd ch st /\ ch bs /\
         (forall u. ch u ->
           tr_reach sc.sd evl bs u /\ locally_winning sc dmn u) ->
@@ -1780,7 +1838,8 @@ module StratProofs
         let pref = with_prefix_in ch st.h_pair in
         let imp = image h_local pref in
         st = sorder_completion ch
-        so (forall x. st.h_local x /\ target x -> maximum o2 st.h_local x
+        so ("stop_split" forall x. st.h_local x /\ target x ->
+          maximum o2 st.h_local x
           by forall y. st.h_local y -> o2 y x
           by exists hl. imp hl /\ hl y
           so exists sty. pref sty /\ sty.h_local = hl
@@ -1790,9 +1849,13 @@ module StratProofs
             so stxy.h_pair = st.h_pair
             so locally_winning sc dmn stxy
             so maximum o2 stxy.h_local x)
-          by (sc.sd stx sty so sty.h_local x by subset stx.h_local sty.h_local)
-          \/ (sc.sd sty stx so stx.h_local y by subset sty.h_local stx.h_local))
-        /\ (let stp = step sc.g2 (iangel sc b target) dmn in
+          by (sc.sd stx sty so sty.h_local x
+             by subset stx.h_local sty.h_local
+             by subchain o2 stx.h_local sty.h_local)
+          \/ (sc.sd sty stx so stx.h_local y
+             by subset sty.h_local stx.h_local
+             by subchain o2 sty.h_local stx.h_local))
+        /\ ("stop_split" let stp = step sc.g2 (iangel sc b target) dmn in
           reach_ch o2 stp ((=) b) st.h_local
           by tr_reach sc.sd evl bs st
           so coherent sc dmn st
@@ -1811,7 +1874,7 @@ module StratProofs
           so let sb = subchain o2 in
             supremum sb imp st.h_local
           so supremum sb chh st.h_local
-            by (upper_bound sb chh st.h_local
+            by ("stop_split" upper_bound sb chh st.h_local
               by forall u. chh u -> sb u st.h_local
               by "case_split" if imp u then true else
                 u = (=) b
@@ -1824,7 +1887,7 @@ module StratProofs
                   so imp st0.h_local
                   so sb st0.h_local st.h_local)
                 by (exists st0. pref st0)
-                by subchain_completion (image h_pair ch) pr
+                by bigunion (image h_pair ch) pr
                 so exists hp. image h_pair ch hp /\ hp pr
                 so exists st2. ch st2 /\ st2.h_pair = hp
                 so (sext st2.h_pair st.h_pair
@@ -1873,7 +1936,7 @@ module StratProofs
       (forall x. maximum o2 ch x /\ g20.transition x (angb x ch) ->
         dmn (angb x ch) = x) /\
       lose_at g20 angb rwin ch
-    so (xt ch = ch by ext (xt ch) ch by ch (stp ch)
+    so ("stop_split" xt ch = ch by ext (xt ch) ch by ch (stp ch)
       by exists x. let a = angb x ch in
         maximum o2 ch x /\ (not g20.transition x a \/ a x)
         so x = sup o2 ch so stp ch = x
@@ -1890,7 +1953,7 @@ module StratProofs
     so maximum sb (tr_reach sb xt ((=) y)) ch
     so subchain o2 stl.h_total ch
     (* Preliminary: check that there are no past winner for h_proj. *)
-    so (forall x. stl.h_proj x -> not (win0 x
+    so ("stop_split" forall x. stl.h_proj x -> not (win0 x
       so image fst stl.h_pair x
       so exists y. stl.h_pair y /\ fst y = x
         so let (_,y) = y in
@@ -1904,11 +1967,11 @@ module StratProofs
       let pr = sup op stl.h_pair in
       let a = fst pr in let b = snd pr in
       (* Safe-guards holds. *)
-      chain op stl.h_pair /\ chain o2 stl.h_local
+      correct sc stl
       so (* Fixpoint can't be at a 'add supremum' step,
             otherwise it would not be a fixpoint. *)
       if not maximum op stl.h_pair pr
-      then chain_complete op
+      then q_chain_complete op
         so supremum op stl.h_pair pr so supremum o2 stl.h_total b
         so stl.h_pair = add stl.h_pair pr so false
       else let s0 = sc.anga a stl.h_proj in
@@ -1920,12 +1983,15 @@ module StratProofs
         else let target = related sc.r s0 in
           let bl = sup o2 stl.h_local in
           (* Other safe-guards holds. *)
-          (supremum o2 stl.h_local bl /\ supremum o2 stl.h_total bl
-            by chain_complete o2
+          ("stop_split"
+            supremum o2 stl.h_local bl /\ supremum o2 stl.h_total bl
+            by q_chain_complete o2
+            so stl.h_local b /\ stl.h_total sc.baseb
             so (exists bl0. supremum o2 stl.h_local bl0)
             /\ (exists bl1. supremum o2 stl.h_total bl1))
           so upper_bound o2 stl.h_total bl
-          so (o2 b bl by op (a,b) (a,bl) by upper_bound op stl.h_pair (a,bl)
+          so ("stop_split"
+            o2 b bl by op (a,b) (a,bl) by upper_bound op stl.h_pair (a,bl)
             by forall u. stl.h_pair u -> op u (a,bl)
             by let (v,w) = u in op (v,w) (a,b)
               so o1 v a so stl.h_total w so o2 w bl)
@@ -1968,7 +2034,7 @@ module StratProofs
                       the case where the demon fail.
                       Then, the run is maximal => it also corresponds
                       to the losing run, which is absurd. *)
-                (angb bl stl.h_total = an
+                ("stop_split" angb bl stl.h_total = an
                   by (maximal_witness sc stl.h_total stl dmn
                     by maximum sc.sd (tr_reach sc.sd evl bs) stl)
                   so any_max_witness sc stl.h_total stl
@@ -1992,4 +2058,3 @@ module StratProofs
     goal simulation
 
 end
-

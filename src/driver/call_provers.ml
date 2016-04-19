@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -51,12 +51,12 @@ let empty_limit =
 
 let get_time x = Opt.get_def 0 x.limit_time
 let get_mem x = Opt.get_def 0 x.limit_mem
-let get_steps x = Opt.get_def (-1) x.limit_steps
+let get_steps x = Opt.get_def 0 x.limit_steps
 
 let mk_limit t m s =
   { limit_time = if t = 0 then None else Some t;
     limit_mem  = if m = 0 then None else Some m;
-    limit_steps = if s = -1 then None else Some s
+    limit_steps = if s = 0 then None else Some s
   }
 
 let limit_max a b =
@@ -236,8 +236,7 @@ let parse_prover_run res_parser time out ret on_timelimit limit ~printer_mapping
   let ans = match ans, limit with
     | (Unknown _ | HighFailure), { limit_time = Some tlimit }
       when on_timelimit && time >= (0.9 *. float tlimit) -> Timeout
-    | _ -> ans
-  in
+    | _ -> ans in
   let model = res_parser.prp_model_parser out printer_mapping in
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;
@@ -253,8 +252,6 @@ let actualcommand command ~use_why3cpulimit limit interactive file =
   let timelimit = get_time limit in
   let memlimit  = get_mem limit in
   let steplimit = get_steps limit in
-  let utime = string_of_int (2 * timelimit + 1) in
-  let ttime = string_of_int (succ timelimit) in
   let stime = string_of_int timelimit in
   let smem = string_of_int memlimit in
   let arglist = Cmdline.cmdline_split command in
@@ -264,9 +261,7 @@ let actualcommand command ~use_why3cpulimit limit interactive file =
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> use_stdin := false; file
-    | "t" -> on_timelimit := true; string_of_int timelimit
-    | "T" -> ttime
-    | "U" -> utime
+    | "t" -> on_timelimit := true; stime
     | "m" -> smem
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
@@ -285,12 +280,13 @@ let actualcommand command ~use_why3cpulimit limit interactive file =
       let cpulimit_bin = Filename.concat Config.libdir "why3-cpulimit" in
       let cpulimit_time =
         (* for steps limit use 2 * t + 1 time *)
-        if limit.limit_steps <> None then utime
+        if limit.limit_steps <> None then string_of_int (2 * timelimit + 1)
         (* if prover implements time limit, use t + 1 *)
-        else if !on_timelimit then ttime
+        else if !on_timelimit then string_of_int (succ timelimit)
         (* otherwise use t *)
         else stime in
-       cpulimit_bin :: cpulimit_time :: smem :: "-s" :: args
+        on_timelimit := true;
+      cpulimit_bin :: cpulimit_time :: smem :: "-s" :: args
     else
       args in
   args, !use_stdin, !on_timelimit

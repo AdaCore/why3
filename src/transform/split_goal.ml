@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -338,8 +338,8 @@ let rec split_core sp f =
                   let cond = if ro then fold_cond cond else cond in
                   let fcl t = - t_forall_close_simp vl [] t in
                   let ecl t = - t_exists_close_simp vl [] t in
-                  let ps cond f = fcl (t_implies_simp cond f) in
-                  let ng cond f = ecl (t_and_simp cond f) in
+                  let ps cond f = fcl (t_implies cond f) in
+                  let ng cond f = ecl (t_and cond f) in
                   let ngt _ a = fcl (t_not a) and tag _ a = ecl a in
                   let pos  = pos  ++ bimap ngt ps cond sf.pos  in
                   let neg  = neg  ++ bimap tag ng cond sf.neg  in

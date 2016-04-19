@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -19,14 +19,13 @@ module S = Session
 let output_dir = ref ""
 let opt_context = ref false
 
-type style = SimpleTree | Jstree | Table
+type style = SimpleTree | Table
 
 let opt_style = ref Table
 let default_style = "table"
 
 let set_opt_style = function
-  | "simple" -> opt_style := SimpleTree
-  | "jstree" -> opt_style := Jstree
+  | "simpletree" -> opt_style := SimpleTree
   | "table" -> opt_style := Table
   | _ ->
     eprintf "Unknown html style, ignored@."
@@ -48,7 +47,7 @@ let spec =
    "<path> output directory ('-' for stdout)") ::
   ("--context", Arg.Set opt_context,
    " add context around the generated HTML code") ::
-  ("--style", Arg.Symbol (["simpletree";"jstree";"table"], set_opt_style),
+  ("--style", Arg.Symbol (["simpletree";"table"], set_opt_style),
    " style to use, defaults to '" ^ default_style ^ "'."
 ) ::
   ("--add_pp", Arg.Tuple
@@ -333,244 +332,12 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
 end
 
 
-module Jstree =
-struct
-
-  let print_verified fmt b =
-    if b
-    then fprintf fmt "class='verified'"
-    else fprintf fmt "class='notverified'"
-
-  let print_prover = Whyconf.print_prover
-
-  let print_proof_status fmt = function
-    | Interrupted -> fprintf fmt "<span class='notverified'>Not yet run</span>"
-    | Unedited -> fprintf fmt "<span class='notverified'>Not yet edited</span>"
-    | JustEdited | Scheduled | Running -> assert false
-    | Done pr -> fprintf fmt "<span class='verified'>Done: %a</span>"
-      Call_provers.print_prover_result pr
-    | InternalFailure exn ->
-      fprintf fmt "<span class='notverified'>Failure: %a</span>"
-        Exn_printer.exn_printer exn
-
-  let cmd_regexp = Str.regexp "%\\(.\\)"
-
-  let pp_run input cmd output =
-    let replace s = match Str.matched_group 1 s with
-      | "%" -> "%"
-      | "i" -> input
-      | "o" -> output
-      | _ -> failwith "unknown format specifier, use %%i, %%o"
-    in
-    let cmd = Str.global_substitute cmd_regexp replace cmd in
-    let c = Sys.command cmd in
-    if c <> 0 then
-      eprintf "[Error] '%s' stopped abnormaly : code %i" cmd c
-
-
-  let find_pp edited =
-    let edited_dst = Filename.concat !output_dir "edited" in
-    let basename = Filename.basename edited in
-    try
-      let suff,(cmd,suff_out) =
-        List.find (fun (s,_) -> Strings.ends_with basename s) !opt_pp in
-      let base =
-        String.sub basename 0 (String.length basename - String.length suff) in
-      let base_dst = (base^suff_out) in
-      if !opt_context then
-        pp_run edited cmd (Filename.concat edited_dst base_dst);
-      base_dst
-    with Not_found ->
-      eprintf "Default %s@." basename;
-      (* default printer *)
-      let base = try Filename.chop_extension basename with _ -> basename in
-      let base_dst = base^".txt" in
-      if !opt_context then
-        Sysutil.copy_file edited (Filename.concat edited_dst base_dst);
-      base_dst
-
-let print_session name fmt session =
-
-  let print_proof_attempt fmt pa =
-    match get_edited_as_abs session pa with
-      | None ->
-        fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
-          print_prover pa.proof_prover
-          print_proof_status pa.proof_state
-      | Some f ->
-        let output = find_pp f in
-        fprintf fmt "@[<hov><li rel='prover' ><a href='#' \
-onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
-          output
-          print_prover pa.proof_prover
-          print_proof_status pa.proof_state in
-
-  let rec print_transf fmt tr =
-    fprintf fmt
-      "@[<hov><li rel='transf'><a href='#'>\
-<span %a>%s</span></a>@,<ul>%a</ul></li>@]"
-      print_verified (Opt.inhabited tr.transf_verified)
-      tr.transf_name
-      (Pp.print_list Pp.newline print_goal) tr.transf_goals
-
-  and print_goal fmt g =
-    fprintf fmt
-      "@[<hov><li rel='goal'><a href='#'>\
-<span %a>%s</a></a>@,<ul>%a%a</ul></li>@]"
-      print_verified (Opt.inhabited g.goal_verified)
-      g.goal_name.Ident.id_string
-      (Pp.print_iter2 PHprover.iter Pp.newline Pp.nothing
-         Pp.nothing print_proof_attempt)
-      g.goal_external_proofs
-      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing
-         Pp.nothing print_transf)
-      g.goal_transformations in
-
-  let print_theory fmt th =
-    let name =
-      try
-        let (l,t,_) = Theory.restore_path th.theory_name in
-        String.concat "." (l@[t])
-      with Not_found -> th.theory_name.Ident.id_string
-    in
-    fprintf fmt
-      "@[<hov><li rel='theory'><a href='#'>\
-<span %a>%s</span></a>@,<ul>%a</ul></li>@]"
-      print_verified (Opt.inhabited th.theory_verified)
-      name
-      (Pp.print_list Pp.newline print_goal) th.theory_goals in
-
-  let print_file fmt f =
-    fprintf fmt
-      "@[<hov><li rel='file'><a href='#'>\
-<span %a>%s</span></a>@,<ul>%a</ul></li>@]"
-      print_verified (Opt.inhabited f.file_verified)
-      f.file_name
-      (Pp.print_list Pp.newline print_theory) f.file_theories in
-
-  let print_session_aux fmt name =
-    fprintf fmt "@[<hov><ul><a href='#'>%s</a>@,%a</ul>@]"
-      name
-      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing print_file)
-      session.session_files in
-
-    fprintf fmt
-      "<a href='#' onclick=\"$('#%s_session').jstree('open_all');\">\
-expand all\
-</a> <a href='#' onclick=\"$('#%s_session').jstree('close_all');\">\
-close all\
-</a>\
-<div id=\"%s_session\" class=\"session\">\
-%a\
-</div>\
-<script type=\"text/javascript\" class=\"source\">\
-$(function () {\
-  $(\"#%s_session\").jstree({\
-      \"types\" : {\
-	   \"types\" : {\
-	   \"file\" : {\
-		\"icon\" : { \"image\" : \"images/folder16.png\"},\
-		      },\
-	   \"theory\" : {\
-		\"icon\" : { \"image\" : \"images/folder16.png\"},\
-		      },\
-	   \"goal\" : {\
-		\"icon\" : { \"image\" : \"images/file16.png\"},\
-		      },\
-	   \"prover\" : {\
-		\"icon\" : { \"image\" : \"images/wizard16.png\"},\
-		      },\
-	   \"transf\" : {\
-		\"icon\" : { \"image\" : \"images/configure16.png\"},\
-		      },\
-                        }\
-                },\
-      \"plugins\" : [\"themes\",\"html_data\",\"types\"]\
-        });\
-});\
-</script>\
-"
-  name name name print_session_aux name name
-
-
-  let context : context = "<!DOCTYPE html\
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-<head>\
-    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\
-    <title>Why3 session of %s</title>\
-    <link rel=\"stylesheet\" type=\"text/css\"\
-     href=\"javascript/session.css\" />\
-    <script type=\"text/javascript\" src=\"javascript/jquery.js\"></script>\
-    <script type=\"text/javascript\" src=\"javascript/jquery.jstree.js\">\
-</script>\
-    <script type=\"text/javascript\" src=\"javascript/session.js\">\
-</script>\
-</head>\
-<body>\
-%a\
-<iframe src=\"\"  id='edited'>\
-<p>Your browser does not support iframes.</p>\
-</iframe>\
-<script type=\"text/javascript\" class=\"source\">\
-$(function () {\
-  $('#edited').hide()\
-})\
-</script>\
-</body>\
-</html>\
-"
-
-  let run_files config =
-    let edited_dst = Filename.concat !output_dir "edited" in
-    if !opt_context then
-      if not (Sys.file_exists edited_dst) then Unix.mkdir edited_dst 0o755;
-    iter_files (run_file context print_session);
-    if !opt_context then
-      let data_dir = Whyconf.datadir (Whyconf.get_main config) in
-      (* copy images *)
-      let img_dir_src = Filename.concat data_dir "images" in
-      let img_dir_src = Filename.concat img_dir_src "boomy" in
-      let img_dir_dst = Filename.concat !output_dir "images" in
-      if not (Sys.file_exists img_dir_dst) then Unix.mkdir img_dir_dst 0o755;
-      List.iter (fun img_name ->
-        let from = Filename.concat img_dir_src img_name in
-        let to_  = Filename.concat img_dir_dst img_name in
-        Sysutil.copy_file from to_)
-        ["folder16.png";"file16.png";"wizard16.png";"configure16.png"];
-      (* copy javascript *)
-      let js_dir_src = Filename.concat data_dir "javascript" in
-      let js_dir_dst = Filename.concat !output_dir "javascript" in
-      Sysutil.copy_dir js_dir_src js_dir_dst
-
-end
-
-
-
 let run () =
-  let _,config,should_exit1 = read_env_spec () in
+  let _,_,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
   match !opt_style with
     | Table -> iter_files Table.run_one
     | SimpleTree -> iter_files Simple.run_one
-    | Jstree ->
-      if !output_dir = "-" then begin
-        Format.eprintf "Option \"-o -\" is not compatible with \"--style jstree\".@.";
-        exit 1
-      end;
-      if !output_dir = "" then begin
-        let first = ref true in
-        iter_files (fun fname ->
-          if not !first then begin
-            Format.eprintf "Option \"-o -\" is mandatory when \"--style jstree\" is used for several files at once.@.";
-            exit 1
-          end;
-          output_dir := Session.get_project_dir fname;
-          first := false);
-      end;
-      Jstree.run_files config
-
 
 let cmd =
   { cmd_spec = spec;

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -42,14 +42,9 @@ val ends_with : string -> string -> bool
 val pad_right : char -> string -> int -> string
 (** chop or pad the given string on the right up to the given length *)
 
-val slice : string -> int -> int -> string
-(* [slice s start end] returns the substring of s that starts at [start] and
-   ends at [end-1]. Uses [String.sub] under the hood, so Invalid_argument will
-   be raised if start/end do not correspond to a valid substring. *)
-
 val has_prefix : string -> string -> bool
 (** [has_prefix pref s] returns true if s [s] starts with prefix [pref] *)
 
 val remove_prefix : string -> string -> string
 (** [remove_prefix pref s] removes the prefix [pref] from [s]. Raises
-    [Not_found if [s] does not start with [pref] *)
+    [Not_found] if [s] does not start with [pref] *)

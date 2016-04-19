@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -240,10 +240,6 @@ src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
 
-src/driver/vc_client.o: src/driver/vc_client.c
-	ocamlopt -c $^
-	mv $(CURDIR)/vc_client.o $@
-
 # hide deprecated warnings for strings
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
 src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
@@ -257,7 +253,7 @@ lib/why3/why3.cma: lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-lib/why3/why3.cmxa: lib/why3/why3.cmx src/driver/vc_client.o
+lib/why3/why3.cmxa: lib/why3/why3.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
@@ -322,7 +318,6 @@ endif
 	cp -f share/images/*.png $(DATADIR)/why3/images
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f share/Makefile.config $(DATADIR)/why3
-	cp -rf share/javascript $(DATADIR)/why3/javascript
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
@@ -563,6 +558,7 @@ clean_old_install::
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	cp -f bin/why3server$(EXE) $(BINDIR)/why3$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
@@ -2027,8 +2023,6 @@ ocp:
 NAME = why3-@VERSION@
 # see .gitattributes for the list of files that are not distributed
 MORE_DIST = configure doc/manual.pdf
-EXTRANAME = why3-extra-@VERSION@
-EXTRA_DIST = share/images/boomy.rc share/images/boomy share/javascript
 
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
@@ -2037,9 +2031,6 @@ dist: $(MORE_DIST)
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
 	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
-	mkdir distrib/$(EXTRANAME)
-	cp -r $(EXTRA_DIST) distrib/$(EXTRANAME)
-	cd distrib; tar cf $(EXTRANAME).tar $(EXTRANAME); gzip -f --best $(EXTRANAME).tar
 
 
 ###############

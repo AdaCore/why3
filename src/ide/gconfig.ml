@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -561,7 +561,7 @@ let show_about_window () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2015 Inria, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2016 Inria, CNRS, Paris-Sud University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"

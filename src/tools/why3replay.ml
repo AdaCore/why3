@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -400,7 +400,7 @@ let run_as_bench env_session =
     eprintf " done.@.";
     exit 0
   in
-  let limit = Call_provers.mk_limit 2 0 (-1) in
+  let limit = Call_provers.mk_limit 2 0 0 in
   M.play_all env_session sched ~callback ~limit provers;
   main_loop ();
   eprintf "main replayer (in bench mode) exited unexpectedly@.";

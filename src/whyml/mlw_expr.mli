@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -160,13 +160,6 @@ and expr_node = private
   | Eabstr  of expr * spec
   | Eassert of assertion_kind * term
   | Eabsurd
-
-(*
-   Earrow - variables of function type
-   Eapp (e,v,s) -
-     represents application (e v), s contains the pre/post/effects
-      of the call
-*)
 
 and let_defn = private {
   let_sym  : let_sym;

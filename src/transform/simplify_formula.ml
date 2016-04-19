@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -102,7 +102,7 @@ let rec fmla_quant sign f = function
         vs::vsl, f
       with Subst_found t ->
         let f = t_subst_single vs t f in
-        vsl, fmla_simpl f
+        vsl, f
 
 let rec fmla_remove_quant f =
   match f.t_node with

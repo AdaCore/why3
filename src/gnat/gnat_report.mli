@@ -36,15 +36,9 @@ open Gnat_objectives
                 "trace_file" : string,
                 "vc_file"    : string,
                 "editor_cmd" : string,
-                "stats"      : stats_rec
+                "stats"      : stats_rec,
+                "cntexmp"    : cntexmp_rec
                 }
-
-     stats_rec = { [prover_name : stats_entry] }
-
-     stats_entry = { "count"     : int,
-                     "max_steps" : int,
-                     "max_time"  : float }
-
 
    The field "id" contains the id of the VC. The field "reason" identifies the
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
@@ -56,9 +50,41 @@ open Gnat_objectives
    present, "vc_file" contains the name of a VC file to be used for manual
    proof, and "editor_cmd" the command to spawn for an external editor for this
    VC.
+
    The optional field "stats" contains a mapping from each prover name to a
    stat record, which indicates the number of VCs proved by this prover, with
-   max time and steps.
+   max time and steps. Note that stats_rec is a record with a variable number
+   of fields, indicated with the [] syntax. It's not a list, nor does it
+   contain a list.
+
+     stats_rec = { [prover_name : stats_entry] }
+
+     stats_entry = { "count"     : int,
+                     "max_steps" : int,
+                     "max_time"  : float }
+
+  The counter example information is stored in the cntexmp field. At the top
+  level, this is a mapping from file names to linesentry record.
+
+     cntexmp_rec = { [filename : linesentry] }
+
+  A linesentry is a mapping from linenumbers to line information. A linenumber
+  is always a string. Usually the strings are integer values saved as strings,
+  but the special value "vc_line" is also used.
+
+     linesentry = { [ linenumber : list lineentry }
+
+     lineentry = { "kind"  : string,
+                   "name"  : string,
+                   "value" : string }
+
+  Possible values for "kind" are
+   - "variable"
+   - "error_message"
+   - "old"
+   - "result"
+
+
    *)
 
 val register :

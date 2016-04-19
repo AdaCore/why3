@@ -28,6 +28,17 @@ let add_warning ?loc s =
 
 let () = Warning.set_hook add_warning
 
+let adapt_stats statsopt =
+  match statsopt with
+  | None -> None
+  | Some stats ->
+      let newstats = Whyconf.Hprover.create 3 in
+      Whyconf.Hprover.iter (fun k v ->
+        let name = k.Whyconf.prover_name in
+        Whyconf.Hprover.add newstats k {v with max_steps =
+          Gnat_config.back_convert_steps ~prover:name v.max_steps}) stats;
+      Some newstats
+
 let register check task model stats valid manual tracefile =
   let extra_info =
     if valid then None
@@ -39,7 +50,7 @@ let register check task model stats valid manual tracefile =
   { check         = check;
     result        = valid;
     extra_info    = extra_info;
-    stats         = stats;
+    stats         = adapt_stats stats;
     tracefile     = tracefile;
     cntexmp_model = model;
     manual_proof  = manual } in

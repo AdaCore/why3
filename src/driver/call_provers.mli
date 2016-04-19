@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -139,7 +139,7 @@ val get_time : resource_limit -> int
 val get_mem : resource_limit -> int
 (* return time, return default value 0 if not set *)
 val get_steps : resource_limit -> int
-(* return time, return default value (-1) if not set *)
+(* return time, return default value 0 if not set *)
 
 val mk_limit : int -> int -> int -> resource_limit
 (* build a limit object, transforming the default values into None on the fly

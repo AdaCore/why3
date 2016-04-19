@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -263,28 +263,30 @@ let print_decl info fmt d = match d.d_node with
         head print_pr pr (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
-let print_decls fm nm rew_rules =
+let print_decls fm nm =
 (*
   Format.eprintf "rewrite rules:";
   Spr.iter (fun pr -> Format.eprintf " %s" pr.pr_name.id_string) rew_rules;
   Format.eprintf "@.";
 *)
-  let print_decl (sm,fm,ct) fmt d =
+  let print_decl (sm,fm,rr,ct) fmt d =
     let info = { info_syn = sm;
                  info_fmt = fm;
                  info_num = nm;
                  info_srt = ref ct;
                  info_urg = ref [];
-                 info_rules = rew_rules } in
+                 info_rules = rr } in
     try print_decl info fmt d;
-        (sm,fm,!(info.info_srt)), !(info.info_urg)
+        (sm,fm,rr,!(info.info_srt)), !(info.info_urg)
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
-    Trans.fold print_decl ((sm,fm,Mty.empty),[]))
+  Trans.on_tagged_pr Compute.meta_rewrite (fun rr ->
+    Trans.fold print_decl ((sm,fm,rr,Mty.empty),[])))
 
 let print_task fm nm =
+  let print_decls = print_decls fm nm in
   fun args ?old:_ fmt task ->
     (* In trans-based p-printing [forget_all] is a no-no *)
     (* forget_all ident_printer; *)
@@ -293,10 +295,7 @@ let print_task fm nm =
     let rec print = function
       | x :: r -> print r; Pp.string fmt x
       | [] -> () in
-    let print_decls_with_meta =
-      Trans.on_tagged_pr Compute.meta_rewrite (print_decls fm nm)
-    in
-    print (snd (Trans.apply print_decls_with_meta task));
+    print (snd (Trans.apply print_decls task));
     pp_print_flush fmt ()
 
 let () =

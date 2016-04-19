@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <tchar.h>
-#include <assert.h>
 #include "queue.h"
 #include "request.h"
 #include "options.h"
