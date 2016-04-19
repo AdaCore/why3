@@ -416,7 +416,7 @@ let name_regions kn wr dst =
 
 (* multi-staged assignment changes the names of regions *)
 
-let writes_of_assign asl =
+let writes_of_assign cv asl =
   let add wr (r,f,v) =
     let f = Opt.get f.rs_field in
     let r = match r.pv_ity.ity_node with
@@ -424,10 +424,7 @@ let writes_of_assign asl =
     Mreg.change (function
       | None   -> Some (Mpv.singleton f v)
       | Some s -> Some (Mpv.add f v s)) r wr in
-  List.fold_left add Mreg.empty asl
-
-let assign_regions kn cv wr dst =
-  let regs = name_regions kn cv dst in
+  let wr = List.fold_left add Mreg.empty asl in
   (* we compute the same region bijection as eff_assign,
      except we do not need any consistency checking now *)
   let reg_rexp {reg_its = s; reg_args = tl; reg_regs = rl} wfs =
@@ -441,10 +438,13 @@ let assign_regions kn cv wr dst =
     let t2f = Mreg.add rt rf t2f in
     let link t2f rf rt = stitch t2f rf rt (Mreg.find_def Mpv.empty rt wr) in
     List.fold_left2 link t2f (reg_rexp rf Mpv.empty) (reg_rexp rt wfs) in
-  let add_write r wfs t2f = (* reset regions do not partake in renaming *)
-    if not (Sreg.mem r cv) then t2f else stitch t2f r r wfs in
-  let t2f = Mreg.fold add_write wr Mreg.empty in
-  Mreg.map (fun rf -> Mreg.find rf regs) t2f
+  (* renaming of regions "dst-to-src" under the surviving regions *)
+  let add_write r wfs t2f = stitch t2f r r wfs in
+  let t2f = Mreg.fold add_write (Mreg.set_inter wr cv) Mreg.empty in
+  (* rearrange the write effect according to the renaming *)
+  let add_write r wfs acc =
+    try Mreg.add (Mreg.find r t2f) wfs acc with Not_found -> acc in
+  Mreg.fold add_write wr Mreg.empty
 
 (* produce a rebuilding postcondition after a write effect *)
 
@@ -474,12 +474,13 @@ let rec havoc kn get_rhs wr regs t ity fl =
         let fd = Opt.get rs.rs_field in
         match get_rhs fd wfs with
         | VD -> fl
-        | PV {pv_vs = v; pv_ity = ity} ->
+        | PV {pv_vs = v} ->
             if sensitive itd fd then begin
               Warning.emit "invariant-breaking updates are not yet supported";
               fl (* TODO: strong invariants *)
             end else
             let nt = fs_app (ls_of_rs rs) [nt] v.vs_ty in
+            let ity = ity_full_inst isb rs.rs_cty.cty_result in
             let t, fl = havoc kn get_rhs wr regs (t_var v) ity fl in
             cons_t_simp nt t fl
         | NF ->
@@ -544,7 +545,10 @@ let print_regs regs = if Debug.test_flag debug then
     (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
       Ity.print_reg r Pretty.print_term t)) (Mreg.bindings regs)
 
-let wp_havoc_raw kn get_rhs wr wp dst regs =
+let wp_havoc_raw kn get_rhs wr cv wp =
+  let dst = dst_of_wp cv wp in
+  if Mpv.is_empty dst then wp else
+  let regs = name_regions kn cv dst in
   let () = print_dst dst; print_regs regs in
   let add _ t fvs = t_freevars fvs t in
   let fvs = Mreg.fold add regs Mvs.empty in
@@ -558,19 +562,18 @@ let wp_havoc_raw kn get_rhs wr wp dst regs =
   wp_forall (Mvs.keys fvs) wp
 
 let wp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} wp =
-  let dst = dst_of_wp cv wp in
-  if Mpv.is_empty dst then wp else
-  let regs = name_regions kn cv dst in
-  wp_havoc_raw kn rhs_of_effect wr wp dst regs
+  wp_havoc_raw kn rhs_of_effect wr cv wp
 
 let wp_assign {known_map = kn} {eff_covers = cv} asl wp =
-  let dst = dst_of_wp cv wp in
-  if Mpv.is_empty dst then wp else
-  let wr = writes_of_assign asl in
-  let regs = assign_regions kn cv wr dst in
-  wp_havoc_raw kn rhs_of_assign wr wp dst regs
+  wp_havoc_raw kn rhs_of_assign (writes_of_assign cv asl) cv wp
 
-let sp_havoc_raw kn get_rhs wr sp dst regs =
+let sp_havoc_raw kn get_rhs wr cv res sp dst =
+  if Sreg.is_empty cv then sp else
+  let rd = vc_freepvs Spv.empty res sp in
+  let dst = if Spv.is_empty rd then dst else
+    dst_step_back_raw cv rd Mreg.empty dst in
+  if Mpv.is_empty dst then sp else
+  let regs = name_regions kn cv dst in
   let () = print_dst dst; print_regs regs in
   let update {pv_vs = o; pv_ity = ity} n sp =
     let t, fl = havoc kn get_rhs wr regs (t_var o) ity [] in
@@ -579,18 +582,10 @@ let sp_havoc_raw kn get_rhs wr sp dst regs =
   sp_and sp (Mpv.fold update dst t_true)
 
 let sp_havoc {known_map = kn} {eff_writes = wr; eff_covers = cv} res sp dst =
-  if Sreg.is_empty cv then sp else
-  let rd = vc_freepvs Spv.empty res sp in
-  let dst = dst_step_back_raw cv rd Mreg.empty dst in
-  if Mpv.is_empty dst then sp else
-  let regs = name_regions kn cv dst in
-  sp_havoc_raw kn rhs_of_effect wr sp dst regs
+  sp_havoc_raw kn rhs_of_effect wr cv res sp dst
 
-let sp_assign {known_map = kn} {eff_covers = cv} asl dst =
-  if Mpv.is_empty dst then t_true else
-  let wr = writes_of_assign asl in
-  let regs = assign_regions kn cv wr dst in
-  sp_havoc_raw kn rhs_of_assign wr t_true dst regs
+let sp_assign {known_map = kn} {eff_covers = cv} res asl dst =
+  sp_havoc_raw kn rhs_of_assign (writes_of_assign cv asl) cv res t_true dst
 
 let dst_complete sp dst =
   let add o n sp =
@@ -919,7 +914,7 @@ and sp_expr env e res xres zout zeff zdst = match e.e_node with
       ok, ok, Mexn.empty
   | Eassign asl ->
       let dst = dst_step_back e.e_effect zeff zdst in
-      let sp = sp_assign env e.e_effect asl dst in
+      let sp = sp_assign env e.e_effect res asl dst in
       out_seq_raw (t_true, vc_label e sp, Mexn.empty) dst res zout
   | Ewhile (e0, invl, varl, e1) ->
       (* ok: I /\ !! I -> (ok0 /\ (ne0 ->  test -> ok1 /\ (ne1 -> I /\ V)))
