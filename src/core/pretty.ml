@@ -88,9 +88,11 @@ let extract_op ls =
 let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
 
 let escape_op s =
-  let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
-  let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
-  s
+  let len = String.length s in
+  if len = 0 then s else
+    let s = if String.get s (len - 1) = '*' then s ^ " " else s in
+    let s = if String.get s 0 = '*' then " " ^ s else s in
+   s
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =

@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Format
 open Worker_proto
 
@@ -48,6 +59,17 @@ let run_alt_ergo_on_task text =
 let () =
   Options.set_steps_bound 100;
   Worker.set_onmessage (fun msg ->
-			let (id, text) = unmarshal msg in
-			let result = run_alt_ergo_on_task text in
-			Worker.post_message (marshal (id,result)))
+			match unmarshal msg with
+			  Goal (id, text, steps) ->
+			  let old_steps = Options.steps_bound () in
+			  if steps > 0 then Options.set_steps_bound steps;
+			  let result = run_alt_ergo_on_task text in
+			  Options.set_steps_bound old_steps;
+			  Worker.post_message (marshal (id,result))
+			| OptionSteps i -> Options.set_steps_bound i)
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. trywhy3"
+End:
+*)

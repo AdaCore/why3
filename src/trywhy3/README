@@ -7,11 +7,14 @@ Instructions to build TryWhy3
 
      git clone https://github.com/ajaxorg/ace-builds.git
 
-  ** copy the fontawesome webfont locally :
-     mkdir fontawesome
-     cd fontawesome
-     wget -nd https://www.lri.fr/~kn/trywhy3/fontawesome/fontawesome.css
-     wget -nd https://www.lri.fr/~kn/trywhy3/fontawesome/fontawesome-webfont.woff
+     copy the mode-why3.js file to the ace-builds/src-min-noconflict directory:
+
+     cp mode-why3.js ace-builds/src-min-noconflict
+
+  ** Download the latest version of Font-Awesome in a directory named 'fontawesome' :
+
+     git clone https://github.com/FortAwesome/Font-Awesome.git fontawesome
+
 
   ** install Alt-Ergo
 
@@ -42,4 +45,31 @@ Instructions to build TryWhy3
       make trywhy3
 
 
-* install : TODO
+* install
+  you can build a package with
+
+  make trywhy3_package
+
+  this creates a tarball containing a directory trywhy3/ which you can put on a webserver.
+  You may want to add a symlink from index.html to trywhy3.html (or rename the file).
+
+
+* customization
+
+  ** install a file trywhy3_help.html that will be shown when clicking the help button.
+
+  ** To change the theme used by the ace editor widget, add the
+     relevant theme-*.js file to the ace-builds/src-min-noconflict/
+     directory and update the variable definition at the top of the
+     trywhy3.html file
+
+  ** To change the look and feel of the rest of the application, edit
+     the file trywhy3_custom.css.
+
+  ** To add some predefined examples, put some .mlw or .why files in the
+     examples/ subdirectory and generate an index as follows (assuming you
+     are in your trywhy3 directory) :
+
+     cp some_file.mlw examples/
+     cd examples/
+     ../gen_index.sh *.mlw > index.txt
