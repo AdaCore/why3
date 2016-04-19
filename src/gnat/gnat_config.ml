@@ -2,11 +2,11 @@ open Why3
 open Stdlib
 
 type proof_mode =
-    Then_Split
+    Progressive
   | No_WP
   | All_Split
-  | Path_WP
-  | No_Split
+  | Per_Path
+  | Per_Check
 
 type limit_mode =
   | Limit_Check of Gnat_expl.check
@@ -39,7 +39,7 @@ let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_force = ref false
-let opt_proof_mode = ref Then_Split
+let opt_proof_mode = ref Progressive
 let opt_lazy = ref true
 let opt_filename : string option ref = ref None
 let opt_parallel = ref 1
@@ -82,16 +82,16 @@ let set_proof_mode s =
       opt_proof_mode := No_WP
    else if s = "all_split" then
       opt_proof_mode := All_Split
-   else if s = "path_wp" then
-      opt_proof_mode := Path_WP
-   else if s = "no_split" then
-      opt_proof_mode := No_Split
-   else if s = "then_split" then
-     opt_proof_mode := Then_Split
+   else if s = "per_path" then
+      opt_proof_mode := Per_Path
+   else if s = "per_check" then
+      opt_proof_mode := Per_Check
+   else if s = "progressive" then
+     opt_proof_mode := Progressive
    else
       Gnat_util.abort_with_message ~internal:true
         "argument for option --proof should be one of\
-        (then_split|no_wp|all_split|path_wp|no_split)."
+        (per_check|per_path|progressive|no_wp|all_split)."
 
 let set_prover s =
    opt_prover := Some s

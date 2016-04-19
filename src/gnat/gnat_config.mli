@@ -51,18 +51,11 @@ val back_convert_steps : prover : string -> int -> int
 val limit : prover : string -> Call_provers.resource_limit
 
 type proof_mode =
-    Then_Split
+    Progressive
   | No_WP
   | All_Split
-  | Path_WP
-  | No_Split
-(* In mode normal, compute VCs and split VCs as necessary, call prover as
-                   necessary;
-   In mode no_wp, do not compute VCs and never call the prover
-   In mode all_split, compute all split VCs, and never call the prover
-   In mode Path_WP, use the "normal WP" to compute one VC for each path
-   In mode No_Split, do not split VCs at all
-   *)
+  | Per_Path
+  | Per_Check
 
 type limit_mode =
   | Limit_Check of Gnat_expl.check

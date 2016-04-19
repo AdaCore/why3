@@ -212,8 +212,8 @@ let next objective =
 
 let strategy =
   match Gnat_config.proof_mode with
-  | Gnat_config.Path_WP -> ["path_split"; Gnat_split_conj.split_conj_name]
-  | Gnat_config.No_Split -> ["split_goal_wp"]
+  | Gnat_config.Per_Path -> ["path_split"; Gnat_split_conj.split_conj_name]
+  | Gnat_config.Per_Check -> ["split_goal_wp"]
   | _ ->
       ["split_goal_wp";
        Gnat_split_conj.split_conj_name;

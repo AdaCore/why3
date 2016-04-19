@@ -90,7 +90,7 @@ let rec handle_vc_result goal result prover_result manual_info =
    | Gnat_objectives.Not_Proved ->
        let (tracefile, trace) =
          match Gnat_config.proof_mode with
-         | Gnat_config.Then_Split | Gnat_config.Path_WP ->
+         | Gnat_config.Progressive | Gnat_config.Per_Path ->
            Gnat_objectives.Save_VCs.save_trace goal
          | _ -> ("", Gnat_loc.S.empty)
        in
@@ -240,9 +240,9 @@ let _ =
    try
       Gnat_objectives.init ();
       match Gnat_config.proof_mode with
-      | Gnat_config.Then_Split
-      | Gnat_config.Path_WP
-      | Gnat_config.No_Split ->
+      | Gnat_config.Progressive
+      | Gnat_config.Per_Path
+      | Gnat_config.Per_Check ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
          Gnat_objectives.iter handle_obj;
          Gnat_objectives.do_scheduled_jobs interpret_result;
