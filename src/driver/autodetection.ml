@@ -232,22 +232,21 @@ let sanitize_exec =
 let ask_prover_version exec_name version_switch =
   let out = Filename.temp_file "out" "" in
   let cmd = sprintf "%s %s" exec_name version_switch in
-  let c = sprintf "(%s) > %s 2>&1" cmd out in
+  let c = sprintf "(%s) >%s 2>&1" cmd out in
   Debug.dprintf debug "Run : %s@." c;
-  let ret = Sys.command c in
-  if ret <> 0 then
-    begin
-      Debug.dprintf debug "command '%s' failed@." cmd;
+  try
+    let ret = Sys.command c in
+    let ch = open_in out in
+    let c = Sysutil.channel_contents ch in
+    close_in ch;
+    Sys.remove out;
+    if ret <> 0 then begin
+      Debug.dprintf debug "command '%s' failed. Output:@\n%s@." cmd c;
       None
-    end
-  else
-    try
-      let ch = open_in out in
-      let c = Sysutil.channel_contents ch in
-      close_in ch;
-      Sys.remove out;
-      Some c
-    with Not_found | End_of_file  -> Some ""
+    end else Some c
+  with Not_found | End_of_file | Sys_error _ ->
+    Debug.dprintf debug "command '%s' failed@." cmd;
+    None
 
 let ask_prover_version env exec_name version_switch =
   try
