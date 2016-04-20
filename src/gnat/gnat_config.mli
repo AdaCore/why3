@@ -23,15 +23,9 @@ val prover_ce : prover option
    None if counterexample should not be generated
 *)
 
-type ce_mode =
-  | On
-  | Off
-(* In mode On, the counterexample will be generated
-   In mode Off, the counterexample will not be generated
-*)
-
-val ce_mode : ce_mode
-(* Reflects the value of the option --counterexample, default off *)
+val counterexamples : bool
+(* Reflects the value of the option --counterexample, default off
+   Counter examples are also disabled when CVC4 is not found *)
 
 val manual_prover : prover option
 (* Currently, if a manual prover is provided, it must be the only one. So in

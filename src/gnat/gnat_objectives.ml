@@ -395,9 +395,7 @@ let register_result goal result =
          GoalSet.reset obj_rec.to_be_scheduled;
          nb_goals_done := !nb_goals_done + n;
 
-	 match Gnat_config.ce_mode with
-	 | Gnat_config.On ->
-	   begin
+         if Gnat_config.counterexamples then begin
 	     (* The goal will be scheduled to get a counterexample *)
 	     obj_rec.not_proved <- true;
 	     obj_rec.counter_example <- true;
@@ -406,9 +404,7 @@ let register_result goal result =
 	        so it is not put to the obj_rec.to_be_scheduled *)
 
              obj, Counter_Example
-	   end
-	 | Gnat_config.Off ->
-	   obj, Not_Proved
+         end else obj, Not_Proved
    end
    end
 

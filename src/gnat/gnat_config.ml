@@ -12,10 +12,6 @@ type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
 
-type ce_mode =
-  | On
-  | Off
-
 type prover =
   { driver : Driver.driver;
     prover : Whyconf.config_prover;
@@ -45,7 +41,7 @@ let opt_filename : string option ref = ref None
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
-let opt_ce_mode = ref Off
+let opt_ce_mode = ref false
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -61,10 +57,8 @@ let set_why3_conf s =
     opt_why3_conf_file := Some s
 
 let set_ce_mode s =
-  if s = "on" then
-    opt_ce_mode := On
-  else if s = "off" then
-    opt_ce_mode := Off
+  if s = "on" then opt_ce_mode := true
+  else if s = "off" then opt_ce_mode := false
   else
     Gnat_util.abort_with_message ~internal:true
         "argument for option --counterexample should be one of\
@@ -269,7 +263,7 @@ let provers, prover_ce, config, env =
           List.map filter_prover l in
       (* the prover for counterexample generation *)
       let base_prover_ce =
-	if !opt_ce_mode = On then
+	if !opt_ce_mode then
 	  Some (filter_prover "cvc4_ce")
 	else
 	  None in
@@ -435,7 +429,7 @@ let () =
     exit 0
   | _ -> ()
 
-let ce_mode = !opt_ce_mode
+let counterexamples = !opt_ce_mode
 
 let manual_prover =
   (* sanity check - we found at least one prover, and don't allow combining

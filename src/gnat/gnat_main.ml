@@ -140,7 +140,7 @@ and interpret_result pa pas =
          let answer = r.Call_provers.pr_answer in
          let info = Gnat_manual.manual_proof_info pa in
          if answer = Call_provers.HighFailure &&
-	   Gnat_config.ce_mode = Gnat_config.Off then
+	   not Gnat_config.counterexamples then
            Gnat_report.add_warning r.Call_provers.pr_output;
          handle_vc_result goal (answer = Call_provers.Valid) (Some r) info
    | _ ->
