@@ -338,8 +338,8 @@ Axiom H6 : (no_repeated_forest f0).
 Axiom H7 : (valid_coloring f0 c1).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 5.
-Ltac cvc4 := why3 "cvc4" timelimit 5.
+Ltac ae := why3 "alt-ergo" timelimit 15.
+Ltac cvc4 := why3 "cvc4" timelimit 15.
 
 (* Why3 goal *)
 Theorem sub_valid_coloring : forall (x:Z) (x1:forest) (x2:forest), (f0 = (N x

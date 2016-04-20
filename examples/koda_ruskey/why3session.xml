@@ -82,23 +82,23 @@
   </goal>
  </transf>
  </goal>
- <goal name="any_stack_frame" expanded="true">
- <transf name="induction_ty_lex" expanded="true">
-  <goal name="any_stack_frame.1" expl="1." expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+ <goal name="any_stack_frame">
+ <transf name="induction_ty_lex">
+  <goal name="any_stack_frame.1" expl="1.">
+  <transf name="split_goal_wp">
    <goal name="any_stack_frame.1.1" expl="1.">
    <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="any_stack_frame.1.2" expl="2." expanded="true">
-   <transf name="introduce_premises" expanded="true">
-    <goal name="any_stack_frame.1.2.1" expl="1." expanded="true">
-    <transf name="compute_in_goal" expanded="true">
-     <goal name="any_stack_frame.1.2.1.1" expl="1." expanded="true">
-     <transf name="split_goal_wp" expanded="true">
+   <goal name="any_stack_frame.1.2" expl="2.">
+   <transf name="introduce_premises">
+    <goal name="any_stack_frame.1.2.1" expl="1.">
+    <transf name="compute_in_goal">
+     <goal name="any_stack_frame.1.2.1.1" expl="1.">
+     <transf name="split_goal_wp">
       <goal name="any_stack_frame.1.2.1.1.1" expl="1.">
       <proof prover="1" timelimit="36"><result status="valid" time="0.02" steps="104"/></proof>
       </goal>
-      <goal name="any_stack_frame.1.2.1.1.2" expl="2." expanded="true">
+      <goal name="any_stack_frame.1.2.1.1.2" expl="2.">
       <proof prover="2"><result status="valid" time="0.06"/></proof>
       </goal>
      </transf>
@@ -444,7 +444,7 @@
      <goal name="sub_valid_coloring.3.1.1.1" expl="1.">
      <transf name="split_goal_wp">
       <goal name="sub_valid_coloring.3.1.1.1.1" expl="1.">
-      <proof prover="9" edited="koda_ruskey_KodaRuskey_Spec_sub_valid_coloring_1.v"><result status="valid" time="5.64"/></proof>
+      <proof prover="9" edited="koda_ruskey_KodaRuskey_Spec_sub_valid_coloring_1.v"><result status="valid" time="1.55"/></proof>
       </goal>
       <goal name="sub_valid_coloring.3.1.1.1.2" expl="2.">
       <proof prover="0" timelimit="6"><result status="valid" time="0.04"/></proof>
