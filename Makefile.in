@@ -160,7 +160,7 @@ LIB_UTIL = config bigInt util opt lists strings \
 LIB_CORE = ident ty term pattern decl theory \
 	   task pretty dterm env trans printer model_parser
 
-LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
+LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection \
              parse_smtv2_model_parser parse_smtv2_model_lexer parse_smtv2_model
 
@@ -609,6 +609,43 @@ clean::
 
 %.type: %.mlw bin/why3ide.opt
 	bin/why3.opt --type-only $*.mlw
+
+##############
+# Why3server #
+##############
+
+SERVER_MODULES := logging arraylist options queue readbuf request \
+		  writebuf server-unix server-win
+
+CPULIM_MODULES := cpulimit-unix cpulimit-win
+
+SERVER_O := $(addprefix src/server/, $(addsuffix .o, $(SERVER_MODULES)))
+
+CPULIM_O := $(addprefix src/server/, $(addsuffix .o, $(CPULIM_MODULES)))
+
+TOOLS = lib/why3server$(EXE) lib/why3cpulimit$(EXE)
+
+byte opt: $(TOOLS)
+
+lib/why3server$(EXE): $(SERVER_O)
+	$(CC) -Wall -o $@ $^
+
+lib/why3cpulimit$(EXE): $(CPULIM_O)
+	$(CC) -Wall -o $@ $^
+
+%.o: %.c %.h
+	$(CC) -c -Wall -g -o $@ $<
+
+%.o: %.c
+	$(CC) -c -Wall -g -o $@ $<
+
+install_no_local::
+	cp -f lib/why3server$(EXE) $(LIBDIR)/why3/why3server$(EXE)
+	cp -f lib/why3cpulimit$(EXE) $(LIBDIR)/why3/why3cpulimit$(EXE)
+	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
+
+clean::
+	rm -f $(SERVER_O) $(CPULIM_O) $(TOOLS)
 
 ##########
 # gallery
@@ -1396,24 +1433,6 @@ clean::
 	$(MAKE) -C src/jessie clean
 
 endif
-
-#######
-# tools
-#######
-
-TOOLS = lib/why3-cpulimit$(EXE)
-
-byte opt: $(TOOLS)
-
-lib/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
-	$(CC) -Wall -o $@ $^
-
-clean::
-	rm -f lib/why3-cpulimit$(EXE)
-
-install_no_local::
-	cp -f lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
-	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 #########
 # why3doc

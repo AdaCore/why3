@@ -38,7 +38,6 @@ val call_on_buffer :
   command      : string ->
   limit        : Call_provers.resource_limit ->
   ?inplace     : bool ->
-  ?interactive : bool ->
   filename     : string ->
   printer_mapping : Printer.printer_mapping ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
@@ -60,7 +59,6 @@ val prove_task :
   ?cntexample  : bool ->
   ?old         : string ->
   ?inplace     : bool ->
-  ?interactive : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
 
 (** Split the previous function in two simpler functions *)
@@ -75,7 +73,6 @@ val prove_task_prepared :
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
-  ?interactive : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
 
 

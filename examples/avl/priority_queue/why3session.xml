@@ -9,7 +9,7 @@
 <file name="../priority_queue.mlw">
 <theory name="PQueue" sum="a8f2dd09a268c50fc0a71d952b1c9e0e">
  <goal name="S.O.Trans">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.02" steps="10"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
  <goal name="M.WP_parameter assoc_m" expl="VC for assoc_m">
  <transf name="split_goal_wp">
@@ -40,28 +40,28 @@
  </transf>
  </goal>
  <goal name="M.WP_parameter neutral_m" expl="VC for neutral_m">
- <proof prover="1" steplimit="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="M.assoc">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.02" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
  <goal name="M.neutral">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.02" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
  <goal name="M.M.assoc">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.02" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
  <goal name="M.M.neutral">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.02" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
  <goal name="M.WP_parameter zero" expl="VC for zero">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.02" steps="1"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
  <goal name="M.WP_parameter op" expl="VC for op">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.18" steps="97"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.18" steps="97"/></proof>
  </goal>
  <goal name="D.WP_parameter measure" expl="VC for measure">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="3"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter monoid_sum_is_min" expl="VC for monoid_sum_is_min">
  <transf name="split_goal_wp">
@@ -74,7 +74,7 @@
    <proof prover="1"><result status="valid" time="0.13"/></proof>
    </goal>
    <goal name="WP_parameter monoid_sum_is_min.2.2" expl="2. VC for monoid_sum_is_min">
-   <proof prover="1"><result status="valid" time="1.36"/></proof>
+   <proof prover="1"><result status="valid" time="1.06"/></proof>
    </goal>
    <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. VC for monoid_sum_is_min">
    <proof prover="6"><result status="valid" time="0.20"/></proof>
@@ -131,7 +131,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter selected_part.3" expl="3. postcondition">
-  <proof prover="3"><result status="valid" time="2.56" steps="1561"/></proof>
+  <proof prover="3"><result status="valid" time="1.92" steps="1561"/></proof>
   </goal>
   <goal name="WP_parameter selected_part.4" expl="4. postcondition">
   <transf name="split_goal_wp">
@@ -179,7 +179,7 @@
       <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
       </goal>
       <goal name="WP_parameter selected_part.5.2.1.1.2" expl="2. VC for selected_part">
-      <proof prover="1"><result status="valid" time="1.65"/></proof>
+      <proof prover="1"><result status="valid" time="0.80"/></proof>
       </goal>
       <goal name="WP_parameter selected_part.5.2.1.1.3" expl="3. VC for selected_part">
       <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
@@ -251,7 +251,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter first_minimum_caracterisation.11" expl="11. precondition">
-  <proof prover="3"><result status="valid" time="0.35" steps="360"/></proof>
+  <proof prover="3"><result status="valid" time="0.18" steps="360"/></proof>
   </goal>
   <goal name="WP_parameter first_minimum_caracterisation.12" expl="12. postcondition">
   <transf name="split_goal_wp">
@@ -279,70 +279,70 @@
  </transf>
  </goal>
  <goal name="Sel.M.assoc">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
  <goal name="Sel.M.neutral">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
  <goal name="Sel.M.sum_def_nil">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
  <goal name="Sel.M.sum_def_cons">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="2"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
  <goal name="Sel.balancing_positive">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="1"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
  </goal>
  <goal name="Sel.selection_empty">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="3"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="3"/></proof>
  </goal>
  <goal name="Sel.WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="1"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
  </goal>
  <goal name="Sel.WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="1"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
  </goal>
  <goal name="Sel.WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.03" steps="1"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
  </goal>
  <goal name="Sel.WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part">
- <proof prover="3" timelimit="3" steplimit="1"><result status="valid" time="0.04" steps="102"/></proof>
+ <proof prover="3" timelimit="3"><result status="valid" time="0.04" steps="102"/></proof>
  </goal>
  <goal name="WP_parameter as_bag_append" expl="VC for as_bag_append">
- <proof prover="3" steplimit="1"><result status="valid" time="0.03" steps="75"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
  </goal>
  <goal name="WP_parameter as_bag_bounds" expl="VC for as_bag_bounds">
- <proof prover="3" steplimit="1"><result status="valid" time="0.08" steps="62"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="62"/></proof>
  </goal>
  <goal name="WP_parameter as_bag_membership" expl="VC for as_bag_membership">
- <proof prover="3" steplimit="1"><result status="valid" time="0.07" steps="131"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="131"/></proof>
  </goal>
  <goal name="WP_parameter m" expl="VC for m">
- <proof prover="3" steplimit="1"><result status="valid" time="0.04" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter correction" expl="VC for correction">
  <proof prover="3"><result status="valid" time="0.16" steps="397"/></proof>
  </goal>
  <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="3" steplimit="1"><result status="valid" time="0.07" steps="14"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="14"/></proof>
  </goal>
  <goal name="WP_parameter singleton" expl="VC for singleton">
- <proof prover="3" steplimit="1"><result status="valid" time="0.03" steps="90"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="90"/></proof>
  </goal>
  <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="3" steplimit="1"><result status="valid" time="0.03" steps="82"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="82"/></proof>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge">
- <proof prover="3" steplimit="1"><result status="valid" time="0.03" steps="46"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="46"/></proof>
  </goal>
  <goal name="WP_parameter remove_count" expl="VC for remove_count">
- <proof prover="3" steplimit="1"><result status="valid" time="0.25" steps="374"/></proof>
+ <proof prover="3"><result status="valid" time="0.25" steps="374"/></proof>
  </goal>
  <goal name="WP_parameter extract_min" expl="VC for extract_min">
  <proof prover="3"><result status="valid" time="0.62" steps="994"/></proof>
  </goal>
  <goal name="WP_parameter min" expl="VC for min">
- <proof prover="3" steplimit="1"><result status="valid" time="0.11" steps="89"/></proof>
+ <proof prover="3"><result status="valid" time="0.11" steps="89"/></proof>
  </goal>
  <goal name="WP_parameter pop_min" expl="VC for pop_min">
  <proof prover="3"><result status="valid" time="1.86" steps="1913"/></proof>

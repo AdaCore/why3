@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../ral.mlw">
 <theory name="RAL" sum="c7ad4c6b81728dbd18a1c23ee5747ec2">
  <goal name="M.assoc">
@@ -112,13 +112,13 @@
  </transf>
  </goal>
  <goal name="WP_parameter get" expl="VC for get">
- <proof prover="2"><result status="valid" time="0.14" steps="116"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="116"/></proof>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert">
  <proof prover="2"><result status="valid" time="0.13" steps="329"/></proof>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove">
- <proof prover="2" steplimit="0"><result status="valid" time="0.15" steps="346"/></proof>
+ <proof prover="2"><result status="valid" time="0.15" steps="346"/></proof>
  </goal>
  <goal name="WP_parameter cut" expl="VC for cut">
  <proof prover="2"><result status="valid" time="0.05" steps="46"/></proof>
@@ -153,7 +153,7 @@
   <proof prover="2"><result status="valid" time="0.03" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter harness.9" expl="9. check">
-  <proof prover="2"><result status="valid" time="0.17" steps="169"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="169"/></proof>
   </goal>
   <goal name="WP_parameter harness.10" expl="10. check">
   <proof prover="2"><result status="valid" time="0.06" steps="199"/></proof>

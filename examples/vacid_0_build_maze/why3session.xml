@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="30" steplimit="1" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="30" steplimit="1" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <file name="../vacid_0_build_maze.mlw" expanded="true">
 <theory name="UnionFind_pure" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
@@ -23,7 +23,7 @@
   <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="Ineq1.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.38"/></proof>
+  <proof prover="0"><result status="valid" time="0.14"/></proof>
   </goal>
  </transf>
  </goal>
@@ -36,7 +36,7 @@
   <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter add_edge_and_union.3" expl="3. postcondition">
-  <proof prover="6"><result status="valid" time="0.53" steps="615"/></proof>
+  <proof prover="6"><result status="valid" time="0.29" steps="615"/></proof>
   </goal>
  </transf>
  </goal>
@@ -67,13 +67,13 @@
   <proof prover="5" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.9" expl="9. precondition">
-  <proof prover="6"><result status="valid" time="0.30" steps="50"/></proof>
+  <proof prover="6"><result status="valid" time="0.13" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.10" expl="10. precondition">
-  <proof prover="6"><result status="valid" time="0.29" steps="44"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="44"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.11" expl="11. precondition">
-  <proof prover="4"><result status="valid" time="0.42" steps="381"/></proof>
+  <proof prover="4"><result status="valid" time="0.24" steps="381"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.12" expl="12. loop invariant preservation">
@@ -81,7 +81,7 @@
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.13" expl="13. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="5.13"/></proof>
+  <proof prover="3"><result status="valid" time="2.47"/></proof>
   <proof prover="4"><result status="valid" time="0.18" steps="175"/></proof>
   </goal>
   <goal name="WP_parameter build_maze.14" expl="14. loop invariant preservation">

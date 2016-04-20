@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.4pl6" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../heapsort.mlw">
 <theory name="HeapSort" sum="9c2fa0e6c0d92d2a002dd9f0c0f63f95">
  <goal name="Min_of_sorted">
- <proof prover="1" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.27"/></proof>
+ <proof prover="1" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="WP_parameter heapSort" expl="VC for heapSort">
  <transf name="split_goal_wp">
@@ -233,10 +233,10 @@
   <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter testHarness.11" expl="11. assertion">
-  <proof prover="5" steplimit="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="5"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="WP_parameter testHarness.12" expl="12. assertion">
-  <proof prover="5" steplimit="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="5"><result status="valid" time="0.14"/></proof>
   </goal>
  </transf>
  </goal>
@@ -441,7 +441,7 @@
    <proof prover="3"><result status="valid" time="0.02" steps="16"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.14.3" expl="3. VC for extractMin">
-   <proof prover="5" steplimit="1"><result status="valid" time="0.09"/></proof>
+   <proof prover="5"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.14.4" expl="4. VC for extractMin">
    <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
@@ -491,7 +491,7 @@
    <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.21.3" expl="3. VC for extractMin">
-   <proof prover="5" steplimit="1"><result status="valid" time="0.10"/></proof>
+   <proof prover="5"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.21.4" expl="4. VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
@@ -551,7 +551,7 @@
    <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.28.3" expl="3. VC for extractMin">
-   <proof prover="5" steplimit="1"><result status="valid" time="0.08"/></proof>
+   <proof prover="5"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="WP_parameter extractMin.28.4" expl="4. VC for extractMin">
    <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>

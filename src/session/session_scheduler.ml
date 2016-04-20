@@ -111,11 +111,13 @@ type t =
     }
 
 let set_maximum_running_proofs max sched =
+  Prove_client.set_max_running_provers max;
   (* TODO dequeue actions if maximum_running_proofs increase *)
   sched.maximum_running_proofs <- max
 
 let init max =
   Debug.dprintf debug "[Sched] init scheduler max=%i@." max;
+  Prove_client.set_max_running_provers max;
   { actions_queue = Queue.create ();
     maximum_running_proofs = max;
     running_proofs = [];
@@ -290,19 +292,7 @@ let schedule_proof_attempt ~cntexample ~limit ?old ~inplace
 
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
-  let res_parser =
-    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown ("", None))];
-      Call_provers.prp_regexps = [];
-      Call_provers.prp_timeregexps = [];
-      Call_provers.prp_stepregexps = [];
-      Call_provers.prp_model_parser = fun _ _ -> Model_parser.default_model
-    } in
-  let nolimit =
-    { Call_provers.limit_time = None; limit_mem = None; limit_steps = None } in
-  let precall =
-    Call_provers.call_on_file ~command ~limit:nolimit ~res_parser
-      ~redirect:false filename
-      ~printer_mapping:Printer.get_default_printer_mapping in
+  let precall = Call_provers.call_editor ~command filename in
   callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
   run_timeout_handler t
@@ -404,9 +394,9 @@ let find_prover eS a =
 (* to avoid corner cases when prover results are obtained very closely
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
-let adapt_limits ~use_steps a =
-  let timelimit = (Call_provers.get_time a.proof_limit) in
-  let memlimit = (Call_provers.get_mem a.proof_limit) in
+let adapt_limits ~interactive ~use_steps a =
+  let timelimit = (a.proof_limit.Call_provers.limit_time) in
+  let memlimit = (a.proof_limit.Call_provers.limit_mem) in
   match a.proof_state with
   | Done { Call_provers.pr_answer = r;
            Call_provers.pr_time = t;
@@ -414,12 +404,11 @@ let adapt_limits ~use_steps a =
     (* increased time limit is 1 + twice the previous running time,
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
-    let increased_time =
-      let t = truncate (1.0 +. 2.0 *. t) in
-      max timelimit (min t (2 * timelimit))
-    in
+    let t = truncate (1.0 +. 2.0 *. t) in
+    let increased_time = if interactive then t
+      else max timelimit (min t (2 * timelimit)) in
     (* increased mem limit is just 1.5 times the previous mem limit *)
-    let increased_mem = 3 * memlimit / 2 in
+    let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
     begin
       match r with
       | Call_provers.OutOfMemory -> increased_time, memlimit, 0
@@ -437,11 +426,12 @@ let adapt_limits ~use_steps a =
         (* correct ? failures are supposed to appear quickly anyway... *)
         timelimit, memlimit, 0
     end
+  | _ when interactive -> 0, 0, 0
   | _ -> timelimit, memlimit, 0
 
-let adapt_limits ~use_steps a =
-  let t, m, s = adapt_limits ~use_steps a in
-  Call_provers.mk_limit t m s
+let adapt_limits ~interactive ~use_steps a =
+  let t, m, s = adapt_limits ~interactive ~use_steps a in
+  { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
 
 type run_external_status =
 | Starting
@@ -472,17 +462,17 @@ let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
     callback a a.proof_prover Call_provers.empty_limit None MissingProver
   | Some(ap,npc,a) ->
     callback a ap Call_provers.empty_limit None Starting;
-    if a.proof_edited_as = None &&
-       npc.prover_config.Whyconf.interactive
-    then begin
+    let itp = npc.prover_config.Whyconf.interactive in
+    if itp && a.proof_edited_as = None then begin
       callback a ap Call_provers.empty_limit None (MissingFile "unedited")
     end else begin
       let previous_result = a.proof_state in
-      let limit = adapt_limits ~use_steps a in
+      let limit = adapt_limits ~interactive:itp ~use_steps a in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command =
         Whyconf.get_complete_command npc.prover_config
-          ~with_steps:(limit.Call_provers.limit_steps <> None) in
+          ~with_steps:(limit.Call_provers.limit_steps <>
+                       Call_provers.empty_limit.Call_provers.limit_steps) in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
         callback a ap limit
@@ -558,8 +548,8 @@ let prover_on_goal eS eT ?callback ?(cntexample=false) ~limit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
-      set_timelimit (Call_provers.get_time limit) a;
-      set_memlimit (Call_provers.get_mem limit) a;
+      set_timelimit (limit.Call_provers.limit_time) a;
+      set_memlimit (limit.Call_provers.limit_mem) a;
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
@@ -963,7 +953,9 @@ let convert_unknown_prover =
                 (* should not happen *)
                 assert false
           in
-          let limit = Call_provers.mk_limit timelimit memlimit (-1) in
+          let limit = { Call_provers.empty_limit with
+                        Call_provers.limit_time = timelimit;
+                        limit_mem  = memlimit} in
           prover_on_goal es sched ~callback ~limit p g
         | Itransform(trname,pcsuccess) ->
           let callback ntr =

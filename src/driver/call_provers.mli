@@ -120,40 +120,30 @@ type post_prover_call = unit -> prover_result
 
 type resource_limit =
   {
-    limit_time  : int option;
-    limit_mem   : int option;
-    limit_steps : int option;
+    limit_time  : int;
+    limit_mem   : int;
+    limit_steps : int;
   }
 (* represents the three ways a prover run can be limited: in time, memory
    and/or steps *)
 
 val empty_limit : resource_limit
-(* the limit object which imposes no limits *)
+(* the limit object which imposes no limits. Use this object to impose no
+   limits, but also to know if some concrete time, steps or memlimit actually
+   means "no limit" *)
 
 val limit_max : resource_limit -> resource_limit -> resource_limit
 (* return the limit object whose components represent the maximum of the
    corresponding components of the arguments *)
 
-val get_time : resource_limit -> int
-(* return time, return default value 0 if not set *)
-val get_mem : resource_limit -> int
-(* return time, return default value 0 if not set *)
-val get_steps : resource_limit -> int
-(* return time, return default value 0 if not set *)
-
-val mk_limit : int -> int -> int -> resource_limit
-(* build a limit object, transforming the default values into None on the fly
-   *)
+val call_editor : command : string -> string -> pre_prover_call
 
 val call_on_file :
   command         : string ->
   limit           : resource_limit ->
   res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
-  ?cleanup        : bool ->
   ?inplace        : bool ->
-  ?interactive    : bool ->
-  ?redirect       : bool ->
   string -> pre_prover_call
 
 val call_on_buffer :
@@ -163,7 +153,6 @@ val call_on_buffer :
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  ?interactive    : bool ->
   Buffer.t -> pre_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
@@ -176,15 +165,7 @@ val call_on_buffer :
     doesn't accept stdin. *)
 
 val query_call : prover_call -> post_prover_call option
-(** Thread-safe non-blocking function that checks if the prover
-    has finished. *)
+(** non-blocking function that checks if the prover has finished. *)
 
 val wait_on_call : prover_call -> post_prover_call
-(** Thread-safe blocking function that waits until the prover finishes. *)
-
-val post_wait_call : prover_call -> Unix.process_status -> post_prover_call
-(** Thread-safe non-blocking function that should be called when the
-    prover's exit status was obtained from a prior call of Unix.waitpid *)
-
-val prover_call_pid : prover_call -> int
-(** Return the pid of the prover *)
+(** blocking function that waits until the prover finishes. *)
