@@ -311,18 +311,12 @@ let handle_answer answer =
 let wait_for_server_result ~blocking =
   List.map handle_answer (Prove_client.read_answers ~blocking)
 
-type post_prover_call = unit -> prover_result
-
 type prover_call =
   | ServerCall of server_id
-  | EditorCall of (Unix.process_status -> post_prover_call) * int
-
-type pre_prover_call = unit -> prover_call
-
-let result_buffer : (server_id, prover_result) Hashtbl.t = Hashtbl.create 17
+  | EditorCall of int
 
 let call_on_file ~command ~limit ~res_parser ~printer_mapping
-                 ?(inplace=false) fin () =
+                 ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace command limit fin in
@@ -341,30 +335,51 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
                             ~cmd;
   ServerCall id
 
-let get_new_results ~blocking =
-  List.iter (fun (id, r) -> Hashtbl.add result_buffer id r)
+type prover_update =
+  | NoUpdates
+  | ProverStarted
+  | ProverFinished of prover_result
+
+let result_buffer : (server_id, prover_update) Hashtbl.t = Hashtbl.create 17
+
+let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
+  List.iter (fun (id, r) -> Hashtbl.add result_buffer id (ProverFinished r))
     (wait_for_server_result ~blocking)
+
+let query_result_buffer id =
+  try let r = Hashtbl.find result_buffer id in
+      Hashtbl.remove result_buffer id; r
+  with Not_found -> NoUpdates
+
+let editor_result ret = {
+  pr_answer = Unknown ("", None);
+  pr_status = ret;
+  pr_output = "";
+  pr_time   = 0.0;
+  pr_steps  = 0;
+  pr_model  = Model_parser.default_model;
+}
 
 let query_call = function
   | ServerCall id ->
-      begin try
-        get_new_results ~blocking:false;
-        Some (let r = Hashtbl.find result_buffer id in (fun () -> r))
-      with Not_found -> None end
-  | EditorCall (call, pid) ->
+      get_new_results ~blocking:false;
+      query_result_buffer id
+  | EditorCall pid ->
       let pid, ret = Unix.waitpid [Unix.WNOHANG] pid in
-      if pid = 0 then None else Some (call ret)
+      if pid = 0 then NoUpdates else
+      ProverFinished (editor_result ret)
 
 let rec wait_on_call = function
   | ServerCall id as pc ->
-      begin try
-        let r = Hashtbl.find result_buffer id in (fun () -> r)
-      with Not_found ->
-        get_new_results ~blocking:true;
-        wait_on_call pc
+      begin match query_result_buffer id with
+        | ProverFinished r -> r
+        | _ ->
+            get_new_results ~blocking:true;
+            wait_on_call pc
       end
-  | EditorCall (call, pid) ->
-      let _, ret = Unix.waitpid [] pid in call ret
+  | EditorCall pid ->
+      let _, ret = Unix.waitpid [] pid in
+      editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
                    ?(inplace=false) buffer =
@@ -385,20 +400,8 @@ let call_editor ~command fin =
   Debug.dprintf debug "@[<hov 2>Call_provers: editor command is: %a@]@."
     (Pp.print_list Pp.space pp_print_string) command;
   let argarray = Array.of_list command in
-  fun () ->
-    let fd_in =
-      if use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
-    let pid = Unix.create_process exec argarray fd_in Unix.stdout Unix.stderr in
-    if use_stdin then Unix.close fd_in;
-    let call = fun ret ->
-      let r =
-        { pr_answer = Unknown ("", None);
-          pr_status = ret;
-          pr_output = "";
-          pr_time   = 0.0;
-          pr_steps  = 0;
-          pr_model  = Model_parser.default_model;
-        } in
-      (fun () -> r)
-    in
-    EditorCall (call, pid)
+  let fd_in =
+    if use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
+  let pid = Unix.create_process exec argarray fd_in Unix.stdout Unix.stderr in
+  if use_stdin then Unix.close fd_in;
+  EditorCall pid

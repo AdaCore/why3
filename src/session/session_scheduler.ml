@@ -100,9 +100,7 @@ type t =
       mutable running_check : (unit -> bool) list;
       (** proof attempt that wait some available action slot *)
       proof_attempts_queue :
-        ((proof_attempt_status -> unit) *
-            (unit -> Call_provers.prover_call))
-        Queue.t;
+        ((proof_attempt_status -> unit) * Call_provers.prover_call) Queue.t;
       (** timeout handler state *)
       mutable timeout_handler_activated : bool;
       mutable timeout_handler_running : bool;
@@ -147,9 +145,10 @@ let timeout_handler t =
        match c with
          | Check_prover(callback,call)  ->
              (match Call_provers.query_call call with
-               | None -> c::acc
-               | Some post ->
-                   let res = post () in callback (Done res);
+               | Call_provers.NoUpdates
+               | Call_provers.ProverStarted -> c::acc
+               | Call_provers.ProverFinished res ->
+                   callback (Done res);
                    acc)
          | Any_timeout callback ->
              let b = callback () in
@@ -160,10 +159,9 @@ let timeout_handler t =
   let l =
     if List.length l < t.maximum_running_proofs then
       begin try
-        let (callback,pre_call) = Queue.pop t.proof_attempts_queue in
+        let (callback,call) = Queue.pop t.proof_attempts_queue in
         callback Running;
         Debug.dprintf debug "[Sched] proof attempts started@.";
-        let call = pre_call () in
         (Check_prover(callback,call))::l
       with Queue.Empty -> l
       end
@@ -216,11 +214,11 @@ let idle_handler t =
               old,inplace,command,driver,callback,goal) ->
             begin
               try
-                let pre_call =
+                let call =
                   Driver.prove_task ?old ~cntexample ~inplace ~command
                     ~limit driver goal
                 in
-                Queue.push (callback,pre_call) t.proof_attempts_queue;
+                Queue.push (callback,call) t.proof_attempts_queue;
                 run_timeout_handler t
               with e when not (Debug.test_flag Debug.stack_trace) ->
                 Format.eprintf
@@ -292,9 +290,9 @@ let schedule_proof_attempt ~cntexample ~limit ?old ~inplace
 
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
-  let precall = Call_provers.call_editor ~command filename in
+  let call = Call_provers.call_editor ~command filename in
   callback Running;
-  t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
+  t.running_proofs <- (Check_prover(callback, call)) :: t.running_proofs;
   run_timeout_handler t
 
 let schedule_delayed_action t callback =

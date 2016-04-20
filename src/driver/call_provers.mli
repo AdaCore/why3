@@ -109,21 +109,15 @@ type prover_result_parser = {
 *)
 
 (** {2 Functions for calling external provers} *)
+
 type prover_call
 (** Type that represents a single prover run *)
 
-type pre_prover_call = unit -> prover_call
-(** Thread-safe closure that launches the prover *)
-
-type post_prover_call = unit -> prover_result
-(** Thread-unsafe closure that interprets the prover's results *)
-
-type resource_limit =
-  {
-    limit_time  : int;
-    limit_mem   : int;
-    limit_steps : int;
-  }
+type resource_limit = {
+  limit_time  : int;
+  limit_mem   : int;
+  limit_steps : int;
+}
 (* represents the three ways a prover run can be limited: in time, memory
    and/or steps *)
 
@@ -136,7 +130,7 @@ val limit_max : resource_limit -> resource_limit -> resource_limit
 (* return the limit object whose components represent the maximum of the
    corresponding components of the arguments *)
 
-val call_editor : command : string -> string -> pre_prover_call
+val call_editor : command : string -> string -> prover_call
 
 val call_on_file :
   command         : string ->
@@ -144,7 +138,7 @@ val call_on_file :
   res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  string -> pre_prover_call
+  string -> prover_call
 
 val call_on_buffer :
   command         : string ->
@@ -153,7 +147,7 @@ val call_on_buffer :
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  Buffer.t -> pre_prover_call
+  Buffer.t -> prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
     @param limit : set the available time limit (def. 0 : unlimited), memory
@@ -164,8 +158,14 @@ val call_on_buffer :
     @param filename : the suffix of the proof task's file, if the prover
     doesn't accept stdin. *)
 
-val query_call : prover_call -> post_prover_call option
-(** non-blocking function that checks if the prover has finished. *)
+type prover_update =
+  | NoUpdates
+  | ProverStarted
+  | ProverFinished of prover_result
 
-val wait_on_call : prover_call -> post_prover_call
+val query_call : prover_call -> prover_update
+(** non-blocking function that reports any new updates
+    from the server related to a given prover call. *)
+
+val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)

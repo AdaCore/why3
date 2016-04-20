@@ -1308,8 +1308,8 @@ let why3tac ?(timelimit=timelimit) s gl =
     if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
     let limit =
     { Call_provers.empty_limit with Call_provers.limit_time = timelimit } in
-    let call = Driver.prove_task ~command ~limit drv !task () in
-    wait_on_call call ()
+    let call = Driver.prove_task ~command ~limit drv !task in
+    wait_on_call call
   with
     | NotFO ->
         if debug then Printexc.print_backtrace stderr; flush stderr;
