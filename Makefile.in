@@ -558,7 +558,6 @@ clean_old_install::
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
@@ -662,28 +661,38 @@ clean::
 # Why3server #
 ##############
 
-SERVER_MODULES:= logging arraylist options queue readbuf request writebuf server_main
-SERVER_C:= $(addprefix src/tools/, $(addsuffix .c, $(SERVER_MODULES)))
-SERVER_H:= $(addprefix src/tools/, $(addsuffix .h, $(SERVER_MODULES)))
-SERVER_O:= $(addprefix src/tools/, $(addsuffix .o, $(SERVER_MODULES)))
+SERVER_MODULES := logging arraylist options queue readbuf request \
+		  writebuf server-unix server-win
 
-opt: bin/why3server$(EXE)
+CPULIM_MODULES := cpulimit-unix cpulimit-win
 
-bin/why3server$(EXE): $(SERVER_O)
-	gcc -o $@ $^
+SERVER_O := $(addprefix src/server/, $(addsuffix .o, $(SERVER_MODULES)))
+
+CPULIM_O := $(addprefix src/server/, $(addsuffix .o, $(CPULIM_MODULES)))
+
+TOOLS = lib/why3server$(EXE) lib/why3cpulimit$(EXE)
+
+byte opt: $(TOOLS)
+
+lib/why3server$(EXE): $(SERVER_O)
+	$(CC) -Wall -o $@ $^
+
+lib/why3cpulimit$(EXE): $(CPULIM_O)
+	$(CC) -Wall -o $@ $^
 
 %.o: %.c %.h
-	gcc -c -Wall -g -o $@ $<
-%.o: %.c
-	gcc -c -Wall -g -o $@ $<
+	$(CC) -c -Wall -g -o $@ $<
 
-src/tools/main.o:: src/tools/server-unix.c src/tools/server-win.c
+%.o: %.c
+	$(CC) -c -Wall -g -o $@ $<
 
 install_no_local::
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
+	cp -f lib/why3server$(EXE) $(LIBDIR)/why3/why3server$(EXE)
+	cp -f lib/why3cpulimit$(EXE) $(LIBDIR)/why3/why3cpulimit$(EXE)
+	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 clean::
-	 rm -f $(SERVER_O)
+	rm -f $(SERVER_O) $(CPULIM_O) $(TOOLS)
 
 install_spark2014:
 	mkdir -p $(BINDIR)
@@ -696,7 +705,7 @@ install_spark2014:
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
 	cp -f share/why3session.dtd $(DATADIR)/why3
-	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
+	cp -f lib/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
 	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
@@ -1490,24 +1499,7 @@ clean::
 
 endif
 
-#######
-# tools
-#######
 
-TOOLS = lib/why3-cpulimit$(EXE)
-
-byte opt: $(TOOLS)
-
-lib/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
-	$(CC) -Wall -o $@ $^
-
-clean::
-	rm -f lib/why3-cpulimit$(EXE)
-
-install_no_local::
-	mkdir -p $(LIBDIR)/why3
-	cp -f lib/why3-cpulimit$(EXE) $(BINDIR)/why3-cpulimit$(EXE)
-	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 #########
 # why3doc
@@ -1598,30 +1590,48 @@ ALTERGOMODS=util/numsNumbers util/numbers \
 	instances/matching \
 	sat/sat_solvers \
 	main/frontend
+ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+TRYWHY3CMO=lib/why3/why3.cma
+TRYWHY3FILES=trywhy3.js why3_worker.js alt_ergo_worker.js trywhy3.html trywhy3.css \
+	README examples/ \
+	trywhy3_custom.css gen_index.sh fontawesome/css/font-awesome.min.css \
+	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
+	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
+	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
+	 ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/theme-chrome.js
 
-TRYWHY3CMO=lib/why3/why3.cma $(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+trywhy3_package: trywhy3
+	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3FILES))
 
-trywhy3: src/trywhy3/trywhy3.js src/trywhy3/index.en.html src/trywhy3/index.fr.html
-
-%.fr.html: %.prehtml
-	yamlpp -l fr $< -o $@
-
-%.en.html: %.prehtml
-	yamlpp -l en $< -o $@
+trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
+	js_of_ocaml +weak.js +nat.js $^
+
+src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+
+src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
 	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
-		--file=drinkers.why:/ \
-		--file=simplearith.why:/ \
-		--file=bin_mult.mlw:/ \
-		--file=fact.mlw:/ \
-		--file=isqrt.mlw:/ \
 		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
-		+weak.js +nat.js $^
+	+weak.js +nat.js $^
 
-src/trywhy3/trywhy3.byte: $(TRYWHY3CMO) src/trywhy3/trywhy3.cmo
+src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+
+src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
+	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $^
+
+src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
+src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
+src/trywhy3/trywhy3.cmo: src/trywhy3/worker_proto.cmo
 
 src/trywhy3/%.cmo: src/trywhy3/%.ml
 	$(JSOCAMLC) $(BFLAGS) -c $<
@@ -1630,7 +1640,10 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 	$(JSOCAMLC) $(BFLAGS) -c $<
 
 clean::
-	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte
+	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
+	 src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte src/trywhy3/why3_worker.cm* \
+         src/trywhy3/alt_ergo_worker.js src/trywhy3/alt_ergo_worker.byte src/trywhy3/alt_ergo_worker.cm* \
+         src/trywhy3/worker_proto.cm* trywhy3.tar.gz
 
 CLEANDIRS += src/trywhy3
 
@@ -2043,7 +2056,8 @@ headers: headers-coq
 		src/*/*.ml src/*/*.ml[iyl4] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
 		lib/coq-tactic/*.v lib/coq/*.v \
-		src/tools/cpulimit.c \
+		src/server/*.c src/server/*.h \
+		src/ide/resetgc.c \
 		examples/use_api/*.ml
 
 headers-coq:

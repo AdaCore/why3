@@ -296,6 +296,42 @@ module ToList
     to_list a l u = Cons a[l] (to_list a (l+1) u)
 
   val to_list (a: array 'a) (l u: int) : list 'a
-    ensures { result = to_list a l u }
+    requires { 0 <= l && u <= length a }
+    ensures  { result = to_list a l u }
+
+end
+
+module ToSeq
+  use import int.Int
+  use import Array
+  use seq.Seq as S
+
+  function to_seq (a: array 'a) (l u: int) : S.seq 'a
+
+  axiom to_seq_empty:
+    forall a: array 'a, l u: int. u <= l ->
+    to_seq a l u = S.empty
+
+  axiom to_seq_cons:
+    forall a: array 'a, l u: int. 0 <= l < u <= length a ->
+    to_seq a l u = S.cons a[l] (to_seq a (l+1) u)
+
+  let rec lemma to_seq_length
+    (a: array 'a) (l u: int)
+    requires { 0 <= l <= u <= length a }
+    variant  { u - l }
+    ensures  { S.length (to_seq a l u) = u - l }
+  = if l < u then to_seq_length a (l+1) u
+
+  let rec lemma to_seq_nth
+    (a: array 'a) (l i u: int)
+    requires { 0 <= l <= i < u <= length a }
+    variant  { i - l }
+    ensures  { S.get (to_seq a l u) (i - l) = a[i] }
+  = if l < i then to_seq_nth a (l+1) i u
+
+  val to_seq (a: array 'a) (l u: int) : S.seq 'a
+    requires { 0 <= l && u <= length a }
+    ensures  { result = to_seq a l u }
 
 end

@@ -238,6 +238,7 @@ let _ =
    Sys.set_signal Sys.sigint (Sys.Signal_handle save_session_and_exit);
 
    try
+     Gnat_sched.init ();
       Gnat_objectives.init ();
       match Gnat_config.proof_mode with
       | Gnat_config.Progressive

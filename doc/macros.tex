@@ -42,8 +42,12 @@
 
 %%% listings for Why3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\RequirePackage{listings}
-\RequirePackage{amssymb}
+
+% cannot use \usepackage here because it breaks hevea (no colored keywords anymore :-()
+\input{../share/latex/why3lang.sty}
+
+% \RequirePackage{listings}
+% \RequirePackage{amssymb}
 
 \lstset{
   basicstyle={\ttfamily},
@@ -54,40 +58,8 @@
   commentstyle=\itshape,
   columns=[l]fullflexible,
   showstringspaces=false,
+  literate=%
 }
-
-\lstdefinelanguage{why3}
-{
-morekeywords={namespace,predicate,function,inductive,type,use,clone,%
-import,export,theory,module,end,in,with,%
-let,rec,for,to,do,done,match,if,then,else,while,try,invariant,variant,%
-absurd,raise,assert,exception,private,abstract,mutable,ghost,%
-downto,raises,writes,reads,requires,ensures,returns,val,model,%
-goal,axiom,lemma,forall,meta},%
-string=[b]",%
-sensitive=true,%
-morecomment=[s]{(*}{*)},%
-keepspaces=true,
-}
-%literate=%
-%{'a}{$\alpha$}{1}%
-%{'b}{$\beta$}{1}%
-%{<}{$<$}{1}%
-%{>}{$>$}{1}%
-%{<=}{$\le$}{1}%
-%{>=}{$\ge$}{1}%
-% {<>}{$\ne$}{1}%
-% {/\\}{$\land$}{1}%
-% {\\/}{ $\lor$ }{3}%
-% {\ or(}{ $\lor$(}{3}%
-% {not\ }{$\lnot$ }{1}%
-% {not(}{$\lnot$(}{1}%
-% {+->}{\texttt{+->}}{2}%
-% % {+->}{$\mapsto$}{2}%
-% {-->}{\texttt{-\relax->}}{2}%
-% %{-->}{$\longrightarrow$}{2}%
-% {->}{$\rightarrow$}{2}%
-% {<->}{$\leftrightarrow$}{2}%
 
 \lstnewenvironment{whycode}{\lstset{language=why3}}{}
 \lstnewenvironment{ocamlcode}{\lstset{language={[Objective]Caml}}}{}

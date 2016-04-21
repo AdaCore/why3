@@ -339,13 +339,16 @@ exception AlreadyDefined
 
 let rec filter_hyp info defs eqs hyps pr f =
   match f.t_node with
-  | Tapp(ls,[t1;t2]) when ls == ps_equ ->
+  | Tapp(ls,[t1;t2]) when ls_equal ls ps_equ ->
       let try_equality t1 t2 =
         match t1.t_node with
           | Tapp(l,[]) ->
               if Hid.mem defs l.ls_name then raise AlreadyDefined;
+              if t_s_any (fun _ -> false) (fun ls -> ls_equal ls l) t2
+              then raise AlreadyDefined;
               Hid.add defs l.ls_name ();
-              t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace defs ls.ls_name ()) () t2;
+              t_s_fold (fun _ _ -> ())
+                (fun _ ls -> Hid.replace defs ls.ls_name ()) () t2;
               ((pr,t1,t2)::eqs, hyps)
           | _ -> raise AlreadyDefined in
       begin try

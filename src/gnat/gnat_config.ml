@@ -29,7 +29,7 @@ let is_builtin_prover =
     let s = String.lowercase s in
     Sstr.mem s builtin_provers_set)
 
-let default_timeout = Some 1
+let default_timeout = 1
 
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
@@ -466,9 +466,10 @@ let filename =
 
 let timeout =
    match !opt_timeout with
-   | Some _ -> !opt_timeout
+   | Some x -> x
    | None ->
-         if !opt_steps <> None then None
+         if !opt_steps <> None then
+           Call_provers.empty_limit.Call_provers.limit_time
          else default_timeout
 
 let min a b =
@@ -486,16 +487,17 @@ let convert_data =
   h
 
 let steps ~prover =
-  if manual_prover <> None then None
+  if manual_prover <> None then
+    Call_provers.empty_limit.Call_provers.limit_steps
   else
     match !opt_steps with
-    | None -> None
+    | None -> Call_provers.empty_limit.Call_provers.limit_steps
     | Some c ->
       let prover = String.sub prover 0 (min 4 (String.length prover)) in
       try
         let conv = Hashtbl.find convert_data prover in
-        Some (conv.add + conv.mult * c)
-      with Not_found -> !opt_steps
+        conv.add + conv.mult * c
+      with Not_found -> c
 
 let back_convert_steps ~prover c =
   try
@@ -507,9 +509,9 @@ let back_convert_steps ~prover c =
   with Not_found -> c
 
 let limit ~prover =
-  { Call_provers.limit_time = timeout;
-    limit_steps = steps ~prover;
-    limit_mem = None }
+  { Call_provers.empty_limit with
+    Call_provers.limit_time = timeout;
+    limit_steps = steps ~prover}
 
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy

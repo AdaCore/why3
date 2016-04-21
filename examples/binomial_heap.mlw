@@ -1,0 +1,320 @@
+
+(** Binomial heaps (Jean Vuillemin, 1978).
+
+    Purely applicative implementation, following Okasaki's implementation
+    in his book "Purely Functional Data Structures" (Section 3.2).
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module BinomialHeap
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Reverse
+  use import list.Append
+
+  (** The type of elements, together with a total pre-order *)
+
+  type elt
+
+  predicate le elt elt
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  (** Trees.
+
+      These are arbitrary trees, not yet constrained
+      to be binomial trees. Field [rank] is used later to store the rank
+      of the binomial tree, for access in constant time. *)
+
+  type tree = {
+        elem: elt;
+    children: list tree;
+        rank: int;
+  }
+
+  function size (l: list tree) : int =
+    match l with
+    | Nil                     -> 0
+    | Cons { children = c } r -> 1 + size c + size r
+    end
+
+  let lemma size_nonnneg (l: list tree)
+    ensures { size l >= 0 }
+  = let rec auxl (l: list tree) ensures { size l >= 0 } variant { l }
+    = match l with Nil -> () | Cons t r -> auxt t; auxl r end
+    with auxt (t: tree) ensures { size t.children >= 0 } variant { t }
+    = match t with { children = c } -> auxl c end in
+    auxl l
+
+  (** Heaps. *)
+
+  (* [e] is no greater than the roots of the trees in [l] *)
+  predicate le_roots (e: elt) (l: list tree) =
+    match l with
+    | Nil      -> true
+    | Cons t r -> le e t.elem && le_roots e r
+    end
+
+  lemma le_roots_trans:
+    forall x y l. le x y -> le_roots y l -> le_roots x l
+
+  predicate heaps (l: list tree) =
+    match l with
+    | Nil                               -> true
+    | Cons { elem = e; children = c } r -> le_roots e c && heaps c && heaps r
+    end
+
+  lemma heaps_append:
+    forall h1 "induction" h2. heaps h1 -> heaps h2 -> heaps (h1 ++ h2)
+  lemma heaps_reverse:
+    forall h. heaps h -> heaps (reverse h)
+
+  (** Number of occurrences of a given element in a list of trees. *)
+
+  function occ (x: elt) (l: list tree) : int =
+    match l with
+    | Nil      -> 0
+    | Cons { elem = y; children = c } r ->
+       (if x = y then 1 else 0) + occ x c + occ x r
+    end
+
+  let rec lemma occ_nonneg (x: elt) (l: list tree)
+    variant { size l }
+    ensures { 0 <= occ x l }
+  = match l with
+    | Nil                     -> ()
+    | Cons { children = c } r -> occ_nonneg x c; occ_nonneg x r
+    end
+
+  lemma occ_append:
+    forall l1 "induction" l2 x. occ x (l1 ++ l2) = occ x l1 + occ x l2
+
+  lemma occ_reverse:
+    forall x l. occ x l = occ x (reverse l)
+
+  predicate mem (x: elt) (l: list tree) =
+    occ x l > 0
+
+  let rec lemma heaps_mem (l: list tree)
+    requires { heaps l }
+    variant  { size l }
+    ensures  { forall x. le_roots x l -> forall y. mem y l -> le x y }
+  = match l with
+    | Nil                     -> ()
+    | Cons { children = c } r -> heaps_mem c; heaps_mem r
+    end
+
+  (** Binomial tree of rank [k]. *)
+
+  predicate has_order (k: int) (l: list tree) =
+    match l with
+    | Nil ->
+        k = 0
+    | Cons { rank = k'; children = c } r ->
+        k' = k - 1 && has_order (k-1) c && has_order (k-1) r
+    end
+
+  predicate binomial_tree (t: tree) =
+    t.rank = length t.children &&
+    has_order t.rank t.children
+
+  lemma has_order_length:
+    forall l k. has_order k l -> length l = k
+
+  (** Binomial heaps. *)
+
+  type heap = list tree
+
+  (** A heap [h] is a list of binomial trees in strict increasing order of
+      ranks, those ranks being no smaller than [m]. *)
+
+  predicate inv (m: int) (h: heap) =
+    match h with
+    | Nil -> true
+    | Cons t r -> let k = t.rank in m <= k && binomial_tree t && inv (k + 1) r
+    end
+
+  lemma inv_trans:
+    forall m1 m2 h. m1 <= m2 -> inv m2 h -> inv m1 h
+
+  let lemma inv_reverse (t: tree)
+    requires { binomial_tree t }
+    ensures  { inv 0 (reverse t.children) }
+  = let rec aux (k: int) (l: list tree) (acc: list tree)
+      requires { has_order k l }
+      requires { inv k acc }
+      variant  { k }
+      ensures  { inv 0 (reverse l ++ acc) }
+    = match l with
+      | Nil -> ()
+      | Cons t r ->
+          assert { binomial_tree t };
+          aux (k-1) r (Cons t acc)
+      end in
+    match t with
+    | { rank = k; children = c } -> aux k c Nil
+    end
+
+  (** Heap operations. *)
+
+  let empty () : heap
+    ensures { heaps result }
+    ensures { inv 0 result }
+    ensures { forall e. not (mem e result) }
+    =
+    Nil
+
+  let is_empty (h: heap) : bool
+    ensures { result <-> h = Nil }
+    =
+    h = Nil
+
+  let get_min (h: heap) : elt
+    requires { heaps h }
+    requires { h <> Nil }
+    ensures  { mem result h }
+    ensures  { forall x. mem x h -> le result x }
+    =
+    match h with
+      | Nil      -> absurd
+      | Cons t l ->
+          let rec aux (m: elt) (l: list tree) : elt
+            requires { heaps l }
+            variant  { l }
+            ensures  { result = m || mem result l }
+            ensures  { le result m }
+            ensures  { forall x. mem x l -> le result x }
+          = match l with
+          | Nil             -> m
+          | Cons {elem=x} r -> aux (if le x m then x else m) r
+          end in
+          aux t.elem l
+    end
+
+  function link (t1 t2: tree) : tree =
+    if le t1.elem t2.elem then
+      { elem = t1.elem; rank = t1.rank + 1; children = Cons t2 t1.children }
+    else
+      { elem = t2.elem; rank = t2.rank + 1; children = Cons t1 t2.children }
+
+  let rec add_tree (t: tree) (h: heap)
+    requires { heaps (Cons t Nil) }
+    requires { binomial_tree t }
+    requires { heaps h }
+    requires { inv (rank t) h }
+    variant  { h }
+    ensures  { heaps result }
+    ensures  { inv (rank t) result }
+    ensures  { forall x. occ x result = occ x (Cons t Nil) + occ x h }
+    =
+    match h with
+    | Nil ->
+        Cons t Nil
+    | Cons hd tl ->
+        if rank t < rank hd then
+          Cons t h
+        else begin
+          assert { rank t = rank hd };
+          add_tree (link t hd) tl
+        end
+    end
+
+  let add (x: elt) (h: heap) : heap
+    requires { heaps h }
+    requires { inv 0 h }
+    ensures  { heaps result }
+    ensures  { inv 0 result }
+    ensures  { occ x result = occ x h + 1 }
+    ensures  { forall e. e <> x -> occ e result = occ e h }
+    =
+    add_tree { elem = x; rank = 0; children = Nil } h
+
+  let rec merge (ghost k: int) (h1 h2: heap)
+    requires { heaps h1 }
+    requires { inv k h1 }
+    requires { heaps h2 }
+    requires { inv k h2 }
+    variant  { h1, h2 }
+    ensures  { heaps result }
+    ensures  { inv k result }
+    ensures  { forall x. occ x result = occ x h1 + occ x h2 }
+    =
+    match h1, h2 with
+    | Nil, _ -> h2
+    | _, Nil -> h1
+    | Cons t1 tl1, Cons t2 tl2 ->
+        if rank t1 < rank t2 then
+          Cons t1 (merge (rank t1 + 1) tl1 h2)
+        else if rank t2 < rank t1 then
+          Cons t2 (merge (rank t2 + 1) h1 tl2)
+        else
+          add_tree (link t1 t2) (merge (rank t1 + 1) tl1 tl2)
+    end
+
+  let rec extract_min_tree (ghost k: int) (h: heap) : (tree, heap)
+    requires { heaps h }
+    requires { inv k h }
+    requires { h <> Nil }
+    variant  { h }
+    ensures  { let (t, h') = result in
+               heaps (Cons t Nil) && heaps h' && inv k h' &&
+               le_roots t.elem h && binomial_tree t &&
+               forall x. occ x h = occ x (Cons t Nil) + occ x h' }
+    =
+    match h with
+    | Nil ->
+        absurd
+    | Cons t Nil ->
+        (t, Nil)
+    | Cons t tl ->
+        let (t', tl') = extract_min_tree (rank t + 1) tl in
+        if le t.elem t'.elem then (t, tl) else (t', Cons t tl')
+    end
+
+  let rec extract_min (h: heap) : (elt, heap)
+    requires { heaps h }
+    requires { inv 0 h }
+    requires { h <> Nil }
+    variant  { h }
+    ensures  { let (e, h') = result in
+               heaps h' && inv 0 h' &&
+               occ e h' = occ e h - 1 &&
+               forall x. x <> e -> occ x h' = occ x h }
+    =
+    let (t, h') = extract_min_tree 0 h in
+    (t.elem, merge 0 (reverse t.children) h')
+
+  (** Complexity analysis. *)
+
+  use import int.Power
+
+  let rec lemma has_order_size (k: int) (l: list tree)
+    requires { has_order k l }
+    variant  { size l }
+    ensures  { size l = power 2 k - 1 }
+  = match l with
+    | Nil -> ()
+    | Cons { children = c } r -> has_order_size (k-1) c; has_order_size (k-1) r
+    end
+
+  lemma binomial_tree_size:
+    forall t. binomial_tree t -> size t.children = power 2 t.rank - 1
+
+  let rec lemma inv_size (k: int) (l: list tree)
+    requires { 0 <= k }
+    requires { inv k l }
+    variant  { l }
+    ensures  { size l >= power 2 (k + length l) - power 2 k }
+  = match l with
+    | Nil -> ()
+    | Cons _ r -> inv_size (k+1) r
+    end
+
+  (** Finally we prove that the number of binomial trees is O(log n) *)
+
+  lemma heap_size:
+    forall h. inv 0 h -> size h >= power 2 (length h) - 1
+
+end

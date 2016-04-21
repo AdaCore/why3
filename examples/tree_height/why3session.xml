@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.8-001" timelimit="6" memlimit="1000"/>
-<prover id="4" name="Vampire" version="0.6" timelimit="6" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../tree_height.mlw" expanded="true">
 <theory name="HeightCPS" sum="bf5f8a1bb7474cc558d4defd10f63945">
  <goal name="height_cps_correct">
@@ -51,7 +51,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter height1.6" expl="6. unreachable point">
-  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter height1.7" expl="7. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
@@ -93,7 +93,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter height1.20" expl="20. unreachable point">
-  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter height1.21" expl="21. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="45"/></proof>
