@@ -700,9 +700,9 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
     }
   with Not_found | Undetermined ->
     let args = List.map term_of_value args in
-    try
-      let d = Ident.Mid.find ls.ls_name engine.known_map in
-      let rewrite () =
+    let d = try Ident.Mid.find ls.ls_name engine.known_map
+      with Not_found -> assert false in
+    let rewrite () =
       (* try a rewrite rule *)
         begin
           try
@@ -747,7 +747,9 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
               cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
             }
           with Irreducible ->
-            raise Not_found
+            { value_stack =
+                Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
+              cont_stack = rem_cont; }
         end in
       match d.Decl.d_node with
       | Decl.Dtype _ | Decl.Dprop _ -> assert false
@@ -772,13 +774,13 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
         rewrite ()
       | Decl.Ddata dl ->
         (* constructor or projection *)
-        match args with
+        begin try match args with
         | [ { t_node = Tapp(ls1,tl1) } ] ->
           (* if ls is a projection and ls1 is a constructor,
              we should compute that projection *)
           let rec iter dl =
             match dl with
-            | [] -> raise Not_found
+            | [] -> raise Exit
             | (_,csl) :: rem ->
               let rec iter2 csl =
                 match csl with
@@ -800,16 +802,13 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
                           iter3 prs tl1
                       | None::prs, _::tl1 ->
                         iter3 prs tl1
-                      | _ -> raise Not_found
+                      | _ -> raise Exit
                     in iter3 prs tl1
                   else iter2 rem2
               in iter2 csl
           in iter dl
-        | _ -> raise Not_found
-    with Not_found ->
-      { value_stack = Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
-        cont_stack = rem_cont;
-      }
+        | _ -> raise Exit
+        with Exit -> rewrite () end
 
 
 and reduce_equ (* engine *) ~orig st v1 v2 cont =

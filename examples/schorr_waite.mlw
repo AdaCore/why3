@@ -175,8 +175,8 @@ module SchorrWaite
     (* graph is closed under left and right *)
     requires { forall n : loc. S.mem n graph ->
                n <> null /\
-               S.mem !left[n] graph /\
-               S.mem !right[n] graph }
+               (!left[n] = null \/ S.mem !left[n] graph) /\
+               (!right[n] = null \/ S.mem !right[n] graph) }
     (* graph starts with nothing marked *)
     requires { forall x : loc. S.mem x graph -> not !m[x] }
     (* the structure of the graph is not changed *)
@@ -203,7 +203,6 @@ module SchorrWaite
                   exists i : int. Seq.get !stackNodes i = n }
       invariant { not_in_stack null !stackNodes }
       invariant { Seq.length !stackNodes = 0 <-> !p = null }
-      invariant { S.mem !t graph }
       invariant { !p <> null -> S.mem !p graph }
       invariant { Seq.length !stackNodes <> 0 -> Seq.get !stackNodes 0 = !p }
       invariant { forall n : loc. S.mem n graph -> not !m[n] ->

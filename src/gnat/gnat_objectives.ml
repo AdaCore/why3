@@ -212,8 +212,8 @@ let next objective =
 
 let strategy =
   match Gnat_config.proof_mode with
-  | Gnat_config.Path_WP -> ["path_split"; Gnat_split_conj.split_conj_name]
-  | Gnat_config.No_Split -> ["split_goal_wp"]
+  | Gnat_config.Per_Path -> ["path_split"; Gnat_split_conj.split_conj_name]
+  | Gnat_config.Per_Check -> ["split_goal_wp"]
   | _ ->
       ["split_goal_wp";
        Gnat_split_conj.split_conj_name;
@@ -395,9 +395,7 @@ let register_result goal result =
          GoalSet.reset obj_rec.to_be_scheduled;
          nb_goals_done := !nb_goals_done + n;
 
-	 match Gnat_config.ce_mode with
-	 | Gnat_config.On ->
-	   begin
+         if Gnat_config.counterexamples then begin
 	     (* The goal will be scheduled to get a counterexample *)
 	     obj_rec.not_proved <- true;
 	     obj_rec.counter_example <- true;
@@ -406,9 +404,7 @@ let register_result goal result =
 	        so it is not put to the obj_rec.to_be_scheduled *)
 
              obj, Counter_Example
-	   end
-	 | Gnat_config.Off ->
-	   obj, Not_Proved
+         end else obj, Not_Proved
    end
    end
 
@@ -527,7 +523,7 @@ let apply_split_goal_if_needed g =
            ~keygen:Keygen.keygen (get_session ()) first_transform g)
 
 let do_scheduled_jobs callback =
-   Gnat_sched.run callback
+   Gnat_sched.handle_proof_results callback
 
 exception Found of Gnat_loc.loc
 
@@ -550,7 +546,6 @@ let init_subp_vcs subp =
    apply_split_goal_if_needed subp.subp_goal
 
 let init () =
-   Call_provers.set_socket_name Gnat_config.socket_name;
    let session_dir =
      let project_dir = Session.get_project_dir Gnat_config.filename in
      match Gnat_config.proof_dir with
@@ -579,7 +574,8 @@ let init () =
       env_session, is_new_session in
    my_session := Some env_session;
    if is_new_session || not (has_file env_session) then begin
-      let rel_filename = Sysutil.relativize_filename session_dir Gnat_config.filename
+      let rel_filename =
+        Sysutil.relativize_filename session_dir Gnat_config.filename
       in
       ignore
         (Session.add_file
@@ -760,14 +756,16 @@ let goal_has_splits goal =
   not (Session.PHstr.is_empty goal.Session.goal_transformations)
 
 let schedule_goal_with_prover ~cntexample g p =
-(* actually schedule the goal, i.e., call the prover. This function returns immediately. *)
+(* actually schedule the goal, i.e., call the prover. This function returns
+   immediately. *)
   if Gnat_config.debug then begin
     save_vc ~cntexample g p;
   end;
-  Gnat_sched.add_goal ~cntexample p g
+  Gnat_sched.run_goal ~cntexample p g
 
 let schedule_goal ~cntexample g =
-   (* actually schedule the goal, ie call the prover. This function returns immediately. *)
+   (* actually schedule the goal, ie call the prover. This function returns
+      immediately. *)
    let p = find_best_untried_prover g in
    schedule_goal_with_prover ~cntexample g p
 

@@ -132,7 +132,7 @@ val get_provers : config -> config_prover Mprover.t
     keys are the unique ids of the prover (argument of the family) *)
 
 val set_provers : config ->
-  ?shortcuts:Mprover.key Mstr.t -> config_prover Mprover.t -> config
+  ?shortcuts:prover Mstr.t -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
     one given *)
 
@@ -188,12 +188,14 @@ val set_policies : config -> prover_upgrade_policy Mprover.t -> config
 
 type config_strategy = {
   strategy_name : string;
-  strategy_desc : Pp.formatted;
+  strategy_desc : string;
   strategy_code : string;
   strategy_shortcut : string;
 }
 
 val get_strategies : config -> config_strategy Mstr.t
+
+val add_strategy : config -> config_strategy -> config
 
 (** filter prover *)
 type filter_prover

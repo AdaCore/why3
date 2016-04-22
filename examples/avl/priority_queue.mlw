@@ -143,7 +143,10 @@ module PQueue
         | Some k -> CO.eq d.key k
         end
       end }
-  = ()
+  = match e.middle with
+    | None -> absurd
+    | Some d -> assert { S.lower_bound d.key e.right && CO.le d.key d.key }
+    end
 
   let selected_part (ghost llis:list (D.t 'a))
     (ghost rlis:list (D.t 'a))

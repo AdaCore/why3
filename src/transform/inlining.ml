@@ -15,7 +15,10 @@ open Decl
 open Theory
 open Task
 
-let t_unfold env fs tl ty =
+let rec relocate loc t =
+  t_map (relocate loc) (t_label ?loc t.t_label t)
+
+let t_unfold loc env fs tl ty =
   match Mls.find_opt fs env with
   | None ->
       t_app fs tl ty
@@ -23,14 +26,14 @@ let t_unfold env fs tl ty =
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
       let mt = oty_match mt e.t_ty ty in
-      t_ty_subst mt mv e
+      t_ty_subst mt mv (relocate loc e)
 
 (* inline every symbol *)
 
 let rec t_replace_all env t =
   let t = t_map (t_replace_all env) t in
   match t.t_node with
-  | Tapp (fs,tl) -> t_label_copy t (t_unfold env fs tl t.t_ty)
+  | Tapp (fs,tl) -> t_label_copy t (t_unfold t.t_loc env fs tl t.t_ty)
   | _ -> t
 
 (* inline the top-most symbol *)
@@ -39,7 +42,7 @@ let rec f_replace_top env f = match f.t_node with
   | Tapp (ps,_) when ls_equal ps ps_equ ->
       t_map (f_replace_top env) f
   | Tapp (ls,tl) ->
-      t_label_copy f (t_unfold env ls tl f.t_ty)
+    t_label_copy f (t_unfold f.t_loc env ls tl f.t_ty)
   | _ when f.t_ty = None ->
       TermTF.t_map (fun t -> t) (f_replace_top env) f
   | _ ->

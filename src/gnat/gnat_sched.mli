@@ -9,16 +9,19 @@ module Keygen : sig
    val keygen : ?parent:'a -> unit -> key
 end
 
-val add_goal :
-  cntexample : bool -> Gnat_config.prover -> int Session.goal -> unit
-(* add a goal to the Goal queue. This function returs immediately.
-   @param cntexample indicates whether the prover should be queried for
-     a counterexample. *)
+val init : unit -> unit
+(* connect to proof server *)
 
-val run :
+val run_goal :
+  cntexample : bool -> Gnat_config.prover -> int Session.goal -> unit
+(* run a prover on a goal. This function returs immediately.
+   @param cntexample indicates whether the prover should be queried for a
+   counterexample. *)
+
+val handle_proof_results :
    (key Session.proof_attempt -> Session.proof_attempt_status -> unit)
    -> unit
-(* Run the prover on all goals in the queue (and remove the goals from the
-   queue). For each proof result, call the callback.  It is safe to call
-   [add_goal] in the callback to add more goals. This function stops when all
-   provers have finished and the queue is empty. *)
+(* Wait for proof results. When proof results arrive, call the callback
+   function on each result. The callback can call run_goal to spawn new
+   provers. The function returns when no results are pending from the proof
+   server. *)

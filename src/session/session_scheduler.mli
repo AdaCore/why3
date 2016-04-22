@@ -94,12 +94,6 @@ module Make(O: OBSERVER) : sig
   val init : int -> t
   (** [init max] *)
 
-
-(* not used
-  val schedule_check: t -> (unit -> bool) -> unit
-    (** test the check time to time, reschedule it if it returns true *)
-*)
-
 (* used by why3session_run, but it should not as it is a low-level scheduler
   function *)
   val schedule_any_timeout: t -> (unit -> bool) -> unit

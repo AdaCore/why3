@@ -41,10 +41,9 @@ val call_on_buffer :
   command      : string ->
   limit        : Call_provers.resource_limit ->
   ?inplace     : bool ->
-  ?interactive : bool ->
   filename     : string ->
   printer_mapping : Printer.printer_mapping ->
-  driver -> Buffer.t -> Call_provers.pre_prover_call
+  driver -> Buffer.t -> Call_provers.server_id
 
 
 val print_task :
@@ -63,8 +62,7 @@ val prove_task :
   ?cntexample  : bool ->
   ?old         : string ->
   ?inplace     : bool ->
-  ?interactive : bool ->
-  driver -> Task.task -> Call_provers.pre_prover_call
+  driver -> Task.task -> Call_provers.server_id
 
 (** Split the previous function in two simpler functions *)
 val prepare_task : cntexample:bool -> driver -> Task.task -> Task.task
@@ -73,19 +71,12 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
-val prove_task_server : string ->
-                        limit : Call_provers.resource_limit ->
-                        cntexample:bool ->
-                        ?old:string -> ?inplace:bool -> driver -> Task.task ->
-                        Call_provers.server_id
-
 val prove_task_prepared :
   command      : string ->
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
-  ?interactive : bool ->
-  driver -> Task.task -> Call_provers.pre_prover_call
+  driver -> Task.task -> Call_provers.server_id
 
 
 (** Traverse all metas from a driver *)

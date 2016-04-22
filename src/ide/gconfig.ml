@@ -381,12 +381,12 @@ let load_icon_names () =
   let ide = config () in
   let iconset = ide.iconset in
   let _,iconsets = iconsets () in
-  let d =
+  let iconset,d =
     try
-      List.assoc iconset iconsets
+      iconset, List.assoc iconset iconsets
     with Not_found ->
       try
-        List.assoc "fatcow" iconsets
+        "fatcow", List.assoc "fatcow" iconsets
       with Not_found ->
         failwith "No icon set found"
   in

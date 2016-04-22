@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="1" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../skew_heaps.mlw" expanded="true">
 <theory name="Heap" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -234,13 +234,13 @@
   <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.22" expl="22. assertion">
-  <proof prover="0"><result status="valid" time="1.66"/></proof>
+  <proof prover="0"><result status="valid" time="0.63"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.23" expl="23. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.24" expl="24. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="3.31"/></proof>
+  <proof prover="0"><result status="valid" time="1.40"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.25" expl="25. postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
@@ -282,7 +282,7 @@
   <proof prover="2"><result status="valid" time="0.11" steps="76"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.38" expl="38. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="1.35" steps="386"/></proof>
+  <proof prover="2"><result status="valid" time="0.69" steps="386"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.39" expl="39. type invariant">
   <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>

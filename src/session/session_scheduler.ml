@@ -85,7 +85,8 @@ type action =
   | Action_delayed of (unit -> unit)
 
 type timeout_action =
-  | Check_prover of (proof_attempt_status -> unit) * Call_provers.prover_call
+  | Check_prover of
+      (proof_attempt_status -> unit) * bool * Call_provers.prover_call
   | Any_timeout of (unit -> bool)
 
 type t =
@@ -94,15 +95,9 @@ type t =
       (** Quota of action slot *)
       mutable maximum_running_proofs : int;
       (** Running actions which take one action slot *)
-      mutable running_proofs : timeout_action list;
-      (** Running check which doesn't take a running slot.
-          Check the end of some computation *)
-      mutable running_check : (unit -> bool) list;
+      mutable running_proofs : int;
       (** proof attempt that wait some available action slot *)
-      proof_attempts_queue :
-        ((proof_attempt_status -> unit) *
-            (unit -> Call_provers.prover_call))
-        Queue.t;
+      proof_attempts_queue : timeout_action Queue.t;
       (** timeout handler state *)
       mutable timeout_handler_activated : bool;
       mutable timeout_handler_running : bool;
@@ -111,15 +106,16 @@ type t =
     }
 
 let set_maximum_running_proofs max sched =
+  Prove_client.set_max_running_provers max;
   (* TODO dequeue actions if maximum_running_proofs increase *)
   sched.maximum_running_proofs <- max
 
 let init max =
   Debug.dprintf debug "[Sched] init scheduler max=%i@." max;
+  Prove_client.set_max_running_provers max;
   { actions_queue = Queue.create ();
     maximum_running_proofs = max;
-    running_proofs = [];
-    running_check = [];
+    running_proofs = 0;
     proof_attempts_queue = Queue.create ();
     timeout_handler_activated = false;
     timeout_handler_running = false;
@@ -130,7 +126,7 @@ let notify_timer_state t continue =
   O.notify_timer_state
     (Queue.length t.actions_queue)
     (Queue.length t.proof_attempts_queue)
-    (List.length t.running_proofs);
+    t.running_proofs;
   continue
 
 (* timeout handler *)
@@ -140,44 +136,33 @@ let timeout_handler t =
   assert (not t.timeout_handler_running);
   t.timeout_handler_running <- true;
   (* Check if some action ended *)
-  let l = List.fold_left
-    (fun acc c ->
-       match c with
-         | Check_prover(callback,call)  ->
-             (match Call_provers.query_call call with
-               | None -> c::acc
-               | Some post ->
-                   let res = post () in callback (Done res);
-                   acc)
-         | Any_timeout callback ->
-             let b = callback () in
-             if b then c::acc else acc)
-    [] t.running_proofs
-  in
-  (* Check if some new actions must be started *)
-  let l =
-    if List.length l < t.maximum_running_proofs then
-      begin try
-        let (callback,pre_call) = Queue.pop t.proof_attempts_queue in
-        callback Running;
-        Debug.dprintf debug "[Sched] proof attempts started@.";
-        let call = pre_call () in
-        (Check_prover(callback,call))::l
-      with Queue.Empty -> l
-      end
-    else l
-  in
-  t.running_proofs <- l;
-  (* Call the running check *)
-  t.running_check <- List.fold_left
-    (fun acc check -> if check () then check::acc else acc)
-    [] t.running_check;
+  let q = Queue.create () in
+  while not (Queue.is_empty t.proof_attempts_queue) do
+    match Queue.pop t.proof_attempts_queue with
+    | Check_prover (callback,started,call) as c ->
+        begin match Call_provers.query_call call with
+          | Call_provers.NoUpdates ->
+              Queue.add c q
+          | Call_provers.ProverStarted when started ->
+              Queue.add c q (* should not happen *)
+          | Call_provers.ProverStarted ->
+              callback Running;
+              t.running_proofs <- t.running_proofs + 1;
+              Debug.dprintf debug "[Sched] proof attempts started@.";
+              Queue.add (Check_prover (callback,true,call)) q
+          | Call_provers.ProverFinished res ->
+              if started then t.running_proofs <- t.running_proofs - 1;
+              callback (Done res)
+        end
+    | Any_timeout callback as c ->
+        if callback () then Queue.add c q
+  done;
+  Queue.transfer q t.proof_attempts_queue;
   let continue =
-    match l with
-      | [] ->
+    if Queue.is_empty t.proof_attempts_queue then begin
           Debug.dprintf debug "[Sched] Timeout handler stopped@.";
           false
-      | _ -> true
+    end else true
   in
   t.timeout_handler_activated <- continue;
   t.timeout_handler_running <- false;
@@ -193,32 +178,26 @@ let run_timeout_handler t =
 
 let schedule_any_timeout t callback =
   Debug.dprintf debug "[Sched] schedule a new timeout@.";
-  t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
+  Queue.add (Any_timeout callback) t.proof_attempts_queue;
   run_timeout_handler t
-
-(* unused
-let schedule_check t callback =
-  Debug.dprintf debug "[Sched] add a new check@.";
-  t.running_check <- callback :: t.running_check;
-  run_timeout_handler t
-*)
 
 (* idle handler *)
 
 let idle_handler t =
   try
     if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
-      begin
-      match Queue.pop t.actions_queue with
+      begin match Queue.pop t.actions_queue with
         | Action_proof_attempt(cntexample,limit,
               old,inplace,command,driver,callback,goal) ->
             begin
               try
-                let pre_call =
+                let call =
                   Driver.prove_task ?old ~cntexample ~inplace ~command
                     ~limit driver goal
                 in
-                Queue.push (callback,pre_call) t.proof_attempts_queue;
+                let pa =
+                  Check_prover (callback,false, Call_provers.ServerCall call) in
+                Queue.push pa t.proof_attempts_queue;
                 run_timeout_handler t
               with e when not (Debug.test_flag Debug.stack_trace) ->
                 Format.eprintf
@@ -227,7 +206,7 @@ let idle_handler t =
                 callback (InternalFailure e)
             end
         | Action_delayed callback -> callback ()
-    end
+      end
     else
       usleep (float default_delay_ms /. 1000.);
     notify_timer_state t true
@@ -266,14 +245,17 @@ let cancel_scheduled_proofs t =
     done
   with Queue.Empty ->
     Queue.transfer new_queue t.actions_queue;
+    (* NOTE: we cannot cancel proof attempts sent to the server *)
+    (*
     try
       while true do
-        let (callback,_) = Queue.pop t.proof_attempts_queue in
+        let (callback,_,_) = Queue.pop t.proof_attempts_queue in
         callback Interrupted
       done
     with
       | Queue.Empty ->
-          O.notify_timer_state 0 0 (List.length t.running_proofs)
+    *)
+    ignore (notify_timer_state t false)
 
 
 let schedule_proof_attempt ~cntexample ~limit ?old ~inplace
@@ -290,21 +272,9 @@ let schedule_proof_attempt ~cntexample ~limit ?old ~inplace
 
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
-  let res_parser =
-    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown ("", None))];
-      Call_provers.prp_regexps = [];
-      Call_provers.prp_timeregexps = [];
-      Call_provers.prp_stepregexps = [];
-      Call_provers.prp_model_parser = fun _ _ -> Model_parser.default_model
-    } in
-  let nolimit =
-    { Call_provers.limit_time = None; limit_mem = None; limit_steps = None } in
-  let precall =
-    Call_provers.call_on_file ~command ~limit:nolimit ~res_parser
-      ~redirect:false filename
-      ~printer_mapping:Printer.get_default_printer_mapping in
+  let call = Call_provers.call_editor ~command filename in
   callback Running;
-  t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
+  Queue.add (Check_prover(callback,false,call)) t.proof_attempts_queue;
   run_timeout_handler t
 
 let schedule_delayed_action t callback =
@@ -404,9 +374,9 @@ let find_prover eS a =
 (* to avoid corner cases when prover results are obtained very closely
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
-let adapt_limits ~use_steps a =
-  let timelimit = (Call_provers.get_time a.proof_limit) in
-  let memlimit = (Call_provers.get_mem a.proof_limit) in
+let adapt_limits ~interactive ~use_steps a =
+  let timelimit = (a.proof_limit.Call_provers.limit_time) in
+  let memlimit = (a.proof_limit.Call_provers.limit_mem) in
   match a.proof_state with
   | Done { Call_provers.pr_answer = r;
            Call_provers.pr_time = t;
@@ -414,12 +384,11 @@ let adapt_limits ~use_steps a =
     (* increased time limit is 1 + twice the previous running time,
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
-    let increased_time =
-      let t = truncate (1.0 +. 2.0 *. t) in
-      max timelimit (min t (2 * timelimit))
-    in
+    let t = truncate (1.0 +. 2.0 *. t) in
+    let increased_time = if interactive then t
+      else max timelimit (min t (2 * timelimit)) in
     (* increased mem limit is just 1.5 times the previous mem limit *)
-    let increased_mem = 3 * memlimit / 2 in
+    let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
     begin
       match r with
       | Call_provers.OutOfMemory -> increased_time, memlimit, 0
@@ -437,11 +406,12 @@ let adapt_limits ~use_steps a =
         (* correct ? failures are supposed to appear quickly anyway... *)
         timelimit, memlimit, 0
     end
+  | _ when interactive -> 0, 0, 0
   | _ -> timelimit, memlimit, 0
 
-let adapt_limits ~use_steps a =
-  let t, m, s = adapt_limits ~use_steps a in
-  Call_provers.mk_limit t m s
+let adapt_limits ~interactive ~use_steps a =
+  let t, m, s = adapt_limits ~interactive ~use_steps a in
+  { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
 
 type run_external_status =
 | Starting
@@ -472,17 +442,17 @@ let run_external_proof_v3 ~use_steps eS eT a ?(cntexample=false) callback =
     callback a a.proof_prover Call_provers.empty_limit None MissingProver
   | Some(ap,npc,a) ->
     callback a ap Call_provers.empty_limit None Starting;
-    if a.proof_edited_as = None &&
-       npc.prover_config.Whyconf.interactive
-    then begin
+    let itp = npc.prover_config.Whyconf.interactive in
+    if itp && a.proof_edited_as = None then begin
       callback a ap Call_provers.empty_limit None (MissingFile "unedited")
     end else begin
       let previous_result = a.proof_state in
-      let limit = adapt_limits ~use_steps a in
+      let limit = adapt_limits ~interactive:itp ~use_steps a in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command =
         Whyconf.get_complete_command npc.prover_config
-          ~with_steps:(limit.Call_provers.limit_steps <> None) in
+          ~with_steps:(limit.Call_provers.limit_steps <>
+                       Call_provers.empty_limit.Call_provers.limit_steps) in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
         callback a ap limit
@@ -558,8 +528,8 @@ let prover_on_goal eS eT ?callback ?(cntexample=false) ~limit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
-      set_timelimit (Call_provers.get_time limit) a;
-      set_memlimit (Call_provers.get_mem limit) a;
+      set_timelimit (limit.Call_provers.limit_time) a;
+      set_memlimit (limit.Call_provers.limit_mem) a;
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
@@ -963,7 +933,9 @@ let convert_unknown_prover =
                 (* should not happen *)
                 assert false
           in
-          let limit = Call_provers.mk_limit timelimit memlimit (-1) in
+          let limit = { Call_provers.empty_limit with
+                        Call_provers.limit_time = timelimit;
+                        limit_mem  = memlimit} in
           prover_on_goal es sched ~callback ~limit p g
         | Itransform(trname,pcsuccess) ->
           let callback ntr =

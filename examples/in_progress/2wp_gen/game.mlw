@@ -59,7 +59,7 @@ module Game
     then d
     else x
 
-  (* Two lemma justifying the correctness of the
+  (* Two lemmas justifying the correctness of the
      construction of history by transfinite chain extension. *)
   lemma step_is_ub_builder : forall g:game 'a,ang dmn.
     game_wf g -> ub_builder g.progress (step g ang dmn)

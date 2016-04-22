@@ -23,15 +23,9 @@ val prover_ce : prover option
    None if counterexample should not be generated
 *)
 
-type ce_mode =
-  | On
-  | Off
-(* In mode On, the counterexample will be generated
-   In mode Off, the counterexample will not be generated
-*)
-
-val ce_mode : ce_mode
-(* Reflects the value of the option --counterexample, default off *)
+val counterexamples : bool
+(* Reflects the value of the option --counterexample, default off
+   Counter examples are also disabled when CVC4 is not found *)
 
 val manual_prover : prover option
 (* Currently, if a manual prover is provided, it must be the only one. So in
@@ -39,9 +33,9 @@ val manual_prover : prover option
 
 (* Configuration settings given or determined by the command line *)
 
-val timeout : int option
+val timeout : int
 
-val steps : prover : string -> int option
+val steps : prover : string -> int
 (* value of the --steps option adjusted for given prover, if no steps are
  * given, return None *)
 
@@ -51,18 +45,11 @@ val back_convert_steps : prover : string -> int -> int
 val limit : prover : string -> Call_provers.resource_limit
 
 type proof_mode =
-    Then_Split
+    Progressive
   | No_WP
   | All_Split
-  | Path_WP
-  | No_Split
-(* In mode normal, compute VCs and split VCs as necessary, call prover as
-                   necessary;
-   In mode no_wp, do not compute VCs and never call the prover
-   In mode all_split, compute all split VCs, and never call the prover
-   In mode Path_WP, use the "normal WP" to compute one VC for each path
-   In mode No_Split, do not split VCs at all
-   *)
+  | Per_Path
+  | Per_Check
 
 type limit_mode =
   | Limit_Check of Gnat_expl.check

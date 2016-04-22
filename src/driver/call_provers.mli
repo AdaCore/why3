@@ -109,52 +109,40 @@ type prover_result_parser = {
 *)
 
 (** {2 Functions for calling external provers} *)
-type prover_call
-(** Type that represents a single prover run *)
 
-type pre_prover_call = unit -> prover_call
-(** Thread-safe closure that launches the prover *)
-
-type post_prover_call = unit -> prover_result
-(** Thread-unsafe closure that interprets the prover's results *)
-
-type resource_limit =
-  {
-    limit_time  : int option;
-    limit_mem   : int option;
-    limit_steps : int option;
-  }
+type resource_limit = {
+  limit_time  : int;
+  limit_mem   : int;
+  limit_steps : int;
+}
 (* represents the three ways a prover run can be limited: in time, memory
    and/or steps *)
 
 val empty_limit : resource_limit
-(* the limit object which imposes no limits *)
+(* the limit object which imposes no limits. Use this object to impose no
+   limits, but also to know if some concrete time, steps or memlimit actually
+   means "no limit" *)
 
 val limit_max : resource_limit -> resource_limit -> resource_limit
 (* return the limit object whose components represent the maximum of the
    corresponding components of the arguments *)
 
-val get_time : resource_limit -> int
-(* return time, return default value 0 if not set *)
-val get_mem : resource_limit -> int
-(* return time, return default value 0 if not set *)
-val get_steps : resource_limit -> int
-(* return time, return default value 0 if not set *)
+type server_id = int
+type editor_id
 
-val mk_limit : int -> int -> int -> resource_limit
-(* build a limit object, transforming the default values into None on the fly
-   *)
+type prover_call =
+  | ServerCall of server_id
+  | EditorCall of editor_id
+
+val call_editor : command : string -> string -> prover_call
 
 val call_on_file :
   command         : string ->
   limit           : resource_limit ->
   res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
-  ?cleanup        : bool ->
   ?inplace        : bool ->
-  ?interactive    : bool ->
-  ?redirect       : bool ->
-  string -> pre_prover_call
+  string -> server_id
 
 val call_on_buffer :
   command         : string ->
@@ -163,8 +151,7 @@ val call_on_buffer :
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  ?interactive    : bool ->
-  Buffer.t -> pre_prover_call
+  Buffer.t -> server_id
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
     @param limit : set the available time limit (def. 0 : unlimited), memory
@@ -175,31 +162,16 @@ val call_on_buffer :
     @param filename : the suffix of the proof task's file, if the prover
     doesn't accept stdin. *)
 
-val query_call : prover_call -> post_prover_call option
-(** Thread-safe non-blocking function that checks if the prover
-    has finished. *)
+type prover_update =
+  | NoUpdates
+  | ProverStarted
+  | ProverFinished of prover_result
 
-val wait_on_call : prover_call -> post_prover_call
-(** Thread-safe blocking function that waits until the prover finishes. *)
+val query_call : prover_call -> prover_update
+(** non-blocking function that reports any new updates
+    from the server related to a given prover call. *)
 
-val post_wait_call : prover_call -> Unix.process_status -> post_prover_call
-(** Thread-safe non-blocking function that should be called when the
-    prover's exit status was obtained from a prior call of Unix.waitpid *)
+val wait_on_call : prover_call -> prover_result
+(** blocking function that waits until the prover finishes. *)
 
-val prover_call_pid : prover_call -> int
-(** Return the pid of the prover *)
-
-val set_socket_name : string -> unit
-
-type server_id = int
-
-val prove_file_server :
-          res_parser : prover_result_parser ->
-          command : string ->
-          limit : resource_limit ->
-          printer_mapping : Printer.printer_mapping ->
-          ?inplace : bool ->
-          ?interactive : bool ->
-          string -> server_id
-
-val wait_for_server_result : unit -> (server_id * prover_result) list
+val wait_for_server_result : blocking:bool -> (server_id * prover_result) list

@@ -128,6 +128,7 @@ associativities, from lowest to greatest priority:
     \texttt{if then else} / \texttt{let in} & -- \\
     label & -- \\
     \texttt{->} / \texttt{<->} & right \\
+    \texttt{by} / \texttt{so} & right \\
     \verb!\/! / \verb!||! & right \\
     \verb|/\| / \verb!&&! & right \\
     \texttt{not}  & -- \\
@@ -156,6 +157,11 @@ transformations. For instance, \texttt{split} transforms the goal
 \verb|A && B| into subgoals \verb|A| and \verb|A -> B|. Similarly, it
 transforms \verb!not (A || B)! into subgoals \verb|not A| and
 \verb|not ((not A) /\ B)|.
+The \texttt{by}/\texttt{so} connectives are proof indications. They are
+logically equivalent to their first argument, but may affect the result
+of some transformations. For instance, the \texttt{split\_goal}
+transformations interpret those connectives as introduction of logical cuts
+ (see~\ref{tech:trans:split} for details).
 
 \subsection{Theories}
 

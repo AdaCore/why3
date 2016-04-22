@@ -252,16 +252,17 @@ let print_report (g,p,l,r) =
   | M.Result(new_res,old_res) ->
     (* begin match !opt_smoke with *)
     (*   | Session.SD_None -> *)
-      let t = Call_provers.get_time l in
-      let m = Call_provers.get_mem l in
-      let s = Call_provers.get_steps l in
         printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
-          print_result new_res print_result old_res t m s
+          print_result new_res print_result old_res
+          l.Call_provers.limit_time
+          l.Call_provers.limit_mem
+          l.Call_provers.limit_steps
     (*   | _ -> *)
     (*     printf "Smoke detected!!!@." *)
     (* end *)
   | M.No_former_result new_res ->
-      printf "no former result available, new result is: %a@." print_result new_res
+      printf "no former result available, new result is: %a@."
+        print_result new_res
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
   | M.Edited_file_absent f ->
@@ -400,7 +401,7 @@ let run_as_bench env_session =
     eprintf " done.@.";
     exit 0
   in
-  let limit = Call_provers.mk_limit 2 0 0 in
+  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 2} in
   M.play_all env_session sched ~callback ~limit provers;
   main_loop ();
   eprintf "main replayer (in bench mode) exited unexpectedly@.";

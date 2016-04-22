@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.4.0" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.4.0" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../rightmostbittrick.mlw" expanded="true">
 <theory name="Rmbt" sum="20adbd3247e4350745dafae5c88a22b8" expanded="true">
  <goal name="WP_parameter rightmost_position_set" expl="VC for rightmost_position_set" expanded="true">
@@ -92,7 +92,7 @@
   <proof prover="2"><result status="valid" time="0.43"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.7" expl="7. postcondition" expanded="true">
-  <proof prover="2" steplimit="-1"><result status="valid" time="0.27"/></proof>
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
   </goal>
   <goal name="WP_parameter rightmost_bit_trick.8" expl="8. postcondition">
   <proof prover="0"><result status="valid" time="0.15" steps="133"/></proof>

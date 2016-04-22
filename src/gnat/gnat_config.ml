@@ -2,19 +2,15 @@ open Why3
 open Stdlib
 
 type proof_mode =
-    Then_Split
+    Progressive
   | No_WP
   | All_Split
-  | Path_WP
-  | No_Split
+  | Per_Path
+  | Per_Check
 
 type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
-
-type ce_mode =
-  | On
-  | Off
 
 type prover =
   { driver : Driver.driver;
@@ -33,19 +29,19 @@ let is_builtin_prover =
     let s = String.lowercase s in
     Sstr.mem s builtin_provers_set)
 
-let default_timeout = Some 1
+let default_timeout = 1
 
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_force = ref false
-let opt_proof_mode = ref Then_Split
+let opt_proof_mode = ref Progressive
 let opt_lazy = ref true
 let opt_filename : string option ref = ref None
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
-let opt_ce_mode = ref Off
+let opt_ce_mode = ref false
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -61,10 +57,8 @@ let set_why3_conf s =
     opt_why3_conf_file := Some s
 
 let set_ce_mode s =
-  if s = "on" then
-    opt_ce_mode := On
-  else if s = "off" then
-    opt_ce_mode := Off
+  if s = "on" then opt_ce_mode := true
+  else if s = "off" then opt_ce_mode := false
   else
     Gnat_util.abort_with_message ~internal:true
         "argument for option --counterexample should be one of\
@@ -82,16 +76,16 @@ let set_proof_mode s =
       opt_proof_mode := No_WP
    else if s = "all_split" then
       opt_proof_mode := All_Split
-   else if s = "path_wp" then
-      opt_proof_mode := Path_WP
-   else if s = "no_split" then
-      opt_proof_mode := No_Split
-   else if s = "then_split" then
-     opt_proof_mode := Then_Split
+   else if s = "per_path" then
+      opt_proof_mode := Per_Path
+   else if s = "per_check" then
+      opt_proof_mode := Per_Check
+   else if s = "progressive" then
+     opt_proof_mode := Progressive
    else
       Gnat_util.abort_with_message ~internal:true
         "argument for option --proof should be one of\
-        (then_split|no_wp|all_split|path_wp|no_split)."
+        (per_check|per_path|progressive|no_wp|all_split)."
 
 let set_prover s =
    opt_prover := Some s
@@ -269,7 +263,7 @@ let provers, prover_ce, config, env =
           List.map filter_prover l in
       (* the prover for counterexample generation *)
       let base_prover_ce =
-	if !opt_ce_mode = On then
+	if !opt_ce_mode then
 	  Some (filter_prover "cvc4_ce")
 	else
 	  None in
@@ -435,7 +429,7 @@ let () =
     exit 0
   | _ -> ()
 
-let ce_mode = !opt_ce_mode
+let counterexamples = !opt_ce_mode
 
 let manual_prover =
   (* sanity check - we found at least one prover, and don't allow combining
@@ -472,9 +466,10 @@ let filename =
 
 let timeout =
    match !opt_timeout with
-   | Some _ -> !opt_timeout
+   | Some x -> x
    | None ->
-         if !opt_steps <> None then None
+         if !opt_steps <> None then
+           Call_provers.empty_limit.Call_provers.limit_time
          else default_timeout
 
 let min a b =
@@ -492,16 +487,17 @@ let convert_data =
   h
 
 let steps ~prover =
-  if manual_prover <> None then None
+  if manual_prover <> None then
+    Call_provers.empty_limit.Call_provers.limit_steps
   else
     match !opt_steps with
-    | None -> None
+    | None -> Call_provers.empty_limit.Call_provers.limit_steps
     | Some c ->
       let prover = String.sub prover 0 (min 4 (String.length prover)) in
       try
         let conv = Hashtbl.find convert_data prover in
-        Some (conv.add + conv.mult * c)
-      with Not_found -> !opt_steps
+        conv.add + conv.mult * c
+      with Not_found -> c
 
 let back_convert_steps ~prover c =
   try
@@ -513,9 +509,9 @@ let back_convert_steps ~prover c =
   with Not_found -> c
 
 let limit ~prover =
-  { Call_provers.limit_time = timeout;
-    limit_steps = steps ~prover;
-    limit_mem = None }
+  { Call_provers.empty_limit with
+    Call_provers.limit_time = timeout;
+    limit_steps = steps ~prover}
 
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy
