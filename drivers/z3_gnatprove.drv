@@ -82,15 +82,6 @@ end
    have the same name for the function to_uint *)
 theory bv.BV_Gen
   syntax function to_uint "(bv2int %1)"
-
-(* While removing all axioms will leave some non smtlib operators
-   without a definition (lsl,nth and other operators with a "_bv"
-   variant), those are not directly used by spark and z3 is not
-   good with them anyway. This definitly help for floats. *)
-(* Note that if an external axiomatization uses them (e.g. bitwalker)
-   this will not help. In this case CVC4 should be able to handle
-   those uninterpreted functions. *)
-  remove allprops
 end
 
 theory bv.BV64
