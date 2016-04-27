@@ -236,8 +236,17 @@ theory GenericFloat
 
   (* axiomatize eq w.r.t. = ? *)
   (* e.g. is_finite x /\ is_finite y /\ not_is_zero x -> eq x y <-> x = y *)
-  axiom eq: forall x y.
-    is_finite x /\ is_finite y /\ not (x = zeroF \/ y = zeroF) -> x .= y <-> x = y
+  axiom feq_eq: forall x y.
+    is_finite x -> is_finite y -> not (x = zeroF) -> not (y = zeroF) -> x .= y -> x = y
+
+  axiom eq_feq: forall x y.
+    is_finite x -> is_finite y -> x = y -> x .= y
+
+  axiom eq_refl: forall x. is_finite x -> x .= x
+
+  axiom eq_sym: forall x y. x .= y -> y .= x
+
+  axiom eq_trans: forall x y z. x .= y -> y .= z -> x .= z
 
   axiom eq_zero: zeroF .= (.- zeroF) /\ (.- zeroF) .= zeroF
 
