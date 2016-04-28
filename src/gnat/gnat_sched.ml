@@ -107,9 +107,7 @@ let init () =
   Prove_client.connect_external Gnat_config.socket_name
 
 let shut_down_proof_server () =
-  Prove_client.disconnect ();
-  if Gnat_config.stand_alone then
-    Unix.kill !server_pid 9
+  Prove_client.disconnect ()
 
 let handle_proof_results callback =
   let handle_list = List.iter (fun (id, res) -> finished_goal callback id res)
