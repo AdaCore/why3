@@ -7,7 +7,6 @@
 <prover id="2" name="CVC3" version="2.4.1" timelimit="36" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="36" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../koda_ruskey.mlw" expanded="true">
 <theory name="KodaRuskey_Spec" sum="8e518d6f01f787c2ba93abeff13d48b2">
@@ -26,7 +25,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Lemmas" sum="e854d03b7c4acc5d88dd8c36e7048e5c" expanded="true">
+<theory name="Lemmas" sum="e854d03b7c4acc5d88dd8c36e7048e5c">
  <goal name="mem_app">
  <transf name="induction_ty_lex">
   <goal name="mem_app.1" expl="1.">
@@ -261,13 +260,9 @@
  <transf name="induction_pr">
   <goal name="sub_weaken2.1" expl="1.">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="sub_weaken2.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="67"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="sub_weaken2.3" expl="3.">
   <transf name="induction_ty_lex">
@@ -506,7 +501,6 @@
   <proof prover="1" timelimit="11"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter sub_valid_coloring_white.9" expl="9. precondition">
-  <proof prover="0" timelimit="11"><result status="valid" time="0.02"/></proof>
   <proof prover="1" timelimit="11"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter sub_valid_coloring_white.10" expl="10. postcondition">
@@ -584,7 +578,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="KodaRuskey" sum="e1f74a7b1053dbbb409b16e4c43cefe2">
+<theory name="KodaRuskey" sum="e1f74a7b1053dbbb409b16e4c43cefe2" expanded="true">
  <goal name="WP_parameter enum" expl="VC for enum">
  <transf name="split_goal_wp">
   <goal name="WP_parameter enum.1" expl="1. unreachable point">
