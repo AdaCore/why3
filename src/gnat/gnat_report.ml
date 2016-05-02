@@ -3,8 +3,7 @@ open Why3.Json
 open Gnat_objectives.Save_VCs
 
 type msg =
-  { check         : Gnat_expl.check;
-    result        : bool;
+  { result        : bool;
     stats         : stats option;
     extra_info    : int option;
     tracefile     : string;
@@ -12,7 +11,7 @@ type msg =
     manual_proof  : (string * string) option
   }
 
-let msg_set : msg list ref = ref []
+let msg_set : msg Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 
 let warning_list : string list ref = ref []
 
@@ -40,21 +39,23 @@ let adapt_stats statsopt =
       Some newstats
 
 let register check task model stats valid manual tracefile =
-  let extra_info =
-    if valid then None
-    else begin match task with
-      | None -> None
-      | Some t -> Gnat_expl.get_extra_info t
-    end in
-  let msg =
-  { check         = check;
-    result        = valid;
-    extra_info    = extra_info;
-    stats         = adapt_stats stats;
-    tracefile     = tracefile;
-    cntexmp_model = model;
-    manual_proof  = manual } in
-  msg_set := msg :: !msg_set
+  if (Gnat_expl.HCheck.mem msg_set check) then ()
+  else begin
+    let extra_info =
+      if valid then None
+      else begin match task with
+        | None -> None
+        | Some t -> Gnat_expl.get_extra_info t
+      end in
+    let msg =
+    { result        = valid;
+      extra_info    = extra_info;
+      stats         = adapt_stats stats;
+      tracefile     = tracefile;
+      cntexmp_model = model;
+      manual_proof  = manual } in
+    Gnat_expl.HCheck.add msg_set check msg
+  end
 
 let get_info info  =
     match info with
@@ -107,11 +108,11 @@ let print_stats fmt stats =
       print_json_field "stats"
 	(map_bindings get_name print_prover_stats) fmt kv_list
 
-let print_json_msg fmt m =
+let print_json_msg fmt (check, m) =
   Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a}"
-    (print_json_field "id" int) m.check.Gnat_expl.id
+    (print_json_field "id" int) check.Gnat_expl.id
     (print_json_field "reason" string)
-      (Gnat_expl.reason_to_ada m.check.Gnat_expl.reason)
+      (Gnat_expl.reason_to_ada check.Gnat_expl.reason)
     (print_json_field "result" bool) m.result
     (print_json_field "extra_info" int) (get_info m.extra_info)
     print_stats m.stats
@@ -126,6 +127,8 @@ let print_warning_list fmt l =
     Format.fprintf fmt ", %a" (print_json_field "warnings" (list string)) l
 
 let print_messages () =
+  let msg_set = Gnat_expl.HCheck.fold (fun k v acc -> (k,v) :: acc) msg_set []
+  in
   Format.printf "{%a%a}@."
-  (print_json_field "results" (list print_json_msg)) !msg_set
+  (print_json_field "results" (list print_json_msg)) msg_set
   print_warning_list !warning_list

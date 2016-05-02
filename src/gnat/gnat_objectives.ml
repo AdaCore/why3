@@ -358,7 +358,6 @@ let register_result goal result =
    GoalSet.remove obj_rec.to_be_proved goal;
    if obj_rec.counter_example then begin
      (* The prover run was scheduled just to get counterexample *)
-     obj_rec.counter_example <- false;
      obj, Not_Proved
    end else begin
      incr nb_goals_done;
