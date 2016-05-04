@@ -419,7 +419,7 @@ module KodaRuskey
     requires { valid_coloring f0 bits.elts }
     variant  { size_stack st, st }
     ensures  { forall i.
-                not (mem_stack i st) -> bits[i] = (old bits)[i] }
+                 not (mem_stack i st) -> bits[i] = (old bits)[i] }
     ensures  { inverse st (old bits).elts bits.elts }
     ensures  { valid_coloring f0 bits.elts }
     ensures  { stored_solutions f0 bits.elts st (old !visited) !visited }
@@ -491,10 +491,10 @@ module KodaRuskey
     ensures  { S.length !visited = count_forest f0 }
     ensures  { let n = S.length !visited  in
                forall j. 0 <= j < n ->
-               valid_coloring f0 (S.get !visited j) &&
-               forall k. 0 <= k < n -> j <> k ->
-                 not (eq_coloring (length bits)
-                       (S.get !visited j) (S.get !visited k)) }
+                 valid_coloring f0 (S.get !visited j) &&
+                 forall k. 0 <= k < n -> j <> k ->
+                   not (eq_coloring (length bits)
+                         (S.get !visited j) (S.get !visited k)) }
   = visited := S.empty;
     enum bits f0 (Cons f0 Nil)
 
