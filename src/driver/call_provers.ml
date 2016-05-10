@@ -259,14 +259,16 @@ let actualcommand ~cleanup ~inplace command limit file =
     raise e
 
 let adapt_limits limit on_timelimit =
-  { limit with limit_time =
-    (* for steps limit use 2 * t + 1 time *)
-    if limit.limit_steps <> empty_limit.limit_steps
-    then (2 * limit.limit_time + 1)
-    (* if prover implements time limit, use t + 1 *)
-    else if on_timelimit then succ limit.limit_time
-    (* otherwise use t *)
-    else limit.limit_time }
+  if limit.limit_time = empty_limit.limit_time then limit
+  else
+    { limit with limit_time =
+      (* for steps limit use 2 * t + 1 time *)
+      if limit.limit_steps <> empty_limit.limit_steps
+      then (2 * limit.limit_time + 1)
+      (* if prover implements time limit, use t + 1 *)
+      else if on_timelimit then succ limit.limit_time
+      (* otherwise use t *)
+      else limit.limit_time }
 
 type server_id = int
 
