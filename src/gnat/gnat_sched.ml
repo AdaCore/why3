@@ -97,8 +97,6 @@ let finished_goal callback id res =
   Intmap.remove state.map id;
   handle_finished_call callback entry res
 
-let server_pid = ref 0
-
 let init () =
   if Gnat_config.stand_alone then begin
     Prove_client.connect_internal ();
