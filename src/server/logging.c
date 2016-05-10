@@ -33,5 +33,5 @@ void logging_shutdown(char* s) {
    log_msg(s);
    fclose(logfile);
   }
-   exit(1);
+  exit(1);
 }
