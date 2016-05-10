@@ -14,6 +14,7 @@
 #include <string.h>
 #include "request.h"
 #include "options.h"
+#include "logging.h"
 
 //count the semicolons in <buf>, up to <len>
 int count_semicolons(char* buf, int len);
@@ -61,6 +62,9 @@ prequest parse_request(char* str_req, int len, int key) {
   prequest req;
   char* tmp;
   bool runstdin = false;
+
+  log_msg("received query");
+  log_msg_len(str_req, len);
 
   semic = count_semicolons(str_req, len);
   if (semic == 0) {
