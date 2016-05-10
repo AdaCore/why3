@@ -29,8 +29,6 @@ let is_builtin_prover =
     let s = String.lowercase s in
     Sstr.mem s builtin_provers_set)
 
-let default_timeout = 1
-
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
@@ -463,10 +461,7 @@ let filename =
 let timeout =
    match !opt_timeout with
    | Some x -> x
-   | None ->
-         if !opt_steps <> None then
-           Call_provers.empty_limit.Call_provers.limit_time
-         else default_timeout
+   | None -> Call_provers.empty_limit.Call_provers.limit_time
 
 let min a b =
   if a <= b then
