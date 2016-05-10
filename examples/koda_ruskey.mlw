@@ -408,10 +408,9 @@ module KodaRuskey
   val map_of_array (a: array 'a) : M.map int 'a
     ensures { result = a.elts }
 
-  val bits : array color
   val ghost visited: ref visited
 
-  let rec enum (ghost f0: forest) (st: list forest) : unit
+  let rec enum (bits: array color) (ghost f0: forest) (st: list forest) : unit
     requires { size_forest f0 = length bits }
     requires { valid_nums_forest f0 (length bits) }
     requires { sub st f0 bits.elts }
@@ -420,7 +419,7 @@ module KodaRuskey
     requires { valid_coloring f0 bits.elts }
     variant  { size_stack st, st }
     ensures  { forall i.
-                not (mem_stack i st) -> bits[i] = (old bits)[i] }
+                 not (mem_stack i st) -> bits[i] = (old bits)[i] }
     ensures  { inverse st (old bits).elts bits.elts }
     ensures  { valid_coloring f0 bits.elts }
     ensures  { stored_solutions f0 bits.elts st (old !visited) !visited }
@@ -435,14 +434,14 @@ module KodaRuskey
            ghost visited := S.snoc !visited (map_of_array bits);
            ()
        | _ ->
-           enum f0 st'
+           enum bits f0 st'
        end
     | Cons (N i f1 f2 as f) st' ->
         assert { disjoint_stack f1 st' };
         assert { not (mem_stack i st') };
         let ghost visited1 = !visited in
         if bits[i] = White then begin
-    'A:   enum f0 (Cons f2 st');
+    'A:   enum bits f0 (Cons f2 st');
           assert { sub st f0 bits.elts };
           let ghost bits1 = map_of_array bits in
           let ghost visited2 = !visited in
@@ -451,7 +450,7 @@ module KodaRuskey
           assert { white_forest f1 bits.elts };
           assert { unchanged (Cons f2 st') (at bits 'B).elts bits.elts};
           assert { inverse (Cons f2 st') (at bits 'A).elts bits.elts };
-    'C:   enum f0 (Cons f1 (Cons f2 st'));
+    'C:   enum bits f0 (Cons f1 (Cons f2 st'));
           assert { bits[i] = Black };
           assert { final_forest f1 bits.elts };
           assert { if not (even_forest f1)
@@ -464,7 +463,7 @@ module KodaRuskey
         end else begin
           assert { if not (even_forest f1) then white_forest f2 bits.elts
                    else final_forest f2 bits.elts };
-    'A:   enum f0 (Cons f1 (Cons f2 st'));
+    'A:   enum bits f0 (Cons f1 (Cons f2 st'));
           assert { sub st f0 bits.elts };
           let ghost bits1 = map_of_array bits in
           let ghost visited2 = !visited in
@@ -477,7 +476,7 @@ module KodaRuskey
           assert { if even_forest f1 || even_forest f2
                    then unchanged st' (at bits 'A).elts bits.elts
                    else inverse st' (at bits 'A).elts bits.elts };
-    'C:   enum f0 (Cons f2 st');
+    'C:   enum bits f0 (Cons f2 st');
           assert { bits[i] = White };
           assert { white_forest f  bits.elts };
           ghost stored_trans2 f0 bits1 (map_of_array bits)
@@ -485,19 +484,19 @@ module KodaRuskey
        end
     end
 
-  let main (f0: forest)
+  let main (bits: array color) (f0: forest)
     requires { white_forest f0 bits.elts }
     requires { size_forest f0 = length bits }
     requires { valid_nums_forest f0 (length bits) }
     ensures  { S.length !visited = count_forest f0 }
     ensures  { let n = S.length !visited  in
                forall j. 0 <= j < n ->
-               valid_coloring f0 (S.get !visited j) &&
-               forall k. 0 <= k < n -> j <> k ->
-                 not (eq_coloring (length bits)
-                       (S.get !visited j) (S.get !visited k)) }
+                 valid_coloring f0 (S.get !visited j) &&
+                 forall k. 0 <= k < n -> j <> k ->
+                   not (eq_coloring (length bits)
+                         (S.get !visited j) (S.get !visited k)) }
   = visited := S.empty;
-    enum f0 (Cons f0 Nil)
+    enum bits f0 (Cons f0 Nil)
 
 end
 

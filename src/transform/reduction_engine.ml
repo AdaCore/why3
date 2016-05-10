@@ -48,6 +48,8 @@ let big_int_of_value v =
   match v with
   | Int n -> n
   | Term {t_node = Tconst c } -> big_int_of_const c
+  | Term { t_node = Tapp (ls,[{ t_node = Tconst c }]) }
+    when ls_compare ls !ls_minus = 0 -> BigInt.minus (big_int_of_const c)
   | _ -> raise NotNum
 
 
@@ -430,7 +432,7 @@ let rec reduce engine c =
                 Term
                   (t_label_copy orig
                      (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
-              cont_stack = rem ;
+              cont_stack = rem;
             }
         end
       | Int _ -> assert false (* would be ill-typed *)
@@ -455,7 +457,7 @@ let rec reduce engine c =
   | [], (Knot,_) :: _ -> assert false
   | Int _ :: _ , (Knot,_) :: _ -> assert false
   | (Term t) :: st, (Knot, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_not t)) :: st;
+    { value_stack = Term (t_label_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
   | st, (Kapp(ls,ty), orig) :: rem ->
@@ -512,8 +514,13 @@ and reduce_match st u ~orig tbl sigma cont =
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined ->
+    let dmy = t_var (create_vsymbol (Ident.id_fresh "__dmy") (t_type u)) in
+    let tbls = match t_subst sigma (t_case dmy tbl) with
+      | { t_node = Tcase (_,tbls) } -> tbls
+      | _ -> assert false
+    in
     { value_stack =
-        Term (t_label_copy orig (t_subst sigma (t_case u tbl))) :: st;
+        Term (t_label_copy orig (t_case u tbls)) :: st;
       cont_stack = cont;
     }
 
