@@ -390,8 +390,7 @@ theory GenericFloat
 
   (** ceil *)
 
-  (* FS: this is not valid, counter-example: x = NaN *)
-  (* axiom ceil_le: forall x:t. x .<= (roundToIntegralTowardsPositive x) *)
+  axiom ceil_le: forall x:t. is_finite x -> x .<= (roundToIntegralTowardsPositive x)
 
   axiom ceil_lest: forall x y:t. x .<= y /\ is_int y -> (roundToIntegralTowardsPositive x) .<= y
 
@@ -405,8 +404,7 @@ theory GenericFloat
 
   (** floor *)
 
-  (* FS: this is not valid, counter-example: x = NaN *)
-  (* axiom floor_le: forall x:t. (roundToIntegralTowardsNegative x) .<= x *)
+  axiom floor_le: forall x:t. is_finite x -> (roundToIntegralTowardsNegative x) .<= x
 
   axiom floor_lest: forall x y:t. y .<= x /\ is_int y -> y .<= (roundToIntegralTowardsNegative x)
 
