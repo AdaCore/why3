@@ -65,7 +65,7 @@ theory "_gnatprove_standard".Float64_next_prev
 end
 
 theory ieee_float.GenericFloat
-   syntax function to_int "(ite (bvslt ((_ fp.to_sbv 64) RNE %1) #x8000000000000000) (bv2int ((_ fp.to_sbv 64) RNE %1)) (- 18446744073709551616 (bv2int ((_ fp.to_sbv 64) RNE %1))))"
+   syntax function to_int "(ite (bvsge ((_ fp.to_sbv 64) RNE %1) #x0000000000000000) (bv2int ((_ fp.to_sbv 64) RNE %1)) (- (bv2int ((_ fp.to_sbv 64) RNE %1)) 18446744073709551616))"
 end
 
 theory ieee_float.Float64
