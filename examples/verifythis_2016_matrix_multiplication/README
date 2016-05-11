@@ -1,0 +1,65 @@
+
+This is a complete solution to Verifythis 2016 challenge 1.
+
+A self-contained solution to task 1 can be found in file naive.mlw
+Other files solve task 2 and 3:
+- sum_extended.mlw prove a few extra lemmas on top of what
+  the standard library already gives
+- matrices.mlw contains the theories of matrices, matrix arithmetic,
+  and block product. Except for providing the requested program,
+  it solves task 2.
+- matrices_ring_simp.mlw is a support file for proof by reflection
+  of matrix algebraic equations
+- strassen.mlw is the implementation of Strassen's Algorithm for task 3.
+  It also contains the program associated to task 2 (assoc_proof).
+
+To replay proofs:
+- Install Why3 development version from the git source repository
+  (at the time this file was written, it would not replay with the
+   release version due to known incompleteness bug in compute)
+- Install SMT solvers Alt-Ergo 1.01, CVC4 1.4 and Z3 4.4.1
+- Run why3 replay -L . FILE to replay the session associated to FILE.
+
+
+Challenge text:
+
+
+Challenge 1: Matrix Multiplication
+
+Consider the following pseudocode algorithm, which is naive implementation of matrix multiplication. For simplicity we assume that the matrices are square.
+
+ int[][] matrixMultiply(int[][] A, int[][] B) {
+    int n = A.length;
+
+    // initialise C
+    int[][] C = new int[n][n];
+
+    for (int i = 0; i < n; i++) {
+           for (int k = 0; k < n; k++) {
+                   for (int j = 0; j < n; j++) {
+                       C[i][j] += A[i][k] * B[k][j];
+                   }
+           }
+    }
+    return C;
+ }
+
+Tasks.
+1. Provide a specification to describe the behaviour of this algorithm, and prove
+   that it correctly implements its specification.
+
+2. Show that matrix multiplication is associative, i.e., the order in which
+   matrices are multiplied can be disregarded: A(BC) = (AB)C. To show this,
+   you should write a program that performs the two different computations,
+   and then prove that the result of the two computations is always the same.
+
+3. [Optional, if time permits] In the literature, there exist many proposals
+   for more efficient matrix multiplication algorithms. Strassen’s algorithm
+   was one of the first. The key idea of the algorithm is to use a recursive
+   algorithm that reduces the number of multiplications on submatrices
+   (from 8 to 7), see https://en.wikipedia.org/wiki/Strassen_algorithm for an
+   explanation. A relatively clean Java implementation (and Python and C++)
+   can be found here: https://martin-thoma.com/strassen-algorithm-in-python-java-cpp/.
+   Prove that the naive algorithm above has the same behaviour as Strassen’s
+   algorithm. Proving it for a restricted case, like a 2x2 matrix should be
+   straightforward, the challenge is to prove it for arbitrary matrices with size 2^n.

@@ -93,7 +93,7 @@ let connect_internal () =
   Unix.chdir (Filename.get_temp_dir_name ());
   let socket_name = Filename.concat (Unix.getcwd ())
     ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
-  let exec = Filename.concat Config.libdir "why3server" in
+  let exec = "why3server" in
   let _pid = Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";

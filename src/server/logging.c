@@ -25,6 +25,14 @@ void init_logging() {
 void log_msg(char* s) {
   if (logging) {
    fprintf (logfile, "%s\n", s);
+   fflush (logfile);
+  }
+}
+
+void log_msg_len(char* s, int len) {
+  if (logging) {
+   fprintf (logfile, "%.*s\n", len, s);
+   fflush (logfile);
   }
 }
 
@@ -33,5 +41,5 @@ void logging_shutdown(char* s) {
    log_msg(s);
    fclose(logfile);
   }
-   exit(1);
+  exit(1);
 }

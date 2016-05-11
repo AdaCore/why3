@@ -29,8 +29,6 @@ let is_builtin_prover =
     let s = String.lowercase s in
     Sstr.mem s builtin_provers_set)
 
-let default_timeout = 1
-
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
@@ -223,8 +221,7 @@ let provers, prover_ce, config, env =
       * --prover was given, with a non-builtin prover *)
      try
        let gnatprove_config =
-         if !opt_prepare_shared then Whyconf.read_config None
-         else Whyconf.read_config (Some gnatprove_why3conf_file) in
+         Whyconf.read_config (Some gnatprove_why3conf_file) in
        if builtin_provers_only then gnatprove_config
         else begin
            let conf = (Whyconf.read_config !opt_why3_conf_file) in
@@ -241,12 +238,9 @@ let provers, prover_ce, config, env =
              (Whyconf.set_provers ~shortcuts gnatprove_config provers)
              editors
         end
-     with Rc.CannotOpen _ ->
-       let conf_name = match !opt_why3_conf_file with
-                       | None -> "why3.conf"
-                       | Some s -> Filename.basename s in
+     with Rc.CannotOpen (f,s) ->
        Gnat_util.abort_with_message ~internal:true
-                                    ("Cannot read file" ^ conf_name ^ ".")
+         (Format.sprintf "cannot read file %s: %s" f s)
   in
   (* now we build the Whyconf.config_prover for all requested provers
    * and for the prover for counterexample generation *)
@@ -467,10 +461,7 @@ let filename =
 let timeout =
    match !opt_timeout with
    | Some x -> x
-   | None ->
-         if !opt_steps <> None then
-           Call_provers.empty_limit.Call_provers.limit_time
-         else default_timeout
+   | None -> Call_provers.empty_limit.Call_provers.limit_time
 
 let min a b =
   if a <= b then

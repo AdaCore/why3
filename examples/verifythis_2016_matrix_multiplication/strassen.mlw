@@ -1,0 +1,377 @@
+module MatrixMultiplication
+
+  use import int.Int
+  use import int.Sum
+  use import ref.Ref
+  use import map.Map
+  use import matrices.FloatMatrix as F
+  use import matrices.MatrixArithmetic
+  use import matrices.BlockMul
+  use import matrices_ring_simp.Symb
+  use import matrix.Matrix
+
+  let blit (src tar: matrix 'a) (src_r tar_r dr src_c tar_c dc: int) : unit
+    requires { 0 <= src_r <= src_r + dr <= src.rows }
+    requires { 0 <= src_c <= src_c + dc <= src.columns }
+    requires { 0 <= tar_r <= tar_r + dr <= tar.rows }
+    requires { 0 <= tar_c <= tar_c + dc <= tar.columns }
+    ensures  { forall i j. tar_r <= i < tar_r + dr -> tar_c <= j < tar_c + dc ->
+      tar.elts[i][j] = src.elts[i + (src_r - tar_r)][j + (src_c - tar_c)] }
+    ensures  { forall i j. 0 <= i < tar.rows -> 0 <= j < tar.columns ->
+                 not (tar_r <= i < tar_r + dr /\ tar_c <= j < tar_c + dc) ->
+                 tar.elts[i][j] = (old tar).elts[i][j] }
+  =
+   'I:
+   for i = tar_r to tar_r + dr - 1 do
+     invariant { forall i j. 0 <= i < tar.rows -> 0 <= j < tar.columns ->
+                 not (tar_r <= i < tar_r + dr /\ tar_c <= j < tar_c + dc) ->
+                 tar.elts[i][j] = (at tar 'I).elts[i][j] }
+     invariant { forall i' j'. tar_r <= i' < i -> tar_c <= j' < tar_c + dc ->
+                 tar.elts[i'][j'] =
+                 src.elts[i' + (src_r - tar_r)][j' + (src_c - tar_c)] }
+     'L:
+     for j = tar_c to tar_c + dc - 1 do
+       invariant { forall i' j'. 0 <= i' < tar.rows -> 0 <= j' < tar.columns ->
+                   (i' <> i \/ not (tar_c <= j' < tar_c + dc)) ->
+                   tar.elts[i'][j'] = (at tar 'L).elts[i'][j']}
+       invariant { forall j'. tar_c <= j' < j -> tar.elts[i][j'] =
+                   src.elts[i + (src_r - tar_r)][j' + (src_c - tar_c)] }
+       set tar i j (get src (i + (src_r - tar_r)) (j + (src_c - tar_c)))
+     done;
+   done
+
+  function mdl (m: matrix 'a) : mat 'a =
+    create m.rows m.columns (\i j. get m i j)
+
+  (*** Very technical: Why3 refuses calls to logic functions
+    in programs when the function signature contains impure types
+    (e.g like matrix 'a). However, this is safe for the particular
+    case of functions that project an impure type to a pure one, so we
+    assume it is possible. *)
+  val ghost mdl (m:matrix 'a) : mat 'a
+    ensures { result = mdl m }
+
+  type with_symb = {
+    phy : matrix int;
+    ghost sym : expr;
+  }
+
+  predicate with_symb_vld (env:env) (ws:with_symb) =
+    e_mdl env ws.sym = ws.phy.mdl /\ e_vld env ws.sym /\
+    ws.sym.e_rows = ws.phy.mdl.F.rows /\
+    ws.sym.e_cols = ws.phy.mdl.F.cols
+  meta rewrite_def predicate with_symb_vld
+
+  let block (a: matrix int) (r dr c dc: int) : matrix int
+    requires { 0 <= r <= r + dr <= a.mdl.F.rows }
+    requires { 0 <= c <= c + dc <= a.mdl.F.cols }
+    ensures  { result.mdl = block a.mdl r dr c dc }
+    ensures  { result.mdl.F.rows = dr /\ result.mdl.F.cols = dc }
+  = let res = make dr dc 0 in
+    blit a res r 0 dr c 0 dc;
+    assert { res.mdl == block a.mdl r dr c dc };
+    res
+
+  let block_ws (ghost env:env) (a:matrix int) (r dr c dc: int) : with_symb
+    requires { 0 <= r <= r + dr <= a.mdl.F.rows }
+    requires { 0 <= c <= c + dc <= a.mdl.F.cols }
+    ensures { let rm = result.phy.mdl in
+      rm = block a.mdl r dr c dc /\ rm.F.rows = dr /\ rm.F.cols = dc }
+    ensures { result.sym ---> symb_mat result.phy.mdl (old env.ev_c) }
+    ensures { env.ev_f --> old (extends env.ev_f env.ev_c result.phy.mdl) }
+    ensures { env.ev_c --> old env.ev_c + 1 }
+    ensures { with_symb_vld env result }
+  = let m = block a r dr c dc in
+    { phy = m;
+      sym = ghost symb_reg env m.mdl }
+
+  let add (a b: matrix int) : matrix int
+    requires { a.mdl === b.mdl }
+    ensures  { result.mdl = add a.mdl b.mdl }
+    ensures  { result.mdl === a.mdl }
+  = let res = make a.rows a.columns 0 in
+    for i = 0 to a.rows - 1 do
+      invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
+                   res.elts[i'][j'] = a.elts[i'][j'] + b.elts[i'][j'] }
+     'L:
+      for j = 0 to a.columns - 1 do
+        invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
+                      res.elts[i'][j'] = (at res 'L).elts[i'][j'] }
+        invariant { forall j'.  0 <= j' < j ->
+                      res.elts[i][j'] = a.elts[i][j'] + b.elts[i][j'] }
+        set res i j (get a i j + get b i j)
+      done;
+    done;
+    assert { res.mdl == add a.mdl b.mdl };
+    res
+
+  let add_ws (ghost env:env) (a b:with_symb) : with_symb
+    requires { a.phy.mdl === b.phy.mdl }
+    requires { with_symb_vld env a /\ with_symb_vld env b }
+    ensures { result.phy.mdl = add a.phy.mdl b.phy.mdl }
+    ensures { result.sym ---> symb_add a.sym b.sym }
+    ensures { with_symb_vld env result }
+  = { phy = add a.phy b.phy;
+      sym = ghost symb_add env a.sym b.sym }
+
+  let sub (a b: matrix int): matrix int
+    requires { a.mdl === b.mdl }
+    ensures  { result.mdl = sub a.mdl b.mdl }
+    ensures  { result.mdl === a.mdl}
+   = let res = make a.rows a.columns 0 in
+    for i = 0 to a.rows - 1 do
+      invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
+                   res.elts[i'][j'] = a.elts[i'][j'] - b.elts[i'][j'] }
+     'L:
+      for j = 0 to a.columns - 1 do
+        invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
+                      res.elts[i'][j'] = (at res 'L).elts[i'][j'] }
+        invariant { forall j'.  0 <= j' < j ->
+                      res.elts[i][j'] = a.elts[i][j'] - b.elts[i][j'] }
+        set res i j (get a i j - get b i j)
+      done;
+    done;
+    assert { res.mdl == sub a.mdl b.mdl };
+    res
+
+  let sub_ws (ghost env:env) (a b:with_symb) : with_symb
+    requires { a.phy.mdl === b.phy.mdl }
+    requires { with_symb_vld env a /\ with_symb_vld env b }
+    ensures { result.phy.mdl = sub a.phy.mdl b.phy.mdl }
+    ensures { result.sym ---> symb_sub a.sym b.sym }
+    ensures { with_symb_vld env result }
+  = { phy = sub a.phy b.phy;
+      sym = ghost symb_sub env a.sym b.sym }
+
+  let mult_ijk (a b:matrix int) : matrix int
+    requires { a.mdl.F.cols = b.mdl.F.rows }
+    ensures { result.mdl.F.rows = a.mdl.F.rows }
+    ensures { result.mdl.F.cols = b.mdl.F.cols }
+    ensures { result.mdl = mul a.mdl b.mdl }
+  = let r = rows a in
+    let c = columns b in
+    let m = rows b in
+    let rs = make r c 0 in
+    for i = 0 to r - 1 do
+      invariant { forall i0 j0. 0 <= i0 < i /\ 0 <= j0 < c ->
+        rs.elts[i0][j0] = mul_cell a.mdl b.mdl i0 j0 }
+      invariant { forall i0 j0. i <= i0 < r /\ 0 <= j0 < c ->
+                    rs.elts[i0][j0] = 0 }
+      'M:
+      for j = 0 to c - 1 do
+        invariant { forall i0 j0.
+          0 <= i0 < r /\ 0 <= j0 < c /\ (i0 <> i \/ j0 >= j) ->
+            rs.elts[i0][j0] = (at rs 'M).elts[i0][j0] }
+        invariant { forall j0. 0 <= j0 < j ->
+                      rs.elts[i][j0] = mul_cell a.mdl b.mdl i j0 }
+        'I:
+        for k = 0 to m - 1 do
+          invariant { forall i0 j0. 0 <= i0 < r /\ 0 <= j0 < c /\
+                        (i0 <> i \/ j0 <> j) ->
+                           rs.elts[i0][j0] = (at rs 'I).elts[i0][j0] }
+          invariant { rs.elts[i][j] = sum 0 k (mul_atom a.mdl b.mdl i j) }
+          set rs i j (get rs i j + get a i k * get b k j)
+        done
+      done;
+    done;
+    assert { rs.mdl == mul a.mdl b.mdl };
+    rs
+
+ let mult_ikj (a b:matrix int) : matrix int
+    requires { a.mdl.F.cols = b.mdl.F.rows }
+    ensures { result.mdl.F.rows = a.mdl.F.rows }
+    ensures { result.mdl.F.cols = b.mdl.F.cols }
+    ensures { result.mdl = mul a.mdl b.mdl }
+  = let r = rows a in
+    let c = columns b in
+    let m = rows b in
+    let rs = make r c 0 in
+    for i = 0 to r - 1 do
+      invariant { forall i0 j0. 0 <= i0 < i /\ 0 <= j0 < c ->
+                    rs.elts[i0][j0] = mul_cell a.mdl b.mdl i0 j0 }
+      invariant { forall i0 j0. i <= i0 < r /\ 0 <= j0 < c ->
+                    rs.elts[i0][j0] = 0 }
+      'M:
+      for k = 0 to m - 1 do
+        invariant { forall i0 j0. 0 <= i0 < r /\ 0 <= j0 < c /\ i0 <> i ->
+                      rs.elts[i0][j0] = (at rs 'M).elts[i0][j0] }
+        invariant { forall j0. 0 <= j0 < c ->
+                      rs.elts[i][j0] = sum 0 k (mul_atom a.mdl b.mdl i j0) }
+        'I:
+        for j = 0 to c - 1 do
+          invariant { forall i0 j0.
+            0 <= i0 < r /\ 0 <= j0 < c /\ (i0 <> i \/ j0 >= j) ->
+              rs.elts[i0][j0] = (at rs 'I).elts[i0][j0] }
+          invariant { forall j0. 0 <= j0 < j ->
+              rs.elts[i][j0] = sum 0 (k+1) (mul_atom a.mdl b.mdl i j0) }
+          set rs i j (get rs i j + get a i k * get b k j)
+        done;
+      done;
+    done;
+    assert { rs.mdl == mul a.mdl b.mdl };
+    rs
+
+  let assoc_proof (a b c:matrix int) : unit
+    requires { a.mdl.F.cols = b.mdl.F.rows /\ b.mdl.F.cols = c.mdl.F.rows }
+  = let ab = mult_ikj a b in
+    let bc = mult_ikj b c in
+    let ab_c = mult_ikj ab c in
+    let a_bc = mult_ikj a bc in
+    assert { ab_c.mdl = a_bc.mdl };
+    assert { ab_c.rows = a_bc.rows && ab_c.columns = a_bc.columns &&
+      forall i j. 0 <= i < ab_c.rows /\ 0 <= j < ab_c.columns ->
+        ab_c.elts[i][j] = F.get ab_c.mdl i j = a_bc.elts[i][j] }
+
+  let mul_naive (a b: matrix int)
+    requires { a.mdl.F.cols = b.mdl.F.rows }
+    ensures { result.mdl.F.rows = a.mdl.F.rows }
+    ensures { result.mdl.F.cols = b.mdl.F.cols }
+    ensures { result.mdl = mul a.mdl b.mdl }
+  = mult_ijk a b
+
+  let ghost double_block (a:matrix int) (r1 dr1 c1 dc1 r2 dr2 c2 dc2:int) : unit
+    requires { 0 <= r1 <= r1 + dr1 <= a.mdl.F.rows }
+    requires { 0 <= c1 <= c1 + dc1 <= a.mdl.F.cols }
+    requires { 0 <= r2 <= r2 + dr2 <= dr1 }
+    requires { 0 <= c2 <= c2 + dc2 <= dc1 }
+    ensures { block (block a.mdl r1 dr1 c1 dc1) r2 dr2 c2 dc2 =
+      block a.mdl (r1+r2) dr2 (c1+c2) dc2 }
+    ensures { F.cols (block a.mdl r1 dr1 c1 dc1) = dc1 }
+    ensures { F.rows (block a.mdl r1 dr1 c1 dc1) = dr1 }
+  = assert { block (block a.mdl r1 dr1 c1 dc1) r2 dr2 c2 dc2 ==
+      block a.mdl (r1+r2) dr2 (c1+c2) dc2 }
+
+  let padding (a: matrix int) (r c: int)
+    requires { a.mdl.F.rows <= r }
+    requires { a.mdl.F.cols <= c }
+    ensures  { result.mdl.F.rows = r }
+    ensures  { result.mdl.F.cols = c }
+    ensures  { a.mdl = block result.mdl 0 a.mdl.F.rows 0 a.mdl.F.cols }
+    ensures  { let dr = (r - a.mdl.F.rows) in
+               zero dr a.mdl.F.cols =
+               block result.mdl a.mdl.F.rows dr 0 a.mdl.F.cols }
+    ensures  { let dc = (c - a.mdl.F.cols) in
+               zero a.mdl.F.rows dc =
+               block result.mdl 0 a.mdl.F.rows a.mdl.F.cols dc }
+  = let res = make r c 0 in
+    let nr = a.rows in
+    let nc = a.columns in
+    blit a res 0 0 nr 0 0 nc;
+    assert { let dc = c - nc in zero nr dc == block res.mdl 0 nr nc dc };
+    assert { let dr = r - nr in zero dr nc == block res.mdl nr dr 0 nc };
+    assert {                         a.mdl == block res.mdl 0  nr 0 nc };
+    res
+
+
+  use import int.EuclideanDivision
+
+  let rec strassen (a b: matrix int) (ghost flag: int)
+    requires { 0 <= flag }
+    requires { flag = 0 -> a.mdl.F.cols = 1 \/
+      exists k. a.mdl.F.cols = 2 * k }
+    requires { a.mdl === b.mdl /\ a.mdl.F.cols = b.mdl.F.rows }
+    ensures  { result.mdl = mul a.mdl b.mdl }
+    ensures  { result.mdl === a.mdl }
+    variant  { a.mdl.F.cols + flag, flag }
+  = let cut_off = abstract ensures { result >= 1 } 42 end in
+    let s = a.columns in
+    assert { 0 <= s = a.mdl.F.cols };
+    if s <= cut_off then mul_naive a b else
+    let (n,r) = abstract
+      ensures { let (n,r) = result in s = 2 * n + r /\ 0 <= r <= 1 }
+      (div s 2,mod s 2)
+    end in
+    if r <> 0
+      then begin (* padding *)
+        let s' = s + 1 in
+        let ap = padding a s' s' in
+        let bp = padding b s' s' in
+        assert { s' = 2 * (n + 1) };
+        let m  = strassen ap bp 0 in
+        ghost (double_block ap 0 s  0 s' 0 s 0 s;
+               double_block ap 0 s  0 s' 0 s s 1;
+               double_block bp 0 s' 0 s  0 s 0 s;
+               double_block bp 0 s' 0 s  s 1 0 s);
+        assert { c_blocks (block ap.mdl 0 s  0 s') a.mdl (zero s 1) };
+        assert { r_blocks (block bp.mdl 0 s' 0 s ) b.mdl (zero 1 s) };
+        block m 0 s 0 s
+
+      end
+    else begin
+      let ghost gm   = mul_naive a b in
+      let ghost gm11 = block gm 0 n 0 n in
+      let ghost gm12 = block gm 0 n n n in
+      let ghost gm21 = block gm n n 0 n in
+      let ghost gm22 = block gm n n n n in
+      let (m11, m12, m21, m22) = abstract
+        ensures { let (m11, m12, m21, m22) = result in
+              mdl m11 = mdl gm11 /\ mdl m12 = mdl gm12 /\
+              mdl m21 = mdl gm21 /\ mdl m22 = mdl gm22 }
+        let ghost e = symb_env () in
+        let mul_ws (a b: with_symb) : with_symb
+          requires { with_symb_vld e a /\ with_symb_vld e b }
+          requires { a.phy.mdl === b.phy.mdl === gm11.mdl }
+          ensures { with_symb_vld e result }
+          ensures { result.phy.mdl = mul a.phy.mdl b.phy.mdl }
+          ensures { result.sym ---> symb_mul a.sym b.sym }
+        = let r = strassen a.phy b.phy (if n = 1 then 0 else 1) in
+          { phy = r; sym = ghost symb_mul e a.sym b.sym }
+        in
+        (* a blocks *)
+        let a11 = block_ws e a 0 n 0 n in let a12 = block_ws e a 0 n n n in
+        let a21 = block_ws e a n n 0 n in let a22 = block_ws e a n n n n in
+        ghost (double_block a 0 n 0 s 0 n 0 n; double_block a 0 n 0 s 0 n n n;
+               double_block a n n 0 s 0 n 0 n; double_block a n n 0 s 0 n n n);
+        assert { c_blocks (block a.mdl 0 n 0 s) a11.phy.mdl a12.phy.mdl };
+        assert { c_blocks (block a.mdl n n 0 s) a21.phy.mdl a22.phy.mdl };
+        (* b blocks *)
+        let b11 = block_ws e b 0 n 0 n in let b12 = block_ws e b 0 n n n in
+        let b21 = block_ws e b n n 0 n in let b22 = block_ws e b n n n n in
+        ghost (double_block b 0 s 0 n 0 n 0 n; double_block b 0 s 0 n n n 0 n;
+               double_block b 0 s n n 0 n 0 n; double_block b 0 s n n n n 0 n);
+        assert { r_blocks (block b.mdl 0 s 0 n) b11.phy.mdl b21.phy.mdl };
+        assert { r_blocks (block b.mdl 0 s n n) b12.phy.mdl b22.phy.mdl };
+        let ghost egm11 = (add_ws e (mul_ws a11 b11) (mul_ws a12 b21)).sym in
+        let ghost egm21 = (add_ws e (mul_ws a21 b11) (mul_ws a22 b21)).sym in
+        let ghost egm12 = (add_ws e (mul_ws a11 b12) (mul_ws a12 b22)).sym in
+        let ghost egm22 = (add_ws e (mul_ws a21 b12) (mul_ws a22 b22)).sym in
+        assert { gm11.mdl = e_mdl e egm11 /\ gm21.mdl = e_mdl e egm21 };
+        assert { gm12.mdl = e_mdl e egm12 /\ gm22.mdl = e_mdl e egm22 };
+        (* x1 ... x7 *)
+        let x1  = mul_ws (add_ws e a11 a22) (add_ws e b11 b22) in
+        let x2  = mul_ws (add_ws e a21 a22) b11 in
+        let x3  = mul_ws a11 (sub_ws e b12 b22) in
+        let x4  = mul_ws a22 (sub_ws e b21 b11) in
+        let x5  = mul_ws (add_ws e a11 a12) b22 in
+        let x6  = mul_ws (sub_ws e a21 a11) (add_ws e b11 b12) in
+        let x7  = mul_ws (sub_ws e a12 a22) (add_ws e b21 b22) in
+        (* m11 ... m22 *)
+        let m11 = add_ws e (sub_ws e (add_ws e x1 x4) x5) x7 in
+        let m12 = add_ws e x3 x5 in
+        let m21 = add_ws e x2 x4 in
+        let m22 = add_ws e (add_ws e (sub_ws e x1 x2) x3) x6 in
+        assert { e_mdl e m11.sym = e_mdl e egm11 /\
+                 e_mdl e m12.sym = e_mdl e egm12 /\
+                 e_mdl e m21.sym = e_mdl e egm21 /\
+                 e_mdl e m22.sym = e_mdl e egm22 };
+        (m11.phy, m12.phy, m21.phy, m22.phy)
+      end in
+      let res = make a.rows b.columns 0 in
+      blit m11 res 0 0 n 0 0 n;
+      blit m12 res 0 0 n 0 n n;
+      blit m21 res 0 n n 0 0 n;
+      blit m22 res 0 n n 0 n n;
+      assert { res.mdl == gm.mdl by
+              forall i j. 0 <= i < s -> 0 <= j < s ->
+              res.elts[i][j] = F.get gm.mdl i j by
+              if i < n then
+                if j < n then res.elts[i][j] = F.get m11.mdl i j
+                else res.elts[i][j] = F.get m12.mdl i (j - n)
+              else
+                if j < n then res.elts[i][j] = F.get m21.mdl (i-n) j
+                else res.elts[i][j] = F.get m22.mdl (i-n) (j - n) };
+      res
+    end
+
+
+end
