@@ -1794,6 +1794,7 @@ STDLIBS = algebra \
 	bag \
 	bintree \
 	bool \
+	bv \
 	floating_point \
 	graph \
 	int \
@@ -1801,16 +1802,24 @@ STDLIBS = algebra \
 	map \
 	number \
 	option \
-	seq \
 	pigeon \
 	real \
 	relations \
+	seq \
 	set \
-	sum \
-	bv
+	sum
 # function ? tptp ?
 
-STDMODS = array matrix hashtbl impset pqueue queue random ref stack string
+STDMODS = array \
+	hashtbl \
+	impset \
+	matrix \
+	pqueue \
+	queue \
+	random \
+	ref \
+	stack \
+	string
 
 STDMACS = array int
 
