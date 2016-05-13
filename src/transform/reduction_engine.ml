@@ -987,8 +987,19 @@ let extract_rule _km t =
       | Decl.Dparam _ | Decl.Dind _ -> ()
   in
 *)
-  (* TODO : verifier que les variables de droite, aussi bien term que type,
-     apparaissent a gauche *)
+
+  let check_vars acc t1 t2 =
+    (* check that quantified variables all appear in the lefthand side *)
+    let vars_lhs = t_vars t1 in
+    if Svs.exists (fun vs -> not (Mvs.mem vs vars_lhs)) acc
+    then raise (NotARewriteRule "lhs should contain all variables");
+    (* check the same with type variables *)
+    if not
+         (Ty.Stv.subset
+            (t_ty_freevars Ty.Stv.empty t2) (t_ty_freevars Ty.Stv.empty t2))
+    then raise (NotARewriteRule "lhs should contain all type variables")
+
+  in
 
   let rec aux acc t =
     match t.t_node with
@@ -998,14 +1009,20 @@ let extract_rule _km t =
       | Tbinop(Tiff,t1,t2) ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> (* check_ls ls; *) acc,ls,args,t2
+            | Tapp(ls,args) ->
+               (* check_ls ls; *)
+               check_vars acc t1 t2;
+               acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of <-> should be a predicate symbol")
         end
       | Tapp(ls,[t1;t2]) when ls == ps_equ ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> (* check_ls ls; *) acc,ls,args,t2
+            | Tapp(ls,args) ->
+               (* check_ls ls; *)
+               check_vars acc t1 t2;
+               acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of = should be a function symbol")
         end
