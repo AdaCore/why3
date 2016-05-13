@@ -1851,11 +1851,11 @@ clean::
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-# supress "unused rec" warning for Menhir-produced files
+# suppress "unused rec" warning for Menhir-produced files
 %.cmo: %.ml %.mly
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) -w -39 $<
 
-# supress "unused rec" warning for Menhir-produced files
+# suppress "unused rec" warning for Menhir-produced files
 %.cmx: %.ml %.mly
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) -w -39 $<
 
