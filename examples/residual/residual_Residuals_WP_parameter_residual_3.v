@@ -11,10 +11,6 @@ Require list.Append.
 (* Why3 assumption *)
 Definition unit := unit.
 
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
 Axiom char : Type.
 Parameter char_WhyType : WhyType char.
 Existing Instance char_WhyType.
@@ -67,6 +63,7 @@ Theorem WP_parameter_residual : forall (r:regexp) (c:char), forall (x:regexp)
   forall (o:regexp), (forall (w:(list char)), (mem w o) <-> (mem
   (Init.Datatypes.cons c w) x)) -> forall (w:(list char)), (mem w (Concat o
   x1)) <-> (mem (Init.Datatypes.cons c w) r)).
+(* Why3 intros r c x x1 h1 result h2 h3 o h4 w. *)
 intros r c x x1 h1 result h2 h3 o h4 w.
 subst.
 intuition.
