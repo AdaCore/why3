@@ -13,6 +13,3 @@ val create_prover_file : goal -> Gnat_expl.check -> Gnat_config.prover -> string
 (* Get the file associated to the goal with the current manual prover.
    If the current prover is not manual None is returned *)
 val manual_proof_info : int Session.proof_attempt -> (string * string) option
-
-(* rewrite the goal to it's prove file *)
-val rewrite_goal : goal -> unit

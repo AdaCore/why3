@@ -13,9 +13,7 @@ let manual_attempt_of_goal goal =
           p.Gnat_config.prover.Whyconf.prover
 
 let is_new_manual_proof goal =
-  match manual_attempt_of_goal goal with
-  | None -> true
-  | Some att -> att.proof_obsolete
+  manual_attempt_of_goal goal = None
 
 let rec find_goal_theory goal =
   match goal.goal_parent with
@@ -130,40 +128,3 @@ let manual_proof_info pa =
           p.Gnat_config.prover.Whyconf.prover = base_prover)
         Gnat_config.provers in
       Some (fn, editor_command real_prover fn)
-
-(* This function is needed because when renaming a file from /tmp
-   to a file on the home partition causes an exception *)
-let mv_file oldf newf =
-  let f_in = open_in oldf in
-  let f_out = open_out newf in
-  try
-    let rec print () =
-      Printf.fprintf f_out "%s\n" (input_line f_in);
-      print () in
-    print ()
-  with
-  | End_of_file -> flush f_out; close_out f_out; close_in f_in
-
-let rewrite_goal g =
-  match manual_attempt_of_goal g with
-  | Some pa ->
-    begin match manual_proof_info pa with
-    | Some (fn, _) ->
-       let old = open_in fn in
-       let tmpfile = Filename.temp_file "tmp__" (Filename.basename fn) in
-       let cout = open_out tmpfile in
-       let fmt = Format.formatter_of_out_channel cout in
-       let prover = Opt.get Gnat_config.manual_prover in
-       Driver.print_task ~old prover.Gnat_config.driver
-                         fmt (Session.goal_task g);
-       close_out cout;
-       close_in old;
-       mv_file tmpfile fn;
-       Unix.unlink tmpfile
-    | None ->
-       Gnat_util.abort_with_message ~internal:true
-         "rewritten goal not edited as a file."
-    end
-  | None ->
-     Gnat_util.abort_with_message ~internal:true
-       "rewritten goal not edited as a file."

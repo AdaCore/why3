@@ -187,12 +187,6 @@ and schedule_goal (g : Gnat_objectives.goal) =
    end
 
 and actually_schedule_goal g =
-  if Gnat_config.manual_prover <> None then
-     (* We need to rewrite the goal if we are working with a manual prover
-        because if the user modified code produced by why3, the file might
-        be proven when it is incomplete or not corresponding to our
-        original VC *)
-     Gnat_manual.rewrite_goal g;
   Gnat_objectives.schedule_goal ~cntexample:false g
 
 let handle_obj obj =
