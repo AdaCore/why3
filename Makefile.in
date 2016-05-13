@@ -1712,12 +1712,12 @@ BNF = qualid label constant operator term type formula theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
 BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
 
-doc/%_bnf.tex: doc/%.bnf doc/bnf
-	doc/bnf $< > $@
+doc/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
+	doc/bnf$(EXE) $< > $@
 
-doc/bnf: doc/bnf.mll
+doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
-	$(OCAMLOPT) -o $@ doc/bnf.ml
+	$(OCAMLC) -o $@ doc/bnf.ml
 
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
@@ -1727,6 +1727,9 @@ DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
+
+CLEANDIRS += doc
+GENERATED += doc/bnf.ml
 
 ifeq (@enable_html_doc@,yes)
 
@@ -1746,7 +1749,8 @@ doc/html/index.html:
 endif
 
 clean::
-	cd doc; rm -rf html; $(RUBBER) --pdf --clean manual.tex
+	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
+	cd doc; $(RUBBER) --pdf --clean manual.tex
 
 else
 
@@ -1830,6 +1834,7 @@ STDLIBS = algebra \
 	bag \
 	bintree \
 	bool \
+	bv \
 	floating_point \
 	graph \
 	int \
@@ -1837,16 +1842,24 @@ STDLIBS = algebra \
 	map \
 	number \
 	option \
-	seq \
 	pigeon \
 	real \
 	relations \
+	seq \
 	set \
-	sum \
-	bv
+	sum
 # function ? tptp ?
 
-STDMODS = array matrix hashtbl impset pqueue queue random ref stack string
+STDMODS = array \
+	hashtbl \
+	impset \
+	matrix \
+	pqueue \
+	queue \
+	random \
+	ref \
+	stack \
+	string
 
 STDMACS = array int
 
@@ -1878,11 +1891,11 @@ clean::
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-# supress "unused rec" warning for Menhir-produced files
+# suppress "unused rec" warning for Menhir-produced files
 %.cmo: %.ml %.mly
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) -w -39 $<
 
-# supress "unused rec" warning for Menhir-produced files
+# suppress "unused rec" warning for Menhir-produced files
 %.cmx: %.ml %.mly
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) -w -39 $<
 
@@ -2042,7 +2055,8 @@ configure: configure.in Version
 
 distclean: clean
 	rm -f config.status config.cache config.log .merlin \
-	    Makefile src/util/config.ml doc/version.tex
+	    Makefile src/util/config.ml doc/version.tex \
+	    src/jessie/Makefile src/config.sh lib/why3/META
 
 depend:
 	rm -f $^
