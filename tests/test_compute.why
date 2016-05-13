@@ -10,7 +10,7 @@ constant a : int
 
 goal g1: f 42 = a
 
-constant compose : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c) = 
+constant compose : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c) =
          (\f:'b->'c.(\g:'a->'b.(\x:'a.f (g x))))
 
 goal g2: compose f f 42 = a
@@ -39,7 +39,7 @@ theory A
   type t
 
   function f t : bool
-  predicate r t 
+  predicate r t
 
   axiom a : forall x:t. f x = True <-> r x
 
@@ -119,7 +119,7 @@ theory TestArith
 
 
   function f int : int
-  
+
   axiom a42 : f 42 + 43 = 56
 
   meta rewrite prop a42
@@ -353,7 +353,7 @@ theory Rinteger
    function f int : int
 
    goal g3 : (f 1 + f 2) + f 3 = f 4
- 
+
 end
 
 theory TestInteger
@@ -404,5 +404,21 @@ goal g015 : mem A (singleton B)
 goal g02 : mem A (union (add B empty) (add C empty))
 
 goal g025 : mem A (union (singleton B) (singleton C))
+
+end
+
+
+theory Wrong
+
+type t
+
+constant a : t
+constant b : t
+
+axiom A : forall x:t. a = x
+
+meta "rewrite" prop A
+
+goal test : a = b
 
 end
