@@ -40,7 +40,15 @@ Instructions to build TryWhy3
 
       ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
 
-  ** compile with
+   ** [optional] If you want to build a standalone trywhy3 that can be
+      run without a Webserver, the example files must be present at
+      compile time. See the step 'To add predefined examples' in the
+      'customization' section below and populate the examples/
+      directory of the trywhy3 source directory accordingly *before*
+      building trywhy3.
+
+
+   ** compile with
 
       make trywhy3
 
@@ -54,9 +62,11 @@ Instructions to build TryWhy3
   You may want to add a symlink from index.html to trywhy3.html (or rename the file).
 
 
+
 * customization
 
-  ** install a file trywhy3_help.html that will be shown when clicking the help button.
+  ** install a file trywhy3_help.html that will be shown when clicking
+     the help button.
 
   ** To change the theme used by the ace editor widget, add the
      relevant theme-*.js file to the ace-builds/src-min-noconflict/
@@ -73,3 +83,9 @@ Instructions to build TryWhy3
      cp some_file.mlw examples/
      cd examples/
      ../gen_index.sh *.mlw > index.txt
+
+  ** [optional] If you want trywhy3 to only use its embedded files
+  (e.g. to run it simply by opening trywhy3.html with a web browser
+  instead of putting it on a webserver), change the variable
+  declaration 'var load_embedded_files = false;' to
+  'var load_embedded_files = true;' in the header section of trywhy3.html.
