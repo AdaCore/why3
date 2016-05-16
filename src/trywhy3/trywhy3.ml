@@ -41,7 +41,10 @@ module XHR =
   struct
     include XmlHttpRequest
 
-    let load_embedded_files = Js.to_bool (get_global "load_embedded_files")
+    let load_embedded_files =
+      Js.to_bool (get_global "load_embedded_files") ||
+	Js.to_string (Dom_html.window ## location ## protocol) = "file:"
+
     let make_url =
       if load_embedded_files then
 	fun u ->

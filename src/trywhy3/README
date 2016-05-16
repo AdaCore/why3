@@ -84,8 +84,10 @@ Instructions to build TryWhy3
      cd examples/
      ../gen_index.sh *.mlw > index.txt
 
-  ** [optional] If you want trywhy3 to only use its embedded files
-  (e.g. to run it simply by opening trywhy3.html with a web browser
-  instead of putting it on a webserver), change the variable
-  declaration 'var load_embedded_files = false;' to
-  'var load_embedded_files = true;' in the header section of trywhy3.html.
+  ** [optional] If you want trywhy3 to only use its embedded files,
+  change the variable declaration 'var load_embedded_files = false;'
+  to 'var load_embedded_files = true;' in the header section of
+  trywhy3.html.
+  Note that this is the default behaviour when trywhy3.html is opened from
+  a file:// URL rather than an http(s):// URL, regardless of the value of
+  the load_embedded_files variable.
