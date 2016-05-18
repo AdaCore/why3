@@ -1028,8 +1028,9 @@ update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories
 
 else
 
-drivers/coq-realizations.aux:
-	echo "(* generated automatically at compilation time *)" > $@
+drivers/coq-realizations.aux: Makefile
+	$(SHOW) 'Generate $@'
+	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd
 
@@ -1066,8 +1067,9 @@ clean:: clean-coq
 
 else
 
-drivers/coq-realizations.aux:
-	echo "(* generated automatically at compilation time *)" > $@
+drivers/coq-realizations.aux: Makefile
+	$(SHOW) 'Generate $@'
+	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 endif
 
@@ -1144,8 +1146,9 @@ update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
 
 else
 
-drivers/pvs-realizations.aux:
-	echo "(* generated automatically at compilation time *)" > $@
+drivers/pvs-realizations.aux: Makefile
+	$(SHOW) 'Generate $@'
+	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 install_no_local::
 	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
@@ -1308,8 +1311,9 @@ clean::
 
 else
 
-drivers/isabelle-realizations.aux:
-	echo "(* generated automatically at compilation time *)" > $@
+drivers/isabelle-realizations.aux: Makefile
+	$(SHOW) 'Generate $@'
+	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 install_no_local::
 	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
@@ -1410,7 +1414,8 @@ TOOLS = lib/why3-cpulimit$(EXE)
 byte opt: $(TOOLS)
 
 lib/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
-	$(CC) -Wall -o $@ $^
+	$(SHOW) 'Cc       $^'
+	$(HIDE)$(CC) -Wall -o $@ $^
 
 clean::
 	rm -f lib/why3-cpulimit$(EXE)
