@@ -251,12 +251,7 @@ byte: lib/why3/why3.cma
 opt:  lib/why3/why3.cmxa
 
 lib/why3/why3.cma: lib/why3/why3.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) -a $(BFLAGS) -o $@ $^
-
 lib/why3/why3.cmxa: lib/why3/why3.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
 lib/why3/why3.cmo: $(LIBCMO)
 	$(SHOW) 'Linking  $@'
@@ -490,68 +485,21 @@ byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
 opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
 
 bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3config.opt: lib/why3/why3.cmxa src/tools/why3config.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3config.byte: lib/why3/why3.cma src/tools/why3config.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3execute.opt: lib/why3/why3.cmxa src/tools/why3execute.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3execute.byte: lib/why3/why3.cma src/tools/why3execute.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3extract.opt: lib/why3/why3.cmxa src/tools/why3extract.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3extract.byte: lib/why3/why3.cma src/tools/why3extract.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3realize.byte: lib/why3/why3.cma src/tools/why3realize.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3replay.opt: lib/why3/why3.cmxa src/tools/why3replay.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3replay.byte: lib/why3/why3.cma src/tools/why3replay.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
 bin/why3wc.opt: src/tools/why3wc.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3wc.byte: src/tools/why3wc.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 clean_old_install::
 	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE)) $(BINDIR)/why3$(EXE)
@@ -829,12 +777,7 @@ lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
-
 lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(SHOW) 'Camlp    $<'
@@ -1349,12 +1292,7 @@ byte: lib/why3/why3extract.cma
 opt:  lib/why3/why3extract.cmxa
 
 lib/why3/why3extract.cma: lib/why3/why3extract.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) -a $(BFLAGS) -o $@ $^
-
 lib/why3/why3extract.cmxa: lib/why3/why3extract.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
 lib/why3/why3extract.cmo: $(OCAMLLIBS_CMO)
 	$(SHOW) 'Linking  $@'
@@ -1880,16 +1818,16 @@ clean::
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
 %.cma:
-	$(SHOW) 'Ocamlc -a $@ $^'
-	$(HIDE)$(OCAMLC) $(LIBOPT) -a -o $@ $^
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 %.cmxa:
-	$(SHOW) 'Ocamlopt -a $@ $^'
-	$(HIDE)$(OCAMLOPT) $(LIBOPT) -a -o $@ $^
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
-%.cmxs: %.ml
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -shared $(OFLAGS) -o $@ $<
+%.cmxs:
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) -shared $(OFLAGS) -o $@ $^
 
 %.ml: %.mll
 	$(SHOW) 'Ocamllex $<'
@@ -1906,6 +1844,14 @@ clean::
 %.dep: %.ml
 	$(SHOW) 'Ocamldep $<'
 	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $< $(TOTARGET)
+
+%.opt:
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+%.byte:
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # .ml4.ml:
 # 	$(CAMLP4) pr_o.cmo -impl $< > $@
