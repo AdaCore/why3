@@ -26,7 +26,7 @@ let meta_compute_max_steps = Theory.register_meta_excl "compute_max_steps"
   ~desc:"Maximal@ number@ of@ reduction@ steps@ done@ by@ compute@ \
          transformation"
 
-let compute_max_steps = ref 1000
+let compute_max_steps = ref 1024
 
 (* not yet used
 let meta_begin_compute_context =

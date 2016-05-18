@@ -93,7 +93,7 @@
 </theory>
 <theory name="FmlaRules" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="FmlaRulesProof" sum="d97da419a00424f9b2325ca183eaef18">
+<theory name="FmlaRulesProof" sum="72e39c488b2d097239b55ca3761e824e" expanded="true">
  <goal name="rel_map_equal">
  <transf name="split_goal_wp">
   <goal name="rel_map_equal.1" expl="1.">
@@ -4399,6 +4399,9 @@
  </goal>
  <goal name="FmlaRules.enforce_does_progress">
  <proof prover="4"><result status="valid" time="0.16" steps="7"/></proof>
+ </goal>
+ <goal name="FmlaRules.enforce_step">
+ <proof prover="4" steplimit="0"><result status="valid" time="2.97" steps="2094"/></proof>
  </goal>
  <goal name="FmlaRules.sequence">
  <proof prover="4"><result status="valid" time="0.13" steps="7"/></proof>

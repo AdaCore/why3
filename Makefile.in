@@ -1592,7 +1592,7 @@ ALTERGOMODS=util/numsNumbers util/numbers \
 	main/frontend
 ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 TRYWHY3CMO=lib/why3/why3.cma
-TRYWHY3FILES=trywhy3.js why3_worker.js alt_ergo_worker.js trywhy3.html trywhy3.css \
+TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	README examples/ \
 	trywhy3_custom.css gen_index.sh fontawesome/css/font-awesome.min.css \
 	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
@@ -1606,8 +1606,13 @@ trywhy3_package: trywhy3
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
-src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml +weak.js +nat.js $^
+src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
+	js_of_ocaml -I src/trywhy3 \
+		--file=why3_worker.js:/ \
+		--file=alt_ergo_worker.js:/ \
+	        --file=examples/index.txt:/ \
+		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/"` \
+	+weak.js +nat.js $<
 
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
@@ -1617,14 +1622,14 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
 	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
 		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
-	+weak.js +nat.js $^
+	+weak.js +nat.js $<
 
 src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
-	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $^
+	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
@@ -1777,12 +1782,12 @@ BNF = qualid label constant operator term type formula theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
 BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
 
-doc/%_bnf.tex: doc/%.bnf doc/bnf
-	doc/bnf $< > $@
+doc/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
+	doc/bnf$(EXE) $< > $@
 
-doc/bnf: doc/bnf.mll
+doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
-	$(OCAMLOPT) -o $@ doc/bnf.ml
+	$(OCAMLC) -o $@ doc/bnf.ml
 
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
@@ -1792,6 +1797,9 @@ DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
+
+CLEANDIRS += doc
+GENERATED += doc/bnf.ml
 
 ifeq (@enable_html_doc@,yes)
 
@@ -1811,7 +1819,8 @@ doc/html/index.html:
 endif
 
 clean::
-	cd doc; rm -rf html; $(RUBBER) --pdf --clean manual.tex
+	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
+	cd doc; $(RUBBER) --pdf --clean manual.tex
 
 else
 
@@ -1895,6 +1904,7 @@ STDLIBS = algebra \
 	bag \
 	bintree \
 	bool \
+	bv \
 	floating_point \
 	graph \
 	int \
@@ -1902,16 +1912,24 @@ STDLIBS = algebra \
 	map \
 	number \
 	option \
-	seq \
 	pigeon \
 	real \
 	relations \
+	seq \
 	set \
-	sum \
-	bv
+	sum
 # function ? tptp ?
 
-STDMODS = array matrix hashtbl impset pqueue queue random ref stack string
+STDMODS = array \
+	hashtbl \
+	impset \
+	matrix \
+	pqueue \
+	queue \
+	random \
+	ref \
+	stack \
+	string
 
 STDMACS = array int
 
@@ -1943,11 +1961,11 @@ clean::
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-# supress "unused rec" warning for Menhir-produced files
+# suppress "unused rec" warning for Menhir-produced files
 %.cmo: %.ml %.mly
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) -w -39 $<
 
-# supress "unused rec" warning for Menhir-produced files
+# suppress "unused rec" warning for Menhir-produced files
 %.cmx: %.ml %.mly
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) -w -39 $<
 
@@ -2109,7 +2127,8 @@ lib/why3/META: lib/why3/META.in config.status
 
 distclean: clean
 	rm -f config.status config.cache config.log .merlin \
-	    Makefile src/util/config.ml doc/version.tex
+	    Makefile src/util/config.ml doc/version.tex \
+	    src/jessie/Makefile src/config.sh lib/why3/META
 
 depend:
 	rm -f $^

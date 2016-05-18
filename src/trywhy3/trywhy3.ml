@@ -24,10 +24,32 @@ let get_global ident =
 
 let int_of_js_string s = int_of_string (Js.to_string s)
 
+let blob_url_of_string s =
+  let s = JSU.inject (Js.string (Sys_js.file_content s)) in
+  let _Blob  = get_global "Blob" in
+  let blob =
+    jsnew _Blob (Js.array [| s |])
+  in
+  let _URL = JSU.(get (get_global "window") (Js.string "URL")) in
+  let url : Js.js_string Js.t =
+    JSU.(meth_call _URL "createObjectURL" [| JSU.inject blob |])
+  in
+  Js.to_string url
+
+
 module XHR =
   struct
     include XmlHttpRequest
 
+    let load_embedded_files =
+      Js.to_bool (get_global "load_embedded_files") ||
+	Js.to_string (Dom_html.window ## location ## protocol) = "file:"
+
+    let make_url =
+      if load_embedded_files then
+	fun u ->
+	Js.string (blob_url_of_string ("/" ^ (Js.to_string u)))
+      else fun u -> u
 
     let update_file ?(date=0.) cb url =
       let xhr = create () in
@@ -35,7 +57,7 @@ module XHR =
         Js.wrap_callback
           (fun () ->
            if xhr ## readyState == DONE then
-	     if xhr ## status = 200 then
+	     if xhr ## status = 200 || (xhr ## status = 0 && load_embedded_files) then
                let date_str = Js.Opt.get (xhr ## getResponseHeader (Js.string "Last-Modified"))
                                          (fun () -> Js.string "01/01/2100") (* far into the future *)
                in
@@ -53,12 +75,12 @@ module XHR =
                                  else
                                    cb `NotFound)
                  in
-                 let () = xhr ## _open (Js.string "GET", url, Js._true) in
+                 let () = xhr ## _open (Js.string "GET", (make_url url), Js._true) in
                  xhr ## send (Js.null)
              else
                cb `NotFound
           );
-      xhr ## _open (Js.string "HEAD", url, Js._true);
+      xhr ## _open (Js.string "HEAD", (make_url url), Js._true);
       xhr ## send (Js.null)
 
   end
@@ -848,7 +870,7 @@ module Controller =
 
 
     let rec init_alt_ergo_worker i =
-      let worker = Worker.create "alt_ergo_worker.js" in
+      let worker = Worker.create (blob_url_of_string "/alt_ergo_worker.js") in
       worker ## onmessage <-
 	(Dom.handler (fun ev ->
                       let (id, result) as res = unmarshal (ev ## data) in
@@ -898,7 +920,7 @@ module Controller =
       process_task ()
 
     let init_why3_worker () =
-      let worker = Worker.create "why3_worker.js" in
+      let worker = Worker.create (blob_url_of_string "/why3_worker.js") in
       worker ## onmessage <-
 	(Dom.handler (fun ev ->
                       let msg = unmarshal (ev ## data) in
@@ -1059,7 +1081,7 @@ let () =
                    Session.save_num_steps !Controller.alt_ergo_steps;
                    Session.save_view_mode (if Panel.is_wide () then Js.string "wide"
                                            else Js.string "column");
-                   
+
                    (Js.string "Do you wish to quit TryWhy3 (your current session will be saved to your browser local storage) ?"))
                 )
 

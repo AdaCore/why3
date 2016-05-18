@@ -216,6 +216,16 @@ module Bridge "W:non_conservative_extension:N" (* => TransProof *)
       (enforce (st_pre sys p) (st_post sys qn ql) (ugame sys) <->
         forall lg. p (lg 0) -> correct sys qn ql lg)
 
+  (* TODO: correct those axioms, they can't work through st_pre/st_post *)
+  axiom egame_trans : false (*forall sys:system 'a 'o,n x y.
+    let p = st_pre sys ((=) x) in
+    let q = st_post sys ((=) y) in
+    system_wf sys -> enforce p q (egame sys)*)
+  axiom ugame_trans : false (*forall sys:system 'a 'o,n x.
+    let p = st_pre sys ((=) x) in
+    let q = st_post sys (* TODO: incorrect for post here. *)none none in
+    system_wf sys -> enforce p q (ugame sys)*)
+
 end
 
 module TransProof
@@ -716,6 +726,14 @@ module TransProof
   use import game_fmla.Subgame
   use import game_fmla.FmlaRules
 
+  (* TODO: first add lemmas about mirroring ONE
+     transition inside e/u-games, can be reused for enforcements ?
+     Nope, they actually can't, as those will use local vision,
+     e.g without guarantee of log consistency => Delayed for later.
+  lemma egame_trans : forall sys:system 'a 'o,p x y.
+    let eg = egame sys in
+    system_wf sys /\ sys.transition x y -> enforce ? ? eg*)
+
   lemma egame_enforce_2 : forall sys:system 'a 'o,p qn ql.
     let pr = st_pre sys p in
     let ps = st_post sys qn ql in
@@ -738,9 +756,12 @@ module TransProof
         so holds c (arrow (enforce ps none) (enforce ((=) sx) ps))
         by let c' = conj c (enforce ps none) in
           holds c' (enforce ((=) sx) ps)
-        by let i = \t s.
-            s = t /\ log_coh lg xtc s /\ valid sys s /\
-            forall n. 0 <= n /\ urange s.time (n+xtc+1) -> not qn (lg n) in
+        by let i = \t s. s = t /\ log_coh lg xtc s /\ valid sys s /\
+            match s.time with
+            | None -> false
+            | Some stc -> stc >= xtc /\
+                forall n. 0 <= n /\ n + xtc < stc -> not qn (lg n)
+            end in
           subset none ps
         so (subset ((=) sx) (i sx)
           by forall n. 0 <= n /\ urange sx.time (n+xtc+1) -> false)
@@ -748,6 +769,36 @@ module TransProof
         by holds c' (universal (u_enforce i (const none)))
         by holds c' (ordering og) /\ order og
         so (holds c' (universal (u_enforce i (later og i)))
+          (* Reduce it to an atomic transition or exit. *)
+          by forall t. holds c' (enforce (i t) (later og i t))
+          by forall s. i t s -> holds c' (enforce ((=) s) (later og i t))
+          by match s.time with
+          | None -> false
+          | Some stc ->
+            let m = stc - xtc in
+            m >= 0
+            so (s.log stc = lg m by urange s.time (m+xtc))
+            so if qn (s.log stc)
+            then subset none (later og i t) so subset ((=) s) ps
+              so holds c' (enforce ps none)
+            else
+              let nlog = \n. if n <= stc then s.log n else lg (m+1) in
+              let ns = { time = Some (stc+1); log = nlog } in
+              sys.transition (s.log stc) (nlog (stc+1))
+              so (valid sys ns
+                by let cp = compose sys.projection ns.log in
+                  monotone (<=) cp o
+                by forall a b. a <= b -> o (cp a) (cp b)
+                by forall a. a <= stc+1 -> o (cp a) (cp (stc+1))
+                by a = stc+1 || o (cp a) (cp stc)
+              ) so (eg.G.transition s ((=) ns) by successor sys stc s.log ns)
+              so holds c' (enforce ((=) s) ((=) ns))
+              so subset ((=) ns) (later og i t)
+              by later og i t ns
+              by og t ns /\ (i ns ns
+                by log_coh lg xtc ns
+                /\ forall n. 0 <= n /\ n + xtc < stc+1 -> not qn (lg n))
+          end
         )
         so (step_limit c' og og i
           by forall ch inh f. ch inh /\ monotone_on ch og f og /\
@@ -770,8 +821,8 @@ module TransProof
             so i x0 (f x0)
           )
           so (valid sys sp by og inh sp /\ sp <> inh)
-          so let cp = compose sys.projection sp.log in
-            let ch2 = image cp all in
+          so let cp2 = compose sys.projection sp.log in
+            let ch2 = image cp2 all in
             let sp2 = sup o ch2 in
             local_repr sys sp = Limit sp2
           so ql sp2
@@ -780,8 +831,29 @@ module TransProof
             so exists x0. ch x0 /\ urange x0.time (n+xtc+1)
             so i x0 (f x0))
           so lim_reach sys ql lg
+          so let cp3 = compose sys.projection lg in
+            exists sp3. supremum sys.progress (image cp3 pos) sp3 /\ ql sp3
+          so sp3 = sp2
+          by supremum sys.progress ch2 sp3
+          by let c0 = \n. sys.projection (sp.log (n+xtc)) in
+            equalizer pos cp3 c0
+          so sext (image cp3 pos) (image c0 pos)
+          so monotone (<=) c0 o
+          so supremum sys.progress (image c0 all) sp3
+          so sext (image c0 all) ch2
+          by (forall u. image cp2 all u -> image c0 all u
+            by exists n. cp2 n = u so c0 (n-xtc) = u)
+          /\ (forall u. image c0 all u -> image cp2 all u
+            by exists n. c0 n = u so cp2 (n+xtc) = u)
         )
     end
+
+  lemma ugame_enforce_2 : forall sys:system 'a 'o,p qn ql.
+    let ug = ugame sys in
+    let pr = st_pre sys p in
+    let ps = st_post sys qn ql in
+    system_wf sys /\ (forall lg. p (lg 0) -> correct sys qn ql lg) ->
+    enforce pr ps ug
 
   clone TransWf with
     goal q_chain_complete_countable_complete,
@@ -795,7 +867,9 @@ module TransProof
 
   clone Bridge with
     goal egame_enforce,
-    goal ugame_enforce
+    goal ugame_enforce,
+    goal egame_trans,
+    goal ugame_trans
 
 end
 
