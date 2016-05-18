@@ -269,7 +269,7 @@ lib/why3/why3.cmx: $(LIBCMX)
 # clean and depend
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(LIBDEP)
+-include $(LIBDEP)
 endif
 
 depend: $(LIBDEP)
@@ -452,7 +452,7 @@ lib/plugins/tptp.cmo: $(TPTPCMO)
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(PLUGDEP)
+-include $(PLUGDEP)
 endif
 
 depend: $(PLUGDEP)
@@ -584,7 +584,7 @@ share/theories:
 	ln -snf ../theories share/theories
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(TOOLSDEP)
+-include $(TOOLSDEP)
 endif
 
 depend: $(TOOLSDEP)
@@ -726,7 +726,7 @@ src/ide/resetgc.o: src/ide/resetgc.c
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(IDEDEP)
+-include $(IDEDEP)
 endif
 
 depend: $(IDEDEP)
@@ -777,7 +777,7 @@ bin/why3session.byte: lib/why3/why3.cma $(SESSIONCMO)
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(SESSIONDEP)
+-include $(SESSIONDEP)
 endif
 
 depend: $(SESSIONDEP)
@@ -853,7 +853,7 @@ src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-ta
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(COQPDEP)
+-include $(COQPDEP)
 endif
 
 depend: $(COQPDEP)
@@ -1054,7 +1054,7 @@ install_local:: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
-include $(COQVD)
+-include $(COQVD)
 endif
 endif
 
@@ -1370,7 +1370,7 @@ install_no_local_lib::
 	  $(OCAMLINSTALLLIB)/why3
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(OCAMLLIBS_DEP)
+-include $(OCAMLLIBS_DEP)
 endif
 
 $(OCAMLLIBS_DEP): lib/ocaml/why3__BigInt_compat.ml
@@ -1459,7 +1459,7 @@ bin/why3doc.byte: lib/why3/why3.cma $(WHY3DOCCMO)
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
-include $(WHY3DOCDEP)
+-include $(WHY3DOCDEP)
 endif
 
 depend: $(WHY3DOCDEP)
