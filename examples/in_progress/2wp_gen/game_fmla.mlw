@@ -178,6 +178,9 @@ module FmlaRules "W:non_conservative_extension:N" (* => FmlaRulesProof *)
     holds c (enforce ((=) x) q) /\ holds c (ordering o) ->
     holds c (enforce ((=) x) (inter q (o x)))
 
+  axiom enforce_step : forall g x,q:set 'a. game_wf g ->
+    g.transition x q -> enforce ((=) x) q g
+
   axiom sequence : forall c,p q r:set 'a.
     holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
 
@@ -1997,6 +2000,7 @@ module FmlaRulesProof
     goal ordering_fmla,
     goal enforce_monotonic,
     goal enforce_does_progress,
+    goal enforce_step,
     goal sequence,
     goal external_pre,
     goal kont_intro,

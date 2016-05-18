@@ -290,6 +290,7 @@ pid_t create_process(char* cmd,
     /* set the CPU time limit */
     getrlimit(RLIMIT_CPU,&res);
     res.rlim_cur = timelimit;
+    res.rlim_max = timelimit;
     setrlimit(RLIMIT_CPU,&res);
   }
 
@@ -297,6 +298,7 @@ pid_t create_process(char* cmd,
     /* set the CPU memory limit */
     getrlimit(RLIMIT_AS,&res);
     res.rlim_cur = memlimit * 1024 * 1024;
+    res.rlim_max = memlimit * 1024 * 1024;
     setrlimit(RLIMIT_AS,&res);
   }
 
@@ -304,6 +306,7 @@ pid_t create_process(char* cmd,
     /* do not generate core dumps */
     getrlimit(RLIMIT_CORE,&res);
     res.rlim_cur = 0;
+    res.rlim_max = 0;
     setrlimit(RLIMIT_CORE,&res);
   }
 

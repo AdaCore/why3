@@ -42,20 +42,16 @@ let run_goal ~cntexample prover g =
            Session.PHprover.find_opt g.Session.goal_external_proofs
                                      base_prover.Whyconf.prover) with
     | true, Some { Session.proof_edited_as = Some fn } ->
-       Some fn, Some true, Call_provers.empty_limit
+       Some fn, true, Call_provers.empty_limit
     | _ ->
         let prover = base_prover.Whyconf.prover.Whyconf.prover_name in
-        None, None, Gnat_config.limit ~prover in
+        None, false, Gnat_config.limit ~prover in
   let id =
     Driver.prove_task
       ~command:(Whyconf.get_complete_command base_prover
       ~with_steps:(limit.Call_provers.limit_steps <>
                    Call_provers.empty_limit.Call_provers.limit_steps))
-      ~cntexample
-      ~limit
-      ?old:old ?inplace:inplace
-      driver
-      (Session.goal_task g) in
+      ~cntexample ~limit ?old ~inplace driver (Session.goal_task g) in
   let entry = { goal = g; prover = prover; cntexample = cntexample } in
   state.num <- state.num + 1;
   Intmap.add state.map id entry
