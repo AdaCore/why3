@@ -19,7 +19,7 @@ Require map.Map.
 Definition const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
   b -> (map.Map.map a b).
 intros a a_WT b b_WT v.
-constructor; intros i.
+intros i.
 exact v.
 Defined.
 
