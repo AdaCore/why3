@@ -37,6 +37,9 @@ EXE   = @EXE@
 
 # other variables
 CC        = @CC@
+MKDIR_P   = @MKDIR_P@
+INSTALL   = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
 OCAMLDEP  = @OCAMLDEP@
@@ -288,38 +291,38 @@ install_no_local:: clean_old_install
 else
 install_no_local:: clean_old_install $(TARGET_EMACS)
 endif
-	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)/why3
-	mkdir -p $(TOOLDIR)
-	mkdir -p $(DATADIR)/why3
-	mkdir -p $(DATADIR)/why3/images
-	mkdir -p $(DATADIR)/why3/vim
-	mkdir -p $(DATADIR)/why3/lang
-	mkdir -p $(DATADIR)/why3/theories
-	mkdir -p $(DATADIR)/why3/modules/mach
-	mkdir -p $(DATADIR)/why3/drivers
-	mkdir -p $(DATADIR)/emacs/site-lisp/
-	cp -f theories/*.why $(DATADIR)/why3/theories
-	cp -f modules/*.mlw $(DATADIR)/why3/modules
-	cp -f modules/mach/*.mlw $(DATADIR)/why3/modules/mach
-	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
-	cp -f LICENSE $(DATADIR)/why3/
-	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
+	$(MKDIR_P) $(BINDIR)
+	$(MKDIR_P) $(LIBDIR)/why3
+	$(MKDIR_P) $(TOOLDIR)
+	$(MKDIR_P) $(DATADIR)/why3
+	$(MKDIR_P) $(DATADIR)/why3/images
+	$(MKDIR_P) $(DATADIR)/why3/vim
+	$(MKDIR_P) $(DATADIR)/why3/lang
+	$(MKDIR_P) $(DATADIR)/why3/theories
+	$(MKDIR_P) $(DATADIR)/why3/modules/mach
+	$(MKDIR_P) $(DATADIR)/why3/drivers
+	$(MKDIR_P) $(DATADIR)/emacs/site-lisp/
+	$(INSTALL_DATA) theories/*.why $(DATADIR)/why3/theories
+	$(INSTALL_DATA) modules/*.mlw $(DATADIR)/why3/modules
+	$(INSTALL_DATA) modules/mach/*.mlw $(DATADIR)/why3/modules/mach
+	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
+	$(INSTALL_DATA) share/provers-detection-data.conf $(DATADIR)/why3/
 	for i in share/images/*.rc; do \
 	     d=`basename $$i .rc`; \
-	     cp -f $$i $(DATADIR)/why3/images; \
-	     mkdir $(DATADIR)/why3/images/$$d; \
-	     cp -f share/images/$$d/* $(DATADIR)/why3/images/$$d; \
+	     $(INSTALL_DATA) $$i $(DATADIR)/why3/images; \
+	     $(MKDIR_P) $(DATADIR)/why3/images/$$d; \
+	     $(INSTALL_DATA) share/images/$$d/* $(DATADIR)/why3/images/$$d; \
 	done
-	cp -f share/images/*.png $(DATADIR)/why3/images
-	cp -f share/why3session.dtd $(DATADIR)/why3
-	cp -f share/Makefile.config $(DATADIR)/why3
-	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
-	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
+	$(INSTALL_DATA) share/images/*.png $(DATADIR)/why3/images
+	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
+	$(INSTALL_DATA) share/Makefile.config $(DATADIR)/why3
+	$(INSTALL_DATA) share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
+	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
 install_no_local_lib::
-	mkdir -p $(OCAMLINSTALLLIB)/why3
-	cp -f $(wildcard $(addprefix lib/why3/why3., $(INSTALLED_LIB_EXTS))) \
+	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
+	$(INSTALL_DATA) $(wildcard $(addprefix lib/why3/why3., $(INSTALLED_LIB_EXTS))) \
 		lib/why3/META $(OCAMLINSTALLLIB)/why3
 
 ifeq (@enable_local@,yes)
@@ -353,9 +356,9 @@ ifneq ($(EMACS),no)
 endif
 
 install_no_local::
-	cp -f share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
+	$(INSTALL_DATA) share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
 ifneq ($(EMACS),no)
-	cp -f share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
+	$(INSTALL_DATA) share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
 endif
 
 
@@ -456,8 +459,8 @@ CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
 GENERATED += $(PLUGGENERATED)
 
 install_no_local::
-	mkdir -p $(LIBDIR)/why3/plugins
-	cp -f $(wildcard $(LIBPLUGCMO) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
+	$(MKDIR_P) $(LIBDIR)/why3/plugins
+	$(INSTALL_DATA) $(wildcard $(LIBPLUGCMO) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
 
 ###############
 # Why3 commands
@@ -506,14 +509,14 @@ clean_old_install::
 	rm -f $(BINDIR)/why3bench$(EXE) $(BINDIR)/why3replayer$(EXE)
 
 install_no_local::
-	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
-	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
-	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
-	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
-	cp -f bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
-	cp -f bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
-	cp -f bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
-	cp -f bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
+	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
+	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
+	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
+	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
+	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
+	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
 
 install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
@@ -685,7 +688,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3ide$(EXE)
 
 install_no_local::
-	cp -f bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
+	$(INSTALL) bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
 
 install_local:: bin/why3ide
 
@@ -736,7 +739,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3session$(EXE)
 
 install_no_local::
-	cp -f bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
+	$(INSTALL) bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
 
 install_local:: bin/why3session
 
@@ -810,8 +813,8 @@ clean::
 	rm -f src/coq-tactic/.why3-vo-*
 
 install_no_local::
-	mkdir -p $(LIBDIR)/why3/coq-tactic
-	cp -f lib/coq-tactic/* $(LIBDIR)/why3/coq-tactic
+	$(MKDIR_P) $(LIBDIR)/why3/coq-tactic
+	$(INSTALL_DATA) lib/coq-tactic/* $(LIBDIR)/why3/coq-tactic
 
 endif
 
@@ -907,31 +910,31 @@ drivers/coq-realizations.aux: Makefile
 	) > $@
 
 install_no_local::
-	mkdir -p $(LIBDIR)/why3/coq
-	cp lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
-	mkdir -p $(LIBDIR)/why3/coq/int
-	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
-	mkdir -p $(LIBDIR)/why3/coq/bool
-	cp $(addsuffix .vo, $(COQLIBS_BOOL)) $(LIBDIR)/why3/coq/bool/
-	mkdir -p $(LIBDIR)/why3/coq/real
-	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
-	mkdir -p $(LIBDIR)/why3/coq/number
-	cp $(addsuffix .vo, $(COQLIBS_NUMBER)) $(LIBDIR)/why3/coq/number/
-	mkdir -p $(LIBDIR)/why3/coq/set
-	cp $(addsuffix .vo, $(COQLIBS_SET)) $(LIBDIR)/why3/coq/set/
-	mkdir -p $(LIBDIR)/why3/coq/map
-	cp $(addsuffix .vo, $(COQLIBS_MAP)) $(LIBDIR)/why3/coq/map/
-	mkdir -p $(LIBDIR)/why3/coq/list
-	cp $(addsuffix .vo, $(COQLIBS_LIST)) $(LIBDIR)/why3/coq/list/
-	mkdir -p $(LIBDIR)/why3/coq/option
-	cp $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
-	mkdir -p $(LIBDIR)/why3/coq/seq
-	cp $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
-	mkdir -p $(LIBDIR)/why3/coq/bv
-	cp $(addsuffix .vo, $(COQLIBS_BV)) $(LIBDIR)/why3/coq/bv/
+	$(MKDIR_P) $(LIBDIR)/why3/coq
+	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/int
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/bool
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_BOOL)) $(LIBDIR)/why3/coq/bool/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/real
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/number
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_NUMBER)) $(LIBDIR)/why3/coq/number/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/set
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_SET)) $(LIBDIR)/why3/coq/set/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/map
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_MAP)) $(LIBDIR)/why3/coq/map/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/list
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_LIST)) $(LIBDIR)/why3/coq/list/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/option
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/seq
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/bv
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_BV)) $(LIBDIR)/why3/coq/bv/
 ifeq (@enable_coq_fp_libs@,yes)
-	mkdir -p $(LIBDIR)/why3/coq/floating_point
-	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/floating_point
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
 
 update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv headers-coq
@@ -1017,7 +1020,7 @@ drivers/coq-realizations.aux: Makefile
 endif
 
 install_no_local::
-	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
+	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
 opt byte: drivers/coq-realizations.aux
 
@@ -1068,15 +1071,15 @@ drivers/pvs-realizations.aux: Makefile
 	) > $@
 
 install_no_local::
-	mkdir -p $(LIBDIR)/why3/pvs/int
-	cp $(addsuffix .pvs, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
-	cp $(addsuffix .prf, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
-	mkdir -p $(LIBDIR)/why3/pvs/real
-	cp $(addsuffix .pvs, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
-	cp $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
-	mkdir -p $(LIBDIR)/why3/pvs/floating_point/
-	cp $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
-	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
+	$(MKDIR_P) $(LIBDIR)/why3/pvs/int
+	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
+	$(INSTALL_DATA) $(addsuffix .prf, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
+	$(MKDIR_P) $(LIBDIR)/why3/pvs/real
+	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
+	$(INSTALL_DATA) $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
+	$(MKDIR_P) $(LIBDIR)/why3/pvs/floating_point/
+	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
+	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 install_local:: drivers/pvs-realizations.aux
 
@@ -1094,7 +1097,7 @@ drivers/pvs-realizations.aux: Makefile
 	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 install_no_local::
-	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
+	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 endif
 
@@ -1193,7 +1196,7 @@ endif
 	  fi)
 
 install_no_local::
-	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
+	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
 install_no_local:: lib/isabelle/last_build
 
@@ -1259,7 +1262,7 @@ drivers/isabelle-realizations.aux: Makefile
 	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 install_no_local::
-	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
+	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
 endif
 
@@ -1303,8 +1306,8 @@ lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX)
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
 install_no_local_lib::
-	mkdir -p $(OCAMLINSTALLLIB)/why3
-	cp -f $(wildcard $(addprefix lib/why3/why3extract., $(INSTALLED_LIB_EXTS))) \
+	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
+	$(INSTALL_DATA) $(wildcard $(addprefix lib/why3/why3extract., $(INSTALLED_LIB_EXTS))) \
 	  $(OCAMLINSTALLLIB)/why3
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
@@ -1334,8 +1337,8 @@ jessie.opt: src/jessie/Makefile lib/why3/why3.cmxa
 	@$(MAKE) -C src/jessie Jessie3.cmxs
 
 install_no_local::
-	mkdir -p $(FRAMAC_LIBDIR)/plugins/
-	cp -f $(wildcard $(addprefix src/jessie/Jessie3., $(INSTALLED_LIB_EXTS))) \
+	$(MKDIR_P) $(FRAMAC_LIBDIR)/plugins/
+	$(INSTALL_DATA) $(wildcard $(addprefix src/jessie/Jessie3., $(INSTALLED_LIB_EXTS))) \
 	  $(FRAMAC_LIBDIR)/plugins/
 
 clean::
@@ -1359,8 +1362,9 @@ clean::
 	rm -f lib/why3-cpulimit$(EXE)
 
 install_no_local::
-	cp -f lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
-	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
+	$(MKDIR_P) $(LIBDIR)/why3
+	$(INSTALL) lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
+	$(INSTALL) lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 #########
 # why3doc
@@ -1409,7 +1413,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3doc$(EXE)
 
 install_no_local::
-	cp -f bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
+	$(INSTALL) bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
 
 install_local:: bin/why3doc
 
@@ -1728,7 +1732,9 @@ clean_old_install::
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then rm -f /etc/bash_completion.d/why3; fi
 
 install_no_local::
-	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
+	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
+	  $(INSTALL_DATA) share/bash/why3 /etc/bash_completion.d; \
+	fi
 
 
 ##########
@@ -1905,7 +1911,7 @@ wc:
 
 NAME = why3-@VERSION@
 # see .gitattributes for the list of files that are not distributed
-MORE_DIST = configure doc/manual.pdf
+MORE_DIST = configure install-sh doc/manual.pdf
 
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
