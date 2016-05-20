@@ -33,6 +33,8 @@ let client_disconnect () =
   | None -> raise NotConnected
   | Some sock ->
       socket := None;
+      if Sys.os_type <> "Win32" then
+        Unix.shutdown sock Unix.SHUTDOWN_ALL;
       Unix.close sock
 
 let send_request_string msg =
@@ -94,16 +96,22 @@ let connect_internal () =
   let socket_name = Filename.concat (Unix.getcwd ())
     ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
   let exec = Filename.concat Config.libdir "why3server" in
-  let _pid = Unix.create_process exec
+  let pid = Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers|]
     Unix.stdin Unix.stdout Unix.stderr in
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
-  (* FIXME? replace this with something more robust *)
-  ignore (Unix.select [] [] [] 0.1);
-  client_connect socket_name
+  let rec try_connect n d =
+    if n <= 0 then client_connect socket_name else
+    try client_connect socket_name with _ ->
+      ignore (Unix.select [] [] [] d);
+      try_connect (pred n) (d *. 4.0) in
+  try_connect 4 0.1; (* 0.1, 0.4, 1.6, 6.4 *)
+  at_exit (fun () -> (* only if succesfully connected *)
+    (try client_disconnect () with NotConnected -> ());
+    ignore (Unix.waitpid [] pid))
 
 (* TODO/FIXME: how should we handle disconnect if there are still
    tasks in queue? What are the use cases for disconnect? *)
