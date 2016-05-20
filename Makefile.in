@@ -117,8 +117,8 @@ EXTLIBS = str unix nums dynlink @ZIPLIB@
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
-INSTALLED_LIB_EXTS = a cma cmi cmxa cmxs
-COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti cmx annot dep conflicts
+INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
+COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
 
 TARGET_EMACS = share/emacs/why3.elc
 
