@@ -61,6 +61,7 @@ let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
   let ctxt = {
     Session.allow_obsolete_goals = true;
+    Session.keep_unmatched_theories = false;
     Session.release_tasks = false;
     Session.use_shapes_for_pairing_sub_goals = false;
     Session.keygen = dummy_keygen;

@@ -76,6 +76,7 @@ let read_update_session ~allow_obsolete env config fname =
   let session,use_shapes = S.read_session project_dir in
   let ctxt = {
     S.allow_obsolete_goals = allow_obsolete;
+    S.keep_unmatched_theories = false;
     S.release_tasks = false;
     S.use_shapes_for_pairing_sub_goals = use_shapes;
     S.keygen = (fun ?parent:_ () -> ());
