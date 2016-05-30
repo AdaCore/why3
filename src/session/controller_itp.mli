@@ -23,6 +23,21 @@ type proof_attempt_status =
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
+type transformation_status = TSscheduled of transID | TSdone of transID | TSfailed
+
+module type Scheduler = sig
+  val timeout: ms:int -> (unit -> bool) -> unit
+  val idle: (unit -> bool) -> unit
+end
+
+module Unix_scheduler : sig
+  include Scheduler
+  val main_loop : unit -> unit
+end
+
+
+module Make(S : Scheduler) : sig
+
 val schedule_proof_attempt :
   session ->
   proofNodeID ->
@@ -34,8 +49,6 @@ val schedule_proof_attempt :
    the function [cb] will be called each time the proof attempt status
    changes. Typically at Scheduled, then Running, then Done. If there
    is already a proof attempt with [p] it is updated. *)
-
-type transformation_status = TSscheduled of transID | TSdone of transID | TSfailed
 
 val schedule_transformations :
   session ->
@@ -71,3 +84,5 @@ val reload_session_files : session -> unit
     raises [OutdatedSession] if the session is obsolete and
     [allow_obsolete] is false
 *)
+
+end
