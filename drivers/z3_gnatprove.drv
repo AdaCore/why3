@@ -39,6 +39,7 @@ transformation "introduce_premises"
 
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory\\|Maximal allocation counts .* have been exceeded\\|(error \".*number of configured allocations exceeded\")"
 timeout "interrupted by timeout"
+steps ":rlimit-count.*\\([0-9]+.?[0-9]*\\)" 1
 
 (** Extra theories supported by Z3 *)
 
