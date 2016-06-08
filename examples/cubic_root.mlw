@@ -1,0 +1,27 @@
+
+module CubicRoot
+
+  use import int.Int
+  use import ref.Ref
+
+  function cube (x: int) : int = x * x * x
+
+  let cubic_root (x: int) : int
+    requires { x >= 0 }
+    ensures  { cube (result - 1) <= x < cube result }
+  =
+    let a = ref 1 in
+    let b = ref 1 in
+    let y = ref 1 in
+    while !y <= x do
+      invariant { cube (!b - 1) <= x }
+      invariant { !y = cube !b }
+      invariant { !a = !b * !b }
+      variant   { x - !y }
+      y := !y + 3 * !a + 3 * !b + 1;
+      a := !a + 2 * !b + 1;
+      b := !b + 1
+    done;
+    !b
+
+end
