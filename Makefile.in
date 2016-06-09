@@ -110,6 +110,9 @@ OFLAGS += -bin-annot
 BFLAGS += -bin-annot
 endif
 
+# see http://caml.inria.fr/mantis/view.php?id=4991
+CMIHACK = -intf-suffix .cmi
+
 # external libraries common to all binaries
 
 EXTOBJS = @MENHIRLIB@
@@ -261,9 +264,9 @@ lib/why3/why3.cmo: $(LIBCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-lib/why3/why3.cmx: $(LIBCMX)
+lib/why3/why3.cmx: $(LIBCMX) lib/why3/why3.cmo
 	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) $(CMIHACK) -pack -o $@ $(filter %.cmx, $^)
 
 # clean and depend
 
@@ -1302,9 +1305,9 @@ lib/why3/why3extract.cmo: $(OCAMLLIBS_CMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX)
+lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX) lib/why3/why3extract.cmo
 	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) $(CMIHACK) -pack -o $@ $(filter %.cmx, $^)
 
 install_no_local_lib::
 	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
@@ -1814,15 +1817,25 @@ clean::
 # suppress "unused rec" warning for Menhir-produced files
 %.cmx: %.ml %.mly
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) -w -39 $<
+	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) -w -39 $(CMIHACK) $<
 
 %.cmo: %.ml
 	$(SHOW) 'Ocamlc   $<'
 	$(HIDE)$(OCAMLC) -c $(BFLAGS) $<
 
-%.cmx: %.ml
+%.cmx: %.ml %.mli
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
+
+# the generic rule cannot be applied since ocaml would confuse
+# lib/why3/why3extract.cmi for the interface (!!!)
+src/tools/why3extract.cmx: src/tools/why3extract.ml
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
+
+%.cmx: %.ml
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $(CMIHACK) $<
 
 %.cma:
 	$(SHOW) 'Linking  $@'
@@ -1850,7 +1863,9 @@ clean::
 
 %.dep: %.ml
 	$(SHOW) 'Ocamldep $<'
-	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $< $(TOTARGET)
+	$(HIDE)($(OCAMLDEP) $(DEPFLAGS) $<; \
+	        echo '$*.cmx : $*.cmi'; \
+	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
 %.opt:
 	$(SHOW) 'Linking  $@'
