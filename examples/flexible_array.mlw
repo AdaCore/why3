@@ -1,0 +1,155 @@
+
+(** Flexible arrays
+
+    Flexible arrays are arrays whose size can be changed by adding or
+    removing elements at either end (one at a time).
+
+    This is an implementation of flexible arrays using Braun trees,
+    following
+
+      Rob Hoogerwoord
+      A logarithmic implementation of flexible arrays
+      http://alexandria.tue.nl/repository/notdare/772185.pdf
+
+    All operations (get, set, le, lr, he, hr) have logarithmic complexity.
+
+    Note: Braun trees can also be used to implement priority queues.
+    See braun_trees.mlw. This file also contains a proof that Braun
+    trees have logarithmic height.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module FlexibleArray
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import bintree.Tree
+  use export bintree.Size
+
+  (* to be a Braun tree *)
+  predicate inv (t: tree 'a) = match t with
+  | Empty      -> true
+  | Node l _ r -> (size l = size r || size l = size r + 1) && inv l && inv r
+  end
+
+  let empty () : tree 'a
+    ensures { inv result }
+    ensures { size result = 0 }
+    = Empty
+
+  let length (t: tree 'a) : int
+    requires { inv t }
+    ensures  { result = size t }
+  =
+    size t
+
+  let is_empty (t: tree 'a) : bool
+    requires { inv t }
+    ensures  { result <-> size t = 0 }
+  =
+    match t with Empty -> True | Node _ _ _ -> False end
+
+  let rec function get (t: tree 'a) (i: int) : 'a
+    requires { 0 <= i < size t }
+    requires { inv t }
+    variant  { t }
+  = match t with
+    | Empty -> absurd
+    | Node l x r ->
+       if i = 0 then x
+       else if mod i 2 = 1 then get l (div i 2) else get r (div i 2 - 1)
+    end
+
+  let rec set (t: tree 'a) (i: int) (v: 'a) : tree 'a
+    requires { 0 <= i < size t }
+    requires { inv t }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t }
+    ensures  { forall j. 0 <= j < size t -> j <> i -> get result j = get t j }
+    ensures  { get result i = v }
+  = match t with
+    | Empty -> absurd
+    | Node l x r ->
+       if i = 0 then Node l v r
+       else if mod i 2 = 1 then Node (set l (div i 2) v) x r
+       else Node l x (set r (div i 2 - 1) v)
+    end
+
+  (* low extension *)
+  let rec le (v: 'a) (t: tree 'a) : tree 'a
+    requires { inv t }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t + 1 }
+    ensures  { get result 0 = v }
+    ensures  { forall j. 0 <= j < size t -> get result (j + 1) = get t j }
+  = match t with
+    | Empty -> Node Empty v Empty
+    | Node l x r -> Node (le x r) v l
+    end
+
+  (* low removal *)
+  let rec lr (t: tree 'a) : tree 'a
+    requires { inv t }
+    requires { size t > 0 }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t - 1 }
+    ensures  { forall j. 0 <= j < size result -> get result j = get t (j + 1) }
+  = match t with
+    | Empty -> absurd
+    | Node Empty _ Empty -> Empty
+    | Node l _ r -> Node r (get l 0) (lr l)
+    end
+
+  (* high extension *)
+  let rec he_aux (s: int) (t: tree 'a) (v: 'a) : tree 'a
+    requires { inv t }
+    requires { s = size t }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t + 1 }
+    ensures  { get result (size t) = v }
+    ensures  { forall j. 0 <= j < size t -> get result j = get t j }
+  = match t with
+    | Empty -> Node Empty v Empty
+    | Node l x r -> if mod s 2 = 1 then Node (he_aux (div s 2) l v) x r
+                                   else Node l x (he_aux (div s 2 - 1) r v)
+    end
+
+  let he (t: tree 'a) (v: 'a) : tree 'a
+    requires { inv t }
+    ensures  { inv result }
+    ensures  { size result = size t + 1 }
+    ensures  { get result (size t) = v }
+    ensures  { forall j. 0 <= j < size t -> get result j = get t j }
+  =
+    he_aux (size t) t v
+
+  (* high removal *)
+  let rec hr_aux (s: int) (t: tree 'a) : tree 'a
+    requires { inv t }
+    requires { s = size t > 0 }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t - 1 }
+    ensures  { forall j. 0 <= j < size result -> get result j = get t j }
+  = match t with
+    | Empty -> absurd
+    | Node Empty _ Empty -> Empty
+    | Node l x r -> if mod s 2 = 0 then Node (hr_aux (div s 2) l) x r
+                                   else Node l x (hr_aux (div s 2) r)
+    end
+
+  let hr (t: tree 'a) : tree 'a
+    requires { inv t }
+    requires { size t > 0 }
+    ensures  { inv result }
+    ensures  { size result = size t - 1 }
+    ensures  { forall j. 0 <= j < size result -> get result j = get t j }
+  =
+    hr_aux (size t) t
+
+end
