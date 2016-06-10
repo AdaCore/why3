@@ -67,7 +67,7 @@ val add_file_to_session :
     [fname] and add the resulting theories to the session [s] *)
 
 val reload_session_files : session -> unit
-(** reload the given session with the given environnement :
+(** reload the given session with the given environment :
     - the files are reloaded
     - apply again the transformation
     - if some goals appear try to find to which goal
