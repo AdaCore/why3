@@ -11,7 +11,7 @@
 
 (** Managing the drivers for external provers *)
 
-(** {2 create a driver} *)
+(** {2 Create a driver} *)
 
 type driver
 
@@ -22,7 +22,7 @@ val load_driver :  Env.env -> string -> string list -> driver
     @param string list additional driver files containing only theories
 *)
 
-(** {2 use a driver} *)
+(** {2 Use a driver} *)
 
 val file_of_task : driver -> string -> string -> Task.task -> string
 (** [file_of_task d f th t] produces a filename

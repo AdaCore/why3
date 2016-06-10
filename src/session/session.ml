@@ -2366,9 +2366,13 @@ exception OutdatedSession
 let merge_theory ~ctxt ~theories env from_th to_th =
   found_missed_goals_in_theory := false;
   set_theory_expanded to_th from_th.theory_expanded;
+  let get_goal_name g =
+    try
+      let (_,_,l) = restore_path g.goal_name in
+      String.concat "." l
+    with Not_found -> g.goal_name.Ident.id_string in
   let from_goals = List.fold_left
-    (fun from_goals g ->
-      Mstr.add g.goal_name.Ident.id_string g from_goals)
+    (fun from_goals g -> Mstr.add (get_goal_name g) g from_goals)
     Mstr.empty from_th.theory_goals
   in
   Debug.dprintf debug
@@ -2379,16 +2383,11 @@ let merge_theory ~ctxt ~theories env from_th to_th =
   List.iter
     (fun to_goal ->
       try
-        let to_goal_name =
-          try
-            let (_,_,l) = restore_path to_goal.goal_name
-            in String.concat "." l
-          with Not_found -> to_goal.goal_name.Ident.id_string
-        in
+        let to_goal_name = get_goal_name to_goal in
         let from_goal = Mstr.find to_goal_name from_goals in
         Debug.dprintf debug
           "[Goal checksum] goal %s: old sum = %a, new sum = %a@."
-          to_goal.goal_name.Ident.id_string
+          to_goal_name
           (Pp.print_option Tc.print_checksum) from_goal.goal_checksum
           (Pp.print_option Tc.print_checksum) to_goal.goal_checksum;
         let goal_obsolete =

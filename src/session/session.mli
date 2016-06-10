@@ -77,7 +77,7 @@ type idpos = {
 
 type 'a goal = private
     { mutable goal_key  : 'a;
-      goal_name : Ident.ident; (** The ident of the task *)
+      goal_name : Ident.ident; (** ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
       mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
@@ -486,7 +486,7 @@ val goal_task_or_recover: 'a env_session -> 'a goal -> Task.task
 
 (** {2 Iterators} *)
 
-(** {3 recursive} *)
+(** {3 Recursive} *)
 
 val goal_iter_proof_attempt : ('key proof_attempt -> unit) -> 'key goal -> unit
 (* unused
@@ -511,7 +511,7 @@ val goal_iter_leaf_goal :
 val fold_all_sub_goals_of_theory :
   ('a -> 'key goal -> 'a) -> 'a -> 'key theory -> 'a
 
-(** {3 not recursive} *)
+(** {3 Not recursive} *)
 
 val iter_goal :
   ('key proof_attempt -> unit) ->
