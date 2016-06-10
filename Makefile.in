@@ -704,6 +704,10 @@ install_spark2014:
 	cp -f theories/*.why $(DATADIR)/why3/theories
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
+	# also copy the fixed coq-realizations.aux file that we use for SPARK;
+	# This will possibly overwrite the one that was copied on the line
+	# before
+	cp -f coq-realizations.aux $(DATADIR)/why3/drivers
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f lib/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
