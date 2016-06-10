@@ -1,0 +1,78 @@
+This is a VC server for Why3. It implements the following functionalities:
+* wait for connections on a unix domain socket (unix) or named pipe
+  (windows) for clients
+* clients can send requests for a process to spawn, including
+  timeout/memory limit
+* server will send back a filename containing the output of the process,
+  as well as the time taken and the exit code
+
+Command line options
+====================
+
+   -j <n>      the maximum number of processes to spawn in parallel
+   --socket    the name of the socket or named pipe
+
+ Protocol
+=========
+
+A client request is a single line which looks like this:
+
+  commandkind;payload
+
+Where commandkind is a simple string and payload is a semicolon-separated
+list. There are currently three possible commands. The first command looks
+like this:
+
+  run;id;timeout;memlimit;cmd;arg1;arg2;...;argn
+
+So the commandstring is "run". All items are separated by semicolons, and must
+not contain semicolons themselves (but may contain spaces). Their meaning is
+the following:
+  id       - a (ideally) unique identifier which identifies the request
+  timeout  - the allowed CPU time in seconds for this command;
+             this must be number, 0 for unlimited
+  memlimit - the allowed consumed memory for this command
+             this must be number, 0 for unlimited
+  cmd      - the name of the executable to run
+  arg(i)   - the commandline arguments of the command to run
+
+The server does not acknowledge the receipt of this message. However, it will
+run the executable with its arguments and time/memory limit. When the
+executable has terminated, the server sends a message like this to the client
+who sent the 'run' request:
+
+  id;exitcode;time;timeout;file
+
+Their meaning is the following:
+  id       - the identifier of the request to which this answer belongs
+  exitcode - the exitcode of the executed program
+  time     - the time taken by the executed program
+  timeout  - 0 for regular exit or crash, 1 for program interrupt through
+             timeout
+  file     - the path to a file which contains the stdout and stderr of the
+             executed program
+
+The second command is very similar:
+
+  runstdin;id;timeout;memlimit;cmd;arg1;arg2;...;argn;filename
+
+The meaning of this command is identical to the "run" command, with the
+difference that an extra filename is given as the last argument to the
+command. This filename is not passed to the command as a commandline argument,
+instead it is "piped" into the stdin of the command.
+
+The third commmand is like this:
+
+  parallel;num
+
+So the commandstring is "parallel". 'num' is a number greater or equal to 1.
+When this command is received, the server will allow to run up to 'num'
+processes in parallel from now on. Later 'parallel' commands can increase or
+decrease this number. There is no server answer to this command.
+
+There are two separate implementations on linux and windows, but both are
+very similar in structure and share some code (but should share much more).
+They are both essentially a single-threaded event loop, where the possible
+events are incoming clients, read/write operations on sockets, and
+terminating child processes. Lists of child processes and connected clients
+are maintained.

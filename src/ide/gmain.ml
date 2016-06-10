@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -489,7 +489,8 @@ let set_proof_state a =
     | S.Done { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
        let s =
         if gconfig.show_time_limit then
-          Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
+          Format.sprintf "%.2f [%d.0]" time
+          (a.S.proof_limit.Call_provers.limit_time)
         else
           Format.sprintf "%.2f" time
        in
@@ -503,7 +504,8 @@ let set_proof_state a =
     | S.Interrupted -> "(interrupted)"
     | S.Scheduled | S.Running ->
         Format.sprintf "[limit=%d sec., %d M]"
-          a.S.proof_timelimit a.S.proof_memlimit
+          (a.S.proof_limit.Call_provers.limit_time)
+          (a.S.proof_limit.Call_provers.limit_mem)
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   (* TODO find a better way to signal archived row *)
@@ -1016,7 +1018,10 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~cntexample ~timelimit ~steplimit:(-1) ~memlimit
+         ~cntexample
+         ~limit:{Call_provers.empty_limit with
+                Call_provers.limit_time = timelimit;
+                              limit_mem = memlimit }
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -1131,13 +1136,13 @@ let bisect_proof_attempt pa =
         assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
 	  ~cntexample
-          ~timelimit:!timelimit
-          ~memlimit:pa.S.proof_memlimit
-	  ~steplimit:(-1)
+          ~limit:{Call_provers.empty_limit with
+                  Call_provers.limit_time = !timelimit;
+                  limit_mem = pa.S.proof_limit.Call_provers.limit_mem }
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (* It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
-          ~command:(C.get_complete_command lp.S.prover_config (-1))
+          ~command:(C.get_complete_command lp.S.prover_config ~with_steps:false)
           ~driver:lp.S.prover_driver
           ~callback:(callback lp pa c) sched t
   in
@@ -1170,12 +1175,14 @@ let bisect_proof_attempt pa =
           | Some lp ->
             M.schedule_proof_attempt
 	      ~cntexample
-              ~timelimit:!timelimit
-              ~memlimit:pa.S.proof_memlimit
-	      ~steplimit:(-1)
+              ~limit:{pa.S.proof_limit with
+                        Call_provers.limit_steps =
+                          Call_provers.empty_limit.Call_provers.limit_steps;
+                        limit_time = !timelimit}
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
-              ~command:(C.get_complete_command lp.S.prover_config (-1))
+              ~command:(C.get_complete_command lp.S.prover_config
+                            ~with_steps:false)
               ~driver:lp.S.prover_driver
               ~callback:(callback lp pa c) sched t in
   dprintf debug "Bisecting with %a started.@."
@@ -1674,6 +1681,7 @@ let () =
 
 let () =
   let iter (name,desc,strat,k) =
+    let desc = Scanf.format_from_string desc "" in
     let b = GButton.button ~packing:strategies_box#add
       ~label:(sanitize_markup name) ()
     in
@@ -2298,6 +2306,7 @@ let () =
   let submenu = tools_factory#add_submenu "Strategies" in
   let submenu = new GMenu.factory submenu ~accel_group in
   let iter (name,desc,strat,k) =
+    let desc = Scanf.format_from_string desc "" in
     let callback () = apply_strategy_on_selection strat in
     let ii = submenu#add_image_item
       ~label:(sanitize_markup name) ~callback ()

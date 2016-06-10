@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -47,4 +47,4 @@ val has_prefix : string -> string -> bool
 
 val remove_prefix : string -> string -> string
 (** [remove_prefix pref s] removes the prefix [pref] from [s]. Raises
-    [Not_found if [s] does not start with [pref] *)
+    [Not_found] if [s] does not start with [pref] *)

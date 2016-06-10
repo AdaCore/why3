@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -55,7 +55,7 @@ exception BoolExpected of string * rc_value
 
 
 type t (** Rc parsed file *)
-type section (** section in rc file *)
+type section (** Section in rc file *)
 type family = (string * section) list (** A family in rc files *)
 type simple_family = section list (** A family w/o arguments in rc files*)
 
@@ -199,7 +199,7 @@ val from_channel : in_channel -> t
 
 val from_file : string -> t
 (** [from_file filename] returns the Rc of the file [filename]
-    @raise CannotOpen is [filename] does not exist
+    @raise CannotOpen if [filename] does not exist
     @raise SyntaxErrorFile in case of incorrect syntax
     @raise ExtraParameters if a section header has more than one argument
 *)

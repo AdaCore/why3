@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -93,6 +93,21 @@ let rec fmla_find_subst boundvars var sign f =
     | Tapp _ | Tfalse | Ttrue -> ()
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
+(* Simplify out equalities that could be selected. *)
+let rec equ_simp f = t_label_copy f (match f.t_node with
+  | Tbinop (op, f1, f2) ->
+       begin match op, equ_simp f1, equ_simp f2 with
+       | Tor, { t_node = Tfalse }, f
+       | Tor, f, { t_node = Tfalse }
+       | Tand, { t_node = Ttrue }, f
+       | Tand, f, { t_node = Ttrue }
+       | Timplies, { t_node = Ttrue }, f -> f
+       | op, f1, f2 -> t_binary op f1 f2
+       end
+  | Tapp (p,[f1;f2]) when ls_equal p ps_equ ->
+       t_equ_simp (equ_simp f1) (equ_simp f2)
+  | _ -> t_map equ_simp f)
+
 let rec fmla_quant sign f = function
   | [] -> [], f
   | vs::l ->
@@ -102,7 +117,7 @@ let rec fmla_quant sign f = function
         vs::vsl, f
       with Subst_found t ->
         let f = t_subst_single vs t f in
-        vsl, fmla_simpl f
+        vsl, equ_simp f
 
 let rec fmla_remove_quant f =
   match f.t_node with

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,28 +26,28 @@ val mapi : (int -> 'a) -> int -> int -> 'a list
 val iterf : (float -> unit) -> float -> float -> float -> unit
 (** [iterf f min max step] *)
 
-(* Convert fold-like functions into [for_all] and [exists] functions.
-   Predicates passed to [all], [all2], and [alld] may raise FoldSkip to
-   signalize [false]. Predicates passed to [any], [any2], and [anyd] may
-   raise FoldSkip to signalize [true]. *)
+(** Convert fold-like functions into [for_all] and [exists] functions.
+    Predicates passed to [all], [all2], and [alld] may raise FoldSkip to
+    signalize [false]. Predicates passed to [any], [any2], and [anyd] may
+    raise FoldSkip to signalize [true]. *)
 
 exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'z -> 'a -> bool
-(* [all_fn pr z a] return true if [pr a] is true,
-   otherwise raises FoldSkip *)
+(** [all_fn pr z a] return true if [pr a] is true,
+    otherwise raise FoldSkip *)
 
 val any_fn : ('a -> bool) -> 'z -> 'a -> bool
-(* [all_fn pr z a] return false if [pr a] is false,
-   otherwise raises FoldSkip *)
+(** [any_fn pr z a] return false if [pr a] is false,
+    otherwise raise FoldSkip *)
 
 val all2_fn : ('a -> 'b -> bool) -> 'z -> 'a -> 'b -> bool
-(* [all_fn pr z a b] return true if [pr a b] is true,
-   otherwise raises FoldSkip *)
+(** [all2_fn pr z a b] return true if [pr a b] is true,
+    otherwise raise FoldSkip *)
 
 val any2_fn : ('a -> 'b -> bool) -> 'z -> 'a -> 'b -> bool
-(* [all_fn pr z a b] return false if [pr a b] is false,
-   otherwise raises FoldSkip *)
+(** [any2_fn pr z a b] return false if [pr a b] is false,
+    otherwise raise FoldSkip *)
 
 type ('z,'a,'c) fold = ('z -> 'a -> 'z) -> 'z -> 'c -> 'z
 

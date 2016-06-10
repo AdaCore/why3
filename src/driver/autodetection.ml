@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -70,6 +70,7 @@ type prover_autodetection_data =
       prover_driver : string;
       prover_editor : string;
       prover_in_place : bool;
+      use_at_auto_level : int;
       message : string option;
     }
 
@@ -79,7 +80,7 @@ let prover_keys =
     ["name";"compile_time_support";
      "exec";"version_switch";"version_regexp";
      "version_ok";"version_old";"version_bad";"command"; "command_steps";
-     "editor";"driver";"in_place";"message";"alternative";]
+     "editor";"driver";"in_place";"message";"alternative";"use_at_auto_level"]
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
@@ -101,6 +102,7 @@ let load_prover kind (id,section) =
     prover_driver = get_string section ~default:""  "driver";
     prover_editor = get_string section ~default:"" "editor";
     prover_in_place = get_bool section ~default:false "in_place";
+    use_at_auto_level = get_int section ~default:0 "use_at_auto_level";
     message = get_stringo section "message";
   } in
   if prover.prover_command != None && prover.prover_driver = "" then
@@ -232,22 +234,21 @@ let sanitize_exec =
 let ask_prover_version exec_name version_switch =
   let out = Filename.temp_file "out" "" in
   let cmd = sprintf "%s %s" exec_name version_switch in
-  let c = sprintf "(%s) > %s 2>&1" cmd out in
+  let c = sprintf "(%s) >%s 2>&1" cmd out in
   Debug.dprintf debug "Run : %s@." c;
-  let ret = Sys.command c in
-  if ret <> 0 then
-    begin
-      Debug.dprintf debug "command '%s' failed@." cmd;
+  try
+    let ret = Sys.command c in
+    let ch = open_in out in
+    let c = Sysutil.channel_contents ch in
+    close_in ch;
+    Sys.remove out;
+    if ret <> 0 then begin
+      Debug.dprintf debug "command '%s' failed. Output:@\n%s@." cmd c;
       None
-    end
-  else
-    try
-      let ch = open_in out in
-      let c = Sysutil.channel_contents ch in
-      close_in ch;
-      Sys.remove out;
-      Some c
-    with Not_found | End_of_file  -> Some ""
+    end else Some c
+  with Not_found | End_of_file | Sys_error _ ->
+    Debug.dprintf debug "command '%s' failed@." cmd;
+    None
 
 let ask_prover_version env exec_name version_switch =
   try
@@ -308,8 +309,97 @@ let add_prover_shortcuts env prover =
 let add_id_prover_shortcut env id prover priority =
   match Hstr.find_opt env.prover_shortcuts id with
   | Some (p,_) when p >= priority -> ()
+  | Some _ -> assert false
   | _ -> Hstr.replace env.prover_shortcuts id (priority,prover)
 
+let prover_auto_levels = Hprover.create 5
+
+let record_prover_for_auto_mode prover level =
+  Hprover.replace prover_auto_levels prover (level,false)
+
+let check_prover_auto_level prover =
+  try
+    let lev,_ = Hprover.find prover_auto_levels prover in
+    Hprover.replace prover_auto_levels prover (lev,true)
+  with Not_found -> ()
+
+let generate_auto_strategies config =
+  eprintf "Generating strategies:@.";
+  Hprover.iter
+    (fun p (lev,b) ->
+     if b then eprintf "  Prover %a will be used in Auto level >= %d@."
+                       Whyconf.print_prover p lev) prover_auto_levels;
+  (* Split *)
+  let code = "t split_goal_wp exit" in
+  let split = {
+      strategy_name = "Split";
+      strategy_desc = "Split@ the@ goal@ into@ subgoals";
+      strategy_shortcut = "s";
+      strategy_code = code }
+  in
+  (* Inline *)
+  let code = "t introduce_premises next next: t inline_goal exit" in
+  let inline = {
+      strategy_name = "Inline";
+      strategy_desc = "Inline@ definitions@ in@ the@ conclusion@ of@ the@ goal";
+      strategy_shortcut = "i";
+      strategy_code = code }
+  in
+  (* Auto level 1 *)
+  let provers_level1 =
+    Hprover.fold
+      (fun p (lev,b) acc ->
+       if b && lev = 1 then
+         let name =
+           p.Whyconf.prover_name ^ "," ^
+             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
+         in name :: acc
+       else acc) prover_auto_levels []
+  in
+  fprintf str_formatter "start:@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
+  fprintf str_formatter "t split_goal_wp start@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
+  let code = flush_str_formatter () in
+  let auto1 = {
+      strategy_name = "Auto level 1";
+      strategy_desc = "Automatic@ run@ of@ main@ provers";
+      strategy_shortcut = "1";
+      strategy_code = code }
+  in
+  (* Auto level 2 *)
+  let provers_level2 =
+    Hprover.fold
+      (fun p (lev,b) acc ->
+       if b && lev >= 1 && lev <= 2 then
+         let name =
+           p.Whyconf.prover_name ^ "," ^
+             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
+         in name :: acc
+       else acc) prover_auto_levels []
+  in
+  fprintf str_formatter "start:@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level2;
+  fprintf str_formatter "t split_goal_wp start@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level2;
+  fprintf str_formatter "t introduce_premises afterintro@\n";
+  fprintf str_formatter "afterintro:@\n";
+  fprintf str_formatter "t inline_goal afterinline@\n";
+  fprintf str_formatter "g trylongertime@\n";
+  fprintf str_formatter "afterinline:@\n";
+  fprintf str_formatter "t split_goal_wp start@\n";
+  fprintf str_formatter "trylongertime:@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level2;
+  let code = flush_str_formatter () in
+  let auto2 = {
+      strategy_name = "Auto level 2";
+      strategy_desc = "Automatic@ run@ of@ provers@ and@ most@ useful@ transformations";
+      strategy_shortcut = "2";
+      strategy_code = code }
+  in
+  add_strategy
+    (add_strategy
+       (add_strategy (add_strategy config inline) split) auto1) auto2
 
 let detect_exec env main data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
@@ -413,6 +503,8 @@ let detect_exec env main data acc exec_name =
       known_version env exec_name;
       add_prover_shortcuts env prover;
       add_id_prover_shortcut env data.prover_id prover priority;
+      let level = data.use_at_auto_level in
+      if level > 0 then record_prover_for_auto_mode prover level;
       add_prover_with_uniq_id prover_config acc
     end
     else (unknown_version env exec_name data.prover_id prover_config priority;
@@ -441,7 +533,7 @@ let detect_unknown env detected =
 
 let convert_shortcuts env =
   Hstr.fold (fun s (_,p) acc ->
-    Mstr.add s p acc
+    check_prover_auto_level p; Mstr.add s p acc
   ) env.prover_shortcuts Mstr.empty
 
 let run_auto_detection config =
@@ -456,6 +548,7 @@ let run_auto_detection config =
     "%d provers detected and %d provers detected with unsupported version@."
     length_detected length_unsupported_version;
   let shortcuts = convert_shortcuts env in
+  let config = generate_auto_strategies config in
   let config = set_editors config (read_editors main) in
   let config = set_prover_shortcuts config shortcuts in
   let config = set_provers config detected in

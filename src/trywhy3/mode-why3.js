@@ -11,7 +11,7 @@ var Why3HighlightRules = function() {
         "exception|exists|for|forall|fun|function|goal|if|import|in|" +
         "invariant|let|match|module|mutable|predicate|"  +
         "rec|requires|then|theory|to|try|type|use|val|variant|" +
-        "while|with"
+        "while|with|diverges"
     );
 
     var builtinConstants = ("true|false");

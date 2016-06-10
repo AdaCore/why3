@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1306,8 +1306,10 @@ let why3tac ?(timelimit=timelimit) s gl =
     let command = String.concat " " (cp.command :: cp.extra_options) in
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
     if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
-    let call = Driver.prove_task ~command ~timelimit drv !task () in
-    wait_on_call call ()
+    let limit =
+    { Call_provers.empty_limit with Call_provers.limit_time = timelimit } in
+    let call = Driver.prove_task ~command ~limit drv !task in
+    wait_on_call call
   with
     | NotFO ->
         if debug then Printexc.print_backtrace stderr; flush stderr;

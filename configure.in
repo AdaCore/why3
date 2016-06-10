@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -140,23 +140,22 @@ AC_MSG_CHECKING(executable suffix)
 if uname -s | grep -q CYGWIN ; then
   EXE=.exe
   STRIP='echo "no strip "'
-  CPULIMIT=cpulimit-win
   AC_MSG_RESULT(.exe <Cygwin>)
 else
 if uname -s | grep -q MINGW ; then
   EXE=.exe
   STRIP=strip
-  CPULIMIT=cpulimit-win
   AC_MSG_RESULT(.exe <MinGW>)
 else
   EXE=
   STRIP=strip
-  CPULIMIT=cpulimit
   AC_MSG_RESULT(<none>)
 fi
 fi
 
-AC_PROG_CC()
+AC_PROG_CC
+AC_PROG_MKDIR_P
+AC_PROG_INSTALL
 
 # Check for Ocaml compilers
 
@@ -709,17 +708,13 @@ dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
 
 VERSION=$PACKAGE_VERSION
 
-BUILDDATE="$(date)"
-
 # substitutions to perform
 AC_SUBST(VERSION)
-AC_SUBST(BUILDDATE)
 
 AC_SUBST(enable_verbose_make)
 
 AC_SUBST(EXE)
 AC_SUBST(STRIP)
-AC_SUBST(CPULIMIT)
 
 AC_SUBST(OCAMLC)
 AC_SUBST(OCAMLOPT)

@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../base.mlw">
 <theory name="Fun" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="FunExt" sum="74d4af5538daa9eb9ddee6284a05e5bf">
  <goal name="WP_parameter extensional" expl="VC for extensional">
- <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="FunCategory" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -19,35 +19,37 @@
   <goal name="ext.1" expl="1.">
   <transf name="inline_goal">
    <goal name="ext.1.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+   <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ext.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="assoc">
- <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="neutral">
- <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
  </goal>
  <goal name="FunExt.extensionality">
- <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="FunCategory.assoc">
- <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="FunCategory.neutral">
- <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
 </theory>
 <theory name="Set" sum="8dc39e2ae96fd0498b0d50bb47f235eb">
  <goal name="sext_is_ext">
- <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
+</theory>
+<theory name="SetBigOps" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Rel" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
@@ -63,66 +65,66 @@
  <goal name="extensionality">
  <transf name="split_goal_wp">
   <goal name="extensionality.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="extensionality.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="extensionality.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="assoc">
  <transf name="compute_specified">
   <goal name="assoc.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="reverse_antimorphism">
- <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
  </goal>
  <goal name="reverse_antimorphism_id">
- <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="reverse_involution">
- <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
  <goal name="neutral">
  <transf name="compute_specified">
   <goal name="neutral.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="RelExt.extensionality">
- <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="RelCategory.assoc">
- <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="RelCategory.reverse_antimorphism">
- <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="RelCategory.reverse_antimorphism_id">
- <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="RelCategory.reverse_involution">
- <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="RelCategory.neutral">
- <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
 </theory>
 <theory name="SubsetOrder" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="SetProofs" sum="0be5aa0fe01aa313571b5c5ef55cb77b">
  <goal name="anti_subset">
- <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
  <goal name="SubsetOrder.subset_order">
- <proof prover="0"><result status="valid" time="0.02" steps="65"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="65"/></proof>
  </goal>
 </theory>
 <theory name="Image" sum="d41d8cd98f00b204e9800998ecf8427e">

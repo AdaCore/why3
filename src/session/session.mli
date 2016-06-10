@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -77,7 +77,7 @@ type idpos = {
 
 type 'a goal = private
     { mutable goal_key  : 'a;
-      goal_name : Ident.ident; (** The ident of the task *)
+      goal_name : Ident.ident; (** ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
       mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
@@ -95,9 +95,7 @@ and 'a proof_attempt = private
       mutable proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
-      mutable proof_timelimit : int;
-      mutable proof_steplimit : int;
-      mutable proof_memlimit : int;
+      mutable proof_limit : Call_provers.resource_limit;
       mutable proof_obsolete : bool;
       mutable proof_archived : bool;
       mutable proof_edited_as : string option;
@@ -346,9 +344,7 @@ val add_external_proof :
   keygen:'key keygen ->
   obsolete:bool ->
   archived:bool ->
-  timelimit:int ->
-  steplimit:int ->
-  memlimit:int ->
+  limit: Call_provers.resource_limit ->
   edit:string option ->
   'key goal ->
   Whyconf.prover ->
@@ -389,9 +385,7 @@ val copy_external_proof :
   keygen:'key keygen ->
   ?obsolete:bool ->
   ?archived:bool ->
-  ?timelimit:int ->
-  ?steplimit:int ->
-  ?memlimit:int ->
+  ?limit:Call_provers.resource_limit ->
   ?edit:string option ->
   ?goal:'key goal ->
   ?prover:Whyconf.prover ->
@@ -492,7 +486,7 @@ val goal_task_or_recover: 'a env_session -> 'a goal -> Task.task
 
 (** {2 Iterators} *)
 
-(** {3 recursive} *)
+(** {3 Recursive} *)
 
 val goal_iter_proof_attempt : ('key proof_attempt -> unit) -> 'key goal -> unit
 (* unused
@@ -517,7 +511,7 @@ val goal_iter_leaf_goal :
 val fold_all_sub_goals_of_theory :
   ('a -> 'key goal -> 'a) -> 'a -> 'key theory -> 'a
 
-(** {3 not recursive} *)
+(** {3 Not recursive} *)
 
 val iter_goal :
   ('key proof_attempt -> unit) ->

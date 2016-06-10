@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -51,7 +51,7 @@ val trivial : Task.task Trans.trans
 (** [trivial] corresponds to the transformation "inline_trivial"
     Inline only the trivial definition :
     logic c : t = a
-    logic f(x : t,...., ) : t = g(y : t2,...) *)
+    logic f(x : t,...) : t = g(y : t2,...) *)
 
 (*
 (** Functions to use in other transformations if inlining is needed *)

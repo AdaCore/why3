@@ -1,3 +1,11 @@
+@import url(fontawesome/fontawesome.css);
+
+/* fontawesome */
+[class*="fontawesome-"]:before {
+    font-family: 'FontAwesome', sans-serif;
+}
+
+
 body {
     padding:0;
     margin:0;
@@ -132,20 +140,20 @@ body {
 
 #console ul {
     list-style-type: none;
-    padding: 8px;
-    margin: 4px;
+    padding: 0.5em;
+    /*margin: 0.5em; */
 }
 
 #console ul ul {
     list-style-type: disc;
-    padding: 8px;
-    margin: 4px;
+    padding: 0.5em;
+    /*margin: 0.5em;*/
 }
 
 #console ul ul ul {
     list-style-type: none;
-    padding: 0px;
-    margin: 4px;
+    padding: 0.5em;
+    /*margin: 0.5em; */
 }
 
 #editor {
@@ -197,4 +205,18 @@ body {
 
 #confirm-dialog .btn {
     width:40%;
+}
+
+#header {
+    height: 30vh;
+
+}
+.menu-bar {
+    height: 5vh;
+}
+#editor-panel {
+    height: 65vh;
+}
+#console {
+    overflow: auto;
 }

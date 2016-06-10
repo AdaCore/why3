@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -92,9 +92,9 @@ let add_proofs_attempts g =
           ~keygen:dummy_keygen
           ~obsolete:true
           ~archived:false
-          ~timelimit:5
-	  ~steplimit:(-1)
-          ~memlimit:1000
+          ~limit:{Call_provers.empty_limit with
+                  Call_provers.limit_time = 5;
+                               limit_mem = 1000 }
           ~edit:None
           g p.Whyconf.prover Session.Scheduled
       in ())

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -367,21 +367,30 @@ let () =
     discriminate_if_poly
     ~desc:"Same@ as@ discriminate@ but@ only@ if@ polymorphism@ appear."
 
+let li_add_ls acc = function
+  | [MAls ls; MAls nls] -> Mls.add nls ls acc
+  | _ -> assert false
+
+let get_lsinst task =
+  Task.on_meta meta_lsinst li_add_ls Mls.empty task
+
 let on_lsinst fn =
-  let add_ls acc = function
-    | [MAls ls; MAls nls] -> Mls.add nls ls acc
-    | _ -> assert false in
   Trans.on_meta meta_lsinst (fun dls ->
-    fn (List.fold_left add_ls Mls.empty dls))
+    fn (List.fold_left li_add_ls Mls.empty dls))
+
+let sm_add_ls sm0 sm = function
+  | [MAls ls; MAls nls] ->
+      begin match Mid.find_opt ls.ls_name sm0 with
+        | Some s -> Mid.add nls.ls_name s sm
+        | None -> sm
+      end
+  | _ -> assert false
+
+let get_syntax_map task =
+  let sm0 = Printer.get_syntax_map task in
+  Task.on_meta meta_lsinst (sm_add_ls sm0) sm0 task
 
 let on_syntax_map fn =
-  let add_ls sm0 sm = function
-    | [MAls ls; MAls nls] ->
-        begin match Mid.find_opt ls.ls_name sm0 with
-          | Some s -> Mid.add nls.ls_name s sm
-          | None -> sm
-        end
-    | _ -> assert false in
   Printer.on_syntax_map (fun sm0 ->
   Trans.on_meta meta_lsinst (fun dls ->
-    fn (List.fold_left (fun sm dl -> add_ls sm0 sm dl) sm0 dls)))
+    fn (List.fold_left (sm_add_ls sm0) sm0 dls)))

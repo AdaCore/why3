@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -91,46 +91,8 @@ type prover_result_parser = {
   (* The parser for a model returned by the solver. *)
   prp_model_parser : Model_parser.model_parser;
 }
-
-(** {2 Functions for calling external provers} *)
-type prover_call
-(** Type that represents a single prover run *)
-
-type pre_prover_call = unit -> prover_call
-(** Thread-safe closure that launches the prover *)
-
-type post_prover_call = unit -> prover_result
-(** Thread-unsafe closure that interprets the prover's results *)
-
-val call_on_file :
-  command     : string ->
-  ?timelimit  : int ->
-  ?memlimit   : int ->
-  ?steplimit  : int ->
-  res_parser  : prover_result_parser ->
-  printer_mapping : Printer.printer_mapping ->
-  ?cleanup    : bool ->
-  ?inplace    : bool ->
-  ?redirect   : bool ->
-  string -> pre_prover_call
-
-val call_on_buffer :
-  command     : string ->
-  ?timelimit  : int ->
-  ?memlimit   : int ->
-  ?steplimit  : int ->
-  res_parser  : prover_result_parser ->
-  filename    : string ->
-  printer_mapping : Printer.printer_mapping ->
-  ?inplace    : bool ->
-  Buffer.t -> pre_prover_call
-(** Call a prover on the task printed in the {!type: Buffer.t} given.
-
-    @param timelimit : set the available time limit (def. 0 : unlimited)
-    @param memlimit : set the available memory limit (def. 0 : unlimited)
-    @param steplimit : set the available step limit (def. -1 : unlimited)
-
-    @param regexps : if the first field matches the prover output,
+(*
+    if the first field matches the prover output,
     the second field is the answer. Regexp groups present in
     the first field are substituted in the second field (\0,\1,...).
     The regexps are tested in the order of the list.
@@ -144,20 +106,66 @@ val call_on_buffer :
     @param exitcodes : if the first field is the exit code, then
     the second field is the answer. Exit codes are tested in the order
     of the list and before the regexps.
+*)
+
+(** {2 Functions for calling external provers} *)
+
+type prover_call
+(** Type that represents a single prover run *)
+
+type resource_limit = {
+  limit_time  : int;
+  limit_mem   : int;
+  limit_steps : int;
+}
+(* represents the three ways a prover run can be limited: in time, memory
+   and/or steps *)
+
+val empty_limit : resource_limit
+(* the limit object which imposes no limits. Use this object to impose no
+   limits, but also to know if some concrete time, steps or memlimit actually
+   means "no limit" *)
+
+val limit_max : resource_limit -> resource_limit -> resource_limit
+(* return the limit object whose components represent the maximum of the
+   corresponding components of the arguments *)
+
+val call_editor : command : string -> string -> prover_call
+
+val call_on_file :
+  command         : string ->
+  limit           : resource_limit ->
+  res_parser      : prover_result_parser ->
+  printer_mapping : Printer.printer_mapping ->
+  ?inplace        : bool ->
+  string -> prover_call
+
+val call_on_buffer :
+  command         : string ->
+  limit           : resource_limit ->
+  res_parser      : prover_result_parser ->
+  filename        : string ->
+  printer_mapping : Printer.printer_mapping ->
+  ?inplace        : bool ->
+  Buffer.t -> prover_call
+(** Call a prover on the task printed in the {!type: Buffer.t} given.
+
+    @param limit : set the available time limit (def. 0 : unlimited), memory
+    limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)
+
+    @param res_parser : prover result parser
 
     @param filename : the suffix of the proof task's file, if the prover
     doesn't accept stdin. *)
 
-val query_call : prover_call -> post_prover_call option
-(** Thread-safe non-blocking function that checks if the prover
-    has finished. *)
+type prover_update =
+  | NoUpdates
+  | ProverStarted
+  | ProverFinished of prover_result
 
-val wait_on_call : prover_call -> post_prover_call
-(** Thread-safe blocking function that waits until the prover finishes. *)
+val query_call : prover_call -> prover_update
+(** non-blocking function that reports any new updates
+    from the server related to a given prover call. *)
 
-val post_wait_call : prover_call -> Unix.process_status -> post_prover_call
-(** Thread-safe non-blocking function that should be called when the
-    prover's exit status was obtained from a prior call of Unix.waitpid *)
-
-val prover_call_pid : prover_call -> int
-(** Return the pid of the prover *)
+val wait_on_call : prover_call -> prover_result
+(** blocking function that waits until the prover finishes. *)
