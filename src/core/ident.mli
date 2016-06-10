@@ -63,10 +63,10 @@ val get_model_trace_label : labels : Slab.t -> Slab.elt
 (** {2 Identifiers} *)
 
 type ident = private {
-  id_string : string;               (* non-unique name *)
-  id_label  : Slab.t;               (* identifier labels *)
-  id_loc    : Loc.position option;  (* optional location *)
-  id_tag    : Weakhtbl.tag;         (* unique magical tag *)
+  id_string : string;               (** non-unique name *)
+  id_label  : Slab.t;               (** identifier labels *)
+  id_loc    : Loc.position option;  (** optional location *)
+  id_tag    : Weakhtbl.tag;         (** unique magical tag *)
 }
 
 module Mid : Extmap.S with type key = ident
@@ -78,29 +78,29 @@ val id_compare : ident -> ident -> int
 val id_equal : ident -> ident -> bool
 val id_hash : ident -> int
 
-(* a user-created type of unregistered identifiers *)
+(** a user-created type of unregistered identifiers *)
 type preid = {
   pre_name  : string;
   pre_label : Slab.t;
   pre_loc   : Loc.position option;
 }
 
-(* register a pre-ident (you should never use this function) *)
+(** register a pre-ident (you should never use this function) *)
 val id_register : preid -> ident
 
-(* create a fresh pre-ident *)
+(** create a fresh pre-ident *)
 val id_fresh : ?label:Slab.t -> ?loc:Loc.position -> string -> preid
 
-(* create a localized pre-ident *)
+(** create a localized pre-ident *)
 val id_user : ?label:Slab.t -> string -> Loc.position -> preid
 
-(* create a duplicate pre-ident with given labels *)
+(** create a duplicate pre-ident with given labels *)
 val id_lab : Slab.t -> ident -> preid
 
-(* create a duplicate pre-ident *)
+(** create a duplicate pre-ident *)
 val id_clone : ?label:Slab.t -> ident -> preid
 
-(* create a derived pre-ident (inherit labels and location) *)
+(** create a derived pre-ident (inherit labels and location) *)
 val id_derive : ?label:Slab.t -> string -> ident -> preid
 
 (* DEPRECATED : retrieve preid name without registering *)
