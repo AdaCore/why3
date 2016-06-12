@@ -4,39 +4,48 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../flexible_array.mlw" expanded="true">
-<theory name="FlexibleArray" sum="5b3c6d4d053c044616fe54c5db5db770" expanded="true">
+<theory name="FlexibleArray" sum="0ddc089b49190005c467c06361e9bd32" expanded="true">
  <goal name="VC empty" expl="VC for empty" expanded="true">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="VC length" expl="VC for length" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
- </goal>
  <goal name="VC is_empty" expl="VC for is_empty" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ </goal>
+ <goal name="VC get_aux" expl="VC for get_aux" expanded="true">
+ <proof prover="0" steplimit="-1"><result status="valid" time="0.04" steps="110"/></proof>
  </goal>
  <goal name="VC get" expl="VC for get" expanded="true">
- <proof prover="0"><result status="valid" time="0.05" steps="110"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="5"/></proof>
+ </goal>
+ <goal name="VC set_aux" expl="VC for set_aux" expanded="true">
+ <proof prover="0" steplimit="-1"><result status="valid" time="0.47" steps="742"/></proof>
  </goal>
  <goal name="VC set" expl="VC for set" expanded="true">
- <proof prover="0"><result status="valid" time="0.52" steps="742"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="44"/></proof>
+ </goal>
+ <goal name="VC le_aux" expl="VC for le_aux" expanded="true">
+ <proof prover="0" steplimit="-1"><result status="valid" time="0.39" steps="521"/></proof>
  </goal>
  <goal name="VC le" expl="VC for le" expanded="true">
- <proof prover="0"><result status="valid" time="0.33" steps="521"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="38"/></proof>
+ </goal>
+ <goal name="VC lr_aux" expl="VC for lr_aux" expanded="true">
+ <proof prover="0" steplimit="-1"><result status="valid" time="1.64" steps="1162"/></proof>
  </goal>
  <goal name="VC lr" expl="VC for lr" expanded="true">
- <proof prover="0" steplimit="-1"><result status="valid" time="1.56" steps="1162"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
  </goal>
  <goal name="VC he_aux" expl="VC for he_aux" expanded="true">
- <proof prover="0" steplimit="-1"><result status="valid" time="0.41" steps="607"/></proof>
+ <proof prover="0"><result status="valid" time="0.41" steps="607"/></proof>
  </goal>
  <goal name="VC he" expl="VC for he" expanded="true">
- <proof prover="0" steplimit="-1"><result status="valid" time="0.00" steps="0"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="36"/></proof>
  </goal>
  <goal name="VC hr_aux" expl="VC for hr_aux" expanded="true">
- <proof prover="0" steplimit="-1"><result status="valid" time="0.65" steps="826"/></proof>
+ <proof prover="0"><result status="valid" time="0.65" steps="826"/></proof>
  </goal>
  <goal name="VC hr" expl="VC for hr" expanded="true">
- <proof prover="0" steplimit="-1"><result status="valid" time="0.00" steps="0"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="30"/></proof>
  </goal>
 </theory>
 </file>
