@@ -30,11 +30,6 @@ module type Scheduler = sig
   val idle: (unit -> bool) -> unit
 end
 
-module Unix_scheduler : sig
-  include Scheduler
-  val main_loop : unit -> unit
-end
-
 
 module Make(S : Scheduler) : sig
 

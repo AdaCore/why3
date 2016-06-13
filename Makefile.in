@@ -786,6 +786,52 @@ install_no_local::
 
 install_local:: bin/why3session
 
+###############
+# Why3 Shell
+###############
+
+SHELL_FILES = why3shell
+
+SHELLMODULES = $(addprefix src/why3shell/, $(SHELL_FILES))
+
+SHELLDEP = $(addsuffix .dep, $(SHELLMODULES))
+SHELLCMO = $(addsuffix .cmo, $(SHELLMODULES))
+SHELLCMX = $(addsuffix .cmx, $(SHELLMODULES))
+
+$(SHELLDEP): DEPFLAGS += -I src/why3shell
+$(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/why3shell
+
+# build targets
+
+byte: bin/why3shell.byte
+opt:  bin/why3shell.opt
+
+bin/why3shell.opt: lib/why3/why3.cmxa $(SHELLCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3shell.byte: lib/why3/why3.cma $(SHELLCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(SHELLDEP)
+endif
+
+depend: $(SHELLDEP)
+
+CLEANDIRS += src/why3shell
+
+clean_old_install::
+	rm -f $(BINDIR)/why3shell$(EXE)
+
+install_no_local::
+	$(INSTALL) bin/why3shell.@OCAMLBEST@ $(TOOLDIR)/why3shell$(EXE)
+
+install_local:: bin/why3shell
+
 
 ##############
 # Coq plugin
