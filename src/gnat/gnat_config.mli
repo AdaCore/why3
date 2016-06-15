@@ -33,8 +33,6 @@ val manual_prover : prover option
 
 (* Configuration settings given or determined by the command line *)
 
-val timeout : int
-
 val steps : prover : string -> int
 (* value of the --steps option adjusted for given prover, if no steps are
  * given, return None *)

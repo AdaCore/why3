@@ -30,6 +30,7 @@ let is_builtin_prover =
     Sstr.mem s builtin_provers_set)
 
 let opt_timeout : int option ref = ref None
+let opt_ce_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_force = ref false
@@ -91,6 +92,9 @@ let set_prover s =
 let set_timeout t =
    opt_timeout := Some t
 
+let set_ce_timeout t =
+   opt_ce_timeout := Some t
+
 let set_steps t =
   if t > 0 then opt_steps := Some t
 
@@ -138,6 +142,8 @@ let options = Arg.align [
           " Set the timeout in seconds (default is 1 second)";
    "--timeout", Arg.Int set_timeout,
           " Set the timeout in seconds (default is 1 second)";
+   "--ce-timeout", Arg.Int set_ce_timeout,
+          " Set the timeout for counter examples in seconds";
    "--steps", Arg.Int set_steps,
        " Set the steps (default: no steps). " ^
          "This option is *not* passed to alt-ergo, " ^
@@ -458,16 +464,13 @@ let filename =
 
 (* freeze values *)
 
-let timeout =
-   match !opt_timeout with
-   | Some x -> x
-   | None -> Call_provers.empty_limit.Call_provers.limit_time
-
-let min a b =
-  if a <= b then
-    a
-  else
-    b
+let limit_time ~prover =
+  match prover_ce, !opt_timeout with
+  | Some p, _ when prover = p.prover.Whyconf.prover.Whyconf.prover_name &&
+                   !opt_ce_timeout <> None ->
+      Opt.get !opt_ce_timeout
+  | _, None -> Call_provers.empty_limit.Call_provers.limit_time
+  | _, Some x -> x
 
 type steps_convert = { add : int; mult : int }
 
@@ -501,7 +504,7 @@ let back_convert_steps ~prover c =
 
 let limit ~prover =
   { Call_provers.empty_limit with
-    Call_provers.limit_time = timeout;
+    Call_provers.limit_time = limit_time ~prover;
     limit_steps = steps ~prover}
 
 let proof_mode = !opt_proof_mode
