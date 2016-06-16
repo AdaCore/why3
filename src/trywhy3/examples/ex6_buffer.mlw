@@ -1,0 +1,67 @@
+
+(* Ring buffer (from the 2nd Verified Software Competition 2012)
+
+   Implement operations create, clear, push, head, and pop below (that
+   is, replace "val" with "let", add a body to the function, and prove
+   it correct).
+*)
+
+module RingBuffer
+
+  use import int.Int
+  use import seq.Seq
+  use import array.Array
+
+  type queue 'a = {
+    mutable first: int;
+    mutable len  : int;
+            data : array 'a;
+    ghost         capacity: int;
+    ghost mutable sequence: Seq.seq 'a;
+  }
+  invariant {
+    self.capacity = Array.length self.data /\
+    0 <= self.first <  self.capacity /\
+    0 <= self.len   <= self.capacity /\
+    self.len = Seq.length self.sequence /\
+    forall i: int. 0 <= i < self.len ->
+       Seq.([]) self.sequence i =
+         self.data[if self.first + i < self.capacity
+         	   then self.first + i
+		   else self.first + i - self.capacity]
+  }
+
+  val create (n: int) (dummy: 'a) : queue 'a
+    requires { n > 0 }
+    ensures  { capacity result = n }
+    ensures  { result.sequence = Seq.empty }
+  (* = ... *)
+
+  let length (q: queue 'a) : int
+    ensures { result = Seq.length q.sequence }
+  = q.len
+
+  val clear (q: queue 'a) : unit
+    writes  { q.len, q.sequence }
+    ensures { q.sequence = Seq.empty }
+  (* = ... *)
+
+  val push (q: queue 'a) (x: 'a) : unit
+    requires { Seq.length q.sequence < q.capacity }
+    writes   { q.data.elts, q.len, q.sequence }
+    ensures  { q.sequence = Seq.snoc (old q.sequence) x }
+  (* = ... *)
+
+  val head (q: queue 'a) : 'a
+    requires { Seq.length q.sequence > 0 }
+    ensures  { result = Seq.([]) q.sequence 0 }
+  (* = ... *)
+
+  val pop (q: queue 'a) : 'a
+    requires { Seq.length q.sequence > 0 }
+    writes   { q.first, q.len, q.sequence }
+    ensures  { result = Seq.([]) (old q.sequence) 0 }
+    ensures  { q.sequence = (old q.sequence)[1 ..] }
+  (* = ... *)
+
+end

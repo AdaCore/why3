@@ -28,7 +28,7 @@ module GcdBezout
        x := !y; y := r;
        let ghost ta = !a in let ghost tb = !b in
        a := !c; b := !d;
-       c := ta - !c * q; d := tb - !d * q
+       c := ta - !c * q; d := tb - !d * q;
     done;
     !x
 

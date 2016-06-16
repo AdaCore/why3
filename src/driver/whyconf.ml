@@ -133,7 +133,7 @@ type config_editor = {
 
 type config_strategy = {
   strategy_name : string;
-  strategy_desc : Pp.formatted;
+  strategy_desc : string;
   strategy_code : string;
   strategy_shortcut : string;
 }
@@ -160,6 +160,18 @@ let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
     | [] -> default
     | s -> s
+
+let set_strategy _ s family =
+  let section = empty_section in
+  let section = set_string section "name" s.strategy_name in
+  let section = set_string section "desc" s.strategy_desc in
+  let section = set_string section "shortcut" s.strategy_shortcut in
+  let section = set_string section "code" s.strategy_code in
+  section::family
+
+let set_strategies rc strategies =
+  let family = Mstr.fold set_strategy strategies [] in
+  set_simple_family rc "strategy" family
 
 (** Main record *)
 
@@ -209,8 +221,8 @@ let cntexample m = m.cntexample
 
 exception StepsCommandNotSpecified of string
 
-let get_complete_command pc steplimit =
-  let comm = if steplimit < 0 then pc.command
+let get_complete_command pc ~with_steps =
+  let comm = if not with_steps then pc.command
     else
       match pc.command_steps with
       | None -> raise (StepsCommandNotSpecified
@@ -489,7 +501,9 @@ let load_strategy strategies section =
   try
     let name = get_string section "name" in
     let desc = get_string section "desc" in
+(*
     let desc = Scanf.format_from_string desc "" in
+ *)
     let shortcut = get_string ~default:"" section "shortcut" in
     let code = get_string section "code" in
     Mstr.add
@@ -799,6 +813,13 @@ let editor_by_id whyconf id =
   Meditor.find id whyconf.editors
 
 let get_strategies config = config.strategies
+
+let add_strategy c strat =
+  let f = get_strategies c in
+  let strategies = Mstr.add strat.strategy_name strat f in
+  { c with strategies = strategies;
+           config = set_strategies c.config strategies }
+
 
 (******)
 

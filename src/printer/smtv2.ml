@@ -24,11 +24,11 @@ let debug = Debug.register_info_flag "smtv2_printer"
          the@ input@ of@ smtv2."
 
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
-let ident_printer =
+let ident_printer () =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
      "sat";"theory";"true";"unknown";"unsat";"xor";
-     "assumption";"axioms";"defintion";"extensions";"formula";
+     "assumption";"axioms";"definition";"extensions";"formula";
      "funs";"extrafuns";"extrasorts";"extrapreds";"language";
      "notes";"preds";"sorts";"status";"theory";"Int";"Real";"Bool";
      "Array";"U";"select";"store"]*)
@@ -76,9 +76,6 @@ let ident_printer =
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
-
-let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
 
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
@@ -128,6 +125,7 @@ type info = {
   mutable info_model : S.t;
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
+  info_printer : ident_printer;
 }
 
 let debug_print_term message t =
@@ -139,14 +137,17 @@ let debug_print_term message t =
     Debug.dprintf debug "@.";
   end
 
+let print_ident info fmt id =
+  fprintf fmt "%s" (id_unique info.info_printer id)
+
 (** type *)
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smtv2: you must encode type polymorphism"
   | Tyapp (ts, l) ->
      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
-      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
-      | None, _ -> fprintf fmt "(%a %a)" print_ident ts.ts_name
+      | None, [] -> fprintf fmt "%a" (print_ident info) ts.ts_name
+      | None, _ -> fprintf fmt "(%a %a)" (print_ident info) ts.ts_name
           (print_list space (print_type info)) l
      end
 
@@ -158,14 +159,14 @@ let print_type_value info fmt = function
   | Some ty -> print_type info fmt ty
 
 (** var *)
-let forget_var v = forget_id ident_printer v.vs_name
+let forget_var info v = forget_id info.info_printer v.vs_name
 
-let print_var fmt {vs_name = id} =
-  let n = id_unique ident_printer id in
+let print_var info fmt {vs_name = id} =
+  let n = id_unique info.info_printer id in
   fprintf fmt "%s" n
 
 let print_typed_var info fmt vs =
-  fprintf fmt "(%a %a)" print_var vs
+  fprintf fmt "(%a %a)" (print_var info) vs
     (print_type info) vs.vs_ty
 
 let print_var_list info fmt vsl =
@@ -306,7 +307,7 @@ let rec print_term info fmt t =
           Number.def_real_support = Number.Number_unsupported;
         } in
       Number.print number_format fmt c
-  | Tvar v -> print_var fmt v
+  | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
     (* let's check if a converter applies *)
     begin try
@@ -339,16 +340,17 @@ let rec print_term info fmt t =
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
 	    end;
-	    fprintf fmt "@[%a@]" print_ident ls.ls_name
+	    fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
           | _ ->
 	    fprintf fmt "@[(%a@ %a)@]"
-	      print_ident ls.ls_name (print_list space (print_term info)) tl
+	      (print_ident info) ls.ls_name
+              (print_list space (print_term info)) tl
         end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
-      fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
+      fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
         (print_term info) t1 (print_term info) t2;
-      forget_var v
+      forget_var info v
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
@@ -364,9 +366,9 @@ let rec print_term info fmt t =
         | _ ->
           let subject = create_vsymbol (id_fresh "subject") (t_type t) in
           fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-            print_var subject (print_term info) t
+            (print_var info) subject (print_term info) t
             (print_branches info subject print_term) bl;
-          forget_var subject
+          forget_var info subject
     end
   | Teps _ -> unsupportedTerm t
       "smtv2: you must eliminate epsilon"
@@ -384,14 +386,15 @@ and print_fmla info fmt f =
 
   let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
-      print_ident fmt id
+      print_ident info fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) f fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
-          | [] -> fprintf fmt "%a" print_ident ls.ls_name
+          | [] -> print_ident info fmt ls.ls_name
           | _ -> fprintf fmt "(%a@ %a)"
-              print_ident ls.ls_name (print_list space (print_term info)) tl
+              (print_ident info) ls.ls_name
+              (print_list space (print_term info)) tl
         end end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "forall" | Texists -> "exists" in
@@ -409,7 +412,7 @@ and print_fmla info fmt f =
           (print_var_list info) vl
           (print_fmla info) f
           (print_triggers info) tl;
-      List.iter forget_var vl
+      List.iter (forget_var info) vl
   | Tbinop (Tand, f1, f2) ->
       fprintf fmt "@[(and@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Tor, f1, f2) ->
@@ -430,9 +433,9 @@ and print_fmla info fmt f =
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
   | Tlet (t1, tb) ->
       let v, f2 = t_open_bound tb in
-      fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
+      fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
         (print_term info) t1 (print_fmla info) f2;
-      forget_var v
+      forget_var info v
   | Tcase(t, bl) ->
     let ty = t_type t in
     begin
@@ -445,9 +448,9 @@ and print_fmla info fmt f =
         | _ ->
           let subject = create_vsymbol (id_fresh "subject") (t_type t) in
           fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
-            print_var subject (print_term info) t
+            (print_var info) subject (print_term info) t
             (print_branches info subject print_fmla) bl;
-          forget_var subject
+          forget_var info subject
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
@@ -487,7 +490,7 @@ and print_branches info subject pr fmt bl = match bl with
             | {pat_node = Pvar v} -> v | _ -> error ()) args in
           if bl = [] then print_branch info subject pr fmt (cs,args,t)
           else fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
-            print_ident cs.ls_name print_var subject
+            (print_ident info) cs.ls_name (print_var info) subject
             (print_branch info subject pr) (cs,args,t)
             (print_branches info subject pr) bl
       | _ -> error ()
@@ -499,7 +502,8 @@ and print_branch info subject pr fmt (cs,vars,t) =
   let i = ref 0 in
   let pr_proj fmt v = incr i;
     if Mvs.mem v tvs then fprintf fmt "(%a (%a_proj_%d %a))"
-      print_var v print_ident cs.ls_name !i print_var subject in
+      (print_var info) v (print_ident info) cs.ls_name
+      !i (print_var info) subject in
   fprintf fmt "@[(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
 
 and print_expr info fmt =
@@ -517,12 +521,12 @@ let print_type_decl info fmt ts =
   if ts.ts_def <> None then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   fprintf fmt "(declare-sort %a %i)@\n@\n"
-    print_ident ts.ts_name (List.length ts.ts_args)
+    (print_ident info) ts.ts_name (List.length ts.ts_args)
 
 let print_param_decl info fmt ls =
   if Mid.mem ls.ls_name info.info_syn then () else
   fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
-    print_ident ls.ls_name
+    (print_ident info) ls.ls_name
     (print_list space (print_type info)) ls.ls_args
     (print_type_value info) ls.ls_value
 
@@ -531,11 +535,11 @@ let print_logic_decl info fmt (ls,def) =
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
     fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
-      print_ident ls.ls_name
+      (print_ident info) ls.ls_name
       (print_var_list info) vsl
       (print_type_value info) ls.ls_value
       (print_expr info) expr;
-    List.iter forget_var vsl
+    List.iter (forget_var info) vsl
   end
 
 let print_info_model cntexample fmt model_list info =
@@ -566,7 +570,7 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
         (print_fmla info) f
   | Pgoal ->
       fprintf fmt "@[(assert@\n";
-      fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
+      fprintf fmt "@[;; %a@]@\n" (print_ident info) pr.pr_name;
       (match pr.pr_name.id_loc with
         | None -> ()
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
@@ -590,15 +594,15 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
 
 let print_constructor_decl info fmt (ls,args) =
   match args with
-  | [] -> fprintf fmt "(%a)" print_ident ls.ls_name
+  | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name
   | _ ->
-     fprintf fmt "@[(%a@ " print_ident ls.ls_name;
+     fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
      let _ =
        List.fold_left2
          (fun i ty pr ->
           begin match pr with
-                | Some pr -> fprintf fmt "(%a" print_ident pr.ls_name
-                | None -> fprintf fmt "(%a_proj_%d" print_ident ls.ls_name i
+          | Some pr -> fprintf fmt "(%a" (print_ident info) pr.ls_name
+          | None -> fprintf fmt "(%a_proj_%d" (print_ident info) ls.ls_name i
           end;
           fprintf fmt " %a)" (print_type info) ty;
           succ i) 1 ls.ls_args args
@@ -607,7 +611,7 @@ let print_constructor_decl info fmt (ls,args) =
 
 let print_data_decl info fmt (ts,cl) =
   fprintf fmt "@[(%a@ %a)@]"
-    print_ident ts.ts_name
+    (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
 let print_decl vc_loc cntexample args info fmt d = match d.d_node with
@@ -628,42 +632,34 @@ let print_decl vc_loc cntexample args info fmt d = match d.d_node with
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc cntexample args info fmt k pr f
 
-let print_decls vc_loc cntexample args =
-  let print_decl (sm, cm, model) fmt d =
-    try
-      let vc_term_info = { vc_inside = false; vc_loc = None; vc_func_name = None } in
-      let info = {
-	info_syn = sm;
-	info_converters = cm;
-	info_model = model;
-	info_in_goal = false;
-	info_vc_term = vc_term_info} in
-      print_decl vc_loc cntexample args info fmt d; (sm, cm, info.info_model), []
-    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
-  let print_decl = Printer.sprint_decl print_decl in
-  let print_decl task acc = print_decl task.Task.task_decl acc in
-  Discriminate.on_syntax_map (fun sm ->
-  Printer.on_converter_map (fun cm ->
-      Trans.fold print_decl ((sm, cm, S.empty),[])))
-
 let set_produce_models fmt cntexample =
   if cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
 
 let print_task args ?old:_ fmt task =
-  (* In trans-based p-printing [forget_all] is a no-no *)
-  (* forget_all ident_printer; *)
-
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
-
+  let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
+  let info = {
+    info_syn = Discriminate.get_syntax_map task;
+    info_converters = Printer.get_converter_map task;
+    info_model = S.empty;
+    info_in_goal = false;
+    info_vc_term = vc_info;
+    info_printer = ident_printer () } in
   print_prelude fmt args.prelude;
   set_produce_models fmt cntexample;
   print_th_prelude task fmt args.th_prelude;
-  let rec print = function
-    | x :: r -> print r; Pp.string fmt x
-    | [] -> () in
-  print (snd (Trans.apply (print_decls vc_loc cntexample args) task));
+  let rec print_decls = function
+    | Some t ->
+        print_decls t.Task.task_prev;
+        begin match t.Task.task_decl.Theory.td_node with
+        | Theory.Decl d ->
+            begin try print_decl vc_loc cntexample args info fmt d
+            with Unsupported s -> raise (UnsupportedDecl (d,s)) end
+        | _ -> () end
+    | None -> () in
+  print_decls task;
   pp_print_flush fmt ()
 
 let () = register_printer "smtv2" print_task

@@ -2,36 +2,44 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="1" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.5" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="2" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="0"/>
 <file name="../bresenham.mlw" expanded="true">
-<theory name="M" sum="8d5a023211d939cd805712e7fb230d8c" expanded="true">
+<theory name="M" sum="3d5e82bb9f3ea61d2077393703418500" expanded="true">
  <goal name="closest" expanded="true">
- <proof prover="1" edited="bresenham_M_closest_1.v"><result status="valid" time="0.80"/></proof>
+ <proof prover="2" edited="bresenham_M_closest_1.v"><result status="valid" time="1.19"/></proof>
  </goal>
- <goal name="VC bresenham" expl="VC for bresenham" expanded="true">
+ <goal name="WP_parameter bresenham" expl="VC for bresenham" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC bresenham.1" expl="1. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="WP_parameter bresenham.1" expl="1. loop invariant init" expanded="true">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="3"/></proof>
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC bresenham.2" expl="2. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="WP_parameter bresenham.2" expl="2. loop invariant init" expanded="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC bresenham.3" expl="3. assertion">
-  <proof prover="0"><result status="valid" time="0.13" steps="42"/></proof>
+  <goal name="WP_parameter bresenham.3" expl="3. assertion" expanded="true">
+  <proof prover="4"><result status="valid" time="1.67" steps="132"/></proof>
+  <proof prover="5" timelimit="30"><result status="valid" time="1.18" steps="129"/></proof>
   </goal>
-  <goal name="VC bresenham.4" expl="4. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="WP_parameter bresenham.4" expl="4. loop invariant preservation" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC bresenham.5" expl="5. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="WP_parameter bresenham.5" expl="5. loop invariant preservation" expanded="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="VC bresenham.6" expl="6. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter bresenham.6" expl="6. loop invariant preservation" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC bresenham.7" expl="7. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  <goal name="WP_parameter bresenham.7" expl="7. loop invariant preservation" expanded="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
  </transf>
  </goal>

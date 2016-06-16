@@ -1,7 +1,7 @@
 #!/usr/bin/env ocaml
 
 (** a mini-mini-make or mini-mini-sub-make
-    just the protocole for parallelism
+    just the protocol for parallelism
 *)
 
 #load "unix.cma";;
@@ -95,7 +95,7 @@ let () =
     ignore (create_process cmd args i)
   done;
   ignore (create_process cmd args nb_run);
-  eprintf "run_wait: *** Attente des tâches non terminées....@.";
+  eprintf "run_wait: *** Attente des tâches non terminées...@.";
   let remaining_child = ref nb_run in
   while !remaining_child <> 0 do
     ignore (Unix.wait ()); decr remaining_child;

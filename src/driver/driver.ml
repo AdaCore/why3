@@ -251,10 +251,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?steplimit
+let call_on_buffer ~command ~limit
                    ?inplace ~filename ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ?steplimit ~res_parser:drv.drv_res_parser
+    ~command ~limit ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace buffer
 
 (** print'n'prove *)
@@ -327,15 +327,8 @@ let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
   print_task ?old drv fmt task
 
-let prove_task_prepared
-    ~command ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
-  let buf = Buffer.create 1024 in
-  let fmt = formatter_of_buffer buf in
-  let old_channel = Opt.map open_in old in
-  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
-  pp_print_flush fmt ();
-  Opt.iter close_in old_channel;
-  let filename = match old, inplace with
+let file_name_of_task ?old ?inplace drv task =
+  match old, inplace with
     | Some fn, Some true -> fn
     | _ ->
         let pr = Task.task_goal task in
@@ -344,17 +337,25 @@ let prove_task_prepared
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         get_filename drv fn "T" pr.pr_name.id_string
-  in
+
+let prove_task_prepared ~command ~limit ?old ?inplace drv task =
+  let buf = Buffer.create 1024 in
+  let fmt = formatter_of_buffer buf in
+  let old_channel = Opt.map open_in old in
+  let filename = file_name_of_task ?old ?inplace drv task in
+  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
+  pp_print_flush fmt ();
+  Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?steplimit
+    call_on_buffer ~command ~limit
                    ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ?(cntexample=false) ?timelimit ?memlimit ?steplimit ?old ?inplace drv task =
+let prove_task ~command ~limit ?(cntexample=false) ?old
+               ?inplace drv task =
   let task = prepare_task ~cntexample drv task in
-  prove_task_prepared ~command ?timelimit ?memlimit
-                      ?steplimit ?old ?inplace drv task
+  prove_task_prepared ~command ~limit ?old ?inplace drv task
 
 (* exception report *)
 

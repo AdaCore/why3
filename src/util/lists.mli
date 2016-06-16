@@ -39,7 +39,7 @@ val fold_product : ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
     tail-recursive *)
 
 val fold_product_l : ('a -> 'b list -> 'a) -> 'a -> 'b list list -> 'a
-(** generalisation of {! Lists.fold_product} not tail-recursive *)
+(** generalisation of {! Lists.fold_product}; not tail-recursive *)
 
 val flatten_rev : 'a list list -> 'a list
 

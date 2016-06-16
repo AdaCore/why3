@@ -43,6 +43,6 @@ let prepare_for_counterexmp env = Trans.store (prepare_for_counterexmp2 env)
 
 let () = Trans.register_env_transform "prepare_for_counterexmp"
   prepare_for_counterexmp
-  ~desc:"Transformation@ that@ prepares@ the@ task@ for@ quering@ for@ \
+  ~desc:"Transformation@ that@ prepares@ the@ task@ for@ querying@ for@ \
     the@ counter-example@ model.@ This@ transformation@ does@ so@ only@ \
     when@ the@ solver@ will@ be@ asked@ for@ the@ counter-example."

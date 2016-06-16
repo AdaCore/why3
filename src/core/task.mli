@@ -37,12 +37,12 @@ type meta_map = tdecl_set Mmeta.t   (* Meta *)
 type task = task_hd option
 
 and task_hd = private {
-  task_decl  : tdecl;        (* last declaration *)
-  task_prev  : task;         (* context *)
-  task_known : known_map;    (* known identifiers *)
-  task_clone : clone_map;    (* use/clone history *)
-  task_meta  : meta_map;     (* meta properties *)
-  task_tag   : Weakhtbl.tag; (* unique magical tag *)
+  task_decl  : tdecl;        (** last declaration *)
+  task_prev  : task;         (** context *)
+  task_known : known_map;    (** known identifiers *)
+  task_clone : clone_map;    (** use/clone history *)
+  task_meta  : meta_map;     (** meta properties *)
+  task_tag   : Weakhtbl.tag; (** unique magical tag *)
 }
 
 val task_equal : task -> task -> bool
@@ -58,7 +58,7 @@ val task_meta  : task -> meta_map
 val find_clone_tds : task -> theory -> tdecl_set
 val find_meta_tds  : task -> meta -> tdecl_set
 
-(** {2 constructors} *)
+(** {2 Constructors} *)
 
 val add_decl : task -> decl -> task
 val add_tdecl : task -> tdecl -> task
@@ -67,7 +67,7 @@ val use_export : task -> theory -> task
 val clone_export : task -> theory -> th_inst -> task
 val add_meta : task -> meta -> meta_arg list -> task
 
-(** {2 declaration constructors + add_decl} *)
+(** {2 Declaration constructors + add_decl} *)
 
 val add_ty_decl : task -> tysymbol -> task
 val add_data_decl : task -> data_decl list -> task
@@ -76,7 +76,7 @@ val add_logic_decl : task -> logic_decl list -> task
 val add_ind_decl : task -> ind_sign -> ind_decl list -> task
 val add_prop_decl : task -> prop_kind -> prsymbol -> term -> task
 
-(** {2 utilities} *)
+(** {2 Utilities} *)
 
 val split_theory : theory -> Spr.t option -> task -> task list
   (** [split_theory th s t] returns the list of proof tasks that
@@ -87,7 +87,7 @@ val split_theory : theory -> Spr.t option -> task -> task list
       Task [t] is the task prefix that can be used to add
       some metas to every generated proof task. *)
 
-(** {2 realization utilities} *)
+(** {2 Realization utilities} *)
 
 val used_theories : task -> theory Mid.t
   (** returns a map from theory names to theories themselves *)
@@ -101,7 +101,7 @@ val local_decls : task -> theory Mid.t -> decl list
       the list of declarations that are not imported
       with those theories or derived thereof *)
 
-(** {2 bottom-up, tail-recursive traversal functions} *)
+(** {2 Bottom-up, tail-recursive traversal functions} *)
 
 val task_fold : ('a -> tdecl -> 'a) -> 'a -> task -> 'a
 val task_iter : (tdecl -> unit) -> task -> unit
@@ -117,7 +117,7 @@ val task_separate_goal : task -> tdecl * task
     goal of the task [t] and [t'] is the rest.  raises [GoalNotFound]
     if task [t] has no goal *)
 
-(** {2 selectors} *)
+(** {2 Selectors} *)
 
 val on_meta : meta -> ('a -> meta_arg list -> 'a) -> 'a -> task -> 'a
 val on_cloned_theory : theory -> ('a -> symbol_map -> 'a) -> 'a -> task -> 'a
@@ -130,7 +130,7 @@ val on_tagged_ts : meta -> task -> Sts.t
 val on_tagged_ls : meta -> task -> Sls.t
 val on_tagged_pr : meta -> task -> Spr.t
 
-(* exceptions *)
+(** Exceptions *)
 
 exception NotTaggingMeta of meta
 exception NotExclusiveMeta of meta

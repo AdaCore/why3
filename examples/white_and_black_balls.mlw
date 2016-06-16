@@ -1,0 +1,48 @@
+
+(* A small puzzle from
+
+   The Correctness Problem in Computer Science
+   Robert S. Boyer, J. Strother Moore
+   Academic Prees, 1982
+
+   (suggested by Shankar at the Sixth Summer School on Formal Techniques)
+
+   Given a bag containing white and black balls, repeatedly
+   - remove a pair from the bag
+   - if they are of the same color, insert a white ball
+   - if they are of difference colors, insert a black ball
+   What is the color of the last ball?
+*)
+
+module WhiteAndBlackBalls
+
+  use import int.Int
+  use import ref.Ref
+  use import number.Parity
+
+  (* answer: the color of the last ball depends on the parity of the
+     number of black balls, which is an invariant of the process *)
+
+  let last_is_black (b0 w0: int) : bool
+    requires { b0 >= 0 && w0 >= 0 && b0 + w0 >= 1 }
+    ensures  { result <-> odd b0 }
+  =
+    let b = ref b0 in
+    let w = ref w0 in
+    while !b + !w >= 2 do
+      invariant { !b >= 0 && !w >= 0 && !b + !w >= 1 }
+      invariant { odd !b <-> odd b0 }
+      variant   { !b + !w }
+      let x, y = any (int, int) returns { x, y ->
+        0 <= x && 0 <= y && x + y = 2 && x <= !b && y <= !w } in
+      if x = 0 || y = 0 then begin (* same color -> insert a white *)
+        b := !b - x;
+        w := !w - y + 1
+      end else begin (* different color -> insert a black *)
+        b := !b - x + 1;
+        w := !w - y
+      end
+    done;
+    !b > 0
+
+end

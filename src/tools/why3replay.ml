@@ -246,19 +246,23 @@ let print_statistics files =
   List.iter print_file (List.rev files)
 
 
-let print_report (g,p,(t,m,s),r) =
+let print_report (g,p,l,r) =
   printf "   goal '%s', prover '%a': " g.Ident.id_string Whyconf.print_prover p;
   match r with
   | M.Result(new_res,old_res) ->
     (* begin match !opt_smoke with *)
     (*   | Session.SD_None -> *)
         printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
-          print_result new_res print_result old_res t m s
+          print_result new_res print_result old_res
+          l.Call_provers.limit_time
+          l.Call_provers.limit_mem
+          l.Call_provers.limit_steps
     (*   | _ -> *)
     (*     printf "Smoke detected!!!@." *)
     (* end *)
   | M.No_former_result new_res ->
-      printf "no former result available, new result is: %a@." print_result new_res
+      printf "no former result available, new result is: %a@."
+        print_result new_res
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
   | M.Edited_file_absent f ->
@@ -288,7 +292,7 @@ let add_to_check_no_smoke config some_merge_miss found_obs env_session sched =
     let report =
       List.filter
         (function
-          | (_,_,_,M.Result(new_res,old_res)) ->
+          | (__,_,_,M.Result(new_res,old_res)) ->
             not (same_result new_res old_res)
           | _ -> true)
         report
@@ -397,7 +401,8 @@ let run_as_bench env_session =
     eprintf " done.@.";
     exit 0
   in
-  M.play_all env_session sched ~callback ~timelimit:2 ~steplimit:(-1) ~memlimit:0 provers;
+  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 2} in
+  M.play_all env_session sched ~callback ~limit provers;
   main_loop ();
   eprintf "main replayer (in bench mode) exited unexpectedly@.";
   exit 1

@@ -71,17 +71,17 @@ end
 theory Elements
 
   use import List
-  use Mem
-  use set.Fset as FSet
+  use import Mem
+  use set.Fset as S
 
-  function elements (list 'a) : FSet.set 'a
+  function elements (l: list 'a) : S.set 'a =
+    match l with
+    | Nil -> S.empty
+    | Cons x r -> S.add x (elements r)
+    end
 
-  axiom elements_mem:
-    forall l:list 'a, x:'a.
-      Mem.mem x l <-> FSet.mem x (elements l)
-
-  lemma elements_Nil:
-    elements (Nil : list 'a) = FSet.empty
+  lemma elements_mem:
+    forall x: 'a, l: list 'a. mem x l <-> S.mem x (elements l)
 
 end
 

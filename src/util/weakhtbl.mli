@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Hashtable with weak key used for memoization *)
+(** Hashtables with weak key used for memoization *)
 
 type tag
 

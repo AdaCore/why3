@@ -26,7 +26,7 @@ theory Seq
 
   (** empty sequence *)
 
-  constant empty : seq 'a
+  val constant empty : seq 'a
 
   axiom empty_length:
     length (empty: seq 'a) = 0
@@ -73,7 +73,7 @@ theory Seq
 
   (** insertion of elements on both sides *)
 
-  function cons 'a (seq 'a) : seq 'a
+  val function cons 'a (seq 'a) : seq 'a
 
   axiom cons_length:
     forall x: 'a, s: seq 'a. length (cons x s) = 1 + length s
@@ -407,8 +407,6 @@ theory Permut
 end
 
 (* TODO / TO DISCUSS
-
-  - reverse
 
   - what about s[i..j] when i..j is not a valid range?
     left undefined? empty sequence?

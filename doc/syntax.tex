@@ -322,6 +322,9 @@ problem''.%
 \footnote{This \why example was contributed by St\'ephane Lescuyer.}
 %END LATEX
 %HEVEA {} (This \why example was contributed by St\'ephane Lescuyer.)
+The code given below is available in the source distribution in
+directory \verb|examples/logic/einstein.why|.
+
 The problem is stated as follows. Five persons, of five
 different nationalities, live in five houses in a row, all
 painted with different colors.
@@ -371,10 +374,10 @@ theory Bijection
   type u
 
   function of t : u
-  function to u : t
+  function to_ u : t
 
-  axiom To_of : forall x : t. to (of x) = x
-  axiom Of_to : forall y : u. of (to y) = y
+  axiom To_of : forall x : t. to_ (of x) = x
+  axiom Of_to : forall y : u. of (to_ y) = y
 end
 \end{whycode}
 
@@ -399,7 +402,7 @@ by cloning the \texttt{Bijection} theory appropriately.
   clone Bijection as Color with type t = house, type u = color
 \end{whycode}
 It introduces two functions, namely \texttt{Color.of} and
-\texttt{Color.to}, from houses to colors and colors to houses,
+\texttt{Color.to\_}, from houses to colors and colors to houses,
 respectively, and the two axioms relating them.
 Similarly, we express that each house is associated bijectively to a
 person
@@ -442,11 +445,11 @@ theory \texttt{Einstein}.
 theory EinsteinHints "Hints"
   use import Einstein
 \end{whycode}
-Then each hypothesis is stated in terms of \texttt{to} and \texttt{of}
+Then each hypothesis is stated in terms of \texttt{to\_} and \texttt{of}
 functions. For instance, the hypothesis ``The Englishman lives in a
 red house'' is declared as the following axiom.
 \begin{whycode}
-  axiom Hint1: Color.of (Owner.to Englishman) = Red
+  axiom Hint1: Color.of (Owner.to_ Englishman) = Red
 \end{whycode}
 And so on for all other hypotheses, up to
 ``The man who smokes Blends has a neighbour who drinks water'', which completes
@@ -454,7 +457,7 @@ this theory.
 \begin{whycode}
   ...
   axiom Hint15:
-    neighbour (Owner.to (Cigar.to Blend)) (Owner.to (Drink.to Water))
+    neighbour (Owner.to_ (Cigar.to_ Blend)) (Owner.to_ (Drink.to_ Water))
 end
 \end{whycode}
 Finally, we declare the goal in the fourth theory:
@@ -463,7 +466,7 @@ theory Problem "Goal of Einstein's problem"
   use import Einstein
   use import EinsteinHints
 
-  goal G: Pet.to Fish = German
+  goal G: Pet.to_ Fish = German
 end
 \end{whycode}
 and we are ready to use \why to discharge this goal with any prover

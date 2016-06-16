@@ -95,6 +95,16 @@ module Set
 
 end
 
+(* Some usual big operators on sets. *)
+module SetBigOps
+
+  use import Set
+
+  function bigunion (c:set (set 'a)) : set 'a = \x. exists s. c s /\ s x
+  function biginter (c:set (set 'a)) : set 'a = \x. forall s. c s -> s x
+
+end
+
 (* Basic definition on relations-as-arrows *)
 module Rel
 

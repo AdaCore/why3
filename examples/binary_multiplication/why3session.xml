@@ -2,48 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="11" steplimit="0" memlimit="1000"/>
 <file name="../binary_multiplication.mlw" expanded="true">
-<theory name="BinaryMultiplication" sum="782bbe968e92df7214b9a29b499aca45" expanded="true">
- <goal name="VC binary_mult" expl="VC for binary_mult" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC binary_mult.1" expl="1. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
-  </goal>
-  <goal name="VC binary_mult.2" expl="2. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
-  </goal>
-  <goal name="VC binary_mult.3" expl="3. precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
-  </goal>
-  <goal name="VC binary_mult.4" expl="4. precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="VC binary_mult.5" expl="5. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="VC binary_mult.6" expl="6. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.07" steps="16"/></proof>
-  </goal>
-  <goal name="VC binary_mult.7" expl="7. loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="VC binary_mult.8" expl="8. precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
-  </goal>
-  <goal name="VC binary_mult.9" expl="9. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="VC binary_mult.10" expl="10. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="VC binary_mult.11" expl="11. loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="VC binary_mult.12" expl="12. postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
-  </goal>
- </transf>
+<theory name="BinaryMultiplication" sum="94846d4b1de94154d88628a5fe380629" expanded="true">
+ <goal name="WP_parameter binary_mult" expl="VC for binary_mult" expanded="true">
+ <proof prover="0"><result status="valid" time="0.74" steps="47"/></proof>
  </goal>
 </theory>
 </file>
