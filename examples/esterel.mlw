@@ -33,7 +33,7 @@ module Esterel
     ghost mdl: set int; (* its interpretation as a set *)
   }
   invariant {
-    forall i: int. (0 <= i < size /\ nth self.bv i) <-> mem i self.mdl
+    forall i: int. (0 <= i < size /\ nth bv i) <-> mem i mdl
   }
 
 

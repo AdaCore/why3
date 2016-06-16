@@ -42,7 +42,7 @@ module Memory
   (** Memory blocks have two parts: a marking part containing in particular
       Schorr-Waite internal management data, and a sequence of pointers
       to other memory blocks. *)
-  type memory model {
+  type memory = abstract {
     (** Associate block size to location. *)
     block_size : map loc int;
     (** Pointers to other memory blocks. *)

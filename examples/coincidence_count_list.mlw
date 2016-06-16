@@ -54,7 +54,13 @@ module CoincidenceCountAnyType
   use list.Mem as L
   use import int.Int
 
-  clone import relations.TotalStrictOrder
+  type t
+
+  val predicate eq (x y : t)
+    ensures { result <-> x = y }
+  val predicate rel (x y : t)
+
+  clone import relations.TotalStrictOrder with type t, predicate rel
 
   clone export list.Sorted
      with type t = t, predicate le = rel, goal Transitive.Trans
@@ -67,7 +73,7 @@ module CoincidenceCountAnyType
   =
     match a, b with
     | Cons ha ta, Cons hb tb ->
-       if ha = hb then
+       if eq ha hb then
          add ha (coincidence_count ta tb)
        else if rel ha hb then
          coincidence_count ta b
