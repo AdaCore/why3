@@ -1,71 +1,4 @@
 
-module SubgameCommon
-
-  use import game.Game
-  use import ho_set.Set
-
-  (* Notion of game inclusion: the larger game simulate the smaller one,
-     using the same ordering support. *)
-  predicate subgame (g1 g2:game 'a) =
-    simulate g1 (=) g2 /\ g1.progress = g2.progress
-
-  (* Trivial game inclusion: the smaller game transitions are included
-     in the larger one. *)
-  predicate trivial_subgame (g1 g2:game 'a) =
-    g1.progress = g2.progress /\
-    forall x. subset (g1.transition x) (g2.transition x)
-
-end
-
-module Subgame "W:non_conservative_extension:N" (* => SubgameProof *)
-
-  use import game.Game
-  use export SubgameCommon
-
-  axiom trivial_subgame_indeed : forall g1 g2:game 'a.
-    game_wf g1 /\ game_wf g2 /\ trivial_subgame g1 g2 -> subgame g1 g2
-
-end
-
-module SubgameProof
-
-  use import game.Game
-  use import SubgameCommon
-  use import ho_set.Set
-  use import ho_rel.RelSet
-  use import ho_rel.Prod
-  use import game.StratProps
-  use import order.LimUniq
-  use import order.Product
-  use import order.Chain
-  use import fn.Fun
-  use import fn.Image
-
-  lemma rel_map_equal : forall s:set 'a.
-    related (=) s = s by sext (related (=) s) s
-
-  lemma ax : forall g1 g2:game 'a.
-    game_wf g1 /\ game_wf g2 /\ trivial_subgame g1 g2 ->
-    subgame g1 g2 by step_simulate g1 (=) g2
-    by let o1 = g1.progress in let o2 = g2.progress in
-      (chain_compatible o1 (=) o2
-      by forall ch inh s1 s2.
-        chain (rprod o1 o2) ch /\ ch inh /\ (forall a b. ch (a,b) -> a = b)
-        /\ supremum (rprod o1 o2) ch (s1,s2) -> s1 = s2
-        by supremum o1 (image fst ch) s1
-        so supremum o2 (image snd ch) s2
-        so sext (image fst ch) (image snd ch)
-        by forall x. (image fst ch x <-> image snd ch x)
-        by (image fst ch x <-> ch (x,x)) /\ (image snd ch x <-> ch (x,x))
-      )
-    /\ (forall x s. g1.transition x s ->
-        have_winning_strat g2 x (related (=) s)
-        by g2.transition x s)
-
-  clone Subgame with goal trivial_subgame_indeed
-
-end
-
 module Fmla
 
   use import order.Chain
@@ -75,7 +8,6 @@ module Fmla
   use import fn.Fun
   use import fn.Image
   use import game.Game
-  use import Subgame
 
   (* Game formulae: predicates over games. *)
   type fmla 'a = game 'a -> bool
@@ -158,7 +90,7 @@ module FmlaRules "W:non_conservative_extension:N" (* => FmlaRulesProof *)
   use import fn.Image
   use import order.Chain
   use import game.Game
-  use export Fmla
+  use import Fmla
 
   (* Formula builders indeed build formulas *)
   axiom enforce_fmla : forall p q:set 'a. is_fmla (enforce p q)
@@ -242,11 +174,10 @@ module FmlaRulesProof
   use import game.StratProps
   use import transfinite.Iterates
   use import transfinite.ChainExtension
-  use import Subgame
   use import Fmla
 
-  lemma rel_map_equal : forall s:set 'a.
-    related (=) s = s by sext (related (=) s) s
+  (*lemma rel_map_equal : forall s:set 'a.
+    related (=) s = s by sext (related (=) s) s*)
 
   (* prepare for enforce_monotonic: postcondition side. *)
   lemma pre_monotonic : forall g x,q1 q2:set 'a.
@@ -333,17 +264,24 @@ module FmlaRulesProof
 
   (* Transfinite loop rule, version 1.
      (it is weak in the sense that it imposes
-      few properties on the I-chain and requires a very strong property,
-      namely the supremum to satisfy the invariant)
+      few properties on the I-chain and requires very strong properties,
+      namely that the second supremum always exists and
+      satisfy the invariant when the first one do exists)
      Under the hood, the transfinite loop rule is an immediate application
      of the simulation theorem based on fully demonic games.
      Consider the fully demonic game of I-state with progression relation
      being the product order. Then, we requires exactly the hypothesis
      needed to have a simulation from this game to the current game. *)
 
+  predicate chain_compatible (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b) =
+    forall ch inh s2.
+      chain (rprod o1 o2) ch /\ ch inh /\ (forall a b. ch (a,b) -> r a b) /\
+        supremum o2 (image snd ch) s2 ->
+        exists s1. supremum o1 (image fst ch) s1 /\ r s1 s2
+
   lemma crude_trampoline : forall c go,i:rel 'b 'a,o:erel 'b.
     holds c (universal (u_enforce i (later o i))) /\
-    holds c (ordering go) /\ order o /\ chain_complete o /\
+    holds c (ordering go) /\ order o /\
     chain_compatible o i go ->
     holds c (universal (u_enforce i (const none)))
     by forall g. game_wf g /\ c g -> forall x.
@@ -351,6 +289,7 @@ module FmlaRulesProof
     by forall y. i x y -> have_winning_strat g y none
     by let op = rprod o go in
       order op
+    so g.progress = go
     so let nx = \x y. let (a,b) = x in let (c,d) = y in
         go b d /\ a <> c /\ o a c /\ i c d in
       let tr = \x. (=) (nx x) in
@@ -375,27 +314,29 @@ module FmlaRulesProof
           by forall z. later o i xx z /\ go y z ->
             related r s z by exists xz. i xz z /\ o xx xz /\ xx <> xz
             so s (xz,z) /\ r (xz,z) z)
-        /\ ("stop_split" chain_compatible op r go
-          by forall chp inhp xp yp. chain (rprod op go) chp /\ chp inhp /\
+        /\ ("stop_split" limit_compatible op r g
+          by forall chp inhp s2. chain (rprod op go) chp /\ chp inhp /\
             (forall x y. chp (x,y) -> r x y) /\
-            supremum (rprod op go) chp (xp,yp) ->
+            supremum go (image snd chp) s2 ->
             let ch = image fst chp in
-            let (inh,_) = inhp in
-            ch inh
-            so supremum op ch xp
+            (exists s1. supremum op ch s1 /\ r s1 s2)
+            by let (inh,_) = inhp in
+              ch inh
+            so chain op ch
             so (forall x y. ch (x,y) -> i x y
               by exists z. chp z /\ fst z = (x,y))
-            so let (a,b) = xp in let (u,_) = inhp in ch u so i a b
-            so b = yp
-              by let ch1 = image snd ch in let ch2 = image snd chp in
-                supremum go ch1 b /\ supremum go (image snd chp) yp
-              so sext ch1 ch2
-              by (forall x. ch1 x -> ch2 x by exists y. ch y /\ snd y = x
-                so exists z. chp z /\ fst z = y so
-                let ((_,b),_) = z in ch2 (snd z) so snd z = b)
-              /\ (forall x. ch2 x -> ch1 x by exists y. chp y /\ snd y = x
-                so ch (fst y) so ch1 (snd (fst y)) so
-                let ((_,_),c) = y in snd (fst y) = c)
+            so (sext (image snd ch) (image snd chp)
+              by (forall x. image snd ch x -> image snd chp x
+                by exists u. ch u /\ snd u = x
+                so exists v. chp v /\ fst v = u
+                so let ((_,_),a) = v in x = a)
+              /\ (forall x. image snd chp x -> image snd ch x
+                by exists u. chp u /\ snd u = x
+                so let ((a,b),_) = u in ch (a,b) so b = x
+              ))
+            so supremum go (image snd ch) s2
+            so exists s1. supremum o (image fst ch) s1 /\ i s1 s2
+            so supremum op ch (s1,s2) /\ r (s1,s2) s2
         ))
       so (related r strt y)
       so (sext (related r none) none)
@@ -500,36 +441,37 @@ module FmlaRulesProof
                 so not (ch1 xn so maximum o ch1 xn))
         ) || sext (i_ch ch) none)
       (* Chain compatibility. *)
-      so ("stop_split"
-        forall chh inhh chs y. chain op chh /\ supremum op chh (chs,y)
-        /\ chh inhh /\ (forall x y. chh (x,y) -> i_ch x y) ->
-        i_ch chs y
-        by let ch1 = image fst chh in let ch2 = image snd chh in
-          supremum o_ch ch1 chs /\ chain o_ch ch1 /\
-          supremum go ch2 y /\ chain go ch2
-        so chs = bigunion ch1
-        so (chain ip chs by forall x. ch1 x -> chain ip x)
-        so let (ch0,_) = inhh in
-          (exists u. chs u by exists v. ch0 v /\ u = v so ch1 ch0)
-        so (let ch3 = image snd chs in
-          supremum go ch3 y
-          by ("stop_split" forall u. ch3 u -> go u y
-            by exists v. chs v /\ snd v = u
-            so exists s0. ch1 s0 /\ s0 v
-            so exists w. chh w /\ fst w = s0
-            so let (_,a) = w in (go a y by op w (chs,y))
-            so supremum go (image snd s0) a /\ image snd s0 u)
-          /\ "stop_split" forall u. upper_bound go ch3 u -> go y u
-            by forall a. ch2 a -> go a u
-            by exists b. chh b /\ snd b = a
-            so let (b,_) = b in
-              supremum go (image snd b) a
-            so upper_bound go (image snd b) u
-            by forall u0. image snd b u0 -> go u0 u
-            by exists v0. b v0 /\ snd v0 = u0
-            so ch3 u0 by ch1 b)
-        so (forall y z. chs (y,z) -> i y z
-          by exists ch. ch1 ch /\ ch (y,z) so exists a. chh a /\ fst a = ch)
+      so ("stop_split" chain_compatible o_ch i_ch go
+        by forall chh inhh y.
+          let ch1 = image fst chh in let ch2 = image snd chh in
+          chain op chh /\ chh inhh /\
+          (forall x y. chh (x,y) -> i_ch x y) /\
+          supremum go ch2 y ->
+          exists chs. supremum o_ch ch1 chs /\ i_ch chs y
+          by chs = bigunion ch1
+          so (chain ip chs by forall x. ch1 x -> chain ip x)
+          so let (ch0,_) = inhh in
+            (exists u. chs u by exists v. ch0 v /\ u = v so ch1 ch0)
+          so supremum o_ch ch1 chs
+          so (forall y z. chs (y,z) -> i y z
+            by exists ch. ch1 ch /\ ch (y,z) so exists a. chh a /\ fst a = ch)
+          so (let ch3 = image snd chs in
+            supremum go ch3 y
+            by ("stop_split" forall u. ch3 u -> go u y
+              by exists v. chs v /\ snd v = u
+              so exists s0. ch1 s0 /\ s0 v
+              so exists w. chh w /\ fst w = s0
+              so let (_,a) = w in (go a y by ch2 a)
+              so supremum go (image snd s0) a /\ image snd s0 u)
+            /\ "stop_split" forall u. upper_bound go ch3 u -> go y u
+              by forall a. ch2 a -> go a u
+              by exists b. chh b /\ snd b = a
+              so let (b,_) = b in
+                supremum go (image snd b) a
+              so upper_bound go (image snd b) u
+              by forall u0. image snd b u0 -> go u0 u
+              by exists v0. b v0 /\ snd v0 = u0
+              so ch3 u0 by ch1 b)
       )
       so holds c (universal (u_enforce i_ch (const none)))
       so forall y. i x y -> have_winning_strat g y none
@@ -1384,14 +1326,7 @@ module FmlaRulesProof
         )
         (* Complete sp with x as to have a maximum in history. *)
         so let csp = add sp x in
-          ("stop_split" dmn_reach mg fr0.angl fr0.strt csp
-            by if sp x then sext csp sp else
-              exists dmn. let st = step mg fr0.angl dmn in
-                reach_ch go st ((=) fr0.strt) csp
-              by reach_ch go st ((=) fr0.strt) sp
-              so (st sp = x by sup go sp = x)
-              so extends_ch go st sp = csp
-          )
+          dmn_reach mg fr0.angl fr0.strt csp
         so maximum go csp x
         (* Prove that the obtained limit historic does satisfy
            the postcondition-maximum criterion for frame validity. *)
@@ -1885,7 +1820,9 @@ module FmlaRulesProof
             by (* Prove that we are above. *)
               "stop_split" upper_bound o chc x /\ not chc x
             by maximum o chc x0
-            by maximum ip chi (x0,y)
+            by chi (x0,y)
+            so (maximum ip chi (x0,y) by upper_bound ip chi (x0,y))
+            so chc x0
             so (forall x. chc x -> o x x0
               by exists p. chi p /\ fst p = x
               so let (_,b) = p in ip (x,b) (x0,y))

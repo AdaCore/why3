@@ -1,0 +1,84 @@
+
+(* TODO: complete. *)
+
+module Base
+
+  meta compute_max_steps 0x1_000_000
+
+  function f (x:('a,'b)) : 'a = let (x,_) = x in x
+  meta rewrite_def function f
+  function s (x:('a,'b)) : 'b = let (_,x) = x in x
+  meta rewrite_def function s
+
+end
+
+(* Decomposition of quantification statements by destructuring
+   the argument structure. This is intended to be used by compute alone,
+   so the definitions/lemmas are kept away from the provers sight. *)
+module Quant "W:non_conservative_extension:N"
+
+  use import HighOrd
+
+  type structure
+  predicate quant_structure bool structure (p:'a -> bool)
+  val ghost quant_structure_def (_:'a -> bool) : unit
+    ensures { forall b s,p:'a -> bool.
+      quant_structure b s p <-> if b then forall y. p y else exists y. p y }
+
+  constant def : structure
+  axiom forall_default : forall p:'a -> bool.
+    quant_structure true def p <-> forall y. p y
+  axiom exists_default : forall p:'a -> bool.
+    quant_structure false def p <-> exists y. p y
+  meta rewrite prop forall_default
+  meta rewrite prop exists_default
+  meta remove_prop prop forall_default
+  meta remove_prop prop exists_default
+
+  function pair structure structure : structure
+  axiom quant_structure_pair : forall b s1 s2,p:('a,'b) -> bool.
+    quant_structure b (pair s1 s2) p <->
+      quant_structure b s1 (\x. quant_structure b s2 (\y. p (x,y)))
+  meta rewrite prop quant_structure_pair
+  meta remove_prop prop quant_structure_pair
+
+  function cond structure structure : structure
+  axiom forall_cond : forall s1 s2,p:('a,bool) -> bool.
+    quant_structure true (cond s1 s2) p <->
+      quant_structure true s1 (\x. p (x,true)) /\
+      quant_structure true s2 (\x. p (x,false))
+  axiom exists_cond : forall s1 s2,p:('a,bool) -> bool.
+    quant_structure false (cond s1 s2) p <->
+      quant_structure false s1 (\x. p (x,true)) \/
+      quant_structure false s2 (\x. p (x,false))
+  meta rewrite prop forall_cond
+  meta rewrite prop exists_cond
+  meta remove_prop prop forall_cond
+  meta remove_prop prop exists_cond
+
+end
+
+module QuantImpl
+
+  use import HighOrd
+
+  type structure = int
+  constant def : int = 0
+  function pair 'a 'b : int = 0
+  predicate quant_structure (b:bool) 'b (p:'a -> bool) =
+    if b then forall x. p x else exists x. p x
+  let ghost quant_structure_def (_:'b) = ()
+
+  clone Quant with type structure = structure,
+    predicate quant_structure = quant_structure,
+    val quant_structure_def = quant_structure_def,
+    function def = def,
+    goal forall_default,
+    goal exists_default,
+    function pair = pair,
+    goal quant_structure_pair,
+    function cond = pair,
+    goal forall_cond,
+    goal exists_cond
+
+end
