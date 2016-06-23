@@ -26,6 +26,10 @@ module FlexibleArray
   use import int.ComputerDivision
   use import bintree.Tree
   use export bintree.Size
+  use import ref.Ref
+  use import seq.Seq as S
+  use import queue.Queue as Q
+  use import list.Mem
 
   (* to be a Braun tree *)
   predicate inv (t: tree 'a) = match t with
@@ -174,5 +178,42 @@ module FlexibleArray
     ensures  { forall j. 0 <= j < result.length -> get result j = get t j }
   =
     { length = t.length - 1; tree = hr_aux t.length t.tree }
+
+  (* val ghost visited: seq 'a *)
+
+  (* function elements (a: t 'a) (i: int) (acc: seq 'a): seq 'a = *)
+
+  val neq (t1 t2: tree 'a) : bool
+    ensures { result <-> t1 <> t2 }
+
+  let iter (a: t 'a) : unit
+    diverges
+  =
+    let ghost visited = ref S.empty in
+    let ghost copy_tree = a in
+    let f x = visited := S.snoc !visited x in
+    let q = Q.create () in
+    let left = Q.create () in
+    let right = Q.create () in
+    if neq a.tree Empty then Q.push a.tree q;
+    while not (Q.is_empty q) do
+      (* variant   { Q.length q, Q.length right } *)
+      invariant { not (mem Empty q.elts) }
+      invariant { not (mem Empty left.elts) }
+      invariant { not (mem Empty right.elts) }
+      let x = Q.safe_pop q in
+      match x with
+        | Empty -> absurd
+        | Node l y r ->
+          f y;
+          ghost visited := snoc !visited y;
+          if neq l Empty then Q.push l left;
+          if neq r Empty then Q.push r right;
+      end;
+      if Q.is_empty q then begin
+        Q.transfer right left;
+        Q.transfer left q;
+      end
+    done
 
 end
