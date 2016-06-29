@@ -7,7 +7,7 @@ let apply_append fn acc l =
 let rec split acc f =
   match f.t_node with
   | Ttrue ->
-      acc
+      f :: acc
   | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
       f :: acc
   | Tbinop (Tand, f1, f2) ->
@@ -16,8 +16,8 @@ let rec split acc f =
       let fn f2 = t_label_copy f (t_implies f1 f2) in
       apply_append fn acc (split [] f2)
   | Tbinop (Tiff,f1,f2) ->
-      let f12 = t_label_copy f (t_implies f1 f2) in
-      let f21 = t_label_copy f (t_implies f2 f1) in
+      let f12 = t_label_copy f (t_implies f1 (t_label_copy f f2)) in
+      let f21 = t_label_copy f (t_implies f2 (t_label_copy f f1)) in
       split (split acc f21) f12
   | Tif (fif,fthen,felse) ->
       let fit = t_label_copy f (t_implies fif fthen) in
