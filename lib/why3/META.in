@@ -2,7 +2,7 @@ description = "Why3 library"
 version = "@VERSION@"
 archive(byte) = "why3.cma"
 archive(native) = "why3.cmxa"
-requires = "str unix num dynlink @ZIPLIB@"
+requires = "str unix num dynlink @ZIPLIB@ @MENHIRLIB@"
 
 package "extract" (
   description = "Why3 support library for extracted code"
