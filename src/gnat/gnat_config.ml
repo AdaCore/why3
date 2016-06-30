@@ -476,7 +476,7 @@ type steps_convert = { add : int; mult : int }
 
 let convert_data =
   let h = Hashtbl.create 17 in
-  Hashtbl.add h "CVC4" { add = 50000; mult = 250 };
+  Hashtbl.add h "CVC4" { add = 10000; mult = 25 };
   Hashtbl.add h "Z3" { add = 450000; mult = 800 };
   h
 
