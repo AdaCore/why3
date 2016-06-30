@@ -3,210 +3,435 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../game_wp.mlw" expanded="true">
 <theory name="WpCommon" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Wp" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Wp" sum="c9a1173826760205deb0e96f229405f7" expanded="true">
+ <goal name="WP_parameter test" expl="VC for test" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter test.1" expl="1. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter test.2" expl="2. to be computed precondition" expanded="true">
+  <proof prover="0"><result status="unknown" time="0.04"/></proof>
+  <transf name="compute_specified" expanded="true">
+   <goal name="WP_parameter test.2.1" expl="1. to be computed precondition" expanded="true">
+   <transf name="introduce_premises" expanded="true">
+    <goal name="WP_parameter test.2.1.1" expl="1. to be computed precondition" expanded="true">
+    <transf name="compute_specified" expanded="true">
+     <goal name="WP_parameter test.2.1.1.1" expl="1. to be computed precondition" expanded="true">
+     <transf name="split_goal_wp" expanded="true">
+      <goal name="WP_parameter test.2.1.1.1.1" expl="1. to be computed precondition">
+      </goal>
+      <goal name="WP_parameter test.2.1.1.1.2" expl="2. to be computed precondition">
+      </goal>
+      <goal name="WP_parameter test.2.1.1.1.3" expl="3. to be computed precondition">
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter test.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter test.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter test.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
 </theory>
-<theory name="WpImpl" sum="743f1ba4014355b9d383132e225bd1dd" expanded="true">
+<theory name="WpImpl" sum="1b7c52a519b2b155d42c8492588af55a" expanded="true">
+ <goal name="ctx_hyp_add_fmla">
+ <proof prover="0"><result status="valid" time="0.40" steps="740"/></proof>
+ </goal>
+ <goal name="enf_transf_identical">
+ <transf name="split_goal_wp">
+  <goal name="enf_transf_identical.1" expl="1.">
+  <proof prover="1"><result status="valid" time="1.48"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.2" expl="2.">
+  <proof prover="1"><result status="valid" time="1.87"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.13" steps="26"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.10" steps="47"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.31" steps="274"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.21" steps="173"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.7" expl="7.">
+  <proof prover="0"><result status="valid" time="0.18" steps="227"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.8" expl="8.">
+  <proof prover="0"><result status="valid" time="0.14" steps="288"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.9" expl="9.">
+  <proof prover="0"><result status="valid" time="0.06" steps="33"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.10" expl="10.">
+  <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.11" expl="11.">
+  <proof prover="0"><result status="valid" time="0.09" steps="30"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.12" expl="12.">
+  <proof prover="1"><result status="valid" time="1.47"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.13" expl="13.">
+  <proof prover="0"><result status="valid" time="0.24" steps="252"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.14" expl="14.">
+  <proof prover="0"><result status="valid" time="0.13" steps="181"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.15" expl="15.">
+  <proof prover="0"><result status="valid" time="0.19" steps="296"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.16" expl="16.">
+  <proof prover="0"><result status="valid" time="0.11" steps="30"/></proof>
+  </goal>
+  <goal name="enf_transf_identical.17" expl="17.">
+  <proof prover="0"><result status="valid" time="0.12" steps="30"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="weaker_hypothesis_correct">
+ <transf name="split_goal_wp">
+  <goal name="weaker_hypothesis_correct.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.11" steps="25"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.14" steps="96"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.12" steps="27"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.12" steps="31"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.19" steps="249"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.7" expl="7.">
+  <proof prover="0"><result status="valid" time="0.14" steps="65"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_correct.8" expl="8.">
+  <proof prover="0"><result status="valid" time="0.16" steps="159"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter sub_context_correct" expl="VC for sub_context_correct">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter sub_context_correct.1" expl="1. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_correct.2" expl="2. unreachable point">
+  <proof prover="0"><result status="valid" time="0.08" steps="3"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_correct.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.20" steps="64"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_correct.4" expl="4. assertion">
+  <proof prover="0"><result status="valid" time="0.08" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_correct.5" expl="5. variant decrease">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_correct.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_correct.7" expl="7. postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="119"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter sub_context_refl" expl="VC for sub_context_refl">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter sub_context_refl.1" expl="1. postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="2"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_refl.2" expl="2. variant decrease">
+  <proof prover="0"><result status="valid" time="0.10" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter sub_context_refl.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="weaker_hypothesis_sufficient">
+ <transf name="split_goal_wp">
+  <goal name="weaker_hypothesis_sufficient.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.81"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_sufficient.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_sufficient.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_sufficient.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.11" steps="95"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_sufficient.5" expl="5.">
+  <proof prover="1"><result status="valid" time="0.74"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_sufficient.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.07" steps="39"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="enforce_inv_reinforced">
  <transf name="split_goal_wp">
   <goal name="enforce_inv_reinforced.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.11" steps="29"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
   <goal name="enforce_inv_reinforced.2" expl="2.">
   <transf name="split_goal_wp">
    <goal name="enforce_inv_reinforced.2.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.40" steps="326"/></proof>
+   <proof prover="0"><result status="valid" time="0.28" steps="304"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.2.2" expl="2.">
-   <proof prover="0"><result status="valid" time="0.16" steps="42"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="37"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.2.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.15" steps="29"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="28"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.2.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.15" steps="33"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="32"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.2.5" expl="5.">
-   <proof prover="0"><result status="valid" time="0.15" steps="33"/></proof>
+   <proof prover="0"><result status="valid" time="0.12" steps="32"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.2.6" expl="6.">
-   <proof prover="0"><result status="valid" time="0.11" steps="31"/></proof>
+   <proof prover="0"><result status="valid" time="0.12" steps="30"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.2.7" expl="7.">
-   <proof prover="0"><result status="valid" time="0.10" steps="59"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="55"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="enforce_inv_reinforced.3" expl="3.">
   <transf name="split_goal_wp">
    <goal name="enforce_inv_reinforced.3.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.08" steps="14"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.3.2" expl="2.">
-   <proof prover="0"><result status="valid" time="0.11" steps="23"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="22"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.3.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.54" steps="390"/></proof>
+   <proof prover="0"><result status="valid" time="0.34" steps="356"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.3.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.14" steps="49"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="44"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="enforce_inv_reinforced.4" expl="4.">
   <transf name="split_goal_wp">
    <goal name="enforce_inv_reinforced.4.1" expl="1.">
-   <proof prover="0" timelimit="30"><result status="valid" time="1.81" steps="1123"/></proof>
+   <proof prover="0"><result status="valid" time="2.03" steps="1212"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.4.2" expl="2.">
-   <proof prover="0" timelimit="30"><result status="valid" time="3.28" steps="1680"/></proof>
+   <proof prover="0"><result status="valid" time="3.03" steps="1636"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.4.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.11" steps="11"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="10"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.4.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.16" steps="29"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="28"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="enforce_inv_reinforced.5" expl="5.">
-  <proof prover="0"><result status="valid" time="0.08" steps="22"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="13"/></proof>
   </goal>
   <goal name="enforce_inv_reinforced.6" expl="6.">
-  <proof prover="0"><result status="valid" time="0.07" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
   </goal>
   <goal name="enforce_inv_reinforced.7" expl="7.">
   <transf name="split_goal_wp">
    <goal name="enforce_inv_reinforced.7.1" expl="1.">
-   <proof prover="0"><result status="valid" time="1.26" steps="1307"/></proof>
+   <proof prover="0"><result status="valid" time="1.52" steps="1397"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.7.2" expl="2.">
-   <proof prover="0"><result status="valid" time="0.14" steps="17"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="16"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.7.3" expl="3.">
-   <proof prover="0"><result status="valid" time="1.03" steps="733"/></proof>
+   <proof prover="0"><result status="valid" time="0.93" steps="741"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.7.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.15" steps="38"/></proof>
+   <proof prover="0"><result status="valid" time="0.15" steps="37"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.7.5" expl="5.">
-   <proof prover="0"><result status="valid" time="0.09" steps="30"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="29"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.7.6" expl="6.">
-   <proof prover="0"><result status="valid" time="4.28" steps="2037"/></proof>
+   <proof prover="0"><result status="valid" time="4.63" steps="2155"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="enforce_inv_reinforced.8" expl="8.">
   <transf name="split_goal_wp">
    <goal name="enforce_inv_reinforced.8.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.22" steps="69"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="66"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.2" expl="2.">
-   <proof prover="0"><result status="valid" time="0.24" steps="96"/></proof>
+   <proof prover="0"><result status="valid" time="0.19" steps="93"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.17" steps="29"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="28"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.39" steps="370"/></proof>
+   <proof prover="0"><result status="valid" time="0.35" steps="363"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.5" expl="5.">
-   <proof prover="1"><result status="valid" time="2.23"/></proof>
+   <proof prover="1"><result status="valid" time="4.92"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.6" expl="6.">
-   <proof prover="0"><result status="valid" time="0.17" steps="370"/></proof>
+   <proof prover="0"><result status="valid" time="0.35" steps="363"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.7" expl="7.">
-   <proof prover="1"><result status="valid" time="2.33"/></proof>
+   <proof prover="1"><result status="valid" time="5.46"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.8" expl="8.">
-   <proof prover="0"><result status="valid" time="0.41" steps="451"/></proof>
+   <proof prover="0"><result status="valid" time="0.40" steps="454"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.9" expl="9.">
-   <proof prover="0"><result status="valid" time="0.25" steps="210"/></proof>
+   <proof prover="0"><result status="valid" time="0.21" steps="211"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.10" expl="10.">
-   <proof prover="0"><result status="valid" time="0.27" steps="285"/></proof>
+   <proof prover="0"><result status="valid" time="0.24" steps="286"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.11" expl="11.">
-   <proof prover="0"><result status="valid" time="0.51" steps="637"/></proof>
+   <proof prover="0"><result status="valid" time="0.64" steps="640"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.12" expl="12.">
-   <proof prover="0"><result status="valid" time="0.37" steps="288"/></proof>
+   <proof prover="0"><result status="valid" time="0.29" steps="286"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.13" expl="13.">
-   <proof prover="0"><result status="valid" time="0.30" steps="354"/></proof>
+   <proof prover="0"><result status="valid" time="0.25" steps="340"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.14" expl="14.">
-   <proof prover="0"><result status="valid" time="0.16" steps="44"/></proof>
+   <proof prover="0"><result status="valid" time="0.12" steps="43"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.15" expl="15.">
-   <proof prover="0"><result status="valid" time="0.49" steps="575"/></proof>
+   <proof prover="0"><result status="valid" time="0.45" steps="559"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.16" expl="16.">
-   <proof prover="0" timelimit="30"><result status="valid" time="3.72" steps="4108"/></proof>
+   <proof prover="0"><result status="valid" time="4.72" steps="4189"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.17" expl="17.">
-   <proof prover="0"><result status="valid" time="0.14" steps="46"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="45"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.18" expl="18.">
-   <proof prover="0"><result status="valid" time="0.51" steps="373"/></proof>
+   <proof prover="0"><result status="valid" time="0.32" steps="359"/></proof>
    </goal>
    <goal name="enforce_inv_reinforced.8.19" expl="19.">
-   <proof prover="0"><result status="valid" time="0.31" steps="361"/></proof>
+   <proof prover="0"><result status="valid" time="0.26" steps="347"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="enforce_inv_reinforced.9" expl="9.">
-  <proof prover="0"><result status="valid" time="0.06" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="25"/></proof>
   </goal>
   <goal name="enforce_inv_reinforced.10" expl="10.">
-  <proof prover="0"><result status="valid" time="0.12" steps="125"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="126"/></proof>
   </goal>
   <goal name="enforce_inv_reinforced.11" expl="11.">
-  <proof prover="0"><result status="valid" time="0.07" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="enforce_inv_on_enf_transf">
+ <goal name="enforce_inv_as_hyp_fmla">
  <transf name="split_goal_wp">
-  <goal name="enforce_inv_on_enf_transf.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.11" steps="21"/></proof>
+  <goal name="enforce_inv_as_hyp_fmla.1" expl="1.">
+  <proof prover="1"><result status="valid" time="1.09"/></proof>
   </goal>
-  <goal name="enforce_inv_on_enf_transf.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
+  <goal name="enforce_inv_as_hyp_fmla.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.12" steps="7"/></proof>
   </goal>
-  <goal name="enforce_inv_on_enf_transf.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.20" steps="97"/></proof>
+  <goal name="enforce_inv_as_hyp_fmla.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.13" steps="11"/></proof>
   </goal>
-  <goal name="enforce_inv_on_enf_transf.4" expl="4.">
-  <proof prover="0"><result status="valid" time="0.09" steps="29"/></proof>
+  <goal name="enforce_inv_as_hyp_fmla.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
   </goal>
-  <goal name="enforce_inv_on_enf_transf.5" expl="5.">
-  <proof prover="0"><result status="valid" time="0.06" steps="19"/></proof>
+  <goal name="enforce_inv_as_hyp_fmla.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.32" steps="341"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="enforce_inv_from_enf_transf">
+ <goal name="enforce_inv_implies_abstraction_inv">
  <transf name="split_goal_wp">
-  <goal name="enforce_inv_from_enf_transf.1" expl="1.">
-  <proof prover="0"><result status="valid" time="1.13" steps="1373"/></proof>
+  <goal name="enforce_inv_implies_abstraction_inv.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.09" steps="9"/></proof>
   </goal>
-  <goal name="enforce_inv_from_enf_transf.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.89" steps="751"/></proof>
+  <goal name="enforce_inv_implies_abstraction_inv.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.14" steps="11"/></proof>
   </goal>
-  <goal name="enforce_inv_from_enf_transf.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.16" steps="25"/></proof>
+  <goal name="enforce_inv_implies_abstraction_inv.3" expl="3.">
+  <proof prover="1"><result status="valid" time="2.97"/></proof>
   </goal>
-  <goal name="enforce_inv_from_enf_transf.4" expl="4.">
-  <proof prover="0"><result status="valid" time="0.18" steps="44"/></proof>
+  <goal name="enforce_inv_implies_abstraction_inv.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.17" steps="39"/></proof>
   </goal>
-  <goal name="enforce_inv_from_enf_transf.5" expl="5.">
-  <proof prover="0"><result status="valid" time="0.12" steps="17"/></proof>
+  <goal name="enforce_inv_implies_abstraction_inv.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.13" steps="28"/></proof>
+  </goal>
+  <goal name="enforce_inv_implies_abstraction_inv.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.11" steps="7"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="abstraction_inv_implies_enforce_inv">
+ <transf name="split_goal_wp">
+  <goal name="abstraction_inv_implies_enforce_inv.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.15" steps="106"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.21" steps="79"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.28" steps="191"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.17" steps="88"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.81" steps="621"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.41" steps="223"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.7" expl="7.">
+  <proof prover="0"><result status="valid" time="1.26" steps="1097"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.8" expl="8.">
+  <proof prover="0"><result status="valid" time="0.11" steps="11"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.9" expl="9.">
+  <proof prover="0"><result status="valid" time="0.11" steps="27"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.10" expl="10.">
+  <proof prover="0"><result status="valid" time="0.14" steps="46"/></proof>
+  </goal>
+  <goal name="abstraction_inv_implies_enforce_inv.11" expl="11.">
+  <proof prover="0"><result status="valid" time="0.09" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
@@ -215,32 +440,121 @@
   <goal name="WP_parameter abstraction.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter abstraction.1.1" expl="1. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
+   <proof prover="0"><result status="valid" time="0.15" steps="30"/></proof>
    </goal>
    <goal name="WP_parameter abstraction.1.2" expl="2. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.11" steps="42"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter abstraction.1.3" expl="3. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.08" steps="13"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="109"/></proof>
    </goal>
    <goal name="WP_parameter abstraction.1.4" expl="4. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.10" steps="85"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter abstraction.1.5" expl="5. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.12" steps="11"/></proof>
+   <proof prover="0"><result status="valid" time="0.10" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter abstraction.1.6" expl="6. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.08" steps="29"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter abstraction.1.7" expl="7. VC for abstraction">
-   <proof prover="0"><result status="valid" time="0.09" steps="51"/></proof>
+   <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction.1.8" expl="8. VC for abstraction">
+   <proof prover="0"><result status="valid" time="0.10" steps="19"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction.1.9" expl="9. VC for abstraction">
+   <proof prover="0"><result status="valid" time="0.13" steps="27"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction.1.10" expl="10. VC for abstraction">
+   <proof prover="0"><result status="valid" time="0.75" steps="505"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction.1.11" expl="11. VC for abstraction">
+   <proof prover="0"><result status="valid" time="0.11" steps="29"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction.1.12" expl="12. VC for abstraction">
+   <proof prover="0"><result status="valid" time="0.15" steps="25"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter abstraction.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="38"/></proof>
+  <proof prover="0"><result status="valid" time="0.32" steps="118"/></proof>
   </goal>
  </transf>
+ </goal>
+ <goal name="WP_parameter expose_quant_structure_def" expl="VC for expose_quant_structure_def">
+ <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+ </goal>
+ <goal name="enf_transf_match_other_def">
+ <transf name="split_goal_wp">
+  <goal name="enf_transf_match_other_def.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="enf_transf_match_other_def.2" expl="2.">
+  <proof prover="1"><result status="valid" time="1.38"/></proof>
+  </goal>
+  <goal name="enf_transf_match_other_def.3" expl="3.">
+  <proof prover="1"><result status="valid" time="1.55"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter abstraction_ex" expl="VC for abstraction_ex">
+ <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+ </goal>
+ <goal name="enf_transf_other_def">
+ <transf name="split_goal_wp">
+  <goal name="enf_transf_other_def.1" expl="1.">
+  <proof prover="1"><result status="valid" time="0.63"/></proof>
+  </goal>
+  <goal name="enf_transf_other_def.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.09" steps="29"/></proof>
+  </goal>
+  <goal name="enf_transf_other_def.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.08" steps="1"/></proof>
+  </goal>
+  <goal name="enf_transf_other_def.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.10" steps="3"/></proof>
+  </goal>
+  <goal name="enf_transf_other_def.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.14" steps="23"/></proof>
+  </goal>
+  <goal name="enf_transf_other_def.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.07" steps="7"/></proof>
+  </goal>
+  <goal name="enf_transf_other_def.7" expl="7.">
+  <proof prover="0"><result status="valid" time="0.08" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Wp.LOCAL.enf_transf_match_fn_rule">
+ <proof prover="1"><result status="valid" time="1.30"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.enf_transf_match_rule">
+ <proof prover="0"><result status="valid" time="0.07" steps="19"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.freeze_context_rule">
+ <proof prover="0"><result status="valid" time="0.14" steps="8"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.proof_obligations_fn_rule">
+ <proof prover="0"><result status="valid" time="0.09" steps="6"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.proof_obligations_rule">
+ <proof prover="1"><result status="valid" time="0.82"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.post_inclusion_rule">
+ <proof prover="0"><result status="valid" time="0.10" steps="15"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.enf_transf_rule">
+ <proof prover="0"><result status="valid" time="0.08" steps="35"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.sub_context_rule" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.11"/></proof>
+ </goal>
+ <goal name="Wp.LOCAL.abstraction_transformer_rule">
+ <proof prover="0"><result status="valid" time="0.09" steps="45"/></proof>
+ </goal>
+ <goal name="Wp.WP_parameter   Wp  abstraction" expl="VC for   Wp  abstraction">
+ <proof prover="0"><result status="valid" time="0.06" steps="2"/></proof>
  </goal>
 </theory>
 </file>
