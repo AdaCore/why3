@@ -29,7 +29,10 @@ module FlexibleArray
   use import ref.Ref
   use import seq.Seq as S
   use import queue.Queue as Q
+  use import list.List
+  use import list.Append
   use import list.Mem
+
 
   (* to be a Braun tree *)
   predicate inv (t: tree 'a) = match t with
@@ -179,41 +182,67 @@ module FlexibleArray
   =
     { length = t.length - 1; tree = hr_aux t.length t.tree }
 
-  (* val ghost visited: seq 'a *)
-
   (* function elements (a: t 'a) (i: int) (acc: seq 'a): seq 'a = *)
 
-  val neq (t1 t2: tree 'a) : bool
-    ensures { result <-> t1 <> t2 }
+  let non_empty (t: tree 'a) : bool
+    ensures { result <-> t <> Empty }
+  = match t with
+    | Empty      -> false
+    | Node _ _ _ -> true
+    end
 
-  let iter (a: t 'a) : unit
-    diverges
-  =
+  function size_list (l: list (tree 'a)) : int =
+    match l with
+    | Nil      -> 0
+    | Cons t s -> size t + size_list s
+    end
+
+  let rec lemma size_list_nonneg (l: list (tree 'a)) : unit
+    variant { l }
+    ensures { size_list l >= 0 }
+  = match l with Nil -> () | Cons _ s -> size_list_nonneg s end
+
+  let rec lemma size_list_append (l1 l2: list (tree 'a)) : unit
+    variant { l1 }
+    ensures { size_list (l1 ++ l2) = size_list l1 + size_list l2 }
+  = match l1 with Nil -> () | Cons _ s1 -> size_list_append s1 l2 end
+
+  lemma size_list_snoc:
+    forall l: list (tree 'a), t: tree 'a.
+    size_list (l ++ Cons t Nil) = size_list l + size t
+
+  let iter (a: t 'a) : unit =
     let ghost visited = ref S.empty in
-    let ghost copy_tree = a in
-    let f x = visited := S.snoc !visited x in
     let q = Q.create () in
     let left = Q.create () in
     let right = Q.create () in
-    if neq a.tree Empty then Q.push a.tree q;
-    while not (Q.is_empty q) do
-      (* variant   { Q.length q, Q.length right } *)
-      invariant { not (mem Empty q.elts) }
-      invariant { not (mem Empty left.elts) }
-      invariant { not (mem Empty right.elts) }
-      let x = Q.safe_pop q in
-      match x with
-        | Empty -> absurd
-        | Node l y r ->
-          f y;
-          ghost visited := snoc !visited y;
-          if neq l Empty then Q.push l left;
-          if neq r Empty then Q.push r right;
-      end;
-      if Q.is_empty q then begin
-        Q.transfer right left;
-        Q.transfer left q;
-      end
-    done
+    if non_empty a.tree then begin
+      Q.push a.tree q;
+      while not (Q.is_empty q) do
+        invariant { not (mem Empty q.elts) }
+        invariant { not (mem Empty left.elts) }
+        invariant { not (mem Empty right.elts) }
+        invariant { S.length !visited + size_list q.elts +
+                    size_list left.elts + size_list right.elts = a.length }
+        invariant { forall i. 0 <= i < S.length !visited ->
+                    !visited[i] = get a i }
+        invariant { Q.length q = 0 -> Q.length left = Q.length right = 0 }
+        variant   { a.length - S.length !visited }
+        let x = Q.safe_pop q in
+        match x with
+          | Empty -> absurd
+          | Node l y r ->
+            (* visit y here *)
+            ghost visited := snoc !visited y;
+            if non_empty l then Q.push l left;
+            if non_empty r then Q.push r right;
+        end;
+        if Q.is_empty q then begin
+          Q.transfer right left;
+          Q.transfer left q;
+        end
+      done
+    end;
+    assert { forall i. 0 <= i < a.length -> !visited[i] = get a i }
 
 end
