@@ -330,8 +330,12 @@ let first_order_matching (vars : Svs.t) (largs : term list)
               begin
                 match t2.t_node with
                   | Tapp(ls2,args2) when ls_equal ls1 ls2 ->
-                    loop sigma (List.rev_append args1 r1)
-                      (List.rev_append args2 r2)
+                    let mt, mv = loop sigma (List.rev_append args1 r1)
+                      (List.rev_append args2 r2) in
+                    begin
+                      try Ty.oty_match mt t1.t_ty t2.t_ty, mv
+                      with Ty.TypeMismatch _ -> raise NoMatch
+                    end
                   | _ -> raise NoMatch
               end
             | _ ->
