@@ -341,6 +341,26 @@ void write_to_client(pclient client, struct pollfd* entry) {
   }
 }
 
+void send_started_msg_to_client(pclient client,
+				char* id) {
+   char* msgbuf;
+   size_t len = 0;
+   int used;
+   //len of id + S + semicolon + \n + \0
+   len += strlen(id) + 4;
+   msgbuf = (char*) malloc(sizeof(char) * len);
+
+   if (msgbuf == NULL) {
+      shutdown_with_msg("error when allocating client msg");
+   }
+
+   used = snprintf(msgbuf, len, "S;%s\n", id);
+   if (used != len - 1) {
+      shutdown_with_msg("message for client too long");
+   }
+   queue_write(client, msgbuf);
+}
+
 void send_msg_to_client(pclient client,
                         char* id,
                         int exitcode,
@@ -350,8 +370,8 @@ void send_msg_to_client(pclient client,
    char* msgbuf;
    size_t len = 0;
    int used;
-   //len of id + semicolon
-   len += strlen(id) + 1;
+   //len of id + F + 2 semicolon
+   len += strlen(id) + 3;
    // we assume a length of at most 9 for both exitcode and time, plus one for
    // the timeout boolean, plus three semicolons, makes 23 chars
    len += 23;
@@ -361,7 +381,7 @@ void send_msg_to_client(pclient client,
    if (msgbuf == NULL) {
       shutdown_with_msg("error when allocating client msg");
    }
-   used = snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
+   used = snprintf(msgbuf, len, "F;%s;%d;%.2f;%d;%s\n",
                    id, exitcode, cpu_time, (timeout?1:0), outfile);
    if (used >= len) {
       shutdown_with_msg("message for client too long");
@@ -444,6 +464,7 @@ void run_request (prequest r) {
   proc->id = id;
   proc->outfile = outfile;
   list_append(processes, id, (void*) proc);
+  send_started_msg_to_client(client, r->id);
 }
 
 void handle_msg(pclient client, int key) {
