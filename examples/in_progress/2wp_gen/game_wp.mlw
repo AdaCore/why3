@@ -81,8 +81,10 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
   (* Common case: order/validity/structure associated to game are shared. *)
   predicate game_sames (enforce 'a 'i1 'o1) (enforce 'a 'i2 'o2)
 
-  predicate app_transformer
-    (transformer 'a 'i 'o) (context 'a) (rel 'o 'a) 'i 'a
+  (* Exposed logical function to create contexts. *)
+  function ctx_nil : 'ig -> context 'a
+  function ctx_add (qstructure 'a) (enf_hyp 'a 'ig 'il 'o)
+                   ('ig -> context 'a) : 'ig -> context 'a
 
   (* Abstraction combinator: replace the backward predicate
      transformer by an explicit interface triple
@@ -105,7 +107,7 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
     requires { "expl:to be computed precondition"
       proof_obligations e.game_strct igs gf e.transformp eh }
     ensures { enforce_inv result }
-    (* TODO: maybe add a shortcut somewhere,
+    (* TODO: maybe add a shortcut predicate somewhere,
        this is a long line for something that will be user-written. *)
     ensures { result.transformp -->
       abstraction_transformer e.game_strct gf eh }
@@ -115,8 +117,33 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
      related to computation rules *)
   namespace LOCAL
 
+    predicate app_transformer
+      (transformer 'a 'i 'o) (context 'a) (rel 'o 'a) 'i 'a
+
+    type hyp 'a
     type ftransformer 'a 'i 'o
     predicate app_ftransformer (ftransformer 'a 'i 'o) (rel 'o 'a) 'i 'a
+
+    function ctx_empty : context 'a
+    function ctx_cons (hyp 'a) (context 'a) : context 'a
+    function ctx_nth (context 'a) int : hyp 'a
+    function ctx_len (context 'a) : int
+
+    axiom ctx_nth_rule : forall h:hyp 'a,ctx n.
+      ctx_nth (ctx_cons h ctx) n = if n = 0 then h else ctx_nth ctx (n-1)
+    meta rewrite prop ctx_nth_rule
+    meta remove_prop prop ctx_nth_rule
+
+    axiom ctx_len_cons : forall h:hyp 'a,ctx.
+      ctx_len (ctx_cons h ctx) = 1 + ctx_len ctx
+    meta rewrite prop ctx_len_cons
+    meta remove_prop prop ctx_len_cons
+
+    axiom ctx_len_empty : ctx_len (ctx_empty:context 'a) = 0
+    meta rewrite prop ctx_len_empty
+    meta remove_prop prop ctx_len_empty
+
+    function transf_hyp (ftransformer 'a 'i 'o) : hyp 'a
 
     function enf_transf_match_fn 'ig (ftransformer 'a 'il 'o)
                                  (enf_hyp 'a 'ig 'il 'o) : set ('il,'a)
@@ -180,12 +207,44 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
     meta rewrite prop enf_transf_rule
     meta remove_prop prop enf_transf_rule
 
+    axiom ctx_nil_apply : forall xg:'ig. ctx_nil xg = (ctx_empty:context 'a)
+    meta rewrite prop ctx_nil_apply
+    meta remove_prop prop ctx_nil_apply
+
+    axiom ctx_add_apply : forall eh:enf_hyp 'a 'ig 'il 'o,q xg ctx.
+      ctx_add q eh ctx xg = ctx_cons (transf_hyp (enf_transf q xg eh)) (ctx xg)
+    meta rewrite prop ctx_add_apply
+    meta remove_prop prop ctx_nil_apply
+
+    predicate weaker_hypothesis (qstructure 'a) (h1 h2:hyp 'a)
+    predicate weaker_hypothesis_prelude (h1 h2:hyp 'a)
+    axiom weaker_hypothesis_rule :
+      forall q1 q2 xg t,eh:enf_hyp 'a 'ig 'il 'o.
+        weaker_hypothesis q1 (transf_hyp (enf_transf q2 xg eh)) (transf_hyp t)
+        <-> (weaker_hypothesis_prelude (transf_hyp (enf_transf q2 xg eh))
+                                       (transf_hyp t) ->
+             enf_transf_match q1 xg t eh)
+    meta rewrite prop weaker_hypothesis_rule
+    meta remove_prop prop weaker_hypothesis_rule
+    axiom weaker_hypothesis_refl : forall q,h:hyp 'a.
+      weaker_hypothesis q h h <-> true
+    meta rewrite prop weaker_hypothesis_refl
+    meta remove_prop prop weaker_hypothesis_refl
+
     predicate sub_context (qstructure 'a) (a b:context 'a)
-    axiom sub_context_rule : forall q:qstructure 'a, c1 c2. sub_context q c1 c2
-      (* TODO, in fact there should be two depending on whether it is
-         empty or cons. *)
-    meta rewrite prop sub_context_rule
-    meta remove_prop prop sub_context_rule
+    axiom sub_context_empty : forall q:qstructure 'a,c.
+      sub_context q ctx_empty c <-> true
+    meta rewrite prop sub_context_empty
+    meta remove_prop prop sub_context_empty
+    axiom sub_context_add : forall q:qstructure 'a,h1 c1 h2 c2.
+      sub_context q (ctx_cons h1 c1) (ctx_cons h2 c2) <->
+        weaker_hypothesis q h1 h2 /\ sub_context q c1 c2
+    meta rewrite prop sub_context_add
+    meta remove_prop prop sub_context_add
+    axiom sub_context_refl : forall q:qstructure 'a,c.
+      sub_context q c c <-> true
+    meta rewrite prop sub_context_refl
+    meta remove_prop prop sub_context_refl
 
     axiom abstraction_transformer_rule :
       forall gs gf ctx q xg xl xs,eh:enf_hyp 'a 'ig 'il 'o.
@@ -208,19 +267,27 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
   }
   meta rewrite_def function h_eh
 
-  let ghost test (c:'g -> context unit) (e:enforce unit ('g,'i) 'o)
+  let ghost test (e:enforce unit ('g,'i) 'o)
+                 (pc1 pc2:set 'ic) (qc1 qc2:rel 'ic 'oc)
                  (p1 p2:set 'i) (q1 q2:rel 'i 'o) : enforce unit ('g,'i) 'o
     requires { enforce_inv e }
     requires { e.game_strct --> q_unit }
     requires { e.transformp -->
-      abstraction_transformer e.game_strct c (h_eh p1 q1) }
+      abstraction_transformer e.game_strct
+      (ctx_add e.game_strct (h_eh pc1 qc1) ctx_nil)
+      (h_eh p1 q1) }
     requires { subset p2 p1 }
     requires { forall x y. p2 x /\ q1 x y -> q2 x y }
+    requires { subset pc1 pc2 }
+    requires { forall x y. pc1 x /\ qc2 x y -> qc1 x y }
     ensures { enforce_inv result }
     ensures { game_sames result e }
     ensures { result.transformp -->
-      abstraction_transformer e.game_strct c (h_eh p2 q2) }
-  = abstraction q_def c (h_eh p2 q2) e
+      abstraction_transformer e.game_strct
+      (ctx_add e.game_strct (h_eh pc2 qc2) ctx_nil)
+      (h_eh p2 q2) }
+  = let c = ctx_add e.game_strct (h_eh pc2 qc2) ctx_nil in
+    abstraction q_def c (h_eh p2 q2) e
 
 end
 
@@ -278,12 +345,12 @@ module WpImpl
   (* Lifting of postcondition with auxiliary (ghost) return values *)
   function e_lift (q:rel 'a 'b) : set 'b = \y. exists x. q x y
   (* Transform a regular backward predicate transformer into an hypothesis. *)
-  function transf_hyp_token (t:rel 'o 'a -> rel 'i 'a) : hyp 'a =
+  function transf_hyp (t:rel 'o 'a -> rel 'i 'a) : hyp 'a =
     \pr. let (p,q) = pr in exists x q'. q = e_lift q' /\ p = t q' x
   (* Directly transform a structured hypothesis into a flat one.
      Even though we will store all hypothesis in transformer form,
      this temporary form is useful when adding structured ones in context. *)
-  function direct_enf_hyp_token
+  function direct_enf_hyp
     (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) : hyp 'a =
     \pr. let (p,q) = pr in
       exists xl xs. p = inter (eh.pre xg xl) ((=) xs) /\
@@ -293,14 +360,14 @@ module WpImpl
   function enf_transf (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) :
                       rel 'o 'a -> rel 'il 'a =
     \q xl xs. eh.pre xg xl xs && forall y ys. eh.post xg xl xs y ys -> q y ys
-  function enf_hyp_token (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) : hyp 'a =
-    transf_hyp_token (enf_transf xg eh)
+  function enf_hyp (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) : hyp 'a =
+    transf_hyp (enf_transf xg eh)
   (* Lemma: both ways of creating a flat hypothesis from a structured
      one are equivalent. *)
   lemma enf_transf_identical :
     forall r:rel 'a 'd,xg,eh:enf_hyp 'a 'ig 'il 'o,g. game_wf g ->
-    let hd = direct_enf_hyp_token xg eh in
-    let ht = enf_hyp_token xg eh in
+    let hd = direct_enf_hyp xg eh in
+    let ht = enf_hyp xg eh in
     (hyp_fmla r hd g -> hyp_fmla r ht g
       by let et = enf_transf xg eh in
         forall p q. ht (p,q) -> pre_post_fmla r (p,q) g
@@ -374,8 +441,8 @@ module WpImpl
     forall xl xs. eh.pre xg xl xs -> t (eh.post xg xl xs) xl xs
   lemma weaker_hypothesis_sufficient : forall xg t,eh:enf_hyp 'a 'ig 'il 'o.
     enf_transf_match xg t eh ->
-    let he = enf_hyp_token xg eh in
-    let ht = transf_hyp_token t in
+    let he = enf_hyp xg eh in
+    let ht = transf_hyp t in
     weaker_hypothesis he ht
     by forall p q xs. he (p,q) /\ p xs ->
       let et = enf_transf xg eh in
@@ -539,7 +606,7 @@ module WpImpl
       let c = conj (hyp_fmla r (ctx_union ctx))
                    (conj (vld_fmla r o o) (ordering o)) in
       let ft = freeze_context xg ctx e.transformp in
-      let ht = transf_hyp_token ft in
+      let ht = transf_hyp ft in
       holds c (hyp_fmla r ht)
       by forall pq. ht pq -> holds c (pre_post_fmla r pq)
       by let (p,q) = pq in
@@ -643,15 +710,15 @@ module WpImpl
         let qr = related r q0 in
         let exs = (=) xs in
         holds c (enforce exs qr)
-      by let hd = direct_enf_hyp_token xg eh in
+      by let hd = direct_enf_hyp xg eh in
         let ft = freeze_context xg ctx e.transformp in
-        let ht = transf_hyp_token ft in
+        let ht = transf_hyp ft in
         let p0 = inter (eh.pre xg xl) ((=) xs) in
         hd (p0,q0)
       so (subset exs (related r p0) by r xs xs)
       so holds c (enforce (related r p0) qr)
       by holds c (hyp_fmla r hd)
-      by let hd = enf_hyp_token xg eh in
+      by let hd = enf_hyp xg eh in
         holds c (hyp_fmla r hd)
       by holds c (hyp_fmla r ht)
       so holds (hyp_fmla r ht) (hyp_fmla r hd)
@@ -734,6 +801,25 @@ module WpImpl
       by let (y,ys) = y in eh.post xg xl xs y ys -> q y ys
   predicate sub_context_ex (qstructure 'a) (c1 c2:context 'a) =
     sub_context c1 c2
+  lemma sub_context_nil : forall c:context 'a.
+    sub_context Nil c by match c with Nil -> true | _ -> true end
+  predicate weaker_hypothesis_ex (qstructure 'a) (h1 h2:hyp 'a) =
+    weaker_hypothesis h1 h2
+  predicate weaker_hypothesis_prelude (h1 h2:hyp 'a) =
+    not weaker_hypothesis h1 h2
+  (* TODO/FIXME: For some 'impossible' reason, defining ctx_nil run into
+     opaqueness problems !
+     Apparently, this have to do with ig/context 'a appearing
+     only in the output.
+     This can be fixed by putting extra 'dummy' arguments to mark 'a/'ig,
+     but this is rather inelegant. We will axiomatize it until Why3
+     bug is fixed. *)
+  constant ctx_nil : 'ig -> context 'a (* = \_. Nil *)
+  axiom ctx_nil_def : forall xg:'ig. ctx_nil xg = (Nil:context 'a)
+  function ctx_add (qstructure 'a)
+                   (eh:enf_hyp 'a 'ig 'il 'o)
+                   (ctxf:'ig -> context 'a) : 'ig -> context 'a =
+    \xg. Cons (enf_hyp xg eh) (ctxf xg)
 
   clone Wp with type context = context,
     type enforce = enforce,
@@ -744,12 +830,23 @@ module WpImpl
     function transformp = transformp,
     predicate enforce_inv = enforce_inv,
     predicate game_sames = game_sames,
-    predicate app_transformer = app_transformer,
+    function ctx_nil = ctx_nil,
+    function ctx_add = ctx_add,
     predicate proof_obligations = proof_obligations_ex,
     function abstraction_transformer = abstraction_transformer_ex,
     val abstraction = abstraction_ex,
+    predicate LOCAL.app_transformer = app_transformer,
+    type LOCAL.hyp = hyp,
     type LOCAL.ftransformer = ftransformer,
     predicate LOCAL.app_ftransformer = app_ftransformer,
+    function LOCAL.ctx_empty = Nil,
+    function LOCAL.ctx_cons = Cons,
+    function LOCAL.ctx_nth = ctx_nth,
+    function LOCAL.ctx_len = length,
+    goal LOCAL.ctx_nth_rule,
+    goal LOCAL.ctx_len_cons,
+    goal LOCAL.ctx_len_empty,
+    function LOCAL.transf_hyp = transf_hyp,
     function LOCAL.enf_transf_match_fn = enf_transf_match_fn,
     goal LOCAL.enf_transf_match_fn_rule,
     predicate LOCAL.enf_transf_match = enf_transf_match_ex,
@@ -763,8 +860,16 @@ module WpImpl
     goal LOCAL.post_inclusion_rule,
     function LOCAL.enf_transf = enf_transf_ex,
     goal LOCAL.enf_transf_rule,
+    goal LOCAL.ctx_nil_apply,
+    goal LOCAL.ctx_add_apply,
+    predicate LOCAL.weaker_hypothesis = weaker_hypothesis_ex,
+    predicate LOCAL.weaker_hypothesis_prelude = weaker_hypothesis_prelude,
+    goal LOCAL.weaker_hypothesis_rule,
+    goal LOCAL.weaker_hypothesis_refl,
     predicate LOCAL.sub_context = sub_context_ex,
-    goal LOCAL.sub_context_rule,
+    goal LOCAL.sub_context_empty,
+    goal LOCAL.sub_context_add,
+    goal LOCAL.sub_context_refl,
     goal LOCAL.abstraction_transformer_rule
 
 end
