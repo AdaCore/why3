@@ -338,24 +338,9 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     end
                   | _ -> raise NoMatch
               end
-            | _ ->
-(*
-              Format.eprintf "are these terms equal ?...";
-*)
-              if t_equal t1 t2 then
-                begin
-(*
-                  Format.eprintf " yes!@.";
-*)
-                  loop sigma r1 r2
-                end
-              else
-                begin
-(*
-                  Format.eprintf " no@.";
-*)
-                  raise NoMatch
-                end
+            | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
+                loop sigma r1 r2
+            | _ -> raise NoMatch
         end
       | _ -> raise NoMatch
   in
