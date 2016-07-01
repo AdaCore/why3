@@ -33,7 +33,6 @@ module FlexibleArray
   use import list.Append
   use import list.Mem
 
-
   (* to be a Braun tree *)
   predicate inv (t: tree 'a) = match t with
   | Empty      -> true
@@ -182,7 +181,50 @@ module FlexibleArray
   =
     { length = t.length - 1; tree = hr_aux t.length t.tree }
 
-  (* function elements (a: t 'a) (i: int) (acc: seq 'a): seq 'a = *)
+  (* the sequence of elements, in order *)
+
+  function interleave (x y: seq 'a) : seq 'a =
+    S.create
+      (S.length x + S.length y)
+      (fun i -> if mod i 2 = 0 then x[div i 2] else y[div i 2])
+
+  function elements_aux (t: tree 'a): seq 'a =
+    match t with
+    | Empty -> S.empty
+    | Node l x r -> cons x (interleave (elements_aux l) (elements_aux r))
+    end
+
+  let rec lemma elements_aux_length (t: tree 'a)
+    variant  { t }
+    ensures  { S.length (elements_aux t) = size t }
+  = match t with
+    | Empty -> ()
+    | Node l _ r -> elements_aux_length l; elements_aux_length r
+    end
+
+  let rec lemma elements_aux_correct (t: tree 'a) (i: int)
+    requires { 0 <= i < size t }
+    requires { inv t }
+    variant  { t }
+    ensures  { (elements_aux t)[i] = get_aux t i }
+  = match t with
+    | Empty -> ()
+    | Node l _ r ->
+        elements_aux_length l; elements_aux_length r;
+        if i = 0 then () else
+        if mod i 2 = 1 then elements_aux_correct l (div i 2)
+                       else elements_aux_correct r (div i 2 - 1)
+    end
+
+  function elements (a: t 'a) : seq 'a =
+    elements_aux a.tree
+
+  lemma elements_correct:
+    forall a: t 'a.
+    S.length (elements a) = a.length /\
+    forall i. 0 <= i < a.length -> (elements a)[i] = get a i
+
+  (* traversing the elements, in order, in linear time *)
 
   let non_empty (t: tree 'a) : bool
     ensures { result <-> t <> Empty }
@@ -210,6 +252,12 @@ module FlexibleArray
   lemma size_list_snoc:
     forall l: list (tree 'a), t: tree 'a.
     size_list (l ++ Cons t Nil) = size_list l + size t
+
+  (* FIXME: In practice, such a function iter would have a visitor function
+     as argument. Here, we only intend to prove the soundness of such
+     an iteration. So we simply store the visited elements in a ghost
+     sequence and then prove at this end that this sequence is in order,
+     with an assertion. *)
 
   let iter (a: t 'a) : unit =
     let ghost visited = ref S.empty in
