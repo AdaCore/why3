@@ -37,13 +37,20 @@ the following:
   arg(i)   - the commandline arguments of the command to run
 
 The server does not acknowledge the receipt of this message. However, it will
-run the executable with its arguments and time/memory limit. When the
-executable has terminated, the server sends a message like this to the client
-who sent the 'run' request:
+run the executable with its arguments and time/memory limit.
+When the executable has started, the server sends a message like this to the
+client who sent the 'run' request:
 
-  id;exitcode;time;timeout;file
+  S;id
+
+Character "S" followed by semi-colon to indicate that the request is started.
+When the executable has terminated, the server sends a message like
+this to the client who sent the 'run' request:
+
+  F;id;exitcode;time;timeout;file
 
 Their meaning is the following:
+  F        - single F character indicating the task is finished
   id       - the identifier of the request to which this answer belongs
   exitcode - the exitcode of the executed program
   time     - the time taken by the executed program
