@@ -86,6 +86,10 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
   function ctx_add (qstructure 'a) (enf_hyp 'a 'ig 'il 'o)
                    ('ig -> context 'a) : 'ig -> context 'a
 
+  (* A potentially useful postcondition for abstractions:
+     empty postcondition. *)
+  function empty_post : 'ig -> 'il -> 'a -> rel 'o 'a
+
   (* Abstraction combinator: replace the backward predicate
      transformer by an explicit interface triple
      (context,precondition,postcondition).
@@ -112,6 +116,18 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
     ensures { result.transformp -->
       abstraction_transformer e.game_strct gf eh }
     ensures { game_sames result e }
+
+  (* Kontinuation combinator: take an enforcement record that
+     may use a continuation for the place right there as last
+     hypothesis, and send back one which does not need it.
+     Programming analogy: this is call/cc. *)
+  function kontinuation_transformer
+    (transformer 'a 'i 'o) : transformer 'a 'i 'o
+  val ghost ktrap (e:enforce 'a 'i 'o) : enforce 'a 'i 'o
+    requires { enforce_inv e }
+    ensures { enforce_inv result }
+    ensures { game_sames result e }
+    ensures { result.transformp --> kontinuation_transformer e.transformp }
 
   (* Hide away from main namespace definitions & axioms
      related to computation rules *)
@@ -253,6 +269,28 @@ module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
         app_ftransformer (enf_transf gs xg eh) q xl xs
     meta rewrite prop abstraction_transformer_rule
     meta remove_prop prop abstraction_transformer_rule
+
+    axiom empty_post_rule :
+      forall xg:'ig,xl:'il,xs:'a,y:'o,ys.
+        empty_post xg xl xs y ys <-> false
+    meta rewrite prop empty_post_rule
+    meta remove_prop prop empty_post_rule
+
+    function kont_pre (q:rel 'o 'a) : 'i -> rel 'o 'a
+    axiom kont_pre_rule : forall q,xl:'i,y:'o,ys:'a.
+      kont_pre q xl y ys <-> q y ys
+    meta rewrite prop kont_pre_rule
+    meta remove_prop prop kont_pre_rule
+
+    axiom kontinuation_transformer_rule :
+      forall t:transformer 'a 'i 'o,ctx q x xs.
+        app_transformer (kontinuation_transformer t) ctx q x xs <->
+        let eh = { pre = kont_pre q; post = empty_post;
+                   pre_strct = q_def; post_strct = q_unit } in
+        let ctx' = ctx_cons (transf_hyp (enf_transf q_def x eh)) ctx in
+        app_transformer t ctx' q x xs
+    meta rewrite prop kontinuation_transformer_rule
+    meta remove_prop prop kontinuation_transformer_rule
 
   end
 
@@ -726,6 +764,54 @@ module WpImpl
     };
     res
 
+  (* Second combinator: kontinuation trap. *)
+  function empty_post : 'a -> 'b -> 'c -> 'd -> 'e -> bool =
+    \_ _ _ _ _. false
+  function kontinuation_transformer
+    (t:transformer 'a 'i 'o) : transformer 'a 'i 'o =
+    \ctx q x xs.
+      let eh = { pre = const q; post = empty_post;
+                 pre_strct = q_def; post_strct = q_unit } in
+      t (Cons (enf_hyp x eh) ctx) q x xs
+
+  let ghost ktrap (e:enforce 'a 'i 'o) : enforce 'a 'i 'o
+    requires { enforce_inv e }
+    ensures { result.transformp = kontinuation_transformer e.transformp }
+    ensures { game_sames result e }
+    ensures { enforce_inv result }
+  = let res = { e with transformp = kontinuation_transformer e.transformp } in
+    assert { forall x q ctx.
+      let r = eqv e.game_valid in let o = e.game_order in
+      let cv = conj (vld_fmla r o o) (ordering o) in
+      let cx = hyp_fmla r (ctx_union ctx) in
+      let c = conj cx cv in
+      let p = res.transformp ctx q x in
+      let p2 = related r p in let q2 = related r (e_lift q) in
+      holds c (enforce p2 q2)
+      by is_fmla c
+      so let k = enforce q2 none in
+        holds (conj c k) (enforce p2 q2)
+      by let cx' = conj cx k in
+        let c' = conj cx' cv in
+        holds c' (enforce p2 q2)
+      by let eh = { pre = const q; post = empty_post;
+                    pre_strct = q_def; post_strct = q_unit } in
+        let h0 = enf_hyp x eh in
+        let ctx' = Cons h0 ctx in
+        let cx'' = hyp_fmla r (ctx_union ctx') in
+        (p = e.transformp ctx' q x by sext p (e.transformp ctx' q x))
+      so holds cx' cx''
+      by holds k (hyp_fmla r h0)
+      by let h1 = direct_enf_hyp x eh in
+        holds k (hyp_fmla r h1)
+      by forall pq. h1 pq -> holds k (pre_post_fmla r pq)
+      by let (p',q') = pq in
+        exists xl xs. p' = inter (q xl) ((=) xs)
+      so let p2' = related r p' in let q2' = related r q' in
+        holds k (enforce p2' q2')
+      by subset p2' q2 /\ holds k k
+    };
+    res
 
 
 
@@ -807,15 +893,7 @@ module WpImpl
     weaker_hypothesis h1 h2
   predicate weaker_hypothesis_prelude (h1 h2:hyp 'a) =
     not weaker_hypothesis h1 h2
-  (* TODO/FIXME: For some 'impossible' reason, defining ctx_nil run into
-     opaqueness problems !
-     Apparently, this have to do with ig/context 'a appearing
-     only in the output.
-     This can be fixed by putting extra 'dummy' arguments to mark 'a/'ig,
-     but this is rather inelegant. We will axiomatize it until Why3
-     bug is fixed. *)
-  constant ctx_nil : 'ig -> context 'a (* = \_. Nil *)
-  axiom ctx_nil_def : forall xg:'ig. ctx_nil xg = (Nil:context 'a)
+  constant ctx_nil : 'ig -> context 'a = \_. Nil
   function ctx_add (qstructure 'a)
                    (eh:enf_hyp 'a 'ig 'il 'o)
                    (ctxf:'ig -> context 'a) : 'ig -> context 'a =
@@ -833,8 +911,11 @@ module WpImpl
     function ctx_nil = ctx_nil,
     function ctx_add = ctx_add,
     predicate proof_obligations = proof_obligations_ex,
+    function empty_post = empty_post,
     function abstraction_transformer = abstraction_transformer_ex,
     val abstraction = abstraction_ex,
+    function kontinuation_transformer = kontinuation_transformer,
+    val ktrap = ktrap,
     predicate LOCAL.app_transformer = app_transformer,
     type LOCAL.hyp = hyp,
     type LOCAL.ftransformer = ftransformer,
@@ -870,7 +951,11 @@ module WpImpl
     goal LOCAL.sub_context_empty,
     goal LOCAL.sub_context_add,
     goal LOCAL.sub_context_refl,
-    goal LOCAL.abstraction_transformer_rule
+    goal LOCAL.abstraction_transformer_rule,
+    goal LOCAL.empty_post_rule,
+    function LOCAL.kont_pre = const,
+    goal LOCAL.kont_pre_rule,
+    goal LOCAL.kontinuation_transformer_rule
 
 end
 
