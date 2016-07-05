@@ -588,9 +588,6 @@ lib/why3server$(EXE): $(SERVER_O)
 lib/why3cpulimit$(EXE): $(CPULIM_O)
 	$(CC) -Wall -o $@ $^
 
-%.o: %.c %.h
-	$(CC) -c -Wall -g -o $@ $<
-
 %.o: %.c
 	$(CC) -c -Wall -g -o $@ $<
 
