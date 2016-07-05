@@ -1,0 +1,63 @@
+
+(* Dijkstra's "Dutch national flag"
+
+   The following program sorts an array whose elements may have three
+   different values, standing for the three colors of the Dutch
+   national flag (blue, white, and red).
+
+   Questions:
+
+   1. Prove safety i.e. the absence of array access out of bounds.
+
+   2. Prove termination.
+
+   3. Prove that, after execution, the array is sorted as follows:
+
+           +--------+---------+---------+
+           |  blue  |  white  |   red   |
+           +--------+---------+---------+
+
+      (using the predicate "monochrome" that is provided).
+
+   4. Show that after execution the array contents is a permutation of its
+      initial contents. Use the library predicate "permut_all" to do so
+      (the corresponding module ArrayPermut is already imported).
+
+*)
+
+module Flag
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.ArraySwap
+  use import array.ArrayPermut
+
+  type color = Blue | White | Red
+
+  predicate monochrome (a: array color) (i: int) (j: int) (c: color) =
+    forall k: int. i <= k < j -> a[k]=c
+
+  let dutch_flag (a: array color)
+    requires { 0 <= length a }
+    ensures  { true }
+  =
+    let b = ref 0 in
+    let i = ref 0 in
+    let r = ref (length a) in
+    while !i < !r do
+      invariant { true }
+      match a[!i] with
+      | Blue ->
+        swap a !b !i;
+        b := !b + 1;
+        i := !i + 1
+      | White ->
+        i := !i + 1
+      | Red ->
+        r := !r - 1;
+        swap a !r !i
+      end
+    done
+
+end

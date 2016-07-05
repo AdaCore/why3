@@ -1,0 +1,83 @@
+
+(** Big numbers as little-endian lists of digits.
+
+    This is borrowed from a PVS tutorial.
+    (see for instance http://fm.csl.sri.com/SSFT11/ITPSummerFormal2011.pdf)
+
+    In addition, we show that the representation is valid (all digits in
+    0..base-1) and canonical (no most significant 0 digits).
+*)
+
+module BigNum
+
+  use import int.Int
+  use import list.List
+
+  constant base: int
+  axiom base_gt1: base > 1
+
+  type digit = int
+  type num = list digit
+
+  function value (n: num) : int =
+    match n with
+    | Nil -> 0
+    | Cons d r -> d + base * value r
+    end
+
+  predicate valid (n: num) =
+    match n with
+    | Nil -> true
+    | Cons d Nil -> 0 < d < base
+    | Cons d r -> 0 <= d < base && valid r
+    end
+
+  let rec lemma nonneg (n: num) : unit
+    requires { valid n }
+    ensures  { value n >= 0 }
+    variant  { n }
+  = match n with Nil -> () | Cons _ r -> nonneg r end
+
+  let rec lemma msd (n: num)
+    requires { valid n }
+    ensures  { value n = 0 <-> n = Nil }
+    variant  { n }
+  = match n with Nil -> () | Cons _ r -> msd r end
+
+  let rec add_digit (n: num) (d: digit) : num
+    requires { valid n }
+    requires { 0 <= d < base }
+    ensures  { valid result }
+    ensures  { value result = value n + d }
+    variant  { n }
+  = match n with
+    | Nil ->
+        if d = 0 then Nil else Cons d Nil
+    | Cons d0 r ->
+        if d + d0 < base then Cons (d + d0) r
+        else Cons (d + d0 - base) (add_digit r 1)
+    end
+
+  let rec add_cin (n1 n2: num) (cin: int) : num
+    requires { valid n1 && valid n2 && 0 <= cin <= 1 }
+    ensures  { valid result }
+    ensures  { value result = value n1 + value n2 + cin }
+    variant  { n1 }
+  = match n1, n2 with
+    | Nil, _ ->
+        add_digit n2 cin
+    | Cons _ _, Nil ->
+        add_digit n1 cin
+    | Cons d1 r1, Cons d2 r2 ->
+        let d = cin + d1 + d2 in
+        if d < base then Cons d          (add_cin r1 r2 0)
+                    else Cons (d - base) (add_cin r1 r2 1)
+    end
+
+  let add (n1 n2: num) : num
+    requires { valid n1 && valid n2 }
+    ensures  { valid result }
+    ensures  { value result = value n1 + value n2 }
+  = add_cin n1 n2 0
+
+end

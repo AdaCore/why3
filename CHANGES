@@ -8,8 +8,14 @@ Tools
     installed provers. These are available under name "Auto level 1"
     and "Auto level 2" in why3 ide.
 
+Version 0.87.1, May 27, 2016
+============================
+
+bug fixes
+  o assorted bug fixes
+
 Version 0.87.0, March 15, 2016
-================================
+==============================
 
 Language
   * Add new logical connectives "by" and "so" as keywords
@@ -88,7 +94,7 @@ provers
 bug fixes
   o why3doc: garbled output
 
-version 0.86, May 11, 2015
+Version 0.86, May 11, 2015
 ==========================
 
 core
@@ -130,7 +136,7 @@ bug fixes
   o IDE: proofs in progress should never be "cleaned"
   o IDE: display warnings after reload
 
-version 0.85, September 17, 2014
+Version 0.85, September 17, 2014
 ================================
 
 langage
@@ -160,7 +166,7 @@ transformations
 provers
   o fixed wrong warning when detecting Isabelle2014
 
-version 0.84, September 1, 2014
+Version 0.84, September 1, 2014
 ===============================
 
 tools
@@ -202,7 +208,7 @@ transformations
   o new transformation "compute_in_goal" that simplifies the goal, by
     computation, as much as possible
 
-version 0.83, March 14, 2014
+Version 0.83, March 14, 2014
 ============================
 
 syntax
@@ -242,7 +248,7 @@ API
 miscellaneous
   o fixed compilation bug with lablgtk 2.18
 
-version 0.82, December 12, 2013
+Version 0.82, December 12, 2013
 ===============================
 
   o lemma functions
@@ -282,7 +288,7 @@ version 0.82, December 12, 2013
   o [fix] syntax highlighting bugs: should be fixed by removing the old language
     file alt-ergo.lang from alt-ergo distribution
 
-version 0.81, March 25, 2013
+Version 0.81, March 25, 2013
 ============================
 
   o [prover] experimental support for SPASS >= 3.8 (with types)
@@ -305,8 +311,9 @@ version 0.81, March 25, 2013
     is not accepted anymore.
 
 
-version 0.80, Oct 31, 2012
-==========================
+Version 0.80, October 31, 2012
+==============================
+
   * [whyml] modified syntax for mlw programs; a summary of changes is
     given in Appendix A of the manual
   o [whyml] support for type invariants and ghost code
@@ -330,8 +337,9 @@ version 0.80, Oct 31, 2012
   * [config] modifiers in --extra-config are now called [prover_modifier]
     instead of just [prover]
 
-version 0.73, Jul 19, 2012
-==========================
+Version 0.73, July 19, 2012
+===========================
+
   o [IDE] "Clean" was cleaning too much
   * no more executable why3ml (why3 now handles WhyML files)
   o [Provers] support for Z3 4.0
@@ -349,8 +357,9 @@ version 0.73, Jul 19, 2012
   o new option -e for "why3session latex" allows to specify when to
     split tables in parts
 
-version 0.72, May 11, 2012
+Version 0.72, May 11, 2012
 ==========================
+
   o [Coq] new tactic "why3" to call external provers as oracles
   o [Coq output] new feature: theory realizations (see manual, chapter 9)
   o new tool why3session (see manual, section 6.7)
@@ -375,7 +384,7 @@ version 0.72, May 11, 2012
     a single abstract function/predicate symbol and Dlogic for
     a list of (mutually recursive) defined symbols.
 
-version 0.71, October 13, 2011
+Version 0.71, October 13, 2011
 ==============================
 
   o [examples] a lot of new program examples in directory examples/programs
@@ -390,7 +399,7 @@ version 0.71, October 13, 2011
     marked obsolete if it was made by a prover with another version
     than the current.
 
-version 0.70, July 6, 2011
+Version 0.70, July 6, 2011
 ==========================
 
   New features
@@ -432,8 +441,8 @@ version 0.70, July 6, 2011
     So old code performing "prove_task t () ()" should be translated to
     "wait_on_call (prove_task t ()) ()".
 
-version 0.64, Feb 16, 2011
-==========================
+Version 0.64, February 16, 2011
+===============================
 
   o configure: if possible, use ocamlfind to find lablgtk2 and sqlite3
   o algebraic types: must be well-founded, non-positive constructors
@@ -463,12 +472,7 @@ version 0.64, Feb 16, 2011
     repositories)
   o better Gappa output: support for sqrt, for negative constants
 
-version 0.63, Dec 21, 2010
-==========================
+Version 0.63, December 21, 2010
+===============================
 
   o first public release. See release notes in manual
-
-# Emacs parameters
-Local Variables:
-mode: text
-End:

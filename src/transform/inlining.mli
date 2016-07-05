@@ -51,7 +51,7 @@ val trivial : Task.task Trans.trans
 (** [trivial] corresponds to the transformation "inline_trivial"
     Inline only the trivial definition :
     logic c : t = a
-    logic f(x : t,...., ) : t = g(y : t2,...) *)
+    logic f(x : t,...) : t = g(y : t2,...) *)
 
 (*
 (** Functions to use in other transformations if inlining is needed *)

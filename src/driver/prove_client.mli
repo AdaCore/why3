@@ -28,13 +28,17 @@ val send_request :
   cmd:string list ->
   unit
 
-type answer = {
+type final_answer = {
   id        : int;
   time      : float;
   timeout   : bool;
   out_file  : string;
   exit_code : int;
 }
+
+type answer =
+  | Started of int
+  | Finished of final_answer
 
 val read_answers : blocking:bool -> answer list
 

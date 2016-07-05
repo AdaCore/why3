@@ -153,7 +153,9 @@ else
 fi
 fi
 
-AC_PROG_CC()
+AC_PROG_CC
+AC_PROG_MKDIR_P
+AC_PROG_INSTALL
 
 # Check for Ocaml compilers
 
@@ -706,11 +708,8 @@ dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
 
 VERSION=$PACKAGE_VERSION
 
-BUILDDATE="$(date)"
-
 # substitutions to perform
 AC_SUBST(VERSION)
-AC_SUBST(BUILDDATE)
 
 AC_SUBST(enable_verbose_make)
 

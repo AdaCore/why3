@@ -65,19 +65,25 @@ test_makejob: $(TEST_MAKEJOB)
 ################
 
 %.cmi: %.mli
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $<
+	$(SHOW) 'Ocamlc   $<'
+	$(HIDE)$(OCAMLC) -c $<
 
 %.cmo: %.ml
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $<
+	$(SHOW) 'Ocamlc   $<'
+	$(HIDE)$(OCAMLC) -c $<
 
 %.cmx: %.ml
-	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $<
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -c $<
 
 %.dep: %.ml
-	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< $<i > $@
+	$(SHOW) 'Ocamldep $<'
+	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $< $<i $(TOTARGET)
 
 %.opt:
-	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -linkpkg -o $@ $^
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -linkpkg -o $@ $^
 
 %.byte:
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -linkpkg -o $@ $^
+	$(SHOW) 'Ocamlc   $<'
+	$(HIDE)$(OCAMLC) -linkpkg -o $@ $^

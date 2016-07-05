@@ -1,0 +1,1097 @@
+
+(* Common definitions. *)
+module WpCommon
+
+  use import ho_set.Set
+  use import ho_rel.Rel
+  use import ho_rel.Prod
+  use import order.Ordered
+  use import order.Chain
+  use import fn.Fun
+  use import fn.Image
+  use import compute_elts.Quant
+
+  (* Represent the basic informations about the game structure:
+     namely ordering, a 'validity' predicate serving as a global
+     invariant, and a structure used for decomposing quantifications. *)
+  type game_info 'a = {
+    game_order : erel 'a;
+    game_valid : set 'a;
+    game_strct : qstructure 'a;
+  }
+
+  (* Represent the usual structure of hypothesis:
+     precondition-postcondition couples, with auxiliary (ghost) parameters
+     'ig and 'il, and auxiliary (ghost) return values 'o.
+     'ig and 'il represent the distinction between global (shared among
+     hypothesis/'goal') and local (parameter of the current hypothesis)
+     parameters.
+     Finally, the 'input/output structure' will be used internally
+     to build quantifications introducting the input/output result(s):
+     input/output for inclusion tests, and output only for usage.
+   *)
+  type enf_hyp 'a 'ig 'il 'o = {
+    pre : 'ig -> rel 'il 'a;
+    post : 'ig -> 'il -> 'a -> rel 'o 'a;
+    pre_strct : qstructure 'il;
+    post_strct : qstructure 'o;
+  }
+
+  (* Definitions for domain shift
+     (TODO: introduce a combinator & explain better) *)
+  predicate invalid_sup_witness (r:rel 'a 'd) (o1:erel 'a) (o2:erel 'd) (sp:'d)
+                                (ch:set ('a,'d)) (inh:('a,'d)) =
+    chain (rprod o1 o2) ch /\ ch inh /\ supremum o2 (image snd ch) sp /\
+    (forall x y. ch (x,y) -> r x y) /\
+    (forall sp0. supremum o1 (image fst ch) sp0 -> not r sp0 sp)
+
+end
+
+module Wp "W:non_conservative_extension:N" (* Definitions in WpImpl *)
+
+  use export WpCommon
+  use import int.Int
+  use import ho_set.Set
+  use import ho_rel.Rel
+  use import compute_elts.Base
+  use import compute_elts.Quant
+
+  (* Context: represent a sequential set of hypothesis,
+     that can be referenced by index.
+     Those behave as De Bruijn Indices. *)
+  type context 'a
+  (* An enforcement record (type enforce 'a 'i 'o) internally
+     represent a game formula shaped roughly as
+
+     |- forall (GS:game_info 'a) (Gamma:context 'a) (x:'i) (Q:rel 'o 'a).
+         ordering(GS) /\ (Gamma MODULO valid(GS)) =>
+         < f(GS,Gamma,Q,x) -> exists y. Q y > (MODULO valid(GS) as well)
+
+     Here, the f(GS,Gamma,Q,x) represent a backward predicate transformer,
+     as would be obtained by wp calculus. It is modified to take into
+     account context & game basic info (the later being for inference reasons).
+
+     The hypothesis set (Gamma) will contain hypothesis shaped as:
+     forall x Q. < f(Q,x) -> exists y. Q y >, e.g regular backward predicate
+     transformer. They do not depend on the context as they are part of it.
+
+     'GS', of type game_info 'a, provides some references to the underlying
+     game:
+     - the underlying game ordering
+     - A validity predicate that indicate which states 'make sense'.
+       The theorem above takes that predicate into account everywhere,
+       as a global invariant.
+     - A 'quantification structure' for the games states, that serve
+       for decomposing quantification mentionning game states. *)
+  type enforce 'a 'i 'o
+  (* Transformer fields.
+     Fields might be added in the future, so enforce 'a 'i 'o
+     is kept abstract. *)
+  type ftransformer 'a 'i 'o = rel 'o 'a -> rel 'i 'a
+  type transformer 'a 'i 'o =
+    game_info 'a -> context 'a -> ftransformer 'a 'i 'o
+  function transformp (enforce 'a 'i 'o) : transformer 'a 'i 'o
+  (* Invariant *)
+  predicate enforce_inv (enforce 'a 'i 'o)
+
+  (* Exposed logical function to create contexts. *)
+  function ctx_nil : 'ig -> context 'a
+  function ctx_add (qstructure 'a)
+                   (enf_hyp 'a 'ig 'il 'o)
+                   ('ig -> context 'a) : 'ig -> context 'a
+
+  (* A potentially useful postcondition for abstractions:
+     empty postcondition. *)
+  function empty_post : 'ig -> 'il -> 'a -> rel 'o 'a
+
+  (* Abstraction combinator: replace the backward predicate
+     transformer by an explicit interface triple
+     (context,precondition,postcondition).
+     This generates proof obligations corresponding to the transformers. *)
+  function abstraction_enforce (game_info 'a)
+                               ('ig -> context 'a)
+                               (enf_hyp 'a 'ig 'il 'o) :
+                               enforce 'a ('ig,'il) 'o
+  predicate proof_obligations (game_info 'a)
+                              (qstructure 'ig)
+                              ('ig -> context 'a)
+                              (enforce 'a ('ig,'il) 'o)
+                              (enf_hyp 'a 'ig 'il 'o)
+  val ghost abstraction (gi:game_info 'a)
+                        (igs:qstructure 'ig)
+                        (gf:'ig -> context 'a)
+                        (eh:enf_hyp 'a 'ig 'il 'o)
+                        (e:enforce 'a ('ig,'il) 'o) : enforce 'a ('ig,'il) 'o
+    requires { enforce_inv e }
+    requires { "expl:to be computed precondition"
+      proof_obligations gi igs gf e eh }
+    ensures { enforce_inv result }
+    ensures { result --> abstraction_enforce gi gf eh }
+
+  (* Kontinuation combinator: take an enforcement record that
+     may use a continuation for the place right there as last
+     hypothesis, and send back one which does not need it.
+     Programming analogy: this is similar to call/cc. *)
+  function kontinuation_enforce (enforce 'a 'i 'o) : enforce 'a 'i 'o
+  val ghost ktrap (e:enforce 'a 'i 'o) : enforce 'a 'i 'o
+    requires { enforce_inv e }
+    ensures { enforce_inv result }
+    ensures { result --> kontinuation_enforce e }
+
+  (* Context reference combinator: create an enforcement record that
+     corresponds to use the n-th hypothesis. *)
+  function ctx_ref_enforce int : enforce 'a ('ig,'il) 'o
+  val ghost ctx_ref (n:int) : enforce 'a ('ig,'il) 'o
+    ensures { enforce_inv result }
+    ensures { result --> ctx_ref_enforce n }
+
+  (* Hide away from main namespace definitions & axioms
+     related to computation rules *)
+  namespace LOCAL
+
+    (* Context members, functions creating them, and associated rules. *)
+    type hyp 'a
+    type fz_enforce 'a 'i 'o
+    function fz_transformp (fz_enforce 'a 'i 'o) : ftransformer 'a 'i 'o
+    function fz_enforce_hyp (fz_enforce 'a 'i 'o) : hyp 'a
+    function enf_hyp_fz (qstructure 'a) (xg:'ig)
+                        (eh:enf_hyp 'a 'ig 'il 'o) : fz_enforce 'a 'il 'o
+    function freeze_context (game_info 'a) (context 'a) 'ig
+                            (enforce 'a ('ig,'il) 'o) : fz_enforce 'a 'il 'o
+    function post_inclusion (q1 q2:rel 'o 'a) : set ('o,'a)
+
+    axiom enf_hyp_fz_rule : forall gs xg q xl xs,eh:enf_hyp 'a 'ig 'il 'o.
+      (enf_hyp_fz gs xg eh).fz_transformp q xl xs <->
+      ("expl:inner precondition" (eh.pre xg xl xs = true)) &&
+      quant_structure true (q_pair eh.post_strct gs)
+                           (post_inclusion (eh.post xg xl xs) q)
+    meta rewrite prop enf_hyp_fz_rule
+    meta remove_prop prop enf_hyp_fz_rule
+
+    axiom freeze_context_transformp_rule :
+      forall gi xg ctx q xl xs,e:enforce 'a ('ig,'il) 'o.
+        (freeze_context gi ctx xg e).fz_transformp q xl xs <->
+        e.transformp gi ctx q (xg,xl) xs
+    meta rewrite prop freeze_context_transformp_rule
+    meta remove_prop prop freeze_context_transformp_rule
+
+    axiom post_inclusion_rule : forall q1 q2:rel 'o 'a,y ys.
+      post_inclusion q1 q2 (y,ys) <->
+        (q1 y ys -> "expl:inner postcondition" (q2 y ys = true))
+    meta rewrite prop post_inclusion_rule
+    meta remove_prop prop post_inclusion_rule
+
+    (* Matching between a 'context-frozen' enforce and a fully structured
+       hypothesis. *)
+    function fz_enforce_match_fn 'ig (ftransformer 'a 'il 'o)
+                                 (enf_hyp 'a 'ig 'il 'o) : set ('il,'a)
+    axiom fz_enforce_match_fn_rule :
+      forall xg ft xl xs,eh:enf_hyp 'a 'ig 'il 'o.
+        fz_enforce_match_fn xg ft eh (xl,xs) <->
+        (eh.pre xg xl xs -> ft (eh.post xg xl xs) xl xs)
+    meta rewrite prop fz_enforce_match_fn_rule
+    meta remove_prop prop fz_enforce_match_fn_rule
+
+    predicate fz_enforce_match (qstructure 'a) 'ig (fz_enforce 'a 'il 'o)
+                               (enf_hyp 'a 'ig 'il 'o)
+    axiom fz_enforce_match_rule : forall gs xg fze,eh:enf_hyp 'a 'ig 'il 'o.
+      fz_enforce_match gs xg fze eh <->
+        let fn = fz_enforce_match_fn xg fze.fz_transformp eh in
+        quant_structure true (q_pair eh.pre_strct gs) fn
+    meta rewrite prop fz_enforce_match_rule
+    meta remove_prop prop fz_enforce_match_rule
+
+    (* Definitions & rules associated to context creation & access *)
+    function ctx_empty : context 'a
+    function ctx_cons (hyp 'a) (context 'a) : context 'a
+    function ctx_nth (context 'a) int : hyp 'a
+    function ctx_len (context 'a) : int
+
+    axiom ctx_nth_rule : forall h:hyp 'a,ctx n.
+      ctx_nth (ctx_cons h ctx) n = if n = 0 then h else ctx_nth ctx (n-1)
+    meta rewrite prop ctx_nth_rule
+    meta remove_prop prop ctx_nth_rule
+
+    axiom ctx_len_cons : forall h:hyp 'a,ctx.
+      ctx_len (ctx_cons h ctx) = 1 + ctx_len ctx
+    meta rewrite prop ctx_len_cons
+    meta remove_prop prop ctx_len_cons
+
+    axiom ctx_len_empty : ctx_len (ctx_empty:context 'a) = 0
+    meta rewrite prop ctx_len_empty
+    meta remove_prop prop ctx_len_empty
+
+    axiom ctx_nil_apply : forall xg:'ig. ctx_nil xg = (ctx_empty:context 'a)
+    meta rewrite prop ctx_nil_apply
+    meta remove_prop prop ctx_nil_apply
+
+    axiom ctx_add_apply : forall eh:enf_hyp 'a 'ig 'il 'o,gs xg ctx.
+      ctx_add gs eh ctx xg =
+        ctx_cons (fz_enforce_hyp (enf_hyp_fz gs xg eh)) (ctx xg)
+    meta rewrite prop ctx_add_apply
+    meta remove_prop prop ctx_add_apply
+
+    (* Rules related to sub-contexts. *)
+    predicate sub_context (qstructure 'a) (a b:context 'a)
+    (* Note: if this symbol is ever seen in a fully reduced goal,
+       it indicates a type mistake. *)
+    predicate weaker_hypothesis (qstructure 'a) (h1 h2:hyp 'a)
+    predicate weaker_hypothesis_prelude (h1 h2:hyp 'a)
+
+    axiom sub_context_empty : forall gs:qstructure 'a,c.
+      sub_context gs ctx_empty c <-> true
+    meta rewrite prop sub_context_empty
+    meta remove_prop prop sub_context_empty
+
+    axiom sub_context_add : forall gs:qstructure 'a,h1 c1 h2 c2.
+      sub_context gs (ctx_cons h1 c1) (ctx_cons h2 c2) <->
+        weaker_hypothesis gs h1 h2 /\ sub_context gs c1 c2
+    meta rewrite prop sub_context_add
+    meta remove_prop prop sub_context_add
+
+    axiom sub_context_refl : forall gs:qstructure 'a,c.
+      sub_context gs c c <-> true
+    meta rewrite prop sub_context_refl
+    meta remove_prop prop sub_context_refl
+
+    axiom weaker_hypothesis_rule :
+      forall gs1 gs2 xg fze,eh:enf_hyp 'a 'ig 'il 'o.
+        weaker_hypothesis gs1 (fz_enforce_hyp (enf_hyp_fz gs2 xg eh))
+                              (fz_enforce_hyp fze)
+        <-> (weaker_hypothesis_prelude (fz_enforce_hyp (enf_hyp_fz gs2 xg eh))
+                                       (fz_enforce_hyp fze) ->
+             fz_enforce_match gs1 xg fze eh)
+    meta rewrite prop weaker_hypothesis_rule
+    meta remove_prop prop weaker_hypothesis_rule
+
+    axiom weaker_hypothesis_refl : forall gs,h:hyp 'a.
+      weaker_hypothesis gs h h <-> true
+    meta rewrite prop weaker_hypothesis_refl
+    meta remove_prop prop weaker_hypothesis_refl
+
+    (* Rules for abstraction. *)
+    function proof_obligations_fn (game_info 'a)
+                                  ('ig -> context 'a)
+                                  (enforce 'a ('ig,'il) 'o)
+                                  (enf_hyp 'a 'ig 'il 'o) : set 'ig
+    axiom proof_obligations_fn_rule :
+      forall gi gf e xg,eh:enf_hyp 'a 'ig 'il 'o.
+        proof_obligations_fn gi gf e eh xg <->
+        fz_enforce_match gi.game_strct xg (freeze_context gi (gf xg) xg e) eh
+    meta rewrite prop proof_obligations_fn_rule
+    meta remove_prop prop proof_obligations_fn_rule
+
+    axiom proof_obligations_rule :
+      forall gi igs gf e,eh:enf_hyp 'a 'ig 'il 'o.
+      proof_obligations gi igs gf e eh <->
+      quant_structure true igs (proof_obligations_fn gi gf e eh)
+    meta rewrite prop proof_obligations_rule
+    meta remove_prop prop proof_obligations_rule
+
+    axiom abstraction_enforce_transformp_rule :
+      forall gi1 gi2 gf ctx q xg xl xs,eh:enf_hyp 'a 'ig 'il 'o.
+      (abstraction_enforce gi1 gf eh).transformp gi2 ctx q (xg,xl) xs <->
+        gi2.game_order = gi1.game_order /\ gi2.game_valid = gi1.game_valid /\
+        sub_context gi2.game_strct (gf xg) ctx /\
+        (enf_hyp_fz gi2.game_strct xg eh).fz_transformp q xl xs
+    meta rewrite prop abstraction_enforce_transformp_rule
+    meta remove_prop prop abstraction_enforce_transformp_rule
+
+    (* Rules for ktrap *)
+    axiom empty_post_rule :
+      forall xg:'ig,xl:'il,xs:'a,y:'o,ys.
+        empty_post xg xl xs y ys <-> false
+    meta rewrite prop empty_post_rule
+    meta remove_prop prop empty_post_rule
+
+    function kont_pre (q:rel 'o 'a) : 'i -> rel 'o 'a
+    axiom kont_pre_rule : forall q,xl:'i,y:'o,ys:'a.
+      kont_pre q xl y ys <-> q y ys
+    meta rewrite prop kont_pre_rule
+    meta remove_prop prop kont_pre_rule
+
+    axiom kontinuation_enforce_transformp_rule :
+      forall e:enforce 'a 'i 'o,gi ctx q x xs.
+        (kontinuation_enforce e).transformp gi ctx q x xs <->
+        let eh = { pre = kont_pre q; post = empty_post;
+                   pre_strct = q_def; post_strct = q_unit } in
+        let ctx' = ctx_cons (fz_enforce_hyp (enf_hyp_fz q_def x eh)) ctx in
+        e.transformp gi ctx' q x xs
+    meta rewrite prop kontinuation_enforce_transformp_rule
+    meta remove_prop prop kontinuation_enforce_transformp_rule
+
+    (* Rules for context reference *)
+    function ctx_t_deref (h:hyp 'a) : ftransformer 'a 'i 'o
+    function ctx_ref_transformer_prelude (fze:fz_enforce 'a 'i 'o) :
+      ftransformer 'a 'i 'o
+    axiom ctx_t_deref_rule : forall fze:fz_enforce 'a 'i 'o,q x xs.
+      ctx_t_deref (fz_enforce_hyp fze) q x xs <->
+      (ctx_ref_transformer_prelude fze q x xs -> fze.fz_transformp q x xs)
+    meta rewrite prop ctx_t_deref_rule
+    meta remove_prop prop ctx_t_deref_rule
+    axiom ctx_ref_enforce_transformp_rule :
+      forall n:int,xg:'ig,gi ctx,q:rel 'o 'a,xl:'il,xs.
+        (ctx_ref_enforce n).transformp gi ctx q (xg,xl) xs <->
+        0 <= n < ctx_len ctx /\ ctx_t_deref (ctx_nth ctx n) q xl xs
+    meta rewrite prop ctx_ref_enforce_transformp_rule
+    meta remove_prop prop ctx_ref_enforce_transformp_rule
+
+  end
+
+  (* TODO: erase those, they are harnesses. *)
+
+  function h_eh (p:'i -> bool) (q:'i -> 'o -> bool) :
+    enf_hyp unit 'g 'i 'o = {
+    pre = \_ x _. p x;
+    post = \_ x _ y _. q x y;
+    pre_strct = q_def;
+    post_strct = q_def;
+  }
+  meta rewrite_def function h_eh
+
+  function gu : game_info unit = {
+    game_order = \_ _. true;
+    game_valid = \_. true;
+    game_strct = q_unit;
+  }
+  meta rewrite_def function gu
+
+  function h_skip : enf_hyp 'a 'g 'i 'o =
+    { pre = \_ _ _. true;
+      post = \_ _ xs _ ys. xs = ys;
+      pre_strct = q_def;
+      post_strct = q_def;
+    }
+  meta rewrite_def function h_skip
+
+  let ghost test (e:enforce unit ('g,'i) 'o)
+                 (pc1 pc2:set 'ic) (qc1 qc2:rel 'ic 'oc)
+                 (p1 p2:set 'i) (q1 q2:rel 'i 'o) : enforce unit ('g,'i) 'o
+    requires { enforce_inv e }
+    requires { e -->
+      abstraction_enforce gu
+      (ctx_add q_unit (h_eh pc1 qc1) ctx_nil)
+      (h_eh p1 q1) }
+    requires { subset p2 p1 }
+    requires { forall x y. p2 x /\ q1 x y -> q2 x y }
+    requires { subset pc1 pc2 }
+    requires { forall x y. pc1 x /\ qc2 x y -> qc1 x y }
+    ensures { enforce_inv result }
+    ensures { result -->
+      abstraction_enforce gu
+      (ctx_add q_unit (h_eh pc2 qc2) ctx_nil)
+      (h_eh p2 q2) }
+  = let c = ctx_add q_unit (h_eh pc2 qc2) ctx_nil in
+    abstraction gu q_def c (h_eh p2 q2) e
+
+  let ghost skip (gi:game_info 'a) : enforce 'a ('g,unit) unit
+    requires { gi.game_strct --> q_def }
+    ensures { enforce_inv result }
+    ensures { result --> abstraction_enforce gi ctx_nil h_skip }
+  = abstraction gi q_def ctx_nil h_skip (ktrap (ktrap (ktrap (ctx_ref 2))))
+
+end
+
+module WpImpl
+
+  use import WpCommon
+  use import int.Int
+  use import choice.Choice
+  use import list.List
+  use import list.Length
+  use import ho_set.Set
+  use import ho_rel.Rel
+  use import ho_rel.Prod
+  use import ho_rel.RelSet
+  use import order.Ordered
+  use import order.Chain
+  use import fn.Fun
+  use import fn.Image
+  use import game.Game
+  use import game.StratProps
+  use import game_fmla.Fmla
+  use import game_fmla.FmlaRules
+  use import compute_elts.Quant
+
+  (* Context definitions & a few lemmas about it. *)
+
+  (* (flat) Hypothesis are set of pairs (precondition,postcondition)  *)
+  type hyp 'a = set (set 'a,set 'a)
+  (* Contexts are merely lists, hypothesis being referenced to by nth.
+     (this is reminiscent to De Bruijn Indices) *)
+  type context 'a = list (hyp 'a)
+  (* Fusion of all hypothesis into one. *)
+  predicate ctx_union (ctx:context 'a) (h:(set 'a,set 'a)) = match ctx with
+    | Nil -> false
+    | Cons x q -> x h \/ ctx_union q h
+    end
+  (* Hypothesis access. *)
+  function ctx_nth (ctx:context 'a) (n:int) : hyp 'a = match ctx with
+    | Nil -> witness
+    | Cons x q -> if n = 0 then x else ctx_nth q (n-1)
+    end
+  (* Interpretation of a pre/post-condition tandem
+     + relation to effective game as a game formula. *)
+  function pre_post_fmla (r:rel 'a 'd) (pq:(set 'a,set 'a)) : fmla 'd =
+    let (p,q) = pq in enforce (related r p) (related r q)
+  (* Transform an hypothesis into a universal formula (quantification
+     over all pre/post-condition tandems) *)
+  function hyp_fmla (r:rel 'a 'd) (h:hyp 'a) : fmla 'd =
+    b_universal h (pre_post_fmla r)
+  (* A natural lemma about context update. *)
+  lemma ctx_hyp_add_fmla : forall r:rel 'a 'd,h q g.
+    game_wf g ->
+    (hyp_fmla r h g /\ hyp_fmla r (ctx_union q) g <->
+      hyp_fmla r (ctx_union (Cons h q)) g)
+  (* Lifting of postcondition with auxiliary (ghost) return values *)
+  function e_lift (q:rel 'a 'b) : set 'b = \y. exists x. q x y
+  (* Transform a regular backward predicate transformer into an hypothesis. *)
+  function transf_hyp (t:rel 'o 'a -> rel 'i 'a) : hyp 'a =
+    \pr. let (p,q) = pr in exists x q'. q = e_lift q' /\ p = t q' x
+  (* Directly transform a structured hypothesis into a flat one.
+     Even though we will store all hypothesis in transformer form,
+     this temporary form is useful when adding structured ones in context. *)
+  function direct_enf_hyp
+    (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) : hyp 'a =
+    \pr. let (p,q) = pr in
+      exists xl xs. p = inter (eh.pre xg xl) ((=) xs) /\
+                    q = e_lift (eh.post xg xl xs)
+  (* Transform a structured hypothesis into a regular backward predicate
+     transformer. *)
+  function enf_transf (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) :
+                      rel 'o 'a -> rel 'il 'a =
+    \q xl xs. eh.pre xg xl xs && forall y ys. eh.post xg xl xs y ys -> q y ys
+  function enf_hyp (xg:'ig) (eh:enf_hyp 'a 'ig 'il 'o) : hyp 'a =
+    transf_hyp (enf_transf xg eh)
+  (* Lemma: both ways of creating a flat hypothesis from a structured
+     one are equivalent. *)
+  lemma enf_transf_identical :
+    forall r:rel 'a 'd,xg,eh:enf_hyp 'a 'ig 'il 'o,g. game_wf g ->
+    let hd = direct_enf_hyp xg eh in
+    let ht = enf_hyp xg eh in
+    (hyp_fmla r hd g -> hyp_fmla r ht g
+      by let et = enf_transf xg eh in
+        forall p q. ht (p,q) -> pre_post_fmla r (p,q) g
+      by let pr = related r p in let qr = related r q in
+        holds (hyp_fmla r hd) (enforce pr qr)
+      by exists xl q'. q = e_lift q' /\ p = et q' xl
+      so forall xd. pr xd -> holds (hyp_fmla r hd) (enforce ((=) xd) qr)
+      by exists xs. r xs xd /\ p xs
+      so let p0 = inter (eh.pre xg xl) ((=) xs) in
+        let q0 = e_lift (eh.post xg xl xs) in
+        hd (p0,q0)
+      so holds (hyp_fmla r hd) (pre_post_fmla r (p0,q0))
+      so subset ((=) xd) (related r p0)
+      so subset (related r q0) qr
+    ) /\ (hyp_fmla r ht g -> hyp_fmla r hd g
+      by let et = enf_transf xg eh in
+        forall p q. hd (p,q) -> pre_post_fmla r (p,q) g
+      by let pr = related r p in let qr = related r q in
+        holds (hyp_fmla r ht) (enforce pr qr)
+      by exists xl xs. p = inter (eh.pre xg xl) ((=) xs) /\
+                       q = e_lift (eh.post xg xl xs)
+      so let p1 = et (eh.post xg xl xs) xl in ht (p1,q)
+      so holds (hyp_fmla r ht) (pre_post_fmla r (p1,q))
+      so subset pr (related r p1)
+    )
+
+  (* Notions related to pointwise context inclusion *)
+  predicate hyp_deduce (h:hyp 'a) (x:'a) (q:set 'a) =
+    exists p' q'. h (p',q') /\ p' x /\ subset q' q
+  predicate weaker_hypothesis (h1 h2:hyp 'a) =
+    forall p q x. h1 (p,q) /\ p x -> hyp_deduce h2 x q
+  predicate sub_context (g1 g2:context 'a) = match g1, g2 with
+    | Nil, _ -> true
+    | _, Nil -> false
+    | Cons h1 q1, Cons h2 q2 -> weaker_hypothesis h1 h2 /\ sub_context q1 q2
+    end
+  lemma weaker_hypothesis_correct : forall r:rel 'a 'd,h1 h2.
+    weaker_hypothesis h1 h2 ->
+    holds (hyp_fmla r h2) (hyp_fmla r h1)
+      by forall pq. h1 pq -> holds (hyp_fmla r h2) (pre_post_fmla r pq)
+      by let (p,q) = pq in
+        let pr = related r p in
+        let qr = related r q in
+        forall xd. pr xd -> holds (hyp_fmla r h2) (enforce ((=) xd) qr)
+          by exists x. p x /\ r x xd
+          so exists p' q'. h2 (p',q') /\ p' x /\ subset q' q
+          so holds (hyp_fmla r h2) (pre_post_fmla r (p',q'))
+          so subset ((=) xd) (related r p') /\ subset (related r q') qr
+  (* if g1 sub g2, then g1 holds under g2. *)
+  let rec lemma sub_context_correct (r:rel 'a 'd) (g1 g2:context 'a) : unit
+    requires { sub_context g1 g2 }
+    ensures { holds (hyp_fmla r (ctx_union g2)) (hyp_fmla r (ctx_union g1)) }
+    variant { g1 }
+  = match g1, g2 with
+    | Nil, _ -> ()
+    | _, Nil -> absurd
+    | Cons h1 q1, Cons h2 q2 ->
+      assert { holds (hyp_fmla r h2) (hyp_fmla r h1) };
+      sub_context_correct r q1 q2
+    end
+  (* Obviously, reflexive. *)
+  let rec lemma sub_context_refl (g:context 'a) : unit
+    ensures { sub_context g g }
+    variant { g }
+  = match g with Nil -> () | Cons _ q -> sub_context_refl q end
+  (* Useful lemma for actual computation-started resolution:
+     a sufficient condition for hypothesis inclusion (which we will
+     require in practice) is that one is transformer-based, the other
+     is structurally-based, and that they match out *)
+  predicate enf_transf_match (xg:'ig) (t:rel 'o 'a -> rel 'il 'a)
+                             (eh:enf_hyp 'a 'ig 'il 'o) =
+    forall xl xs. eh.pre xg xl xs -> t (eh.post xg xl xs) xl xs
+  lemma weaker_hypothesis_sufficient : forall xg t,eh:enf_hyp 'a 'ig 'il 'o.
+    enf_transf_match xg t eh ->
+    let he = enf_hyp xg eh in
+    let ht = transf_hyp t in
+    weaker_hypothesis he ht
+    by forall p q xs. he (p,q) /\ p xs ->
+      let et = enf_transf xg eh in
+      exists xl q'. q = e_lift q' /\ p = et q' xl
+    so eh.pre xg xl xs
+    so let q2 = eh.post xg xl xs in
+       let p2 = t q2 xl in
+       let q2' = e_lift q2 in
+      p2 xs /\ subset q2' q /\ ht (p2,q2')
+
+
+  (* transformer definition, invariant, and a domain shift lemma. *)
+  type ftransformer 'a 'i 'o = rel 'o 'a -> rel 'i 'a
+  type transformer 'a 'i 'o =
+    game_info 'a -> context 'a -> ftransformer 'a 'i 'o
+  function sing_kont_fmla (x:'d) : fmla 'd = enforce ((=) x) none
+  predicate invalid_sup (r:rel 'a 'd) (o1:erel 'a) (o2:erel 'd) (sp:'d) =
+    exists ch inh. invalid_sup_witness r o1 o2 sp ch inh
+  function vld_fmla (r:rel 'a 'd) (o1:erel 'a) (o2:erel 'd) : fmla 'd =
+    b_universal (invalid_sup r o1 o2) sing_kont_fmla
+  predicate eqv (s:set 'a) (x y:'a) = x = y /\ s x
+  predicate valid_proj (gi:game_info 'a) (r:rel 'a 'd) (o:erel 'd) =
+    order gi.game_order /\
+    (forall x y. r x y -> gi.game_valid x) /\
+    (forall x y u v. r x y /\ r u v /\ o y v -> gi.game_order x u)
+  predicate transform_inv (t:transformer 'a 'i 'o) =
+    forall gi ctx q x.
+      let o = gi.game_order in
+      let r = eqv gi.game_valid in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      let p2 = related r (t gi ctx q x) in
+      let q2 = related r (e_lift q) in
+      holds c (enforce p2 q2)
+
+  (* Very important lemma: in the invariant, we fixed the game support type
+     to be 'd = 'a, as well as we fixed the order and the relation.
+     However, this will still holds for ANY support type 'd and order
+     with a validity-compatible relation that maps ordering relation backward.
+     This allows to port theorems to different domains.
+     Note: monotonicity condition come from the fact that if
+       (x -> Q) is in context, what is truly implied is
+       (x -> \y. Q y /\ y >= x). However, related (\y. Q y /\ y >= x) is
+       a priori not a superset of \y'. related(Q) y' /\ y' >= x'.
+       The condition on the ordering relation is the simplest way to guarantee
+       this.
+     Method:
+     1) build a canonical game satisfying the context
+     2) Show the relation induce simulation from the canonical game
+        to the 'd-one.
+     This lemma will be used to switch between game supports.
+     TODO: need to devise tools to carry out switching correctly on
+       context, as it is non-trivial. We may need to enforce
+       usage of a very particular kind of explicit contexts...
+       but they cannot be explicited for obvious typing reasons ! *)
+
+  lemma transform_inv_reinforced : forall t:transformer 'a 'i 'o.
+    transform_inv t ->
+    forall gi ctx q x rd,od:erel 'd. valid_proj gi rd od ->
+      let oe = gi.game_order in
+      let c = conj (hyp_fmla rd (ctx_union ctx))
+                   (conj (vld_fmla rd oe od) (ordering od)) in
+      let p0 = t gi ctx q x in let q0 = e_lift q in
+      let pd = related rd p0 in let qd = related rd q0 in
+      holds c (enforce pd qd)
+      by forall gd. game_wf gd /\ c gd -> have_uniform_winning_strat gd pd qd
+      by let re = eqv gi.game_valid in
+        let ctx0 = \p q. (exists p0 q0. ctx_union ctx (p0,q0) /\
+                          p = related re p0 /\ q = related re q0) \/
+                         (exists sp. invalid_sup re oe oe sp /\
+                          p = (=) sp /\ q = none)
+        in
+        let tr = \x s. exists p q. ctx0 p q /\ p x /\ s = inter q (oe x) in
+        let ge = { progress = oe; transition = tr } in
+        game_wf ge
+      (* Preliminary: related by re then rd is equivalent to relate
+           directly by rd *)
+      so ("stop_split" forall s. related rd (related re s) = related rd s
+        by let rds = related rd s in let res = related re s in
+          let rdes = related rd res in
+          sext rdes rds
+        by (forall x. rdes x -> rds x)
+        /\ (forall x. rds x -> rdes x
+          by exists y. s y /\ rd y x so res y by re y y)
+      )
+      (* All pre-post implied by the context are validated by ge
+         (the canonical game associated to the theorem) *)
+      so ("stop_split" forall p q. ctx0 p q -> enforce p q ge
+        by forall x. p x -> have_winning_strat ge x q
+        by let s = inter q (oe x) in
+          subset s q /\ tr x s)
+      (* Hence the context is validated by ge, and so the final
+         pre/post holds. *)
+      so let ce = conj (hyp_fmla re (ctx_union ctx))
+                       (conj (vld_fmla re oe oe) (ordering oe))
+        in ("stop_split" ce ge
+          by hyp_fmla re (ctx_union ctx) ge
+          /\ (vld_fmla re oe oe ge)
+          /\ ordering oe ge
+      )
+      so let pe = related re p0 in let qe = related re q0 in
+        (enforce pe qe ge by holds ce (enforce pe qe))
+      (* To conclude, it remains only to notice that rd
+         induce a step-by-step simulation from ge to gd. *)
+      so step_simulate ge rd gd
+      by ("stop_split" limit_compatible oe rd gd
+        by forall ch inh sd. chain (rprod oe od) ch /\ ch inh /\
+          (forall a b. ch (a,b) -> rd a b) /\ supremum od (image snd ch) sd ->
+          (have_winning_strat gd sd none
+          \/ exists se. supremum oe (image fst ch) se /\ rd se sd)
+        by if invalid_sup rd oe od sd
+        then have_winning_strat gd sd none
+          by enforce ((=) sd) none gd
+        else not invalid_sup_witness rd oe od sd ch inh
+          so exists se. supremum oe (image fst ch) se /\ rd se sd
+      )
+      /\ "stop_split" forall x y s. tr x s /\ rd x y ->
+        (* Out of the two transitions possibility, the invalid
+           supremum one is unfeasible as this supremum may not be related. *)
+        have_winning_strat gd y (related rd s)
+        by exists p q. ctx0 p q /\ p x /\ s = inter q (oe x)
+        so (false by exists sp. invalid_sup re oe oe sp /\
+          p = (=) sp /\ q = none so exists ch inh.
+            invalid_sup_witness re oe oe sp ch inh
+          so image fst ch = image snd ch
+          by sext (image fst ch) (image snd ch)
+          by (forall x. image fst ch x <-> ch (x,x))
+          /\ (forall x. image snd ch x <-> ch (x,x))
+        )
+        \/ (exists p0 q0. ctx_union ctx (p0,q0) /\
+          p = related re p0 /\ q = related re q0
+          so enforce (related rd p0) (related rd q0) gd
+          so let cd = subgame gd in
+            holds cd (enforce (related rd p0) (related rd q0))
+          so let qr = related rd q in
+            (holds cd (enforce ((=) y) qr)
+            by subset ((=) y) (related rd p0))
+          so holds cd (enforce ((=) y) (inter qr (od y)))
+          so (holds cd (enforce ((=) y) (related rd s))
+            by subset (inter qr (od y)) (related rd s)
+          )
+          so have_uniform_winning_strat gd ((=) y) (related rd s)
+        )
+
+  (* Another useful lemma: the invariant can be mostly reworded using
+     hyp_fmla & transformer hypothesis. *)
+  function freeze_context_t (gi:game_info 'a) (g:context 'a) (xg:'ig)
+                            (t:transformer 'a ('ig,'il) 'o) :
+                            ftransformer 'a 'il 'o = \q xl. t gi g q (xg,xl)
+  lemma transform_inv_as_hyp_fmla : forall t:transformer 'a ('ig,'il) 'o.
+    transform_inv t -> forall gi ctx xg.
+      let r = eqv gi.game_valid in
+      let o = gi.game_order in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      let ft = freeze_context_t gi ctx xg t in
+      let ht = transf_hyp ft in
+      holds c (hyp_fmla r ht)
+      by forall pq. ht pq -> holds c (pre_post_fmla r pq)
+      by let (p,q) = pq in
+        let p2 = related r p in
+        let q2 = related r q in
+        holds c (enforce p2 q2)
+      by exists xl q'. q = e_lift q' /\ p = ft q' xl
+      so p = t gi ctx q' (xg,xl)
+
+
+
+  (* First combinator: abstract away internal transformer by a given interface. *)
+  function abstraction_transformer (gi:game_info 'a)
+                                   (gf:'ig -> context 'a)
+                                   (eh:enf_hyp 'a 'ig 'il 'o) :
+                                   transformer 'a ('ig,'il) 'o =
+    \gi2 ctx q x xs. let (xg,xl) = x in
+      gi2.game_order = gi.game_order /\ gi2.game_valid = gi.game_valid /\
+      sub_context (gf xg) ctx /\ enf_transf xg eh q xl xs
+  (* Alternative (equivalent) invariant for enforcements that have
+     an abstraction for transformer. *)
+  predicate abstraction_inv (gi:game_info 'a)
+                            (gf:'ig -> context 'a)
+                            (eh:enf_hyp 'a 'ig 'il 'o) =
+    let o = gi.game_order in
+    let r = eqv gi.game_valid in
+    forall xg xl xs. let ctx = gf xg in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      gi.game_valid xs /\ eh.pre xg xl xs ->
+      let qr = related r (e_lift (eh.post xg xl xs)) in
+      holds c (enforce ((=) xs) qr)
+
+  lemma transform_inv_implies_abstraction_inv :
+    forall gi gf,eh:enf_hyp 'a 'ig 'il 'o.
+      let t = abstraction_transformer gi gf eh in
+      transform_inv t -> abstraction_inv gi gf eh
+      by forall xg xl xs. let ctx = gf xg in
+        let r = eqv gi.game_valid in let o = gi.game_order in
+        let c = conj (hyp_fmla r (ctx_union ctx))
+                     (conj (vld_fmla r o o) (ordering o)) in
+        gi.game_valid xs /\ eh.pre xg xl xs ->
+        let q = eh.post xg xl xs in
+        let qr = related r (e_lift q) in
+        holds c (enforce ((=) xs) qr)
+      by let p1 = t gi ctx q (xg,xl) in
+        let p2 = related r p1 in
+        holds c (enforce p2 qr)
+      so subset ((=) xs) p2
+      by r xs xs /\ p1 xs
+
+  lemma abstraction_inv_implies_transform_inv :
+    forall gi gf,eh:enf_hyp 'a 'ig 'il 'o.
+      let t = abstraction_transformer gi gf eh in
+      abstraction_inv gi gf eh -> transform_inv t
+    by forall gi2 ctx q0 x.
+        let o = gi2.game_order in let r = eqv gi2.game_valid in
+        let c0 = conj (vld_fmla r o o) (ordering o) in
+        let cx = hyp_fmla r (ctx_union ctx) in
+        let c = conj cx c0 in
+        let p2 = related r (t gi2 ctx q0 x) in
+        let q2 = related r (e_lift q0) in
+        holds c (enforce p2 q2)
+      by forall xs. p2 xs -> holds c (enforce ((=) xs) q2)
+      by r = eqv gi.game_valid /\ o = gi.game_order
+      so let (xg,xl) = x in
+        let q = eh.post xg xl xs in
+        let qr = related r (e_lift q) in
+        t gi2 ctx q0 x xs
+      so enf_transf xg eh q0 xl xs
+      so (holds c (enforce ((=) xs) qr)
+         by let ctx' = gf xg in
+           let cx' = hyp_fmla r (ctx_union ctx') in
+           let c' = conj cx' c0 in
+           holds c c' by holds cx cx')
+      so subset qr q2
+      by forall ys. qr ys -> q2 ys
+      by exists y. q y ys
+
+  predicate proof_obligations_t (gi:game_info 'a)
+                                (gf:'ig -> context 'a)
+                                (t:transformer 'a ('ig,'il) 'o)
+                                (eh:enf_hyp 'a 'ig 'il 'o) =
+    forall xg. enf_transf_match xg (freeze_context_t gi (gf xg) xg t) eh
+
+  (* Combinator itself. *)
+  let ghost abstraction_t (gi:game_info 'a)
+                          (gf:'ig -> context 'a)
+                          (eh:enf_hyp 'a 'ig 'il 'o)
+                          (t:transformer 'a ('ig,'il) 'o) :
+                          transformer 'a ('ig,'il) 'o
+    requires { transform_inv t }
+    requires { proof_obligations_t gi gf t eh }
+    ensures { result = abstraction_transformer gi gf eh }
+    ensures { transform_inv result }
+  = assert { abstraction_inv gi gf eh
+      by forall xg xl xs. let ctx = gf xg in
+        let o = gi.game_order in
+        let r = eqv gi.game_valid in
+        let c = conj (hyp_fmla r (ctx_union ctx))
+                     (conj (vld_fmla r o o) (ordering o)) in
+        let q0 = e_lift (eh.post xg xl xs) in
+        gi.game_valid xs /\ eh.pre xg xl xs ->
+        let qr = related r q0 in
+        let exs = (=) xs in
+        holds c (enforce exs qr)
+      by let hd = direct_enf_hyp xg eh in
+        let ft = freeze_context_t gi ctx xg t in
+        let ht = transf_hyp ft in
+        let p0 = inter (eh.pre xg xl) ((=) xs) in
+        hd (p0,q0)
+      so (subset exs (related r p0) by r xs xs)
+      so holds c (enforce (related r p0) qr)
+      by holds c (hyp_fmla r hd)
+      by let hd = enf_hyp xg eh in
+        holds c (hyp_fmla r hd)
+      by holds c (hyp_fmla r ht)
+      so holds (hyp_fmla r ht) (hyp_fmla r hd)
+      by weaker_hypothesis hd ht by enf_transf_match xg ft eh
+    };
+    abstraction_transformer gi gf eh
+
+  (* Second combinator: kontinuation trap. *)
+  function empty_post : 'a -> 'b -> 'c -> 'd -> 'e -> bool =
+    \_ _ _ _ _. false
+  function kontinuation_transformer
+    (t:transformer 'a 'i 'o) : transformer 'a 'i 'o =
+    \gi ctx q x xs.
+      let eh = { pre = const q; post = empty_post;
+                 pre_strct = q_def; post_strct = q_unit } in
+      t gi (Cons (enf_hyp x eh) ctx) q x xs
+
+  let ghost ktrap_t (t:transformer 'a 'i 'o) : transformer 'a 'i 'o
+    requires { transform_inv t }
+    ensures { result = kontinuation_transformer t }
+    ensures { transform_inv result }
+  = let res = kontinuation_transformer t in
+    assert { forall gi ctx q x.
+      let r = eqv gi.game_valid in let o = gi.game_order in
+      let cv = conj (vld_fmla r o o) (ordering o) in
+      let cx = hyp_fmla r (ctx_union ctx) in
+      let c = conj cx cv in
+      let p = res gi ctx q x in
+      let p2 = related r p in let q2 = related r (e_lift q) in
+      holds c (enforce p2 q2)
+      by is_fmla c
+      so let k = enforce q2 none in
+        holds (conj c k) (enforce p2 q2)
+      by let cx' = conj cx k in
+        let c' = conj cx' cv in
+        holds c' (enforce p2 q2)
+      by let eh = { pre = const q; post = empty_post;
+                    pre_strct = q_def; post_strct = q_unit } in
+        let h0 = enf_hyp x eh in
+        let ctx' = Cons h0 ctx in
+        let cx'' = hyp_fmla r (ctx_union ctx') in
+        (p = t gi ctx' q x by sext p (t gi ctx' q x))
+      so holds cx' cx''
+      by holds k (hyp_fmla r h0)
+      by let h1 = direct_enf_hyp x eh in
+        holds k (hyp_fmla r h1)
+      by forall pq. h1 pq -> holds k (pre_post_fmla r pq)
+      by let (p',q') = pq in
+        exists xl xs. p' = inter (q xl) ((=) xs)
+      so let p2' = related r p' in let q2' = related r q' in
+        holds k (enforce p2' q2')
+      by subset p2' q2 /\ holds k k
+    };
+    res
+
+  (* Third combinator: context reference. *)
+  function ctx_ref_transformer (n:int) : transformer 'a 'i 'o =
+    \_ ctx q _ xs. 0 <= n < length ctx /\
+      hyp_deduce (ctx_nth ctx n) xs (e_lift q)
+  let rec lemma ctx_nth_hyp (r:rel 'a 'd) (ctx:context 'a) (n:int) : unit
+    requires { 0 <= n < length ctx }
+    ensures { holds (hyp_fmla r (ctx_union ctx)) (hyp_fmla r (ctx_nth ctx n)) }
+    variant { ctx }
+  = match ctx with
+    | Nil -> absurd
+    | Cons _ q -> if n > 0 then ctx_nth_hyp r q (n-1)
+    end
+
+  let ghost ctx_ref_t (n:int) : transformer 'a 'i 'o
+    ensures { result = ctx_ref_transformer n }
+    ensures { transform_inv result }
+  = let t = ctx_ref_transformer n in
+    assert { forall gi ctx q x.
+      let o = gi.game_order in
+      let r = eqv gi.game_valid in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      let p = t gi ctx q x in
+      let qe = e_lift q in
+      let p2 = related r p in
+      let q2 = related r qe in
+      holds c (enforce p2 q2)
+      by forall xs. p2 xs -> holds c (enforce ((=) xs) q2)
+      by let h = ctx_nth ctx n in
+        holds c (hyp_fmla r h)
+      so exists p' q'. h (p',q') /\ p' xs /\ subset q' qe
+      so holds c (enforce (related r p') (related r q'))
+      so subset (related r q') q2
+    };
+    t
+
+  lemma hyp_deduce_sufficient :
+    forall ft:ftransformer 'a 'il 'o,q xl xs.
+      ft q xl xs -> hyp_deduce (transf_hyp ft) xs (e_lift q)
+      by transf_hyp ft (ft q xl,e_lift q)
+
+
+  (* Export zone: define exported types & values.
+     TODO(in late future): modify enforce/fz_enforce to allow other
+     (equivalent) wp calculus to be used, such as fast-wp. *)
+
+  (* Expose universal quant_structure definition to considerably
+     ease proof of computation rules *)
+  let lemma expose_quant_structure_def (s:qstructure 'a) (p:'a -> bool) : unit
+    ensures { quant_structure true s p <-> forall y. p y }
+  = quant_structure_def p
+
+  (* Proxy type for predicate transformers. *)
+  type enforce 'a 'i 'o = {
+    transformp : transformer 'a 'i 'o;
+  }
+  predicate enforce_inv (e:enforce 'a 'i 'o) = transform_inv e.transformp
+  (* Proxy type for context-frozen predicate transformers. *)
+  type fz_enforce 'a 'i 'o = {
+    fz_transformp : ftransformer 'a 'i 'o;
+  }
+  function fz_enforce_hyp (fze:fz_enforce 'a 'i 'o) : hyp 'a =
+    transf_hyp fze.fz_transformp
+  function enf_hyp_fz (qstructure 'a) (xg:'ig)
+                      (eh:enf_hyp 'a 'ig 'il 'o) : fz_enforce 'a 'il 'o =
+    { fz_transformp = enf_transf xg eh }
+  function freeze_context (gi:game_info 'a) (ctx:context 'a) (xg:'ig)
+                          (e:enforce 'a ('ig,'il) 'o) : fz_enforce 'a 'il 'o =
+    { fz_transformp = freeze_context_t gi ctx xg e.transformp }
+
+  function fz_enforce_match_fn (xg:'ig)
+                               (ft:ftransformer 'a 'il 'o)
+                               (eh:enf_hyp 'a 'ig 'il 'o) : set ('il,'a) =
+    \pr. let (xl,xs) = pr in
+      eh.pre xg xl xs -> ft (eh.post xg xl xs) xl xs
+  predicate fz_enforce_match (qstructure 'a)
+                             (xg:'ig)
+                             (fze:fz_enforce 'a 'il 'o)
+                             (eh:enf_hyp 'a 'ig 'il 'o) =
+    enf_transf_match xg fze.fz_transformp eh
+  lemma enf_transf_match_other_def :
+    forall xg ft,eh:enf_hyp 'a 'ig 'il 'o.
+      enf_transf_match xg ft eh <-> forall x. fz_enforce_match_fn xg ft eh x
+        by let (xl,xs) = x in eh.pre xg xl xs -> ft (eh.post xg xl xs) xl xs
+
+  function post_inclusion (q1 q2:rel 'o 'a) : set ('o,'a) =
+    \yp. let (y,ys) = yp in q1 y ys -> q2 y ys
+  lemma enf_transf_other_def : forall xg,eh:enf_hyp 'a 'ig 'il 'o,q xl xs.
+    (enf_transf xg eh q xl xs
+      by eh.pre xg xl xs /\ forall y ys. eh.post xg xl xs y ys -> q y ys
+      by post_inclusion (eh.post xg xl xs) q (y,ys))
+    <-> eh.pre xg xl xs /\
+      forall y. post_inclusion (eh.post xg xl xs) q y
+      by let (y,ys) = y in eh.post xg xl xs y ys -> q y ys
+
+  function ctx_nil : 'ig -> context 'a = \_. Nil
+  function ctx_add (qstructure 'a)
+                   (eh:enf_hyp 'a 'ig 'il 'o)
+                   (ctxf:'ig -> context 'a) : 'ig -> context 'a =
+    \xg. Cons (enf_hyp xg eh) (ctxf xg)
+
+  predicate sub_context_ex (qstructure 'a) (ctx1 ctx2:context 'a) =
+    sub_context ctx1 ctx2
+  predicate weaker_hypothesis_ex (qstructure 'a) (h1 h2:hyp 'a) =
+    weaker_hypothesis h1 h2
+  predicate weaker_hypothesis_prelude (h1 h2:hyp 'a) =
+    not weaker_hypothesis h1 h2
+  lemma sub_context_nil : forall c:context 'a.
+    sub_context Nil c by match c with Nil -> true | _ -> true end
+
+  function abstraction_enforce (gi:game_info 'a)
+                               (gf:'ig -> context 'a)
+                               (eh:enf_hyp 'a 'ig 'il 'o) :
+                               enforce 'a ('ig,'il) 'o =
+  { transformp = abstraction_transformer gi gf eh }
+
+  predicate proof_obligations (gi:game_info 'a)
+                              (igs:qstructure 'ig)
+                              (gf:'ig -> context 'a)
+                              (e:enforce 'a ('ig,'il) 'o)
+                              (eh:enf_hyp 'a 'ig 'il 'o) =
+    proof_obligations_t gi gf e.transformp eh
+  function proof_obligations_fn (gi:game_info 'a)
+                                (gf:'ig -> context 'a)
+                                (e:enforce 'a ('ig,'il) 'o)
+                                (eh:enf_hyp 'a 'ig 'il 'o) : set 'ig =
+    \xg. enf_transf_match xg (freeze_context_t gi (gf xg) xg e.transformp) eh
+
+  let ghost abstraction (gi:game_info 'a)
+                        (igs:qstructure 'ig)
+                        (gf:'ig -> context 'a)
+                        (eh:enf_hyp 'a 'ig 'il 'o)
+                        (e:enforce 'a ('ig,'il) 'o) :
+                        enforce 'a ('ig,'il) 'o
+    requires { enforce_inv e }
+    requires { proof_obligations gi igs gf e eh }
+    ensures { enforce_inv result }
+    ensures { result = abstraction_enforce gi gf eh }
+  = { transformp = abstraction_t gi gf eh e.transformp }
+
+  function kontinuation_enforce (e:enforce 'a 'i 'o) : enforce 'a 'i 'o =
+    { transformp = kontinuation_transformer e.transformp }
+
+  let ghost ktrap (e:enforce 'a 'i 'o) : enforce 'a 'i 'o
+    requires { enforce_inv e }
+    ensures { enforce_inv result }
+    ensures { result = kontinuation_enforce e }
+  = { transformp = ktrap_t e.transformp }
+
+  function ctx_ref_enforce (n:int) : enforce 'a 'i 'o =
+    { transformp = ctx_ref_transformer n }
+  let ghost ctx_ref (n:int) : enforce 'a 'i 'o
+    ensures { result = ctx_ref_enforce n }
+    ensures { enforce_inv result }
+  = { transformp = ctx_ref_t n }
+
+  function ctx_t_deref (h:hyp 'a) : ftransformer 'a 'i 'o =
+    \q _ xs. hyp_deduce h xs (e_lift q)
+  function ctx_ref_transformer_prelude
+    (fze:fz_enforce 'a 'i 'o) : ftransformer 'a 'i 'o =
+    \q x xs. not ctx_t_deref (fz_enforce_hyp fze) q x xs
+
+  clone Wp with type context = context,
+    type enforce = enforce,
+    function transformp = transformp,
+    predicate enforce_inv = enforce_inv,
+    function ctx_nil = ctx_nil,
+    function ctx_add = ctx_add,
+    function empty_post = empty_post,
+    function abstraction_enforce = abstraction_enforce,
+    predicate proof_obligations = proof_obligations,
+    val abstraction = abstraction,
+    function kontinuation_enforce = kontinuation_enforce,
+    val ktrap = ktrap,
+    function ctx_ref_enforce = ctx_ref_enforce,
+    val ctx_ref = ctx_ref,
+
+    type LOCAL.hyp = hyp,
+    type LOCAL.fz_enforce = fz_enforce,
+    function LOCAL.fz_transformp = fz_transformp,
+    function LOCAL.fz_enforce_hyp = fz_enforce_hyp,
+    function LOCAL.enf_hyp_fz = enf_hyp_fz,
+    function LOCAL.freeze_context = freeze_context,
+    function LOCAL.post_inclusion = post_inclusion,
+    goal LOCAL.enf_hyp_fz_rule,
+    goal LOCAL.freeze_context_transformp_rule,
+    goal LOCAL.post_inclusion_rule,
+    function LOCAL.fz_enforce_match_fn = fz_enforce_match_fn,
+    goal LOCAL.fz_enforce_match_fn_rule,
+    predicate LOCAL.fz_enforce_match = fz_enforce_match,
+    goal LOCAL.fz_enforce_match_rule,
+    function LOCAL.ctx_empty = Nil,
+    function LOCAL.ctx_cons = Cons,
+    function LOCAL.ctx_nth = ctx_nth,
+    function LOCAL.ctx_len = length,
+    goal LOCAL.ctx_nth_rule,
+    goal LOCAL.ctx_len_cons,
+    goal LOCAL.ctx_len_empty,
+    goal LOCAL.ctx_nil_apply,
+    goal LOCAL.ctx_add_apply,
+    predicate LOCAL.sub_context = sub_context_ex,
+    predicate LOCAL.weaker_hypothesis = weaker_hypothesis_ex,
+    predicate LOCAL.weaker_hypothesis_prelude = weaker_hypothesis_prelude,
+    goal LOCAL.sub_context_empty,
+    goal LOCAL.sub_context_add,
+    goal LOCAL.sub_context_refl,
+    goal LOCAL.weaker_hypothesis_rule,
+    goal LOCAL.weaker_hypothesis_refl,
+    function LOCAL.proof_obligations_fn = proof_obligations_fn,
+    goal LOCAL.proof_obligations_fn_rule,
+    goal LOCAL.proof_obligations_rule,
+    goal LOCAL.abstraction_enforce_transformp_rule,
+    goal LOCAL.empty_post_rule,
+    function LOCAL.kont_pre = const,
+    goal LOCAL.kont_pre_rule,
+    goal LOCAL.kontinuation_enforce_transformp_rule,
+    function LOCAL.ctx_t_deref = ctx_t_deref,
+    function LOCAL.ctx_ref_transformer_prelude = ctx_ref_transformer_prelude,
+    goal LOCAL.ctx_t_deref_rule,
+    goal LOCAL.ctx_ref_enforce_transformp_rule
+
+end
+

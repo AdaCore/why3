@@ -33,6 +33,8 @@ let client_disconnect () =
   | None -> raise NotConnected
   | Some sock ->
       socket := None;
+      if Sys.os_type <> "Win32" then
+        Unix.shutdown sock Unix.SHUTDOWN_ALL;
       Unix.close sock
 
 let send_request_string msg =
@@ -94,16 +96,22 @@ let connect_internal () =
   let socket_name = Filename.concat (Unix.getcwd ())
     ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
   let exec = "why3server" in
-  let _pid = Unix.create_process exec
+  let pid = Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers|]
     Unix.stdin Unix.stdout Unix.stderr in
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
-  (* FIXME? replace this with something more robust *)
-  ignore (Unix.select [] [] [] 0.1);
-  client_connect socket_name
+  let rec try_connect n d =
+    if n <= 0 then client_connect socket_name else
+    try client_connect socket_name with _ ->
+      ignore (Unix.select [] [] [] d);
+      try_connect (pred n) (d *. 4.0) in
+  try_connect 4 0.1; (* 0.1, 0.4, 1.6, 6.4 *)
+  at_exit (fun () -> (* only if succesfully connected *)
+    (try client_disconnect () with NotConnected -> ());
+    ignore (Unix.waitpid [] pid))
 
 (* TODO/FIXME: how should we handle disconnect if there are still
    tasks in queue? What are the use cases for disconnect? *)
@@ -158,7 +166,7 @@ let rec read_lines blocking =
     read_lines blocking
   end
 
-type answer = {
+type final_answer = {
   id        : int;
   time      : float;
   timeout   : bool;
@@ -166,16 +174,22 @@ type answer = {
   exit_code : int;
 }
 
+type answer =
+  | Started of int
+  | Finished of final_answer
+
 let read_answer s = match Strings.split ';' s with
-  | id :: exit_s :: time_s :: timeout_s :: ( (_ :: _) as rest) ->
+  | "F":: id :: exit_s :: time_s :: timeout_s :: ( (_ :: _) as rest) ->
       (* same trick we use in other parsing code. The file name may contain
          ';'. Luckily, the file name comes last, so we still split on ';',
          and put the pieces back together afterwards *)
-      { id = int_of_string id;
+      Finished { id = int_of_string id;
         out_file = Strings.join ";" rest;
         time = float_of_string time_s;
         exit_code = int_of_string exit_s;
         timeout = (timeout_s = "1"); }
+  | "S" :: [id] ->
+      Started (int_of_string id)
   | _ ->
       raise (InvalidAnswer s)
 

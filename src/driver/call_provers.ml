@@ -295,19 +295,23 @@ let read_and_delete_file fn =
   out
 
 let handle_answer answer =
-  let id = answer.Prove_client.id in
-  let save = Hashtbl.find saved_data id in
-  Hashtbl.remove saved_data id;
-  if Debug.test_noflag debug then begin
-    Sys.remove save.vc_file;
-    if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
-  end;
-  let out = read_and_delete_file answer.Prove_client.out_file in
-  let ret = Unix.WEXITED answer.Prove_client.exit_code in
-  let printer_mapping = save.printer_mapping in
-  let ans = parse_prover_run save.res_parser
-    answer.Prove_client.time out ret save.limit ~printer_mapping in
-  id, ans
+  match answer with
+  | Prove_client.Finished answer ->
+      let id = answer.Prove_client.id in
+      let save = Hashtbl.find saved_data id in
+      Hashtbl.remove saved_data id;
+      if Debug.test_noflag debug then begin
+	Sys.remove save.vc_file;
+	if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
+      end;
+      let out = read_and_delete_file answer.Prove_client.out_file in
+      let ret = Unix.WEXITED answer.Prove_client.exit_code in
+      let printer_mapping = save.printer_mapping in
+      let ans = parse_prover_run save.res_parser
+	  answer.Prove_client.time out ret save.limit ~printer_mapping in
+      id, Some ans
+  | Prove_client.Started id ->
+      id, None
 
 let wait_for_server_result ~blocking =
   List.map handle_answer (Prove_client.read_answers ~blocking)
@@ -347,7 +351,11 @@ type prover_update =
 let result_buffer : (server_id, prover_update) Hashtbl.t = Hashtbl.create 17
 
 let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
-  List.iter (fun (id, r) -> Hashtbl.add result_buffer id (ProverFinished r))
+  List.iter (fun (id, r) ->
+    let x = match r with
+    | Some r -> ProverFinished r
+    | None -> ProverStarted in
+    Hashtbl.add result_buffer id x)
     (wait_for_server_result ~blocking)
 
 let query_result_buffer id =
@@ -377,7 +385,7 @@ let rec wait_on_call = function
   | ServerCall id as pc ->
       begin match query_result_buffer id with
         | ProverFinished r -> r
-        | _ ->
+	| _ ->
             get_new_results ~blocking:true;
             wait_on_call pc
       end

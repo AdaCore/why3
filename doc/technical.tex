@@ -13,10 +13,10 @@ The XML file follows the DTD given in \texttt{share/why3session.dtd} and reprodu
 \section{Prover Detection}
 \label{sec:proverdetecttiondata}
 
-All the necessary data configuration for the automatic detection of
+The data configuration for the automatic detection of
 installed provers is stored in the file
 \texttt{provers-detection-data.conf} typically located in directory
-\verb|/usr/local/share/why3| after installation. The contents of this
+\verb|/usr/local/share/why3| after installation. The content of this
 file is reproduced below.
 %BEGIN LATEX
 {\footnotesize
@@ -185,9 +185,9 @@ each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
 \subsection{Induction Transformations}
 
 \begin{description}
-\item[induction\_ty\_lex]:
+\item[induction\_ty\_lex]
   \index{induction-ty-lex@\verb+induction_ty_lex+}
-  This transformation performs structural, lexicographic induction on
+  performs structural, lexicographic induction on
   goals involving universally quantified variables of algebraic data
   types, such as lists, trees, etc. For instance, it transforms the
   following goal
@@ -210,7 +210,7 @@ goal G :
 goal G: forall l1 "induction" l2 l3: list 'a.
         l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 \end{whycode}
-induction will be applied on \verb|l1|. If this label is attached on
+induction will be applied on \verb|l1|. If this label is attached to
 several variables, a lexicographic induction is performed on these
 variables, from left to right.
 
@@ -229,11 +229,11 @@ simplification, described below. The transformations differ only by
 the kind of rules they apply:
 \begin{description}
 \item[compute\_in\_goal] aggressively applies all known
-  computation/simplification rules
+  computation/simplification rules.
   \index{compute-in-goal@\verb+compute_in_goal+}
 
 \item[compute\_specified] performs rewriting using only built-in
-  operators and user-provided rules
+  operators and user-provided rules.
   \index{compute-specified@\verb+compute_specified+}
 \end{description}
 
@@ -249,8 +249,8 @@ The kinds of simplification are as follows.
   \verb|true| and the transformations thus does not produce any sub-goal.
   For example, a goal
   like \verb|6*7=42| is solved by those transformations.
-\item Unfolding of definitions, as done by \verb|inline_goal|.
-  \verb|compute_in_goal| unfold all definitions, including recursive ones.
+\item Unfolding of definitions, as done by \verb|inline_goal|. Transformation
+  \verb|compute_in_goal| unfolds all definitions, including recursive ones.
   For \verb|compute_specified|, the user can enable unfolding of a specific
   logic symbol by attaching the meta \verb|rewrite_def| to the symbol.
 \begin{whycode}
@@ -322,7 +322,7 @@ definitions~\cite{paskevich09rr}.
 
 \item[eliminate\_if\_term] replaces terms of the form \texttt{if
     formula then t2 else t3} by lifting them at the level of formulas.
-  This may introduce \texttt{if then else } in formulas.
+  This may introduce \texttt{if then else} in formulas.
 \index{eliminate-if-term@\verb+eliminate_if_term+}
 
 \item[eliminate\_if\_fmla] replaces formulas of the form \texttt{if f1 then f2
@@ -356,7 +356,7 @@ definitions~\cite{paskevich09rr}.
 % \item[encoding\_enumeration]
 
 \item[encoding\_smt]
-  encodes polymorphic types into monomorphic type~\cite{conchon08smt}.
+  encodes polymorphic types into monomorphic types~\cite{conchon08smt}.
 \index{encoding-smt@\verb+encoding_smt+}
 
 \item[encoding\_tptp]
@@ -391,7 +391,7 @@ definitions~\cite{paskevich09rr}.
 \item[simplify\_recursive\_definition] reduces mutually recursive
   definitions if they are not really mutually recursive, \eg
 \begin{whycode}
-function f : ... = .... g ...
+function f : ... = ... g ...
 with g : ... = e
 \end{whycode}
 becomes
@@ -405,18 +405,15 @@ if $f$ does not occur in $e$.
 \item[simplify\_trivial\_quantification]
   simplifies quantifications of the form
 \begin{whycode}
-forall x, x=t -> P(x)
+forall x, x = t -> P(x)
 \end{whycode}
-or
-\begin{whycode}
-forall x, t=x -> P(x)
-\end{whycode}
-when $x$ does not occur in $t$ into
+into
 \begin{whycode}
 P(t)
 \end{whycode}
-  More generally, it applies this simplification whenever $x=t$ appears
-  in a negative position.
+  when $x$ does not occur in $t$.
+  More generally, this simplification is applied whenever $x=t$ or
+  $t=x$ appears in negative position.
 \index{simplify-trivial-quantification@\verb+simplify_trivial_quantification+}
 
 \item[simplify\_trivial\_quantification\_in\_goal]
@@ -430,12 +427,16 @@ P(t)
   linear in the size of that initial axiom.
 \index{split-premise@\verb+split_premise+}
 
-\item[split\_premise\_full]: This transformation is similar to \texttt{split\_premise}, but also converts the axioms to conjunctive normal form. The number of axioms generated per initial axiom may be exponential in the size of the initial axiom.
+\item[split\_premise\_full] is similar to \texttt{split\_premise}, but it
+  also converts the axioms to conjunctive normal form. The number of
+  axioms generated per initial axiom may be exponential in the size of
+  the initial axiom.
 \index{split-premise-full@\verb+split_premise_full+}
 
 \end{description}
 
-\subsection{Other Splitting Transformations}~\label{tech:trans:split}
+\subsection{Other Splitting Transformations}
+\label{tech:trans:split}
 
 \begin{description}
 
@@ -443,14 +444,14 @@ P(t)
   but it also removes the goal if it is equivalent to true.
 \index{simplify-formula-and-task@\verb+simplify_formula_and_task+}
 
-\item[split\_goal]: if the goal is a conjunction of goals, returns the
+\item[split\_goal] changes conjunctive goals into the
   corresponding set of subgoals. In absence of case analysis labels,
   the number of subgoals generated is linear in the size of the initial goal.
 
   \paragraph{Behavior on asymmetric connectives and
     \texttt{by}/\texttt{so}}
 
-  The transformation treat specially asymmetric and
+  The transformation treats specially asymmetric and
   \texttt{by}/\texttt{so} connectives. Asymmetric conjunction
   \verb|A && B| in goal position is handled as syntactic sugar for
   \verb|A /\ (A -> B)|.  The conclusion of the first subgoal can then
@@ -519,10 +520,10 @@ Note that in the side-condition subgoal, the context is universally closed.
 
 The \texttt{so} connective plays a similar role in hypothesis position, as it serves as a consequence indication. In goal position, \verb|A so B| is treated as if it were syntactic sugar for its regular interpretation \verb|A|. In hypothesis position, it is treated as if both \verb|A| and \verb|B| were true because \verb|B| is a consequence of \verb|A|. \verb|A so B| is replaced by \verb|A /\ B| and the transformation also generates a side-condition subgoal \verb|A -> B| corresponding to the consequence relation between formula.
 
-  As for the \texttt{by} connective, occurrences of \texttt{so} are unrestricted.
-  For instance:
-  \begin{itemize}
-  \item Splitting
+As with the \texttt{by} connective, occurrences of \texttt{so} are
+unrestricted. For instance:
+\begin{itemize}
+\item Splitting
 \begin{whycode}
 goal G : (((A so B) \/ C) -> D) && E
 \end{whycode}
@@ -537,6 +538,7 @@ goal G3 : A -> B               (* side-condition *)
 goal G : A by exists x. P x so Q x so R x by T x
 (* reads: A by (exists x. P x so (Q x so (R x by T x))) *)
 \end{whycode}
+generates
 \begin{whycode}
 goal G1 : exists x. P x
 goal G2 : forall x. P x -> Q x               (* side-condition *)
@@ -544,7 +546,7 @@ goal G3 : forall x. P x -> Q x -> T x        (* side-condition *)
 goal G4 : forall x. P x -> Q x -> T x -> R x (* side-condition *)
 goal G5 : (exists x. P x /\ Q x /\ R x) -> A (* side-condition *)
 \end{whycode}
-In natural language, this corresponds to the following proof schema
+In natural language, this corresponds to the following proof scheme
 for \verb|A|: There exists a \verb|x| for which \verb|P| holds. Then,
 for that witness \verb|Q| and \verb|R| also holds. The last one holds
 because \verb|T| holds as well. And from those three conditions on
@@ -575,11 +577,11 @@ generates the subgoals
 goal G1 : A -> C
 goal G2 : B -> C
 \end{whycode}
-Without the label, the transformation do nothing because undesired case analysis
+Without the label, the transformation does nothing because undesired case analysis
 may easily lead to an exponential blow-up.
 
-Note that the precise behavior of splitting transformation in presence of
-the \verb|"case_split"| is not yet specified
+Note that the precise behavior of splitting transformations in presence of
+the \verb|"case_split"| label is not yet specified
 and is likely to change in future versions.
 
 \index{split-goal@\verb+split_goal+}
@@ -588,10 +590,12 @@ and is likely to change in future versions.
   performs both \texttt{split\_premise} and \texttt{split\_goal}.
 \index{split-all@\verb+split_all+}
 
-\item[split\_intro]: Composition of \texttt{split\_goal} and \texttt{introduce\_premises}.
+\item[split\_intro]
+  performs both \texttt{split\_goal} and \texttt{introduce\_premises}.
 \index{split-intro@\verb+split_intro+}
 
-\item[split\_goal\_full]: This transformation has a behavior similar
+\item[split\_goal\_full]
+  has a behavior similar
   to \texttt{split\_goal}, but also converts the goal to conjunctive normal form.
   The number of subgoals generated may be exponential in the size of the initial goal.
 \index{split-goal-full@\verb+split_goal_full+}

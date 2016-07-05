@@ -61,7 +61,7 @@ val lookup_printer : string -> printer
 
 val list_printers : unit -> (string * Pp.formatted) list
 
-(** {2 use printers} *)
+(** {2 Use printers} *)
 
 val print_prelude : prelude pp
 val print_th_prelude : task -> prelude_map pp
@@ -108,7 +108,7 @@ val syntax_arguments_typed :
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
      the list l using the template templ and the printer print_arg *)
 
-(** {2 pretty-printing transformations (useful for caching)} *)
+(** {2 Pretty-printing transformations (useful for caching)} *)
 
 val on_syntax_map : (syntax_map -> 'a Trans.trans) -> 'a Trans.trans
 
@@ -122,7 +122,7 @@ val sprint_decl :
   ('a -> Format.formatter -> Decl.decl -> 'a * string list) ->
     Theory.tdecl -> 'a * string list -> 'a * string list
 
-(** {2 exceptions to use in transformations and printers} *)
+(** {2 Exceptions to use in transformations and printers} *)
 
 exception UnsupportedType of ty   * string
 exception UnsupportedTerm of term * string
@@ -135,7 +135,7 @@ val unsupportedPattern : pattern -> string -> 'a
 val unsupportedDecl : decl -> string -> 'a
 val notImplemented  :         string -> 'a
 
-(** {3 functions that catch inner error} *)
+(** {3 Functions that catch inner error} *)
 
 exception Unsupported of string
 (** This exception must be raised only inside a call

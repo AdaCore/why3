@@ -35,6 +35,7 @@ echo "Starting time (UTC): "`date --utc +%H:%M` >> $REPORT
 
 # configuration
 autoconf
+automake --add-missing
 ./configure --enable-local &> $OUT
 if test "$?" != "0" ; then
     echo "Configure failed" >> $REPORT

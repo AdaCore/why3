@@ -1,8 +1,16 @@
 
+(* Ancient Egyptian Multiplication
+
+   Multiply two integers a and b using only addition, multiplication by 2,
+   and division by 2.
+
+   Note: this is exactly the same algorithm as exponentiation by squaring
+   with power/*/1 being replaced by */+/0.
+*)
+
 module BinaryMultiplication
 
   use import mach.int.Int
-  use import number.Parity
   use import ref.Ref
 
   let binary_mult (a b: int)
@@ -15,7 +23,7 @@ module BinaryMultiplication
       invariant { 0 <= !y }
       invariant { !z + !x * !y = a * b }
       variant   { !y }
-      if odd !y then z := !z + !x;
+      if !y % 2 = 1 then z := !z + !x;
       x := 2 * !x;
       y := !y / 2
     done;

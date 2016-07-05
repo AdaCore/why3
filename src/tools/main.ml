@@ -42,8 +42,8 @@ let option_list = [
       Arg.Unit (fun _ -> printf "%s@." Config.datadir; exit 0),
       " print location of non-binary data (theories, modules, etc)";
   "--version",
-      Arg.Unit (fun _ -> printf "Why3 platform, version %s (build date: %s)@."
-        Config.version Config.builddate; exit 0),
+      Arg.Unit (fun _ -> printf "Why3 platform, version %s@."
+        Config.version; exit 0),
       " print version information";
 ]
 

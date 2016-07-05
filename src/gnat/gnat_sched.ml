@@ -104,7 +104,10 @@ let shut_down_proof_server () =
   Prove_client.disconnect ()
 
 let handle_proof_results callback =
-  let handle_list = List.iter (fun (id, res) -> finished_goal callback id res)
+  let handle_list = List.iter (fun (id, res) ->
+    match res with
+    | None -> ()
+    | Some r -> finished_goal callback id r)
   in
   while state.num > 0 do
     let l = Call_provers.wait_for_server_result ~blocking:true in

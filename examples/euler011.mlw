@@ -1,0 +1,220 @@
+
+(** {1 Euler Project, problem11}
+
+In the 20×20 grid below, four numbers along a diagonal line have been marked in red.
+
+{h <Pre>
+08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
+49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00
+81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65
+52 70 95 23 04 60 11 42 69 24 68 56 01 32 56 71 37 02 36 91
+22 31 16 71 51 67 63 89 41 92 36 54 22 40 40 28 66 33 13 80
+24 47 32 60 99 03 45 02 44 75 33 53 78 36 84 20 35 17 12 50
+32 98 81 28 64 23 67 10 26 38 40 67 59 54 70 66 18 38 64 70
+67 26 20 68 02 62 12 20 95 63 94 39 63 08 40 91 66 49 94 21
+24 55 58 05 66 73 99 26 97 17 78 78 96 83 14 88 34 89 63 72
+21 36 23 09 75 00 76 44 20 45 35 14 00 61 33 97 34 31 33 95
+78 17 53 28 22 75 31 67 15 94 03 80 04 62 16 14 09 53 56 92
+16 39 05 42 96 35 31 47 55 58 88 24 00 17 54 24 36 29 85 57
+86 56 00 48 35 71 89 07 05 44 44 37 44 60 21 58 51 54 17 58
+19 80 81 68 05 94 47 69 28 73 92 13 86 52 17 77 04 89 55 40
+04 52 08 83 97 35 99 16 07 97 57 32 16 26 26 79 33 27 98 66
+88 36 68 87 57 62 20 72 03 46 33 67 46 55 12 32 63 93 53 69
+04 42 16 73 38 25 39 11 24 94 72 18 08 46 29 32 40 62 76 36
+20 69 36 41 72 30 23 88 34 62 99 69 82 67 59 85 74 04 36 16
+20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
+01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48
+</Pre> }
+
+The product of these numbers is 26 × 63 × 78 × 14 = 1788696.
+
+What is the greatest product of four adjacent numbers in the same direction (up, down, left, right, or diagonally) in the 20×20 grid?
+
+*)
+
+module ProductFour
+
+use import int.Int
+use import ref.Ref
+use import matrix.Matrix
+use import option.Option
+
+(** Direction of the product checked *)
+type direction =
+     | Left_bottom
+     | Right_bottom
+     | Bottom
+     | Right
+
+(** Math functions about the result of a product. Incomplete product generate None *)
+function left_diag (m: matrix int) (i: int) (j: int) : option int =
+	 if (i < m.rows /\ j >= 0 /\ i >= 3 /\ j < m.columns - 3) then
+	    Some (((get m i j) * (get m (i - 1) (j + 1)) * (get m (i - 2) (j + 2)) * (get m (i-3) (j+3))))
+	 else
+	    None
+
+function right_diag (m: matrix int) (i: int) (j: int) : option int =
+	 if (i < m.rows - 3 /\ i >= 0 /\ j < m.columns - 3 /\ j >= 0) then
+	    Some (((get m i j) * (get m (i + 1) (j + 1)) * (get m (i + 2) (j + 2)) * (get m (i+3) (j+3))))
+	 else
+	    None
+
+function line (m: matrix int) (i: int) (j: int) : option int =
+	 if (0 <= j < m.columns /\ i >= 0 /\ i < m.rows - 3) then
+	    Some ((get m i j) * (get m (i+1) j) * (get m (i+2) j) * (get m (i+3) j))
+	 else
+	    None
+
+function column (m: matrix int) (i: int) (j: int) : option int =
+	 if (0 <= i < m.rows /\ j >= 0 /\ j < m.columns - 3) then
+	    Some ((get m i j) * (get m i (j+1)) * (get m i (j+2)) * (get m i (j + 3)))
+	 else
+	    None
+
+(** Computational functions for the product in each direction *)
+let right_diag_c m i j : option int =
+    ensures {result = right_diag m i j}
+    if (i < m.rows - 3 && i >= 0 && j < m.columns - 3 && j >= 0) then
+       Some (((get m i j) * (get m (i + 1) (j + 1)) * (get m (i + 2) (j + 2)) * (get m (i+3) (j+3))))
+    else
+       None
+
+let left_diag_c m i j : option int =
+    ensures {result = left_diag m i j}
+    if (i < m.rows && j >= 0 && i >= 3 && j < m.columns - 3) then
+       Some (((get m i j) * (get m (i - 1) (j + 1)) * (get m (i - 2) (j + 2)) * (get m (i-3) (j+3))))
+    else
+       None
+
+
+let line_c m i j : option int =
+    ensures {result = line m i j}
+    if (0 <= j && j < m.columns &&  i >= 0 && i < m.rows - 3) then
+       Some ((get m i j) * (get m (i+1) j) * (get m (i+2) j) * (get m (i+3) j))
+    else
+       None
+
+let column_c m i j : option int =
+    ensures {result = column m i j}
+    if (0 <= i && i < m.rows && j >= 0 && j < m.columns - 3) then
+       Some ((get m i j) * (get m i (j+1)) * (get m i (j+2)) * (get m i (j + 3)))
+    else
+       None
+
+(* function compute4 (m: matrix int) (i: int) (j: int) (d: direction) : option int = *)
+(*     match d with *)
+(*     | Left_bottom -> left_diag m i j *)
+(*     | Right_bottom -> right_diag m i j *)
+(*     | Bottom -> column m i j *)
+(*     | Right -> line m i j *)
+(*     end *)
+
+(* TODO Failed attempt at pattern matching above. Combination of mathematical product result functions *)
+function compute4 (m: matrix int) (i: int) (j: int) (d: direction) : option int =
+	if (d = Left_bottom) then left_diag m i j
+	else if (d = Right_bottom) then right_diag m i j
+	else if (d = Bottom) then column m i j
+	else if (d = Right) then line m i j
+	else None
+
+(** A product is_valid if each elements of the product is in the matrix *)
+(* predicate is_valid (m: matrix int) (i: int) (j: int) (d: direction) = *)
+(*   match d with *)
+(*   | Left_bottom -> i < m.rows /\ j >= 0 /\ i >= 3 /\ j < m.columns - 3 *)
+(*   | Right_bottom -> i >= 0 /\ j >= 0 /\ i < m.rows - 3 /\ j < m.columns - 3 *)
+(*   | Bottom -> 0 <= i /\ i < m.rows /\ j >= 0 /\ j < m.columns - 3 *)
+(*   | Right -> 0 <= j /\ j < m.columns /\ i >= 0 /\ i < m.rows - 3 *)
+(*   end *)
+
+(** Return the maximum product of 4 for matrix m *)
+let find_max (m: matrix int) =
+    requires {m.rows > 4 /\ m.columns > 4}
+    ensures {forall i j d. match (compute4 m i j d) with
+    	      	     	     | None -> true
+			     | Some v -> v <= result
+			   end}
+    ensures {exists i j d. Some result = compute4 m i j d}
+
+(** Current max and element of the matrix for which it is attained *)
+  let cur_max = ref (
+      match (line_c m 0 0) with
+      | None -> 0 (* TODO should not happen *)
+      | Some v -> v
+      end) in
+  let cur_i = ref 0 in
+  let cur_j = ref 0 in
+  let cur_d = ref Right in
+  for i = 0 to (m.rows - 1) do
+(* Cur_max is greater than each product already seen *)
+    invariant { forall i' j' d. (0 <= i' < i /\ 0 <= j' < m.columns) ->
+    	      match (compute4 m i' j' d) with
+	      | None -> true
+	      | Some v -> v <= !cur_max
+	      end}
+(* cur_max is actually the product at (cur_i, cur_j, cur_d) *)
+    invariant {Some !cur_max = compute4 m !cur_i !cur_j !cur_d}
+    for j = 0 to (m.columns - 1) do
+(* cur_max is actually the product at (cur_i, cur_j, cur_d) *)
+    invariant {Some !cur_max = compute4 m !cur_i !cur_j !cur_d}
+(* Cur_max is greater than each product already seen *)
+    invariant { forall i' j' d. ((i' = i /\ 0 <= j' /\ j' < j) \/ (0 <= i' < i /\ 0 <= j' < m.columns)) ->
+    	      match (compute4 m i' j' d) with
+	      | None -> true
+	      | Some v -> v <= !cur_max
+	      end}
+(* Computation of the product for each direction *)
+	 match (left_diag_c m i j) with
+	 | None -> ()
+	 | Some v ->
+	   if (v > !cur_max) then
+	   begin
+		cur_max := v;
+	      	cur_i := i;
+	      	cur_j := j;
+	      	cur_d := Left_bottom;
+           end
+	 end;
+
+	 match (right_diag_c m i j) with
+	 | None -> ()
+	 | Some v ->
+	   if (v > !cur_max) then
+	   begin
+		cur_max := v;
+	      	cur_i := i;
+	      	cur_j := j;
+	      	cur_d := Right_bottom;
+           end
+	 end;
+
+  	 match (line_c m i j) with
+	 | None -> ()
+	 | Some v ->
+	   if (v > !cur_max) then
+	   begin
+		cur_max := v;
+	      	cur_i := i;
+	      	cur_j := j;
+	      	cur_d := Right;
+           end
+	 end;
+
+	 match (column_c m i j) with
+	 | None -> ()
+	 | Some v ->
+	   if (v > !cur_max) then
+	   begin
+		cur_max := v;
+	      	cur_i := i;
+	      	cur_j := j;
+	      	cur_d := Bottom;
+           end
+	 end;
+    done;
+  done;
+
+(** Assert implying directly the postcondition *)
+  assert { Some !cur_max = compute4 m !cur_i !cur_j !cur_d};
+  !cur_max;;
+
+end
