@@ -589,7 +589,7 @@ lib/why3cpulimit$(EXE): $(CPULIM_O)
 	$(CC) -Wall -o $@ $^
 
 %.o: %.c
-	$(CC) -c -Wall -g -o $@ $<
+	$(CC) -Wall -O -g -o $@ -c $<
 
 install_no_local::
 	$(MKDIR_P) $(LIBDIR)/why3
