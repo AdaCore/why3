@@ -37,13 +37,15 @@ module WpCommon
     post_strct : qstructure 'o;
   }
 
-  (* Definitions for domain shift
-     (TODO: introduce a combinator & explain better) *)
+  (* Definitions for domain shift. *)
   predicate invalid_sup_witness (r:rel 'a 'd) (o1:erel 'a) (o2:erel 'd) (sp:'d)
                                 (ch:set ('a,'d)) (inh:('a,'d)) =
     chain (rprod o1 o2) ch /\ ch inh /\ supremum o2 (image snd ch) sp /\
     (forall x y. ch (x,y) -> r x y) /\
     (forall sp0. supremum o1 (image fst ch) sp0 -> not r sp0 sp)
+
+  (* Lifting of postcondition with auxiliary (ghost) return values *)
+  function e_lift (q:rel 'a 'b) : set 'b = \y. exists x. q x y
 
 end
 
@@ -405,6 +407,7 @@ module WpImpl
   use import ho_rel.RelSet
   use import order.Ordered
   use import order.Chain
+  use import order.ProductChain
   use import fn.Fun
   use import fn.Image
   use import game.Game
@@ -443,8 +446,6 @@ module WpImpl
     game_wf g ->
     (hyp_fmla r h g /\ hyp_fmla r (ctx_union q) g <->
       hyp_fmla r (ctx_union (Cons h q)) g)
-  (* Lifting of postcondition with auxiliary (ghost) return values *)
-  function e_lift (q:rel 'a 'b) : set 'b = \y. exists x. q x y
   (* Transform a regular backward predicate transformer into an hypothesis. *)
   function transf_hyp (t:rel 'o 'a -> rel 'i 'a) : hyp 'a =
     \pr. let (p,q) = pr in exists x q'. q = e_lift q' /\ p = t q' x
@@ -556,6 +557,8 @@ module WpImpl
       p2 xs /\ subset q2' q /\ ht (p2,q2')
 
 
+
+
   (* transformer definition, invariant, and a domain shift lemma. *)
   type ftransformer 'a 'i 'o = rel 'o 'a -> rel 'i 'a
   type transformer 'a 'i 'o =
@@ -595,11 +598,7 @@ module WpImpl
      1) build a canonical game satisfying the context
      2) Show the relation induce simulation from the canonical game
         to the 'd-one.
-     This lemma will be used to switch between game supports.
-     TODO: need to devise tools to carry out switching correctly on
-       context, as it is non-trivial. We may need to enforce
-       usage of a very particular kind of explicit contexts...
-       but they cannot be explicited for obvious typing reasons ! *)
+     This lemma will be used to switch between game supports. *)
 
   lemma transform_inv_reinforced : forall t:transformer 'a 'i 'o.
     transform_inv t ->
@@ -642,7 +641,7 @@ module WpImpl
                        (conj (vld_fmla re oe oe) (ordering oe))
         in ("stop_split" ce ge
           by hyp_fmla re (ctx_union ctx) ge
-          /\ (vld_fmla re oe oe ge)
+          /\ vld_fmla re oe oe ge
           /\ ordering oe ge
       )
       so let pe = related re p0 in let qe = related re q0 in
@@ -651,7 +650,8 @@ module WpImpl
          induce a step-by-step simulation from ge to gd. *)
       so step_simulate ge rd gd
       by ("stop_split" limit_compatible oe rd gd
-        by forall ch inh sd. chain (rprod oe od) ch /\ ch inh /\
+        by gd.progress = od
+        so forall ch inh sd. chain (rprod oe od) ch /\ ch inh /\
           (forall a b. ch (a,b) -> rd a b) /\ supremum od (image snd ch) sd ->
           (have_winning_strat gd sd none
           \/ exists se. supremum oe (image fst ch) se /\ rd se sd)
@@ -713,7 +713,149 @@ module WpImpl
 
 
 
-  (* First combinator: abstract away internal transformer by a given interface. *)
+
+  (* First combinator, unusual but absolutely necessary for applications to
+     work: domain relation combinator. This is a consequence of the
+     'very important lemma'. *)
+  function inv_dp_rel (r:rel 'a 'd) (q:rel 'p 'd) : rel 'p 'a =
+    \xp xa. forall xd. r xa xd -> q xp xd
+  function domain_rel_hyp (r:rel 'a 'd) (h:hyp 'd) : hyp 'a =
+    \pqa. let (pa,qa) = pqa in
+      exists pd qd. h (pd,qd) /\ subset qd (related r qa) /\
+        subset (related r pa) qd
+  function domain_rel_ctx (r:rel 'a 'd) (ctx:context 'd) : context 'a =
+    match ctx with
+    | Nil -> Nil
+    | Cons h q -> Cons (domain_rel_hyp r h) (domain_rel_ctx r q)
+    end
+  function domain_rel_transformer
+    (gia:game_info 'a) (r:rel 'a 'd) (gid:game_info 'd)
+    (ta:transformer 'a 'i 'o)
+    (ti:transformer 'd (set ('a,'d),('a,'d)) 'o_any) :
+    transformer 'd ('i,'a) 'o =
+    \gi ctx q x xd.
+      gi.game_order = gid.game_order /\ gi.game_valid = gid.game_valid /\
+      (forall x y. r x y -> gia.game_valid x /\ gid.game_valid y) /\
+      order gia.game_order /\
+      (forall x y u v. r x y /\ r u v /\ gid.game_order y v ->
+        gia.game_order x u) /\
+      (forall ch inh sp.
+        invalid_sup_witness r gia.game_order gid.game_order sp ch inh ->
+        ti gi ctx (const none) (ch,inh) sp) /\
+      let (xi,xa) = x in
+      r xa xd /\ ta gia (domain_rel_ctx r ctx) (inv_dp_rel r q) xi xa
+
+  let rec lemma domain_rel_ctx_ok (r:rel 'a 'd) (s:set 'd)
+                                  (ctx:context 'd) : unit
+    requires { forall x y. r x y -> s y }
+    ensures { holds (hyp_fmla (eqv s) (ctx_union ctx))
+                    (hyp_fmla r (ctx_union (domain_rel_ctx r ctx))) }
+    variant { ctx }
+  = match ctx with
+    | Nil -> ()
+    | Cons h q ->
+        assert { let rs = eqv s in
+          let hr = domain_rel_hyp r h in
+          let ch = hyp_fmla rs h in
+          holds ch (hyp_fmla r hr)
+          by forall pqa. hr pqa -> holds ch (pre_post_fmla r pqa)
+          by let (pa,qa) = pqa in
+            exists pd qd. h (pd,qd) /\ subset qd (related r qa) /\
+              subset (related r pa) qd
+          so holds ch (pre_post_fmla rs (pd,qd))
+        };
+        domain_rel_ctx_ok r s q
+    end
+  (* TODO/FIXME: ugly way around eval_match that inlines fst/snd under
+     epsilon... *)
+  lemma domain_rel_t : forall gia r gid,ta:transformer 'a 'i 'o,
+                              ti:transformer 'd (set ('a,'d),('a,'d)) 'o_any.
+    transform_inv ta /\ transform_inv ti ->
+    let res = domain_rel_transformer gia r gid ta ti in
+    transform_inv res
+    by forall gi ctxd q x.
+      let od = gi.game_order in let rd = eqv gi.game_valid in
+      let cd = hyp_fmla rd (ctx_union ctxd) in
+      let vd = vld_fmla rd od od in
+      let ctd = conj cd (conj vd (ordering od)) in
+      let p0 = res gi ctxd q x in
+      let pd = related rd p0 in
+      let qd = related rd (e_lift q) in
+      holds ctd (enforce pd qd)
+      by forall xd. pd xd -> holds ctd (enforce ((=) xd) qd)
+      by od = gid.game_order /\ gi.game_valid = gid.game_valid
+      so let (xi,xa) = x in
+        let oa = gia.game_order in
+        p0 xd
+      so valid_proj gia r od
+      so let ctxa = domain_rel_ctx r ctxd in
+        let ca = hyp_fmla r (ctx_union ctxa) in
+        let va = vld_fmla r oa od in
+        let cta = conj ca (conj va (ordering od)) in
+        let qir = inv_dp_rel r q in
+        let pa = related r (ta gia ctxa qir xi) in
+        let qa = related r (e_lift qir) in
+        (holds cta (enforce ((=) xd) qd)
+         by holds cta (enforce pa qa)
+         so (pa xd by r xa xd /\ ta gia ctxa qir xi xa)
+         so subset qa qd
+         by forall yd. qa yd -> qd yd
+         by exists ya. e_lift qir ya /\ r ya yd so rd yd yd
+         so exists yo. qir yo ya so q yo yd
+        )
+      so holds ctd cta
+      by holds cd ca
+      /\ (holds ctd va
+        by forall g. ctd g /\ game_wf g -> va g
+        by forall sp. invalid_sup r oa od sp ->
+          let sk = sing_kont_fmla sp in sk g
+        by holds ctd sk
+        by exists ch inh. invalid_sup_witness r oa od sp ch inh
+        so order oa /\ order od
+        so let (_,inhd) = inh in
+          let ch2 = image snd ch in
+          if gid.game_valid sp
+          then let q0 = (const none:rel 'o_any 'd) in
+            let qr = related rd (e_lift q0) in
+            let p0 = ti gi ctxd (const none) (ch,inh) in
+            let pr = related rd p0 in
+            (pr sp by rd sp sp) /\ sext qr none
+            so holds ctd (enforce pr none)
+          else holds vd sk
+            by let ch0 = \x. let (a,b) = x in a = b /\ ch2 b in
+              invalid_sup rd od od sp
+            by invalid_sup_witness rd od od sp ch0 (inhd,inhd)
+            by (forall x y. ch0 (x,y) -> rd x y
+              by x = y so ch2 y so exists x. ch (x,y) so r x y
+              so gid.game_valid y)
+            so (forall x. image snd ch0 x \/ image fst ch0 x -> ch2 x
+              by exists a. ch0 a /\ (snd a = x \/ fst a = x)
+              so let (_,b) = a in b = x /\ ch2 b)
+            so (forall x. ch2 x -> (image fst ch0 x by fst (x,x) = x)
+                                   /\ (image snd ch0 x by snd (x,x) = x))
+            so (image fst ch0 = ch2 by sext (image fst ch0) ch2)
+            /\ (image snd ch0 = ch2 by sext (image snd ch0) ch2)
+            so (chain (rprod od od) ch0 by chain od ch2)
+            so supremum od ch2 sp
+      )
+  let ghost domain_rel_t (gia:game_info 'a) (r:rel 'a 'd) (gid:game_info 'd)
+                         (ta:transformer 'a 'i 'o)
+                         (ti:transformer 'd (set ('a,'d),('a,'d)) 'o_any) :
+                         transformer 'd ('i,'a) 'o
+    requires { transform_inv ta /\ transform_inv ti }
+    ensures { transform_inv result }
+    ensures { result = domain_rel_transformer gia r gid ta ti }
+  = domain_rel_transformer gia r gid ta ti
+  meta remove_prop prop domain_rel_t
+  (* TODO: insert lemmas that would allow to rewrite
+     'domain_rel_hyp (transf_hyp)' as expected. *)
+
+
+
+
+
+  (* Second combinator:
+     abstract away internal transformer by a given interface. *)
   function abstraction_transformer (gi:game_info 'a)
                                    (gf:'ig -> context 'a)
                                    (eh:enf_hyp 'a 'ig 'il 'o) :
@@ -721,6 +863,7 @@ module WpImpl
     \gi2 ctx q x xs. let (xg,xl) = x in
       gi2.game_order = gi.game_order /\ gi2.game_valid = gi.game_valid /\
       sub_context (gf xg) ctx /\ enf_transf xg eh q xl xs
+
   (* Alternative (equivalent) invariant for enforcements that have
      an abstraction for transformer. *)
   predicate abstraction_inv (gi:game_info 'a)
@@ -824,15 +967,90 @@ module WpImpl
     };
     abstraction_transformer gi gf eh
 
+  (* Third combinator: if the transformer is in abstraction form,
+     and the validity predicate is trivial,
+     then one may expose the invariant. *)
+  predicate expose_hyp (h:hyp 'a) (gm:game 'a) =
+    forall p q. h (p,q) -> enforce p q gm
+  predicate expose_context (ctx:context 'a) (gm:game 'a) = match ctx with
+    | Nil -> true
+    | Cons h q -> expose_hyp h gm /\ expose_context q gm
+    end
+  let rec lemma trivial_rel_expose_context
+    (r:erel 'a) (ctx:context 'a) (gm:game 'a) : unit
+    requires { forall x y. r x y <-> x = y }
+    requires { expose_context ctx gm }
+    ensures { hyp_fmla r (ctx_union ctx) gm }
+    variant { ctx }
+  = match ctx with
+    | Nil -> ()
+    | Cons _ q ->
+      assert { forall p. let pr = related r p in pr = p by sext pr p
+        by forall x. p x -> pr x by r x x };
+      trivial_rel_expose_context r q gm
+    end
+  let ghost expose (gi:game_info 'a)
+                   (gf:'ig -> context 'a)
+                   (eh:enf_hyp 'a 'ig 'il 'o) : unit
+    requires { forall x. gi.game_valid x }
+    requires { transform_inv (abstraction_transformer gi gf eh) }
+    ensures { forall xg xl xs gm. let ctx = gf xg in
+        eh.pre xg xl xs /\ gm.progress = gi.game_order /\ game_wf gm /\
+        expose_context ctx gm ->
+        enforce ((=) xs) (e_lift (eh.post xg xl xs)) gm }
+  = assert { forall xg xl xs gm. let ctx = gf xg in
+      eh.pre xg xl xs /\ gm.progress = gi.game_order /\ game_wf gm /\
+      expose_context ctx gm ->
+      let q0 = e_lift (eh.post xg xl xs) in
+      let exs = ((=) xs) in
+      enforce exs q0 gm
+      by abstraction_inv gi gf eh
+      so let r = eqv gi.game_valid in let o = gi.game_order in
+        let cx = hyp_fmla r (ctx_union ctx) in
+        let cv = vld_fmla r o o in
+        let c = conj cx (conj cv (ordering o)) in
+        let qr = related r q0 in
+        holds c (enforce exs qr)
+      so (c gm by cv gm by forall sp. invalid_sup r o o sp -> false
+        by exists ch inh. invalid_sup_witness r o o sp ch inh
+        so (sext (image fst ch) (image snd ch)
+          by forall x. ((image fst ch x <-> ch (x,x)) /\
+                       (image snd ch x <-> ch (x,x))) by r x x /\
+                       fst (x,x) = x /\ snd (x,x) = x)
+        so r sp sp)
+      so enforce exs qr gm
+      so (sext qr q0 by forall x. q0 x -> qr x by r x x)
+    }
+
+    (* TODO: rework comment from there. *)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   (* Second combinator: kontinuation trap. *)
   function empty_post : 'a -> 'b -> 'c -> 'd -> 'e -> bool =
     \_ _ _ _ _. false
   function kontinuation_transformer
     (t:transformer 'a 'i 'o) : transformer 'a 'i 'o =
-    \gi ctx q x xs.
+    \gi ctx q x.
       let eh = { pre = const q; post = empty_post;
                  pre_strct = q_def; post_strct = q_unit } in
-      t gi (Cons (enf_hyp x eh) ctx) q x xs
+      t gi (Cons (enf_hyp x eh) ctx) q x
 
   let ghost ktrap_t (t:transformer 'a 'i 'o) : transformer 'a 'i 'o
     requires { transform_inv t }
@@ -858,7 +1076,7 @@ module WpImpl
         let h0 = enf_hyp x eh in
         let ctx' = Cons h0 ctx in
         let cx'' = hyp_fmla r (ctx_union ctx') in
-        (p = t gi ctx' q x by sext p (t gi ctx' q x))
+        p = t gi ctx' q x
       so holds cx' cx''
       by holds k (hyp_fmla r h0)
       by let h1 = direct_enf_hyp x eh in
@@ -912,6 +1130,107 @@ module WpImpl
     forall ft:ftransformer 'a 'il 'o,q xl xs.
       ft q xl xs -> hyp_deduce (transf_hyp ft) xs (e_lift q)
       by transf_hyp ft (ft q xl,e_lift q)
+
+  (* Fourth combinator: sequence. *)
+  function seq_transformer (t1:transformer 'a 'i 'm)
+                           (t2:transformer 'a ('i,'m) 'o) :
+                           transformer 'a 'i 'o =
+    \gi ctx q xi. t1 gi ctx (freeze_context_t gi ctx xi t2 q) xi
+
+  let ghost seq_t (t1:transformer 'a 'i 'm)
+                  (t2:transformer 'a ('i,'m) 'o) :
+                  transformer 'a 'i 'o
+    requires { transform_inv t1 /\ transform_inv t2 }
+    ensures { transform_inv result }
+    ensures { result = seq_transformer t1 t2 }
+  = let t = seq_transformer t1 t2 in
+    assert { forall gi ctx q xi.
+      let o = gi.game_order in let r = eqv gi.game_valid in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      let p = t gi ctx q xi in
+      let p2 = related r p in let q2 = related r (e_lift q) in
+      holds c (enforce p2 q2)
+      by let qi = freeze_context_t gi ctx xi t2 q in
+        let qi2 = related r (e_lift qi) in
+        holds c (enforce p2 qi2)
+      so holds c (enforce qi2 q2)
+      by forall ys. qi2 ys -> holds c (enforce ((=) ys) q2)
+      by exists xm. qi xm ys
+      so let pi = t2 gi ctx q (xi,xm) in
+        holds c (enforce (related r pi) q2)
+    };
+    t
+
+  (* Fifth combinator: camera (snapshot initial state in parameters) *)
+  function camera_transformer
+    (t:transformer 'a ('i,'a) 'o) : transformer 'a 'i 'o =
+    \gi ctx q xi xs. t gi ctx q (xi,xs) xs
+  let ghost camera_t (t:transformer 'a ('i,'a) 'o) : transformer 'a 'i 'o
+    requires { transform_inv t }
+    ensures { transform_inv result }
+    ensures { result = camera_transformer t }
+  = let t2 = camera_transformer t in
+    assert { forall gi ctx q xi.
+      let o = gi.game_order in let r = eqv gi.game_valid in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      let p = t2 gi ctx q xi in
+      let p2 = related r p in let q2 = related r (e_lift q) in
+      holds c (enforce p2 q2)
+      by forall xs. p2 xs -> holds c (enforce ((=) xs) q2)
+      by holds c (enforce (related r (t gi ctx q (xi,xs))) q2)
+    };
+    t2
+
+  (* Sixth (trivial) combinator: parameter management. *)
+  function reorder_transformer (f:'i1 -> 'i2)
+    (t:transformer 'a 'i2 'o) : transformer 'a 'i1 'o =
+    \gi ctx q xi. t gi ctx q (f xi)
+  let ghost reorder_t (f:'i1 -> 'i2)
+                      (t:transformer 'a 'i2 'o) : transformer 'a 'i1 'o
+    requires { transform_inv t }
+    ensures { transform_inv result }
+    ensures { result = reorder_transformer f t }
+  = reorder_transformer f t
+
+  (* Seventh combinator: angelic decision.
+     Note that this is a complete rupture with usual wp calculus, as it
+     introduce an existential/disjunction in the formula instead
+     of the regular conjunction/implications/quantifications. *)
+  function ex_transformer (t:transformer 'a ('i,'e) 'o) : transformer 'a 'i 'o =
+    \gi ctx q xi xs. exists a. t gi ctx q (xi,a) xs
+
+  let ghost ex_t (t:transformer 'a ('i,'e) 'o) : transformer 'a 'i 'o
+    requires { transform_inv t }
+    ensures { transform_inv result }
+    ensures { result = ex_transformer t }
+  = let t2 = ex_transformer t in
+    assert { forall gi ctx q xi.
+      let o = gi.game_order in let r = eqv gi.game_valid in
+      let c = conj (hyp_fmla r (ctx_union ctx))
+                   (conj (vld_fmla r o o) (ordering o)) in
+      let p = t2 gi ctx q xi in
+      let pr = related r p in let qr = related r (e_lift q) in
+      holds c (enforce pr qr)
+      by forall xs. pr xs -> holds c (enforce ((=) xs) qr)
+      by exists a. let p = t gi ctx q (xi,a) in p xs
+      so holds c (enforce (related r p) qr)
+    };
+    t2
+
+  (* Eighth combinator: explicit weakening.
+     Mostly intended so that one may write new combinators naturally. *)
+  let ghost weaken (t1 t2:transformer 'a 'i 'o) : unit
+    requires { transform_inv t2 }
+    requires { forall gi ctx q xi xs. t1 gi ctx q xi xs -> t2 gi ctx q xi xs }
+    ensures { transform_inv t1 }
+  = assert { forall gi ctx q xi c.
+      let r = eqv gi.game_valid in
+      let p1r = related r (t1 gi ctx q xi) in
+      let p2r = related r (t2 gi ctx q xi) in
+      let qr = related r (e_lift q) in
+      holds c (enforce p2r qr) -> holds c (enforce p1r qr) }
 
 
   (* Export zone: define exported types & values.
