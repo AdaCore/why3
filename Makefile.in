@@ -124,8 +124,6 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
 COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
 
-TARGET_EMACS = share/emacs/why3.elc
-
 TOTARGET = > "$@" || (RV=$$?; rm -f "$@"; exit $${RV})
 
 ###############
@@ -290,11 +288,7 @@ clean_old_install::
 	rm -rf $(OCAMLINSTALLLIB)/why3
 
 
-ifeq ($(EMACS),no)
 install_no_local:: clean_old_install
-else
-install_no_local:: clean_old_install $(TARGET_EMACS)
-endif
 	$(MKDIR_P) $(BINDIR)
 	$(MKDIR_P) $(LIBDIR)/why3
 	$(MKDIR_P) $(TOOLDIR)
@@ -305,7 +299,6 @@ endif
 	$(MKDIR_P) $(DATADIR)/why3/theories
 	$(MKDIR_P) $(DATADIR)/why3/modules/mach
 	$(MKDIR_P) $(DATADIR)/why3/drivers
-	$(MKDIR_P) $(DATADIR)/emacs/site-lisp/
 	$(INSTALL_DATA) theories/*.why $(DATADIR)/why3/theories
 	$(INSTALL_DATA) modules/*.mlw $(DATADIR)/why3/modules
 	$(INSTALL_DATA) modules/mach/*.mlw $(DATADIR)/why3/modules/mach
@@ -355,14 +348,17 @@ uninstall: clean_old_install
 
 clean_old_install::
 	rm -f $(DATADIR)/emacs/site-lisp/why3.el
-ifneq ($(EMACS),no)
 	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
-endif
 
 install_no_local::
+	$(MKDIR_P) $(DATADIR)/emacs/site-lisp/
 	$(INSTALL_DATA) share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
-ifneq ($(EMACS),no)
+ifeq (@enable_emacs_compilation@,yes)
 	$(INSTALL_DATA) share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
+endif
+
+ifeq (@enable_emacs_compilation@,yes)
+all: share/emacs/why3.elc
 endif
 
 
@@ -584,7 +580,7 @@ CPULIM_O := $(addprefix src/server/, $(addsuffix .o, $(CPULIM_MODULES)))
 
 TOOLS = lib/why3server$(EXE) lib/why3cpulimit$(EXE)
 
-byte opt: $(TOOLS)
+all: $(TOOLS)
 
 lib/why3server$(EXE): $(SERVER_O)
 	$(CC) -Wall -o $@ $^
@@ -1036,9 +1032,7 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 	$(SHOW) 'Coqdep   $<'
 	$(HIDE)$(COQDEP) -R lib/coq Why3 $< $(TOTARGET)
 
-opt byte: $(COQVO)
-
-install_local:: $(COQVO) drivers/coq-realizations.aux
+all: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
@@ -1063,8 +1057,6 @@ endif
 
 install_no_local::
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
-
-opt byte: drivers/coq-realizations.aux
 
 clean::
 	rm -f drivers/coq-realizations.aux
@@ -1123,8 +1115,6 @@ install_no_local::
 	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
 	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
-install_local:: drivers/pvs-realizations.aux
-
 update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
 	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
 	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
@@ -1143,7 +1133,7 @@ install_no_local::
 
 endif
 
-opt byte: drivers/pvs-realizations.aux
+all: drivers/pvs-realizations.aux
 
 clean::
 	rm -f drivers/pvs-realizations.aux
@@ -1292,7 +1282,7 @@ $(ISABELLELIBS_BV): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.au
 	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o lib/isabelle/bv/
 
 # do not update isabelle realizations systematically
-# opt byte: update-isabelle
+# all: update-isabelle
 
 clean::
 	rm -f lib/isabelle/*/*.xml
@@ -1308,7 +1298,7 @@ install_no_local::
 
 endif
 
-opt byte: drivers/isabelle-realizations.aux
+all: drivers/isabelle-realizations.aux
 
 clean::
 	rm -f drivers/isabelle-realizations.aux
@@ -2032,7 +2022,7 @@ doc/version.tex: doc/version.tex.in config.status
 config.status: configure
 	./config.status --recheck
 
-opt byte: lib/why3/META .merlin
+all: lib/why3/META .merlin
 
 lib/why3/META: lib/why3/META.in config.status
 	./config.status chmod --file $@
