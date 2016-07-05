@@ -87,20 +87,18 @@ open Gnat_objectives
 
    *)
 
-val register :
-     Gnat_expl.check
-  -> Task.task option                  (* task of the last goal *)
-  -> Model_parser.model option         (* counterexample model *)
-  -> Save_VCs.stats option             (* extra information about the run *)
-  -> bool                              (* if the goal was proved or not *)
-  -> (string * string) option          (* (for manual provers) *)
-                                       (* pair of (vc_file, editor_cmd) *)
-  -> string                            (* the name of the trace file *)
-    -> unit
-(* register a proof result for the given objective, and the given result (the
-   boolean). The task may be used to improve the localization of the message.
-   Use the empty string for the trace file if there is none.
-   *)
+type result_info =
+  | Proved of Save_VCs.stats           (* extra information about the run *)
+  | Not_Proved of
+       Task.task option *              (* task of the last goal *)
+       Model_parser.model option *     (* counterexample model *)
+       string *                        (* the name of the trace file, empty
+                                          string if none *)
+       (string * string) option        (* for manual provers,
+                                          pair of (vc_file, editor_cmd) *)
+
+val register : Gnat_expl.check -> result_info -> unit
+(* register a proof result for the given objective, and the given result *)
 
 val print_messages : unit -> unit
 (* print all messages that have been registered so far. Also

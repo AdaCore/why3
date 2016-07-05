@@ -21,8 +21,6 @@
 
 open Why3
 open Term
-open Call_provers
-open Model_parser
 
 
 let search_labels =
@@ -75,54 +73,16 @@ let register_goal goal =
        else
          Gnat_objectives.add_to_objective c goal
 
-let rec handle_vc_result goal result prover_result manual_info =
+let rec handle_vc_result goal result =
    (* This function is called when the prover has returned from a VC.
        goal           is the VC that the prover has dealt with
        result         a boolean, true if the prover has proved the VC
        prover_result  the actual proof result, to extract statistics
    *)
    let obj, status = Gnat_objectives.register_result goal result in
-   let task = Session.goal_task goal in
    match status with
-   | Gnat_objectives.Proved ->
-       let stats = Gnat_objectives.Save_VCs.extract_stats obj in
-       Gnat_report.register obj (Some task) None (Some stats) true None ""
-   | Gnat_objectives.Not_Proved ->
-       let (tracefile, trace) =
-         match Gnat_config.proof_mode with
-         | Gnat_config.Progressive | Gnat_config.Per_Path ->
-           Gnat_objectives.Save_VCs.save_trace goal
-         | _ -> ("", Gnat_loc.S.empty)
-       in
-       let model = match prover_result with
-	 | None -> None
-	 | Some r ->
-	   match r.pr_answer with
-	     (* Resource limit was hit, the model is not useful *)
-	   | Unknown (_, Some Resourceout) -> None
-	   | _ ->
-	     let filter_model m trace =
-	       if trace = Gnat_loc.S.empty then
-		 m
-	       else
-		 let trace_to_list trace =
-		 (* Build list of locations (pairs of filename and line number) from trace *)
-		   Gnat_loc.S.fold
-		     (fun loc list ->
-		       let sloc = Gnat_loc.orig_loc loc in
-		       let col = Gnat_loc.get_col sloc in
-		       let pos = Why3.Loc.user_position
-			 (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
-		       (pos::list)
-		     )
-		     trace
-		     [] in
-		 model_for_positions_and_decls m ~positions:(trace_to_list trace)
-	     in
-	     Some (filter_model r.pr_model trace)
-       in
-       Gnat_report.register obj (Some task) model None
-         false manual_info tracefile
+   | Gnat_objectives.Proved -> ()
+   | Gnat_objectives.Not_Proved -> ()
    | Gnat_objectives.Work_Left ->
        List.iter (create_manual_or_schedule obj) (Gnat_objectives.next obj)
    | Gnat_objectives.Counter_Example ->
@@ -138,11 +98,10 @@ and interpret_result pa pas =
    | Session.Done r ->
          let goal = pa.Session.proof_parent in
          let answer = r.Call_provers.pr_answer in
-         let info = Gnat_manual.manual_proof_info pa in
          if answer = Call_provers.HighFailure &&
 	   not Gnat_config.counterexamples then
            Gnat_report.add_warning r.Call_provers.pr_output;
-         handle_vc_result goal (answer = Call_provers.Valid) (Some r) info
+         handle_vc_result goal (answer = Call_provers.Valid)
    | _ ->
          ()
 
@@ -150,13 +109,11 @@ and create_manual_or_schedule obj goal =
   match Gnat_config.manual_prover with
   | Some _ when Gnat_objectives.goal_has_splits goal &&
                 goal.Session.goal_verified = None ->
-                  handle_vc_result goal false None None
+                  handle_vc_result goal false
   | Some p when Gnat_manual.is_new_manual_proof goal &&
                 goal.Session.goal_verified = None ->
                   let _ = Gnat_manual.create_prover_file goal obj p in
-                  let pa = Gnat_manual.manual_attempt_of_goal goal in
-                  let info = Gnat_manual.manual_proof_info (Opt.get pa) in
-                  Gnat_report.register obj None None None false info ""
+                  ()
   | _ -> schedule_goal goal
 
 and schedule_goal (g : Gnat_objectives.goal) =
@@ -176,11 +133,11 @@ and schedule_goal (g : Gnat_objectives.goal) =
    end else begin
       (* Maybe the goal is already proved *)
       if g.Session.goal_verified <> None then begin
-         handle_vc_result g true None None
+         handle_vc_result g true
       (* Maybe there was a previous proof attempt with identical parameters *)
       end else if Gnat_objectives.all_provers_tried g then begin
          (* the proof attempt was necessarily false *)
-         handle_vc_result g false None None
+         handle_vc_result g false
       end else begin
          actually_schedule_goal g
       end;
@@ -190,10 +147,7 @@ and actually_schedule_goal g =
   Gnat_objectives.schedule_goal ~cntexample:false g
 
 let handle_obj obj =
-   if Gnat_objectives.objective_status obj =
-      Gnat_objectives.Proved then begin
-        Gnat_report.register obj None None None true None ""
-   end else begin
+   if Gnat_objectives.objective_status obj <> Gnat_objectives.Proved then begin
       match Gnat_objectives.next obj with
       | [] -> ()
       | l ->
@@ -213,6 +167,56 @@ let all_split_subp subp =
      Gnat_objectives.all_split_leaf_goals ();
      Gnat_objectives.clear ()
    end
+
+let filter_model m trace =
+  if trace = Gnat_loc.S.empty then
+    m
+  else
+    let trace_to_list trace =
+    (* Build list of locations (pairs of filename and line number) from trace *)
+      Gnat_loc.S.fold
+        (fun loc list ->
+          let sloc = Gnat_loc.orig_loc loc in
+          let col = Gnat_loc.get_col sloc in
+          let pos = Why3.Loc.user_position
+            (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
+          (pos::list)
+        )
+        trace
+        [] in
+    let positions = trace_to_list trace in
+    Model_parser.model_for_positions_and_decls m ~positions
+
+let report_messages obj =
+  let result =
+    if Gnat_objectives.session_proved_status obj  then
+      Gnat_report.Proved (Gnat_objectives.Save_VCs.extract_stats obj)
+    else
+      let unproved_pa = Gnat_objectives.session_find_unproved_pa obj in
+      let unproved_goal =
+        Opt.map (fun pa -> pa.Session.proof_parent) unproved_pa in
+      let unproved_task = Opt.map Session.goal_task unproved_goal in
+      let (tracefile, trace) =
+        match unproved_goal, Gnat_config.proof_mode with
+        | Some goal, (Gnat_config.Progressive | Gnat_config.Per_Path) ->
+            Gnat_objectives.Save_VCs.save_trace goal
+        | _ -> ("", Gnat_loc.S.empty) in
+      let model =
+        match unproved_pa with
+        | Some { Session.proof_state =
+                   Session.Done { Call_provers.pr_answer =
+                     Call_provers.Unknown (_, Some Call_provers.Resourceout)} }
+          ->
+            (* Resource limit was hit, the model is not useful *)
+            None
+        | Some { Session.proof_state =
+                  Session.Done ({ Call_provers.pr_answer = _ } as r) } ->
+             Some (filter_model r.Call_provers.pr_model trace)
+        | _ -> None
+      in
+      let manual_info = None in
+      Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
+  Gnat_report.register obj result
 
 let _ =
    (* This is the main code. We read the file into the session if not already
@@ -241,9 +245,9 @@ let _ =
          Gnat_objectives.iter_subps normal_handle_one_subp;
          Gnat_objectives.iter handle_obj;
          Gnat_objectives.do_scheduled_jobs interpret_result;
-         Gnat_objectives.clear ();
-         Gnat_report.print_messages ();
-         Gnat_objectives.save_session ()
+         Gnat_objectives.save_session ();
+         Gnat_objectives.iter report_messages;
+         Gnat_report.print_messages ()
       | Gnat_config.All_Split ->
          Gnat_objectives.iter_subps all_split_subp
       | Gnat_config.No_WP ->

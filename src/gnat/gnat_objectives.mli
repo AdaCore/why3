@@ -185,3 +185,11 @@ val clean_automatic_proofs : goal -> unit
 (* deletes previous proof attempts of the selected provers for this goal *)
 
 val goal_has_splits : goal -> bool
+
+val session_proved_status : objective -> bool
+(* check the proof status of an objective by looking at the verified/not
+   verified status of its VCs in the session *)
+
+val session_find_unproved_pa : objective -> key Session.proof_attempt option
+(* find the first unproved proof attempt in a session. If counter examples are
+ * activated, this will return a CE proof attempt, if any *)

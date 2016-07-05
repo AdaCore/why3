@@ -254,13 +254,7 @@ let provers, prover_ce, config, env =
     try
       let filter_prover prover_string =
 	Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover_string) in
-      let base_provers = match prover_str_list with
-	| [] when !opt_prepare_shared -> []
-	| [] ->
-        (* default provers are cvc4 and altergo. in this order *)
-          List.map filter_prover ["cvc4";"altergo"]
-	| l ->
-          List.map filter_prover l in
+      let base_provers = List.map filter_prover prover_str_list in
       (* the prover for counterexample generation *)
       let base_prover_ce =
 	if !opt_ce_mode then
@@ -432,16 +426,11 @@ let () =
 let counterexamples = !opt_ce_mode
 
 let manual_prover =
-  (* sanity check - we found at least one prover, and don't allow combining
+  (* sanity check - we don't allow combining
      manual with other provers. Or said otherwise, if there is more than one
-     prover, they must all be automatic.
-     This is done after handling of --prepare-shared, because in that mode we
-     may end of with no provers at all, e.g. when in fact all provers are
-     automatic *)
+     prover, they must all be automatic. *)
   match provers with
-  | [] ->
-        Gnat_util.abort_with_message ~internal:true
-        "no prover available, aborting"
+  | [] -> None
   | [x] when x.prover.Whyconf.interactive -> Some x
   | _ :: _ :: _ when
      List.exists (fun p -> p.prover.Whyconf.interactive) provers ->

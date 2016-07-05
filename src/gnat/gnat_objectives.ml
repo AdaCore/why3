@@ -815,3 +815,57 @@ let all_split_leaf_goals () =
 let add_to_objective = add_to_objective ~toplevel:true
 (* we mask the add_to_objective function here and fix it's toplevel argument to
    "true", so that outside calls always set toplevel to true *)
+
+let session_proved_status obj =
+   let obj_rec = Gnat_expl.HCheck.find explmap obj in
+   try
+     GoalSet.iter
+       (fun x -> if x.Session.goal_verified = None then raise Exit)
+       obj_rec.toplevel;
+     true
+   with Exit -> false
+
+let finished_but_not_valid pa =
+  (* return true if the proof attempt in argument has terminated, but did not
+     prove the goal. *)
+  match pa.Session.proof_state with
+  | Session.Done { Call_provers.pr_answer = Call_provers.Valid } -> false
+  | Session.Done _ -> true
+  | _ -> false
+
+(* exception Goal_Found of goal *)
+exception PA_Found of key Session.proof_attempt
+
+
+let nothing _ =
+  (* one-argument function which does nothing, is used below as dummy argument
+     to traversal functions *)
+  ()
+
+let equals_ce_prover ce prover =
+(* helper function that checks if the prover in argument is the same as the
+   counter example prover. Returns true when there is no counter example prover
+   configured. *)
+  match ce, Gnat_config.prover_ce with
+  | true, Some { Gnat_config.prover = { Whyconf.prover = p }} ->
+      prover = p
+  | _ -> true
+
+let session_find_unproved_pa obj =
+  let obj_rec = Gnat_expl.HCheck.find explmap obj in
+  let ce = obj_rec.counter_example in
+  let rec aux goal =
+    if goal.Session.goal_verified <> None then ()
+    else begin
+      Session.iter_goal nothing (Session.iter_transf aux) nothing goal;
+      Session.iter_goal (fun pa ->
+        if not pa.Session.proof_obsolete && finished_but_not_valid pa &&
+        equals_ce_prover ce pa.Session.proof_prover then
+          raise (PA_Found pa)) nothing nothing goal
+    end
+  in
+   try
+     GoalSet.iter aux obj_rec.toplevel;
+     None
+   with PA_Found p ->
+     Some p

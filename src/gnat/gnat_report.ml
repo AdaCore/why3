@@ -2,6 +2,14 @@ open Why3
 open Why3.Json
 open Gnat_objectives.Save_VCs
 
+type result_info =
+  | Proved of Gnat_objectives.Save_VCs.stats
+  | Not_Proved of
+       Task.task option *
+       Model_parser.model option *
+       string *
+       (string * string) option
+
 type msg =
   { result        : bool;
     stats         : stats option;
@@ -38,15 +46,19 @@ let adapt_stats statsopt =
           Gnat_config.back_convert_steps ~prover:name v.max_steps}) stats;
       Some newstats
 
-let register check task model stats valid manual tracefile =
-  if (Gnat_expl.HCheck.mem msg_set check) then ()
+let register check result =
+  let valid, extra_info, stats, tracefile, model, manual =
+    match result with
+    | Proved stats -> true, None, Some stats, "", None, None
+    | Not_Proved (task, model, tracefile, manual) ->
+        let extra_info =
+          match task with
+          | None -> None
+          | Some t -> Gnat_expl.get_extra_info t in
+        false, extra_info, None, tracefile, model, manual
+  in
+  if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
-    let extra_info =
-      if valid then None
-      else begin match task with
-        | None -> None
-        | Some t -> Gnat_expl.get_extra_info t
-      end in
     let msg =
     { result        = valid;
       extra_info    = extra_info;
