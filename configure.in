@@ -127,6 +127,12 @@ AC_ARG_ENABLE(profiling,
     AS_HELP_STRING([--enable-profiling], [enable profiling]),,
     enable_profiling=no)
 
+# Emacs compilation
+
+AC_ARG_ENABLE(emacs-compilation,
+    AS_HELP_STRING([--disable-emacs-compilation], [do not compile why3.elc]),,
+    enable_emacs_compilation=yes)
+
 # either relocation or local, not both
 if test "$enable_relocation" = yes ; then
 if test "$enable_local" = yes ; then
@@ -348,7 +354,13 @@ if test "$enable_html_doc" = yes ; then
 fi
 
 # checking for emacs
-AC_CHECK_PROG(EMACS,emacs,emacs,no)
+if test "$enable_emacs_compilation" = yes ; then
+   AC_CHECK_PROG(EMACS,emacs,emacs,no)
+   if test "$EMACS" = no ; then
+      enable_emacs_compilation=no
+      AC_MSG_WARN([Cannot find emacs, compilation of why3.elc disabled.])
+   fi
+fi
 
 # checking for Zarith
 if test "$enable_zarith" = yes; then
@@ -786,6 +798,8 @@ AC_SUBST(enable_html_doc)
 AC_SUBST(RUBBER)
 AC_SUBST(HEVEA)
 AC_SUBST(HACHA)
+
+AC_SUBST(enable_emacs_compilation)
 AC_SUBST(EMACS)
 
 AC_SUBST(enable_frama_c)
