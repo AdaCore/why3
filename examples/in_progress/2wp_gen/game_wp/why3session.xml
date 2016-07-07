@@ -5,10 +5,10 @@
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../game_wp.mlw">
+<file name="../game_wp.mlw" expanded="true">
 <theory name="WpCommon" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Wp" sum="c4c2a30e0e6ac4970a9fd6796bbf8186">
+<theory name="WpCore" sum="5b838d017b5f1f11bce96a2185eeff5b" expanded="true">
  <goal name="WP_parameter test" expl="VC for test">
  <transf name="split_goal_wp">
   <goal name="WP_parameter test.1" expl="1. precondition">
@@ -25,16 +25,16 @@
       <goal name="WP_parameter test.2.1.1.1.1" expl="1. VC for test">
       <transf name="split_goal_wp">
        <goal name="WP_parameter test.2.1.1.1.1.1" expl="1. inner precondition">
-       <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+       <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
        </goal>
        <goal name="WP_parameter test.2.1.1.1.1.2" expl="2. inner postcondition">
-       <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+       <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
        </goal>
        <goal name="WP_parameter test.2.1.1.1.1.3" expl="3. inner precondition">
-       <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+       <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
        </goal>
        <goal name="WP_parameter test.2.1.1.1.1.4" expl="4. inner postcondition">
-       <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+       <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
        </goal>
       </transf>
       </goal>
@@ -50,34 +50,30 @@
   <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter test.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter skip" expl="VC for skip">
  <transf name="split_goal_wp">
   <goal name="WP_parameter skip.1" expl="1. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter skip.2" expl="2. precondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter skip.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter skip.4" expl="4. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter skip.5" expl="5. to be computed precondition">
   <transf name="compute_specified">
    <goal name="WP_parameter skip.5.1" expl="1. to be computed precondition">
    <transf name="simplify_trivial_quantification_in_goal">
     <goal name="WP_parameter skip.5.1.1" expl="1. VC for skip">
-    <transf name="introduce_premises">
-     <goal name="WP_parameter skip.5.1.1.1" expl="1. VC for skip">
-     <transf name="compute_specified">
-     </transf>
-     </goal>
+    <transf name="compute_specified">
     </transf>
     </goal>
    </transf>
@@ -88,14 +84,70 @@
   <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter skip.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter rtest" expl="VC for rtest" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter rtest.1" expl="1. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter rtest.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter rtest.3" expl="3. to be computed precondition" expanded="true">
+  <transf name="compute_specified" expanded="true">
+   <goal name="WP_parameter rtest.3.1" expl="1. to be computed precondition" expanded="true">
+   <transf name="introduce_premises" expanded="true">
+    <goal name="WP_parameter rtest.3.1.1" expl="1. to be computed precondition" expanded="true">
+    <transf name="compute_specified" expanded="true">
+     <goal name="WP_parameter rtest.3.1.1.1" expl="1. to be computed precondition" expanded="true">
+     <transf name="split_goal_wp" expanded="true">
+      <goal name="WP_parameter rtest.3.1.1.1.1" expl="1. ordering expected">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.2" expl="2. relation imply validity">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.3" expl="3. relation imply validity">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.4" expl="4. backward relation monotonicity">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.5" expl="5. limit relation condition">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.6" expl="6. VC for rtest">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.7" expl="7. inner precondition">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.8" expl="8. VC for rtest">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.9" expl="9. VC for rtest" expanded="true">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.10" expl="10. inner precondition">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.11" expl="11. inner postcondition">
+      </goal>
+      <goal name="WP_parameter rtest.3.1.1.1.12" expl="12. inner postcondition">
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter rtest.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter rtest.5" expl="5. postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="WpImpl" sum="28e57dbb16d8bfe12192ad237957a110">
+<theory name="WpImpl" sum="b39cd5ad7f0b9814f41dad6bafc8e45f">
  <goal name="ctx_hyp_add_fmla">
- <proof prover="0"><result status="valid" time="0.63" steps="740"/></proof>
+ <proof prover="0"><result status="valid" time="0.39" steps="740"/></proof>
  </goal>
  <goal name="enf_transf_identical">
  <transf name="split_goal_wp">
@@ -133,7 +185,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="30"/></proof>
   </goal>
   <goal name="enf_transf_identical.12" expl="12.">
-  <proof prover="1"><result status="valid" time="2.33"/></proof>
+  <proof prover="1"><result status="valid" time="1.68"/></proof>
   </goal>
   <goal name="enf_transf_identical.13" expl="13.">
   <proof prover="0"><result status="valid" time="0.24" steps="257"/></proof>
@@ -221,22 +273,22 @@
  <goal name="weaker_hypothesis_sufficient">
  <transf name="split_goal_wp">
   <goal name="weaker_hypothesis_sufficient.1" expl="1.">
-  <proof prover="1"><result status="valid" time="1.19"/></proof>
+  <proof prover="1"><result status="valid" time="0.67"/></proof>
   </goal>
   <goal name="weaker_hypothesis_sufficient.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
   </goal>
   <goal name="weaker_hypothesis_sufficient.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="11"/></proof>
   </goal>
   <goal name="weaker_hypothesis_sufficient.4" expl="4.">
-  <proof prover="0"><result status="valid" time="0.11" steps="95"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="95"/></proof>
   </goal>
   <goal name="weaker_hypothesis_sufficient.5" expl="5.">
-  <proof prover="1"><result status="valid" time="1.48"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="16"/></proof>
   </goal>
   <goal name="weaker_hypothesis_sufficient.6" expl="6.">
-  <proof prover="0"><result status="valid" time="0.07" steps="38"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="77"/></proof>
   </goal>
  </transf>
  </goal>
@@ -292,7 +344,7 @@
    <proof prover="0"><result status="valid" time="1.90" steps="1212"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.4.2" expl="2.">
-   <proof prover="0"><result status="valid" time="3.09" steps="1659"/></proof>
+   <proof prover="0"><result status="valid" time="3.19" steps="1659"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.4.3" expl="3.">
    <proof prover="0"><result status="valid" time="0.11" steps="10"/></proof>
@@ -314,13 +366,13 @@
    <proof prover="0"><result status="valid" time="0.31" steps="250"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.7.2" expl="2.">
-   <proof prover="0"><result status="valid" time="1.52" steps="1668"/></proof>
+   <proof prover="0"><result status="valid" time="1.78" steps="1668"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.7.3" expl="3.">
    <proof prover="0"><result status="valid" time="0.14" steps="17"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.7.4" expl="4.">
-   <proof prover="0"><result status="valid" time="1.14" steps="869"/></proof>
+   <proof prover="0"><result status="valid" time="0.79" steps="869"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.7.5" expl="5.">
    <proof prover="0"><result status="valid" time="0.14" steps="38"/></proof>
@@ -354,7 +406,7 @@
    <proof prover="0"><result status="valid" time="0.33" steps="389"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.8.7" expl="7.">
-   <proof prover="1"><result status="valid" time="5.96"/></proof>
+   <proof prover="1"><result status="valid" time="4.88"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.8.8" expl="8.">
    <proof prover="0"><result status="valid" time="0.32" steps="486"/></proof>
@@ -381,7 +433,7 @@
    <proof prover="0"><result status="valid" time="0.31" steps="570"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.8.16" expl="16.">
-   <proof prover="0"><result status="valid" time="5.91" steps="4237"/></proof>
+   <proof prover="0"><result status="valid" time="3.97" steps="4237"/></proof>
    </goal>
    <goal name="transform_inv_reinforced.8.17" expl="17.">
    <proof prover="0"><result status="valid" time="0.16" steps="45"/></proof>
@@ -408,7 +460,7 @@
  <goal name="transform_inv_as_hyp_fmla">
  <transf name="split_goal_wp">
   <goal name="transform_inv_as_hyp_fmla.1" expl="1.">
-  <proof prover="1"><result status="valid" time="1.80"/></proof>
+  <proof prover="1"><result status="valid" time="1.27"/></proof>
   </goal>
   <goal name="transform_inv_as_hyp_fmla.2" expl="2.">
   <proof prover="0"><result status="valid" time="0.12" steps="6"/></proof>
@@ -420,7 +472,7 @@
   <proof prover="0"><result status="valid" time="0.12" steps="8"/></proof>
   </goal>
   <goal name="transform_inv_as_hyp_fmla.5" expl="5.">
-  <proof prover="0"><result status="valid" time="3.36" steps="1805"/></proof>
+  <proof prover="0"><result status="valid" time="1.73" steps="1805"/></proof>
   </goal>
  </transf>
  </goal>
@@ -432,15 +484,30 @@
   <goal name="WP_parameter domain_rel_ctx_ok.2" expl="2. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter domain_rel_ctx_ok.2.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.37" steps="111"/></proof>
+   <proof prover="0"><result status="valid" time="0.21" steps="55"/></proof>
    </goal>
    <goal name="WP_parameter domain_rel_ctx_ok.2.2" expl="2. assertion">
-   <proof prover="0"><result status="valid" time="0.16" steps="97"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
    </goal>
    <goal name="WP_parameter domain_rel_ctx_ok.2.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.95" steps="612"/></proof>
+   <proof prover="0"><result status="valid" time="0.16" steps="115"/></proof>
    </goal>
    <goal name="WP_parameter domain_rel_ctx_ok.2.4" expl="4. assertion">
+   <proof prover="0"><result status="valid" time="0.12" steps="31"/></proof>
+   </goal>
+   <goal name="WP_parameter domain_rel_ctx_ok.2.5" expl="5. assertion">
+   <proof prover="0"><result status="valid" time="0.13" steps="30"/></proof>
+   </goal>
+   <goal name="WP_parameter domain_rel_ctx_ok.2.6" expl="6. assertion">
+   <proof prover="0"><result status="valid" time="0.10" steps="23"/></proof>
+   </goal>
+   <goal name="WP_parameter domain_rel_ctx_ok.2.7" expl="7. assertion">
+   <proof prover="0"><result status="valid" time="1.08" steps="1578"/></proof>
+   </goal>
+   <goal name="WP_parameter domain_rel_ctx_ok.2.8" expl="8. assertion">
+   <proof prover="0"><result status="valid" time="0.21" steps="81"/></proof>
+   </goal>
+   <goal name="WP_parameter domain_rel_ctx_ok.2.9" expl="9. assertion">
    <proof prover="0"><result status="valid" time="0.20" steps="105"/></proof>
    </goal>
   </transf>
@@ -471,37 +538,37 @@
   <proof prover="0"><result status="valid" time="0.32" steps="170"/></proof>
   </goal>
   <goal name="domain_rel_t.5" expl="5.">
-  <proof prover="0"><result status="valid" time="0.25" steps="83"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="87"/></proof>
   </goal>
   <goal name="domain_rel_t.6" expl="6.">
-  <proof prover="0"><result status="valid" time="0.29" steps="100"/></proof>
+  <proof prover="0"><result status="valid" time="0.29" steps="104"/></proof>
   </goal>
   <goal name="domain_rel_t.7" expl="7.">
-  <proof prover="0"><result status="valid" time="0.28" steps="100"/></proof>
+  <proof prover="0"><result status="valid" time="0.28" steps="104"/></proof>
   </goal>
   <goal name="domain_rel_t.8" expl="8.">
   <proof prover="0"><result status="valid" time="0.20" steps="18"/></proof>
   </goal>
   <goal name="domain_rel_t.9" expl="9.">
-  <proof prover="0"><result status="valid" time="0.24" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.24" steps="62"/></proof>
   </goal>
   <goal name="domain_rel_t.10" expl="10.">
-  <proof prover="0"><result status="valid" time="0.29" steps="130"/></proof>
+  <proof prover="0"><result status="valid" time="0.29" steps="134"/></proof>
   </goal>
   <goal name="domain_rel_t.11" expl="11.">
-  <proof prover="0"><result status="valid" time="0.25" steps="77"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="78"/></proof>
   </goal>
   <goal name="domain_rel_t.12" expl="12.">
-  <proof prover="0"><result status="valid" time="0.30" steps="135"/></proof>
+  <proof prover="0"><result status="valid" time="0.23" steps="139"/></proof>
   </goal>
   <goal name="domain_rel_t.13" expl="13.">
-  <proof prover="0"><result status="valid" time="0.54" steps="300"/></proof>
+  <proof prover="0"><result status="valid" time="0.56" steps="306"/></proof>
   </goal>
   <goal name="domain_rel_t.14" expl="14.">
   <proof prover="0"><result status="valid" time="0.18" steps="14"/></proof>
   </goal>
   <goal name="domain_rel_t.15" expl="15.">
-  <proof prover="0"><result status="valid" time="0.24" steps="73"/></proof>
+  <proof prover="0"><result status="valid" time="0.24" steps="74"/></proof>
   </goal>
   <goal name="domain_rel_t.16" expl="16.">
   <proof prover="0"><result status="valid" time="0.27" steps="121"/></proof>
@@ -519,16 +586,16 @@
   <proof prover="0"><result status="valid" time="0.12" steps="31"/></proof>
   </goal>
   <goal name="domain_rel_t.21" expl="21.">
-  <proof prover="0"><result status="valid" time="0.70" steps="393"/></proof>
+  <proof prover="0"><result status="valid" time="0.74" steps="393"/></proof>
   </goal>
   <goal name="domain_rel_t.22" expl="22.">
   <proof prover="0"><result status="valid" time="0.25" steps="113"/></proof>
   </goal>
   <goal name="domain_rel_t.23" expl="23.">
-  <proof prover="0"><result status="valid" time="0.42" steps="281"/></proof>
+  <proof prover="0"><result status="valid" time="0.40" steps="281"/></proof>
   </goal>
   <goal name="domain_rel_t.24" expl="24.">
-  <proof prover="0"><result status="valid" time="1.33" steps="695"/></proof>
+  <proof prover="0"><result status="valid" time="1.58" steps="695"/></proof>
   </goal>
   <goal name="domain_rel_t.25" expl="25.">
   <proof prover="0"><result status="valid" time="0.33" steps="121"/></proof>
@@ -564,7 +631,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="28"/></proof>
   </goal>
   <goal name="domain_rel_t.36" expl="36.">
-  <proof prover="0"><result status="valid" time="2.08" steps="1433"/></proof>
+  <proof prover="0"><result status="valid" time="2.45" steps="1433"/></proof>
   </goal>
   <goal name="domain_rel_t.37" expl="37.">
   <proof prover="0"><result status="valid" time="2.66" steps="1433"/></proof>
@@ -582,7 +649,7 @@
   <proof prover="0"><result status="valid" time="0.22" steps="199"/></proof>
   </goal>
   <goal name="domain_rel_t.42" expl="42.">
-  <proof prover="0"><result status="valid" time="0.13" steps="136"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="136"/></proof>
   </goal>
   <goal name="domain_rel_t.43" expl="43.">
   <proof prover="0"><result status="valid" time="0.52" steps="596"/></proof>
@@ -591,13 +658,13 @@
   <proof prover="0"><result status="valid" time="0.14" steps="21"/></proof>
   </goal>
   <goal name="domain_rel_t.45" expl="45.">
-  <proof prover="0"><result status="valid" time="4.62" steps="3131"/></proof>
+  <proof prover="0"><result status="valid" time="3.67" steps="3131"/></proof>
   </goal>
   <goal name="domain_rel_t.46" expl="46.">
   <proof prover="0"><result status="valid" time="0.18" steps="43"/></proof>
   </goal>
   <goal name="domain_rel_t.47" expl="47.">
-  <proof prover="0"><result status="valid" time="1.48" steps="1117"/></proof>
+  <proof prover="0"><result status="valid" time="1.58" steps="1117"/></proof>
   </goal>
   <goal name="domain_rel_t.48" expl="48.">
   <proof prover="0"><result status="valid" time="0.59" steps="419"/></proof>
@@ -606,7 +673,7 @@
   <proof prover="0"><result status="valid" time="0.14" steps="17"/></proof>
   </goal>
   <goal name="domain_rel_t.50" expl="50.">
-  <proof prover="0"><result status="valid" time="5.83" steps="3841"/></proof>
+  <proof prover="0"><result status="valid" time="4.06" steps="3841"/></proof>
   </goal>
   <goal name="domain_rel_t.51" expl="51.">
   <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
@@ -637,7 +704,7 @@
   <proof prover="0"><result status="valid" time="0.11" steps="9"/></proof>
   </goal>
   <goal name="transform_inv_implies_abstraction_inv.3" expl="3.">
-  <proof prover="1"><result status="valid" time="5.50"/></proof>
+  <proof prover="1"><result status="valid" time="3.13"/></proof>
   </goal>
   <goal name="transform_inv_implies_abstraction_inv.4" expl="4.">
   <proof prover="0"><result status="valid" time="0.16" steps="37"/></proof>
@@ -659,7 +726,7 @@
   <proof prover="0"><result status="valid" time="0.29" steps="121"/></proof>
   </goal>
   <goal name="abstraction_inv_implies_transform_inv.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.11" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="89"/></proof>
   </goal>
   <goal name="abstraction_inv_implies_transform_inv.4" expl="4.">
   <proof prover="0"><result status="valid" time="0.19" steps="69"/></proof>
@@ -671,13 +738,13 @@
   <proof prover="0"><result status="valid" time="0.20" steps="78"/></proof>
   </goal>
   <goal name="abstraction_inv_implies_transform_inv.7" expl="7.">
-  <proof prover="0"><result status="valid" time="0.77" steps="648"/></proof>
+  <proof prover="0"><result status="valid" time="0.81" steps="648"/></proof>
   </goal>
   <goal name="abstraction_inv_implies_transform_inv.8" expl="8.">
   <proof prover="0"><result status="valid" time="0.36" steps="211"/></proof>
   </goal>
   <goal name="abstraction_inv_implies_transform_inv.9" expl="9.">
-  <proof prover="0"><result status="valid" time="1.25" steps="955"/></proof>
+  <proof prover="0"><result status="valid" time="0.97" steps="955"/></proof>
   </goal>
   <goal name="abstraction_inv_implies_transform_inv.10" expl="10.">
   <proof prover="0"><result status="valid" time="0.15" steps="11"/></proof>
@@ -698,7 +765,7 @@
   <goal name="WP_parameter abstraction_t.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter abstraction_t.1.1" expl="1. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.16" steps="20"/></proof>
+   <proof prover="0"><result status="valid" time="0.16" steps="26"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.2" expl="2. VC for abstraction_t">
    <proof prover="0"><result status="valid" time="0.15" steps="10"/></proof>
@@ -707,31 +774,37 @@
    <proof prover="0"><result status="valid" time="0.20" steps="105"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.4" expl="4. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.25" steps="96"/></proof>
+   <proof prover="0"><result status="valid" time="0.29" steps="95"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.5" expl="5. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.16" steps="10"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="212"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.6" expl="6. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.19" steps="13"/></proof>
+   <proof prover="1"><result status="valid" time="3.67"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.7" expl="7. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.17" steps="13"/></proof>
+   <proof prover="0"><result status="valid" time="0.27" steps="114"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.8" expl="8. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.17" steps="18"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="101"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.9" expl="9. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.14" steps="18"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.10" expl="10. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.71" steps="511"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="13"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.11" expl="11. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.15" steps="28"/></proof>
+   <proof prover="0"><result status="valid" time="0.14" steps="18"/></proof>
    </goal>
    <goal name="WP_parameter abstraction_t.1.12" expl="12. VC for abstraction_t">
-   <proof prover="0"><result status="valid" time="0.18" steps="6"/></proof>
+   <proof prover="0"><result status="valid" time="0.66" steps="505"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction_t.1.13" expl="13. VC for abstraction_t">
+   <proof prover="0"><result status="valid" time="0.17" steps="28"/></proof>
+   </goal>
+   <goal name="WP_parameter abstraction_t.1.14" expl="14. VC for abstraction_t">
+   <proof prover="0"><result status="valid" time="0.18" steps="26"/></proof>
    </goal>
   </transf>
   </goal>
@@ -746,7 +819,7 @@
  <goal name="WP_parameter trivial_rel_expose_context" expl="VC for trivial_rel_expose_context">
  <transf name="split_goal_wp">
   <goal name="WP_parameter trivial_rel_expose_context.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="41"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="41"/></proof>
   </goal>
   <goal name="WP_parameter trivial_rel_expose_context.2" expl="2. assertion">
   <transf name="split_goal_wp">
@@ -774,96 +847,92 @@
   <proof prover="0"><result status="valid" time="0.14" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter trivial_rel_expose_context.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="210"/></proof>
+  <proof prover="0"><result status="valid" time="0.24" steps="210"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="expose">
+ <transf name="split_goal_wp">
+  <goal name="expose.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.16" steps="21"/></proof>
+  </goal>
+  <goal name="expose.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.19" steps="52"/></proof>
+  </goal>
+  <goal name="expose.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.20" steps="15"/></proof>
+  </goal>
+  <goal name="expose.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.22" steps="27"/></proof>
+  </goal>
+  <goal name="expose.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.16" steps="15"/></proof>
+  </goal>
+  <goal name="expose.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.16" steps="15"/></proof>
+  </goal>
+  <goal name="expose.7" expl="7.">
+  <proof prover="0"><result status="valid" time="0.30" steps="276"/></proof>
+  </goal>
+  <goal name="expose.8" expl="8.">
+  <proof prover="0"><result status="valid" time="0.28" steps="156"/></proof>
+  </goal>
+  <goal name="expose.9" expl="9.">
+  <proof prover="0"><result status="valid" time="0.35" steps="278"/></proof>
+  </goal>
+  <goal name="expose.10" expl="10.">
+  <proof prover="0"><result status="valid" time="0.28" steps="165"/></proof>
+  </goal>
+  <goal name="expose.11" expl="11.">
+  <proof prover="0"><result status="valid" time="2.68" steps="3591"/></proof>
+  </goal>
+  <goal name="expose.12" expl="12.">
+  <proof prover="0"><result status="valid" time="0.21" steps="28"/></proof>
+  </goal>
+  <goal name="expose.13" expl="13.">
+  <proof prover="0"><result status="valid" time="0.23" steps="76"/></proof>
+  </goal>
+  <goal name="expose.14" expl="14.">
+  <proof prover="0"><result status="valid" time="0.52" steps="298"/></proof>
+  </goal>
+  <goal name="expose.15" expl="15.">
+  <proof prover="0"><result status="valid" time="0.40" steps="252"/></proof>
+  </goal>
+  <goal name="expose.16" expl="16.">
+  <proof prover="0"><result status="valid" time="0.12" steps="12"/></proof>
+  </goal>
+  <goal name="expose.17" expl="17.">
+  <proof prover="0"><result status="valid" time="0.16" steps="19"/></proof>
+  </goal>
+  <goal name="expose.18" expl="18.">
+  <proof prover="0"><result status="valid" time="0.14" steps="30"/></proof>
+  </goal>
+  <goal name="expose.19" expl="19.">
+  <proof prover="0"><result status="valid" time="0.26" steps="135"/></proof>
+  </goal>
+  <goal name="expose.20" expl="20.">
+  <proof prover="0"><result status="valid" time="0.16" steps="73"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter expose" expl="VC for expose">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter expose.1" expl="1. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter expose.1.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.19" steps="21"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.2" expl="2. VC for expose">
-   <proof prover="0"><result status="valid" time="0.25" steps="52"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.3" expl="3. VC for expose">
-   <proof prover="0"><result status="valid" time="0.21" steps="76"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.4" expl="4. VC for expose">
-   <proof prover="0"><result status="valid" time="0.16" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.5" expl="5. VC for expose">
-   <proof prover="0"><result status="valid" time="0.17" steps="27"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.6" expl="6. VC for expose">
-   <proof prover="0"><result status="valid" time="0.14" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.7" expl="7. VC for expose">
-   <proof prover="0"><result status="valid" time="0.17" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.8" expl="8. VC for expose">
-   <proof prover="0"><result status="valid" time="0.30" steps="276"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.9" expl="9. VC for expose">
-   <proof prover="0"><result status="valid" time="0.13" steps="156"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.10" expl="10. VC for expose">
-   <proof prover="0"><result status="valid" time="0.27" steps="278"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.11" expl="11. VC for expose">
-   <proof prover="0"><result status="valid" time="0.12" steps="165"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.12" expl="12. VC for expose">
-   <proof prover="0"><result status="valid" time="2.92" steps="3591"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.13" expl="13. VC for expose">
-   <proof prover="0"><result status="valid" time="0.21" steps="28"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.14" expl="14. VC for expose">
-   <proof prover="0"><result status="valid" time="0.38" steps="298"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.15" expl="15. VC for expose">
-   <proof prover="0"><result status="valid" time="0.36" steps="252"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.16" expl="16. VC for expose">
-   <proof prover="0"><result status="valid" time="0.20" steps="12"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.17" expl="17. VC for expose">
-   <proof prover="0"><result status="valid" time="0.21" steps="19"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.18" expl="18. VC for expose">
-   <proof prover="0"><result status="valid" time="0.13" steps="30"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.19" expl="19. VC for expose">
-   <proof prover="0"><result status="valid" time="0.25" steps="135"/></proof>
-   </goal>
-   <goal name="WP_parameter expose.1.20" expl="20. VC for expose">
-   <proof prover="0"><result status="valid" time="0.22" steps="73"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter expose.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.19" steps="11"/></proof>
-  </goal>
- </transf>
+ <proof prover="0"><result status="valid" time="0.10" steps="61"/></proof>
  </goal>
  <goal name="WP_parameter ktrap_t" expl="VC for ktrap_t">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ktrap_t.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter ktrap_t.1.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="3.00" steps="1560"/></proof>
+   <proof prover="0"><result status="valid" time="2.30" steps="1560"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.2" expl="2. VC for ktrap_t">
-   <proof prover="0"><result status="valid" time="0.17" steps="3"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="16"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.3" expl="3. VC for ktrap_t">
-   <proof prover="1"><result status="valid" time="6.48"/></proof>
+   <proof prover="1"><result status="valid" time="4.16"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.4" expl="4. VC for ktrap_t">
-   <proof prover="0"><result status="valid" time="0.33" steps="191"/></proof>
+   <proof prover="0"><result status="valid" time="0.33" steps="197"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.5" expl="5. VC for ktrap_t">
    <proof prover="0"><result status="valid" time="0.16" steps="7"/></proof>
@@ -875,19 +944,19 @@
    <proof prover="0"><result status="valid" time="0.16" steps="11"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.8" expl="8. VC for ktrap_t">
-   <proof prover="0"><result status="valid" time="0.31" steps="192"/></proof>
+   <proof prover="0"><result status="valid" time="0.31" steps="206"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.9" expl="9. VC for ktrap_t">
-   <proof prover="0"><result status="valid" time="0.17" steps="14"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="49"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.10" expl="10. VC for ktrap_t">
    <proof prover="0"><result status="valid" time="0.20" steps="65"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.11" expl="11. VC for ktrap_t">
-   <proof prover="0"><result status="valid" time="0.76" steps="694"/></proof>
+   <proof prover="0"><result status="valid" time="0.67" steps="718"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.12" expl="12. VC for ktrap_t">
-   <proof prover="0"><result status="valid" time="0.27" steps="347"/></proof>
+   <proof prover="0"><result status="valid" time="0.46" steps="347"/></proof>
    </goal>
    <goal name="WP_parameter ktrap_t.1.13" expl="13. VC for ktrap_t">
    <proof prover="0"><result status="valid" time="0.19" steps="83"/></proof>
@@ -926,19 +995,19 @@
   <goal name="WP_parameter ctx_ref_t.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter ctx_ref_t.1.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.38" steps="385"/></proof>
+   <proof prover="0"><result status="valid" time="0.55" steps="385"/></proof>
    </goal>
    <goal name="WP_parameter ctx_ref_t.1.2" expl="2. VC for ctx_ref_t">
-   <proof prover="0"><result status="valid" time="0.37" steps="414"/></proof>
+   <proof prover="0"><result status="valid" time="0.53" steps="414"/></proof>
    </goal>
    <goal name="WP_parameter ctx_ref_t.1.3" expl="3. VC for ctx_ref_t">
-   <proof prover="0"><result status="valid" time="0.94" steps="620"/></proof>
+   <proof prover="0"><result status="valid" time="1.19" steps="620"/></proof>
    </goal>
    <goal name="WP_parameter ctx_ref_t.1.4" expl="4. VC for ctx_ref_t">
    <proof prover="0"><result status="valid" time="0.14" steps="37"/></proof>
    </goal>
    <goal name="WP_parameter ctx_ref_t.1.5" expl="5. VC for ctx_ref_t">
-   <proof prover="0"><result status="valid" time="0.52" steps="386"/></proof>
+   <proof prover="0"><result status="valid" time="0.38" steps="386"/></proof>
    </goal>
    <goal name="WP_parameter ctx_ref_t.1.6" expl="6. VC for ctx_ref_t">
    <proof prover="0"><result status="valid" time="0.12" steps="39"/></proof>
@@ -946,7 +1015,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter ctx_ref_t.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="0"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="0"/></proof>
   </goal>
   <goal name="WP_parameter ctx_ref_t.3" expl="3. postcondition">
   <proof prover="0"><result status="valid" time="0.09" steps="2"/></proof>
@@ -956,10 +1025,41 @@
  <goal name="hyp_deduce_sufficient">
  <transf name="split_goal_wp">
   <goal name="hyp_deduce_sufficient.1" expl="1.">
-  <proof prover="1"><result status="valid" time="1.75"/></proof>
+  <proof prover="1"><result status="valid" time="1.27"/></proof>
   </goal>
   <goal name="hyp_deduce_sufficient.2" expl="2.">
   <proof prover="0"><result status="valid" time="0.11" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="domain_rel_hyp_sufficient">
+ <transf name="split_goal_wp">
+  <goal name="domain_rel_hyp_sufficient.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.16" steps="6"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.16" steps="24"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.18" steps="39"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.24" steps="80"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.18" steps="14"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.17" steps="11"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.7" expl="7.">
+  <proof prover="0"><result status="valid" time="0.16" steps="30"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.8" expl="8.">
+  <proof prover="0"><result status="valid" time="0.27" steps="76"/></proof>
+  </goal>
+  <goal name="domain_rel_hyp_sufficient.9" expl="9.">
+  <proof prover="0"><result status="valid" time="0.15" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
@@ -971,13 +1071,13 @@
    <proof prover="0"><result status="valid" time="0.14" steps="42"/></proof>
    </goal>
    <goal name="WP_parameter seq_t.1.2" expl="2. VC for seq_t">
-   <proof prover="0"><result status="valid" time="0.24" steps="118"/></proof>
+   <proof prover="0"><result status="valid" time="0.37" steps="118"/></proof>
    </goal>
    <goal name="WP_parameter seq_t.1.3" expl="3. VC for seq_t">
    <proof prover="0"><result status="valid" time="0.15" steps="9"/></proof>
    </goal>
    <goal name="WP_parameter seq_t.1.4" expl="4. VC for seq_t">
-   <proof prover="0"><result status="valid" time="0.44" steps="518"/></proof>
+   <proof prover="0"><result status="valid" time="0.65" steps="518"/></proof>
    </goal>
    <goal name="WP_parameter seq_t.1.5" expl="5. VC for seq_t">
    <proof prover="0"><result status="valid" time="0.14" steps="36"/></proof>
@@ -1006,20 +1106,20 @@
    <proof prover="0"><result status="valid" time="0.57" steps="434"/></proof>
    </goal>
    <goal name="WP_parameter camera_t.1.3" expl="3. VC for camera_t">
-   <proof prover="0"><result status="valid" time="0.11" steps="40"/></proof>
+   <proof prover="0"><result status="valid" time="0.23" steps="40"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter camera_t.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.07" steps="3"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="3"/></proof>
   </goal>
   <goal name="WP_parameter camera_t.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.08" steps="0"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="0"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter reorder_t" expl="VC for reorder_t">
- <proof prover="0"><result status="valid" time="0.27" steps="35"/></proof>
+ <proof prover="0"><result status="valid" time="0.23" steps="35"/></proof>
  </goal>
  <goal name="WP_parameter ex_t" expl="VC for ex_t">
  <transf name="split_goal_wp">
@@ -1032,7 +1132,7 @@
    <proof prover="0"><result status="valid" time="0.14" steps="7"/></proof>
    </goal>
    <goal name="WP_parameter ex_t.1.3" expl="3. VC for ex_t">
-   <proof prover="0"><result status="valid" time="0.71" steps="456"/></proof>
+   <proof prover="0"><result status="valid" time="0.51" steps="456"/></proof>
    </goal>
    <goal name="WP_parameter ex_t.1.4" expl="4. VC for ex_t">
    <proof prover="0"><result status="valid" time="0.18" steps="40"/></proof>
@@ -1050,10 +1150,10 @@
  <goal name="WP_parameter weaken" expl="VC for weaken">
  <transf name="split_goal_wp">
   <goal name="WP_parameter weaken.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.52" steps="227"/></proof>
+  <proof prover="0"><result status="valid" time="0.26" steps="227"/></proof>
   </goal>
   <goal name="WP_parameter weaken.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.27" steps="38"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="38"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1066,10 +1166,10 @@
   <proof prover="0"><result status="valid" time="0.11" steps="8"/></proof>
   </goal>
   <goal name="enf_transf_match_other_def.2" expl="2.">
-  <proof prover="1"><result status="valid" time="1.31"/></proof>
+  <proof prover="1"><result status="valid" time="1.06"/></proof>
   </goal>
   <goal name="enf_transf_match_other_def.3" expl="3.">
-  <proof prover="1"><result status="valid" time="2.22"/></proof>
+  <proof prover="1"><result status="valid" time="1.22"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1098,6 +1198,22 @@
   </goal>
  </transf>
  </goal>
+ <goal name="inv_rel_post_other_def">
+ <transf name="split_goal_wp">
+  <goal name="inv_rel_post_other_def.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.13" steps="15"/></proof>
+  </goal>
+  <goal name="inv_rel_post_other_def.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.18" steps="2"/></proof>
+  </goal>
+  <goal name="inv_rel_post_other_def.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
+  </goal>
+  <goal name="inv_rel_post_other_def.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.13" steps="5"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="sub_context_nil">
  <transf name="split_goal_wp">
   <goal name="sub_context_nil.1" expl="1.">
@@ -1105,105 +1221,245 @@
   </goal>
  </transf>
  </goal>
+ <goal name="ctx_fz_deref_rel_sufficient">
+ <transf name="split_goal_wp">
+  <goal name="ctx_fz_deref_rel_sufficient.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.24" steps="14"/></proof>
+  </goal>
+  <goal name="ctx_fz_deref_rel_sufficient.2" expl="2.">
+  <proof prover="1"><result status="valid" time="3.76"/></proof>
+  </goal>
+  <goal name="ctx_fz_deref_rel_sufficient.3" expl="3.">
+  <proof prover="2"><result status="valid" time="1.59"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="rel_valids_cond">
+ <transf name="split_goal_wp">
+  <goal name="rel_valids_cond.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.12" steps="10"/></proof>
+  </goal>
+  <goal name="rel_valids_cond.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.13" steps="7"/></proof>
+  </goal>
+  <goal name="rel_valids_cond.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.11" steps="2"/></proof>
+  </goal>
+  <goal name="rel_valids_cond.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.17" steps="2"/></proof>
+  </goal>
+  <goal name="rel_valids_cond.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.17" steps="12"/></proof>
+  </goal>
+  <goal name="rel_valids_cond.6" expl="6.">
+  <proof prover="0"><result status="valid" time="0.14" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="rel_b_mono_cond">
+ <transf name="split_goal_wp">
+  <goal name="rel_b_mono_cond.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.13" steps="17"/></proof>
+  </goal>
+  <goal name="rel_b_mono_cond.2" expl="2.">
+  <proof prover="0"><result status="valid" time="0.22" steps="19"/></proof>
+  </goal>
+  <goal name="rel_b_mono_cond.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.17" steps="4"/></proof>
+  </goal>
+  <goal name="rel_b_mono_cond.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.15" steps="2"/></proof>
+  </goal>
+  <goal name="rel_b_mono_cond.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.14" steps="106"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="invalid_sup_to_rel_cond">
+ <transf name="split_goal_wp">
+  <goal name="invalid_sup_to_rel_cond.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.15" steps="33"/></proof>
+  </goal>
+  <goal name="invalid_sup_to_rel_cond.2" expl="2.">
+  <proof prover="1"><result status="valid" time="2.85"/></proof>
+  </goal>
+  <goal name="invalid_sup_to_rel_cond.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.17" steps="3"/></proof>
+  </goal>
+  <goal name="invalid_sup_to_rel_cond.4" expl="4.">
+  <proof prover="0"><result status="valid" time="0.18" steps="2"/></proof>
+  </goal>
+  <goal name="invalid_sup_to_rel_cond.5" expl="5.">
+  <proof prover="0"><result status="valid" time="0.32" steps="359"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter domain_rel" expl="VC for domain_rel">
+ <proof prover="0"><result status="valid" time="0.16" steps="2"/></proof>
+ </goal>
  <goal name="WP_parameter abstraction" expl="VC for abstraction">
- <proof prover="0"><result status="valid" time="0.08" steps="8"/></proof>
+ <proof prover="0"><result status="valid" time="0.19" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter ktrap" expl="VC for ktrap">
- <proof prover="0"><result status="valid" time="0.12" steps="6"/></proof>
- </goal>
- <goal name="WP_parameter ctx_ref" expl="VC for ctx_ref">
- <proof prover="1"><result status="valid" time="0.24"/></proof>
- </goal>
- <goal name="Wp.LOCAL.enf_hyp_fz_rule">
- <proof prover="0"><result status="valid" time="0.24" steps="52"/></proof>
- </goal>
- <goal name="Wp.LOCAL.freeze_context_transformp_rule">
- <proof prover="0"><result status="valid" time="0.21" steps="4"/></proof>
- </goal>
- <goal name="Wp.LOCAL.post_inclusion_rule">
- <proof prover="0"><result status="valid" time="0.21" steps="15"/></proof>
- </goal>
- <goal name="Wp.LOCAL.fz_enforce_match_fn_rule">
- <proof prover="1"><result status="valid" time="2.37"/></proof>
- </goal>
- <goal name="Wp.LOCAL.fz_enforce_match_rule">
- <proof prover="0"><result status="valid" time="0.21" steps="12"/></proof>
- </goal>
- <goal name="Wp.LOCAL.ctx_nth_rule">
- <proof prover="0"><result status="valid" time="0.19" steps="4"/></proof>
- </goal>
- <goal name="Wp.LOCAL.ctx_len_cons">
  <proof prover="0"><result status="valid" time="0.12" steps="1"/></proof>
  </goal>
- <goal name="Wp.LOCAL.ctx_len_empty">
- <proof prover="0"><result status="valid" time="0.07" steps="1"/></proof>
+ <goal name="WP_parameter ctx_ref" expl="VC for ctx_ref">
+ <proof prover="1"><result status="valid" time="0.21"/></proof>
  </goal>
- <goal name="Wp.LOCAL.ctx_nil_apply">
+ <goal name="WpCore.LOCAL.enf_hyp_fz_rule">
+ <proof prover="0"><result status="valid" time="0.24" steps="52"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.freeze_context_transformp_rule">
+ <proof prover="0"><result status="valid" time="0.16" steps="4"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.post_inclusion_rule">
+ <proof prover="0"><result status="valid" time="0.16" steps="15"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.set_inclusion_rule">
+ <proof prover="0"><result status="valid" time="0.20" steps="5"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.rel_post_rule">
+ <proof prover="0"><result status="valid" time="0.12" steps="32"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.fz_enforce_match_fn_rule">
+ <transf name="split_goal_wp">
+  <goal name="fz_enforce_match_fn_rule.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.26" steps="57"/></proof>
+  </goal>
+  <goal name="fz_enforce_match_fn_rule.2" expl="2.">
+  <proof prover="1"><result status="valid" time="1.41"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WpCore.LOCAL.fz_enforce_match_rule">
+ <proof prover="0"><result status="valid" time="0.17" steps="10"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.ctx_nth_rule">
+ <proof prover="0"><result status="valid" time="0.20" steps="4"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.ctx_len_cons">
  <proof prover="0"><result status="valid" time="0.19" steps="1"/></proof>
  </goal>
- <goal name="Wp.LOCAL.ctx_add_apply">
- <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
+ <goal name="WpCore.LOCAL.ctx_len_empty">
+ <proof prover="0"><result status="valid" time="0.19" steps="1"/></proof>
  </goal>
- <goal name="Wp.LOCAL.sub_context_empty">
- <proof prover="0"><result status="valid" time="0.11" steps="1"/></proof>
+ <goal name="WpCore.LOCAL.ctx_nil_apply">
+ <proof prover="0"><result status="valid" time="0.18" steps="1"/></proof>
  </goal>
- <goal name="Wp.LOCAL.sub_context_add">
- <proof prover="0"><result status="valid" time="0.15" steps="37"/></proof>
+ <goal name="WpCore.LOCAL.ctx_add_apply">
+ <proof prover="0"><result status="valid" time="0.17" steps="10"/></proof>
  </goal>
- <goal name="Wp.LOCAL.sub_context_refl">
- <proof prover="0"><result status="valid" time="0.11" steps="1"/></proof>
+ <goal name="WpCore.LOCAL.ctx_fz_deref_fz_transformp_rule">
+ <transf name="split_goal_wp">
+  <goal name="ctx_fz_deref_fz_transformp_rule.1" expl="1.">
+  <proof prover="1"><result status="valid" time="1.51"/></proof>
+  </goal>
+  <goal name="ctx_fz_deref_fz_transformp_rule.2" expl="2.">
+  <proof prover="1"><result status="valid" time="1.67"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="Wp.LOCAL.weaker_hypothesis_rule">
- <proof prover="0"><result status="valid" time="0.12" steps="20"/></proof>
+ <goal name="WpCore.LOCAL.ctx_fz_deref_rel_transformp_rule">
+ <transf name="split_goal_wp">
+  <goal name="ctx_fz_deref_rel_transformp_rule.1" expl="1.">
+  <proof prover="1" timelimit="20"><result status="valid" time="4.40"/></proof>
+  </goal>
+  <goal name="ctx_fz_deref_rel_transformp_rule.2" expl="2.">
+  <proof prover="1"><result status="valid" time="4.17"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="Wp.LOCAL.weaker_hypothesis_refl">
- <proof prover="0"><result status="valid" time="0.09" steps="16"/></proof>
+ <goal name="WpCore.LOCAL.sub_context_empty">
+ <proof prover="0"><result status="valid" time="0.18" steps="1"/></proof>
  </goal>
- <goal name="Wp.LOCAL.proof_obligations_fn_rule">
- <proof prover="0"><result status="valid" time="0.20" steps="8"/></proof>
+ <goal name="WpCore.LOCAL.sub_context_add">
+ <proof prover="0"><result status="valid" time="0.21" steps="37"/></proof>
  </goal>
- <goal name="Wp.LOCAL.proof_obligations_rule">
- <proof prover="0"><result status="valid" time="0.24" steps="16"/></proof>
+ <goal name="WpCore.LOCAL.sub_context_refl">
+ <proof prover="0"><result status="valid" time="0.21" steps="1"/></proof>
  </goal>
- <goal name="Wp.LOCAL.abstraction_enforce_transformp_rule">
- <proof prover="0"><result status="valid" time="0.48" steps="333"/></proof>
+ <goal name="WpCore.LOCAL.weaker_hypothesis_rule">
+ <transf name="split_goal_wp">
+  <goal name="weaker_hypothesis_rule.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.13" steps="3"/></proof>
+  </goal>
+  <goal name="weaker_hypothesis_rule.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.53"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="Wp.LOCAL.empty_post_rule">
- <proof prover="0"><result status="valid" time="0.22" steps="1"/></proof>
+ <goal name="WpCore.LOCAL.weaker_hypothesis_refl">
+ <proof prover="0"><result status="valid" time="0.21" steps="16"/></proof>
  </goal>
- <goal name="Wp.LOCAL.kont_pre_rule">
+ <goal name="WpCore.LOCAL.inv_rel_post_rule">
+ <proof prover="0"><result status="valid" time="0.22" steps="13"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.absurd_post_rule">
+ <proof prover="0"><result status="valid" time="0.17" steps="5"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.domain_rel_ctx_empty_rule">
+ <proof prover="0"><result status="valid" time="0.18" steps="1"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.domain_rel_ctx_cons_rule">
+ <proof prover="0"><result status="valid" time="0.18" steps="1"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.rel_valids_rule">
+ <proof prover="0"><result status="valid" time="0.24" steps="26"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.rel_b_mono_rule">
+ <proof prover="0"><result status="valid" time="0.17" steps="127"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.invalid_sup_to_rel_rule">
+ <proof prover="0"><result status="valid" time="0.24" steps="33"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.domain_rel_enforce_transformp_rule">
+ <proof prover="0"><result status="valid" time="0.94" steps="851"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.proof_obligations_fn_rule">
+ <proof prover="0"><result status="valid" time="0.21" steps="8"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.proof_obligations_rule">
+ <proof prover="0"><result status="valid" time="0.25" steps="16"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.abstraction_enforce_transformp_rule">
+ <proof prover="0"><result status="valid" time="0.27" steps="333"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.empty_post_rule">
+ <proof prover="0"><result status="valid" time="0.20" steps="1"/></proof>
+ </goal>
+ <goal name="WpCore.LOCAL.kont_pre_rule">
  <proof prover="0"><result status="valid" time="0.23" steps="4"/></proof>
  </goal>
- <goal name="Wp.LOCAL.kontinuation_enforce_transformp_rule">
- <proof prover="0"><result status="valid" time="0.23" steps="136"/></proof>
+ <goal name="WpCore.LOCAL.kontinuation_enforce_transformp_rule">
+ <proof prover="0"><result status="valid" time="0.18" steps="136"/></proof>
  </goal>
- <goal name="Wp.LOCAL.ctx_t_deref_rule">
- <proof prover="0"><result status="valid" time="0.25" steps="18"/></proof>
- </goal>
- <goal name="Wp.LOCAL.ctx_ref_enforce_transformp_rule">
+ <goal name="WpCore.LOCAL.ctx_ref_enforce_transformp_rule">
  <transf name="split_goal_wp">
   <goal name="ctx_ref_enforce_transformp_rule.1" expl="1.">
-  <proof prover="2"><result status="valid" time="0.58"/></proof>
+  <proof prover="2"><result status="valid" time="0.64"/></proof>
   </goal>
   <goal name="ctx_ref_enforce_transformp_rule.2" expl="2.">
-  <proof prover="2"><result status="valid" time="0.56"/></proof>
+  <proof prover="2"><result status="valid" time="0.64"/></proof>
   </goal>
   <goal name="ctx_ref_enforce_transformp_rule.3" expl="3.">
-  <proof prover="2"><result status="valid" time="0.69"/></proof>
+  <proof prover="2"><result status="valid" time="0.79"/></proof>
   </goal>
   <goal name="ctx_ref_enforce_transformp_rule.4" expl="4.">
   <proof prover="2"><result status="valid" time="0.74"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="Wp.WP_parameter   Wp  abstraction" expl="VC for   Wp  abstraction">
- <proof prover="0"><result status="valid" time="0.09" steps="3"/></proof>
+ <goal name="WpCore.WP_parameter   WpCore  domain_rel" expl="VC for   WpCore  domain_rel">
+ <proof prover="0"><result status="valid" time="0.20" steps="3"/></proof>
  </goal>
- <goal name="Wp.WP_parameter   Wp  ktrap" expl="VC for   Wp  ktrap">
- <proof prover="0"><result status="valid" time="0.18" steps="2"/></proof>
+ <goal name="WpCore.WP_parameter   WpCore  abstraction" expl="VC for   WpCore  abstraction">
+ <proof prover="0"><result status="valid" time="0.22" steps="3"/></proof>
  </goal>
- <goal name="Wp.WP_parameter   Wp  ctx_ref" expl="VC for   Wp  ctx_ref">
- <proof prover="0"><result status="valid" time="0.14" steps="2"/></proof>
+ <goal name="WpCore.WP_parameter   WpCore  ktrap" expl="VC for   WpCore  ktrap">
+ <proof prover="0"><result status="valid" time="0.16" steps="2"/></proof>
+ </goal>
+ <goal name="WpCore.WP_parameter   WpCore  ctx_ref" expl="VC for   WpCore  ctx_ref">
+ <proof prover="0"><result status="valid" time="0.17" steps="2"/></proof>
  </goal>
 </theory>
 </file>
