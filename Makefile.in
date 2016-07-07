@@ -572,16 +572,18 @@ clean::
 # GNATWhy3
 ########
 
-GNAT_FILES = gnat_util gnat_loc gnat_expl gnat_config \
-	     gnat_sched gnat_manual gnat_objectives gnat_report gnat_main
+GNAT_FILES := gnat_util gnat_loc gnat_expl gnat_config \
+	      gnat_sched gnat_manual gnat_objectives gnat_report gnat_main
 
-GNATMODULES = $(addprefix src/gnat/, $(GNAT_FILES))
+GNATMODULES := $(addprefix src/gnat/, $(GNAT_FILES))
 
 GNATML  = $(addsuffix .ml,  $(GNATMODULES))
-GNATMLI = $(addsuffix .mli, $(GNATMODULES))
+GNATMLI = $(addsuffix .mli, $(filter-out %gnat_main, $(GNATMODULES)))
+GNATCMI = $(addsuffix .cmi, $(filter-out %gnat_main, $(GNATMODULES)))
 GNATCMO = $(addsuffix .cmo, $(GNATMODULES))
 GNATCMX = $(addsuffix .cmx, $(GNATMODULES))
 $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
+$(GNATCMX): $(GNATCMO)
 
 # build targets
 
