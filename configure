@@ -590,6 +590,7 @@ FRAMAC_LIBDIR
 FRAMAC_SHARE
 FRAMAC_VERSION
 enable_frama_c
+enable_emacs_compilation
 enable_html_doc
 enable_doc
 enable_hypothesis_selection
@@ -725,6 +726,7 @@ enable_doc
 enable_html_doc
 enable_frama_c
 enable_profiling
+enable_emacs_compilation
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1372,6 +1374,8 @@ Optional Features:
   --disable-html-doc      do not build HTML documentation
   --enable-frama-c        enable Frama-C plugin
   --enable-profiling      enable profiling
+  --disable-emacs-compilation
+                          do not compile why3.elc
 
 Some influential environment variables:
   CC          C compiler command
@@ -2017,6 +2021,16 @@ if test "${enable_profiling+set}" = set; then :
   enableval=$enable_profiling;
 else
   enable_profiling=no
+fi
+
+
+# Emacs compilation
+
+# Check whether --enable-emacs-compilation was given.
+if test "${enable_emacs_compilation+set}" = set; then :
+  enableval=$enable_emacs_compilation;
+else
+  enable_emacs_compilation=yes
 fi
 
 
@@ -3821,7 +3835,8 @@ $as_echo "$as_me: WARNING: Cannot find hacha, HTML documentation disabled." >&2;
 fi
 
 # checking for emacs
-# Extract the first word of "emacs", so it can be a program name with args.
+if test "$enable_emacs_compilation" = yes ; then
+   # Extract the first word of "emacs", so it can be a program name with args.
 set dummy emacs; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -3859,6 +3874,12 @@ $as_echo "no" >&6; }
 fi
 
 
+   if test "$EMACS" = no ; then
+      enable_emacs_compilation=no
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find emacs, compilation of why3.elc disabled." >&5
+$as_echo "$as_me: WARNING: Cannot find emacs, compilation of why3.elc disabled." >&2;}
+   fi
+fi
 
 # checking for Zarith
 if test "$enable_zarith" = yes; then
@@ -4591,6 +4612,8 @@ fi
 VERSION=$PACKAGE_VERSION
 
 # substitutions to perform
+
+
 
 
 
