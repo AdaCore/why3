@@ -556,9 +556,11 @@ void close_client(pclient client, int key) {
 }
 
 void schedule_new_jobs() {
-   while (list_length(processes) < parallel && !(queue_is_empty (queue))) {
-      run_request((prequest) queue_pop (queue));
-   }
+  while (list_length(processes) < parallel && !(queue_is_empty (queue))) {
+    prequest r = (prequest) queue_pop (queue);
+    run_request(r);
+    free_request(r);
+  }
 }
 
 void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) {
