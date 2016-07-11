@@ -104,6 +104,20 @@ module Array
 
 end
 
+module Init
+
+  use import int.Int
+  use export Array
+  use HighOrd
+
+  val init (n: int) (f: int -> 'a) : array 'a
+    requires { "expl:array creation size" n >= 0 }
+    ensures { forall i:int. 0 <= i < n -> result[i] = f i }
+    ensures { result.length = n }
+
+
+end
+
 (** {2 Sorted Arrays} *)
 
 module IntArraySorted
