@@ -537,7 +537,9 @@ void read_on_client(pclient client) {
 
 void schedule_new_jobs() {
   while (list_length(processes) < parallel && !(queue_is_empty (queue))) {
-    run_request((prequest) queue_pop (queue));
+    prequest r = (prequest) queue_pop (queue);
+    run_request(r);
+    free_request(r);
   }
 }
 
