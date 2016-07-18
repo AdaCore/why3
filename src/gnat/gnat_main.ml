@@ -214,7 +214,10 @@ let report_messages obj =
              Some (filter_model r.Call_provers.pr_model trace)
         | _ -> None
       in
-      let manual_info = None in
+      let manual_info =
+        match unproved_pa with
+        | None -> None
+        | Some pa -> Gnat_manual.manual_proof_info pa in
       Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
   Gnat_report.register obj result
 
