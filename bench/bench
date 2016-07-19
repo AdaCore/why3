@@ -192,23 +192,6 @@ bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
 echo ""
 
-echo "=== Checking good files ==="
-goods bench/typing/good
-goods bench/programs/good
-goods examples/bts
-goods examples/tests
-goods examples/tests-provers
-goods examples/check-builtin
-goods examples/logic
-goods examples
-goods examples/foveoos11-cm
-goods examples/hoare_logic
-goods examples/avl "-L examples/avl"
-goods examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps"
-goods examples/bitvectors "-L examples/bitvectors"
-goods examples/in_progress
-echo ""
-
 echo "=== Checking execution ==="
 execute examples/euler001.mlw Euler001.bench
 execute examples/euler002.mlw Solve.bench
@@ -239,6 +222,24 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # examples/queens.mlw --exec  NQueensBits.test8
 # fails: "let" are cloned as "val"
 # examples/in_progress/residual.mlw --exec Test.test_astar
+echo ""
+
+
+echo "=== Checking good files ==="
+goods bench/typing/good
+goods bench/programs/good
+goods examples/bts
+goods examples/tests
+goods examples/tests-provers
+goods examples/check-builtin
+goods examples/logic
+goods examples
+goods examples/foveoos11-cm
+goods examples/hoare_logic
+goods examples/avl "-L examples/avl"
+goods examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps"
+goods examples/bitvectors "-L examples/bitvectors"
+goods examples/in_progress
 echo ""
 
 echo "=== Extraction to Ocaml ==="
