@@ -1173,14 +1173,6 @@ let rec eval_expr env (e : expr) : result =
   | Earrow ps ->
     let len = List.length ps.ps_aty.aty_args in
     Fun(ps,[],len),s
-  | Erec (defs,e1) ->
-    let env' =
-      { env with funenv =
-          List.fold_left
-            (fun acc d -> Mps.add d.fun_ps d acc) env.funenv defs
-      }
-    in
-    eval_expr env' s e1
 *)
   | Eassign l ->
     List.iter
@@ -1212,13 +1204,21 @@ let rec eval_expr env (e : expr) : result =
             eval_expr (bind_pvs pvs v env) e2
           | r -> r
         end
-      | LDsym _ | LDrec _ -> Irred e
+      | LDsym(rs,ce) ->
+        let env' = { env with funenv = Mrs.add rs ce env.funenv }
+        in eval_expr env' e2
+      | LDrec l ->
+        let env' =
+          { env with funenv =
+              List.fold_left
+                (fun acc d ->
+                  Mrs.add d.rec_sym d.rec_fun
+                    (Mrs.add d.rec_rsym d.rec_fun acc))
+                env.funenv l }
+        in eval_expr env' e2
     end
   | Eif(e1,e2,e3) ->
     begin
-(*
-      eprintf "[interp] condition of the if: @?";
-*)
       match eval_expr env e1 with
         | Normal t ->
           begin
@@ -1291,21 +1291,22 @@ let rec eval_expr env (e : expr) : result =
       with
           NotNum -> Irred e
     end
-  | Etry(e1,_el) ->
+  | Etry(e1,el) ->
     begin
       let r = eval_expr env e1 in
       match r with
         | Excep(ex,t) ->
-          let rec _find_exc l =
-            match l with
-              | [] -> r
-              | (xs,pvs,e2)::rem ->
-                if xs_equal ex xs then
-                  let env' = bind_vs pvs.pv_vs t env in
-                  eval_expr env' e2
-                else _find_exc rem
-          in
-          assert false (* TODO find_exc el *)
+          begin
+            let (vl,e2) = Mexn.find ex el in
+            match vl with
+            | [] ->
+              (* assert (t = Vvoid); *)
+              eval_expr env e2
+            | [v] ->
+              let env' = bind_vs v.pv_vs t env in
+              eval_expr env' e2
+            | _ -> assert false (* TODO ? *)
+          end
         | _ -> r
     end
   | Eraise(xs,e1) ->

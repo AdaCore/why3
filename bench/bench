@@ -197,19 +197,18 @@ execute examples/euler001.mlw Euler001.bench
 execute examples/euler002.mlw Solve.bench
 execute examples/fibonacci.mlw FibRecGhost.bench
 execute examples/fibonacci.mlw FibonacciLogarithmic.bench
-# fails: definition of psymbol eq not found
+# fails: cannot execute Cany
 # execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
-# execute examples/same_fringe.mlw --exec SameFringe.test5
-# fails: "let" are cloned as "val"
-# execute examples/same_fringe.mlw --exec Test.test1
+# execute examples/same_fringe.mlw SameFringe.test5
+execute examples/same_fringe.mlw Test.test1
 execute examples/vstte12_combinators.mlw Combinators.test_SKK
 execute examples/selection_sort.mlw SelectionSort.bench
 execute examples/insertion_sort.mlw InsertionSort.bench
 execute examples/quicksort.mlw Test.bench
 execute examples/conjugate.mlw Test.bench
 # fails: needs support for "val" without code (how to do it?)
-# examples/vacid_0_sparse_array.mlw --exec Harness.bench
+# examples/vacid_0_sparse_array.mlw Harness.bench
 execute examples/knuth_prime_numbers.mlw PrimeNumbers.bench
 execute examples/vstte10_max_sum.mlw TestCase.test_case
 execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
@@ -219,9 +218,9 @@ execute examples/verifythis_fm2012_LRS.mlw LRS_test.bench
 execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
 execute examples/vstte10_queens.mlw NQueens.test8
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
-# examples/queens.mlw --exec  NQueensBits.test8
-# fails: "let" are cloned as "val"
-# examples/in_progress/residual.mlw --exec Test.test_astar
+# examples/queens.mlw NQueensBits.test8
+# fails: cannot find definition of routine eq
+# examples/residual.mlw Test.test_astar
 echo ""
 
 
