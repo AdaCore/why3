@@ -560,7 +560,7 @@ let init () =
    let env_session, is_new_session =
       (* either create a new session, or read an existing ession *)
       let session, is_new_session =
-         if Sys.file_exists session_dir then
+         if not Gnat_config.force && Sys.file_exists session_dir then
            let session, _ = Session.read_session session_dir in
             session , false
          else
