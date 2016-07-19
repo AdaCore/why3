@@ -150,7 +150,7 @@ and let_defn = private
 and rec_defn = private {
   rec_sym  : rsymbol; (* exported symbol *)
   rec_rsym : rsymbol; (* internal symbol *)
-  rec_fun  : cexp;    (* Cfun *)
+  rec_fun  : cexp;    (* necessary a Cfun *)
   rec_varl : variant list;
 }
 
