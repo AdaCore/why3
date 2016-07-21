@@ -193,3 +193,5 @@ val session_proved_status : objective -> bool
 val session_find_unproved_pa : objective -> key Session.proof_attempt option
 (* find the first unproved proof attempt in a session. If counter examples are
  * activated, this will return a CE proof attempt, if any *)
+
+val replay : unit -> unit

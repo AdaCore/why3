@@ -244,8 +244,13 @@ let _ =
       | Gnat_config.Per_Path
       | Gnat_config.Per_Check ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
-         Gnat_objectives.iter handle_obj;
-         Gnat_objectives.do_scheduled_jobs interpret_result;
+         if Gnat_config.replay then begin
+           Gnat_objectives.replay ();
+           Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());
+         end else begin
+           Gnat_objectives.iter handle_obj;
+           Gnat_objectives.do_scheduled_jobs interpret_result;
+         end;
          Gnat_objectives.save_session ();
          Gnat_objectives.iter report_messages;
          Gnat_report.print_messages ()

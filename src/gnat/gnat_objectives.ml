@@ -839,6 +839,11 @@ let finished_but_not_valid_or_unedited pa =
   | Session.Unedited -> true
   | _ -> false
 
+let is_valid_pa pa =
+  match pa.Session.proof_state with
+  | Session.Done { Call_provers.pr_answer = Call_provers.Valid } -> true
+  | _ -> false
+
 (* exception Goal_Found of goal *)
 exception PA_Found of key Session.proof_attempt
 
@@ -881,3 +886,40 @@ let session_find_unproved_pa obj =
      None
    with PA_Found p ->
      Some p
+
+let rec replay_transf tf =
+  let tf_proves_goal =
+    List.for_all (fun g -> g.Session.goal_verified <> None)
+      tf.Session.transf_goals
+  in
+  if tf_proves_goal then List.iter replay_goal tf.Session.transf_goals
+  else ()
+
+and replay_goal goal =
+  if goal.Session.goal_verified = None then ()
+  else
+    try
+      (* first try to find a proof_attempt that proves this goal entirely. This
+       * will raise PA_Found if such a PA is found. *)
+      Session.iter_goal (fun pa -> if is_valid_pa pa then raise (PA_Found pa))
+        nothing nothing goal;
+      (* we go here only if no such PA was found. We now replay the
+         transformations *)
+      Session.iter_goal nothing (replay_transf) nothing goal
+    with PA_Found pa ->
+      try
+        let prover =
+          List.find (fun p ->
+            p.Gnat_config.prover.Whyconf.prover = pa.Session.proof_prover)
+            Gnat_config.provers in
+        Gnat_sched.run_goal ~cntexample:false prover goal
+      with Not_found -> ()
+
+
+
+let replay_obj obj =
+  let obj_rec = Gnat_expl.HCheck.find explmap obj in
+  GoalSet.iter replay_goal obj_rec.toplevel
+
+let replay () =
+  iter replay_obj

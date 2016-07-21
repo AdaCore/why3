@@ -46,6 +46,7 @@ let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
+let opt_replay = ref false
 
 let opt_prepare_shared = ref false
 
@@ -167,6 +168,8 @@ let options = Arg.align [
           " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,
           " Use prover given in argument instead of Alt-Ergo";
+   "--replay", Arg.Set opt_replay,
+          " Do not try new proofs, only replay existing proofs";
    "--socket", Arg.String set_socket_name,
           " The name of the socket to be used";
    "--debug", Arg.Set opt_debug,
@@ -533,3 +536,5 @@ let is_selected_prover p =
   try
     Some (List.find (fun g -> g.prover.Whyconf.prover = p) provers)
   with Not_found -> None
+
+let replay = !opt_replay
