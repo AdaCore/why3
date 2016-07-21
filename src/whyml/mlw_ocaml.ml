@@ -950,7 +950,7 @@ module Print = struct
         fprintf fmt (protect_on paren "@[<hov 2>%a@ %a@]")
           (print_expr info) e (print_list space (print_expr_p info)) el
     | Efun (vl, e1) ->
-        fprintf fmt (protect_on paren "@[<hov 2>fun %a ->@ %a@]")
+        fprintf fmt (protect_on paren "@[<hov 2>(fun %a ->@ %a)@]")
           (print_list space (print_vs_arg info)) vl (print_expr info) e1;
         forget_vars vl
     | Econstr (c, []) ->

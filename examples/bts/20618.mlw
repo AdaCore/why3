@@ -1,0 +1,10 @@
+module Bug
+  use HighOrd
+  
+  type foo = { a: unit -> unit ; b : unit }
+
+  constant bar : foo = {
+    a = \_. () ;
+    b = ()
+  }
+end
