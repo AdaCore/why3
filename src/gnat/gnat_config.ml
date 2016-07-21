@@ -12,15 +12,36 @@ type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
 
+let spark_prefix =
+  (Filename.dirname
+          (Filename.dirname (Filename.dirname
+          (Filename.dirname Sys.executable_name))))
+
+let rec file_concat l =
+  match l with
+  | [] -> ""
+  | [x] -> x
+  | [x;y] -> Filename.concat x y
+  | x :: xs -> Filename.concat x (file_concat xs)
+
 type prover =
   { driver : Driver.driver;
     prover : Whyconf.config_prover;
     editor : Whyconf.config_editor
   }
 
-let gnatprove_why3conf_file = "why3.conf"
+let spark_config_dir =
+  file_concat [spark_prefix; "share"; "spark"; "config"]
+let gnatprove_why3conf_file =
+  file_concat [spark_config_dir; "why3.conf"]
 
 let builtin_provers = ["altergo"; "cvc4"; "z3"]
+
+let spark_loadpath =
+  [ file_concat [spark_prefix; "share"; "why3"; "theories"];
+    file_concat [spark_prefix; "share"; "why3"; "modules"];
+    file_concat [spark_prefix; "share"; "spark"; "theories"]
+  ]
 
 let is_builtin_prover =
   let builtin_provers_set =
@@ -280,15 +301,31 @@ let provers, prover_ce, config, env =
     (* load plugins; may be needed for external provers *)
     if not builtin_provers_only then
       Whyconf.load_plugins config_main;
-    Env.create_env (match !opt_proof_dir with
-                    | Some dir -> (Filename.concat dir "_theories")
-                                  :: Whyconf.loadpath config_main
-                    | None -> Whyconf.loadpath config_main) in
+    let base_loadpath = spark_loadpath @ Whyconf.loadpath config_main in
+    let extended_loadpath =
+      match !opt_proof_dir with
+      | Some dir -> (Filename.concat dir "_theories") :: base_loadpath
+      | None -> base_loadpath
+    in
+    Env.create_env extended_loadpath  in
   (* this function loads the driver for a given prover *)
   let prover_driver base_prover =
     try
-      Driver.load_driver env base_prover.Whyconf.driver
-        base_prover.Whyconf.extra_drivers
+      (* If a relative path is provided in the config file, Why3 uses the
+         location of the driver file to transform it into an absolute path.
+         This is OK in the case of a user-created conf file. But for the
+         SPARK-provided provers, we also use a relative name, but we refer to
+         the driver directory of the SPARK install. So we detect when the
+         driver path returned by Why3 is equal to the config directory, and
+         correct the path in that case *)
+      let driver_file =
+        let orig_driver_path = Filename.dirname base_prover.Whyconf.driver in
+        if orig_driver_path = spark_config_dir then
+          let driver_file = Filename.basename base_prover.Whyconf.driver in
+          file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
+        else base_prover.Whyconf.driver
+      in
+      Driver.load_driver env driver_file base_prover.Whyconf.extra_drivers
     with e ->
       let s =
         Pp.sprintf "Failed to load driver for prover: %a"
