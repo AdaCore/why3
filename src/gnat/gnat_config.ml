@@ -32,9 +32,6 @@ type prover =
 
 let spark_config_dir =
   file_concat [spark_prefix; "share"; "spark"; "config"]
-let gnatprove_why3conf_file =
-  file_concat [spark_config_dir; "why3.conf"]
-
 let builtin_provers = ["altergo"; "cvc4"; "z3"]
 
 let spark_loadpath =
@@ -68,6 +65,7 @@ let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
 let opt_replay = ref false
+let opt_benchmark = ref false
 
 let opt_prepare_shared = ref false
 
@@ -191,6 +189,8 @@ let options = Arg.align [
           " Use prover given in argument instead of Alt-Ergo";
    "--replay", Arg.Set opt_replay,
           " Do not try new proofs, only replay existing proofs";
+   "--benchmark", Arg.Set opt_benchmark,
+          " Load fake why3.conf instead of real one";
    "--socket", Arg.String set_socket_name,
           " The name of the socket to be used";
    "--debug", Arg.Set opt_debug,
@@ -208,6 +208,12 @@ let options = Arg.align [
 ]
 
 let () = Arg.parse options set_filename usage_msg
+
+let gnatprove_why3conf_file () =
+  if !opt_benchmark then
+    file_concat [spark_config_dir; "why3.conf.fake"]
+  else
+    file_concat [spark_config_dir; "why3.conf"]
 
 let merge_opt_keep_first _ v1 v2 =
   match v1, v2 with
@@ -251,7 +257,7 @@ let provers, prover_ce, config, env =
       * --prover was given, with a non-builtin prover *)
      try
        let gnatprove_config =
-         Whyconf.read_config (Some gnatprove_why3conf_file) in
+         Whyconf.read_config (Some (gnatprove_why3conf_file ())) in
        if builtin_provers_only then gnatprove_config
         else begin
            let conf = (Whyconf.read_config !opt_why3_conf_file) in
