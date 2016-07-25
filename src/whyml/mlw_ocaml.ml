@@ -782,14 +782,14 @@ module Print = struct
         fprintf fmt "%s" s
       else
         let fname = if lp = [] then info.fname else None in
-        let m = String.capitalize (modulename ?fname lp t) in
+        let m = Strings.capitalize (modulename ?fname lp t) in
         fprintf fmt "%s.%s" m s
     with Not_found ->
       let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
 
-  let print_lident = print_qident ~sanitizer:String.uncapitalize
-  let print_uident = print_qident ~sanitizer:String.capitalize
+  let print_lident = print_qident ~sanitizer:Strings.uncapitalize
+  let print_uident = print_qident ~sanitizer:Strings.capitalize
 
   let print_path_id fmt = function
     | [], id -> print_ident fmt id
