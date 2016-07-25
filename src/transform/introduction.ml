@@ -20,7 +20,11 @@ open Ty
 open Term
 open Decl
 
-let rec intros pr f = match f.t_node with
+let stop_intro = Ident.create_label "stop_intro"
+
+let rec intros pr f =
+  if Slab.mem stop_intro f.t_label then [create_prop_decl Pgoal pr f] else
+  match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
       when Slab.mem Term.asym_label f2.t_label ->
         [create_prop_decl Pgoal pr f]
