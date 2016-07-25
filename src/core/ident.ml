@@ -243,8 +243,8 @@ let char_to_alpha c = match c with
   | '6' -> "sx" | '7'  -> "st" | '8' -> "oc"
   | '9' -> "nn" | '\n' -> "br" |  _  -> "zz"
 
-let char_to_lalpha c = String.uncapitalize (char_to_alpha c)
-let char_to_ualpha c = String.capitalize (char_to_alpha c)
+let char_to_lalpha c = Strings.uncapitalize (char_to_alpha c)
+let char_to_ualpha c = Strings.capitalize (char_to_alpha c)
 
 let char_to_alnum c =
   match c with '0'..'9' -> String.make 1 c | _ -> char_to_alpha c

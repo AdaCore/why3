@@ -88,12 +88,15 @@ INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 #   44   Open statement shadows an already defined identifier.
 #   45   Open statement shadows an already defined label or constructor.
 #   50   Unexpected documentation comment.
+#   52   The argument of this constructor should not be matched against a
+#        constant pattern; the actual value of the argument could change
+#        in the future.
 # - fatal:
 #   5    Partially applied function: expression whose result has function
 #        type and is ignored.
 #   48   Implicit elimination of optional arguments.
 
-WARNINGS = A-4-9-41-44-45-50@5@48
+WARNINGS = A-4-9-41-44-45-50-52@5@48
 
 OFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
