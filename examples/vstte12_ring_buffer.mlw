@@ -188,7 +188,7 @@ module RingBufferSeq
     writes  { b.len, b.sequence }
     ensures { length b = 0 }
     ensures { b.sequence = S.empty }
-  = ghost b.sequence <- S.empty;
+  = ghost b.sequence <- (S.empty : seq {'a});
     b.len <- 0
 
   let push (b: buffer 'a) (x: 'a) : unit

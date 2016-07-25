@@ -14,6 +14,13 @@ module KodaRuskey_Spec
 
   type color = White | Black
 
+  let eq_color (c1 c2:color) : bool
+    ensures { result <-> c1 = c2 }
+  = match c1,c2 with
+    | White,White | Black,Black -> True
+    | _ -> False
+    end
+
   type forest =
     | E
     | N int forest forest
@@ -440,7 +447,7 @@ module KodaRuskey
         assert { disjoint_stack f1 st' };
         assert { not (mem_stack i st') };
         let ghost visited1 = !visited in
-        if bits[i] = White then begin
+        if eq_color bits[i] White then begin
           label A in
           enum bits f0 (Cons f2 st');
           assert { sub st f0 bits.elts };
