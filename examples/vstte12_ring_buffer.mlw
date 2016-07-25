@@ -152,7 +152,7 @@ module RingBufferSeq
     mutable first: int;
     mutable len  : int;
             data : array 'a;
-    ghost mutable sequence: S.seq {'a};
+    ghost mutable sequence: S.seq 'a;
   }
   invariant {
     let size = Array.length data in
@@ -188,7 +188,7 @@ module RingBufferSeq
     writes  { b.len, b.sequence }
     ensures { length b = 0 }
     ensures { b.sequence = S.empty }
-  = ghost b.sequence <- (S.empty : seq {'a});
+  = ghost b.sequence <- S.empty;
     b.len <- 0
 
   let push (b: buffer 'a) (x: 'a) : unit
