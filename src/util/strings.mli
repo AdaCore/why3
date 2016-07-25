@@ -17,6 +17,9 @@ val create : int -> string
 val copy : string -> string
 val set : string -> int -> char -> unit
 
+val capitalize : string -> string
+val uncapitalize : string -> string
+
 (** {2 Other useful functions on strings} *)
 
 val rev_split : char -> string -> string list
