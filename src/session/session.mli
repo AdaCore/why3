@@ -248,6 +248,16 @@ type 'key update_context =
     keep_unmatched_theories : bool;
   }
 
+val mk_update_context:
+  ?allow_obsolete_goals : bool ->
+  ?release_tasks : bool ->
+  ?use_shapes_for_pairing_sub_goals : bool ->
+  ?keep_unmatched_theories : bool ->
+  'key keygen ->
+  'key update_context
+(** By default all optional arguments are false. The meaning of the
+    arguments is described in {!Session.update_session} *)
+
 val update_session :
   ctxt:'key update_context ->
   'oldkey session ->

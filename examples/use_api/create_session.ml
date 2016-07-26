@@ -59,13 +59,9 @@ let dummy_keygen ?parent () = ()
 (* create an empty session in the current directory *)
 let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
-  let ctxt = {
-    Session.allow_obsolete_goals = true;
-    Session.keep_unmatched_theories = false;
-    Session.release_tasks = false;
-    Session.use_shapes_for_pairing_sub_goals = false;
-    Session.keygen = dummy_keygen;
-  }
+  let ctxt = Session.mk_update_context
+    ~allow_obsolete_goals:true
+    dummy_keygen
   in
   Session.update_session ~ctxt dummy_session env config
 

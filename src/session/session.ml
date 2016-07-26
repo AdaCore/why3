@@ -2294,6 +2294,20 @@ type 'key update_context =
     keep_unmatched_theories : bool;
   }
 
+let mk_update_context
+  ?(allow_obsolete_goals=false)
+  ?(release_tasks=false)
+  ?(use_shapes_for_pairing_sub_goals=false)
+  ?(keep_unmatched_theories=false)
+  keygen =
+  { allow_obsolete_goals;
+    release_tasks;
+    use_shapes_for_pairing_sub_goals;
+    keygen;
+    keep_unmatched_theories;
+  }
+
+
 let rec recover_sub_tasks ~theories env_session task g =
   g.goal_task <- Some task;
   (* Check that the sum and shape don't change (the order is kept)

@@ -294,13 +294,11 @@ let init_session session = session_iter init_any session
 let update_session ~allow_obsolete ~release ~use_shapes
     old_session env whyconf  =
   O.reset ();
-  let ctxt = {
-    keep_unmatched_theories = false;
-    allow_obsolete_goals = allow_obsolete;
-    release_tasks = release;
-    use_shapes_for_pairing_sub_goals = use_shapes;
-    keygen = O.create;
-  }
+  let ctxt = Session.mk_update_context
+      ~allow_obsolete_goals:allow_obsolete
+      ~release_tasks:release
+      ~use_shapes_for_pairing_sub_goals:use_shapes
+      O.create
   in
   let (env_session,_,_) as res =
     update_session ~ctxt old_session env whyconf

@@ -74,13 +74,10 @@ let read_env_spec () =
 let read_update_session ~allow_obsolete env config fname =
   let project_dir = S.get_project_dir fname in
   let session,use_shapes = S.read_session project_dir in
-  let ctxt = {
-    S.allow_obsolete_goals = allow_obsolete;
-    S.keep_unmatched_theories = false;
-    S.release_tasks = false;
-    S.use_shapes_for_pairing_sub_goals = use_shapes;
-    S.keygen = (fun ?parent:_ () -> ());
-  }
+  let ctxt = S.mk_update_context
+    ~allow_obsolete_goals:allow_obsolete
+    ~use_shapes_for_pairing_sub_goals:use_shapes
+    (fun ?parent:_ () -> ())
   in
   S.update_session ~ctxt session env config
 
