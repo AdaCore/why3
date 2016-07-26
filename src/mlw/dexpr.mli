@@ -54,7 +54,7 @@ exception UnboundLabel of string
 
 type register_old = pvsymbol -> string -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
-      a registrar function. The label string must be [0] for [old]. *)
+      a register_old function. The label string must be ["0"] for [old]. *)
 
 type 'a later = pvsymbol Mstr.t -> register_old -> 'a
   (** Specification terms are parsed and typechecked after the program

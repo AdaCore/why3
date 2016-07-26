@@ -119,14 +119,14 @@ let map_get : Term.lsymbol = find map_theory "get"
 
 let () = Self.result "Loading Why3 modules..."
 
-let find_ps mo s =
+let find_rs mo s =
   try
-    Mlw_module.ns_find_ps mo.Mlw_module.mod_export [s]
+    Pmodule.ns_find_rs mo.Pmodule.mod_export [s]
   with e ->
     Self.fatal "Exception raised while loading Why3 program symbol %s:@ %a"
       s Exn_printer.exn_printer e
 
-let find_ls mo s = find mo.Mlw_module.mod_theory s
+let find_ls mo s = find mo.Pmodule.mod_theory s
 
 (* ref.Ref module *)
 
@@ -140,19 +140,19 @@ let ref_modules, ref_theories =
 
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 *)
-let ref_module : Mlw_module.modul =
-  Mlw_module.read_module env ["ref"] "Ref"
+let ref_module : Pmodule.pmodule =
+  Pmodule.read_module env ["ref"] "Ref"
 
-let ref_type : Mlw_ty.T.itysymbol =
-  Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
+let ref_type : Ity.itysymbol =
+  Pmodule.ns_find_its ref_module.Pmodule.mod_export ["ref"]
 
-let ref_fun : Mlw_expr.psymbol = find_ps ref_module "ref"
+let ref_fun : Expr.rsymbol = find_rs ref_module "ref"
 
 let get_logic_fun : Term.lsymbol = find_ls ref_module "prefix !"
 
-let get_fun : Mlw_expr.psymbol = find_ps ref_module "prefix !"
+let get_fun : Expr.rsymbol = find_rs ref_module "prefix !"
 
-let set_fun : Mlw_expr.psymbol = find_ps ref_module "infix :="
+let set_fun : Expr.rsymbol = find_rs ref_module "infix :="
 
 (* mach_int.Int32 module *)
 
@@ -166,7 +166,7 @@ let mach_int_modules, _mach_int_theories =
 *)
 
 (*
-let int32_module : Mlw_module.modul =
+let int32_module : Pmodule.modul =
   try
     Self.result "Looking up module mach.int.Int32";
     Stdlib.Mstr.find "Int32" mach_int_modules
@@ -176,43 +176,43 @@ let int32_module : Mlw_module.modul =
 
 let uint32_module =
   try
-    Mlw_module.read_module env ["mach";"bv"] "BVCheck32"
+    Pmodule.read_module env ["mach";"bv"] "BVCheck32"
   with e ->
     Self.fatal "Exception raised while loading ref module:@ %a"
       Exn_printer.exn_printer e
 
-let uint32_type : Why3.Ty.tysymbol =
-  Mlw_module.ns_find_ts uint32_module.Mlw_module.mod_export ["t"]
+let uint32_type : Why3.Ity.itysymbol =
+  Pmodule.ns_find_its uint32_module.Pmodule.mod_export ["t"]
 
 let uint32_to_int : Term.lsymbol = find_ls uint32_module "to_uint"
 
-let uadd32_fun : Mlw_expr.psymbol = find_ps uint32_module "add_check"
+let uadd32_fun : Expr.rsymbol = find_rs uint32_module "add_check"
 
-let usub32_fun : Mlw_expr.psymbol = find_ps uint32_module "sub_check"
+let usub32_fun : Expr.rsymbol = find_rs uint32_module "sub_check"
 
-let umul32_fun : Mlw_expr.psymbol = find_ps uint32_module "mul_check"
+let umul32_fun : Expr.rsymbol = find_rs uint32_module "mul_check"
 
-(*let neg32_fun : Mlw_expr.psymbol = find_ps uint32_module "prefix -"
+(*let neg32_fun : Expr.rsymbol = find_rs uint32_module "prefix -"
  *)
 
-let ueq32_fun : Mlw_expr.psymbol = find_ps uint32_module "eq_check"
+let ueq32_fun : Expr.rsymbol = find_rs uint32_module "eq_check"
 
-let une32_fun : Mlw_expr.psymbol = find_ps uint32_module "ne_check"
+let une32_fun : Expr.rsymbol = find_rs uint32_module "ne_check"
 
-let ule32_fun : Mlw_expr.psymbol = find_ps uint32_module "le_check"
+let ule32_fun : Expr.rsymbol = find_rs uint32_module "le_check"
 
-let ult32_fun : Mlw_expr.psymbol = find_ps uint32_module "lt_check"
+let ult32_fun : Expr.rsymbol = find_rs uint32_module "lt_check"
 
-let uge32_fun : Mlw_expr.psymbol = find_ps uint32_module "ge_check"
+let uge32_fun : Expr.rsymbol = find_rs uint32_module "ge_check"
 
-let ugt32_fun : Mlw_expr.psymbol = find_ps uint32_module "gt_check"
+let ugt32_fun : Expr.rsymbol = find_rs uint32_module "gt_check"
 
-let uint32ofint_fun : Mlw_expr.psymbol = find_ps uint32_module "int_check"
+let uint32ofint_fun : Expr.rsymbol = find_rs uint32_module "int_check"
 
 (* mach_int.Int64 module *)
 
 (*
-let int64_module : Mlw_module.modul =
+let int64_module : Pmodule.modul =
   try
     Self.result "Looking up module mach.int.Int64";
     Stdlib.Mstr.find "Int64" mach_int_modules
@@ -220,24 +220,24 @@ let int64_module : Mlw_module.modul =
     Self.fatal "Module mach.int.Int64 not found"
 *)
 let int64_module =
-  Mlw_module.read_module env ["mach";"int"] "Int64"
+  Pmodule.read_module env ["mach";"int"] "Int64"
 
-let int64_type : Why3.Ty.tysymbol =
-  Mlw_module.ns_find_ts int64_module.Mlw_module.mod_export ["int64"]
+let int64_type : Why3.Ity.itysymbol =
+  Pmodule.ns_find_its int64_module.Pmodule.mod_export ["int64"]
 
 let int64_to_int : Term.lsymbol = find_ls int64_module "to_int"
 
-let add64_fun : Mlw_expr.psymbol = find_ps int64_module "infix +"
+let add64_fun : Expr.rsymbol = find_rs int64_module "infix +"
 
-let sub64_fun : Mlw_expr.psymbol = find_ps int64_module "infix -"
+let sub64_fun : Expr.rsymbol = find_rs int64_module "infix -"
 
-let mul64_fun : Mlw_expr.psymbol = find_ps int64_module "infix *"
+let mul64_fun : Expr.rsymbol = find_rs int64_module "infix *"
 
-let le64_fun : Mlw_expr.psymbol = find_ps int64_module "infix <="
+let le64_fun : Expr.rsymbol = find_rs int64_module "infix <="
 
-let lt64_fun : Mlw_expr.psymbol = find_ps int64_module "infix <"
+let lt64_fun : Expr.rsymbol = find_rs int64_module "infix <"
 
-let int64ofint_fun : Mlw_expr.psymbol = find_ps int64_module "of_int"
+let int64ofint_fun : Expr.rsymbol = find_rs int64_module "of_int"
 
 (* array.Array module *)
 
@@ -245,16 +245,16 @@ let int64ofint_fun : Mlw_expr.psymbol = find_ps int64_module "of_int"
 let array_modules, array_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["array"]
 
-let array_module : Mlw_module.modul = Stdlib.Mstr.find "Array" array_modules
+let array_module : Pmodule.modul = Stdlib.Mstr.find "Array" array_modules
 *)
 
 (*
-let array_type : Mlw_ty.T.itysymbol =
+let array_type : Ity.T.itysymbol =
   match
-    Mlw_module.ns_find_ts array_module.Mlw_module.mod_export ["array"]
+    Pmodule.ns_find_ts array_module.Pmodule.mod_export ["array"]
   with
-    | Mlw_module.PT itys -> itys
-    | Mlw_module.TS _ -> assert false
+    | Pmodule.PT itys -> itys
+    | Pmodule.TS _ -> assert false
 *)
 
 
@@ -262,31 +262,32 @@ let array_type : Mlw_ty.T.itysymbol =
 (* types *)
 (*********)
 
-let unit_type = Ty.ty_tuple []
-let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
-let mlw_uint32_type = Mlw_ty.ity_pur uint32_type []
-let mlw_int64_type = Mlw_ty.ity_pur int64_type []
+let ty_unit = Ty.ty_tuple []
+let ity_unit = Ity.ity_tuple []
+let mlw_int_type = Ity.ity_int
+let mlw_uint32_type =  Ity.ity_app uint32_type [] []
+let mlw_int64_type = Ity.ity_app int64_type [] []
 
-let rec ctype_and_default ty =
+let (*rec*) ctype_and_default ty =
   match ty with
-    | TVoid _attr -> Mlw_ty.ity_unit, Mlw_expr.e_void
+    | TVoid _attr -> Ity.ity_unit, Expr.e_void
     | TInt (IInt, _attr) ->
-      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      let n = Expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
       mlw_uint32_type,
-      Mlw_expr.e_app
-        (Mlw_expr.e_arrow uint32ofint_fun [mlw_int_type] mlw_uint32_type) [n]
+      Expr.e_app uint32ofint_fun [n] [mlw_int_type] mlw_uint32_type
     | TInt (ILong, _attr) ->
-      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      let n = Expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
       mlw_int64_type,
-      Mlw_expr.e_app
-        (Mlw_expr.e_arrow int64ofint_fun [mlw_int_type] mlw_int64_type) [n]
+      Expr.e_app int64ofint_fun [n] [mlw_int_type] mlw_int64_type
     | TInt (_, _) ->
       Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
+(*
     | TPtr(TInt _ as t, _attr) ->
       let t,_ = ctype_and_default t in
-      Mlw_ty.ity_pur map_ts [mlw_int_type ; t], Mlw_expr.e_void
+      Ity.ity_pure map_ts [mlw_int_type ; t], Expr.e_void
+ *)
     | TPtr(_ty, _attr) ->
       Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) ->
@@ -343,17 +344,15 @@ let rec logic_type ty =
 
 
 
-let mk_ref ty =
-    let ref_ty = Mlw_ty.ity_app_fresh ref_type [ty] in
-    Mlw_expr.e_arrow ref_fun [ty] ref_ty
+(*
 
 let mk_get ref_ty ty =
-    Mlw_expr.e_arrow get_fun [ref_ty] ty
+    Expr.e_arrow get_fun [ref_ty] ty
 
 let mk_set ref_ty ty =
     (* (:=) has type (r:ref 'a) (v:'a) unit *)
-    Mlw_expr.e_arrow set_fun [ref_ty; ty] Mlw_ty.ity_unit
-
+    Expr.e_arrow set_fun [ref_ty; ty] Ity.ity_unit
+ *)
 
 
 
@@ -442,8 +441,9 @@ let create_var_full v =
 (**)
   let id = Ident.id_fresh v.vname in
   let ty,def = ctype_and_default v.vtype in
-  let def = Mlw_expr.e_app (mk_ref ty) [def] in
-  let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
+  let ref_ty = Ity.ity_app ref_type [ty] [] in
+  let def = Expr.e_app ref_fun [def] [ty] ref_ty in
+  let let_defn, vs = Expr.let_var id def in
   Hashtbl.add program_vars v.vid (vs,true,ty);
   let_defn,vs
 
@@ -457,18 +457,18 @@ let get_var v =
 
 let program_funs = Hashtbl.create 257
 
-let create_function v args spec ret_type =
+let create_function v args pre post xpost effect ret_type =
   let id = Ident.id_fresh v.vname in
-  let aty = Mlw_ty.vty_arrow args ~spec (Mlw_ty.VTvalue ret_type) in
-  let ps = Mlw_expr.create_psymbol id aty in
+  let cty = Ity.create_cty args pre post xpost Ity.Mpv.empty effect ret_type in
+  let rs = Expr.create_rsymbol id cty in
 (*
-  let def = Mlw_expr.create_fun_defn id lambda in
-  let ps = def.Mlw_expr.fun_ps in
+  let def = Expr.let_sym id cexp in
+  let ps = def.Expr.fun_ps in
 *)
   Self.result "created program function %s (%d)" v.vname v.vid;
-  let arg_ty = List.map (fun v -> v.Mlw_ty.pv_ity) args in
-  Hashtbl.add program_funs v.vid (ps,arg_ty,ret_type);
-  ps
+  let arg_ty = List.map (fun v -> v.Ity.pv_ity) args in
+  Hashtbl.add program_funs v.vid (rs,arg_ty,ret_type);
+  rs
 
 let get_function v =
   try
@@ -497,7 +497,7 @@ let get_lsymbol li =
       Not_found -> Self.fatal "logic symbol %s not found" li.l_var_info.lv_name
 
 let result_vsymbol =
-  ref (Term.create_vsymbol (Ident.id_fresh "result") unit_type)
+  ref (Term.create_vsymbol (Ident.id_fresh "result") ty_unit)
 
 type label = Here | Old | At of string
 
@@ -618,9 +618,9 @@ and tlval ~label (host,offset) =
             | Some v ->
               let (v,is_mutable,_ty) = get_var v in
               if is_mutable then
-                t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
+                t_app get_logic_fun [Term.t_var v.Ity.pv_vs]
               else
-                Term.t_var v.Mlw_ty.pv_vs
+                Term.t_var v.Ity.pv_vs
         in
         match label with
           | Here -> t
@@ -874,14 +874,14 @@ let identified_proposition p =
 
 
 let seq e1 e2 =
-  let l = Mlw_expr.create_let_defn (Ident.id_fresh "_tmp") e1 in
-  Mlw_expr.e_let l e2
+  let l = Expr.create_let_defn (Ident.id_fresh "_tmp") e1 in
+  Expr.e_let l e2
 
 let annot a e =
   match a.annot_content with
   | AAssert ([],pred) ->
     let p = predicate_named ~label:Here pred in
-    let a = Mlw_expr.e_assert Mlw_expr.Aassert p in
+    let a = Expr.e_assert Expr.Aassert p in
     seq a e
   | AAssert(_labels,_pred) ->
     Self.not_yet_implemented "annot AAssert"
@@ -929,12 +929,12 @@ let binop op e1 e2 =
       | PlusA -> uadd32_fun, mlw_uint32_type, mlw_uint32_type
       | MinusA -> usub32_fun, mlw_uint32_type, mlw_uint32_type
       | Mult -> umul32_fun, mlw_uint32_type, mlw_uint32_type
-      | Lt -> ult32_fun, mlw_uint32_type, Mlw_ty.ity_bool
-      | Le -> ule32_fun, mlw_uint32_type, Mlw_ty.ity_bool
-      | Gt -> ugt32_fun, mlw_uint32_type, Mlw_ty.ity_bool
-      | Ge -> uge32_fun, mlw_uint32_type, Mlw_ty.ity_bool
-      | Eq -> ueq32_fun, mlw_uint32_type, Mlw_ty.ity_bool
-      | Ne -> une32_fun, mlw_uint32_type, Mlw_ty.ity_bool
+      | Lt -> ult32_fun, mlw_uint32_type, Ity.ity_bool
+      | Le -> ule32_fun, mlw_uint32_type, Ity.ity_bool
+      | Gt -> ugt32_fun, mlw_uint32_type, Ity.ity_bool
+      | Ge -> uge32_fun, mlw_uint32_type, Ity.ity_bool
+      | Eq -> ueq32_fun, mlw_uint32_type, Ity.ity_bool
+      | Ne -> une32_fun, mlw_uint32_type, Ity.ity_bool
       | PlusPI|IndexPI|MinusPI|MinusPP ->
         Self.not_yet_implemented "binop plus/minus"
       | Div|Mod ->
@@ -944,7 +944,7 @@ let binop op e1 e2 =
       | BAnd|BXor|BOr|LAnd|LOr ->
         Self.not_yet_implemented "binop bool"
   in
-  Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty;ty] ty') [e1;e2]
+  Expr.e_app (Expr.e_arrow ls [ty;ty] ty') [e1;e2]
 
 let unop op e =
   let ls,ty,ty' =
@@ -957,7 +957,7 @@ let unop op e =
       | LNot -> (* Logical Not (!) *)
         Self.not_yet_implemented "unop LNot"
   in
-  Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty] ty') [e]
+  Expr.e_app (Expr.e_arrow ls [ty] ty') [e]
 
 let constant c =
   match c with
@@ -967,9 +967,9 @@ let constant c =
         | Some s -> s
         | None -> Integer.to_string t
     in
-    let n = Mlw_expr.e_const (Number.ConstInt (Literals.integer s)) in
-    Mlw_expr.e_app
-      (Mlw_expr.e_arrow uint32ofint_fun [mlw_int_type] mlw_uint32_type) [n]
+    let n = Expr.e_const (Number.ConstInt (Literals.integer s)) in
+    Expr.e_app
+      (Expr.e_arrow uint32ofint_fun [mlw_int_type] mlw_uint32_type) [n]
   | CInt64(_t,_ikind, _) ->
       Self.not_yet_implemented "CInt64"
   | CStr _
@@ -992,10 +992,10 @@ let rec expr e =
       begin
         match ty, Cil.typeOf e with
           | TInt(ILong,_attr1), TInt(IInt,_attr2) ->
-            Mlw_expr.e_app
-              (Mlw_expr.e_arrow int64ofint_fun
+            Expr.e_app
+              (Expr.e_arrow int64ofint_fun
                  [mlw_int_type] mlw_int64_type)
-              [Mlw_expr.e_lapp uint32_to_int [e'] mlw_int_type]
+              [Expr.e_lapp uint32_to_int [e'] mlw_int_type]
           | _ ->
             Self.not_yet_implemented "expr CastE"
       end
@@ -1015,15 +1015,15 @@ and lval (host,offset) =
       let v,is_mutable,ty = get_var v in
       if is_mutable then
         begin try
-                Mlw_expr.e_app
-                  (mk_get v.Mlw_ty.pv_ity ty)
-                  [Mlw_expr.e_value v]
+                Expr.e_app
+                  (mk_get v.Ity.pv_ity ty)
+                  [Expr.e_value v]
           with e ->
             Self.fatal "Exception raised during application of !@ %a@."
               Exn_printer.exn_printer e
         end
       else
-        Mlw_expr.e_value v
+        Expr.e_value v
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
     | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
@@ -1035,8 +1035,8 @@ and lval (host,offset) =
           | _ -> assert false
       in
       let i = expr i in
-      let i = Mlw_expr.e_lapp uint32_to_int [i] mlw_int_type in
-      Mlw_expr.e_lapp map_get [e;i] ity
+      let i = Expr.e_lapp uint32_to_int [i] mlw_int_type in
+      Expr.e_lapp map_get [e;i] ity
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
@@ -1044,7 +1044,7 @@ let functional_expr e =
   match e.enode with
     | Lval (Var v, NoOffset) ->
       let id,tyl,ty = get_function v in
-      Mlw_expr.e_arrow id tyl ty
+      Expr.e_arrow id tyl ty
     | Lval _
     | Const _
     | BinOp _
@@ -1065,9 +1065,9 @@ let assignment (lhost,offset) e _loc =
     | Var v , NoOffset ->
       let v,is_mutable,ty = get_var v in
       if is_mutable then
-        Mlw_expr.e_app
-          (mk_set v.Mlw_ty.pv_ity ty)
-          [Mlw_expr.e_value v; e]
+        Expr.e_app
+          (mk_set v.Ity.pv_ity ty)
+          [Expr.e_value v; e]
       else
         Self.not_yet_implemented "mutation of formal parameters"
     | Var _ , Field _ ->
@@ -1082,20 +1082,20 @@ let instr i =
   | Set(lv,e,loc) -> assignment lv (expr e) loc
   | Call (None, e, el, _loc) ->
     let e = functional_expr e in
-    Mlw_expr.e_app e (List.map expr el)
+    Expr.e_app e (List.map expr el)
   | Call (Some lv, e, el, loc) ->
     let e = functional_expr e in
-    let e = Mlw_expr.e_app e (List.map expr el) in
+    let e = Expr.e_app e (List.map expr el) in
     assignment lv e loc
   | Asm _ ->
     Self.not_yet_implemented "instr Asm"
   | Skip _loc ->
-    Mlw_expr.e_void
+    Expr.e_void
   | Code_annot (_, _) ->
     Self.not_yet_implemented "instr Code_annot"
 
 let exc_break =
-  Mlw_ty.create_xsymbol (Ident.id_fresh "Break") Mlw_ty.ity_unit
+  Ity.create_xsymbol (Ident.id_fresh "Break") Ity.ity_unit
 
 let rec stmt s =
   match s.skind with
@@ -1106,18 +1106,18 @@ let rec stmt s =
       in e
     | Block b -> block b
     | Return (None, _loc) ->
-      Mlw_expr.e_void
+      Expr.e_void
     | Return (Some e, _loc) ->
       expr e
     | Goto (_, _) ->
       Self.not_yet_implemented "stmt Goto"
     | Break _loc ->
-      Mlw_expr.e_raise exc_break Mlw_expr.e_void
-        Mlw_ty.ity_unit
+      Expr.e_raise exc_break Expr.e_void
+        Ity.ity_unit
     | Continue _ ->
       Self.not_yet_implemented "stmt Continue"
     | If (c, e1, e2, _loc) ->
-      Mlw_expr.e_if (expr c) (block e1) (block e2)
+      Expr.e_if (expr c) (block e1) (block e2)
     | Switch (_, _, _, _) ->
       Self.not_yet_implemented "stmt Switch"
     | Loop (annots, body, _loc, _continue, _break) ->
@@ -1132,11 +1132,11 @@ let rec stmt s =
       let annots = Annotations.code_annot s in
       let inv, var = loop_annot annots in
       let v =
-        Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit
+        Ity.create_pvsymbol (Ident.id_fresh "_dummy") Ity.ity_unit
       in
-      Mlw_expr.e_try
-        (Mlw_expr.e_loop inv var (block body))
-        [exc_break,v,Mlw_expr.e_void]
+      Expr.e_try
+        (Expr.e_loop inv var (block body))
+        [exc_break,v,Expr.e_void]
     | UnspecifiedSequence _ ->
       Self.not_yet_implemented "stmt UnspecifiedSequence"
     | Throw (_, _) ->
@@ -1151,7 +1151,7 @@ let rec stmt s =
 and block b =
   let rec mk_seq l =
     match l with
-      | [] -> Mlw_expr.e_void
+      | [] -> Expr.e_void
       | [s] -> stmt s
       | s::r -> seq (stmt s) (mk_seq r)
   in
@@ -1218,12 +1218,12 @@ let fundecl fdec =
   let args =
     match Kernel_function.get_formals kf with
       | [] ->
-        [ Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit ]
+        [ Ity.create_pvsymbol (Ident.id_fresh "_dummy") Ity.ity_unit ]
       | l ->
         List.map (fun v ->
           let ity = ctype v.vtype in
           let vs =
-            Mlw_ty.create_pvsymbol (Ident.id_fresh v.vname) ity
+            Ity.create_pvsymbol (Ident.id_fresh v.vname) ity
           in
           Hashtbl.add program_vars v.vid (vs,false,ity);
           vs)
@@ -1235,33 +1235,33 @@ let fundecl fdec =
   let ret_type = ctype (Kernel_function.get_return_type kf) in
   let result =
     Term.create_vsymbol (Ident.id_fresh "result")
-      (Mlw_ty.ty_of_ity ret_type)
+      (Ity.ty_of_ity ret_type)
   in
   result_vsymbol := result;
   let locals =
     List.map create_var (Kernel_function.get_locals kf)
   in
   let spec = {
-    Mlw_ty.c_pre = predicate_named ~label:Here pre;
+    Ity.c_pre = predicate_named ~label:Here pre;
     c_post =
       Term.t_eps
         (Term.t_close_bound result (predicate_named ~label:Here post));
-    c_xpost = Mlw_ty.Mexn.empty;
-    c_effect = Mlw_ty.eff_empty;
+    c_xpost = Ity.Mexn.empty;
+    c_effect = Ity.eff_empty;
     c_variant = [];
     c_letrec  = 0;
   }
   in
   let ps = create_function fun_id args spec ret_type in
   let body = block body in
-  let full_body = List.fold_right Mlw_expr.e_let locals body in
+  let full_body = List.fold_right Expr.e_let locals body in
   let lambda = {
-    Mlw_expr.l_args = args;
+    Expr.l_args = args;
     l_expr = full_body;
     l_spec = spec;
   }
   in
-  let def = Mlw_expr.create_rec_defn [ps,lambda] in
+  let def = Expr.create_rec_defn [ps,lambda] in
   Mlw_decl.create_rec_decl def
 
 
@@ -1296,7 +1296,7 @@ let global (theories,lemmas,functions) g =
           (intern_string vi.vname, g)::acc.AST.prog_vars }
 *)
      let _,pv = create_var_full vi in
-     let sym = Mlw_expr.LetV pv in
+     let sym = Expr.LetV pv in
      (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
 
     | GFunDecl(_funspec,vi,_location) ->
@@ -1311,7 +1311,7 @@ let global (theories,lemmas,functions) g =
       end
     | GVarDecl(vi,_location) ->
        let _,pv = create_var_full vi in
-       let sym = Mlw_expr.LetV pv in
+       let sym = Expr.LetV pv in
        (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
     | GAnnot (a, loc) ->
       let (t,l) = logic_decl ~in_axiomatic:false a loc (theories,lemmas) in
@@ -1338,7 +1338,7 @@ let print_id fmt id = Format.fprintf fmt "%s" id.Ident.id_string
 
 let add_pdecl m d =
   try
-    Mlw_module.add_pdecl ~wp:true m d
+    Pmodule.add_pdecl ~wp:true m d
   with
       Not_found ->
         Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id)
@@ -1346,17 +1346,17 @@ let add_pdecl m d =
 
 let use m th =
   let name = th.Theory.th_name in
-  Mlw_module.close_scope
-    (Mlw_module.use_export_theory
-       (Mlw_module.open_scope m name.Ident.id_string)
+  Pmodule.close_scope
+    (Pmodule.use_export_theory
+       (Pmodule.open_scope m name.Ident.id_string)
        th)
     true
 
 let use_module m modul =
-  let name = modul.Mlw_module.mod_theory.Theory.th_name in
-  Mlw_module.close_scope
-    (Mlw_module.use_export
-       (Mlw_module.open_scope m name.Ident.id_string)
+  let name = modul.Pmodule.mod_theory.Theory.th_name in
+  Pmodule.close_scope
+    (Pmodule.use_export
+       (Pmodule.open_scope m name.Ident.id_string)
        modul)
     true
 
@@ -1372,7 +1372,7 @@ let prog p =
         (Ident.id_fresh global_logic_decls_theory_name) decls
     in
     Self.result "made %d theory(ies)" (List.length theories);
-    let m = Mlw_module.create_module env
+    let m = Pmodule.create_module env
       (Ident.id_fresh programs_module_name)
     in
     let m = use m int_theory in
@@ -1383,12 +1383,12 @@ let prog p =
     let m = use_module m uint32_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
-    let m = Mlw_module.close_module m in
-    List.rev (m.Mlw_module.mod_theory :: theories) ;
+    let m = Pmodule.close_module m in
+    List.rev (m.Pmodule.mod_theory :: theories) ;
   with (Exit | Not_found| Ty.TypeMismatch _
-           | Mlw_ty.TypeMismatch _ | Decl.UnknownIdent _) as e  ->
+           | Ity.TypeMismatch _ | Decl.UnknownIdent _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."
       Exn_printer.exn_printer e
-    (* | Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) ->  *)
+    (* | Ity.TypeMismatch(ity1,ity2,_ity_subst) ->  *)
     (*   Self.fatal "TypeMismatch(%a,%a,_)" *)
     (*         Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2 *)
