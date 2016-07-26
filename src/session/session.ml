@@ -2513,9 +2513,7 @@ let merge_file ~ctxt ~theories env from_f to_f =
         try
           let from_th, acc =
             let name = to_th.theory_name.Ident.id_string in
-            try find_remove name acc
-            (* TODO: remove this later when all sessions are updated *)
-            with Not_found -> find_remove ("WP "^name) acc
+            find_remove name acc
           in
           merge_theory ~ctxt ~theories env from_th to_th;
           acc
