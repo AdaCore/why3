@@ -175,8 +175,8 @@ theory Mem
   use import int.Int
   use import Seq
 
-  val predicate mem (x: 'a) (s: seq 'a)
-    ensures { result <-> exists i: int. 0 <= i < length s && s[i] = x }
+  predicate mem (x: 'a) (s: seq 'a) =
+    exists i: int. 0 <= i < length s && s[i] = x
 
 end
 
@@ -184,10 +184,9 @@ theory Distinct
   use import int.Int
   use import Seq
 
-  val predicate distinct (s : seq 'a)
-    ensures { result <->
-      forall i j. 0 <= i < length s -> 0 <= j < length s ->
-        i <> j -> s[i] <> s[j] }
+  predicate distinct (s : seq 'a) =
+    forall i j. 0 <= i < length s -> 0 <= j < length s ->
+    i <> j -> s[i] <> s[j]
 
 end
 
@@ -307,8 +306,8 @@ theory SeqEq
   use import int.Int
   use import Seq
 
-  val predicate seq_eq_sub (s1 s2: seq 'a) (l u: int)
-    ensures { result <-> forall i. l <= i < u -> s1[i] = s2[i] }
+  predicate seq_eq_sub (s1 s2: seq 'a) (l u: int) =
+    forall i. l <= i < u -> s1[i] = s2[i]
 
 end
 
