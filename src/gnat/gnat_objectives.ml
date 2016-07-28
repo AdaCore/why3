@@ -574,6 +574,7 @@ let init () =
          Session.update_session
            ~ctxt:{
              Session.allow_obsolete_goals = true;
+             keep_unmatched_theories = (Gnat_config.limit_subp <> None);
              release_tasks = false;
              use_shapes_for_pairing_sub_goals = true;
              keygen = Gnat_sched.Keygen.keygen }
@@ -603,7 +604,8 @@ let mk_subp_goal goal =
 let iter_subps f =
    let acc = ref [] in
    iter_main_goals (fun g ->
-     acc := mk_subp_goal g :: !acc);
+     if Session.goal_task_option g = None then ()
+     else acc := mk_subp_goal g :: !acc);
    List.iter f !acc
 
 let matches_subp_filter subp =

@@ -59,19 +59,22 @@ let rec is_trivial fml =
 let register_goal goal =
    (* Register the goal by extracting the explanation and trace. If the goal is
     * trivial, do not register *)
-   let task = Session.goal_task goal in
-   let fml = Task.task_goal_fmla task in
-   match is_trivial fml, search_labels fml with
-   | true, None ->
+     match Session.goal_task_option goal with
+     | None ->
          Gnat_objectives.set_not_interesting goal
-   | _, None ->
-         Gnat_util.abort_with_message ~internal:true
-         "Task has no tracability label."
-   | _, Some c ->
-       if c.Gnat_expl.already_proved then
-         Gnat_objectives.set_not_interesting goal
-       else
-         Gnat_objectives.add_to_objective c goal
+     | Some task ->
+         let fml = Task.task_goal_fmla task in
+         match is_trivial fml, search_labels fml with
+         | true, None ->
+               Gnat_objectives.set_not_interesting goal
+         | _, None ->
+               Gnat_util.abort_with_message ~internal:true
+               "Task has no tracability label."
+         | _, Some c ->
+             if c.Gnat_expl.already_proved then
+               Gnat_objectives.set_not_interesting goal
+             else
+               Gnat_objectives.add_to_objective c goal
 
 let rec handle_vc_result goal result =
    (* This function is called when the prover has returned from a VC.
@@ -238,27 +241,27 @@ let _ =
 
    try
      Gnat_sched.init ();
-      Gnat_objectives.init ();
-      match Gnat_config.proof_mode with
-      | Gnat_config.Progressive
-      | Gnat_config.Per_Path
-      | Gnat_config.Per_Check ->
-         Gnat_objectives.iter_subps normal_handle_one_subp;
-         if Gnat_config.replay then begin
-           Gnat_objectives.replay ();
-           Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());
-         end else begin
-           Gnat_objectives.iter handle_obj;
-           Gnat_objectives.do_scheduled_jobs interpret_result;
-         end;
-         Gnat_objectives.save_session ();
-         Gnat_objectives.iter report_messages;
-         Gnat_report.print_messages ()
-      | Gnat_config.All_Split ->
-         Gnat_objectives.iter_subps all_split_subp
-      | Gnat_config.No_WP ->
-         (* we should never get here *)
-         ()
+     Gnat_objectives.init ();
+     match Gnat_config.proof_mode with
+     | Gnat_config.Progressive
+     | Gnat_config.Per_Path
+     | Gnat_config.Per_Check ->
+        Gnat_objectives.iter_subps normal_handle_one_subp;
+        if Gnat_config.replay then begin
+          Gnat_objectives.replay ();
+          Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());
+        end else begin
+          Gnat_objectives.iter handle_obj;
+          Gnat_objectives.do_scheduled_jobs interpret_result;
+        end;
+        Gnat_objectives.save_session ();
+        Gnat_objectives.iter report_messages;
+        Gnat_report.print_messages ()
+     | Gnat_config.All_Split ->
+        Gnat_objectives.iter_subps all_split_subp
+     | Gnat_config.No_WP ->
+        (* we should never get here *)
+        ()
     with e ->
        let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
        Gnat_util.abort_with_message ~internal:true s
