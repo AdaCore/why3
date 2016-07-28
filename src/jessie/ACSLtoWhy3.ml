@@ -63,9 +63,9 @@ let env,config =
     Self.fatal "Exception raised while reading Why3 environment:@ %a"
       Exn_printer.exn_printer e
 
-let find th s =
+let find m s =
   try
-    Theory.ns_find_ls th.Theory.th_export [s]
+    Theory.ns_find_ls m.Pmodule.mod_theory.Theory.th_export [s]
   with e ->
     Self.fatal "Exception raised while loading Why3 symbol %s:@ %a"
       s Exn_printer.exn_printer e
@@ -81,9 +81,9 @@ let () = Self.result "Loading Why3 theories..."
 
 (* int.Int theory *)
 let int_type : Ty.ty = Ty.ty_int
-let int_theory : Theory.theory =
+let int_theory =
   try
-    Env.read_theory env ["int"] "Int"
+    Pmodule.read_module env ["int"] "Int"
   with e ->
     Self.fatal "Exception raised while loading int theory:@ %a"
       Exn_printer.exn_printer e
@@ -97,13 +97,13 @@ let le_int : Term.lsymbol = find int_theory "infix <="
 let gt_int : Term.lsymbol = find int_theory "infix >"
 let lt_int : Term.lsymbol = find int_theory "infix <"
 
-let computer_div_theory : Theory.theory =
-  Env.read_theory env ["int"] "ComputerDivision"
+let computer_div_theory =
+  Pmodule.read_module env ["int"] "ComputerDivision"
 let div_int : Term.lsymbol = find computer_div_theory "div"
 
 (* real.Real theory *)
 let real_type : Ty.ty = Ty.ty_real
-let real_theory : Theory.theory = Env.read_theory env ["real"] "Real"
+let real_theory = Pmodule.read_module env ["real"] "Real"
 let add_real : Term.lsymbol = find real_theory "infix +"
 let sub_real : Term.lsymbol = find real_theory "infix -"
 let minus_real : Term.lsymbol = find real_theory "prefix -"
@@ -111,11 +111,12 @@ let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
 
 (* map.Map theory *)
+(*
 let map_theory : Theory.theory = Env.read_theory env ["map"] "Map"
 let map_ts : Ty.tysymbol = find_type map_theory "map"
 (* let map_type (t:Ty.ty) : Ty.ty = Ty.ty_app map_ts [t] *)
 let map_get : Term.lsymbol = find map_theory "get"
-
+ *)
 
 let () = Self.result "Loading Why3 modules..."
 
@@ -125,8 +126,6 @@ let find_rs mo s =
   with e ->
     Self.fatal "Exception raised while loading Why3 program symbol %s:@ %a"
       s Exn_printer.exn_printer e
-
-let find_ls mo s = find mo.Pmodule.mod_theory s
 
 (* ref.Ref module *)
 
@@ -148,7 +147,7 @@ let ref_type : Ity.itysymbol =
 
 let ref_fun : Expr.rsymbol = find_rs ref_module "ref"
 
-let get_logic_fun : Term.lsymbol = find_ls ref_module "prefix !"
+let get_logic_fun : Term.lsymbol = find ref_module "prefix !"
 
 let get_fun : Expr.rsymbol = find_rs ref_module "prefix !"
 
@@ -184,7 +183,9 @@ let uint32_module =
 let uint32_type : Why3.Ity.itysymbol =
   Pmodule.ns_find_its uint32_module.Pmodule.mod_export ["t"]
 
-let uint32_to_int : Term.lsymbol = find_ls uint32_module "to_uint"
+let uint32_to_int : Term.lsymbol = find uint32_module "to_uint"
+
+let uint32_to_int_fun : Expr.rsymbol = find_rs uint32_module "to_uint"
 
 let uadd32_fun : Expr.rsymbol = find_rs uint32_module "add_check"
 
@@ -225,7 +226,7 @@ let int64_module =
 let int64_type : Why3.Ity.itysymbol =
   Pmodule.ns_find_its int64_module.Pmodule.mod_export ["int64"]
 
-let int64_to_int : Term.lsymbol = find_ls int64_module "to_int"
+let int64_to_int : Term.lsymbol = find int64_module "to_int"
 
 let add64_fun : Expr.rsymbol = find_rs int64_module "infix +"
 
@@ -258,6 +259,14 @@ let array_type : Ity.T.itysymbol =
 *)
 
 
+
+let de_app e1 e2 = Dexpr.dexpr(Dexpr.DEapp(e1,e2))
+
+let de_app1 rs e1 = de_app (Dexpr.dexpr(Dexpr.DErs rs)) e1
+
+let de_app2 rs e1 e2 = de_app (de_app1 rs e1) e2
+
+
 (*********)
 (* types *)
 (*********)
@@ -268,21 +277,24 @@ let mlw_int_type = Ity.ity_int
 let mlw_uint32_type =  Ity.ity_app uint32_type [] []
 let mlw_int64_type = Ity.ity_app int64_type [] []
 
+let e_void = Dexpr.dexpr (Dexpr.DEls (Term.fs_tuple 0))
+let e_true = Dexpr.dexpr Dexpr.DEtrue
+
+let de_const_int s = Dexpr.dexpr (Dexpr.DEconst (Number.ConstInt (Literals.integer s)))
+
 let (*rec*) ctype_and_default ty =
   match ty with
-    | TVoid _attr -> Ity.ity_unit, Expr.e_void
+    | TVoid _attr -> Ity.ity_unit, e_void
     | TInt (IInt, _attr) ->
-      let n = Expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
-      mlw_uint32_type,
-      Expr.e_app uint32ofint_fun [n] [mlw_int_type] mlw_uint32_type
+      let n = de_const_int "0" in
+      mlw_uint32_type, de_app1 uint32ofint_fun n
     | TInt (ILong, _attr) ->
-      let n = Expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
-      mlw_int64_type,
-      Expr.e_app int64ofint_fun [n] [mlw_int_type] mlw_int64_type
+      let n = de_const_int "0" in
+      mlw_int64_type, de_app1 int64ofint_fun n
     | TInt (_, _) ->
-      Self.not_yet_implemented "ctype TInt"
+       Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
-      Self.not_yet_implemented "ctype TFloat"
+       Self.not_yet_implemented "ctype TFloat"
 (*
     | TPtr(TInt _ as t, _attr) ->
       let t,_ = ctype_and_default t in
@@ -343,16 +355,6 @@ let rec logic_type ty =
         Self.not_yet_implemented "logic_type"
 
 
-
-(*
-
-let mk_get ref_ty ty =
-    Expr.e_arrow get_fun [ref_ty] ty
-
-let mk_set ref_ty ty =
-    (* (:=) has type (r:ref 'a) (v:'a) unit *)
-    Expr.e_arrow set_fun [ref_ty; ty] Ity.ity_unit
- *)
 
 
 
@@ -435,30 +437,57 @@ let get_lvar lv =
 
 let program_vars = Hashtbl.create 257
 
-let create_var_full v =
+let create_var v is_mutable =
 (**)
- Self.result "create program variable %s (%d)" v.vname v.vid;
+ Self.result "create program variable %s (%d), mutable = %b" v.vname v.vid is_mutable;
 (**)
+(*
   let id = Ident.id_fresh v.vname in
   let ty,def = ctype_and_default v.vtype in
   let ref_ty = Ity.ity_app ref_type [ty] [] in
-  let def = Expr.e_app ref_fun [def] [ty] ref_ty in
-  let let_defn, vs = Expr.let_var id def in
-  Hashtbl.add program_vars v.vid (vs,true,ty);
-  let_defn,vs
+  let def = de_app1 ref_fun def in
+  let dlet_defn : Dexpr.dlet_defn= (id,false,Expr.RKnone,def) in
+  let let_defn = Dexpr.let_defn dlet_defn in
+  let pvs = match let_defn with
+      | Expr.LDvar (pvs,_) -> pvs
+      | Expr.LDsym _ | Expr.LDrec _ -> assert false
+  in
+ *)
+  Hashtbl.add program_vars v.vid is_mutable
 
-let create_var v = fst (create_var_full v)
-
-let get_var v =
+let get_var denv v =
   try
-    Hashtbl.find program_vars v.vid
+    let is_mutable = Hashtbl.find program_vars v.vid in
+    Self.result "get program variable %s (%d), mutable = %b" v.vname v.vid is_mutable;
+    Dexpr.denv_get denv v.vname, is_mutable
   with Not_found ->
     Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
-let program_funs = Hashtbl.create 257
-
-let create_function v args pre post xpost effect ret_type =
+(*let program_funs = Hashtbl.create 257
+ *)
+(*
+let create_function v args spec ret_type body =
   let id = Ident.id_fresh v.vname in
+  let ret_type = Dexpr.dity_of_ity ret_type in
+  let mask = Ity.MaskVisible in
+  let def denv (* : Dexpr.dspec Dexpr.later * variant list Dexpr.later * dexpr *) =
+    (spec,(fun _ _ -> []), body)
+  in
+  let predef = (id,false,Expr.RKfunc,args,ret_type,mask,def) in
+  let _,def = Dexpr.drec_defn Dexpr.denv_empty [predef] in
+  let def = Dexpr.rec_defn def in
+  let rs = match def with
+      | Expr.LDvar _ -> assert false
+      | Expr.LDrec _ -> assert false
+      | Expr.LDsym (rs,cexp) ->
+         Hashtbl.add program_funs v.vid (rs,cexp);
+         rs
+  in
+  Self.result "created program function %s (%d)" v.vname v.vid;
+  id
+ *)
+
+(*
   let cty = Ity.create_cty args pre post xpost Ity.Mpv.empty effect ret_type in
   let rs = Expr.create_rsymbol id cty in
 (*
@@ -469,12 +498,15 @@ let create_function v args pre post xpost effect ret_type =
   let arg_ty = List.map (fun v -> v.Ity.pv_ity) args in
   Hashtbl.add program_funs v.vid (rs,arg_ty,ret_type);
   rs
+ *)
 
+(*
 let get_function v =
   try
     Hashtbl.find program_funs v.vid
   with Not_found ->
     Self.fatal "program function %s (%d) not found" v.vname v.vid
+ *)
 
 
 let logic_symbols = Hashtbl.create 257
@@ -496,8 +528,8 @@ let get_lsymbol li =
   with
       Not_found -> Self.fatal "logic symbol %s not found" li.l_var_info.lv_name
 
-let result_vsymbol =
-  ref (Term.create_vsymbol (Ident.id_fresh "result") ty_unit)
+let result_pvsymbol =
+  ref (Ity.create_pvsymbol (Ident.id_fresh "result") ity_unit)
 
 type label = Here | Old | At of string
 
@@ -522,12 +554,12 @@ let coerce_to_int ty t =
     | _ -> Self.not_yet_implemented "coerce_to_int"
 
 
-let rec term_node ~label t =
+let rec term_node denv ~label t lvm old =
   match t with
     | TConst cst -> Term.t_const (logic_constant cst)
-    | TLval lv -> tlval ~label lv
-    | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
-    | TUnOp (op, t) -> unary op (term ~label t)
+    | TLval lv -> tlval denv ~label lv lvm old
+    | TBinOp (op, t1, t2) -> bin (term denv ~label t1 lvm old) op (term denv ~label t2 lvm old)
+    | TUnOp (op, t) -> unary op (term denv ~label t lvm old)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | Tapp (li, labels, args) ->
       begin
@@ -535,7 +567,7 @@ let rec term_node ~label t =
           | [] ->
             let ls = get_lsymbol li in
             let args = List.map (fun x ->
-              let _ty,t = term ~label x in
+              let _ty,t = term denv ~label x lvm old in
 (*
               Self.result "arg = %a, type  = %a"
               Cil_printer.pp_term x
@@ -549,9 +581,9 @@ let rec term_node ~label t =
     | Tat (t, lab) ->
       begin
         match lab with
-          | LogicLabel(None, "Here") -> snd (term ~label:Here t)
-          | LogicLabel(None, "Old") -> snd (term ~label:Old t)
-          | LogicLabel(None, lab) -> snd (term ~label:(At lab) t)
+          | LogicLabel(None, "Here") -> snd (term denv ~label:Here t lvm old)
+          | LogicLabel(None, "Old") -> snd (term denv ~label:Old t lvm old)
+          | LogicLabel(None, lab) -> snd (term denv ~label:(At lab) t lvm old)
           | LogicLabel(Some _, _lab) ->
             Self.not_yet_implemented "term_node Tat/LogicLabel/Some"
           | StmtLabel _ ->
@@ -562,7 +594,7 @@ let rec term_node ~label t =
     | TCoerceE (_, _)->
       Self.not_yet_implemented "TCoerceE"
     | TLogic_coerce (ty, t) when is_int_type ty ->
-      let _,t' = term ~label t in
+      let _,t' = term denv ~label t lvm old in
       begin
         match ty, t.term_type with
           | Linteger, Ctype(TInt(IInt,_attr)) ->
@@ -600,42 +632,52 @@ let rec term_node ~label t =
     | Tlet (_, _) ->
       Self.not_yet_implemented "term_node (2)"
 
-and term ~label t =
+and term denv ~label t lvm old =
 (*
   Self.result "term %a: type = %a"
     Cil_printer.pp_term t Cil_printer.pp_logic_type t.term_type;
 *)
-  (t.term_type, term_node ~label t.term_node)
+  (t.term_type, term_node denv ~label t.term_node lvm old)
 
-and tlval ~label (host,offset) =
+and tlval denv ~label (host,offset) _lvm _old =
   match host,offset with
-    | TResult _, TNoOffset -> Term.t_var !result_vsymbol
+    | TResult _, TNoOffset -> Term.t_var !result_pvsymbol.Ity.pv_vs
     | TVar lv, TNoOffset ->
       begin
         let t =
           match lv.lv_origin with
             | None -> Term.t_var (get_lvar lv)
             | Some v ->
-              let (v,is_mutable,_ty) = get_var v in
+              let e,is_mutable = get_var denv v in
+              let pvs = match e with
+                  | Dexpr.DEpv pvs -> pvs
+                  | Dexpr.DEvar (s,_dvty) ->
+                     Self.fatal "found var %s" s
+                  | _ -> assert false
+              in
               if is_mutable then
-                t_app get_logic_fun [Term.t_var v.Ity.pv_vs]
+                t_app get_logic_fun [Term.t_var pvs.Ity.pv_vs]
               else
-                Term.t_var v.Ity.pv_vs
+                Term.t_var pvs.Ity.pv_vs
         in
         match label with
           | Here -> t
-          | Old -> Mlw_wp.t_at_old t
+          | Old ->
+             Self.not_yet_implemented "tlval TVar/Old"
+             (* label "0" in Why3 ? *)
           | At _lab ->
             (* t_app Mlw_wp.fs_at [t; ??? lab] *)
-      Self.not_yet_implemented "tlval TVar/At"
+             Self.not_yet_implemented "tlval TVar/At"
       end
     | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
       Self.not_yet_implemented "tlval TVar"
     | TResult _, _ ->
       Self.not_yet_implemented "tlval Result"
+(*
     | TMem({term_node = TBinOp((PlusPI|IndexPI),t,i)}), TNoOffset ->
       (* t[i] *)
-      t_app map_get [snd(term ~label t);snd(term ~label i)]
+      t_app map_get [snd(term ~label t lvm old);snd(term ~label i lvm old)]
+ *)
     | TMem({term_node = TBinOp(_,t,i)}), TNoOffset ->
       Self.not_yet_implemented "tlval Mem(TBinOp(_,%a,%a), TNoOffset)"
         Cil_printer.pp_term t Cil_printer.pp_term i
@@ -706,18 +748,18 @@ let rel (ty1,t1) op (ty2,t2) =
       Self.not_yet_implemented "rel Rlt %a %a"
         Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
-let rec predicate ~label p =
+let rec predicate denv ~label p lvm old =
   match p with
     | Pfalse -> Term.t_false
     | Ptrue -> Term.t_true
-    | Prel (op, t1, t2) -> rel (term ~label t1) op (term ~label t2)
+    | Prel (op, t1, t2) -> rel (term denv ~label t1 lvm old) op (term denv ~label t2 lvm old)
     | Pforall (lv, p) ->
       let l = List.map create_lvar lv in
-      Term.t_forall_close l [] (predicate_named ~label p)
+      Term.t_forall_close l [] (predicate_named denv ~label p lvm old)
     | Pimplies (p1, p2) ->
-      Term.t_implies (predicate_named ~label p1) (predicate_named ~label p2)
+      Term.t_implies (predicate_named denv ~label p1 lvm old) (predicate_named denv ~label p2 lvm old)
     | Pand (p1, p2) ->
-      Term.t_and (predicate_named ~label p1) (predicate_named ~label p2)
+      Term.t_and (predicate_named denv ~label p1 lvm old) (predicate_named denv ~label p2 lvm old)
     | Papp (_, _, _) ->
       Self.not_yet_implemented "predicate Papp"
     | Pnot _ ->
@@ -738,13 +780,11 @@ let rec predicate ~label p =
     | Pallocable (_, _)
     | Pfreeable (_, _)
     | Pfresh (_, _, _, _)
-    | Psubtype (_, _) ->
+    | Psubtype (_, _)
+    | Pvalid_function _ ->
         Self.not_yet_implemented "predicate"
 
-and predicate_named ~label p = predicate ~label p.content
-
-
-
+and predicate_named denv ~label p lvm old = predicate denv ~label p.content lvm old
 
 
 
@@ -769,15 +809,18 @@ let add_decls_as_theory theories id decls =
     | [] -> theories
     | _ ->
       let th = Theory.create_theory id in
-      let th = use th int_theory in
-      let th = use th real_theory in
-      let th = use th map_theory in
+      let th = use th int_theory.Pmodule.mod_theory in
+      let th = use th real_theory.Pmodule.mod_theory in
+(*
+      let th = use th map_theory.Pmodule.mod_theory in
+ *)
       let th = List.fold_left use th theories in
       let th = List.fold_left add_decl th (List.rev decls) in
       let th = Theory.close_theory th in
       th :: theories
 
 let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
+  let denv = Dexpr.denv_empty in
   match a with
     | Dtype (lt, loc) ->
       let targs =
@@ -806,7 +849,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
                   Decl.create_param_decl ls
                 | LBterm d ->
                   let ls,args = create_lsymbol li in
-                  let (_ty,d) = term ~label:Here d in
+                  let _ty,d = term denv ~label:Here d Term.Mvs.empty (fun v _ -> v) in
                   let def = Decl.make_ls_defn ls args d in
                   Decl.create_logic_decl [def]
                 | _ ->
@@ -829,7 +872,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
               in
               Decl.create_prop_decl
                 (if is_axiom then Decl.Paxiom else Decl.Plemma)
-                pr (predicate_named ~label:Here p)
+                pr (predicate_named denv ~label:Here p Term.Mvs.empty (fun v _ -> v))
             in
             (theories,d::decls)
           | _ ->
@@ -873,16 +916,17 @@ let identified_proposition p =
 
 
 
-let seq e1 e2 =
-  let l = Expr.create_let_defn (Ident.id_fresh "_tmp") e1 in
-  Expr.e_let l e2
+let seq ?loc e1 e2 =
+  let letdefn = (Ident.id_fresh "_tmp", false, Expr.RKlocal,e1) in
+  Dexpr.dexpr ?loc (Dexpr.DElet(letdefn,e2))
 
-let annot a e =
+
+let annot denv a e =
   match a.annot_content with
   | AAssert ([],pred) ->
-    let p = predicate_named ~label:Here pred in
-    let a = Expr.e_assert Expr.Aassert p in
-    seq a e
+    let p = predicate_named denv ~label:Here pred in
+    let a = Dexpr.dexpr (* todo ~loc *) (Dexpr.DEassert(Expr.Assert, p)) in
+    seq ?loc:e.Dexpr.de_loc a e
   | AAssert(_labels,_pred) ->
     Self.not_yet_implemented "annot AAssert"
   | AStmtSpec _ ->
@@ -898,21 +942,23 @@ let annot a e =
   | APragma _ ->
     Self.not_yet_implemented "annot APragma"
 
-let loop_annot a =
-  List.fold_left (fun (inv,var) a ->
-    match a.annot_content with
-      | AAssert ([],_pred) ->
-        Self.not_yet_implemented "loop_annot AAssert"
-      | AAssert(_labels,_pred) ->
-        Self.not_yet_implemented "loop_annot AAssert"
-      | AStmtSpec _ ->
-        Self.not_yet_implemented "loop_annot AStmtSpec"
-      | AInvariant([],true,p) ->
-        (Term.t_and inv (predicate_named ~label:Here p),var)
+let loop_annot denv a =
+  let inv,var =
+    List.fold_left
+      (fun (inv,var) a ->
+       match a.annot_content with
+       | AAssert ([],_pred) ->
+          Self.not_yet_implemented "loop_annot AAssert"
+       | AAssert(_labels,_pred) ->
+          Self.not_yet_implemented "loop_annot AAssert"
+       | AStmtSpec _ ->
+          Self.not_yet_implemented "loop_annot AStmtSpec"
+       | AInvariant([],true,p) ->
+          (p :: inv,var)
       | AInvariant _ ->
         Self.not_yet_implemented "loop_annot AInvariant"
       | AVariant (t, None) ->
-        (inv,(snd (term ~label:Here t),None)::var)
+        (inv,t :: var)
       | AVariant (_var, Some _) ->
         Self.not_yet_implemented "loop_annot AVariant/Some"
       | AAssigns _ ->
@@ -921,10 +967,19 @@ let loop_annot a =
         Self.not_yet_implemented "loop_annot AAllocation"
       | APragma _ ->
         Self.not_yet_implemented "loop_annot APragma")
-    (Term.t_true, []) a
+    ([], []) a
+  in
+  (fun lvm old ->
+   List.rev_map
+     (fun p -> predicate_named denv ~label:Here p lvm old)
+     inv),
+  (fun lvm old ->
+   List.rev_map
+     (fun t -> (snd(term denv ~label:Here t lvm old),None))
+     var)
 
 let binop op e1 e2 =
-  let ls,ty,ty' =
+  let rs,_ty,_ty' =
     match op with
       | PlusA -> uadd32_fun, mlw_uint32_type, mlw_uint32_type
       | MinusA -> usub32_fun, mlw_uint32_type, mlw_uint32_type
@@ -944,10 +999,10 @@ let binop op e1 e2 =
       | BAnd|BXor|BOr|LAnd|LOr ->
         Self.not_yet_implemented "binop bool"
   in
-  Expr.e_app (Expr.e_arrow ls [ty;ty] ty') [e1;e2]
+  de_app2 rs e1 e2
 
 let unop op e =
-  let ls,ty,ty' =
+  let rs,_ty,_ty' =
     match op with
       | Neg -> (* Unary minus *)
         Self.not_yet_implemented "unop Neg"
@@ -957,7 +1012,7 @@ let unop op e =
       | LNot -> (* Logical Not (!) *)
         Self.not_yet_implemented "unop LNot"
   in
-  Expr.e_app (Expr.e_arrow ls [ty] ty') [e]
+  de_app1 rs e
 
 let constant c =
   match c with
@@ -967,9 +1022,8 @@ let constant c =
         | Some s -> s
         | None -> Integer.to_string t
     in
-    let n = Expr.e_const (Number.ConstInt (Literals.integer s)) in
-    Expr.e_app
-      (Expr.e_arrow uint32ofint_fun [mlw_int_type] mlw_uint32_type) [n]
+    let n = de_const_int s  in
+    de_app1 uint32ofint_fun n
   | CInt64(_t,_ikind, _) ->
       Self.not_yet_implemented "CInt64"
   | CStr _
@@ -979,23 +1033,20 @@ let constant c =
   | CEnum _ ->
       Self.not_yet_implemented "constant"
 
-let rec expr e =
+let rec expr denv e =
   match e.enode with
     | Const c -> constant c
-    | Lval lv -> lval lv
+    | Lval lv -> lval denv lv
     | BinOp (op, e1, e2, _loc) ->
-      binop op (expr e1) (expr e2)
+      binop op (expr denv e1) (expr denv e2)
     | UnOp (op, e, _loc) ->
-      unop op (expr e)
+      unop op (expr denv e)
     | CastE (ty, e) ->
-      let e' = expr e in
+      let e' = expr denv e in
       begin
         match ty, Cil.typeOf e with
           | TInt(ILong,_attr1), TInt(IInt,_attr2) ->
-            Expr.e_app
-              (Expr.e_arrow int64ofint_fun
-                 [mlw_int_type] mlw_int64_type)
-              [Expr.e_lapp uint32_to_int [e'] mlw_int_type]
+            de_app1 int64ofint_fun (de_app1 uint32_to_int_fun e')
           | _ ->
             Self.not_yet_implemented "expr CastE"
       end
@@ -1009,25 +1060,23 @@ let rec expr e =
     | Info (_, _)
       -> Self.not_yet_implemented "expr"
 
-and lval (host,offset) =
+and lval denv (host,offset) =
   match host,offset with
     | Var v, NoOffset ->
-      let v,is_mutable,ty = get_var v in
+      let e,is_mutable = get_var denv v in
       if is_mutable then
         begin try
-                Expr.e_app
-                  (mk_get v.Ity.pv_ity ty)
-                  [Expr.e_value v]
+                de_app1 get_fun (Dexpr.dexpr e)
           with e ->
             Self.fatal "Exception raised during application of !@ %a@."
               Exn_printer.exn_printer e
         end
-      else
-        Expr.e_value v
+      else (Dexpr.dexpr e)
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
-    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
+    | Mem({enode = BinOp((PlusPI|IndexPI),_e,_i,_ty)}), NoOffset ->
       (* e[i] -> Map.get e i *)
+(*
       let e = expr e in
       let ity =
         match ty with
@@ -1035,16 +1084,20 @@ and lval (host,offset) =
           | _ -> assert false
       in
       let i = expr i in
-      let i = Expr.e_lapp uint32_to_int [i] mlw_int_type in
-      Expr.e_lapp map_get [e;i] ity
+      let i = de_app1 uint32_to_int_fun i in
+      de_app2 map_get e i
+ *)
+      Self.not_yet_implemented "lval Mem e+i"
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
 let functional_expr e =
   match e.enode with
-    | Lval (Var v, NoOffset) ->
-      let id,tyl,ty = get_function v in
-      Expr.e_arrow id tyl ty
+    | Lval (Var _v, NoOffset) ->
+       Self.not_yet_implemented "functional_expr Lval"
+(*
+      let rs,_cexp = get_function v in
+      Dexpr.dexpr(Dexpr.DErs rs) *)
     | Lval _
     | Const _
     | BinOp _
@@ -1060,14 +1113,17 @@ let functional_expr e =
     | Info (_, _)
       -> Self.not_yet_implemented "functional_expr"
 
-let assignment (lhost,offset) e _loc =
+let assignment denv (lhost,offset) e _loc =
   match lhost,offset with
     | Var v , NoOffset ->
-      let v,is_mutable,ty = get_var v in
+      let v,is_mutable = get_var denv v in
       if is_mutable then
-        Expr.e_app
-          (mk_set v.Ity.pv_ity ty)
-          [Expr.e_value v; e]
+         begin
+           Self.result "creating call to (:=)";
+           let de = de_app2 set_fun (Dexpr.dexpr v) e in
+           Self.result "OK";
+           de
+         end
       else
         Self.not_yet_implemented "mutation of formal parameters"
     | Var _ , Field _ ->
@@ -1077,47 +1133,50 @@ let assignment (lhost,offset) e _loc =
     | Mem _, _ ->
       Self.not_yet_implemented "assignment Mem"
 
-let instr i =
+let instr denv i =
   match i with
-  | Set(lv,e,loc) -> assignment lv (expr e) loc
+  | Set(lv,e,loc) -> assignment denv lv (expr denv e) loc
   | Call (None, e, el, _loc) ->
     let e = functional_expr e in
-    Expr.e_app e (List.map expr el)
+    List.fold_left
+      (fun acc e -> de_app acc (expr denv e))
+      e el
   | Call (Some lv, e, el, loc) ->
     let e = functional_expr e in
-    let e = Expr.e_app e (List.map expr el) in
-    assignment lv e loc
+    let e =
+    List.fold_left
+      (fun acc e -> de_app acc (expr denv e))
+      e el
+    in
+    assignment denv lv e loc
   | Asm _ ->
     Self.not_yet_implemented "instr Asm"
-  | Skip _loc ->
-    Expr.e_void
+  | Skip _loc -> e_void
   | Code_annot (_, _) ->
     Self.not_yet_implemented "instr Code_annot"
 
 let exc_break =
   Ity.create_xsymbol (Ident.id_fresh "Break") Ity.ity_unit
 
-let rec stmt s =
+let rec stmt denv s =
   match s.skind with
     | Instr i ->
       let annotations = Annotations.code_annot s in
       let e =
-        List.fold_right annot annotations (instr i)
+        List.fold_right (annot denv) annotations (instr denv i)
       in e
-    | Block b -> block b
-    | Return (None, _loc) ->
-      Expr.e_void
+    | Block b -> block denv b
+    | Return (None, _loc) -> e_void
     | Return (Some e, _loc) ->
-      expr e
+      expr denv e
     | Goto (_, _) ->
       Self.not_yet_implemented "stmt Goto"
     | Break _loc ->
-      Expr.e_raise exc_break Expr.e_void
-        Ity.ity_unit
+      Dexpr.dexpr (Dexpr.DEraise(exc_break,e_void))
     | Continue _ ->
       Self.not_yet_implemented "stmt Continue"
     | If (c, e1, e2, _loc) ->
-      Expr.e_if (expr c) (block e1) (block e2)
+      Dexpr.dexpr(Dexpr.DEif(expr denv c,block denv e1,block denv e2))
     | Switch (_, _, _, _) ->
       Self.not_yet_implemented "stmt Switch"
     | Loop (annots, body, _loc, _continue, _break) ->
@@ -1130,13 +1189,11 @@ let rec stmt s =
       *)
       assert (annots = []);
       let annots = Annotations.code_annot s in
-      let inv, var = loop_annot annots in
-      let v =
-        Ity.create_pvsymbol (Ident.id_fresh "_dummy") Ity.ity_unit
-      in
-      Expr.e_try
-        (Expr.e_loop inv var (block body))
-        [exc_break,v,Expr.e_void]
+      let inv, var = loop_annot denv annots in
+      let v = Ident.id_fresh "_dummy" in
+      let loop = Dexpr.dexpr(Dexpr.DEwhile(e_true,inv,var,block denv body)) in
+      let pat = Dexpr.dpattern(Dexpr.DPvar(v,false)) in
+      Dexpr.dexpr(Dexpr.DEtry(loop,[exc_break,pat,e_void]))
     | UnspecifiedSequence _ ->
       Self.not_yet_implemented "stmt UnspecifiedSequence"
     | Throw (_, _) ->
@@ -1148,12 +1205,12 @@ let rec stmt s =
     | TryExcept (_, _, _, _) ->
       Self.not_yet_implemented "stmt TryExcept"
 
-and block b =
+and block denv b =
   let rec mk_seq l =
     match l with
-      | [] -> Expr.e_void
-      | [s] -> stmt s
-      | s::r -> seq (stmt s) (mk_seq r)
+      | [] -> e_void
+      | [s] -> stmt denv s
+      | s::r -> seq (stmt denv s) (mk_seq r)
   in
   mk_seq b.bstmts
 
@@ -1168,6 +1225,7 @@ and block b =
 (*************)
 
 let extract_simple_contract c =
+  let denv = Dexpr.denv_empty in
   let pre,post,ass = List.fold_left
     (fun (pre,post,ass) b ->
       if not (Cil.is_default_behavior b) then
@@ -1192,7 +1250,7 @@ let extract_simple_contract c =
         | WritesAny -> ass
         | Writes l ->
           let l = List.map (fun (t,_) ->
-            term (* ~in_contract:true Logic_const.here_label *) t.it_content) l in
+            term (* ~in_contract:true Logic_const.here_label *) denv t.it_content) l in
           match ass with
           | None -> Some l
           | Some l' -> Some (l@l')
@@ -1200,7 +1258,7 @@ let extract_simple_contract c =
       (pre,post, ass))
     ([],[],None) c.spec_behavior
   in
-  (Logic_const.pands pre, Logic_const.pands post, ass)
+  (pre, post, ass)
 
 
 
@@ -1211,59 +1269,109 @@ let extract_simple_contract c =
 (* function declarations *)
 (*************************)
 
-let fundecl fdec =
+let fundecl denv_global fdec =
   let fun_id = fdec.svar in
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
-  let args =
-    match Kernel_function.get_formals kf with
+  let args = Kernel_function.get_formals kf in
+(*
       | [] ->
-        [ Ity.create_pvsymbol (Ident.id_fresh "_dummy") Ity.ity_unit ]
+        [ None,false,Dexpr.dity_of_ity Ity.ity_unit ]
       | l ->
-        List.map (fun v ->
-          let ity = ctype v.vtype in
+         List.map
+           (fun v ->
+            let ity = ctype v.vtype in
+(*
           let vs =
-            Ity.create_pvsymbol (Ident.id_fresh v.vname) ity
+            Ity.create_pvsymbol () ity
           in
           Hashtbl.add program_vars v.vid (vs,false,ity);
           vs)
-        l
+ *)
+            (Some (Ident.id_fresh v.vname), false,Dexpr.dity_of_ity ity))
+           l
   in
+ *)
   let body = fdec.sbody in
   let contract = Annotations.funspec kf in
   let pre,post,_ass = extract_simple_contract contract in
-  let ret_type = ctype (Kernel_function.get_return_type kf) in
-  let result =
-    Term.create_vsymbol (Ident.id_fresh "result")
-      (Ity.ty_of_ity ret_type)
+  let locals = Kernel_function.get_locals kf in
+  let ret_type = Kernel_function.get_return_type kf in
+  (* creating environnement *)
+  (*  add parameters *)
+(**)
+  let _denv_params,binders =
+    if args = [] then (denv_global,[None,false,Dexpr.dity_of_ity Ity.ity_unit])
+    else
+    List.fold_right
+      (fun v (denv,args) ->
+       let id = Ident.id_fresh v.vname in
+       let dity = Dexpr.dity_of_ity (ctype v.vtype) in
+       (Dexpr.denv_add_var denv id dity,(Some id,false,dity)::args))
+      args (denv_global,[])
   in
-  result_vsymbol := result;
-  let locals =
-    List.map create_var (Kernel_function.get_locals kf)
+(**)
+(*
+  let denv_local =
+    List.fold_left
+      (fun denv v ->
+       Self.log "local variable %s" v.vname;
+       let ity,def = ctype_and_default v.vtype in
+       let letdefn = (Ident.id_fresh v.vname,false,Expr.RKlocal,def) in
+       Dexpr.denv_add_let denv letdefn)
+      denv_params locals
   in
-  let spec = {
-    Ity.c_pre = predicate_named ~label:Here pre;
-    c_post =
-      Term.t_eps
-        (Term.t_close_bound result (predicate_named ~label:Here post));
-    c_xpost = Ity.Mexn.empty;
-    c_effect = Ity.eff_empty;
-    c_variant = [];
-    c_letrec  = 0;
-  }
-  in
-  let ps = create_function fun_id args spec ret_type in
-  let body = block body in
-  let full_body = List.fold_right Expr.e_let locals body in
-  let lambda = {
-    Expr.l_args = args;
-    l_expr = full_body;
-    l_spec = spec;
-  }
-  in
-  let def = Expr.create_rec_defn [ps,lambda] in
-  Mlw_decl.create_rec_decl def
+ *)
+  let body denv =
+    let rec add_locals denv l =
+      match l with
+      | [] -> block denv body
+      | v::rem ->
+         Self.log "local variable %s" v.vname;
+         let _ity,def = ctype_and_default v.vtype in
+         create_var v true;
+         let def = de_app1 ref_fun def in
+         let letdefn = (Ident.id_fresh v.vname,false,Expr.RKlocal,def) in
+         let denv = Dexpr.denv_add_let denv letdefn in
+         Dexpr.dexpr(Dexpr.DElet(letdefn,add_locals denv rem))
+    in
+(*
+    let body =
+      List.fold_right
+        (fun v acc ->
+         let _,letdef = create_var v in
+         Dexpr.dexpr(Dexpr.DElet(letdef,acc)))
+        (Kernel_function.get_locals kf) body
+    in
+ *)
 
+    let body = add_locals denv locals in
+    let spec_later lvm old (ret_type:Ity.ity) =
+(**)
+      let result =
+        Ity.create_pvsymbol (Ident.id_fresh "result") ret_type
+      in
+      result_pvsymbol := result;
+ (**)
+      {
+        Dexpr.ds_pre =
+          List.map (fun t -> predicate_named denv ~label:Here t lvm old) pre;
+        Dexpr.ds_post =
+          List.map (fun t -> (result,predicate_named denv ~label:Here t lvm old)) post;
+        Dexpr.ds_xpost = Ity.Mexn.empty;
+        Dexpr.ds_reads = [];
+        Dexpr.ds_writes = [];
+        Dexpr.ds_diverge = false;
+        Dexpr.ds_checkrw = true;
+      }
+    in
+    let variants _lvm _old = [Term.t_nat_const 0,None] in
+    (spec_later,variants,body)
+  in
+  let id = Ident.id_fresh fun_id.vname in
+  let predef = (id,true,Expr.RKfunc,binders,Dexpr.dity_of_ity (ctype ret_type),Ity.MaskVisible, body) in
+  let denv,def = Dexpr.drec_defn denv_global [predef] in
+  denv,Dexpr.rec_defn def
 
 
 
@@ -1274,12 +1382,12 @@ let fundecl fdec =
 (***********************)
 
 
-let global (theories,lemmas,functions) g =
+let global (theories,lemmas,denv,functions) g =
   match g with
     | GFun (fdec,_) ->
-      let f = fundecl fdec in
-      (theories,lemmas,f::functions)
-   | GVar (vi, _init, _loc) ->
+      let denv,f = fundecl denv fdec in
+      (theories,lemmas,denv,(Pdecl.create_let_decl f)::functions)
+   | GVar (_vi, _init, _loc) ->
 (*
         let ty = translate_type vi.vtype in
         let init = match init.init with
@@ -1295,27 +1403,33 @@ let global (theories,lemmas,functions) g =
         { acc with AST.prog_vars =
           (intern_string vi.vname, g)::acc.AST.prog_vars }
 *)
-     let _,pv = create_var_full vi in
-     let sym = Expr.LetV pv in
-     (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
+      Self.not_yet_implemented "global: GVar"
+(*
+     let _,dlet = create_var vi in
+     let d = Dexpr.let_defn dlet in
+     (theories,lemmas,denv,(Pdecl.create_let_decl d)::functions)
+ *)
 
     | GFunDecl(_funspec,vi,_location) ->
       begin match vi.vname with
         | "Frama_C_bzero" | "Frama_C_copy_block" ->
-          (theories,lemmas,functions)
+          (theories,lemmas,denv,functions)
         | _ ->
 (*
           let f = fundecl vi in
  *)
-          (theories,lemmas,functions)
+          (theories,lemmas,denv,functions)
       end
-    | GVarDecl(vi,_location) ->
-       let _,pv = create_var_full vi in
-       let sym = Expr.LetV pv in
-       (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
+    | GVarDecl(_vi,_location) ->
+      Self.not_yet_implemented "global: GVarDecl"
+(*
+       let _,dlet = create_var vi in
+       let d = Dexpr.let_defn dlet in
+       (theories,lemmas,denv,(Pdecl.create_let_decl d)::functions)
+ *)
     | GAnnot (a, loc) ->
       let (t,l) = logic_decl ~in_axiomatic:false a loc (theories,lemmas) in
-      (t,l,functions)
+      (t,l,denv,functions)
     | GText _ ->
       Self.not_yet_implemented "global: GText"
     | GPragma (_, _) ->
@@ -1338,19 +1452,21 @@ let print_id fmt id = Format.fprintf fmt "%s" id.Ident.id_string
 
 let add_pdecl m d =
   try
-    Pmodule.add_pdecl ~wp:true m d
+    Pmodule.add_pdecl ~vc:true m d
   with
       Not_found ->
         Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id)
-          (Ident.Sid.elements d.Mlw_decl.pd_news)
+          (Ident.Sid.elements d.Pdecl.pd_news)
 
+(*
 let use m th =
   let name = th.Theory.th_name in
   Pmodule.close_scope
-    (Pmodule.use_export_theory
+    (Pmodule.use_export
        (Pmodule.open_scope m name.Ident.id_string)
        th)
     true
+ *)
 
 let use_module m modul =
   let name = modul.Pmodule.mod_theory.Theory.th_name in
@@ -1363,22 +1479,28 @@ let use_module m modul =
 let prog p =
    try
     (* Self.result "Starting translation"; *)
-    let theories,decls,functions =
-      List.fold_left global ([],[],[]) p.globals
+    let theories,decls,_,functions =
+      List.fold_left global ([],[],Dexpr.denv_empty,[]) p.globals
     in
     Self.result "found %d logic decl(s)" (List.length decls);
+(*
     let theories =
       add_decls_as_theory theories
         (Ident.id_fresh global_logic_decls_theory_name) decls
     in
+ *)
     Self.result "made %d theory(ies)" (List.length theories);
     let m = Pmodule.create_module env
       (Ident.id_fresh programs_module_name)
     in
-    let m = use m int_theory in
-    let m = use m real_theory in
-    let m = use m map_theory in
-    let m = List.fold_left use m theories in
+    let m = use_module m int_theory in
+    let m = use_module m real_theory in
+(*
+    let m = use_module m map_theory in
+ *)
+(*
+    let m = List.fold_left use_module m theories in
+ *)
     let m = use_module m ref_module in
     let m = use_module m uint32_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
@@ -1389,6 +1511,7 @@ let prog p =
            | Ity.TypeMismatch _ | Decl.UnknownIdent _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."
       Exn_printer.exn_printer e
+
     (* | Ity.TypeMismatch(ity1,ity2,_ity_subst) ->  *)
     (*   Self.fatal "TypeMismatch(%a,%a,_)" *)
     (*         Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2 *)

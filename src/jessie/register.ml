@@ -26,13 +26,17 @@ open Why3
 let () = Debug.set_flag Call_provers.debug
 *)
 
+let limit = Call_provers.{ limit_time = 3 ;
+                           limit_mem  = 1000;
+                           limit_steps = -1;}
+
 let run_on_task fmt prover prover_driver t =
   let result =
     Call_provers.wait_on_call
       (Why3.Driver.prove_task
          ~command:prover.Whyconf.command
-         ~timelimit:3
-         prover_driver t ()) ()
+         ~limit
+         prover_driver t)
   in
   Format.fprintf fmt "%a" Call_provers.print_prover_answer result.Call_provers.pr_answer;
   match result.Call_provers.pr_answer with
@@ -80,12 +84,12 @@ let process () =
         Exn_printer.exn_printer e
   in
   let theories =
-    try
+    (* try *)
       ACSLtoWhy3.Self.result "Translating to Why3...";
       ACSLtoWhy3.prog prog
-    with e ->
-      ACSLtoWhy3.Self.fatal "Exception raised while translating to Why3:@ %a"
-        Exn_printer.exn_printer e
+    (* with e -> *)
+    (*   ACSLtoWhy3.Self.fatal "Exception raised while translating to Why3:@ %a" *)
+    (*     Exn_printer.exn_printer e *)
   in
   try
     ACSLtoWhy3.Self.result "Running provers...";
