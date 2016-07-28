@@ -123,6 +123,8 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
   | Tyapp (ts, [t1;t2]) when ts_equal ts Ty.ts_func ->
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
         (print_ty_node 1) t1 (print_ty_node 0) t2
+  | Tyapp (ts, []) when is_ts_tuple ts ->
+      fprintf fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       fprintf fmt "(%a)" (print_list comma (print_ty_node 0)) tl
   | Tyapp (ts, []) -> print_ts fmt ts
