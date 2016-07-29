@@ -30,15 +30,15 @@ let pr_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_symbol fmt id =
-  let san = String.uncapitalize in
+  let san = Strings.uncapitalize in
   fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
 let print_tvar fmt {tv_name = id} =
-  let san = String.capitalize in
+  let san = Strings.capitalize in
   fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
 let print_var fmt {vs_name = id} =
-  let san = String.capitalize in
+  let san = Strings.capitalize in
   fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
 let print_pr fmt pr =

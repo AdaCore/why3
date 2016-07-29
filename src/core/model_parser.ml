@@ -198,9 +198,10 @@ let print_model_file fmt me_name_trans filename model_file =
   fprintf fmt "File %s:" filename;
   IntMap.iter
     (fun line m_elements ->
-      fprintf fmt "\nLine %d:\n" line;
+      fprintf fmt "@\nLine %d:@\n" line;
       print_model_elements me_name_trans fmt m_elements)
-    model_file
+    model_file;
+  fprintf fmt "@\n"
 
 let why_name_trans me_name =
   match me_name.men_kind with
@@ -375,6 +376,7 @@ let print_model_json
     (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
     fmt
     model_files_bindings
+
 
 let model_to_string_json
     ?(me_name_trans = why_name_trans)
