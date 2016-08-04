@@ -229,6 +229,17 @@ let editor_merge me1 me2 =
 let shortcut_merge s1 s2 =
   Mstr.merge merge_opt_keep_first s1 s2
 
+let find_driver_file fn =
+  (* Here we search for the driver file. The argument [fn] is the driver path
+     as returned by the Why3 API. If the path in the why3.conf file is
+     relative, why3 completes this with the path of the why3.conf file. We
+     first look into that location, and if the file is not there, we look
+     into the SPARK config dir *)
+  if Sys.file_exists fn then fn
+  else
+    let driver_file = Filename.basename fn in
+    file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
+
 (* Depending on what kinds of provers are requested, environment loading is a
  * bit different, hence we do this all together here *)
 
@@ -317,20 +328,7 @@ let provers, prover_ce, config, env =
   (* this function loads the driver for a given prover *)
   let prover_driver base_prover =
     try
-      (* If a relative path is provided in the config file, Why3 uses the
-         location of the driver file to transform it into an absolute path.
-         This is OK in the case of a user-created conf file. But for the
-         SPARK-provided provers, we also use a relative name, but we refer to
-         the driver directory of the SPARK install. So we detect when the
-         driver path returned by Why3 is equal to the config directory, and
-         correct the path in that case *)
-      let driver_file =
-        let orig_driver_path = Filename.dirname base_prover.Whyconf.driver in
-        if orig_driver_path = spark_config_dir then
-          let driver_file = Filename.basename base_prover.Whyconf.driver in
-          file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
-        else base_prover.Whyconf.driver
-      in
+      let driver_file = find_driver_file base_prover.Whyconf.driver in
       Driver.load_driver env driver_file base_prover.Whyconf.extra_drivers
     with e ->
       let s =
