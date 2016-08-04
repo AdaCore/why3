@@ -60,7 +60,7 @@ let provers =
         eprintf "Failed to load driver for %s %s: %a@."
           p.Whyconf.prover_name p.Whyconf.prover_version
           Exn_printer.exn_printer e;
-        exit 1)
+        acc)
     provers
     []
 
@@ -78,7 +78,7 @@ let alt_ergo : Whyconf.config_prover =
 
 (** Testing Session_itp *)
 
-let (s,b) = Session_itp.load_session "../bitwalker/why3session.xml"
+let s = Session_itp.load_session "../bitwalker/why3session.xml"
 
 let id =
   match Session_itp.get_theories s with
@@ -94,7 +94,16 @@ let () =
   printf "%a@." (Session_itp.print_tree s) (Session_itp.get_tree s id)
 
 
-(** Testing Controller_itp *)
+let () = Session_itp.save_session "../bitwalker/testsession.xml" s
+let s' = Session_itp.load_session "../bitwalker/testsession.xml"
+let id' =
+  match Session_itp.get_theories s' with
+    | (n, (thn, _::_::x::_)::_)::_ -> x
+    | _ -> assert false
+let () =
+  printf "%a@." (Session_itp.print_tree s') (Session_itp.get_tree s' id')
+
+(** testing Controller_itp *)
 
 let my_session = Session_itp.empty_session ()
 

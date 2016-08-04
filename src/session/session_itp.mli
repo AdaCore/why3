@@ -80,12 +80,11 @@ val remove_proof_attempt : session -> proofNodeID -> Whyconf.prover -> unit
 val remove_transformation : session -> transID -> unit
 (** [remove_transformation s id] removes the transformation [id]
     from the session [s] *)
-(*
+
 val save_session : string -> session -> unit
- *)
 (** [save_session f s] Save the session [s] in file [f] *)
 
-val load_session : string -> session * bool
+val load_session : string -> session
 (** [load_session f] load a session from a file [f]; all the tasks are
     initialised to None *)
 
