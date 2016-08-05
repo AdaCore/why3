@@ -819,34 +819,40 @@ let effect_of_dspec dsp =
 
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
-let check_spec dsp ecty e =
+let check_spec inr dsp ecty ({e_loc = loc} as e) =
+  let bad_read  reff eff = not (Spv.subset  reff.eff_reads  eff.eff_reads) in
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
                                             weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sexn.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
-  let check_rw = dsp.ds_checkrw in
   let uwrl, ue = effect_of_dspec dsp in
   let ucty = create_cty ecty.cty_args ecty.cty_pre ecty.cty_post
     ecty.cty_xpost ecty.cty_oldies ue ecty.cty_result in
   let ueff = ucty.cty_effect and eeff = ecty.cty_effect in
-  let urds = ueff.eff_reads and erds = eeff.eff_reads in
-  (* check that every user effect actually happens *)
-  if not (Spv.subset urds erds) then Loc.errorm ?loc:e.e_loc
+  let check_ue = not inr and check_rw = dsp.ds_checkrw in
+  (* check that every user effect actually happens. We omit this
+     for local functions inside recursive functions because if
+     they call the parent function, they may have more effects
+     than we know at this point: those will only be known after
+     we finish constructing the parent function. TODO: make an
+     effort to only disable the check for local functions that
+     actually call their parent. *)
+  if check_ue && bad_read ueff eeff then Loc.errorm ?loc
     "variable@ %a@ does@ not@ occur@ in@ this@ expression"
-    Pretty.print_vs (Spv.choose (Spv.diff urds erds)).pv_vs;
-  if bad_write ueff eeff then List.iter (fun (weff,t) ->
+    Pretty.print_vs (Spv.choose (Spv.diff ueff.eff_reads eeff.eff_reads)).pv_vs;
+  if check_ue && bad_write ueff eeff then List.iter (fun (weff,t) ->
     if bad_write weff eeff then Loc.errorm ?loc:t.t_loc
       "this@ write@ effect@ does@ not@ happen@ in@ the@ expression") uwrl;
-  if bad_raise ueff eeff then Loc.errorm ?loc:e.e_loc
+  if check_ue && bad_raise ueff eeff then Loc.errorm ?loc
     "this@ expression@ does@ not@ raise@ exception@ %a"
     print_xs (Sexn.choose (Sexn.diff ueff.eff_raises eeff.eff_raises));
-  if ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc:e.e_loc
-    "this@ expression@ does@ not@ diverge";
+  if check_ue && ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc
+      "this@ expression@ does@ not@ diverge";
   (* check that every computed effect is listed *)
-  if check_rw && not (Spv.subset erds urds) then Spv.iter (fun v ->
-    Loc.errorm ?loc:e.e_loc
-      "this@ expression@ depends@ on@ variable@ %a@ left@ out@ in@ \
-      the@ specification" Pretty.print_vs v.pv_vs) (Spv.diff erds urds);
+  if check_rw && bad_read eeff ueff then Loc.errorm ?loc
+    "this@ expression@ depends@ on@ variable@ %a,@ \
+      which@ is@ left@ out@ in@ the@ specification"
+    Pretty.print_vs (Spv.choose (Spv.diff eeff.eff_reads ueff.eff_reads)).pv_vs;
   if check_rw && bad_write eeff ueff then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
@@ -883,14 +889,14 @@ let check_aliases recu c =
   let regs = List.fold_left add_arg rds_regs c.cty_args in
   ignore (add_ity (if recu then regs else rds_regs) c.cty_result)
 
-let check_fun rsym dsp e =
+let check_fun inr rsym dsp e =
   let c,e = match e with
     | { c_node = Cfun e; c_cty = c } -> c,e
     | _ -> invalid_arg "Dexpr.check_fun" in
   let c = match rsym with
     | Some s -> s.rs_cty
     | None -> c in
-  check_spec dsp c e;
+  check_spec inr dsp c e;
   check_aliases (rsym <> None) c
 
 (** Environment *)
@@ -902,6 +908,7 @@ type env = {
   ghs : bool; (* we are under DEghost or in a ghost function *)
   lgh : bool; (* we are under let ghost c = <cexp> *)
   cgh : bool; (* we are under DEghost in a cexp *)
+  inr : bool; (* we are inside a recursive function *)
 }
 
 let env_empty = {
@@ -911,6 +918,7 @@ let env_empty = {
   ghs = false;
   lgh = false;
   cgh = false;
+  inr = false;
 }
 
 exception UnboundLabel of string
@@ -1101,7 +1109,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let dvl _ _ = [] in
       let env = {env with ghs = env.ghs || env.lgh} in
       let c, dsp, _ = lambda uloc env (binders env.ghs bl) msk dsp dvl de in
-      check_fun None dsp c;
+      check_fun env.inr None dsp c;
       proxy c
   | DEany (bl,msk,dsp,dity) ->
       let env = {env with ghs = env.ghs || env.lgh} in
@@ -1286,7 +1294,7 @@ and sym_defn uloc env (id,gh,kind,de) =
   let ld, s = let_sym id ~ghost:(lgh || cgh) ~kind c in
   ld::ldl, add_rsymbol env s
 
-and rec_defn uloc env {fds = dfdl} =
+and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
   let step1 env (id, gh, kind, bl, mask, dsp, dvl, ({de_dvty = dvty} as de)) =
     let ghost = env.ghs || gh || kind = RKlemma in
     let pvl = binders ghost bl in
@@ -1294,7 +1302,7 @@ and rec_defn uloc env {fds = dfdl} =
     let cty = create_cty ~mask pvl [] [] Mexn.empty Mpv.empty eff_empty ity in
     let rs = create_rsymbol id ~ghost ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, mask, dsp, dvl, de) in
-  let env, fdl = Lists.map_fold_left step1 env dfdl in
+  let env, fdl = Lists.map_fold_left step1 {env with inr = true} dfdl in
   let step2 (rs, kind, mask, dsp, dvl, de) (fdl,dspl) =
     let env = {env with ghs = env.ghs || rs_ghost rs} in
     let {rs_name = {id_string = nm; id_loc = loc}; rs_cty = c} = rs in
@@ -1316,7 +1324,7 @@ and rec_defn uloc env {fds = dfdl} =
           Loc.try2 ?loc check_aliases true lam.c_cty) fdl;
         raise exn in
   let add_fd env {rec_sym = s; rec_rsym = rs; rec_fun = c} dsp =
-    Loc.try3 ?loc:rs.rs_name.id_loc check_fun (Some rs) dsp c;
+    Loc.try4 ?loc:rs.rs_name.id_loc check_fun inr (Some rs) dsp c;
     add_rsymbol env s in
   ld, List.fold_left2 add_fd env rdl dspl
 
