@@ -1229,10 +1229,6 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
   let mask = mask_reduce mask in
   (* the arguments are pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
-  (* add empty and drop unused exceptional postconditions *)
-  let xpost = Mexn.merge (fun _ x q -> match x, q with
-    | Some (), Some _  -> q | Some (), None -> Some []
-    | None, _ -> None) effect.eff_raises xpost in
   (* complete the reads and freeze the external context.
      oldies must be fresh: collisions with args and external
      reads are forbidden, to simplify instantiation later. *)
