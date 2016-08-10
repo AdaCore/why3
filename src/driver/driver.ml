@@ -302,9 +302,14 @@ let add_cntexample_meta task cntexample =
 
 let prepare_task ~cntexample drv task =
   let task = add_cntexample_meta task cntexample in
-  let lookup_transform t = lookup_transform t drv.drv_env in
+  let lookup_transform t =
+    let stat_name = "gnatwhy3.transformations." ^ t in
+    stat_name, lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
-  let apply task tr = Trans.apply tr task in
+  let apply task (name, tr) =
+    let res = Trans.apply tr task in
+    Util.timing_step_completed name;
+    res in
   let task = update_task drv task in
   List.fold_left apply task transl
 

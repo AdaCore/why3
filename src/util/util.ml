@@ -62,3 +62,23 @@ let anyd fold pr1 pr2 x =
 (* constant boolean function *)
 let ttrue _ = true
 let ffalse _ = false
+
+let last_timing = ref 0.
+
+let timing_map : (string, float) Hashtbl.t = Hashtbl.create 17
+
+let init_timing () =
+  last_timing := (Unix.times ()).Unix.tms_utime
+
+let timing_step_completed str =
+  let now = (Unix.times ()).Unix.tms_utime in
+  let consumed = now -. !last_timing in
+  last_timing := now;
+  try
+    let cur = Hashtbl.find timing_map str in
+    Hashtbl.replace timing_map str (cur +. consumed)
+  with Not_found ->
+    Hashtbl.add timing_map str consumed
+
+let get_timings () = timing_map
+

@@ -138,9 +138,16 @@ let print_warning_list fmt l =
   | l ->
     Format.fprintf fmt ", %a" (print_json_field "warnings" (list string)) l
 
+let print_timing_entry fmt t =
+  let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) t [] in
+  let get_name s = s in
+  Format.fprintf fmt ", ";
+  print_json_field "timings" (map_bindings get_name float) fmt l
+
 let print_messages () =
   let msg_set = Gnat_expl.HCheck.fold (fun k v acc -> (k,v) :: acc) msg_set []
   in
-  Format.printf "{%a%a}@."
+  Format.printf "{%a%a%a}@."
   (print_json_field "results" (list print_json_msg)) msg_set
   print_warning_list !warning_list
+  print_timing_entry (Util.get_timings ())

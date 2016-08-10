@@ -240,21 +240,27 @@ let _ =
    Sys.set_signal Sys.sigint (Sys.Signal_handle save_session_and_exit);
 
    try
+     Util.init_timing ();
      Gnat_sched.init ();
      Gnat_objectives.init ();
+     Util.timing_step_completed "gnatwhy3.init";
      match Gnat_config.proof_mode with
      | Gnat_config.Progressive
      | Gnat_config.Per_Path
      | Gnat_config.Per_Check ->
         Gnat_objectives.iter_subps normal_handle_one_subp;
+        Util.timing_step_completed "gnatwhy3.register_vcs";
         if Gnat_config.replay then begin
           Gnat_objectives.replay ();
           Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());
         end else begin
           Gnat_objectives.iter handle_obj;
+          Util.timing_step_completed "gnatwhy3.schedule_vcs";
           Gnat_objectives.do_scheduled_jobs interpret_result;
+          Util.timing_step_completed "gnatwhy3.run_vcs";
         end;
         Gnat_objectives.save_session ();
+        Util.timing_step_completed "gnatwhy3.save_session";
         Gnat_objectives.iter report_messages;
         Gnat_report.print_messages ()
      | Gnat_config.All_Split ->

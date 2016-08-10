@@ -70,3 +70,20 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
+
+
+(* timing functions allow to measure CPU time consumption of parts of Why3 *)
+
+val init_timing : unit -> unit
+(* call this function to start measurements *)
+
+val timing_step_completed : string -> unit
+(* call this function to signal the completion of a processing step identified
+   by a string. The consumed CPU time since the last call of init_timing or
+   timing_step_completed will be considered as the time consumed by that
+   processing step. If the function is called more than once with the same
+   string argument, processing times will accumulate. *)
+
+val get_timings : unit -> (string, float) Hashtbl.t
+(* return the current timings obtained by calls to init_timing and
+ * timing_step_completed *)
