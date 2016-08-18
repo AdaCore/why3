@@ -2067,6 +2067,62 @@ module AssoGoals = Tc.Pairing(Goal)(Goal)
 (* merge a file into another      *)
 (**********************************)
 
+(* the import_* functions can be used to copy session items from one 'b session
+   into another 'b session. The two sessions will have different keys. This is
+   different from the copy_* functions where we have 'a = 'b.  Most import
+   functions import the entire subtree, but do not include the subtree into the
+   parent. For example, [import_theory keygen file theory] will return a new
+   theory whose parent is [file], but it will not modify [file.file_theories]
+   to contain the new theory. This is left to the caller. An exception to this
+   rule is [import_proof_attempt], because of its usage of
+   [add_external_proof]. *)
+
+let rec import_theory ~keygen file th =
+  let new_th =
+    raw_add_theory
+      ~keygen
+      ~expanded:th.theory_expanded
+      ~checksum:th.theory_checksum
+      file th.theory_name in
+  let goals =
+    List.map (import_goal ~keygen (Parent_theory new_th)) th.theory_goals in
+  new_th.theory_goals <- goals;
+  new_th
+
+and import_goal ~keygen parent g =
+  let new_goal =
+    raw_add_no_task
+      ~keygen
+      ~expanded:g.goal_expanded
+      parent g.goal_name g.goal_expl g.goal_checksum g.goal_shape in
+  PHprover.iter (fun _ v -> import_proof_attempt ~keygen new_goal v)
+  g.goal_external_proofs;
+  PHstr.iter (fun k v ->
+    let tf = import_transf ~keygen new_goal v in
+    PHstr.add new_goal.goal_transformations k tf) g.goal_transformations;
+  new_goal
+
+and import_proof_attempt ~keygen goal pa =
+    ignore (add_external_proof
+      ~keygen
+      ~obsolete:pa.proof_obsolete
+      ~archived:pa.proof_archived
+      ~limit:pa.proof_limit
+      ~edit:pa.proof_edited_as
+      goal pa.proof_prover pa.proof_state)
+
+and import_transf ~keygen goal tf =
+  let new_tf =
+    raw_add_transformation
+      ~keygen
+      ~expanded:tf.transf_expanded
+      goal
+      tf.transf_name in
+  let goals =
+    List.map (import_goal ~keygen (Parent_transf new_tf)) tf.transf_goals in
+  new_tf.transf_goals <- goals;
+  new_tf
+
 let found_obsolete = ref false
 let found_missed_goals = ref false
 let found_missed_goals_in_theory = ref false
@@ -2235,7 +2291,22 @@ type 'key update_context =
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
     keygen : 'key keygen;
+    keep_unmatched_theories : bool;
   }
+
+let mk_update_context
+  ?(allow_obsolete_goals=false)
+  ?(release_tasks=false)
+  ?(use_shapes_for_pairing_sub_goals=false)
+  ?(keep_unmatched_theories=false)
+  keygen =
+  { allow_obsolete_goals;
+    release_tasks;
+    use_shapes_for_pairing_sub_goals;
+    keygen;
+    keep_unmatched_theories;
+  }
+
 
 let rec recover_sub_tasks ~theories env_session task g =
   g.goal_task <- Some task;
@@ -2446,21 +2517,30 @@ let merge_file ~ctxt ~theories env from_f to_f =
     (fun acc t -> Mstr.add t.theory_name.Ident.id_string t acc)
     Mstr.empty from_f.file_theories
   in
-  List.iter
-    (fun to_th ->
-      try
-        let from_th =
-          let name = to_th.theory_name.Ident.id_string in
-          try Mstr.find name from_theories
-          (* TODO: remove this later when all sessions are updated *)
-          with Not_found -> Mstr.find ("WP "^name) from_theories
-        in
-        merge_theory ~ctxt ~theories env from_th to_th
-      with
-        | Not_found when ctxt.allow_obsolete_goals -> ()
-        | Not_found -> raise OutdatedSession
-    )
-    to_f.file_theories;
+  let find_remove k map =
+    let elt = Mstr.find k map in
+    let acc = Mstr.remove k map in
+    elt, acc in
+  let remaining_theories =
+    List.fold_left
+      (fun acc to_th ->
+        try
+          let from_th, acc =
+            let name = to_th.theory_name.Ident.id_string in
+            find_remove name acc
+          in
+          merge_theory ~ctxt ~theories env from_th to_th;
+          acc
+        with
+          | Not_found when ctxt.allow_obsolete_goals -> acc
+          | Not_found -> raise OutdatedSession
+      )
+      from_theories to_f.file_theories in
+  if ctxt.keep_unmatched_theories then
+    Mstr.iter (fun _ v ->
+        to_f.file_theories <-
+          (import_theory ~keygen:ctxt.keygen to_f v) :: to_f.file_theories)
+      remaining_theories;
   Debug.dprintf debug "[Info] merge_file, done@\n"
 
 let rec recompute_all_shapes_goal ~release g =

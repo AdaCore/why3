@@ -427,6 +427,7 @@ void run_request (prequest r) {
    proc->outfile    = outfile;
    key              = keygen();
    list_append(processes, key, (void*) proc);
+   send_started_msg_to_client(client, r->id);
    portassoc.CompletionKey = (void*) to_ms_key(key, PROCESS);
    portassoc.CompletionPort = completion_port;
    if (!SetInformationJobObject
@@ -489,6 +490,27 @@ void free_process(pproc proc) {
    free(proc);
 }
 
+void send_started_msg_to_client(pclient client,
+				char* id) {
+   char* msgbuf;
+   size_t len = 0;
+   int used;
+   //len of id + S + semicolon + \n + \0
+   len += strlen(id) + 4;
+   msgbuf = (char*) malloc(sizeof(char) * len);
+
+   if (msgbuf == NULL) {
+      shutdown_with_msg("error when allocating client msg");
+   }
+
+   used = snprintf(msgbuf, len, "S;%s\n", id);
+   if (used != len - 1) {
+      shutdown_with_msg("message for client too long");
+   }
+   queue_write(client, msgbuf);
+}
+
+
 void send_msg_to_client(pclient client,
                         char* id,
                         DWORD exitcode,
@@ -498,8 +520,8 @@ void send_msg_to_client(pclient client,
    char* msgbuf;
    int len = 0;
    int used;
-   //len of id + semicolon
-   len += strlen(id) + 1;
+   //len of id + F + 2 semicolon
+   len += strlen(id) + 3;
    // we assume a length of at most 9 for both exitcode and time, plus one for
    // the timeout boolean, plus three semicolons, makes 23 chars
    len += 23;
@@ -509,7 +531,7 @@ void send_msg_to_client(pclient client,
    if (msgbuf == NULL) {
      shutdown_with_msg("error when allocating buffer for client msg");
    }
-   used = snprintf(msgbuf, len, "%s;%lu;%.2f;%d;%s\n",
+   used = snprintf(msgbuf, len, "F;%s;%lu;%.2f;%d;%s\n",
                    id, exitcode, cpu_time, (timeout?1:0), outfile);
    if (used >= len) {
       shutdown_with_msg("message for client too long");
@@ -534,9 +556,11 @@ void close_client(pclient client, int key) {
 }
 
 void schedule_new_jobs() {
-   while (list_length(processes) < parallel && !(queue_is_empty (queue))) {
-      run_request((prequest) queue_pop (queue));
-   }
+  while (list_length(processes) < parallel && !(queue_is_empty (queue))) {
+    prequest r = (prequest) queue_pop (queue);
+    run_request(r);
+    free_request(r);
+  }
 }
 
 void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) {

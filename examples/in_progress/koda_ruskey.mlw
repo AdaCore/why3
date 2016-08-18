@@ -524,10 +524,11 @@ module CountCorrect
     valid_coloring f c &&
     forall j. not (mem_forest j f) -> M.get c j = White
 
-  lemma solution_eq:
-    forall n f c1 c2.
-    valid_nums_forest f n ->
-    solution f c1 -> eq_coloring n c1 c2 -> solution f c2
+  (* WRONG: c2 is not necessarily white outside *)
+  (* lemma solution_eq: *)
+  (*   forall n f c1 c2. *)
+  (*   valid_nums_forest f n -> *)
+  (*   solution f c1 -> eq_coloring n c1 c2 -> solution f c2 *)
 
   predicate is_product (i: int) (f1 f2: forest int) (c1 c2 r: coloring) =
     solution (N i f1 f2) r &&
@@ -577,51 +578,66 @@ module CountCorrect
                is_product i f1 f2 s1[j] s2[k] result[j * length s2 + k] }
     ensures  { length result = length s1 * length s2 }
   = let s = ref empty in
+    let n2 = length s2 in
     for j = 0 to length s1 - 1 do
-      invariant { length !s = j * length s2 }
+      invariant { length !s = j * n2 }
       invariant { solutions n (N i f1 f2) !s }
-      invariant { forall j' k'. 0 <= j' < j -> 0 <= k' < length s2 ->
-                  let c = !s[j' * length s2 + k'] in
-                  is_product i f1 f2 s1[j'] s2[k'] c }
-      for k = 0 to length s2 - 1 do
-        invariant { length !s = j * length s2 + k }
+      invariant { forall j' k'. 0 <= j' < j -> 0 <= k' < n2 ->
+                  is_product i f1 f2 s1[j'] s2[k'] !s[j' * n2 + k'] }
+      for k = 0 to n2 - 1 do
+        invariant { length !s = j * n2 + k }
         invariant { solutions n (N i f1 f2) !s }
-        invariant { forall j' k'. 0 <= j' < j && 0 <= k' < length s2
-                               || j' = j && 0 <= k' < k ->
-                    let c = !s[j' * length s2 + k'] in
-                    is_product i f1 f2 s1[j'] s2[k'] c }
+        invariant { forall j' k'. 0 <= j' < j -> 0 <= k' < n2 ->
+                    is_product i f1 f2 s1[j'] s2[k'] !s[j' * n2 + k']
+                      by j' * n2 <= (j - 1) * n2 }
+        invariant { forall k'. 0 <= k' < k ->
+                    is_product i f1 f2 s1[j] s2[k'] !s[j * n2 + k'] }
         let p = product n i f1 f2 s1[j] s2[k] in
-        assert { forall l. 0 <= l < length !s ->
-                  not (eq_coloring n p !s[l]) };
+        assert { forall l. 0 <= l < length !s -> not (eq_coloring n p !s[l])
+                   by l = (div l n2) * n2 + (mod l n2)
+                   so is_product i f1 f2 s1[div l n2] s2[mod l n2] !s[l]  };
         s := snoc !s p
       done
     done;
     !s
 
-  lemma solution_white_or_black:
-    forall n i f1 f2 c.
-    valid_nums_forest (N i f1 f2) n ->
-    solution (N i f1 f2) c ->
-    match M.get c i with
-    | White -> solution f2 c
-    | Black -> exists c1 c2. is_product i f1 f2 c1 c2 c &&
-                             solution f1 c1 && solution f2 c2
-    end
+  let lemma solution_white_or_black (n i: int) (f1 f2: forest int) : unit
+    requires { valid_nums_forest (N i f1 f2) n }
+    ensures  { valid_nums_forest f1 n }
+    ensures  { valid_nums_forest f2 n }
+    ensures  { forall c. solution (N i f1 f2) c ->
+      match M.get c i with
+      | White -> solution f2 c
+      | Black -> exists c1 c2. is_product i f1 f2 c1 c2 c &&
+                               solution f1 c1 && solution f2 c2
+      end }
+   = ()
+
+  lemma solution_E:
+    forall c. solution E c -> forall n. eq_coloring n c (const White)
 
   let rec enum (n: int) (f: forest int) : seq coloring
     requires { valid_nums_forest f n }
     ensures  { length result = count_forest f }
     ensures  { solutions n f result }
-    ensures  { forall c. solution f c <->
+    ensures  { forall c. solution f c ->
                  exists j. 0 <= j < length result && eq_coloring n c result[j] }
     variant  { f }
   = match f with
     | E ->
         cons (const White) empty
     | N i f1 f2 ->
+        solution_white_or_black n i f1 f2;
+        assert { 0 <= i < n };
         let s1 = enum n f1 in
         let s2 = enum n f2 in
-        s2 ++ product_all n i f1 f2 s1 s2
+        let p = product_all n i f1 f2 s1 s2 in
+        assert { forall j. 0 <= j < length s2 ->
+                 forall k. 0 <= k < length p ->
+                 not (eq_coloring n s1[j] p[k])
+                   by M.get s2[j] i = White && M.get p[k] i = Black
+                   by k = (div k (length s2)) * length s2 + mod k (length s2) };
+        s2 ++ p
    end
 
 end

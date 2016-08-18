@@ -37,24 +37,24 @@ let meta_begin_compute_context =
 
 let rule_label = Ident.create_label "rewrite"
 
-let collect_rule_decl prs e d =
-  match d.Decl.d_node with
-    | Decl.Dprop((Plemma|Paxiom), pr, t) ->
-      if Decl.Spr.mem pr prs || Ident.Slab.mem rule_label t.t_label then
-        try add_rule t e
-        with NotARewriteRule msg ->
-          Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"
-            Pretty.print_pr pr msg;
-          e
-      else e
-    | _ -> e
-
 let collect_rules p env km prs t =
-  Task.task_fold
-    (fun e td -> match td.Theory.td_node with
-      | Theory.Decl d -> collect_rule_decl prs e d
-      | _ -> e)
-    (create p env km) t
+  let acc = Task.task_fold
+    (fun acc td -> match td.Theory.td_node with
+      | Theory.Decl { d_node = Dprop((Plemma|Paxiom), pr, t) }
+        when Decl.Spr.mem pr prs || Ident.Slab.mem rule_label t.t_label ->
+          (pr,t) :: acc
+      | _ -> acc)
+    [] t
+  in
+  List.fold_left
+    (fun e (pr,t) ->
+      try add_rule t e
+      with NotARewriteRule msg ->
+        Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"
+         Pretty.print_pr pr msg;
+        e
+    )
+    (create p env km) acc
 
 let normalize_goal p env (prs : Decl.Spr.t) task =
   match task with

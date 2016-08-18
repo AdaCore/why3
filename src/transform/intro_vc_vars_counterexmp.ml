@@ -33,11 +33,11 @@ let model_trace_prefix = "model_trace:"
 
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
-  mutable vc_inside : bool;
+  vc_inside : bool;
   (* true if the term that triggers VC is currently processed *)
-  mutable vc_loc : Loc.position option;
+  vc_loc : Loc.position option;
   (* the position of the term that triggers VC *)
-  mutable vc_pre_or_post : bool;
+  vc_pre_or_post : bool;
   (* true if VC was generated for precondition or postcondition *)
 }
 
@@ -48,23 +48,21 @@ let get_label labels prefix =
 let is_model_vc_label l =
   lab_equal l model_vc_label || lab_equal l model_vc_post_label
 
-let check_enter_vc_term t info =
+let check_enter_vc_term t info vc_loc =
   (* Check whether the term that triggers VC is entered.
      If it is entered, extract the location of the term and if the VC is
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if Slab.exists is_model_vc_label t.t_label then begin
-    info.vc_inside <- true;
-    info.vc_loc <- t.t_loc;
-    info.vc_pre_or_post <- Slab.mem model_vc_post_label t.t_label;
-  end
-
-let check_exit_vc_term t info =
-  (* Check whether the term triggering VC is exited. *)
-  if Slab.exists is_model_vc_label t.t_label then begin
-    info.vc_inside <- false;
-  end
+  if Slab.exists is_model_vc_label t.t_label then
+    begin
+      vc_loc := t.t_loc;
+      { vc_inside = true;
+      vc_loc = t.t_loc;
+      vc_pre_or_post = Slab.mem model_vc_post_label t.t_label}
+    end
+  else
+    info
 
 (* TODO: add "remove_suffix" to Strings and use it here instead of regexps *)
 let add_old lab_str =
@@ -97,9 +95,12 @@ let model_trace_for_postcondition ~labels =
   with Not_found ->
     labels
 
-let rec do_intro info t =
-  check_enter_vc_term t info;
+let is_counterexample_label l =
+  lab_equal l model_label || lab_equal l model_projected_label
 
+let rec do_intro info vc_loc t =
+  let info = check_enter_vc_term t info vc_loc in
+  let do_intro = do_intro info vc_loc in
   let defs = match t.t_node with
     | Tapp (ls, tl) ->
       begin
@@ -113,8 +114,6 @@ let rec do_intro info t =
 		 If the variable should be in counterexample, introduce new constant
 		 in location loc with all labels necessary for collecting the it for
 		 counterexample and make it equal to the variable *)
-	      let is_counterexample_label l = if
-		  l = model_label || l = model_projected_label then true else false in
 	      if Slab.exists is_counterexample_label ls.ls_name.id_label then
 		let const_label = if info.vc_pre_or_post then
 		    model_trace_for_postcondition ~labels:ls.ls_name.id_label
@@ -131,35 +130,35 @@ let rec do_intro info t =
 	| _ ->
 	  List.fold_left
 	    (fun defs term ->
-	      List.append defs (do_intro info term))
+	      List.append defs (do_intro term))
 	    []
 	    tl
       end;
     | Tbinop (_, f1, f2) ->
-      List.append (do_intro info f1) (do_intro info f2)
+      List.append (do_intro f1) (do_intro f2)
     | Tquant (_, fq) ->
       let _, _, f = t_open_quant fq in
-      do_intro info f
+      do_intro f
     | Tlet (t, tb) ->
       let _, f = t_open_bound tb in
-      List.append (do_intro info t) (do_intro info f)
+      List.append (do_intro t) (do_intro f)
     | Tnot f ->
-      do_intro info f
+      do_intro f
     | Tif (f1, f2, f3) ->
       List.append
-	(List.append (do_intro info f1) (do_intro info f2))
-	(do_intro info f3)
+	(List.append (do_intro f1) (do_intro f2))
+	(do_intro f3)
     | Tcase (t, _) ->
-      do_intro info t
+      do_intro t
       (* todo: handle the second argument of Tcase *)
     | _ -> [] in
 
-  check_exit_vc_term t info;
+  (* check_exit_vc_term t info; *)
 
   defs
 
-let do_intro_vc_vars_counterexmp info pr f =
-  List.append (do_intro info f) [(create_prop_decl Pgoal pr f)]
+let do_intro_vc_vars_counterexmp info vc_loc pr f =
+  List.append (do_intro info vc_loc f) [(create_prop_decl Pgoal pr f)]
 
 let intro_vc_vars_counterexmp2 task =
   let info = {
@@ -167,14 +166,15 @@ let intro_vc_vars_counterexmp2 task =
     vc_loc = None;
     vc_pre_or_post = false;
   } in
+  let vc_loc = ref None in
   (* Do introduction and find location of term triggering VC *)
-  let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info) in
+  let do_intro_trans = Trans.goal (do_intro_vc_vars_counterexmp info vc_loc) in
   let task = (Trans.apply do_intro_trans) task in
 
   (* Pass meta with location of the term triggering VC to printer  *)
   let vc_loc_meta = Theory.lookup_meta "vc_location" in
   let g,task = Task.task_separate_goal task in
-  let pos_str = match info.vc_loc with
+  let pos_str = match !vc_loc with
     | None -> ""
     | Some loc ->
       let (file, line, col1, col2) = Loc.get loc in

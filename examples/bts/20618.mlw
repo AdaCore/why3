@@ -1,0 +1,8 @@
+module Bug
+  type foo = { a: unit -> unit ; b : unit }
+
+  constant bar : foo = {
+    a = fun _ -> () ;
+    b = ()
+  }
+end

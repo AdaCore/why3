@@ -195,8 +195,6 @@ module TransWf "W:non_conservative_extension:N" (* => TransProof *)
     supremum (gprogress sys) ch sp ->
     supremum (lprogress sys) (image (local_repr sys) ch) (local_repr sys sp)
 
-  (* Missing: validity is continuous. *)
-
   axiom egame_wf : forall sys:system 'a 'o.
     system_wf sys -> game_wf (egame sys)
 
@@ -208,6 +206,7 @@ end
 module Bridge "W:non_conservative_extension:N" (* => TransProof *)
 
   use import game_fmla.Fmla
+  use import ho_set.Set
   use import Trans
 
   axiom egame_enforce : forall sys:system 'a 'o,p qn ql.
@@ -219,15 +218,15 @@ module Bridge "W:non_conservative_extension:N" (* => TransProof *)
       (enforce (st_pre sys p) (st_post sys qn ql) (ugame sys) <->
         forall lg. p (lg 0) -> correct sys qn ql lg)
 
-  (* TODO: correct those axioms, they can't work through st_pre/st_post *)
-  axiom egame_trans : false (*forall sys:system 'a 'o,n x y.
-    let p = st_pre sys ((=) x) in
-    let q = st_post sys ((=) y) in
-    system_wf sys -> enforce p q (egame sys)*)
-  axiom ugame_trans : false (*forall sys:system 'a 'o,n x.
-    let p = st_pre sys ((=) x) in
-    let q = st_post sys (* TODO: incorrect for post here. *)none none in
-    system_wf sys -> enforce p q (ugame sys)*)
+  axiom egame_trans : forall sys:system 'a 'o,x y.
+    system_wf sys /\ sys.transition x y ->
+      enforce (st_pre sys ((=) x)) (st_post sys ((=) y) none) (egame sys)
+
+  axiom ugame_trans : forall sys:system 'a 'o,x.
+    system_wf sys /\ (exists y. sys.transition x y) ->
+      enforce (st_pre sys ((=) x))
+              (st_post sys (sys.transition x) none)
+              (ugame sys)
 
 end
 
@@ -466,6 +465,7 @@ module TransProof
   use import order.SubChain
   use import order.LimUniq
   use import fn.Fun
+  use import game.StratProps
   use import game_fmla.Fmla
   use import transfinite.Iterates
   use import transfinite.ChainExtension
@@ -495,33 +495,38 @@ module TransProof
       "induction" tr_reach o1 f1 b1 ch -> transit sys ch)
     by (forall ch. reach_ch og st ((=) sx) ch /\ transit sys ch ->
       let nch = extends_ch og st ch in
-      transit sys nch by let nst = st ch in
-      forall n. n >= 0 /\ urange nst.time (n+1) ->
-        sys.transition (nst.log n) (nst.log (n+1))
-      by let sp0 = sup og ch in
-        let a = ang sp0 ch in
-        let d = dmn a in
-        "case_split" if ch sp0 /\ g.G.transition sp0 a /\ a d
-        then (if sp0 = d then true else
-            match sp0.time with
-            | None -> false
-            | Some stc -> match d.time with
-                | None -> false
-                | Some dtc -> dtc = stc + 1
-                    so (d.log n = sp0.log n by urange sp0.time n)
-                    so "case_split" if n < stc
-                    then (d.log (n+1) = sp0.log (n+1) by urange sp0.time (n+1))
-                    else n = stc so sys.transition  (d.log n) (d.log (n+1))
-                end by successor sys stc sp0.log d
-            end by osucc sys sp0 d) by nst = d so og sp0 d
-        else (ch sx by subset ((=) sx) ch by sbg ((=) sx) ch)
-          so (supremum og ch nst by chain og ch so exists sp. supremum og ch sp)
-          so "case_split" if ch sp0 then true else
-            maxless og ch
-          so go_beyond ch (n+1)
-          so exists s0. ch s0 /\ urange s0.time (n+1)
-          so og s0 nst so urange s0.time n
-          so s0.log n = nst.log n /\ s0.log (n+1) = nst.log (n+1)
+      transit sys nch by "case_split" match st ch with
+      | None -> true
+      | Some nst -> nch = add ch nst
+        so forall n. n >= 0 /\ urange nst.time (n+1) ->
+          sys.transition (nst.log n) (nst.log (n+1))
+        by let sp0 = sup og ch in
+          let a = ang sp0 ch in
+          let d = dmn a in
+          supremum og ch sp0
+          so "case_split" if ch sp0 /\ g.G.transition sp0 a /\ a d
+          then (if sp0 = d then true else
+              match sp0.time with
+              | None -> false
+              | Some stc -> match d.time with
+                  | None -> false
+                  | Some dtc -> dtc = stc + 1
+                      so (d.log n = sp0.log n by urange sp0.time n)
+                      so "case_split" if n < stc
+                      then (d.log (n+1) = sp0.log (n+1) by urange sp0.time (n+1))
+                      else n = stc so sys.transition  (d.log n) (d.log (n+1))
+                  end by successor sys stc sp0.log d
+              end by osucc sys sp0 d) by nst = d so og sp0 d
+          else (ch sx by subset ((=) sx) ch by sbg ((=) sx) ch)
+            so (supremum og ch nst by chain og ch
+              so exists sp. supremum og ch sp)
+            so "case_split" if ch sp0 then true else
+              maxless og ch
+            so go_beyond ch (n+1)
+            so exists s0. ch s0 /\ urange s0.time (n+1)
+            so og s0 nst so urange s0.time n
+            so s0.log n = nst.log n /\ s0.log (n+1) = nst.log (n+1)
+      end
     ) /\ (forall chh sp. chain (subchain og) chh /\ chh ((=) sx) /\
       (forall ch. chh ch -> transit sys ch) /\
       supremum (subchain og) chh sp -> transit sys sp
@@ -558,6 +563,8 @@ module TransProof
       let og = eg.G.progress in
       exists ch. reach_ch og st ((=) sx) ch /\
         win_at eg ps ang dmn ch
+    so not (supless og ch so subchain og ((=) sx) ch so ch sx
+      so q_chain_complete og)
     so exists sy. (maximum og ch sy
       so (ch sx by subset ((=) sx) ch by subchain og ((=) sx) ch
                by order (subchain og) by order og)
@@ -614,21 +621,27 @@ module TransProof
       (forall o1 f1 b1 ch. o1 = sbg /\ f1 = xt /\ b1 = (=) sx ->
         "induction" tr_reach o1 f1 b1 ch -> all_log_coh lg ch)
     by (forall ch. reach_ch og st ((=) sx) ch /\ all_log_coh lg ch ->
-      all_log_coh lg (xt ch) by let nst = st ch in log_coh lg 0 nst
-      by let sp0 = sup og ch in
-        let a = ang sp0 ch in
-        let d = dmn a in
-        if ch sp0 /\ ug.G.transition sp0 a /\ a d
-        then log_coh lg 0 d by let x = choice (inter a (log_coh lg 0)) in
-            log_coh lg 0 x || log_coh lg 0 d
-        else (ch sx by subset ((=) sx) ch by sbg ((=) sx) ch by order sbg)
-          so (supremum og ch nst by chain og ch so exists sp. supremum og ch sp)
-          so if ch sp0 then true else maxless og ch
-          so forall n. 0 <= n -> nst.log n = lg n
-          by go_beyond ch (n+1)
-          so exists s0. ch s0 /\ urange s0.time (n+1)
-          so og s0 nst so urange s0.time n
-          so lg n = s0.log (n+0) = nst.log n
+      all_log_coh lg (xt ch) by "case_split" match st ch with
+      | None -> xt ch = ch
+      | Some nst -> (xt ch = add ch nst by chain og ch)
+        so log_coh lg 0 nst
+        by let sp0 = sup og ch in
+          let a = ang sp0 ch in
+          let d = dmn a in
+          supremum og ch sp0
+          so if ch sp0 /\ ug.G.transition sp0 a /\ a d
+          then d = nst so log_coh lg 0 d
+            by let x = choice (inter a (log_coh lg 0)) in
+              log_coh lg 0 x || log_coh lg 0 d
+          else (ch sx by subset ((=) sx) ch by sbg ((=) sx) ch by order sbg)
+            so nst = sp0
+            so if ch sp0 then true else maxless og ch
+            so forall n. 0 <= n -> nst.log n = lg n
+            by go_beyond ch (n+1)
+            so exists s0. ch s0 /\ urange s0.time (n+1)
+            so og s0 nst so urange s0.time n
+            so lg n = s0.log (n+0) = nst.log n
+      end
     ) /\ (forall chh sp. chain sbg chh /\ supremum sbg chh sp /\
         (forall ch. chh ch -> all_log_coh lg ch) ->
         all_log_coh lg sp by sp = bigunion chh)
@@ -652,6 +665,8 @@ module TransProof
       exists ch. reach_ch og st ((=) sx) ch /\
         win_at ug ps ang dmn ch
     so transit sys ch
+    so not (supless og ch so subchain og ((=) sx) ch so ch sx
+      so q_chain_complete og)
     so exists sy.
       (maximum og ch sy
          so ch sy so (log_coh lg 0 sy by all_log_coh lg ch)
@@ -733,7 +748,6 @@ module TransProof
       end
     ))
 
-  use import game_fmla.Subgame
   use import game_fmla.FmlaRules
 
   function nlog (tm:int) (lg:int -> 'a) (z:'a) : int -> 'a =
@@ -976,6 +990,25 @@ module TransProof
           so local_repr sys sp = Limit sp'
         )
     end
+
+  (* Immediate application: translate transition steps into enforcements
+     properties. *)
+  lemma egame_trans : forall sys:system 'a 'o,x y.
+    system_wf sys /\ sys.transition x y ->
+      let eg = egame sys in
+      let p = (=) x in let q = (=) y in
+      enforce (st_pre sys p) (st_post sys q none) eg
+      by forall x. p x -> (exists lg. x = lg 0 /\ reach sys q none lg)
+      by let lg = \n. if n <= 0 then x else y in
+        reach sys q none lg by fin_reach sys q lg 1
+
+  lemma ugame_trans : forall sys:system 'a 'o,x y.
+    system_wf sys /\ sys.transition x y ->
+      let ug = ugame sys in
+      let p = (=) x in let q = sys.transition x in
+      enforce (st_pre sys p) (st_post sys q none) ug
+      by forall lg. p (lg 0) -> correct sys q none lg
+      by fin_correct sys q lg 0 \/ fin_correct sys q lg 1
 
   clone TransWf with
     goal q_chain_complete_countable_complete,
