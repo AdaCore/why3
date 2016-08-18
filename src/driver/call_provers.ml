@@ -158,7 +158,7 @@ let print_prover_status fmt = function
   | Unix.WEXITED n -> fprintf fmt "exited with status %d" n
 
 let print_steps fmt s =
-  if s >= 0 then fprintf fmt ", %d steps)" s
+  if s >= 0 then fprintf fmt ", %d steps" s
 
 let print_prover_result fmt {pr_answer = ans; pr_status = status;
                              pr_output = out; pr_time   = t;
