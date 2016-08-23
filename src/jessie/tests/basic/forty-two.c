@@ -11,12 +11,10 @@ void g(void) {
   //@ assert x*7 == 42;
 }
 
-// ensures \result == 42;
-/*
+//@ ensures \result == 42;
 int h(void) {
   return 6*7;
 }
-*/
 
 /*
 Local Variables:

@@ -5,7 +5,7 @@
 
 //@ logic integer sum_upto(integer n) = n*(n+1) / 2;
 
-/*@ lemma sum_rec: \forall integer n; n >=0 ==>
+/*@ lemma sum_rec: \forall integer n; n >= 0 ==>
   @     sum_upto(n+1) == sum_upto(n)+n+1;
   @*/
 
@@ -41,6 +41,6 @@ long main () {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 rec.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 rec.c"
 End:
 */

@@ -444,6 +444,8 @@ type denv = {
   locals : (Stv.t option * dvty) Mstr.t;
 }
 
+let denv_contents d = d.locals
+
 let denv_empty = { frozen = []; locals = Mstr.empty }
 
 let is_frozen frozen v =

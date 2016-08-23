@@ -23,8 +23,6 @@ void g(int x) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 call.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 call.c"
 End:
 */
-
-

@@ -144,6 +144,8 @@ val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
 
 val denv_get_opt : denv -> string -> dexpr_node option
 
+val denv_contents : denv -> (Ty.Stv.t option * dvty) Mstr.t
+
 (** Constructors *)
 
 val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
