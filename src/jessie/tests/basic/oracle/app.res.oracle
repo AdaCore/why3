@@ -6,49 +6,37 @@
 [kernel] Parsing tests/basic/app.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
+[jessie3] create logic variable 67
 [jessie3] creating logic symbol 68 (f)
 [jessie3] processing function g
+[jessie3] create local program variable x (71), mutable = false
+[jessie3] fundecl g done
+[jessie3] denv_global contains []
+[jessie3] function parameter x
+[jessie3] lookup program variable x (71)
+[jessie3] got program variable x (71) : ev = DEvar(x), mutable = false
+[jessie3] denv contains [g]
 [jessie3] created program function g (69)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
-[jessie3] made 1 function(s)
-[jessie3] Running provers...
-[jessie3] running theory 1:
-[jessie3] theory Global_logic_declarations
-            (* use why3.BuiltIn.BuiltIn *)
-            
-            (* use int.Int *)
-            
-            (* use real.Real *)
-            
-            (* use map.Map *)
-            
-            function f (x:int) : int = x + 1
-            end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] running theory 1:
-[jessie3] theory C_Functions
-            (* use why3.BuiltIn.BuiltIn *)
-            
-            (* use why3.Bool.Bool *)
-            
-            (* use why3.Unit.Unit *)
-            
-            (* use why3.Prelude.Prelude *)
-            
-            (* use int.Int *)
-            
-            (* use real.Real *)
-            
-            (* use map.Map *)
-            
-            (* use Global_logic_declarations *)
-            
-            (* use ref.Ref *)
-            
-            (* use mach.bv.BVCheck32 *)
-            
-            goal WP_parameter_g : true
-            end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (WP_parameter g): Valid, Valid, Valid, Valid, Valid
+[jessie3] failure: Exception raised during translation to Why3:
+                   Ident f is not yet declared
+[kernel] Current source was: tests/basic/app.c:11
+         The full backtrace is:
+         Raised at file "src/kernel_services/plugin_entry_points/log.ml", line 583, characters 30-31
+         Called from file "src/kernel_services/plugin_entry_points/log.ml", line 577, characters 9-16
+         Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 580, characters 15-16
+         Called from file "register.ml", line 87, characters 6-26
+         Called from file "queue.ml", line 105, characters 6-15
+         Called from file "src/kernel_internals/runtime/boot.ml", line 37, characters 4-20
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 787, characters 2-9
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 817, characters 18-64
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 228, characters 4-8
+         
+         Plug-in jessie3 aborted: internal error.
+         Please report as 'crash' at http://bts.frama-c.com/.
+         Your Frama-C version is Aluminium-20160501.
+         Note that a version and a backtrace alone often do not contain enough
+         information to understand the bug. Guidelines for reporting bugs are at:
+         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines

@@ -2,8 +2,9 @@
    OPT: -journal-disable -jessie3
 */
 
-void f(void) {
+int f(void) {
   //@ assert 6*7 == 42;
+  return 0;
 }
 
 void g(void) {

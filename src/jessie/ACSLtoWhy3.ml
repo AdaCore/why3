@@ -464,7 +464,12 @@ let get_var denv v =
       Self.result "got program variable %s (%d) : ev = %a, mutable = %b"
                   v.vname v.vid pr_de ev is_mutable;
       let ev = match ev with
-        | Dexpr.DEvar _ -> Dexpr.DEpv (Hashtbl.find global_vars v.vid)
+        | Dexpr.DEvar _ ->
+           begin try
+               let v = Hashtbl.find global_vars v.vid in
+               Dexpr.DEpv v
+             with Not_found -> ev
+           end
         | _ -> ev
       in
       ev, is_mutable
@@ -476,7 +481,8 @@ let get_var denv v =
                   (Pp.print_list Pp.semi Format.pp_print_string) l;
       Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
-(*let program_funs = Hashtbl.create 257
+(*
+let program_funs = Hashtbl.create 257
  *)
 (*
 let create_function v args spec ret_type body =
@@ -1116,13 +1122,26 @@ and lval denv (host,offset) =
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
-let functional_expr e =
+let global_funs : (int,Expr.rsymbol) Hashtbl.t = Hashtbl.create 257
+
+let functional_expr denv e =
   match e.enode with
-    | Lval (Var _v, NoOffset) ->
-       Self.not_yet_implemented "functional_expr Lval"
+    | Lval (Var v, NoOffset) ->
 (*
-      let rs,_cexp = get_function v in
-      Dexpr.dexpr(Dexpr.DErs rs) *)
+       Self.not_yet_implemented "functional_expr Lval"
+ *)
+      Self.log "lookup program function %s (%d)" v.vname v.vid;
+      let ev = Dexpr.denv_get denv v.vname in
+      let ev = match ev with
+        | Dexpr.DEvar _ ->
+           begin try
+               let v = Hashtbl.find global_funs v.vid in
+               Dexpr.DErs v
+             with Not_found -> ev
+           end
+        | _ -> ev
+      in
+      Dexpr.dexpr ev
     | Lval _
     | Const _
     | BinOp _
@@ -1163,12 +1182,12 @@ let instr denv i =
   match i with
   | Set(lv,e,loc) -> assignment denv lv (expr denv e) loc
   | Call (None, e, el, _loc) ->
-    let e = functional_expr e in
+    let e = functional_expr denv e in
     List.fold_left
       (fun acc e -> de_app acc (expr denv e))
       e el
   | Call (Some lv, e, el, loc) ->
-    let e = functional_expr e in
+    let e = functional_expr denv e in
     let e =
     List.fold_left
       (fun acc e -> de_app acc (expr denv e))
@@ -1395,12 +1414,22 @@ let fundecl denv_global fdec =
   in
   Self.result "denv contains @[[%a]@]"
               (Pp.print_list Pp.semi Format.pp_print_string) l;
-  try
-    denv,Dexpr.rec_defn def
-  with e ->
-       Self.fatal "Dexpr.rec_defn failed!:@ %a"
-        Exn_printer.exn_printer e
-
+  let def =
+    try
+      Dexpr.rec_defn def
+    with e ->
+      Self.fatal "Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e
+  in
+  let rs =
+    match def with
+    | Expr.LDvar _ -> assert false
+    | Expr.LDrec [d] -> d.Expr.rec_sym
+    | Expr.LDrec _ -> assert false
+    | Expr.LDsym (rs,_) -> rs
+  in
+  Hashtbl.add global_funs fun_id.vid rs;
+  Self.result "created program function %s (%d)" fun_id.vname fun_id.vid;
+  denv,def
 
 
 

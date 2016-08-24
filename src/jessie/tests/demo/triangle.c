@@ -3,7 +3,7 @@
    OPT: -journal-disable -jessie3
 */
 
-/* Area of a triangle, a formale revisit
+/* Area of a triangle, a formal revisit
  * http://hal.inria.fr/hal-00790071
  */
 
@@ -33,6 +33,6 @@ double triangle (double a,double b, double c) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 triangle.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 triangle.c"
 End:
 */

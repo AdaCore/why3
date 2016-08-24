@@ -16,8 +16,6 @@ int g(int x) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 app.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 app.c"
 End:
 */
-
-

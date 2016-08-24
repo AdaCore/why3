@@ -6,31 +6,60 @@
 [kernel] Parsing tests/demo/isqrt.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
+[jessie3] create logic variable 67
 [jessie3] creating logic symbol 68 (sqr)
 [jessie3] processing function isqrt
-[jessie3] created program function isqrt (69)
-[jessie3] processing function main
-[jessie3] created program function main (76)
-[jessie3] found 1 logic decl(s)
-[jessie3] made 1 theory(ies)
-[jessie3] failure: Exception raised during translation to Why3:
-                   Ident isqrt is not yet declared
-[jessie3] failure: Exception raised when loading prover drivers:
-                   anomaly: Log.AbortFatal("jessie3")
+[jessie3] create local program variable x (71), mutable = false
+[jessie3] fundecl isqrt done
+[jessie3] denv_global contains []
+[jessie3] function parameter x
+[jessie3] local variable count
+[jessie3] create local program variable count (74), mutable = true
+[jessie3] local variable sum
+[jessie3] create local program variable sum (75), mutable = true
+[jessie3] lookup program variable count (74)
+[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
+[jessie3] lookup program variable count (74)
+[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
+[jessie3] lookup program variable sum (75)
+[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
+[jessie3] lookup program variable sum (75)
+[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
+[jessie3] lookup program variable count (74)
+[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
+[jessie3] lookup program variable count (74)
+[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
+[jessie3] lookup program variable x (71)
+[jessie3] got program variable x (71) : ev = DEvar(x), mutable = false
+[jessie3] lookup program variable sum (75)
+[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
+[jessie3] lookup program variable sum (75)
+[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
+[jessie3] lookup program variable count (74)
+[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
+[jessie3] denv contains [isqrt]
+[jessie3] failure: Dexpr.rec_defn failed!:
+                   This expression makes a ghost modification in the non-ghost variable count
 [kernel] Current source was: tests/demo/isqrt.c:22
          The full backtrace is:
-         Raised at file "src/kernel/log.ml", line 524, characters 30-31
-         Called from file "src/kernel/log.ml", line 518, characters 9-16
-         Re-raised at file "src/kernel/log.ml", line 521, characters 15-16
-         Called from file "register.ml", line 87, characters 6-113
-         Called from file "queue.ml", line 134, characters 6-20
-         Called from file "src/kernel/boot.ml", line 37, characters 4-20
-         Called from file "src/kernel/cmdline.ml", line 763, characters 2-9
-         Called from file "src/kernel/cmdline.ml", line 216, characters 4-8
+         Raised at file "src/kernel_services/plugin_entry_points/log.ml", line 583, characters 30-31
+         Called from file "src/kernel_services/plugin_entry_points/log.ml", line 577, characters 9-16
+         Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 580, characters 15-16
+         Called from file "ACSLtoWhy3.ml", line 1421, characters 6-72
+         Called from file "ACSLtoWhy3.ml", line 1445, characters 19-36
+         Called from file "list.ml", line 88, characters 24-34
+         Called from file "ACSLtoWhy3.ml", line 1565, characters 6-65
+         Called from file "register.ml", line 87, characters 6-26
+         Called from file "queue.ml", line 105, characters 6-15
+         Called from file "src/kernel_internals/runtime/boot.ml", line 37, characters 4-20
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 787, characters 2-9
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 817, characters 18-64
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 228, characters 4-8
          
          Plug-in jessie3 aborted: internal error.
          Please report as 'crash' at http://bts.frama-c.com/.
-         Your Frama-C version is Sodium-20150201.
+         Your Frama-C version is Aluminium-20160501.
          Note that a version and a backtrace alone often do not contain enough
          information to understand the bug. Guidelines for reporting bugs are at:
          http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines

@@ -41,6 +41,6 @@ int max(int *a, int len) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 array_max.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 array_max.c"
 End:
 */
