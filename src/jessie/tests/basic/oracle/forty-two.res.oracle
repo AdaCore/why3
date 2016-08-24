@@ -10,12 +10,6 @@
 [jessie3] processing function f
 [jessie3] fundecl f done
 [jessie3] denv_global contains []
-[jessie3] local variable __retres
-[jessie3] create local program variable __retres (76), mutable = true
-[jessie3] lookup program variable __retres (76)
-[jessie3] got program variable __retres (76) : ev = DEvar(__retres), mutable = true
-[jessie3] lookup program variable __retres (76)
-[jessie3] got program variable __retres (76) : ev = DEvar(__retres), mutable = true
 [jessie3] denv contains [f]
 [jessie3] created program function f (67)
 [jessie3] processing function g
@@ -31,11 +25,11 @@
 [jessie3] fundecl h done
 [jessie3] denv_global contains [g; f]
 [jessie3] local variable __retres
-[jessie3] create local program variable __retres (77), mutable = true
-[jessie3] lookup program variable __retres (77)
-[jessie3] got program variable __retres (77) : ev = DEvar(__retres), mutable = true
-[jessie3] lookup program variable __retres (77)
-[jessie3] got program variable __retres (77) : ev = DEvar(__retres), mutable = true
+[jessie3] create local program variable __retres (76), mutable = true
+[jessie3] lookup program variable __retres (76)
+[jessie3] got program variable __retres (76) : ev = DEvar(__retres), mutable = true
+[jessie3] lookup program variable __retres (76)
+[jessie3] got program variable __retres (76) : ev = DEvar(__retres), mutable = true
 [jessie3] denv contains [h; g; f]
 [jessie3] created program function h (72)
 [jessie3] found 0 logic decl(s)
@@ -58,11 +52,7 @@
             
             (* use mach.bv.BVCheck32 *)
             
-            goal VC_f :
-              (0 <= 0 /\ 0 < two_power_size) /\
-               (forall o:t.
-                 to_uint o = 0 /\ o = of_int 0 ->
-                  (6 * 7) = 42 && 0 <= 0 /\ 0 < two_power_size)
+            goal VC_f : (6 * 7) = 42
             
             goal VC_g :
               (0 <= 0 /\ 0 < two_power_size) /\
@@ -91,14 +81,12 @@
                               us_retres = o3 -> to_uint us_retres = 42)))))
             end
 [jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
-[jessie3] Task 1 (VC f) (precondition): Valid, Valid, Valid
-[jessie3] Task 2 (VC f) (assertion): Valid, Valid, Valid
-[jessie3] Task 3 (VC f) (precondition): Valid, Valid, Valid
-[jessie3] Task 4 (VC g) (precondition): Valid, Valid, Valid
-[jessie3] Task 5 (VC g) (precondition): Valid, Valid, Valid
-[jessie3] Task 6 (VC g) (assertion): Valid, Valid, Valid
+[jessie3] Task 1 (VC f) (assertion): Valid, Valid, Valid
+[jessie3] Task 2 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC g) (assertion): Valid, Valid, Valid
+[jessie3] Task 5 (VC h) (precondition): Valid, Valid, Valid
+[jessie3] Task 6 (VC h) (precondition): Valid, Valid, Valid
 [jessie3] Task 7 (VC h) (precondition): Valid, Valid, Valid
 [jessie3] Task 8 (VC h) (precondition): Valid, Valid, Valid
-[jessie3] Task 9 (VC h) (precondition): Valid, Valid, Valid
-[jessie3] Task 10 (VC h) (precondition): Valid, Valid, Valid
-[jessie3] Task 11 (VC h) (postcondition): Valid, Valid, Valid
+[jessie3] Task 9 (VC h) (postcondition): Valid, Valid, Valid

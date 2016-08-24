@@ -277,7 +277,7 @@ let mlw_int_type = Ity.ity_int
 let mlw_uint32_type =  Ity.ity_app uint32_type [] []
 let mlw_int64_type = Ity.ity_app int64_type [] []
 
-let e_void = Dexpr.dexpr (Dexpr.DEls (Term.fs_tuple 0))
+let e_void = Dexpr.dexpr (Dexpr.DErs (Expr.rs_tuple 0))
 let e_true = Dexpr.dexpr Dexpr.DEtrue
 
 let de_const_int s = Dexpr.dexpr (Dexpr.DEconst (Number.ConstInt (Literals.integer s)))
@@ -1336,7 +1336,7 @@ let fundecl denv_global fdec =
            l
   in
  *)
-  let body = fdec.sbody in
+  let cbody = fdec.sbody in
   let contract = Annotations.funspec kf in
   let pre,post,_ass = extract_simple_contract contract in
   let locals = Kernel_function.get_locals kf in
@@ -1367,7 +1367,8 @@ let fundecl denv_global fdec =
     in
     let rec add_locals denv l =
       match l with
-      | [] -> block denv body
+      | [] ->
+         block denv cbody
       | v::rem ->
          Self.log "local variable %s" v.vname;
          let _ity,def = ctype_and_default v.vtype in
@@ -1418,7 +1419,7 @@ let fundecl denv_global fdec =
     try
       Dexpr.rec_defn def
     with e ->
-      Self.fatal "Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e
+      Self.fatal "HERE Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e
   in
   let rs =
     match def with

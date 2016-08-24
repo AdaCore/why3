@@ -39,17 +39,29 @@
 [jessie3] lookup program variable count (74)
 [jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
 [jessie3] denv contains [isqrt]
-[jessie3] failure: Dexpr.rec_defn failed!:
-                   This expression makes a ghost modification in the non-ghost variable count
+[jessie3] created program function isqrt (69)
+[jessie3] processing function main
+[jessie3] fundecl main done
+[jessie3] denv_global contains [isqrt]
+[jessie3] local variable r
+[jessie3] create local program variable r (79), mutable = true
+[jessie3] lookup program variable r (79)
+[jessie3] got program variable r (79) : ev = DEvar(r), mutable = true
+[jessie3] lookup program function isqrt (69)
+[jessie3] lookup program variable r (79)
+[jessie3] got program variable r (79) : ev = DEvar(r), mutable = true
+[jessie3] denv contains [main; isqrt]
+[jessie3] created program function main (76)
+[jessie3] found 1 logic decl(s)
+[jessie3] made 1 theory(ies)
+[jessie3] failure: add_pdecl
 [kernel] Current source was: tests/demo/isqrt.c:22
          The full backtrace is:
          Raised at file "src/kernel_services/plugin_entry_points/log.ml", line 583, characters 30-31
          Called from file "src/kernel_services/plugin_entry_points/log.ml", line 577, characters 9-16
          Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 580, characters 15-16
-         Called from file "ACSLtoWhy3.ml", line 1421, characters 6-72
-         Called from file "ACSLtoWhy3.ml", line 1445, characters 19-36
          Called from file "list.ml", line 88, characters 24-34
-         Called from file "ACSLtoWhy3.ml", line 1565, characters 6-65
+         Called from file "ACSLtoWhy3.ml", line 1587, characters 12-59
          Called from file "register.ml", line 87, characters 6-26
          Called from file "queue.ml", line 105, characters 6-15
          Called from file "src/kernel_internals/runtime/boot.ml", line 37, characters 4-20

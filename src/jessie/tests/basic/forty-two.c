@@ -2,9 +2,8 @@
    OPT: -journal-disable -jessie3
 */
 
-int f(void) {
+void f(void) {
   //@ assert 6*7 == 42;
-  return 0;
 }
 
 void g(void) {
@@ -16,6 +15,8 @@ void g(void) {
 int h(void) {
   return 6*7;
 }
+
+
 
 /*
 Local Variables:

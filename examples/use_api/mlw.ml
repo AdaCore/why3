@@ -39,7 +39,7 @@ let mul_int : Term.lsymbol =
 let unit_type = Ty.ty_tuple []
 
 (* start a module named "Program" *)
-let m = Mlw_module.create_module env (Ident.id_fresh "Program")
+let m = Pmodule.create_module env (Ident.id_fresh "Program")
 
 
 (* declaration of
@@ -50,36 +50,46 @@ let m = Mlw_module.create_module env (Ident.id_fresh "Program")
         assert { 6*7 = 42 }
  *)
 let d =
+  let id = Ident.id_fresh "f" in
   let args =
-    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
+    [None,false,Dexpr.dity_of_ity Ity.ity_unit]
   in
-  let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
-  let spec = {
-    Mlw_ty.c_pre = Term.t_true;
-    c_post = Mlw_ty.create_post result Term.t_true;
-    c_xpost = Mlw_ty.Mexn.empty;
-    c_effect = Mlw_ty.eff_empty;
-    c_variant = [];
-    c_letrec  = 0;
-  }
-  in
-  let body =
-    let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
-    let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
-    let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
-    let p =
-      Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
+  let body denv =
+    let spec_later _lvm _old _ret_type =
+      {
+        Dexpr.ds_pre = [];
+        Dexpr.ds_post = [];
+        Dexpr.ds_xpost = Ity.Mexn.empty;
+        Dexpr.ds_reads = [];
+        Dexpr.ds_writes = [];
+        Dexpr.ds_diverge = false;
+        Dexpr.ds_checkrw = false;
+      }
     in
-    Mlw_expr.e_assert Mlw_expr.Aassert p
+    let variants _lvm _old = [Term.t_nat_const 0,None] in
+    let body =
+      let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
+      let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
+      let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
+      let p =
+        Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
+      in
+      Dexpr.dexpr (Dexpr.DEassert(Expr.Assert,(fun _lvm _old -> p)))
+    in
+    (spec_later,variants,body)
   in
-  let lambda = {
-    Mlw_expr.l_args = args;
-    l_expr = body;
-    l_spec = spec;
-  }
+  let predef = (id, false (* function is not ghost *),
+                Expr.RKnone (* function is not intended to be used in the specifications *),
+                args,
+                Dexpr.dity_of_ity Ity.ity_unit,
+                Ity.MaskVisible,
+                body)
   in
-  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
-  Mlw_decl.create_rec_decl [def]
+  let denv,def = Dexpr.drec_defn Dexpr.denv_empty [predef] in
+  let def = Dexpr.rec_defn def in
+  Format.eprintf "It works!@.";
+  def
+
 
 (*
 
@@ -93,6 +103,7 @@ declaration of
 
 *)
 
+(***
 
 (* import the ref.Ref module *)
 
@@ -158,7 +169,7 @@ let d2 =
   Mlw_decl.create_rec_decl [def]
 
 
-
+ **)
 
 
 
@@ -325,6 +336,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma mlw.ml"
+compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma -I `ocamlfind query menhirLib` menhirLib.cmo -I `ocamlfind query camlzip` zip.cma ../../lib/why3/why3.cma mlw.ml"
 End:
 *)
