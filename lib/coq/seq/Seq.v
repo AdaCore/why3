@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -74,7 +74,7 @@ Defined.
 Definition set: forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z -> a -> (seq
   a).
 admit.
-Defined.
+Admitted.
 
 (* Why3 goal *)
 Lemma set_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
@@ -82,14 +82,14 @@ Lemma set_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
   v)) = (length s)).
 intros a a_WT s i v (h1,h2).
 admit.
-Qed.
+Admitted.
 
 (* Why3 goal *)
 Lemma set_def2 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
   (v:a), ((0%Z <= i)%Z /\ (i < (length s))%Z) -> ((get (set s i v) i) = v).
 intros a a_WT s i v (h1,h2).
 admit.
-Qed.
+Admitted.
 
 (* Why3 goal *)
 Lemma set_def3 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
@@ -98,7 +98,7 @@ Lemma set_def3 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
   j) = (get s j))).
 intros a a_WT s i v (h1,h2) j (h3,h4) h5.
 admit.
-Qed.
+Admitted.
 
 (* Why3 assumption *)
 Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(seq a)) (s2:(seq
@@ -243,7 +243,7 @@ rewrite (Zabs2Nat.id (Datatypes.length l)). omega.
 subst i.
 rewrite (Zabs2Nat.id (Datatypes.length l)). omega.
 *)
-Qed.
+Admitted.
 
 (* Why3 goal *)
 Lemma snoc_last : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (x:a),
@@ -296,7 +296,7 @@ unfold length, infix_plpl.
 rewrite List.app_length.
 rewrite Nat2Z.inj_add. auto.
 *)
-Qed.
+Admitted.
 
 (* Why3 goal *)
 Lemma concat_get1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(seq a))

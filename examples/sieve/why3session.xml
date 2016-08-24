@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.2" timelimit="6" memlimit="1000"/>
-<prover id="5" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../sieve.mlw" expanded="true">
-<theory name="Sieve" sum="a4ff6967cc063435496d968c626846f0" expanded="true">
+<theory name="Sieve" sum="a3fc383ce2ea2023cf0da48f1f4c958a" expanded="true">
  <goal name="WP_parameter incr" expl="VC for incr">
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
@@ -75,10 +75,10 @@
    <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
    </goal>
    <goal name="WP_parameter sieve.15.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.86" steps="83"/></proof>
+   <proof prover="0"><result status="valid" time="0.84" steps="83"/></proof>
    </goal>
    <goal name="WP_parameter sieve.15.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
    </goal>
    <goal name="WP_parameter sieve.15.5" expl="5. assertion">
    <proof prover="0"><result status="valid" time="0.05" steps="65"/></proof>
@@ -110,13 +110,13 @@
    <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
    </goal>
    <goal name="WP_parameter sieve.19.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="0.06" steps="39"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
    </goal>
    <goal name="WP_parameter sieve.19.4" expl="4. assertion">
    <proof prover="0"><result status="valid" time="0.14" steps="74"/></proof>
    </goal>
    <goal name="WP_parameter sieve.19.5" expl="5. assertion">
-   <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="3"/></proof>
    </goal>
    <goal name="WP_parameter sieve.19.6" expl="6. assertion">
    <proof prover="0"><result status="valid" time="0.03" steps="35"/></proof>

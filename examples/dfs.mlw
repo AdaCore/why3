@@ -1,0 +1,98 @@
+
+(* Depth-First Search
+   (following François Pottier's lecture INF431 at École Polytechnique)
+
+   We are given memory cells with two (possibly null) [left] and [right]
+   neighbours and a mutable Boolean attribute [marked]. In Java, it would
+   look like
+
+     class Cell { Cell left, right; boolean marked; ... }
+
+   We mark all cells that are reachable from a given cell [root] using
+   depth-first search, that is using the following recursive function:
+
+     static void dfs(Cell c) {
+       if (c != null && !c.marked) {
+         c.marked = true;
+         dfs(c.left);
+         dfs(c.right);
+       }
+    }
+
+  We wish to prove that, assuming that all cells are initially unmarked,
+  a call to dfs(root) will mark all cells reachable from root, and only
+  those cells.
+
+*)
+
+module DFS
+
+  use import bool.Bool
+  use import map.Map
+  use import ref.Ref
+
+  type loc
+  constant null: loc
+  constant root: loc
+
+  function left  loc: loc
+  function right loc: loc
+
+  type marks = map loc bool
+  val marked: ref marks
+  val ghost busy: ref marks
+
+  predicate edge (x y: loc) = x <> null && (left x = y || right x = y)
+
+  inductive path (x y: loc) =
+  | path_nil: forall x: loc. path x x
+  | path_cons: forall x y z: loc. path x y -> edge y z -> path x z
+
+  predicate only_descendants_are_marked (marked: marks) =
+    forall x: loc. x <> null && marked[x] = True -> path root x
+
+  predicate well_colored (marked busy: marks) =
+    forall x y: loc. edge x y -> y <> null ->
+    busy[x] = True || (marked[x] = True -> marked[y] = True)
+
+  let rec dfs (c: loc) : unit
+    requires { well_colored !marked !busy }
+    requires { only_descendants_are_marked !marked }
+    requires { path root c }
+    diverges
+    ensures  { well_colored !marked !busy }
+    ensures  { forall x: loc. (old !marked)[x] = True -> !marked[x] = True }
+    ensures  { c <> null -> !marked[c] = True }
+    ensures  { forall x: loc. !busy[x] = True -> (old !busy)[x] = True }
+    ensures  { only_descendants_are_marked !marked }
+  =
+    if c <> null && not !marked[c] then begin
+      ghost busy := !busy[c <- True];
+      marked := !marked[c <- True];
+      dfs (left c);
+      dfs (right c);
+      busy := !busy[c <- False]
+    end
+
+  predicate all_descendants_are_marked (marked: marks) =
+    root <> null ->
+    marked[root] = True &&
+    forall x y: loc. edge x y -> marked[x] = True -> y <> null -> marked[y] = True
+
+  lemma reformulation:
+    forall marked: marks.
+    all_descendants_are_marked marked ->
+    forall x: loc. x <> null -> path root x -> marked[x] = True /\ root <> null
+
+  let traverse () : unit
+    requires { forall x: loc. x <> null ->
+               !marked[x] = False && !busy[x] = False }
+    diverges
+    ensures  { only_descendants_are_marked !marked }
+    ensures  { all_descendants_are_marked !marked }
+    ensures  { forall x: loc. x <> null -> !busy[x] = False }
+  =
+    assert { well_colored !marked !busy };
+    dfs root
+
+end

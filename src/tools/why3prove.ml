@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -277,10 +277,15 @@ let output_theory drv fname _tname th task dir =
   close_out cout
 
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
+  let limit =
+    { Call_provers.empty_limit with
+      Call_provers.limit_time = timelimit;
+                   limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let call = Driver.prove_task ~command ~cntexample:!opt_cntexmp ~timelimit ~memlimit drv task in
-        let res = Call_provers.wait_on_call (call ()) () in
+        let call =
+          Driver.prove_task ~command ~limit ~cntexample:!opt_cntexmp drv task in
+        let res = Call_provers.wait_on_call call in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res

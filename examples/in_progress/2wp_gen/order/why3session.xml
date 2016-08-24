@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
+<file name="../order.mlw">
+<theory name="Ordered" sum="c4cd675c6d383cf9b5db02c4bda78691">
+ <goal name="maximum_supremum">
+ <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="22"/></proof>
+ </goal>
+ <goal name="minimum_infimum">
+ <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="29"/></proof>
+ </goal>
+</theory>
+<theory name="LimUniq" sum="145bb52ee4a424df949cd6b90ea9915f">
+ <goal name="maximum_uniq">
+ <transf name="split_goal_wp">
+  <goal name="maximum_uniq.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.03" steps="97"/></proof>
+  </goal>
+  <goal name="maximum_uniq.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.02" steps="76"/></proof>
+  </goal>
+  <goal name="maximum_uniq.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="minimum_uniq">
+ <transf name="split_goal_wp">
+  <goal name="minimum_uniq.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="74"/></proof>
+  </goal>
+  <goal name="minimum_uniq.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.11" steps="109"/></proof>
+  </goal>
+  <goal name="minimum_uniq.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="infimum_uniq">
+ <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
+ </goal>
+ <goal name="supremum_uniq">
+ <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+ </goal>
+</theory>
+<theory name="Chain" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="WfChain" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="WfChainProof" sum="76c1ff9b2be6dcaacb75e7b135c35314">
+ <goal name="wf_chain_hence_acc_on">
+ <transf name="split_goal_wp">
+  <goal name="wf_chain_hence_acc_on.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_acc_on.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_acc_on.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.02" steps="30"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_acc_on.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.05" steps="166"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_acc_on.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.09" steps="345"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wf_chain_hence_chain">
+ <transf name="split_goal_wp">
+  <goal name="wf_chain_hence_chain.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.01" steps="0"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.05" steps="210"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.13" steps="204"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.6" expl="6.">
+  <proof prover="2"><result status="valid" time="0.10" steps="271"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.7" expl="7.">
+  <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.8" expl="8.">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="wf_chain_hence_chain.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wf_on_so_wf_chain">
+ <transf name="split_goal_wp">
+  <goal name="wf_on_so_wf_chain.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.6" expl="6.">
+  <proof prover="2"><result status="valid" time="0.01" steps="0"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.7" expl="7.">
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="wf_on_so_wf_chain.8" expl="8.">
+  <transf name="induction_pr">
+   <goal name="wf_on_so_wf_chain.8.1" expl="1.">
+   <transf name="simplify_trivial_quantification_in_goal">
+    <goal name="wf_on_so_wf_chain.8.1.1" expl="1.">
+    <transf name="simplify_trivial_quantification_in_goal">
+     <goal name="wf_on_so_wf_chain.8.1.1.1" expl="1.">
+     <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WfChain.wf_chain_alt_def">
+ <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
+ </goal>
+</theory>
+<theory name="SubChain" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="SubChainProof" sum="c57370796bba4f99edbd20bd549c07e9">
+ <goal name="subchain_antisymetric">
+ <proof prover="2"><result status="valid" time="0.03" steps="123"/></proof>
+ </goal>
+ <goal name="subchain_order">
+ <proof prover="2"><result status="valid" time="0.03" steps="158"/></proof>
+ </goal>
+ <goal name="subchain_completion">
+ <transf name="split_goal_wp">
+  <goal name="subchain_completion.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="subchain_completion.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="subchain_completion.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="subchain_completion.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.02" steps="75"/></proof>
+  </goal>
+  <goal name="subchain_completion.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
+  </goal>
+  <goal name="subchain_completion.6" expl="6.">
+  <proof prover="2"><result status="valid" time="0.02" steps="55"/></proof>
+  </goal>
+  <goal name="subchain_completion.7" expl="7.">
+  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="subchain_completion.8" expl="8.">
+  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="subchain_completion.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.01" steps="58"/></proof>
+  </goal>
+  <goal name="subchain_completion.10" expl="10.">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="subchain_completion.11" expl="11.">
+  <proof prover="2"><result status="valid" time="0.01" steps="65"/></proof>
+  </goal>
+  <goal name="subchain_completion.12" expl="12.">
+  <proof prover="2"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="subchain_completion.13" expl="13.">
+  <proof prover="2"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="chain_subchain_completion">
+ <transf name="split_goal_wp">
+  <goal name="chain_subchain_completion.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.16" steps="357"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.6" expl="6.">
+  <proof prover="2"><result status="valid" time="0.02" steps="54"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.7" expl="7.">
+  <proof prover="2"><result status="valid" time="0.74" steps="1001"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.8" expl="8.">
+  <proof prover="2"><result status="valid" time="0.04" steps="63"/></proof>
+  </goal>
+  <goal name="chain_subchain_completion.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wf_subchain_completion">
+ <transf name="split_goal_wp">
+  <goal name="wf_subchain_completion.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.18" steps="368"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.2" expl="2.">
+  <proof prover="2"><result status="valid" time="0.02" steps="62"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.3" expl="3.">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.02" steps="82"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.6" expl="6.">
+  <proof prover="2"><result status="valid" time="0.03" steps="141"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.7" expl="7.">
+  <proof prover="2"><result status="valid" time="0.02" steps="60"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.8" expl="8.">
+  <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="wf_subchain_completion.10" expl="10.">
+  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="SubChain.subchain_complete_order">
+ <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+ </goal>
+ <goal name="SubChain.subchain_completion">
+ <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="SubChain.chain_subchain_completion">
+ <proof prover="2"><result status="valid" time="0.02" steps="48"/></proof>
+ </goal>
+ <goal name="SubChain.wf_subchain_completion">
+ <proof prover="2"><result status="valid" time="0.03" steps="39"/></proof>
+ </goal>
+</theory>
+<theory name="Product" sum="a605e98e1feab6fd671571dae0625b67">
+ <goal name="order_product">
+ <transf name="split_goal_wp">
+  <goal name="order_product.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="order_product.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.49"/></proof>
+  </goal>
+  <goal name="order_product.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.50"/></proof>
+  </goal>
+  <goal name="order_product.4" expl="4.">
+  <proof prover="2"><result status="valid" time="0.04" steps="33"/></proof>
+  </goal>
+  <goal name="order_product.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="order_product.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.52"/></proof>
+  </goal>
+  <goal name="order_product.7" expl="7.">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="order_product.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.59"/></proof>
+  </goal>
+  <goal name="order_product.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="order_product.10" expl="10.">
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="prod_upper_bound">
+ <transf name="split_goal_wp">
+  <goal name="prod_upper_bound.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.55"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.45"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.4" expl="4.">
+  <proof prover="1"><result status="valid" time="2.59"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.6" expl="6.">
+  <proof prover="2"><result status="valid" time="0.03" steps="11"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.7" expl="7.">
+  <proof prover="1"><result status="valid" time="2.85"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.8" expl="8.">
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.04" steps="90"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.10" expl="10.">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.11" expl="11.">
+  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.12" expl="12.">
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="prod_upper_bound.13" expl="13.">
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="prod_lower_bound">
+ <transf name="split_goal_wp">
+  <goal name="prod_lower_bound.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.70"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.3" expl="3.">
+  <proof prover="1"><result status="valid" time="0.68"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.4" expl="4.">
+  <proof prover="1"><result status="valid" time="3.56"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.5" expl="5.">
+  <proof prover="2"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.6" expl="6.">
+  <proof prover="1"><result status="valid" time="0.63"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.7" expl="7.">
+  <proof prover="1"><result status="valid" time="3.72"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.8" expl="8.">
+  <proof prover="1"><result status="valid" time="0.61"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.9" expl="9.">
+  <proof prover="1"><result status="valid" time="0.67"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.10" expl="10.">
+  <proof prover="1"><result status="valid" time="0.72"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.11" expl="11.">
+  <proof prover="1"><result status="valid" time="0.55"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.12" expl="12.">
+  <proof prover="1"><result status="valid" time="0.37"/></proof>
+  </goal>
+  <goal name="prod_lower_bound.13" expl="13.">
+  <proof prover="1"><result status="valid" time="0.65"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="prod_supremum">
+ <transf name="split_goal_wp">
+  <goal name="prod_supremum.1" expl="1.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.06" steps="143"/></proof>
+  </goal>
+  <goal name="prod_supremum.2" expl="2.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.08" steps="142"/></proof>
+  </goal>
+  <goal name="prod_supremum.3" expl="3.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="74"/></proof>
+  </goal>
+  <goal name="prod_supremum.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.54"/></proof>
+  </goal>
+  <goal name="prod_supremum.5" expl="5.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.16" steps="166"/></proof>
+  </goal>
+  <goal name="prod_supremum.6" expl="6.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.05" steps="81"/></proof>
+  </goal>
+  <goal name="prod_supremum.7" expl="7.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.68"/></proof>
+  </goal>
+  <goal name="prod_supremum.8" expl="8.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.07" steps="166"/></proof>
+  </goal>
+  <goal name="prod_supremum.9" expl="9.">
+  <proof prover="2"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="prod_supremum.10" expl="10.">
+  <proof prover="2"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="prod_supremum.11" expl="11.">
+  <proof prover="2"><result status="valid" time="1.23" steps="1436"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="prod_infimum">
+ <transf name="split_goal_wp">
+  <goal name="prod_infimum.1" expl="1.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.05" steps="144"/></proof>
+  </goal>
+  <goal name="prod_infimum.2" expl="2.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.04" steps="143"/></proof>
+  </goal>
+  <goal name="prod_infimum.3" expl="3.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.04" steps="74"/></proof>
+  </goal>
+  <goal name="prod_infimum.4" expl="4.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.69"/></proof>
+  </goal>
+  <goal name="prod_infimum.5" expl="5.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.08" steps="200"/></proof>
+  </goal>
+  <goal name="prod_infimum.6" expl="6.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.07" steps="81"/></proof>
+  </goal>
+  <goal name="prod_infimum.7" expl="7.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.72"/></proof>
+  </goal>
+  <goal name="prod_infimum.8" expl="8.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.06" steps="200"/></proof>
+  </goal>
+  <goal name="prod_infimum.9" expl="9.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="prod_infimum.10" expl="10.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+  <goal name="prod_infimum.11" expl="11.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="1.34" steps="1504"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="ProductChain" sum="77e62c0f32a88126e6186c89d6c363b8">
+ <goal name="prod_chain">
+ <transf name="split_goal_wp">
+  <goal name="prod_chain.1" expl="1.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="prod_chain.2" expl="2.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="prod_chain.3" expl="3.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="prod_chain.4" expl="4.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.04" steps="42"/></proof>
+  </goal>
+  <goal name="prod_chain.5" expl="5.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.41"/></proof>
+  </goal>
+  <goal name="prod_chain.6" expl="6.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="17"/></proof>
+  </goal>
+  <goal name="prod_chain.7" expl="7.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="prod_chain.8" expl="8.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="38"/></proof>
+  </goal>
+  <goal name="prod_chain.9" expl="9.">
+  <proof prover="1" steplimit="-1"><result status="valid" time="0.47"/></proof>
+  </goal>
+  <goal name="prod_chain.10" expl="10.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="prod_chain_complete">
+ <transf name="split_goal_wp">
+  <goal name="prod_chain_complete.1" expl="1.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="28"/></proof>
+  </goal>
+  <goal name="prod_chain_complete.2" expl="2.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="62"/></proof>
+  </goal>
+  <goal name="prod_chain_complete.3" expl="3.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="prod_chain_complete.4" expl="4.">
+  <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="prod_q_chain_complete">
+ <transf name="split_goal_wp">
+  <goal name="prod_q_chain_complete.1" expl="1.">
+  <proof prover="1" steplimit="0"><result status="valid" time="0.52"/></proof>
+  </goal>
+  <goal name="prod_q_chain_complete.2" expl="2.">
+  <proof prover="1" steplimit="0"><result status="valid" time="0.39"/></proof>
+  </goal>
+  <goal name="prod_q_chain_complete.3" expl="3.">
+  <proof prover="2" steplimit="0"><result status="valid" time="0.06" steps="57"/></proof>
+  </goal>
+  <goal name="prod_q_chain_complete.4" expl="4.">
+  <proof prover="2" steplimit="0"><result status="valid" time="0.07" steps="106"/></proof>
+  </goal>
+  <goal name="prod_q_chain_complete.5" expl="5.">
+  <proof prover="2" steplimit="0"><result status="valid" time="0.04" steps="26"/></proof>
+  </goal>
+  <goal name="prod_q_chain_complete.6" expl="6.">
+  <proof prover="2" steplimit="0"><result status="valid" time="0.04" steps="36"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

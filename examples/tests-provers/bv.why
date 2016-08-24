@@ -9,51 +9,51 @@ theory CheckBV64
   constant md    : int                                       =      0x1_0000_0000_0000_0000
   constant lastb : t                                         = of_int 0x8000_0000_0000_0000
 
-  goal ok_zero   : zero                                      = (of_int 0)
+  goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zero                              = 0
+  goal ok_zero2  : to_uint zeros                             = 0
   goal ok_ones2  : to_uint ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
 
-  goal ok1       : add ones one                              = zero
-  goal ok2       : sub zero one                              = ones
+  goal ok1       : add ones one                              = zeros
+  goal ok2       : sub zeros one                             = ones
   goal ok3       : neg ones                                  = one
   goal ok5       : mul one two                               = two
   goal ok6       : mul ones ones                             = one
-  goal ok7       : udiv one two                              = zero
+  goal ok7       : udiv one two                              = zeros
   goal ok8       : urem one two                              = one
   goal ok9       : lsl_bv one one                            = two
   goal ok10      : lsl_bv ones one                           = sub ones one
-  goal ok12      : lsr_bv one two                            = zero
+  goal ok12      : lsr_bv one two                            = zeros
   goal ok13      : lsr_bv ones (sub (of_int sz) one)         = one
-  goal ok14      : asr_bv one two                            = zero
+  goal ok14      : asr_bv one two                            = zeros
   goal ok15      : asr_bv ones two                           = ones
   goal ok16      : bw_and ones one                           = one
   goal ok17      : bw_or  ones one                           = ones
   goal ok18      : bw_xor ones one                           = sub ones one
-  goal ok19      : bw_not ones                               = zero
+  goal ok19      : bw_not ones                               = zeros
   goal ok20      : rotate_right_bv one one                   = lastb
   goal ok21      : rotate_right_bv ones two                  = ones
   goal ok22      : rotate_left_bv lastb one                  = one
   goal ok23      : rotate_left_bv ones two                   = ones
-  goal ok24      : lsl_bv one (add (of_int sz) one)          = zero
-  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zero
+  goal ok24      : lsl_bv one (add (of_int sz) one)          = zeros
+  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zeros
   goal ok26      : asr_bv lastb (add (of_int sz) one)        = ones
   goal ok27      : rotate_right_bv one (add (of_int sz) one) = lastb
   goal ok28      : rotate_left_bv one (add (of_int sz) one)  = two
 
-  goal trap      : of_int md                                 = zero
+  goal trap      : of_int md                                 = zeros
 
-  goal smoke1    : neg lastb                                 = zero
-  goal smoke2    : udiv one zero                             = zero
-  goal smoke3    : urem one zero                             = zero
+  goal smoke1    : neg lastb                                 = zeros
+  goal smoke2    : udiv one zeros                            = zeros
+  goal smoke3    : urem one zeros                            = zeros
   goal smoke4    : lsl_bv ones one                           = ones
   goal smoke5    : ugt (lsr_bv ones one) lastb
   goal smoke6    : ule (asr_bv lastb one) lastb
-  goal smoke7    : rotate_right_bv one one                   = zero
-  goal smoke8    : rotate_left_bv lastb one                  = zero
+  goal smoke7    : rotate_right_bv one one                   = zeros
+  goal smoke8    : rotate_left_bv lastb one                  = zeros
 
   (* from example/logic/bitvectors.why *)
 
@@ -152,51 +152,51 @@ theory CheckBV32
   constant md    : int                                       = 0x100000000
   constant lastb : t                                         = of_int 0x80000000
 
-  goal ok_zero   : zero                                      = (of_int 0)
+  goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zero                              = 0
+  goal ok_zero2  : to_uint zeros                             = 0
   goal ok_ones2  : to_uint ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
 
-  goal ok1       : add ones one                              = zero
-  goal ok2       : sub zero one                              = ones
+  goal ok1       : add ones one                              = zeros
+  goal ok2       : sub zeros one                             = ones
   goal ok3       : neg ones                                  = one
   goal ok5       : mul one two                               = two
   goal ok6       : mul ones ones                             = one
-  goal ok7       : udiv one two                              = zero
+  goal ok7       : udiv one two                              = zeros
   goal ok8       : urem one two                              = one
   goal ok9       : lsl_bv one one                            = two
   goal ok10      : lsl_bv ones one                           = sub ones one
-  goal ok12      : lsr_bv one two                            = zero
+  goal ok12      : lsr_bv one two                            = zeros
   goal ok13      : lsr_bv ones (sub (of_int sz) one)         = one
-  goal ok14      : asr_bv one two                            = zero
+  goal ok14      : asr_bv one two                            = zeros
   goal ok15      : asr_bv ones two                           = ones
   goal ok16      : bw_and ones one                           = one
   goal ok17      : bw_or  ones one                           = ones
   goal ok18      : bw_xor ones one                           = sub ones one
-  goal ok19      : bw_not ones                               = zero
+  goal ok19      : bw_not ones                               = zeros
   goal ok20      : rotate_right_bv one one                   = lastb
   goal ok21      : rotate_right_bv ones two                  = ones
   goal ok22      : rotate_left_bv lastb one                  = one
   goal ok23      : rotate_left_bv ones two                   = ones
-  goal ok24      : lsl_bv one (add (of_int sz) one)          = zero
-  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zero
+  goal ok24      : lsl_bv one (add (of_int sz) one)          = zeros
+  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zeros
   goal ok26      : asr_bv lastb (add (of_int sz) one)        = ones
   goal ok27      : rotate_right_bv one (add (of_int sz) one) = lastb
   goal ok28      : rotate_left_bv one (add (of_int sz) one)  = two
 
-  goal trap      : of_int md                                 = zero
+  goal trap      : of_int md                                 = zeros
 
-  goal smoke1    : neg lastb                                 = zero
-  goal smoke2    : udiv one zero                             = zero
-  goal smoke3    : urem one zero                             = zero
+  goal smoke1    : neg lastb                                 = zeros
+  goal smoke2    : udiv one zeros                            = zeros
+  goal smoke3    : urem one zeros                            = zeros
   goal smoke4    : lsl_bv ones one                           = ones
   goal smoke5    : ugt (lsr_bv ones one) lastb
   goal smoke6    : ule (asr_bv lastb one) lastb
-  goal smoke7    : rotate_right_bv one one                   = zero
-  goal smoke8    : rotate_left_bv lastb one                  = zero
+  goal smoke7    : rotate_right_bv one one                   = zeros
+  goal smoke8    : rotate_left_bv lastb one                  = zeros
 end
 
 theory CheckBV16
@@ -210,51 +210,51 @@ theory CheckBV16
   constant md    : int                                       = 65536
   constant lastb : t                                         = of_int 32768
 
-  goal ok_zero   : zero                                      = (of_int 0)
+  goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zero                              = 0
+  goal ok_zero2  : to_uint zeros                             = 0
   goal ok_ones2  : to_uint ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
 
-  goal ok1       : add ones one                              = zero
-  goal ok2       : sub zero one                              = ones
+  goal ok1       : add ones one                              = zeros
+  goal ok2       : sub zeros one                             = ones
   goal ok3       : neg ones                                  = one
   goal ok5       : mul one two                               = two
   goal ok6       : mul ones ones                             = one
-  goal ok7       : udiv one two                              = zero
+  goal ok7       : udiv one two                              = zeros
   goal ok8       : urem one two                              = one
   goal ok9       : lsl_bv one one                            = two
   goal ok10      : lsl_bv ones one                           = sub ones one
-  goal ok12      : lsr_bv one two                            = zero
+  goal ok12      : lsr_bv one two                            = zeros
   goal ok13      : lsr_bv ones (sub (of_int sz) one)         = one
-  goal ok14      : asr_bv one two                            = zero
+  goal ok14      : asr_bv one two                            = zeros
   goal ok15      : asr_bv ones two                           = ones
   goal ok16      : bw_and ones one                           = one
   goal ok17      : bw_or  ones one                           = ones
   goal ok18      : bw_xor ones one                           = sub ones one
-  goal ok19      : bw_not ones                               = zero
+  goal ok19      : bw_not ones                               = zeros
   goal ok20      : rotate_right_bv one one                   = lastb
   goal ok21      : rotate_right_bv ones two                  = ones
   goal ok22      : rotate_left_bv lastb one                  = one
   goal ok23      : rotate_left_bv ones two                   = ones
-  goal ok24      : lsl_bv one (add (of_int sz) one)          = zero
-  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zero
+  goal ok24      : lsl_bv one (add (of_int sz) one)          = zeros
+  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zeros
   goal ok26      : asr_bv lastb (add (of_int sz) one)        = ones
   goal ok27      : rotate_right_bv one (add (of_int sz) one) = lastb
   goal ok28      : rotate_left_bv one (add (of_int sz) one)  = two
 
-  goal trap      : of_int md                                 = zero
+  goal trap      : of_int md                                 = zeros
 
-  goal smoke1    : neg lastb                                 = zero
-  goal smoke2    : udiv one zero                             = zero
-  goal smoke3    : urem one zero                             = zero
+  goal smoke1    : neg lastb                                 = zeros
+  goal smoke2    : udiv one zeros                            = zeros
+  goal smoke3    : urem one zeros                            = zeros
   goal smoke4    : lsl_bv ones one                           = ones
   goal smoke5    : ugt (lsr_bv ones one) lastb
   goal smoke6    : ule (asr_bv lastb one) lastb
-  goal smoke7    : rotate_right_bv one one                   = zero
-  goal smoke8    : rotate_left_bv lastb one                  = zero
+  goal smoke7    : rotate_right_bv one one                   = zeros
+  goal smoke8    : rotate_left_bv lastb one                  = zeros
 end
 
 theory CheckBV8
@@ -268,49 +268,49 @@ theory CheckBV8
   constant md    : int                                       = 256
   constant lastb : t                                         = of_int 128
 
-  goal ok_zero   : zero                                      = (of_int 0)
+  goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zero                              = 0
+  goal ok_zero2  : to_uint zeros                             = 0
   goal ok_ones2  : to_uint ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
 
-  goal ok1       : add ones one                              = zero
-  goal ok2       : sub zero one                              = ones
+  goal ok1       : add ones one                              = zeros
+  goal ok2       : sub zeros one                             = ones
   goal ok3       : neg ones                                  = one
   goal ok5       : mul one two                               = two
   goal ok6       : mul ones ones                             = one
-  goal ok7       : udiv one two                              = zero
+  goal ok7       : udiv one two                              = zeros
   goal ok8       : urem one two                              = one
   goal ok9       : lsl_bv one one                            = two
   goal ok10      : lsl_bv ones one                           = sub ones one
-  goal ok12      : lsr_bv one two                            = zero
+  goal ok12      : lsr_bv one two                            = zeros
   goal ok13      : lsr_bv ones (sub (of_int sz) one)         = one
-  goal ok14      : asr_bv one two                            = zero
+  goal ok14      : asr_bv one two                            = zeros
   goal ok15      : asr_bv ones two                           = ones
   goal ok16      : bw_and ones one                           = one
   goal ok17      : bw_or  ones one                           = ones
   goal ok18      : bw_xor ones one                           = sub ones one
-  goal ok19      : bw_not ones                               = zero
+  goal ok19      : bw_not ones                               = zeros
   goal ok20      : rotate_right_bv one one                   = lastb
   goal ok21      : rotate_right_bv ones two                  = ones
   goal ok22      : rotate_left_bv lastb one                  = one
   goal ok23      : rotate_left_bv ones two                   = ones
-  goal ok24      : lsl_bv one (add (of_int sz) one)          = zero
-  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zero
+  goal ok24      : lsl_bv one (add (of_int sz) one)          = zeros
+  goal ok25      : lsr_bv lastb (add (of_int sz) one)        = zeros
   goal ok26      : asr_bv lastb (add (of_int sz) one)        = ones
   goal ok27      : rotate_right_bv one (add (of_int sz) one) = lastb
   goal ok28      : rotate_left_bv one (add (of_int sz) one)  = two
 
-  goal trap      : of_int md                                 = zero
+  goal trap      : of_int md                                 = zeros
 
-  goal smoke1    : neg lastb                                 = zero
-  goal smoke2    : udiv one zero                             = zero
-  goal smoke3    : urem one zero                             = zero
+  goal smoke1    : neg lastb                                 = zeros
+  goal smoke2    : udiv one zeros                            = zeros
+  goal smoke3    : urem one zeros                            = zeros
   goal smoke4    : lsl_bv ones one                           = ones
   goal smoke5    : ugt (lsr_bv ones one) lastb
   goal smoke6    : ule (asr_bv lastb one) lastb
-  goal smoke7    : rotate_right_bv one one                   = zero
-  goal smoke8    : rotate_left_bv lastb one                  = zero
+  goal smoke7    : rotate_right_bv one one                   = zeros
+  goal smoke8    : rotate_left_bv lastb one                  = zeros
 end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -68,7 +68,8 @@ val pl_clone : Theory.symbol_map -> symbol_map
 type ppattern = private {
   ppat_pattern : pattern;
   ppat_ity     : ity;
-  ppat_ghost   : bool;
+  ppat_ghost   : bool;  (* matches a ghost value *)
+  ppat_fail    : bool;  (* refutable under ghost *)
 }
 
 type pre_ppattern =

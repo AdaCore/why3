@@ -8,7 +8,7 @@ module BitCount8bit_fact
   function nth_as_bv (a i : t) : t =
     if nth_bv a i
     then (of_int 1)
-    else zero
+    else zeros
 
   function nth_as_int (a : t) (i : int) : int =
     if nth a i
@@ -328,8 +328,8 @@ module AsciiCode
   let lemma bv_even (b:t)
     ensures { even (to_uint b) <-> not (nth b 0) }
   =
-    assert { not (nth_bv b zero) <-> b = mul (of_int 2) (lsr_bv b one) };
-    assert { (exists k. b = mul (of_int 2) k) -> not (nth_bv b zero) };
+    assert { not (nth_bv b zeros) <-> b = mul (of_int 2) (lsr_bv b one) };
+    assert { (exists k. b = mul (of_int 2) k) -> not (nth_bv b zeros) };
     assert { (exists k. to_uint b = 2 * k) -> (exists k. b = mul (of_int 2) k) };
     assert { not (nth b 0) <-> to_uint b = 2 * to_uint (lsr b 1) }
 
@@ -350,7 +350,7 @@ module AsciiCode
     numof_or p q a (b-1)
 
   let lemma count_or (b c : t)
-    requires { bw_and b c = zero }
+    requires { bw_and b c = zeros }
     ensures  { count_logic (bw_or b c) = count_logic b + count_logic c }
   =
     assert { forall i. ult i size_bv ->
@@ -366,16 +366,16 @@ module AsciiCode
       number is odd, set the 8th bit to 1 if not, do nothing:*)
   let ascii (b : t) =
     requires { not (nth_bv b lastbit) }
-    ensures  { eq_sub_bv result b zero lastbit }
+    ensures  { eq_sub_bv result b zeros lastbit }
     ensures  { validAscii result }
     let c = count b in
     let maskbit = lsl_check c lastbit in
-    assert { bw_and b maskbit = zero };
+    assert { bw_and b maskbit = zeros };
     assert { even (to_uint c) ->
-               not (nth_bv c zero)
+               not (nth_bv c zeros)
             && count_logic maskbit    = 0 };
     assert { odd  (to_uint c) ->
-               nth_bv c zero
+               nth_bv c zeros
             && nth maskbit 31
             && (forall i. 0 <= i < 31 -> not (nth maskbit i))
             && count_logic maskbit    = 1 };
@@ -458,7 +458,7 @@ module GrayCode
     assert { b <> ones -> toGray (add b one) = bw_xor (toGray b) (bw_and (bw_not b) (add b one)) };
     assert { b <> ones -> exists k. (bw_and (bw_not b) (add b one)) = lsl one k };
     assert { b <> ones -> count_logic (bw_and (bw_not b) (add b one)) = 1 };
-    assert { b = ones -> (toGray b) = of_int 0x80000000 /\ (toGray (add b one)) = zero }
+    assert { b = ones -> (toGray b) = of_int 0x80000000 /\ (toGray (add b one)) = zeros }
 
   (** Now, a couple of property between the Gray code and the binary
       representation.
@@ -488,7 +488,7 @@ module GrayCode
       encoding has an odd number of 1-bits. *)
 
   lemma evenOdd : forall b.
-    nth_bv b zero <-> even (count_logic (toGray b))
+    nth_bv b zeros <-> even (count_logic (toGray b))
 
 end
 

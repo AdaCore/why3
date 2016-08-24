@@ -2,106 +2,74 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.4pl6" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="3.2" timelimit="10" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="7" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
-<prover id="9" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../neg_as_xor.why" expanded="true">
 <theory name="TestNegAsXOR" sum="4b3f5b71a28db1ecea74d9fd0780e47d" expanded="true">
  <goal name="Nth_j">
  <proof prover="1"><result status="valid" time="0.56" steps="114"/></proof>
- <proof prover="6" timelimit="3"><result status="valid" time="0.35" steps="107"/></proof>
  </goal>
  <goal name="sign_of_j">
  <proof prover="1"><result status="valid" time="0.15" steps="108"/></proof>
  <proof prover="3"><result status="valid" time="0.65"/></proof>
- <proof prover="6"><result status="valid" time="0.09" steps="100"/></proof>
  </goal>
  <goal name="mantissa_of_j">
  <proof prover="1"><result status="valid" time="0.16" steps="123"/></proof>
  <proof prover="3"><result status="valid" time="0.61"/></proof>
- <proof prover="4"><result status="valid" time="0.85"/></proof>
- <proof prover="5"><result status="valid" time="3.73"/></proof>
- <proof prover="6"><result status="valid" time="0.06" steps="104"/></proof>
- <proof prover="7"><result status="valid" time="0.06"/></proof>
+ <proof prover="5"><result status="valid" time="3.37"/></proof>
  <proof prover="9"><result status="valid" time="0.78"/></proof>
  </goal>
  <goal name="exp_of_j">
  <proof prover="1"><result status="valid" time="0.17" steps="124"/></proof>
  <proof prover="3"><result status="valid" time="0.46"/></proof>
- <proof prover="4"><result status="valid" time="0.70"/></proof>
  <proof prover="5" timelimit="11"><result status="valid" time="2.71"/></proof>
- <proof prover="6"><result status="valid" time="0.21" steps="107"/></proof>
- <proof prover="7"><result status="valid" time="0.07"/></proof>
  <proof prover="9"><result status="valid" time="0.73"/></proof>
  </goal>
  <goal name="int_of_bv">
  <proof prover="1"><result status="valid" time="0.06" steps="94"/></proof>
  <proof prover="3"><result status="valid" time="0.05"/></proof>
- <proof prover="4"><result status="valid" time="0.13"/></proof>
  <proof prover="5" timelimit="5"><result status="valid" time="0.10"/></proof>
- <proof prover="6"><result status="valid" time="0.04" steps="93"/></proof>
- <proof prover="7"><result status="valid" time="0.05"/></proof>
  <proof prover="9"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="MainResultBits">
  <proof prover="1"><result status="valid" time="0.15" steps="132"/></proof>
  <proof prover="3"><result status="valid" time="0.55"/></proof>
- <proof prover="6"><result status="valid" time="0.16" steps="127"/></proof>
- <proof prover="7"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="MainResultSign">
  <proof prover="1"><result status="valid" time="0.04" steps="102"/></proof>
  <proof prover="3"><result status="valid" time="0.06"/></proof>
- <proof prover="6"><result status="valid" time="0.03" steps="104"/></proof>
- <proof prover="7"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="Sign_of_xor_j">
  <proof prover="1"><result status="valid" time="0.04" steps="85"/></proof>
  <proof prover="3"><result status="valid" time="0.05"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5" timelimit="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="valid" time="0.03" steps="96"/></proof>
- <proof prover="7"><result status="valid" time="0.06"/></proof>
  <proof prover="9"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Exp_of_xor_j">
- <proof prover="1"><result status="valid" time="1.53" steps="498"/></proof>
+ <proof prover="1"><result status="valid" time="1.20" steps="498"/></proof>
  <proof prover="3"><result status="valid" time="0.65"/></proof>
- <proof prover="4"><result status="valid" time="0.87"/></proof>
- <proof prover="5"><result status="valid" time="3.00"/></proof>
- <proof prover="7"><result status="valid" time="0.09"/></proof>
- <proof prover="9"><result status="valid" time="0.90"/></proof>
+ <proof prover="5"><result status="valid" time="2.61"/></proof>
+ <proof prover="9"><result status="valid" time="0.66"/></proof>
  </goal>
  <goal name="Mantissa_of_xor_j">
  <proof prover="3"><result status="valid" time="0.66"/></proof>
- <proof prover="4"><result status="valid" time="0.71"/></proof>
- <proof prover="5"><result status="valid" time="2.67"/></proof>
- <proof prover="7"><result status="valid" time="0.08"/></proof>
+ <proof prover="5"><result status="valid" time="2.66"/></proof>
  <proof prover="9"><result status="valid" time="0.75"/></proof>
  </goal>
  <goal name="MainResultZero">
  <proof prover="1"><result status="valid" time="0.07" steps="104"/></proof>
  <proof prover="3"><result status="valid" time="0.06"/></proof>
- <proof prover="4"><result status="valid" time="0.94"/></proof>
- <proof prover="5"><result status="valid" time="3.14"/></proof>
- <proof prover="6" timelimit="6"><result status="valid" time="1.15" steps="142"/></proof>
- <proof prover="7"><result status="valid" time="0.06"/></proof>
- <proof prover="9"><result status="valid" time="1.36"/></proof>
+ <proof prover="5"><result status="valid" time="2.69"/></proof>
+ <proof prover="9"><result status="valid" time="0.95"/></proof>
  </goal>
  <goal name="sign_neg">
  <proof prover="1"><result status="valid" time="0.07" steps="107"/></proof>
  <proof prover="3"><result status="valid" time="0.04"/></proof>
- <proof prover="6" timelimit="9"><result status="valid" time="0.07" steps="124"/></proof>
- <proof prover="7"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="MainResult">
  <proof prover="1"><result status="valid" time="1.86" steps="326"/></proof>
- <proof prover="2" edited="neg_as_xor_TestNegAsXOR_MainResult_1.v"><result status="valid" time="1.78"/></proof>
  </goal>
 </theory>
 </file>

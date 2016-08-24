@@ -2,8 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="60" memlimit="0"/>
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="60" steplimit="0" memlimit="0"/>
 <file name="../relabel.mlw" expanded="true">
 <theory name="Relabel" sum="c15b7e75d79b8907db0e5bc10b7356ec" expanded="true">
  <goal name="labels_Leaf">
@@ -21,13 +20,13 @@
   <proof prover="2"><result status="valid" time="0.02" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter relabel.2" expl="2. variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="2" timelimit="5" memlimit="4000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter relabel.3" expl="3. variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="2" timelimit="5" memlimit="4000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter relabel.4" expl="4. postcondition">
-  <proof prover="2"><result status="valid" time="7.11" steps="25743"/></proof>
+  <proof prover="2"><result status="valid" time="6.64" steps="23632"/></proof>
   </goal>
  </transf>
  </goal>

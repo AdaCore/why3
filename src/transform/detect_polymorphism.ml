@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,11 +13,12 @@ open Decl
 open Theory
 
 let debug = Debug.register_info_flag "detect_poly"
-  ~desc:"Print@ debugging@ messages@ of@ the@ 'detect_polymorphism'@ transformation."
+  ~desc:"Print@ debugging@ messages@ of@ the@ \
+    'detect_polymorphism'@ transformation."
 
 (* metas to attach to symbols or propositions to tell their polymorphic
-nature can be ignored because it will be treated specifically by
-drivers *)
+   nature can be ignored because it will be treated specifically by
+   drivers *)
 
 let meta_ignore_polymorphism_ts =
   register_meta
@@ -50,7 +51,7 @@ let check_ls ign_ls ls =
   List.fold_left
     (fun acc ty -> acc || not (Ty.ty_closed ty))
     false
-    ls.Term.ls_args
+    (Ty.oty_cons ls.Term.ls_args ls.Term.ls_value)
 
 let detect_polymorphism_in_decl ign_ts ign_ls ign_pr d =
   Debug.dprintf debug "[detect_polymorphism] |sts|=%d |sls|=%d |spr|=%d@."

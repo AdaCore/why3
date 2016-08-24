@@ -2,9 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../same_fringe.mlw" expanded="true">
 <theory name="SameFringe" sum="7aba67478ad55ab5a65bef38c5e411fd" expanded="true">
  <goal name="WP_parameter enum" expl="VC for enum">
@@ -65,7 +64,7 @@
  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+ <proof prover="3" memlimit="4000"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
 </theory>
 <theory name="Test" sum="fb32280419454357f1773e7d0ede665e" expanded="true">

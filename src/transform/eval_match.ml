@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -115,12 +115,18 @@ let dive_to_constructor kn fn env t =
 
 let rec cs_equ kn env t1 t2 =
   if t_equal t1 t2 then t_true
-  else match t1,t2 with
+  else
+    let aux cs tl t =
+      let fn = apply_cs_equ kn cs tl in
+      try dive_to_constructor kn fn env t
+      with Exit -> t_equ t1 t2
+    in
+    match t1,t2 with
+    (* cannot merge the 2 patterns because of warning 57 *)
     | { t_node = Tapp (cs,tl) }, t
-    | t, { t_node = Tapp (cs,tl) } when is_constructor kn cs ->
-        let fn = apply_cs_equ kn cs tl in
-        begin try dive_to_constructor kn fn env t
-        with Exit -> t_equ t1 t2 end
+         when is_constructor kn cs -> aux cs tl t
+    | t, { t_node = Tapp (cs,tl) }
+         when is_constructor kn cs -> aux cs tl t
     | _ -> t_equ t1 t2
 
 and apply_cs_equ kn cs1 tl1 env t = match t.t_node with

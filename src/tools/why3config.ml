@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -102,15 +102,19 @@ let plugins_auto_detection config =
   let main = get_main config in
   let main = set_plugins main [] in
   let dir = Whyconf.pluginsdir main in
-  let files = Sys.readdir dir in
-  let fold main p =
-    if p.[0] == '.' then main else
-    let p = Filename.concat dir p in
-    try
-        install_plugin main p
-    with Exit -> main
+  let main =
+    if Sys.file_exists dir then
+      let files = Sys.readdir dir in
+      let fold main p =
+        if p.[0] == '.' then main else
+        let p = Filename.concat dir p in
+        try
+            install_plugin main p
+        with Exit -> main
+      in
+      Array.fold_left fold main files
+    else main
   in
-  let main = Array.fold_left fold main files in
   set_main config main
 
 let main () =

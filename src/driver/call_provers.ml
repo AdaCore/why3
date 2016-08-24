@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -39,7 +39,21 @@ type prover_result = {
   pr_model  : model;
 }
 
-(** time regexp "%h:%m:%s" *)
+type resource_limit = {
+  limit_time  : int;
+  limit_mem   : int;
+  limit_steps : int;
+}
+
+let empty_limit = { limit_time = 0 ; limit_mem = 0; limit_steps = 0 }
+
+let limit_max =
+  let single_limit_max a b = if a = 0 || b = 0 then 0 else max a b in
+  fun a b ->
+    { limit_time = single_limit_max a.limit_time b.limit_time;
+      limit_steps = single_limit_max a.limit_steps b.limit_steps;
+      limit_mem = single_limit_max a.limit_mem b.limit_mem; }
+
 type timeunit =
   | Hour
   | Min
@@ -74,24 +88,23 @@ let timeregexp s =
   let s = Str.global_substitute cmd_regexp replace s in
   let group = Array.make !nb Hour in
   List.iter (fun (i,u) -> group.(i) <- u) !l;
-  { re = Str.regexp s; group = group}
+  { re = Str.regexp s; group = group }
 
 let rec grep_time out = function
   | [] -> None
   | re :: l ->
-    begin try
-            ignore (Str.search_forward re.re out 0);
-            let t = ref 0. in
-            Array.iteri (fun i u ->
-              let v = Str.matched_group (succ i) out in
-              match u with
-                | Hour -> t := !t +. float_of_string v *. 3600.
-                | Min  -> t := !t +. float_of_string v *. 60.
-                | Sec  -> t := !t +. float_of_string v
-                | Msec -> t := !t +. float_of_string v /. 1000. ) re.group;
-            Some( !t )
-      with _ -> grep_time out l
-    end
+      begin try
+        ignore (Str.search_forward re.re out 0);
+        let t = ref 0. in
+        Array.iteri (fun i u ->
+          let v = Str.matched_group (succ i) out in
+          match u with
+          | Hour -> t := !t +. float_of_string v *. 3600.
+          | Min  -> t := !t +. float_of_string v *. 60.
+          | Sec  -> t := !t +. float_of_string v
+          | Msec -> t := !t +. float_of_string v /. 1000.) re.group;
+        Some !t
+      with _ -> grep_time out l end
 
 let stepregexp s_re s_group_num =
   {steps_re = (Str.regexp s_re); steps_group_num = s_group_num}
@@ -99,18 +112,17 @@ let stepregexp s_re s_group_num =
 let rec grep_steps out = function
   | [] -> None
   | re :: l ->
-    begin try
-	    ignore (Str.search_forward re.steps_re out 0);
-	    let v = Str.matched_group (re.steps_group_num) out in
-	    Some(int_of_string v)
-      with _ -> grep_steps out l
-    end
+      begin try
+        ignore (Str.search_forward re.steps_re out 0);
+        let v = Str.matched_group (re.steps_group_num) out in
+        Some(int_of_string v)
+      with _ -> grep_steps out l end
 
 let grep_reason_unknown out =
   try
     let re = Str.regexp "^(:reason-unknown \\([^)]*\\)" in
     ignore (Str.search_forward re out 0);
-    match  (Str.matched_group 1 out) with
+    match (Str.matched_group 1 out) with
     | "resourceout" -> Resourceout
     | _ -> Other
   with Not_found ->
@@ -124,8 +136,7 @@ type prover_result_parser = {
   prp_model_parser : Model_parser.model_parser;
 }
 
-let print_unknown_reason fmt r =
-  match r with
+let print_unknown_reason fmt = function
   | Some Resourceout -> fprintf fmt " because of resource limit reached "
   | _ -> ()
 
@@ -147,10 +158,11 @@ let print_prover_status fmt = function
   | Unix.WEXITED n -> fprintf fmt "exited with status %d" n
 
 let print_steps fmt s =
-  if s >= 0 then fprintf fmt ", %d steps)" s
+  if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result fmt
-  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t; pr_steps=s; pr_model=m} =
+let print_prover_result fmt {pr_answer = ans; pr_status = status;
+                             pr_output = out; pr_time   = t;
+                             pr_steps  = s;   pr_model  = m} =
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if not (Model_parser.is_model_empty m) then begin
     fprintf fmt "\nCounter-example model:";
@@ -173,23 +185,13 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-type post_prover_call = unit -> prover_result
-
-type prover_call = {
-  call : Unix.process_status -> post_prover_call;
-  pid  : int
-}
-
-type pre_prover_call = unit -> prover_call
-
-let save f = f ^ ".save"
+let backup_file f = f ^ ".save"
 
 let debug_print_model model =
   let model_str = Model_parser.model_to_string model in
   Debug.dprintf debug "Call_provers: %s@." model_str
 
-
-let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping =
+let parse_prover_run res_parser time out ret limit ~printer_mapping =
   let ans = match ret with
     | Unix.WSTOPPED n ->
         Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
@@ -209,11 +211,10 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
   let ans = match ans with
     | Unknown (s, _) -> Unknown (s, Some reason_unknown)
     | _ -> ans in
-  let ans = match ans with
-    | Unknown _ | HighFailure when on_timelimit && timelimit > 0
-      && time >= (0.9 *. float timelimit) -> Timeout
-    | _ -> ans
-  in
+  let ans = match ans, limit with
+    | (Unknown _ | HighFailure), { limit_time = tlimit }
+      when tlimit > 0 && time >= (0.9 *. float tlimit) -> Timeout
+    | _ -> ans in
   let model = res_parser.prp_model_parser out printer_mapping in
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;
@@ -225,107 +226,192 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
     pr_model  = model;
   }
 
-let actualcommand command timelimit memlimit steplimit file =
+let actualcommand command limit file =
+  let stime = string_of_int limit.limit_time in
+  let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
-  (* FIXME: use_stdin is never modified below ?? *)
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> file
-    | "t" -> on_timelimit := true; string_of_int timelimit
-    | "T" -> string_of_int (succ timelimit)
-    | "U" -> string_of_int (2 * timelimit + 1)
-    | "m" -> string_of_int memlimit
+    | "f" -> use_stdin := false; file
+    | "t" -> on_timelimit := true; stime
+    | "m" -> smem
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
        to prepare the command line in a separate function? *)
     | "l" -> Config.libdir
     | "d" -> Config.datadir
-    | "S" -> string_of_int steplimit
-    | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, %d or %S"
+    | "S" -> string_of_int limit.limit_steps
+    | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
   in
-  (* FIXME: are we sure that tuples are evaluated from left to right ? *)
-  List.map (Str.global_substitute cmd_regexp replace) arglist,
-  !use_stdin, !on_timelimit
+  let args =
+    List.map (Str.global_substitute cmd_regexp replace) arglist
+  in
+  args, !use_stdin, !on_timelimit
 
-let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(steplimit=(-1))
-                 ~res_parser
-		 ~printer_mapping
-                 ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
+let actualcommand ~cleanup ~inplace command limit file =
+  try actualcommand command limit file
+  with e ->
+    if cleanup then Sys.remove file;
+    if inplace then Sys.rename (backup_file file) file;
+    raise e
 
-  let command, use_stdin, on_timelimit =
-    try actualcommand command timelimit memlimit steplimit fin
-    with e ->
-      if cleanup then Sys.remove fin;
-      if inplace then Sys.rename (save fin) fin;
-      raise e in
-  let exec = List.hd command in
-  Debug.dprintf debug "@[<hov 2>Call_provers: command is: %a@]@."
-    (Pp.print_list Pp.space pp_print_string) command;
-  let argarray = Array.of_list command in
+let adapt_limits limit on_timelimit =
+  if limit.limit_time = empty_limit.limit_time then limit
+  else
+    { limit with limit_time =
+      (* for steps limit use 2 * t + 1 time *)
+      if limit.limit_steps <> empty_limit.limit_steps
+      then (2 * limit.limit_time + 1)
+      (* if prover implements time limit, use t + 1 *)
+      else if on_timelimit then succ limit.limit_time
+      (* otherwise use t *)
+      else limit.limit_time }
 
+type server_id = int
+
+let gen_id =
+  let x = ref 0 in
   fun () ->
-    let fd_in = if use_stdin then
-      Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
-    let fout,cout,fd_out,fd_err =
-      if redirect then
-        let fout,cout =
-          Filename.open_temp_file (Filename.basename fin) ".out" in
-        let fd_out = Unix.descr_of_out_channel cout in
-        fout, cout, fd_out, fd_out
-      else
-        "", stdout, Unix.stdout, Unix.stderr in
-    let time = Unix.gettimeofday () in
-    let pid = Unix.create_process exec argarray fd_in fd_out fd_err in
-    if use_stdin then Unix.close fd_in;
-    if redirect then close_out cout;
+    incr x;
+    !x
 
-    let call = fun ret ->
-      let time = Unix.gettimeofday () -. time in
-      let out =
-        if redirect then
-          let cout = open_in fout in
-          let out = Sysutil.channel_contents cout in
-          close_in cout;
-          out
-        else "" in
+type save_data = {
+  vc_file    : string;
+  inplace    : bool;
+  limit      : resource_limit;
+  res_parser : prover_result_parser;
+  printer_mapping : Printer.printer_mapping;
+}
 
-      fun () ->
-        if Debug.test_noflag debug then begin
-          let swallow f x =
-            try f x with Sys_error s -> eprintf "Call_provers: %s@." s in
-          if cleanup then swallow Sys.remove fin;
-          if inplace then swallow (Sys.rename (save fin)) fin;
-          if redirect then swallow Sys.remove fout
-        end;
-        parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_mapping
-    in
-    { call = call; pid = pid }
+let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
 
-let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(steplimit=(-1))
-                   ~res_parser ~filename
-		   ~printer_mapping
+let read_and_delete_file fn =
+  let cin = open_in fn in
+  let out = Sysutil.channel_contents cin in
+  close_in cin;
+  if Debug.test_noflag debug then Sys.remove fn;
+  out
+
+let handle_answer answer =
+  match answer with
+  | Prove_client.Finished answer ->
+      let id = answer.Prove_client.id in
+      let save = Hashtbl.find saved_data id in
+      Hashtbl.remove saved_data id;
+      if Debug.test_noflag debug then begin
+	Sys.remove save.vc_file;
+	if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
+      end;
+      let out = read_and_delete_file answer.Prove_client.out_file in
+      let ret = Unix.WEXITED answer.Prove_client.exit_code in
+      let printer_mapping = save.printer_mapping in
+      let ans = parse_prover_run save.res_parser
+	  answer.Prove_client.time out ret save.limit ~printer_mapping in
+      id, Some ans
+  | Prove_client.Started id ->
+      id, None
+
+let wait_for_server_result ~blocking =
+  List.map handle_answer (Prove_client.read_answers ~blocking)
+
+type prover_call =
+  | ServerCall of server_id
+  | EditorCall of int
+
+let call_on_file ~command ~limit ~res_parser ~printer_mapping
+                 ?(inplace=false) fin =
+  let id = gen_id () in
+  let cmd, use_stdin, on_timelimit =
+    actualcommand ~cleanup:true ~inplace command limit fin in
+  let save = {
+    vc_file    = fin;
+    inplace    = inplace;
+    limit      = limit;
+    res_parser = res_parser;
+    printer_mapping = printer_mapping } in
+  Hashtbl.add saved_data id save;
+  let limit = adapt_limits limit on_timelimit in
+  let use_stdin = if use_stdin then Some fin else None in
+  Prove_client.send_request ~use_stdin ~id
+                            ~timelimit:limit.limit_time
+                            ~memlimit:limit.limit_mem
+                            ~cmd;
+  ServerCall id
+
+type prover_update =
+  | NoUpdates
+  | ProverStarted
+  | ProverFinished of prover_result
+
+let result_buffer : (server_id, prover_update) Hashtbl.t = Hashtbl.create 17
+
+let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
+  List.iter (fun (id, r) ->
+    let x = match r with
+    | Some r -> ProverFinished r
+    | None -> ProverStarted in
+    Hashtbl.add result_buffer id x)
+    (wait_for_server_result ~blocking)
+
+let query_result_buffer id =
+  try let r = Hashtbl.find result_buffer id in
+      Hashtbl.remove result_buffer id; r
+  with Not_found -> NoUpdates
+
+let editor_result ret = {
+  pr_answer = Unknown ("", None);
+  pr_status = ret;
+  pr_output = "";
+  pr_time   = 0.0;
+  pr_steps  = 0;
+  pr_model  = Model_parser.default_model;
+}
+
+let query_call = function
+  | ServerCall id ->
+      get_new_results ~blocking:false;
+      query_result_buffer id
+  | EditorCall pid ->
+      let pid, ret = Unix.waitpid [Unix.WNOHANG] pid in
+      if pid = 0 then NoUpdates else
+      ProverFinished (editor_result ret)
+
+let rec wait_on_call = function
+  | ServerCall id as pc ->
+      begin match query_result_buffer id with
+        | ProverFinished r -> r
+	| _ ->
+            get_new_results ~blocking:true;
+            wait_on_call pc
+      end
+  | EditorCall pid ->
+      let _, ret = Unix.waitpid [] pid in
+      editor_result ret
+
+let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
                    ?(inplace=false) buffer =
-
   let fin,cin =
     if inplace then begin
-      Sys.rename filename (save filename);
+      let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
+      Sys.rename filename (backup_file filename);
       filename, open_out filename
     end else
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~timelimit ~memlimit ~steplimit
-               ~res_parser ~printer_mapping ~cleanup:true ~inplace fin
+  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
 
-let query_call pc =
-  let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
-  if pid = 0 then None else Some (pc.call ret)
-
-let wait_on_call pc =
-  let _, ret = Unix.waitpid [] pc.pid in pc.call ret
-
-let post_wait_call pc ret = pc.call ret
-
-let prover_call_pid pc = pc.pid
+let call_editor ~command fin =
+  let command, use_stdin, _ =
+    actualcommand ~cleanup:false ~inplace:false command empty_limit fin in
+  let exec = List.hd command in
+  Debug.dprintf debug "@[<hov 2>Call_provers: editor command is: %a@]@."
+    (Pp.print_list Pp.space pp_print_string) command;
+  let argarray = Array.of_list command in
+  let fd_in =
+    if use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
+  let pid = Unix.create_process exec argarray fd_in Unix.stdout Unix.stderr in
+  if use_stdin then Unix.close fd_in;
+  EditorCall pid

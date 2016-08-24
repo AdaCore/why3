@@ -1,0 +1,130 @@
+
+(* TODO: complete.... if feasible. *)
+
+module Base
+
+  meta compute_max_steps 0x1_000_000
+
+  function f (x:('a,'b)) : 'a = let (x,_) = x in x
+  meta rewrite_def function f
+  function s (x:('a,'b)) : 'b = let (_,x) = x in x
+  meta rewrite_def function s
+  predicate (-->) (x y:'a) = "rewrite" (x = y)
+  meta rewrite_def predicate (-->)
+
+
+end
+
+(* Decomposition of quantification statements by destructuring
+   the argument structure. This is intended to be used by compute alone,
+   so the definitions/lemmas are kept away from the provers sight. *)
+module Quant "W:non_conservative_extension:N"
+
+  use import HighOrd
+  use import int.Int
+
+  type qstructure 'a
+  predicate quant_structure bool (qstructure 'a) (p:'a -> bool)
+  val ghost quant_structure_def (_:'a -> bool) : unit
+    ensures { forall b s,p:'a -> bool.
+      quant_structure b s p <-> if b then forall y. p y else exists y. p y }
+
+  (* Unstructured quantification. *)
+  constant q_def : qstructure 'a
+  axiom forall_default : forall p:'a -> bool.
+    quant_structure true q_def p <-> forall y. p y
+  axiom exists_default : forall p:'a -> bool.
+    quant_structure false q_def p <-> exists y. p y
+  meta rewrite prop forall_default
+  meta rewrite prop exists_default
+  meta remove_prop prop forall_default
+  meta remove_prop prop exists_default
+
+  (* Unit quantification. *)
+  constant q_unit : qstructure unit
+  axiom quant_structure_unit : forall b p.
+    quant_structure b q_unit p <-> p ()
+  meta rewrite prop quant_structure_unit
+  meta remove_prop prop quant_structure_unit
+
+  (* Splitting pairs *)
+  function q_pair (qstructure 'a) (qstructure 'b) : qstructure ('a,'b)
+  axiom quant_structure_pair : forall b s1 s2,p:('a,'b) -> bool.
+    quant_structure b (q_pair s1 s2) p <->
+      quant_structure b s1 (\x. quant_structure b s2 (\y. p (x,y)))
+  meta rewrite prop quant_structure_pair
+  meta remove_prop prop quant_structure_pair
+
+  (* Boolean casing *)
+  function q_cond (qstructure 'a) (qstructure 'a) : qstructure ('a,bool)
+  axiom forall_cond : forall s1 s2,p:('a,bool) -> bool.
+    quant_structure true (q_cond s1 s2) p <->
+      quant_structure true s1 (\x. p (x,true)) /\
+      quant_structure true s2 (\x. p (x,false))
+  axiom exists_cond : forall s1 s2,p:('a,bool) -> bool.
+    quant_structure false (q_cond s1 s2) p <->
+      quant_structure false s1 (\x. p (x,true)) \/
+      quant_structure false s2 (\x. p (x,false))
+  meta rewrite prop forall_cond
+  meta rewrite prop exists_cond
+  meta remove_prop prop forall_cond
+  meta remove_prop prop exists_cond
+
+  (* Integer casing *)
+  function q_range int int (qstructure int) : qstructure int
+  predicate q_range_structure bool (qstructure int) int int int (int -> bool)
+  axiom quant_structure_range : forall b s n m,p:int -> bool.
+    quant_structure b (q_range n m s) p <-> q_range_structure b s n n m p
+  axiom forall_range_structure : forall s n l m,p:int -> bool.
+    q_range_structure true s n l m p =
+      if l = m then quant_structure true s (\x. not(n <= x < m) -> p x)
+      else p l /\ q_range_structure true s n (l+1) m p
+  axiom exists_range_structure : forall s n l m,p:int -> bool.
+    q_range_structure false s n l m p =
+      if l = m then quant_structure false s (\x. not(n <= x < m) /\ p x)
+      else p l \/ q_range_structure false s n (l+1) m p
+  meta rewrite prop quant_structure_range
+  meta rewrite prop forall_range_structure
+  meta rewrite prop exists_range_structure
+  meta remove_prop prop quant_structure_range
+  meta remove_prop prop forall_range_structure
+  meta remove_prop prop exists_range_structure
+
+end
+
+module QuantImpl
+
+  use import HighOrd
+  use import int.Int
+
+  type qstructure 'a = int
+  constant q_def : int = 0
+  function q_pair 'a 'b : int = 0
+  predicate quant_structure (b:bool) 'b (p:'a -> bool) =
+    if b then forall x. p x else exists x. p x
+  let ghost quant_structure_def (_:'b) = ()
+  function q_range 'a 'b 'c : int = 0
+  predicate q_range_structure (b:bool) 'a (n i m:int) (p:int -> bool) =
+    if b then forall x. not(n <= x < i) -> p x
+    else exists x. not (n <= x < i) /\ p x
+
+  clone Quant with type qstructure = qstructure,
+    predicate quant_structure = quant_structure,
+    val quant_structure_def = quant_structure_def,
+    function q_def = q_def,
+    goal forall_default,
+    goal exists_default,
+    function q_unit = q_def,
+    goal quant_structure_unit,
+    function q_pair = q_pair,
+    goal quant_structure_pair,
+    function q_cond = q_pair,
+    goal forall_cond,
+    goal exists_cond,
+    function q_range = q_range,
+    predicate q_range_structure = q_range_structure,
+    goal quant_structure_range,
+    goal forall_range_structure,
+    goal exists_range_structure
+
+end

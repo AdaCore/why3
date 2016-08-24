@@ -150,12 +150,14 @@ Axiom Permut_append_swap : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
 Axiom Permut_mem : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
   a)) (l2:(list a)), (permut l1 l2) -> ((mem x l1) -> (mem x l2)).
 
+Require Import Why3.
+Ltac cvc := why3 "CVC4,1.4,"; admit.
+
 (* Why3 goal *)
 Theorem Permut_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
   a)) (l2:(list a)), (permut l1 l2) -> ((length l1) = (length l2)).
+(* Why3 intros a a_WT l1 l2 h1. *)
 intros a a_WT l1 l2 h1.
-Require Import Why3.
-Ltac cvc := why3 "CVC4,1.4,".
 generalize dependent l2.
 induction l1; intros.
 destruct l2.
@@ -164,12 +166,13 @@ cvc.
 pose (h2 := h1).
 clearbody h2.
 specialize (h1 a0).
-assert (mem a0 l2) by cvc.
+assert (mem a0 l2).
+ cvc.
 apply mem_decomp in H.
 destruct H as [l3 [l4 H]].
 assert (permut l1 (infix_plpl l3 l4)).
 intro.
 cvc.
 cvc.
-Qed.
+Admitted.
 

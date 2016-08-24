@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../compute_elts.mlw">
+<theory name="Base" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Quant" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="QuantImpl" sum="43b1dc380e604d26ccd15795dd6d972d">
+ <goal name="WP_parameter quant_structure_def" expl="VC for quant_structure_def">
+ <proof prover="1"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+ <goal name="Quant.forall_default">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="Quant.exists_default">
+ <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="Quant.quant_structure_unit">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="Quant.quant_structure_pair">
+ <proof prover="0"><result status="valid" time="0.18"/></proof>
+ </goal>
+ <goal name="Quant.forall_cond">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="Quant.exists_cond">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="Quant.quant_structure_range">
+ <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+ </goal>
+ <goal name="Quant.forall_range_structure">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Quant.exists_range_structure">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Quant.WP_parameter   Quant  quant_structure_def" expl="VC for   Quant  quant_structure_def">
+ <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

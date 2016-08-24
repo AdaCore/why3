@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -158,11 +158,11 @@ end
 
 (* keywords *)
 
-%token AS AXIOM CLONE COINDUCTIVE CONSTANT
+%token AS AXIOM BY CLONE COINDUCTIVE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
 %token LET MATCH META NAMESPACE NOT PROP PREDICATE
-%token THEN THEORY TRUE TYPE USE WITH
+%token SO THEN THEORY TRUE TYPE USE WITH
 
 (* program keywords *)
 
@@ -201,6 +201,7 @@ end
 %nonassoc COLON
 
 %right ARROW LRARROW
+%right BY SO
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
@@ -624,6 +625,8 @@ triggers:
 | BARBAR  { Tor_asym }
 | AND     { Tand }
 | AMPAMP  { Tand_asym }
+| BY      { Tby }
+| SO      { Tso }
 
 quant:
 | FORALL  { Tforall }

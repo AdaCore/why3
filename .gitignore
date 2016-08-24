@@ -18,6 +18,7 @@ why3.conf
 *.vo
 *.vd
 *.glob
+.*.aux
 *.elc
 *.summary
 \#*\#
@@ -28,6 +29,7 @@ why3.conf
 /autom4te.cache
 /Makefile
 /configure
+/install-sh
 /semantic.cache
 /TAGS
 /output_why3
@@ -120,8 +122,10 @@ why3.conf
 /doc/stdlibdoc/
 
 # /lib
-/lib/why3-cpulimit
-/lib/why3-cpulimit.exe
+/lib/why3cpulimit
+/lib/why3cpulimit.exe
+/lib/why3server
+/lib/why3server.exe
 
 # /lib/why3/
 /lib/why3/META
@@ -143,6 +147,9 @@ why3.conf
 /src/coq-tactic/why3tac.ml
 /src/coq-tactic/.why3-vo-*
 
+# Coq
+/lib/coq/bv/BV_Gen.v
+
 # PVS
 .pvscontext
 orphaned-proofs.prf
@@ -157,8 +164,7 @@ pvsbin/
 /lib/isabelle/map/
 /lib/isabelle/real/
 /lib/isabelle/set/
-/lib/isabelle/Tools/why3
-/lib/isabelle/Why3_Number.thy
+/lib/isabelle/Why3_BV.thy
 /lib/isabelle/why3.ML
 /lib/isabelle/last_build
 /lib/isabelle/bv
@@ -275,14 +281,19 @@ pvsbin/
 /modules/mach/int/
 
 # Try Why3
-/src/trywhy3/trywhy3.js
 /src/trywhy3/trywhy3.byte
+/src/trywhy3/trywhy3.js
+/src/trywhy3/alt_ergo_worker.byte
+/src/trywhy3/alt_ergo_worker.js
+/src/trywhy3/why3_worker.byte
+/src/trywhy3/why3_worker.js
 /src/trywhy3/index.en.html
 /src/trywhy3/index.fr.html
 /src/trywhy3/index.html
-/src/trywhy3/ace-builds
+/src/trywhy3/ace-builds/
 /src/trywhy3/*.png
 /src/trywhy3/alt-ergo-1.00-private-2015-01-29
+/src/trywhy3/fontawesome/
 
 # jessie3
 /src/jessie/config.log
@@ -293,3 +304,4 @@ pvsbin/
 /src/jessie/tests/demo/result/*.log
 
 /trash
+trywhy3.tar.gz

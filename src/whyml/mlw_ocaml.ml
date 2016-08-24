@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -765,14 +765,14 @@ module Print = struct
         fprintf fmt "%s" s
       else
         let fname = if lp = [] then info.fname else None in
-        let m = String.capitalize (modulename ?fname lp t) in
+        let m = Strings.capitalize (modulename ?fname lp t) in
         fprintf fmt "%s.%s" m s
     with Not_found ->
       let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
 
-  let print_lident = print_qident ~sanitizer:String.uncapitalize
-  let print_uident = print_qident ~sanitizer:String.capitalize
+  let print_lident = print_qident ~sanitizer:Strings.uncapitalize
+  let print_uident = print_qident ~sanitizer:Strings.capitalize
 
   let print_path_id fmt = function
     | [], id -> print_ident fmt id
@@ -950,7 +950,7 @@ module Print = struct
         fprintf fmt (protect_on paren "@[<hov 2>%a@ %a@]")
           (print_expr info) e (print_list space (print_expr_p info)) el
     | Efun (vl, e1) ->
-        fprintf fmt (protect_on paren "@[<hov 2>fun %a ->@ %a@]")
+        fprintf fmt (protect_on paren "@[<hov 2>(fun %a ->@ %a)@]")
           (print_list space (print_vs_arg info)) vl (print_expr info) e1;
         forget_vars vl
     | Econstr (c, []) ->

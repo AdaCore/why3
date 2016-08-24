@@ -7,4 +7,3 @@ Require BuiltIn.
 Theorem G2 : False.
 Qed.
 
-

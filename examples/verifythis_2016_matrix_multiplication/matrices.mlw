@@ -1,0 +1,337 @@
+theory MatrixGen
+
+  use import int.Int
+
+  type mat 'a
+
+  function rows (mat 'a) : int
+
+  function cols (mat 'a) : int
+
+  axiom rows_and_cols_nonnegative:
+    forall m: mat 'a. 0 <= rows m /\ 0 <= cols m
+
+  function get (mat 'a) int int : 'a
+
+  function set (mat 'a) int int 'a : mat 'a
+
+  axiom set_def1:
+    forall m: mat 'a, i j: int, v: 'a. 0 <= i < rows m -> 0 <= j < cols m ->
+    rows (set m i j v) = rows m
+
+  axiom set_def2:
+    forall m: mat 'a, i j: int, v: 'a. 0 <= i < rows m -> 0 <= j < cols m ->
+    cols (set m i j v) = cols m
+
+  axiom set_def3:
+    forall m: mat 'a, i j: int, v: 'a. 0 <= i < rows m -> 0 <= j < cols m ->
+    get (set m i j v) i j = v
+
+  axiom set_def4:
+    forall m: mat 'a, i j: int, v: 'a. 0 <= i < rows m -> 0 <= j < cols m ->
+    forall i' j': int. (i <> i' \/ j <> j') ->
+    get (set m i j v) i' j' = get m i' j'
+
+  predicate (==) (m1 m2: mat 'a) =
+    rows m1 = rows m2 && cols m1 = cols m2 &&
+    forall i j: int. 0 <= i < rows m1 -> 0 <= j < cols m1 ->
+    get m1 i j = get m2 i j
+
+  axiom extensionality:
+    forall m1 m2: mat 'a. m1 == m2 -> m1 = m2
+
+  predicate (===) (a b: mat 'a) =
+    rows a = rows b /\ cols a = cols b
+
+end
+
+
+theory FloatMatrix
+
+  clone export MatrixGen
+  use HighOrd
+
+  use import int.Int
+
+  function create (r c: int) (f: int -> int -> 'a) : mat 'a
+
+  axiom create_rows:
+    forall r c: int, f: int -> int -> 'a.
+    0 <= r -> rows (create r c f) = r
+
+  axiom create_cols:
+  forall r c: int, f: int -> int -> 'a.
+    0 <= c -> cols (create r c f) = c
+
+  axiom create_get:
+    forall r c: int, f: int -> int -> 'a, i j: int.
+    0 <= i < r -> 0 <= j < c -> get (create r c f) i j = f i j
+
+end
+
+theory FixedMatrix
+
+  use import int.Int
+
+  constant r: int
+  constant c: int
+
+  type mat 'a
+
+  function rows (mat 'a) : int =  r
+
+  function cols (mat 'a) : int  =  c
+
+  axiom r_and_c_nonnegative:
+    0 <= r /\ 0 <= c
+
+  clone export MatrixGen with
+  	type mat 'a  = mat 'a,
+	function rows = rows,
+	function cols = cols,
+	goal rows_and_cols_nonnegative
+
+  use HighOrd
+
+  function create (f: int -> int -> 'a) : mat 'a
+
+  axiom create_get:
+    forall f: int -> int -> 'a, i j: int.
+    0 <= i < r -> 0 <= j < c -> get (create f) i j = f i j
+
+end
+
+theory SquareFixedMatrix
+
+  use import int.Int
+
+  constant d: int
+
+  axiom dimension_nonnegative:
+    0 <= d
+
+  clone export FixedMatrix with
+        function r = d,
+	function c = d,
+	goal r_and_c_nonnegative
+
+end
+
+(* theory Square_Matrix = Matrix with  axiom rows_and_cols_nonnegative:
+    forall m: mat 'a. 0 <= rows m /\ 0 <= cols m /\ rows m = cols m  *)
+
+module MatrixArithmetic
+
+  use import int.Int
+  use import int.Sum
+  use import sum_extended.Sum_extended
+  use import FloatMatrix
+
+  (* Zero matrix *)
+  constant zerof : int -> int -> int = \_ _. 0
+
+  function zero (r c: int) : mat int = create r c zerof
+
+  (* Matrix addition *)
+  function add2f (a b: mat int) : int -> int -> int =
+    \x y. get a x y + get b x y
+
+  function add (a b: mat int) : mat int =
+    create (rows a) (cols a) (add2f a b)
+
+  (* Matrix additive inverse *)
+  function opp2f (a: mat int) : int -> int -> int =
+    \x y. - get a x y
+
+  function opp (a: mat int) : mat int =
+    create (rows a) (cols a) (opp2f a)
+
+  function sub (a b: mat int) : mat int =
+    add a (opp b)
+
+  (* Matrix multiplication *)
+  function mul_atom (a b: mat int) (i j:int) : int -> int =
+    \k. get a i k  * get b k j
+
+  function mul_cell (a b: mat int): int -> int -> int =
+     \i j. sum 0 (cols a) (mul_atom a b i j)
+
+  function mul (a b: mat int) : mat int =
+    create (rows a) (cols b) (mul_cell a b)
+
+  lemma zero_neutral:
+    forall a. add a (zero a.rows a.cols) =  a
+           by add a (zero a.rows a.cols) == a
+
+  lemma add_commutative:
+    forall a b. a === b ->
+          add a b =  add b a
+      by  add a b == add b a
+
+  lemma add_associative:
+    forall a b c. a === b === c ->
+       add a (add b c) =  add (add a b) c
+    by add a (add b c) == add (add a b) c
+
+  lemma add_opposite:
+    forall a. add a (opp a) =  zero a.rows a.cols
+           by add a (opp a) == zero a.rows a.cols
+
+  lemma opp_involutive:
+    forall m. opp (opp m) = m
+
+  lemma opposite_add: forall m1 m2.
+    m1 === m2 -> opp (add m1 m2) = add (opp m1) (opp m2)
+
+  function ft1 (a b c: mat int) (i j: int)  : int -> int -> int =
+                \k. smulf (get c k j) (mul_atom a b i k)
+
+  function ft2 (a b c: mat int) (i j: int) : int -> int -> int =
+   	    	\k. smulf (get a i k) (mul_atom b c k j)
+
+  let lemma mul_assoc_get (a b c: mat int) (i j: int)
+    requires { cols a = rows b }
+    requires { cols b = rows c }
+    requires { 0 <= i < (rows a) /\ 0 <= j < (cols c) }
+    ensures  { get (mul (mul a b) c) i j = get (mul a (mul b c)) i j }
+  = let ft1 = ft1 a b c i j in
+    let ft2 = ft2 a b c i j in
+    fubini ft1 ft2 0 (cols b) 0 (cols a);
+    sum_ext 0 (cols b) (mul_atom (mul a b) c i j) (sumf 0 (cols a) ft1);
+    assert { get (mul (mul a b) c) i j = sum 0 (cols b) (sumf 0 (cols a) ft1) };
+    sum_ext 0 (cols a) (mul_atom a (mul b c) i j) (sumf 0 (cols b) ft2);
+    assert { get (mul a (mul b c)) i j = sum 0 (cols a) (sumf 0 (cols b) ft2) }
+
+   lemma mul_assoc:
+     forall a b c. cols a = rows b -> cols b = rows c ->
+     let ab = mul a b in
+     let bc = mul b c in
+     let a_bc = mul a bc in
+     let ab_c = mul ab c in
+        a_bc =  ab_c
+     by a_bc == ab_c
+
+  let lemma mul_distr_right_get (a b c: mat int) (i j: int)
+    requires { 0 <= i < rows a /\ 0 <= j < cols c }
+    requires { cols b = rows c}
+    requires { a === b }
+    ensures  { get (mul (add a b) c) i j = get (add (mul a c) (mul b c)) i j }
+  = let mac = mul_atom a c i j in
+    let mbc = mul_atom b c i j in
+    assert { get (add (mul a c) (mul b c)) i j =
+             get (mul a c) i j + get (mul b c) i j =
+             sum 0 (cols b) (addf mac mbc) };
+    sum_ext 0 (cols b) (addf mac mbc) (mul_atom (add a b) c i j)
+
+  lemma mul_distr_right:
+     forall a b c.  a === b -> cols b = rows c ->
+       mul (add a b) c = add (mul a c) (mul b c)
+         by mul (add a b) c == add (mul a c) (mul b c)
+
+  let lemma mul_distr_left_get (a b c: mat int) (i j : int)
+    requires { 0 <= i < rows a /\ 0 <= j < cols c }
+    requires { cols a = rows b }
+    requires { b === c }
+    ensures  { get (mul a (add b c)) i j = get (add (mul a b) (mul a c)) i j }
+  = let mab = mul_atom a b i j in
+    let mac = mul_atom a c i j in
+    assert { get (add (mul a b) (mul a c)) i j =
+             get (mul a b) i j + get (mul a c) i j =
+             sum 0 (cols a) (addf mab mac) };
+    sum_ext 0 (cols a) (addf mab mac) (mul_atom a (add b c) i j)
+
+  lemma mul_distr_left:
+    forall a b c.  b === c -> cols a = rows b ->
+          mul a (add b c) =  add (mul a b) (mul a c)
+       by mul a (add b c) == add (mul a b) (mul a c)
+
+  lemma mul_zero_right:
+    forall a c. 0 <= c -> mul a (zero a.cols c) = zero a.rows c
+
+  lemma mul_zero_left:
+    forall a r. 0 <= r -> mul (zero r a.rows) a = zero r a.cols
+
+  lemma mul_opp:
+    forall a b. a.cols = b.rows ->
+    let oa = opp a in
+    let ob = opp b in
+    let ab = mul a b in
+    let oab = opp ab in
+    mul oa b = oab = mul a ob
+    by add (mul oa b) (add ab oab) = oab = add (mul a ob) (add ab oab)
+
+end
+
+module BlockMul
+
+  use import int.Int
+  use import int.Sum
+  use import sum_extended.Sum_extended
+  use import FloatMatrix
+  use import MatrixArithmetic
+
+  function ofs2 (a: mat int) (ai aj: int) : int -> int -> int
+    = \i j. get a (ai + i) (aj + j)
+
+  function block (a: mat int) (r dr c dc: int) : mat int =
+    create dr dc (ofs2 a r c)
+
+  predicate c_blocks (a a1 a2: mat int) =
+    0 <= a1.cols <= a.cols /\ a1 = block a 0 a.rows 0 a1.cols /\
+    a2 = block a 0 a.rows a1.cols (a.cols - a1.cols)
+
+  predicate r_blocks (a a1 a2: mat int) =
+    0 <= a1.rows <= a.rows /\ a1 = block a 0 a1.rows 0 a.cols /\
+    a2 = block a a1.rows (a.rows - a1.rows) 0 a.cols
+
+  let rec ghost block_mul_ij (a a1 a2 b b1 b2: mat int) (k: int) : unit
+    requires { a.cols = b.rows /\ a1.cols = b1.rows}
+    requires { 0 <= k <= a.cols }
+    requires { c_blocks a a1 a2 /\ r_blocks b b1 b2 }
+    ensures  { forall i j. 0 <= i < a.rows -> 0 <= j < b.cols ->
+  	         0 <= k <= a1.cols ->
+	           sum 0 k (mul_atom a b i j) = sum 0 k (mul_atom a1 b1 i j)  }
+    ensures  { forall i j. 0 <= i < a.rows -> 0 <= j < b.cols ->
+  	        a1.cols <= k <= a.cols ->
+  	          sum 0 k (mul_atom a b i j)  =
+	            sum 0 a1.cols (mul_atom a1 b1 i j) +
+		    sum 0 (k - a1.cols) (mul_atom a2 b2 i j)  }
+    variant { k }
+  = if 0 < k then begin
+      let k = k - 1 in
+      assert { forall i j. 0 <= i < a.rows -> 0 <= j < b.cols ->
+     	        mul_atom a b i j k = if k < a1.cols then mul_atom a1 b1 i j k
+	        else  mul_atom a2 b2 i j (k - a1.cols) };
+      block_mul_ij a a1 a2 b b1 b2 k
+    end
+
+  let lemma mul_split (a a1 a2 b b1 b2: mat int) : unit
+    requires { a.cols = b.rows /\ a1.cols = b1.rows}
+    requires { c_blocks a a1 a2 /\ r_blocks b b1 b2 }
+    ensures  {add (mul a1 b1) (mul a2 b2) = mul a b }
+  = block_mul_ij a a1 a2 b b1 b2 a.cols;
+    assert { add (mul a1 b1) (mul a2 b2) == mul a b }
+
+  let lemma mul_block_cell (a b: mat int) (r dr c dc i j: int) : unit
+    requires { a.cols = b.rows }
+    requires { 0 <= r /\ r + dr <= a.rows }
+    requires { 0 <= c /\ c + dc <= b.cols }
+    requires { 0 <= i < dr /\ 0 <= j < dc }
+    ensures  { ofs2 (mul a b) r c i j =
+               get (mul (block a r dr 0 a.cols) (block b 0 b.rows c dc)) i j }
+  = let a' = block a r dr 0 a.cols in
+    let b' = block b 0 b.rows c dc in
+    sum_ext 0 a.cols (mul_atom a b (i + r) (j + c)) (mul_atom a' b' i j)
+
+  lemma mul_block:
+    forall a b: mat int, r dr c dc: int.
+    a.cols = b.rows -> 0 <= r <= r + dr <= a.rows ->
+    0 <= c <= c + dc <= b.cols ->
+    let a' = block a r dr 0 a.cols in
+    let b' = block b 0 b.rows c dc in
+    let m' = block (mul a b) r dr c dc in
+       m' =  mul a' b'
+    by m' == mul a' b'
+
+end
+

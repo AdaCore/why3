@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -127,6 +127,12 @@ AC_ARG_ENABLE(profiling,
     AS_HELP_STRING([--enable-profiling], [enable profiling]),,
     enable_profiling=no)
 
+# Emacs compilation
+
+AC_ARG_ENABLE(emacs-compilation,
+    AS_HELP_STRING([--disable-emacs-compilation], [do not compile why3.elc]),,
+    enable_emacs_compilation=yes)
+
 # either relocation or local, not both
 if test "$enable_relocation" = yes ; then
 if test "$enable_local" = yes ; then
@@ -140,23 +146,22 @@ AC_MSG_CHECKING(executable suffix)
 if uname -s | grep -q CYGWIN ; then
   EXE=.exe
   STRIP='echo "no strip "'
-  CPULIMIT=cpulimit-win
   AC_MSG_RESULT(.exe <Cygwin>)
 else
 if uname -s | grep -q MINGW ; then
   EXE=.exe
   STRIP=strip
-  CPULIMIT=cpulimit-win
   AC_MSG_RESULT(.exe <MinGW>)
 else
   EXE=
   STRIP=strip
-  CPULIMIT=cpulimit
   AC_MSG_RESULT(<none>)
 fi
 fi
 
-AC_PROG_CC()
+AC_PROG_CC
+AC_PROG_MKDIR_P
+AC_PROG_INSTALL
 
 # Check for Ocaml compilers
 
@@ -349,7 +354,13 @@ if test "$enable_html_doc" = yes ; then
 fi
 
 # checking for emacs
-AC_CHECK_PROG(EMACS,emacs,emacs,no)
+if test "$enable_emacs_compilation" = yes ; then
+   AC_CHECK_PROG(EMACS,emacs,emacs,no)
+   if test "$EMACS" = no ; then
+      enable_emacs_compilation=no
+      AC_MSG_WARN([Cannot find emacs, compilation of why3.elc disabled.])
+   fi
+fi
 
 # checking for Zarith
 if test "$enable_zarith" = yes; then
@@ -618,21 +629,21 @@ else
         ISABELLEDETECTEDVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
 
         case $ISABELLEDETECTEDVERSION in
-          2014*)
-	        enable_isabelle_support=yes
-                ISABELLEVERSION=2014
-                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
-                ;;
           2015*)
 	        enable_isabelle_support=yes
                 ISABELLEVERSION=2015
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
+          2016*)
+	        enable_isabelle_support=yes
+                ISABELLEVERSION=2016
+                AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
+                ;;
           *)
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2014 or 2015; Isabelle discarded)
-                reason_isabelle_support=" (need version >= 2014)"
+	        AC_MSG_WARN(You need Isabelle 2015 or later; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2015)"
                 ;;
         esac
     fi
@@ -709,17 +720,13 @@ dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
 
 VERSION=$PACKAGE_VERSION
 
-BUILDDATE="$(date)"
-
 # substitutions to perform
 AC_SUBST(VERSION)
-AC_SUBST(BUILDDATE)
 
 AC_SUBST(enable_verbose_make)
 
 AC_SUBST(EXE)
 AC_SUBST(STRIP)
-AC_SUBST(CPULIMIT)
 
 AC_SUBST(OCAMLC)
 AC_SUBST(OCAMLOPT)
@@ -791,6 +798,8 @@ AC_SUBST(enable_html_doc)
 AC_SUBST(RUBBER)
 AC_SUBST(HEVEA)
 AC_SUBST(HACHA)
+
+AC_SUBST(enable_emacs_compilation)
 AC_SUBST(EMACS)
 
 AC_SUBST(enable_frama_c)

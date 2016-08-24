@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="13" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="18" name="Z3" version="4.3.2" timelimit="15" steplimit="0" memlimit="1000"/>
+<file name="../dfs.mlw" expanded="true">
+<theory name="DFS" sum="f30cfdc8f980d8ec0f281573e7aff648" expanded="true">
+ <goal name="WP_parameter dfs" expl="VC for dfs">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter dfs.1" expl="1. precondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.2" expl="2. precondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.3" expl="3. precondition">
+  <proof prover="13"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.4" expl="4. precondition">
+  <proof prover="13"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.5" expl="5. precondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.6" expl="6. precondition">
+  <proof prover="13"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.7" expl="7. postcondition">
+  <proof prover="13"><result status="valid" time="0.08" steps="140"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.8" expl="8. postcondition">
+  <proof prover="13"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.9" expl="9. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.10" expl="10. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.11" expl="11. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.12" expl="12. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.13" expl="13. postcondition">
+  <proof prover="13"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.14" expl="14. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.15" expl="15. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.16" expl="16. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.17" expl="17. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="reformulation">
+ <transf name="induction_pr">
+  <goal name="reformulation.1" expl="1.">
+  <transf name="simplify_trivial_quantification">
+   <goal name="reformulation.1.1" expl="1.">
+   <proof prover="13"><result status="valid" time="0.00" steps="3"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="reformulation.2" expl="2.">
+  <transf name="simplify_trivial_quantification">
+   <goal name="reformulation.2.1" expl="1.">
+   <proof prover="18"><result status="valid" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter traverse" expl="VC for traverse">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter traverse.1" expl="1. assertion">
+  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter traverse.2" expl="2. precondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="1"/></proof>
+  </goal>
+  <goal name="WP_parameter traverse.3" expl="3. precondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter traverse.4" expl="4. precondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="2"/></proof>
+  </goal>
+  <goal name="WP_parameter traverse.5" expl="5. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter traverse.6" expl="6. postcondition">
+  <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter traverse.7" expl="7. postcondition">
+  <proof prover="13"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

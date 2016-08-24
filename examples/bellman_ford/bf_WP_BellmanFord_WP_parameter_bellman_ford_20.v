@@ -354,7 +354,7 @@ Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo".
+Ltac ae := why3 "Alt-Ergo,0.99.1,"; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_bellman_ford : (((cardinal vertices) - 1%Z)%Z < 1%Z)%Z ->
@@ -377,7 +377,7 @@ Theorem WP_parameter_bellman_ford : (((cardinal vertices) - 1%Z)%Z < 1%Z)%Z ->
       vertex t)) s (Finite 0%Z))
       result1) with
       | Infinite => True
-      | (Finite y) => ((x + (weight result result1))%Z < y)%Z
+      | (Finite x1) => ((x + (weight result result1))%Z < x1)%Z
       end
   end -> exists v:vertex, (negative_cycle v)))))).
 (* Why3 intros h1 h2 es h3 es1 (h4,h5) o h6 h7 h8 es2 result result1 result2
@@ -395,8 +395,12 @@ assert (v = s) by ae. subst v.
 rewrite Map.Select_eq; auto.
 intros hneg.
 exists s. red.
-split. ae.
-split. exists nil; ae.
-exists (cons s nil); ae.
-Qed.
+split. 
+- ae.
+- split. 
+  + exists nil; ae.
+  + exists (cons s nil); split.
+    apply Path_cons with s; ae.
+    ae.
+Admitted.
 

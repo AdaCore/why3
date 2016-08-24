@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -120,15 +120,13 @@ rule scan code = parse
   | goto space+ (ident as id)
       { add_instr code (Igoto (find_label code id));
         scan code lexbuf }
-  | call space+ (ident as p) space+ (integer as t) space+ (integer as s) space+ (integer as m)
+  | call space+ (ident as p) space+ (integer as t) space+ (integer as m)
       { let p = prover code p in
         let t = integer "timelimit" t in
         if t <= 0 then error "timelimit %d is invalid" t;
-	let s = integer "steplimit" s in
-        if s <= 0 then error "steplimit %d is invalid" s;
         let m = integer "memlimit" m in
         if m <= 0 then error "memlimit %d is invalid" m;
-        add_instr code (Icall_prover (p.Whyconf.prover, t, s, m));
+        add_instr code (Icall_prover (p.Whyconf.prover, t, m));
         scan code lexbuf }
   | transform space+ (ident as t) space+ (ident as l)
       { transform code t;

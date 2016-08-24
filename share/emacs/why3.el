@@ -21,7 +21,7 @@
 ;; font-lock
 
 (defun why3-regexp-opt (l)
-  (concat "\\<" (concat (regexp-opt l t) "\\>")))
+  (regexp-opt l 'words))
 
 (defconst why3-font-lock-keywords-1
   (list
@@ -29,7 +29,7 @@
    '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
 ;   '("{}\\|{[^|]\\([^}]*\\)}" . font-lock-type-face)
    `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "returns" "raises" "reads" "writes" "assert" "assume" "check")) . font-lock-type-face)
-   `(,(why3-regexp-opt '("use" "clone" "namespace" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "try" "with" "theory" "uses" "module" "converter" "fun")) . font-lock-keyword-face)
+   `(,(why3-regexp-opt '("use" "clone" "namespace" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "try" "with" "theory" "uses" "module" "converter" "fun" "by" "so" "meta")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")
 
@@ -136,7 +136,7 @@
             (indent-line-to cur-indent)
           (indent-line-to 0)))))))
 
-; compile will propose "why3 ide file" is no Makefile is present
+; compile will propose "why3 ide file" if no Makefile is present
 
 (add-hook 'why3-mode-hook
           (lambda ()
@@ -145,7 +145,8 @@
                    (let ((file (file-name-nondirectory buffer-file-name)))
                      (format "why3 ide %s" file))))))
 
-
+(add-hook 'why3-mode-hook
+          (lambda () (modify-syntax-entry ?_ "w")))
 
 ;; setting the mode
 (defun why3-mode ()
@@ -174,4 +175,3 @@
   (run-hooks 'why3-mode-hook))
 
 (provide 'why3)
-

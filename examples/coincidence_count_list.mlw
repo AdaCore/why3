@@ -1,0 +1,111 @@
+
+(** Coincidence count
+
+    Exercise proposed by Rustan Leino at Dagstuhl seminar 16131, March 2016
+
+    You are given two sequences of integers, sorted in increasing
+    order and without duplicate elements, and you count the number of
+    elements that appear in both sequences (in linear time and constant
+    space).
+
+    See also coincidence_count.mlw for a version using arrays.
+
+    Authors: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module CoincidenceCount
+
+  use import list.List
+  use import set.Fset
+  use import list.Elements
+  use list.Mem as L
+  use import int.Int
+
+  clone export list.Sorted
+     with type t = int, predicate le = (<), goal Transitive.Trans
+
+  let rec coincidence_count (a b: list int) : set int
+    requires { sorted a }
+    requires { sorted b }
+    ensures  { result == inter (elements a) (elements b) }
+    variant  { a, b }
+  =
+    match a, b with
+    | Cons ha ta, Cons hb tb ->
+       if ha = hb then
+         add ha (coincidence_count ta tb)
+       else if ha < hb then
+         coincidence_count ta b
+       else
+         coincidence_count a tb
+    | _ ->
+       empty
+    end
+
+end
+
+(* the same, with elements of any type *)
+
+module CoincidenceCountAnyType
+
+  use import list.List
+  use import set.Fset
+  use import list.Elements
+  use list.Mem as L
+  use import int.Int
+
+  clone import relations.TotalStrictOrder
+
+  clone export list.Sorted
+     with type t = t, predicate le = rel, goal Transitive.Trans
+
+  let rec coincidence_count (a b: list t) : set t
+    requires { sorted a }
+    requires { sorted b }
+    ensures  { result == inter (elements a) (elements b) }
+    variant  { a, b }
+  =
+    match a, b with
+    | Cons ha ta, Cons hb tb ->
+       if ha = hb then
+         add ha (coincidence_count ta tb)
+       else if rel ha hb then
+         coincidence_count ta b
+       else
+         coincidence_count a tb
+    | _ ->
+       empty
+    end
+
+end
+
+(* the same, using only lists *)
+
+module CoincidenceCountList
+
+  use import list.List
+  use import list.Mem
+  use import int.Int
+
+  clone export list.Sorted
+     with type t = int, predicate le = (<), goal Transitive.Trans
+
+  let rec coincidence_count (a b: list int) : list int
+    requires { sorted a }
+    requires { sorted b }
+    ensures  { forall x. mem x result <-> mem x a /\ mem x b }
+    variant  { a, b }
+  =
+    match a, b with
+    | Cons ha ta, Cons hb tb ->
+       if ha = hb then
+         Cons ha (coincidence_count ta tb)
+       else if ha < hb then
+         coincidence_count ta b
+       else
+         coincidence_count a tb
+    | _ ->
+       Nil
+    end
+
+end

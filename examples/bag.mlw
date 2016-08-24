@@ -152,7 +152,9 @@ module BagImpl
     t.contents <- Bag.remove x t.contents;
     assert { forall v: 'a. numof t.data v 0 i = numof (at t.data 'L) v 0 i };
     assert { forall v: 'a.
-             numof t.data v i n = numof (at t.data 'L) v (i+1) (n+1) }
+             numof t.data v i n = numof (at t.data 'L) v (i+1) (n+1) };
+    assert { forall v: 'a.
+             numof t.data v 0 n = numof t.data v 0 i + numof t.data v i n }
 
 end
 

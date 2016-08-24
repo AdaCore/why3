@@ -7,13 +7,13 @@ When using Isabelle from \why, files generated from \why theories and
 goals are stored in a dedicated XML format. Those files should not be
 edited. Instead, the proofs must be completed in a file with the same
 name and extension \texttt{.thy}. This is the file that is opened when
-using ``Edit'' action in \texttt{why3ide}.
+using ``Edit'' action in \texttt{why3 ide}.
 
 \subsection{Installation}
 
-You need version Isabelle2014 or Isabelle2015. Former versions are not
-supported. We assume below that your version is 2015, please replace
-2015 by 2014 otherwise.
+You need version Isabelle2015 or Isabelle2016. Former versions are not
+supported. We assume below that your version is 2016, please replace
+2016 by 2015 otherwise.
 
 Isabelle must be installed before compiling \why. After compilation
 and installation of \why, you must manually add the path
@@ -22,7 +22,7 @@ and installation of \why, you must manually add the path
 \end{verbatim}
 into either the user file
 \begin{verbatim}
-.isabelle/Isabelle2015/etc/components
+.isabelle/Isabelle2016/etc/components
 \end{verbatim}
 or the system-wide file
 \begin{verbatim}
@@ -33,15 +33,15 @@ or the system-wide file
 
 The most convenient way to call Isabelle for discharging a \why goal
 is to start the Isabelle/jedit interface in server mode. In this mode,
-one must start the server once, before launching \texttt{why3ide},
+one must start the server once, before launching \texttt{why3 ide},
 using
 \begin{verbatim}
 isabelle why3_jedit
 \end{verbatim}
-Then, inside a \texttt{why3ide} session, any use of ``Edit'' will
+Then, inside a \texttt{why3 ide} session, any use of ``Edit'' will
 transfer the file to the already opened instance of jEdit. When the
 proof is completed, the user must send back the edited proof to
-\texttt{why3ide} by closing the opened buffer, typically by hitting
+\texttt{why3 ide} by closing the opened buffer, typically by hitting
 \texttt{Ctrl-w}.
 
 \subsection{Realizations}

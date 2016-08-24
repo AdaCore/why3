@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -42,8 +42,8 @@ let option_list = [
       Arg.Unit (fun _ -> printf "%s@." Config.datadir; exit 0),
       " print location of non-binary data (theories, modules, etc)";
   "--version",
-      Arg.Unit (fun _ -> printf "Why3 platform, version %s (build date: %s)@."
-        Config.version Config.builddate; exit 0),
+      Arg.Unit (fun _ -> printf "Why3 platform, version %s@."
+        Config.version; exit 0),
       " print version information";
 ]
 

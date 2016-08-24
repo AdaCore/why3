@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Task
 
 let debug = Debug.register_info_flag "prepare_for_counterexmp"
@@ -33,7 +44,7 @@ let prepare_for_counterexmp2 env task =
 let prepare_for_counterexmp env = Trans.store (prepare_for_counterexmp2 env)
 
 let () = Trans.register_env_transform "prepare_for_counterexmp" prepare_for_counterexmp
-  ~desc:"Transformation@ that@ prepares@ the@ task@ for@ quering@ for@ \
+  ~desc:"Transformation@ that@ prepares@ the@ task@ for@ querying@ for@ \
     the@ counter-example@ model.@ This@ transformation@ does@ so@ only@ \
 when@ the@ solver@ will@ be@ asked@ for@ the@ counter-example."
 

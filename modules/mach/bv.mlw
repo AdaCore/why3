@@ -7,7 +7,7 @@ module BVCheck_Gen
   constant size : int
 
   constant two_power_size : int
-  constant zero           : t
+  constant zeros           : t
 
   function to_uint t   : int
   function of_int  int : t
@@ -69,12 +69,12 @@ module BVCheck_Gen
   use import int.EuclideanDivision
 
   val udiv_check (a b:t) : t
-    requires {b <> zero}
+    requires {b <> zeros}
     ensures  { to_uint result = div (to_uint a) (to_uint b) }
     ensures  { result = udiv a b }
 
   val urem_check (a b:t) : t
-    requires {b <> zero}
+    requires {b <> zeros}
     ensures  { to_uint result = mod (to_uint a) (to_uint b) }
     ensures  { result = urem a b }
 
@@ -147,7 +147,7 @@ module BVCheck8
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
-    function zero = zero,
+    function zeros = zeros,
     function to_uint = to_uint,
     function of_int = of_int,
     function add = add,
@@ -175,7 +175,7 @@ module BVCheck16
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
-    function zero = zero,
+    function zeros = zeros,
     function to_uint = to_uint,
     function of_int = of_int,
     function add = add,
@@ -203,7 +203,7 @@ module BVCheck32
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
-    function zero = zero,
+    function zeros = zeros,
     function to_uint = to_uint,
     function of_int = of_int,
     function add = add,
@@ -231,7 +231,7 @@ module BVCheck64
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
-    function zero = zero,
+    function zeros = zeros,
     function to_uint = to_uint,
     function of_int = of_int,
     function add = add,

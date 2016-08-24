@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -23,6 +23,8 @@ let string fmt s =
 
 let int fmt d = Format.fprintf fmt "%d" d
 let bool fmt b = Format.fprintf fmt "%b" b
+let float fmt f = Format.fprintf fmt "%f" f
+(* TODO check that you can print a floating point number like this in JSON *)
 
 let print_json_field key value_pr fmt value =
   Format.fprintf fmt "%a : %a " string key value_pr value

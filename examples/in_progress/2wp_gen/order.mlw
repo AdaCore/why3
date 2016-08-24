@@ -1,0 +1,362 @@
+(* Usual definition about (pre)orders. *)
+module Ordered
+
+  use export ho_rel.Rel
+
+  predicate lower (o:erel 'a) (x y:'a) = o x y /\ not o y x
+
+  predicate upper_bound (o:erel 'a) (s:'a -> bool) (u:'a) =
+    forall x. s x -> o x u
+
+  predicate lower_bound (o:erel 'a) (s:'a -> bool) (l:'a) =
+    forall x. s x -> o l x
+
+  predicate maximum (o:erel 'a) (s:'a -> bool) (u:'a) =
+    upper_bound o s u /\ s u
+
+  predicate minimum (o:erel 'a) (s:'a -> bool) (l:'a) =
+    lower_bound o s l /\ s l
+
+  predicate supremum (o:erel 'a) (s:'a -> bool) (x:'a) =
+    minimum o (upper_bound o s) x
+
+  lemma maximum_supremum : forall o s,x:'a.
+    maximum o s x -> supremum o s x
+
+  predicate infimum (o:erel 'a) (s:'a -> bool) (x:'a) =
+    maximum o (lower_bound o s) x
+
+  lemma minimum_infimum : forall o s,x:'a.
+    minimum o s x -> infimum o s x
+
+  predicate maximal (o:erel 'a) (s:'a -> bool) (x:'a) =
+    forall y. s y /\ o x y -> o y x
+
+  predicate minimal (o:erel 'a) (s:'a -> bool) (x:'a) =
+    forall y. s y /\ o y x -> o x y
+
+  predicate monotone (o1:erel 'a) (f:'a -> 'b) (o2:erel 'b) =
+    forall x y. o1 x y -> o2 (f x) (f y)
+
+  predicate monotone_on (s:'a -> bool) (o1:erel 'a) (f:'a -> 'b) (o2:erel 'b) =
+    forall x y. s x /\ s y /\ o1 x y -> o2 (f x) (f y)
+
+  predicate inflationary (o:erel 'a) (f:'a -> 'a) =
+    forall x. o x (f x)
+
+end
+
+module LimUniq
+
+  use export Ordered
+  use import choice.Choice
+
+  function min (o:erel 'a) (s:'a -> bool) : 'a = choice (minimum o s)
+  function max (o:erel 'a) (s:'a -> bool) : 'a = choice (maximum o s)
+  function inf (o:erel 'a) (s:'a -> bool) : 'a =
+    max o (lower_bound o s)
+  function sup (o:erel 'a) (s:'a -> bool) : 'a =
+    min o (upper_bound o s)
+
+  lemma maximum_uniq : forall o s,x:'a.
+    order o /\ maximum o s x -> x = max o s
+    by o x (max o s) so o (max o s) x
+
+  lemma minimum_uniq : forall o s,x:'a.
+    order o /\ minimum o s x -> x = min o s
+    by o x (min o s) so o (min o s) x
+
+  lemma infimum_uniq : forall o s,x:'a.
+    order o /\ infimum o s x -> x = inf o s
+
+  lemma supremum_uniq : forall o s,x:'a.
+    order o /\ supremum o s x -> x = sup o s
+
+end
+
+(* Definition about chains in orders,
+   e.g totally ordered subsets. *)
+module Chain
+
+  use import ho_set.Set
+  use export Ordered
+
+  predicate chain (o:erel 'a) (s:set 'a) =
+    forall x y. s x /\ s y -> o x y \/ o y x
+
+  (* chain-bounded = all chains admit upper bound *)
+  predicate chain_bounded (o:erel 'a) =
+    forall s. chain o s -> exists y. upper_bound o s y
+
+  (* chain-complete = all chains admit supremum. *)
+  predicate chain_complete (o:erel 'a) =
+    forall s. chain o s -> exists y. supremum o s y
+
+  (* quasi-chain-complete = all non-empty chains admit supremum. *)
+  predicate q_chain_complete (o:erel 'a) =
+    forall s inh. chain o s /\ s inh -> exists y. supremum o s y
+
+  predicate subchain (o:erel 'a) (s1 s2:set 'a) =
+    subset s1 s2 /\
+    forall x y. s1 x /\ s2 y /\ not s1 y -> o x y
+
+  predicate wf_chain (o:erel 'a) (s:set 'a) =
+    forall s2. subset s2 s /\ (exists x. s2 x) ->
+      exists y. minimum o s2 y
+
+  predicate well_order (o:erel 'a) =
+    order o /\ wf_chain o all
+
+end
+
+module WfChain "W:non_conservative_extension:N" (* => WfChainProof *)
+
+  use import ho_rel.Rel
+  use export Chain
+
+  axiom wf_chain_alt_def : forall o:erel 'a,s. order o ->
+    wf_chain o s <-> wf_on (lower o) s /\ chain o s
+
+end
+
+module WfChainProof
+
+  use import ho_rel.Rel
+  use import ho_set.Set
+  use import LimUniq
+  use import Chain
+
+  lemma wf_chain_hence_acc_on : forall o s.
+    order o /\ wf_chain o s ->
+      let lo = lower o in
+      not (exists x:'a. s x /\ not acc_on lo s x
+        so let s2 = diff s (acc_on lo s) in
+          let mn = min o s2 in
+        (minimum o s2 mn by subset s2 s /\ s2 x)
+        so acc_on lo s mn)
+
+  lemma wf_chain_hence_chain : forall o s.
+    order o /\ wf_chain o s -> chain o s
+      by let s2 = \x. s x /\ exists y. s y /\ not o x y /\ not o y x in
+        not (exists y:'a. s2 y so
+          let u = min o s2 in
+          (minimum o s2 u by subset s2 s /\ s2 y)
+        so exists z. s z /\ not o u z /\ o z u
+        so s2 z)
+        so (forall x y. s x /\ s y /\ not o x y /\ not o y x -> false by s2 x)
+
+  lemma wf_on_so_wf_chain : forall o s s2,x:'a.
+    let lo = lower o in
+    order o /\ chain o s /\ wf_on lo s /\ subset s2 s /\ s2 x ->
+    not ((forall y. not minimum o s2 y)
+      so (forall o1 s1 x. o1 = lo /\ s1 = s ->
+        ("induction" acc_on o1 s1 x) -> not s2 x)
+      by forall x. (forall y. s y /\ lo y x -> not s2 y) ->
+        not (s2 x so minimum o s2 x
+          by forall y. s2 y -> o x y
+          by o x y || (false by lo y x by o y x)))
+
+  clone WfChain with goal wf_chain_alt_def
+
+end
+
+module SubChain "W:non_conservative_extension:N" (* => SubChainProof *)
+
+  use export Chain
+  use import ho_set.SetBigOps
+
+  axiom subchain_complete_order : forall o:erel 'a.
+    transitive o -> order (subchain o) /\ chain_complete (subchain o)
+
+  axiom subchain_completion : forall o:erel 'a,ch.
+    chain (subchain o) ch ->
+    supremum (subchain o) ch (bigunion ch)
+
+  axiom chain_subchain_completion : forall o:erel 'a,ch x.
+    chain (subchain o) ch /\ (forall x. ch x -> chain o x) /\
+    supremum (subchain o) ch x -> chain o x
+
+  axiom wf_subchain_completion : forall o:erel 'a,ch x.
+    chain (subchain o) ch /\ (forall x. ch x -> wf_chain o x) /\
+    supremum (subchain o) ch x -> wf_chain o x
+
+end
+
+module SubChainProof
+
+  use import ho_set.SubsetOrder
+  use import ho_set.SetBigOps
+  use import Chain
+
+  lemma subchain_antisymetric : forall o:erel 'a.
+    antisymetric (subchain o)
+
+  lemma subchain_order : forall o:erel 'a.
+    transitive o -> order (subchain o)
+
+  lemma subchain_completion : forall o:erel 'a,ch.
+    let u = bigunion ch in
+    let sb = subchain o in
+    chain sb ch ->
+    supremum sb ch u
+    by (upper_bound sb ch u
+      by forall x. ch x -> sb x u
+      by forall a b. x a /\ u b /\ not x b -> o a b
+      by exists wb. ch wb /\ wb b
+      so sb x wb)
+    /\ forall v. upper_bound sb ch v -> sb u v
+    by (forall a. u a -> v a
+      by exists wa. ch wa /\ wa a so sb wa v)
+    /\ forall a b. u a /\ v b /\ not u b -> o a b
+      by exists wa. ch wa /\ wa a so sb wa v
+
+  lemma chain_subchain_completion : forall o ch,x:set 'a.
+    chain (subchain o) ch /\
+    (forall x. ch x -> chain o x) /\ supremum (subchain o) ch x ->
+    chain o x
+    by x = bigunion ch
+    so forall u v. x u /\ x v -> o u v \/ o v u
+    by exists wu. ch wu /\ wu u
+    so exists wv. ch wv /\ wv v
+    so exists w. ch w /\ w u /\ w v
+    by if subchain o wu wv then w = wv else w = wu
+
+  lemma wf_subchain_completion : forall o ch,x:set 'a.
+    chain (subchain o) ch /\
+    (forall x. ch x -> wf_chain o x) /\ supremum (subchain o) ch x ->
+    wf_chain o x
+    by x = bigunion ch
+    so forall s2 y. s2 y /\ subset s2 x ->
+      (exists z. minimum o s2 z)
+    by exists wy. ch wy /\ wy y
+    so let s3 = inter s2 wy in
+      subset s3 wy /\ s3 y
+    so exists z. minimum o s3 z
+    so minimum o s2 z
+    by forall t. s2 t -> o z t
+    by s3 t || subchain o wy x
+
+  clone SubChain with goal subchain_complete_order,
+    goal subchain_completion,
+    goal chain_subchain_completion,
+    goal wf_subchain_completion
+
+end
+
+module Product
+
+  use import Ordered
+  use import ho_rel.Prod
+  use import fn.Fun
+  use import fn.Image
+
+  lemma order_product : forall o1:erel 'a,o2:erel 'b.
+    order o1 /\ order o2 -> order (rprod o1 o2)
+    by let op = rprod o1 o2 in
+      (reflexive op by forall x. op x x by let (a,_) = x in o1 a a)
+    /\ (antisymetric op by forall x y. op x y /\ op y x -> x = y
+      by let (a,_) = x in let (c,_) = y in a = c)
+    /\ (transitive op by forall x y z. op x y /\ op y z -> op x z
+      by let (a,_) = x in let (_,_) = y in let (e,_) = z in o1 a e)
+
+  lemma prod_upper_bound : forall o1 o2 s,x:'a,y:'b.
+    order o1 /\ order o2 ->
+    (upper_bound (rprod o1 o2) s (x,y) <->
+    upper_bound o1 (image fst s) x /\ upper_bound o2 (image snd s) y)
+    by let op = rprod o1 o2 in
+      (upper_bound op s (x,y) ->
+        (upper_bound o1 (image fst s) x
+        by forall z. image fst s z -> o1 z x
+        by exists t. s (z,t))
+      /\ (upper_bound o2 (image snd s) y)
+        by forall t. image snd s t -> o2 t y
+        by exists z. s (z,t))
+    /\ (upper_bound o1 (image fst s) x /\ upper_bound o2 (image snd s) y ->
+      upper_bound op s (x,y)
+      by forall z. s z -> op z (x,y)
+      by let (zx,zy) = z in
+        image fst s zx /\ image snd s zy)
+
+  lemma prod_lower_bound : forall o1 o2 s,x:'a,y:'b.
+    order o1 /\ order o2 ->
+    (lower_bound (rprod o1 o2) s (x,y) <->
+    lower_bound o1 (image fst s) x /\ lower_bound o2 (image snd s) y)
+    by let op = rprod o1 o2 in
+      (lower_bound op s (x,y) ->
+        (lower_bound o1 (image fst s) x
+        by forall z. image fst s z -> o1 x z
+        by exists t. s (z,t))
+      /\ (lower_bound o2 (image snd s) y)
+        by forall t. image snd s t -> o2 y t
+        by exists z. s (z,t))
+    /\ (lower_bound o1 (image fst s) x /\ lower_bound o2 (image snd s) y ->
+      lower_bound op s (x,y)
+      by forall z. s z -> op (x,y) z
+      by let (zx,zy) = z in
+        image fst s zx /\ image snd s zy)
+
+  lemma prod_supremum : forall o1 o2 s,x:'a,y:'b.
+    order o1 /\ order o2 ->
+    (supremum (rprod o1 o2) s (x,y) <->
+     supremum o1 (image fst s) x /\ supremum o2 (image snd s) y)
+   by let op = rprod o1 o2 in
+     supremum op s (x,y) ->
+     (supremum o1 (image fst s) x
+     by forall u. upper_bound o1 (image fst s) u -> o1 x u
+     by upper_bound op s (u,y) so op (x,y) (u,y))
+     /\ (supremum o2 (image snd s) y
+     by forall u. upper_bound o2 (image snd s) u -> o2 y u
+     by upper_bound op s (x,u) so op (x,y) (x,u))
+
+  lemma prod_infimum : forall o1 o2 s,x:'a,y:'b.
+    order o1 /\ order o2 ->
+    (infimum (rprod o1 o2) s (x,y) <->
+     infimum o1 (image fst s) x /\ infimum o2 (image snd s) y)
+   by let op = rprod o1 o2 in
+     infimum op s (x,y) ->
+     (infimum o1 (image fst s) x
+     by forall u. lower_bound o1 (image fst s) u -> o1 u x
+     by lower_bound op s (u,y) so op (u,y) (x,y))
+     /\ (infimum o2 (image snd s) y
+     by forall u. lower_bound o2 (image snd s) u -> o2 u y
+     by lower_bound op s (x,u) so op (x,u) (x,y))
+
+end
+
+module ProductChain
+
+  use import Chain
+  use import ho_rel.Prod
+  use import Product
+  use import fn.Fun
+  use import fn.Image
+
+  lemma prod_chain : forall o1:erel 'a,o2:erel 'b,ch.
+    chain (rprod o1 o2) ch ->
+    (chain o1 (image fst ch)
+     by forall x y. image fst ch x /\ image fst ch y -> (o1 x y \/ o1 y x)
+     by exists z. ch (x,z) so exists t. ch (y,t)
+     so rprod o1 o2 (x,z) (y,t) \/ rprod o1 o2 (y,t) (x,z))
+    /\ (chain o2 (image snd ch)
+     by forall x y. image snd ch x /\ image snd ch y -> (o2 x y \/ o2 y x)
+     by exists z. ch (z,x) so exists t. ch (t,y)
+     so rprod o1 o2 (z,x) (t,y) \/ rprod o1 o2 (t,y) (z,x))
+
+  lemma prod_chain_complete : forall o1:erel 'a,o2:erel 'b.
+    order o1 /\ order o2 /\ chain_complete o1 /\ chain_complete o2 ->
+    chain_complete (rprod o1 o2)
+    by forall ch. chain (rprod o1 o2) ch ->
+      exists x. supremum o1 (image fst ch) x
+    so exists y. supremum o2 (image snd ch) y
+    so supremum (rprod o1 o2) ch (x,y)
+
+  lemma prod_q_chain_complete : forall o1:erel 'a,o2:erel 'b.
+    order o1 /\ order o2 /\ q_chain_complete o1 /\ q_chain_complete o2 ->
+    q_chain_complete (rprod o1 o2)
+    by forall ch inh. chain (rprod o1 o2) ch /\ ch inh ->
+      let (a,b) = inh in image fst ch a /\ image snd ch b
+    so exists x. supremum o1 (image fst ch) x
+    so exists y. supremum o2 (image snd ch) y
+    so supremum (rprod o1 o2) ch (x,y)
+
+end

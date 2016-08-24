@@ -10,10 +10,6 @@ Require set.Set.
 (* Why3 assumption *)
 Definition unit := unit.
 
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
 (* Why3 assumption *)
 Inductive datatype :=
   | Tint : datatype
@@ -316,6 +312,9 @@ Axiom while_rule_ext : forall (e:term) (inv:fmla) (inv':fmla) (i:stmt),
   inv') -> (valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e))
   inv'))).
 
+Require Import Why3.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
+
 (* Why3 goal *)
 Theorem WP_parameter_wp : forall (i:stmt) (q:fmla), forall (x:term) (x1:fmla)
   (x2:stmt), (i = (Swhile x x1 x2)) -> forall (o:fmla), (valid_triple o x2
@@ -356,12 +355,18 @@ assert (H_abstr_in_s3 := Hnext s3 p3 n1 First_iter); clear Hnext.
 split; auto.
 red in H_WP_body.
 apply H_WP_body with (2:=First_iter).
+ae.
+(*
 apply Htrue; auto.
+*)
 (* case cond = false *)
 inversion H2; [subst; clear H2 | inversion H0].
 destruct (H_abstracted s2 p2 H_abstr_in_s2) as ((_,Hfalse) & Hnext).
 clear H_abstracted.
+ae.
+(*
 apply Hfalse; split; auto.
 rewrite H11; discriminate.
-Qed.
+*)
+Admitted.
 

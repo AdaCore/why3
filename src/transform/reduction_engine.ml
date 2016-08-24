@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -48,6 +48,8 @@ let big_int_of_value v =
   match v with
   | Int n -> n
   | Term {t_node = Tconst c } -> big_int_of_const c
+  | Term { t_node = Tapp (ls,[{ t_node = Tconst c }]) }
+    when ls_compare ls !ls_minus = 0 -> BigInt.minus (big_int_of_const c)
   | _ -> raise NotNum
 
 
@@ -328,28 +330,17 @@ let first_order_matching (vars : Svs.t) (largs : term list)
               begin
                 match t2.t_node with
                   | Tapp(ls2,args2) when ls_equal ls1 ls2 ->
-                    loop sigma (List.rev_append args1 r1)
-                      (List.rev_append args2 r2)
+                    let mt, mv = loop sigma (List.rev_append args1 r1)
+                      (List.rev_append args2 r2) in
+                    begin
+                      try Ty.oty_match mt t1.t_ty t2.t_ty, mv
+                      with Ty.TypeMismatch _ -> raise NoMatch
+                    end
                   | _ -> raise NoMatch
               end
-            | _ ->
-(*
-              Format.eprintf "are these terms equal ?...";
-*)
-              if t_equal t1 t2 then
-                begin
-(*
-                  Format.eprintf " yes!@.";
-*)
-                  loop sigma r1 r2
-                end
-              else
-                begin
-(*
-                  Format.eprintf " no@.";
-*)
-                  raise NoMatch
-                end
+            | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
+                loop sigma r1 r2
+            | _ -> raise NoMatch
         end
       | _ -> raise NoMatch
   in
@@ -430,7 +421,7 @@ let rec reduce engine c =
                 Term
                   (t_label_copy orig
                      (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
-              cont_stack = rem ;
+              cont_stack = rem;
             }
         end
       | Int _ -> assert false (* would be ill-typed *)
@@ -455,7 +446,7 @@ let rec reduce engine c =
   | [], (Knot,_) :: _ -> assert false
   | Int _ :: _ , (Knot,_) :: _ -> assert false
   | (Term t) :: st, (Knot, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_not t)) :: st;
+    { value_stack = Term (t_label_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
   | st, (Kapp(ls,ty), orig) :: rem ->
@@ -512,8 +503,13 @@ and reduce_match st u ~orig tbl sigma cont =
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined ->
+    let dmy = t_var (create_vsymbol (Ident.id_fresh "__dmy") (t_type u)) in
+    let tbls = match t_subst sigma (t_case dmy tbl) with
+      | { t_node = Tcase (_,tbls) } -> tbls
+      | _ -> assert false
+    in
     { value_stack =
-        Term (t_label_copy orig (t_subst sigma (t_case u tbl))) :: st;
+        Term (t_label_copy orig (t_case u tbls)) :: st;
       cont_stack = cont;
     }
 
@@ -700,9 +696,9 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
     }
   with Not_found | Undetermined ->
     let args = List.map term_of_value args in
-    try
-      let d = Ident.Mid.find ls.ls_name engine.known_map in
-      let rewrite () =
+    let d = try Ident.Mid.find ls.ls_name engine.known_map
+      with Not_found -> assert false in
+    let rewrite () =
       (* try a rewrite rule *)
         begin
           try
@@ -747,7 +743,9 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
               cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
             }
           with Irreducible ->
-            raise Not_found
+            { value_stack =
+                Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
+              cont_stack = rem_cont; }
         end in
       match d.Decl.d_node with
       | Decl.Dtype _ | Decl.Dprop _ -> assert false
@@ -772,13 +770,13 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
         rewrite ()
       | Decl.Ddata dl ->
         (* constructor or projection *)
-        match args with
+        begin try match args with
         | [ { t_node = Tapp(ls1,tl1) } ] ->
           (* if ls is a projection and ls1 is a constructor,
              we should compute that projection *)
           let rec iter dl =
             match dl with
-            | [] -> raise Not_found
+            | [] -> raise Exit
             | (_,csl) :: rem ->
               let rec iter2 csl =
                 match csl with
@@ -800,16 +798,13 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
                           iter3 prs tl1
                       | None::prs, _::tl1 ->
                         iter3 prs tl1
-                      | _ -> raise Not_found
+                      | _ -> raise Exit
                     in iter3 prs tl1
                   else iter2 rem2
               in iter2 csl
           in iter dl
-        | _ -> raise Not_found
-    with Not_found ->
-      { value_stack = Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
-        cont_stack = rem_cont;
-      }
+        | _ -> raise Exit
+        with Exit -> rewrite () end
 
 
 and reduce_equ (* engine *) ~orig st v1 v2 cont =
@@ -987,8 +982,19 @@ let extract_rule _km t =
       | Decl.Dparam _ | Decl.Dind _ -> ()
   in
 *)
-  (* TODO : verifier que les variables de droite, aussi bien term que type,
-     apparaissent a gauche *)
+
+  let check_vars acc t1 t2 =
+    (* check that quantified variables all appear in the lefthand side *)
+    let vars_lhs = t_vars t1 in
+    if Svs.exists (fun vs -> not (Mvs.mem vs vars_lhs)) acc
+    then raise (NotARewriteRule "lhs should contain all variables");
+    (* check the same with type variables *)
+    if not
+         (Ty.Stv.subset
+            (t_ty_freevars Ty.Stv.empty t2) (t_ty_freevars Ty.Stv.empty t2))
+    then raise (NotARewriteRule "lhs should contain all type variables")
+
+  in
 
   let rec aux acc t =
     match t.t_node with
@@ -998,14 +1004,20 @@ let extract_rule _km t =
       | Tbinop(Tiff,t1,t2) ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> (* check_ls ls; *) acc,ls,args,t2
+            | Tapp(ls,args) ->
+               (* check_ls ls; *)
+               check_vars acc t1 t2;
+               acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of <-> should be a predicate symbol")
         end
       | Tapp(ls,[t1;t2]) when ls == ps_equ ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> (* check_ls ls; *) acc,ls,args,t2
+            | Tapp(ls,args) ->
+               (* check_ls ls; *)
+               check_vars acc t1 t2;
+               acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of = should be a function symbol")
         end

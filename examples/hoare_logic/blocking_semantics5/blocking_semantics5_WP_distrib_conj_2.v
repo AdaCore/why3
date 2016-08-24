@@ -480,7 +480,7 @@ Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla), (valid_fmla
   (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 5.
+Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 5; admit.
 
 (* Why3 goal *)
 Theorem distrib_conj : forall (s:stmt), forall (x:stmt) (x1:stmt),
@@ -502,5 +502,5 @@ assert (H: valid_fmla
   unfold valid_fmla ; simpl; ae.
 generalize (monotonicity x _ _ H).
 unfold valid_fmla; simpl; ae.
-Qed.
+Admitted.
 

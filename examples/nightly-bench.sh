@@ -35,6 +35,7 @@ echo "Starting time (UTC): "`date --utc +%H:%M` >> $REPORT
 
 # configuration
 autoconf
+automake --add-missing
 ./configure --enable-local &> $OUT
 if test "$?" != "0" ; then
     echo "Configure failed" >> $REPORT
@@ -103,7 +104,7 @@ target_name = "Coq"
 target_version = "$COQVER"
 version = "8.4pl5"
 
-[uninstalled_prover policy2]
+[uninstalled_prover policy3]
 alternative = ""
 name = "Coq"
 policy = "upgrade"
@@ -111,6 +112,15 @@ target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
 version = "8.4pl6"
+
+[uninstalled_prover policy4]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "$COQVER"
+version = "8.5"
 
 EOF
 fi

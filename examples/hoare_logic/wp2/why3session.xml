@@ -2,205 +2,184 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.4pl6" timelimit="3" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
-<prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="0"/>
-<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
-<prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="3" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.4pl6" timelimit="3" steplimit="0" memlimit="0"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
+<prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../wp2.mlw" expanded="true">
 <theory name="Imp" sum="128a05171862f85c119bf4cc4ff1493c">
  <goal name="eval_subst_term">
- <proof prover="1" timelimit="5" memlimit="0" edited="wp2_Imp_eval_subst_term_1.v"><result status="valid" time="0.88"/></proof>
+ <proof prover="1" timelimit="5" edited="wp2_Imp_eval_subst_term_1.v"><result status="valid" time="0.83"/></proof>
  </goal>
  <goal name="eval_term_change_free">
- <proof prover="1" timelimit="5" memlimit="0" edited="wp2_Imp_eval_term_change_free_1.v"><result status="valid" time="0.87"/></proof>
+ <proof prover="1" timelimit="5" edited="wp2_Imp_eval_term_change_free_1.v"><result status="valid" time="0.83"/></proof>
  </goal>
  <goal name="eval_subst">
- <proof prover="1" timelimit="5" memlimit="0" edited="wp2_Imp_eval_subst_1.v"><result status="valid" time="0.96"/></proof>
+ <proof prover="1" timelimit="5" edited="wp2_Imp_eval_subst_1.v"><result status="valid" time="0.92"/></proof>
  </goal>
  <goal name="eval_swap">
- <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.02"/></proof>
- <proof prover="4" timelimit="3" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="eval_change_free">
- <proof prover="1" timelimit="5" memlimit="0" edited="wp2_Imp_eval_change_free_1.v"><result status="valid" time="0.91"/></proof>
+ <proof prover="1" timelimit="5" edited="wp2_Imp_eval_change_free_1.v"><result status="valid" time="0.88"/></proof>
  </goal>
  <goal name="check_skip">
- <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="7" timelimit="5" memlimit="0"><result status="valid" time="0.01" steps="1"/></proof>
+ <proof prover="7" memlimit="0"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="steps_non_neg">
- <proof prover="1" memlimit="0" edited="wp2_Imp_steps_non_neg_1.v"><result status="valid" time="0.84"/></proof>
+ <proof prover="1" edited="wp2_Imp_steps_non_neg_1.v"><result status="valid" time="0.85"/></proof>
  </goal>
  <goal name="many_steps_seq">
- <proof prover="1" memlimit="0" edited="wp2_Imp_many_steps_seq_1.v"><result status="valid" time="1.04"/></proof>
+ <proof prover="1" edited="wp2_Imp_many_steps_seq_1.v"><result status="valid" time="0.99"/></proof>
  </goal>
 </theory>
 <theory name="TestSemantics" sum="43e242b3d12bc39d4b29f9b888732dc9">
  <goal name="Test13">
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="4"><result status="valid" time="0.03"/></proof>
- <proof prover="7" timelimit="5"><result status="valid" time="0.02" steps="2"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
  <goal name="Test42">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
- <proof prover="4"><result status="valid" time="0.03"/></proof>
- <proof prover="7" timelimit="5"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+ <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
  <goal name="Test0">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
- <proof prover="4"><result status="valid" time="0.04"/></proof>
- <proof prover="7" timelimit="5"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+ <proof prover="7" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
  <goal name="Test55">
- <proof prover="1" timelimit="5" edited="wp2_TestSemantics_Test55_1.v"><result status="valid" time="0.87"/></proof>
+ <proof prover="1" timelimit="5" memlimit="1000" edited="wp2_TestSemantics_Test55_1.v"><result status="valid" time="0.84"/></proof>
  </goal>
  <goal name="Ass42">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
- <proof prover="4"><result status="valid" time="0.03"/></proof>
- <proof prover="7" timelimit="5"><result status="valid" time="0.06" steps="100"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
+ <proof prover="7" memlimit="1000"><result status="valid" time="0.06" steps="100"/></proof>
  </goal>
  <goal name="If42">
- <proof prover="1" timelimit="5" edited="wp2_TestSemantics_If42_1.v"><result status="valid" time="1.85"/></proof>
+ <proof prover="1" timelimit="5" memlimit="1000" edited="wp2_TestSemantics_If42_1.v"><result status="valid" time="1.43"/></proof>
  </goal>
 </theory>
 <theory name="HoareLogic" sum="82e50c9c6ac0f07e1bde1792daeea9d0">
  <goal name="consequence_rule">
- <proof prover="2"><result status="valid" time="0.12"/></proof>
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="2" memlimit="1000"><result status="valid" time="0.32"/></proof>
  </goal>
  <goal name="skip_rule">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_skip_rule_1.v"><result status="valid" time="1.00"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_skip_rule_1.v"><result status="valid" time="0.94"/></proof>
  </goal>
  <goal name="assign_rule">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_assign_rule_1.v"><result status="valid" time="1.21"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_assign_rule_1.v"><result status="valid" time="0.89"/></proof>
  </goal>
  <goal name="seq_rule">
- <proof prover="3"><result status="valid" time="0.03"/></proof>
  <proof prover="5" timelimit="3"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="if_rule">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_if_rule_1.v"><result status="valid" time="1.09"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_if_rule_1.v"><result status="valid" time="1.08"/></proof>
  </goal>
  <goal name="assert_rule">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_assert_rule_1.v"><result status="valid" time="1.02"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_assert_rule_1.v"><result status="valid" time="1.02"/></proof>
  </goal>
  <goal name="assert_rule_ext">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="1.17"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="1.17"/></proof>
  </goal>
  <goal name="while_rule">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_while_rule_1.v"><result status="valid" time="1.34"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_while_rule_1.v"><result status="valid" time="0.99"/></proof>
  </goal>
  <goal name="while_rule_ext">
- <proof prover="1" memlimit="0" edited="wp2_HoareLogic_while_rule_ext_1.v"><result status="valid" time="1.17"/></proof>
+ <proof prover="1" edited="wp2_HoareLogic_while_rule_ext_1.v"><result status="valid" time="1.12"/></proof>
  </goal>
 </theory>
-<theory name="WP" sum="fecbd41e24059a14cd35723bb1094997" expanded="true">
+<theory name="WP" sum="fecbd41e24059a14cd35723bb1094997">
  <goal name="assigns_refl">
- <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="3"/></proof>
+ <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
  <goal name="assigns_trans">
- <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="8"/></proof>
+ <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="8"/></proof>
  </goal>
  <goal name="assigns_union_left">
- <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
+ <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
  <goal name="assigns_union_right">
- <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="8"/></proof>
+ <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter compute_writes" expl="VC for compute_writes">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compute_writes.1" expl="1. postcondition">
-  <proof prover="7" memlimit="0"><result status="valid" time="0.06" steps="94"/></proof>
+  <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.06" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.2" expl="2. postcondition">
-  <proof prover="1" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_1.v"><result status="valid" time="1.00"/></proof>
+  <proof prover="1" edited="wp2_WP_WP_WP_parameter_compute_writes_1.v"><result status="valid" time="0.97"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.3" expl="3. variant decrease">
-  <proof prover="6"><result status="valid" time="0.04" steps="43"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.4" expl="4. variant decrease">
-  <proof prover="6"><result status="valid" time="0.04" steps="45"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="5" timelimit="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.6" expl="6. variant decrease">
-  <proof prover="6"><result status="valid" time="0.03" steps="47"/></proof>
+  <proof prover="7"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.7" expl="7. variant decrease">
-  <proof prover="6"><result status="valid" time="0.04" steps="49"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.8" expl="8. postcondition">
-  <proof prover="1" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_3.v"><result status="valid" time="0.94"/></proof>
+  <proof prover="1" edited="wp2_WP_WP_WP_parameter_compute_writes_3.v"><result status="valid" time="0.91"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.9" expl="9. variant decrease">
-  <proof prover="6"><result status="valid" time="0.04" steps="47"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="47"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.10" expl="10. postcondition">
-  <proof prover="1" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_4.v"><result status="valid" time="1.12"/></proof>
+  <proof prover="1" edited="wp2_WP_WP_WP_parameter_compute_writes_4.v"><result status="valid" time="1.05"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.11" expl="11. postcondition">
-  <proof prover="1" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_2.v"><result status="valid" time="0.99"/></proof>
+  <proof prover="1" edited="wp2_WP_WP_WP_parameter_compute_writes_2.v"><result status="valid" time="0.99"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter wp" expl="VC for wp" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter wp" expl="VC for wp">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter wp.1" expl="1. postcondition">
-  <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4" timelimit="3" memlimit="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" timelimit="3"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.00"/></proof>
-  <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter wp.2" expl="2. variant decrease">
-  <proof prover="6"><result status="valid" time="0.03" steps="43"/></proof>
+  <proof prover="7"><result status="valid" time="0.03" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter wp.3" expl="3. variant decrease">
-  <proof prover="6"><result status="valid" time="0.03" steps="46"/></proof>
+  <proof prover="7"><result status="valid" time="0.03" steps="44"/></proof>
   </goal>
   <goal name="WP_parameter wp.4" expl="4. postcondition">
-  <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="4" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="3"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.12"/></proof>
-  <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter wp.5" expl="5. postcondition">
-  <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="3"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.11"/></proof>
-  <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter wp.6" expl="6. variant decrease">
-  <proof prover="6"><result status="valid" time="0.03" steps="47"/></proof>
+  <proof prover="7"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
   <goal name="WP_parameter wp.7" expl="7. variant decrease">
-  <proof prover="6"><result status="valid" time="0.04" steps="50"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
-  <goal name="WP_parameter wp.8" expl="8. postcondition" expanded="true">
-  <proof prover="1" memlimit="0" edited="wp2_WP_WP_WP_parameter_wp_1.v"><result status="valid" time="0.83"/></proof>
+  <goal name="WP_parameter wp.8" expl="8. postcondition">
+  <proof prover="1" edited="wp2_WP_WP_WP_parameter_wp_1.v"><result status="valid" time="0.82"/></proof>
   </goal>
   <goal name="WP_parameter wp.9" expl="9. postcondition">
-  <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="4" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" timelimit="3"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.11"/></proof>
-  <proof prover="7" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter wp.10" expl="10. variant decrease">
-  <proof prover="6"><result status="valid" time="0.04" steps="47"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter wp.11" expl="11. postcondition" expanded="true">
-  <proof prover="1" timelimit="5" memlimit="0" edited="wp2_WP_WP_WP_parameter_wp_2.v"><result status="valid" time="1.19"/></proof>
+  <goal name="WP_parameter wp.11" expl="11. postcondition">
+  <proof prover="1" timelimit="5" edited="wp2_WP_WP_WP_parameter_wp_2.v"><result status="valid" time="1.52"/></proof>
   </goal>
  </transf>
  </goal>

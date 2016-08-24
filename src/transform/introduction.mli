@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -30,3 +30,8 @@
 val intros :  Decl.prsymbol -> Term.term -> Decl.decl list
  (** [intros G f] returns the declarations after introducing
      premises of [goal G : f] *)
+
+val introduce_premises : Task.task Trans.trans
+
+val split_intro : Task.task Trans.tlist
+(** [split_intro] is [split_goal_wp] followed by [introduce_premises] *)

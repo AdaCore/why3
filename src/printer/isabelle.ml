@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -205,7 +205,7 @@ let rec print_term info defs fmt t = match t.t_node with
                    <num val=\"%s\"/>\
                  </app>",
                 "<app>\
-                   <const name=\"Fields.inverse_class.divide\"/>\
+                   <const name=\"Why3_Real.why3_divide\"/>\
                    <num val=\"%s\"><type name=\"Real.real\"/></num>\
                    <num val=\"%s\"/>\
                  </app>"));
