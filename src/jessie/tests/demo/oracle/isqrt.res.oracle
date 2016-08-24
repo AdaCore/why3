@@ -54,14 +54,13 @@
 [jessie3] created program function main (76)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
-[jessie3] failure: add_pdecl
+[jessie3] failure: Exception raised during translation to Why3:
+                   Ident Break is not yet declared
 [kernel] Current source was: tests/demo/isqrt.c:22
          The full backtrace is:
          Raised at file "src/kernel_services/plugin_entry_points/log.ml", line 583, characters 30-31
          Called from file "src/kernel_services/plugin_entry_points/log.ml", line 577, characters 9-16
          Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 580, characters 15-16
-         Called from file "list.ml", line 88, characters 24-34
-         Called from file "ACSLtoWhy3.ml", line 1587, characters 12-59
          Called from file "register.ml", line 87, characters 6-26
          Called from file "queue.ml", line 105, characters 6-15
          Called from file "src/kernel_internals/runtime/boot.ml", line 37, characters 4-20

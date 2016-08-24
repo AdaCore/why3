@@ -344,8 +344,8 @@ let rec logic_type ty =
     | Ltype (lt, args) ->
       begin
         try
-          let ts = Hashtbl.find logic_types lt.lt_name in
-          Ty.ty_app ts (List.map logic_type args)
+          let its = Hashtbl.find logic_types lt.lt_name in
+          Ty.ty_app its.Ity.its_ts (List.map logic_type args)
         with
             Not_found -> Self.fatal "logic type %s not found" lt.lt_name
       end
@@ -813,32 +813,43 @@ and predicate_named ~label p lvm old = predicate ~label p.content lvm old
 (* logic declarations *)
 (**********************)
 
+(*
 let use th1 th2 =
   let name = th2.Theory.th_name in
   Theory.close_scope
     (Theory.use_export (Theory.open_scope th1 name.Ident.id_string) th2)
     true
+ *)
 
-let add_decl th d =
+let use_module m modul =
+  let name = modul.Pmodule.mod_theory.Theory.th_name in
+  Pmodule.close_scope
+    (Pmodule.use_export
+       (Pmodule.open_scope m name.Ident.id_string)
+       modul)
+    true
+
+
+let add_logic_decl th d =
   try
-    Theory.add_decl th d
+       Pmodule.add_pdecl ~vc:false th d
   with
-      Not_found -> Self.fatal "add_decl"
+      Not_found -> Self.fatal "add_logic_decl"
 
-let add_decls_as_theory theories id decls =
+let add_decls_as_module modules id decls =
   match decls with
-    | [] -> theories
+    | [] -> modules
     | _ ->
-      let th = Theory.create_theory id in
-      let th = use th int_theory.Pmodule.mod_theory in
-      let th = use th real_theory.Pmodule.mod_theory in
+      let m = Pmodule.create_module env id in
+      let m = use_module m int_theory in
+      let m = use_module m real_theory in
 (*
       let th = use th map_theory.Pmodule.mod_theory in
  *)
-      let th = List.fold_left use th theories in
-      let th = List.fold_left add_decl th (List.rev decls) in
-      let th = Theory.close_theory th in
-      th :: theories
+      let m = List.fold_left use_module m modules in
+      let m = List.fold_left add_logic_decl m (List.rev decls) in
+      let m = Pmodule.close_module m in
+      m :: modules
 
 let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
   match a with
@@ -846,17 +857,16 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
       let targs =
         List.map (fun s -> Ty.create_tvsymbol (Ident.id_fresh s)) lt.lt_params
       in
-      let tdef = match lt.lt_def with
-          | None -> None
-          | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
-      in
-      let ts =
-        Ty.create_tysymbol
-          (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef
-      in
-      Hashtbl.add logic_types lt.lt_name ts;
-      let d = Decl.create_ty_decl ts in
-      (theories,d::decls)
+      begin
+        match lt.lt_def with
+        | None ->
+           let preid =  (Ident.id_user lt.lt_name (Loc.extract loc)) in
+           let its = Pdecl.create_plain_record_decl ~priv:true ~mut:false preid targs [] [] in
+           Hashtbl.add logic_types lt.lt_name its.Pdecl.itd_its;
+           let d = Pdecl.create_type_decl [its] in
+           (theories,d::decls)
+        | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
+      end
     | Dfun_or_pred (li, _loc) ->
       begin
         match li.l_labels with
@@ -876,7 +886,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
                   Self.not_yet_implemented "Dfun_or_pred, other bodies"
             in
             List.iter pop_type_var (List.rev li.l_tparams);
-            (theories,d :: decls)
+            (theories,(Pdecl.create_pure_decl d) :: decls)
 
           | _ ->
             Self.not_yet_implemented "Dfun_or_pred with labels"
@@ -894,13 +904,13 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
                 (if is_axiom then Decl.Paxiom else Decl.Plemma)
                 pr (predicate_named ~label:Here p Stdlib.Mstr.empty (fun v _ -> v))
             in
-            (theories,d::decls)
+            (theories,(Pdecl.create_pure_decl d)::decls)
           | _ ->
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
     | Daxiomatic (name, decls', loc) ->
       let theories =
-        add_decls_as_theory theories
+        add_decls_as_module theories
           (Ident.id_fresh global_logic_decls_theory_name) decls
       in
       let (t,decls'') =
@@ -911,7 +921,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
       in
       assert (t = []);
       let theories =
-        add_decls_as_theory theories (Ident.id_user name (Loc.extract loc)) decls''
+        add_decls_as_module theories (Ident.id_user name (Loc.extract loc)) decls''
       in
       (theories,[])
     | Dvolatile (_, _, _, _)
@@ -1367,8 +1377,7 @@ let fundecl denv_global fdec =
     in
     let rec add_locals denv l =
       match l with
-      | [] ->
-         block denv cbody
+      | [] -> block denv cbody
       | v::rem ->
          Self.log "local variable %s" v.vname;
          let _ity,def = ctype_and_default v.vtype in
@@ -1419,7 +1428,7 @@ let fundecl denv_global fdec =
     try
       Dexpr.rec_defn def
     with e ->
-      Self.fatal "HERE Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e
+      Self.fatal "Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e
   in
   let rs =
     match def with
@@ -1551,14 +1560,6 @@ let use m th =
     true
  *)
 
-let use_module m modul =
-  let name = modul.Pmodule.mod_theory.Theory.th_name in
-  Pmodule.close_scope
-    (Pmodule.use_export
-       (Pmodule.open_scope m name.Ident.id_string)
-       modul)
-    true
-
 let prog p =
    try
     Self.result "Starting translation";
@@ -1567,7 +1568,7 @@ let prog p =
     in
     Self.result "found %d logic decl(s)" (List.length decls);
     let theories =
-      add_decls_as_theory theories
+      add_decls_as_module theories
         (Ident.id_fresh global_logic_decls_theory_name) decls
     in
     Self.result "made %d theory(ies)" (List.length theories);
@@ -1579,15 +1580,13 @@ let prog p =
 (*
     let m = use_module m map_theory in
  *)
-(*
     let m = List.fold_left use_module m theories in
- *)
     let m = use_module m ref_module in
     let m = use_module m uint32_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Pmodule.close_module m in
-    List.rev (m.Pmodule.mod_theory :: theories) ;
+    List.rev (m (*.Pmodule.mod_theory*) :: theories) ;
   with (Exit | Not_found| Ty.TypeMismatch _
            | Ity.TypeMismatch _ | Decl.UnknownIdent _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."
