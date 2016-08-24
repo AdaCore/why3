@@ -1583,6 +1583,7 @@ let prog p =
     let m = List.fold_left use_module m theories in
     let m = use_module m ref_module in
     let m = use_module m uint32_module in
+    let m = Pmodule.add_pdecl ~vc:false m (Pdecl.create_exn_decl exc_break) in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Pmodule.close_module m in
