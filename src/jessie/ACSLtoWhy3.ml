@@ -877,6 +877,7 @@ let add_decls_as_module modules id decls =
     | _ ->
       let m = Pmodule.create_module env id in
       let m = use_module m int_theory in
+      let m = use_module m computer_div_theory in
       let m = use_module m real_theory in
       let m = use_module m array_module in
       let m = List.fold_left use_module m modules in
@@ -1369,24 +1370,6 @@ let fundecl denv_global fdec =
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
   let args = Kernel_function.get_formals kf in
-(*
-      | [] ->
-        [ None,false,Dexpr.dity_of_ity Ity.ity_unit ]
-      | l ->
-         List.map
-           (fun v ->
-            let ity = ctype v.vtype in
-(*
-          let vs =
-            Ity.create_pvsymbol () ity
-          in
-          Hashtbl.add program_vars v.vid (vs,false,ity);
-          vs)
- *)
-            (Some (Ident.id_fresh v.vname), false,Dexpr.dity_of_ity ity))
-           l
-  in
- *)
   let cbody = fdec.sbody in
   (* isolate the return, which is always the last statement *)
   let cbody,return_stmt =
@@ -1610,19 +1593,8 @@ let add_pdecl m d =
     Pmodule.add_pdecl ~vc:true m def
   with
     Not_found ->
-    Self.fatal "add_pdecl"
-    (* Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id) *)
-    (*              (Ident.Sid.elements d.Pdecl.pd_news) *)
-
-(*
-let use m th =
-  let name = th.Theory.th_name in
-  Pmodule.close_scope
-    (Pmodule.use_export
-       (Pmodule.open_scope m name.Ident.id_string)
-       th)
-    true
- *)
+    Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id)
+               (Ident.Sid.elements def.Pdecl.pd_news)
 
 let prog p =
    try
@@ -1640,6 +1612,7 @@ let prog p =
       (Ident.id_fresh programs_module_name)
     in
     let m = use_module m int_theory in
+    let m = use_module m computer_div_theory in
     let m = use_module m real_theory in
     let m = use_module m array_module in
     let m = List.fold_left use_module m theories in

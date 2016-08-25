@@ -13,17 +13,22 @@
 [jessie3] processing function sum
 [jessie3] lookup program function sum (70)
 [jessie3] created program function sum (70)
+[jessie3] processing function sum2
+[jessie3] lookup program function sum2 (76)
+[jessie3] created program function sum2 (76)
 [jessie3] processing function main
 [jessie3] lookup program function sum (70)
-[jessie3] created program function main (76)
+[jessie3] created program function main (82)
 [jessie3] found 2 logic decl(s)
-[jessie3] failure: Exception raised during translation to Why3:
-                   Ident div is not yet declared
-[kernel] Current source was: tests/basic/rec.c:36
+[jessie3] made 1 theory(ies)
+[jessie3] failure: add_pdecl sum
+[kernel] Current source was: tests/basic/rec.c:34
          The full backtrace is:
          Raised at file "src/kernel_services/plugin_entry_points/log.ml", line 583, characters 30-31
          Called from file "src/kernel_services/plugin_entry_points/log.ml", line 577, characters 9-16
          Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 580, characters 15-16
+         Called from file "list.ml", line 88, characters 24-34
+         Called from file "ACSLtoWhy3.ml", line 1623, characters 12-59
          Called from file "register.ml", line 88, characters 6-26
          Called from file "queue.ml", line 105, characters 6-15
          Called from file "src/kernel_internals/runtime/boot.ml", line 37, characters 4-20

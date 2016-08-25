@@ -20,16 +20,14 @@ long sum(int x) {
   return /* x+ */ tmp;
 }
 
-#if 0
 /*@ requires 0 <= x <= 60000;
   @ decreases x;
   @ ensures \result == sum_upto(x+0);
   @*/
-long sum(int x) {
+long sum2(int x) {
   if (x == 0) return 0;
-  else return x + sum (x-1);
+  else return /* x + */ sum2(x-1);
 }
-#endif
 
 /*@ ensures \result == 36;
   @*/
@@ -37,6 +35,7 @@ long main () {
   long i = sum(8);
   return i;
 }
+
 
 
 /*
