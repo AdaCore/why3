@@ -12,6 +12,28 @@
 [jessie3] create logic variable 69
 [jessie3] processing function sum
 [jessie3] lookup program function sum (70)
-[kernel] Plug-in jessie3 aborted: unimplemented feature.
-         You may send a feature request at http://bts.frama-c.com with:
-         '[Plug-in jessie3] stmt Goto'.
+[jessie3] created program function sum (70)
+[jessie3] processing function main
+[jessie3] lookup program function sum (70)
+[jessie3] created program function main (76)
+[jessie3] found 2 logic decl(s)
+[jessie3] failure: Exception raised during translation to Why3:
+                   Ident div is not yet declared
+[kernel] Current source was: tests/basic/rec.c:36
+         The full backtrace is:
+         Raised at file "src/kernel_services/plugin_entry_points/log.ml", line 583, characters 30-31
+         Called from file "src/kernel_services/plugin_entry_points/log.ml", line 577, characters 9-16
+         Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 580, characters 15-16
+         Called from file "register.ml", line 88, characters 6-26
+         Called from file "queue.ml", line 105, characters 6-15
+         Called from file "src/kernel_internals/runtime/boot.ml", line 37, characters 4-20
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 787, characters 2-9
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 817, characters 18-64
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 228, characters 4-8
+         
+         Plug-in jessie3 aborted: internal error.
+         Please report as 'crash' at http://bts.frama-c.com/.
+         Your Frama-C version is Aluminium-20160501.
+         Note that a version and a backtrace alone often do not contain enough
+         information to understand the bug. Guidelines for reporting bugs are at:
+         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines

@@ -10,7 +10,7 @@
   @*/
 
 /*@ requires n >= 0 ;
-  @ // requires \valid(t+(0..n-1));
+  @ requires \valid(t+(0..n-1));
   @ // requires sorted(t,0,n-1);
   @ requires \forall integer i,j; 0 <= i <= j < n ==> t[i] <= t[j];
   @ ensures -1 <= \result+0 < n;
@@ -32,13 +32,11 @@ int binary_search(long t[], int n, long v) {
     else if (t[m] > v) u = m - 1;
     else return m;
   }
-  return -1;
+  return 0-1;
 }
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 binary_search.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 binary_search.c"
 End:
 */
-
-

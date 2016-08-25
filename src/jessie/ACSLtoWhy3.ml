@@ -39,6 +39,40 @@ module Enabled =
        let help = help
      end)
 
+(* Does not seem to have effect
+
+module ForceAdHocNormalization =
+  Self.False(struct
+          let option_name = "-jessie-adhoc-normalization"
+          let help =
+            "enforce code normalization in a mode suitable for Jessie plugin."
+        end)
+
+let () =
+  ForceAdHocNormalization.add_set_hook
+    (fun _ b ->
+       if b then begin
+	 Kernel.SimplifyCfg.on ();
+	 Kernel.KeepSwitch.on ();
+	 Kernel.Constfold.on ();
+	 Kernel.PreprocessAnnot.on ();
+	 Cabs2cil.setDoTransformWhile ();
+	 Cabs2cil.setDoAlternateConditional ();
+       end);
+  State_dependency_graph.add_dependencies
+    ~from:ForceAdHocNormalization.self
+    [ Kernel.SimplifyCfg.self;
+      Kernel.KeepSwitch.self;
+      Kernel.Constfold.self;
+      Kernel.PreprocessAnnot.self ]
+
+let () =
+  Enabled.add_set_hook (fun _ b -> ForceAdHocNormalization.set b);
+  State_dependency_graph.add_dependencies
+    ~from:Enabled.self [ ForceAdHocNormalization.self ]
+
+  *)
+
 open Cil_types
 open Why3
 
@@ -163,42 +197,42 @@ let int32_module : Pmodule.modul =
     Self.fatal "Module mach.int.Int32 not found"
 *)
 
-let uint32_module =
+let bv32_module =
   try
     Pmodule.read_module env ["mach";"bv"] "BVCheck32"
   with e ->
     Self.fatal "Exception raised while loading ref module:@ %a"
       Exn_printer.exn_printer e
 
-let uint32_type : Why3.Ity.itysymbol =
-  Pmodule.ns_find_its uint32_module.Pmodule.mod_export ["t"]
+let bv32_type : Why3.Ity.itysymbol =
+  Pmodule.ns_find_its bv32_module.Pmodule.mod_export ["t"]
 
-let uint32_to_int : Term.lsymbol = find uint32_module "to_uint"
+let bv32_to_int : Term.lsymbol = find bv32_module "to_uint"
 
-let uint32_to_int_fun : Expr.rsymbol = find_rs uint32_module "to_uint"
+let bv32_to_int_fun : Expr.rsymbol = find_rs bv32_module "to_uint"
 
-let uadd32_fun : Expr.rsymbol = find_rs uint32_module "add_check"
+let uadd32_fun : Expr.rsymbol = find_rs bv32_module "add_check"
 
-let usub32_fun : Expr.rsymbol = find_rs uint32_module "sub_check"
+let usub32_fun : Expr.rsymbol = find_rs bv32_module "sub_check"
 
-let umul32_fun : Expr.rsymbol = find_rs uint32_module "mul_check"
+let umul32_fun : Expr.rsymbol = find_rs bv32_module "mul_check"
 
-(*let neg32_fun : Expr.rsymbol = find_rs uint32_module "prefix -"
+(*let neg32_fun : Expr.rsymbol = find_rs bv32_module "prefix -"
  *)
 
-let ueq32_fun : Expr.rsymbol = find_rs uint32_module "eq_check"
+let ueq32_fun : Expr.rsymbol = find_rs bv32_module "eq_check"
 
-let une32_fun : Expr.rsymbol = find_rs uint32_module "ne_check"
+let une32_fun : Expr.rsymbol = find_rs bv32_module "ne_check"
 
-let ule32_fun : Expr.rsymbol = find_rs uint32_module "le_check"
+let ule32_fun : Expr.rsymbol = find_rs bv32_module "le_check"
 
-let ult32_fun : Expr.rsymbol = find_rs uint32_module "lt_check"
+let ult32_fun : Expr.rsymbol = find_rs bv32_module "lt_check"
 
-let uge32_fun : Expr.rsymbol = find_rs uint32_module "ge_check"
+let uge32_fun : Expr.rsymbol = find_rs bv32_module "ge_check"
 
-let ugt32_fun : Expr.rsymbol = find_rs uint32_module "gt_check"
+let ugt32_fun : Expr.rsymbol = find_rs bv32_module "gt_check"
 
-let uint32ofint_fun : Expr.rsymbol = find_rs uint32_module "int_check"
+let bv32ofint_fun : Expr.rsymbol = find_rs bv32_module "int_check"
 
 (* mach_int.Int64 module *)
 
@@ -250,7 +284,7 @@ let array_get_fun : Expr.rsymbol = find_rs array_module "mixfix []"
 let ty_unit = Ty.ty_tuple []
 let ity_unit = Ity.ity_tuple []
 let mlw_int_type = Ity.ity_int
-let mlw_uint32_type =  Ity.ity_app uint32_type [] []
+let mlw_bv32_type =  Ity.ity_app bv32_type [] []
 let mlw_int64_type = Ity.ity_app int64_type [] []
 
 (* helpers *)
@@ -271,7 +305,7 @@ let rec ctype_and_default ty =
     | TVoid _attr -> Ity.ity_unit, e_void
     | TInt (IInt, _attr) ->
       let n = de_const_int "0" in
-      mlw_uint32_type, de_app1 uint32ofint_fun n
+      mlw_bv32_type, de_app1 bv32ofint_fun n
     | TInt (ILong, _attr) ->
       let n = de_const_int "0" in
       mlw_int64_type, de_app1 int64ofint_fun n
@@ -558,7 +592,7 @@ let is_real_type t =
 let coerce_to_int ty t =
   match ty with
     | Linteger -> t
-    | Ctype(TInt(IInt,_attr)) -> t_app uint32_to_int [t]
+    | Ctype(TInt(IInt,_attr)) -> t_app bv32_to_int [t]
     | Ctype(TInt(ILong,_attr)) -> t_app int64_to_int [t]
     | _ -> Self.not_yet_implemented "coerce_to_int"
 
@@ -607,7 +641,7 @@ let rec term_node ~label t lvm old =
       begin
         match ty, t.term_type with
           | Linteger, Ctype(TInt(IInt,_attr)) ->
-             t_app uint32_to_int [t']
+             t_app bv32_to_int [t']
           | Linteger, Ctype(TInt(ILong,_attr)) ->
              t_app int64_to_int [t']
           | _ ->
@@ -1010,15 +1044,15 @@ let loop_annot a =
 let binop op e1 e2 =
   let rs,_ty,_ty' =
     match op with
-      | PlusA -> uadd32_fun, mlw_uint32_type, mlw_uint32_type
-      | MinusA -> usub32_fun, mlw_uint32_type, mlw_uint32_type
-      | Mult -> umul32_fun, mlw_uint32_type, mlw_uint32_type
-      | Lt -> ult32_fun, mlw_uint32_type, Ity.ity_bool
-      | Le -> ule32_fun, mlw_uint32_type, Ity.ity_bool
-      | Gt -> ugt32_fun, mlw_uint32_type, Ity.ity_bool
-      | Ge -> uge32_fun, mlw_uint32_type, Ity.ity_bool
-      | Eq -> ueq32_fun, mlw_uint32_type, Ity.ity_bool
-      | Ne -> une32_fun, mlw_uint32_type, Ity.ity_bool
+      | PlusA -> uadd32_fun, mlw_bv32_type, mlw_bv32_type
+      | MinusA -> usub32_fun, mlw_bv32_type, mlw_bv32_type
+      | Mult -> umul32_fun, mlw_bv32_type, mlw_bv32_type
+      | Lt -> ult32_fun, mlw_bv32_type, Ity.ity_bool
+      | Le -> ule32_fun, mlw_bv32_type, Ity.ity_bool
+      | Gt -> ugt32_fun, mlw_bv32_type, Ity.ity_bool
+      | Ge -> uge32_fun, mlw_bv32_type, Ity.ity_bool
+      | Eq -> ueq32_fun, mlw_bv32_type, Ity.ity_bool
+      | Ne -> une32_fun, mlw_bv32_type, Ity.ity_bool
       | PlusPI|IndexPI|MinusPI|MinusPP ->
         Self.not_yet_implemented "binop plus/minus"
       | Div|Mod ->
@@ -1035,7 +1069,7 @@ let unop op e =
     match op with
       | Neg -> (* Unary minus *)
         Self.not_yet_implemented "unop Neg"
-      (*        neg32_fun, mlw_int32_type, mlw_int32_type*)
+         (* neg32_fun, mlw_int32_type, mlw_int32_type *)
       | BNot -> (* Bitwise complement (~) *)
         Self.not_yet_implemented "unop BNot"
       | LNot -> (* Logical Not (!) *)
@@ -1052,7 +1086,7 @@ let constant c =
         | None -> Integer.to_string t
     in
     let n = de_const_int s  in
-    de_app1 uint32ofint_fun n
+    de_app1 bv32ofint_fun n
   | CInt64(_t,_ikind, _) ->
       Self.not_yet_implemented "CInt64"
   | CStr _
@@ -1075,7 +1109,7 @@ let rec expr denv e =
       begin
         match ty, Cil.typeOf e with
           | TInt(ILong,_attr1), TInt(IInt,_attr2) ->
-            de_app1 int64ofint_fun (de_app1 uint32_to_int_fun e')
+            de_app1 int64ofint_fun (de_app1 bv32_to_int_fun e')
           | _ ->
             Self.not_yet_implemented "expr CastE"
       end
@@ -1125,7 +1159,7 @@ and lval denv (host,offset) =
       in
  *)
       let i = expr denv i in
-      let i = de_app1 uint32_to_int_fun i in
+      let i = de_app1 bv32_to_int_fun i in
       de_app2 array_get_fun e i
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
@@ -1211,6 +1245,9 @@ let instr denv i =
 let exc_break =
   Ity.create_xsymbol (Ident.id_fresh "Break") Ity.ity_unit
 
+let exc_return =
+  Ity.create_xsymbol (Ident.id_fresh "Return") Ity.ity_unit
+
 let rec stmt denv s =
   match s.skind with
     | Instr i ->
@@ -1222,8 +1259,14 @@ let rec stmt denv s =
     | Return (None, _loc) -> e_void
     | Return (Some e, _loc) ->
       expr denv e
-    | Goto (_, _) ->
-      Self.not_yet_implemented "stmt Goto"
+    | Goto (target, _) ->
+       if List.exists (fun lab ->
+                       match lab with
+                         | Label("return_label",_,_) -> true
+                         | _ -> false) !target.labels then
+         Dexpr.dexpr (Dexpr.DEraise(exc_return,e_void))
+       else
+         Self.not_yet_implemented "stmt Goto"
     | Break _loc ->
       Dexpr.dexpr (Dexpr.DEraise(exc_break,e_void))
     | Continue _ ->
@@ -1259,13 +1302,13 @@ let rec stmt denv s =
       Self.not_yet_implemented "stmt TryExcept"
 
 and block denv b =
-  let rec mk_seq l =
+  mk_seq denv b.bstmts
+
+and mk_seq denv l =
     match l with
       | [] -> e_void
       | [s] -> stmt denv s
-      | s::r -> seq (stmt denv s) (mk_seq r)
-  in
-  mk_seq b.bstmts
+      | s::r -> seq (stmt denv s) (mk_seq denv r)
 
 
 
@@ -1345,6 +1388,13 @@ let fundecl denv_global fdec =
   in
  *)
   let cbody = fdec.sbody in
+  (* isolate the return, which is always the last statement *)
+  let cbody,return_stmt =
+    match cbody.bstmts with
+      | [] -> assert false
+      | s::l -> List.fold_left (fun (b,l) x -> (l::b,x)) ([],s) l
+  in
+  let cbody = List.rev cbody in
   let contract = Annotations.funspec kf in
   let pre,post,_ass = extract_simple_contract contract in
   let locals = Kernel_function.get_locals kf in
@@ -1377,7 +1427,12 @@ let fundecl denv_global fdec =
     in
     let rec add_locals denv l =
       match l with
-      | [] -> block denv cbody
+      | [] ->
+         let b = mk_seq denv cbody in
+         let b = seq b (Dexpr.dexpr (Dexpr.DEraise(exc_return,e_void))) in
+         let v = Ident.id_fresh "_dummy" in
+         let pat = Dexpr.dpattern(Dexpr.DPvar(v,false)) in
+         Dexpr.dexpr(Dexpr.DEtry(b,[exc_return,pat,stmt denv return_stmt]))
       | v::rem ->
 (*
          Self.log "local variable %s" v.vname;
@@ -1589,8 +1644,9 @@ let prog p =
     let m = use_module m array_module in
     let m = List.fold_left use_module m theories in
     let m = use_module m ref_module in
-    let m = use_module m uint32_module in
+    let m = use_module m bv32_module in
     let m = Pmodule.add_pdecl ~vc:false m (Pdecl.create_exn_decl exc_break) in
+    let m = Pmodule.add_pdecl ~vc:false m (Pdecl.create_exn_decl exc_return) in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Pmodule.close_module m in
