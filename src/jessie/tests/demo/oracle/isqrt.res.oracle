@@ -10,47 +10,9 @@
 [jessie3] create logic variable 67
 [jessie3] creating logic symbol 68 (sqr)
 [jessie3] processing function isqrt
-[jessie3] create local program variable x (71), mutable = false
-[jessie3] fundecl isqrt done
-[jessie3] denv_global contains []
-[jessie3] function parameter x
-[jessie3] local variable count
-[jessie3] create local program variable count (74), mutable = true
-[jessie3] local variable sum
-[jessie3] create local program variable sum (75), mutable = true
-[jessie3] lookup program variable count (74)
-[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
-[jessie3] lookup program variable count (74)
-[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
-[jessie3] lookup program variable sum (75)
-[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
-[jessie3] lookup program variable sum (75)
-[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
-[jessie3] lookup program variable count (74)
-[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
-[jessie3] lookup program variable count (74)
-[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
-[jessie3] lookup program variable x (71)
-[jessie3] got program variable x (71) : ev = DEvar(x), mutable = false
-[jessie3] lookup program variable sum (75)
-[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
-[jessie3] lookup program variable sum (75)
-[jessie3] got program variable sum (75) : ev = DEvar(sum), mutable = true
-[jessie3] lookup program variable count (74)
-[jessie3] got program variable count (74) : ev = DEvar(count), mutable = true
-[jessie3] denv contains [isqrt]
 [jessie3] created program function isqrt (69)
 [jessie3] processing function main
-[jessie3] fundecl main done
-[jessie3] denv_global contains [isqrt]
-[jessie3] local variable r
-[jessie3] create local program variable r (79), mutable = true
-[jessie3] lookup program variable r (79)
-[jessie3] got program variable r (79) : ev = DEvar(r), mutable = true
 [jessie3] lookup program function isqrt (69)
-[jessie3] lookup program variable r (79)
-[jessie3] got program variable r (79) : ev = DEvar(r), mutable = true
-[jessie3] denv contains [main; isqrt]
 [jessie3] created program function main (76)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
@@ -68,6 +30,8 @@
             
             (* use real.Real *)
             
+            (* use array.Array *)
+            
             function sqr (x:int) : int = x * x
             end
 [jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
@@ -82,6 +46,8 @@
             (* use int.Int *)
             
             (* use real.Real *)
+            
+            (* use array.Array *)
             
             (* use Global_logic_declarations *)
             
@@ -279,10 +245,10 @@
 [jessie3] Task 8 (VC isqrt) (precondition): Valid, Valid, Valid
 [jessie3] Task 9 (VC isqrt) (precondition): Valid, Valid, Valid
 [jessie3] Task 10 (VC isqrt) (precondition): Valid, Unknown, Valid
-[jessie3] Task 11 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 11 (VC isqrt) (precondition): Valid, Timeout, Valid
 [jessie3] Task 12 (VC isqrt) (precondition): Valid, Unknown, Valid
 [jessie3] Task 13 (VC isqrt) (loop invariant preservation): Valid, Valid, Valid
-[jessie3] Task 14 (VC isqrt) (loop variant decrease): Valid, Unknown, Valid
+[jessie3] Task 14 (VC isqrt) (loop variant decrease): Timeout, Unknown, Valid
 [jessie3] Task 15 (VC isqrt) (postcondition): Valid, Valid, Valid
 [jessie3] Task 16 (VC isqrt) (postcondition): Valid, Valid, Valid
 [jessie3] Task 17 (VC main) (precondition): Valid, Valid, Valid

@@ -8,7 +8,125 @@
 [jessie3] Translating to Why3...
 [jessie3] Starting translation
 [jessie3] processing function max
-[jessie3] create local program variable a (70), mutable = false
-[kernel] Plug-in jessie3 aborted: unimplemented feature.
-         You may send a feature request at http://bts.frama-c.com with:
-         '[Plug-in jessie3] ctype TPtr'.
+[jessie3] created program function max (67)
+[jessie3] found 0 logic decl(s)
+[jessie3] made 0 theory(ies)
+[jessie3] made 1 function(s)
+[jessie3] Running provers...
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            (* use array.Array *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach.bv.BVCheck32 *)
+            
+            goal VC_max :
+              forall a:array t, len:t.
+               to_uint len > 0 ->
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 0 /\ 0 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 0 /\ o1 = of_int 0 ->
+                        (0 <= 0 /\ 0 < two_power_size) /\
+                         (forall o2:t.
+                           to_uint o2 = 0 /\ o2 = of_int 0 ->
+                            (forall x:t.
+                              x = o2 ->
+                               (0 <= 1 /\ 1 < two_power_size) /\
+                                (forall o3:t.
+                                  to_uint o3 = 1 /\ o3 = of_int 1 ->
+                                   (0 <= (to_uint len - to_uint o3) /\
+                                     (to_uint len - to_uint o3) < two_power_size) /\
+                                    (let o4 = sub len o3 in
+                                    to_uint o4 = (to_uint len - to_uint o3) ->
+                                     (forall y:t.
+                                       y = o4 ->
+                                        ((0 <= to_uint x /\ to_uint x <= to_uint y) /\
+                                          to_uint y < to_uint len) /\
+                                         (forall y1:t, x1:t.
+                                           (0 <= to_uint x1 /\ to_uint x1 <= to_uint y1) /\
+                                            to_uint y1 < to_uint len ->
+                                            (if true then if not x1 = y1 then let o5 = 
+                                            to_uint y1 in
+                                            (0 <= o5 /\ o5 < length a) /\
+                                             (let o6 = a[o5] in let o7 = to_uint x1 in
+                                             (0 <= o7 /\ o7 < length a) /\
+                                              (let o8 = a[o7] in
+                                              (to_uint o8 <= to_uint o6 <-> ule o8 o6) ->
+                                               (if to_uint o8 <= to_uint o6 then 
+                                               (0 <= 1 /\ 1 < two_power_size) /\
+                                                (forall o9:t.
+                                                  to_uint o9 = 1 /\ o9 = of_int 1 ->
+                                                   (0 <= (to_uint x1 + to_uint o9) /\
+                                                     (to_uint x1 + to_uint o9) <
+                                                      two_power_size) /\
+                                                    (forall o10:t.
+                                                      to_uint o10 =
+                                                       (to_uint x1 + to_uint o9) /\
+                                                       o10 = add x1 o9 ->
+                                                       (forall x2:t.
+                                                         x2 = o10 ->
+                                                          ((0 <= to_uint x2 /\
+                                                             to_uint x2 <= to_uint y1) /\
+                                                            to_uint y1 < to_uint len) /\
+                                                           0 <=
+                                                            (to_uint y1 - to_uint x1) /\
+                                                            (to_uint y1 - to_uint x2) <
+                                                             (to_uint y1 - to_uint x1))))
+                                               else (0 <= 1 /\ 1 < two_power_size) /\
+                                                     (forall o9:t.
+                                                       to_uint o9 = 1 /\ o9 = of_int 1 ->
+                                                        (0 <= (to_uint y1 - to_uint o9) /\
+                                                          (to_uint y1 - to_uint o9) <
+                                                           two_power_size) /\
+                                                         (let o10 = sub y1 o9 in
+                                                         to_uint o10 =
+                                                          (to_uint y1 - to_uint o9) ->
+                                                          (forall y2:t.
+                                                            y2 = o10 ->
+                                                             ((0 <= to_uint x1 /\
+                                                                to_uint x1 <=
+                                                                 to_uint y2) /\
+                                                               to_uint y2 < to_uint len) /\
+                                                              0 <=
+                                                               (to_uint y1 - to_uint x1) /\
+                                                               (to_uint y2 - to_uint x1) <
+                                                                (to_uint y1 -
+                                                                  to_uint x1)))))))
+                                            else 0 <= to_uint x1 /\
+                                                  to_uint x1 < to_uint len
+                                            else 0 <= to_uint x1 /\
+                                                  to_uint x1 < to_uint len)))))))))
+            end
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC max) (precondition): Valid, Valid, Timeout
+[jessie3] Task 6 (VC max) (loop invariant init): Valid, Valid, Valid
+[jessie3] Task 7 (VC max) (index in array bounds): Timeout, Unknown, Timeout
+[jessie3] Task 8 (VC max) (index in array bounds): Timeout, Unknown, Timeout
+[jessie3] Task 9 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 10 (VC max) (precondition): Valid, Valid, Timeout
+[jessie3] Task 11 (VC max) (loop invariant preservation): Valid, Timeout, Timeout
+[jessie3] Task 12 (VC max) (loop variant decrease): Valid, Valid, Valid
+[jessie3] Task 13 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 14 (VC max) (precondition): Valid, Timeout, Timeout
+[jessie3] Task 15 (VC max) (loop invariant preservation): Valid, Timeout, Valid
+[jessie3] Task 16 (VC max) (loop variant decrease): Valid, Valid, Valid
+[jessie3] Task 17 (VC max) (postcondition): Valid, Valid, Valid
+[jessie3] Task 18 (VC max) (postcondition): Valid, Valid, Valid

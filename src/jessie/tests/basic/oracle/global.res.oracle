@@ -7,34 +7,15 @@
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
 [jessie3] Starting translation
-[jessie3] create global program variable x (67), mutable = true
 [jessie3] global var x done
 [jessie3] denv contains [x]
 [jessie3] processing function test0
-[jessie3] fundecl test0 done
-[jessie3] denv_global contains [x]
-[jessie3] lookup program variable x (67)
-[jessie3] got program variable x (67) : ev = DEvar(x), mutable = true
-[jessie3] denv contains [x; test0]
 [jessie3] created program function test0 (68)
 [jessie3] processing function test1
-[jessie3] fundecl test1 done
-[jessie3] denv_global contains [x; test0]
-[jessie3] lookup program variable x (67)
-[jessie3] got program variable x (67) : ev = DEvar(x), mutable = true
-[jessie3] denv contains [x; test1; test0]
 [jessie3] created program function test1 (70)
-[jessie3] create global program variable y (72), mutable = true
 [jessie3] global var y done
 [jessie3] denv contains [y; x; test1; test0]
 [jessie3] processing function f
-[jessie3] fundecl f done
-[jessie3] denv_global contains [y; x; test1; test0]
-[jessie3] lookup program variable x (67)
-[jessie3] got program variable x (67) : ev = DEvar(x), mutable = true
-[jessie3] lookup program variable x (67)
-[jessie3] got program variable x (67) : ev = DEvar(x), mutable = true
-[jessie3] denv contains [y; x; test1; test0; f]
 [jessie3] created program function f (73)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
@@ -51,6 +32,8 @@
             (* use int.Int *)
             
             (* use real.Real *)
+            
+            (* use array.Array *)
             
             (* use ref.Ref *)
             

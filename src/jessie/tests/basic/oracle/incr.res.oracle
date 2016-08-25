@@ -8,35 +8,10 @@
 [jessie3] Translating to Why3...
 [jessie3] Starting translation
 [jessie3] processing function f
-[jessie3] create local program variable x (69), mutable = false
-[jessie3] fundecl f done
-[jessie3] denv_global contains []
-[jessie3] function parameter x
-[jessie3] local variable __retres
-[jessie3] create local program variable __retres (77), mutable = true
-[jessie3] lookup program variable __retres (77)
-[jessie3] got program variable __retres (77) : ev = DEvar(__retres), mutable = true
-[jessie3] lookup program variable x (69)
-[jessie3] got program variable x (69) : ev = DEvar(x), mutable = false
-[jessie3] lookup program variable __retres (77)
-[jessie3] got program variable __retres (77) : ev = DEvar(__retres), mutable = true
-[jessie3] denv contains [f]
 [jessie3] created program function f (67)
-[jessie3] create global program variable g (72), mutable = true
 [jessie3] global var g done
 [jessie3] denv contains [g; f]
 [jessie3] processing function h
-[jessie3] create local program variable x (75), mutable = false
-[jessie3] fundecl h done
-[jessie3] denv_global contains [g; f]
-[jessie3] function parameter x
-[jessie3] lookup program variable x (75)
-[jessie3] got program variable x (75) : ev = DEvar(x), mutable = false
-[jessie3] lookup program variable g (72)
-[jessie3] got program variable g (72) : ev = DEvar(g), mutable = true
-[jessie3] lookup program variable g (72)
-[jessie3] got program variable g (72) : ev = DEvar(g), mutable = true
-[jessie3] denv contains [h; g; f]
 [jessie3] created program function h (73)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
@@ -53,6 +28,8 @@
             (* use int.Int *)
             
             (* use real.Real *)
+            
+            (* use array.Array *)
             
             (* use ref.Ref *)
             

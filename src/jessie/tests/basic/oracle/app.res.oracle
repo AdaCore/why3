@@ -10,13 +10,6 @@
 [jessie3] create logic variable 67
 [jessie3] creating logic symbol 68 (f)
 [jessie3] processing function g
-[jessie3] create local program variable x (71), mutable = false
-[jessie3] fundecl g done
-[jessie3] denv_global contains []
-[jessie3] function parameter x
-[jessie3] lookup program variable x (71)
-[jessie3] got program variable x (71) : ev = DEvar(x), mutable = false
-[jessie3] denv contains [g]
 [jessie3] created program function g (69)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
@@ -34,6 +27,8 @@
             
             (* use real.Real *)
             
+            (* use array.Array *)
+            
             function f (x:int) : int = x + 1
             end
 [jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
@@ -48,6 +43,8 @@
             (* use int.Int *)
             
             (* use real.Real *)
+            
+            (* use array.Array *)
             
             (* use Global_logic_declarations *)
             

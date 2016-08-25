@@ -129,16 +129,6 @@ let find_rs mo s =
 
 (* ref.Ref module *)
 
-(*
-let ref_modules, ref_theories =
-  try
-    Env.read_library (Env.locate_library env) ["ref"]
-  with e ->
-    Self.fatal "Exception raised while loading ref module:@ %a"
-      Exn_printer.exn_printer e
-
-let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
-*)
 let ref_module : Pmodule.pmodule =
   Pmodule.read_module env ["ref"] "Ref"
 
@@ -242,29 +232,14 @@ let int64ofint_fun : Expr.rsymbol = find_rs int64_module "of_int"
 
 (* array.Array module *)
 
-(*
-let array_modules, array_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["array"]
+let array_module : Pmodule.pmodule =
+  Pmodule.read_module env ["array"] "Array"
 
-let array_module : Pmodule.modul = Stdlib.Mstr.find "Array" array_modules
-*)
+let array_type : Ity.itysymbol =
+  Pmodule.ns_find_its array_module.Pmodule.mod_export ["array"]
 
-(*
-let array_type : Ity.T.itysymbol =
-  match
-    Pmodule.ns_find_ts array_module.Pmodule.mod_export ["array"]
-  with
-    | Pmodule.PT itys -> itys
-    | Pmodule.TS _ -> assert false
-*)
-
-
-
-let de_app e1 e2 = Dexpr.dexpr(Dexpr.DEapp(e1,e2))
-
-let de_app1 rs e1 = de_app (Dexpr.dexpr(Dexpr.DErs rs)) e1
-
-let de_app2 rs e1 e2 = de_app (de_app1 rs e1) e2
+let array_get : Term.lsymbol = find array_module "mixfix []"
+let array_get_fun : Expr.rsymbol = find_rs array_module "mixfix []"
 
 
 (*********)
@@ -277,12 +252,20 @@ let mlw_int_type = Ity.ity_int
 let mlw_uint32_type =  Ity.ity_app uint32_type [] []
 let mlw_int64_type = Ity.ity_app int64_type [] []
 
+(* helpers *)
+
+let de_app e1 e2 = Dexpr.dexpr(Dexpr.DEapp(e1,e2))
+
+let de_app1 rs e1 = de_app (Dexpr.dexpr(Dexpr.DErs rs)) e1
+
+let de_app2 rs e1 e2 = de_app (de_app1 rs e1) e2
+
 let e_void = Dexpr.dexpr (Dexpr.DErs (Expr.rs_tuple 0))
 let e_true = Dexpr.dexpr Dexpr.DEtrue
 
 let de_const_int s = Dexpr.dexpr (Dexpr.DEconst (Number.ConstInt (Literals.integer s)))
 
-let (*rec*) ctype_and_default ty =
+let rec ctype_and_default ty =
   match ty with
     | TVoid _attr -> Ity.ity_unit, e_void
     | TInt (IInt, _attr) ->
@@ -295,11 +278,9 @@ let (*rec*) ctype_and_default ty =
        Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
        Self.not_yet_implemented "ctype TFloat"
-(*
     | TPtr(TInt _ as t, _attr) ->
       let t,_ = ctype_and_default t in
-      Ity.ity_pure map_ts [mlw_int_type ; t], Expr.e_void
- *)
+      Ity.ity_app array_type [t] [], e_void
     | TPtr(_ty, _attr) ->
       Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) ->
@@ -438,13 +419,17 @@ let get_lvar lv =
 let program_vars = Hashtbl.create 257
 
 let create_var v is_mutable =
+(*
   Self.result "create local program variable %s (%d), mutable = %b" v.vname v.vid is_mutable;
+ *)
   Hashtbl.add program_vars v.vid is_mutable
 
 let global_vars : (int,Ity.pvsymbol) Hashtbl.t = Hashtbl.create 257
 
 let create_global_var v pvs =
+(*
   Self.result "create global program variable %s (%d), mutable = true" v.vname v.vid;
+ *)
   Hashtbl.add global_vars v.vid pvs;
   Hashtbl.add program_vars v.vid true
 
@@ -457,12 +442,16 @@ let pr_de fmt e =
     | _ -> assert false
 
 let get_var denv v =
+(*
     Self.log "lookup program variable %s (%d)" v.vname v.vid;
+ *)
     let is_mutable = Hashtbl.find program_vars v.vid in
     try
       let ev = Dexpr.denv_get denv v.vname in
+(*
       Self.result "got program variable %s (%d) : ev = %a, mutable = %b"
                   v.vname v.vid pr_de ev is_mutable;
+ *)
       let ev = match ev with
         | Dexpr.DEvar _ ->
            begin try
@@ -694,11 +683,9 @@ and tlval ~label (host,offset) lvm old =
       Self.not_yet_implemented "tlval TVar"
     | TResult _, _ ->
       Self.not_yet_implemented "tlval Result"
-(*
     | TMem({term_node = TBinOp((PlusPI|IndexPI),t,i)}), TNoOffset ->
       (* t[i] *)
-      t_app map_get [snd(term ~label t lvm old);snd(term ~label i lvm old)]
- *)
+      t_app array_get [snd(term ~label t lvm old);snd(term ~label i lvm old)]
     | TMem({term_node = TBinOp(_,t,i)}), TNoOffset ->
       Self.not_yet_implemented "tlval Mem(TBinOp(_,%a,%a), TNoOffset)"
         Cil_printer.pp_term t Cil_printer.pp_term i
@@ -843,9 +830,7 @@ let add_decls_as_module modules id decls =
       let m = Pmodule.create_module env id in
       let m = use_module m int_theory in
       let m = use_module m real_theory in
-(*
-      let th = use th map_theory.Pmodule.mod_theory in
- *)
+      let m = use_module m array_module in
       let m = List.fold_left use_module m modules in
       let m = List.fold_left add_logic_decl m (List.rev decls) in
       let m = Pmodule.close_module m in
@@ -1115,20 +1100,19 @@ and lval denv (host,offset) =
       else (Dexpr.dexpr ev)
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
-    | Mem({enode = BinOp((PlusPI|IndexPI),_e,_i,_ty)}), NoOffset ->
-      (* e[i] -> Map.get e i *)
+    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,_ty)}), NoOffset ->
+      (* e[i] -> Array.get e i *)
+      let e = expr denv e in
 (*
-      let e = expr e in
       let ity =
         match ty with
           | TPtr(t,_) -> ctype t
           | _ -> assert false
       in
-      let i = expr i in
-      let i = de_app1 uint32_to_int_fun i in
-      de_app2 map_get e i
  *)
-      Self.not_yet_implemented "lval Mem e+i"
+      let i = expr denv i in
+      let i = de_app1 uint32_to_int_fun i in
+      de_app2 array_get_fun e i
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
@@ -1371,7 +1355,9 @@ let fundecl denv_global fdec =
          match id with
          | None -> denv
          | Some id ->
+(*
             Self.log "function parameter %s" id.Ident.pre_name;
+ *)
             Dexpr.denv_add_var denv id dity)
         binders denv
     in
@@ -1379,7 +1365,9 @@ let fundecl denv_global fdec =
       match l with
       | [] -> block denv cbody
       | v::rem ->
+(*
          Self.log "local variable %s" v.vname;
+ *)
          let _ity,def = ctype_and_default v.vtype in
          create_var v true;
          let def = de_app1 ref_fun def in
@@ -1412,23 +1400,29 @@ let fundecl denv_global fdec =
   in
   let id = Ident.id_fresh fun_id.vname in
   let predef = (id,false,Expr.RKnone,binders,Dexpr.dity_of_ity (ctype ret_type),Ity.MaskVisible, body) in
+(*
   Self.result "fundecl %s done" fun_id.vname;
+ *)
+(*
   let l =
     Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv_global) []
   in
   Self.result "denv_global contains @[[%a]@]"
               (Pp.print_list Pp.semi Format.pp_print_string) l;
+ *)
   let denv,def = Dexpr.drec_defn denv_global [predef] in
+(*
   let l =
     Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv) []
   in
   Self.result "denv contains @[[%a]@]"
               (Pp.print_list Pp.semi Format.pp_print_string) l;
+ *)
   let def =
-    try
+    (* try *)
       Dexpr.rec_defn def
-    with e ->
-      Self.fatal "Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e
+    (* with e -> *)
+    (*   Self.fatal "Dexpr.rec_defn failed!:@ %a" Exn_printer.exn_printer e *)
   in
   let rs =
     match def with
@@ -1542,13 +1536,14 @@ let global (theories,lemmas,denv,functions) g =
 let print_id fmt id = Format.fprintf fmt "%s" id.Ident.id_string
 
 let add_pdecl m d =
+  let def = Pdecl.create_let_decl d in
   try
-    Pmodule.add_pdecl ~vc:true m (Pdecl.create_let_decl d)
+    Pmodule.add_pdecl ~vc:true m def
   with
-      Not_found ->
+    Not_found ->
     Self.fatal "add_pdecl"
-        (* Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id) *)
-        (*   (Ident.Sid.elements d.Pdecl.pd_news) *)
+    (* Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id) *)
+    (*              (Ident.Sid.elements d.Pdecl.pd_news) *)
 
 (*
 let use m th =
@@ -1577,9 +1572,7 @@ let prog p =
     in
     let m = use_module m int_theory in
     let m = use_module m real_theory in
-(*
-    let m = use_module m map_theory in
- *)
+    let m = use_module m array_module in
     let m = List.fold_left use_module m theories in
     let m = use_module m ref_module in
     let m = use_module m uint32_module in
