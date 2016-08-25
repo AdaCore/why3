@@ -4,7 +4,7 @@
 
 
 
-/*@ // requires \valid(t+(0..10));
+/*@ requires \valid(t+(0..10));
   @ ensures \result == t[0];
   @*/
 int f(int t[]) {

@@ -33,18 +33,19 @@
             
             goal VC_f :
               forall t:array t.
-               (0 <= 0 /\ 0 < two_power_size) /\
-                (forall o:t.
-                  to_uint o = 0 /\ o = of_int 0 ->
-                   (0 <= 0 /\ 0 < two_power_size) /\
-                    (forall o1:t.
-                      to_uint o1 = 0 /\ o1 = of_int 0 -> (let o2 = to_uint o1 in
-                       (0 <= o2 /\ o2 < length t) /\
-                        (forall us_retres:t.
-                          us_retres = t[o2] -> to_uint us_retres = to_uint t[0]))))
+               0 <= 0 /\ 10 < length t ->
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 0 /\ 0 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 0 /\ o1 = of_int 0 -> (let o2 = to_uint o1 in
+                        (0 <= o2 /\ o2 < length t) /\
+                         (forall us_retres:t.
+                           us_retres = t[o2] -> to_uint us_retres = to_uint t[0]))))
             end
 [jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
 [jessie3] Task 1 (VC f) (precondition): Valid, Valid, Valid
 [jessie3] Task 2 (VC f) (precondition): Valid, Valid, Valid
-[jessie3] Task 3 (VC f) (index in array bounds): Timeout, Unknown, Timeout
+[jessie3] Task 3 (VC f) (index in array bounds): Valid, Valid, Valid
 [jessie3] Task 4 (VC f) (postcondition): Valid, Valid, Valid

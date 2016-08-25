@@ -239,6 +239,7 @@ let array_type : Ity.itysymbol =
   Pmodule.ns_find_its array_module.Pmodule.mod_export ["array"]
 
 let array_get : Term.lsymbol = find array_module "mixfix []"
+let array_length : Term.lsymbol = find array_module "length"
 let array_get_fun : Expr.rsymbol = find_rs array_module "mixfix []"
 
 
@@ -756,6 +757,8 @@ let rel (ty1,t1) op (ty2,t2) =
       Self.not_yet_implemented "rel Rlt %a %a"
         Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
+let zero = Term.t_nat_const 0
+
 let rec predicate ~label p lvm old =
   match p with
     | Pfalse -> Term.t_false
@@ -768,6 +771,18 @@ let rec predicate ~label p lvm old =
       Term.t_implies (predicate_named ~label p1 lvm old) (predicate_named ~label p2 lvm old)
     | Pand (p1, p2) ->
       Term.t_and (predicate_named ~label p1 lvm old) (predicate_named ~label p2 lvm old)
+    | Pvalid (_lab, t1) ->
+       begin match t1.term_node with
+         | TBinOp ((PlusPI|IndexPI),t1,{term_node = Trange(Some a,Some b)}) ->
+            let _,tt = term ~label t1 lvm old in
+            let _,ta = term ~label a lvm old in
+            let _,tb = term ~label b lvm old in
+            let c1 = t_app le_int [zero;coerce_to_int a.term_type ta] in
+            let len = t_app array_length [tt] in
+            let c2 = t_app lt_int [coerce_to_int a.term_type tb;len] in
+            Term.t_and c1 c2
+         | _ -> Self.not_yet_implemented "predicate Pvalid"
+       end
     | Papp (_, _, _) ->
       Self.not_yet_implemented "predicate Papp"
     | Pnot _ ->
@@ -783,7 +798,6 @@ let rec predicate ~label p lvm old =
     | Plet (_, _)
     | Pexists (_, _)
     | Pvalid_read (_, _)
-    | Pvalid (_, _)
     | Pinitialized (_, _)
     | Pallocable (_, _)
     | Pfreeable (_, _)

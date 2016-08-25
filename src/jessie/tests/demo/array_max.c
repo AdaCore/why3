@@ -17,7 +17,7 @@ an element maximal in the array.
 */
 
 /*@ requires len > 0;
-  @ // requires \valid(a+(0..(len-1)));
+  @ requires \valid(a+(0..(len-1)));
   @ ensures 0 <= \result < len;
   @ // ensures \forall integer i; 0 <= i < len ==> a[i] <= a[\result];
   @*/
