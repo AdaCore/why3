@@ -798,7 +798,7 @@ module Print = struct
         print_lident info fmt ts
     | Tapp (ts, [ty]) ->
         fprintf fmt (protect_on paren "%a@ %a")
-          (print_ty info) ty (print_lident info) ts
+          (print_ty ~paren:true info) ty (print_lident info) ts
     | Tapp (ts, tl) ->
         fprintf fmt (protect_on paren "(%a)@ %a")
           (print_list comma (print_ty info)) tl
