@@ -620,15 +620,15 @@ let rec eval_expr env (e : expr) : result =
       match r with
         | Excep(ex,t) ->
           begin
-            let (vl,e2) = Mexn.find ex el in
-            match vl with
-            | [] ->
+            match Mexn.find ex el with
+            | ([], e2) ->
               (* assert (t = Vvoid); *)
               eval_expr env e2
-            | [v] ->
+            | ([v], e2) ->
               let env' = bind_vs v.pv_vs t env in
               eval_expr env' e2
             | _ -> assert false (* TODO ? *)
+            | exception Not_found -> r
           end
         | _ -> r
     end
