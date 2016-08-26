@@ -26,8 +26,27 @@ val print_status : Format.formatter -> proof_attempt_status -> unit
 type transformation_status = TSscheduled of transID | TSdone of transID | TSfailed
 
 module type Scheduler = sig
-  val timeout: ms:int -> (unit -> bool) -> unit
-  val idle: (unit -> bool) -> unit
+
+    (** Any module of this signature should implement a scheduler,
+    that allows the register functions to call, and call them
+    depending on some time constraints: after a given delay, or simply
+    when there is no more tasks with higher priority. *)
+
+    val timeout: ms:int -> (unit -> bool) -> unit
+    (** [timeout ~ms f] registers the function [f] as a function to be
+    called every [ms] milliseconds. The function is called repeatedly
+    until it returns false. the [ms] delay is not strictly guaranteed:
+    it is only a minimum delay between the end of the last call and
+    the beginning of the next call.  Several functions can be
+    registered at the same time. *)
+
+    val idle: prio:int -> (unit -> bool) -> unit
+    (** [idle prio f] registers the function [f] as a function to be
+    called whenever there is nothing else to do. Several functions can
+    be registered at the same time.  Several functions can be
+    registered at the same time. Functions registered with higher
+    priority will be called first. *)
+
 end
 
 

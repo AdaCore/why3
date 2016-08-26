@@ -2,7 +2,18 @@ type session
 type transID
 type proofNodeID
 type proof_attempt
-type trans_arg
+
+type trans_arg =
+  | TAint      of int
+  | TAstring   of string
+  | TAterm     of Term.term
+  | TAty       of Ty.ty
+  | TAtysymbol of Ty.tysymbol
+  (* | ... *)
+
+
+
+
 
 (* New Proof sessions ("Refectoire") *)
 
@@ -17,12 +28,17 @@ type trans_arg
 type tree =
     Tree of
       (proofNodeID * string
-       * proof_attempt list (* proof attempts in this node *)
-       * (transID * string * tree list) list) (* transformation in this node *)
+       * proof_attempt list (* proof attempts on this node *)
+       * (transID * string * tree list) list) (* transformations on this node *)
+(* a tree is a complete proof whenever at least one proof_attempf or
+  one transformation proves the goal, where a transformation proves a
+  goal when all subgoals have a complete proof.  In other word, the
+  list of proof_attempt and transformation are "disjunctive" but the
+  list of tree below a transformation is "conjunctive" *)
 
 val get_theories : session -> (string * (string * proofNodeID list) list) list
 (** [get_theories s] returns a list of pairs [name,l] where [name] is a
-    file name and [l] is a list of pairs [thnmae,l'] where [thname] is
+    file name and [l] is a list of pairs [thname,l'] where [thname] is
     a theory name and [l'] is the list of goal ids *)
 
 val get_tree : session -> proofNodeID -> tree
