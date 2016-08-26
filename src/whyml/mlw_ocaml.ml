@@ -969,7 +969,7 @@ module Print = struct
         fprintf fmt "%a.%a" (print_expr_p info) e (print_lident info) f
     | Esetfield (e1, f, e2) ->
         fprintf fmt (protect_on paren "%a.%a <- %a")
-        (print_expr info) e1 (print_lident info) f (print_expr info) e2
+        (print_expr_p info) e1 (print_lident info) f (print_expr info) e2
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
