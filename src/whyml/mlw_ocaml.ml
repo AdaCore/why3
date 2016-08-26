@@ -1069,7 +1069,7 @@ module Print = struct
        fprintf fmt "exception %a@\n@\n" (print_uident info) xs
     | Dexn (xs, Some ty) ->
        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-               (print_uident info) xs (print_ty info) ty
+               (print_uident info) xs (print_ty ~paren:true info) ty
 
 end
 
