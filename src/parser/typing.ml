@@ -120,14 +120,22 @@ let ty_of_pty ?(noop=true) uc pty =
   in
   get_ty pty
 
-let opaque_tvs args =
-  let rec opaque_tvs acc = function
-    | PTtyvar (id, true) -> Stv.add (tv_of_string id.id_str) acc
-    | PTtyvar (_, false) -> acc
-    | PTtyapp (_, pl)
-    | PTtuple pl -> List.fold_left opaque_tvs acc pl
-    | PTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
-    | PTparen ty -> opaque_tvs acc ty in
+let rec elim_opaque = function
+  | PTtyvar (id, _) -> PTtyvar (id, false)
+  | PTtyapp (ts, pl) -> PTtyapp (ts, List.map elim_opaque pl)
+  | PTtuple pl -> PTtuple (List.map elim_opaque pl)
+  | PTarrow (ty1, ty2) -> PTarrow (elim_opaque ty1, elim_opaque ty2)
+  | PTparen ty -> PTparen (elim_opaque ty)
+
+let rec opaque_tvs acc = function
+  | PTtyvar (id, true) -> Stv.add (tv_of_string id.id_str) acc
+  | PTtyvar (_, false) -> acc
+  | PTtyapp (_, pl)
+  | PTtuple pl -> List.fold_left opaque_tvs acc pl
+  | PTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
+  | PTparen ty -> opaque_tvs acc ty
+
+let opaque_tvs_l args =
   List.fold_left (fun acc (_,_,_,ty) -> opaque_tvs acc ty) Stv.empty args
 
 (** typing using destructive type variables
@@ -535,14 +543,8 @@ let add_logics dl th =
     let id = d.ld_ident.id_str in
     let v = create_user_id d.ld_ident in
     let pl = tyl_of_params th d.ld_params in
-    let ty = Opt.map (ty_of_pty th) d.ld_type in
-    let opaque = opaque_tvs d.ld_params in
-    (* for abstract lsymbols fresh tyvars are opaque *)
-    let opaque = if d.ld_def = None && ty <> None then
-      let atvs = List.fold_left ty_freevars Stv.empty pl in
-      let vtvs = oty_freevars Stv.empty ty in
-      Stv.union opaque (Stv.diff vtvs atvs)
-    else opaque in
+    let opaque = Opt.fold opaque_tvs (opaque_tvs_l d.ld_params) d.ld_type in
+    let ty = Opt.map (ty_of_pty ~noop:false th) d.ld_type in
     let ls = create_lsymbol ~opaque v pl ty in
     Hstr.add lsymbols id ls;
     Loc.try2 ~loc:d.ld_loc add_param_decl th ls
@@ -569,7 +571,7 @@ let add_logics dl th =
         let f = fmla ~strict:true ~keep_loc:true f in
         abst, (ls, vl, f) :: defn
     | Some e, Some ty -> (* function *)
-        let e = { e with term_desc = Tcast (e, ty) } in
+        let e = { e with term_desc = Tcast (e, elim_opaque ty) } in
         let t = dterm th' (fun _ -> None) denv e in
         let t = term ~strict:true ~keep_loc:true t in
         abst, (ls, vl, t) :: defn
@@ -625,7 +627,7 @@ let add_inductives s dl th =
     let id = d.in_ident.id_str in
     let v = create_user_id d.in_ident in
     let pl = tyl_of_params th d.in_params in
-    let opaque = opaque_tvs d.in_params in
+    let opaque = opaque_tvs_l d.in_params in
     let ps = create_psymbol ~opaque v pl in
     Hstr.add psymbols id ps;
     Loc.try2 ~loc:d.in_loc add_param_decl th ps

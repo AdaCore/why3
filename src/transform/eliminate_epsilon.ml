@@ -113,10 +113,8 @@ let to_elim el t = match el with
       let vl,_,t = t_open_lambda t in
       vl = [] || t.t_ty = None
 
-let rec lift_f el acc t0 = match t0.t_node with
-  | (Tapp (ps, [t1; {t_node = Teps fb} as t2])
-  | Tapp (ps, [{t_node = Teps fb} as t2; t1]))
-    when ls_equal ps ps_equ && to_elim el t2 ->
+let rec lift_f el acc t0 =
+  let elim_eps_eq t1 fb t2 =
       let vs, f = t_open_bound fb in
       if canonicalize vs f <> Nothing then
         match t1.t_node with
@@ -132,6 +130,15 @@ let rec lift_f el acc t0 = match t0.t_node with
       else
         let f = t_let_close_simp vs t1 f in
         lift_f el acc (t_label_copy t0 f)
+  in
+  match t0.t_node with
+    (* cannot merge the 2 patterns because of warning 57 *)
+  | Tapp (ps, [t1; {t_node = Teps fb} as t2])
+    when ls_equal ps ps_equ && to_elim el t2 ->
+     elim_eps_eq t1 fb t2
+  | Tapp (ps, [{t_node = Teps fb} as t2; t1])
+    when ls_equal ps ps_equ && to_elim el t2 ->
+     elim_eps_eq t1 fb t2
   | Teps fb when to_elim el t0 ->
       let vl = Mvs.keys (t_vars t0) in
       let vs, f = t_open_bound fb in

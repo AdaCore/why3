@@ -27,7 +27,7 @@ available: [ ocaml-version >= "4.01.0" ]
 build: [
   ["./configure" "--prefix" prefix "--disable-frama-c"
                  "--disable-ide" { !conf-gtksourceview:installed }]
-  [make "-j%{jobs}%" "opt" "byte"]
+  [make "-j%{jobs}%" "all" "opt" "byte"]
 ]
 
 install: [make "install" "install-lib"]

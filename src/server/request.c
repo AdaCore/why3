@@ -74,12 +74,14 @@ prequest parse_request(char* str_req, int len, int key) {
   if (semic == 1) {
     pos = copy_up_to_semicolon (str_req, pos, len, &tmp);
     if (strncmp(tmp, "parallel", pos) == 0) {
-        pos = copy_up_to_semicolon (str_req, pos, len, &tmp);
-        parallel_arg = atoi(tmp);
-        if (parallel_arg >= 1) {
-          parallel = parallel_arg;
-        }
+      free(tmp);
+      pos = copy_up_to_semicolon (str_req, pos, len, &tmp);
+      parallel_arg = atoi(tmp);
+      if (parallel_arg >= 1) {
+        parallel = parallel_arg;
+      }
     }
+    free(tmp);
     return NULL;
   }
 
@@ -92,9 +94,11 @@ prequest parse_request(char* str_req, int len, int key) {
     if (strncmp(tmp, "runstdin", pos) == 0) {
       runstdin = true;
     } else {
+      free(tmp);
       return NULL;
     }
   }
+  free(tmp);
   req = (prequest) malloc(sizeof(request));
   req->key = key;
   req->numargs = numargs;

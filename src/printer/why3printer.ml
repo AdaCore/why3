@@ -48,14 +48,14 @@ let print_tv fmt tv =
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
-  let sanitizer = String.uncapitalize in
+  let sanitizer = Strings.uncapitalize in
   fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
-  let sanitizer = String.capitalize in
+  let sanitizer = Strings.capitalize in
   fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
@@ -65,7 +65,7 @@ let print_ls fmt ls =
   fprintf fmt "%s" (id_unique iprinter ls.ls_name)
 
 let print_cs fmt ls =
-  let sanitizer = String.capitalize in
+  let sanitizer = Strings.capitalize in
   fprintf fmt "%s" (id_unique iprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
