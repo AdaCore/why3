@@ -1005,7 +1005,7 @@ module Print = struct
         fprintf fmt (protect_on paren "raise %a") (print_uident info) id
     | Eraise (Xident id, Some e1) ->
         fprintf fmt (protect_on paren "raise (%a %a)")
-              (print_uident info) id (print_expr info) e1
+              (print_uident info) id (print_expr ~paren:true info) e1
     | Etry (e1, bl) ->
         fprintf fmt
           "@[<v>@[<hv>@[<hov 2>begin@ try@ %a@]@ with@]@\n@[<hov>%a@]@\nend@]"
