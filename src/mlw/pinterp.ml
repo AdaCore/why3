@@ -126,6 +126,9 @@ let rec matching env (v:value) p =
         else
           if ls2.ls_constr > 0 then raise NoMatch
           else raise Undetermined
+      | Vbool b ->
+        let ls2 = if b then fs_bool_true else fs_bool_false in
+        if ls_equal ls ls2 then env else raise NoMatch
       | _ -> raise Undetermined
 
 
