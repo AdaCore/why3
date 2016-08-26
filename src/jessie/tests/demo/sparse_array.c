@@ -2,14 +2,11 @@
    OPT: -journal-disable -jessie3
 */
 
-
+// ISSUE: GType not implemented
 
 typedef unsigned int size_t;
 void *malloc(size_t size);
 void *calloc(size_t nmemb, size_t size);
-
-
-
 
 typedef unsigned int uint;
 
@@ -118,6 +115,6 @@ int main() {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 sparse_array.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 sparse_array.c"
 End:
 */

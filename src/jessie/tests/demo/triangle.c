@@ -1,7 +1,9 @@
-
 /* run.config
    OPT: -journal-disable -jessie3
 */
+
+// ISSUE: \let not implemented
+// ISSUE: floats not implemented
 
 /* Area of a triangle, a formal revisit
  * http://hal.inria.fr/hal-00790071

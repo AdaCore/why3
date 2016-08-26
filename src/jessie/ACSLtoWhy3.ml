@@ -438,9 +438,9 @@ let bound_vars = Hashtbl.create 257
 let create_lvar v =
   let id = Ident.id_fresh v.lv_name in
   let vs = Term.create_vsymbol id (logic_type v.lv_type) in
-(**)
+(*
   Self.result "create logic variable %d" v.lv_id;
-(**)
+*)
   Hashtbl.add bound_vars v.lv_id vs;
   vs
 
@@ -561,7 +561,9 @@ let create_lsymbol li =
   let targs = List.map (fun v -> v.Term.vs_ty) args in
   let ret_ty = Opt.map logic_type li.l_type in
   let vs = Term.create_lsymbol id targs ret_ty in
+(*
   Self.result "creating logic symbol %d (%s)" li.l_var_info.lv_id name;
+*)
   Hashtbl.add logic_symbols li.l_var_info.lv_id vs;
   vs,args
 
@@ -649,6 +651,8 @@ let rec term_node ~label t lvm old =
       end
     | TLogic_coerce (_, _) ->
       Self.not_yet_implemented "TLogic_coerce"
+    | Tlet (_, _) ->
+      Self.not_yet_implemented "Tlet"
     | TSizeOf _
     | TSizeOfE _
     | TSizeOfStr _
@@ -671,8 +675,7 @@ let rec term_node ~label t lvm old =
     | Tunion _
     | Tinter _
     | Tcomprehension (_, _, _)
-    | Trange (_, _)
-    | Tlet (_, _) ->
+    | Trange (_, _) ->
       Self.not_yet_implemented "term_node (2)"
 
 and term ~label t lvm old =

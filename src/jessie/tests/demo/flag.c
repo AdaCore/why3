@@ -1,7 +1,8 @@
-
 /* run.config
    OPT: -journal-disable -jessie3
 */
+
+// ISSUE: enum not implemented
 
 /* Dijkstra's dutch flag */
 

@@ -2,6 +2,8 @@
    OPT: -journal-disable -jessie3
 */
 
+// ISSUE WITH -1 in program (workaround: 0-1)
+// ISSUES WITH CONVERSION long <-> int
 
 //@ lemma mean: \forall integer x, y; x <= y ==> x <= (x+y)/2 <= y;
 

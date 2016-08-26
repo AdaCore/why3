@@ -7,7 +7,7 @@
 //@ logic integer f(integer x) = x+1;
 
 
-//@ requires f(x+0) >= 0;
+//@ requires f(x) >= 0;
 int g(int x) {
   return x;
 }

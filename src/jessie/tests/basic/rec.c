@@ -17,7 +17,7 @@ long sum(int x) {
   long tmp;
   if (x == 0) return 0;
   tmp = sum (x-1);
-  return /* x+ */ tmp;
+  return /* x+ */ tmp; // CONVERSION ISSUE
 }
 
 /*@ requires 0 <= x <= 60000;
@@ -26,7 +26,7 @@ long sum(int x) {
   @*/
 long sum2(int x) {
   if (x == 0) return 0;
-  else return /* x + */ sum2(x-1);
+  else return /* x + */ sum2(x-1);  // CONVERSION ISSUE
 }
 
 /*@ ensures \result == 36;
