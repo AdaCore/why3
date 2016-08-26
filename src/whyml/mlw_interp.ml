@@ -45,6 +45,8 @@ type value =
   | Vcase of value * term_branch list
 
 let array_cons_ls = ref ps_equ
+let ls_true = ref ps_equ
+let ls_false = ref ps_equ
 
 let rec print_value fmt v =
   match v with
@@ -228,6 +230,9 @@ let rec matching env (t:value) p =
         else
           if ls2.ls_constr > 0 then raise NoMatch
           else raise Undetermined
+      | Vbool b ->
+         let l = if b then !ls_true else !ls_false in
+         if ls_equal ls1 l then env else raise NoMatch
       | _ -> raise Undetermined
 
 
@@ -407,8 +412,8 @@ let eval_map_set ls_set l =
 
 let built_in_theories =
   [ ["bool"],"Bool", [],
-    [ "True", None, eval_true ;
-      "False", None, eval_false ;
+    [ "True", Some ls_true, eval_true ;
+      "False", Some ls_false, eval_false ;
     ] ;
     ["int"],"Int", [],
     [ "infix +", None, eval_int_op BigInt.add;
