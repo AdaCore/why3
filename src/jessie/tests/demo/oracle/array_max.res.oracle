@@ -33,6 +33,8 @@
             
             (* use mach.bv.BVCheck32 *)
             
+            (* use mach.int.Int64 *)
+            
             goal VC_max :
               forall a:array t, len:t.
                (0 <= 0 /\ (to_uint len - 1) < length a) /\ to_uint len > 0 ->

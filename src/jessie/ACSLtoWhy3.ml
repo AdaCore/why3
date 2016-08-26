@@ -1354,7 +1354,7 @@ let extract_simple_contract c =
       (pre,post, ass))
     ([],[],None) c.spec_behavior
   in
-  (pre, post, ass)
+  (pre, c.spec_variant, post, ass)
 
 
 
@@ -1379,7 +1379,7 @@ let fundecl denv_global fdec =
   in
   let cbody = List.rev cbody in
   let contract = Annotations.funspec kf in
-  let pre,post,_ass = extract_simple_contract contract in
+  let pre,var,post,_ass = extract_simple_contract contract in
   let locals = Kernel_function.get_locals kf in
   let ret_type = Kernel_function.get_return_type kf in
   (* creating environnement *)
@@ -1447,7 +1447,15 @@ let fundecl denv_global fdec =
         Dexpr.ds_checkrw = false;
       }
     in
-    let variants _lvm _old = [Term.t_nat_const 0,None] in
+    let variants lvm old =
+      match var with
+        | None -> [Term.t_nat_const 0,None]
+        | Some(t,None) ->
+           let _,v = term ~label:Here t lvm old in
+           [ coerce_to_int t.term_type v, None]
+        | Some(_,Some _) ->
+           Self.not_yet_implemented "decreases clause with order relation";
+    in
     (spec_later,variants,body)
   in
   let id = Ident.id_fresh fun_id.vname in
@@ -1618,12 +1626,13 @@ let prog p =
     let m = List.fold_left use_module m theories in
     let m = use_module m ref_module in
     let m = use_module m bv32_module in
+    let m = use_module m int64_module in
     let m = Pmodule.add_pdecl ~vc:false m (Pdecl.create_exn_decl exc_break) in
     let m = Pmodule.add_pdecl ~vc:false m (Pdecl.create_exn_decl exc_return) in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Pmodule.close_module m in
-    List.rev (m (*.Pmodule.mod_theory*) :: theories) ;
+    List.rev (m :: theories) ;
   with (Exit | Not_found| Ty.TypeMismatch _
            | Ity.TypeMismatch _ | Decl.UnknownIdent _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."

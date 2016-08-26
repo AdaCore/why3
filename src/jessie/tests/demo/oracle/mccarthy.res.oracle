@@ -35,6 +35,8 @@
             
             (* use mach.bv.BVCheck32 *)
             
+            (* use mach.int.Int64 *)
+            
             goal VC_f91 :
               forall n:t.
                (0 <= 0 /\ 0 < two_power_size) /\
@@ -66,8 +68,13 @@
                                                                          (to_uint n +
                                                                            to_uint o4) /\
                                                                          o5 = add n o4 ->
-                                                                         (0 <= 0 /\
-                                                                           0 < 0) /\
+                                                                         (0 <=
+                                                                           (101 -
+                                                                             to_uint n) /\
+                                                                           (101 -
+                                                                             to_uint o5) <
+                                                                            (101 -
+                                                                              to_uint n)) /\
                                                                           (forall o6:t.
                                                                             (to_uint o5 >=
                                                                               101 ->
@@ -82,8 +89,14 @@
                                                                              (forall tmp:
                                                                               t.
                                                                               tmp = o6 ->
-                                                                              (0 <= 0 /\
-                                                                              0 < 0) /\
+                                                                              (0 <=
+                                                                              (101 -
+                                                                              to_uint n) /\
+                                                                              (101 -
+                                                                              to_uint
+                                                                              tmp) <
+                                                                              (101 -
+                                                                              to_uint n)) /\
                                                                               (forall o7:
                                                                               t.
                                                                               (to_uint
@@ -138,8 +151,8 @@
 [jessie3] Task 4 (VC f91) (precondition): Valid, Valid, Valid
 [jessie3] Task 5 (VC f91) (precondition): Valid, Valid, Valid
 [jessie3] Task 6 (VC f91) (precondition): Valid, Valid, Timeout
-[jessie3] Task 7 (VC f91) (variant decrease): Timeout, Unknown, Timeout
-[jessie3] Task 8 (VC f91) (variant decrease): Timeout, Timeout, Timeout
+[jessie3] Task 7 (VC f91) (variant decrease): Valid, Valid, Valid
+[jessie3] Task 8 (VC f91) (variant decrease): Valid, Valid, Valid
 [jessie3] Task 9 (VC f91) (postcondition): Valid, Valid, Valid
 [jessie3] Task 10 (VC f91) (postcondition): Valid, Timeout, Valid
 [jessie3] Task 11 (VC f91) (precondition): Valid, Valid, Valid

@@ -37,6 +37,8 @@
             
             (* use mach.bv.BVCheck32 *)
             
+            (* use mach.int.Int64 *)
+            
             goal VC_f :
               forall x:t.
                to_uint x <= 1000000 ->
@@ -67,7 +69,7 @@
 [jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
 [jessie3] Task 1 (VC f) (precondition): Valid, Valid, Valid
 [jessie3] Task 2 (VC f) (precondition): Valid, Valid, Valid
-[jessie3] Task 3 (VC f) (precondition): Valid, Unknown, Timeout
+[jessie3] Task 3 (VC f) (precondition): Valid, Timeout, Timeout
 [jessie3] Task 4 (VC f) (postcondition): Valid, Valid, Valid
 [jessie3] Task 5 (VC h) (precondition): Valid, Timeout, Valid
 [jessie3] Task 6 (VC h) (postcondition): Valid, Valid, Valid
