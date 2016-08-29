@@ -118,12 +118,13 @@ end)
     @param info used to know if the current term is under a vc_label
     @param vc_loc is the location of the vc_label (returned value)
     @param vc_map is a container for generated vc_constant id (used to avoid duplication)
+    @param vc_var contains the variables we can safely use as CE (ie: we introduced these)
     @param t: current subterm of the goal
     @return list of declarations added by do_intro
  *)
-let rec do_intro info vc_loc vc_map t =
+let rec do_intro info vc_loc vc_map vc_var t =
   let info = check_enter_vc_term t info vc_loc in
-  let do_intro = do_intro info vc_loc vc_map in
+  let do_intro = do_intro info vc_loc vc_map vc_var in
 
   (* Do the necessary machinery to add a printable counterexample when encountered
      (variable or function without arguments) *)
@@ -177,7 +178,10 @@ let rec do_intro info vc_loc vc_map t =
 	    tl
     end
   | Tvar v ->
-    new_counter_example_variable v.vs_name info
+    if (Hvs.mem vc_var v) then
+      new_counter_example_variable v.vs_name info
+    else
+      []
   | Tbinop (_, f1, f2) ->
       List.append (do_intro f1) (do_intro f2)
   | Tquant (_, fq) ->
@@ -201,26 +205,31 @@ let rec do_intro info vc_loc vc_map t =
   | Teps _ -> []
 
 (* Meant to remove foralls in positive positions (not necessarily in top
-   position) *)
-let rec remove_positive_foralls f =
+   position). vc_var is the set of variables we already introduced. *)
+let rec remove_positive_foralls vc_var f =
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
-      let (decl, fres) = remove_positive_foralls f2 in
+      let (decl, fres) = remove_positive_foralls vc_var f2 in
       (decl, t_implies f1 fres)
+(*  | Tbinop (Tor, f1, f2) ->
+      let (decl1, fres1) = remove_positive_foralls vc_var f1 in
+      let (decl2, fres2) = remove_positive_foralls vc_var f2 in
+      (decl1 @ decl2, t_or fres1 fres2)*)
   | Tbinop (Tand, f1, f2) ->
-      let (decl1, fres1) = remove_positive_foralls f1 in
-      let (decl2, fres2) = remove_positive_foralls f2 in
+      let (decl1, fres1) = remove_positive_foralls vc_var f1 in
+      let (decl2, fres2) = remove_positive_foralls vc_var f2 in
       (decl1 @ decl2, t_and fres1 fres2)
   | Tquant (Tforall, fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
+	Hvs.add vc_var vs true;
 	Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
       let f = t_label_copy f (t_subst subst f_t) in
-      let decl, goal = remove_positive_foralls f in
+      let decl, goal = remove_positive_foralls vc_var f in
       (dl @ decl, goal)
   | _ -> ([], f)
 
@@ -240,15 +249,16 @@ let rec remove_positive_foralls f =
     @param vc_loc is the location of the vc_label (returned value)
     @param vc_map is a container for generated vc_constant id
     (used to avoid duplication)
+    @param vc_var current set of variables we introduced
     @param f current goal
     @return pair of the declarations introduced and the modified goal. *)
-let rec intros info vc_loc vc_map f =
+let rec intros info vc_loc vc_map vc_var f =
   let info = check_enter_vc_term f info vc_loc in
-  let intros = intros info vc_loc vc_map in
+  let intros = intros info vc_loc vc_map vc_var in
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
       let f2 = t_label_copy f f2 in
-      let l = if info.vc_inside then do_intro info vc_loc vc_map f1 else [] in
+      let l = if info.vc_inside then do_intro info vc_loc vc_map vc_var f1 else [] in
       let id = create_prsymbol (id_fresh "H") in
       let d = create_prop_decl Paxiom id f1 in
       let decl, goal = intros f2 in
@@ -257,6 +267,7 @@ let rec intros info vc_loc vc_map f =
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
+	Hvs.add vc_var vs true;
 	Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
@@ -277,23 +288,24 @@ let rec intros info vc_loc vc_map f =
 	 might want it *)
       let decl, goal = intros f in
       if info.vc_inside then
-        let l = do_intro info vc_loc vc_map t in
+        let l = do_intro info vc_loc vc_map vc_var t in
 	(d :: l @ decl, goal)
       else
         (d :: decl, goal)
-  | _ -> remove_positive_foralls f
+  | _ -> remove_positive_foralls vc_var f
 
 let do_intro_vc_vars_counterexmp info vc_loc pr t =
   (* TODO initial guess on number of counter-examples to print *)
   let vc_map = Hprid.create 100 in
+  let vc_var = Hvs.create 100 in
   let tvs = t_ty_freevars Stv.empty t in
   let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] None in
   let tvm = Mtv.mapi mk_ts tvs in
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let (defs_intros, t) =
-    intros info vc_loc vc_map (t_ty_subst subst Mvs.empty t) in
-  let defs_do_intro = do_intro info vc_loc vc_map t in
+    intros info vc_loc vc_map vc_var (t_ty_subst subst Mvs.empty t) in
+  let defs_do_intro = do_intro info vc_loc vc_map vc_var t in
   Mtv.values decls @ defs_intros @ defs_do_intro @ [(create_prop_decl Pgoal pr t)]
 
 let intro_vc_vars_counterexmp2 task =
