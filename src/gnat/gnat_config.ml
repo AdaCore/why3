@@ -27,7 +27,6 @@ let rec file_concat l =
 type prover =
   { driver : Driver.driver;
     prover : Whyconf.config_prover;
-    editor : Whyconf.config_editor
   }
 
 let spark_config_dir =
@@ -335,20 +334,10 @@ let provers, prover_ce, config, env =
         Pp.sprintf "Failed to load driver for prover: %a"
              Exn_printer.exn_printer e in
       Gnat_util.abort_with_message ~internal:true s in
-  (* this function loads the editor for a given prover, otherwise returns a
-     default value *)
-  let prover_editor prover =
-    try Whyconf.editor_by_id config prover.Whyconf.editor
-    with Not_found ->
-      { Whyconf.editor_name = "";
-        editor_command = "";
-        editor_options = [] }
-    in
   (* now we build the prover record for each requested prover *)
   let build_prover_rec base_prover =
     { driver = prover_driver  base_prover;
-        prover = base_prover;
-        editor = prover_editor base_prover } in
+        prover = base_prover} in
   let provers =
     List.map build_prover_rec base_provers in
   let prover_ce = match base_prover_ce with

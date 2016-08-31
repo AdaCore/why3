@@ -112,7 +112,16 @@ let create_prover_file goal expl prover =
 (* ??? maybe use a Buffer.t? Isn't there some code already doing this in Why3?
  * *)
 let editor_command prover fn =
-  let editor = prover.Gnat_config.editor in
+  (* this function loads the editor for a given prover, otherwise returns a
+     default value *)
+  let editor =
+    try Whyconf.editor_by_id Gnat_config.config
+        prover.Gnat_config.prover.Whyconf.editor
+    with Not_found ->
+      { Whyconf.editor_name = "";
+        editor_command = "";
+        editor_options = [] }
+  in
   let cmd_line =
     List.fold_left (fun str s -> str ^ " " ^ s)
                   editor.Whyconf.editor_command

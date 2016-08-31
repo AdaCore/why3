@@ -8,7 +8,6 @@ val env : Env.env
 type prover =
   { driver : Driver.driver;
     prover : Whyconf.config_prover;
-    editor : Whyconf.config_editor
   }
 
 val provers : prover list
