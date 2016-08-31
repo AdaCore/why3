@@ -489,57 +489,62 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 # Coq
 
+enable_coq_support=yes
 enable_coq_fp_libs=yes
 
 coq_compat_version=
 
 if test "$enable_coq_tactic" = no -a "$enable_coq_libs" = no; then
-    enable_coq_support=no
-    AC_MSG_WARN(coq support disabled)
-    reason_coq_support=" (disabled by user)"
-else
-    AC_CHECK_PROG(COQC,coqc,coqc,no)
-    if test "$COQC" = no ; then
-        enable_coq_support=no
-        AC_MSG_WARN(Cannot find coqc.)
-        reason_coq_support=" (coqc not found)"
-    else
-        COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
-        AC_MSG_CHECKING(Coq version)
-        COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
+   enable_coq_support=no
+   AC_MSG_WARN(coq support disabled)
+   reason_coq_support=" (disabled by user)"
+fi
 
-        #Even if the name of the variable is CAMLP4 the value can be camlp5
-        CAMLP4BIN=`coqtop -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
-        CAMLP4=`coqtop -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
-        COQCAMLPLIB=`coqtop -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
-        COQCAMLP=${CAMLP4BIN}${CAMLP4}o
+if test "$enable_coq_support" = yes; then
+   AC_CHECK_PROG(COQC,coqc,coqc,no)
+   if test "$COQC" = no ; then
+      enable_coq_support=no
+      AC_MSG_WARN(Cannot find coqc.)
+      reason_coq_support=" (coqc not found)"
+   fi
+fi
 
-        case $COQVERSION in
-          8.4*)
-	        enable_coq_support=yes
-                coq_compat_version="COQ84"
-                COQPPLIBS="$COQLIB/parsing/grammar.cma"
-                AC_MSG_RESULT($COQVERSION)
-                ;;
-          8.5*|trunk)
-                enable_coq_support=yes
-                coq_compat_version="COQ85"
-                COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
-                AC_MSG_RESULT($COQVERSION)
-                ;;
-          *)
-                enable_coq_support=no
-	        AC_MSG_WARN(You need Coq 8.4 or later; Coq discarded)
-                reason_coq_support=" (version is $COQVERSION but need version 8.4 or higher)"
-                ;;
-        esac
-    fi
-    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
-    if test "$COQDEP" = no ; then
-        enable_coq_support=no
-        AC_MSG_WARN(Cannot find coqdep.)
-        reason_coq_support=" (coqdep not found)"
-     fi
+if test "$enable_coq_support" = yes; then
+   COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
+   AC_MSG_CHECKING(Coq version)
+   COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
+
+   #Even if the name of the variable is CAMLP4 the value can be camlp5
+   CAMLP4BIN=`coqtop -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
+   CAMLP4=`coqtop -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
+   COQCAMLPLIB=`coqtop -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
+
+   case $COQVERSION in
+      8.4*)
+         coq_compat_version="COQ84"
+         COQPPLIBS="$COQLIB/parsing/grammar.cma"
+         AC_MSG_RESULT($COQVERSION)
+         ;;
+      8.5*|trunk)
+         coq_compat_version="COQ85"
+         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
+         AC_MSG_RESULT($COQVERSION)
+         ;;
+      *)
+         enable_coq_support=no
+         AC_MSG_WARN(You need Coq 8.4 or later; Coq discarded)
+         reason_coq_support=" (version is $COQVERSION but need version 8.4 or later)"
+         ;;
+   esac
+fi
+
+if test "$enable_coq_support" = yes; then
+   AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
+   if test "$COQDEP" = no; then
+      enable_coq_support=no
+      AC_MSG_WARN(Cannot find coqdep.)
+      reason_coq_support=" (coqdep not found)"
+   fi
 fi
 
 if test "$enable_coq_support" = no; then
@@ -557,9 +562,13 @@ if test "$enable_coq_tactic" = yes; then
    fi
 fi
 
-if test "$enable_coq_tactic" = yes -a "$CAMLP5O" = no; then
-   enable_coq_tactic=no
-   reason_coq_tactic=" (camlp5o not found)"
+if test "$enable_coq_tactic" = yes; then
+   AC_PATH_PROG(COQCAMLP,${CAMLP4}o,no,$CAMLP4BIN)
+   if test "$COQCAMLP" = no; then
+      enable_coq_tactic=no
+      AC_MSG_WARN(Cannot find camlpXo.)
+      reason_coq_tactic=" (camlpXo not found)"
+   fi
 fi
 
 if test "$enable_coq_libs" = yes; then
