@@ -1032,7 +1032,7 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 	$(SHOW) 'Coqdep   $<'
 	$(HIDE)$(COQDEP) -R lib/coq Why3 $< $(TOTARGET)
 
-all: $(COQVO) drivers/coq-realizations.aux
+all: $(COQVO)
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
@@ -1054,6 +1054,8 @@ drivers/coq-realizations.aux: Makefile
 	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 endif
+
+all: drivers/coq-realizations.aux
 
 install_no_local::
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/

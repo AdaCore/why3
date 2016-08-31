@@ -798,7 +798,7 @@ module Print = struct
         print_lident info fmt ts
     | Tapp (ts, [ty]) ->
         fprintf fmt (protect_on paren "%a@ %a")
-          (print_ty info) ty (print_lident info) ts
+          (print_ty ~paren:true info) ty (print_lident info) ts
     | Tapp (ts, tl) ->
         fprintf fmt (protect_on paren "(%a)@ %a")
           (print_list comma (print_ty info)) tl
@@ -969,7 +969,7 @@ module Print = struct
         fprintf fmt "%a.%a" (print_expr_p info) e (print_lident info) f
     | Esetfield (e1, f, e2) ->
         fprintf fmt (protect_on paren "%a.%a <- %a")
-        (print_expr info) e1 (print_lident info) f (print_expr info) e2
+        (print_expr_p info) e1 (print_lident info) f (print_expr info) e2
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
@@ -1005,7 +1005,7 @@ module Print = struct
         fprintf fmt (protect_on paren "raise %a") (print_uident info) id
     | Eraise (Xident id, Some e1) ->
         fprintf fmt (protect_on paren "raise (%a %a)")
-              (print_uident info) id (print_expr info) e1
+              (print_uident info) id (print_expr ~paren:true info) e1
     | Etry (e1, bl) ->
         fprintf fmt
           "@[<v>@[<hv>@[<hov 2>begin@ try@ %a@]@ with@]@\n@[<hov>%a@]@\nend@]"
@@ -1069,7 +1069,7 @@ module Print = struct
        fprintf fmt "exception %a@\n@\n" (print_uident info) xs
     | Dexn (xs, Some ty) ->
        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-               (print_uident info) xs (print_ty info) ty
+               (print_uident info) xs (print_ty ~paren:true info) ty
 
 end
 

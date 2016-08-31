@@ -55,18 +55,14 @@ val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
 
 val intro_const_equal_to_term :
   term : Term.term ->
-  const_label : Ident.Slab.t ->
-  const_loc : Loc.position ->
-  const_name : string ->
+  id_new : Ident.preid ->
   axiom_name : string ->
   Decl.decl list
 (** Creates declaration of new constant and declaration of axiom
     stating that the constant is equal to given term.
 
     @param term the term to which the new constant will be equal
-    @param const_label the label of the constant
-    @param const_loc the location of the constant
-    @param const_name the name of the constant
+    @param id_new the preid composed of the name, label and loc of the constant
     @param axiom_name the name of the axiom about the constant
     @return the definition of the constant and axiom about the constant
 *)
