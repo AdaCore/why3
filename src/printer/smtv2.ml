@@ -547,26 +547,33 @@ let print_logic_decl info fmt (ls,def) =
     List.iter (forget_var info) vsl
   end
 
-let print_info_model cntexample fmt model_list info =
+let print_info_model cntexample fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if model_list != [] && cntexample then
+  if not (S.is_empty info_model) && cntexample then
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
             (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
       fprintf fmt "@[(get-value (";
-      List.iter (fun f ->
-	fprintf str_formatter "%a" (print_fmla info) f;
-        let s = flush_str_formatter () in
-        fprintf fmt "%s " s;
-      ) model_list;
+
+      let model_map =
+	S.fold (fun f acc ->
+          fprintf str_formatter "%a" (print_fmla info) f;
+          let s = flush_str_formatter () in
+          fprintf fmt "%s " s;
+	  Stdlib.Mstr.add s f acc)
+	info_model
+	Stdlib.Mstr.empty in
       fprintf fmt "))@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
-      info.info_model <- info_model
+      info.info_model <- info_model;
+      model_map
     end
+  else
+    Stdlib.Mstr.empty
 
 let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
   | Paxiom ->
@@ -583,9 +590,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
-      print_info_model cntexample fmt model_list info;
+      let model_list = print_info_model cntexample fmt info in
       if cntexample then begin
 	(* (get-info :reason-unknown) *)
 	fprintf fmt "@[(get-info :reason-unknown)@]@\n";
