@@ -90,35 +90,72 @@ end
 
 
 
+(************************)
+(* parsing command line *)
+(************************)
+
+let files = Queue.create ()
+
+let spec = Arg.align [
+]
+
+let usage_str = Format.sprintf
+  "Usage: %s [options] <project directory>"
+  (Filename.basename Sys.argv.(0))
+
+let config, base_config, env =
+  Why3.Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+
+let ses =
+  if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
+  let fname = Queue.pop files in
+  ref (Why3.Session_itp.load_session fname)
+
 module C = Why3.Controller_itp.Make(Unix_scheduler)
 
 open Why3.Session_itp
+open Format
 
 let interp s =
   match s with
+    | "?" ->
+       printf "Commands@\n";
+       printf "a : run a simple test of Unix_scheduler.timeout@\n";
+       printf "i : run a simple test of Unix_scheduler.idle@\n";
+       printf "ls : list current directory@\n";
+       printf "p : print the session in raw form@\n";
+       printf "q : exit the shell@\n";
+       printf "@."
     | "a" ->
        Unix_scheduler.timeout
          ~ms:1000
          (let c = ref 10 in
           fun () -> decr c;
                     if !c > 0 then
-                      (Format.printf "%d@." !c; true)
+                      (printf "%d@." !c; true)
                     else
-                      (Format.printf "boom!@."; false))
+                      (printf "boom!@."; false))
     | "i" ->
        Unix_scheduler.idle
          ~prio:0
-         (fun () -> Format.printf "idle@."; false)
-(*
+         (fun () -> printf "idle@."; false)
     | "p" ->
-       let s = empty_session () in
-       C.schedule_proof_attempt
-         s (get_node s 0)
-*)
-
-    | _ -> Format.printf "unknown command `%s`@." s
-
+       printf "%a@." print_session !ses
+    | "q" -> exit 0
+    | "ls" ->
+       let t = get_theories !ses in
+       List.iter
+         (fun (s,l) ->
+          printf "File: %s@\n" s;
+          List.iter
+            (fun (th,_) ->
+             printf "  Theory: %s@\n" th)
+            l)
+         t;
+       printf "@?"
+    | _ -> printf "unknown command `%s`@." s
 
 
 let () =
+  printf "Welcome to Why3 shell. Type '?' for help.@.";
   Unix_scheduler.main_loop interp

@@ -49,7 +49,7 @@ val get_tree : session -> proofNodeID -> tree
 val get_node : session -> int -> proofNodeID
 val get_trans : session -> int -> transID
 val print_tree : session -> Format.formatter -> tree -> unit
-val print_session : session -> unit
+val print_session : Format.formatter -> session -> unit
 
 (* val get_proof_attempts : session -> proofNodeID -> proof_attempt Whyconf.Hprover.t *)
 val get_transformations : session -> proofNodeID -> transID list

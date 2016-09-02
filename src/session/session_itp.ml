@@ -189,7 +189,7 @@ and print_trans s fmt (id, name, l) =
   fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
     (Pp.print_list Pp.semi (print_tree s)) l
 
-let print_session s =
+let print_session fmt s =
   let print_theory s fmt (thname, pnl) =
     fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" thname
       (Pp.print_list Pp.semi (fun fmt a -> print_tree s fmt (get_tree s a))) pnl
@@ -202,7 +202,7 @@ let print_session s =
     fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
   in
   let l = get_theories s in
-  printf "%a@." (print_s s) l;;
+  fprintf fmt "%a@." (print_s s) l;;
 
 let empty_session ?shape_version () =
   let shape_version = match shape_version with
