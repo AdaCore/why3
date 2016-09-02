@@ -113,11 +113,23 @@ let ses =
 
 module C = Why3.Controller_itp.Make(Unix_scheduler)
 
-open Why3.Session_itp
+open Why3
 open Format
 
+exception Error of string
+
+let resolve _ses _path = assert false (* TODO *)
+
+let curdir = ref []
+
+
 let interp s =
-  match s with
+  let cmd,args =
+    match Strings.split ' ' s with
+    | [] -> assert false
+    | a::b -> a,b
+  in
+  match cmd with
     | "?" ->
        printf "Commands@\n";
        printf "a : run a simple test of Unix_scheduler.timeout@\n";
@@ -140,13 +152,32 @@ let interp s =
          ~prio:0
          (fun () -> printf "idle@."; false)
     | "p" ->
-       printf "%a@." print_session !ses
+       printf "%a@." Session_itp.print_session !ses
+    | "cd" ->
+       begin
+         match args with
+         | [d] ->
+            begin
+              try
+                let path = Strings.split '/' d in
+                let path =
+                  if String.get d 0 = '/' then path
+                  else !curdir @ path
+                in
+                let dir = resolve !ses path in
+                curdir := dir
+              with Error s ->
+                printf "command cd failed: %s@." s
+            end
+         | _ -> printf "command cd expects exactly one argument@."
+       end
+    | "pwd" -> printf "/%a@." (Pp.print_list Pp.slash Pp.string) !curdir
     | "q" -> exit 0
     | "ls" ->
-       let t = get_theories !ses in
+       let t = Session_itp.get_theories !ses in
        List.iter
          (fun (s,l) ->
-          printf "File: %s@\n" s;
+          printf "File: %s@\n" (Filename.basename s);
           List.iter
             (fun (th,_) ->
              printf "  Theory: %s@\n" th)

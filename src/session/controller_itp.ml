@@ -55,7 +55,7 @@ let dummy_result =
     pr_model  = Model_parser.default_model;
 }
 
-let build_prover_call s id pr timelimit callback =
+let build_prover_call _s _id _pr _timelimit callback =
   let c = ref 0 in
   let call () =
     incr c;
@@ -134,7 +134,7 @@ let timeout_handler () =
      number of running provers, then we heuristically decide to add
      more tasks *)
   try
-    for i = Queue.length prover_tasks_in_progress
+    for _i = Queue.length prover_tasks_in_progress
         to 3 * !max_number_of_running_provers do
       let (s,id,pr,timelimit,callback) = Queue.pop scheduled_proof_attempts in
       try

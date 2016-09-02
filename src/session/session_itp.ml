@@ -798,7 +798,7 @@ module CombinedTheoryChecksum = struct
     | None -> assert false
     | Some c -> Buffer.add_string b (Termcode.string_of_checksum c)
 
-  let compute s th =
+  let _compute s th =
     let () = fold_all_sub_goals_of_theory s f () th in
     let c = Termcode.buffer_checksum b in
     Buffer.clear b; c
