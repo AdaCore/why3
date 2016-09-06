@@ -15,6 +15,7 @@
 %start <Model_parser.model_element list> output
 %token <string> SPACE
 %token <string> ATOM
+%token MODEL
 %token STORE
 %token CONST
 %token AS
@@ -29,6 +30,10 @@
 %%
 
 output:
+| possible_space LPAREN MODEL output1 RPAREN {$4}
+| output1 {$1}
+
+output1:
 | EOF { [] }
 | possible_space text { [] }
 | possible_space LPAREN text { [] }
