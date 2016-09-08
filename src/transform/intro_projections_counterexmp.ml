@@ -45,16 +45,13 @@ let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
 
 let intro_const_equal_to_term
     ~term
-    ~const_label
-    ~const_loc
-    ~const_name
+    ~id_new
     ~axiom_name
     =
   (* See documentation of the function in file intro_projections_counterexmp.mli. *)
 
   (* Create declaration of new constant *)
   (*let lab_new = Slab.add model_label labels in*)
-  let id_new = Ident.id_user ~label:const_label const_name const_loc in
   let ls_new_constant =  Term.create_lsymbol id_new [] term.t_ty in
   let decl_new_constant = Decl.create_param_decl ls_new_constant in
   let t_new_constant = Term.t_app ls_new_constant [] term.t_ty in
@@ -98,7 +95,8 @@ let intro_proj_for_ls env map_projs ls_projected =
 	  let const_loc = Opt.get ls_projected.ls_name.id_loc in
 	  let const_name = ls_projected.ls_name.id_string^"_proj_constant_"^proj_name in
 	  let axiom_name = ls_projected.ls_name.id_string^"_proj_axiom_"^proj_name in
-	  intro_const_equal_to_term ~term:t_rhs ~const_label ~const_loc ~const_name ~axiom_name in
+	  let id_new = Ident.id_user ~label:const_label const_name const_loc in
+	  intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name in
 
       let rec projections_for_term term proj_name applied_projs map_projs =
 	(* Return declarations for projections of the term.

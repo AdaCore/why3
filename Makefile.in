@@ -195,7 +195,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		instantiate_predicate smoke_detector \
 		induction_pr prop_curry
 
-LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
+LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
 LIB_SESSION = compress xml termcode session session_tools strategy \
@@ -1864,7 +1864,8 @@ clean::
 
 # the generic rule cannot be applied since ocaml would confuse
 # lib/why3/why3extract.cmi for the interface (!!!)
-src/tools/why3extract.cmx: src/tools/why3extract.ml
+# same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
+src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
