@@ -49,23 +49,29 @@ module type Scheduler = sig
 
 end
 
+type controller =
+  { controller_session : Session_itp.session;
+    (* controller_env : Env.env; *)
+    controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+  }
 
 module Make(S : Scheduler) : sig
 
 val schedule_proof_attempt :
-  session ->
+  controller ->
   proofNodeID ->
   Whyconf.prover ->
-  timelimit:int ->
+  limit:Call_provers.resource_limit ->
   callback:(proof_attempt_status -> unit) -> unit
-(** [schedule_proof_attempt s id p tl cb] schedules a proof attempt for
-   a goal specified by [id] with the prover [p] with time limit [tl];
-   the function [cb] will be called each time the proof attempt status
-   changes. Typically at Scheduled, then Running, then Done. If there
-   is already a proof attempt with [p] it is updated. *)
+(** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
+   proof attempt for a goal specified by [id] with the prover [p] with
+   time limit [timelimit]; the function [callback] will be called each
+   time the proof attempt status changes. Typically at Scheduled, then
+   Running, then Done. If there is already a proof attempt with [p] it
+   is updated. *)
 
 val schedule_transformations :
-  session ->
+  controller ->
   proofNodeID ->
   string ->
   trans_arg list ->

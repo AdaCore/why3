@@ -1,3 +1,7 @@
+
+
+
+open Format
 open Session_itp
 
 (** State of a proof *)
@@ -9,8 +13,6 @@ type proof_attempt_status =
     | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
-
-open Format
 
 let print_status fmt st =
   match st with
@@ -24,6 +26,13 @@ let print_status fmt st =
 
 type transformation_status =
   | TSscheduled of transID | TSdone of transID | TSfailed
+
+type controller =
+  { controller_session : Session_itp.session;
+    (* controller_env : Env.env; *)
+    controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+  }
+
 
 module type Scheduler = sig
   val timeout: ms:int -> (unit -> bool) -> unit
@@ -43,8 +52,9 @@ let max_number_of_running_provers = ref 1
 
 let number_of_running_provers = ref 0
 
-open Call_provers
+module Hprover = Whyconf.Hprover
 
+(*
 let dummy_result =
   {
     pr_answer = Call_provers.Unknown ("I'm dumb", None);
@@ -54,14 +64,27 @@ let dummy_result =
     pr_steps  = 42;
     pr_model  = Model_parser.default_model;
 }
+ *)
 
-let build_prover_call _s _id _pr _timelimit callback =
+let build_prover_call c id pr limit callback =
+  let (config_pr,driver) = Hprover.find c.controller_provers pr in
+  let command =
+    Whyconf.get_complete_command config_pr
+          ~with_steps:(limit.Call_provers.limit_steps <>
+                       Call_provers.empty_limit.Call_provers.limit_steps) in
+  let task = Session_itp.get_task c.controller_session id in
+  let call =
+    Driver.prove_task ?old:None ~cntexample:false ~inplace:false ~command
+                      ~limit driver task
+  in
+(*
   let c = ref 0 in
   let call () =
     incr c;
-    if !c = 1000 then Call_provers.ProverStarted else
-      if !c = 10000 then Call_provers.ProverFinished dummy_result
+    if !c = 10 then Call_provers.ProverStarted else
+      if !c = 20 then Call_provers.ProverFinished dummy_result
       else Call_provers.NoUpdates
+ *)
 (*
   match find_prover eS a with
   | None ->
@@ -109,7 +132,6 @@ let build_prover_call _s _id _pr _timelimit callback =
                             ~limit driver goal
         in
  *)
-  in
   let pa = (callback,false,call) in
   Queue.push pa prover_tasks_in_progress
 
@@ -118,7 +140,7 @@ let timeout_handler () =
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
     let (callback,started,call) as c = Queue.pop prover_tasks_in_progress in
-    match (*Call_provers.query_call*) call () with
+    match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
     | Call_provers.ProverStarted ->
        assert (not started);
@@ -130,18 +152,18 @@ let timeout_handler () =
        callback (Done res)
   done;
   Queue.transfer q prover_tasks_in_progress;
-  (* if the number of prover tasks in less that 3 times the maximum
+  (* if the number of prover tasks is less than 3 times the maximum
      number of running provers, then we heuristically decide to add
      more tasks *)
   try
     for _i = Queue.length prover_tasks_in_progress
         to 3 * !max_number_of_running_provers do
-      let (s,id,pr,timelimit,callback) = Queue.pop scheduled_proof_attempts in
+      let (c,id,pr,timelimit,callback) = Queue.pop scheduled_proof_attempts in
       try
-        build_prover_call s id pr timelimit callback
+        build_prover_call c id pr timelimit callback
       with e when not (Debug.test_flag Debug.stack_trace) ->
         Format.eprintf
-          "@[Exception raise in Controler_itp.build_prover_call:@ %a@.@]"
+          "@[Exception raise in Controller_itp.build_prover_call:@ %a@.@]"
           Exn_printer.exn_printer e;
         callback (InternalFailure e)
     done;
@@ -155,14 +177,14 @@ let run_timeout_handler () =
       S.timeout ~ms:125 timeout_handler;
     end
 
-let schedule_proof_attempt s id pr ~timelimit ~callback =
-  graft_proof_attempt s id pr ~timelimit;
-  Queue.add (s,id,pr,timelimit,callback) scheduled_proof_attempts;
+let schedule_proof_attempt c id pr ~limit ~callback =
+  graft_proof_attempt c.controller_session id pr ~timelimit:5;
+  Queue.add (c,id,pr,limit,callback) scheduled_proof_attempts;
   callback Scheduled;
   run_timeout_handler ()
 
-let schedule_transformations s id name args ~callback =
-  let tid = graft_transf s id name args in
+let schedule_transformations c id name args ~callback =
+  let tid = graft_transf c.controller_session id name args in
   callback (TSscheduled tid)
 
 let read_file env ?format fn =

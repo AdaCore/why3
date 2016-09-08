@@ -134,6 +134,10 @@ let get_proofNode (s : session) (id : proofNodeID) =
     Hint.find s.proofNode_table id
   with Not_found -> raise BadID
 
+let get_task (s:session) (id:proofNodeID) =
+  let node = get_proofNode s id in
+  node.proofn_task
+
 let get_transfNode (s : session) (id : transID) =
   try
     Hint.find s.trans_table id

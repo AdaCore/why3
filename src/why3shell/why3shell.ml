@@ -94,6 +94,9 @@ end
 (* parsing command line *)
 (************************)
 
+open Why3
+open Format
+
 let files = Queue.create ()
 
 let spec = Arg.align [
@@ -103,18 +106,57 @@ let usage_str = Format.sprintf
   "Usage: %s [options] <project directory>"
   (Filename.basename Sys.argv.(0))
 
-let config, base_config, env =
+
+let config, base_config, _env =
   Why3.Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+
+let main : Whyconf.main = Whyconf.get_main config
+(* all the provers detected, from the config file *)
+let provers : Whyconf.config_prover Whyconf.Mprover.t =
+  Whyconf.get_provers config
+
+(* builds the environment from the [loadpath] *)
+let env : Env.env = Env.create_env (Whyconf.loadpath main)
+
+(* loading the drivers *)
+let provers =
+  Whyconf.Mprover.fold
+    (fun _ p acc ->
+      try
+        let d = Driver.load_driver env p.Whyconf.driver [] in
+        (p,d)::acc
+      with e ->
+        let p = p.Whyconf.prover in
+        eprintf "Failed to load driver for %s %s: %a@."
+          p.Whyconf.prover_name p.Whyconf.prover_version
+          Exn_printer.exn_printer e;
+        acc)
+    provers
+    []
+
+(* One prover named Alt-Ergo in the config file *)
+let alt_ergo =
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  (** all provers that have the name "Alt-Ergo" *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
+    eprintf "Prover Alt-Ergo not installed or not configured@.";
+    exit 0
+  end else
+    snd (Whyconf.Mprover.choose provers)
+
 
 let ses =
   if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
   let fname = Queue.pop files in
   ref (Why3.Session_itp.load_session fname)
 
-module C = Why3.Controller_itp.Make(Unix_scheduler)
+let cont = Controller_itp.{
+    controller_session = !ses;
+    controller_provers = Whyconf.Hprover.create 7;
+  }
 
-open Why3
-open Format
+module C = Why3.Controller_itp.Make(Unix_scheduler)
 
 exception Error of string
 
@@ -137,7 +179,27 @@ let interp s =
        printf "ls : list current directory@\n";
        printf "p : print the session in raw form@\n";
        printf "q : exit the shell@\n";
+       printf "t : test schedule_proof_attempt on the first goal@\n";
        printf "@."
+    | "t" ->
+       let id =
+         match Session_itp.get_theories !ses with
+         | (_n, (_thn, x::_)::_)::_ -> x
+         | _ -> assert false
+       in
+       let callback status =
+         printf "status: %a@."
+                Controller_itp.print_status status
+       in
+       let limit = Call_provers.{
+           limit_time = 5 ;
+           limit_mem  = 1000;
+           limit_steps = -1;
+         }
+       in
+       C.schedule_proof_attempt
+         cont id alt_ergo.Whyconf.prover
+         ~limit ~callback
     | "a" ->
        Unix_scheduler.timeout
          ~ms:1000

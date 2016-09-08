@@ -45,6 +45,8 @@ val get_tree : session -> proofNodeID -> tree
 (** [get_tree s id] returns the proof tree of the goal identified by
     [id] *)
 
+val get_task : session -> proofNodeID -> Task.task
+
 (* temp *)
 val get_node : session -> int -> proofNodeID
 val get_trans : session -> int -> transID
@@ -70,7 +72,7 @@ val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
   timelimit:int -> unit
 (** [graft_proof_attempt s id pr t] adds a proof attempt with prover
     [pr] and timelimit [t] in the session [s] as a child of the task
-    [id]. If there allready a proof attempt with the same prover,
+    [id]. If there already a proof attempt with the same prover,
     it updates it with the new timelimit. *)
 
 val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->

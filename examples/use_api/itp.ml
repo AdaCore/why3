@@ -88,6 +88,7 @@ let id =
 let () =
   printf "%a@." (Session_itp.print_tree s) (Session_itp.get_tree s id)
 
+
 let pid = Session_itp.graft_proof_attempt s id alt_ergo.Whyconf.prover ~timelimit:42
 
 let () =
@@ -106,6 +107,10 @@ let () =
 (** testing Controller_itp *)
 
 let my_session = Session_itp.empty_session ()
+
+module M = Controller_itp
+
+let _ = M.add_file_to_session
 
 (* adds a file in the new session *)
 let () =
