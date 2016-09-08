@@ -45,12 +45,19 @@ module Unix_scheduler = struct
      (* buffer for storing character read on stdin *)
      let buf = Bytes.create 256
 
+     let show_prompt = ref true
+     let prompt = ref "> "
+
      (* [main_loop interp] starts the scheduler. On idle, standard input is
         read.  When a complete line is read from stdin, it is passed
         as a string to the function [interp] *)
      let main_loop interp =
        try
          while true do
+           if !show_prompt then begin
+               Format.printf "%s@?" !prompt;
+               show_prompt := false;
+             end;
            (* attempt to run the first timeout handler *)
            let time = Unix.gettimeofday () in
            match !timeout_handler with
@@ -79,8 +86,10 @@ module Unix_scheduler = struct
                  in
                  let a,_,_ = Unix.select [Unix.stdin] [] [] delay in
                  match a with
-                 | [_] -> let n = Unix.read Unix.stdin buf 0 256 in
-                          interp (Bytes.sub_string buf 0 (n-1))
+                 | [_] ->
+                    let n = Unix.read Unix.stdin buf 0 256 in
+                    interp (Bytes.sub_string buf 0 (n-1));
+                    show_prompt := true
                  | [] -> () (* nothing read *)
                  | _ -> assert false
          done
@@ -165,7 +174,7 @@ let resolve _ses _path = assert false (* TODO *)
 let curdir = ref []
 
 
-let interp s =
+let interp chout fmt s =
   let cmd,args =
     match Strings.split ' ' s with
     | [] -> assert false
@@ -188,7 +197,7 @@ let interp s =
          | _ -> assert false
        in
        let callback status =
-         printf "status: %a@."
+         fprintf fmt "status: %a@."
                 Controller_itp.print_status status
        in
        let limit = Call_provers.{
@@ -206,15 +215,15 @@ let interp s =
          (let c = ref 10 in
           fun () -> decr c;
                     if !c > 0 then
-                      (printf "%d@." !c; true)
+                      (fprintf fmt "%d@." !c; true)
                     else
-                      (printf "boom!@."; false))
+                      (fprintf fmt "boom!@."; false))
     | "i" ->
        Unix_scheduler.idle
          ~prio:0
-         (fun () -> printf "idle@."; false)
+         (fun () -> fprintf fmt "idle@."; false)
     | "p" ->
-       printf "%a@." Session_itp.print_session !ses
+       fprintf fmt "%a@." Session_itp.print_session !ses
     | "cd" ->
        begin
          match args with
@@ -234,21 +243,26 @@ let interp s =
          | _ -> printf "command cd expects exactly one argument@."
        end
     | "pwd" -> printf "/%a@." (Pp.print_list Pp.slash Pp.string) !curdir
-    | "q" -> exit 0
+    | "q" ->
+       fprintf fmt "Shell exited@.";
+       close_out chout;
+       exit 0
     | "ls" ->
        let t = Session_itp.get_theories !ses in
        List.iter
          (fun (s,l) ->
-          printf "File: %s@\n" (Filename.basename s);
+          fprintf fmt "File: %s@\n" (Filename.basename s);
           List.iter
             (fun (th,_) ->
-             printf "  Theory: %s@\n" th)
+             fprintf fmt "  Theory: %s@\n" th)
             l)
          t;
-       printf "@?"
+       fprintf fmt "@?"
     | _ -> printf "unknown command `%s`@." s
 
 
 let () =
   printf "Welcome to Why3 shell. Type '?' for help.@.";
-  Unix_scheduler.main_loop interp
+  let chout = open_out "why3shell.out" in
+  let fmt = formatter_of_out_channel chout in
+  Unix_scheduler.main_loop (interp chout fmt)
