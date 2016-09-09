@@ -199,7 +199,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		gnat_split_conj gnat_split_disj \
 		eliminate_unused_hypo
 
-LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
+LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
 LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
@@ -1103,7 +1103,7 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 	$(SHOW) 'Coqdep   $<'
 	$(HIDE)$(COQDEP) -R lib/coq Why3 $< $(TOTARGET)
 
-all: $(COQVO) drivers/coq-realizations.aux
+all: $(COQVO)
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
@@ -1125,6 +1125,8 @@ drivers/coq-realizations.aux: Makefile
 	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
 endif
+
+all: drivers/coq-realizations.aux
 
 install_no_local::
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
@@ -1936,7 +1938,8 @@ clean::
 
 # the generic rule cannot be applied since ocaml would confuse
 # lib/why3/why3extract.cmi for the interface (!!!)
-src/tools/why3extract.cmx: src/tools/why3extract.ml
+# same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
+src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 

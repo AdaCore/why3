@@ -426,15 +426,15 @@ theory GenFloatSpecFull
     /\
     (is_infinite x /\ is_finite y -> is_infinite r /\ same_sign r x)
     /\
-    (is_infinite x /\ is_infinite y /\ same_sign x y
-      -> is_infinite r /\ same_sign r x)
-    /\
-    (is_infinite x /\ is_infinite y /\ diff_sign x y -> is_NaN r)
+    (is_infinite x /\ is_infinite y ->
+     if same_sign x y then is_infinite r /\ same_sign r x
+     else is_NaN r)
     /\
     (is_finite x /\ is_finite y /\ no_overflow m (value x + value y)
       -> is_finite r /\
         value r = round m (value x + value y) /\
-        sign_zero_result m r)
+        (if same_sign x y then same_sign r x
+         else sign_zero_result m r))
     /\
     (is_finite x /\ is_finite y /\ not no_overflow m (value x + value y)
       -> SpecialValues.same_sign_real (sign r) (value x + value y)
@@ -449,15 +449,15 @@ theory GenFloatSpecFull
     /\
     (is_infinite x /\ is_finite y -> is_infinite r /\ same_sign r x)
     /\
-    (is_infinite x /\ is_infinite y /\ same_sign x y -> is_NaN r)
-    /\
-    (is_infinite x /\ is_infinite y /\ diff_sign x y
-      -> is_infinite r /\ same_sign r x)
+    (is_infinite x /\ is_infinite y ->
+     if diff_sign x y then is_infinite r /\ same_sign r x
+     else is_NaN r)
     /\
     (is_finite x /\ is_finite y /\ no_overflow m (value x - value y)
       -> is_finite r /\
         value r = round m (value x - value y) /\
-        sign_zero_result m r)
+        (if diff_sign x y then same_sign r x
+         else sign_zero_result m r))
     /\
     (is_finite x /\ is_finite y /\ not no_overflow m (value x - value y)
       -> SpecialValues.same_sign_real (sign r) (value x - value y)
@@ -509,8 +509,8 @@ theory GenFloatSpecFull
         -> is_infinite r)
     /\(is_gen_zero x /\ is_gen_zero y -> is_NaN r)
     /\ product_sign r x y
-    /\ exact r = exact x /exact y 
-    /\ model r = model x /model y
+    /\ exact r = exact x / exact y
+    /\ model r = model x / model y
 
   predicate of_real_exact_post (x:real) (r:t) =
     is_finite r /\ value r = x /\ exact r = x /\ model r = x

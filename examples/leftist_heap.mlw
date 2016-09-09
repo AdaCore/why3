@@ -1,0 +1,242 @@
+
+(** Leftist heaps (Clark Allan Crane, 1972 && Donald E. Knuth, 1973).
+
+    Purely applicative implementation, following Okasaki's implementation
+    in his book "Purely Functional Data Structures" (Section 3.1).
+
+    Author: Mário Pereira (Université Paris Sud)
+*)
+
+module Heap
+
+  use import int.Int
+
+  type elt
+  predicate le elt elt
+
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  type heap
+
+  function size heap : int
+
+  function occ elt heap : int
+
+  predicate mem (x: elt) (h: heap) = occ x h > 0
+
+  function minimum heap : elt
+
+  predicate is_minimum (x: elt) (h: heap) =
+    mem x h && forall e. mem e h -> le x e
+
+  axiom min_def:
+    forall h. 0 < size h -> is_minimum (minimum h) h
+
+  val empty () : heap
+    ensures { size result = 0 }
+    ensures { forall x. occ x result = 0 }
+
+  val is_empty (h: heap) : bool
+    ensures { result <-> size h = 0 }
+
+  val size (h: heap) : int
+    ensures { result = size h }
+
+  val merge (h1 h2: heap) : heap
+    ensures { forall x. occ x result = occ x h1 + occ x h2 }
+    ensures { size result = size h1 + size h2 }
+
+  val insert (x: elt) (h: heap) : heap
+    ensures { occ x result = occ x h + 1 }
+    ensures { forall y. y <> x -> occ y h = occ y result }
+    ensures { size result = size h + 1 }
+
+  val find_min (h: heap) : elt
+    requires { size h > 0 }
+    ensures  { result = minimum h }
+
+  val delete_min (h: heap) : heap
+    requires { size h > 0 }
+    ensures  { let x = minimum h in occ x result = occ x h - 1 }
+    ensures  { forall y. y <> minimum h -> occ y result = occ y h }
+    ensures  { size result = size h - 1 }
+
+end
+
+module TreeRank
+
+  type tree 'a = E | N int (tree 'a) 'a (tree 'a)
+
+end
+
+module Size
+
+  use import TreeRank
+  use import int.Int
+
+  function size (t: tree 'a) : int = match t with
+    | E -> 0
+    | N _ l _ r -> 1 + size l + size r
+    end
+
+  lemma size_nonneg: forall t: tree 'a. 0 <= size t
+  lemma size_empty: forall t: tree 'a. 0 = size t <-> t = E
+
+end
+
+module Occ
+
+  use import TreeRank
+  use import int.Int
+
+  function occ (x: 'a) (t: tree 'a) : int = match t with
+    | E -> 0
+    | N _ l e r -> (if x = e then 1 else 0) + occ x l + occ x r
+    end
+
+  lemma occ_nonneg:
+    forall x:'a, t. 0 <= occ x t
+
+  predicate mem (x: 'a) (t: tree 'a) =
+    0 < occ x t
+
+end
+
+module LeftistHeap
+
+  type elt
+  predicate le elt elt
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  use import TreeRank
+  use export Size
+  use export Occ
+  use import int.Int
+  use import int.MinMax
+
+  type t = tree elt
+
+  (* [e] is no greater than the root of [h], if any *)
+  predicate le_root (e: elt) (h: t) = match h with
+    | E -> true
+    | N _ _ x _ -> le e x
+    end
+
+  lemma le_root_trans:
+    forall x y h. le x y -> le_root y h -> le_root x h
+
+  (* [h] is a heap *)
+  predicate is_heap (h: t) = match h with
+    | E -> true
+    | N _ l x r -> le_root x l && is_heap l && le_root x r && is_heap r
+    end
+
+  function minimum t : elt
+  axiom minimum_def: forall l x r s. minimum (N s l x r) = x
+
+  predicate is_minimum (x: elt) (h: t) =
+    mem x h && forall e. mem e h -> le x e
+
+  let rec lemma root_is_miminum (h: t) : unit
+    requires { is_heap h && 0 < size h }
+    ensures  { is_minimum (minimum h) h }
+    variant  { h }
+  = match h with
+    | E -> absurd
+    | N _ l _ r ->
+       if l <> E then root_is_miminum l;
+       if r <> E then root_is_miminum r
+    end
+
+  function rank (h: t) : int = match h with
+    | E -> 0
+    | N _ l _ r -> 1 + min (rank l) (rank r)
+    end
+
+  predicate leftist (h: t) = match h with
+    | E -> true
+    | N s l _ r ->
+       s = rank h &&
+       leftist l && leftist r &&
+       rank l >= rank r
+    end
+
+   predicate leftist_heap (h: t) =
+    is_heap h && leftist h
+
+  let empty () : t
+    ensures { size result = 0 }
+    ensures { forall x. occ x result = 0 }
+    ensures { leftist_heap result }
+  = E
+
+  let is_empty (h: t) : bool
+    ensures { result <-> size h = 0 }
+  = h = E
+
+  let size (h: t) : int
+    ensures { result = size h }
+  = size h
+
+  let rank (h: t) : int
+    requires { leftist_heap h }
+    ensures  { result = rank h }
+  = match h with
+    | E -> 0
+    | N r _ _ _ -> r
+    end
+
+  let make_n (x: elt) (l r: t) : t
+    requires { leftist_heap r && leftist_heap l }
+    requires { le_root x l && le_root x r }
+    ensures  { leftist_heap result }
+    ensures  { minimum result = x }
+    ensures  { size result = 1 + size l + size r }
+    ensures  { occ x result = 1 + occ x l + occ x r }
+    ensures  { forall y. x <> y -> occ y result = occ y l + occ y r }
+  = if rank l >= rank r then N (rank r + 1) l x r
+    else N (rank l + 1) r x l
+
+  let rec merge (h1 h2: t) : t
+    requires { leftist_heap h1 && leftist_heap h2 }
+    ensures  { size result = size h1 + size h2 }
+    ensures  { forall x. occ x result = occ x h1 + occ x h2 }
+    ensures  { leftist_heap result }
+    variant  { size h1 + size h2 }
+  = match h1, h2 with
+    | h, E | E, h -> h
+    | N _ l1 x1 r1, N _ l2 x2 r2 ->
+       if le x1 x2 then make_n x1 l1 (merge r1 h2)
+       else make_n x2 l2 (merge h1 r2)
+    end
+
+  let insert (x: elt) (h: t) : t
+    requires { leftist_heap h }
+    ensures  { leftist_heap result }
+    ensures  { occ x result = occ x h + 1 }
+    ensures  { forall y. x <> y -> occ y result = occ y h }
+    ensures  { size result = size h + 1 }
+  = merge (N 1 E x E) h
+
+  let find_min (h: t) : elt
+    requires { leftist_heap h }
+    requires { 0 < size h }
+    ensures  { result = minimum h }
+  = match h with
+    | E -> absurd
+    | N _ _ x _ -> x
+    end
+
+  let delete_min (h: t) : t
+    requires { 0 < size h }
+    requires { leftist_heap h }
+    ensures  { occ (minimum h) result = occ (minimum h) h - 1 }
+    ensures  { forall x. x <> minimum h -> occ x result = occ x h }
+    ensures  { size result = size h - 1 }
+    ensures  { leftist_heap result }
+  = match h with
+    | E -> absurd
+    | N _ l _ r -> merge l r
+    end
+
+end

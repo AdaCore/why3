@@ -57,6 +57,8 @@ module WpCore "W:non_conservative_extension:N" (* Definitions in WpImpl *)
   use import ho_rel.Rel
   use import compute_elts.Base
   use import compute_elts.Quant
+  use import game.Game
+  use import game_fmla.Fmla
 
   (* Context: represent a sequential set of hypothesis,
      that can be referenced by index.
@@ -143,6 +145,24 @@ module WpCore "W:non_conservative_extension:N" (* Definitions in WpImpl *)
       proof_obligations gi igs gf e eh }
     ensures { enforce_inv result }
     ensures { result --> abstraction_enforce gi gf eh }
+
+  (* Invariant exposure combinator: expose a theorem about games
+     when the transformer has a certain shape. *)
+  function expose_inv (gi:game_info 'a)
+                      (gf:'ig -> context 'a)
+                      (eh:enf_hyp 'a 'ig 'il 'o) :
+                      set (('ig,'il),('a,game 'a))
+  val ghost expose (gi:game_info 'a)
+                   (igs:qstructure 'ig)
+                   (gf:'ig -> context 'a)
+                   (eh:enf_hyp 'a 'ig 'il 'o) : unit
+    requires { "expl:to be computed precondition"
+      quant_structure true gi.game_strct gi.game_valid }
+    requires { enforce_inv (abstraction_enforce gi gf eh) }
+    ensures {
+      let qs = q_pair (q_pair igs eh.pre_strct)
+                      (q_pair gi.game_strct q_def) in
+      quant_structure true qs (expose_inv gi gf eh) }
 
   (* Kontinuation combinator: take an enforcement record that
      may use a continuation for the place right there as last
@@ -453,6 +473,37 @@ module WpCore "W:non_conservative_extension:N" (* Definitions in WpImpl *)
         (ctx_fz_deref (ctx_nth ctx n)).fz_transformp q xl xs
     meta rewrite prop ctx_ref_enforce_transformp_rule
     meta remove_prop prop ctx_ref_enforce_transformp_rule
+
+    (* Rules for invariant exposure *)
+    predicate expose_hyp (hyp 'a) (game 'a)
+    predicate expose_context (context 'a) (game 'a)
+    axiom expose_inv_rule :
+      forall gi gf,eh:enf_hyp 'a 'ig 'il 'o,xg xl xs gm.
+        expose_inv gi gf eh ((xg,xl),(xs,gm)) <->
+          eh.pre xg xl xs /\ gm.progress = gi.game_order /\ game_wf gm /\
+          expose_context (gf xg) gm ->
+          enforce ((=) xs) (e_lift (eh.post xg xl xs)) gm
+    meta rewrite prop expose_inv_rule
+    meta remove_prop prop expose_inv_rule
+
+    axiom expose_context_empty :
+      forall gm:game 'a. expose_context ctx_empty gm <-> true
+    meta rewrite prop expose_context_empty
+    meta remove_prop prop expose_context_empty
+
+    axiom expose_context_add :
+      forall h q,gm:game 'a. expose_context (ctx_cons h q) gm <->
+        expose_hyp h gm /\ expose_context q gm
+    meta rewrite prop expose_context_add
+    meta remove_prop prop expose_context_add
+
+    axiom expose_hyp_rule :
+      forall qs xg,eh:enf_hyp 'a 'ig 'il 'o,gm.
+        expose_hyp (fz_enforce_hyp (enf_hyp_fz qs xg eh)) gm <->
+        game_wf gm /\ forall xl xs. eh.pre xg xl xs ->
+          enforce ((=) xs) (e_lift (eh.post xg xl xs)) gm
+    meta rewrite prop expose_hyp_rule
+    meta remove_prop prop expose_hyp_rule
 
   end
 
@@ -1140,7 +1191,8 @@ module WpImpl
      and the validity predicate is trivial,
      then one may expose the invariant. *)
   predicate expose_hyp (h:hyp 'a) (gm:game 'a) =
-    forall p q. h (p,q) -> enforce p q gm
+    game_wf gm (* technicality for computation rules to go through. *)
+    /\ forall p q. h (p,q) -> enforce p q gm
   predicate expose_context (ctx:context 'a) (gm:game 'a) = match ctx with
     | Nil -> true
     | Cons h q -> expose_hyp h gm /\ expose_context q gm
@@ -1597,6 +1649,52 @@ module WpImpl
     ensures { result = abstraction_enforce gi gf eh }
   = { transformp = abstraction_t gi gf eh e.transformp }
 
+  function expose_inv (gi:game_info 'a)
+                      (gf:'ig -> context 'a)
+                      (eh:enf_hyp 'a 'ig 'il 'o) :
+                      set (('ig,'il),('a,game 'a)) =
+    \x. let ((xg,xl),(xs,gm)) = x in
+        eh.pre xg xl xs /\ gm.progress = gi.game_order /\ game_wf gm /\
+          expose_context (gf xg) gm ->
+          enforce ((=) xs) (e_lift (eh.post xg xl xs)) gm
+
+  let ghost expose_ex (gi:game_info 'a)
+                      (igs:qstructure 'ig)
+                      (gf:'ig -> context 'a)
+                      (eh:enf_hyp 'a 'ig 'il 'o) : unit
+    requires { quant_structure true gi.game_strct gi.game_valid }
+    requires { enforce_inv (abstraction_enforce gi gf eh) }
+    ensures { forall qs. quant_structure true qs (expose_inv gi gf eh) }
+  = expose gi gf eh;
+    assert { forall x. expose_inv gi gf eh x by
+      let ((_,_),(_,_)) = x in expose_inv gi gf eh x }
+
+  lemma expose_hyp_rule_1 : forall qs xg,eh:enf_hyp 'a 'ig 'il 'o,gm.
+    let h = fz_enforce_hyp (enf_hyp_fz qs xg eh) in
+    expose_hyp (fz_enforce_hyp (enf_hyp_fz qs xg eh)) gm ->
+    game_wf gm && forall xl xs. eh.pre xg xl xs ->
+      let q = eh.post xg xl xs in
+      let q' = e_lift q in
+      enforce ((=) xs) q' gm
+      by let t = enf_transf xg eh in
+        let p = t q xl in let c = (=) gm in
+        h (p,q')
+      so enforce p q' gm so holds c (enforce p q')
+      so subset ((=) xs) p
+      so holds c (enforce ((=) xs) q') /\ c gm
+  lemma expose_hyp_rule_2 : forall qs xg,eh:enf_hyp 'a 'ig 'il 'o,gm.
+    game_wf gm /\ (forall xl xs. eh.pre xg xl xs ->
+      enforce ((=) xs) (e_lift (eh.post xg xl xs)) gm) ->
+     let h = fz_enforce_hyp (enf_hyp_fz qs xg eh) in
+     expose_hyp h gm
+     by let t = enf_transf xg eh in
+       forall p q. h (p,q) -> enforce p q gm
+     by exists xl q'. q = e_lift q' /\ p = t q' xl
+     so let c = (=) gm in holds c (enforce p q) /\ c gm
+     by forall xs. p xs -> holds c (enforce ((=) xs) q)
+     by let q0 = eh.post xg xl xs in let q1 = e_lift q0 in
+       holds c (enforce ((=) xs) q1) /\ subset q1 q
+
   function kontinuation_enforce (e:enforce 'a 'i 'o) : enforce 'a 'i 'o =
     { transformp = kontinuation_transformer e.transformp }
 
@@ -1628,6 +1726,8 @@ module WpImpl
     function abstraction_enforce = abstraction_enforce,
     predicate proof_obligations = proof_obligations,
     val abstraction = abstraction,
+    function expose_inv = expose_inv,
+    val expose = expose_ex,
     function kontinuation_enforce = kontinuation_enforce,
     val ktrap = ktrap,
     function ctx_ref_enforce = ctx_ref_enforce,
@@ -1703,7 +1803,14 @@ module WpImpl
     goal LOCAL.kont_pre_rule,
     goal LOCAL.kontinuation_enforce_transformp_rule,
 
-    goal LOCAL.ctx_ref_enforce_transformp_rule
+    goal LOCAL.ctx_ref_enforce_transformp_rule,
+
+    predicate LOCAL.expose_context = expose_context,
+    predicate LOCAL.expose_hyp = expose_hyp,
+    goal LOCAL.expose_inv_rule,
+    goal LOCAL.expose_context_empty,
+    goal LOCAL.expose_context_add,
+    goal LOCAL.expose_hyp_rule
 
 end
 
