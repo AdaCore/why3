@@ -33,7 +33,7 @@ type final_answer = {
   time      : float;
   timeout   : bool;
   out_file  : string;
-  exit_code : int;
+  exit_code : int64;
 }
 
 type answer =

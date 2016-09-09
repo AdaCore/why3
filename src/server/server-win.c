@@ -18,6 +18,7 @@
 
 #ifdef _WIN32
 
+#include <ntstatus.h>
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -568,6 +569,7 @@ void schedule_new_jobs() {
 
 void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) {
    DWORD exitcode;
+   bool timeout;
    FILETIME ft_start, ft_stop, ft_system, ft_user;
    ULARGE_INTEGER ull_system, ull_user;
    double cpu_time;
@@ -599,11 +601,12 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
          ull_user.HighPart = ft_user.dwHighDateTime;
          cpu_time =
            ((ull_system.QuadPart + ull_user.QuadPart + 0.0) / 10000000.);
+         timeout = (exitcode == 1816) || (exitcode == STATUS_QUOTA_EXCEEDED);
          send_msg_to_client(client,
                             child->id,
                             exitcode,
                             cpu_time,
-                            (exitcode == 1816),
+                            timeout,
                             child->outfile);
          free_process(child);
          break;

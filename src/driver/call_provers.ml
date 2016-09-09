@@ -191,19 +191,16 @@ let debug_print_model model =
   let model_str = Model_parser.model_to_string model in
   Debug.dprintf debug "Call_provers: %s@." model_str
 
-let parse_prover_run res_parser time out ret limit ~printer_mapping =
-  let ans = match ret with
-    | Unix.WSTOPPED n ->
-        Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
-        grep out res_parser.prp_regexps
-    | Unix.WSIGNALED n ->
-        Debug.dprintf debug "Call_provers: killed by signal %d@." n;
-        grep out res_parser.prp_regexps
-    | Unix.WEXITED n ->
-        Debug.dprintf debug "Call_provers: exited with status %d@." n;
-        (try List.assoc n res_parser.prp_exitcodes
-         with Not_found -> grep out res_parser.prp_regexps)
-  in
+let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
+  Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
+  (* the following conversion is incorrect (but does not fail) on 32bit, but if
+     the incoming exitcode was really outside the bounds of [int], its exact
+     value is meaningless for Why3 anyway (e.g. some windows status codes). If
+     it becomes meaningful, we might want to change the conversion here *)
+  let int_exitcode = Int64.to_int exitcode in
+  let ans =
+    try List.assoc int_exitcode res_parser.prp_exitcodes
+    with Not_found -> grep out res_parser.prp_regexps in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -219,7 +216,7 @@ let parse_prover_run res_parser time out ret limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;
   { pr_answer = ans;
-    pr_status = ret;
+    pr_status = Unix.WEXITED int_exitcode;
     pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
@@ -305,7 +302,7 @@ let handle_answer answer =
 	if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let out = read_and_delete_file answer.Prove_client.out_file in
-      let ret = Unix.WEXITED answer.Prove_client.exit_code in
+      let ret = answer.Prove_client.exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
 	  answer.Prove_client.time out ret save.limit ~printer_mapping in
