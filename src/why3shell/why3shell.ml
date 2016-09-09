@@ -236,9 +236,6 @@ let commands =
     "a", "run a simple test of Unix_scheduler.timeout", test_timeout;
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt on the first goal", test_schedule_proof_attempt;
-(*
-  printf "ls : list current directory@\n";
- *)
   ]
 
 let commands_table = Stdlib.Hstr.create 17
@@ -276,38 +273,6 @@ let interp chout fmt s =
        with Not_found ->
          printf "unknown command `%s`@." s
 
-(*
-    | "cd" ->
-       begin
-         match args with
-         | [d] ->
-            begin
-              try
-                let path = Strings.split '/' d in
-                let path =
-                  if String.get d 0 = '/' then path
-                  else !curdir @ path
-                in
-                let dir = resolve !ses path in
-                curdir := dir
-              with Error s ->
-                printf "command cd failed: %s@." s
-            end
-         | _ -> printf "command cd expects exactly one argument@."
-       end
-    | "pwd" -> printf "/%a@." (Pp.print_list Pp.slash Pp.string) !curdir
-    | "ls" ->
-       let t = Session_itp.get_theories !ses in
-       List.iter
-         (fun (s,l) ->
-          fprintf fmt "File: %s@\n" (Filename.basename s);
-          List.iter
-            (fun (th,_) ->
-             fprintf fmt "  Theory: %s@\n" th)
-            l)
-         t;
-       fprintf fmt "@?"
- *)
 
 let () =
   printf "Welcome to Why3 shell. Type '?' for help.@.";
