@@ -611,7 +611,11 @@ clean::
 
 .PHONY: gallery
 
-gallery::
+gallery:: gallery-simple gallery-subs
+
+.PHONY: gallery-simple
+
+gallery-simple::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
@@ -628,7 +632,7 @@ gallery::
 
 .PHONY: gallery-subs
 
-GALLERYSUBS=avl
+GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp
 
 gallery-subs::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
