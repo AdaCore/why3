@@ -127,21 +127,29 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
+let ses =
+  if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
+  let fname = Queue.pop files in
+  ref (Why3.Session_itp.load_session fname)
+
+let cont = Controller_itp.{
+    controller_session = !ses;
+    controller_provers = Whyconf.Hprover.create 7;
+}
+
 (* loading the drivers *)
-let provers =
-  Whyconf.Mprover.fold
-    (fun _ p acc ->
+let () =
+  Whyconf.Mprover.iter
+    (fun _ p ->
       try
         let d = Driver.load_driver env p.Whyconf.driver [] in
-        (p,d)::acc
+        Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
       with e ->
         let p = p.Whyconf.prover in
         eprintf "Failed to load driver for %s %s: %a@."
           p.Whyconf.prover_name p.Whyconf.prover_version
-          Exn_printer.exn_printer e;
-        acc)
+          Exn_printer.exn_printer e)
     provers
-    []
 
 (* One prover named Alt-Ergo in the config file *)
 let alt_ergo =
@@ -155,23 +163,98 @@ let alt_ergo =
     snd (Whyconf.Mprover.choose provers)
 
 
-let ses =
-  if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
-  let fname = Queue.pop files in
-  ref (Why3.Session_itp.load_session fname)
-
-let cont = Controller_itp.{
-    controller_session = !ses;
-    controller_provers = Whyconf.Hprover.create 7;
-  }
-
 module C = Why3.Controller_itp.Make(Unix_scheduler)
 
-exception Error of string
+let test_idle fmt _args =
+  Unix_scheduler.idle
+    ~prio:0
+    (fun () -> fprintf fmt "idle@."; false)
 
-let resolve _ses _path = assert false (* TODO *)
+let test_timeout fmt _args =
+  Unix_scheduler.timeout
+    ~ms:1000
+    (let c = ref 10 in
+     fun () -> decr c;
+               if !c > 0 then
+                 (fprintf fmt "%d@." !c; true)
+               else
+                 (fprintf fmt "boom!@."; false))
 
-let curdir = ref []
+let list_provers _fmt _args =
+  let l =
+    Whyconf.Hprover.fold
+      (fun p _ acc -> (Pp.sprintf "%a" Whyconf.print_prover p)::acc)
+      cont.Controller_itp.controller_provers
+      []
+  in
+  let l = List.sort String.compare l in
+  printf "@[<hov 2>== Known provers ==@\n%a@]@."
+          (Pp.print_list Pp.newline Pp.string) l
+
+let sort_pair (x,_) (y,_) = String.compare x y
+
+let list_transforms _fmt _args =
+  let l =
+    List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ())
+  in
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r in
+  printf "@[<hov 2>== Known transformations ==@\n%a@]@\n@."
+         (Pp.print_list Pp.newline2 print_trans_desc)
+         (List.sort sort_pair l)
+
+let dump_session_raw fmt _args =
+  fprintf fmt "%a@." Session_itp.print_session !ses
+
+let test_schedule_proof_attempt fmt _args =
+  (* temporary : get the first goal *)
+  let id =
+    match Session_itp.get_theories !ses with
+    | (_n, (_thn, x::_)::_)::_ -> x
+    | _ -> assert false
+  in
+  let callback status =
+    fprintf fmt "status: %a@."
+            Controller_itp.print_status status
+  in
+  let limit = Call_provers.{
+                limit_time = 5 ;
+                limit_mem  = 1000;
+                limit_steps = -1;
+              }
+  in
+  C.schedule_proof_attempt
+    cont id alt_ergo.Whyconf.prover
+    ~limit ~callback
+
+let commands =
+  [
+    "list-provers", "list available provers", list_provers;
+    "list-transforms", "list available transformations", list_transforms;
+    (* temporary *)
+    "i", "run a simple test of Unix_scheduler.idle", test_idle;
+    "a", "run a simple test of Unix_scheduler.timeout", test_timeout;
+    "p", "print the session in raw form", dump_session_raw;
+    "t", "test schedule_proof_attempt on the first goal", test_schedule_proof_attempt;
+(*
+  printf "ls : list current directory@\n";
+ *)
+  ]
+
+let commands_table = Stdlib.Hstr.create 17
+let () =
+  List.iter
+    (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
+    commands
+
+let help () =
+  printf "== Available commands ==@\n";
+  let l = ("q", "exit the shell") ::
+            List.rev_map (fun (c,h,_) -> (c,h)) commands
+  in
+  let l = List.sort sort_pair l in
+  List.iter (fun (c,help) -> printf "%20s : %s@\n" c help) l;
+  printf "@."
 
 
 let interp chout fmt s =
@@ -181,49 +264,19 @@ let interp chout fmt s =
     | a::b -> a,b
   in
   match cmd with
-    | "?" ->
-       printf "Commands@\n";
-       printf "a : run a simple test of Unix_scheduler.timeout@\n";
-       printf "i : run a simple test of Unix_scheduler.idle@\n";
-       printf "ls : list current directory@\n";
-       printf "p : print the session in raw form@\n";
-       printf "q : exit the shell@\n";
-       printf "t : test schedule_proof_attempt on the first goal@\n";
-       printf "@."
-    | "t" ->
-       let id =
-         match Session_itp.get_theories !ses with
-         | (_n, (_thn, x::_)::_)::_ -> x
-         | _ -> assert false
-       in
-       let callback status =
-         fprintf fmt "status: %a@."
-                Controller_itp.print_status status
-       in
-       let limit = Call_provers.{
-           limit_time = 5 ;
-           limit_mem  = 1000;
-           limit_steps = -1;
-         }
-       in
-       C.schedule_proof_attempt
-         cont id alt_ergo.Whyconf.prover
-         ~limit ~callback
-    | "a" ->
-       Unix_scheduler.timeout
-         ~ms:1000
-         (let c = ref 10 in
-          fun () -> decr c;
-                    if !c > 0 then
-                      (fprintf fmt "%d@." !c; true)
-                    else
-                      (fprintf fmt "boom!@."; false))
-    | "i" ->
-       Unix_scheduler.idle
-         ~prio:0
-         (fun () -> fprintf fmt "idle@."; false)
-    | "p" ->
-       fprintf fmt "%a@." Session_itp.print_session !ses
+    | "?" -> help ()
+    | "q" ->
+       fprintf fmt "Shell exited@.";
+       close_out chout;
+       exit 0
+    | _ ->
+       try
+         let f = Stdlib.Hstr.find commands_table cmd in
+         f fmt args
+       with Not_found ->
+         printf "unknown command `%s`@." s
+
+(*
     | "cd" ->
        begin
          match args with
@@ -243,10 +296,6 @@ let interp chout fmt s =
          | _ -> printf "command cd expects exactly one argument@."
        end
     | "pwd" -> printf "/%a@." (Pp.print_list Pp.slash Pp.string) !curdir
-    | "q" ->
-       fprintf fmt "Shell exited@.";
-       close_out chout;
-       exit 0
     | "ls" ->
        let t = Session_itp.get_theories !ses in
        List.iter
@@ -258,8 +307,7 @@ let interp chout fmt s =
             l)
          t;
        fprintf fmt "@?"
-    | _ -> printf "unknown command `%s`@." s
-
+ *)
 
 let () =
   printf "Welcome to Why3 shell. Type '?' for help.@.";
