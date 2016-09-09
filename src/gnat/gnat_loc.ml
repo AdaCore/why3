@@ -75,9 +75,14 @@ let parse_loc =
             parse_loc_list (new_loc :: acc) ~first:false rest
       | [] -> acc
       | _ ->
-          Gnat_util.abort_with_message ~internal:true "location list malformed."
+        raise (Failure "incorrect format")
    in
-   fun l -> List.rev (parse_loc_list [] ~first:true l)
+   fun l ->
+   try
+     List.rev (parse_loc_list [] ~first:true l)
+   with Failure s ->
+          Gnat_util.abort_with_message ~internal:true
+            ("failure when parsing location list: " ^ s)
 
 let get_file l = l.file
 let get_line l = l.line
