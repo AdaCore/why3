@@ -127,15 +127,21 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
-let ses =
+
+module C = Why3.Controller_itp.Make(Unix_scheduler)
+
+let cont =
   if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
   let fname = Queue.pop files in
-  ref (Why3.Session_itp.load_session fname)
-
-let cont = Controller_itp.{
-    controller_session = !ses;
-    controller_provers = Whyconf.Hprover.create 7;
-}
+  let ses =
+    if Filename.check_suffix fname ".xml" then
+      Session_itp.load_session fname
+    else
+      let ses = Session_itp.empty_session () in
+      C.add_file_to_session env ses fname;
+      ses
+  in
+  Controller_itp.create_controller ses
 
 (* loading the drivers *)
 let () =
@@ -161,9 +167,6 @@ let alt_ergo =
     exit 0
   end else
     snd (Whyconf.Mprover.choose provers)
-
-
-module C = Why3.Controller_itp.Make(Unix_scheduler)
 
 let test_idle fmt _args =
   Unix_scheduler.idle
@@ -204,12 +207,12 @@ let list_transforms _fmt _args =
          (List.sort sort_pair l)
 
 let dump_session_raw fmt _args =
-  fprintf fmt "%a@." Session_itp.print_session !ses
+  fprintf fmt "%a@." Session_itp.print_session cont.Controller_itp.controller_session
 
 let test_schedule_proof_attempt fmt _args =
   (* temporary : get the first goal *)
   let id =
-    match Session_itp.get_theories !ses with
+    match Session_itp.get_theories cont.Controller_itp.controller_session with
     | (_n, (_thn, x::_)::_)::_ -> x
     | _ -> assert false
   in
@@ -227,6 +230,18 @@ let test_schedule_proof_attempt fmt _args =
     cont id alt_ergo.Whyconf.prover
     ~limit ~callback
 
+let task_driver = Driver.load_driver env "drivers/why3_itp.drv" []
+
+let test_print_goal fmt _args =
+  (* temporary : get the first goal *)
+  let id =
+    match Session_itp.get_theories cont.Controller_itp.controller_session with
+    | (_n, (_thn, x::_)::_)::_ -> x
+    | _ -> assert false
+  in
+  let task = Session_itp.get_task cont.Controller_itp.controller_session id in
+  Driver.print_task ~cntexample:false task_driver fmt task
+
 let commands =
   [
     "list-provers", "list available provers", list_provers;
@@ -235,7 +250,8 @@ let commands =
     "i", "run a simple test of Unix_scheduler.idle", test_idle;
     "a", "run a simple test of Unix_scheduler.timeout", test_timeout;
     "p", "print the session in raw form", dump_session_raw;
-    "t", "test schedule_proof_attempt on the first goal", test_schedule_proof_attempt;
+    "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
+    "g", "prints the first goal", test_print_goal;
   ]
 
 let commands_table = Stdlib.Hstr.create 17

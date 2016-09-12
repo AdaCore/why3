@@ -49,11 +49,13 @@ module type Scheduler = sig
 
 end
 
-type controller =
+type controller = private
   { controller_session : Session_itp.session;
     (* controller_env : Env.env; *)
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
+
+val create_controller : Session_itp.session -> controller
 
 module Make(S : Scheduler) : sig
 

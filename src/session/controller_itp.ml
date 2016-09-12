@@ -33,6 +33,12 @@ type controller =
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
+let create_controller s = {
+    controller_session = s;
+    controller_provers = Whyconf.Hprover.create 7;
+}
+
+
 
 module type Scheduler = sig
   val timeout: ms:int -> (unit -> bool) -> unit
@@ -163,7 +169,7 @@ let timeout_handler () =
         build_prover_call c id pr timelimit callback
       with e when not (Debug.test_flag Debug.stack_trace) ->
         Format.eprintf
-          "@[Exception raise in Controller_itp.build_prover_call:@ %a@.@]"
+          "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
           Exn_printer.exn_printer e;
         callback (InternalFailure e)
     done;
