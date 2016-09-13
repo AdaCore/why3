@@ -9,6 +9,8 @@ type reason =
    | VC_Range_Check
    | VC_Predicate_Check
    | VC_Predicate_Check_On_Default_Value
+   | VC_Invariant_Check
+   | VC_Invariant_Check_On_Default_Value
    | VC_Length_Check
    | VC_Discriminant_Check
    | VC_Tag_Check
@@ -76,6 +78,9 @@ let reason_from_string s =
    | "VC_PREDICATE_CHECK"           -> VC_Predicate_Check
    | "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE" ->
       VC_Predicate_Check_On_Default_Value
+   | "VC_INVARIANT_CHECK"           -> VC_Invariant_Check
+   | "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE" ->
+      VC_Invariant_Check_On_Default_Value
    | "VC_LENGTH_CHECK"              -> VC_Length_Check
    | "VC_DISCRIMINANT_CHECK"        -> VC_Discriminant_Check
    | "VC_TAG_CHECK"                 -> VC_Tag_Check
@@ -119,6 +124,9 @@ let reason_to_ada reason =
    | VC_Predicate_Check           -> "VC_PREDICATE_CHECK"
    | VC_Predicate_Check_On_Default_Value ->
      "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE"
+   | VC_Invariant_Check           -> "VC_INVARIANT_CHECK"
+   | VC_Invariant_Check_On_Default_Value ->
+     "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE"
    | VC_Length_Check              -> "VC_LENGTH_CHECK"
    | VC_Discriminant_Check        -> "VC_DISCRIMINANT_CHECK"
    | VC_Tag_Check                 -> "VC_TAG_CHECK"
@@ -158,6 +166,8 @@ let reason_to_string reason =
    | VC_Range_Check               -> "range_check"
    | VC_Predicate_Check           -> "predicate_check"
    | VC_Predicate_Check_On_Default_Value -> "predicate_check_on_default_value"
+   | VC_Invariant_Check           -> "invariant_check"
+   | VC_Invariant_Check_On_Default_Value -> "invariant_check_on_default_value"
    | VC_Length_Check              -> "length_check"
    | VC_Discriminant_Check        -> "discriminant_check"
    | VC_Tag_Check                 -> "tag_check"
