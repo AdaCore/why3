@@ -25,7 +25,13 @@ let print_status fmt st =
   | InternalFailure e -> fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
 
 type transformation_status =
-  | TSscheduled of transID | TSdone of transID | TSfailed
+  | TSscheduled | TSdone | TSfailed
+
+let print_trans_status fmt st =
+  match st with
+  | TSscheduled -> fprintf fmt "TScheduled"
+  | TSdone -> fprintf fmt "TSdone"
+  | TSfailed -> fprintf fmt "TSfailed"
 
 type controller =
   { mutable controller_session : Session_itp.session;
@@ -137,9 +143,23 @@ let schedule_proof_attempt c id pr ~limit ~callback =
   callback Scheduled;
   run_timeout_handler ()
 
-let schedule_transformations c id name args ~callback =
-  let tid = graft_transf c.controller_session id name args in
-  callback (TSscheduled tid)
+let schedule_transformation c id name args ~callback =
+  let apply_trans () =
+    let task = get_task c.controller_session id in
+    try
+      let subtasks = Trans.apply_transform name c.controller_env task in
+      let _tid = graft_transf c.controller_session id name args subtasks in
+      callback TSdone;
+      false
+    with e when not (Debug.test_flag Debug.stack_trace) ->
+      Format.eprintf
+        "@[Exception raised in Trans.apply_transform %s:@ %a@.@]"
+          name Exn_printer.exn_printer e;
+        callback TSfailed;
+        false
+  in
+  S.idle ~prio:0 apply_trans;
+  callback TSscheduled
 
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in

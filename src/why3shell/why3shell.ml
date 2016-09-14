@@ -243,6 +243,15 @@ let test_schedule_proof_attempt fmt _args =
     cont id alt_ergo.Whyconf.prover
     ~limit ~callback
 
+let test_transformation fmt _args =
+  (* temporary : apply split on the first goal *)
+  let id = first_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+            Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "split_goal_wp" [] ~callback
+
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)
                           (Filename.concat "drivers" "why3_itp.drv")
@@ -272,6 +281,7 @@ let commands =
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
+    "tr", "test schedule_transformation with split_goal on the first goal", test_transformation;
   ]
 
 let commands_table = Stdlib.Hstr.create 17

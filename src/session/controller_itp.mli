@@ -23,7 +23,9 @@ type proof_attempt_status =
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
-type transformation_status = TSscheduled of transID | TSdone of transID | TSfailed
+type transformation_status = TSscheduled | TSdone  | TSfailed
+
+val print_trans_status : Format.formatter -> transformation_status -> unit
 
 module type Scheduler = sig
 
@@ -72,15 +74,15 @@ val schedule_proof_attempt :
    Running, then Done. If there is already a proof attempt with [p] it
    is updated. *)
 
-val schedule_transformations :
+val schedule_transformation :
   controller ->
   proofNodeID ->
   string ->
   trans_arg list ->
   callback:(transformation_status -> unit) -> unit
-(** [schedule_transformations s id cb] schedules a transformation for a
+(** [schedule_transformation c id cb] schedules a transformation for a
    goal specified by [id]; the function [cb] will be called each time
-   the transformation status changes. Typically at Scheluded, then
+   the transformation status changes. Typically at Scheduled, then
    Done tid.*)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit

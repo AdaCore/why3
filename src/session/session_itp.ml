@@ -52,10 +52,10 @@ type trans_arg =
   (* | ... *)
 
 type transformation_node = {
-  transf_name             : string;
-  transf_args             : trans_arg list;
-  mutable transf_subtasks : proofNodeID list;
-  transf_parent           : proofNodeID;
+  transf_name     : string;
+  transf_args     : trans_arg list;
+  transf_subtasks : proofNodeID list;
+  transf_parent   : proofNodeID;
 }
 
 type file = {
@@ -305,16 +305,11 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
   Hint.add s.trans_table node_id tn;
   pn.proofn_transformations <- node_id::pn.proofn_transformations
 
-let set_transf_tasks (s : session) (id : transID) (tl : Task.task list) =
-  let tn = get_transfNode s id in
-  assert (tn.transf_subtasks = []);
-  let sub_tasks = List.map (mk_transf_proof_node s id) tl in
-  tn.transf_subtasks <- sub_tasks
-
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
-    (args : trans_arg list) =
+    (args : trans_arg list) (tl : Task.task list) =
   let tid = gen_transID s in
-  mk_transf_node s id tid name args [];
+  let sub_tasks = List.map (mk_transf_proof_node s tid) tl in
+  mk_transf_node s id tid name args sub_tasks;
   tid
 
 let remove_transformation (s : session) (id : transID) =
@@ -491,9 +486,13 @@ and load_proof_or_transf session old_provers pid a =
     | "transf" ->
         let trname = string_attribute "name" a in
         let tid = gen_transID session in
-        let subtasks_ids = List.rev (List.fold_left (fun goals th -> match th.Xml.name with
-        | "goal" -> (gen_proofNodeID session) :: goals
-        | _ -> goals) [] a.Xml.elements) in
+        let subtasks_ids =
+          List.rev (List.fold_left
+                      (fun goals th ->
+                       match th.Xml.name with
+                       | "goal" -> (gen_proofNodeID session) :: goals
+                       | _ -> goals) [] a.Xml.elements)
+        in
         mk_transf_node session pid tid trname [] subtasks_ids;
         List.iter2
           (load_goal session old_provers (Trans tid))

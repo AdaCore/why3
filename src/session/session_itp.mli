@@ -112,15 +112,11 @@ val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
     corresponding proof attempt with [st]. *)
 
 val graft_transf : session -> proofNodeID -> string -> trans_arg list ->
-   transID
-(** [graft_transf s id name l] adds the transformation [name] as a
+   Task.task list -> transID
+(** [graft_transf s id name l tl] adds the transformation [name] as a
     child of the task [id] of the session [s]. [l] is the list of
-    argument of the transformation. The subtasks are initialized to
-    the empty list *)
-
-val set_transf_tasks : session -> transID -> Task.task list -> unit
-(** [set_transf_tasks s id tl] sets the tasks of the transformation node
-    [id] to [tl] *)
+    argument of the transformation, and [tl] is the list of subtasks.
+ *)
 
 val remove_proof_attempt : session -> proofNodeID -> Whyconf.prover -> unit
 (** [remove_proof_attempt s id pr] removes the proof attempt from the
