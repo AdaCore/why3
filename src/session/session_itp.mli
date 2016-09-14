@@ -107,7 +107,7 @@ val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
     it updates it with the new timelimit. *)
 
 val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  Call_provers.prover_result option -> unit
+  Call_provers.prover_result -> unit
 (** [update_proof_attempt s id pr st] update the status of the
     corresponding proof attempt with [st]. *)
 

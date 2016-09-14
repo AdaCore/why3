@@ -58,7 +58,6 @@ let timeout_handler_running = ref false
 let max_number_of_running_provers = ref 1
 
 let number_of_running_provers = ref 0
-
 module Hprover = Whyconf.Hprover
 
 (*
@@ -84,78 +83,26 @@ let build_prover_call c id pr limit callback =
     Driver.prove_task ?old:None ~cntexample:false ~inplace:false ~command
                       ~limit driver task
   in
-(*
-  let c = ref 0 in
-  let call () =
-    incr c;
-    if !c = 10 then Call_provers.ProverStarted else
-      if !c = 20 then Call_provers.ProverFinished dummy_result
-      else Call_provers.NoUpdates
- *)
-(*
-  match find_prover eS a with
-  | None ->
-    callback a a.proof_prover Call_provers.empty_limit None Starting;
-    (* nothing to do *)
-    callback a a.proof_prover Call_provers.empty_limit None MissingProver
-  | Some(ap,npc,a) ->
-    callback a ap Call_provers.empty_limit None Starting;
-    let itp = npc.prover_config.Whyconf.interactive in
-    if itp && a.proof_edited_as = None then begin
-      callback a ap Call_provers.empty_limit None (MissingFile "unedited")
-    end else begin
-      let previous_result = a.proof_state in
-      let limit = adapt_limits ~interactive:itp ~use_steps a in
-      let inplace = npc.prover_config.Whyconf.in_place in
-      let command =
-        Whyconf.get_complete_command npc.prover_config
-          ~with_steps:(limit.Call_provers.limit_steps <>
-                       Call_provers.empty_limit.Call_provers.limit_steps) in
-      let cb result =
-        let result = fuzzy_proof_time result previous_result in
-        callback a ap limit
-          (match previous_result with Done res -> Some res | _ -> None)
-          (StatusChange result) in
-      try
-        let old =
-          match get_edited_as_abs eS.session a with
-          | None -> None
-          | Some f ->
-            if Sys.file_exists f then Some f
-            else raise (NoFile f) in
-        schedule_proof_attempt
-          ~cntexample ~limit
-          ?old ~inplace ~command
-          ~driver:npc.prover_driver
-          ~callback:cb
-          eT
-          (goal_task_or_recover eS a.proof_parent)
-      with NoFile f ->
-        callback a ap Call_provers.empty_limit None (MissingFile f)
-    end
-
-        let call =
-          Driver.prove_task ?old:None ~cntexample:false ~inplace:false ~command
-                            ~limit driver goal
-        in
- *)
-  let pa = (callback,false,call) in
+  let pa = (c.controller_session,id,pr,callback,false,call) in
   Queue.push pa prover_tasks_in_progress
 
 let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (callback,started,call) as c = Queue.pop prover_tasks_in_progress in
+    let (ses,id,pr,callback,started,call) as c = Queue.pop prover_tasks_in_progress in
     match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
     | Call_provers.ProverStarted ->
        assert (not started);
        callback Running;
        incr number_of_running_provers;
-       Queue.add (callback,true,call) q
+       Queue.add (ses,id,pr,callback,true,call) q
     | Call_provers.ProverFinished res ->
        if started then decr number_of_running_provers;
+       (* update the session *)
+       update_proof_attempt ses id pr res;
+       (* inform the callback *)
        callback (Done res)
   done;
   Queue.transfer q prover_tasks_in_progress;

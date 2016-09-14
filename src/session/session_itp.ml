@@ -327,7 +327,7 @@ let remove_transformation (s : session) (id : transID) =
 let update_proof_attempt s id pr st =
   let n = get_proofNode s id in
   let pa = Hprover.find n.proofn_attempts pr in
-  pa.proofa_attempt.proof_state <- st
+  pa.proofa_attempt.proof_state <- Some st
 
 (****************************)
 (*     session opening      *)
