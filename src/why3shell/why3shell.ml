@@ -112,7 +112,7 @@ let spec = Arg.align [
 ]
 
 let usage_str = Format.sprintf
-  "Usage: %s [options] <project directory>"
+  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
   (Filename.basename Sys.argv.(0))
 
 
@@ -137,11 +137,14 @@ let cont =
     if Filename.check_suffix fname ".xml" then
       Session_itp.load_session fname
     else
-      let ses = Session_itp.empty_session () in
-      C.add_file_to_session env ses fname;
-      ses
+      begin
+        Queue.push fname files;
+        Session_itp.empty_session ()
+      end
   in
-  Controller_itp.create_controller ses
+  let c = Controller_itp.create_controller env ses in
+  Queue.iter (fun fname -> C.add_file c fname) files;
+  c
 
 (* loading the drivers *)
 let () =
@@ -209,13 +212,23 @@ let list_transforms _fmt _args =
 let dump_session_raw fmt _args =
   fprintf fmt "%a@." Session_itp.print_session cont.Controller_itp.controller_session
 
+let first_goal () =
+  let files = Session_itp.get_files cont.Controller_itp.controller_session in
+  let file = ref None in
+  Stdlib.Hstr.iter (fun _ f -> file := Some f) files;
+  let file = Opt.get !file in
+  match file.Session_itp.file_theories with
+  | th::_ ->
+     begin
+       match Session_itp.theory_goals th with
+       | id :: _ -> id
+       | _ -> assert false
+     end
+  | _ -> assert false
+
 let test_schedule_proof_attempt fmt _args =
   (* temporary : get the first goal *)
-  let id =
-    match Session_itp.get_theories cont.Controller_itp.controller_session with
-    | (_n, (_thn, x::_)::_)::_ -> x
-    | _ -> assert false
-  in
+  let id = first_goal () in
   let callback status =
     fprintf fmt "status: %a@."
             Controller_itp.print_status status
@@ -230,17 +243,23 @@ let test_schedule_proof_attempt fmt _args =
     cont id alt_ergo.Whyconf.prover
     ~limit ~callback
 
-let task_driver = Driver.load_driver env "drivers/why3_itp.drv" []
+let task_driver =
+  let d = Filename.concat (Whyconf.datadir main)
+                          (Filename.concat "drivers" "why3_itp.drv")
+  in
+  Driver.load_driver env d []
 
 let test_print_goal fmt _args =
   (* temporary : get the first goal *)
-  let id =
-    match Session_itp.get_theories cont.Controller_itp.controller_session with
-    | (_n, (_thn, x::_)::_)::_ -> x
-    | _ -> assert false
-  in
+  let id = first_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
-  Driver.print_task ~cntexample:false task_driver fmt task
+  fprintf fmt "@[====================== Task =====================@\n%a@]@."
+          (Driver.print_task ~cntexample:false task_driver) task
+
+let test_reload fmt _args =
+  fprintf fmt "Reloading... @?";
+  C.reload_files cont;
+  fprintf fmt "done @."
 
 let commands =
   [
@@ -252,6 +271,7 @@ let commands =
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
     "g", "prints the first goal", test_print_goal;
+    "r", "reload the session (test only)", test_reload;
   ]
 
 let commands_table = Stdlib.Hstr.create 17

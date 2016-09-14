@@ -1,7 +1,48 @@
+
+
+
+
+(** {1 New Proof sessions ("Refectoire")} *)
+
+
+(** {2 upper level structure of sessions}
+
+   A [session] contains a collection of files, a [file] contains a
+collection of theories, a [theory] contains a collection of goals. The
+structure of goals remain abstract, each goal being identified by
+unique identifiers of type [proofNodeId]
+
+*)
+
 type session
-type transID
+
 type proofNodeID
+
+type theory
+
+val theory_name : theory -> Ident.ident
+val theory_goals : theory -> proofNodeID list
+
+type file = private {
+  file_name     : string;
+  file_format   : string option;
+  file_theories : theory list;
+}
+
+val get_files : session -> file Stdlib.Hstr.t
+
+
+
+(** {2 Proof trees}
+
+Each goal
+
+*)
+
+
+
 type proof_attempt
+type transID
 
 type trans_arg =
   | TAint      of int
@@ -10,13 +51,6 @@ type trans_arg =
   | TAty       of Ty.ty
   | TAtysymbol of Ty.tysymbol
   (* | ... *)
-
-
-
-
-
-(* New Proof sessions ("Refectoire") *)
-
 (* note: la fonction register des transformations doit permettre de
    declarer les types des arguments
 
@@ -25,21 +59,20 @@ type trans_arg =
 
 *)
 
-type tree =
-    Tree of
-      (proofNodeID * string
-       * proof_attempt list (* proof attempts on this node *)
-       * (transID * string * tree list) list) (* transformations on this node *)
+
+type tree = {
+    tree_node_id : proofNodeID;
+    tree_goal_name : string;
+    tree_proof_attempts : proof_attempt list; (* proof attempts on this node *)
+    tree_transformations : (transID * string * tree list) list;
+                                (* transformations on this node *)
+  }
 (* a tree is a complete proof whenever at least one proof_attempf or
   one transformation proves the goal, where a transformation proves a
   goal when all subgoals have a complete proof.  In other word, the
   list of proof_attempt and transformation are "disjunctive" but the
   list of tree below a transformation is "conjunctive" *)
 
-val get_theories : session -> (string * (string * proofNodeID list) list) list
-(** [get_theories s] returns a list of pairs [name,l] where [name] is a
-    file name and [l] is a list of pairs [thname,l'] where [thname] is
-    a theory name and [l'] is the list of goal ids *)
 
 val get_tree : session -> proofNodeID -> tree
 (** [get_tree s id] returns the proof tree of the goal identified by
@@ -56,8 +89,6 @@ val print_session : Format.formatter -> session -> unit
 (* val get_proof_attempts : session -> proofNodeID -> proof_attempt Whyconf.Hprover.t *)
 val get_transformations : session -> proofNodeID -> transID list
 val get_sub_tasks : session -> transID -> proofNodeID list
-
-(* Note for big brother Andrei: grafting is the opposite of pruning *)
 
 val empty_session : ?shape_version:int -> unit -> session
 
@@ -105,31 +136,3 @@ val save_session : string -> session -> unit
 val load_session : string -> session
 (** [load_session f] load a session from a file [f]; all the tasks are
     initialised to None *)
-
-
-(*
-
-  couche au-dessus: "scheduler" cad modifications asynchrones de la
-  session
-
-   - gere une file de travaux de modifications a faire
-
-   - recupere les resultats de travaux , et les applique s'ils sont
-     encore valides
-*)
-(*
-type theory =
-  {
-    goals : sequence of task
-  }
-
-type file =
-  {
-    theories = sequence of theories
-  }
-
-type session =
-  {
-    session_files : set of files
-  }
- *)

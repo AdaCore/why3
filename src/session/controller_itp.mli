@@ -50,12 +50,12 @@ module type Scheduler = sig
 end
 
 type controller = private
-  { controller_session : Session_itp.session;
-    (* controller_env : Env.env; *)
+  { mutable controller_session : Session_itp.session;
+    controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-val create_controller : Session_itp.session -> controller
+val create_controller : Env.env -> Session_itp.session -> controller
 
 module Make(S : Scheduler) : sig
 
@@ -83,28 +83,53 @@ val schedule_transformations :
    the transformation status changes. Typically at Scheluded, then
    Done tid.*)
 
-val add_file_to_session :
-  Env.env -> session -> ?format:Env.fformat -> string -> unit
-(** [add_file_to_session env s ?fmt fname] parses the source file
-    [fname] and add the resulting theories to the session [s] *)
+val add_file : controller -> ?format:Env.fformat -> string -> unit
+(** [add_file_to_session cont ?fmt fname] parses the source file
+    [fname] and add the resulting theories to the session of [cont] *)
 
-val reload_session_files : session -> unit
-(** reload the given session with the given environment :
-    - the files are reloaded
-    - apply again the transformation
-    - if some goals appear try to find to which goal
-    in the given session it corresponds.
+val reload_files : controller -> unit
+(** reload the files of the given session:
 
-    The last case meant that the session was obsolete.
-    It is authorized if [allow_obsolete] is [true],
-    otherwise the exception {!OutdatedSession} is raised.
-    If the session was obsolete is indicated by
-    the second result.
-    If the merge generated new unpaired goals is indicated by
-    the third result.
+  - each file is parsed again and theories/goals extracted from it. If
+    some syntax error or parsing error occurs, then the corresponding
+    file is kept in the session, without any corresponding new theory,
+    that is as if it was an empty file (TODO: such errors should be
+    returned somehow by the function [reload_files])
 
-    raises [OutdatedSession] if the session is obsolete and
-    [allow_obsolete] is false
-*)
+  - each new theory is associated to a theory of the former session if
+    the names match exactly. In case of no match:
+
+    . a new theory and its goals appear without any proof attempts in
+      it in the new session
+
+    . an unmatched old theory is kept in the new session together with
+      its former goals, proof attempts and transformations, but
+      without any tasks associated to goals and subgoals.
+
+  - within a new theory with a corresponding old theory, each goal is
+    in turn associated to a former goal if possible. the match is done
+    either on the goal name, or if no name match exactly, on the goal
+    shape.
+
+    . a new goal without match is added with an empty set of proof
+      attempts and transformations
+
+    . an old goal without match is kept with all its former proof
+      attempts and transformations, but no task is associated to it,
+      neither to its subgoals.
+
+  - on each new goal that has a matching old goal, old proof
+    attempts are attached, with the status obsolete if the task has
+    changed
+
+  - on each new goal that has a matching old goal, old
+    transformations are attached, and applied to the task, the
+    generated subgoals are in turn matched to the old sub-goals, in
+    the same manner as for goals in a theory
+
+  - TODO: the presence of obsolete goals should be returned somehow by
+    that function, as the presence of unmatch old theories or goals
+
+ *)
 
 end

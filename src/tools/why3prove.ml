@@ -151,9 +151,11 @@ let option_list = [
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
+let main = Whyconf.get_main config
+
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
+  else Filename.concat (Whyconf.datadir main) (Filename.concat "drivers" (s ^ ".drv"))
 
 let opt_driver = ref (match List.rev_map driver_file !opt_driver with
   | f::ef -> Some (f, ef)

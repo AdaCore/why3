@@ -28,13 +28,14 @@ type transformation_status =
   | TSscheduled of transID | TSdone of transID | TSfailed
 
 type controller =
-  { controller_session : Session_itp.session;
-    (* controller_env : Env.env; *)
+  { mutable controller_session : Session_itp.session;
+    controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-let create_controller s = {
+let create_controller env s = {
     controller_session = s;
+    controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
 }
 
@@ -212,11 +213,29 @@ let read_file env ?format fn =
   in
   List.map (fun (_,_,a) -> a) th
 
-let add_file_to_session env s ?format fname =
-  let theories = read_file env ?format fname in
-  add_file_section s fname theories None
+let add_file c ?format fname =
+  let theories = read_file c.controller_env ?format fname in
+  add_file_section c.controller_session fname theories None
 
-let reload_session_files (_s : session)  =
-  failwith "Controller_itp.reload_session_files not yet implemented"
+(** reload files, associating old proof attempts and transformations
+    to the new goals.  old theories and old goals for which we cannot
+    find a corresponding new theory resp. old goal are kept, with
+    tasks associated to them *)
+
+let merge_file (_old_ses : session) (c : controller) _ file =
+  try
+    let theories =
+      read_file c.controller_env file.file_name ?format:file.file_format
+    in
+    add_file_section c.controller_session file.file_name theories None;
+
+  with _ -> (* TODO: filter only syntax error and typing errors *)
+    (* TODO: copy the old session with empty tasks *)
+    add_file_section c.controller_session file.file_name [] None
+
+let reload_files (c : controller)  =
+  let old_ses = c.controller_session in
+  c.controller_session <- empty_session ();
+  Stdlib.Hstr.iter (merge_file old_ses c) (get_files old_ses)
 
 end

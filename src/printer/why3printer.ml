@@ -413,7 +413,7 @@ let print_task args ?old:_ fmt task =
 let () = register_printer "why3" print_task
   ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."
 
-let print_sequent args ?old:_ fmt =
+let print_sequent _args ?old:_ fmt =
   Trans.apply
     (Printer.on_syntax_map
        (fun sm ->
@@ -421,11 +421,11 @@ let print_sequent args ?old:_ fmt =
         Trans.store
           (fun task ->
            let task = Trans.apply (Trans.goal Introduction.intros) task in
-           print_th_prelude task fmt args.th_prelude;
+           (* print_th_prelude task fmt args.th_prelude; *)
            let ut = Task.used_symbols (Task.used_theories task) in
            let ld = Task.local_decls task ut in
-           List.iter (print_decl fmt) ld;
-           fprintf fmt "@\n@.")))
+           fprintf fmt "@[<v 0>%a@]"
+                   (Pp.print_list Pp.newline print_decl) ld)))
 
 
 let () = register_printer "why3_itp" print_sequent
