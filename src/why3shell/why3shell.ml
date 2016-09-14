@@ -263,7 +263,15 @@ let test_print_goal fmt _args =
   let id = first_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
-          (Driver.print_task ~cntexample:false task_driver) task
+    (Driver.print_task ~cntexample:false task_driver) task
+
+let test_save_session _fmt args =
+  match args with
+  | file :: _ ->
+    Session_itp.save_session (file ^ ".xml") cont.Controller_itp.controller_session;
+    printf "session saved@."
+  | [] ->
+    printf "missing session file name@."
 
 let test_reload fmt _args =
   fprintf fmt "Reloading... @?";
@@ -281,6 +289,7 @@ let commands =
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
+    "s", "[s my_session] save the current session in my_session.xml", test_save_session;
     "tr", "test schedule_transformation with split_goal on the first goal", test_transformation;
   ]
 
