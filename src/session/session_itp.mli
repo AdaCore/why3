@@ -59,6 +59,7 @@ type trans_arg =
 
 *)
 
+type proof_parent = Trans of transID | Theory of theory
 
 type tree = {
     tree_node_id : proofNodeID;
@@ -89,6 +90,9 @@ val print_session : Format.formatter -> session -> unit
 (* val get_proof_attempts : session -> proofNodeID -> proof_attempt Whyconf.Hprover.t *)
 val get_transformations : session -> proofNodeID -> transID list
 val get_sub_tasks : session -> transID -> proofNodeID list
+
+val get_proof_parent : session -> proofNodeID -> proof_parent
+val get_trans_parent : session -> transID -> proofNodeID
 
 val empty_session : ?shape_version:int -> unit -> session
 

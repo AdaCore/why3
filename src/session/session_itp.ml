@@ -16,7 +16,7 @@ type theory = {
 }
 
 let theory_name t = t.theory_name
-let theory_goals t = t. theory_goals
+let theory_goals t = t.theory_goals
 
 type proof_parent = Trans of transID | Theory of theory
 
@@ -162,6 +162,12 @@ let get_transformations (s : session) (id : proofNodeID) =
 
 let get_sub_tasks (s : session) (id : transID) =
   (get_transfNode s id).transf_subtasks
+
+let get_proof_parent (s : session) (id : proofNodeID) =
+  (get_proofNode s id).proofn_parent
+
+let get_trans_parent (s : session) (id : transID) =
+  (get_transfNode s id).transf_parent
 
 let rec fold_all_sub_goals_of_proofn s f acc pnid =
   let pn = get_proofNode s pnid in

@@ -212,23 +212,107 @@ let list_transforms _fmt _args =
 let dump_session_raw fmt _args =
   fprintf fmt "%a@." Session_itp.print_session cont.Controller_itp.controller_session
 
-let first_goal () =
-  let files = Session_itp.get_files cont.Controller_itp.controller_session in
+open Controller_itp
+open Session_itp
+
+(* type proof_cursor = Th of theory | Pn of proofNodeID | Tn of transID *)
+
+type proof_hole =
+    Th of theory list * theory * theory list |
+    Pn of proofNodeID list * proofNodeID * proofNodeID list |
+    Tn of transID list * transID * transID list
+
+type proof_zipper = { mutable cursor : proof_hole; ctxt : proof_hole Queue.t }
+
+let ctxt = Queue.create ()
+
+let zipper =
+  let files =
+    get_files cont.Controller_itp.controller_session
+  in
   let file = ref None in
   Stdlib.Hstr.iter (fun _ f -> file := Some f) files;
   let file = Opt.get !file in
-  match file.Session_itp.file_theories with
-  | th::_ ->
-     begin
-       match Session_itp.theory_goals th with
-       | id :: _ -> id
-       | _ -> assert false
-     end
+  match file.file_theories with
+  | th :: tail -> { cursor = (Th ([], th, tail)); ctxt }
   | _ -> assert false
+
+let zipper_down () =
+  match zipper.cursor with
+  | Th (_,th,_) ->
+    (match theory_goals th with
+    | pn::l ->
+      Queue.add zipper.cursor zipper.ctxt;
+      zipper.cursor <- Pn ([],pn,l);
+      true
+    | _ -> false)
+  | Pn (_,pn,_) ->
+    (match get_transformations cont.controller_session pn with
+    | tn::l ->
+      Queue.add zipper.cursor zipper.ctxt;
+      zipper.cursor <- Tn ([],tn,l);
+      true
+    | _ -> false)
+  | Tn (_,tn,_) ->
+    (match get_sub_tasks cont.controller_session tn with
+    | pn::l ->
+      Queue.add zipper.cursor zipper.ctxt;
+      zipper.cursor <- Pn ([],pn,l);
+      true
+    | _ -> false)
+
+let zipper_up () =
+  if not (Queue.is_empty zipper.ctxt) then begin
+    zipper.cursor <- Queue.pop zipper.ctxt;
+    true
+  end else
+    false
+
+let zipper_right () =
+  match zipper.cursor with
+  | Th (l,cs,hd::r) ->
+    zipper.cursor <- Th (cs::l,hd,r);
+    true
+  | Pn (l,cs,hd::r) ->
+    zipper.cursor <- Pn (cs::l,hd,r);
+    true
+  | Tn (l,cs,hd::r) ->
+    zipper.cursor <- Tn (cs::l,hd,r);
+    true
+  | _ -> false
+
+let zipper_left () =
+  match zipper.cursor with
+  | Th (hd::l,cs,r) ->
+    zipper.cursor <- Th (l,hd,cs::r);
+    true
+  | Pn (hd::l,cs,r) ->
+    zipper.cursor <- Pn (l,hd,cs::r);
+    true
+  | Tn (hd::l,cs,r) ->
+    zipper.cursor <- Tn (l,hd,cs::r);
+    true
+  | _ -> false
+
+let rec next_node () =
+  zipper_down () || zipper_right () || (zipper_up () && next_node_no_down ())
+and next_node_no_down () =
+  zipper_right () || (zipper_up () && next_node_no_down ())
+
+let prev_node = zipper_left () || zipper_up ()
+
+let rec nearest_goal_right () =
+  match zipper.cursor with
+  | Pn (_,pn,_) -> Some pn
+  | _  ->
+    if next_node () then
+      nearest_goal_right ()
+    else
+      None
 
 let test_schedule_proof_attempt fmt _args =
   (* temporary : get the first goal *)
-  let id = first_goal () in
+  let Some id = nearest_goal_right () in
   let callback status =
     fprintf fmt "status: %a@."
             Controller_itp.print_status status
@@ -240,7 +324,7 @@ let test_schedule_proof_attempt fmt _args =
 
 let test_transformation fmt _args =
   (* temporary : apply split on the first goal *)
-  let id = first_goal () in
+  let Some id = nearest_goal_right () in
   let callback status =
     fprintf fmt "transformation status: %a@."
             Controller_itp.print_trans_status status
@@ -255,7 +339,7 @@ let task_driver =
 
 let test_print_goal fmt _args =
   (* temporary : get the first goal *)
-  let id = first_goal () in
+  let Some id = nearest_goal_right () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
     (Driver.print_task ~cntexample:false task_driver) task
