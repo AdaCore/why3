@@ -82,8 +82,7 @@ let build_prover_call c id pr limit callback =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let command =
     Whyconf.get_complete_command config_pr
-          ~with_steps:(limit.Call_provers.limit_steps <>
-                       Call_provers.empty_limit.Call_provers.limit_steps) in
+          ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let task = Session_itp.get_task c.controller_session id in
   let call =
     Driver.prove_task ?old:None ~cntexample:false ~inplace:false ~command

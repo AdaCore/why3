@@ -233,12 +233,7 @@ let test_schedule_proof_attempt fmt _args =
     fprintf fmt "status: %a@."
             Controller_itp.print_status status
   in
-  let limit = Call_provers.{
-                limit_time = 5 ;
-                limit_mem  = 1000;
-                limit_steps = -1;
-              }
-  in
+  let limit = Call_provers.{empty_limit with limit_time = 2} in
   C.schedule_proof_attempt
     cont id alt_ergo.Whyconf.prover
     ~limit ~callback
