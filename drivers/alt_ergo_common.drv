@@ -1,16 +1,15 @@
 (* Why drivers for Alt-Ergo: common part *)
 
-prelude "(* this is the prelude for Alt-Ergo, any versions *)"
+prelude "(* this is the prelude for Alt-Ergo, version >= 0.95.2 *)"
 
 printer "alt-ergo"
 filename "%f-%t-%g.why"
 
-valid "^File \"[^\"]*\", line [0-9]+, characters [0-9]+-[0-9]+:Valid"
-valid "^Inconsistent assumption$"
-invalid "^File \"[^\"]*\", line [0-9]+, characters [0-9]+-[0-9]+:Invalid"
-unknown "^File \"[^\"]*\", line [0-9]+, characters [0-9]+-[0-9]+:I don't know" ""
-timeout "^File \"[^\"]*\", line [0-9]+, characters [0-9]+-[0-9]+:Timeout"
-steplimitexceeded "^File \"[^\"]*\", line [0-9]+, characters [0-9]+-[0-9]+:Steps limit reached"
+valid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Valid"
+invalid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Invalid"
+unknown "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:I don't know" ""
+timeout "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Timeout"
+steplimitexceeded "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Steps limit reached"
 outofmemory "Fatal error: out of memory"
 outofmemory "Fatal error: exception Stack_overflow"
 fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
@@ -40,6 +39,10 @@ theory BuiltIn
   syntax type real  "real"
 
   syntax predicate (=)  "(%1 = %2)"
+
+  meta "eliminate_algebraic" "keep_enums"
+  meta "eliminate_algebraic" "keep_recs"
+
 end
 
 theory int.Int

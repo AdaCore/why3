@@ -1,22 +1,16 @@
-(* Driver for Alt-Ergo version >= 0.95 *)
+(* Driver for Alt-Ergo versions >= 0.95.2 *)
 
 import "alt_ergo_common.drv"
 import "no-bv.gen"
 
-theory BuiltIn
-
-  (* Alt-Ergo >= 0.95 supports enumerated datatypes and records *)
-
-  meta "eliminate_algebraic" "keep_enums"
-  meta "eliminate_algebraic" "keep_recs"
-
-end
+(* additional regexp for detection of answers, needed for alt-ergo <= 0.99 *)
+valid "^Inconsistent assumption$"
 
 
 theory int.EuclideanDivision
 
   (* protection against wrong semantics for negative arguments
-    last checked on 0.99.1: this is still needed
+    last checked on 1.20.prv: this is still needed
   *)
 
   prelude "logic safe_eucl_div: int, int -> int"
@@ -33,7 +27,7 @@ end
 theory int.ComputerDivision
 
   (* protection against wrong semantics for negative arguments
-     last checked on 0.99.1: this is still needed
+    last checked on 1.20.prv: this is still needed
   *)
 
   prelude "logic safe_comp_div: int, int -> int"
