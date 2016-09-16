@@ -237,6 +237,19 @@ let zipper =
   | th :: tail -> { cursor = (Th ([], th, tail)); ctxt }
   | _ -> assert false
 
+let zipper_init () =
+  let files =
+    get_files cont.Controller_itp.controller_session
+  in
+  let file = ref None in
+  Stdlib.Hstr.iter (fun _ f -> file := Some f) files;
+  let file = Opt.get !file in
+  match file.file_theories with
+  | th :: tail -> zipper.cursor <- (Th ([], th, tail));
+      while not (Queue.is_empty zipper.ctxt) do ignore (Queue.pop zipper.ctxt) done
+  | _ -> assert false
+
+
 let zipper_down () =
   match zipper.cursor with
   | Th (_,th,_) ->
@@ -301,18 +314,52 @@ and next_node_no_down () =
 
 let prev_node = zipper_left () || zipper_up ()
 
+(* This function always move from current position to the next goal even when on a goal *)
 let rec nearest_goal_right () =
+  if next_node () then
+    match zipper.cursor with
+    | Pn (_,pn,_) -> Some pn
+    | _  -> nearest_goal_right ()
+  else
+    None
+
+let print_position (s: session) (cursor: proof_zipper) fmt: unit =
+  match cursor.cursor with
+  | Th (_, th, _) -> fprintf fmt "%a@." (print_theory s) th
+  | Pn (_, pn, _) -> fprintf fmt "%a@." (print_proof_node s) pn
+  | Tn (_, tn, _) -> fprintf fmt "%a@." (print_trans_node s) tn
+
+let print_position_p s cursor fmt _ = print_position s cursor fmt
+
+(* This function try to get the id of the nearest goal right. If it can't, it tries
+   to get you to the first goal of the session. If this is still not possible,
+   it returns an error. *)
+let ngr_ret () =
+  match
+    (match nearest_goal_right () with
+    | None -> Printf.eprintf "No more goal right. You might want to go back to the root@.";
+	zipper_init(); nearest_goal_right ()
+    | Some id -> Some id) with
+  | None -> failwith "After initialization there is no goal to go to@."
+  | Some id -> id
+
+(* The cursor of the zipper is on a goal *)
+let is_goal_cursor () =
   match zipper.cursor with
-  | Pn (_,pn,_) -> Some pn
-  | _  ->
-    if next_node () then
-      nearest_goal_right ()
-    else
-      None
+  | Pn (_, pn, _) -> Some pn
+  | _ -> None
+
+let ngr_ret_p _ _ = ignore (ngr_ret ())
+
+(* If on goal, do nothing else go to next_goal *)
+let nearest_goal () =
+  match (is_goal_cursor ()) with
+  | None -> ngr_ret ()
+  | Some id -> id
 
 let test_schedule_proof_attempt fmt _args =
   (* temporary : get the first goal *)
-  let Some id = nearest_goal_right () in
+  let id = nearest_goal () in
   let callback status =
     fprintf fmt "status: %a@."
             Controller_itp.print_status status
@@ -324,7 +371,7 @@ let test_schedule_proof_attempt fmt _args =
 
 let test_transformation fmt _args =
   (* temporary : apply split on the first goal *)
-  let Some id = nearest_goal_right () in
+  let id = nearest_goal () in
   let callback status =
     fprintf fmt "transformation status: %a@."
             Controller_itp.print_trans_status status
@@ -337,9 +384,10 @@ let task_driver =
   in
   Driver.load_driver env d []
 
+(* Print current goal or nearest next goal if we are not on a goal *)
 let test_print_goal fmt _args =
   (* temporary : get the first goal *)
-  let Some id = nearest_goal_right () in
+  let id = nearest_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
     (Driver.print_task ~cntexample:false task_driver) task
@@ -369,7 +417,9 @@ let commands =
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
-    "tr", "test schedule_transformation with split_goal on the first goal", test_transformation;
+    "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
+    "ngr", "get to the next goal right", ngr_ret_p;
+    "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper)
   ]
 
 let commands_table = Stdlib.Hstr.create 17

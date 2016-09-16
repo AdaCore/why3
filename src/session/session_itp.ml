@@ -86,6 +86,7 @@ let session_iter_proof_attempt f =
          (fun _ pan -> f pan.proofa_attempt)
         pn.proofn_attempts)
 
+(* This is not needed. Keeping it as information on the structure
 type tree = {
     tree_node_id : proofNodeID;
     tree_goal_name : string;
@@ -93,7 +94,9 @@ type tree = {
     tree_transformations : (transID * string * tree list) list;
                                 (* transformations on this node *)
   }
+*)
 
+(*
 let rec get_tree s id : tree =
   let t = Hint.find s.proofNode_table id in
   let pal =
@@ -109,6 +112,7 @@ let rec get_tree s id : tree =
 and get_trans s id =
   let tr = Hint.find s.trans_table id in
   (id, tr.transf_name, List.map (get_tree s) tr.transf_subtasks)
+*)
 
 (*
 let get_theories s =
@@ -125,11 +129,13 @@ let get_theories s =
 
 let get_files s = s.session_files
 
+(*
 let get_node (s : session) (n : int) =
   let _ = Hint.find s.proofNode_table n in n
 
 let get_trans (s : session) (n : int) =
   let _ = Hint.find s.trans_table n in n
+*)
 
 let gen_transID (s : session) =
   let id = s.next_transID in
@@ -194,6 +200,30 @@ let print_proof_attempt fmt pa =
           pa.limit.Call_provers.limit_time
           (Pp.print_option Call_provers.print_prover_result) pa.proof_state
 
+let rec print_proof_node s (fmt: Format.formatter) p =
+  let pn = get_proofNode s p in
+  let parent = match pn.proofn_parent with
+  | Theory t -> t.theory_name.id_string
+  | Trans id -> (get_transfNode s id).transf_name
+  in
+  fprintf fmt
+    "@[<hv 2> Goal %s;@ parent %s;@ sum %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
+    pn.proofn_name.id_string parent
+    (Opt.fold (fun _ a -> Termcode.string_of_checksum a) "None" pn.proofn_checksum)
+    (Pp.print_list Pp.semi print_proof_attempt)
+      (Hprover.fold (fun _key e l -> e.proofa_attempt :: l) pn.proofn_attempts [])
+    (Pp.print_list Pp.semi (print_trans_node s)) pn.proofn_transformations
+
+and print_trans_node s fmt id =
+  let tn = get_transfNode s id in
+  let name = tn.transf_name in
+  let l = tn.transf_subtasks in
+  let parent = (get_proofNode s tn.transf_parent).proofn_name.id_string in
+  fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
+    (Pp.print_list Pp.semi (print_proof_node s)) l
+
+
+(*
 let rec print_tree s fmt t =
   let pn = get_proofNode s t.tree_node_id in
   let parent = match pn.proofn_parent with
@@ -212,19 +242,20 @@ and print_trans s fmt (id, name, l) =
   let parent = (get_proofNode s tn.transf_parent).proofn_name.id_string in
   fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
     (Pp.print_list Pp.semi (print_tree s)) l
+*)
+
+let print_theory s fmt th : unit =
+  fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" th.theory_name.Ident.id_string
+    (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) th.theory_goals
+
+let print_file s fmt (file, thl) =
+  fprintf fmt "@[<hv 2> File %s;@ [%a]@]" file.file_name
+    (Pp.print_list Pp.semi (print_theory s)) thl
+
+let print_s s fmt =
+  fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
 
 let print_session fmt s =
-  let print_theory s fmt th =
-    fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" th.theory_name.Ident.id_string
-      (Pp.print_list Pp.semi (fun fmt a -> print_tree s fmt (get_tree s a))) th.theory_goals
-  in
-  let print_file s fmt (file, thl) =
-    fprintf fmt "@[<hv 2> File %s;@ [%a]@]" file.file_name
-      (Pp.print_list Pp.semi (print_theory s)) thl
-  in
-  let print_s s fmt =
-    fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
-  in
   let l = Hstr.fold (fun _ f acc -> (f,f.file_theories) :: acc) (get_files s) [] in
   fprintf fmt "%a@." (print_s s) l;;
 

@@ -61,6 +61,7 @@ type trans_arg =
 
 type proof_parent = Trans of transID | Theory of theory
 
+(* This is not needed
 type tree = {
     tree_node_id : proofNodeID;
     tree_goal_name : string;
@@ -73,18 +74,33 @@ type tree = {
   goal when all subgoals have a complete proof.  In other word, the
   list of proof_attempt and transformation are "disjunctive" but the
   list of tree below a transformation is "conjunctive" *)
+*)
 
-
+(*
 val get_tree : session -> proofNodeID -> tree
 (** [get_tree s id] returns the proof tree of the goal identified by
     [id] *)
+*)
 
 val get_task : session -> proofNodeID -> Task.task
 
 (* temp *)
+(*
 val get_node : session -> int -> proofNodeID
 val get_trans : session -> int -> transID
-val print_tree : session -> Format.formatter -> tree -> unit
+*)
+
+(* [print_proof_node s fmt t]: From definition of s, print on fmt the tree
+   rooted at element t *)
+val print_proof_node : session -> Format.formatter -> proofNodeID -> unit
+
+(* [print_theory s fmt t]: From definition of s, print on fmt the theory t *)
+val print_theory : session -> Format.formatter -> theory -> unit
+
+(* [print_trans s fmt tn]: From definition of s, print on fmt the tree originating
+   from transformation tn *)
+val print_trans_node : session -> Format.formatter -> transID -> unit
+
 val print_session : Format.formatter -> session -> unit
 
 (* val get_proof_attempts : session -> proofNodeID -> proof_attempt Whyconf.Hprover.t *)
