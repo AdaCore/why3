@@ -138,7 +138,8 @@ and apply_cs_equ kn cs1 tl1 env t = match t.t_node with
 
 let eval_match ~inline kn t =
   let rec eval stop env t =
-    let stop = stop || Slab.mem Split_goal.stop_split t.t_label in
+    let stop = stop || Slab.mem Split_goal.stop_split t.t_label ||
+    Slab.mem keep_on_simp_label t.t_label in
     let eval = eval stop in
     let t_eval_matched = (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
