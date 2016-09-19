@@ -181,23 +181,25 @@ let read_file env ?format fn =
 
 let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
-  add_file_section c.controller_session fname theories None
+  add_file_section c.controller_session fname theories format (empty_session ()) []
 
 (** reload files, associating old proof attempts and transformations
     to the new goals.  old theories and old goals for which we cannot
     find a corresponding new theory resp. old goal are kept, with
     tasks associated to them *)
 
-let merge_file (_old_ses : session) (c : controller) _ file =
-  try
-    let theories =
-      read_file c.controller_env file.file_name ?format:file.file_format
-    in
-    add_file_section c.controller_session file.file_name theories None;
+let merge_file (old_ses : session) (c : controller) _ file =
+  let format = file.file_format in
+  let old_theories = file.file_theories in
+  let new_theories =
+    try
+      read_file c.controller_env file.file_name ?format
+    with _ -> (* TODO: filter only syntax error and typing errors *)
+      []
+  in
+  add_file_section
+    c.controller_session file.file_name new_theories format old_ses old_theories
 
-  with _ -> (* TODO: filter only syntax error and typing errors *)
-    (* TODO: copy the old session with empty tasks *)
-    add_file_section c.controller_session file.file_name [] None
 
 let reload_files (c : controller)  =
   let old_ses = c.controller_session in

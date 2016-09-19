@@ -17,7 +17,7 @@ module Unix_scheduler = struct
       in
       idle_handler := aux !idle_handler
 
-    (* the private list of functions to call on idle, sorted on
+    (* the private list of functions to call on timeout, sorted on
        earliest trigger time first. *)
     let timeout_handler = ref []
 

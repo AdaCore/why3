@@ -113,11 +113,15 @@ val get_trans_parent : session -> transID -> proofNodeID
 val empty_session : ?shape_version:int -> unit -> session
 
 val add_file_section :
-  session -> string -> (Theory.theory list) -> Env.fformat option -> unit
-(** [add_file_section s fn ths] adds a new 'file' section in session
-    [s], named [fn], containing fresh theory subsections corresponding
-    to theories [ths]. The tasks of each theory nodes generated are
-    computed using [Task.split_theory] *)
+  session -> string -> (Theory.theory list) -> Env.fformat option ->
+  session -> theory list -> unit
+(** [add_file_section s fn ths old_s old_ths] adds a new 'file'
+    section in session [s], named [fn], containing fresh theory
+    subsections corresponding to theories [ths]. The tasks of each
+    theory nodes generated are computed using [Task.split_theory]. For
+    each theory whose name is identical to one theory of old_ths, it
+    is attempted to associate the old goals, proof_attempts and transformations
+    to the goals of the new theory *)
 
 val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
   timelimit:int -> unit

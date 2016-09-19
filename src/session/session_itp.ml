@@ -641,9 +641,7 @@ let load_session (file : string) =
   else
     session
 
-(* add a why file from a session *)
-let add_file_section (s:session) (fn:string) (theories:Theory.theory list) format : unit =
-  let add_theory acc (th : Theory.theory) =
+let make_theory_section ?old (s:session) (th:Theory.theory)  : theory =
     let add_goal parent goal id =
       let name,_expl,task = Termcode.goal_expl_task ~root:true goal in
       mk_proof_node s name task parent id;
@@ -655,9 +653,37 @@ let add_file_section (s:session) (fn:string) (theories:Theory.theory list) forma
                    theory_goals = goalsID; } in
     let parent = Theory theory in
     List.iter2 (add_goal parent) tasks goalsID;
-    theory::acc
+    begin
+      match old with
+      | None -> ()
+      | Some (old_ses,old_th) ->
+         let old_goals_table = Hstr.create 7 in
+         List.iter
+           (fun id ->
+            let pn = get_proofNode old_ses id in
+            Hstr.add old_goals_table pn.proofn_name.Ident.id_string pn)
+           old_th.theory_goals;
+         assert false (* TODO: merge with old theory *)
+    end;
+    theory
+
+(* add a why file from a session *)
+let add_file_section (s:session) (fn:string) (theories:Theory.theory list) format
+    (old_ses:session) (old_theories: theory list) : unit =
+  let old_th_table = Hstr.create 7 in
+  List.iter
+    (fun th -> Hstr.add old_th_table th.theory_name.Ident.id_string th)
+    old_theories;
+  let add_theory (th: Theory.theory) =
+    try
+      let old_th = Hstr.find old_th_table th.Theory.th_name.Ident.id_string in
+      Hstr.remove old_th_table th.Theory.th_name.Ident.id_string;
+      make_theory_section ~old:(old_ses,old_th) s th
+    with Not_found ->
+      make_theory_section s th
   in
-  let theories = List.fold_left add_theory [] theories in
+  let theories = List.rev_map add_theory theories in
+  (* TODO : put remaining theories in old_th_table in the new session *)
   let f = { file_name = fn;
             file_format = format;
             file_theories = List.rev theories }
