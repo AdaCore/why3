@@ -6,9 +6,9 @@
 <prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../heapsort.mlw">
-<theory name="HeapSort" sum="9c2fa0e6c0d92d2a002dd9f0c0f63f95">
+<theory name="HeapSort" sum="22dcc72b4152d2a7faabe19ba0aad177">
  <goal name="Min_of_sorted">
- <proof prover="1" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="0.98"/></proof>
+ <proof prover="1" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.24"/></proof>
  </goal>
  <goal name="WP_parameter heapSort" expl="VC for heapSort">
  <transf name="split_goal_wp">
@@ -189,7 +189,7 @@
 </theory>
 </file>
 <file name="../bag_of_integers.why">
-<theory name="Bag_integers" sum="c6a5503758ac17839636e662391ad545">
+<theory name="Bag_integers" sum="f6fca1dde064c1c11f87d439580ab672">
  <goal name="Min_bag_union1">
  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
@@ -199,7 +199,7 @@
 </theory>
 </file>
 <file name="../test_harness.mlw">
-<theory name="TestHarness" sum="06a27ea95dd253ccd6b0bf1754ea9665">
+<theory name="TestHarness" sum="24f1a917dc94e9b5a49affd1083a6983">
  <goal name="WP_parameter testHarness" expl="VC for testHarness">
  <transf name="split_goal_wp">
   <goal name="WP_parameter testHarness.1" expl="1. array creation size">
@@ -221,7 +221,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter testHarness.7" expl="7. assertion">
-  <proof prover="5"><result status="valid" time="2.57"/></proof>
+  <proof prover="5"><result status="valid" time="2.96"/></proof>
   </goal>
   <goal name="WP_parameter testHarness.8" expl="8. assertion">
   <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
@@ -243,7 +243,7 @@
 </theory>
 </file>
 <file name="../elements.why">
-<theory name="Elements" sum="17fd0b43142cdea5b8de8ebf1bb3efee">
+<theory name="Elements" sum="b6b4ef6b712441a10ab1ad8bbba73245">
  <goal name="Elements_singleton">
  <proof prover="5"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -271,7 +271,7 @@
 </theory>
 </file>
 <file name="../heap_implem.mlw">
-<theory name="Implementation" sum="322e041e7468d24a1fcfab5ca52f254c">
+<theory name="Implementation" sum="1c8ec4a14cef5e8321d07748bb130c77">
  <goal name="Is_heap_min">
  <proof prover="1" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.95"/></proof>
  </goal>
@@ -604,7 +604,7 @@
 </theory>
 </file>
 <file name="../heap_model.why">
-<theory name="Model" sum="86cb5604bda95464b033ec793352c213">
+<theory name="Model" sum="6a9cc559c914aaec73a72f10b1efcd2b">
  <goal name="Model_empty">
  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>

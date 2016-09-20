@@ -89,7 +89,7 @@ echo ""
 echo "=== Programs ==="
 run_dir .
 run_dir foveoos11-cm
-run_dir hoare_logic
+run_dir WP_revisited
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 run_dir avl "-L avl"
 run_dir double_wp "-L double_wp"
@@ -100,6 +100,3 @@ echo "Sessions size : "`wc -cl $sessions | tail -1`
 echo "Shapes   size : "`wc -cl $shapes | tail -1`
 
 exit $res
-
-
-
