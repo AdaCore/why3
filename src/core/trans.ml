@@ -415,11 +415,12 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
     end
 
 (* example of use: TO BE REMOVED*)
-let case : term -> task -> task list = assert false
-let aus : int -> term -> string -> task -> task list = assert false
+(*
+  let case : term -> task -> task list = ...
+  let aus : int -> term -> string -> task -> task list = ...
 
-let case' = wrap (Tterm Ttrans) case
-let aus' = wrap (Tint (Tterm (Tstring Ttrans))) aus
+  let case' = wrap (Tterm Ttrans) case
+  let aus' = wrap (Tint (Tterm (Tstring Ttrans))) aus *)
 
 (*
 
