@@ -43,17 +43,10 @@ type proof_node = {
   mutable proofn_transformations : transID list;
 }
 
-type trans_arg =
-  | TAint      of int
-  | TAstring   of string
-  | TAterm     of Term.term
-  | TAty       of Ty.ty
-  | TAtysymbol of Ty.tysymbol
-  (* | ... *)
 
 type transformation_node = {
   transf_name     : string;
-  transf_args     : trans_arg list;
+  transf_args     : Trans.trans_arg list;
   transf_subtasks : proofNodeID list;
   transf_parent   : proofNodeID;
 }
@@ -333,7 +326,7 @@ let mk_transf_proof_node (s : session) (tid : int) (t : Task.task) =
   id
 
 let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
-    (name : string) (args : trans_arg list) (pnl : proofNodeID list) =
+    (name : string) (args : Trans.trans_arg list) (pnl : proofNodeID list) =
   let pn = get_proofNode s id in
   let tn = { transf_name = name;
              transf_args = args;
@@ -343,7 +336,7 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
   pn.proofn_transformations <- node_id::pn.proofn_transformations
 
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
-    (args : trans_arg list) (tl : Task.task list) =
+    (args : Trans.trans_arg list) (tl : Task.task list) =
   let tid = gen_transID s in
   let sub_tasks = List.map (mk_transf_proof_node s tid) tl in
   mk_transf_node s id tid name args sub_tasks;

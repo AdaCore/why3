@@ -274,7 +274,7 @@ let create_debugging_trans trans_name (tran : Task.task trans) =
     print_task_goal t2;
     Debug.dprintf debug "@.@.";
     t2;
-    
+
   end in
   store new_trans
 
@@ -331,23 +331,98 @@ let list_transforms () =
 let list_transforms_l () =
   Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_l []
 
-(** fast transform *)
+(** transformations with arguments *)
+
+(*
+
+type _ trans_gadt =
+  | TAvoid : (task -> task list) -> unit trans_gadt
+  | TAint : (int -> 'a trans_gadt) -> (int * 'a) trans_gadt
+
+let rec apply_trans_gadt : type a. a trans_gadt -> a -> task -> task list =
+  fun t x ->
+  match t,x with
+  | TAvoid f,() -> f
+  | TAint f,(n,rem) -> apply_trans_gadt (f n) rem
+
+let id_trans = TAvoid (fun task -> [task])
+
+let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
+
+let duplicate = TAint (fun n -> TAvoid (fun task -> dup n task))
+
+let []
+let l = [id_trans ; duplicate]
+
+let transforms_with_args : 'a trans_gadt Mstr.t = Mstr.empty
+
+let m = Mstr.add  "id" id_trans transforms_with_args
+
+let m1 = Mstr.add "dup" duplicate m
+ *)
+
+type trans_arg =
+  | TAint      of int
+  | TAstring   of string
+  | TAterm     of Term.term
+  | TAty       of Ty.ty
+  | TAtysymbol of Ty.tysymbol
+
+type trans_with_args = trans_arg list -> task -> task list
+
+(*
+
+type trans_arg_type = TTint | TTstring | TTterm | TTty | TTtysymbol
+ | TTlsymbol | TTprsymbol
+
+
+let encapsulate : trans_arg_type list -> ? -> trans_with_args =
+  fun args f tr ->
+  match args with
+    | [] -> fun
+
+ *)
+
+
+let transforms_with_args = Hstr.create 17
+
+let lookup_transform_with_args s =
+ try snd (Hstr.find transforms_with_args s)
+ with Not_found -> raise (UnknownTrans s)
+
+let register_transform_with_args ~desc s p =
+  if Hstr.mem transforms_with_args s then raise (KnownTrans s);
+  Hstr.replace transforms_with_args s (desc, fun _ -> p)
+
 type gentrans =
   | Trans_one of Task.task trans
   | Trans_list of Task.task tlist
+  | Trans_with_args of trans_with_args
 
 let lookup_trans env name =
   try
     let t = lookup_transform name env in
     Trans_one t
   with UnknownTrans _ ->
-    let t = lookup_transform_l name env in
-    Trans_list t
+    try
+      let t = lookup_transform_l name env in
+      Trans_list t
+    with UnknownTrans _ ->
+         let t = lookup_transform_with_args name env in
+         Trans_with_args t
 
 let apply_transform tr_name env task =
    match lookup_trans env tr_name with
     | Trans_one t -> [apply t task]
     | Trans_list t -> apply t task
+    | Trans_with_args t -> t [] task
+
+let apply_transform_args tr_name env args task =
+   match lookup_trans env tr_name with
+    | Trans_one t -> [apply t task]
+    | Trans_list t -> apply t task
+    | Trans_with_args t -> t args task
+
 
 (** Flag-dependent transformations *)
 

@@ -44,20 +44,6 @@ Each goal
 type proof_attempt
 type transID
 
-type trans_arg =
-  | TAint      of int
-  | TAstring   of string
-  | TAterm     of Term.term
-  | TAty       of Ty.ty
-  | TAtysymbol of Ty.tysymbol
-  (* | ... *)
-(* note: la fonction register des transformations doit permettre de
-   declarer les types des arguments
-
-   type trans_arg_type = TTint | TTstring | TTterm | TTty | TTtysymbol
-   | TTlsymbol | TTprsymbol
-
-*)
 
 type proof_parent = Trans of transID | Theory of theory
 
@@ -135,7 +121,7 @@ val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
 (** [update_proof_attempt s id pr st] update the status of the
     corresponding proof attempt with [st]. *)
 
-val graft_transf : session -> proofNodeID -> string -> trans_arg list ->
+val graft_transf : session -> proofNodeID -> string -> Trans.trans_arg list ->
    Task.task list -> transID
 (** [graft_transf s id name l tl] adds the transformation [name] as a
     child of the task [id] of the session [s]. [l] is the list of

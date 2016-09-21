@@ -378,6 +378,20 @@ let test_transformation fmt _args =
   in
   C.schedule_transformation cont id "split_goal_wp" [] ~callback
 
+let test_transformation_with_args fmt args =
+  (* temporary : apply duplicate on the first goal *)
+  let n =
+    match args with
+    | [s] -> int_of_string s
+    | _ -> assert false
+  in
+  let id = nearest_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+            Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "duplicate" [Trans.TAint n] ~callback
+
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)
                           (Filename.concat "drivers" "why3_itp.drv")
@@ -418,6 +432,7 @@ let commands =
     "r", "reload the session (test only)", test_reload;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
     "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
+    "tra", "test duplicate transformation", test_transformation_with_args;
     "ngr", "get to the next goal right", ngr_ret_p;
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper)
   ]

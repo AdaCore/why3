@@ -146,7 +146,7 @@ let schedule_transformation c id name args ~callback =
   let apply_trans () =
     let task = get_task c.controller_session id in
     try
-      let subtasks = Trans.apply_transform name c.controller_env task in
+      let subtasks = Trans.apply_transform_args name c.controller_env args task in
       let _tid = graft_transf c.controller_session id name args subtasks in
       callback TSdone;
       false

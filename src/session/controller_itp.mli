@@ -78,7 +78,7 @@ val schedule_transformation :
   controller ->
   proofNodeID ->
   string ->
-  trans_arg list ->
+  Trans.trans_arg list ->
   callback:(transformation_status -> unit) -> unit
 (** [schedule_transformation c id cb] schedules a transformation for a
    goal specified by [id]; the function [cb] will be called each time
