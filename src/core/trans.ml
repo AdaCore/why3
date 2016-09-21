@@ -370,6 +370,57 @@ type trans_arg =
 
 type trans_with_args = trans_arg list -> task -> task list
 
+(* TODO : syntax to be confirmed *)
+type _ trans_typ =
+  | Ttrans : (task -> task list) trans_typ
+  | Tint : 'a trans_typ -> (int -> 'a) trans_typ
+  | Tstring : 'a trans_typ -> (string -> 'a) trans_typ
+  | Tty : 'a trans_typ -> (ty -> 'a) trans_typ
+  | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
+  | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
+
+let rec wrap : type a. a trans_typ -> a -> trans_with_args =
+  fun t f ->
+  match t with
+  | Ttrans -> fun _ -> f
+  | Tint t' ->
+    begin fun l ->
+      match l with
+      | (TAint i) :: tail -> wrap t' (f i) tail
+      | _ -> assert false
+    end
+  | Tstring t' ->
+    begin fun l ->
+      match l with
+      | (TAstring s) :: tail -> wrap t' (f s) tail
+      | _ -> assert false
+    end
+  | Tterm t' ->
+    begin fun l ->
+      match l with
+      | (TAterm te) :: tail -> wrap t' (f te) tail
+      | _ -> assert false
+    end
+  | Tty t' ->
+    begin fun l ->
+      match l with
+      | (TAty ty) :: tail -> wrap t' (f ty) tail
+      | _ -> assert false
+    end
+  | Ttysymbol t' ->
+    begin fun l ->
+      match l with
+      | (TAtysymbol tys) :: tail -> wrap t' (f tys) tail
+      | _ -> assert false
+    end
+
+(* example of use: TO BE REMOVED*)
+let case : term -> task -> task list = assert false
+let aus : int -> term -> string -> task -> task list = assert false
+
+let case' = wrap (Tterm Ttrans) case
+let aus' = wrap (Tint (Tterm (Tstring Ttrans))) aus
+
 (*
 
 type trans_arg_type = TTint | TTstring | TTterm | TTty | TTtysymbol
