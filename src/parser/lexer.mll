@@ -227,6 +227,9 @@ rule token = parse
       { raise (IllegalCharacter c) }
 
 {
+
+  let parse_term lb = Parser.term_eof token lb
+
   let parse_logic_file env path lb =
     open_file token (Lexing.from_string "") (Typing.open_file env path);
     Loc.with_location (logic_file token) lb;
@@ -243,6 +246,7 @@ rule token = parse
 
   let () = Env.register_format Env.base_language "why" ["why"] read_channel
     ~desc:"WhyML@ logical@ language"
+
 }
 
 (*
@@ -250,4 +254,3 @@ Local Variables:
 compile-command: "unset LANG; make -C ../.. test"
 End:
 *)
-

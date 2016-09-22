@@ -9,4 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
+val parse_term : Lexing.lexbuf -> Ptree.term
+
 val parse_program_file : Ptree.incremental -> Lexing.lexbuf -> unit

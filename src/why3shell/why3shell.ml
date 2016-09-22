@@ -392,6 +392,32 @@ let test_transformation_with_args fmt args =
   in
   C.schedule_transformation cont id "duplicate" [Trans.TAint n] ~callback
 
+let test_transformation_with_term_arg _fmt args =
+  (* temporary : parses the term *)
+  match args with
+  | [s] ->
+     let s =
+       let l = String.length s in
+       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
+         String.sub s 1 (l - 2)
+       else s
+     in
+     printf "parsing string \"%s\"@." s;
+     begin try
+         let lb = Lexing.from_string s in
+         let t = Lexer.parse_term lb in
+         printf "parsing OK@.";
+         let env = cont.controller_env in
+         let th = Theory.create_theory (Ident.id_fresh "dummy") in
+         let int_theory = Env.read_theory env ["int"] "Int" in
+         let th = Theory.use_export th int_theory in
+         let t = Typing.type_fmla th (fun _ -> None) t in
+         printf "typing OK: %a@." Pretty.print_term t
+       with e ->
+         printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e
+     end
+  | _ -> printf "term argument expected@."
+
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)
                           (Filename.concat "drivers" "why3_itp.drv")
@@ -434,7 +460,8 @@ let commands =
     "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
     "tra", "test duplicate transformation", test_transformation_with_args;
     "ngr", "get to the next goal right", ngr_ret_p;
-    "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper)
+    "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
+    "tf", "test a transformation having a formula as argument", test_transformation_with_term_arg;
   ]
 
 let commands_table = Stdlib.Hstr.create 17
@@ -453,12 +480,35 @@ let help () =
   printf "@."
 
 
-let interp chout fmt s =
-  let cmd,args =
-    match Strings.split ' ' s with
-    | [] -> assert false
+let split_args s =
+  let args = ref [] in
+  let b = Buffer.create 17 in
+  let state = ref 0 in
+  for i = 0 to String.length s - 1 do
+    let c = s.[i] in
+    match !state, c with
+    | 0,' ' -> ()
+    | 0,'"' -> state := 1
+    | 0,_ -> Buffer.add_char b c; state := 2
+    | 1,'"' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
+    | 1,_ -> Buffer.add_char b c
+    | 2,' ' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
+    | 2,_ -> Buffer.add_char b c
+    | _ -> assert false
+  done;
+  begin
+    match !state with
+      | 0 -> ()
+      | 1 -> args := Buffer.contents b :: !args (* TODO : report missing '"' *)
+      | 2 -> args := Buffer.contents b :: !args
+      | _ -> assert false
+  end;
+  match List.rev !args with
     | a::b -> a,b
-  in
+    | [] -> "",[]
+
+let interp chout fmt s =
+  let cmd,args = split_args s in
   match cmd with
     | "?" -> help ()
     | "q" ->
@@ -470,7 +520,7 @@ let interp chout fmt s =
          let f = Stdlib.Hstr.find commands_table cmd in
          f fmt args
        with Not_found ->
-         printf "unknown command `%s`@." s
+         printf "unknown command '%s'@." cmd
 
 
 let () =

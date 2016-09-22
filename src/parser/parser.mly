@@ -219,7 +219,13 @@ end
 
 %start <Ptree.incremental -> unit> open_file
 %start <unit> logic_file program_file
+%start <Ptree.term> term_eof
 %%
+
+(* parsing of a single term *)
+
+term_eof:
+| term EOF { $1 }
 
 (* Theories, modules, namespaces *)
 
