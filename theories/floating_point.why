@@ -482,7 +482,7 @@ theory GenFloatSpecFull
          -> is_finite r /\ value r = round m (value x * value y))
     /\ (is_finite x /\ is_finite y /\ not no_overflow m (value x * value y)
          -> overflow_value m r)
-    /\ product_sign r x y
+    /\ (not is_NaN r -> product_sign r x y)
     /\ exact r = exact x * exact y
     /\ model r = model x * model y
 
@@ -508,7 +508,7 @@ theory GenFloatSpecFull
     /\ (is_finite x /\ is_gen_zero y /\ value x <> 0.0
         -> is_infinite r)
     /\ (is_gen_zero x /\ is_gen_zero y -> is_NaN r)
-    /\ product_sign r x y
+    /\ (not is_NaN r -> product_sign r x y)
     /\ exact r = exact x / exact y
     /\ model r = model x / model y
 
@@ -538,7 +538,8 @@ theory GenFloatSpecFull
         -> is_finite r /\
         value r = round m (value x * value y + value z) /\
         (if product_sign z x y then same_sign r z
-         else sign_zero_result m r))
+         else (value x * value y + value z = 0.0 ->
+               if m = Down then sign r = Neg else sign r = Pos)))
     /\ (is_finite x /\ is_finite y /\ is_finite z /\
         not no_overflow m (value x * value y + value z)
         -> SpecialValues.same_sign_real (sign r) (value x * value y + value z)
