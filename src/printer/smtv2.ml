@@ -72,7 +72,10 @@ let ident_printer () =
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (* From Z3 *)
-      "map"; "bv"; "subset"; "union"; "default"
+      "map"; "bv"; "subset"; "union"; "default";
+
+(* floats *)
+      "RNE"; "RNA"; "RTP"; "RTN"; "RTZ"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in

@@ -7,9 +7,9 @@
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
-
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
+import "smt-libv2-floats.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -109,4 +109,24 @@ theory bv.BV8
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
+end
+
+theory ieee_float.Float64
+(* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
+   syntax function to_int
+     "(ite (= ((_ extract 1024 1024) ((_ fp.to_sbv 1025) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 1025) %1 %2)) (- (bv2int ((_ fp.to_sbv 1025) %1 %2)) (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026)))))"
+  syntax function of_int
+    "((_ to_fp 11 53) %1 (ite (< %2 0) ((_ int2bv 1025) (+ (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026))) %2)) ((_ int2bv 1025) %2)))"
+end
+
+theory ieee_float.Float32
+  (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
+   syntax function to_int
+     "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
+  syntax function of_int
+    "((_ to_fp 8 24) %1 (ite (< %2 0) ((_ int2bv 129) (+ (bv2int (bvshl (_ bv1 130) (_ bv129 130))) %2)) ((_ int2bv 129) %2)))"
+end
+
+theory real.Square
+  remove allprops
 end
