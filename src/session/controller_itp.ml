@@ -85,7 +85,7 @@ let build_prover_call c id pr limit callback =
           ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let task = Session_itp.get_task c.controller_session id in
   let call =
-    Driver.prove_task ?old:None ~cntexample:false ~inplace:false ~command
+    Driver.prove_task ?old:None ~cntexample:true ~inplace:false ~command
                       ~limit driver task
   in
   let pa = (c.controller_session,id,pr,callback,false,call) in

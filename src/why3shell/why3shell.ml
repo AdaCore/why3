@@ -401,13 +401,7 @@ let parse_transformation_arg args : Term.term option =
   (* temporary : parses the term *)
   match args with
   | [s] ->
-     let s =
-       let l = String.length s in
-       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
-         String.sub s 1 (l - 2)
-       else s
-     in
-     printf "parsing string \"%s\"@." s;
+     printf "parsing string '%s'@." s;
      begin try
          let lb = Lexing.from_string s in
          let t = Lexer.parse_term lb in
