@@ -640,6 +640,8 @@ theory GenericFloat
   (* is_int predicate  *)
   predicate is_int (x:t)
 
+  axiom zeroF_is_int: is_int zeroF
+
   (* temporary range check on int set to 2^64; TODO find the actual
      max int that don't give INF with of_int for both clones *)
      (* just take max *)
