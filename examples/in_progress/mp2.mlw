@@ -1,0 +1,61 @@
+
+
+module M
+
+
+  use import int.Int
+  use import map.Map as M
+
+(*
+  type array 'a model { length : int; mutable elts : map int 'a }
+    invariant { 0 <= self.length }
+*)
+
+  type ptr 'a model { mutable elts : map int 'a ; length : int ; offset : int }
+     invariant { 0 <= self.length }
+     (* it is not required the offset is in 0..length *)
+
+  val get (p:ptr 'a) : 'a
+    requires { 0 <= p.offset < p.length }
+    ensures { result = p.elts[p.offset] }
+
+
+end
+
+
+module Heap
+
+  type elt
+
+  type base
+
+  type ptr model { base: base; mutable offset:int }
+
+  (** heap of memory blocks storing values of type elt *)
+  type heap = {
+    ghost mutable length : map base int;  (* returns -1 for non-allocated block *)
+    ghost mutable contents : map base (map int elt);
+  }
+
+  val ghost h : heap
+
+  (** operation [*p] *)
+  val get (p : ptr) :elt
+    requires { 0 <= p.offset < h.length[p.base] }
+    reads { h }
+    ensures { result = h.contents[p.base][p.offset] }
+
+  (** operations [p+i], [p[i]] *)
+
+  val malloc(n:int32):ptr
+    requires { n >= 0 }
+    writes  { h.length }
+    ensures { result.offset = 0 }
+    ensures { h.length[result.base] = n  }
+    ensures { (old h).length[result.base] = -1  }
+    ensures { forall b:base. b <> result.base -> (old h).length[b] = h,length[b]  }
+
+
+  val free ...
+
+end

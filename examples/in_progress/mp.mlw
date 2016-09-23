@@ -1,3 +1,34 @@
+(* TODO
+
+  voir si le type t est loin des types GMP
+
+   - il faudrait remplacer array par un type tableau' ou la longueur
+     est ghost, pour que la longueur ne soit pas extraite vers C
+
+   - entiers signés : voir plus loin
+
+   - travailler avec pointeur au milieu des tableaux plutot que
+     pointeur sur le debut + offset ? -> avoir un type de données
+     pointeur qui aurait en ghost le bloc memoire vers lequel il
+     pointe (y compris la taille de bloc) et l'offset de ce pointeur)
+
+  pour chaque fonction : commenter en indiquant le nom de la fonction
+  GMP qui correspond
+
+  compare_limbs :
+
+    decouper en plusieurs fonctions : une qui suppose que les tableaux ont la meme taille [mpn_cmp], une qui compare avec zero [mpn_zero_p]
+
+    Faire les versions signées des fonctions : mpz_*
+
+  supprimer add_array : cf le TODO correspondant
+
+  extraction:
+
+    voir si Limb.add_with_carry s'extrait raisonnablement vers C
+    envisager de remplacer par 2 fonctions au lieu de renvoyer une paire
+
+*)
 
 
 (** {1 Multi-precision integer arithmetic} *)
@@ -21,7 +52,7 @@ module N
   be a machine word, abstractly it can be any unsigned integer type
   *)
 
-(*i FIXME: does not allow extraction...
+(*** FIXME: does not allow extraction...
 
   type limb
 
@@ -34,7 +65,8 @@ module N
 
 *)
 
-(*i temporary: stick to uint32 *)
+
+(*** temporary: stick to uint32 *)
 
   use mach.int.UInt32 as Limb
 
@@ -140,6 +172,7 @@ module N
     assert { MapEq.map_eq_sub x.digits.elts r.elts 0 (p2i lx) };
     { digits = r }
 
+  (* [enlarge x l] enlarges [x] to length [l] *)
   let enlarge (x:t) (l:int31) : unit
     requires { p2i l > p2i x.digits.length }
     writes  { x }
@@ -280,6 +313,8 @@ module N
 
   exception Break
 
+  (** [add_limb x y x1 x2] adds in-place to the sub-array [x[x1..x2-1]]
+      the value of the limb [y], and returns the carry *)
   let add_limb (x:array limb) (y:limb) (x1 x2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
     writes  { x }
@@ -308,6 +343,10 @@ module N
     done;
     !c
 
+  (** [add_limbs x y x1 x2 y1 y2] adds in-place in sub-array
+      [x[x1..x2-1]] the value of the sub-array [y[y1..y2-1]] and returns
+      the carry. The size of sub-array y must be smaller or equal to the
+      size of sub-array x *)
   let add_limbs (x y:array limb) (x1 x2 y1 y2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
     requires { 0 <= p2i y1 <= p2i y2 <= p2i y.length }
@@ -414,7 +453,8 @@ module N
   let add (x y:t) : t
     ensures { value result = value x + value y }
     raises  { TooManyDigits -> true }
-  = (* TODO: just copy x or y and call add_in_place, and throw away add_array *)
+  = (* TODO: just copy x or y and call add_in_place,
+       and throw away add_array *)
     let lx = x.digits.length in
     let ly = y.digits.length in
     if Int31.(>=) lx ly then
@@ -424,6 +464,8 @@ module N
 
 (** {2 Multiplication} *)
 
+  (** [mul_limb z x y z1 x1 x2] multiplies [x[x1..x2-1]] by [y] and adds
+      the result to [z[z1..z1+x2-x1]], and returns the carry *)
   let mul_limb (z x:array limb) (y:limb) (z1 x1 x2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
     requires { 0 <= p2i z1 }
@@ -458,6 +500,9 @@ module N
     done;
     !c
 
+  (** [mul_limbs z x y z1 x1 x2 y1 y2] multiplies [x[x1..x2-1]] and
+      [y[y1..y2-1]] and adds the result to [z[z1..z1+x2-x1+y2-y1]] and
+      returns the carry *)
   let mul_limbs (z x y:array limb) (z1 x1 x2 y1 y2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
     requires { 0 <= p2i y1 <= p2i y2 <= p2i y.length }
@@ -511,7 +556,7 @@ end
 
 
 
-(*i does not work as expected
+(*** does not work as expected
 module N64
 
   use import mach.int.Int64
