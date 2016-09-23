@@ -8,11 +8,15 @@ let duplicate args task =
     | [TAint n] -> dup n task
     | _ -> failwith "wrong arguments for duplicate"
 
-
-let case _t task = (* Sylvain *)
-  [task;task]
-  (* TODO : from task [delta |- G] , build the tasks [delta, t] |- G] and [delta, not t | - G] *)
-
+(* from task [delta |- G] and term t, build the tasks:
+   [delta, t] |- G] and [delta, not t | - G] *)
+let case t task =
+  let g, task = Task.task_separate_goal task in
+  let h = Decl.create_prsymbol (Ident.id_fresh "h") in
+  let hnot = Decl.create_prsymbol (Ident.id_fresh "hnot") in
+  let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
+  let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
+  [Task.add_tdecl (Task.add_decl task t_decl) g; Task.add_tdecl (Task.add_decl task t_not_decl) g]
 
 let cut _t task = (* Sylvain *)
   [task;task]

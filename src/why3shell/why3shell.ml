@@ -392,6 +392,39 @@ let test_transformation_with_args fmt args =
   in
   C.schedule_transformation cont id "duplicate" [Trans.TAint n] ~callback
 
+let parse_transformation_arg args : Term.term option =
+  (* temporary : parses the term *)
+  match args with
+  | [s] ->
+     let s =
+       let l = String.length s in
+       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
+         String.sub s 1 (l - 2)
+       else s
+     in
+     printf "parsing string \"%s\"@." s;
+     begin try
+         let lb = Lexing.from_string s in
+         let t = Lexer.parse_term lb in
+         printf "parsing OK@.";
+         let env = cont.controller_env in
+         let th = Theory.create_theory (Ident.id_fresh "dummy") in
+         let int_theory = Env.read_theory env ["int"] "Int" in
+         let th = Theory.use_export th int_theory in
+         let t = Typing.type_fmla th (fun _ -> None) t in
+         let _ = printf "typing OK: %a@." Pretty.print_term t in
+         Some t
+       with e ->
+         let _ = printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e in
+         None
+     end
+  | _ -> let _ = printf "term argument expected@." in None
+
+(* Only parses arguments and print debugging information *)
+let test_transformation_with_term_arg _fmt args =
+  let _ = parse_transformation_arg args in ()
+
+(*
 let test_transformation_with_term_arg _fmt args =
   (* temporary : parses the term *)
   match args with
@@ -417,6 +450,18 @@ let test_transformation_with_term_arg _fmt args =
          printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e
      end
   | _ -> printf "term argument expected@."
+*)
+
+let test_case_with_term_args fmt args =
+  match (parse_transformation_arg args) with
+  | None -> ()
+  | Some t ->
+  let id = nearest_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+            Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "case" [Trans.TAterm t] ~callback
 
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)
@@ -454,6 +499,7 @@ let commands =
     "a", "run a simple test of Unix_scheduler.timeout", test_timeout;
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
+    "c", "case on next goal", test_case_with_term_args;
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
