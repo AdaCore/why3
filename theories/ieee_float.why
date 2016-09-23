@@ -230,11 +230,13 @@ theory GenericFloat
 
   (* is this correct &| accurate ? *)
   (* FS: seems OK for float32 at least *)
-  axiom of_int_is_finite: forall m:mode, x:int. no_overflow m (FromInt.from_int x) ->
-        is_finite (of_int m x)
+  axiom of_int_is_finite: forall m:mode, x:int [of_int m x].
+    no_overflow m (FromInt.from_int x) ->
+    is_finite (of_int m x)
 
-  axiom of_int_to_real: forall m:mode, x:int. no_overflow m (FromInt.from_int x) ->
-        to_real (of_int m x) = round m (FromInt.from_int x)
+  axiom of_int_to_real: forall m:mode, x:int [of_int m x].
+    no_overflow m (FromInt.from_int x) ->
+    to_real (of_int m x) = round m (FromInt.from_int x)
 
   (* Axioms on round *)
 
