@@ -392,6 +392,11 @@ let test_transformation_with_args fmt args =
   in
   C.schedule_transformation cont id "duplicate" [Trans.TAint n] ~callback
 
+(* Do not use this. TODO *)
+let typing_terms t th =
+  try (Typing.type_fmla th (fun _ -> None) t) with
+  | _ -> Typing.type_term th (fun _ -> None) t
+
 let parse_transformation_arg args : Term.term option =
   (* temporary : parses the term *)
   match args with
@@ -411,7 +416,7 @@ let parse_transformation_arg args : Term.term option =
          let th = Theory.create_theory (Ident.id_fresh "dummy") in
          let int_theory = Env.read_theory env ["int"] "Int" in
          let th = Theory.use_export th int_theory in
-         let t = Typing.type_fmla th (fun _ -> None) t in
+         let t = typing_terms t th in
          let _ = printf "typing OK: %a@." Pretty.print_term t in
          Some t
        with e ->
@@ -424,34 +429,6 @@ let parse_transformation_arg args : Term.term option =
 let test_transformation_with_term_arg _fmt args =
   let _ = parse_transformation_arg args in ()
 
-(*
-let test_transformation_with_term_arg _fmt args =
-  (* temporary : parses the term *)
-  match args with
-  | [s] ->
-     let s =
-       let l = String.length s in
-       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
-         String.sub s 1 (l - 2)
-       else s
-     in
-     printf "parsing string \"%s\"@." s;
-     begin try
-         let lb = Lexing.from_string s in
-         let t = Lexer.parse_term lb in
-         printf "parsing OK@.";
-         let env = cont.controller_env in
-         let th = Theory.create_theory (Ident.id_fresh "dummy") in
-         let int_theory = Env.read_theory env ["int"] "Int" in
-         let th = Theory.use_export th int_theory in
-         let t = Typing.type_fmla th (fun _ -> None) t in
-         printf "typing OK: %a@." Pretty.print_term t
-       with e ->
-         printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e
-     end
-  | _ -> printf "term argument expected@."
-*)
-
 let test_case_with_term_args fmt args =
   match (parse_transformation_arg args) with
   | None -> ()
@@ -462,6 +439,22 @@ let test_case_with_term_args fmt args =
             Controller_itp.print_trans_status status
   in
   C.schedule_transformation cont id "case" [Trans.TAterm t] ~callback
+
+
+(* TODO rewrite this. Only for testing *)
+let test_transformation_one_arg_term fmt args =
+  match args with
+  | [] -> printf "Give the name of the transformation@."
+  | tr :: tl ->
+      let id = nearest_goal () in
+      let callback status =
+        fprintf fmt "transformation %s status: %a@."
+          tr Controller_itp.print_trans_status status
+      in
+      match (parse_transformation_arg tl) with
+      | None -> ()
+      | Some t ->
+          C.schedule_transformation cont id tr [Trans.TAterm t] ~callback
 
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)
@@ -504,6 +497,7 @@ let commands =
     "r", "reload the session (test only)", test_reload;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
     "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
+    "ttr", "takes 2 arguments. Name of the transformation (with one term argument) and a term" , test_transformation_one_arg_term;
     "tra", "test duplicate transformation", test_transformation_with_args;
     "ngr", "get to the next goal right", ngr_ret_p;
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
