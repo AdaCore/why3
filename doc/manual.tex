@@ -285,10 +285,11 @@ egalite sur les type algebriques ? engendrees automatiquement ?
     0.87 & 0.90 \\
 \hline
 \texttt{'L:} & \texttt{label L in} \\
-\texttt{at !x 'L} & \texttt{!x at L} \\
+\texttt{at x 'L} & \texttt{x at L} \\
+\texttt{assert \{ ... (old x) ... \}} & \texttt{ assert \{... (x at Init) .. \}} \\
 \verb|\|\texttt{ x. e} & \texttt{fun x -> e} \\
-\verb|\|\texttt{use HighOrd} & nothing, not needed anymore \\
-\verb|\|\texttt{HighOrd.pred ty} & \texttt{ty -> bool} \\
+\texttt{use HighOrd} & nothing, not needed anymore \\
+\texttt{HighOrd.pred ty} & \texttt{ty -> bool} \\
 \texttt{type t model ...} & \texttt{type t = abstract ... } \\
 \hline
   \end{tabular}
