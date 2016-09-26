@@ -73,11 +73,13 @@ let do_input f =
                 begin
                   match cexp.c_node with
                   | Cfun e ->
-                    let cfg = Abstract_interpreter.start_cfg rsym in
-                    let i = Abstract_interpreter.put_expr_in_cfg cfg e in
-                    Abstract_interpreter.eval_fixpoints cfg;
-                    let d = Abstract_interpreter.get_domain i in
-                    Format.printf "%s@." @@ Abstract_interpreter.domain_to_string d
+                    Expr.print_expr Format.err_formatter e; Format.eprintf "@.";
+                    begin
+                      match e.e_node with
+                      | Eexec(_) -> Format.eprintf "exec@.";
+                        Expr.print_expr Format.err_formatter e; Format.eprintf "@."
+                      | _ -> Format.eprintf "else@."
+                    end
                   | Cany ->
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;
@@ -106,5 +108,8 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let () = Abstract_interpreter.launch ()
-
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. byte"
+End:
+*)
