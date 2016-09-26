@@ -397,7 +397,6 @@ fi
 # checking for apron and fixpoint
 if test "$enable_infer" = yes; then
    if test "$USEOCAMLFIND" = yes; then
-   	  # gmp is a dependency of apron
       INFERINCLUDE=$(ocamlfind query apron apron.polkaMPQ)
    fi
    if test -n "$INFERINCLUDE"; then
