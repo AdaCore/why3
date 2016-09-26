@@ -425,6 +425,33 @@ let parse_transformation_arg args : Term.term option =
      end
   | _ -> let _ = printf "term argument expected@." in None
 
+
+let parse_transformation_string args : string option =
+  (* temporary : parses a string *)
+  match args with
+  | [s] ->
+     let s =
+       let l = String.length s in
+       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
+         String.sub s 1 (l - 2)
+       else s
+     in
+     printf "parsing string \"%s\"@." s;
+     Some s
+  | _ -> let _ = printf "term argument expected@." in None
+
+
+let test_remove_with_string_args fmt args =
+  match (parse_transformation_string args) with
+  | None -> ()
+  | Some s ->
+      let id = nearest_goal () in
+      let callback status =
+        fprintf fmt "transformation status: %a@."
+          Controller_itp.print_trans_status status
+      in
+      C.schedule_transformation cont id "remove" [Trans.TAstring s] ~callback
+
 (* Only parses arguments and print debugging information *)
 let test_transformation_with_term_arg _fmt args =
   let _ = parse_transformation_arg args in ()
@@ -495,6 +522,7 @@ let commands =
     "c", "case on next goal", test_case_with_term_args;
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
+    "rem", "test remove transformation. Take one string argument", test_remove_with_string_args;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
     "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
     "ttr", "takes 2 arguments. Name of the transformation (with one term argument) and a term" , test_transformation_one_arg_term;

@@ -3,6 +3,7 @@ open Trans
 open Term
 open Decl
 open Theory
+open Task
 
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
@@ -57,9 +58,38 @@ let exists x task =
       [Task.add_decl task new_goal]
   | _ -> failwith "No goal"
 
-let remove _name task =
-  [task;task]
-  (* TODO :from task [delta, name:A |- G]  build the task [delta |- G] *)
+(* TODO ask to have functions in ident and Pretty that do something like that *)
+let string_pr pr =
+  ignore (Format.flush_str_formatter ());
+  Pretty.print_pr Format.str_formatter pr;
+  Format.flush_str_formatter()
+
+let rec remove_task_decl task (name: string) : task_hd option =
+  match task with
+  | Some {task_decl = {td_node = Decl {d_node = Dprop (Paxiom, pr, _)}};
+          task_prev = task} when (string_pr pr = name) ->
+    task
+  | Some {task_decl = decl;
+          task_prev = task;
+          task_known = known;
+          task_clone = clone;
+          task_meta = meta;
+          task_tag = _} ->
+    (* Should create a new unique tag each time *)
+    Task.mk_task decl (remove_task_decl task name) known clone meta
+  | None -> None
+
+(* TODO check this works in particular when hypothesis names
+    are extracted from same name. Seemed not to work before
+  adding "print_task". To be resolved in a better way. *)
+(* from task [delta, name:A |- G]  build the task [delta |- G] *)
+let remove name task =
+  (* Force setting of pprinter *)
+  let _ = Pretty.print_task Format.str_formatter task in
+  let _ = ignore (Format.flush_str_formatter ()) in
+  let g, task = Task.task_separate_goal task in
+  let task = remove_task_decl task name in
+  [Task.add_tdecl task g]
 
 let simple_apply _name _t task = (* ? *)
   [task;task]
@@ -86,7 +116,13 @@ let exists' args task =
   | [TAterm t] -> exists t task
   | _ -> failwith "wrong arguments for exists"
 
+let remove' args task =
+  match args with
+  | [TAstring name] -> remove name task
+  | _ -> failwith "wrong argument for remove"
+
 let () = register_transform_with_args ~desc:"test case" "case" case'
 let () = register_transform_with_args ~desc:"test cut" "cut" cut'
 let () = register_transform_with_args ~desc:"test exists" "exists" exists'
+let () = register_transform_with_args ~desc:"test remove" "remove" remove'
 let () = register_transform_with_args ~desc:"test duplicate" "duplicate" duplicate
