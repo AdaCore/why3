@@ -204,16 +204,25 @@ LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 smtv2_cvc_ce coq\
 LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
+ifeq (@enable_infer@,yes)
+LIB_ABSINT = abstract_interpreter
+endif
+
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW)) \
+	      $(addprefix src/absint/, $(LIB_ABSINT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
+ifeq (@enable_infer@,yes)
+LIBDIRS = util core driver mlw parser transform printer session absint
+else
 LIBDIRS = util core driver mlw parser transform printer session
+endif
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
