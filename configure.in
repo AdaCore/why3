@@ -397,13 +397,15 @@ fi
 # checking for apron and fixpoint
 if test "$enable_infer" = yes; then
    if test "$USEOCAMLFIND" = yes; then
+   	  # gmp is a dependency of apron
       INFERINCLUDE=$(ocamlfind query apron apron.polkaMPQ)
    fi
    if test -n "$INFERINCLUDE"; then
       INFERINCLUDE=$(ocamlfind query fixpoint)
 	  if test -n "$INFERINCLUDE"; then
 		  echo "ocamlfind found apron, apron.polkaMPQ and fixpoint in $INFERINCLUDE"
-		  INFERINCLUDE="-I $(ocamlfind query apron) -I $(ocamlfind query apron.polkaMPQ) -I $(ocamlfind query fixpoint)"
+		  # camllib is a dependency of fixpoint, so it should not be nedded to check for it
+		  INFERINCLUDE="-I $(ocamlfind query apron) -I $(ocamlfind query apron.polkaMPQ) -I $(ocamlfind query fixpoint) -I $(ocamlfind query camllib) -I $(ocamlfind query gmp)"
 		  INFERLIB="apron apron.polkaMPQ fixpoint"
 	  else
 		 enable_infer=no

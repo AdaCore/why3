@@ -121,6 +121,10 @@ CMIHACK = -intf-suffix .cmi
 EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
+ifeq (@enable_infer@,yes)
+EXTLIBS += gmp apron camllib fixpoint polkaMPQ bigarray
+endif
+
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
@@ -854,8 +858,8 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel
-COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
+COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
+COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@ @INFERINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
@@ -867,10 +871,12 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(EXTCMXA)
 
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
+ifeq (@enable_infer@,yes)
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma, "gmp apron camllib fixpoint polkaMPQ bigarray")
+endif
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
