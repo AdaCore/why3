@@ -120,6 +120,7 @@ let rec grep_steps out = function
 
 let grep_reason_unknown out =
   try
+    (* TODO: this is SMTLIB specific, should be done in drivers instead *)
     let re = Str.regexp "^(:reason-unknown \\([^)]*\\)" in
     ignore (Str.search_forward re out 0);
     match (Str.matched_group 1 out) with
@@ -137,8 +138,9 @@ type prover_result_parser = {
 }
 
 let print_unknown_reason fmt = function
-  | Some Resourceout -> fprintf fmt " because of resource limit reached "
-  | _ -> ()
+  | Some Resourceout -> fprintf fmt "resource limit reached"
+  | Some Other -> fprintf fmt "other"
+  | None -> fprintf fmt "none"
 
 let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
@@ -146,7 +148,7 @@ let print_prover_answer fmt = function
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown ("", r) -> fprintf fmt "Unknown%a" print_unknown_reason r
+  | Unknown ("", r) -> fprintf fmt "Unknown (%a)" print_unknown_reason r
   | Failure "" -> fprintf fmt "Failure"
   | Unknown (s, r) -> fprintf fmt "Unknown %a(%s)" print_unknown_reason r s
   | Failure s -> fprintf fmt "Failure (%s)" s
@@ -207,14 +209,47 @@ let parse_prover_run res_parser time out ret limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
-  let reason_unknown = grep_reason_unknown out in
+  (* add info for unknown if possible. FIXME: this is too SMTLIB specific *)
   let ans = match ans with
-    | Unknown (s, _) -> Unknown (s, Some reason_unknown)
-    | _ -> ans in
-  let ans = match ans, limit with
-    | (Unknown _ | HighFailure), { limit_time = tlimit }
-      when tlimit > 0 && time >= (0.9 *. float tlimit) -> Timeout
-    | _ -> ans in
+    | Unknown (s, _) ->
+       let reason_unknown = grep_reason_unknown out in
+       Unknown (s, Some reason_unknown)
+    | _ -> ans
+  in
+  (* Highfailures close to time limit are assumed to be timeouts *)
+  let tlimit = float limit.limit_time in
+  let ans, time =
+    match ans with
+    | HighFailure when tlimit > 0.0 && time >= 0.9 *. tlimit ->
+       Debug.dprintf
+	 debug
+	 "[Call_provers.parse_prover_run] highfailure after %f >= 0.9 timelimit -> set to Timeout@." time;
+       Timeout, tlimit
+    | _ -> ans,time
+  in
+  (* attempt to fix early timeouts / resp. unknown answers after timelimit *)
+  (* does not work well. Let's give the answer and time without change instead, and let
+     Session_scheduler.fuzzy_proof_time do the job instead
+  Debug.dprintf
+    debug
+    "[Call_provers.parse_prover_run] fixing timeout versus unknown answers (time=%f, tlimit=%f)@."
+    time tlimit;
+  let ans,time =
+    match ans with
+    | Unknown _ when tlimit > 0.0 && time >= 0.99 *. tlimit ->
+       Debug.dprintf
+	 debug
+	 "[Call_provers.parse_prover_run] unknown answer after %f >= 0.99 timelimit -> set to Timeout@." time;
+       Timeout, tlimit
+    | Timeout when time < tlimit ->
+       Debug.dprintf
+	 debug
+	 "[Call_provers.parse_prover_run] timeout answer after %f <= timelimit -> set to Unknown@." time;
+       Unknown("early timeout",Some Resourceout), time
+    | _ -> ans, time
+  in
+   ***)
+  (* get counterexample if any *)
   let model = res_parser.prp_model_parser out printer_mapping in
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;

@@ -3,33 +3,31 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="3" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="6" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.3.1" timelimit="120" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="10" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="1.00.prv" timelimit="120" steplimit="0" memlimit="1000"/>
-<prover id="12" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="13" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="14" name="Z3" version="4.3.2" timelimit="2" steplimit="0" memlimit="1000"/>
-<prover id="15" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../knuth_prime_numbers.mlw" expanded="true">
 <theory name="PrimeNumbers" sum="e361cfcaa48459f7d746ba4913899264" expanded="true">
  <goal name="exists_prime">
  <proof prover="3" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="1.09"/></proof>
  </goal>
- <goal name="WP_parameter prime_numbers" expl="VC for prime_numbers" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter prime_numbers" expl="VC for prime_numbers">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter prime_numbers.1" expl="1. array creation size">
-  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.2" expl="2. index in array bounds">
-  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="9"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -37,7 +35,7 @@
   <proof prover="9"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.4" expl="4. postcondition">
-  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   <proof prover="9"><result status="valid" time="0.04" steps="14"/></proof>
   </goal>
@@ -89,7 +87,7 @@
   <proof prover="9"><result status="valid" time="0.03" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.17" expl="17. precondition">
-  <proof prover="2"><result status="valid" time="1.25"/></proof>
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="1.25"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.18" expl="18. precondition">
   <proof prover="14" timelimit="5"><result status="valid" time="0.08"/></proof>
@@ -111,16 +109,9 @@
   </transf>
   </goal>
   <goal name="WP_parameter prime_numbers.23" expl="23. precondition">
-  <proof prover="2"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="timeout" time="5.02"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00"/></proof>
-  <proof prover="10"><result status="timeout" time="5.04"/></proof>
-  <proof prover="12"><result status="timeout" time="5.17"/></proof>
-  <proof prover="13"><result status="timeout" time="5.00"/></proof>
-  <proof prover="14" timelimit="5"><result status="timeout" time="5.01"/></proof>
-  <proof prover="15"><result status="timeout" time="5.10"/></proof>
   <transf name="split_goal_wp">
    <goal name="WP_parameter prime_numbers.23.1" expl="1. VC for prime_numbers">
+   <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
    <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="32"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.23.2" expl="2. VC for prime_numbers">
@@ -168,7 +159,7 @@
   <proof prover="9"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.37" expl="37. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.38" expl="38. precondition">
   <proof prover="10"><result status="valid" time="0.04"/></proof>
@@ -179,12 +170,12 @@
    <transf name="split_goal_wp">
     <goal name="WP_parameter prime_numbers.39.1.1" expl="1. VC for prime_numbers">
     <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="6"><result status="valid" time="0.01"/></proof>
+    <proof prover="6" timelimit="5"><result status="valid" time="0.01"/></proof>
     <proof prover="7"><result status="valid" time="0.03"/></proof>
     <proof prover="9" memlimit="1000"><result status="valid" time="0.09" steps="18"/></proof>
     </goal>
     <goal name="WP_parameter prime_numbers.39.1.2" expl="2. VC for prime_numbers">
-    <proof prover="6"><result status="valid" time="0.02"/></proof>
+    <proof prover="6" timelimit="5"><result status="valid" time="0.02"/></proof>
     <proof prover="7"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
@@ -201,7 +192,7 @@
     <proof prover="14"><result status="valid" time="0.01"/></proof>
     </goal>
     <goal name="WP_parameter prime_numbers.40.1.2" expl="2. VC for prime_numbers">
-    <proof prover="6" timelimit="120"><result status="valid" time="0.02"/></proof>
+    <proof prover="6"><result status="valid" time="0.02"/></proof>
     <proof prover="7"><result status="valid" time="0.03"/></proof>
     <metas>
      <ts_pos name="real" arity="0" id="2"
@@ -371,7 +362,7 @@
       <ip_library name="array"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="first_primes" id="6640"
+     <ls_pos name="first_primes" id="6639"
       ip_theory="PrimeNumbers">
       <ip_qualid name="first_primes"/>
      </ls_pos>
@@ -849,11 +840,11 @@
       <ip_library name="map"/>
       <ip_qualid name="Select_neq"/>
      </pr_pos>
-     <pr_pos name="exists_prime" id="6667"
+     <pr_pos name="exists_prime" id="6666"
       ip_theory="PrimeNumbers">
       <ip_qualid name="exists_prime"/>
      </pr_pos>
-     <pr_pos name="Bertrand_postulate" id="6680"
+     <pr_pos name="Bertrand_postulate" id="6679"
       ip_theory="PrimeNumbers">
       <ip_qualid name="Bertrand_postulate"/>
      </pr_pos>
@@ -933,7 +924,7 @@
       <meta_arg_ls id="3581"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="6640"/>
+      <meta_arg_ls id="6639"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="1745"/>
@@ -1215,10 +1206,10 @@
       <meta_arg_pr id="3134"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6667"/>
+      <meta_arg_pr id="6666"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6680"/>
+      <meta_arg_pr id="6679"/>
      </meta>
      <meta name="remove_type">
       <meta_arg_ts id="2"/>
@@ -1244,7 +1235,7 @@
      <goal name="WP_parameter prime_numbers.40.1.2" expl="2. VC for prime_numbers">
      <transf name="eliminate_builtin">
       <goal name="WP_parameter prime_numbers.40.1.2.1" expl="1. VC for prime_numbers">
-      <proof prover="6" timelimit="120"><result status="valid" time="0.02"/></proof>
+      <proof prover="6"><result status="valid" time="0.02"/></proof>
       <proof prover="7"><result status="valid" time="0.03"/></proof>
       <proof prover="9" timelimit="2" memlimit="1000"><result status="valid" time="1.18" steps="161"/></proof>
       </goal>
@@ -1422,7 +1413,7 @@
       <ip_library name="array"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="first_primes" id="6640"
+     <ls_pos name="first_primes" id="6639"
       ip_theory="PrimeNumbers">
       <ip_qualid name="first_primes"/>
      </ls_pos>
@@ -1900,11 +1891,11 @@
       <ip_library name="map"/>
       <ip_qualid name="Select_neq"/>
      </pr_pos>
-     <pr_pos name="exists_prime" id="6667"
+     <pr_pos name="exists_prime" id="6666"
       ip_theory="PrimeNumbers">
       <ip_qualid name="exists_prime"/>
      </pr_pos>
-     <pr_pos name="Bertrand_postulate" id="6680"
+     <pr_pos name="Bertrand_postulate" id="6679"
       ip_theory="PrimeNumbers">
       <ip_qualid name="Bertrand_postulate"/>
      </pr_pos>
@@ -1984,7 +1975,7 @@
       <meta_arg_ls id="3581"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="6640"/>
+      <meta_arg_ls id="6639"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="1745"/>
@@ -2266,10 +2257,10 @@
       <meta_arg_pr id="3134"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6667"/>
+      <meta_arg_pr id="6666"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6680"/>
+      <meta_arg_pr id="6679"/>
      </meta>
      <meta name="remove_type">
       <meta_arg_ts id="2"/>
@@ -2472,7 +2463,7 @@
       <ip_library name="array"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="first_primes" id="6640"
+     <ls_pos name="first_primes" id="6639"
       ip_theory="PrimeNumbers">
       <ip_qualid name="first_primes"/>
      </ls_pos>
@@ -2950,11 +2941,11 @@
       <ip_library name="map"/>
       <ip_qualid name="Select_neq"/>
      </pr_pos>
-     <pr_pos name="exists_prime" id="6667"
+     <pr_pos name="exists_prime" id="6666"
       ip_theory="PrimeNumbers">
       <ip_qualid name="exists_prime"/>
      </pr_pos>
-     <pr_pos name="Bertrand_postulate" id="6680"
+     <pr_pos name="Bertrand_postulate" id="6679"
       ip_theory="PrimeNumbers">
       <ip_qualid name="Bertrand_postulate"/>
      </pr_pos>
@@ -3034,7 +3025,7 @@
       <meta_arg_ls id="3581"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="6640"/>
+      <meta_arg_ls id="6639"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="1745"/>
@@ -3316,10 +3307,10 @@
       <meta_arg_pr id="3134"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6667"/>
+      <meta_arg_pr id="6666"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6680"/>
+      <meta_arg_pr id="6679"/>
      </meta>
      <meta name="remove_type">
       <meta_arg_ts id="2"/>
