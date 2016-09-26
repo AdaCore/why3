@@ -76,7 +76,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
+INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -491,9 +491,14 @@ install_no_local::
 
 TOOLSGENERATED = src/tools/why3wc.ml
 
+ifeq (@enable_infer@,yes)
 TOOLS_BIN = why3config why3execute why3extract why3prove \
 	    why3realize why3replay why3wc \
 		why3infer
+else
+TOOLS_BIN = why3config why3execute why3extract why3prove \
+		why3realize why3replay why3wc
+endif
 
 TOOLS_FILES = main $(TOOLS_BIN)
 
@@ -519,8 +524,10 @@ bin/why3execute.opt: lib/why3/why3.cmxa src/tools/why3execute.cmx
 bin/why3execute.byte: lib/why3/why3.cma src/tools/why3execute.cmo
 bin/why3extract.opt: lib/why3/why3.cmxa src/tools/why3extract.cmx
 bin/why3extract.byte: lib/why3/why3.cma src/tools/why3extract.cmo
+ifeq (@enable_infer@,yes)
 bin/why3infer.opt: lib/why3/why3.cmxa src/tools/why3infer.cmx
 bin/why3infer.byte: lib/why3/why3.cma src/tools/why3infer.cmo
+endif
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
 bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
 bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
@@ -534,6 +541,7 @@ clean_old_install::
 	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE)) $(BINDIR)/why3$(EXE)
 	rm -f $(BINDIR)/why3bench$(EXE) $(BINDIR)/why3replayer$(EXE)
 
+ifeq (@enable_infer@,yes)
 install_no_local::
 	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
@@ -544,6 +552,17 @@ install_no_local::
 	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
 	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
 	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+else
+install_no_local::
+	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
+	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
+	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
+	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
+	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
+	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
+	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+endif
 
 install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
