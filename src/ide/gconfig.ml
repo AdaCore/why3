@@ -1126,7 +1126,7 @@ let uninstalled_prover c eS unknown =
     in
     let label = "Please select a policy for associated proof attempts" in
     let policy_frame = GBin.frame ~label ~packing:vbox_pack () in
-    let choice = ref 0 in
+    let choice = ref 1 in
     let prover_choosed = ref None in
     let set_prover prover () = prover_choosed := Some prover in
     let box =
