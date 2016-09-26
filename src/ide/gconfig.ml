@@ -1133,17 +1133,17 @@ let uninstalled_prover c eS unknown =
       GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
         ~packing:policy_frame#add ()
     in
-    let choice0 = GButton.radio_button
-      ~label:"keep proofs as they are, do not try to play them"
-      ~active:true
-      ~packing:box#add () in
     let choice1 = GButton.radio_button
       ~label:"move proofs to the selected prover below"
-      ~active:false ~group:choice0#group
+      ~active:true
       ~packing:box#add () in
     let choice2 = GButton.radio_button
       ~label:"duplicate proofs to the selected prover below"
-      ~active:false ~group:choice0#group
+      ~active:false ~group:choice1#group
+      ~packing:box#add () in
+    let choice0 = GButton.radio_button
+      ~label:"keep proofs as they are, do not try to play them"
+      ~active:false  ~group:choice1#group
       ~packing:box#add () in
     let first = ref None in
     let alternatives_section acc label alternatives =
@@ -1154,21 +1154,21 @@ let uninstalled_prover c eS unknown =
             ~packing:frame#add ()
         in
         let iter_alter prover =
-          let choice =
+          let choice_button =
             let label = Pp.string_of_wnl print_prover prover in
             match !first with
               | None ->
-                let choice =
+                let choice_button =
                   GButton.radio_button ~label ~active:true ~packing:box#add ()
                 in
                 prover_choosed := Some prover;
-                first := Some choice;
-                choice
+                first := Some choice_button;
+                choice_button
               | Some first ->
                 GButton.radio_button ~label ~group:first#group
                   ~active:false ~packing:box#add ()
           in
-          ignore (choice#connect#toggled ~callback:(set_prover prover))
+          ignore (choice_button#connect#toggled ~callback:(set_prover prover))
         in
         List.iter iter_alter alternatives;
         frame#misc :: (* box#misc :: *) acc
@@ -1179,7 +1179,6 @@ let uninstalled_prover c eS unknown =
     let boxes = alternatives_section boxes "Different name" others in
     let hide_provers () = List.iter (fun b -> b#set_sensitive false) boxes in
     let show_provers () = List.iter (fun b -> b#set_sensitive true) boxes in
-    hide_provers ();
     ignore (choice0#connect#toggled
               ~callback:(fun () -> choice := 0; hide_provers ()));
     ignore (choice1#connect#toggled
