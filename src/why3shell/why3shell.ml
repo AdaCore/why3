@@ -502,6 +502,10 @@ let commands =
     "ngr", "get to the next goal right", ngr_ret_p;
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
     "tf", "test a transformation having a formula as argument", test_transformation_with_term_arg;
+    "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
+    "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
+    "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));
+    "zr", "navigation right, right brother", (fun _ _ -> ignore (zipper_right ()))
   ]
 
 let commands_table = Stdlib.Hstr.create 17
