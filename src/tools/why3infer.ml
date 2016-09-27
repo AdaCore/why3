@@ -74,9 +74,9 @@ let do_input f =
                   match cexp.c_node with
                   | Cfun e ->
                     let cfg = Abstract_interpreter.start_cfg rsym in
-                    let i = Abstract_interpreter.put_expr_in_cfg cfg e in
+                    let i = snd (Abstract_interpreter.put_expr_in_cfg cfg e) in
                     Abstract_interpreter.eval_fixpoints cfg;
-                    let d = Abstract_interpreter.get_domain i in
+                    let d = Abstract_interpreter.get_domain cfg i in
                     Format.printf "%s@." @@ Abstract_interpreter.domain_to_string d
                   | Cany ->
                     Format.eprintf "rs:";
@@ -105,6 +105,4 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-let () = Abstract_interpreter.launch ()
 

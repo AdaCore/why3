@@ -4,32 +4,210 @@ open Apron
 
 (* Apron manager *)
 let manpk = Polka.manager_alloc_strict()
+type apron_domain = Polka.strict Polka.t
 
 type control_point = int
 
-type domain
+type domain = unit
 
 type cfg = {
+  (* not one to one *)
   expr_to_control_point: (Expr.expr, control_point) Hashtbl.t;
-  mutable control_point_count: control_point;
-  mutable vars: Var.t list;
+  g:(int,int,unit,unit,unit) PSHGraph.t;
+  mutable control_point_count: int;
+  mutable hedge_count: int;
+  mutable env: Environment.t;
+  mutable apply: apron_domain Apron.Manager.t -> int -> apron_domain Apron.Abstract1.t array -> unit * apron_domain Apron.Abstract1.t
 }
 
+exception Unknown_hedge
+   
+(* Some useful constants to express return values and linear expressions *)
+let zero = Coeff.Scalar (Scalar.of_int 0) 
+let one = Coeff.Scalar (Scalar.of_int 1)
+let neg_one = Coeff.Scalar (Scalar.of_int (-1))
+let var_return = Var.of_string "$return"
+
+(* Initialize an hedge *)
 let start_cfg rs =
   { expr_to_control_point = Hashtbl.create 100;
     control_point_count = 0;
-    vars = []; }
+    hedge_count = 0;
+    g = PSHGraph.create PSHGraph.stdcompare 3 ();
+    apply = (fun _ _ a -> raise Unknown_hedge);
+    env = Environment.make [|var_return|] [||]; }
+
+let vs_to_var vs =
+  Var.of_string Ident.(Term.(vs.vs_name.id_string))
+
+let pv_to_var psym =
+  vs_to_var Ity.(psym.pv_vs)
+
+let new_node_cfg cfg expr =
+    let i = cfg.control_point_count in
+    Hashtbl.add cfg.expr_to_control_point expr i;
+    cfg.control_point_count <- i + 1;
+    (* save in the cfg *)
+    PSHGraph.add_vertex cfg.g i ();
+    i
+
+let new_hedge_cfg cfg (a, b) f =
+    let hedge = cfg.hedge_count in
+    cfg.hedge_count <- cfg.hedge_count + 1;
+    PSHGraph.add_hedge cfg.g hedge () ~pred:[|a|] ~succ:[|b|];
+    let old_apply = cfg.apply in
+    cfg.apply <- begin fun man h tabs ->
+      if h = hedge then
+        let abs = tabs.(0) in
+        (), f man abs
+      else old_apply man h tabs
+    end
+
+let unepsilon_term var_string = 7
+
+exception Not_handled
+
+let linear_expressions_from_term cfg t =
+  let open Term in
+
+  match t.t_node with
+  | Teps(tb) ->
+    let return, t = Term.t_open_bound tb in
+
+    let rec aux t =
+      try
+        match t.t_node with
+        | Tbinop(Tand, a, b) ->
+          aux a @ aux b
+        | Tapp(func, args) ->
+
+          let cst = ref 0 in
+          let constr = ref [] in
+          if ls_equal ps_equ func then
+            match args with
+            | [a; b] ->
+              let term_to_int coeff t = match t.t_node with
+                | Tvar(a) ->
+                  begin
+                  let var = vs_to_var a in
+                  try
+                    let c = List.assoc var !constr in
+                    constr := (var, c+coeff) :: (List.remove_assoc var !constr);
+                  with
+                  | Not_found ->
+                    constr := (var, coeff) :: !constr
+                  end
+                | _ -> raise Not_handled
+              in
+              term_to_int 1 a; term_to_int (-1) b;
+              let expr = Linexpr1.make cfg.env in
+              let constr = List.map (fun (var, coeff) ->
+                  Coeff.Scalar (Scalar.of_int coeff), var) !constr in
+              Linexpr1.set_list expr constr None;
+              let cons = Lincons1.make expr Lincons1.EQ in
+              Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int !cst));
+              [cons]
+            | _ -> raise Not_handled
+          else
+            raise Not_handled
+
+        | _ ->
+          raise Not_handled
+      with
+      | Not_handled ->
+        Format.eprintf "Couldn't understand the entire post condition: ";
+        Pretty.print_term Format.err_formatter t;
+        Format.eprintf "@.";
+        []
+    in
+
+    aux t
+  | _ ->
+    Format.eprintf "Couldn't understand post condition.@.";
+    []
+
+
 
 let rec put_expr_in_cfg cfg expr =
   let open Expr in
   match expr.e_node with
-  | Elet(LDsym(_), b) ->
-    let i = cfg.control_point_count in
-    cfg.control_point_count <- i + 1;
-    put_expr_in_cfg cfg b
+  | Elet(LDvar(psym, let_expr), b) ->
+    if Ity.(ity_equal psym.pv_ity ity_int) then
+      begin
+        let let_begin_cp, let_end_cp = put_expr_in_cfg cfg let_expr in
+
+        (* compute the child and add an hyperedge, to set the value of psym
+         * to the value returned by let_expr *)
+        let b_begin_cp, b_end_cp = put_expr_in_cfg cfg b in
+        (* Save the effect of the let *)
+        new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
+            let expr = Linexpr1.make cfg.env in
+            Linexpr1.set_list expr [(one, var_return)] (Some(zero));
+            let p = pv_to_var psym in
+            Abstract1.assign_linexpr man abs p expr None
+          );
+        let_begin_cp, b_end_cp
+      end
+    else
+      put_expr_in_cfg cfg b
+  | Evar(psym) ->
+    if Ity.(ity_equal psym.pv_ity ity_int) then
+      begin
+        let begin_cp = new_node_cfg cfg expr in
+        let end_cp = new_node_cfg cfg expr in
+        new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+            let expr = Linexpr1.make cfg.env in
+            let p = pv_to_var psym in
+            Linexpr1.set_list expr [(one, p)] (Some(zero));
+            Abstract1.assign_linexpr man abs var_return expr None
+          );
+        begin_cp, end_cp
+      end
+    else
+      let i = new_node_cfg cfg expr in
+      i, i
+  | Econst(Number.ConstInt(n)) ->
+    let coeff =
+      Number.compute_int n
+      |> BigInt.to_int
+      |> Coeff.s_of_int
+    in
+    let begin_cp = new_node_cfg cfg expr in
+    let end_cp = new_node_cfg cfg expr in
+    new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+        let expr = Linexpr1.make cfg.env in
+        Linexpr1.set_list expr [] (Some(coeff));
+        Abstract1.assign_linexpr man abs var_return expr None
+      );
+    begin_cp, end_cp
+  | Eexec({c_node = Capp(rsym, args); _}, { Ity.cty_post = post; Ity.cty_result = ity; _ }) ->
+    if Ity.(ity_equal ity ity_int) then
+      begin
+        let constraints =
+          List.map (linear_expressions_from_term cfg) post
+          |> List.concat
+        in
+        let cons_arr = Lincons1.array_make cfg.env (List.length constraints) in
+        List.iteri (Lincons1.array_set cons_arr) constraints;
+        Expr.print_rs Format.err_formatter rsym;
+        let begin_cp = new_node_cfg cfg expr in
+        let end_cp = new_node_cfg cfg expr in
+        new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+            let abs = Abstract1.forget_array man abs [|var_return|] false in
+            Abstract1.meet_lincons_array man abs cons_arr
+          );
+        begin_cp, end_cp
+      end
+    else
+      let i = new_node_cfg cfg expr in
+      i, i
   | _ ->
-    Format.eprintf "unhandled expr";
-    cfg.control_point_count - 1
+    Expr.print_expr Format.err_formatter expr;
+    Format.eprintf "unhandled expr@.";
+
+    let i = new_node_cfg cfg expr in
+
+    i, i
 
 let eval_fixpoints cfg = ()
 
@@ -50,41 +228,6 @@ let env = Environment.make
   [||] (* real variables *)
 ;;
 
-(** {2 The equation system, modelled as an hypergraph} *)
-
-(* Creation of the following equation graph:
-   X0: x=0;
-   X1: y=0;
-   X2: while (x<=99) do
-   X3:   incr x;
-   X4:   if (x<=49) then
-   X5:     incr y;
-	else
-   X7      decr y;
-	endif
-   X9  done
-   X10
-
-*)
-
-(* Define the structure of the hypergraph (wrt our code) *)
-let initial_info = ();;
-let (g:(int,int,unit,unit,unit) PSHGraph.t) = PSHGraph.create PSHGraph.stdcompare 10 initial_info;;
-
-let attr_vertex = () and attr_hedge = () in
-for i=0 to 10 do PSHGraph.add_vertex g i attr_vertex done;
-PSHGraph.add_hedge g 01 attr_hedge ~pred:[|0|] ~succ:[|1|];
-PSHGraph.add_hedge g 12 attr_hedge ~pred:[|1|] ~succ:[|2|];
-PSHGraph.add_hedge g 23 attr_hedge ~pred:[|2|] ~succ:[|3|];
-PSHGraph.add_hedge g 210 attr_hedge ~pred:[|2|] ~succ:[|10|];
-PSHGraph.add_hedge g 34 attr_hedge ~pred:[|3|] ~succ:[|4|];
-PSHGraph.add_hedge g 45 attr_hedge ~pred:[|4|] ~succ:[|5|];
-PSHGraph.add_hedge g 59 attr_hedge ~pred:[|5|] ~succ:[|9|];
-PSHGraph.add_hedge g 47 attr_hedge ~pred:[|4|] ~succ:[|7|];
-PSHGraph.add_hedge g 79 attr_hedge ~pred:[|7|] ~succ:[|9|];
-PSHGraph.add_hedge g 92 attr_hedge ~pred:[|9|] ~succ:[|2|];
-;;
-
 (* Define the application function for each edge of the hyper graph
     i.e. how to label the hyper edges
 *)
@@ -92,89 +235,54 @@ let apply man hedge tabs =
   let abs = tabs.(0) in
   let nabs hedge =
     let zero = Coeff.Scalar (Scalar.of_int 0) and
-	one = Coeff.Scalar (Scalar.of_int 1)  and
-	neg_one = Coeff.Scalar (Scalar.of_int (-1))
+    one = Coeff.Scalar (Scalar.of_int 1)  and
+    neg_one = Coeff.Scalar (Scalar.of_int (-1))
     in
     let expr = Linexpr1.make env in
     match hedge with
-      | 01 -> (* x = 0; *)
-	      begin
-		Linexpr1.set_list expr [(zero, var_x); (zero, var_y)] (Some(zero));
-		Abstract1.assign_linexpr man abs var_x expr None
-	      end;
-      | 12 -> (* y = 0; *)
-	      begin
-		Linexpr1.set_list expr [(zero, var_x); (zero, var_y)] (Some(zero));
-		Abstract1.assign_linexpr man abs var_y expr None
-	      end;
-      | 23 -> (* -x >= -99; *)
-	      begin
-		Linexpr1.set_list expr [(neg_one, var_x); (zero, var_y)] None;
-		let cons = Lincons1.make expr Lincons1.SUPEQ in
-		begin
-		  Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (99)));
-		  let cons_arr = Lincons1.array_make env 1 in
-		  begin
-		    Lincons1.array_set cons_arr 0 cons;
-		    Abstract1.meet_lincons_array man abs cons_arr;
-		  end;
-		end;
-	      end;
-
-      | 210 -> (* x >= 100 *)
-	       begin
-		 Linexpr1.set_list expr [(one, var_x); (zero, var_y)] None;
-		 let cons = Lincons1.make expr Lincons1.SUPEQ in
-		 begin
-		   Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (-100)));
-		   let cons_arr = Lincons1.array_make env 1 in
-		   begin
-		     Lincons1.array_set cons_arr 0 cons;
-		     Abstract1.meet_lincons_array man abs cons_arr;
-		   end;
-		 end;
-	       end;
-      | 34 -> (* x := x+1 *)
-	      begin
-		Linexpr1.set_list expr [(one, var_x); (zero, var_y)] (Some(one));
-		Abstract1.assign_linexpr man abs var_x expr None
-	      end;
-      | 45 -> (* -x >= -49; *)
-	      begin
-		Linexpr1.set_list expr [(neg_one, var_x); (zero, var_y)] None;
-		let cons = Lincons1.make expr Lincons1.SUPEQ in
-		begin
-		  Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (49)));
-		  let cons_arr = Lincons1.array_make env 1 in
-		  begin
-		    Lincons1.array_set cons_arr 0 cons;
-		    Abstract1.meet_lincons_array man abs cons_arr;
-		  end;
-		end;
-	      end;
+    | 01 -> (* x = 0; *)
+      Linexpr1.set_list expr [(zero, var_x); (zero, var_y)] (Some(zero));
+      Abstract1.assign_linexpr man abs var_x expr None
+    | 12 -> (* y = 0; *)
+      Linexpr1.set_list expr [(zero, var_x); (zero, var_y)] (Some(zero));
+      Abstract1.assign_linexpr man abs var_y expr None
+    | 23 -> (* -x >= -99; *)
+      Linexpr1.set_list expr [(neg_one, var_x); (zero, var_y)] None;
+      let cons = Lincons1.make expr Lincons1.SUPEQ in
+      Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (99)));
+      let cons_arr = Lincons1.array_make env 1 in
+      Lincons1.array_set cons_arr 0 cons;
+      Abstract1.meet_lincons_array man abs cons_arr;
+    | 210 -> (* x >= 100 *)
+      Linexpr1.set_list expr [(one, var_x); (zero, var_y)] None;
+      let cons = Lincons1.make expr Lincons1.SUPEQ in
+      Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (-100)));
+      let cons_arr = Lincons1.array_make env 1 in
+      Lincons1.array_set cons_arr 0 cons;
+      Abstract1.meet_lincons_array man abs cons_arr;
+    | 34 -> (* x := x+1 *)
+      Linexpr1.set_list expr [(one, var_x); (zero, var_y)] (Some(one));
+      Abstract1.assign_linexpr man abs var_x expr None
+    | 45 -> (* -x >= -49; *)
+      Linexpr1.set_list expr [(neg_one, var_x); (zero, var_y)] None;
+      let cons = Lincons1.make expr Lincons1.SUPEQ in
+      Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (49)));
+      let cons_arr = Lincons1.array_make env 1 in
+      Lincons1.array_set cons_arr 0 cons;
+      Abstract1.meet_lincons_array man abs cons_arr;
     | 59 -> (* y := y+1 *)
-	    begin
-	      Linexpr1.set_list expr [(zero, var_x); (one, var_y)] (Some(one));
-	      Abstract1.assign_linexpr man abs var_y expr None
-	    end;
+      Linexpr1.set_list expr [(zero, var_x); (one, var_y)] (Some(one));
+      Abstract1.assign_linexpr man abs var_y expr None
     | 47 -> (* x >= 50 *)
-	       begin
-		 Linexpr1.set_list expr [(one, var_x); (zero, var_y)] None;
-		 let cons = Lincons1.make expr Lincons1.SUPEQ in
-		 begin
-		   Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (-50)));
-		   let cons_arr = Lincons1.array_make env 1 in
-		   begin
-		     Lincons1.array_set cons_arr 0 cons;
-		     Abstract1.meet_lincons_array man abs cons_arr;
-		   end;
-		 end;
-	       end;
+      Linexpr1.set_list expr [(one, var_x); (zero, var_y)] None;
+      let cons = Lincons1.make expr Lincons1.SUPEQ in
+      Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int (-50)));
+      let cons_arr = Lincons1.array_make env 1 in
+      Lincons1.array_set cons_arr 0 cons;
+      Abstract1.meet_lincons_array man abs cons_arr;
     | 79 -> (* y := y-1 *)
-	    begin
-	      Linexpr1.set_list expr [(zero, var_x); (one, var_y)] (Some(neg_one));
-	      Abstract1.assign_linexpr man abs var_y expr None
-	    end;
+      Linexpr1.set_list expr [(zero, var_x); (one, var_y)] (Some(neg_one));
+      Abstract1.assign_linexpr man abs var_y expr None
     | 92 -> abs
     | _ -> failwith ""
   in
@@ -231,6 +339,7 @@ let get_fixpoint_man man =
   in manager
 ;;
 
+(*
 let essai1 man =
   let manager = get_fixpoint_man man in
   let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
@@ -303,3 +412,4 @@ let essai3 man =
 let launch () =
   essai3 manpk;
   ()
+*)
