@@ -61,11 +61,6 @@ let do_input f =
           let open Expr in
           match decl.pd_node with
           | PDlet(let_expr) ->
-            (*
-            Format.printf "rs:@.";
-            Expr.print_rs Format.std_formatter a;
-            Format.printf "@.";
-            *)
             begin match let_expr with
               | LDvar(_) -> Format.eprintf "ldvar not handled@."
               | LDsym(rsym_, cexp) ->
@@ -73,7 +68,13 @@ let do_input f =
                 begin
                   match cexp.c_node with
                   | Cfun e ->
+                    Expr.print_expr Format.err_formatter e;
+                    Format.eprintf "@.";
+                    let module Abstract_interpreter =
+                      Abstract_interpreter.Abstract_interpreter(struct let env = env end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
+                    List.iter (Abstract_interpreter.add_variable cfg)
+                      Ity.(cexp.c_cty.cty_args);
                     let i = snd (Abstract_interpreter.put_expr_in_cfg cfg e) in
                     Abstract_interpreter.eval_fixpoints cfg;
                     let d = Abstract_interpreter.get_domain cfg i in
