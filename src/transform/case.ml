@@ -31,33 +31,30 @@ let cut t task =
   let goal = Task.add_tdecl (Task.add_decl task h_t) g in
   [goal; goal_cut]
 
-(* Transform (exists v, f) into f[x/v] *)
+let subst_quant c tq x : term =
+  let (vsl, tr, te) = t_open_quant tq in
+  (match vsl with
+  | hdv :: tl ->
+      (try
+        (let new_t = t_subst_single hdv x te in
+        t_quant_close c tl tr new_t)
+      with
+      | Ty.TypeMismatch (_ty1, _ty2) -> failwith "type mismatch") (* TODO match errors *)
+  | [] -> failwith "no")
+
+
+(* Transform the term (exists v, f) into f[x/v] *)
 let subst_exist t x =
   match t.t_node with
   | Tquant (Texists, tq) ->
-      let (vsl, tr, te) = t_open_quant tq in
-      (match vsl with
-      | hdv :: tl ->
-          (try
-            (let new_t = t_subst_single hdv x te in
-              t_exists_close tl tr new_t)
-          with
-          | Ty.TypeMismatch (_ty1, _ty2) -> failwith "type mismatch") (* TODO match errors *)
-      | [] -> failwith "no")
+      subst_quant Texists tq x
   | _ -> failwith "term do not begin with exists"
 
+(* Transform the term (forall v, f) into f[x/v] *)
 let subst_forall t x =
   match t.t_node with
   | Tquant (Tforall, tq) ->
-      let (vsl, tr, te) = t_open_quant tq in
-      (match vsl with
-      | hdv :: tl ->
-          (try
-            (let new_t = t_subst_single hdv x te in
-              t_forall_close tl tr new_t)
-          with
-          | Ty.TypeMismatch (_ty1, _ty2) -> failwith "type mismatch") (* TODO match errors *)
-      | [] -> failwith "Should not happen")
+      subst_quant Tforall tq x
   | _ -> failwith "term do not begin with forall"
 
 (* From task [delta |- exists x. G] and term t, build the task [delta] |- G[x -> t]]
