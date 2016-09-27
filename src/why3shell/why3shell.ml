@@ -440,6 +440,44 @@ let parse_transformation_string args : string option =
      Some s
   | _ -> let _ = printf "term argument expected@." in None
 
+let test_simple_apply fmt args =
+  (* temporary : parses a string *)
+  match args with
+  | [s';s] ->
+     let s =
+       let l = String.length s in
+       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
+         String.sub s 1 (l - 2)
+       else s
+     in
+     let s' =
+       let l = String.length s' in
+       if l >= 2 && s'.[0] = '"' && s'.[l - 1] = '"' then
+         String.sub s' 1 (l - 2)
+       else s'
+     in
+     printf "parsing string \"%s\"@." s;
+     begin try
+       let lb = Lexing.from_string s in
+       let t = Lexer.parse_term lb in
+       printf "parsing OK@.";
+       let env = cont.controller_env in
+       let th = Theory.create_theory (Ident.id_fresh "dummy") in
+       let int_theory = Env.read_theory env ["int"] "Int" in
+       let th = Theory.use_export th int_theory in
+       let t = typing_terms t th in
+       let _ = printf "typing OK: %a@." Pretty.print_term t in
+       let id = nearest_goal () in
+     let callback status =
+       fprintf fmt "transformation status: %a@."
+         Controller_itp.print_trans_status status
+     in
+     C.schedule_transformation cont id "simple_apply" [Trans.TAstring s'; Trans.TAterm t] ~callback
+     with e ->
+       let _ = printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e in
+       ()
+     end
+  | _ -> let _ = printf "term argument expected@." in ()
 
 let test_remove_with_string_args fmt args =
   match (parse_transformation_string args) with
@@ -533,7 +571,8 @@ let commands =
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
     "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
     "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));
-    "zr", "navigation right, right brother", (fun _ _ -> ignore (zipper_right ()))
+    "zr", "navigation right, right brother", (fun _ _ -> ignore (zipper_right ()));
+    "sa", "test simple_apply", test_simple_apply
   ]
 
 let commands_table = Stdlib.Hstr.create 17

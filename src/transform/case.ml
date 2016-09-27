@@ -46,6 +46,20 @@ let subst_exist t x =
       | [] -> failwith "no")
   | _ -> failwith "term do not begin with exists"
 
+let subst_forall t x =
+  match t.t_node with
+  | Tquant (Tforall, tq) ->
+      let (vsl, tr, te) = t_open_quant tq in
+      (match vsl with
+      | hdv :: tl ->
+          (try
+            (let new_t = t_subst_single hdv x te in
+              t_forall_close tl tr new_t)
+          with
+          | Ty.TypeMismatch (_ty1, _ty2) -> failwith "type mismatch") (* TODO match errors *)
+      | [] -> failwith "Should not happen")
+  | _ -> failwith "term do not begin with forall"
+
 (* From task [delta |- exists x. G] and term t, build the task [delta] |- G[x -> t]]
    Return an error if x and t are not unifiable. *)
 let exists x task =
@@ -79,7 +93,7 @@ let rec remove_task_decl task (name: string) : task_hd option =
     Task.mk_task decl (remove_task_decl task name) known clone meta
   | None -> None
 
-(* TODO check this works in particular when hypothesis names
+(* TODO check if this works in particular when hypothesis names
     are extracted from same name. Seemed not to work before
   adding "print_task". To be resolved in a better way. *)
 (* from task [delta, name:A |- G]  build the task [delta |- G] *)
@@ -91,10 +105,33 @@ let remove name task =
   let task = remove_task_decl task name in
   [Task.add_tdecl task g]
 
-let simple_apply _name _t task = (* ? *)
-  [task;task]
-  (* TODO : from task [delta, name:forall x.A |- G,
+let pr_prsymbol pr =
+  match pr with
+  | Decl {d_node = Dprop (_pk, pr, _t)} -> Some pr
+  | _ -> None
+
+(* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
+let simple_apply name t task =
+  (* Force setting of pprinter *)
+  let _ = Pretty.print_task Format.str_formatter task in
+  let _ = ignore (Format.flush_str_formatter ()) in
+  let g, task = Task.task_separate_goal task in
+  let ndecl = ref None in
+  let _ = task_iter (fun x -> if (
+    match (pr_prsymbol x.td_node) with
+    | None -> false
+    | Some pr -> string_pr pr = name) then ndecl := Some x) task in
+  match !ndecl with
+  | None -> Format.printf "Hypothesis %s not found@." name; [Task.add_tdecl task g]
+  | Some decl -> (match decl.td_node with
+    | Decl {d_node = Dprop (pk, _pr, ht)} ->
+      let t_subst = subst_forall ht t in
+      let new_pr = create_prsymbol (Ident.id_fresh name) in
+      let new_decl = create_prop_decl pk new_pr t_subst in
+      let task = add_decl task new_decl in
+        [Task.add_tdecl task g]
+    | _ -> Format.printf "Not an hypothesis@."; [Task.add_tdecl task g])
 
 let apply _name task = (* ? *)
   [task;task]
@@ -121,8 +158,14 @@ let remove' args task =
   | [TAstring name] -> remove name task
   | _ -> failwith "wrong argument for remove"
 
+let simple_apply' args task =
+  match args with
+  | [TAstring name; TAterm t] -> simple_apply name t task
+  | _ -> failwith "wrong arguments of simple_apply"
+
 let () = register_transform_with_args ~desc:"test case" "case" case'
 let () = register_transform_with_args ~desc:"test cut" "cut" cut'
 let () = register_transform_with_args ~desc:"test exists" "exists" exists'
 let () = register_transform_with_args ~desc:"test remove" "remove" remove'
+let () = register_transform_with_args ~desc:"test simple_apply" "simple_apply" simple_apply'
 let () = register_transform_with_args ~desc:"test duplicate" "duplicate" duplicate
