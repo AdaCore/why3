@@ -32,7 +32,7 @@ type running_goals =
 
 let state = { num = 0; map = Intmap.create 17 }
 
-let run_goal ~cntexample prover g =
+let run_goal ~cntexample ?limit prover g =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal *)
   let base_prover = prover.Session.prover_config in
@@ -45,7 +45,11 @@ let run_goal ~cntexample prover g =
        Some fn, true, Call_provers.empty_limit
     | _ ->
         let prover = base_prover.Whyconf.prover.Whyconf.prover_name in
-        None, false, Gnat_config.limit ~prover in
+        let limit =
+          match limit with
+          | None -> Gnat_config.limit ~prover
+          | Some x -> x in
+        None, false, limit in
   let id =
     Driver.prove_task
       ~command:(Whyconf.get_complete_command base_prover

@@ -234,10 +234,7 @@ let find_driver_file fn =
     let driver_file = Filename.basename fn in
     file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
 
-(* Depending on what kinds of provers are requested, environment loading is a
- * bit different, hence we do this all together here *)
-
-let provers, prover_ce, config, env =
+let computer_prover_str_list () =
   (* this is a string list of the requested provers by the user *)
   let prover_str_list =
     match !opt_prover with
@@ -249,10 +246,43 @@ let provers, prover_ce, config, env =
     List.map (fun s -> if s = "alt-ergo" then "altergo" else s) prover_str_list
   in
   (* in --prepare-shared mode, we don't care about built-in provers *)
-  let prover_str_list =
-    if !opt_prepare_shared then
-      List.filter (fun x -> not (is_builtin_prover x)) prover_str_list
-    else prover_str_list in
+  if !opt_prepare_shared then
+    List.filter (fun x -> not (is_builtin_prover x)) prover_str_list
+  else prover_str_list
+
+let compute_base_provers config str_list =
+  if str_list = [] && !opt_replay then
+    let base_provers =
+      Whyconf.Mprover.fold (fun _ v acc -> v :: acc)
+        (Whyconf.get_provers config) [] in
+    base_provers, None
+  else try
+    let filter_prover prover_string =
+      Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover_string) in
+    let base_provers = List.map filter_prover str_list in
+    (* the prover for counterexample generation *)
+    let base_prover_ce =
+      if !opt_ce_mode then
+        Some (filter_prover "cvc4_ce")
+      else
+        None in
+    base_provers, base_prover_ce
+  with
+  | Not_found ->
+    Gnat_util.abort_with_message ~internal:false
+      "Default prover not installed or not configured."
+  | Whyconf.ProverNotFound _ ->
+    Gnat_util.abort_with_message ~internal:false
+      "Selected prover not installed or not configured."
+  | Whyconf.ProverAmbiguity _ ->
+    Gnat_util.abort_with_message ~internal:false
+      "Several provers match the selection."
+
+(* Depending on what kinds of provers are requested, environment loading is a
+ * bit different, hence we do this all together here *)
+
+let provers, prover_ce, config, env =
+  let prover_str_list = computer_prover_str_list () in
   (* did the user request some prover which is not shipped with SPARK? *)
   let builtin_provers_only =
     prover_str_list = [] || List.for_all is_builtin_prover prover_str_list in
@@ -286,27 +316,7 @@ let provers, prover_ce, config, env =
   (* now we build the Whyconf.config_prover for all requested provers
    * and for the prover for counterexample generation *)
   let base_provers, base_prover_ce =
-    try
-      let filter_prover prover_string =
-	Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover_string) in
-      let base_provers = List.map filter_prover prover_str_list in
-      (* the prover for counterexample generation *)
-      let base_prover_ce =
-	if !opt_ce_mode then
-	  Some (filter_prover "cvc4_ce")
-	else
-	  None in
-      base_provers, base_prover_ce
-    with
-    | Not_found ->
-      Gnat_util.abort_with_message ~internal:false
-        "Default prover not installed or not configured."
-    | Whyconf.ProverNotFound _ ->
-      Gnat_util.abort_with_message ~internal:false
-        "Selected prover not installed or not configured."
-    | Whyconf.ProverAmbiguity _ ->
-      Gnat_util.abort_with_message ~internal:false
-        "Several provers match the selection." in
+    compute_base_provers config prover_str_list in
   let env =
     let config_main = Whyconf.get_main (config) in
     (* load plugins; may be needed for external provers *)
@@ -463,6 +473,7 @@ let manual_prover =
   | [x] when x.Session.prover_config.Whyconf.interactive -> Some x
   | _ :: _ :: _ when
      List.exists (fun p -> p.Session.prover_config.Whyconf.interactive) provers
+     && not !opt_replay
      ->
        Gnat_util.abort_with_message ~internal:false
         "manual provers cannot be combined with other provers"

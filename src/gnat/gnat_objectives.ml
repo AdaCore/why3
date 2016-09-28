@@ -1,5 +1,4 @@
 open Why3
-open Model_parser
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -619,15 +618,6 @@ let matches_subp_filter subp =
 
 module Save_VCs = struct
 
-   type prover_stat =
-     {
-       mutable count     : int;
-       mutable max_time  : float;
-       mutable max_steps : int;
-    }
-
-   type stats = prover_stat Whyconf.Hprover.t
-
    exception Found of Whyconf.prover *  Call_provers.prover_result
 
    let find_successful_proof goal =
@@ -647,11 +637,11 @@ module Save_VCs = struct
 let add_to_prover_stat pr stat =
   (* add the result of the prover run to the statistics record for some prover
      *)
-  stat.count <- stat.count + 1;
-  if pr.Call_provers.pr_time > stat.max_time then
-    stat.max_time <- pr.Call_provers.pr_time;
-  if pr.Call_provers.pr_steps > stat.max_steps then
-    stat.max_steps <- pr.Call_provers.pr_steps
+  stat.Gnat_report.count <- stat.Gnat_report.count + 1;
+  if pr.Call_provers.pr_time > stat.Gnat_report.max_time then
+    stat.Gnat_report.max_time <- pr.Call_provers.pr_time;
+  if pr.Call_provers.pr_steps > stat.Gnat_report.max_steps then
+    stat.Gnat_report.max_steps <- pr.Call_provers.pr_steps
 
 let add_to_stat prover pr stat =
   (* add the result pr of the prover run of "prover" to the statistics table *)
@@ -659,7 +649,7 @@ let add_to_stat prover pr stat =
     add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
   else
     Whyconf.Hprover.add stat prover
-      { count = 1;
+      { Gnat_report.count = 1;
         max_time = pr.Call_provers.pr_time;
         max_steps = pr.Call_provers.pr_steps }
 
@@ -753,11 +743,6 @@ let add_to_stat prover pr stat =
 	(trace_fn, trace)
       end
       else ("", Gnat_loc.S.empty)
-
-   let spark_counterexample_transform me_name =
-     (* Just return the name of the model element. Transformation of model
-        element names to SPARK syntax is now handled in gnat2why. *)
-     me_name.men_name
 
 end
 
@@ -894,6 +879,15 @@ let session_find_unproved_pa obj =
    with PA_Found p ->
      Some p
 
+let compute_replay_limit_from_pas pas =
+  match pas with
+  | { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
+    let time = int_of_float time + 1 in
+    let steps = steps + steps / 10 + 1 in
+    { Call_provers.empty_limit with
+      Call_provers.limit_steps = steps;
+      limit_time = time }
+
 let rec replay_transf tf =
   let tf_proves_goal =
     List.for_all (fun g -> g.Session.goal_verified <> None)
@@ -914,13 +908,24 @@ and replay_goal goal =
          transformations *)
       Session.iter_goal nothing (replay_transf) nothing goal
     with PA_Found pa ->
-      try
-        let prover =
+      let prover =
+        try
+          Some (
           List.find (fun p ->
             p.Session.prover_config.Whyconf.prover = pa.Session.proof_prover)
-            Gnat_config.provers in
-        Gnat_sched.run_goal ~cntexample:false prover goal
-      with Not_found -> ()
+            Gnat_config.provers)
+        with Not_found ->
+          Gnat_report.add_warning
+          ("could not replay goal due to missing prover " ^
+            pa.Session.proof_prover.Whyconf.prover_name);
+          None in
+      Opt.iter (fun prover ->
+          let limit =
+            match pa.Session.proof_state with
+            | Session.Done pas -> compute_replay_limit_from_pas pas
+            | _ -> assert false in
+          Gnat_sched.run_goal ~cntexample:false ~limit prover goal) prover
+
 
 
 

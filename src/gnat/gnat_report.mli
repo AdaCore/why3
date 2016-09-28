@@ -1,5 +1,4 @@
 open Why3
-open Gnat_objectives
 
 (* This unit serves to
    - store the proof results which should be output at the end;
@@ -87,8 +86,17 @@ open Gnat_objectives
 
    *)
 
+type prover_stat =
+  {
+    mutable count     : int;
+    mutable max_time  : float;
+    mutable max_steps : int;
+  }
+
+type stats = prover_stat Whyconf.Hprover.t
+
 type result_info =
-  | Proved of Save_VCs.stats           (* extra information about the run *)
+  | Proved of stats           (* extra information about the run *)
   | Not_Proved of
        Task.task option *              (* task of the last goal *)
        Model_parser.model option *     (* counterexample model *)

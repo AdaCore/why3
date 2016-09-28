@@ -1,9 +1,17 @@
 open Why3
 open Why3.Json
-open Gnat_objectives.Save_VCs
+
+type prover_stat =
+  {
+    mutable count     : int;
+    mutable max_time  : float;
+    mutable max_steps : int;
+  }
+
+type stats = prover_stat Whyconf.Hprover.t
 
 type result_info =
-  | Proved of Gnat_objectives.Save_VCs.stats
+  | Proved of stats
   | Not_Proved of
        Task.task option *
        Model_parser.model option *
@@ -80,6 +88,12 @@ let print_trace_file fmt trace  =
     Format.fprintf fmt ", ";
     print_json_field "tracefile" string fmt trace
   end
+
+let spark_counterexample_transform me_name =
+  (* Just return the name of the model element. Transformation of model
+     element names to SPARK syntax is now handled in gnat2why.
+     See Flow_Error_Messages.Error_Msg_Proof.Do_Pretty_Cntexmp*)
+  me_name.Model_parser.men_name
 
 let print_cntexmp_model fmt model =
   match model with

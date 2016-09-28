@@ -153,26 +153,12 @@ val matches_subp_filter : subp -> bool
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
-   type prover_stat =
-     {
-       mutable count     : int;
-       mutable max_time  : float;
-       mutable max_steps : int;
-     }
-
-   type stats = prover_stat Whyconf.Hprover.t
-
-   val extract_stats : objective -> stats
+   val extract_stats : objective -> Gnat_report.stats
 
    val save_trace : goal -> (string * Gnat_loc.S.t)
    (* compute the trace from the goal and save it to a file; return the trace
       file name and the computed trace,
       ("", Gnat_loc.S.empty) if no trace was saved *)
-
-   val spark_counterexample_transform :
-     Model_parser.model_element_name -> string
-   (* Transformation of counterexample model elements names to SPARK syntax.
-      This is now handled in gnat2why. See Flow_Error_Messages.Error_Msg_Proof.Do_Pretty_Cntexmp*)
 
    val vc_file : goal -> string
    (* get the file name for a given goal *)
