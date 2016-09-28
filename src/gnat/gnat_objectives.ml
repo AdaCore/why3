@@ -325,7 +325,7 @@ let further_split goal =
 
 let has_been_tried_by g prover =
    (* Check whether the goal has been tried already *)
-  let prover = prover.Gnat_config.prover.Whyconf.prover in
+  let prover = prover.Session.prover_config.Whyconf.prover in
    try
       Session.goal_iter (fun child ->
          match child with
@@ -481,7 +481,7 @@ let iter_leafs goal f =
 
 let iter_leaf_goals subp f = iter_leafs subp.subp_goal f
 
-exception Prover_Found of Gnat_config.prover
+exception Prover_Found of Session.loaded_prover
 
 let find_obsolete_valid_proof g =
   (* if there is an obsolete valid proof of goal g with prover p, such that p
@@ -712,13 +712,13 @@ let add_to_stat prover pr stat =
       incr r;
       let n = !r in
       let count_str = if n = 1 then "" else string_of_int n in
-      let ext = Driver.get_extension prover.Gnat_config.driver in
+      let ext = Driver.get_extension prover.Session.prover_driver in
       Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
    let save_vc ~cntexample goal prover =
       let check = get_objective goal in
       let task = Session.goal_task goal in
-      let dr = prover.Gnat_config.driver in
+      let dr = prover.Session.prover_driver in
       let vc_fn = vc_name check prover in
       GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn
@@ -786,7 +786,7 @@ let clean_automatic_proofs =
     if not (GoalSet.mem seen g) then begin
       GoalSet.add seen g;
       List.iter (fun prover ->
-        let prover = prover.Gnat_config.prover.Whyconf.prover in
+        let prover = prover.Session.prover_config.Whyconf.prover in
         Session.goal_iter (fun child ->
           match child with
           | Session.Proof_attempt pa ->
@@ -862,10 +862,10 @@ let nothing _ =
 let is_most_appropriate_prover obj_rec prover =
   if obj_rec.counter_example then begin
     match Gnat_config.prover_ce with
-    | Some { Gnat_config.prover = { Whyconf.prover = p }} -> prover = p
+    | Some { Session.prover_config = { Whyconf.prover = p }} -> prover = p
     | _ -> true
   end else
-    List.exists (fun p -> p.Gnat_config.prover.Whyconf.prover = prover)
+    List.exists (fun p -> p.Session.prover_config.Whyconf.prover = prover)
     Gnat_config.provers
 
 let select_appropriate_proof_attempt obj_rec pa =
@@ -917,7 +917,7 @@ and replay_goal goal =
       try
         let prover =
           List.find (fun p ->
-            p.Gnat_config.prover.Whyconf.prover = pa.Session.proof_prover)
+            p.Session.prover_config.Whyconf.prover = pa.Session.proof_prover)
             Gnat_config.provers in
         Gnat_sched.run_goal ~cntexample:false prover goal
       with Not_found -> ()

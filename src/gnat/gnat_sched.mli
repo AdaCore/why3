@@ -13,7 +13,7 @@ val init : unit -> unit
 (* connect to proof server *)
 
 val run_goal :
-  cntexample : bool -> Gnat_config.prover -> int Session.goal -> unit
+  cntexample : bool -> Session.loaded_prover -> int Session.goal -> unit
 (* run a prover on a goal. This function returs immediately.
    @param cntexample indicates whether the prover should be queried for a
    counterexample. *)

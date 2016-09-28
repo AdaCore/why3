@@ -13,7 +13,7 @@ end
 
  type queue_entry =
    { goal   : int Session.goal;
-     prover : Gnat_config.prover;
+     prover : Session.loaded_prover;
      cntexample : bool;
    }
 
@@ -35,8 +35,8 @@ let state = { num = 0; map = Intmap.create 17 }
 let run_goal ~cntexample prover g =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal *)
-  let base_prover = prover.Gnat_config.prover in
-  let driver = prover.Gnat_config.driver in
+  let base_prover = prover.Session.prover_config in
+  let driver = prover.Session.prover_driver in
   let old, inplace, limit =
     match (base_prover.Whyconf.interactive,
            Session.PHprover.find_opt g.Session.goal_external_proofs
@@ -60,7 +60,7 @@ let handle_finished_call callback entry res =
   (* On a pair of the type post_prover_call * goal, register the proof result
      in the session and call the callback *)
   let g = entry.goal in
-  let prover = entry.prover.Gnat_config.prover.Whyconf.prover in
+  let prover = entry.prover.Session.prover_config.Whyconf.prover in
   let res =
     (* we do not want to store succesful counter example proofs in the session,
        so we mark them unknown *)

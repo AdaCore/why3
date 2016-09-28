@@ -24,11 +24,6 @@ let rec file_concat l =
   | [x;y] -> Filename.concat x y
   | x :: xs -> Filename.concat x (file_concat xs)
 
-type prover =
-  { driver : Driver.driver;
-    prover : Whyconf.config_prover;
-  }
-
 let spark_config_dir =
   file_concat [spark_prefix; "share"; "spark"; "config"]
 let builtin_provers = ["altergo"; "cvc4"; "z3"]
@@ -336,8 +331,8 @@ let provers, prover_ce, config, env =
       Gnat_util.abort_with_message ~internal:true s in
   (* now we build the prover record for each requested prover *)
   let build_prover_rec base_prover =
-    { driver = prover_driver  base_prover;
-        prover = base_prover} in
+    { Session.prover_driver = prover_driver  base_prover;
+      prover_config = base_prover} in
   let provers =
     List.map build_prover_rec base_provers in
   let prover_ce = match base_prover_ce with
@@ -446,11 +441,12 @@ let () =
   (* check whether we are in prepare_shared mode, if so, do just that *)
   match !opt_prepare_shared, !opt_proof_dir with
   | (true, Some pdir) ->
-    List.iter (fun prover -> build_shared pdir prover.prover) provers;
+    List.iter (fun prover ->
+      build_shared pdir prover.Session.prover_config) provers;
 
     let () = match prover_ce with
     | Some prover_ce ->
-      build_shared pdir prover_ce.prover;
+      build_shared pdir prover_ce.Session.prover_config;
     | None -> () in
 
     exit 0
@@ -464,9 +460,10 @@ let manual_prover =
      prover, they must all be automatic. *)
   match provers with
   | [] -> None
-  | [x] when x.prover.Whyconf.interactive -> Some x
+  | [x] when x.Session.prover_config.Whyconf.interactive -> Some x
   | _ :: _ :: _ when
-     List.exists (fun p -> p.prover.Whyconf.interactive) provers ->
+     List.exists (fun p -> p.Session.prover_config.Whyconf.interactive) provers
+     ->
        Gnat_util.abort_with_message ~internal:false
         "manual provers cannot be combined with other provers"
   | _ ->
@@ -488,7 +485,8 @@ let filename =
 
 let limit_time ~prover =
   match prover_ce, !opt_timeout with
-  | Some p, _ when prover = p.prover.Whyconf.prover.Whyconf.prover_name &&
+  | Some p, _ when prover =
+    p.Session.prover_config.Whyconf.prover.Whyconf.prover_name &&
                    !opt_ce_timeout <> None ->
       Opt.get !opt_ce_timeout
   | _, None -> Call_provers.empty_limit.Call_provers.limit_time
@@ -564,7 +562,8 @@ let () =
 
 let is_selected_prover p =
   try
-    Some (List.find (fun g -> g.prover.Whyconf.prover = p) provers)
+    Some (List.find (fun g ->
+      g.Session.prover_config.Whyconf.prover = p) provers)
   with Not_found -> None
 
 let replay = !opt_replay

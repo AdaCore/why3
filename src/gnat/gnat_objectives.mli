@@ -116,7 +116,8 @@ val schedule_goal : cntexample : bool -> goal -> unit
      a counterexample.
 *)
 
-val schedule_goal_with_prover : cntexample : bool -> goal -> Gnat_config.prover -> unit
+val schedule_goal_with_prover :
+  cntexample : bool -> goal -> Session.loaded_prover -> unit
 (* schedule a goal for proof with given prover and
    default timeout. The function returns immediately.
    @param cntexample indicates whether the prover should be queried for

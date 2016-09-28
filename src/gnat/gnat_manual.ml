@@ -11,7 +11,7 @@ let manual_attempt_of_goal goal =
   | None -> None
   | Some p ->
         PHprover.find_opt goal.goal_external_proofs
-          p.Gnat_config.prover.Whyconf.prover
+          p.Session.prover_config.Whyconf.prover
 
 let is_new_manual_proof goal =
   manual_attempt_of_goal goal = None
@@ -32,7 +32,7 @@ let get_file_extension filename =
   | Invalid_argument _ -> ""
 
 let prover_files_dir proj prover =
-  let wc_prover = prover.Gnat_config.prover.Whyconf.prover in
+  let wc_prover = prover.Session.prover_config.Whyconf.prover in
   match Gnat_config.proof_dir with
   | None -> ""
   | Some dir ->
@@ -63,7 +63,7 @@ let resize_shape sh limit =
 
 let compute_filename contain_dir theory goal expl prover =
   let why_fn =
-    Driver.file_of_task prover.Gnat_config.driver
+    Driver.file_of_task prover.Session.prover_driver
                         theory.theory_name.Ident.id_string
                         theory.theory_parent.file_name
                         (goal_task goal) in
@@ -100,12 +100,12 @@ let create_prover_file goal expl prover =
     compute_filename (prover_files_dir proj_name prover) th goal expl prover in
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
-  Driver.print_task prover.Gnat_config.driver fmt (goal_task goal);
+  Driver.print_task prover.Session.prover_driver fmt (goal_task goal);
   close_out cout;
   let pa = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
                              ~archived:false ~limit:Call_provers.empty_limit
                              ~edit:(Some filename) goal
-                             prover.Gnat_config.prover.Whyconf.prover
+                             prover.Session.prover_config.Whyconf.prover
                              Unedited in
   pa
 
@@ -116,7 +116,7 @@ let editor_command prover fn =
      default value *)
   let editor =
     try Whyconf.editor_by_id Gnat_config.config
-        prover.Gnat_config.prover.Whyconf.editor
+        prover.Session.prover_config.Whyconf.editor
     with Not_found ->
       { Whyconf.editor_name = "";
         editor_command = "";
@@ -135,6 +135,6 @@ let manual_proof_info pa =
       let base_prover = pa.Session.proof_prover in
       let real_prover =
         List.find (fun p ->
-          p.Gnat_config.prover.Whyconf.prover = base_prover)
+          p.Session.prover_config.Whyconf.prover = base_prover)
         Gnat_config.provers in
       Some (fn, editor_command real_prover fn)
