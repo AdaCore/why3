@@ -2,7 +2,79 @@
 open Format
 open Apron
 
-module Abstract_interpreter(E: sig val env: Env.env end) = struct
+(* Copied from inlining, it looks like it is difficult to use the code from there
+ * without messing up the interface. *)
+
+type env = {
+  known : Decl.known_map;
+  funenv : Decl.logic_decl Term.Mls.t;
+}
+
+exception Recursive_logical_definition
+
+let find_global_definition kn rs =
+  let open Term in
+  match (Ident.Mid.find rs.ls_name kn).Decl.d_node with
+  | Decl.Dlogic(decls) ->
+    if List.length decls <> 1 then
+      raise Recursive_logical_definition;
+    Some (List.hd decls)
+  | Decl.Dparam(_) -> None
+  | _ -> raise Not_found
+
+let find_definition env rs =
+  let open Term in
+    try
+      (* then try if it is a local function *)
+      let f = Mls.find rs env.funenv in
+      Some f
+    with Not_found ->
+      (* else look for a global function *)
+      try
+        find_global_definition env.known rs
+      with
+      | Not_found ->
+        Format.eprintf "Couldn't find definition of: ";
+        Pretty.print_ls Format.err_formatter rs;
+        Format.eprintf "@.";
+        raise Not_found
+
+module Abstract_interpreter(E: sig
+    val env: Env.env
+    val pmod: Pmodule.pmodule
+  end) = struct
+
+  let known_logical_ident = Pmodule.(Theory.(E.pmod.mod_theory.th_known))
+
+  (* General purpose inlining stuff *)
+
+  let t_unfold loc fs tl ty =
+    let open Term in
+    let open Ty in
+    if Term.ls_equal fs Term.ps_equ then
+      t_app fs tl ty
+    else
+      match find_definition { known = known_logical_ident; funenv = Mls.empty; } fs with
+      | None ->
+        t_app fs tl ty
+      | Some (vl,e) ->
+        assert (Term.ls_equal vl fs);
+        let vsym, new_term = Decl.open_ls_defn e in
+        let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
+        let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vsym tl in
+        let mt = oty_match mt (Some (t_type new_term)) ty in
+        t_ty_subst mt mv new_term
+
+  (* inline every symbol *)
+
+  let rec t_replace_all t =
+    let open Term in
+    let t = t_map t_replace_all t in
+    match t.t_node with
+    | Tapp (fs,tl) ->
+      t_label_copy t (t_unfold t.t_loc fs tl t.t_ty)
+    | _ -> t
+
 
   (* Apron manager *)
   let manpk = Polka.manager_alloc_strict()
@@ -40,15 +112,19 @@ module Abstract_interpreter(E: sig val env: Env.env end) = struct
       env = Environment.make [|var_return|] [||]; }
 
   let vs_to_var vs =
-    Var.of_string Ident.(Term.(vs.vs_name.id_string))
+    ignore (Format.flush_str_formatter ());
+    Pretty.print_vs Format.str_formatter vs;
+    Var.of_string (Format.flush_str_formatter ())
 
   let pv_to_var psym =
     vs_to_var Ity.(psym.pv_vs)
 
   let add_variable cfg psym =
     if Ity.(ity_equal ity_int psym.pv_ity) then
-      let var = pv_to_var psym in
-      cfg.env <- Environment.add cfg.env [|var|] [||]
+      begin
+        let var = pv_to_var psym in
+        cfg.env <- Environment.add cfg.env [|var|] [||]
+      end
 
   let new_node_cfg cfg expr =
     let i = cfg.control_point_count in
@@ -82,6 +158,8 @@ module Abstract_interpreter(E: sig val env: Env.env end) = struct
   let linear_expressions_from_term cfg t =
     let open Term in
 
+    let t = t_replace_all t in
+
     match t.t_node with
     | Teps(tb) ->
       let return, t = Term.t_open_bound tb in
@@ -89,7 +167,10 @@ module Abstract_interpreter(E: sig val env: Env.env end) = struct
       let rec term_to_int coeff cst constr t = match t.t_node with
         | Tvar(a) ->
           begin
-            let var = vs_to_var a in
+            let var =
+              if Term.vs_equal a return then
+                var_return
+              else vs_to_var a in
             try
               let c = List.assoc var !constr in
               constr := (var, c+coeff) :: (List.remove_assoc var !constr);
@@ -102,6 +183,33 @@ module Abstract_interpreter(E: sig val env: Env.env end) = struct
           cst := !cst + coeff * (BigInt.to_int n)
         | Tapp(func, args) when Term.ls_equal func ad_int ->
           List.iter (term_to_int coeff cst constr) args
+        | Tapp(func, [arg]) -> (* record access *)
+          let rec term_to_string t = match t.t_node with
+            | Tapp(func, [arg]) ->
+              begin
+
+                (* this check might not be needed, as everyting is supposed to
+                 * have been inlined *)
+                match (Ident.Mid.find func.ls_name known_logical_ident).Decl.d_node with
+                | Decl.Ddata(_) ->
+                  ignore (Format.flush_str_formatter ());
+                  Pretty.print_ls Format.str_formatter func;
+                  let func_str = (Format.flush_str_formatter ()) in
+                  Format.sprintf "%s(%s)@." func_str (term_to_string arg)
+                | _ ->  raise (Not_handled t)
+              end
+            | Tvar(a) ->
+              ignore (Format.flush_str_formatter ());
+              Pretty.print_vs Format.str_formatter a;
+              let func_str = (Format.flush_str_formatter ()) in
+              func_str
+            | _ -> raise (Not_handled t)
+          in
+          let t = term_to_string t in
+          let v = Var.of_string t in
+          if not (Environment.mem_var cfg.env v) then
+            cfg.env <- Environment.add cfg.env [|v|] [||];
+          constr := (v, coeff) :: !constr
         | _ -> raise (Not_handled t)
       in
       let rec aux t =
@@ -109,7 +217,7 @@ module Abstract_interpreter(E: sig val env: Env.env end) = struct
           match t.t_node with
           | Tbinop(Tand, a, b) ->
             aux a @ aux b
-          | Tapp(func, args) ->
+          | Tapp(func, args) -> (* ATM, this is handled only for equality. *)
 
             let cst = ref 0 in
             let constr = ref [] in
@@ -167,8 +275,7 @@ module Abstract_interpreter(E: sig val env: Env.env end) = struct
            **)
 
           let let_begin_cp, let_end_cp = put_expr_in_cfg cfg let_expr in
-          let p = pv_to_var psym in
-          cfg.env <- Environment.add cfg.env [|p|] [||];
+          add_variable cfg psym;
 
           (* compute the child and add an hyperedge, to set the value of psym
            * to the value returned by let_expr *)

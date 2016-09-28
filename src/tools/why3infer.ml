@@ -71,7 +71,10 @@ let do_input f =
                     Expr.print_expr Format.err_formatter e;
                     Format.eprintf "@.";
                     let module Abstract_interpreter =
-                      Abstract_interpreter.Abstract_interpreter(struct let env = env end) in
+                      Abstract_interpreter.Abstract_interpreter(struct
+                        let env = env
+                        let pmod = m
+                      end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
                     List.iter (Abstract_interpreter.add_variable cfg)
                       Ity.(cexp.c_cty.cty_args);

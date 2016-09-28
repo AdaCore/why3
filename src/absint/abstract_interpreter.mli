@@ -1,4 +1,7 @@
-module Abstract_interpreter(S:sig val env: Env.env end): sig
+module Abstract_interpreter(S:sig
+    val env: Env.env
+    val pmod: Pmodule.pmodule
+  end): sig
   type control_point
   type domain
   type cfg
