@@ -242,21 +242,25 @@ module Abstract_interpreter(E: sig
 
           let cst = ref 0 in
           let constr = ref [] in
-          if ls_equal ps_equ func then
+          if ls_equal ps_equ func || ls_equal lt_int func then
             match args with
             | [a; b] ->
-              term_to_int 1 cst constr a; term_to_int (-1) cst constr b;
+              term_to_int (-1) cst constr a; term_to_int (1) cst constr b;
               let expr = Linexpr1.make cfg.env in
               let constr = List.map (fun (var, coeff) ->
                   Coeff.Scalar (Scalar.of_int coeff), var) !constr in
               Linexpr1.set_list expr constr None;
-              let cons = Lincons1.make expr Lincons1.EQ in
+              let cons = Lincons1.make expr (if ls_equal ps_equ func then
+                                               Lincons1.EQ
+                                                 else Lincons1.SUP) in
               Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int !cst));
               [cons]
             | _ -> raise (Not_handled t)
           else
             raise (Not_handled t)
-
+        | Tif(a, b, c) ->
+          aux a @ aux b
+        | Ttrue -> []
         | _ ->
           raise (Not_handled t)
       with
@@ -275,7 +279,7 @@ module Abstract_interpreter(E: sig
         return_var := Some return;
         aux t
       | _ ->
-        raise (Not_handled t) (*aux t*)
+        aux t
     with
     | e ->
       Format.eprintf "error while computing domain for post conditions: ";
@@ -423,20 +427,32 @@ module Abstract_interpreter(E: sig
         );
       begin_cp, end_cp
     | Ewhile(cond, inv, var, content) ->
+
+      (* Condition expression *)
+      let cond_term = 
+        match Expr.term_of_expr ~prop:true cond with
+        | Some s ->
+          s
+        | None ->
+          Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
+          Term.t_true
+      in
+      let constraints = linear_expressions_from_term cfg local_ty cond_term in
+      let cons_arr = Lincons1.array_make cfg.env (List.length constraints) in
+      List.iteri (Lincons1.array_set cons_arr) constraints;
+
       let before_loop_cp = new_node_cfg cfg cond in
       let start_loop_cp, end_loop_cp = put_expr_in_cfg cfg local_ty content in
-      cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
+      cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let after_loop_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man abs ->
-          (* todo *)
-          abs
+          Abstract1.meet_lincons_array man abs cons_arr
         );
       new_hedge_cfg cfg (end_loop_cp, after_loop_cp) (fun man abs ->
           (* todo *)
           abs
         );
-      new_hedge_cfg cfg (end_loop_cp, start_loop_cp) (fun man abs ->
-          (* todo *)
+      new_hedge_cfg cfg (end_loop_cp, before_loop_cp) (fun man abs ->
           abs
         );
       before_loop_cp, end_loop_cp
