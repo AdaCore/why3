@@ -479,6 +479,17 @@ let test_simple_apply fmt args =
      end
   | _ -> let _ = printf "term argument expected@." in ()
 
+let test_apply_with_string_args fmt args =
+  match (parse_transformation_string args) with
+  | None -> ()
+  | Some s ->
+      let id = nearest_goal () in
+      let callback status =
+        fprintf fmt "transformation status: %a@."
+          Controller_itp.print_trans_status status
+      in
+      C.schedule_transformation cont id "apply" [Trans.TAstring s] ~callback
+
 let test_remove_with_string_args fmt args =
   match (parse_transformation_string args) with
   | None -> ()
@@ -561,6 +572,7 @@ let commands =
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
     "rem", "test remove transformation. Take one string argument", test_remove_with_string_args;
+    "app", "test apply transformation. Take one string argument", test_apply_with_string_args;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
     "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
     "ttr", "takes 2 arguments. Name of the transformation (with one term argument) and a term" , test_transformation_one_arg_term;
