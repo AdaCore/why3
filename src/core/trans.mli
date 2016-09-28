@@ -153,6 +153,16 @@ type trans_arg =
 
 type trans_with_args = trans_arg list -> task -> task list
 
+type _ trans_typ =
+  | Ttrans : (task -> task list) trans_typ
+  | Tint : 'a trans_typ -> (int -> 'a) trans_typ
+  | Tstring : 'a trans_typ -> (string -> 'a) trans_typ
+  | Tty : 'a trans_typ -> (ty -> 'a) trans_typ
+  | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
+  | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
+
+val wrap : 'a trans_typ -> 'a -> trans_with_args
+
 val register_transform_with_args : desc:Pp.formatted -> string -> trans_with_args -> unit
 
 val apply_transform_args : string -> Env.env -> trans_arg list -> task -> task list

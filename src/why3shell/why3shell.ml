@@ -392,7 +392,9 @@ let test_transformation_with_args fmt args =
   in
   C.schedule_transformation cont id "duplicate" [Trans.TAint n] ~callback
 
-(* Do not use this. TODO *)
+(* Do not use this. TODO
+   Claude: indeed type_fmla and type_term should never be used like this
+*)
 let typing_terms t th =
   try (Typing.type_fmla th (fun _ -> None) t) with
   | _ -> Typing.type_term th (fun _ -> None) t
@@ -495,6 +497,62 @@ let test_remove_with_string_args fmt args =
       in
       C.schedule_transformation cont id "remove" [Trans.TAstring s] ~callback
 
+
+(*** term argument parsed in the context of the task ***)
+
+let type_ptree ~as_fmla t task =
+  let used_ths = Task.used_theories task in
+  let used_symbs = Task.used_symbols used_ths in
+  let local_decls = Task.local_decls task used_symbs in
+  (* rebuild a theory_uc *)
+  let th_uc = Theory.create_theory (Ident.id_fresh "dummy") in
+  let th_uc =
+    Ident.Mid.fold
+      (fun _id th acc -> Theory.use_export acc th)
+      used_ths th_uc
+  in
+  let th_uc =
+    List.fold_left
+      (fun acc d -> Theory.add_decl ~warn:false acc d)
+      th_uc local_decls
+  in
+  if as_fmla
+  then Typing.type_fmla th_uc (fun _ -> None) t
+  else Typing.type_term th_uc (fun _ -> None) t
+
+let parse_arg_only s task =
+  let lb = Lexing.from_string s in
+  let t =
+    (* try *)
+      Lexer.parse_term lb
+    (* with _ -> failwith "parsing error" *)
+  in
+  let t =
+    (* try *)
+      type_ptree ~as_fmla:false t task
+    (* with *)
+  in
+  eprintf "transformation parse_arg_only succeeds: %a@." Pretty.print_term t;
+  [task]
+
+let () = Trans.(register_transform_with_args
+           "parse_arg_only" (wrap (Tstring Ttrans) parse_arg_only)
+           ~desc:"Just parse and type the string argument")
+
+let test_transformation_with_string_parsed_later fmt args =
+  match args with
+    | [s] ->
+       let id = nearest_goal () in
+       let callback status =
+         fprintf fmt "transformation status: %a@."
+                 Controller_itp.print_trans_status status
+       in
+       C.schedule_transformation cont id "parse_arg_only" [Trans.TAstring s] ~callback  | _ ->  printf "string argument expected"
+
+
+(*******)
+
+
 (* Only parses arguments and print debugging information *)
 let test_transformation_with_term_arg _fmt args =
   let _ = parse_transformation_arg args in ()
@@ -573,7 +631,7 @@ let commands =
     "tra", "test duplicate transformation", test_transformation_with_args;
     "ngr", "get to the next goal right", ngr_ret_p;
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
-    "tf", "test a transformation having a formula as argument", test_transformation_with_term_arg;
+    "tt", "test a transformation having a term as argument", test_transformation_with_string_parsed_later;
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
     "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
     "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));
