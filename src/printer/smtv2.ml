@@ -24,7 +24,7 @@ let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
 
-(** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
+(** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -59,12 +59,12 @@ let ident_printer () =
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
-      "rotate_right";
+      "rotate_right"; "bvredor"; "bvredand";
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
       (** the new floating point theory - updated to the 2014-05-27 standard *)
-      "FloatingPoint";
+      "FloatingPoint"; "fp";
       "Float16"; "Float32"; "Float64"; "Float128";
       "RoundingMode";
       "roundNearestTiesToEven"; "RNE";
@@ -81,6 +81,18 @@ let ident_printer () =
       "fp.isNegative"; "fp.isPositive";
       "to_fp"; "to_fp_unsigned";
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
+
+      (** the new proposed string theory *)
+      "String";
+      "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
+      "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
+      "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
+      "str.in.re"; "str.to.re"; "re.++"; "re.union"; "re.inter";
+      "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
+
+      (** the new proposed set theory *)
+      "union"; "intersection"; "setminus"; "subset"; "member";
+      "singleton"; "insert";
 
       (** built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";

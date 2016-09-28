@@ -1,0 +1,120 @@
+theory ieee_float.RoundingMode
+   syntax type mode "RoundingMode"
+   syntax function RNE "RNE"
+   syntax function RNA "RNA"
+   syntax function RTP "RTP"
+   syntax function RTN "RTN"
+   syntax function RTZ "RTZ"
+end
+
+theory ieee_float.GenericFloat
+   (* Part I *)
+   syntax function abs  "(fp.abs %1)"
+   syntax function neg  "(fp.neg %1)"
+
+   syntax function add  "(fp.add %1 %2 %3)"
+   syntax function sub  "(fp.sub %1 %2 %3)"
+   syntax function mul  "(fp.mul %1 %2 %3)"
+   syntax function div  "(fp.div %1 %2 %3)"
+
+   syntax function fma  "(fp.fma %1 %2 %3 %4)"
+
+   syntax function sqrt "(fp.sqrt %1 %2)"
+   syntax function rem  "(fp.rem %1 %2)"
+
+   syntax function roundToIntegral "(fp.roundToIntegral %1 %2)"
+
+   syntax function min "(fp.min %1 %2)"
+   syntax function max "(fp.max %1 %2)"
+
+   syntax predicate le  "(fp.leq %1 %2)"
+   syntax predicate lt  "(fp.lt %1 %2)"
+   syntax predicate ge  "(fp.geq %1 %2)"
+   syntax predicate gt  "(fp.gt %1 %2)"
+
+   syntax predicate eq  "(fp.eq %1 %2)"
+
+   syntax predicate is_normal    "(fp.isNormal    %1)"
+   syntax predicate is_subnormal "(fp.isSubnormal %1)"
+   syntax predicate is_zero      "(fp.isZero      %1)"
+   syntax predicate is_infinite  "(fp.isInfinite  %1)"
+   syntax predicate is_nan       "(fp.isNaN       %1)"
+   syntax predicate is_positive  "(fp.isPositive  %1)"
+   syntax predicate is_negative  "(fp.isNegative  %1)"
+
+   syntax predicate is_finite "(or (fp.isNormal %1) (or (fp.isZero %1) (fp.isSubnormal %1)))"
+
+   syntax function to_real  "(fp.to_real %1)"
+
+   syntax predicate overflow_value "true"
+
+   syntax predicate sign_zero_result "true"
+
+   (* Part II *)
+
+   remove allprops
+end
+
+theory ieee_float.Float32
+  (* Part I *)
+  syntax type t "Float32"
+
+  syntax converter from_binary "((_ to_fp 8 24) ((_ int2bv 32) %1))"
+  syntax converter (!_) "((_ to_fp 8 24) %1 %2)"
+
+  syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
+  syntax function half      "((_ to_fp 8 24) #x3F000000)"
+
+  remove allprops
+end
+
+theory ieee_float.Float64
+  (* Part I *)
+  syntax type t "Float64"
+
+  syntax converter from_binary "((_ to_fp 11 53) ((_ int2bv 64) %1))"
+  syntax converter (!_) "((_ to_fp 11 53) %1 %2)"
+
+  syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
+  syntax function half      "((_ to_fp 11 53) #x3FE0000000000000)"
+
+  remove allprops
+end
+
+theory ieee_float.FloatConverter
+  (* Part I *)
+   syntax function to_float32 "((_ to_fp 8 24) %1 %2)"
+   syntax function to_float64 "((_ to_fp 11 53) %1 %2)"
+
+   remove allprops
+end
+
+theory ieee_float.Float_BV_Converter
+  (* Part I *)
+   syntax function to_ubv8  "((_ fp.to_ubv 8)  %1 %2)"
+   syntax function to_ubv16 "((_ fp.to_ubv 16) %1 %2)"
+   syntax function to_ubv32 "((_ fp.to_ubv 32) %1 %2)"
+   syntax function to_ubv64 "((_ fp.to_ubv 64) %1 %2)"
+
+   remove allprops
+end
+
+theory ieee_float.Float32_BV_Converter
+  (* Part I *)
+  syntax function of_ubv8  "((_ to_fp_unsigned 8 24) %1 %2)"
+  syntax function of_ubv16 "((_ to_fp_unsigned 8 24) %1 %2)"
+  syntax function of_ubv32 "((_ to_fp_unsigned 8 24) %1 %2)"
+  syntax function of_ubv64 "((_ to_fp_unsigned 8 24) %1 %2)"
+
+  remove allprops
+end
+
+theory ieee_float.Float64_BV_Converter
+  (* Part I *)
+  syntax function of_ubv8  "((_ to_fp_unsigned 11 53) %1 %2)"
+  syntax function of_ubv16 "((_ to_fp_unsigned 11 53) %1 %2)"
+  syntax function of_ubv32 "((_ to_fp_unsigned 11 53) %1 %2)"
+  syntax function of_ubv64 "((_ to_fp_unsigned 11 53) %1 %2)"
+
+  remove allprops
+end

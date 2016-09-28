@@ -1,0 +1,32 @@
+import "alt_ergo.drv"
+
+theory ada__model.Finite_Float_Literal
+  remove prop l_bin
+end
+
+theory ieee_float.GenericFloat
+ remove prop abs_special
+ remove prop le_special
+ remove prop lt_special
+ remove prop eq_special
+ remove prop add_special
+ remove prop sub_special
+ remove prop mul_special
+ remove prop div_special
+ remove prop neg_special
+ remove prop fma_finite
+ remove prop fma_special
+ remove prop sqrt_finite
+ remove prop sqrt_special
+end
+
+theory real.Square
+ remove allprops
+end
+
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)
