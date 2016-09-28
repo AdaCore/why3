@@ -78,7 +78,7 @@ let do_input f =
                     let cfg = Abstract_interpreter.start_cfg rsym in
                     List.iter (Abstract_interpreter.add_variable cfg)
                       Ity.(cexp.c_cty.cty_args);
-                    let i = snd (Abstract_interpreter.put_expr_in_cfg cfg e) in
+                    let i = snd (Abstract_interpreter.put_expr_in_cfg cfg Ident.Mid.empty e) in
                     Abstract_interpreter.eval_fixpoints cfg;
                     let d = Abstract_interpreter.get_domain cfg i in
                     Format.printf "%s@." @@ Abstract_interpreter.domain_to_string d

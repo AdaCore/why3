@@ -8,7 +8,7 @@ module Abstract_interpreter(S:sig
 
   val start_cfg: Expr.rsymbol -> cfg
 
-  val put_expr_in_cfg: cfg -> Expr.expr -> (control_point * control_point)
+  val put_expr_in_cfg: cfg -> Ity.ity Ident.Mid.t -> Expr.expr -> (control_point * control_point)
 
   val eval_fixpoints: cfg -> unit
 
