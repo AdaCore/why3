@@ -210,6 +210,9 @@ theory GenericFloat
   function round mode real : real
 
   constant max_real : real (* defined when cloning *)
+  constant max_int  : int
+
+  axiom max_real_int: max_real = FromInt.from_int max_int
 
   predicate in_range (x:real) = -. max_real <=. x <=. max_real
 
@@ -642,12 +645,8 @@ theory GenericFloat
 
   axiom zeroF_is_int: is_int zeroF
 
-  (* temporary range check on int set to 2^64; TODO find the actual
-     max int that don't give INF with of_int for both clones *)
-     (* just take max *)
   axiom of_int_is_int: forall m, x.
-    (- 0x10000000000000000) <= x <= 0x10000000000000000
-      -> is_int (of_int m x)
+    (- max_int) <= x <= max_int -> is_int (of_int m x)
 
   axiom is_int_is_finite: forall x. is_int x -> is_finite x
 
@@ -656,6 +655,12 @@ theory GenericFloat
 
 (*  axiom int_mode: forall m1 m2 x.
     is_int x -> to_int m1 x = to_int m2 x  etc ...*)
+  (** big floats are ints *)
+  axiom big_float_is_int: forall m i.
+    is_finite i ->
+    (i .<= (of_int m (- max_representable_integer)) /\
+    (of_int m max_representable_integer) .<= i) ->
+      is_int i
 
   (** rounded are ints *)
 
