@@ -11,6 +11,42 @@ type _ trans_typ =
   | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
   | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
 
+(*** term argument parsed in the context of the task ***)
+let type_ptree ~as_fmla t task =
+  let used_ths = Task.used_theories task in
+  let used_symbs = Task.used_symbols used_ths in
+  let local_decls = Task.local_decls task used_symbs in
+  (* rebuild a theory_uc *)
+  let th_uc = Theory.create_theory (Ident.id_fresh "dummy") in
+  let th_uc =
+    Ident.Mid.fold
+      (fun _id th acc -> (*Format.eprintf "%s@." _id.Ident.id_string;*)
+        try Theory.use_export acc th with _ -> acc) (* TODO to be investigated. error: set is already defined. Create_theory already has the builtin_theory by default. Use empty theory ? *)
+      used_ths th_uc
+  in
+  let th_uc =
+    List.fold_left
+      (fun acc d -> Theory.add_decl ~warn:false acc d)
+      th_uc local_decls
+  in
+  if as_fmla
+  then Typing.type_fmla th_uc (fun _ -> None) t
+  else Typing.type_term th_uc (fun _ -> None) t
+
+let parse_and_type s task =
+  let lb = Lexing.from_string s in
+  let t =
+      Lexer.parse_term lb
+  in
+  let t =
+    (* TODO I need both as_fmla = true and as_fmla = false in some transformations. How to tell which one to use ?
+     For example, cut needs a formula and simple_apply needs a term *)
+    try
+      type_ptree ~as_fmla:false t task
+    with _ -> type_ptree ~as_fmla:true t task
+  in
+  t
+
 let rec wrap : type a. a trans_typ -> a -> trans_with_args =
   fun t f l task ->
   match t with
@@ -31,11 +67,17 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
       | s :: tail -> wrap t' (f s) tail task
       | _ -> failwith "Missing argument: expecting a string."
     end
+(*  | Tformula t' ->
+    begin
+
+
+    end (* TODO *)
+*)
   | Tterm t' ->
     begin
       match l with
-      | _s :: tail ->
-         let te = Term.t_true in (* TODO: parsing + typing of s *)
+      | s :: tail ->
+         let te = parse_and_type s task in
          wrap t' (f te) tail task
       | _ -> failwith "Missing argument: expecting a term."
     end

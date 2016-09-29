@@ -570,9 +570,6 @@ let test_remove_with_string_args fmt args =
       in
       C.schedule_transformation cont id "remove" args ~callback
 
-
-(*** term argument parsed in the context of the task ***)
-
 let type_ptree ~as_fmla t task =
   let used_ths = Task.used_theories task in
   let used_symbs = Task.used_symbols used_ths in
