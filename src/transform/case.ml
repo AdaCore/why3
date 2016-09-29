@@ -4,13 +4,9 @@ open Term
 open Decl
 open Theory
 open Task
+open Args_wrapper
 
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
-
-let duplicate args task =
-  match args with
-    | [TAint n] -> dup n task
-    | _ -> failwith "wrong arguments for duplicate"
 
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
@@ -228,10 +224,14 @@ let apply name task =
   | Tbinop (Timplies, _ta, _tb) -> failwith "Not implemented yet" (* TODO to be done later *)
   | _ -> failwith "Not of the form forall x. A -> B"
 
-let case' args task  =
+(*
+let case' =
+(*
+args task  =
   match args with
   | [TAterm t] -> case t task
   | _ -> failwith "wrong arguments for case"
+ *)
 
 let cut' args task =
   match args with
@@ -257,11 +257,13 @@ let apply' args task =
   match args with
   | [TAstring name] -> apply name task
   | _ -> failwith "wrong arguments of simple_apply"
+         *)
 
-let () = register_transform_with_args ~desc:"test case" "case" case'
-let () = register_transform_with_args ~desc:"test cut" "cut" cut'
-let () = register_transform_with_args ~desc:"test exists" "exists" exists'
-let () = register_transform_with_args ~desc:"test remove" "remove" remove'
-let () = register_transform_with_args ~desc:"test simple_apply" "simple_apply" simple_apply'
-let () = register_transform_with_args ~desc:"test apply" "apply" apply'
-let () = register_transform_with_args ~desc:"test duplicate" "duplicate" duplicate
+let () = register_transform_with_args ~desc:"test case" "case" (wrap (Tterm Ttrans) case)
+let () = register_transform_with_args ~desc:"test cut" "cut" (wrap (Tterm Ttrans) cut)
+let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
+let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tstring Ttrans) remove)
+let () = register_transform_with_args ~desc:"test simple_apply" "simple_apply"
+                                      (wrap (Tstring (Tterm Ttrans)) simple_apply)
+let () = register_transform_with_args ~desc:"test apply" "apply" (wrap (Tstring Ttrans) apply)
+let () = register_transform_with_args ~desc:"test duplicate" "duplicate" (wrap (Tint Ttrans) dup)

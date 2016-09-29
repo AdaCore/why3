@@ -121,11 +121,11 @@ val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
 (** [update_proof_attempt s id pr st] update the status of the
     corresponding proof attempt with [st]. *)
 
-val graft_transf : session -> proofNodeID -> string -> Trans.trans_arg list ->
+val graft_transf : session -> proofNodeID -> string -> string list ->
    Task.task list -> transID
 (** [graft_transf s id name l tl] adds the transformation [name] as a
     child of the task [id] of the session [s]. [l] is the list of
-    argument of the transformation, and [tl] is the list of subtasks.
+    arguments of the transformation, and [tl] is the list of subtasks.
  *)
 
 val remove_proof_attempt : session -> proofNodeID -> Whyconf.prover -> unit

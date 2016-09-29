@@ -388,17 +388,12 @@ let apply_transform_no_args fmt args =
 
 let test_transformation_with_args fmt args =
   (* temporary : apply duplicate on the first goal *)
-  let n =
-    match args with
-    | [s] -> int_of_string s
-    | _ -> assert false
-  in
   let id = nearest_goal () in
   let callback status =
     fprintf fmt "transformation status: %a@."
             Controller_itp.print_trans_status status
   in
-  C.schedule_transformation cont id "duplicate" [Trans.TAint n] ~callback
+  C.schedule_transformation cont id "duplicate" args ~callback
 
 (* Do not use this. TODO
    Claude: indeed type_fmla and type_term should never be used like this
@@ -407,6 +402,7 @@ let typing_terms t th =
   try (Typing.type_fmla th (fun _ -> None) t) with
   | _ -> Typing.type_term th (fun _ -> None) t
 
+(*
 let parse_transformation_arg args : Term.term option =
   (* temporary : parses the term *)
   match args with
@@ -428,8 +424,10 @@ let parse_transformation_arg args : Term.term option =
          None
      end
   | _ -> let _ = printf "term argument expected@." in None
+ *)
 
 
+(*
 let parse_transformation_string args : string option =
   (* temporary : parses a string *)
   match args with
@@ -443,9 +441,11 @@ let parse_transformation_string args : string option =
      printf "parsing string \"%s\"@." s;
      Some s
   | _ -> let _ = printf "term argument expected@." in None
+ *)
 
 let test_simple_apply fmt args =
   (* temporary : parses a string *)
+(*
   match args with
   | [s';s] ->
      let s =
@@ -471,39 +471,46 @@ let test_simple_apply fmt args =
        let th = Theory.use_export th int_theory in
        let t = typing_terms t th in
        let _ = printf "typing OK: %a@." Pretty.print_term t in
-       let id = nearest_goal () in
+ *)
+     let id = nearest_goal () in
      let callback status =
        fprintf fmt "transformation status: %a@."
          Controller_itp.print_trans_status status
      in
-     C.schedule_transformation cont id "simple_apply" [Trans.TAstring s'; Trans.TAterm t] ~callback
+     C.schedule_transformation cont id "simple_apply" args ~callback
+(*
      with e ->
        let _ = printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e in
        ()
      end
   | _ -> let _ = printf "term argument expected@." in ()
+ *)
 
 let test_apply_with_string_args fmt args =
+(*
   match (parse_transformation_string args) with
   | None -> ()
   | Some s ->
+ *)
       let id = nearest_goal () in
       let callback status =
         fprintf fmt "transformation status: %a@."
           Controller_itp.print_trans_status status
       in
-      C.schedule_transformation cont id "apply" [Trans.TAstring s] ~callback
+      C.schedule_transformation cont id "apply" args ~callback
 
 let test_remove_with_string_args fmt args =
+(*
   match (parse_transformation_string args) with
   | None -> ()
   | Some s ->
+ *)
       let id = nearest_goal () in
       let callback status =
         fprintf fmt "transformation status: %a@."
           Controller_itp.print_trans_status status
       in
-      C.schedule_transformation cont id "remove" [Trans.TAstring s] ~callback
+      C.schedule_transformation cont id "remove" args ~callback
 
 
 (*** term argument parsed in the context of the task ***)
@@ -544,38 +551,46 @@ let parse_arg_only s task =
   [task]
 
 let () = Trans.(register_transform_with_args
-           "parse_arg_only" (wrap (Tstring Ttrans) parse_arg_only)
+           "parse_arg_only" Args_wrapper.(wrap (Tstring Ttrans) parse_arg_only)
            ~desc:"Just parse and type the string argument")
 
 let test_transformation_with_string_parsed_later fmt args =
+(*
   match args with
     | [s] ->
+ *)
        let id = nearest_goal () in
        let callback status =
          fprintf fmt "transformation status: %a@."
                  Controller_itp.print_trans_status status
        in
-       C.schedule_transformation cont id "parse_arg_only" [Trans.TAstring s] ~callback
+       C.schedule_transformation cont id "parse_arg_only" args ~callback
+(*
     | _ ->  printf "string argument expected@."
+ *)
 
 
 (*******)
 
 
 (* Only parses arguments and print debugging information *)
+(*
 let test_transformation_with_term_arg _fmt args =
   let _ = parse_transformation_arg args in ()
+ *)
 
 let test_case_with_term_args fmt args =
+(*
   match (parse_transformation_arg args) with
   | None -> ()
   | Some t ->
+ *)
   let id = nearest_goal () in
   let callback status =
     fprintf fmt "transformation status: %a@."
             Controller_itp.print_trans_status status
   in
-  C.schedule_transformation cont id "case" [Trans.TAterm t] ~callback
+  C.schedule_transformation cont id "case" args ~callback
 
 
 (* TODO rewrite this. Only for testing *)
@@ -588,10 +603,13 @@ let test_transformation_one_arg_term fmt args =
         fprintf fmt "transformation %s status: %a@."
           tr Controller_itp.print_trans_status status
       in
+(*
       match (parse_transformation_arg tl) with
       | None -> ()
       | Some t ->
-          C.schedule_transformation cont id tr [Trans.TAterm t] ~callback
+ *)
+          C.schedule_transformation cont id tr tl ~callback
+
 
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)

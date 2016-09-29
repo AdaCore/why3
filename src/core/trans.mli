@@ -134,36 +134,16 @@ val named : string -> 'a trans -> 'a trans
 val apply_transform : string -> Env.env -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n, directly *)
 
-(** {2 Transformations with arguments} *)
+(** {2 Transformations with arguments}
 
-type trans_arg =
-  | TAint      of int
-  | TAstring   of string
-  | TAterm     of Term.term
-  | TAty       of Ty.ty
-  | TAtysymbol of Ty.tysymbol
-  (* | ... *)
-(* note: la fonction register des transformations doit permettre de
-   declarer les types des arguments
-
-   type trans_arg_type = TTint | TTstring | TTterm | TTty | TTtysymbol
-   | TTlsymbol | TTprsymbol
+  These transformations take strings as arguments. For a more "typed" version,
+  see file [src/transform/args_wrapper.ml]
 
 *)
 
-type trans_with_args = trans_arg list -> task -> task list
-
-type _ trans_typ =
-  | Ttrans : (task -> task list) trans_typ
-  | Tint : 'a trans_typ -> (int -> 'a) trans_typ
-  | Tstring : 'a trans_typ -> (string -> 'a) trans_typ
-  | Tty : 'a trans_typ -> (ty -> 'a) trans_typ
-  | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
-  | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
-
-val wrap : 'a trans_typ -> 'a -> trans_with_args
+type trans_with_args = string list -> task -> task list
 
 val register_transform_with_args : desc:Pp.formatted -> string -> trans_with_args -> unit
 
-val apply_transform_args : string -> Env.env -> trans_arg list -> task -> task list
+val apply_transform_args : string -> Env.env -> string list -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n or a trans with args, directly *)
