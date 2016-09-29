@@ -218,9 +218,9 @@ type proof_hole =
     Pn of proofNodeID list * proofNodeID * proofNodeID list |
     Tn of transID list * transID * transID list
 
-type proof_zipper = { mutable cursor : proof_hole; ctxt : proof_hole Queue.t }
+type proof_zipper = { mutable cursor : proof_hole; ctxt : proof_hole Stack.t }
 
-let ctxt = Queue.create ()
+let ctxt = Stack.create ()
 
 let zipper =
   let files =
@@ -242,7 +242,7 @@ let zipper_init () =
   let file = Opt.get !file in
   match file.file_theories with
   | th :: tail -> zipper.cursor <- (Th ([], th, tail));
-      while not (Queue.is_empty zipper.ctxt) do ignore (Queue.pop zipper.ctxt) done
+      while not (Stack.is_empty zipper.ctxt) do ignore (Stack.pop zipper.ctxt) done
   | _ -> assert false
 
 
@@ -251,28 +251,28 @@ let zipper_down () =
   | Th (_,th,_) ->
     (match theory_goals th with
     | pn::l ->
-      Queue.add zipper.cursor zipper.ctxt;
+      Stack.push zipper.cursor zipper.ctxt;
       zipper.cursor <- Pn ([],pn,l);
       true
     | _ -> false)
   | Pn (_,pn,_) ->
     (match get_transformations cont.controller_session pn with
     | tn::l ->
-      Queue.add zipper.cursor zipper.ctxt;
+      Stack.push zipper.cursor zipper.ctxt;
       zipper.cursor <- Tn ([],tn,l);
       true
     | _ -> false)
   | Tn (_,tn,_) ->
     (match get_sub_tasks cont.controller_session tn with
     | pn::l ->
-      Queue.add zipper.cursor zipper.ctxt;
+      Stack.push zipper.cursor zipper.ctxt;
       zipper.cursor <- Pn ([],pn,l);
       true
     | _ -> false)
 
 let zipper_up () =
-  if not (Queue.is_empty zipper.ctxt) then begin
-    zipper.cursor <- Queue.pop zipper.ctxt;
+  if not (Stack.is_empty zipper.ctxt) then begin
+    zipper.cursor <- Stack.pop zipper.ctxt;
     true
   end else
     false
