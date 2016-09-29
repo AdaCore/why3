@@ -326,7 +326,7 @@ let rec move_to_goal move =
 let move_to_goal_ret move =
   match
     (match move_to_goal move with
-    | None -> Printf.eprintf "No more goal right; back to root@.";
+    | None -> Printf.printf "No more goal right; back to root@.";
 	zipper_init(); move_to_goal next_node
     | Some id -> Some id) with
   | None -> failwith "After initialization there is no goal to go to@."
@@ -427,129 +427,18 @@ let test_schedule_proof_attempt fmt _args =
     cont id alt_ergo.Whyconf.prover
     ~limit ~callback
 
-let apply_transform_no_args fmt args =
+let apply_transform fmt args =
   match args with
-    | [s] ->
+    | tr :: tl ->
        let id = nearest_goal () in
        let callback status =
          fprintf fmt "transformation status: %a@."
                  Controller_itp.print_trans_status status
        in
-       begin
-         try
-           C.schedule_transformation cont id s [] ~callback
-         with
-           e when not (Debug.test_flag Debug.stack_trace) ->
-           printf "Error: %a@." Exn_printer.exn_printer e
-       end
-    | _ -> printf "Error: exactly one argument expected@."
-
-let test_transformation_with_args fmt args =
-  (* temporary : apply duplicate on the first goal *)
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-            Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "duplicate" args ~callback
-
-let test_simple_apply fmt args =
-  (* temporary : parses a string *)
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-      Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "simple_apply" args ~callback
-
-let test_apply_with_string_args fmt args =
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-      Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "apply" args ~callback
-
-let test_remove_with_string_args fmt args =
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-      Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "remove" args ~callback
-
-let type_ptree ~as_fmla t task =
-  let used_ths = Task.used_theories task in
-  let used_symbs = Task.used_symbols used_ths in
-  let local_decls = Task.local_decls task used_symbs in
-  (* rebuild a theory_uc *)
-  let th_uc = Theory.create_theory (Ident.id_fresh "dummy") in
-  let th_uc =
-    Ident.Mid.fold
-      (fun _id th acc -> Theory.use_export acc th)
-      used_ths th_uc
-  in
-  let th_uc =
-    List.fold_left
-      (fun acc d -> Theory.add_decl ~warn:false acc d)
-      th_uc local_decls
-  in
-  if as_fmla
-  then Typing.type_fmla th_uc (fun _ -> None) t
-  else Typing.type_term th_uc (fun _ -> None) t
-
-let parse_arg_only s task =
-  let lb = Lexing.from_string s in
-  let t =
-    Lexer.parse_term lb
-  in
-  let t =
-    type_ptree ~as_fmla:false t task
-  in
-  eprintf "transformation parse_arg_only succeeds: %a@." Pretty.print_term t;
-  [task]
-
-let () = Trans.(register_transform_with_args
-           "parse_arg_only" Args_wrapper.(wrap (Tstring Ttrans) parse_arg_only)
-           ~desc:"Just parse and type the string argument")
-
-let test_transformation_with_string_parsed_later fmt args =
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-      Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "parse_arg_only" args ~callback
+       C.schedule_transformation cont id tr tl ~callback
+    | _ -> printf "Error: Give the name of the transformation@."
 
 (*******)
-
-
-(* Only parses arguments and print debugging information *)
-(*
-let test_transformation_with_term_arg _fmt args =
-  let _ = parse_transformation_arg args in ()
- *)
-
-let test_case_with_term_args fmt args =
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-      Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "case" args ~callback
-
-(* TODO rewrite this. Only for testing *)
-let test_transformation_one_arg_term fmt args =
-  match args with
-  | [] -> printf "Give the name of the transformation@."
-  | tr :: tl ->
-      let id = nearest_goal () in
-      let callback status =
-        fprintf fmt "transformation %s status: %a@."
-          tr Controller_itp.print_trans_status status
-      in
-      C.schedule_transformation cont id tr tl ~callback
-
 
 let task_driver =
   let d = Filename.concat (Whyconf.datadir main)
@@ -582,38 +471,23 @@ let commands =
   [
     "list-provers", "list available provers", list_provers;
     "list-transforms", "list available transformations", list_transforms;
-    (* temporary *)
-    "i", "run a simple test of Unix_scheduler.idle", test_idle;
-(*
-    "a", "run a simple test of Unix_scheduler.timeout", test_timeout;
- *)
-    "a", "<transname>: apply the transformation <transname> with no argument", apply_transform_no_args;
+    "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
-    "c", "case on next goal", test_case_with_term_args;
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
-    "rem", "test remove transformation. Take one string argument", test_remove_with_string_args;
-    "app", "test apply transformation. Take one string argument", test_apply_with_string_args;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
-(*
-    "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
- *)
-    "ttr", "takes 2 arguments. Name of the transformation (with one term argument) and a term" , test_transformation_one_arg_term;
-    "tra", "test duplicate transformation", test_transformation_with_args;
     "ng", "get to the next goal", move_to_goal_ret_p next_node;
     "pg", "get to the prev goal", move_to_goal_ret_p prev_node;
     "gu", "get to the goal up",  move_to_goal_ret_p zipper_up;
-    "gd", "get to the goal up",  move_to_goal_ret_p zipper_down;
-    "gr", "get to the goal up",  move_to_goal_ret_p zipper_right;
-    "gl", "get to the goal up",  move_to_goal_ret_p zipper_left;
+    "gd", "get to the goal down",  move_to_goal_ret_p zipper_down;
+    "gr", "get to the goal right",  move_to_goal_ret_p zipper_right;
+    "gl", "get to the goal left",  move_to_goal_ret_p zipper_left;
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
-    "tt", "test a transformation having a term as argument", test_transformation_with_string_parsed_later;
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
     "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
     "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));
-    "zr", "navigation right, right brother", (fun _ _ -> ignore (zipper_right ()));
-    "sa", "test simple_apply", test_simple_apply
+    "zr", "navigation right, right brother", (fun _ _ -> ignore (zipper_right ()))
   ]
 
 let commands_table = Stdlib.Hstr.create 17
