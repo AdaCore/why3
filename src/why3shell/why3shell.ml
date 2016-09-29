@@ -369,14 +369,22 @@ let test_schedule_proof_attempt fmt _args =
     cont id alt_ergo.Whyconf.prover
     ~limit ~callback
 
-let test_transformation fmt _args =
-  (* temporary : apply split on the first goal *)
-  let id = nearest_goal () in
-  let callback status =
-    fprintf fmt "transformation status: %a@."
-            Controller_itp.print_trans_status status
-  in
-  C.schedule_transformation cont id "split_goal_wp" [] ~callback
+let apply_transform_no_args fmt args =
+  match args with
+    | [s] ->
+       let id = nearest_goal () in
+       let callback status =
+         fprintf fmt "transformation status: %a@."
+                 Controller_itp.print_trans_status status
+       in
+       begin
+         try
+           C.schedule_transformation cont id s [] ~callback
+         with
+           e when not (Debug.test_flag Debug.stack_trace) ->
+           printf "Error: %a@." Exn_printer.exn_printer e
+       end
+    | _ -> printf "Error: exactly one argument expected@."
 
 let test_transformation_with_args fmt args =
   (* temporary : apply duplicate on the first goal *)
@@ -547,7 +555,8 @@ let test_transformation_with_string_parsed_later fmt args =
          fprintf fmt "transformation status: %a@."
                  Controller_itp.print_trans_status status
        in
-       C.schedule_transformation cont id "parse_arg_only" [Trans.TAstring s] ~callback  | _ ->  printf "string argument expected"
+       C.schedule_transformation cont id "parse_arg_only" [Trans.TAstring s] ~callback
+    | _ ->  printf "string argument expected@."
 
 
 (*******)
@@ -617,7 +626,10 @@ let commands =
     "list-transforms", "list available transformations", list_transforms;
     (* temporary *)
     "i", "run a simple test of Unix_scheduler.idle", test_idle;
+(*
     "a", "run a simple test of Unix_scheduler.timeout", test_timeout;
+ *)
+    "a", "<transname>: apply the transformation <transname> with no argument", apply_transform_no_args;
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
     "c", "case on next goal", test_case_with_term_args;
@@ -626,7 +638,9 @@ let commands =
     "rem", "test remove transformation. Take one string argument", test_remove_with_string_args;
     "app", "test apply transformation. Take one string argument", test_apply_with_string_args;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
+(*
     "tr", "test schedule_transformation with split_goal on the current or next right goal (or on the top goal if there is none", test_transformation;
+ *)
     "ttr", "takes 2 arguments. Name of the transformation (with one term argument) and a term" , test_transformation_one_arg_term;
     "tra", "test duplicate transformation", test_transformation_with_args;
     "ngr", "get to the next goal right", ngr_ret_p;
