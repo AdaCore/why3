@@ -453,122 +453,30 @@ let test_transformation_with_args fmt args =
   in
   C.schedule_transformation cont id "duplicate" args ~callback
 
-(* Do not use this. TODO
-   Claude: indeed type_fmla and type_term should never be used like this
-*)
-let typing_terms t th =
-  try (Typing.type_fmla th (fun _ -> None) t) with
-  | _ -> Typing.type_term th (fun _ -> None) t
-
-(*
-let parse_transformation_arg args : Term.term option =
-  (* temporary : parses the term *)
-  match args with
-  | [s] ->
-     printf "parsing string '%s'@." s;
-     begin try
-         let lb = Lexing.from_string s in
-         let t = Lexer.parse_term lb in
-         printf "parsing OK@.";
-         let env = cont.controller_env in
-         let th = Theory.create_theory (Ident.id_fresh "dummy") in
-         let int_theory = Env.read_theory env ["int"] "Int" in
-         let th = Theory.use_export th int_theory in
-         let t = typing_terms t th in
-         let _ = printf "typing OK: %a@." Pretty.print_term t in
-         Some t
-       with e ->
-         let _ = printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e in
-         None
-     end
-  | _ -> let _ = printf "term argument expected@." in None
- *)
-
-
-(*
-let parse_transformation_string args : string option =
-  (* temporary : parses a string *)
-  match args with
-  | [s] ->
-     let s =
-       let l = String.length s in
-       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
-         String.sub s 1 (l - 2)
-       else s
-     in
-     printf "parsing string \"%s\"@." s;
-     Some s
-  | _ -> let _ = printf "term argument expected@." in None
- *)
-
 let test_simple_apply fmt args =
   (* temporary : parses a string *)
-(*
-  match args with
-  | [s';s] ->
-     let s =
-       let l = String.length s in
-       if l >= 2 && s.[0] = '"' && s.[l - 1] = '"' then
-         String.sub s 1 (l - 2)
-       else s
-     in
-     let s' =
-       let l = String.length s' in
-       if l >= 2 && s'.[0] = '"' && s'.[l - 1] = '"' then
-         String.sub s' 1 (l - 2)
-       else s'
-     in
-     printf "parsing string \"%s\"@." s;
-     begin try
-       let lb = Lexing.from_string s in
-       let t = Lexer.parse_term lb in
-       printf "parsing OK@.";
-       let env = cont.controller_env in
-       let th = Theory.create_theory (Ident.id_fresh "dummy") in
-       let int_theory = Env.read_theory env ["int"] "Int" in
-       let th = Theory.use_export th int_theory in
-       let t = typing_terms t th in
-       let _ = printf "typing OK: %a@." Pretty.print_term t in
- *)
-     let id = nearest_goal () in
-     let callback status =
-       fprintf fmt "transformation status: %a@."
-         Controller_itp.print_trans_status status
-     in
-     C.schedule_transformation cont id "simple_apply" args ~callback
-(*
-     with e ->
-       let _ = printf "Error while parsing/typing: %a@." Exn_printer.exn_printer e in
-       ()
-     end
-  | _ -> let _ = printf "term argument expected@." in ()
- *)
+  let id = nearest_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+      Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "simple_apply" args ~callback
 
 let test_apply_with_string_args fmt args =
-(*
-  match (parse_transformation_string args) with
-  | None -> ()
-  | Some s ->
- *)
-      let id = nearest_goal () in
-      let callback status =
-        fprintf fmt "transformation status: %a@."
-          Controller_itp.print_trans_status status
-      in
-      C.schedule_transformation cont id "apply" args ~callback
+  let id = nearest_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+      Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "apply" args ~callback
 
 let test_remove_with_string_args fmt args =
-(*
-  match (parse_transformation_string args) with
-  | None -> ()
-  | Some s ->
- *)
-      let id = nearest_goal () in
-      let callback status =
-        fprintf fmt "transformation status: %a@."
-          Controller_itp.print_trans_status status
-      in
-      C.schedule_transformation cont id "remove" args ~callback
+  let id = nearest_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+      Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "remove" args ~callback
 
 let type_ptree ~as_fmla t task =
   let used_ths = Task.used_theories task in
@@ -593,14 +501,10 @@ let type_ptree ~as_fmla t task =
 let parse_arg_only s task =
   let lb = Lexing.from_string s in
   let t =
-    (* try *)
-      Lexer.parse_term lb
-    (* with _ -> failwith "parsing error" *)
+    Lexer.parse_term lb
   in
   let t =
-    (* try *)
-      type_ptree ~as_fmla:false t task
-    (* with *)
+    type_ptree ~as_fmla:false t task
   in
   eprintf "transformation parse_arg_only succeeds: %a@." Pretty.print_term t;
   [task]
@@ -610,20 +514,12 @@ let () = Trans.(register_transform_with_args
            ~desc:"Just parse and type the string argument")
 
 let test_transformation_with_string_parsed_later fmt args =
-(*
-  match args with
-    | [s] ->
- *)
-       let id = nearest_goal () in
-       let callback status =
-         fprintf fmt "transformation status: %a@."
-                 Controller_itp.print_trans_status status
-       in
-       C.schedule_transformation cont id "parse_arg_only" args ~callback
-(*
-    | _ ->  printf "string argument expected@."
- *)
-
+  let id = nearest_goal () in
+  let callback status =
+    fprintf fmt "transformation status: %a@."
+      Controller_itp.print_trans_status status
+  in
+  C.schedule_transformation cont id "parse_arg_only" args ~callback
 
 (*******)
 
@@ -635,18 +531,12 @@ let test_transformation_with_term_arg _fmt args =
  *)
 
 let test_case_with_term_args fmt args =
-(*
-  match (parse_transformation_arg args) with
-  | None -> ()
-  | Some t ->
- *)
   let id = nearest_goal () in
   let callback status =
     fprintf fmt "transformation status: %a@."
-            Controller_itp.print_trans_status status
+      Controller_itp.print_trans_status status
   in
   C.schedule_transformation cont id "case" args ~callback
-
 
 (* TODO rewrite this. Only for testing *)
 let test_transformation_one_arg_term fmt args =
@@ -658,12 +548,7 @@ let test_transformation_one_arg_term fmt args =
         fprintf fmt "transformation %s status: %a@."
           tr Controller_itp.print_trans_status status
       in
-(*
-      match (parse_transformation_arg tl) with
-      | None -> ()
-      | Some t ->
- *)
-          C.schedule_transformation cont id tr tl ~callback
+      C.schedule_transformation cont id tr tl ~callback
 
 
 let task_driver =

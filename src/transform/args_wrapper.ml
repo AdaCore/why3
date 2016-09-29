@@ -10,6 +10,7 @@ type _ trans_typ =
   | Tty : 'a trans_typ -> (ty -> 'a) trans_typ
   | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
   | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
+  | Tformula : 'a trans_typ -> (term -> 'a) trans_typ
 
 (*** term argument parsed in the context of the task ***)
 let type_ptree ~as_fmla t task =
@@ -33,17 +34,13 @@ let type_ptree ~as_fmla t task =
   then Typing.type_fmla th_uc (fun _ -> None) t
   else Typing.type_term th_uc (fun _ -> None) t
 
-let parse_and_type s task =
+let parse_and_type ~as_fmla s task =
   let lb = Lexing.from_string s in
   let t =
       Lexer.parse_term lb
   in
   let t =
-    (* TODO I need both as_fmla = true and as_fmla = false in some transformations. How to tell which one to use ?
-     For example, cut needs a formula and simple_apply needs a term *)
-    try
-      type_ptree ~as_fmla:false t task
-    with _ -> type_ptree ~as_fmla:true t task
+      type_ptree ~as_fmla:as_fmla t task
   in
   t
 
@@ -67,17 +64,19 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
       | s :: tail -> wrap t' (f s) tail task
       | _ -> failwith "Missing argument: expecting a string."
     end
-(*  | Tformula t' ->
+  | Tformula t' ->
     begin
-
-
-    end (* TODO *)
-*)
+      match l with
+      | s :: tail ->
+         let te = parse_and_type ~as_fmla:true s task in
+         wrap t' (f te) tail task
+      | _ -> failwith "Missing argument: expecting a formula."
+    end
   | Tterm t' ->
     begin
       match l with
       | s :: tail ->
-         let te = parse_and_type s task in
+         let te = parse_and_type ~as_fmla:false s task in
          wrap t' (f te) tail task
       | _ -> failwith "Missing argument: expecting a term."
     end

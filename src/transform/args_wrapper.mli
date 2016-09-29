@@ -8,5 +8,6 @@ type _ trans_typ =
   | Tty : 'a trans_typ -> (Ty.ty -> 'a) trans_typ
   | Ttysymbol : 'a trans_typ -> (Ty.tysymbol -> 'a) trans_typ
   | Tterm : 'a trans_typ -> (Term.term -> 'a) trans_typ
+  | Tformula : 'a trans_typ -> (Term.term -> 'a) trans_typ
 
 val wrap : 'a trans_typ -> 'a -> Trans.trans_with_args

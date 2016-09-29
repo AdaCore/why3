@@ -224,43 +224,8 @@ let apply name task =
   | Tbinop (Timplies, _ta, _tb) -> failwith "Not implemented yet" (* TODO to be done later *)
   | _ -> failwith "Not of the form forall x. A -> B"
 
-(*
-let case' =
-(*
-args task  =
-  match args with
-  | [TAterm t] -> case t task
-  | _ -> failwith "wrong arguments for case"
- *)
-
-let cut' args task =
-  match args with
-  | [TAterm t] -> cut t task
-  | _ -> failwith "wrong arguments for cut"
-
-let exists' args task =
-   match args with
-  | [TAterm t] -> exists t task
-  | _ -> failwith "wrong arguments for exists"
-
-let remove' args task =
-  match args with
-  | [TAstring name] -> remove name task
-  | _ -> failwith "wrong argument for remove"
-
-let simple_apply' args task =
-  match args with
-  | [TAstring name; TAterm t] -> simple_apply name t task
-  | _ -> failwith "wrong arguments of simple_apply"
-
-let apply' args task =
-  match args with
-  | [TAstring name] -> apply name task
-  | _ -> failwith "wrong arguments of simple_apply"
-         *)
-
-let () = register_transform_with_args ~desc:"test case" "case" (wrap (Tterm Ttrans) case)
-let () = register_transform_with_args ~desc:"test cut" "cut" (wrap (Tterm Ttrans) cut)
+let () = register_transform_with_args ~desc:"test case" "case" (wrap (Tformula Ttrans) case)
+let () = register_transform_with_args ~desc:"test cut" "cut" (wrap (Tformula Ttrans) cut)
 let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tstring Ttrans) remove)
 let () = register_transform_with_args ~desc:"test simple_apply" "simple_apply"
