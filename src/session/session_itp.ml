@@ -159,8 +159,17 @@ let get_transfNode (s : session) (id : transID) =
 let get_transformations (s : session) (id : proofNodeID) =
   (get_proofNode s id).proofn_transformations
 
+let get_proof_attempts (s : session) (id : proofNodeID) =
+  Hprover.fold (fun _ a l -> a.proofa_attempt :: l) (get_proofNode s id).proofn_attempts []
+
 let get_sub_tasks (s : session) (id : transID) =
   (get_transfNode s id).transf_subtasks
+
+let get_transformation_name (s : session) (id : transID) =
+  (get_transfNode s id).transf_name
+
+let get_proof_name (s : session) (id : proofNodeID) =
+  (get_proofNode s id).proofn_name
 
 let get_proof_parent (s : session) (id : proofNodeID) =
   (get_proofNode s id).proofn_parent

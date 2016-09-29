@@ -41,7 +41,14 @@ Each goal
 
 
 
-type proof_attempt
+type proof_attempt = {
+  prover              : Whyconf.prover;
+  limit               : Call_provers.resource_limit;
+  mutable proof_state : Call_provers.prover_result option;
+  (* None means that the call was not done or never returned *)
+  proof_obsolete      : bool;
+  proof_script        : string option;  (* non empty for external ITP *)
+}
 type transID
 
 
@@ -91,7 +98,11 @@ val print_session : Format.formatter -> session -> unit
 
 (* val get_proof_attempts : session -> proofNodeID -> proof_attempt Whyconf.Hprover.t *)
 val get_transformations : session -> proofNodeID -> transID list
+val get_proof_attempts : session -> proofNodeID -> proof_attempt list
 val get_sub_tasks : session -> transID -> proofNodeID list
+
+val get_transformation_name : session -> transID -> string
+val get_proof_name : session -> proofNodeID -> Ident.ident
 
 val get_proof_parent : session -> proofNodeID -> proof_parent
 val get_trans_parent : session -> transID -> proofNodeID

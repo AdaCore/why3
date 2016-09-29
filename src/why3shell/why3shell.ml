@@ -209,14 +209,10 @@ let list_transforms _fmt _args =
          (Pp.print_list Pp.newline2 print_trans_desc)
          (List.sort sort_pair l)
 
-let dump_session_raw fmt _args =
-  fprintf fmt "%a@." Session_itp.print_session cont.Controller_itp.controller_session
-
 open Controller_itp
 open Session_itp
-
-(* type proof_cursor = Th of theory | Pn of proofNodeID | Tn of transID *)
-
+(* _____________________________________________________________________ *)
+(* -------------------- zipper ----------------------------------------- *)
 type proof_hole =
     Th of theory list * theory * theory list |
     Pn of proofNodeID list * proofNodeID * proofNodeID list |
@@ -307,21 +303,106 @@ let zipper_left () =
     true
   | _ -> false
 
+(* _____________________________________________________________________ *)
+(* -------------------- moving around ---------------------------------- *)
+
 let rec next_node () =
   zipper_down () || zipper_right () || (zipper_up () && next_node_no_down ())
 and next_node_no_down () =
   zipper_right () || (zipper_up () && next_node_no_down ())
 
-let prev_node = zipper_left () || zipper_up ()
+let prev_node () = zipper_left () || zipper_up ()
 
-(* This function always move from current position to the next goal even when on a goal *)
-let rec nearest_goal_right () =
-  if next_node () then
+(* This function try to reach a goal from the current position using
+   the move function *)
+let rec move_to_goal move =
+  if move () then
     match zipper.cursor with
     | Pn (_,pn,_) -> Some pn
-    | _  -> nearest_goal_right ()
+    | _  -> move_to_goal move
   else
     None
+
+let move_to_goal_ret move =
+  match
+    (match move_to_goal move with
+    | None -> Printf.eprintf "No more goal right; back to root@.";
+	zipper_init(); move_to_goal next_node
+    | Some id -> Some id) with
+  | None -> failwith "After initialization there is no goal to go to@."
+  | Some id -> id
+
+let move_to_goal_ret_p move _ _ = ignore (move_to_goal_ret move)
+
+(* The cursor of the zipper is on a goal *)
+let is_goal_cursor () =
+  match zipper.cursor with
+  | Pn (_, pn, _) -> Some pn
+  | _ -> None
+
+(* If on goal, do nothing else go to next_goal *)
+let nearest_goal () =
+  match is_goal_cursor () with
+  | None -> move_to_goal_ret next_node
+  | Some id -> id
+
+(* _____________________________________________________________________ *)
+(* -------------------- printing --------------------------------------- *)
+
+let print_proof_attempt fmt pa =
+  fprintf fmt "%a tl=%d %a"
+          Whyconf.print_prover pa.prover
+          pa.limit.Call_provers.limit_time
+          (Pp.print_option Call_provers.print_prover_result) pa.proof_state
+
+let rec print_proof_node s (fmt: Format.formatter) p =
+  let parent = match get_proof_parent s p with
+  | Theory t -> (theory_name t).Ident.id_string
+  | Trans id -> get_transformation_name s id
+  in
+  let current_goal =
+    match is_goal_cursor () with
+    | Some pn -> pn = p
+    | _ -> false
+  in
+  if current_goal then
+    fprintf fmt "**";
+
+  fprintf fmt
+    "@[<hv 2> Goal %s;@ parent %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
+    (get_proof_name s p).Ident.id_string parent
+    (Pp.print_list Pp.semi print_proof_attempt)
+    (get_proof_attempts s p)
+    (Pp.print_list Pp.semi (print_trans_node s)) (get_transformations s p);
+
+  if current_goal then
+    fprintf fmt "**"
+
+and print_trans_node s fmt id =
+  let name = get_transformation_name s id in
+  let l = get_sub_tasks s id in
+  let parent = (get_proof_name s (get_trans_parent s id)).Ident.id_string in
+  fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
+    (Pp.print_list Pp.semi (print_proof_node s)) l
+
+let print_theory s fmt th : unit =
+  fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" (theory_name th).Ident.id_string
+    (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) (theory_goals th)
+
+let print_file s fmt (file, thl) =
+  fprintf fmt "@[<hv 2> File %s;@ [%a]@]" file.file_name
+    (Pp.print_list Pp.semi (print_theory s)) thl
+
+let print_s s fmt =
+  fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
+
+let print_session fmt s =
+  let l = Stdlib.Hstr.fold (fun _ f acc -> (f,f.file_theories) :: acc) (get_files s) [] in
+  fprintf fmt "%a@." (print_s s) l;;
+
+let dump_session_raw fmt _args =
+  fprintf fmt "%a@." print_session cont.Controller_itp.controller_session
+
 
 let print_position (s: session) (cursor: proof_zipper) fmt: unit =
   match cursor.cursor with
@@ -331,31 +412,8 @@ let print_position (s: session) (cursor: proof_zipper) fmt: unit =
 
 let print_position_p s cursor fmt _ = print_position s cursor fmt
 
-(* This function try to get the id of the nearest goal right. If it can't, it tries
-   to get you to the first goal of the session. If this is still not possible,
-   it returns an error. *)
-let ngr_ret () =
-  match
-    (match nearest_goal_right () with
-    | None -> Printf.eprintf "No more goal right. You might want to go back to the root@.";
-	zipper_init(); nearest_goal_right ()
-    | Some id -> Some id) with
-  | None -> failwith "After initialization there is no goal to go to@."
-  | Some id -> id
-
-(* The cursor of the zipper is on a goal *)
-let is_goal_cursor () =
-  match zipper.cursor with
-  | Pn (_, pn, _) -> Some pn
-  | _ -> None
-
-let ngr_ret_p _ _ = ignore (ngr_ret ())
-
-(* If on goal, do nothing else go to next_goal *)
-let nearest_goal () =
-  match (is_goal_cursor ()) with
-  | None -> ngr_ret ()
-  | Some id -> id
+(* _____________________________________________________________________ *)
+(* -------------------- test with transformations ---------------------- *)
 
 let test_schedule_proof_attempt fmt _args =
   (* temporary : get the first goal *)
@@ -661,7 +719,12 @@ let commands =
  *)
     "ttr", "takes 2 arguments. Name of the transformation (with one term argument) and a term" , test_transformation_one_arg_term;
     "tra", "test duplicate transformation", test_transformation_with_args;
-    "ngr", "get to the next goal right", ngr_ret_p;
+    "ng", "get to the next goal", move_to_goal_ret_p next_node;
+    "pg", "get to the prev goal", move_to_goal_ret_p prev_node;
+    "gu", "get to the goal up",  move_to_goal_ret_p zipper_up;
+    "gd", "get to the goal up",  move_to_goal_ret_p zipper_down;
+    "gr", "get to the goal up",  move_to_goal_ret_p zipper_right;
+    "gl", "get to the goal up",  move_to_goal_ret_p zipper_left;
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
     "tt", "test a transformation having a term as argument", test_transformation_with_string_parsed_later;
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));

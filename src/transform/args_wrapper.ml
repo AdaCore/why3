@@ -1,5 +1,3 @@
-
-
 open Task
 open Ty
 open Term
@@ -21,15 +19,17 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
     begin
       match l with
       | s :: tail ->
-         let n = int_of_string s in
-         wrap t' (f n) tail task
-      | _ -> assert false
+        (try
+          let n = int_of_string s in
+          wrap t' (f n) tail task
+        with Failure _ -> raise (Failure "Parsing error: expecting an integer."))
+      | _ -> failwith "Missing argument: expecting an integer."
     end
   | Tstring t' ->
     begin
       match l with
       | s :: tail -> wrap t' (f s) tail task
-      | _ -> assert false
+      | _ -> failwith "Missing argument: expecting a string."
     end
   | Tterm t' ->
     begin
@@ -37,7 +37,7 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
       | _s :: tail ->
          let te = Term.t_true in (* TODO: parsing + typing of s *)
          wrap t' (f te) tail task
-      | _ -> assert false
+      | _ -> failwith "Missing argument: expecting a term."
     end
   | Tty t' ->
     begin
@@ -45,7 +45,7 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
       | _s :: tail ->
          let ty = Ty.ty_int in (* TODO: parsing + typing of s *)
          wrap t' (f ty) tail task
-      | _ -> assert false
+      | _ -> failwith "Missing argument: expecting a type."
     end
   | Ttysymbol t' ->
     begin
@@ -53,5 +53,5 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
       | _s :: tail ->
          let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
          wrap t' (f tys) tail task
-      | _ -> assert false
+      | _ -> failwith "Missing argument: expecting a type symbol."
     end
