@@ -420,7 +420,9 @@ let print_sequent _args ?old:_ fmt =
         info := {info_syn = sm; itp = true};
         Trans.store
           (fun task ->
-           let task = Trans.apply (Trans.goal Introduction.intros) task in
+(*
+          let task = Trans.apply (Trans.goal Introduction.intros) task in
+*)
            (* print_th_prelude task fmt args.th_prelude; *)
            let ut = Task.used_symbols (Task.used_theories task) in
            let ld = Task.local_decls task ut in
