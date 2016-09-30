@@ -613,3 +613,6 @@ let () = Exn_printer.register
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
   | _ -> raise exn
   end
+
+(* TODO To remove *)
+let ppunique = Ident.string_unique pprinter

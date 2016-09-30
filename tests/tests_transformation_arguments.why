@@ -1,0 +1,38 @@
+
+theory Test
+   use import int.Int
+
+   goal G: forall x. exists y. x = 2 * y
+
+   (*
+ng
+b introduce_premises
+>> print goal with primitives introduced
+b cut "exists x: int. x = x"
+>> print goal with h in context
+b exists "5"
+>> print new goal G1 with (x = (2 * 5))
+p
+>> print the proof tree with ** where we are
+b case "exists x. exists y. x + y = y - x"
+>> print the goal with the hypothesis in context
+ng
+g
+>> print the goal with the contrary hypothesis
+pg
+>> return to context with positive exists
+g
+>> print it
+b cut "exists x. exists y. x + y = 0"
+ng
+g
+>> Have to prove h2 with 2 exists
+b exists "4"
+>> Instantiate x1
+b cut "forall x. forall y. x + y = 0"
+>> print with h2 in context
+b instantiate "h2" "4"
+>> create h21 which is correct
+   *)
+
+end

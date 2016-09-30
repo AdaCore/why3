@@ -452,7 +452,8 @@ let test_print_goal fmt _args =
   let id = nearest_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
-    (Driver.print_task ~cntexample:false task_driver) task
+    (*(fprintf fmt "@[%a@]@?" Pretty.print_task task)*) Pretty.print_task
+(*Driver.print_task ~cntexample:false task_driver)*) task
 
 let test_save_session _fmt args =
   match args with
@@ -467,11 +468,28 @@ let test_reload fmt _args =
   C.reload_files cont;
   fprintf fmt "done @."
 
+let test_transform_and_display fmt args =
+  match args with
+    | tr :: tl ->
+       let id = nearest_goal () in
+       let callback status =
+         fprintf fmt "transformation status: %a@."
+                 Controller_itp.print_trans_status status;
+         match status with
+         | TSdone -> (ignore (move_to_goal_ret next_node);
+             test_print_goal fmt [])
+         | _ -> ()
+       in
+       C.schedule_transformation cont id tr tl ~callback
+    | _ -> printf "Error: Give the name of the transformation@."
+
+(*******)
 let commands =
   [
     "list-provers", "list available provers", list_provers;
     "list-transforms", "list available transformations", list_transforms;
     "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
+    "b", "<transname> <args>: behave like a then wait 0.2sec and display goal", test_transform_and_display;
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
     "g", "prints the first goal", test_print_goal;

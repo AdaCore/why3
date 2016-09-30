@@ -8,19 +8,29 @@ open Args_wrapper
 
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
+(* TODO ugly ! Solve it an other way *)
+let clean_environment task =
+  let _ = Pretty.forget_all in
+  let _ = Pretty.print_task Format.str_formatter task in
+  ()
+
+let gen_ident s = Ident.id_fresh (Pretty.ppunique s)
+
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
 let case t task =
-  let h = Decl.create_prsymbol (Ident.id_fresh "h") in
-  let hnot = Decl.create_prsymbol (Ident.id_fresh "hnot") in
+  clean_environment task;
+  let h = Decl.create_prsymbol (gen_ident "h") in
+  let hnot = Decl.create_prsymbol (gen_ident "hnot") in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
   let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
   List.map (fun f -> Trans.apply f task) [Trans.add_decls [t_decl]; Trans.add_decls [t_not_decl]]
 
 (* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
 let cut t task =
+  clean_environment task;
   let g, task = Task.task_separate_goal task in
-  let h = Decl.create_prsymbol (Ident.id_fresh "h") in
+  let h = Decl.create_prsymbol (gen_ident "h") in
   let g_t = Decl.create_prop_decl Decl.Pgoal h t in
   let h_t = Decl.create_prop_decl Decl.Paxiom h t in
   let goal_cut = Task.add_decl task g_t in
@@ -56,11 +66,12 @@ let subst_forall t x =
 (* From task [delta |- exists x. G] and term t, build the task [delta] |- G[x -> t]]
    Return an error if x and t are not unifiable. *)
 let exists x task =
+  clean_environment task;
   let g, task = Task.task_separate_goal task in
   match g.td_node with
   | Decl {d_node = Dprop (_, _, t)} ->
       let t = subst_exist t x in
-      let pr_goal = create_prsymbol (Ident.id_fresh "G") in
+      let pr_goal = create_prsymbol (gen_ident "G") in
       let new_goal = Decl.create_prop_decl Decl.Pgoal pr_goal t in
       [Task.add_decl task new_goal]
   | _ -> failwith "No goal"
@@ -92,9 +103,7 @@ let rec remove_task_decl task (name: string) : task_hd option =
   adding "print_task". To be resolved in a better way. *)
 (* from task [delta, name:A |- G]  build the task [delta |- G] *)
 let remove name task =
-  (* Force setting of pprinter *)
-  let _ = Pretty.print_task Format.str_formatter task in
-  let _ = ignore (Format.flush_str_formatter ()) in
+  clean_environment task;
   let g, task = Task.task_separate_goal task in
   let task = remove_task_decl task name in
   [Task.add_tdecl task g]
@@ -115,10 +124,8 @@ let find_hypothesis name task =
 
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
-let simple_apply name t task =
-  (* Force setting of pprinter *)
-  let _ = Pretty.print_task Format.str_formatter task in
-  let _ = ignore (Format.flush_str_formatter ()) in
+let instantiate name t task =
+  clean_environment task;
   let g, task = Task.task_separate_goal task in
   let ndecl = find_hypothesis name task in
   match ndecl with
@@ -126,7 +133,7 @@ let simple_apply name t task =
   | Some decl -> (match decl.td_node with
     | Decl {d_node = Dprop (pk, _pr, ht)} ->
       let t_subst = subst_forall ht t in
-      let new_pr = create_prsymbol (Ident.id_fresh name) in
+      let new_pr = create_prsymbol (gen_ident name) in
       let new_decl = create_prop_decl pk new_pr t_subst in
       let task = add_decl task new_decl in
         [Task.add_tdecl task g]
@@ -188,9 +195,7 @@ let term_decl d =
 (* from task [delta, name:forall x.A->B |- G,
    build the task [delta,name:forall x.A->B] |- A[x -> t]] ou t est tel que B[x->t] = G *)
 let apply name task =
-  (* Force setting of pprinter *)
-  let _ = Pretty.print_task Format.str_formatter task in
-  let _ = ignore (Format.flush_str_formatter ()) in
+  clean_environment task;
   let g, task = Task.task_separate_goal task in
   let tg = term_decl g in
   let d = find_hypothesis name task in
@@ -214,7 +219,7 @@ let apply name task =
             (* TODO t_equal is probably too strong *)
             if (Term.t_equal new_tb tg) then
                [Task.add_decl task (create_prop_decl Pgoal
-                 (create_prsymbol (Ident.id_fresh "G")) new_goal)]
+                 (create_prsymbol (gen_ident "G")) new_goal)]
             else
               (Format.printf "Term substituted was %a. Should be goal was %a. Goal was %a @." Pretty.print_term x Pretty.print_term new_tb Pretty.print_term tg;
               failwith "After substitution, terms are not exactly identical")
@@ -228,7 +233,7 @@ let () = register_transform_with_args ~desc:"test case" "case" (wrap (Tformula T
 let () = register_transform_with_args ~desc:"test cut" "cut" (wrap (Tformula Ttrans) cut)
 let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tstring Ttrans) remove)
-let () = register_transform_with_args ~desc:"test simple_apply" "simple_apply"
-                                      (wrap (Tstring (Tterm Ttrans)) simple_apply)
+let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
+                                      (wrap (Tstring (Tterm Ttrans)) instantiate)
 let () = register_transform_with_args ~desc:"test apply" "apply" (wrap (Tstring Ttrans) apply)
 let () = register_transform_with_args ~desc:"test duplicate" "duplicate" (wrap (Tint Ttrans) dup)
