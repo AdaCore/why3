@@ -598,7 +598,8 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
          ull_user.HighPart = ft_user.dwHighDateTime;
          cpu_time =
            ((ull_system.QuadPart + ull_user.QuadPart + 0.0) / 10000000.);
-         timeout = (exitcode == 1816) || (exitcode == STATUS_QUOTA_EXCEEDED);
+         timeout = (exitcode == ERROR_NOT_ENOUGH_QUOTA) ||
+                   (exitcode == STATUS_QUOTA_EXCEEDED);
          send_msg_to_client(client,
                             child->id,
                             exitcode,
