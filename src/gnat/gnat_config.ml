@@ -505,33 +505,56 @@ let limit_time ~prover =
 
 type steps_convert = { add : int; mult : int }
 
-let convert_data =
-  let h = Hashtbl.create 17 in
-  Hashtbl.add h "CVC4" { add = 10000; mult = 25 };
-  Hashtbl.add h "Z3" { add = 450000; mult = 800 };
-  h
+module Steps_conversion : sig
+
+  val convert : prover : string -> int -> int
+  val back_convert : prover : string -> int -> int
+
+end = struct
+
+  let convert_data =
+    ["cvc4", { add = 10000; mult = 25 };
+     "z3",   { add = 450000; mult = 800 }]
+
+  let starts_with a b =
+    if String.length a > String.length b then false
+    else
+      a = String.sub (String.lowercase b) 0 (String.length a)
+
+  let num_convert conv c =
+    conv.add + conv.mult * c
+
+  let num_back_convert conv c =
+  (* we are adding 1 to the count because the division will round downwards,
+     but we want to have the property that checks are proved with the
+     reported steps *)
+    (max 0 (c - conv.add)) / conv.mult + 1
+
+  let find_convert prover =
+    let rec aux l =
+      match l with
+      | [] -> { add = 0 ; mult = 1 }
+      | (name, conv) :: rest ->
+          if starts_with name prover then conv
+          else aux rest
+    in
+    aux convert_data
+
+  let convert ~prover c =
+    num_convert (find_convert prover) c
+
+  let back_convert ~prover c =
+    num_back_convert (find_convert prover) c
+
+end
+
 
 let steps ~prover =
-  if manual_prover <> None then
-    Call_provers.empty_limit.Call_provers.limit_steps
-  else
-    match !opt_steps with
-    | None -> Call_provers.empty_limit.Call_provers.limit_steps
-    | Some c ->
-      let prover = String.sub prover 0 (min 4 (String.length prover)) in
-      try
-        let conv = Hashtbl.find convert_data prover in
-        conv.add + conv.mult * c
-      with Not_found -> c
+  match manual_prover, !opt_steps with
+  | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_steps
+  | _, Some c -> Steps_conversion.convert ~prover c
 
-let back_convert_steps ~prover c =
-  try
-    let conv = Hashtbl.find convert_data prover in
-    (* we are adding 1 to the count because the division will round downwards,
-       but we want to have the property that checks are proved with the
-       reported steps *)
-    (max 0 (c - conv.add)) / conv.mult + 1
-  with Not_found -> c
+let back_convert_steps = Steps_conversion.back_convert
 
 let limit ~prover =
   { Call_provers.empty_limit with
