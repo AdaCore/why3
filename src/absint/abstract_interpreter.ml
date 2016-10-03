@@ -59,11 +59,14 @@ module Abstract_interpreter(E: sig
         t_app fs tl ty
       | Some (vl,e) ->
         assert (Term.ls_equal vl fs);
+        try
         let vsym, new_term = Decl.open_ls_defn e in
         let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
         let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vsym tl in
         let mt = oty_match mt (Some (t_type new_term)) ty in
         t_ty_subst mt mv new_term
+        with
+        | Term.TermExpected(_) -> t_app fs tl ty
 
   (* inline every symbol *)
 
@@ -84,6 +87,7 @@ module Abstract_interpreter(E: sig
 
   type domain = unit
 
+  (* control flow graph *)
   type cfg = {
     (* not one to one *)
     expr_to_control_point: (Expr.expr, control_point) Hashtbl.t;
@@ -122,13 +126,19 @@ module Abstract_interpreter(E: sig
   let pv_to_var psym =
     vs_to_var Ity.(psym.pv_vs)
 
+  let ensure_variable cfg v t =
+    if not (Environment.mem_var cfg.env v) then
+      cfg.env <- Environment.add cfg.env [|v|] [||]
+
   let add_variable cfg psym =
     if Ity.(ity_equal ity_int psym.pv_ity) then
       begin
         let var = pv_to_var psym in
-        cfg.env <- Environment.add cfg.env [|var|] [||]
+        ensure_variable cfg var (Term.t_var Ity.(psym.pv_vs));
       end
 
+  (* Adds a new node to the cfg, associated to expr (which is only useful for
+   * debugging purpose ATM) *)
   let new_node_cfg cfg expr =
     let i = cfg.control_point_count in
     Hashtbl.add cfg.expr_to_control_point expr i;
@@ -137,6 +147,7 @@ module Abstract_interpreter(E: sig
     PSHGraph.add_vertex cfg.g i ();
     i
 
+  (* Adds a new hyperedge between a and b, whose effect is described in f *)
   let new_hedge_cfg cfg (a, b) f =
     let hedge = cfg.hedge_count in
     cfg.hedge_count <- cfg.hedge_count + 1;
@@ -158,12 +169,26 @@ module Abstract_interpreter(E: sig
   let lt_int = Theory.(ns_find_ls th_int.th_export ["infix <"])
   let ad_int = Theory.(ns_find_ls th_int.th_export ["infix +"])
 
+  (* Get a set of (apron) linear expressions from a constraint stated in why3 logic.
+   * ATM it only works for conjunction, and if there is not that much uninterpreted function.
+   * In the worst case, it returns an empty list.
+   *
+   * The resulting list of linear expressions is weaker than the original why3
+   * formula. *)
   let linear_expressions_from_term cfg local_ty t =
     let open Term in
 
+    (* First inline everything, for instance needed for references
+     * where !i is (!) i *)
     let t = t_replace_all t in
     let return_var = ref None in
 
+    (* Assuming that t is an arithmetic term, this computes the number of ocurrence of variables
+     * to constr, and set cst to the constant of the arithmetic expression.
+     * constr is a reference of list of (var, number_of_ocurrence).
+     *
+     * For instance, 4 + x + y set cst to 4, and constr to [(x, 1), (y, 1)]
+     * *)
     let rec term_to_int coeff cst constr t = match t.t_node with
       | Tvar(a) ->
         begin
@@ -227,12 +252,13 @@ module Abstract_interpreter(E: sig
         in
         let t = term_to_string t in
         let v = Var.of_string t in
-        if not (Environment.mem_var cfg.env v) then
-          cfg.env <- Environment.add cfg.env [|v|] [||];
+        ensure_variable cfg v t;
         constr := (v, coeff) :: !constr
       | _ -> raise (Not_handled t)
     in
     
+    (* This takes an epsilon-free formula and returns a list of linear expressions weaker than
+     * the original formula. *)
     let rec aux t =
       try
         match t.t_node with
@@ -242,6 +268,7 @@ module Abstract_interpreter(E: sig
 
           let cst = ref 0 in
           let constr = ref [] in
+          (* FIXME: >, <=, >=, booleans *)
           if ls_equal ps_equ func || ls_equal lt_int func then
             match args with
             | [a; b] ->
@@ -252,7 +279,7 @@ module Abstract_interpreter(E: sig
               Linexpr1.set_list expr constr None;
               let cons = Lincons1.make expr (if ls_equal ps_equ func then
                                                Lincons1.EQ
-                                                 else Lincons1.SUP) in
+                                             else Lincons1.SUP) in
               Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int !cst));
               [cons]
             | _ -> raise (Not_handled t)
@@ -271,7 +298,6 @@ module Abstract_interpreter(E: sig
         []
     in
 
-
     try
       match t.t_node with
       | Teps(tb) ->
@@ -287,7 +313,14 @@ module Abstract_interpreter(E: sig
       Format.eprintf "@.";
       raise e
 
-
+  (* Adds expr to the cfg. local_ty is the types of the locally defined variable
+   * (useful for references, when we need to get the type of a term in a logical formula).
+   *
+   * Adds multiple node and edges if expr requires so.
+   *
+   * returns a tuple, whose first element is the entry point of expr in the cfg, and the second
+   * one is the ending point. The result of expr is stored is the variable "result"
+   * (see var_return) *)
   let rec put_expr_in_cfg cfg local_ty expr =
     let open Expr in
     match expr.e_node with
@@ -335,12 +368,27 @@ module Abstract_interpreter(E: sig
         end
       else
         begin
-          let local_ty = Ident.Mid.add (Ity.(Term.(psym.pv_vs.vs_name))) Expr.(let_expr.e_ity) local_ty in
+          (* As it is not an int, the type could be useful, so we can save it *)
+          let variable_type = Expr.(let_expr.e_ity) in
+          begin
+            match Ity.(variable_type.ity_node) with
+            | Ity.Ityvar(_) -> Format.printf "type variable@."
+            | Ity.Ityreg({reg_args = a; reg_regs = b; reg_name = n; _ }) ->
+              Pretty.print_id Format.std_formatter n;
+              Format.printf "region with %d %d@." (List.length a) (List.length b)
+            | Ity.Ityapp(its, a, b) -> 
+              Ity.print_its Format.std_formatter its;
+              Format.printf "app@.";
+          end;
+          let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
+          let local_ty = Ident.Mid.add variable_ident variable_type local_ty in
+
           let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
           let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
+
           new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
               Abstract1.forget_array man abs [|var_return|] false
-              );
+            );
           let_begin_cp, b_end_cp
         end
     | Evar(psym) ->
@@ -394,19 +442,6 @@ module Abstract_interpreter(E: sig
       List.iteri (Lincons1.array_set cons_arr) constraints;
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
-      ignore @@ Ity.Mreg.mapi (fun a b ->
-          Ity.Mpv.mapi (fun c () ->
-              ignore (Format.flush_str_formatter ());
-              Ity.print_pv Format.str_formatter c;
-              Format.fprintf Format.str_formatter "(";
-              Ity.print_reg_name Format.str_formatter a;
-              Format.fprintf Format.str_formatter ")";
-              let s = Format.flush_str_formatter () in
-              let v = Var.of_string s in
-              if not (Environment.mem_var cfg.env v) then
-                cfg.env <- Environment.add cfg.env [|v|] [||];
-            ) b;
-        ) eff_write;
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
           (* effects *)
           let abs = ref (Abstract1.forget_array man abs [|var_return|] false) in
