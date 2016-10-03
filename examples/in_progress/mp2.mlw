@@ -1,31 +1,540 @@
-
-
 module M
 
 
   use import int.Int
   use import map.Map as M
+  use import mach.int.Unsigned
+  use import mach.int.Int32
+  use import mach.int.UInt32
 
 (*
   type array 'a model { length : int; mutable elts : map int 'a }
     invariant { 0 <= self.length }
 *)
 
-  type ptr 'a model { mutable elts : map int 'a ; length : int ; offset : int }
-     invariant { 0 <= self.length }
+  predicate in_us_bounds (n:int) = 0 <= n <= max_uint32
+  predicate in_bounds (n:int) = min_int32 <= n <= max_int32
+
+  type ptr 'a = abstract { mutable elts : map int 'a ; mutable initialized : map int bool; length : int ; offset : int ; addr : int }
+     invariant { in_us_bounds length }
+     invariant { 0 <= addr }
      (* it is not required the offset is in 0..length *)
+
+  val is_null (p:ptr 'a) : bool
+    ensures { result <-> p.addr = 0 }
+
+  val null () : ptr 'a
+    ensures { result.length = 0 }
+    ensures { result.addr = 0 }
 
   val get (p:ptr 'a) : 'a
     requires { 0 <= p.offset < p.length }
+    requires { p.initialized[p.offset] }
     ensures { result = p.elts[p.offset] }
+
+  val get_ofs (p:ptr 'a) (ofs:int32) : 'a
+    requires { 0 <= p.offset + Int32.to_int ofs < p.length }
+    requires { p.initialized[p.offset + Int32.to_int ofs] }
+    ensures { result = p.elts[p.offset + Int32.to_int ofs] }
+
+  val set (p:ptr 'a) (v:'a) : unit
+    requires { 0 <= p.offset < p.length }
+    ensures { p.elts[p.offset] = v }
+    ensures { p.initialized[p.offset] }
+
+  val set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
+    requires { 0 <= p.offset + Int32.to_int ofs < p.length }
+    ensures { p.elts[p.offset + Int32.to_int ofs] = v }
+    ensures { p.initialized[p.offset + Int32.to_int ofs] }
+
+  predicate valid_ptr_shift (p:ptr 'a) (i:int) =
+    0 <= p.offset + i < p.length
+
+  predicate valid_ptr_itv (p:ptr 'a) (sz:int) =
+    in_bounds sz /\ 0 <= sz
+      /\ forall i. 0 <= i < sz -> 0 <= p.offset+i < p.length
+
+  let lemma valid_itv_to_shift (p:ptr 'a) (sz:int)
+    requires { valid_ptr_itv p sz }
+    ensures { forall i. 0 <= i < sz -> valid_ptr_shift p i }
+  = ()
+
+  predicate valid_and_initialized_ofs (p:ptr 'a) (sz:int) =
+    valid_ptr_itv p sz /\
+    forall i. 0 <= i < sz -> p.initialized[p.offset+i]
+
+  predicate initialized_itv (p:ptr 'a) (l h:int) =
+    forall i. 0 <= l <= i < h <= p.length -> p.initialized[i]
+
+  predicate initialized_ofs (p:ptr 'a) (sz:int) =
+    forall i. 0 <= i < sz -> p.initialized[p.offset+i]
+
+  val malloc (sz:int32) : ptr 'a
+    ensures { result.length = Int32.to_int sz \/ result.length = 0 }
+    ensures { result.offset = 0 }
+    ensures { result.length = 0 <-> result.addr = 0 }
+
+  val free (p:ptr 'a) : unit
+    requires { p.offset = 0 }
+    writes { p }
+    ensures { p.length = 0 }
+
+  val realloc (p:ptr 'a) (sz:int32) : ptr 'a
+    requires { p.offset = 0 }
+    writes { p }
+    ensures { result.length = Int32.to_int sz \/ result.length = 0 }
+    ensures { result.length = 0 <-> result.addr = 0 }
+    ensures { result.length = Int32.to_int sz -> p.length = 0 }
+    ensures { result.length = Int32.to_int sz ->
+		forall i:int. 0 <= i < (old p).length /\ i < Int32.to_int sz ->
+		  result.elts[i] = (old p).elts[i]
+		/\result.initialized[i] = (old p).initialized[i] }
+    ensures { result.length <> Int32.to_int sz -> p = old p }
+
+  val incr (p:ptr 'a) (ofs:int32) : ptr 'a
+    ensures { result.offset = p.offset + Int32.to_int ofs }
+    ensures { result.length = p.length }
+    ensures { result.elts = p.elts }
+    ensures { result.addr = p.addr + Int32.to_int ofs }
 
 
 end
+(*
+module Limb
+
+  use import int.Int
+  clone export mach.int.UInt32
+
+  type limb = uint32
+
+  val add_carry (x y:limb) : limb
+    ensures { 0 <= to_int result <= 1 }
+
+  val add_res (x y:limb) : limb
+    ensures { result + add_carry x y = add_with_carry x y zero_unsigned }
+
+end *)
+
+module N
+
+  use import map.Map
+  use import mach.int.Int32
+  use import M
+  use import ref.Ref
+  use import mach.int.UInt32
+  use import int.Int
+  use import int.Power
+
+  type limb = uint32
+
+  lemma limb_max_bound: 1 <= max_uint32
+
+  constant radix : int = max_uint32 + 1
+
+  function l2i (x:limb) : int = UInt32.to_int x
+
+  function p2i (i:int32) : int = Int32.to_int i
+
+  type t = ptr limb
+
+  (** {2 Integer value of a natural number} *)
+
+  (** [value_sub x n m] denotes the integer represented by
+     the digits x[n..m-1] with lsb at index n *)
+  let rec ghost function value_sub (x:map int limb) (n:int) (m:int) : int
+     variant {m - n}
+   =
+     if n < m then
+       l2i x[n] + radix * value_sub x (n+1) m
+       else 0
+
+  function value (x:t) : int =
+     value_sub x.elts 0 x.length
+
+  function value_sub_shift (x:t) (sz:int) : int =
+     value_sub x.elts x.offset (x.offset + sz)
+
+  use map.MapEq
+  use map.Const
+
+  predicate map_eq_sub_shift (x y:map int 'a) (xi yi sz:int) =
+    forall i. 0 <= i < sz -> x[xi+i] = y[yi+i]
+
+  let lemma map_eq_shift (x y:map int 'a) (xi yi sz k:int)
+    requires { map_eq_sub_shift x y xi yi sz }
+    requires { 0 <= k < sz }
+    ensures { x[xi+k] = y[yi+k] }
+  = ()
+
+  let rec lemma map_eq_shift_zero (x y: map int 'a) (n m: int)
+    requires { map_eq_sub_shift x y n n (m-n) }
+    variant { m - n }
+    ensures { MapEq.map_eq_sub x y n m }
+  =
+    if n < m then
+    begin
+      assert { forall i. 0 <= i < m-n -> x[n+i] = y[n+i] };
+      assert { forall i. n <= i < m ->
+		 let j = i - n in 0 <= j < m-n ->
+		     x[n+j] = y[n+j] -> x[i] = y[i]};
+      map_eq_shift_zero x y (n+1) m;
+    end
+    else ()
+
+  let rec lemma value_sub_frame (x y:map int limb) (n m:int)
+    requires { MapEq.map_eq_sub x y n m }
+    variant  { m - n }
+    ensures  { value_sub x n m = value_sub y n m }
+  =
+    if n < m then value_sub_frame x y (n+1) m else ()
+
+  let rec lemma value_sub_frame_shift (x y:map int limb) (xi yi sz:int)
+    requires { map_eq_sub_shift x y xi yi sz }
+    variant { sz }
+    ensures { value_sub x xi (xi+sz) = value_sub y yi (yi+sz) }
+ =
+    if sz>0
+    then begin
+      map_eq_shift x y xi yi sz 0;
+      assert { forall i. 0 <= i < sz-1 ->
+		 0 <= 1+i < sz ->
+		 let j = 1+i in x[xi+j] = y[yi+j] ->
+		   x[xi+1+i] = y[yi+1+i]  };
+      value_sub_frame_shift x y (xi+1) (yi+1) (sz-1)
+      end
+    else assert { 1+2 = 3 }
+
+  let rec lemma value_sub_tail (x:map int limb) (n m:int)
+    requires { n <= m }
+    variant  { m - n }
+    ensures  {
+      value_sub x n (m+1) =
+	value_sub x n m + l2i (Map.get x m) * power radix (m-n) }
+  = "vc:sp" if n < m then value_sub_tail x (n+1) m else ()(*assert { 1+2=3 }*)
+
+  let rec lemma value_sub_concat (x:map int limb) (n m l:int)
+    requires { n <= m <= l}
+    variant  { m - n }
+    ensures  {
+      value_sub x n l =
+	value_sub x n m + value_sub x m l * power radix (m-n) }
+  =
+  if n < m then
+     begin
+     assert {n<m};
+     value_sub_concat x (n+1) m l
+     end
+  else ()
+
+  let lemma value_sub_update (x:map int limb) (i n m:int) (v:limb)
+    requires { n <= i < m }
+    ensures {
+      value_sub (Map.set x i v) n m =
+      value_sub x n m + power radix (i - n) * (l2i v - l2i (Map.get x i))
+    }
+  = assert { MapEq.map_eq_sub x (Map.set x i v) n i };
+    assert { MapEq.map_eq_sub x (Map.set x i v) (i+1) m };
+    value_sub_concat x n i m;
+    value_sub_concat (Map.set x i v) n i m
+
+  let rec lemma value_zero (x:map int limb) (n m:int)
+    requires { MapEq.map_eq_sub x (Const.const UInt32.zero_unsigned) n m }
+    variant  { m - n }
+    ensures  { value_sub x n m = 0 }
+  = if n < m then value_zero x (n+1) m else ()
+
+  (** {2 Comparisons} *)
+
+    let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
+    variant  { x2 - x1 }
+    ensures  { 0 <= value_sub x x1 x2 }
+  = if x2 <= x1 then () else
+      begin
+	assert { value_sub x x1 x2 = l2i (Map.get x x1) + radix * value_sub x (x1+1) x2};
+	value_sub_lower_bound x (x1+1) x2
+      end
+
+  let rec lemma value_sub_upper_bound (x:map int limb) (x1 x2:int)
+    requires { x1 <= x2 }
+    variant  { x2 - x1 }
+    ensures  { value_sub x x1 x2 < power radix (x2 - x1) }
+  = if x1 = x2 then () else
+      begin
+      assert { value_sub x x1 x2 <= value_sub x x1 (x2-1) + power radix (x2-x1-1) * (radix - 1) };
+      value_sub_upper_bound x x1 (x2-1)
+      end
+
+  let lemma value_sub_lower_bound_tight (x:map int limb) (x1 x2:int)
+    requires { x1 < x2 }
+    ensures  { power radix (x2-x1-1) *	l2i (Map.get x (x2-1)) <= value_sub x x1 x2 }
+  = assert   { value_sub x x1 x2 = value_sub x x1 (x2-1)
+	       + power radix (x2-x1-1) * l2i (Map.get x (x2-1)) }
+
+  let lemma value_sub_upper_bound_tight (x:map int limb) (x1 x2:int)
+    requires { x1 < x2 }
+    ensures  { value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1) }
+  = value_sub_upper_bound x x1 (x2-1)
+
+  exception Break32 int32
+
+  use import ref.Refint
+
+  function compare_int (x y:int) : int =
+    if x < y then -1 else if x=y then 0 else 1
+
+  (** [compare_same_size] compares [x[0..sz-1]] and [y[0..sz-1]] as unsigned integers. It corresponds to [GMPN_CMP]. *)
+  let compare_same_size (x y:t) (sz:int32) : int32
+    requires { valid_and_initialized_ofs x (p2i sz) }
+    requires { valid_and_initialized_ofs y (p2i sz) }
+    ensures { p2i result = compare_int (value_sub_shift x (p2i sz))
+	      (value_sub_shift y (p2i sz))
+	      }
+  =
+   let i = ref sz in
+   let zero = Int32.of_int 0 in
+   let uzero = UInt32.of_int 0 in
+   let lx = ref uzero in
+   let ly = ref uzero in
+   let res = ref zero in
+   try
+     while Int32.(>=) !i (Int32.of_int 1) do
+       variant { p2i !i }
+       invariant { 0 <= p2i !i <= p2i sz }
+       invariant { forall j. p2i !i <= j < p2i sz ->
+		   x.elts[x.offset+j] = y.elts[y.offset+j] }
+       assert { forall j. 0 <= j < p2i sz - (p2i !i) ->
+		let k = p2i !i+j in
+		p2i !i <= k < p2i sz ->
+		x.elts[x.offset+k] = y.elts[y.offset+k] /\
+		x.elts [p2i !i+x.offset+j] = y.elts[p2i !i+y.offset+j] };
+       value_sub_frame_shift x.elts y.elts (p2i !i+x.offset) (p2i !i+y.offset) ((p2i sz) - (p2i !i));
+       let ghost k = p2i !i in
+       i := Int32.(-) !i (Int32.of_int 1);
+
+       assert { 0 <= p2i !i < p2i sz };
+       lx := get_ofs x !i;
+       ly := get_ofs y !i;
+       if (UInt32.ne !lx !ly)
+       then begin
+	    value_sub_concat x.elts x.offset (x.offset+k) (x.offset+ p2i sz);
+	    value_sub_concat y.elts y.offset (y.offset+k) (y.offset+ p2i sz);
+	    assert { compare_int (value_sub_shift x (p2i sz))
+		       (value_sub_shift y (p2i sz))
+		   = compare_int (value_sub_shift x k) (value_sub_shift y k) };
+	    value_sub_tail x.elts x.offset (x.offset+k-1);
+	    value_sub_tail y.elts y.offset (y.offset+k-1);
+	    if UInt32.(>) !lx !ly
+	    then begin
+	     value_sub_upper_bound y.elts y.offset (y.offset+k-1);
+	     value_sub_lower_bound x.elts x.offset (x.offset+k-1);
+	     assert { value_sub_shift x k - value_sub_shift y k =
+		      (l2i !lx - l2i !ly) * (power radix (k-1))
+		    - ((value_sub_shift y (k-1)) - (value_sub_shift x (k-1)))
+		       };
+	     assert { (l2i !lx - l2i !ly) * (power radix (k-1))
+		      >= power radix (k-1)
+		      > ((value_sub_shift y (k-1)) - (value_sub_shift x (k-1)))
+		       };
+	     res := Int32.of_int 1
+	    end
+	    else begin
+	     assert { l2i !ly > l2i !lx };
+	     value_sub_upper_bound x.elts x.offset (x.offset+k-1);
+	     value_sub_lower_bound y.elts y.offset (y.offset+k-1);
+	     assert { value_sub_shift y k - value_sub_shift x k =
+		    (l2i !ly - l2i !lx) * (power radix (k-1))
+		    - ((value_sub_shift x (k-1)) - (value_sub_shift y (k-1)))
+		     };
+	     assert { (l2i !ly - l2i !lx) * (power radix (k-1))
+		      >= power radix (k-1)
+		      > ((value_sub_shift x (k-1)) - (value_sub_shift y (k-1)))
+		     };
+	    res := Int32.of_int (-1)
+	    end;
+	 raise Break32 !res
+	 end
+       else ()
+     done;
+     value_sub_frame_shift x.elts y.elts x.offset y.offset (p2i sz);
+     zero
+   with Break32 r -> r
+   end
+
+   (* [is_zero] checks if [x[0..sz-1]] is zero. It corresponds to [mpn_zero_p]. *)
+   let is_zero (x:t) (sz:int32) : int32
+     requires { valid_and_initialized_ofs x (p2i sz) }
+     ensures { 0 <= Int32.to_int result <= 1 }
+     ensures { Int32.to_int result = 1 <-> value_sub_shift x (p2i sz) = 0 }
+   =
+     let i = ref sz in
+     let uzero = UInt32.of_int 0 in
+     let lx = ref uzero in
+     try
+       while Int32.(>=) !i (Int32.of_int 1) do
+	 variant { p2i !i }
+	 invariant { 0 <= p2i !i <= p2i sz }
+	 invariant { value_sub x.elts (x.offset + p2i !i) (x.offset + p2i sz)=0 }
+	 let ghost k = p2i !i in
+	 i := Int32.(-) !i (Int32.of_int 1);
+	 assert { 0 <= p2i !i < p2i sz };
+	 lx := get_ofs x !i;
+	 if (UInt32.ne !lx uzero)
+	 then begin
+	   value_sub_concat x.elts x.offset (x.offset+k) (x.offset + p2i sz);
+	   value_sub_lower_bound_tight x.elts x.offset (x.offset+k);
+	   value_sub_lower_bound x.elts (x.offset+k) (x.offset + p2i sz);
+	   raise Break32 (Int32.of_int 0)
+	 end
+	 else begin
+	   assert { 1+2=3 };
+	 end
+       done;
+       Int32.of_int 1
+     with Break32 r -> r
+     end
+
+  (** {2 Addition} *)
+
+  exception Break
+
+  (** [add_limb x y x1 x2] adds to [x] the value of the limb [y],
+      writes the result in [r] and returns the carry. [r] and [x]
+      have size [sz]. This corresponds to the function mpn_add_1 *)
+  (* r and x must be separated. Enforce this ? *)
+let add_limb (r x:t) (y:limb) (sz:int32) : limb
+    requires { valid_and_initialized_ofs x (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz) }
+    requires { p2i sz > 0 } (* ? GMP does the same for 0 and 1*)
+    ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =
+	      value_sub_shift x (p2i sz) + l2i y }
+    ensures { 0 <= l2i result <= 1 }
+    ensures { initialized_ofs r (p2i sz) }
+  =
+    let limb_zero = UInt32.of_int 0 in
+    let c = ref y in
+    let lx = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz && UInt32.ne !c limb_zero do
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { p2i !i > 0 -> 0 <= l2i !c <= 1 }
+      invariant { initialized_ofs r (p2i !i) }
+      invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+		  value_sub_shift x (p2i !i) + l2i y}
+      variant { p2i sz - p2i !i }
+      label StartLoop in
+      lx := get_ofs x !i;
+      let (res, carry) = add_with_carry !lx !c limb_zero in
+      set_ofs r !i res;
+      c := carry;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail r.elts r.offset (r.offset + k);
+      value_sub_tail x.elts x.offset (x.offset + k);
+      let ghost m = power radix k in
+      assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+      	     = value_sub_shift x (p2i !i) + l2i y
+      	     by
+	     value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+      	     = value_sub_shift r k + (power radix k) * l2i res
+	       		       + (power radix (p2i !i)) * l2i !c
+	     = value_sub_shift r k + (power radix k) * l2i res
+	       		       + (power radix k) * radix * l2i !c
+	     = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)	      = value_sub_shift r k +
+	       (power radix k) * (l2i !lx + l2i (!c at StartLoop))
+	     = value_sub_shift r k + (power radix k) * l2i (!c at StartLoop)
+	       		       + (power radix k) * l2i !lx
+	     = value_sub_shift x k + l2i y + (power radix k) * l2i !lx
+	     = value_sub_shift x (p2i !i) + l2i y }
+    done;
+    assert { p2i !i = p2i sz \/ l2i !c = 0 };
+    assert { p2i !i < p2i sz -> l2i !c = 0 };
+    if Int32.eq !i sz then !c
+    else begin
+    while Int32.(<) !i sz do
+      invariant { l2i !c  = 0 }
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { initialized_ofs r (p2i !i) }
+      invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+		  value_sub_shift x (p2i !i) + l2i y}
+      variant { p2i sz - p2i !i }
+      lx := get_ofs x !i;
+      set_ofs r !i !lx;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail r.elts r.offset (r.offset + k);
+      value_sub_tail x.elts x.offset (x.offset + k);
+    done;
+    !c
+    end
 
 
+(** [add_limbs r x y sz] adds [x[0..sz-1]] and [y[0..sz-1]] and writes the result    in [r]. Returns the carry, either [0] or [1].
+    Corresponds to the function [mpn_add_n]. *)
+
+let add_limbs (r x y:t) (sz:int32) : limb
+  requires { valid_and_initialized_ofs x (p2i sz) }
+  requires { valid_and_initialized_ofs y (p2i sz) }
+  requires { valid_ptr_itv r (p2i sz) }
+  ensures { 0 <= l2i result <= 1 }
+  ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =
+  	  value_sub_shift x (p2i sz) + value_sub_shift y (p2i sz) }
+  ensures { initialized_ofs r (p2i sz) }
+  =
+  let limb_zero = UInt32.of_int 0 in
+  let lx = ref limb_zero in
+  let ly = ref limb_zero in
+  let c = ref limb_zero in
+  let i = ref (Int32.of_int 0) in
+  while Int32.(<) !i sz do
+    variant { p2i sz - p2i !i }
+    invariant { 0 <= p2i !i <= p2i sz }
+    invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i) }
+    invariant { 0 <= l2i !c <= 1 }
+    invariant { initialized_ofs r (p2i !i) }
+    label StartLoop in
+    lx := get_ofs x !i;
+    ly := get_ofs y !i;
+    let res, carry = add_with_carry !lx !ly !c in
+    set_ofs r !i res;
+    c := carry;
+    let ghost k = p2i !i in
+    i := Int32.(+) !i (Int32.of_int 1);
+    value_sub_tail r.elts r.offset (r.offset + k);
+    value_sub_tail x.elts x.offset (x.offset + k);
+    value_sub_tail y.elts y.offset (y.offset + k);
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i)
+	    by
+	    value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+	    = value_sub_shift r k + (power radix k) * l2i res
+	      	 + (power radix (p2i !i)) * l2i !c
+	    = value_sub_shift r k + (power radix k) * l2i res
+	         + (power radix k) * radix * l2i !c
+	    = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)
+	    = value_sub_shift r k +
+	        (power radix k) * (l2i !lx + l2i !ly + l2i (!c at StartLoop))
+  	    = value_sub_shift r k + (power radix k) * l2i (!c at StartLoop)
+	       + (power radix k) * (l2i !lx + l2i !ly)
+	    = value_sub_shift x k + value_sub_shift y k
+	       + (power radix k) * (l2i !lx + l2i !ly)
+	    = value_sub_shift x k + (power radix k) * l2i !lx
+	       + value_sub_shift y k + (power radix k) * l2i !ly
+	    = value_sub_shift x (p2i !i)
+	       + value_sub_shift y k + (power radix k) * l2i !ly
+	    = value_sub_shift x (p2i !i)
+	       + (value_sub_shift y k + (power radix k) * l2i !ly)
+	    = value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i) }
+  done;
+  !c
+
+end
+
+(*
 module Heap
 
   type elt
+
 
   type base
 
@@ -51,11 +560,12 @@ module Heap
     requires { n >= 0 }
     writes  { h.length }
     ensures { result.offset = 0 }
-    ensures { h.length[result.base] = n  }
-    ensures { (old h).length[result.base] = -1  }
+    ensures { h.length[result.base] = n	 }
+    ensures { (old h).length[result.base] = -1	}
     ensures { forall b:base. b <> result.base -> (old h).length[b] = h,length[b]  }
 
 
   val free ...
 
 end
+*)
