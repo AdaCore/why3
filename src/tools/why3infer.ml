@@ -14,6 +14,62 @@ open Why3
 open Stdlib
 
 
+exception File_too_small
+
+exception Unwraaap
+let unwrap = function
+  | Some s -> s
+  | None -> raise Unwraaap
+
+(* can't be used because why3 does not seem to keep a good character count (?) *)
+let insert_at filename filename_2 offset to_add = 
+  let buf = Bytes.create offset in
+  let fin = open_in filename in
+  let fout = open_out filename_2 in
+  begin
+    try
+      really_input fin buf 0 offset;
+      output_bytes fout buf;
+    with End_of_file ->
+      raise File_too_small
+  end;
+  let buf_inserted = Bytes.of_string to_add in
+  output_bytes fout buf_inserted;
+  begin
+    try
+      while true do
+        really_input fin buf 0 offset;
+        output_bytes fout buf;
+      done;
+    with End_of_file ->
+      close_in fin; close_out fout
+  end
+
+let insert_at_lines filename filename_2 offset to_add = 
+  let fin = open_in filename in
+  let fout = open_out filename_2 in
+  begin
+    try
+      for i = 0 to offset-1 do
+        input_line fin
+        |> Format.sprintf "%s\n"
+        |> output_string fout;
+      done;
+    with End_of_file ->
+      raise File_too_small
+  end;
+  output_string fout to_add;
+  begin
+    try
+      while true do
+        input_line fin
+        |> Format.sprintf "%s\n"
+        |> output_string fout;
+      done;
+    with End_of_file ->
+      close_in fin; close_out fout
+  end
+
 let usage_msg = sprintf
   "Usage: %s [options] file"
   (Filename.basename Sys.argv.(0))
@@ -79,7 +135,36 @@ let do_input f =
                     List.iter (Abstract_interpreter.add_variable cfg)
                       Ity.(cexp.c_cty.cty_args);
                     ignore (Abstract_interpreter.put_expr_in_cfg cfg Abstract_interpreter.empty_local_ty e);
-                    Abstract_interpreter.eval_fixpoints cfg;
+                    (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
+                    let copied = Hashtbl.create 10 in
+                    Abstract_interpreter.eval_fixpoints cfg
+                    |> List.iter begin fun (expr, domain) ->
+                      match expr.e_node with
+                      | Ewhile(_, _, _, expr) ->
+                        Pretty.forget_all ();
+                        ignore @@ Format.flush_str_formatter ();
+                        let inv =
+                          Abstract_interpreter.domain_to_term cfg domain
+                          |> Pretty.print_term Format.str_formatter
+                          |> Format.flush_str_formatter
+                          |> Format.sprintf "invariant { %s }\n"
+                        in
+                        let file, origin_offset, _, _ = Expr.(expr.e_loc) |> unwrap |> Loc.get in
+                        let new_file = Format.sprintf "%s_inferred.mlw" file in
+                        let new_file_tmp = Format.sprintf "%s_inferred.mlw~" file in
+                        let o =
+                          try
+                            let o = Hashtbl.find copied file in
+                            insert_at new_file new_file_tmp 1 ""; o
+                          with
+                          | Not_found ->
+                            insert_at file new_file_tmp 1 "";
+                            Hashtbl.add copied file 0; 0
+                        in
+                        insert_at_lines new_file_tmp new_file (o + origin_offset - 1) inv;
+                        Hashtbl.replace copied file (o + 1);
+                      | _ -> assert false
+                    end
                   | Cany ->
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;

@@ -26,7 +26,6 @@ let extract_fields variable_type =
       | { its_mfields = fldl; _ } ->
         let open Term in
         let open Ident in
-        Format.eprintf "%d@.@." (List.length a);
         List.map (fun p ->
             try
               Hashtbl.find hc p
@@ -522,6 +521,14 @@ module Abstract_interpreter(E: sig
         );
       begin_cp, end_cp
     | Ewhile(cond, inv, var, content) ->
+      let open Expr in
+      begin
+      match expr.e_loc  with
+      | Some s ->
+        let s, a, b, c = Loc.get s in
+        Format.printf "%s, %d, %d, %d@." s a b c;
+      | None -> ()
+      end;
 
       (* Condition expression *)
       let cond_term = 
@@ -654,7 +661,7 @@ module Abstract_interpreter(E: sig
 
     (* Print loop invariants *)
 
-    Format.printf "Loop invariants:\n@.";
+(*    Format.printf "Loop invariants:\n@.";
 
     List.iter (fun (expr, cp) ->
         Format.printf "For:@.";
@@ -665,6 +672,11 @@ module Abstract_interpreter(E: sig
       Pretty.forget_all ();
         Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
         printf "@."
+      ) cfg.loop_invariants*)
+    
+    List.map (fun (expr, cp) ->
+        let abs = PSHGraph.attrvertex output cp in
+        expr, abs
       ) cfg.loop_invariants
 
 end
