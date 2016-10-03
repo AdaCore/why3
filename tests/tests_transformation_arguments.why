@@ -33,6 +33,26 @@ b cut "forall x. forall y. x + y = 0"
 >> print with h2 in context
 b instantiate "h2" "4"
 >> create h21 which is correct
+b exists "3"
+>> instantiate y in the goal
+b cut "forall y. true -> 4 + y = 0"
+>> generate h3
+b apply h3
+>> apply h3 to the goal and generate the new goal
+gu
+g
+>> go back to the 4 + 3 = 0 goal
+b cut "forall y. y = 5 -> 4 + y = 0"
+>> new hypothesis to apply
+b apply h4
+>> apply hypothesis and generate the goal 3 = 5 which is correct.
+b remove h21
+>> remove correct hypothesis h21
+b remove x
+>> Silently fails probably because not an axiom. Do we want to remove constant ? TODO
+b remove CompatOrderMult
+>> Success
+
    *)
 
 end
