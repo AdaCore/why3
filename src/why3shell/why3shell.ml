@@ -489,7 +489,7 @@ let commands =
     "list-provers", "list available provers", list_provers;
     "list-transforms", "list available transformations", list_transforms;
     "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
-    "b", "<transname> <args>: behave like a then wait 0.2sec and display goal", test_transform_and_display;
+    "b", "<transname> <args>: behave like a but add function to display into the callback", test_transform_and_display;
     "p", "print the session in raw form", dump_session_raw;
     "t", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
     "g", "prints the first goal", test_print_goal;
