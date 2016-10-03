@@ -21,8 +21,16 @@ let type_ptree ~as_fmla t task =
   let th_uc = Theory.create_theory (Ident.id_fresh "dummy") in
   let th_uc =
     Ident.Mid.fold
-      (fun _id th acc -> (*Format.eprintf "%s@." _id.Ident.id_string;*)
-        try Theory.use_export acc th with _ -> acc) (* TODO to be investigated. error: set is already defined. Create_theory already has the builtin_theory by default. Use empty theory ? *)
+      (fun _id th acc ->
+       let name = th.Theory.th_name in
+       Format.eprintf "[Args_wrapper.type_ptree] use theory %s (%s)@."
+                      _id.Ident.id_string
+                      name.Ident.id_string;
+       Theory.close_namespace
+         (Theory.use_export
+            (Theory.open_namespace acc name.Ident.id_string)
+            th)
+         true)
       used_ths th_uc
   in
   let th_uc =
