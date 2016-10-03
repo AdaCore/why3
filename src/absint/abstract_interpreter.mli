@@ -5,16 +5,17 @@ module Abstract_interpreter(S:sig
   type control_point
   type domain
   type cfg
+  type local_ty
+
+  val empty_local_ty : local_ty
 
   val start_cfg: Expr.rsymbol -> cfg
 
-  val put_expr_in_cfg: cfg -> Ity.ity Ident.Mid.t -> Expr.expr -> (control_point * control_point)
+  val put_expr_in_cfg: cfg -> local_ty -> Expr.expr -> (control_point * control_point)
 
   val eval_fixpoints: cfg -> unit
 
-  val get_domain: cfg -> control_point -> domain
-
-  val domain_to_string: domain -> string
+  val domain_to_term: cfg -> domain -> Term.term
 
   val add_variable: cfg -> Ity.pvsymbol -> unit
 end

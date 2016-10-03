@@ -12,6 +12,37 @@ type env = {
 
 exception Recursive_logical_definition
 
+let hc = Hashtbl.create 100
+
+let get_proj = Hashtbl.find hc
+
+let extract_fields variable_type = 
+  let open Ity in
+  match Ity.(variable_type.ity_node) with
+  | Ity.Ityvar(_) -> []
+  | Ity.Ityreg({reg_args = a; reg_regs = b; reg_name = n; reg_its = its }) ->
+    begin
+      match its with
+      | { its_mfields = fldl; _ } ->
+        let open Term in
+        let open Ident in
+        Format.eprintf "%d@.@." (List.length a);
+        List.map (fun p ->
+            try
+              Hashtbl.find hc p
+            with
+            | Not_found ->
+                let r = Expr.create_projection its p in
+                let varinst = Ity.its_match_args its a in
+                let ity = Expr.(r.rs_cty.cty_result) in
+                let ity = Ity.ity_full_inst varinst ity in
+                Expr.print_rs Format.err_formatter r;
+                let res = p, r, ity in
+                Hashtbl.add hc p res;
+                res) fldl
+    end
+  | Ity.Ityapp(its, a, b) -> []
+
 let find_global_definition kn rs =
   let open Term in
   match (Ident.Mid.find rs.ls_name kn).Decl.d_node with
@@ -85,7 +116,7 @@ module Abstract_interpreter(E: sig
 
   type control_point = int
 
-  type domain = unit
+  type domain = apron_domain Abstract1.t
 
   (* control flow graph *)
   type cfg = {
@@ -97,8 +128,16 @@ module Abstract_interpreter(E: sig
     mutable env: Environment.t;
     mutable apply: apron_domain Apron.Manager.t -> int -> apron_domain Apron.Abstract1.t array -> unit * apron_domain Apron.Abstract1.t;
     mutable loop_invariants: (Expr.expr * control_point) list;
+    variable_mapping: (Apron.Var.t, Term.term) Hashtbl.t;
   
   }
+
+  type local_ty = {
+      ident_ty: Ity.ity Ident.Mid.t;
+      region_ident: Ity.pvsymbol Ity.Mreg.t
+  }
+
+  let empty_local_ty = { ident_ty = Ident.Mid.empty; region_ident = Ity.Mreg.empty }
 
   exception Unknown_hedge
 
@@ -109,14 +148,6 @@ module Abstract_interpreter(E: sig
   let var_return = Var.of_string "result"
 
   (* Initialize an hedge *)
-  let start_cfg rs =
-    { expr_to_control_point = Hashtbl.create 100;
-      control_point_count = 0;
-      hedge_count = 0;
-      g = PSHGraph.create PSHGraph.stdcompare 3 ();
-      apply = (fun _ _ a -> raise Unknown_hedge);
-      env = Environment.make [|var_return|] [||];
-      loop_invariants = []; }
 
   let vs_to_var vs =
     ignore (Format.flush_str_formatter ());
@@ -128,7 +159,40 @@ module Abstract_interpreter(E: sig
 
   let ensure_variable cfg v t =
     if not (Environment.mem_var cfg.env v) then
-      cfg.env <- Environment.add cfg.env [|v|] [||]
+      begin
+        Hashtbl.add cfg.variable_mapping v t;
+        cfg.env <- Environment.add cfg.env [|v|] [||]
+      end
+  
+  let start_cfg rs =
+    let cfg = { expr_to_control_point = Hashtbl.create 100;
+      variable_mapping = Hashtbl.create 100;
+      control_point_count = 0;
+      hedge_count = 0;
+      g = PSHGraph.create PSHGraph.stdcompare 3 ();
+      apply = (fun _ _ a -> raise Unknown_hedge);
+      env = Environment.make [||] [||];
+      loop_invariants = []; }
+    in
+    let open Ident in
+    ensure_variable cfg var_return (Term.t_var (Term.create_vsymbol {pre_name = "result"; pre_label = Expr.(Ident.(rs.rs_name.id_label)); pre_loc = None } Ty.ty_int));
+    cfg
+
+  let var_of_field_region cfg reg t (c, a, ity_field) =
+    ignore (Format.flush_str_formatter ());
+    Ity.print_pv Format.str_formatter c;
+    Format.fprintf Format.str_formatter "(";
+    Ity.print_reg_name Format.str_formatter reg;
+    Format.fprintf Format.str_formatter ")";
+    let s = Format.flush_str_formatter () in
+    let v = Var.of_string s in
+    let unwrap = function
+      | Some s -> s
+      | None -> raise Not_found
+    in
+    let t = unwrap (Expr.term_of_expr (Expr.e_exec @@  Expr.c_app a [t] [] ity_field) ~prop:false) in
+    ensure_variable cfg v t;
+    v
 
   let add_variable cfg psym =
     if Ity.(ity_equal ity_int psym.pv_ity) then
@@ -237,7 +301,7 @@ module Abstract_interpreter(E: sig
           | Tvar(a) ->
             begin
               try
-                let ity = Ident.Mid.find Term.(a.vs_name) local_ty in
+                let ity = Ident.Mid.find Term.(a.vs_name) local_ty.ident_ty in
                 match Ity.(ity.ity_node) with
                 | Ity.Ityreg(a) ->
                   ignore (Format.flush_str_formatter ());
@@ -250,8 +314,8 @@ module Abstract_interpreter(E: sig
             end
           | _ -> raise (Not_handled t)
         in
-        let t = term_to_string t in
-        let v = Var.of_string t in
+        let n = term_to_string t in
+        let v = Var.of_string n in
         ensure_variable cfg v t;
         constr := (v, coeff) :: !constr
       | _ -> raise (Not_handled t)
@@ -370,18 +434,17 @@ module Abstract_interpreter(E: sig
         begin
           (* As it is not an int, the type could be useful, so we can save it *)
           let variable_type = Expr.(let_expr.e_ity) in
-          begin
-            match Ity.(variable_type.ity_node) with
-            | Ity.Ityvar(_) -> Format.printf "type variable@."
-            | Ity.Ityreg({reg_args = a; reg_regs = b; reg_name = n; _ }) ->
-              Pretty.print_id Format.std_formatter n;
-              Format.printf "region with %d %d@." (List.length a) (List.length b)
-            | Ity.Ityapp(its, a, b) -> 
-              Ity.print_its Format.std_formatter its;
-              Format.printf "app@.";
-          end;
+          let fields = extract_fields variable_type in
+          let local_ty = match Ity.(variable_type.ity_node), fields with
+            | _, [] -> local_ty
+            | Ity.Ityreg(reg), l ->
+              let vars = List.map (var_of_field_region cfg reg psym) l in
+              ignore vars;
+              { local_ty with region_ident = Ity.Mreg.add reg psym local_ty.region_ident }
+            | _ -> failwith "fields for a variable whose type is not a region?"
+          in
           let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
-          let local_ty = Ident.Mid.add variable_ident variable_type local_ty in
+          let local_ty = { local_ty with ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
 
           let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
           let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
@@ -447,14 +510,11 @@ module Abstract_interpreter(E: sig
           let abs = ref (Abstract1.forget_array man abs [|var_return|] false) in
           ignore @@ Ity.Mreg.mapi (fun a b ->
               Ity.Mpv.mapi (fun c () ->
-                  ignore (Format.flush_str_formatter ());
-                  Ity.print_pv Format.str_formatter c;
-                  Format.fprintf Format.str_formatter "(";
-                  Ity.print_reg_name Format.str_formatter a;
-                  Format.fprintf Format.str_formatter ")";
-                  let s = Format.flush_str_formatter () in
-                  let v = Var.of_string s in
-                  abs :=  Abstract1.forget_array man !abs [|v|] false;
+                  let open Ity in
+                  let var = Ity.Mreg.find a local_ty.region_ident in
+                  let proj = get_proj c in
+                  let v = var_of_field_region cfg a var proj in
+                  abs :=  Abstract1.forget_array man !abs [|v|] false; abs
                 ) b;
             ) eff_write;
 
@@ -501,9 +561,17 @@ module Abstract_interpreter(E: sig
 
   let get_domain cfg control_point = ()
 
-  let domain_to_logic domain = ()
+  module Apron_to_term = Apron_to_term.Apron_to_term (E)
+  let domain_to_term cfg domain =
+    Apron_to_term.domain_to_term manpk domain (fun a ->
+        try
+        Hashtbl.find cfg.variable_mapping a
+        with 
+        | Not_found ->
+          Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
+          raise Not_found
+      )
 
-  let domain_to_string domain = ""
 
   let vertex_dummy = -1
   (** dummy value *)
@@ -593,7 +661,10 @@ module Abstract_interpreter(E: sig
         Expr.print_expr Format.std_formatter expr;
         Format.printf "@.";
         let abs = PSHGraph.attrvertex output cp in
-        printf "%a@." (Abstract1.print) abs
+        Format.printf "%a@." Abstract1.print abs;
+      Pretty.forget_all ();
+        Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
+        printf "@."
       ) cfg.loop_invariants
 
 end
