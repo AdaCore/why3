@@ -69,6 +69,12 @@ module M
   predicate initialized_ofs (p:ptr 'a) (sz:int) =
     forall i. 0 <= i < sz -> p.initialized[p.offset+i]
 
+  let lemma initialized_tail (p:ptr 'a) (sz:int)
+    requires { initialized_ofs p sz }
+    requires { p.initialized[p.offset + sz] }
+    ensures { initialized_ofs p (sz+1) }
+  = ()
+
   val malloc (sz:int32) : ptr 'a
     ensures { result.length = Int32.to_int sz \/ result.length = 0 }
     ensures { result.offset = 0 }
@@ -399,7 +405,7 @@ module N
 
   (** [add_limb x y x1 x2] adds to [x] the value of the limb [y],
       writes the result in [r] and returns the carry. [r] and [x]
-      have size [sz]. This corresponds to the function mpn_add_1 *)
+      have size [sz]. This corresponds to the function [mpn_add_1] *)
   (* r and x must be separated. Enforce this ? *)
 let add_limb (r x:t) (y:limb) (sz:int32) : limb
     requires { valid_and_initialized_ofs x (p2i sz) }
@@ -439,7 +445,8 @@ let add_limb (r x:t) (y:limb) (sz:int32) : limb
 	       		       + (power radix (p2i !i)) * l2i !c
 	     = value_sub_shift r k + (power radix k) * l2i res
 	       		       + (power radix k) * radix * l2i !c
-	     = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)	      = value_sub_shift r k +
+	     = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)
+	     = value_sub_shift r k +
 	       (power radix k) * (l2i !lx + l2i (!c at StartLoop))
 	     = value_sub_shift r k + (power radix k) * l2i (!c at StartLoop)
 	       		       + (power radix k) * l2i !lx
@@ -468,8 +475,8 @@ let add_limb (r x:t) (y:limb) (sz:int32) : limb
     end
 
 
-(** [add_limbs r x y sz] adds [x[0..sz-1]] and [y[0..sz-1]] and writes the result    in [r]. Returns the carry, either [0] or [1].
-    Corresponds to the function [mpn_add_n]. *)
+(** [add_limbs r x y sz] adds [x[0..sz-1]] and [y[0..sz-1]] and writes the result in [r].
+    Returns the carry, either [0] or [1]. Corresponds to the function [mpn_add_n]. *)
 
 let add_limbs (r x y:t) (sz:int32) : limb
   requires { valid_and_initialized_ofs x (p2i sz) }
@@ -528,6 +535,104 @@ let add_limbs (r x y:t) (sz:int32) : limb
   done;
   !c
 
+(** [add r x y sx sy] adds [x] of size [sx] and [y] of size [sy] and writes the result in [r].
+    [sx] must be greater than or equal to [sy]. Returns carry, either 0 or 1. Corresponds to
+    [mpn_add]. *)
+let add (r x y:t) (sx sy:int32) : limb
+  requires { 0 <= p2i sy <= p2i sx }
+  requires { valid_and_initialized_ofs x (p2i sx) }
+  requires { valid_and_initialized_ofs y (p2i sy) }
+  requires { valid_ptr_itv r (p2i sx) }
+  ensures { value_sub_shift r (p2i sx) + (power radix (p2i sx)) * l2i result =
+  	    value_sub_shift x (p2i sx) + value_sub_shift y (p2i sy) }
+  ensures { initialized_ofs r (p2i sx) }
+  ensures { 0 <= l2i result <= 1 }
+=
+  let limb_zero = UInt32.of_int 0 in
+  let lx = ref limb_zero in
+  let ly = ref limb_zero in
+  let c = ref limb_zero in
+  let i = ref (Int32.of_int 0) in
+  while Int32.(<) !i sy do
+    variant { p2i sy - p2i !i }
+    invariant { 0 <= p2i !i <= p2i sy }
+    invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i) }
+    invariant { 0 <= l2i !c <= 1 }
+    invariant { initialized_ofs r (p2i !i) }
+    label StartLoop in
+    lx := get_ofs x !i;
+    ly := get_ofs y !i;
+    let res, carry = add_with_carry !lx !ly !c in
+    set_ofs r !i res;
+    initialized_tail r (p2i !i);
+    c := carry;
+    let ghost k = p2i !i in
+    i := Int32.(+) !i (Int32.of_int 1);
+    value_sub_tail r.elts r.offset (r.offset + k);
+    value_sub_tail x.elts x.offset (x.offset + k);
+    value_sub_tail y.elts y.offset (y.offset + k);
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i)
+	    by
+	    value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+	    = value_sub_shift r k + (power radix k) * l2i res
+	      	 + (power radix (p2i !i)) * l2i !c
+	    = value_sub_shift r k + (power radix k) * l2i res
+	         + (power radix k) * radix * l2i !c
+	    = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)
+	    = value_sub_shift r k +
+	        (power radix k) * (l2i !lx + l2i !ly + l2i (!c at StartLoop))
+  	    = value_sub_shift r k + (power radix k) * l2i (!c at StartLoop)
+	       + (power radix k) * (l2i !lx + l2i !ly)
+	    = value_sub_shift x k + value_sub_shift y k
+	       + (power radix k) * (l2i !lx + l2i !ly)
+	    = value_sub_shift x k + (power radix k) * l2i !lx
+	       + value_sub_shift y k + (power radix k) * l2i !ly
+	    = value_sub_shift x (p2i !i)
+	       + value_sub_shift y k + (power radix k) * l2i !ly
+	    = value_sub_shift x (p2i !i)
+	       + (value_sub_shift y k + (power radix k) * l2i !ly)
+	    = value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i) };
+  done;
+  while Int32.(<) !i sx do
+    variant { p2i sx - p2i !i }
+    invariant { p2i sy <= p2i !i <= p2i sx }
+    invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i sy) }
+    invariant { 0 <= l2i !c <= 1 }
+    invariant { initialized_ofs r (p2i !i) }
+    label StartLoop2 in
+    lx := get_ofs x !i;
+    let res, carry = add_with_carry !lx limb_zero !c in
+    set_ofs r !i res;
+    initialized_tail r (p2i !i);
+    c := carry;
+    let ghost k = p2i !i in
+    i := Int32.(+) !i (Int32.of_int 1);
+    value_sub_tail r.elts r.offset (r.offset + k);
+    value_sub_tail x.elts x.offset (x.offset + k);
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i sy)
+	    by
+	    value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+	    = value_sub_shift r k + (power radix k) * l2i res
+	      	 + (power radix (p2i !i)) * l2i !c
+	    = value_sub_shift r k + (power radix k) * l2i res
+	         + (power radix k) * radix * l2i !c
+	    = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)
+	    = value_sub_shift r k +
+	        (power radix k) * (l2i !lx + 0 + l2i (!c at StartLoop2))
+  	    = value_sub_shift r k + (power radix k) * l2i (!c at StartLoop2)
+	       + (power radix k) * l2i !lx
+	    = value_sub_shift x k + value_sub_shift y (p2i sy)
+	       + (power radix k) * l2i !lx
+	   (* = value_sub_shift x k + (power radix k) * l2i !lx
+	       + value_sub_shift y k + (power radix k) * l2i !ly*)
+	    = value_sub_shift x (p2i !i)
+	       + value_sub_shift y (p2i sy) }
+  done;
+  !c
 end
 
 (*
