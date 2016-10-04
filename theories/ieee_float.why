@@ -285,10 +285,8 @@ theory GenericFloat
   predicate diff_sign (x y : t) =
     (is_positive x /\ is_negative y) \/ (is_negative x /\ is_positive y)
 
-  (* axiomatize eq w.r.t. = ? *)
-  (* e.g. is_finite x /\ is_finite y /\ not_is_zero x -> eq x y <-> x = y *)
   axiom feq_eq: forall x y.
-    is_finite x -> is_finite y -> not (x = zeroF) -> not (y = zeroF) -> x .= y -> x = y
+    is_finite x -> is_finite y -> not (is_zero x) -> x .= y -> x = y
 
   axiom eq_feq: forall x y.
     is_finite x -> is_finite y -> x = y -> x .= y
@@ -309,11 +307,11 @@ theory GenericFloat
     /\ ((is_finite x /\ is_finite y) \/ (is_infinite x /\ is_infinite y)
          /\ same_sign x y))
 
-  axiom lt_finite: forall x y.
-    is_finite x /\ is_finite y -> (x .< y <-> to_real x <. to_real y)
+  axiom lt_finite: forall x y [lt x y].
+    is_finite x /\ is_finite y -> (lt x y <-> to_real x <. to_real y)
 
-  axiom le_finite: forall x y.
-    is_finite x /\ is_finite y -> (x .<= y <-> to_real x <=. to_real y)
+  axiom le_finite: forall x y [le x y].
+    is_finite x /\ is_finite y -> (le x y <-> to_real x <=. to_real y)
 
   lemma le_lt_trans:
     forall x y z:t. x .<= y /\ y .< z -> x .< z
@@ -330,12 +328,12 @@ theory GenericFloat
   lemma not_gt_le: forall x y:t.
     not (x .> y) /\ is_not_nan x /\ is_not_nan y -> x .<= y
 
-  axiom le_special: forall x y. x .<= y ->
+  axiom le_special: forall x y [le x y]. le x y ->
       ((is_finite x /\ is_finite y)
    \/ ((is_minus_infinity x /\ is_not_nan y)
    \/  (is_not_nan x /\ is_plus_infinity y)))
 
-  axiom lt_special: forall x y. x .< y ->
+  axiom lt_special: forall x y [lt x y]. lt x y ->
       ((is_finite x /\ is_finite y)
    \/ ((is_minus_infinity x /\ is_not_nan y /\ not (is_minus_infinity y))
    \/  (is_not_nan x /\ not (is_plus_infinity x) /\ is_plus_infinity y)))
