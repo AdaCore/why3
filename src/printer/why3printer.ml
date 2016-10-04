@@ -20,7 +20,7 @@ open Decl
 open Printer
 open Theory
 
-let iprinter,aprinter,tprinter,pprinter =
+let iprinter,aprinter,tprinter,pprinter,fresh_printer =
   let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
             "namespace"; "import"; "export"; "end";
@@ -31,7 +31,8 @@ let iprinter,aprinter,tprinter,pprinter =
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:isanitize
+  create_ident_printer bl ~sanitizer:isanitize,
+  fun () -> create_ident_printer bl ~sanitizer:isanitize
 
 let forget_tvs () =
   forget_all aprinter
@@ -432,3 +433,64 @@ let print_sequent _args ?old:_ fmt =
 
 let () = register_printer "why3_itp" print_sequent
   ~desc:"Print@ the@ goal@ in@ a@ format@ dedicated@ to@ ITP."
+
+
+(** *)
+
+(*
+type namespace = {
+  ns_ts : tysymbol Mstr.t;   (* type symbols *)
+  ns_ls : lsymbol Mstr.t;    (* logic symbols *)
+  ns_pr : prsymbol Mstr.t;   (* propositions *)
+  ns_ns : namespace Mstr.t;  (* inner namespaces *)
+}
+ *)
+
+type name_tables = {
+    namespace : Theory.namespace;
+    unique_names : string Mid.t;
+  }
+
+
+let build_name_tables task : name_tables =
+(*
+  TODO:
+   - simply use [km = Task.task_known task] as the set of identifiers
+     to insert in the tables
+   - only one printer (do not attempt te rebuild qualified idents)
+   - use syntax_map from why3_itp driver
+   - to build the namespace, do a match on the decl associated with the id
+      in [km]
+  | Dtype  -> tysymbol
+  | Ddata | Dparam | Dlogic | Dind  -> lsymbol
+  | Dprop  -> prsymbol
+
+  TODO: use the result of this function in
+    - a new variant of a printer in this file
+    - use the namespace to type the terms
+      (change the code in parser/typing.ml to use namespace
+      instead of theory_uc)
+
+*)
+  let used_ths = Task.used_theories task in
+  let used_symbs = Task.used_symbols used_ths in
+  let local_decls = Task.local_decls task used_symbs in
+  let tables = { namespace = empty_ns; unique_names = Mid.empty } in
+  let printers,tables =
+    Mid.fold
+      (fun id th (prs,tables) ->
+       let pr = fresh_printer () in
+       let tables =
+         Sid.fold
+           (fun id table ->
+            let s = id_unique pr id in
+            { tables with unique_names =
+                            Mid.add id s tables.unique_names  })
+           th.Theory.th_local
+           tables
+       in
+       (Mid.add id pr prs,tables))
+      used_ths
+      (Mid.empty,tables)
+  in
+  tables

@@ -530,8 +530,21 @@ let list_strategies _fmt _args =
 (*******)
 
 
+let print_known_map _fmt _args =
+  let id = nearest_goal () in
+  let task = get_task cont.controller_session id in
+  let km = Task.task_known task in
+  Ident.Mid.iter
+    (fun id _d ->
+     printf "known: %s@." id.Ident.id_string)
+    km
+
+(****)
+
+
 let commands =
   [
+    "k", "list known identifiers", print_known_map;
     "list-provers", "list available provers", list_provers;
     "list-transforms", "list available transformations", list_transforms;
     "list-strategies", "list available strategies", list_strategies;
