@@ -11,14 +11,22 @@ module Apron_to_term(E: sig
   let th_int = Env.read_theory E.env ["int"] "Int"
   let int_tys = Theory.(ns_find_ts th_int.th_export ["int"])
   let ty_int = (Ty.ty_app int_tys [])
-  let int_zero = fs_app Theory.(ns_find_ls th_int.th_export ["zero"]) [] ty_int
+  (*let int_zero = fs_app Theory.(ns_find_ls th_int.th_export ["zero"]) [] ty_int (* not nice *) *)
+  let int_zero = t_const Number.(ConstInt (int_const_dec "0"))
+  let int_one = t_const Number.(ConstInt (int_const_dec "1"))
   let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="])
   let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"])
   let int_add = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix +"]) a ty_int
   let int_minus = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix -"]) a ty_int
   let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a ty_int
-  (*let int_minus_u = fun a -> Theory.(ns_find_ls th_int.th_export ["infix -_"]) a ty_int (* does not work for some weird reasons *) *)
-  let int_minus_u = (fun a -> int_minus (int_zero::a))
+  let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a ty_int
+
+  type coeff =
+    | CNone
+    | CPos of Term.term
+    | CMinus of Term.term
+    | CMinusOne
+    | COne
 
   let coeff_to_term = function
     | Coeff.Scalar(s) ->
@@ -27,12 +35,16 @@ module Apron_to_term(E: sig
       let n = Number.int_const_dec s in
       let n = Number.ConstInt n in
 
-      if i > 0 then
-        Some (t_const n)
+      if i = 1 then
+        COne
+      else if i = -1 then
+        CMinusOne
+      else if i > 0 then
+        CPos (t_const n)
       else if i < 0 then
-        Some (int_minus_u [t_const n])
+        CMinus (t_const n)
       else
-        None
+        CNone
     | Coeff.Interval(_) -> raise Cannot_be_expressed
 
   let lincons_to_term l variable_mapping =
@@ -40,16 +52,32 @@ module Apron_to_term(E: sig
     let term = ref int_zero in
     Lincons1.iter (fun c v ->
         match coeff_to_term c with
-        | Some c ->
+        | CPos c ->
           let v = variable_mapping v in
           term := int_add [!term; int_mult [c; v]];
-        | None -> ()
+        | COne ->
+          let v = variable_mapping v in
+          term := int_add [!term; v];
+        | CMinusOne ->
+          let v = variable_mapping v in
+          term := int_minus [!term; v];
+        | CMinus c ->
+          let v = variable_mapping v in
+          term := int_minus [!term; int_mult [c; v]];
+        | CNone -> ()
       ) l;
     let c = coeff_to_term (Lincons1.get_cst l) in
     let term = match c with
-      | None -> !term
-      | Some c ->
-        int_add [c; !term] in
+      | CNone -> !term
+      | CPos c ->
+        int_add [c; !term]
+      | CMinus c ->
+        int_minus [!term;c]
+      | COne ->
+        int_add [int_one; !term]
+      | CMinusOne ->
+        int_minus [!term; int_one]
+    in
     match Lincons1.get_typ l with
     | Lincons1.EQ -> ps_app ps_equ [term; int_zero]
     | Lincons1.SUP -> ps_app int_lt [int_zero; term]
@@ -60,7 +88,7 @@ module Apron_to_term(E: sig
     let n = Lincons1.array_length l in
     let t = ref (Term.t_true) in
     for i = 0 to n - 1 do
-      t := t_and !t (lincons_to_term (Lincons1.array_get l i) variable_mapping);
+      t := t_and_simp !t (lincons_to_term (Lincons1.array_get l i) variable_mapping);
     done;
     !t
 

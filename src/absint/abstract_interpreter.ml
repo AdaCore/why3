@@ -238,7 +238,7 @@ module Abstract_interpreter(E: sig
    *
    * The resulting list of linear expressions is weaker than the original why3
    * formula. *)
-  let linear_expressions_from_term cfg local_ty t =
+  let linear_expressions_from_term: cfg -> local_ty -> Term.term -> (domain -> domain)  = fun cfg local_ty t ->
     let open Term in
 
     (* First inline everything, for instance needed for references
@@ -326,8 +326,11 @@ module Abstract_interpreter(E: sig
       try
         match t.t_node with
         | Tbinop(Tand, a, b) ->
-          aux a @ aux b
-        | Tapp(func, args) -> (* ATM, this is handled only for equality. *)
+          let fa = aux a in
+          let fb = aux b in
+          (fun d ->
+            fb (fa d))
+        | Tapp(func, args) -> (* ATM, this is handled only for equality and integer comparison *)
 
           let cst = ref 0 in
           let constr = ref [] in
@@ -344,13 +347,19 @@ module Abstract_interpreter(E: sig
                                                Lincons1.EQ
                                              else Lincons1.SUP) in
               Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int !cst));
-              [cons]
+              let arr = Lincons1.array_make cfg.env 1 in
+              Lincons1.array_set arr 0 cons;
+              (fun d ->
+                 Abstract1.meet_lincons_array manpk d arr)
             | _ -> raise (Not_handled t)
           else
             raise (Not_handled t)
         | Tif(a, b, c) ->
-          aux a @ aux b
-        | Ttrue -> []
+          let fa = aux a in
+          let fb = aux b in
+          (fun d ->
+             fb (fa d))
+        | Ttrue -> (fun d -> d)
         | _ ->
           raise (Not_handled t)
       with
@@ -358,7 +367,7 @@ module Abstract_interpreter(E: sig
         Format.eprintf "Couldn't understand entirely the post condition: ";
         Pretty.print_term Format.err_formatter t;
         Format.eprintf "@.";
-        []
+        (fun d -> d)
     in
 
     try
@@ -492,7 +501,8 @@ module Abstract_interpreter(E: sig
       Format.eprintf "@.";
       let constraints =
         List.map (linear_expressions_from_term cfg local_ty) post
-        |> List.concat
+        |> List.fold_left (fun f a ->
+            (fun d -> f (a d))) (fun x -> x)
       in
       List.iter (fun a ->
           Format.eprintf "  ->  ";
@@ -500,8 +510,6 @@ module Abstract_interpreter(E: sig
           Format.eprintf "@.";
         ) post;
 
-      let cons_arr = Lincons1.array_make cfg.env (List.length constraints) in
-      List.iteri (Lincons1.array_set cons_arr) constraints;
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
@@ -517,7 +525,7 @@ module Abstract_interpreter(E: sig
                 ) b;
             ) eff_write;
 
-          Abstract1.meet_lincons_array man !abs cons_arr
+          constraints !abs
         );
       begin_cp, end_cp
     | Ewhile(cond, inv, var, content) ->
@@ -540,15 +548,13 @@ module Abstract_interpreter(E: sig
           Term.t_true
       in
       let constraints = linear_expressions_from_term cfg local_ty cond_term in
-      let cons_arr = Lincons1.array_make cfg.env (List.length constraints) in
-      List.iteri (Lincons1.array_set cons_arr) constraints;
 
       let before_loop_cp = new_node_cfg cfg cond in
       let start_loop_cp, end_loop_cp = put_expr_in_cfg cfg local_ty content in
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let after_loop_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man abs ->
-          Abstract1.meet_lincons_array man abs cons_arr
+          constraints abs
         );
       new_hedge_cfg cfg (end_loop_cp, after_loop_cp) (fun man abs ->
           (* todo *)
