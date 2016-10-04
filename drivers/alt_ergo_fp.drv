@@ -1,0 +1,29 @@
+theory real.Abs
+  syntax function abs "abs_real(%1)"
+end
+
+theory real.MinMax
+  syntax function min "min_real(%1)"
+  syntax function max "max_real(%1)"
+end
+
+theory real.Square
+  syntax function sqrt "sqrt_real(%1)"
+end
+
+theory ieee_float.RoundingMode
+  syntax type mode "fpa_rounding_mode"
+  syntax function RNE "NearestTiesToEven"
+  syntax function RNA "NearestTiesToAway"
+  syntax function RTN "Down"
+  syntax function RTP "Up"
+  syntax function RTZ "ToZero"
+end
+
+theory ieee_float.Float32
+  syntax function round "float32(%1,%2)"
+end
+
+theory ieee_float.Float64
+  syntax function round "float64(%1,%2)"
+end
