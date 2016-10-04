@@ -452,8 +452,9 @@ let test_print_goal fmt _args =
   let id = nearest_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
-          (* (fprintf fmt "@[%a@]@?" Pretty.print_task task) Pretty.print_task *)
-          (Driver.print_task ~cntexample:false task_driver) task
+          Pretty.print_task
+          (* (Driver.print_task ~cntexample:false task_driver) *)
+          task
 
 let test_save_session _fmt args =
   match args with

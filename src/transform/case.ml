@@ -83,20 +83,14 @@ let string_pr pr =
   Format.flush_str_formatter()
 
 (* Return a new task with hypothesis name removed *)
-let rec remove_task_decl task (name: string) : task_hd option =
-  match task with
-  | Some {task_decl = {td_node = Decl {d_node = Dprop (Paxiom, pr, _)}};
-          task_prev = task} when (string_pr pr = name) ->
-    task
-  | Some {task_decl = decl;
-          task_prev = task;
-          task_known = known;
-          task_clone = clone;
-          task_meta = meta;
-          task_tag = _} ->
-    (* Should create a new unique tag each time *)
-    Task.mk_task decl (remove_task_decl task name) known clone meta
-  | None -> None
+let remove_task_decl (name: string) : task trans =
+  Trans.decl
+    (fun d ->
+     match d.d_node with
+    | Dprop (Paxiom, pr, _) when (string_pr pr = name) ->
+       []
+    | _ -> [d])
+    None
 
 (* TODO check if this works in particular when hypothesis names
     are extracted from same name. Seemed not to work before
@@ -104,9 +98,8 @@ let rec remove_task_decl task (name: string) : task_hd option =
 (* from task [delta, name:A |- G]  build the task [delta |- G] *)
 let remove name task =
   clean_environment task;
-  let g, task = Task.task_separate_goal task in
-  let task = remove_task_decl task name in
-  [Task.add_tdecl task g]
+  [Trans.apply (remove_task_decl name) task]
+
 
 let pr_prsymbol pr =
   match pr with

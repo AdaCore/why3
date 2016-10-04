@@ -126,9 +126,6 @@ val on_tagged_ts : meta -> task -> Sts.t
 val on_tagged_ls : meta -> task -> Sls.t
 val on_tagged_pr : meta -> task -> Spr.t
 
-
-val mk_task: Theory.tdecl -> task -> Decl.known_map -> clone_map -> meta_map -> task
-
 (** Exceptions *)
 
 exception NotTaggingMeta of meta

@@ -48,6 +48,10 @@ val fold_map   : (task_hd -> 'a * 'b -> ('a * 'b)     ) -> 'a -> 'b -> 'b trans
 val fold_map_l : (task_hd -> 'a * 'b -> ('a * 'b) list) -> 'a -> 'b -> 'b tlist
 
 val decl   : (decl -> decl list     ) -> task -> task trans
+(** [decl f t1 t2] adds to task [t1] the declarations [f d] for each
+    declaration [d] of task [t2]. (similar to a "flat_map"
+    operation) *)
+
 val decl_l : (decl -> decl list list) -> task -> task tlist
 
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
