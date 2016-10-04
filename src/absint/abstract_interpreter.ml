@@ -420,6 +420,22 @@ module Abstract_interpreter(E: sig
       Format.eprintf "@.";
       raise e
 
+  let add_typed_variable cfg local_ty psym variable_type =
+    let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
+    let local_ty = { local_ty with ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
+    match Ity.(variable_type.ity_node) with
+    | Ity.Ityreg(reg) ->
+      let fields = extract_fields variable_type in
+      let vars = List.map (var_of_field_region cfg reg psym) fields in
+      ignore vars;
+      { local_ty with region_ident = Ity.Mreg.add reg psym local_ty.region_ident }
+    | _ when Ity.(ity_equal variable_type ity_int) ->
+      add_variable cfg psym;
+      local_ty
+    | _ when  extract_fields variable_type = [] -> local_ty
+    | _ -> failwith "fields for a variable whose type is not a region?"
+
+
   (* Adds expr to the cfg. local_ty is the types of the locally defined variable
    * (useful for references, when we need to get the type of a term in a logical formula).
    *
@@ -434,7 +450,6 @@ module Abstract_interpreter(E: sig
     | Elet(LDvar(psym, let_expr), b) ->
       (* As it may not be an int, the type could be useful, so we can save it *)
       let variable_type = Expr.(let_expr.e_ity) in
-      let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
 
           (*
            * let a = b in c
@@ -452,24 +467,11 @@ module Abstract_interpreter(E: sig
            **)
       let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
 
-      let local_ty = { local_ty with ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
-      let local_ty = match Ity.(variable_type.ity_node) with
-        | Ity.Ityreg(reg) ->
-          let fields = extract_fields variable_type in
-          let vars = List.map (var_of_field_region cfg reg psym) fields in
-          ignore vars;
-          { local_ty with region_ident = Ity.Mreg.add reg psym local_ty.region_ident }
-        | _ when Ity.(ity_equal variable_type ity_int) ->
-          add_variable cfg psym;
-          local_ty
-        | _ when  extract_fields variable_type = [] -> local_ty
-        | _ -> failwith "fields for a variable whose type is not a region?"
-      in
+      let local_ty = add_typed_variable cfg local_ty psym variable_type in
 
       (* compute the child and add an hyperedge, to set the value of psym
        * to the value returned by let_expr *)
       let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
-
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
