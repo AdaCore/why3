@@ -101,7 +101,9 @@ val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempts : session -> proofNodeID -> proof_attempt list
 val get_sub_tasks : session -> transID -> proofNodeID list
 
-val get_transformation_name : session -> transID -> string
+val get_transf_args : session -> transID -> string list
+val get_transf_name : session -> transID -> string
+
 val get_proof_name : session -> proofNodeID -> Ident.ident
 
 val get_proof_parent : session -> proofNodeID -> proof_parent

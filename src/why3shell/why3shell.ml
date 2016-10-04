@@ -358,7 +358,7 @@ let print_proof_attempt fmt pa =
 let rec print_proof_node s (fmt: Format.formatter) p =
   let parent = match get_proof_parent s p with
   | Theory t -> (theory_name t).Ident.id_string
-  | Trans id -> get_transformation_name s id
+  | Trans id -> get_transf_name s id
   in
   let current_goal =
     match is_goal_cursor () with
@@ -369,20 +369,21 @@ let rec print_proof_node s (fmt: Format.formatter) p =
     fprintf fmt "**";
 
   fprintf fmt
-    "@[<hv 2> Goal %s;@ parent %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
+    "@[<hv 2> Goal %s; parent %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
     (get_proof_name s p).Ident.id_string parent
     (Pp.print_list Pp.semi print_proof_attempt)
     (get_proof_attempts s p)
     (Pp.print_list Pp.semi (print_trans_node s)) (get_transformations s p);
 
   if current_goal then
-    fprintf fmt "**"
+    fprintf fmt " **"
 
 and print_trans_node s fmt id =
-  let name = get_transformation_name s id in
+  let name = get_transf_name s id in
+  let args = get_transf_args s id in
   let l = get_sub_tasks s id in
   let parent = (get_proof_name s (get_trans_parent s id)).Ident.id_string in
-  fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
+  fprintf fmt "@[<hv 2> Trans %s; args %a; parent %s;@ [%a]@]" name (Pp.print_list Pp.semi pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
 let print_theory s fmt th : unit =

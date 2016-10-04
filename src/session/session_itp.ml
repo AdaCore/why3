@@ -165,7 +165,10 @@ let get_proof_attempts (s : session) (id : proofNodeID) =
 let get_sub_tasks (s : session) (id : transID) =
   (get_transfNode s id).transf_subtasks
 
-let get_transformation_name (s : session) (id : transID) =
+let get_transf_args (s : session) (id : transID) =
+  (get_transfNode s id).transf_args
+
+let get_transf_name (s : session) (id : transID) =
   (get_transfNode s id).transf_name
 
 let get_proof_name (s : session) (id : proofNodeID) =
@@ -218,10 +221,11 @@ let rec print_proof_node s (fmt: Format.formatter) p =
 
 and print_trans_node s fmt id =
   let tn = get_transfNode s id in
+  let args = get_transf_args s id in
   let name = tn.transf_name in
   let l = tn.transf_subtasks in
   let parent = (get_proofNode s tn.transf_parent).proofn_name.id_string in
-  fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
+  fprintf fmt "@[<hv 2> Trans %s; args %a; parent %s;@ [%a]@]" name (Pp.print_list Pp.colon pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
 
@@ -523,25 +527,31 @@ and load_proof_or_transf session old_provers pid a =
           raise (LoadError (a,"prover not listing in header"))
       end
     | "transf" ->
-        let trname = string_attribute "name" a in
-        let tid = gen_transID session in
-        let subtasks_ids =
-          List.rev (List.fold_left
-                      (fun goals th ->
+      let trname = string_attribute "name" a in
+      let rec get_args id =
+        match string_attribute_opt ("arg"^(string_of_int id)) a with
+        | Some arg -> arg :: (get_args (id+1))
+        | None -> []
+      in
+      let args = get_args 1 in
+      let tid = gen_transID session in
+      let subtasks_ids =
+        List.rev (List.fold_left
+                    (fun goals th ->
                        match th.Xml.name with
                        | "goal" -> (gen_proofNodeID session) :: goals
                        | _ -> goals) [] a.Xml.elements)
-        in
-        mk_transf_node session pid tid trname [] subtasks_ids;
-        List.iter2
-          (load_goal session old_provers (Trans tid))
-          a.Xml.elements subtasks_ids;
+      in
+      mk_transf_node session pid tid trname args subtasks_ids;
+      List.iter2
+        (load_goal session old_provers (Trans tid))
+        a.Xml.elements subtasks_ids;
     | "metas" -> ()
     | "label" -> ()
     | s ->
-        Warning.emit
-          "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
-          s
+      Warning.emit
+        "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
+        s
 
 let load_theory session old_provers acc th =
   match th.Xml.name with
@@ -866,8 +876,13 @@ let rec save_goal s ctxt fmt pnid =
   fprintf fmt "@]@\n</goal>"
 
 and save_trans s ctxt fmt t =
-  fprintf fmt "@\n@[<hov 1>@[<h><transf@ name=\"%a\">@]"
-    save_string t.transf_name;
+  let arg_id = ref 0 in
+  let save_arg fmt s =
+    arg_id := !arg_id + 1;
+    fprintf fmt "arg%i=\"%a\"" !arg_id save_string s
+  in
+  fprintf fmt "@\n@[<hov 1>@[<h><transf@ name=\"%a\" %a>@]"
+    save_string t.transf_name (Pp.print_list Pp.space save_arg) t.transf_args;
   List.iter (save_goal s ctxt fmt) t.transf_subtasks;
   fprintf fmt "@]@\n</transf>"
 
