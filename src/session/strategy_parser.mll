@@ -10,7 +10,6 @@
 (********************************************************************)
 
 {
-  open Session
   open Strategy
 
   exception SyntaxError of string
@@ -28,17 +27,19 @@
   }
 
   type 'a code = {
-    env: 'a Session.env_session;
+    env: Env.env;
+    whyconf: Whyconf.config;
     mutable instr: instruction array;
     mutable next: int;
     labels: (string, label) Hashtbl.t; (* label name -> label *)
     mutable temp: int;
   }
 
-  let create_code env =
+  let create_code env conf =
     let h = Hashtbl.create 17 in
     Hashtbl.add h "exit" { defined = Some (-1); temporary = 0 };
     { env = env;
+      whyconf = conf;
       instr = Array.make 10 (Igoto 0);
       next = 0;
       temp = 1;
@@ -80,7 +81,7 @@
   let prover code p =
     try
       let fp = Whyconf.parse_filter_prover p in
-      Whyconf.filter_one_prover code.env.whyconf fp
+      Whyconf.filter_one_prover code.whyconf fp
     with
       | Whyconf.ProverNotFound _ ->
           error "Prover %S not installed or not configured" p
@@ -93,10 +94,10 @@
 
   let transform code t =
     try
-      ignore (Trans.lookup_transform t code.env.Session.env)
+      ignore (Trans.lookup_transform t code.env)
     with Trans.UnknownTrans _ ->
     try
-      ignore (Trans.lookup_transform_l t code.env.Session.env)
+      ignore (Trans.lookup_transform_l t code.env)
     with Trans.UnknownTrans _->
       error "transformation %S is unknown" t
 
@@ -140,7 +141,21 @@ rule scan code = parse
 
 {
 
-  let parse env s =
+  let parse2 env conf s =
+    let code = create_code env conf in
+    scan code (Lexing.from_string s);
+    let label = Array.make code.temp 0 in
+    let fill name lab = match lab.defined with
+      | None -> error "label '%s' is undefined" name
+      | Some n -> label.(lab.temporary) <- n in
+    Hashtbl.iter fill code.labels;
+    let solve = function
+      | Icall_prover _ as i -> i
+      | Itransform (t, n) -> Itransform (t, label.(n))
+      | Igoto n -> Igoto label.(n) in
+    Array.map solve (Array.sub code.instr 0 code.next)
+
+(*
     let code = create_code env in
     scan code (Lexing.from_string s);
     let label = Array.make code.temp 0 in
@@ -153,5 +168,8 @@ rule scan code = parse
       | Itransform (t, n) -> Itransform (t, label.(n))
       | Igoto n -> Igoto label.(n) in
     Array.map solve (Array.sub code.instr 0 code.next)
+*)
+
+  let parse env s = parse2 env.Session.env env.Session.whyconf s
 
 }

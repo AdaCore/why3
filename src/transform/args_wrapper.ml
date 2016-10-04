@@ -23,9 +23,11 @@ let type_ptree ~as_fmla t task =
     Ident.Mid.fold
       (fun _id th acc ->
        let name = th.Theory.th_name in
+       (**)
        Format.eprintf "[Args_wrapper.type_ptree] use theory %s (%s)@."
                       _id.Ident.id_string
                       name.Ident.id_string;
+       (**)
        Theory.close_namespace
          (Theory.use_export
             (Theory.open_namespace acc name.Ident.id_string)
@@ -35,7 +37,12 @@ let type_ptree ~as_fmla t task =
   in
   let th_uc =
     List.fold_left
-      (fun acc d -> Theory.add_decl ~warn:false acc d)
+      (fun acc d ->
+       (**)
+       Format.eprintf "[Args_wrapper.type_ptree] add decl %a@."
+                      Pretty.print_decl d;
+       (**)
+       Theory.add_decl ~warn:false acc d)
       th_uc local_decls
   in
   if as_fmla

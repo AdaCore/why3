@@ -452,8 +452,8 @@ let test_print_goal fmt _args =
   let id = nearest_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
-    (*(fprintf fmt "@[%a@]@?" Pretty.print_task task)*) Pretty.print_task
-(*Driver.print_task ~cntexample:false task_driver)*) task
+          (* (fprintf fmt "@[%a@]@?" Pretty.print_task task) Pretty.print_task *)
+          (Driver.print_task ~cntexample:false task_driver) task
 
 let test_save_session _fmt args =
   match args with
@@ -483,11 +483,52 @@ let test_transform_and_display fmt args =
        C.schedule_transformation cont id tr tl ~callback
     | _ -> printf "Error: Give the name of the transformation@."
 
+
+(***************** strategy *****************)
+
+let loaded_strategies = ref []
+
+let strategies () =
+  match !loaded_strategies with
+    | [] ->
+      let strategies = Whyconf.get_strategies config in
+      let strategies =
+        Stdlib.Mstr.fold_left
+          (fun acc _ st ->
+            let name = st.Whyconf.strategy_name in
+            try
+              let code = st.Whyconf.strategy_code in
+              let code = Strategy_parser.parse2 env config code in
+              let shortcut = st.Whyconf.strategy_shortcut in
+              Format.eprintf "[Why3shell] Strategy '%s' loaded.@." name;
+              (name, shortcut, st.Whyconf.strategy_desc, code) :: acc
+            with Strategy_parser.SyntaxError msg ->
+              Format.eprintf
+                "[Why3shell warning] Loading strategy '%s' failed: %s@." name msg;
+              acc)
+          []
+          strategies
+      in
+      let strategies = List.rev strategies in
+      loaded_strategies := strategies;
+      strategies
+    | l -> l
+
+let list_strategies _fmt _args =
+  let l = strategies () in
+  let pp_strat fmt (n,s,_,_) = fprintf fmt "%s: %s" s n in
+  printf "@[<hov 2>== Known strategies ==@\n%a@]@."
+          (Pp.print_list Pp.newline pp_strat) l
+
+
 (*******)
+
+
 let commands =
   [
     "list-provers", "list available provers", list_provers;
     "list-transforms", "list available transformations", list_transforms;
+    "list-strategies", "list available strategies", list_strategies;
     "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
     "b", "<transname> <args>: behave like a but add function to display into the callback", test_transform_and_display;
     "p", "print the session in raw form", dump_session_raw;
