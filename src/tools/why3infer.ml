@@ -136,8 +136,15 @@ let do_input f =
                       Ity.(cexp.c_cty.cty_args);
                     ignore (Abstract_interpreter.put_expr_in_cfg cfg Abstract_interpreter.empty_local_ty e);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
-                    let copied = Hashtbl.create 10 in
+                    let open Expr in
+                    let copying_informations = Hashtbl.create 100 in
                     Abstract_interpreter.eval_fixpoints cfg
+                    |> List.sort (fun (e1, _) (e2, _) -> 
+                        match e1.e_node, e2.e_node with
+                        | Ewhile(_, _, _, e1), Ewhile(_, _, _, e2) ->
+                          compare e1.e_loc e2.e_loc
+                        | _ -> assert false
+                      )
                     |> List.iter begin fun (expr, domain) ->
                       match expr.e_node with
                       | Ewhile(_, _, _, expr) ->
@@ -149,22 +156,34 @@ let do_input f =
                           |> Format.flush_str_formatter
                           |> Format.sprintf "invariant { %s }\n"
                         in
-                        let file, origin_offset, _, _ = Expr.(expr.e_loc) |> unwrap |> Loc.get in
+                        let file, line_number, _, _ = Expr.(expr.e_loc) |> unwrap |> Loc.get in
+                        let line_number = line_number - 1 in (* we want to insert the invariant
+                                                                before the loop *)
                         let new_file = Format.sprintf "%s_inferred.mlw" file in
-                        let new_file_tmp = Format.sprintf "%s_inferred.mlw~" file in
-                        let o =
+                        let o, fin, fout =
                           try
-                            let o = Hashtbl.find copied file in
-                            insert_at new_file new_file_tmp 1 ""; o
+                            Hashtbl.find copying_informations file
                           with
                           | Not_found ->
-                            insert_at file new_file_tmp 1 "";
-                            Hashtbl.add copied file 0; 0
+                            let v = 0, open_in file, open_out new_file in
+                            Hashtbl.add copying_informations file v; v
                         in
-                        insert_at_lines new_file_tmp new_file (o + origin_offset - 1) inv;
-                        Hashtbl.replace copied file (o + 1);
+                        let number_of_lines_to_read = line_number - (o + 1) in (* the file was copied up to o *)
+                        assert (number_of_lines_to_read >= 0);
+                        for i = 0 to number_of_lines_to_read do
+                          input_line fin |> Format.sprintf "%s\n" |> output_string fout;
+                        done;
+                        output_string fout inv;
+                        Hashtbl.replace copying_informations file (line_number, fin, fout);
                       | _ -> assert false
-                    end
+                    end;
+                    Hashtbl.iter (fun _ (o, fin, fout) ->
+                        try
+                          while true do
+                            input_line fin |> Format.sprintf "%s\n" |> output_string fout;
+                          done;
+                        with
+                        | End_of_file -> ()) copying_informations
                   | Cany ->
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;

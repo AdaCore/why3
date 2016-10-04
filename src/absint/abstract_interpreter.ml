@@ -229,8 +229,12 @@ module Abstract_interpreter(E: sig
 
   let th_int = Env.read_theory E.env ["int"] "Int"
   let le_int = Theory.(ns_find_ls th_int.th_export ["infix <="])
+  let ge_int = Theory.(ns_find_ls th_int.th_export ["infix >="])
   let lt_int = Theory.(ns_find_ls th_int.th_export ["infix <"])
+  let gt_int = Theory.(ns_find_ls th_int.th_export ["infix >"])
   let ad_int = Theory.(ns_find_ls th_int.th_export ["infix +"])
+  let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
+  let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
 
   (* Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    * ATM it only works for conjunction, and if there is not that much uninterpreted function.
@@ -272,6 +276,10 @@ module Abstract_interpreter(E: sig
         cst := !cst + coeff * (BigInt.to_int n)
       | Tapp(func, args) when Term.ls_equal func ad_int ->
         List.iter (term_to_int coeff cst constr) args
+      | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
+        term_to_int coeff cst constr a; term_to_int (-coeff) cst constr b;
+      | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
+        term_to_int (-coeff) cst constr a;
       | Tapp(func, [arg]) -> (* record access *)
         let rec term_to_string t = match t.t_node with
           | Tapp(func, [arg]) ->
@@ -330,22 +338,46 @@ module Abstract_interpreter(E: sig
           let fb = aux b in
           (fun d ->
             fb (fa d))
+        | Tbinop(Tor, a, b) ->
+          let fa = aux a in
+          let fb = aux b in
+          (fun d ->
+             let d1 = fa d in
+             let d2 = fb d in
+             Abstract1.join manpk d1 d2)
         | Tapp(func, args) -> (* ATM, this is handled only for equality and integer comparison *)
 
           let cst = ref 0 in
           let constr = ref [] in
           (* FIXME: >, <=, >=, booleans *)
-          if ls_equal ps_equ func || ls_equal lt_int func then
+          if ls_equal ps_equ func ||
+             ls_equal lt_int func ||
+             ls_equal gt_int func ||
+             ls_equal le_int func ||
+             ls_equal ge_int func
+          then
             match args with
             | [a; b] ->
-              term_to_int (-1) cst constr a; term_to_int (1) cst constr b;
+              let base_coeff, eq_type =
+                if ls_equal ps_equ func then
+                  1, Lincons1.EQ
+                else if ls_equal lt_int func then
+                  1, Lincons1.SUP
+                else if ls_equal gt_int func then
+                  -1, Lincons1.SUP
+                else if ls_equal le_int func then
+                  1, Lincons1.SUPEQ
+                else if ls_equal ge_int func then
+                  -1, Lincons1.SUPEQ
+                else
+                  assert false
+              in
+              term_to_int (-base_coeff) cst constr a; term_to_int base_coeff cst constr b;
               let expr = Linexpr1.make cfg.env in
               let constr = List.map (fun (var, coeff) ->
                   Coeff.Scalar (Scalar.of_int coeff), var) !constr in
               Linexpr1.set_list expr constr None;
-              let cons = Lincons1.make expr (if ls_equal ps_equ func then
-                                               Lincons1.EQ
-                                             else Lincons1.SUP) in
+              let cons = Lincons1.make expr eq_type in
               Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int !cst));
               let arr = Lincons1.array_make cfg.env 1 in
               Lincons1.array_set arr 0 cons;
@@ -357,8 +389,11 @@ module Abstract_interpreter(E: sig
         | Tif(a, b, c) ->
           let fa = aux a in
           let fb = aux b in
+          let fc = aux c in
           (fun d ->
-             fb (fa d))
+             let d1 = fb (fa d) in
+             let d2 = fc d in
+             Abstract1.join manpk d1 d2)
         | Ttrue -> (fun d -> d)
         | _ ->
           raise (Not_handled t)
@@ -397,8 +432,10 @@ module Abstract_interpreter(E: sig
     let open Expr in
     match expr.e_node with
     | Elet(LDvar(psym, let_expr), b) ->
-      if Ity.(ity_equal psym.pv_ity ity_int) then
-        begin
+      (* As it may not be an int, the type could be useful, so we can save it *)
+      let variable_type = Expr.(let_expr.e_ity) in
+      let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
+
           (*
            * let a = b in c
            *
@@ -413,55 +450,51 @@ module Abstract_interpreter(E: sig
            *  | erase every temporary variable
            *  . end_cp
            **)
+      let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
 
-          let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
+      let local_ty = { local_ty with ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
+      let local_ty = match Ity.(variable_type.ity_node) with
+        | Ity.Ityreg(reg) ->
+          let fields = extract_fields variable_type in
+          let vars = List.map (var_of_field_region cfg reg psym) fields in
+          ignore vars;
+          { local_ty with region_ident = Ity.Mreg.add reg psym local_ty.region_ident }
+        | _ when Ity.(ity_equal variable_type ity_int) ->
           add_variable cfg psym;
+          local_ty
+        | _ when  extract_fields variable_type = [] -> local_ty
+        | _ -> failwith "fields for a variable whose type is not a region?"
+      in
 
-          (* compute the child and add an hyperedge, to set the value of psym
-           * to the value returned by let_expr *)
-          let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
+      (* compute the child and add an hyperedge, to set the value of psym
+       * to the value returned by let_expr *)
+      let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
 
-          let end_cp = new_node_cfg cfg expr in
 
-          (* Save the effect of the let *)
-          new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
+      (* Save the effect of the let *)
+      new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
+          let abs =
+            match Ity.(variable_type.ity_node) with
+            | _ when Ity.(ity_equal variable_type ity_int) ->
               let expr = Linexpr1.make cfg.env in
               Linexpr1.set_list expr [(one, var_return)] (Some(zero));
               let p = pv_to_var psym in
-              let abs = Abstract1.assign_linexpr man abs p expr None in
-              Abstract1.forget_array man abs [|var_return|] false
-            );
-
-          (* erase a *)
-          new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
-              Abstract1.forget_array man abs [|pv_to_var psym|] false);
-
-          let_begin_cp, end_cp
-        end
-      else
-        begin
-          (* As it is not an int, the type could be useful, so we can save it *)
-          let variable_type = Expr.(let_expr.e_ity) in
-          let fields = extract_fields variable_type in
-          let local_ty = match Ity.(variable_type.ity_node), fields with
-            | _, [] -> local_ty
-            | Ity.Ityreg(reg), l ->
-              let vars = List.map (var_of_field_region cfg reg psym) l in
-              ignore vars;
-              { local_ty with region_ident = Ity.Mreg.add reg psym local_ty.region_ident }
-            | _ -> failwith "fields for a variable whose type is not a region?"
+              Abstract1.assign_linexpr man abs p expr None
+            | _ -> abs
           in
-          let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
-          let local_ty = { local_ty with ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
+          Abstract1.forget_array man abs [|var_return|] false
+        );
+      let end_cp = new_node_cfg cfg expr in
+      (* erase a *)
+      new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
+          match Ity.(variable_type.ity_node) with
+          | _ when Ity.(ity_equal variable_type ity_int) ->
+            Abstract1.forget_array man abs [|pv_to_var psym|] false
+          | _ -> abs
+        );
 
-          let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
-          let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
 
-          new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
-              Abstract1.forget_array man abs [|var_return|] false
-            );
-          let_begin_cp, b_end_cp
-        end
+      let_begin_cp, end_cp
     | Evar(psym) ->
       if Ity.(ity_equal psym.pv_ity ity_int) then
         begin
@@ -556,14 +589,17 @@ module Abstract_interpreter(E: sig
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man abs ->
           constraints abs
         );
-      new_hedge_cfg cfg (end_loop_cp, after_loop_cp) (fun man abs ->
+      new_hedge_cfg cfg (before_loop_cp, after_loop_cp) (fun man abs ->
           (* todo *)
           abs
         );
       new_hedge_cfg cfg (end_loop_cp, before_loop_cp) (fun man abs ->
           abs
         );
-      before_loop_cp, end_loop_cp
+      before_loop_cp, after_loop_cp
+    (*| Etry(e, exc) ->
+      Ity.Mexn.mapi (fun a b ->
+          () ) exc;*)
     | _ ->
       Expr.print_expr Format.err_formatter expr;
       Format.eprintf "unhandled expr@.";
@@ -653,23 +689,23 @@ module Abstract_interpreter(E: sig
         manager cfg.g sinit make_strategy
     in
     (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
-    (*PSHGraph.iter_vertex output
+    PSHGraph.iter_vertex output
       (begin fun vtx abs ~pred ~succ ->
          printf "acc(%i) = %a@."
            vtx (Abstract1.print) abs
-       end)
+       end);
     
  Hashtbl.iter (fun a b ->
         Format.eprintf "%d -> " b;
         Expr.print_expr Format.err_formatter a;
         Format.eprintf "@."
-      ) cfg.expr_to_control_point*)
+        ) cfg.expr_to_control_point;
 
     (* Print loop invariants *)
 
-(*    Format.printf "Loop invariants:\n@.";
+    Format.printf "Loop invariants:\n@.";
 
-    List.iter (fun (expr, cp) ->
+    (*List.iter (fun (expr, cp) ->
         Format.printf "For:@.";
         Expr.print_expr Format.std_formatter expr;
         Format.printf "@.";
@@ -678,7 +714,7 @@ module Abstract_interpreter(E: sig
       Pretty.forget_all ();
         Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
         printf "@."
-      ) cfg.loop_invariants*)
+      ) cfg.loop_invariants;*)
     
     List.map (fun (expr, cp) ->
         let abs = PSHGraph.attrvertex output cp in
