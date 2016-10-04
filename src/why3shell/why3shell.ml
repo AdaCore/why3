@@ -412,6 +412,21 @@ let print_position (s: session) (cursor: proof_zipper) fmt: unit =
 
 let print_position_p s cursor fmt _ = print_position s cursor fmt
 
+(* Print current goal or nearest next goal if we are not on a goal *)
+let test_print_goal fmt _args =
+  (* temporary : get the first goal *)
+  let id = nearest_goal () in
+  let task = Session_itp.get_task cont.Controller_itp.controller_session id in
+  fprintf fmt "@[====================== Task =====================@\n%a@]@."
+          Pretty.print_task
+          (* (Driver.print_task ~cntexample:false task_driver) *)
+          task
+
+(* Execute f and then print the goal *)
+let then_print f fmt args =
+  f fmt args;
+  test_print_goal fmt []
+
 (* _____________________________________________________________________ *)
 (* -------------------- test with transformations ---------------------- *)
 
@@ -445,16 +460,6 @@ let task_driver =
                           (Filename.concat "drivers" "why3_itp.drv")
   in
   Driver.load_driver env d []
-
-(* Print current goal or nearest next goal if we are not on a goal *)
-let test_print_goal fmt _args =
-  (* temporary : get the first goal *)
-  let id = nearest_goal () in
-  let task = Session_itp.get_task cont.Controller_itp.controller_session id in
-  fprintf fmt "@[====================== Task =====================@\n%a@]@."
-          Pretty.print_task
-          (* (Driver.print_task ~cntexample:false task_driver) *)
-          task
 
 let test_save_session _fmt args =
   match args with
@@ -521,7 +526,6 @@ let list_strategies _fmt _args =
   printf "@[<hov 2>== Known strategies ==@\n%a@]@."
           (Pp.print_list Pp.newline pp_strat) l
 
-
 (*******)
 
 
@@ -537,12 +541,12 @@ let commands =
     "g", "prints the first goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
     "s", "[s my_session] save the current session in my_session.xml", test_save_session;
-    "ng", "get to the next goal", move_to_goal_ret_p next_node;
-    "pg", "get to the prev goal", move_to_goal_ret_p prev_node;
-    "gu", "get to the goal up",  move_to_goal_ret_p zipper_up;
-    "gd", "get to the goal down",  move_to_goal_ret_p zipper_down;
-    "gr", "get to the goal right",  move_to_goal_ret_p zipper_right;
-    "gl", "get to the goal left",  move_to_goal_ret_p zipper_left;
+    "ng", "get to the next goal", then_print (move_to_goal_ret_p next_node);
+    "pg", "get to the prev goal", then_print (move_to_goal_ret_p prev_node);
+    "gu", "get to the goal up",  then_print (move_to_goal_ret_p zipper_up);
+    "gd", "get to the goal down",  then_print (move_to_goal_ret_p zipper_down);
+    "gr", "get to the goal right",  then_print (move_to_goal_ret_p zipper_right);
+    "gl", "get to the goal left",  then_print (move_to_goal_ret_p zipper_left);
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
     "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
