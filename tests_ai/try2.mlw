@@ -1,0 +1,25 @@
+module Try2
+
+	use import int.Int
+	use import ref.Ref
+
+
+	type d = { field1: int; field2: int }
+	exception Myexc d
+	let b(x:int) : int
+	ensures { result = 10 }
+	=
+		let i = ref 0 in
+		i := 0;
+		while !i < 10 do
+			variant { 10 - !i  }
+			try
+			i := !i + 1;
+			raise (Myexc { field1 = !i + 5; field2 = -1 })
+			with
+			| Myexc(a) -> i := a.field1
+			end
+		done;
+		!i
+end
+
