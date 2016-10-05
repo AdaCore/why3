@@ -11,7 +11,7 @@ module Abstract_interpreter(S:sig
 
   val start_cfg: Expr.rsymbol -> cfg
 
-  val put_expr_in_cfg: cfg -> local_ty -> Expr.expr -> (control_point * control_point)
+  val put_expr_in_cfg: cfg -> local_ty -> Expr.expr -> (control_point * control_point * ((control_point * Ity.xsymbol) list))
 
   val eval_fixpoints: cfg -> (Expr.expr * domain) list
 

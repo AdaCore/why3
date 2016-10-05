@@ -235,6 +235,7 @@ module Abstract_interpreter(E: sig
   let ad_int = Theory.(ns_find_ls th_int.th_export ["infix +"])
   let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
   let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
+  let mult_int = Theory.(ns_find_ls th_int.th_export ["infix *"])
 
   (* Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    * ATM it only works for conjunction, and if there is not that much uninterpreted function.
@@ -280,6 +281,9 @@ module Abstract_interpreter(E: sig
         term_to_int coeff cst constr a; term_to_int (-coeff) cst constr b;
       | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
         term_to_int (-coeff) cst constr a;
+      | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a]) when Term.ls_equal func mult_int ->
+        let n = Number.compute_int n in
+        term_to_int ((BigInt.to_int n) * coeff) cst constr a
       | Tapp(func, [arg]) -> (* record access *)
         let rec term_to_string t = match t.t_node with
           | Tapp(func, [arg]) ->
@@ -465,13 +469,13 @@ module Abstract_interpreter(E: sig
            *  | erase every temporary variable
            *  . end_cp
            **)
-      let let_begin_cp, let_end_cp = put_expr_in_cfg cfg local_ty let_expr in
+      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg cfg local_ty let_expr in
 
       let local_ty = add_typed_variable cfg local_ty psym variable_type in
 
       (* compute the child and add an hyperedge, to set the value of psym
        * to the value returned by let_expr *)
-      let b_begin_cp, b_end_cp = put_expr_in_cfg cfg local_ty b in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg local_ty b in
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
@@ -496,7 +500,7 @@ module Abstract_interpreter(E: sig
         );
 
 
-      let_begin_cp, end_cp
+      let_begin_cp, end_cp, let_exn @ b_exn
     | Evar(psym) ->
       if Ity.(ity_equal psym.pv_ity ity_int) then
         begin
@@ -508,11 +512,11 @@ module Abstract_interpreter(E: sig
               Linexpr1.set_list expr [(one, p)] (Some(zero));
               Abstract1.assign_linexpr man abs var_return expr None
             );
-          begin_cp, end_cp
+          begin_cp, end_cp, []
         end
       else
         let i = new_node_cfg cfg expr in
-        i, i
+        i, i, []
     | Econst(Number.ConstInt(n)) ->
       let coeff =
         Number.compute_int n
@@ -526,7 +530,7 @@ module Abstract_interpreter(E: sig
           Linexpr1.set_list expr [] (Some(coeff));
           Abstract1.assign_linexpr man abs var_return expr None
         );
-      begin_cp, end_cp
+      begin_cp, end_cp, []
     | Eexec({c_node = Capp(rsym, args); _}, { Ity.cty_post = post; Ity.cty_result = ity; Ity.cty_effect = effect;  _ }) ->
       let eff_write = Ity.(effect.eff_writes) in
 
@@ -562,17 +566,10 @@ module Abstract_interpreter(E: sig
 
           constraints !abs
         );
-      begin_cp, end_cp
+      (* FIXME: handle exceptions *)
+      begin_cp, end_cp, []
     | Ewhile(cond, inv, var, content) ->
       let open Expr in
-      begin
-      match expr.e_loc  with
-      | Some s ->
-        let s, a, b, c = Loc.get s in
-        Format.printf "%s, %d, %d, %d@." s a b c;
-      | None -> ()
-      end;
-
       (* Condition expression *)
       let cond_term = 
         match Expr.term_of_expr ~prop:true cond with
@@ -585,7 +582,7 @@ module Abstract_interpreter(E: sig
       let constraints = linear_expressions_from_term cfg local_ty cond_term in
 
       let before_loop_cp = new_node_cfg cfg cond in
-      let start_loop_cp, end_loop_cp = put_expr_in_cfg cfg local_ty content in
+      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg local_ty content in
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let after_loop_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man abs ->
@@ -598,17 +595,91 @@ module Abstract_interpreter(E: sig
       new_hedge_cfg cfg (end_loop_cp, before_loop_cp) (fun man abs ->
           abs
         );
-      before_loop_cp, after_loop_cp
-    (*| Etry(e, exc) ->
-      Ity.Mexn.mapi (fun a b ->
-          () ) exc;*)
+      (* FIXME: exceptions while inside the condition *)
+      before_loop_cp, after_loop_cp, loop_exn
+    | Etry(e, exc) ->
+      let additional_exn = ref [] in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+      let i = new_node_cfg cfg expr in
+      let exc = Ity.Mexn.map (fun (l, e) ->
+          let local_ty = List.fold_left (fun local_ty p ->
+              add_typed_variable cfg local_ty p Ity.(p.pv_ity)) local_ty l in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+          additional_exn := e_exn @ !additional_exn;
+          new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> abs);
+          l, e_begin_cp, e_end_cp) exc in
+      
+      let e_exn = Ity.Mexn.fold (fun exc_sym (l, cp_begin, _) e_exn ->
+          List.filter (fun (cp, exc_sym_) ->
+              if Ity.xs_equal exc_sym exc_sym_ then
+                begin
+                  new_hedge_cfg cfg (cp, cp_begin) (fun man abs ->
+                      match l with
+                      | [t] ->
+                        if Ity.(ity_equal t.pv_ity ity_int) then
+                          begin
+                            let old_arg = var_return in
+                            let new_arg = pv_to_var t in
+                            let expr = Linexpr1.make cfg.env in
+                            Linexpr1.set_list expr [(one, old_arg)] (Some(zero));
+                            let abs = Abstract1.assign_linexpr man abs new_arg expr None in
+                            Abstract1.forget_array man abs [|old_arg|] false
+                          end
+                        else abs
+                      | _ -> abs
+                    );
+                false
+                end
+              else
+                true
+            ) e_exn) exc e_exn in
+      new_hedge_cfg cfg (e_end_cp, i) (fun man abs ->
+          abs
+        );
+      e_begin_cp, i, !additional_exn @ e_exn
+    | Eraise(s, e) ->
+      let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg local_ty e in
+      let j = new_node_cfg cfg expr in
+      arg_begin, j, [(arg_end_cp, s)]
+
+    | Eif(cond, b, c) ->
+      let open Expr in
+      (* Condition expression *)
+      let cond_term = 
+        match Expr.term_of_expr ~prop:true cond with
+        | Some s ->
+          s
+        | None ->
+          Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated (migth even be wrong if there are exceptions)";
+          Term.t_true
+      in
+      let constraints = linear_expressions_from_term cfg local_ty cond_term in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg local_ty b in
+      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg local_ty c in
+      let start_cp = new_node_cfg cfg expr in
+      let end_cp = new_node_cfg cfg expr in
+      new_hedge_cfg cfg (start_cp, b_begin_cp) (fun man abs ->
+          constraints abs);
+      new_hedge_cfg cfg (start_cp, c_begin_cp) (fun man abs ->
+          (* todo *)
+          abs);
+      new_hedge_cfg cfg (c_end_cp, end_cp) (fun man abs ->
+          abs);
+      new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
+          abs);
+      start_cp, end_cp, b_exn @ c_exn
+    | Eassert(_) -> (* FIXME: maybe they could be taken into account *)
+      let i = new_node_cfg cfg expr in
+
+      i, i, []
     | _ ->
       Expr.print_expr Format.err_formatter expr;
+      Format.eprintf "@.";
       Format.eprintf "unhandled expr@.";
 
       let i = new_node_cfg cfg expr in
 
-      i, i
+      i, i, []
 
   let get_domain cfg control_point = ()
 
@@ -691,7 +762,7 @@ module Abstract_interpreter(E: sig
         manager cfg.g sinit make_strategy
     in
     (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
-    PSHGraph.iter_vertex output
+(*    PSHGraph.iter_vertex output
       (begin fun vtx abs ~pred ~succ ->
          printf "acc(%i) = %a@."
            vtx (Abstract1.print) abs
@@ -701,7 +772,7 @@ module Abstract_interpreter(E: sig
         Format.eprintf "%d -> " b;
         Expr.print_expr Format.err_formatter a;
         Format.eprintf "@."
-        ) cfg.expr_to_control_point;
+        ) cfg.expr_to_control_point;*)
 
     (* Print loop invariants *)
 

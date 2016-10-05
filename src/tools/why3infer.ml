@@ -124,7 +124,6 @@ let do_input f =
                 begin
                   match cexp.c_node with
                   | Cfun e ->
-                    Expr.print_expr Format.err_formatter e;
                     Format.eprintf "@.";
                     let module Abstract_interpreter =
                       Abstract_interpreter.Abstract_interpreter(struct
