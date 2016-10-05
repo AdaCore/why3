@@ -281,7 +281,7 @@ theory GenericFloat
     (is_positive x /\ is_negative y) \/ (is_negative x /\ is_positive y)
 
   axiom feq_eq: forall x y.
-    is_finite x -> is_finite y -> not (x = zeroF) -> not (y = zeroF) -> x .= y -> x = y
+    is_finite x -> is_finite y -> not (is_zero x) -> x .= y -> x = y
 
   axiom eq_feq: forall x y.
     is_finite x -> is_finite y -> x = y -> x .= y
@@ -302,11 +302,11 @@ theory GenericFloat
     /\ ((is_finite x /\ is_finite y)
         \/ (is_infinite x /\ is_infinite y /\ same_sign x y)))
 
-  axiom lt_finite: forall x y.
-    is_finite x /\ is_finite y -> (x .< y <-> to_real x <. to_real y)
+  axiom lt_finite: forall x y [lt x y].
+    is_finite x /\ is_finite y -> (lt x y <-> to_real x <. to_real y)
 
-  axiom le_finite: forall x y.
-    is_finite x /\ is_finite y -> (x .<= y <-> to_real x <=. to_real y)
+  axiom le_finite: forall x y [le x y].
+    is_finite x /\ is_finite y -> (le x y <-> to_real x <=. to_real y)
 
   lemma le_lt_trans:
     forall x y z:t. x .<= y /\ y .< z -> x .< z
@@ -323,15 +323,15 @@ theory GenericFloat
   lemma not_gt_le: forall x y:t.
     not (x .> y) /\ is_not_nan x /\ is_not_nan y -> x .<= y
 
-  axiom le_special: forall x y. x .<= y ->
-      (is_finite x /\ is_finite y)
-   \/ (is_minus_infinity x /\ is_not_nan y)
-   \/ (is_not_nan x /\ is_plus_infinity y)
+  axiom le_special: forall x y [le x y]. le x y ->
+      ((is_finite x /\ is_finite y)
+   \/ ((is_minus_infinity x /\ is_not_nan y)
+   \/  (is_not_nan x /\ is_plus_infinity y)))
 
-  axiom lt_special: forall x y. x .< y ->
-      (is_finite x /\ is_finite y)
-   \/ (is_minus_infinity x /\ is_not_nan y /\ not (is_minus_infinity y))
-   \/ (is_not_nan x /\ not (is_plus_infinity x) /\ is_plus_infinity y)
+  axiom lt_special: forall x y [lt x y]. lt x y ->
+      ((is_finite x /\ is_finite y)
+   \/ ((is_minus_infinity x /\ is_not_nan y /\ not (is_minus_infinity y))
+   \/  (is_not_nan x /\ not (is_plus_infinity x) /\ is_plus_infinity y)))
 
   (*  lemmas on sign *)
   axiom positive_to_real: forall x[is_positive x|to_real x >=. 0.0].
@@ -781,9 +781,13 @@ theory Float32
 
   (* axiom half_bv: half = from_bv (BV32.of_uint 0x3F00_0000) *)
 
-  lemma round_bound :           (* /!\ check the impact of the rounding mode /!\ *)
+  lemma round_bound_ne :
+    forall x:real [round RNE x].
+      x - 0x1p-24 * Abs.abs(x) - 0x1p-150 <= round RNE x <= x + 0x1p-24 * Abs.abs(x) + 0x1p-150
+
+  lemma round_bound :
     forall m:mode, x:real [round m x].
-      x - 0x1p-24 * Abs.abs(x) - 0x1p-150 <= round m x <= x + 0x1p-24 * Abs.abs(x) + 0x1p-150
+      x - 0x1p-23 * Abs.abs(x) - 0x1p-149 <= round m x <= x + 0x1p-23 * Abs.abs(x) + 0x1p-149
 end
 
 theory Float64
@@ -806,9 +810,13 @@ theory Float64
 
   (* axiom half_bv: half = from_bv (BV64.of_uint 0x3FE0_0000_0000_0000) *)
 
-  axiom round_bound :
+  lemma round_bound_ne :
+    forall x:real [round RNE x].
+      x - 0x1p-53 * Abs.abs(x) - 0x1p-1075 <= round RNE x <= x + 0x1p-53 * Abs.abs(x) + 0x1p-1075
+
+  lemma round_bound :
     forall m:mode, x:real [round m x].
-      x - 0x1p-53 * Abs.abs(x) - 0x1p-1075 <= round m x <= x + 0x1p-53 * Abs.abs(x) + 0x1p-1075
+      x - 0x1p-52 * Abs.abs(x) - 0x1p-1074 <= round m x <= x + 0x1p-52 * Abs.abs(x) + 0x1p-1074
 end
 
 theory FloatConverter
