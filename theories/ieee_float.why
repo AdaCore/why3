@@ -55,11 +55,11 @@ theory GenericFloat
 
   constant zeroF     : t   (* +0.0 *)
   constant half      : t   (* 0.5 *)
-  (* exp_bia = 2^(sb - 1) - 1 *)
-  (* max_finite_exp = 2^sb - 2 - exp_bia = exp_bia *)
-  (* max_signifacnd = (2^eb + 2^eb - 1) * 2^(1-eb) *)
+  (* exp_bias = 2^(sb - 1) - 1 *)
+  (* max_finite_exp = 2^sb - 2 - exp_bias = exp_bias *)
+  (* max_significand = (2^eb + 2^eb - 1) * 2^(1-eb) *)
   (* max_value = (2^eb + 2^eb - 1) * 2^(1-eb) * 2 ^ max_finite_exp *)
-  (* [m;x] = ( 1 + m * 2^(1-eb) ) * 2^( x - exp_bia ) *)
+  (* [m;x] = ( 1 + m * 2^(1-eb) ) * 2^( x - exp_bias ) *)
   (* max_value = [2^(eb-1); 2^sb - 2] *)
 
   (* constructor, perform an unchecked convertion from the binary *)
@@ -84,14 +84,11 @@ theory GenericFloat
   function (.*)  (x y:t) : t = mul RNE x y
   function (./)  (x y:t) : t = div RNE x y
 
-  function fma  mode t t t : t (* xy + z *)
+  function fma  mode t t t : t (* x * y + z *)
 
   function sqrt mode t   : t
   function rem                t t : t
 
-  (* In Ada/SPARK we need sign-preserving floor/ceil in the case of 0,    *)
-  (* but luckily this is the case for IEEE floats so we can use the below *)
-  (* directly.                                                            *)
   function roundToIntegral mode t : t
 
   (* Min & Max *)
@@ -174,18 +171,18 @@ theory GenericFloat
   (* with mathematical int *)
   (* note that these conversions do not feature in SMTLIB *)
 
-  (* intended semantics for of_int are the same as (_ to_fp eb sb) RNE with *)
-  (* a suitably sized bitvector, large enough to hold x                     *)
+  (* intended semantics for of_int are the same as (_ to_fp eb sb) with a   *)
+  (* suitably sized bitvector, large enough to hold x                       *)
   (* note values >= than the below should result in infinities              *)
   (*    float32 : 0x1ffffff * 2^103                                         *)
   (*    float64 : 0x3fffffffffffff * 2^970                                  *)
-  (* also note that this function never yields a subnormal, or a nan, or -0 *)
+  (* also note that this function never yields a subnormal, or a NaN, or -0 *)
   function of_int (m:mode) (x:int) : t
 
   (* {3 Conversions to other sorts} *)
 
-  (* Intended semantics for to_int are the same as (_ fp.to_sbv) RNE with  *)
-  (* a suitably sized bitvector. Safe minimum sizes are given below:       *)
+  (* Intended semantics for to_int are the same as (_ fp.to_sbv) with a    *)
+  (* suitably sized bitvector. Safe minimum sizes are given below:         *)
   (*    float32 : 129                                                      *)
   (*    float64 : 1025                                                     *)
   (* In particular this function should be uninterpreted for infinities    *)
@@ -200,8 +197,8 @@ theory GenericFloat
 
   (* {3 Arithmetic} *)
 
-  (* The intended meaning for round is the RNE rounding for floating point *)
-  (* as described on p17 of IEEE-754. For results where the corresponding  *)
+  (* The intended meaning for round is the rounding for floating point as  *)
+  (* described on p17 of IEEE-754. For results where the corresponding     *)
   (* floating point result would be infinity or NaN this function should   *)
   (* be uninterpreted.                                                     *)
   (*                                                                       *)
@@ -231,8 +228,6 @@ theory GenericFloat
   (* used as a condition to propagate is_finite *)
   predicate no_overflow (m:mode) (x:real) = in_range (round m x)
 
-  (* is this correct &| accurate ? *)
-  (* FS: seems OK for float32 at least *)
   axiom of_int_is_finite: forall m:mode, x:int [of_int m x].
     no_overflow m (FromInt.from_int x) ->
     is_finite (of_int m x)
@@ -254,8 +249,6 @@ theory GenericFloat
 
   axiom Round_to_real :
     forall m:mode, x:t. is_finite x -> round m (to_real x) = to_real x
-    (* removing is_finite x implies that to_real oo & NaN is finite
-    float, safe ? worth it ? *)
 
   (** rounding up and down *)
   axiom Round_down_le:
@@ -267,6 +260,8 @@ theory GenericFloat
   axiom Round_up_neg:
     forall x:real. round RTP (-.x) = -. round RTN x
 
+  (* The biggest representable integer whose predecessor (i.e. -1) is
+     representable *)
   constant max_representable_integer : int (* defined when cloning RENAME -> max_safe_integer ? *)
 
   (* round and integers *)
@@ -304,8 +299,8 @@ theory GenericFloat
 
   axiom eq_special: forall x y. x .= y ->
        (is_not_nan x  /\ is_not_nan y
-    /\ ((is_finite x /\ is_finite y) \/ (is_infinite x /\ is_infinite y)
-         /\ same_sign x y))
+    /\ ((is_finite x /\ is_finite y)
+        \/ (is_infinite x /\ is_infinite y /\ same_sign x y)))
 
   axiom lt_finite: forall x y [lt x y].
     is_finite x /\ is_finite y -> (lt x y <-> to_real x <. to_real y)
@@ -370,8 +365,9 @@ theory GenericFloat
 
   (** overflow *)
 
-  (* This predicate tells what is the result of a rounding in case
-     of overflow *)
+  (* This predicate is used to tell what is the result of a rounding
+     in case of overflow in the axioms specifying add/sub/mul and fma
+     *)
   predicate overflow_value (m:mode) (x:t) =
     match m with
     | RTN -> if is_positive x then is_finite x /\ to_real x = max_real
@@ -383,6 +379,8 @@ theory GenericFloat
     | (RNA | RNE) -> is_infinite x
     end
 
+  (* This predicate is used to tell what is the sign of zero in the
+     axioms specifying add and sub *)
   predicate sign_zero_result (m:mode) (x:t) =
     is_zero x ->
     match m with
@@ -409,7 +407,7 @@ theory GenericFloat
 
   axiom div_finite: forall m:mode, x y:t [div m x y].
     is_finite x -> is_finite y ->
-    no_overflow m (to_real x /. to_real y) -> not is_zero y ->
+    not is_zero y -> no_overflow m (to_real x /. to_real y) ->
     is_finite (div m x y) /\
     to_real (div m x y) = round m (to_real x /. to_real y)
 
@@ -423,6 +421,8 @@ theory GenericFloat
     is_finite (abs x) /\
     to_real (abs x) = Abs.abs (to_real x) /\
     is_positive (abs x)
+
+  axiom abs_universal : forall x:t [abs x]. not (is_negative (abs x))
 
   axiom fma_finite: forall m:mode, x y z:t [fma m x y z].
     is_finite x -> is_finite y -> is_finite z ->
@@ -460,55 +460,6 @@ theory GenericFloat
     /\
     (is_finite x /\ is_finite y
       -> if same_sign x y then same_sign r x else sign_zero_result m r)
-
-(*
-  constant min_normalized_double : real = 0x1p-1022
-  constant eps_normalized_double : real = 0x1.004p-53
-  constant eta_normalized_double : real = 0x1.002p-1075
-
-  (\* TODO: find constants for type single *\)
-
-  constant min_normalized : real
-  constant eps_normalized : real
-  constant eta_normalized : real
-
-  axiom add_range: forall m:mode, x y.t.
-    let res = add m x y in
-     ((* CASE 1 : normalized numbers *)
-     (Abs.abs(to_real x + to_real y) >=. min_normalized ->
-      Abs.abs(to_real res -. (to_real x +. to_real y)) <=. eps_normalized *. Abs.abs(to_real x +. to_real y))
-     /\
-     (*CASE 2: denormalized numbers *)
-     (Abs.abs(to_real x +. to_real y) <=. min_normalized -.>
-      Abs.abs(to_real res -. (to_real x +. to_real y)) <=. eta_normalized))
-
-  axiom sub_range: forall m:mode, x y.t.
-    let res = sub m x y in
-    ((* CASE 1 : normalized numbers *)
-     (Abs.abs(to_real x -. to_real y) >=. min_normalized -.>
-      Abs.abs(to_real res -. (to_real x -. to_real y)) <=. eps_normalized *. Abs.abs(to_real x -. to_real y))
-     /\
-     (*CASE 2: denormalized numbers *)
-     (Abs.abs(to_real x -. to_real y) <=. min_normalized -.>
-      Abs.abs(to_real res -. (to_real x -. to_real y)) <=. eta_normalized))
-
-  axiom mul_range: forall m:mode, x y.t.
-    let res = mul m x y in
-    ((* CASE 1 : normalized numbers *)
-     (Abs.abs(to_real x *. to_real y) >=. min_normalized -.>
-      Abs.abs(to_real res -. (to_real x *. to_real y)) <=. eps_normalized *. Abs.abs(to_real x *. to_real y))
-     /\
-     (*CASE 2: denormalized numbers *)
-     (Abs.abs(to_real x *. to_real y) <=. min_normalized -.>
-      Abs.abs(to_real res -. (to_real x *. to_real y)) <=. eta_normalized))
-
-  axiom neg_range: forall x.t.
-   let res = neg x in
-   ((Abs.abs(to_real x) >=. min_normalized -.>
-     Abs.abs(to_real res -. (-. to_real x)) <=. eps_normalized *. Abs.abs(-. to_real x))
-    /\
-    (Abs.abs(to_real x) <=. min_normalized -.>
-     Abs.abs(to_real res -. (-. to_real x)) <=. eta_normalized)) *)
 
   axiom sub_special: forall m:mode, x y:t [sub m x y].
     let r = sub m x y in
@@ -638,7 +589,7 @@ theory GenericFloat
 
   use real.Truncate
 
-  (* is_int predicate  *)
+  (* This predicate specify if a float is finite and is an integer *)
   predicate is_int (x:t)
 
   axiom zeroF_is_int: is_int zeroF
@@ -771,11 +722,6 @@ theory Float_BV_Converter
   function of_ubv16 mode BV16.t : t
   function of_ubv32 mode BV32.t : t
   function of_ubv64 mode BV64.t : t
-
-  (* the to_[us]bv* functions are used to convert to a modular or integer
-     type in ada, and as such the rounding follows the rounding rules in
-     Ada, i.e. RNA. Note the reverse ( of_[us]bv* ) will follow RNE
-     rounding however. *)
 
   function to_ubv8  mode t : BV8.t
   function to_ubv16 mode t : BV16.t
