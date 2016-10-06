@@ -50,9 +50,11 @@ let ident_printer () =
   let bls = [
     "ac"; "and"; "array"; "as"; "axiom"; "bitv"; "bool";
     "check"; "cut"; "distinct"; "else"; "exists";
-    "false"; "forall"; "function"; "goal";
+    "false"; "float"; "forall"; "function"; "goal";
     "if"; "in"; "include"; "int"; "inversion";
-    "let"; "logic"; "not"; "or"; "parameter"; "predicate";
+    "let"; "logic";
+    "max_int"; "max_real";
+    "not"; "or"; "parameter"; "predicate";
     "prop"; "real"; "rewriting"; "select"; "store";
     "then"; "true"; "type"; "unit"; "void"; "with";
   ]
