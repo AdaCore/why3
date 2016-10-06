@@ -163,6 +163,32 @@ theory floating_point.Double
 
 end
 
+theory jessie_why3.JessieFloats
+
+  meta "instantiate : auto" prop Single.only_finite
+  meta "instantiate : auto" prop Double.only_finite
+
+end
+
+theory ieee_float.RoundingMode
+
+  syntax function RNE "ne"
+  syntax function RTZ "zr"
+  syntax function RTP "up"
+  syntax function RTN "dn"
+  syntax function RNA "na"
+
+end
+
+theory ieee_float.GenericFloat
+
+  meta "instantiate : auto" prop add_finite
+  meta "instantiate : auto" prop sub_finite
+  meta "instantiate : auto" prop mul_finite
+  meta "instantiate : auto" prop div_finite
+
+end
+
 theory ieee_float.Float32
 
   syntax function round "float<ieee_32,%1>(%2)"
