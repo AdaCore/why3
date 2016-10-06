@@ -2,7 +2,7 @@ module M
 
 
   use import int.Int
-  use import map.Map as M
+  use import map.Map
   use import mach.int.Unsigned
   use import mach.int.Int32
   use import mach.int.UInt32
@@ -41,17 +41,28 @@ module M
     requires { 0 <= p.offset < p.length }
     ensures { p.elts[p.offset] = v }
     ensures { p.initialized[p.offset] }
+    writes { p.elts }
+    writes { p.initialized }
 
   val set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
     requires { 0 <= p.offset + Int32.to_int ofs < p.length }
     ensures { p.elts[p.offset + Int32.to_int ofs] = v }
     ensures { p.initialized[p.offset + Int32.to_int ofs] }
+    ensures { forall k. k < Int32.to_int ofs \/ k > Int32.to_int ofs ->
+    	      p.elts[p.offset+k]=(old p.elts)[p.offset+k] }
+    ensures { forall k. k <> Int32.to_int ofs ->
+    	      p.initialized[p.offset+k]=(old p.initialized)[p.offset+k] }
+    ensures { p.elts = Map.set (old p.elts) (p.offset + Int32.to_int ofs) v }
+    ensures { p.initialized = Map.set (old p.initialized)
+    	      (p.offset + Int32.to_int ofs) true }
+    writes { p.elts }
+    writes { p.initialized }
 
   predicate valid_ptr_shift (p:ptr 'a) (i:int) =
     0 <= p.offset + i < p.length
 
   predicate valid_ptr_itv (p:ptr 'a) (sz:int) =
-    in_bounds sz /\ 0 <= sz
+    in_bounds sz /\ 0 <= sz /\ 0 <= p.offset < p.length
       /\ forall i. 0 <= i < sz -> 0 <= p.offset+i < p.length
 
   let lemma valid_itv_to_shift (p:ptr 'a) (sz:int)
@@ -127,7 +138,7 @@ module N
   use import mach.int.Int32
   use import M
   use import ref.Ref
-  use import mach.int.UInt32
+  use import mach.int.UInt32 as Limb
   use import int.Int
   use import int.Power
 
@@ -248,6 +259,19 @@ module N
     variant  { m - n }
     ensures  { value_sub x n m = 0 }
   = if n < m then value_zero x (n+1) m else ()
+
+  let lemma value_sub_update_no_change (x: map int limb) (i n m: int) (v:limb)
+     requires { n <= m }
+     requires { i < n \/ m <= i }
+     ensures { value_sub x n m = value_sub (Map.set x i v) n m }
+  = value_sub_frame x (Map.set x i v) n m
+
+  let lemma value_sub_shift_no_change (x:map int limb) (ofs i sz:int) (v:limb)
+     requires { i < 0 \/ sz <= i }
+     requires { 0 <= sz }
+     ensures { value_sub x ofs (ofs + sz) =
+     	       value_sub (Map.set x (ofs+i) v) ofs (ofs+sz) }
+  = value_sub_frame_shift x (Map.set x (ofs+i) v) ofs ofs sz
 
   (** {2 Comparisons} *)
 
@@ -431,6 +455,9 @@ let add_limb (r x:t) (y:limb) (sz:int32) : limb
       lx := get_ofs x !i;
       let (res, carry) = add_with_carry !lx !c limb_zero in
       set_ofs r !i res;
+      assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+		  value_sub_shift x (p2i !i) + l2i y };
+      initialized_tail r (p2i !i);
       c := carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
@@ -466,6 +493,8 @@ let add_limb (r x:t) (y:limb) (sz:int32) : limb
       variant { p2i sz - p2i !i }
       lx := get_ofs x !i;
       set_ofs r !i !lx;
+      assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+		  value_sub_shift x (p2i !i) + l2i y };
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
       value_sub_tail r.elts r.offset (r.offset + k);
@@ -504,6 +533,9 @@ let add_limbs (r x y:t) (sz:int32) : limb
     ly := get_ofs y !i;
     let res, carry = add_with_carry !lx !ly !c in
     set_ofs r !i res;
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i) };
+    initialized_tail r (p2i !i);
     c := carry;
     let ghost k = p2i !i in
     i := Int32.(+) !i (Int32.of_int 1);
@@ -565,6 +597,8 @@ let add (r x y:t) (sx sy:int32) : limb
     ly := get_ofs y !i;
     let res, carry = add_with_carry !lx !ly !c in
     set_ofs r !i res;
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i) };
     initialized_tail r (p2i !i);
     c := carry;
     let ghost k = p2i !i in
@@ -606,6 +640,8 @@ let add (r x y:t) (sx sy:int32) : limb
     lx := get_ofs x !i;
     let res, carry = add_with_carry !lx limb_zero !c in
     set_ofs r !i res;
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      value_sub_shift x (p2i !i) + value_sub_shift y (p2i sy) };
     initialized_tail r (p2i !i);
     c := carry;
     let ghost k = p2i !i in
@@ -627,12 +663,212 @@ let add (r x y:t) (sx sy:int32) : limb
 	       + (power radix k) * l2i !lx
 	    = value_sub_shift x k + value_sub_shift y (p2i sy)
 	       + (power radix k) * l2i !lx
-	   (* = value_sub_shift x k + (power radix k) * l2i !lx
-	       + value_sub_shift y k + (power radix k) * l2i !ly*)
 	    = value_sub_shift x (p2i !i)
 	       + value_sub_shift y (p2i sy) }
   done;
   !c
+
+  (** {2 Multiplication} *)
+
+  (** [mul_limb r x y sz] multiplies [x[0..sz-1]] by the limb [y] and
+  writes the n least significant limbs in [r], and returns the most
+  significant limb. It corresponds to [mpn_mul_1]. *)
+let mul_limb (r x:t) (y:limb) (sz:int32) : limb
+  requires { valid_and_initialized_ofs x (p2i sz) }
+  requires { valid_ptr_itv r (p2i sz) }
+  ensures { initialized_ofs r (p2i sz) }
+  ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result
+    	      = value_sub_shift x (p2i sz) * l2i y }
+=
+  let limb_zero = UInt32.of_int 0 in
+  let lx = ref limb_zero in
+  let c = ref limb_zero in
+  let i = ref (Int32.of_int 0) in
+  while Int32.(<) !i sz do
+    variant { p2i sz - p2i !i }
+    invariant { 0 <= p2i !i <= p2i sz }
+    invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      	value_sub_shift x (p2i !i) * l2i y }
+    invariant { initialized_ofs r (p2i !i) }
+    label StartLoop in
+    lx := get_ofs x !i;
+    let rl, rh = Limb.mul_double !lx y in
+    let res, carry = Limb.add_with_carry rl !c limb_zero in
+    label BeforeWrite in
+    value_sub_shift_no_change r.elts r.offset (p2i !i) (p2i !i) res; 
+    set_ofs r !i res;
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	      	value_sub_shift x (p2i !i) * l2i y };
+    initialized_tail r (p2i !i);
+    assert { l2i rh < radix - 1
+    	     by
+	     (l2i !lx * l2i y <= l2i !lx * (radix-1) <= (radix-1)*(radix-1)
+	       by
+	      0 <= l2i !lx <= radix - 1 /\ 0 <= l2i y <= radix -1)
+	       /\
+    	     (radix * l2i rh <= l2i !lx * l2i y
+ 	       by
+	     l2i rl + radix * l2i rh = l2i !lx * l2i y)
+	     so
+    	     radix * l2i rh <= (radix -1) * (radix -1)
+	     };
+    c := Limb.(+) rh carry;
+    let ghost k = p2i !i in
+    i := Int32.(+) !i (Int32.of_int 1);
+    value_sub_tail r.elts r.offset (r.offset + k);
+    value_sub_tail x.elts x.offset (x.offset + k);
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
+    	     value_sub_shift x (p2i !i) * l2i y
+	     by
+	       value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+	     = value_sub_shift r k + (power radix k) * l2i res
+	           + (power radix (p2i !i)) * l2i !c
+	     = value_sub_shift r k + (power radix k) * l2i res
+	           + (power radix k) * radix * l2i !c
+	     = value_sub_shift r k + (power radix k) * (l2i res + radix * l2i !c)
+	     = value_sub_shift r k + (power radix k) *
+	       		       	 (l2i res + radix * (l2i rh + l2i carry))
+	     = value_sub_shift r k + (power radix k) *
+	       		       	 (l2i res + radix * l2i carry + radix * l2i rh)
+ 	     = value_sub_shift r k + (power radix k) *
+	       		       	 (l2i (!c at StartLoop) + l2i rl + radix*l2i rh)
+	     = value_sub_shift r k + (power radix k) *
+	       		       	 (l2i (!c at StartLoop) + l2i !lx * l2i y)
+	     = value_sub_shift r k + (power radix k) * l2i (!c at StartLoop)
+	       		       + (power radix k) * l2i !lx * l2i y
+	     = value_sub_shift x k * l2i y + (power radix k) * l2i !lx * l2i y
+	     = (value_sub_shift x k + (power radix k) * l2i !lx) * l2i y
+	     = value_sub_shift x (p2i !i) * l2i y
+	     };
+  done;
+  !c
+
+(** [addmul_limb r x y sz] multiplies [(x, sz)] by [i], adds the [sz]
+    least significant limbs to [(r, sz)] and writes the result in [(r,sz)].
+    Returns the most significant limb of the product plus the carry
+    of the addition. Corresponds to [mpn_addmul_1].*)
+
+let addmul_limb (r x:t) (y:limb) (sz:int32):limb
+  requires { valid_and_initialized_ofs x (p2i sz) }
+  requires { valid_and_initialized_ofs r (p2i sz) }
+  ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result
+  	  = value_sub_shift (old r) (p2i sz)
+	    + value_sub_shift x (p2i sz) * l2i y }
+=
+  let limb_zero = Limb.of_int 0 in
+  let lx = ref limb_zero in
+  let lr = ref limb_zero in
+  let c = ref limb_zero in
+  let i = ref (Int32.of_int 0) in
+  while Int32.(<) !i sz do
+    variant { p2i sz - p2i !i }
+    invariant { 0 <= p2i !i <= p2i sz }
+    invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+  	       = value_sub_shift (old r) (p2i !i)
+	         + value_sub_shift x (p2i !i) * l2i y }
+    invariant { initialized_ofs r (p2i sz) }
+    invariant { forall j. p2i !i <= j < p2i sz ->
+    	       (old r.elts) [r.offset+j] = r.elts [r.offset + j]  }
+    label StartLoop in
+    let ghost k = p2i !i in
+    lx := get_ofs x !i;
+    lr := get_ofs r !i;
+    assert { l2i !lr = l2i (old r.elts)[r.offset+ p2i !i] };
+    let rl, rh = Limb.mul_double !lx y in
+    let res, carry = Limb.add3 !lr rl !c in
+    value_sub_tail r.elts r.offset (r.offset + k);
+    value_sub_tail x.elts x.offset (x.offset + k);
+    value_sub_update r.elts (r.offset + p2i !i) r.offset (r.offset + p2i !i +1) res;
+    assert { forall j. 0 <= j < p2i sz -> r.initialized[r.offset+j] };
+    set_ofs r !i res;
+    assert { forall j. 0 <= j < p2i sz ->
+    	     r.initialized[r.offset+j]
+	     by
+	     "case_split" j = p2i !i \/
+	      (j <> p2i !i
+	      so r.initialized[r.offset+j]
+		 =(r.initialized at StartLoop)[(r.offset at StartLoop)+j]
+	         = true ) };
+    assert { forall j. (p2i !i + 1) <= j < p2i sz ->
+    	     (old r.elts)[r.offset+j] = r.elts[r.offset+j]
+	     by
+    	     r.elts[r.offset+j] = (r.elts at StartLoop)[r.offset+j]
+	     			= (old r.elts)[r.offset+j] };
+    assert { value_sub_shift r (p2i !i + 1)
+    	    = value_sub_shift (r at StartLoop) (p2i !i + 1)
+	      + (power radix (p2i !i)) * (l2i res - l2i !lr) };
+    assert { l2i rl + radix * l2i rh <= (radix-1)*(radix-1)
+    	     by
+	     (l2i !lx * l2i y <= l2i !lx * (radix-1) <= (radix-1)*(radix-1)
+	       by
+	      0 <= l2i !lx <= radix - 1 /\ 0 <= l2i y <= radix -1)
+	      /\
+	      l2i rl + radix * l2i rh = l2i !lx * l2i y
+	      };
+    assert { l2i rh < radix - 1
+    	     by
+	     l2i rl + radix * l2i rh  <= (radix -1) * (radix -1)
+	     so
+    	     radix * l2i rh <= (radix -1) * (radix -1)
+	     };
+    assert { l2i rh = radix - 2 -> l2i rl <= 1
+    	     by
+	     l2i rl + radix * l2i rh <= (radix-1)*(radix-1) };
+    assert { l2i rh = radix - 2 -> l2i carry <= 1
+    	     by l2i rl <= 1 };
+    c := Limb.(+) rh carry;
+    i := Int32.(+) !i (Int32.of_int 1);
+    assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+  	       = value_sub_shift (old r) (p2i !i)
+	         + value_sub_shift x (p2i !i) * l2i y
+	     by
+	      (value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i res - l2i !lr)
+		 + (power radix (p2i !i)) * l2i !c
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i res - l2i !lr)
+		 + (power radix (p2i !i)) * (l2i rh + l2i carry)
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i res - l2i !lr)
+		 + (power radix k) * radix * (l2i rh + l2i carry)
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i res - l2i !lr
+		 	      	 + radix * (l2i rh + l2i carry))
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i res + radix * l2i carry
+		 	- l2i !lr + radix * l2i rh)
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	         (power radix k) * (l2i rl + l2i !lr + l2i (!c at StartLoop)
+		        - l2i !lr + radix * l2i rh)
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i rl + radix * l2i rh + l2i (!c at StartLoop))
+	      = value_sub_shift (r at StartLoop) (p2i !i) +
+	      	 (power radix k) * (l2i !lx * l2i y + l2i (!c at StartLoop))
+	      = value_sub_shift (r at StartLoop) k
+	      	  + (power radix k) * l2i !lr
+		  + (power radix k) * (l2i !lx * l2i y + l2i (!c at StartLoop))
+	      = value_sub_shift (r at StartLoop) k
+ 	      	  + (power radix k) * l2i (!c at StartLoop)
+		  + (power radix k) * (l2i !lx * l2i y + l2i !lr)
+	      = value_sub_shift (old r) k
+	          + value_sub_shift x k * l2i y
+		  + (power radix k) * (l2i !lx * l2i y + l2i !lr)
+	      = value_sub_shift (old r) k
+	          + (power radix k) * l2i !lr
+	       	  + (value_sub_shift x k + (power radix k)*l2i !lx) * l2i y
+	      = value_sub_shift (old r) (p2i !i)
+	       	  + (value_sub_shift x k + (power radix k)*l2i !lx) * l2i y
+	      = value_sub_shift (old r) (p2i !i)
+	          + value_sub_shift x (p2i !i) * l2i y
+		  by
+		value_sub_shift (old r) (p2i !i) = value_sub_shift (old r) k
+		   + (power radix k) * l2i !lr
+		   )
+		  };
+  done;
+  !c
+
 end
 
 (*
@@ -647,6 +883,7 @@ module Heap
 
   (** heap of memory blocks storing values of type elt *)
   type heap = {
+
     ghost mutable length : map base int;  (* returns -1 for non-allocated block *)
     ghost mutable contents : map base (map int elt);
   }
