@@ -25,26 +25,90 @@ let print_status fmt st =
   | InternalFailure e -> fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
 
 type transformation_status =
-  | TSscheduled | TSdone | TSfailed
+  | TSscheduled | TSdone of transID | TSfailed
 
 let print_trans_status fmt st =
   match st with
   | TSscheduled -> fprintf fmt "TScheduled"
-  | TSdone -> fprintf fmt "TSdone"
+  | TSdone tid -> fprintf fmt "TSdone" (* TODO print tid *)
   | TSfailed -> fprintf fmt "TSfailed"
+
+open Ident
+
+type proof_state = {
+    th_state: bool Hid.t;
+    tn_state: bool Htn.t;
+    pn_state : bool Hpn.t;
+  }
+
+let init_proof_state () =
+  {th_state = Hid.create 7;
+   tn_state = Htn.create 42;
+   pn_state = Hpn.create 42}
 
 type controller =
   { mutable controller_session : Session_itp.session;
+    proof_state : proof_state;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
 let create_controller env s = {
     controller_session = s;
+    proof_state = init_proof_state ();
     controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
 }
 
+let find_tn c tid =
+  try Htn.find c.proof_state.tn_state tid with
+  | Not_found -> false
+
+let find_pn c id =
+  try Hpn.find c.proof_state.pn_state id with
+  | Not_found -> false
+
+(* Update the result of the theory according to its children *)
+let update_theory th ps =
+  let goals = theory_goals th in
+  Hid.replace ps.th_state (theory_name th)
+    (List.for_all (fun id -> Hpn.find ps.pn_state id) goals)
+
+let rec propagate_proof c (id: Session_itp.proofNodeID) =
+  let tr_list = get_transformations c.controller_session id in
+  let new_state = List.exists (fun id -> find_tn c id) tr_list in
+  if new_state != find_pn c id then
+    begin
+      Hpn.replace c.proof_state.pn_state id new_state;
+      update_proof c id
+    end
+
+and propagate_trans c (tid: Session_itp.transID) =
+  let proof_list = get_sub_tasks c.controller_session tid in
+  let cur_state = find_tn c tid in
+  let new_state = List.for_all (fun id -> find_pn c id) proof_list in
+  if cur_state != new_state then
+    begin
+      Htn.replace c.proof_state.tn_state tid new_state;
+      propagate_proof c (get_trans_parent c.controller_session tid)
+    end
+
+and update_proof c id =
+  match get_proof_parent c.controller_session id with
+  | Theory th -> update_theory th c.proof_state
+  | Trans tid -> propagate_trans c tid
+
+(* [update_proof_node c id b] Update the whole proof_state
+   of c according to the result (id, b) *)
+let update_proof_node c id b =
+  Hpn.replace c.proof_state.pn_state id b;
+  update_proof c id
+
+(* [update_trans_node c id b] Update the proof_state of c to take the result of (id,b). Then
+   propagates it to its parents *)
+let update_trans_node c id b =
+  Htn.replace c.proof_state.tn_state id b;
+  propagate_proof c (get_trans_parent c.controller_session id)
 
 
 module type Scheduler = sig
@@ -136,19 +200,28 @@ let run_timeout_handler () =
       S.timeout ~ms:125 timeout_handler;
     end
 
-let schedule_proof_attempt c id pr ~limit ~callback =
+let schedule_proof_attempt_r c id pr ~limit ~callback =
   graft_proof_attempt c.controller_session id pr ~timelimit:5;
   Queue.add (c,id,pr,limit,callback) scheduled_proof_attempts;
   callback Scheduled;
   run_timeout_handler ()
 
-let schedule_transformation c id name args ~callback =
+let schedule_proof_attempt c id pr ~limit ~callback =
+  let callback s = (match s with
+  | Done pr -> update_proof_node c id true
+  | Interrupted | InternalFailure _ -> update_proof_node c id false
+  | _ -> ());
+  callback s
+  in
+  schedule_proof_attempt_r c id pr ~limit:limit ~callback:callback
+
+let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
     let task = get_task c.controller_session id in
     try
       let subtasks = Trans.apply_transform_args name c.controller_env args task in
-      let _tid = graft_transf c.controller_session id name args subtasks in
-      callback TSdone;
+      let tid = graft_transf c.controller_session id name args subtasks in
+      callback (TSdone tid);
       false
     with e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf
@@ -159,6 +232,13 @@ let schedule_transformation c id name args ~callback =
   in
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
+
+let schedule_transformation c id name args ~callback =
+  let callback s = (match s with
+  | TSdone tid -> update_trans_node c tid false (*(get_sub_tasks c.controller_session tid = [])*) (* TODO need to change schedule transformation to get the id ? *)
+  | TSfailed -> ()
+  | _ -> ()); callback s in
+  schedule_transformation_r c id name args ~callback:callback
 
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in

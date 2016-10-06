@@ -17,6 +17,11 @@ unique identifiers of type [proofNodeId]
 type session
 
 type proofNodeID
+type transID
+
+module Hpn: Exthtbl.S with type key = proofNodeID
+module Htn: Exthtbl.S with type key = transID
+
 
 type theory
 
@@ -49,7 +54,6 @@ type proof_attempt = {
   proof_obsolete      : bool;
   proof_script        : string option;  (* non empty for external ITP *)
 }
-type transID
 
 
 type proof_parent = Trans of transID | Theory of theory

@@ -57,6 +57,23 @@ type file = {
   file_theories : theory list;
 }
 
+module Proofnodeid = struct
+  type t = proofNodeID
+  let compare (x : proofNodeID) y  = Pervasives.compare x y
+  let equal (x : proofNodeID) y = x = y
+  let hash  (x : proofNodeID) = x
+end
+
+module Transid = struct
+  type t = transID
+  let compare (x : transID) y  = Pervasives.compare x y
+  let equal (x : transID) y = x = y
+  let hash  (x : transID) = x
+end
+
+module Hpn = Exthtbl.Make(Proofnodeid)
+module Htn = Exthtbl.Make(Transid)
+
 type session = {
   proofNode_table               : proof_node Hint.t;
   mutable next_proofNodeID      : int;
@@ -66,6 +83,17 @@ type session = {
   mutable session_shape_version : int;
   session_prover_ids            : int Hprover.t;
 }
+
+(*
+(* TODO replace *)
+let init_Hpn (s : session) (h: 'a Hpn.t) (d: 'a) : unit =
+  Hint.iter (fun k _pn -> Hpn.replace h k d) s.proofNode_table
+
+let init_Htn (s : session) (h: 'a Htn.t) (d: 'a) : unit =
+  Hint.iter (fun k _pn -> Htn.replace h k d) s.trans_table
+*)
+
+
 
 let session_iter_proofNode f s =
   Hint.iter

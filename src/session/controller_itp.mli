@@ -23,7 +23,7 @@ type proof_attempt_status =
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
-type transformation_status = TSscheduled | TSdone  | TSfailed
+type transformation_status = TSscheduled | TSdone of transID  | TSfailed
 
 val print_trans_status : Format.formatter -> transformation_status -> unit
 
@@ -51,13 +51,35 @@ module type Scheduler = sig
 
 end
 
+open Ident
+
+(** Correspondance between a node of the proof tree
+    and its state (proved or not) *)
+type proof_state = {
+    th_state: bool Hid.t;
+    tn_state: bool Htn.t;
+    pn_state : bool Hpn.t;
+  }
+
 type controller = private
   { mutable controller_session : Session_itp.session;
+    proof_state : proof_state;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
 val create_controller : Env.env -> Session_itp.session -> controller
+
+(** [update_proof_node c id b] Update the whole proof_state
+   of c according to the result (id, b) *)
+val update_proof_node: controller -> Session_itp.proofNodeID -> bool -> unit
+
+(** [update_trans_node c id b] Update the whole proof_state of c
+   according to the result (id,b) *)
+val update_trans_node: controller -> Session_itp.transID -> bool -> unit
+
+(** Used to find if a proof node is proved or not TODO remove *)
+val find_pn: controller -> Session_itp.proofNodeID -> bool
 
 module Make(S : Scheduler) : sig
 

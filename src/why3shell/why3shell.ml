@@ -365,8 +365,16 @@ let rec print_proof_node s (fmt: Format.formatter) p =
     | Some pn -> pn = p
     | _ -> false
   in
+  (* TODO proved or not to be done on the whole tree. Just a test *)
+  let is_proved () =
+    match is_goal_cursor () with
+    | Some p -> Controller_itp.find_pn cont p
+    | _ -> false
+  in
   if current_goal then
     fprintf fmt "**";
+  if is_proved () then
+    fprintf fmt "P";
 
   fprintf fmt
     "@[<hv 2> Goal %s; parent %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
@@ -483,7 +491,7 @@ let test_transform_and_display fmt args =
          fprintf fmt "transformation status: %a@."
                  Controller_itp.print_trans_status status;
          match status with
-         | TSdone -> (ignore (move_to_goal_ret next_node);
+         | TSdone tid -> (ignore (move_to_goal_ret next_node);
              test_print_goal fmt [])
          | _ -> ()
        in
