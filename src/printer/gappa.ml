@@ -220,7 +220,7 @@ let rec print_fmla info fmt f =
   | Tapp ({ ls_name = id }, []) ->
     begin match query_syntax info.info_syn id with
       | Some s -> syntax_arguments s term fmt []
-      | None -> fprintf fmt "%a in [0,0]" print_ident id
+      | None -> fprintf fmt "%a in [1,1]" print_ident id
     end
   | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
       (* TODO: distinguish between type of t1 and t2
@@ -298,6 +298,13 @@ let rec print_fmla info fmt f =
       "gappa: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
+let print_fmla info truths fmt f =
+  let rec simpl f =
+    match f.t_node with
+    | Tapp (ls, []) when Sls.mem ls truths -> t_true
+    | _ -> t_map_simp simpl f in
+  print_fmla info fmt (simpl f)
+
 (*
 let print_decl (* ?old *) info fmt d =
   match d.d_node with
@@ -337,7 +344,7 @@ let print_decls ?old info fmt dl =
 
 exception AlreadyDefined
 
-let rec filter_hyp info defs eqs hyps pr f =
+let rec filter_hyp info defs eqs hyps truths pr f =
   match f.t_node with
   | Tapp(ls,[t1;t2]) when ls_equal ls ps_equ ->
       let try_equality t1 t2 =
@@ -349,38 +356,23 @@ let rec filter_hyp info defs eqs hyps pr f =
               Hid.add defs l.ls_name ();
               t_s_fold (fun _ _ -> ())
                 (fun _ ls -> Hid.replace defs ls.ls_name ()) () t2;
-              ((pr,t1,t2)::eqs, hyps)
+              ((pr,t1,t2)::eqs, hyps, truths)
           | _ -> raise AlreadyDefined in
       begin try
         try_equality t1 t2
       with AlreadyDefined -> try
         try_equality t2 t1
       with AlreadyDefined ->
-        (eqs, (pr,f)::hyps)
+        (eqs, (pr,f)::hyps, truths)
       end
   | Tbinop (Tand, f1, f2) ->
-      let (eqs,hyps) = filter_hyp info defs eqs hyps pr f2 in
-      filter_hyp info defs eqs hyps pr f1
-  | Tapp(_,[]) ->
-      (* Discard (abstracted) predicate variables.
-         While Gappa would handle them, it is usually just noise from
-         Gappa's point of view and better delegated to a SAT solver. *)
-      (eqs,hyps)
-  | Ttrue -> (eqs,hyps)
-  | _ -> (eqs, (pr,f)::hyps)
+      let (eqs,hyps,truths) = filter_hyp info defs eqs hyps truths pr f2 in
+      filter_hyp info defs eqs hyps truths pr f1
+  | Tapp(ls,[]) -> (eqs, hyps, Sls.add ls truths)
+  | Ttrue -> (eqs, hyps, truths)
+  | _ -> (eqs, (pr,f)::hyps, truths)
 
-type filter_goal =
-  | Goal_good of Decl.prsymbol * term
-  | Goal_bad of string
-  | Goal_none
-
-let filter_goal pr f =
-  match f.t_node with
-    | Tapp(ps,[]) -> Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
-        (* todo: filter more goals *)
-    | _ -> Goal_good(pr,f)
-
-let prepare info defs ((eqs,hyps,goal) as acc) d =
+let prepare info defs ((eqs,hyps,truths,goal) as acc) d =
   match d.d_node with
     | Dtype _ | Ddata _ -> acc
     | Dparam _ | Dlogic _ -> acc
@@ -388,11 +380,12 @@ let prepare info defs ((eqs,hyps,goal) as acc) d =
         unsupportedDecl d
           "please remove inductive definitions before calling gappa printer"
     | Dprop (Paxiom, pr, f) ->
-        let (eqs,hyps) = filter_hyp info defs eqs hyps pr f in (eqs,hyps,goal)
+        let (eqs,hyps,truths) = filter_hyp info defs eqs hyps truths pr f in
+        (eqs,hyps,truths,goal)
     | Dprop (Pgoal, pr, f) ->
         begin
           match goal with
-            | Goal_none -> (eqs,hyps,filter_goal pr f)
+            | None -> (eqs, hyps, truths, Some (pr, f))
             | _ -> assert false
         end
     | Dprop ((Plemma|Pskip), _, _) ->
@@ -404,7 +397,7 @@ let find_used_equations eqs hyps goal =
   let mark_used f =
     t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace used ls.ls_name ()) () f in
   begin match goal with
-  | Goal_good (_,f) -> mark_used f;
+  | Some (_,f) -> mark_used f;
   | _ -> ()
   end;
   List.iter (fun (_,f) -> mark_used f) hyps;
@@ -416,23 +409,36 @@ let find_used_equations eqs hyps goal =
     end else acc
   ) [] eqs
 
+let rec find_bools ((bools, known) as acc) f =
+  match f.t_node with
+  | Tapp(ls,[]) ->
+      if Sls.mem ls known then acc
+      else (ls :: bools, Sls.add ls known)
+  | Tbinop (_, f1, f2) ->
+      find_bools (find_bools acc f2) f1
+  | _ -> acc
+
 let print_equation info fmt (pr,t1,t2) =
   fprintf fmt "# equation '%a'@\n" print_ident pr.pr_name;
   fprintf fmt "%a = %a ;@\n" (print_term info) t1 (print_term info) t2
 
-let print_hyp info fmt (pr,f) =
-  fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
-  fprintf fmt "%a ->@\n" (print_fmla info) f
+let print_bool fmt ls =
+  fprintf fmt "(%a in [0,0] \\/ %a in [1,1]) ->@\n"
+          print_ident ls.ls_name print_ident ls.ls_name
 
-let print_goal info fmt g =
+let print_bool2 fmt ls =
+  fprintf fmt "%a in (0.5)" print_ident ls.ls_name
+
+let print_hyp info truths fmt (pr,f) =
+  fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
+  fprintf fmt "%a ->@\n" (print_fmla info truths) f
+
+let print_goal info truths fmt g =
   match g with
-    | Goal_good(pr,f) ->
+    | Some (pr,f) ->
         fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
-        fprintf fmt "%a@\n" (print_fmla info) f
-    | Goal_bad msg ->
-        fprintf fmt "# (unsupported kind of goal: %s)@\n" msg;
-        fprintf fmt "1 in [0,0]@\n"
-    | Goal_none ->
+        fprintf fmt "%a@\n" (print_fmla info truths) f
+    | None ->
         fprintf fmt "# (no goal at all ??)@\n";
         fprintf fmt "1 in [0,0]@\n"
 
@@ -441,12 +447,25 @@ let print_task args ?old:_ fmt task =
   let info = get_info args.env task in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
-  let equations,hyps,goal =
-    List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
+  let equations,hyps,truths,goal =
+    List.fold_left (prepare info (Hid.create 17))
+                   ([],[],Sls.empty,None) (Task.task_decls task)
   in
   List.iter (print_equation info fmt) (find_used_equations equations hyps goal);
-  fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) (List.rev hyps)
-    (print_goal info) goal
+  let (bools, _) =
+    let gbools =
+      match goal with
+      | Some (_,f) -> find_bools ([], truths) f
+      | None -> ([], truths) in
+    List.fold_left (fun acc (_,f) -> find_bools acc f) gbools hyps in
+  fprintf fmt "@[<v 2>{ %a%a%a}@\n@]%a"
+    (print_list nothing print_bool) bools
+    (print_list nothing (print_hyp info truths)) (List.rev hyps)
+    (print_goal info truths) goal
+    (print_list_delim
+       ~start:(fun fmt () -> fprintf fmt "$ ")
+       ~stop:(fun fmt () -> fprintf fmt ";@\n")
+       ~sep:comma print_bool2) (List.rev bools)
 (*
   print_decls ?old info fmt (Task.task_decls task)
 *)
