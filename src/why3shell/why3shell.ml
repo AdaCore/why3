@@ -421,14 +421,20 @@ let print_position (s: session) (cursor: proof_zipper) fmt: unit =
 
 let print_position_p s cursor fmt _ = print_position s cursor fmt
 
+let task_driver =
+  let d = Filename.concat (Whyconf.datadir main)
+                          (Filename.concat "drivers" "why3_itp.drv")
+  in
+  Driver.load_driver env d []
+
 (* Print current goal or nearest next goal if we are not on a goal *)
 let test_print_goal fmt _args =
   (* temporary : get the first goal *)
   let id = nearest_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
-          Pretty.print_task
-          (* (Driver.print_task ~cntexample:false task_driver) *)
+          (*Pretty.print_task*)
+          (Driver.print_task ~cntexample:false task_driver)
           task
 
 (* Execute f and then print the goal *)
@@ -463,12 +469,6 @@ let apply_transform fmt args =
     | _ -> printf "Error: Give the name of the transformation@."
 
 (*******)
-
-let task_driver =
-  let d = Filename.concat (Whyconf.datadir main)
-                          (Filename.concat "drivers" "why3_itp.drv")
-  in
-  Driver.load_driver env d []
 
 let test_save_session _fmt args =
   match args with
@@ -570,6 +570,10 @@ let commands =
     "gr", "get to the goal right",  then_print (move_to_goal_ret_p zipper_right);
     "gl", "get to the goal left",  then_print (move_to_goal_ret_p zipper_left);
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
+    "test", "test register known_map", (fun _ _ -> ignore (
+      let id = nearest_goal () in
+      let task = get_task cont.controller_session id in
+      Why3printer.build_name_tables task));
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
     "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
     "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));

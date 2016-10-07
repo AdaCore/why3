@@ -8,4 +8,20 @@
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
+open Format
+open Pp
+open Ident
+open Ty
+open Term
+open Decl
+open Printer
+open Theory
+open Stdlib
 
+type name_tables = {
+    namespace : Theory.namespace;
+    unique_names : string Mid.t;
+    th: theory_uc;
+  }
+
+val build_name_tables : Task.task -> name_tables

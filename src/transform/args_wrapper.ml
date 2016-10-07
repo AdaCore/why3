@@ -12,6 +12,14 @@ type _ trans_typ =
   | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
   | Tformula : 'a trans_typ -> (term -> 'a) trans_typ
 
+let type_ptree ~as_fmla t task =
+  (* Simply build th_uc at the same time by rebuilding the declarations with unique names ??? *)
+  let tables = Why3printer.build_name_tables task in
+  let th_uc = tables.th in
+  if as_fmla
+  then Typing.type_fmla th_uc (fun _ -> None) t
+  else Typing.type_term th_uc (fun _ -> None) t
+
 (*** term argument parsed in the context of the task ***)
 let type_ptree ~as_fmla t task =
   let used_ths = Task.used_theories task in
