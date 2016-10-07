@@ -888,6 +888,26 @@ let compute_replay_limit_from_pas pas =
       Call_provers.limit_steps = steps;
       limit_time = time }
 
+let for_some_proof_attempt pred map =
+  try
+    Session.PHprover.iter (fun _ pa -> if pred pa then raise Exit else ()) map;
+    false
+  with Exit -> true
+
+let for_some_transformation pred map =
+  try
+    Session.PHstr.iter (fun _ tf -> if pred tf then raise Exit else ()) map;
+    false
+  with Exit -> true
+
+let rec is_obsolete_verified goal =
+  (* Check if a goal is or was verified, including using obsolete proofs *)
+  goal.Session.goal_verified <> None ||
+  for_some_proof_attempt is_valid_pa goal.Session.goal_external_proofs ||
+    for_some_transformation
+    (fun tf -> List.for_all is_obsolete_verified tf.Session.transf_goals)
+    goal.Session.goal_transformations
+
 let rec replay_transf tf =
   let tf_proves_goal =
     List.for_all (fun g -> g.Session.goal_verified <> None)
@@ -897,7 +917,7 @@ let rec replay_transf tf =
   else ()
 
 and replay_goal goal =
-  if goal.Session.goal_verified = None then ()
+  if not (is_obsolete_verified goal) then ()
   else
     try
       (* first try to find a proof_attempt that proves this goal entirely. This
