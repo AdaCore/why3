@@ -161,7 +161,6 @@ module Abstract_interpreter(E: sig
   let ensure_variable cfg v t =
     if not (Environment.mem_var cfg.env v) then
       begin
-        Format.eprintf "adding %s@." (Var.to_string v);
         Hashtbl.add cfg.variable_mapping v t;
         cfg.env <- Environment.add cfg.env [|v|] [||]
       end
