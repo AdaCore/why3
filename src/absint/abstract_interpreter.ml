@@ -247,6 +247,41 @@ module Abstract_interpreter(E: sig
   let access_fields a b i (proj, t) =
     access_field a i (proj, t), access_field b i (proj, t)
 
+  let warning_t s t =
+    Format.eprintf "-- warning: %s -- triggered by " s;
+    Pretty.print_term Format.err_formatter t;
+    Format.eprintf "@."
+            
+          
+  let create_vreturn vsym = Term.create_vsymbol Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; } vsym.vs_ty
+
+  let get_subvalues a =
+    let open Ty in
+    let myty = t_type a in
+    match myty.ty_node with
+    | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
+      [a]
+    | Tyapp(tys, vars) -> 
+      begin
+        let vars = Ty.ts_match_args tys vars in
+        match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
+        | Decl.Ddata([_, [ls, ls_projs]]) ->
+          List.map (function
+              | Some s ->  Some s,
+                           (match s.ls_value with
+                            | Some t -> Ty.ty_inst vars t
+                            | None -> assert false)
+              | None -> assert false) ls_projs
+          |> List.mapi (access_field a)
+        | _->
+          warning_t "Recursive types or multiple constructors is not supported in abstract interpretation."
+            a;
+          []
+      end
+    | Tyvar(_) ->
+      warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
+      []
+
   (* Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    * ATM it only works for conjunction, and if there is not that much uninterpreted function.
    * In the worst case, it returns an empty list.
@@ -422,45 +457,24 @@ module Abstract_interpreter(E: sig
       match t.t_node with
       | Teps(tb) ->
         let return, t = Term.t_open_bound tb in
-        let myty = Term.(return.vs_ty) in
+        (* Always use the same variable when returning a value, 
+         * otherwise variables keep being created and the previous ones (with the
+         * good constraints) can not be accessed *)
+        let return_term = create_vreturn return in
+        let return_term = t_var return_term in
+        let subvalues = get_subvalues return_term in
         let l =
-          match myty.ty_node with
-          | _ when Ty.ty_equal myty ty_int ->
-            let v = var_return in
-            ensure_variable cfg v Term.t_bool_true;
-            to_forget := v :: !to_forget;
-            { !local_ty with local_vars = Term.Mterm.add t v (!local_ty).local_vars }
-          | Tyapp(tys, vars) -> 
-            begin
-              let vars = Ty.ts_match_args tys vars in
-              match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-              | Decl.Ddata([_, [ls, ls_projs]]) ->
-                List.map (function
-                    | Some s ->  Some s,
-                                 (match s.ls_value with
-                                 | Some t -> Ty.ty_inst vars t
-                                 | None -> assert false)
-                    | None -> assert false) ls_projs
-                |> List.mapi (access_field (Term.t_var return))
-                |> List.combine ls_projs
-                |> List.fold_left (fun local_ty (Some l, a) ->
+          List.fold_left (fun local_ty a ->
 
-                    ignore (Format.flush_str_formatter ());
-                    let v = Pretty.print_ls Format.str_formatter l
-                            |> Format.flush_str_formatter
-                            |> Format.sprintf "%s.%s" "$$result"
-                            |> Var.of_string
-                    in
-                    to_forget := v :: !to_forget;
-                    ensure_variable cfg v a;
-                    { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }
-                  ) !local_ty
-              | _->
-                Format.eprintf "type equality not fully recognized: ";
-                Pretty.print_term Format.err_formatter t;
-                Format.eprintf "@."; !local_ty
-            end
-          | _ -> raise (Not_handled t)
+              ignore (Format.flush_str_formatter ());
+              let v = Pretty.print_term Format.str_formatter a
+                      |> Format.flush_str_formatter
+                      |> Var.of_string
+              in
+              to_forget := v :: !to_forget;
+              ensure_variable cfg v a;
+              { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }
+            ) !local_ty subvalues
         in
         local_ty := l;
         return_var := Some return;
