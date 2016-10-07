@@ -6,8 +6,10 @@ module While1
 	let b(x:int) : int
 	ensures { result = 18 }
 	=
-		let i = ref 42 in
-		let j = ref 43 in
+		let i = ref 1 in
+		let j = ref 0 in
+		j := 0;
+		i := 1;
 		while !i < 10 do
 			variant { 10 - !i  }
 			i := !i + 1;

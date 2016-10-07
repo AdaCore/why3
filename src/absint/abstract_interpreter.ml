@@ -134,7 +134,7 @@ module Abstract_interpreter(E: sig
 
   type local_ty = {
       ident_ty: Ity.ity Ident.Mid.t;
-      region_ident: Ity.pvsymbol Ity.Mreg.t;
+      region_ident: (Ity.pvsymbol * Term.term) list Ity.Mreg.t;
       local_vars: Var.t Term.Mterm.t
   }
 
@@ -280,7 +280,7 @@ module Abstract_interpreter(E: sig
    *
    * The resulting list of linear expressions is weaker than the original why3
    * formula. *)
-  let linear_expressions_from_term: cfg -> local_ty -> Term.term -> (domain -> domain)  = fun cfg local_ty t ->
+  let linear_expressions_from_term: cfg -> local_ty -> Term.term -> ((domain -> domain) * Var.t list)  = fun cfg local_ty t ->
     let open Term in
 
     (* First inline everything, for instance needed for references
@@ -334,7 +334,7 @@ module Abstract_interpreter(E: sig
           match var_of_term t with
           | None -> raise (Not_handled t)
           | Some s ->
-            ([s, 1], 0)
+            ([s, coeff], 0)
         end
       | _ ->
         raise (Not_handled t)
@@ -343,7 +343,6 @@ module Abstract_interpreter(E: sig
     (* This takes an epsilon-free formula and returns a list of linear expressions weaker than
      * the original formula. *)
     let rec aux t =
-      Pretty.print_term Format.err_formatter t;
       try
         match t.t_node with
         | Tbinop(Tand, a, b) ->
@@ -442,6 +441,7 @@ module Abstract_interpreter(E: sig
         (fun d -> d)
     in
 
+    let to_forget = ref [] in
     try
       let open Ty in
       match t.t_node with
@@ -457,6 +457,7 @@ module Abstract_interpreter(E: sig
           | _ when Ty.ty_equal myty ty_int ->
             let v = var_return in
             ensure_variable cfg v Term.t_bool_true;
+            to_forget := v :: !to_forget;
             { !local_ty with local_vars = Term.Mterm.add t v (!local_ty).local_vars }
           | Tyapp(tys, _) -> 
             begin
@@ -473,6 +474,7 @@ module Abstract_interpreter(E: sig
                             |> Format.sprintf "%s.%s" "$$result"
                             |> Var.of_string
                     in
+                    to_forget := v :: !to_forget;
                     ensure_variable cfg v a;
                     { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }
                   ) !local_ty
@@ -481,12 +483,13 @@ module Abstract_interpreter(E: sig
                 Pretty.print_term Format.err_formatter t;
                 Format.eprintf "@."; !local_ty
             end
+          | _ -> raise (Not_handled t)
         in
         local_ty := l;
         return_var := Some return;
-        aux t
+        aux t, !to_forget
       | _ ->
-        aux t
+        aux t, !to_forget
     with
     | e ->
       Format.eprintf "error while computing domain for post conditions: ";
@@ -511,47 +514,60 @@ module Abstract_interpreter(E: sig
     let local_ty = { local_ty with
                      ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
     ignore (Format.flush_str_formatter ());
-    let reg_name = 
-      match Ity.(variable_type.ity_node) with
-      | Ity.Ityreg(reg) ->
-        Ity.print_reg_name Format.str_formatter reg
-        |> Format.flush_str_formatter
-      | Ity.Ityapp(_) ->
-        Ity.print_pv Format.str_formatter psym
-        |> Format.flush_str_formatter
-      | Ity.Ityvar(_) -> failwith "fields for a variable whose type is not a regionn?"
-    in
     let local_ty = 
-      match (Term.t_type logical_term).ty_node with
-      | t when Ty.ty_equal (t_type logical_term) ty_int ->
+      match Ity.(variable_type.ity_node), (Term.t_type logical_term).ty_node with
+      | _ when Ty.ty_equal (t_type logical_term) ty_int ->
+        let reg_name = Ity.print_pv Format.str_formatter psym
+        |> Format.flush_str_formatter in
         let v =
           Var.of_string reg_name in
-        cfg.env <- Environment.add cfg.env [|v|] [||];
+        ensure_variable cfg v logical_term;
         { local_ty with local_vars = Term.Mterm.add logical_term v local_ty.local_vars }
-      | Tyapp(tys, _) -> 
+      | _ when Ity.ity_equal variable_type Ity.ity_unit
+        -> local_ty
+      | Ity.Ityreg(reg), Tyapp(tys, _) -> 
         begin
-          match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-          | Decl.Ddata([_, [ls, ls_projs]]) ->
-            List.combine ls_projs child_types
-            |> List.mapi (access_field logical_term)
-            |> List.combine ls_projs
-            |> List.fold_left (fun local_ty (Some l, a) ->
+          let reg_name = 
+            Ity.print_reg_name Format.str_formatter reg
+            |> Format.flush_str_formatter
+          in
+          let local_ty, proj_list =
+            match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node
+            with
+            | Decl.Ddata([_, [ls, ls_projs]]) ->
+              let pfields = 
+                Pdecl.((find_its_defn known_pdecl reg.reg_its).itd_fields) in
+              List.combine ls_projs child_types
+              |> List.mapi (access_field logical_term)
+              |> List.combine ls_projs
+              |> List.combine pfields
+              |> List.fold_left (fun (local_ty, acc) (pfield, (Some l, a)) ->
 
-                ignore (Format.flush_str_formatter ());
-                let v = Pretty.print_ls Format.str_formatter l
-                |> Format.flush_str_formatter
-                |> Format.sprintf "%s.%s" reg_name
-                |> Var.of_string
-                in
-                cfg.env <- Environment.add cfg.env [|v|] [||];
-                { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }
-              ) local_ty
-          | _->
-            Format.eprintf "type equality not fully recognized: ";
-            Pretty.print_term Format.err_formatter logical_term;
-            Format.eprintf "@."; local_ty
+                  ignore (Format.flush_str_formatter ());
+                  let v = Pretty.print_ls Format.str_formatter l
+                          |> Format.flush_str_formatter
+                          |> Format.sprintf "%s.%s" reg_name
+                          |> Var.of_string
+                  in
+                  ensure_variable cfg v a;
+                  let accessor = match pfield.rs_field with
+                    | Some s -> s
+                    | None -> assert false
+                  in
+                  { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }, (accessor, a) :: acc
+                ) (local_ty, [])
+            | _->
+              Format.eprintf "type equality not fully recognized: ";
+              Pretty.print_term Format.err_formatter logical_term;
+              Format.eprintf "@."; local_ty, []
+          in
+          { local_ty with region_ident = Ity.Mreg.add reg proj_list local_ty.region_ident }
         end
-      | Tyvar(_) -> raise (Not_handled logical_term)
+      | _ ->
+        Format.eprintf "Variable could not be added properly: ";
+        Pretty.print_term Format.err_formatter logical_term;
+        Format.eprintf "@.";
+        raise (Not_handled logical_term)
     in local_ty
 
 
@@ -565,8 +581,6 @@ module Abstract_interpreter(E: sig
    * (see var_return) *)
   let rec put_expr_in_cfg cfg local_ty expr =
     let open Expr in
-    Expr.print_expr Format.err_formatter expr;
-    Format.eprintf "@.";
     match expr.e_node with
     | Elet(LDvar(psym, let_expr), b) ->
       (* As it may not be an int, the type could be useful, so we can save it *)
@@ -590,7 +604,7 @@ module Abstract_interpreter(E: sig
 
       let local_ty = add_typed_variable cfg local_ty psym variable_type in
 
-      let constraints =
+      let constraints, to_forget =
         if not Ity.(ity_equal  psym.pv_ity ity_unit) then
           begin
           let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
@@ -607,7 +621,7 @@ module Abstract_interpreter(E: sig
           end
         else
           let () = Format.eprintf "no Postocndition:@." in
-          (fun abs -> abs)
+          (fun abs -> abs), []
       in
 
       (* compute the child and add an hyperedge, to set the value of psym
@@ -617,7 +631,8 @@ module Abstract_interpreter(E: sig
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
-          Abstract1.forget_array man (constraints abs) [|var_return|] false
+          let to_forget = Array.of_list to_forget in
+          Abstract1.forget_array man (constraints abs) to_forget false
         );
       let end_cp = new_node_cfg cfg expr in
       (* erase a *)
@@ -675,31 +690,28 @@ module Abstract_interpreter(E: sig
       Format.eprintf "@.";
       let constraints =
         List.map (linear_expressions_from_term cfg local_ty) post
-        |> List.fold_left (fun f a ->
+        |> List.fold_left (fun f (a, _) ->
             (fun d -> f (a d))) (fun x -> x)
       in
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
+
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
           (* effects *)
           let abs = ref (Abstract1.forget_array man abs [|var_return|] false) in
           (* FIXME: bad, does not work with sub records *)
-          (*ignore @@ Ity.Mreg.mapi (fun a b ->
+          ignore @@ Ity.Mreg.mapi (fun a b ->
               Ity.Mpv.mapi (fun c () ->
                   let open Ity in
                   let var = Ity.Mreg.find a local_ty.region_ident in
-                  let _, proj, proj_ity = get_proj c in
-                  let t = Expr.e_app proj  [Expr.e_var var] [] proj_ity in
-                  let t = Expr.term_of_expr ~prop:false t in
-                  match t with
-                  | Some t ->
-                    let v = Term.Mterm.find t local_ty.local_vars in
-                    Format.eprintf "%s@." (Var.to_string v);
-                    abs :=  Abstract1.forget_array man !abs [|v|] false;
-                  | None -> Format.eprintf "Couldn't get logic term for this projection.@.";
-                    Ity.print_pv Format.err_formatter var;
+                  let _, t = List.find (fun (p, _) ->
+                      Ity.pv_equal p c) var in
+                  Pretty.print_term Format.err_formatter t;
+                  let v = Term.Mterm.find t local_ty.local_vars in
+                  Format.eprintf "%s@." (Var.to_string v);
+                  abs :=  Abstract1.forget_array man !abs [|v|] false;
                 ) b;
-            ) eff_write;*)
+            ) eff_write;
 
           constraints !abs
         );
@@ -709,14 +721,14 @@ module Abstract_interpreter(E: sig
       let open Expr in
       (* Condition expression *)
       let cond_term = 
-        match Expr.term_of_expr ~prop:true cond with
+        match Expr.term_of_expr ~prop:false cond with
         | Some s ->
           s
         | None ->
           Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
           Term.t_true
       in
-      let constraints = linear_expressions_from_term cfg local_ty cond_term in
+      let constraints, _ = linear_expressions_from_term cfg local_ty cond_term in
 
       let before_loop_cp = new_node_cfg cfg cond in
       let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg local_ty content in
@@ -790,7 +802,7 @@ module Abstract_interpreter(E: sig
           Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated (migth even be wrong if there are exceptions)";
           Term.t_true
       in
-      let constraints = linear_expressions_from_term cfg local_ty cond_term in
+      let constraints, _ = linear_expressions_from_term cfg local_ty cond_term in
       let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg local_ty b in
       let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg local_ty c in
       let start_cp = new_node_cfg cfg expr in
@@ -853,7 +865,7 @@ module Abstract_interpreter(E: sig
   let domain_to_term cfg domain =
     Apron_to_term.domain_to_term manpk domain (fun a ->
         try
-        Hashtbl.find cfg.variable_mapping a
+          Hashtbl.find cfg.variable_mapping a
         with 
         | Not_found ->
           Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
