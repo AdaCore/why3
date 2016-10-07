@@ -429,7 +429,8 @@ module Abstract_interpreter(E: sig
              let d1 = fb (fa d) in
              let d2 = fc d in
              Abstract1.join manpk d1 d2)
-        | Ttrue -> (fun d -> d)
+        | Ttrue  | _ when t_equal t t_bool_true -> (fun d -> d)
+        | Tfalse | _ when t_equal t t_bool_false -> (fun d -> Abstract1.bottom manpk cfg.env)
         | _ ->
           raise (Not_handled t)
       with
