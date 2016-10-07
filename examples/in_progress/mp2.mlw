@@ -6,32 +6,30 @@ module M
   use import mach.int.Unsigned
   use import mach.int.Int32
   use import mach.int.UInt32
-
-(*
-  type array 'a model { length : int; mutable elts : map int 'a }
-    invariant { 0 <= self.length }
-*)
+  use import array.Array
 
   predicate in_us_bounds (n:int) = 0 <= n <= max_uint32
   predicate in_bounds (n:int) = min_int32 <= n <= max_int32
 
-  type ptr 'a = abstract { mutable elts : map int 'a ; mutable initialized : map int bool; length : int ; offset : int ; addr : int }
-     invariant { in_us_bounds length }
-     invariant { 0 <= addr }
-     (* it is not required the offset is in 0..length *)
+  type ptr 'a = abstract {
+    mutable elts : array 'a ;
+    offset : int ;
+  }
+  invariant { in_us_bounds elts.length }
+  (* it is not required the offset is in 0..elts.length *)
 
-  val is_null (p:ptr 'a) : bool
-    ensures { result <-> p.addr = 0 }
+  val predicate is_null (p:ptr 'a) : bool
+    ensures { result <-> p.elts.length = 0 }
 
   val null () : ptr 'a
     ensures { result.length = 0 }
     ensures { result.addr = 0 }
 
   val get (p:ptr 'a) : 'a
-    requires { 0 <= p.offset < p.length }
-    requires { p.initialized[p.offset] }
+    requires { 0 <= p.offset < p.elts.length }
     ensures { result = p.elts[p.offset] }
 
+  (* useless *)
   val get_ofs (p:ptr 'a) (ofs:int32) : 'a
     requires { 0 <= p.offset + Int32.to_int ofs < p.length }
     requires { p.initialized[p.offset + Int32.to_int ofs] }
@@ -166,7 +164,7 @@ module N
        else 0
 
   function value (x:t) : int =
-     value_sub x.elts 0 x.length
+     value_sub x.elts 0 x.elts.length
 
   function value_sub_shift (x:t) (sz:int) : int =
      value_sub x.elts x.offset (x.offset + sz)
@@ -427,14 +425,15 @@ module N
 
   exception Break
 
-  (** [add_limb x y x1 x2] adds to [x] the value of the limb [y],
+  (** [add_limb r x y sz] adds to [x] the value of the limb [y],
       writes the result in [r] and returns the carry. [r] and [x]
       have size [sz]. This corresponds to the function [mpn_add_1] *)
-  (* r and x must be separated. Enforce this ? *)
+  (* r and x must be separated. This is enforced by Why3 regions in typing *)
 let add_limb (r x:t) (y:limb) (sz:int32) : limb
     requires { valid_and_initialized_ofs x (p2i sz) }
     requires { valid_ptr_itv r (p2i sz) }
     requires { p2i sz > 0 } (* ? GMP does the same for 0 and 1*)
+    writes  { r }
     ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =
 	      value_sub_shift x (p2i sz) + l2i y }
     ensures { 0 <= l2i result <= 1 }
@@ -695,7 +694,7 @@ let mul_limb (r x:t) (y:limb) (sz:int32) : limb
     let rl, rh = Limb.mul_double !lx y in
     let res, carry = Limb.add_with_carry rl !c limb_zero in
     label BeforeWrite in
-    value_sub_shift_no_change r.elts r.offset (p2i !i) (p2i !i) res; 
+    value_sub_shift_no_change r.elts r.offset (p2i !i) (p2i !i) res;
     set_ofs r !i res;
     assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
     	      	value_sub_shift x (p2i !i) * l2i y };
