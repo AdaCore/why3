@@ -12,15 +12,17 @@ let fresh_printer =
             "namespace"; "import"; "export"; "end";
             "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
             "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
+(*
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  fun () -> create_ident_printer bl ~sanitizer:isanitize
+ *)
+  fun () -> create_ident_printer bl (* ~sanitizer:isanitize *)
 
 
 open Stdlib
 
 type name_tables = {
     namespace : namespace;
-    unique_names : string Mid.t;
+    known_map : known_map;
     printer : ident_printer;
   }
 
@@ -36,16 +38,15 @@ let add_unsafe (s: string) (id: symb) (tables: name_tables) : name_tables =
   | Ts ty ->
       {tables with
         namespace = {tables.namespace with ns_ts = Mstr.add s ty tables.namespace.ns_ts};
-       unique_names = Mid.add ty.ts_name s tables.unique_names;
       }
   | Ls ls ->
       {tables with
         namespace = {tables.namespace with ns_ls = Mstr.add s ls tables.namespace.ns_ls};
-       unique_names = Mid.add ls.ls_name s tables.unique_names}
+      }
   | Pr pr ->
       {tables with
         namespace = {tables.namespace with ns_pr = Mstr.add s pr tables.namespace.ns_pr};
-       unique_names = Mid.add pr.pr_name s tables.unique_names}
+}
 
 (* Adds symbols that are introduced to a constructor *)
 let constructor_add (cl: constructor list) tables : name_tables =
@@ -140,9 +141,15 @@ let build_name_tables task : name_tables =
 
 *)
   let pr = fresh_printer () in
-  let tables = {
-      namespace = empty_ns; unique_names = Mid.empty ; printer = pr } in
   let km = Task.task_known task in
+  let tables = {
+      namespace = empty_ns;
+      known_map = km;
+(*
+      unique_names = Mid.empty ;
+ *)
+      printer = pr;
+  } in
   Mid.fold
     (fun _id d tables ->
 (* TODO optimization. We may check if id is already there to not explore twice the same
@@ -158,22 +165,28 @@ let build_name_tables task : name_tables =
 type _ trans_typ =
   | Ttrans : (task -> task list) trans_typ
   | Tint : 'a trans_typ -> (int -> 'a) trans_typ
+(*
   | Tstring : 'a trans_typ -> (string -> 'a) trans_typ
+*)
   | Tty : 'a trans_typ -> (ty -> 'a) trans_typ
   | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
+  | Tprsymbol : 'a trans_typ -> (Decl.prsymbol -> 'a) trans_typ
   | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
   | Tformula : 'a trans_typ -> (term -> 'a) trans_typ
 
-let type_ptree ~as_fmla t task =
-  (* Simply build th_uc at the same time by rebuilding the declarations with unique names ??? *)
+let find_pr s task =
   let tables = build_name_tables task in
-  failwith "todo"
-(*  let th_uc = tables.th in
-  if as_fmla
-  then Typing.type_fmla th_uc (fun _ -> None) t
-  else Typing.type_term th_uc (fun _ -> None) t
- *)
+  Mstr.find s tables.namespace.ns_pr
 
+let type_ptree ~as_fmla t task =
+  let tables = build_name_tables task in
+  let km = tables.known_map in
+  let ns = tables.namespace in
+  if as_fmla
+  then Typing.type_fmla_in_namespace ns km (fun _ -> None) t
+  else Typing.type_term_in_namespace ns km (fun _ -> None) t
+
+(*
 (*** term argument parsed in the context of the task ***)
 let type_ptree ~as_fmla t task =
   let used_ths = Task.used_theories task in
@@ -210,6 +223,7 @@ let type_ptree ~as_fmla t task =
   if as_fmla
   then Typing.type_fmla th_uc (fun _ -> None) t
   else Typing.type_term th_uc (fun _ -> None) t
+ *)
 
 let parse_and_type ~as_fmla s task =
   let lb = Lexing.from_string s in
@@ -235,12 +249,14 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
         with Failure _ -> raise (Failure "Parsing error: expecting an integer."))
       | _ -> failwith "Missing argument: expecting an integer."
     end
+(*
   | Tstring t' ->
     begin
       match l with
       | s :: tail -> wrap t' (f s) tail task
       | _ -> failwith "Missing argument: expecting a string."
     end
+ *)
   | Tformula t' ->
     begin
       match l with
@@ -272,4 +288,12 @@ let rec wrap : type a. a trans_typ -> a -> trans_with_args =
          let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
          wrap t' (f tys) tail task
       | _ -> failwith "Missing argument: expecting a type symbol."
+    end
+  | Tprsymbol t' ->
+    begin
+      match l with
+        | s :: tail ->
+          let pr = find_pr s task in
+          wrap t' (f pr) tail task
+      | _ -> failwith "Missing argument: expecting a prop symbol."
     end

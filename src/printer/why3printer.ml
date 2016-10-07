@@ -22,11 +22,7 @@ open Theory
 
 open Args_wrapper
 
-let id_unique tables id =
-  try
-    Mid.find id tables.unique_names
-  with Not_found ->
-    id_unique tables.printer id
+let id_unique tables id = id_unique tables.printer id
 
 (*
 let forget_tvs () =

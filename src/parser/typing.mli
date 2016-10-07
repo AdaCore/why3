@@ -51,9 +51,11 @@ val find_qualid :
 
 type global_vs = Ptree.qualid -> vsymbol option
 
-val type_term_in_namespace : namespace -> global_vs -> Ptree.term -> term
+val type_term_in_namespace : namespace -> Decl.known_map -> global_vs -> Ptree.term -> term
 
 val type_term : theory_uc -> global_vs -> Ptree.term -> term
+
+val type_fmla_in_namespace : namespace -> Decl.known_map -> global_vs -> Ptree.term -> term
 
 val type_fmla : theory_uc -> global_vs -> Ptree.term -> term
 

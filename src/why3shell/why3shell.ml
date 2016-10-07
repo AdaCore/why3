@@ -491,7 +491,7 @@ let test_transform_and_display fmt args =
          fprintf fmt "transformation status: %a@."
                  Controller_itp.print_trans_status status;
          match status with
-         | TSdone tid -> (ignore (move_to_goal_ret next_node);
+         | TSdone _tid -> (ignore (move_to_goal_ret next_node);
              test_print_goal fmt [])
          | _ -> ()
        in

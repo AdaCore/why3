@@ -9,17 +9,21 @@ open Args_wrapper
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
 (* TODO ugly ! Solve it an other way *)
-let clean_environment task =
+let clean_environment _task =
+(*
   let _ = Pretty.forget_all in
   let _ = Pretty.print_task Format.str_formatter task in
+ *)
   ()
 
-let gen_ident s = Ident.id_fresh (Pretty.ppunique s)
+let gen_ident = Ident.id_fresh
 
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
 let case t task =
+(*
   clean_environment task;
+ *)
   let h = Decl.create_prsymbol (gen_ident "h") in
   let hnot = Decl.create_prsymbol (gen_ident "hnot") in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
@@ -76,18 +80,12 @@ let exists x task =
       [Task.add_decl task new_goal]
   | _ -> failwith "No goal"
 
-(* TODO ask to have functions in ident and Pretty that do something like that *)
-let string_pr pr =
-  ignore (Format.flush_str_formatter ());
-  Pretty.print_pr Format.str_formatter pr;
-  Format.flush_str_formatter()
-
 (* Return a new task with hypothesis name removed *)
-let remove_task_decl (name: string) : task trans =
+let remove_task_decl (name: Ident.ident) : task trans =
   Trans.decl
     (fun d ->
      match d.d_node with
-    | Dprop (Paxiom, pr, _) when (string_pr pr = name) ->
+    | Dprop (Paxiom, pr, _) when (Ident.id_equal pr.pr_name name) ->
        []
     | _ -> [d])
     None
@@ -98,7 +96,7 @@ let remove_task_decl (name: string) : task trans =
 (* from task [delta, name:A |- G]  build the task [delta |- G] *)
 let remove name task =
   clean_environment task;
-  [Trans.apply (remove_task_decl name) task]
+  [Trans.apply (remove_task_decl name.pr_name) task]
 
 
 let pr_prsymbol pr =
@@ -107,26 +105,28 @@ let pr_prsymbol pr =
   | _ -> None
 
 (* Looks for the hypothesis name and return it. If not found return None *)
-let find_hypothesis name task =
+let find_hypothesis (name:Ident.ident) task =
   let ndecl = ref None in
   let _ = task_iter (fun x -> if (
     match (pr_prsymbol x.td_node) with
     | None -> false
-    | Some pr -> string_pr pr = name) then ndecl := Some x) task in
+    | Some pr -> Ident.id_equal pr.pr_name name) then ndecl := Some x) task in
   !ndecl
 
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
-let instantiate name t task =
+let instantiate (pr:Decl.prsymbol) t task =
+  let name = pr.pr_name in
   clean_environment task;
   let g, task = Task.task_separate_goal task in
   let ndecl = find_hypothesis name task in
   match ndecl with
-  | None -> Format.printf "Hypothesis %s not found@." name; [Task.add_tdecl task g]
+  | None -> Format.printf "Hypothesis %s not found@." name.Ident.id_string;
+            [Task.add_tdecl task g]
   | Some decl -> (match decl.td_node with
     | Decl {d_node = Dprop (pk, _pr, ht)} ->
       let t_subst = subst_forall ht t in
-      let new_pr = create_prsymbol (gen_ident name) in
+      let new_pr = create_prsymbol (Ident.id_clone name) in
       let new_decl = create_prop_decl pk new_pr t_subst in
       let task = add_decl task new_decl in
         [Task.add_tdecl task g]
@@ -187,7 +187,8 @@ let term_decl d =
 
 (* from task [delta, name:forall x.A->B |- G,
    build the task [delta,name:forall x.A->B] |- A[x -> t]] ou t est tel que B[x->t] = G *)
-let apply name task =
+let apply pr task =
+  let name = pr.pr_name in
   clean_environment task;
   let g, task = Task.task_separate_goal task in
   let tg = term_decl g in
@@ -225,8 +226,8 @@ let apply name task =
 let () = register_transform_with_args ~desc:"test case" "case" (wrap (Tformula Ttrans) case)
 let () = register_transform_with_args ~desc:"test cut" "cut" (wrap (Tformula Ttrans) cut)
 let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
-let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tstring Ttrans) remove)
+let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
 let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
-                                      (wrap (Tstring (Tterm Ttrans)) instantiate)
-let () = register_transform_with_args ~desc:"test apply" "apply" (wrap (Tstring Ttrans) apply)
+                                      (wrap (Tprsymbol (Tterm Ttrans)) instantiate)
+let () = register_transform_with_args ~desc:"test apply" "apply" (wrap (Tprsymbol Ttrans) apply)
 let () = register_transform_with_args ~desc:"test duplicate" "duplicate" (wrap (Tint Ttrans) dup)
