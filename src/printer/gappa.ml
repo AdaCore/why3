@@ -280,9 +280,8 @@ let rec print_fmla info fmt f =
       fprintf fmt "(%a \\/@ %a)" fmla f1 fmla f2
   | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "(%a ->@ %a)" fmla f1 fmla f2
-  | Tbinop (Tiff, _f1, _f2) ->
-      unsupportedTerm f
-        "gappa: connector <-> is not supported"
+  | Tbinop (Tiff, f1, f2) ->
+      fprintf fmt "((%a ->@ %a) /\\@ (%a ->@ %a))" fmla f1 fmla f2 fmla f2 fmla f1
   | Tnot f ->
       fprintf fmt "not %a" fmla f
   | Ttrue ->
@@ -458,7 +457,7 @@ let print_task args ?old:_ fmt task =
       | Some (_,f) -> find_bools ([], truths) f
       | None -> ([], truths) in
     List.fold_left (fun acc (_,f) -> find_bools acc f) gbools hyps in
-  fprintf fmt "@[<v 2>{ %a%a%a}@\n@]%a"
+  fprintf fmt "@[<v 2>{ %a%a%a}@]@\n%a"
     (print_list nothing print_bool) bools
     (print_list nothing (print_hyp info truths)) (List.rev hyps)
     (print_goal info truths) goal
