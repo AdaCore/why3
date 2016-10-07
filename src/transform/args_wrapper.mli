@@ -1,5 +1,18 @@
 
+open Ident
+open Theory
 open Task
+
+(** Pre-processing of tasks, to build unique names for all declared
+    identifiers of a task.*)
+
+type name_tables = {
+    namespace : Theory.namespace;
+    unique_names : string Mid.t;
+    printer : ident_printer;
+  }
+
+val build_name_tables : Task.task -> name_tables
 
 type _ trans_typ =
   | Ttrans : (task -> task list) trans_typ
@@ -10,4 +23,8 @@ type _ trans_typ =
   | Tterm : 'a trans_typ -> (Term.term -> 'a) trans_typ
   | Tformula : 'a trans_typ -> (Term.term -> 'a) trans_typ
 
-val wrap : 'a trans_typ -> 'a -> Trans.trans_with_args
+(** wrap arguments of transformations, turning string arguments into
+    arguments of proper types.  arguments of type term of formula are
+    parsed and typed, name resolution using the given name_tables. *)
+
+val wrap : (* name_tables -> *) 'a trans_typ -> 'a -> Trans.trans_with_args

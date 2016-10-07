@@ -570,10 +570,16 @@ let commands =
     "gr", "get to the goal right",  then_print (move_to_goal_ret_p zipper_right);
     "gl", "get to the goal left",  then_print (move_to_goal_ret_p zipper_left);
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
-    "test", "test register known_map", (fun _ _ -> ignore (
-      let id = nearest_goal () in
-      let task = get_task cont.controller_session id in
-      Why3printer.build_name_tables task));
+    "test", "test register known_map",
+    (fun _ _ ->
+      try
+        let id = nearest_goal () in
+        let task = get_task cont.controller_session id in
+        let _ = Args_wrapper.build_name_tables task in
+        ()
+      with e when not (Debug.test_flag Debug.stack_trace) ->
+        Format.eprintf
+          "@[Exception raised :@ %a@.@]" Exn_printer.exn_printer e);
     "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
     "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
     "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));
