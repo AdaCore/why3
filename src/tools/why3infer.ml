@@ -133,6 +133,8 @@ let do_input f =
                     let cfg = Abstract_interpreter.start_cfg rsym in
                     List.iter (Abstract_interpreter.add_variable cfg)
                       Ity.(cexp.c_cty.cty_args);
+                    Expr.print_expr Format.err_formatter e;
+                    Format.eprintf "@.";
                     ignore (Abstract_interpreter.put_expr_in_cfg cfg Abstract_interpreter.empty_local_ty e);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
                     let open Expr in

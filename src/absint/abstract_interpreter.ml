@@ -43,32 +43,6 @@ let find_definition env rs =
         Format.eprintf "@.";
         raise Not_found
 
-let extract_fields known_map variable_type = 
-  let open Ity in
-  match Ity.(variable_type.ity_node) with
-  | Ity.Ityvar(_) -> []
-  | Ity.Ityreg({reg_args = a; reg_regs = b; reg_name = n; reg_its = its }) ->
-    begin
-      match its with
-      | { its_mfields = fldl; _ } ->
-        let open Term in
-        let open Ident in
-        let open Expr in
-        let open Ity in
-        let my_fields = Pdecl.((find_its_defn known_map its).itd_fields) in
-        let fields = List.combine fldl my_fields in
-        List.map (fun (p, r) ->
-            try
-              Hashtbl.find hc p
-            with
-            | Not_found ->
-                Expr.print_rs Format.err_formatter r;
-                let res = p, r, r.rs_cty.cty_result in
-                Hashtbl.add hc p res;
-                res) fields
-    end
-  | Ity.Ityapp(its, a, b) -> []
-
 module Abstract_interpreter(E: sig
     val env: Env.env
     val pmod: Pmodule.pmodule
@@ -397,18 +371,19 @@ module Abstract_interpreter(E: sig
         | Tapp(func, [a;b]) when ls_equal ps_equ func ->
           begin
             let open Ty in
-            (* FIXME: is the order of the type guaranteed ? *)
-            let child_types =  
-              ty_fold (fun l a ->
-                  a::l
-                ) [] (Term.t_type a) in
             (* the only case handled ATM is types with a single constructor *)
             match (Term.t_type a).ty_node with
-            | Tyapp(tys, _) -> 
+            | Tyapp(tys, vars) -> 
               begin
+                let vars = Ty.ts_match_args tys vars in
                 match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
                 | Decl.Ddata([_, [ls, ls_projs]]) ->
-                  List.combine ls_projs child_types
+                  List.map (function
+                      | Some s ->  Some s,
+                                   (match s.ls_value with
+                                    | Some t -> Ty.ty_inst vars t
+                                    | None -> assert false)
+                      | None -> assert false) ls_projs
                   |> List.mapi (access_fields a b)
                   |> List.fold_left (fun f (a, b) ->
                       let g = aux (t_app ps_equ [a; b] None) in
@@ -448,10 +423,6 @@ module Abstract_interpreter(E: sig
       | Teps(tb) ->
         let return, t = Term.t_open_bound tb in
         let myty = Term.(return.vs_ty) in
-        let child_types =  
-          ty_fold (fun l a ->
-              a::l
-            ) [] myty in
         let l =
           match myty.ty_node with
           | _ when Ty.ty_equal myty ty_int ->
@@ -459,11 +430,17 @@ module Abstract_interpreter(E: sig
             ensure_variable cfg v Term.t_bool_true;
             to_forget := v :: !to_forget;
             { !local_ty with local_vars = Term.Mterm.add t v (!local_ty).local_vars }
-          | Tyapp(tys, _) -> 
+          | Tyapp(tys, vars) -> 
             begin
+              let vars = Ty.ts_match_args tys vars in
               match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
               | Decl.Ddata([_, [ls, ls_projs]]) ->
-                List.combine ls_projs child_types
+                List.map (function
+                    | Some s ->  Some s,
+                                 (match s.ls_value with
+                                 | Some t -> Ty.ty_inst vars t
+                                 | None -> assert false)
+                    | None -> assert false) ls_projs
                 |> List.mapi (access_field (Term.t_var return))
                 |> List.combine ls_projs
                 |> List.fold_left (fun local_ty (Some l, a) ->
@@ -507,10 +484,6 @@ module Abstract_interpreter(E: sig
       | Some s -> s
       | None -> assert false
     in
-    let child_types =  
-      ty_fold (fun l a ->
-          a::l
-        ) [] (Term.t_type logical_term) in
     let local_ty = { local_ty with
                      ident_ty = Ident.Mid.add variable_ident variable_type local_ty.ident_ty } in
     ignore (Format.flush_str_formatter ());
@@ -523,21 +496,34 @@ module Abstract_interpreter(E: sig
           Var.of_string reg_name in
         ensure_variable cfg v logical_term;
         { local_ty with local_vars = Term.Mterm.add logical_term v local_ty.local_vars }
+      | _ when Ty.ty_equal (t_type logical_term) ty_bool ->
+        let reg_name = Ity.print_pv Format.str_formatter psym
+        |> Format.flush_str_formatter in
+        let v =
+          Var.of_string reg_name in
+        ensure_variable cfg v logical_term;
+        { local_ty with local_vars = Term.Mterm.add logical_term v local_ty.local_vars }
       | _ when Ity.ity_equal variable_type Ity.ity_unit
         -> local_ty
-      | Ity.Ityreg(reg), Tyapp(tys, _) -> 
+      | Ity.Ityreg(reg), Tyapp(tys, vars) -> 
         begin
           let reg_name = 
             Ity.print_reg_name Format.str_formatter reg
             |> Format.flush_str_formatter
           in
+          let vars = Ty.ts_match_args tys vars in
           let local_ty, proj_list =
             match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node
             with
             | Decl.Ddata([_, [ls, ls_projs]]) ->
               let pfields = 
                 Pdecl.((find_its_defn known_pdecl reg.reg_its).itd_fields) in
-              List.combine ls_projs child_types
+              List.map (function
+                  | Some s ->  Some s,
+                               (match s.ls_value with
+                                | Some t -> Ty.ty_inst vars t
+                                | None -> assert false)
+                  | None -> assert false) ls_projs
               |> List.mapi (access_field logical_term)
               |> List.combine ls_projs
               |> List.combine pfields
@@ -566,6 +552,8 @@ module Abstract_interpreter(E: sig
       | _ ->
         Format.eprintf "Variable could not be added properly: ";
         Pretty.print_term Format.err_formatter logical_term;
+        Format.eprintf " of type ";
+        Ity.print_ity Format.err_formatter variable_type;
         Format.eprintf "@.";
         raise (Not_handled logical_term)
     in local_ty
