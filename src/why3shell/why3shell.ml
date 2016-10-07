@@ -365,15 +365,9 @@ let rec print_proof_node s (fmt: Format.formatter) p =
     | Some pn -> pn = p
     | _ -> false
   in
-  (* TODO proved or not to be done on the whole tree. Just a test *)
-  let is_proved () =
-    match is_goal_cursor () with
-    | Some p -> Controller_itp.find_pn cont p
-    | _ -> false
-  in
   if current_goal then
     fprintf fmt "**";
-  if is_proved () then
+  if Controller_itp.pn_proved cont p then
     fprintf fmt "P";
 
   fprintf fmt
@@ -391,10 +385,14 @@ and print_trans_node s fmt id =
   let args = get_transf_args s id in
   let l = get_sub_tasks s id in
   let parent = (get_proof_name s (get_trans_parent s id)).Ident.id_string in
+  if Controller_itp.tn_proved cont id then
+    fprintf fmt "P";
   fprintf fmt "@[<hv 2> Trans %s; args %a; parent %s;@ [%a]@]" name (Pp.print_list Pp.semi pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
 let print_theory s fmt th : unit =
+  if Controller_itp.th_proved cont (theory_name th) then
+    fprintf fmt "P";
   fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" (theory_name th).Ident.id_string
     (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) (theory_goals th)
 
@@ -638,12 +636,15 @@ let interp chout fmt s =
        close_out chout;
        exit 0
     | _ ->
-       try
-         let f = Stdlib.Hstr.find commands_table cmd in
-         f fmt args
-       with Not_found ->
-         printf "unknown command '%s'@." cmd
-
+      let f =
+        try
+          Some (Stdlib.Hstr.find commands_table cmd)
+        with Not_found ->
+          None
+      in
+      match f with
+      | Some f -> f fmt args
+      | None -> printf "unknown command '%s'@." cmd
 
 let () =
   printf "Welcome to Why3 shell. Type '?' for help.@.";

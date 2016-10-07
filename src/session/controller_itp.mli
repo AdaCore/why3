@@ -78,8 +78,10 @@ val update_proof_node: controller -> Session_itp.proofNodeID -> bool -> unit
    according to the result (id,b) *)
 val update_trans_node: controller -> Session_itp.transID -> bool -> unit
 
-(** Used to find if a proof node is proved or not TODO remove *)
-val find_pn: controller -> Session_itp.proofNodeID -> bool
+(** Used to find if a proof/trans node or theory is proved or not *)
+val tn_proved: controller -> Session_itp.transID -> bool
+val pn_proved: controller -> Session_itp.proofNodeID -> bool
+val th_proved: controller -> Ident.ident -> bool
 
 module Make(S : Scheduler) : sig
 

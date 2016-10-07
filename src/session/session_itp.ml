@@ -84,16 +84,12 @@ type session = {
   session_prover_ids            : int Hprover.t;
 }
 
-(*
 (* TODO replace *)
 let init_Hpn (s : session) (h: 'a Hpn.t) (d: 'a) : unit =
   Hint.iter (fun k _pn -> Hpn.replace h k d) s.proofNode_table
 
 let init_Htn (s : session) (h: 'a Htn.t) (d: 'a) : unit =
   Hint.iter (fun k _pn -> Htn.replace h k d) s.trans_table
-*)
-
-
 
 let session_iter_proofNode f s =
   Hint.iter

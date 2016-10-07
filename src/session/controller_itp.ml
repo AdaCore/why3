@@ -41,7 +41,7 @@ type proof_state = {
     pn_state : bool Hpn.t;
   }
 
-let init_proof_state () =
+let init_proof_state ses =
   {th_state = Hid.create 7;
    tn_state = Htn.create 42;
    pn_state = Hpn.create 42}
@@ -55,18 +55,14 @@ type controller =
 
 let create_controller env s = {
     controller_session = s;
-    proof_state = init_proof_state ();
+    proof_state = init_proof_state s;
     controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
 }
 
-let find_tn c tid =
-  try Htn.find c.proof_state.tn_state tid with
-  | Not_found -> false
-
-let find_pn c id =
-  try Hpn.find c.proof_state.pn_state id with
-  | Not_found -> false
+let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid
+let pn_proved c pid = Hpn.find_def c.proof_state.pn_state false pid
+let th_proved c th  = Hid.find_def c.proof_state.th_state false th
 
 (* Update the result of the theory according to its children *)
 let update_theory th ps =
@@ -76,8 +72,8 @@ let update_theory th ps =
 
 let rec propagate_proof c (id: Session_itp.proofNodeID) =
   let tr_list = get_transformations c.controller_session id in
-  let new_state = List.exists (fun id -> find_tn c id) tr_list in
-  if new_state != find_pn c id then
+  let new_state = List.exists (fun id -> tn_proved c id) tr_list in
+  if new_state != pn_proved c id then
     begin
       Hpn.replace c.proof_state.pn_state id new_state;
       update_proof c id
@@ -85,8 +81,8 @@ let rec propagate_proof c (id: Session_itp.proofNodeID) =
 
 and propagate_trans c (tid: Session_itp.transID) =
   let proof_list = get_sub_tasks c.controller_session tid in
-  let cur_state = find_tn c tid in
-  let new_state = List.for_all (fun id -> find_pn c id) proof_list in
+  let cur_state = tn_proved c tid in
+  let new_state = List.for_all (fun id -> pn_proved c id) proof_list in
   if cur_state != new_state then
     begin
       Htn.replace c.proof_state.tn_state tid new_state;
@@ -208,7 +204,7 @@ let schedule_proof_attempt_r c id pr ~limit ~callback =
 
 let schedule_proof_attempt c id pr ~limit ~callback =
   let callback s = (match s with
-  | Done pr -> update_proof_node c id true
+  | Done pr -> update_proof_node c id (pr.Call_provers.pr_answer == Call_provers.Valid)
   | Interrupted | InternalFailure _ -> update_proof_node c id false
   | _ -> ());
   callback s

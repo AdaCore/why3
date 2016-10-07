@@ -22,6 +22,8 @@ type transID
 module Hpn: Exthtbl.S with type key = proofNodeID
 module Htn: Exthtbl.S with type key = transID
 
+val init_Hpn: session ->'a Hpn.t -> 'a -> unit
+val init_Htn: session ->'a Htn.t -> 'a -> unit
 
 type theory
 
@@ -35,8 +37,6 @@ type file = private {
 }
 
 val get_files : session -> file Stdlib.Hstr.t
-
-
 
 (** {2 Proof trees}
 
