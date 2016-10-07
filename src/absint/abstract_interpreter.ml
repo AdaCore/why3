@@ -124,14 +124,6 @@ module Abstract_interpreter(E: sig
 
   (* Initialize an hedge *)
 
-  let vs_to_var vs =
-    ignore (Format.flush_str_formatter ());
-    Pretty.print_vs Format.str_formatter vs;
-    Var.of_string (Format.flush_str_formatter ())
-
-  let pv_to_var psym =
-    vs_to_var Ity.(psym.pv_vs)
-
   let ensure_variable cfg v t =
     if not (Environment.mem_var cfg.env v) then
       begin
@@ -152,13 +144,6 @@ module Abstract_interpreter(E: sig
     let open Ident in
     ensure_variable cfg var_return (Term.t_var (Term.create_vsymbol {pre_name = "result"; pre_label = Expr.(Ident.(rs.rs_name.id_label)); pre_loc = None } Ty.ty_int));
     cfg
-
-  let add_variable cfg psym =
-    if Ity.(ity_equal ity_int psym.pv_ity) then
-      begin
-        let var = pv_to_var psym in
-        ensure_variable cfg var (Term.t_var Ity.(psym.pv_vs));
-      end
 
   (* Adds a new node to the cfg, associated to expr (which is only useful for
    * debugging purpose ATM) *)
@@ -253,26 +238,35 @@ module Abstract_interpreter(E: sig
     Format.eprintf "@."
             
           
-  let create_vreturn vsym = Term.create_vsymbol Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; } vsym.vs_ty
+  let create_vreturn ty = Term.create_vsymbol Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; } ty
 
-  let get_subvalues a =
+  let get_subvalues a ity =
     let open Ty in
     let myty = t_type a in
     match myty.ty_node with
     | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
-      [a]
+      [a, None]
     | Tyapp(tys, vars) -> 
       begin
         let vars = Ty.ts_match_args tys vars in
         match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
         | Decl.Ddata([_, [ls, ls_projs]]) ->
-          List.map (function
+          let l = List.map (function
               | Some s ->  Some s,
                            (match s.ls_value with
                             | Some t -> Ty.ty_inst vars t
                             | None -> assert false)
               | None -> assert false) ls_projs
           |> List.mapi (access_field a)
+          in
+          begin
+          match ity with
+          | None -> List.map (fun a -> a, None) l
+          | Some its ->
+            let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
+            List.map (fun a -> Some a) pdecl
+            |> List.combine l
+          end
         | _->
           warning_t "Recursive types or multiple constructors is not supported in abstract interpretation."
             a;
@@ -317,7 +311,8 @@ module Abstract_interpreter(E: sig
         let var =
           match !return_var with
           | Some s when Term.vs_equal a s -> var_return
-          | _ -> vs_to_var a
+          | _ -> Mterm.find t !local_ty.local_vars
+
         in
         ([(var, coeff)], 0)
       | Tconst(Number.ConstInt(n)) ->
@@ -365,7 +360,7 @@ module Abstract_interpreter(E: sig
              let d1 = fa d in
              let d2 = fb d in
              Abstract1.join manpk d1 d2)
-        | Tapp(func, [a; b]) when Ty.ty_equal (t_type a) Ty.ty_int
+        | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int || Ty.ty_equal (t_type a) Ty.ty_bool)
           && 
           (ls_equal ps_equ func ||
            ls_equal lt_int func ||
@@ -406,30 +401,13 @@ module Abstract_interpreter(E: sig
         | Tapp(func, [a;b]) when ls_equal ps_equ func ->
           begin
             let open Ty in
-            (* the only case handled ATM is types with a single constructor *)
-            match (Term.t_type a).ty_node with
-            | Tyapp(tys, vars) -> 
-              begin
-                let vars = Ty.ts_match_args tys vars in
-                match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-                | Decl.Ddata([_, [ls, ls_projs]]) ->
-                  List.map (function
-                      | Some s ->  Some s,
-                                   (match s.ls_value with
-                                    | Some t -> Ty.ty_inst vars t
-                                    | None -> assert false)
-                      | None -> assert false) ls_projs
-                  |> List.mapi (access_fields a b)
-                  |> List.fold_left (fun f (a, b) ->
-                      let g = aux (t_app ps_equ [a; b] None) in
-                      (fun abs ->
-                         f (g (abs)))) (fun abs -> abs)
-                | _->
-                  Format.eprintf "type equality not fully recognized: ";
-                  Pretty.print_term Format.err_formatter t;
-                  Format.eprintf "@."; fun abs -> abs
-              end
-            | Tyvar(_) -> raise (Not_handled t)
+            let subv_a = get_subvalues a None in
+            let subv_b = get_subvalues b None in
+            List.combine subv_a subv_b 
+            |> List.fold_left (fun f ((a, _), (b, _)) ->
+                let g = aux (t_app ps_equ [a; b] None) in
+                (fun abs ->
+                   f (g (abs)))) (fun abs -> abs)
           end
         | Tif(a, b, c) ->
           let fa = aux a in
@@ -460,11 +438,11 @@ module Abstract_interpreter(E: sig
         (* Always use the same variable when returning a value, 
          * otherwise variables keep being created and the previous ones (with the
          * good constraints) can not be accessed *)
-        let return_term = create_vreturn return in
+        let return_term = create_vreturn (return.vs_ty) in
         let return_term = t_var return_term in
-        let subvalues = get_subvalues return_term in
+        let subvalues = get_subvalues return_term None in
         let l =
-          List.fold_left (fun local_ty a ->
+          List.fold_left (fun local_ty (a, _) ->
 
               ignore (Format.flush_str_formatter ());
               let v = Pretty.print_term Format.str_formatter a
@@ -525,41 +503,29 @@ module Abstract_interpreter(E: sig
             Ity.print_reg_name Format.str_formatter reg
             |> Format.flush_str_formatter
           in
-          let vars = Ty.ts_match_args tys vars in
+          let vret = create_vreturn (t_type logical_term) in
+          let vret = t_var vret in
+          let subv = get_subvalues vret (Some reg.reg_its) in
           let local_ty, proj_list =
-            match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node
-            with
-            | Decl.Ddata([_, [ls, ls_projs]]) ->
-              let pfields = 
-                Pdecl.((find_its_defn known_pdecl reg.reg_its).itd_fields) in
-              List.map (function
-                  | Some s ->  Some s,
-                               (match s.ls_value with
-                                | Some t -> Ty.ty_inst vars t
-                                | None -> assert false)
-                  | None -> assert false) ls_projs
-              |> List.mapi (access_field logical_term)
-              |> List.combine ls_projs
-              |> List.combine pfields
-              |> List.fold_left (fun (local_ty, acc) (pfield, (Some l, a)) ->
+            List.fold_left (fun (local_ty, acc) (a, pfield) ->
+                let pfield = match pfield with
+                  | Some s -> s
+                  | None -> assert false
+                in
 
-                  ignore (Format.flush_str_formatter ());
-                  let v = Pretty.print_ls Format.str_formatter l
-                          |> Format.flush_str_formatter
-                          |> Format.sprintf "%s.%s" reg_name
-                          |> Var.of_string
-                  in
-                  ensure_variable cfg v a;
-                  let accessor = match pfield.rs_field with
-                    | Some s -> s
-                    | None -> assert false
-                  in
-                  { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }, (accessor, a) :: acc
-                ) (local_ty, [])
-            | _->
-              Format.eprintf "type equality not fully recognized: ";
-              Pretty.print_term Format.err_formatter logical_term;
-              Format.eprintf "@."; local_ty, []
+                ignore (Format.flush_str_formatter ());
+                let v = Pretty.print_term Format.str_formatter a
+                        |> Format.flush_str_formatter
+                        |> Format.sprintf "%s.%s" reg_name
+                        |> Var.of_string
+                in
+                ensure_variable cfg v a;
+                let accessor = match pfield.rs_field with
+                  | Some s -> s
+                  | None -> assert false
+                in
+                { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }, (accessor, a) :: acc
+              ) (local_ty, []) subv
           in
           { local_ty with region_ident = Ity.Mreg.add reg proj_list local_ty.region_ident }
         end
@@ -571,6 +537,10 @@ module Abstract_interpreter(E: sig
         Format.eprintf "@.";
         raise (Not_handled logical_term)
     in local_ty
+
+  let add_variable cfg local_ty pv =
+    add_typed_variable cfg local_ty pv Ity.(pv.pv_ity)
+
 
 
   (* Adds expr to the cfg. local_ty is the types of the locally defined variable
@@ -611,8 +581,7 @@ module Abstract_interpreter(E: sig
           begin
           let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
 
-          let vreturn = Term.create_vsymbol Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; }
-              ty in
+          let vreturn = create_vreturn ty in
           let postcondition = Term.( t_eps_close vreturn (
               t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
 
@@ -638,31 +607,50 @@ module Abstract_interpreter(E: sig
         );
       let end_cp = new_node_cfg cfg expr in
       (* erase a *)
+      let var_term = match Expr.term_of_expr ~prop:false (Expr.e_var psym) with
+        | Some s -> s
+        | None -> assert false
+      in
+      let vars_to_forget =
+        get_subvalues var_term None
+        |> List.map (fun (a, _) -> Term.Mterm.find a local_ty.local_vars)
+        |> Array.of_list
+      in
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
           match Ity.(variable_type.ity_node) with
           | _ when Ity.(ity_equal variable_type ity_int) ->
-            Abstract1.forget_array man abs [|pv_to_var psym|] false
+            Abstract1.forget_array man abs vars_to_forget false
           | _ -> abs
         );
 
 
       let_begin_cp, end_cp, let_exn @ b_exn
     | Evar(psym) ->
-      if Ity.(ity_equal psym.pv_ity ity_int) then
-        begin
-          let begin_cp = new_node_cfg cfg expr in
-          let end_cp = new_node_cfg cfg expr in
-          new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
-              let expr = Linexpr1.make cfg.env in
-              let p = pv_to_var psym in
-              Linexpr1.set_list expr [(one, p)] (Some(zero));
-              Abstract1.assign_linexpr man abs var_return expr None
-            );
-          begin_cp, end_cp, []
-        end
-      else
-        let i = new_node_cfg cfg expr in
-        i, i, []
+      let constraints, _ =
+        if not Ity.(ity_equal  psym.pv_ity ity_unit) then
+          begin
+          let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
+
+          let vreturn = create_vreturn ty in
+          let postcondition = Term.( t_eps_close vreturn (
+              t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
+
+          Format.eprintf "--> Postcondition for let: ";
+          Pretty.print_term Format.err_formatter postcondition;
+          Format.eprintf "@.";
+          (linear_expressions_from_term cfg local_ty) postcondition
+          end
+        else
+          let () = Format.eprintf "no Postocndition:@." in
+          (fun abs -> abs), []
+      in
+
+      let begin_cp = new_node_cfg cfg expr in
+      let end_cp = new_node_cfg cfg expr in
+      new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+          constraints abs
+        );
+      begin_cp, end_cp, []
     | Econst(Number.ConstInt(n)) ->
       let coeff =
         Number.compute_int n
@@ -764,22 +752,27 @@ module Abstract_interpreter(E: sig
           List.filter (fun (cp, exc_sym_) ->
               if Ity.xs_equal exc_sym exc_sym_ then
                 begin
+                  let constraints, _ =
+                    match l with
+                    | [t] ->
+                      let psym = t in
+                      if not Ity.(ity_equal psym.pv_ity ity_unit) then
+                        begin
+                          let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
+
+                          let vreturn = create_vreturn ty in
+                          let postcondition = Term.( t_eps_close vreturn (
+                              t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
+                          (linear_expressions_from_term cfg local_ty) postcondition
+                        end
+                      else
+                        (fun abs -> abs), []
+                    | _ -> (fun abs -> abs), []
+                  in
                   new_hedge_cfg cfg (cp, cp_begin) (fun man abs ->
-                      match l with
-                      | [t] ->
-                        if Ity.(ity_equal t.pv_ity ity_int) then
-                          begin
-                            let old_arg = var_return in
-                            let new_arg = pv_to_var t in
-                            let expr = Linexpr1.make cfg.env in
-                            Linexpr1.set_list expr [(one, old_arg)] (Some(zero));
-                            let abs = Abstract1.assign_linexpr man abs new_arg expr None in
-                            Abstract1.forget_array man abs [|old_arg|] false
-                          end
-                        else abs
-                      | _ -> abs
+                      constraints abs
                     );
-                false
+                  false
                 end
               else
                 true

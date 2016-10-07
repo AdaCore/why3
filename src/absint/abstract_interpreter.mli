@@ -17,6 +17,7 @@ module Abstract_interpreter(S:sig
 
   val domain_to_term: cfg -> domain -> Term.term
 
-  val add_variable: cfg -> Ity.pvsymbol -> unit
+  val add_variable: cfg -> local_ty -> Ity.pvsymbol -> local_ty
+
 
 end

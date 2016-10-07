@@ -131,11 +131,12 @@ let do_input f =
                         let pmod = m
                       end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
-                    List.iter (Abstract_interpreter.add_variable cfg)
-                      Ity.(cexp.c_cty.cty_args);
+                    let local_ty = Abstract_interpreter.empty_local_ty  in
+                    let local_ty = List.fold_left (Abstract_interpreter.add_variable cfg) local_ty
+                      Ity.(cexp.c_cty.cty_args) in
                     Expr.print_expr Format.err_formatter e;
                     Format.eprintf "@.";
-                    ignore (Abstract_interpreter.put_expr_in_cfg cfg Abstract_interpreter.empty_local_ty e);
+                    ignore (Abstract_interpreter.put_expr_in_cfg cfg local_ty e);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
                     let open Expr in
                     let copying_informations = Hashtbl.create 100 in
