@@ -157,24 +157,31 @@ let number_format = {
     Number.def_real_support = Number.Number_unsupported;
   }
 
-let constant_value t =
+let rec constant_value defs t =
   match t.t_node with
-    | Tconst c ->
-        fprintf str_formatter "%a" (Number.print number_format) c;
-        flush_str_formatter ()
-    | Tapp(ls, [{ t_node = Tconst c}])
-        when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-        fprintf str_formatter "-%a" (Number.print number_format) c;
-        flush_str_formatter ()
-    | _ -> raise Not_found
+  | Tconst c ->
+      fprintf str_formatter "%a" (Number.print number_format) c;
+      flush_str_formatter ()
+  | Tapp (ls, [{ t_node = Tconst c}])
+      when ls_equal ls !int_minus || ls_equal ls !real_minus ->
+      fprintf str_formatter "-%a" (Number.print number_format) c;
+      flush_str_formatter ()
+  | Tapp (ls, []) ->
+    begin
+      match Hid.find defs ls.ls_name with
+      | Some c -> constant_value defs c
+      | None -> raise Not_found
+    end
+  | _ -> raise Not_found
 
 (* terms *)
 
-let rec print_term info fmt t =
-  let term = print_term info in
+let rec print_term info defs fmt t =
+  let term = print_term info defs in
+  try fprintf fmt "%s" (constant_value defs t)
+  with Not_found ->
   match t.t_node with
-  | Tconst c ->
-      fprintf fmt "%a" (Number.print number_format) c
+  | Tconst _ -> assert false
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp ( { ls_name = id } ,[] ) ->
@@ -213,9 +220,9 @@ let rel_error_pat =
         PatApp (["real"], "Abs", ["abs"], [
           PatHole 1])])])
 
-let rec print_fmla info fmt f =
-  let term = print_term info in
-  let fmla = print_fmla info in
+let rec print_fmla info defs fmt f =
+  let term = print_term info defs in
+  let fmla = print_fmla info defs in
   match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
     begin match query_syntax info.info_syn id with
@@ -227,11 +234,11 @@ let rec print_fmla info fmt f =
          the following is OK only for real of integer
       *)
       begin try
-        let c1 = constant_value t1 in
+        let c1 = constant_value defs t1 in
         fprintf fmt "%a in [%s,%s]" term t2 c1 c1
       with Not_found ->
         try
-          let c2 = constant_value t2 in
+          let c2 = constant_value defs t2 in
           fprintf fmt "%a in [%s,%s]" term t1 c2 c2
         with Not_found ->
           fprintf fmt "%a - %a in [0,0]" term t1 term t2
@@ -242,14 +249,14 @@ let rec print_fmla info fmt f =
       in
       begin try
         let t = pat_match info.info_env 3 rel_error_pat f in
-        let c = constant_value t.(2) in
+        let c = constant_value defs t.(2) in
         fprintf fmt "|%a -/ %a| <= %s" term t.(0) term t.(1) c
       with Not_found -> try
-        let c1 = constant_value t1 in
+        let c1 = constant_value defs t1 in
         fprintf fmt "%s%a %s %s" s term t2 rev_op c1
       with Not_found ->
         try
-          let c2 = constant_value t2 in
+          let c2 = constant_value defs t2 in
           fprintf fmt "%s%a %s %s" s term t1 op c2
         with Not_found ->
           fprintf fmt "%s%a - %a %s 0" s term t1 term t2 op
@@ -264,16 +271,6 @@ let rec print_fmla info fmt f =
   | Tquant (_q, _fq) ->
       unsupportedTerm f
         "gappa: quantifiers are not supported"
-(*
-      let q = match q with Tforall -> "forall" | Texists -> "exists" in
-      let vl, tl, f = t_open_quant fq in
-      let forall fmt v =
-        fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
-      in
-      fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
-        (print_triggers info) tl (print_fmla info) f;
-      List.iter forget_var vl
-*)
   | Tbinop (Tand, f1, f2) ->
       fprintf fmt "(%a /\\@ %a)" fmla f1 fmla f2
   | Tbinop (Tor, f1, f2) ->
@@ -297,108 +294,111 @@ let rec print_fmla info fmt f =
       "gappa: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-let print_fmla info truths fmt f =
-  let rec simpl f =
-    match f.t_node with
-    | Tapp (ls, []) when Sls.mem ls truths -> t_true
-    | _ -> t_map_simp simpl f in
-  print_fmla info fmt (simpl f)
+let rec simpl_fmla truths f =
+  match f.t_node with
+  | Tapp (ls, []) ->
+    begin
+      try if Hid.find truths ls.ls_name then t_true else t_false
+      with Not_found -> f
+    end
+  | Tbinop _ | Tnot _ -> t_map_simp (simpl_fmla truths) f
+  | _ -> f
 
-(*
-let print_decl (* ?old *) info fmt d =
-  match d.d_node with
-  | Dtype _ -> ()
-(*
-unsupportedDecl d
-      "gappa : type declarations are not supported"
-*)
-  | Dlogic _ -> ()
-(*
-unsupportedDecl d
-      "gappa : logic declarations are not supported"
-*)
-  | Dind _ -> unsupportedDecl d
-      "gappa: inductive definitions are not supported"
-  | Dprop (Paxiom, pr, f) ->
-      fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
-      fprintf fmt "@[<hv 2>%a ->@]@\n" (print_fmla info) f
-  | Dprop (Pgoal, pr, f) ->
-      fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
-(*
-      fprintf fmt "@[<hv 2>{ %a@ }@]@\n" (print_fmla info) f
-*)
-      fprintf fmt "@[<hv 2>%a@]@\n" (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) ->
-      unsupportedDecl d
-        "gappa: lemmas are not supported"
-*)
-
-(*
-let print_decl ?old:_ info fmt =
-  catch_unsupportedDecl (print_decl (* ?old *) info fmt)
-
-let print_decls ?old info fmt dl =
-  fprintf fmt "@[<hov>{ %a }@\n@]" (print_list nothing (print_decl ?old info)) dl
-*)
 
 exception AlreadyDefined
+exception Contradiction
 
-let rec filter_hyp info defs eqs hyps truths pr f =
+let split_hyp truths pr acc f =
+  let rec split acc pos f =
+    match f.t_node with
+    | Tbinop (Tand, f1, f2) when pos ->
+        split (split acc true f1) true f2
+    | Tbinop (Tor, f1, f2) when not pos ->
+        split (split acc false f1) false f2
+    | Tbinop (Timplies, f1, f2) when not pos ->
+        split (split acc true f1) false f2
+    | Tapp (ls,[]) ->
+        let () =
+          try if Hid.find truths ls.ls_name <> pos then raise Contradiction
+          with Not_found -> Hid.add truths ls.ls_name pos in
+        acc
+    | Ttrue -> if pos then acc else raise Contradiction
+    | Tfalse -> if pos then raise Contradiction else acc
+    | Tnot f -> split acc (not pos) f
+    | _ -> if pos then (pr,f)::acc else (pr, t_not f)::acc in
+  split acc true f
+
+let prepare truths acc d =
+  match d.d_node with
+  | Dtype _ | Ddata _ -> acc
+  | Dparam _ | Dlogic _ -> acc
+  | Dind _ ->
+      unsupportedDecl d
+        "please remove inductive definitions before calling gappa printer"
+  | Dprop (Paxiom, pr, f) ->
+      split_hyp truths pr acc (simpl_fmla truths f)
+  | Dprop (Pgoal, pr, f) ->
+      split_hyp truths pr acc (simpl_fmla truths (t_not f))
+  | Dprop ((Plemma|Pskip), _, _) ->
+      unsupportedDecl d "gappa: lemmas are not supported"
+
+let get_constant defs t =
+  let rec follow neg_ls t =
+    match t.t_node with
+    | Tconst _ ->
+      begin
+        match neg_ls with
+        | Some ls -> Some (t_app_infer ls [t])
+        | None -> Some t
+      end
+    | Tapp (ls, [t])
+        when ls_equal ls !int_minus || ls_equal ls !real_minus ->
+        follow (match neg_ls with None -> Some ls | Some _ -> None) t
+    | Tapp (ls, []) ->
+      begin
+        match Hid.find defs ls.ls_name with
+        | Some t -> follow neg_ls t
+        | None -> None
+        | exception Not_found -> None
+      end
+    | _ -> None in
+  follow None t
+
+let filter_hyp defs (eqs, hyps) ((pr, f) as hyp) =
   match f.t_node with
   | Tapp(ls,[t1;t2]) when ls_equal ls ps_equ ->
+    begin
       let try_equality t1 t2 =
-        match t1.t_node with
-          | Tapp(l,[]) ->
-              if Hid.mem defs l.ls_name then raise AlreadyDefined;
-              if t_s_any (fun _ -> false) (fun ls -> ls_equal ls l) t2
-              then raise AlreadyDefined;
-              Hid.add defs l.ls_name ();
-              t_s_fold (fun _ _ -> ())
-                (fun _ ls -> Hid.replace defs ls.ls_name ()) () t2;
-              ((pr,t1,t2)::eqs, hyps, truths)
+        let l =
+          match t1.t_node with
+          | Tapp (l,[]) -> l
           | _ -> raise AlreadyDefined in
-      begin try
+        if Hid.mem defs l.ls_name then raise AlreadyDefined;
+        if t_s_any (fun _ -> false) (fun ls -> ls_equal ls l) t2
+        then raise AlreadyDefined;
+        let c = get_constant defs t2 in
+        Hid.add defs l.ls_name c;
+        match c with
+        | Some _ -> (eqs, hyps)
+        | None ->
+           t_s_fold (fun _ _ -> ())
+             (fun _ ls ->
+              if not (Hid.mem defs ls.ls_name) then Hid.add defs ls.ls_name None)
+             () t2;
+           ((pr,t1,t2)::eqs, hyps) in
+      try
         try_equality t1 t2
       with AlreadyDefined -> try
         try_equality t2 t1
       with AlreadyDefined ->
-        (eqs, (pr,f)::hyps, truths)
-      end
-  | Tbinop (Tand, f1, f2) ->
-      let (eqs,hyps,truths) = filter_hyp info defs eqs hyps truths pr f2 in
-      filter_hyp info defs eqs hyps truths pr f1
-  | Tapp(ls,[]) -> (eqs, hyps, Sls.add ls truths)
-  | Ttrue -> (eqs, hyps, truths)
-  | _ -> (eqs, (pr,f)::hyps, truths)
+        (eqs, hyp::hyps)
+    end
+  | _ -> (eqs, hyp::hyps)
 
-let prepare info defs ((eqs,hyps,truths,goal) as acc) d =
-  match d.d_node with
-    | Dtype _ | Ddata _ -> acc
-    | Dparam _ | Dlogic _ -> acc
-    | Dind _ ->
-        unsupportedDecl d
-          "please remove inductive definitions before calling gappa printer"
-    | Dprop (Paxiom, pr, f) ->
-        let (eqs,hyps,truths) = filter_hyp info defs eqs hyps truths pr f in
-        (eqs,hyps,truths,goal)
-    | Dprop (Pgoal, pr, f) ->
-        begin
-          match goal with
-            | None -> (eqs, hyps, truths, Some (pr, f))
-            | _ -> assert false
-        end
-    | Dprop ((Plemma|Pskip), _, _) ->
-        unsupportedDecl d
-          "gappa: lemmas are not supported"
-
-let find_used_equations eqs hyps goal =
+let find_used_equations eqs hyps =
   let used = Hid.create 17 in
   let mark_used f =
     t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace used ls.ls_name ()) () f in
-  begin match goal with
-  | Some (_,f) -> mark_used f;
-  | _ -> ()
-  end;
   List.iter (fun (_,f) -> mark_used f) hyps;
   List.fold_left (fun acc ((_, v, t) as eq) ->
     let v = match v.t_node with Tapp (l,[]) -> l.ls_name | _ -> assert false in
@@ -408,73 +408,73 @@ let find_used_equations eqs hyps goal =
     end else acc
   ) [] eqs
 
-let rec find_bools ((bools, known) as acc) f =
+let rec find_used_bools known acc f =
   match f.t_node with
   | Tapp(ls,[]) ->
-      if Sls.mem ls known then acc
-      else (ls :: bools, Sls.add ls known)
+      if Hid.mem known ls.ls_name then acc
+      else (Hid.add known ls.ls_name (); ls.ls_name :: acc)
   | Tbinop (_, f1, f2) ->
-      find_bools (find_bools acc f2) f1
+      find_used_bools known (find_used_bools known acc f2) f1
+  | Tnot f ->
+      find_used_bools known acc f
   | _ -> acc
 
-let print_equation info fmt (pr,t1,t2) =
+let print_equation info defs fmt (pr,t1,t2) =
   fprintf fmt "# equation '%a'@\n" print_ident pr.pr_name;
-  fprintf fmt "%a = %a ;@\n" (print_term info) t1 (print_term info) t2
+  fprintf fmt "%a = %a ;@\n" (print_term info defs) t1 (print_term info defs) t2
 
 let print_bool fmt ls =
   fprintf fmt "(%a in [0,0] \\/ %a in [1,1]) ->@\n"
-          print_ident ls.ls_name print_ident ls.ls_name
+          print_ident ls print_ident ls
 
 let print_bool2 fmt ls =
-  fprintf fmt "%a in (0.5)" print_ident ls.ls_name
+  fprintf fmt "%a in (0.5)" print_ident ls
 
-let print_hyp info truths fmt (pr,f) =
+let print_hyp info defs fmt (pr,f) =
   fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
-  fprintf fmt "%a ->@\n" (print_fmla info truths) f
-
-let print_goal info truths fmt g =
-  match g with
-    | Some (pr,f) ->
-        fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
-        fprintf fmt "%a@\n" (print_fmla info truths) f
-    | None ->
-        fprintf fmt "# (no goal at all ??)@\n";
-        fprintf fmt "1 in [0,0]@\n"
+  fprintf fmt "%a ->@\n" (print_fmla info defs) f
 
 let print_task args ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info args.env task in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
-  let equations,hyps,truths,goal =
-    List.fold_left (prepare info (Hid.create 17))
-                   ([],[],Sls.empty,None) (Task.task_decls task)
-  in
-  List.iter (print_equation info fmt) (find_used_equations equations hyps goal);
-  let (bools, _) =
-    let gbools =
-      match goal with
-      | Some (_,f) -> find_bools ([], truths) f
-      | None -> ([], truths) in
-    List.fold_left (fun acc (_,f) -> find_bools acc f) gbools hyps in
-  fprintf fmt "@[<v 2>{ %a%a%a}@]@\n%a"
-    (print_list nothing print_bool) bools
-    (print_list nothing (print_hyp info truths)) (List.rev hyps)
-    (print_goal info truths) goal
-    (print_list_delim
-       ~start:(fun fmt () -> fprintf fmt "$ ")
-       ~stop:(fun fmt () -> fprintf fmt ";@\n")
-       ~sep:comma print_bool2) (List.rev bools)
-(*
-  print_decls ?old info fmt (Task.task_decls task)
-*)
+  try
+    (* get hypotheses and simplify them *)
+    let hyps =
+      let truths = Hid.create 17 in
+      let rec iter old_nb hyps =
+        let hyps =
+          List.fold_left
+            (fun acc (pr,f) -> split_hyp truths pr acc (simpl_fmla truths f))
+            [] hyps in
+        let hyps = List.rev hyps in
+        let nb = Hid.length truths in
+        if nb > old_nb then iter nb hyps
+        else hyps in
+      let hyps = List.fold_left (prepare truths) [] (Task.task_decls task) in
+      iter (Hid.length truths) (List.rev hyps) in
+    (* extract equations and keep the needed ones *)
+    let defs = Hid.create 17 in
+    let (eqs, hyps) = List.fold_left (filter_hyp defs) ([],[]) hyps in
+    let hyps = List.rev hyps in
+    let eqs = find_used_equations eqs hyps in
+    (* find needed booleans *)
+    let bools =
+      let bools = Hid.create 17 in
+      List.fold_left (fun acc (_,f) -> find_used_bools bools acc f) [] hyps in
+    (* print equalities *)
+    List.iter (print_equation info defs fmt) eqs;
+    (* print formula *)
+    fprintf fmt "@[<v 2>{ %a%a1 in [0,0] }@]@\n%a"
+      (print_list nothing print_bool) bools
+      (print_list nothing (print_hyp info defs)) hyps
+      (print_list_delim
+         ~start:(fun fmt () -> fprintf fmt "$ ")
+         ~stop:(fun fmt () -> fprintf fmt ";@\n")
+         ~sep:comma print_bool2) bools
+  with Contradiction -> fprintf fmt "{ 0 in [0,0] }@\n"
 
 let () = register_printer "gappa" print_task
   ~desc:"Printer@ for@ the@ Gappa@ theorem@ prover@ specialized@ in@ \
          floating@ point@ reasoning."
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
