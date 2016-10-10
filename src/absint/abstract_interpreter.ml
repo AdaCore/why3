@@ -12,10 +12,6 @@ type env = {
 
 exception Recursive_logical_definition
 
-let hc = Hashtbl.create 100
-
-let get_proj = Hashtbl.find hc
-
 let find_global_definition kn rs =
   let open Term in
   match (Ident.Mid.find rs.ls_name kn).Decl.d_node with
@@ -228,60 +224,101 @@ module Abstract_interpreter(E: sig
 
   open Term
 
-  let access_field a i (proj, t) =
-    match proj with
-    | None -> Format.eprintf "complex field access@."; raise Not_found
-    | Some s ->
+  let access_field constr constr_args a i (proj, t) =
       match a.t_node with
       | Tapp(func, args) when func.ls_constr = 1 ->
         List.nth args i
       | Tvar(_) | _ ->
-        t_app s [a] (Some t)
-
-  let access_fields a b i (proj, t) =
-    access_field a i (proj, t), access_field b i (proj, t)
+        match proj with
+        | None ->
+          let return = create_vsymbol ident_ret t in
+          let pat = List.mapi (fun k t ->
+              if k = i then
+                pat_var return
+              else
+                pat_wild t
+            ) constr_args in
+          t_case a [t_close_branch (pat_app constr pat (t_type a)) (t_var return)]
+        | Some s ->
+          t_app s [a] (Some t)
 
   let warning_t s t =
     Format.eprintf "-- warning: %s -- triggered by " s;
     Pretty.print_term Format.err_formatter t;
+    Format.eprintf " of type ";
+    Pretty.print_ty Format.err_formatter (Term.t_type t);
     Format.eprintf "@."
             
           
   let get_subvalues a ity =
     let open Ty in
     let myty = t_type a in
-    match myty.ty_node with
-    | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
-      [a, None]
-    | Tyapp(tys, vars) -> 
-      begin
-        let vars = Ty.ts_match_args tys vars in
-        match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-        | Decl.Ddata([_, [ls, ls_projs]]) ->
-          let l = List.map (function
-              | Some s ->  Some s,
-                           (match s.ls_value with
-                            | Some t -> Ty.ty_inst vars t
-                            | None -> assert false)
-              | None -> assert false) ls_projs
-          |> List.mapi (access_field a)
-          in
-          begin
-          match ity with
-          | None -> List.map (fun a -> a, None) l
-          | Some its ->
-            let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
-            List.map (fun a -> Some a) pdecl
-            |> List.combine l
-          end
-        | _->
-          warning_t "Recursive types or multiple constructors is not supported in abstract interpretation."
-            a;
-          []
-      end
-    | Tyvar(_) ->
-      warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
-      []
+    let rec aux ty ity =
+      match myty.ty_node with
+      | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
+        [a, None]
+      | Tyapp(tys, vars) -> 
+        begin
+          let vars = Ty.ts_match_args tys vars in
+          match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
+          | Decl.Ddata([_, [ls, ls_projs]]) ->
+            let l =
+              let my_ls_args = List.map (fun i -> Ty.ty_inst vars i) ls.ls_args in
+              List.combine my_ls_args ls_projs
+              |> List.map (fun (arg_type, proj) ->
+                  match proj with
+                  | Some s ->  Some s,
+                               (match s.ls_value with
+                                | Some t ->
+                                  let l = Ty.ty_inst vars t in
+                                  assert (Ty.ty_equal l arg_type);
+                                  l
+                                | None -> assert false)
+                  | None -> None, arg_type)
+              |> List.mapi (access_field ls my_ls_args a)
+            in
+            begin
+              match ity with
+              | None -> List.map (fun a -> a, None) l
+              | Some its ->
+                let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
+                List.map (fun a -> Some a) pdecl
+                |> List.combine l
+            end
+          | Decl.Dtype({ts_def = Some ty; ts_args = args; _ } as tys) ->
+            let vars = Ty.ts_match_args tys (List.map Ty.ty_var args) in
+            aux (Ty.ty_inst vars ty) ity
+          | Decl.Ddata([c, b]) ->
+            warning_t "Multiple constructors is not supported in abstract interpretation." a; []
+          | Decl.Ddata(_) ->
+            warning_t "Recursive types is not supported in abstract interpretation." a; []
+          | Decl.Dtype({ ts_def = ty; _}) ->
+            assert (ty = None);
+            warning_t "Could not find type declaration (got type alias)."
+              a;
+            []
+          | Decl.Dind(_) ->
+            warning_t "Could not find type declaration (got inductive predicate)."
+              a;
+            []
+          | Decl.Dlogic(_) ->
+            warning_t "Could not find type declaration (got logic declaration)."
+              a;
+            []
+          | Decl.Dprop(_) ->
+            warning_t "Could not find type declaration (got propsition) for: "
+              a;
+            []
+          | Decl.Dparam(_) ->
+            warning_t "Could not find type declaration (got param)."
+              a;
+            []
+        end
+      | Tyvar(_) ->
+        warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
+        []
+    in
+    aux myty ity
 
   (* Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    * ATM it only works for conjunction, and if there is not that much uninterpreted function.
@@ -314,8 +351,11 @@ module Abstract_interpreter(E: sig
     let rec term_to_var_list coeff t =
       match t.t_node with
       | Tvar(a) ->
-        let var = Mterm.find t !local_ty.local_vars in
-        ([(var, coeff)], 0)
+        begin
+        match var_of_term t with
+        | Some var -> ([(var, coeff)], 0)
+        | None -> Format.eprintf "Variable undefined: "; Pretty.print_term Format.err_formatter t; Format.eprintf "@."; failwith "undefined var"
+        end
       | Tconst(Number.ConstInt(n)) ->
         let n = Number.compute_int n in
         ([], coeff * (BigInt.to_int n))
@@ -333,15 +373,13 @@ module Abstract_interpreter(E: sig
         let n = Number.compute_int n in
         term_to_var_list ((BigInt.to_int n) * coeff) a
       (* FIXME: need a nice domain for algebraic types *)
-      | Tapp(func, [arg]) when Term.(func.ls_constr = 0) -> (* maybe a record access *)
+      | _ -> (* maybe a record access *)
         begin
           match var_of_term t with
-          | None -> raise (Not_handled t)
+          | None -> Format.eprintf "Could not find term@."; raise (Not_handled t)
           | Some s ->
             ([s, coeff], 0)
         end
-      | _ ->
-        raise (Not_handled t)
     in
     
     (* This takes an epsilon-free formula and returns a list of linear expressions weaker than
@@ -709,8 +747,22 @@ module Abstract_interpreter(E: sig
               Ity.Mpv.mapi (fun c () ->
                   let open Ity in
                   let var = Ity.Mreg.find a local_ty.region_ident in
-                  let _, t = List.find (fun (p, _) ->
-                      Ity.pv_equal p c) var in
+                  let _, t =
+                    try List.find (fun (p, _) ->
+                      Ity.pv_equal p c) var
+                    with
+                    | Not_found ->
+                      Format.eprintf "Couldn't find projection for field ";
+                      Ity.print_pv Format.err_formatter c;
+                      Format.eprintf "@.";
+                      Format.eprintf "(known fields: ";
+                      List.iter (fun (p, _) ->
+                          Ity.print_pv Format.err_formatter p;
+                          Format.eprintf " @.";
+                        ) var;
+                      Format.eprintf ")@.";
+                      assert false
+                  in
                   Pretty.print_term Format.err_formatter t;
                   let v = Term.Mterm.find t local_ty.local_vars in
                   Format.eprintf "%s@." (Var.to_string v);
@@ -834,26 +886,34 @@ module Abstract_interpreter(E: sig
       let e_exns = ref [case_e_exn] in
       let case_end_cp = new_node_cfg cfg expr in
       List.iter (fun (p, e) ->
-              let open Term in
-              let open Expr in
-          begin
-              match p.pp_pat.pat_node with
-              | Pwild -> ()
-              | Pvar(vsym) -> failwith "pattern"
-              | Papp(l, p) -> Pretty.print_ls Format.err_formatter l; failwith "pattern app"
-              | Por(a, b) -> failwith "pattern or"
-              | Pas(a, b) -> failwith "pattern as"
-          end;
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+          let open Term in
+          let open Expr in
+          let local_ty = ref local_ty in
+          let constraints, to_forget = match p.pp_pat.pat_node with
+            | Pwild -> (fun abs -> abs), []
+            | Pvar(vsym) -> failwith "pattern"
+            | Papp(l, p) ->
+              let args = List.map (fun p -> match p.pat_node with
+                  | Pvar(vsym) ->
+                    let pv = Ity.restore_pv vsym in
+                    local_ty := add_typed_variable cfg !local_ty pv Ity.(pv.pv_ity);
+                    t_var vsym
+                  | _ -> failwith "nested pattern or worse"
+                ) p in
+              let matched_term = t_app l args (Some (Ity.ty_of_ity (case_e.e_ity))) in
+              let vreturn = create_vreturn (t_type matched_term) in
+              let postcondition =
+                t_eps_close vreturn (
+                  t_app ps_equ [matched_term; t_var vreturn] None) in
+              linear_expressions_from_term cfg !local_ty postcondition
+
+            | Por(a, b) -> failwith "pattern or"
+            | Pas(a, b) -> failwith "pattern as"
+          in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !local_ty e in
           new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
-              (* we need to add the new variables declared in the case pattern *)
-              match p.pp_pat.pat_node with
-              | Pwild -> abs
-              | Pvar(vsym) -> failwith "pattern"
-              | Papp(l, p) -> failwith "pattern app"
-              | Por(a, b) -> failwith "pattern or"
-              | Pas(a, b) -> failwith "pattern as"
-              );
+              Abstract1.forget_array man (constraints abs) (Array.of_list to_forget) false
+            );
           new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs -> abs);
           e_exns := e_exn :: !e_exns;
         ) l;

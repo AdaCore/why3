@@ -109,8 +109,7 @@ let do_input f =
   let do_infer mid m =
     let open Pmodule in
     Mstr.iter (fun k ps -> match ps with
-        | PV a ->
-          failwith "PV not handled"
+        | PV a -> (* this is a val - nothing to do *) ()
         | RS(rsym) ->
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
           let open Pdecl in
