@@ -567,6 +567,24 @@ module Abstract_interpreter(E: sig
   let add_variable cfg local_ty pv =
     add_typed_variable cfg local_ty pv Ity.(pv.pv_ity)
 
+  let create_postcondition cfg local_ty psym =
+    if not Ity.(ity_equal  psym.pv_ity ity_unit) then
+      begin
+        let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
+
+        let vreturn = create_vreturn ty in
+        let postcondition = Term.( t_eps_close vreturn (
+            t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
+
+        Format.eprintf "--> Postcondition for let: ";
+        Pretty.print_term Format.err_formatter postcondition;
+        Format.eprintf "@.";
+        (linear_expressions_from_term cfg local_ty) postcondition
+      end
+    else
+      let () = Format.eprintf "no Postocndition:@." in
+      (fun abs -> abs), []
+
 
 
   (* Adds expr to the cfg. local_ty is the types of the locally defined variable
@@ -603,22 +621,7 @@ module Abstract_interpreter(E: sig
       let local_ty = add_typed_variable cfg local_ty psym variable_type in
 
       let constraints, to_forget =
-        if not Ity.(ity_equal  psym.pv_ity ity_unit) then
-          begin
-          let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
-
-          let vreturn = create_vreturn ty in
-          let postcondition = Term.( t_eps_close vreturn (
-              t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
-
-          Format.eprintf "--> Postcondition for let: ";
-          Pretty.print_term Format.err_formatter postcondition;
-          Format.eprintf "@.";
-          (linear_expressions_from_term cfg local_ty) postcondition
-          end
-        else
-          let () = Format.eprintf "no Postocndition:@." in
-          (fun abs -> abs), []
+        create_postcondition cfg local_ty psym
       in
 
       (* compute the child and add an hyperedge, to set the value of psym
@@ -767,36 +770,35 @@ module Abstract_interpreter(E: sig
       let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
       let i = new_node_cfg cfg expr in
       let exc = Ity.Mexn.map (fun (l, e) ->
+
           let local_ty = List.fold_left (fun local_ty p ->
               add_typed_variable cfg local_ty p Ity.(p.pv_ity)) local_ty l in
+
+          let before_assign_cp = new_node_cfg cfg e in
+
           let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+
           additional_exn := e_exn @ !additional_exn;
-          new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> abs);
-          l, e_begin_cp, e_end_cp) exc in
+
+          begin
+            match l with
+            | [p] ->
+              let constraints, to_forget = create_postcondition cfg local_ty p in
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun man abs -> constraints abs);
+              new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> Abstract1.forget_array manpk abs (Array.of_list to_forget) false);
+            | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun man abs -> abs);
+              new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> abs);
+          end;
+          l, before_assign_cp, e_end_cp
+          ) exc in
       
       let e_exn = Ity.Mexn.fold (fun exc_sym (l, cp_begin, _) e_exn ->
           List.filter (fun (cp, exc_sym_) ->
               if Ity.xs_equal exc_sym exc_sym_ then
                 begin
-                  let constraints, _ =
-                    match l with
-                    | [t] ->
-                      let psym = t in
-                      if not Ity.(ity_equal psym.pv_ity ity_unit) then
-                        begin
-                          let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
-
-                          let vreturn = create_vreturn ty in
-                          let postcondition = Term.( t_eps_close vreturn (
-                              t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
-                          (linear_expressions_from_term cfg local_ty) postcondition
-                        end
-                      else
-                        (fun abs -> abs), []
-                    | _ -> (fun abs -> abs), []
-                  in
                   new_hedge_cfg cfg (cp, cp_begin) (fun man abs ->
-                      constraints abs
+                       abs
                     );
                   false
                 end
@@ -810,7 +812,10 @@ module Abstract_interpreter(E: sig
     | Eraise(s, e) ->
       let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg local_ty e in
       let j = new_node_cfg cfg expr in
-      arg_begin, j, [(arg_end_cp, s)]
+      let k = new_node_cfg cfg expr in
+      new_hedge_cfg cfg (j, k) (fun man abs ->
+          Abstract1.bottom man cfg.env);
+      arg_begin, k, [(arg_end_cp, s)]
 
     | Eif(cond, b, c) ->
       let open Expr in
