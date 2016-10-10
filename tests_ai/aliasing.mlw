@@ -1,0 +1,16 @@
+module Aliasing1
+
+	use import int.Int
+	use import ref.Ref
+
+	let b(x:int) : int
+	ensures { result = 10 }
+	=
+		let i = ref 0 in
+		let j = i in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+		done;
+		!j
+end
