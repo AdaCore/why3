@@ -132,7 +132,7 @@ module Unsigned
   val add3 (x y z:t) : (t,t)
     returns { (r,d) ->
       to_int r + (max+1) * to_int d =
-      to_int x + to_int y + to_int z 
+      to_int x + to_int y + to_int z
       /\ 0 <= to_int d <= 2 }
 
   val mul_double (x y:t) : (t,t)
