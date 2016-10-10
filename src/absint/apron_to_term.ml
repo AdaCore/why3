@@ -28,6 +28,12 @@ module Apron_to_term(E: sig
     | CMinusOne
     | COne
 
+  let int_of_string s =
+    let f = float_of_string s in
+    let i = int_of_float f in
+    assert (float_of_int i = f);
+    i
+
   let coeff_to_term = function
     | Coeff.Scalar(s) ->
       let i = int_of_string (Scalar.to_string s) in

@@ -238,7 +238,16 @@ module Abstract_interpreter(E: sig
     Format.eprintf "@."
             
           
-  let create_vreturn ty = Term.create_vsymbol Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; } ty
+  let ident_ret = Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; }
+  let cached_vreturn = ref (Ty.Mty.empty)
+  let create_vreturn ty =
+    try
+      Ty.Mty.find ty !cached_vreturn
+    with
+    | Not_found ->
+      let v  = Term.create_vsymbol ident_ret ty in
+      cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
+      v
 
   let get_subvalues a ity =
     let open Ty in
@@ -334,10 +343,25 @@ module Abstract_interpreter(E: sig
       (* FIXME: need a nice domain for algebraic types *)
       | Tapp(func, [arg]) when Term.(func.ls_constr = 0) -> (* maybe a record access *)
         begin
-          match var_of_term t with
-          | None -> raise (Not_handled t)
-          | Some s ->
-            ([s, coeff], 0)
+          match arg.t_node with
+          | Tvar(a) ->
+            begin
+              match !return_var with
+              | Some s when Term.vs_equal a s ->
+                ([var_return, coeff], 0)
+              | _ ->
+                match var_of_term t with
+                | None -> raise (Not_handled t)
+                | Some s ->
+                  ([s, coeff], 0)
+            end
+          | _ ->
+            begin
+              match var_of_term t with
+              | None -> raise (Not_handled t)
+              | Some s ->
+                ([s, coeff], 0)
+            end
         end
       | _ ->
         raise (Not_handled t)
@@ -506,25 +530,27 @@ module Abstract_interpreter(E: sig
           let vret = create_vreturn (t_type logical_term) in
           let vret = t_var vret in
           let subv = get_subvalues vret (Some reg.reg_its) in
+          let subv_r = get_subvalues logical_term (Some reg.reg_its) in
+          let subv = List.combine subv subv_r in
           let local_ty, proj_list =
-            List.fold_left (fun (local_ty, acc) (a, pfield) ->
+            List.fold_left (fun (local_ty, acc) ((generic_region_term, pfield), (real_term, _)) ->
                 let pfield = match pfield with
                   | Some s -> s
                   | None -> assert false
                 in
 
                 ignore (Format.flush_str_formatter ());
-                let v = Pretty.print_term Format.str_formatter a
+                let v = Pretty.print_term Format.str_formatter generic_region_term
                         |> Format.flush_str_formatter
                         |> Format.sprintf "%s.%s" reg_name
                         |> Var.of_string
                 in
-                ensure_variable cfg v a;
+                ensure_variable cfg v real_term;
                 let accessor = match pfield.rs_field with
                   | Some s -> s
                   | None -> assert false
                 in
-                { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }, (accessor, a) :: acc
+                { local_ty with local_vars = Term.Mterm.add real_term v local_ty.local_vars }, (accessor, real_term) :: acc
               ) (local_ty, []) subv
           in
           { local_ty with region_ident = Ity.Mreg.add reg proj_list local_ty.region_ident }
