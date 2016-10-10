@@ -286,17 +286,33 @@ module Abstract_interpreter(E: sig
                 |> List.combine l
             end
           | Decl.Dtype({ts_def = Some ty; ts_args = args; _ } as tys) ->
+            (* untested code, probably works *)
+            let () = assert false in
             let vars = Ty.ts_match_args tys (List.map Ty.ty_var args) in
             aux (Ty.ty_inst vars ty) ity
           | Decl.Ddata([c, b]) ->
             warning_t "Multiple constructors is not supported in abstract interpretation." a; []
           | Decl.Ddata(_) ->
             warning_t "Recursive types is not supported in abstract interpretation." a; []
-          | Decl.Dtype({ ts_def = ty; _}) ->
-            assert (ty = None);
-            warning_t "Could not find type declaration (got type alias)."
-              a;
-            []
+          | Decl.Dtype({ ts_def = ty; _}) -> (* This happens when a type is private or has an invariant: it can't be accesed
+                                              * by the logic, so we give up and only look for projections by looking
+                                              * at program projections. *)
+            (* warning_t "Could not find type declaration (got type alias)." a; *)
+            begin
+              try
+                let its = Ity.restore_its tys in
+                (match ity with
+                 | None -> ()
+                 | Some s -> assert (Ity.its_equal its s));
+                let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
+                List.map (fun b ->
+                    let l = match Expr.(b.rs_logic) with | Expr.RLls(l) -> l | _ -> assert false in
+                    let this_ty = Expr.(Ity.(ty_of_ity b.rs_cty.cty_result)) in
+                    let ty = Ty.ty_inst vars this_ty in
+                    t_app l [a] (Some ty), if ity = None then None else Some b) pdecl
+              with
+              | Not_found -> failwith "could not restore its"
+            end
           | Decl.Dind(_) ->
             warning_t "Could not find type declaration (got inductive predicate)."
               a;
@@ -585,12 +601,13 @@ module Abstract_interpreter(E: sig
         in
         local_ty
       | _ ->
+        (* We can safely give up on a, as no integer variable can descend from it (because it is well typed) *)
         Format.eprintf "Variable could not be added properly: ";
         Pretty.print_term Format.err_formatter logical_term;
         Format.eprintf " of type ";
         Ity.print_ity Format.err_formatter variable_type;
         Format.eprintf "@.";
-        raise (Not_handled logical_term)
+        local_ty
     in local_ty
 
   let add_variable cfg local_ty pv =
@@ -627,6 +644,15 @@ module Abstract_interpreter(E: sig
   let rec put_expr_in_cfg cfg local_ty expr =
     let open Expr in
     match expr.e_node with
+    | Epure (t) ->
+      let i, j = new_node_cfg cfg expr, new_node_cfg cfg expr in
+      let vreturn = create_vreturn (t_type t) in
+      let postcondition = t_eps_close vreturn (t_app ps_equ [t_var vreturn; t] None) in
+      let constraints, _ = linear_expressions_from_term cfg local_ty postcondition in
+      new_hedge_cfg cfg (i, j) (fun man abs ->
+          constraints abs);
+      i, j, []
+
     | Elet(LDvar(psym, let_expr), b) ->
       (* As it may not be an int, the type could be useful, so we can save it *)
       let variable_type = Expr.(let_expr.e_ity) in
@@ -922,13 +948,42 @@ module Abstract_interpreter(E: sig
       let i = new_node_cfg cfg expr in
 
       i, i, []
-    | _ ->
-      Expr.print_expr Format.err_formatter expr;
-      Format.eprintf "@.";
-      Format.eprintf "unhandled expr@.";
 
+    | Eghost(e) -> put_expr_in_cfg cfg local_ty e
+
+    | Efor(p, (lo, dir, up), _, e) ->
+      let local_ty = add_variable cfg local_ty p in
       let i = new_node_cfg cfg expr in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+      let index_term, lo, up =
+        match Expr.term_of_expr ~prop:false (Expr.e_var p),
+              Expr.term_of_expr ~prop:false (Expr.e_var lo),
+              Expr.term_of_expr ~prop:false (Expr.e_var up) with
+        | Some s, Some u, Some v -> s, u, v
+        | _ -> assert false
+      in
+      let postcondition =
+        if dir = Expr.To then
+          t_and (t_app lt_int [lo; index_term] None) (t_app lt_int [index_term; up] None)
+        else
+          t_and (t_app lt_int [up; index_term] None) (t_app lt_int [index_term; lo] None)
+      in
+      let constraints, _ = linear_expressions_from_term cfg local_ty postcondition in
+      new_hedge_cfg cfg (i, e_begin_cp) (fun man abs ->
+          constraints abs
+        );
+      cfg.loop_invariants <- (expr, i) :: cfg.loop_invariants;
+      i, e_end_cp, e_exn
 
+    | _ ->
+      Format.eprintf "expression not handled";
+      Expr.print_expr Format.err_formatter expr;
+      begin
+      match expr.e_loc with
+      | None -> ()
+      | Some l -> Loc.report_position Format.err_formatter l;
+      end;
+      let i = new_node_cfg cfg expr in
       i, i, []
 
   let get_domain cfg control_point = ()
@@ -1005,7 +1060,7 @@ module Abstract_interpreter(E: sig
         let make_strategy =
           fun is_active ->
             Fixpoint.make_strategy_default
-              ~widening_start:1 ~widening_descend:2
+              ~widening_start:10 ~widening_descend:2
               ~priority:(PSHGraph.Filter is_active)
               ~vertex_dummy ~hedge_dummy
               cfg.g sinit

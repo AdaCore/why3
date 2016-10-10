@@ -141,14 +141,21 @@ let do_input f =
                     let copying_informations = Hashtbl.create 100 in
                     Abstract_interpreter.eval_fixpoints cfg
                     |> List.sort (fun (e1, _) (e2, _) -> 
-                        match e1.e_node, e2.e_node with
-                        | Ewhile(_, _, _, e1), Ewhile(_, _, _, e2) ->
-                          compare e1.e_loc e2.e_loc
-                        | _ -> assert false
+                        let e1 = match e1.e_node with
+                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
+                            -> e1
+                          | _ -> assert false
+                        in
+                        let e2 = match e2.e_node with
+                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
+                            -> e1
+                          | _ -> assert false
+                        in
+                        compare e1.e_loc e2.e_loc
                       )
                     |> List.iter begin fun (expr, domain) ->
                       match expr.e_node with
-                      | Ewhile(_, _, _, expr) ->
+                      | Ewhile(_, _, _, expr) | Efor(_, _, _, expr) ->
                         Pretty.forget_all ();
                         ignore @@ Format.flush_str_formatter ();
                         let inv =
