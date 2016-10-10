@@ -120,7 +120,6 @@ module Abstract_interpreter(E: sig
   let zero = Coeff.Scalar (Scalar.of_int 0) 
   let one = Coeff.Scalar (Scalar.of_int 1)
   let neg_one = Coeff.Scalar (Scalar.of_int (-1))
-  let var_return = Var.of_string "$$result"
 
   (* Initialize an hedge *)
 
@@ -131,6 +130,17 @@ module Abstract_interpreter(E: sig
         cfg.env <- Environment.add cfg.env [|v|] [||]
       end
   
+  let ident_ret = Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; }
+  let cached_vreturn = ref (Ty.Mty.empty)
+  let create_vreturn ty =
+    try
+      Ty.Mty.find ty !cached_vreturn
+    with
+    | Not_found ->
+      let v  = Term.create_vsymbol ident_ret ty in
+      cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
+      v
+
   let start_cfg rs =
     let cfg = { expr_to_control_point = Hashtbl.create 100;
       variable_mapping = Hashtbl.create 100;
@@ -142,7 +152,6 @@ module Abstract_interpreter(E: sig
       loop_invariants = []; }
     in
     let open Ident in
-    ensure_variable cfg var_return (Term.t_var (Term.create_vsymbol {pre_name = "result"; pre_label = Expr.(Ident.(rs.rs_name.id_label)); pre_loc = None } Ty.ty_int));
     cfg
 
   (* Adds a new node to the cfg, associated to expr (which is only useful for
@@ -238,17 +247,6 @@ module Abstract_interpreter(E: sig
     Format.eprintf "@."
             
           
-  let ident_ret = Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; }
-  let cached_vreturn = ref (Ty.Mty.empty)
-  let create_vreturn ty =
-    try
-      Ty.Mty.find ty !cached_vreturn
-    with
-    | Not_found ->
-      let v  = Term.create_vsymbol ident_ret ty in
-      cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
-      v
-
   let get_subvalues a ity =
     let open Ty in
     let myty = t_type a in
@@ -297,7 +295,6 @@ module Abstract_interpreter(E: sig
     (* First inline everything, for instance needed for references
      * where !i is (!) i *)
     let t = t_replace_all t in
-    let return_var = ref None in
 
     let local_ty = ref local_ty in
 
@@ -317,12 +314,7 @@ module Abstract_interpreter(E: sig
     let rec term_to_var_list coeff t =
       match t.t_node with
       | Tvar(a) ->
-        let var =
-          match !return_var with
-          | Some s when Term.vs_equal a s -> var_return
-          | _ -> Mterm.find t !local_ty.local_vars
-
-        in
+        let var = Mterm.find t !local_ty.local_vars in
         ([(var, coeff)], 0)
       | Tconst(Number.ConstInt(n)) ->
         let n = Number.compute_int n in
@@ -343,25 +335,10 @@ module Abstract_interpreter(E: sig
       (* FIXME: need a nice domain for algebraic types *)
       | Tapp(func, [arg]) when Term.(func.ls_constr = 0) -> (* maybe a record access *)
         begin
-          match arg.t_node with
-          | Tvar(a) ->
-            begin
-              match !return_var with
-              | Some s when Term.vs_equal a s ->
-                ([var_return, coeff], 0)
-              | _ ->
-                match var_of_term t with
-                | None -> raise (Not_handled t)
-                | Some s ->
-                  ([s, coeff], 0)
-            end
-          | _ ->
-            begin
-              match var_of_term t with
-              | None -> raise (Not_handled t)
-              | Some s ->
-                ([s, coeff], 0)
-            end
+          match var_of_term t with
+          | None -> raise (Not_handled t)
+          | Some s ->
+            ([s, coeff], 0)
         end
       | _ ->
         raise (Not_handled t)
@@ -462,8 +439,8 @@ module Abstract_interpreter(E: sig
         (* Always use the same variable when returning a value, 
          * otherwise variables keep being created and the previous ones (with the
          * good constraints) can not be accessed *)
-        let return_term = create_vreturn (return.vs_ty) in
-        let return_term = t_var return_term in
+        let return_var = create_vreturn (return.vs_ty) in
+        let return_term = t_var return_var in
         let subvalues = get_subvalues return_term None in
         let l =
           List.fold_left (fun local_ty (a, _) ->
@@ -479,8 +456,7 @@ module Abstract_interpreter(E: sig
             ) !local_ty subvalues
         in
         local_ty := l;
-        return_var := Some return;
-        aux t, !to_forget
+        aux (t_subst_single return return_term t), !to_forget
       | _ ->
         aux t, !to_forget
     with
@@ -555,6 +531,21 @@ module Abstract_interpreter(E: sig
           in
           { local_ty with region_ident = Ity.Mreg.add reg proj_list local_ty.region_ident }
         end
+      | Ity.Ityapp(_), _ ->
+        Format.eprintf "Let's check that ";
+        Ity.print_ity Format.err_formatter variable_type;
+        Format.eprintf " has only non mutable fields.";
+        let subv = get_subvalues logical_term None in
+        let local_ty = List.fold_left (fun local_ty (t, _) ->
+            ignore (Format.flush_str_formatter ());
+            let v = Pretty.print_term Format.str_formatter t
+                    |> Format.flush_str_formatter
+                    |> Var.of_string
+            in
+            ensure_variable cfg v t;
+            { local_ty with local_vars = Term.Mterm.add t v local_ty.local_vars }) local_ty subv
+        in
+        local_ty
       | _ ->
         Format.eprintf "Variable could not be added properly: ";
         Pretty.print_term Format.err_formatter logical_term;
@@ -646,10 +637,7 @@ module Abstract_interpreter(E: sig
         |> Array.of_list
       in
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
-          match Ity.(variable_type.ity_node) with
-          | _ when Ity.(ity_equal variable_type ity_int) ->
-            Abstract1.forget_array man abs vars_to_forget false
-          | _ -> abs
+          Abstract1.forget_array man abs vars_to_forget false
         );
 
 
@@ -680,18 +668,16 @@ module Abstract_interpreter(E: sig
           constraints abs
         );
       begin_cp, end_cp, []
-    | Econst(Number.ConstInt(n)) ->
-      let coeff =
-        Number.compute_int n
-        |> BigInt.to_int
-        |> Coeff.s_of_int
-      in
+    | Econst(n) ->
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
+
+      let vreturn = create_vreturn Ty.ty_int in
+      let postcondition = t_eps_close vreturn (t_app ps_equ [t_const n; t_var vreturn] None) in
+      let constraints, _ = linear_expressions_from_term cfg local_ty postcondition in
+
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
-          let expr = Linexpr1.make cfg.env in
-          Linexpr1.set_list expr [] (Some(coeff));
-          Abstract1.assign_linexpr man abs var_return expr None
+          constraints abs
         );
       begin_cp, end_cp, []
     | Eexec({c_node = Capp(rsym, args); _}, { Ity.cty_post = post; Ity.cty_result = ity; Ity.cty_effect = effect;  _ }) ->
@@ -717,7 +703,7 @@ module Abstract_interpreter(E: sig
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
           (* effects *)
-          let abs = ref (Abstract1.forget_array man abs [|var_return|] false) in
+          let abs = ref abs in
           (* FIXME: bad, does not work with sub records *)
           ignore @@ Ity.Mreg.mapi (fun a b ->
               Ity.Mpv.mapi (fun c () ->
