@@ -1030,7 +1030,12 @@ module Abstract_interpreter(E: sig
       let i = new_node_cfg cfg expr in
       i, i, []
 
-  let get_domain cfg control_point = ()
+  let put_expr_with_pre cfg local_ty e pre =
+    let i = new_node_cfg cfg e in
+    let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+    let constraints, _ = linear_expressions_from_term cfg local_ty (t_and_l pre) in
+    new_hedge_cfg cfg (i, e_start_cp) (fun man -> constraints);
+    i, e_end_cp, e_exn
 
   module Apron_to_term = Apron_to_term.Apron_to_term (E)
   let domain_to_term cfg domain =

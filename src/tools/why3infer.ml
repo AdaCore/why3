@@ -124,6 +124,7 @@ let do_input f =
                 begin
                   match cexp.c_node with
                   | Cfun e ->
+                    let preconditions = Ity.(Expr.(cexp.c_cty.cty_pre)) in
                     Format.eprintf "@.";
                     let module Abstract_interpreter =
                       Abstract_interpreter.Abstract_interpreter(struct
@@ -136,7 +137,7 @@ let do_input f =
                       Ity.(cexp.c_cty.cty_args) in
                     Expr.print_expr Format.err_formatter e;
                     Format.eprintf "@.";
-                    ignore (Abstract_interpreter.put_expr_in_cfg cfg local_ty e);
+                    ignore (Abstract_interpreter.put_expr_with_pre cfg local_ty e preconditions);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
                     let fixp = Abstract_interpreter.eval_fixpoints cfg
                     |> List.map (fun (expr, domain) ->
