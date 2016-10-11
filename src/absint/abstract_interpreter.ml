@@ -397,7 +397,8 @@ module Abstract_interpreter(E: sig
         (c @ e, d + f)
       | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
         term_to_var_list (-coeff)  a;
-      | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a]) when Term.ls_equal func mult_int ->
+      | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a])
+      | Tapp(func, [a; {t_node = Tconst(Number.ConstInt(n)); _};]) when Term.ls_equal func mult_int ->
         let n = Number.compute_int n in
         term_to_var_list ((BigInt.to_int n) * coeff) a
       (* FIXME: need a nice domain for algebraic types *)
@@ -1109,7 +1110,7 @@ module Abstract_interpreter(E: sig
         let make_strategy =
           fun is_active ->
             Fixpoint.make_strategy_default
-              ~widening_start:10 ~widening_descend:2
+              ~widening_start:30 ~widening_descend:1
               ~priority:(PSHGraph.Filter is_active)
               ~vertex_dummy ~hedge_dummy
               cfg.g sinit
