@@ -423,11 +423,19 @@ exception NoFile of string
 (* do not modify the proof duration stored in proof sessions if it
    changed by less than 10% or 0.1s, so as to avoid diff noise in
    session files *)
+
+let group_answer a =
+  match a with
+  | Call_provers.OutOfMemory
+  | Call_provers.Unknown _
+  | Call_provers.Timeout -> Call_provers.Timeout
+  | _ -> a
+
 let fuzzy_proof_time nres ores =
   match ores, nres with
-  | Done { Call_provers.pr_time = told },
-    Done ({ Call_provers.pr_time = tnew } as res')
-  when tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1 ->
+  | Done { Call_provers.pr_answer= ansold; Call_provers.pr_time = told },
+    Done ({ Call_provers.pr_answer= ansnew; Call_provers.pr_time = tnew } as res')
+  when group_answer ansold = group_answer ansnew && tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1 ->
     Done { res' with Call_provers.pr_time = told }
   | _, _ -> nres
 
