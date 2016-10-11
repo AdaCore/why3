@@ -38,6 +38,11 @@ theory real.Square
   syntax function sqrt "sqrt_real(%1)"
 end
 
+theory ieee_float.GenericFloat
+  remove prop Round_monotonic
+  remove prop Round_idempotent
+end
+
 theory ieee_float.RoundingMode
   syntax type mode "fpa_rounding_mode"
   syntax function RNE "NearestTiesToEven"
