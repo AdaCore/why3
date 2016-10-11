@@ -48,15 +48,25 @@ type info = {
 
 let ident_printer () =
   let bls = [
-    "ac"; "and"; "array"; "as"; "axiom"; "bitv"; "bool";
+    "abs_int"; "abs_real"; "ac"; "and"; "array"; "as"; "axiom";
+    "bitv"; "bool";
     "check"; "cut"; "distinct"; "else"; "exists";
-    "false"; "float"; "forall"; "function"; "goal";
-    "if"; "in"; "include"; "int"; "inversion";
-    "let"; "logic";
-    "max_int"; "max_real";
-    "not"; "or"; "parameter"; "predicate";
-    "prop"; "real"; "rewriting"; "select"; "store";
+    "false"; "float"; "float32"; "float32d"; "float64"; "float64d";
+    "forall"; "fpa_rounding_mode"; "function";
+    "goal";
+    "if"; "in"; "include"; "int"; "int_ceil"; "int_floor";
+    "integer_log2"; "integer_round"; "is_theory_constant"; "inversion";
+    "let"; "linear_dependency"; "logic";
+    "max_int"; "max_real"; "min_int"; "min_real";
+    "not"; "not_theory_constant"; "or";
+    "parameter"; "predicate"; "pow_real_int"; "pow_real_real";
+    "prop";
+    "real"; "real_of_int"; "rewriting";
+    "select"; "sqrt_real"; "sqrt_real_default"; "sqrt_real_excess"; "store";
     "then"; "true"; "type"; "unit"; "void"; "with";
+    "Aw"; "Down"; "Od";
+    "NearestTiesToAway"; "NearestTiesToEven"; "Nd"; "No"; "Nu"; "Nz";
+    "ToZero"; "Up";
   ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
