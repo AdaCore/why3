@@ -106,14 +106,15 @@ let do_input f =
     | file ->
         Env.read_file Pmodule.mlw_language ?format env file
   in
+  let all_while = ref [] in
+  let open Pdecl in
+  let open Expr in
   let do_infer mid m =
     let open Pmodule in
     Mstr.iter (fun k ps -> match ps with
         | PV a -> (* this is a val - nothing to do *) ()
         | RS(rsym) ->
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
-          let open Pdecl in
-          let open Expr in
           match decl.pd_node with
           | PDlet(let_expr) ->
             begin match let_expr with
@@ -137,61 +138,17 @@ let do_input f =
                     Format.eprintf "@.";
                     ignore (Abstract_interpreter.put_expr_in_cfg cfg local_ty e);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
-                    let open Expr in
-                    let copying_informations = Hashtbl.create 100 in
-                    Abstract_interpreter.eval_fixpoints cfg
-                    |> List.sort (fun (e1, _) (e2, _) -> 
-                        let e1 = match e1.e_node with
-                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
-                            -> e1
-                          | _ -> assert false
-                        in
-                        let e2 = match e2.e_node with
-                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
-                            -> e1
-                          | _ -> assert false
-                        in
-                        compare e1.e_loc e2.e_loc
-                      )
-                    |> List.iter begin fun (expr, domain) ->
-                      match expr.e_node with
-                      | Ewhile(_, _, _, expr) | Efor(_, _, _, expr) ->
-                        Pretty.forget_all ();
-                        ignore @@ Format.flush_str_formatter ();
-                        let inv =
-                          Abstract_interpreter.domain_to_term cfg domain
-                          |> Pretty.print_term Format.str_formatter
-                          |> Format.flush_str_formatter
-                          |> Format.sprintf "invariant { %s }\n"
-                        in
-                        let file, line_number, _, _ = Expr.(expr.e_loc) |> unwrap |> Loc.get in
-                        let line_number = line_number - 1 in (* we want to insert the invariant
-                                                                before the loop *)
-                        let new_file = Format.sprintf "%s_inferred.mlw" file in
-                        let o, fin, fout =
-                          try
-                            Hashtbl.find copying_informations file
-                          with
-                          | Not_found ->
-                            let v = 0, open_in file, open_out new_file in
-                            Hashtbl.add copying_informations file v; v
-                        in
-                        let number_of_lines_to_read = line_number - (o + 1) in (* the file was copied up to o *)
-                        assert (number_of_lines_to_read >= 0);
-                        for i = 0 to number_of_lines_to_read do
-                          input_line fin |> Format.sprintf "%s\n" |> output_string fout;
-                        done;
-                        output_string fout inv;
-                        Hashtbl.replace copying_informations file (line_number, fin, fout);
-                      | _ -> assert false
-                    end;
-                    Hashtbl.iter (fun _ (o, fin, fout) ->
-                        try
-                          while true do
-                            input_line fin |> Format.sprintf "%s\n" |> output_string fout;
-                          done;
-                        with
-                        | End_of_file -> ()) copying_informations
+                    let fixp = Abstract_interpreter.eval_fixpoints cfg
+                    |> List.map (fun (expr, domain) ->
+                                  let inv =
+                                    Abstract_interpreter.domain_to_term cfg domain
+                                    |> Pretty.print_term Format.str_formatter
+                                    |> Format.flush_str_formatter
+                                    |> Format.sprintf "invariant { %s }\n"
+                                  in
+                                  expr, inv)
+                    in
+                    all_while := fixp :: !all_while;
                   | Cany ->
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;
@@ -211,7 +168,56 @@ let do_input f =
 
       ) m.mod_export.ns_ps
   in
-  Mstr.iter do_infer mm
+  Mstr.iter do_infer mm;
+  let copying_informations = Hashtbl.create 100 in
+  !all_while
+  |> List.concat
+  |> List.sort (fun (e1, _) (e2, _) -> 
+                        let e1 = match e1.e_node with
+                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
+                            -> e1
+                          | _ -> assert false
+                        in
+                        let e2 = match e2.e_node with
+                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
+                            -> e1
+                          | _ -> assert false
+                        in
+                        compare e1.e_loc e2.e_loc
+                      )
+  |> List.iter begin fun (expr, inv) ->
+    match expr.e_node with
+    | Ewhile(_, _, _, expr) | Efor(_, _, _, expr) ->
+      Pretty.forget_all ();
+      ignore @@ Format.flush_str_formatter ();
+      let file, line_number, _, _ = Expr.(expr.e_loc) |> unwrap |> Loc.get in
+      let line_number = line_number - 1 in (* we want to insert the invariant
+                                              before the loop *)
+      let new_file = Format.sprintf "%s_inferred.mlw" file in
+      let o, fin, fout =
+        try
+          Hashtbl.find copying_informations file
+        with
+        | Not_found ->
+          let v = 0, open_in file, open_out new_file in
+          Hashtbl.add copying_informations file v; v
+      in
+      let number_of_lines_to_read = line_number - (o + 1) in (* the file was copied up to o *)
+      assert (number_of_lines_to_read >= -1);
+      for i = 0 to number_of_lines_to_read do
+        input_line fin |> Format.sprintf "%s\n" |> output_string fout;
+      done;
+      output_string fout inv;
+      Hashtbl.replace copying_informations file (line_number, fin, fout);
+    | _ -> assert false
+  end;
+  Hashtbl.iter (fun _ (o, fin, fout) ->
+      try
+        while true do
+          input_line fin |> Format.sprintf "%s\n" |> output_string fout;
+        done;
+      with
+      | End_of_file -> ()) copying_informations
 
 let () =
   try

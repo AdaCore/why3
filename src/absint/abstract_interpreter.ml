@@ -951,29 +951,60 @@ module Abstract_interpreter(E: sig
 
     | Eghost(e) -> put_expr_in_cfg cfg local_ty e
 
-    | Efor(p, (lo, dir, up), _, e) ->
-      let local_ty = add_variable cfg local_ty p in
-      let i = new_node_cfg cfg expr in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
-      let index_term, lo, up =
-        match Expr.term_of_expr ~prop:false (Expr.e_var p),
+    | Efor(k, (lo, dir, up), _, e) ->
+      (* . before_loop
+       * | k = 0      k = n -> forget_k
+       * . start_loop ------------------> end_loop
+       * | 0 <= k <= n 
+       * . e_begin
+       * :
+       * :       k = k + 1
+       * . e_end --------> start_loop
+       *)
+      let k_term, lo, up =
+        match Expr.term_of_expr ~prop:false (Expr.e_var k),
               Expr.term_of_expr ~prop:false (Expr.e_var lo),
               Expr.term_of_expr ~prop:false (Expr.e_var up) with
         | Some s, Some u, Some v -> s, u, v
         | _ -> assert false
       in
-      let postcondition =
+      let local_ty = add_variable cfg local_ty k in
+      let k_var = Mterm.find k_term local_ty.local_vars in
+
+      let before_loop_cp = new_node_cfg cfg expr in
+      let start_loop_cp = new_node_cfg cfg expr in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+      let end_loop_cp = new_node_cfg cfg expr in
+
+      let postcondition_before = t_app ps_equ [k_term; lo] None in
+      let constraints_start, _ = linear_expressions_from_term cfg local_ty postcondition_before in
+
+      let precondition_e =
         if dir = Expr.To then
-          t_and (t_app lt_int [lo; index_term] None) (t_app lt_int [index_term; up] None)
+          t_and (t_app le_int [lo; k_term] None) (t_app le_int [k_term; up] None)
         else
-          t_and (t_app lt_int [up; index_term] None) (t_app lt_int [index_term; lo] None)
+          t_and (t_app le_int [up; k_term] None) (t_app le_int [k_term; lo] None)
       in
-      let constraints, _ = linear_expressions_from_term cfg local_ty postcondition in
-      new_hedge_cfg cfg (i, e_begin_cp) (fun man abs ->
-          constraints abs
+      let constraints_e, _ = linear_expressions_from_term cfg local_ty precondition_e in
+
+      let postcondition =
+          t_app ps_equ [k_term; up] None
+      in
+      let constraints_post, _ = linear_expressions_from_term cfg local_ty postcondition in
+
+      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man -> constraints_start);
+      new_hedge_cfg cfg (start_loop_cp, e_begin_cp) (fun man -> constraints_e);
+      new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun man abs ->
+          (* k = k + 1 *)
+          let expr = Linexpr1.make cfg.env in
+          Linexpr1.set_array expr [|Coeff.s_of_int 1,  k_var|] (Some (Coeff.s_of_int 1));
+          Abstract1.assign_linexpr man abs k_var expr None
         );
-      cfg.loop_invariants <- (expr, i) :: cfg.loop_invariants;
-      i, e_end_cp, e_exn
+      new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun man abs ->
+          let abs = constraints_post abs in
+          Abstract1.forget_array man abs [|k_var|] false);
+      cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
+      before_loop_cp, end_loop_cp, e_exn
 
     | _ ->
       Format.eprintf "expression not handled";
