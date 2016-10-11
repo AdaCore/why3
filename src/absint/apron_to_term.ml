@@ -16,10 +16,24 @@ module Apron_to_term(E: sig
   let int_one = t_const Number.(ConstInt (int_const_dec "1"))
   let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="])
   let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"])
-  let int_add = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix +"]) a ty_int
-  let int_minus = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix -"]) a ty_int
-  let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a ty_int
+  let int_add =  begin fun a ->
+    match a with
+    | [a; b] ->
+      if t_equal a int_zero then b
+      else if t_equal b int_zero then a
+      else fs_app Theory.(ns_find_ls th_int.th_export ["infix +"]) [a; b] ty_int
+    | _ -> assert false
+  end
   let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a ty_int
+  let int_minus = begin fun a ->
+    match a with
+    | [a; b] ->
+      if t_equal a int_zero then int_minus_u [b]
+      else if t_equal b int_zero then a
+      else fs_app Theory.(ns_find_ls th_int.th_export ["infix -"]) [a; b] ty_int
+    | _ -> assert false
+  end
+  let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a ty_int
 
   type coeff =
     | CNone
