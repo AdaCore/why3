@@ -1,0 +1,35 @@
+b introduce_premises
+(* print goal with premisses introduced *)
+b cut "exists x: int. x = x"
+(* print goal with h in context *)
+b exists "5"
+(* print new goal G1 with (x = (2 * 5)) *)
+b case "exists x. exists y. x + y = y - x"
+(* print the goal with the hypothesis in context *)
+pg
+(* return to context with positive exists *)
+b cut "exists x. exists y. x + y = 0"
+ng
+(* Have to prove h1 with 2 exists *)
+b exists "4"
+(* Instantiate x1 *)
+b cut "forall x. forall y. x + y = 0"
+(* print with h2 in context *)
+b instantiate "h2" "4"
+(* create h21 which is correct *)
+b exists "3"
+(* instantiate y in the goal *)
+b cut "forall y. true -> 4 + y = 0"
+(* generate h3 *)
+b apply h2
+(* apply h2 to the goal and generate the new goal*)
+gu
+(* go back to the 4 + 3 = 0 goal *)
+b cut "forall y. y = 5 -> 4 + y = 0"
+(* new hypothesis to apply *)
+b apply h3
+(* apply hypothesis and generate the goal 3 = 5 which is correct. *)
+b remove h2
+(* remove correct hypothesis h2 *)
+b remove CompatOrderMult
+(* Success *)

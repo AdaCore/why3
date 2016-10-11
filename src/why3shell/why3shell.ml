@@ -1,4 +1,6 @@
 
+(* TODO *)
+let proof_general = true
 
 module Unix_scheduler = struct
 
@@ -45,7 +47,7 @@ module Unix_scheduler = struct
      (* buffer for storing character read on stdin *)
      let buf = Bytes.create 256
 
-     let show_prompt = ref true
+     let show_prompt = ref 0
      let prompt = ref "> "
 
      (* [main_loop interp] starts the scheduler. On idle, standard input is
@@ -54,12 +56,13 @@ module Unix_scheduler = struct
      let main_loop interp =
        try
          while true do
-           if !show_prompt then begin
-               Format.printf "%s@?" !prompt;
-               show_prompt := false;
-             end;
+           show_prompt := !show_prompt + 1;
+           if !show_prompt = 2 then begin
+             Format.printf "%s@?" !prompt;
+             show_prompt := 0;
+           end;
            (* attempt to run the first timeout handler *)
-           let time = Unix.gettimeofday () in
+           (let time = Unix.gettimeofday () in
            match !timeout_handler with
            | (ms,t,f) :: rem when t <= time ->
               timeout_handler := rem;
@@ -89,9 +92,9 @@ module Unix_scheduler = struct
                  | [_] ->
                     let n = Unix.read Unix.stdin buf 0 256 in
                     interp (Bytes.sub_string buf 0 (n-1));
-                    show_prompt := true
+                    show_prompt := 0
                  | [] -> () (* nothing read *)
-                 | _ -> assert false
+                 | _ -> assert false);
          done
        with Exit -> ()
 
@@ -490,7 +493,7 @@ let test_transform_and_display fmt args =
                  Controller_itp.print_trans_status status;
          match status with
          | TSdone _tid -> (ignore (move_to_goal_ret next_node);
-             test_print_goal fmt [])
+             dump_session_raw fmt []; test_print_goal fmt [])
          | _ -> ()
        in
        C.schedule_transformation cont id tr tl ~callback
@@ -649,5 +652,5 @@ let interp chout fmt s =
 let () =
   printf "Welcome to Why3 shell. Type '?' for help.@.";
   let chout = open_out "why3shell.out" in
-  let fmt = formatter_of_out_channel chout in
+  let fmt = if proof_general then formatter_of_out_channel stdout else formatter_of_out_channel chout in
   Unix_scheduler.main_loop (interp chout fmt)
