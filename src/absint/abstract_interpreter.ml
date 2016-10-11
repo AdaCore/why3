@@ -43,14 +43,26 @@ module Abstract_interpreter(E: sig
     val env: Env.env
     val pmod: Pmodule.pmodule
   end) = struct
+  
+  open Term
 
   let known_logical_ident = Pmodule.(Theory.(E.pmod.mod_theory.th_known))
   let known_pdecl = Pmodule.(Theory.(E.pmod.mod_known))
+  
+  let th_int = Env.read_theory E.env ["int"] "Int"
+  let le_int = Theory.(ns_find_ls th_int.th_export ["infix <="])
+  let ge_int = Theory.(ns_find_ls th_int.th_export ["infix >="])
+  let lt_int = Theory.(ns_find_ls th_int.th_export ["infix <"])
+  let gt_int = Theory.(ns_find_ls th_int.th_export ["infix >"])
+  let ad_int = Theory.(ns_find_ls th_int.th_export ["infix +"])
+  let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
+  let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
+  let mult_int = Theory.(ns_find_ls th_int.th_export ["infix *"])
+
 
   (* General purpose inlining stuff *)
 
   let t_unfold loc fs tl ty =
-    let open Term in
     let open Ty in
     if Term.ls_equal fs Term.ps_equ then
       t_app fs tl ty
@@ -72,12 +84,43 @@ module Abstract_interpreter(E: sig
   (* inline every symbol *)
 
   let rec t_replace_all t =
-    let open Term in
     let t = t_map t_replace_all t in
     match t.t_node with
     | Tapp (fs,tl) ->
       t_label_copy t (t_unfold t.t_loc fs tl t.t_ty)
     | _ -> t
+
+  (** Descend nots in the tree *)
+  (* if way is true, then we must return the negation of t *)
+  let rec t_descend_nots ?way:(way=false) t =
+    match t.t_node with
+    | Tbinop(Tand, t1, t2) ->
+      if way then
+        t_or_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
+      else
+        t_and_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
+    | Tbinop(Tor, t1, t2) ->
+      if way then
+        t_and_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
+      else
+        t_or_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
+    | Tnot(t) ->
+      t_descend_nots ~way:(not way) t
+    | Tapp(l, args) when ls_equal l lt_int && way ->
+      t_app ge_int args None
+    | Tapp(l, args) when ls_equal l gt_int && way ->
+      t_app le_int args None
+    | Tapp(l, args) when ls_equal l le_int && way ->
+      t_app gt_int args None
+    | Tapp(l, args) when ls_equal l ge_int && way ->
+      t_app lt_int args None
+    | _ ->
+      if way then
+        t_not t
+      else t
+
+
+ 
 
 
   (* Apron manager *)
@@ -175,38 +218,6 @@ module Abstract_interpreter(E: sig
 
   exception Not_handled of Term.term
 
-  let th_int = Env.read_theory E.env ["int"] "Int"
-  let le_int = Theory.(ns_find_ls th_int.th_export ["infix <="])
-  let ge_int = Theory.(ns_find_ls th_int.th_export ["infix >="])
-  let lt_int = Theory.(ns_find_ls th_int.th_export ["infix <"])
-  let gt_int = Theory.(ns_find_ls th_int.th_export ["infix >"])
-  let ad_int = Theory.(ns_find_ls th_int.th_export ["infix +"])
-  let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
-  let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
-  let mult_int = Theory.(ns_find_ls th_int.th_export ["infix *"])
-
-  type logic_path = int list
-  type logic_value =
-    | VTree of (logic_value list * Ty.ty)
-    | VNode of int * (Var.t * int) list
-    | VVar of Term.vsymbol * Ty.ty * logic_path * Term.term
-
-  let ty_from_tree = function
-    | VTree(_, t) -> t
-    | VNode(_) -> Ty.ty_int
-    | VVar(_, t, _, _) -> t
-
-  let logic_path_to_var cfg vsym logic_path =
-    let _ = Format.flush_str_formatter () in
-    let v =
-      Pretty.print_vs Format.str_formatter vsym
-      |> Format.flush_str_formatter
-      |> Format.sprintf "%s|%s" (List.map string_of_int logic_path |> String.concat "|")
-      |> Var.of_string
-    in
-    ensure_variable cfg v Term.t_true;
-    v
-
   (* utility function that make equivalent classes and sum the last component *)
   let sum_list a =
     let a = List.sort (fun (i, _) (j, _) ->
@@ -221,8 +232,6 @@ module Abstract_interpreter(E: sig
           (a, b) :: (merge ((c, d)::q))
     in
     merge a
-
-  open Term
 
   let access_field constr constr_args a i (proj, t) =
       match a.t_node with
@@ -346,8 +355,11 @@ module Abstract_interpreter(E: sig
     let open Term in
 
     (* First inline everything, for instance needed for references
-     * where !i is (!) i *)
+     * where !i is (!) i and must be replaced by (contents i) *)
     let t = t_replace_all t in
+
+    (* Let's try to remove the nots that we can *)
+    let t = t_descend_nots t in
 
     let local_ty = ref local_ty in
 
@@ -466,11 +478,12 @@ module Abstract_interpreter(E: sig
           end
         | Tif(a, b, c) ->
           let fa = aux a in
+          let fa_not = aux (t_descend_nots a) in
           let fb = aux b in
           let fc = aux c in
           (fun d ->
              let d1 = fb (fa d) in
-             let d2 = fc d in
+             let d2 = fc (fa_not d) in
              Abstract1.join manpk d1 d2)
         | Ttrue  | _ when t_equal t t_bool_true -> (fun d -> d)
         | Tfalse | _ when t_equal t t_bool_false -> (fun d -> Abstract1.bottom manpk cfg.env)
@@ -893,6 +906,7 @@ module Abstract_interpreter(E: sig
           Term.t_true
       in
       let constraints, _ = linear_expressions_from_term cfg local_ty cond_term in
+      let constraints_not, _ = linear_expressions_from_term cfg local_ty (t_not cond_term) in
       let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg local_ty b in
       let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg local_ty c in
       let start_cp = new_node_cfg cfg expr in
@@ -900,8 +914,7 @@ module Abstract_interpreter(E: sig
       new_hedge_cfg cfg (start_cp, b_begin_cp) (fun man abs ->
           constraints abs);
       new_hedge_cfg cfg (start_cp, c_begin_cp) (fun man abs ->
-          (* todo *)
-          abs);
+          constraints_not abs);
       new_hedge_cfg cfg (c_end_cp, end_cp) (fun man abs ->
           abs);
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
