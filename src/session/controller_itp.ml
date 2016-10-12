@@ -280,6 +280,7 @@ let merge_file (old_ses : session) (c : controller) _ file =
 let reload_files (c : controller)  =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ();
-  Stdlib.Hstr.iter (merge_file old_ses c) (get_files old_ses)
+  Stdlib.Hstr.iter (fun _ f -> add_file c f.file_name) (get_files old_ses)
+  (* Stdlib.Hstr.iter (merge_file old_ses c) (get_files old_ses) *)
 
 end

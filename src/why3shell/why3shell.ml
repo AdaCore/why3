@@ -47,7 +47,8 @@ module Unix_scheduler = struct
      (* buffer for storing character read on stdin *)
      let buf = Bytes.create 256
 
-     let show_prompt = ref 0
+     let prompt_delay = ref 0
+     let print_prompt = ref true
      let prompt = ref "> "
 
      (* [main_loop interp] starts the scheduler. On idle, standard input is
@@ -56,10 +57,13 @@ module Unix_scheduler = struct
      let main_loop interp =
        try
          while true do
-           show_prompt := !show_prompt + 1;
-           if !show_prompt = 2 then begin
-             Format.printf "%s@?" !prompt;
-             show_prompt := 0;
+           if !print_prompt then begin
+             prompt_delay := !prompt_delay + 1;
+             if !prompt_delay = 2 then begin
+               Format.printf "%s@?" !prompt;
+               prompt_delay := 0;
+               print_prompt := false;
+             end
            end;
            (* attempt to run the first timeout handler *)
            (let time = Unix.gettimeofday () in
@@ -92,7 +96,7 @@ module Unix_scheduler = struct
                  | [_] ->
                     let n = Unix.read Unix.stdin buf 0 256 in
                     interp (Bytes.sub_string buf 0 (n-1));
-                    show_prompt := 0
+                    print_prompt := true
                  | [] -> () (* nothing read *)
                  | _ -> assert false);
          done
@@ -109,16 +113,17 @@ end
 open Why3
 open Format
 
+(* files of the current task *)
 let files = Queue.create ()
 
-let spec = Arg.align [
-]
+let spec = Arg.align []
 
+(* --help *)
 let usage_str = Format.sprintf
   "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
   (Filename.basename Sys.argv.(0))
 
-
+(* build command line *)
 let config, base_config, _env =
   Why3.Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
 
@@ -130,10 +135,25 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
+(* -- declare provers -- *)
+
+(* One prover named Alt-Ergo in the config file *)
+let alt_ergo =
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  (** all provers that have the name "Alt-Ergo" *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
+    eprintf "Prover Alt-Ergo not installed or not configured@.";
+    exit 0
+  end else
+    snd (Whyconf.Mprover.choose provers)
+
+(* -- init controller -- *)
 
 module C = Why3.Controller_itp.Make(Unix_scheduler)
 
-let cont =
+let cont_init () =
+  (* create controller *)
   if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
   let fname = Queue.pop files in
   let ses =
@@ -146,33 +166,26 @@ let cont =
       end
   in
   let c = Controller_itp.create_controller env ses in
+  (* add files to controller *)
   Queue.iter (fun fname -> C.add_file c fname) files;
-  c
-
-(* loading the drivers *)
-let () =
+  (* load provers drivers *)
   Whyconf.Mprover.iter
     (fun _ p ->
-      try
-        let d = Driver.load_driver env p.Whyconf.driver [] in
-        Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
-      with e ->
-        let p = p.Whyconf.prover in
-        eprintf "Failed to load driver for %s %s: %a@."
-          p.Whyconf.prover_name p.Whyconf.prover_version
-          Exn_printer.exn_printer e)
-    provers
+       try
+         let d = Driver.load_driver env p.Whyconf.driver [] in
+         Whyconf.Hprover.add c.Controller_itp.controller_provers p.Whyconf.prover (p,d)
+       with e ->
+         let p = p.Whyconf.prover in
+         eprintf "Failed to load driver for %s %s: %a@."
+           p.Whyconf.prover_name p.Whyconf.prover_version
+           Exn_printer.exn_printer e)
+    provers;
+  (* return the controller *)
+  c
 
-(* One prover named Alt-Ergo in the config file *)
-let alt_ergo =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-  (** all provers that have the name "Alt-Ergo" *)
-  let provers = Whyconf.filter_provers config fp in
-  if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
-  end else
-    snd (Whyconf.Mprover.choose provers)
+let cont = cont_init ()
+
+(* --  -- *)
 
 let test_idle fmt _args =
   Unix_scheduler.idle
@@ -214,8 +227,10 @@ let list_transforms _fmt _args =
 
 open Controller_itp
 open Session_itp
+
 (* _____________________________________________________________________ *)
 (* -------------------- zipper ----------------------------------------- *)
+
 type proof_hole =
     Th of theory list * theory * theory list |
     Pn of proofNodeID list * proofNodeID * proofNodeID list |
@@ -247,7 +262,6 @@ let zipper_init () =
   | th :: tail -> zipper.cursor <- (Th ([], th, tail));
       while not (Stack.is_empty zipper.ctxt) do ignore (Stack.pop zipper.ctxt) done
   | _ -> assert false
-
 
 let zipper_down () =
   match zipper.cursor with
@@ -482,6 +496,7 @@ let test_save_session _fmt args =
 let test_reload fmt _args =
   fprintf fmt "Reloading... @?";
   C.reload_files cont;
+  zipper_init ();
   fprintf fmt "done @."
 
 let test_transform_and_display fmt args =
